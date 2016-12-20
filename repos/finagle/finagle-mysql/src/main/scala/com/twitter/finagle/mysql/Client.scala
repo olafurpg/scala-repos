@@ -24,8 +24,9 @@ object Client {
     * and the finagle-mysql netty pipeline.
     * @param statsReceiver collects finagle stats scoped to "mysql"
     */
-  @deprecated("Use the com.twitter.finagle.exp.Mysql object to build a client",
-              "6.6.2")
+  @deprecated(
+    "Use the com.twitter.finagle.exp.Mysql object to build a client",
+    "6.6.2")
   def apply(
       host: String,
       username: String,

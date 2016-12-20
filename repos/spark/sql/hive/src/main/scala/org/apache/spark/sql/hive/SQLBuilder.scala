@@ -52,8 +52,9 @@ case class SubqueryHolder(query: String)
   */
 class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
     extends Logging {
-  require(logicalPlan.resolved,
-          "SQLBuilder only supports resolved logical query plans")
+  require(
+    logicalPlan.resolved,
+    "SQLBuilder only supports resolved logical query plans")
 
   def this(df: DataFrame) = this(df.queryExecution.analyzed, df.sqlContext)
 
@@ -165,11 +166,12 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
     case p: SubqueryAlias => build("(" + toSQL(p.child) + ")", "AS", p.alias)
 
     case p: Join =>
-      build(toSQL(p.left),
-            p.joinType.sql,
-            "JOIN",
-            toSQL(p.right),
-            p.condition.map(" ON " + _.sql).getOrElse(""))
+      build(
+        toSQL(p.left),
+        p.joinType.sql,
+        "JOIN",
+        toSQL(p.right),
+        p.condition.map(" ON " + _.sql).getOrElse(""))
 
     case SQLTable(database, table, _, sample) =>
       val qualifiedName =
@@ -185,9 +187,10 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
 
     case Sort(orders, _, RepartitionByExpression(partitionExprs, child, _))
         if orders.map(_.child) == partitionExprs =>
-      build(toSQL(child),
-            "CLUSTER BY",
-            partitionExprs.map(_.sql).mkString(", "))
+      build(
+        toSQL(child),
+        "CLUSTER BY",
+        partitionExprs.map(_.sql).mkString(", "))
 
     case p: Sort =>
       build(
@@ -366,11 +369,13 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
           case ar: AttributeReference if ar == gid => GroupingID(Nil)
           case ar: AttributeReference if groupByAttrMap.contains(ar) =>
             groupByAttrMap(ar)
-          case a @ Cast(BitwiseAnd(ShiftRight(ar: AttributeReference,
-                                              Literal(value: Any,
-                                                      IntegerType)),
-                                   Literal(1, IntegerType)),
-                        ByteType) if ar == gid =>
+          case a @ Cast(
+                BitwiseAnd(
+                  ShiftRight(
+                    ar: AttributeReference,
+                    Literal(value: Any, IntegerType)),
+                  Literal(1, IntegerType)),
+                ByteType) if ar == gid =>
             // for converting an expression to its original SQL format grouping(col)
             val idx = groupByExprs.length - 1 - value.asInstanceOf[Int]
             groupByExprs.lift(idx).map(Grouping).getOrElse(a)
@@ -411,19 +416,20 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
 
   object Canonicalizer extends RuleExecutor[LogicalPlan] {
     override protected def batches: Seq[Batch] = Seq(
-      Batch("Prepare",
-            FixedPoint(100),
-            // The `WidenSetOperationTypes` analysis rule may introduce extra `Project`s over
-            // `Aggregate`s to perform type casting.  This rule merges these `Project`s into
-            // `Aggregate`s.
-            CollapseProject,
-            // Parser is unable to parse the following query:
-            // SELECT  `u_1`.`id`
-            // FROM (((SELECT  `t0`.`id` FROM `default`.`t0`)
-            // UNION ALL (SELECT  `t0`.`id` FROM `default`.`t0`))
-            // UNION ALL (SELECT  `t0`.`id` FROM `default`.`t0`)) AS u_1
-            // This rule combine adjacent Unions together so we can generate flat UNION ALL SQL string.
-            CombineUnions),
+      Batch(
+        "Prepare",
+        FixedPoint(100),
+        // The `WidenSetOperationTypes` analysis rule may introduce extra `Project`s over
+        // `Aggregate`s to perform type casting.  This rule merges these `Project`s into
+        // `Aggregate`s.
+        CollapseProject,
+        // Parser is unable to parse the following query:
+        // SELECT  `u_1`.`id`
+        // FROM (((SELECT  `t0`.`id` FROM `default`.`t0`)
+        // UNION ALL (SELECT  `t0`.`id` FROM `default`.`t0`))
+        // UNION ALL (SELECT  `t0`.`id` FROM `default`.`t0`)) AS u_1
+        // This rule combine adjacent Unions together so we can generate flat UNION ALL SQL string.
+        CombineUnions),
       Batch(
         "Recover Scoping Info",
         Once,
@@ -456,8 +462,9 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
               exprId = a.exprId,
               qualifiers = Nil)
           case a: Alias =>
-            Alias(a.child, normalizedName(a))(exprId = a.exprId,
-                                              qualifiers = Nil)
+            Alias(a.child, normalizedName(a))(
+              exprId = a.exprId,
+              qualifiers = Nil)
         }
     }
 
@@ -514,8 +521,9 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
         case w: Window => w.copy(child = addSubqueryIfNeeded(w.child))
 
         case j: Join =>
-          j.copy(left = addSubqueryIfNeeded(j.left),
-                 right = addSubqueryIfNeeded(j.right))
+          j.copy(
+            left = addSubqueryIfNeeded(j.left),
+            right = addSubqueryIfNeeded(j.right))
 
         // A special case for Generate. When we put UDTF in project list, followed by WHERE, e.g.
         // SELECT EXPLODE(arr) FROM tbl WHERE id > 1, the Filter operator will be under Generate
@@ -559,16 +567,18 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
 
   object ExtractSQLTable {
     def unapply(plan: LogicalPlan): Option[SQLTable] = plan match {
-      case l @ LogicalRelation(_,
-                               _,
-                               Some(TableIdentifier(table, Some(database)))) =>
+      case l @ LogicalRelation(
+            _,
+            _,
+            Some(TableIdentifier(table, Some(database)))) =>
         Some(SQLTable(database, table, l.output.map(_.withQualifiers(Nil))))
 
       case m: MetastoreRelation =>
         Some(
-          SQLTable(m.databaseName,
-                   m.tableName,
-                   m.output.map(_.withQualifiers(Nil))))
+          SQLTable(
+            m.databaseName,
+            m.tableName,
+            m.output.map(_.withQualifiers(Nil))))
 
       case _ => None
     }

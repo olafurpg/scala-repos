@@ -37,8 +37,9 @@ class FourierTrTest extends FunSuite {
     val dm = test16.asDenseMatrix.t
     assert(dm.cols === 1)
     val transformed = fourierTr(dm(::, *))
-    assert(norm(transformed(::, 0) - test16fftC) < testNormThreshold,
-           s"$transformed $test16fftC")
+    assert(
+      norm(transformed(::, 0) - test16fftC) < testNormThreshold,
+      s"$transformed $test16fftC")
   }
 
   test("fft 2D of DenseMatrix[Complex]") {
@@ -65,22 +66,23 @@ class FourierTrTest extends FunSuite {
 
   val testNormThreshold = 1E-12
 
-  val test16 = DenseVector[Double](0.814723686393179,
-                                   0.905791937075619,
-                                   0.126986816293506,
-                                   0.913375856139019,
-                                   0.63235924622541,
-                                   0.0975404049994095,
-                                   0.278498218867048,
-                                   0.546881519204984,
-                                   0.957506835434298,
-                                   0.964888535199277,
-                                   0.157613081677548,
-                                   0.970592781760616,
-                                   0.957166948242946,
-                                   0.485375648722841,
-                                   0.8002804688888,
-                                   0.141886338627215)
+  val test16 = DenseVector[Double](
+    0.814723686393179,
+    0.905791937075619,
+    0.126986816293506,
+    0.913375856139019,
+    0.63235924622541,
+    0.0975404049994095,
+    0.278498218867048,
+    0.546881519204984,
+    0.957506835434298,
+    0.964888535199277,
+    0.157613081677548,
+    0.970592781760616,
+    0.957166948242946,
+    0.485375648722841,
+    0.8002804688888,
+    0.141886338627215)
 
   val test16C = DenseVector[Complex](
     Complex(0.814723686393179, 0),

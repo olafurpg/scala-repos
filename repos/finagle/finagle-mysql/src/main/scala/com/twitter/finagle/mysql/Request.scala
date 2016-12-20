@@ -90,8 +90,9 @@ case class QueryRequest(sqlStatement: String)
   * [[http://dev.mysql.com/doc/internals/en/com-stmt-prepare.html]]
   */
 case class PrepareRequest(sqlStatement: String)
-    extends SimpleCommandRequest(Command.COM_STMT_PREPARE,
-                                 sqlStatement.getBytes)
+    extends SimpleCommandRequest(
+      Command.COM_STMT_PREPARE,
+      sqlStatement.getBytes)
 
 /**
   * Client response sent during connection phase.
@@ -235,11 +236,12 @@ class ExecuteRequest(
       if (hasNewParams) {
         val types = BufferWriter(new Array[Byte](params.size * 2))
         params foreach { writeTypeCode(_, types) }
-        Buffer(bw,
-               Buffer(nullBitmap),
-               Buffer(Array(newParamsBound)),
-               types,
-               values)
+        Buffer(
+          bw,
+          Buffer(nullBitmap),
+          Buffer(Array(newParamsBound)),
+          types,
+          values)
       } else {
         Buffer(bw, Buffer(nullBitmap), Buffer(Array(newParamsBound)), values)
       }

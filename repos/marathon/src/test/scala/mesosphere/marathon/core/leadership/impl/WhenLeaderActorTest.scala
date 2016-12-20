@@ -45,8 +45,8 @@ class WhenLeaderActorTest extends MarathonSpec {
     val probe = TestProbe()
     val ref = whenLeaderRef()
     ref.underlying.become(
-      ref.underlyingActor.starting(coordinatorRef = probe.ref,
-                                   childRef = childProbe.ref))
+      ref.underlyingActor
+        .starting(coordinatorRef = probe.ref, childRef = childProbe.ref))
     probe.send(ref, WhenLeaderActor.Stop)
     val failure = probe.expectMsgClass(classOf[Status.Failure])
     assert(failure.cause.getMessage.contains("starting aborted due to stop"))
@@ -68,8 +68,8 @@ class WhenLeaderActorTest extends MarathonSpec {
     val dyingProbe = TestProbe()
 
     ref.underlying.become(
-      ref.underlyingActor.dying(stopAckRef = probe.ref,
-                                childRef = dyingProbe.ref))
+      ref.underlyingActor
+        .dying(stopAckRef = probe.ref, childRef = dyingProbe.ref))
     ref.underlying.watch(dyingProbe.ref)
 
     val stashMeThenFail: String = "Stash me, then respond with fail"

@@ -41,8 +41,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class Point2DSpec
-    extends SimpleSFXDelegateSpec[jfxg.Point2D, Point2D](classOf[jfxg.Point2D],
-                                                         classOf[Point2D]) {
+    extends SimpleSFXDelegateSpec[jfxg.Point2D, Point2D](
+      classOf[jfxg.Point2D],
+      classOf[Point2D]) {
 
   override protected def getScalaClassInstance = new Point2D(0, 0)
 

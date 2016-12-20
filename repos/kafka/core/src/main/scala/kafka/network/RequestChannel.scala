@@ -121,8 +121,8 @@ object RequestChannel extends Logging {
     }
 
     trace(
-      "Processor %d received request : %s".format(processor,
-                                                  requestDesc(true)))
+      "Processor %d received request : %s"
+        .format(processor, requestDesc(true)))
 
     def updateRequestMetrics() {
       val endTimeMs = SystemTime.milliseconds
@@ -173,29 +173,31 @@ object RequestChannel extends Logging {
       if (requestLogger.isTraceEnabled)
         requestLogger.trace(
           "Completed request:%s from connection %s;totalTime:%d,requestQueueTime:%d,localTime:%d,remoteTime:%d,responseQueueTime:%d,sendTime:%d,securityProtocol:%s,principal:%s"
-            .format(requestDesc(true),
-                    connectionId,
-                    totalTime,
-                    requestQueueTime,
-                    apiLocalTime,
-                    apiRemoteTime,
-                    responseQueueTime,
-                    responseSendTime,
-                    securityProtocol,
-                    session.principal))
+            .format(
+              requestDesc(true),
+              connectionId,
+              totalTime,
+              requestQueueTime,
+              apiLocalTime,
+              apiRemoteTime,
+              responseQueueTime,
+              responseSendTime,
+              securityProtocol,
+              session.principal))
       else if (requestLogger.isDebugEnabled)
         requestLogger.debug(
           "Completed request:%s from connection %s;totalTime:%d,requestQueueTime:%d,localTime:%d,remoteTime:%d,responseQueueTime:%d,sendTime:%d,securityProtocol:%s,principal:%s"
-            .format(requestDesc(false),
-                    connectionId,
-                    totalTime,
-                    requestQueueTime,
-                    apiLocalTime,
-                    apiRemoteTime,
-                    responseQueueTime,
-                    responseSendTime,
-                    securityProtocol,
-                    session.principal))
+            .format(
+              requestDesc(false),
+              connectionId,
+              totalTime,
+              requestQueueTime,
+              apiLocalTime,
+              apiRemoteTime,
+              responseQueueTime,
+              responseSendTime,
+              securityProtocol,
+              session.principal))
     }
   }
 
@@ -206,10 +208,11 @@ object RequestChannel extends Logging {
     request.responseCompleteTimeMs = SystemTime.milliseconds
 
     def this(processor: Int, request: Request, responseSend: Send) =
-      this(processor,
-           request,
-           responseSend,
-           if (responseSend == null) NoOpAction else SendAction)
+      this(
+        processor,
+        request,
+        responseSend,
+        if (responseSend == null) NoOpAction else SendAction)
 
     def this(request: Request, send: Send) =
       this(request.processor, request, send)
@@ -264,20 +267,22 @@ class RequestChannel(val numProcessors: Int, val queueSize: Int)
   /** No operation to take for the request, need to read more over the network */
   def noOperation(processor: Int, request: RequestChannel.Request) {
     responseQueues(processor).put(
-      new RequestChannel.Response(processor,
-                                  request,
-                                  null,
-                                  RequestChannel.NoOpAction))
+      new RequestChannel.Response(
+        processor,
+        request,
+        null,
+        RequestChannel.NoOpAction))
     for (onResponse <- responseListeners) onResponse(processor)
   }
 
   /** Close the connection for the request */
   def closeConnection(processor: Int, request: RequestChannel.Request) {
     responseQueues(processor).put(
-      new RequestChannel.Response(processor,
-                                  request,
-                                  null,
-                                  RequestChannel.CloseConnectionAction))
+      new RequestChannel.Response(
+        processor,
+        request,
+        null,
+        RequestChannel.CloseConnectionAction))
     for (onResponse <- responseListeners) onResponse(processor)
   }
 
@@ -310,8 +315,9 @@ object RequestMetrics {
   val metricsMap = new scala.collection.mutable.HashMap[String, RequestMetrics]
   val consumerFetchMetricName = ApiKeys.FETCH.name + "Consumer"
   val followFetchMetricName = ApiKeys.FETCH.name + "Follower"
-  (ApiKeys.values().toList.map(e => e.name) ++ List(consumerFetchMetricName,
-                                                    followFetchMetricName))
+  (ApiKeys.values().toList.map(e => e.name) ++ List(
+    consumerFetchMetricName,
+    followFetchMetricName))
     .foreach(name => metricsMap.put(name, new RequestMetrics(name)))
 }
 

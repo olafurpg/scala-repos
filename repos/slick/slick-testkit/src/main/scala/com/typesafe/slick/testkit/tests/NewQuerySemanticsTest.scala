@@ -549,15 +549,16 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
         c2 <- as
       } yield (c.id, c2.a)
       r2 <- q2.result.named("q2").map(_.toSet)
-      _ = r2 shouldBe Set((1, "a1"),
-                          (1, "a2"),
-                          (1, "a3"),
-                          (2, "a1"),
-                          (2, "a2"),
-                          (2, "a3"),
-                          (3, "a1"),
-                          (3, "a2"),
-                          (3, "a3"))
+      _ = r2 shouldBe Set(
+        (1, "a1"),
+        (1, "a2"),
+        (1, "a3"),
+        (2, "a1"),
+        (2, "a2"),
+        (2, "a3"),
+        (3, "a1"),
+        (3, "a2"),
+        (3, "a3"))
     } yield ()
   }
 
@@ -680,9 +681,10 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
       _ <- mark("q5b", q5b.result).map(_ shouldBe Set(2, 3))
       _ <- mark("q5c", q5c.result).map(_ shouldBe Set(2, 3))
       _ <- mark("q6", q6.result).map(
-        _.toSet shouldBe Set((("c", "b"), 3, 3, 3, Some(3), 3),
-                             (("a", "a"), 3, 3, 3, Some(1), 3),
-                             (("a", "b"), 3, 3, 3, Some(2), 3)))
+        _.toSet shouldBe Set(
+          (("c", "b"), 3, 3, 3, Some(3), 3),
+          (("a", "a"), 3, 3, 3, Some(1), 3),
+          (("a", "b"), 3, 3, 3, Some(2), 3)))
       _ <- mark("q7", q7.result).map(_.toSet shouldBe Set(1, 2))
       _ <- mark("q8", q8.result).map(_ shouldBe Seq("c", "a", "a"))
       _ <- mark("q9a", q9a.result).map(_ shouldBe Seq(3, 1, 2))
@@ -704,13 +706,15 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
         mark("q17", q17.result).map(_ shouldBe Seq((1, 0), (2, 1))))
       _ <- mark("q18", q18.result).map(_ shouldBe Seq(Some((3, "c", "b"))))
       _ <- mark("q19", q19.result).map(
-        _.toSet shouldBe Set(Some((1, "a", "a")),
-                             Some((2, "a", "b")),
-                             Some((3, "c", "b"))))
+        _.toSet shouldBe Set(
+          Some((1, "a", "a")),
+          Some((2, "a", "b")),
+          Some((3, "c", "b"))))
       _ <- mark("q19b", q19b.result).map(
-        _.toSet shouldBe Set(Some((1, "a", "a")),
-                             Some((2, "a", "b")),
-                             Some((3, "c", "b"))))
+        _.toSet shouldBe Set(
+          Some((1, "a", "a")),
+          Some((2, "a", "b")),
+          Some((3, "c", "b"))))
     } yield ()
   }
 }

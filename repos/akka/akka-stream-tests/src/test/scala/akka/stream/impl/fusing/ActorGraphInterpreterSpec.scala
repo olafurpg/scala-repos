@@ -30,13 +30,14 @@ class ActorGraphInterpreterSpec extends AkkaSpec {
     "be able to reuse a simple identity graph stage" in assertAllStagesStopped {
       val identity = GraphStages.identity[Int]
 
-      Await.result(Source(1 to 100)
-                     .via(identity)
-                     .via(identity)
-                     .via(identity)
-                     .grouped(200)
-                     .runWith(Sink.head),
-                   3.seconds) should ===(1 to 100)
+      Await.result(
+        Source(1 to 100)
+          .via(identity)
+          .via(identity)
+          .via(identity)
+          .grouped(200)
+          .runWith(Sink.head),
+        3.seconds) should ===(1 to 100)
     }
 
     "be able to interpret a simple bidi stage" in assertAllStagesStopped {
@@ -268,10 +269,12 @@ class ActorGraphInterpreterSpec extends AkkaSpec {
           }
       }
 
-      EventFilter[IllegalArgumentException](pattern = "Error in stage.*",
-                                            occurrences = 1).intercept {
-        Await.result(Source.fromGraph(failyStage).runWith(Sink.ignore),
-                     3.seconds)
+      EventFilter[IllegalArgumentException](
+        pattern = "Error in stage.*",
+        occurrences = 1).intercept {
+        Await.result(
+          Source.fromGraph(failyStage).runWith(Sink.ignore),
+          3.seconds)
       }
     }
 
@@ -302,9 +305,10 @@ class ActorGraphInterpreterSpec extends AkkaSpec {
 
       val failyStage = new GraphStage[FanOutShape2[Int, Int, Int]] {
         override val shape: FanOutShape2[Int, Int, Int] =
-          new FanOutShape2(Inlet[Int]("test.in"),
-                           Outlet[Int]("test.out0"),
-                           Outlet[Int]("test.out1"))
+          new FanOutShape2(
+            Inlet[Int]("test.in"),
+            Outlet[Int]("test.out0"),
+            Outlet[Int]("test.out1"))
 
         override def createLogic(
             inheritedAttributes: Attributes): GraphStageLogic =

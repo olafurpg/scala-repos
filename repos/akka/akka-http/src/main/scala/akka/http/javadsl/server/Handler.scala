@@ -29,7 +29,8 @@ trait Handler
   * A handler MUST NOT return `null` as the result.
   */
 trait AsyncHandler
-    extends akka.japi.function.Function[RequestContext,
-                                        CompletionStage[RouteResult]] {
+    extends akka.japi.function.Function[
+      RequestContext,
+      CompletionStage[RouteResult]] {
   override def apply(ctx: RequestContext): CompletionStage[RouteResult]
 }

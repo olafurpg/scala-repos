@@ -66,15 +66,17 @@ class MainGenericRunner {
     val jsConsole = new ScalaConsoleJSConsole
     val semantics = readSemantics()
     val ir =
-      (loadIR(command.settings.classpathURLs) :+ runnerIR(command.thingToRun,
-                                                          command.arguments))
+      (loadIR(command.settings.classpathURLs) :+ runnerIR(
+        command.thingToRun,
+        command.arguments))
 
     val jsRunner = new MemVirtualJSFile("launcher.js")
       .withContent(s"PartestLauncher().launch();")
 
-    val linker = Linker(semantics,
-                        withSourceMap = false,
-                        useClosureCompiler = optMode == FullOpt)
+    val linker = Linker(
+      semantics,
+      withSourceMap = false,
+      useClosureCompiler = optMode == FullOpt)
 
     val libJSEnv = {
       /* Historically, we used Rhino in NoOpt and NodeJS in FastOpt and FullOpt.
@@ -129,10 +131,12 @@ class MainGenericRunner {
             Nil,
             AnyType,
             Block(
-              Apply(LoadModule(ClassType(mainModuleClassName)),
-                    Ident("main__AT__V"),
-                    List(ArrayValue(ArrayType("T", 1),
-                                    args.map(StringLiteral(_)))))(NoType),
+              Apply(
+                LoadModule(ClassType(mainModuleClassName)),
+                Ident("main__AT__V"),
+                List(
+                  ArrayValue(ArrayType("T", 1), args.map(StringLiteral(_)))))(
+                NoType),
               Undefined()
             )
           )(OptimizerHints.empty, None),

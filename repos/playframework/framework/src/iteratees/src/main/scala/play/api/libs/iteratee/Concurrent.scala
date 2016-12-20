@@ -265,9 +265,10 @@ object Concurrent {
             Iteratee.flatten(
               Future
                 .firstCompletedOf(
-                  it.unflatten.map(Left(_))(dec) :: timeoutFuture(Right(()),
-                                                                  timeout,
-                                                                  unit) :: Nil
+                  it.unflatten.map(Left(_))(dec) :: timeoutFuture(
+                    Right(()),
+                    timeout,
+                    unit) :: Nil
                 )(dec)
                 .map {
                   case Left(Step.Cont(k)) => Cont(step(k(other)))

@@ -134,10 +134,11 @@ class ScalaFindUsagesHandler(element: PsiElement,
           }
           a.map(
             role =>
-              t.getTypedDefinitionWrapper(isStatic = false,
-                                          isInterface = false,
-                                          role = role,
-                                          cClass = None))
+              t.getTypedDefinitionWrapper(
+                isStatic = false,
+                isInterface = false,
+                role = role,
+                cClass = None))
         }
       case _ => Array.empty
     }
@@ -149,13 +150,14 @@ class ScalaFindUsagesHandler(element: PsiElement,
       mustOpenInNewTab: Boolean): AbstractFindUsagesDialog = {
     element match {
       case t: ScTypeDefinition =>
-        new ScalaTypeDefinitionUsagesDialog(t,
-                                            getProject,
-                                            getFindUsagesOptions,
-                                            toShowInNewTab,
-                                            mustOpenInNewTab,
-                                            isSingleFile,
-                                            this)
+        new ScalaTypeDefinitionUsagesDialog(
+          t,
+          getProject,
+          getFindUsagesOptions,
+          toShowInNewTab,
+          mustOpenInNewTab,
+          isSingleFile,
+          this)
       case _ =>
         super
           .getFindUsagesDialog(isSingleFile, toShowInNewTab, mustOpenInNewTab)
@@ -254,8 +256,9 @@ class ScalaFindUsagesHandler(element: PsiElement,
     inReadAction {
       element match {
         case function: ScFunction if !function.isLocal =>
-          for (elem <- ScalaOverridingMemberSearcher.search(function,
-                                                            deep = true)) {
+          for (elem <- ScalaOverridingMemberSearcher.search(
+                 function,
+                 deep = true)) {
             val processed =
               super.processElementUsages(elem, processor, options)
             if (!processed) return false

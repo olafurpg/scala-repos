@@ -66,10 +66,11 @@ private[akka] class CachingConfig(_config: Config) extends Config {
                 emptyPathEntry
               case Success(v) ⇒
                 if (v.valueType() == ConfigValueType.STRING)
-                  StringPathEntry(true,
-                                  true,
-                                  v.atKey("cached"),
-                                  v.unwrapped().asInstanceOf[String])
+                  StringPathEntry(
+                    true,
+                    true,
+                    v.atKey("cached"),
+                    v.unwrapped().asInstanceOf[String])
                 else ValuePathEntry(true, true, v.atKey("cached"))
             }
         }

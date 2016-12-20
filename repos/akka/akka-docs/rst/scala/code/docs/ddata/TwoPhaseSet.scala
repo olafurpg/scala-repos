@@ -21,7 +21,8 @@ case class TwoPhaseSet(adds: GSet[String] = GSet.empty,
   def elements: Set[String] = adds.elements -- removals.elements
 
   override def merge(that: TwoPhaseSet): TwoPhaseSet =
-    copy(adds = this.adds.merge(that.adds),
-         removals = this.removals.merge(that.removals))
+    copy(
+      adds = this.adds.merge(that.adds),
+      removals = this.removals.merge(that.removals))
 }
 //#twophaseset

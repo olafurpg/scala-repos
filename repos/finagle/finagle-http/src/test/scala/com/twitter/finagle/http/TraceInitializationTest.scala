@@ -39,16 +39,17 @@ class TraceInitializationTest extends FunSuite {
 
     assertAnnotationsInOrder(
       tracer.toSeq,
-      Seq(Annotation.Rpc("GET"),
-          Annotation.BinaryAnnotation("http.uri", "/this/is/a/uri/path"),
-          Annotation.ServiceName("theClient"),
-          Annotation.ClientSend(),
-          Annotation.Rpc("GET"),
-          Annotation.BinaryAnnotation("http.uri", "/this/is/a/uri/path"),
-          Annotation.ServiceName("theServer"),
-          Annotation.ServerRecv(),
-          Annotation.ServerSend(),
-          Annotation.ClientRecv()))
+      Seq(
+        Annotation.Rpc("GET"),
+        Annotation.BinaryAnnotation("http.uri", "/this/is/a/uri/path"),
+        Annotation.ServiceName("theClient"),
+        Annotation.ClientSend(),
+        Annotation.Rpc("GET"),
+        Annotation.BinaryAnnotation("http.uri", "/this/is/a/uri/path"),
+        Annotation.ServiceName("theServer"),
+        Annotation.ServerRecv(),
+        Annotation.ServerSend(),
+        Annotation.ClientRecv()))
 
     assert(tracer.map(_.traceId).toSet.size == 1)
   }

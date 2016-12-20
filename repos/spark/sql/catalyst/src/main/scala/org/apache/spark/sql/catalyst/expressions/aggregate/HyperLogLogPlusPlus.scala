@@ -56,17 +56,19 @@ case class HyperLogLogPlusPlus(child: Expression,
   import HyperLogLogPlusPlus._
 
   def this(child: Expression) = {
-    this(child = child,
-         relativeSD = 0.05,
-         mutableAggBufferOffset = 0,
-         inputAggBufferOffset = 0)
+    this(
+      child = child,
+      relativeSD = 0.05,
+      mutableAggBufferOffset = 0,
+      inputAggBufferOffset = 0)
   }
 
   def this(child: Expression, relativeSD: Expression) = {
-    this(child = child,
-         relativeSD = HyperLogLogPlusPlus.validateDoubleLiteral(relativeSD),
-         mutableAggBufferOffset = 0,
-         inputAggBufferOffset = 0)
+    this(
+      child = child,
+      relativeSD = HyperLogLogPlusPlus.validateDoubleLiteral(relativeSD),
+      mutableAggBufferOffset = 0,
+      inputAggBufferOffset = 0)
   }
 
   override def prettyName: String = "approx_count_distinct"
@@ -93,9 +95,10 @@ case class HyperLogLogPlusPlus(child: Expression,
   private[this] val p =
     Math.ceil(2.0d * Math.log(1.106d / relativeSD) / Math.log(2.0d)).toInt
 
-  require(p >= 4,
-          "HLL++ requires at least 4 bits for addressing. " +
-            "Use a lower error, at most 27%.")
+  require(
+    p >= 4,
+    "HLL++ requires at least 4 bits for addressing. " +
+      "Use a lower error, at most 27%.")
 
   /**
     * Shift used to extract the index of the register from the hashed value.
@@ -195,8 +198,9 @@ case class HyperLogLogPlusPlus(child: Expression,
 
       // Assign the maximum number of leading zeros to the register.
       if (pw > Midx) {
-        buffer.setLong(mutableAggBufferOffset + wordOffset,
-                       (word & ~mask) | (pw << shift))
+        buffer.setLong(
+          mutableAggBufferOffset + wordOffset,
+          (word & ~mask) | (pw << shift))
       }
     }
   }
@@ -382,21 +386,22 @@ object HyperLogLogPlusPlus {
   /**
     * Thresholds which decide if the linear counting or the regular algorithm is used.
     */
-  val THRESHOLDS = Array[Double](10,
-                                 20,
-                                 40,
-                                 80,
-                                 220,
-                                 400,
-                                 900,
-                                 1800,
-                                 3100,
-                                 6500,
-                                 15500,
-                                 20000,
-                                 50000,
-                                 120000,
-                                 350000)
+  val THRESHOLDS = Array[Double](
+    10,
+    20,
+    40,
+    80,
+    220,
+    400,
+    900,
+    1800,
+    3100,
+    6500,
+    15500,
+    20000,
+    50000,
+    120000,
+    350000)
 
   /**
     * Lookup table used to find the (index of the) bias correction for a given precision (exact)

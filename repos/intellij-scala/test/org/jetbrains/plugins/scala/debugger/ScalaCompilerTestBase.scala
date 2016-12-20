@@ -188,9 +188,10 @@ abstract class ScalaCompilerTestBase extends ModuleTestCase with ScalaVersion {
   }
 
   protected def addFileToProject(relativePath: String, text: String) {
-    VfsTestUtil.createFile(getSourceRootDir,
-                           relativePath,
-                           StringUtil.convertLineSeparators(text))
+    VfsTestUtil.createFile(
+      getSourceRootDir,
+      relativePath,
+      StringUtil.convertLineSeparators(text))
   }
 
   protected def getSourceRootDir: VirtualFile = {

@@ -635,9 +635,10 @@ trait ScalatraBase
   protected def addRoute(method: HttpMethod,
                          transformers: Seq[RouteTransformer],
                          action: => Any): Route = {
-    val route = Route(transformers,
-                      () => action,
-                      (req: HttpServletRequest) => routeBasePath(req))
+    val route = Route(
+      transformers,
+      () => action,
+      (req: HttpServletRequest) => routeBasePath(req))
     routes.prependRoute(method, route)
     route
   }
@@ -657,9 +658,10 @@ trait ScalatraBase
   }
 
   protected[scalatra] def addStatusRoute(codes: Range, action: => Any): Unit = {
-    val route = Route(Seq.empty,
-                      () => action,
-                      (req: HttpServletRequest) => routeBasePath(req))
+    val route = Route(
+      Seq.empty,
+      () => action,
+      (req: HttpServletRequest) => routeBasePath(req))
     routes.addStatusRoute(codes, route)
   }
 
@@ -690,11 +692,12 @@ trait ScalatraBase
                   includeServletPath: Boolean = true)(
       implicit request: HttpServletRequest,
       response: HttpServletResponse): String = {
-    url(path,
-        params,
-        includeContextPath,
-        includeServletPath,
-        absolutize = false)
+    url(
+      path,
+      params,
+      includeContextPath,
+      includeServletPath,
+      absolutize = false)
   }
 
   /**
@@ -814,11 +817,12 @@ trait ScalatraBase
       response: HttpServletResponse): String = {
     if (path.startsWith("http")) path
     else {
-      val p = url(path,
-                  params,
-                  includeContextPath,
-                  includeServletPath,
-                  withSessionId)
+      val p = url(
+        path,
+        params,
+        includeContextPath,
+        includeServletPath,
+        withSessionId)
       if (p.startsWith("http")) p else buildBaseUrl + ensureSlash(p)
     }
   }

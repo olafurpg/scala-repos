@@ -35,9 +35,10 @@ class ScalaVariableOfTypeMacro extends Macro {
   override def calculateLookupItems(
       exprs: Array[Expression],
       context: ExpressionContext): Array[LookupElement] = {
-    calculateLookupItems(exprs.map(_.calculateResult(context).toString),
-                         context,
-                         showOne = false)
+    calculateLookupItems(
+      exprs.map(_.calculateResult(context).toString),
+      context,
+      showOne = false)
   }
   def calculateLookupItems(exprs: Array[String],
                            context: ExpressionContext,
@@ -73,12 +74,13 @@ class ScalaVariableOfTypeMacro extends Macro {
           variant.getElement match {
             case typed: ScTypedDefinition =>
               for (t <- typed.getType(TypingContext.empty))
-                addLookupItems(exprs,
-                               context,
-                               variant,
-                               t,
-                               file.getProject,
-                               array)
+                addLookupItems(
+                  exprs,
+                  context,
+                  variant,
+                  t,
+                  file.getProject,
+                  array)
             case _ =>
           }
         }
@@ -194,14 +196,16 @@ class ScalaVariableOfTypeMacro extends Macro {
         array += item
       case ScalaVariableOfTypeMacro.iterableId
           if scType.canonicalText.startsWith("_root_.scala.Array") =>
-        array += LookupElementBuilder.create(variant.getElement,
-                                             variant.getElement.name)
+        array += LookupElementBuilder.create(
+          variant.getElement,
+          variant.getElement.name)
       case ScalaVariableOfTypeMacro.iterableId =>
         ScType.extractClass(scType) match {
           case Some(x: ScTypeDefinition)
               if x.functionsByName("foreach").nonEmpty =>
-            array += LookupElementBuilder.create(variant.getElement,
-                                                 variant.getElement.name)
+            array += LookupElementBuilder.create(
+              variant.getElement,
+              variant.getElement.name)
           case _ =>
         }
       case _ =>
@@ -210,8 +214,9 @@ class ScalaVariableOfTypeMacro extends Macro {
                 case Some(x) => x.qualifiedName
                 case None => ""
               }) == expr)
-            array += LookupElementBuilder.create(variant.getElement,
-                                                 variant.getElement.name)
+            array += LookupElementBuilder.create(
+              variant.getElement,
+              variant.getElement.name)
         }
     }
   }

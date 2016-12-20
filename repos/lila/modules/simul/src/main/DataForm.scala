@@ -36,15 +36,16 @@ final class DataForm {
         "clockExtra" -> numberIn(clockExtraChoices),
         "variants" -> list {
           number.verifying(
-            Set(chess.variant.Standard.id,
-                chess.variant.Chess960.id,
-                chess.variant.KingOfTheHill.id,
-                chess.variant.ThreeCheck.id,
-                chess.variant.Antichess.id,
-                chess.variant.Atomic.id,
-                chess.variant.Horde.id,
-                chess.variant.RacingKings.id,
-                chess.variant.Crazyhouse.id) contains _)
+            Set(
+              chess.variant.Standard.id,
+              chess.variant.Chess960.id,
+              chess.variant.KingOfTheHill.id,
+              chess.variant.ThreeCheck.id,
+              chess.variant.Antichess.id,
+              chess.variant.Atomic.id,
+              chess.variant.Horde.id,
+              chess.variant.RacingKings.id,
+              chess.variant.Crazyhouse.id) contains _)
         }.verifying("At least one variant", _.nonEmpty),
         "color" -> stringIn(colorChoices)
       )(SimulSetup.apply)(SimulSetup.unapply)) fill SimulSetup(

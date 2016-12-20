@@ -4,8 +4,9 @@ object Test {
   def rangeForeach(range: Range) = {
     val buffer = new scala.collection.mutable.ListBuffer[Int];
     range.foreach(buffer += _);
-    assert(buffer.toList == range.iterator.toList,
-           buffer.toList + "/" + range.iterator.toList)
+    assert(
+      buffer.toList == range.iterator.toList,
+      buffer.toList + "/" + range.iterator.toList)
   }
 
   def boundaryTests() = {

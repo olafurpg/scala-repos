@@ -25,10 +25,11 @@ case class DataSourceParams( // CHANGED
 ) extends Params
 
 class DataSource(val dsp: DataSourceParams)
-    extends PDataSource[TrainingData,
-                        EmptyEvaluationInfo,
-                        Query,
-                        EmptyActualResult] {
+    extends PDataSource[
+      TrainingData,
+      EmptyEvaluationInfo,
+      Query,
+      EmptyActualResult] {
 
   @transient lazy val logger = Logger[this.type]
 
@@ -39,17 +40,19 @@ class DataSource(val dsp: DataSourceParams)
       "mongo.input.uri",
       s"mongodb://${dsp.host}:${dsp.port}/${dsp.db}.${dsp.collection}")
 
-    val mongoRDD = sc.newAPIHadoopRDD(config,
-                                      classOf[MongoInputFormat],
-                                      classOf[Object],
-                                      classOf[BSONObject])
+    val mongoRDD = sc.newAPIHadoopRDD(
+      config,
+      classOf[MongoInputFormat],
+      classOf[Object],
+      classOf[BSONObject])
 
     // mongoRDD contains tuples of (ObjectId, BSONObject)
     val ratings = mongoRDD.map {
       case (id, bson) =>
-        Rating(bson.get("uid").asInstanceOf[String],
-               bson.get("iid").asInstanceOf[String],
-               bson.get("rating").asInstanceOf[Double])
+        Rating(
+          bson.get("uid").asInstanceOf[String],
+          bson.get("iid").asInstanceOf[String],
+          bson.get("rating").asInstanceOf[Double])
     }
     new TrainingData(ratings)
   }

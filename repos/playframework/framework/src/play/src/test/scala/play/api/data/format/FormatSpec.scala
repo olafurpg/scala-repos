@@ -15,8 +15,9 @@ object FormatSpec extends Specification {
       val data = Map("date" -> "00:00")
 
       val format =
-        Formats.dateFormat("HH:mm",
-                           TimeZone.getTimeZone("America/Los_Angeles"))
+        Formats.dateFormat(
+          "HH:mm",
+          TimeZone.getTimeZone("America/Los_Angeles"))
       format.bind("date", data).right.map(_.getTime) should beRight(28800000L)
       format.unbind("date", new Date(28800000L)) should equalTo(data)
 

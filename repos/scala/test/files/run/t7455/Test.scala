@@ -21,10 +21,11 @@ object Test extends DirectTest {
     new compiler.Run
 
     for {
-      name <- Seq("Outer",
-                  "Outer$PrivateInner",
-                  "Outer$PrivateStaticInner",
-                  "Outer$PublicInner")
+      name <- Seq(
+        "Outer",
+        "Outer$PrivateInner",
+        "Outer$PrivateStaticInner",
+        "Outer$PublicInner")
       clazz = compiler.rootMirror.staticClass(name)
       constr <- clazz.info.member(termNames.CONSTRUCTOR).alternatives
     } {

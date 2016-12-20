@@ -92,10 +92,11 @@ class PipedProcessTest {
     val sink = new PipeSinkMock
     val a = new ProcessMock(error = false)
     val b = new ProcessMock(error = false)
-    val p = new PipedProcesses(new ProcessBuilderMock(a, error = false),
-                               new ProcessBuilderMock(b, error = false),
-                               io,
-                               false)
+    val p = new PipedProcesses(
+      new ProcessBuilderMock(a, error = false),
+      new ProcessBuilderMock(b, error = false),
+      io,
+      false)
     val f = Future {
       p.callRunAndExitValue(source, sink)
     }
@@ -114,10 +115,11 @@ class PipedProcessTest {
     val sink = new PipeSinkMock
     val a = new ProcessMock(error = false)
     val b = new ProcessMock(error = false)
-    val p = new PipedProcesses(new ProcessBuilderMock(a, error = false),
-                               new ProcessBuilderMock(b, error = true),
-                               io,
-                               false)
+    val p = new PipedProcesses(
+      new ProcessBuilderMock(a, error = false),
+      new ProcessBuilderMock(b, error = true),
+      io,
+      false)
     val f = Future {
       ignoring(classOf[IOException]) {
         p.callRunAndExitValue(source, sink)
@@ -138,10 +140,11 @@ class PipedProcessTest {
     val sink = new PipeSinkMock
     val a = new ProcessMock(error = false)
     val b = new ProcessMock(error = false)
-    val p = new PipedProcesses(new ProcessBuilderMock(a, error = true),
-                               new ProcessBuilderMock(b, error = false),
-                               io,
-                               false)
+    val p = new PipedProcesses(
+      new ProcessBuilderMock(a, error = true),
+      new ProcessBuilderMock(b, error = false),
+      io,
+      false)
     val f = Future {
       ignoring(classOf[IOException]) {
         p.callRunAndExitValue(source, sink)
@@ -162,10 +165,11 @@ class PipedProcessTest {
     val sink = new PipeSinkMock
     val a = new ProcessMock(error = true)
     val b = new ProcessMock(error = false)
-    val p = new PipedProcesses(new ProcessBuilderMock(a, error = false),
-                               new ProcessBuilderMock(b, error = false),
-                               io,
-                               false)
+    val p = new PipedProcesses(
+      new ProcessBuilderMock(a, error = false),
+      new ProcessBuilderMock(b, error = false),
+      io,
+      false)
     val f = Future {
       p.callRunAndExitValue(source, sink)
     }
@@ -184,10 +188,11 @@ class PipedProcessTest {
     val sink = new PipeSinkMock
     val a = new ProcessMock(error = false)
     val b = new ProcessMock(error = true)
-    val p = new PipedProcesses(new ProcessBuilderMock(a, error = false),
-                               new ProcessBuilderMock(b, error = false),
-                               io,
-                               false)
+    val p = new PipedProcesses(
+      new ProcessBuilderMock(a, error = false),
+      new ProcessBuilderMock(b, error = false),
+      io,
+      false)
     val f = Future {
       p.callRunAndExitValue(source, sink)
     }

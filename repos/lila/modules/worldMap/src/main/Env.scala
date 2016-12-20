@@ -13,8 +13,9 @@ final class Env(system: akka.actor.ActorSystem, config: Config) {
 
   private val stream = system.actorOf(
     Props(
-      new Stream(geoIp = MaxMindIpGeo(GeoIPFile, 0),
-                 geoIpCacheTtl = GeoIPCacheTtl)))
+      new Stream(
+        geoIp = MaxMindIpGeo(GeoIPFile, 0),
+        geoIpCacheTtl = GeoIPCacheTtl)))
 
   def getStream = {
     import play.api.libs.iteratee._
@@ -28,6 +29,7 @@ final class Env(system: akka.actor.ActorSystem, config: Config) {
 object Env {
 
   lazy val current: Env =
-    "worldMap" boot new Env(system = lila.common.PlayApp.system,
-                            config = lila.common.PlayApp loadConfig "worldMap")
+    "worldMap" boot new Env(
+      system = lila.common.PlayApp.system,
+      config = lila.common.PlayApp loadConfig "worldMap")
 }

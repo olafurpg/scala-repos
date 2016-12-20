@@ -25,12 +25,13 @@ import org.apache.spark.sql.hive.test.TestHive
   * A set of tests that validate type promotion and coercion rules.
   */
 class HiveTypeCoercionSuite extends HiveComparisonTest {
-  val baseTypes = Seq(("1", "1"),
-                      ("1.0", "CAST(1.0 AS DOUBLE)"),
-                      ("1L", "1L"),
-                      ("1S", "1S"),
-                      ("1Y", "1Y"),
-                      ("'1'", "'1'"))
+  val baseTypes = Seq(
+    ("1", "1"),
+    ("1.0", "CAST(1.0 AS DOUBLE)"),
+    ("1L", "1L"),
+    ("1S", "1S"),
+    ("1Y", "1Y"),
+    ("'1'", "'1'"))
 
   baseTypes.foreach {
     case (ni, si) =>

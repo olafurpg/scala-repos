@@ -37,7 +37,8 @@ class JsonTest {
     assertEquals("[1,\"2\",[3]]", Json.encode(Seq(1, "2", Seq(3))))
     assertEquals("{}", Json.encode(Map()))
     assertEquals("{\"a\":1,\"b\":2}", Json.encode(Map("a" -> 1, "b" -> 2)))
-    assertEquals("{\"a\":[1,2],\"c\":[3,4]}",
-                 Json.encode(Map("a" -> Seq(1, 2), "c" -> Seq(3, 4))))
+    assertEquals(
+      "{\"a\":[1,2],\"c\":[3,4]}",
+      Json.encode(Map("a" -> Seq(1, 2), "c" -> Seq(3, 4))))
   }
 }

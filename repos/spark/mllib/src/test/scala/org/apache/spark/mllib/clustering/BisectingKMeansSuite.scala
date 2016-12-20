@@ -30,8 +30,9 @@ class BisectingKMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(bkm0.getMaxIterations === 20)
     assert(bkm0.getMinDivisibleClusterSize === 1.0)
     val bkm1 = new BisectingKMeans()
-    assert(bkm0.getSeed === bkm1.getSeed,
-           "The default seed should be constant.")
+    assert(
+      bkm0.getSeed === bkm1.getSeed,
+      "The default seed should be constant.")
   }
 
   test("setter/getter") {
@@ -84,8 +85,9 @@ class BisectingKMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(model.computeCost(data) ~== 2.0 relTol 1e-12)
     val predictions = data.map(v => (v(0), model.predict(v))).collectAsMap()
     Range(0, 8, 2).foreach { i =>
-      assert(predictions(i) === predictions(i + 1),
-             s"$i and ${i + 1} should belong to the same cluster.")
+      assert(
+        predictions(i) === predictions(i + 1),
+        s"$i and ${i + 1} should belong to the same cluster.")
     }
     val root = model.root
     assert(root.center(0) ~== 3.5 relTol 1e-12)
@@ -111,9 +113,10 @@ class BisectingKMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
 
   test("min divisible cluster") {
     val data =
-      sc.parallelize(Seq.tabulate(16)(i => Vectors.dense(i)) ++ Seq.tabulate(
-                       4)(i => Vectors.dense(-100.0 - i)),
-                     2)
+      sc.parallelize(
+        Seq.tabulate(16)(i => Vectors.dense(i)) ++ Seq.tabulate(4)(i =>
+          Vectors.dense(-100.0 - i)),
+        2)
     val bkm = new BisectingKMeans()
       .setK(4)
       .setMinDivisibleClusterSize(10)
@@ -132,9 +135,10 @@ class BisectingKMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
 
   test("larger clusters get selected first") {
     val data =
-      sc.parallelize(Seq.tabulate(16)(i => Vectors.dense(i)) ++ Seq.tabulate(
-                       4)(i => Vectors.dense(-100.0 - i)),
-                     2)
+      sc.parallelize(
+        Seq.tabulate(16)(i => Vectors.dense(i)) ++ Seq.tabulate(4)(i =>
+          Vectors.dense(-100.0 - i)),
+        2)
     val bkm = new BisectingKMeans().setK(3).setMaxIterations(1).setSeed(1L)
     val model = bkm.run(data)
     assert(model.k === 3)

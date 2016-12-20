@@ -29,16 +29,18 @@ class MinMaxScalerSuite
     with DefaultReadWriteTest {
 
   test("MinMaxScaler fit basic case") {
-    val data = Array(Vectors.dense(1, 0, Long.MinValue),
-                     Vectors.dense(2, 0, 0),
-                     Vectors.sparse(3, Array(0, 2), Array(3, Long.MaxValue)),
-                     Vectors.sparse(3, Array(0), Array(1.5)))
+    val data = Array(
+      Vectors.dense(1, 0, Long.MinValue),
+      Vectors.dense(2, 0, 0),
+      Vectors.sparse(3, Array(0, 2), Array(3, Long.MaxValue)),
+      Vectors.sparse(3, Array(0), Array(1.5)))
 
     val expected: Array[Vector] =
-      Array(Vectors.dense(-5, 0, -5),
-            Vectors.dense(0, 0, 0),
-            Vectors.sparse(3, Array(0, 2), Array(5, 5)),
-            Vectors.sparse(3, Array(0), Array(-2.5)))
+      Array(
+        Vectors.dense(-5, 0, -5),
+        Vectors.dense(0, 0, 0),
+        Vectors.sparse(3, Array(0, 2), Array(5, 5)),
+        Vectors.sparse(3, Array(0), Array(-2.5)))
 
     val df = sqlContext
       .createDataFrame(data.zip(expected))
@@ -52,8 +54,9 @@ class MinMaxScalerSuite
     val model = scaler.fit(df)
     model.transform(df).select("expected", "scaled").collect().foreach {
       case Row(vector1: Vector, vector2: Vector) =>
-        assert(vector1.equals(vector2),
-               "Transformed vector is different with expected.")
+        assert(
+          vector1.equals(vector2),
+          "Transformed vector is different with expected.")
     }
 
     // copied model must have the same parent.
@@ -88,9 +91,10 @@ class MinMaxScalerSuite
   }
 
   test("MinMaxScalerModel read/write") {
-    val instance = new MinMaxScalerModel("myMinMaxScalerModel",
-                                         Vectors.dense(-1.0, 0.0),
-                                         Vectors.dense(1.0, 10.0))
+    val instance = new MinMaxScalerModel(
+      "myMinMaxScalerModel",
+      Vectors.dense(-1.0, 0.0),
+      Vectors.dense(1.0, 10.0))
       .setInputCol("myInputCol")
       .setOutputCol("myOutputCol")
       .setMin(-1.0)

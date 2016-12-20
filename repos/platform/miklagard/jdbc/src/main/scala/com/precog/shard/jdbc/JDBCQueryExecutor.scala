@@ -77,9 +77,10 @@ object JDBCQueryExecutor {
             jobManager: JobManager[Future],
             jobActorSystem: ActorSystem)(implicit ec: ExecutionContext,
                                          M: Monad[Future]): ManagedPlatform = {
-    new JDBCQueryExecutor(new JDBCQueryExecutorConfig(config),
-                          jobManager,
-                          jobActorSystem)
+    new JDBCQueryExecutor(
+      new JDBCQueryExecutorConfig(config),
+      jobManager,
+      jobActorSystem)
   }
 }
 
@@ -177,10 +178,11 @@ class JDBCQueryExecutor(val yggConfig: JDBCQueryExecutorConfig,
 
                     try {
                       // May need refinement to get meaningful results
-                      val results = conn.getMetaData.getTables(null,
-                                                               null,
-                                                               "%",
-                                                               Array("TABLE"))
+                      val results = conn.getMetaData.getTables(
+                        null,
+                        null,
+                        "%",
+                        Array("TABLE"))
 
                       var tables = List.empty[String]
 

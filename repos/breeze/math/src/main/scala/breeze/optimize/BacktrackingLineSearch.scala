@@ -19,8 +19,9 @@ class BacktrackingLineSearch(initfval: Double,
                              enforceWolfeConditions: Boolean = true,
                              enforceStrongWolfeConditions: Boolean = true)
     extends ApproximateLineSearch {
-  require(shrinkStep * growStep != 1.0,
-          "Can't do a line search with growStep * shrinkStep == 1.0")
+  require(
+    shrinkStep * growStep != 1.0,
+    "Can't do a line search with growStep * shrinkStep == 1.0")
   require(cArmijo < 0.5)
   require(cArmijo > 0.0)
   require(cWolfe > cArmijo)

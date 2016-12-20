@@ -496,16 +496,17 @@ case class PCData(_data: String) extends Atom[String](_data) {
 object AltXML {
   val ieBadTags: Set[String] = Set("br", "hr")
 
-  val inlineTags: Set[String] = Set("base",
-                                    "meta",
-                                    "link",
-                                    "hr",
-                                    "br",
-                                    "param",
-                                    "img",
-                                    "area",
-                                    "input",
-                                    "col")
+  val inlineTags: Set[String] = Set(
+    "base",
+    "meta",
+    "link",
+    "hr",
+    "br",
+    "param",
+    "img",
+    "area",
+    "input",
+    "col")
 
   def toXML(n: Node,
             stripComment: Boolean,
@@ -655,12 +656,13 @@ object AltXML {
 
       case g: Group =>
         for (c <- g.nodes)
-          toXML(c,
-                x.scope,
-                sb,
-                stripComment,
-                convertAmp,
-                legacyIeCompatibilityMode)
+          toXML(
+            c,
+            x.scope,
+            sb,
+            stripComment,
+            convertAmp,
+            legacyIeCompatibilityMode)
 
       case e: Elem
           if !legacyIeCompatibilityMode &&
@@ -689,12 +691,13 @@ object AltXML {
         if (e.attributes ne null) e.attributes.buildString(sb)
         e.scope.buildString(sb, pscope)
         sb.append('>')
-        sequenceToXML(e.child,
-                      e.scope,
-                      sb,
-                      stripComment,
-                      convertAmp,
-                      legacyIeCompatibilityMode)
+        sequenceToXML(
+          e.child,
+          e.scope,
+          sb,
+          stripComment,
+          convertAmp,
+          legacyIeCompatibilityMode)
         sb.append("</")
         e.nameToString(sb)
         sb.append('>')
@@ -716,12 +719,13 @@ object AltXML {
                     legacyIeCompatibilityMode: Boolean): Unit = {
     val it = children.iterator
     while (it.hasNext) {
-      toXML(it.next,
-            pscope,
-            sb,
-            stripComment,
-            convertAmp,
-            legacyIeCompatibilityMode)
+      toXML(
+        it.next,
+        pscope,
+        sb,
+        stripComment,
+        convertAmp,
+        legacyIeCompatibilityMode)
     }
   }
 

@@ -57,8 +57,9 @@ class NullFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
 
   test("nanvl") {
     checkEvaluation(NaNvl(Literal(5.0), Literal.create(null, DoubleType)), 5.0)
-    checkEvaluation(NaNvl(Literal.create(null, DoubleType), Literal(5.0)),
-                    null)
+    checkEvaluation(
+      NaNvl(Literal.create(null, DoubleType), Literal(5.0)),
+      null)
     checkEvaluation(
       NaNvl(Literal.create(null, DoubleType), Literal(Double.NaN)),
       null)
@@ -86,23 +87,26 @@ class NullFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
   }
 
   test("AtLeastNNonNulls") {
-    val mix = Seq(Literal("x"),
-                  Literal.create(null, StringType),
-                  Literal.create(null, DoubleType),
-                  Literal(Double.NaN),
-                  Literal(5f))
+    val mix = Seq(
+      Literal("x"),
+      Literal.create(null, StringType),
+      Literal.create(null, DoubleType),
+      Literal(Double.NaN),
+      Literal(5f))
 
-    val nanOnly = Seq(Literal("x"),
-                      Literal(10.0),
-                      Literal(Float.NaN),
-                      Literal(math.log(-2)),
-                      Literal(Double.MaxValue))
+    val nanOnly = Seq(
+      Literal("x"),
+      Literal(10.0),
+      Literal(Float.NaN),
+      Literal(math.log(-2)),
+      Literal(Double.MaxValue))
 
-    val nullOnly = Seq(Literal("x"),
-                       Literal.create(null, DoubleType),
-                       Literal.create(null, DecimalType.USER_DEFAULT),
-                       Literal(Float.MaxValue),
-                       Literal(false))
+    val nullOnly = Seq(
+      Literal("x"),
+      Literal.create(null, DoubleType),
+      Literal.create(null, DecimalType.USER_DEFAULT),
+      Literal(Float.MaxValue),
+      Literal(false))
 
     checkEvaluation(AtLeastNNonNulls(2, mix), true, EmptyRow)
     checkEvaluation(AtLeastNNonNulls(3, mix), false, EmptyRow)

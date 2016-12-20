@@ -611,8 +611,9 @@ class ScalaJSDefinedTest {
     assertEquals(0, new OverloadedConstructorWithRepeatedParameters().sum)
     assertEquals(1, new OverloadedConstructorWithRepeatedParameters(1).sum)
     assertEquals(3, new OverloadedConstructorWithRepeatedParameters(1, 2).sum)
-    assertEquals(7,
-                 new OverloadedConstructorWithRepeatedParameters(1, 2, 4).sum)
+    assertEquals(
+      7,
+      new OverloadedConstructorWithRepeatedParameters(1, 2, 4).sum)
 
     assertEquals(3, new OverloadedConstructorWithRepeatedParameters("abc").sum)
     assertEquals(

@@ -30,10 +30,11 @@ class TestTransport(val localAddress: Address,
     extends Transport {
 
   def this(system: ExtendedActorSystem, conf: Config) = {
-    this(AddressFromURIString(conf.getString("local-address")),
-         AssociationRegistry.get(conf.getString("registry-key")),
-         conf.getBytes("maximum-payload-bytes").toInt,
-         conf.getString("scheme-identifier"))
+    this(
+      AddressFromURIString(conf.getString("local-address")),
+      AssociationRegistry.get(conf.getString("registry-key")),
+      conf.getBytes("maximum-payload-bytes").toInt,
+      conf.getString("scheme-identifier"))
   }
 
   import akka.remote.transport.TestTransport._
@@ -69,8 +70,9 @@ class TestTransport(val localAddress: Address,
               remoteListener ← remoteHandlerFuture
               localListener ← localHandle.readHandlerPromise.future
             } {
-              registry.registerListenerPair(localHandle.key,
-                                            (localListener, remoteListener))
+              registry.registerListenerPair(
+                localHandle.key,
+                (localListener, remoteListener))
               localHandle.writable = true
               remoteHandle.writable = true
             }
@@ -91,14 +93,16 @@ class TestTransport(val localAddress: Address,
   private def createHandlePair(remoteTransport: TestTransport,
                                remoteAddress: Address)
     : (TestAssociationHandle, TestAssociationHandle) = {
-    val localHandle = new TestAssociationHandle(localAddress,
-                                                remoteAddress,
-                                                this,
-                                                inbound = false)
-    val remoteHandle = new TestAssociationHandle(remoteAddress,
-                                                 localAddress,
-                                                 remoteTransport,
-                                                 inbound = true)
+    val localHandle = new TestAssociationHandle(
+      localAddress,
+      remoteAddress,
+      this,
+      inbound = false)
+    val remoteHandle = new TestAssociationHandle(
+      remoteAddress,
+      localAddress,
+      remoteTransport,
+      inbound = true)
 
     (localHandle, remoteHandle)
   }
@@ -109,8 +113,9 @@ class TestTransport(val localAddress: Address,
     * The [[akka.remote.transport.TestTransport.SwitchableLoggedBehavior]] for the listen() method.
     */
   val listenBehavior =
-    new SwitchableLoggedBehavior[Unit,
-                                 (Address, Promise[AssociationEventListener])](
+    new SwitchableLoggedBehavior[
+      Unit,
+      (Address, Promise[AssociationEventListener])](
       (_) ⇒ defaultListen,
       (_) ⇒ registry.logActivity(ListenAttempt(localAddress)))
 
@@ -333,8 +338,9 @@ object TestTransport {
       Address,
       (TestTransport, Future[AssociationEventListener])]()
     private val listenersTable =
-      new ConcurrentHashMap[(Address, Address),
-                            (HandleEventListener, HandleEventListener)]()
+      new ConcurrentHashMap[
+        (Address, Address),
+        (HandleEventListener, HandleEventListener)]()
 
     /**
       * Returns the remote endpoint for a pair of endpoints relative to the owner of the supplied handle.
@@ -394,8 +400,9 @@ object TestTransport {
         transport: TestTransport,
         associationEventListenerFuture: Future[AssociationEventListener])
       : Unit = {
-      transportTable.put(transport.localAddress,
-                         (transport, associationEventListenerFuture))
+      transportTable.put(
+        transport.localAddress,
+        (transport, associationEventListenerFuture))
     }
 
     /**

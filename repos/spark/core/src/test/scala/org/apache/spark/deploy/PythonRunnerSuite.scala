@@ -30,8 +30,9 @@ class PythonRunnerSuite extends SparkFunSuite {
     assert(PythonRunner.formatPath("local:/spark.py") === "/spark.py")
     assert(PythonRunner.formatPath("local:///spark.py") === "/spark.py")
     if (Utils.isWindows) {
-      assert(PythonRunner.formatPath("file:/C:/a/b/spark.py",
-                                     testWindows = true) === "C:/a/b/spark.py")
+      assert(PythonRunner.formatPath(
+        "file:/C:/a/b/spark.py",
+        testWindows = true) === "C:/a/b/spark.py")
       assert(
         PythonRunner
           .formatPath("C:\\a\\b\\spark.py", testWindows = true) === "C:/a/b/spark.py")
@@ -71,11 +72,9 @@ class PythonRunnerSuite extends SparkFunSuite {
           .formatPaths("C:\\free.py,pie.py", testWindows = true) === Array(
           "C:/free.py",
           "pie.py"))
-      assert(
-        PythonRunner.formatPaths("lovely.py,C:\\free.py,file:/d:/fry.py",
-                                 testWindows = true) === Array("lovely.py",
-                                                               "C:/free.py",
-                                                               "d:/fry.py"))
+      assert(PythonRunner.formatPaths(
+        "lovely.py,C:\\free.py,file:/d:/fry.py",
+        testWindows = true) === Array("lovely.py", "C:/free.py", "d:/fry.py"))
     }
     intercept[IllegalArgumentException] {
       PythonRunner.formatPaths("one:two,three")

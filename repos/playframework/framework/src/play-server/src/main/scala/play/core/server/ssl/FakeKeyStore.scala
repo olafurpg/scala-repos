@@ -71,10 +71,11 @@ object FakeKeyStore {
 
       // Create the key store, first set the store pass
       keyStore.load(null, "".toCharArray)
-      keyStore.setKeyEntry("playgenerated",
-                           keyPair.getPrivate,
-                           "".toCharArray,
-                           Array(cert))
+      keyStore.setKeyEntry(
+        "playgenerated",
+        keyPair.getPrivate,
+        "".toCharArray,
+        Array(cert))
       keyStore.setCertificateEntry("playgeneratedtrusted", cert)
       val out = new FileOutputStream(keyStoreFile)
       try {
@@ -119,10 +120,12 @@ object FakeKeyStore {
     // and when setting the subject or issuer just the X500Name should be used.
     val owner = new X500Name(DnName)
     val justName = isJavaAtLeast("1.8")
-    certInfo.set(X509CertInfo.SUBJECT,
-                 if (justName) owner else new CertificateSubjectName(owner))
-    certInfo.set(X509CertInfo.ISSUER,
-                 if (justName) owner else new CertificateIssuerName(owner))
+    certInfo.set(
+      X509CertInfo.SUBJECT,
+      if (justName) owner else new CertificateSubjectName(owner))
+    certInfo.set(
+      X509CertInfo.ISSUER,
+      if (justName) owner else new CertificateIssuerName(owner))
 
     // Key and algorithm
     certInfo.set(X509CertInfo.KEY, new CertificateX509Key(keyPair.getPublic))

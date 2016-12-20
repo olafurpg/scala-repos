@@ -67,13 +67,14 @@ final class OptimizerOptions private (
                    prettyPrintFullOptJS: Boolean = prettyPrintFullOptJS,
                    checkScalaJSIR: Boolean = checkScalaJSIR,
                    useClosureCompiler: Boolean = useClosureCompiler) = {
-    new OptimizerOptions(bypassLinkingErrors,
-                         parallel,
-                         batchMode,
-                         disableOptimizer,
-                         prettyPrintFullOptJS,
-                         checkScalaJSIR,
-                         useClosureCompiler)
+    new OptimizerOptions(
+      bypassLinkingErrors,
+      parallel,
+      batchMode,
+      disableOptimizer,
+      prettyPrintFullOptJS,
+      checkScalaJSIR,
+      useClosureCompiler)
   }
 
   override def toString: String = {

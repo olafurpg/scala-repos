@@ -126,10 +126,11 @@ class DatasetAggregatorSuite extends QueryTest with SharedSQLContext {
   test("typed aggregation: TypedAggregator") {
     val ds = Seq(("a", 10), ("a", 20), ("b", 1), ("b", 2), ("c", 1)).toDS()
 
-    checkDataset(ds.groupByKey(_._1).agg(sum(_._2)),
-                 ("a", 30),
-                 ("b", 3),
-                 ("c", 1))
+    checkDataset(
+      ds.groupByKey(_._1).agg(sum(_._2)),
+      ("a", 30),
+      ("b", 3),
+      ("c", 1))
   }
 
   test("typed aggregation: TypedAggregator, expr, expr") {
@@ -145,27 +146,30 @@ class DatasetAggregatorSuite extends QueryTest with SharedSQLContext {
   test("typed aggregation: complex case") {
     val ds = Seq("a" -> 1, "a" -> 3, "b" -> 3).toDS()
 
-    checkDataset(ds.groupByKey(_._1)
-                   .agg(expr("avg(_2)").as[Double], TypedAverage.toColumn),
-                 ("a", 2.0, 2.0),
-                 ("b", 3.0, 3.0))
+    checkDataset(
+      ds.groupByKey(_._1)
+        .agg(expr("avg(_2)").as[Double], TypedAverage.toColumn),
+      ("a", 2.0, 2.0),
+      ("b", 3.0, 3.0))
   }
 
   test("typed aggregation: complex result type") {
     val ds = Seq("a" -> 1, "a" -> 3, "b" -> 3).toDS()
 
-    checkDataset(ds.groupByKey(_._1)
-                   .agg(expr("avg(_2)").as[Double], ComplexResultAgg.toColumn),
-                 ("a", 2.0, (2L, 4L)),
-                 ("b", 3.0, (1L, 3L)))
+    checkDataset(
+      ds.groupByKey(_._1)
+        .agg(expr("avg(_2)").as[Double], ComplexResultAgg.toColumn),
+      ("a", 2.0, (2L, 4L)),
+      ("b", 3.0, (1L, 3L)))
   }
 
   test("typed aggregation: in project list") {
     val ds = Seq(1, 3, 2, 5).toDS()
 
     checkDataset(ds.select(sum((i: Int) => i)), 11)
-    checkDataset(ds.select(sum((i: Int) => i), sum((i: Int) => i * 2)),
-                 11 -> 22)
+    checkDataset(
+      ds.select(sum((i: Int) => i), sum((i: Int) => i * 2)),
+      11 -> 22)
   }
 
   test("typed aggregation: class input") {
@@ -179,8 +183,9 @@ class DatasetAggregatorSuite extends QueryTest with SharedSQLContext {
 
     checkDataset(ds.select(ClassInputAgg.toColumn), 1)
 
-    checkDataset(ds.select(expr("avg(a)").as[Double], ClassInputAgg.toColumn),
-                 (1.0, 1))
+    checkDataset(
+      ds.select(expr("avg(a)").as[Double], ClassInputAgg.toColumn),
+      (1.0, 1))
 
     checkDataset(ds.groupByKey(_.b).agg(ClassInputAgg.toColumn), ("one", 1))
   }
@@ -197,8 +202,9 @@ class DatasetAggregatorSuite extends QueryTest with SharedSQLContext {
       ds.select(expr("avg(a)").as[Double], ComplexBufferAgg.toColumn),
       (1.5, 2))
 
-    checkDataset(ds.groupByKey(_.b).agg(ComplexBufferAgg.toColumn),
-                 ("one", 1),
-                 ("two", 1))
+    checkDataset(
+      ds.groupByKey(_.b).agg(ComplexBufferAgg.toColumn),
+      ("one", 1),
+      ("two", 1))
   }
 }

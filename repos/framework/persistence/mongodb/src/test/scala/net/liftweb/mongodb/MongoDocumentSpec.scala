@@ -172,10 +172,11 @@ class MongoDocumentSpec extends Specification with MongoTestKit {
       checkMongoIsRunning
       import mongodocumentspecs._
 
-      val btd = BoxTestDoc(ObjectId.get,
-                           Empty,
-                           Full("Full String"),
-                           Failure("This is a failure"))
+      val btd = BoxTestDoc(
+        ObjectId.get,
+        Empty,
+        Full("Full String"),
+        Failure("This is a failure"))
       passSaveAndRetrieveTests(btd, BoxTestDoc)
     }
 

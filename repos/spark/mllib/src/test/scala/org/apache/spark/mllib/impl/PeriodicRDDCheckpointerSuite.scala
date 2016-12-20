@@ -58,8 +58,9 @@ class PeriodicRDDCheckpointerSuite
     var rddsToCheck = Seq.empty[RDDToCheck]
     sc.setCheckpointDir(path)
     val rdd1 = createRDD(sc)
-    val checkpointer = new PeriodicRDDCheckpointer[Double](checkpointInterval,
-                                                           rdd1.sparkContext)
+    val checkpointer = new PeriodicRDDCheckpointer[Double](
+      checkpointInterval,
+      rdd1.sparkContext)
     checkpointer.update(rdd1)
     rdd1.count()
     rddsToCheck = rddsToCheck :+ RDDToCheck(rdd1, 1)
@@ -134,8 +135,9 @@ private object PeriodicRDDCheckpointerSuite {
     //       is fixed (though it can then be simplified and not look for the files).
     val fs = FileSystem.get(rdd.sparkContext.hadoopConfiguration)
     rdd.getCheckpointFile.foreach { checkpointFile =>
-      assert(!fs.exists(new Path(checkpointFile)),
-             "RDD checkpoint file should have been removed")
+      assert(
+        !fs.exists(new Path(checkpointFile)),
+        "RDD checkpoint file should have been removed")
     }
   }
 
@@ -155,16 +157,18 @@ private object PeriodicRDDCheckpointerSuite {
         if (iteration - 2 * checkpointInterval < gIndex &&
             gIndex <= iteration) {
           assert(rdd.isCheckpointed, "RDD should be checkpointed")
-          assert(rdd.getCheckpointFile.nonEmpty,
-                 "RDD should have 2 checkpoint files")
+          assert(
+            rdd.getCheckpointFile.nonEmpty,
+            "RDD should have 2 checkpoint files")
         } else {
           confirmCheckpointRemoved(rdd)
         }
       } else {
         // RDD should never be checkpointed
         assert(!rdd.isCheckpointed, "RDD should never have been checkpointed")
-        assert(rdd.getCheckpointFile.isEmpty,
-               "RDD should not have any checkpoint files")
+        assert(
+          rdd.getCheckpointFile.isEmpty,
+          "RDD should not have any checkpoint files")
       }
     } catch {
       case e: AssertionError =>

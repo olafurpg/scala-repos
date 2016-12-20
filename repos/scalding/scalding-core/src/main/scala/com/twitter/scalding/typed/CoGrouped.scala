@@ -254,15 +254,18 @@ trait CoGrouped[K, +R]
               * not repeated. That case is below
               */
             val NUM_OF_SELF_JOINS = firstCount - 1
-            new CoGroup(assignName(inputs.head.toPipe[(K, Any)](
-                          ("key", "value"))(flowDef, mode, tupset)),
-                        ordKeyField,
-                        NUM_OF_SELF_JOINS,
-                        outFields(firstCount),
-                        WrappedJoiner(
-                          new DistinctCoGroupJoiner(firstCount,
-                                                    Grouped.keyGetter(ord),
-                                                    joinFunction)))
+            new CoGroup(
+              assignName(
+                inputs.head
+                  .toPipe[(K, Any)](("key", "value"))(flowDef, mode, tupset)),
+              ordKeyField,
+              NUM_OF_SELF_JOINS,
+              outFields(firstCount),
+              WrappedJoiner(
+                new DistinctCoGroupJoiner(
+                  firstCount,
+                  Grouped.keyGetter(ord),
+                  joinFunction)))
           } else if (firstCount == 1) {
 
             def keyId(idx: Int): String = "key%d".format(idx)
@@ -310,22 +313,25 @@ trait CoGrouped[K, +R]
                   }
                   .toMap
 
-                new CoGroupedJoiner(isize,
-                                    Grouped.keyGetter(ord),
-                                    joinFunction) {
+                new CoGroupedJoiner(
+                  isize,
+                  Grouped.keyGetter(ord),
+                  joinFunction) {
                   val distinctSize = dsize
                   def distinctIndexOf(orig: Int) = mapping(orig)
                 }
               } else {
-                new DistinctCoGroupJoiner(isize,
-                                          Grouped.keyGetter(ord),
-                                          joinFunction)
+                new DistinctCoGroupJoiner(
+                  isize,
+                  Grouped.keyGetter(ord),
+                  joinFunction)
               }
 
-            new CoGroup(pipes,
-                        groupFields,
-                        outFields(dsize),
-                        WrappedJoiner(cjoiner))
+            new CoGroup(
+              pipes,
+              groupFields,
+              outFields(dsize),
+              WrappedJoiner(cjoiner))
           } else {
 
             /**

@@ -36,10 +36,11 @@ trait AsyncWriteJournal
       config.getDuration("circuit-breaker.call-timeout", MILLISECONDS).millis
     val resetTimeout =
       config.getDuration("circuit-breaker.reset-timeout", MILLISECONDS).millis
-    CircuitBreaker(context.system.scheduler,
-                   maxFailures,
-                   callTimeout,
-                   resetTimeout)
+    CircuitBreaker(
+      context.system.scheduler,
+      maxFailures,
+      callTimeout,
+      resetTimeout)
   }
 
   private val replayFilterMode: ReplayFilter.Mode =
@@ -96,10 +97,11 @@ trait AsyncWriteJournal
 
         writeResult.onComplete {
           case Success(results) ⇒
-            resequencer ! Desequenced(WriteMessagesSuccessful,
-                                      cctr,
-                                      persistentActor,
-                                      self)
+            resequencer ! Desequenced(
+              WriteMessagesSuccessful,
+              cctr,
+              persistentActor,
+              self)
 
             val resultsIter =
               if (results.isEmpty)
@@ -130,19 +132,20 @@ trait AsyncWriteJournal
                 }
 
               case r: NonPersistentRepr ⇒
-                resequencer ! Desequenced(LoopMessageSuccess(r.payload,
-                                                             actorInstanceId),
-                                          n,
-                                          persistentActor,
-                                          r.sender)
+                resequencer ! Desequenced(
+                  LoopMessageSuccess(r.payload, actorInstanceId),
+                  n,
+                  persistentActor,
+                  r.sender)
                 n += 1
             }
 
           case Failure(e) ⇒
-            resequencer ! Desequenced(WriteMessagesFailed(e),
-                                      cctr,
-                                      persistentActor,
-                                      self)
+            resequencer ! Desequenced(
+              WriteMessagesFailed(e),
+              cctr,
+              persistentActor,
+              self)
             var n = cctr + 1
             messages.foreach {
               case a: AtomicWrite ⇒
@@ -155,35 +158,38 @@ trait AsyncWriteJournal
                   n += 1
                 }
               case r: NonPersistentRepr ⇒
-                resequencer ! Desequenced(LoopMessageSuccess(r.payload,
-                                                             actorInstanceId),
-                                          n,
-                                          persistentActor,
-                                          r.sender)
+                resequencer ! Desequenced(
+                  LoopMessageSuccess(r.payload, actorInstanceId),
+                  n,
+                  persistentActor,
+                  r.sender)
                 n += 1
             }
         }
 
-      case r @ ReplayMessages(fromSequenceNr,
-                              toSequenceNr,
-                              max,
-                              persistenceId,
-                              persistentActor) ⇒
+      case r @ ReplayMessages(
+            fromSequenceNr,
+            toSequenceNr,
+            max,
+            persistenceId,
+            persistentActor) ⇒
         val replyTo =
           if (isReplayFilterEnabled)
             context.actorOf(
-              ReplayFilter.props(persistentActor,
-                                 replayFilterMode,
-                                 replayFilterWindowSize,
-                                 replayFilterMaxOldWriters,
-                                 replayDebugEnabled))
+              ReplayFilter.props(
+                persistentActor,
+                replayFilterMode,
+                replayFilterWindowSize,
+                replayFilterMaxOldWriters,
+                replayDebugEnabled))
           else persistentActor
 
         val readHighestSequenceNrFrom = math.max(0L, fromSequenceNr - 1)
         breaker
           .withCircuitBreaker(
-            asyncReadHighestSequenceNr(persistenceId,
-                                       readHighestSequenceNrFrom))
+            asyncReadHighestSequenceNr(
+              persistenceId,
+              readHighestSequenceNrFrom))
           .flatMap { highSeqNr ⇒
             val toSeqNr = math.min(toSequenceNr, highSeqNr)
             if (highSeqNr == 0L || fromSequenceNr > toSeqNr)
@@ -196,8 +202,9 @@ trait AsyncWriteJournal
                 p ⇒
                   if (!p.deleted) // old records from 2.3 may still have the deleted flag
                     adaptFromJournal(p).foreach { adaptedPersistentRepr ⇒
-                      replyTo.tell(ReplayedMessage(adaptedPersistentRepr),
-                                   Actor.noSender)
+                      replyTo.tell(
+                        ReplayedMessage(adaptedPersistentRepr),
+                        Actor.noSender)
                     }
               }.map(_ ⇒ highSeqNr)
             }

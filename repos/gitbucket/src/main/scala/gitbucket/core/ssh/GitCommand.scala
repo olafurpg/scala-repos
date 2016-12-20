@@ -92,9 +92,10 @@ abstract class DefaultGitCommand(val owner: String, val repoName: String)
       implicit session: Session): Boolean =
     getAccountByUserName(username) match {
       case Some(account) =>
-        hasWritePermission(repositoryInfo.owner,
-                           repositoryInfo.name,
-                           Some(account))
+        hasWritePermission(
+          repositoryInfo.owner,
+          repositoryInfo.name,
+          Some(account))
       case None => false
     }
 }

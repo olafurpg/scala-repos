@@ -295,8 +295,9 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
   final def checkJarArtifactExists(dd: ModuleRevisionId): Boolean = {
     // TODO - We really want this to be as fast/efficient as possible!
     val request = new AetherArtifactRequest()
-    val art = new AetherArtifact(aetherCoordsFromMrid(dd, "jar"),
-                                 getArtifactProperties(dd))
+    val art = new AetherArtifact(
+      aetherCoordsFromMrid(dd, "jar"),
+      getArtifactProperties(dd))
     request.setArtifact(art)
     addRepositories(request)
     try {
@@ -329,11 +330,12 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
           // THere we have to attempt to download the JAR and see if it comes, if not, we can punt.
           // This is because sometimes pom-packaging attaches a JAR.
           if (checkJarArtifactExists(drid)) {
-            val defaultArt = new DefaultArtifact(md.getModuleRevisionId,
-                                                 new Date(lastModifiedTime),
-                                                 artifactId,
-                                                 packaging,
-                                                 "jar")
+            val defaultArt = new DefaultArtifact(
+              md.getModuleRevisionId,
+              new Date(lastModifiedTime),
+              artifactId,
+              packaging,
+              "jar")
             md.addArtifact(
               MavenRepositoryResolver.DEFAULT_ARTIFACT_CONFIGURATION,
               defaultArt)
@@ -345,11 +347,12 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
             throw new MavenResolutionException(
               s"Failed to find JAR file associated with $dd")
           // Assume for now everything else is a jar.
-          val defaultArt = new DefaultArtifact(md.getModuleRevisionId,
-                                               new Date(lastModifiedTime),
-                                               artifactId,
-                                               packaging,
-                                               "jar")
+          val defaultArt = new DefaultArtifact(
+            md.getModuleRevisionId,
+            new Date(lastModifiedTime),
+            artifactId,
+            packaging,
+            "jar")
           // TODO - Unfortunately we have to try to download the JAR file HERE and then fail resolution if we cannot find it.
           //       This is because sometime a pom.xml exists with no JARs.
           md.addArtifact(
@@ -371,11 +374,12 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
         getClassifier(requestedArt) match {
           case None =>
             // This is the default artifact.  We do need to add this, and to the default configuration.
-            val defaultArt = new DefaultArtifact(md.getModuleRevisionId,
-                                                 new Date(lastModifiedTime),
-                                                 requestedArt.getName,
-                                                 requestedArt.getType,
-                                                 requestedArt.getExt)
+            val defaultArt = new DefaultArtifact(
+              md.getModuleRevisionId,
+              new Date(lastModifiedTime),
+              requestedArt.getName,
+              requestedArt.getType,
+              requestedArt.getExt)
             md.addArtifact(
               MavenRepositoryResolver.DEFAULT_ARTIFACT_CONFIGURATION,
               defaultArt)
@@ -383,12 +387,13 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
             Message.debug(
               s"Adding additional artifact in $scope, $requestedArt")
             // TODO - more Extra attributes?
-            val mda = new MDArtifact(md,
-                                     requestedArt.getName,
-                                     requestedArt.getType,
-                                     requestedArt.getExt,
-                                     requestedArt.getUrl,
-                                     requestedArt.getExtraAttributes)
+            val mda = new MDArtifact(
+              md,
+              requestedArt.getName,
+              requestedArt.getType,
+              requestedArt.getExt,
+              requestedArt.getUrl,
+              requestedArt.getExtraAttributes)
             md.addArtifact(getConfiguration(scope), mda)
         }
       }
@@ -401,11 +406,12 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
     for (d <- result.getManagedDependencies.asScala) {
       // TODO - Figure out what to do about exclusions on managed dependencies.
       md.addDependencyDescriptorMediator(
-        ModuleId.newInstance(d.getArtifact.getGroupId,
-                             d.getArtifact.getArtifactId),
+        ModuleId
+          .newInstance(d.getArtifact.getGroupId, d.getArtifact.getArtifactId),
         ExactPatternMatcher.INSTANCE,
-        new OverrideDependencyDescriptorMediator(null,
-                                                 d.getArtifact.getVersion) {
+        new OverrideDependencyDescriptorMediator(
+          null,
+          d.getArtifact.getVersion) {
           override def mediate(
               dd: DependencyDescriptor): DependencyDescriptor = {
             super.mediate(dd)
@@ -427,9 +433,10 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
       // TODO - Is this correct for changing detection.  We should use the Ivy mechanism configured...
       val isChanging = d.getArtifact.getVersion.endsWith("-SNAPSHOT")
       val drid = {
-        val tmp = ModuleRevisionId.newInstance(d.getArtifact.getGroupId,
-                                               d.getArtifact.getArtifactId,
-                                               d.getArtifact.getVersion)
+        val tmp = ModuleRevisionId.newInstance(
+          d.getArtifact.getGroupId,
+          d.getArtifact.getArtifactId,
+          d.getArtifact.getVersion)
         extraAttributes get tmp match {
           case Some(props) =>
             Message.debug(
@@ -447,10 +454,11 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
       // Note: The previous maven integration ALWAYS set force to true for dependnecies.  If we do not do this, for some
       //       reason, Ivy will create dummy nodes when doing dependnecy mediation (e.g. dependencyManagement of one pom overrides version of a dependency)
       //       which was leading to "data not found" exceptions as Ivy would pick the correct IvyNode in the dependency tree but never load it with data....
-      val dd = new DefaultDependencyDescriptor(md,
-                                               drid, /* force  */ true,
-                                               isChanging,
-                                               true) {}
+      val dd = new DefaultDependencyDescriptor(
+        md,
+        drid, /* force  */ true,
+        isChanging,
+        true) {}
 
       // TODO - Configuration mappings (are we grabbing scope correctly, or should the default not always be compile?)
       val scope = Option(d.getScope).filterNot(_.isEmpty).getOrElse("compile")
@@ -477,12 +485,13 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
           extraAtt.put("m:classifier", d.getArtifact.getClassifier)
         }
         val depArtifact: DefaultDependencyArtifactDescriptor =
-          new DefaultDependencyArtifactDescriptor(dd,
-                                                  dd.getDependencyId.getName,
-                                                  tpe,
-                                                  ext,
-                                                  null,
-                                                  extraAtt)
+          new DefaultDependencyArtifactDescriptor(
+            dd,
+            dd.getDependencyId.getName,
+            tpe,
+            ext,
+            null,
+            extraAtt)
         val optionalizedScope: String = if (d.isOptional) "optional" else scope
         // TOOD - We may need to fix the configuration mappings here.
         dd.addDependencyArtifact(optionalizedScope, depArtifact)
@@ -492,14 +501,16 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
         val excludedModule = new ModuleId(e.getGroupId, e.getArtifactId)
         for (conf <- dd.getModuleConfigurations) {
           // TODO - Do we need extra attributes for this?
-          dd.addExcludeRule(conf,
-                            new DefaultExcludeRule(
-                              new ArtifactId(excludedModule,
-                                             PatternMatcher.ANY_EXPRESSION,
-                                             PatternMatcher.ANY_EXPRESSION,
-                                             PatternMatcher.ANY_EXPRESSION),
-                              ExactPatternMatcher.INSTANCE,
-                              null))
+          dd.addExcludeRule(
+            conf,
+            new DefaultExcludeRule(
+              new ArtifactId(
+                excludedModule,
+                PatternMatcher.ANY_EXPRESSION,
+                PatternMatcher.ANY_EXPRESSION,
+                PatternMatcher.ANY_EXPRESSION),
+              ExactPatternMatcher.INSTANCE,
+              null))
         }
       }
       md.addDependency(dd)
@@ -528,8 +539,9 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
       val request = new AetherArtifactRequest
       val aetherArt = getClassifier(a) match {
         case None | Some("") =>
-          new AetherArtifact(aetherCoordsFromMrid(a.getModuleRevisionId),
-                             getArtifactProperties(a.getModuleRevisionId))
+          new AetherArtifact(
+            aetherCoordsFromMrid(a.getModuleRevisionId),
+            getArtifactProperties(a.getModuleRevisionId))
         case Some(other) =>
           new AetherArtifact(
             aetherCoordsFromMrid(a.getModuleRevisionId, other, a.getExt),

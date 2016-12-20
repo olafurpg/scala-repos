@@ -57,9 +57,10 @@ trait ClassHelpers { self: ControlHelpers =>
     (for (place <- where.view;
           mod <- modifiers.view;
           fullName = place + "." + mod(name);
-          ignore = List(classOf[ClassNotFoundException],
-                        classOf[ClassCastException],
-                        classOf[NoClassDefFoundError]);
+          ignore = List(
+            classOf[ClassNotFoundException],
+            classOf[ClassCastException],
+            classOf[NoClassDefFoundError]);
           klass <- tryo(ignore)(
             Class
               .forName(fullName)
@@ -259,11 +260,12 @@ trait ClassHelpers { self: ControlHelpers =>
       inst,
       StringHelpers.camelify(meth),
       params,
-      Empty) or _invokeMethod(clz,
-                              inst,
-                              StringHelpers.camelifyMethod(meth),
-                              params,
-                              Empty)
+      Empty) or _invokeMethod(
+      clz,
+      inst,
+      StringHelpers.camelifyMethod(meth),
+      params,
+      Empty)
   }
 
   /**
@@ -289,11 +291,12 @@ trait ClassHelpers { self: ControlHelpers =>
       inst,
       StringHelpers.camelify(meth),
       params,
-      Full(ptypes)) or _invokeMethod(clz,
-                                     inst,
-                                     StringHelpers.camelifyMethod(meth),
-                                     params,
-                                     Full(ptypes))
+      Full(ptypes)) or _invokeMethod(
+      clz,
+      inst,
+      StringHelpers.camelifyMethod(meth),
+      params,
+      Full(ptypes))
   }
 
   /**

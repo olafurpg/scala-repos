@@ -91,11 +91,12 @@ private case class ScalaSdkData(name: String,
 }
 
 private object ScalaSdkData {
-  private val VersionToLanguageLevel = Seq(("2.7", "Scala_2_7"),
-                                           ("2.8", "Scala_2_8"),
-                                           ("2.9", "Scala_2_9"),
-                                           ("2.10", "Scala_2_10"),
-                                           ("2.11", "Scala_2_11"))
+  private val VersionToLanguageLevel = Seq(
+    ("2.7", "Scala_2_7"),
+    ("2.8", "Scala_2_8"),
+    ("2.9", "Scala_2_9"),
+    ("2.10", "Scala_2_10"),
+    ("2.11", "Scala_2_11"))
 
   def findAllIn(context: ConversionContext): Seq[ScalaSdkData] = {
     val elements =
@@ -116,10 +117,11 @@ private object ScalaSdkData {
 
     val languageLevel = languageLevelFrom(compilerClasspath)
 
-    ScalaSdkData(standardLibrary.name,
-                 standardLibrary,
-                 languageLevel,
-                 compilerClasspath)
+    ScalaSdkData(
+      standardLibrary.name,
+      standardLibrary,
+      languageLevel,
+      compilerClasspath)
   }
 
   def languageLevelFrom(compilerClasspath: Seq[String]): String = {

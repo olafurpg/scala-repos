@@ -189,9 +189,10 @@ private[parser] trait CommonRules { this: Parser with StringBuilding ⇒
     `challenge-or-credentials` ~> { (scheme, params) ⇒
       val (realms, otherParams) =
         params.partition(_._1 equalsIgnoreCase "realm")
-      HttpChallenge(scheme,
-                    realms.headOption.map(_._2).getOrElse(""),
-                    otherParams.toMap)
+      HttpChallenge(
+        scheme,
+        realms.headOption.map(_._2).getOrElse(""),
+        otherParams.toMap)
     }
   }
 

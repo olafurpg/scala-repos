@@ -80,10 +80,11 @@ trait GenTrees { self: Reifier =>
   def reifyModifiers(m: global.Modifiers) =
     if (m == NoMods) mirrorSelect(nme.NoMods)
     else
-      mirrorFactoryCall(nme.Modifiers,
-                        reifyFlags(m.flags),
-                        reify(m.privateWithin),
-                        reify(m.annotations))
+      mirrorFactoryCall(
+        nme.Modifiers,
+        reifyFlags(m.flags),
+        reify(m.privateWithin),
+        reify(m.annotations))
 
   private def spliceTree(tree: Tree): Tree = {
     tree match {
@@ -138,9 +139,10 @@ trait GenTrees { self: Reifier =>
 
     tree match {
       case This(qual) =>
-        assert(sym != NoSymbol,
-               "unexpected: bound term that doesn't have a symbol: " + showRaw(
-                 tree))
+        assert(
+          sym != NoSymbol,
+          "unexpected: bound term that doesn't have a symbol: " + showRaw(
+            tree))
         if (sym.isLocalToReifee) mirrorCall(nme.This, reify(qual))
         else if (sym.isClass && !sym.isModuleClass) {
           if (reifyDebug)
@@ -161,9 +163,10 @@ trait GenTrees { self: Reifier =>
         } else if (!sym.isLocalToReifee) {
           if (sym.isVariable && sym.owner.isTerm) {
             captureVariable(sym) // Note order dependency: captureVariable needs to come before reification here.
-            mirrorCall(nme.Select,
-                       mirrorBuildCall(nme.mkIdent, reify(sym)),
-                       reify(nme.elem))
+            mirrorCall(
+              nme.Select,
+              mirrorBuildCall(nme.mkIdent, reify(sym)),
+              reify(nme.elem))
           } else mirrorBuildCall(nme.mkIdent, reify(sym))
         } else mirrorCall(nme.Ident, reify(name))
 

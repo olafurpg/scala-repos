@@ -43,13 +43,14 @@ object SqlToSlick extends App {
   val db = Database.forConfig("h2mem1")
   try {
 
-    Await.result(db.run(
-                   DBIO.seq(
-                     addresses.schema.create,
-                     people.schema.create,
-                     inserts
-                   )),
-                 Duration.Inf)
+    Await.result(
+      db.run(
+        DBIO.seq(
+          addresses.schema.create,
+          people.schema.create,
+          inserts
+        )),
+      Duration.Inf)
 
     def _jdbc = {
       //#jdbc

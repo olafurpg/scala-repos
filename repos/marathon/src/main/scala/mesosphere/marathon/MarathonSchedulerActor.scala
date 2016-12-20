@@ -360,18 +360,19 @@ object MarathonSchedulerActor {
             eventBus: EventStream,
             cancellationTimeout: FiniteDuration = 1.minute): Props = {
     Props(
-      new MarathonSchedulerActor(createSchedulerActions,
-                                 deploymentManagerProps,
-                                 historyActorProps,
-                                 appRepository,
-                                 deploymentRepository,
-                                 healthCheckManager,
-                                 taskTracker,
-                                 taskQueue,
-                                 marathonSchedulerDriverHolder,
-                                 leaderInfo,
-                                 eventBus,
-                                 cancellationTimeout))
+      new MarathonSchedulerActor(
+        createSchedulerActions,
+        deploymentManagerProps,
+        historyActorProps,
+        appRepository,
+        deploymentRepository,
+        healthCheckManager,
+        taskTracker,
+        taskQueue,
+        marathonSchedulerDriverHolder,
+        leaderInfo,
+        eventBus,
+        cancellationTimeout))
   }
 
   case class RecoverDeployments(deployments: Seq[DeploymentPlan])

@@ -149,8 +149,9 @@ object MergePreferred {
 final class MergePreferred[T] private (val secondaryPorts: Int,
                                        val eagerComplete: Boolean)
     extends GraphStage[MergePreferred.MergePreferredShape[T]] {
-  require(secondaryPorts >= 1,
-          "A MergePreferred must have more than 0 secondary input ports")
+  require(
+    secondaryPorts >= 1,
+    "A MergePreferred must have more than 0 secondary input ports")
 
   override def initialAttributes = DefaultAttributes.mergePreferred
   override val shape: MergePreferred.MergePreferredShape[T] =

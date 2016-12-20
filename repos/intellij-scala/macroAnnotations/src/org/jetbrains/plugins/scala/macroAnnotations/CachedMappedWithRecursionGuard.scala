@@ -71,10 +71,11 @@ object CachedMappedWithRecursionGuard {
           case _ =>
             flatParams.zipWithIndex.map {
               case (param, i) =>
-                ValDef(NoMods,
-                       param.name,
-                       param.tpt,
-                       q"$dataName.${TermName("_" + (i + 1))}")
+                ValDef(
+                  NoMods,
+                  param.name,
+                  param.tpt,
+                  q"$dataName.${TermName("_" + (i + 1))}")
             }
         }
 

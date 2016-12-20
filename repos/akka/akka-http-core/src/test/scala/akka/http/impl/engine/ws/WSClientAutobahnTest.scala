@@ -215,9 +215,10 @@ object WSClientAutobahnTest extends App {
     */
   def runToSingleText(uri: Uri): Future[String] = {
     val sink = Sink.head[Message]
-    runWs(uri,
-          Flow
-            .fromSinkAndSourceMat(sink, Source.maybe[Message])(Keep.left))
+    runWs(
+      uri,
+      Flow
+        .fromSinkAndSourceMat(sink, Source.maybe[Message])(Keep.left))
       .flatMap {
         case tm: TextMessage ⇒ tm.textStream.runWith(Sink.fold("")(_ + _))
         case other ⇒

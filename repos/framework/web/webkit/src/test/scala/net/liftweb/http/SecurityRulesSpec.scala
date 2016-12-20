@@ -114,8 +114,9 @@ class ContentSecurityPolicySpec extends Specification {
           case (headerName, _)
               if headerName.contains("Content-Security-Policy") =>
             headerName
-        } must_== List("Content-Security-Policy-Report-Only",
-                       "X-Content-Security-Policy-Report-Only")
+        } must_== List(
+        "Content-Security-Policy-Report-Only",
+        "X-Content-Security-Policy-Report-Only")
     }
 
     "provide no headers with enforcement and logging disabled" in {

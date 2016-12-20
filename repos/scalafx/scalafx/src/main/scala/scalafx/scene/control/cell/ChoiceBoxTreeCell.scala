@@ -75,8 +75,9 @@ object ChoiceBoxTreeCell {
   /**
     * Added to satisfy Spec tests.
     */
-  @deprecated(message = "Use forTreeView[T](ObservableBuffer[T])",
-              since = "1.0")
+  @deprecated(
+    message = "Use forTreeView[T](ObservableBuffer[T])",
+    since = "1.0")
   def forTreeView[T](items: jfxc.ObservableList[T]) =
     jfxscc.ChoiceBoxTreeCell.forTreeView[T](items)
 
@@ -97,9 +98,9 @@ object ChoiceBoxTreeCell {
   /**
     * Added to satisfy Spec tests.
     */
-  @deprecated(message =
-                "Use forTreeView[T](StringConverter[T], ObservableBuffer[T])",
-              since = "1.0")
+  @deprecated(
+    message = "Use forTreeView[T](StringConverter[T], ObservableBuffer[T])",
+    since = "1.0")
   def forTreeView[T](converter: jfxu.StringConverter[T],
                      items: jfxc.ObservableList[T]) =
     jfxscc.ChoiceBoxTreeCell.forTreeView[T](converter, items)
@@ -120,8 +121,9 @@ object ChoiceBoxTreeCell {
   /**
     * Added to satisfy Spec tests.
     */
-  @deprecated(message = "Use forTreeView[T](StringConverter[T], T*)",
-              since = "1.0")
+  @deprecated(
+    message = "Use forTreeView[T](StringConverter[T], T*)",
+    since = "1.0")
   def forTreeView[T](converter: jfxu.StringConverter[T], items: T*) =
     jfxscc.ChoiceBoxTreeCell.forTreeView[T](converter, items: _*)
 

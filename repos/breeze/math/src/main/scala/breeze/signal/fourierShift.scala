@@ -26,8 +26,9 @@ object fourierShift extends UFunc {
           DenseVector
             .vertcat(dft(dft.length / 2 to -1), dft(0 to dft.length / 2 - 1))
         else
-          DenseVector.vertcat(dft((dft.length + 1) / 2 to -1),
-                              dft(0 to (dft.length - 1) / 2))
+          DenseVector.vertcat(
+            dft((dft.length + 1) / 2 to -1),
+            dft(0 to (dft.length - 1) / 2))
       }
     }
   }

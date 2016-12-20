@@ -49,10 +49,11 @@ class ChangesConfirmationDialog private (
     val swappedChanges: java.util.ArrayList[Change] =
       new java.util.ArrayList[Change]()
     swappedChanges.addAll(changes.map(BuildFileChange.swap))
-    val changesBrowser = new BuildFileChangeBrowser(project,
-                                                    swappedChanges,
-                                                    canExcludeChanges,
-                                                    fileStatusMap)
+    val changesBrowser = new BuildFileChangeBrowser(
+      project,
+      swappedChanges,
+      canExcludeChanges,
+      fileStatusMap)
     myChangesBrowser = changesBrowser
     changesBrowser.setChangesToDisplay(swappedChanges)
     changesBrowser.addToolbarAction(

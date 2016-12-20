@@ -75,12 +75,13 @@ object Upgrade_0_8_3 {
   }
 
   val obsEntityTypes = Set("pio_user", "pio_item")
-  val obsProperties = Set("pio_itypes",
-                          "pio_starttime",
-                          "pio_endtime",
-                          "pio_inactive",
-                          "pio_price",
-                          "pio_rating")
+  val obsProperties = Set(
+    "pio_itypes",
+    "pio_starttime",
+    "pio_endtime",
+    "pio_inactive",
+    "pio_price",
+    "pio_rating")
 
   def hasPIOPrefix(eventClient: LEvents, appId: Int): Boolean = {
     eventClient
@@ -131,9 +132,10 @@ object Upgrade_0_8_3 {
             (newK, v)
         })
 
-        val toEvent = fromEvent.copy(entityType = toEntityType,
-                                     targetEntityType = toTargetEntityType,
-                                     properties = toProperties)
+        val toEvent = fromEvent.copy(
+          entityType = toEntityType,
+          targetEntityType = toTargetEntityType,
+          properties = toProperties)
 
         eventClient.insert(toEvent, toAppId)
       }
@@ -193,8 +195,9 @@ object Upgrade_0_8_3 {
 
     val eventClient = Storage.getLEvents().asInstanceOf[HBLEvents]
 
-    require(fromAppId != toAppId,
-            s"FromAppId: $fromAppId must be different from toAppId: $toAppId")
+    require(
+      fromAppId != toAppId,
+      s"FromAppId: $fromAppId must be different from toAppId: $toAppId")
 
     if (hasPIOPrefix(eventClient, fromAppId)) {
       require(

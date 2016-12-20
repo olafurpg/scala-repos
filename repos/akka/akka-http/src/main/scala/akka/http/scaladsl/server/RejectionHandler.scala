@@ -24,9 +24,10 @@ trait RejectionHandler extends (immutable.Seq[Rejection] ⇒ Option[Route]) {
       case (a: BuiltRejectionHandler, _) if a.isDefault ⇒
         this // the default handler already handles everything
       case (a: BuiltRejectionHandler, b: BuiltRejectionHandler) ⇒
-        new BuiltRejectionHandler(a.cases ++ b.cases,
-                                  a.notFound orElse b.notFound,
-                                  b.isDefault)
+        new BuiltRejectionHandler(
+          a.cases ++ b.cases,
+          a.notFound orElse b.notFound,
+          b.isDefault)
       case _ ⇒
         new RejectionHandler {
           def apply(rejections: immutable.Seq[Rejection]): Option[Route] =
@@ -201,8 +202,9 @@ object RejectionHandler {
                     "Request contains too many ranges."))
       }
       .handle {
-        case UnsatisfiableRangeRejection(unsatisfiableRanges,
-                                         actualEntityLength) ⇒
+        case UnsatisfiableRangeRejection(
+            unsatisfiableRanges,
+            actualEntityLength) ⇒
           complete(
             (RequestedRangeNotSatisfiable,
              List(`Content-Range`(

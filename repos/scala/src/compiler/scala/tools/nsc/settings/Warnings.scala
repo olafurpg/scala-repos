@@ -59,9 +59,10 @@ trait Warnings { self: MutableSettings =>
       "adapted-args",
       "Warn if an argument list is modified to match the receiver.",
       true)
-    val NullaryUnit = LintWarning("nullary-unit",
-                                  "Warn when nullary methods return Unit.",
-                                  true)
+    val NullaryUnit = LintWarning(
+      "nullary-unit",
+      "Warn when nullary methods return Unit.",
+      true)
     val Inaccessible = LintWarning(
       "inaccessible",
       "Warn about inaccessible types in method signatures.",
@@ -139,11 +140,12 @@ trait Warnings { self: MutableSettings =>
   def YwarnInferAny = warnInferAny
 
   // The Xlint warning group.
-  val lint = MultiChoiceSetting(name = "-Xlint",
-                                helpArg = "warning",
-                                descr = "Enable or disable specific warnings",
-                                domain = LintWarnings,
-                                default = Some(List("_")))
+  val lint = MultiChoiceSetting(
+    name = "-Xlint",
+    helpArg = "warning",
+    descr = "Enable or disable specific warnings",
+    domain = LintWarnings,
+    default = Some(List("_")))
 
   allLintWarnings foreach {
     case w if w.yAliased =>

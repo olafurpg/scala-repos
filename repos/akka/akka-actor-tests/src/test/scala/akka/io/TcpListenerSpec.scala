@@ -176,12 +176,13 @@ class TcpListenerSpec extends AkkaSpec("""
         extends Actor
         with ChannelRegistry {
       val listener = context.actorOf(
-        props = Props(classOf[TcpListener],
-                      selectorRouter.ref,
-                      Tcp(system),
-                      this,
-                      bindCommander.ref,
-                      Bind(handler.ref, endpoint, 100, Nil, pullMode))
+        props = Props(
+          classOf[TcpListener],
+          selectorRouter.ref,
+          Tcp(system),
+          this,
+          bindCommander.ref,
+          Bind(handler.ref, endpoint, 100, Nil, pullMode))
           .withDeploy(Deploy.local),
         name = "test-listener-" + counter.next())
       parent.watch(listener)

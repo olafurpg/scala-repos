@@ -24,8 +24,9 @@ import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
   * @author Nikolay.Tropin
   */
 class FieldFromDelayedInitInspection
-    extends AbstractInspection("FieldFromDelayedInit",
-                               "Field from DelayedInit") {
+    extends AbstractInspection(
+      "FieldFromDelayedInit",
+      "Field from DelayedInit") {
   override def actionFor(
       holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case ref: ScReferenceExpression =>
@@ -48,12 +49,14 @@ class FieldFromDelayedInitInspection
     def unapply(srr: ScalaResolveResult): Option[PsiClass] = {
       ScalaPsiUtil.nameContext(srr.getElement) match {
         case LazyVal(_) => None
-        case Both((_: ScPatternDefinition | _: ScVariableDefinition),
-                  ContainingClass(clazz @ (_: ScClass | _: ScObject))) =>
+        case Both(
+            (_: ScPatternDefinition | _: ScVariableDefinition),
+            ContainingClass(clazz @ (_: ScClass | _: ScObject))) =>
           if (srr.fromType.exists(
-                InspectionsUtil.conformsToTypeFromClass(_,
-                                                        "scala.DelayedInit",
-                                                        clazz.getProject)))
+                InspectionsUtil.conformsToTypeFromClass(
+                  _,
+                  "scala.DelayedInit",
+                  clazz.getProject)))
             Some(clazz)
           else None
         case _ => None

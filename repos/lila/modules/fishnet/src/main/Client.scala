@@ -26,12 +26,13 @@ case class Client(
 
 object Client {
 
-  val offline = Client(_id = Key("offline"),
-                       userId = UserId("offline"),
-                       skill = Skill.All,
-                       instance = None,
-                       enabled = true,
-                       createdAt = DateTime.now)
+  val offline = Client(
+    _id = Key("offline"),
+    userId = UserId("offline"),
+    skill = Skill.All,
+    instance = None,
+    enabled = true,
+    createdAt = DateTime.now)
 
   case class Key(value: String) extends AnyVal with StringValue
   case class Version(value: String) extends AnyVal with StringValue

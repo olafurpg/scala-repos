@@ -27,8 +27,9 @@ trait LatticePartialOrderLaws[A] extends Laws {
     new LatticePartialOrderProperties(
       name = "joinSemilatticePartialOrder",
       parents = Seq.empty,
-      bases = Seq("order" → OrderLaws[A].partialOrder,
-                  "lattice" → LatticeLaws[A].joinSemilattice),
+      bases = Seq(
+        "order" → OrderLaws[A].partialOrder,
+        "lattice" → LatticeLaws[A].joinSemilattice),
       "join.lteqv" → forAll((x: A, y: A) => (x <= y) === (y === (x join y)))
     )
 
@@ -37,8 +38,9 @@ trait LatticePartialOrderLaws[A] extends Laws {
     new LatticePartialOrderProperties(
       name = "meetSemilatticePartialOrder",
       parents = Seq.empty,
-      bases = Seq("order" → OrderLaws[A].partialOrder,
-                  "lattice" → LatticeLaws[A].meetSemilattice),
+      bases = Seq(
+        "order" → OrderLaws[A].partialOrder,
+        "lattice" → LatticeLaws[A].meetSemilattice),
       "meet.lteqv" → forAll((x: A, y: A) => (x <= y) === (x === (x meet y)))
     )
 
@@ -87,8 +89,9 @@ trait LatticePartialOrderLaws[A] extends Laws {
                                  P: PartialOrder[A]) =
     new LatticePartialOrderProperties(
       name = "boundedLatticePartialOrder",
-      parents = Seq(boundedJoinSemilatticePartialOrder,
-                    boundedMeetSemilatticePartialOrder),
+      parents = Seq(
+        boundedJoinSemilatticePartialOrder,
+        boundedMeetSemilatticePartialOrder),
       bases = Seq("lattice" → LatticeLaws[A].boundedLattice)
     )
 

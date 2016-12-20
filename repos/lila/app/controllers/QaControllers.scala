@@ -22,15 +22,16 @@ trait QaController extends LilaController {
       case (((answers, popular), related), captcha) =>
         fuccess {
           Ok(
-            views.html.qa.questionShow(q,
-                                       answers,
-                                       popular,
-                                       related,
-                                       answerForm =
-                                         if (QaAuth canAnswer q)
-                                           answerForm orElse Some(forms.answer)
-                                         else None,
-                                       captcha = captcha))
+            views.html.qa.questionShow(
+              q,
+              answers,
+              popular,
+              related,
+              answerForm =
+                if (QaAuth canAnswer q)
+                  answerForm orElse Some(forms.answer)
+                else None,
+              captcha = captcha))
         }
       case _ => notFound
     }

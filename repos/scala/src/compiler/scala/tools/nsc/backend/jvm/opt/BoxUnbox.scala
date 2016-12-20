@@ -267,8 +267,9 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
               toReplace(write.consumer) = List(storeOp)
 
             case c: EscapingConsumer =>
-              assert(keepBox,
-                     s"found escaping consumer, but box is eliminated: $c")
+              assert(
+                keepBox,
+                s"found escaping consumer, but box is eliminated: $c")
 
             case extraction =>
               val (slot, tp) =
@@ -366,8 +367,9 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
                       case (tp, i) =>
                         if (i == valueIndex) {
                           val resultSlot = getLocal(tp.getSize)
-                          loadOps = new VarInsnNode(tp.getOpcode(ILOAD),
-                                                    resultSlot) :: extraction
+                          loadOps = new VarInsnNode(
+                              tp.getOpcode(ILOAD),
+                              resultSlot) :: extraction
                               .postExtractionAdaptationOps(tp)
                           new VarInsnNode(tp.getOpcode(ISTORE), resultSlot)
                         } else {
@@ -382,11 +384,12 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
           }
         }
 
-        checkCopyOpReplacements(allCreations,
-                                allConsumers,
-                                boxKind.boxedTypes,
-                                nextLocal,
-                                prodCons) match {
+        checkCopyOpReplacements(
+          allCreations,
+          allConsumers,
+          boxKind.boxedTypes,
+          nextLocal,
+          prodCons) match {
           case Some((replacements, nextCopyOpLocal, reTypedLocals)) =>
             toReplace ++= replacements
             updateLocalVariableTypes(reTypedLocals)
@@ -421,16 +424,18 @@ class BoxUnbox[BT <: BTypes](val btypes: BT) {
                     if (!hasEscaping && !hasWrite) {
                       // M2 -- see doc comment in the beginning of this file
                       // If both M1 and M2 can be applied, we prefer M2 because it doesn't introduce new locals.
-                      replaceBoxOperationsMultipleCreations(allCreations,
-                                                            allConsumers,
-                                                            boxKind)
+                      replaceBoxOperationsMultipleCreations(
+                        allCreations,
+                        allConsumers,
+                        boxKind)
                     } else if (allCreations.size == 1 &&
                                (!hasEscaping || !boxKind.isMutable)) {
                       // M1 -- see doc comment in the beginning of this file
-                      replaceBoxOperationsSingleCreation(allCreations.head,
-                                                         allConsumers,
-                                                         boxKind,
-                                                         keepBox = hasEscaping)
+                      replaceBoxOperationsSingleCreation(
+                        allCreations.head,
+                        allConsumers,
+                        boxKind,
+                        keepBox = hasEscaping)
                     }
                   }
 

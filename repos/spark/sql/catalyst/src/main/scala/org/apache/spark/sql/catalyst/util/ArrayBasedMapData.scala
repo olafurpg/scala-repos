@@ -56,8 +56,9 @@ object ArrayBasedMapData {
   }
 
   def apply(keys: Array[Any], values: Array[Any]): ArrayBasedMapData = {
-    new ArrayBasedMapData(new GenericArrayData(keys),
-                          new GenericArrayData(values))
+    new ArrayBasedMapData(
+      new GenericArrayData(keys),
+      new GenericArrayData(values))
   }
 
   def toScalaMap(map: ArrayBasedMapData): Map[Any, Any] = {

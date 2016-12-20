@@ -37,13 +37,15 @@ abstract class CheckPrivateAccessTestBase
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     val offset = fileText.indexOf(refMarker) + refMarker.length
-    assert(offset != refMarker.length - 1,
-           "Not specified caret marker in test case. Use " + refMarker +
-             " in scala file for this.")
+    assert(
+      offset != refMarker.length - 1,
+      "Not specified caret marker in test case. Use " + refMarker +
+        " in scala file for this.")
     val elem = scalaFile.findElementAt(offset).getParent
     if (!elem.isInstanceOf[ScReferenceElement])
-      assert(assertion = true,
-             message = "Ref marker should point on reference")
+      assert(
+        assertion = true,
+        message = "Ref marker should point on reference")
     val ref = elem.asInstanceOf[ScReferenceElement]
     val resolve: PsiMember =
       PsiTreeUtil.getParentOfType(ref.resolve(), classOf[PsiMember], false)

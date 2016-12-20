@@ -18,9 +18,10 @@ private[opening] final class Finisher(api: OpeningApi, openingColl: Coll) {
       case None =>
         val userRating = user.perfs.opening.toRating
         val openingRating = opening.perf.toRating
-        updateRatings(userRating,
-                      openingRating,
-                      win.fold(Glicko.Result.Win, Glicko.Result.Loss))
+        updateRatings(
+          userRating,
+          openingRating,
+          win.fold(Glicko.Result.Win, Glicko.Result.Loss))
         val date = DateTime.now
         val userPerf = user.perfs.opening.addOrReset(
           _.opening.crazyGlicko,
@@ -59,10 +60,11 @@ private[opening] final class Finisher(api: OpeningApi, openingColl: Coll) {
   private val system = new RatingCalculator(VOLATILITY, TAU)
 
   private def mkRating(perf: Perf) =
-    new Rating(math.max(1000, perf.glicko.rating),
-               perf.glicko.deviation,
-               perf.glicko.volatility,
-               perf.nb)
+    new Rating(
+      math.max(1000, perf.glicko.rating),
+      perf.glicko.deviation,
+      perf.glicko.volatility,
+      perf.nb)
 
   private def updateRatings(u1: Rating, u2: Rating, result: Glicko.Result) {
     val results = new RatingPeriodResults()

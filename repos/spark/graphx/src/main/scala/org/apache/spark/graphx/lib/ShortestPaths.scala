@@ -39,8 +39,9 @@ object ShortestPaths {
   private def addMaps(spmap1: SPMap, spmap2: SPMap): SPMap =
     (spmap1.keySet ++ spmap2.keySet)
       .map { k =>
-        k -> math.min(spmap1.getOrElse(k, Int.MaxValue),
-                      spmap2.getOrElse(k, Int.MaxValue))
+        k -> math.min(
+          spmap1.getOrElse(k, Int.MaxValue),
+          spmap2.getOrElse(k, Int.MaxValue))
       }
       .toMap
 

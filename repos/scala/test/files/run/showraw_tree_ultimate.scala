@@ -8,14 +8,16 @@ object Test extends App {
   def stabilize(s: String) = """#\d+""".r.replaceAllIn(s, "#<id>")
   println(
     stabilize(
-      showRaw(tb.typecheck(tree1.tree),
-              printIds = true,
-              printKinds = true,
-              printTypes = true)))
+      showRaw(
+        tb.typecheck(tree1.tree),
+        printIds = true,
+        printKinds = true,
+        printTypes = true)))
   println(
     stabilize(
-      showRaw(tb.typecheck(tree2.tree),
-              printIds = true,
-              printKinds = true,
-              printTypes = true)))
+      showRaw(
+        tb.typecheck(tree2.tree),
+        printIds = true,
+        printKinds = true,
+        printTypes = true)))
 }

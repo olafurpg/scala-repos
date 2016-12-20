@@ -24,31 +24,35 @@ object JournalPerfSpec {
       case c @ Cmd("p", payload) ⇒
         persist(c) { d ⇒
           counter += 1
-          require(d.payload == counter,
-                  s"Expected to receive [$counter] yet got: [${d.payload}]")
+          require(
+            d.payload == counter,
+            s"Expected to receive [$counter] yet got: [${d.payload}]")
           if (counter == replyAfter) replyTo ! d.payload
         }
 
       case c @ Cmd("pa", payload) ⇒
         persistAsync(c) { d ⇒
           counter += 1
-          require(d.payload == counter,
-                  s"Expected to receive [$counter] yet got: [${d.payload}]")
+          require(
+            d.payload == counter,
+            s"Expected to receive [$counter] yet got: [${d.payload}]")
           if (counter == replyAfter) replyTo ! d.payload
         }
 
       case c @ Cmd("par", payload) ⇒
         counter += 1
         persistAsync(c) { d ⇒
-          require(d.payload == counter,
-                  s"Expected to receive [$counter] yet got: [${d.payload}]")
+          require(
+            d.payload == counter,
+            s"Expected to receive [$counter] yet got: [${d.payload}]")
         }
         if (counter == replyAfter) replyTo ! payload
 
       case c @ Cmd("n", payload) ⇒
         counter += 1
-        require(payload == counter,
-                s"Expected to receive [$counter] yet got: [${payload}]")
+        require(
+          payload == counter,
+          s"Expected to receive [$counter] yet got: [${payload}]")
         if (counter == replyAfter) replyTo ! payload
 
       case ResetCounter ⇒
@@ -58,8 +62,9 @@ object JournalPerfSpec {
     override def receiveRecover: Receive = {
       case Cmd(_, payload) ⇒
         counter += 1
-        require(payload == counter,
-                s"Expected to receive [$counter] yet got: [${payload}]")
+        require(
+          payload == counter,
+          s"Expected to receive [$counter] yet got: [${payload}]")
         if (counter == replyAfter) replyTo ! payload
     }
   }

@@ -137,9 +137,10 @@ class RangeDirectivesSpec extends RoutingSpec with Inspectors with Inside {
         Range(ByteRange(5, 10), ByteRange(0, 1), ByteRange(1, 2))) ~> {
         wrs {
           complete(
-            HttpEntity.Default(ContentTypes.`text/plain(UTF-8)`,
-                               content.length,
-                               entityData()))
+            HttpEntity.Default(
+              ContentTypes.`text/plain(UTF-8)`,
+              content.length,
+              entityData()))
         }
       } ~> check {
         header[`Content-Range`] should be(None)

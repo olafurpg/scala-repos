@@ -115,15 +115,16 @@ class AbstractFileClassLoader(val root: AbstractFile, parent: ClassLoader)
       case file =>
         packages.getOrElseUpdate(name, {
           val ctor =
-            classOf[Package].getDeclaredConstructor(classOf[String],
-                                                    classOf[String],
-                                                    classOf[String],
-                                                    classOf[String],
-                                                    classOf[String],
-                                                    classOf[String],
-                                                    classOf[String],
-                                                    classOf[URL],
-                                                    classOf[ClassLoader])
+            classOf[Package].getDeclaredConstructor(
+              classOf[String],
+              classOf[String],
+              classOf[String],
+              classOf[String],
+              classOf[String],
+              classOf[String],
+              classOf[String],
+              classOf[URL],
+              classOf[ClassLoader])
           ctor.setAccessible(true)
           ctor
             .newInstance(name, null, null, null, null, null, null, null, this)

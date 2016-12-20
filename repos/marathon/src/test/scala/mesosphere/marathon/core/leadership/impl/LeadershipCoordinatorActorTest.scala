@@ -70,8 +70,9 @@ class LeadershipCoordinatorActorTest extends MarathonSpec {
     assert(
       coordinatorRef.underlyingActor.whenLeaderActors == Set(
         whenLeader2Probe.ref))
-    whenLeader2Probe.send(coordinatorRef,
-                          PreparationMessages.Prepared(whenLeader2Probe.ref))
+    whenLeader2Probe.send(
+      coordinatorRef,
+      PreparationMessages.Prepared(whenLeader2Probe.ref))
 
     probe.expectMsg(PreparationMessages.Prepared(coordinatorRef))
   }
@@ -118,8 +119,9 @@ class LeadershipCoordinatorActorTest extends MarathonSpec {
 
     requester2.send(coordinatorRef, PreparationMessages.PrepareForStart)
 
-    whenLeader1Probe.send(coordinatorRef,
-                          PreparationMessages.Prepared(whenLeader1Probe.ref))
+    whenLeader1Probe.send(
+      coordinatorRef,
+      PreparationMessages.Prepared(whenLeader1Probe.ref))
 
     requester1.expectMsg(PreparationMessages.Prepared(coordinatorRef))
     requester2.expectMsg(PreparationMessages.Prepared(coordinatorRef))

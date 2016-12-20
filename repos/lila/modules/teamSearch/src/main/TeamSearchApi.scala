@@ -20,10 +20,11 @@ final class TeamSearchApi(client: ESClient,
   def store(team: Team) = client.store(Id(team.id), toDoc(team))
 
   private def toDoc(team: Team) =
-    Json.obj(Fields.name -> team.name,
-             Fields.description -> team.description.take(10000),
-             Fields.location -> team.location,
-             Fields.nbMembers -> team.nbMembers)
+    Json.obj(
+      Fields.name -> team.name,
+      Fields.description -> team.description.take(10000),
+      Fields.location -> team.location,
+      Fields.nbMembers -> team.nbMembers)
 
   def reset = client match {
     case c: ESClientHttp =>

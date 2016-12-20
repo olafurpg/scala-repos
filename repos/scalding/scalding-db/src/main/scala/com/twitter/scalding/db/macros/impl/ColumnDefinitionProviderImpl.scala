@@ -78,52 +78,59 @@ object ColumnDefinitionProviderImpl {
       oTpe match {
         // String handling
         case tpe if tpe =:= typeOf[String] =>
-          StringTypeHandler(c)(accessorTree,
-                               fieldName,
-                               defaultValOpt,
-                               annotationInfo,
-                               nullable)
+          StringTypeHandler(c)(
+            accessorTree,
+            fieldName,
+            defaultValOpt,
+            annotationInfo,
+            nullable)
         case tpe if tpe =:= typeOf[Short] =>
-          NumericTypeHandler(c)(accessorTree,
-                                fieldName,
-                                defaultValOpt,
-                                annotationInfo,
-                                nullable,
-                                "SMALLINT")
+          NumericTypeHandler(c)(
+            accessorTree,
+            fieldName,
+            defaultValOpt,
+            annotationInfo,
+            nullable,
+            "SMALLINT")
         case tpe if tpe =:= typeOf[Int] =>
-          NumericTypeHandler(c)(accessorTree,
-                                fieldName,
-                                defaultValOpt,
-                                annotationInfo,
-                                nullable,
-                                "INT")
+          NumericTypeHandler(c)(
+            accessorTree,
+            fieldName,
+            defaultValOpt,
+            annotationInfo,
+            nullable,
+            "INT")
         case tpe if tpe =:= typeOf[Long] =>
-          NumericTypeHandler(c)(accessorTree,
-                                fieldName,
-                                defaultValOpt,
-                                annotationInfo,
-                                nullable,
-                                "BIGINT")
+          NumericTypeHandler(c)(
+            accessorTree,
+            fieldName,
+            defaultValOpt,
+            annotationInfo,
+            nullable,
+            "BIGINT")
         case tpe if tpe =:= typeOf[Double] =>
-          NumericTypeHandler(c)(accessorTree,
-                                fieldName,
-                                defaultValOpt,
-                                annotationInfo,
-                                nullable,
-                                "DOUBLE")
+          NumericTypeHandler(c)(
+            accessorTree,
+            fieldName,
+            defaultValOpt,
+            annotationInfo,
+            nullable,
+            "DOUBLE")
         case tpe if tpe =:= typeOf[Boolean] =>
-          NumericTypeHandler(c)(accessorTree,
-                                fieldName,
-                                defaultValOpt,
-                                annotationInfo,
-                                nullable,
-                                "BOOLEAN")
+          NumericTypeHandler(c)(
+            accessorTree,
+            fieldName,
+            defaultValOpt,
+            annotationInfo,
+            nullable,
+            "BOOLEAN")
         case tpe if tpe =:= typeOf[java.util.Date] =>
-          DateTypeHandler(c)(accessorTree,
-                             fieldName,
-                             defaultValOpt,
-                             annotationInfo,
-                             nullable)
+          DateTypeHandler(c)(
+            accessorTree,
+            fieldName,
+            defaultValOpt,
+            annotationInfo,
+            nullable)
         case tpe if tpe.erasure =:= typeOf[Option[Any]] && nullable == true =>
           Failure(new Exception(
             s"Case class ${T.tpe} has field ${fieldName} which contains a nested option. This is not supported by this macro."))
@@ -133,12 +140,13 @@ object ColumnDefinitionProviderImpl {
             Failure(new Exception(
               s"Case class ${T.tpe} has field ${fieldName}: ${oTpe.toString}, with a default value. Options cannot have default values"))
           else {
-            matchField(accessorTree,
-                       tpe.asInstanceOf[TypeRefApi].args.head,
-                       fieldName,
-                       None,
-                       annotationInfo,
-                       true)
+            matchField(
+              accessorTree,
+              tpe.asInstanceOf[TypeRefApi].args.head,
+              fieldName,
+              None,
+              annotationInfo,
+              true)
           }
         case tpe if IsCaseClassImpl.isCaseClassType(c)(tpe) =>
           expandMethod(accessorTree, tpe)
@@ -204,12 +212,13 @@ object ColumnDefinitionProviderImpl {
         }
         .map {
           case (accessorMethod, fieldName, defaultVal, annotationInfo) =>
-            matchField(outerAccessorTree :+ accessorMethod,
-                       accessorMethod.returnType,
-                       FieldName(fieldName),
-                       defaultVal,
-                       annotationInfo,
-                       false)
+            matchField(
+              outerAccessorTree :+ accessorMethod,
+              accessorMethod.returnType,
+              FieldName(fieldName),
+              defaultVal,
+              annotationInfo,
+              false)
         }
         .toList
         // This algorithm returns the error from the first exception we run into.
@@ -232,8 +241,9 @@ object ColumnDefinitionProviderImpl {
       formats.map(_.fieldName).groupBy(identity).filter(_._2.size > 1).keys
 
     if (duplicateFields.nonEmpty) {
-      c.abort(c.enclosingPosition,
-              s"""
+      c.abort(
+        c.enclosingPosition,
+        s"""
         Duplicate field names found: ${duplicateFields.mkString(",")}.
         Please check your nested case classes.
         """)

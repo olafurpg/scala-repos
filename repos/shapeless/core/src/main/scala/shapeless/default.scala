@@ -290,8 +290,9 @@ class DefaultMacros(val c: whitebox.Context) extends CaseClassMacros {
       if (hasDefaults) {
         val methodOpt =
           methodFrom(tpe.companion, s"apply$$default$$${idx + 1}").orElse(
-            methodFrom(companion.symbol.info,
-                       s"$$lessinit$$greater$$default$$${idx + 1}"))
+            methodFrom(
+              companion.symbol.info,
+              s"$$lessinit$$greater$$default$$${idx + 1}"))
 
         methodOpt match {
           case Some(method) =>

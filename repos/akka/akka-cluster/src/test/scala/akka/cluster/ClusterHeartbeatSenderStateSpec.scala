@@ -49,10 +49,11 @@ class ClusterHeartbeatSenderStateSpec extends WordSpec with Matchers {
 
   private def emptyState(selfUniqueAddress: UniqueAddress) =
     ClusterHeartbeatSenderState(
-      ring = HeartbeatNodeRing(selfUniqueAddress,
-                               Set(selfUniqueAddress),
-                               Set.empty,
-                               monitoredByNrOfMembers = 3),
+      ring = HeartbeatNodeRing(
+        selfUniqueAddress,
+        Set(selfUniqueAddress),
+        Set.empty,
+        monitoredByNrOfMembers = 3),
       oldReceiversNowUnreachable = Set.empty[UniqueAddress],
       failureDetector = new DefaultFailureDetectorRegistry[Address](() ⇒
         new FailureDetectorStub))

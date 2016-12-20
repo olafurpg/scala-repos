@@ -59,15 +59,17 @@ object ContentEncoding {
   }
 
   val GZip: ContentEncoding = {
-    create("gzip",
-           out => new GZIPOutputStream(out),
-           in => new GZIPInputStream(in))
+    create(
+      "gzip",
+      out => new GZIPOutputStream(out),
+      in => new GZIPInputStream(in))
   }
 
   val Deflate: ContentEncoding = {
-    create("deflate",
-           out => new DeflaterOutputStream(out),
-           in => new InflaterInputStream(in))
+    create(
+      "deflate",
+      out => new DeflaterOutputStream(out),
+      in => new InflaterInputStream(in))
   }
 
   def forName(name: String): Option[ContentEncoding] = name.toLowerCase match {

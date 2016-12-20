@@ -146,11 +146,13 @@ class CreateScalaDocStubAction
           extensions inWriteAction {
             docOwner match {
               case fun: ScFunctionDefinition =>
-                processParams(List("@param", "@tparam"),
-                              List(fun.parameters, fun.typeParameters))
+                processParams(
+                  List("@param", "@tparam"),
+                  List(fun.parameters, fun.typeParameters))
               case clazz: ScClass =>
-                processParams(List("@param", "@tparam"),
-                              List(clazz.parameters, clazz.typeParameters))
+                processParams(
+                  List("@param", "@tparam"),
+                  List(clazz.parameters, clazz.typeParameters))
               case trt: ScTrait =>
                 processParams(List("@tparam"), List(trt.typeParameters))
               case alias: ScTypeAlias =>

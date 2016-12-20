@@ -80,9 +80,10 @@ object NeedsToBeMixin extends AnnotatorPart[ScTemplateDefinition] {
                     if (place != null) {
                       holder.createErrorAnnotation(
                         place,
-                        message(kindOf(element),
-                                element.name,
-                                (f.name, f.containingClass.name)))
+                        message(
+                          kindOf(element),
+                          element.name,
+                          (f.name, f.containingClass.name)))
                     }
                 }
               }

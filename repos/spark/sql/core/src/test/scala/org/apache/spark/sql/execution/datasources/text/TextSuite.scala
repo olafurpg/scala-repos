@@ -108,15 +108,19 @@ class TextSuite extends QueryTest with SharedSQLContext {
 
   test("SPARK-13543 Write the output as uncompressed via option()") {
     val clonedConf = new Configuration(hadoopConfiguration)
-    hadoopConfiguration.set("mapreduce.output.fileoutputformat.compress",
-                            "true")
-    hadoopConfiguration.set("mapreduce.output.fileoutputformat.compress.type",
-                            CompressionType.BLOCK.toString)
-    hadoopConfiguration.set("mapreduce.output.fileoutputformat.compress.codec",
-                            classOf[GzipCodec].getName)
+    hadoopConfiguration.set(
+      "mapreduce.output.fileoutputformat.compress",
+      "true")
+    hadoopConfiguration.set(
+      "mapreduce.output.fileoutputformat.compress.type",
+      CompressionType.BLOCK.toString)
+    hadoopConfiguration.set(
+      "mapreduce.output.fileoutputformat.compress.codec",
+      classOf[GzipCodec].getName)
     hadoopConfiguration.set("mapreduce.map.output.compress", "true")
-    hadoopConfiguration.set("mapreduce.map.output.compress.codec",
-                            classOf[GzipCodec].getName)
+    hadoopConfiguration.set(
+      "mapreduce.map.output.compress.codec",
+      classOf[GzipCodec].getName)
     withTempDir { dir =>
       try {
         val testDf = sqlContext.read.text(testFile)

@@ -48,11 +48,12 @@ class Context {
   def healthStat: Int = statsRecv.gauges(Seq("testGroup", "health"))().toInt
   val timer = new MockTimer
 
-  val stabilizedAddr = StabilizingAddr(addrs.offer,
-                                       healthStatus.pulse.recv,
-                                       grace,
-                                       statsRecv.scope("testGroup"),
-                                       timer)
+  val stabilizedAddr = StabilizingAddr(
+    addrs.offer,
+    healthStatus.pulse.recv,
+    grace,
+    statsRecv.scope("testGroup"),
+    timer)
 
   @volatile var stabilized: Addr = Addr.Pending
   for (addr <- stabilizedAddr) stabilized = addr

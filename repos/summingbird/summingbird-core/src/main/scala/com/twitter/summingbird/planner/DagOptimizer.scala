@@ -35,8 +35,9 @@ trait DagOptimizer[P <: Platform[P]] {
   }
   protected def mkAlsoTail[T, U]: (Prod[T], Prod[U]) => Prod[U] = {
     (left, right) =>
-      new AlsoTailProducer(left.asInstanceOf[TailProducer[P, T]],
-                           right.asInstanceOf[TailProducer[P, U]])
+      new AlsoTailProducer(
+        left.asInstanceOf[TailProducer[P, T]],
+        right.asInstanceOf[TailProducer[P, U]])
   }
   protected def mkMerge[T]: (Prod[T], Prod[T]) => Prod[T] = { (left, right) =>
     MergedProducer(left, right)
@@ -346,8 +347,9 @@ trait DagOptimizer[P <: Platform[P]] {
   object DiamondToFlatMap extends PartialRule[Prod] {
     def applyWhere[T](on: ExpressionDag[Prod]) = {
       //Can't fuse flatMaps when on fanout
-      case MergedProducer(left @ FlatMappedProducer(inleft, fnleft),
-                          right @ FlatMappedProducer(inright, fnright))
+      case MergedProducer(
+          left @ FlatMappedProducer(inleft, fnleft),
+          right @ FlatMappedProducer(inright, fnright))
           if (inleft == inright) && (on.fanOut(left) == 1) &&
             (on.fanOut(right) == 1) =>
         FlatMappedProducer(inleft, MergeResults(fnleft, fnright))

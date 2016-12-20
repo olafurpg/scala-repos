@@ -18,9 +18,10 @@ private[flow] object OfferMatcherLaunchTokensActor {
             taskStatusObservables: TaskStatusObservables,
             offerMatcherManager: OfferMatcherManager): Props = {
     Props(
-      new OfferMatcherLaunchTokensActor(conf,
-                                        taskStatusObservables,
-                                        offerMatcherManager))
+      new OfferMatcherLaunchTokensActor(
+        conf,
+        taskStatusObservables,
+        offerMatcherManager))
   }
 }
 

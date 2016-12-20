@@ -147,11 +147,12 @@ object ClientConfig {
   // historical defaults for ClientBuilder
   private[builder] val DefaultParams =
     Stack.Params.empty + param.Stats(NullStatsReceiver) +
-      param.Label(DefaultName) + DefaultPool.Param(low = 1,
-                                                   high = Int.MaxValue,
-                                                   bufferSize = 0,
-                                                   idleTime = 5.seconds,
-                                                   maxWaiters = Int.MaxValue) +
+      param.Label(DefaultName) + DefaultPool.Param(
+      low = 1,
+      high = Int.MaxValue,
+      bufferSize = 0,
+      idleTime = 5.seconds,
+      maxWaiters = Int.MaxValue) +
       param.Tracer(NullTracer) + param.Monitor(NullMonitor) +
       param.Reporter(NullReporterFactory) + Daemonize(false)
 }
@@ -163,9 +164,10 @@ private[builder] trait ClientConfigEvidence[
 
 private[builder] object ClientConfigEvidence {
   implicit object FullyConfigured
-      extends ClientConfigEvidence[ClientConfig.Yes,
-                                   ClientConfig.Yes,
-                                   ClientConfig.Yes]
+      extends ClientConfigEvidence[
+        ClientConfig.Yes,
+        ClientConfig.Yes,
+        ClientConfig.Yes]
 }
 
 /**
@@ -777,9 +779,10 @@ class ClientBuilder[Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit] priv
   def tls(sslContext: SSLContext, hostname: Option[String]): This =
     configured((Transport.TLSClientEngine(Some({
       case inet: InetSocketAddress =>
-        Ssl.client(sslContext,
-                   hostname.getOrElse(inet.getHostName),
-                   inet.getPort)
+        Ssl.client(
+          sslContext,
+          hostname.getOrElse(inet.getHostName),
+          inet.getPort)
       case _ => Ssl.client(sslContext)
     })))).configured(Transporter.TLSHostname(hostname))
 
@@ -818,8 +821,9 @@ class ClientBuilder[Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit] priv
     configured(
       params[Transporter.HttpProxy].copy(credentials = Some(credentials)))
 
-  @deprecated("Use socksProxy(socksProxy: Option[SocketAddress])",
-              "2014-12-02")
+  @deprecated(
+    "Use socksProxy(socksProxy: Option[SocketAddress])",
+    "2014-12-02")
   def socksProxy(socksProxy: SocketAddress): This =
     configured(params[Transporter.SocksProxy].copy(sa = Some(socksProxy)))
 
@@ -983,9 +987,10 @@ class ClientBuilder[Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit] priv
   def buildFactory(
       THE_BUILDER_IS_NOT_FULLY_SPECIFIED_SEE_ClientBuilder_DOCUMENTATION: ThisConfig =:= FullySpecifiedConfig
   ): ServiceFactory[Req, Rep] =
-    buildFactory()(new ClientConfigEvidence[HasCluster,
-                                            HasCodec,
-                                            HasHostConnectionLimit] {})
+    buildFactory()(new ClientConfigEvidence[
+      HasCluster,
+      HasCodec,
+      HasHostConnectionLimit] {})
 
   /**
     * Construct a Service.
@@ -1005,9 +1010,10 @@ class ClientBuilder[Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit] priv
   def build(
       THE_BUILDER_IS_NOT_FULLY_SPECIFIED_SEE_ClientBuilder_DOCUMENTATION: ThisConfig =:= FullySpecifiedConfig
   ): Service[Req, Rep] =
-    build()(new ClientConfigEvidence[HasCluster,
-                                     HasCodec,
-                                     HasHostConnectionLimit] {})
+    build()(new ClientConfigEvidence[
+      HasCluster,
+      HasCodec,
+      HasHostConnectionLimit] {})
 
   private[this] def validated = {
     if (!params.contains[DestName])
@@ -1057,9 +1063,10 @@ private object ClientBuilderClient {
   import com.twitter.finagle.param._
 
   private class StatsFilterModule[Req, Rep]
-      extends Stack.Module2[Stats,
-                            ExceptionStatsHandler,
-                            ServiceFactory[Req, Rep]] {
+      extends Stack.Module2[
+        Stats,
+        ExceptionStatsHandler,
+        ServiceFactory[Req, Rep]] {
     override val role = new Stack.Role("ClientBuilder StatsFilter")
     override val description =
       "Record request stats scoped to 'tries', measured after any retries have occurred"
@@ -1137,9 +1144,10 @@ private object ClientBuilderClient {
       private[this] val closed = new AtomicBoolean(false)
       override def close(deadline: Time): Future[Unit] = {
         if (!closed.compareAndSet(false, true)) {
-          logger.log(Level.WARNING,
-                     "Close on ServiceFactory called multiple times!",
-                     new Exception /*stack trace please*/ )
+          logger.log(
+            Level.WARNING,
+            "Close on ServiceFactory called multiple times!",
+            new Exception /*stack trace please*/ )
           return Future.exception(new IllegalStateException)
         }
 
@@ -1160,10 +1168,12 @@ private object ClientBuilderClient {
         def apply[Request, Response](
             stack: Stack[ServiceFactory[Request, Response]]) =
           stack
-            .insertBefore(Retries.Role,
-                          new StatsFilterModule[Request, Response])
-            .replace(Retries.Role,
-                     Retries.moduleWithRetryPolicy[Request, Response])
+            .insertBefore(
+              Retries.Role,
+              new StatsFilterModule[Request, Response])
+            .replace(
+              Retries.Role,
+              Retries.moduleWithRetryPolicy[Request, Response])
             .prepend(new GlobalTimeoutModule[Request, Response])
             .prepend(new ExceptionSourceFilterModule[Request, Response])
       })
@@ -1177,9 +1187,10 @@ private object ClientBuilderClient {
       override def close(deadline: Time): Future[Unit] = {
         if (!released.compareAndSet(false, true)) {
           val Logger(logger) = client.params[Logger]
-          logger.log(java.util.logging.Level.WARNING,
-                     "Release on Service called multiple times!",
-                     new Exception /*stack trace please*/ )
+          logger.log(
+            java.util.logging.Level.WARNING,
+            "Release on Service called multiple times!",
+            new Exception /*stack trace please*/ )
           return Future.exception(new IllegalStateException)
         }
         super.close(deadline)
@@ -1228,9 +1239,10 @@ private case class CodecClient[Req, Rep](
     val clientStack = {
       val stack0 = stack
         .replace(StackClient.Role.prepConn, prepConn)
-        .replace(StackClient.Role.prepFactory,
-                 (next: ServiceFactory[Req, Rep]) =>
-                   codec.prepareServiceFactory(next))
+        .replace(
+          StackClient.Role.prepFactory,
+          (next: ServiceFactory[Req, Rep]) =>
+            codec.prepareServiceFactory(next))
         .replace(TraceInitializerFilter.role, codec.newTraceInitializer)
 
       // disable failFast if the codec requests it or it is

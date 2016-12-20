@@ -41,12 +41,13 @@ object ScriptedPlugin extends Plugin {
     }
 
   def scriptedRunTask: Initialize[Task[Method]] = (scriptedTests) map { (m) =>
-    m.getClass.getMethod("run",
-                         classOf[File],
-                         classOf[Boolean],
-                         classOf[Array[String]],
-                         classOf[File],
-                         classOf[Array[String]])
+    m.getClass.getMethod(
+      "run",
+      classOf[File],
+      classOf[Boolean],
+      classOf[Array[String]],
+      classOf[File],
+      classOf[Array[String]])
   }
 
   private def scriptedParser(scriptedBase: File): Parser[Seq[String]] = {
@@ -71,12 +72,13 @@ object ScriptedPlugin extends Plugin {
     val args = scriptedParser(sbtTestDirectory.value).parsed
     val prereq: Unit = scriptedDependencies.value
     try {
-      scriptedRun.value.invoke(scriptedTests.value,
-                               sbtTestDirectory.value,
-                               scriptedBufferLog.value: java.lang.Boolean,
-                               args.toArray,
-                               sbtLauncher.value,
-                               scriptedLaunchOpts.value.toArray)
+      scriptedRun.value.invoke(
+        scriptedTests.value,
+        sbtTestDirectory.value,
+        scriptedBufferLog.value: java.lang.Boolean,
+        args.toArray,
+        sbtLauncher.value,
+        scriptedLaunchOpts.value.toArray)
     } catch {
       case e: java.lang.reflect.InvocationTargetException => throw e.getCause
     }

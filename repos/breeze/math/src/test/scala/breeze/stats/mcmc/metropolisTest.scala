@@ -38,12 +38,13 @@ class metropolisTest extends FunSuite {
   val TOLERANCE = 0.1
 
   test("stupidly simple mcmc") {
-    val mh = ArbitraryMetropolisHastings(logLikelihood _,
-                                         (_: State) => proposal,
-                                         (_: State, _: State) => 0.0,
-                                         A,
-                                         burnIn = 10000,
-                                         dropCount = DROP_COUNT)
+    val mh = ArbitraryMetropolisHastings(
+      logLikelihood _,
+      (_: State) => proposal,
+      (_: State, _: State) => 0.0,
+      A,
+      burnIn = 10000,
+      dropCount = DROP_COUNT)
     var aCount: Double = 0
     var bCount: Double = 0
     var cCount: Double = 0
@@ -70,12 +71,13 @@ class metropolisTest extends FunSuite {
     }
 
   test("stupidly simple mcmc, anisotropic") {
-    val mh = ArbitraryMetropolisHastings(logLikelihood _,
-                                         skewedProposal _,
-                                         logSkewedTransitionProbability _,
-                                         A,
-                                         burnIn = 30000,
-                                         dropCount = DROP_COUNT)
+    val mh = ArbitraryMetropolisHastings(
+      logLikelihood _,
+      skewedProposal _,
+      logSkewedTransitionProbability _,
+      A,
+      burnIn = 30000,
+      dropCount = DROP_COUNT)
     var aCount: Double = 0
     var bCount: Double = 0
     var cCount: Double = 0

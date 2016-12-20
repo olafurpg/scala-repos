@@ -24,10 +24,12 @@ case class ItemScore(
 
 object SimilarProductEngine extends IEngineFactory {
   def apply() = {
-    new Engine(classOf[DataSource],
-               classOf[Preparator],
-               Map("als" -> classOf[ALSAlgorithm],
-                   "likealgo" -> classOf[LikeAlgorithm]), // ADDED
-               classOf[Serving])
+    new Engine(
+      classOf[DataSource],
+      classOf[Preparator],
+      Map(
+        "als" -> classOf[ALSAlgorithm],
+        "likealgo" -> classOf[LikeAlgorithm]), // ADDED
+      classOf[Serving])
   }
 }

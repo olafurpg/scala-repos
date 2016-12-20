@@ -236,9 +236,10 @@ abstract class RemoteSupport
     */
   @deprecated("Will be removed after 1.1", "1.1")
   def actorOf[T <: Actor: ClassTag](host: String, port: Int): ActorRef =
-    clientManagedActorOf(() => createActorFromClass(classTag[T].erasure),
-                         host,
-                         port)
+    clientManagedActorOf(
+      () => createActorFromClass(classTag[T].erasure),
+      host,
+      port)
 
   protected def createActorFromClass(clazz: Class[_]): Actor = {
     import ReflectiveAccess.{createInstance, noParams, noArgs}
@@ -463,23 +464,25 @@ trait RemoteClientModule extends RemoteModule { self: RemoteModule =>
   def actorFor(classNameOrServiceId: String,
                hostname: String,
                port: Int): ActorRef =
-    actorFor(classNameOrServiceId,
-             classNameOrServiceId,
-             Actor.TIMEOUT,
-             hostname,
-             port,
-             None)
+    actorFor(
+      classNameOrServiceId,
+      classNameOrServiceId,
+      Actor.TIMEOUT,
+      hostname,
+      port,
+      None)
 
   def actorFor(classNameOrServiceId: String,
                hostname: String,
                port: Int,
                loader: ClassLoader): ActorRef =
-    actorFor(classNameOrServiceId,
-             classNameOrServiceId,
-             Actor.TIMEOUT,
-             hostname,
-             port,
-             Some(loader))
+    actorFor(
+      classNameOrServiceId,
+      classNameOrServiceId,
+      Actor.TIMEOUT,
+      hostname,
+      port,
+      Some(loader))
 
   def actorFor(serviceId: String,
                className: String,
@@ -498,24 +501,26 @@ trait RemoteClientModule extends RemoteModule { self: RemoteModule =>
                timeout: Long,
                hostname: String,
                port: Int): ActorRef =
-    actorFor(classNameOrServiceId,
-             classNameOrServiceId,
-             timeout,
-             hostname,
-             port,
-             None)
+    actorFor(
+      classNameOrServiceId,
+      classNameOrServiceId,
+      timeout,
+      hostname,
+      port,
+      None)
 
   def actorFor(classNameOrServiceId: String,
                timeout: Long,
                hostname: String,
                port: Int,
                loader: ClassLoader): ActorRef =
-    actorFor(classNameOrServiceId,
-             classNameOrServiceId,
-             timeout,
-             hostname,
-             port,
-             Some(loader))
+    actorFor(
+      classNameOrServiceId,
+      classNameOrServiceId,
+      timeout,
+      hostname,
+      port,
+      Some(loader))
 
   def actorFor(serviceId: String,
                className: String,
@@ -528,26 +533,28 @@ trait RemoteClientModule extends RemoteModule { self: RemoteModule =>
                        serviceIdOrClassName: String,
                        hostname: String,
                        port: Int): T =
-    typedActorFor(intfClass,
-                  serviceIdOrClassName,
-                  serviceIdOrClassName,
-                  Actor.TIMEOUT,
-                  hostname,
-                  port,
-                  None)
+    typedActorFor(
+      intfClass,
+      serviceIdOrClassName,
+      serviceIdOrClassName,
+      Actor.TIMEOUT,
+      hostname,
+      port,
+      None)
 
   def typedActorFor[T](intfClass: Class[T],
                        serviceIdOrClassName: String,
                        timeout: Long,
                        hostname: String,
                        port: Int): T =
-    typedActorFor(intfClass,
-                  serviceIdOrClassName,
-                  serviceIdOrClassName,
-                  timeout,
-                  hostname,
-                  port,
-                  None)
+    typedActorFor(
+      intfClass,
+      serviceIdOrClassName,
+      serviceIdOrClassName,
+      timeout,
+      hostname,
+      port,
+      None)
 
   def typedActorFor[T](intfClass: Class[T],
                        serviceIdOrClassName: String,
@@ -555,13 +562,14 @@ trait RemoteClientModule extends RemoteModule { self: RemoteModule =>
                        hostname: String,
                        port: Int,
                        loader: ClassLoader): T =
-    typedActorFor(intfClass,
-                  serviceIdOrClassName,
-                  serviceIdOrClassName,
-                  timeout,
-                  hostname,
-                  port,
-                  Some(loader))
+    typedActorFor(
+      intfClass,
+      serviceIdOrClassName,
+      serviceIdOrClassName,
+      timeout,
+      hostname,
+      port,
+      Some(loader))
 
   def typedActorFor[T](intfClass: Class[T],
                        serviceId: String,
@@ -570,13 +578,14 @@ trait RemoteClientModule extends RemoteModule { self: RemoteModule =>
                        hostname: String,
                        port: Int,
                        loader: ClassLoader): T =
-    typedActorFor(intfClass,
-                  serviceId,
-                  implClassName,
-                  timeout,
-                  hostname,
-                  port,
-                  Some(loader))
+    typedActorFor(
+      intfClass,
+      serviceId,
+      implClassName,
+      timeout,
+      hostname,
+      port,
+      Some(loader))
 
   @deprecated("Will be removed after 1.1", "1.1")
   def clientManagedActorOf(factory: () => Actor,

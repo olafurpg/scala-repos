@@ -39,13 +39,14 @@ class ReplicaFetcherManager(brokerConfig: KafkaConfig,
       case Some(p) =>
         "%s:ReplicaFetcherThread-%d-%d".format(p, fetcherId, sourceBroker.id)
     }
-    new ReplicaFetcherThread(threadName,
-                             fetcherId,
-                             sourceBroker,
-                             brokerConfig,
-                             replicaMgr,
-                             metrics,
-                             time)
+    new ReplicaFetcherThread(
+      threadName,
+      fetcherId,
+      sourceBroker,
+      brokerConfig,
+      replicaMgr,
+      metrics,
+      time)
   }
 
   def shutdown() {

@@ -184,8 +184,9 @@ private[spark] class SqlNewHadoopRDD[V: ClassTag](
           format.getClass.getName == "org.apache.parquet.hadoop.ParquetInputFormat") {
         val parquetReader: VectorizedParquetRecordReader =
           new VectorizedParquetRecordReader()
-        if (!parquetReader.tryInitialize(split.serializableHadoopSplit.value,
-                                         hadoopAttemptContext)) {
+        if (!parquetReader.tryInitialize(
+              split.serializableHadoopSplit.value,
+              hadoopAttemptContext)) {
           parquetReader.close()
         } else {
           reader = parquetReader.asInstanceOf[RecordReader[Void, V]]
@@ -196,10 +197,12 @@ private[spark] class SqlNewHadoopRDD[V: ClassTag](
       }
 
       if (reader == null) {
-        reader = format.createRecordReader(split.serializableHadoopSplit.value,
-                                           hadoopAttemptContext)
-        reader.initialize(split.serializableHadoopSplit.value,
-                          hadoopAttemptContext)
+        reader = format.createRecordReader(
+          split.serializableHadoopSplit.value,
+          hadoopAttemptContext)
+        reader.initialize(
+          split.serializableHadoopSplit.value,
+          hadoopAttemptContext)
       }
 
       // Register an on-task-completion callback to close the input stream.

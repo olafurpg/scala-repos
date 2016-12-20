@@ -27,8 +27,9 @@ class ActorMaterializerSpec extends AkkaSpec with ImplicitSender {
 
       m.shutdown()
 
-      an[AbruptTerminationException] should be thrownBy Await.result(f,
-                                                                     3.seconds)
+      an[AbruptTerminationException] should be thrownBy Await.result(
+        f,
+        3.seconds)
     }
 
     "refuse materialization after shutdown" in {

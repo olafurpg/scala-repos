@@ -338,13 +338,14 @@ trait SeqLike[+A, +Repr]
       else if (tl < 1) clippedFrom
       else if (l < tl) -1
       else
-        SeqLike.kmpSearch(thisCollection,
-                          clippedFrom,
-                          l,
-                          that.seq,
-                          0,
-                          tl,
-                          forward = true)
+        SeqLike.kmpSearch(
+          thisCollection,
+          clippedFrom,
+          l,
+          that.seq,
+          0,
+          tl,
+          forward = true)
     } else {
       var i = from
       var s: Seq[A] = thisCollection drop i
@@ -381,13 +382,14 @@ trait SeqLike[+A, +Repr]
     else if (tl < 1) clippedL
     else if (l < tl) -1
     else
-      SeqLike.kmpSearch(thisCollection,
-                        0,
-                        clippedL + tl,
-                        that.seq,
-                        0,
-                        tl,
-                        forward = false)
+      SeqLike.kmpSearch(
+        thisCollection,
+        0,
+        clippedL + tl,
+        that.seq,
+        0,
+        tl,
+        forward = false)
   }
 
   /** Tests whether this $coll contains a given sequence as a slice.

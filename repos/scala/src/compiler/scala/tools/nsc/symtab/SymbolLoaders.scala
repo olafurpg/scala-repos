@@ -45,8 +45,9 @@ abstract class SymbolLoaders {
   protected def enterIfNew(owner: Symbol,
                            member: Symbol,
                            completer: SymbolLoader): Symbol = {
-    assert(owner.info.decls.lookup(member.name) == NoSymbol,
-           owner.fullName + "." + member.name)
+    assert(
+      owner.info.decls.lookup(member.name) == NoSymbol,
+      owner.fullName + "." + member.name)
     owner.info.decls enter member
     member
   }

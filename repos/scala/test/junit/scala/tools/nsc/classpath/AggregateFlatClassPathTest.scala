@@ -110,20 +110,23 @@ class AggregateFlatClassPathTest {
     val packageDirs =
       if (inPackage == FlatClassPath.RootPackage) ""
       else inPackage.split('.').mkString("/", "/", "")
-    new VirtualFile(fileName + extension,
-                    s"$pathPrefix$packageDirs/$fileName$extension")
+    new VirtualFile(
+      fileName + extension,
+      s"$pathPrefix$packageDirs/$fileName$extension")
   }
 
   private def createDefaultTestClasspath() = {
     val partialClassPaths = Seq(
       TestSourcePath(dir1, EntryNamesInPackage(pkg1)("F", "A", "G")),
-      TestClassPath(dir2,
-                    EntryNamesInPackage(pkg1)("C", "B", "A"),
-                    EntryNamesInPackage(pkg2)("D", "A", "E")),
+      TestClassPath(
+        dir2,
+        EntryNamesInPackage(pkg1)("C", "B", "A"),
+        EntryNamesInPackage(pkg2)("D", "A", "E")),
       TestClassPath(dir3, EntryNamesInPackage(pkg1)("A", "D", "F")),
-      TestSourcePath(dir4,
-                     EntryNamesInPackage(pkg2)("A", "H", "I"),
-                     EntryNamesInPackage(pkg1)("A")),
+      TestSourcePath(
+        dir4,
+        EntryNamesInPackage(pkg2)("A", "H", "I"),
+        EntryNamesInPackage(pkg1)("A")),
       TestSourcePath(dir2, EntryNamesInPackage(pkg3)("J", "K", "L")))
 
     AggregateFlatClassPath(partialClassPaths)
@@ -161,16 +164,18 @@ class AggregateFlatClassPathTest {
   def testGettingClasses: Unit = {
     val cp = createDefaultTestClasspath()
 
-    val classesInPkg1 = Seq(classFileEntry(dir2, pkg1, "C"),
-                            classFileEntry(dir2, pkg1, "B"),
-                            classFileEntry(dir2, pkg1, "A"),
-                            classFileEntry(dir3, pkg1, "D"),
-                            classFileEntry(dir3, pkg1, "F"))
+    val classesInPkg1 = Seq(
+      classFileEntry(dir2, pkg1, "C"),
+      classFileEntry(dir2, pkg1, "B"),
+      classFileEntry(dir2, pkg1, "A"),
+      classFileEntry(dir3, pkg1, "D"),
+      classFileEntry(dir3, pkg1, "F"))
     assertEquals(classesInPkg1, cp.classes(pkg1))
 
-    val classesInPkg2 = Seq(classFileEntry(dir2, pkg2, "D"),
-                            classFileEntry(dir2, pkg2, "A"),
-                            classFileEntry(dir2, pkg2, "E"))
+    val classesInPkg2 = Seq(
+      classFileEntry(dir2, pkg2, "D"),
+      classFileEntry(dir2, pkg2, "A"),
+      classFileEntry(dir2, pkg2, "E"))
     assertEquals(classesInPkg2, cp.classes(pkg2))
 
     assertEquals(Seq.empty, cp.classes(pkg3))
@@ -181,24 +186,27 @@ class AggregateFlatClassPathTest {
   def testGettingSources: Unit = {
     val partialClassPaths = Seq(
       TestClassPath(dir1, EntryNamesInPackage(pkg1)("F", "A", "G")),
-      TestSourcePath(dir2,
-                     EntryNamesInPackage(pkg1)("C", "B", "A"),
-                     EntryNamesInPackage(pkg2)("D", "A", "E")),
+      TestSourcePath(
+        dir2,
+        EntryNamesInPackage(pkg1)("C", "B", "A"),
+        EntryNamesInPackage(pkg2)("D", "A", "E")),
       TestSourcePath(dir3, EntryNamesInPackage(pkg1)("A", "D", "F")),
       TestClassPath(dir4, EntryNamesInPackage(pkg2)("A", "H", "I")),
       TestClassPath(dir2, EntryNamesInPackage(pkg3)("J", "K", "L")))
     val cp = AggregateFlatClassPath(partialClassPaths)
 
-    val sourcesInPkg1 = Seq(sourceFileEntry(dir2, pkg1, "C"),
-                            sourceFileEntry(dir2, pkg1, "B"),
-                            sourceFileEntry(dir2, pkg1, "A"),
-                            sourceFileEntry(dir3, pkg1, "D"),
-                            sourceFileEntry(dir3, pkg1, "F"))
+    val sourcesInPkg1 = Seq(
+      sourceFileEntry(dir2, pkg1, "C"),
+      sourceFileEntry(dir2, pkg1, "B"),
+      sourceFileEntry(dir2, pkg1, "A"),
+      sourceFileEntry(dir3, pkg1, "D"),
+      sourceFileEntry(dir3, pkg1, "F"))
     assertEquals(sourcesInPkg1, cp.sources(pkg1))
 
-    val sourcesInPkg2 = Seq(sourceFileEntry(dir2, pkg2, "D"),
-                            sourceFileEntry(dir2, pkg2, "A"),
-                            sourceFileEntry(dir2, pkg2, "E"))
+    val sourcesInPkg2 = Seq(
+      sourceFileEntry(dir2, pkg2, "D"),
+      sourceFileEntry(dir2, pkg2, "A"),
+      sourceFileEntry(dir2, pkg2, "E"))
     assertEquals(sourcesInPkg2, cp.sources(pkg2))
 
     assertEquals(Seq.empty, cp.sources(pkg3))
@@ -210,10 +218,12 @@ class AggregateFlatClassPathTest {
     val cp = createDefaultTestClasspath()
 
     val classesAndSourcesInPkg1 = Seq(
-      ClassAndSourceFilesEntry(classFile(dir3, pkg1, "F"),
-                               sourceFile(dir1, pkg1, "F")),
-      ClassAndSourceFilesEntry(classFile(dir2, pkg1, "A"),
-                               sourceFile(dir1, pkg1, "A")),
+      ClassAndSourceFilesEntry(
+        classFile(dir3, pkg1, "F"),
+        sourceFile(dir1, pkg1, "F")),
+      ClassAndSourceFilesEntry(
+        classFile(dir2, pkg1, "A"),
+        sourceFile(dir1, pkg1, "A")),
       sourceFileEntry(dir1, pkg1, "G"),
       classFileEntry(dir2, pkg1, "C"),
       classFileEntry(dir2, pkg1, "B"),
@@ -230,14 +240,17 @@ class AggregateFlatClassPathTest {
 
     assertEquals(
       Some(
-        ClassAndSourceFilesEntry(classFile(dir2, pkg1, "A"),
-                                 sourceFile(dir1, pkg1, "A"))),
+        ClassAndSourceFilesEntry(
+          classFile(dir2, pkg1, "A"),
+          sourceFile(dir1, pkg1, "A"))),
       cp.findClass(s"$pkg1.A")
     )
-    assertEquals(Some(classFileEntry(dir3, pkg1, "D")),
-                 cp.findClass(s"$pkg1.D"))
-    assertEquals(Some(sourceFileEntry(dir2, pkg3, "L")),
-                 cp.findClass(s"$pkg3.L"))
+    assertEquals(
+      Some(classFileEntry(dir3, pkg1, "D")),
+      cp.findClass(s"$pkg1.D"))
+    assertEquals(
+      Some(sourceFileEntry(dir2, pkg3, "L")),
+      cp.findClass(s"$pkg3.L"))
     assertEquals(None, cp.findClass("Nonexisting"))
   }
 }

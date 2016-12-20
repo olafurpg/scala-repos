@@ -121,9 +121,10 @@ class JsonExtractorSuite extends FunSuite with Matchers {
     val json =
       """{"string": "query string", "optional": "o", "default": "d"}"""
     intercept[RuntimeException] {
-      JsonExtractor.extract(JsonExtractorOption.Gson,
-                            json,
-                            classOf[ScalaQuery])
+      JsonExtractor.extract(
+        JsonExtractorOption.Gson,
+        json,
+        classOf[ScalaQuery])
     }
   }
 
@@ -153,9 +154,10 @@ class JsonExtractorSuite extends FunSuite with Matchers {
     val json = """{"q": "query string"}"""
 
     intercept[MappingException] {
-      JsonExtractor.extract(JsonExtractorOption.Json4sNative,
-                            json,
-                            classOf[JavaQuery])
+      JsonExtractor.extract(
+        JsonExtractorOption.Json4sNative,
+        json,
+        classOf[JavaQuery])
     }
   }
 
@@ -288,8 +290,9 @@ class JsonExtractorSuite extends FunSuite with Matchers {
   }
 
   test("Java Params to Json using option Both") {
-    val params = Seq(("algo", new JavaParams("parameter")),
-                     ("algo2", new JavaParams("parameter2")))
+    val params = Seq(
+      ("algo", new JavaParams("parameter")),
+      ("algo2", new JavaParams("parameter2")))
     val json = JsonExtractor.paramsToJson(JsonExtractorOption.Both, params)
 
     json should be(
@@ -297,8 +300,9 @@ class JsonExtractorSuite extends FunSuite with Matchers {
   }
 
   test("Java Params to Json using option Gson") {
-    val params = Seq(("algo", new JavaParams("parameter")),
-                     ("algo2", new JavaParams("parameter2")))
+    val params = Seq(
+      ("algo", new JavaParams("parameter")),
+      ("algo2", new JavaParams("parameter2")))
     val json = JsonExtractor.paramsToJson(JsonExtractorOption.Gson, params)
 
     json should be(
@@ -306,8 +310,9 @@ class JsonExtractorSuite extends FunSuite with Matchers {
   }
 
   test("Scala Params to Json using option Both") {
-    val params = Seq(("algo", AlgorithmParams("parameter")),
-                     ("algo2", AlgorithmParams("parameter2")))
+    val params = Seq(
+      ("algo", AlgorithmParams("parameter")),
+      ("algo2", AlgorithmParams("parameter2")))
     val json = JsonExtractor.paramsToJson(JsonExtractorOption.Both, params)
 
     json should be(
@@ -316,8 +321,9 @@ class JsonExtractorSuite extends FunSuite with Matchers {
   }
 
   test("Scala Params to Json using option Json4sNative") {
-    val params = Seq(("algo", AlgorithmParams("parameter")),
-                     ("algo2", AlgorithmParams("parameter2")))
+    val params = Seq(
+      ("algo", AlgorithmParams("parameter")),
+      ("algo2", AlgorithmParams("parameter2")))
     val json =
       JsonExtractor.paramsToJson(JsonExtractorOption.Json4sNative, params)
 
@@ -327,8 +333,9 @@ class JsonExtractorSuite extends FunSuite with Matchers {
   }
 
   test("Mixed Java and Scala Params to Json using option Both") {
-    val params = Seq(("scala", AlgorithmParams("parameter")),
-                     ("java", new JavaParams("parameter2")))
+    val params = Seq(
+      ("scala", AlgorithmParams("parameter")),
+      ("java", new JavaParams("parameter2")))
     val json = JsonExtractor.paramsToJson(JsonExtractorOption.Both, params)
 
     json should be(
@@ -336,10 +343,9 @@ class JsonExtractorSuite extends FunSuite with Matchers {
   }
 
   test("Serializing Scala EngineParams works using option Json4sNative") {
-    val ep = new EngineParams(dataSourceParams =
-                                ("ds", DataSourceParams("dsp")),
-                              algorithmParamsList =
-                                Seq(("a0", AlgorithmParams("ap"))))
+    val ep = new EngineParams(
+      dataSourceParams = ("ds", DataSourceParams("dsp")),
+      algorithmParamsList = Seq(("a0", AlgorithmParams("ap"))))
 
     val json =
       JsonExtractor.engineParamsToJson(JsonExtractorOption.Json4sNative, ep)
@@ -390,12 +396,14 @@ private class UpperCaseFormat
             JField("string", JString(string)) :: JField(
               "optional",
               JString(optional)) :: JField("default", JString(default)) :: Nil) =>
-          ScalaQuery(string.toUpperCase,
-                     Some(optional.toUpperCase),
-                     default.toUpperCase)
+          ScalaQuery(
+            string.toUpperCase,
+            Some(optional.toUpperCase),
+            default.toUpperCase)
       }, {
         case x: ScalaQuery =>
-          JObject(JField("string", JString(x.string.toUpperCase)),
-                  JField("optional", JString(x.optional.get.toUpperCase)),
-                  JField("default", JString(x.default.toUpperCase)))
+          JObject(
+            JField("string", JString(x.string.toUpperCase)),
+            JField("optional", JString(x.optional.get.toUpperCase)),
+            JField("default", JString(x.default.toUpperCase)))
       }))

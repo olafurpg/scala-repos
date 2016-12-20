@@ -134,8 +134,9 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
     assertBroadcastNestedLoopJoin(spark_10484_4)
   }
 
-  createQueryTest("insert table with generator with column name",
-                  """
+  createQueryTest(
+    "insert table with generator with column name",
+    """
       |  CREATE TABLE gen_tmp (key Int);
       |  INSERT OVERWRITE TABLE gen_tmp
       |    SELECT explode(array(1,2,3)) AS val FROM src LIMIT 3;
@@ -151,8 +152,9 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
       |  SELECT key, value FROM gen_tmp ORDER BY key, value ASC;
     """.stripMargin)
 
-  createQueryTest("insert table with generator without column name",
-                  """
+  createQueryTest(
+    "insert table with generator without column name",
+    """
       |  CREATE TABLE gen_tmp (key Int);
       |  INSERT OVERWRITE TABLE gen_tmp
       |    SELECT explode(array(1,2,3)) FROM src LIMIT 3;
@@ -172,15 +174,17 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
     }
   }
 
-  createQueryTest("! operator",
-                  """
+  createQueryTest(
+    "! operator",
+    """
       |SELECT a FROM (
       |  SELECT 1 AS a UNION ALL SELECT 2 AS a) t
       |WHERE !(a>1)
     """.stripMargin)
 
-  createQueryTest("constant object inspector for generic udf",
-                  """SELECT named_struct(
+  createQueryTest(
+    "constant object inspector for generic udf",
+    """SELECT named_struct(
       lower("AA"), "10",
       repeat(lower("AA"), 3), "11",
       lower(repeat("AA", 3)), "12",
@@ -227,8 +231,9 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
     assert(new Timestamp(1000) == r1.getTimestamp(0))
   }
 
-  createQueryTest("constant array",
-                  """
+  createQueryTest(
+    "constant array",
+    """
     |SELECT sort_array(
     |  sort_array(
     |    array("hadoop distributed file system",
@@ -252,8 +257,9 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
     "case else null",
     """SELECT case when 1 = 2 then 1 when 2 = 2 then 3 else null end FROM src LIMIT 1""")
 
-  createQueryTest("having no references",
-                  "SELECT key FROM src GROUP BY key HAVING COUNT(*) > 1")
+  createQueryTest(
+    "having no references",
+    "SELECT key FROM src GROUP BY key HAVING COUNT(*) > 1")
 
   createQueryTest("no from clause", "SELECT 1, +1, -1")
 
@@ -272,8 +278,9 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
 
   test("CREATE TABLE AS runs once") {
     sql("CREATE TABLE foo AS SELECT 1 FROM src LIMIT 1").collect()
-    assert(sql("SELECT COUNT(*) FROM foo").collect().head.getLong(0) === 1,
-           "Incorrect number of rows in created table")
+    assert(
+      sql("SELECT COUNT(*) FROM foo").collect().head.getLong(0) === 1,
+      "Incorrect number of rows in created table")
   }
 
   createQueryTest("between", "SELECT * FROM src WHERE key Between 1 and 2")
@@ -317,8 +324,9 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
       | FROM src LIMIT 1
     """.stripMargin)
 
-  createQueryTest("Date comparison test 1",
-                  """
+  createQueryTest(
+    "Date comparison test 1",
+    """
       | SELECT
       | CAST(CAST('1970-01-01 22:00:00' AS timestamp) AS date) ==
       | CAST(CAST('1970-01-01 23:00:00' AS timestamp) AS date)
@@ -329,21 +337,25 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
 
   createQueryTest("Simple Average + 1", "SELECT AVG(key) + 1.0 FROM src")
 
-  createQueryTest("Simple Average + 1 with group",
-                  "SELECT AVG(key) + 1.0, value FROM src group by value")
+  createQueryTest(
+    "Simple Average + 1 with group",
+    "SELECT AVG(key) + 1.0, value FROM src group by value")
 
   createQueryTest("string literal", "SELECT 'test' FROM src")
 
-  createQueryTest("Escape sequences",
-                  """SELECT key, '\\\t\\' FROM src WHERE key = 86""")
+  createQueryTest(
+    "Escape sequences",
+    """SELECT key, '\\\t\\' FROM src WHERE key = 86""")
 
   createQueryTest("IgnoreExplain", """EXPLAIN SELECT key FROM src""")
 
-  createQueryTest("trivial join where clause",
-                  "SELECT * FROM src a JOIN src b WHERE a.key = b.key")
+  createQueryTest(
+    "trivial join where clause",
+    "SELECT * FROM src a JOIN src b WHERE a.key = b.key")
 
-  createQueryTest("trivial join ON clause",
-                  "SELECT * FROM src a JOIN src b ON a.key = b.key")
+  createQueryTest(
+    "trivial join ON clause",
+    "SELECT * FROM src a JOIN src b ON a.key = b.key")
 
   createQueryTest(
     "small.cartesian",
@@ -352,11 +364,13 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
 
   createQueryTest("length.udf", "SELECT length(\"test\") FROM src LIMIT 1")
 
-  createQueryTest("partitioned table scan",
-                  "SELECT ds, hr, key, value FROM srcpart")
+  createQueryTest(
+    "partitioned table scan",
+    "SELECT ds, hr, key, value FROM srcpart")
 
-  createQueryTest("create table as",
-                  """
+  createQueryTest(
+    "create table as",
+    """
       |CREATE TABLE createdtable AS SELECT * FROM src;
       |SELECT * FROM createdtable
     """.stripMargin)
@@ -421,31 +435,36 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
     }
   }
 
-  createQueryTest("transform",
-                  "SELECT TRANSFORM (key) USING 'cat' AS (tKey) FROM src")
+  createQueryTest(
+    "transform",
+    "SELECT TRANSFORM (key) USING 'cat' AS (tKey) FROM src")
 
-  createQueryTest("schema-less transform",
-                  """
+  createQueryTest(
+    "schema-less transform",
+    """
       |SELECT TRANSFORM (key, value) USING 'cat' FROM src;
       |SELECT TRANSFORM (*) USING 'cat' FROM src;
     """.stripMargin)
 
   val delimiter = "'\t'"
 
-  createQueryTest("transform with custom field delimiter",
-                  s"""
+  createQueryTest(
+    "transform with custom field delimiter",
+    s"""
       |SELECT TRANSFORM (key) ROW FORMAT DELIMITED FIELDS TERMINATED BY ${delimiter}
       |USING 'cat' AS (tKey) ROW FORMAT DELIMITED FIELDS TERMINATED BY ${delimiter} FROM src;
     """.stripMargin.replaceAll("\n", " "))
 
-  createQueryTest("transform with custom field delimiter2",
-                  s"""
+  createQueryTest(
+    "transform with custom field delimiter2",
+    s"""
       |SELECT TRANSFORM (key, value) ROW FORMAT DELIMITED FIELDS TERMINATED BY ${delimiter}
       |USING 'cat' ROW FORMAT DELIMITED FIELDS TERMINATED BY ${delimiter} FROM src;
     """.stripMargin.replaceAll("\n", " "))
 
-  createQueryTest("transform with custom field delimiter3",
-                  s"""
+  createQueryTest(
+    "transform with custom field delimiter3",
+    s"""
       |SELECT TRANSFORM (*) ROW FORMAT DELIMITED FIELDS TERMINATED BY ${delimiter}
       |USING 'cat' ROW FORMAT DELIMITED FIELDS TERMINATED BY ${delimiter} FROM src;
     """.stripMargin.replaceAll("\n", " "))
@@ -505,15 +524,17 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
 
   createQueryTest("DISTINCT", "SELECT DISTINCT key, value FROM src")
 
-  createQueryTest("empty aggregate input",
-                  "SELECT SUM(key) FROM (SELECT * FROM src LIMIT 0) a")
+  createQueryTest(
+    "empty aggregate input",
+    "SELECT SUM(key) FROM (SELECT * FROM src LIMIT 0) a")
 
   createQueryTest(
     "lateral view1",
     "SELECT tbl.* FROM src LATERAL VIEW explode(array(1,2)) tbl as a")
 
-  createQueryTest("lateral view2",
-                  "SELECT * FROM src LATERAL VIEW explode(array(1,2)) tbl")
+  createQueryTest(
+    "lateral view2",
+    "SELECT * FROM src LATERAL VIEW explode(array(1,2)) tbl")
 
   createQueryTest(
     "lateral view3",
@@ -532,8 +553,9 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
     """.stripMargin)
   // scalastyle:on
 
-  createQueryTest("lateral view5",
-                  "FROM src SELECT explode(array(key+3, key+4))")
+  createQueryTest(
+    "lateral view5",
+    "FROM src SELECT explode(array(key+3, key+4))")
 
   createQueryTest(
     "lateral view6",
@@ -561,8 +583,9 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
     sql("SELECT * FROM src").toString
   }
 
-  createQueryTest("case statements with key #1",
-                  "SELECT (CASE 1 WHEN 2 THEN 3 END) FROM src where key < 15")
+  createQueryTest(
+    "case statements with key #1",
+    "SELECT (CASE 1 WHEN 2 THEN 3 END) FROM src where key < 15")
 
   createQueryTest(
     "case statements with key #2",
@@ -647,22 +670,25 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
     "CTE feature #1",
     "with q1 as (select key from src) select * from q1 where key = 5")
 
-  createQueryTest("CTE feature #2",
-                  """with q1 as (select * from src where key= 5),
+  createQueryTest(
+    "CTE feature #2",
+    """with q1 as (select * from src where key= 5),
       |q2 as (select * from src s2 where key = 4)
       |select value from q1 union all select value from q2
     """.stripMargin)
 
-  createQueryTest("CTE feature #3",
-                  """with q1 as (select key from src)
+  createQueryTest(
+    "CTE feature #3",
+    """with q1 as (select key from src)
       |from q1
       |select * where key = 4
     """.stripMargin)
 
   // test get_json_object again Hive, because the HiveCompatibilitySuite cannot handle result
   // with newline in it.
-  createQueryTest("get_json_object #1",
-                  "SELECT get_json_object(src_json.json, '$') FROM src_json")
+  createQueryTest(
+    "get_json_object #1",
+    "SELECT get_json_object(src_json.json, '$') FROM src_json")
 
   createQueryTest(
     "get_json_object #2",
@@ -895,12 +921,13 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
 
     // Describe a table
     assertResult(
-      Array(Row("key", "int", null),
-            Row("value", "string", null),
-            Row("dt", "string", null),
-            Row("# Partition Information", "", ""),
-            Row("# col_name", "data_type", "comment"),
-            Row("dt", "string", null))
+      Array(
+        Row("key", "int", null),
+        Row("value", "string", null),
+        Row("dt", "string", null),
+        Row("# Partition Information", "", ""),
+        Row("# col_name", "data_type", "comment"),
+        Row("dt", "string", null))
     ) {
       sql("DESCRIBE test_describe_commands1")
         .select('col_name, 'data_type, 'comment)
@@ -909,12 +936,13 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
 
     // Describe a table with a fully qualified table name
     assertResult(
-      Array(Row("key", "int", null),
-            Row("value", "string", null),
-            Row("dt", "string", null),
-            Row("# Partition Information", "", ""),
-            Row("# col_name", "data_type", "comment"),
-            Row("dt", "string", null))
+      Array(
+        Row("key", "int", null),
+        Row("value", "string", null),
+        Row("dt", "string", null),
+        Row("# Partition Information", "", ""),
+        Row("# col_name", "data_type", "comment"),
+        Row("dt", "string", null))
     ) {
       sql("DESCRIBE default.test_describe_commands1")
         .select('col_name, 'data_type, 'comment)
@@ -939,14 +967,15 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
 
     // Describe a partition is a native command
     assertResult(
-      Array(Array("key", "int"),
-            Array("value", "string"),
-            Array("dt", "string"),
-            Array(""),
-            Array("# Partition Information"),
-            Array("# col_name", "data_type", "comment"),
-            Array(""),
-            Array("dt", "string"))
+      Array(
+        Array("key", "int"),
+        Array("value", "string"),
+        Array("dt", "string"),
+        Array(""),
+        Array("# Partition Information"),
+        Array("# col_name", "data_type", "comment"),
+        Array(""),
+        Array("dt", "string"))
     ) {
       sql("DESCRIBE test_describe_commands1 PARTITION (dt='2008-06-08')")
         .select('result)
@@ -1063,10 +1092,11 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
       "CREATE TABLE dynamic_part_table(intcol INT) PARTITIONED BY (partcol1 INT, partcol2 INT)")
     sql("SET hive.exec.dynamic.partition.mode=nonstrict")
 
-    val data = Map(Seq("1", "1") -> 1,
-                   Seq("1", "NULL") -> 2,
-                   Seq("NULL", "1") -> 3,
-                   Seq("NULL", "NULL") -> 4)
+    val data = Map(
+      Seq("1", "1") -> 1,
+      Seq("1", "NULL") -> 2,
+      Seq("NULL", "1") -> 3,
+      Seq("NULL", "NULL") -> 4)
 
     data.foreach {
       case (parts, value) =>
@@ -1256,8 +1286,9 @@ class HiveQuerySuite extends HiveComparisonTest with BeforeAndAfter {
     sql(s"SET ${testKey + testKey}=${testVal + testVal}")
     assert(hiveconf.get(testKey + testKey, "") == testVal + testVal)
     assertResult(
-      defaults ++ Set(testKey -> testVal,
-                      (testKey + testKey) -> (testVal + testVal))) {
+      defaults ++ Set(
+        testKey -> testVal,
+        (testKey + testKey) -> (testVal + testVal))) {
       collectResults(sql("SET"))
     }
 

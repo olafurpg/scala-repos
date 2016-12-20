@@ -31,8 +31,9 @@ trait ScalaXmlSupport {
       .forContentTypes(ranges: _*)
       .mapWithCharset { (bytes, charset) ⇒
         if (bytes.length > 0) {
-          val reader = new InputStreamReader(new ByteArrayInputStream(bytes),
-                                             charset.nioCharset)
+          val reader = new InputStreamReader(
+            new ByteArrayInputStream(bytes),
+            charset.nioCharset)
           XML
             .withSAXParser(createSAXParser())
             .load(reader): NodeSeq // blocking call! Ideally we'd have a `loadToFuture`
@@ -58,20 +59,24 @@ object ScalaXmlSupport extends ScalaXmlSupport {
     import com.sun.org.apache.xerces.internal.impl.Constants
     import javax.xml.XMLConstants
 
-    factory.setFeature(Constants.SAX_FEATURE_PREFIX +
-                         Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE,
-                       false)
-    factory.setFeature(Constants.SAX_FEATURE_PREFIX +
-                         Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE,
-                       false)
-    factory.setFeature(Constants.XERCES_FEATURE_PREFIX +
-                         Constants.DISALLOW_DOCTYPE_DECL_FEATURE,
-                       true)
+    factory.setFeature(
+      Constants.SAX_FEATURE_PREFIX +
+        Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE,
+      false)
+    factory.setFeature(
+      Constants.SAX_FEATURE_PREFIX +
+        Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE,
+      false)
+    factory.setFeature(
+      Constants.XERCES_FEATURE_PREFIX +
+        Constants.DISALLOW_DOCTYPE_DECL_FEATURE,
+      true)
     factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
     val parser = factory.newSAXParser()
     try {
-      parser.setProperty("http://apache.org/xml/properties/locale",
-                         java.util.Locale.ROOT)
+      parser.setProperty(
+        "http://apache.org/xml/properties/locale",
+        java.util.Locale.ROOT)
     } catch {
       case e: org.xml.sax.SAXNotRecognizedException ⇒ // property is not needed
     }

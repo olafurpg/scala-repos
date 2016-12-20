@@ -1232,14 +1232,16 @@ trait Internals { self: Universe =>
     implicit class CompatibleBuildApi(api: BuildApi) {
 
       /** @see [[BuildApi.setInfo]] */
-      @deprecated("Use `internal.reificationSupport.setInfo` instead",
-                  "2.11.0")
+      @deprecated(
+        "Use `internal.reificationSupport.setInfo` instead",
+        "2.11.0")
       def setTypeSignature[S <: Symbol](sym: S, tpe: Type): S =
         internal.reificationSupport.setInfo(sym, tpe)
 
       /** @see [[BuildApi.FlagsRepr]] */
-      @deprecated("Use `internal.reificationSupport.FlagsRepr` instead",
-                  "2.11.0")
+      @deprecated(
+        "Use `internal.reificationSupport.FlagsRepr` instead",
+        "2.11.0")
       def flagsFromBits(bits: Long): FlagSet =
         internal.reificationSupport.FlagsRepr(bits)
 
@@ -1252,19 +1254,22 @@ trait Internals { self: Universe =>
       def This(sym: Symbol): Tree = internal.reificationSupport.mkThis(sym)
 
       /** @see [[BuildApi.mkSelect]] */
-      @deprecated("Use `internal.reificationSupport.mkSelect` instead",
-                  "2.11.0")
+      @deprecated(
+        "Use `internal.reificationSupport.mkSelect` instead",
+        "2.11.0")
       def Select(qualifier: Tree, sym: Symbol): Select =
         internal.reificationSupport.mkSelect(qualifier, sym)
 
       /** @see [[BuildApi.mkIdent]] */
-      @deprecated("Use `internal.reificationSupport.mkIdent` instead",
-                  "2.11.0")
+      @deprecated(
+        "Use `internal.reificationSupport.mkIdent` instead",
+        "2.11.0")
       def Ident(sym: Symbol): Ident = internal.reificationSupport.mkIdent(sym)
 
       /** @see [[BuildApi.mkTypeTree]] */
-      @deprecated("Use `internal.reificationSupport.mkTypeTree` instead",
-                  "2.11.0")
+      @deprecated(
+        "Use `internal.reificationSupport.mkTypeTree` instead",
+        "2.11.0")
       def TypeTree(tp: Type): TypeTree =
         internal.reificationSupport.mkTypeTree(tp)
     }
@@ -1314,8 +1319,9 @@ trait Internals { self: Universe =>
       def isLocal: Boolean =
         symbol.asInstanceOf[scala.reflect.internal.Symbols#Symbol].isLocal
 
-      @deprecated("This API is unreliable. Use `overrides.nonEmpty` instead",
-                  "2.11.0")
+      @deprecated(
+        "This API is unreliable. Use `overrides.nonEmpty` instead",
+        "2.11.0")
       def isOverride: Boolean =
         symbol.asInstanceOf[scala.reflect.internal.Symbols#Symbol].isOverride
 

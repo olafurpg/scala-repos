@@ -38,9 +38,10 @@ trait PresentationCompilation { self: IMain =>
       val compiler = newPresentationCompiler()
       val trees = compiler.newUnitParser(line1).parseStats()
       val importer = global.mkImporter(compiler)
-      val request = new Request(line1,
-                                trees map (t => importer.importTree(t)),
-                                generousImports = true)
+      val request = new Request(
+        line1,
+        trees map (t => importer.importTree(t)),
+        generousImports = true)
       val wrappedCode: String = request.ObjectSourceCode(request.handlers)
       val unit = compiler.newCompilationUnit(wrappedCode)
       import compiler._

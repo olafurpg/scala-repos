@@ -94,24 +94,27 @@ object StepWise {
     def expectMultipleMessages[V](timeout: FiniteDuration, count: Int)(
         f: (Seq[T], U) ⇒ V): Steps[T, V] =
       copy(
-        ops = MultiMessage(timeout,
-                           count,
-                           f.asInstanceOf[(Seq[Any], Any) ⇒ Any],
-                           getTrace()) :: ops)
+        ops = MultiMessage(
+            timeout,
+            count,
+            f.asInstanceOf[(Seq[Any], Any) ⇒ Any],
+            getTrace()) :: ops)
 
     def expectFailure[V](timeout: FiniteDuration)(
         f: (Failed, U) ⇒ (Failed.Decision, V)): Steps[T, V] =
       copy(
-        ops = Failure(timeout,
-                      f.asInstanceOf[(Failed, Any) ⇒ (Failed.Decision, Any)],
-                      getTrace()) :: ops)
+        ops = Failure(
+            timeout,
+            f.asInstanceOf[(Failed, Any) ⇒ (Failed.Decision, Any)],
+            getTrace()) :: ops)
 
     def expectTermination[V](timeout: FiniteDuration)(
         f: (Terminated, U) ⇒ V): Steps[T, V] =
       copy(
-        ops = Termination(timeout,
-                          f.asInstanceOf[(Terminated, Any) ⇒ Any],
-                          getTrace()) :: ops)
+        ops = Termination(
+            timeout,
+            f.asInstanceOf[(Terminated, Any) ⇒ Any],
+            getTrace()) :: ops)
 
     def expectMessageKeep(timeout: FiniteDuration)(
         f: (T, U) ⇒ Unit): Steps[T, U] =
@@ -128,12 +131,11 @@ object StepWise {
     def expectFailureKeep(timeout: FiniteDuration)(
         f: (Failed, U) ⇒ Failed.Decision): Steps[T, U] =
       copy(
-        ops = Failure(timeout,
-                      (failed, value) ⇒
-                        f.asInstanceOf[(Failed, Any) ⇒ Failed.Decision](
-                          failed,
-                          value) -> value,
-                      getTrace()) :: ops)
+        ops = Failure(
+            timeout,
+            (failed, value) ⇒
+              f.asInstanceOf[(Failed, Any) ⇒ Failed.Decision](failed, value) -> value,
+            getTrace()) :: ops)
 
     def expectTerminationKeep(timeout: FiniteDuration)(
         f: (Terminated, U) ⇒ Unit): Steps[T, U] =
@@ -182,12 +184,14 @@ object StepWise {
         ctx.setReceiveTimeout(t)
         Full {
           case Sig(_, ReceiveTimeout) ⇒
-            throwTimeout(trace,
-                         s"timeout of $t expired while waiting for a message")
+            throwTimeout(
+              trace,
+              s"timeout of $t expired while waiting for a message")
           case Msg(_, msg) ⇒ run(ctx, tail, f(msg, value))
           case Sig(_, other) ⇒
-            throwIllegalState(trace,
-                              s"unexpected $other while waiting for a message")
+            throwIllegalState(
+              trace,
+              s"unexpected $other while waiting for a message")
         }
       case MultiMessage(t, c, f, trace) :: tail ⇒
         val deadline = Deadline.now + t
@@ -214,15 +218,17 @@ object StepWise {
         ctx.setReceiveTimeout(t)
         Full {
           case Sig(_, ReceiveTimeout) ⇒
-            throwTimeout(trace,
-                         s"timeout of $t expired while waiting for a failure")
+            throwTimeout(
+              trace,
+              s"timeout of $t expired while waiting for a failure")
           case Sig(_, failure: Failed) ⇒
             val (response, v) = f(failure, value)
             failure.decide(response)
             run(ctx, tail, v)
           case other ⇒
-            throwIllegalState(trace,
-                              s"unexpected $other while waiting for a message")
+            throwIllegalState(
+              trace,
+              s"unexpected $other while waiting for a message")
         }
       case Termination(t, f, trace) :: tail ⇒
         ctx.setReceiveTimeout(t)

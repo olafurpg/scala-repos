@@ -49,18 +49,19 @@ class TruncatedNewtonMinimizer[T, H](maxIterations: Int = -1,
     val initDelta = norm(adjgrad)
     val adjfval = v + 0.5 * l2Regularization * (initial dot initial)
     val f_too_small = if (adjfval < -1.0e+32) true else false
-    State(0,
-          initDelta,
-          initDelta,
-          initial,
-          v,
-          grad,
-          h,
-          adjfval,
-          adjgrad,
-          f_too_small,
-          true,
-          initialHistory(f, initial))
+    State(
+      0,
+      initDelta,
+      initDelta,
+      initial,
+      v,
+      grad,
+      h,
+      adjfval,
+      adjgrad,
+      f_too_small,
+      true,
+      initialHistory(f, initial))
   }
 
   // from tron
@@ -78,10 +79,11 @@ class TruncatedNewtonMinimizer[T, H](maxIterations: Int = -1,
     Iterator.iterate(initialState(f, initial)) { (state: State) =>
       import state._
       val cg =
-        new ConjugateGradient[T, H](maxNormValue = delta,
-                                    tolerance = .1 * norm(adjGrad),
-                                    maxIterations = 400,
-                                    normSquaredPenalty = l2Regularization)
+        new ConjugateGradient[T, H](
+          maxNormValue = delta,
+          tolerance = .1 * norm(adjGrad),
+          maxIterations = 400,
+          normSquaredPenalty = l2Regularization)
       // todo see if we can use something other than zeros as an initializer?
       val initStep = chooseDescentDirection(state)
       val (step, residual) =
@@ -109,24 +111,27 @@ class TruncatedNewtonMinimizer[T, H](maxIterations: Int = -1,
         if (actualReduction < eta0 * predictedReduction)
           math.min(math.max(alpha, sigma1) * stepNorm, sigma2 * newDelta)
         else if (actualReduction < eta1 * predictedReduction)
-          math.max(sigma1 * newDelta,
-                   math.min(alpha * stepNorm, sigma2 * newDelta))
+          math.max(
+            sigma1 * newDelta,
+            math.min(alpha * stepNorm, sigma2 * newDelta))
         else if (actualReduction < eta2 * predictedReduction)
-          math.max(sigma1 * newDelta,
-                   math.min(alpha * stepNorm, sigma3 * newDelta))
+          math.max(
+            sigma1 * newDelta,
+            math.min(alpha * stepNorm, sigma3 * newDelta))
         else math.max(newDelta, math.min(10 * stepNorm, sigma3 * newDelta))
       }
 
       if (actualReduction > eta0 * predictedReduction) {
         logger.info(
           "Accept %d d=%.2E newv=%.4E newG=%.4E resNorm=%.2E pred=%.2E actual=%.2E"
-            .format(iter,
-                    delta,
-                    adjNewV,
-                    norm(adjNewG),
-                    norm(residual),
-                    predictedReduction,
-                    actualReduction))
+            .format(
+              iter,
+              delta,
+              adjNewV,
+              norm(adjNewG),
+              norm(residual),
+              predictedReduction,
+              actualReduction))
         val stop_cond =
           if (adjNewV < -1.0e+32 ||
               (math.abs(actualReduction) <= math.abs(adjNewV) * 1.0e-12 &&
@@ -135,18 +140,19 @@ class TruncatedNewtonMinimizer[T, H](maxIterations: Int = -1,
           else false
         val newHistory = updateHistory(x_new, adjNewG, adjNewV, state)
         val this_iter = if (state.accept == true) iter + 1 else iter
-        State(this_iter,
-              initialGNorm,
-              newDelta,
-              x_new,
-              newv,
-              newg,
-              newh,
-              adjNewV,
-              adjNewG,
-              stop_cond,
-              true,
-              newHistory)
+        State(
+          this_iter,
+          initialGNorm,
+          newDelta,
+          x_new,
+          newv,
+          newg,
+          newh,
+          adjNewV,
+          adjNewG,
+          stop_cond,
+          true,
+          newHistory)
       } else {
         val this_iter = if (state.accept == true) iter + 1 else iter
         val stop_cond =

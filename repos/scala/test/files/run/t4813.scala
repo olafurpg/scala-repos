@@ -5,8 +5,9 @@ object Test extends App {
   def runTest[T, U](col: T)(clone: T => U)(mod: T => Unit)(
       implicit ct: ClassTag[T]): Unit = {
     val cloned = clone(col)
-    assert(cloned == col,
-           s"cloned should be equal to original. $cloned != $col")
+    assert(
+      cloned == col,
+      s"cloned should be equal to original. $cloned != $col")
     mod(col)
     assert(cloned != col, s"cloned should not modify when original does: $ct")
   }

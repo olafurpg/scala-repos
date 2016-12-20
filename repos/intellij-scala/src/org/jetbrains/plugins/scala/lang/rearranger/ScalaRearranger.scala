@@ -46,17 +46,19 @@ class ScalaRearranger
 
     val existingInfo = new ScalaArrangementParseInfo
     root.accept(
-      new ScalaArrangementVisitor(existingInfo,
-                                  document,
-                                  collectionAsScalaIterable(ranges),
-                                  groupingRules))
+      new ScalaArrangementVisitor(
+        existingInfo,
+        document,
+        collectionAsScalaIterable(ranges),
+        groupingRules))
 
     val newInfo = new ScalaArrangementParseInfo
     element.accept(
-      new ScalaArrangementVisitor(newInfo,
-                                  document,
-                                  Iterable(element.getTextRange),
-                                  groupingRules))
+      new ScalaArrangementVisitor(
+        newInfo,
+        document,
+        Iterable(element.getTextRange),
+        groupingRules))
     if (newInfo.entries.size != 1) {
       null
     } else {
@@ -71,10 +73,11 @@ class ScalaRearranger
     UsageTrigger.trigger(ScalaRearranger.featureId)
     val info = new ScalaArrangementParseInfo
     root.accept(
-      new ScalaArrangementVisitor(info,
-                                  document,
-                                  ranges,
-                                  getGroupingRules(settings)))
+      new ScalaArrangementVisitor(
+        info,
+        document,
+        ranges,
+        getGroupingRules(settings)))
     if (settings != null) {
       for (rule <- settings.getGroupings) {
         if (DEPENDENT_METHODS == rule.getGroupingType) {
@@ -128,9 +131,10 @@ class ScalaRearranger
   override def getSupportedGroupingTokens =
     seqAsJavaList(
       immutable.List(
-        new CompositeArrangementSettingsToken(DEPENDENT_METHODS,
-                                              BREADTH_FIRST,
-                                              DEPTH_FIRST),
+        new CompositeArrangementSettingsToken(
+          DEPENDENT_METHODS,
+          BREADTH_FIRST,
+          DEPTH_FIRST),
         new CompositeArrangementSettingsToken(JAVA_GETTERS_AND_SETTERS),
         new CompositeArrangementSettingsToken(SCALA_GETTERS_AND_SETTERS),
         new CompositeArrangementSettingsToken(
@@ -139,13 +143,16 @@ class ScalaRearranger
   override def getSupportedMatchingTokens =
     seqAsJavaList(
       immutable.List(
-        new CompositeArrangementSettingsToken(General.TYPE,
-                                              scalaTypesValues.toList),
-        new CompositeArrangementSettingsToken(General.MODIFIER,
-                                              scalaModifiers.toList),
-        new CompositeArrangementSettingsToken(General.ORDER,
-                                              Order.KEEP,
-                                              Order.BY_NAME)))
+        new CompositeArrangementSettingsToken(
+          General.TYPE,
+          scalaTypesValues.toList),
+        new CompositeArrangementSettingsToken(
+          General.MODIFIER,
+          scalaModifiers.toList),
+        new CompositeArrangementSettingsToken(
+          General.ORDER,
+          Order.KEEP,
+          Order.BY_NAME)))
 
   override def isEnabled(token: ArrangementSettingsToken,
                          current: ArrangementMatchCondition) =

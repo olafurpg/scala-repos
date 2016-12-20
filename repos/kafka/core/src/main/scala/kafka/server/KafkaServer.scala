@@ -82,30 +82,37 @@ object KafkaServer {
       .put(LogConfig.FlushMessagesProp, kafkaConfig.logFlushIntervalMessages)
     logProps.put(LogConfig.FlushMsProp, kafkaConfig.logFlushIntervalMs)
     logProps.put(LogConfig.RetentionBytesProp, kafkaConfig.logRetentionBytes)
-    logProps.put(LogConfig.RetentionMsProp,
-                 kafkaConfig.logRetentionTimeMillis: java.lang.Long)
+    logProps.put(
+      LogConfig.RetentionMsProp,
+      kafkaConfig.logRetentionTimeMillis: java.lang.Long)
     logProps.put(LogConfig.MaxMessageBytesProp, kafkaConfig.messageMaxBytes)
     logProps
       .put(LogConfig.IndexIntervalBytesProp, kafkaConfig.logIndexIntervalBytes)
-    logProps.put(LogConfig.DeleteRetentionMsProp,
-                 kafkaConfig.logCleanerDeleteRetentionMs)
+    logProps.put(
+      LogConfig.DeleteRetentionMsProp,
+      kafkaConfig.logCleanerDeleteRetentionMs)
     logProps.put(LogConfig.FileDeleteDelayMsProp, kafkaConfig.logDeleteDelayMs)
-    logProps.put(LogConfig.MinCleanableDirtyRatioProp,
-                 kafkaConfig.logCleanerMinCleanRatio)
+    logProps.put(
+      LogConfig.MinCleanableDirtyRatioProp,
+      kafkaConfig.logCleanerMinCleanRatio)
     logProps.put(LogConfig.CleanupPolicyProp, kafkaConfig.logCleanupPolicy)
     logProps
       .put(LogConfig.MinInSyncReplicasProp, kafkaConfig.minInSyncReplicas)
     logProps.put(LogConfig.CompressionTypeProp, kafkaConfig.compressionType)
-    logProps.put(LogConfig.UncleanLeaderElectionEnableProp,
-                 kafkaConfig.uncleanLeaderElectionEnable)
+    logProps.put(
+      LogConfig.UncleanLeaderElectionEnableProp,
+      kafkaConfig.uncleanLeaderElectionEnable)
     logProps
       .put(LogConfig.PreAllocateEnableProp, kafkaConfig.logPreAllocateEnable)
-    logProps.put(LogConfig.MessageFormatVersionProp,
-                 kafkaConfig.logMessageFormatVersion.version)
-    logProps.put(LogConfig.MessageTimestampTypeProp,
-                 kafkaConfig.logMessageTimestampType.name)
-    logProps.put(LogConfig.MessageTimestampDifferenceMaxMsProp,
-                 kafkaConfig.logMessageTimestampDifferenceMaxMs)
+    logProps.put(
+      LogConfig.MessageFormatVersionProp,
+      kafkaConfig.logMessageFormatVersion.version)
+    logProps.put(
+      LogConfig.MessageTimestampTypeProp,
+      kafkaConfig.logMessageTimestampType.name)
+    logProps.put(
+      LogConfig.MessageTimestampDifferenceMaxMsProp,
+      kafkaConfig.logMessageTimestampDifferenceMaxMs)
     logProps
   }
 }
@@ -229,23 +236,25 @@ class KafkaServer(val config: KafkaConfig,
         socketServer.startup()
 
         /* start replica manager */
-        replicaManager = new ReplicaManager(config,
-                                            metrics,
-                                            time,
-                                            kafkaMetricsTime,
-                                            zkUtils,
-                                            kafkaScheduler,
-                                            logManager,
-                                            isShuttingDown)
+        replicaManager = new ReplicaManager(
+          config,
+          metrics,
+          time,
+          kafkaMetricsTime,
+          zkUtils,
+          kafkaScheduler,
+          logManager,
+          isShuttingDown)
         replicaManager.startup()
 
         /* start kafka controller */
-        kafkaController = new KafkaController(config,
-                                              zkUtils,
-                                              brokerState,
-                                              kafkaMetricsTime,
-                                              metrics,
-                                              threadNamePrefix)
+        kafkaController = new KafkaController(
+          config,
+          zkUtils,
+          brokerState,
+          kafkaMetricsTime,
+          metrics,
+          threadNamePrefix)
         kafkaController.startup()
 
         /* start kafka coordinator */
@@ -264,16 +273,17 @@ class KafkaServer(val config: KafkaConfig,
           }
 
         /* start processing requests */
-        apis = new KafkaApis(socketServer.requestChannel,
-                             replicaManager,
-                             consumerCoordinator,
-                             kafkaController,
-                             zkUtils,
-                             config.brokerId,
-                             config,
-                             metadataCache,
-                             metrics,
-                             authorizer)
+        apis = new KafkaApis(
+          socketServer.requestChannel,
+          replicaManager,
+          consumerCoordinator,
+          kafkaController,
+          zkUtils,
+          config.brokerId,
+          config,
+          metadataCache,
+          metrics,
+          authorizer)
         requestHandlerPool = new KafkaRequestHandlerPool(
           config.brokerId,
           socketServer.requestChannel,
@@ -306,9 +316,10 @@ class KafkaServer(val config: KafkaConfig,
           case (protocol, endpoint) =>
             if (endpoint.port == 0)
               (protocol,
-               EndPoint(endpoint.host,
-                        socketServer.boundPort(protocol),
-                        endpoint.protocolType))
+               EndPoint(
+                 endpoint.host,
+                 socketServer.boundPort(protocol),
+                 endpoint.protocolType))
             else (protocol, endpoint)
         }
         kafkaHealthcheck = new KafkaHealthcheck(
@@ -359,19 +370,21 @@ class KafkaServer(val config: KafkaConfig,
     if (chroot.length > 1) {
       val zkConnForChrootCreation =
         config.zkConnect.substring(0, config.zkConnect.indexOf("/"))
-      val zkClientForChrootCreation = ZkUtils(zkConnForChrootCreation,
-                                              config.zkSessionTimeoutMs,
-                                              config.zkConnectionTimeoutMs,
-                                              secureAclsEnabled)
+      val zkClientForChrootCreation = ZkUtils(
+        zkConnForChrootCreation,
+        config.zkSessionTimeoutMs,
+        config.zkConnectionTimeoutMs,
+        secureAclsEnabled)
       zkClientForChrootCreation.makeSurePersistentPathExists(chroot)
       info("Created zookeeper path " + chroot)
       zkClientForChrootCreation.zkClient.close()
     }
 
-    val zkUtils = ZkUtils(config.zkConnect,
-                          config.zkSessionTimeoutMs,
-                          config.zkConnectionTimeoutMs,
-                          secureAclsEnabled)
+    val zkUtils = ZkUtils(
+      config.zkConnect,
+      config.zkSessionTimeoutMs,
+      config.zkConnectionTimeoutMs,
+      secureAclsEnabled)
     zkUtils.setupCommonPaths()
     zkUtils
   }
@@ -413,20 +426,22 @@ class KafkaServer(val config: KafkaConfig,
           "kafka-server-controlled-shutdown",
           Map.empty.asJava,
           false,
-          ChannelBuilders.create(config.interBrokerSecurityProtocol,
-                                 Mode.CLIENT,
-                                 LoginType.SERVER,
-                                 config.values)
+          ChannelBuilders.create(
+            config.interBrokerSecurityProtocol,
+            Mode.CLIENT,
+            LoginType.SERVER,
+            config.values)
         )
-        new NetworkClient(selector,
-                          metadataUpdater,
-                          config.brokerId.toString,
-                          1,
-                          0,
-                          Selectable.USE_DEFAULT_BUFFER_SIZE,
-                          Selectable.USE_DEFAULT_BUFFER_SIZE,
-                          config.requestTimeoutMs,
-                          kafkaMetricsTime)
+        new NetworkClient(
+          selector,
+          metadataUpdater,
+          config.brokerId.toString,
+          1,
+          0,
+          Selectable.USE_DEFAULT_BUFFER_SIZE,
+          Selectable.USE_DEFAULT_BUFFER_SIZE,
+          config.requestTimeoutMs,
+          kafkaMetricsTime)
       }
 
       var shutdownSucceeded: Boolean = false
@@ -468,8 +483,9 @@ class KafkaServer(val config: KafkaConfig,
           if (prevController != null) {
             try {
 
-              if (!networkClient.blockingReady(node(prevController),
-                                               socketTimeoutMs))
+              if (!networkClient.blockingReady(
+                    node(prevController),
+                    socketTimeoutMs))
                 throw socketTimeoutException
 
               // send the controlled shutdown request
@@ -479,10 +495,11 @@ class KafkaServer(val config: KafkaConfig,
                 node(prevController).idString,
                 requestHeader,
                 new ControlledShutdownRequest(config.brokerId).toStruct)
-              val request = new ClientRequest(kafkaMetricsTime.milliseconds(),
-                                              true,
-                                              send,
-                                              null)
+              val request = new ClientRequest(
+                kafkaMetricsTime.milliseconds(),
+                true,
+                send,
+                null)
               val clientResponse = networkClient
                 .blockingSendAndReceive(request, socketTimeoutMs)
                 .getOrElse {
@@ -714,18 +731,18 @@ class KafkaServer(val config: KafkaConfig,
       maxIoBytesPerSecond = config.logCleanerIoMaxBytesPerSecond,
       backOffMs = config.logCleanerBackoffMs,
       enableCleaner = config.logCleanerEnable)
-    new LogManager(logDirs = config.logDirs.map(new File(_)).toArray,
-                   topicConfigs = configs,
-                   defaultConfig = defaultLogConfig,
-                   cleanerConfig = cleanerConfig,
-                   ioThreads = config.numRecoveryThreadsPerDataDir,
-                   flushCheckMs = config.logFlushSchedulerIntervalMs,
-                   flushCheckpointMs =
-                     config.logFlushOffsetCheckpointIntervalMs,
-                   retentionCheckMs = config.logCleanupIntervalMs,
-                   scheduler = kafkaScheduler,
-                   brokerState = brokerState,
-                   time = time)
+    new LogManager(
+      logDirs = config.logDirs.map(new File(_)).toArray,
+      topicConfigs = configs,
+      defaultConfig = defaultLogConfig,
+      cleanerConfig = cleanerConfig,
+      ioThreads = config.numRecoveryThreadsPerDataDir,
+      flushCheckMs = config.logFlushSchedulerIntervalMs,
+      flushCheckpointMs = config.logFlushOffsetCheckpointIntervalMs,
+      retentionCheckMs = config.logCleanupIntervalMs,
+      scheduler = kafkaScheduler,
+      brokerState = brokerState,
+      time = time)
   }
 
   /**

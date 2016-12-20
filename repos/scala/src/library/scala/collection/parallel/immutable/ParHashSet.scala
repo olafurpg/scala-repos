@@ -132,11 +132,11 @@ object ParHashSet extends ParSetFactory[ParHashSet] {
 }
 
 private[immutable] abstract class HashSetCombiner[T]
-    extends scala.collection.parallel.BucketCombiner[T,
-                                                     ParHashSet[T],
-                                                     Any,
-                                                     HashSetCombiner[T]](
-      HashSetCombiner.rootsize) {
+    extends scala.collection.parallel.BucketCombiner[
+      T,
+      ParHashSet[T],
+      Any,
+      HashSetCombiner[T]](HashSetCombiner.rootsize) {
 //self: EnvironmentPassingCombiner[T, ParHashSet[T]] =>
   import HashSetCombiner._
   val emptyTrie = HashSet.empty[T]
@@ -215,8 +215,9 @@ private[immutable] abstract class HashSetCombiner[T]
     }
     def split = {
       val fp = howmany / 2
-      List(new CreateTrie(bucks, root, offset, fp),
-           new CreateTrie(bucks, root, offset + fp, howmany - fp))
+      List(
+        new CreateTrie(bucks, root, offset, fp),
+        new CreateTrie(bucks, root, offset + fp, howmany - fp))
     }
     def shouldSplitFurther =
       howmany > scala.collection.parallel

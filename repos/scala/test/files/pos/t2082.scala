@@ -33,10 +33,11 @@ object Main {
       keyGetter: (PType) => FKType): Map[Long, CType] = Map.empty
 
   def callIt {
-    oneToOneJoin[TestRun,
-                 TestSubject,
-                 MetaTestSubject,
-                 MappedForeignKey[Long, TestRun, TestSubject]](
+    oneToOneJoin[
+      TestRun,
+      TestSubject,
+      MetaTestSubject,
+      MappedForeignKey[Long, TestRun, TestSubject]](
       List(),
       TestSubject,
       (tr: TestRun) => tr.testSubject)

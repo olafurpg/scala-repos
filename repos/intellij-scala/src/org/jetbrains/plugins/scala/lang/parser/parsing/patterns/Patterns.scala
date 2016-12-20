@@ -72,14 +72,16 @@ object XmlPatterns extends ParserNode {
     val args = builder.mark
     def parseSeqWildcard(withComma: Boolean): Boolean = {
       if (if (withComma)
-            lookAhead(builder,
-                      ScalaTokenTypes.tCOMMA,
-                      ScalaTokenTypes.tUNDER,
-                      ScalaTokenTypes.tIDENTIFIER)
+            lookAhead(
+              builder,
+              ScalaTokenTypes.tCOMMA,
+              ScalaTokenTypes.tUNDER,
+              ScalaTokenTypes.tIDENTIFIER)
           else
-            lookAhead(builder,
-                      ScalaTokenTypes.tUNDER,
-                      ScalaTokenTypes.tIDENTIFIER)) {
+            lookAhead(
+              builder,
+              ScalaTokenTypes.tUNDER,
+              ScalaTokenTypes.tIDENTIFIER)) {
         if (withComma) builder.advanceLexer()
         val wild = builder.mark
         builder.getTokenType
@@ -100,18 +102,20 @@ object XmlPatterns extends ParserNode {
 
     def parseSeqWildcardBinding(withComma: Boolean): Boolean = {
       if (if (withComma)
-            lookAhead(builder,
-                      ScalaTokenTypes.tCOMMA,
-                      ScalaTokenTypes.tIDENTIFIER,
-                      ScalaTokenTypes.tAT,
-                      ScalaTokenTypes.tUNDER,
-                      ScalaTokenTypes.tIDENTIFIER)
+            lookAhead(
+              builder,
+              ScalaTokenTypes.tCOMMA,
+              ScalaTokenTypes.tIDENTIFIER,
+              ScalaTokenTypes.tAT,
+              ScalaTokenTypes.tUNDER,
+              ScalaTokenTypes.tIDENTIFIER)
           else
-            lookAhead(builder,
-                      ScalaTokenTypes.tIDENTIFIER,
-                      ScalaTokenTypes.tAT,
-                      ScalaTokenTypes.tUNDER,
-                      ScalaTokenTypes.tIDENTIFIER)) {
+            lookAhead(
+              builder,
+              ScalaTokenTypes.tIDENTIFIER,
+              ScalaTokenTypes.tAT,
+              ScalaTokenTypes.tUNDER,
+              ScalaTokenTypes.tIDENTIFIER)) {
         if (withComma) builder.advanceLexer() // ,
         val wild = builder.mark
         builder.getTokenType

@@ -76,12 +76,13 @@ class RequeueFilterTest extends FunSuite {
     val retryBudget =
       RetryBudget(1.second, minRetries, 0.0, Stopwatch.timeMillis)
     val filter =
-      new RequeueFilter[String, Int](retryBudget,
-                                     Backoff.constant(Duration.Zero),
-                                     stats,
-                                     () => true,
-                                     percentRequeues,
-                                     DefaultTimer.twitter)
+      new RequeueFilter[String, Int](
+        retryBudget,
+        Backoff.constant(Duration.Zero),
+        stats,
+        () => true,
+        percentRequeues,
+        DefaultTimer.twitter)
 
     var numNos = 0
     val svc = filter.andThen(Service.mk { s: String =>

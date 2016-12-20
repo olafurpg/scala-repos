@@ -156,32 +156,34 @@ object ListHelpersSpec extends Specification with ListHelpers {
 
   "The ListHelpers permuteList function (permute method on a List object)" should {
     "create a List of all the permutations of a given list" in {
-      List(1, 2, 3).permute must_== List(List(1, 2, 3),
-                                         List(1, 3, 2),
-                                         List(2, 3, 1),
-                                         List(2, 1, 3),
-                                         List(3, 1, 2),
-                                         List(3, 2, 1))
+      List(1, 2, 3).permute must_== List(
+        List(1, 2, 3),
+        List(1, 3, 2),
+        List(2, 3, 1),
+        List(2, 1, 3),
+        List(3, 1, 2),
+        List(3, 2, 1))
     }
   }
 
   "The ListHelpers permuteWithSublists function (permuteAll method on a List object)" should {
     "create a List of all the permutations of a given list" in {
-      List(1, 2, 3).permuteAll must_== List(List(1, 2, 3),
-                                            List(1, 3, 2),
-                                            List(2, 3, 1),
-                                            List(2, 1, 3),
-                                            List(3, 1, 2),
-                                            List(3, 2, 1),
-                                            List(2, 3),
-                                            List(3, 2),
-                                            List(3, 1),
-                                            List(1, 3),
-                                            List(1, 2),
-                                            List(2, 1),
-                                            List(3),
-                                            List(2),
-                                            List(1))
+      List(1, 2, 3).permuteAll must_== List(
+        List(1, 2, 3),
+        List(1, 3, 2),
+        List(2, 3, 1),
+        List(2, 1, 3),
+        List(3, 1, 2),
+        List(3, 2, 1),
+        List(2, 3),
+        List(3, 2),
+        List(3, 1),
+        List(1, 3),
+        List(1, 2),
+        List(2, 1),
+        List(3),
+        List(2),
+        List(1))
     }
   }
 

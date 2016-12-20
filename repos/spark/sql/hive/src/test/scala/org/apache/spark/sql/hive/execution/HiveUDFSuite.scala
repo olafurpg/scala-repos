@@ -95,50 +95,56 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
   }
 
   test("Max/Min on named_struct") {
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
         |SELECT max(named_struct(
         |           "key", key,
         |           "value", value)).value FROM src
       """.stripMargin),
-                Seq(Row("val_498")))
-    checkAnswer(sql("""
+      Seq(Row("val_498")))
+    checkAnswer(
+      sql("""
         |SELECT min(named_struct(
         |           "key", key,
         |           "value", value)).value FROM src
       """.stripMargin),
-                Seq(Row("val_0")))
+      Seq(Row("val_0")))
 
     // nested struct cases
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
         |SELECT max(named_struct(
         |           "key", named_struct(
                             "key", key,
                             "value", value),
         |           "value", value)).value FROM src
       """.stripMargin),
-                Seq(Row("val_498")))
-    checkAnswer(sql("""
+      Seq(Row("val_498")))
+    checkAnswer(
+      sql("""
         |SELECT min(named_struct(
         |           "key", named_struct(
                            "key", key,
                            "value", value),
         |           "value", value)).value FROM src
       """.stripMargin),
-                Seq(Row("val_0")))
+      Seq(Row("val_0")))
   }
 
   test("SPARK-6409 UDAF Average test") {
     sql(
       s"CREATE TEMPORARY FUNCTION test_avg AS '${classOf[GenericUDAFAverage].getName}'")
-    checkAnswer(sql("SELECT test_avg(1), test_avg(substr(value,5)) FROM src"),
-                Seq(Row(1.0, 260.182)))
+    checkAnswer(
+      sql("SELECT test_avg(1), test_avg(substr(value,5)) FROM src"),
+      Seq(Row(1.0, 260.182)))
     sql("DROP TEMPORARY FUNCTION IF EXISTS test_avg")
     hiveContext.reset()
   }
 
   test("SPARK-2693 udaf aggregates test") {
-    checkAnswer(sql("SELECT percentile(key, 1) FROM src LIMIT 1"),
-                sql("SELECT max(key) FROM src").collect().toSeq)
+    checkAnswer(
+      sql("SELECT percentile(key, 1) FROM src LIMIT 1"),
+      sql("SELECT max(key) FROM src").collect().toSeq)
 
     checkAnswer(
       sql("SELECT percentile(key, array(1, 1)) FROM src LIMIT 1"),
@@ -164,8 +170,9 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
 
     val udfName = classOf[UDFIntegerToString].getName
     sql(s"CREATE TEMPORARY FUNCTION testUDFIntegerToString AS '$udfName'")
-    checkAnswer(sql("SELECT testUDFIntegerToString(i) FROM integerTable"),
-                Seq(Row("1"), Row("2")))
+    checkAnswer(
+      sql("SELECT testUDFIntegerToString(i) FROM integerTable"),
+      Seq(Row("1"), Row("2")))
     sql("DROP TEMPORARY FUNCTION IF EXISTS testUDFIntegerToString")
 
     hiveContext.reset()
@@ -254,8 +261,9 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
 
     sql(
       s"CREATE TEMPORARY FUNCTION testUDFListListInt AS '${classOf[UDFListListInt].getName}'")
-    checkAnswer(sql("SELECT testUDFListListInt(lli) FROM listListIntTable"),
-                Seq(Row(0), Row(2), Row(13)))
+    checkAnswer(
+      sql("SELECT testUDFListListInt(lli) FROM listListIntTable"),
+      Seq(Row(0), Row(2), Row(13)))
     sql("DROP TEMPORARY FUNCTION IF EXISTS testUDFListListInt")
 
     hiveContext.reset()
@@ -271,8 +279,9 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
 
     sql(
       s"CREATE TEMPORARY FUNCTION testUDFListString AS '${classOf[UDFListString].getName}'")
-    checkAnswer(sql("SELECT testUDFListString(l) FROM listStringTable"),
-                Seq(Row("a,b,c"), Row("d,e")))
+    checkAnswer(
+      sql("SELECT testUDFListString(l) FROM listStringTable"),
+      Seq(Row("a,b,c"), Row("d,e")))
     sql("DROP TEMPORARY FUNCTION IF EXISTS testUDFListString")
 
     hiveContext.reset()
@@ -310,8 +319,9 @@ class HiveUDFSuite extends QueryTest with TestHiveSingleton with SQLTestUtils {
 
     sql(
       s"CREATE TEMPORARY FUNCTION testUDFTwoListList AS '${classOf[UDFTwoListList].getName}'")
-    checkAnswer(sql("SELECT testUDFTwoListList(lli, lli) FROM TwoListTable"),
-                Seq(Row("0, 0"), Row("2, 2"), Row("13, 13")))
+    checkAnswer(
+      sql("SELECT testUDFTwoListList(lli, lli) FROM TwoListTable"),
+      Seq(Row("0, 0"), Row("2, 2"), Row("13, 13")))
     sql("DROP TEMPORARY FUNCTION IF EXISTS testUDFTwoListList")
 
     hiveContext.reset()
@@ -540,8 +550,9 @@ class PairUDF extends GenericUDF {
   override def initialize(p1: Array[ObjectInspector]): ObjectInspector =
     ObjectInspectorFactory.getStandardStructObjectInspector(
       Arrays.asList("id", "value"),
-      Arrays.asList(PrimitiveObjectInspectorFactory.javaIntObjectInspector,
-                    PrimitiveObjectInspectorFactory.javaIntObjectInspector)
+      Arrays.asList(
+        PrimitiveObjectInspectorFactory.javaIntObjectInspector,
+        PrimitiveObjectInspectorFactory.javaIntObjectInspector)
     )
 
   override def evaluate(args: Array[DeferredObject]): AnyRef = {

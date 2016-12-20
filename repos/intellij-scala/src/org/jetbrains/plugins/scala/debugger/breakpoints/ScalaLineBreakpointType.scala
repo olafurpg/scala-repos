@@ -74,11 +74,12 @@ class ScalaLineBreakpointType
             if PsiTreeUtil.getParentOfType(e, classOf[PsiComment]) != null =>
           true
         case _
-            if PsiTreeUtil.getParentOfType(e,
-                                           classOf[ScExpression],
-                                           classOf[ScConstructorPattern],
-                                           classOf[ScInfixPattern],
-                                           classOf[ScClass]) != null =>
+            if PsiTreeUtil.getParentOfType(
+              e,
+              classOf[ScExpression],
+              classOf[ScConstructorPattern],
+              classOf[ScInfixPattern],
+              classOf[ScClass]) != null =>
           result = true
           false
         case _ => true

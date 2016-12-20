@@ -71,8 +71,9 @@ private[akka] object FailureDetectorLoader {
       .dynamicAccess
       .createInstanceFor[FailureDetector](
         fqcn,
-        List(classOf[Config] -> config,
-             classOf[EventStream] -> system.eventStream))
+        List(
+          classOf[Config] -> config,
+          classOf[EventStream] -> system.eventStream))
       .recover({
         case e ⇒
           throw new ConfigurationException(

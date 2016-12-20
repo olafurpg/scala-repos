@@ -155,9 +155,10 @@ object RenameSuperMembersUtil {
             if (clazz == classes.last) renameOnlyCurrent
             else if (oneSuperClass) renameBase
             else
-              ScalaBundle.message("rename.only.in",
-                                  classKind,
-                                  ScalaNamesUtil.scalaName(clazz))
+              ScalaBundle.message(
+                "rename.only.in",
+                classKind,
+                ScalaNamesUtil.scalaName(clazz))
           }
 
           override def getContainerText(clazz: PsiClass,

@@ -16,11 +16,12 @@ final class JsonView(getLightUser: String => Option[LightUser]) {
       Json.obj(
         "id" -> simul.id,
         "host" -> lightHost.map { host =>
-          Json.obj("id" -> host.id,
-                   "username" -> host.name,
-                   "title" -> host.title,
-                   "rating" -> simul.hostRating,
-                   "gameId" -> simul.hostGameId)
+          Json.obj(
+            "id" -> host.id,
+            "username" -> host.name,
+            "title" -> host.title,
+            "rating" -> simul.hostRating,
+            "gameId" -> simul.hostGameId)
         },
         "name" -> simul.name,
         "fullName" -> simul.fullName,
@@ -40,11 +41,12 @@ final class JsonView(getLightUser: String => Option[LightUser]) {
     }
 
   private def variantJson(speed: chess.Speed)(v: chess.variant.Variant) =
-    Json.obj("key" -> v.key,
-             "icon" -> lila.game.PerfPicker
-               .perfType(speed, v, none)
-               .map(_.iconChar.toString),
-             "name" -> v.name)
+    Json.obj(
+      "key" -> v.key,
+      "icon" -> lila.game.PerfPicker
+        .perfType(speed, v, none)
+        .map(_.iconChar.toString),
+      "name" -> v.name)
 
   private def playerJson(player: SimulPlayer) = {
     val light = getLightUser(player.user)
@@ -64,11 +66,12 @@ final class JsonView(getLightUser: String => Option[LightUser]) {
     Json.obj("player" -> playerJson(app.player), "accepted" -> app.accepted)
 
   private def gameJson(hostId: String)(g: Game) =
-    Json.obj("id" -> g.id,
-             "status" -> g.status.id,
-             "fen" -> (chess.format.Forsyth exportBoard g.toChess.board),
-             "lastMove" -> ~g.castleLastMoveTime.lastMoveString,
-             "orient" -> g.playerByUserId(hostId).map(_.color))
+    Json.obj(
+      "id" -> g.id,
+      "status" -> g.status.id,
+      "fen" -> (chess.format.Forsyth exportBoard g.toChess.board),
+      "lastMove" -> ~g.castleLastMoveTime.lastMoveString,
+      "orient" -> g.playerByUserId(hostId).map(_.color))
 
   private def pairingJson(games: List[Game], hostId: String)(p: SimulPairing) =
     Json.obj(

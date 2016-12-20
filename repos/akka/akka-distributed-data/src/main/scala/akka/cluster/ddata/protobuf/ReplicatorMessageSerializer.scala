@@ -146,8 +146,9 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
   import ReplicatorMessageSerializer.SmallCache
 
   private val cacheTimeToLive = system.settings.config
-    .getDuration("akka.cluster.distributed-data.serializer-cache-time-to-live",
-                 TimeUnit.MILLISECONDS)
+    .getDuration(
+      "akka.cluster.distributed-data.serializer-cache-time-to-live",
+      TimeUnit.MILLISECONDS)
     .millis
   private val readCache = new SmallCache[Read, Array[Byte]](
     4,
@@ -261,10 +262,11 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
 
   private def statusFromBinary(bytes: Array[Byte]): Status = {
     val status = dm.Status.parseFrom(bytes)
-    Status(status.getEntriesList.asScala.map(e ⇒
-             e.getKey -> AkkaByteString(e.getDigest.toByteArray()))(breakOut),
-           status.getChunk,
-           status.getTotChunks)
+    Status(
+      status.getEntriesList.asScala.map(e ⇒
+        e.getKey -> AkkaByteString(e.getDigest.toByteArray()))(breakOut),
+      status.getChunk,
+      status.getTotChunks)
   }
 
   private def gossipToProto(gossip: Gossip): dm.Gossip = {
@@ -282,9 +284,10 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
 
   private def gossipFromBinary(bytes: Array[Byte]): Gossip = {
     val gossip = dm.Gossip.parseFrom(decompress(bytes))
-    Gossip(gossip.getEntriesList.asScala.map(e ⇒
-             e.getKey -> dataEnvelopeFromProto(e.getEnvelope))(breakOut),
-           sendBack = gossip.getSendBack)
+    Gossip(
+      gossip.getEntriesList.asScala.map(e ⇒
+        e.getKey -> dataEnvelopeFromProto(e.getEnvelope))(breakOut),
+      sendBack = gossip.getSendBack)
   }
 
   private def getToProto(get: Get[_]): dm.Get = {
@@ -458,8 +461,9 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
             PruningState.PruningInitialized(
               pruningEntry.getSeenList.asScala.map(addressFromProto)(breakOut))
         val state =
-          PruningState(uniqueAddressFromProto(pruningEntry.getOwnerAddress),
-                       phase)
+          PruningState(
+            uniqueAddressFromProto(pruningEntry.getOwnerAddress),
+            phase)
         val removed = uniqueAddressFromProto(pruningEntry.getRemovedAddress)
         removed -> state
       }(breakOut)

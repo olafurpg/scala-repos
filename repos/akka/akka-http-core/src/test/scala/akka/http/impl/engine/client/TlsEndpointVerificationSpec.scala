@@ -38,8 +38,9 @@ class TlsEndpointVerificationSpec
         Http().defaultClientHttpsContext,
         hostname = "akka.example.org") // default context doesn't include custom CA
 
-      whenReady(pipe(HttpRequest(uri = "https://akka.example.org/")).failed,
-                timeout) { e ⇒
+      whenReady(
+        pipe(HttpRequest(uri = "https://akka.example.org/")).failed,
+        timeout) { e ⇒
         e shouldBe an[Exception]
       }
     }
@@ -48,8 +49,9 @@ class TlsEndpointVerificationSpec
         ExampleHttpContexts.exampleClientContext,
         hostname = "akka.example.org") // example context does include custom CA
 
-      whenReady(pipe(HttpRequest(uri = "https://akka.example.org:8080/")),
-                timeout) { response ⇒
+      whenReady(
+        pipe(HttpRequest(uri = "https://akka.example.org:8080/")),
+        timeout) { response ⇒
         response.status shouldEqual StatusCodes.OK
         val tlsInfo = response.header[`Tls-Session-Info`].get
         tlsInfo.peerPrincipal.get.getName shouldEqual "CN=akka.example.org,O=Internet Widgits Pty Ltd,ST=Some-State,C=AU"
@@ -116,8 +118,9 @@ class TlsEndpointVerificationSpec
             _ == "CN=akka.example.org,O=Internet Widgits Pty Ltd,ST=Some-State,C=AU"))
         HttpResponse()
       else
-        HttpResponse(StatusCodes.BadRequest,
-                     entity = "Tls-Session-Info header verification failed")
+        HttpResponse(
+          StatusCodes.BadRequest,
+          entity = "Tls-Session-Info header verification failed")
     }
 
     val serverSideTls =

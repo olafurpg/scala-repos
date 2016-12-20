@@ -255,9 +255,10 @@ object PatternAnnotatorUtil {
       scType.recursiveUpdate {
         case tp: ScTypeParameterType =>
           (true,
-           ScAbstractType(tp,
-                          abstraction(tp.lower.v, newVisited),
-                          abstraction(tp.upper.v, newVisited)))
+           ScAbstractType(
+             tp,
+             abstraction(tp.lower.v, newVisited),
+             abstraction(tp.upper.v, newVisited)))
         case tpe => (false, tpe)
       }
     }
@@ -306,8 +307,9 @@ object PatternAnnotatorUtil {
         val subTypes = subPat.flatMap(patternType)
         if (subTypes.size == subPat.size)
           Some(
-            ScTupleType(subTypes)(project,
-                                  GlobalSearchScope.allScope(project)))
+            ScTupleType(subTypes)(
+              project,
+              GlobalSearchScope.allScope(project)))
         else None
       case typed: ScTypedPattern =>
         typed.typePattern.map(_.typeElement.calcType)

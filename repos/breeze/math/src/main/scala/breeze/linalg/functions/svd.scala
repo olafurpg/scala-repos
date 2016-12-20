@@ -99,20 +99,21 @@ object svd extends UFunc {
       case ReducedSVD => m min n
     }
 
-    lapack.dgesdd(mode.JOBZ,
-                  m,
-                  n,
-                  cm.data,
-                  scala.math.max(1, m),
-                  S.data,
-                  U.data,
-                  scala.math.max(1, m),
-                  Vt.data,
-                  LDVT,
-                  work,
-                  work.length,
-                  iwork,
-                  info)
+    lapack.dgesdd(
+      mode.JOBZ,
+      m,
+      n,
+      cm.data,
+      scala.math.max(1, m),
+      S.data,
+      U.data,
+      scala.math.max(1, m),
+      Vt.data,
+      LDVT,
+      work,
+      work.length,
+      iwork,
+      info)
 
     if (info.`val` > 0)
       throw new NotConvergedException(NotConvergedException.Iterations)
@@ -157,20 +158,21 @@ object svd extends UFunc {
       case "S" => m min n
     }
 
-    lapack.sgesdd(mode.JOBZ,
-                  m,
-                  n,
-                  cm.data,
-                  scala.math.max(1, m),
-                  S.data,
-                  U.data,
-                  scala.math.max(1, m),
-                  Vt.data,
-                  LDVT,
-                  work,
-                  work.length,
-                  iwork,
-                  info)
+    lapack.sgesdd(
+      mode.JOBZ,
+      m,
+      n,
+      cm.data,
+      scala.math.max(1, m),
+      S.data,
+      U.data,
+      scala.math.max(1, m),
+      Vt.data,
+      LDVT,
+      work,
+      work.length,
+      iwork,
+      info)
 
     if (info.`val` > 0)
       throw new NotConvergedException(NotConvergedException.Iterations)
@@ -284,43 +286,45 @@ object svd extends UFunc {
         var workl = new Array[Double](ncv * (ncv + 8))
         var ipntr = new Array[Int](11)
 
-        arpack.dsaupd(ido,
-                      bmat,
-                      n,
-                      which,
-                      nev.`val`,
-                      tolW,
-                      resid,
-                      ncv,
-                      v,
-                      n,
-                      iparam,
-                      ipntr,
-                      workd,
-                      workl,
-                      workl.length,
-                      info)
+        arpack.dsaupd(
+          ido,
+          bmat,
+          n,
+          which,
+          nev.`val`,
+          tolW,
+          resid,
+          ncv,
+          v,
+          n,
+          iparam,
+          ipntr,
+          workd,
+          workl,
+          workl.length,
+          info)
 
         while (ido.`val` != 99) {
           if (ido.`val` != -1 && ido.`val` != 1)
             throw new IllegalStateException("ido = " + ido.`val`)
           av(mt, mtTrans, n, k, workd, ipntr(0) - 1, ipntr(1) - 1)
-          arpack.dsaupd(ido,
-                        bmat,
-                        n,
-                        which,
-                        nev.`val`,
-                        tolW,
-                        resid,
-                        ncv,
-                        v,
-                        n,
-                        iparam,
-                        ipntr,
-                        workd,
-                        workl,
-                        workl.length,
-                        info)
+          arpack.dsaupd(
+            ido,
+            bmat,
+            n,
+            which,
+            nev.`val`,
+            tolW,
+            resid,
+            ncv,
+            v,
+            n,
+            iparam,
+            ipntr,
+            workd,
+            workl,
+            workl.length,
+            info)
         }
 
         if (info.`val` != 0)
@@ -330,28 +334,29 @@ object svd extends UFunc {
         val select = new Array[Boolean](ncv)
         val z = java.util.Arrays.copyOfRange(v, 0, nev.`val` * n)
 
-        arpack.dseupd(true,
-                      "A",
-                      select,
-                      d,
-                      z,
-                      n,
-                      0.0,
-                      bmat,
-                      n,
-                      which,
-                      nev,
-                      tol,
-                      resid,
-                      ncv,
-                      v,
-                      n,
-                      iparam,
-                      ipntr,
-                      workd,
-                      workl,
-                      workl.length,
-                      info)
+        arpack.dseupd(
+          true,
+          "A",
+          select,
+          d,
+          z,
+          n,
+          0.0,
+          bmat,
+          n,
+          which,
+          nev,
+          tol,
+          resid,
+          ncv,
+          v,
+          n,
+          iparam,
+          ipntr,
+          workd,
+          workl,
+          workl.length,
+          info)
 
         val computed = iparam(4)
         val eigenVectors = new DenseVector(z)

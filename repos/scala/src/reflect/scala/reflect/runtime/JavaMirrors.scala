@@ -363,8 +363,9 @@ private[scala] trait JavaMirrors
       def set(value: Any) = {
         // it appears useful to be able to set values of vals, therefore I'm disabling this check
         // if (!symbol.isMutable) ErrorSetImmutableField(symbol)
-        jfield.set(receiver,
-                   if (isDerivedValueClass) unboxer.invoke(value) else value)
+        jfield.set(
+          receiver,
+          if (isDerivedValueClass) unboxer.invoke(value) else value)
       }
 
       override def toString =
@@ -382,13 +383,14 @@ private[scala] trait JavaMirrors
     lazy val bytecodelessMethodOwners =
       Set[Symbol](AnyClass, AnyValClass, AnyRefClass, ObjectClass, ArrayClass) ++ ScalaPrimitiveValueClasses
     lazy val bytecodefulObjectMethods =
-      Set[Symbol](Object_clone,
-                  Object_equals,
-                  Object_finalize,
-                  Object_hashCode,
-                  Object_toString,
-                  Object_notify,
-                  Object_notifyAll) ++ ObjectClass.info
+      Set[Symbol](
+        Object_clone,
+        Object_equals,
+        Object_finalize,
+        Object_hashCode,
+        Object_toString,
+        Object_notify,
+        Object_notifyAll) ++ ObjectClass.info
         .member(nme.wait_)
         .asTerm
         .alternatives
@@ -463,9 +465,10 @@ private[scala] trait JavaMirrors
                                           ret: DerivedValueClassMetadata)
         extends JavaMethodMirror(symbol, ret) {
       def this(receiver: Any, symbol: MethodSymbol) =
-        this(receiver,
-             symbol,
-             new DerivedValueClassMetadata(symbol.returnType))
+        this(
+          receiver,
+          symbol,
+          new DerivedValueClassMetadata(symbol.returnType))
       def bind(newReceiver: Any) =
         new JavaVanillaMethodMirror(newReceiver, symbol, ret)
       def apply(args: Any*): Any = jinvoke(args)
@@ -476,9 +479,10 @@ private[scala] trait JavaMirrors
                                            ret: DerivedValueClassMetadata)
         extends JavaVanillaMethodMirror(receiver, symbol, ret) {
       def this(receiver: Any, symbol: MethodSymbol) =
-        this(receiver,
-             symbol,
-             new DerivedValueClassMetadata(symbol.returnType))
+        this(
+          receiver,
+          symbol,
+          new DerivedValueClassMetadata(symbol.returnType))
       override def bind(newReceiver: Any) =
         new JavaVanillaMethodMirror0(newReceiver, symbol, ret)
       override def jinvokeraw(args: Seq[Any]) =
@@ -492,9 +496,10 @@ private[scala] trait JavaMirrors
                                            ret: DerivedValueClassMetadata)
         extends JavaVanillaMethodMirror(receiver, symbol, ret) {
       def this(receiver: Any, symbol: MethodSymbol) =
-        this(receiver,
-             symbol,
-             new DerivedValueClassMetadata(symbol.returnType))
+        this(
+          receiver,
+          symbol,
+          new DerivedValueClassMetadata(symbol.returnType))
       override def bind(newReceiver: Any) =
         new JavaVanillaMethodMirror1(newReceiver, symbol, ret)
       override def jinvokeraw(args: Seq[Any]) =
@@ -503,8 +508,9 @@ private[scala] trait JavaMirrors
         else if (receiver == null)
           jconstr.newInstance(args(0).asInstanceOf[AnyRef])
         else
-          jconstr.newInstance(receiver.asInstanceOf[AnyRef],
-                              args(0).asInstanceOf[AnyRef])
+          jconstr.newInstance(
+            receiver.asInstanceOf[AnyRef],
+            args(0).asInstanceOf[AnyRef])
     }
 
     private class JavaVanillaMethodMirror2(receiver: Any,
@@ -512,23 +518,27 @@ private[scala] trait JavaMirrors
                                            ret: DerivedValueClassMetadata)
         extends JavaVanillaMethodMirror(receiver, symbol, ret) {
       def this(receiver: Any, symbol: MethodSymbol) =
-        this(receiver,
-             symbol,
-             new DerivedValueClassMetadata(symbol.returnType))
+        this(
+          receiver,
+          symbol,
+          new DerivedValueClassMetadata(symbol.returnType))
       override def bind(newReceiver: Any) =
         new JavaVanillaMethodMirror2(newReceiver, symbol, ret)
       override def jinvokeraw(args: Seq[Any]) =
         if (!symbol.isConstructor)
-          jmeth.invoke(receiver,
-                       args(0).asInstanceOf[AnyRef],
-                       args(1).asInstanceOf[AnyRef])
+          jmeth.invoke(
+            receiver,
+            args(0).asInstanceOf[AnyRef],
+            args(1).asInstanceOf[AnyRef])
         else if (receiver == null)
-          jconstr.newInstance(args(0).asInstanceOf[AnyRef],
-                              args(1).asInstanceOf[AnyRef])
+          jconstr.newInstance(
+            args(0).asInstanceOf[AnyRef],
+            args(1).asInstanceOf[AnyRef])
         else
-          jconstr.newInstance(receiver.asInstanceOf[AnyRef],
-                              args(0).asInstanceOf[AnyRef],
-                              args(1).asInstanceOf[AnyRef])
+          jconstr.newInstance(
+            receiver.asInstanceOf[AnyRef],
+            args(0).asInstanceOf[AnyRef],
+            args(1).asInstanceOf[AnyRef])
     }
 
     private class JavaVanillaMethodMirror3(receiver: Any,
@@ -536,26 +546,30 @@ private[scala] trait JavaMirrors
                                            ret: DerivedValueClassMetadata)
         extends JavaVanillaMethodMirror(receiver, symbol, ret) {
       def this(receiver: Any, symbol: MethodSymbol) =
-        this(receiver,
-             symbol,
-             new DerivedValueClassMetadata(symbol.returnType))
+        this(
+          receiver,
+          symbol,
+          new DerivedValueClassMetadata(symbol.returnType))
       override def bind(newReceiver: Any) =
         new JavaVanillaMethodMirror3(newReceiver, symbol, ret)
       override def jinvokeraw(args: Seq[Any]) =
         if (!symbol.isConstructor)
-          jmeth.invoke(receiver,
-                       args(0).asInstanceOf[AnyRef],
-                       args(1).asInstanceOf[AnyRef],
-                       args(2).asInstanceOf[AnyRef])
+          jmeth.invoke(
+            receiver,
+            args(0).asInstanceOf[AnyRef],
+            args(1).asInstanceOf[AnyRef],
+            args(2).asInstanceOf[AnyRef])
         else if (receiver == null)
-          jconstr.newInstance(args(0).asInstanceOf[AnyRef],
-                              args(1).asInstanceOf[AnyRef],
-                              args(2).asInstanceOf[AnyRef])
+          jconstr.newInstance(
+            args(0).asInstanceOf[AnyRef],
+            args(1).asInstanceOf[AnyRef],
+            args(2).asInstanceOf[AnyRef])
         else
-          jconstr.newInstance(receiver.asInstanceOf[AnyRef],
-                              args(0).asInstanceOf[AnyRef],
-                              args(1).asInstanceOf[AnyRef],
-                              args(2).asInstanceOf[AnyRef])
+          jconstr.newInstance(
+            receiver.asInstanceOf[AnyRef],
+            args(0).asInstanceOf[AnyRef],
+            args(1).asInstanceOf[AnyRef],
+            args(2).asInstanceOf[AnyRef])
     }
 
     private class JavaVanillaMethodMirror4(receiver: Any,
@@ -563,29 +577,33 @@ private[scala] trait JavaMirrors
                                            ret: DerivedValueClassMetadata)
         extends JavaVanillaMethodMirror(receiver, symbol, ret) {
       def this(receiver: Any, symbol: MethodSymbol) =
-        this(receiver,
-             symbol,
-             new DerivedValueClassMetadata(symbol.returnType))
+        this(
+          receiver,
+          symbol,
+          new DerivedValueClassMetadata(symbol.returnType))
       override def bind(newReceiver: Any) =
         new JavaVanillaMethodMirror4(newReceiver, symbol, ret)
       override def jinvokeraw(args: Seq[Any]) =
         if (!symbol.isConstructor)
-          jmeth.invoke(receiver,
-                       args(0).asInstanceOf[AnyRef],
-                       args(1).asInstanceOf[AnyRef],
-                       args(2).asInstanceOf[AnyRef],
-                       args(3).asInstanceOf[AnyRef])
+          jmeth.invoke(
+            receiver,
+            args(0).asInstanceOf[AnyRef],
+            args(1).asInstanceOf[AnyRef],
+            args(2).asInstanceOf[AnyRef],
+            args(3).asInstanceOf[AnyRef])
         else if (receiver == null)
-          jconstr.newInstance(args(0).asInstanceOf[AnyRef],
-                              args(1).asInstanceOf[AnyRef],
-                              args(2).asInstanceOf[AnyRef],
-                              args(3).asInstanceOf[AnyRef])
+          jconstr.newInstance(
+            args(0).asInstanceOf[AnyRef],
+            args(1).asInstanceOf[AnyRef],
+            args(2).asInstanceOf[AnyRef],
+            args(3).asInstanceOf[AnyRef])
         else
-          jconstr.newInstance(receiver.asInstanceOf[AnyRef],
-                              args(0).asInstanceOf[AnyRef],
-                              args(1).asInstanceOf[AnyRef],
-                              args(2).asInstanceOf[AnyRef],
-                              args(3).asInstanceOf[AnyRef])
+          jconstr.newInstance(
+            receiver.asInstanceOf[AnyRef],
+            args(0).asInstanceOf[AnyRef],
+            args(1).asInstanceOf[AnyRef],
+            args(2).asInstanceOf[AnyRef],
+            args(3).asInstanceOf[AnyRef])
     }
 
     // caches MethodSymbol metadata, so that we minimize the work that needs to be done during Mirror.apply
@@ -971,10 +989,11 @@ private[scala] trait JavaMirrors
 
       override def load(sym: Symbol): Unit = {
         debugInfo("completing from Java " + sym + "/" + clazz.fullName) //debug
-        assert(sym == clazz ||
-                 (module != NoSymbol &&
-                   (sym == module || sym == module.moduleClass)),
-               sym)
+        assert(
+          sym == clazz ||
+            (module != NoSymbol &&
+              (sym == module || sym == module.moduleClass)),
+          sym)
 
         assignAssociatedFile(clazz, module, jclazz)
         propagatePackageBoundary(jclazz, relatedSymbols: _*)
@@ -1014,12 +1033,14 @@ private[scala] trait JavaMirrors
         } finally {
           parentsLevel -= 1
         }
-        clazz setInfo GenPolyType(tparams,
-                                  new ClassInfoType(parents, newScope, clazz))
+        clazz setInfo GenPolyType(
+          tparams,
+          new ClassInfoType(parents, newScope, clazz))
         if (module != NoSymbol) {
-          module.moduleClass setInfo new ClassInfoType(List(),
-                                                       newScope,
-                                                       module.moduleClass)
+          module.moduleClass setInfo new ClassInfoType(
+            List(),
+            newScope,
+            module.moduleClass)
         }
 
         def enter(sym: Symbol, mods: JavaAccFlags) =
@@ -1178,8 +1199,9 @@ private[scala] trait JavaMirrors
       toScala(constructorCache, jconstr)(_ constructorToScala1 _)
 
     private def constructorToScala1(jconstr: jConstructor[_]): MethodSymbol = {
-      val owner = followStatic(classToScala(jconstr.getDeclaringClass),
-                               jconstr.javaFlags)
+      val owner = followStatic(
+        classToScala(jconstr.getDeclaringClass),
+        jconstr.javaFlags)
       (lookup(owner, jconstr.getName) suchThat (erasesTo(_, jconstr)) orElse jconstrAsScala(
         jconstr)).asMethod
     }
@@ -1422,8 +1444,9 @@ private[scala] trait JavaMirrors
                             restpe: Type) = {
       meth setInfo GenPolyType(
         tparams,
-        MethodType(meth.owner.newSyntheticValueParams(paramtpes map objToAny),
-                   restpe))
+        MethodType(
+          meth.owner.newSyntheticValueParams(paramtpes map objToAny),
+          restpe))
     }
 
     /**
@@ -1505,9 +1528,10 @@ private[scala] trait JavaMirrors
         // suggested in https://issues.scala-lang.org/browse/SI-4023?focusedCommentId=54759#comment-54759
         var ownerClazz = classToJava(clazz.owner.asClass)
         if (childOfTopLevelObject)
-          ownerClazz = jClass.forName(ownerClazz.getName stripSuffix "$",
-                                      true,
-                                      ownerClazz.getClassLoader)
+          ownerClazz = jClass.forName(
+            ownerClazz.getName stripSuffix "$",
+            true,
+            ownerClazz.getClassLoader)
 
         val ownerChildren = ownerClazz.getDeclaredClasses
 

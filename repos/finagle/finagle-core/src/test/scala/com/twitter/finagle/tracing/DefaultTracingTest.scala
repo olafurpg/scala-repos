@@ -61,13 +61,15 @@ class DefaultTracingTest extends FunSuite with StringClient with StringServer {
     assert(serverTracer.map(_.traceId).toSet.size == 1)
     assert(clientTracer.map(_.traceId).toSet.size == 1)
 
-    assertAnnotationsInOrder(combinedTracer.toSeq,
-                             Seq(Annotation.ServiceName("theClient"),
-                                 Annotation.ClientSend(),
-                                 Annotation.ServiceName("theServer"),
-                                 Annotation.ServerRecv(),
-                                 Annotation.ServerSend(),
-                                 Annotation.ClientRecv()))
+    assertAnnotationsInOrder(
+      combinedTracer.toSeq,
+      Seq(
+        Annotation.ServiceName("theClient"),
+        Annotation.ClientSend(),
+        Annotation.ServiceName("theServer"),
+        Annotation.ServerRecv(),
+        Annotation.ServerSend(),
+        Annotation.ClientRecv()))
   }
 
   test("core events are traced in the stack client/server") {

@@ -247,11 +247,12 @@ private[sbt] object MissingBracketHandler {
           case scala.util.Success(_) =>
             text
           case scala.util.Failure(th) =>
-            findMissingText(content,
-                            index + 1,
-                            positionLine,
-                            fileName,
-                            originalException)
+            findMissingText(
+              content,
+              index + 1,
+              positionLine,
+              fileName,
+              originalException)
         }
       case _ =>
         throw new MessageOnlyException(

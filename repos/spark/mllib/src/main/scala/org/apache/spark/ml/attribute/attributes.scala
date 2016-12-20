@@ -110,8 +110,9 @@ sealed abstract class Attribute extends Serializable {
   def toStructField(existingMetadata: Metadata): StructField = {
     val newMetadata = new MetadataBuilder()
       .withMetadata(existingMetadata)
-      .putMetadata(AttributeKeys.ML_ATTR,
-                   withoutName.withoutIndex.toMetadataImpl())
+      .putMetadata(
+        AttributeKeys.ML_ATTR,
+        withoutName.withoutIndex.toMetadataImpl())
       .build()
     StructField(name.get, DoubleType, nullable = false, newMetadata)
   }
@@ -355,8 +356,9 @@ class NominalAttribute private[ml] (override val name: Option[String] = None,
   numValues.foreach { n =>
     require(n >= 0, s"numValues cannot be negative but got $n.")
   }
-  require(!(numValues.isDefined && values.isDefined),
-          "Cannot have both numValues and values defined.")
+  require(
+    !(numValues.isDefined && values.isDefined),
+    "Cannot have both numValues and values defined.")
 
   override def attrType: AttributeType = AttributeType.Nominal
 

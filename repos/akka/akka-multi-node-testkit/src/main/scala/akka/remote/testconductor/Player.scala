@@ -66,8 +66,9 @@ trait Player { this: TestConductorExt ⇒
 
     if (_client ne null)
       throw new IllegalStateException("TestConductorClient already started")
-    _client = system.actorOf(Props(classOf[ClientFSM], name, controllerAddr),
-                             "TestConductorClient")
+    _client = system.actorOf(
+      Props(classOf[ClientFSM], name, controllerAddr),
+      "TestConductorClient")
     val a = system.actorOf(
       Props(
         new Actor with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
@@ -187,13 +188,14 @@ private[akka] class ClientFSM(name: RoleName,
   val settings = TestConductor().Settings
 
   val handler =
-    new PlayerHandler(controllerAddr,
-                      settings.ClientReconnects,
-                      settings.ReconnectBackoff,
-                      settings.ClientSocketWorkerPoolSize,
-                      self,
-                      Logging(context.system, classOf[PlayerHandler].getName),
-                      context.system.scheduler)(context.dispatcher)
+    new PlayerHandler(
+      controllerAddr,
+      settings.ClientReconnects,
+      settings.ReconnectBackoff,
+      settings.ClientSocketWorkerPoolSize,
+      self,
+      Logging(context.system, classOf[PlayerHandler].getName),
+      context.system.scheduler)(context.dispatcher)
 
   startWith(Connecting, Data(None, None))
 
@@ -208,8 +210,9 @@ private[akka] class ClientFSM(name: RoleName,
       log.error(e, "ConnectionFailure")
       goto(Failed)
     case Event(StateTimeout, _) ⇒
-      log.error("Failed to connect to test conductor within {} ms.",
-                settings.ConnectTimeout.toMillis)
+      log.error(
+        "Failed to connect to test conductor within {} ms.",
+        settings.ConnectTimeout.toMillis)
       goto(Failed)
   }
 
@@ -278,10 +281,11 @@ private[akka] class ClientFSM(name: RoleName,
             // Conversion needed as the TokenBucket measures in octets: 125000 Octets/s = 1Mbit/s
             // FIXME: Initial capacity should be carefully chosen
             else
-              TokenBucket(capacity = 1000,
-                          tokensPerSecond = t.rateMBit * 125000.0,
-                          nanoTimeOfLastSend = 0,
-                          availableTokens = 0)
+              TokenBucket(
+                capacity = 1000,
+                tokensPerSecond = t.rateMBit * 125000.0,
+                nanoTimeOfLastSend = 0,
+                availableTokens = 0)
 
           val cmdFuture = TestConductor().transport
             .managementCommand(SetThrottle(t.target, t.direction, mode))
@@ -406,9 +410,10 @@ private[akka] class PlayerHandler(
       case msg: NetworkOp ⇒
         fsm ! msg
       case msg ⇒
-        log.info("server {} sent garbage '{}', disconnecting",
-                 getAddrString(channel),
-                 msg)
+        log.info(
+          "server {} sent garbage '{}', disconnecting",
+          getAddrString(channel),
+          msg)
         channel.close()
     }
   }

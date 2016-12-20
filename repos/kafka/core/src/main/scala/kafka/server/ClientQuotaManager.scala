@@ -89,8 +89,9 @@ class ClientQuotaManager(private val config: ClientQuotaManagerConfig,
     * @param delayQueue DelayQueue to dequeue from
     */
   class ThrottledRequestReaper(delayQueue: DelayQueue[ThrottledResponse])
-      extends ShutdownableThread("ThrottledRequestReaper-%s".format(apiKey),
-                                 false) {
+      extends ShutdownableThread(
+        "ThrottledRequestReaper-%s".format(apiKey),
+        false) {
 
     override def doWork(): Unit = {
       val response: ThrottledResponse = delayQueue.poll(1, TimeUnit.SECONDS)
@@ -155,8 +156,9 @@ class ClientQuotaManager(private val config: ClientQuotaManagerConfig,
     val difference = clientMetric.value() - quota.bound
     // Use the precise window used by the rate calculation
     val throttleTimeMs =
-      difference / quota.bound * rateMetric.windowSize(config,
-                                                       time.milliseconds())
+      difference / quota.bound * rateMetric.windowSize(
+        config,
+        time.milliseconds())
     throttleTimeMs.round.toInt
   }
 
@@ -229,11 +231,12 @@ class ClientQuotaManager(private val config: ClientQuotaManagerConfig,
             null,
             ClientQuotaManagerConfig.InactiveSensorExpirationTimeSeconds)
           throttleTimeSensor.add(
-            metrics.metricName("throttle-time",
-                               apiKey,
-                               "Tracking average throttle-time per client",
-                               "client-id",
-                               clientId),
+            metrics.metricName(
+              "throttle-time",
+              apiKey,
+              "Tracking average throttle-time per client",
+              "client-id",
+              clientId),
             new Avg())
         }
 
@@ -299,11 +302,12 @@ class ClientQuotaManager(private val config: ClientQuotaManagerConfig,
   }
 
   private def clientRateMetricName(clientId: String): MetricName = {
-    metrics.metricName("byte-rate",
-                       apiKey,
-                       "Tracking byte-rate per client",
-                       "client-id",
-                       clientId)
+    metrics.metricName(
+      "byte-rate",
+      apiKey,
+      "Tracking byte-rate per client",
+      "client-id",
+      clientId)
   }
 
   def shutdown() = {

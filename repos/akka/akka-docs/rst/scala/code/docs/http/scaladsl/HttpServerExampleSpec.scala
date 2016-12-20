@@ -144,8 +144,9 @@ class HttpServerExampleSpec
       request =>
         // simple text "echo" response:
         HttpResponse(
-          entity = HttpEntity(ContentTypes.`text/plain(UTF-8)`,
-                              request.entity.dataBytes))
+          entity = HttpEntity(
+            ContentTypes.`text/plain(UTF-8)`,
+            request.entity.dataBytes))
     }
 
     serverSource.runForeach { con =>
@@ -169,8 +170,9 @@ class HttpServerExampleSpec
     val requestHandler: HttpRequest => HttpResponse = {
       case HttpRequest(GET, Uri.Path("/"), _, _, _) =>
         HttpResponse(
-          entity = HttpEntity(ContentTypes.`text/html(UTF-8)`,
-                              "<html><body>Hello world!</body></html>"))
+          entity = HttpEntity(
+            ContentTypes.`text/html(UTF-8)`,
+            "<html><body>Hello world!</body></html>"))
 
       case HttpRequest(GET, Uri.Path("/ping"), _, _, _) =>
         HttpResponse(entity = "PONG!")
@@ -211,8 +213,9 @@ class HttpServerExampleSpec
         val requestHandler: HttpRequest => HttpResponse = {
           case HttpRequest(GET, Uri.Path("/"), _, _, _) =>
             HttpResponse(
-              entity = HttpEntity(ContentTypes.`text/html(UTF-8)`,
-                                  "<html><body>Hello world!</body></html>"))
+              entity = HttpEntity(
+                ContentTypes.`text/html(UTF-8)`,
+                "<html><body>Hello world!</body></html>"))
 
           case HttpRequest(GET, Uri.Path("/ping"), _, _, _) =>
             HttpResponse(entity = "PONG!")

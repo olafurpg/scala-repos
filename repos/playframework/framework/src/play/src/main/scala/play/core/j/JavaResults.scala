@@ -38,14 +38,16 @@ object JavaResults
     with DefaultContentTypeOfs {
   def writeContent(mimeType: String)(
       implicit codec: Codec): Writeable[Content] =
-    Writeable((content: Content) => codec.encode(contentBody(content)),
-              Some(ContentTypes.withCharset(mimeType)))
+    Writeable(
+      (content: Content) => codec.encode(contentBody(content)),
+      Some(ContentTypes.withCharset(mimeType)))
   def contentBody(content: Content): String = content match {
     case xml: play.twirl.api.Xml => xml.body.trim; case c => c.body
   }
   def writeString(mimeType: String)(implicit codec: Codec): Writeable[String] =
-    Writeable((s: String) => codec.encode(s),
-              Some(ContentTypes.withCharset(mimeType)))
+    Writeable(
+      (s: String) => codec.encode(s),
+      Some(ContentTypes.withCharset(mimeType)))
   def writeString(implicit codec: Codec): Writeable[String] =
     writeString(MimeTypes.TEXT)
   def writeBytes: Writeable[Array[Byte]] = Writeable.wByteArray
@@ -100,13 +102,14 @@ object JavaResultExtractor {
       }
 
       private def makeJavaCookie(cookie: Cookie): JCookie = {
-        new JCookie(cookie.name,
-                    cookie.value,
-                    cookie.maxAge.map(i => new Integer(i)).orNull,
-                    cookie.path,
-                    cookie.domain.orNull,
-                    cookie.secure,
-                    cookie.httpOnly)
+        new JCookie(
+          cookie.name,
+          cookie.value,
+          cookie.maxAge.map(i => new Integer(i)).orNull,
+          cookie.path,
+          cookie.domain.orNull,
+          cookie.secure,
+          cookie.httpOnly)
       }
 
       def iterator: java.util.Iterator[JCookie] = {

@@ -222,10 +222,11 @@ private[nio] object TypedArrayByteBuffer {
               initialPosition: Int,
               initialLimit: Int,
               readOnly: Boolean): TypedArrayByteBuffer = {
-      new TypedArrayByteBuffer(typedArray,
-                               initialPosition,
-                               initialLimit,
-                               readOnly)
+      new TypedArrayByteBuffer(
+        typedArray,
+        initialPosition,
+        initialLimit,
+        readOnly)
     }
 
     @inline

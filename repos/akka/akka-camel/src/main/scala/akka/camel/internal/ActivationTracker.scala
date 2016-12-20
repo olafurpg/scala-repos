@@ -113,9 +113,10 @@ private[camel] class ActivationTracker extends Actor with ActorLogging {
 
   private[this] def logStateWarning(actorRef: ActorRef): Receive = {
     case msg ⇒
-      log.warning("Message [{}] not expected in current state of actor [{}]",
-                  msg,
-                  actorRef)
+      log.warning(
+        "Message [{}] not expected in current state of actor [{}]",
+        msg,
+        actorRef)
   }
 }
 

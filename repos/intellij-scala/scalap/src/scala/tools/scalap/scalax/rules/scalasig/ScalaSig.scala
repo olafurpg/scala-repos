@@ -240,14 +240,15 @@ object ScalaSigEntryParsers extends RulesWithState with MemoisableRules {
     10 -~ nameRef ~ (symbolRef ?) ~ get ^~~^ ExternalSymbol as "extModClassRef"
 
   lazy val symbol: EntryParser[Symbol] =
-    oneOf(noSymbol,
-          typeSymbol,
-          aliasSymbol,
-          classSymbol,
-          objectSymbol,
-          methodSymbol,
-          extRef,
-          extModClassRef) as "symbol"
+    oneOf(
+      noSymbol,
+      typeSymbol,
+      aliasSymbol,
+      classSymbol,
+      objectSymbol,
+      methodSymbol,
+      extRef,
+      extModClassRef) as "symbol"
 
   val classSymRef = refTo(classSymbol)
   val attribTreeRef = ref

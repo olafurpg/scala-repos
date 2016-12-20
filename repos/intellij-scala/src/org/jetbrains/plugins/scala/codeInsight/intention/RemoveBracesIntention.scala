@@ -102,9 +102,10 @@ class RemoveBracesIntention extends PsiElementBaseIntentionAction {
                     .createBlockExpressionWithoutBracesFromText(
                       code,
                       element.getManager)
-                  CodeEditUtil.replaceChild(x.getParent.getNode,
-                                            x.getNode,
-                                            replacement.getNode)
+                  CodeEditUtil.replaceChild(
+                    x.getParent.getNode,
+                    x.getNode,
+                    replacement.getNode)
                   CodeEditUtil.markToReformat(caseClause.getNode, true)
                 case _ =>
                   ()
@@ -141,9 +142,10 @@ class RemoveBracesIntention extends PsiElementBaseIntentionAction {
         () =>
           {
             IntentionUtil.addComments(comments, blkExpr.getParent, blkExpr)
-            CodeEditUtil.replaceChild(blkExpr.getParent.getNode,
-                                      blkExpr.getNode,
-                                      onlyExpr.getNode)
+            CodeEditUtil.replaceChild(
+              blkExpr.getParent.getNode,
+              blkExpr.getNode,
+              onlyExpr.getNode)
           }
     }
   }

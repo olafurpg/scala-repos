@@ -15,14 +15,15 @@ object Test extends InteractiveTest {
     "@see something else"
   )
 
-  val names = Seq("Class",
-                  "Def",
-                  "Val",
-                  "Var",
-                  "AbstracType",
-                  "TypeAlias",
-                  "Trait",
-                  "InnerClass")
+  val names = Seq(
+    "Class",
+    "Def",
+    "Val",
+    "Var",
+    "AbstracType",
+    "TypeAlias",
+    "Trait",
+    "InnerClass")
   val bareText = """abstract class %s {
     |  def %s = ""
     |  val %s = ""

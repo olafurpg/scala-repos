@@ -77,8 +77,9 @@ abstract class KindProjectorTestBase
         }
         assertEquals(output, res)
       case _ =>
-        assert(assertion = false,
-               message = "Projection type not created from parameterized type")
+        assert(
+          assertion = false,
+          message = "Projection type not created from parameterized type")
     }
   }
 }

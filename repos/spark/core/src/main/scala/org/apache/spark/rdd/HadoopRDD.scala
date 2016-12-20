@@ -77,8 +77,9 @@ private[spark] class HadoopPartition(rddId: Int, idx: Int, s: InputSplit)
         val is: FileSplit = inputSplit.value.asInstanceOf[FileSplit]
         // map_input_file is deprecated in favor of mapreduce_map_input_file but set both
         // since its not removed yet
-        Map("map_input_file" -> is.getPath().toString(),
-            "mapreduce_map_input_file" -> is.getPath().toString())
+        Map(
+          "map_input_file" -> is.getPath().toString(),
+          "mapreduce_map_input_file" -> is.getPath().toString())
       } else {
         Map()
       }
@@ -126,14 +127,15 @@ class HadoopRDD[K, V](sc: SparkContext,
            keyClass: Class[K],
            valueClass: Class[V],
            minPartitions: Int) = {
-    this(sc,
-         sc.broadcast(new SerializableConfiguration(conf))
-           .asInstanceOf[Broadcast[SerializableConfiguration]],
-         initLocalJobConfFuncOpt = None,
-         inputFormatClass,
-         keyClass,
-         valueClass,
-         minPartitions)
+    this(
+      sc,
+      sc.broadcast(new SerializableConfiguration(conf))
+        .asInstanceOf[Broadcast[SerializableConfiguration]],
+      initLocalJobConfFuncOpt = None,
+      inputFormatClass,
+      keyClass,
+      valueClass,
+      minPartitions)
   }
 
   protected val jobConfCacheKey = "rdd_%d_job_conf".format(id)
@@ -452,9 +454,10 @@ private[spark] object HadoopRDD extends Logging {
       Some(new SplitInfoReflections)
     } catch {
       case e: Exception =>
-        logDebug("SplitLocationInfo and other new Hadoop classes are " +
-                   "unavailable. Using the older Hadoop location info code.",
-                 e)
+        logDebug(
+          "SplitLocationInfo and other new Hadoop classes are " +
+            "unavailable. Using the older Hadoop location info code.",
+          e)
         None
     }
 

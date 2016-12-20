@@ -109,10 +109,11 @@ class DStreamScopeSuite
     // RDDs created by these streams should inherit the IDs and names of their parent
     // DStream's base scopes
     assertDefined(mappedScopeBase, mappedScope1, mappedScope2, mappedScope3)
-    assertDefined(filteredScopeBase,
-                  filteredScope1,
-                  filteredScope2,
-                  filteredScope3)
+    assertDefined(
+      filteredScopeBase,
+      filteredScope1,
+      filteredScope2,
+      filteredScope3)
     assert(mappedScopeBase.get.name === "map")
     assert(filteredScopeBase.get.name === "filter")
     assertScopeCorrect(mappedScopeBase.get, mappedScope1.get, 1000)
@@ -175,10 +176,11 @@ class DStreamScopeSuite
     val transformScope3 = transformedStream.getOrCompute(Time(3000)).get.scope
 
     // Assert that all children RDDs inherit the DStream operation name correctly
-    assertDefined(transformScopeBase,
-                  transformScope1,
-                  transformScope2,
-                  transformScope3)
+    assertDefined(
+      transformScopeBase,
+      transformScope1,
+      transformScope2,
+      transformScope3)
     assert(transformScopeBase.get.name === "transform")
     assertNestedScopeCorrect(transformScope1.get, 1000)
     assertNestedScopeCorrect(transformScope2.get, 2000)
@@ -188,9 +190,10 @@ class DStreamScopeSuite
                                  batchTime: Long): Unit = {
       assert(rddScope.name === "reduceByKey")
       assert(rddScope.parent.isDefined)
-      assertScopeCorrect(transformScopeBase.get,
-                         rddScope.parent.get,
-                         batchTime)
+      assertScopeCorrect(
+        transformScopeBase.get,
+        rddScope.parent.get,
+        batchTime)
     }
   }
 
@@ -221,9 +224,10 @@ class DStreamScopeSuite
       case (rddScope, idx) =>
         assert(rddScope.get.name === "reduceByKey")
         assert(rddScope.get.parent.isDefined)
-        assertScopeCorrect(foreachBaseScope.get,
-                           rddScope.get.parent.get,
-                           (idx + 1) * 1000)
+        assertScopeCorrect(
+          foreachBaseScope.get,
+          rddScope.get.parent.get,
+          (idx + 1) * 1000)
     }
   }
 

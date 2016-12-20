@@ -56,8 +56,9 @@ class InterpolatedStringEnterHandler extends EnterHandlerDelegateAdapter {
                  if (caretOffset.get - a.getTextOffset == 1) modifyOffset(1)
                } else {
                  val lexer =
-                   new StringLiteralLexer(StringLiteralLexer.NO_QUOTE_CHAR,
-                                          a.getNode.getElementType)
+                   new StringLiteralLexer(
+                     StringLiteralLexer.NO_QUOTE_CHAR,
+                     a.getNode.getElementType)
                  lexer.start(a.getText, 0, a.getTextLength)
 
                  do {
@@ -82,8 +83,8 @@ class InterpolatedStringEnterHandler extends EnterHandlerDelegateAdapter {
 
                  caretOffset.set(caretOffset.get + 3)
                  caretAdvance.set(b.getTextLength + 1)
-                 editor.getDocument.insertString(offset,
-                                                 "\" +" + b.getText + "\"")
+                 editor.getDocument
+                   .insertString(offset, "\" +" + b.getText + "\"")
                }
                return Result.Continue
              case _ =>

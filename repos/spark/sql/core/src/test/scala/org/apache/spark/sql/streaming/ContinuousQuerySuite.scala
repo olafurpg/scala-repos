@@ -43,19 +43,22 @@ class ContinuousQuerySuite extends StreamTest with SharedSQLContext {
       CheckAnswer(6, 3),
       TestAwaitTermination(ExpectBlocked),
       TestAwaitTermination(ExpectBlocked, timeoutMs = 2000),
-      TestAwaitTermination(ExpectNotBlocked,
-                           timeoutMs = 10,
-                           expectedReturnValue = false),
+      TestAwaitTermination(
+        ExpectNotBlocked,
+        timeoutMs = 10,
+        expectedReturnValue = false),
       StopStream,
       AssertOnQuery(_.isActive === false),
       AssertOnQuery(_.exception.isEmpty),
       TestAwaitTermination(ExpectNotBlocked),
-      TestAwaitTermination(ExpectNotBlocked,
-                           timeoutMs = 2000,
-                           expectedReturnValue = true),
-      TestAwaitTermination(ExpectNotBlocked,
-                           timeoutMs = 10,
-                           expectedReturnValue = true),
+      TestAwaitTermination(
+        ExpectNotBlocked,
+        timeoutMs = 2000,
+        expectedReturnValue = true),
+      TestAwaitTermination(
+        ExpectNotBlocked,
+        timeoutMs = 10,
+        expectedReturnValue = true),
       StartStream,
       AssertOnQuery(_.isActive === true),
       AddData(inputData, 0),
@@ -64,10 +67,11 @@ class ContinuousQuerySuite extends StreamTest with SharedSQLContext {
       TestAwaitTermination(ExpectException[SparkException]),
       TestAwaitTermination(ExpectException[SparkException], timeoutMs = 2000),
       TestAwaitTermination(ExpectException[SparkException], timeoutMs = 10),
-      AssertOnQuery(q =>
-                      q.exception.get.startOffset.get === q.streamProgress
-                        .toCompositeOffset(Seq(inputData)),
-                    "incorrect start offset on exception")
+      AssertOnQuery(
+        q =>
+          q.exception.get.startOffset.get === q.streamProgress
+            .toCompositeOffset(Seq(inputData)),
+        "incorrect start offset on exception")
     )
   }
 
@@ -113,9 +117,10 @@ class ContinuousQuerySuite extends StreamTest with SharedSQLContext {
       timeoutMs: Int = -1,
       expectedReturnValue: Boolean = false
   ) extends AssertOnQuery(
-        TestAwaitTermination.assertOnQueryCondition(expectedBehavior,
-                                                    timeoutMs,
-                                                    expectedReturnValue),
+        TestAwaitTermination.assertOnQueryCondition(
+          expectedBehavior,
+          timeoutMs,
+          expectedReturnValue),
         "Error testing awaitTermination behavior"
       ) {
     override def toString(): String = {
@@ -146,8 +151,9 @@ class ContinuousQuerySuite extends StreamTest with SharedSQLContext {
           q.awaitTermination()
         } else {
           val returnedValue = q.awaitTermination(timeoutMs)
-          assert(returnedValue === expectedReturnValue,
-                 "Returned value does not match expected")
+          assert(
+            returnedValue === expectedReturnValue,
+            "Returned value does not match expected")
         }
       }
       AwaitTerminationTester.test(expectedBehavior, awaitTermFunc)

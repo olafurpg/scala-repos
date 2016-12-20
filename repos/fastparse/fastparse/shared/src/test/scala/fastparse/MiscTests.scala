@@ -38,14 +38,18 @@ object MiscTests extends TestSuite {
         check(("A" | "B").rep, """ ("A" | "B").rep """)
         check(("A".? | "B").rep, """ ("A".? | "B").rep """)
         check(("A".? | "B").rep(1), """ ("A".? | "B").rep(1) """)
-        check(("A".? | "B").rep(1, max = 2),
-              """ ("A".? | "B").rep(1, max = 2) """)
-        check(("A".? | "B").rep(sep = "C"),
-              """ ("A".? | "B").rep(sep = "C") """)
-        check(("A".? | "B").rep(sep = "C", max = 2),
-              """ ("A".? | "B").rep(sep = "C", max = 2) """)
-        check(("A".? | "B").rep(1, sep = "C" ~ "D" | "E"),
-              """("A".? | "B").rep(1, sep = "C" ~ "D" | "E")""")
+        check(
+          ("A".? | "B").rep(1, max = 2),
+          """ ("A".? | "B").rep(1, max = 2) """)
+        check(
+          ("A".? | "B").rep(sep = "C"),
+          """ ("A".? | "B").rep(sep = "C") """)
+        check(
+          ("A".? | "B").rep(sep = "C", max = 2),
+          """ ("A".? | "B").rep(sep = "C", max = 2) """)
+        check(
+          ("A".? | "B").rep(1, sep = "C" ~ "D" | "E"),
+          """("A".? | "B").rep(1, sep = "C" ~ "D" | "E")""")
       }
       'lookahead {
         check(&("A") ~ "ABC", """&("A") ~ "ABC" """)
@@ -146,8 +150,9 @@ object MiscTests extends TestSuite {
       }
     }
     'formatParser {
-      assert(Parsed.Failure.formatParser("a", "", 0) == """"a":0:0""",
-             Parsed.Failure.formatParser("A", "B", 0) == """"A":1:1""")
+      assert(
+        Parsed.Failure.formatParser("a", "", 0) == """"a":0:0""",
+        Parsed.Failure.formatParser("A", "B", 0) == """"A":1:1""")
     }
     'utils {
       'trieNode {

@@ -70,16 +70,18 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
 
   class ProdConsAnalyzer(val methodNode: MethodNode,
                          classInternalName: InternalName)
-      extends AsmAnalyzer(methodNode,
-                          classInternalName,
-                          new Analyzer(new InitialProducerSourceInterpreter))
+      extends AsmAnalyzer(
+        methodNode,
+        classInternalName,
+        new Analyzer(new InitialProducerSourceInterpreter))
       with ProdConsAnalyzerImpl
 
   class NonLubbingTypeFlowAnalyzer(val methodNode: MethodNode,
                                    classInternalName: InternalName)
-      extends AsmAnalyzer(methodNode,
-                          classInternalName,
-                          new Analyzer(new NonLubbingTypeFlowInterpreter))
+      extends AsmAnalyzer(
+        methodNode,
+        classInternalName,
+        new Analyzer(new NonLubbingTypeFlowInterpreter))
 
   /**
     * Add:
@@ -105,16 +107,18 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
       MethodBType(jliSerializedLambdaRef :: Nil, ObjectRef).descriptor
 
     {
-      val mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC + ACC_SYNTHETIC,
-                              "$deserializeLambda$",
-                              serlamObjDesc,
-                              null,
-                              null)
+      val mv = cw.visitMethod(
+        ACC_PRIVATE + ACC_STATIC + ACC_SYNTHETIC,
+        "$deserializeLambda$",
+        serlamObjDesc,
+        null,
+        null)
       mv.visitCode()
       mv.visitVarInsn(ALOAD, 0)
-      mv.visitInvokeDynamicInsn("lambdaDeserialize",
-                                serlamObjDesc,
-                                lambdaDeserializeBootstrapHandle)
+      mv.visitInvokeDynamicInsn(
+        "lambdaDeserialize",
+        serlamObjDesc,
+        lambdaDeserializeBootstrapHandle)
       mv.visitInsn(ARETURN)
       mv.visitEnd()
     }
@@ -153,10 +157,11 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
   }
 
   def getBoxedUnit: FieldInsnNode =
-    new FieldInsnNode(GETSTATIC,
-                      srBoxedUnitRef.internalName,
-                      "UNIT",
-                      srBoxedUnitRef.descriptor)
+    new FieldInsnNode(
+      GETSTATIC,
+      srBoxedUnitRef.internalName,
+      "UNIT",
+      srBoxedUnitRef.descriptor)
 
   private val anonfunAdaptedName = """.*\$anonfun\$\d+\$adapted""".r
   def hasAdaptedImplMethod(closureInit: ClosureInstantiation): Boolean = {
@@ -197,10 +202,11 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
     val bType = primitiveAsmTypeToBType(primitiveType)
     val MethodNameAndType(name, methodBType) = srBoxesRuntimeBoxToMethods(
       bType)
-    new MethodInsnNode(INVOKESTATIC,
-                       srBoxesRunTimeRef.internalName,
-                       name,
-                       methodBType.descriptor, /*itf =*/ false)
+    new MethodInsnNode(
+      INVOKESTATIC,
+      srBoxesRunTimeRef.internalName,
+      name,
+      methodBType.descriptor, /*itf =*/ false)
   }
 
   def isScalaUnbox(insn: MethodInsnNode): Boolean = {
@@ -217,10 +223,11 @@ class BackendUtils[BT <: BTypes](val btypes: BT) {
     val bType = primitiveAsmTypeToBType(primitiveType)
     val MethodNameAndType(name, methodBType) = srBoxesRuntimeUnboxToMethods(
       bType)
-    new MethodInsnNode(INVOKESTATIC,
-                       srBoxesRunTimeRef.internalName,
-                       name,
-                       methodBType.descriptor, /*itf =*/ false)
+    new MethodInsnNode(
+      INVOKESTATIC,
+      srBoxesRunTimeRef.internalName,
+      name,
+      methodBType.descriptor, /*itf =*/ false)
   }
 
   private def calleeInMap(insn: MethodInsnNode,

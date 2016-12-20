@@ -45,16 +45,18 @@ class HttpEntitySpec
         Strict(tpe, abc) must collectBytesTo(abc)
       }
       "Default" in {
-        Default(tpe, 11, source(abc, de, fgh, ijk)) must collectBytesTo(abc,
-                                                                        de,
-                                                                        fgh,
-                                                                        ijk)
+        Default(tpe, 11, source(abc, de, fgh, ijk)) must collectBytesTo(
+          abc,
+          de,
+          fgh,
+          ijk)
       }
       "CloseDelimited" in {
-        CloseDelimited(tpe, source(abc, de, fgh, ijk)) must collectBytesTo(abc,
-                                                                           de,
-                                                                           fgh,
-                                                                           ijk)
+        CloseDelimited(tpe, source(abc, de, fgh, ijk)) must collectBytesTo(
+          abc,
+          de,
+          fgh,
+          ijk)
       }
       "Chunked w/o LastChunk" in {
         Chunked(tpe, source(Chunk(abc), Chunk(fgh), Chunk(ijk))) must collectBytesTo(
@@ -107,11 +109,10 @@ class HttpEntitySpec
       "Infinite data stream" in {
         val neverCompleted = Promise[ByteString]()
         intercept[TimeoutException] {
-          Await.result(Default(tpe,
-                               42,
-                               Source.fromFuture(neverCompleted.future))
-                         .toStrict(100.millis),
-                       150.millis)
+          Await.result(
+            Default(tpe, 42, Source.fromFuture(neverCompleted.future))
+              .toStrict(100.millis),
+            150.millis)
         }.getMessage must be(
           "HttpEntity.toStrict timed out after 100 milliseconds while still waiting for outstanding data")
       }
@@ -138,12 +139,9 @@ class HttpEntitySpec
           Strict(tpe, doubleChars("abcfghijk") ++ trailer))
       }
       "Chunked with extra LastChunk" in {
-        Chunked(tpe,
-                source(Chunk(abc),
-                       Chunk(fgh),
-                       Chunk(ijk),
-                       LastChunk,
-                       LastChunk)) must transformTo(
+        Chunked(
+          tpe,
+          source(Chunk(abc), Chunk(fgh), Chunk(ijk), LastChunk, LastChunk)) must transformTo(
           Strict(tpe, doubleChars("abcfghijk") ++ trailer))
       }
     }
@@ -163,8 +161,9 @@ class HttpEntitySpec
         val utf8Type = ContentTypes.`text/plain(UTF-8)`
         val longString = Random.alphanumeric.take(10000).mkString
         val entity =
-          Strict(utf8Type,
-                 ByteString.apply(longString, utf8Type.charset.value))
+          Strict(
+            utf8Type,
+            ByteString.apply(longString, utf8Type.charset.value))
         entity must renderStrictDataAs(
           s"${longString.take(4095)} ... (10000 bytes total)")
       }
@@ -211,11 +210,9 @@ class HttpEntitySpec
             .withoutSizeLimit)
       }
       "Chunked" in {
-        withReturnType[Chunked](Chunked(tpe,
-                                        source(Chunk(abc),
-                                               Chunk(fgh),
-                                               Chunk(ijk),
-                                               LastChunk)).withoutSizeLimit)
+        withReturnType[Chunked](Chunked(
+          tpe,
+          source(Chunk(abc), Chunk(fgh), Chunk(ijk), LastChunk)).withoutSizeLimit)
         withReturnType[RequestEntity](
           Chunked(tpe, source(Chunk(abc), Chunk(fgh), Chunk(ijk), LastChunk))
             .asInstanceOf[RequestEntity]
@@ -253,9 +250,10 @@ class HttpEntitySpec
     Matcher { strict: Strict ⇒
       val expectedRendering =
         s"${strict.productPrefix}(${strict.contentType},$dataRendering)"
-      MatchResult(strict.toString == expectedRendering,
-                  strict.toString + " != " + expectedRendering,
-                  strict.toString + " == " + expectedRendering)
+      MatchResult(
+        strict.toString == expectedRendering,
+        strict.toString + " != " + expectedRendering,
+        strict.toString + " == " + expectedRendering)
     }
 
   def duplicateBytesTransformer(): Flow[ByteString, ByteString, NotUsed] =

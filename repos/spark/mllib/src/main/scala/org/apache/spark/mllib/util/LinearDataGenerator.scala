@@ -75,13 +75,14 @@ object LinearDataGenerator {
                           nPoints: Int,
                           seed: Int,
                           eps: Double = 0.1): Seq[LabeledPoint] = {
-    generateLinearInput(intercept,
-                        weights,
-                        Array.fill[Double](weights.length)(0.0),
-                        Array.fill[Double](weights.length)(1.0 / 3.0),
-                        nPoints,
-                        seed,
-                        eps)
+    generateLinearInput(
+      intercept,
+      weights,
+      Array.fill[Double](weights.length)(0.0),
+      Array.fill[Double](weights.length)(1.0 / 3.0),
+      nPoints,
+      seed,
+      eps)
   }
 
   /**
@@ -104,14 +105,15 @@ object LinearDataGenerator {
                           nPoints: Int,
                           seed: Int,
                           eps: Double): Seq[LabeledPoint] = {
-    generateLinearInput(intercept,
-                        weights,
-                        xMean,
-                        xVariance,
-                        nPoints,
-                        seed,
-                        eps,
-                        0.0)
+    generateLinearInput(
+      intercept,
+      weights,
+      xMean,
+      xVariance,
+      nPoints,
+      seed,
+      eps,
+      0.0)
   }
 
   /**
@@ -198,11 +200,12 @@ object LinearDataGenerator {
       sc.parallelize(0 until nparts, nparts).flatMap { p =>
         val seed = 42 + p
         val examplesInPartition = nexamples / nparts
-        generateLinearInput(intercept,
-                            w.toArray,
-                            examplesInPartition,
-                            seed,
-                            eps)
+        generateLinearInput(
+          intercept,
+          w.toArray,
+          examplesInPartition,
+          seed,
+          eps)
       }
     data
   }

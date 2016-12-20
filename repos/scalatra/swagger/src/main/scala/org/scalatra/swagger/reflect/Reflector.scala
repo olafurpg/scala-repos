@@ -15,29 +15,30 @@ object Reflector {
   private[this] val descriptors = new Memo[ScalaType, ObjectDescriptor]
 
   private[this] val primitives = {
-    Set[Type](classOf[String],
-              classOf[Char],
-              classOf[Int],
-              classOf[Long],
-              classOf[Double],
-              classOf[Float],
-              classOf[Byte],
-              classOf[BigInt],
-              classOf[Boolean],
-              classOf[Short],
-              classOf[java.lang.Integer],
-              classOf[java.lang.Long],
-              classOf[java.lang.Double],
-              classOf[java.lang.Float],
-              classOf[java.lang.Character],
-              classOf[java.lang.Byte],
-              classOf[java.lang.Boolean],
-              classOf[Number],
-              classOf[java.lang.Short],
-              classOf[Date],
-              classOf[Timestamp],
-              classOf[Symbol],
-              classOf[Unit])
+    Set[Type](
+      classOf[String],
+      classOf[Char],
+      classOf[Int],
+      classOf[Long],
+      classOf[Double],
+      classOf[Float],
+      classOf[Byte],
+      classOf[BigInt],
+      classOf[Boolean],
+      classOf[Short],
+      classOf[java.lang.Integer],
+      classOf[java.lang.Long],
+      classOf[java.lang.Double],
+      classOf[java.lang.Float],
+      classOf[java.lang.Character],
+      classOf[java.lang.Byte],
+      classOf[java.lang.Boolean],
+      classOf[Number],
+      classOf[java.lang.Short],
+      classOf[Date],
+      classOf[Timestamp],
+      classOf[Symbol],
+      classOf[Unit])
   }
 
   private[this] val defaultExcluded = Set(classOf[Nothing], classOf[Null])
@@ -114,11 +115,12 @@ object Reflector {
       val companion =
         c flatMap { cl =>
           allCatch opt {
-            SingletonDescriptor(cl.getSimpleName,
-                                cl.getName,
-                                scalaTypeOf(cl),
-                                cl.getField(ModuleFieldName).get(null),
-                                Seq.empty)
+            SingletonDescriptor(
+              cl.getSimpleName,
+              cl.getName,
+              scalaTypeOf(cl),
+              cl.getField(ModuleFieldName).get(null),
+              Seq.empty)
           }
         }
 
@@ -175,12 +177,13 @@ object Reflector {
               v.getActualTypeArguments.toList.zipWithIndex map {
                 case (ct, idx) =>
                   val prev = container.map(_._2).getOrElse(Nil)
-                  ctorParamType(name,
-                                index,
-                                owner,
-                                ctorParameterNames,
-                                ct,
-                                Some((st, idx :: prev)))
+                  ctorParamType(
+                    name,
+                    index,
+                    owner,
+                    ctorParameterNames,
+                    ct,
+                    Some((st, idx :: prev)))
               }
             st.copy(typeArgs = actualArgs)
           case v: WildcardType =>
@@ -191,10 +194,11 @@ object Reflector {
             val st = scalaTypeOf(x)
             if (st.erasure == classOf[java.lang.Object]) {
               scalaTypeOf(
-                ScalaSigReader.readConstructor(name,
-                                               owner,
-                                               idxes getOrElse List(index),
-                                               ctorParameterNames))
+                ScalaSigReader.readConstructor(
+                  name,
+                  owner,
+                  idxes getOrElse List(index),
+                  ctorParameterNames))
             } else st
         }
       }
@@ -215,27 +219,30 @@ object Reflector {
                   companion flatMap { comp =>
                     defaultValue(comp.erasure.erasure, comp.instance, index)
                   }
-                val theType = ctorParamType(paramName,
-                                            index,
-                                            tpe,
-                                            ctorParameterNames.toList,
-                                            genParams(index))
-                ConstructorParamDescriptor(decoded,
-                                           paramName,
-                                           index,
-                                           theType,
-                                           default)
+                val theType = ctorParamType(
+                  paramName,
+                  index,
+                  tpe,
+                  ctorParameterNames.toList,
+                  genParams(index))
+                ConstructorParamDescriptor(
+                  decoded,
+                  paramName,
+                  index,
+                  theType,
+                  default)
             }
           ConstructorDescriptor(ctorParams.toSeq, ctor, isPrimary = false)
         }
       }
 
-      ClassDescriptor(tpe.simpleName,
-                      tpe.fullName,
-                      tpe,
-                      companion,
-                      constructors,
-                      properties)
+      ClassDescriptor(
+        tpe.simpleName,
+        tpe.fullName,
+        tpe,
+        companion,
+        constructors,
+        properties)
     }
   }
 

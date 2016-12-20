@@ -48,8 +48,9 @@ class ScalaWrongMethodsUsageInspection extends LocalInspectionTool {
         map += (("getQualifiedName", Seq("com.intellij.psi.PsiClass")))
         map +=
           (("getName",
-            Seq("com.intellij.navigation.NavigationItem",
-                "com.intellij.psi.PsiNamedElement")))
+            Seq(
+              "com.intellij.navigation.NavigationItem",
+              "com.intellij.psi.PsiNamedElement")))
         map += (("getClasses", Seq("com.intellij.psi.PsiClassOwner")))
         map += (("getClassNames", Seq("com.intellij.psi.PsiClassOwnerEx")))
         map +=
@@ -67,8 +68,9 @@ class ScalaWrongMethodsUsageInspection extends LocalInspectionTool {
                       instance.getCachedClass(m.getResolveScope, clazz).orNull
                     if (cachedClass != null && containingClass != null) {
                       if (cachedClass == containingClass ||
-                          instance.cachedDeepIsInheritor(cachedClass,
-                                                         containingClass)) {
+                          instance.cachedDeepIsInheritor(
+                            cachedClass,
+                            containingClass)) {
                         true
                       } else false
                     } else false

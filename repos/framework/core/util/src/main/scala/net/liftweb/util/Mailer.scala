@@ -333,16 +333,18 @@ trait Mailer extends SimpleInjector {
         bp.setText(txt, charset)
 
       case XHTMLMailBodyType(html) =>
-        bp.setContent(encodeHtmlBodyPart(html),
-                      "text/html; charset=" + charSet)
+        bp.setContent(
+          encodeHtmlBodyPart(html),
+          "text/html; charset=" + charSet)
 
       case XHTMLPlusImages(html, img @ _ *) =>
         val (attachments, images) = img.partition(_.attachment)
         val relatedMultipart = new MimeMultipart("related")
 
         val htmlBodyPart = new MimeBodyPart
-        htmlBodyPart.setContent(encodeHtmlBodyPart(html),
-                                "text/html; charset=" + charSet)
+        htmlBodyPart.setContent(
+          encodeHtmlBodyPart(html),
+          "text/html; charset=" + charSet)
         relatedMultipart.addBodyPart(htmlBodyPart)
 
         images.foreach { image =>

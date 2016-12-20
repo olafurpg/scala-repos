@@ -61,8 +61,9 @@ class Netty4ClientChannelInitializerTest
 
       client
         .connect(
-          new InetSocketAddress(InetAddress.getLoopbackAddress,
-                                server.getLocalPort)
+          new InetSocketAddress(
+            InetAddress.getLoopbackAddress,
+            server.getLocalPort)
         )
         .awaitUninterruptibly(timeout.inMilliseconds)
 
@@ -192,8 +193,9 @@ class Netty4ClientChannelInitializerTest
     val server = new ServerSocket(0, 50, InetAddress.getLoopbackAddress)
     ctx.client
       .connect(
-        new InetSocketAddress(InetAddress.getLoopbackAddress,
-                              server.getLocalPort)
+        new InetSocketAddress(
+          InetAddress.getLoopbackAddress,
+          server.getLocalPort)
       )
       .awaitUninterruptibly(timeout.inMilliseconds)
 

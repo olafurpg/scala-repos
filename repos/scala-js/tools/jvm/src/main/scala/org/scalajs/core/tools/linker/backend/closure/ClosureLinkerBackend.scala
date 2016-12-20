@@ -83,9 +83,10 @@ final class ClosureLinkerBackend(
     val compiler = closureCompiler(logger)
 
     val result = logger.time("Closure: Compiler pass") {
-      compiler.compileModules(List(closureExterns).asJava,
-                              List(module).asJava,
-                              options)
+      compiler.compileModules(
+        List(closureExterns).asJava,
+        List(module).asJava,
+        options)
     }
 
     logger.time("Closure: Write result") {

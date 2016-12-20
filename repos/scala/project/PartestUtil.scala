@@ -43,26 +43,27 @@ object PartestUtil {
 
   /** A parser for the custom `partest` command */
   def partestParser(globalBase: File, testBase: File): Parser[String] = {
-    val knownUnaryOptions = List("--pos",
-                                 "--neg",
-                                 "--run",
-                                 "--jvm",
-                                 "--res",
-                                 "--ant",
-                                 "--scalap",
-                                 "--specialized",
-                                 "--scalacheck",
-                                 "--instrumented",
-                                 "--presentation",
-                                 "--failed",
-                                 "--update-check",
-                                 "--show-diff",
-                                 "--verbose",
-                                 "--terse",
-                                 "--debug",
-                                 "--version",
-                                 "--self-test",
-                                 "--help")
+    val knownUnaryOptions = List(
+      "--pos",
+      "--neg",
+      "--run",
+      "--jvm",
+      "--res",
+      "--ant",
+      "--scalap",
+      "--specialized",
+      "--scalacheck",
+      "--instrumented",
+      "--presentation",
+      "--failed",
+      "--update-check",
+      "--show-diff",
+      "--verbose",
+      "--terse",
+      "--debug",
+      "--version",
+      "--self-test",
+      "--help")
     val srcPathOption = "--srcpath"
     val grepOption = "--grep"
 
@@ -113,8 +114,9 @@ object PartestUtil {
       }
 
       val completion = Completions.strict(
-        Set("<filename glob>",
-            "<regex> (for source, flags or checkfile contents)").map(s =>
+        Set(
+          "<filename glob>",
+          "<regex> (for source, flags or checkfile contents)").map(s =>
           Completion.displayOnly(s)))
       val tokenCompletion = TokenCompletions.fixed((seen, level) => completion)
 

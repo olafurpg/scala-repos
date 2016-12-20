@@ -157,10 +157,11 @@ class WorksheetInProcessRunnerFactory {
           else originalClassName
         val originalFileName =
           if (fileName == null) original.getFileName else fileName
-        new StackTraceElement(declaringClassName,
-                              original.getMethodName,
-                              originalFileName,
-                              original.getLineNumber - 4)
+        new StackTraceElement(
+          declaringClassName,
+          original.getMethodName,
+          originalFileName,
+          original.getLineNumber - 4)
       }
 
       val els = e.getStackTrace

@@ -44,9 +44,10 @@ object App extends Logging {
         }
       }
       val appid = apps.insert(
-        storage.App(id = ca.app.id.getOrElse(0),
-                    name = ca.app.name,
-                    description = ca.app.description))
+        storage.App(
+          id = ca.app.id.getOrElse(0),
+          name = ca.app.name,
+          description = ca.app.description))
       appid map { id =>
         val dbInit = events.init(id)
         val r =
@@ -55,9 +56,10 @@ object App extends Logging {
             val accessKeys = storage.Storage.getMetaDataAccessKeys
             val accessKey =
               accessKeys.insert(
-                storage.AccessKey(key = ca.accessKey.accessKey,
-                                  appid = id,
-                                  events = Seq()))
+                storage.AccessKey(
+                  key = ca.accessKey.accessKey,
+                  appid = id,
+                  events = Seq()))
             accessKey map { k =>
               info("Created new app:")
               info(s"      Name: ${ca.app.name}")

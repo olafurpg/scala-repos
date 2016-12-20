@@ -62,26 +62,27 @@ object Arguments {
   private val Delimiter = "\n"
 
   def from(strings: Seq[String]): Arguments = strings match {
-    case Seq(PathToFile(interfaceJar),
-             PathToFile(sourceJar),
-             PathToFile(interfacesHome),
-             javaClassVersion,
-             StringToOption(compilerJarPaths),
-             StringToOption(javaHomePath),
-             PathsToFiles(sources),
-             PathsToFiles(classpath),
-             PathToFile(output),
-             StringToSequence(scalaOptions),
-             StringToSequence(javaOptions),
-             order,
-             PathToFile(cacheFile),
-             PathsToFiles(outputs),
-             PathsToFiles(caches),
-             incrementalTypeName,
-             PathsToFiles(sourceRoots),
-             PathsToFiles(outputDirs),
-             StringToSequence(worksheetClass),
-             sbtIncOptionsString) =>
+    case Seq(
+        PathToFile(interfaceJar),
+        PathToFile(sourceJar),
+        PathToFile(interfacesHome),
+        javaClassVersion,
+        StringToOption(compilerJarPaths),
+        StringToOption(javaHomePath),
+        PathsToFiles(sources),
+        PathsToFiles(classpath),
+        PathToFile(output),
+        StringToSequence(scalaOptions),
+        StringToSequence(javaOptions),
+        order,
+        PathToFile(cacheFile),
+        PathsToFiles(outputs),
+        PathsToFiles(caches),
+        incrementalTypeName,
+        PathsToFiles(sourceRoots),
+        PathsToFiles(outputDirs),
+        StringToSequence(worksheetClass),
+        sbtIncOptionsString) =>
       val sbtData =
         SbtData(interfaceJar, sourceJar, interfacesHome, javaClassVersion)
 
@@ -104,16 +105,17 @@ object Arguments {
 
       val sbtIncOptions = SbtIncrementalOptions.fromString(sbtIncOptionsString)
 
-      val compilationData = CompilationData(sources,
-                                            classpath,
-                                            output,
-                                            scalaOptions,
-                                            javaOptions,
-                                            CompileOrder.valueOf(order),
-                                            cacheFile,
-                                            outputToCacheMap,
-                                            outputGroups,
-                                            sbtIncOptions)
+      val compilationData = CompilationData(
+        sources,
+        classpath,
+        output,
+        scalaOptions,
+        javaOptions,
+        CompileOrder.valueOf(order),
+        cacheFile,
+        outputToCacheMap,
+        outputGroups,
+        sbtIncOptions)
 
       Arguments(sbtData, compilerData, compilationData, worksheetClass)
   }

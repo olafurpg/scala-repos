@@ -236,9 +236,10 @@ trait TransSpecModule extends FNModule {
           case trans.Filter(source, pred) =>
             trans.Filter(mapSources(source)(f), mapSources(pred)(f))
           case trans.FilterDefined(source, definedFor, definedness) =>
-            trans.FilterDefined(mapSources(source)(f),
-                                mapSources(definedFor)(f),
-                                definedness)
+            trans.FilterDefined(
+              mapSources(source)(f),
+              mapSources(definedFor)(f),
+              definedness)
 
           case Scan(source, scanner) => Scan(mapSources(source)(f), scanner)
           case MapWith(source, mapper) =>
@@ -294,9 +295,10 @@ trait TransSpecModule extends FNModule {
             trans.EqualLiteral(mapSources(source)(f), value, invert)
 
           case trans.Cond(pred, left, right) =>
-            trans.Cond(mapSources(pred)(f),
-                       mapSources(left)(f),
-                       mapSources(right)(f))
+            trans.Cond(
+              mapSources(pred)(f),
+              mapSources(left)(f),
+              mapSources(right)(f))
         }
       }
 
@@ -312,9 +314,10 @@ trait TransSpecModule extends FNModule {
           case trans.Filter(source, pred) =>
             trans.Filter(deepMap(source)(f), deepMap(pred)(f))
           case trans.FilterDefined(source, definedFor, definedness) =>
-            trans.FilterDefined(deepMap(source)(f),
-                                deepMap(definedFor)(f),
-                                definedness)
+            trans.FilterDefined(
+              deepMap(source)(f),
+              deepMap(definedFor)(f),
+              definedness)
 
           case Scan(source, scanner) => Scan(deepMap(source)(f), scanner)
           case MapWith(source, mapper) => MapWith(deepMap(source)(f), mapper)
@@ -435,11 +438,13 @@ trait TransSpecModule extends FNModule {
         keySpec match {
           case GroupKeySpecSource(key, spec) => GroupKeySpecSource(key, spec)
           case GroupKeySpecAnd(GroupKeySpecOr(ol, or), right) =>
-            GroupKeySpecOr(dnf(GroupKeySpecAnd(ol, right)),
-                           dnf(GroupKeySpecAnd(or, right)))
+            GroupKeySpecOr(
+              dnf(GroupKeySpecAnd(ol, right)),
+              dnf(GroupKeySpecAnd(or, right)))
           case GroupKeySpecAnd(left, GroupKeySpecOr(ol, or)) =>
-            GroupKeySpecOr(dnf(GroupKeySpecAnd(left, ol)),
-                           dnf(GroupKeySpecAnd(left, or)))
+            GroupKeySpecOr(
+              dnf(GroupKeySpecAnd(left, ol)),
+              dnf(GroupKeySpecAnd(left, or)))
 
           case gand @ GroupKeySpecAnd(left, right) =>
             val leftdnf = dnf(left)
@@ -526,8 +531,9 @@ trait TransSpecModule extends FNModule {
       source: TransSpec[A]): TransSpec[A] = {
     val bottomWrapped =
       trans.WrapObject(trans.ConstLiteral(CEmptyArray, source), paths.Key.name)
-    trans.InnerObjectConcat(bottomWrapped,
-                            trans.WrapObject(source, paths.Value.name))
+    trans.InnerObjectConcat(
+      bottomWrapped,
+      trans.WrapObject(source, paths.Value.name))
   }
 
   def buildValueWrapSpec[A <: SourceType](source: TransSpec[A]): TransSpec[A] = {

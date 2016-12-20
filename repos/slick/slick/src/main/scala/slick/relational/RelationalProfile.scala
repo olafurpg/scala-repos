@@ -39,8 +39,9 @@ trait RelationalProfile
     type BaseColumnType[T] = self.BaseColumnType[T]
     val MappedColumnType = self.MappedColumnType
 
-    @deprecated("Use an explicit conversion to an Option column with `.?`",
-                "3.0")
+    @deprecated(
+      "Use an explicit conversion to an Option column with `.?`",
+      "3.0")
     implicit def columnToOptionColumn[T: BaseTypedType](
         c: Rep[T]): Rep[Option[T]] = c.?
     implicit def valueToConstColumn[T: TypedType](v: T): LiteralColumn[T] =
@@ -81,8 +82,9 @@ trait RelationalProfile
     val canJoinFull = capabilities contains RelationalCapabilities.joinFull
     if (canJoinLeft && canJoinRight && canJoinFull) base
     else
-      base.addBefore(new EmulateOuterJoins(canJoinLeft, canJoinRight),
-                     Phase.expandRecords)
+      base.addBefore(
+        new EmulateOuterJoins(canJoinLeft, canJoinRight),
+        Phase.expandRecords)
   }
 
   class TableQueryExtensionMethods[T <: RelationalProfile#Table[_], U](
@@ -121,9 +123,10 @@ trait RelationalProfile
         fpf: (TypeMappingResultConverter[M, T, _] => SimpleFastPathResultConverter[
                 M,
                 T])): MappedProjection[T, P] = mp.genericFastPath {
-      case tm @ TypeMappingResultConverter(_: ProductResultConverter[_, _],
-                                           _,
-                                           _) =>
+      case tm @ TypeMappingResultConverter(
+            _: ProductResultConverter[_, _],
+            _,
+            _) =>
         fpf(tm.asInstanceOf[TypeMappingResultConverter[M, T, _]])
       case tm => tm
     }

@@ -83,27 +83,29 @@ object Test {
     )
 
     val indexOfSliceInputs = (
-      List(Nil,
-           List(1),
-           List(3),
-           List(5),
-           List(1, 2),
-           List(2, 3, 4),
-           List(4, 5),
-           seq),
+      List(
+        Nil,
+        List(1),
+        List(3),
+        List(5),
+        List(1, 2),
+        List(2, 3, 4),
+        List(4, 5),
+        seq),
       List(List(1, 2, 3, 5), List(6), List(5, 4, 3, 2, 1), List(2, 1))
     )
 
     val sameElementsInputs = (
       List(List(1, 2, 3, 4, 5)),
-      List(Nil,
-           List(1),
-           List(1, 2),
-           List(2, 3, 4),
-           List(2, 3, 4, 5),
-           List(2, 3, 4, 5, 1),
-           List(1, 2, 3, 5, 4),
-           seq.reverse)
+      List(
+        Nil,
+        List(1),
+        List(1, 2),
+        List(2, 3, 4),
+        List(2, 3, 4, 5),
+        List(2, 3, 4, 5, 1),
+        List(1, 2, 3, 5, 4),
+        seq.reverse)
     )
   }
 

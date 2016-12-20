@@ -148,11 +148,12 @@ object EvaluateConfigurations {
     val (importDefs, definitions) =
       if (parsed.definitions.isEmpty) (Nil, DefinedSbtValues.empty)
       else {
-        val definitions = evaluateDefinitions(eval,
-                                              name,
-                                              parsed.imports,
-                                              parsed.definitions,
-                                              Some(file))
+        val definitions = evaluateDefinitions(
+          eval,
+          name,
+          parsed.imports,
+          parsed.definitions,
+          Some(file))
         val imp = BuildUtil.importAllRoot(definitions.enclosingModule :: Nil)
         val projs = (loader: ClassLoader) =>
           definitions
@@ -190,12 +191,13 @@ object EvaluateConfigurations {
             case internals.ProjectManipulation(f) => f
           }
         // TODO -get project manipulations.
-        new LoadedSbtFile(settings,
-                          projects,
-                          importDefs,
-                          manipulations,
-                          definitions,
-                          allGeneratedFiles)
+        new LoadedSbtFile(
+          settings,
+          projects,
+          importDefs,
+          manipulations,
+          definitions,
+          allGeneratedFiles)
       }
   }
 
@@ -243,11 +245,12 @@ object EvaluateConfigurations {
     // TODO - Should we try to namespace these between.sbt files?  IF they hash to the same value, they may actually be
     // exactly the same setting, so perhaps we don't care?
     val result = try {
-      eval.eval(expression,
-                imports = new EvalImports(imports, name),
-                srcName = name,
-                tpeName = Some(SettingsDefinitionName),
-                line = range.start)
+      eval.eval(
+        expression,
+        imports = new EvalImports(imports, name),
+        srcName = name,
+        tpeName = Some(SettingsDefinitionName),
+        line = range.start)
     } catch {
       case e: sbt.compiler.EvalException =>
         throw new MessageOnlyException(e.getMessage)
@@ -356,10 +359,11 @@ object EvaluateConfigurations {
     DefinitionKeywords.exists(trimmed startsWith _)
   }
   private[this] def extractedValTypes: Seq[String] =
-    Seq(classOf[Project],
-        classOf[InputKey[_]],
-        classOf[TaskKey[_]],
-        classOf[SettingKey[_]]).map(_.getName)
+    Seq(
+      classOf[Project],
+      classOf[InputKey[_]],
+      classOf[TaskKey[_]],
+      classOf[SettingKey[_]]).map(_.getName)
   private[this] def evaluateDefinitions(
       eval: Eval,
       name: String,
@@ -369,11 +373,12 @@ object EvaluateConfigurations {
     val convertedRanges = definitions.map {
       case (s, r) => (s, r.start to r.end)
     }
-    eval.evalDefinitions(convertedRanges,
-                         new EvalImports(imports, name),
-                         name,
-                         file,
-                         extractedValTypes)
+    eval.evalDefinitions(
+      convertedRanges,
+      new EvalImports(imports, name),
+      name,
+      file,
+      extractedValTypes)
   }
 }
 object Index {

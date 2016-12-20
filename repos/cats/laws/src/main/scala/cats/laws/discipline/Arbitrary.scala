@@ -38,8 +38,9 @@ object arbitrary extends ArbitraryInstances0 {
       implicit A: Arbitrary[A],
       B: Arbitrary[B]): Arbitrary[Validated[A, B]] =
     Arbitrary(
-      Gen.oneOf(A.arbitrary.map(Validated.invalid),
-                B.arbitrary.map(Validated.valid)))
+      Gen.oneOf(
+        A.arbitrary.map(Validated.invalid),
+        B.arbitrary.map(Validated.valid)))
 
   implicit def iorArbitrary[A, B](implicit A: Arbitrary[A],
                                   B: Arbitrary[B]): Arbitrary[A Ior B] =
@@ -62,9 +63,10 @@ object arbitrary extends ArbitraryInstances0 {
 
   implicit def evalArbitrary[A: Arbitrary]: Arbitrary[Eval[A]] =
     Arbitrary(
-      Gen.oneOf(getArbitrary[A].map(Eval.now(_)),
-                getArbitrary[A].map(Eval.later(_)),
-                getArbitrary[A].map(Eval.always(_))))
+      Gen.oneOf(
+        getArbitrary[A].map(Eval.now(_)),
+        getArbitrary[A].map(Eval.later(_)),
+        getArbitrary[A].map(Eval.always(_))))
 
   implicit def prodArbitrary[F[_], G[_], A](
       implicit F: Arbitrary[F[A]],
@@ -95,8 +97,9 @@ object arbitrary extends ArbitraryInstances0 {
       implicit F: Arbitrary[F[A]],
       G: Arbitrary[G[A]]): Arbitrary[Coproduct[F, G, A]] =
     Arbitrary(
-      Gen.oneOf(F.arbitrary.map(Coproduct.leftc[F, G, A]),
-                G.arbitrary.map(Coproduct.rightc[F, G, A])))
+      Gen.oneOf(
+        F.arbitrary.map(Coproduct.leftc[F, G, A]),
+        G.arbitrary.map(Coproduct.rightc[F, G, A])))
 
   implicit def showArbitrary[A: Arbitrary]: Arbitrary[Show[A]] =
     Arbitrary(Show.fromToString[A])

@@ -44,12 +44,13 @@ class IntegerLiteralCheckTest extends SimpleTestCase {
   def appendL(s: String): List[String] = List(s + "l", s + "L")
 
   val intValues = List(0, -0, 1, -1, 1234, -1234, Int.MinValue, Int.MaxValue)
-  val longValues = List(1l + Int.MaxValue,
-                        12345l + Int.MaxValue,
-                        -1l + Int.MinValue,
-                        -1234l + Int.MinValue,
-                        Long.MinValue,
-                        Long.MaxValue)
+  val longValues = List(
+    1l + Int.MaxValue,
+    12345l + Int.MaxValue,
+    -1l + Int.MinValue,
+    -1234l + Int.MinValue,
+    Long.MinValue,
+    Long.MaxValue)
   val numOfGenInteger = 10
 
   def testFine() {
@@ -88,9 +89,10 @@ class IntegerLiteralCheckTest extends SimpleTestCase {
     val overflowLongStrings =
       (longValues ++ randomLongValues(numOfGenInteger)).flatMap(
         x =>
-          List(x.toString.padTo(21, '1'),
-               "0x" + x.toHexString.padTo(17, '1'),
-               "0" + x.toOctalString.padTo(23, '1')))
+          List(
+            x.toString.padTo(21, '1'),
+            "0x" + x.toHexString.padTo(17, '1'),
+            "0" + x.toOctalString.padTo(23, '1')))
     val overflowLongStringsWithL = overflowLongStrings.flatMap(appendL)
     for (s <- overflowLongStrings ++ overflowLongStringsWithL ++ Seq(
            "9223372036854775808l",

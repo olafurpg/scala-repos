@@ -300,9 +300,10 @@ private[ml] object GBTClassificationModel {
     }
     val uid =
       if (parent != null) parent.uid else Identifiable.randomUID("gbtc")
-    new GBTClassificationModel(parent.uid,
-                               newTrees,
-                               oldModel.treeWeights,
-                               numFeatures)
+    new GBTClassificationModel(
+      parent.uid,
+      newTrees,
+      oldModel.treeWeights,
+      numFeatures)
   }
 }

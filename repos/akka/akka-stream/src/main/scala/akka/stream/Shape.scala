@@ -300,8 +300,9 @@ final case class FlowShape[-I, +O](in: Inlet[I @uncheckedVariance],
     FlowShape(in.carbonCopy(), out.carbonCopy())
   override def copyFromPorts(inlets: immutable.Seq[Inlet[_]],
                              outlets: immutable.Seq[Outlet[_]]): Shape = {
-    require(inlets.size == 1,
-            s"proposed inlets [${inlets.mkString(", ")}] do not fit FlowShape")
+    require(
+      inlets.size == 1,
+      s"proposed inlets [${inlets.mkString(", ")}] do not fit FlowShape")
     require(
       outlets.size == 1,
       s"proposed outlets [${outlets.mkString(", ")}] do not fit FlowShape")
@@ -326,8 +327,9 @@ final case class SinkShape[-T](in: Inlet[T @uncheckedVariance]) extends Shape {
   override def deepCopy(): SinkShape[T] = SinkShape(in.carbonCopy())
   override def copyFromPorts(inlets: immutable.Seq[Inlet[_]],
                              outlets: immutable.Seq[Outlet[_]]): Shape = {
-    require(inlets.size == 1,
-            s"proposed inlets [${inlets.mkString(", ")}] do not fit SinkShape")
+    require(
+      inlets.size == 1,
+      s"proposed inlets [${inlets.mkString(", ")}] do not fit SinkShape")
     require(
       outlets.isEmpty,
       s"proposed outlets [${outlets.mkString(", ")}] do not fit SinkShape")
@@ -371,14 +373,16 @@ final case class BidiShape[-In1, +Out1, -In2, +Out2](
     this(top.in, top.out, bottom.in, bottom.out)
 
   override def deepCopy(): BidiShape[In1, Out1, In2, Out2] =
-    BidiShape(in1.carbonCopy(),
-              out1.carbonCopy(),
-              in2.carbonCopy(),
-              out2.carbonCopy())
+    BidiShape(
+      in1.carbonCopy(),
+      out1.carbonCopy(),
+      in2.carbonCopy(),
+      out2.carbonCopy())
   override def copyFromPorts(inlets: immutable.Seq[Inlet[_]],
                              outlets: immutable.Seq[Outlet[_]]): Shape = {
-    require(inlets.size == 2,
-            s"proposed inlets [${inlets.mkString(", ")}] do not fit BidiShape")
+    require(
+      inlets.size == 2,
+      s"proposed inlets [${inlets.mkString(", ")}] do not fit BidiShape")
     require(
       outlets.size == 2,
       s"proposed outlets [${outlets.mkString(", ")}] do not fit BidiShape")

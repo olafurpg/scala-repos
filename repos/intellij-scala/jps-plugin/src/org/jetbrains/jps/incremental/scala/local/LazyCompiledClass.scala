@@ -14,10 +14,11 @@ import org.jetbrains.jps.incremental.{BinaryContent, CompiledClass}
 private class LazyCompiledClass(outputFile: File,
                                 sourceFile: File,
                                 className: String)
-    extends CompiledClass(outputFile,
-                          sourceFile,
-                          className,
-                          new BinaryContent(Array.empty)) {
+    extends CompiledClass(
+      outputFile,
+      sourceFile,
+      className,
+      new BinaryContent(Array.empty)) {
 
   private var loadedContent: Option[BinaryContent] = None
   private var contentIsSet = false

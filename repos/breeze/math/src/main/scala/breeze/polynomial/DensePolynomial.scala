@@ -15,9 +15,10 @@ trait DensePolynomial {
       def apply(k: PolyDenseUFuncWrapper, v: Double) = k.p(v)
     }
     implicit object denseVectorImpl
-        extends Impl2[PolyDenseUFuncWrapper,
-                      DenseVector[Double],
-                      DenseVector[Double]] {
+        extends Impl2[
+          PolyDenseUFuncWrapper,
+          DenseVector[Double],
+          DenseVector[Double]] {
       /* This implementation uses Horner's Algorithm:
        *  http://en.wikipedia.org/wiki/Horner's_method
        *
@@ -40,9 +41,10 @@ trait DensePolynomial {
       }
     }
     implicit object denseMatrixImpl
-        extends Impl2[PolyDenseUFuncWrapper,
-                      DenseMatrix[Double],
-                      DenseMatrix[Double]] {
+        extends Impl2[
+          PolyDenseUFuncWrapper,
+          DenseMatrix[Double],
+          DenseMatrix[Double]] {
       /* This implementation uses Horner's Algorithm:
        *  http://en.wikipedia.org/wiki/Horner's_method
        *

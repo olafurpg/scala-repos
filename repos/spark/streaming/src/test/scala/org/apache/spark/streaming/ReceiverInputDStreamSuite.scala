@@ -175,9 +175,10 @@ class ReceiverInputDStreamSuite extends TestSuiteBase with BeforeAndAfterAll {
     }
     val storeResult =
       if (withWALInfo) {
-        new WriteAheadLogBasedStoreResult(blockId,
-                                          None,
-                                          new WriteAheadLogRecordHandle {})
+        new WriteAheadLogBasedStoreResult(
+          blockId,
+          None,
+          new WriteAheadLogRecordHandle {})
       } else {
         new BlockManagerBasedStoreResult(blockId, None)
       }

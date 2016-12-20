@@ -179,19 +179,22 @@ class InsertSuite extends DataSourceTest with SharedSQLContext {
     // Cached Query Execution
     caseInsensitiveContext.cacheTable("jsonTable")
     assertCached(sql("SELECT * FROM jsonTable"))
-    checkAnswer(sql("SELECT * FROM jsonTable"),
-                (1 to 10).map(i => Row(i, s"str$i")))
+    checkAnswer(
+      sql("SELECT * FROM jsonTable"),
+      (1 to 10).map(i => Row(i, s"str$i")))
 
     assertCached(sql("SELECT a FROM jsonTable"))
     checkAnswer(sql("SELECT a FROM jsonTable"), (1 to 10).map(Row(_)).toSeq)
 
     assertCached(sql("SELECT a FROM jsonTable WHERE a < 5"))
-    checkAnswer(sql("SELECT a FROM jsonTable WHERE a < 5"),
-                (1 to 4).map(Row(_)).toSeq)
+    checkAnswer(
+      sql("SELECT a FROM jsonTable WHERE a < 5"),
+      (1 to 4).map(Row(_)).toSeq)
 
     assertCached(sql("SELECT a * 2 FROM jsonTable"))
-    checkAnswer(sql("SELECT a * 2 FROM jsonTable"),
-                (1 to 10).map(i => Row(i * 2)).toSeq)
+    checkAnswer(
+      sql("SELECT a * 2 FROM jsonTable"),
+      (1 to 10).map(i => Row(i * 2)).toSeq)
 
     assertCached(
       sql(

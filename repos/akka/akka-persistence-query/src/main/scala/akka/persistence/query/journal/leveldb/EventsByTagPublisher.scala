@@ -30,19 +30,21 @@ private[akka] object EventsByTagPublisher {
     refreshInterval match {
       case Some(interval) ⇒
         Props(
-          new LiveEventsByTagPublisher(tag,
-                                       fromOffset,
-                                       toOffset,
-                                       interval,
-                                       maxBufSize,
-                                       writeJournalPluginId))
+          new LiveEventsByTagPublisher(
+            tag,
+            fromOffset,
+            toOffset,
+            interval,
+            maxBufSize,
+            writeJournalPluginId))
       case None ⇒
         Props(
-          new CurrentEventsByTagPublisher(tag,
-                                          fromOffset,
-                                          toOffset,
-                                          maxBufSize,
-                                          writeJournalPluginId))
+          new CurrentEventsByTagPublisher(
+            tag,
+            fromOffset,
+            toOffset,
+            maxBufSize,
+            writeJournalPluginId))
     }
   }
 
@@ -100,34 +102,38 @@ private[akka] abstract class AbstractEventsByTagPublisher(
 
   def replay(): Unit = {
     val limit = maxBufSize - buf.size
-    log.debug("request replay for tag [{}] from [{}] to [{}] limit [{}]",
-              tag,
-              currOffset,
-              toOffset,
-              limit)
+    log.debug(
+      "request replay for tag [{}] from [{}] to [{}] limit [{}]",
+      tag,
+      currOffset,
+      toOffset,
+      limit)
     journal ! ReplayTaggedMessages(currOffset, toOffset, limit, tag, self)
     context.become(replaying(limit))
   }
 
   def replaying(limit: Int): Receive = {
     case ReplayedTaggedMessage(p, _, offset) ⇒
-      buf :+= EventEnvelope(offset = offset,
-                            persistenceId = p.persistenceId,
-                            sequenceNr = p.sequenceNr,
-                            event = p.payload)
+      buf :+= EventEnvelope(
+        offset = offset,
+        persistenceId = p.persistenceId,
+        sequenceNr = p.sequenceNr,
+        event = p.payload)
       currOffset = offset + 1
       deliverBuf()
 
     case RecoverySuccess(highestSeqNr) ⇒
-      log.debug("replay completed for tag [{}], currOffset [{}]",
-                tag,
-                currOffset)
+      log.debug(
+        "replay completed for tag [{}], currOffset [{}]",
+        tag,
+        currOffset)
       receiveRecoverySuccess(highestSeqNr)
 
     case ReplayMessagesFailure(cause) ⇒
-      log.debug("replay failed for tag [{}], due to [{}]",
-                tag,
-                cause.getMessage)
+      log.debug(
+        "replay failed for tag [{}], due to [{}]",
+        tag,
+        cause.getMessage)
       deliverBuf()
       onErrorThenStop(cause)
 
@@ -153,10 +159,11 @@ private[akka] class LiveEventsByTagPublisher(tag: String,
                                              refreshInterval: FiniteDuration,
                                              maxBufSize: Int,
                                              writeJournalPluginId: String)
-    extends AbstractEventsByTagPublisher(tag,
-                                         fromOffset,
-                                         maxBufSize,
-                                         writeJournalPluginId) {
+    extends AbstractEventsByTagPublisher(
+      tag,
+      fromOffset,
+      maxBufSize,
+      writeJournalPluginId) {
   import EventsByTagPublisher._
 
   val tickTask = context.system.scheduler
@@ -191,10 +198,11 @@ private[akka] class CurrentEventsByTagPublisher(tag: String,
                                                 var _toOffset: Long,
                                                 maxBufSize: Int,
                                                 writeJournalPluginId: String)
-    extends AbstractEventsByTagPublisher(tag,
-                                         fromOffset,
-                                         maxBufSize,
-                                         writeJournalPluginId) {
+    extends AbstractEventsByTagPublisher(
+      tag,
+      fromOffset,
+      maxBufSize,
+      writeJournalPluginId) {
   import EventsByTagPublisher._
 
   override def toOffset: Long = _toOffset

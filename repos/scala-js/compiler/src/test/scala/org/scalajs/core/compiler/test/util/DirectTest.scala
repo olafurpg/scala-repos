@@ -23,12 +23,13 @@ abstract class DirectTest {
 
   def newScalaJSCompiler(args: String*): Global = {
     val settings = newSettings(
-      List("-d",
-           testOutputPath,
-           "-bootclasspath",
-           scalaLibPath,
-           "-classpath",
-           scalaJSLibPath) ++ extraArgs ++ args.toList)
+      List(
+        "-d",
+        testOutputPath,
+        "-bootclasspath",
+        scalaLibPath,
+        "-classpath",
+        scalaJSLibPath) ++ extraArgs ++ args.toList)
 
     lazy val global: Global = new Global(settings, newReporter(settings)) {
       override lazy val plugins = newScalaJSPlugin(global) :: Nil

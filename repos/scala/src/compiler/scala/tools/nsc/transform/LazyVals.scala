@@ -63,8 +63,9 @@ abstract class LazyVals
     import symtab.Flags._
     private def flattenThickets(stats: List[Tree]): List[Tree] =
       stats.flatMap(_ match {
-        case b @ Block(List(d1 @ DefDef(_, n1, _, _, _, _)),
-                       d2 @ DefDef(_, n2, _, _, _, _))
+        case b @ Block(
+              List(d1 @ DefDef(_, n1, _, _, _, _)),
+              d2 @ DefDef(_, n2, _, _, _, _))
             if b.tpe == null && n1.endsWith(nme.LAZY_SLOW_SUFFIX) =>
           List(d1, d2)
         case stat =>
@@ -121,27 +122,31 @@ abstract class LazyVals
                   s"determined enclosing class/dummy/method for lazy val as $enclosingClassOrDummyOrMethod given symbol $sym")
                 val idx = lazyVals(enclosingClassOrDummyOrMethod)
                 lazyVals(enclosingClassOrDummyOrMethod) = idx + 1
-                val (rhs1, sDef) = mkLazyDef(enclosingClassOrDummyOrMethod,
-                                             transform(rhs),
-                                             idx,
-                                             sym)
+                val (rhs1, sDef) = mkLazyDef(
+                  enclosingClassOrDummyOrMethod,
+                  transform(rhs),
+                  idx,
+                  sym)
                 sym.resetFlag((if (lazyUnit(sym)) 0 else LAZY) | ACCESSOR)
                 (rhs1, sDef)
               } else if (sym.hasAllFlags(MODULE | METHOD) &&
                          !sym.owner.isTrait) {
                 rhs match {
-                  case b @ Block((assign @ Assign(moduleRef, _)) :: Nil,
-                                 expr) =>
+                  case b @ Block(
+                        (assign @ Assign(moduleRef, _)) :: Nil,
+                        expr) =>
                     def cond =
-                      Apply(Select(moduleRef, Object_eq),
-                            List(Literal(Constant(null))))
+                      Apply(
+                        Select(moduleRef, Object_eq),
+                        List(Literal(Constant(null))))
                     val (fastPath, slowPath) =
-                      mkFastPathBody(sym.owner.enclClass,
-                                     moduleRef.symbol,
-                                     cond,
-                                     transform(assign) :: Nil,
-                                     Nil,
-                                     transform(expr))
+                      mkFastPathBody(
+                        sym.owner.enclClass,
+                        moduleRef.symbol,
+                        cond,
+                        transform(assign) :: Nil,
+                        Nil,
+                        transform(expr))
                     (localTyper.typedPos(tree.pos)(fastPath),
                      localTyper.typedPos(tree.pos)(slowPath))
                   case rhs =>
@@ -215,10 +220,11 @@ abstract class LazyVals
           if (LocalLazyValFinder.find(thenp0))
             deriveLabelDef(l)(
               _ =>
-                treeCopy.If(ifp1,
-                            cond0,
-                            typed(addBitmapDefs(sym.owner, thenp0)),
-                            elsep0))
+                treeCopy.If(
+                  ifp1,
+                  cond0,
+                  typed(addBitmapDefs(sym.owner, thenp0)),
+                  elsep0))
           else l
 
         case l @ LabelDef(name0, params0, block @ Block(stats0, expr))
@@ -260,8 +266,9 @@ abstract class LazyVals
         rhs match {
           case Block(assign, l @ LabelDef(name, params, _))
               if (name string_== "_" + methSym.name) && isMatch(params) =>
-            Block(assign,
-                  deriveLabelDef(l)(rhs => typed(prependStats(bmps, rhs))))
+            Block(
+              assign,
+              deriveLabelDef(l)(rhs => typed(prependStats(bmps, rhs))))
 
           case _ => prependStats(bmps, rhs)
         }
@@ -358,12 +365,13 @@ abstract class LazyVals
       }
 
       def cond = (bitmapRef GEN_& (mask, bitmapKind)) GEN_== (ZERO, bitmapKind)
-      val lazyDefs = mkFastPathBody(methOrClass.enclClass,
-                                    lazyVal,
-                                    cond,
-                                    List(block),
-                                    Nil,
-                                    res)
+      val lazyDefs = mkFastPathBody(
+        methOrClass.enclClass,
+        lazyVal,
+        cond,
+        List(block),
+        Nil,
+        res)
       (atPos(tree.pos)(localTyper.typed { lazyDefs._1 }),
        atPos(tree.pos)(localTyper.typed { lazyDefs._2 }))
     }

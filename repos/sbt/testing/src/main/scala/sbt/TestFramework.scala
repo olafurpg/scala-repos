@@ -23,11 +23,13 @@ object TestResult extends Enumeration {
 
 object TestFrameworks {
   val ScalaCheck = new TestFramework("org.scalacheck.ScalaCheckFramework")
-  val ScalaTest = new TestFramework("org.scalatest.tools.Framework",
-                                    "org.scalatest.tools.ScalaTestFramework")
+  val ScalaTest = new TestFramework(
+    "org.scalatest.tools.Framework",
+    "org.scalatest.tools.ScalaTestFramework")
   val Specs = new TestFramework("org.specs.runner.SpecsFramework")
-  val Specs2 = new TestFramework("org.specs2.runner.Specs2Framework",
-                                 "org.specs2.runner.SpecsFramework")
+  val Specs2 = new TestFramework(
+    "org.specs2.runner.Specs2Framework",
+    "org.specs2.runner.SpecsFramework")
   val JUnit = new TestFramework("com.novocode.junit.JUnitFramework")
 }
 
@@ -83,18 +85,20 @@ final class TestRunner(delegate: Runner,
       testDefs
         .map(
           df =>
-            new TaskDef(df.name,
-                        df.fingerprint,
-                        df.explicitlySpecified,
-                        df.selectors))
+            new TaskDef(
+              df.name,
+              df.fingerprint,
+              df.explicitlySpecified,
+              df.selectors))
         .toArray)
 
   final def run(taskDef: TaskDef,
                 testTask: TestTask): (SuiteResult, Seq[TestTask]) = {
-    val testDefinition = new TestDefinition(taskDef.fullyQualifiedName,
-                                            taskDef.fingerprint,
-                                            taskDef.explicitlySpecified,
-                                            taskDef.selectors)
+    val testDefinition = new TestDefinition(
+      taskDef.fullyQualifiedName,
+      taskDef.fingerprint,
+      taskDef.explicitlySpecified,
+      taskDef.selectors)
     log.debug("Running " + taskDef)
     val name = testDefinition.name
 
@@ -254,12 +258,13 @@ object TestFramework {
       name.startsWith("org.scalatools.testing.") ||
         name.startsWith("sbt.testing.")
     val notInterfaceFilter = (name: String) => !interfaceFilter(name)
-    val dual = new DualLoader(scalaInstance.loader,
-                              notInterfaceFilter,
-                              x => true,
-                              getClass.getClassLoader,
-                              interfaceFilter,
-                              x => false)
+    val dual = new DualLoader(
+      scalaInstance.loader,
+      notInterfaceFilter,
+      x => true,
+      getClass.getClassLoader,
+      interfaceFilter,
+      x => false)
     val main =
       ClasspathUtilities.makeLoader(classpath, dual, scalaInstance, tempDir)
     // TODO - There's actually an issue with the classpath facility such that unmanagedScalaInstances are not added

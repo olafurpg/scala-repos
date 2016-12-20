@@ -15,8 +15,9 @@ case class Append(key: ChannelBuffer, value: ChannelBuffer)
 object Append {
   def apply(args: Seq[Array[Byte]]) = {
     val list = trimList(args, 2, "APPEND")
-    new Append(ChannelBuffers.wrappedBuffer(list(0)),
-               ChannelBuffers.wrappedBuffer(list(1)))
+    new Append(
+      ChannelBuffers.wrappedBuffer(list(0)),
+      ChannelBuffers.wrappedBuffer(list(1)))
   }
 }
 
@@ -53,9 +54,10 @@ object BitCount {
       val end = RequireClientProtocol.safe {
         NumberFormat.toInt(BytesToString(list(2)))
       }
-      new BitCount(ChannelBuffers.wrappedBuffer(list(0)),
-                   Some(start),
-                   Some(end))
+      new BitCount(
+        ChannelBuffers.wrappedBuffer(list(0)),
+        Some(start),
+        Some(end))
     }
   }
 }
@@ -65,12 +67,14 @@ case class BitOp(op: ChannelBuffer,
                  srcKeys: Seq[ChannelBuffer])
     extends Command {
   val command = Commands.BITOP
-  RequireClientProtocol((op equals BitOp.And) || (op equals BitOp.Or) ||
-                          (op equals BitOp.Xor) || (op equals BitOp.Not),
-                        "BITOP supports only AND/OR/XOR/NOT")
+  RequireClientProtocol(
+    (op equals BitOp.And) || (op equals BitOp.Or) ||
+      (op equals BitOp.Xor) || (op equals BitOp.Not),
+    "BITOP supports only AND/OR/XOR/NOT")
   RequireClientProtocol(srcKeys.size > 0, "srcKeys must not be empty")
-  RequireClientProtocol(!op.equals(BitOp.Not) || srcKeys.size == 1,
-                        "NOT operation takes only 1 input key")
+  RequireClientProtocol(
+    !op.equals(BitOp.Not) || srcKeys.size == 1,
+    "NOT operation takes only 1 input key")
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(Seq(CommandBytes.BITOP, op, dstKey) ++ srcKeys)
 }
@@ -164,10 +168,11 @@ case class GetRange(key: ChannelBuffer, start: Long, end: Long)
   val command = Commands.GETRANGE
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(
-      Seq(CommandBytes.GETRANGE,
-          key,
-          StringToChannelBuffer(start.toString),
-          StringToChannelBuffer(end.toString)))
+      Seq(
+        CommandBytes.GETRANGE,
+        key,
+        StringToChannelBuffer(start.toString),
+        StringToChannelBuffer(end.toString)))
 }
 object GetRange {
   def apply(args: Seq[Array[Byte]]) = {
@@ -192,8 +197,9 @@ case class GetSet(key: ChannelBuffer, value: ChannelBuffer)
 object GetSet {
   def apply(args: Seq[Array[Byte]]) = {
     val list = trimList(args, 2, "GETSET")
-    new GetSet(ChannelBuffers.wrappedBuffer(list(0)),
-               ChannelBuffers.wrappedBuffer(list(1)))
+    new GetSet(
+      ChannelBuffers.wrappedBuffer(list(0)),
+      ChannelBuffers.wrappedBuffer(list(1)))
   }
 }
 
@@ -282,10 +288,11 @@ case class PSetEx(key: ChannelBuffer, millis: Long, value: ChannelBuffer)
   RequireClientProtocol(millis > 0, "Milliseconds must be greater than 0")
   def toChannelBuffer = {
     RedisCodec.toUnifiedFormat(
-      Seq(CommandBytes.PSETEX,
-          key,
-          StringToChannelBuffer(millis.toString),
-          value))
+      Seq(
+        CommandBytes.PSETEX,
+        key,
+        StringToChannelBuffer(millis.toString),
+        value))
   }
 }
 object PSetEx {
@@ -294,9 +301,10 @@ object PSetEx {
     val millis = RequireClientProtocol.safe {
       NumberFormat.toLong(BytesToString(list(1)))
     }
-    new PSetEx(ChannelBuffers.wrappedBuffer(args(0)),
-               millis,
-               ChannelBuffers.wrappedBuffer(list(2)))
+    new PSetEx(
+      ChannelBuffers.wrappedBuffer(args(0)),
+      millis,
+      ChannelBuffers.wrappedBuffer(list(2)))
   }
 }
 
@@ -341,8 +349,9 @@ object Set {
     val key = ChannelBuffers.wrappedBuffer(args(0))
     val value = ChannelBuffers.wrappedBuffer(args(1))
 
-    val set = new Set(ChannelBuffers.wrappedBuffer(args(0)),
-                      ChannelBuffers.wrappedBuffer(args(1)))
+    val set = new Set(
+      ChannelBuffers.wrappedBuffer(args(0)),
+      ChannelBuffers.wrappedBuffer(args(1)))
 
     def run(args: Seq[Array[Byte]], set: Set): Set = {
       args.headOption match {
@@ -365,11 +374,12 @@ object Set {
               args.tail.headOption match {
                 case None => throw ClientError("Invalid syntax for SET")
                 case Some(bytes) =>
-                  run(args.tail.tail,
-                      set.copy(
-                        ttl = Some(InMilliseconds(RequireClientProtocol.safe {
-                          NumberFormat.toLong(BytesToString(bytes))
-                        }))))
+                  run(
+                    args.tail.tail,
+                    set.copy(
+                      ttl = Some(InMilliseconds(RequireClientProtocol.safe {
+                        NumberFormat.toLong(BytesToString(bytes))
+                      }))))
               }
             case Nx => run(args.tail, set.copy(nx = true))
             case Xx => run(args.tail, set.copy(xx = true))
@@ -388,10 +398,11 @@ case class SetBit(key: ChannelBuffer, offset: Int, value: Int)
   val command = Commands.SETBIT
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(
-      Seq(CommandBytes.SETBIT,
-          key,
-          StringToChannelBuffer(offset.toString),
-          StringToChannelBuffer(value.toString)))
+      Seq(
+        CommandBytes.SETBIT,
+        key,
+        StringToChannelBuffer(offset.toString),
+        StringToChannelBuffer(value.toString)))
 }
 object SetBit {
   def apply(args: Seq[Array[Byte]]) = {
@@ -439,10 +450,12 @@ case class SetNx(key: ChannelBuffer, value: ChannelBuffer)
 }
 object SetNx {
   def apply(args: Seq[Array[Byte]]) = {
-    RequireClientProtocol(args.length > 1,
-                          "SETNX requires at least one member")
-    new SetNx(ChannelBuffers.wrappedBuffer(args(0)),
-              ChannelBuffers.wrappedBuffer(args(1)))
+    RequireClientProtocol(
+      args.length > 1,
+      "SETNX requires at least one member")
+    new SetNx(
+      ChannelBuffers.wrappedBuffer(args(0)),
+      ChannelBuffers.wrappedBuffer(args(1)))
   }
 }
 
@@ -494,8 +507,9 @@ trait MultiSetCompanion {
   def apply(args: Seq[Array[Byte]]) = {
     val length = args.length
 
-    RequireClientProtocol(length % 2 == 0 && length > 0,
-                          "Expected even number of k/v pairs")
+    RequireClientProtocol(
+      length % 2 == 0 && length > 0,
+      "Expected even number of k/v pairs")
 
     val map = args
       .grouped(2)
@@ -507,8 +521,9 @@ trait MultiSetCompanion {
           throw ClientError("Unexpected uneven pair of elements in MSET")
       }
       .toMap
-    RequireClientProtocol(map.size == length / 2,
-                          "Broken mapping, map size not equal to group size")
+    RequireClientProtocol(
+      map.size == length / 2,
+      "Broken mapping, map size not equal to group size")
     get(map)
   }
   def get(map: Map[ChannelBuffer, ChannelBuffer]): MultiSet

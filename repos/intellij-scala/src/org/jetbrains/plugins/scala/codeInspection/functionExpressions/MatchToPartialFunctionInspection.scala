@@ -73,11 +73,12 @@ class MatchToPartialFunctionInspection
         offset - fExprToReplace.getTextRange.getStartOffset
       val rangeInParent = new TextRange(0, endOffsetInParent)
       val fix = new MatchToPartialFunctionQuickFix(ms, fExprToReplace)
-      holder.registerProblem(fExprToReplace,
-                             inspectionName,
-                             ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
-                             rangeInParent,
-                             fix)
+      holder.registerProblem(
+        fExprToReplace,
+        inspectionName,
+        ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+        rangeInParent,
+        fix)
     }
   }
 
@@ -119,9 +120,10 @@ object MatchToPartialFunctionInspection {
 
 class MatchToPartialFunctionQuickFix(matchStmt: ScMatchStmt,
                                      fExprToReplace: ScExpression)
-    extends AbstractFixOnTwoPsiElements(inspectionName,
-                                        matchStmt,
-                                        fExprToReplace) {
+    extends AbstractFixOnTwoPsiElements(
+      inspectionName,
+      matchStmt,
+      fExprToReplace) {
   def doApplyFix(project: Project) {
     val mStmt = getFirstElement
     val fExpr = getSecondElement
@@ -178,15 +180,15 @@ class MatchToPartialFunctionQuickFix(matchStmt: ScMatchStmt,
     indexes.map(i => clauses(i).pattern).foreach {
       case Some(w: ScWildcardPattern) =>
         w.replace(
-          ScalaPsiElementFactory.createPatternFromText(name,
-                                                       matchStmt.getManager))
+          ScalaPsiElementFactory
+            .createPatternFromText(name, matchStmt.getManager))
       case Some(p: ScPattern) =>
         val newPatternText =
           if (needParentheses(p)) s"$name @ (${p.getText})"
           else s"$name @ ${p.getText}"
         p.replace(
-          ScalaPsiElementFactory.createPatternFromText(newPatternText,
-                                                       matchStmt.getManager))
+          ScalaPsiElementFactory
+            .createPatternFromText(newPatternText, matchStmt.getManager))
       case _ =>
     }
   }

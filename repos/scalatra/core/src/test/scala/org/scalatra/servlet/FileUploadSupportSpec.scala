@@ -19,10 +19,12 @@ class FileUploadSupportSpecServlet
   def fileParamsToHeaders() {
     fileParams.foreach(fileParam => {
       response.setHeader("File-" + fileParam._1 + "-Name", fileParam._2.name)
-      response.setHeader("File-" + fileParam._1 + "-Size",
-                         fileParam._2.size.toString)
-      response.setHeader("File-" + fileParam._1 + "-SHA",
-                         DigestUtils.shaHex(fileParam._2.get()))
+      response.setHeader(
+        "File-" + fileParam._1 + "-Size",
+        fileParam._2.size.toString)
+      response.setHeader(
+        "File-" + fileParam._1 + "-SHA",
+        DigestUtils.shaHex(fileParam._2.get()))
     })
   }
 
@@ -67,8 +69,9 @@ class FileUploadSupportSpecServlet
       items.foreach(item => {
         response.setHeader("File-" + name + i + "-Name", item.name)
         response.setHeader("File-" + name + i + "-Size", item.size.toString)
-        response.setHeader("File-" + name + i + "-SHA",
-                           DigestUtils.shaHex(item.get()))
+        response.setHeader(
+          "File-" + name + i + "-SHA",
+          DigestUtils.shaHex(item.get()))
 
         i += 1
       })
@@ -273,11 +276,12 @@ class FileUploadSupportSpec extends MutableScalatraSpec {
 
   "POST with multipart/form-data and maxFileSize set" should {
     "handle IllegalStateException by wrapping it as SizeConstraintExceededException handled by error handler" in {
-      post("/max-size/upload",
-           Map(),
-           Map(
-             "file" -> new File(
-               "core/src/test/resources/org/scalatra/servlet/smiley.png"))) {
+      post(
+        "/max-size/upload",
+        Map(),
+        Map(
+          "file" -> new File(
+            "core/src/test/resources/org/scalatra/servlet/smiley.png"))) {
         (status mustEqual 413) and (body mustEqual "too much!")
       }
     }

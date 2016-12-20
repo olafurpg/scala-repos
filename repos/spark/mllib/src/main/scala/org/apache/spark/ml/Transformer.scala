@@ -110,9 +110,10 @@ abstract class UnaryTransformer[IN, OUT, T <: UnaryTransformer[IN, OUT, T]]
         s"Output column ${$(outputCol)} already exists.")
     }
     val outputFields =
-      schema.fields :+ StructField($(outputCol),
-                                   outputDataType,
-                                   nullable = false)
+      schema.fields :+ StructField(
+        $(outputCol),
+        outputDataType,
+        nullable = false)
     StructType(outputFields)
   }
 

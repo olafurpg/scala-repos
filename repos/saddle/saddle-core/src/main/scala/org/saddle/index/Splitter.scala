@@ -105,9 +105,10 @@ object Splitter {
                         T6: ST: ORD,
                         T7: ST: ORD,
                         T8: ST: ORD] =
-    new Splitter[(T1, T2, T3, T4, T5, T6, T7, T8),
-                 (T1, T2, T3, T4, T5, T6, T7),
-                 T8] {
+    new Splitter[
+      (T1, T2, T3, T4, T5, T6, T7, T8),
+      (T1, T2, T3, T4, T5, T6, T7),
+      T8] {
       def apply(i: Index[(T1, T2, T3, T4, T5, T6, T7, T8)]) =
         (i.map(t => (t._1, t._2, t._3, t._4, t._5, t._6, t._7)), i.map(_._8))
     }
@@ -121,9 +122,10 @@ object Splitter {
                         T7: ST: ORD,
                         T8: ST: ORD,
                         T9: ST: ORD] =
-    new Splitter[(T1, T2, T3, T4, T5, T6, T7, T8, T9),
-                 (T1, T2, T3, T4, T5, T6, T7, T8),
-                 T9] {
+    new Splitter[
+      (T1, T2, T3, T4, T5, T6, T7, T8, T9),
+      (T1, T2, T3, T4, T5, T6, T7, T8),
+      T9] {
       def apply(i: Index[(T1, T2, T3, T4, T5, T6, T7, T8, T9)]) =
         (i.map(t => (t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8)),
          i.map(_._9))

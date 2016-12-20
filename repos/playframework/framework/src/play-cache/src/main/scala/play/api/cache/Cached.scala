@@ -270,9 +270,10 @@ final class CachedBuilder(cache: CacheApi,
         // Cache the new ETAG of the resource
         cache.set(etagKey, etag, duration)
         // Cache the new Result of the resource
-        cache.set(resultKey,
-                  new SerializableResult(resultWithHeaders),
-                  duration)
+        cache.set(
+          resultKey,
+          new SerializableResult(resultWithHeaders),
+          duration)
 
         resultWithHeaders
       }

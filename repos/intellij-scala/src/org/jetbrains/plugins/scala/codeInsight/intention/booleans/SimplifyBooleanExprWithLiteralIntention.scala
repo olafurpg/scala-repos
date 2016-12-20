@@ -40,8 +40,9 @@ class SimplifyBooleanExprWithLiteralIntention
     findSimplifiableParent(element) match {
       case Some(expr) =>
         inWriteAction {
-          expr.replaceExpression(SimplifyBooleanUtil.simplify(expr),
-                                 removeParenthesis = true)
+          expr.replaceExpression(
+            SimplifyBooleanUtil.simplify(expr),
+            removeParenthesis = true)
         }
       case _ =>
     }

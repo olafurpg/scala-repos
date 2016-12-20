@@ -29,18 +29,20 @@ class SVDPlusPlusSuite extends SparkFunSuite with LocalSparkContext {
         sc.textFile(getClass.getResource("/als-test.data").getFile).map {
           line =>
             val fields = line.split(",")
-            Edge(fields(0).toLong * 2,
-                 fields(1).toLong * 2 + 1,
-                 fields(2).toDouble)
+            Edge(
+              fields(0).toLong * 2,
+              fields(1).toLong * 2 + 1,
+              fields(2).toDouble)
         }
-      val conf = new SVDPlusPlus.Conf(10,
-                                      2,
-                                      0.0,
-                                      5.0,
-                                      0.007,
-                                      0.007,
-                                      0.005,
-                                      0.015) // 2 iterations
+      val conf = new SVDPlusPlus.Conf(
+        10,
+        2,
+        0.0,
+        5.0,
+        0.007,
+        0.007,
+        0.005,
+        0.015) // 2 iterations
       val (graph, _) = SVDPlusPlus.run(edges, conf)
       graph.cache()
       val err =

@@ -33,13 +33,15 @@ object ShouldNotTypecheck {
       case e: TypecheckException =>
         val msg = e.getMessage
         if ((expected ne null) && !(expPat.matcher(msg)).matches)
-          ctx.abort(ctx.enclosingPosition,
-                    "Type-checking failed in an unexpected way.\n" +
-                      expMsg + "\nActual error: " + msg)
+          ctx.abort(
+            ctx.enclosingPosition,
+            "Type-checking failed in an unexpected way.\n" +
+              expMsg + "\nActual error: " + msg)
         else return reify(())
     }
 
-    ctx.abort(ctx.enclosingPosition,
-              "Type-checking succeeded unexpectedly.\n" + expMsg)
+    ctx.abort(
+      ctx.enclosingPosition,
+      "Type-checking succeeded unexpectedly.\n" + expMsg)
   }
 }

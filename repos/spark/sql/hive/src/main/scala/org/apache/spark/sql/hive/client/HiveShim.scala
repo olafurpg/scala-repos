@@ -116,8 +116,9 @@ private[client] sealed abstract class Shim {
                                  name: String,
                                  args: Class[_]*): Method = {
     val method = findMethod(klass, name, args: _*)
-    require(Modifier.isStatic(method.getModifiers()),
-            s"Method $name of class $klass is not static.")
+    require(
+      Modifier.isStatic(method.getModifiers()),
+      s"Method $name of class $klass is not static.")
     method
   }
 
@@ -155,12 +156,13 @@ private[client] class Shim_v0_12 extends Shim with Logging {
     JBoolean.TYPE,
     JBoolean.TYPE,
     JBoolean.TYPE)
-  private lazy val loadTableMethod = findMethod(classOf[Hive],
-                                                "loadTable",
-                                                classOf[Path],
-                                                classOf[String],
-                                                JBoolean.TYPE,
-                                                JBoolean.TYPE)
+  private lazy val loadTableMethod = findMethod(
+    classOf[Hive],
+    "loadTable",
+    classOf[Path],
+    classOf[String],
+    JBoolean.TYPE,
+    JBoolean.TYPE)
   private lazy val loadDynamicPartitionsMethod = findMethod(
     classOf[Hive],
     "loadDynamicPartitions",
@@ -171,12 +173,13 @@ private[client] class Shim_v0_12 extends Shim with Logging {
     JInteger.TYPE,
     JBoolean.TYPE,
     JBoolean.TYPE)
-  private lazy val dropIndexMethod = findMethod(classOf[Hive],
-                                                "dropIndex",
-                                                classOf[String],
-                                                classOf[String],
-                                                classOf[String],
-                                                JBoolean.TYPE)
+  private lazy val dropIndexMethod = findMethod(
+    classOf[Hive],
+    "dropIndex",
+    classOf[String],
+    classOf[String],
+    classOf[String],
+    JBoolean.TYPE)
 
   override def setCurrentSessionState(state: SessionState): Unit = {
     // Starting from Hive 0.13, setCurrentSessionState will internally override
@@ -238,14 +241,15 @@ private[client] class Shim_v0_12 extends Shim with Logging {
                              holdDDLTime: Boolean,
                              inheritTableSpecs: Boolean,
                              isSkewedStoreAsSubdir: Boolean): Unit = {
-    loadPartitionMethod.invoke(hive,
-                               loadPath,
-                               tableName,
-                               partSpec,
-                               replace: JBoolean,
-                               holdDDLTime: JBoolean,
-                               inheritTableSpecs: JBoolean,
-                               isSkewedStoreAsSubdir: JBoolean)
+    loadPartitionMethod.invoke(
+      hive,
+      loadPath,
+      tableName,
+      partSpec,
+      replace: JBoolean,
+      holdDDLTime: JBoolean,
+      inheritTableSpecs: JBoolean,
+      isSkewedStoreAsSubdir: JBoolean)
   }
 
   override def loadTable(hive: Hive,
@@ -253,11 +257,12 @@ private[client] class Shim_v0_12 extends Shim with Logging {
                          tableName: String,
                          replace: Boolean,
                          holdDDLTime: Boolean): Unit = {
-    loadTableMethod.invoke(hive,
-                           loadPath,
-                           tableName,
-                           replace: JBoolean,
-                           holdDDLTime: JBoolean)
+    loadTableMethod.invoke(
+      hive,
+      loadPath,
+      tableName,
+      replace: JBoolean,
+      holdDDLTime: JBoolean)
   }
 
   override def loadDynamicPartitions(hive: Hive,
@@ -268,14 +273,15 @@ private[client] class Shim_v0_12 extends Shim with Logging {
                                      numDP: Int,
                                      holdDDLTime: Boolean,
                                      listBucketingEnabled: Boolean): Unit = {
-    loadDynamicPartitionsMethod.invoke(hive,
-                                       loadPath,
-                                       tableName,
-                                       partSpec,
-                                       replace: JBoolean,
-                                       numDP: JInteger,
-                                       holdDDLTime: JBoolean,
-                                       listBucketingEnabled: JBoolean)
+    loadDynamicPartitionsMethod.invoke(
+      hive,
+      loadPath,
+      tableName,
+      partSpec,
+      replace: JBoolean,
+      numDP: JInteger,
+      holdDDLTime: JBoolean,
+      listBucketingEnabled: JBoolean)
   }
 
   override def dropIndex(hive: Hive,
@@ -339,11 +345,13 @@ private[client] class Shim_v0_13 extends Shim_v0_12 {
 
     filters
       .collect {
-        case op @ BinaryComparison(a: Attribute,
-                                   Literal(v, _: IntegralType)) =>
+        case op @ BinaryComparison(
+              a: Attribute,
+              Literal(v, _: IntegralType)) =>
           s"${a.name} ${op.symbol} $v"
-        case op @ BinaryComparison(Literal(v, _: IntegralType),
-                                   a: Attribute) =>
+        case op @ BinaryComparison(
+              Literal(v, _: IntegralType),
+              a: Attribute) =>
           s"$v ${op.symbol} ${a.name}"
         case op @ BinaryComparison(a: Attribute, Literal(v, _: StringType))
             if !varcharKeys.contains(a.name) =>
@@ -410,15 +418,16 @@ private[client] class Shim_v0_14 extends Shim_v0_13 {
     JBoolean.TYPE,
     JBoolean.TYPE,
     JBoolean.TYPE)
-  private lazy val loadTableMethod = findMethod(classOf[Hive],
-                                                "loadTable",
-                                                classOf[Path],
-                                                classOf[String],
-                                                JBoolean.TYPE,
-                                                JBoolean.TYPE,
-                                                JBoolean.TYPE,
-                                                JBoolean.TYPE,
-                                                JBoolean.TYPE)
+  private lazy val loadTableMethod = findMethod(
+    classOf[Hive],
+    "loadTable",
+    classOf[Path],
+    classOf[String],
+    JBoolean.TYPE,
+    JBoolean.TYPE,
+    JBoolean.TYPE,
+    JBoolean.TYPE,
+    JBoolean.TYPE)
   private lazy val loadDynamicPartitionsMethod = findMethod(
     classOf[Hive],
     "loadDynamicPartitions",
@@ -430,10 +439,11 @@ private[client] class Shim_v0_14 extends Shim_v0_13 {
     JBoolean.TYPE,
     JBoolean.TYPE,
     JBoolean.TYPE)
-  private lazy val getTimeVarMethod = findMethod(classOf[HiveConf],
-                                                 "getTimeVar",
-                                                 classOf[HiveConf.ConfVars],
-                                                 classOf[TimeUnit])
+  private lazy val getTimeVarMethod = findMethod(
+    classOf[HiveConf],
+    "getTimeVar",
+    classOf[HiveConf.ConfVars],
+    classOf[TimeUnit])
 
   override def loadPartition(hive: Hive,
                              loadPath: Path,
@@ -443,16 +453,17 @@ private[client] class Shim_v0_14 extends Shim_v0_13 {
                              holdDDLTime: Boolean,
                              inheritTableSpecs: Boolean,
                              isSkewedStoreAsSubdir: Boolean): Unit = {
-    loadPartitionMethod.invoke(hive,
-                               loadPath,
-                               tableName,
-                               partSpec,
-                               replace: JBoolean,
-                               holdDDLTime: JBoolean,
-                               inheritTableSpecs: JBoolean,
-                               isSkewedStoreAsSubdir: JBoolean,
-                               isSrcLocal(loadPath, hive.getConf()): JBoolean,
-                               JBoolean.FALSE)
+    loadPartitionMethod.invoke(
+      hive,
+      loadPath,
+      tableName,
+      partSpec,
+      replace: JBoolean,
+      holdDDLTime: JBoolean,
+      inheritTableSpecs: JBoolean,
+      isSkewedStoreAsSubdir: JBoolean,
+      isSrcLocal(loadPath, hive.getConf()): JBoolean,
+      JBoolean.FALSE)
   }
 
   override def loadTable(hive: Hive,
@@ -460,14 +471,15 @@ private[client] class Shim_v0_14 extends Shim_v0_13 {
                          tableName: String,
                          replace: Boolean,
                          holdDDLTime: Boolean): Unit = {
-    loadTableMethod.invoke(hive,
-                           loadPath,
-                           tableName,
-                           replace: JBoolean,
-                           holdDDLTime: JBoolean,
-                           isSrcLocal(loadPath, hive.getConf()): JBoolean,
-                           JBoolean.FALSE,
-                           JBoolean.FALSE)
+    loadTableMethod.invoke(
+      hive,
+      loadPath,
+      tableName,
+      replace: JBoolean,
+      holdDDLTime: JBoolean,
+      isSrcLocal(loadPath, hive.getConf()): JBoolean,
+      JBoolean.FALSE,
+      JBoolean.FALSE)
   }
 
   override def loadDynamicPartitions(hive: Hive,
@@ -478,23 +490,25 @@ private[client] class Shim_v0_14 extends Shim_v0_13 {
                                      numDP: Int,
                                      holdDDLTime: Boolean,
                                      listBucketingEnabled: Boolean): Unit = {
-    loadDynamicPartitionsMethod.invoke(hive,
-                                       loadPath,
-                                       tableName,
-                                       partSpec,
-                                       replace: JBoolean,
-                                       numDP: JInteger,
-                                       holdDDLTime: JBoolean,
-                                       listBucketingEnabled: JBoolean,
-                                       JBoolean.FALSE)
+    loadDynamicPartitionsMethod.invoke(
+      hive,
+      loadPath,
+      tableName,
+      partSpec,
+      replace: JBoolean,
+      numDP: JInteger,
+      holdDDLTime: JBoolean,
+      listBucketingEnabled: JBoolean,
+      JBoolean.FALSE)
   }
 
   override def getMetastoreClientConnectRetryDelayMillis(
       conf: HiveConf): Long = {
     getTimeVarMethod
-      .invoke(conf,
-              HiveConf.ConfVars.METASTORE_CLIENT_CONNECT_RETRY_DELAY,
-              TimeUnit.MILLISECONDS)
+      .invoke(
+        conf,
+        HiveConf.ConfVars.METASTORE_CLIENT_CONNECT_RETRY_DELAY,
+        TimeUnit.MILLISECONDS)
       .asInstanceOf[Long]
   }
 
@@ -509,24 +523,26 @@ private[client] class Shim_v1_0 extends Shim_v0_14 {}
 
 private[client] class Shim_v1_1 extends Shim_v1_0 {
 
-  private lazy val dropIndexMethod = findMethod(classOf[Hive],
-                                                "dropIndex",
-                                                classOf[String],
-                                                classOf[String],
-                                                classOf[String],
-                                                JBoolean.TYPE,
-                                                JBoolean.TYPE)
+  private lazy val dropIndexMethod = findMethod(
+    classOf[Hive],
+    "dropIndex",
+    classOf[String],
+    classOf[String],
+    classOf[String],
+    JBoolean.TYPE,
+    JBoolean.TYPE)
 
   override def dropIndex(hive: Hive,
                          dbName: String,
                          tableName: String,
                          indexName: String): Unit = {
-    dropIndexMethod.invoke(hive,
-                           dbName,
-                           tableName,
-                           indexName,
-                           true: JBoolean,
-                           true: JBoolean)
+    dropIndexMethod.invoke(
+      hive,
+      dbName,
+      tableName,
+      indexName,
+      true: JBoolean,
+      true: JBoolean)
   }
 }
 
@@ -553,15 +569,16 @@ private[client] class Shim_v1_2 extends Shim_v1_1 {
                                      numDP: Int,
                                      holdDDLTime: Boolean,
                                      listBucketingEnabled: Boolean): Unit = {
-    loadDynamicPartitionsMethod.invoke(hive,
-                                       loadPath,
-                                       tableName,
-                                       partSpec,
-                                       replace: JBoolean,
-                                       numDP: JInteger,
-                                       holdDDLTime: JBoolean,
-                                       listBucketingEnabled: JBoolean,
-                                       JBoolean.FALSE,
-                                       0L: JLong)
+    loadDynamicPartitionsMethod.invoke(
+      hive,
+      loadPath,
+      tableName,
+      partSpec,
+      replace: JBoolean,
+      numDP: JInteger,
+      holdDDLTime: JBoolean,
+      listBucketingEnabled: JBoolean,
+      JBoolean.FALSE,
+      0L: JLong)
   }
 }

@@ -67,6 +67,7 @@ private[leadership] class LeadershipModuleImpl(
   /**
     * Register this actor by default.
     */
-  startWhenLeader(AbdicateOnConnectionLossActor.props(zk, leader),
-                  "AbdicateOnConnectionLoss")
+  startWhenLeader(
+    AbdicateOnConnectionLossActor.props(zk, leader),
+    "AbdicateOnConnectionLoss")
 }

@@ -227,9 +227,10 @@ class NingAsyncHttpClientConfigBuilder(
         // break out the static methods as much as we can...
         val keyManagerFactory = buildKeyManagerFactory(sslConfig)
         val trustManagerFactory = buildTrustManagerFactory(sslConfig)
-        new ConfigSSLContextBuilder(sslConfig,
-                                    keyManagerFactory,
-                                    trustManagerFactory).build()
+        new ConfigSSLContextBuilder(
+          sslConfig,
+          keyManagerFactory,
+          trustManagerFactory).build()
       }
 
     // protocols!
@@ -284,8 +285,9 @@ class NingAsyncHttpClientConfigBuilder(
             .parseAll(AlgorithmConstraintsParser.expression, a)
             .get)
       .toSet
-    val algorithmChecker = new AlgorithmChecker(keyConstraints = constraints,
-                                                signatureConstraints = Set())
+    val algorithmChecker = new AlgorithmChecker(
+      keyConstraints = constraints,
+      signatureConstraints = Set())
     for (cert <- trustManager.getAcceptedIssuers) {
       try {
         algorithmChecker.checkKeyAlgorithms(cert)

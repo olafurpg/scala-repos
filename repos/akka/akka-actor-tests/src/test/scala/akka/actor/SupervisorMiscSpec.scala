@@ -53,18 +53,21 @@ class SupervisorMiscSpec
         })
 
         val actor1, actor2 =
-          Await.result((supervisor ? workerProps.withDispatcher(
-                         "pinned-dispatcher")).mapTo[ActorRef],
-                       timeout.duration)
+          Await.result(
+            (supervisor ? workerProps.withDispatcher("pinned-dispatcher"))
+              .mapTo[ActorRef],
+            timeout.duration)
 
-        val actor3 = Await.result((supervisor ? workerProps.withDispatcher(
-                                    "test-dispatcher")).mapTo[ActorRef],
-                                  timeout.duration)
+        val actor3 = Await.result(
+          (supervisor ? workerProps.withDispatcher("test-dispatcher"))
+            .mapTo[ActorRef],
+          timeout.duration)
 
         val actor4 =
-          Await.result((supervisor ? workerProps.withDispatcher(
-                         "pinned-dispatcher")).mapTo[ActorRef],
-                       timeout.duration)
+          Await.result(
+            (supervisor ? workerProps.withDispatcher("pinned-dispatcher"))
+              .mapTo[ActorRef],
+            timeout.duration)
 
         actor1 ! Kill
         actor2 ! Kill
@@ -73,10 +76,11 @@ class SupervisorMiscSpec
 
         countDownLatch.await(10, TimeUnit.SECONDS)
 
-        Seq("actor1" -> actor1,
-            "actor2" -> actor2,
-            "actor3" -> actor3,
-            "actor4" -> actor4) map {
+        Seq(
+          "actor1" -> actor1,
+          "actor2" -> actor2,
+          "actor3" -> actor3,
+          "actor4" -> actor4) map {
           case (id, ref) ⇒ (id, ref ? "status")
         } foreach {
           case (id, f) ⇒
@@ -166,8 +170,9 @@ class SupervisorMiscSpec
       }))
       parent ! "engage"
       expectMsg("green")
-      EventFilter[IllegalStateException]("handleChildTerminated failed",
-                                         occurrences = 1) intercept {
+      EventFilter[IllegalStateException](
+        "handleChildTerminated failed",
+        occurrences = 1) intercept {
         system.stop(parent)
       }
     }

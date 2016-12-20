@@ -77,12 +77,13 @@ class ScalaIntroduceParameterDialog(project: Project,
 
   override def createRefactoringProcessor(): BaseRefactoringProcessor = {
     val parameters = splittedItems.map(_.map(_.parameter))
-    val changeInfo = new ScalaChangeInfo(getVisibility,
-                                         method.fun,
-                                         getMethodName,
-                                         returnType,
-                                         parameters,
-                                         isAddDefaultArgs)
+    val changeInfo = new ScalaChangeInfo(
+      getVisibility,
+      method.fun,
+      getMethodName,
+      returnType,
+      parameters,
+      isAddDefaultArgs)
 
     val newData = introduceData.copy(
       paramName = paramNameField.getText,

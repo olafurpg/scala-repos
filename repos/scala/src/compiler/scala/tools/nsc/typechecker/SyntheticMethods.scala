@@ -37,11 +37,12 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
   import definitions._
   import CODE._
 
-  private lazy val productSymbols = List(Product_productPrefix,
-                                         Product_productArity,
-                                         Product_productElement,
-                                         Product_iterator,
-                                         Product_canEqual)
+  private lazy val productSymbols = List(
+    Product_productPrefix,
+    Product_productArity,
+    Product_productElement,
+    Product_iterator,
+    Product_canEqual)
   private lazy val valueSymbols = List(Any_hashCode, Any_equals)
   private lazy val caseSymbols =
     List(Object_hashCode, Object_toString) ::: productSymbols
@@ -129,10 +130,11 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
     def productIteratorMethod = {
       createMethod(nme.productIterator, iteratorOfType(AnyTpe))(
         _ =>
-          gen.mkMethodCall(ScalaRunTimeModule,
-                           nme.typedProductIterator,
-                           List(AnyTpe),
-                           List(mkThis)))
+          gen.mkMethodCall(
+            ScalaRunTimeModule,
+            nme.typedProductIterator,
+            List(AnyTpe),
+            List(mkThis)))
     }
 
     /* Common code for productElement and (currently disabled) productElementName */
@@ -166,9 +168,10 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
       Match(
         Ident(eqmeth.firstParam),
         List(
-          CaseDef(Typed(Ident(nme.WILDCARD), TypeTree(clazz.tpe)),
-                  EmptyTree,
-                  TRUE),
+          CaseDef(
+            Typed(Ident(nme.WILDCARD), TypeTree(clazz.tpe)),
+            EmptyTree,
+            TRUE),
           CaseDef(Ident(nme.WILDCARD), EmptyTree, FALSE)
         )
       )
@@ -195,9 +198,10 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
       val pairwise =
         accessors map
           (acc =>
-             fn(Select(mkThis, acc),
-                acc.tpe member nme.EQ,
-                Select(Ident(otherSym), acc)))
+             fn(
+               Select(mkThis, acc),
+               acc.tpe member nme.EQ,
+               Select(Ident(otherSym), acc)))
       val canEq = gen.mkMethodCall(otherSym, nme.canEqual_, Nil, List(mkThis))
       val tests =
         if (clazz.isDerivedValueClass || clazz.isFinal && syntheticCanEqual)
@@ -302,12 +306,14 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
             (acc =>
                Assign(
                  Ident(accumulator),
-                 callStaticsMethod("mix")(Ident(accumulator),
-                                          hashcodeImplementation(acc))
+                 callStaticsMethod("mix")(
+                   Ident(accumulator),
+                   hashcodeImplementation(acc))
                ))
         val finish =
-          callStaticsMethod("finalizeHash")(Ident(accumulator),
-                                            Literal(Constant(arity)))
+          callStaticsMethod("finalizeHash")(
+            Ident(accumulator),
+            Literal(Constant(arity)))
 
         Block(valdef :: mixes, finish)
       }

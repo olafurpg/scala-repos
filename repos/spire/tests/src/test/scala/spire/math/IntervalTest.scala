@@ -565,10 +565,11 @@ class IntervalIteratorCheck
           Try(xs.iterator(0)).isFailure shouldBe true
         }
       } else {
-        val triples = List((cc, true, true),
-                           (oo, false, false),
-                           (oc, false, true),
-                           (co, true, false))
+        val triples = List(
+          (cc, true, true),
+          (oo, false, false),
+          (oc, false, true),
+          (co, true, false))
         triples.foreach {
           case (interval, hasLower, hasUpper) =>
             testEndpoints(interval, step, hasLower, hasUpper)

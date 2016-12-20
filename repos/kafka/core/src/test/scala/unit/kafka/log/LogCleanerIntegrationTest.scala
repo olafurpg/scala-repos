@@ -44,9 +44,10 @@ class LogCleanerIntegrationTest(compressionCodec: String) {
   val logName = "log"
   val logDir = TestUtils.tempDir()
   var counter = 0
-  val topics = Array(TopicAndPartition("log", 0),
-                     TopicAndPartition("log", 1),
-                     TopicAndPartition("log", 2))
+  val topics = Array(
+    TopicAndPartition("log", 0),
+    TopicAndPartition("log", 1),
+    TopicAndPartition("log", 2))
 
   @Test
   def cleanerTest() {
@@ -76,9 +77,10 @@ class LogCleanerIntegrationTest(compressionCodec: String) {
       startSize > compactedSize)
 
     val read = readFromLog(log)
-    assertEquals("Contents of the map shouldn't change.",
-                 appends.toMap,
-                 read.toMap)
+    assertEquals(
+      "Contents of the map shouldn't change.",
+      appends.toMap,
+      read.toMap)
     assertTrue(startSize > log.size)
 
     // write some more stuff and validate again
@@ -94,13 +96,15 @@ class LogCleanerIntegrationTest(compressionCodec: String) {
     val lastCleaned2 = cleaner.cleanerManager.allCleanerCheckpoints
       .get(TopicAndPartition("log", 0))
       .get
-    assertTrue(s"log cleaner should have processed up to offset $firstDirty2",
-               lastCleaned2 >= firstDirty2);
+    assertTrue(
+      s"log cleaner should have processed up to offset $firstDirty2",
+      lastCleaned2 >= firstDirty2);
 
     val read2 = readFromLog(log)
-    assertEquals("Contents of the map shouldn't change.",
-                 appends2.toMap,
-                 read2.toMap)
+    assertEquals(
+      "Contents of the map shouldn't change.",
+      appends2.toMap,
+      read2.toMap)
 
     // simulate deleting a partition, by removing it from logs
     // force a checkpoint
@@ -138,9 +142,10 @@ class LogCleanerIntegrationTest(compressionCodec: String) {
     for (dup <- 0 until numDups; key <- 0 until numKeys) yield {
       val count = counter
       log.append(
-        TestUtils.singleMessageSet(payload = counter.toString.getBytes,
-                                   codec = codec,
-                                   key = key.toString.getBytes),
+        TestUtils.singleMessageSet(
+          payload = counter.toString.getBytes,
+          codec = codec,
+          key = key.toString.getBytes),
         assignOffsets = true)
       counter += 1
       (key, count)
@@ -172,21 +177,24 @@ class LogCleanerIntegrationTest(compressionCodec: String) {
       logProps
         .put(LogConfig.FileDeleteDelayMsProp, deleteDelay: java.lang.Integer)
       logProps.put(LogConfig.CleanupPolicyProp, LogConfig.Compact)
-      logProps.put(LogConfig.MinCleanableDirtyRatioProp,
-                   minCleanableDirtyRatio: java.lang.Float)
+      logProps.put(
+        LogConfig.MinCleanableDirtyRatioProp,
+        minCleanableDirtyRatio: java.lang.Float)
 
-      val log = new Log(dir = dir,
-                        LogConfig(logProps),
-                        recoveryPoint = 0L,
-                        scheduler = time.scheduler,
-                        time = time)
+      val log = new Log(
+        dir = dir,
+        LogConfig(logProps),
+        recoveryPoint = 0L,
+        scheduler = time.scheduler,
+        time = time)
       logs.put(TopicAndPartition("log", i), log)
     }
 
-    new LogCleaner(CleanerConfig(numThreads = numThreads),
-                   logDirs = Array(logDir),
-                   logs = logs,
-                   time = time)
+    new LogCleaner(
+      CleanerConfig(numThreads = numThreads),
+      logDirs = Array(logDir),
+      logs = logs,
+      time = time)
   }
 }
 

@@ -56,11 +56,12 @@ object HttpErrorHandler {
   def bindingsFromConfiguration(
       environment: Environment,
       configuration: Configuration): Seq[Binding[_]] = {
-    Reflect.bindingsFromConfiguration[HttpErrorHandler,
-                                      play.http.HttpErrorHandler,
-                                      JavaHttpErrorHandlerAdapter,
-                                      JavaHttpErrorHandlerDelegate,
-                                      GlobalSettingsHttpErrorHandler](
+    Reflect.bindingsFromConfiguration[
+      HttpErrorHandler,
+      play.http.HttpErrorHandler,
+      JavaHttpErrorHandlerAdapter,
+      JavaHttpErrorHandlerDelegate,
+      GlobalSettingsHttpErrorHandler](
       environment,
       PlayConfig(configuration),
       "play.http.errorHandler",
@@ -139,10 +140,11 @@ class DefaultHttpErrorHandler(environment: Environment,
            configuration: Configuration,
            sourceMapper: OptionalSourceMapper,
            router: Provider[Router]) =
-    this(environment,
-         configuration,
-         sourceMapper.sourceMapper,
-         Some(router.get))
+    this(
+      environment,
+      configuration,
+      sourceMapper.sourceMapper,
+      Some(router.get))
 
   private val playEditor = configuration.getString("play.editor")
 
@@ -264,12 +266,13 @@ class DefaultHttpErrorHandler(environment: Environment,
     */
   protected def logServerError(request: RequestHeader,
                                usefulException: UsefulException) {
-    Logger.error("""
+    Logger.error(
+      """
                     |
                     |! @%s - Internal server error, for (%s) [%s] ->
                     | """.stripMargin
-                   .format(usefulException.id, request.method, request.uri),
-                 usefulException)
+        .format(usefulException.id, request.method, request.uri),
+      usefulException)
   }
 
   /**
@@ -339,10 +342,11 @@ object HttpErrorHandlerExceptions {
   * A default HTTP error handler that can be used when there's no application available
   */
 object DefaultHttpErrorHandler
-    extends DefaultHttpErrorHandler(Environment.simple(),
-                                    Configuration.empty,
-                                    None,
-                                    None)
+    extends DefaultHttpErrorHandler(
+      Environment.simple(),
+      Configuration.empty,
+      None,
+      None)
 
 /**
   * A lazy HTTP error handler, that looks up the error handler from the current application

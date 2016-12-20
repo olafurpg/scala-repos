@@ -50,12 +50,13 @@ object ClientStore {
                   batchesToKeep: Int)(
       implicit batcher: Batcher,
       semigroup: Semigroup[V]): ClientStore[K, V] =
-    new ClientStore[K, V](offlineStore,
-                          onlineStore,
-                          batcher,
-                          batchesToKeep,
-                          defaultOnlineKeyFilter[K],
-                          FutureCollector.bestEffort)
+    new ClientStore[K, V](
+      offlineStore,
+      onlineStore,
+      batcher,
+      batchesToKeep,
+      defaultOnlineKeyFilter[K],
+      FutureCollector.bestEffort)
 
   def apply[K, V](offlineStore: ReadableStore[K, (BatchID, V)],
                   onlineStore: ReadableStore[(K, BatchID), V],
@@ -63,12 +64,13 @@ object ClientStore {
                   onlineKeyFilter: K => Boolean)(
       implicit batcher: Batcher,
       semigroup: Semigroup[V]): ClientStore[K, V] =
-    new ClientStore[K, V](offlineStore,
-                          onlineStore,
-                          batcher,
-                          batchesToKeep,
-                          onlineKeyFilter,
-                          FutureCollector.bestEffort)
+    new ClientStore[K, V](
+      offlineStore,
+      onlineStore,
+      batcher,
+      batchesToKeep,
+      onlineKeyFilter,
+      FutureCollector.bestEffort)
 
   def apply[K, V](offlineStore: ReadableStore[K, (BatchID, V)],
                   onlineStore: ReadableStore[(K, BatchID), V],
@@ -77,12 +79,13 @@ object ClientStore {
                   collector: FutureCollector[(K, Iterable[BatchID])])(
       implicit batcher: Batcher,
       semigroup: Semigroup[V]): ClientStore[K, V] =
-    new ClientStore[K, V](offlineStore,
-                          onlineStore,
-                          batcher,
-                          batchesToKeep,
-                          onlineKeyFilter,
-                          collector)
+    new ClientStore[K, V](
+      offlineStore,
+      onlineStore,
+      batcher,
+      batchesToKeep,
+      onlineKeyFilter,
+      collector)
 
   /** You can't read the batch counts before what offline has counted up to
     */

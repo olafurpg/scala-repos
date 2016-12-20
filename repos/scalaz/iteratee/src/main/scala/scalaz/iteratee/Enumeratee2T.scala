@@ -107,8 +107,9 @@ trait Enumeratee2TFunctions {
               contf(nextInput) >>== (s => cstep(s).pointI)
           },
           done = (a, r) =>
-            sdone(sdone(a, if (r.isEof) eofInput else emptyInput),
-                  if (r.isEof) eofInput else emptyInput)
+            sdone(
+              sdone(a, if (r.isEof) eofInput else emptyInput),
+              if (r.isEof) eofInput else emptyInput)
         )
 
         (step: StepT[(J, K), F, A]) =>
@@ -175,8 +176,9 @@ trait Enumeratee2TFunctions {
               contf(nextInput) >>== (s => cstep(s).pointI)
           },
           done = (a, r) =>
-            sdone(sdone(a, if (r.isEof) eofInput else emptyInput),
-                  if (r.isEof) eofInput else emptyInput)
+            sdone(
+              sdone(a, if (r.isEof) eofInput else emptyInput),
+              if (r.isEof) eofInput else emptyInput)
         )
 
         (step: StepT[J, F, A]) =>

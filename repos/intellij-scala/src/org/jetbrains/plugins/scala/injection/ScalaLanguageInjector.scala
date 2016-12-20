@@ -142,19 +142,21 @@ class ScalaLanguageInjector(myInjectionConfiguration: Configuration)
           else ""
 
         if (!literal.isMultiLineString) {
-          registrar.addPlace(prefix,
-                             suffix,
-                             literal,
-                             ScalaLanguageInjector getRangeInElement literal)
+          registrar.addPlace(
+            prefix,
+            suffix,
+            literal,
+            ScalaLanguageInjector getRangeInElement literal)
         } else {
           val rangesCollected = extractMultiLineStringRanges(literal)
 
           for ((lineRange, index) <- rangesCollected.zipWithIndex) {
-            registrar.addPlace(if (index == 0) prefix else " ",
-                               if (index == rangesCollected.length - 1) suffix
-                               else " ",
-                               literal,
-                               lineRange)
+            registrar.addPlace(
+              if (index == 0) prefix else " ",
+              if (index == rangesCollected.length - 1) suffix
+              else " ",
+              literal,
+              lineRange)
           }
         }
       }
@@ -181,16 +183,18 @@ class ScalaLanguageInjector(myInjectionConfiguration: Configuration)
             InjectedLanguage findLanguageById injection.getInjectedLanguageId
           if (language != null) {
             val injectedLanguage =
-              InjectedLanguage.create(injection.getInjectedLanguageId,
-                                      injection.getPrefix,
-                                      injection.getSuffix,
-                                      false)
-            ScalaLanguageInjector.performSimpleInjection(literals,
-                                                         injectedLanguage,
-                                                         injection,
-                                                         host,
-                                                         registrar,
-                                                         support)
+              InjectedLanguage.create(
+                injection.getInjectedLanguageId,
+                injection.getPrefix,
+                injection.getSuffix,
+                false)
+            ScalaLanguageInjector.performSimpleInjection(
+              literals,
+              injectedLanguage,
+              injection,
+              host,
+              registrar,
+              support)
           }
           done = true
         }
@@ -260,10 +264,11 @@ class ScalaLanguageInjector(myInjectionConfiguration: Configuration)
             .getInstance(host.getProject)
             .getIntInjectionMapping
           val allInjections =
-            new util.HashMap[InjectedLanguage,
-                             util.ArrayList[Trinity[PsiLanguageInjectionHost,
-                                                    InjectedLanguage,
-                                                    TextRange]]]()
+            new util.HashMap[
+              InjectedLanguage,
+              util.ArrayList[Trinity[PsiLanguageInjectionHost,
+                                     InjectedLanguage,
+                                     TextRange]]]()
 
           literals filter {
             case interpolated: ScInterpolatedStringLiteral
@@ -292,10 +297,11 @@ class ScalaLanguageInjector(myInjectionConfiguration: Configuration)
             val lang = languages.next()
             val list = allInjections get lang
 
-            InjectorUtils.registerInjection(lang.getLanguage,
-                                            list,
-                                            host.getContainingFile,
-                                            registrar)
+            InjectorUtils.registerInjection(
+              lang.getLanguage,
+              list,
+              host.getContainingFile,
+              registrar)
             InjectorUtils.registerSupport(support, true, registrar)
           }
 
@@ -347,8 +353,9 @@ class ScalaLanguageInjector(myInjectionConfiguration: Configuration)
           case _ => None
         }
       case tuple: ScTuple if tuple.isCall =>
-        getParameter(tuple.getContext.asInstanceOf[ScInfixExpr],
-                     tuple.exprs.indexOf(argument))
+        getParameter(
+          tuple.getContext.asInstanceOf[ScInfixExpr],
+          tuple.exprs.indexOf(argument))
       case infix: ScInfixExpr => getParameter(infix, 0)
       case _ => None
     }
@@ -383,10 +390,11 @@ object ScalaLanguageInjector {
 
       if (wsPrefixLength != lineLength) {
         rangesCollected +=
-          (new TextRange(if (partOfMlLine.trim startsWith margin)
-                           count + 1 + wsPrefixLength
-                         else count,
-                         count + lineLength) shiftRight range.getStartOffset)
+          (new TextRange(
+            if (partOfMlLine.trim startsWith margin)
+              count + 1 + wsPrefixLength
+            else count,
+            count + lineLength) shiftRight range.getStartOffset)
       }
 
       count += lineLength + 1
@@ -433,10 +441,11 @@ object ScalaLanguageInjector {
       (ScalaLanguageInjector
         .handleInjectionImpl(_, injectedLanguage, injection, list))
 
-    InjectorUtils.registerInjection(injectedLanguage.getLanguage,
-                                    list,
-                                    host.getContainingFile,
-                                    registrar)
+    InjectorUtils.registerInjection(
+      injectedLanguage.getLanguage,
+      list,
+      host.getContainingFile,
+      registrar)
     InjectorUtils.registerSupport(support, true, registrar)
   }
 

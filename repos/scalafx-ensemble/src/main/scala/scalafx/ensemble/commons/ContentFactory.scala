@@ -158,8 +158,8 @@ object ContentFactory {
                   Option(fileChooser.showDialog(thisButton.scene.window()))
                 result match {
                   case Some(projectDir) =>
-                    SBTProjectBuilder.createSampleProject(projectDir,
-                                                          exampleInfo)
+                    SBTProjectBuilder
+                      .createSampleProject(projectDir, exampleInfo)
                     SBTProjectBuilder.parentDir =
                       projectDir.getCanonicalFile.getParentFile
                   case _ =>
@@ -167,11 +167,12 @@ object ContentFactory {
               } catch {
                 case t: Throwable =>
                   val stage = thisButton.scene().window().asInstanceOf[Stage]
-                  showError(stage,
-                            title = thisButton.text(),
-                            header = "Error saving sample SBT project",
-                            message = t.getClass.getName + ": " + t.getMessage,
-                            t)
+                  showError(
+                    stage,
+                    title = thisButton.text(),
+                    header = "Error saving sample SBT project",
+                    message = t.getClass.getName + ": " + t.getMessage,
+                    t)
             }
           },
           new Button { thisButton =>
@@ -186,11 +187,12 @@ object ContentFactory {
               } catch {
                 case t: Throwable =>
                   val stage = thisButton.scene().window().asInstanceOf[Stage]
-                  showError(stage,
-                            title = thisButton.text(),
-                            header = "Error copying source to clipboard",
-                            message = t.getClass.getName + ": " + t.getMessage,
-                            t)
+                  showError(
+                    stage,
+                    title = thisButton.text(),
+                    header = "Error copying source to clipboard",
+                    message = t.getClass.getName + ": " + t.getMessage,
+                    t)
             }
           }
         )

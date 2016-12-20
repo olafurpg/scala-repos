@@ -50,8 +50,9 @@ class ContentionSnapshot {
           }
         }
 
-    Snapshot(blockedThreads = blocked.map(_.toString).toSeq,
-             lockOwners = owners,
-             deadlocks = deadlocks.map(_.toString).toSeq)
+    Snapshot(
+      blockedThreads = blocked.map(_.toString).toSeq,
+      lockOwners = owners,
+      deadlocks = deadlocks.map(_.toString).toSeq)
   }
 }

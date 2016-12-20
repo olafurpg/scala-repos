@@ -111,21 +111,21 @@ class SecurityServiceHandlers(
               "Error creating new API key.",
               Some("Unable to create API key with expired permission"))
           } else {
-            apiKeyManager.newAPIKeyWithGrants(request.name,
-                                              request.description,
-                                              authAPIKey,
-                                              request.grants.toSet) flatMap {
-              k =>
-                if (k.isDefined) {
-                  (k collect recordDetails sequence) map {
-                    ok[v1.APIKeyDetails]
-                  }
-                } else {
-                  Promise successful badRequest(
-                    "Error creating new API key.",
-                    Some(
-                      "Requestor lacks permission to assign given grants to API key"))
+            apiKeyManager.newAPIKeyWithGrants(
+              request.name,
+              request.description,
+              authAPIKey,
+              request.grants.toSet) flatMap { k =>
+              if (k.isDefined) {
+                (k collect recordDetails sequence) map {
+                  ok[v1.APIKeyDetails]
                 }
+              } else {
+                Promise successful badRequest(
+                  "Error creating new API key.",
+                  Some(
+                    "Requestor lacks permission to assign given grants to API key"))
+              }
             }
           }
 
@@ -133,8 +133,9 @@ class SecurityServiceHandlers(
           logger.warn(
             "The API key request body \n" +
               requestBody.renderPretty + "\n was invalid: " + e)
-          Promise successful badRequest("Invalid new API key request body.",
-                                        Some(e.message))
+          Promise successful badRequest(
+            "Invalid new API key request body.",
+            Some(e.message))
       }
     }
 
@@ -251,17 +252,18 @@ class SecurityServiceHandlers(
       with Logging {
     val service = (request: HttpRequest[Future[JValue]]) =>
       Success {
-        Apply[Option].apply2(request.parameters.get('apikey),
-                             request.parameters.get('grantId)) {
-          (apiKey, grantId) =>
-            apiKeyManager.removeGrants(apiKey, Set(grantId)) map { k =>
-              if (k.isDefined) noContent
-              else
-                badRequest("Invalid remove grant request.",
-                           Some(
-                             "Unable to remove grant " + grantId +
-                               " from API key " + apiKey))
-            }
+        Apply[Option].apply2(
+          request.parameters.get('apikey),
+          request.parameters.get('grantId)) { (apiKey, grantId) =>
+          apiKeyManager.removeGrants(apiKey, Set(grantId)) map { k =>
+            if (k.isDefined) noContent
+            else
+              badRequest(
+                "Invalid remove grant request.",
+                Some(
+                  "Unable to remove grant " + grantId +
+                    " from API key " + apiKey))
+          }
         } getOrElse {
           Promise successful badRequest(
             "Missing API key or grant ID from request URL")
@@ -290,23 +292,26 @@ class SecurityServiceHandlers(
     protected def create(authAPIKey: APIKey, requestBody: JValue): Future[R] = {
       requestBody.validated[v1.NewGrantRequest] match {
         case Success(request) =>
-          apiKeyManager.deriveGrant(request.name,
-                                    request.description,
-                                    authAPIKey,
-                                    request.permissions,
-                                    request.expirationDate) map { g =>
+          apiKeyManager.deriveGrant(
+            request.name,
+            request.description,
+            authAPIKey,
+            request.permissions,
+            request.expirationDate) map { g =>
             if (g.isDefined) ok(g map grantDetails)
             else
-              badRequest("Error creating new grant.",
-                         Some("Requestor lacks permissions to create grant"))
+              badRequest(
+                "Error creating new grant.",
+                Some("Requestor lacks permissions to create grant"))
           }
 
         case Failure(e) =>
           logger.warn(
             "The grant creation request body \n" +
               requestBody.renderPretty + "\n was invalid: " + e)
-          Promise successful badRequest("Invalid new grant request body.",
-                                        Some(e.message))
+          Promise successful badRequest(
+            "Invalid new grant request body.",
+            Some(e.message))
       }
     }
 
@@ -361,16 +366,18 @@ class SecurityServiceHandlers(
                requestBody: JValue): Future[R] = {
       requestBody.validated[v1.NewGrantRequest] match {
         case Success(r) =>
-          apiKeyManager.deriveSingleParentGrant(None,
-                                                None,
-                                                issuerKey,
-                                                parentId,
-                                                r.permissions,
-                                                r.expirationDate) map { g =>
+          apiKeyManager.deriveSingleParentGrant(
+            None,
+            None,
+            issuerKey,
+            parentId,
+            r.permissions,
+            r.expirationDate) map { g =>
             if (g.isDefined) ok(g map grantDetails)
             else
-              badRequest("Error creating new child grant.",
-                         Some("Requestor lacks permissions to create grant."))
+              badRequest(
+                "Error creating new child grant.",
+                Some("Requestor lacks permissions to create grant."))
           }
 
         case Failure(e) =>

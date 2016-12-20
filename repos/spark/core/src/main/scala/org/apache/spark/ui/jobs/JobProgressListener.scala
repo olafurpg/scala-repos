@@ -183,11 +183,12 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
                             SparkContext.SPARK_JOB_GROUP_ID)))
         yield group
       val jobData: JobUIData =
-        new JobUIData(jobId = jobStart.jobId,
-                      submissionTime = Option(jobStart.time).filter(_ >= 0),
-                      stageIds = jobStart.stageIds,
-                      jobGroup = jobGroup,
-                      status = JobExecutionStatus.RUNNING)
+        new JobUIData(
+          jobId = jobStart.jobId,
+          submissionTime = Option(jobStart.time).filter(_ >= 0),
+          stageIds = jobStart.stageIds,
+          jobGroup = jobGroup,
+          status = JobExecutionStatus.RUNNING)
       // A null jobGroupId is used for jobs that are run without a job group
       jobGroupToJobIds
         .getOrElseUpdate(jobGroup.orNull, new HashSet[JobId])
@@ -214,8 +215,9 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
       // so that we can display stage descriptions for pending stages:
       for (stageInfo <- jobStart.stageInfos) {
         stageIdToInfo.getOrElseUpdate(stageInfo.stageId, stageInfo)
-        stageIdToData.getOrElseUpdate((stageInfo.stageId, stageInfo.attemptId),
-                                      new StageUIData)
+        stageIdToData.getOrElseUpdate(
+          (stageInfo.stageId, stageInfo.attemptId),
+          new StageUIData)
       }
     }
 
@@ -548,10 +550,11 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
       val metrics = TaskMetrics.fromAccumulatorUpdates(accumUpdates)
       taskData.foreach { t =>
         if (!t.taskInfo.finished) {
-          updateAggregateMetrics(stageData,
-                                 executorMetricsUpdate.execId,
-                                 metrics,
-                                 t.taskMetrics)
+          updateAggregateMetrics(
+            stageData,
+            executorMetricsUpdate.execId,
+            metrics,
+            t.taskMetrics)
           // Overwrite task metrics
           t.taskMetrics = Some(metrics)
         }

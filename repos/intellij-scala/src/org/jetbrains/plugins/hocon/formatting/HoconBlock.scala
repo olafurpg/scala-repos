@@ -34,8 +34,9 @@ class HoconBlock(formatter: HoconFormatter,
   override def getIndent = indent
 
   override def getChildAttributes(newChildIndex: Int) =
-    new ChildAttributes(formatter.getChildIndent(node),
-                        formatter.getChildAlignment(alignmentCache, node))
+    new ChildAttributes(
+      formatter.getChildIndent(node),
+      formatter.getChildAlignment(alignmentCache, node))
 
   def buildChildren() = children.asJava
 
@@ -46,9 +47,10 @@ class HoconBlock(formatter: HoconFormatter,
     if (child1 == null)
       formatter.getFirstSpacing(node, child2.asInstanceOf[HoconBlock].getNode)
     else
-      formatter.getSpacing(node,
-                           child1.asInstanceOf[HoconBlock].getNode,
-                           child2.asInstanceOf[HoconBlock].getNode)
+      formatter.getSpacing(
+        node,
+        child1.asInstanceOf[HoconBlock].getNode,
+        child2.asInstanceOf[HoconBlock].getNode)
 
   lazy val children: Seq[Block] = formatter
     .getChildren(node)
@@ -58,11 +60,12 @@ class HoconBlock(formatter: HoconFormatter,
     .toVector
 
   private def createChildBlock(child: ASTNode) =
-    new HoconBlock(formatter,
-                   child,
-                   formatter.getIndent(node, child),
-                   formatter.getWrap(wrapCache, node, child),
-                   formatter.getAlignment(alignmentCache, node, child))
+    new HoconBlock(
+      formatter,
+      child,
+      formatter.getIndent(node, child),
+      formatter.getWrap(wrapCache, node, child),
+      formatter.getAlignment(alignmentCache, node, child))
 
   override def toString =
     s"${node.getElementType}[${node.getText

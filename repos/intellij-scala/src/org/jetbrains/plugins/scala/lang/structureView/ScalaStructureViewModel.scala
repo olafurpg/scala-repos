@@ -67,8 +67,9 @@ class ScalaStructureViewModel(private val myRootElement: ScalaFile,
       override def getComparator: Comparator[_] = new Comparator[AnyRef] {
         override def compare(o1: AnyRef, o2: AnyRef): Int =
           (o1, o2) match {
-            case (test1: TestStructureViewElement,
-                  test2: TestStructureViewElement) =>
+            case (
+                test1: TestStructureViewElement,
+                test2: TestStructureViewElement) =>
               0
             case (_, test: TestStructureViewElement) => -1
             case (test: TestStructureViewElement, _) => 1

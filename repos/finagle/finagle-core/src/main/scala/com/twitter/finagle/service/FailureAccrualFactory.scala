@@ -25,14 +25,15 @@ object FailureAccrualFactory {
   ): ServiceFactoryWrapper = {
     new ServiceFactoryWrapper {
       def andThen[Req, Rep](factory: ServiceFactory[Req, Rep]) =
-        new FailureAccrualFactory(factory,
-                                  failureAccrualPolicy,
-                                  timer,
-                                  statsReceiver.scope("failure_accrual"),
-                                  label,
-                                  logger,
-                                  endpoint,
-                                  responseClassifier)
+        new FailureAccrualFactory(
+          factory,
+          failureAccrualPolicy,
+          timer,
+          statsReceiver.scope("failure_accrual"),
+          label,
+          logger,
+          endpoint,
+          responseClassifier)
     }
   }
 
@@ -128,8 +129,8 @@ object FailureAccrualFactory {
   def Param(numFailures: Int, markDeadFor: Duration): Param =
     Param.Configured(
       () =>
-        FailureAccrualPolicy.consecutiveFailures(numFailures,
-                                                 Backoff.const(markDeadFor)))
+        FailureAccrualPolicy
+          .consecutiveFailures(numFailures, Backoff.const(markDeadFor)))
 
   /**
     * Configures the [[FailureAccrualFactory]].
@@ -265,15 +266,16 @@ class FailureAccrualFactory[Req, Rep] private[finagle] (
       endpoint: Address,
       responseClassifier: ResponseClassifier
   ) =
-    this(underlying,
-         FailureAccrualPolicy.consecutiveFailures(numFailures,
-                                                  Backoff.const(markDeadFor)),
-         timer,
-         statsReceiver,
-         label,
-         logger,
-         endpoint,
-         responseClassifier)
+    this(
+      underlying,
+      FailureAccrualPolicy
+        .consecutiveFailures(numFailures, Backoff.const(markDeadFor)),
+      timer,
+      statsReceiver,
+      label,
+      logger,
+      endpoint,
+      responseClassifier)
 
   def this(
       underlying: ServiceFactory[Req, Rep],
@@ -285,14 +287,15 @@ class FailureAccrualFactory[Req, Rep] private[finagle] (
       logger: Logger,
       endpoint: Address
   ) =
-    this(underlying,
-         FailureAccrualPolicy.consecutiveFailures(numFailures,
-                                                  Backoff.const(markDeadFor)),
-         timer,
-         statsReceiver,
-         label,
-         logger,
-         endpoint)
+    this(
+      underlying,
+      FailureAccrualPolicy
+        .consecutiveFailures(numFailures, Backoff.const(markDeadFor)),
+      timer,
+      statsReceiver,
+      label,
+      logger,
+      endpoint)
 
   // writes to `state` and `reviveTimerTask` are synchronized on `svcFacSelf`
   @volatile private[this] var state: State = Alive

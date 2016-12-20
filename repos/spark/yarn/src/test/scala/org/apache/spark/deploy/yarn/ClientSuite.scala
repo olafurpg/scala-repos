@@ -190,12 +190,13 @@ class ClientSuite
       "/remotePath/1:/remotePath/2")
 
     val env = new MutableHashMap[String, String]()
-    populateClasspath(null,
-                      conf,
-                      sparkConf,
-                      env,
-                      false,
-                      extraClassPath = Some("/localPath/my1.jar"))
+    populateClasspath(
+      null,
+      conf,
+      sparkConf,
+      env,
+      false,
+      extraClassPath = Some("/localPath/my1.jar"))
     val cp = classpath(env)
     cp should contain("/remotePath/spark.jar")
     cp should contain("/remotePath/my1.jar")
@@ -248,10 +249,11 @@ class ClientSuite
     val jar3 = TestUtils.createJarWithFiles(Map(), single)
     val jar4 = TestUtils.createJarWithFiles(Map(), single)
 
-    val jarsConf = Seq(s"${libs.getAbsolutePath()}/*",
-                       jar3.getPath(),
-                       s"local:${jar4.getPath()}",
-                       s"local:${single.getAbsolutePath()}/*")
+    val jarsConf = Seq(
+      s"${libs.getAbsolutePath()}/*",
+      jar3.getPath(),
+      s"local:${jar4.getPath()}",
+      s"local:${single.getAbsolutePath()}/*")
 
     val sparkConf = new SparkConf().set(SPARK_JARS, jarsConf)
     val client = createClient(sparkConf)
@@ -262,15 +264,18 @@ class ClientSuite
     assert(sparkConf.get(SPARK_JARS) === Some(
       Seq(s"local:${jar4.getPath()}", s"local:${single.getAbsolutePath()}/*")))
 
-    verify(client).copyFileToRemote(any(classOf[Path]),
-                                    meq(new Path(jar1.toURI())),
-                                    anyShort())
-    verify(client).copyFileToRemote(any(classOf[Path]),
-                                    meq(new Path(jar2.toURI())),
-                                    anyShort())
-    verify(client).copyFileToRemote(any(classOf[Path]),
-                                    meq(new Path(jar3.toURI())),
-                                    anyShort())
+    verify(client).copyFileToRemote(
+      any(classOf[Path]),
+      meq(new Path(jar1.toURI())),
+      anyShort())
+    verify(client).copyFileToRemote(
+      any(classOf[Path]),
+      meq(new Path(jar2.toURI())),
+      anyShort())
+    verify(client).copyFileToRemote(
+      any(classOf[Path]),
+      meq(new Path(jar3.toURI())),
+      anyShort())
 
     val cp = classpath(client)
     cp should contain(buildPath(PWD, LOCALIZED_LIB_DIR, "*"))
@@ -287,9 +292,10 @@ class ClientSuite
     val client = createClient(sparkConf)
     client.prepareLocalResources(temp.getAbsolutePath(), Nil)
 
-    verify(client).copyFileToRemote(any(classOf[Path]),
-                                    meq(new Path(archive.toURI())),
-                                    anyShort())
+    verify(client).copyFileToRemote(
+      any(classOf[Path]),
+      meq(new Path(archive.toURI())),
+      anyShort())
     classpath(client) should contain(buildPath(PWD, LOCALIZED_LIB_DIR, "*"))
 
     sparkConf.set(SPARK_ARCHIVE, LOCAL_SCHEME + ":" + archive.getPath())
@@ -308,9 +314,10 @@ class ClientSuite
       new SparkConfWithEnv(Map("SPARK_HOME" -> temp.getAbsolutePath()))
     val client = createClient(sparkConf)
     client.prepareLocalResources(temp.getAbsolutePath(), Nil)
-    verify(client).copyFileToRemote(any(classOf[Path]),
-                                    meq(new Path(jar.toURI())),
-                                    anyShort())
+    verify(client).copyFileToRemote(
+      any(classOf[Path]),
+      meq(new Path(jar.toURI())),
+      anyShort())
     classpath(client) should contain(buildPath(PWD, LOCALIZED_LIB_DIR, "*"))
   }
 

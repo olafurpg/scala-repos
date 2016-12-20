@@ -58,8 +58,9 @@ class SemiJoinSuite extends SparkPlanTest with SharedSQLContext {
     new StructType().add("c", IntegerType).add("d", DoubleType))
 
   private lazy val condition = {
-    And((left.col("a") === right.col("c")).expr,
-        LessThan(left.col("b").expr, right.col("d").expr))
+    And(
+      (left.col("a") === right.col("c")).expr,
+      LessThan(left.col("b").expr, right.col("d").expr))
   }
 
   // Note: the input dataframes and expression must be evaluated lazily because
@@ -71,10 +72,11 @@ class SemiJoinSuite extends SparkPlanTest with SharedSQLContext {
                                expectedAnswer: Seq[Product]): Unit = {
 
     def extractJoinParts(): Option[ExtractEquiJoinKeys.ReturnType] = {
-      val join = Join(leftRows.logicalPlan,
-                      rightRows.logicalPlan,
-                      Inner,
-                      Some(condition))
+      val join = Join(
+        leftRows.logicalPlan,
+        rightRows.logicalPlan,
+        Inner,
+        Some(condition))
       ExtractEquiJoinKeys.unapply(join)
     }
 
@@ -87,13 +89,14 @@ class SemiJoinSuite extends SparkPlanTest with SharedSQLContext {
               rightRows,
               (left: SparkPlan, right: SparkPlan) =>
                 EnsureRequirements(left.sqlContext.sessionState.conf).apply(
-                  ShuffledHashJoin(leftKeys,
-                                   rightKeys,
-                                   LeftSemi,
-                                   BuildRight,
-                                   boundCondition,
-                                   left,
-                                   right)),
+                  ShuffledHashJoin(
+                    leftKeys,
+                    rightKeys,
+                    LeftSemi,
+                    BuildRight,
+                    boundCondition,
+                    left,
+                    right)),
               expectedAnswer.map(Row.fromTuple),
               sortAnswers = true)
           }
@@ -104,49 +107,55 @@ class SemiJoinSuite extends SparkPlanTest with SharedSQLContext {
       extractJoinParts().foreach {
         case (joinType, leftKeys, rightKeys, boundCondition, _, _) =>
           withSQLConf(SQLConf.SHUFFLE_PARTITIONS.key -> "1") {
-            checkAnswer2(leftRows,
-                         rightRows,
-                         (left: SparkPlan, right: SparkPlan) =>
-                           BroadcastHashJoin(leftKeys,
-                                             rightKeys,
-                                             LeftSemi,
-                                             BuildRight,
-                                             boundCondition,
-                                             left,
-                                             right),
-                         expectedAnswer.map(Row.fromTuple),
-                         sortAnswers = true)
+            checkAnswer2(
+              leftRows,
+              rightRows,
+              (left: SparkPlan, right: SparkPlan) =>
+                BroadcastHashJoin(
+                  leftKeys,
+                  rightKeys,
+                  LeftSemi,
+                  BuildRight,
+                  boundCondition,
+                  left,
+                  right),
+              expectedAnswer.map(Row.fromTuple),
+              sortAnswers = true)
           }
       }
     }
 
     test(s"$testName using BroadcastNestedLoopJoin build left") {
       withSQLConf(SQLConf.SHUFFLE_PARTITIONS.key -> "1") {
-        checkAnswer2(leftRows,
-                     rightRows,
-                     (left: SparkPlan, right: SparkPlan) =>
-                       BroadcastNestedLoopJoin(left,
-                                               right,
-                                               BuildLeft,
-                                               LeftSemi,
-                                               Some(condition)),
-                     expectedAnswer.map(Row.fromTuple),
-                     sortAnswers = true)
+        checkAnswer2(
+          leftRows,
+          rightRows,
+          (left: SparkPlan, right: SparkPlan) =>
+            BroadcastNestedLoopJoin(
+              left,
+              right,
+              BuildLeft,
+              LeftSemi,
+              Some(condition)),
+          expectedAnswer.map(Row.fromTuple),
+          sortAnswers = true)
       }
     }
 
     test(s"$testName using BroadcastNestedLoopJoin build right") {
       withSQLConf(SQLConf.SHUFFLE_PARTITIONS.key -> "1") {
-        checkAnswer2(leftRows,
-                     rightRows,
-                     (left: SparkPlan, right: SparkPlan) =>
-                       BroadcastNestedLoopJoin(left,
-                                               right,
-                                               BuildRight,
-                                               LeftSemi,
-                                               Some(condition)),
-                     expectedAnswer.map(Row.fromTuple),
-                     sortAnswers = true)
+        checkAnswer2(
+          leftRows,
+          rightRows,
+          (left: SparkPlan, right: SparkPlan) =>
+            BroadcastNestedLoopJoin(
+              left,
+              right,
+              BuildRight,
+              LeftSemi,
+              Some(condition)),
+          expectedAnswer.map(Row.fromTuple),
+          sortAnswers = true)
       }
     }
   }

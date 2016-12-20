@@ -137,10 +137,11 @@ final class FpFilterExact[A](val value: Double) extends AnyVal {
 
 object FpFilterExact {
   implicit def liftExact[A: Field](exact: FpFilterExact[A]): FpFilter[A] =
-    new FpFilter(exact.value,
-                 spire.math.abs(exact.value),
-                 0,
-                 Field[A].fromDouble(exact.value))
+    new FpFilter(
+      exact.value,
+      spire.math.abs(exact.value),
+      0,
+      Field[A].fromDouble(exact.value))
 }
 
 object FpFilter {

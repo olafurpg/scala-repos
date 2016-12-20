@@ -57,49 +57,57 @@ class CalendarOpsTest extends WordSpec {
     "truncate to a minute" in {
       assert(
         dateTimeParser.parse("February 12, 2002 12:34:00.000") === CalendarOps
-          .truncate(dateTimeParser.parse("February 12, 2002 12:34:56.789"),
-                    Calendar.MINUTE))
+          .truncate(
+            dateTimeParser.parse("February 12, 2002 12:34:56.789"),
+            Calendar.MINUTE))
 
       assert(
         dateTimeParser.parse("November 18, 2001 1:23:00.000") === CalendarOps
-          .truncate(dateTimeParser.parse("November 18, 2001 1:23:11.321"),
-                    Calendar.MINUTE))
+          .truncate(
+            dateTimeParser.parse("November 18, 2001 1:23:11.321"),
+            Calendar.MINUTE))
     }
 
     "truncate to a second" in {
       assert(
         dateTimeParser.parse("February 12, 2002 12:34:56.000") === CalendarOps
-          .truncate(dateTimeParser.parse("February 12, 2002 12:34:56.789"),
-                    Calendar.SECOND))
+          .truncate(
+            dateTimeParser.parse("February 12, 2002 12:34:56.789"),
+            Calendar.SECOND))
 
       assert(
         dateTimeParser.parse("November 18, 2001 1:23:11.000") === CalendarOps
-          .truncate(dateTimeParser.parse("November 18, 2001 1:23:11.321"),
-                    Calendar.SECOND))
+          .truncate(
+            dateTimeParser.parse("November 18, 2001 1:23:11.321"),
+            Calendar.SECOND))
     }
 
     "truncate to AM" in {
       assert(
         dateTimeParser.parse("February 3, 2002 00:00:00.000") === CalendarOps
-          .truncate(dateTimeParser.parse("February 3, 2002 01:10:00.000"),
-                    Calendar.AM_PM))
+          .truncate(
+            dateTimeParser.parse("February 3, 2002 01:10:00.000"),
+            Calendar.AM_PM))
 
       assert(
         dateTimeParser.parse("February 3, 2002 00:00:00.000") === CalendarOps
-          .truncate(dateTimeParser.parse("February 3, 2002 11:10:00.000"),
-                    Calendar.AM_PM))
+          .truncate(
+            dateTimeParser.parse("February 3, 2002 11:10:00.000"),
+            Calendar.AM_PM))
     }
 
     "truncate to PM" in {
       assert(
         dateTimeParser.parse("February 3, 2002 12:00:00.000") === CalendarOps
-          .truncate(dateTimeParser.parse("February 3, 2002 13:10:00.000"),
-                    Calendar.AM_PM))
+          .truncate(
+            dateTimeParser.parse("February 3, 2002 13:10:00.000"),
+            Calendar.AM_PM))
 
       assert(
         dateTimeParser.parse("February 3, 2002 12:00:00.000") === CalendarOps
-          .truncate(dateTimeParser.parse("February 3, 2002 19:10:00.000"),
-                    Calendar.AM_PM))
+          .truncate(
+            dateTimeParser.parse("February 3, 2002 19:10:00.000"),
+            Calendar.AM_PM))
     }
 
     "truncate respects DST" in {
@@ -108,13 +116,15 @@ class CalendarOpsTest extends WordSpec {
 
       assert(
         dateTimeParser.parse("March 30, 2003 00:00:00.000") === CalendarOps
-          .truncate(dateTimeParser.parse("March 30, 2003 05:30:45.000"),
-                    Calendar.DATE))
+          .truncate(
+            dateTimeParser.parse("March 30, 2003 05:30:45.000"),
+            Calendar.DATE))
 
       assert(
         dateTimeParser.parse("October 26, 2003 00:00:00.000") === CalendarOps
-          .truncate(dateTimeParser.parse("October 26, 2003 05:30:45.000"),
-                    Calendar.DATE))
+          .truncate(
+            dateTimeParser.parse("October 26, 2003 05:30:45.000"),
+            Calendar.DATE))
     }
   }
 }

@@ -315,10 +315,11 @@ class GroupsResource @Inject()(groupManager: GroupManager,
 
     val effectivePath = update.id.map(_.canonicalPath(id)).getOrElse(id)
     val deployment = result(
-      groupManager.update(effectivePath,
-                          applyGroupUpdate(_, update, version),
-                          version,
-                          force))
+      groupManager.update(
+        effectivePath,
+        applyGroupUpdate(_, update, version),
+        version,
+        force))
     (deployment, effectivePath)
   }
 

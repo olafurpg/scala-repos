@@ -21,20 +21,23 @@ class FormFieldDirectivesSpec extends RoutingSpec {
   val nodeSeq: xml.NodeSeq = <b>yes</b>
   val urlEncodedForm = FormData(Map("firstName" -> "Mike", "age" -> "42"))
   val urlEncodedFormWithVip = FormData(
-    Map("firstName" -> "Mike",
-        "age" -> "42",
-        "VIP" -> "true",
-        "super" -> "<b>no</b>"))
+    Map(
+      "firstName" -> "Mike",
+      "age" -> "42",
+      "VIP" -> "true",
+      "super" -> "<b>no</b>"))
   val multipartForm = Multipart.FormData {
-    Map("firstName" -> HttpEntity("Mike"),
-        "age" -> HttpEntity(ContentTypes.`text/xml(UTF-8)`, "<int>42</int>"),
-        "VIPBoolean" -> HttpEntity("true"))
+    Map(
+      "firstName" -> HttpEntity("Mike"),
+      "age" -> HttpEntity(ContentTypes.`text/xml(UTF-8)`, "<int>42</int>"),
+      "VIPBoolean" -> HttpEntity("true"))
   }
   val multipartFormWithTextHtml = Multipart.FormData {
-    Map("firstName" -> HttpEntity("Mike"),
-        "age" -> HttpEntity(ContentTypes.`text/xml(UTF-8)`, "<int>42</int>"),
-        "VIP" -> HttpEntity(ContentTypes.`text/html(UTF-8)`, "<b>yes</b>"),
-        "super" -> HttpEntity("no"))
+    Map(
+      "firstName" -> HttpEntity("Mike"),
+      "age" -> HttpEntity(ContentTypes.`text/xml(UTF-8)`, "<int>42</int>"),
+      "VIP" -> HttpEntity(ContentTypes.`text/html(UTF-8)`, "<b>yes</b>"),
+      "super" -> HttpEntity("no"))
   }
   val multipartFormWithFile = Multipart.FormData(
     Multipart.FormData.BodyPart.Strict(

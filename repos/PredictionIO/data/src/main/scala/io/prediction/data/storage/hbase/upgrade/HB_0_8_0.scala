@@ -132,10 +132,11 @@ object HB_0_8_0 {
 
     def getStringCol(col: String): String = {
       val r = result.getValue(eBytes, colNames(col))
-      require(r != null,
-              s"Failed to get value for column ${col}. " +
-                s"Rowkey: ${rowKey.toString} " +
-                s"StringBinary: ${Bytes.toStringBinary(result.getRow())}.")
+      require(
+        r != null,
+        s"Failed to get value for column ${col}. " +
+          s"Rowkey: ${rowKey.toString} " +
+          s"StringBinary: ${Bytes.toStringBinary(result.getRow())}.")
 
       Bytes.toString(r)
     }

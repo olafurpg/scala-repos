@@ -97,8 +97,9 @@ private[camel] object TestSupport {
     val clazz = tag.runtimeClass.asInstanceOf[Class[T]]
     new BePropertyMatcher[AnyRef] {
       def apply(left: AnyRef) =
-        BePropertyMatchResult(clazz.isAssignableFrom(left.getClass),
-                              "an instance of " + clazz.getName)
+        BePropertyMatchResult(
+          clazz.isAssignableFrom(left.getClass),
+          "an instance of " + clazz.getName)
     }
   }
 }

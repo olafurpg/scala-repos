@@ -94,10 +94,11 @@ abstract class ClusterShardingGetStatsSpec
   }
 
   def startProxy(): ActorRef = {
-    ClusterSharding(system).startProxy(typeName = shardTypeName,
-                                       role = Some("shard"),
-                                       extractEntityId = extractEntityId,
-                                       extractShardId = extractShardId)
+    ClusterSharding(system).startProxy(
+      typeName = shardTypeName,
+      role = Some("shard"),
+      extractEntityId = extractEntityId,
+      extractShardId = extractShardId)
   }
 
   def join(from: RoleName): Unit = {
@@ -140,8 +141,9 @@ abstract class ClusterShardingGetStatsSpec
       within(10.seconds) {
         awaitAssert {
           val probe = TestProbe()
-          region.tell(ShardRegion.GetClusterShardingStats(10.seconds.dilated),
-                      probe.ref)
+          region.tell(
+            ShardRegion.GetClusterShardingStats(10.seconds.dilated),
+            probe.ref)
           val shardStats =
             probe.expectMsgType[ShardRegion.ClusterShardingStats]
           shardStats.regions.size should ===(3)
@@ -175,8 +177,9 @@ abstract class ClusterShardingGetStatsSpec
         awaitAssert {
           val probe = TestProbe()
           val region = ClusterSharding(system).shardRegion(shardTypeName)
-          region.tell(ShardRegion.GetClusterShardingStats(10.seconds.dilated),
-                      probe.ref)
+          region.tell(
+            ShardRegion.GetClusterShardingStats(10.seconds.dilated),
+            probe.ref)
           val regions =
             probe.expectMsgType[ShardRegion.ClusterShardingStats].regions
           regions.size shouldEqual 3

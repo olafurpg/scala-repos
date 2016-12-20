@@ -174,8 +174,9 @@ trait Batcher extends Serializable {
     dateToBatch(interval)(truncateUp)(truncateDown)
 
   def toInterval(b: BatchID): Interval[Timestamp] =
-    Intersection(InclusiveLower(earliestTimeOf(b)),
-                 ExclusiveUpper(earliestTimeOf(b.next)))
+    Intersection(
+      InclusiveLower(earliestTimeOf(b)),
+      ExclusiveUpper(earliestTimeOf(b.next)))
 
   def toTimestamp(b: Interval[BatchID]): Interval[Timestamp] =
     b match {

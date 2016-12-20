@@ -102,13 +102,15 @@ trait DievImplementation {
                 Coincidence(adjustedPosition)
               else {
                 if (value < start)
-                  Between(liftedIntervals(adjustedPosition - 1).map(_ =>
-                            adjustedPosition - 1),
-                          adjustedPosition.some)
+                  Between(
+                    liftedIntervals(adjustedPosition - 1).map(_ =>
+                      adjustedPosition - 1),
+                    adjustedPosition.some)
                 else
-                  Between(adjustedPosition.some,
-                          liftedIntervals(adjustedPosition + 1).map(_ =>
-                            adjustedPosition + 1))
+                  Between(
+                    adjustedPosition.some,
+                    liftedIntervals(adjustedPosition + 1).map(_ =>
+                      adjustedPosition + 1))
               }
             }
             case _ => Between(None, None)
@@ -137,11 +139,12 @@ trait DievImplementation {
       val correctedInterval = fixIntervalOrder(interval)
       (binarySearch(correctedInterval._1), binarySearch(correctedInterval._2)) match {
         case (Coincidence(startPosition), Coincidence(endPosition)) => {
-          construct(startPosition,
-                    Vector(
-                      (intervals(startPosition)._1.min(correctedInterval._1),
-                       intervals(endPosition)._2.max(correctedInterval._2))),
-                    endPosition + 1)
+          construct(
+            startPosition,
+            Vector(
+              (intervals(startPosition)._1.min(correctedInterval._1),
+               intervals(endPosition)._2.max(correctedInterval._2))),
+            endPosition + 1)
         }
         case (Coincidence(startPosition), between @ Between(_, after)) => {
           val adjacentAfterResult = between.adjacentAfter(correctedInterval)
@@ -172,8 +175,9 @@ trait DievImplementation {
           )
         }
         //(Between(None,Some(0)),Between(Some(0),Some(1)))
-        case (earlyBound @ Between(before, after),
-              lateBound @ Between(_, otherAfter)) => {
+        case (
+            earlyBound @ Between(before, after),
+            lateBound @ Between(_, otherAfter)) => {
           val adjacentBeforeResult =
             earlyBound.adjacentBefore(correctedInterval)
           val adjacentAfterResult =

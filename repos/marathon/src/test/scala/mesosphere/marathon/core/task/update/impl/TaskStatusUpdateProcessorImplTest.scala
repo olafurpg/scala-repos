@@ -91,8 +91,9 @@ class TaskStatusUpdateProcessorImplTest
       Some(
         MarathonTestHelper.minimalReservedTask(
           taskId.appId,
-          Task.Reservation(Iterable.empty,
-                           MarathonTestHelper.taskReservationStateNew)))
+          Task.Reservation(
+            Iterable.empty,
+            MarathonTestHelper.taskReservationStateNew)))
     )
 
     When("we process the updated")

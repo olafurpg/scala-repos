@@ -146,8 +146,9 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
                    version: Version): EitherT[M, ResourceError, Long] = {
       readResource(apiKey, path, version, AccessMode.ReadMetadata) flatMap {
         //need mapM
-        _.fold(br => EitherT.right(br.byteLength.point[M]),
-               pr => EitherT.right(pr.recordCount))
+        _.fold(
+          br => EitherT.right(br.byteLength.point[M]),
+          pr => EitherT.right(pr.recordCount))
       }
     }
 
@@ -214,11 +215,12 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
           // version does not exist, then run synchronously and cache (if cacheable)
           for {
             basePath <- pathPrefix
-            caching <- executeAndCache(platform,
-                                       path,
-                                       ctx,
-                                       queryOptions,
-                                       cacheable.option(cachePath))
+            caching <- executeAndCache(
+              platform,
+              path,
+              ctx,
+              queryOptions,
+              cacheable.option(cachePath))
           } yield caching
         }
 
@@ -229,8 +231,8 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
         case Some(VersionEntry(id, _, timestamp))
             if maxAge.forall(ms => timestamp.plus(ms) >= clock.instant()) =>
           logger.debug(
-            "Found fresh cache entry (%s) for query on %s".format(timestamp,
-                                                                  path))
+            "Found fresh cache entry (%s) for query on %s"
+              .format(timestamp, path))
           val recacheAction = (recacheAfter
             .exists(ms => timestamp.plus(ms) < clock.instant()))
             .whenM[({ type l[a] = EitherT[M, EvaluationError, a] })#l, UUID] {
@@ -243,13 +245,14 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
                   path,
                   Version.Current,
                   AccessMode.Execute) leftMap storageError
-                taskId <- scheduler.addTask(None,
-                                            ctx.apiKey,
-                                            queryResource.authorities,
-                                            ctx,
-                                            path,
-                                            cachePath,
-                                            None) leftMap invalidState
+                taskId <- scheduler.addTask(
+                  None,
+                  ctx.apiKey,
+                  queryResource.authorities,
+                  ctx,
+                  path,
+                  cachePath,
+                  None) leftMap invalidState
                 _ = logger.debug(
                   "Cache refresh scheduled for query %s, as id %s."
                     .format(path.path, taskId))
@@ -258,14 +261,16 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
 
           for {
             _ <- recacheAction
-            projection <- readProjection(ctx.apiKey,
-                                         cachePath,
-                                         Version.Current,
-                                         AccessMode.Read) leftMap storageError
+            projection <- readProjection(
+              ctx.apiKey,
+              cachePath,
+              Version.Current,
+              AccessMode.Read) leftMap storageError
           } yield {
-            StoredQueryResult(projection.getBlockStream(None),
-                              Some(timestamp),
-                              None)
+            StoredQueryResult(
+              projection.getBlockStream(None),
+              Some(timestamp),
+              None)
           }
 
         case Some(VersionEntry(_, _, timestamp)) =>
@@ -294,10 +299,11 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
         executor <- platform.executorFor(ctx.apiKey) leftMap { err =>
           systemError(new RuntimeException(err))
         }
-        queryRes <- readResource(ctx.apiKey,
-                                 path,
-                                 Version.Current,
-                                 AccessMode.Execute) leftMap {
+        queryRes <- readResource(
+          ctx.apiKey,
+          path,
+          Version.Current,
+          AccessMode.Execute) leftMap {
           storageError _
         }
         query <- Resource
@@ -312,19 +318,19 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
           case Some(cachePath) =>
             for {
               _ <- EitherT {
-                permissionsFinder.writePermissions(ctx.apiKey,
-                                                   cachePath,
-                                                   clock.instant()) map {
-                  pset =>
-                    /// here, we just terminate the computation early if no write permissions are available.
-                    if (pset.nonEmpty) \/.right(PrecogUnit)
-                    else
-                      \/.left(
-                        storageError(
-                          PermissionsError(
-                            "API key %s has no permission to write to the caching path %s."
-                              .format(ctx.apiKey, cachePath)))
-                      )
+                permissionsFinder.writePermissions(
+                  ctx.apiKey,
+                  cachePath,
+                  clock.instant()) map { pset =>
+                  /// here, we just terminate the computation early if no write permissions are available.
+                  if (pset.nonEmpty) \/.right(PrecogUnit)
+                  else
+                    \/.left(
+                      storageError(
+                        PermissionsError(
+                          "API key %s has no permission to write to the caching path %s."
+                            .format(ctx.apiKey, cachePath)))
+                    )
                 }
               }
               job <- EitherT.right(
@@ -342,12 +348,13 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
               // FIXME: determination of authorities with which to write the cached data needs to be implemented;
               // for right now, simply using the authorities with which the query itself was written is probably
               // best.
-              val stream = persistingStream(ctx.apiKey,
-                                            cachePath,
-                                            queryRes.authorities,
-                                            Some(job.id),
-                                            raw,
-                                            clock) {
+              val stream = persistingStream(
+                ctx.apiKey,
+                cachePath,
+                queryRes.authorities,
+                Some(job.id),
+                raw,
+                clock) {
                 VFS.derefValue
               }
 
@@ -394,13 +401,14 @@ trait SecureVFSModule[M[+ _], Block] extends VFSModule[M, Block] {
                   // where we might want Create? AFAICT, this is only
                   // used for caching queries right now.
                   val streamRef = StreamRef.Replace(streamId, terminal)
-                  val msg = IngestMessage(apiKey,
-                                          path,
-                                          writeAs,
-                                          ingestRecords,
-                                          jobId,
-                                          clock.instant(),
-                                          streamRef)
+                  val msg = IngestMessage(
+                    apiKey,
+                    path,
+                    writeAs,
+                    ingestRecords,
+                    jobId,
+                    clock.instant(),
+                    streamRef)
                   vfs.writeAllSync(Seq((pseudoOffset, msg))).run
                 }
               } yield {

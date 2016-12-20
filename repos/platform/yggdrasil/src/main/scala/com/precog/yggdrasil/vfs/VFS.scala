@@ -163,8 +163,9 @@ trait VFSModule[M[+ _], Block] extends Logging {
       val acceptableMimeTypes =
         ((Seq(ApplicationJson, XJsonStream, TextCSV).map { mt =>
           mt -> (mt, mt)
-        }) ++ Seq(AnyMimeType -> (XJsonStream, XJsonStream),
-                  OctetStream -> (XJsonStream, OctetStream))).toMap
+        }) ++ Seq(
+          AnyMimeType -> (XJsonStream, XJsonStream),
+          OctetStream -> (XJsonStream, OctetStream))).toMap
       for {
         selectedMT <- OptionT(
           M.point(requestedMimeTypes.find(acceptableMimeTypes.contains)))
@@ -185,9 +186,10 @@ trait VFSModule[M[+ _], Block] extends Logging {
     def byteStream(requestedMimeTypes: Seq[MimeType])(implicit M: Monad[M])
       : OptionT[M, (MimeType, StreamT[M, Array[Byte]])] = {
       import FileContent._
-      val acceptableMimeTypes = Map(mimeType -> mimeType,
-                                    AnyMimeType -> mimeType,
-                                    OctetStream -> OctetStream)
+      val acceptableMimeTypes = Map(
+        mimeType -> mimeType,
+        AnyMimeType -> mimeType,
+        OctetStream -> OctetStream)
       for {
         selectedMT <- OptionT(
           M.point(requestedMimeTypes.find(acceptableMimeTypes.contains)))

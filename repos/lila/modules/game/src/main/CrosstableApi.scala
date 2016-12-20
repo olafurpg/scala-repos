@@ -99,10 +99,11 @@ final class CrosstableApi(coll: Coll) {
               }.reverse
             }
           nbGames <- gameColl.count(selector.some)
-          ctDraft = Crosstable(Crosstable.User(su1, 0),
-                               Crosstable.User(su2, 0),
-                               localResults,
-                               nbGames)
+          ctDraft = Crosstable(
+            Crosstable.User(su1, 0),
+            Crosstable.User(su2, 0),
+            localResults,
+            nbGames)
 
           crosstable <- gameColl
             .aggregate(

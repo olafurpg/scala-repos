@@ -16,8 +16,9 @@ trait StdTags {
     u.TypeTag[List[String]](m, new TypeCreator {
       def apply[U <: ApiUniverse with Singleton](m: Mirror[U]): U#Type = {
         val u = m.universe
-        u.appliedType(u.definitions.ListClass.toType,
-                      List(u.definitions.StringClass.toType))
+        u.appliedType(
+          u.definitions.ListClass.toType,
+          List(u.definitions.StringClass.toType))
       }
     })
 

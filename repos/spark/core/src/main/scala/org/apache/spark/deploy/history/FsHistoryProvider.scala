@@ -216,17 +216,19 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
     if (!conf.contains("spark.testing")) {
       // A task that periodically checks for event log updates on disk.
       logDebug(s"Scheduling update thread every $UPDATE_INTERVAL_S seconds")
-      pool.scheduleWithFixedDelay(getRunner(checkForLogs),
-                                  0,
-                                  UPDATE_INTERVAL_S,
-                                  TimeUnit.SECONDS)
+      pool.scheduleWithFixedDelay(
+        getRunner(checkForLogs),
+        0,
+        UPDATE_INTERVAL_S,
+        TimeUnit.SECONDS)
 
       if (conf.getBoolean("spark.history.fs.cleaner.enabled", false)) {
         // A task that periodically cleans event logs on disk.
-        pool.scheduleWithFixedDelay(getRunner(cleanLogs),
-                                    0,
-                                    CLEAN_INTERVAL_S,
-                                    TimeUnit.SECONDS)
+        pool.scheduleWithFixedDelay(
+          getRunner(cleanLogs),
+          0,
+          CLEAN_INTERVAL_S,
+          TimeUnit.SECONDS)
       }
     } else {
       logDebug("Background update thread disabled for testing")
@@ -257,8 +259,9 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
           val appListener = new ApplicationEventListener()
           replayBus.addListener(appListener)
           val appAttemptInfo =
-            replay(fs.getFileStatus(new Path(logDir, attempt.logPath)),
-                   replayBus)
+            replay(
+              fs.getFileStatus(new Path(logDir, attempt.logPath)),
+              replayBus)
           appAttemptInfo.map { info =>
             val uiAclsEnabled =
               conf.getBoolean("spark.history.ui.acls.enable", false)
@@ -420,9 +423,10 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
             }
             .foreach { attempt =>
               val logPath = new Path(logDir, attempt.logPath)
-              zipFileToStream(new Path(logDir, attempt.logPath),
-                              attempt.logPath,
-                              zipStream)
+              zipFileToStream(
+                new Path(logDir, attempt.logPath),
+                attempt.logPath,
+                zipStream)
             }
         } finally {
           zipStream.close()
@@ -474,13 +478,16 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
             app.attempts
               .filter(_.attemptId != attempt.attemptId)
               .toList ++ List(attempt)
-          new FsApplicationHistoryInfo(attempt.appId,
-                                       attempt.name,
-                                       attempts.sortWith(compareAttemptInfo))
+          new FsApplicationHistoryInfo(
+            attempt.appId,
+            attempt.name,
+            attempts.sortWith(compareAttemptInfo))
         }
-        .getOrElse(new FsApplicationHistoryInfo(attempt.appId,
-                                                attempt.name,
-                                                List(attempt)))
+        .getOrElse(
+          new FsApplicationHistoryInfo(
+            attempt.appId,
+            attempt.name,
+            List(attempt)))
       newAppMap(attempt.appId) = appInfo
     }
 
@@ -539,9 +546,10 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
           appsToRetain += (app.id -> app)
         } else if (toRetain.nonEmpty) {
           appsToRetain +=
-            (app.id -> new FsApplicationHistoryInfo(app.id,
-                                                    app.name,
-                                                    toRetain.toList))
+            (app.id -> new FsApplicationHistoryInfo(
+              app.id,
+              app.name,
+              toRetain.toList))
         }
       }
 
@@ -753,12 +761,13 @@ private class FsApplicationAttemptInfo(val logPath: String,
                                        sparkUser: String,
                                        completed: Boolean,
                                        val fileSize: Long)
-    extends ApplicationAttemptInfo(attemptId,
-                                   startTime,
-                                   endTime,
-                                   lastUpdated,
-                                   sparkUser,
-                                   completed) {
+    extends ApplicationAttemptInfo(
+      attemptId,
+      startTime,
+      endTime,
+      lastUpdated,
+      sparkUser,
+      completed) {
 
   /** extend the superclass string value with the extra attributes of this class */
   override def toString: String = {

@@ -158,9 +158,10 @@ class Partition(val topic: String,
         removePartitionMetrics()
       } catch {
         case e: IOException =>
-          fatal("Error deleting the log for partition [%s,%d]"
-                  .format(topic, partitionId),
-                e)
+          fatal(
+            "Error deleting the log for partition [%s,%d]"
+              .format(topic, partitionId),
+            e)
           Runtime.getRuntime().halt(1)
       }
     }
@@ -264,18 +265,20 @@ class Partition(val topic: String,
 
         debug(
           "Recorded replica %d log end offset (LEO) position %d for partition %s."
-            .format(replicaId,
-                    logReadResult.info.fetchOffsetMetadata.messageOffset,
-                    TopicAndPartition(topic, partitionId)))
+            .format(
+              replicaId,
+              logReadResult.info.fetchOffsetMetadata.messageOffset,
+              TopicAndPartition(topic, partitionId)))
       case None =>
         throw new NotAssignedReplicaException(
           ("Leader %d failed to record follower %d's position %d since the replica" +
             " is not recognized to be one of the assigned replicas %s for partition %s.")
-            .format(localBrokerId,
-                    replicaId,
-                    logReadResult.info.fetchOffsetMetadata.messageOffset,
-                    assignedReplicas().map(_.brokerId).mkString(","),
-                    TopicAndPartition(topic, partitionId)))
+            .format(
+              localBrokerId,
+              replicaId,
+              logReadResult.info.fetchOffsetMetadata.messageOffset,
+              assignedReplicas().map(_.brokerId).mkString(","),
+              TopicAndPartition(topic, partitionId)))
     }
   }
 
@@ -389,11 +392,12 @@ class Partition(val topic: String,
     } else {
       debug(
         "Skipping update high watermark since Old hw %s is larger than new hw %s for partition [%s,%d]. All leo's are %s"
-          .format(oldHighWatermark,
-                  newHighWatermark,
-                  topic,
-                  partitionId,
-                  allLogEndOffsets.mkString(",")))
+          .format(
+            oldHighWatermark,
+            newHighWatermark,
+            topic,
+            partitionId,
+            allLogEndOffsets.mkString(",")))
       false
     }
   }
@@ -507,10 +511,11 @@ class Partition(val topic: String,
   }
 
   private def updateIsr(newIsr: Set[Replica]) {
-    val newLeaderAndIsr = new LeaderAndIsr(localBrokerId,
-                                           leaderEpoch,
-                                           newIsr.map(r => r.brokerId).toList,
-                                           zkVersion)
+    val newLeaderAndIsr = new LeaderAndIsr(
+      localBrokerId,
+      leaderEpoch,
+      newIsr.map(r => r.brokerId).toList,
+      zkVersion)
     val (updateSucceeded, newVersion) = ReplicationUtils.updateLeaderAndIsr(
       zkUtils,
       topic,

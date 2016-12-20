@@ -45,20 +45,23 @@ object MethodRepr {
           case tuple: ScTuple => tuple.exprs
           case _ => Seq(infix.getArgExpr)
         }
-        Some(expr,
-             Some(stripped(infix.getBaseExpr)),
-             Some(infix.operation),
-             args)
+        Some(
+          expr,
+          Some(stripped(infix.getBaseExpr)),
+          Some(infix.operation),
+          args)
       case prefix: ScPrefixExpr =>
-        Some(expr,
-             Some(stripped(prefix.getBaseExpr)),
-             Some(prefix.operation),
-             Seq())
+        Some(
+          expr,
+          Some(stripped(prefix.getBaseExpr)),
+          Some(prefix.operation),
+          Seq())
       case postfix: ScPostfixExpr =>
-        Some(expr,
-             Some(stripped(postfix.getBaseExpr)),
-             Some(postfix.operation),
-             Seq())
+        Some(
+          expr,
+          Some(stripped(postfix.getBaseExpr)),
+          Some(postfix.operation),
+          Seq())
       case refExpr: ScReferenceExpression =>
         refExpr.getParent match {
           case _: ScGenericCall => None

@@ -31,23 +31,26 @@ object Script {
     import extracted._
 
     val embeddedSettings = blocks(script).flatMap { block =>
-      evaluate(eval(),
-               script,
-               block.lines,
-               currentUnit.imports,
-               block.offset + 1)(currentLoader)
+      evaluate(
+        eval(),
+        script,
+        block.lines,
+        currentUnit.imports,
+        block.offset + 1)(currentLoader)
     }
     val scriptAsSource = sources in Compile := script :: Nil
     val asScript =
       scalacOptions ++= Seq("-Xscript", script.getName.stripSuffix(".scala"))
-    val scriptSettings = Seq(asScript,
-                             scriptAsSource,
-                             logLevel in Global := Level.Warn,
-                             showSuccess in Global := false)
-    val append = Load.transformSettings(Load.projectScope(currentRef),
-                                        currentRef.build,
-                                        rootProject,
-                                        scriptSettings ++ embeddedSettings)
+    val scriptSettings = Seq(
+      asScript,
+      scriptAsSource,
+      logLevel in Global := Level.Warn,
+      showSuccess in Global := false)
+    val append = Load.transformSettings(
+      Load.projectScope(currentRef),
+      currentRef.build,
+      rootProject,
+      scriptSettings ++ embeddedSettings)
 
     val newStructure = Load.reapply(session.original ++ append, structure)
     val arguments = state.remainingCommands.drop(1)
@@ -70,8 +73,9 @@ object Script {
           !line.startsWith(BlockEnd)
         }
         val offset = b.offset + dropped.length
-        blocks(Block(offset + block.length, remaining),
-               Block(offset, block.drop(1)) :: acc)
+        blocks(
+          Block(offset + block.length, remaining),
+          Block(offset, block.drop(1)) :: acc)
       }
     blocks(Block(0, lines), Nil)
   }

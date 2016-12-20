@@ -24,8 +24,9 @@ final class WeakHashSet[A <: AnyRef](val initialCapacity: Int,
   import WeakHashSet._
 
   def this() =
-    this(initialCapacity = WeakHashSet.defaultInitialCapacity,
-         loadFactor = WeakHashSet.defaultLoadFactor)
+    this(
+      initialCapacity = WeakHashSet.defaultInitialCapacity,
+      loadFactor = WeakHashSet.defaultLoadFactor)
 
   type This = WeakHashSet[A]
 

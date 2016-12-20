@@ -83,9 +83,10 @@ class NIHDBFileStoreSpec
              Authorities(testAccount),
              None,
              EventId.fromLong(42L),
-             FileContent(loremIpsum.getBytes("UTF-8"),
-                         MimeType("text", "plain"),
-                         RawUTF8Encoding),
+             FileContent(
+               loremIpsum.getBytes("UTF-8"),
+               MimeType("text", "plain"),
+               RawUTF8Encoding),
              Clock.System.instant,
              StreamRef.Create(UUID.randomUUID, true)))))).copoint must beLike {
         case UpdateSuccess(_) => ok

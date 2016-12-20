@@ -138,9 +138,10 @@ private[play] class PollingFileWatchService(val pollDelayMillis: Int)
         var state = WatchState.empty
         while (!stopped) {
           val (triggered, newState) =
-            SourceModificationWatch.watch(distinctPathFinder(filesToWatch.***),
-                                          pollDelayMillis,
-                                          state)(stopped)
+            SourceModificationWatch.watch(
+              distinctPathFinder(filesToWatch.***),
+              pollDelayMillis,
+              state)(stopped)
           if (triggered) onChange()
           state = newState
         }
@@ -182,11 +183,12 @@ private object JNotifyFileWatchService {
                         removeWatchMethod: Method) {
     def addWatch(fileOrDirectory: String, listener: AnyRef): Int = {
       addWatchMethod
-        .invoke(null,
-                fileOrDirectory, // The file or directory to watch
-                15: java.lang.Integer, // flags to say watch for all events
-                true: java.lang.Boolean, // Watch subtree
-                listener)
+        .invoke(
+          null,
+          fileOrDirectory, // The file or directory to watch
+          15: java.lang.Integer, // flags to say watch for all events
+          true: java.lang.Boolean, // Watch subtree
+          listener)
         .asInstanceOf[Int]
     }
     def removeWatch(id: Int): Unit = {
@@ -243,14 +245,16 @@ private object JNotifyFileWatchService {
 
               if (!nativeLibrariesDirectory.exists) {
                 // Unzip native libraries from the jnotify jar to target/native_libraries
-                IO.unzip(jnotifyJarFile,
-                         targetDirectory,
-                         (name: String) => name.startsWith("native_libraries"))
+                IO.unzip(
+                  jnotifyJarFile,
+                  targetDirectory,
+                  (name: String) => name.startsWith("native_libraries"))
               }
 
-              val libs = new File(nativeLibrariesDirectory,
-                                  System.getProperty("sun.arch.data.model") +
-                                    "bits").getAbsolutePath
+              val libs = new File(
+                nativeLibrariesDirectory,
+                System.getProperty("sun.arch.data.model") +
+                  "bits").getAbsolutePath
 
               // Hack to set java.library.path
               System.setProperty("java.library.path", {
@@ -278,18 +282,20 @@ private object JNotifyFileWatchService {
             classloader.loadClass("net.contentobjects.jnotify.JNotify")
           val jnotifyListenerClass =
             classloader.loadClass("net.contentobjects.jnotify.JNotifyListener")
-          val addWatchMethod = jnotifyClass.getMethod("addWatch",
-                                                      classOf[String],
-                                                      classOf[Int],
-                                                      classOf[Boolean],
-                                                      jnotifyListenerClass)
+          val addWatchMethod = jnotifyClass.getMethod(
+            "addWatch",
+            classOf[String],
+            classOf[Int],
+            classOf[Boolean],
+            jnotifyListenerClass)
           val removeWatchMethod =
             jnotifyClass.getMethod("removeWatch", classOf[Int])
 
-          val d = new JNotifyDelegate(classloader,
-                                      jnotifyListenerClass,
-                                      addWatchMethod,
-                                      removeWatchMethod)
+          val d = new JNotifyDelegate(
+            classloader,
+            jnotifyListenerClass,
+            addWatchMethod,
+            removeWatchMethod)
 
           // Try it
           d.ensureLoaded()
@@ -430,12 +436,13 @@ private[runsupport] object GlobalStaticVar {
     // Now we construct a MBean that exposes the AtomicReference.get method
     val getMethod = classOf[AtomicReference[_]].getMethod("get")
     val getInfo = new ModelMBeanOperationInfo("The value", getMethod)
-    val mmbi = new ModelMBeanInfoSupport("GlobalStaticVar",
-                                         "A global static variable",
-                                         null, // no attributes
-                                         null, // no constructors
-                                         Array(getInfo), // the operation
-                                         null); // no notifications
+    val mmbi = new ModelMBeanInfoSupport(
+      "GlobalStaticVar",
+      "A global static variable",
+      null, // no attributes
+      null, // no constructors
+      Array(getInfo), // the operation
+      null); // no notifications
 
     val mmb = new RequiredModelMBean(mmbi)
     mmb.setManagedResource(reference, "ObjectReference")

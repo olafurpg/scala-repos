@@ -15,11 +15,12 @@ class FailureTest
   val exc =
     Gen.oneOf[Throwable](null, new Exception("first"), new Exception("second"))
 
-  val flag = Gen.oneOf(0L,
-                       Failure.Restartable,
-                       Failure.Interrupted,
-                       Failure.Wrapped,
-                       Failure.Naming)
+  val flag = Gen.oneOf(
+    0L,
+    Failure.Restartable,
+    Failure.Interrupted,
+    Failure.Wrapped,
+    Failure.Naming)
 
   val flag2 = for (f1 <- flag; f2 <- flag if f1 != f2) yield f1 | f2
 
@@ -102,10 +103,12 @@ class FailureTest
     assertFail(Failure("ok", Failure.Restartable), Failure("ok"))
 
     assertFail(Failure("ok"), Failure("ok"))
-    assertFail(Failure("ok", Failure.Interrupted),
-               Failure("ok", Failure.Interrupted))
-    assertFail(Failure("ok", Failure.Interrupted | Failure.Restartable),
-               Failure("ok", Failure.Interrupted))
+    assertFail(
+      Failure("ok", Failure.Interrupted),
+      Failure("ok", Failure.Interrupted))
+    assertFail(
+      Failure("ok", Failure.Interrupted | Failure.Restartable),
+      Failure("ok", Failure.Interrupted))
 
     val inner = new Exception
     assertFail(Failure.wrap(inner), inner)

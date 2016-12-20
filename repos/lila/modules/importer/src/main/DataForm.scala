@@ -57,8 +57,9 @@ case class ImportData(pgn: String, analyse: Option[String]) {
               tag(_.Variant)
                 .map(Chess960.fixVariantName)
                 .flatMap(chess.variant.Variant.byName) | {
-                fromPosition.fold(chess.variant.FromPosition,
-                                  chess.variant.Standard)
+                fromPosition.fold(
+                  chess.variant.FromPosition,
+                  chess.variant.Standard)
               }
             } match {
               case chess.variant.Chess960

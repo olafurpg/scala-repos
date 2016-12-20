@@ -238,8 +238,9 @@ case class GetJsonObject(json: Expression, path: Expression)
         }
         dirty
 
-      case (START_ARRAY,
-            Subscript :: Wildcard :: Subscript :: Wildcard :: xs) =>
+      case (
+          START_ARRAY,
+          Subscript :: Wildcard :: Subscript :: Wildcard :: xs) =>
         // special handling for the non-structure preserving double wildcard behavior in Hive
         var dirty = false
         g.writeStartArray()
@@ -298,8 +299,9 @@ case class GetJsonObject(json: Expression, path: Expression)
 
         dirty
 
-      case (START_ARRAY,
-            Subscript :: Index(idx) :: (xs @ Subscript :: Wildcard :: _)) =>
+      case (
+          START_ARRAY,
+          Subscript :: Index(idx) :: (xs @ Subscript :: Wildcard :: _)) =>
         p.nextToken()
         // we're going to have 1 or more results, switch to QuotedStyle
         arrayIndex(p, () => evaluatePath(p, g, QuotedStyle, xs))(idx)
@@ -467,9 +469,10 @@ case class JsonTuple(children: Seq[Expression])
       case JsonToken.VALUE_STRING if parser.hasTextCharacters =>
         // slight optimization to avoid allocating a String instance, though the characters
         // still have to be decoded... Jackson doesn't have a way to access the raw bytes
-        generator.writeRaw(parser.getTextCharacters,
-                           parser.getTextOffset,
-                           parser.getTextLength)
+        generator.writeRaw(
+          parser.getTextCharacters,
+          parser.getTextOffset,
+          parser.getTextLength)
 
       case JsonToken.VALUE_STRING =>
         // the normal String case, pass it through to the output without enclosing quotes

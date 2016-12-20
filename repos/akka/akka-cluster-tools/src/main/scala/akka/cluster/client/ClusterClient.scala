@@ -124,8 +124,9 @@ final class ClusterClientSettings(
     val reconnectTimeout: Option[FiniteDuration])
     extends NoSerializationVerificationNeeded {
 
-  require(bufferSize >= 0 && bufferSize <= 10000,
-          "bufferSize must be >= 0 and <= 10000")
+  require(
+    bufferSize >= 0 && bufferSize <= 10000,
+    "bufferSize must be >= 0 and <= 10000")
 
   /**
     * For binary/source compatibility
@@ -136,13 +137,14 @@ final class ClusterClientSettings(
            heartbeatInterval: FiniteDuration,
            acceptableHeartbeatPause: FiniteDuration,
            bufferSize: Int) =
-    this(initialContacts,
-         establishingGetContactsInterval,
-         refreshContactsInterval,
-         heartbeatInterval,
-         acceptableHeartbeatPause,
-         bufferSize,
-         None)
+    this(
+      initialContacts,
+      establishingGetContactsInterval,
+      refreshContactsInterval,
+      heartbeatInterval,
+      acceptableHeartbeatPause,
+      bufferSize,
+      None)
 
   /**
     * Scala API
@@ -173,8 +175,9 @@ final class ClusterClientSettings(
   def withHeartbeat(
       heartbeatInterval: FiniteDuration,
       acceptableHeartbeatPause: FiniteDuration): ClusterClientSettings =
-    copy(heartbeatInterval = heartbeatInterval,
-         acceptableHeartbeatPause = acceptableHeartbeatPause)
+    copy(
+      heartbeatInterval = heartbeatInterval,
+      acceptableHeartbeatPause = acceptableHeartbeatPause)
 
   def withBufferSize(bufferSize: Int): ClusterClientSettings =
     copy(bufferSize = bufferSize)
@@ -193,13 +196,14 @@ final class ClusterClientSettings(
       bufferSize: Int = bufferSize,
       reconnectTimeout: Option[FiniteDuration] = reconnectTimeout)
     : ClusterClientSettings =
-    new ClusterClientSettings(initialContacts,
-                              establishingGetContactsInterval,
-                              refreshContactsInterval,
-                              heartbeatInterval,
-                              acceptableHeartbeatPause,
-                              bufferSize,
-                              reconnectTimeout)
+    new ClusterClientSettings(
+      initialContacts,
+      establishingGetContactsInterval,
+      refreshContactsInterval,
+      heartbeatInterval,
+      acceptableHeartbeatPause,
+      bufferSize,
+      reconnectTimeout)
 }
 
 object ClusterClient {
@@ -364,8 +368,9 @@ final class ClusterClient(settings: ClusterClientSettings)
       receptionist forward DistributedPubSubMediator.Publish(topic, msg)
     case HeartbeatTick ⇒
       if (!failureDetector.isAvailable) {
-        log.info("Lost contact with [{}], restablishing connection",
-                 receptionist)
+        log.info(
+          "Lost contact with [{}], restablishing connection",
+          receptionist)
         sendGetContacts()
         scheduleRefreshContactsTick(establishingGetContactsInterval)
         context.become(establishing)
@@ -404,8 +409,9 @@ final class ClusterClient(settings: ClusterClientSettings)
         m.getClass.getName)
       buffer.addLast((msg, sender()))
     } else {
-      log.debug("Receptionist not available, buffering message type [{}]",
-                msg.getClass.getName)
+      log.debug(
+        "Receptionist not available, buffering message type [{}]",
+        msg.getClass.getName)
       buffer.addLast((msg, sender()))
     }
 
@@ -586,9 +592,10 @@ final class ClusterReceptionistSettings(
       numberOfContacts: Int = numberOfContacts,
       responseTunnelReceiveTimeout: FiniteDuration =
         responseTunnelReceiveTimeout): ClusterReceptionistSettings =
-    new ClusterReceptionistSettings(role,
-                                    numberOfContacts,
-                                    responseTunnelReceiveTimeout)
+    new ClusterReceptionistSettings(
+      role,
+      numberOfContacts,
+      responseTunnelReceiveTimeout)
 }
 
 /**
@@ -728,10 +735,12 @@ final class ClusterReceptionist(pubSubMediator: ActorRef,
     context.child(encName) match {
       case Some(tunnel) ⇒ tunnel
       case None ⇒
-        context.actorOf(Props(classOf[ClientResponseTunnel],
-                              client,
-                              responseTunnelReceiveTimeout),
-                        encName)
+        context.actorOf(
+          Props(
+            classOf[ClientResponseTunnel],
+            client,
+            responseTunnelReceiveTimeout),
+          encName)
     }
   }
 
@@ -754,9 +763,10 @@ final class ClusterReceptionist(pubSubMediator: ActorRef,
         val contacts = Contacts(
           nodes.map(a ⇒ self.path.toStringWithAddress(a))(collection.breakOut))
         if (log.isDebugEnabled)
-          log.debug("Client [{}] gets contactPoints [{}] (all nodes)",
-                    sender().path,
-                    contacts.contactPoints.mkString(","))
+          log.debug(
+            "Client [{}] gets contactPoints [{}] (all nodes)",
+            sender().path,
+            contacts.contactPoints.mkString(","))
         sender() ! contacts
       } else {
         // using toStringWithAddress in case the client is local, normally it is not, and
@@ -771,9 +781,10 @@ final class ClusterReceptionist(pubSubMediator: ActorRef,
         val contacts = Contacts(
           slice.map(a ⇒ self.path.toStringWithAddress(a))(collection.breakOut))
         if (log.isDebugEnabled)
-          log.debug("Client [{}] gets contactPoints [{}]",
-                    sender().path,
-                    contacts.contactPoints.mkString(","))
+          log.debug(
+            "Client [{}] gets contactPoints [{}]",
+            sender().path,
+            contacts.contactPoints.mkString(","))
         sender() ! contacts
       }
 

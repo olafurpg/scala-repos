@@ -51,8 +51,9 @@ private[stream] object ReactiveStreamsCompliance {
   final def rejectDuplicateSubscriber[T](subscriber: Subscriber[T]): Unit = {
     // since it is already subscribed it has received the subscription first
     // and we can emit onError immediately
-    tryOnError(subscriber,
-               canNotSubscribeTheSameSubscriberMultipleTimesException)
+    tryOnError(
+      subscriber,
+      canNotSubscribeTheSameSubscriberMultipleTimesException)
   }
 
   final def rejectAdditionalSubscriber[T](subscriber: Subscriber[T],

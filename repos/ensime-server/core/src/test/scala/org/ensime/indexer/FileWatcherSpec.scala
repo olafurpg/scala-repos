@@ -375,8 +375,9 @@ class ApacheFileWatcherSpec extends FileWatcherSpec {
 
   override def createJarWatcher(jar: File)(implicit vfs: EnsimeVFS,
                                            tk: TestKit): Watcher =
-    new ApachePollingFileWatcher(jar.getParentFile,
-                                 JarSelector,
-                                 false,
-                                 listeners)
+    new ApachePollingFileWatcher(
+      jar.getParentFile,
+      JarSelector,
+      false,
+      listeners)
 }

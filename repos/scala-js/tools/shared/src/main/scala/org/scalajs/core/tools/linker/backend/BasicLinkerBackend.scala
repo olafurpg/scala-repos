@@ -61,10 +61,11 @@ final class BasicLinkerBackend(
 
   private def newBuilder(output: WritableVirtualJSFile): JSFileBuilder = {
     if (withSourceMap) {
-      new JSFileBuilderWithSourceMap(output.name,
-                                     output.contentWriter,
-                                     output.sourceMapWriter,
-                                     config.relativizeSourceMapBase)
+      new JSFileBuilderWithSourceMap(
+        output.name,
+        output.contentWriter,
+        output.sourceMapWriter,
+        config.relativizeSourceMapBase)
     } else {
       new JSFileBuilder(output.name, output.contentWriter)
     }

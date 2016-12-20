@@ -108,18 +108,20 @@ class MigrationTest
 
     f.store.load("internal:storage:version") returns Future.successful(
       Some(
-        InMemoryEntity(id = "internal:storage:version",
-                       version = 0,
-                       bytes = minVersion.toByteArray)))
+        InMemoryEntity(
+          id = "internal:storage:version",
+          version = 0,
+          bytes = minVersion.toByteArray)))
     f.store.initialize() returns Future.successful(())
 
     Given("An unsupported storage version")
     val unsupportedVersion = StorageVersions(0, 2, 0)
     f.store.load("internal:storage:version") returns Future.successful(
       Some(
-        InMemoryEntity(id = "internal:storage:version",
-                       version = 0,
-                       bytes = unsupportedVersion.toByteArray)))
+        InMemoryEntity(
+          id = "internal:storage:version",
+          version = 0,
+          bytes = unsupportedVersion.toByteArray)))
 
     When("A migration is approached for that version")
     val ex = intercept[RuntimeException] {
@@ -153,11 +155,12 @@ class MigrationTest
         prefix = "task:"),
       metrics
     )
-    val migration = new Migration(store,
-                                  appRepo,
-                                  groupRepo,
-                                  taskRepo,
-                                  config,
-                                  new Metrics(new MetricRegistry))
+    val migration = new Migration(
+      store,
+      appRepo,
+      groupRepo,
+      taskRepo,
+      config,
+      new Metrics(new MetricRegistry))
   }
 }

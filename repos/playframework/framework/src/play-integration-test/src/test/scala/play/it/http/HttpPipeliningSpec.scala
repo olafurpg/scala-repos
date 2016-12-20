@@ -33,12 +33,13 @@ trait HttpPipeliningSpec
     def withServer[T](action: EssentialAction)(block: Port => T) = {
       val port = testServerPort
       running(
-        TestServer(port,
-                   GuiceApplicationBuilder()
-                     .routes {
-                       case _ => action
-                     }
-                     .build())) {
+        TestServer(
+          port,
+          GuiceApplicationBuilder()
+            .routes {
+              case _ => action
+            }
+            .build())) {
         block(port)
       }
     }
@@ -70,9 +71,10 @@ trait HttpPipeliningSpec
             Accumulator.done(
               Results.Ok.chunked(
                 Source
-                  .tick(initialDelay = 50.milliseconds,
-                        interval = 50.milliseconds,
-                        tick = "chunk")
+                  .tick(
+                    initialDelay = 50.milliseconds,
+                    interval = 50.milliseconds,
+                    tick = "chunk")
                   .take(3))
             )
           case "/short" => Accumulator.done(Results.Ok("short"))

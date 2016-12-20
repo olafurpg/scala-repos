@@ -35,14 +35,14 @@ class MultipartSpec
         Multipart.General(
           MediaTypes.`multipart/mixed`,
           Source(
-            Multipart.General.BodyPart(defaultEntity("data"),
-                                       List(ETag("xzy"))) :: Nil))
+            Multipart.General
+              .BodyPart(defaultEntity("data"), List(ETag("xzy"))) :: Nil))
       val strict = Await.result(streamed.toStrict(1.second), 1.second)
 
       strict shouldEqual Multipart.General(
         MediaTypes.`multipart/mixed`,
-        Multipart.General.BodyPart.Strict(HttpEntity("data"),
-                                          List(ETag("xzy"))))
+        Multipart.General.BodyPart
+          .Strict(HttpEntity("data"), List(ETag("xzy"))))
     }
   }
 
@@ -68,25 +68,27 @@ class MultipartSpec
             ContentRange(0, 6),
             defaultEntity("snippet"),
             _additionalHeaders = List(ETag("abc"))) :: Multipart.ByteRanges
-            .BodyPart(ContentRange(8, 9),
-                      defaultEntity("PR"),
-                      _additionalHeaders = List(ETag("xzy"))) :: Nil))
+            .BodyPart(
+              ContentRange(8, 9),
+              defaultEntity("PR"),
+              _additionalHeaders = List(ETag("xzy"))) :: Nil))
       val strict = Await.result(streamed.toStrict(1.second), 1.second)
 
       strict shouldEqual Multipart.ByteRanges(
-        Multipart.ByteRanges.BodyPart.Strict(ContentRange(0, 6),
-                                             HttpEntity("snippet"),
-                                             additionalHeaders =
-                                               List(ETag("abc"))),
-        Multipart.ByteRanges.BodyPart.Strict(ContentRange(8, 9),
-                                             HttpEntity("PR"),
-                                             additionalHeaders =
-                                               List(ETag("xzy"))))
+        Multipart.ByteRanges.BodyPart.Strict(
+          ContentRange(0, 6),
+          HttpEntity("snippet"),
+          additionalHeaders = List(ETag("abc"))),
+        Multipart.ByteRanges.BodyPart.Strict(
+          ContentRange(8, 9),
+          HttpEntity("PR"),
+          additionalHeaders = List(ETag("xzy"))))
     }
   }
 
   def defaultEntity(content: String) =
-    HttpEntity.Default(ContentTypes.`text/plain(UTF-8)`,
-                       content.length,
-                       Source(ByteString(content) :: Nil))
+    HttpEntity.Default(
+      ContentTypes.`text/plain(UTF-8)`,
+      content.length,
+      Source(ByteString(content) :: Nil))
 }

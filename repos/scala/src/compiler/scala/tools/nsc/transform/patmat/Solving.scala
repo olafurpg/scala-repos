@@ -440,9 +440,10 @@ trait Solving extends Logic {
 
             val solution = TseitinSolution(model, unassigned)
             val negated = negateModel(model)
-            findAllModels(clauses :+ negated,
-                          solution :: models,
-                          recursionDepthAllowed - 1)
+            findAllModels(
+              clauses :+ negated,
+              solution :: models,
+              recursionDepthAllowed - 1)
           } else models
         }
 
@@ -472,8 +473,9 @@ trait Solving extends Logic {
     }
 
     def findModelFor(solvable: Solvable): Model = {
-      projectToModel(findTseitinModelFor(solvable.cnf),
-                     solvable.symbolMapping.symForVar)
+      projectToModel(
+        findTseitinModelFor(solvable.cnf),
+        solvable.symbolMapping.symForVar)
     }
 
     def findTseitinModelFor(clauses: Array[Clause]): TseitinModel = {
@@ -520,8 +522,9 @@ trait Solving extends Logic {
               } else {
                 val split = clauses.head.head
                 // debug.patmat("split: "+ split)
-                orElse(findTseitinModelFor(clauses :+ clause(split)),
-                       findTseitinModelFor(clauses :+ clause(-split)))
+                orElse(
+                  findTseitinModelFor(clauses :+ clause(split)),
+                  findTseitinModelFor(clauses :+ clause(-split)))
               }
           }
 

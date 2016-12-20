@@ -23,8 +23,9 @@ final class ModApi(logApi: ModlogApi,
       (user.engine != v) ?? {
         logApi.engine(mod, user.id, v) zip UserRepo.setEngine(user.id, v) >>- {
           if (v)
-            lilaBus.publish(lila.hub.actorApi.mod.MarkCheater(user.id),
-                            'adjustCheater)
+            lilaBus.publish(
+              lila.hub.actorApi.mod.MarkCheater(user.id),
+              'adjustCheater)
           reporter ! lila.hub.actorApi.report.MarkCheater(user.id, mod)
         } void
       }
@@ -48,8 +49,9 @@ final class ModApi(logApi: ModlogApi,
       (user.booster != v) ?? {
         logApi.booster(mod, user.id, v) zip UserRepo.setBooster(user.id, v) >>- {
           if (v)
-            lilaBus.publish(lila.hub.actorApi.mod.MarkBooster(user.id),
-                            'adjustBooster)
+            lilaBus.publish(
+              lila.hub.actorApi.mod.MarkBooster(user.id),
+              'adjustBooster)
         } void
       }
     }

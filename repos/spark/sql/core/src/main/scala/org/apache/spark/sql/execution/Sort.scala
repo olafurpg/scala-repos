@@ -80,11 +80,12 @@ case class Sort(sortOrder: Seq[SortOrder],
     }
 
     val pageSize = SparkEnv.get.memoryManager.pageSizeBytes
-    val sorter = new UnsafeExternalRowSorter(schema,
-                                             ordering,
-                                             prefixComparator,
-                                             prefixComputer,
-                                             pageSize)
+    val sorter = new UnsafeExternalRowSorter(
+      schema,
+      ordering,
+      prefixComparator,
+      prefixComputer,
+      pageSize)
     if (testSpillFrequency > 0) {
       sorter.setTestSpillFrequency(testSpillFrequency)
     }
@@ -130,22 +131,25 @@ case class Sort(sortOrder: Seq[SortOrder],
     // the iterator to return sorted rows.
     val thisPlan = ctx.addReferenceObj("plan", this)
     sorterVariable = ctx.freshName("sorter")
-    ctx.addMutableState(classOf[UnsafeExternalRowSorter].getName,
-                        sorterVariable,
-                        s"$sorterVariable = $thisPlan.createSorter();")
+    ctx.addMutableState(
+      classOf[UnsafeExternalRowSorter].getName,
+      sorterVariable,
+      s"$sorterVariable = $thisPlan.createSorter();")
     val metrics = ctx.freshName("metrics")
     ctx.addMutableState(
       classOf[TaskMetrics].getName,
       metrics,
       s"$metrics = org.apache.spark.TaskContext.get().taskMetrics();")
     val sortedIterator = ctx.freshName("sortedIter")
-    ctx.addMutableState("scala.collection.Iterator<UnsafeRow>",
-                        sortedIterator,
-                        "")
+    ctx.addMutableState(
+      "scala.collection.Iterator<UnsafeRow>",
+      sortedIterator,
+      "")
 
     val addToSorter = ctx.freshName("addToSorter")
-    ctx.addNewFunction(addToSorter,
-                       s"""
+    ctx.addNewFunction(
+      addToSorter,
+      s"""
         | private void $addToSorter() throws java.io.IOException {
         |   ${child.asInstanceOf[CodegenSupport].produce(ctx, this)}
         | }

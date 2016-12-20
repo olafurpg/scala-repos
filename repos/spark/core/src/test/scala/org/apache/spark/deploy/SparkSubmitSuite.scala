@@ -114,29 +114,31 @@ class SparkSubmitSuite
   }
 
   test("handles arguments to user program") {
-    val clArgs = Seq("--name",
-                     "myApp",
-                     "--class",
-                     "Foo",
-                     "userjar.jar",
-                     "some",
-                     "--weird",
-                     "args")
+    val clArgs = Seq(
+      "--name",
+      "myApp",
+      "--class",
+      "Foo",
+      "userjar.jar",
+      "some",
+      "--weird",
+      "args")
     val appArgs = new SparkSubmitArguments(clArgs)
     appArgs.childArgs should be(Seq("some", "--weird", "args"))
   }
 
   test("handles arguments to user program with name collision") {
-    val clArgs = Seq("--name",
-                     "myApp",
-                     "--class",
-                     "Foo",
-                     "userjar.jar",
-                     "--master",
-                     "local",
-                     "some",
-                     "--weird",
-                     "args")
+    val clArgs = Seq(
+      "--name",
+      "myApp",
+      "--class",
+      "Foo",
+      "userjar.jar",
+      "--master",
+      "local",
+      "some",
+      "--weird",
+      "args")
     val appArgs = new SparkSubmitArguments(clArgs)
     appArgs.childArgs should be(
       Seq("--master", "local", "some", "--weird", "args"))
@@ -193,35 +195,36 @@ class SparkSubmitSuite
   }
 
   test("handles YARN cluster mode") {
-    val clArgs = Seq("--deploy-mode",
-                     "cluster",
-                     "--master",
-                     "yarn",
-                     "--executor-memory",
-                     "5g",
-                     "--executor-cores",
-                     "5",
-                     "--class",
-                     "org.SomeClass",
-                     "--jars",
-                     "one.jar,two.jar,three.jar",
-                     "--driver-memory",
-                     "4g",
-                     "--queue",
-                     "thequeue",
-                     "--files",
-                     "file1.txt,file2.txt",
-                     "--archives",
-                     "archive1.txt,archive2.txt",
-                     "--num-executors",
-                     "6",
-                     "--name",
-                     "beauty",
-                     "--conf",
-                     "spark.ui.enabled=false",
-                     "thejar.jar",
-                     "arg1",
-                     "arg2")
+    val clArgs = Seq(
+      "--deploy-mode",
+      "cluster",
+      "--master",
+      "yarn",
+      "--executor-memory",
+      "5g",
+      "--executor-cores",
+      "5",
+      "--class",
+      "org.SomeClass",
+      "--jars",
+      "one.jar,two.jar,three.jar",
+      "--driver-memory",
+      "4g",
+      "--queue",
+      "thequeue",
+      "--files",
+      "file1.txt,file2.txt",
+      "--archives",
+      "archive1.txt,archive2.txt",
+      "--num-executors",
+      "6",
+      "--name",
+      "beauty",
+      "--conf",
+      "spark.ui.enabled=false",
+      "thejar.jar",
+      "arg1",
+      "arg2")
     val appArgs = new SparkSubmitArguments(clArgs)
     val (childArgs, classpath, sysProps, mainClass) =
       prepareSubmitEnvironment(appArgs)
@@ -247,35 +250,36 @@ class SparkSubmitSuite
   }
 
   test("handles YARN client mode") {
-    val clArgs = Seq("--deploy-mode",
-                     "client",
-                     "--master",
-                     "yarn",
-                     "--executor-memory",
-                     "5g",
-                     "--executor-cores",
-                     "5",
-                     "--class",
-                     "org.SomeClass",
-                     "--jars",
-                     "one.jar,two.jar,three.jar",
-                     "--driver-memory",
-                     "4g",
-                     "--queue",
-                     "thequeue",
-                     "--files",
-                     "file1.txt,file2.txt",
-                     "--archives",
-                     "archive1.txt,archive2.txt",
-                     "--num-executors",
-                     "6",
-                     "--name",
-                     "trill",
-                     "--conf",
-                     "spark.ui.enabled=false",
-                     "thejar.jar",
-                     "arg1",
-                     "arg2")
+    val clArgs = Seq(
+      "--deploy-mode",
+      "client",
+      "--master",
+      "yarn",
+      "--executor-memory",
+      "5g",
+      "--executor-cores",
+      "5",
+      "--class",
+      "org.SomeClass",
+      "--jars",
+      "one.jar,two.jar,three.jar",
+      "--driver-memory",
+      "4g",
+      "--queue",
+      "thequeue",
+      "--files",
+      "file1.txt,file2.txt",
+      "--archives",
+      "archive1.txt,archive2.txt",
+      "--num-executors",
+      "6",
+      "--name",
+      "trill",
+      "--conf",
+      "spark.ui.enabled=false",
+      "thejar.jar",
+      "arg1",
+      "arg2")
     val appArgs = new SparkSubmitArguments(clArgs)
     val (childArgs, classpath, sysProps, mainClass) =
       prepareSubmitEnvironment(appArgs)
@@ -314,22 +318,23 @@ class SparkSubmitSuite
     * @param useRest whether to use the REST submission gateway introduced in Spark 1.3
     */
   private def testStandaloneCluster(useRest: Boolean): Unit = {
-    val clArgs = Seq("--deploy-mode",
-                     "cluster",
-                     "--master",
-                     "spark://h:p",
-                     "--class",
-                     "org.SomeClass",
-                     "--supervise",
-                     "--driver-memory",
-                     "4g",
-                     "--driver-cores",
-                     "5",
-                     "--conf",
-                     "spark.ui.enabled=false",
-                     "thejar.jar",
-                     "arg1",
-                     "arg2")
+    val clArgs = Seq(
+      "--deploy-mode",
+      "cluster",
+      "--master",
+      "spark://h:p",
+      "--class",
+      "org.SomeClass",
+      "--supervise",
+      "--driver-memory",
+      "4g",
+      "--driver-cores",
+      "5",
+      "--conf",
+      "spark.ui.enabled=false",
+      "thejar.jar",
+      "arg1",
+      "arg2")
     val appArgs = new SparkSubmitArguments(clArgs)
     appArgs.useRest = useRest
     val (childArgs, classpath, sysProps, mainClass) = prepareSubmitEnvironment(
@@ -358,23 +363,24 @@ class SparkSubmitSuite
   }
 
   test("handles standalone client mode") {
-    val clArgs = Seq("--deploy-mode",
-                     "client",
-                     "--master",
-                     "spark://h:p",
-                     "--executor-memory",
-                     "5g",
-                     "--total-executor-cores",
-                     "5",
-                     "--class",
-                     "org.SomeClass",
-                     "--driver-memory",
-                     "4g",
-                     "--conf",
-                     "spark.ui.enabled=false",
-                     "thejar.jar",
-                     "arg1",
-                     "arg2")
+    val clArgs = Seq(
+      "--deploy-mode",
+      "client",
+      "--master",
+      "spark://h:p",
+      "--executor-memory",
+      "5g",
+      "--total-executor-cores",
+      "5",
+      "--class",
+      "org.SomeClass",
+      "--driver-memory",
+      "4g",
+      "--conf",
+      "spark.ui.enabled=false",
+      "thejar.jar",
+      "arg1",
+      "arg2")
     val appArgs = new SparkSubmitArguments(clArgs)
     val (childArgs, classpath, sysProps, mainClass) =
       prepareSubmitEnvironment(appArgs)
@@ -388,23 +394,24 @@ class SparkSubmitSuite
   }
 
   test("handles mesos client mode") {
-    val clArgs = Seq("--deploy-mode",
-                     "client",
-                     "--master",
-                     "mesos://h:p",
-                     "--executor-memory",
-                     "5g",
-                     "--total-executor-cores",
-                     "5",
-                     "--class",
-                     "org.SomeClass",
-                     "--driver-memory",
-                     "4g",
-                     "--conf",
-                     "spark.ui.enabled=false",
-                     "thejar.jar",
-                     "arg1",
-                     "arg2")
+    val clArgs = Seq(
+      "--deploy-mode",
+      "client",
+      "--master",
+      "mesos://h:p",
+      "--executor-memory",
+      "5g",
+      "--total-executor-cores",
+      "5",
+      "--class",
+      "org.SomeClass",
+      "--driver-memory",
+      "4g",
+      "--conf",
+      "spark.ui.enabled=false",
+      "thejar.jar",
+      "arg1",
+      "arg2")
     val appArgs = new SparkSubmitArguments(clArgs)
     val (childArgs, classpath, sysProps, mainClass) =
       prepareSubmitEnvironment(appArgs)
@@ -418,19 +425,20 @@ class SparkSubmitSuite
   }
 
   test("handles confs with flag equivalents") {
-    val clArgs = Seq("--deploy-mode",
-                     "cluster",
-                     "--executor-memory",
-                     "5g",
-                     "--class",
-                     "org.SomeClass",
-                     "--conf",
-                     "spark.executor.memory=4g",
-                     "--conf",
-                     "spark.master=yarn",
-                     "thejar.jar",
-                     "arg1",
-                     "arg2")
+    val clArgs = Seq(
+      "--deploy-mode",
+      "cluster",
+      "--executor-memory",
+      "5g",
+      "--class",
+      "org.SomeClass",
+      "--conf",
+      "spark.executor.memory=4g",
+      "--conf",
+      "spark.master=yarn",
+      "thejar.jar",
+      "arg1",
+      "arg2")
     val appArgs = new SparkSubmitArguments(clArgs)
     val (_, _, sysProps, mainClass) = prepareSubmitEnvironment(appArgs)
     sysProps("spark.executor.memory") should be("5g")
@@ -441,17 +449,18 @@ class SparkSubmitSuite
 
   test("launch simple application with spark-submit") {
     val unusedJar = TestUtils.createJarWithClasses(Seq.empty)
-    val args = Seq("--class",
-                   SimpleApplicationTest.getClass.getName.stripSuffix("$"),
-                   "--name",
-                   "testApp",
-                   "--master",
-                   "local",
-                   "--conf",
-                   "spark.ui.enabled=false",
-                   "--conf",
-                   "spark.master.rest.enabled=false",
-                   unusedJar.toString)
+    val args = Seq(
+      "--class",
+      SimpleApplicationTest.getClass.getName.stripSuffix("$"),
+      "--name",
+      "testApp",
+      "--master",
+      "local",
+      "--conf",
+      "spark.ui.enabled=false",
+      "--conf",
+      "spark.master.rest.enabled=false",
+      unusedJar.toString)
     runSparkSubmit(args)
   }
 
@@ -460,21 +469,22 @@ class SparkSubmitSuite
     val jar1 = TestUtils.createJarWithClasses(Seq("SparkSubmitClassA"))
     val jar2 = TestUtils.createJarWithClasses(Seq("SparkSubmitClassB"))
     val jarsString = Seq(jar1, jar2).map(j => j.toString).mkString(",")
-    val args = Seq("--class",
-                   JarCreationTest.getClass.getName.stripSuffix("$"),
-                   "--name",
-                   "testApp",
-                   "--master",
-                   "local-cluster[2,1,1024]",
-                   "--conf",
-                   "spark.ui.enabled=false",
-                   "--conf",
-                   "spark.master.rest.enabled=false",
-                   "--jars",
-                   jarsString,
-                   unusedJar.toString,
-                   "SparkSubmitClassA",
-                   "SparkSubmitClassB")
+    val args = Seq(
+      "--class",
+      JarCreationTest.getClass.getName.stripSuffix("$"),
+      "--name",
+      "testApp",
+      "--master",
+      "local-cluster[2,1,1024]",
+      "--conf",
+      "spark.ui.enabled=false",
+      "--conf",
+      "spark.master.rest.enabled=false",
+      "--jars",
+      jarsString,
+      unusedJar.toString,
+      "SparkSubmitClassA",
+      "SparkSubmitClassB")
     runSparkSubmit(args)
   }
 
@@ -484,23 +494,24 @@ class SparkSubmitSuite
     val main = MavenCoordinate("my.great.lib", "mylib", "0.1")
     val dep = MavenCoordinate("my.great.dep", "mylib", "0.1")
     IvyTestUtils.withRepository(main, Some(dep.toString), None) { repo =>
-      val args = Seq("--class",
-                     JarCreationTest.getClass.getName.stripSuffix("$"),
-                     "--name",
-                     "testApp",
-                     "--master",
-                     "local-cluster[2,1,1024]",
-                     "--packages",
-                     Seq(main, dep).mkString(","),
-                     "--repositories",
-                     repo,
-                     "--conf",
-                     "spark.ui.enabled=false",
-                     "--conf",
-                     "spark.master.rest.enabled=false",
-                     unusedJar.toString,
-                     "my.great.lib.MyLib",
-                     "my.great.dep.MyLib")
+      val args = Seq(
+        "--class",
+        JarCreationTest.getClass.getName.stripSuffix("$"),
+        "--name",
+        "testApp",
+        "--master",
+        "local-cluster[2,1,1024]",
+        "--packages",
+        Seq(main, dep).mkString(","),
+        "--repositories",
+        repo,
+        "--conf",
+        "spark.ui.enabled=false",
+        "--conf",
+        "spark.master.rest.enabled=false",
+        unusedJar.toString,
+        "my.great.lib.MyLib",
+        "my.great.dep.MyLib")
       runSparkSubmit(args)
     }
   }
@@ -517,18 +528,19 @@ class SparkSubmitSuite
         .mkString(File.separator)
     assert(new File(rScriptDir).exists)
     IvyTestUtils.withRepository(main, None, None, withR = true) { repo =>
-      val args = Seq("--name",
-                     "testApp",
-                     "--master",
-                     "local-cluster[2,1,1024]",
-                     "--packages",
-                     main.toString,
-                     "--repositories",
-                     repo,
-                     "--verbose",
-                     "--conf",
-                     "spark.ui.enabled=false",
-                     rScriptDir)
+      val args = Seq(
+        "--name",
+        "testApp",
+        "--master",
+        "local-cluster[2,1,1024]",
+        "--packages",
+        main.toString,
+        "--repositories",
+        repo,
+        "--verbose",
+        "--conf",
+        "spark.ui.enabled=false",
+        rScriptDir)
       runSparkSubmit(args)
     }
   }
@@ -540,15 +552,16 @@ class SparkSubmitSuite
     val pyFiles = "py-file1,py-file2" // --py-files
 
     // Test jars and files
-    val clArgs = Seq("--master",
-                     "local",
-                     "--class",
-                     "org.SomeClass",
-                     "--jars",
-                     jars,
-                     "--files",
-                     files,
-                     "thejar.jar")
+    val clArgs = Seq(
+      "--master",
+      "local",
+      "--class",
+      "org.SomeClass",
+      "--jars",
+      jars,
+      "--files",
+      files,
+      "thejar.jar")
     val appArgs = new SparkSubmitArguments(clArgs)
     val sysProps = SparkSubmit.prepareSubmitEnvironment(appArgs)._3
     appArgs.jars should be(Utils.resolveURIs(jars))
@@ -662,34 +675,36 @@ class SparkSubmitSuite
     val systemJar =
       TestUtils.createJarWithFiles(Map("test.resource" -> "SYSTEM"))
     val userJar = TestUtils.createJarWithFiles(Map("test.resource" -> "USER"))
-    val args = Seq("--class",
-                   UserClasspathFirstTest.getClass.getName.stripSuffix("$"),
-                   "--name",
-                   "testApp",
-                   "--master",
-                   "local",
-                   "--conf",
-                   "spark.driver.extraClassPath=" + systemJar,
-                   "--conf",
-                   "spark.driver.userClassPathFirst=true",
-                   "--conf",
-                   "spark.ui.enabled=false",
-                   "--conf",
-                   "spark.master.rest.enabled=false",
-                   userJar.toString)
+    val args = Seq(
+      "--class",
+      UserClasspathFirstTest.getClass.getName.stripSuffix("$"),
+      "--name",
+      "testApp",
+      "--master",
+      "local",
+      "--conf",
+      "spark.driver.extraClassPath=" + systemJar,
+      "--conf",
+      "spark.driver.userClassPathFirst=true",
+      "--conf",
+      "spark.ui.enabled=false",
+      "--conf",
+      "spark.master.rest.enabled=false",
+      userJar.toString)
     runSparkSubmit(args)
   }
 
   test("SPARK_CONF_DIR overrides spark-defaults.conf") {
     forConfDir(Map("spark.executor.memory" -> "2.3g")) { path =>
       val unusedJar = TestUtils.createJarWithClasses(Seq.empty)
-      val args = Seq("--class",
-                     SimpleApplicationTest.getClass.getName.stripSuffix("$"),
-                     "--name",
-                     "testApp",
-                     "--master",
-                     "local",
-                     unusedJar.toString)
+      val args = Seq(
+        "--class",
+        SimpleApplicationTest.getClass.getName.stripSuffix("$"),
+        "--name",
+        "testApp",
+        "--master",
+        "local",
+        unusedJar.toString)
       val appArgs =
         new SparkSubmitArguments(args, Map("SPARK_CONF_DIR" -> path))
       assert(appArgs.propertiesFile != null)
@@ -724,8 +739,9 @@ class SparkSubmitSuite
     val tmpDir = Utils.createTempDir()
 
     val defaultsConf = new File(tmpDir.getAbsolutePath, "spark-defaults.conf")
-    val writer = new OutputStreamWriter(new FileOutputStream(defaultsConf),
-                                        StandardCharsets.UTF_8)
+    val writer = new OutputStreamWriter(
+      new FileOutputStream(defaultsConf),
+      StandardCharsets.UTF_8)
     for ((key, value) <- defaults) writer.write(s"$key $value\n")
 
     writer.close()

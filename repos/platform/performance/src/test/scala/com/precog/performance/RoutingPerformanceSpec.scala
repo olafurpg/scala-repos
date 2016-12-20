@@ -77,30 +77,35 @@ trait RoutingPerformanceSpec extends Specification with PerformanceSpec {
         system.actorOf(Props(new MockProjectionActor), "mock_projection_actor")
 
       val projectionActors: ActorRef =
-        system.actorOf(Props(new MockProjectionActors(projectionActor)),
-                       "mock_projections_actor")
+        system.actorOf(
+          Props(new MockProjectionActors(projectionActor)),
+          "mock_projections_actor")
 
       val routingTable: RoutingTable = new SingleColumnProjectionRoutingTable
 
       val ingestActor: ActorRef =
-        system.actorOf(Props(new MockIngestActor(inserts / batchSize, batch)),
-                       "mock_shard_ingest")
+        system.actorOf(
+          Props(new MockIngestActor(inserts / batchSize, batch)),
+          "mock_shard_ingest")
 
       val routingActor: ActorRef = {
         val routingTable = new SingleColumnProjectionRoutingTable
         val eventStore =
-          new EventStore(routingTable,
-                         projectionActors,
-                         metadataActor,
-                         Duration(60, "seconds"),
-                         new Timeout(60000),
-                         ExecutionContext.defaultExecutionContext(system))
-        system.actorOf(Props(
-                         new BatchStoreActor(eventStore,
-                                             1000,
-                                             Some(ingestActor),
-                                             system.scheduler)),
-                       "router")
+          new EventStore(
+            routingTable,
+            projectionActors,
+            metadataActor,
+            Duration(60, "seconds"),
+            new Timeout(60000),
+            ExecutionContext.defaultExecutionContext(system))
+        system.actorOf(
+          Props(
+            new BatchStoreActor(
+              eventStore,
+              1000,
+              Some(ingestActor),
+              system.scheduler)),
+          "router")
       }
 
       def testIngest() = {

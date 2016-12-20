@@ -145,9 +145,10 @@ private object ParallelCollectionRDD {
               if (r.isInclusive && index == numSlices - 1) {
                 new Range.Inclusive(r.start + start * r.step, r.end, r.step)
               } else {
-                new Range(r.start + start * r.step,
-                          r.start + end * r.step,
-                          r.step)
+                new Range(
+                  r.start + start * r.step,
+                  r.start + end * r.step,
+                  r.step)
               }
           })
           .toSeq

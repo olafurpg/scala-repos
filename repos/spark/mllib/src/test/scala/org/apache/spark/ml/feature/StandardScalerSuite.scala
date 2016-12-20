@@ -63,8 +63,9 @@ class StandardScalerSuite
   def assertResult(df: DataFrame): Unit = {
     df.select("standardized_features", "expected").collect().foreach {
       case Row(vector1: Vector, vector2: Vector) =>
-        assert(vector1 ~== vector2 absTol 1E-5,
-               "The vector value is not correct after standardization.")
+        assert(
+          vector1 ~== vector2 absTol 1E-5,
+          "The vector value is not correct after standardization.")
     }
   }
 
@@ -133,9 +134,10 @@ class StandardScalerSuite
   }
 
   test("StandardScalerModel read/write") {
-    val instance = new StandardScalerModel("myStandardScalerModel",
-                                           Vectors.dense(1.0, 2.0),
-                                           Vectors.dense(3.0, 4.0))
+    val instance = new StandardScalerModel(
+      "myStandardScalerModel",
+      Vectors.dense(1.0, 2.0),
+      Vectors.dense(3.0, 4.0))
     val newInstance = testDefaultReadWrite(instance)
     assert(newInstance.std === instance.std)
     assert(newInstance.mean === instance.mean)

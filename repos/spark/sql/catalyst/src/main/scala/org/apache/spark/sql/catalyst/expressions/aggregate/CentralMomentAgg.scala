@@ -155,11 +155,13 @@ case class StddevSamp(child: Expression) extends CentralMomentAgg(child) {
   override protected def momentOrder = 2
 
   override val evaluateExpression: Expression = {
-    If(n === Literal(0.0),
-       Literal.create(null, DoubleType),
-       If(n === Literal(1.0),
-          Literal(Double.NaN),
-          Sqrt(m2 / (n - Literal(1.0)))))
+    If(
+      n === Literal(0.0),
+      Literal.create(null, DoubleType),
+      If(
+        n === Literal(1.0),
+        Literal(Double.NaN),
+        Sqrt(m2 / (n - Literal(1.0)))))
   }
 
   override def prettyName: String = "stddev_samp"
@@ -183,9 +185,10 @@ case class VarianceSamp(child: Expression) extends CentralMomentAgg(child) {
   override protected def momentOrder = 2
 
   override val evaluateExpression: Expression = {
-    If(n === Literal(0.0),
-       Literal.create(null, DoubleType),
-       If(n === Literal(1.0), Literal(Double.NaN), m2 / (n - Literal(1.0))))
+    If(
+      n === Literal(0.0),
+      Literal.create(null, DoubleType),
+      If(n === Literal(1.0), Literal(Double.NaN), m2 / (n - Literal(1.0))))
   }
 
   override def prettyName: String = "var_samp"
@@ -198,11 +201,13 @@ case class Skewness(child: Expression) extends CentralMomentAgg(child) {
   override protected def momentOrder = 3
 
   override val evaluateExpression: Expression = {
-    If(n === Literal(0.0),
-       Literal.create(null, DoubleType),
-       If(m2 === Literal(0.0),
-          Literal(Double.NaN),
-          Sqrt(n) * m3 / Sqrt(m2 * m2 * m2)))
+    If(
+      n === Literal(0.0),
+      Literal.create(null, DoubleType),
+      If(
+        m2 === Literal(0.0),
+        Literal(Double.NaN),
+        Sqrt(n) * m3 / Sqrt(m2 * m2 * m2)))
   }
 }
 
@@ -211,11 +216,13 @@ case class Kurtosis(child: Expression) extends CentralMomentAgg(child) {
   override protected def momentOrder = 4
 
   override val evaluateExpression: Expression = {
-    If(n === Literal(0.0),
-       Literal.create(null, DoubleType),
-       If(m2 === Literal(0.0),
-          Literal(Double.NaN),
-          n * m4 / (m2 * m2) - Literal(3.0)))
+    If(
+      n === Literal(0.0),
+      Literal.create(null, DoubleType),
+      If(
+        m2 === Literal(0.0),
+        Literal(Double.NaN),
+        n * m4 / (m2 * m2) - Literal(3.0)))
   }
 
   override def prettyName: String = "kurtosis"

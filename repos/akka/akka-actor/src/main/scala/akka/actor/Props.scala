@@ -44,9 +44,10 @@ object Props extends AbstractProps {
   /**
     * The default Props instance, uses the settings from the Props object starting with default*.
     */
-  final val default = Props(defaultDeploy,
-                            classOf[CreatorFunctionConsumer],
-                            List(defaultCreator))
+  final val default = Props(
+    defaultDeploy,
+    classOf[CreatorFunctionConsumer],
+    List(defaultCreator))
 
   /**
     * INTERNAL API

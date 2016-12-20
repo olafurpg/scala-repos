@@ -81,18 +81,23 @@ class DefaultTests {
 
   @Test
   def invalid {
-    illTyped(" Default[Base] ",
-             "could not find implicit value for parameter default: .*")
+    illTyped(
+      " Default[Base] ",
+      "could not find implicit value for parameter default: .*")
 
-    illTyped(" Default[Dummy] ",
-             "could not find implicit value for parameter default: .*")
+    illTyped(
+      " Default[Dummy] ",
+      "could not find implicit value for parameter default: .*")
 
-    illTyped(" Default[Any] ",
-             "could not find implicit value for parameter default: .*")
-    illTyped(" Default[AnyRef] ",
-             "could not find implicit value for parameter default: .*")
-    illTyped(" Default[Array[Int]] ",
-             "could not find implicit value for parameter default: .*")
+    illTyped(
+      " Default[Any] ",
+      "could not find implicit value for parameter default: .*")
+    illTyped(
+      " Default[AnyRef] ",
+      "could not find implicit value for parameter default: .*")
+    illTyped(
+      " Default[Array[Int]] ",
+      "could not find implicit value for parameter default: .*")
   }
 
   @Test
@@ -115,18 +120,23 @@ class DefaultTests {
 
   @Test
   def invalidAsRecord {
-    illTyped(" Default.AsRecord[Base] ",
-             "could not find implicit value for parameter default: .*")
+    illTyped(
+      " Default.AsRecord[Base] ",
+      "could not find implicit value for parameter default: .*")
 
-    illTyped(" Default.AsRecord[Dummy] ",
-             "could not find implicit value for parameter default: .*")
+    illTyped(
+      " Default.AsRecord[Dummy] ",
+      "could not find implicit value for parameter default: .*")
 
-    illTyped(" Default.AsRecord[Any] ",
-             "could not find implicit value for parameter default: .*")
-    illTyped(" Default.AsRecord[AnyRef] ",
-             "could not find implicit value for parameter default: .*")
-    illTyped(" Default.AsRecord[Array[Int]] ",
-             "could not find implicit value for parameter default: .*")
+    illTyped(
+      " Default.AsRecord[Any] ",
+      "could not find implicit value for parameter default: .*")
+    illTyped(
+      " Default.AsRecord[AnyRef] ",
+      "could not find implicit value for parameter default: .*")
+    illTyped(
+      " Default.AsRecord[Array[Int]] ",
+      "could not find implicit value for parameter default: .*")
   }
 
   @Test
@@ -161,18 +171,23 @@ class DefaultTests {
 
   @Test
   def invalidAsOptions {
-    illTyped(" Default.AsOptions[Base] ",
-             "could not find implicit value for parameter default: .*")
+    illTyped(
+      " Default.AsOptions[Base] ",
+      "could not find implicit value for parameter default: .*")
 
-    illTyped(" Default.AsOptions[Dummy] ",
-             "could not find implicit value for parameter default: .*")
+    illTyped(
+      " Default.AsOptions[Dummy] ",
+      "could not find implicit value for parameter default: .*")
 
-    illTyped(" Default.AsOptions[Any] ",
-             "could not find implicit value for parameter default: .*")
-    illTyped(" Default.AsOptions[AnyRef] ",
-             "could not find implicit value for parameter default: .*")
-    illTyped(" Default.AsOptions[Array[Int]] ",
-             "could not find implicit value for parameter default: .*")
+    illTyped(
+      " Default.AsOptions[Any] ",
+      "could not find implicit value for parameter default: .*")
+    illTyped(
+      " Default.AsOptions[AnyRef] ",
+      "could not find implicit value for parameter default: .*")
+    illTyped(
+      " Default.AsOptions[Array[Int]] ",
+      "could not find implicit value for parameter default: .*")
   }
 
   @Test

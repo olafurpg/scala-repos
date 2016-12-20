@@ -126,8 +126,9 @@ object WebSocket {
               case TextMessage(text) => Left(text)
               case BinaryMessage(_) =>
                 Right(
-                  CloseMessage(Some(CloseCodes.Unacceptable),
-                               "This WebSocket only supports text frames"))
+                  CloseMessage(
+                    Some(CloseCodes.Unacceptable),
+                    "This WebSocket only supports text frames"))
             })(flow map TextMessage.apply)
         }
       }
@@ -146,8 +147,9 @@ object WebSocket {
               case BinaryMessage(data) => Left(data)
               case TextMessage(_) =>
                 Right(
-                  CloseMessage(Some(CloseCodes.Unacceptable),
-                               "This WebSocket only supports binary frames"))
+                  CloseMessage(
+                    Some(CloseCodes.Unacceptable),
+                    "This WebSocket only supports binary frames"))
             })(flow map BinaryMessage.apply)
         }
       }
@@ -174,8 +176,9 @@ object WebSocket {
         } catch {
           case NonFatal(e) =>
             Right(
-              CloseMessage(Some(CloseCodes.Unacceptable),
-                           "Unable to parse json message"))
+              CloseMessage(
+                Some(CloseCodes.Unacceptable),
+                "Unable to parse json message"))
         }
 
       new MessageFlowTransformer[JsValue, JsValue] {
@@ -206,8 +209,9 @@ object WebSocket {
             .fromJson[In](json)
             .fold({ errors =>
               throw WebSocketCloseException(
-                CloseMessage(Some(CloseCodes.Unacceptable),
-                             Json.stringify(JsError.toJson(errors))))
+                CloseMessage(
+                  Some(CloseCodes.Unacceptable),
+                  Json.stringify(JsError.toJson(errors))))
             }, identity),
         out => Json.toJson(out))
     }
@@ -273,8 +277,9 @@ object WebSocket {
           }) >>> Enumerator.flatten(enumeratorCompletion.future)
         val publisher = Streams.enumeratorToPublisher(nonCompletingEnumerator)
         val (subscriber, _) = Streams.iterateeToSubscriber(iteratee)
-        Flow.fromSinkAndSource(Sink.fromSubscriber(subscriber),
-                               Source.fromPublisher(publisher))
+        Flow.fromSinkAndSource(
+          Sink.fromSubscriber(subscriber),
+          Source.fromPublisher(publisher))
     })))
   }
 

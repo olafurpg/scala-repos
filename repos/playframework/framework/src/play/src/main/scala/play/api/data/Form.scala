@@ -178,12 +178,13 @@ case class Form[T](mapping: Mapping[T],
     * @return the field, returned even if the field does not exist
     */
   def apply(key: String): Field =
-    Field(this,
-          key,
-          constraints.get(key).getOrElse(Nil),
-          formats.get(key),
-          errors.collect { case e if e.key == key => e },
-          data.get(key))
+    Field(
+      this,
+      key,
+      constraints.get(key).getOrElse(Nil),
+      formats.get(key),
+      errors.collect { case e if e.key == key => e },
+      data.get(key))
 
   /**
     * Retrieves the first global error, if it exists, i.e. an error without any key.
@@ -427,11 +428,12 @@ private[data] object FormUtils {
         fields
           .map {
             case (key, value) =>
-              fromJson(Option(prefix)
-                         .filterNot(_.isEmpty)
-                         .map(_ + ".")
-                         .getOrElse("") + key,
-                       value)
+              fromJson(
+                Option(prefix)
+                  .filterNot(_.isEmpty)
+                  .map(_ + ".")
+                  .getOrElse("") + key,
+                value)
           }
           .foldLeft(Map.empty[String, String])(_ ++ _)
       }

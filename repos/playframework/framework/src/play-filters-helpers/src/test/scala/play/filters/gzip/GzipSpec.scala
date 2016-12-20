@@ -80,9 +80,10 @@ object GzipSpec extends Specification {
     }
 
     "gzip multiple large random inputs" in {
-      test(scala.util.Random.nextString(10000),
-           scala.util.Random.nextString(10000),
-           scala.util.Random.nextString(10000))
+      test(
+        scala.util.Random.nextString(10000),
+        scala.util.Random.nextString(10000),
+        scala.util.Random.nextString(10000))
     }
   }
 

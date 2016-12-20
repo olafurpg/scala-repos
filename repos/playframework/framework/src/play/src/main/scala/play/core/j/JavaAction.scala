@@ -34,8 +34,9 @@ class JavaActionAnnotations(val controller: Class[_],
     HttpConfiguration.current.actionComposition
 
   val parser: Class[_ <: JBodyParser[_]] =
-    Seq(method.getAnnotation(classOf[play.mvc.BodyParser.Of]),
-        controller.getAnnotation(classOf[play.mvc.BodyParser.Of]))
+    Seq(
+      method.getAnnotation(classOf[play.mvc.BodyParser.Of]),
+      controller.getAnnotation(classOf[play.mvc.BodyParser.Of]))
       .filterNot(_ == null)
       .headOption
       .map(_.value)

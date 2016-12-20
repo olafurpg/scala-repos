@@ -125,10 +125,11 @@ class ScAssignStmtImpl(node: ASTNode)
                   case None =>
                     fun.getContext match {
                       case d: ScDeclarationSequenceHolder =>
-                        d.processDeclarations(processor,
-                                              ResolveState.initial(),
-                                              fun,
-                                              ref)
+                        d.processDeclarations(
+                          processor,
+                          ResolveState.initial(),
+                          fun,
+                          ref)
                       case _ =>
                     }
                 }

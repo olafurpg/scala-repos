@@ -173,11 +173,12 @@ private class RandomForest(private val strategy: Strategy,
     val withReplacement = if (numTrees > 1) true else false
 
     val baggedInput = BaggedPoint
-      .convertToBaggedRDD(treeInput,
-                          strategy.subsamplingRate,
-                          numTrees,
-                          withReplacement,
-                          seed)
+      .convertToBaggedRDD(
+        treeInput,
+        strategy.subsamplingRate,
+        numTrees,
+        withReplacement,
+        seed)
       .persist(StorageLevel.MEMORY_AND_DISK)
 
     // depth of the decision tree
@@ -224,10 +225,11 @@ private class RandomForest(private val strategy: Strategy,
     val nodeIdCache =
       if (strategy.useNodeIdCache) {
         Some(
-          NodeIdCache.init(data = baggedInput,
-                           numTrees = numTrees,
-                           checkpointInterval = strategy.checkpointInterval,
-                           initVal = 1))
+          NodeIdCache.init(
+            data = baggedInput,
+            numTrees = numTrees,
+            checkpointInterval = strategy.checkpointInterval,
+            initVal = 1))
       } else {
         None
       }
@@ -257,16 +259,17 @@ private class RandomForest(private val strategy: Strategy,
 
       // Choose node splits, and enqueue new nodes as needed.
       timer.start("findBestSplits")
-      DecisionTree.findBestSplits(baggedInput,
-                                  metadata,
-                                  topNodes,
-                                  nodesForGroup,
-                                  treeToNodeToIndexInfo,
-                                  splits,
-                                  bins,
-                                  nodeQueue,
-                                  timer,
-                                  nodeIdCache = nodeIdCache)
+      DecisionTree.findBestSplits(
+        baggedInput,
+        metadata,
+        topNodes,
+        nodesForGroup,
+        treeToNodeToIndexInfo,
+        splits,
+        bins,
+        nodeQueue,
+        timer,
+        nodeIdCache = nodeIdCache)
       timer.stop("findBestSplits")
     }
 
@@ -362,13 +365,14 @@ object RandomForest extends Serializable with Logging {
       maxBins: Int,
       seed: Int = Utils.random.nextInt()): RandomForestModel = {
     val impurityType = Impurities.fromString(impurity)
-    val strategy = new Strategy(Classification,
-                                impurityType,
-                                maxDepth,
-                                numClasses,
-                                maxBins,
-                                Sort,
-                                categoricalFeaturesInfo)
+    val strategy = new Strategy(
+      Classification,
+      impurityType,
+      maxDepth,
+      numClasses,
+      maxBins,
+      Sort,
+      categoricalFeaturesInfo)
     trainClassifier(input, strategy, numTrees, featureSubsetStrategy, seed)
   }
 
@@ -387,18 +391,19 @@ object RandomForest extends Serializable with Logging {
       maxDepth: Int,
       maxBins: Int,
       seed: Int): RandomForestModel = {
-    trainClassifier(input.rdd,
-                    numClasses,
-                    categoricalFeaturesInfo
-                      .asInstanceOf[java.util.Map[Int, Int]]
-                      .asScala
-                      .toMap,
-                    numTrees,
-                    featureSubsetStrategy,
-                    impurity,
-                    maxDepth,
-                    maxBins,
-                    seed)
+    trainClassifier(
+      input.rdd,
+      numClasses,
+      categoricalFeaturesInfo
+        .asInstanceOf[java.util.Map[Int, Int]]
+        .asScala
+        .toMap,
+      numTrees,
+      featureSubsetStrategy,
+      impurity,
+      maxDepth,
+      maxBins,
+      seed)
   }
 
   /**
@@ -463,13 +468,14 @@ object RandomForest extends Serializable with Logging {
                      maxBins: Int,
                      seed: Int = Utils.random.nextInt()): RandomForestModel = {
     val impurityType = Impurities.fromString(impurity)
-    val strategy = new Strategy(Regression,
-                                impurityType,
-                                maxDepth,
-                                0,
-                                maxBins,
-                                Sort,
-                                categoricalFeaturesInfo)
+    val strategy = new Strategy(
+      Regression,
+      impurityType,
+      maxDepth,
+      0,
+      maxBins,
+      Sort,
+      categoricalFeaturesInfo)
     trainRegressor(input, strategy, numTrees, featureSubsetStrategy, seed)
   }
 
@@ -486,17 +492,18 @@ object RandomForest extends Serializable with Logging {
                      maxDepth: Int,
                      maxBins: Int,
                      seed: Int): RandomForestModel = {
-    trainRegressor(input.rdd,
-                   categoricalFeaturesInfo
-                     .asInstanceOf[java.util.Map[Int, Int]]
-                     .asScala
-                     .toMap,
-                   numTrees,
-                   featureSubsetStrategy,
-                   impurity,
-                   maxDepth,
-                   maxBins,
-                   seed)
+    trainRegressor(
+      input.rdd,
+      categoricalFeaturesInfo
+        .asInstanceOf[java.util.Map[Int, Int]]
+        .asScala
+        .toMap,
+      numTrees,
+      featureSubsetStrategy,
+      impurity,
+      maxDepth,
+      maxBins,
+      seed)
   }
 
   /**
@@ -547,9 +554,10 @@ object RandomForest extends Serializable with Logging {
         if (metadata.subsamplingFeatures) {
           Some(
             SamplingUtils
-              .reservoirSampleAndCount(Range(0, metadata.numFeatures).iterator,
-                                       metadata.numFeaturesPerNode,
-                                       rng.nextLong)
+              .reservoirSampleAndCount(
+                Range(0, metadata.numFeatures).iterator,
+                metadata.numFeaturesPerNode,
+                rng.nextLong)
               ._1)
         } else {
           None

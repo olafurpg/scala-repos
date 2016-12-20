@@ -52,8 +52,9 @@ class ScalaExplicitlyImportedWeigher extends ProximityWeigher {
       }
       buffer = new ArrayBuffer[ScImportStmt]()
       treeWalkup(position.getContext, position)
-      position.putUserData(ScalaExplicitlyImportedWeigher.key,
-                           (buffer, currentModCount))
+      position.putUserData(
+        ScalaExplicitlyImportedWeigher.key,
+        (buffer, currentModCount))
     }
     val iter = buffer.iterator
     while (iter.hasNext) {

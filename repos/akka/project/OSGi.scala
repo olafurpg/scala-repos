@@ -39,14 +39,16 @@ object OSGi {
   val cluster = exports(Seq("akka.cluster.*"))
 
   val clusterTools = exports(
-    Seq("akka.cluster.singleton.*",
-        "akka.cluster.client.*",
-        "akka.cluster.pubsub.*"))
+    Seq(
+      "akka.cluster.singleton.*",
+      "akka.cluster.client.*",
+      "akka.cluster.pubsub.*"))
 
   val clusterSharding = exports(Seq("akka.cluster.sharding.*"))
 
-  val clusterMetrics = exports(Seq("akka.cluster.metrics.*"),
-                               imports = Seq(kamonImport(), sigarImport()))
+  val clusterMetrics = exports(
+    Seq("akka.cluster.metrics.*"),
+    imports = Seq(kamonImport(), sigarImport()))
 
   val distributedData = exports(Seq("akka.cluster.ddata.*"))
 
@@ -58,23 +60,27 @@ object OSGi {
 
   val remote = exports(Seq("akka.remote.*"))
 
-  val parsing = exports(Seq("akka.parboiled2.*", "akka.shapeless.*"),
-                        imports = Seq(optionalResolution("scala.quasiquotes")))
+  val parsing = exports(
+    Seq("akka.parboiled2.*", "akka.shapeless.*"),
+    imports = Seq(optionalResolution("scala.quasiquotes")))
 
   val httpCore =
     exports(Seq("akka.http.*"), imports = Seq(scalaJava8CompatImport()))
 
-  val http = exports(Seq("akka.http.impl.server",
-                         "akka.http.scaladsl.server.*",
-                         "akka.http.javadsl.server.*",
-                         "akka.http.scaladsl.client",
-                         "akka.http.scaladsl.coding",
-                         "akka.http.scaladsl.common",
-                         "akka.http.scaladsl.marshalling",
-                         "akka.http.scaladsl.unmarshalling"),
-                     imports = Seq(scalaJava8CompatImport(),
-                                   akkaImport("akka.stream.*"),
-                                   akkaImport("akka.parboiled2.*")))
+  val http = exports(
+    Seq(
+      "akka.http.impl.server",
+      "akka.http.scaladsl.server.*",
+      "akka.http.javadsl.server.*",
+      "akka.http.scaladsl.client",
+      "akka.http.scaladsl.coding",
+      "akka.http.scaladsl.common",
+      "akka.http.scaladsl.marshalling",
+      "akka.http.scaladsl.unmarshalling"),
+    imports = Seq(
+      scalaJava8CompatImport(),
+      akkaImport("akka.stream.*"),
+      akkaImport("akka.parboiled2.*")))
 
   val httpTestkit = exports(
     Seq("akka.http.scaladsl.testkit.*", "akka.http.javadsl.testkit.*"))
@@ -94,8 +100,9 @@ object OSGi {
 
   val persistence = exports(
     Seq("akka.persistence.*"),
-    imports = Seq(optionalResolution("org.fusesource.leveldbjni.*"),
-                  optionalResolution("org.iq80.leveldb.*")))
+    imports = Seq(
+      optionalResolution("org.fusesource.leveldbjni.*"),
+      optionalResolution("org.iq80.leveldb.*")))
 
   val persistenceQuery = exports(Seq("akka.persistence.query.*"))
 
@@ -113,11 +120,12 @@ object OSGi {
       OsgiKeys.exportPackage := packages
     )
   def defaultImports(scalaVersion: String) =
-    Seq("!sun.misc",
-        akkaImport(),
-        configImport(),
-        scalaImport(scalaVersion),
-        "*")
+    Seq(
+      "!sun.misc",
+      akkaImport(),
+      configImport(),
+      scalaImport(scalaVersion),
+      "*")
   def akkaImport(packageName: String = "akka.*") =
     versionedImport(packageName, "2.4", "2.5")
   def configImport(packageName: String = "com.typesafe.config.*") =
@@ -126,9 +134,10 @@ object OSGi {
     val packageName = "scala.*"
     val ScalaVersion = """(\d+)\.(\d+)\..*""".r
     val ScalaVersion(epoch, major) = version
-    versionedImport(packageName,
-                    s"$epoch.$major",
-                    s"$epoch.${major.toInt + 1}")
+    versionedImport(
+      packageName,
+      s"$epoch.$major",
+      s"$epoch.${major.toInt + 1}")
   }
   def scalaJava8CompatImport(packageName: String = "scala.compat.java8.*") =
     versionedImport(packageName, "0.7.0", "1.0.0")

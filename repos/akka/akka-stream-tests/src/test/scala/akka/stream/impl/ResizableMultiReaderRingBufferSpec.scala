@@ -19,9 +19,10 @@ class ResizableMultiReaderRingBufferSpec extends WordSpec with ShouldMatchers {
       inspect shouldEqual "0 0 0 0 (size=0, writeIx=0, readIx=0, cursors=3)"
     }
 
-    "fail reads if nothing can be read" in new Test(iSize = 4,
-                                                    mSize = 4,
-                                                    cursorCount = 3) {
+    "fail reads if nothing can be read" in new Test(
+      iSize = 4,
+      mSize = 4,
+      cursorCount = 3) {
       write(1) shouldEqual true
       write(2) shouldEqual true
       write(3) shouldEqual true
@@ -43,9 +44,10 @@ class ResizableMultiReaderRingBufferSpec extends WordSpec with ShouldMatchers {
       inspect shouldEqual "0 0 0 0 (size=0, writeIx=3, readIx=3, cursors=3)"
     }
 
-    "fail writes if there is no more space" in new Test(iSize = 4,
-                                                        mSize = 4,
-                                                        cursorCount = 2) {
+    "fail writes if there is no more space" in new Test(
+      iSize = 4,
+      mSize = 4,
+      cursorCount = 2) {
       write(1) shouldEqual true
       write(2) shouldEqual true
       write(3) shouldEqual true
@@ -85,9 +87,10 @@ class ResizableMultiReaderRingBufferSpec extends WordSpec with ShouldMatchers {
       inspect shouldEqual "0 0 0 0 (size=0, writeIx=9, readIx=9, cursors=2)"
     }
 
-    "automatically grow if possible" in new Test(iSize = 2,
-                                                 mSize = 8,
-                                                 cursorCount = 2) {
+    "automatically grow if possible" in new Test(
+      iSize = 2,
+      mSize = 8,
+      cursorCount = 2) {
       write(1) shouldEqual true
       inspect shouldEqual "1 0 (size=1, writeIx=1, readIx=0, cursors=2)"
       write(2) shouldEqual true

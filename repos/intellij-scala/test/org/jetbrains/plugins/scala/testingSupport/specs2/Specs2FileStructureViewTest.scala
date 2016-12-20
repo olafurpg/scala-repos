@@ -14,8 +14,9 @@ abstract class Specs2FileStructureViewTest extends Specs2TestCase {
   }
 
   protected def prepareFile(): Unit = {
-    addFileToProject("SpecsFileStrctureViewTest.scala",
-                     """|import org.specs2.mutable.Specification
+    addFileToProject(
+      "SpecsFileStrctureViewTest.scala",
+      """|import org.specs2.mutable.Specification
         |
         |class SpecsFileStrctureViewTest extends Specification {
         |
@@ -68,8 +69,9 @@ abstract class Specs2FileStructureViewTest extends Specs2TestCase {
 
   def testHierarchy(): Unit = {
     prepareFile()
-    runFileStructureViewTest("SpecsFileStrctureViewTest",
-                             "\"child1\"",
-                             Some("\"parent\""))
+    runFileStructureViewTest(
+      "SpecsFileStrctureViewTest",
+      "\"child1\"",
+      Some("\"parent\""))
   }
 }

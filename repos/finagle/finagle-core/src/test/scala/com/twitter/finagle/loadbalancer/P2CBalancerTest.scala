@@ -53,8 +53,9 @@ private[loadbalancer] trait P2CSuite {
   def assertEven(fs: Traversable[P2CServiceFactory]) {
     val ml = fs.head.meanLoad
     for (f <- fs) {
-      assert(math.abs(f.meanLoad - ml) < ε,
-             "ml=%f; f.ml=%f; ε=%f".format(ml, f.meanLoad, ε))
+      assert(
+        math.abs(f.meanLoad - ml) < ε,
+        "ml=%f; f.ml=%f; ε=%f".format(ml, f.meanLoad, ε))
     }
   }
 }

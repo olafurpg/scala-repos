@@ -56,8 +56,9 @@ class ActorLifeCycleSpec
           override def postRestart(reason: Throwable) { report("postRestart") }
         }).withDeploy(Deploy.local)
         val restarter =
-          Await.result((supervisor ? restarterProps).mapTo[ActorRef],
-                       timeout.duration)
+          Await.result(
+            (supervisor ? restarterProps).mapTo[ActorRef],
+            timeout.duration)
 
         expectMsg(("preStart", id, 0))
         restarter ! Kill
@@ -94,8 +95,9 @@ class ActorLifeCycleSpec
         val restarterProps =
           Props(classOf[LifeCycleTestActor], testActor, id, gen)
         val restarter =
-          Await.result((supervisor ? restarterProps).mapTo[ActorRef],
-                       timeout.duration)
+          Await.result(
+            (supervisor ? restarterProps).mapTo[ActorRef],
+            timeout.duration)
 
         expectMsg(("preStart", id, 0))
         restarter ! Kill
@@ -123,8 +125,9 @@ class ActorLifeCycleSpec
     "not invoke preRestart and postRestart when never restarted using OneForOneStrategy" in {
       val id = newUuid().toString
       val supervisor = system.actorOf(
-        Props(classOf[Supervisor],
-              OneForOneStrategy(maxNrOfRetries = 3)(List(classOf[Exception]))))
+        Props(
+          classOf[Supervisor],
+          OneForOneStrategy(maxNrOfRetries = 3)(List(classOf[Exception]))))
       val gen = new AtomicInteger(0)
       val props = Props(classOf[LifeCycleTestActor], testActor, id, gen)
       val a =

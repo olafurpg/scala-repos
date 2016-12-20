@@ -25,10 +25,11 @@ private[message] final class DataForm(security: MessageSecurity) {
         "text" -> text(minLength = 3, maxLength = 8000)
       )({
         case (username, subject, text) =>
-          ThreadData(user = fetchUser(username) err "Unknown username " +
-                         username,
-                     subject = subject,
-                     text = text)
+          ThreadData(
+            user = fetchUser(username) err "Unknown username " +
+                username,
+            subject = subject,
+            text = text)
       })(_.export.some))
 
   def post =

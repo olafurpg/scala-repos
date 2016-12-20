@@ -44,6 +44,7 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "db" boot new Env(config = lila.common.PlayApp loadConfig "mongodb",
-                      lifecycle = lila.common.PlayApp.lifecycle)
+    "db" boot new Env(
+      config = lila.common.PlayApp loadConfig "mongodb",
+      lifecycle = lila.common.PlayApp.lifecycle)
 }

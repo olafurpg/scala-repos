@@ -31,23 +31,26 @@ class TopicMetadataRequest(val versionId: Short,
 
   val underlying: kafka.api.TopicMetadataRequest = {
     import scala.collection.JavaConversions._
-    new kafka.api.TopicMetadataRequest(versionId,
-                                       correlationId,
-                                       clientId,
-                                       topics: mutable.Buffer[String])
+    new kafka.api.TopicMetadataRequest(
+      versionId,
+      correlationId,
+      clientId,
+      topics: mutable.Buffer[String])
   }
 
   def this(topics: java.util.List[String]) =
-    this(kafka.api.TopicMetadataRequest.CurrentVersion,
-         0,
-         kafka.api.TopicMetadataRequest.DefaultClientId,
-         topics)
+    this(
+      kafka.api.TopicMetadataRequest.CurrentVersion,
+      0,
+      kafka.api.TopicMetadataRequest.DefaultClientId,
+      topics)
 
   def this(topics: java.util.List[String], correlationId: Int) =
-    this(kafka.api.TopicMetadataRequest.CurrentVersion,
-         correlationId,
-         kafka.api.TopicMetadataRequest.DefaultClientId,
-         topics)
+    this(
+      kafka.api.TopicMetadataRequest.CurrentVersion,
+      correlationId,
+      kafka.api.TopicMetadataRequest.DefaultClientId,
+      topics)
 
   def writeTo(buffer: ByteBuffer) = underlying.writeTo(buffer)
 

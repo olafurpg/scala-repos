@@ -140,8 +140,9 @@ class Path private[io] (val jfile: JFile) {
   def resolve(other: Path) =
     if (other.isAbsolute || isEmpty) other else /(other)
   def relativize(other: Path) = {
-    assert(isAbsolute == other.isAbsolute,
-           "Paths not of same type: " + this + ", " + other)
+    assert(
+      isAbsolute == other.isAbsolute,
+      "Paths not of same type: " + this + ", " + other)
 
     def createRelativePath(baseSegs: List[String],
                            otherSegs: List[String]): String = {

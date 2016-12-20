@@ -32,8 +32,9 @@ trait TypedPipeOperationsConversions {
       extends TypedPipeOperation[TypeOut] {
     override def apply(pipes: List[TypedPipe[_]]): TypedPipe[TypeOut] = {
       assertPipeSize(pipes, 2)
-      op(pipes(0).asInstanceOf[TypedPipe[TypeIn1]],
-         pipes(1).asInstanceOf[TypedPipe[TypeIn2]])
+      op(
+        pipes(0).asInstanceOf[TypedPipe[TypeIn1]],
+        pipes(1).asInstanceOf[TypedPipe[TypeIn2]])
     }
   }
 
@@ -43,9 +44,10 @@ trait TypedPipeOperationsConversions {
       extends TypedPipeOperation[TypeOut] {
     override def apply(pipes: List[TypedPipe[_]]): TypedPipe[TypeOut] = {
       assertPipeSize(pipes, 3)
-      op(pipes(0).asInstanceOf[TypedPipe[TypeIn1]],
-         pipes(1).asInstanceOf[TypedPipe[TypeIn2]],
-         pipes(2).asInstanceOf[TypedPipe[TypeIn3]])
+      op(
+        pipes(0).asInstanceOf[TypedPipe[TypeIn1]],
+        pipes(1).asInstanceOf[TypedPipe[TypeIn2]],
+        pipes(2).asInstanceOf[TypedPipe[TypeIn3]])
     }
   }
 

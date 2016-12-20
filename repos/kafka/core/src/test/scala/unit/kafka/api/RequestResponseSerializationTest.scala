@@ -68,10 +68,11 @@ object SerializationTestUtils {
     new Message("third message".getBytes))
   private val partitionDataMessage3 = new ByteBufferMessageSet(
     new Message("fourth message".getBytes))
-  private val partitionDataProducerRequestArray = Array(partitionDataMessage0,
-                                                        partitionDataMessage1,
-                                                        partitionDataMessage2,
-                                                        partitionDataMessage3)
+  private val partitionDataProducerRequestArray = Array(
+    partitionDataMessage0,
+    partitionDataMessage1,
+    partitionDataMessage2,
+    partitionDataMessage3)
 
   val topicDataProducerRequest = {
     val groupedData = Array(topic1, topic2).flatMap(topic =>
@@ -97,21 +98,24 @@ object SerializationTestUtils {
     new Broker(
       0,
       Map(
-        SecurityProtocol.PLAINTEXT -> EndPoint("localhost",
-                                               1011,
-                                               SecurityProtocol.PLAINTEXT))),
+        SecurityProtocol.PLAINTEXT -> EndPoint(
+          "localhost",
+          1011,
+          SecurityProtocol.PLAINTEXT))),
     new Broker(
       1,
       Map(
-        SecurityProtocol.PLAINTEXT -> EndPoint("localhost",
-                                               1012,
-                                               SecurityProtocol.PLAINTEXT))),
+        SecurityProtocol.PLAINTEXT -> EndPoint(
+          "localhost",
+          1012,
+          SecurityProtocol.PLAINTEXT))),
     new Broker(
       2,
       Map(
-        SecurityProtocol.PLAINTEXT -> EndPoint("localhost",
-                                               1013,
-                                               SecurityProtocol.PLAINTEXT))))
+        SecurityProtocol.PLAINTEXT -> EndPoint(
+          "localhost",
+          1013,
+          SecurityProtocol.PLAINTEXT))))
   private val brokerEndpoints =
     brokers.map(_.getBrokerEndPoint(SecurityProtocol.PLAINTEXT))
 
@@ -139,10 +143,11 @@ object SerializationTestUtils {
     replicas = brokerEndpoints,
     isr = brokerEndpoints.tail.tail,
     errorCode = 3)
-  private val partitionMetaDataSeq = Seq(partitionMetaData0,
-                                         partitionMetaData1,
-                                         partitionMetaData2,
-                                         partitionMetaData3)
+  private val partitionMetaDataSeq = Seq(
+    partitionMetaData0,
+    partitionMetaData1,
+    partitionMetaData2,
+    partitionMetaData3)
   private val topicmetaData1 = new TopicMetadata(topic1, partitionMetaDataSeq)
   private val topicmetaData2 = new TopicMetadata(topic2, partitionMetaDataSeq)
 
@@ -193,10 +198,12 @@ object SerializationTestUtils {
     ProducerResponse(
       1,
       Map(
-        TopicAndPartition(topic1, 0) -> ProducerResponseStatus(0.toShort,
-                                                               10001),
-        TopicAndPartition(topic2, 0) -> ProducerResponseStatus(0.toShort,
-                                                               20001)
+        TopicAndPartition(topic1, 0) -> ProducerResponseStatus(
+          0.toShort,
+          10001),
+        TopicAndPartition(topic2, 0) -> ProducerResponseStatus(
+          0.toShort,
+          20001)
       ),
       ProducerRequest.CurrentVersion,
       100)
@@ -229,8 +236,9 @@ object SerializationTestUtils {
       groupId = "group 1",
       retentionMs = SystemTime.milliseconds,
       requestInfo = collection.immutable.Map(
-        TopicAndPartition(topic1, 0) -> OffsetAndMetadata(42L,
-                                                          "some metadata"),
+        TopicAndPartition(topic1, 0) -> OffsetAndMetadata(
+          42L,
+          "some metadata"),
         TopicAndPartition(topic1, 1) -> OffsetAndMetadata(
           100L,
           OffsetMetadata.NoMetadata)
@@ -258,8 +266,9 @@ object SerializationTestUtils {
       versionId = 0,
       groupId = "group 1",
       requestInfo = collection.immutable.Map(
-        TopicAndPartition(topic1, 0) -> OffsetAndMetadata(42L,
-                                                          "some metadata"),
+        TopicAndPartition(topic1, 0) -> OffsetAndMetadata(
+          42L,
+          "some metadata"),
         TopicAndPartition(topic1, 1) -> OffsetAndMetadata(
           100L,
           OffsetMetadata.NoMetadata)
@@ -274,11 +283,12 @@ object SerializationTestUtils {
   }
 
   def createTestOffsetFetchRequest: OffsetFetchRequest = {
-    new OffsetFetchRequest("group 1",
-                           Seq(
-                             TopicAndPartition(topic1, 0),
-                             TopicAndPartition(topic1, 1)
-                           ))
+    new OffsetFetchRequest(
+      "group 1",
+      Seq(
+        TopicAndPartition(topic1, 0),
+        TopicAndPartition(topic1, 1)
+      ))
   }
 
   def createTestOffsetFetchResponse: OffsetFetchResponse = {
@@ -366,10 +376,11 @@ class RequestResponseSerializationTest extends JUnitSuite {
         "All serialized bytes in " + original.getClass.getSimpleName +
           " should have been consumed",
         buffer.hasRemaining)
-      assertEquals("The original and deserialized for " +
-                     original.getClass.getSimpleName + " should be the same.",
-                   original,
-                   deserialized)
+      assertEquals(
+        "The original and deserialized for " +
+          original.getClass.getSimpleName + " should be the same.",
+        original,
+        deserialized)
     }
   }
 
@@ -392,8 +403,9 @@ class RequestResponseSerializationTest extends JUnitSuite {
       100)
 
     // new response should have 4 bytes more than the old response since delayTime is an INT32
-    assertEquals(oldClientResponse.sizeInBytes + 4,
-                 newClientResponse.sizeInBytes)
+    assertEquals(
+      oldClientResponse.sizeInBytes + 4,
+      newClientResponse.sizeInBytes)
 
     val buffer = ByteBuffer.allocate(newClientResponse.sizeInBytes)
     newClientResponse.writeTo(buffer)
@@ -423,7 +435,8 @@ class RequestResponseSerializationTest extends JUnitSuite {
       100)
 
     // new response should have 4 bytes more than the old response since delayTime is an INT32
-    assertEquals(oldClientResponse.sizeInBytes + 4,
-                 newClientResponse.sizeInBytes)
+    assertEquals(
+      oldClientResponse.sizeInBytes + 4,
+      newClientResponse.sizeInBytes)
   }
 }

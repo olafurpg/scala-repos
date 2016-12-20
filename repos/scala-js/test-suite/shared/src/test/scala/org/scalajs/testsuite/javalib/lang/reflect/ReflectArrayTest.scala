@@ -57,19 +57,23 @@ class ReflectArrayTest {
     testNewInstance(classOf[Object], classOf[Array[Object]], null)
     testNewInstance(classOf[String], classOf[Array[String]], null)
 
-    testNewInstance(classOf[java.lang.Integer],
-                    classOf[Array[java.lang.Integer]],
-                    null)
-    testNewInstance(classOf[java.lang.Long],
-                    classOf[Array[java.lang.Long]],
-                    null)
+    testNewInstance(
+      classOf[java.lang.Integer],
+      classOf[Array[java.lang.Integer]],
+      null)
+    testNewInstance(
+      classOf[java.lang.Long],
+      classOf[Array[java.lang.Long]],
+      null)
 
-    testNewInstance(classOf[Array[Object]],
-                    classOf[Array[Array[Object]]],
-                    null)
+    testNewInstance(
+      classOf[Array[Object]],
+      classOf[Array[Array[Object]]],
+      null)
     testNewInstance(classOf[Array[Int]], classOf[Array[Array[Int]]], null)
-    testNewInstance(classOf[Array[String]],
-                    classOf[Array[Array[String]]],
-                    null)
+    testNewInstance(
+      classOf[Array[String]],
+      classOf[Array[Array[String]]],
+      null)
   }
 }

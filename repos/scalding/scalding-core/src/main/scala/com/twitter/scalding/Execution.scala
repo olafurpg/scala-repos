@@ -198,8 +198,9 @@ sealed trait Execution[+T] extends java.io.Serializable {
     */
   def waitFor(conf: Config, mode: Mode): Try[T] =
     Try(
-      Await.result(run(conf, mode)(ConcurrentExecutionContext.global),
-                   scala.concurrent.duration.Duration.Inf))
+      Await.result(
+        run(conf, mode)(ConcurrentExecutionContext.global),
+        scala.concurrent.duration.Duration.Inf))
 
   /**
     * This is here to silence warnings in for comprehensions, but is
@@ -481,9 +482,10 @@ object Execution {
     def runStats(conf: Config, mode: Mode, cache: EvalCache)(
         implicit cec: ConcurrentExecutionContext) = {
       val mutatedConfig = fn(conf)
-      cache.getOrElseInsert(mutatedConfig,
-                            this,
-                            prev.runStats(mutatedConfig, mode, cache))
+      cache.getOrElseInsert(
+        mutatedConfig,
+        this,
+        prev.runStats(mutatedConfig, mode, cache))
     }
   }
 

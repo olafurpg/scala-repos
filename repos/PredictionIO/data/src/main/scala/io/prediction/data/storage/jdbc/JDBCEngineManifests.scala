@@ -108,11 +108,12 @@ class JDBCEngineManifests(client: String,
 
   /** Convert JDBC results to [[EngineManifest]] */
   def resultToEngineManifest(rs: WrappedResultSet): EngineManifest = {
-    EngineManifest(id = rs.string("id"),
-                   version = rs.string("version"),
-                   name = rs.string("engineName"),
-                   description = rs.stringOpt("description"),
-                   files = rs.string("files").split(","),
-                   engineFactory = rs.string("engineFactory"))
+    EngineManifest(
+      id = rs.string("id"),
+      version = rs.string("version"),
+      name = rs.string("engineName"),
+      description = rs.stringOpt("description"),
+      files = rs.string("files").split(","),
+      engineFactory = rs.string("engineFactory"))
   }
 }

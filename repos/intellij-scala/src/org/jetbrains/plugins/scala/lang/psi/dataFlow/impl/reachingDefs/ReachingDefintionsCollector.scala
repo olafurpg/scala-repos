@@ -40,9 +40,10 @@ object ReachingDefintionsCollector {
                           place: PsiElement): FragmentVariableInfos = {
     // CFG -> DFA
     val commonParent = findCommonParent(fragment: _*)
-    val cfowner = getParentOfType(commonParent.getContext,
-                                  classOf[ScControlFlowOwner],
-                                  false)
+    val cfowner = getParentOfType(
+      commonParent.getContext,
+      classOf[ScControlFlowOwner],
+      false)
     if (cfowner == null) {
       val message =
         "cfowner == null: " +
@@ -52,9 +53,10 @@ object ReachingDefintionsCollector {
     }
     val cfg =
       cfowner.getControlFlow(policy = ExtractMethodControlFlowPolicy) //todo: make cache more right to not get PsiInvalidAccess
-    val engine = new DfaEngine(cfg,
-                               ReachingDefinitionsInstance,
-                               ReachingDefinitionsLattice)
+    val engine = new DfaEngine(
+      cfg,
+      ReachingDefinitionsInstance,
+      ReachingDefinitionsLattice)
     val dfaResult = engine.performDFA
 
     // instructions in given fragment
@@ -93,14 +95,16 @@ object ReachingDefintionsCollector {
     val resolvesAtNewPlace = element match {
       case _: PsiMethod | _: ScFun =>
         checkResolve(
-          createExpressionWithContextFromText(element.name + " _",
-                                              place.getContext,
-                                              place).getFirstChild)
+          createExpressionWithContextFromText(
+            element.name + " _",
+            place.getContext,
+            place).getFirstChild)
       case _: ScObject =>
         checkResolve(
-          createExpressionWithContextFromText(element.name,
-                                              place.getContext,
-                                              place))
+          createExpressionWithContextFromText(
+            element.name,
+            place.getContext,
+            place))
       case _: ScTypeAlias | _: ScTypeDefinition =>
         val decl = createDeclarationFromText(
           s"val dummyVal: ${element.name}",
@@ -113,9 +117,10 @@ object ReachingDefintionsCollector {
         }
       case _ =>
         checkResolve(
-          createExpressionWithContextFromText(element.name,
-                                              place.getContext,
-                                              place))
+          createExpressionWithContextFromText(
+            element.name,
+            place.getContext,
+            place))
     }
     isInstanceMethod || isSynthetic || resolvesAtNewPlace
   }
@@ -133,11 +138,13 @@ object ReachingDefintionsCollector {
       dfaResult: mutable.Map[Instruction, RDSet]): Iterable[VariableInfo] = {
     val buffer = new ArrayBuffer[PsiNamedElement]
     for {
-      (read @ ReadWriteVariableInstruction(_,
-                                           readRef,
-                                           Some(definitionToRead),
-                                           false),
-       rdset) <- dfaResult if !innerInstructions.contains(read)
+      (
+        read @ ReadWriteVariableInstruction(
+          _,
+          readRef,
+          Some(definitionToRead),
+          false),
+        rdset) <- dfaResult if !innerInstructions.contains(read)
       reaching <- rdset if innerInstructions.contains(reaching)
     } {
       reaching match {

@@ -6,8 +6,9 @@ object HasColumnProjection {
   val LOG = LoggerFactory.getLogger(this.getClass)
 
   def requireNoSemiColon(glob: String) = {
-    require(!glob.contains(";"),
-            "A column projection glob cannot contain a ; character")
+    require(
+      !glob.contains(";"),
+      "A column projection glob cannot contain a ; character")
   }
 }
 
@@ -46,8 +47,9 @@ trait HasColumnProjection {
     val deprecated = withColumns
     val strict = withColumnProjections
 
-    require(deprecated.isEmpty || strict.isEmpty,
-            "Cannot provide both withColumns and withColumnProjections")
+    require(
+      deprecated.isEmpty || strict.isEmpty,
+      "Cannot provide both withColumns and withColumnProjections")
 
     deprecated.foreach(requireNoSemiColon)
     strict.foreach(requireNoSemiColon)

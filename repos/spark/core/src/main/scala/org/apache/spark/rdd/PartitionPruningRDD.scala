@@ -62,8 +62,9 @@ private[spark] class PruneDependency[T](rdd: RDD[T],
 @DeveloperApi
 class PartitionPruningRDD[T: ClassTag](prev: RDD[T],
                                        partitionFilterFunc: Int => Boolean)
-    extends RDD[T](prev.context,
-                   List(new PruneDependency(prev, partitionFilterFunc))) {
+    extends RDD[T](
+      prev.context,
+      List(new PruneDependency(prev, partitionFilterFunc))) {
 
   override def compute(split: Partition, context: TaskContext): Iterator[T] = {
     firstParent[T].iterator(

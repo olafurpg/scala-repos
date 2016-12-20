@@ -24,8 +24,9 @@ object Play2OldStructureAdapter {
       .groupBy(_._2)
       .mapValues(_.map({ case (id, _, v) => (id, v) }))
 
-    new Play2ProjectData(SbtProjectSystem.Id,
-                         avoidSL7005Bug(oldData.mapValues(_.toMap)))
+    new Play2ProjectData(
+      SbtProjectSystem.Id,
+      avoidSL7005Bug(oldData.mapValues(_.toMap)))
   }
 
   private def extractProjectKeyValue(

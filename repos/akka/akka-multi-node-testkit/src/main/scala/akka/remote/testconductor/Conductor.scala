@@ -286,9 +286,10 @@ private[akka] class ConductorHandler(_createTimeout: Timeout,
                                 event: ChannelStateEvent) = {
     val channel = event.getChannel
     log.debug("connection from {}", getAddrString(channel))
-    val fsm: ActorRef = Await.result(controller ? Controller.CreateServerFSM(
-                                       channel) mapTo classTag[ActorRef],
-                                     Duration.Inf)
+    val fsm: ActorRef = Await.result(
+      controller ? Controller
+        .CreateServerFSM(channel) mapTo classTag[ActorRef],
+      Duration.Inf)
     clients.put(channel, fsm)
   }
 
@@ -309,9 +310,10 @@ private[akka] class ConductorHandler(_createTimeout: Timeout,
       case msg: NetworkOp ⇒
         clients.get(channel) ! msg
       case msg ⇒
-        log.info("client {} sent garbage '{}', disconnecting",
-                 getAddrString(channel),
-                 msg)
+        log.info(
+          "client {} sent garbage '{}', disconnecting",
+          getAddrString(channel),
+          msg)
         channel.close()
     }
   }
@@ -382,8 +384,9 @@ private[akka] class ServerFSM(val controller: ActorRef, val channel: Channel)
       log.warning("cannot send {} in state Initial", msg)
       stay
     case Event(StateTimeout, _) ⇒
-      log.info("closing channel to {} because of Hello timeout",
-               getAddrString(channel))
+      log.info(
+        "closing channel to {} because of Hello timeout",
+        getAddrString(channel))
       channel.close()
       stop()
   }
@@ -396,9 +399,10 @@ private[akka] class ServerFSM(val controller: ActorRef, val channel: Channel)
       controller ! op
       stay
     case Event(msg: NetworkOp, _) ⇒
-      log.warning("client {} sent unsupported message {}",
-                  getAddrString(channel),
-                  msg)
+      log.warning(
+        "client {} sent unsupported message {}",
+        getAddrString(channel),
+        msg)
       stop()
     case Event(ToClient(msg: UnconfirmedClientOp), _) ⇒
       channel.write(msg)
@@ -646,9 +650,11 @@ private[akka] class BarrierCoordinator
         (clients find (_.name == name)) match {
           case None ⇒ stay
           case Some(c) ⇒
-            throw ClientLost(d.copy(clients = clients - c,
-                                    arrived = arrived filterNot (_ == c.fsm)),
-                             name)
+            throw ClientLost(
+              d.copy(
+                clients = clients - c,
+                arrived = arrived filterNot (_ == c.fsm)),
+              name)
         }
       }
   }
@@ -661,14 +667,16 @@ private[akka] class BarrierCoordinator
       else if (clients.find(_.fsm == sender()).isEmpty)
         stay replying ToClient(BarrierResult(name, false))
       else {
-        goto(Waiting) using d.copy(barrier = name,
-                                   arrived = sender() :: Nil,
-                                   deadline = getDeadline(timeout))
+        goto(Waiting) using d.copy(
+          barrier = name,
+          arrived = sender() :: Nil,
+          deadline = getDeadline(timeout))
       }
     case Event(RemoveClient(name), d @ Data(clients, _, _, _)) ⇒
       if (clients.isEmpty)
-        throw BarrierEmpty(d,
-                           "cannot remove " + name + ": no client to remove")
+        throw BarrierEmpty(
+          d,
+          "cannot remove " + name + ": no client to remove")
       stay using d.copy(clients = clients filterNot (_.name == name))
   }
 
@@ -679,8 +687,9 @@ private[akka] class BarrierCoordinator
   }
 
   when(Waiting) {
-    case Event(EnterBarrier(name, timeout),
-               d @ Data(clients, barrier, arrived, deadline)) ⇒
+    case Event(
+        EnterBarrier(name, timeout),
+        d @ Data(clients, barrier, arrived, deadline)) ⇒
       if (name != barrier) throw WrongBarrier(name, sender(), d)
       val together =
         if (clients.exists(_.fsm == sender())) sender() :: arrived else arrived
@@ -695,8 +704,9 @@ private[akka] class BarrierCoordinator
         case None ⇒ stay
         case Some(client) ⇒
           handleBarrier(
-            d.copy(clients = clients - client,
-                   arrived = arrived filterNot (_ == client.fsm)))
+            d.copy(
+              clients = clients - client,
+              arrived = arrived filterNot (_ == client.fsm)))
       }
     case Event(FailBarrier(name), d @ Data(_, barrier, _, _)) ⇒
       if (name != barrier) throw WrongBarrier(name, sender(), d)

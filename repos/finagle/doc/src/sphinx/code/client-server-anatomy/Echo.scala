@@ -90,8 +90,9 @@ object SimpleListenerExample {
     }
     val serveTransport = (t: Transport[String, String]) =>
       new SerialServerDispatcher(t, service)
-    val listener = Netty3Listener[String, String](StringServerPipeline,
-                                                  StackServer.defaultParams)
+    val listener = Netty3Listener[String, String](
+      StringServerPipeline,
+      StackServer.defaultParams)
     val server = listener.listen(address) { serveTransport(_) }
     //#simplelisten
 

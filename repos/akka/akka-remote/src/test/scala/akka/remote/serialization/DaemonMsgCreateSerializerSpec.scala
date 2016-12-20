@@ -46,28 +46,31 @@ class DaemonMsgCreateSerializerSpec extends AkkaSpec {
 
     "serialize and de-serialize DaemonMsgCreate with FromClassCreator" in {
       verifySerialization {
-        DaemonMsgCreate(props = Props[MyActor],
-                        deploy = Deploy(),
-                        path = "foo",
-                        supervisor = supervisor)
+        DaemonMsgCreate(
+          props = Props[MyActor],
+          deploy = Deploy(),
+          path = "foo",
+          supervisor = supervisor)
       }
     }
 
     "serialize and de-serialize DaemonMsgCreate with FromClassCreator, with null parameters for Props" in {
       verifySerialization {
-        DaemonMsgCreate(props = Props(classOf[MyActorWithParam], null),
-                        deploy = Deploy(),
-                        path = "foo",
-                        supervisor = supervisor)
+        DaemonMsgCreate(
+          props = Props(classOf[MyActorWithParam], null),
+          deploy = Deploy(),
+          path = "foo",
+          supervisor = supervisor)
       }
     }
 
     "serialize and de-serialize DaemonMsgCreate with function creator" in {
       verifySerialization {
-        DaemonMsgCreate(props = Props(new MyActor),
-                        deploy = Deploy(),
-                        path = "foo",
-                        supervisor = supervisor)
+        DaemonMsgCreate(
+          props = Props(new MyActor),
+          deploy = Deploy(),
+          path = "foo",
+          supervisor = supervisor)
       }
     }
 
@@ -78,19 +81,21 @@ class DaemonMsgCreateSerializerSpec extends AkkaSpec {
           case _ ⇒ SupervisorStrategy.Escalate
         }
         val deploy1 =
-          Deploy(path = "path1",
-                 config = ConfigFactory.parseString("a=1"),
-                 routerConfig = RoundRobinPool(nrOfInstances = 5,
-                                               supervisorStrategy =
-                                                 supervisorStrategy),
-                 scope = RemoteScope(Address("akka", "Test", "host1", 1921)),
-                 dispatcher = "mydispatcher")
+          Deploy(
+            path = "path1",
+            config = ConfigFactory.parseString("a=1"),
+            routerConfig = RoundRobinPool(
+              nrOfInstances = 5,
+              supervisorStrategy = supervisorStrategy),
+            scope = RemoteScope(Address("akka", "Test", "host1", 1921)),
+            dispatcher = "mydispatcher")
         val deploy2 =
-          Deploy(path = "path2",
-                 config = ConfigFactory.parseString("a=2"),
-                 routerConfig = FromConfig,
-                 scope = RemoteScope(Address("akka", "Test", "host2", 1922)),
-                 dispatcher = Deploy.NoDispatcherGiven)
+          Deploy(
+            path = "path2",
+            config = ConfigFactory.parseString("a=2"),
+            routerConfig = FromConfig,
+            scope = RemoteScope(Address("akka", "Test", "host2", 1922)),
+            dispatcher = Deploy.NoDispatcherGiven)
         DaemonMsgCreate(
           props = Props[MyActor].withDispatcher("my-disp").withDeploy(deploy1),
           deploy = deploy2,

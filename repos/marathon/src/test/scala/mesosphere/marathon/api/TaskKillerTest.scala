@@ -45,12 +45,13 @@ class TaskKillerTest
     auth = new TestAuthFixture
     identity = auth.identity
 
-    taskKiller = new TaskKiller(tracker,
-                                groupManager,
-                                service,
-                                config,
-                                auth.auth,
-                                auth.auth)
+    taskKiller = new TaskKiller(
+      tracker,
+      groupManager,
+      service,
+      config,
+      auth.auth,
+      auth.auth)
 
     when(config.zkTimeoutDuration).thenReturn(1.second)
   }
@@ -100,11 +101,12 @@ class TaskKillerTest
       ArgumentCaptor.forClass(classOf[Map[PathId, Iterable[Task]]])
     val expectedDeploymentPlan = DeploymentPlan.empty
     when(
-      groupManager.update(any[PathId],
-                          groupUpdateCaptor.capture(),
-                          any[Timestamp],
-                          forceCaptor.capture(),
-                          toKillCaptor.capture()))
+      groupManager.update(
+        any[PathId],
+        groupUpdateCaptor.capture(),
+        any[Timestamp],
+        forceCaptor.capture(),
+        toKillCaptor.capture()))
       .thenReturn(Future.successful(expectedDeploymentPlan))
 
     val result =

@@ -85,10 +85,11 @@ object ZkUtils {
   def createZkClient(zkUrl: String,
                      sessionTimeout: Int,
                      connectionTimeout: Int): ZkClient = {
-    val zkClient = new ZkClient(zkUrl,
-                                sessionTimeout,
-                                connectionTimeout,
-                                ZKStringSerializer)
+    val zkClient = new ZkClient(
+      zkUrl,
+      sessionTimeout,
+      connectionTimeout,
+      ZKStringSerializer)
     zkClient
   }
 
@@ -155,24 +156,26 @@ class ZkUtils(val zkClient: ZkClient,
               val isSecure: Boolean)
     extends Logging {
   // These are persistent ZK paths that should exist on kafka broker startup.
-  val persistentZkPaths = Seq(ConsumersPath,
-                              BrokerIdsPath,
-                              BrokerTopicsPath,
-                              EntityConfigChangesPath,
-                              getEntityConfigRootPath(ConfigType.Topic),
-                              getEntityConfigRootPath(ConfigType.Client),
-                              DeleteTopicsPath,
-                              BrokerSequenceIdPath,
-                              IsrChangeNotificationPath)
+  val persistentZkPaths = Seq(
+    ConsumersPath,
+    BrokerIdsPath,
+    BrokerTopicsPath,
+    EntityConfigChangesPath,
+    getEntityConfigRootPath(ConfigType.Topic),
+    getEntityConfigRootPath(ConfigType.Client),
+    DeleteTopicsPath,
+    BrokerSequenceIdPath,
+    IsrChangeNotificationPath)
 
-  val securePersistentZkPaths = Seq(BrokerIdsPath,
-                                    BrokerTopicsPath,
-                                    EntityConfigChangesPath,
-                                    getEntityConfigRootPath(ConfigType.Topic),
-                                    getEntityConfigRootPath(ConfigType.Client),
-                                    DeleteTopicsPath,
-                                    BrokerSequenceIdPath,
-                                    IsrChangeNotificationPath)
+  val securePersistentZkPaths = Seq(
+    BrokerIdsPath,
+    BrokerTopicsPath,
+    EntityConfigChangesPath,
+    getEntityConfigRootPath(ConfigType.Topic),
+    getEntityConfigRootPath(ConfigType.Client),
+    DeleteTopicsPath,
+    BrokerSequenceIdPath,
+    IsrChangeNotificationPath)
 
   val DefaultAcls: java.util.List[ACL] = ZkUtils.DefaultAcls(isSecure)
 
@@ -335,14 +338,15 @@ class ZkUtils(val zkClient: ZkClient,
     val timestamp = SystemTime.milliseconds.toString
 
     val version = if (apiVersion >= KAFKA_0_10_0_IV0) 3 else 2
-    var jsonMap = Map("version" -> version,
-                      "host" -> host,
-                      "port" -> port,
-                      "endpoints" -> advertisedEndpoints.values
-                        .map(_.connectionString)
-                        .toArray,
-                      "jmx_port" -> jmxPort,
-                      "timestamp" -> timestamp)
+    var jsonMap = Map(
+      "version" -> version,
+      "host" -> host,
+      "port" -> port,
+      "endpoints" -> advertisedEndpoints.values
+        .map(_.connectionString)
+        .toArray,
+      "jmx_port" -> jmxPort,
+      "timestamp" -> timestamp)
     rack.foreach(rack => if (version >= 3) jsonMap += ("rack" -> rack))
 
     val brokerInfo = Json.encode(jsonMap)
@@ -382,11 +386,12 @@ class ZkUtils(val zkClient: ZkClient,
   def leaderAndIsrZkData(leaderAndIsr: LeaderAndIsr,
                          controllerEpoch: Int): String = {
     Json.encode(
-      Map("version" -> 1,
-          "leader" -> leaderAndIsr.leader,
-          "leader_epoch" -> leaderAndIsr.leaderEpoch,
-          "controller_epoch" -> controllerEpoch,
-          "isr" -> leaderAndIsr.isr))
+      Map(
+        "version" -> 1,
+        "leader" -> leaderAndIsr.leader,
+        "leader_epoch" -> leaderAndIsr.leaderEpoch,
+        "controller_epoch" -> controllerEpoch,
+        "isr" -> leaderAndIsr.isr))
   }
 
   /**
@@ -726,8 +731,9 @@ class ZkUtils(val zkClient: ZkClient,
                 case Some(repl) =>
                   val replicaMap = repl.asInstanceOf[Map[String, Seq[Int]]]
                   for ((partition, replicas) <- replicaMap) {
-                    ret.put(TopicAndPartition(topic, partition.toInt),
-                            replicas)
+                    ret.put(
+                      TopicAndPartition(topic, partition.toInt),
+                      replicas)
                     debug(
                       "Replicas assigned to topic [%s], partition [%s] are [%s]"
                         .format(topic, partition, replicas))
@@ -762,8 +768,8 @@ class ZkUtils(val zkClient: ZkClient,
         case None => Map[Int, Seq[Int]]()
       }
       debug(
-        "Partition map for /brokers/topics/%s is %s".format(topic,
-                                                            partitionMap))
+        "Partition map for /brokers/topics/%s is %s"
+          .format(topic, partitionMap))
       ret += (topic -> partitionMap)
     }
     ret
@@ -846,12 +852,14 @@ class ZkUtils(val zkClient: ZkClient,
   def getPartitionReassignmentZkData(
       partitionsToBeReassigned: Map[TopicAndPartition, Seq[Int]]): String = {
     Json.encode(
-      Map("version" -> 1,
-          "partitions" -> partitionsToBeReassigned.map(
-            e =>
-              Map("topic" -> e._1.topic,
-                  "partition" -> e._1.partition,
-                  "replicas" -> e._2))))
+      Map(
+        "version" -> 1,
+        "partitions" -> partitionsToBeReassigned.map(
+          e =>
+            Map(
+              "topic" -> e._1.topic,
+              "partition" -> e._1.partition,
+              "replicas" -> e._2))))
   }
 
   def updatePartitionReassignmentData(
@@ -1199,12 +1207,13 @@ class ZKCheckedEphemeral(path: String,
   }
 
   private def createEphemeral() {
-    zkHandle.create(path,
-                    ZKStringSerializer.serialize(data),
-                    DefaultAcls(isSecure),
-                    CreateMode.EPHEMERAL,
-                    createCallback,
-                    null)
+    zkHandle.create(
+      path,
+      ZKStringSerializer.serialize(data),
+      DefaultAcls(isSecure),
+      CreateMode.EPHEMERAL,
+      createCallback,
+      null)
   }
 
   private def createRecursive(prefix: String, suffix: String) {

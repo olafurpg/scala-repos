@@ -69,8 +69,9 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
     configProps2 = createBrokerConfig(brokerId2, zkConnect)
 
     for (configProps <- List(configProps1, configProps2)) {
-      configProps.put("controlled.shutdown.enable",
-                      String.valueOf(enableControlledShutdown))
+      configProps.put(
+        "controlled.shutdown.enable",
+        String.valueOf(enableControlledShutdown))
       configProps.put("controlled.shutdown.max.retries", String.valueOf(1))
       configProps
         .put("controlled.shutdown.retry.backoff.ms", String.valueOf(1000))
@@ -198,8 +199,9 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
     assertTrue("Leader should get elected", leaderIdOpt.isDefined)
     val leaderId = leaderIdOpt.get
     debug("Leader for " + topic + " is elected to be: %s".format(leaderId))
-    assertTrue("Leader id is set to expected value for topic: " + topic,
-               leaderId == brokerId1 || leaderId == brokerId2)
+    assertTrue(
+      "Leader id is set to expected value for topic: " + topic,
+      leaderId == brokerId1 || leaderId == brokerId2)
 
     // the non-leader broker is the follower
     val followerId = if (leaderId == brokerId1) brokerId2 else brokerId1
@@ -226,10 +228,11 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
       .map(server => server.startup())
 
     // wait until new leader is (uncleanly) elected
-    waitUntilLeaderIsElectedOrChanged(zkUtils,
-                                      topic,
-                                      partitionId,
-                                      newLeaderOpt = Some(followerId))
+    waitUntilLeaderIsElectedOrChanged(
+      zkUtils,
+      topic,
+      partitionId,
+      newLeaderOpt = Some(followerId))
 
     produceMessage(servers, topic, "third")
 
@@ -244,8 +247,9 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
     assertTrue("Leader should get elected", leaderIdOpt.isDefined)
     val leaderId = leaderIdOpt.get
     debug("Leader for " + topic + " is elected to be: %s".format(leaderId))
-    assertTrue("Leader id is set to expected value for topic: " + topic,
-               leaderId == brokerId1 || leaderId == brokerId2)
+    assertTrue(
+      "Leader id is set to expected value for topic: " + topic,
+      leaderId == brokerId1 || leaderId == brokerId2)
 
     // the non-leader broker is the follower
     val followerId = if (leaderId == brokerId1) brokerId2 else brokerId1
@@ -272,10 +276,11 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
       .map(server => server.startup())
 
     // verify that unclean election to non-ISR follower does not occur
-    waitUntilLeaderIsElectedOrChanged(zkUtils,
-                                      topic,
-                                      partitionId,
-                                      newLeaderOpt = Some(-1))
+    waitUntilLeaderIsElectedOrChanged(
+      zkUtils,
+      topic,
+      partitionId,
+      newLeaderOpt = Some(-1))
 
     // message production and consumption should both fail while leader is down
     try {
@@ -293,10 +298,11 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
     servers
       .filter(server => server.config.brokerId == leaderId)
       .map(server => server.startup())
-    waitUntilLeaderIsElectedOrChanged(zkUtils,
-                                      topic,
-                                      partitionId,
-                                      newLeaderOpt = Some(leaderId))
+    waitUntilLeaderIsElectedOrChanged(
+      zkUtils,
+      topic,
+      partitionId,
+      newLeaderOpt = Some(leaderId))
 
     produceMessage(servers, topic, "third")
     waitUntilMetadataIsPropagated(servers, topic, partitionId)
@@ -305,10 +311,11 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
       .map(server => shutdownServer(server))
 
     // verify clean leader transition to ISR follower
-    waitUntilLeaderIsElectedOrChanged(zkUtils,
-                                      topic,
-                                      partitionId,
-                                      newLeaderOpt = Some(followerId))
+    waitUntilLeaderIsElectedOrChanged(
+      zkUtils,
+      topic,
+      partitionId,
+      newLeaderOpt = Some(followerId))
 
     // verify messages can be consumed from ISR follower that was just promoted to leader
     assertEquals(List("first", "second", "third"), consumeAllMessages(topic))
@@ -322,10 +329,11 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
   private def consumeAllMessages(topic: String): List[String] = {
     // use a fresh consumer group every time so that we don't need to mess with disabling auto-commit or
     // resetting the ZK offset
-    val consumerProps = createConsumerProperties(zkConnect,
-                                                 "group" + random.nextLong,
-                                                 "id",
-                                                 1000)
+    val consumerProps = createConsumerProperties(
+      zkConnect,
+      "group" + random.nextLong,
+      "id",
+      1000)
     val consumerConnector = Consumer.create(new ConsumerConfig(consumerProps))
     val messageStream = consumerConnector.createMessageStreams(
       Map(topic -> 1),

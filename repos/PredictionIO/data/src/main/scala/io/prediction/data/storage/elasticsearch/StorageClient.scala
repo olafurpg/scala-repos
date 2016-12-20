@@ -38,8 +38,9 @@ class StorageClient(val config: StorageClientConfig)
       .getOrElse(Seq(9300))
     val settings = ImmutableSettings
       .settingsBuilder()
-      .put("cluster.name",
-           config.properties.getOrElse("CLUSTERNAME", "elasticsearch"))
+      .put(
+        "cluster.name",
+        config.properties.getOrElse("CLUSTERNAME", "elasticsearch"))
     val transportClient = new TransportClient(settings)
     (hosts zip ports) foreach { hp =>
       transportClient.addTransportAddress(

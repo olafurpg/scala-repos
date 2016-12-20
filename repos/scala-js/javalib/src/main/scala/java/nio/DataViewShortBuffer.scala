@@ -106,11 +106,12 @@ private[nio] object DataViewShortBuffer {
               initialLimit: Int,
               readOnly: Boolean,
               isBigEndian: Boolean): ShortBuffer = {
-      new DataViewShortBuffer(dataView,
-                              initialPosition,
-                              initialLimit,
-                              readOnly,
-                              isBigEndian)
+      new DataViewShortBuffer(
+        dataView,
+        initialPosition,
+        initialLimit,
+        readOnly,
+        isBigEndian)
     }
   }
 

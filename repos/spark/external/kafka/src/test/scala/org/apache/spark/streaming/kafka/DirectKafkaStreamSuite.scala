@@ -146,9 +146,10 @@ class DirectKafkaStreamSuite
     }
     ssc.start()
     eventually(timeout(20000.milliseconds), interval(200.milliseconds)) {
-      assert(allReceived.size === totalSent,
-             "didn't get expected number of messages, messages:\n" +
-               allReceived.asScala.mkString("\n"))
+      assert(
+        allReceived.size === totalSent,
+        "didn't get expected number of messages, messages:\n" +
+          allReceived.asScala.mkString("\n"))
     }
     ssc.stop()
   }
@@ -233,11 +234,12 @@ class DirectKafkaStreamSuite
     // Setup context and kafka stream with largest offset
     ssc = new StreamingContext(sparkConf, Milliseconds(200))
     val stream = withClue("Error creating direct stream") {
-      KafkaUtils.createDirectStream[String,
-                                    String,
-                                    StringDecoder,
-                                    StringDecoder,
-                                    String](
+      KafkaUtils.createDirectStream[
+        String,
+        String,
+        StringDecoder,
+        StringDecoder,
+        String](
         ssc,
         kafkaParams,
         Map(topicPartition -> 11L),
@@ -390,9 +392,10 @@ class DirectKafkaStreamSuite
     }
     ssc.start()
     eventually(timeout(20000.milliseconds), interval(200.milliseconds)) {
-      assert(allReceived.size === totalSent,
-             "didn't get expected number of messages, messages:\n" +
-               allReceived.asScala.mkString("\n"))
+      assert(
+        allReceived.size === totalSent,
+        "didn't get expected number of messages, messages:\n" +
+          allReceived.asScala.mkString("\n"))
 
       // Calculate all the record number collected in the StreamingListener.
       assert(collector.numRecordsSubmitted.get() === totalSent)
@@ -406,8 +409,9 @@ class DirectKafkaStreamSuite
     val topic = "maxMessagesPerPartition"
     val kafkaStream = getDirectKafkaStream(topic, None)
 
-    val input = Map(TopicAndPartition(topic, 0) -> 50L,
-                    TopicAndPartition(topic, 1) -> 50L)
+    val input = Map(
+      TopicAndPartition(topic, 0) -> 50L,
+      TopicAndPartition(topic, 1) -> 50L)
     assert(
       kafkaStream.maxMessagesPerPartition(input).get == Map(
         TopicAndPartition(topic, 0) -> 10L,
@@ -431,8 +435,9 @@ class DirectKafkaStreamSuite
       Some(new ConstantRateController(0, new ConstantEstimator(100), 1000))
     val kafkaStream = getDirectKafkaStream(topic, rateController)
 
-    val input = Map(TopicAndPartition(topic, 0) -> 1000L,
-                    TopicAndPartition(topic, 1) -> 1000L)
+    val input = Map(
+      TopicAndPartition(topic, 0) -> 1000L,
+      TopicAndPartition(topic, 1) -> 1000L)
     assert(
       kafkaStream.maxMessagesPerPartition(input).get == Map(
         TopicAndPartition(topic, 0) -> 10L,
@@ -471,17 +476,16 @@ class DirectKafkaStreamSuite
         (mmd: MessageAndMetadata[String, String]) => (mmd.key, mmd.message)
       val m = kc
         .getEarliestLeaderOffsets(topicPartitions)
-        .fold(e => Map.empty[TopicAndPartition, Long],
-              m => m.mapValues(lo => lo.offset))
+        .fold(
+          e => Map.empty[TopicAndPartition, Long],
+          m => m.mapValues(lo => lo.offset))
 
-      new DirectKafkaInputDStream[String,
-                                  String,
-                                  StringDecoder,
-                                  StringDecoder,
-                                  (String, String)](ssc,
-                                                    kafkaParams,
-                                                    m,
-                                                    messageHandler) {
+      new DirectKafkaInputDStream[
+        String,
+        String,
+        StringDecoder,
+        StringDecoder,
+        (String, String)](ssc, kafkaParams, m, messageHandler) {
         override protected[streaming] val rateController =
           Some(new DirectKafkaRateController(id, estimator))
       }
@@ -510,8 +514,9 @@ class DirectKafkaStreamSuite
       estimator.updateRate(rate) // Set a new rate.
       // Expect blocks of data equal to "rate", scaled by the interval length in secs.
       val expectedSize = Math.round(rate * batchIntervalMilliseconds * 0.001)
-      eventually(timeout(5.seconds),
-                 interval(batchIntervalMilliseconds.milliseconds)) {
+      eventually(
+        timeout(5.seconds),
+        interval(batchIntervalMilliseconds.milliseconds)) {
         // Assert that rate estimator values are used to determine maxMessagesPerPartition.
         // Funky "-" in message makes the complete assertion message read better.
         assert(
@@ -552,14 +557,16 @@ class DirectKafkaStreamSuite
       Map(TopicAndPartition(topic, 0) -> 0L, TopicAndPartition(topic, 1) -> 0L)
     val messageHandler = (mmd: MessageAndMetadata[String, String]) =>
       (mmd.key, mmd.message)
-    new DirectKafkaInputDStream[String,
-                                String,
-                                StringDecoder,
-                                StringDecoder,
-                                (String, String)](ssc,
-                                                  Map[String, String](),
-                                                  earliestOffsets,
-                                                  messageHandler) {
+    new DirectKafkaInputDStream[
+      String,
+      String,
+      StringDecoder,
+      StringDecoder,
+      (String, String)](
+      ssc,
+      Map[String, String](),
+      earliestOffsets,
+      messageHandler) {
       override protected[streaming] val rateController = mockRateController
     }
   }

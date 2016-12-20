@@ -103,10 +103,11 @@ trait ManagedExecution
       new JobQueryLogger[JobQueryTF, A] with ShardQueryLogger[JobQueryTF, A]
       with TimingQueryLogger[JobQueryTF, A] {
         val M = shardQueryMonad
-        val jobManager = self.jobManager.withM[JobQueryTF](lift,
-                                                           implicitly,
-                                                           shardQueryMonad.M,
-                                                           shardQueryMonad)
+        val jobManager = self.jobManager.withM[JobQueryTF](
+          lift,
+          implicitly,
+          shardQueryMonad.M,
+          shardQueryMonad)
         val jobId = jobId0
         val clock = yggConfig.clock
         val decomposer = decomposer0
@@ -166,17 +167,19 @@ trait ManagedExecution
 
       //TODO: this is craziness
       EitherT.right(
-        createQueryJob(context.apiKey,
-                       Some(userQuery.serialize),
-                       opts.timeout)(executionContext)) flatMap {
+        createQueryJob(
+          context.apiKey,
+          Some(userQuery.serialize),
+          opts.timeout)(executionContext)) flatMap {
         implicit shardQueryMonad: JobQueryTFMonad =>
           import JobQueryState._
 
-          complete(EitherT
-                     .eitherTHoist[EvaluationError]
-                     .hoist(sink)
-                     .apply(executor.execute(query, context, opts)),
-                   opts.output)
+          complete(
+            EitherT
+              .eitherTHoist[EvaluationError]
+              .hoist(sink)
+              .apply(executor.execute(query, context, opts)),
+            opts.output)
       }
     }
   }
@@ -225,15 +228,16 @@ trait ManagedExecution
           val convertedStream: StreamT[JobQueryTF, CharBuffer] =
             ColumnarTableModule.toCharBuffers(outputType, derefed)
           //FIXME: Thread this through the EitherT
-          jobManager.setResult(jobId,
-                               Some(JSON),
-                               encodeCharStream(completeJob(convertedStream),
-                                                Utf8)) map {
+          jobManager.setResult(
+            jobId,
+            Some(JSON),
+            encodeCharStream(completeJob(convertedStream), Utf8)) map {
             case Left(error) =>
-              jobManager.abort(jobId,
-                               "Error occured while storing job results: " +
-                                 error,
-                               yggConfig.clock.now())
+              jobManager.abort(
+                jobId,
+                "Error occured while storing job results: " +
+                  error,
+                yggConfig.clock.now())
             case Right(_) =>
             // This is "finished" by `completeJob`.
           }

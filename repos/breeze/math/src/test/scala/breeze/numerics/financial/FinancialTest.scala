@@ -60,42 +60,45 @@ class FinancialTest extends FunSuite {
     val (principal, interest, remainingPrincipal) =
       principalInterest(0.0824 / 12, 12, 2500.0)
 
-    val expectedRemainingPrincipal = DenseVector[Double](2299.42,
-                                                         2097.46,
-                                                         1894.11,
-                                                         1689.37,
-                                                         1483.22,
-                                                         1275.66,
-                                                         1066.67,
-                                                         856.25,
-                                                         644.38,
-                                                         431.05,
-                                                         216.26,
-                                                         -0.00)
-    val expectedInterestPayment = DenseVector[Double](-17.17,
-                                                      -15.79,
-                                                      -14.40,
-                                                      -13.01,
-                                                      -11.60,
-                                                      -10.18,
-                                                      -8.76,
-                                                      -7.32,
-                                                      -5.88,
-                                                      -4.42,
-                                                      -2.96,
-                                                      -1.49)
-    val expectedPrincipalPayment = DenseVector[Double](-200.58,
-                                                       -201.96,
-                                                       -203.35,
-                                                       -204.74,
-                                                       -206.15,
-                                                       -207.56,
-                                                       -208.99,
-                                                       -210.42,
-                                                       -211.87,
-                                                       -213.32,
-                                                       -214.79,
-                                                       -216.26)
+    val expectedRemainingPrincipal = DenseVector[Double](
+      2299.42,
+      2097.46,
+      1894.11,
+      1689.37,
+      1483.22,
+      1275.66,
+      1066.67,
+      856.25,
+      644.38,
+      431.05,
+      216.26,
+      -0.00)
+    val expectedInterestPayment = DenseVector[Double](
+      -17.17,
+      -15.79,
+      -14.40,
+      -13.01,
+      -11.60,
+      -10.18,
+      -8.76,
+      -7.32,
+      -5.88,
+      -4.42,
+      -2.96,
+      -1.49)
+    val expectedPrincipalPayment = DenseVector[Double](
+      -200.58,
+      -201.96,
+      -203.35,
+      -204.74,
+      -206.15,
+      -207.56,
+      -208.99,
+      -210.42,
+      -211.87,
+      -213.32,
+      -214.79,
+      -216.26)
 
     assert(norm(expectedRemainingPrincipal - remainingPrincipal) < 2e-1)
     assert(norm(expectedPrincipalPayment - principal) < 1e-1)
@@ -124,14 +127,16 @@ class FinancialTest extends FunSuite {
     assert(math.abs(interalRateReturn(expectZeroIRR).get) < DOUBLE_ROUND5_MIN)
 
     val expectNormalMIRR =
-      modifiedInternalRateReturn(DenseVector[Double](-180, 42, 39, 40, 32, 48),
-                                 0.08,
-                                 0.11);
+      modifiedInternalRateReturn(
+        DenseVector[Double](-180, 42, 39, 40, 32, 48),
+        0.08,
+        0.11);
     assert(math.abs(expectNormalMIRR - 0.06782) < DOUBLE_ROUND5_MIN)
     val expectNegativeMIRR =
-      modifiedInternalRateReturn(DenseVector[Double](-180, 42, 39, 40),
-                                 0.08,
-                                 0.11)
+      modifiedInternalRateReturn(
+        DenseVector[Double](-180, 42, 39, 40),
+        0.08,
+        0.11)
     assert(math.abs(expectNegativeMIRR + 0.091354) < DOUBLE_ROUND5_MIN)
     val withMultiNegMIRR = modifiedInternalRateReturn(
       DenseVector[Double](-180, 42, 39, -50, 40, 32, 48),

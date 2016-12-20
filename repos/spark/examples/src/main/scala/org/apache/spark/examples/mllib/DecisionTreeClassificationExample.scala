@@ -46,12 +46,13 @@ object DecisionTreeClassificationExample {
     val maxDepth = 5
     val maxBins = 32
 
-    val model = DecisionTree.trainClassifier(trainingData,
-                                             numClasses,
-                                             categoricalFeaturesInfo,
-                                             impurity,
-                                             maxDepth,
-                                             maxBins)
+    val model = DecisionTree.trainClassifier(
+      trainingData,
+      numClasses,
+      categoricalFeaturesInfo,
+      impurity,
+      maxDepth,
+      maxBins)
 
     // Evaluate model on test instances and compute test error
     val labelAndPreds = testData.map { point =>

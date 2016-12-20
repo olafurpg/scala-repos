@@ -107,19 +107,22 @@ class ColumnPruningSuite extends PlanTest {
     val query = Aggregate(
       Seq('aa, 'gid),
       Seq(sum('c).as("sum")),
-      Expand(Seq(Seq('a, 'b, 'c, Literal.create(null, StringType), 1),
-                 Seq('a, 'b, 'c, 'a, 2)),
-             Seq('a, 'b, 'c, 'aa.int, 'gid.int),
-             input)).analyze
+      Expand(
+        Seq(
+          Seq('a, 'b, 'c, Literal.create(null, StringType), 1),
+          Seq('a, 'b, 'c, 'a, 2)),
+        Seq('a, 'b, 'c, 'aa.int, 'gid.int),
+        input)).analyze
     val optimized = Optimize.execute(query)
 
     val expected =
-      Aggregate(Seq('aa, 'gid),
-                Seq(sum('c).as("sum")),
-                Expand(Seq(Seq('c, Literal.create(null, StringType), 1),
-                           Seq('c, 'a, 2)),
-                       Seq('c, 'aa.int, 'gid.int),
-                       Project(Seq('a, 'c), input))).analyze
+      Aggregate(
+        Seq('aa, 'gid),
+        Seq(sum('c).as("sum")),
+        Expand(
+          Seq(Seq('c, Literal.create(null, StringType), 1), Seq('c, 'a, 2)),
+          Seq('c, 'aa.int, 'gid.int),
+          Project(Seq('a, 'c), input))).analyze
 
     comparePlans(optimized, expected)
   }
@@ -128,8 +131,9 @@ class ColumnPruningSuite extends PlanTest {
     val input = LocalRelation('a.int, 'b.string, 'c.double)
     val query = Project('a :: Nil, Filter('c > Literal(0.0), input)).analyze
     val expected =
-      Project('a :: Nil,
-              Filter('c > Literal(0.0), Project(Seq('a, 'c), input))).analyze
+      Project(
+        'a :: Nil,
+        Filter('c > Literal(0.0), Project(Seq('a, 'c), input))).analyze
     comparePlans(Optimize.execute(query), expected)
   }
 
@@ -155,8 +159,9 @@ class ColumnPruningSuite extends PlanTest {
     val input = OneRowRelation
     val expected = Project(Literal(1).as("1") :: Nil, input).analyze
 
-    val query1 = Project(Literal(1).as("1") :: Nil,
-                         Project(Literal(1).as("1") :: Nil, input)).analyze
+    val query1 = Project(
+      Literal(1).as("1") :: Nil,
+      Project(Literal(1).as("1") :: Nil, input)).analyze
     comparePlans(Optimize.execute(query1), expected)
 
     val query2 =
@@ -236,9 +241,10 @@ class ColumnPruningSuite extends PlanTest {
         'd,
         WindowExpression(
           AggregateExpression(Count('b), Complete, isDistinct = false),
-          WindowSpecDefinition('a :: Nil,
-                               SortOrder('b, Ascending) :: Nil,
-                               UnspecifiedFrame)).as('window))
+          WindowSpecDefinition(
+            'a :: Nil,
+            SortOrder('b, Ascending) :: Nil,
+            UnspecifiedFrame)).as('window))
       .select('a, 'c)
 
     val correctAnswer =
@@ -253,27 +259,31 @@ class ColumnPruningSuite extends PlanTest {
     val input = LocalRelation('a.int, 'b.string, 'c.double, 'd.int)
 
     val originalQuery = input
-      .select('a,
-              'b,
-              'c,
-              'd,
-              WindowExpression(
-                AggregateExpression(Count('b), Complete, isDistinct = false),
-                WindowSpecDefinition('a :: Nil,
-                                     SortOrder('b, Ascending) :: Nil,
-                                     UnspecifiedFrame)).as('window))
+      .select(
+        'a,
+        'b,
+        'c,
+        'd,
+        WindowExpression(
+          AggregateExpression(Count('b), Complete, isDistinct = false),
+          WindowSpecDefinition(
+            'a :: Nil,
+            SortOrder('b, Ascending) :: Nil,
+            UnspecifiedFrame)).as('window))
       .where('window > 1)
       .select('a, 'c)
 
     val correctAnswer = input
       .select('a, 'b, 'c)
-      .window(WindowExpression(
-                AggregateExpression(Count('b), Complete, isDistinct = false),
-                WindowSpecDefinition('a :: Nil,
-                                     SortOrder('b, Ascending) :: Nil,
-                                     UnspecifiedFrame)).as('window) :: Nil,
-              'a :: Nil,
-              'b.asc :: Nil)
+      .window(
+        WindowExpression(
+          AggregateExpression(Count('b), Complete, isDistinct = false),
+          WindowSpecDefinition(
+            'a :: Nil,
+            SortOrder('b, Ascending) :: Nil,
+            UnspecifiedFrame)).as('window) :: Nil,
+        'a :: Nil,
+        'b.asc :: Nil)
       .select('a, 'c, 'window)
       .where('window > 1)
       .select('a, 'c)
@@ -288,15 +298,17 @@ class ColumnPruningSuite extends PlanTest {
     val input = LocalRelation('a.int, 'b.string, 'c.double, 'd.int)
 
     val originalQuery = input
-      .select('a,
-              'b,
-              'c,
-              'd,
-              WindowExpression(
-                AggregateExpression(Count('b), Complete, isDistinct = false),
-                WindowSpecDefinition('a :: Nil,
-                                     SortOrder('b, Ascending) :: Nil,
-                                     UnspecifiedFrame)).as('window))
+      .select(
+        'a,
+        'b,
+        'c,
+        'd,
+        WindowExpression(
+          AggregateExpression(Count('b), Complete, isDistinct = false),
+          WindowSpecDefinition(
+            'a :: Nil,
+            SortOrder('b, Ascending) :: Nil,
+            UnspecifiedFrame)).as('window))
       .select('a, 'c)
 
     val correctAnswer = input.select('a, 'c).analyze
@@ -310,30 +322,31 @@ class ColumnPruningSuite extends PlanTest {
     val input1 = LocalRelation('a.int, 'b.string, 'c.double)
     val input2 = LocalRelation('c.int, 'd.string, 'e.double)
     val query = Project('b :: Nil, Union(input1 :: input2 :: Nil)).analyze
-    val expected = Project('b :: Nil,
-                           Union(
-                             Project('b :: Nil, input1) :: Project(
-                               'd :: Nil,
-                               input2) :: Nil)).analyze
+    val expected = Project(
+      'b :: Nil,
+      Union(Project('b :: Nil, input1) :: Project('d :: Nil, input2) :: Nil)).analyze
     comparePlans(Optimize.execute(query), expected)
   }
 
   test("Remove redundant projects in column pruning rule") {
     val input = LocalRelation('key.int, 'value.string)
 
-    val query = Project(Seq($"x.key", $"y.key"),
-                        Join(SubqueryAlias("x", input),
-                             BroadcastHint(SubqueryAlias("y", input)),
-                             Inner,
-                             None)).analyze
+    val query = Project(
+      Seq($"x.key", $"y.key"),
+      Join(
+        SubqueryAlias("x", input),
+        BroadcastHint(SubqueryAlias("y", input)),
+        Inner,
+        None)).analyze
 
     val optimized = Optimize.execute(query)
 
     val expected =
-      Join(Project(Seq($"x.key"), SubqueryAlias("x", input)),
-           BroadcastHint(Project(Seq($"y.key"), SubqueryAlias("y", input))),
-           Inner,
-           None).analyze
+      Join(
+        Project(Seq($"x.key"), SubqueryAlias("x", input)),
+        BroadcastHint(Project(Seq($"y.key"), SubqueryAlias("y", input))),
+        Inner,
+        None).analyze
 
     comparePlans(optimized, expected)
   }

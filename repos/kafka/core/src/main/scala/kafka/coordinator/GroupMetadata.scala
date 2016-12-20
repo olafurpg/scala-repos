@@ -243,10 +243,11 @@ private[coordinator] class GroupMetadata(val groupId: String,
           member.summaryNoMetadata()
         }
         .toList
-      GroupSummary(state.toString,
-                   protocolType,
-                   GroupCoordinator.NoProtocol,
-                   members)
+      GroupSummary(
+        state.toString,
+        protocolType,
+        GroupCoordinator.NoProtocol,
+        members)
     }
   }
 
@@ -258,10 +259,11 @@ private[coordinator] class GroupMetadata(val groupId: String,
     if (!GroupMetadata.validPreviousStates(targetState).contains(state))
       throw new IllegalStateException(
         "Group %s should be in the %s states before moving to %s state. Instead it is in %s state"
-          .format(groupId,
-                  GroupMetadata.validPreviousStates(targetState).mkString(","),
-                  targetState,
-                  state))
+          .format(
+            groupId,
+            GroupMetadata.validPreviousStates(targetState).mkString(","),
+            targetState,
+            state))
   }
 
   override def toString = {

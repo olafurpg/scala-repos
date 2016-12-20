@@ -155,10 +155,11 @@ abstract class AbstractTransportAdapterHandle(
     with SchemeAugmenter {
 
   def this(wrappedHandle: AssociationHandle, addedSchemeIdentifier: String) =
-    this(wrappedHandle.localAddress,
-         wrappedHandle.remoteAddress,
-         wrappedHandle,
-         addedSchemeIdentifier)
+    this(
+      wrappedHandle.localAddress,
+      wrappedHandle.remoteAddress,
+      wrappedHandle,
+      addedSchemeIdentifier)
 
   override val localAddress = augmentScheme(originalLocalAddress)
   override val remoteAddress = augmentScheme(originalRemoteAddress)
@@ -222,8 +223,9 @@ abstract class ActorTransportAdapter(wrappedTransport: Transport,
 
   override def shutdown(): Future[Boolean] =
     for {
-      stopResult ← gracefulStop(manager,
-                                RARP(system).provider.remoteSettings.FlushWait)
+      stopResult ← gracefulStop(
+        manager,
+        RARP(system).provider.remoteSettings.FlushWait)
       wrappedStopResult ← wrappedTransport.shutdown()
     } yield stopResult && wrappedStopResult
 }

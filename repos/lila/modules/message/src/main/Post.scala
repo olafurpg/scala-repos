@@ -22,11 +22,12 @@ object Post {
   val idSize = 8
 
   def make(text: String, isByCreator: Boolean): Post =
-    Post(id = Random nextStringUppercase idSize,
-         text = text,
-         isByCreator = isByCreator,
-         isRead = false,
-         createdAt = DateTime.now)
+    Post(
+      id = Random nextStringUppercase idSize,
+      text = text,
+      isByCreator = isByCreator,
+      isRead = false,
+      createdAt = DateTime.now)
 
   import lila.db.JsTube
   import JsTube.Helpers._

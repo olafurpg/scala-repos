@@ -23,8 +23,9 @@ class HandlerEventTest extends FunSuite with MockitoSugar {
     new ChannelStatsHandler(new InMemoryStatsReceiver),
     new SimpleChannelSnooper("test"),
     new ByteBufSnooper("test"),
-    new WriteCompletionTimeoutHandler(DefaultTimer.twitter,
-                                      Duration.fromSeconds(10))
+    new WriteCompletionTimeoutHandler(
+      DefaultTimer.twitter,
+      Duration.fromSeconds(10))
   )
   val loop = new NioEventLoopGroup()
 
@@ -54,26 +55,30 @@ class HandlerEventTest extends FunSuite with MockitoSugar {
 
     test(s"$name doesn't suppress ChannelReadComplete event") {
       pipeline.fireChannelReadComplete()
-      assert(handler.channelReadCompleteFired,
-             "suppressed ChannelReadComplete event")
+      assert(
+        handler.channelReadCompleteFired,
+        "suppressed ChannelReadComplete event")
     }
 
     test(s"$name doesn't suppress ChannelRegistered event") {
       pipeline.fireChannelRegistered()
-      assert(handler.channelRegisteredFired,
-             "suppressed ChannelRegistered event")
+      assert(
+        handler.channelRegisteredFired,
+        "suppressed ChannelRegistered event")
     }
 
     test(s"$name doesn't suppress ChannelUnregistered event") {
       pipeline.fireChannelUnregistered()
-      assert(handler.channelUnregisteredFired,
-             "suppressed ChannelUnregistered event")
+      assert(
+        handler.channelUnregisteredFired,
+        "suppressed ChannelUnregistered event")
     }
 
     test(s"$name doesn't suppress ChannelWritabilityChanged event") {
       pipeline.fireChannelWritabilityChanged()
-      assert(handler.channelWritabilityChangedFired,
-             "suppressed ChannelWritabilityChanged event")
+      assert(
+        handler.channelWritabilityChangedFired,
+        "suppressed ChannelWritabilityChanged event")
     }
 
     test(s"$name doesn't suppress ExceptionCaught event") {
@@ -83,8 +88,9 @@ class HandlerEventTest extends FunSuite with MockitoSugar {
 
     test(s"$name doesn't suppress UserEventTriggered event") {
       pipeline.fireUserEventTriggered(new Object)
-      assert(handler.userEventTriggeredFired,
-             "suppressed UserEventTriggered event")
+      assert(
+        handler.userEventTriggeredFired,
+        "suppressed UserEventTriggered event")
     }
 
     // outbound actions

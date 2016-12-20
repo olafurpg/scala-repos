@@ -168,16 +168,18 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     val dim2 = broadcast(
       sqlContext
         .range(M)
-        .selectExpr("cast(id as int) as k1",
-                    "cast(id as int) as k2",
-                    "cast(id as string) as v"))
+        .selectExpr(
+          "cast(id as int) as k1",
+          "cast(id as int) as k2",
+          "cast(id as string) as v"))
 
     runBenchmark("Join w 2 ints", N) {
       sqlContext
         .range(N)
-        .join(dim2,
-              (col("id") bitwiseAND M).cast(IntegerType) === col("k1") &&
-                (col("id") bitwiseAND M).cast(IntegerType) === col("k2"))
+        .join(
+          dim2,
+          (col("id") bitwiseAND M).cast(IntegerType) === col("k1") &&
+            (col("id") bitwiseAND M).cast(IntegerType) === col("k2"))
         .count()
     }
 
@@ -196,9 +198,10 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     runBenchmark("Join w 2 longs", N) {
       sqlContext
         .range(N)
-        .join(dim3,
-              (col("id") bitwiseAND M) === col("k1") &&
-                (col("id") bitwiseAND M) === col("k2"))
+        .join(
+          dim3,
+          (col("id") bitwiseAND M) === col("k1") &&
+            (col("id") bitwiseAND M) === col("k2"))
         .count()
     }
 
@@ -325,10 +328,11 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
       var s = 0
       while (i < N) {
         key.setInt(0, i % 1000)
-        val h = Murmur3_x86_32.hashUnsafeWords(key.getBaseObject,
-                                               key.getBaseOffset,
-                                               key.getSizeInBytes,
-                                               42)
+        val h = Murmur3_x86_32.hashUnsafeWords(
+          key.getBaseObject,
+          key.getBaseOffset,
+          key.getSizeInBytes,
+          42)
         s += h
         i += 1
       }
@@ -463,23 +467,26 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
         var i = 0
         while (i < N) {
           key.setInt(0, i % 65536)
-          val loc = map.lookup(key.getBaseObject,
-                               key.getBaseOffset,
-                               key.getSizeInBytes,
-                               Murmur3_x86_32.hashLong(i % 65536, 42))
+          val loc = map.lookup(
+            key.getBaseObject,
+            key.getBaseOffset,
+            key.getSizeInBytes,
+            Murmur3_x86_32.hashLong(i % 65536, 42))
           if (loc.isDefined) {
-            value.pointTo(loc.getValueBase,
-                          loc.getValueOffset,
-                          loc.getValueLength)
+            value.pointTo(
+              loc.getValueBase,
+              loc.getValueOffset,
+              loc.getValueLength)
             value.setInt(0, value.getInt(0) + 1)
             i += 1
           } else {
-            loc.putNewKey(key.getBaseObject,
-                          key.getBaseOffset,
-                          key.getSizeInBytes,
-                          value.getBaseObject,
-                          value.getBaseOffset,
-                          value.getSizeInBytes)
+            loc.putNewKey(
+              key.getBaseObject,
+              key.getBaseOffset,
+              key.getSizeInBytes,
+              value.getBaseObject,
+              value.getBaseOffset,
+              value.getSizeInBytes)
           }
         }
       }

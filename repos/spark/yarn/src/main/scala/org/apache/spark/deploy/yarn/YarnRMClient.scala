@@ -73,14 +73,15 @@ private[spark] class YarnRMClient(args: ApplicationMasterArguments)
       amClient.registerApplicationMaster(Utils.localHostName(), 0, uiAddress)
       registered = true
     }
-    new YarnAllocator(driverUrl,
-                      driverRef,
-                      conf,
-                      sparkConf,
-                      amClient,
-                      getAttemptId(),
-                      args,
-                      securityMgr)
+    new YarnAllocator(
+      driverUrl,
+      driverRef,
+      conf,
+      sparkConf,
+      amClient,
+      getAttemptId(),
+      args,
+      securityMgr)
   }
 
   /**
@@ -125,8 +126,9 @@ private[spark] class YarnRMClient(args: ApplicationMasterArguments)
       val uriBases = proxies.asScala.map { proxy =>
         prefix + proxy + proxyBase
       }
-      Map("PROXY_HOSTS" -> hosts.mkString(","),
-          "PROXY_URI_BASES" -> uriBases.mkString(","))
+      Map(
+        "PROXY_HOSTS" -> hosts.mkString(","),
+        "PROXY_URI_BASES" -> uriBases.mkString(","))
     } catch {
       case e: NoSuchMethodException =>
         val proxy = WebAppUtils.getProxyHostAndPort(conf)

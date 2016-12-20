@@ -22,10 +22,11 @@ import cascading.tuple.Fields
 abstract class DailyPrefixSuffixSource(prefixTemplate: String,
                                        suffixTemplate: String,
                                        dateRange: DateRange)
-    extends TimePathedSource(prefixTemplate + TimePathedSource.YEAR_MONTH_DAY +
-                               suffixTemplate + "/*",
-                             dateRange,
-                             DateOps.UTC)
+    extends TimePathedSource(
+      prefixTemplate + TimePathedSource.YEAR_MONTH_DAY +
+        suffixTemplate + "/*",
+      dateRange,
+      DateOps.UTC)
 
 abstract class DailyPrefixSuffixMostRecentSource(prefixTemplate: String,
                                                  suffixTemplate: String,

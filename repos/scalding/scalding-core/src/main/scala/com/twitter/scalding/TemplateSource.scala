@@ -59,9 +59,10 @@ abstract class TemplateSource extends SchemedSource with HfsTapProvider {
             new HTemplateTap(hfsTap, template, pathFields)
           }
           case hdfsTest @ HadoopTest(_, _) => {
-            val hfsTap = createHfsTap(hdfsScheme,
-                                      hdfsTest.getWritePathFor(this),
-                                      sinkMode)
+            val hfsTap = createHfsTap(
+              hdfsScheme,
+              hdfsTest.getWritePathFor(this),
+              sinkMode)
             new HTemplateTap(hfsTap, template, pathFields)
           }
           case _ => TestTapFactory(this, hdfsScheme).createTap(readOrWrite)

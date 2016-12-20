@@ -84,9 +84,10 @@ object Cache {
     def apply(builder: CacheBuilder[K, V]) =
       builder.removalListener(new RemovalListener[K, V] {
         def onRemoval(notification: RemovalNotification[K, V]) =
-          onRemove(notification.getKey,
-                   notification.getValue,
-                   notification.getCause)
+          onRemove(
+            notification.getKey,
+            notification.getValue,
+            notification.getCause)
       })
   }
 

@@ -224,8 +224,9 @@ private[streaming] class JobScheduler(val ssc: StreamingContext)
 
         ssc.sc.setJobDescription(
           s"""Streaming job from <a href="$batchUrl">$batchLinkText</a>""")
-        ssc.sc.setLocalProperty(BATCH_TIME_PROPERTY_KEY,
-                                job.time.milliseconds.toString)
+        ssc.sc.setLocalProperty(
+          BATCH_TIME_PROPERTY_KEY,
+          job.time.milliseconds.toString)
         ssc.sc
           .setLocalProperty(OUTPUT_OP_ID_PROPERTY_KEY, job.outputOpId.toString)
         // Checkpoint all RDDs marked for checkpointing to ensure their lineages are

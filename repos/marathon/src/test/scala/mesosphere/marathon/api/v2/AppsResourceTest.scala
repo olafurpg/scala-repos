@@ -48,9 +48,10 @@ class AppsResourceTest
 
   test("Create a new app successfully") {
     Given("An app and group")
-    val app = AppDefinition(id = PathId("/app"),
-                            cmd = Some("cmd"),
-                            versionInfo = OnlyVersion(Timestamp.zero))
+    val app = AppDefinition(
+      id = PathId("/app"),
+      cmd = Some("cmd"),
+      versionInfo = OnlyVersion(Timestamp.zero))
     val group = Group(PathId("/"), Set(app))
     val plan = DeploymentPlan(group, group)
     val body = Json.stringify(Json.toJson(app)).getBytes("UTF-8")
@@ -81,10 +82,11 @@ class AppsResourceTest
 
   test("Create a new app fails with Validation errors for negative resources") {
     Given("An app with negative resources")
-    var app = AppDefinition(id = PathId("/app"),
-                            cmd = Some("cmd"),
-                            versionInfo = OnlyVersion(Timestamp.zero),
-                            mem = -128)
+    var app = AppDefinition(
+      id = PathId("/app"),
+      cmd = Some("cmd"),
+      versionInfo = OnlyVersion(Timestamp.zero),
+      mem = -128)
     var group = Group(PathId("/"), Set(app))
     var plan = DeploymentPlan(group, group)
     var body = Json.stringify(Json.toJson(app)).getBytes("UTF-8")
@@ -96,10 +98,11 @@ class AppsResourceTest
     var response = appsResource.create(body, false, auth.request)
     response.getStatus should be(422)
 
-    app = AppDefinition(id = PathId("/app"),
-                        cmd = Some("cmd"),
-                        versionInfo = OnlyVersion(Timestamp.zero),
-                        cpus = -1)
+    app = AppDefinition(
+      id = PathId("/app"),
+      cmd = Some("cmd"),
+      versionInfo = OnlyVersion(Timestamp.zero),
+      cpus = -1)
     group = Group(PathId("/"), Set(app))
     plan = DeploymentPlan(group, group)
     body = Json.stringify(Json.toJson(app)).getBytes("UTF-8")
@@ -110,10 +113,11 @@ class AppsResourceTest
     response = appsResource.create(body, false, auth.request)
     response.getStatus should be(422)
 
-    app = AppDefinition(id = PathId("/app"),
-                        cmd = Some("cmd"),
-                        versionInfo = OnlyVersion(Timestamp.zero),
-                        instances = -1)
+    app = AppDefinition(
+      id = PathId("/app"),
+      cmd = Some("cmd"),
+      versionInfo = OnlyVersion(Timestamp.zero),
+      instances = -1)
     group = Group(PathId("/"), Set(app))
     plan = DeploymentPlan(group, group)
     body = Json.stringify(Json.toJson(app)).getBytes("UTF-8")
@@ -359,9 +363,10 @@ class AppsResourceTest
     val app = AppDefinition(id = PathId("/app"), cmd = Some("foo"))
     val expectedEmbeds: Set[Embed] = Set(Embed.Counts, Embed.Deployments)
     val appInfo =
-      AppInfo(app,
-              maybeDeployments = Some(Seq(Identifiable("deployment-123"))),
-              maybeCounts = Some(TaskCounts(1, 2, 3, 4)))
+      AppInfo(
+        app,
+        maybeDeployments = Some(Seq(Identifiable("deployment-123"))),
+        maybeCounts = Some(TaskCounts(1, 2, 3, 4)))
     appInfoService.selectAppsBy(any, eq(expectedEmbeds)) returns Future
       .successful(Seq(appInfo))
 
@@ -377,12 +382,14 @@ class AppsResourceTest
   }
 
   test("Search apps can be filtered") {
-    val app1 = AppDefinition(id = PathId("/app/service-a"),
-                             cmd = Some("party hard"),
-                             labels = Map("a" -> "1", "b" -> "2"))
-    val app2 = AppDefinition(id = PathId("/app/service-b"),
-                             cmd = Some("work hard"),
-                             labels = Map("a" -> "1", "b" -> "3"))
+    val app1 = AppDefinition(
+      id = PathId("/app/service-a"),
+      cmd = Some("party hard"),
+      labels = Map("a" -> "1", "b" -> "2"))
+    val app2 = AppDefinition(
+      id = PathId("/app/service-b"),
+      cmd = Some("work hard"),
+      labels = Map("a" -> "1", "b" -> "3"))
     val apps = Set(app1, app2)
 
     def search(cmd: Option[String],

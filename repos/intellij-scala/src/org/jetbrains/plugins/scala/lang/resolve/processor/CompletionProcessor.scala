@@ -127,8 +127,9 @@ class CompletionProcessor(override val kinds: Set[ResolveTargets.Value],
                   val next = iterator.next()
                   if (getQualifiedName(next) == getQualifiedName(result) &&
                       next.element != result.element &&
-                      signature == getSignature(next.element,
-                                                next.substitutor)) {
+                      signature == getSignature(
+                        next.element,
+                        next.substitutor)) {
                     iterator.remove()
                   }
                 }
@@ -153,14 +154,14 @@ class CompletionProcessor(override val kinds: Set[ResolveTargets.Value],
         return true //do not add constructor
       case td: ScTypeDefinition =>
         if (kindMatches(td)) {
-          val result = new ScalaResolveResult(td,
-                                              substitutor,
-                                              nameShadow = isRenamed,
-                                              implicitFunction = implFunction,
-                                              fromType = fromType,
-                                              importsUsed = importsUsed,
-                                              prefixCompletion =
-                                                prefixCompletion)
+          val result = new ScalaResolveResult(
+            td,
+            substitutor,
+            nameShadow = isRenamed,
+            implicitFunction = implFunction,
+            fromType = fromType,
+            importsUsed = importsUsed,
+            prefixCompletion = prefixCompletion)
           _addResult(result)
         }
         ScalaPsiUtil.getCompanionModule(td) match {

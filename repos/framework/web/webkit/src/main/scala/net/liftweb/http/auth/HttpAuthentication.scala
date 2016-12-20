@@ -130,16 +130,17 @@ case class HttpDigestAuthentication(realmName: String)(
 
       val info = auth.substring(7, auth.length)
       val pairs = splitNameValuePairs(info)
-      DigestAuthentication(req.request.method.toUpperCase,
-                           pairs("username"),
-                           pairs("realm"),
-                           pairs("nonce"),
-                           pairs("uri"),
-                           pairs("qop"),
-                           pairs("nc"),
-                           pairs("cnonce"),
-                           pairs("response"),
-                           pairs("opaque"))
+      DigestAuthentication(
+        req.request.method.toUpperCase,
+        pairs("username"),
+        pairs("realm"),
+        pairs("nonce"),
+        pairs("uri"),
+        pairs("qop"),
+        pairs("nc"),
+        pairs("cnonce"),
+        pairs("response"),
+        pairs("opaque"))
     })
 
   /**

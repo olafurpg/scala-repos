@@ -39,16 +39,18 @@ package object reify {
       // If we're in the constructor of an object or others don't have easy access to `this`, we have no good way to grab
       // the class of that object.  Instead, we construct an anonymous class and grab his class file, assuming
       // this is enough to get the correct class loadeer for the class we *want* a mirror for, the object itself.
-      rClassTree orElse Apply(Select(gen.mkAnonymousNew(Nil), sn.GetClass),
-                              Nil)
+      rClassTree orElse Apply(
+        Select(gen.mkAnonymousNew(Nil), sn.GetClass),
+        Nil)
     }
     // JavaUniverse is defined in scala-reflect.jar, so we must be very careful in case someone reifies stuff having only scala-library.jar on the classpath
     val isJavaUniverse =
       JavaUniverseClass != NoSymbol &&
         universe.tpe <:< JavaUniverseClass.toTypeConstructor
     if (isJavaUniverse && !enclosingErasure.isEmpty)
-      Apply(Select(universe, nme.runtimeMirror),
-            List(Select(enclosingErasure, sn.GetClassLoader)))
+      Apply(
+        Select(universe, nme.runtimeMirror),
+        List(Select(enclosingErasure, sn.GetClassLoader)))
     else Select(universe, nme.rootMirror)
   }
 
@@ -95,14 +97,16 @@ package object reify {
       case TypeRef(_, ArrayClass, componentTpe :: Nil) =>
         val componentErasure =
           reifyRuntimeClass(global)(typer0, componentTpe, concrete)
-        gen.mkMethodCall(currentRun.runDefinitions.arrayClassMethod,
-                         List(componentErasure))
+        gen.mkMethodCall(
+          currentRun.runDefinitions.arrayClassMethod,
+          List(componentErasure))
       case _ =>
         var erasure = tpe.erasure
         if (tpe.typeSymbol.isDerivedValueClass &&
             global.phase.id < global.currentRun.erasurePhase.id) erasure = tpe
-        gen.mkNullaryCall(currentRun.runDefinitions.Predef_classOf,
-                          List(erasure))
+        gen.mkNullaryCall(
+          currentRun.runDefinitions.Predef_classOf,
+          List(erasure))
     }
   }
 
@@ -131,9 +135,10 @@ package object reify {
         isInsideConstructorSuper && isInsideObject
       }
       if (!classInScope.isEmpty)
-        reifyRuntimeClass(global)(typer0,
-                                  classInScope.symbol.toTypeConstructor,
-                                  concrete = true)
+        reifyRuntimeClass(global)(
+          typer0,
+          classInScope.symbol.toTypeConstructor,
+          concrete = true)
       else if (!isUnsafeToUseThis) Select(This(tpnme.EMPTY), sn.GetClass)
       else EmptyTree
     } else EmptyTree

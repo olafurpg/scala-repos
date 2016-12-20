@@ -48,8 +48,9 @@ class PartitionBatchPruningSuite
   override protected def afterAll(): Unit = {
     try {
       sqlContext.setConf(SQLConf.COLUMN_BATCH_SIZE, originalColumnBatchSize)
-      sqlContext.setConf(SQLConf.IN_MEMORY_PARTITION_PRUNING,
-                         originalInMemoryPartitionPruning)
+      sqlContext.setConf(
+        SQLConf.IN_MEMORY_PARTITION_PRUNING,
+        originalInMemoryPartitionPruning)
     } finally {
       super.afterAll()
     }
@@ -103,19 +104,22 @@ class PartitionBatchPruningSuite
   }
 
   // IS NOT NULL
-  checkBatchPruning("SELECT key FROM pruningData WHERE value IS NOT NULL",
-                    5,
-                    5) {
+  checkBatchPruning(
+    "SELECT key FROM pruningData WHERE value IS NOT NULL",
+    5,
+    5) {
     (11 to 20) ++ (31 to 40) ++ (51 to 60) ++ (71 to 80) ++ (91 to 100)
   }
 
   // Conjunction and disjunction
-  checkBatchPruning("SELECT key FROM pruningData WHERE key > 8 AND key <= 21",
-                    2,
-                    3)(9 to 21)
-  checkBatchPruning("SELECT key FROM pruningData WHERE key < 2 OR key > 99",
-                    2,
-                    2)(Seq(1, 100))
+  checkBatchPruning(
+    "SELECT key FROM pruningData WHERE key > 8 AND key <= 21",
+    2,
+    3)(9 to 21)
+  checkBatchPruning(
+    "SELECT key FROM pruningData WHERE key < 2 OR key > 99",
+    2,
+    2)(Seq(1, 100))
   checkBatchPruning(
     "SELECT key FROM pruningData WHERE key < 12 AND key IS NOT NULL",
     1,
@@ -135,9 +139,10 @@ class PartitionBatchPruningSuite
   // With unsupported predicate
   {
     val seq = (1 to 30).mkString(", ")
-    checkBatchPruning(s"SELECT key FROM pruningData WHERE NOT (key IN ($seq))",
-                      5,
-                      10)(31 to 100)
+    checkBatchPruning(
+      s"SELECT key FROM pruningData WHERE NOT (key IN ($seq))",
+      5,
+      10)(31 to 100)
     checkBatchPruning(
       s"SELECT key FROM pruningData WHERE NOT (key IN ($seq)) AND key > 88",
       1,
@@ -155,8 +160,9 @@ class PartitionBatchPruningSuite
       val df = sql(query)
       val queryExecution = df.queryExecution
 
-      assertResult(expectedQueryResult.toArray,
-                   s"Wrong query result: $queryExecution") {
+      assertResult(
+        expectedQueryResult.toArray,
+        s"Wrong query result: $queryExecution") {
         df.collect().map(_(0)).toArray
       }
 
@@ -167,10 +173,12 @@ class PartitionBatchPruningSuite
         }
         .head
 
-      assert(readBatches === expectedReadBatches,
-             s"Wrong number of read batches: $queryExecution")
-      assert(readPartitions === expectedReadPartitions,
-             s"Wrong number of read partitions: $queryExecution")
+      assert(
+        readBatches === expectedReadBatches,
+        s"Wrong number of read batches: $queryExecution")
+      assert(
+        readPartitions === expectedReadPartitions,
+        s"Wrong number of read partitions: $queryExecution")
     }
   }
 }

@@ -183,10 +183,12 @@ private[spark] object ApiRootResource {
     holder.setInitParameter(
       "com.sun.jersey.config.property.resourceConfigClass",
       "com.sun.jersey.api.core.PackagesResourceConfig")
-    holder.setInitParameter("com.sun.jersey.config.property.packages",
-                            "org.apache.spark.status.api.v1")
-    holder.setInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
-                            classOf[SecurityFilter].getCanonicalName)
+    holder.setInitParameter(
+      "com.sun.jersey.config.property.packages",
+      "org.apache.spark.status.api.v1")
+    holder.setInitParameter(
+      ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+      classOf[SecurityFilter].getCanonicalName)
     UIRootFromServletContext.setUiRoot(jerseyContext, uiRoot)
     jerseyContext.addServlet(holder, "/*")
     jerseyContext

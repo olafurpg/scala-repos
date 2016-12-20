@@ -30,21 +30,22 @@ object ExtractionExamples extends Specification {
     json.extract[Person] mustEqual Person(
       "joe",
       Address("Bulevard", "Helsinki"),
-      List(Child("Mary", 5, Some(date("2004-09-04T18:06:22Z"))),
-           Child("Mazy", 3, None)))
+      List(
+        Child("Mary", 5, Some(date("2004-09-04T18:06:22Z"))),
+        Child("Mazy", 3, None)))
   }
 
   "Extraction with path expression example" in {
     val json = parse(testJson)
-    (json \ "address").extract[Address] mustEqual Address("Bulevard",
-                                                          "Helsinki")
+    (json \ "address")
+      .extract[Address] mustEqual Address("Bulevard", "Helsinki")
   }
 
   "Partial extraction example" in {
     val json = parse(testJson)
-    json.extract[SimplePerson] mustEqual SimplePerson("joe",
-                                                      Address("Bulevard",
-                                                              "Helsinki"))
+    json.extract[SimplePerson] mustEqual SimplePerson(
+      "joe",
+      Address("Bulevard", "Helsinki"))
   }
 
   "Extract with a default value" in {
@@ -65,8 +66,9 @@ object ExtractionExamples extends Specification {
     val json = parse(twoAddresses)
     json.extract[PersonWithAddresses] mustEqual PersonWithAddresses(
       "joe",
-      Map("address1" -> Address("Bulevard", "Helsinki"),
-          "address2" -> Address("Soho", "London")))
+      Map(
+        "address1" -> Address("Bulevard", "Helsinki"),
+        "address2" -> Address("Soho", "London")))
   }
 
   "Simple value extraction example" in {
@@ -90,15 +92,16 @@ object ExtractionExamples extends Specification {
 
   "Primitive extraction example" in {
     val json = parse(primitives)
-    json.extract[Primitives] mustEqual Primitives(124,
-                                                  123L,
-                                                  126.5,
-                                                  127.5.floatValue,
-                                                  "128",
-                                                  'symb,
-                                                  125,
-                                                  129.byteValue,
-                                                  true)
+    json.extract[Primitives] mustEqual Primitives(
+      124,
+      123L,
+      126.5,
+      127.5.floatValue,
+      "128",
+      'symb,
+      125,
+      129.byteValue,
+      true)
   }
 
   "Null extraction example" in {
@@ -141,9 +144,10 @@ object ExtractionExamples extends Specification {
     val f = Extraction.flatten(
       Extraction.decompose(
         SimplePerson("joe", Address("Bulevard", "Helsinki"))))
-    val e = Map(".name" -> "\"joe\"",
-                ".address.street" -> "\"Bulevard\"",
-                ".address.city" -> "\"Helsinki\"")
+    val e = Map(
+      ".name" -> "\"joe\"",
+      ".address.street" -> "\"Bulevard\"",
+      ".address.city" -> "\"Helsinki\"")
 
     f mustEqual e
   }
@@ -163,15 +167,20 @@ object ExtractionExamples extends Specification {
   }
 
   "Unflatten example with two-level string properties" in {
-    val m = Map(".name" -> "\"joe\"",
-                ".address.street" -> "\"Bulevard\"",
-                ".address.city" -> "\"Helsinki\"")
+    val m = Map(
+      ".name" -> "\"joe\"",
+      ".address.street" -> "\"Bulevard\"",
+      ".address.city" -> "\"Helsinki\"")
 
     Extraction.unflatten(m) mustEqual JObject(
-      List(JField("name", JString("joe")),
-           JField("address",
-                  JObject(List(JField("street", JString("Bulevard")),
-                               JField("city", JString("Helsinki")))))))
+      List(
+        JField("name", JString("joe")),
+        JField(
+          "address",
+          JObject(
+            List(
+              JField("street", JString("Bulevard")),
+              JField("city", JString("Helsinki")))))))
   }
 
   "Unflatten example with top level array" in {
@@ -182,14 +191,16 @@ object ExtractionExamples extends Specification {
   }
 
   "Unflatten example with common prefixes" in {
-    val m = Map(".photo" -> "\"photo string\"",
-                ".photographer" -> "\"photographer string\"",
-                ".other" -> "\"other string\"")
+    val m = Map(
+      ".photo" -> "\"photo string\"",
+      ".photographer" -> "\"photographer string\"",
+      ".other" -> "\"other string\"")
 
     Extraction.unflatten(m) mustEqual JObject(
-      List(JField("photo", JString("photo string")),
-           JField("photographer", JString("photographer string")),
-           JField("other", JString("other string"))))
+      List(
+        JField("photo", JString("photo string")),
+        JField("photographer", JString("photographer string")),
+        JField("other", JString("other string"))))
   }
 
   "Flatten and unflatten are symmetric" in {
@@ -220,8 +231,9 @@ object ExtractionExamples extends Specification {
 
   "Map extraction example" in {
     val json = parse(testJson) \ "address"
-    json.extract[Map[String, String]] mustEqual Map("street" -> "Bulevard",
-                                                    "city" -> "Helsinki")
+    json.extract[Map[String, String]] mustEqual Map(
+      "street" -> "Bulevard",
+      "city" -> "Helsinki")
   }
 
   "Extraction and decomposition are symmetric" in {
@@ -239,34 +251,40 @@ object ExtractionExamples extends Specification {
 
   "Best matching constructor selection example" in {
     parse("""{"name":"john","age":32,"size":"M"}""")
-      .extract[MultipleConstructors] mustEqual MultipleConstructors("john",
-                                                                    32,
-                                                                    Some("M"))
+      .extract[MultipleConstructors] mustEqual MultipleConstructors(
+      "john",
+      32,
+      Some("M"))
 
     parse("""{"name":"john","age":32}""")
-      .extract[MultipleConstructors] mustEqual MultipleConstructors("john",
-                                                                    32,
-                                                                    Some("S"))
+      .extract[MultipleConstructors] mustEqual MultipleConstructors(
+      "john",
+      32,
+      Some("S"))
 
     parse("""{"name":"john","foo":"xxx"}""")
-      .extract[MultipleConstructors] mustEqual MultipleConstructors("john",
-                                                                    30,
-                                                                    None)
+      .extract[MultipleConstructors] mustEqual MultipleConstructors(
+      "john",
+      30,
+      None)
 
     parse("""{"name":"john","age":32,"size":null}""")
-      .extract[MultipleConstructors] mustEqual MultipleConstructors("john",
-                                                                    32,
-                                                                    None)
+      .extract[MultipleConstructors] mustEqual MultipleConstructors(
+      "john",
+      32,
+      None)
 
     parse("""{"birthYear":1990,"name":"john","foo":2}""")
-      .extract[MultipleConstructors] mustEqual MultipleConstructors("john",
-                                                                    20,
-                                                                    None)
+      .extract[MultipleConstructors] mustEqual MultipleConstructors(
+      "john",
+      20,
+      None)
 
     parse("""{"foo":2,"age":12,"size":"XS"}""")
-      .extract[MultipleConstructors] mustEqual MultipleConstructors("unknown",
-                                                                    12,
-                                                                    Some("XS"))
+      .extract[MultipleConstructors] mustEqual MultipleConstructors(
+      "unknown",
+      12,
+      Some("XS"))
   }
 
   "Partial JSON extraction" in {

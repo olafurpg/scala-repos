@@ -30,16 +30,18 @@ object QueryableMacros {
     import internal._
     val element_type = implicitly[c.WeakTypeTag[S]].tpe
     val foo = c.Expr[ru.Expr[Queryable[S]]](
-      c.reifyTree(gen.mkRuntimeUniverseRef,
-                  EmptyTree,
-                  c.typecheck(
-                    Utils[c.type](c)
-                      .removeDoubleReify(
-                        Apply(Select(c.prefix.tree, TermName(name)),
-                              List(projection.tree))
-                      )
-                      .asInstanceOf[Tree]
-                  )))
+      c.reifyTree(
+        gen.mkRuntimeUniverseRef,
+        EmptyTree,
+        c.typecheck(
+          Utils[c.type](c)
+            .removeDoubleReify(
+              Apply(
+                Select(c.prefix.tree, TermName(name)),
+                List(projection.tree))
+            )
+            .asInstanceOf[Tree]
+        )))
     c.universe.reify { Queryable.factory[S](foo.splice) }
   }
   def map[T: c.WeakTypeTag, S: c.WeakTypeTag](c: Context)(

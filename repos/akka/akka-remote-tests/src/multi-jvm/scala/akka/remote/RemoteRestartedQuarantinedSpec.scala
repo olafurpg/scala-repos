@@ -113,8 +113,8 @@ abstract class RemoteRestartedQuarantinedSpec
         val addr =
           system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
         val firstAddress = node(first).address
-        system.eventStream.subscribe(testActor,
-                                     classOf[ThisActorSystemQuarantinedEvent])
+        system.eventStream
+          .subscribe(testActor, classOf[ThisActorSystemQuarantinedEvent])
 
         val (_, ref) = identifyWithUid(first, "subject")
 
@@ -124,9 +124,9 @@ abstract class RemoteRestartedQuarantinedSpec
         within(10.seconds) {
           awaitAssert {
             EventFilter
-              .warning(pattern =
-                         "The remote system has quarantined this system",
-                       occurrences = 1)
+              .warning(
+                pattern = "The remote system has quarantined this system",
+                occurrences = 1)
               .intercept {
                 ref ! "boo!"
               }
@@ -142,8 +142,9 @@ abstract class RemoteRestartedQuarantinedSpec
         Await.result(system.whenTerminated, 10.seconds)
 
         val freshSystem =
-          ActorSystem(system.name,
-                      ConfigFactory.parseString(s"""
+          ActorSystem(
+            system.name,
+            ConfigFactory.parseString(s"""
                     akka.remote.retry-gate-closed-for = 0.5 s
                     akka.remote.netty.tcp {
                       hostname = ${addr.host.get}

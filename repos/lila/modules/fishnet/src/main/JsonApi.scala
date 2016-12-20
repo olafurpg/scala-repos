@@ -15,10 +15,11 @@ object JsonApi {
     val engine: Request.Engine
 
     def instance(ip: Client.IpAddress) =
-      Client.Instance(fishnet.version,
-                      Client.Engine(engine.name),
-                      ip,
-                      DateTime.now)
+      Client.Instance(
+        fishnet.version,
+        Client.Engine(engine.name),
+        ip,
+        DateTime.now)
   }
 
   object Request {
@@ -85,10 +86,11 @@ object JsonApi {
                   moves: String)
 
   def fromGame(g: W.Game) =
-    Game(game_id = g.id,
-         position = g.initialFen | FEN(Forsyth.initial),
-         variant = g.variant,
-         moves = g.moves)
+    Game(
+      game_id = g.id,
+      position = g.initialFen | FEN(Forsyth.initial),
+      variant = g.variant,
+      moves = g.moves)
 
   sealed trait Work {
     val id: String

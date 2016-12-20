@@ -64,10 +64,11 @@ object BroadcastedColumns {
                    ColumnType,
                    ResultColumn,
                    Result] = {
-    new CanMapValues[BroadcastedColumns[T, ColumnType],
-                     ColumnType,
-                     ResultColumn,
-                     Result] {
+    new CanMapValues[
+      BroadcastedColumns[T, ColumnType],
+      ColumnType,
+      ResultColumn,
+      Result] {
       def apply(from: BroadcastedColumns[T, ColumnType],
                 fn: (ColumnType) => ResultColumn): Result = {
         cc(from.underlying, Axis._0) { fn }

@@ -49,16 +49,18 @@ final class xMain extends xsbti.AppMain {
 final class ScriptMain extends xsbti.AppMain {
   def run(configuration: xsbti.AppConfiguration): xsbti.MainResult =
     runManaged(
-      initialState(configuration,
-                   BuiltinCommands.ScriptCommands,
-                   Script.Name :: Nil))
+      initialState(
+        configuration,
+        BuiltinCommands.ScriptCommands,
+        Script.Name :: Nil))
 }
 final class ConsoleMain extends xsbti.AppMain {
   def run(configuration: xsbti.AppConfiguration): xsbti.MainResult =
     runManaged(
-      initialState(configuration,
-                   BuiltinCommands.ConsoleCommands,
-                   IvyConsole.Name :: Nil))
+      initialState(
+        configuration,
+        BuiltinCommands.ConsoleCommands,
+        IvyConsole.Name :: Nil))
 }
 
 object StandardMain {
@@ -73,9 +75,10 @@ object StandardMain {
     ConsoleOut.systemOutOverwrite(ConsoleOut.overwriteContaining("Resolving "))
 
   def initialGlobalLogging: GlobalLogging =
-    GlobalLogging.initial(MainLogging.globalDefault(console),
-                          File.createTempFile("sbt", ".log"),
-                          console)
+    GlobalLogging.initial(
+      MainLogging.globalDefault(console),
+      File.createTempFile("sbt", ".log"),
+      console)
 
   def initialState(configuration: xsbti.AppConfiguration,
                    initialDefinitions: Seq[Command],
@@ -86,15 +89,16 @@ object StandardMain {
       (preCommands ++ userCommands).partition(isEarlyCommand)
     val commands = earlyCommands ++ normalCommands
     val initAttrs = BuiltinCommands.initialAttributes
-    val s = State(configuration,
-                  initialDefinitions,
-                  Set.empty,
-                  None,
-                  commands,
-                  State.newHistory,
-                  initAttrs,
-                  initialGlobalLogging,
-                  State.Continue)
+    val s = State(
+      configuration,
+      initialDefinitions,
+      Set.empty,
+      None,
+      commands,
+      State.newHistory,
+      initAttrs,
+      initialGlobalLogging,
+      State.Continue)
     s.initializeClassLoaderCache
   }
 }
@@ -113,49 +117,50 @@ object BuiltinCommands {
   def ScriptCommands: Seq[Command] =
     Seq(ignore, exit, Script.command, setLogLevel, early, act, nop)
   def DefaultCommands: Seq[Command] =
-    Seq(ignore,
-        help,
-        completionsCommand,
-        about,
-        tasks,
-        settingsCommand,
-        loadProject,
-        projects,
-        project,
-        reboot,
-        read,
-        history,
-        set,
-        sessionCommand,
-        inspect,
-        loadProjectImpl,
-        loadFailed,
-        Cross.crossBuild,
-        Cross.switchVersion,
-        setOnFailure,
-        clearOnFailure,
-        stashOnFailure,
-        popOnFailure,
-        setLogLevel,
-        plugin,
-        plugins,
-        ifLast,
-        multi,
-        shell,
-        continuous,
-        eval,
-        alias,
-        append,
-        last,
-        lastGrep,
-        export,
-        boot,
-        nop,
-        call,
-        exit,
-        early,
-        initialize,
-        act) ++ compatCommands
+    Seq(
+      ignore,
+      help,
+      completionsCommand,
+      about,
+      tasks,
+      settingsCommand,
+      loadProject,
+      projects,
+      project,
+      reboot,
+      read,
+      history,
+      set,
+      sessionCommand,
+      inspect,
+      loadProjectImpl,
+      loadFailed,
+      Cross.crossBuild,
+      Cross.switchVersion,
+      setOnFailure,
+      clearOnFailure,
+      stashOnFailure,
+      popOnFailure,
+      setLogLevel,
+      plugin,
+      plugins,
+      ifLast,
+      multi,
+      shell,
+      continuous,
+      eval,
+      alias,
+      append,
+      last,
+      lastGrep,
+      export,
+      boot,
+      nop,
+      call,
+      exit,
+      early,
+      initialize,
+      act) ++ compatCommands
   def DefaultBootCommands: Seq[String] =
     LoadProject :: (IfLast + " " + Shell) :: Nil
 
@@ -240,16 +245,18 @@ object BuiltinCommands {
   }
 
   def settingsCommand =
-    showSettingLike(SettingsCommand,
-                    settingsPreamble,
-                    KeyRanks.MainSettingCutoff,
-                    key => !isTask(key.manifest))
+    showSettingLike(
+      SettingsCommand,
+      settingsPreamble,
+      KeyRanks.MainSettingCutoff,
+      key => !isTask(key.manifest))
 
   def tasks =
-    showSettingLike(TasksCommand,
-                    tasksPreamble,
-                    KeyRanks.MainTaskCutoff,
-                    key => isTask(key.manifest))
+    showSettingLike(
+      TasksCommand,
+      tasksPreamble,
+      KeyRanks.MainTaskCutoff,
+      key => isTask(key.manifest))
 
   def showSettingLike(command: String,
                       preamble: String,
@@ -472,10 +479,11 @@ object BuiltinCommands {
     import extracted.{showKey, structure}
     val keysParser =
       token(flag("--last" <~ Space)) ~ Act.aggregatedKeyParser(extracted)
-    val show = Aggregation.ShowConfig(settingValues = true,
-                                      taskValues = false,
-                                      print = println _,
-                                      success = false)
+    val show = Aggregation.ShowConfig(
+      settingValues = true,
+      taskValues = false,
+      print = println _,
+      success = false)
     for {
       lastOnly_keys <- keysParser
       kvs = Act.keyValues(structure)(lastOnly_keys._2)
@@ -586,9 +594,10 @@ object BuiltinCommands {
   }
 
   def projects =
-    Command(ProjectsCommand,
-            (ProjectsCommand, projectsBrief),
-            projectsDetailed)(s => projectsParser(s).?) {
+    Command(
+      ProjectsCommand,
+      (ProjectsCommand, projectsBrief),
+      projectsDetailed)(s => projectsParser(s).?) {
       case (s, Some(modifyBuilds)) => transformExtraBuilds(s, modifyBuilds)
       case (s, None) => showProjects(s); s
     }
@@ -677,11 +686,12 @@ object BuiltinCommands {
     val s =
       if (s1 has Keys.stateCompilerCache) s1 else registerCompilerCache(s1)
 
-    val (eval, structure) = try Load.defaultLoad(s,
-                                                 base,
-                                                 s.log,
-                                                 Project.inPluginProject(s),
-                                                 Project.extraBuilds(s))
+    val (eval, structure) = try Load.defaultLoad(
+      s,
+      base,
+      s.log,
+      Project.inPluginProject(s),
+      Project.extraBuilds(s))
     catch {
       case ex: compiler.EvalException =>
         s0.log.debug(ex.getMessage)

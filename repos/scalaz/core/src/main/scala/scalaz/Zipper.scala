@@ -161,9 +161,10 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
     * Pairs each element with a boolean indicating whether that element has focus.
     */
   def withFocus: Zipper[(A, Boolean)] =
-    zipper(lefts.zip(Stream.continually(false)),
-           (focus, true),
-           rights.zip(Stream.continually(false)))
+    zipper(
+      lefts.zip(Stream.continually(false)),
+      (focus, true),
+      rights.zip(Stream.continually(false)))
 
   /**
     * Moves focus n elements in the zipper, or None if there is no such element.
@@ -477,12 +478,13 @@ sealed abstract class ZipperInstances {
     import std.stream._
 
     override def show(f: Zipper[A]) =
-      Cord("Zipper(",
-           Show[Stream[A]].show(f.lefts),
-           ", ",
-           Show[A].show(f.focus),
-           ", ",
-           Show[Stream[A]].show(f.rights),
-           ")")
+      Cord(
+        "Zipper(",
+        Show[Stream[A]].show(f.lefts),
+        ", ",
+        Show[A].show(f.focus),
+        ", ",
+        Show[Stream[A]].show(f.rights),
+        ")")
   }
 }

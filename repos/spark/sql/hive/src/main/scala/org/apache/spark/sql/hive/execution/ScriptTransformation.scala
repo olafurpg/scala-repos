@@ -87,9 +87,10 @@ private[hive] case class ScriptTransformation(
       // of error output that we retain. See SPARK-7862 for more discussion of the deadlock / hang
       // that motivates this.
       val stderrBuffer = new CircularBuffer(2048)
-      new RedirectThread(errorStream,
-                         stderrBuffer,
-                         "Thread-ScriptTransformation-STDERR-Consumer").start()
+      new RedirectThread(
+        errorStream,
+        stderrBuffer,
+        "Thread-ScriptTransformation-STDERR-Consumer").start()
 
       val outputProjection = new InterpretedProjection(input, child.output)
 
@@ -364,8 +365,9 @@ private[hive] case class HiveScriptIOSchema(
       val serde = initSerDe(serdeClass, columns, columnTypes, inputSerdeProps)
       val fieldObjectInspectors = columnTypes.map(toInspector)
       val objectInspector = ObjectInspectorFactory
-        .getStandardStructObjectInspector(columns.asJava,
-                                          fieldObjectInspectors.asJava)
+        .getStandardStructObjectInspector(
+          columns.asJava,
+          fieldObjectInspectors.asJava)
         .asInstanceOf[ObjectInspector]
       (serde, objectInspector)
     }

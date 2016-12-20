@@ -66,8 +66,9 @@ class TypeclassExistenceTest extends FunSuite {
   }
 
   def hasEq[A](implicit ev: Eq[A] = null, m: ClassTag[A]): Unit = {
-    assert(ev != null,
-           "Expected implicit Eq[%s] instance, but it was not found." format m)
+    assert(
+      ev != null,
+      "Expected implicit Eq[%s] instance, but it was not found." format m)
   }
 
   def hasConvertableFrom[A](implicit ev: ConvertableFrom[A] = null,

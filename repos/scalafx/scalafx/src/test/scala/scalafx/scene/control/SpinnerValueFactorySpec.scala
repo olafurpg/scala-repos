@@ -41,8 +41,9 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
   */
 @RunWith(classOf[JUnitRunner])
 class SpinnerValueFactorySpec[Integer]
-    extends SimpleSFXDelegateSpec[jfxsc.SpinnerValueFactory[Integer],
-                                  SpinnerValueFactory[Integer]](
+    extends SimpleSFXDelegateSpec[
+      jfxsc.SpinnerValueFactory[Integer],
+      SpinnerValueFactory[Integer]](
       classOf[jfxsc.SpinnerValueFactory[Integer]],
       classOf[SpinnerValueFactory[Integer]])
     with RunOnApplicationThread {

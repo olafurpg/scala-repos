@@ -74,17 +74,18 @@ abstract class RehighlightingPerformanceTypingTestBase
     val editor = myCodeInsightTestFixture.getEditor
     val initialText = editor.getDocument.getText
     PlatformTestUtil
-      .startPerformanceTest(s"Performance test $filename",
-                            timeoutInMillis,
-                            new ThrowableRunnable[Nothing] {
-                              override def run(): Unit = {
-                                stringsToType.foreach { s =>
-                                  myCodeInsightTestFixture.`type`(s)
-                                  myCodeInsightTestFixture.doHighlighting()
-                                }
-                                fileManager.cleanupForNextTest()
-                              }
-                            })
+      .startPerformanceTest(
+        s"Performance test $filename",
+        timeoutInMillis,
+        new ThrowableRunnable[Nothing] {
+          override def run(): Unit = {
+            stringsToType.foreach { s =>
+              myCodeInsightTestFixture.`type`(s)
+              myCodeInsightTestFixture.doHighlighting()
+            }
+            fileManager.cleanupForNextTest()
+          }
+        })
       .setup(new ThrowableRunnable[Nothing] {
         override def run(): Unit = {
           //file.refresh(false, false)

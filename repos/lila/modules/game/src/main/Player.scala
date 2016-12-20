@@ -28,9 +28,10 @@ case class Player(id: String,
   }
 
   def withUser(id: User.ID, perf: lila.rating.Perf): Player =
-    copy(userId = id.some,
-         rating = perf.intRating.some,
-         provisional = perf.glicko.provisional)
+    copy(
+      userId = id.some,
+      rating = perf.intRating.some,
+      provisional = perf.glicko.provisional)
 
   def isAi = aiLevel.isDefined
 
@@ -179,17 +180,18 @@ object Player {
 
     def writes(w: BSON.Writer, o: Builder) =
       o(chess.White)("0000")(none)(none) |> { p =>
-        BSONDocument(aiLevel -> p.aiLevel,
-                     isOfferingDraw -> w.boolO(p.isOfferingDraw),
-                     isOfferingRematch -> w.boolO(p.isOfferingRematch),
-                     lastDrawOffer -> p.lastDrawOffer,
-                     proposeTakebackAt -> w.intO(p.proposeTakebackAt),
-                     rating -> p.rating,
-                     ratingDiff -> p.ratingDiff,
-                     provisional -> w.boolO(p.provisional),
-                     blurs -> w.intO(p.blurs),
-                     holdAlert -> p.holdAlert,
-                     name -> p.name)
+        BSONDocument(
+          aiLevel -> p.aiLevel,
+          isOfferingDraw -> w.boolO(p.isOfferingDraw),
+          isOfferingRematch -> w.boolO(p.isOfferingRematch),
+          lastDrawOffer -> p.lastDrawOffer,
+          proposeTakebackAt -> w.intO(p.proposeTakebackAt),
+          rating -> p.rating,
+          ratingDiff -> p.ratingDiff,
+          provisional -> w.boolO(p.provisional),
+          blurs -> w.intO(p.blurs),
+          holdAlert -> p.holdAlert,
+          name -> p.name)
       }
   }
 }

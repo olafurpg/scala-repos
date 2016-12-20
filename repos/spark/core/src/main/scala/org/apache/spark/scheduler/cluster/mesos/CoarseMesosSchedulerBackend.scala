@@ -245,9 +245,10 @@ private[spark] class CoarseMesosSchedulerBackend(
     if (conf.contains("spark.testing")) {
       "driverURL"
     } else {
-      RpcEndpointAddress(conf.get("spark.driver.host"),
-                         conf.get("spark.driver.port").toInt,
-                         CoarseGrainedSchedulerBackend.ENDPOINT_NAME).toString
+      RpcEndpointAddress(
+        conf.get("spark.driver.host"),
+        conf.get("spark.driver.port").toInt,
+        CoarseGrainedSchedulerBackend.ENDPOINT_NAME).toString
     }
   }
 
@@ -450,8 +451,9 @@ private[spark] class CoarseMesosSchedulerBackend(
   }
 
   private def executorCores(offerCPUs: Int): Int = {
-    sc.conf.getInt("spark.executor.cores",
-                   math.min(offerCPUs, maxCores - totalCoresAcquired))
+    sc.conf.getInt(
+      "spark.executor.cores",
+      math.min(offerCPUs, maxCores - totalCoresAcquired))
   }
 
   override def statusUpdate(d: SchedulerDriver, status: TaskStatus) {
@@ -507,10 +509,11 @@ private[spark] class CoarseMesosSchedulerBackend(
                 "is Spark installed on it?")
           }
         }
-        executorTerminated(d,
-                           slaveId,
-                           taskId,
-                           s"Executor finished with state $state")
+        executorTerminated(
+          d,
+          slaveId,
+          taskId,
+          s"Executor finished with state $state")
         // In case we'd rejected everything before but have now lost a node
         d.reviveOffers()
       }

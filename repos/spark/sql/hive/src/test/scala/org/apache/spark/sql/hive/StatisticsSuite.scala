@@ -49,8 +49,9 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
       }
     }
 
-    assertAnalyzeCommand("ANALYZE TABLE Table1 COMPUTE STATISTICS",
-                         classOf[HiveNativeCommand])
+    assertAnalyzeCommand(
+      "ANALYZE TABLE Table1 COMPUTE STATISTICS",
+      classOf[HiveNativeCommand])
     assertAnalyzeCommand(
       "ANALYZE TABLE Table1 PARTITION(ds='2008-04-09', hr=11) COMPUTE STATISTICS",
       classOf[HiveNativeCommand])
@@ -64,8 +65,9 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
       "ANALYZE TABLE Table1 PARTITION(ds, hr) COMPUTE STATISTICS noscan",
       classOf[HiveNativeCommand])
 
-    assertAnalyzeCommand("ANALYZE TABLE Table1 COMPUTE STATISTICS nOscAn",
-                         classOf[AnalyzeTable])
+    assertAnalyzeCommand(
+      "ANALYZE TABLE Table1 COMPUTE STATISTICS nOscAn",
+      classOf[AnalyzeTable])
   }
 
   test("analyze MetastoreRelations") {
@@ -128,8 +130,9 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
         mr.statistics.sizeInBytes
     }
     assert(sizes.size === 1, s"Size wrong for:\n ${df.queryExecution}")
-    assert(sizes(0).equals(BigInt(5812)),
-           s"expected exact size 5812 for test table 'src', got: ${sizes(0)}")
+    assert(
+      sizes(0).equals(BigInt(5812)),
+      s"expected exact size 5812 for test table 'src', got: ${sizes(0)}")
   }
 
   test("auto converts to broadcast hash join, by size estimate of a relation") {
@@ -243,8 +246,9 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
       bhj = df.queryExecution.sparkPlan.collect {
         case j: BroadcastHashJoin => j
       }
-      assert(bhj.isEmpty,
-             "BroadcastHashJoin still planned even though it is switched off")
+      assert(
+        bhj.isEmpty,
+        "BroadcastHashJoin still planned even though it is switched off")
 
       val shj = df.queryExecution.sparkPlan.collect {
         case j: ShuffledHashJoin => j

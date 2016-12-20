@@ -83,8 +83,9 @@ private[util] class BatchedWriteAheadLog(val wrappedLog: WriteAheadLog,
       }
     }
     if (putSuccessfully) {
-      Await.result(promise.future,
-                   WriteAheadLogUtils.getBatchingTimeout(conf).milliseconds)
+      Await.result(
+        promise.future,
+        WriteAheadLogUtils.getBatchingTimeout(conf).milliseconds)
     } else {
       throw new IllegalStateException(
         "close() was called on BatchedWriteAheadLog before " +

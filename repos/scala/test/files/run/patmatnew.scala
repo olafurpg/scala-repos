@@ -668,9 +668,10 @@ object Test {
 
   object Ticket11 {
     def run() {
-      Array[Throwable](new Exception("abc"),
-                       new MyException1,
-                       new MyException2).foreach { e =>
+      Array[Throwable](
+        new Exception("abc"),
+        new MyException1,
+        new MyException2).foreach { e =>
         try {
           throw e
         } catch {

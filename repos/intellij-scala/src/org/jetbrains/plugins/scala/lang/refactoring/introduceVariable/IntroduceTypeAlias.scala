@@ -144,11 +144,12 @@ trait IntroduceTypeAlias { this: ScalaIntroduceVariableHandler =>
             mainScope
         }
 
-        val dialog = getDialogForTypes(project,
-                                       editor,
-                                       typeElementHelper,
-                                       currentDataObject.possibleScopes,
-                                       updatedMainScope)
+        val dialog = getDialogForTypes(
+          project,
+          editor,
+          typeElementHelper,
+          currentDataObject.possibleScopes,
+          updatedMainScope)
 
         if (!dialog.isOK) {
           occurrenceHighlighters.foreach(_.dispose())
@@ -163,12 +164,13 @@ trait IntroduceTypeAlias { this: ScalaIntroduceVariableHandler =>
           dialog.isReplaceOccurrenceInInheritors,
           dialog.getSelectedScope)
 
-        runRefactoringForTypes(file,
-                               editor,
-                               typeElementHelper,
-                               dialog.getEnteredName,
-                               occurrences,
-                               dialog.getSelectedScope)
+        runRefactoringForTypes(
+          file,
+          editor,
+          typeElementHelper,
+          dialog.getEnteredName,
+          occurrences,
+          dialog.getSelectedScope)
       }
 
       // replace all occurrences, don't replace occurences available from companion object or inheritors
@@ -230,12 +232,13 @@ trait IntroduceTypeAlias { this: ScalaIntroduceVariableHandler =>
                       editor.getDocument)
 
                   val typeAliasIntroducer =
-                    ScalaInplaceTypeAliasIntroducer(namedElement,
-                                                    namedElement,
-                                                    editor,
-                                                    namedElement.getName,
-                                                    namedElement.getName,
-                                                    scopeItem)
+                    ScalaInplaceTypeAliasIntroducer(
+                      namedElement,
+                      namedElement,
+                      editor,
+                      namedElement.getName,
+                      namedElement.getName,
+                      scopeItem)
 
                   typeAliasIntroducer.performInplaceRefactoring(
                     suggestedNamesSet)
@@ -265,17 +268,19 @@ trait IntroduceTypeAlias { this: ScalaIntroduceVariableHandler =>
             currentDataObject.currentScope,
             currentDataObject.getNamedElement)
 
-          runWithDialog(fromInplace = true,
-                        currentDataObject.currentScope,
-                        enteredName)
+          runWithDialog(
+            fromInplace = true,
+            currentDataObject.currentScope,
+            enteredName)
 //          editor.getUserData(IntroduceTypeAlias.REVERT_TYPE_ALIAS_INFO).clearData()
         } else {
           currentDataObject.setInintialInfo(inTypeElement.getTextRange)
-          afterScopeChoosing(project,
-                             editor,
-                             file,
-                             currentDataObject.possibleScopes,
-                             INTRODUCE_TYPEALIAS_REFACTORING_NAME) {
+          afterScopeChoosing(
+            project,
+            editor,
+            file,
+            currentDataObject.possibleScopes,
+            INTRODUCE_TYPEALIAS_REFACTORING_NAME) {
             case simpleScope: SimpleScopeItem
                 if simpleScope.usualOccurrences.nonEmpty =>
               handleScope(simpleScope, needReplacement = true)
@@ -321,9 +326,10 @@ trait IntroduceTypeAlias { this: ScalaIntroduceVariableHandler =>
 
       val resultTypeAlias = ScalaPsiUtil
         .addTypeAliasBefore(definition, parent, getAhchor(parent, typeElement))
-      ScalaPsiUtil.adjustTypes(resultTypeAlias,
-                               addImports = true,
-                               useTypeAliases = false)
+      ScalaPsiUtil.adjustTypes(
+        resultTypeAlias,
+        addImports = true,
+        useTypeAliases = false)
       resultTypeAlias
     }
 
@@ -337,18 +343,20 @@ trait IntroduceTypeAlias { this: ScalaIntroduceVariableHandler =>
       case packageScope: PackageScopeItem =>
         packageScope.fileEncloser match {
           case suggestedDirectory: PsiDirectory =>
-            createAndGetPackageObjectBody(typeElement,
-                                          suggestedDirectory,
-                                          packageScope.needDirectoryCreating,
-                                          scope.getName)
+            createAndGetPackageObjectBody(
+              typeElement,
+              suggestedDirectory,
+              packageScope.needDirectoryCreating,
+              scope.getName)
           case _ =>
             packageScope.fileEncloser
         }
     }
 
-    val typeAlias = addTypeAliasDefinition(typeName,
-                                           occurrences.getAllOccurrences(0),
-                                           parent)
+    val typeAlias = addTypeAliasDefinition(
+      typeName,
+      occurrences.getAllOccurrences(0),
+      parent)
     if (editor.getUserData(IntroduceTypeAlias.REVERT_TYPE_ALIAS_INFO) != null) {
       editor
         .getUserData(IntroduceTypeAlias.REVERT_TYPE_ALIAS_INFO)
@@ -360,9 +368,10 @@ trait IntroduceTypeAlias { this: ScalaIntroduceVariableHandler =>
 
     val usualOccurrences =
       replaceTypeElements(occurrences.getUsualOccurrences, typeName, typeAlias)
-    replaceTypeElements(occurrences.getExtendedOccurrences,
-                        typeName,
-                        typeAlias)
+    replaceTypeElements(
+      occurrences.getExtendedOccurrences,
+      typeName,
+      typeAlias)
 
     val className =
       PsiTreeUtil.getParentOfType(parent, classOf[ScObject]) match {
@@ -371,9 +380,10 @@ trait IntroduceTypeAlias { this: ScalaIntroduceVariableHandler =>
         case _ => ""
       }
 
-    replaceTypeElements(occurrences.getCompanionObjOccurrences,
-                        className + "." + typeName,
-                        typeAlias)
+    replaceTypeElements(
+      occurrences.getCompanionObjOccurrences,
+      className + "." + typeName,
+      typeAlias)
 
     val resultTypeElement =
       if (typeElementIdx == -1) {
@@ -399,18 +409,20 @@ trait IntroduceTypeAlias { this: ScalaIntroduceVariableHandler =>
 
     val writeAction = new Runnable() {
       def run() {
-        runRefactoringForTypeInside(file,
-                                    editor,
-                                    typeElement,
-                                    typeName,
-                                    occurrences_,
-                                    scope)
+        runRefactoringForTypeInside(
+          file,
+          editor,
+          typeElement,
+          typeName,
+          occurrences_,
+          scope)
       }
     }
 
-    ScalaUtils.runWriteAction(writeAction,
-                              editor.getProject,
-                              INTRODUCE_TYPEALIAS_REFACTORING_NAME)
+    ScalaUtils.runWriteAction(
+      writeAction,
+      editor.getProject,
+      INTRODUCE_TYPEALIAS_REFACTORING_NAME)
     editor.getSelectionModel.removeSelection()
   }
 
@@ -426,12 +438,13 @@ trait IntroduceTypeAlias { this: ScalaIntroduceVariableHandler =>
     new Computable[(SmartPsiElementPointer[PsiElement],
                     SmartPsiElementPointer[PsiElement])]() {
       def compute() =
-        runRefactoringForTypeInside(file,
-                                    editor,
-                                    typeElement,
-                                    typeName,
-                                    occurrences_,
-                                    scope)
+        runRefactoringForTypeInside(
+          file,
+          editor,
+          typeElement,
+          typeName,
+          occurrences_,
+          scope)
     }
   }
 
@@ -534,11 +547,12 @@ trait IntroduceTypeAlias { this: ScalaIntroduceVariableHandler =>
             isSelected: Boolean,
             cellHasFocus: Boolean): Component = {
           val rendererComponent: Component =
-            getSuperListCellRendererComponent(container.getList,
-                                              value,
-                                              index,
-                                              isSelected,
-                                              cellHasFocus)
+            getSuperListCellRendererComponent(
+              container.getList,
+              value,
+              index,
+              isSelected,
+              cellHasFocus)
           val element: T = value.asInstanceOf[T]
           //        if (element.isValid) {
           setText(elementName(element))
@@ -600,10 +614,11 @@ trait IntroduceTypeAlias { this: ScalaIntroduceVariableHandler =>
       }
 
     val packageObject: ScTypeDefinition = ScalaDirectoryService
-      .createClassFromTemplate(newDir,
-                               newDirectoryName,
-                               "Package Object",
-                               askToDefineVariables = false)
+      .createClassFromTemplate(
+        newDir,
+        newDirectoryName,
+        "Package Object",
+        askToDefineVariables = false)
       .asInstanceOf[ScTypeDefinition]
 
     PsiTreeUtil.getChildOfType(
@@ -630,12 +645,13 @@ trait IntroduceTypeAlias { this: ScalaIntroduceVariableHandler =>
       occurrenceHighlighters = ScalaRefactoringUtil
         .highlightOccurrences(project, occurrences.map(_.getTextRange), editor)
 
-    val dialog = new ScalaIntroduceTypeAliasDialog(project,
-                                                   typeElement,
-                                                   possibleScopes,
-                                                   mainScope,
-                                                   this,
-                                                   editor)
+    val dialog = new ScalaIntroduceTypeAliasDialog(
+      project,
+      typeElement,
+      possibleScopes,
+      mainScope,
+      this,
+      editor)
     dialog.show()
     if (!dialog.isOK) {
       if (occurrences.length > 1) {

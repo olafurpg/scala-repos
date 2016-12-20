@@ -316,9 +316,10 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
     case a: Alias =>
       // As the root of the expression, Alias will always take an arbitrary exprId, we need
       // to erase that for equality testing.
-      val cleanedExprId = Alias(a.child, a.name)(ExprId(-1),
-                                                 a.qualifiers,
-                                                 isGenerated = a.isGenerated)
+      val cleanedExprId = Alias(a.child, a.name)(
+        ExprId(-1),
+        a.qualifiers,
+        isGenerated = a.isGenerated)
       BindReferences
         .bindReference(cleanedExprId, allAttributes, allowFailures = true)
     case other =>

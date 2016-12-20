@@ -61,23 +61,28 @@ class LawTests extends FunSuite with Discipline {
 
   checkAll("List[Int]", VectorSpaceLaws[List[Int], Int].module)
   checkAll("Vector[Int]", VectorSpaceLaws[Vector[Int], Int].module)
-  checkAll("List[Rational]",
-           VectorSpaceLaws[List[Rational], Rational].vectorSpace)
-  checkAll("Vector[Rational]",
-           VectorSpaceLaws[Vector[Rational], Rational].vectorSpace)
+  checkAll(
+    "List[Rational]",
+    VectorSpaceLaws[List[Rational], Rational].vectorSpace)
+  checkAll(
+    "Vector[Rational]",
+    VectorSpaceLaws[Vector[Rational], Rational].vectorSpace)
 
   checkAll("Array[Int]", VectorSpaceLaws[Array[Int], Int].module)
-  checkAll("Array[VectorSpace]",
-           VectorSpaceLaws[Array[Rational], Rational].vectorSpace)
+  checkAll(
+    "Array[VectorSpace]",
+    VectorSpaceLaws[Array[Rational], Rational].vectorSpace)
 
   checkAll("Map[String,Int]", VectorSpaceLaws[Map[String, Int], Int].module)
-  checkAll("Map[String,Rational]",
-           VectorSpaceLaws[Map[String, Rational], Rational].vectorSpace)
+  checkAll(
+    "Map[String,Rational]",
+    VectorSpaceLaws[Map[String, Rational], Rational].vectorSpace)
 
   val max = NormedVectorSpace.max[Rational, List]
-  checkAll("List[Rational]",
-           VectorSpaceLaws[List[Rational], Rational]
-             .normedVectorSpace(max, implicitly, implicitly))
+  checkAll(
+    "List[Rational]",
+    VectorSpaceLaws[List[Rational], Rational]
+      .normedVectorSpace(max, implicitly, implicitly))
 
   checkAll("List[Int]", GroupLaws[List[Int]].monoid)
   checkAll("Vector[Int]", GroupLaws[Vector[Int]].monoid)
@@ -87,9 +92,9 @@ class LawTests extends FunSuite with Discipline {
   checkAll("String[Int]", GroupLaws[String].monoid)
   checkAll("Array[Int]", GroupLaws[Array[Int]].monoid)
 
-  checkAll("Seq[String]",
-           PartialGroupLaws[Seq[String]](spire.optional.genericEq.generic,
-                                         implicitly).semigroupoid)
+  checkAll(
+    "Seq[String]",
+    PartialGroupLaws[Seq[String]](spire.optional.genericEq.generic, implicitly).semigroupoid)
   checkAll("Seq[Int]", PartialGroupLaws[Seq[Int]].groupoid)
 
   checkAll("String", VectorSpaceLaws[String, Int].metricSpace)
@@ -145,9 +150,10 @@ class LawTests extends FunSuite with Discipline {
   checkAll(
     "Map[Int, Int]",
     PartialActionLaws
-      .apply[Map[Int, Int], Seq[Int]](implicitly,
-                                      Arbitrary(arbitrary[Perm].map(_.map)),
-                                      implicitly,
-                                      implicitly)
+      .apply[Map[Int, Int], Seq[Int]](
+        implicitly,
+        Arbitrary(arbitrary[Perm].map(_.map)),
+        implicitly,
+        implicitly)
       .groupPartialAction)
 }

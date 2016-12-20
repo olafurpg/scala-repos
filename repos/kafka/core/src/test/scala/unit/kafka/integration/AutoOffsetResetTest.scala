@@ -66,13 +66,15 @@ class AutoOffsetResetTest extends KafkaServerTestHarness with Logging {
 
   @Test
   def testResetToEarliestWhenOffsetTooHigh() =
-    assertEquals(NumMessages,
-                 resetAndConsume(NumMessages, "smallest", LargeOffset))
+    assertEquals(
+      NumMessages,
+      resetAndConsume(NumMessages, "smallest", LargeOffset))
 
   @Test
   def testResetToEarliestWhenOffsetTooLow() =
-    assertEquals(NumMessages,
-                 resetAndConsume(NumMessages, "smallest", SmallOffset))
+    assertEquals(
+      NumMessages,
+      resetAndConsume(NumMessages, "smallest", SmallOffset))
 
   @Test
   def testResetToLatestWhenOffsetTooHigh() =
@@ -106,9 +108,10 @@ class AutoOffsetResetTest extends KafkaServerTestHarness with Logging {
     consumerProps.put("fetch.wait.max.ms", "0")
     val consumerConfig = new ConsumerConfig(consumerProps)
 
-    TestUtils.updateConsumerOffset(consumerConfig,
-                                   dirs.consumerOffsetDir + "/" + "0",
-                                   offset)
+    TestUtils.updateConsumerOffset(
+      consumerConfig,
+      dirs.consumerOffsetDir + "/" + "0",
+      offset)
     info("Updated consumer offset to " + offset)
 
     val consumerConnector: ConsumerConnector = Consumer.create(consumerConfig)

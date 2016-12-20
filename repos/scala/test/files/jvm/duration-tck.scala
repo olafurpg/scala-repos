@@ -15,11 +15,13 @@ object Test extends App {
       case r: Double if r.isNaN =>
         assert(left.asInstanceOf[Double].isNaN, s"$left was not NaN")
       case r: Double if r == 0 && r.compareTo(0) == -1 =>
-        assert(left == 0 && left.asInstanceOf[Double].compareTo(0) == -1,
-               s"$left was not -0.0")
+        assert(
+          left == 0 && left.asInstanceOf[Double].compareTo(0) == -1,
+          s"$left was not -0.0")
       case Undefined =>
-        assert(left.asInstanceOf[AnyRef] eq Undefined,
-               s"$left was not Undefined")
+        assert(
+          left.asInstanceOf[AnyRef] eq Undefined,
+          s"$left was not Undefined")
       case _ => assert(left == right, s"$left was not equal to $right")
     }
   }
@@ -135,13 +137,14 @@ object Test extends App {
   Duration.fromNanos(nan) mustBe undef
 
   // test overflow protection
-  for (unit ← Seq(DAYS,
-                  HOURS,
-                  MINUTES,
-                  SECONDS,
-                  MILLISECONDS,
-                  MICROSECONDS,
-                  NANOSECONDS)) {
+  for (unit ← Seq(
+         DAYS,
+         HOURS,
+         MINUTES,
+         SECONDS,
+         MILLISECONDS,
+         MICROSECONDS,
+         NANOSECONDS)) {
     val x = unit.convert(Long.MaxValue, NANOSECONDS)
     val dur = Duration(x, unit)
     val mdur = Duration(-x, unit)

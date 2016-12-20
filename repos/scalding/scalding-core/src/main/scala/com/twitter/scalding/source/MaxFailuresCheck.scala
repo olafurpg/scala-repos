@@ -32,8 +32,9 @@ class MaxFailuresCheck[T, U](val maxFailures: Int)(
       case e: Exception =>
         // TODO: use proper logging
         e.printStackTrace()
-        assert(failures.incrementAndGet <= maxFailures,
-               "maximum decoding errors exceeded")
+        assert(
+          failures.incrementAndGet <= maxFailures,
+          "maximum decoding errors exceeded")
         None
     }
   }

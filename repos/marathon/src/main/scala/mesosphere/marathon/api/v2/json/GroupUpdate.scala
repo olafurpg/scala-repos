@@ -19,8 +19,9 @@ case class GroupUpdate(id: Option[PathId],
 
   def apply(current: Group, timestamp: Timestamp): Group = {
     require(scaleBy.isEmpty, "To apply the update, no scale should be given.")
-    require(version.isEmpty,
-            "To apply the update, no version should be given.")
+    require(
+      version.isEmpty,
+      "To apply the update, no version should be given.")
     val effectiveGroups = groups.fold(current.groups) { updates =>
       val currentIds = current.groups.map(_.id)
       val groupIds = updates.map(_.groupId.canonicalPath(current.id))
@@ -43,20 +44,22 @@ case class GroupUpdate(id: Option[PathId],
       apps.getOrElse(current.apps).map(toApp(current.id, _, timestamp))
     val effectiveDependencies = dependencies.fold(current.dependencies)(
       _.map(_.canonicalPath(current.id)))
-    Group(current.id,
-          effectiveApps,
-          effectiveGroups,
-          effectiveDependencies,
-          timestamp)
+    Group(
+      current.id,
+      effectiveApps,
+      effectiveGroups,
+      effectiveDependencies,
+      timestamp)
   }
 
   def toApp(gid: PathId,
             app: AppDefinition,
             version: Timestamp): AppDefinition = {
     val appId = app.id.canonicalPath(gid)
-    app.copy(id = appId,
-             dependencies = app.dependencies.map(_.canonicalPath(gid)),
-             versionInfo = AppDefinition.VersionInfo.OnlyVersion(version))
+    app.copy(
+      id = appId,
+      dependencies = app.dependencies.map(_.canonicalPath(gid)),
+      versionInfo = AppDefinition.VersionInfo.OnlyVersion(version))
   }
 
   def toGroup(gid: PathId, version: Timestamp): Group = Group(
@@ -77,9 +80,10 @@ object GroupUpdate {
   def apply(id: PathId,
             apps: Set[AppDefinition],
             groups: Set[GroupUpdate]): GroupUpdate = {
-    GroupUpdate(Some(id),
-                if (apps.isEmpty) None else Some(apps),
-                if (groups.isEmpty) None else Some(groups))
+    GroupUpdate(
+      Some(id),
+      if (apps.isEmpty) None else Some(apps),
+      if (groups.isEmpty) None else Some(groups))
   }
   def empty(id: PathId): GroupUpdate = GroupUpdate(Some(id))
 

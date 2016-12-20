@@ -72,22 +72,24 @@ class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
             .shouldInspect(file) =>
         processScalaFile(sFile)
         import scala.collection.JavaConversions._
-        UpdateHighlightersUtil.setHighlightersToEditor(file.getProject,
-                                                       editor.getDocument,
-                                                       0,
-                                                       file.getTextLength,
-                                                       highlightInfos,
-                                                       getColorsScheme,
-                                                       getId)
+        UpdateHighlightersUtil.setHighlightersToEditor(
+          file.getProject,
+          editor.getDocument,
+          0,
+          file.getTextLength,
+          highlightInfos,
+          getColorsScheme,
+          getId)
         highlightInfos.clear()
       case sFile: ScalaFile =>
-        UpdateHighlightersUtil.setHighlightersToEditor(file.getProject,
-                                                       editor.getDocument,
-                                                       0,
-                                                       file.getTextLength,
-                                                       Collections.emptyList(),
-                                                       getColorsScheme,
-                                                       getId)
+        UpdateHighlightersUtil.setHighlightersToEditor(
+          file.getProject,
+          editor.getDocument,
+          0,
+          file.getTextLength,
+          Collections.emptyList(),
+          getColorsScheme,
+          getId)
       case _ =>
     }
   }
@@ -122,10 +124,11 @@ class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
     }
     val localUnusedShortName = ScalaUnusedSymbolInspection.ShortName
     val localAssignShortName = VarCouldBeValInspection.ShortName
-    UnusedConfig(isEnabled(localUnusedShortName),
-                 severity(localUnusedShortName),
-                 isEnabled(localAssignShortName),
-                 severity(localAssignShortName))
+    UnusedConfig(
+      isEnabled(localUnusedShortName),
+      severity(localUnusedShortName),
+      isEnabled(localAssignShortName),
+      severity(localAssignShortName))
   }
 
   private def processDeclaredElementHolder(x: ScDeclaredElementsHolder,
@@ -305,7 +308,7 @@ class VarToValFix(varDef: ScVariableDefinition, name: Option[String])
     if (!varDef.isValid) return
     if (!FileModificationService.getInstance.prepareFileForWrite(file)) return
     varDef.replace(
-      ScalaPsiElementFactory.createValFromVarDefinition(varDef,
-                                                        varDef.getManager))
+      ScalaPsiElementFactory
+        .createValFromVarDefinition(varDef, varDef.getManager))
   }
 }

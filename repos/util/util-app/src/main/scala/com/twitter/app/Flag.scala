@@ -640,9 +640,8 @@ class Flags(argv0: String,
             catch {
               case NonFatal(e) =>
                 return Error(
-                  "Error parsing flag \"%s\": %s\n%s".format(k,
-                                                             e.getMessage,
-                                                             usage)
+                  "Error parsing flag \"%s\": %s\n%s"
+                    .format(k, e.getMessage, usage)
                 )
             }
 
@@ -652,9 +651,8 @@ class Flags(argv0: String,
             catch {
               case e: Throwable =>
                 return Error(
-                  "Error parsing flag \"%s\": %s\n%s".format(k,
-                                                             e.getMessage,
-                                                             usage)
+                  "Error parsing flag \"%s\": %s\n%s"
+                    .format(k, e.getMessage, usage)
                 )
             }
         }
@@ -921,9 +919,10 @@ class GlobalFlag[T] private[app] (
         case NonFatal(exc) =>
           java.util.logging.Logger
             .getLogger("")
-            .log(java.util.logging.Level.SEVERE,
-                 "Failed to parse system property " + name + " as flag",
-                 exc)
+            .log(
+              java.util.logging.Level.SEVERE,
+              "Failed to parse system property " + name + " as flag",
+              exc)
           None
       }
     }

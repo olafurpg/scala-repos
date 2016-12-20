@@ -52,10 +52,11 @@ class HashingTF(override val uid: String)
     * (default = 2^18^)
     * @group param
     */
-  val numFeatures = new IntParam(this,
-                                 "numFeatures",
-                                 "number of features (> 0)",
-                                 ParamValidators.gt(0))
+  val numFeatures = new IntParam(
+    this,
+    "numFeatures",
+    "number of features (> 0)",
+    ParamValidators.gt(0))
 
   setDefault(numFeatures -> (1 << 18))
 
@@ -77,8 +78,9 @@ class HashingTF(override val uid: String)
 
   override def transformSchema(schema: StructType): StructType = {
     val inputType = schema($(inputCol)).dataType
-    require(inputType.isInstanceOf[ArrayType],
-            s"The input column must be ArrayType, but got $inputType.")
+    require(
+      inputType.isInstanceOf[ArrayType],
+      s"The input column must be ArrayType, but got $inputType.")
     val attrGroup = new AttributeGroup($(outputCol), $(numFeatures))
     SchemaUtils.appendColumn(schema, attrGroup.toStructField())
   }

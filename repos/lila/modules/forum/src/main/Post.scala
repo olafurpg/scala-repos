@@ -41,18 +41,19 @@ object Post {
            lang: Option[String],
            troll: Boolean,
            hidden: Boolean): Post =
-    Post(id = Random nextStringUppercase idSize,
-         topicId = topicId,
-         author = author,
-         userId = userId,
-         ip = ip,
-         text = text,
-         number = number,
-         lang = lang,
-         troll = troll,
-         hidden = hidden,
-         createdAt = DateTime.now,
-         categId = categId)
+    Post(
+      id = Random nextStringUppercase idSize,
+      topicId = topicId,
+      author = author,
+      userId = userId,
+      ip = ip,
+      text = text,
+      number = number,
+      lang = lang,
+      troll = troll,
+      hidden = hidden,
+      createdAt = DateTime.now,
+      categId = categId)
 
   import lila.db.JsTube
   import JsTube.Helpers._

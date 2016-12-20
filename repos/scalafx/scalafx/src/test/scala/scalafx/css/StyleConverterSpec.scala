@@ -39,8 +39,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class StyleConverterSpec
-    extends SimpleSFXDelegateSpec[jfxcss.StyleConverter[String, String],
-                                  StyleConverter[String, String]](
+    extends SimpleSFXDelegateSpec[
+      jfxcss.StyleConverter[String, String],
+      StyleConverter[String, String]](
       classOf[jfxcss.StyleConverter[String, String]],
       classOf[StyleConverter[String, String]]) {
 

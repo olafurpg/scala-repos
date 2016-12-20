@@ -37,8 +37,9 @@ class CORSFilter @Inject()(config: MarathonConf) extends Filter {
           .asScala
           .flatMap(_.split(","))
 
-        httpResponse.setHeader("Access-Control-Allow-Headers",
-                               accessControlRequestHeaders.mkString(", "))
+        httpResponse.setHeader(
+          "Access-Control-Allow-Headers",
+          accessControlRequestHeaders.mkString(", "))
 
         httpResponse
           .setHeader("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")

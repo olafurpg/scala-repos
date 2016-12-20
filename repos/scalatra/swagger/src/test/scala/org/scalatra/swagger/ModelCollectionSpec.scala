@@ -21,10 +21,11 @@ object ModelCollectionSpec {
                    id: Option[Int],
                    relatedAsset: Asset)
 
-  val taggedThingModels = Set(Swagger.modelToSwagger[Tag],
-                              Swagger.modelToSwagger[Name],
-                              Swagger.modelToSwagger[Sequence],
-                              Swagger.modelToSwagger[TaggedThing])
+  val taggedThingModels = Set(
+    Swagger.modelToSwagger[Tag],
+    Swagger.modelToSwagger[Name],
+    Swagger.modelToSwagger[Sequence],
+    Swagger.modelToSwagger[TaggedThing])
   val onlyPrimitivesModel = Swagger.modelToSwagger[OnlyPrimitives].get
   val assetModel = Swagger.modelToSwagger(Reflector.scalaTypeOf[Asset]).get
 

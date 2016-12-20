@@ -64,23 +64,25 @@ class CompoundTypeCheckSignatureProcessor(s: Signature,
           //lower type
           val lower1 = tp1.lowerBound.getOrNothing
           val lower2 = substitutor.subst(tp2.lowerType())
-          var t = Conformance.conformsInner(if (variance == 1) lower2
-                                            else lower1,
-                                            if (variance == 1) lower1
-                                            else lower2,
-                                            Set.empty,
-                                            undef)
+          var t = Conformance.conformsInner(
+            if (variance == 1) lower2
+            else lower1,
+            if (variance == 1) lower1
+            else lower2,
+            Set.empty,
+            undef)
           if (!t._1) return false
           undef = t._2
 
           val upper1 = tp1.upperBound.getOrAny
           val upper2 = substitutor.subst(tp2.upperType())
-          t = Conformance.conformsInner(if (variance == 1) upper1
-                                        else upper2,
-                                        if (variance == 1) upper2
-                                        else upper1,
-                                        Set.empty,
-                                        undef)
+          t = Conformance.conformsInner(
+            if (variance == 1) upper1
+            else upper2,
+            if (variance == 1) upper2
+            else upper1,
+            Set.empty,
+            undef)
           if (!t._1) return false
           undef = t._2
 
@@ -154,9 +156,10 @@ class CompoundTypeCheckSignatureProcessor(s: Signature,
         })
         val dcl: ScTypedDefinition = element.asInstanceOf[ScTypedDefinition]
         val isVar = dcl.isVar
-        if (!checkSignature(new Signature(dcl.name, Seq.empty, 0, subst, dcl),
-                            Array.empty,
-                            rt)) return false
+        if (!checkSignature(
+              new Signature(dcl.name, Seq.empty, 0, subst, dcl),
+              Array.empty,
+              rt)) return false
         if (isVar && !checkSignature(
               new Signature(dcl.name + "_=", Seq(() => rt), 1, subst, dcl),
               Array.empty,
@@ -166,9 +169,10 @@ class CompoundTypeCheckSignatureProcessor(s: Signature,
         if (!checkSignature(sign1, method.getTypeParameters, method match {
               case fun: ScFunction => fun.returnType.getOrNothing
               case method: PsiMethod =>
-                ScType.create(method.getReturnType,
-                              method.getProject,
-                              method.getResolveScope)
+                ScType.create(
+                  method.getReturnType,
+                  method.getProject,
+                  method.getResolveScope)
             })) return false
       case _ =>
     }
@@ -212,23 +216,25 @@ class CompoundTypeCheckTypeAliasProcessor(sign: TypeAliasSignature,
           //lower type
           val lower1 = tp1.lowerBound.getOrNothing
           val lower2 = substitutor.subst(tp2.lowerType())
-          var t = Conformance.conformsInner(if (variance == 1) lower2
-                                            else lower1,
-                                            if (variance == 1) lower1
-                                            else lower2,
-                                            Set.empty,
-                                            undef)
+          var t = Conformance.conformsInner(
+            if (variance == 1) lower2
+            else lower1,
+            if (variance == 1) lower1
+            else lower2,
+            Set.empty,
+            undef)
           if (!t._1) return false
           undef = t._2
 
           val upper1 = tp1.upperBound.getOrAny
           val upper2 = substitutor.subst(tp2.upperType())
-          t = Conformance.conformsInner(if (variance == 1) upper1
-                                        else upper2,
-                                        if (variance == 1) upper2
-                                        else upper1,
-                                        Set.empty,
-                                        undef)
+          t = Conformance.conformsInner(
+            if (variance == 1) upper1
+            else upper2,
+            if (variance == 1) upper2
+            else upper1,
+            Set.empty,
+            undef)
           if (!t._1) return false
           undef = t._2
 
@@ -269,10 +275,11 @@ class CompoundTypeCheckTypeAliasProcessor(sign: TypeAliasSignature,
             Set.empty,
             undef)
           if (t._1) {
-            t = Conformance.conformsInner(substitutor.subst(sign.upperBound),
-                                          subst.subst(tp.upperBound.getOrAny),
-                                          Set.empty,
-                                          t._2)
+            t = Conformance.conformsInner(
+              substitutor.subst(sign.upperBound),
+              subst.subst(tp.upperBound.getOrAny),
+              Set.empty,
+              t._2)
             if (t._1) {
               trueResult = true
               undef = t._2

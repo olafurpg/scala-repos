@@ -48,10 +48,11 @@ trait BasicAuthSupport[UserType <: AnyRef] {
 
 object BasicAuthStrategy {
 
-  private val AUTHORIZATION_KEYS = List("Authorization",
-                                        "HTTP_AUTHORIZATION",
-                                        "X-HTTP_AUTHORIZATION",
-                                        "X_HTTP_AUTHORIZATION")
+  private val AUTHORIZATION_KEYS = List(
+    "Authorization",
+    "HTTP_AUTHORIZATION",
+    "X-HTTP_AUTHORIZATION",
+    "X_HTTP_AUTHORIZATION")
   class BasicAuthRequest(r: HttpServletRequest) {
 
     def parts =

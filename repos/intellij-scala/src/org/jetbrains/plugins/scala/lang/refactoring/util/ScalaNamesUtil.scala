@@ -47,8 +47,9 @@ object ScalaNamesUtil {
   }
 
   def isIdentifier(text: String): Boolean = {
-    checkGeneric(text,
-                 lexer => lexer.getTokenType == ScalaTokenTypes.tIDENTIFIER)
+    checkGeneric(
+      text,
+      lexer => lexer.getTokenType == ScalaTokenTypes.tIDENTIFIER)
   }
 
   def isKeyword(text: String): Boolean = keywordNames.contains(text)

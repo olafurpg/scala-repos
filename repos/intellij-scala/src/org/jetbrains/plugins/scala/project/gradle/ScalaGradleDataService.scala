@@ -44,10 +44,11 @@ class ScalaGradleDataService
       projectData: ProjectData,
       project: Project,
       modelsProvider: IdeModifiableModelsProvider): Importer[ScalaModelData] =
-    new ScalaGradleDataService.Importer(toImport,
-                                        projectData,
-                                        project,
-                                        modelsProvider)
+    new ScalaGradleDataService.Importer(
+      toImport,
+      projectData,
+      project,
+      modelsProvider)
 }
 
 private object ScalaGradleDataService {
@@ -56,10 +57,11 @@ private object ScalaGradleDataService {
                          projectData: ProjectData,
                          project: Project,
                          modelsProvider: IdeModifiableModelsProvider)
-      extends AbstractImporter[ScalaModelData](dataToImport,
-                                               projectData,
-                                               project,
-                                               modelsProvider) {
+      extends AbstractImporter[ScalaModelData](
+        dataToImport,
+        projectData,
+        project,
+        modelsProvider) {
 
     override def importData(): Unit =
       dataToImport.foreach(doImport)
@@ -80,8 +82,9 @@ private object ScalaGradleDataService {
         findScalaLibraryIn(compilerClasspath).flatMap(getVersionFromJar)
       if (compilerVersionOption.isEmpty) {
         showWarning(
-          ScalaBundle.message("gradle.dataService.scalaVersionCantBeDetected",
-                              module.getName))
+          ScalaBundle.message(
+            "gradle.dataService.scalaVersionCantBeDetected",
+            module.getName))
         return
       }
       val compilerVersion = compilerVersionOption.get
@@ -93,9 +96,10 @@ private object ScalaGradleDataService {
         scalaLibraries.find(_.scalaVersion.contains(compilerVersion))
       if (scalaLibraryOption.isEmpty) {
         showWarning(
-          ScalaBundle.message("gradle.dataService.scalaLibraryIsNotFound",
-                              compilerVersion.number,
-                              module.getName))
+          ScalaBundle.message(
+            "gradle.dataService.scalaLibraryIsNotFound",
+            compilerVersion.number,
+            module.getName))
         return
       }
       val scalaLibrary = scalaLibraryOption.get
@@ -140,10 +144,11 @@ private object ScalaGradleDataService {
       if (b) Seq(s) else Seq.empty
 
     private def showWarning(message: String): Unit = {
-      val notification = new NotificationData("Gradle Sync",
-                                              message,
-                                              NotificationCategory.WARNING,
-                                              NotificationSource.PROJECT_SYNC);
+      val notification = new NotificationData(
+        "Gradle Sync",
+        message,
+        NotificationCategory.WARNING,
+        NotificationSource.PROJECT_SYNC);
       ExternalSystemNotificationManager
         .getInstance(project)
         .showNotification(GradleConstants.SYSTEM_ID, notification);

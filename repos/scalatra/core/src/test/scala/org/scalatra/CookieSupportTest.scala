@@ -39,8 +39,9 @@ class CookieSupportServlet extends ScalatraServlet {
 
   post("/remove-cookie") {
     cookies -= "somecookie"
-    response.setHeader("Somecookie-Is-Defined",
-                       cookies.get("somecookie").isDefined.toString)
+    response.setHeader(
+      "Somecookie-Is-Defined",
+      cookies.get("somecookie").isDefined.toString)
   }
 
   post("/remove-cookie-with-path") {
@@ -79,9 +80,10 @@ class CookieSupportTest extends ScalatraFunSuite {
   }
 
   test("POST /setexpiringcookie should set the max age of the cookie") {
-    post("/foo/setexpiringcookie",
-         "cookieval" -> "The value",
-         "maxAge" -> oneWeek.toString) {
+    post(
+      "/foo/setexpiringcookie",
+      "cookieval" -> "The value",
+      "maxAge" -> oneWeek.toString) {
       val cookie = HttpCookie.parse(response.getHeader("Set-Cookie")).get(0)
 
       // Allow some slop, since it's a new call to currentTimeMillis
@@ -113,9 +115,11 @@ class CookieSupportTest extends ScalatraFunSuite {
   // http://github.com/scalatra/scalatra/issue/84
   test("handles multiple cookies") {
     session {
-      post("/foo/setcookie",
-           Map("cookieval" -> "The value",
-               "anothercookieval" -> "Another Cookie")) {
+      post(
+        "/foo/setcookie",
+        Map(
+          "cookieval" -> "The value",
+          "anothercookieval" -> "Another Cookie")) {
         body should equal("OK")
       }
       get("/foo/getcookie") {

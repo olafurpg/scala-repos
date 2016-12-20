@@ -67,16 +67,17 @@ class Producer[K, V](
   AppInfo.registerInfo()
 
   def this(config: ProducerConfig) =
-    this(config,
-         new DefaultEventHandler[K, V](
-           config,
-           CoreUtils.createObject[Partitioner](config.partitionerClass,
-                                               config.props),
-           CoreUtils.createObject[Encoder[V]](config.serializerClass,
-                                              config.props),
-           CoreUtils.createObject[Encoder[K]](config.keySerializerClass,
-                                              config.props),
-           new ProducerPool(config)))
+    this(
+      config,
+      new DefaultEventHandler[K, V](
+        config,
+        CoreUtils
+          .createObject[Partitioner](config.partitionerClass, config.props),
+        CoreUtils
+          .createObject[Encoder[V]](config.serializerClass, config.props),
+        CoreUtils
+          .createObject[Encoder[K]](config.keySerializerClass, config.props),
+        new ProducerPool(config)))
 
   /**
     * Sends the data, partitioned by key to the topic using either the
@@ -116,9 +117,10 @@ class Producer[K, V](
                 queue.put(message)
                 true
               case _ =>
-                queue.offer(message,
-                            config.queueEnqueueTimeoutMs,
-                            TimeUnit.MILLISECONDS)
+                queue.offer(
+                  message,
+                  config.queueEnqueueTimeoutMs,
+                  TimeUnit.MILLISECONDS)
             }
           } catch {
             case e: InterruptedException =>

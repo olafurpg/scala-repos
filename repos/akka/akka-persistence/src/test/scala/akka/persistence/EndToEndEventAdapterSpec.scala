@@ -162,11 +162,13 @@ abstract class EndToEndEventAdapterSpec(journalName: String,
 
   def persister(name: String, probe: Option[ActorRef] = None)(
       implicit system: ActorSystem) =
-    system.actorOf(Props(classOf[EndToEndAdapterActor],
-                         name,
-                         "akka.persistence.journal." + journalName,
-                         probe),
-                   name)
+    system.actorOf(
+      Props(
+        classOf[EndToEndAdapterActor],
+        name,
+        "akka.persistence.journal." + journalName,
+        probe),
+      name)
 
   def withActorSystem[T](name: String, config: Config)(
       block: ActorSystem ⇒ T): T = {
@@ -247,19 +249,19 @@ abstract class EndToEndEventAdapterSpec(journalName: String,
         .withoutPath(s"""$journalPath.event-adapter-bindings."${classOf[
           EndToEndEventAdapterSpec].getCanonicalName}$$A"""")
 
-      withActorSystem("MissingAdapterSystem",
-                      journalConfig.withFallback(missingAdapterConfig)) {
-        implicit system2 ⇒
-          EventFilter[ActorInitializationException](
-            occurrences = 1,
-            pattern = ".*undefined event-adapter.*") intercept {
-            intercept[IllegalArgumentException] {
-              Persistence(system2)
-                .adaptersFor(s"akka.persistence.journal.$journalName")
-                .get(classOf[String])
-            }.getMessage should include(
-              "was bound to undefined event-adapter: a (bindings: [a, b], known adapters: b)")
-          }
+      withActorSystem(
+        "MissingAdapterSystem",
+        journalConfig.withFallback(missingAdapterConfig)) { implicit system2 ⇒
+        EventFilter[ActorInitializationException](
+          occurrences = 1,
+          pattern = ".*undefined event-adapter.*") intercept {
+          intercept[IllegalArgumentException] {
+            Persistence(system2)
+              .adaptersFor(s"akka.persistence.journal.$journalName")
+              .get(classOf[String])
+          }.getMessage should include(
+            "was bound to undefined event-adapter: a (bindings: [a, b], known adapters: b)")
+        }
       }
     }
   }

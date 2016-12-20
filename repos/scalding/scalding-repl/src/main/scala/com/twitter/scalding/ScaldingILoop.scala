@@ -104,10 +104,11 @@ class ScaldingILoop(in: Option[BufferedReader], out: JPrintWriter)
   override def commands: List[LoopCommand] = super.commands ++ scaldingCommands
 
   protected def imports: List[String] =
-    List("com.twitter.scalding._",
-         "com.twitter.scalding.ReplImplicits._",
-         "com.twitter.scalding.ReplImplicitContext._",
-         "com.twitter.scalding.ReplState._")
+    List(
+      "com.twitter.scalding._",
+      "com.twitter.scalding.ReplImplicits._",
+      "com.twitter.scalding.ReplImplicitContext._",
+      "com.twitter.scalding.ReplState._")
 
   override def createInterpreter() {
     super.createInterpreter()

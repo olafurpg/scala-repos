@@ -58,13 +58,15 @@ private[spark] class YarnClusterSchedulerBackend(scheduler: TaskSchedulerImpl,
         s"$httpScheme$httpAddress/node/containerlogs/$containerId/$user"
       logDebug(s"Base URL for logs: $baseUrl")
       driverLogs = Some(
-        Map("stderr" -> s"$baseUrl/stderr?start=-4096",
-            "stdout" -> s"$baseUrl/stdout?start=-4096"))
+        Map(
+          "stderr" -> s"$baseUrl/stderr?start=-4096",
+          "stdout" -> s"$baseUrl/stdout?start=-4096"))
     } catch {
       case e: Exception =>
-        logInfo("Error while building AM log links, so AM" +
-                  " logs link will not appear in application UI",
-                e)
+        logInfo(
+          "Error while building AM log links, so AM" +
+            " logs link will not appear in application UI",
+          e)
     }
     driverLogs
   }

@@ -75,8 +75,9 @@ object CanPadRight {
                              optDim: Dimensions1,
                              padDV: DenseVector[T]): DenseVector[T] = {
         require(optDim.n1 > 0, "Cannot pad to zero or negative length!")
-        require(optDim.n1 - v.length <= padDV.length,
-                "Cannot pad beyond specified padding DenseVector!")
+        require(
+          optDim.n1 - v.length <= padDV.length,
+          "Cannot pad beyond specified padding DenseVector!")
         v.length match {
           case optDim.n1 => v.copy
           case num: Int if num < optDim.n1 =>
@@ -144,12 +145,14 @@ object CanPadRight {
       def padRight2ImplFixed[T](m: DenseMatrix[T],
                                 optDim: Dimensions2,
                                 padValue: T): DenseMatrix[T] = {
-        require(optDim.n1 > 0 && optDim.n2 > 0,
-                "Cannot pad to zero or negative length!")
+        require(
+          optDim.n1 > 0 && optDim.n2 > 0,
+          "Cannot pad to zero or negative length!")
 
         val tempret = DenseMatrix.zeros[T](optDim.n1, optDim.n2)
-        cforRange2(0 until min(optDim.n2, m.cols),
-                   0 until min(optDim.n1, m.rows)) { (c, r) =>
+        cforRange2(
+          0 until min(optDim.n2, m.cols),
+          0 until min(optDim.n1, m.rows)) { (c, r) =>
           tempret(r, c) = m(r, c)
         }
         tempret
@@ -221,8 +224,9 @@ object CanPadLeft {
                             optDim: Dimensions1,
                             padDV: DenseVector[T]): DenseVector[T] = {
         require(optDim.n1 > 0, "Cannot pad to zero or negative length!")
-        require(optDim.n1 - v.length <= padDV.length,
-                "Cannot pad beyond specified padding DenseVector!")
+        require(
+          optDim.n1 - v.length <= padDV.length,
+          "Cannot pad beyond specified padding DenseVector!")
         v.length match {
           case optDim.n1 => v.copy
           case num: Int if num < optDim.n1 =>
@@ -289,8 +293,9 @@ object CanPadLeft {
       def padLeft2ImplFixed[T](m: DenseMatrix[T],
                                optDim: Dimensions2,
                                padValue: T): DenseMatrix[T] = {
-        require(optDim.n1 > 0 && optDim.n2 > 0,
-                "Cannot pad to zero or negative length!")
+        require(
+          optDim.n1 > 0 && optDim.n2 > 0,
+          "Cannot pad to zero or negative length!")
 
         val tempret = DenseMatrix.zeros[T](optDim.n1, optDim.n2)
         cforRange2(1 to min(optDim.n2, m.cols), 1 to min(optDim.n1, m.rows)) {

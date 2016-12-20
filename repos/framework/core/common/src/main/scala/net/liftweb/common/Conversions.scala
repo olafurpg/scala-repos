@@ -128,9 +128,10 @@ final case class ConstStringFunc(str: String) extends StringFunc {
   * with the implicit conversions defined in its [[NodeSeqFunc$ companion
   * object]].
   */
-@deprecated("""Lift now mostly uses `NodeSeq=>NodeSeq` transformations rather
+@deprecated(
+  """Lift now mostly uses `NodeSeq=>NodeSeq` transformations rather
 than `NodeSeq` constants; consider doing the same.""",
-            "3.0")
+  "3.0")
 sealed trait NodeSeqFunc {
   def func: () => NodeSeq
 }
@@ -141,9 +142,10 @@ sealed trait NodeSeqFunc {
   * the flexibility of a `()=>[[scala.xml.NodeSeq NodeSeq]]` without having to
   * write overloads for all methods that should accept both.
   */
-@deprecated("""Lift now mostly uses `NodeSeq=>NodeSeq` transformations rather
+@deprecated(
+  """Lift now mostly uses `NodeSeq=>NodeSeq` transformations rather
 than `NodeSeq` constants; consider doing the same.""",
-            "3.0")
+  "3.0")
 object NodeSeqFunc {
 
   /**
@@ -166,17 +168,19 @@ object NodeSeqFunc {
 /**
   * The case class that holds a `[[scala.xml.NodeSeq NodeSeq]]` function.
   */
-@deprecated("""Lift now mostly uses `NodeSeq=>NodeSeq` transformations rather
+@deprecated(
+  """Lift now mostly uses `NodeSeq=>NodeSeq` transformations rather
 than `NodeSeq` constants; consider doing the same.""",
-            "3.0")
+  "3.0")
 final case class RealNodeSeqFunc(func: () => NodeSeq) extends NodeSeqFunc
 
 /**
   * The case class that holds the `[[scala.xml.NodeSeq NodeSeq]]` constant.
   */
-@deprecated("""Lift now mostly uses `NodeSeq=>NodeSeq` transformations rather
+@deprecated(
+  """Lift now mostly uses `NodeSeq=>NodeSeq` transformations rather
 than `NodeSeq` constants; consider doing the same.""",
-            "3.0")
+  "3.0")
 final case class ConstNodeSeqFunc(ns: NodeSeq) extends NodeSeqFunc {
   lazy val func = () => ns
 }

@@ -28,10 +28,11 @@ object ParseKey extends Properties("Key parser test") {
       val expected = resolve(structure, key, mask)
       val string = displayMasked(key, mask)
 
-      ("Key: " + displayFull(key)) |: parseExpected(structure,
-                                                    string,
-                                                    expected,
-                                                    mask)
+      ("Key: " + displayFull(key)) |: parseExpected(
+        structure,
+        string,
+        expected,
+        mask)
     }
 
   property("An unspecified project axis resolves to the current project") =
@@ -54,8 +55,9 @@ object ParseKey extends Properties("Key parser test") {
       val mask = skm.mask.copy(task = false)
       val string = displayMasked(key, mask)
 
-      ("Key: " + displayFull(key)) |: ("Mask: " + mask) |: parse(structure,
-                                                                 string) {
+      ("Key: " + displayFull(key)) |: ("Mask: " + mask) |: parse(
+        structure,
+        string) {
         case Left(err) => false
         case Right(sk) => sk.scope.task == Global
       }
@@ -94,11 +96,10 @@ object ParseKey extends Properties("Key parser test") {
   def resolve(structure: Structure,
               key: ScopedKey[_],
               mask: ScopeMask): ScopedKey[_] =
-    ScopedKey(Resolve(structure.extra,
-                      Select(structure.current),
-                      key.key,
-                      mask)(key.scope),
-              key.key)
+    ScopedKey(
+      Resolve(structure.extra, Select(structure.current), key.key, mask)(
+        key.scope),
+      key.key)
 
   def parseExpected(structure: Structure,
                     s: String,

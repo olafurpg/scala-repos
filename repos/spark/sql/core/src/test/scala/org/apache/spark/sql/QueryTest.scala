@@ -54,11 +54,13 @@ abstract class QueryTest extends PlanTest {
     val outputs = df.collect().map(_.mkString).mkString
     for (key <- keywords) {
       if (exists) {
-        assert(outputs.contains(key),
-               s"Failed for $df ($key doesn't exist in result)")
+        assert(
+          outputs.contains(key),
+          s"Failed for $df ($key doesn't exist in result)")
       } else {
-        assert(!outputs.contains(key),
-               s"Failed for $df ($key existed in the result)")
+        assert(
+          !outputs.contains(key),
+          s"Failed for $df ($key existed in the result)")
       }
     }
   }
@@ -75,12 +77,13 @@ abstract class QueryTest extends PlanTest {
     *    which performs a subset of the checks done by this function.
     */
   protected def checkDataset[T](ds: Dataset[T], expectedAnswer: T*): Unit = {
-    checkAnswer(ds.toDF(),
-                sqlContext
-                  .createDataset(expectedAnswer)(ds.unresolvedTEncoder)
-                  .toDF()
-                  .collect()
-                  .toSeq)
+    checkAnswer(
+      ds.toDF(),
+      sqlContext
+        .createDataset(expectedAnswer)(ds.unresolvedTEncoder)
+        .toDF()
+        .collect()
+        .toSeq)
 
     checkDecoding(ds, expectedAnswer: _*)
   }
@@ -89,13 +92,14 @@ abstract class QueryTest extends PlanTest {
     val decoded = try ds.collect().toSet
     catch {
       case e: Exception =>
-        fail(s"""
+        fail(
+          s"""
              |Exception collecting dataset as objects
              |${ds.resolvedTEncoder}
              |${ds.resolvedTEncoder.fromRowExpression.treeString}
              |${ds.queryExecution}
            """.stripMargin,
-             e)
+          e)
     }
 
     // Handle the case where the return type is an array
@@ -224,11 +228,12 @@ abstract class QueryTest extends PlanTest {
       logicalPlan.toJSON
     } catch {
       case NonFatal(e) =>
-        fail(s"""
+        fail(
+          s"""
              |Failed to parse logical plan to JSON:
              |${logicalPlan.treeString}
            """.stripMargin,
-             e)
+          e)
     }
 
     // scala function is not serializable to JSON, use null to replace them so that we can compare
@@ -251,13 +256,14 @@ abstract class QueryTest extends PlanTest {
       TreeNode.fromJSON[LogicalPlan](jsonString, sqlContext.sparkContext)
     } catch {
       case NonFatal(e) =>
-        fail(s"""
+        fail(
+          s"""
              |Failed to rebuild the logical plan from JSON:
              |${logicalPlan.treeString}
              |
              |${logicalPlan.prettyJson}
            """.stripMargin,
-             e)
+          e)
     }
 
     val normalized2 =
@@ -273,14 +279,16 @@ abstract class QueryTest extends PlanTest {
         case l: InMemoryRelation =>
           val origin = inMemoryRelations.head
           inMemoryRelations = inMemoryRelations.drop(1)
-          InMemoryRelation(l.output,
-                           l.useCompression,
-                           l.batchSize,
-                           l.storageLevel,
-                           origin.child,
-                           l.tableName)(origin.cachedColumnBuffers,
-                                        l._statistics,
-                                        origin._batchStats)
+          InMemoryRelation(
+            l.output,
+            l.useCompression,
+            l.batchSize,
+            l.storageLevel,
+            origin.child,
+            l.tableName)(
+            origin.cachedColumnBuffers,
+            l._statistics,
+            origin._batchStats)
       }
 
     assert(logicalRDDs.isEmpty)
@@ -374,8 +382,9 @@ object QueryTest {
   def sameRows(expectedAnswer: Seq[Row],
                sparkAnswer: Seq[Row],
                isSorted: Boolean = false): Option[String] = {
-    if (prepareAnswer(expectedAnswer, isSorted) != prepareAnswer(sparkAnswer,
-                                                                 isSorted)) {
+    if (prepareAnswer(expectedAnswer, isSorted) != prepareAnswer(
+          sparkAnswer,
+          isSorted)) {
       val errorMessage =
         s"""
          |== Results ==
@@ -401,9 +410,10 @@ object QueryTest {
   protected def checkAggregatesWithTol(actualAnswer: Row,
                                        expectedAnswer: Row,
                                        absTol: Double) = {
-    require(actualAnswer.length == expectedAnswer.length,
-            s"actual answer length ${actualAnswer.length} != " +
-              s"expected answer length ${expectedAnswer.length}")
+    require(
+      actualAnswer.length == expectedAnswer.length,
+      s"actual answer length ${actualAnswer.length} != " +
+        s"expected answer length ${expectedAnswer.length}")
 
     // TODO: support other numeric types besides Double
     // TODO: support struct types?

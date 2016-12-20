@@ -312,8 +312,9 @@ private[streaming] class FileInputDStream[K, V, F <: NewInputFormat[K, V]](
 
   /** Get file mod time from cache or fetch it from the file system */
   private def getFileModTime(path: Path) = {
-    fileToModTime.getOrElseUpdate(path.toString,
-                                  fs.getFileStatus(path).getModificationTime())
+    fileToModTime.getOrElseUpdate(
+      path.toString,
+      fs.getFileStatus(path).getModificationTime())
   }
 
   private def directoryPath: Path = {

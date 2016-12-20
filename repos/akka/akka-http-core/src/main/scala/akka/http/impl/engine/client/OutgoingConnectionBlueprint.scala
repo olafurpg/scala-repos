@@ -85,9 +85,10 @@ private[http] object OutgoingConnectionBlueprint {
                                    ByteString,
                                    NotUsed] = {
           val requestRendererFactory =
-            new HttpRequestRendererFactory(userAgentHeader,
-                                           requestHeaderSizeHint,
-                                           log)
+            new HttpRequestRendererFactory(
+              userAgentHeader,
+              requestHeaderSizeHint,
+              log)
           Flow[RequestRenderingContext]
             .flatMapConcat(requestRendererFactory.renderToSource)
             .named("renderer")
@@ -105,14 +106,15 @@ private[http] object OutgoingConnectionBlueprint {
             // the initial header parser we initially use for every connection,
             // will not be mutated, all "shared copy" parsers copy on first-write into the header cache
             val rootParser =
-              new HttpResponseParser(parserSettings,
-                                     HttpHeaderParser(parserSettings) { info ⇒
-                                       if (parserSettings.illegalHeaderWarnings)
-                                         logParsingError(
-                                           info withSummaryPrepended "Illegal response header",
-                                           log,
-                                           parserSettings.errorLoggingVerbosity)
-                                     })
+              new HttpResponseParser(
+                parserSettings,
+                HttpHeaderParser(parserSettings) { info ⇒
+                  if (parserSettings.illegalHeaderWarnings)
+                    logParsingError(
+                      info withSummaryPrepended "Illegal response header",
+                      log,
+                      parserSettings.errorLoggingVerbosity)
+                })
             new ResponseParsingMerge(rootParser)
           }
 
@@ -140,10 +142,11 @@ private[http] object OutgoingConnectionBlueprint {
         responseParsingMerge.out ~> responsePrep ~> terminationFanout.in
         terminationFanout.out(0) ~> terminationMerge.in1
 
-        BidiShape(renderingContextCreation.in,
-                  wrapTls.out,
-                  collectSessionBytes.in,
-                  terminationFanout.out(1))
+        BidiShape(
+          renderingContextCreation.in,
+          wrapTls.out,
+          collectSessionBytes.in,
+          terminationFanout.out(1))
       })
 
     One2OneBidiFlow[HttpRequest, HttpResponse](-1) atop core
@@ -214,11 +217,12 @@ private[http] object OutgoingConnectionBlueprint {
         }
 
         def onPush(): Unit = grab(in) match {
-          case ResponseStart(statusCode,
-                             protocol,
-                             headers,
-                             entityCreator,
-                             closeRequested) ⇒
+          case ResponseStart(
+              statusCode,
+              protocol,
+              headers,
+              entityCreator,
+              closeRequested) ⇒
             val entity =
               createEntity(entityCreator) withSizeLimit parserSettings.maxContentLength
             push(out, HttpResponse(statusCode, headers, entity, protocol))

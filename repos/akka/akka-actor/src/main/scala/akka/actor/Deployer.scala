@@ -62,13 +62,14 @@ final case class Deploy(path: String = "",
     * other members are merged using `X.withFallback(other.X)`.
     */
   def withFallback(other: Deploy): Deploy = {
-    Deploy(path,
-           config.withFallback(other.config),
-           routerConfig.withFallback(other.routerConfig),
-           scope.withFallback(other.scope),
-           if (dispatcher == Deploy.NoDispatcherGiven) other.dispatcher
-           else dispatcher,
-           if (mailbox == Deploy.NoMailboxGiven) other.mailbox else mailbox)
+    Deploy(
+      path,
+      config.withFallback(other.config),
+      routerConfig.withFallback(other.routerConfig),
+      scope.withFallback(other.scope),
+      if (dispatcher == Deploy.NoDispatcherGiven) other.dispatcher
+      else dispatcher,
+      if (mailbox == Deploy.NoMailboxGiven) other.mailbox else mailbox)
   }
 }
 
@@ -181,10 +182,11 @@ private[akka] class Deployer(val settings: ActorSystem.Settings,
 
   def parseConfig(key: String, config: Config): Option[Deploy] = {
     val deployment = config.withFallback(default)
-    val router = createRouterConfig(deployment.getString("router"),
-                                    key,
-                                    config,
-                                    deployment)
+    val router = createRouterConfig(
+      deployment.getString("router"),
+      key,
+      config,
+      deployment)
     val dispatcher = deployment.getString("dispatcher")
     val mailbox = deployment.getString("mailbox")
     Some(Deploy(key, deployment, router, NoScopeGiven, dispatcher, mailbox))
@@ -222,8 +224,9 @@ private[akka] class Deployer(val settings: ActorSystem.Settings,
 
       // first try with Config param, and then with Config and DynamicAccess parameters
       val args1 = List(classOf[Config] -> deployment2)
-      val args2 = List(classOf[Config] -> deployment2,
-                       classOf[DynamicAccess] -> dynamicAccess)
+      val args2 = List(
+        classOf[Config] -> deployment2,
+        classOf[DynamicAccess] -> dynamicAccess)
       dynamicAccess
         .createInstanceFor[RouterConfig](fqn, args1)
         .recover({

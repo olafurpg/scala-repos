@@ -41,8 +41,9 @@ private[akka] final case class ServerSettingsImpl(
     extends ServerSettings {
 
   require(0 < maxConnections, "max-connections must be > 0")
-  require(0 < pipeliningLimit && pipeliningLimit <= 1024,
-          "pipelining-limit must be > 0 and <= 1024")
+  require(
+    0 < pipeliningLimit && pipeliningLimit <= 1024,
+    "pipelining-limit must be > 0 and <= 1024")
   require(0 < responseHeaderSizeHint, "response-size-hint must be > 0")
   require(0 < backlog, "backlog must be > 0")
 
@@ -60,17 +61,19 @@ object ServerSettingsImpl
                             bindTimeout: FiniteDuration)
       extends ServerSettings.Timeouts {
     require(idleTimeout > Duration.Zero, "idleTimeout must be infinite or > 0")
-    require(requestTimeout > Duration.Zero,
-            "requestTimeout must be infinite or > 0")
+    require(
+      requestTimeout > Duration.Zero,
+      "requestTimeout must be infinite or > 0")
     require(bindTimeout > Duration.Zero, "bindTimeout must be > 0")
   }
 
   def fromSubConfig(root: Config, c: Config) =
     new ServerSettingsImpl(
       c.getString("server-header").toOption.map(Server(_)),
-      new Timeouts(c getPotentiallyInfiniteDuration "idle-timeout",
-                   c getPotentiallyInfiniteDuration "request-timeout",
-                   c getFiniteDuration "bind-timeout"),
+      new Timeouts(
+        c getPotentiallyInfiniteDuration "idle-timeout",
+        c getPotentiallyInfiniteDuration "request-timeout",
+        c getFiniteDuration "bind-timeout"),
       c getInt "max-connections",
       c getInt "pipelining-limit",
       c getBoolean "remote-address-header",

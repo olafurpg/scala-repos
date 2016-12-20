@@ -516,9 +516,10 @@ class AssetsBuilder(errorHandler: HttpErrorHandler) extends Controller {
       } getOrElse Future.successful(None)
 
     def notFound =
-      errorHandler.onClientError(request,
-                                 NOT_FOUND,
-                                 "Resource not found by Assets controller")
+      errorHandler.onClientError(
+        request,
+        NOT_FOUND,
+        "Resource not found by Assets controller")
 
     val pendingResult: Future[Result] = assetInfoFuture.flatMap {
       case Some((assetInfo, gzipRequested)) =>
@@ -538,12 +539,13 @@ class AssetsBuilder(errorHandler: HttpErrorHandler) extends Controller {
               cacheableResult(
                 assetInfo,
                 aggressiveCaching,
-                result(file,
-                       length,
-                       assetInfo.mimeType,
-                       resourceData,
-                       gzipRequested,
-                       assetInfo.gzipUrl.isDefined)
+                result(
+                  file,
+                  length,
+                  assetInfo.mimeType,
+                  resourceData,
+                  gzipRequested,
+                  assetInfo.gzipUrl.isDefined)
               )
             })
         }

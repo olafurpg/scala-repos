@@ -199,16 +199,17 @@ class ParquetHadoopFsRelationSuite extends HadoopFsRelationTest {
         .add("index", IntegerType, nullable = false)
         .add("col", ByteType, nullable = true)
 
-      val data = Seq(Row(1, -33.toByte),
-                     Row(2, 0.toByte),
-                     Row(3, -55.toByte),
-                     Row(4, 56.toByte),
-                     Row(5, 127.toByte),
-                     Row(6, -44.toByte),
-                     Row(7, 23.toByte),
-                     Row(8, -95.toByte),
-                     Row(9, 127.toByte),
-                     Row(10, 13.toByte))
+      val data = Seq(
+        Row(1, -33.toByte),
+        Row(2, 0.toByte),
+        Row(3, -55.toByte),
+        Row(4, 56.toByte),
+        Row(5, 127.toByte),
+        Row(6, -44.toByte),
+        Row(7, 23.toByte),
+        Row(8, -95.toByte),
+        Row(9, 127.toByte),
+        Row(10, 13.toByte))
 
       val rdd = sqlContext.sparkContext.parallelize(data)
       val df =

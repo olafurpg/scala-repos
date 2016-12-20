@@ -37,8 +37,9 @@ class CompletionTest {
     val completer = new PresentationCompilerCompleter(intp)
     checkExact(completer, "object O { def x_y_z = 1 }; import O._; x_y")(
       "x_y_z")
-    checkExact(completer,
-               "object O { private def x_y_z = 1 }; import O._; x_y")()
+    checkExact(
+      completer,
+      "object O { private def x_y_z = 1 }; import O._; x_y")()
     checkExact(completer, "object O { private def x_y_z = 1; x_y", "}")(
       "x_y_z")
     checkExact(completer, "object x_y_z; import x_y")("x_y_z")
@@ -50,12 +51,12 @@ class CompletionTest {
       "definition")
 
     // stable terms are offered in type completion as they might be used as a prefix
-    checkExact(completer,
-               """object O { def x_y_z = 0; val x_z_y = ""; type T = x_""")(
-      "x_z_y")
-    checkExact(completer,
-               """def method { def x_y_z = 0; val x_z_y = ""; type T = x_""")(
-      "x_z_y")
+    checkExact(
+      completer,
+      """object O { def x_y_z = 0; val x_z_y = ""; type T = x_""")("x_z_y")
+    checkExact(
+      completer,
+      """def method { def x_y_z = 0; val x_z_y = ""; type T = x_""")("x_z_y")
 
     // We exclude inherited members of the synthetic interpreter wrapper classes
     checkExact(completer, """asInstanceO""")()
@@ -103,11 +104,13 @@ class CompletionTest {
   def camelCompletions(): Unit = {
     val intp = newIMain()
     val completer = new PresentationCompilerCompleter(intp)
-    checkExact(completer,
-               "object O { def theCatSatOnTheMat = 1 }; import O._; tCSO")(
+    checkExact(
+      completer,
+      "object O { def theCatSatOnTheMat = 1 }; import O._; tCSO")(
       "theCatSatOnTheMat")
-    checkExact(completer,
-               "object O { def getBlerganator = 1 }; import O._; blerga")(
+    checkExact(
+      completer,
+      "object O { def getBlerganator = 1 }; import O._; blerga")(
       "getBlerganator")
     checkExact(
       completer,
@@ -120,8 +123,9 @@ class CompletionTest {
       "object O { def xxxxYyyyyZzzz = 1; def xxxxYyyyyZeee = 1 }; import O._; xYZ")(
       "xxxxYyyyyZzzz",
       "xxxxYyyyyZeee")
-    checkExact(completer,
-               "object O { class AbstractMetaFactoryFactory }; new O.AMFF")(
+    checkExact(
+      completer,
+      "object O { class AbstractMetaFactoryFactory }; new O.AMFF")(
       "AbstractMetaFactoryFactory")
   }
 
@@ -129,14 +133,17 @@ class CompletionTest {
   def lenientCamelCompletions(): Unit = {
     val intp = newIMain()
     val completer = new PresentationCompilerCompleter(intp)
-    checkExact(completer,
-               "object O { def theCatSatOnTheMat = 1 }; import O._; tcso")(
+    checkExact(
+      completer,
+      "object O { def theCatSatOnTheMat = 1 }; import O._; tcso")(
       "theCatSatOnTheMat")
-    checkExact(completer,
-               "object O { def theCatSatOnTheMat = 1 }; import O._; sotm")(
+    checkExact(
+      completer,
+      "object O { def theCatSatOnTheMat = 1 }; import O._; sotm")(
       "theCatSatOnTheMat")
-    checkExact(completer,
-               "object O { def theCatSatOnTheMat = 1 }; import O._; TCSOTM")()
+    checkExact(
+      completer,
+      "object O { def theCatSatOnTheMat = 1 }; import O._; TCSOTM")()
   }
 
   @Test
@@ -174,8 +181,9 @@ class CompletionTest {
 
     // Double Tab on a fully typed selection shows the def string
     checkExact(completer, "(p: {def a_b_c: Int}) => p.a_b_c")()
-    checkExact(completer, "(p: {def a_b_c: Int}) => p.a_b_c")(EmptyString,
-                                                              "def a_b_c: Int")
+    checkExact(completer, "(p: {def a_b_c: Int}) => p.a_b_c")(
+      EmptyString,
+      "def a_b_c: Int")
 
     // likewise for an ident
     checkExact(completer, "(p: {def x_y_z: Int}) => {import p._; x_y_z")()
@@ -184,18 +192,20 @@ class CompletionTest {
       "def x_y_z: Int")
 
     // If the first completion only gives one alternative
-    checkExact(completer,
-               "(p: {def x_y_z: Int; def x_y_z(a: String): Int }) => p.x_y")(
-      "x_y_z")
+    checkExact(
+      completer,
+      "(p: {def x_y_z: Int; def x_y_z(a: String): Int }) => p.x_y")("x_y_z")
     // ... it is automatically inserted into the buffer. Hitting <TAB> again is triggers the help
-    checkExact(completer,
-               "(p: {def x_y_z: Int; def x_y_z(a: String): Int }) => p.x_y_z")(
+    checkExact(
+      completer,
+      "(p: {def x_y_z: Int; def x_y_z(a: String): Int }) => p.x_y_z")(
       EmptyString,
       "def x_y_z(a: String): Int",
       "def x_y_z: Int")
 
-    checkExact(completer,
-               "(p: {def x_y_z: Int; def x_z_y(a: String): Int }) => p.x_")(
+    checkExact(
+      completer,
+      "(p: {def x_y_z: Int; def x_z_y(a: String): Int }) => p.x_")(
       "x_y_z",
       "x_z_y")
     // By contrast, in this case the user had to type "y_z" manually, so no def string printing just yet
@@ -203,8 +213,9 @@ class CompletionTest {
       completer,
       "(p: {def x_y_z: Int; def x_z_y(a: String): Int }) => p.x_y_z")()
     // Another <TAB>, Okay, time to print.
-    checkExact(completer,
-               "(p: {def x_y_z: Int; def x_z_y(a: String): Int }) => p.x_y_z")(
+    checkExact(
+      completer,
+      "(p: {def x_y_z: Int; def x_z_y(a: String): Int }) => p.x_y_z")(
       EmptyString,
       "def x_y_z: Int")
 
@@ -256,7 +267,8 @@ class CompletionTest {
   def checkExact(completer: PresentationCompilerCompleter,
                  before: String,
                  after: String = "")(expected: String*): Unit = {
-    assertEquals(expected.toSet,
-                 completer.complete(before, after).candidates.toSet)
+    assertEquals(
+      expected.toSet,
+      completer.complete(before, after).candidates.toSet)
   }
 }

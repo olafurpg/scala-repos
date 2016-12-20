@@ -54,8 +54,9 @@ abstract class CreateEntityQuickFix(ref: ScReferenceExpression,
     }
 
     ref match {
-      case Both(Parent(_: ScAssignStmt),
-                Parent(Parent(_: ScArgumentExprList))) =>
+      case Both(
+          Parent(_: ScAssignStmt),
+          Parent(Parent(_: ScArgumentExprList))) =>
         false
       case exp @ Parent(infix: ScInfixExpr) if infix.operation == exp =>
         checkBlock(infix.getBaseExpr)
@@ -74,11 +75,12 @@ abstract class CreateEntityQuickFix(ref: ScReferenceExpression,
       blockFor(expr) match {
         case Success(bl) => Some(bl)
         case Failure(e) =>
-          CommonRefactoringUtil.showErrorHint(project,
-                                              editor,
-                                              e.getMessage,
-                                              "Create entity quickfix",
-                                              null)
+          CommonRefactoringUtil.showErrorHint(
+            project,
+            editor,
+            e.getMessage,
+            "Create entity quickfix",
+            null)
           None
       }
     }
@@ -187,8 +189,9 @@ object CreateEntityQuickFix {
         }
       case Both(th: ScThisReference, ParentExtendsBlock(block)) =>
         Success(block)
-      case Both(ReferenceTarget((_: ScSelfTypeElement)),
-                ParentExtendsBlock(block)) =>
+      case Both(
+          ReferenceTarget((_: ScSelfTypeElement)),
+          ParentExtendsBlock(block)) =>
         Success(block)
       case _ =>
         Failure(

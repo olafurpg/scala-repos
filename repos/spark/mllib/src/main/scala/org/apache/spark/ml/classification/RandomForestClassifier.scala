@@ -53,9 +53,10 @@ import org.apache.spark.sql.functions._
 @Experimental
 final class RandomForestClassifier @Since("1.4.0")(
     @Since("1.4.0") override val uid: String)
-    extends ProbabilisticClassifier[Vector,
-                                    RandomForestClassifier,
-                                    RandomForestClassificationModel]
+    extends ProbabilisticClassifier[
+      Vector,
+      RandomForestClassifier,
+      RandomForestClassificationModel]
     with RandomForestParams
     with TreeClassifierParams {
 
@@ -128,16 +129,18 @@ final class RandomForestClassifier @Since("1.4.0")(
         // TODO: Automatically index labels: SPARK-7126
       }
     val oldDataset: RDD[LabeledPoint] = extractLabeledPoints(dataset)
-    val strategy = super.getOldStrategy(categoricalFeatures,
-                                        numClasses,
-                                        OldAlgo.Classification,
-                                        getOldImpurity)
+    val strategy = super.getOldStrategy(
+      categoricalFeatures,
+      numClasses,
+      OldAlgo.Classification,
+      getOldImpurity)
     val trees = RandomForest
-      .run(oldDataset,
-           strategy,
-           getNumTrees,
-           getFeatureSubsetStrategy,
-           getSeed)
+      .run(
+        oldDataset,
+        strategy,
+        getNumTrees,
+        getFeatureSubsetStrategy,
+        getSeed)
       .map(_.asInstanceOf[DecisionTreeClassificationModel])
     val numFeatures = oldDataset.first().features.size
     new RandomForestClassificationModel(trees, numFeatures, numClasses)
@@ -178,13 +181,15 @@ final class RandomForestClassificationModel private[ml] (
     private val _trees: Array[DecisionTreeClassificationModel],
     @Since("1.6.0") override val numFeatures: Int,
     @Since("1.5.0") override val numClasses: Int)
-    extends ProbabilisticClassificationModel[Vector,
-                                             RandomForestClassificationModel]
+    extends ProbabilisticClassificationModel[
+      Vector,
+      RandomForestClassificationModel]
     with TreeEnsembleModel
     with Serializable {
 
-  require(numTrees > 0,
-          "RandomForestClassificationModel requires at least 1 tree.")
+  require(
+    numTrees > 0,
+    "RandomForestClassificationModel requires at least 1 tree.")
 
   /**
     * Construct a random forest classification model, with all trees weighted equally.
@@ -249,11 +254,13 @@ final class RandomForestClassificationModel private[ml] (
 
   @Since("1.4.0")
   override def copy(extra: ParamMap): RandomForestClassificationModel = {
-    copyValues(new RandomForestClassificationModel(uid,
-                                                   _trees,
-                                                   numFeatures,
-                                                   numClasses),
-               extra).setParent(parent)
+    copyValues(
+      new RandomForestClassificationModel(
+        uid,
+        _trees,
+        numFeatures,
+        numClasses),
+      extra).setParent(parent)
   }
 
   @Since("1.4.0")

@@ -43,8 +43,9 @@ class IteratorTest {
       def hasNext = true; def next = new Throwable
     }
 
-    assertEquals(it.drop(1).next.getStackTrace.length,
-                 it.drop(1).drop(1).next.getStackTrace.length)
+    assertEquals(
+      it.drop(1).next.getStackTrace.length,
+      it.drop(1).drop(1).next.getStackTrace.length)
   }
 
   @Test def dropIsChainable(): Unit = {

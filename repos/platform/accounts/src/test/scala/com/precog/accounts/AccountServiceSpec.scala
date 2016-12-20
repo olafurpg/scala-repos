@@ -105,8 +105,9 @@ trait TestAccountService
   def RootKey(config: Configuration) = M.copoint(apiKeyManager.rootAPIKey)
   def Emailer(config: Configuration) = {
     // Empty properties to force use of javamail-mock
-    new ClassLoaderTemplateEmailer(Map("servicehost" -> "test.precog.com"),
-                                   Some(new java.util.Properties))
+    new ClassLoaderTemplateEmailer(
+      Map("servicehost" -> "test.precog.com"),
+      Some(new java.util.Properties))
   }
 
   val clock = Clock.System
@@ -121,12 +122,13 @@ trait TestAccountService
 
   override def map(fs: => Fragments) =
     Step {
-      accountManager.setAccount("0000000001",
-                                rootUser,
-                                rootPass,
-                                new DateTime,
-                                AccountPlan.Root,
-                                None)
+      accountManager.setAccount(
+        "0000000001",
+        rootUser,
+        rootPass,
+        new DateTime,
+        AccountPlan.Root,
+        None)
     } ^ super.map(fs)
 }
 
@@ -256,8 +258,9 @@ class AccountServiceSpec extends TestAccountService with Tags {
         res0 <- deleteAccount(id, user, pass)
         res1 <- getAccount(id, user, pass)
       } yield ((res0, res1))).copoint must beLike {
-        case (HttpResponse(HttpStatus(NoContent, _), _, _, _),
-              HttpResponse(HttpStatus(Unauthorized, _), _, _, _)) =>
+        case (
+            HttpResponse(HttpStatus(NoContent, _), _, _, _),
+            HttpResponse(HttpStatus(Unauthorized, _), _, _, _)) =>
           ok
       }
     }
@@ -271,9 +274,10 @@ class AccountServiceSpec extends TestAccountService with Tags {
         res1 <- getAccount(id, user, oldPass)
         res2 <- getAccount(id, user, newPass)
       } yield ((res0, res1, res2))).copoint must beLike {
-        case (HttpResponse(HttpStatus(OK, _), _, _, _),
-              HttpResponse(HttpStatus(Unauthorized, _), _, _, _),
-              HttpResponse(HttpStatus(OK, _), _, _, _)) =>
+        case (
+            HttpResponse(HttpStatus(OK, _), _, _, _),
+            HttpResponse(HttpStatus(Unauthorized, _), _, _, _),
+            HttpResponse(HttpStatus(OK, _), _, _, _)) =>
           ok
       }
     }
@@ -296,8 +300,9 @@ class AccountServiceSpec extends TestAccountService with Tags {
         res0 <- putAccountPlan(id, user, pass, "Root")
         res1 <- getAccountPlan(id, user, pass)
       } yield ((res0, res1))).copoint must beLike {
-        case (HttpResponse(HttpStatus(OK, _), _, _, _),
-              HttpResponse(HttpStatus(OK, _), _, Some(jv), _)) =>
+        case (
+            HttpResponse(HttpStatus(OK, _), _, _, _),
+            HttpResponse(HttpStatus(OK, _), _, Some(jv), _)) =>
           jv \ "type" must_== JString("Root")
       }
     }

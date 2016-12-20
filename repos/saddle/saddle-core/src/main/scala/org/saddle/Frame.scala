@@ -331,9 +331,10 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
   def rowAt(slice: Slice[Int]): Frame[RX, CX, T] = {
     val idx = IndexIntRange(numRows)
     val pair = slice(idx)
-    Frame(values.map(_.slice(pair._1, pair._2)),
-          rowIx.slice(pair._1, pair._2),
-          colIx)
+    Frame(
+      values.map(_.slice(pair._1, pair._2)),
+      rowIx.slice(pair._1, pair._2),
+      colIx)
   }
 
   /**
@@ -343,9 +344,10 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
     * @param stride Optional increment between offsets
     */
   def rowSlice(from: Int, until: Int, stride: Int = 1): Frame[RX, CX, T] = {
-    Frame(values.map(v => v.slice(from, until, stride)),
-          rowIx.slice(from, until, stride),
-          colIx)
+    Frame(
+      values.map(v => v.slice(from, until, stride)),
+      rowIx.slice(from, until, stride),
+      colIx)
   }
 
   /**
@@ -463,9 +465,10 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
   def reindexRow(rix: Index[RX]): Frame[RX, CX, T] = {
     val ixer = rowIx.getIndexer(rix)
     ixer.map { i =>
-      Frame(values.map(v => Vec(array.take(v, i, v.scalarTag.missing))),
-            rix,
-            colIx)
+      Frame(
+        values.map(v => Vec(array.take(v, i, v.scalarTag.missing))),
+        rix,
+        colIx)
     } getOrElse this
   }
 
@@ -504,9 +507,10 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
     val (columns1, locs1) = values.takeType[U1]
     val (columns2, locs2) = values.takeType[U2]
 
-    val frm = Panel(columns1 ++ columns2,
-                    rowIx,
-                    colIx.take(locs1) concat colIx.take(locs2))
+    val frm = Panel(
+      columns1 ++ columns2,
+      rowIx,
+      colIx.take(locs1) concat colIx.take(locs2))
     val tkr = array.argsort(array.flatten(Seq(locs1, locs2)))
 
     frm.colAt(tkr)
@@ -1092,9 +1096,10 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
       indexer.rTake.map { loc =>
         other.values.map(_.take(loc))
       } getOrElse other.values
-    Frame(lft ++ rgt,
-          indexer.index,
-          IndexIntRange(colIx.length + other.colIx.length))
+    Frame(
+      lft ++ rgt,
+      indexer.index,
+      IndexIntRange(colIx.length + other.colIx.length))
   }
 
   /**
@@ -1152,9 +1157,10 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
       indexer.rTake.map { loc =>
         other.values.map(_.take(loc))
       } getOrElse other.values
-    Panel(lft ++ rgt,
-          indexer.index,
-          IndexIntRange(colIx.length + other.colIx.length))
+    Panel(
+      lft ++ rgt,
+      indexer.index,
+      IndexIntRange(colIx.length + other.colIx.length))
   }
 
   /**
@@ -1422,9 +1428,10 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
     */
   def rwhere(pred: Series[_, Boolean]): Frame[RX, CX, T] = {
     val predv = pred.values
-    new Frame(new MatCols(values.map(v => v.where(predv))),
-              Index(rowIx.toVec.where(predv)),
-              colIx)
+    new Frame(
+      new MatCols(values.map(v => v.where(predv))),
+      Index(rowIx.toVec.where(predv)),
+      colIx)
   }
 
   /**
@@ -1686,10 +1693,11 @@ class Frame[RX: ST: ORD, CX: ST: ORD, T: ST](
 
       // now build row strings
       buf.append(
-        util.buildStr(nrows,
-                      numRows,
-                      (r: Int) => createIx(r) + " -> " + createVals(r),
-                      rowBreakStr))
+        util.buildStr(
+          nrows,
+          numRows,
+          (r: Int) => createIx(r) + " -> " + createVals(r),
+          rowBreakStr))
     }
     buf.toString()
   }
@@ -1747,9 +1755,10 @@ object Frame extends BinOpFrame {
     if (values.isEmpty) empty[Int, Int, T]
     else {
       val asIdxSeq = values.toIndexedSeq
-      apply(asIdxSeq,
-            IndexIntRange(asIdxSeq(0).length),
-            IndexIntRange(asIdxSeq.length))
+      apply(
+        asIdxSeq,
+        IndexIntRange(asIdxSeq(0).length),
+        IndexIntRange(asIdxSeq.length))
     }
 
   /**
@@ -1863,9 +1872,10 @@ object Frame extends BinOpFrame {
     * Build a Frame from a provided Mat
     */
   def apply[T: ST](values: Mat[T]): Frame[Int, Int, T] =
-    apply(values,
-          new IndexIntRange(values.numRows),
-          new IndexIntRange(values.numCols))
+    apply(
+      values,
+      new IndexIntRange(values.numRows),
+      new IndexIntRange(values.numCols))
 
   /**
     * Build a Frame from a provided Mat, row index, and col index
@@ -1904,9 +1914,10 @@ object Panel {
     if (values.isEmpty) empty[Int, Int]
     else {
       val asIdxSeq = values.toIndexedSeq
-      apply(asIdxSeq,
-            IndexIntRange(asIdxSeq(0).length),
-            IndexIntRange(asIdxSeq.length))
+      apply(
+        asIdxSeq,
+        IndexIntRange(asIdxSeq(0).length),
+        IndexIntRange(asIdxSeq.length))
     }
 
   /**

@@ -33,8 +33,9 @@ package scala
   *  @param  _19   Element 19 of this Tuple20
   *  @param  _20   Element 20 of this Tuple20
   */
-@deprecatedInheritance("Tuples will be made final in a future version.",
-                       "2.11.0")
+@deprecatedInheritance(
+  "Tuples will be made final in a future version.",
+  "2.11.0")
 case class Tuple20[+T1,
                    +T2,
                    +T3,
@@ -74,26 +75,27 @@ case class Tuple20[+T1,
                          _18: T18,
                          _19: T19,
                          _20: T20)
-    extends Product20[T1,
-                      T2,
-                      T3,
-                      T4,
-                      T5,
-                      T6,
-                      T7,
-                      T8,
-                      T9,
-                      T10,
-                      T11,
-                      T12,
-                      T13,
-                      T14,
-                      T15,
-                      T16,
-                      T17,
-                      T18,
-                      T19,
-                      T20] {
+    extends Product20[
+      T1,
+      T2,
+      T3,
+      T4,
+      T5,
+      T6,
+      T7,
+      T8,
+      T9,
+      T10,
+      T11,
+      T12,
+      T13,
+      T14,
+      T15,
+      T16,
+      T17,
+      T18,
+      T19,
+      T20] {
   override def toString() =
     "(" + _1 + "," + _2 + "," + _3 + "," + _4 + "," + _5 + "," + _6 + "," +
       _7 + "," + _8 + "," + _9 + "," + _10 + "," + _11 + "," + _12 + "," + _13 +

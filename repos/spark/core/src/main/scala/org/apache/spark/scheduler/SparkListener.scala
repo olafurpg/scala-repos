@@ -35,9 +35,10 @@ import org.apache.spark.ui.SparkUI
 import org.apache.spark.util.{Distribution, Utils}
 
 @DeveloperApi
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS,
-              include = JsonTypeInfo.As.PROPERTY,
-              property = "Event")
+@JsonTypeInfo(
+  use = JsonTypeInfo.Id.CLASS,
+  include = JsonTypeInfo.As.PROPERTY,
+  property = "Event")
 trait SparkListenerEvent {
   /* Whether output this event to the event log */
   protected[spark] def logEvent: Boolean = true
@@ -291,9 +292,10 @@ class StatsReportListener extends SparkListener with Logging {
     implicit val sc = stageCompleted
     this.logInfo(
       s"Finished stage: ${getStatusDetail(stageCompleted.stageInfo)}")
-    showMillisDistribution("task runtime:",
-                           (info, _) => Some(info.duration),
-                           taskInfoMetrics)
+    showMillisDistribution(
+      "task runtime:",
+      (info, _) => Some(info.duration),
+      taskInfoMetrics)
 
     // Shuffle write
     showBytesDistribution(
@@ -310,25 +312,28 @@ class StatsReportListener extends SparkListener with Logging {
       "remote bytes read:",
       (_, metric) => metric.shuffleReadMetrics.map(_.remoteBytesRead),
       taskInfoMetrics)
-    showBytesDistribution("task result size:",
-                          (_, metric) => Some(metric.resultSize),
-                          taskInfoMetrics)
+    showBytesDistribution(
+      "task result size:",
+      (_, metric) => Some(metric.resultSize),
+      taskInfoMetrics)
 
     // Runtime breakdown
     val runtimePcts = taskInfoMetrics.map {
       case (info, metrics) =>
         RuntimePercentage(info.duration, metrics)
     }
-    showDistribution("executor (non-fetch) time pct: ",
-                     Distribution(runtimePcts.map(_.executorPct * 100)),
-                     "%2.0f %%")
+    showDistribution(
+      "executor (non-fetch) time pct: ",
+      Distribution(runtimePcts.map(_.executorPct * 100)),
+      "%2.0f %%")
     showDistribution(
       "fetch wait time pct: ",
       Distribution(runtimePcts.flatMap(_.fetchPct.map(_ * 100))),
       "%2.0f %%")
-    showDistribution("other time pct: ",
-                     Distribution(runtimePcts.map(_.other * 100)),
-                     "%2.0f %%")
+    showDistribution(
+      "other time pct: ",
+      Distribution(runtimePcts.map(_.other * 100)),
+      "%2.0f %%")
     taskInfoMetrics.clear()
   }
 
@@ -401,16 +406,18 @@ private[spark] object StatsReportListener extends Logging {
                        format: String,
                        getMetric: (TaskInfo, TaskMetrics) => Option[Double],
                        taskInfoMetrics: Seq[(TaskInfo, TaskMetrics)]) {
-    showDistribution(heading,
-                     extractDoubleDistribution(taskInfoMetrics, getMetric),
-                     format)
+    showDistribution(
+      heading,
+      extractDoubleDistribution(taskInfoMetrics, getMetric),
+      format)
   }
 
   def showBytesDistribution(heading: String,
                             getMetric: (TaskInfo, TaskMetrics) => Option[Long],
                             taskInfoMetrics: Seq[(TaskInfo, TaskMetrics)]) {
-    showBytesDistribution(heading,
-                          extractLongDistribution(taskInfoMetrics, getMetric))
+    showBytesDistribution(
+      heading,
+      extractLongDistribution(taskInfoMetrics, getMetric))
   }
 
   def showBytesDistribution(heading: String, dOpt: Option[Distribution]) {
@@ -420,9 +427,10 @@ private[spark] object StatsReportListener extends Logging {
   }
 
   def showBytesDistribution(heading: String, dist: Distribution) {
-    showDistribution(heading,
-                     dist,
-                     (d => Utils.bytesToString(d.toLong)): Double => String)
+    showDistribution(
+      heading,
+      dist,
+      (d => Utils.bytesToString(d.toLong)): Double => String)
   }
 
   def showMillisDistribution(heading: String, dOpt: Option[Distribution]) {
@@ -436,8 +444,9 @@ private[spark] object StatsReportListener extends Logging {
                              getMetric: (TaskInfo,
                                          TaskMetrics) => Option[Long],
                              taskInfoMetrics: Seq[(TaskInfo, TaskMetrics)]) {
-    showMillisDistribution(heading,
-                           extractLongDistribution(taskInfoMetrics, getMetric))
+    showMillisDistribution(
+      heading,
+      extractLongDistribution(taskInfoMetrics, getMetric))
   }
 
   val seconds = 1000L

@@ -46,9 +46,10 @@ trait NormalizationHelperModule[M[+ _]]
     trait NormalizationHelper {
       import TransSpecModule._
 
-      val tpe = BinaryOperationType(JType.JUniverseT,
-                                    JObjectUnfixedT,
-                                    JType.JUniverseT)
+      val tpe = BinaryOperationType(
+        JType.JUniverseT,
+        JObjectUnfixedT,
+        JType.JUniverseT)
 
       case class Stats(mean: BigDecimal, stdDev: BigDecimal)
       case class RowValueWithStats(rowValue: BigDecimal, stats: Stats)

@@ -62,8 +62,9 @@ object CheckBoxTableCell {
       selectedProperty: Int => ObservableValue[Boolean, java.lang.Boolean])
     : jfxu.Callback[java.lang.Integer,
                     jfxbv.ObservableValue[java.lang.Boolean]] =
-    new jfxu.Callback[java.lang.Integer,
-                      jfxbv.ObservableValue[java.lang.Boolean]] {
+    new jfxu.Callback[
+      java.lang.Integer,
+      jfxbv.ObservableValue[java.lang.Boolean]] {
       def call(x: java.lang.Integer) = selectedProperty(x)
     }
 
@@ -184,9 +185,10 @@ class CheckBoxTableCell[S, T](
       new jfxscc.CheckBoxTableCell[S, T])
     extends TableCell[S, T](delegate)
     with ConvertableCell[jfxscc.CheckBoxTableCell[S, T], T, T]
-    with StateSelectableCell[jfxscc.CheckBoxTableCell[S, T],
-                             T,
-                             java.lang.Integer]
+    with StateSelectableCell[
+      jfxscc.CheckBoxTableCell[S, T],
+      T,
+      java.lang.Integer]
     with UpdatableCell[jfxscc.CheckBoxTableCell[S, T], T]
     with SFXDelegate[jfxscc.CheckBoxTableCell[S, T]] {
 

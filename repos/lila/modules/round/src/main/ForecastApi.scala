@@ -47,12 +47,14 @@ final class ForecastApi(coll: Coll, roundMap: akka.actor.ActorSelection) {
     else
       Uci.Move(uciMove).fold[Funit](fufail(s"Invalid move $uciMove")) { uci =>
         val promise = Promise[Unit]
-        roundMap ! Tell(pov.game.id,
-                        actorApi.round.HumanPlay(playerId = pov.playerId,
-                                                 uci = uci,
-                                                 blur = true,
-                                                 lag = Duration.Zero,
-                                                 promise = promise.some))
+        roundMap ! Tell(
+          pov.game.id,
+          actorApi.round.HumanPlay(
+            playerId = pov.playerId,
+            uci = uci,
+            blur = true,
+            lag = Duration.Zero,
+            promise = promise.some))
         saveSteps(pov, steps) >> promise.future
       }
 

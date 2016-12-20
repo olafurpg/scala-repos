@@ -61,8 +61,9 @@ trait IdSourceScannerModule extends YggConfigComponent {
       }
 
       (pos + range.end,
-       Map(ColumnRef(CPath(CPathIndex(0)), CLong) -> seqCol,
-           ColumnRef(CPath(CPathIndex(1)), CLong) -> idCol))
+       Map(
+         ColumnRef(CPath(CPathIndex(0)), CLong) -> seqCol,
+         ColumnRef(CPath(CPathIndex(1)), CLong) -> idCol))
     }
   }
 }

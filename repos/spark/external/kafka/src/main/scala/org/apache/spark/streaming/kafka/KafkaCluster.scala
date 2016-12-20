@@ -61,11 +61,12 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
   }
 
   def connect(host: String, port: Int): SimpleConsumer =
-    new SimpleConsumer(host,
-                       port,
-                       config.socketTimeoutMs,
-                       config.socketReceiveBufferBytes,
-                       config.clientId)
+    new SimpleConsumer(
+      host,
+      port,
+      config.socketTimeoutMs,
+      config.socketReceiveBufferBytes,
+      config.clientId)
 
   def connectLeader(topic: String,
                     partition: Int): Either[Err, SimpleConsumer] =
@@ -77,10 +78,11 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
   // scalastyle:on
 
   def findLeader(topic: String, partition: Int): Either[Err, (String, Int)] = {
-    val req = TopicMetadataRequest(TopicMetadataRequest.CurrentVersion,
-                                   0,
-                                   config.clientId,
-                                   Seq(topic))
+    val req = TopicMetadataRequest(
+      TopicMetadataRequest.CurrentVersion,
+      0,
+      config.clientId,
+      Seq(topic))
     val errs = new Err
     withBrokers(Random.shuffle(config.seedBrokers), errs) { consumer =>
       val resp: TopicMetadataResponse = consumer.send(req)
@@ -143,10 +145,11 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
 
   def getPartitionMetadata(
       topics: Set[String]): Either[Err, Set[TopicMetadata]] = {
-    val req = TopicMetadataRequest(TopicMetadataRequest.CurrentVersion,
-                                   0,
-                                   config.clientId,
-                                   topics.toSeq)
+    val req = TopicMetadataRequest(
+      TopicMetadataRequest.CurrentVersion,
+      0,
+      config.clientId,
+      topics.toSeq)
     val errs = new Err
     withBrokers(Random.shuffle(config.seedBrokers), errs) { consumer =>
       val resp: TopicMetadataResponse = consumer.send(req)
@@ -281,9 +284,10 @@ class KafkaCluster(val kafkaParams: Map[String, String]) extends Serializable {
       groupId: String,
       topicAndPartitions: Set[TopicAndPartition]
   ): Either[Err, Map[TopicAndPartition, OffsetMetadataAndError]] =
-    getConsumerOffsetMetadata(groupId,
-                              topicAndPartitions,
-                              defaultConsumerApiVersion)
+    getConsumerOffsetMetadata(
+      groupId,
+      topicAndPartitions,
+      defaultConsumerApiVersion)
 
   def getConsumerOffsetMetadata(
       groupId: String,

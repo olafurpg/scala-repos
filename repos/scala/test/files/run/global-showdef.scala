@@ -35,11 +35,12 @@ object Bippy {
   """
 
   override def show(): Unit = {
-    val classes = List("Bippy",
-                       "Bippy#BippyType",
-                       "Bippy.BippyType",
-                       "Bippy#Boppity",
-                       "Bippy#Boppity#Boo")
+    val classes = List(
+      "Bippy",
+      "Bippy#BippyType",
+      "Bippy.BippyType",
+      "Bippy#Boppity",
+      "Bippy#Boppity#Boo")
     val objects = List("Bippy", "Bippy#Boppity#Boo")
 
     def interesting(line: String) =

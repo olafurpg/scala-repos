@@ -53,11 +53,12 @@ class EnsembleBubbleChart extends EnsembleExample {
 
     val series1 = new XYChart.Series[Number, Number] {
       name = "Series 1"
-      data = Seq((30d, 40d, 10d),
-                 (60d, 20d, 13d),
-                 (10d, 90d, 7d),
-                 (100d, 40d, 10d),
-                 (50d, 23d, 5d)).map(toChartData)
+      data = Seq(
+        (30d, 40d, 10d),
+        (60d, 20d, 13d),
+        (10d, 90d, 7d),
+        (100d, 40d, 10d),
+        (50d, 23d, 5d)).map(toChartData)
     }
 
     val series2 = new XYChart.Series[Number, Number] {
@@ -69,11 +70,12 @@ class EnsembleBubbleChart extends EnsembleExample {
 
     val series3 = new XYChart.Series[Number, Number] {
       name = "Series 3"
-      data = Seq((17d, 55d, 7d),
-                 (67d, 98d, 13d),
-                 (45d, 23d, 10d),
-                 (89d, 87d, 6d),
-                 (59d, 34d, 12d)).map(toChartData)
+      data = Seq(
+        (17d, 55d, 7d),
+        (67d, 98d, 13d),
+        (45d, 23d, 10d),
+        (89d, 87d, 6d),
+        (59d, 34d, 12d)).map(toChartData)
     }
 
     new BubbleChart(xAxis, yAxis) {

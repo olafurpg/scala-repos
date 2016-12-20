@@ -95,9 +95,10 @@ abstract class ScalaIntroduceFieldHandlerBase
       .statementsAndMembersInClass(aClass)
       .find(_.getTextRange.getEndOffset >= firstOccOffset)
     anchor.getOrElse {
-      if (PsiTreeUtil.isAncestor(aClass.extendsBlock.templateBody.orNull,
-                                 commonParent,
-                                 false))
+      if (PsiTreeUtil.isAncestor(
+            aClass.extendsBlock.templateBody.orNull,
+            commonParent,
+            false))
         null
       else {
         aClass.extendsBlock match {

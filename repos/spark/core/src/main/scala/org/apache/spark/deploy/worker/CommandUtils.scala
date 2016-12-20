@@ -45,11 +45,12 @@ private[deploy] object CommandUtils extends Logging {
       substituteArguments: String => String,
       classPaths: Seq[String] = Seq[String](),
       env: Map[String, String] = sys.env): ProcessBuilder = {
-    val localCommand = buildLocalCommand(command,
-                                         securityMgr,
-                                         substituteArguments,
-                                         classPaths,
-                                         env)
+    val localCommand = buildLocalCommand(
+      command,
+      securityMgr,
+      substituteArguments,
+      classPaths,
+      env)
     val commandSeq = buildCommandSeq(localCommand, memory, sparkHome)
     val builder = new ProcessBuilder(commandSeq: _*)
     val environment = builder.environment()

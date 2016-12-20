@@ -65,11 +65,12 @@ object Schemifier extends Loggable {
                structureOnly: Boolean,
                logFunc: (=> AnyRef) => Unit,
                stables: BaseMetaMapper*): List[String] =
-    schemify(performWrite,
-             structureOnly,
-             logFunc,
-             DefaultConnectionIdentifier,
-             stables: _*)
+    schemify(
+      performWrite,
+      structureOnly,
+      logFunc,
+      DefaultConnectionIdentifier,
+      stables: _*)
 
   private case class Collector(funcs: List[() => Any], cmds: List[String]) {
     def +(other: Collector) =
@@ -115,11 +116,12 @@ object Schemifier extends Loggable {
       }
       logger.debug(
         "Starting schemify. write=%s, structureOnly=%s, dbId=%s, schema=%s, tables=%s"
-          .format(performWrite,
-                  structureOnly,
-                  dbId,
-                  getDefaultSchemaName(con),
-                  tables.map(_.dbTableName)))
+          .format(
+            performWrite,
+            structureOnly,
+            dbId,
+            getDefaultSchemaName(con),
+            tables.map(_.dbTableName)))
 
       val connection = con // SuperConnection(con)
       val driver = DriverType.calcDriver(connection)
@@ -145,41 +147,48 @@ object Schemifier extends Loggable {
       val toRun =
         tables.foldLeft(EmptyCollector)(
           (b, t) =>
-            b + ensureTable(performWrite,
-                            logFunc,
-                            t,
-                            connection,
-                            actualTableNames)) +
+            b + ensureTable(
+              performWrite,
+              logFunc,
+              t,
+              connection,
+              actualTableNames)) +
           tables.foldLeft(EmptyCollector)(
             (b, t) =>
-              b + tableCheck(t,
-                             "ensureColumns",
-                             ensureColumns(performWrite,
-                                           logFunc,
-                                           t,
-                                           connection,
-                                           actualTableNames))) +
+              b + tableCheck(
+                t,
+                "ensureColumns",
+                ensureColumns(
+                  performWrite,
+                  logFunc,
+                  t,
+                  connection,
+                  actualTableNames))) +
           (if (structureOnly) EmptyCollector
            else
              (tables.foldLeft(EmptyCollector)(
                (b, t) =>
-                 b + tableCheck(t,
-                                "ensureIndexes",
-                                ensureIndexes(performWrite,
-                                              logFunc,
-                                              t,
-                                              connection,
-                                              actualTableNames))) +
+                 b + tableCheck(
+                   t,
+                   "ensureIndexes",
+                   ensureIndexes(
+                     performWrite,
+                     logFunc,
+                     t,
+                     connection,
+                     actualTableNames))) +
                tables.foldLeft(EmptyCollector)(
                  (b, t) =>
-                   b + tableCheck(t,
-                                  "ensureConstraints",
-                                  ensureConstraints(performWrite,
-                                                    logFunc,
-                                                    t,
-                                                    dbId,
-                                                    connection,
-                                                    actualTableNames)))))
+                   b + tableCheck(
+                     t,
+                     "ensureConstraints",
+                     ensureConstraints(
+                       performWrite,
+                       logFunc,
+                       t,
+                       dbId,
+                       connection,
+                       actualTableNames)))))
 
       if (performWrite) {
         logger.debug("Executing DDL statements")
@@ -342,10 +351,11 @@ object Schemifier extends Loggable {
       val md = connection.getMetaData
 
       using(
-        md.getColumns(null,
-                      getDefaultSchemaName(connection),
-                      actualTableNames(table._dbTableNameLC),
-                      null))(rs =>
+        md.getColumns(
+          null,
+          getDefaultSchemaName(connection),
+          actualTableNames(table._dbTableNameLC),
+          null))(rs =>
         while (hasColumn < totalColCnt && rs.next) {
           val tableName = rs.getString(3).toLowerCase
           val columnName = rs.getString(4).toLowerCase
@@ -402,11 +412,12 @@ object Schemifier extends Loggable {
 
     val md = connection.getMetaData
     val q = using(
-      md.getIndexInfo(null,
-                      getDefaultSchemaName(connection),
-                      actualTableNames(table._dbTableNameLC),
-                      false,
-                      false)) { rs =>
+      md.getIndexInfo(
+        null,
+        getDefaultSchemaName(connection),
+        actualTableNames(table._dbTableNameLC),
+        false,
+        false)) { rs =>
       def quad(rs: ResultSet): List[(String, String, Int)] = {
         if (!rs.next) Nil
         else {
@@ -468,8 +479,9 @@ object Schemifier extends Loggable {
         case i: UniqueIndex[_] =>
           "CREATE UNIQUE INDEX " + standardCreationStatement
         case GenericIndex(createFunc, _, _) =>
-          createFunc(table._dbTableNameLC,
-                     columns.map(_.field._dbColumnNameLC))
+          createFunc(
+            table._dbTableNameLC,
+            columns.map(_.field._dbColumnNameLC))
         case _ => logger.error("Invalid index: " + index); ""
       }
 
@@ -512,9 +524,10 @@ object Schemifier extends Loggable {
             // val rs = md.getCrossReference(null, null,otherTable , null, null, myTable)
             var foundIt = false
             using(
-              md.getImportedKeys(null,
-                                 getDefaultSchemaName(connection),
-                                 myTable))(rs =>
+              md.getImportedKeys(
+                null,
+                getDefaultSchemaName(connection),
+                myTable))(rs =>
               //val rs = md.getCrossReference(null, null,myTable , null, null, otherTable)
               while (!foundIt && rs.next) {
                 val pkName = rs.getString(4)

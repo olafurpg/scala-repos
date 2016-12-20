@@ -271,10 +271,12 @@ class SparkListenerSuite
           * Small test, so some tasks might take less than 1 millisecond, but average should be greater
           * than 0 ms.
           */
-        checkNonZeroAvg(taskInfoMetrics.map(_._2.executorRunTime),
-                        stageInfo + " executorRunTime")
-        checkNonZeroAvg(taskInfoMetrics.map(_._2.executorDeserializeTime),
-                        stageInfo + " executorDeserializeTime")
+        checkNonZeroAvg(
+          taskInfoMetrics.map(_._2.executorRunTime),
+          stageInfo + " executorRunTime")
+        checkNonZeroAvg(
+          taskInfoMetrics.map(_._2.executorDeserializeTime),
+          stageInfo + " executorDeserializeTime")
 
         /* Test is disabled (SEE SPARK-2208)
       if (stageInfo.rddInfos.exists(_.name == d4.name)) {
@@ -416,9 +418,10 @@ class SparkListenerSuite
     val conf = new SparkConf()
       .setMaster("local")
       .setAppName("test")
-      .set("spark.extraListeners",
-           classOf[ListenerThatAcceptsSparkConf].getName + "," +
-             classOf[BasicJobCounter].getName)
+      .set(
+        "spark.extraListeners",
+        classOf[ListenerThatAcceptsSparkConf].getName + "," +
+          classOf[BasicJobCounter].getName)
     sc = new SparkContext(conf)
     sc.listenerBus.listeners.asScala
       .count(_.isInstanceOf[BasicJobCounter]) should be(1)

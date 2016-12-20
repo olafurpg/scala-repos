@@ -189,8 +189,9 @@ class StreamingListenerSuite extends TestSuiteBase with Matchers {
     inputStream.foreachRDD(_.count)
 
     val failureReasons = startStreamingContextAndCollectFailureReasons(ssc)
-    assert(failureReasons != null && failureReasons.isEmpty,
-           "A successful batch should not set errorMessage")
+    assert(
+      failureReasons != null && failureReasons.isEmpty,
+      "A successful batch should not set errorMessage")
   }
 
   test("onBatchCompleted with failed batch and one failed job") {
@@ -278,8 +279,9 @@ class StreamingListenerSuite extends TestSuiteBase with Matchers {
     val batchCounter = new BatchCounter(_ssc)
     _ssc.start()
     // Make sure running at least one batch
-    batchCounter.waitUntilBatchesCompleted(expectedNumCompletedBatches = 1,
-                                           timeout = 10000)
+    batchCounter.waitUntilBatchesCompleted(
+      expectedNumCompletedBatches = 1,
+      timeout = 10000)
     if (isFailed) {
       intercept[RuntimeException] {
         _ssc.awaitTerminationOrTimeout(10000)

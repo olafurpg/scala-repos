@@ -65,17 +65,18 @@ class ScCaseClauseImpl(node: ASTNode)
               case _ =>
                 //todo: is this good? Maybe parser => always expression.
                 val last = findLastChildByType(
-                  TokenSet.create(ScalaElementTypes.FUNCTION_DECLARATION,
-                                  ScalaElementTypes.FUNCTION_DEFINITION,
-                                  ScalaElementTypes.PATTERN_DEFINITION,
-                                  ScalaElementTypes.VALUE_DECLARATION,
-                                  ScalaElementTypes.VARIABLE_DECLARATION,
-                                  ScalaElementTypes.VARIABLE_DEFINITION,
-                                  ScalaElementTypes.TYPE_DECLARATION,
-                                  ScalaElementTypes.TYPE_DECLARATION,
-                                  ScalaElementTypes.CLASS_DEF,
-                                  ScalaElementTypes.TRAIT_DEF,
-                                  ScalaElementTypes.OBJECT_DEF))
+                  TokenSet.create(
+                    ScalaElementTypes.FUNCTION_DECLARATION,
+                    ScalaElementTypes.FUNCTION_DEFINITION,
+                    ScalaElementTypes.PATTERN_DEFINITION,
+                    ScalaElementTypes.VALUE_DECLARATION,
+                    ScalaElementTypes.VARIABLE_DECLARATION,
+                    ScalaElementTypes.VARIABLE_DEFINITION,
+                    ScalaElementTypes.TYPE_DECLARATION,
+                    ScalaElementTypes.TYPE_DECLARATION,
+                    ScalaElementTypes.CLASS_DEF,
+                    ScalaElementTypes.TRAIT_DEF,
+                    ScalaElementTypes.OBJECT_DEF))
                 if (last != null && lastParent != null &&
                     last.startOffsetInParent == lastParent.startOffsetInParent) {
                   if (!process) return false

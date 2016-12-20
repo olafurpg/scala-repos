@@ -71,10 +71,11 @@ class NettyBlockTransferService(conf: SparkConf,
       serverBootstrap = Some(
         new SaslServerBootstrap(transportConf, securityManager))
       clientBootstrap = Some(
-        new SaslClientBootstrap(transportConf,
-                                conf.getAppId,
-                                securityManager,
-                                securityManager.isSaslEncryptionEnabled()))
+        new SaslClientBootstrap(
+          transportConf,
+          conf.getAppId,
+          securityManager,
+          securityManager.isSaslEncryptionEnabled()))
     }
     transportContext = new TransportContext(transportConf, rpcHandler)
     clientFactory =
@@ -109,11 +110,12 @@ class NettyBlockTransferService(conf: SparkConf,
         override def createAndStart(blockIds: Array[String],
                                     listener: BlockFetchingListener) {
           val client = clientFactory.createClient(host, port)
-          new OneForOneBlockFetcher(client,
-                                    appId,
-                                    execId,
-                                    blockIds.toArray,
-                                    listener).start()
+          new OneForOneBlockFetcher(
+            client,
+            appId,
+            execId,
+            blockIds.toArray,
+            listener).start()
         }
       }
 
@@ -121,10 +123,11 @@ class NettyBlockTransferService(conf: SparkConf,
       if (maxRetries > 0) {
         // Note this Fetcher will correctly handle maxRetries == 0; we avoid it just in case there's
         // a bug in this code. We should remove the if statement once we're sure of the stability.
-        new RetryingBlockFetcher(transportConf,
-                                 blockFetchStarter,
-                                 blockIds,
-                                 listener).start()
+        new RetryingBlockFetcher(
+          transportConf,
+          blockFetchStarter,
+          blockIds,
+          listener).start()
       } else {
         blockFetchStarter.createAndStart(blockIds, listener)
       }
@@ -156,21 +159,18 @@ class NettyBlockTransferService(conf: SparkConf,
     // Convert or copy nio buffer into array in order to serialize it.
     val array = JavaUtils.bufferToArray(blockData.nioByteBuffer())
 
-    client.sendRpc(new UploadBlock(appId,
-                                   execId,
-                                   blockId.toString,
-                                   levelBytes,
-                                   array).toByteBuffer,
-                   new RpcResponseCallback {
-                     override def onSuccess(response: ByteBuffer): Unit = {
-                       logTrace(s"Successfully uploaded block $blockId")
-                       result.success((): Unit)
-                     }
-                     override def onFailure(e: Throwable): Unit = {
-                       logError(s"Error while uploading block $blockId", e)
-                       result.failure(e)
-                     }
-                   })
+    client.sendRpc(
+      new UploadBlock(appId, execId, blockId.toString, levelBytes, array).toByteBuffer,
+      new RpcResponseCallback {
+        override def onSuccess(response: ByteBuffer): Unit = {
+          logTrace(s"Successfully uploaded block $blockId")
+          result.success((): Unit)
+        }
+        override def onFailure(e: Throwable): Unit = {
+          logError(s"Error while uploading block $blockId", e)
+          result.failure(e)
+        }
+      })
 
     result.future
   }

@@ -79,8 +79,9 @@ class AppliedTypeLambdaCanBeSimplifiedInspection extends LocalInspectionTool {
               (ct.components, ct.refinement) match {
                 case (Seq(), Some(refinement)) =>
                   (refinement.holders, refinement.types) match {
-                    case (Seq(),
-                          Seq(typeAliasDefinition: ScTypeAliasDefinition)) =>
+                    case (
+                        Seq(),
+                        Seq(typeAliasDefinition: ScTypeAliasDefinition)) =>
                       val name1 = typeProjection.nameId
                       val name2 = typeAliasDefinition.nameId
                       if (name1.getText == name2.getText) {
@@ -98,8 +99,9 @@ class AppliedTypeLambdaCanBeSimplifiedInspection extends LocalInspectionTool {
                                 case (res, (param, arg)) =>
                                   val typeVar =
                                     ScalaPsiManager.typeVariable(param)
-                                  res.bindT((typeVar.name, typeVar.getId),
-                                            arg.calcType)
+                                  res.bindT(
+                                    (typeVar.name, typeVar.getId),
+                                    arg.calcType)
                               }
                             val substituted = subst.subst(aliased)
                             ScType.presentableText(substituted)
@@ -143,14 +145,15 @@ class AppliedTypeLambdaCanBeSimplifiedInspection extends LocalInspectionTool {
 
 class SimplifyAppliedTypeLambdaQuickFix(paramType: ScParameterizedTypeElement,
                                         replacement: => String)
-    extends AbstractFixOnPsiElement(InspectionBundle.message("simplify.type"),
-                                    paramType) {
+    extends AbstractFixOnPsiElement(
+      InspectionBundle.message("simplify.type"),
+      paramType) {
 
   def doApplyFix(project: Project): Unit = {
     val pType = getElement
     val parent = pType.getContext
     pType.replace(
-      ScalaPsiElementFactory.createTypeElementFromText(replacement,
-                                                       pType.getManager))
+      ScalaPsiElementFactory
+        .createTypeElementFromText(replacement, pType.getManager))
   }
 }

@@ -32,10 +32,11 @@ private[bookmark] object BookmarkRepo {
 
   private def add(gameId: String, userId: String, date: DateTime): Funit =
     $insert(
-      Json.obj("_id" -> makeId(gameId, userId),
-               "g" -> gameId,
-               "u" -> userId,
-               "d" -> $date(date)))
+      Json.obj(
+        "_id" -> makeId(gameId, userId),
+        "g" -> gameId,
+        "u" -> userId,
+        "d" -> $date(date)))
 
   def userIdQuery(userId: String) = Json.obj("u" -> userId)
   def makeId(gameId: String, userId: String) = gameId + userId

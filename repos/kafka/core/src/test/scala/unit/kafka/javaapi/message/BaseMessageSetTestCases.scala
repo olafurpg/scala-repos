@@ -63,12 +63,14 @@ trait BaseMessageSetTestCases extends JUnitSuite {
 
   @Test
   def testSizeInBytes() {
-    assertEquals("Empty message set should have 0 bytes.",
-                 0,
-                 createMessageSet(Array[Message]()).sizeInBytes)
-    assertEquals("Predicted size should equal actual size.",
-                 kafka.message.MessageSet.messageSetSize(messages),
-                 createMessageSet(messages).sizeInBytes)
+    assertEquals(
+      "Empty message set should have 0 bytes.",
+      0,
+      createMessageSet(Array[Message]()).sizeInBytes)
+    assertEquals(
+      "Predicted size should equal actual size.",
+      kafka.message.MessageSet.messageSetSize(messages),
+      createMessageSet(messages).sizeInBytes)
   }
 
   @Test

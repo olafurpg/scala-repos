@@ -56,9 +56,10 @@ class InlineParsersTest
     ("*italic * italic*", "<em>italic * italic</em>"),
     ("_italic_", "<em>italic</em>"))
 
-  val boldTests = List(("**bold**", "<strong>bold</strong>"),
-                       ("**bold * bold**", "<strong>bold * bold</strong>"),
-                       ("__bold__", "<strong>bold</strong>"))
+  val boldTests = List(
+    ("**bold**", "<strong>bold</strong>"),
+    ("**bold * bold**", "<strong>bold * bold</strong>"),
+    ("__bold__", "<strong>bold</strong>"))
 
   val codeTests = List(
     ("`code`", "<code>code</code>"),

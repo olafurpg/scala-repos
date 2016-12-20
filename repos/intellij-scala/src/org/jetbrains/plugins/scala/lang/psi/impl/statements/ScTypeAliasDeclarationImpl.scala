@@ -49,8 +49,9 @@ class ScTypeAliasDeclarationImpl private (stub: StubElement[ScTypeAlias],
   def nameId = findChildByType[PsiElement](ScalaTokenTypes.tIDENTIFIER) match {
     case null =>
       ScalaPsiElementFactory
-        .createIdentifier(getStub.asInstanceOf[ScTypeAliasStub].getName,
-                          getManager)
+        .createIdentifier(
+          getStub.asInstanceOf[ScTypeAliasStub].getName,
+          getManager)
         .getPsi
     case n => n
   }

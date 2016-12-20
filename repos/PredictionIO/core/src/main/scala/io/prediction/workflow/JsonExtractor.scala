@@ -123,8 +123,9 @@ object JsonExtractor {
 
     val servingParamsJValue =
       toJValue(extractorOption, params.servingParams._2)
-    jValue = jValue.replace("servingParams" :: params.servingParams._1 :: Nil,
-                            servingParamsJValue)
+    jValue = jValue.replace(
+      "servingParams" :: params.servingParams._1 :: Nil,
+      servingParamsJValue)
 
     jValue
   }

@@ -351,12 +351,13 @@ class PolynomialTest extends FunSuite {
 
     assert(p1 + p2 === Polynomial.dense(Array(r"1/1", r"5/1", r"1/2")))
     assert(
-      (legDense(2) * legDense(3)).coeffsArray === Array(r"0",
-                                                        r"3/4",
-                                                        r"0",
-                                                        r"-7/2",
-                                                        r"0",
-                                                        r"15/4"))
+      (legDense(2) * legDense(3)).coeffsArray === Array(
+        r"0",
+        r"3/4",
+        r"0",
+        r"-7/2",
+        r"0",
+        r"15/4"))
     assert(p1 % p2 === Polynomial("-x"))
     assert(p1 /~ p2 === Polynomial("1"))
   }

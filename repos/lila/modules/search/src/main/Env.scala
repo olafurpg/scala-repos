@@ -23,7 +23,8 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "search" boot new Env(config = lila.common.PlayApp loadConfig "search",
-                          system = lila.common.PlayApp.system,
-                          scheduler = lila.common.PlayApp.scheduler)
+    "search" boot new Env(
+      config = lila.common.PlayApp loadConfig "search",
+      system = lila.common.PlayApp.system,
+      scheduler = lila.common.PlayApp.scheduler)
 }

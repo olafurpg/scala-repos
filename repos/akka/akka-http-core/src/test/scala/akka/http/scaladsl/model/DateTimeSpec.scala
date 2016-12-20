@@ -26,17 +26,19 @@ class DateTimeSpec extends WordSpec with Matchers {
     }
     "behave exactly as a corresponding formatting via SimpleDateFormat" in {
       val Rfc1123Format = {
-        val fmt = new java.text.SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z",
-                                                 java.util.Locale.US)
+        val fmt = new java.text.SimpleDateFormat(
+          "EEE, dd MMM yyyy HH:mm:ss z",
+          java.util.Locale.US)
         fmt.setTimeZone(GMT)
         fmt
       }
       def rfc1123Format(dt: DateTime) =
         Rfc1123Format.format(new java.util.Date(dt.clicks))
       val matchSimpleDateFormat: Matcher[DateTime] = Matcher { dt: DateTime ⇒
-        MatchResult(dt.toRfc1123DateTimeString == rfc1123Format(dt),
-                    dt.toRfc1123DateTimeString + " != " + rfc1123Format(dt),
-                    dt.toRfc1123DateTimeString + " == " + rfc1123Format(dt))
+        MatchResult(
+          dt.toRfc1123DateTimeString == rfc1123Format(dt),
+          dt.toRfc1123DateTimeString + " != " + rfc1123Format(dt),
+          dt.toRfc1123DateTimeString + " == " + rfc1123Format(dt))
       }
       all(httpDateTimes.take(10000)) should matchSimpleDateFormat
     }
@@ -82,14 +84,15 @@ class DateTimeSpec extends WordSpec with Matchers {
       def roundTrip(dt: DateTime) =
         DateTime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
       val roundTripOk: Matcher[DateTime] = Matcher { dt: DateTime ⇒
-        MatchResult({
-                      val rt = roundTrip(dt);
-                      dt == rt && dt.weekday == rt.weekday
-                    },
-                    dt.toRfc1123DateTimeString + " != " +
-                      roundTrip(dt).toRfc1123DateTimeString,
-                    dt.toRfc1123DateTimeString +
-                      " == " + roundTrip(dt).toRfc1123DateTimeString)
+        MatchResult(
+          {
+            val rt = roundTrip(dt);
+            dt == rt && dt.weekday == rt.weekday
+          },
+          dt.toRfc1123DateTimeString + " != " +
+            roundTrip(dt).toRfc1123DateTimeString,
+          dt.toRfc1123DateTimeString +
+            " == " + roundTrip(dt).toRfc1123DateTimeString)
       }
       all(httpDateTimes.take(10000)) should roundTripOk
     }

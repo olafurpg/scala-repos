@@ -55,17 +55,20 @@ class GaussianMixtureSuite extends SparkFunSuite with MLlibTestSparkContext {
     val initialGmm = new GaussianMixtureModel(
       Array(0.5, 0.5),
       Array(
-        new MultivariateGaussian(Vectors.dense(-1.0),
-                                 Matrices.dense(1, 1, Array(1.0))),
-        new MultivariateGaussian(Vectors.dense(1.0),
-                                 Matrices.dense(1, 1, Array(1.0)))
+        new MultivariateGaussian(
+          Vectors.dense(-1.0),
+          Matrices.dense(1, 1, Array(1.0))),
+        new MultivariateGaussian(
+          Vectors.dense(1.0),
+          Matrices.dense(1, 1, Array(1.0)))
       )
     )
 
     val Ew = Array(1.0 / 3.0, 2.0 / 3.0)
     val Emu = Array(Vectors.dense(-4.3673), Vectors.dense(5.1604))
-    val Esigma = Array(Matrices.dense(1, 1, Array(1.1098)),
-                       Matrices.dense(1, 1, Array(0.86644)))
+    val Esigma = Array(
+      Matrices.dense(1, 1, Array(1.1098)),
+      Matrices.dense(1, 1, Array(0.86644)))
 
     val gmm =
       new GaussianMixture().setK(2).setInitialModel(initialGmm).run(data)
@@ -100,17 +103,19 @@ class GaussianMixtureSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     val Ew = 1.0
     val Emu = Vectors.dense(2.0, 2.0, 2.0)
-    val Esigma = Matrices.dense(3,
-                                3,
-                                Array(8.0 / 3.0,
-                                      -4.0,
-                                      4.0 / 3.0,
-                                      -4.0,
-                                      8.0,
-                                      -4.0,
-                                      4.0 / 3.0,
-                                      -4.0,
-                                      8.0 / 3.0))
+    val Esigma = Matrices.dense(
+      3,
+      3,
+      Array(
+        8.0 / 3.0,
+        -4.0,
+        4.0 / 3.0,
+        -4.0,
+        8.0,
+        -4.0,
+        4.0 / 3.0,
+        -4.0,
+        8.0 / 3.0))
 
     val seeds = Array(42, 1994, 27, 11, 0)
     seeds.foreach { seed =>
@@ -129,16 +134,19 @@ class GaussianMixtureSuite extends SparkFunSuite with MLlibTestSparkContext {
     val initialGmm = new GaussianMixtureModel(
       Array(0.5, 0.5),
       Array(
-        new MultivariateGaussian(Vectors.dense(-1.0),
-                                 Matrices.dense(1, 1, Array(1.0))),
-        new MultivariateGaussian(Vectors.dense(1.0),
-                                 Matrices.dense(1, 1, Array(1.0)))
+        new MultivariateGaussian(
+          Vectors.dense(-1.0),
+          Matrices.dense(1, 1, Array(1.0))),
+        new MultivariateGaussian(
+          Vectors.dense(1.0),
+          Matrices.dense(1, 1, Array(1.0)))
       )
     )
     val Ew = Array(1.0 / 3.0, 2.0 / 3.0)
     val Emu = Array(Vectors.dense(-4.3673), Vectors.dense(5.1604))
-    val Esigma = Array(Matrices.dense(1, 1, Array(1.1098)),
-                       Matrices.dense(1, 1, Array(0.86644)))
+    val Esigma = Array(
+      Matrices.dense(1, 1, Array(1.1098)),
+      Matrices.dense(1, 1, Array(0.86644)))
 
     val sparseGMM =
       new GaussianMixture().setK(2).setInitialModel(initialGmm).run(sparseData)

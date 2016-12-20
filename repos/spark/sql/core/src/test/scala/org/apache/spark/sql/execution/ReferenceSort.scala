@@ -57,8 +57,9 @@ case class ReferenceSort(sortOrder: Seq[SortOrder],
           context
             .taskMetrics()
             .incPeakExecutionMemory(sorter.peakMemoryUsedBytes)
-          CompletionIterator[InternalRow, Iterator[InternalRow]](baseIterator,
-                                                                 sorter.stop())
+          CompletionIterator[InternalRow, Iterator[InternalRow]](
+            baseIterator,
+            sorter.stop())
         }, preservesPartitioning = true)
     }
 

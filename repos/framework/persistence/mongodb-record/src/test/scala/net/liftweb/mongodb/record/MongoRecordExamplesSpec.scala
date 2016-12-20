@@ -153,8 +153,9 @@ package mongotestrecords {
               case bdbo: BasicDBObject
                   if (bdbo.containsField("name") &&
                     bdbo.containsField("type")) =>
-                Map("name" -> bdbo.getString("name"),
-                    "type" -> bdbo.getString("type"))
+                Map(
+                  "name" -> bdbo.getString("name"),
+                  "type" -> bdbo.getString("type"))
               case _ => null
             }
           })
@@ -237,11 +238,11 @@ class MongoRecordExamplesSpec extends Specification with MongoTestKit {
 
       // JsonObjectField
       val dob1 = Calendar.getInstance.setYear(2005).setMonth(7).setDay(4)
-      val per = Person("joe",
-                       27,
-                       Address("Bulevard", "Helsinki"),
-                       List(Child("Mary", 5, Some(dob1.getTime)),
-                            Child("Mazy", 3, None)))
+      val per = Person(
+        "joe",
+        27,
+        Address("Bulevard", "Helsinki"),
+        List(Child("Mary", 5, Some(dob1.getTime)), Child("Mazy", 3, None)))
       tr.person(per)
 
       // save the record in the db
@@ -449,8 +450,9 @@ class MongoRecordExamplesSpec extends Specification with MongoTestKit {
     ld1.patternlist.set(
       List(Pattern.compile("^Mongo"), Pattern.compile("^Mongo2")))
     ld1.maplist.set(
-      List(Map("name" -> "map1", "type" -> "map"),
-           Map("name" -> "map2", "type" -> "map")))
+      List(
+        Map("name" -> "map1", "type" -> "map"),
+        Map("name" -> "map2", "type" -> "map")))
     ld1.binarylist.set(List[Array[Byte]]("foo".getBytes(), "bar".getBytes()))
 
     ld1.save() must_== ld1

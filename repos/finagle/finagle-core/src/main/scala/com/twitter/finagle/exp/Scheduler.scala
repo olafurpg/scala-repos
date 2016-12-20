@@ -56,12 +56,13 @@ private[finagle] object FinagleScheduler {
       new BridgedThreadPoolScheduler(
         "bridged scheduler",
         (threadFactory: ThreadFactory) =>
-          new ThreadPoolExecutor(numWorkers,
-                                 numWorkers,
-                                 0L,
-                                 TimeUnit.MILLISECONDS,
-                                 queue,
-                                 threadFactory)))
+          new ThreadPoolExecutor(
+            numWorkers,
+            numWorkers,
+            0L,
+            TimeUnit.MILLISECONDS,
+            queue,
+            threadFactory)))
 
     log.info("Using bridged scheduler with %d workers".format(numWorkers))
   }
@@ -69,8 +70,9 @@ private[finagle] object FinagleScheduler {
   private def switchToForkJoin(numWorkers: Int) {
     log.info("Using forkjoin scheduler with %d workers".format(numWorkers))
     Scheduler.setUnsafe(
-      new ForkJoinScheduler(numWorkers,
-                            DefaultStatsReceiver.scope("forkjoin")))
+      new ForkJoinScheduler(
+        numWorkers,
+        DefaultStatsReceiver.scope("forkjoin")))
   }
 
   def init() {

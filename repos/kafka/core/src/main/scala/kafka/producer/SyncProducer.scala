@@ -124,9 +124,10 @@ class SyncProducer(val config: SyncProducerConfig) extends Logging {
       producerRequestStats.getProducerRequestAllBrokersStats.requestTimer
     aggregateTimer.time {
       specificTimer.time {
-        response = doSend(producerRequest,
-                          if (producerRequest.requiredAcks == 0) false
-                          else true)
+        response = doSend(
+          producerRequest,
+          if (producerRequest.requiredAcks == 0) false
+          else true)
       }
     }
     if (producerRequest.requiredAcks != 0) {
@@ -176,9 +177,10 @@ class SyncProducer(val config: SyncProducerConfig) extends Logging {
       } catch {
         case e: Exception => {
           disconnect()
-          error("Producer connection to " +
-                  formatAddress(config.host, config.port) + " unsuccessful",
-                e)
+          error(
+            "Producer connection to " +
+              formatAddress(config.host, config.port) + " unsuccessful",
+            e)
           throw e
         }
       }

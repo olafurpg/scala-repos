@@ -183,8 +183,9 @@ trait AtmosphereSupport
         request(AtmosphereRouteKey) = atmoRoute.get
         request.getSession(true) // force session creation
         if (request.get(FrameworkConfig.ATMOSPHERE_HANDLER_WRAPPER).isEmpty)
-          atmosphereFramework.doCometSupport(AtmosphereRequest.wrap(request),
-                                             AtmosphereResponse.wrap(response))
+          atmosphereFramework.doCometSupport(
+            AtmosphereRequest.wrap(request),
+            AtmosphereResponse.wrap(response))
       } else {
         super.handle(request, response)
       }

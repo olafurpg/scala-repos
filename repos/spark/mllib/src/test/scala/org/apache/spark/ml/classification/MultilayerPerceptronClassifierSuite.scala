@@ -34,10 +34,11 @@ class MultilayerPerceptronClassifierSuite
     "XOR function learning as binary classification problem with two outputs.") {
     val dataFrame = sqlContext
       .createDataFrame(
-        Seq((Vectors.dense(0.0, 0.0), 0.0),
-            (Vectors.dense(0.0, 1.0), 1.0),
-            (Vectors.dense(1.0, 0.0), 1.0),
-            (Vectors.dense(1.0, 1.0), 0.0)))
+        Seq(
+          (Vectors.dense(0.0, 0.0), 0.0),
+          (Vectors.dense(0.0, 1.0), 1.0),
+          (Vectors.dense(1.0, 0.0), 1.0),
+          (Vectors.dense(1.0, 1.0), 0.0)))
       .toDF("features", "label")
     val layers = Array[Int](2, 5, 2)
     val trainer = new MultilayerPerceptronClassifier()
@@ -60,28 +61,31 @@ class MultilayerPerceptronClassifierSuite
 
     // The following coefficients are taken from OneVsRestSuite.scala
     // they represent 3-class iris dataset
-    val coefficients = Array(-0.57997,
-                             0.912083,
-                             -0.371077,
-                             -0.819866,
-                             2.688191,
-                             -0.16624,
-                             -0.84355,
-                             -0.048509,
-                             -0.301789,
-                             4.170682)
+    val coefficients = Array(
+      -0.57997,
+      0.912083,
+      -0.371077,
+      -0.819866,
+      2.688191,
+      -0.16624,
+      -0.84355,
+      -0.048509,
+      -0.301789,
+      4.170682)
 
     val xMean = Array(5.843, 3.057, 3.758, 1.199)
     val xVariance = Array(0.6856, 0.1899, 3.116, 0.581)
     // the input seed is somewhat magic, to make this test pass
     val rdd =
-      sc.parallelize(generateMultinomialLogisticInput(coefficients,
-                                                      xMean,
-                                                      xVariance,
-                                                      true,
-                                                      nPoints,
-                                                      1),
-                     2)
+      sc.parallelize(
+        generateMultinomialLogisticInput(
+          coefficients,
+          xMean,
+          xVariance,
+          true,
+          nPoints,
+          1),
+        2)
     val dataFrame = sqlContext.createDataFrame(rdd).toDF("label", "features")
     val numClasses = 3
     val numIterations = 100

@@ -106,8 +106,9 @@ object LookupElementManager {
     name match {
       case Setter(prefix) if !element.isInstanceOf[FakePsiMethod] =>
         //if element is fake psi method, then this setter is already generated from var
-        Seq(getLookupElementInternal(isAssignment = true, prefix),
-            getLookupElementInternal(isAssignment = false, name))
+        Seq(
+          getLookupElementInternal(isAssignment = true, prefix),
+          getLookupElementInternal(isAssignment = false, name))
       case _ => Seq(getLookupElementInternal(isAssignment = false, name))
     }
   }

@@ -160,12 +160,14 @@ object SessionMaster extends LiftActor with Loggable {
   private def lockAndBump(f: => Box[SessionInfo]): Box[LiftSession] =
     this.synchronized {
       f.map { s =>
-        nsessions.put(s.session.underlyingId,
-                      SessionInfo(s.session,
-                                  s.userAgent,
-                                  s.ipAddress,
-                                  s.requestCnt + 1,
-                                  millis))
+        nsessions.put(
+          s.session.underlyingId,
+          SessionInfo(
+            s.session,
+            s.userAgent,
+            s.ipAddress,
+            s.requestCnt + 1,
+            millis))
 
         s.session
       }

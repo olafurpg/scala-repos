@@ -68,17 +68,18 @@ class BlockManagerReplicationSuite
       new NettyBlockTransferService(conf, securityMgr, numCores = 1)
     val memManager =
       new StaticMemoryManager(conf, Long.MaxValue, maxMem, numCores = 1)
-    val store = new BlockManager(name,
-                                 rpcEnv,
-                                 master,
-                                 serializer,
-                                 conf,
-                                 memManager,
-                                 mapOutputTracker,
-                                 shuffleManager,
-                                 transfer,
-                                 securityMgr,
-                                 0)
+    val store = new BlockManager(
+      name,
+      rpcEnv,
+      master,
+      serializer,
+      conf,
+      memManager,
+      mapOutputTracker,
+      shuffleManager,
+      transfer,
+      securityMgr,
+      0)
     memManager.setMemoryStore(store.memoryStore)
     store.initialize("app-id")
     allStores += store
@@ -101,10 +102,11 @@ class BlockManagerReplicationSuite
     master = new BlockManagerMaster(
       rpcEnv.setupEndpoint(
         "blockmanager",
-        new BlockManagerMasterEndpoint(rpcEnv,
-                                       true,
-                                       conf,
-                                       new LiveListenerBus)),
+        new BlockManagerMasterEndpoint(
+          rpcEnv,
+          true,
+          conf,
+          new LiveListenerBus)),
       conf,
       true)
     allStores.clear()
@@ -175,27 +177,31 @@ class BlockManagerReplicationSuite
   }
 
   test("block replication - 2x replication") {
-    testReplication(2,
-                    Seq(MEMORY_ONLY,
-                        MEMORY_ONLY_SER,
-                        DISK_ONLY,
-                        MEMORY_AND_DISK_2,
-                        MEMORY_AND_DISK_SER_2))
+    testReplication(
+      2,
+      Seq(
+        MEMORY_ONLY,
+        MEMORY_ONLY_SER,
+        DISK_ONLY,
+        MEMORY_AND_DISK_2,
+        MEMORY_AND_DISK_SER_2))
   }
 
   test("block replication - 3x replication") {
     // Generate storage levels with 3x replication
     val storageLevels = {
-      Seq(MEMORY_ONLY,
-          MEMORY_ONLY_SER,
-          DISK_ONLY,
-          MEMORY_AND_DISK,
-          MEMORY_AND_DISK_SER).map { level =>
-        StorageLevel(level.useDisk,
-                     level.useMemory,
-                     level.useOffHeap,
-                     level.deserialized,
-                     3)
+      Seq(
+        MEMORY_ONLY,
+        MEMORY_ONLY_SER,
+        DISK_ONLY,
+        MEMORY_AND_DISK,
+        MEMORY_AND_DISK_SER).map { level =>
+        StorageLevel(
+          level.useDisk,
+          level.useMemory,
+          level.useOffHeap,
+          level.deserialized,
+          3)
       }
     }
     testReplication(3, storageLevels)
@@ -219,9 +225,11 @@ class BlockManagerReplicationSuite
 
   test("block replication - 2x replication without peers") {
     intercept[org.scalatest.exceptions.TestFailedException] {
-      testReplication(1,
-                      Seq(StorageLevel.MEMORY_AND_DISK_2,
-                          StorageLevel(true, false, false, false, 3)))
+      testReplication(
+        1,
+        Seq(
+          StorageLevel.MEMORY_AND_DISK_2,
+          StorageLevel(true, false, false, false, 3)))
     }
   }
 
@@ -275,8 +283,9 @@ class BlockManagerReplicationSuite
 
     // Test if 3x replication of two different blocks gives two different sets of locations
     val a3Locs3x = putBlockAndGetLocations("a3", storageLevel3x)
-    assert(a3Locs3x !== a2Locs3x,
-           "Two blocks gave same locations with 3x replication")
+    assert(
+      a3Locs3x !== a2Locs3x,
+      "Two blocks gave same locations with 3x replication")
   }
 
   test("block replication - replication failures") {
@@ -302,9 +311,10 @@ class BlockManagerReplicationSuite
 
     // Insert a block with 2x replication and return the number of copies of the block
     def replicateAndGetNumCopies(blockId: String): Int = {
-      store.putSingle(blockId,
-                      new Array[Byte](1000),
-                      StorageLevel.MEMORY_AND_DISK_2)
+      store.putSingle(
+        blockId,
+        new Array[Byte](1000),
+        StorageLevel.MEMORY_AND_DISK_2)
       val numLocations = master.getLocations(blockId).size
       allStores.foreach { _.removeBlock(blockId) }
       numLocations
@@ -318,17 +328,18 @@ class BlockManagerReplicationSuite
     when(failableTransfer.port).thenReturn(1000)
     val memManager =
       new StaticMemoryManager(conf, Long.MaxValue, 10000, numCores = 1)
-    val failableStore = new BlockManager("failable-store",
-                                         rpcEnv,
-                                         master,
-                                         serializer,
-                                         conf,
-                                         memManager,
-                                         mapOutputTracker,
-                                         shuffleManager,
-                                         failableTransfer,
-                                         securityMgr,
-                                         0)
+    val failableStore = new BlockManager(
+      "failable-store",
+      rpcEnv,
+      master,
+      serializer,
+      conf,
+      memManager,
+      mapOutputTracker,
+      shuffleManager,
+      failableTransfer,
+      securityMgr,
+      0)
     memManager.setMemoryStore(failableStore.memoryStore)
     failableStore.initialize("app-id")
     allStores += failableStore // so that this gets stopped after test
@@ -409,8 +420,9 @@ class BlockManagerReplicationSuite
                               storageLevels: Seq[StorageLevel]) {
     import org.apache.spark.storage.StorageLevel._
 
-    assert(maxReplication > 1,
-           s"Cannot test replication factor $maxReplication")
+    assert(
+      maxReplication > 1,
+      s"Cannot test replication factor $maxReplication")
 
     // storage levels to test with the given replication factor
 
@@ -442,8 +454,9 @@ class BlockManagerReplicationSuite
         }
         .foreach { testStore =>
           val testStoreName = testStore.blockManagerId.executorId
-          assert(testStore.getLocalValues(blockId).isDefined,
-                 s"$blockId was not found in $testStoreName")
+          assert(
+            testStore.getLocalValues(blockId).isDefined,
+            s"$blockId was not found in $testStoreName")
           testStore.releaseLock(blockId)
           assert(
             master
@@ -475,9 +488,10 @@ class BlockManagerReplicationSuite
           if (storageLevel.useMemory) {
             // Force the block to be dropped by adding a number of dummy blocks
             (1 to 10).foreach { i =>
-              testStore.putSingle(s"dummy-block-$i",
-                                  new Array[Byte](1000),
-                                  MEMORY_ONLY_SER)
+              testStore.putSingle(
+                s"dummy-block-$i",
+                new Array[Byte](1000),
+                MEMORY_ONLY_SER)
             }
             (1 to 10).foreach { i =>
               testStore.removeBlock(s"dummy-block-$i")

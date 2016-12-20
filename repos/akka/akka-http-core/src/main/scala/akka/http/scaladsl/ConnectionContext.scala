@@ -24,11 +24,12 @@ object ConnectionContext {
             enabledProtocols: Option[immutable.Seq[String]] = None,
             clientAuth: Option[TLSClientAuth] = None,
             sslParameters: Option[SSLParameters] = None) = {
-    new HttpsConnectionContext(sslContext,
-                               enabledCipherSuites,
-                               enabledProtocols,
-                               clientAuth,
-                               sslParameters)
+    new HttpsConnectionContext(
+      sslContext,
+      enabledCipherSuites,
+      enabledProtocols,
+      clientAuth,
+      sslParameters)
   }
   //#https-context-creation
 
@@ -45,10 +46,11 @@ final class HttpsConnectionContext(
     with ConnectionContext {
 
   def firstSession =
-    NegotiateNewSession(enabledCipherSuites,
-                        enabledProtocols,
-                        clientAuth,
-                        sslParameters)
+    NegotiateNewSession(
+      enabledCipherSuites,
+      enabledProtocols,
+      clientAuth,
+      sslParameters)
 
   override def getSslContext = sslContext
   override def getEnabledCipherSuites: Optional[JCollection[String]] =

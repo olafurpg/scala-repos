@@ -10,9 +10,10 @@ object Test extends App {
       val x: T = "2".asInstanceOf[T]; println("ima worx: %s".format(x)); x
     }
     println(freeTypes(code.tree))
-    val tree = substituteSymbols(code.tree,
-                                 freeTypes(code.tree),
-                                 List(definitions.StringClass))
+    val tree = substituteSymbols(
+      code.tree,
+      freeTypes(code.tree),
+      List(definitions.StringClass))
     cm.mkToolBox().eval(tree)
   }
 

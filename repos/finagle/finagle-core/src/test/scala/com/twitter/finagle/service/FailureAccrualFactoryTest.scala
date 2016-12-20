@@ -48,11 +48,12 @@ class FailureAccrualFactoryTest extends FunSuite with MockitoSugar {
 
     val timer = new MockTimer
 
-    val factory = new FailureAccrualFactory[Int, Int](underlying,
-                                                      failureAccrualPolicy,
-                                                      timer,
-                                                      statsReceiver,
-                                                      "test")
+    val factory = new FailureAccrualFactory[Int, Int](
+      underlying,
+      failureAccrualPolicy,
+      timer,
+      statsReceiver,
+      "test")
     val service = Await.result(factory())
     verify(underlying)()
   }
@@ -643,11 +644,12 @@ class FailureAccrualFactoryTest extends FunSuite with MockitoSugar {
         failureAccrualPolicy: FailureAccrualPolicy,
         timer: Timer,
         label: String)
-        extends FailureAccrualFactory[Int, Int](underlying,
-                                                failureAccrualPolicy,
-                                                timer,
-                                                NullStatsReceiver,
-                                                label) {
+        extends FailureAccrualFactory[Int, Int](
+          underlying,
+          failureAccrualPolicy,
+          timer,
+          NullStatsReceiver,
+          label) {
       override def isSuccess(reqRep: ReqRep): Boolean = {
         reqRep.response match {
           case Throw(_) => false

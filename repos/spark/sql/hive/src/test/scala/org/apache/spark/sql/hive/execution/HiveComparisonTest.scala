@@ -381,9 +381,10 @@ abstract class HiveComparisonTest
 
                       // We need to add a new line to non-empty answers so we can differentiate Seq()
                       // from Seq("").
-                      stringToFile(cachedAnswerFile,
-                                   answer.mkString("\n") +
-                                     (if (answer.nonEmpty) "\n" else ""))
+                      stringToFile(
+                        cachedAnswerFile,
+                        answer.mkString("\n") +
+                          (if (answer.nonEmpty) "\n" else ""))
                       answer
                     } catch {
                       case e: Exception =>
@@ -393,9 +394,9 @@ abstract class HiveComparisonTest
                         |${stackTraceToString(e)}
                         |$queryString
                       """.stripMargin
-                        stringToFile(new File(hiveFailedDirectory,
-                                              testCaseName),
-                                     errorMessage + consoleTestCase)
+                        stringToFile(
+                          new File(hiveFailedDirectory, testCaseName),
+                          errorMessage + consoleTestCase)
                         fail(errorMessage)
                     }
                 }
@@ -428,7 +429,8 @@ abstract class HiveComparisonTest
                       new SQLBuilder(originalQuery.analyzed, TestHive).toSQL
                     } catch {
                       case NonFatal(e) =>
-                        fail(s"""Cannot convert the following HiveQL query plan back to SQL query string:
+                        fail(
+                          s"""Cannot convert the following HiveQL query plan back to SQL query string:
                         |
                         |# Original HiveQL query string:
                         |$queryString
@@ -436,7 +438,7 @@ abstract class HiveComparisonTest
                         |# Resolved query plan:
                         |${originalQuery.analyzed.treeString}
                      """.stripMargin,
-                             e)
+                          e)
                     }
 
                     try {
@@ -447,7 +449,8 @@ abstract class HiveComparisonTest
                       queryExecution
                     } catch {
                       case NonFatal(e) =>
-                        fail(s"""Failed to analyze the converted SQL string:
+                        fail(
+                          s"""Failed to analyze the converted SQL string:
                         |
                         |# Original HiveQL query string:
                         |$queryString
@@ -458,7 +461,7 @@ abstract class HiveComparisonTest
                         |# Converted SQL query string:
                         |$convertedSQL
                      """.stripMargin,
-                             e)
+                          e)
                     }
                   }
                 }
@@ -475,8 +478,9 @@ abstract class HiveComparisonTest
                   |== HIVE - ${hive.size} row(s) ==
                   |${hive.mkString("\n")}
                 """.stripMargin
-                  stringToFile(new File(failedDirectory, testCaseName),
-                               errorMessage + consoleTestCase)
+                  stringToFile(
+                    new File(failedDirectory, testCaseName),
+                    errorMessage + consoleTestCase)
                   fail(errorMessage)
               }
           }
@@ -556,8 +560,9 @@ abstract class HiveComparisonTest
                   |$computedTablesMessages
                 """.stripMargin
 
-              stringToFile(new File(wrongDirectory, testCaseName),
-                           errorMessage + consoleTestCase)
+              stringToFile(
+                new File(wrongDirectory, testCaseName),
+                errorMessage + consoleTestCase)
               if (isSpeculative && !reset) {
                 fail("Failed on first run; retrying")
               } else {

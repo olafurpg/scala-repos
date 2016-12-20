@@ -32,8 +32,9 @@ object BroadcastStatsReceiver {
     val repr = this
 
     def counter(names: String*): Counter =
-      new BroadcastCounter.Two(first.counter(names: _*),
-                               second.counter(names: _*))
+      new BroadcastCounter.Two(
+        first.counter(names: _*),
+        second.counter(names: _*))
 
     def stat(names: String*): Stat =
       new BroadcastStat.Two(first.stat(names: _*), second.stat(names: _*))

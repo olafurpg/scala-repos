@@ -40,10 +40,11 @@ import scalafx.Includes._
   */
 @RunWith(classOf[JUnitRunner])
 class DefaultStringConverterSpec
-    extends AbstractStringConverterDelegateSpec[java.lang.String,
-                                                jfxuc.DefaultStringConverter,
-                                                String,
-                                                DefaultStringConverter](
+    extends AbstractStringConverterDelegateSpec[
+      java.lang.String,
+      jfxuc.DefaultStringConverter,
+      String,
+      DefaultStringConverter](
       classOf[jfxuc.DefaultStringConverter],
       classOf[DefaultStringConverter],
       classOf[String]) {

@@ -47,8 +47,9 @@ trait CommandHandler {
   private[this] def serverError[R](cmdName: String,
                                    ex: Throwable): ModelValidation[R] = {
     commandLogger.error("There was an error while executing " + cmdName, ex)
-    ValidationError("An error occurred while handling: " + cmdName,
-                    UnknownError).failureNel[R]
+    ValidationError(
+      "An error occurred while handling: " + cmdName,
+      UnknownError).failureNel[R]
   }
 
   type Handler = PartialFunction[ModelCommand[_], ModelValidation[_]]

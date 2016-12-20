@@ -48,9 +48,10 @@ private[redis] object RedisCodec {
                       includeHeader: Boolean = true) = {
     val header = includeHeader match {
       case true =>
-        Seq(ARG_COUNT_MARKER_BA,
-            StringToChannelBuffer(args.length.toString),
-            EOL_DELIMITER_BA)
+        Seq(
+          ARG_COUNT_MARKER_BA,
+          StringToChannelBuffer(args.length.toString),
+          EOL_DELIMITER_BA)
       case false => Nil
     }
     val buffers = args

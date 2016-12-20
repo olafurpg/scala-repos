@@ -3,8 +3,9 @@ import sbt._
 object SiteMap {
   // represents the configurable aspects of a sitemap entry
   final case class Entry(changeFreq: String, priority: Double) {
-    assert(priority >= 0.0 && priority <= 1.0,
-           s"Priority must be between 0.0 and 1.0:, was $priority")
+    assert(
+      priority >= 0.0 && priority <= 1.0,
+      s"Priority must be between 0.0 and 1.0:, was $priority")
   }
   def generate(repoBase: File,
                remoteBase: URI,
@@ -21,8 +22,9 @@ object SiteMap {
           }
       }
     def entriesXML(entries: Seq[xml.Node]): xml.Elem = {
-      assert(entries.size <= 50000,
-             "A site map cannot contain more than 50,000 entries.")
+      assert(
+        entries.size <= 50000,
+        "A site map cannot contain more than 50,000 entries.")
       <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
             { entries }
           </urlset>
@@ -41,10 +43,11 @@ object SiteMap {
       if (es.isEmpty) None
       else
         Some(
-          writeXMLgz(dir / "sitemap.xml",
-                     dir / "sitemap.xml.gz",
-                     gzip,
-                     entriesXML(es)))
+          writeXMLgz(
+            dir / "sitemap.xml",
+            dir / "sitemap.xml.gz",
+            gzip,
+            entriesXML(es)))
     }
     def indexEntryXML(sub: File, relPath: String): xml.Elem =
       <sitemap>
@@ -59,10 +62,11 @@ object SiteMap {
       relativize(subs) map { case (f, path) => indexEntryXML(f, path) }
     def siteMapIndex(dir: File, subs: Seq[File]): File = {
       val xml = indexEntriesXML(indexEntries(subs))
-      writeXMLgz(dir / "sitemap_index.xml",
-                 dir / "sitemap_index.xml.gz",
-                 gzip,
-                 xml)
+      writeXMLgz(
+        dir / "sitemap_index.xml",
+        dir / "sitemap_index.xml.gz",
+        gzip,
+        xml)
     }
     def isSymlink(f: File) = f.getCanonicalFile != f.getAbsoluteFile
 

@@ -64,10 +64,11 @@ class ScalaIntroduceVariableHandler
       def findTypeElement(offset: Int) =
         if (!hasSelection && !isExpression)
           Option(
-            PsiTreeUtil.findElementOfClassAtOffset(file,
-                                                   offset,
-                                                   classOf[ScTypeElement],
-                                                   false))
+            PsiTreeUtil.findElementOfClassAtOffset(
+              file,
+              offset,
+              classOf[ScTypeElement],
+              false))
         else None
 
       file.findElementAt(offset) match {
@@ -80,18 +81,20 @@ class ScalaIntroduceVariableHandler
     if (hasSelection && selectedElement.isEmpty) {
       val message =
         ScalaBundle.message("cannot.refactor.not.expression.nor.type")
-      CommonRefactoringUtil.showErrorHint(project,
-                                          editor,
-                                          message,
-                                          INTRODUCE_VARIABLE_REFACTORING_NAME,
-                                          HelpID.INTRODUCE_VARIABLE)
+      CommonRefactoringUtil.showErrorHint(
+        project,
+        editor,
+        message,
+        INTRODUCE_VARIABLE_REFACTORING_NAME,
+        HelpID.INTRODUCE_VARIABLE)
       return
     }
 
     //clear data on startRefactoring, if there is no marks, but there is some data
     if (StartMarkAction.canStart(project) == null) {
-      editor.putUserData(IntroduceTypeAlias.REVERT_TYPE_ALIAS_INFO,
-                         new IntroduceTypeAliasData())
+      editor.putUserData(
+        IntroduceTypeAlias.REVERT_TYPE_ALIAS_INFO,
+        new IntroduceTypeAliasData())
     }
 
     val typeElement = selectedElement match {

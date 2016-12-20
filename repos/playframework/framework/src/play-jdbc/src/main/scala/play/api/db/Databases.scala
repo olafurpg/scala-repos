@@ -127,15 +127,16 @@ abstract class DefaultDatabase(val name: String,
     databaseConfig.driver.map { driverClassName =>
       try {
         val proxyDriver = new ProxyDriver(
-          Reflect.createInstance[Driver](driverClassName,
-                                         environment.classLoader))
+          Reflect
+            .createInstance[Driver](driverClassName, environment.classLoader))
         DriverManager.registerDriver(proxyDriver)
         proxyDriver
       } catch {
         case NonFatal(e) =>
-          throw config.reportError("driver",
-                                   s"Driver not found: [$driverClassName}]",
-                                   Some(e))
+          throw config.reportError(
+            "driver",
+            s"Driver not found: [$driverClassName}]",
+            Some(e))
       }
     }
   }
@@ -220,10 +221,11 @@ class PooledDatabase(name: String,
     extends DefaultDatabase(name, configuration, environment) {
 
   def this(name: String, configuration: Configuration) =
-    this(name,
-         configuration.underlying,
-         Environment.simple(),
-         new HikariCPConnectionPool(Environment.simple()))
+    this(
+      name,
+      configuration.underlying,
+      Environment.simple(),
+      new HikariCPConnectionPool(Environment.simple()))
 
   def createDataSource(): DataSource = {
     val datasource: DataSource =

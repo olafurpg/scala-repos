@@ -69,8 +69,9 @@ class Same extends ScalaMatchingTask {
       mapperElement = Some(mapper)
       mapper
     } else
-      throw new BuildException("Cannot define more than one mapper",
-                               getLocation)
+      throw new BuildException(
+        "Cannot define more than one mapper",
+        getLocation)
 
   def add(fileNameMapper: FileNameMapper) =
     createMapper().add(fileNameMapper)
@@ -161,9 +162,10 @@ class Same extends ScalaMatchingTask {
     else {
       if (!resultProperty.isEmpty)
         getProject.setProperty(resultProperty.get, "yes")
-      log("All files in '" + origin.get + "' and '" +
-            destination.get + "' are equal",
-          Project.MSG_VERBOSE)
+      log(
+        "All files in '" + origin.get + "' and '" +
+          destination.get + "' are equal",
+        Project.MSG_VERBOSE)
     }
   }
 }

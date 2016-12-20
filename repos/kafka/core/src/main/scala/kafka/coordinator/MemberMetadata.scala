@@ -91,19 +91,21 @@ private[coordinator] class MemberMetadata(
   }
 
   def summary(protocol: String): MemberSummary = {
-    MemberSummary(memberId,
-                  clientId,
-                  clientHost,
-                  metadata(protocol),
-                  assignment)
+    MemberSummary(
+      memberId,
+      clientId,
+      clientHost,
+      metadata(protocol),
+      assignment)
   }
 
   def summaryNoMetadata(): MemberSummary = {
-    MemberSummary(memberId,
-                  clientId,
-                  clientHost,
-                  Array.empty[Byte],
-                  Array.empty[Byte])
+    MemberSummary(
+      memberId,
+      clientId,
+      clientHost,
+      Array.empty[Byte],
+      Array.empty[Byte])
   }
 
   /**

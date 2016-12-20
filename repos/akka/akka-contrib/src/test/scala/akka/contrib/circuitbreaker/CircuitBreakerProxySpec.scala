@@ -271,10 +271,12 @@ class CircuitBreakerProxySpec extends AkkaSpec() with GivenWhenThen {
 
       Then(
         "First message should be forwarded, following ones ignored if the failure persist")
-      sender.send(circuitBreaker,
-                  "First message in half-open state, should be forwarded")
-      sender.send(circuitBreaker,
-                  "Second message in half-open state, should be ignored")
+      sender.send(
+        circuitBreaker,
+        "First message in half-open state, should be forwarded")
+      sender.send(
+        circuitBreaker,
+        "Second message in half-open state, should be ignored")
 
       receiver.expectMsg(
         "First message in half-open state, should be forwarded")

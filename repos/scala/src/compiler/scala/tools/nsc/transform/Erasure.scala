@@ -588,8 +588,9 @@ abstract class Erasure
             else EmptyTree
 
           if (guardExtractor && (zero ne EmptyTree)) {
-            val typeTest = gen.mkIsInstanceOf(REF(bridge.firstParam),
-                                              member.tpe.params.head.tpe)
+            val typeTest = gen.mkIsInstanceOf(
+              REF(bridge.firstParam),
+              member.tpe.params.head.tpe)
             IF(typeTest) THEN bridgingCall ELSE zero
           } else bridgingCall
         }
@@ -631,8 +632,9 @@ abstract class Erasure
     private def adaptMember(tree: Tree): Tree = {
       //Console.println("adaptMember: " + tree);
       tree match {
-        case Apply(ta @ TypeApply(sel @ Select(qual, name), List(targ)),
-                   List()) if tree.symbol == Any_asInstanceOf =>
+        case Apply(
+            ta @ TypeApply(sel @ Select(qual, name), List(targ)),
+            List()) if tree.symbol == Any_asInstanceOf =>
           val qual1 =
             typedQualifier(qual, NOmode, ObjectTpe) // need to have an expected type, see #3037
           // !!! Make pending/run/t5866b.scala work. The fix might be here and/or in unbox1.
@@ -648,10 +650,12 @@ abstract class Erasure
               val untyped =
 //                util.trace("new asinstanceof test") {
                 gen.evalOnce(qual1, context.owner, context.unit) { qual =>
-                  If(Apply(Select(qual(), nme.eq),
-                           List(Literal(Constant(null)) setType NullTpe)),
-                     Literal(Constant(null)) setType targ.tpe,
-                     unbox(qual(), targ.tpe))
+                  If(
+                    Apply(
+                      Select(qual(), nme.eq),
+                      List(Literal(Constant(null)) setType NullTpe)),
+                    Literal(Constant(null)) setType targ.tpe,
+                    unbox(qual(), targ.tpe))
                 }
 //                }
               typed(untyped)
@@ -813,8 +817,9 @@ abstract class Erasure
           if (exitingRefchecks(lowType matches highType)) ""
           else " after erasure: " + exitingPostErasure(highType)
 
-        reporter.error(pos,
-                       s"""|$what:
+        reporter.error(
+          pos,
+          s"""|$what:
               |${exitingRefchecks(highString)} and
               |${exitingRefchecks(lowString)}
               |have same type$when""".trim.stripMargin)
@@ -966,16 +971,18 @@ abstract class Erasure
 
               def mkIsInstanceOf(q: () => Tree)(tp: Type): Tree =
                 Apply(
-                  TypeApply(Select(q(), Object_isInstanceOf) setPos sel.pos,
-                            List(TypeTree(tp) setPos targ.pos)) setPos fn.pos,
+                  TypeApply(
+                    Select(q(), Object_isInstanceOf) setPos sel.pos,
+                    List(TypeTree(tp) setPos targ.pos)) setPos fn.pos,
                   List()) setPos tree.pos
               targ.tpe match {
                 case SingleType(_, _) | ThisType(_) | SuperType(_, _) =>
                   val cmpOp =
                     if (targ.tpe <:< AnyValTpe) Any_equals else Object_eq
                   atPos(tree.pos) {
-                    Apply(Select(qual, cmpOp),
-                          List(gen.mkAttributedQualifier(targ.tpe)))
+                    Apply(
+                      Select(qual, cmpOp),
+                      List(gen.mkAttributedQualifier(targ.tpe)))
                   }
                 case RefinedType(parents, decls) if (parents.length >= 2) =>
                   gen.evalOnce(qual, currentOwner, unit) { q =>
@@ -1028,8 +1035,9 @@ abstract class Erasure
             // !!! todo: simplify by having GenericArray also extract trees
             val level = unboundedGenericArrayLevel(arg.tpe)
             def isArrayTest(arg: Tree) =
-              gen.mkRuntimeCall(nme.isArray,
-                                List(arg, Literal(Constant(level))))
+              gen.mkRuntimeCall(
+                nme.isArray,
+                List(arg, Literal(Constant(level))))
 
             global.typer.typedPos(tree.pos) {
               if (level == 1) isArrayTest(qual)
@@ -1112,11 +1120,9 @@ abstract class Erasure
                 }
               } else if (isPrimitiveValueClass(qual.tpe.typeSymbol)) {
                 // Rewrite 5.getClass to ScalaRunTime.anyValClass(5)
-                global.typer.typed(
-                  gen.mkRuntimeCall(
-                    nme.anyValClass,
-                    List(qual,
-                         typer.resolveClassTag(tree.pos, qual.tpe.widen))))
+                global.typer.typed(gen.mkRuntimeCall(
+                  nme.anyValClass,
+                  List(qual, typer.resolveClassTag(tree.pos, qual.tpe.widen))))
               } else if (primitiveGetClassMethods.contains(fn.symbol)) {
                 // if we got here then we're trying to send a primitive getClass method to either
                 // a) an Any, in which cage Object_getClass works because Any erases to object. Or
@@ -1203,19 +1209,21 @@ abstract class Erasure
                     !qualSym.isPackageObjectClass) {
                   // insert cast to prevent illegal access error (see #4283)
                   // util.trace("insert erasure cast ") (*/
-                  treeCopy.Select(tree,
-                                  gen.mkAttributedCast(qual, qual.tpe.widen),
-                                  name) //)
+                  treeCopy.Select(
+                    tree,
+                    gen.mkAttributedCast(qual, qual.tpe.widen),
+                    name) //)
                 } else tree
             }
           } else tree
         case Template(parents, self, body) =>
           //Console.println("checking no dble defs " + tree)//DEBUG
           checkNoDoubleDefs(tree.symbol.owner)
-          treeCopy.Template(tree,
-                            parents,
-                            noSelfType,
-                            addBridges(body, currentOwner))
+          treeCopy.Template(
+            tree,
+            parents,
+            noSelfType,
+            addBridges(body, currentOwner))
 
         case Match(selector, cases) =>
           Match(Typed(selector, TypeTree(selector.tpe)), cases)
@@ -1257,10 +1265,11 @@ abstract class Erasure
               tree1 setType specialScalaErasure(tree1.tpe)
             case ArrayValue(elemtpt, trees) =>
               treeCopy
-                .ArrayValue(tree1,
-                            elemtpt setType specialScalaErasure.applyInArray(
-                              elemtpt.tpe),
-                            trees map transform)
+                .ArrayValue(
+                  tree1,
+                  elemtpt setType specialScalaErasure.applyInArray(
+                    elemtpt.tpe),
+                  trees map transform)
                 .clearType()
             case DefDef(_, _, _, _, tpt, _) =>
               try super.transform(tree1).clearType()

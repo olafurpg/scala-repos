@@ -31,11 +31,12 @@ case class DataSourceParams(val filepath: String,
     extends Params
 
 case class ParallelDataSource(val dsp: DataSourceParams)
-    extends PDataSource[DataSourceParams,
-                        Integer,
-                        RDD[LabeledPoint],
-                        Vector,
-                        Double] {
+    extends PDataSource[
+      DataSourceParams,
+      Integer,
+      RDD[LabeledPoint],
+      Vector,
+      Double] {
   override def read(sc: SparkContext)
     : Seq[(Integer, RDD[LabeledPoint], RDD[(Vector, Double)])] = {
     val input = sc.textFile(dsp.filepath)
@@ -58,11 +59,12 @@ case class AlgorithmParams(val numIterations: Int = 200,
     extends Params
 
 case class ParallelSGDAlgorithm(val ap: AlgorithmParams)
-    extends P2LAlgorithm[AlgorithmParams,
-                         RDD[LabeledPoint],
-                         RegressionModel,
-                         Vector,
-                         Double] {
+    extends P2LAlgorithm[
+      AlgorithmParams,
+      RDD[LabeledPoint],
+      RegressionModel,
+      Vector,
+      Double] {
 
   def train(data: RDD[LabeledPoint]): RegressionModel = {
     LinearRegressionWithSGD.train(data, ap.numIterations, ap.stepSize)
@@ -78,10 +80,11 @@ case class ParallelSGDAlgorithm(val ap: AlgorithmParams)
 
 object RegressionEngineFactory extends IEngineFactory {
   def apply() = {
-    new Engine(classOf[ParallelDataSource],
-               classOf[IdentityPreparator[RDD[LabeledPoint]]],
-               Map("SGD" -> classOf[ParallelSGDAlgorithm]),
-               LAverageServing(classOf[ParallelSGDAlgorithm]))
+    new Engine(
+      classOf[ParallelDataSource],
+      classOf[IdentityPreparator[RDD[LabeledPoint]]],
+      Map("SGD" -> classOf[ParallelSGDAlgorithm]),
+      LAverageServing(classOf[ParallelSGDAlgorithm]))
   }
 }
 
@@ -90,22 +93,20 @@ object Run {
     val filepath = new File("../data/lr_data.txt").getCanonicalPath
     val dataSourceParams = DataSourceParams(filepath, 3)
     val SGD = "SGD"
-    val algorithmParamsList = Seq((SGD, AlgorithmParams(stepSize = 0.1)),
-                                  (SGD, AlgorithmParams(stepSize = 0.2)),
-                                  (SGD, AlgorithmParams(stepSize = 0.4)))
+    val algorithmParamsList = Seq(
+      (SGD, AlgorithmParams(stepSize = 0.1)),
+      (SGD, AlgorithmParams(stepSize = 0.2)),
+      (SGD, AlgorithmParams(stepSize = 0.4)))
 
-    Workflow.run(dataSourceClassOpt = Some(classOf[ParallelDataSource]),
-                 dataSourceParams = dataSourceParams,
-                 preparatorClassOpt =
-                   Some(classOf[IdentityPreparator[RDD[LabeledPoint]]]),
-                 algorithmClassMapOpt =
-                   Some(Map(SGD -> classOf[ParallelSGDAlgorithm])),
-                 algorithmParamsList = algorithmParamsList,
-                 servingClassOpt =
-                   Some(LAverageServing(classOf[ParallelSGDAlgorithm])),
-                 evaluatorClassOpt = Some(classOf[MeanSquareError]),
-                 params =
-                   WorkflowParams(batch = "Imagine: Parallel Regression"))
+    Workflow.run(
+      dataSourceClassOpt = Some(classOf[ParallelDataSource]),
+      dataSourceParams = dataSourceParams,
+      preparatorClassOpt = Some(classOf[IdentityPreparator[RDD[LabeledPoint]]]),
+      algorithmClassMapOpt = Some(Map(SGD -> classOf[ParallelSGDAlgorithm])),
+      algorithmParamsList = algorithmParamsList,
+      servingClassOpt = Some(LAverageServing(classOf[ParallelSGDAlgorithm])),
+      evaluatorClassOpt = Some(classOf[MeanSquareError]),
+      params = WorkflowParams(batch = "Imagine: Parallel Regression"))
   }
 }
 

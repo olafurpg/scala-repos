@@ -80,9 +80,10 @@ trait Solver extends parser.AST with typer.Binder {
       }, {
         case Add(loc, Div(loc2, w, x), Div(loc3, y, z)) =>
           Set(
-            Div(loc2,
-                Add(loc, Mul(loc2, w, z), Mul(loc3, y, x)),
-                Mul(loc2, x, z)))
+            Div(
+              loc2,
+              Add(loc, Mul(loc2, w, z), Mul(loc3, y, x)),
+              Mul(loc2, x, z)))
       }, {
         case Mul(loc, Div(loc2, x, y), z) => Set(Div(loc2, Mul(loc, x, z), y))
       }, {
@@ -100,9 +101,10 @@ trait Solver extends parser.AST with typer.Binder {
       }, {
         case Sub(loc, Div(loc2, w, x), Div(loc3, y, z)) =>
           Set(
-            Div(loc2,
-                Sub(loc, Mul(loc2, w, z), Mul(loc3, y, x)),
-                Mul(loc2, x, z)))
+            Div(
+              loc2,
+              Sub(loc, Mul(loc2, w, z), Mul(loc3, y, x)),
+              Mul(loc2, x, z)))
       }, {
         case Neg(loc, Add(loc2, x, y)) =>
           Set(Add(loc2, Neg(loc, x), Neg(loc, y)))
@@ -235,9 +237,10 @@ trait Solver extends parser.AST with typer.Binder {
 
         // return just the first set of results we find
         if (results2.isEmpty)
-          search(newWorkLists,
-                 seen ++ (filteredWork map { _.head }),
-                 results ++ results2)
+          search(
+            newWorkLists,
+            seen ++ (filteredWork map { _.head }),
+            results ++ results2)
         else results2
       }
     }

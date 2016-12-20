@@ -161,12 +161,13 @@ trait Crudify {
   def showAllMenuLoc: Box[Menu] =
     Full(
       Menu(
-        Loc("List " + Prefix,
-            listPath,
-            showAllMenuName,
-            addlMenuLocParams :::
-              (locSnippets :: Loc
-                .Template(showAllTemplate) :: showAllMenuLocParams))))
+        Loc(
+          "List " + Prefix,
+          listPath,
+          showAllMenuName,
+          addlMenuLocParams :::
+            (locSnippets :: Loc
+              .Template(showAllTemplate) :: showAllMenuLocParams))))
 
   /**
     * Override to include new Params for the show all menu
@@ -179,12 +180,13 @@ trait Crudify {
   def createMenuLoc: Box[Menu] =
     Full(
       Menu(
-        Loc("Create " + Prefix,
-            createPath,
-            createMenuName,
-            (addlMenuLocParams :::
-              (locSnippets :: Loc
-                .Template(createTemplate) :: createMenuLocParams)))))
+        Loc(
+          "Create " + Prefix,
+          createPath,
+          createMenuName,
+          (addlMenuLocParams :::
+            (locSnippets :: Loc
+              .Template(createTemplate) :: createMenuLocParams)))))
 
   /**
     * Override to include new Params for the create menu
@@ -602,11 +604,12 @@ trait Crudify {
   private def mp(in: List[String]) = in.mkString("/", "/", "")
 
   def menus: List[Menu] =
-    List(showAllMenuLoc,
-         createMenuLoc,
-         viewMenuLoc,
-         editMenuLoc,
-         deleteMenuLoc).flatMap(x => x)
+    List(
+      showAllMenuLoc,
+      createMenuLoc,
+      viewMenuLoc,
+      editMenuLoc,
+      deleteMenuLoc).flatMap(x => x)
 
   /**
     * Given a range, find the records.  Your implementation of this

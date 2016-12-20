@@ -57,13 +57,14 @@ class StorageTabSuite extends SparkFunSuite with BeforeAndAfter {
     assert(storageListener.rddInfoList.isEmpty)
 
     // 2 RDDs are known, but none are cached
-    val stageInfo0 = new StageInfo(0,
-                                   0,
-                                   "0",
-                                   100,
-                                   Seq(rddInfo0, rddInfo1),
-                                   Seq.empty,
-                                   "details")
+    val stageInfo0 = new StageInfo(
+      0,
+      0,
+      "0",
+      100,
+      Seq(rddInfo0, rddInfo1),
+      Seq.empty,
+      "details")
     bus.postToAll(SparkListenerStageSubmitted(stageInfo0))
     assert(storageListener._rddInfoMap.size === 2)
     assert(storageListener.rddInfoList.isEmpty)
@@ -73,13 +74,14 @@ class StorageTabSuite extends SparkFunSuite with BeforeAndAfter {
     val rddInfo3Cached = rddInfo3
     rddInfo2Cached.numCachedPartitions = 1
     rddInfo3Cached.numCachedPartitions = 1
-    val stageInfo1 = new StageInfo(1,
-                                   0,
-                                   "0",
-                                   100,
-                                   Seq(rddInfo2Cached, rddInfo3Cached),
-                                   Seq.empty,
-                                   "details")
+    val stageInfo1 = new StageInfo(
+      1,
+      0,
+      "0",
+      100,
+      Seq(rddInfo2Cached, rddInfo3Cached),
+      Seq.empty,
+      "details")
     bus.postToAll(SparkListenerStageSubmitted(stageInfo1))
     assert(storageListener._rddInfoMap.size === 4)
     assert(storageListener.rddInfoList.size === 2)
@@ -105,13 +107,14 @@ class StorageTabSuite extends SparkFunSuite with BeforeAndAfter {
     val rddInfo1Cached = rddInfo1
     rddInfo0Cached.numCachedPartitions = 1
     rddInfo1Cached.numCachedPartitions = 1
-    val stageInfo0 = new StageInfo(0,
-                                   0,
-                                   "0",
-                                   100,
-                                   Seq(rddInfo0Cached, rddInfo1Cached),
-                                   Seq.empty,
-                                   "details")
+    val stageInfo0 = new StageInfo(
+      0,
+      0,
+      "0",
+      100,
+      Seq(rddInfo0Cached, rddInfo1Cached),
+      Seq.empty,
+      "details")
     bus.postToAll(SparkListenerStageSubmitted(stageInfo0))
     assert(storageListener._rddInfoMap.size === 2)
     assert(storageListener.rddInfoList.size === 2)
@@ -130,13 +133,14 @@ class StorageTabSuite extends SparkFunSuite with BeforeAndAfter {
     val myRddInfo0 = rddInfo0
     val myRddInfo1 = rddInfo1
     val myRddInfo2 = rddInfo2
-    val stageInfo0 = new StageInfo(0,
-                                   0,
-                                   "0",
-                                   100,
-                                   Seq(myRddInfo0, myRddInfo1, myRddInfo2),
-                                   Seq.empty,
-                                   "details")
+    val stageInfo0 = new StageInfo(
+      0,
+      0,
+      "0",
+      100,
+      Seq(myRddInfo0, myRddInfo1, myRddInfo2),
+      Seq.empty,
+      "details")
     bus.postToAll(SparkListenerBlockManagerAdded(1L, bm1, 1000L))
     bus.postToAll(SparkListenerStageSubmitted(stageInfo0))
     assert(storageListener._rddInfoMap.size === 3)
@@ -147,12 +151,13 @@ class StorageTabSuite extends SparkFunSuite with BeforeAndAfter {
 
     // Task end with no updated blocks. This should not change anything.
     bus.postToAll(
-      SparkListenerTaskEnd(0,
-                           0,
-                           "obliteration",
-                           Success,
-                           taskInfo,
-                           new TaskMetrics))
+      SparkListenerTaskEnd(
+        0,
+        0,
+        "obliteration",
+        Success,
+        taskInfo,
+        new TaskMetrics))
     assert(storageListener._rddInfoMap.size === 3)
     assert(storageListener.rddInfoList.size === 0)
 

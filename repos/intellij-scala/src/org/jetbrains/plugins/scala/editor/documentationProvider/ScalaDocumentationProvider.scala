@@ -318,8 +318,9 @@ class ScalaDocumentationProvider extends CodeDocumentationProvider {
     findDocCommentOwner(startPoint)
       .map(
         d =>
-          Pair.create(d.asInstanceOf[PsiElement],
-                      d.getDocComment.asInstanceOf[PsiComment]))
+          Pair.create(
+            d.asInstanceOf[PsiElement],
+            d.getDocComment.asInstanceOf[PsiComment]))
       .orNull
   }
 }
@@ -340,12 +341,13 @@ object ScalaDocumentationProvider {
     LOG debug s"[ScalaDocProvider] [ $msg ] $footer"
   }
 
-  val replaceWikiScheme = Map("__" -> "u>",
-                              "'''" -> "b>",
-                              "''" -> "i>",
-                              "`" -> "tt>",
-                              ",," -> "sub>",
-                              "^" -> "sup>")
+  val replaceWikiScheme = Map(
+    "__" -> "u>",
+    "'''" -> "b>",
+    "''" -> "i>",
+    "`" -> "tt>",
+    ",," -> "sub>",
+    "^" -> "sup>")
 
   private trait MacroFinder {
     def getMacroBody(name: String): Option[String]

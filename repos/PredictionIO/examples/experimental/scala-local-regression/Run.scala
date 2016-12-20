@@ -33,11 +33,12 @@ case class TrainingData(x: Vector[Vector[Double]], y: Vector[Double])
 }
 
 case class LocalDataSource(val dsp: DataSourceParams)
-    extends LDataSource[DataSourceParams,
-                        String,
-                        TrainingData,
-                        Vector[Double],
-                        Double] {
+    extends LDataSource[
+      DataSourceParams,
+      String,
+      TrainingData,
+      Vector[Double],
+      Double] {
   override def read(
       ): Seq[(String, TrainingData, Seq[(Vector[Double], Double)])] = {
     val lines =
@@ -77,11 +78,12 @@ case class LocalPreparator(val pp: PreparatorParams = PreparatorParams())
 }
 
 case class LocalAlgorithm()
-    extends LAlgorithm[EmptyParams,
-                       TrainingData,
-                       Array[Double],
-                       Vector[Double],
-                       Double] {
+    extends LAlgorithm[
+      EmptyParams,
+      TrainingData,
+      Array[Double],
+      Vector[Double],
+      Double] {
 
   def train(td: TrainingData): Array[Double] = {
     val xArray: Array[Double] = td.x.foldLeft(Vector[Double]())(_ ++ _).toArray
@@ -116,17 +118,19 @@ class VectorSerializer
 
 object RegressionEngineFactory extends IEngineFactory {
   def apply() = {
-    new Engine(classOf[LocalDataSource],
-               classOf[LocalPreparator],
-               Map("" -> classOf[LocalAlgorithm]),
-               classOf[LFirstServing[Vector[Double], Double]])
+    new Engine(
+      classOf[LocalDataSource],
+      classOf[LocalPreparator],
+      Map("" -> classOf[LocalAlgorithm]),
+      classOf[LFirstServing[Vector[Double], Double]])
   }
 }
 
 object Run {
-  val workflowParams = WorkflowParams(batch = "Imagine: Local Regression",
-                                      verbose = 3,
-                                      saveModel = true)
+  val workflowParams = WorkflowParams(
+    batch = "Imagine: Local Regression",
+    verbose = 3,
+    saveModel = true)
 
   def runComponents() {
     val filepath = new File("../data/lr_data.txt").getCanonicalPath
@@ -153,10 +157,11 @@ object Run {
       preparatorParams = PreparatorParams(n = 2, k = 0),
       algorithmParamsList = Seq(("", EmptyParams())))
 
-    Workflow.runEngine(params = workflowParams,
-                       engine = engine,
-                       engineParams = engineParams,
-                       evaluatorClassOpt = Some(classOf[MeanSquareError]))
+    Workflow.runEngine(
+      params = workflowParams,
+      engine = engine,
+      engineParams = engineParams,
+      evaluatorClassOpt = Some(classOf[MeanSquareError]))
   }
 
   def main(args: Array[String]) {

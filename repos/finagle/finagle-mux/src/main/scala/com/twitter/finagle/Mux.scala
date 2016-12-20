@@ -65,8 +65,9 @@ object Mux
   object Client {
     val stack: Stack[ServiceFactory[mux.Request, mux.Response]] =
       StackClient.newStack
-        .replace(StackClient.Role.pool,
-                 SingletonPool.module[mux.Request, mux.Response])
+        .replace(
+          StackClient.Role.pool,
+          SingletonPool.module[mux.Request, mux.Response])
         .replace(StackClient.Role.protoTracing, new ClientProtoTracing)
         .replace(BindingFactory.role, MuxBindingFactory)
         .prepend(PayloadSizeFilter.module(_.body.length, _.body.length))
@@ -104,10 +105,11 @@ object Mux
         headers = Nil,
         negotiate = mux.Handshake.NoopNegotiator)
 
-      val session = new mux.ClientSession(negotiatedTrans,
-                                          detectorConfig,
-                                          name,
-                                          sr.scope("mux"))
+      val session = new mux.ClientSession(
+        negotiatedTrans,
+        detectorConfig,
+        name,
+        sr.scope("mux"))
 
       mux.ClientDispatcher.newRequestResponse(session)
     }
@@ -169,11 +171,12 @@ object Mux
         headers = _ => Nil,
         negotiate = mux.Handshake.NoopNegotiator)
 
-      mux.ServerDispatcher.newRequestResponse(negotiatedTrans,
-                                              service,
-                                              lessor,
-                                              tracer,
-                                              statsReceiver)
+      mux.ServerDispatcher.newRequestResponse(
+        negotiatedTrans,
+        service,
+        lessor,
+        tracer,
+        statsReceiver)
     }
   }
 

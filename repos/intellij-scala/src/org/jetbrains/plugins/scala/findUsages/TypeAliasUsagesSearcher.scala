@@ -52,11 +52,12 @@ class TypeAliasUsagesSearcher
       inReadAction(parameters.getEffectiveSearchScope) // TODO PsiUtil.restrictScopeToGroovyFiles(parameters.getEffectiveSearchScope)
     val collector: SearchRequestCollector = parameters.getOptimizer
     val session: SearchSession = collector.getSearchSession
-    collector.searchWord(name,
-                         scope,
-                         UsageSearchContext.IN_CODE,
-                         true,
-                         new MyProcessor(target, null, session))
+    collector.searchWord(
+      name,
+      scope,
+      UsageSearchContext.IN_CODE,
+      true,
+      new MyProcessor(target, null, session))
   }
 
   private class MyProcessor(myTarget: PsiElement,

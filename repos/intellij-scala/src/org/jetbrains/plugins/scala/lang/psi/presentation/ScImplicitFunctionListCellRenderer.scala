@@ -49,11 +49,12 @@ class ScImplicitFunctionListCellRenderer(actual: PsiNamedElement)
     val item = tuple.getNewExpression
     val firstPart = tuple.getFirstPart
     val secondPart = tuple.getSecondPart
-    val comp = getSuperListCellRendererComponent(containter.getList,
-                                                 item,
-                                                 index,
-                                                 isSelected,
-                                                 cellHasFocus)
+    val comp = getSuperListCellRendererComponent(
+      containter.getList,
+      item,
+      index,
+      isSelected,
+      cellHasFocus)
     comp match {
       case container: Container =>
         val colored =
@@ -61,8 +62,9 @@ class ScImplicitFunctionListCellRenderer(actual: PsiNamedElement)
         if (item == actual) {
           colored.clear()
           colored.setIcon(actual.getIcon(0))
-          colored.append(getElementText(actual),
-                         SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES)
+          colored.append(
+            getElementText(actual),
+            SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES)
         }
 
         if (firstPart.contains(item)) {

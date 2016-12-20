@@ -61,15 +61,17 @@ private[streaming] class ReceiverSupervisorImpl(
             "Please use streamingContext.checkpoint() to set the checkpoint directory. " +
             "See documentation for more details.")
       }
-      new WriteAheadLogBasedBlockHandler(env.blockManager,
-                                         receiver.streamId,
-                                         receiver.storageLevel,
-                                         env.conf,
-                                         hadoopConf,
-                                         checkpointDirOption.get)
+      new WriteAheadLogBasedBlockHandler(
+        env.blockManager,
+        receiver.streamId,
+        receiver.storageLevel,
+        env.conf,
+        hadoopConf,
+        checkpointDirOption.get)
     } else {
-      new BlockManagerBasedBlockHandler(env.blockManager,
-                                        receiver.storageLevel)
+      new BlockManagerBasedBlockHandler(
+        env.blockManager,
+        receiver.storageLevel)
     }
   }
 
@@ -136,9 +138,10 @@ private[streaming] class ReceiverSupervisorImpl(
       metadataOption: Option[Any],
       blockIdOption: Option[StreamBlockId]
   ) {
-    pushAndReportBlock(ArrayBufferBlock(arrayBuffer),
-                       metadataOption,
-                       blockIdOption)
+    pushAndReportBlock(
+      ArrayBufferBlock(arrayBuffer),
+      metadataOption,
+      blockIdOption)
   }
 
   /** Store a iterator of received data as a data block into Spark's memory. */
@@ -196,11 +199,12 @@ private[streaming] class ReceiverSupervisorImpl(
   }
 
   override protected def onReceiverStart(): Boolean = {
-    val msg = RegisterReceiver(streamId,
-                               receiver.getClass.getSimpleName,
-                               host,
-                               executorId,
-                               endpoint)
+    val msg = RegisterReceiver(
+      streamId,
+      receiver.getClass.getSimpleName,
+      host,
+      executorId,
+      endpoint)
     trackerEndpoint.askWithRetry[Boolean](msg)
   }
 

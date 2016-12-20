@@ -102,35 +102,37 @@ class AvatarImageProviderSpec extends FunSpec with MockitoSugar {
   }
 
   private def createAccount(image: Option[String]) =
-    Account(userName = "user",
-            fullName = "user@localhost",
-            mailAddress = "",
-            password = "",
-            isAdmin = false,
-            url = None,
-            registeredDate = new Date(),
-            updatedDate = new Date(),
-            lastLoginDate = None,
-            image = image,
-            isGroupAccount = false,
-            isRemoved = false)
+    Account(
+      userName = "user",
+      fullName = "user@localhost",
+      mailAddress = "",
+      password = "",
+      isAdmin = false,
+      url = None,
+      registeredDate = new Date(),
+      updatedDate = new Date(),
+      lastLoginDate = None,
+      image = image,
+      isGroupAccount = false,
+      isRemoved = false)
 
   private def createSystemSettings(useGravatar: Boolean) =
-    SystemSettings(baseUrl = None,
-                   information = None,
-                   allowAccountRegistration = false,
-                   allowAnonymousAccess = true,
-                   isCreateRepoOptionPublic = true,
-                   gravatar = useGravatar,
-                   notification = false,
-                   activityLogLimit = None,
-                   ssh = false,
-                   sshHost = None,
-                   sshPort = None,
-                   useSMTP = false,
-                   smtp = None,
-                   ldapAuthentication = false,
-                   ldap = None)
+    SystemSettings(
+      baseUrl = None,
+      information = None,
+      allowAccountRegistration = false,
+      allowAnonymousAccess = true,
+      isCreateRepoOptionPublic = true,
+      gravatar = useGravatar,
+      notification = false,
+      activityLogLimit = None,
+      ssh = false,
+      sshHost = None,
+      sshPort = None,
+      useSMTP = false,
+      smtp = None,
+      ldapAuthentication = false,
+      ldap = None)
 
   /**
     * Adapter to test AvatarImageProviderImpl.

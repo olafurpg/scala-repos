@@ -106,12 +106,13 @@ class CachingAPIKeyManager[M[+ _]](manager: APIKeyManager[M],
                   parentIds: Set[GrantId],
                   perms: Set[Permission],
                   expiration: Option[DateTime]) =
-    manager.createGrant(name,
-                        description,
-                        issuerKey,
-                        parentIds,
-                        perms,
-                        expiration) map {
+    manager.createGrant(
+      name,
+      description,
+      issuerKey,
+      parentIds,
+      perms,
+      expiration) map {
       _ tap add unsafePerformIO
     }
 

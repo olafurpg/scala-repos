@@ -102,13 +102,15 @@ private[ml] class WeightedLeastSquares(val fitIntercept: Boolean,
         val coefficients = new DenseVector(Array.ofDim(k - 1))
         val intercept = bBar
         val diagInvAtWA = new DenseVector(Array(0D))
-        return new WeightedLeastSquaresModel(coefficients,
-                                             intercept,
-                                             diagInvAtWA)
+        return new WeightedLeastSquaresModel(
+          coefficients,
+          intercept,
+          diagInvAtWA)
       } else {
-        require(!(regParam > 0.0 && standardizeLabel),
-                "The standard deviation of the label is zero. " +
-                  "Model cannot be regularized with standardization=true")
+        require(
+          !(regParam > 0.0 && standardizeLabel),
+          "The standard deviation of the label is zero. " +
+            "Model cannot be regularized with standardization=true")
         logWarning(
           s"The standard deviation of the label is zero. " +
             "Consider setting fitIntercept=true.")
@@ -219,8 +221,9 @@ private[ml] object WeightedLeastSquares {
       if (!initialized) {
         init(ak)
       }
-      assert(ak == k,
-             s"Dimension mismatch. Expect vectors of size $k but got $ak.")
+      assert(
+        ak == k,
+        s"Dimension mismatch. Expect vectors of size $k but got $ak.")
       count += 1L
       wSum += w
       wwSum += w * w
@@ -242,8 +245,9 @@ private[ml] object WeightedLeastSquares {
         if (!initialized) {
           init(other.k)
         }
-        assert(k == other.k,
-               s"dimension mismatch: this.k = $k but other.k = ${other.k}")
+        assert(
+          k == other.k,
+          s"dimension mismatch: this.k = $k but other.k = ${other.k}")
         count += other.count
         wSum += other.wSum
         wwSum += other.wwSum

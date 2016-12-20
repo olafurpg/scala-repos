@@ -33,12 +33,13 @@ final class Env(config: Config,
 
   lazy val logApi = new ModlogApi
 
-  lazy val api = new ModApi(logApi = logApi,
-                            userSpy = userSpy,
-                            firewall = firewall,
-                            reporter = hub.actor.report,
-                            lightUserApi = lightUserApi,
-                            lilaBus = system.lilaBus)
+  lazy val api = new ModApi(
+    logApi = logApi,
+    userSpy = userSpy,
+    firewall = firewall,
+    reporter = hub.actor.report,
+    lightUserApi = lightUserApi,
+    lilaBus = system.lilaBus)
 
   private lazy val boosting = new BoostingApi(
     modApi = api,
@@ -54,9 +55,10 @@ final class Env(config: Config,
     fishnet = hub.actor.fishnet,
     userIdsSharingIp = securityApi.userIdsSharingIp)
 
-  lazy val gamify = new Gamify(logColl = logColl,
-                               reportColl = reportColl,
-                               historyColl = db(CollectionGamingHistory))
+  lazy val gamify = new Gamify(
+    logColl = logColl,
+    reportColl = reportColl,
+    historyColl = db(CollectionGamingHistory))
 
   lazy val search =
     new UserSearch(securityApi = securityApi, emailAddress = emailAddress)
@@ -84,14 +86,15 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "mod" boot new Env(config = lila.common.PlayApp loadConfig "mod",
-                       db = lila.db.Env.current,
-                       hub = lila.hub.Env.current,
-                       system = lila.common.PlayApp.system,
-                       firewall = lila.security.Env.current.firewall,
-                       reportColl = lila.report.Env.current.reportColl,
-                       userSpy = lila.security.Env.current.userSpy,
-                       lightUserApi = lila.user.Env.current.lightUserApi,
-                       securityApi = lila.security.Env.current.api,
-                       emailAddress = lila.security.Env.current.emailAddress)
+    "mod" boot new Env(
+      config = lila.common.PlayApp loadConfig "mod",
+      db = lila.db.Env.current,
+      hub = lila.hub.Env.current,
+      system = lila.common.PlayApp.system,
+      firewall = lila.security.Env.current.firewall,
+      reportColl = lila.report.Env.current.reportColl,
+      userSpy = lila.security.Env.current.userSpy,
+      lightUserApi = lila.user.Env.current.lightUserApi,
+      securityApi = lila.security.Env.current.api,
+      emailAddress = lila.security.Env.current.emailAddress)
 }

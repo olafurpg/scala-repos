@@ -82,10 +82,11 @@ private[spark] class TaskResultGetter(sparkEnv: SparkEnv,
                   /* We won't be able to get the task result if the machine that ran the task failed
                    * between when the task ended and when we tried to fetch the result, or if the
                    * block manager had to flush the result. */
-                  scheduler.handleFailedTask(taskSetManager,
-                                             tid,
-                                             TaskState.FINISHED,
-                                             TaskResultLost)
+                  scheduler.handleFailedTask(
+                    taskSetManager,
+                    tid,
+                    TaskState.FINISHED,
+                    TaskResultLost)
                   return
                 }
                 val deserializedResult = serializer

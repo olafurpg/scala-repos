@@ -61,14 +61,16 @@ class TrainValidationSplitSuite
 
   test("train validation with linear regression") {
     val dataset = sqlContext.createDataFrame(
-      sc.parallelize(LinearDataGenerator.generateLinearInput(6.3,
-                                                             Array(4.7, 7.2),
-                                                             Array(0.9, -1.3),
-                                                             Array(0.7, 1.2),
-                                                             100,
-                                                             42,
-                                                             0.1),
-                     2))
+      sc.parallelize(
+        LinearDataGenerator.generateLinearInput(
+          6.3,
+          Array(4.7, 7.2),
+          Array(0.9, -1.3),
+          Array(0.7, 1.2),
+          100,
+          42,
+          0.1),
+        2))
 
     val trainer = new LinearRegression().setSolver("l-bfgs")
     val lrParamMaps = new ParamGridBuilder()

@@ -91,11 +91,12 @@ object PersistenceDocSpec {
       //#backoff
       val childProps = Props[MyPersistentActor]
       val props = BackoffSupervisor.props(
-        Backoff.onStop(childProps,
-                       childName = "myActor",
-                       minBackoff = 3.seconds,
-                       maxBackoff = 30.seconds,
-                       randomFactor = 0.2))
+        Backoff.onStop(
+          childProps,
+          childName = "myActor",
+          minBackoff = 3.seconds,
+          maxBackoff = 30.seconds,
+          randomFactor = 0.2))
       context.actorOf(props, name = "mySupervisor")
       //#backoff
     }
@@ -173,9 +174,9 @@ object PersistenceDocSpec {
       //#snapshot-criteria
       override def recovery =
         Recovery(
-          fromSnapshot = SnapshotSelectionCriteria(maxSequenceNr = 457L,
-                                                   maxTimestamp =
-                                                     System.currentTimeMillis))
+          fromSnapshot = SnapshotSelectionCriteria(
+            maxSequenceNr = 457L,
+            maxTimestamp = System.currentTimeMillis))
       //#snapshot-criteria
 
       //#snapshot-offer

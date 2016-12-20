@@ -82,8 +82,9 @@ private[spark] object SchemaUtils {
     * @return new schema with the input column appended
     */
   def appendColumn(schema: StructType, col: StructField): StructType = {
-    require(!schema.fieldNames.contains(col.name),
-            s"Column ${col.name} already exists.")
+    require(
+      !schema.fieldNames.contains(col.name),
+      s"Column ${col.name} already exists.")
     StructType(schema.fields :+ col)
   }
 }

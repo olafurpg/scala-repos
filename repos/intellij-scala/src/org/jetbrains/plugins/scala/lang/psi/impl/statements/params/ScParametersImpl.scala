@@ -33,8 +33,9 @@ class ScParametersImpl private (stub: StubElement[ScParameters],
   override def toString: String = "Parameters"
 
   def clauses: Seq[ScParameterClause] = {
-    getStubOrPsiChildren(ScalaElementTypes.PARAM_CLAUSE,
-                         JavaArrayFactoryUtil.ScParameterClauseFactory).toSeq
+    getStubOrPsiChildren(
+      ScalaElementTypes.PARAM_CLAUSE,
+      JavaArrayFactoryUtil.ScParameterClauseFactory).toSeq
   }
 
   override def processDeclarations(processor: PsiScopeProcessor,

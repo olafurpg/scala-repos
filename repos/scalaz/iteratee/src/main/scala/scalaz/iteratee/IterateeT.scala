@@ -274,9 +274,10 @@ trait IterateeTFunctions {
     : IterateeT[E, F, A[E]] = {
     import scalaz.syntax.plus._
     def step(e: Input[E]): IterateeT[E, F, A[E]] =
-      e.fold(empty = cont(step),
-             el = e => cont(step).map(a => Applicative[A].point(e) <+> a),
-             eof = done(PlusEmpty[A].empty, eofInput[E]))
+      e.fold(
+        empty = cont(step),
+        el = e => cont(step).map(a => Applicative[A].point(e) <+> a),
+        eof = done(PlusEmpty[A].empty, eofInput[E]))
 
     cont(step)
   }
@@ -287,9 +288,10 @@ trait IterateeTFunctions {
       pointed: Applicative[A]): IterateeT[E, F, A[E]] = {
     import scalaz.syntax.semigroup._
     def step(e: Input[E]): IterateeT[E, F, A[E]] =
-      e.fold(empty = cont(step),
-             el = e => cont(step).map(a => Applicative[A].point(e) |+| a),
-             eof = done(Monoid[A[E]].zero, eofInput[E]))
+      e.fold(
+        empty = cont(step),
+        el = e => cont(step).map(a => Applicative[A].point(e) |+| a),
+        eof = done(Monoid[A[E]].zero, eofInput[E]))
 
     cont(step)
   }
@@ -297,7 +299,8 @@ trait IterateeTFunctions {
   /**An iteratee that consumes the head of the input **/
   def head[E, F[_]: Applicative]: IterateeT[E, F, Option[E]] = {
     def step(s: Input[E]): IterateeT[E, F, Option[E]] =
-      s(empty = cont(step),
+      s(
+        empty = cont(step),
         el = e => done(Some(e), emptyInput[E]),
         eof = done(None, eofInput[E]))
     cont(step)
@@ -315,7 +318,8 @@ trait IterateeTFunctions {
   /**An iteratee that returns the first element of the input **/
   def peek[E, F[_]: Applicative]: IterateeT[E, F, Option[E]] = {
     def step(s: Input[E]): IterateeT[E, F, Option[E]] =
-      s(el = e => done(Some(e), s),
+      s(
+        el = e => done(Some(e), s),
         empty = cont(step),
         eof = done(None, eofInput[E]))
     cont(step)
@@ -343,7 +347,8 @@ trait IterateeTFunctions {
     */
   def dropWhile[E, F[_]: Applicative](p: E => Boolean): IterateeT[E, F, Unit] = {
     def step(s: Input[E]): IterateeT[E, F, Unit] =
-      s(el = e => if (p(e)) dropWhile(p) else done((), s),
+      s(
+        el = e => if (p(e)) dropWhile(p) else done((), s),
         empty = cont(step),
         eof = done((), eofInput[E]))
     cont(step)
@@ -359,7 +364,8 @@ trait IterateeTFunctions {
       f: (A, E) => A): IterateeT[E, F, A] = {
     def step(acc: A): Input[E] => IterateeT[E, F, A] =
       s =>
-        s(el = e => cont(step(f(acc, e))),
+        s(
+          el = e => cont(step(f(acc, e))),
           empty = cont(step(acc)),
           eof = done(acc, eofInput[E]))
     cont(step(init))
@@ -369,7 +375,8 @@ trait IterateeTFunctions {
       implicit m: Monad[F]): IterateeT[E, F, A] = {
     def step(acc: A): Input[E] => IterateeT[E, F, A] =
       s =>
-        s(el = e =>
+        s(
+          el = e =>
             IterateeT.IterateeTMonadTrans[E].liftM(f(acc, e)) flatMap
               (a => cont(step(a))),
           empty = cont(step(acc)),

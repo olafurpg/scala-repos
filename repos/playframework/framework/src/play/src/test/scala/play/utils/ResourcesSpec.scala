@@ -130,29 +130,32 @@ object ResourcesSpec extends Specification {
     }
 
     "return true for a directory resource URL that contains spaces in the zip path with the 'zip' protocol" in {
-      val url = new URL("zip",
-                        "",
-                        0,
-                        createZipUrl(spacesJar, dirRes),
-                        EmptyURLStreamHandler)
+      val url = new URL(
+        "zip",
+        "",
+        0,
+        createZipUrl(spacesJar, dirRes),
+        EmptyURLStreamHandler)
       isDirectory(classloader, url) must beTrue
     }
 
     "return true for a directory resource URL that contains spaces in the file path with the 'zip' protocol" in {
-      val url = new URL("zip",
-                        "",
-                        0,
-                        createZipUrl(jar, dirSpacesRes),
-                        EmptyURLStreamHandler)
+      val url = new URL(
+        "zip",
+        "",
+        0,
+        createZipUrl(jar, dirSpacesRes),
+        EmptyURLStreamHandler)
       isDirectory(classloader, url) must beTrue
     }
 
     "return false for a file resource URL with the 'zip' protocol" in {
-      val url = new URL("zip",
-                        "",
-                        0,
-                        createZipUrl(jar, fileRes),
-                        EmptyURLStreamHandler)
+      val url = new URL(
+        "zip",
+        "",
+        0,
+        createZipUrl(jar, fileRes),
+        EmptyURLStreamHandler)
       isDirectory(classloader, url) must beFalse
     }
 

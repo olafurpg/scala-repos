@@ -207,23 +207,26 @@ sealed abstract class VersionVector
             // both nodes exist compare the timestamps
             // same timestamp so just continue with the next nodes
             if (nt1._2 == nt2._2)
-              compareNext(nextOrElse(i1, cmpEndMarker),
-                          nextOrElse(i2, cmpEndMarker),
-                          currentOrder)
+              compareNext(
+                nextOrElse(i1, cmpEndMarker),
+                nextOrElse(i2, cmpEndMarker),
+                currentOrder)
             else if (nt1._2 < nt2._2) {
               // t1 is less than t2, so i1 can only be Before
               if (currentOrder eq After) Concurrent
               else
-                compareNext(nextOrElse(i1, cmpEndMarker),
-                            nextOrElse(i2, cmpEndMarker),
-                            Before)
+                compareNext(
+                  nextOrElse(i1, cmpEndMarker),
+                  nextOrElse(i2, cmpEndMarker),
+                  Before)
             } else {
               // t2 is less than t1, so i1 can only be After
               if (currentOrder eq Before) Concurrent
               else
-                compareNext(nextOrElse(i1, cmpEndMarker),
-                            nextOrElse(i2, cmpEndMarker),
-                            After)
+                compareNext(
+                  nextOrElse(i1, cmpEndMarker),
+                  nextOrElse(i2, cmpEndMarker),
+                  After)
             }
           } else if (nc < 0) {
             // this node only exists in i1 so i1 can only be After
@@ -236,16 +239,18 @@ sealed abstract class VersionVector
           }
         }
 
-      compareNext(nextOrElse(i1, cmpEndMarker),
-                  nextOrElse(i2, cmpEndMarker),
-                  Same)
+      compareNext(
+        nextOrElse(i1, cmpEndMarker),
+        nextOrElse(i2, cmpEndMarker),
+        Same)
     }
 
     if (this eq that) Same
     else
-      compare(this.versionsIterator,
-              that.versionsIterator,
-              if (order eq Concurrent) FullOrder else order)
+      compare(
+        this.versionsIterator,
+        that.versionsIterator,
+        if (order eq Concurrent) FullOrder else order)
   }
 
   /**

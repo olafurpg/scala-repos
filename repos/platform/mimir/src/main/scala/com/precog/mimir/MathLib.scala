@@ -37,44 +37,46 @@ trait MathLibModule[M[+ _]]
     val MathNamespace = Vector("std", "math")
 
     override def _lib1 =
-      super._lib1 ++ Set(sinh,
-                         toDegrees,
-                         expm1,
-                         getExponent,
-                         asin,
-                         log10,
-                         cos,
-                         exp,
-                         cbrt,
-                         atan,
-                         ceil,
-                         rint,
-                         log1p,
-                         sqrt,
-                         floor,
-                         toRadians,
-                         tanh,
-                         round,
-                         cosh,
-                         tan,
-                         abs,
-                         sin,
-                         log,
-                         signum,
-                         acos,
-                         ulp)
+      super._lib1 ++ Set(
+        sinh,
+        toDegrees,
+        expm1,
+        getExponent,
+        asin,
+        log10,
+        cos,
+        exp,
+        cbrt,
+        atan,
+        ceil,
+        rint,
+        log1p,
+        sqrt,
+        floor,
+        toRadians,
+        tanh,
+        round,
+        cosh,
+        tan,
+        abs,
+        sin,
+        log,
+        signum,
+        acos,
+        ulp)
 
     override def _lib2 =
-      super._lib2 ++ Set(minOf,
-                         min,
-                         hypot,
-                         pow,
-                         maxOf,
-                         max,
-                         atan2,
-                         copySign,
-                         roundTo,
-                         IEEEremainder)
+      super._lib2 ++ Set(
+        minOf,
+        min,
+        hypot,
+        pow,
+        maxOf,
+        max,
+        atan2,
+        copySign,
+        roundTo,
+        IEEEremainder)
 
     import StdLib.{DoubleFrom, doubleIsDefined}
     import java.lang.Math
@@ -103,9 +105,10 @@ trait MathLibModule[M[+ _]]
     object expm1 extends Op1DD("expm1", doubleIsDefined, Math.expm1)
 
     object getExponent
-        extends Op1DD("getExponent",
-                      n => doubleIsDefined(n) && n > 0.0,
-                      n => Math.getExponent(n).toDouble)
+        extends Op1DD(
+          "getExponent",
+          n => doubleIsDefined(n) && n > 0.0,
+          n => Math.getExponent(n).toDouble)
 
     object asin extends Op1DD("asin", n => -1.0 <= n && n <= 1.0, Math.asin)
 
@@ -160,9 +163,10 @@ trait MathLibModule[M[+ _]]
     object signum extends Op1DD("signum", doubleIsDefined, Math.signum)
 
     object acos
-        extends Op1DD("acos",
-                      n => doubleIsDefined(n) && -1.0 <= n && n <= 1.0,
-                      Math.acos)
+        extends Op1DD(
+          "acos",
+          n => doubleIsDefined(n) && -1.0 <= n && n <= 1.0,
+          Math.acos)
 
     object ulp extends Op1DD("ulp", doubleIsDefined, Math.ulp)
 

@@ -34,18 +34,20 @@ object GraphXApp {
     SparkContext.jarOfClass(this.getClass).foreach(sc.addJar)
 
     val users: RDD[(VertexId, (String, String))] = sc.parallelize(
-      Array((3L, ("rxin", "student")),
-            (7L, ("jgonzal", "postdoc")),
-            (5L, ("franklin", "prof")),
-            (2L, ("istoica", "prof")),
-            (4L, ("peter", "student"))))
+      Array(
+        (3L, ("rxin", "student")),
+        (7L, ("jgonzal", "postdoc")),
+        (5L, ("franklin", "prof")),
+        (2L, ("istoica", "prof")),
+        (4L, ("peter", "student"))))
     val relationships: RDD[Edge[String]] = sc.parallelize(
-      Array(Edge(3L, 7L, "collab"),
-            Edge(5L, 3L, "advisor"),
-            Edge(2L, 5L, "colleague"),
-            Edge(5L, 7L, "pi"),
-            Edge(4L, 0L, "student"),
-            Edge(5L, 0L, "colleague")))
+      Array(
+        Edge(3L, 7L, "collab"),
+        Edge(5L, 3L, "advisor"),
+        Edge(2L, 5L, "colleague"),
+        Edge(5L, 7L, "pi"),
+        Edge(4L, 0L, "student"),
+        Edge(5L, 0L, "colleague")))
     val defaultUser = ("John Doe", "Missing")
     val graph = Graph(users, relationships, defaultUser)
     // Notice that there is a user 0 (for which we have no information) connected to users

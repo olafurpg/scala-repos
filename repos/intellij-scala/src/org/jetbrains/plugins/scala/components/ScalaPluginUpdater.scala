@@ -73,9 +73,10 @@ object ScalaPluginUpdater {
   def currentRepo = knownVersions(currentVersion)
 
   val updGroupId = "ScalaPluginUpdate"
-  val GROUP = new NotificationGroup(updGroupId,
-                                    NotificationDisplayType.STICKY_BALLOON,
-                                    true)
+  val GROUP = new NotificationGroup(
+    updGroupId,
+    NotificationDisplayType.STICKY_BALLOON,
+    true)
 
   // save plugin version before patching to restore it when switching back
   var savedPluginVersion = ""
@@ -301,8 +302,9 @@ object ScalaPluginUpdater {
           val buildNumber = ApplicationInfo.getInstance().getBuild.asString()
           val pluginVersion = pluginDescriptor.getVersion
           val os =
-            URLEncoder.encode(SystemInfo.OS_NAME + " " + SystemInfo.OS_VERSION,
-                              CharsetToolkit.UTF8)
+            URLEncoder.encode(
+              SystemInfo.OS_NAME + " " + SystemInfo.OS_VERSION,
+              CharsetToolkit.UTF8)
           val uid =
             UpdateChecker.getInstallationUID(PropertiesComponent.getInstance())
           val url =

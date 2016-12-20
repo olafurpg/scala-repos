@@ -255,8 +255,9 @@ final class Eval(optionsNoncp: Seq[String],
       getValue[Any](moduleName, new AbstractFileClassLoader(dir, parent))
   def loadPlain(dir: File, moduleName: String): ClassLoader => Any =
     parent =>
-      getValue[Any](moduleName,
-                    new URLClassLoader(Array(dir.toURI.toURL), parent))
+      getValue[Any](
+        moduleName,
+        new URLClassLoader(Array(dir.toURI.toURL), parent))
 
   //wrap tree in object objectName { def WrapValName = <tree> }
   def augment(parser: global.syntaxAnalyzer.UnitParser,
@@ -279,17 +280,19 @@ final class Eval(optionsNoncp: Seq[String],
       Nil,
       List(Nil),
       TypeTree(),
-      Block(List(
-              Apply(Select(Super(This(emptyTypeName), emptyTypeName),
-                           nme.CONSTRUCTOR),
-                    Nil)),
-            Literal(Constant(())))
+      Block(
+        List(
+          Apply(
+            Select(Super(This(emptyTypeName), emptyTypeName), nme.CONSTRUCTOR),
+            Nil)),
+        Literal(Constant(())))
     )
 
     def moduleBody =
-      Template(List(gen.scalaAnyRefConstr),
-               emptyValDef,
-               emptyInit :: definitions)
+      Template(
+        List(gen.scalaAnyRefConstr),
+        emptyValDef,
+        emptyInit :: definitions)
     def moduleDef = ModuleDef(NoMods, newTermName(objectName), moduleBody)
     parser.makePackaging(0, emptyPkg, (imports :+ moduleDef).toList)
   }

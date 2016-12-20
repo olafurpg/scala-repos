@@ -45,17 +45,19 @@ class SimplifyJumpsTest {
         rest: _*
     )
     assertTrue(LocalOptImpls.simplifyJumps(method))
-    assertSameCode(instructionsFromMethod(method),
-                   Op(ACONST_NULL) :: Op(ATHROW) :: rest)
+    assertSameCode(
+      instructionsFromMethod(method),
+      Op(ACONST_NULL) :: Op(ATHROW) :: rest)
   }
 
   @Test
   def gotoThrowInTry(): Unit = {
     val handler = List(
-      ExceptionHandler(Label(1),
-                       Label(2),
-                       Label(4),
-                       Some("java/lang/Throwable")))
+      ExceptionHandler(
+        Label(1),
+        Label(2),
+        Label(4),
+        Some("java/lang/Throwable")))
     val initialInstrs = List(
       Label(1),
       Op(ACONST_NULL),
@@ -75,8 +77,9 @@ class SimplifyJumpsTest {
 
     val optMethod = genMethod()(initialInstrs: _*) // no handler
     assertTrue(LocalOptImpls.simplifyJumps(optMethod))
-    assertSameCode(instructionsFromMethod(optMethod).take(3),
-                   List(Label(1), Op(ACONST_NULL), Op(ATHROW)))
+    assertSameCode(
+      instructionsFromMethod(optMethod).take(3),
+      List(Label(1), Op(ACONST_NULL), Op(ATHROW)))
   }
 
   @Test
@@ -97,8 +100,9 @@ class SimplifyJumpsTest {
     )
     val method = genMethod()(begin ::: rest: _*)
     assertTrue(LocalOptImpls.simplifyJumps(method))
-    assertSameCode(instructionsFromMethod(method),
-                   List(VarOp(ILOAD, 1), Jump(IFLT, Label(3))) ::: rest.tail)
+    assertSameCode(
+      instructionsFromMethod(method),
+      List(VarOp(ILOAD, 1), Jump(IFLT, Label(3))) ::: rest.tail)
 
     // branch over goto is OK even if there's a label in between, if that label is not a jump target
     val withNonJumpTargetLabel = genMethod()(begin ::: Label(22) :: rest: _*)
@@ -115,12 +119,14 @@ class SimplifyJumpsTest {
       genMethod()(List(VarOp(ILOAD, 1), Jump(IFLE, Label(22))) ::: begin ::: Label(
         22) :: rest: _*)
     assertTrue(LocalOptImpls.simplifyJumps(twoRounds))
-    assertSameCode(instructionsFromMethod(twoRounds),
-                   List(VarOp(ILOAD, 1),
-                        Jump(IFLE, Label(3)),
-                        VarOp(ILOAD, 1),
-                        Jump(IFLT, Label(3)),
-                        Label(22)) ::: rest.tail)
+    assertSameCode(
+      instructionsFromMethod(twoRounds),
+      List(
+        VarOp(ILOAD, 1),
+        Jump(IFLE, Label(3)),
+        VarOp(ILOAD, 1),
+        Jump(IFLT, Label(3)),
+        Label(22)) ::: rest.tail)
   }
 
   @Test

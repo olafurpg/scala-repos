@@ -1293,14 +1293,18 @@ class BufAsByteBufTest extends FunSuite with BeforeAndAfter {
     assertEquals(0, buffer.slice(1, buffer.capacity - 1).readerIndex)
     assertEquals(0, buffer.slice(1, buffer.capacity - 2).readerIndex)
 
-    assertEquals(buffer.capacity,
-                 buffer.slice(0, buffer.capacity).writerIndex())
-    assertEquals(buffer.capacity - 1,
-                 buffer.slice(0, buffer.capacity - 1).writerIndex())
-    assertEquals(buffer.capacity - 1,
-                 buffer.slice(1, buffer.capacity - 1).writerIndex())
-    assertEquals(buffer.capacity - 2,
-                 buffer.slice(1, buffer.capacity - 2).writerIndex())
+    assertEquals(
+      buffer.capacity,
+      buffer.slice(0, buffer.capacity).writerIndex())
+    assertEquals(
+      buffer.capacity - 1,
+      buffer.slice(0, buffer.capacity - 1).writerIndex())
+    assertEquals(
+      buffer.capacity - 1,
+      buffer.slice(1, buffer.capacity - 1).writerIndex())
+    assertEquals(
+      buffer.capacity - 2,
+      buffer.slice(1, buffer.capacity - 2).writerIndex())
   }
 
   test("equals") {
@@ -1379,8 +1383,9 @@ class BufAsByteBufTest extends FunSuite with BeforeAndAfter {
     random.nextBytes(value)
     val wrappedBuf = BufAsByteBuf.Owned(Buf.ByteArray.Owned(value))
     0.until(Capacity - BlockSize + 1, BlockSize).foreach { i =>
-      assertEquals(ByteBuffer.wrap(value, i, BlockSize),
-                   wrappedBuf.nioBuffer(i, BlockSize))
+      assertEquals(
+        ByteBuffer.wrap(value, i, BlockSize),
+        wrappedBuf.nioBuffer(i, BlockSize))
     }
   }
 

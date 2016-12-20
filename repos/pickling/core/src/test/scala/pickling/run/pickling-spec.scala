@@ -16,8 +16,9 @@ object PicklingSpec {
   final class D(i: Int) extends Base { override def toString = "D" }
 
   implicit val arbitraryBase: Arbitrary[Base] = Arbitrary[Base](
-    oneOf(arbitrary[String].map(s => new C(s)),
-          arbitrary[Int].map(i => new D(i))))
+    oneOf(
+      arbitrary[String].map(s => new C(s)),
+      arbitrary[Int].map(i => new D(i))))
 
   sealed abstract class CaseBase
   case class CaseC(s: String) extends CaseBase
@@ -42,8 +43,9 @@ object PicklingSpec {
       val gc = new GregorianCalendar()
       gc.set(Calendar.YEAR, randBetween(1900, 3000))
       gc.set(Calendar.MONTH, randBetween(1, 12))
-      gc.set(Calendar.DAY_OF_YEAR,
-             randBetween(1, gc.getActualMaximum(Calendar.DAY_OF_YEAR)))
+      gc.set(
+        Calendar.DAY_OF_YEAR,
+        randBetween(1, gc.getActualMaximum(Calendar.DAY_OF_YEAR)))
       gc.set(Calendar.HOUR_OF_DAY, randBetween(0, 24))
       gc.set(Calendar.MINUTE, randBetween(0, 59))
       gc.set(Calendar.SECOND, randBetween(0, 99))

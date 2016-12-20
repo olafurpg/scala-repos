@@ -49,25 +49,26 @@ object WebHook {
   case object TeamAdd extends Event("team_add")
   case object Watch extends Event("watch")
   object Event {
-    val values = List(CommitComment,
-                      Create,
-                      Delete,
-                      Deployment,
-                      DeploymentStatus,
-                      Fork,
-                      Gollum,
-                      IssueComment,
-                      Issues,
-                      Member,
-                      PageBuild,
-                      Public,
-                      PullRequest,
-                      PullRequestReviewComment,
-                      Push,
-                      Release,
-                      Status,
-                      TeamAdd,
-                      Watch)
+    val values = List(
+      CommitComment,
+      Create,
+      Delete,
+      Deployment,
+      DeploymentStatus,
+      Fork,
+      Gollum,
+      IssueComment,
+      Issues,
+      Member,
+      PageBuild,
+      Public,
+      PullRequest,
+      PullRequestReviewComment,
+      Push,
+      Release,
+      Status,
+      TeamAdd,
+      Watch)
     private val map: Map[String, Event] = values.map(e => e.name -> e).toMap
     def valueOf(name: String): Event = map(name)
     def valueOpt(name: String): Option[Event] = map.get(name)

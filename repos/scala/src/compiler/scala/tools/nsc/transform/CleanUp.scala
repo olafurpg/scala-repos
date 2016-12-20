@@ -141,13 +141,14 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
           BLOCK(
             ValDef(
               methodCache,
-              ApplyDynamic(gen.mkAttributedIdent(StructuralCallSite_dummy),
-                           LIT(StructuralCallSite_bootstrap) :: LIT(
-                             dummyMethodType) :: Nil)
+              ApplyDynamic(
+                gen.mkAttributedIdent(StructuralCallSite_dummy),
+                LIT(StructuralCallSite_bootstrap) :: LIT(dummyMethodType) :: Nil)
                 .setType(StructuralCallSite.tpe)),
-            ValDef(methodSym,
-                   (REF(methodCache) DOT StructuralCallSite_find)(
-                     REF(forReceiverSym))),
+            ValDef(
+              methodSym,
+              (REF(methodCache) DOT StructuralCallSite_find)(
+                REF(forReceiverSym))),
             IF(REF(methodSym) OBJ_NE NULL).THEN(Return(REF(methodSym))) ELSE {
               def methodSymRHS =
                 ((REF(forReceiverSym) DOT Class_getMethod)(
@@ -175,12 +176,14 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
       def testForName(name: Name): Tree => Tree =
         t =>
           (if (nme.CommonOpNames(name))
-             gen.mkMethodCall(currentRun.runDefinitions.Boxes_isNumberOrBool,
-                              t :: Nil)
+             gen.mkMethodCall(
+               currentRun.runDefinitions.Boxes_isNumberOrBool,
+               t :: Nil)
            else if (nme.BooleanOpNames(name)) t IS_OBJ BoxedBooleanClass.tpe
            else
-             gen.mkMethodCall(currentRun.runDefinitions.Boxes_isNumber,
-                              t :: Nil))
+             gen.mkMethodCall(
+               currentRun.runDefinitions.Boxes_isNumber,
+               t :: Nil))
 
       /*  The Tree => Tree function in the return is necessary to prevent the original qual
        *  from being duplicated in the resulting code.  It may be a side-effecting expression,
@@ -290,9 +293,11 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
               currentOwner
                 .newValue(mkTerm(""), ad.pos) setInfo InvocationTargetExceptionClass.tpe
             def catchVar =
-              Bind(invokeExc,
-                   Typed(Ident(nme.WILDCARD),
-                         TypeTree(InvocationTargetExceptionClass.tpe)))
+              Bind(
+                invokeExc,
+                Typed(
+                  Ident(nme.WILDCARD),
+                  TypeTree(InvocationTargetExceptionClass.tpe)))
             def catchBody =
               Throw(Apply(Select(Ident(invokeExc), nme.getCause), Nil))
 
@@ -510,8 +515,9 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
        * And, finally, be advised - Scala's Symbol literal (scala.Symbol) and the Symbol class of the compiler
        * have little in common.
        */
-      case Apply(fn @ Select(qual, _),
-                 (arg @ Literal(Constant(symname: String))) :: Nil)
+      case Apply(
+          fn @ Select(qual, _),
+          (arg @ Literal(Constant(symname: String))) :: Nil)
           if treeInfo.isQualifierSafeToElide(qual) &&
             fn.symbol == Symbol_apply && !currentClass.isTrait =>
         super.transform(
@@ -533,10 +539,11 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
           if wrapRefArrayMeth.symbol == currentRun.runDefinitions.Predef_wrapRefArray &&
             appMeth.symbol == ArrayModule_genericApply =>
         super.transform(arg)
-      case Apply(appMeth,
-                 List(
-                   elem0,
-                   Apply(wrapArrayMeth, List(rest @ ArrayValue(elemtpt, _)))))
+      case Apply(
+          appMeth,
+          List(
+            elem0,
+            Apply(wrapArrayMeth, List(rest @ ArrayValue(elemtpt, _)))))
           if wrapArrayMeth.symbol == Predef_wrapArray(elemtpt.tpe) &&
             appMeth.symbol == ArrayModule_apply(elemtpt.tpe) =>
         super.transform(

@@ -40,44 +40,50 @@ import scala.language.implicitConversions"""
 
     def isCardinal: Boolean = isIntegerType(this)
     def unaryOps = {
-      val ops = List(Op("+", "/** Returns this value, unmodified. */"),
-                     Op("-", "/** Returns the negation of this value. */"))
+      val ops = List(
+        Op("+", "/** Returns this value, unmodified. */"),
+        Op("-", "/** Returns the negation of this value. */"))
 
       if (isCardinal)
-        Op("~",
-           "/**\n" + " * Returns the bitwise negation of this value.\n" +
-             " * @example {{{\n" +
-             " * ~5 == -6\n" + " * // in binary: ~00000101 ==\n" +
-             " * //             11111010\n" + " * }}}\n" + " */") :: ops
+        Op(
+          "~",
+          "/**\n" + " * Returns the bitwise negation of this value.\n" +
+            " * @example {{{\n" +
+            " * ~5 == -6\n" + " * // in binary: ~00000101 ==\n" +
+            " * //             11111010\n" + " * }}}\n" + " */") :: ops
       else ops
     }
 
     def bitwiseOps =
       if (isCardinal)
-        List(Op("|",
-                "/**\n" +
-                  "  * Returns the bitwise OR of this value and `x`.\n" +
-                  "  * @example {{{\n" + "  * (0xf0 | 0xaa) == 0xfa\n" +
-                  "  * // in binary:   11110000\n" +
-                  "  * //            | 10101010\n" +
-                  "  * //              --------\n" +
-                  "  * //              11111010\n" + "  * }}}\n" + "  */"),
-             Op("&",
-                "/**\n" +
-                  "  * Returns the bitwise AND of this value and `x`.\n" +
-                  "  * @example {{{\n" + "  * (0xf0 & 0xaa) == 0xa0\n" +
-                  "  * // in binary:   11110000\n" +
-                  "  * //            & 10101010\n" +
-                  "  * //              --------\n" +
-                  "  * //              10100000\n" + "  * }}}\n" + "  */"),
-             Op("^",
-                "/**\n" +
-                  "  * Returns the bitwise XOR of this value and `x`.\n" +
-                  "  * @example {{{\n" + "  * (0xf0 ^ 0xaa) == 0x5a\n" +
-                  "  * // in binary:   11110000\n" +
-                  "  * //            ^ 10101010\n" +
-                  "  * //              --------\n" +
-                  "  * //              01011010\n" + "  * }}}\n" + "  */"))
+        List(
+          Op(
+            "|",
+            "/**\n" +
+              "  * Returns the bitwise OR of this value and `x`.\n" +
+              "  * @example {{{\n" + "  * (0xf0 | 0xaa) == 0xfa\n" +
+              "  * // in binary:   11110000\n" +
+              "  * //            | 10101010\n" +
+              "  * //              --------\n" +
+              "  * //              11111010\n" + "  * }}}\n" + "  */"),
+          Op(
+            "&",
+            "/**\n" +
+              "  * Returns the bitwise AND of this value and `x`.\n" +
+              "  * @example {{{\n" + "  * (0xf0 & 0xaa) == 0xa0\n" +
+              "  * // in binary:   11110000\n" +
+              "  * //            & 10101010\n" +
+              "  * //              --------\n" +
+              "  * //              10100000\n" + "  * }}}\n" + "  */"),
+          Op(
+            "^",
+            "/**\n" +
+              "  * Returns the bitwise XOR of this value and `x`.\n" +
+              "  * @example {{{\n" + "  * (0xf0 ^ 0xaa) == 0x5a\n" +
+              "  * // in binary:   11110000\n" +
+              "  * //            ^ 10101010\n" +
+              "  * //              --------\n" +
+              "  * //              01011010\n" + "  * }}}\n" + "  */"))
       else Nil
 
     def shiftOps =
@@ -251,8 +257,8 @@ import scala.language.implicitConversions"""
       "@unboxRunTimeDoc@" -> """
  *  Runtime implementation determined by `scala.runtime.BoxesRunTime.unboxTo%s`. See [[https://github.com/scala/scala src/library/scala/runtime/BoxesRunTime.java]].
  *""".format(name),
-      "@unboxImpl@" -> "x.asInstanceOf[%s].%sValue()".format(boxedName,
-                                                             lcname),
+      "@unboxImpl@" -> "x.asInstanceOf[%s].%sValue()"
+        .format(boxedName, lcname),
       "@unboxDoc@" -> "the %s resulting from calling %sValue() on `x`"
         .format(name, lcname)
     )
@@ -274,8 +280,9 @@ import scala.language.implicitConversions"""
     def mkImports = ""
 
     def mkClass =
-      assemble("final abstract class " + name + " private extends AnyVal",
-               classLines)
+      assemble(
+        "final abstract class " + name + " private extends AnyVal",
+        classLines)
     def mkObject =
       assemble("object " + name + " extends AnyValCompanion", objectLines)
     def make() =
@@ -390,13 +397,15 @@ class AnyVals extends AnyValReps with AnyValTemplates {
   object I extends AnyValNum("Int", Some("32-bit signed integer"), "int")
   object L extends AnyValNum("Long", Some("64-bit signed integer"), "long")
   object F
-      extends AnyValNum("Float",
-                        Some("32-bit IEEE-754 floating point number"),
-                        "float")
+      extends AnyValNum(
+        "Float",
+        Some("32-bit IEEE-754 floating point number"),
+        "float")
   object D
-      extends AnyValNum("Double",
-                        Some("64-bit IEEE-754 floating point number"),
-                        "double")
+      extends AnyValNum(
+        "Double",
+        Some("64-bit IEEE-754 floating point number"),
+        "double")
   object Z extends AnyValRep("Boolean", None, "boolean") {
     def classLines =
       """

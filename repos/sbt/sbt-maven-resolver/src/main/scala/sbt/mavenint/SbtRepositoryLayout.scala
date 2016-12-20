@@ -25,8 +25,9 @@ class SbtPluginLayoutFactory extends RepositoryLayoutFactory {
       case SbtRepositoryLayout.LAYOUT_NAME =>
         SbtRepositoryLayout
       case _ =>
-        throw new NoRepositoryLayoutException(repository,
-                                              "Not an sbt-plugin repository")
+        throw new NoRepositoryLayoutException(
+          repository,
+          "Not an sbt-plugin repository")
     }
   }
   def getPriority: Float = 100.0f
@@ -140,6 +141,7 @@ object SbtRepositoryLayout extends RepositoryLayout {
     getChecksums(location)
 
   private def getChecksums(location: URI): java.util.List[Checksum] =
-    java.util.Arrays.asList(Checksum.forLocation(location, "SHA-1"),
-                            Checksum.forLocation(location, "MD5"))
+    java.util.Arrays.asList(
+      Checksum.forLocation(location, "SHA-1"),
+      Checksum.forLocation(location, "MD5"))
 }

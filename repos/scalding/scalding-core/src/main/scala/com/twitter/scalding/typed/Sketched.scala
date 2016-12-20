@@ -129,8 +129,9 @@ case class SketchJoined[K: Ordering, V, V2, R](
 
     kord match {
       case kos: OrderedSerialization[_] =>
-        new OrderedSerialization2(ordSer[Int],
-                                  kos.asInstanceOf[OrderedSerialization[K]])
+        new OrderedSerialization2(
+          ordSer[Int],
+          kos.asInstanceOf[OrderedSerialization[K]])
       case _ => Ordering.Tuple2[Int, K]
     }
   }

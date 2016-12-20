@@ -122,8 +122,9 @@ trait ModelBuilders { self: RichPresentationCompiler =>
 
         val sortedInfos = nestedTypes ++ fields ++ constructors ++ methods
 
-        new InterfaceInfo(TypeInfo(ownerSym.tpe, PosNeededAvail, sortedInfos),
-                          viaView.map(_.name.toString))
+        new InterfaceInfo(
+          TypeInfo(ownerSym.tpe, PosNeededAvail, sortedInfos),
+          viaView.map(_.name.toString))
     }
   }
 
@@ -214,12 +215,13 @@ trait ModelBuilders { self: RichPresentationCompiler =>
     }
 
     def nullInfo = {
-      new BasicTypeInfo("NA",
-                        DeclaredAs.Nil,
-                        "NA",
-                        List.empty,
-                        List.empty,
-                        None)
+      new BasicTypeInfo(
+        "NA",
+        DeclaredAs.Nil,
+        "NA",
+        List.empty,
+        List.empty,
+        None)
     }
   }
 
@@ -302,11 +304,12 @@ trait ModelBuilders { self: RichPresentationCompiler =>
         if (m.sym.pos == NoPosition) None else Some(EmptySourcePosition())
       val signatureString =
         if (decl == DeclaredAs.Method) Some(m.sym.signatureString) else None
-      new NamedTypeMemberInfo(m.sym.nameString,
-                              TypeInfo(m.tpe),
-                              pos,
-                              signatureString,
-                              decl)
+      new NamedTypeMemberInfo(
+        m.sym.nameString,
+        TypeInfo(m.tpe),
+        pos,
+        signatureString,
+        decl)
     }
   }
 
@@ -315,13 +318,15 @@ trait ModelBuilders { self: RichPresentationCompiler =>
     def apply(tpe: Type): ArrowTypeInfo = {
       tpe match {
         case tpe: MethodType =>
-          apply(tpe,
-                tpe.paramss.map(ParamSectionInfo.apply),
-                tpe.finalResultType)
+          apply(
+            tpe,
+            tpe.paramss.map(ParamSectionInfo.apply),
+            tpe.finalResultType)
         case tpe: PolyType =>
-          apply(tpe,
-                tpe.paramss.map(ParamSectionInfo.apply),
-                tpe.finalResultType)
+          apply(
+            tpe,
+            tpe.paramss.map(ParamSectionInfo.apply),
+            tpe.finalResultType)
         case _ => nullInfo()
       }
     }
@@ -385,8 +390,9 @@ object OffsetSourcePositionHelper {
     case NoPosition => None
     case realPos =>
       Some(
-        new OffsetSourcePosition(File(realPos.source.file.path).canon,
-                                 realPos.point))
+        new OffsetSourcePosition(
+          File(realPos.source.file.path).canon,
+          realPos.point))
   }
 }
 

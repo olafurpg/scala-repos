@@ -23,8 +23,9 @@ object CaseClassWithoutParamList extends AnnotatorPart[ScClass] {
         nameId,
         "case classes without a parameter list have been deprecated")
       annotation.setHighlightType(ProblemHighlightType.LIKE_DEPRECATED)
-      val fixes = Seq(new ConvertToObjectFix(element),
-                      new AddEmptyParenthesesToPrimaryConstructorFix(element))
+      val fixes = Seq(
+        new ConvertToObjectFix(element),
+        new AddEmptyParenthesesToPrimaryConstructorFix(element))
       fixes.foreach(fix => annotation.registerFix(fix, nameId.getTextRange))
     }
   }

@@ -56,20 +56,21 @@ trait Function14[-T1,
     (x1: T1) =>
       ((x2: T2, x3: T3, x4: T4, x5: T5, x6: T6, x7: T7, x8: T8, x9: T9,
         x10: T10, x11: T11, x12: T12, x13: T13, x14: T14) =>
-         self.apply(x1,
-                    x2,
-                    x3,
-                    x4,
-                    x5,
-                    x6,
-                    x7,
-                    x8,
-                    x9,
-                    x10,
-                    x11,
-                    x12,
-                    x13,
-                    x14)).curried
+         self.apply(
+           x1,
+           x2,
+           x3,
+           x4,
+           x5,
+           x6,
+           x7,
+           x8,
+           x9,
+           x10,
+           x11,
+           x12,
+           x13,
+           x14)).curried
   }
 
   /** Creates a tupled version of this function: instead of 14 arguments,
@@ -92,20 +93,21 @@ trait Function14[-T1,
                       T12,
                       T13,
                       T14] => R = {
-    case Tuple14(x1,
-                 x2,
-                 x3,
-                 x4,
-                 x5,
-                 x6,
-                 x7,
-                 x8,
-                 x9,
-                 x10,
-                 x11,
-                 x12,
-                 x13,
-                 x14) =>
+    case Tuple14(
+        x1,
+        x2,
+        x3,
+        x4,
+        x5,
+        x6,
+        x7,
+        x8,
+        x9,
+        x10,
+        x11,
+        x12,
+        x13,
+        x14) =>
       apply(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14)
   }
   override def toString() = "<function14>"

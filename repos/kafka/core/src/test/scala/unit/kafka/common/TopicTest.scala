@@ -29,21 +29,22 @@ class TopicTest {
     var longName = "ATCG"
     for (i <- 1 to 6) longName += longName
     invalidTopicNames += longName
-    val badChars = Array('/',
-                         '\\',
-                         ',',
-                         '\u0000',
-                         ':',
-                         "\"",
-                         '\'',
-                         ';',
-                         '*',
-                         '?',
-                         ' ',
-                         '\t',
-                         '\r',
-                         '\n',
-                         '=')
+    val badChars = Array(
+      '/',
+      '\\',
+      ',',
+      '\u0000',
+      ':',
+      "\"",
+      '\'',
+      ';',
+      '*',
+      '?',
+      ' ',
+      '\t',
+      '\r',
+      '\n',
+      '=')
     for (weirdChar <- badChars) {
       invalidTopicNames += "Is" + weirdChar + "illegal"
     }

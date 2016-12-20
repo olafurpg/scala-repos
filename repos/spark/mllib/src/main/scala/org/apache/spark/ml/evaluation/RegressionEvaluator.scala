@@ -58,10 +58,11 @@ final class RegressionEvaluator @Since("1.4.0")(
   val metricName: Param[String] = {
     val allowedParams =
       ParamValidators.inArray(Array("mse", "rmse", "r2", "mae"))
-    new Param(this,
-              "metricName",
-              "metric name in evaluation (mse|rmse|r2|mae)",
-              allowedParams)
+    new Param(
+      this,
+      "metricName",
+      "metric name in evaluation (mse|rmse|r2|mae)",
+      allowedParams)
   }
 
   /** @group getParam */
@@ -98,8 +99,9 @@ final class RegressionEvaluator @Since("1.4.0")(
       s"Label column $labelColName must be of type float or double, but not $labelType")
 
     val predictionAndLabels = dataset
-      .select(col($(predictionCol)).cast(DoubleType),
-              col($(labelCol)).cast(DoubleType))
+      .select(
+        col($(predictionCol)).cast(DoubleType),
+        col($(labelCol)).cast(DoubleType))
       .rdd
       .map {
         case Row(prediction: Double, label: Double) =>

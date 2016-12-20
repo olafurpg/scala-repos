@@ -50,15 +50,16 @@ abstract class IdeClient(compilerName: String,
           lines.filterNot(_.trim == "^").mkString("\n")
         } else text
       context.processMessage(
-        new CompilerMessage(name,
-                            kind,
-                            withoutPointer,
-                            sourcePath.orNull,
-                            -1L,
-                            -1L,
-                            -1L,
-                            line.getOrElse(-1L),
-                            column.getOrElse(-1L)))
+        new CompilerMessage(
+          name,
+          kind,
+          withoutPointer,
+          sourcePath.orNull,
+          -1L,
+          -1L,
+          -1L,
+          line.getOrElse(-1L),
+          column.getOrElse(-1L)))
     }
   }
 

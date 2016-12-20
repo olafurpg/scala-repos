@@ -335,11 +335,12 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
       var launchedTask = false
       for (taskSet <- sortedTaskSets; maxLocality <- taskSet.myLocalityLevels) {
         do {
-          launchedTask = resourceOfferSingleTaskSet(taskSet,
-                                                    maxLocality,
-                                                    shuffledOffers,
-                                                    availableCpus,
-                                                    tasks)
+          launchedTask = resourceOfferSingleTaskSet(
+            taskSet,
+            maxLocality,
+            shuffledOffers,
+            availableCpus,
+            tasks)
         } while (launchedTask)
       }
 
@@ -424,9 +425,10 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
             }
         }
       }
-    dagScheduler.executorHeartbeatReceived(execId,
-                                           accumUpdatesWithTaskIds,
-                                           blockManagerId)
+    dagScheduler.executorHeartbeatReceived(
+      execId,
+      accumUpdatesWithTaskIds,
+      blockManagerId)
   }
 
   def handleTaskGettingResult(taskSetManager: TaskSetManager,

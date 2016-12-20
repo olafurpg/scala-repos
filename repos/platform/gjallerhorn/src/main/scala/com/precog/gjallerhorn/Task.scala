@@ -28,20 +28,21 @@ import org.specs2.mutable.Specification
 import specs2._
 
 abstract class Task(settings: Settings) extends Specification {
-  val Settings(serviceHost,
-               id,
-               token,
-               accountsPort,
-               accountsPath,
-               authPort,
-               authPath,
-               ingestPort,
-               ingestPath,
-               jobsPort,
-               jobsPath,
-               shardPort,
-               shardPath,
-               secure) = settings
+  val Settings(
+    serviceHost,
+    id,
+    token,
+    accountsPort,
+    accountsPath,
+    authPort,
+    authPath,
+    ingestPort,
+    ingestPath,
+    jobsPort,
+    jobsPath,
+    shardPort,
+    shardPath,
+    secure) = settings
 
   def http(rb: RequestBuilder): Promise[ApiResult] =
     Http(rb).map { r =>
@@ -187,9 +188,10 @@ abstract class Task(settings: Settings) extends Specification {
     JObject("permissions" -> JArray(perms.map {
       case (accessType, path, owners) =>
         val ids = JArray(owners.map(JString(_)))
-        JObject("accessType" -> JString(accessType),
-                "path" -> JString(path),
-                "ownerAccountIds" -> ids)
+        JObject(
+          "accessType" -> JString(accessType),
+          "path" -> JString(path),
+          "ownerAccountIds" -> ids)
     })).renderCompact
 
   def createGrant(apiKey: String,

@@ -40,19 +40,20 @@ case class NingWSClient(config: AsyncHttpClientConfig)(
   def close(): Unit = ahcWsClient.close()
 
   def url(url: String): WSRequest =
-    AhcWSRequest(ahcWsClient,
-                 url,
-                 "GET",
-                 EmptyBody,
-                 Map(),
-                 Map(),
-                 None,
-                 None,
-                 None,
-                 None,
-                 None,
-                 None,
-                 None)
+    AhcWSRequest(
+      ahcWsClient,
+      url,
+      "GET",
+      EmptyBody,
+      Map(),
+      Map(),
+      None,
+      None,
+      None,
+      None,
+      None,
+      None,
+      None)
 }
 
 @deprecated("Use AhcWSClient instead", "2.5")

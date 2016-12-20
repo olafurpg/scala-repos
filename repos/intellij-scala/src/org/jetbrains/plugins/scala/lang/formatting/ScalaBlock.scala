@@ -55,8 +55,9 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
   def getTextRange =
     if (myLastNode == null) myNode.getTextRange
     else
-      new TextRange(myNode.getTextRange.getStartOffset,
-                    myLastNode.getTextRange.getEndOffset)
+      new TextRange(
+        myNode.getTextRange.getStartOffset,
+        myLastNode.getTextRange.getEndOffset)
 
   def getIndent = myIndent
 
@@ -85,9 +86,10 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
     parent match {
       case m: ScMatchStmt =>
         if (m.caseClauses.length == 0) {
-          new ChildAttributes(if (braceShifted) Indent.getNoneIndent
-                              else Indent.getNormalIndent,
-                              null)
+          new ChildAttributes(
+            if (braceShifted) Indent.getNoneIndent
+            else Indent.getNormalIndent,
+            null)
         } else {
           val indent =
             if (mySettings.INDENT_CASE_FROM_SWITCH)
@@ -135,12 +137,13 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
         new ChildAttributes(Indent.getNormalIndent, null)
       case _: ScBlock =>
         val grandParent = parent.getParent
-        new ChildAttributes(if (grandParent != null &&
-                                (grandParent.isInstanceOf[ScCaseClause] ||
-                                grandParent.isInstanceOf[ScFunctionExpr]))
-                              Indent.getNormalIndent
-                            else Indent.getNoneIndent,
-                            null)
+        new ChildAttributes(
+          if (grandParent != null &&
+              (grandParent.isInstanceOf[ScCaseClause] ||
+              grandParent.isInstanceOf[ScFunctionExpr]))
+            Indent.getNormalIndent
+          else Indent.getNoneIndent,
+          null)
       case _: ScIfStmt =>
         new ChildAttributes(
           Indent.getNormalIndent(scalaSettings.ALIGN_IF_ELSE),
@@ -157,8 +160,9 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
       case _: ScalaFile => new ChildAttributes(Indent.getNoneIndent, null)
       case _: ScCaseClause => new ChildAttributes(Indent.getNormalIndent, null)
       case _: ScExpression | _: ScPattern | _: ScParameters =>
-        new ChildAttributes(Indent.getContinuationWithoutFirstIndent,
-                            this.getAlignment)
+        new ChildAttributes(
+          Indent.getContinuationWithoutFirstIndent,
+          this.getAlignment)
       case _: ScDocComment =>
         new ChildAttributes(
           Indent.getSpaceIndent(
@@ -197,8 +201,9 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
   }
 
   def getSpacing(child1: Block, child2: Block) = {
-    ScalaSpacingProcessor.getSpacing(child1.asInstanceOf[ScalaBlock],
-                                     child2.asInstanceOf[ScalaBlock])
+    ScalaSpacingProcessor.getSpacing(
+      child1.asInstanceOf[ScalaBlock],
+      child2.asInstanceOf[ScalaBlock])
   }
 
   def getSubBlocks: util.List[Block] = {

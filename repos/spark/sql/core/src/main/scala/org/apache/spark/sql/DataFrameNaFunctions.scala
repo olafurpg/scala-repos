@@ -427,11 +427,13 @@ final class DataFrameNaFunctions private[sql] (df: DataFrame) {
   private def fillCol[T](col: StructField, replacement: T): Column = {
     col.dataType match {
       case DoubleType | FloatType =>
-        coalesce(nanvl(df.col("`" + col.name + "`"), lit(null)),
-                 lit(replacement).cast(col.dataType)).as(col.name)
+        coalesce(
+          nanvl(df.col("`" + col.name + "`"), lit(null)),
+          lit(replacement).cast(col.dataType)).as(col.name)
       case _ =>
-        coalesce(df.col("`" + col.name + "`"),
-                 lit(replacement).cast(col.dataType)).as(col.name)
+        coalesce(
+          df.col("`" + col.name + "`"),
+          lit(replacement).cast(col.dataType)).as(col.name)
     }
   }
 

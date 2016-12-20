@@ -90,22 +90,24 @@ object ScSyntheticPackage {
 
     import scala.collection.JavaConversions._
     val packages = StubIndex
-      .getElements(ScalaIndexKeys.PACKAGE_FQN_KEY
-                     .asInstanceOf[StubIndexKey[Any, ScPackageContainer]],
-                   fqn.hashCode(),
-                   project,
-                   GlobalSearchScope.allScope(project),
-                   classOf[ScPackageContainer])
+      .getElements(
+        ScalaIndexKeys.PACKAGE_FQN_KEY
+          .asInstanceOf[StubIndexKey[Any, ScPackageContainer]],
+        fqn.hashCode(),
+        project,
+        GlobalSearchScope.allScope(project),
+        classOf[ScPackageContainer])
       .toSeq
 
     if (packages.isEmpty) {
       StubIndex
-        .getElements(ScalaIndexKeys.PACKAGE_OBJECT_KEY
-                       .asInstanceOf[StubIndexKey[Any, PsiClass]],
-                     fqn.hashCode(),
-                     project,
-                     GlobalSearchScope.allScope(project),
-                     classOf[PsiClass])
+        .getElements(
+          ScalaIndexKeys.PACKAGE_OBJECT_KEY
+            .asInstanceOf[StubIndexKey[Any, PsiClass]],
+          fqn.hashCode(),
+          project,
+          GlobalSearchScope.allScope(project),
+          classOf[PsiClass])
         .toSeq
         .find(pc => {
           pc.qualifiedName == fqn

@@ -143,14 +143,15 @@ sealed abstract case class Uri(scheme: String,
     * The given base Uri must be absolute.
     */
   def resolvedAgainst(base: Uri): Uri =
-    resolve(scheme,
-            authority.userinfo,
-            authority.host,
-            authority.port,
-            path,
-            rawQueryString,
-            fragment,
-            base)
+    resolve(
+      scheme,
+      authority.userinfo,
+      authority.host,
+      authority.port,
+      path,
+      rawQueryString,
+      fragment,
+      base)
 
   /**
     * Converts this URI to an "effective HTTP request URI" as defined by
@@ -161,24 +162,26 @@ sealed abstract case class Uri(scheme: String,
       hostHeaderPort: Int,
       securedConnection: Boolean = false,
       defaultAuthority: Authority = Authority.Empty): Uri =
-    effectiveHttpRequestUri(scheme,
-                            authority.host,
-                            authority.port,
-                            path,
-                            rawQueryString,
-                            fragment,
-                            securedConnection,
-                            hostHeaderHost,
-                            hostHeaderPort,
-                            defaultAuthority)
+    effectiveHttpRequestUri(
+      scheme,
+      authority.host,
+      authority.port,
+      path,
+      rawQueryString,
+      fragment,
+      securedConnection,
+      hostHeaderHost,
+      hostHeaderPort,
+      defaultAuthority)
 
   /**
     * Converts this URI into a relative URI by keeping the path, query and fragment, but dropping the scheme and authority.
     */
   def toRelative =
-    Uri(path = if (path.isEmpty) Uri.Path./ else path,
-        queryString = rawQueryString,
-        fragment = fragment)
+    Uri(
+      path = if (path.isEmpty) Uri.Path./ else path,
+      queryString = rawQueryString,
+      fragment = fragment)
 
   /**
     * Converts this URI into an HTTP request target "origin-form" as defined by
@@ -188,11 +191,12 @@ sealed abstract case class Uri(scheme: String,
     * be a "relative" URI with a part component starting with a double slash.)
     */
   def toHttpRequestTargetOriginForm =
-    create("",
-           Authority.Empty,
-           if (path.isEmpty) Uri.Path./ else path,
-           rawQueryString,
-           None)
+    create(
+      "",
+      Authority.Empty,
+      if (path.isEmpty) Uri.Path./ else path,
+      rawQueryString,
+      None)
 
   /**
     * Drops the fragment from this URI
@@ -263,11 +267,12 @@ object Uri {
             queryString: Option[String] = None,
             fragment: Option[String] = None): Uri = {
     val p = verifyPath(path, scheme, authority.host)
-    create(scheme = normalizeScheme(scheme),
-           authority = authority.normalizedFor(scheme),
-           path = if (scheme.isEmpty) p else collapseDotSegments(p),
-           queryString = queryString,
-           fragment = fragment)
+    create(
+      scheme = normalizeScheme(scheme),
+      authority = authority.normalizedFor(scheme),
+      path = if (scheme.isEmpty) p else collapseDotSegments(p),
+      queryString = queryString,
+      fragment = fragment)
   }
 
   /**
@@ -375,13 +380,14 @@ object Uri {
         }
       }
     }
-    create(_scheme,
-           "",
-           _host,
-           _port,
-           collapseDotSegments(path),
-           query,
-           fragment)
+    create(
+      _scheme,
+      "",
+      _host,
+      _port,
+      collapseDotSegments(path),
+      query,
+      fragment)
   }
 
   def httpScheme(securedConnection: Boolean = false) =
@@ -501,11 +507,12 @@ object Uri {
     private[http] def apply(bytes: String, address: String): IPv6Host = {
       import CharUtils.{hexValue ⇒ hex}
       require(bytes.length == 32, "`bytes` must be a 32 character hex string")
-      apply(bytes.toCharArray
-              .grouped(2)
-              .map(s ⇒ (hex(s(0)) * 16 + hex(s(1))).toByte)
-              .toArray,
-            address)
+      apply(
+        bytes.toCharArray
+          .grouped(2)
+          .map(s ⇒ (hex(s(0)) * 16 + hex(s(1))).toByte)
+          .toArray,
+        address)
     }
     private[http] def apply(bytes: Array[Byte], address: String): IPv6Host =
       apply(immutable.Seq(bytes: _*), address)
@@ -676,8 +683,9 @@ object Uri {
                  q: Query): Map[String, List[String]] =
         if (q.isEmpty) map
         else
-          append(map.updated(q.key, q.value :: map.getOrElse(q.key, Nil)),
-                 q.tail)
+          append(
+            map.updated(q.key, q.value :: map.getOrElse(q.key, Nil)),
+            q.tail)
       append(Map.empty, this)
     }
     override def newBuilder: mutable.Builder[(String, String), Query] =
@@ -741,23 +749,24 @@ object Uri {
   }
 
   private val defaultPorts: Map[String, Int] =
-    Map("ftp" -> 21,
-        "ssh" -> 22,
-        "telnet" -> 23,
-        "smtp" -> 25,
-        "domain" -> 53,
-        "tftp" -> 69,
-        "http" -> 80,
-        "ws" -> 80,
-        "pop3" -> 110,
-        "nntp" -> 119,
-        "imap" -> 143,
-        "snmp" -> 161,
-        "ldap" -> 389,
-        "https" -> 443,
-        "wss" -> 443,
-        "imaps" -> 993,
-        "nfs" -> 2049).withDefaultValue(-1)
+    Map(
+      "ftp" -> 21,
+      "ssh" -> 22,
+      "telnet" -> 23,
+      "smtp" -> 25,
+      "domain" -> 53,
+      "tftp" -> 69,
+      "http" -> 80,
+      "ws" -> 80,
+      "pop3" -> 110,
+      "nntp" -> 119,
+      "imap" -> 143,
+      "snmp" -> 161,
+      "ldap" -> 389,
+      "https" -> 443,
+      "wss" -> 443,
+      "imaps" -> 993,
+      "nfs" -> 2049).withDefaultValue(-1)
 
   sealed trait ParsingMode extends akka.http.javadsl.model.Uri.ParsingMode
   object ParsingMode {
@@ -806,27 +815,30 @@ object Uri {
               replaceLastSegment(base.path, path)
             }
           val p = if (path.startsWithSlash) path else mergePaths(base, path)
-          create(base.scheme,
-                 base.authority,
-                 collapseDotSegments(p),
-                 query,
-                 fragment)
+          create(
+            base.scheme,
+            base.authority,
+            collapseDotSegments(p),
+            query,
+            fragment)
         } else
-        create(base.scheme,
-               userinfo,
-               host,
-               port,
-               collapseDotSegments(path),
-               query,
-               fragment)
+        create(
+          base.scheme,
+          userinfo,
+          host,
+          port,
+          collapseDotSegments(path),
+          query,
+          fragment)
     else
-      create(scheme,
-             userinfo,
-             host,
-             port,
-             collapseDotSegments(path),
-             query,
-             fragment)
+      create(
+        scheme,
+        userinfo,
+        host,
+        port,
+        collapseDotSegments(path),
+        query,
+        fragment)
   }
 
   private[http] def decode(string: String, charset: Charset): String = {
@@ -955,11 +967,12 @@ object Uri {
                            path: Path,
                            queryString: Option[String],
                            fragment: Option[String]): Uri =
-    create(scheme,
-           Authority(host, normalizePort(port, scheme), userinfo),
-           path,
-           queryString,
-           fragment)
+    create(
+      scheme,
+      Authority(host, normalizePort(port, scheme), userinfo),
+      path,
+      queryString,
+      fragment)
 
   private[http] def create(scheme: String,
                            authority: Authority,

@@ -85,9 +85,10 @@ abstract class LeaderDowningNodeThatIsUnreachableSpec(
 
         // --- HERE THE LEADER SHOULD DETECT FAILURE AND AUTO-DOWN THE UNREACHABLE NODE ---
 
-        awaitMembersUp(numberOfMembers = 3,
-                       canNotBePartOfMemberRing = Set(fourthAddress),
-                       30.seconds)
+        awaitMembersUp(
+          numberOfMembers = 3,
+          canNotBePartOfMemberRing = Set(fourthAddress),
+          30.seconds)
       }
 
       runOn(fourth) {
@@ -97,9 +98,10 @@ abstract class LeaderDowningNodeThatIsUnreachableSpec(
       runOn(second, third) {
         enterBarrier("down-fourth-node")
 
-        awaitMembersUp(numberOfMembers = 3,
-                       canNotBePartOfMemberRing = Set(fourthAddress),
-                       30.seconds)
+        awaitMembersUp(
+          numberOfMembers = 3,
+          canNotBePartOfMemberRing = Set(fourthAddress),
+          30.seconds)
       }
 
       enterBarrier("await-completion-1")
@@ -119,9 +121,10 @@ abstract class LeaderDowningNodeThatIsUnreachableSpec(
 
         // --- HERE THE LEADER SHOULD DETECT FAILURE AND AUTO-DOWN THE UNREACHABLE NODE ---
 
-        awaitMembersUp(numberOfMembers = 2,
-                       canNotBePartOfMemberRing = Set(secondAddress),
-                       30.seconds)
+        awaitMembersUp(
+          numberOfMembers = 2,
+          canNotBePartOfMemberRing = Set(secondAddress),
+          30.seconds)
       }
 
       runOn(second) {
@@ -131,9 +134,10 @@ abstract class LeaderDowningNodeThatIsUnreachableSpec(
       runOn(third) {
         enterBarrier("down-second-node")
 
-        awaitMembersUp(numberOfMembers = 2,
-                       canNotBePartOfMemberRing = Set(secondAddress),
-                       30 seconds)
+        awaitMembersUp(
+          numberOfMembers = 2,
+          canNotBePartOfMemberRing = Set(secondAddress),
+          30 seconds)
       }
 
       enterBarrier("await-completion-2")

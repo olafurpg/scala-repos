@@ -34,17 +34,19 @@ object FormSpec extends Specification {
   "a java form" should {
     "be valid" in {
       val req = dummyRequest(
-        Map("id" -> Array("1234567891"),
-            "name" -> Array("peter"),
-            "done" -> Array("true"),
-            "dueDate" -> Array("15/12/2009")))
+        Map(
+          "id" -> Array("1234567891"),
+          "name" -> Array("peter"),
+          "done" -> Array("true"),
+          "dueDate" -> Array("15/12/2009")))
       Context.current.set(
-        new Context(666,
-                    null,
-                    req,
-                    Map.empty.asJava,
-                    Map.empty.asJava,
-                    Map.empty.asJava))
+        new Context(
+          666,
+          null,
+          req,
+          Map.empty.asJava,
+          Map.empty.asJava,
+          Map.empty.asJava))
 
       val myForm =
         formFactory.form(classOf[play.data.models.Task]).bindFromRequest()
@@ -52,16 +54,18 @@ object FormSpec extends Specification {
     }
     "be valid with mandatory params passed" in {
       val req = dummyRequest(
-        Map("id" -> Array("1234567891"),
-            "name" -> Array("peter"),
-            "dueDate" -> Array("15/12/2009")))
+        Map(
+          "id" -> Array("1234567891"),
+          "name" -> Array("peter"),
+          "dueDate" -> Array("15/12/2009")))
       Context.current.set(
-        new Context(666,
-                    null,
-                    req,
-                    Map.empty.asJava,
-                    Map.empty.asJava,
-                    Map.empty.asJava))
+        new Context(
+          666,
+          null,
+          req,
+          Map.empty.asJava,
+          Map.empty.asJava,
+          Map.empty.asJava))
 
       val myForm =
         formFactory.form(classOf[play.data.models.Task]).bindFromRequest()
@@ -69,16 +73,18 @@ object FormSpec extends Specification {
     }
     "have an error due to badly formatted date" in new WithApplication() {
       val req = dummyRequest(
-        Map("id" -> Array("1234567891"),
-            "name" -> Array("peter"),
-            "dueDate" -> Array("2009/11e/11")))
+        Map(
+          "id" -> Array("1234567891"),
+          "name" -> Array("peter"),
+          "dueDate" -> Array("2009/11e/11")))
       Context.current.set(
-        new Context(666,
-                    null,
-                    req,
-                    Map.empty.asJava,
-                    Map.empty.asJava,
-                    Map.empty.asJava))
+        new Context(
+          666,
+          null,
+          req,
+          Map.empty.asJava,
+          Map.empty.asJava,
+          Map.empty.asJava))
 
       val myForm =
         formFactory.form(classOf[play.data.models.Task]).bindFromRequest()
@@ -96,16 +102,18 @@ object FormSpec extends Specification {
         .configure("play.i18n.langs" -> Seq("en", "en-US", "fr"))
         .build()) {
       val req = dummyRequest(
-        Map("id" -> Array("1234567891"),
-            "name" -> Array("peter"),
-            "dueDate" -> Array("2009/11e/11")))
+        Map(
+          "id" -> Array("1234567891"),
+          "name" -> Array("peter"),
+          "dueDate" -> Array("2009/11e/11")))
       Context.current.set(
-        new Context(666,
-                    null,
-                    req,
-                    Map.empty.asJava,
-                    Map.empty.asJava,
-                    Map.empty.asJava))
+        new Context(
+          666,
+          null,
+          req,
+          Map.empty.asJava,
+          Map.empty.asJava,
+          Map.empty.asJava))
 
       Context.current.get().setTransientLang("fr");
 
@@ -127,16 +135,18 @@ object FormSpec extends Specification {
         .configure("play.i18n.langs" -> Seq("en", "en-US", "fr"))
         .build()) {
       val req = dummyRequest(
-        Map("id" -> Array("1234567891"),
-            "name" -> Array("peter"),
-            "dueDate" -> Array("2009/11e/11")))
+        Map(
+          "id" -> Array("1234567891"),
+          "name" -> Array("peter"),
+          "dueDate" -> Array("2009/11e/11")))
       Context.current.set(
-        new Context(666,
-                    null,
-                    req,
-                    Map.empty.asJava,
-                    Map.empty.asJava,
-                    Map.empty.asJava))
+        new Context(
+          666,
+          null,
+          req,
+          Map.empty.asJava,
+          Map.empty.asJava,
+          Map.empty.asJava))
 
       Context.current.get().changeLang("fr");
 
@@ -157,12 +167,13 @@ object FormSpec extends Specification {
       val req = dummyRequest(
         Map("id" -> Array("1234567891x"), "name" -> Array("peter")))
       Context.current.set(
-        new Context(666,
-                    null,
-                    req,
-                    Map.empty.asJava,
-                    Map.empty.asJava,
-                    Map.empty.asJava))
+        new Context(
+          666,
+          null,
+          req,
+          Map.empty.asJava,
+          Map.empty.asJava,
+          Map.empty.asJava))
 
       val myForm =
         formFactory.form(classOf[play.data.models.Task]).bindFromRequest()
@@ -172,16 +183,18 @@ object FormSpec extends Specification {
     }
     "have an error due to bad value in Id field" in new WithApplication() {
       val req = dummyRequest(
-        Map("id" -> Array("1234567891x"),
-            "name" -> Array("peter"),
-            "dueDate" -> Array("12/12/2009")))
+        Map(
+          "id" -> Array("1234567891x"),
+          "name" -> Array("peter"),
+          "dueDate" -> Array("12/12/2009")))
       Context.current.set(
-        new Context(666,
-                    null,
-                    req,
-                    Map.empty.asJava,
-                    Map.empty.asJava,
-                    Map.empty.asJava))
+        new Context(
+          666,
+          null,
+          req,
+          Map.empty.asJava,
+          Map.empty.asJava,
+          Map.empty.asJava))
 
       val myForm =
         formFactory.form(classOf[play.data.models.Task]).bindFromRequest()
@@ -191,17 +204,19 @@ object FormSpec extends Specification {
     }
     "be valid with default date binder" in {
       val req = dummyRequest(
-        Map("id" -> Array("1234567891"),
-            "name" -> Array("peter"),
-            "dueDate" -> Array("15/12/2009"),
-            "endDate" -> Array("2008-11-21")))
+        Map(
+          "id" -> Array("1234567891"),
+          "name" -> Array("peter"),
+          "dueDate" -> Array("15/12/2009"),
+          "endDate" -> Array("2008-11-21")))
       Context.current.set(
-        new Context(666,
-                    null,
-                    req,
-                    Map.empty.asJava,
-                    Map.empty.asJava,
-                    Map.empty.asJava))
+        new Context(
+          666,
+          null,
+          req,
+          Map.empty.asJava,
+          Map.empty.asJava,
+          Map.empty.asJava))
 
       val myForm =
         formFactory.form(classOf[play.data.models.Task]).bindFromRequest()
@@ -209,17 +224,19 @@ object FormSpec extends Specification {
     }
     "have an error due to badly formatted date for default date binder" in new WithApplication() {
       val req = dummyRequest(
-        Map("id" -> Array("1234567891"),
-            "name" -> Array("peter"),
-            "dueDate" -> Array("15/12/2009"),
-            "endDate" -> Array("2008-11e-21")))
+        Map(
+          "id" -> Array("1234567891"),
+          "name" -> Array("peter"),
+          "dueDate" -> Array("15/12/2009"),
+          "endDate" -> Array("2008-11e-21")))
       Context.current.set(
-        new Context(666,
-                    null,
-                    req,
-                    Map.empty.asJava,
-                    Map.empty.asJava,
-                    Map.empty.asJava))
+        new Context(
+          666,
+          null,
+          req,
+          Map.empty.asJava,
+          Map.empty.asJava,
+          Map.empty.asJava))
 
       val myForm =
         formFactory.form(classOf[play.data.models.Task]).bindFromRequest()
@@ -240,8 +257,10 @@ object FormSpec extends Specification {
       val user2 = formFactory
         .form(classOf[AnotherUser])
         .bindFromRequest(
-          dummyRequest(Map("name" -> Array("Kiki"),
-                           "emails[0]" -> Array("kiki@gmail.com"))))
+          dummyRequest(
+            Map(
+              "name" -> Array("Kiki"),
+              "emails[0]" -> Array("kiki@gmail.com"))))
         .get
       user2.getName must beEqualTo("Kiki")
       user2.getEmails.size must beEqualTo(1)
@@ -250,9 +269,10 @@ object FormSpec extends Specification {
         .form(classOf[AnotherUser])
         .bindFromRequest(
           dummyRequest(
-            Map("name" -> Array("Kiki"),
-                "emails[0]" -> Array("kiki@gmail.com"),
-                "emails[1]" -> Array("kiki@zen.com"))))
+            Map(
+              "name" -> Array("Kiki"),
+              "emails[0]" -> Array("kiki@gmail.com"),
+              "emails[1]" -> Array("kiki@zen.com"))))
         .get
       user3.getName must beEqualTo("Kiki")
       user3.getEmails.size must beEqualTo(2)
@@ -269,8 +289,9 @@ object FormSpec extends Specification {
         .form(classOf[AnotherUser])
         .bindFromRequest(
           dummyRequest(
-            Map("name" -> Array("Kiki"),
-                "emails[]" -> Array("kiki@gmail.com", "kiki@zen.com"))))
+            Map(
+              "name" -> Array("Kiki"),
+              "emails[]" -> Array("kiki@gmail.com", "kiki@zen.com"))))
         .get
       user5.getName must beEqualTo("Kiki")
       user5.getEmails.size must beEqualTo(2)
@@ -342,9 +363,10 @@ object FormSpec extends Specification {
         val form = formFactory
           .form(classOf[MyBlueUser])
           .bind(
-            Map("name" -> "Shrek",
-                "skinColor" -> "green",
-                "hairColor" -> "blue").asJava)
+            Map(
+              "name" -> "Shrek",
+              "skinColor" -> "green",
+              "hairColor" -> "blue").asJava)
         form.hasErrors must beEqualTo(true)
         form.errors().get("hairColor") must beNull
         val validationErrors = form.errors().get("skinColor")
@@ -356,9 +378,10 @@ object FormSpec extends Specification {
         val form = formFactory
           .form(classOf[MyBlueUser])
           .bind(
-            Map("name" -> "Smurf",
-                "skinColor" -> "blue",
-                "hairColor" -> "white").asJava)
+            Map(
+              "name" -> "Smurf",
+              "skinColor" -> "blue",
+              "hairColor" -> "white").asJava)
         form.errors().get("skinColor") must beNull
         form.hasErrors must beEqualTo(true)
         val validationErrors = form.errors().get("hairColor")
@@ -419,23 +442,26 @@ object FormSpec extends Specification {
         render(
           form.fill(
             new JavaForm(
-              List(new JavaSubForm("a", "b"),
-                   new JavaSubForm("c", "d"),
-                   new JavaSubForm("e", "f"),
-                   new JavaSubForm("g", "h")).asJava))
-        ) must exactly("foo[0].a=a,foo[0].b=b",
-                       "foo[1].a=c,foo[1].b=d",
-                       "foo[2].a=e,foo[2].b=f",
-                       "foo[3].a=g,foo[3].b=h").inOrder
+              List(
+                new JavaSubForm("a", "b"),
+                new JavaSubForm("c", "d"),
+                new JavaSubForm("e", "f"),
+                new JavaSubForm("g", "h")).asJava))
+        ) must exactly(
+          "foo[0].a=a,foo[0].b=b",
+          "foo[1].a=c,foo[1].b=d",
+          "foo[2].a=e,foo[2].b=f",
+          "foo[3].a=g,foo[3].b=h").inOrder
       }
 
       "get the order of the fields correct when filled from a form" in {
         render(
           fillNoBind("a" -> "b", "c" -> "d", "e" -> "f", "g" -> "h")
-        ) must exactly("foo[0].a=a,foo[0].b=b",
-                       "foo[1].a=c,foo[1].b=d",
-                       "foo[2].a=e,foo[2].b=f",
-                       "foo[3].a=g,foo[3].b=h").inOrder
+        ) must exactly(
+          "foo[0].a=a,foo[0].b=b",
+          "foo[1].a=c,foo[1].b=d",
+          "foo[2].a=e,foo[2].b=f",
+          "foo[3].a=g,foo[3].b=h").inOrder
       }
     }
   }

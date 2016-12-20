@@ -162,14 +162,15 @@ class HBLEvents(val client: HBClient,
 
       val table = getTable(appId, channelId)
 
-      val scan = HBEventsUtil.createScan(startTime = startTime,
-                                         untilTime = untilTime,
-                                         entityType = entityType,
-                                         entityId = entityId,
-                                         eventNames = eventNames,
-                                         targetEntityType = targetEntityType,
-                                         targetEntityId = targetEntityId,
-                                         reversed = reversed)
+      val scan = HBEventsUtil.createScan(
+        startTime = startTime,
+        untilTime = untilTime,
+        entityType = entityType,
+        entityId = entityId,
+        eventNames = eventNames,
+        targetEntityType = targetEntityType,
+        targetEntityId = targetEntityId,
+        reversed = reversed)
       val scanner = table.getScanner(scan)
       table.close()
 

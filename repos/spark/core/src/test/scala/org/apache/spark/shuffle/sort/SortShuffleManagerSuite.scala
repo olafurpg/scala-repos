@@ -46,8 +46,9 @@ class SortShuffleManagerSuite extends SparkFunSuite with Matchers {
       keyOrdering: Option[Ordering[Any]],
       aggregator: Option[Aggregator[Any, Any, Any]],
       mapSideCombine: Boolean): ShuffleDependency[Any, Any, Any] = {
-    val dep = mock(classOf[ShuffleDependency[Any, Any, Any]],
-                   new RuntimeExceptionAnswer())
+    val dep = mock(
+      classOf[ShuffleDependency[Any, Any, Any]],
+      new RuntimeExceptionAnswer())
     doReturn(0).when(dep).shuffleId
     doReturn(partitioner).when(dep).partitioner
     doReturn(serializer).when(dep).serializer

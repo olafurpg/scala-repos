@@ -75,9 +75,10 @@ final case class RoundRobinPool(
     with PoolOverrideUnsetConfig[RoundRobinPool] {
 
   def this(config: Config) =
-    this(nrOfInstances = config.getInt("nr-of-instances"),
-         resizer = Resizer.fromConfig(config),
-         usePoolDispatcher = config.hasPath("pool-dispatcher"))
+    this(
+      nrOfInstances = config.getInt("nr-of-instances"),
+      resizer = Resizer.fromConfig(config),
+      usePoolDispatcher = config.hasPath("pool-dispatcher"))
 
   /**
     * Java API

@@ -52,8 +52,9 @@ trait Command {
       "This is open-source software, available to you under a BSD-like license. " & "See accompanying \"copyright\" or \"LICENSE\" file for copying conditions. " & "There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A " & "PARTICULAR PURPOSE.")
 
   def bugs =
-    Section("REPORTING BUGS",
-            "Report bugs to " & Mono("https://issues.scala-lang.org/") & ".")
+    Section(
+      "REPORTING BUGS",
+      "Report bugs to " & Mono("https://issues.scala-lang.org/") & ".")
 
   def manpage: Document
 }

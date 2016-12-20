@@ -63,8 +63,9 @@ case class Lang(locale: Locale) {
     * @param accept The accepted language
     */
   def satisfies(accept: Lang): Boolean =
-    Locale.lookup(Seq(new Locale.LanguageRange(code)).asJava,
-                  Seq(accept.locale).asJava) != null
+    Locale.lookup(
+      Seq(new Locale.LanguageRange(code)).asJava,
+      Seq(accept.locale).asJava) != null
 
   /**
     * The language tag (such as fr or en-US).
@@ -536,19 +537,21 @@ class DefaultMessagesApi @Inject()(environment: Environment,
 
   def setLang(result: Result, lang: Lang) =
     result.withCookies(
-      Cookie(langCookieName,
-             lang.code,
-             path = Session.path,
-             domain = Session.domain,
-             secure = langCookieSecure,
-             httpOnly = langCookieHttpOnly))
+      Cookie(
+        langCookieName,
+        lang.code,
+        path = Session.path,
+        domain = Session.domain,
+        secure = langCookieSecure,
+        httpOnly = langCookieHttpOnly))
 
   def clearLang(result: Result) =
     result.discardingCookies(
-      DiscardingCookie(langCookieName,
-                       path = Session.path,
-                       domain = Session.domain,
-                       secure = langCookieSecure))
+      DiscardingCookie(
+        langCookieName,
+        path = Session.path,
+        domain = Session.domain,
+        secure = langCookieSecure))
 
   def apply(key: String, args: Any*)(implicit lang: Lang): String = {
     translate(key, args).getOrElse(noMatch(key, args))

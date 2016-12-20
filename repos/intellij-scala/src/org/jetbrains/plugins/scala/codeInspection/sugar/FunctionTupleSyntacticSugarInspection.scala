@@ -116,8 +116,9 @@ object FunctionTupleSyntacticSugarInspection {
   }
 
   class FunctionTypeSyntacticSugarQuickFix(te: ScParameterizedTypeElement)
-      extends AbstractFixOnPsiElement(ScalaBundle.message("replace.fun.type"),
-                                      te) {
+      extends AbstractFixOnPsiElement(
+        ScalaBundle.message("replace.fun.type"),
+        te) {
     def doApplyFix(project: Project): Unit = {
       val typeElement = getElement
       val paramTypes = typeElement.typeArgList.typeArgs.dropRight(1)

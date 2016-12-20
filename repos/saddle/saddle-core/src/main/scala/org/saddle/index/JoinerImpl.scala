@@ -206,9 +206,10 @@ class JoinerImpl[@spec(Boolean, Int, Long, Double) T: ST: ORD]
     val rl = right.length
 
     if (ll == 0 || rl == 0)
-      ReIndexer(Some(Array.empty[Int]),
-                Some(Array.empty[Int]),
-                Index(Array.empty[T]))
+      ReIndexer(
+        Some(Array.empty[Int]),
+        Some(Array.empty[Int]),
+        Index(Array.empty[T]))
     else {
       // first, count
       var i = 0

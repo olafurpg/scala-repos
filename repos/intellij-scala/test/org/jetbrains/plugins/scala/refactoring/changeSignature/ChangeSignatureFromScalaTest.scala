@@ -32,8 +32,9 @@ class ChangeSignatureFromScalaTest extends ChangeSignatureTestBase {
   override def findTargetElement: PsiMember = {
     val element = new ScalaChangeSignatureHandler()
       .findTargetMember(getFileAdapter, getEditorAdapter)
-    assertTrue("<caret> is not on method name",
-               element.isInstanceOf[ScMethodLike])
+    assertTrue(
+      "<caret> is not on method name",
+      element.isInstanceOf[ScMethodLike])
     element.asInstanceOf[ScMethodLike]
   }
 
@@ -42,11 +43,12 @@ class ChangeSignatureFromScalaTest extends ChangeSignatureTestBase {
       newName: String,
       newReturnType: String,
       newParams: => Seq[Seq[ParameterInfo]]): ChangeSignatureProcessorBase = {
-    scalaProcessor(newVisibility,
-                   newName,
-                   newReturnType,
-                   newParams,
-                   isAddDefaultValue)
+    scalaProcessor(
+      newVisibility,
+      newName,
+      newReturnType,
+      newParams,
+      isAddDefaultValue)
   }
 
   private def parameterInfo(name: String,
@@ -55,35 +57,39 @@ class ChangeSignatureFromScalaTest extends ChangeSignatureTestBase {
                             defVal: String = "",
                             isRep: Boolean = false,
                             isByName: Boolean = false) = {
-    new ScalaParameterInfo(name,
-                           oldIdx,
-                           tpe,
-                           getProjectAdapter,
-                           isRep,
-                           isByName,
-                           defVal)
+    new ScalaParameterInfo(
+      name,
+      oldIdx,
+      tpe,
+      getProjectAdapter,
+      isRep,
+      isByName,
+      defVal)
   }
 
   def testSimpleMethod() = {
     isAddDefaultValue = false
-    val params = Seq(parameterInfo("ii", 0, types.Int),
-                     parameterInfo("b", 2, types.Boolean))
+    val params = Seq(
+      parameterInfo("ii", 0, types.Int),
+      parameterInfo("b", 2, types.Boolean))
     doTest(null, "bar", null, Seq(params))
   }
 
   def testSimpleMethodAdd() = {
     isAddDefaultValue = false
-    val params = Seq(parameterInfo("i", 0, types.Int),
-                     parameterInfo("s", -1, types.AnyRef, "\"hi\""),
-                     parameterInfo("b", 1, types.Boolean))
+    val params = Seq(
+      parameterInfo("i", 0, types.Int),
+      parameterInfo("s", -1, types.AnyRef, "\"hi\""),
+      parameterInfo("b", 1, types.Boolean))
     doTest(null, "foo", null, Seq(params))
   }
 
   def testAddWithDefault() = {
     isAddDefaultValue = true
-    val params = Seq(parameterInfo("i", 0, types.Int),
-                     parameterInfo("s", -1, types.AnyRef, "\"hi\""),
-                     parameterInfo("b", 1, types.Boolean))
+    val params = Seq(
+      parameterInfo("i", 0, types.Int),
+      parameterInfo("s", -1, types.AnyRef, "\"hi\""),
+      parameterInfo("b", 1, types.Boolean))
     doTest(null, "foo", null, Seq(params))
   }
 
@@ -94,8 +100,9 @@ class ChangeSignatureFromScalaTest extends ChangeSignatureTestBase {
   }
 
   def testAddByName() = {
-    val params = Seq(parameterInfo("x", 0, types.Int),
-                     parameterInfo("s", 1, types.AnyRef, isByName = true))
+    val params = Seq(
+      parameterInfo("x", 0, types.Int),
+      parameterInfo("s", 1, types.AnyRef, isByName = true))
     doTest(null, "foo", null, Seq(params))
   }
 
@@ -113,15 +120,17 @@ class ChangeSignatureFromScalaTest extends ChangeSignatureTestBase {
 
   def testSecConstructor() = {
     isAddDefaultValue = false
-    val params = Seq(parameterInfo("i", 0, types.Int),
-                     parameterInfo("j", -1, types.Int, "0"))
+    val params = Seq(
+      parameterInfo("i", 0, types.Int),
+      parameterInfo("j", -1, types.Int, "0"))
     doTest(null, "Constructor", null, Seq(params))
   }
 
   def testPrimConstructor() = {
     isAddDefaultValue = false
-    val params = Seq(parameterInfo("i", 0, types.Int),
-                     parameterInfo("b", -1, types.Boolean, "true"))
+    val params = Seq(
+      parameterInfo("i", 0, types.Int),
+      parameterInfo("b", -1, types.Boolean, "true"))
     doTest("protected", "Constructor", null, Seq(params))
   }
 
@@ -132,37 +141,44 @@ class ChangeSignatureFromScalaTest extends ChangeSignatureTestBase {
 
   def testPrimConstructorDefault() = {
     isAddDefaultValue = true
-    val params = Seq(parameterInfo("i", 0, types.Int),
-                     parameterInfo("b", -1, types.Boolean, "true"))
+    val params = Seq(
+      parameterInfo("i", 0, types.Int),
+      parameterInfo("b", -1, types.Boolean, "true"))
     doTest("protected", "Constructor", null, Seq(params))
   }
 
   def testAddNewClauseWithDefault() = {
     isAddDefaultValue = true
-    val params = Seq(Seq(parameterInfo("b", -1, types.Boolean, "true")),
-                     Seq(parameterInfo("x", 0, types.Int),
-                         parameterInfo("y", -1, types.Int, "0")))
+    val params = Seq(
+      Seq(parameterInfo("b", -1, types.Boolean, "true")),
+      Seq(
+        parameterInfo("x", 0, types.Int),
+        parameterInfo("y", -1, types.Int, "0")))
     doTest(null, "foo", null, params)
   }
 
   def testAddNewClause() = {
     isAddDefaultValue = false
-    val params = Seq(Seq(parameterInfo("b", -1, types.Boolean, "true")),
-                     Seq(parameterInfo("x", 0, types.Int),
-                         parameterInfo("y", -1, types.Int, "0")))
+    val params = Seq(
+      Seq(parameterInfo("b", -1, types.Boolean, "true")),
+      Seq(
+        parameterInfo("x", 0, types.Int),
+        parameterInfo("y", -1, types.Int, "0")))
     doTest(null, "foo", null, params)
   }
 
   def testRemoveClause() = {
-    val params = Seq(parameterInfo("b", 1, types.Boolean),
-                     parameterInfo("i", 0, types.Int))
+    val params = Seq(
+      parameterInfo("b", 1, types.Boolean),
+      parameterInfo("i", 0, types.Int))
     doTest(null, "RemoveClauseConstructor", null, Seq(params))
   }
 
   def testCaseClass(): Unit = {
-    val params = Seq(parameterInfo("number", 1, types.Int),
-                     parameterInfo("char", 0, types.Char),
-                     parameterInfo("b", -1, types.Boolean, "true"))
+    val params = Seq(
+      parameterInfo("number", 1, types.Int),
+      parameterInfo("char", 0, types.Char),
+      parameterInfo("b", -1, types.Boolean, "true"))
     doTest(null, "MyClass", null, Seq(params))
   }
 }

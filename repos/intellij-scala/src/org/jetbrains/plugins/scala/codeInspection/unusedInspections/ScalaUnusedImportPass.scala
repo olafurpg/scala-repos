@@ -48,8 +48,9 @@ class ScalaUnusedImportPass(val file: PsiFile,
       highlightInfoProcessor)
     with ScalaUnusedImportPassBase {
   protected def getFixes: List[IntentionAction] =
-    List(new ScalaOptimizeImportsFix,
-         new ScalaEnableOptimizeImportsOnTheFlyFix)
+    List(
+      new ScalaOptimizeImportsFix,
+      new ScalaEnableOptimizeImportsOnTheFlyFix)
 
   private var myHighlights: util.List[HighlightInfo] = null
   private var myOptimizeImportsRunnable: Runnable = null

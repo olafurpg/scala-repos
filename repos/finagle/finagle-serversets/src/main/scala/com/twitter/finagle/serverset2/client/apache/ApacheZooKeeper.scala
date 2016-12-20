@@ -68,12 +68,13 @@ private[serverset2] class ApacheZooKeeper private[apache] (
         }
     }
     try {
-      zk.create(path,
-                zkData(data),
-                (acl map ApacheData.ACL.zk).asJava,
-                ApacheCreateMode.zk(createMode),
-                cb,
-                null)
+      zk.create(
+        path,
+        zkData(data),
+        (acl map ApacheData.ACL.zk).asJava,
+        ApacheCreateMode.zk(createMode),
+        cb,
+        null)
     } catch {
       case t: Throwable =>
         rv.setException(t)
@@ -181,8 +182,9 @@ private[serverset2] class ApacheZooKeeper private[apache] (
         ApacheKeeperException(ret, Option(path)) match {
           case None =>
             rv.setValue(
-              Watched(Node.Data(fromZKData(data), ApacheData.Stat(stat)),
-                      watcher.state))
+              Watched(
+                Node.Data(fromZKData(data), ApacheData.Stat(stat)),
+                watcher.state))
           case Some(e) => rv.setException(e)
         }
     }
@@ -229,8 +231,9 @@ private[serverset2] class ApacheZooKeeper private[apache] (
         ApacheKeeperException(ret, Option(path)) match {
           case None =>
             rv.setValue(
-              Node.ACL(acl.asScala.toList map (ApacheData.ACL(_)),
-                       ApacheData.Stat(stat)))
+              Node.ACL(
+                acl.asScala.toList map (ApacheData.ACL(_)),
+                ApacheData.Stat(stat)))
           case Some(e) => rv.setException(e)
         }
     }
@@ -258,11 +261,12 @@ private[serverset2] class ApacheZooKeeper private[apache] (
         }
     }
     try {
-      zk.setACL(path,
-                (acl map ApacheData.ACL.zk).asJava,
-                version getOrElse -1,
-                cb,
-                null)
+      zk.setACL(
+        path,
+        (acl map ApacheData.ACL.zk).asJava,
+        version getOrElse -1,
+        cb,
+        null)
     } catch {
       case t: Throwable =>
         rv.setException(t)
@@ -305,8 +309,9 @@ private[serverset2] class ApacheZooKeeper private[apache] (
         ApacheKeeperException(ret, Option(path)) match {
           case None =>
             rv.setValue(
-              Watched(Node.Children(children.asScala, ApacheData.Stat(stat)),
-                      watcher.state))
+              Watched(
+                Node.Children(children.asScala, ApacheData.Stat(stat)),
+                watcher.state))
           case Some(e) => rv.setException(e)
         }
     }
@@ -361,11 +366,12 @@ private[serverset2] object ApacheZooKeeper {
     val zk = (config.sessionId, config.password) match {
       case (Some(id), Some(pw)) =>
         new ApacheZooKeeper(
-          new zookeeper.ZooKeeper(config.hosts,
-                                  timeoutInMs,
-                                  watcher,
-                                  id,
-                                  toByteArray(pw)))
+          new zookeeper.ZooKeeper(
+            config.hosts,
+            timeoutInMs,
+            watcher,
+            id,
+            toByteArray(pw)))
       case _ =>
         new ApacheZooKeeper(
           new zookeeper.ZooKeeper(config.hosts, timeoutInMs, watcher))

@@ -24,12 +24,13 @@ case class TypeAliasSignature(name: String,
                               isDefinition: Boolean,
                               ta: ScTypeAlias) {
   def this(ta: ScTypeAlias) {
-    this(ta.name,
-         ta.typeParameters.map(new TypeParameter(_)).toList,
-         ta.lowerBound.getOrNothing,
-         ta.upperBound.getOrAny,
-         ta.isInstanceOf[ScTypeAliasDefinition],
-         ta)
+    this(
+      ta.name,
+      ta.typeParameters.map(new TypeParameter(_)).toList,
+      ta.lowerBound.getOrNothing,
+      ta.upperBound.getOrAny,
+      ta.isInstanceOf[ScTypeAliasDefinition],
+      ta)
   }
 
   def updateTypes(fun: ScType => ScType,
@@ -45,12 +46,13 @@ case class TypeAliasSignature(name: String,
           res
       }, tp.ptp)
     }
-    val res = TypeAliasSignature(name,
-                                 typeParams.map(updateTypeParam),
-                                 fun(lowerBound),
-                                 fun(upperBound),
-                                 isDefinition,
-                                 ta)
+    val res = TypeAliasSignature(
+      name,
+      typeParams.map(updateTypeParam),
+      fun(lowerBound),
+      fun(upperBound),
+      isDefinition,
+      ta)
 
     if (withCopy) res.copy(ta = ScTypeAlias.getCompoundCopy(res, ta))
     else res
@@ -60,18 +62,20 @@ case class TypeAliasSignature(name: String,
                               variance: Int,
                               withCopy: Boolean = true): TypeAliasSignature = {
     def updateTypeParam(tp: TypeParameter): TypeParameter = {
-      new TypeParameter(tp.name,
-                        tp.typeParams.map(updateTypeParam),
-                        () => fun(tp.lowerType(), variance),
-                        () => fun(tp.upperType(), -variance),
-                        tp.ptp)
+      new TypeParameter(
+        tp.name,
+        tp.typeParams.map(updateTypeParam),
+        () => fun(tp.lowerType(), variance),
+        () => fun(tp.upperType(), -variance),
+        tp.ptp)
     }
-    val res = TypeAliasSignature(name,
-                                 typeParams.map(updateTypeParam),
-                                 fun(lowerBound, variance),
-                                 fun(upperBound, -variance),
-                                 isDefinition,
-                                 ta)
+    val res = TypeAliasSignature(
+      name,
+      typeParams.map(updateTypeParam),
+      fun(lowerBound, variance),
+      fun(upperBound, -variance),
+      isDefinition,
+      ta)
 
     if (withCopy) res.copy(ta = ScTypeAlias.getCompoundCopy(res, ta))
     else res
@@ -106,12 +110,13 @@ class Signature(val name: String,
            paramLength: Int,
            substitutor: ScSubstitutor,
            namedElement: PsiNamedElement) =
-    this(name,
-         List(stream),
-         List(paramLength),
-         Array.empty,
-         substitutor,
-         namedElement)
+    this(
+      name,
+      List(stream),
+      List(paramLength),
+      Array.empty,
+      substitutor,
+      namedElement)
 
   private def types: List[Seq[() => ScType]] = typesEval
 
@@ -156,9 +161,10 @@ class Signature(val name: String,
   }
 
   def paramTypesEquiv(other: Signature): Boolean = {
-    paramTypesEquivExtended(other,
-                            new ScUndefinedSubstitutor,
-                            falseUndef = true)._1
+    paramTypesEquivExtended(
+      other,
+      new ScUndefinedSubstitutor,
+      falseUndef = true)._1
   }
 
   def paramTypesEquivExtended(
@@ -311,12 +317,13 @@ object PhysicalSignature {
 
 class PhysicalSignature(val method: PsiMethod,
                         override val substitutor: ScSubstitutor)
-    extends Signature(method.name,
-                      PhysicalSignature.typesEval(method),
-                      PhysicalSignature.paramLength(method),
-                      TypeParameter.fromArray(method.getTypeParameters),
-                      substitutor,
-                      method,
-                      PhysicalSignature.hasRepeatedParam(method)) {
+    extends Signature(
+      method.name,
+      PhysicalSignature.typesEval(method),
+      PhysicalSignature.paramLength(method),
+      TypeParameter.fromArray(method.getTypeParameters),
+      substitutor,
+      method,
+      PhysicalSignature.hasRepeatedParam(method)) {
   override def isJava = method.getLanguage == JavaFileType.INSTANCE.getLanguage
 }

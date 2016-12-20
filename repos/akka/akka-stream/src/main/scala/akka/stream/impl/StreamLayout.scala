@@ -249,32 +249,37 @@ object StreamLayout {
         if (downstreams.contains(from))
           s"The output port [$from] is already connected"
         else s"The output port [$from] is not part of the underlying graph.")
-      require(inPorts(to),
-              if (upstreams.contains(to))
-                s"The input port [$to] is already connected"
-              else
-                s"The input port [$to] is not part of the underlying graph.")
+      require(
+        inPorts(to),
+        if (upstreams.contains(to))
+          s"The input port [$to] is already connected"
+        else
+          s"The input port [$to] is not part of the underlying graph.")
 
-      CompositeModule(if (isSealed) Set(this) else subModules,
-                      AmorphousShape(shape.inlets.filterNot(_ == to),
-                                     shape.outlets.filterNot(_ == from)),
-                      downstreams.updated(from, to),
-                      upstreams.updated(to, from),
-                      materializedValueComputation,
-                      if (isSealed) Attributes.none else attributes)
+      CompositeModule(
+        if (isSealed) Set(this) else subModules,
+        AmorphousShape(
+          shape.inlets.filterNot(_ == to),
+          shape.outlets.filterNot(_ == from)),
+        downstreams.updated(from, to),
+        upstreams.updated(to, from),
+        materializedValueComputation,
+        if (isSealed) Attributes.none else attributes)
     }
 
     final def transformMaterializedValue(f: Any ⇒ Any): Module = {
       if (Debug) validate(this)
 
-      CompositeModule(if (this.isSealed) Set(this) else this.subModules,
-                      shape,
-                      downstreams,
-                      upstreams,
-                      Transform(f,
-                                if (this.isSealed) Atomic(this)
-                                else this.materializedValueComputation),
-                      if (this.isSealed) Attributes.none else attributes)
+      CompositeModule(
+        if (this.isSealed) Set(this) else this.subModules,
+        shape,
+        downstreams,
+        upstreams,
+        Transform(
+          f,
+          if (this.isSealed) Atomic(this)
+          else this.materializedValueComputation),
+        if (this.isSealed) Attributes.none else attributes)
     }
 
     /**
@@ -326,13 +331,15 @@ object StreamLayout {
         else comp
       }
 
-      CompositeModule(modulesLeft ++ modulesRight,
-                      AmorphousShape(shape.inlets ++ that.shape.inlets,
-                                     shape.outlets ++ that.shape.outlets),
-                      downstreams ++ that.downstreams,
-                      upstreams ++ that.upstreams,
-                      mat,
-                      Attributes.none)
+      CompositeModule(
+        modulesLeft ++ modulesRight,
+        AmorphousShape(
+          shape.inlets ++ that.shape.inlets,
+          shape.outlets ++ that.shape.outlets),
+        downstreams ++ that.downstreams,
+        upstreams ++ that.upstreams,
+        mat,
+        Attributes.none)
     }
 
     /**
@@ -364,14 +371,16 @@ object StreamLayout {
       val matComputation =
         if (this.isSealed) Atomic(this) else this.materializedValueComputation
 
-      CompositeModule(modules1 ++ modules2,
-                      AmorphousShape(shape.inlets ++ that.shape.inlets,
-                                     shape.outlets ++ that.shape.outlets),
-                      downstreams ++ that.downstreams,
-                      upstreams ++ that.upstreams,
-                      // would like to optimize away this allocation for Keep.{left,right} but that breaks side-effecting transformations
-                      matComputation,
-                      Attributes.none)
+      CompositeModule(
+        modules1 ++ modules2,
+        AmorphousShape(
+          shape.inlets ++ that.shape.inlets,
+          shape.outlets ++ that.shape.outlets),
+        downstreams ++ that.downstreams,
+        upstreams ++ that.upstreams,
+        // would like to optimize away this allocation for Keep.{left,right} but that breaks side-effecting transformations
+        matComputation,
+        Attributes.none)
     }
 
     def subModules: Set[Module]
@@ -496,12 +505,13 @@ object StreamLayout {
 
   object CompositeModule {
     def apply(m: Module, s: Shape): CompositeModule =
-      CompositeModule(Set(m),
-                      s,
-                      Map.empty,
-                      Map.empty,
-                      Atomic(m),
-                      Attributes.none)
+      CompositeModule(
+        Set(m),
+        s,
+        Map.empty,
+        Map.empty,
+        Atomic(m),
+        Attributes.none)
   }
 
   final case class FusedModule(
@@ -704,8 +714,9 @@ private[stream] final class VirtualProcessor[T]
     @tailrec def rec(ex: Throwable): Unit =
       get() match {
         case null =>
-          if (!compareAndSet(null,
-                             ErrorPublisher(ex, "failed-VirtualProcessor")))
+          if (!compareAndSet(
+                null,
+                ErrorPublisher(ex, "failed-VirtualProcessor")))
             rec(ex)
           else if (t == null) throw ex
         case s: Subscription =>
@@ -750,8 +761,9 @@ private[stream] final class VirtualProcessor[T]
       @tailrec def rec(): Unit =
         get() match {
           case x @ (null | _: Subscription) =>
-            if (!compareAndSet(x,
-                               ErrorPublisher(ex, "failed-VirtualProcessor")))
+            if (!compareAndSet(
+                  x,
+                  ErrorPublisher(ex, "failed-VirtualProcessor")))
               rec()
           case s: Subscriber[_] =>
             try s.onError(ex)
@@ -786,8 +798,9 @@ private[stream] final class VirtualProcessor[T]
             throw ex
           case Inert | _: Publisher[_] => // nothing to be done
           case other =>
-            val pub = ErrorPublisher(new IllegalStateException(noDemand),
-                                     "failed-VirtualPublisher")
+            val pub = ErrorPublisher(
+              new IllegalStateException(noDemand),
+              "failed-VirtualPublisher")
             if (!compareAndSet(other, pub)) rec()
             else throw pub.t
         }
@@ -850,8 +863,9 @@ private[impl] class VirtualPublisher[T]
             pub.asInstanceOf[Publisher[T]].subscribe(subscriber)
           } else rec()
         case _: Subscriber[_] =>
-          rejectAdditionalSubscriber(subscriber,
-                                     "Sink.asPublisher(fanout = false)")
+          rejectAdditionalSubscriber(
+            subscriber,
+            "Sink.asPublisher(fanout = false)")
       }
     }
     rec() // return value is boolean only to make the expressions above compile
@@ -963,8 +977,9 @@ private[stream] abstract class MaterializerSession(
   final def materialize(): Any = {
     if (MaterializerSession.Debug)
       println(s"beginning materialization of $topLevel")
-    require(topLevel ne EmptyModule,
-            "An empty module cannot be materialized (EmptyModule was given)")
+    require(
+      topLevel ne EmptyModule,
+      "An empty module cannot be materialized (EmptyModule was given)")
     require(
       topLevel.isRunnable,
       s"The top level module cannot be materialized because it has unconnected ports: ${(topLevel.inPorts ++ topLevel.outPorts)
@@ -1035,9 +1050,10 @@ private[stream] abstract class MaterializerSession(
         .mkString("\n    ")}")
     }
 
-    val ret = resolveMaterialized(module.materializedValueComputation,
-                                  materializedValues,
-                                  2)
+    val ret = resolveMaterialized(
+      module.materializedValueComputation,
+      materializedValues,
+      2)
     while (!matValSrc.isEmpty) {
       val node = matValSrc.keySet.iterator.next()
       if (MaterializerSession.Debug) println(s"  delayed computation of $node")
@@ -1066,7 +1082,8 @@ private[stream] abstract class MaterializerSession(
     val ret = matNode match {
       case Atomic(m) ⇒ matVal.get(m)
       case Combine(f, d1, d2) ⇒
-        f(resolveMaterialized(d1, matVal, spaces + 2),
+        f(
+          resolveMaterialized(d1, matVal, spaces + 2),
           resolveMaterialized(d2, matVal, spaces + 2))
       case Transform(f, d) ⇒ f(resolveMaterialized(d, matVal, spaces + 2))
       case Ignore ⇒ NotUsed

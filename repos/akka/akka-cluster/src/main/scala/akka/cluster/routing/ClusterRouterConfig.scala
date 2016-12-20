@@ -58,10 +58,11 @@ final case class ClusterRouterGroupSettings(
            routeesPaths: java.lang.Iterable[String],
            allowLocalRoutees: Boolean,
            useRole: String) =
-    this(totalInstances,
-         immutableSeq(routeesPaths),
-         allowLocalRoutees,
-         ClusterRouterSettingsBase.useRoleOption(useRole))
+    this(
+      totalInstances,
+      immutableSeq(routeesPaths),
+      allowLocalRoutees,
+      ClusterRouterSettingsBase.useRoleOption(useRole))
 
   if (totalInstances <= 0)
     throw new IllegalArgumentException(
@@ -110,10 +111,11 @@ final case class ClusterRouterPoolSettings(totalInstances: Int,
            maxInstancesPerNode: Int,
            allowLocalRoutees: Boolean,
            useRole: String) =
-    this(totalInstances,
-         maxInstancesPerNode,
-         allowLocalRoutees,
-         ClusterRouterSettingsBase.useRoleOption(useRole))
+    this(
+      totalInstances,
+      maxInstancesPerNode,
+      allowLocalRoutees,
+      ClusterRouterSettingsBase.useRoleOption(useRole))
 
   if (maxInstancesPerNode <= 0)
     throw new IllegalArgumentException(
@@ -150,8 +152,9 @@ private[akka] trait ClusterRouterSettingsBase {
   def allowLocalRoutees: Boolean
   def useRole: Option[String]
 
-  require(useRole.isEmpty || useRole.get.nonEmpty,
-          "useRole must be either None or non-empty Some wrapped role")
+  require(
+    useRole.isEmpty || useRole.get.nonEmpty,
+    "useRole must be either None or non-empty Some wrapped role")
   require(totalInstances > 0, "totalInstances of cluster router must be > 0")
 }
 
@@ -205,8 +208,9 @@ final case class ClusterRouterPool(local: Pool,
     extends Pool
     with ClusterRouterConfigBase {
 
-  require(local.resizer.isEmpty,
-          "Resizer can't be used together with cluster router")
+  require(
+    local.resizer.isEmpty,
+    "Resizer can't be used together with cluster router")
 
   @transient private val childNameCounter = new AtomicInteger
 
@@ -218,9 +222,10 @@ final case class ClusterRouterPool(local: Pool,
     val name = "c" + childNameCounter.incrementAndGet
     val ref = context
       .asInstanceOf[ActorCell]
-      .attachChild(local.enrichWithPoolDispatcher(routeeProps, context),
-                   name,
-                   systemService = false)
+      .attachChild(
+        local.enrichWithPoolDispatcher(routeeProps, context),
+        name,
+        systemService = false)
     ActorRefRoutee(ref)
   }
 
@@ -298,9 +303,10 @@ private[akka] class ClusterRouterPoolActor(
       case None ⇒ // done
       case Some(target) ⇒
         val routeeProps = cell.routeeProps
-        val deploy = Deploy(config = ConfigFactory.empty(),
-                            routerConfig = routeeProps.routerConfig,
-                            scope = RemoteScope(target))
+        val deploy = Deploy(
+          config = ConfigFactory.empty(),
+          routerConfig = routeeProps.routerConfig,
+          scope = RemoteScope(target))
         val routee = pool.newRoutee(routeeProps.withDeploy(deploy), context)
         // must register each one, since registered routees are used in selectDeploymentTarget
         cell.addRoutee(routee)

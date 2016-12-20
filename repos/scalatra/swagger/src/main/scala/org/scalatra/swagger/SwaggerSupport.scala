@@ -249,14 +249,15 @@ object SwaggerSupportSyntax {
     //    def allowsMultiple: Boolean = !SwaggerSupportSyntax.SingleValued.contains(paramType) && _allowMultiple
 
     def result =
-      Parameter(name,
-                dataType,
-                description,
-                notes,
-                paramType,
-                defaultValue,
-                allowableValues,
-                isRequired)
+      Parameter(
+        name,
+        dataType,
+        description,
+        notes,
+        paramType,
+        defaultValue,
+        allowableValues,
+        isRequired)
   }
 
   class ParameterBuilder[T: Manifest](initialDataType: DataType)
@@ -357,19 +358,20 @@ object SwaggerSupportSyntax {
   class OperationBuilder(val resultClass: DataType)
       extends SwaggerOperationBuilder[Operation] {
     def result: Operation =
-      Operation(null,
-                resultClass,
-                summary,
-                position,
-                notes,
-                deprecated,
-                nickname,
-                parameters,
-                responseMessages,
-                consumes,
-                produces,
-                protocols,
-                authorizations)
+      Operation(
+        null,
+        resultClass,
+        summary,
+        position,
+        notes,
+        deprecated,
+        nickname,
+        parameters,
+        responseMessages,
+        consumes,
+        produces,
+        protocols,
+        authorizations)
   }
 }
 trait SwaggerSupportSyntax extends Initializable with CorsSupport {
@@ -403,14 +405,15 @@ trait SwaggerSupportSyntax extends Initializable with CorsSupport {
     }
     val listingPath = resourcePath.drop(1) // drop the leading slash
 
-    swagger.register(listingPath,
-                     resourcePath,
-                     applicationDescription.blankOption,
-                     this,
-                     swaggerConsumes,
-                     swaggerProduces,
-                     swaggerProtocols,
-                     swaggerAuthorizations)
+    swagger.register(
+      listingPath,
+      resourcePath,
+      applicationDescription.blankOption,
+      this,
+      swaggerConsumes,
+      swaggerProduces,
+      swaggerProtocols,
+      swaggerAuthorizations)
   }
 
   /**

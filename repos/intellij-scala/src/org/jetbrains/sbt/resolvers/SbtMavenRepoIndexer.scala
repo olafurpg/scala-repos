@@ -119,13 +119,14 @@ class SbtMavenRepoIndexer private (val root: String, val indexDir: File)
       indexerEngine,
       queryCreator
     )
-    val nexusContext = nexusIndexer.addIndexingContext(root.shaDigest,
-                                                       root.shaDigest,
-                                                       context.getRepository,
-                                                       indexDir,
-                                                       null,
-                                                       null,
-                                                       indexers)
+    val nexusContext = nexusIndexer.addIndexingContext(
+      root.shaDigest,
+      root.shaDigest,
+      context.getRepository,
+      indexDir,
+      null,
+      null,
+      indexers)
     nexusIndexer.scan(nexusContext, scannerListener, true)
     nexusIndexer.removeIndexingContext(nexusContext, false)
 

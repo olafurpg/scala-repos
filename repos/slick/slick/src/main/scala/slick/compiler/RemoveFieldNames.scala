@@ -29,16 +29,17 @@ class RemoveFieldNames(val alwaysKeepSubqueryNames: Boolean = false)
           .collect[TypeSymbol] {
             case Select(_ :@ NominalType(s, _), _) => s
             case Union(_, _ :@ CollectionType(_, NominalType(s, _)), _) => s
-            case Comprehension(_,
-                               _ :@ CollectionType(_, NominalType(s, _)),
-                               _,
-                               _,
-                               _,
-                               _,
-                               _,
-                               _,
-                               _,
-                               _) if alwaysKeepSubqueryNames =>
+            case Comprehension(
+                _,
+                _ :@ CollectionType(_, NominalType(s, _)),
+                _,
+                _,
+                _,
+                _,
+                _,
+                _,
+                _,
+                _) if alwaysKeepSubqueryNames =>
               s
           }
           .toSet

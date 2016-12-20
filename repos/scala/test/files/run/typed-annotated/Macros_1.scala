@@ -8,8 +8,9 @@ object Macros {
     import c.universe._
     // val tpt = Annotated(Apply(Select(New(Ident(newTypeName("ann"))), termNames.CONSTRUCTOR), List()), Ident(newTypeName("Int")))
     val tpt = Annotated(
-      Apply(Select(New(Ident(newTypeName("ann"))), termNames.CONSTRUCTOR),
-            List()),
+      Apply(
+        Select(New(Ident(newTypeName("ann"))), termNames.CONSTRUCTOR),
+        List()),
       TypeTree(weakTypeOf[Int]))
     c.Expr[Unit](
       Block(

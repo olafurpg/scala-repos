@@ -67,8 +67,9 @@ class Interaction @Since("1.6.0")(override val uid: String)
     require(get(inputCols).isDefined, "Input cols must be defined first.")
     require(get(outputCol).isDefined, "Output col must be defined first.")
     require($(inputCols).length > 0, "Input cols must have non-zero length.")
-    require($(inputCols).distinct.length == $(inputCols).length,
-            "Input cols must be distinct.")
+    require(
+      $(inputCols).distinct.length == $(inputCols).length,
+      "Input cols must be distinct.")
     StructType(
       schema.fields :+ StructField($(outputCol), new VectorUDT, false))
   }
@@ -114,9 +115,10 @@ class Interaction @Since("1.6.0")(override val uid: String)
         case _: NumericType | BooleanType => dataset(f.name).cast(DoubleType)
       }
     }
-    dataset.select(col("*"),
-                   interactFunc(struct(featureCols: _*))
-                     .as($(outputCol), featureAttrs.toMetadata()))
+    dataset.select(
+      col("*"),
+      interactFunc(struct(featureCols: _*))
+        .as($(outputCol), featureAttrs.toMetadata()))
   }
 
   /**
@@ -130,10 +132,11 @@ class Interaction @Since("1.6.0")(override val uid: String)
     def getNumFeatures(attr: Attribute): Int = {
       attr match {
         case nominal: NominalAttribute =>
-          math.max(1,
-                   nominal.getNumValues.getOrElse(
-                     throw new SparkException(
-                       "Nominal features must have attr numValues defined.")))
+          math.max(
+            1,
+            nominal.getNumValues.getOrElse(
+              throw new SparkException(
+                "Nominal features must have attr numValues defined.")))
         case _ =>
           1 // numeric feature
       }
@@ -283,12 +286,14 @@ private[ml] class FeatureEncoder(numFeatures: Array[Int])
   def foreachNonzeroOutput(value: Any, f: (Int, Double) => Unit): Unit =
     value match {
       case d: Double =>
-        assert(numFeatures.length == 1,
-               "DoubleType columns should only contain one feature.")
+        assert(
+          numFeatures.length == 1,
+          "DoubleType columns should only contain one feature.")
         val numOutputCols = numFeatures.head
         if (numOutputCols > 1) {
-          assert(d >= 0.0 && d == d.toInt && d < numOutputCols,
-                 s"Values from column must be indices, but got $d.")
+          assert(
+            d >= 0.0 && d == d.toInt && d < numOutputCols,
+            s"Values from column must be indices, but got $d.")
           f(d.toInt, 1.0)
         } else {
           f(0, d)
@@ -300,8 +305,9 @@ private[ml] class FeatureEncoder(numFeatures: Array[Int])
         vec.foreachActive { (i, v) =>
           val numOutputCols = numFeatures(i)
           if (numOutputCols > 1) {
-            assert(v >= 0.0 && v == v.toInt && v < numOutputCols,
-                   s"Values from column must be indices, but got $v.")
+            assert(
+              v >= 0.0 && v == v.toInt && v < numOutputCols,
+              s"Values from column must be indices, but got $v.")
             f(outputOffsets(i) + v.toInt, 1.0)
           } else {
             f(outputOffsets(i), v)

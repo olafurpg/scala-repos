@@ -61,19 +61,22 @@ class AsyncTest {
 
     val res = asyncTest
 
-    assertArrayEquals(Array("prep-future", "prep-map", "prep-foreach", "done"),
-                      res.toArray)
+    assertArrayEquals(
+      Array("prep-future", "prep-map", "prep-foreach", "done"),
+      res.toArray)
 
     processQueue()
 
-    assertArrayEquals(Array("prep-future",
-                            "prep-map",
-                            "prep-foreach",
-                            "done",
-                            "future",
-                            "map",
-                            "foreach"),
-                      res.toArray)
+    assertArrayEquals(
+      Array(
+        "prep-future",
+        "prep-map",
+        "prep-foreach",
+        "done",
+        "future",
+        "map",
+        "foreach"),
+      res.toArray)
   }
 
   @Test def scala_scalajs_concurrent_JSExecutionContext_queue(): Unit = {
@@ -88,14 +91,16 @@ class AsyncTest {
   @Test def scala_scalajs_concurrent_JSExecutionContext_runNow(): Unit = {
     val res = asyncTest(JSExecutionContext.runNow)
 
-    assertArrayEquals(Array("prep-future",
-                            "future",
-                            "prep-map",
-                            "map",
-                            "prep-foreach",
-                            "foreach",
-                            "done"),
-                      res.toArray)
+    assertArrayEquals(
+      Array(
+        "prep-future",
+        "future",
+        "prep-map",
+        "map",
+        "prep-foreach",
+        "foreach",
+        "done"),
+      res.toArray)
   }
 
   @Test def scala_scala_concurrent_ExecutionContext_global(): Unit = {

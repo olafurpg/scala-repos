@@ -184,10 +184,11 @@ class ScAnnotationImpl private (stub: StubElement[ScAnnotation],
           namePrefix = attributeName + " = "
         }
 
-        args(0).addBefore(ScalaPsiElementFactory.createExpressionFromText(
-                            namePrefix + value.getText,
-                            value.getManager),
-                          null)
+        args(0).addBefore(
+          ScalaPsiElementFactory.createExpressionFromText(
+            namePrefix + value.getText,
+            value.getManager),
+          null)
       }
     }
     findDeclaredAttributeValue(attributeName).asInstanceOf[T]

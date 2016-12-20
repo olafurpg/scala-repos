@@ -62,10 +62,11 @@ class ServerSetResolver {
     implicit val timer = DefaultTimer.twitter
 
     val stabilizationWindow = Duration.fromSeconds(stabilizationSec)
-    val resolver = new Zk2Resolver(NullStatsReceiver,
-                                   stabilizationWindow,
-                                   stabilizationWindow,
-                                   stabilizationWindow)
+    val resolver = new Zk2Resolver(
+      NullStatsReceiver,
+      stabilizationWindow,
+      stabilizationWindow,
+      stabilizationWindow)
 
     val serverSetPaths =
       LocalServerSetService.createServerSetPaths(serverSetsToResolve)

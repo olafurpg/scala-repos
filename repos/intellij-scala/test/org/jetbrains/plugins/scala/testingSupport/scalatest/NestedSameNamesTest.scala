@@ -9,8 +9,9 @@ trait NestedSameNamesTest extends ScalaTestTestCase {
     List("[root]", "FunSpecTest", "FunSpecTest", "FunSpecTest", "FunSpecTest")
 
   def testNestedSameNames(): Unit = {
-    addFileToProject("FunSpecTest.scala",
-                     """
+    addFileToProject(
+      "FunSpecTest.scala",
+      """
         |import org.scalatest._
         |
         |class FunSpecTest extends FunSpec {
@@ -28,9 +29,10 @@ trait NestedSameNamesTest extends ScalaTestTestCase {
       6,
       12,
       "FunSpecTest.scala",
-      checkConfigAndSettings(_,
-                             "FunSpecTest",
-                             "FunSpecTest FunSpecTest FunSpecTest"),
+      checkConfigAndSettings(
+        _,
+        "FunSpecTest",
+        "FunSpecTest FunSpecTest FunSpecTest"),
       root => checkResultTreeHasExactNamedPath(root, testPath: _*))
   }
 }

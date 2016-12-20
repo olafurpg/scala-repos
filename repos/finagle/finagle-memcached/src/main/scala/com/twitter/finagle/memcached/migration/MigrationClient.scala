@@ -343,10 +343,11 @@ object MigrationClient {
     val migrationStatsReceiver = ClientStatsReceiver.scope("migrationclient")
 
     // create MigrationClient, by oldClient newClient, (zkPath, zkClient)
-    new MigrationClient(oldClient,
-                        newClient,
-                        zkPath,
-                        zkClient,
-                        migrationStatsReceiver)
+    new MigrationClient(
+      oldClient,
+      newClient,
+      zkPath,
+      zkClient,
+      migrationStatsReceiver)
   }
 }

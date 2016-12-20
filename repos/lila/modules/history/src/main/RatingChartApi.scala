@@ -41,29 +41,31 @@ final class RatingChartApi(historyApi: HistoryApi,
         ("name" -> perfType.name, "points" -> ratingsMap.map {
           case (days, rating) =>
             val date = user.createdAt plusDays days
-            Json.arr(date.getYear,
-                     date.getMonthOfYear - 1,
-                     date.getDayOfMonth,
-                     rating)
+            Json.arr(
+              date.getYear,
+              date.getMonthOfYear - 1,
+              date.getDayOfMonth,
+              rating)
         })
 
     historyApi get user.id map2 { (history: History) =>
       Json stringify {
         Json.toJson {
           import lila.rating.PerfType._
-          List(Bullet,
-               Blitz,
-               Classical,
-               Correspondence,
-               Chess960,
-               KingOfTheHill,
-               ThreeCheck,
-               Antichess,
-               Atomic,
-               Horde,
-               RacingKings,
-               Crazyhouse,
-               Puzzle) map { pt =>
+          List(
+            Bullet,
+            Blitz,
+            Classical,
+            Correspondence,
+            Chess960,
+            KingOfTheHill,
+            ThreeCheck,
+            Antichess,
+            Atomic,
+            Horde,
+            RacingKings,
+            Crazyhouse,
+            Puzzle) map { pt =>
             ratingsMapToJson(pt, history(pt))
           }
         }

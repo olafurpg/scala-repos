@@ -62,8 +62,9 @@ trait VectorBuilderOps { this: VectorBuilder.type =>
     : Op.InPlaceImpl2[VectorBuilder[T], VectorBuilder[T]] = {
     new Op.InPlaceImpl2[VectorBuilder[T], VectorBuilder[T]] {
       def apply(a: VectorBuilder[T], b: VectorBuilder[T]) {
-        require(a.length < 0 || b.length < 0 || a.length == b.length,
-                "Dimension mismatch!")
+        require(
+          a.length < 0 || b.length < 0 || a.length == b.length,
+          "Dimension mismatch!")
         a.reserve(a.activeSize + b.activeSize)
         var i = 0
         // read once here in case we're doing a += a
@@ -83,8 +84,9 @@ trait VectorBuilderOps { this: VectorBuilder.type =>
     new Op.InPlaceImpl2[VectorBuilder[T], VectorBuilder[T]] {
       val r = implicitly[Ring[T]]
       def apply(a: VectorBuilder[T], b: VectorBuilder[T]) {
-        require(a.length < 0 || b.length < 0 || a.length == b.length,
-                "Dimension mismatch!")
+        require(
+          a.length < 0 || b.length < 0 || a.length == b.length,
+          "Dimension mismatch!")
         a.reserve(a.activeSize + b.activeSize)
         var i = 0
         // read once here in case we're doing a += a
@@ -164,8 +166,9 @@ trait VectorBuilderOps { this: VectorBuilder.type =>
     : scaleAdd.InPlaceImpl3[VectorBuilder[T], T, VectorBuilder[T]] = {
     new scaleAdd.InPlaceImpl3[VectorBuilder[T], T, VectorBuilder[T]] {
       def apply(a: VectorBuilder[T], s: T, b: VectorBuilder[T]) {
-        require(a.length < 0 || b.length < 0 || a.length == b.length,
-                "Dimension mismatch!")
+        require(
+          a.length < 0 || b.length < 0 || a.length == b.length,
+          "Dimension mismatch!")
         if (a eq b) {
           a :*= (1 + s)
         } else {
@@ -187,8 +190,9 @@ trait VectorBuilderOps { this: VectorBuilder.type =>
     new scaleAdd.InPlaceImpl3[VectorBuilder[T], T, VectorBuilder[T]] {
       val sr = implicitly[Semiring[T]]
       def apply(a: VectorBuilder[T], s: T, b: VectorBuilder[T]) {
-        require(a.length < 0 || b.length < 0 || a.length == b.length,
-                "Dimension mismatch!")
+        require(
+          a.length < 0 || b.length < 0 || a.length == b.length,
+          "Dimension mismatch!")
 
         if (a eq b) {
           a :*= sr.+(sr.one, s)

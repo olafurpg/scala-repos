@@ -86,13 +86,14 @@ object AndroidClassExtractor extends JavaConversionHelpers {
         .map(AndroidClassExtractor.toScalaType(_))
       val paramedTypes = (retType +: argTypes).filter(_.isVar).distinct
 
-      AndroidMethod(name,
-                    retType,
-                    argTypes,
-                    paramedTypes,
-                    isAbstract(m),
-                    isOverride(m),
-                    isDeprecated(m))
+      AndroidMethod(
+        name,
+        retType,
+        argTypes,
+        paramedTypes,
+        isAbstract(m),
+        isOverride(m),
+        isDeprecated(m))
     }
 
     def isListenerSetterOrAdder(m: Method): Boolean = {
@@ -183,12 +184,13 @@ object AndroidClassExtractor extends JavaConversionHelpers {
                 else None
 
               Some(
-                AndroidProperty(name,
-                                tpe,
-                                getter,
-                                setters,
-                                switch,
-                                nameClashes))
+                AndroidProperty(
+                  name,
+                  tpe,
+                  getter,
+                  setters,
+                  switch,
+                  nameClashes))
             }
         }
         .flatten
@@ -199,11 +201,12 @@ object AndroidClassExtractor extends JavaConversionHelpers {
     def toAndroidIntentMethods(method: Method): AndroidIntentMethod = {
       val am = toAndroidMethod(method)
       val args = am.argTypes.tail
-      AndroidIntentMethod(method.getName,
-                          am.retType,
-                          args,
-                          args.length == 0,
-                          isDeprecated(method))
+      AndroidIntentMethod(
+        method.getName,
+        am.retType,
+        args,
+        args.length == 0,
+        isDeprecated(method))
     }
 
     def toAndroidListeners(method: Method): List[AndroidListener] = {
@@ -348,12 +351,13 @@ object AndroidClassExtractor extends JavaConversionHelpers {
       val paramedTypes =
         (tpe.params ++ args.map(_.tpe)).filter(_.isVar).distinct
 
-      ScalaConstructor(args,
-                       implicits,
-                       explicits,
-                       paramedTypes,
-                       cons.isVarArgs,
-                       isDeprecated(cons))
+      ScalaConstructor(
+        args,
+        implicits,
+        explicits,
+        paramedTypes,
+        cons.isVarArgs,
+        isDeprecated(cons))
     }
 
     def getHierarchy(c: Class[_], accu: List[String] = Nil): List[String] =
@@ -383,19 +387,20 @@ object AndroidClassExtractor extends JavaConversionHelpers {
 
     val hasBlankConstructor = constructors.exists(_.explicitArgs.length == 0)
 
-    AndroidClass(clsName,
-                 pkg,
-                 tpe,
-                 parentType,
-                 constructors,
-                 props,
-                 listeners,
-                 intentMethods,
-                 isA,
-                 isAbstract(cls),
-                 isFinal(cls),
-                 hasBlankConstructor,
-                 isDeprecated(cls))
+    AndroidClass(
+      clsName,
+      pkg,
+      tpe,
+      parentType,
+      constructors,
+      props,
+      listeners,
+      intentMethods,
+      isA,
+      isAbstract(cls),
+      isFinal(cls),
+      hasBlankConstructor,
+      isDeprecated(cls))
   }
 
   def extractTask = (moduleName, baseDirectory, streams) map {
@@ -404,8 +409,9 @@ object AndroidClassExtractor extends JavaConversionHelpers {
       else {
         s.log.info("Extracting class info from Android...")
 
-        val classLoaders = List(ClasspathHelper.contextClassLoader(),
-                                ClasspathHelper.staticClassLoader())
+        val classLoaders = List(
+          ClasspathHelper.contextClassLoader(),
+          ClasspathHelper.staticClassLoader())
 
         val inputFilter = new FilterBuilder()
           .include(FilterBuilder.prefix("android"))

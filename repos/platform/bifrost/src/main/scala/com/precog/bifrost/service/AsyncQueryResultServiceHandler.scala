@@ -41,8 +41,9 @@ import scalaz._
 class AsyncQueryResultServiceHandler(jobManager: JobManager[Future])(
     implicit executor: ExecutionContext,
     M: Monad[Future])
-    extends CustomHttpService[ByteChunk,
-                              APIKey => Future[HttpResponse[ByteChunk]]] {
+    extends CustomHttpService[
+      ByteChunk,
+      APIKey => Future[HttpResponse[ByteChunk]]] {
   import JobManager._
   import JobState._
   import scalaz.syntax.monad._
@@ -61,12 +62,10 @@ class AsyncQueryResultServiceHandler(jobManager: JobManager[Future])(
                 case Finished(_, _) =>
                   for {
                     result <- jobManager.getResult(jobId)
-                    warnings <- jobManager.listMessages(jobId,
-                                                        channels.Warning,
-                                                        None)
-                    errors <- jobManager.listMessages(jobId,
-                                                      channels.Error,
-                                                      None)
+                    warnings <- jobManager
+                      .listMessages(jobId, channels.Warning, None)
+                    errors <- jobManager
+                      .listMessages(jobId, channels.Error, None)
                   } yield {
                     result.fold({ _ =>
                       HttpResponse[ByteChunk](NotFound)

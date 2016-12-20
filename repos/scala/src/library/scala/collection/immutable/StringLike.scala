@@ -93,10 +93,11 @@ trait StringLike[+Repr]
     else {
       val last = apply(len - 1)
       if (isLineBreak(last))
-        toString.substring(0,
-                           if (last == LF && len >= 2 && apply(len - 2) == CR)
-                             len - 2
-                           else len - 1)
+        toString.substring(
+          0,
+          if (last == LF && len >= 2 && apply(len - 2) == CR)
+            len - 2
+          else len - 1)
       else toString
     }
   }

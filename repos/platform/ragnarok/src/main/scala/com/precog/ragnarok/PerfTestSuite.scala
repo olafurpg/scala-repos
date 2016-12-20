@@ -40,8 +40,9 @@ trait PerfTestSuite extends Logging {
 
   /** Returns the top-level test for this suite. */
   def test: Tree[PerfTest] =
-    Tree.node(Group(suiteName),
-              Stream(Tree.node(RunSequential, tests.reverse.toStream)))
+    Tree.node(
+      Group(suiteName),
+      Stream(Tree.node(RunSequential, tests.reverse.toStream)))
 
   /**
     * Any tests created while running `f` will be given to `g` to consolidate

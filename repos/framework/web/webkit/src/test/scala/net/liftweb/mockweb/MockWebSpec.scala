@@ -46,17 +46,19 @@ object MockWebSpec extends Specification {
   LiftRulesMocker.devTestLiftRulesInstance.doWith(mockLiftRules) {
     // Global LiftRules setup
     LiftRules.statelessRewrite.append {
-      case RewriteRequest(ParsePath(List("test", "stateless"), _, _, _),
-                          _,
-                          _) => {
+      case RewriteRequest(
+          ParsePath(List("test", "stateless"), _, _, _),
+          _,
+          _) => {
         RewriteResponse(List("stateless", "works"))
       }
     }
 
     LiftRules.statefulRewrite.append {
-      case RewriteRequest(ParsePath(List("test", "stateful"), _, _, _),
-                          _,
-                          _) => {
+      case RewriteRequest(
+          ParsePath(List("test", "stateful"), _, _, _),
+          _,
+          _) => {
         RewriteResponse(List("stateful", "works"))
       }
     }
@@ -162,8 +164,9 @@ object MockWebSpec extends Specification {
 
     "emulate a snippet invocation" in {
       testS("http://foo.com/test/stateful") {
-        withSnippet("MyWidget.foo",
-                    new UnprefixedAttribute("bar", Text("bat"), Null)) {
+        withSnippet(
+          "MyWidget.foo",
+          new UnprefixedAttribute("bar", Text("bat"), Null)) {
           S.currentSnippet must_== Full("MyWidget.foo")
           S.attr("bar") must_== Full("bat")
         }

@@ -35,8 +35,9 @@ trait Spec {
           if (e.getClass == implicitly[ClassTag[T]].runtimeClass)
             produced = true
       } finally {
-        assert(produced,
-               "Did not produce exception of type: " + implicitly[ClassTag[T]])
+        assert(
+          produced,
+          "Did not produce exception of type: " + implicitly[ClassTag[T]])
       }
     }
   }

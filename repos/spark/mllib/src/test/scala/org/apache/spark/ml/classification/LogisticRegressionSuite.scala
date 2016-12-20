@@ -54,12 +54,13 @@ class LogisticRegressionSuite
       val xMean = Array(5.843, 3.057, 3.758, 1.199)
       val xVariance = Array(0.6856, 0.1899, 3.116, 0.581)
 
-      val testData = generateMultinomialLogisticInput(coefficients,
-                                                      xMean,
-                                                      xVariance,
-                                                      addIntercept = true,
-                                                      nPoints,
-                                                      42)
+      val testData = generateMultinomialLogisticInput(
+        coefficients,
+        xMean,
+        xVariance,
+        addIntercept = true,
+        nPoints,
+        42)
 
       sqlContext.createDataFrame(sc.parallelize(testData, 4))
     }
@@ -122,8 +123,9 @@ class LogisticRegressionSuite
   test("setThreshold, getThreshold") {
     val lr = new LogisticRegression
     // default
-    assert(lr.getThreshold === 0.5,
-           "LogisticRegression.threshold should default to 0.5")
+    assert(
+      lr.getThreshold === 0.5,
+      "LogisticRegression.threshold should default to 0.5")
     withClue("LogisticRegression should not have thresholds set by default.") {
       intercept[java.util.NoSuchElementException] {
         // Note: The exception type may change in future
@@ -154,9 +156,10 @@ class LogisticRegressionSuite
     withClue(
       "fit with ParamMap should throw error if threshold, thresholds do not match.") {
       intercept[IllegalArgumentException] {
-        val lr2model = lr2.fit(dataset,
-                               lr2.thresholds -> Array(0.3, 0.7),
-                               lr2.threshold -> (expectedThreshold / 2.0))
+        val lr2model = lr2.fit(
+          dataset,
+          lr2.thresholds -> Array(0.3, 0.7),
+          lr2.threshold -> (expectedThreshold / 2.0))
         lr2model.getThreshold
       }
     }
@@ -193,14 +196,16 @@ class LogisticRegressionSuite
       .select("prediction", "myProbability")
       .collect()
       .map { case Row(pred: Double, prob: Vector) => pred }
-    assert(predAllZero.forall(_ === 0),
-           s"With threshold=1.0, expected predictions to be all 0, but only" +
-             s" ${predAllZero.count(_ === 0)} of ${dataset.count()} were 0.")
+    assert(
+      predAllZero.forall(_ === 0),
+      s"With threshold=1.0, expected predictions to be all 0, but only" +
+        s" ${predAllZero.count(_ === 0)} of ${dataset.count()} were 0.")
     // Call transform with params, and check that the params worked.
     val predNotAllZero = model
-      .transform(dataset,
-                 model.threshold -> 0.0,
-                 model.probabilityCol -> "myProb")
+      .transform(
+        dataset,
+        model.threshold -> 0.0,
+        model.probabilityCol -> "myProb")
       .select("prediction", "myProb")
       .collect()
       .map { case Row(pred: Double, prob: Vector) => pred }
@@ -208,10 +213,11 @@ class LogisticRegressionSuite
 
     // Call fit() with new params, and check as many params as we can.
     lr.setThresholds(Array(0.6, 0.4))
-    val model2 = lr.fit(dataset,
-                        lr.maxIter -> 5,
-                        lr.regParam -> 0.1,
-                        lr.probabilityCol -> "theProb")
+    val model2 = lr.fit(
+      dataset,
+      lr.maxIter -> 5,
+      lr.regParam -> 0.1,
+      lr.probabilityCol -> "theProb")
     val parent2 = model2.parent.asInstanceOf[LogisticRegression]
     assert(parent2.getMaxIter === 5)
     assert(parent2.getRegParam === 0.1)
@@ -846,8 +852,9 @@ class LogisticRegressionSuite
         },
         combOp = (c1, c2) =>
           (c1, c2) match {
-            case (classSummarizer1: MultiClassSummarizer,
-                  classSummarizer2: MultiClassSummarizer) =>
+            case (
+                classSummarizer1: MultiClassSummarizer,
+                classSummarizer2: MultiClassSummarizer) =>
               classSummarizer1.merge(classSummarizer2)
         })
       .histogram
@@ -939,12 +946,13 @@ class LogisticRegressionSuite
         Array(-0.57997, 0.912083, -0.371077, -0.819866, 2.688191)
       val xMean = Array(5.843, 3.057, 3.758, 1.199)
       val xVariance = Array(0.6856, 0.1899, 3.116, 0.581)
-      val testData = generateMultinomialLogisticInput(coefficients,
-                                                      xMean,
-                                                      xVariance,
-                                                      true,
-                                                      nPoints,
-                                                      42)
+      val testData = generateMultinomialLogisticInput(
+        coefficients,
+        xMean,
+        xVariance,
+        true,
+        nPoints,
+        42)
 
       // Let's over-sample the positive samples twice.
       val data1 = testData.flatMap {
@@ -961,14 +969,16 @@ class LogisticRegressionSuite
         case LabeledPoint(label: Double, features: Vector) =>
           if (rnd.nextGaussian() > 0.0) {
             if (label == 1.0) {
-              Iterator(Instance(label, 1.2, features),
-                       Instance(label, 0.8, features),
-                       Instance(0.0, 0.0, features))
+              Iterator(
+                Instance(label, 1.2, features),
+                Instance(label, 0.8, features),
+                Instance(0.0, 0.0, features))
             } else {
-              Iterator(Instance(label, 0.3, features),
-                       Instance(1.0, 0.0, features),
-                       Instance(label, 0.1, features),
-                       Instance(label, 0.6, features))
+              Iterator(
+                Instance(label, 0.3, features),
+                Instance(1.0, 0.0, features),
+                Instance(label, 0.1, features),
+                Instance(label, 0.6, features))
             }
           } else {
             if (label == 1.0) {
@@ -1048,10 +1058,11 @@ class LogisticRegressionSuite
       assert(model.numFeatures === model2.numFeatures)
     }
     val lr = new LogisticRegression()
-    testEstimatorAndModelReadWrite(lr,
-                                   dataset,
-                                   LogisticRegressionSuite.allParamSettings,
-                                   checkModelData)
+    testEstimatorAndModelReadWrite(
+      lr,
+      dataset,
+      LogisticRegressionSuite.allParamSettings,
+      checkModelData)
   }
 }
 

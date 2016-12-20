@@ -37,8 +37,9 @@ object StageStyle
     * Defines a normal Stage style with a solid white background and platform decorations.
     */
   val Decorated = new StageStyle(jfxs.StageStyle.DECORATED)
-  @deprecated("Use Decorated; DECORATED will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Decorated; DECORATED will be removed in a future release",
+    "8.0.60-R10")
   val DECORATED = Decorated
 
   /**
@@ -63,14 +64,16 @@ object StageStyle
     * Defines a Stage style with a solid white background and minimal platform decorations used for a utility window.
     */
   val Utility = new StageStyle(jfxs.StageStyle.UTILITY)
-  @deprecated("Use Utility; UTILITY will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Utility; UTILITY will be removed in a future release",
+    "8.0.60-R10")
   val UTILITY = Utility
 
   /** Defines a Stage style with platform decorations and eliminates the border between client area and decorations. */
   val Unified = new StageStyle(jfxs.StageStyle.UNIFIED)
-  @deprecated("Use Unified; UNIFIED will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Unified; UNIFIED will be removed in a future release",
+    "8.0.60-R10")
   val UNIFIED = Unified
 
   protected override def unsortedValues: Array[StageStyle] =

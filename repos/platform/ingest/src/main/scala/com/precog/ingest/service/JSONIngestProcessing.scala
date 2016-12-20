@@ -69,9 +69,11 @@ final class JSONIngestProcessing(
     def update(newParser: AsyncParser,
                newIngested: Int,
                newErrors: Seq[(Int, String)] = Seq.empty) = {
-      JSONParseState(newParser,
-                     IngestReport(report.ingested + newIngested,
-                                  report.errors ++ newErrors))
+      JSONParseState(
+        newParser,
+        IngestReport(
+          report.ingested + newIngested,
+          report.errors ++ newErrors))
     }
   }
 
@@ -122,9 +124,10 @@ final class JSONIngestProcessing(
                     overLargeIdx + state.report.ingested -> overLargeMsg)
 
               if (errors.isEmpty) {
-                accumulate(state.update(updatedParser, ingestSize),
-                           records ++ parsed.values,
-                           rest)
+                accumulate(
+                  state.update(updatedParser, ingestSize),
+                  records ++ parsed.values,
+                  rest)
               } else {
                 IngestReport(0, errors).point[Future]
               }
@@ -141,12 +144,13 @@ final class JSONIngestProcessing(
 
               if (errors.isEmpty) {
                 val completedRecords = records ++ parsed.values
-                storage.store(apiKey,
-                              path,
-                              authorities,
-                              completedRecords,
-                              jobId,
-                              streamRef.terminate) map {
+                storage.store(
+                  apiKey,
+                  path,
+                  authorities,
+                  completedRecords,
+                  jobId,
+                  streamRef.terminate) map {
                   _.fold(
                     storeFailure =>
                       IngestReport(0, (0, storeFailure.message) :: Nil),
@@ -222,12 +226,13 @@ final class JSONIngestProcessing(
               }
             val ingestSize = toIngest.size
 
-            storage.store(apiKey,
-                          path,
-                          authorities,
-                          toIngest,
-                          jobId,
-                          streamRef) flatMap {
+            storage.store(
+              apiKey,
+              path,
+              authorities,
+              toIngest,
+              jobId,
+              streamRef) flatMap {
               _.fold(
                 storeFailure =>
                   sys.error(
@@ -249,12 +254,13 @@ final class JSONIngestProcessing(
             val ingestSize = toIngest.size
 
             if (overLarge.isEmpty && parsed.errors.isEmpty) {
-              storage.store(apiKey,
-                            path,
-                            authorities,
-                            toIngest,
-                            jobId,
-                            streamRef) flatMap {
+              storage.store(
+                apiKey,
+                path,
+                authorities,
+                toIngest,
+                jobId,
+                streamRef) flatMap {
                 _.fold(
                   storeFailure =>
                     sys.error(
@@ -263,12 +269,13 @@ final class JSONIngestProcessing(
                 )
               }
             } else {
-              storage.store(apiKey,
-                            path,
-                            authorities,
-                            toIngest,
-                            jobId,
-                            streamRef.terminate) map {
+              storage.store(
+                apiKey,
+                path,
+                authorities,
+                toIngest,
+                jobId,
+                streamRef.terminate) map {
                 _.fold(
                   storeFailure =>
                     sys.error(
@@ -291,21 +298,24 @@ final class JSONIngestProcessing(
 
       errorHandling match {
         case StopOnFirstError =>
-          ingestUnbuffered(JSONParseState.empty(true),
-                           stream,
-                           StreamRef.forWriteMode(storeMode, false)) map {
+          ingestUnbuffered(
+            JSONParseState.empty(true),
+            stream,
+            StreamRef.forWriteMode(storeMode, false)) map {
             _.report
           }
         case IngestAllPossible =>
-          ingestUnbuffered(JSONParseState.empty(false),
-                           stream,
-                           StreamRef.forWriteMode(storeMode, false)) map {
+          ingestUnbuffered(
+            JSONParseState.empty(false),
+            stream,
+            StreamRef.forWriteMode(storeMode, false)) map {
             _.report
           }
         case AllOrNothing =>
-          ingestAllOrNothing(JSONParseState.empty(true),
-                             stream,
-                             StreamRef.forWriteMode(storeMode, false))
+          ingestAllOrNothing(
+            JSONParseState.empty(true),
+            stream,
+            StreamRef.forWriteMode(storeMode, false))
       }
     }
 
@@ -325,9 +335,10 @@ final class JSONIngestProcessing(
                   StreamingResult(ingested, errors.headOption.map(_._2))
 
                 case IngestAllPossible =>
-                  BatchResult(ingested + errors.size,
-                              ingested,
-                              Vector(errors: _*))
+                  BatchResult(
+                    ingested + errors.size,
+                    ingested,
+                    Vector(errors: _*))
               }
           }
 

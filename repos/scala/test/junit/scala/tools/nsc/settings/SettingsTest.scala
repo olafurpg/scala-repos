@@ -191,11 +191,12 @@ class SettingsTest {
       val ac = Choice("ac", expandsTo = List(a, c))
       val uber = Choice("uber", expandsTo = List(ab, d))
     }
-    val m = s.MultiChoiceSetting("-m",
-                                 "args",
-                                 "magic sauce",
-                                 mChoices,
-                                 Some(List("ac")))
+    val m = s.MultiChoiceSetting(
+      "-m",
+      "args",
+      "magic sauce",
+      mChoices,
+      Some(List("ac")))
 
     def check(args: String*)(
         t: s.MultiChoiceSetting[mChoices.type] => Boolean): Boolean = {
@@ -228,8 +229,9 @@ class SettingsTest {
     assertThrows[IllegalArgumentException](
       check("-m:-_")(_ => true),
       _ contains "'-_' is not a valid choice")
-    assertThrows[IllegalArgumentException](check("-m:a,b,-ab")(_ => true),
-                                           _ contains "'ab' cannot be negated")
+    assertThrows[IllegalArgumentException](
+      check("-m:a,b,-ab")(_ => true),
+      _ contains "'ab' cannot be negated")
     assertThrows[IllegalArgumentException](
       check("-m:a,ac,-uber,uber")(_ => true),
       _ contains "'uber' cannot be negated")

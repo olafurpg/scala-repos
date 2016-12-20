@@ -52,14 +52,16 @@ private[pickling] object IrAst {
             runtime))
       case SubclassDispatch(subs, parent, bOpt, runtime) =>
         f(
-          SubclassDispatch(subs,
-                           parent,
-                           (bOpt map chain).asInstanceOf[Option[PicklerAst]],
-                           runtime))
+          SubclassDispatch(
+            subs,
+            parent,
+            (bOpt map chain).asInstanceOf[Option[PicklerAst]],
+            runtime))
       case PickleUnpickleImplementation(p, u) =>
         f(
-          PickleUnpickleImplementation(chain(p).asInstanceOf[PicklerAst],
-                                       chain(u).asInstanceOf[UnpicklerAst]))
+          PickleUnpickleImplementation(
+            chain(p).asInstanceOf[PicklerAst],
+            chain(u).asInstanceOf[UnpicklerAst]))
     }
   }
 }

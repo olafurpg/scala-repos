@@ -547,48 +547,51 @@ object Run {
     "ZTS"
   )
 
-  val tickerList = Seq("GOOG",
-                       "GOOGL",
-                       "FB",
-                       "AAPL",
-                       "AMZN",
-                       "MSFT",
-                       "IBM",
-                       "HPQ",
-                       "INTC",
-                       "NTAP",
-                       "CSCO",
-                       "ORCL",
-                       "XRX",
-                       "YHOO",
-                       "AMAT",
-                       "QCOM",
-                       "TXN",
-                       "CRM",
-                       "INTU",
-                       "WDC",
-                       "SNDK")
+  val tickerList = Seq(
+    "GOOG",
+    "GOOGL",
+    "FB",
+    "AAPL",
+    "AMZN",
+    "MSFT",
+    "IBM",
+    "HPQ",
+    "INTC",
+    "NTAP",
+    "CSCO",
+    "ORCL",
+    "XRX",
+    "YHOO",
+    "AMAT",
+    "QCOM",
+    "TXN",
+    "CRM",
+    "INTU",
+    "WDC",
+    "SNDK")
 
   def main(args: Array[String]) {
     val dataSourceParams =
       (if (false) {
-         new DataSourceParams(baseDate = new DateTime(2002, 1, 1, 0, 0),
-                              fromIdx = 300,
-                              untilIdx = 2000,
-                              trainingWindowSize = 200,
-                              maxTestingWindowSize = 20,
-                              marketTicker = "SPY",
-                              tickerList = tickerList)
+         new DataSourceParams(
+           baseDate = new DateTime(2002, 1, 1, 0, 0),
+           fromIdx = 300,
+           untilIdx = 2000,
+           trainingWindowSize = 200,
+           maxTestingWindowSize = 20,
+           marketTicker = "SPY",
+           tickerList = tickerList)
        } else {
          // Need to pass "--driver-memory 8G" to pio-run since it requires a lot
          // of driver memory.
-         new DataSourceParams(baseDate = new DateTime(2002, 1, 1, 0, 0),
-                              fromIdx = 300,
-                              untilIdx = 2000,
-                              trainingWindowSize = 200,
-                              maxTestingWindowSize = 20,
-                              marketTicker = "SPY",
-                              tickerList = sp500List)
+         new DataSourceParams(
+           baseDate = new DateTime(2002, 1, 1, 0, 0),
+           fromIdx = 300,
+           untilIdx = 2000,
+           trainingWindowSize = 200,
+           maxTestingWindowSize = 20,
+           marketTicker = "SPY",
+           tickerList = sp500List)
        })
 
     val momentumParams = MomentumStrategyParams(20, 3)

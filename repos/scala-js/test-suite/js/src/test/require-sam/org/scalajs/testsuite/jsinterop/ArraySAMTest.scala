@@ -19,12 +19,14 @@ class ArraySAMTest {
   import js.JSArrayOps._
 
   @Test def should_provide_jsMap(): Unit = {
-    assertJSArrayEquals(js.Array(2, 3, 1, 2),
-                        js.Array("Sc", "ala", ".", "js").jsMap(_.length))
+    assertJSArrayEquals(
+      js.Array(2, 3, 1, 2),
+      js.Array("Sc", "ala", ".", "js").jsMap(_.length))
   }
 
   @Test def should_provide_jsFilter(): Unit = {
-    assertJSArrayEquals(js.Array(56, -20, 86),
-                        js.Array(56, 30, -20, 33, 54, 86).jsFilter(_ % 3 != 0))
+    assertJSArrayEquals(
+      js.Array(56, -20, 86),
+      js.Array(56, 30, -20, 33, 54, 86).jsFilter(_ % 3 != 0))
   }
 }

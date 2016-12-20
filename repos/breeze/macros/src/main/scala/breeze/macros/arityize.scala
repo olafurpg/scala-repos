@@ -31,10 +31,11 @@ object arityize {
             impl.body.flatMap(x => expandArity(c, order, bindings)(x)))
           val newTargs =
             targs.flatMap(arg => expandTypeDef(c, order, bindings)(arg))
-          ClassDef(mods,
-                   newTypeName(name.encoded + order),
-                   newTargs,
-                   newTemplate)
+          ClassDef(
+            mods,
+            newTypeName(name.encoded + order),
+            newTargs,
+            newTemplate)
         }
 
         val ret = c.Expr(Block(results.toList, Literal(Constant(()))))
@@ -51,12 +52,13 @@ object arityize {
           val newTargs =
             targs.flatMap(arg => expandTypeDef(c, order, bindings)(arg))
           val newRet = expandArity(c, order, bindings)(tpt).head
-          DefDef(mods,
-                 newTermName(name.encoded + order),
-                 newTargs,
-                 newVargs,
-                 newRet,
-                 newImpl)
+          DefDef(
+            mods,
+            newTermName(name.encoded + order),
+            newTargs,
+            newVargs,
+            newRet,
+            newImpl)
         }
 
         val ret = c.Expr(Block(results.toList, Literal(Constant(()))))
@@ -137,8 +139,9 @@ object arityize {
         }
       case Block(stats, ret) =>
         Seq(
-          Block(stats.flatMap(st => expandArity(c, order, bindings)(st)),
-                expandArity(c, order, bindings)(ret).last))
+          Block(
+            stats.flatMap(st => expandArity(c, order, bindings)(st)),
+            expandArity(c, order, bindings)(ret).last))
       case Ident(nme) if nme.encoded == "__order__" =>
         Seq(Literal(Constant(order)))
       case t @ Ident(x) => Seq(t)
@@ -174,10 +177,11 @@ object arityize {
       List.tabulate(order) { i =>
         val newBindings = bindings + (vdef.name.encoded -> (i + 1))
 //        println(vdef.tpt + " " + expandArity(c, order, newBindings)(vdef.tpt).head)
-        ValDef(vdef.mods,
-               newTermName(vdef.name.encoded + (i + 1)),
-               expandArity(c, order, newBindings)(vdef.tpt).head,
-               vdef.rhs)
+        ValDef(
+          vdef.mods,
+          newTermName(vdef.name.encoded + (i + 1)),
+          expandArity(c, order, newBindings)(vdef.tpt).head,
+          vdef.rhs)
       }
     } else {
       shouldRelativize(c)(vdef.mods) match {
@@ -185,10 +189,11 @@ object arityize {
           val newBindings = bindings + (vdef.name.encoded -> bindings(x))
           val newTpt = expandArity(c, order, newBindings)(vdef.tpt).head
           List(
-            ValDef(vdef.mods,
-                   newTermName(vdef.name.encoded + bindings(x)),
-                   newTpt,
-                   vdef.rhs))
+            ValDef(
+              vdef.mods,
+              newTermName(vdef.name.encoded + bindings(x)),
+              newTpt,
+              vdef.rhs))
         case _ =>
           val newTpt = expandArity(c, order, bindings)(vdef.tpt).head
           List(ValDef(vdef.mods, vdef.name, newTpt, vdef.rhs))
@@ -202,20 +207,22 @@ object arityize {
     if (shouldExpand(c)(vdef.mods)) {
       List.tabulate(order)(
         i =>
-          TypeDef(vdef.mods,
-                  newTypeName(vdef.name.encoded + (i + 1)),
-                  vdef.tparams,
-                  vdef.rhs))
+          TypeDef(
+            vdef.mods,
+            newTypeName(vdef.name.encoded + (i + 1)),
+            vdef.tparams,
+            vdef.rhs))
     } else if (shouldRepeat(c)(vdef.mods)) {
       List.fill(order)(vdef)
     } else {
       shouldRelativize(c)(vdef.mods) match {
         case Some(x) =>
           List(
-            TypeDef(vdef.mods,
-                    newTypeName(vdef.name.encoded + bindings(x)),
-                    vdef.tparams,
-                    vdef.rhs))
+            TypeDef(
+              vdef.mods,
+              newTypeName(vdef.name.encoded + bindings(x)),
+              vdef.tparams,
+              vdef.rhs))
         case _ =>
           List(vdef)
       }

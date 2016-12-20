@@ -186,9 +186,10 @@ object MovetimeRange {
   case object MTR10
       extends MovetimeRange(10, "5 to 10 seconds", NonEmptyList(60, 80, 100))
   case object MTR30
-      extends MovetimeRange(30,
-                            "10 to 30 seconds",
-                            NonEmptyList(150, 200, 300))
+      extends MovetimeRange(
+        30,
+        "10 to 30 seconds",
+        NonEmptyList(150, 200, 300))
   case object MTRInf
       extends MovetimeRange(60, "More than 30 seconds", NonEmptyList(400, 600))
   val all = List(MTR1, MTR3, MTR5, MTR10, MTR30, MTRInf)

@@ -66,13 +66,15 @@ trait AccountControllerBase extends AccountManagementControllerBase {
 
   val newForm = mapping(
     "userName" -> trim(
-      label("User name",
-            text(required, maxlength(100), identifier, uniqueUserName))),
+      label(
+        "User name",
+        text(required, maxlength(100), identifier, uniqueUserName))),
     "password" -> trim(label("Password", text(required, maxlength(20)))),
     "fullName" -> trim(label("Full Name", text(required, maxlength(100)))),
     "mailAddress" -> trim(
-      label("Mail Address",
-            text(required, maxlength(100), uniqueMailAddress()))),
+      label(
+        "Mail Address",
+        text(required, maxlength(100), uniqueMailAddress()))),
     "url" -> trim(label("URL", optional(text(maxlength(200))))),
     "fileId" -> trim(label("File ID", optional(text())))
   )(AccountNewForm.apply)
@@ -81,8 +83,9 @@ trait AccountControllerBase extends AccountManagementControllerBase {
     "password" -> trim(label("Password", optional(text(maxlength(20))))),
     "fullName" -> trim(label("Full Name", text(required, maxlength(100)))),
     "mailAddress" -> trim(
-      label("Mail Address",
-            text(required, maxlength(100), uniqueMailAddress("userName")))),
+      label(
+        "Mail Address",
+        text(required, maxlength(100), uniqueMailAddress("userName")))),
     "url" -> trim(label("URL", optional(text(maxlength(200))))),
     "fileId" -> trim(label("File ID", optional(text()))),
     "clearImage" -> trim(label("Clear image", boolean()))
@@ -109,8 +112,9 @@ trait AccountControllerBase extends AccountManagementControllerBase {
 
   val newGroupForm = mapping(
     "groupName" -> trim(
-      label("Group name",
-            text(required, maxlength(100), identifier, uniqueUserName))),
+      label(
+        "Group name",
+        text(required, maxlength(100), identifier, uniqueUserName))),
     "url" -> trim(label("URL", optional(text(maxlength(200))))),
     "fileId" -> trim(label("File ID", optional(text()))),
     "members" -> trim(label("Members", text(required, members)))
@@ -134,11 +138,13 @@ trait AccountControllerBase extends AccountManagementControllerBase {
 
   val newRepositoryForm = mapping(
     "owner" -> trim(
-      label("Owner",
-            text(required, maxlength(100), identifier, existsAccount))),
+      label(
+        "Owner",
+        text(required, maxlength(100), identifier, existsAccount))),
     "name" -> trim(
-      label("Repository name",
-            text(required, maxlength(100), repository, uniqueRepository))),
+      label(
+        "Repository name",
+        text(required, maxlength(100), repository, uniqueRepository))),
     "description" -> trim(label("Description", optional(text()))),
     "isPrivate" -> trim(label("Repository Type", boolean())),
     "createReadme" -> trim(label("Create README", boolean()))
@@ -165,12 +171,12 @@ trait AccountControllerBase extends AccountManagementControllerBase {
       params.getOrElse("tab", "repositories") match {
         // Public Activity
         case "activity" =>
-          gitbucket.core.account.html.activity(account,
-                                               if (account.isGroupAccount) Nil
-                                               else
-                                                 getGroupsByUserName(userName),
-                                               getActivitiesByUser(userName,
-                                                                   true))
+          gitbucket.core.account.html.activity(
+            account,
+            if (account.isGroupAccount) Nil
+            else
+              getGroupsByUserName(userName),
+            getActivitiesByUser(userName, true))
 
         // Members
         case "members" if (account.isGroupAccount) => {
@@ -211,8 +217,9 @@ trait AccountControllerBase extends AccountManagementControllerBase {
   get("/:userName/_avatar") {
     val userName = params("userName")
     getAccountByUserName(userName).flatMap(_.image).map { image =>
-      RawData(FileUtil.getMimeType(image),
-              new java.io.File(getUserUploadDir(userName), image))
+      RawData(
+        FileUtil.getMimeType(image),
+        new java.io.File(getUserUploadDir(userName), image))
     } getOrElse {
       contentType = "image/png"
       Thread.currentThread.getContextClassLoader
@@ -232,11 +239,11 @@ trait AccountControllerBase extends AccountManagementControllerBase {
     getAccountByUserName(userName).map {
       account =>
         updateAccount(
-          account.copy(password =
-                         form.password.map(sha1).getOrElse(account.password),
-                       fullName = form.fullName,
-                       mailAddress = form.mailAddress,
-                       url = form.url))
+          account.copy(
+            password = form.password.map(sha1).getOrElse(account.password),
+            fullName = form.fullName,
+            mailAddress = form.mailAddress,
+            url = form.url))
 
         updateImage(userName, form.fileId, form.clearImage)
         flash += "info" -> "Account information has been updated."
@@ -334,42 +341,46 @@ trait AccountControllerBase extends AccountManagementControllerBase {
 
   post("/register", newForm) { form =>
     if (context.settings.allowAccountRegistration) {
-      createAccount(form.userName,
-                    sha1(form.password),
-                    form.fullName,
-                    form.mailAddress,
-                    false,
-                    form.url)
+      createAccount(
+        form.userName,
+        sha1(form.password),
+        form.fullName,
+        form.mailAddress,
+        false,
+        form.url)
       updateImage(form.userName, form.fileId, false)
       redirect("/signin")
     } else NotFound
   }
 
   get("/groups/new")(usersOnly {
-    html.group(None,
-               List(GroupMember("", context.loginAccount.get.userName, true)))
+    html.group(
+      None,
+      List(GroupMember("", context.loginAccount.get.userName, true)))
   })
 
   post("/groups/new", newGroupForm)(usersOnly { form =>
     createGroup(form.groupName, form.url)
-    updateGroupMembers(form.groupName,
-                       form.members
-                         .split(",")
-                         .map {
-                           _.split(":") match {
-                             case Array(userName, isManager) =>
-                               (userName, isManager.toBoolean)
-                           }
-                         }
-                         .toList)
+    updateGroupMembers(
+      form.groupName,
+      form.members
+        .split(",")
+        .map {
+          _.split(":") match {
+            case Array(userName, isManager) =>
+              (userName, isManager.toBoolean)
+          }
+        }
+        .toList)
     updateImage(form.groupName, form.fileId, false)
     redirect(s"/${form.groupName}")
   })
 
   get("/:groupName/_editgroup")(managersOnly {
     defining(params("groupName")) { groupName =>
-      html.group(getAccountByUserName(groupName, true),
-                 getGroupMembers(groupName))
+      html.group(
+        getAccountByUserName(groupName, true),
+        getGroupMembers(groupName))
     }
   })
 
@@ -394,16 +405,17 @@ trait AccountControllerBase extends AccountManagementControllerBase {
   })
 
   post("/:groupName/_editgroup", editGroupForm)(managersOnly { form =>
-    defining(params("groupName"),
-             form.members
-               .split(",")
-               .map {
-                 _.split(":") match {
-                   case Array(userName, isManager) =>
-                     (userName, isManager.toBoolean)
-                 }
-               }
-               .toList) {
+    defining(
+      params("groupName"),
+      form.members
+        .split(",")
+        .map {
+          _.split(":") match {
+            case Array(userName, isManager) =>
+              (userName, isManager.toBoolean)
+          }
+        }
+        .toList) {
       case (groupName, members) =>
         getAccountByUserName(groupName, true).map {
           account =>
@@ -431,8 +443,9 @@ trait AccountControllerBase extends AccountManagementControllerBase {
     * Show the new repository form.
     */
   get("/new")(usersOnly {
-    html.newrepo(getGroupsByUserName(context.loginAccount.get.userName),
-                 context.settings.isCreateRepoOptionPublic)
+    html.newrepo(
+      getGroupsByUserName(context.loginAccount.get.userName),
+      context.settings.isCreateRepoOptionPublic)
   })
 
   /**
@@ -441,12 +454,13 @@ trait AccountControllerBase extends AccountManagementControllerBase {
   post("/new", newRepositoryForm)(usersOnly { form =>
     LockUtil.lock(s"${form.owner}/${form.name}") {
       if (getRepository(form.owner, form.name).isEmpty) {
-        createRepository(context.loginAccount.get,
-                         form.owner,
-                         form.name,
-                         form.description,
-                         form.isPrivate,
-                         form.createReadme)
+        createRepository(
+          context.loginAccount.get,
+          form.owner,
+          form.name,
+          form.description,
+          form.isPrivate,
+          form.createReadme)
       }
 
       // redirect to the repository
@@ -527,10 +541,11 @@ trait AccountControllerBase extends AccountManagementControllerBase {
             getWikiRepositoryDir(accountName, repository.name))
 
           // Record activity
-          recordForkActivity(repository.owner,
-                             repository.name,
-                             loginUserName,
-                             accountName)
+          recordForkActivity(
+            repository.owner,
+            repository.name,
+            loginUserName,
+            accountName)
           // redirect to the repository
           redirect(s"/${accountName}/${repository.name}")
         }

@@ -150,9 +150,10 @@ class VerifiableProperties(val props: Properties) extends Logging {
     if (!containsKey(name)) default
     else {
       val v = getProperty(name)
-      require(v == "true" || v == "false",
-              "Unacceptable value for property '" + name +
-                "', boolean values must be either 'true' or 'false")
+      require(
+        v == "true" || v == "false",
+        "Unacceptable value for property '" + name +
+          "', boolean values must be either 'true' or 'false")
       v.toBoolean
     }
   }
@@ -193,8 +194,8 @@ class VerifiableProperties(val props: Properties) extends Logging {
     } catch {
       case e: Exception =>
         throw new IllegalArgumentException(
-          "Error parsing configuration property '%s': %s".format(name,
-                                                                 e.getMessage))
+          "Error parsing configuration property '%s': %s"
+            .format(name, e.getMessage))
     }
   }
 
@@ -226,8 +227,8 @@ class VerifiableProperties(val props: Properties) extends Logging {
         warn("Property %s is not valid".format(key))
       else
         info(
-          "Property %s is overridden to %s".format(key,
-                                                   props.getProperty(key)))
+          "Property %s is overridden to %s"
+            .format(key, props.getProperty(key)))
     }
   }
 

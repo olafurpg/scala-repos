@@ -91,8 +91,9 @@ class TaskMetrics private[spark] (initialAccums: Seq[Accumulator[_]])
   private val _diskBytesSpilled = getAccum(DISK_BYTES_SPILLED)
   private val _peakExecutionMemory = getAccum(PEAK_EXECUTION_MEMORY)
   private val _updatedBlockStatuses =
-    TaskMetrics.getAccum[Seq[(BlockId, BlockStatus)]](initialAccumsMap,
-                                                      UPDATED_BLOCK_STATUSES)
+    TaskMetrics.getAccum[Seq[(BlockId, BlockStatus)]](
+      initialAccumsMap,
+      UPDATED_BLOCK_STATUSES)
 
   /**
     * Time taken on the executor to deserialize this task.
@@ -428,8 +429,9 @@ private[spark] object TaskMetrics extends Logging {
       accum.asInstanceOf[Accumulator[T]]
     } catch {
       case e: ClassCastException =>
-        throw new SparkException(s"accumulator $name was of unexpected type",
-                                 e)
+        throw new SparkException(
+          s"accumulator $name was of unexpected type",
+          e)
     }
   }
 

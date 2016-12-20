@@ -198,8 +198,9 @@ private[streaming] abstract class ReceiverSupervisor(
     Future {
       // This is a blocking action so we should use "futureExecutionContext" which is a cached
       // thread pool.
-      logWarning("Restarting receiver with delay " + delay + " ms: " + message,
-                 error.getOrElse(null))
+      logWarning(
+        "Restarting receiver with delay " + delay + " ms: " + message,
+        error.getOrElse(null))
       stopReceiver(
         "Restarting receiver with delay " + delay + "ms: " + message,
         error)

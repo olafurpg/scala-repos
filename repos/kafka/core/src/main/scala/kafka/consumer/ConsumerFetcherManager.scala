@@ -73,11 +73,12 @@ class ConsumerFetcherManager(private val consumerIdString: String,
         val brokers =
           zkUtils.getAllBrokerEndPointsForChannel(SecurityProtocol.PLAINTEXT)
         val topicsMetadata = ClientUtils
-          .fetchTopicMetadata(noLeaderPartitionSet.map(m => m.topic).toSet,
-                              brokers,
-                              config.clientId,
-                              config.socketTimeoutMs,
-                              correlationId.getAndIncrement)
+          .fetchTopicMetadata(
+            noLeaderPartitionSet.map(m => m.topic).toSet,
+            brokers,
+            config.clientId,
+            config.socketTimeoutMs,
+            correlationId.getAndIncrement)
           .topicsMetadata
         if (logger.isDebugEnabled)
           topicsMetadata.foreach(topicMetadata =>
@@ -99,8 +100,9 @@ class ConsumerFetcherManager(private val consumerIdString: String,
           if (!isRunning.get())
             throw t /* If this thread is stopped, propagate this exception to kill the thread. */
           else
-            warn("Failed to find leader for %s".format(noLeaderPartitionSet),
-                 t)
+            warn(
+              "Failed to find leader for %s".format(noLeaderPartitionSet),
+              t)
         }
       } finally {
         lock.unlock()
@@ -118,9 +120,10 @@ class ConsumerFetcherManager(private val consumerIdString: String,
           if (!isRunning.get())
             throw t /* If this thread is stopped, propagate this exception to kill the thread. */
           else {
-            warn("Failed to add leader for partitions %s; will retry".format(
-                   leaderForPartitionsMap.keySet.mkString(",")),
-                 t)
+            warn(
+              "Failed to add leader for partitions %s; will retry".format(
+                leaderForPartitionsMap.keySet.mkString(",")),
+              t)
             lock.lock()
             noLeaderPartitionSet ++= leaderForPartitionsMap.keySet
             lock.unlock()

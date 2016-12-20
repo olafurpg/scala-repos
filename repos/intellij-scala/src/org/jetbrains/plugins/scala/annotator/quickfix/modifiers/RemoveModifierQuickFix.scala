@@ -27,9 +27,10 @@ class RemoveModifierQuickFix(method: ScModifierListOwner, modifier: String)
     //Should be handled by autoformatting
     CodeStyleManager
       .getInstance(method.getProject)
-      .reformatText(method.getContainingFile,
-                    method.getModifierList.getTextRange.getStartOffset,
-                    method.getModifierList.getTextRange.getEndOffset)
+      .reformatText(
+        method.getContainingFile,
+        method.getModifierList.getTextRange.getStartOffset,
+        method.getModifierList.getTextRange.getEndOffset)
   }
 
   def getFamilyName: String =

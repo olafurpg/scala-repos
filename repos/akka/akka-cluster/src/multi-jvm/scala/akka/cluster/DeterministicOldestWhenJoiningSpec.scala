@@ -48,9 +48,10 @@ abstract class DeterministicOldestWhenJoiningSpec
     Vector(address(seed1), address(seed2), address(seed3))
       .sorted(Member.addressOrdering)
       .reverse
-  val roleByAddress = Map(address(seed1) -> seed1,
-                          address(seed2) -> seed2,
-                          address(seed3) -> seed3)
+  val roleByAddress = Map(
+    address(seed1) -> seed1,
+    address(seed2) -> seed2,
+    address(seed3) -> seed3)
 
   "Joining a cluster" must {
     "result in deterministic oldest node" taggedAs LongRunningTest in {
@@ -62,15 +63,17 @@ abstract class DeterministicOldestWhenJoiningSpec
       }
       enterBarrier("first-seed-joined")
 
-      runOn(roleByAddress(seedNodes(1)),
-            roleByAddress(roleByAddress(seedNodes(2)))) {
+      runOn(
+        roleByAddress(seedNodes(1)),
+        roleByAddress(roleByAddress(seedNodes(2)))) {
         cluster.joinSeedNodes(seedNodes)
       }
 
       within(10.seconds) {
-        val ups = List(expectMsgType[MemberUp],
-                       expectMsgType[MemberUp],
-                       expectMsgType[MemberUp])
+        val ups = List(
+          expectMsgType[MemberUp],
+          expectMsgType[MemberUp],
+          expectMsgType[MemberUp])
         ups.map(_.member).sorted(Member.ageOrdering).head.address should ===(
           seedNodes.head)
       }

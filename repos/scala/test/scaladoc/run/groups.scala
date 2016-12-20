@@ -69,14 +69,16 @@ object Test extends ScaladocModelTest {
       rootPackage._package("test")._package("scaladoc")._package("groups")
 
     def checkGroup(mbr: MemberEntity, grp: String) =
-      assert(mbr.group == grp,
-             "Incorrect group for " + mbr.qualifiedName + ": " + mbr.group +
-               " instead of " + grp)
+      assert(
+        mbr.group == grp,
+        "Incorrect group for " + mbr.qualifiedName + ": " + mbr.group +
+          " instead of " + grp)
 
     def checkGroupDesc(dtpl: DocTemplateEntity, grp: String, grpDesc: String) = {
-      assert(dtpl.groupDescription(grp).isDefined,
-             "Group description for " + grp + " not defined in " +
-               dtpl.qualifiedName)
+      assert(
+        dtpl.groupDescription(grp).isDefined,
+        "Group description for " + grp + " not defined in " +
+          dtpl.qualifiedName)
       assert(
         extractCommentText(dtpl.groupDescription(grp).get).contains(grpDesc),
         "Group description for " + grp + " in " + dtpl.qualifiedName +
@@ -93,9 +95,10 @@ object Test extends ScaladocModelTest {
           "\"")
 
     def checkGroupPrio(dtpl: DocTemplateEntity, grp: String, grpPrio: Int) =
-      assert(dtpl.groupPriority(grp) == grpPrio,
-             "Group priority for " + grp + " in " + dtpl.qualifiedName +
-               " does not equal " + grpPrio + ": " + dtpl.groupPriority(grp))
+      assert(
+        dtpl.groupPriority(grp) == grpPrio,
+        "Group priority for " + grp + " in " + dtpl.qualifiedName +
+          " does not equal " + grpPrio + ": " + dtpl.groupPriority(grp))
 
     val A = base._trait("A")
     val B = base._trait("B")

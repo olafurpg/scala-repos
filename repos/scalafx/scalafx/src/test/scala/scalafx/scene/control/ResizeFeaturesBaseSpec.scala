@@ -39,8 +39,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class ResizeFeaturesBaseSpec[S]
-    extends SimpleSFXDelegateSpec[jfxsc.ResizeFeaturesBase[S],
-                                  ResizeFeaturesBase[S]](
+    extends SimpleSFXDelegateSpec[
+      jfxsc.ResizeFeaturesBase[S],
+      ResizeFeaturesBase[S]](
       classOf[jfxsc.ResizeFeaturesBase[S]],
       classOf[ResizeFeaturesBase[S]]) {
 

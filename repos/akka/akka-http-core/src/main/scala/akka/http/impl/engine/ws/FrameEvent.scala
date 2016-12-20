@@ -67,8 +67,9 @@ private[http] object FrameEvent {
                 rsv1: Boolean = false,
                 rsv2: Boolean = false,
                 rsv3: Boolean = false): FrameStart =
-    FrameStart(FrameHeader(opcode, mask, data.length, fin, rsv1, rsv2, rsv3),
-               data)
+    FrameStart(
+      FrameHeader(opcode, mask, data.length, fin, rsv1, rsv2, rsv3),
+      data)
   val emptyLastContinuationFrame: FrameStart =
     empty(Protocol.Opcode.Continuation, fin = true)
 
@@ -81,9 +82,10 @@ private[http] object FrameEvent {
         reason,
         "UTF8")
 
-    fullFrame(Opcode.Close,
-              mask,
-              FrameEventParser.mask(body, mask),
-              fin = true)
+    fullFrame(
+      Opcode.Close,
+      mask,
+      FrameEventParser.mask(body, mask),
+      fin = true)
   }
 }

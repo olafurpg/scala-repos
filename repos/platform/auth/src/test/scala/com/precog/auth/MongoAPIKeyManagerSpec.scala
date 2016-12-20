@@ -74,19 +74,21 @@ class MongoAPIKeyManagerSpec
 
     "return current root API key" in new TestAPIKeyManager {
       val result =
-        Await.result(MongoAPIKeyManager.findRootAPIKey(
-                       testDB,
-                       MongoAPIKeyManagerSettings.defaults.apiKeys),
-                     timeout)
+        Await.result(
+          MongoAPIKeyManager.findRootAPIKey(
+            testDB,
+            MongoAPIKeyManagerSettings.defaults.apiKeys),
+          timeout)
 
       result.apiKey mustEqual rootAPIKey
     }
 
     "error if a root API key cannot be found and creation isn't requested" in new TestAPIKeyManager {
-      Await.result(MongoAPIKeyManager.findRootAPIKey(
-                     testDB,
-                     MongoAPIKeyManagerSettings.defaults.apiKeys + "_empty"),
-                   timeout) must throwAn[Exception]
+      Await.result(
+        MongoAPIKeyManager.findRootAPIKey(
+          testDB,
+          MongoAPIKeyManagerSettings.defaults.apiKeys + "_empty"),
+        timeout) must throwAn[Exception]
     }
 
     "not find missing API key" in new TestAPIKeyManager {
@@ -111,14 +113,10 @@ class MongoAPIKeyManagerSpec
 
     "list children API keys" in new TestAPIKeyManager {
       val (result, expected) = Await.result(for {
-        k1 <- apiKeyManager.createAPIKey(Some("blah1"),
-                                         None,
-                                         child2.apiKey,
-                                         Set.empty)
-        k2 <- apiKeyManager.createAPIKey(Some("blah2"),
-                                         None,
-                                         child2.apiKey,
-                                         Set.empty)
+        k1 <- apiKeyManager
+          .createAPIKey(Some("blah1"), None, child2.apiKey, Set.empty)
+        k2 <- apiKeyManager
+          .createAPIKey(Some("blah2"), None, child2.apiKey, Set.empty)
         kids <- apiKeyManager.findAPIKeyChildren(child2.apiKey)
       } yield (kids, List(k1, k2)), timeout)
 

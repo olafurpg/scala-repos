@@ -89,16 +89,17 @@ trait IssuesControllerBase extends ControllerBase {
     defining(repository.owner, repository.name, params("id")) {
       case (owner, name, issueId) =>
         getIssue(owner, name, issueId) map {
-          html.issue(_,
-                     getComments(owner, name, issueId.toInt),
-                     getIssueLabels(owner, name, issueId.toInt),
-                     (getCollaborators(owner, name) :::
-                       (if (getAccountByUserName(owner).get.isGroupAccount) Nil
-                        else List(owner))).sorted,
-                     getMilestonesWithIssueCount(owner, name),
-                     getLabels(owner, name),
-                     hasWritePermission(owner, name, context.loginAccount),
-                     repository)
+          html.issue(
+            _,
+            getComments(owner, name, issueId.toInt),
+            getIssueLabels(owner, name, issueId.toInt),
+            (getCollaborators(owner, name) :::
+              (if (getAccountByUserName(owner).get.isGroupAccount) Nil
+               else List(owner))).sorted,
+            getMilestonesWithIssueCount(owner, name),
+            getLabels(owner, name),
+            hasWritePermission(owner, name, context.loginAccount),
+            repository)
         } getOrElse NotFound
     }
   })
@@ -106,13 +107,14 @@ trait IssuesControllerBase extends ControllerBase {
   get("/:owner/:repository/issues/new")(readableUsersOnly { repository =>
     defining(repository.owner, repository.name) {
       case (owner, name) =>
-        html.create((getCollaborators(owner, name) :::
-                      (if (getAccountByUserName(owner).get.isGroupAccount) Nil
-                       else List(owner))).sorted,
-                    getMilestones(owner, name),
-                    getLabels(owner, name),
-                    hasWritePermission(owner, name, context.loginAccount),
-                    repository)
+        html.create(
+          (getCollaborators(owner, name) :::
+            (if (getAccountByUserName(owner).get.isGroupAccount) Nil
+             else List(owner))).sorted,
+          getMilestones(owner, name),
+          getLabels(owner, name),
+          hasWritePermission(owner, name, context.loginAccount),
+          repository)
     }
   })
 
@@ -124,14 +126,15 @@ trait IssuesControllerBase extends ControllerBase {
           val userName = context.loginAccount.get.userName
 
           // insert issue
-          val issueId = createIssue(owner,
-                                    name,
-                                    userName,
-                                    form.title,
-                                    form.content,
-                                    if (writable) form.assignedUserName
-                                    else None,
-                                    if (writable) form.milestoneId else None)
+          val issueId = createIssue(
+            owner,
+            name,
+            userName,
+            form.title,
+            form.content,
+            if (writable) form.assignedUserName
+            else None,
+            if (writable) form.milestoneId else None)
 
           // insert labels
           if (writable) {
@@ -151,26 +154,27 @@ trait IssuesControllerBase extends ControllerBase {
           getIssue(owner, name, issueId.toString).foreach {
             issue =>
               // extract references and create refer comment
-              createReferComment(owner,
-                                 name,
-                                 issue,
-                                 form.title + " " + form.content.getOrElse(""),
-                                 context.loginAccount.get)
+              createReferComment(
+                owner,
+                name,
+                issue,
+                form.title + " " + form.content.getOrElse(""),
+                context.loginAccount.get)
 
               // call web hooks
-              callIssuesWebHook("opened",
-                                repository,
-                                issue,
-                                context.baseUrl,
-                                context.loginAccount.get)
+              callIssuesWebHook(
+                "opened",
+                repository,
+                issue,
+                context.baseUrl,
+                context.loginAccount.get)
 
               // notifications
-              Notifier().toNotify(repository,
-                                  issue,
-                                  form.content.getOrElse("")) {
-                Notifier.msgIssue(
-                  s"${context.baseUrl}/${owner}/${name}/issues/${issueId}")
-              }
+              Notifier()
+                .toNotify(repository, issue, form.content.getOrElse("")) {
+                  Notifier.msgIssue(
+                    s"${context.baseUrl}/${owner}/${name}/issues/${issueId}")
+                }
           }
 
           redirect(s"/${owner}/${name}/issues/${issueId}")
@@ -187,11 +191,12 @@ trait IssuesControllerBase extends ControllerBase {
                 // update issue
                 updateIssue(owner, name, issue.issueId, title, issue.content)
                 // extract references and create refer comment
-                createReferComment(owner,
-                                   name,
-                                   issue.copy(title = title),
-                                   title,
-                                   context.loginAccount.get)
+                createReferComment(
+                  owner,
+                  name,
+                  issue.copy(title = title),
+                  title,
+                  context.loginAccount.get)
 
                 redirect(s"/${owner}/${name}/issues/_data/${issue.issueId}")
               } else Unauthorized
@@ -209,11 +214,12 @@ trait IssuesControllerBase extends ControllerBase {
                 // update issue
                 updateIssue(owner, name, issue.issueId, issue.title, content)
                 // extract references and create refer comment
-                createReferComment(owner,
-                                   name,
-                                   issue,
-                                   content.getOrElse(""),
-                                   context.loginAccount.get)
+                createReferComment(
+                  owner,
+                  name,
+                  issue,
+                  content.getOrElse(""),
+                  context.loginAccount.get)
 
                 redirect(s"/${owner}/${name}/issues/_data/${issue.issueId}")
               } else Unauthorized
@@ -229,9 +235,10 @@ trait IssuesControllerBase extends ControllerBase {
             .get("action")
             .filter(
               _ =>
-                isEditable(issue.userName,
-                           issue.repositoryName,
-                           issue.openedUserName))
+                isEditable(
+                  issue.userName,
+                  issue.repositoryName,
+                  issue.openedUserName))
           handleComment(issue, Some(form.content), repository, actionOpt) map {
             case (issue, id) =>
               redirect(
@@ -250,9 +257,10 @@ trait IssuesControllerBase extends ControllerBase {
             .get("action")
             .filter(
               _ =>
-                isEditable(issue.userName,
-                           issue.repositoryName,
-                           issue.openedUserName))
+                isEditable(
+                  issue.userName,
+                  issue.repositoryName,
+                  issue.openedUserName))
           handleComment(issue, form.content, repository, actionOpt) map {
             case (issue, id) =>
               redirect(
@@ -295,10 +303,8 @@ trait IssuesControllerBase extends ControllerBase {
         if (isEditable(x.userName, x.repositoryName, x.openedUserName)) {
           params.get("dataType") collect {
             case t if t == "html" =>
-              html.editissue(x.content,
-                             x.issueId,
-                             x.userName,
-                             x.repositoryName)
+              html
+                .editissue(x.content, x.issueId, x.userName, x.repositoryName)
           } getOrElse {
             contentType = formats("json")
             org.json4s.jackson.Serialization.write(
@@ -328,10 +334,11 @@ trait IssuesControllerBase extends ControllerBase {
         if (isEditable(x.userName, x.repositoryName, x.commentedUserName)) {
           params.get("dataType") collect {
             case t if t == "html" =>
-              html.editcomment(x.content,
-                               x.commentId,
-                               x.userName,
-                               x.repositoryName)
+              html.editcomment(
+                x.content,
+                x.commentId,
+                x.userName,
+                x.repositoryName)
           } getOrElse {
             contentType = formats("json")
             org.json4s.jackson.Serialization.write(
@@ -344,9 +351,10 @@ trait IssuesControllerBase extends ControllerBase {
                   enableAnchor = true,
                   enableLineBreaks = true,
                   enableTaskList = true,
-                  hasWritePermission = isEditable(x.userName,
-                                                  x.repositoryName,
-                                                  x.commentedUserName)
+                  hasWritePermission = isEditable(
+                    x.userName,
+                    x.repositoryName,
+                    x.commentedUserName)
                 )
               )
             )
@@ -366,10 +374,11 @@ trait IssuesControllerBase extends ControllerBase {
   ajaxPost("/:owner/:repository/issues/:id/label/new")(collaboratorsOnly {
     repository =>
       defining(params("id").toInt) { issueId =>
-        registerIssueLabel(repository.owner,
-                           repository.name,
-                           issueId,
-                           params("labelId").toInt)
+        registerIssueLabel(
+          repository.owner,
+          repository.name,
+          issueId,
+          params("labelId").toInt)
         html.labellist(
           getIssueLabels(repository.owner, repository.name, issueId))
       }
@@ -378,10 +387,11 @@ trait IssuesControllerBase extends ControllerBase {
   ajaxPost("/:owner/:repository/issues/:id/label/delete")(collaboratorsOnly {
     repository =>
       defining(params("id").toInt) { issueId =>
-        deleteIssueLabel(repository.owner,
-                         repository.name,
-                         issueId,
-                         params("labelId").toInt)
+        deleteIssueLabel(
+          repository.owner,
+          repository.name,
+          issueId,
+          params("labelId").toInt)
         html.labellist(
           getIssueLabels(repository.owner, repository.name, issueId))
       }
@@ -389,19 +399,21 @@ trait IssuesControllerBase extends ControllerBase {
 
   ajaxPost("/:owner/:repository/issues/:id/assign")(collaboratorsOnly {
     repository =>
-      updateAssignedUserName(repository.owner,
-                             repository.name,
-                             params("id").toInt,
-                             assignedUserName("assignedUserName"))
+      updateAssignedUserName(
+        repository.owner,
+        repository.name,
+        params("id").toInt,
+        assignedUserName("assignedUserName"))
       Ok("updated")
   })
 
   ajaxPost("/:owner/:repository/issues/:id/milestone")(collaboratorsOnly {
     repository =>
-      updateMilestoneId(repository.owner,
-                        repository.name,
-                        params("id").toInt,
-                        milestoneId("milestoneId"))
+      updateMilestoneId(
+        repository.owner,
+        repository.name,
+        params("id").toInt,
+        milestoneId("milestoneId"))
       milestoneId("milestoneId").map {
         milestoneId =>
           getMilestonesWithIssueCount(repository.owner, repository.name)
@@ -442,10 +454,11 @@ trait IssuesControllerBase extends ControllerBase {
       params("value").toIntOpt.map { labelId =>
         executeBatch(repository) { issueId =>
           getIssueLabel(repository.owner, repository.name, issueId, labelId) getOrElse {
-            registerIssueLabel(repository.owner,
-                               repository.name,
-                               issueId,
-                               labelId)
+            registerIssueLabel(
+              repository.owner,
+              repository.name,
+              issueId,
+              labelId)
           }
         }
       } getOrElse NotFound
@@ -474,8 +487,9 @@ trait IssuesControllerBase extends ControllerBase {
       case dir if (dir.exists && dir.isDirectory) =>
         dir.listFiles.find(_.getName.startsWith(params("file") + ".")).map {
           file =>
-            response.setHeader("Content-Disposition",
-                               f"""inline; filename=${file.getName}""")
+            response.setHeader(
+              "Content-Disposition",
+              f"""inline; filename=${file.getName}""")
             RawData(FileUtil.getMimeType(file.getName), file)
         }
       case _ => None
@@ -516,10 +530,11 @@ trait IssuesControllerBase extends ControllerBase {
             if (q == null || q.trim.isEmpty) {
               IssueSearchCondition(request)
             } else {
-              IssueSearchCondition(q,
-                                   getMilestones(owner, repoName)
-                                     .map(x => (x.title, x.milestoneId))
-                                     .toMap)
+              IssueSearchCondition(
+                q,
+                getMilestones(owner, repoName)
+                  .map(x => (x.title, x.milestoneId))
+                  .toMap)
             }
           } else
             session
@@ -528,11 +543,12 @@ trait IssuesControllerBase extends ControllerBase {
 
         html.list(
           "issues",
-          searchIssue(condition,
-                      false,
-                      (page - 1) * IssueLimit,
-                      IssueLimit,
-                      owner -> repoName),
+          searchIssue(
+            condition,
+            false,
+            (page - 1) * IssueLimit,
+            IssueLimit,
+            owner -> repoName),
           page,
           if (!getAccountByUserName(owner).exists(_.isGroupAccount)) {
             (getCollaborators(owner, repoName) :+ owner).sorted
@@ -542,9 +558,10 @@ trait IssuesControllerBase extends ControllerBase {
           getMilestones(owner, repoName),
           getLabels(owner, repoName),
           countIssue(condition.copy(state = "open"), false, owner -> repoName),
-          countIssue(condition.copy(state = "closed"),
-                     false,
-                     owner -> repoName),
+          countIssue(
+            condition.copy(state = "closed"),
+            false,
+            owner -> repoName),
           condition,
           repository,
           hasWritePermission(owner, repoName, context.loginAccount))

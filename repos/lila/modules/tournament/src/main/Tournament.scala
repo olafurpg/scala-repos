@@ -115,39 +115,41 @@ object Tournament {
            mode: Mode,
            `private`: Boolean,
            waitMinutes: Int) =
-    Tournament(id = Random nextStringUppercase 8,
-               name =
-                 if (position.initial)
-                   GreatPlayer.randomName
-                 else position.shortName,
-               status = Status.Created,
-               system = system,
-               clock = clock,
-               minutes = minutes,
-               createdBy = createdBy.id,
-               createdAt = DateTime.now,
-               nbPlayers = 0,
-               variant = variant,
-               position = position,
-               mode = mode,
-               `private` = `private`,
-               schedule = None,
-               startsAt = DateTime.now plusMinutes waitMinutes)
+    Tournament(
+      id = Random nextStringUppercase 8,
+      name =
+        if (position.initial)
+          GreatPlayer.randomName
+        else position.shortName,
+      status = Status.Created,
+      system = system,
+      clock = clock,
+      minutes = minutes,
+      createdBy = createdBy.id,
+      createdAt = DateTime.now,
+      nbPlayers = 0,
+      variant = variant,
+      position = position,
+      mode = mode,
+      `private` = `private`,
+      schedule = None,
+      startsAt = DateTime.now plusMinutes waitMinutes)
 
   def schedule(sched: Schedule, minutes: Int) =
-    Tournament(id = Random nextStringUppercase 8,
-               name = sched.name,
-               status = Status.Created,
-               system = System.default,
-               clock = Schedule clockFor sched,
-               minutes = minutes,
-               createdBy = "lichess",
-               createdAt = DateTime.now,
-               nbPlayers = 0,
-               variant = sched.variant,
-               position = sched.position,
-               mode = Mode.Rated,
-               `private` = false,
-               schedule = Some(sched),
-               startsAt = sched.at)
+    Tournament(
+      id = Random nextStringUppercase 8,
+      name = sched.name,
+      status = Status.Created,
+      system = System.default,
+      clock = Schedule clockFor sched,
+      minutes = minutes,
+      createdBy = "lichess",
+      createdAt = DateTime.now,
+      nbPlayers = 0,
+      variant = sched.variant,
+      position = sched.position,
+      mode = Mode.Rated,
+      `private` = false,
+      schedule = Some(sched),
+      startsAt = sched.at)
 }

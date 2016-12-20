@@ -72,8 +72,8 @@ abstract class ScTypeDefinitionImpl protected (
         val mem: Option[ScMember] = member match {
           case method: PsiMethod =>
             Some(
-              ScalaPsiElementFactory.createMethodFromText(newMemberText,
-                                                          getManager))
+              ScalaPsiElementFactory
+                .createMethodFromText(newMemberText, getManager))
           case _ => None
         }
         mem match {
@@ -101,9 +101,10 @@ abstract class ScTypeDefinitionImpl protected (
   override def isAnnotationType: Boolean = {
     val annotation = ScalaPsiManager
       .instance(getProject)
-      .getCachedClass("scala.annotation.Annotation",
-                      getResolveScope,
-                      ScalaPsiManager.ClassCategory.TYPE)
+      .getCachedClass(
+        "scala.annotation.Annotation",
+        getResolveScope,
+        ScalaPsiManager.ClassCategory.TYPE)
     if (annotation == null) return false
     ScalaPsiManager
       .instance(getProject)
@@ -114,28 +115,33 @@ abstract class ScTypeDefinitionImpl protected (
     val parentClass: ScTemplateDefinition = containingClass
     if (typeParameters.isEmpty) {
       if (parentClass != null) {
-        Success(ScProjectionType(ScThisType(parentClass),
-                                 this,
-                                 superReference = false),
-                Some(this))
+        Success(
+          ScProjectionType(
+            ScThisType(parentClass),
+            this,
+            superReference = false),
+          Some(this))
       } else {
         Success(ScType.designator(this), Some(this))
       }
     } else {
       if (parentClass != null) {
-        Success(ScParameterizedType(
-                  ScProjectionType(ScThisType(parentClass),
-                                   this,
-                                   superReference = false),
-                  typeParameters.map(
-                    new ScTypeParameterType(_, ScSubstitutor.empty))),
-                Some(this))
+        Success(
+          ScParameterizedType(
+            ScProjectionType(
+              ScThisType(parentClass),
+              this,
+              superReference = false),
+            typeParameters.map(
+              new ScTypeParameterType(_, ScSubstitutor.empty))),
+          Some(this))
       } else {
-        Success(ScParameterizedType(
-                  ScType.designator(this),
-                  typeParameters.map(
-                    new ScTypeParameterType(_, ScSubstitutor.empty))),
-                Some(this))
+        Success(
+          ScParameterizedType(
+            ScType.designator(this),
+            typeParameters.map(
+              new ScTypeParameterType(_, ScSubstitutor.empty))),
+          Some(this))
       }
     }
   }
@@ -153,16 +159,18 @@ abstract class ScTypeDefinitionImpl protected (
       val tpe: ScType =
         if (!thisProjections)
           parentClazz
-            .getTypeWithProjections(TypingContext.empty,
-                                    thisProjections = false)
+            .getTypeWithProjections(
+              TypingContext.empty,
+              thisProjections = false)
             .getOrElse(
               return Failure("Cannot resolve parent class", Some(this)))
         else ScThisType(parentClazz)
 
       val innerProjection = ScProjectionType(tpe, this, superReference = false)
-      Success(if (typeParameters.isEmpty) innerProjection
-              else ScParameterizedType(innerProjection, args),
-              Some(this))
+      Success(
+        if (typeParameters.isEmpty) innerProjection
+        else ScParameterizedType(innerProjection, args),
+        Some(this))
     } else Success(innerType, Some(this))
   }
 
@@ -282,8 +290,9 @@ abstract class ScTypeDefinitionImpl protected (
   def getQualifiedNameForDebugger: String = {
     containingClass match {
       case td: ScTypeDefinition =>
-        td.getQualifiedNameForDebugger + "$" + transformName(encodeName = true,
-                                                             name)
+        td.getQualifiedNameForDebugger + "$" + transformName(
+          encodeName = true,
+          name)
       case _ =>
         if (this.isPackageObject)
           qualifiedName("", encodeName = true) + ".package"
@@ -444,9 +453,10 @@ abstract class ScTypeDefinitionImpl protected (
   }
 
   override def getNameIdentifier: PsiIdentifier = {
-    Predef.assert(nameId != null,
-                  "Class hase null nameId. Class text: " +
-                    getText) //diagnostic for EA-20122
+    Predef.assert(
+      nameId != null,
+      "Class hase null nameId. Class text: " +
+        getText) //diagnostic for EA-20122
     new JavaIdentifier(nameId)
   }
 

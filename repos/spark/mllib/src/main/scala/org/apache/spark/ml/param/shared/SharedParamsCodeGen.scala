@@ -31,22 +31,27 @@ private[shared] object SharedParamsCodeGen {
 
   def main(args: Array[String]): Unit = {
     val params = Seq(
-      ParamDesc[Double]("regParam",
-                        "regularization parameter (>= 0)",
-                        isValid = "ParamValidators.gtEq(0)"),
-      ParamDesc[Int]("maxIter",
-                     "maximum number of iterations (>= 0)",
-                     isValid = "ParamValidators.gtEq(0)"),
-      ParamDesc[String]("featuresCol",
-                        "features column name",
-                        Some("\"features\"")),
+      ParamDesc[Double](
+        "regParam",
+        "regularization parameter (>= 0)",
+        isValid = "ParamValidators.gtEq(0)"),
+      ParamDesc[Int](
+        "maxIter",
+        "maximum number of iterations (>= 0)",
+        isValid = "ParamValidators.gtEq(0)"),
+      ParamDesc[String](
+        "featuresCol",
+        "features column name",
+        Some("\"features\"")),
       ParamDesc[String]("labelCol", "label column name", Some("\"label\"")),
-      ParamDesc[String]("predictionCol",
-                        "prediction column name",
-                        Some("\"prediction\"")),
-      ParamDesc[String]("rawPredictionCol",
-                        "raw prediction (a.k.a. confidence) column name",
-                        Some("\"rawPrediction\"")),
+      ParamDesc[String](
+        "predictionCol",
+        "prediction column name",
+        Some("\"prediction\"")),
+      ParamDesc[String](
+        "rawPredictionCol",
+        "raw prediction (a.k.a. confidence) column name",
+        Some("\"rawPrediction\"")),
       ParamDesc[String](
         "probabilityCol",
         "Column name for predicted class conditional" +
@@ -73,38 +78,43 @@ private[shared] object SharedParamsCodeGen {
         finalMethods = false),
       ParamDesc[String]("inputCol", "input column name"),
       ParamDesc[Array[String]]("inputCols", "input column names"),
-      ParamDesc[String]("outputCol",
-                        "output column name",
-                        Some("uid + \"__output\"")),
+      ParamDesc[String](
+        "outputCol",
+        "output column name",
+        Some("uid + \"__output\"")),
       ParamDesc[Int](
         "checkpointInterval",
         "set checkpoint interval (>= 1) or " +
           "disable checkpoint (-1). E.g. 10 means that the cache will get checkpointed " +
           "every 10 iterations",
         isValid = "(interval: Int) => interval == -1 || interval >= 1"),
-      ParamDesc[Boolean]("fitIntercept",
-                         "whether to fit an intercept term",
-                         Some("true")),
+      ParamDesc[Boolean](
+        "fitIntercept",
+        "whether to fit an intercept term",
+        Some("true")),
       ParamDesc[String](
         "handleInvalid",
         "how to handle invalid entries. Options are skip (which " +
           "will filter out rows with bad values), or error (which will throw an errror). More " +
           "options may be added later",
         isValid = "ParamValidators.inArray(Array(\"skip\", \"error\"))"),
-      ParamDesc[Boolean]("standardization",
-                         "whether to standardize the training features" +
-                           " before fitting the model",
-                         Some("true")),
-      ParamDesc[Long]("seed",
-                      "random seed",
-                      Some("this.getClass.getName.hashCode.toLong")),
+      ParamDesc[Boolean](
+        "standardization",
+        "whether to standardize the training features" +
+          " before fitting the model",
+        Some("true")),
+      ParamDesc[Long](
+        "seed",
+        "random seed",
+        Some("this.getClass.getName.hashCode.toLong")),
       ParamDesc[Double](
         "elasticNetParam",
         "the ElasticNet mixing parameter, in range [0, 1]." +
           " For alpha = 0, the penalty is an L2 penalty. For alpha = 1, it is an L1 penalty",
         isValid = "ParamValidators.inRange(0, 1)"),
-      ParamDesc[Double]("tol",
-                        "the convergence tolerance for iterative algorithms"),
+      ParamDesc[Double](
+        "tol",
+        "the convergence tolerance for iterative algorithms"),
       ParamDesc[Double](
         "stepSize",
         "Step size to be used for each iteration of optimization"),

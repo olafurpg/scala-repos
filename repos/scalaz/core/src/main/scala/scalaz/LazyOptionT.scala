@@ -171,8 +171,9 @@ private trait LazyOptionTBindRec[F[_]]
     LazyOptionT(
       B.tailrecM[A, LazyOption[B]](a =>
         F.map(f(a).run) {
-          _.fold(_.map(b => LazyOption.lazySome(b)),
-                 \/.right(LazyOption.lazyNone))
+          _.fold(
+            _.map(b => LazyOption.lazySome(b)),
+            \/.right(LazyOption.lazyNone))
       })(a)
     )
 }

@@ -57,8 +57,9 @@ trait Holes { self: Quasiquotes =>
   private def iterableTypeFromRank(n: Rank, tpe: Type): Type = {
     if (n == NoDot) tpe
     else
-      appliedType(IterableClass.toType,
-                  List(iterableTypeFromRank(n.pred, tpe)))
+      appliedType(
+        IterableClass.toType,
+        List(iterableTypeFromRank(n.pred, tpe)))
   }
 
   /** Hole encapsulates information about unquotees in quasiquotes.
@@ -145,9 +146,11 @@ trait Holes { self: Quasiquotes =>
 
     private def toStats(tree: Tree): Tree =
       // q"$u.internal.reificationSupport.toStats($tree)"
-      Apply(Select(Select(Select(u, nme.internal), nme.reificationSupport),
-                   nme.toStats),
-            tree :: Nil)
+      Apply(
+        Select(
+          Select(Select(u, nme.internal), nme.reificationSupport),
+          nme.toStats),
+        tree :: Nil)
 
     private def toList(tree: Tree, tpe: Type): Tree =
       if (isListType(tpe)) tree
@@ -160,8 +163,9 @@ trait Holes { self: Quasiquotes =>
         // q"$tree.map { $x => ${f(Ident(x))} }"
         Apply(
           Select(tree, nme.map),
-          Function(ValDef(Modifiers(PARAM), x, TypeTree(), EmptyTree) :: Nil,
-                   f(Ident(x))) :: Nil)
+          Function(
+            ValDef(Modifiers(PARAM), x, TypeTree(), EmptyTree) :: Nil,
+            f(Ident(x))) :: Nil)
       }
 
     private object IterableType {
@@ -284,16 +288,19 @@ trait Holes { self: Quasiquotes =>
           val lifter = inferUnliftable(tpe)
           assert(helperName.isTermName)
           // q"val $name: $u.internal.reificationSupport.${helperName.toTypeName} = $u.internal.reificationSupport.$helperName($lifter)"
-          ValDef(NoMods,
-                 name,
-                 AppliedTypeTree(Select(Select(Select(u, nme.internal),
-                                               nme.reificationSupport),
-                                        helperName.toTypeName),
-                                 List(TypeTree(tpe))),
-                 Apply(Select(Select(Select(u, nme.internal),
-                                     nme.reificationSupport),
-                              helperName),
-                       lifter :: Nil))
+          ValDef(
+            NoMods,
+            name,
+            AppliedTypeTree(
+              Select(
+                Select(Select(u, nme.internal), nme.reificationSupport),
+                helperName.toTypeName),
+              List(TypeTree(tpe))),
+            Apply(
+              Select(
+                Select(Select(u, nme.internal), nme.reificationSupport),
+                helperName),
+              lifter :: Nil))
       }
   }
 }

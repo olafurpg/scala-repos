@@ -9,8 +9,9 @@ object Namer {
 
   def players(game: Game, withRatings: Boolean = true)(
       implicit lightUser: String => Option[LightUser]): (Html, Html) =
-    player(game.firstPlayer, withRatings) -> player(game.secondPlayer,
-                                                    withRatings)
+    player(game.firstPlayer, withRatings) -> player(
+      game.secondPlayer,
+      withRatings)
 
   def player(p: Player, withRating: Boolean = true, withTitle: Boolean = true)(
       implicit lightUser: String => Option[LightUser]) = Html {

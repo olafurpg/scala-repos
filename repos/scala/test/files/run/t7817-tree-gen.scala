@@ -21,17 +21,18 @@ object Test extends CompilerTest {
     def checkTree(msg: String, t: => Tree) = {
       val run = currentRun
       import run._
-      val phases = List(typerPhase,
-                        picklerPhase,
-                        refchecksPhase,
-                        uncurryPhase,
-                        specializePhase,
-                        explicitouterPhase,
-                        erasurePhase,
-                        posterasurePhase,
-                        flattenPhase,
-                        mixinPhase,
-                        cleanupPhase)
+      val phases = List(
+        typerPhase,
+        picklerPhase,
+        refchecksPhase,
+        uncurryPhase,
+        specializePhase,
+        explicitouterPhase,
+        erasurePhase,
+        posterasurePhase,
+        flattenPhase,
+        mixinPhase,
+        cleanupPhase)
       for (phase <- phases) {
         enteringPhase(phase) {
           val error = t.exists(t => t.symbol == NoSymbol)
@@ -55,8 +56,9 @@ object Test extends CompilerTest {
       val po =
         staticModule("test2.package").moduleClass.info.decl(TermName("PO"))
       checkTree("test2.PO", gen.mkAttributedQualifier(po.moduleClass.thisType))
-      checkTree("test2.bar",
-                gen.mkAttributedRef(po.owner.info.decl(TermName("bar"))))
+      checkTree(
+        "test2.bar",
+        gen.mkAttributedRef(po.owner.info.decl(TermName("bar"))))
     }
 
     println("\n\nSeparate Compilation:\n")
@@ -71,8 +73,9 @@ object Test extends CompilerTest {
       val po =
         staticModule("test2.package").moduleClass.info.decl(TermName("PO"))
       checkTree("PO", gen.mkAttributedQualifier(po.moduleClass.thisType))
-      checkTree("testSep2.bar",
-                gen.mkAttributedRef(po.owner.info.decl(TermName("bar"))))
+      checkTree(
+        "testSep2.bar",
+        gen.mkAttributedRef(po.owner.info.decl(TermName("bar"))))
     }
   }
 }

@@ -47,15 +47,16 @@ private[launchqueue] object AppTaskLauncherActor {
             rateLimiterActor: ActorRef)(app: AppDefinition,
                                         initialCount: Int): Props = {
     Props(
-      new AppTaskLauncherActor(config,
-                               offerMatcherManager,
-                               clock,
-                               taskOpFactory,
-                               maybeOfferReviver,
-                               taskTracker,
-                               rateLimiterActor,
-                               app,
-                               initialCount))
+      new AppTaskLauncherActor(
+        config,
+        offerMatcherManager,
+        clock,
+        taskOpFactory,
+        maybeOfferReviver,
+        taskTracker,
+        rateLimiterActor,
+        app,
+        initialCount))
   }
   // scalastyle:on parameter.number
 
@@ -133,16 +134,18 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
     recheckBackOff.foreach(_.cancel())
 
     if (inFlightTaskOperations.nonEmpty) {
-      log.warning("Actor shutdown but still some tasks in flight: {}",
-                  inFlightTaskOperations.keys.mkString(", "))
+      log.warning(
+        "Actor shutdown but still some tasks in flight: {}",
+        inFlightTaskOperations.keys.mkString(", "))
       inFlightTaskOperations.values.foreach(_.cancel())
     }
 
     super.postStop()
 
-    log.info("Stopped appTaskLaunchActor for {} version {}",
-             app.id,
-             app.version)
+    log.info(
+      "Stopped appTaskLaunchActor for {} version {}",
+      app.id,
+      app.version)
   }
 
   override def receive: Receive = waitForInitialDelay
@@ -211,9 +214,10 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
         if (backOffUntil.exists(_ > now)) {
           import context.dispatcher
           recheckBackOff = Some(
-            context.system.scheduler.scheduleOnce(now until delayUntil,
-                                                  self,
-                                                  RecheckIfBackOffUntilReached)
+            context.system.scheduler.scheduleOnce(
+              now until delayUntil,
+              self,
+              RecheckIfBackOffUntilReached)
           )
         }
 
@@ -277,9 +281,10 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
             log.debug("no change for {}", taskId)
 
           case TaskStateChange.Failure(cause) =>
-            log.warning("Task state update failed for {}. Reason: {}",
-                        taskId,
-                        cause.getMessage)
+            log.warning(
+              "Task state update failed for {}. Reason: {}",
+              taskId,
+              cause.getMessage)
         }
       }
 
@@ -373,9 +378,10 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
     case ActorOfferMatcher.MatchOffer(deadline, offer)
         if clock.now() >= deadline || !shouldLaunchTasks =>
       val deadlineReached = clock.now() >= deadline
-      log.debug("ignoring offer, offer deadline {}reached. {}",
-                if (deadlineReached) "" else "NOT ",
-                status)
+      log.debug(
+        "ignoring offer, offer deadline {}reached. {}",
+        if (deadlineReached) "" else "NOT ",
+        status)
       sender ! MatchedTaskOps(offer.getId, Seq.empty)
 
     case ActorOfferMatcher.MatchOffer(deadline, offer) =>
@@ -408,11 +414,12 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
       OfferMatcherRegistration.manageOfferMatcherStatus()
     }
 
-    log.info("Request {} for task '{}', version '{}'. {}",
-             taskOp.getClass.getSimpleName,
-             taskOp.taskId.idString,
-             app.version,
-             status)
+    log.info(
+      "Request {} for task '{}', version '{}'. {}",
+      taskOp.getClass.getSimpleName,
+      taskOp.taskId.idString,
+      app.version,
+      status)
 
     updateActorState()
     sender() ! MatchedTaskOps(
@@ -489,9 +496,10 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
             app.id,
             app.version)
         } else {
-          log.info("No tasks left to launch. Stop receiving offers for {}, {}",
-                   app.id,
-                   app.version)
+          log.info(
+            "No tasks left to launch. Stop receiving offers for {}, {}",
+            app.id,
+            app.version)
         }
         offerMatcherManager.removeSubscription(myselfAsOfferMatcher)(
           context.dispatcher)

@@ -303,15 +303,16 @@ object qrp extends UFunc {
       var info = new intW(0)
       lapack.dgeqrf(m, n, scratch, m, scratch, work, -1, info)
       val lwork1 = if (info.`val` != 0) n else work(0).toInt
-      lapack.dorgqr(m,
-                    m,
-                    scala.math.min(m, n),
-                    scratch,
-                    m,
-                    scratch,
-                    work,
-                    -1,
-                    info)
+      lapack.dorgqr(
+        m,
+        m,
+        scala.math.min(m, n),
+        scratch,
+        m,
+        scratch,
+        work,
+        -1,
+        info)
       val lwork2 = if (info.`val` != 0) n else work(0).toInt
       //allocate workspace mem. as max of lwork1 and lwork3
       val workspace = new Array[Double](scala.math.max(lwork1, lwork2))
@@ -326,15 +327,16 @@ object qrp extends UFunc {
         AFact(r, c) = A(r, c)
       }
 
-      lapack.dgeqp3(m,
-                    n,
-                    AFact.data,
-                    m,
-                    pvt,
-                    tau,
-                    workspace,
-                    workspace.length,
-                    info)
+      lapack.dgeqp3(
+        m,
+        n,
+        AFact.data,
+        m,
+        pvt,
+        tau,
+        workspace,
+        workspace.length,
+        info)
 
       //Error check
       if (info.`val` > 0)
@@ -352,15 +354,16 @@ object qrp extends UFunc {
 
       //Get Q from the matrix returned by dgep3
       val Q = DenseMatrix.zeros[Double](m, m)
-      lapack.dorgqr(m,
-                    m,
-                    scala.math.min(m, n),
-                    AFact.data,
-                    m,
-                    tau,
-                    workspace,
-                    workspace.length,
-                    info)
+      lapack.dorgqr(
+        m,
+        m,
+        scala.math.min(m, n),
+        AFact.data,
+        m,
+        tau,
+        workspace,
+        workspace.length,
+        info)
 
       cforRange2(0 until m, 0 until min(m, maxd)) { (r, c) =>
         Q(r, c) = AFact(r, c)

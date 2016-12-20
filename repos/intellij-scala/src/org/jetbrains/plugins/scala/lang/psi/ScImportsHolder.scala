@@ -50,8 +50,9 @@ trait ScImportsHolder extends ScalaPsiElement {
         val stub: StubElement[_] = s.getStub
         if (stub != null) {
           return stub
-            .getChildrenByType(ScalaElementTypes.IMPORT_STMT,
-                               JavaArrayFactoryUtil.ScImportStmtFactory)
+            .getChildrenByType(
+              ScalaElementTypes.IMPORT_STMT,
+              JavaArrayFactoryUtil.ScImportStmtFactory)
             .toSeq
         }
       case _ =>
@@ -236,10 +237,11 @@ trait ScImportsHolder extends ScalaPsiElement {
         .asInstanceOf[ScImportStmt]
       val range = inserted.getTextRange
       val namesAtStart = namesAtRangeStart(inserted)
-      val rangeInfo = RangeInfo(namesAtStart,
-                                importInfosToAdd,
-                                usedImportedNames = usedNames,
-                                isLocal = false)
+      val rangeInfo = RangeInfo(
+        namesAtStart,
+        importInfosToAdd,
+        usedImportedNames = usedNames,
+        isLocal = false)
       val infosToAdd = optimizedImportInfos(rangeInfo, settings)
 
       replaceWithNewInfos(range, infosToAdd)

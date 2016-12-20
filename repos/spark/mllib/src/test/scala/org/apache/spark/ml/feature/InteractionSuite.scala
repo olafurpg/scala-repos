@@ -79,26 +79,30 @@ class InteractionSuite
       .toDF("a", "b")
     val groupAttr = new AttributeGroup(
       "b",
-      Array[Attribute](NumericAttribute.defaultAttr.withName("foo"),
-                       NumericAttribute.defaultAttr.withName("bar")))
+      Array[Attribute](
+        NumericAttribute.defaultAttr.withName("foo"),
+        NumericAttribute.defaultAttr.withName("bar")))
     val df =
-      data.select(col("a").as("a", NumericAttribute.defaultAttr.toMetadata()),
-                  col("b").as("b", groupAttr.toMetadata()))
+      data.select(
+        col("a").as("a", NumericAttribute.defaultAttr.toMetadata()),
+        col("b").as("b", groupAttr.toMetadata()))
     val trans =
       new Interaction().setInputCols(Array("a", "b")).setOutputCol("features")
     val res = trans.transform(df)
     val expected = sqlContext
       .createDataFrame(
-        Seq((2, Vectors.dense(3.0, 4.0), Vectors.dense(6.0, 8.0)),
-            (1, Vectors.dense(1.0, 5.0), Vectors.dense(1.0, 5.0)))
+        Seq(
+          (2, Vectors.dense(3.0, 4.0), Vectors.dense(6.0, 8.0)),
+          (1, Vectors.dense(1.0, 5.0), Vectors.dense(1.0, 5.0)))
       )
       .toDF("a", "b", "features")
     assert(res.collect() === expected.collect())
     val attrs = AttributeGroup.fromStructField(res.schema("features"))
     val expectedAttrs = new AttributeGroup(
       "features",
-      Array[Attribute](new NumericAttribute(Some("a:b_foo"), Some(1)),
-                       new NumericAttribute(Some("a:b_bar"), Some(2))))
+      Array[Attribute](
+        new NumericAttribute(Some("a:b_foo"), Some(1)),
+        new NumericAttribute(Some("a:b_bar"), Some(2))))
     assert(attrs === expectedAttrs)
   }
 
@@ -110,49 +114,56 @@ class InteractionSuite
       .toDF("a", "b")
     val groupAttr = new AttributeGroup(
       "b",
-      Array[Attribute](NumericAttribute.defaultAttr.withName("foo"),
-                       NumericAttribute.defaultAttr.withName("bar")))
-    val df = data.select(col("a").as("a",
-                                     NominalAttribute.defaultAttr
-                                       .withValues(Array("up", "down", "left"))
-                                       .toMetadata()),
-                         col("b").as("b", groupAttr.toMetadata()))
+      Array[Attribute](
+        NumericAttribute.defaultAttr.withName("foo"),
+        NumericAttribute.defaultAttr.withName("bar")))
+    val df = data.select(
+      col("a").as(
+        "a",
+        NominalAttribute.defaultAttr
+          .withValues(Array("up", "down", "left"))
+          .toMetadata()),
+      col("b").as("b", groupAttr.toMetadata()))
     val trans =
       new Interaction().setInputCols(Array("a", "b")).setOutputCol("features")
     val res = trans.transform(df)
     val expected = sqlContext
       .createDataFrame(
-        Seq((2, Vectors.dense(3.0, 4.0), Vectors.dense(0, 0, 0, 0, 3, 4)),
-            (1, Vectors.dense(1.0, 5.0), Vectors.dense(0, 0, 1, 5, 0, 0)))
+        Seq(
+          (2, Vectors.dense(3.0, 4.0), Vectors.dense(0, 0, 0, 0, 3, 4)),
+          (1, Vectors.dense(1.0, 5.0), Vectors.dense(0, 0, 1, 5, 0, 0)))
       )
       .toDF("a", "b", "features")
     assert(res.collect() === expected.collect())
     val attrs = AttributeGroup.fromStructField(res.schema("features"))
     val expectedAttrs = new AttributeGroup(
       "features",
-      Array[Attribute](new NumericAttribute(Some("a_up:b_foo"), Some(1)),
-                       new NumericAttribute(Some("a_up:b_bar"), Some(2)),
-                       new NumericAttribute(Some("a_down:b_foo"), Some(3)),
-                       new NumericAttribute(Some("a_down:b_bar"), Some(4)),
-                       new NumericAttribute(Some("a_left:b_foo"), Some(5)),
-                       new NumericAttribute(Some("a_left:b_bar"), Some(6))))
+      Array[Attribute](
+        new NumericAttribute(Some("a_up:b_foo"), Some(1)),
+        new NumericAttribute(Some("a_up:b_bar"), Some(2)),
+        new NumericAttribute(Some("a_down:b_foo"), Some(3)),
+        new NumericAttribute(Some("a_down:b_bar"), Some(4)),
+        new NumericAttribute(Some("a_left:b_foo"), Some(5)),
+        new NumericAttribute(Some("a_left:b_bar"), Some(6))))
     assert(attrs === expectedAttrs)
   }
 
   test("default attr names") {
     val data = sqlContext
       .createDataFrame(
-        Seq((2, Vectors.dense(0.0, 4.0), 1.0),
-            (1, Vectors.dense(1.0, 5.0), 10.0))
+        Seq(
+          (2, Vectors.dense(0.0, 4.0), 1.0),
+          (1, Vectors.dense(1.0, 5.0), 10.0))
       )
       .toDF("a", "b", "c")
     val groupAttr = new AttributeGroup(
       "b",
-      Array[Attribute](NominalAttribute.defaultAttr.withNumValues(2),
-                       NumericAttribute.defaultAttr))
+      Array[Attribute](
+        NominalAttribute.defaultAttr.withNumValues(2),
+        NumericAttribute.defaultAttr))
     val df = data.select(
-      col("a").as("a",
-                  NominalAttribute.defaultAttr.withNumValues(3).toMetadata()),
+      col("a")
+        .as("a", NominalAttribute.defaultAttr.withNumValues(3).toMetadata()),
       col("b").as("b", groupAttr.toMetadata()),
       col("c").as("c", NumericAttribute.defaultAttr.toMetadata()))
     val trans = new Interaction()
@@ -161,29 +172,31 @@ class InteractionSuite
     val res = trans.transform(df)
     val expected = sqlContext
       .createDataFrame(
-        Seq((2,
-             Vectors.dense(0.0, 4.0),
-             1.0,
-             Vectors.dense(0, 0, 0, 0, 0, 0, 1, 0, 4)),
-            (1,
-             Vectors.dense(1.0, 5.0),
-             10.0,
-             Vectors.dense(0, 0, 0, 0, 10, 50, 0, 0, 0)))
+        Seq(
+          (2,
+           Vectors.dense(0.0, 4.0),
+           1.0,
+           Vectors.dense(0, 0, 0, 0, 0, 0, 1, 0, 4)),
+          (1,
+           Vectors.dense(1.0, 5.0),
+           10.0,
+           Vectors.dense(0, 0, 0, 0, 10, 50, 0, 0, 0)))
       )
       .toDF("a", "b", "c", "features")
     assert(res.collect() === expected.collect())
     val attrs = AttributeGroup.fromStructField(res.schema("features"))
     val expectedAttrs = new AttributeGroup(
       "features",
-      Array[Attribute](new NumericAttribute(Some("a_0:b_0_0:c"), Some(1)),
-                       new NumericAttribute(Some("a_0:b_0_1:c"), Some(2)),
-                       new NumericAttribute(Some("a_0:b_1:c"), Some(3)),
-                       new NumericAttribute(Some("a_1:b_0_0:c"), Some(4)),
-                       new NumericAttribute(Some("a_1:b_0_1:c"), Some(5)),
-                       new NumericAttribute(Some("a_1:b_1:c"), Some(6)),
-                       new NumericAttribute(Some("a_2:b_0_0:c"), Some(7)),
-                       new NumericAttribute(Some("a_2:b_0_1:c"), Some(8)),
-                       new NumericAttribute(Some("a_2:b_1:c"), Some(9))))
+      Array[Attribute](
+        new NumericAttribute(Some("a_0:b_0_0:c"), Some(1)),
+        new NumericAttribute(Some("a_0:b_0_1:c"), Some(2)),
+        new NumericAttribute(Some("a_0:b_1:c"), Some(3)),
+        new NumericAttribute(Some("a_1:b_0_0:c"), Some(4)),
+        new NumericAttribute(Some("a_1:b_0_1:c"), Some(5)),
+        new NumericAttribute(Some("a_1:b_1:c"), Some(6)),
+        new NumericAttribute(Some("a_2:b_0_0:c"), Some(7)),
+        new NumericAttribute(Some("a_2:b_0_1:c"), Some(8)),
+        new NumericAttribute(Some("a_2:b_1:c"), Some(9))))
     assert(attrs === expectedAttrs)
   }
 

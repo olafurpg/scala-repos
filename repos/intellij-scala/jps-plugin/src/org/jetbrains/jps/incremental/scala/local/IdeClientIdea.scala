@@ -62,9 +62,10 @@ class IdeClientIdea(compilerName: String,
       }
       if (!isTemp && isClassFile && !Utils.errorsDetected(context)) {
         try {
-          val reader: ClassReader = new ClassReader(content.getBuffer,
-                                                    content.getOffset,
-                                                    content.getLength)
+          val reader: ClassReader = new ClassReader(
+            content.getBuffer,
+            content.getOffset,
+            content.getLength)
           mappingsCallback.associate(
             FileUtil.toSystemIndependentName(outputFile.getPath),
             sourcePath,
@@ -124,9 +125,10 @@ class IdeClientIdea(compilerName: String,
       className.stripSuffix(packageObjectClassName).replace("/", ".")
     for {
       typeName <- baseTypes.map(_.replace('/', '.'))
-      packObjectBaseClass = PackageObjectBaseClass(source,
-                                                   packageName,
-                                                   typeName)
+      packObjectBaseClass = PackageObjectBaseClass(
+        source,
+        packageName,
+        typeName)
       if !packageObjectsBaseClasses.contains(packObjectBaseClass)
     } yield {
       packObjectBaseClass

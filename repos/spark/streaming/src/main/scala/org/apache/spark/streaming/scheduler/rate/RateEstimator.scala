@@ -64,11 +64,12 @@ object RateEstimator {
           conf.getDouble("spark.streaming.backpressure.pid.derived", 0.0)
         val minRate =
           conf.getDouble("spark.streaming.backpressure.pid.minRate", 100)
-        new PIDRateEstimator(batchInterval.milliseconds,
-                             proportional,
-                             integral,
-                             derived,
-                             minRate)
+        new PIDRateEstimator(
+          batchInterval.milliseconds,
+          proportional,
+          integral,
+          derived,
+          minRate)
 
       case estimator =>
         throw new IllegalArgumentException(

@@ -86,8 +86,9 @@ case class MetricEvaluatorResult[R](
       JsonExtractor.engineParamstoPrettyJson(Both, bestEngineParams)
 
     val strings =
-      Seq("MetricEvaluatorResult:",
-          s"  # engine params evaluated: ${engineParamsScores.size}") ++ Seq(
+      Seq(
+        "MetricEvaluatorResult:",
+        s"  # engine params evaluated: ${engineParamsScores.size}") ++ Seq(
         "Optimal Engine Params:",
         s"  $bestEPStr",
         "Metrics:",
@@ -123,9 +124,10 @@ object MetricEvaluator {
 
   def apply[EI, Q, P, A, R](
       metric: Metric[EI, Q, P, A, R]): MetricEvaluator[EI, Q, P, A, R] = {
-    new MetricEvaluator[EI, Q, P, A, R](metric,
-                                        Seq[Metric[EI, Q, P, A, _]](),
-                                        None)
+    new MetricEvaluator[EI, Q, P, A, R](
+      metric,
+      Seq[Metric[EI, Q, P, A, _]](),
+      None)
   }
 
   case class NameParams(name: String, params: Params) {
@@ -141,14 +143,15 @@ object MetricEvaluator {
                            serving: NameParams) {
 
     def this(evaluation: Evaluation, engineParams: EngineParams) =
-      this(id = "",
-           description = "",
-           engineFactory = evaluation.getClass.getName,
-           datasource = new NameParams(engineParams.dataSourceParams),
-           preparator = new NameParams(engineParams.preparatorParams),
-           algorithms =
-             engineParams.algorithmParamsList.map(np => new NameParams(np)),
-           serving = new NameParams(engineParams.servingParams))
+      this(
+        id = "",
+        description = "",
+        engineFactory = evaluation.getClass.getName,
+        datasource = new NameParams(engineParams.dataSourceParams),
+        preparator = new NameParams(engineParams.preparatorParams),
+        algorithms =
+          engineParams.algorithmParamsList.map(np => new NameParams(np)),
+        serving = new NameParams(engineParams.servingParams))
   }
 }
 
@@ -214,8 +217,9 @@ class MetricEvaluator[EI, Q, P, A, R](
         .map {
           case ((engineParams, evalDataSet), idx) =>
             val metricScores =
-              MetricScores[R](metric.calculate(sc, evalDataSet),
-                              otherMetrics.map(_.calculate(sc, evalDataSet)))
+              MetricScores[R](
+                metric.calculate(sc, evalDataSet),
+                otherMetrics.map(_.calculate(sc, evalDataSet)))
             (engineParams, metricScores)
         }
         .seq
@@ -242,12 +246,13 @@ class MetricEvaluator[EI, Q, P, A, R](
       saveEngineJson(evaluation, bestEngineParams, path)
     }
 
-    MetricEvaluatorResult(bestScore = bestScore,
-                          bestEngineParams = bestEngineParams,
-                          bestIdx = bestIdx,
-                          metricHeader = metric.header,
-                          otherMetricHeaders = otherMetrics.map(_.header),
-                          engineParamsScores = evalResultList,
-                          outputPath = outputPath)
+    MetricEvaluatorResult(
+      bestScore = bestScore,
+      bestEngineParams = bestEngineParams,
+      bestIdx = bestIdx,
+      metricHeader = metric.header,
+      otherMetricHeaders = otherMetrics.map(_.header),
+      engineParamsScores = evalResultList,
+      outputPath = outputPath)
   }
 }

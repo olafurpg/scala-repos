@@ -228,16 +228,17 @@ object ProductTypes {
   val eq = Definition("Eq")(eqv :: Nil)
   val order = Definition("Order", Some("Eq"))(compare :: overrideEqv :: Nil)
 
-  val algebra = List(semigroup,
-                     monoid,
-                     group,
-                     abGroup,
-                     semiring,
-                     rng,
-                     rig,
-                     ring,
-                     eq,
-                     order)
+  val algebra = List(
+    semigroup,
+    monoid,
+    group,
+    abGroup,
+    semiring,
+    rng,
+    rig,
+    ring,
+    eq,
+    order)
 
   def algebraProductTypes: String =
     renderAll("spire.std", "spire.algebra._" :: Nil, 2, 22)(algebra)

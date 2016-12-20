@@ -75,8 +75,9 @@ trait StubColumnarTableModule[M[+ _]]
       // We use the sort transspec1 to compute a new table with a combination of the
       // original data and the new sort columns, referenced under the sortkey namespace
       val tableWithSortKey = transform(
-        InnerObjectConcat(WrapObject(sortKey, "0"),
-                          WrapObject(Leaf(Source), "1")))
+        InnerObjectConcat(
+          WrapObject(sortKey, "0"),
+          WrapObject(Leaf(Source), "1")))
 
       implicit val jValueOrdering =
         if (sortOrder.isAscending) {
@@ -95,10 +96,11 @@ trait StubColumnarTableModule[M[+ _]]
     override def load(apiKey: APIKey, jtpe: JType) = EitherT {
       self.toJson map { events =>
         val parsedV =
-          events.toStream.traverse[({
-                                     type λ[α] = Validation[ResourceError, α]
-                                   })#λ,
-                                   Stream[JObject]] {
+          events.toStream.traverse[
+            ({
+              type λ[α] = Validation[ResourceError, α]
+            })#λ,
+            Stream[JObject]] {
             case JString(pathStr) =>
               success {
                 indexLock synchronized {

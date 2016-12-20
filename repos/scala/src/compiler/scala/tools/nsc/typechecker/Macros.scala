@@ -187,9 +187,9 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
           case _ => Other
         }
 
-        val transformed = transformTypeTagEvidenceParams(macroImplRef,
-                                                         (param,
-                                                          tparam) => tparam)
+        val transformed = transformTypeTagEvidenceParams(
+          macroImplRef,
+          (param, tparam) => tparam)
         mmap(transformed)(p =>
           if (p.isTerm) fingerprint(p.info) else Tagged(p.paramPos))
       }
@@ -270,20 +270,22 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
       val className = unpickle("className", classOf[String])
       val methodName = unpickle("methodName", classOf[String])
       val signature = unpickle("signature", classOf[List[List[Fingerprint]]])
-      MacroImplBinding(isBundle,
-                       isBlackbox,
-                       className,
-                       methodName,
-                       signature,
-                       targs)
+      MacroImplBinding(
+        isBundle,
+        isBlackbox,
+        className,
+        methodName,
+        signature,
+        targs)
     }
   }
 
   def bindMacroImpl(macroDef: Symbol, macroImplRef: Tree): Unit = {
     val pickle = MacroImplBinding.pickle(macroImplRef)
-    macroDef withAnnotation AnnotationInfo(MacroImplAnnotation.tpe,
-                                           List(pickle),
-                                           Nil)
+    macroDef withAnnotation AnnotationInfo(
+      MacroImplAnnotation.tpe,
+      List(pickle),
+      Nil)
   }
 
   def loadMacroImplBinding(macroDef: Symbol): Option[MacroImplBinding] =
@@ -318,8 +320,9 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
 
         // Step III. Transform c.prefix.value.XXX to this.XXX and implParam.value.YYY to defParam.YYY
         def unsigma(tpe: Type): Type =
-          transformTypeTagEvidenceParams(macroImplRef,
-                                         (param, tparam) => NoSymbol) match {
+          transformTypeTagEvidenceParams(
+            macroImplRef,
+            (param, tparam) => NoSymbol) match {
             case (implCtxParam :: Nil) :: implParamss =>
               val implToDef = flatMap2(implParamss, macroDdef.vparamss)(
                 map2(_, _)((_, _))).toMap
@@ -379,8 +382,9 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
       "typechecking macro def %s at %s".format(macroDef, macroDdef.pos))
     if (fastTrack contains macroDef) {
       macroLogVerbose("typecheck terminated unexpectedly: macro is fast track")
-      assert(!macroDdef.tpt.isEmpty,
-             "fast track macros must provide result type")
+      assert(
+        !macroDdef.tpt.isEmpty,
+        "fast track macros must provide result type")
       EmptyTree
     } else {
       def fail() = {
@@ -391,9 +395,10 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
         bindMacroImpl(macroDef, macroImplRef); macroImplRef
       }
 
-      if (!typer.checkFeature(macroDdef.pos,
-                              currentRun.runDefinitions.MacrosFeature,
-                              immediate = true)) {
+      if (!typer.checkFeature(
+            macroDdef.pos,
+            currentRun.runDefinitions.MacrosFeature,
+            immediate = true)) {
         macroLogVerbose(
           "typecheck terminated unexpectedly: language.experimental.macros feature is not enabled")
         fail()
@@ -548,10 +553,11 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
                          macroDef.typeParams.indexWhere(_.name == targ.name)
                        targs(argPos).tpe
                      } else
-                       targ.tpe.asSeenFrom(if (prefix == EmptyTree)
-                                             macroDef.owner.tpe
-                                           else prefix.tpe,
-                                           macroDef.owner)
+                       targ.tpe.asSeenFrom(
+                         if (prefix == EmptyTree)
+                           macroDef.owner.tpe
+                         else prefix.tpe,
+                         macroDef.owner)
                    } else targ.tpe
                  context.WeakTypeTag(tpe)
                })
@@ -810,10 +816,11 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
           typer.instantiatePossiblyExpectingUnit(delayed, mode, outerPt)
         else {
           forced += delayed
-          typer.infer.inferExprInstance(delayed,
-                                        typer.context.extractUndetparams(),
-                                        outerPt,
-                                        keepNothings = false)
+          typer.infer.inferExprInstance(
+            delayed,
+            typer.context.extractUndetparams(),
+            outerPt,
+            keepNothings = false)
           macroExpand(typer, delayed, mode, outerPt)
         }
       } else delayed

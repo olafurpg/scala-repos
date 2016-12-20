@@ -202,14 +202,17 @@ class VectorUDT extends UserDefinedType[Vector] {
     // vectors. The "values" field is nullable because we might want to add binary vectors later,
     // which uses "size" and "indices", but not "values".
     StructType(
-      Seq(StructField("type", ByteType, nullable = false),
-          StructField("size", IntegerType, nullable = true),
-          StructField("indices",
-                      ArrayType(IntegerType, containsNull = false),
-                      nullable = true),
-          StructField("values",
-                      ArrayType(DoubleType, containsNull = false),
-                      nullable = true)))
+      Seq(
+        StructField("type", ByteType, nullable = false),
+        StructField("size", IntegerType, nullable = true),
+        StructField(
+          "indices",
+          ArrayType(IntegerType, containsNull = false),
+          nullable = true),
+        StructField(
+          "values",
+          ArrayType(DoubleType, containsNull = false),
+          nullable = true)))
   }
 
   override def serialize(obj: Vector): InternalRow = {
@@ -312,8 +315,9 @@ object Vectors {
     */
   @Since("1.0.0")
   def sparse(size: Int, elements: Seq[(Int, Double)]): Vector = {
-    require(size > 0,
-            "The size of the requested sparse vector must be greater than 0.")
+    require(
+      size > 0,
+      "The size of the requested sparse vector must be greater than 0.")
 
     val (indices, values) = elements.sortBy(_._1).unzip
     var prev = -1
@@ -338,13 +342,14 @@ object Vectors {
   @Since("1.0.0")
   def sparse(size: Int,
              elements: JavaIterable[(JavaInteger, JavaDouble)]): Vector = {
-    sparse(size,
-           elements.asScala
-             .map {
-               case (i, x) =>
-                 (i.intValue(), x.doubleValue())
-             }
-             .toSeq)
+    sparse(
+      size,
+      elements.asScala
+        .map {
+          case (i, x) =>
+            (i.intValue(), x.doubleValue())
+        }
+        .toSeq)
   }
 
   /**
@@ -414,9 +419,10 @@ object Vectors {
         if (v.index.length == v.used) {
           new SparseVector(v.length, v.index, v.data)
         } else {
-          new SparseVector(v.length,
-                           v.index.slice(0, v.used),
-                           v.data.slice(0, v.used))
+          new SparseVector(
+            v.length,
+            v.index.slice(0, v.used),
+            v.data.slice(0, v.used))
         }
       case v: BV[_] =>
         sys.error("Unsupported Breeze vector type: " + v.getClass.getName)
@@ -488,9 +494,10 @@ object Vectors {
     */
   @Since("1.3.0")
   def sqdist(v1: Vector, v2: Vector): Double = {
-    require(v1.size == v2.size,
-            s"Vector dimensions do not match: Dim(v1)=${v1.size} and Dim(v2)" +
-              s"=${v2.size}.")
+    require(
+      v1.size == v2.size,
+      s"Vector dimensions do not match: Dim(v1)=${v1.size} and Dim(v2)" +
+        s"=${v2.size}.")
     var squaredDistance = 0.0
     (v1, v2) match {
       case (v1: SparseVector, v2: SparseVector) =>
@@ -742,9 +749,10 @@ class SparseVector @Since("1.0.0")(@Since("1.0.0") override val size: Int,
     "Sparse vectors require that the dimension of the" +
       s" indices match the dimension of the values. You provided ${indices.length} indices and " +
       s" ${values.length} values.")
-  require(indices.length <= size,
-          s"You provided ${indices.length} indices and values, " +
-            s"which exceeds the specified vector size ${size}.")
+  require(
+    indices.length <= size,
+    s"You provided ${indices.length} indices and values, " +
+      s"which exceeds the specified vector size ${size}.")
 
   override def toString: String =
     s"($size,${indices.mkString("[", ",", "]")},${values.mkString("[", ",", "]")})"
@@ -905,9 +913,10 @@ class SparseVector @Since("1.0.0")(@Since("1.0.0") override val size: Int,
         i_v
       }
       .unzip
-    new SparseVector(selectedIndices.length,
-                     sliceInds.toArray,
-                     sliceVals.toArray)
+    new SparseVector(
+      selectedIndices.length,
+      sliceInds.toArray,
+      sliceVals.toArray)
   }
 
   @Since("1.6.0")

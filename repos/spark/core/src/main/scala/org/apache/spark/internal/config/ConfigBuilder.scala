@@ -107,29 +107,32 @@ private[spark] class TypedConfigBuilder[T](val parent: ConfigBuilder,
   }
 
   def toSequence: TypedConfigBuilder[Seq[T]] = {
-    new TypedConfigBuilder(parent,
-                           stringToSeq(_, converter),
-                           seqToString(_, stringConverter))
+    new TypedConfigBuilder(
+      parent,
+      stringToSeq(_, converter),
+      seqToString(_, stringConverter))
   }
 
   /** Creates a [[ConfigEntry]] that does not require a default value. */
   def optional: OptionalConfigEntry[T] = {
-    new OptionalConfigEntry[T](parent.key,
-                               converter,
-                               stringConverter,
-                               parent._doc,
-                               parent._public)
+    new OptionalConfigEntry[T](
+      parent.key,
+      converter,
+      stringConverter,
+      parent._doc,
+      parent._public)
   }
 
   /** Creates a [[ConfigEntry]] that has a default value. */
   def withDefault(default: T): ConfigEntry[T] = {
     val transformedDefault = converter(stringConverter(default))
-    new ConfigEntryWithDefault[T](parent.key,
-                                  transformedDefault,
-                                  converter,
-                                  stringConverter,
-                                  parent._doc,
-                                  parent._public)
+    new ConfigEntryWithDefault[T](
+      parent.key,
+      transformedDefault,
+      converter,
+      stringConverter,
+      parent._doc,
+      parent._public)
   }
 
   /**
@@ -138,12 +141,13 @@ private[spark] class TypedConfigBuilder[T](val parent: ConfigBuilder,
     */
   def withDefaultString(default: String): ConfigEntry[T] = {
     val typedDefault = converter(default)
-    new ConfigEntryWithDefault[T](parent.key,
-                                  typedDefault,
-                                  converter,
-                                  stringConverter,
-                                  parent._doc,
-                                  parent._public)
+    new ConfigEntryWithDefault[T](
+      parent.key,
+      typedDefault,
+      converter,
+      stringConverter,
+      parent._doc,
+      parent._public)
   }
 }
 
@@ -190,15 +194,17 @@ private[spark] case class ConfigBuilder(key: String) {
   }
 
   def timeConf(unit: TimeUnit): TypedConfigBuilder[Long] = {
-    new TypedConfigBuilder(this,
-                           timeFromString(_, unit),
-                           timeToString(_, unit))
+    new TypedConfigBuilder(
+      this,
+      timeFromString(_, unit),
+      timeToString(_, unit))
   }
 
   def bytesConf(unit: ByteUnit): TypedConfigBuilder[Long] = {
-    new TypedConfigBuilder(this,
-                           byteFromString(_, unit),
-                           byteToString(_, unit))
+    new TypedConfigBuilder(
+      this,
+      byteFromString(_, unit),
+      byteToString(_, unit))
   }
 
   def fallbackConf[T](fallback: ConfigEntry[T]): ConfigEntry[T] = {

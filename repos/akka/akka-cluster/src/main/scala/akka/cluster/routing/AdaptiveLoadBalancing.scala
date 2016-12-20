@@ -42,8 +42,9 @@ import akka.routing._
   * @param metricsSelector decides what probability to use for selecting a routee, based
   *   on remaining capacity as indicated by the node metrics
   */
-@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
-            "2.4")
+@deprecated(
+  "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+  "2.4")
 final case class AdaptiveLoadBalancingRoutingLogic(
     system: ActorSystem,
     metricsSelector: MetricsSelector = MixMetricsSelector)
@@ -65,9 +66,10 @@ final case class AdaptiveLoadBalancingRoutingLogic(
     val oldValue = weightedRouteesRef.get
     val (routees, _, _) = oldValue
     val weightedRoutees = Some(
-      new WeightedRoutees(routees,
-                          cluster.selfAddress,
-                          metricsSelector.weights(event.nodeMetrics)))
+      new WeightedRoutees(
+        routees,
+        cluster.selfAddress,
+        metricsSelector.weights(event.nodeMetrics)))
     // retry when CAS failure
     if (!weightedRouteesRef.compareAndSet(
           oldValue,
@@ -86,9 +88,10 @@ final case class AdaptiveLoadBalancingRoutingLogic(
 
         if (routees ne oldRoutees) {
           val weightedRoutees = Some(
-            new WeightedRoutees(routees,
-                                cluster.selfAddress,
-                                metricsSelector.weights(oldMetrics)))
+            new WeightedRoutees(
+              routees,
+              cluster.selfAddress,
+              metricsSelector.weights(oldMetrics)))
           // ignore, don't update, in case of CAS failure
           weightedRouteesRef
             .compareAndSet(oldValue, (routees, oldMetrics, weightedRoutees))
@@ -142,8 +145,9 @@ final case class AdaptiveLoadBalancingRoutingLogic(
   *   supervision, death watch and router management messages
   */
 @SerialVersionUID(1L)
-@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
-            "2.4")
+@deprecated(
+  "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+  "2.4")
 final case class AdaptiveLoadBalancingPool(
     metricsSelector: MetricsSelector = MixMetricsSelector,
     override val nrOfInstances: Int = 0,
@@ -154,10 +158,11 @@ final case class AdaptiveLoadBalancingPool(
     extends Pool {
 
   def this(config: Config, dynamicAccess: DynamicAccess) =
-    this(nrOfInstances =
-           ClusterRouterSettingsBase.getMaxTotalNrOfInstances(config),
-         metricsSelector = MetricsSelector.fromConfig(config, dynamicAccess),
-         usePoolDispatcher = config.hasPath("pool-dispatcher"))
+    this(
+      nrOfInstances =
+        ClusterRouterSettingsBase.getMaxTotalNrOfInstances(config),
+      metricsSelector = MetricsSelector.fromConfig(config, dynamicAccess),
+      usePoolDispatcher = config.hasPath("pool-dispatcher"))
 
   /**
     * Java API
@@ -178,8 +183,9 @@ final case class AdaptiveLoadBalancingPool(
   override def routingLogicController(
       routingLogic: RoutingLogic): Option[Props] =
     Some(
-      Props(classOf[AdaptiveLoadBalancingMetricsListener],
-            routingLogic.asInstanceOf[AdaptiveLoadBalancingRoutingLogic]))
+      Props(
+        classOf[AdaptiveLoadBalancingMetricsListener],
+        routingLogic.asInstanceOf[AdaptiveLoadBalancingRoutingLogic]))
 
   /**
     * Setting the supervisor strategy to be used for the “head” Router actor.
@@ -236,8 +242,9 @@ final case class AdaptiveLoadBalancingPool(
   *   router management messages
   */
 @SerialVersionUID(1L)
-@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
-            "2.4")
+@deprecated(
+  "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+  "2.4")
 final case class AdaptiveLoadBalancingGroup(
     metricsSelector: MetricsSelector = MixMetricsSelector,
     override val paths: immutable.Iterable[String] = Nil,
@@ -245,8 +252,9 @@ final case class AdaptiveLoadBalancingGroup(
     extends Group {
 
   def this(config: Config, dynamicAccess: DynamicAccess) =
-    this(metricsSelector = MetricsSelector.fromConfig(config, dynamicAccess),
-         paths = immutableSeq(config.getStringList("routees.paths")))
+    this(
+      metricsSelector = MetricsSelector.fromConfig(config, dynamicAccess),
+      paths = immutableSeq(config.getStringList("routees.paths")))
 
   /**
     * Java API
@@ -268,8 +276,9 @@ final case class AdaptiveLoadBalancingGroup(
   override def routingLogicController(
       routingLogic: RoutingLogic): Option[Props] =
     Some(
-      Props(classOf[AdaptiveLoadBalancingMetricsListener],
-            routingLogic.asInstanceOf[AdaptiveLoadBalancingRoutingLogic]))
+      Props(
+        classOf[AdaptiveLoadBalancingMetricsListener],
+        routingLogic.asInstanceOf[AdaptiveLoadBalancingRoutingLogic]))
 
   /**
     * Setting the dispatcher to be used for the router head actor, which handles
@@ -284,8 +293,9 @@ final case class AdaptiveLoadBalancingGroup(
   * Low heap capacity => small weight.
   */
 @SerialVersionUID(1L)
-@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
-            "2.4")
+@deprecated(
+  "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+  "2.4")
 case object HeapMetricsSelector extends CapacityMetricsSelector {
 
   /**
@@ -313,8 +323,9 @@ case object HeapMetricsSelector extends CapacityMetricsSelector {
   * Low cpu capacity => small weight.
   */
 @SerialVersionUID(1L)
-@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
-            "2.4")
+@deprecated(
+  "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+  "2.4")
 case object CpuMetricsSelector extends CapacityMetricsSelector {
 
   /**
@@ -341,8 +352,9 @@ case object CpuMetricsSelector extends CapacityMetricsSelector {
   * Low load average capacity => small weight.
   */
 @SerialVersionUID(1L)
-@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
-            "2.4")
+@deprecated(
+  "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+  "2.4")
 case object SystemLoadAverageMetricsSelector extends CapacityMetricsSelector {
 
   /**
@@ -366,13 +378,15 @@ case object SystemLoadAverageMetricsSelector extends CapacityMetricsSelector {
   * [akka.cluster.routing.CpuMetricsSelector], and [akka.cluster.routing.SystemLoadAverageMetricsSelector]
   */
 @SerialVersionUID(1L)
-@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
-            "2.4")
+@deprecated(
+  "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+  "2.4")
 object MixMetricsSelector
     extends MixMetricsSelectorBase(
-      Vector(HeapMetricsSelector,
-             CpuMetricsSelector,
-             SystemLoadAverageMetricsSelector)) {
+      Vector(
+        HeapMetricsSelector,
+        CpuMetricsSelector,
+        SystemLoadAverageMetricsSelector)) {
 
   /**
     * Java API: get the default singleton instance
@@ -386,8 +400,9 @@ object MixMetricsSelector
   * [akka.cluster.routing.CpuMetricsSelector], and [akka.cluster.routing.SystemLoadAverageMetricsSelector]
   */
 @SerialVersionUID(1L)
-@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
-            "2.4")
+@deprecated(
+  "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+  "2.4")
 final case class MixMetricsSelector(
     selectors: immutable.IndexedSeq[CapacityMetricsSelector])
     extends MixMetricsSelectorBase(selectors)
@@ -396,8 +411,9 @@ final case class MixMetricsSelector(
   * Base class for MetricsSelector that combines other selectors and aggregates their capacity.
   */
 @SerialVersionUID(1L)
-@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
-            "2.4")
+@deprecated(
+  "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+  "2.4")
 abstract class MixMetricsSelectorBase(
     selectors: immutable.IndexedSeq[CapacityMetricsSelector])
     extends CapacityMetricsSelector {
@@ -424,8 +440,9 @@ abstract class MixMetricsSelectorBase(
   }
 }
 
-@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
-            "2.4")
+@deprecated(
+  "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+  "2.4")
 object MetricsSelector {
   def fromConfig(config: Config, dynamicAccess: DynamicAccess) =
     config.getString("metrics-selector") match {
@@ -453,8 +470,9 @@ object MetricsSelector {
   * A MetricsSelector is responsible for producing weights from the node metrics.
   */
 @SerialVersionUID(1L)
-@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
-            "2.4")
+@deprecated(
+  "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+  "2.4")
 trait MetricsSelector extends Serializable {
 
   /**
@@ -468,8 +486,9 @@ trait MetricsSelector extends Serializable {
   * The weights are typically proportional to the remaining capacity.
   */
 @SerialVersionUID(1L)
-@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
-            "2.4")
+@deprecated(
+  "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+  "2.4")
 abstract class CapacityMetricsSelector extends MetricsSelector {
 
   /**
@@ -556,8 +575,9 @@ private[cluster] class WeightedRoutees(routees: immutable.IndexedSeq[Routee],
     * Pick the routee matching a value, from 1 to total.
     */
   def apply(value: Int): Routee = {
-    require(1 <= value && value <= total,
-            "value must be between [1 - %s]" format total)
+    require(
+      1 <= value && value <= total,
+      "value must be between [1 - %s]" format total)
     routees(idx(Arrays.binarySearch(buckets, value)))
   }
 

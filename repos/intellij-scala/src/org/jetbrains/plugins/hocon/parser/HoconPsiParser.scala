@@ -185,17 +185,19 @@ class HoconPsiParser extends PsiParser {
       }
 
       marker.done(ObjectEntries)
-      setEdgeTokenBinders(marker,
-                          nonGreedyLeft = false,
-                          nonGreedyRight = false)
+      setEdgeTokenBinders(
+        marker,
+        nonGreedyLeft = false,
+        nonGreedyRight = false)
     }
 
     def parseObjectEntry(): Unit = {
       if (matchesUnquoted("include")) parseInclude()
       else parseObjectField()
-      errorUntil(ValueEnding.orNewLineOrEof,
-                 "unexpected token",
-                 onlyNonEmpty = true)
+      errorUntil(
+        ValueEnding.orNewLineOrEof,
+        "unexpected token",
+        onlyNonEmpty = true)
     }
 
     def parseInclude() = {
@@ -204,8 +206,9 @@ class HoconPsiParser extends PsiParser {
       parseIncluded()
       marker.done(Include)
 
-      marker.setCustomEdgeTokenBinders(DocumentationCommentsBinder,
-                                       WhitespacesBinders.DEFAULT_RIGHT_BINDER)
+      marker.setCustomEdgeTokenBinders(
+        DocumentationCommentsBinder,
+        WhitespacesBinders.DEFAULT_RIGHT_BINDER)
     }
 
     def parseIncluded(): Unit = {
@@ -247,8 +250,9 @@ class HoconPsiParser extends PsiParser {
       parseKeyedField(true)
       marker.done(ObjectField)
 
-      marker.setCustomEdgeTokenBinders(DocumentationCommentsBinder,
-                                       WhitespacesBinders.DEFAULT_RIGHT_BINDER)
+      marker.setCustomEdgeTokenBinders(
+        DocumentationCommentsBinder,
+        WhitespacesBinders.DEFAULT_RIGHT_BINDER)
     }
 
     def parseKeyedField(first: Boolean): Unit = {
@@ -269,12 +273,14 @@ class HoconPsiParser extends PsiParser {
           if (matches(ValueStart)) {
             parseValue()
           } else {
-            errorUntil(ValueEnding.orNewLineOrEof,
-                       "expected value for object field")
+            errorUntil(
+              ValueEnding.orNewLineOrEof,
+              "expected value for object field")
           }
         } else
-          errorUntil(ValueEnding.orNewLineOrEof,
-                     "expected ':', '=', '+=' or object")
+          errorUntil(
+            ValueEnding.orNewLineOrEof,
+            "expected ':', '=', '+=' or object")
         marker.done(ValuedField)
       }
 
@@ -313,10 +319,11 @@ class HoconPsiParser extends PsiParser {
       def parseKeyParts(first: Boolean): Unit = {
         if (!matches(KeyEnding.orNewLineOrEof)) {
           if (matches(UnquotedChars)) {
-            parseUnquotedString(KeyPart,
-                                UnquotedChars.noNewLine,
-                                first,
-                                PathEnding.orNewLineOrEof)
+            parseUnquotedString(
+              KeyPart,
+              UnquotedChars.noNewLine,
+              first,
+              PathEnding.orNewLineOrEof)
           } else if (matches(StringLiteral)) {
             parseStringLiteral(KeyPart)
           } else {
@@ -347,13 +354,15 @@ class HoconPsiParser extends PsiParser {
         advanceLexer()
       }
       marker.done(UnquotedString)
-      setEdgeTokenBinders(marker,
-                          nonGreedyLeft,
-                          matches(nonGreedyRightMatcher))
+      setEdgeTokenBinders(
+        marker,
+        nonGreedyLeft,
+        matches(nonGreedyRightMatcher))
       stringMarker.done(stringType)
-      setEdgeTokenBinders(stringMarker,
-                          nonGreedyLeft,
-                          matches(nonGreedyRightMatcher))
+      setEdgeTokenBinders(
+        stringMarker,
+        nonGreedyLeft,
+        matches(nonGreedyRightMatcher))
     }
 
     def parseValue(): Unit = {
@@ -380,9 +389,10 @@ class HoconPsiParser extends PsiParser {
       def tryParseNull =
         tryParse(passKeyword("null") && matches(endingMatcher), Null)
       def tryParseBoolean =
-        tryParse((passKeyword("true") ||
-                   passKeyword("false")) && matches(endingMatcher),
-                 Boolean)
+        tryParse(
+          (passKeyword("true") ||
+            passKeyword("false")) && matches(endingMatcher),
+          Boolean)
       def tryParseNumber =
         tryParse(passNumber() && matches(endingMatcher), Number)
 
@@ -396,10 +406,11 @@ class HoconPsiParser extends PsiParser {
           } else if (matches(Dollar) && builder.lookAhead(1) == SubLBrace) {
             parseSubstitution()
           } else if (matches(ValueUnquotedChars)) {
-            parseUnquotedString(StringValue,
-                                ValueUnquotedChars.noNewLine,
-                                partCount == 0,
-                                ValueEnding.orNewLineOrEof)
+            parseUnquotedString(
+              StringValue,
+              ValueUnquotedChars.noNewLine,
+              partCount == 0,
+              ValueEnding.orNewLineOrEof)
           } else if (matches(StringLiteral)) {
             parseStringLiteral(StringValue)
           } else {

@@ -377,9 +377,10 @@ class Regex private[matching] (val pattern: Pattern, groupNames: String*)
       def hasNext = matchIterator.hasNext
       def next: Match = {
         matchIterator.next()
-        new Match(matchIterator.source,
-                  matchIterator.matcher,
-                  matchIterator.groupNames).force
+        new Match(
+          matchIterator.source,
+          matchIterator.matcher,
+          matchIterator.groupNames).force
       }
     }
   }

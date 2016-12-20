@@ -432,8 +432,9 @@ class BasicDirectivesExamplesSpec extends RoutingSpec {
         Complete(HttpResponse(entity = "Nothing to see here, move along."))
       else if (rejections == Nil) // see "Empty Rejections" for more details
         Complete(
-          HttpResponse(StatusCodes.NotFound,
-                       entity = "Literally nothing to see here."))
+          HttpResponse(
+            StatusCodes.NotFound,
+            entity = "Literally nothing to see here."))
       else Rejected(rejections)
     }
     val neverAuth: Authenticator[String] = creds => None

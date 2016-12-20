@@ -568,7 +568,8 @@ class SpoolTest extends WordSpec with GeneratorDrivenPropertyChecks {
       "ac" *:: Future.value(
         "bbe" *:: Future.value("ab" *:: Future.value(Spool.empty[String])))
     assert(
-      Await.result(spool.distinctBy(_.length).toSeq, 5.seconds) == Seq("ac",
-                                                                       "bbe"))
+      Await.result(spool.distinctBy(_.length).toSeq, 5.seconds) == Seq(
+        "ac",
+        "bbe"))
   }
 }

@@ -36,8 +36,9 @@ class DocParser(settings: nsc.Settings, reporter: Reporter)
     def loop(enclosing: List[Tree], tree: Tree): List[Parsed] = tree match {
       case x: PackageDef => x.stats flatMap (t => loop(enclosing :+ x, t))
       case x: DocDef =>
-        new Parsed(enclosing, x) :: loop(enclosing :+ x.definition,
-                                         x.definition)
+        new Parsed(enclosing, x) :: loop(
+          enclosing :+ x.definition,
+          x.definition)
       case x => x.children flatMap (t => loop(enclosing, t))
     }
     loop(Nil, docUnit(code))

@@ -29,12 +29,13 @@ trait Contexts { self: Analyzer =>
   protected def onTreeCheckerError(pos: Position, msg: String): Unit = ()
 
   object NoContext
-      extends Context(EmptyTree,
-                      NoSymbol,
-                      EmptyScope,
-                      NoCompilationUnit,
-                      // We can't pass the uninitialized `this`. Instead, we treat null specially in `Context#outer`
-                      null) {
+      extends Context(
+        EmptyTree,
+        NoSymbol,
+        EmptyScope,
+        NoCompilationUnit,
+        // We can't pass the uninitialized `this`. Instead, we treat null specially in `Context#outer`
+        null) {
     enclClass = this
     enclMethod = this
 
@@ -656,12 +657,13 @@ trait Contexts { self: Analyzer =>
                        featureTrait: Symbol,
                        construct: => String = "",
                        required: Boolean): Unit =
-      currentRun.reporting.featureWarning(fixPosition(pos),
-                                          featureName,
-                                          featureDesc,
-                                          featureTrait,
-                                          construct,
-                                          required)
+      currentRun.reporting.featureWarning(
+        fixPosition(pos),
+        featureName,
+        featureDesc,
+        featureTrait,
+        construct,
+        required)
 
     // nextOuter determines which context is searched next for implicits
     // (after `this`, which contributes `newImplicits` below.) In
@@ -787,8 +789,9 @@ trait Contexts { self: Analyzer =>
             val res =
               isSubClassOrCompanion(pre.widen.typeSymbol, c.owner) ||
                 c.owner.isModuleClass &&
-                  isSubClassOrCompanion(pre.widen.typeSymbol,
-                                        c.owner.linkedClassOfClass)
+                  isSubClassOrCompanion(
+                    pre.widen.typeSymbol,
+                    c.owner.linkedClassOfClass)
             if (!res)
               lastAccessCheckDetails = "\n Access to protected " + target +
                   " not permitted because" + "\n prefix type " + pre.widen +
@@ -905,10 +908,11 @@ trait Contexts { self: Analyzer =>
         name: Name,
         pre: Type)(f: Symbol => Unit) =
       for {
-        sym <- importedAccessibleSymbol(imp,
-                                        name,
-                                        requireExplicit = false,
-                                        record = false).alternatives
+        sym <- importedAccessibleSymbol(
+          imp,
+          name,
+          requireExplicit = false,
+          record = false).alternatives
         if isQualifyingImplicit(name, sym, pre, imported = true)
       } f(sym)
 
@@ -1000,8 +1004,9 @@ trait Contexts { self: Analyzer =>
         debuglog("collect local implicits " + scope.toList) //DEBUG
         Some(collectImplicits(scope, NoPrefix))
       } else if (firstImport != nextOuter.firstImport) {
-        assert(imports.tail.headOption == nextOuter.firstImport,
-               (imports, nextOuter.imports))
+        assert(
+          imports.tail.headOption == nextOuter.firstImport,
+          (imports, nextOuter.imports))
         Some(collectImplicitImports(imports.head))
       } else if (owner.isPackageClass) {
         // the corresponding package object may contain implicit members.

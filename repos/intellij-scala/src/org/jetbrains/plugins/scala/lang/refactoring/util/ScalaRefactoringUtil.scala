@@ -180,10 +180,11 @@ object ScalaRefactoringUtil {
                      file: PsiFile,
                      startOffset: Int,
                      endOffset: Int): Option[ScTypeElement] = {
-    val element = PsiTreeUtil.findElementOfClassAtRange(file,
-                                                        startOffset,
-                                                        endOffset,
-                                                        classOf[ScTypeElement])
+    val element = PsiTreeUtil.findElementOfClassAtRange(
+      file,
+      startOffset,
+      endOffset,
+      classOf[ScTypeElement])
 
     Option(element)
       .filter(_.getTextRange.getEndOffset == endOffset)
@@ -271,11 +272,12 @@ object ScalaRefactoringUtil {
               val documentManager: PsiDocumentManager =
                 PsiDocumentManager.getInstance(project)
               documentManager.commitDocument(document)
-              val newOpt = getExpression(project,
-                                         editor,
-                                         file,
-                                         startOffset,
-                                         endOffset + 2)
+              val newOpt = getExpression(
+                project,
+                editor,
+                file,
+                startOffset,
+                endOffset + 2)
               newOpt match {
                 case Some((expression: ScExpression, typez)) =>
                   expression.getParent match {
@@ -302,10 +304,11 @@ object ScalaRefactoringUtil {
     }
 
     def partOfStringLiteral(): Option[(ScExpression, Array[ScType])] = {
-      val lit = PsiTreeUtil.findElementOfClassAtOffset(file,
-                                                       startOffset,
-                                                       classOf[ScLiteral],
-                                                       false)
+      val lit = PsiTreeUtil.findElementOfClassAtOffset(
+        file,
+        startOffset,
+        classOf[ScLiteral],
+        false)
       val endLit = PsiTreeUtil
         .findElementOfClassAtOffset(file, endOffset, classOf[ScLiteral], false)
       if (lit == null || !lit.isString || lit != endLit) return None
@@ -325,10 +328,11 @@ object ScalaRefactoringUtil {
       Some(expr, Array(tpe))
     }
 
-    val element = PsiTreeUtil.findElementOfClassAtRange(file,
-                                                        startOffset,
-                                                        endOffset,
-                                                        classOf[ScExpression])
+    val element = PsiTreeUtil.findElementOfClassAtRange(
+      file,
+      startOffset,
+      endOffset,
+      classOf[ScExpression])
 
     if (element == null || element.getTextRange.getEndOffset != endOffset) {
       return selectedInfixExpr() orElse partOfStringLiteral()
@@ -428,8 +432,9 @@ object ScalaRefactoringUtil {
       case intrp: ScInterpolatedStringLiteral =>
         val prefix = intrp.reference.fold("")(_.refName)
         val fileText = intrp.getContainingFile.getText
-        val text = fileText.substring(intrp.contentRange.getStartOffset,
-                                      intrp.contentRange.getEndOffset)
+        val text = fileText.substring(
+          intrp.contentRange.getStartOffset,
+          intrp.contentRange.getEndOffset)
         val refNameToResolved = mutable.HashMap[String, PsiElement]()
         intrp.depthFirst.foreach {
           case ref: ScReferenceExpression =>
@@ -525,11 +530,12 @@ object ScalaRefactoringUtil {
                validatorsRes: mutable.MutableList[ScalaTypeValidator]) = {
 
       val occurrences = getTypeElementOccurrences(typeElement, classObject)
-      val validator = ScalaTypeValidator(conflictsReporter,
-                                         project,
-                                         typeElement,
-                                         classObject,
-                                         occurrences.isEmpty)
+      val validator = ScalaTypeValidator(
+        conflictsReporter,
+        project,
+        typeElement,
+        classObject,
+        occurrences.isEmpty)
       occurrencesRes += occurrences
       validatorsRes += validator
     }
@@ -589,12 +595,13 @@ object ScalaRefactoringUtil {
       val attributes = colorsManager.getGlobalScheme.getAttributes(
         EditorColors.SEARCH_RESULT_ATTRIBUTES)
       for (occurence <- occurrences)
-        highlightManager.addRangeHighlight(editor,
-                                           occurence.getStartOffset,
-                                           occurence.getEndOffset,
-                                           attributes,
-                                           true,
-                                           highlighters)
+        highlightManager.addRangeHighlight(
+          editor,
+          occurence.getStartOffset,
+          occurence.getEndOffset,
+          attributes,
+          true,
+          highlighters)
     }
     highlighters.asScala
   }
@@ -657,11 +664,12 @@ object ScalaRefactoringUtil {
             isSelected: Boolean,
             cellHasFocus: Boolean): Component = {
           val rendererComponent: Component =
-            getSuperListCellRendererComponent(container.getList,
-                                              value,
-                                              index,
-                                              isSelected,
-                                              cellHasFocus)
+            getSuperListCellRendererComponent(
+              container.getList,
+              value,
+              index,
+              isSelected,
+              cellHasFocus)
           val element: T = value.asInstanceOf[T]
           if (element.isValid) {
             setText(elementName(element))
@@ -880,8 +888,9 @@ object ScalaRefactoringUtil {
       }
       val expressions = getExpressions(element).filter(exprFilter)
       def chooseExpression(expr: ScExpression) {
-        editor.getSelectionModel.setSelection(expr.getTextRange.getStartOffset,
-                                              expr.getTextRange.getEndOffset)
+        editor.getSelectionModel.setSelection(
+          expr.getTextRange.getStartOffset,
+          expr.getTextRange.getEndOffset)
         invokesNext
       }
       if (expressions.length == 0) editor.getSelectionModel.selectLineAtCaret()
@@ -1050,10 +1059,11 @@ object ScalaRefactoringUtil {
                 editor: Editor,
                 refactoringName: String) {
     if (!file.isInstanceOf[ScalaFile])
-      showErrorMessageWithException(ScalaBundle.message("only.for.scala"),
-                                    project,
-                                    editor,
-                                    refactoringName)
+      showErrorMessageWithException(
+        ScalaBundle.message("only.for.scala"),
+        project,
+        editor,
+        refactoringName)
 
     if (!ScalaRefactoringUtil.ensureFileWritable(project, file))
       showErrorMessageWithException(
@@ -1141,21 +1151,24 @@ object ScalaRefactoringUtil {
           }
         shift = pars.getTextRange.getStartOffset -
             inner.getTextRange.getStartOffset + (if (afterWord) 1 else 0)
-        document.replaceString(textRange.getStartOffset,
-                               textRange.getEndOffset,
-                               (if (afterWord) " " else "") + newString)
+        document.replaceString(
+          textRange.getStartOffset,
+          textRange.getEndOffset,
+          (if (afterWord) " " else "") + newString)
       case ChildOf(ScPostfixExpr(_, `parent`)) =>
         //This case for block argument expression
         val textRange = parent.getTextRange
-        document.replaceString(textRange.getStartOffset,
-                               textRange.getEndOffset,
-                               "(" + newString + ")")
+        document.replaceString(
+          textRange.getStartOffset,
+          textRange.getEndOffset,
+          "(" + newString + ")")
         shift = 1
       case _: ScReferencePattern =>
         val textRange = parent.getTextRange
-        document.replaceString(textRange.getStartOffset,
-                               textRange.getEndOffset,
-                               "`" + newString + "`")
+        document.replaceString(
+          textRange.getStartOffset,
+          textRange.getEndOffset,
+          "`" + newString + "`")
       case lit: ScLiteral =>
         val prefix = lit match {
           case intrp: ScInterpolatedStringLiteral =>
@@ -1172,9 +1185,10 @@ object ScalaRefactoringUtil {
               withNextChar.last != '$'
           val text = if (needBraces) s"$${$newString}" else s"$$$newString"
           shift += (if (needBraces) 2 else 1)
-          document.replaceString(newRange.getStartOffset,
-                                 newRange.getEndOffset,
-                                 text)
+          document.replaceString(
+            newRange.getStartOffset,
+            newRange.getEndOffset,
+            text)
         } else {
           val quote = if (lit.isMultiLineString) "\"\"\"" else "\""
           val isStart =
@@ -1281,8 +1295,9 @@ object ScalaRefactoringUtil {
           _: ScalaFile | _: ScCaseClause =>
         false
       case _: ScFunction => true
-      case Both(fun: ScFunction,
-                _ childOf (_: ScTemplateBody | _: ScEarlyDefinitions)) =>
+      case Both(
+          fun: ScFunction,
+          _ childOf (_: ScTemplateBody | _: ScEarlyDefinitions)) =>
         true
       case ifSt: ScIfStmt
           if Seq(ifSt.thenBranch, ifSt.elseBranch) contains Option(parExpr) =>
@@ -1337,13 +1352,14 @@ object ScalaRefactoringUtil {
 
     if (element == null) file
     else {
-      val candidate = ScalaPsiUtil.getParentOfType(element,
-                                                   false,
-                                                   classOf[ScalaFile],
-                                                   classOf[ScBlock],
-                                                   classOf[ScTemplateBody],
-                                                   classOf[ScCaseClause],
-                                                   classOf[ScEarlyDefinitions])
+      val candidate = ScalaPsiUtil.getParentOfType(
+        element,
+        false,
+        classOf[ScalaFile],
+        classOf[ScBlock],
+        classOf[ScTemplateBody],
+        classOf[ScCaseClause],
+        classOf[ScEarlyDefinitions])
 
       val funDef =
         PsiTreeUtil.getParentOfType(element, classOf[ScFunctionDefinition])
@@ -1425,10 +1441,11 @@ object ScalaRefactoringUtil {
 
     if (elements.isEmpty ||
         !elements.exists(_.isInstanceOf[ScBlockStatement])) {
-      showErrorHint(ScalaBundle.message("cannot.extract.empty.message"),
-                    project,
-                    editor,
-                    refactoringName)
+      showErrorHint(
+        ScalaBundle.message("cannot.extract.empty.message"),
+        project,
+        editor,
+        refactoringName)
       return true
     }
 

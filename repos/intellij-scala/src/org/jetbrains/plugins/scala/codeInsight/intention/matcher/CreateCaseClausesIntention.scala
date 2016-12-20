@@ -180,14 +180,17 @@ final class CreateCaseClausesIntention extends PsiElementBaseIntentionAction {
         classType match {
           case Some((cls: ScTypeDefinition, _))
               if cls.hasModifierProperty("sealed") =>
-            Some(addMatchClausesForSealedClass(x, x.expr.get, cls),
-                 " for variants of sealed type")
+            Some(
+              addMatchClausesForSealedClass(x, x.expr.get, cls),
+              " for variants of sealed type")
           case Some((cls: PsiClass, _)) if cls.isEnum =>
-            Some(addMatchClausesForEnum(x, x.expr.get, cls),
-                 " for variants of java enum")
+            Some(
+              addMatchClausesForEnum(x, x.expr.get, cls),
+              " for variants of java enum")
           case Some((cls: PsiClass, _)) if !cls.hasFinalModifier =>
-            Some(addMatchClausesForCaseClassesAndObjects(x, x.expr.get, cls),
-                 " for inherited objects and case classes")
+            Some(
+              addMatchClausesForCaseClassesAndObjects(x, x.expr.get, cls),
+              " for inherited objects and case classes")
           case _ => None
         }
       case _ => None

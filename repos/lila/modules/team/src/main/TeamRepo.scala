@@ -42,8 +42,9 @@ object TeamRepo {
   def disable(team: Team) = $update.field(team.id, "enabled", false)
 
   def addRequest(teamId: String, request: Request): Funit =
-    $update($select(teamId) ++ Json.obj("requests.user" -> $ne(request.user)),
-            $push("requests", request.user))
+    $update(
+      $select(teamId) ++ Json.obj("requests.user" -> $ne(request.user)),
+      $push("requests", request.user))
 
   val enabledQuery = Json.obj("enabled" -> true)
 

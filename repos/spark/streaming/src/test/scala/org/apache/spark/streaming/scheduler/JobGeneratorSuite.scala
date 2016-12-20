@@ -60,8 +60,9 @@ class JobGeneratorSuite extends TestSuiteBase {
     import JobGeneratorSuite._
     val checkpointDir = Utils.createTempDir()
     val testConf = conf
-    testConf.set("spark.streaming.clock",
-                 "org.apache.spark.streaming.util.ManualClock")
+    testConf.set(
+      "spark.streaming.clock",
+      "org.apache.spark.streaming.util.ManualClock")
     testConf.set("spark.streaming.receiver.writeAheadLog.rollingInterval", "1")
 
     withStreamingContext(new StreamingContext(testConf, batchDuration)) {
@@ -92,8 +93,9 @@ class JobGeneratorSuite extends TestSuiteBase {
 
         // Get the blocks belonging to a batch
         def getBlocksOfBatch(batchTime: Long): Seq[ReceivedBlockInfo] = {
-          receiverTracker.getBlocksOfBatchAndStream(Time(batchTime),
-                                                    inputStream.id)
+          receiverTracker.getBlocksOfBatchAndStream(
+            Time(batchTime),
+            inputStream.id)
         }
 
         // Wait for new blocks to be received
@@ -125,8 +127,9 @@ class JobGeneratorSuite extends TestSuiteBase {
         }
 
         // Verify that the 3rd batch's block data is still present while the 3rd batch is incomplete
-        assert(getBlocksOfBatch(longBatchTime).nonEmpty,
-               "blocks of incomplete batch already deleted")
+        assert(
+          getBlocksOfBatch(longBatchTime).nonEmpty,
+          "blocks of incomplete batch already deleted")
         assert(batchCounter.getNumCompletedBatches < longBatchNumber)
         waitLatch.countDown()
     }

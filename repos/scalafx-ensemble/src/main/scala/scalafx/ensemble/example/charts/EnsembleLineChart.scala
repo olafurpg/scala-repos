@@ -66,8 +66,9 @@ class EnsembleLineChart extends EnsembleExample {
         .map(toChartData)
     }
 
-    new LineChart[Number, Number](xAxis,
-                                  yAxis,
-                                  ObservableBuffer(series1, series2))
+    new LineChart[Number, Number](
+      xAxis,
+      yAxis,
+      ObservableBuffer(series1, series2))
   }
 }

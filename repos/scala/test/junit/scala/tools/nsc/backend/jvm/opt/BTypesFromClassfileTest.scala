@@ -43,17 +43,19 @@ class BTypesFromClassfileTest {
     if (checked(fromSym.internalName)) checked
     else {
       assert(fromSym == fromClassfile, s"$fromSym != $fromClassfile")
-      sameInfo(fromSym.info.get,
-               fromClassfile.info.get,
-               checked + fromSym.internalName)
+      sameInfo(
+        fromSym.info.get,
+        fromClassfile.info.get,
+        checked + fromSym.internalName)
     }
   }
 
   def sameBTypes(fromSyms: Iterable[ClassBType],
                  fromClassfiles: Iterable[ClassBType],
                  checked: Set[InternalName]): Set[InternalName] = {
-    assert(fromSyms.size == fromClassfiles.size,
-           s"\n$fromSyms\n$fromClassfiles")
+    assert(
+      fromSyms.size == fromClassfiles.size,
+      s"\n$fromSyms\n$fromClassfiles")
     (fromSyms, fromClassfiles).zipped.foldLeft(checked) {
       case (chk, (fromSym, fromClassfile)) =>
         sameBType(fromSym, fromClassfile, chk)
@@ -103,12 +105,14 @@ class BTypesFromClassfileTest {
     // Sorting is required: the backend sorts all InnerClass entries by internalName before writing
     // them to the classfile (to make it deterministic: the entries are collected in a Set during
     // code generation).
-    val chk3 = sameBTypes(fromSym.nestedClasses.sortBy(_.internalName),
-                          memberClassesFromClassfile.sortBy(_.internalName),
-                          chk2)
-    sameBTypes(fromSym.nestedInfo.map(_.enclosingClass),
-               fromClassfile.nestedInfo.map(_.enclosingClass),
-               chk3)
+    val chk3 = sameBTypes(
+      fromSym.nestedClasses.sortBy(_.internalName),
+      memberClassesFromClassfile.sortBy(_.internalName),
+      chk2)
+    sameBTypes(
+      fromSym.nestedInfo.map(_.enclosingClass),
+      fromClassfile.nestedInfo.map(_.enclosingClass),
+      chk3)
   }
 
   def check(classSym: Symbol): Unit = duringBackend {

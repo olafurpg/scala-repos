@@ -29,10 +29,11 @@ object InstructionStackEffect {
     */
   def forAsmAnalysis[V <: Value](insn: AbstractInsnNode,
                                  frame: Frame[V]): Int =
-    computeConsProd(insn,
-                    forClassfile = false,
-                    conservative = false,
-                    frame = frame)
+    computeConsProd(
+      insn,
+      forClassfile = false,
+      conservative = false,
+      frame = frame)
 
   /**
     * Returns the maximal possible growth of the stack when executing `insn`. The returned value
@@ -241,14 +242,16 @@ object InstructionStackEffect {
         t(cons, 0)
 
       case INVOKEVIRTUAL | INVOKESPECIAL | INVOKESTATIC | INVOKEINTERFACE =>
-        invokeConsProd(insn.asInstanceOf[MethodInsnNode].desc,
-                       insn,
-                       forClassfile)
+        invokeConsProd(
+          insn.asInstanceOf[MethodInsnNode].desc,
+          insn,
+          forClassfile)
 
       case INVOKEDYNAMIC =>
-        invokeConsProd(insn.asInstanceOf[InvokeDynamicInsnNode].desc,
-                       insn,
-                       forClassfile)
+        invokeConsProd(
+          insn.asInstanceOf[InvokeDynamicInsnNode].desc,
+          insn,
+          forClassfile)
 
       case NEW => t(0, 1)
 

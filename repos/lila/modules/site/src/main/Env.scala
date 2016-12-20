@@ -20,7 +20,8 @@ final class Env(config: Config, hub: lila.hub.Env, system: ActorSystem) {
 object Env {
 
   lazy val current =
-    "site" boot new Env(config = lila.common.PlayApp loadConfig "site",
-                        hub = lila.hub.Env.current,
-                        system = lila.common.PlayApp.system)
+    "site" boot new Env(
+      config = lila.common.PlayApp loadConfig "site",
+      hub = lila.hub.Env.current,
+      system = lila.common.PlayApp.system)
 }

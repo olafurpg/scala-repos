@@ -104,10 +104,11 @@ class AppVersionsResourceTest
     config = mock[MarathonConf]
     service = mock[MarathonSchedulerService]
     groupManager = mock[GroupManager]
-    appsVersionsResource = new AppVersionsResource(service,
-                                                   groupManager,
-                                                   auth.auth,
-                                                   auth.auth,
-                                                   config)
+    appsVersionsResource = new AppVersionsResource(
+      service,
+      groupManager,
+      auth.auth,
+      auth.auth,
+      config)
   }
 }

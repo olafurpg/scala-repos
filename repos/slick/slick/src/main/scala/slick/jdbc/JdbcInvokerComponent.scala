@@ -26,9 +26,10 @@ trait JdbcInvokerComponent { self: JdbcProfile =>
 
   class QueryInvokerImpl[R](tree: Node, param: Any, overrideSql: String)
       extends QueryInvoker[R] {
-    protected[this] val ResultSetMapping(_,
-                                         compiled,
-                                         CompiledMapping(_converter, _)) = tree
+    protected[this] val ResultSetMapping(
+      _,
+      compiled,
+      CompiledMapping(_converter, _)) = tree
     protected[this] val converter =
       _converter.asInstanceOf[ResultConverter[JdbcResultConverterDomain, R]]
     protected[this] val CompiledStatement(_, sres: SQLBuilder.Result, _) =

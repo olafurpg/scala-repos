@@ -63,8 +63,9 @@ case class ScalaTool(mainClass: String,
     val patched = patchedToolScript(
       IO.read(rootDir / templatePath).replace("\r", ""),
       forWindows)
-    IO.write(scriptFile,
-             if (forWindows) patched.replace("\n", "\r\n") else patched)
+    IO.write(
+      scriptFile,
+      if (forWindows) patched.replace("\n", "\r\n") else patched)
     scriptFile
   }
 }

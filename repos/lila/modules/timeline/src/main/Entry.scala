@@ -55,12 +55,13 @@ object Entry {
     }) match {
       case (typ, json) =>
         json.asOpt[JsObject] map {
-          new Entry(BSONObjectID.generate,
-                    users,
-                    typ,
-                    data.channel.some,
-                    _,
-                    DateTime.now)
+          new Entry(
+            BSONObjectID.generate,
+            users,
+            typ,
+            data.channel.some,
+            _,
+            DateTime.now)
         }
     }
 

@@ -99,9 +99,10 @@ class ScalaChangeSignatureUsageProcessor
             val usageInfo = ScalaNamedElementUsageInfo(named)
             if (usageInfo != null) results += usageInfo
 
-            findMethodRefUsages(named,
-                                results,
-                                searchInJava = synthetics.contains(named))
+            findMethodRefUsages(
+              named,
+              results,
+              searchInJava = synthetics.contains(named))
           case _ =>
         }
       case _ =>
@@ -119,8 +120,9 @@ class ScalaChangeSignatureUsageProcessor
           case f: ScFunction =>
             processNamedElementUsage(changeInfo, FunUsageInfo(f))
           case pc: ScPrimaryConstructor =>
-            processNamedElementUsage(changeInfo,
-                                     PrimaryConstructorUsageInfo(pc))
+            processNamedElementUsage(
+              changeInfo,
+              PrimaryConstructorUsageInfo(pc))
           case _ =>
         }
         true
@@ -346,9 +348,10 @@ class ScalaChangeSignatureUsageProcessor
         case refElem: ScReferenceElement =>
           results += ParameterUsageInfo(oldIndex, newName, refElem)
         case refElem: PsiReferenceExpression =>
-          results += new ChangeSignatureParameterUsageInfo(refElem,
-                                                           param.name,
-                                                           newName)
+          results += new ChangeSignatureParameterUsageInfo(
+            refElem,
+            param.name,
+            newName)
         case _ =>
       }
       true

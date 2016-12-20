@@ -41,8 +41,9 @@ trait PojoSRTestSupport extends Suite with BeforeAndAfterAll {
 
   lazy val context: BundleContext = {
     val config = new HashMap[String, AnyRef]()
-    System.setProperty("org.osgi.framework.storage",
-                       "target/akka-osgi/" + UUID.randomUUID().toString)
+    System.setProperty(
+      "org.osgi.framework.storage",
+      "target/akka-osgi/" + UUID.randomUUID().toString)
 
     val bundles = new ClasspathScanner().scanForBundles()
     bundles.addAll(testBundles)
@@ -167,9 +168,10 @@ class BundleDescriptorBuilder(name: String) {
     */
   def build: BundleDescriptor = {
     val file: File = tinybundleToJarFile(name)
-    new BundleDescriptor(getClass().getClassLoader(),
-                         new URL("jar:" + file.toURI().toString() + "!/"),
-                         extractHeaders(file))
+    new BundleDescriptor(
+      getClass().getClassLoader(),
+      new URL("jar:" + file.toURI().toString() + "!/"),
+      extractHeaders(file))
   }
 
   def extractHeaders(file: File): HashMap[String, String] = {

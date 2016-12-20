@@ -46,10 +46,11 @@ class NGram(override val uid: String)
     * Default: 2, bigram features
     * @group param
     */
-  val n: IntParam = new IntParam(this,
-                                 "n",
-                                 "number elements per n-gram (>=1)",
-                                 ParamValidators.gtEq(1))
+  val n: IntParam = new IntParam(
+    this,
+    "n",
+    "number elements per n-gram (>=1)",
+    ParamValidators.gtEq(1))
 
   /** @group setParam */
   def setN(value: Int): this.type = set(n, value)
@@ -64,8 +65,9 @@ class NGram(override val uid: String)
   }
 
   override protected def validateInputType(inputType: DataType): Unit = {
-    require(inputType.sameType(ArrayType(StringType)),
-            s"Input type must be ArrayType(StringType) but got $inputType.")
+    require(
+      inputType.sameType(ArrayType(StringType)),
+      s"Input type must be ArrayType(StringType) but got $inputType.")
   }
 
   override protected def outputDataType: DataType =

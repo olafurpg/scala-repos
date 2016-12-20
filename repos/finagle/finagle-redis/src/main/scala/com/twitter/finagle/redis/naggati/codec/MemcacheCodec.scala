@@ -97,9 +97,10 @@ object MemcacheCodec {
         bytes.flip()
         buffer.skipBytes(2)
         emit(
-          MemcacheRequest(segments.toList,
-                          Some(bytes),
-                          line.length + dataBytes + 4))
+          MemcacheRequest(
+            segments.toList,
+            Some(bytes),
+            line.length + dataBytes + 4))
       }
     } else {
       emit(MemcacheRequest(segments.toList, None, line.length + 2))

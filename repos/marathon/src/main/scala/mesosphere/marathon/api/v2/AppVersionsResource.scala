@@ -49,9 +49,10 @@ class AppVersionsResource(service: MarathonSchedulerService,
     implicit identity =>
       val id = appId.toRootPath
       val timestamp = Timestamp(version)
-      withAuthorization(ViewApp,
-                        service.getApp(id, timestamp),
-                        unknownApp(id, Some(timestamp))) { app =>
+      withAuthorization(
+        ViewApp,
+        service.getApp(id, timestamp),
+        unknownApp(id, Some(timestamp))) { app =>
         ok(jsonString(app))
       }
   }

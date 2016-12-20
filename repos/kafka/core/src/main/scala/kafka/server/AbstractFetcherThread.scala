@@ -106,8 +106,8 @@ abstract class AbstractFetcherThread(name: String,
 
     try {
       trace(
-        "Issuing to broker %d of fetch request %s".format(sourceBroker.id,
-                                                          fetchRequest))
+        "Issuing to broker %d of fetch request %s"
+          .format(sourceBroker.id, fetchRequest))
       responseData = fetch(fetchRequest)
     } catch {
       case t: Throwable =>
@@ -145,17 +145,19 @@ abstract class AbstractFetcherThread(name: String,
                             case Some(m: MessageAndOffset) => m.nextOffset
                             case None => currentPartitionFetchState.offset
                           }
-                        partitionMap.put(topicAndPartition,
-                                         new PartitionFetchState(newOffset))
+                        partitionMap.put(
+                          topicAndPartition,
+                          new PartitionFetchState(newOffset))
                         fetcherLagStats
                           .getFetcherLagStats(topic, partitionId)
                           .lag =
                           Math.max(0L, partitionData.highWatermark - newOffset)
                         fetcherStats.byteRate.mark(validBytes)
                         // Once we hand off the partition data to the subclass, we can't mess with it any more in this thread
-                        processPartitionData(topicAndPartition,
-                                             currentPartitionFetchState.offset,
-                                             partitionData)
+                        processPartitionData(
+                          topicAndPartition,
+                          currentPartitionFetchState.offset,
+                          partitionData)
                       } catch {
                         case ime: CorruptRecordException =>
                           // we log the error and continue. This ensures two things
@@ -170,28 +172,32 @@ abstract class AbstractFetcherThread(name: String,
                         case e: Throwable =>
                           throw new KafkaException(
                             "error processing data for partition [%s,%d] offset %d"
-                              .format(topic,
-                                      partitionId,
-                                      currentPartitionFetchState.offset),
+                              .format(
+                                topic,
+                                partitionId,
+                                currentPartitionFetchState.offset),
                             e)
                       }
                     case Errors.OFFSET_OUT_OF_RANGE =>
                       try {
                         val newOffset =
                           handleOffsetOutOfRange(topicAndPartition)
-                        partitionMap.put(topicAndPartition,
-                                         new PartitionFetchState(newOffset))
+                        partitionMap.put(
+                          topicAndPartition,
+                          new PartitionFetchState(newOffset))
                         error(
                           "Current offset %d for partition [%s,%d] out of range; reset offset to %d"
-                            .format(currentPartitionFetchState.offset,
-                                    topic,
-                                    partitionId,
-                                    newOffset))
+                            .format(
+                              currentPartitionFetchState.offset,
+                              topic,
+                              partitionId,
+                              newOffset))
                       } catch {
                         case e: Throwable =>
-                          error("Error getting offset for partition [%s,%d] to broker %d"
-                                  .format(topic, partitionId, sourceBroker.id),
-                                e)
+                          error(
+                            "Error getting offset for partition [%s,%d] to broker %d"
+                              .format(topic, partitionId, sourceBroker.id),
+                            e)
                           partitionsWithError += topicAndPartition
                       }
                     case _ =>
@@ -246,8 +252,9 @@ abstract class AbstractFetcherThread(name: String,
               if (currentPartitionFetchState.isActive)
                 partitionMap.put(
                   partition,
-                  new PartitionFetchState(currentPartitionFetchState.offset,
-                                          new DelayedItem(delay))))
+                  new PartitionFetchState(
+                    currentPartitionFetchState.offset,
+                    new DelayedItem(delay))))
       }
       partitionMapCond.signalAll()
     } finally partitionMapLock.unlock()
@@ -284,13 +291,15 @@ object AbstractFetcherThread {
 class FetcherLagMetrics(metricId: ClientIdTopicPartition)
     extends KafkaMetricsGroup {
   private[this] val lagVal = new AtomicLong(-1L)
-  newGauge("ConsumerLag",
-           new Gauge[Long] {
-             def value = lagVal.get
-           },
-           Map("clientId" -> metricId.clientId,
-               "topic" -> metricId.topic,
-               "partition" -> metricId.partitionId.toString))
+  newGauge(
+    "ConsumerLag",
+    new Gauge[Long] {
+      def value = lagVal.get
+    },
+    Map(
+      "clientId" -> metricId.clientId,
+      "topic" -> metricId.topic,
+      "partition" -> metricId.partitionId.toString))
 
   def lag_=(newLag: Long) {
     lagVal.set(newLag)
@@ -312,9 +321,10 @@ class FetcherLagStats(metricId: ClientIdAndBroker) {
 }
 
 class FetcherStats(metricId: ClientIdAndBroker) extends KafkaMetricsGroup {
-  val tags = Map("clientId" -> metricId.clientId,
-                 "brokerHost" -> metricId.brokerHost,
-                 "brokerPort" -> metricId.brokerPort.toString)
+  val tags = Map(
+    "clientId" -> metricId.clientId,
+    "brokerHost" -> metricId.brokerHost,
+    "brokerPort" -> metricId.brokerPort.toString)
 
   val requestRate =
     newMeter("RequestsPerSec", "requests", TimeUnit.SECONDS, tags)

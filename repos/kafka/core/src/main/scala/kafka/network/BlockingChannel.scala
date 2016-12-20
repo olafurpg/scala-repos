@@ -76,13 +76,14 @@ class BlockingChannel(val host: String,
         val msg =
           "Created socket with SO_TIMEOUT = %d (requested %d), SO_RCVBUF = %d (requested %d), SO_SNDBUF = %d (requested %d), connectTimeoutMs = %d."
         debug(
-          msg.format(channel.socket.getSoTimeout,
-                     readTimeoutMs,
-                     channel.socket.getReceiveBufferSize,
-                     readBufferSize,
-                     channel.socket.getSendBufferSize,
-                     writeBufferSize,
-                     connectTimeoutMs))
+          msg.format(
+            channel.socket.getSoTimeout,
+            readTimeoutMs,
+            channel.socket.getReceiveBufferSize,
+            readBufferSize,
+            channel.socket.getSendBufferSize,
+            writeBufferSize,
+            connectTimeoutMs))
       } catch {
         case e: Throwable => disconnect()
       }

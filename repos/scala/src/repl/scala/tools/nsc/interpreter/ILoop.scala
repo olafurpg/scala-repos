@@ -75,8 +75,9 @@ class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
   def history = in.history
 
   // classpath entries added via :cp
-  @deprecated("Use reset, replay or require to update class path",
-              since = "2.11")
+  @deprecated(
+    "Use reset, replay or require to update class path",
+    since = "2.11")
   var addedClasspath: String = ""
 
   /** A reverse list of commands to replay if the user requests a :replay */
@@ -205,63 +206,76 @@ class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
   /** Standard commands **/
   lazy val standardCommands = List(
     cmd("edit", "<id>|<line>", "edit history", editCommand),
-    cmd("help",
-        "[command]",
-        "print this summary or command-specific help",
-        helpCommand),
+    cmd(
+      "help",
+      "[command]",
+      "print this summary or command-specific help",
+      helpCommand),
     historyCommand,
     cmd("h?", "<string>", "search the history", searchHistory),
-    cmd("imports",
-        "[name name ...]",
-        "show import history, identifying sources of names",
-        importsCommand),
-    cmd("implicits",
-        "[-v]",
-        "show the implicits in scope",
-        intp.implicitsCommand),
-    cmd("javap",
-        "<path|class>",
-        "disassemble a file or class name",
-        javapCommand),
-    cmd("line",
-        "<id>|<line>",
-        "place line(s) at the end of history",
-        lineCommand),
+    cmd(
+      "imports",
+      "[name name ...]",
+      "show import history, identifying sources of names",
+      importsCommand),
+    cmd(
+      "implicits",
+      "[-v]",
+      "show the implicits in scope",
+      intp.implicitsCommand),
+    cmd(
+      "javap",
+      "<path|class>",
+      "disassemble a file or class name",
+      javapCommand),
+    cmd(
+      "line",
+      "<id>|<line>",
+      "place line(s) at the end of history",
+      lineCommand),
     cmd("load", "<path>", "interpret lines in a file", loadCommand),
-    cmd("paste",
-        "[-raw] [path]",
-        "enter paste mode or paste a file",
-        pasteCommand),
+    cmd(
+      "paste",
+      "[-raw] [path]",
+      "enter paste mode or paste a file",
+      pasteCommand),
     nullary("power", "enable power user mode", powerCmd),
-    nullary("quit",
-            "exit the interpreter",
-            () => Result(keepRunning = false, None)),
-    cmd("replay",
-        "[options]",
-        "reset the repl and replay all previous commands",
-        replayCommand),
+    nullary(
+      "quit",
+      "exit the interpreter",
+      () => Result(keepRunning = false, None)),
+    cmd(
+      "replay",
+      "[options]",
+      "reset the repl and replay all previous commands",
+      replayCommand),
     cmd("require", "<path>", "add a jar to the classpath", require),
-    cmd("reset",
-        "[options]",
-        "reset the repl to its initial state, forgetting all session entries",
-        resetCommand),
+    cmd(
+      "reset",
+      "[options]",
+      "reset the repl to its initial state, forgetting all session entries",
+      resetCommand),
     cmd("save", "<path>", "save replayable session to a file", saveCommand),
     shCommand,
-    cmd("settings",
-        "<options>",
-        "update compiler options, if possible; see reset",
-        changeSettings),
-    nullary("silent",
-            "disable/enable automatic printing of results",
-            verbosity),
-    cmd("type",
-        "[-v] <expr>",
-        "display the type of an expression without evaluating it",
-        typeCommand),
-    cmd("kind",
-        "[-v] <expr>",
-        "display the kind of expression's type",
-        kindCommand),
+    cmd(
+      "settings",
+      "<options>",
+      "update compiler options, if possible; see reset",
+      changeSettings),
+    nullary(
+      "silent",
+      "disable/enable automatic printing of results",
+      verbosity),
+    cmd(
+      "type",
+      "[-v] <expr>",
+      "display the type of an expression without evaluating it",
+      typeCommand),
+    cmd(
+      "kind",
+      "[-v] <expr>",
+      "display the kind of expression's type",
+      kindCommand),
     nullary(
       "warnings",
       "show the suppressed warnings from the most recent line which had any",
@@ -270,10 +284,11 @@ class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
 
   /** Power user commands */
   lazy val powerCommands: List[LoopCommand] = List(
-    cmd("phase",
-        "<phase>",
-        "set the implicit phase for power commands",
-        phaseCommand)
+    cmd(
+      "phase",
+      "<phase>",
+      "set the implicit phase for power commands",
+      phaseCommand)
   )
 
   private def importsCommand(line: String): Result = {
@@ -323,9 +338,10 @@ class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
   }
 
   protected def newJavap() =
-    JavapClass(addToolsJarToLoader(),
-               new IMain.ReplStrippingWriter(intp),
-               intp)
+    JavapClass(
+      addToolsJarToLoader(),
+      new IMain.ReplStrippingWriter(intp),
+      intp)
 
   private lazy val javap =
     substituteAndLog[Javap]("javap", NoJavap)(newJavap())
@@ -335,8 +351,9 @@ class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
     line0.trim match {
       case "" => ":type [-v] <expression>"
       case s =>
-        intp.typeCommandInternal(s stripPrefix "-v " trim,
-                                 verbose = s startsWith "-v ")
+        intp.typeCommandInternal(
+          s stripPrefix "-v " trim,
+          verbose = s startsWith "-v ")
     }
   }
 
@@ -344,8 +361,9 @@ class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
     expr.trim match {
       case "" => ":kind [-v] <expression>"
       case s =>
-        intp.kindCommandInternal(s stripPrefix "-v " trim,
-                                 verbose = s startsWith "-v ")
+        intp.kindCommandInternal(
+          s stripPrefix "-v " trim,
+          verbose = s startsWith "-v ")
     }
   }
 
@@ -560,8 +578,9 @@ class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
     def diagnose(code: String) = {
       echo("The edited code is incomplete!\n")
       val errless =
-        intp compileSources new BatchSourceFile("<pastie>",
-                                                s"object pastel {\n$code\n}")
+        intp compileSources new BatchSourceFile(
+          "<pastie>",
+          s"object pastel {\n$code\n}")
       if (errless) echo("The compiler reports no errors.")
     }
 
@@ -679,8 +698,9 @@ class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
      else if (replayCommandStack.isEmpty) echo("No replay commands in session")
      else File(filename).printlnAll(replayCommands: _*))
 
-  @deprecated("Use reset, replay or require to update class path",
-              since = "2.11")
+  @deprecated(
+    "Use reset, replay or require to update class path",
+    since = "2.11")
   def addClasspath(arg: String): Unit = {
     val f = File(arg).normalize
     if (f.exists) {
@@ -859,8 +879,9 @@ class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
         echo("The pasted code is incomplete!\n")
         // Remembrance of Things Pasted in an object
         val errless =
-          intp compileSources new BatchSourceFile("<pastie>",
-                                                  s"object pastel {\n$code\n}")
+          intp compileSources new BatchSourceFile(
+            "<pastie>",
+            s"object pastel {\n$code\n}")
         if (errless)
           echo("...but compilation found no error? Good luck with that.")
       }

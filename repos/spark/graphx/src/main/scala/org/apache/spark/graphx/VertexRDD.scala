@@ -335,10 +335,11 @@ object VertexRDD {
             if (routingTableIter.hasNext) routingTableIter.next()
             else RoutingTablePartition.empty
           Iterator(
-            ShippableVertexPartition(vertexIter,
-                                     routingTable,
-                                     defaultVal,
-                                     mergeFunc))
+            ShippableVertexPartition(
+              vertexIter,
+              routingTable,
+              defaultVal,
+              mergeFunc))
       }
     new VertexRDDImpl(vertexPartitions)
   }

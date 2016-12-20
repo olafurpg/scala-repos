@@ -45,13 +45,14 @@ object CanDesignFilterDecimation {
               case IntOpt(ord) => ord
             }
             //cannot use parameter-by-name for optWindow, given duplicate variable name
-            designFilterFirwin(realOrder,
-                               DenseVector(1d / factor.toDouble),
-                               nyquist = 1d,
-                               zeroPass = true,
-                               scale = true,
-                               multiplier,
-                               optWindow)
+            designFilterFirwin(
+              realOrder,
+              DenseVector(1d / factor.toDouble),
+              nyquist = 1d,
+              zeroPass = true,
+              scale = true,
+              multiplier,
+              optWindow)
           }
           case meth: OptDesignMethod =>
             throw new IllegalArgumentException(
@@ -72,16 +73,18 @@ object CanDesignFilterDecimation {
                 optDesignMethod: OptDesignMethod,
                 optWindow: OptWindowFunction,
                 optFilterOrder: OptFilterTaps): FIRKernel1D[Long] = {
-        val temp = designFilterDecimation[FIRKernel1D[Double]](factor,
-                                                               multiplier,
-                                                               optDesignMethod,
-                                                               optWindow,
-                                                               optFilterOrder)
+        val temp = designFilterDecimation[FIRKernel1D[Double]](
+          factor,
+          multiplier,
+          optDesignMethod,
+          optWindow,
+          optFilterOrder)
         temp match {
           case x: FIRKernel1D[Double] =>
-            new FIRKernel1D[Long](convert(x.kernel, Long),
-                                  x.multiplier.toLong,
-                                  x.designText)
+            new FIRKernel1D[Long](
+              convert(x.kernel, Long),
+              x.multiplier.toLong,
+              x.designText)
           case _ =>
             throw new IllegalArgumentException("Something is wrong here! ")
         }

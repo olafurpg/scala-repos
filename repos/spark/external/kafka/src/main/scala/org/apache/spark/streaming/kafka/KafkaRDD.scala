@@ -61,13 +61,14 @@ private[kafka] class KafkaRDD[K: ClassTag,
       .map {
         case (o, i) =>
           val (host, port) = leaders(TopicAndPartition(o.topic, o.partition))
-          new KafkaRDDPartition(i,
-                                o.topic,
-                                o.partition,
-                                o.fromOffset,
-                                o.untilOffset,
-                                host,
-                                port)
+          new KafkaRDDPartition(
+            i,
+            o.topic,
+            o.partition,
+            o.fromOffset,
+            o.untilOffset,
+            host,
+            port)
       }
       .toArray
   }
@@ -106,10 +107,11 @@ private[kafka] class KafkaRDD[K: ClassTag,
     }
 
     val buf = new ArrayBuffer[R]
-    val res = context.runJob(this,
-                             (tc: TaskContext, it: Iterator[R]) =>
-                               it.take(parts(tc.partitionId)).toArray,
-                             parts.keys.toArray)
+    val res = context.runJob(
+      this,
+      (tc: TaskContext,
+       it: Iterator[R]) => it.take(parts(tc.partitionId)).toArray,
+      parts.keys.toArray)
     res.foreach(buf ++= _)
     buf.toArray
   }
@@ -207,10 +209,11 @@ private[kafka] class KafkaRDD[K: ClassTag,
 
     private def fetchBatch: Iterator[MessageAndOffset] = {
       val req = new FetchRequestBuilder()
-        .addFetch(part.topic,
-                  part.partition,
-                  requestOffset,
-                  kc.config.fetchMessageMaxBytes)
+        .addFetch(
+          part.topic,
+          part.partition,
+          requestOffset,
+          kc.config.fetchMessageMaxBytes)
         .build()
       val resp = consumer.fetch(req)
       handleFetchErr(resp)
@@ -238,19 +241,21 @@ private[kafka] class KafkaRDD[K: ClassTag,
       } else {
         val item = iter.next()
         if (item.offset >= part.untilOffset) {
-          assert(item.offset == part.untilOffset,
-                 errOvershotEnd(item.offset, part))
+          assert(
+            item.offset == part.untilOffset,
+            errOvershotEnd(item.offset, part))
           finished = true
           null.asInstanceOf[R]
         } else {
           requestOffset = item.nextOffset
           messageHandler(
-            new MessageAndMetadata(part.topic,
-                                   part.partition,
-                                   item.message,
-                                   item.offset,
-                                   keyDecoder,
-                                   valueDecoder))
+            new MessageAndMetadata(
+              part.topic,
+              part.partition,
+              item.message,
+              item.offset,
+              keyDecoder,
+              valueDecoder))
         }
       }
     }
@@ -297,10 +302,11 @@ private[kafka] object KafkaRDD {
       }
       .toArray
 
-    new KafkaRDD[K, V, U, T, R](sc,
-                                kafkaParams,
-                                offsetRanges,
-                                leaders,
-                                messageHandler)
+    new KafkaRDD[K, V, U, T, R](
+      sc,
+      kafkaParams,
+      offsetRanges,
+      leaders,
+      messageHandler)
   }
 }

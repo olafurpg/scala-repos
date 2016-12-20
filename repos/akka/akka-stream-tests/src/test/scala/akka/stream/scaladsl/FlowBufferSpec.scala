@@ -238,9 +238,10 @@ class FlowBufferSpec extends AkkaSpec {
       subscriber.expectError(error)
     }
 
-    for (strategy ← List(OverflowStrategy.dropHead,
-                         OverflowStrategy.dropTail,
-                         OverflowStrategy.dropBuffer)) {
+    for (strategy ← List(
+           OverflowStrategy.dropHead,
+           OverflowStrategy.dropTail,
+           OverflowStrategy.dropBuffer)) {
 
       s"work with $strategy if buffer size of one" in {
 

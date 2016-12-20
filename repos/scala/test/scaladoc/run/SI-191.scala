@@ -79,7 +79,8 @@ object Test extends ScaladocModelTest {
       case _ => false
     }
 
-    assert(countLinks(test.comment.get, isExpectedExternalLink) == 8,
-           countLinks(test.comment.get, isExpectedExternalLink) + " == 8")
+    assert(
+      countLinks(test.comment.get, isExpectedExternalLink) == 8,
+      countLinks(test.comment.get, isExpectedExternalLink) + " == 8")
   }
 }

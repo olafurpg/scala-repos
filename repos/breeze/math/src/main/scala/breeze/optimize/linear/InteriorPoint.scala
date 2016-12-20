@@ -143,9 +143,10 @@ object InteriorPoint {
     val n = A.cols
     val m = A.rows
     import DenseMatrix._
-    val mat = vertcat[Double](horzcat(zeros[Double](m, m), A, eye[Double](m)),
-                              horzcat(A.t, zeros[Double](n, n + m)),
-                              horzcat(diag(s), zeros[Double](m, n), diag(z)))
+    val mat = vertcat[Double](
+      horzcat(zeros[Double](m, m), A, eye[Double](m)),
+      horzcat(A.t, zeros[Double](n, n + m)),
+      horzcat(diag(s), zeros[Double](m, n), diag(z)))
 
     diag(mat) += 1E-20
 

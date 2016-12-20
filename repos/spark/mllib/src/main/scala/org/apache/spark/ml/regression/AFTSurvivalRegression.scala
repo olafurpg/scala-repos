@@ -83,15 +83,16 @@ private[regression] trait AFTSurvivalRegressionParams
   @Since("1.6.0")
   def getQuantileProbabilities: Array[Double] = $(quantileProbabilities)
   setDefault(
-    quantileProbabilities -> Array(0.01,
-                                   0.05,
-                                   0.1,
-                                   0.25,
-                                   0.5,
-                                   0.75,
-                                   0.9,
-                                   0.95,
-                                   0.99))
+    quantileProbabilities -> Array(
+      0.01,
+      0.05,
+      0.1,
+      0.25,
+      0.5,
+      0.75,
+      0.9,
+      0.95,
+      0.99))
 
   /**
     * Param for quantiles column name.
@@ -233,8 +234,9 @@ class AFTSurvivalRegression @Since("1.6.0")(
      */
     val initialParameters = Vectors.zeros(numFeatures + 2)
 
-    val states = optimizer.iterations(new CachedDiffFunction(costFun),
-                                      initialParameters.toBreeze.toDenseVector)
+    val states = optimizer.iterations(
+      new CachedDiffFunction(costFun),
+      initialParameters.toBreeze.toDenseVector)
 
     val parameters = {
       val arrayBuilder = mutable.ArrayBuilder.make[Double]
@@ -417,10 +419,11 @@ object AFTSurvivalRegressionModel
       val coefficients = data.getAs[Vector](0)
       val intercept = data.getDouble(1)
       val scale = data.getDouble(2)
-      val model = new AFTSurvivalRegressionModel(metadata.uid,
-                                                 coefficients,
-                                                 intercept,
-                                                 scale)
+      val model = new AFTSurvivalRegressionModel(
+        metadata.uid,
+        coefficients,
+        intercept,
+        scale)
 
       DefaultParamsReader.getAndSetParams(model, metadata)
       model
@@ -508,9 +511,10 @@ private class AFTAggregator(parameters: BDV[Double], fitIntercept: Boolean)
 
   // Here we optimize loss function over coefficients, intercept and log(sigma)
   def gradient: BDV[Double] =
-    BDV.vertcat(BDV(Array(gradientLogSigmaSum / totalCnt.toDouble)),
-                BDV(Array(gradientInterceptSum / totalCnt.toDouble)),
-                gradientCoefficientSum / totalCnt.toDouble)
+    BDV.vertcat(
+      BDV(Array(gradientLogSigmaSum / totalCnt.toDouble)),
+      BDV(Array(gradientInterceptSum / totalCnt.toDouble)),
+      gradientCoefficientSum / totalCnt.toDouble)
 
   /**
     * Add a new training data to this AFTAggregator, and update the loss and gradient
@@ -533,8 +537,9 @@ private class AFTAggregator(parameters: BDV[Double], fitIntercept: Boolean)
     lossSum += (math.exp(epsilon) - delta * epsilon)
 
     // Sanity check (should never occur):
-    assert(!lossSum.isInfinity,
-           s"AFTAggregator loss sum is infinity. Error for unknown reason.")
+    assert(
+      !lossSum.isInfinity,
+      s"AFTAggregator loss sum is infinity. Error for unknown reason.")
 
     val deltaMinusExpEps = delta - math.exp(epsilon)
     gradientCoefficientSum += xi * deltaMinusExpEps / sigma
@@ -602,6 +607,7 @@ private class AFTCostFun(data: RDD[AFTPoint], fitIntercept: Boolean)
 private[regression] case class AFTPoint(features: Vector,
                                         label: Double,
                                         censor: Double) {
-  require(censor == 1.0 || censor == 0.0,
-          "censor of class AFTPoint must be 1.0 or 0.0")
+  require(
+    censor == 1.0 || censor == 0.0,
+    "censor of class AFTPoint must be 1.0 or 0.0")
 }

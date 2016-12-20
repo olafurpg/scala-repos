@@ -64,9 +64,10 @@ object ConvertImplicitBoundsToImplicitParameter {
 
   def doConversion(element: PsiElement): Seq[ScParameter] = {
     if (element == null || !element.isValid) return Seq.empty
-    val (function: ScMethodLike,
-         paramOwner: ScParameterOwner,
-         typeParamOwner: ScTypeParametersOwner) = PsiTreeUtil
+    val (
+      function: ScMethodLike,
+      paramOwner: ScParameterOwner,
+      typeParamOwner: ScTypeParametersOwner) = PsiTreeUtil
       .getParentOfType(element, classOf[ScParameterOwner], false) match {
       case x: ScFunction => (x, x, x)
       case x: ScClass => (x.constructor.getOrElse(return Seq.empty), x, x)

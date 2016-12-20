@@ -125,15 +125,17 @@ class InsertTest extends AsyncTest[JdbcTestDB] {
     seq(
       (ts.schema ++ src.schema).create,
       ts += (101, "A", 1, false, "S1", "S2", 0),
-      ts.map(_.ins) ++= Seq((102, "B", 1, false, "S1", "S2", 0),
-                            (103, "C", 1, false, "S1", "S2", 0)),
+      ts.map(_.ins) ++= Seq(
+        (102, "B", 1, false, "S1", "S2", 0),
+        (103, "C", 1, false, "S1", "S2", 0)),
       ts.filter(_.id > 100).length.result.map(_ shouldBe 0),
       ifCap(jcap.forceInsert)(
         seq(
           ts.forceInsert(104, "A", 1, false, "S1", "S2", 0),
           ts.map(_.ins)
-            .forceInsertAll(Seq((105, "B", 1, false, "S1", "S2", 0),
-                                (106, "C", 1, false, "S1", "S2", 0))),
+            .forceInsertAll(Seq(
+              (105, "B", 1, false, "S1", "S2", 0),
+              (106, "C", 1, false, "S1", "S2", 0))),
           ts.filter(_.id > 100).length.result.map(_ shouldBe 3),
           ts.map(_.ins)
             .forceInsertAll(Seq((111, "D", 1, false, "S1", "S2", 0))),

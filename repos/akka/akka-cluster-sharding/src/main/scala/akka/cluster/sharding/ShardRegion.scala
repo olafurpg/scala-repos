@@ -36,13 +36,14 @@ object ShardRegion {
                           extractShardId: ShardRegion.ExtractShardId,
                           handOffStopMessage: Any): Props =
     Props(
-      new ShardRegion(typeName,
-                      Some(entityProps),
-                      settings,
-                      coordinatorPath,
-                      extractEntityId,
-                      extractShardId,
-                      handOffStopMessage)).withDeploy(Deploy.local)
+      new ShardRegion(
+        typeName,
+        Some(entityProps),
+        settings,
+        coordinatorPath,
+        extractEntityId,
+        extractShardId,
+        handOffStopMessage)).withDeploy(Deploy.local)
 
   /**
     * INTERNAL API
@@ -56,13 +57,14 @@ object ShardRegion {
       extractEntityId: ShardRegion.ExtractEntityId,
       extractShardId: ShardRegion.ExtractShardId): Props =
     Props(
-      new ShardRegion(typeName,
-                      None,
-                      settings,
-                      coordinatorPath,
-                      extractEntityId,
-                      extractShardId,
-                      PoisonPill)).withDeploy(Deploy.local)
+      new ShardRegion(
+        typeName,
+        None,
+        settings,
+        coordinatorPath,
+        extractEntityId,
+        extractShardId,
+        PoisonPill)).withDeploy(Deploy.local)
 
   /**
     * Marker type of entity identifier (`String`).
@@ -442,9 +444,10 @@ class ShardRegion(typeName: String,
     membersByAge = newMembers
     if (before != after) {
       if (log.isDebugEnabled)
-        log.debug("Coordinator moved from [{}] to [{}]",
-                  before.map(_.address).getOrElse(""),
-                  after.map(_.address).getOrElse(""))
+        log.debug(
+          "Coordinator moved from [{}] to [{}]",
+          before.map(_.address).getOrElse(""),
+          after.map(_.address).getOrElse(""))
       coordinator = None
       register()
     }
@@ -592,9 +595,10 @@ class ShardRegion(typeName: String,
       regionByShard --= shards
       regions -= ref
       if (log.isDebugEnabled)
-        log.debug("Region [{}] with shards [{}] terminated",
-                  ref,
-                  shards.mkString(", "))
+        log.debug(
+          "Region [{}] with shards [{}] terminated",
+          ref,
+          shards.mkString(", "))
     } else if (shardsByRef.contains(ref)) {
       val shardId: ShardId = shardsByRef(ref)
 
@@ -724,9 +728,10 @@ class ShardRegion(typeName: String,
   def deliverBufferedMessages(shardId: ShardId, receiver: ActorRef): Unit = {
     shardBuffers.get(shardId) match {
       case Some(buf) ⇒
-        log.debug("Deliver [{}] buffered messages for shard [{}]",
-                  buf.size,
-                  shardId)
+        log.debug(
+          "Deliver [{}] buffered messages for shard [{}]",
+          buf.size,
+          shardId)
         buf.foreach { case (msg, snd) ⇒ receiver.tell(msg, snd) }
         shardBuffers -= shardId
       case None ⇒
@@ -771,13 +776,15 @@ class ShardRegion(typeName: String,
               case None ⇒ bufferMessage(shardId, msg, snd)
             }
           case Some(ref) ⇒
-            log.debug("Forwarding request for shard [{}] to [{}]",
-                      shardId,
-                      ref)
+            log.debug(
+              "Forwarding request for shard [{}] to [{}]",
+              shardId,
+              ref)
             ref.tell(msg, snd)
           case None if (shardId == null || shardId == "") ⇒
-            log.warning("Shard must not be empty, dropping message [{}]",
-                        msg.getClass.getName)
+            log.warning(
+              "Shard must not be empty, dropping message [{}]",
+              msg.getClass.getName)
             context.system.deadLetters ! msg
           case None ⇒
             if (!shardBuffers.contains(shardId)) {
@@ -799,16 +806,18 @@ class ShardRegion(typeName: String,
 
             val name = URLEncoder.encode(id, "utf-8")
             val shard = context.watch(
-              context.actorOf(Shard
-                                .props(typeName,
-                                       id,
-                                       props,
-                                       settings,
-                                       extractEntityId,
-                                       extractShardId,
-                                       handOffStopMessage)
-                                .withDispatcher(context.props.dispatcher),
-                              name))
+              context.actorOf(
+                Shard
+                  .props(
+                    typeName,
+                    id,
+                    props,
+                    settings,
+                    extractEntityId,
+                    extractShardId,
+                    handOffStopMessage)
+                  .withDispatcher(context.props.dispatcher),
+                name))
             shardsByRef = shardsByRef.updated(shard, id)
             shards = shards.updated(id, shard)
             startingShards += id

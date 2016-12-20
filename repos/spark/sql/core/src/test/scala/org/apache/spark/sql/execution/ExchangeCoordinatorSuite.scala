@@ -74,9 +74,10 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
       // All bytes per partition are 0.
       val bytesByPartitionId = Array[Long](0, 0, 0, 0, 0)
       val expectedPartitionStartIndices = Array[Int](0)
-      checkEstimation(coordinator,
-                      Array(bytesByPartitionId),
-                      expectedPartitionStartIndices)
+      checkEstimation(
+        coordinator,
+        Array(bytesByPartitionId),
+        expectedPartitionStartIndices)
     }
 
     {
@@ -84,45 +85,50 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
       // 1 post-shuffle partition is needed.
       val bytesByPartitionId = Array[Long](10, 0, 20, 0, 0)
       val expectedPartitionStartIndices = Array[Int](0)
-      checkEstimation(coordinator,
-                      Array(bytesByPartitionId),
-                      expectedPartitionStartIndices)
+      checkEstimation(
+        coordinator,
+        Array(bytesByPartitionId),
+        expectedPartitionStartIndices)
     }
 
     {
       // 2 post-shuffle partitions are needed.
       val bytesByPartitionId = Array[Long](10, 0, 90, 20, 0)
       val expectedPartitionStartIndices = Array[Int](0, 3)
-      checkEstimation(coordinator,
-                      Array(bytesByPartitionId),
-                      expectedPartitionStartIndices)
+      checkEstimation(
+        coordinator,
+        Array(bytesByPartitionId),
+        expectedPartitionStartIndices)
     }
 
     {
       // There are a few large pre-shuffle partitions.
       val bytesByPartitionId = Array[Long](110, 10, 100, 110, 0)
       val expectedPartitionStartIndices = Array[Int](0, 1, 3, 4)
-      checkEstimation(coordinator,
-                      Array(bytesByPartitionId),
-                      expectedPartitionStartIndices)
+      checkEstimation(
+        coordinator,
+        Array(bytesByPartitionId),
+        expectedPartitionStartIndices)
     }
 
     {
       // All pre-shuffle partitions are larger than the targeted size.
       val bytesByPartitionId = Array[Long](100, 110, 100, 110, 110)
       val expectedPartitionStartIndices = Array[Int](0, 1, 2, 3, 4)
-      checkEstimation(coordinator,
-                      Array(bytesByPartitionId),
-                      expectedPartitionStartIndices)
+      checkEstimation(
+        coordinator,
+        Array(bytesByPartitionId),
+        expectedPartitionStartIndices)
     }
 
     {
       // The last pre-shuffle partition is in a single post-shuffle partition.
       val bytesByPartitionId = Array[Long](30, 30, 0, 40, 110)
       val expectedPartitionStartIndices = Array[Int](0, 4)
-      checkEstimation(coordinator,
-                      Array(bytesByPartitionId),
-                      expectedPartitionStartIndices)
+      checkEstimation(
+        coordinator,
+        Array(bytesByPartitionId),
+        expectedPartitionStartIndices)
     }
   }
 
@@ -135,8 +141,9 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
       val bytesByPartitionId1 = Array[Long](0, 0, 0, 0, 0)
       val bytesByPartitionId2 = Array[Long](0, 0, 0, 0, 0, 0)
       val mapOutputStatistics =
-        Array(new MapOutputStatistics(0, bytesByPartitionId1),
-              new MapOutputStatistics(1, bytesByPartitionId2))
+        Array(
+          new MapOutputStatistics(0, bytesByPartitionId1),
+          new MapOutputStatistics(1, bytesByPartitionId2))
       intercept[AssertionError](
         coordinator.estimatePartitionStartIndices(mapOutputStatistics))
     }
@@ -146,9 +153,10 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
       val bytesByPartitionId1 = Array[Long](0, 0, 0, 0, 0)
       val bytesByPartitionId2 = Array[Long](0, 0, 0, 0, 0)
       val expectedPartitionStartIndices = Array[Int](0)
-      checkEstimation(coordinator,
-                      Array(bytesByPartitionId1, bytesByPartitionId2),
-                      expectedPartitionStartIndices)
+      checkEstimation(
+        coordinator,
+        Array(bytesByPartitionId1, bytesByPartitionId2),
+        expectedPartitionStartIndices)
     }
 
     {
@@ -157,9 +165,10 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
       val bytesByPartitionId1 = Array[Long](0, 10, 0, 20, 0)
       val bytesByPartitionId2 = Array[Long](30, 0, 20, 0, 20)
       val expectedPartitionStartIndices = Array[Int](0)
-      checkEstimation(coordinator,
-                      Array(bytesByPartitionId1, bytesByPartitionId2),
-                      expectedPartitionStartIndices)
+      checkEstimation(
+        coordinator,
+        Array(bytesByPartitionId1, bytesByPartitionId2),
+        expectedPartitionStartIndices)
     }
 
     {
@@ -167,9 +176,10 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
       val bytesByPartitionId1 = Array[Long](0, 10, 0, 20, 0)
       val bytesByPartitionId2 = Array[Long](30, 0, 70, 0, 30)
       val expectedPartitionStartIndices = Array[Int](0, 3)
-      checkEstimation(coordinator,
-                      Array(bytesByPartitionId1, bytesByPartitionId2),
-                      expectedPartitionStartIndices)
+      checkEstimation(
+        coordinator,
+        Array(bytesByPartitionId1, bytesByPartitionId2),
+        expectedPartitionStartIndices)
     }
 
     {
@@ -177,9 +187,10 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
       val bytesByPartitionId1 = Array[Long](0, 99, 0, 20, 0)
       val bytesByPartitionId2 = Array[Long](30, 0, 70, 0, 30)
       val expectedPartitionStartIndices = Array[Int](0, 2)
-      checkEstimation(coordinator,
-                      Array(bytesByPartitionId1, bytesByPartitionId2),
-                      expectedPartitionStartIndices)
+      checkEstimation(
+        coordinator,
+        Array(bytesByPartitionId1, bytesByPartitionId2),
+        expectedPartitionStartIndices)
     }
 
     {
@@ -187,9 +198,10 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
       val bytesByPartitionId1 = Array[Long](0, 100, 0, 30, 0)
       val bytesByPartitionId2 = Array[Long](30, 0, 70, 0, 30)
       val expectedPartitionStartIndices = Array[Int](0, 2, 4)
-      checkEstimation(coordinator,
-                      Array(bytesByPartitionId1, bytesByPartitionId2),
-                      expectedPartitionStartIndices)
+      checkEstimation(
+        coordinator,
+        Array(bytesByPartitionId1, bytesByPartitionId2),
+        expectedPartitionStartIndices)
     }
 
     {
@@ -197,9 +209,10 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
       val bytesByPartitionId1 = Array[Long](0, 100, 40, 30, 0)
       val bytesByPartitionId2 = Array[Long](30, 0, 60, 0, 110)
       val expectedPartitionStartIndices = Array[Int](0, 2, 3)
-      checkEstimation(coordinator,
-                      Array(bytesByPartitionId1, bytesByPartitionId2),
-                      expectedPartitionStartIndices)
+      checkEstimation(
+        coordinator,
+        Array(bytesByPartitionId1, bytesByPartitionId2),
+        expectedPartitionStartIndices)
     }
 
     {
@@ -207,9 +220,10 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
       val bytesByPartitionId1 = Array[Long](100, 100, 40, 30, 0)
       val bytesByPartitionId2 = Array[Long](30, 0, 60, 70, 110)
       val expectedPartitionStartIndices = Array[Int](0, 1, 2, 3, 4)
-      checkEstimation(coordinator,
-                      Array(bytesByPartitionId1, bytesByPartitionId2),
-                      expectedPartitionStartIndices)
+      checkEstimation(
+        coordinator,
+        Array(bytesByPartitionId1, bytesByPartitionId2),
+        expectedPartitionStartIndices)
     }
   }
 
@@ -223,9 +237,10 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
       val bytesByPartitionId1 = Array[Long](0, 0, 0, 0, 0)
       val bytesByPartitionId2 = Array[Long](0, 0, 0, 0, 0)
       val expectedPartitionStartIndices = Array[Int](0)
-      checkEstimation(coordinator,
-                      Array(bytesByPartitionId1, bytesByPartitionId2),
-                      expectedPartitionStartIndices)
+      checkEstimation(
+        coordinator,
+        Array(bytesByPartitionId1, bytesByPartitionId2),
+        expectedPartitionStartIndices)
     }
 
     {
@@ -233,9 +248,10 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
       val bytesByPartitionId1 = Array[Long](10, 5, 5, 0, 20)
       val bytesByPartitionId2 = Array[Long](5, 10, 0, 10, 5)
       val expectedPartitionStartIndices = Array[Int](0, 3)
-      checkEstimation(coordinator,
-                      Array(bytesByPartitionId1, bytesByPartitionId2),
-                      expectedPartitionStartIndices)
+      checkEstimation(
+        coordinator,
+        Array(bytesByPartitionId1, bytesByPartitionId2),
+        expectedPartitionStartIndices)
     }
 
     {
@@ -243,9 +259,10 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
       val bytesByPartitionId1 = Array[Long](10, 50, 20, 80, 20)
       val bytesByPartitionId2 = Array[Long](40, 10, 0, 10, 30)
       val expectedPartitionStartIndices = Array[Int](0, 2, 4)
-      checkEstimation(coordinator,
-                      Array(bytesByPartitionId1, bytesByPartitionId2),
-                      expectedPartitionStartIndices)
+      checkEstimation(
+        coordinator,
+        Array(bytesByPartitionId1, bytesByPartitionId2),
+        expectedPartitionStartIndices)
     }
   }
 
@@ -273,12 +290,14 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
       .set(SQLConf.SHUFFLE_PARTITIONS.key, "5")
       .set(SQLConf.ADAPTIVE_EXECUTION_ENABLED.key, "true")
       .set(SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key, "-1")
-      .set(SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key,
-           targetNumPostShufflePartitions.toString)
+      .set(
+        SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key,
+        targetNumPostShufflePartitions.toString)
     minNumPostShufflePartitions match {
       case Some(numPartitions) =>
-        sparkConf.set(SQLConf.SHUFFLE_MIN_NUM_POSTSHUFFLE_PARTITIONS.key,
-                      numPartitions.toString)
+        sparkConf.set(
+          SQLConf.SHUFFLE_MIN_NUM_POSTSHUFFLE_PARTITIONS.key,
+          numPartitions.toString)
       case None =>
         sparkConf.set(SQLConf.SHUFFLE_MIN_NUM_POSTSHUFFLE_PARTITIONS.key, "-1")
     }

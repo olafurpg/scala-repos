@@ -204,29 +204,31 @@ object Plugins extends PluginsFunctions {
             })
           log.debug(
             s"deducing auto plugins based on known facts ${knowlege0.toString} and clauses ${clauses.toString}")
-          Logic.reduce(clauses,
-                       (flattenConvert(requestedPlugins) ++ convertAll(
-                         alwaysEnabled)).toSet) match {
+          Logic.reduce(
+            clauses,
+            (flattenConvert(requestedPlugins) ++ convertAll(alwaysEnabled)).toSet) match {
             case Left(problem) => throw AutoPluginException(problem)
             case Right(results) =>
               log.debug(s"  :: deduced result: ${results}")
               val selectedAtoms: List[Atom] = results.ordered
               val selectedPlugins =
                 selectedAtoms map { a =>
-                  byAtomMap.getOrElse(a,
-                                      throw AutoPluginException(
-                                        s"${a} was not found in atom map."))
+                  byAtomMap.getOrElse(
+                    a,
+                    throw AutoPluginException(
+                      s"${a} was not found in atom map."))
                 }
               val forbidden: Set[AutoPlugin] = (selectedPlugins flatMap {
                 Plugins.asExclusions
               }).toSet
               val c = selectedPlugins.toSet & forbidden
               if (c.nonEmpty) {
-                exlusionConflictError(requestedPlugins,
-                                      selectedPlugins,
-                                      c.toSeq sortBy {
-                                        _.label
-                                      })
+                exlusionConflictError(
+                  requestedPlugins,
+                  selectedPlugins,
+                  c.toSeq sortBy {
+                    _.label
+                  })
               }
               val retval = topologicalSort(selectedPlugins, log)
               log.debug(s"  :: sorted deduced result: ${retval.toString}")

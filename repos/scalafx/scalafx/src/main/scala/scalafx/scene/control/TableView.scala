@@ -318,8 +318,9 @@ class TableView[S](
   def columnResizePolicy_=(p: TableView.ResizeFeatures[_] => Boolean) {
     delegate
       .columnResizePolicyProperty()
-      .setValue(new jfxu.Callback[jfxsc.TableView.ResizeFeatures[_],
-                                  java.lang.Boolean] {
+      .setValue(new jfxu.Callback[
+        jfxsc.TableView.ResizeFeatures[_],
+        java.lang.Boolean] {
         def call(v: jfxsc.TableView.ResizeFeatures[_]): java.lang.Boolean = {
           p(v)
         }

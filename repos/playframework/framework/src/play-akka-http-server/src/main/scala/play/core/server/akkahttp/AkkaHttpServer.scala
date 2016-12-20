@@ -68,9 +68,10 @@ class AkkaHttpServer(config: ServerConfig,
     val connectionSink: Sink[Http.IncomingConnection, _] = Sink.foreach {
       connection: Http.IncomingConnection =>
         connection.handleWithAsyncHandler(
-          handleRequest(connection.remoteAddress,
-                        _,
-                        connectionContext.isSecure))
+          handleRequest(
+            connection.remoteAddress,
+            _,
+            connectionContext.isSecure))
     }
 
     val bindingFuture: Future[Http.ServerBinding] =
@@ -120,10 +121,11 @@ class AkkaHttpServer(config: ServerConfig,
                             secure: Boolean): Future[HttpResponse] = {
     val requestId = requestIDs.incrementAndGet()
     val (convertedRequestHeader, requestBodySource) =
-      modelConversion.convertRequest(requestId = requestId,
-                                     remoteAddress = remoteAddress,
-                                     secureProtocol = secure,
-                                     request = request)
+      modelConversion.convertRequest(
+        requestId = requestId,
+        remoteAddress = remoteAddress,
+        secureProtocol = secure,
+        request = request)
     val (taggedRequestHeader, handler, newTryApp) = getHandler(
       convertedRequestHeader)
     val responseFuture = executeHandler(
@@ -173,11 +175,12 @@ class AkkaHttpServer(config: ServerConfig,
               handleHandlerError(tryApp, taggedRequestHeader, error)
           }
         }
-        executeAction(tryApp,
-                      request,
-                      taggedRequestHeader,
-                      requestBodySource,
-                      actionWithErrorHandling)
+        executeAction(
+          tryApp,
+          request,
+          taggedRequestHeader,
+          requestBodySource,
+          actionWithErrorHandling)
 
       case (websocket: WebSocket, Some(upgrade)) =>
         import play.api.libs.iteratee.Execution.Implicits.trampoline
@@ -344,9 +347,10 @@ object AkkaHttpServer {
   */
 class AkkaHttpServerProvider extends ServerProvider {
   def createServer(context: ServerProvider.Context) =
-    new AkkaHttpServer(context.config,
-                       context.appProvider,
-                       context.actorSystem,
-                       context.materializer,
-                       context.stopHook)
+    new AkkaHttpServer(
+      context.config,
+      context.appProvider,
+      context.actorSystem,
+      context.materializer,
+      context.stopHook)
 }

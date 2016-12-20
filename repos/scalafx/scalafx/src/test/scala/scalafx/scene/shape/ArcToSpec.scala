@@ -42,8 +42,9 @@ import scalafx.testutil.{PositionDelegateSpec, SimpleSFXDelegateSpec}
   */
 @RunWith(classOf[JUnitRunner])
 class ArcToSpec
-    extends SimpleSFXDelegateSpec[jfxss.ArcTo, ArcTo](classOf[jfxss.ArcTo],
-                                                      classOf[ArcTo])
+    extends SimpleSFXDelegateSpec[jfxss.ArcTo, ArcTo](
+      classOf[jfxss.ArcTo],
+      classOf[ArcTo])
     with PositionDelegateSpec[ArcTo] {
 
   val positionDelegate = getScalaClassInstance

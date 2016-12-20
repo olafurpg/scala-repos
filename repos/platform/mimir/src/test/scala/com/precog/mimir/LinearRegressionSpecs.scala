@@ -44,9 +44,10 @@ trait LinearRegressionTestSupport[M[+ _]]
 
   def morph2Input(morph: Morphism2, dataLeft: String, dataRight: String) = {
     val line = Line(0, 0, "")
-    dag.Morph2(morph,
-               dag.AbsoluteLoad(Const(CString(dataLeft))(line))(line),
-               dag.AbsoluteLoad(Const(CString(dataRight))(line))(line))(line)
+    dag.Morph2(
+      morph,
+      dag.AbsoluteLoad(Const(CString(dataLeft))(line))(line),
+      dag.AbsoluteLoad(Const(CString(dataRight))(line))(line))(line)
   }
 
   def createLinearSamplePoints(
@@ -98,15 +99,18 @@ trait LinearRegressionSpecs[M[+ _]]
   def makeDAG(points: String) = {
     val line = Line(1, 1, "")
 
-    dag.Morph2(MultiLinearRegression,
-               dag.Join(DerefArray,
-                        Cross(Some(TableModule.CrossOrder.CrossLeft)),
-                        dag.AbsoluteLoad(Const(CString(points))(line))(line),
-                        dag.Const(CLong(1))(line))(line),
-               dag.Join(DerefArray,
-                        Cross(Some(TableModule.CrossOrder.CrossLeft)),
-                        dag.AbsoluteLoad(Const(CString(points))(line))(line),
-                        dag.Const(CLong(0))(line))(line))(line)
+    dag.Morph2(
+      MultiLinearRegression,
+      dag.Join(
+        DerefArray,
+        Cross(Some(TableModule.CrossOrder.CrossLeft)),
+        dag.AbsoluteLoad(Const(CString(points))(line))(line),
+        dag.Const(CLong(1))(line))(line),
+      dag.Join(
+        DerefArray,
+        Cross(Some(TableModule.CrossOrder.CrossLeft)),
+        dag.AbsoluteLoad(Const(CString(points))(line))(line),
+        dag.Const(CLong(0))(line))(line))(line)
   }
 
   val numPoints = 100
@@ -253,10 +257,11 @@ trait LinearRegressionSpecs[M[+ _]]
 
     //runs the linear regression function on `loops` sets of data generated from the same distribution
     while (i < loops) {
-      val cpaths = Seq(CPath(CPathIndex(0), CPathField("foo")),
-                       CPath(CPathIndex(0), CPathField("bar")),
-                       CPath(CPathIndex(0), CPathField("baz")),
-                       CPath(CPathIndex(1))) sorted
+      val cpaths = Seq(
+        CPath(CPathIndex(0), CPathField("foo")),
+        CPath(CPathIndex(0), CPathField("bar")),
+        CPath(CPathIndex(0), CPathField("baz")),
+        CPath(CPathIndex(1))) sorted
 
       val (result, samples) = produceResult(cpaths, num, actualThetas)
 
@@ -303,14 +308,16 @@ trait LinearRegressionSpecs[M[+ _]]
                   returnValues(obj)
               }
 
-            (List(theta0.toDouble,
-                  theta1.toDouble,
-                  theta2.toDouble,
-                  theta3.toDouble),
-             List(error0.toDouble,
-                  error1.toDouble,
-                  error2.toDouble,
-                  error3.toDouble),
+            (List(
+               theta0.toDouble,
+               theta1.toDouble,
+               theta2.toDouble,
+               theta3.toDouble),
+             List(
+               error0.toDouble,
+               error1.toDouble,
+               error2.toDouble,
+               error3.toDouble),
              rSquared.toDouble)
         }
 
@@ -372,10 +379,11 @@ trait LinearRegressionSpecs[M[+ _]]
       val cpaths = Seq(
         CPath(CPathIndex(0), CPathField("ack"), CPathIndex(0)),
         CPath(CPathIndex(0), CPathField("bak"), CPathField("bazoo")),
-        CPath(CPathIndex(0),
-              CPathField("bar"),
-              CPathField("baz"),
-              CPathIndex(0)),
+        CPath(
+          CPathIndex(0),
+          CPathField("bar"),
+          CPathField("baz"),
+          CPathIndex(0)),
         CPath(CPathIndex(0), CPathField("foo")),
         CPath(CPathIndex(1))) sorted
 

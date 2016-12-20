@@ -41,7 +41,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class TranslateTransitionSpec
-    extends SimpleSFXDelegateSpec[jfxa.TranslateTransition,
-                                  TranslateTransition](
+    extends SimpleSFXDelegateSpec[
+      jfxa.TranslateTransition,
+      TranslateTransition](
       classOf[jfxa.TranslateTransition],
       classOf[TranslateTransition])

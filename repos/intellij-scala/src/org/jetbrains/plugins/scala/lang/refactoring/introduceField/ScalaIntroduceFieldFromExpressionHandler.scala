@@ -59,12 +59,13 @@ class ScalaIntroduceFieldFromExpressionHandler
             return
         }
 
-      afterClassChoosing[ScExpression](expr,
-                                       types,
-                                       project,
-                                       editor,
-                                       file,
-                                       "Choose class for Introduce Field") {
+      afterClassChoosing[ScExpression](
+        expr,
+        types,
+        project,
+        editor,
+        file,
+        "Choose class for Introduce Field") {
         convertExpressionToField
       }
     } catch {
@@ -78,18 +79,20 @@ class ScalaIntroduceFieldFromExpressionHandler
                       dataContext: DataContext) {
     val canBeIntroduced: (ScExpression) => Boolean =
       ScalaRefactoringUtil.checkCanBeIntroduced(_)
-    ScalaRefactoringUtil.afterExpressionChoosing(project,
-                                                 editor,
-                                                 file,
-                                                 dataContext,
-                                                 REFACTORING_NAME,
-                                                 canBeIntroduced) {
+    ScalaRefactoringUtil.afterExpressionChoosing(
+      project,
+      editor,
+      file,
+      dataContext,
+      REFACTORING_NAME,
+      canBeIntroduced) {
       ScalaRefactoringUtil.trimSpacesAndComments(editor, file)
-      invoke(project,
-             editor,
-             file,
-             editor.getSelectionModel.getSelectionStart,
-             editor.getSelectionModel.getSelectionEnd)
+      invoke(
+        project,
+        editor,
+        file,
+        editor.getSelectionModel.getSelectionStart,
+        editor.getSelectionModel.getSelectionEnd)
     }
   }
 
@@ -109,9 +112,10 @@ class ScalaIntroduceFieldFromExpressionHandler
     def runWithDialog() {
       val settings = new IntroduceFieldSettings(ifc)
       if (!settings.canBeInitInDeclaration && !settings.canBeInitLocally) {
-        showErrorMessage("Cannot create field from this expression",
-                         ifc.project,
-                         ifc.editor)
+        showErrorMessage(
+          "Cannot create field from this expression",
+          ifc.project,
+          ifc.editor)
       } else {
         val dialog = getDialog(ifc, settings)
         if (dialog.isOK) {
@@ -135,9 +139,10 @@ class ScalaIntroduceFieldFromExpressionHandler
     val checkAnchor: PsiElement =
       anchorForNewDeclaration(expression, occurrencesToReplace, aClass)
     if (checkAnchor == null) {
-      showErrorMessage("Cannot find place for the new field",
-                       ifc.project,
-                       ifc.editor)
+      showErrorMessage(
+        "Cannot find place for the new field",
+        ifc.project,
+        ifc.editor)
       return
     }
     val manager = aClass.getManager
@@ -264,10 +269,11 @@ class ScalaIntroduceFieldFromExpressionHandler
   private def showErrorMessage(text: String,
                                project: Project,
                                editor: Editor) = {
-    CommonRefactoringUtil.showErrorHint(project,
-                                        editor,
-                                        text,
-                                        REFACTORING_NAME,
-                                        HelpID.INTRODUCE_FIELD)
+    CommonRefactoringUtil.showErrorHint(
+      project,
+      editor,
+      text,
+      REFACTORING_NAME,
+      HelpID.INTRODUCE_FIELD)
   }
 }

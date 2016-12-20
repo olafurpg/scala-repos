@@ -44,8 +44,9 @@ class EvalTest extends WordSpec {
       val processedSource = e.sourceForString(
         Source.fromFile(sourceFile).getLines().mkString("\n"))
       val fullClassName =
-        "Evaluator__%s_%s.class".format(className,
-                                        e.uniqueId(processedSource, None))
+        "Evaluator__%s_%s.class".format(
+          className,
+          e.uniqueId(processedSource, None))
       val targetFileName = f.getAbsolutePath() + File.separator + fullClassName
       val targetFile = new File(targetFileName)
       assert(targetFile.exists)
@@ -65,8 +66,9 @@ class EvalTest extends WordSpec {
       val processedSource = e.sourceForString(
         Source.fromFile(sourceFile).getLines().mkString("\n"))
       val fullClassName =
-        "Evaluator__%s_%s.class".format(className,
-                                        e.uniqueId(processedSource, None))
+        "Evaluator__%s_%s.class".format(
+          className,
+          e.uniqueId(processedSource, None))
       val targetFileName = f.getAbsolutePath() + File.separator + fullClassName
       val targetFile = new File(targetFileName)
       assert(targetFile.exists)
@@ -142,8 +144,9 @@ class EvalTest extends WordSpec {
 
     "recursive #include" in {
       val derived =
-        Eval[() => String](TempFile.fromResourcePath("/Base.scala"),
-                           TempFile.fromResourcePath("/IncludeInclude.scala"))
+        Eval[() => String](
+          TempFile.fromResourcePath("/Base.scala"),
+          TempFile.fromResourcePath("/IncludeInclude.scala"))
       assert(derived() == "hello")
       assert(derived.toString == "hello, joe; hello, joe")
     }

@@ -57,9 +57,10 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
         altName(index) #::
           ((0 until alts.length).toStream filter (index != _) map altName)
       case tpe =>
-        assert(tpe != NoType,
-               imeth.name + " not found in " + imeth.owner + "'s decls: " +
-                 imeth.owner.info.decls)
+        assert(
+          tpe != NoType,
+          imeth.name + " not found in " + imeth.owner + "'s decls: " +
+            imeth.owner.info.decls)
         Stream(newTermName(imeth.name + "$extension"))
     }
   }
@@ -78,8 +79,9 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
       val matching =
         candidates filter
           (alt => normalize(alt.tpe, imeth.owner) matches imeth.tpe)
-      assert(matching.nonEmpty,
-             sm"""|no extension method found for:
+      assert(
+        matching.nonEmpty,
+        sm"""|no extension method found for:
            |
            |  $imeth:${imeth.tpe}
            |
@@ -90,8 +92,8 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
            | Candidates (signatures normalized):
            |
            | ${candidates
-               .map(c => c.name + ":" + normalize(c.tpe, imeth.owner))
-               .mkString("\n")}
+          .map(c => c.name + ":" + normalize(c.tpe, imeth.owner))
+          .mkString("\n")}
            |
            | Eligible Names: ${extensionNames(imeth).mkString(",")}" """)
       matching.head
@@ -254,8 +256,9 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
           log(
             s"Value class $origThis spawns extension method.\n  Old: ${origMeth.defString}\n  New: ${extensionMeth.defString}")
 
-          val GenPolyType(extensionTpeParams,
-                          MethodType(thiz :: Nil, extensionMono)) = newInfo
+          val GenPolyType(
+            extensionTpeParams,
+            MethodType(thiz :: Nil, extensionMono)) = newInfo
           val extensionParams = allParameters(extensionMono)
           val extensionThis =
             gen.mkAttributedStableRef(thiz setPos extensionMeth.pos)

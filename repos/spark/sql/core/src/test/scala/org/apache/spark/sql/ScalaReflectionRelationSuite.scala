@@ -73,18 +73,19 @@ class ScalaReflectionRelationSuite
   import testImplicits._
 
   test("query case class RDD") {
-    val data = ReflectData("a",
-                           1,
-                           1L,
-                           1.toFloat,
-                           1.toDouble,
-                           1.toShort,
-                           1.toByte,
-                           true,
-                           new java.math.BigDecimal(1),
-                           Date.valueOf("1970-01-01"),
-                           new Timestamp(12345),
-                           Seq(1, 2, 3))
+    val data = ReflectData(
+      "a",
+      1,
+      1L,
+      1.toFloat,
+      1.toDouble,
+      1.toShort,
+      1.toByte,
+      true,
+      new java.math.BigDecimal(1),
+      Date.valueOf("1970-01-01"),
+      new Timestamp(12345),
+      Seq(1, 2, 3))
     Seq(data).toDF().registerTempTable("reflectData")
 
     assert(
@@ -140,11 +141,12 @@ class ScalaReflectionRelationSuite
       Seq(Some(1), Some(2), None),
       Map(1 -> 10L, 2 -> 20L),
       Map(1 -> Some(10L), 2 -> Some(20L), 3 -> None),
-      Data(Seq(10, 20, 30),
-           Seq(Some(10), Some(20), None),
-           Map(10 -> 100L, 20 -> 200L),
-           Map(10 -> Some(100L), 20 -> Some(200L), 30 -> None),
-           Nested(None, "abc")))
+      Data(
+        Seq(10, 20, 30),
+        Seq(Some(10), Some(20), None),
+        Map(10 -> 100L, 20 -> 200L),
+        Map(10 -> Some(100L), 20 -> Some(200L), 30 -> None),
+        Nested(None, "abc")))
 
     Seq(data).toDF().registerTempTable("reflectComplexData")
     assert(
@@ -153,10 +155,11 @@ class ScalaReflectionRelationSuite
         Seq(1, 2, null),
         Map(1 -> 10L, 2 -> 20L),
         Map(1 -> 10L, 2 -> 20L, 3 -> null),
-        Row(Seq(10, 20, 30),
-            Seq(10, 20, null),
-            Map(10 -> 100L, 20 -> 200L),
-            Map(10 -> 100L, 20 -> 200L, 30 -> null),
-            Row(null, "abc"))))
+        Row(
+          Seq(10, 20, 30),
+          Seq(10, 20, null),
+          Map(10 -> 100L, 20 -> 200L),
+          Map(10 -> 100L, 20 -> 200L, 30 -> null),
+          Row(null, "abc"))))
   }
 }

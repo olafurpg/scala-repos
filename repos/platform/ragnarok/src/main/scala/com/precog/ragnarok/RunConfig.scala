@@ -130,8 +130,9 @@ object RunConfig {
         config *> "The argument to --outliers must be a real number in [0, 0.5)".failureNel)
 
     case "--root-dir" :: rootDir :: args =>
-      fromCommandLine(args,
-                      config map (_.copy(rootDir = Some(new File(rootDir)))))
+      fromCommandLine(
+        args,
+        config map (_.copy(rootDir = Some(new File(rootDir)))))
 
     case "--ingest" :: db :: file :: args =>
       fromCommandLine(args, config map { cfg =>

@@ -42,9 +42,10 @@ private[sql] class ResolveDataSource(sqlContext: SQLContext)
   def apply(plan: LogicalPlan): LogicalPlan = plan resolveOperators {
     case u: UnresolvedRelation if u.tableIdentifier.database.isDefined =>
       try {
-        val dataSource = DataSource(sqlContext,
-                                    paths = u.tableIdentifier.table :: Nil,
-                                    className = u.tableIdentifier.database.get)
+        val dataSource = DataSource(
+          sqlContext,
+          paths = u.tableIdentifier.table :: Nil,
+          className = u.tableIdentifier.database.get)
         val plan = LogicalRelation(dataSource.resolveRelation())
         u.alias.map(a => SubqueryAlias(u.alias.get, plan)).getOrElse(plan)
       } catch {
@@ -67,14 +68,15 @@ private[sql] object PreInsertCastAndRename extends Rule[LogicalPlan] {
     case p: LogicalPlan if !p.childrenResolved => p
 
     // We are inserting into an InsertableRelation or HadoopFsRelation.
-    case i @ InsertIntoTable(l @ LogicalRelation(_: InsertableRelation |
-                                                 _: HadoopFsRelation,
-                                                 _,
-                                                 _),
-                             _,
-                             child,
-                             _,
-                             _) =>
+    case i @ InsertIntoTable(
+          l @ LogicalRelation(
+            _: InsertableRelation | _: HadoopFsRelation,
+            _,
+            _),
+          _,
+          child,
+          _,
+          _) =>
       // First, make sure the data to be inserted have the same number of fields with the
       // schema of the relation.
       if (l.output.size != child.output.size) {
@@ -143,11 +145,12 @@ private[sql] case class PreWriteCheck(catalog: Catalog)
           }
         }
 
-      case logical.InsertIntoTable(LogicalRelation(r: HadoopFsRelation, _, _),
-                                   part,
-                                   query,
-                                   overwrite,
-                                   _) =>
+      case logical.InsertIntoTable(
+          LogicalRelation(r: HadoopFsRelation, _, _),
+          part,
+          query,
+          overwrite,
+          _) =>
         // We need to make sure the partition columns specified by users do match partition
         // columns of the relation.
         val existingPartitionColumns = r.partitionSchema.fieldNames.toSet

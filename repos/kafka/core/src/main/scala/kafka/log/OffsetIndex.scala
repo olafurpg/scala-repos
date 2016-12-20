@@ -102,12 +102,13 @@ class OffsetIndex(@volatile var file: File,
 
   debug(
     "Loaded index file %s with maxEntries = %d, maxIndexSize = %d, entries = %d, lastOffset = %d, file position = %d"
-      .format(file.getAbsolutePath,
-              maxEntries,
-              maxIndexSize,
-              entries(),
-              lastOffset,
-              mmap.position))
+      .format(
+        file.getAbsolutePath,
+        maxEntries,
+        maxIndexSize,
+        entries(),
+        lastOffset,
+        mmap.position))
 
   /**
     * The last entry in the index
@@ -117,8 +118,9 @@ class OffsetIndex(@volatile var file: File,
       size.get match {
         case 0 => OffsetPosition(baseOffset, 0)
         case s =>
-          OffsetPosition(baseOffset + relativeOffset(this.mmap, s - 1),
-                         physical(this.mmap, s - 1))
+          OffsetPosition(
+            baseOffset + relativeOffset(this.mmap, s - 1),
+            physical(this.mmap, s - 1))
       }
     }
   }
@@ -139,8 +141,9 @@ class OffsetIndex(@volatile var file: File,
       val slot = indexSlotFor(idx, targetOffset)
       if (slot == -1) OffsetPosition(baseOffset, 0)
       else
-        OffsetPosition(baseOffset + relativeOffset(idx, slot),
-                       physical(idx, slot))
+        OffsetPosition(
+          baseOffset + relativeOffset(idx, slot),
+          physical(idx, slot))
     }
   }
 
@@ -205,8 +208,9 @@ class OffsetIndex(@volatile var file: File,
     */
   def append(offset: Long, position: Int) {
     inLock(lock) {
-      require(!isFull,
-              "Attempt to append to a full index (size = " + size + ").")
+      require(
+        !isFull,
+        "Attempt to append to a full index (size = " + size + ").")
       if (size.get == 0 || offset > lastOffset) {
         debug(
           "Adding index entry %d => %d to %s."
@@ -215,9 +219,10 @@ class OffsetIndex(@volatile var file: File,
         this.mmap.putInt(position)
         this.size.incrementAndGet()
         this.lastOffset = offset
-        require(entries * 8 == mmap.position,
-                entries + " entries but file position in index is " +
-                  mmap.position + ".")
+        require(
+          entries * 8 == mmap.position,
+          entries + " entries but file position in index is " +
+            mmap.position + ".")
       } else {
         throw new InvalidOffsetException(
           "Attempt to append an offset (%d) to position %d no larger than the last offset appended (%d) to %s."
@@ -370,9 +375,10 @@ class OffsetIndex(@volatile var file: File,
       "Corrupt index found, index file (%s) has non-zero size but the last offset is %d and the base offset is %d"
         .format(file.getAbsolutePath, lastOffset, baseOffset))
     val len = file.length()
-    require(len % 8 == 0,
-            "Index file " + file.getName + " is corrupt, found " + len +
-              " bytes which is not positive or not a multiple of 8.")
+    require(
+      len % 8 == 0,
+      "Index file " + file.getName + " is corrupt, found " + len +
+        " bytes which is not positive or not a multiple of 8.")
   }
 
   /**

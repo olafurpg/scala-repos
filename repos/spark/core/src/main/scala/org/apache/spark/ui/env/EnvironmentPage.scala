@@ -28,22 +28,26 @@ private[ui] class EnvironmentPage(parent: EnvironmentTab)
   private val listener = parent.listener
 
   def render(request: HttpServletRequest): Seq[Node] = {
-    val runtimeInformationTable = UIUtils.listingTable(propertyHeader,
-                                                       jvmRow,
-                                                       listener.jvmInformation,
-                                                       fixedWidth = true)
-    val sparkPropertiesTable = UIUtils.listingTable(propertyHeader,
-                                                    propertyRow,
-                                                    listener.sparkProperties,
-                                                    fixedWidth = true)
-    val systemPropertiesTable = UIUtils.listingTable(propertyHeader,
-                                                     propertyRow,
-                                                     listener.systemProperties,
-                                                     fixedWidth = true)
-    val classpathEntriesTable = UIUtils.listingTable(classPathHeaders,
-                                                     classPathRow,
-                                                     listener.classpathEntries,
-                                                     fixedWidth = true)
+    val runtimeInformationTable = UIUtils.listingTable(
+      propertyHeader,
+      jvmRow,
+      listener.jvmInformation,
+      fixedWidth = true)
+    val sparkPropertiesTable = UIUtils.listingTable(
+      propertyHeader,
+      propertyRow,
+      listener.sparkProperties,
+      fixedWidth = true)
+    val systemPropertiesTable = UIUtils.listingTable(
+      propertyHeader,
+      propertyRow,
+      listener.systemProperties,
+      fixedWidth = true)
+    val classpathEntriesTable = UIUtils.listingTable(
+      classPathHeaders,
+      classPathRow,
+      listener.classpathEntries,
+      fixedWidth = true)
     val content = <span>
         <h4>Runtime Information</h4> {runtimeInformationTable}
         <h4>Spark Properties</h4> {sparkPropertiesTable}

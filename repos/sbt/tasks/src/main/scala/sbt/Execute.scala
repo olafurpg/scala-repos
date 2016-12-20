@@ -376,10 +376,10 @@ private[sbt] final class Execute[A[_] <: AnyRef](
     if (all contains target) cyclic(node, target, "Cyclic reference")
   }
   def cyclic[T](caller: A[T], target: A[T], msg: String) =
-    throw new Incomplete(Some(caller),
-                         message = Some(msg),
-                         directCause =
-                           Some(new CyclicException(caller, target, msg)))
+    throw new Incomplete(
+      Some(caller),
+      message = Some(msg),
+      directCause = Some(new CyclicException(caller, target, msg)))
   final class CyclicException[T](val caller: A[T],
                                  val target: A[T],
                                  msg: String)

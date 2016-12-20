@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -40,7 +40,8 @@ import scalaz.syntax.comonad._
 import scalaz.syntax.monad._
 
 trait MergeSpec[M[+ _]]
-    extends ColumnarTableModuleTestSupport[M] with TableModuleSpec[M]
+    extends ColumnarTableModuleTestSupport[M]
+    with TableModuleSpec[M]
     with IndicesModule[M] {
 
   type GroupId = Int
@@ -89,7 +90,7 @@ trait MergeSpec[M[+ _]]
         | {"key":[5908438637678328473],"value":{"a":3,"b":7}}
         | """.stripMargin
       val foo = fromJson(
-          JParser.parseManyFromString(fooJson).valueOr(throw _).toStream)
+        JParser.parseManyFromString(fooJson).valueOr(throw _).toStream)
 
       val barJson =
         """
@@ -101,7 +102,7 @@ trait MergeSpec[M[+ _]]
         | {"key":[5908438637678328581],"value":{"a":0,"c":13,"b":-1}}
         | """.stripMargin
       val bar = fromJson(
-          JParser.parseManyFromString(barJson).valueOr(throw _).toStream)
+        JParser.parseManyFromString(barJson).valueOr(throw _).toStream)
 
       val resultJson0 =
         """
@@ -123,52 +124,52 @@ trait MergeSpec[M[+ _]]
       val twoField = CPathField("2")
 
       val grouping = GroupingAlignment(
-          TransSpec1.Id,
-          TransSpec1.Id,
-          GroupingSource(
-              bar,
-              DerefObjectStatic(Leaf(Source), keyField),
-              Some(InnerObjectConcat(
-                      ObjectDelete(Leaf(Source), Set(valueField)),
-                      WrapObject(DerefObjectStatic(DerefObjectStatic(Leaf(
-                                                                         Source),
-                                                                     valueField),
-                                                   cField),
-                                 "value"))),
-              0,
-              GroupKeySpecOr(
-                  GroupKeySpecSource(
-                      oneField,
-                      DerefObjectStatic(DerefObjectStatic(Leaf(Source),
-                                                          valueField),
-                                        aField)),
-                  GroupKeySpecSource(
-                      twoField,
-                      DerefObjectStatic(DerefObjectStatic(Leaf(Source),
-                                                          valueField),
-                                        bField)))
-          ),
-          GroupingSource(
-              foo,
-              DerefObjectStatic(Leaf(Source), keyField),
-              Some(InnerObjectConcat(
-                      ObjectDelete(Leaf(Source), Set(valueField)),
-                      WrapObject(DerefObjectStatic(Leaf(Source), valueField),
-                                 "value"))),
-              3,
-              GroupKeySpecAnd(
-                  GroupKeySpecSource(
-                      oneField,
-                      DerefObjectStatic(DerefObjectStatic(Leaf(Source),
-                                                          valueField),
-                                        aField)),
-                  GroupKeySpecSource(
-                      twoField,
-                      DerefObjectStatic(DerefObjectStatic(Leaf(Source),
-                                                          valueField),
-                                        bField)))
-          ),
-          GroupingSpec.Intersection)
+        TransSpec1.Id,
+        TransSpec1.Id,
+        GroupingSource(
+          bar,
+          DerefObjectStatic(Leaf(Source), keyField),
+          Some(
+            InnerObjectConcat(
+              ObjectDelete(Leaf(Source), Set(valueField)),
+              WrapObject(
+                DerefObjectStatic(
+                  DerefObjectStatic(Leaf(Source), valueField),
+                  cField),
+                "value"))),
+          0,
+          GroupKeySpecOr(
+            GroupKeySpecSource(
+              oneField,
+              DerefObjectStatic(
+                DerefObjectStatic(Leaf(Source), valueField),
+                aField)),
+            GroupKeySpecSource(
+              twoField,
+              DerefObjectStatic(
+                DerefObjectStatic(Leaf(Source), valueField),
+                bField)))
+        ),
+        GroupingSource(
+          foo,
+          DerefObjectStatic(Leaf(Source), keyField),
+          Some(InnerObjectConcat(
+            ObjectDelete(Leaf(Source), Set(valueField)),
+            WrapObject(DerefObjectStatic(Leaf(Source), valueField), "value"))),
+          3,
+          GroupKeySpecAnd(
+            GroupKeySpecSource(
+              oneField,
+              DerefObjectStatic(
+                DerefObjectStatic(Leaf(Source), valueField),
+                aField)),
+            GroupKeySpecSource(
+              twoField,
+              DerefObjectStatic(
+                DerefObjectStatic(Leaf(Source), valueField),
+                bField)))
+        ),
+        GroupingSpec.Intersection)
 
       def evaluator(key: RValue, partition: GroupId => M[Table]) = {
         val K0 = RValue.fromJValue(JParser.parseUnsafe("""{"1":0,"2":4}"""))
@@ -195,43 +196,43 @@ trait MergeSpec[M[+ _]]
           | """.stripMargin
 
         val r0 = fromJson(
-            JParser.parseManyFromString(r0Json).valueOr(throw _).toStream)
+          JParser.parseManyFromString(r0Json).valueOr(throw _).toStream)
         val r1 = fromJson(
-            JParser.parseManyFromString(r1Json).valueOr(throw _).toStream)
+          JParser.parseManyFromString(r1Json).valueOr(throw _).toStream)
         val r2 = fromJson(
-            JParser.parseManyFromString(r2Json).valueOr(throw _).toStream)
+          JParser.parseManyFromString(r2Json).valueOr(throw _).toStream)
         val r3 = fromJson(
-            JParser.parseManyFromString(r3Json).valueOr(throw _).toStream)
+          JParser.parseManyFromString(r3Json).valueOr(throw _).toStream)
 
         (key match {
           case K0 => {
-              //println("key: "+keyJson+" partition(0):")
-              //partition(0).flatMap(_.toJson).copoint.foreach(println)
-              //println("key: "+keyJson+" partition(3):")
-              //partition(3).flatMap(_.toJson).copoint.foreach(println)
-              r0
-            }
+            //println("key: "+keyJson+" partition(0):")
+            //partition(0).flatMap(_.toJson).copoint.foreach(println)
+            //println("key: "+keyJson+" partition(3):")
+            //partition(3).flatMap(_.toJson).copoint.foreach(println)
+            r0
+          }
           case K1 => {
-              //println("key: "+keyJson+" partition(0):")
-              //partition(0).flatMap(_.toJson).copoint.foreach(println)
-              //println("key: "+keyJson+" partition(3):")
-              //partition(3).flatMap(_.toJson).copoint.foreach(println)
-              r1
-            }
+            //println("key: "+keyJson+" partition(0):")
+            //partition(0).flatMap(_.toJson).copoint.foreach(println)
+            //println("key: "+keyJson+" partition(3):")
+            //partition(3).flatMap(_.toJson).copoint.foreach(println)
+            r1
+          }
           case K2 => {
-              //println("key: "+keyJson+" partition(0):")
-              //partition(0).flatMap(_.toJson).copoint.foreach(println)
-              //println("key: "+keyJson+" partition(3):")
-              //partition(3).flatMap(_.toJson).copoint.foreach(println)
-              r2
-            }
+            //println("key: "+keyJson+" partition(0):")
+            //partition(0).flatMap(_.toJson).copoint.foreach(println)
+            //println("key: "+keyJson+" partition(3):")
+            //partition(3).flatMap(_.toJson).copoint.foreach(println)
+            r2
+          }
           case K3 => {
-              //println("key: "+keyJson+" partition(0):")
-              //partition(0).flatMap(_.toJson).copoint.foreach(println)
-              //println("key: "+keyJson+" partition(3):")
-              //partition(3).flatMap(_.toJson).copoint.foreach(println)
-              r3
-            }
+            //println("key: "+keyJson+" partition(0):")
+            //partition(0).flatMap(_.toJson).copoint.foreach(println)
+            //println("key: "+keyJson+" partition(3):")
+            //partition(3).flatMap(_.toJson).copoint.foreach(println)
+            r3
+          }
           case _ => sys.error("Unexpected group key")
         }).point[M]
       }
@@ -255,7 +256,7 @@ trait MergeSpec[M[+ _]]
         | {"key":[5908438637678314380],"value":{"Edition":"2008","Gender":"Women"}}
         | """.stripMargin
       val medals = fromJson(
-          JParser.parseManyFromString(medalsJson).valueOr(throw _).toStream)
+        JParser.parseManyFromString(medalsJson).valueOr(throw _).toStream)
 
       val resultJson0 =
         """
@@ -276,85 +277,87 @@ trait MergeSpec[M[+ _]]
       val oneField = CPathField("1")
 
       val grouping = GroupingAlignment(
-          TransSpec1.Id,
-          TransSpec1.Id,
-          GroupingSource(
-              medals,
-              DerefObjectStatic(Leaf(Source), keyField),
-              Some(InnerObjectConcat(
-                      ObjectDelete(Leaf(Source), Set(valueField)),
-                      WrapObject(DerefObjectStatic(DerefObjectStatic(Leaf(
-                                                                         Source),
-                                                                     valueField),
-                                                   genderField),
-                                 "value"))),
-              0,
-              GroupKeySpecAnd(
-                  GroupKeySpecSource(
-                      extra0Field,
-                      Filter(
-                          EqualLiteral(
-                              DerefObjectStatic(DerefObjectStatic(Leaf(Source),
-                                                                  valueField),
-                                                genderField),
-                              CString("Men"),
-                              false),
-                          EqualLiteral(DerefObjectStatic(
-                                           DerefObjectStatic(
-                                               Leaf(Source), valueField),
-                                           genderField),
-                                       CString("Men"),
-                                       false))),
-                  GroupKeySpecSource(
-                      oneField,
-                      DerefObjectStatic(DerefObjectStatic(Leaf(Source),
-                                                          valueField),
-                                        editionField)))
-          ),
-          GroupingSource(
-              medals,
-              DerefObjectStatic(Leaf(Source), keyField),
-              Some(InnerObjectConcat(
-                      ObjectDelete(Leaf(Source), Set(valueField)),
-                      WrapObject(
-                          DerefObjectStatic(DerefObjectStatic(Leaf(Source),
-                                                              valueField),
-                                            genderField),
-                          "value"))),
-              2,
-              GroupKeySpecAnd(
-                  GroupKeySpecSource(
-                      extra1Field,
-                      Filter(
-                          EqualLiteral(
-                              DerefObjectStatic(DerefObjectStatic(Leaf(Source),
-                                                                  valueField),
-                                                genderField),
-                              CString("Women"),
-                              false),
-                          EqualLiteral(DerefObjectStatic(
-                                           DerefObjectStatic(
-                                               Leaf(Source), valueField),
-                                           genderField),
-                                       CString("Women"),
-                                       false))),
-                  GroupKeySpecSource(
-                      oneField,
-                      DerefObjectStatic(DerefObjectStatic(Leaf(Source),
-                                                          valueField),
-                                        editionField)))
-          ),
-          GroupingSpec.Intersection)
+        TransSpec1.Id,
+        TransSpec1.Id,
+        GroupingSource(
+          medals,
+          DerefObjectStatic(Leaf(Source), keyField),
+          Some(
+            InnerObjectConcat(
+              ObjectDelete(Leaf(Source), Set(valueField)),
+              WrapObject(
+                DerefObjectStatic(
+                  DerefObjectStatic(Leaf(Source), valueField),
+                  genderField),
+                "value"))),
+          0,
+          GroupKeySpecAnd(
+            GroupKeySpecSource(
+              extra0Field,
+              Filter(
+                EqualLiteral(
+                  DerefObjectStatic(
+                    DerefObjectStatic(Leaf(Source), valueField),
+                    genderField),
+                  CString("Men"),
+                  false),
+                EqualLiteral(
+                  DerefObjectStatic(
+                    DerefObjectStatic(Leaf(Source), valueField),
+                    genderField),
+                  CString("Men"),
+                  false))),
+            GroupKeySpecSource(
+              oneField,
+              DerefObjectStatic(
+                DerefObjectStatic(Leaf(Source), valueField),
+                editionField)))
+        ),
+        GroupingSource(
+          medals,
+          DerefObjectStatic(Leaf(Source), keyField),
+          Some(
+            InnerObjectConcat(
+              ObjectDelete(Leaf(Source), Set(valueField)),
+              WrapObject(
+                DerefObjectStatic(
+                  DerefObjectStatic(Leaf(Source), valueField),
+                  genderField),
+                "value"))),
+          2,
+          GroupKeySpecAnd(
+            GroupKeySpecSource(
+              extra1Field,
+              Filter(
+                EqualLiteral(
+                  DerefObjectStatic(
+                    DerefObjectStatic(Leaf(Source), valueField),
+                    genderField),
+                  CString("Women"),
+                  false),
+                EqualLiteral(
+                  DerefObjectStatic(
+                    DerefObjectStatic(Leaf(Source), valueField),
+                    genderField),
+                  CString("Women"),
+                  false))),
+            GroupKeySpecSource(
+              oneField,
+              DerefObjectStatic(
+                DerefObjectStatic(Leaf(Source), valueField),
+                editionField)))
+        ),
+        GroupingSpec.Intersection)
 
       def evaluator(key: RValue, partition: GroupId => M[Table]) = {
-        val K0 = RValue.fromJValue(JParser.parseUnsafe(
-                """{"1":"1996","extra0":true,"extra1":true}"""))
-        val K1 = RValue.fromJValue(JParser.parseUnsafe(
-                """{"1":"2000","extra0":true,"extra1":true}"""))
-        val K2 = RValue.fromJValue(JParser.parseUnsafe(
-                """{"1":"2004","extra0":true,"extra1":true}"""))
-        val K3 = RValue.fromJValue(JParser.parseUnsafe(
-                """{"1":"2008","extra0":true,"extra1":true}"""))
+        val K0 = RValue.fromJValue(
+          JParser.parseUnsafe("""{"1":"1996","extra0":true,"extra1":true}"""))
+        val K1 = RValue.fromJValue(
+          JParser.parseUnsafe("""{"1":"2000","extra0":true,"extra1":true}"""))
+        val K2 = RValue.fromJValue(
+          JParser.parseUnsafe("""{"1":"2004","extra0":true,"extra1":true}"""))
+        val K3 = RValue.fromJValue(
+          JParser.parseUnsafe("""{"1":"2008","extra0":true,"extra1":true}"""))
 
         val r0Json = """
           | {"key":[],"value":{"year":"1996","ratio":139.0}}
@@ -370,43 +373,43 @@ trait MergeSpec[M[+ _]]
           | """.stripMargin
 
         val r0 = fromJson(
-            JParser.parseManyFromString(r0Json).valueOr(throw _).toStream)
+          JParser.parseManyFromString(r0Json).valueOr(throw _).toStream)
         val r1 = fromJson(
-            JParser.parseManyFromString(r1Json).valueOr(throw _).toStream)
+          JParser.parseManyFromString(r1Json).valueOr(throw _).toStream)
         val r2 = fromJson(
-            JParser.parseManyFromString(r2Json).valueOr(throw _).toStream)
+          JParser.parseManyFromString(r2Json).valueOr(throw _).toStream)
         val r3 = fromJson(
-            JParser.parseManyFromString(r3Json).valueOr(throw _).toStream)
+          JParser.parseManyFromString(r3Json).valueOr(throw _).toStream)
 
         (key match {
           case K0 => {
-              //println("key: "+keyJson+" partition(0):")
-              //partition(0).flatMap(_.toJson).copoint.foreach(println)
-              //println("key: "+keyJson+" partition(2):")
-              //partition(2).flatMap(_.toJson).copoint.foreach(println)
-              r0
-            }
+            //println("key: "+keyJson+" partition(0):")
+            //partition(0).flatMap(_.toJson).copoint.foreach(println)
+            //println("key: "+keyJson+" partition(2):")
+            //partition(2).flatMap(_.toJson).copoint.foreach(println)
+            r0
+          }
           case K1 => {
-              //println("key: "+keyJson+" partition(0):")
-              //partition(0).flatMap(_.toJson).copoint.foreach(println)
-              //println("key: "+keyJson+" partition(2):")
-              //partition(2).flatMap(_.toJson).copoint.foreach(println)
-              r1
-            }
+            //println("key: "+keyJson+" partition(0):")
+            //partition(0).flatMap(_.toJson).copoint.foreach(println)
+            //println("key: "+keyJson+" partition(2):")
+            //partition(2).flatMap(_.toJson).copoint.foreach(println)
+            r1
+          }
           case K2 => {
-              //println("key: "+keyJson+" partition(0):")
-              //partition(0).flatMap(_.toJson).copoint.foreach(println)
-              //println("key: "+keyJson+" partition(2):")
-              //partition(2).flatMap(_.toJson).copoint.foreach(println)
-              r2
-            }
+            //println("key: "+keyJson+" partition(0):")
+            //partition(0).flatMap(_.toJson).copoint.foreach(println)
+            //println("key: "+keyJson+" partition(2):")
+            //partition(2).flatMap(_.toJson).copoint.foreach(println)
+            r2
+          }
           case K3 => {
-              //println("key: "+keyJson+" partition(0):")
-              //partition(0).flatMap(_.toJson).copoint.foreach(println)
-              //println("key: "+keyJson+" partition(3):")
-              //partition(3).flatMap(_.toJson).copoint.foreach(println)
-              r3
-            }
+            //println("key: "+keyJson+" partition(0):")
+            //partition(0).flatMap(_.toJson).copoint.foreach(println)
+            //println("key: "+keyJson+" partition(3):")
+            //partition(3).flatMap(_.toJson).copoint.foreach(println)
+            r3
+          }
           case _ => sys.error("Unexpected group key")
         }).point[M]
       }

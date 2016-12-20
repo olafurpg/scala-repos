@@ -73,83 +73,91 @@ object MediaType {
   def applicationBinary(subType: String,
                         comp: Compressibility,
                         fileExtensions: String*): Binary =
-    new Binary("application/" + subType,
-               "application",
-               subType,
-               comp,
-               fileExtensions.toList) {
+    new Binary(
+      "application/" + subType,
+      "application",
+      subType,
+      comp,
+      fileExtensions.toList) {
       override def isApplication = true
     }
 
   def applicationWithFixedCharset(subType: String,
                                   charset: HttpCharset,
                                   fileExtensions: String*): WithFixedCharset =
-    new WithFixedCharset("application/" + subType,
-                         "application",
-                         subType,
-                         charset,
-                         fileExtensions.toList) {
+    new WithFixedCharset(
+      "application/" + subType,
+      "application",
+      subType,
+      charset,
+      fileExtensions.toList) {
       override def isApplication = true
     }
 
   def applicationWithOpenCharset(subType: String,
                                  fileExtensions: String*): WithOpenCharset =
-    new NonMultipartWithOpenCharset("application/" + subType,
-                                    "application",
-                                    subType,
-                                    fileExtensions.toList) {
+    new NonMultipartWithOpenCharset(
+      "application/" + subType,
+      "application",
+      subType,
+      fileExtensions.toList) {
       override def isApplication = true
     }
 
   def audio(subType: String,
             comp: Compressibility,
             fileExtensions: String*): Binary =
-    new Binary("audio/" + subType,
-               "audio",
-               subType,
-               comp,
-               fileExtensions.toList) {
+    new Binary(
+      "audio/" + subType,
+      "audio",
+      subType,
+      comp,
+      fileExtensions.toList) {
       override def isAudio = true
     }
 
   def image(subType: String,
             comp: Compressibility,
             fileExtensions: String*): Binary =
-    new Binary("image/" + subType,
-               "image",
-               subType,
-               comp,
-               fileExtensions.toList) {
+    new Binary(
+      "image/" + subType,
+      "image",
+      subType,
+      comp,
+      fileExtensions.toList) {
       override def isImage = true
     }
 
   def message(subType: String,
               comp: Compressibility,
               fileExtensions: String*): Binary =
-    new Binary("message/" + subType,
-               "message",
-               subType,
-               comp,
-               fileExtensions.toList) {
+    new Binary(
+      "message/" + subType,
+      "message",
+      subType,
+      comp,
+      fileExtensions.toList) {
       override def isMessage = true
     }
 
   def text(subType: String, fileExtensions: String*): WithOpenCharset =
-    new NonMultipartWithOpenCharset("text/" + subType,
-                                    "text",
-                                    subType,
-                                    fileExtensions.toList) {
+    new NonMultipartWithOpenCharset(
+      "text/" + subType,
+      "text",
+      subType,
+      fileExtensions.toList) {
       override def isText = true
     }
 
   def video(subType: String,
             comp: Compressibility,
             fileExtensions: String*): Binary =
-    new Binary("video/" + subType,
-               "video",
-               subType,
-               comp,
-               fileExtensions.toList) {
+    new Binary(
+      "video/" + subType,
+      "video",
+      subType,
+      comp,
+      fileExtensions.toList) {
       override def isVideo = true
     }
 
@@ -166,11 +174,12 @@ object MediaType {
       allowArbitrarySubtypes || subType != "*",
       "Cannot create a MediaRange here, use `MediaRange.custom` instead!")
     val _params = params
-    new Binary(renderValue(mainType, subType, params),
-               mainType,
-               subType,
-               comp,
-               fileExtensions) {
+    new Binary(
+      renderValue(mainType, subType, params),
+      mainType,
+      subType,
+      comp,
+      fileExtensions) {
       override def params = _params
       override def isApplication = mainType == "application"
       override def isAudio = mainType == "audio"
@@ -195,11 +204,12 @@ object MediaType {
       allowArbitrarySubtypes || subType != "*",
       "Cannot create a MediaRange here, use `MediaRange.custom` instead!")
     val _params = params
-    new WithFixedCharset(renderValue(mainType, subType, params),
-                         mainType,
-                         subType,
-                         charset,
-                         fileExtensions) {
+    new WithFixedCharset(
+      renderValue(mainType, subType, params),
+      mainType,
+      subType,
+      charset,
+      fileExtensions) {
       override def params = _params
       override def isApplication = mainType == "application"
       override def isAudio = mainType == "audio"
@@ -223,10 +233,11 @@ object MediaType {
       allowArbitrarySubtypes || subType != "*",
       "Cannot create a MediaRange here, use `MediaRange.custom` instead!")
     val _params = params
-    new NonMultipartWithOpenCharset(renderValue(mainType, subType, params),
-                                    mainType,
-                                    subType,
-                                    fileExtensions) {
+    new NonMultipartWithOpenCharset(
+      renderValue(mainType, subType, params),
+      mainType,
+      subType,
+      fileExtensions) {
       override def params = _params
       override def isApplication = mainType == "application"
       override def isAudio = mainType == "audio"
@@ -316,11 +327,12 @@ object MediaType {
     def params: Map[String, String] = Map.empty
     def withParams(
         params: Map[String, String]): WithFixedCharset with MediaType =
-      customWithFixedCharset(mainType,
-                             subType,
-                             charset,
-                             fileExtensions,
-                             params)
+      customWithFixedCharset(
+        mainType,
+        subType,
+        charset,
+        fileExtensions,
+        params)
 
     /**
       * JAVA API

@@ -44,6 +44,7 @@ object DetectLanguage {
 
   import com.typesafe.config.Config
   def apply(config: Config): DetectLanguage =
-    new DetectLanguage(url = config getString "api.url",
-                       key = config getString "api.key")
+    new DetectLanguage(
+      url = config getString "api.url",
+      key = config getString "api.key")
 }

@@ -44,8 +44,9 @@ object AdaptiveLoadBalancingRouterConfig extends MultiNodeConfig {
         val allocateBytes = (0.7 * (max - used)).toInt
         val numberOfArrays = allocateBytes / 1024
         usedMemory = Array.ofDim(numberOfArrays, 248) // each 248 element Int array will use ~ 1 kB
-        log.info("used heap after: [{}] bytes",
-                 ManagementFactory.getMemoryMXBean.getHeapMemoryUsage.getUsed)
+        log.info(
+          "used heap after: [{}] bytes",
+          ManagementFactory.getMemoryMXBean.getHeapMemoryUsage.getUsed)
         sender() ! "done"
     }
   }
@@ -157,12 +158,13 @@ abstract class AdaptiveLoadBalancingRouterSpec
 
   def startRouter(name: String): ActorRef = {
     val router = system.actorOf(
-      ClusterRouterPool(local = AdaptiveLoadBalancingPool(HeapMetricsSelector),
-                        settings = ClusterRouterPoolSettings(
-                          totalInstances = 10,
-                          maxInstancesPerNode = 1,
-                          allowLocalRoutees = true,
-                          useRole = None)).props(Props[Echo]),
+      ClusterRouterPool(
+        local = AdaptiveLoadBalancingPool(HeapMetricsSelector),
+        settings = ClusterRouterPoolSettings(
+          totalInstances = 10,
+          maxInstancesPerNode = 1,
+          allowLocalRoutees = true,
+          useRole = None)).props(Props[Echo]),
       name)
     // it may take some time until router receives cluster member events
     awaitAssert { currentRoutees(router).size should ===(roles.size) }

@@ -44,22 +44,25 @@ class Migration @Inject()(store: PersistentStore,
     StorageVersions(0, 11, 0) -> { () =>
       new MigrationTo0_11(groupRepo, appRepo).migrateApps().recover {
         case NonFatal(e) =>
-          throw new MigrationFailedException("while migrating storage to 0.11",
-                                             e)
+          throw new MigrationFailedException(
+            "while migrating storage to 0.11",
+            e)
       }
     },
     StorageVersions(0, 13, 0) -> { () =>
       new MigrationTo0_13(taskRepo, store).migrate().recover {
         case NonFatal(e) =>
-          throw new MigrationFailedException("while migrating storage to 0.13",
-                                             e)
+          throw new MigrationFailedException(
+            "while migrating storage to 0.13",
+            e)
       }
     },
     StorageVersions(0, 16, 0) -> { () =>
       new MigrationTo0_16(groupRepo, appRepo).migrate().recover {
         case NonFatal(e) =>
-          throw new MigrationFailedException("while migrating storage to 0.16",
-                                             e)
+          throw new MigrationFailedException(
+            "while migrating storage to 0.16",
+            e)
       }
     }
   )
@@ -237,9 +240,10 @@ class MigrationTo0_11(groupRepository: GroupRepository,
           for {
             maybeLastApp <- maybeLastAppFuture
             maybeNextApp <- loadApp(id, nextVersion)
-            withVersionInfo = addVersionInfoToVersioned(maybeLastApp,
-                                                        nextVersion,
-                                                        maybeNextApp)
+            withVersionInfo = addVersionInfoToVersioned(
+              maybeLastApp,
+              nextVersion,
+              maybeNextApp)
             storedResult <- withVersionInfo
               .map((newApp: AppDefinition) =>
                 appRepository.store(newApp).map(Some(_)))
@@ -294,8 +298,9 @@ class MigrationTo0_13(taskRepository: TaskRepository, store: PersistentStore) {
         val oldFormatRegex = """^.*:.*\..*$""".r
         val namesInOldFormat =
           keys.filter(key => oldFormatRegex.pattern.matcher(key).matches)
-        log.info("{} tasks in old format need to be migrated.",
-                 namesInOldFormat.size)
+        log.info(
+          "{} tasks in old format need to be migrated.",
+          namesInOldFormat.size)
 
         namesInOldFormat.foldLeft(Future.successful(())) { (f, nextKey) =>
           f.flatMap(_ => migrateKey(nextKey))
@@ -461,11 +466,13 @@ object StorageVersions {
     override def compare(that: StorageVersion): Int = {
       def by(left: Int, right: Int, fn: => Int): Int =
         if (left.compareTo(right) != 0) left.compareTo(right) else fn
-      by(version.getMajor,
-         that.getMajor,
-         by(version.getMinor,
-            that.getMinor,
-            by(version.getPatch, that.getPatch, 0)))
+      by(
+        version.getMajor,
+        that.getMajor,
+        by(
+          version.getMinor,
+          that.getMinor,
+          by(version.getPatch, that.getPatch, 0)))
     }
 
     def str: String =

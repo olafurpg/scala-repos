@@ -94,8 +94,8 @@ object VerifyConsumerRebalance extends Logging {
       case (topic, partitions) =>
         val topicDirs = new ZKGroupTopicDirs(group, topic)
         info(
-          "Alive partitions for topic %s are %s ".format(topic,
-                                                         partitions.toString))
+          "Alive partitions for topic %s are %s "
+            .format(topic, partitions.toString))
         info(
           "Alive consumers for topic %s => %s "
             .format(topic, consumersPerTopicMap.get(topic)))

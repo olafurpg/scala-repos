@@ -110,11 +110,11 @@ private[akka] class DaemonMsgCreateSerializer(val system: ExtendedActorSystem)
       Props(deploy(proto.getProps.getDeploy), clazz, args)
     }
 
-    DaemonMsgCreate(props = props,
-                    deploy = deploy(proto.getDeploy),
-                    path = proto.getPath,
-                    supervisor =
-                      deserializeActorRef(system, proto.getSupervisor))
+    DaemonMsgCreate(
+      props = props,
+      deploy = deploy(proto.getDeploy),
+      path = proto.getPath,
+      supervisor = deserializeActorRef(system, proto.getSupervisor))
   }
 
   protected def serialize(any: Any): ByteString =

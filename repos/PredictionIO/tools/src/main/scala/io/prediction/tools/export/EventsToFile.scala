@@ -82,9 +82,10 @@ object EventsToFile extends Logging {
       WorkflowUtils.modifyLogging(verbose = args.verbose)
       @transient lazy implicit val formats =
         Utils.json4sDefaultFormats + new EventJson4sSupport.APISerializer
-      val sc = WorkflowContext(mode = "Export",
-                               batch = "App ID " + args.appId + channelStr,
-                               executorEnv = Runner.envStringToMap(args.env))
+      val sc = WorkflowContext(
+        mode = "Export",
+        batch = "App ID " + args.appId + channelStr,
+        executorEnv = Runner.envStringToMap(args.env))
       val sqlContext = new SQLContext(sc)
       val events = Storage.getPEvents()
       val eventsRdd =

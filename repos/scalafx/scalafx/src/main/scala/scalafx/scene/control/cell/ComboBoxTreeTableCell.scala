@@ -88,8 +88,9 @@ object ComboBoxTreeTableCell {
   /**
     * $SATISFY
     */
-  @deprecated(message = "Use forTreeTableColumn[S, T](ObservableBuffer[S, T])",
-              since = "8.0")
+  @deprecated(
+    message = "Use forTreeTableColumn[S, T](ObservableBuffer[S, T])",
+    since = "8.0")
   def forTreeTableColumn[S, T](items: jfxc.ObservableList[T]) =
     jfxscc.ComboBoxTreeTableCell.forTreeTableColumn[S, T](items)
 
@@ -139,9 +140,9 @@ object ComboBoxTreeTableCell {
   /**
     * $SATISFY
     */
-  @deprecated(message =
-                "Use forTreeTableColumn[S, T](StringConverter[S, T], T*)",
-              since = "8.0")
+  @deprecated(
+    message = "Use forTreeTableColumn[S, T](StringConverter[S, T], T*)",
+    since = "8.0")
   def forTreeTableColumn[S, T](converter: jfxu.StringConverter[T], items: T*) =
     jfxscc.ComboBoxTreeTableCell.forTreeTableColumn[S, T](converter, items: _*)
 

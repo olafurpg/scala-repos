@@ -19,10 +19,11 @@ private[http] class RespondToExpectContinue
       case request: HttpRequest
           if HttpHeaders.is100ContinueExpected(request) =>
         // Write the response immediately.
-        Channels.write(ctx,
-                       Channels.future(ctx.getChannel),
-                       OneHundredContinueResponse,
-                       e.getRemoteAddress)
+        Channels.write(
+          ctx,
+          Channels.future(ctx.getChannel),
+          OneHundredContinueResponse,
+          e.getRemoteAddress)
 
         // Remove the the ``Expect:'' header, and let the upstream
         // continue receiving chunks after this.

@@ -13,17 +13,19 @@ object DatabasesSpec extends Specification {
   "Databases" should {
 
     "create database" in new WithDatabase {
-      val db = Databases(name = "test",
-                         driver = "org.h2.Driver",
-                         url = "jdbc:h2:mem:test")
+      val db = Databases(
+        name = "test",
+        driver = "org.h2.Driver",
+        url = "jdbc:h2:mem:test")
       db.name must_== "test"
       db.url must_== "jdbc:h2:mem:test"
     }
 
     "create database with named arguments" in new WithDatabase {
-      val db = Databases(name = "test",
-                         driver = "org.h2.Driver",
-                         url = "jdbc:h2:mem:test")
+      val db = Databases(
+        name = "test",
+        driver = "org.h2.Driver",
+        url = "jdbc:h2:mem:test")
       db.name must_== "test"
       db.url must_== "jdbc:h2:mem:test"
     }
@@ -36,9 +38,10 @@ object DatabasesSpec extends Specification {
 
     "create database with log sql" in new WithDatabase {
       val config = Map("logSql" -> "true")
-      val db = Databases(driver = "org.h2.Driver",
-                         url = "jdbc:h2:mem:default",
-                         config = config)
+      val db = Databases(
+        driver = "org.h2.Driver",
+        url = "jdbc:h2:mem:default",
+        config = config)
       db.dataSource must beAnInstanceOf[LogSqlDataSource]
     }
 
@@ -148,9 +151,10 @@ object DatabasesSpec extends Specification {
 
     "not supply connections after shutdown a database with log sql" in {
       val config = Map("logSql" -> "true")
-      val db = Databases(driver = "org.h2.Driver",
-                         url = "jdbc:h2:mem:default",
-                         config = config)
+      val db = Databases(
+        driver = "org.h2.Driver",
+        url = "jdbc:h2:mem:default",
+        config = config)
 
       db.getConnection.close()
       db.shutdown()

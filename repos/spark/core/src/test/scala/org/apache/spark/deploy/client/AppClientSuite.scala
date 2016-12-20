@@ -95,8 +95,9 @@ class AppClientSuite
     // Client should connect with one Master which registers the application
     eventually(timeout(10.seconds), interval(10.millis)) {
       val apps = getApplications()
-      assert(ci.listener.connectedIdList.size === 1,
-             "client listener should have one connection")
+      assert(
+        ci.listener.connectedIdList.size === 1,
+        "client listener should have one connection")
       assert(apps.size === 1, "master should have 1 registered app")
     }
 
@@ -106,8 +107,9 @@ class AppClientSuite
 
     eventually(timeout(10.seconds), interval(10.millis)) {
       val apps = getApplications()
-      assert(apps.head.getExecutorLimit === numExecutorsRequested,
-             s"executor request failed")
+      assert(
+        apps.head.getExecutorLimit === numExecutorsRequested,
+        s"executor request failed")
     }
 
     // Send request to kill executor, verify request was made
@@ -123,8 +125,9 @@ class AppClientSuite
     // Verify Client is marked dead and unregistered from Master
     eventually(timeout(10.seconds), interval(10.millis)) {
       val apps = getApplications()
-      assert(ci.listener.deadReasonList.size === 1,
-             "client should have been marked dead")
+      assert(
+        ci.listener.deadReasonList.size === 1,
+        "client should have been marked dead")
       assert(apps.isEmpty, "master should have 0 registered apps")
     }
   }
@@ -160,15 +163,16 @@ class AppClientSuite
   private def makeWorkers(cores: Int, memory: Int): Seq[Worker] = {
     (0 until numWorkers).map { i =>
       val rpcEnv = workerRpcEnvs(i)
-      val worker = new Worker(rpcEnv,
-                              0,
-                              cores,
-                              memory,
-                              Array(masterRpcEnv.address),
-                              Worker.ENDPOINT_NAME,
-                              null,
-                              conf,
-                              securityManager)
+      val worker = new Worker(
+        rpcEnv,
+        0,
+        cores,
+        memory,
+        Array(masterRpcEnv.address),
+        Worker.ENDPOINT_NAME,
+        null,
+        conf,
+        securityManager)
       rpcEnv.setupEndpoint(Worker.ENDPOINT_NAME, worker)
       worker
     }
@@ -232,11 +236,12 @@ class AppClientSuite
       Seq(),
       Seq(),
       Seq())
-    private val desc = new ApplicationDescription("AppClientSuite",
-                                                  Some(1),
-                                                  512,
-                                                  cmd,
-                                                  "ignored")
+    private val desc = new ApplicationDescription(
+      "AppClientSuite",
+      Some(1),
+      512,
+      cmd,
+      "ignored")
     val listener = new AppClientCollector
     val client =
       new AppClient(rpcEnv, Array(masterUrl), desc, listener, new SparkConf)

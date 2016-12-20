@@ -58,8 +58,9 @@ object Mx4jLoader extends Logging {
         Class.forName("mx4j.tools.adaptor.http.XSLTProcessor")
       val xsltProcessor = xsltProcessorClass.newInstance()
       httpAdaptorClass
-        .getMethod("setProcessor",
-                   Class.forName("mx4j.tools.adaptor.http.ProcessorMBean"))
+        .getMethod(
+          "setProcessor",
+          Class.forName("mx4j.tools.adaptor.http.ProcessorMBean"))
         .invoke(httpAdaptor, xsltProcessor.asInstanceOf[AnyRef])
       mbs.registerMBean(xsltProcessor, processorName)
       httpAdaptorClass.getMethod("start").invoke(httpAdaptor)

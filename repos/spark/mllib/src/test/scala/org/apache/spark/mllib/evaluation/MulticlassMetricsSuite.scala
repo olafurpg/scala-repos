@@ -32,16 +32,18 @@ class MulticlassMetricsSuite extends SparkFunSuite with MLlibTestSparkContext {
     val confusionMatrix =
       Matrices.dense(3, 3, Array(2, 1, 0, 1, 3, 0, 1, 0, 1))
     val labels = Array(0.0, 1.0, 2.0)
-    val predictionAndLabels = sc.parallelize(Seq((0.0, 0.0),
-                                                 (0.0, 1.0),
-                                                 (0.0, 0.0),
-                                                 (1.0, 0.0),
-                                                 (1.0, 1.0),
-                                                 (1.0, 1.0),
-                                                 (1.0, 1.0),
-                                                 (2.0, 2.0),
-                                                 (2.0, 0.0)),
-                                             2)
+    val predictionAndLabels = sc.parallelize(
+      Seq(
+        (0.0, 0.0),
+        (0.0, 1.0),
+        (0.0, 0.0),
+        (1.0, 0.0),
+        (1.0, 1.0),
+        (1.0, 1.0),
+        (1.0, 1.0),
+        (2.0, 2.0),
+        (2.0, 0.0)),
+      2)
     val metrics = new MulticlassMetrics(predictionAndLabels)
     val delta = 0.0000001
     val fpRate0 = 1.0 / (9 - 4)

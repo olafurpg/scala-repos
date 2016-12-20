@@ -29,11 +29,12 @@ import java.io.File
 case class DataSourceParams(val filepath: String) extends Params
 
 case class DataSource(val dsp: DataSourceParams)
-    extends PDataSource[DataSourceParams,
-                        Null,
-                        RDD[Rating],
-                        (Int, Int),
-                        Double] {
+    extends PDataSource[
+      DataSourceParams,
+      Null,
+      RDD[Rating],
+      (Int, Int),
+      Double] {
 
   override def read(sc: SparkContext)
     : Seq[(Null, RDD[Rating], RDD[((Int, Int), Double)])] = {
@@ -83,17 +84,19 @@ object PMatrixFactorizationModel
 }
 
 class ALSAlgorithm(val ap: AlgorithmParams)
-    extends PAlgorithm[AlgorithmParams,
-                       RDD[Rating],
-                       PMatrixFactorizationModel,
-                       (Int, Int),
-                       Double] {
+    extends PAlgorithm[
+      AlgorithmParams,
+      RDD[Rating],
+      PMatrixFactorizationModel,
+      (Int, Int),
+      Double] {
 
   def train(data: RDD[Rating]): PMatrixFactorizationModel = {
     val m = ALS.train(data, ap.rank, ap.numIterations, ap.lambda)
-    new PMatrixFactorizationModel(rank = m.rank,
-                                  userFeatures = m.userFeatures,
-                                  productFeatures = m.productFeatures)
+    new PMatrixFactorizationModel(
+      rank = m.rank,
+      userFeatures = m.userFeatures,
+      productFeatures = m.productFeatures)
   }
 
   override def batchPredict(
@@ -140,10 +143,11 @@ object Run {
 
 object RecommendationEngine extends IEngineFactory {
   def apply() = {
-    new Engine(classOf[DataSource],
-               PIdentityPreparator(classOf[DataSource]),
-               Map("" -> classOf[ALSAlgorithm]),
-               LFirstServing(classOf[ALSAlgorithm]))
+    new Engine(
+      classOf[DataSource],
+      PIdentityPreparator(classOf[DataSource]),
+      Map("" -> classOf[ALSAlgorithm]),
+      LFirstServing(classOf[ALSAlgorithm]))
   }
 }
 

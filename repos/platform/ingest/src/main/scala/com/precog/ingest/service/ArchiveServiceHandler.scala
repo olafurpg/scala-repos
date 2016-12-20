@@ -45,16 +45,18 @@ class ArchiveServiceHandler[A](
     eventStore: EventStore[Future],
     clock: Clock,
     archiveTimeout: Timeout)(implicit M: Monad[Future])
-    extends CustomHttpService[A,
-                              (APIKey, Path) => Future[HttpResponse[JValue]]]
+    extends CustomHttpService[
+      A,
+      (APIKey, Path) => Future[HttpResponse[JValue]]]
     with Logging {
   val service = (request: HttpRequest[A]) => {
     Success { (apiKey: APIKey, path: Path) =>
       import Permission._
       // FIXME: This delete permission check may be excessively restrictive, need to look at the implementation
-      accessControl.hasCapability(apiKey,
-                                  Set(DeletePermission(path, WrittenByAny)),
-                                  Some(clock.now())) flatMap {
+      accessControl.hasCapability(
+        apiKey,
+        Set(DeletePermission(path, WrittenByAny)),
+        Some(clock.now())) flatMap {
         case true =>
           //FIXME: this should spawn a job
           val archiveInstance = Archive(apiKey, path, None, clock.instant())

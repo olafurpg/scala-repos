@@ -59,12 +59,13 @@ class MasterWebUISuite extends SparkFunSuite with BeforeAndAfter {
     val worker = createWorkerInfo()
     val appDesc = createAppDesc()
     // use new start date so it isn't filtered by UI
-    val activeApp = new ApplicationInfo(new Date().getTime,
-                                        "id",
-                                        appDesc,
-                                        new Date(),
-                                        null,
-                                        Int.MaxValue)
+    val activeApp = new ApplicationInfo(
+      new Date().getTime,
+      "id",
+      appDesc,
+      new Date(),
+      null,
+      Int.MaxValue)
     activeApp.addExecutor(worker, 2)
 
     val workers = Array[WorkerInfo](worker)
@@ -72,15 +73,16 @@ class MasterWebUISuite extends SparkFunSuite with BeforeAndAfter {
     val completedApps = Array[ApplicationInfo]()
     val activeDrivers = Array[DriverInfo]()
     val completedDrivers = Array[DriverInfo]()
-    val stateResponse = new MasterStateResponse("host",
-                                                8080,
-                                                None,
-                                                workers,
-                                                activeApps,
-                                                completedApps,
-                                                activeDrivers,
-                                                completedDrivers,
-                                                RecoveryState.ALIVE)
+    val stateResponse = new MasterStateResponse(
+      "host",
+      8080,
+      None,
+      workers,
+      activeApps,
+      completedApps,
+      activeDrivers,
+      completedDrivers,
+      RecoveryState.ALIVE)
 
     when(masterPage.getMasterState).thenReturn(stateResponse)
 

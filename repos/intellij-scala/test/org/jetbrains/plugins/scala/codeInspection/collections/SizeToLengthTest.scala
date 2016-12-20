@@ -37,13 +37,15 @@ class SizeToLengthTest extends OperationsOnCollectionInspectionTest {
   }
 
   def testArray(): Unit = {
-    doTest(s"Array(1, 2).${START}size$END",
-           "Array(1, 2).size",
-           "Array(1, 2).length")
+    doTest(
+      s"Array(1, 2).${START}size$END",
+      "Array(1, 2).size",
+      "Array(1, 2).length")
 
-    doTest(s"Seq(1, 2).toArray.${START}size$END",
-           "Seq(1, 2).toArray.size",
-           "Seq(1, 2).toArray.length")
+    doTest(
+      s"Seq(1, 2).toArray.${START}size$END",
+      "Seq(1, 2).toArray.size",
+      "Seq(1, 2).toArray.length")
 
     doTest(
       s"""

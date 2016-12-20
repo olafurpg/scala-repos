@@ -54,7 +54,8 @@ object PluginDescription {
       throw new RuntimeException(
         "Plugin descriptor root element must be <plugin>.")
 
-    PluginDescription(text(root.getElementsByTagName("name")),
-                      text(root.getElementsByTagName("classname")))
+    PluginDescription(
+      text(root.getElementsByTagName("name")),
+      text(root.getElementsByTagName("classname")))
   }
 }

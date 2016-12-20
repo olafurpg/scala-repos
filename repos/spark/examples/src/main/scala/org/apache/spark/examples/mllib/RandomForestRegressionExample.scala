@@ -46,13 +46,14 @@ object RandomForestRegressionExample {
     val maxDepth = 4
     val maxBins = 32
 
-    val model = RandomForest.trainRegressor(trainingData,
-                                            categoricalFeaturesInfo,
-                                            numTrees,
-                                            featureSubsetStrategy,
-                                            impurity,
-                                            maxDepth,
-                                            maxBins)
+    val model = RandomForest.trainRegressor(
+      trainingData,
+      categoricalFeaturesInfo,
+      numTrees,
+      featureSubsetStrategy,
+      impurity,
+      maxDepth,
+      maxBins)
 
     // Evaluate model on test instances and compute test error
     val labelsAndPredictions = testData.map { point =>

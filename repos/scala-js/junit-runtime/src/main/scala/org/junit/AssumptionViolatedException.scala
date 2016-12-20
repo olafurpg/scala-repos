@@ -10,10 +10,11 @@ class AssumptionViolatedException protected (fAssumption: String,
                                              fValueMatcher: Boolean,
                                              fMatcher: Matcher[_],
                                              fValue: AnyRef)
-    extends org.junit.internal.AssumptionViolatedException(fAssumption,
-                                                           fValueMatcher,
-                                                           fMatcher,
-                                                           fValue) {
+    extends org.junit.internal.AssumptionViolatedException(
+      fAssumption,
+      fValueMatcher,
+      fMatcher,
+      fValue) {
 
   @Deprecated
   def this(actual: Any, matcher: Matcher[_]) =
@@ -21,10 +22,11 @@ class AssumptionViolatedException protected (fAssumption: String,
 
   @Deprecated
   def this(message: String, expected: Any, matcher: Matcher[_]) =
-    this(message,
-         true,
-         fMatcher = matcher,
-         fValue = expected.asInstanceOf[AnyRef])
+    this(
+      message,
+      true,
+      fMatcher = matcher,
+      fValue = expected.asInstanceOf[AnyRef])
 
   def this(message: String) =
     this(message, false, null, null)

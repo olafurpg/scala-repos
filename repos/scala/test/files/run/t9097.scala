@@ -26,11 +26,13 @@ object Test extends StoreReporterDirectTest {
   override def show(): Unit = {
     val baos = new java.io.ByteArrayOutputStream()
     Console.withOut(baos)(Console.withErr(baos)(compile()))
-    assert(!storeReporter.hasErrors,
-           message = filteredInfos map (_.msg) mkString "; ")
+    assert(
+      !storeReporter.hasErrors,
+      message = filteredInfos map (_.msg) mkString "; ")
     val out = baos.toString("UTF-8")
     // was 2 before the fix, the two PackageDefs for a would both contain the ClassDef for the closure
-    assert(out.lines.count(_ contains "def $anonfun$1(x$1: Int): String") == 1,
-           out)
+    assert(
+      out.lines.count(_ contains "def $anonfun$1(x$1: Int): String") == 1,
+      out)
   }
 }

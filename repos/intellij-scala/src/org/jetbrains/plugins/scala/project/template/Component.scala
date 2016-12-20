@@ -34,13 +34,14 @@ sealed class Artifact(val prefix: String, resource: Option[String] = None) {
 
 object Artifact {
   def values: Set[Artifact] =
-    Set(ScalaLibrary,
-        ScalaCompiler,
-        ScalaReflect,
-        ScalaXml,
-        ScalaSwing,
-        ScalaCombinators,
-        ScalaActors)
+    Set(
+      ScalaLibrary,
+      ScalaCompiler,
+      ScalaReflect,
+      ScalaXml,
+      ScalaSwing,
+      ScalaCombinators,
+      ScalaActors)
 
   private def readProperty(file: File,
                            resource: String,

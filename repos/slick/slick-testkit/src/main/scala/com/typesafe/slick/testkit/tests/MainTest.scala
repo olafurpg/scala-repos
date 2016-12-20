@@ -19,8 +19,9 @@ class MainTest extends AsyncTest[JdbcTestDB] { mainTest =>
   lazy val users = TableQuery[Users]
 
   class Orders(tag: Tag)
-      extends Table[(Int, Int, String, Boolean, Option[Boolean])](tag,
-                                                                  "orders") {
+      extends Table[(Int, Int, String, Boolean, Option[Boolean])](
+        tag,
+        "orders") {
     def userID = column[Int]("userID")
     def orderID = column[Int]("orderID", O.PrimaryKey, O.AutoInc)
     def product = column[String]("product")
@@ -64,10 +65,11 @@ class MainTest extends AsyncTest[JdbcTestDB] { mainTest =>
       ins1 <- users.map(u => (u.first, u.last)) +=
         ("Homer", Some("Simpson"))
       ins2 <- users.map(u => (u.first, u.last)) ++=
-        Seq(("Marge", Some("Simpson")),
-            ("Apu", Some("Nahasapeemapetilon")),
-            ("Carl", Some("Carlson")),
-            ("Lenny", Some("Leonard")))
+        Seq(
+          ("Marge", Some("Simpson")),
+          ("Apu", Some("Nahasapeemapetilon")),
+          ("Carl", Some("Carlson")),
+          ("Lenny", Some("Leonard")))
       ins3 <- users.map(_.first) ++=
         Seq("Santa's Little Helper", "Snowball")
       total = for (i2 <- ins2; i3 <- ins3) yield ins1 + i2 + i3
@@ -139,20 +141,22 @@ class MainTest extends AsyncTest[JdbcTestDB] { mainTest =>
 
         db.run(for {
           r4 <- q4.to[Set].result.named("Latest Order per User")
-          _ = r4 shouldBe Set(("Homer", 2),
-                              ("Marge", 4),
-                              ("Carl", 6),
-                              ("Lenny", 8),
-                              ("Santa's Little Helper", 10))
+          _ = r4 shouldBe Set(
+            ("Homer", 2),
+            ("Marge", 4),
+            ("Carl", 6),
+            ("Lenny", 8),
+            ("Santa's Little Helper", 10))
           r4b <- q4b
             .to[Set]
             .result
             .named("Latest Order per User, using maxOfPer")
-          _ = r4b shouldBe Set(("Homer", 2),
-                               ("Marge", 4),
-                               ("Carl", 6),
-                               ("Lenny", 8),
-                               ("Santa's Little Helper", 10))
+          _ = r4b shouldBe Set(
+            ("Homer", 2),
+            ("Marge", 4),
+            ("Carl", 6),
+            ("Lenny", 8),
+            ("Santa's Little Helper", 10))
           _ <- q4d.result.map(r => r.length shouldBe 4)
         } yield ())
       }
@@ -195,8 +199,9 @@ class MainTest extends AsyncTest[JdbcTestDB] { mainTest =>
 
         db.run(for {
           r5 <- q5.to[Set].result.named("Users without Orders")
-          _ = r5 shouldBe Set((3, "Apu", Some("Nahasapeemapetilon")),
-                              (7, "Snowball", None))
+          _ = r5 shouldBe Set(
+            (3, "Apu", Some("Nahasapeemapetilon")),
+            (7, "Snowball", None))
           deleted <- q5.delete
           _ = deleted shouldBe 2
           _ <- q6.result.head.map(_ shouldBe 0)

@@ -61,11 +61,12 @@ case class ScCompoundType(components: Seq[ScType],
     ScCompoundType(components.map(_.removeAbstracts), signatureMap.map {
       case (s: Signature, tp: ScType) =>
         def updateTypeParam(tp: TypeParameter): TypeParameter = {
-          new TypeParameter(tp.name,
-                            tp.typeParams.map(updateTypeParam),
-                            () => tp.lowerType().removeAbstracts,
-                            () => tp.upperType().removeAbstracts,
-                            tp.ptp)
+          new TypeParameter(
+            tp.name,
+            tp.typeParams.map(updateTypeParam),
+            () => tp.lowerType().removeAbstracts,
+            () => tp.upperType().removeAbstracts,
+            tp.ptp)
         }
 
         val pTypes: List[Seq[() => ScType]] =
@@ -74,24 +75,25 @@ case class ScCompoundType(components: Seq[ScType],
           if (s.typeParams.length == 0) TypeParameter.EMPTY_ARRAY
           else s.typeParams.map(updateTypeParam)
         val rt: ScType = tp.removeAbstracts
-        (new Signature(s.name,
-                       pTypes,
-                       s.paramLength,
-                       tParams,
-                       ScSubstitutor.empty,
-                       s.namedElement match {
-                         case fun: ScFunction =>
-                           ScFunction.getCompoundCopy(
-                             pTypes.map(_.map(_()).toList),
-                             tParams.toList,
-                             rt,
-                             fun)
-                         case b: ScBindingPattern =>
-                           ScBindingPattern.getCompoundCopy(rt, b)
-                         case f: ScFieldId => ScFieldId.getCompoundCopy(rt, f)
-                         case named => named
-                       },
-                       s.hasRepeatedParam),
+        (new Signature(
+           s.name,
+           pTypes,
+           s.paramLength,
+           tParams,
+           ScSubstitutor.empty,
+           s.namedElement match {
+             case fun: ScFunction =>
+               ScFunction.getCompoundCopy(
+                 pTypes.map(_.map(_()).toList),
+                 tParams.toList,
+                 rt,
+                 fun)
+             case b: ScBindingPattern =>
+               ScBindingPattern.getCompoundCopy(rt, b)
+             case f: ScFieldId => ScFieldId.getCompoundCopy(rt, f)
+             case named => named
+           },
+           s.hasRepeatedParam),
          rt)
     }, typesMap.map {
       case (s: String, sign) => (s, sign.updateTypes(_.removeAbstracts))
@@ -140,10 +142,11 @@ case class ScCompoundType(components: Seq[ScType],
                  ScSubstitutor.empty,
                  s.namedElement match {
                    case fun: ScFunction =>
-                     ScFunction.getCompoundCopy(pTypes.map(_.map(_()).toList),
-                                                tParams.toList,
-                                                rt,
-                                                fun)
+                     ScFunction.getCompoundCopy(
+                       pTypes.map(_.map(_()).toList),
+                       tParams.toList,
+                       rt,
+                       fun)
                    case b: ScBindingPattern =>
                      ScBindingPattern.getCompoundCopy(rt, b)
                    case f: ScFieldId => ScFieldId.getCompoundCopy(rt, f)
@@ -196,9 +199,10 @@ case class ScCompoundType(components: Seq[ScType],
                    _.map(
                      f =>
                        () =>
-                         f().recursiveVarianceUpdateModifiable(newData,
-                                                               update,
-                                                               1))),
+                         f().recursiveVarianceUpdateModifiable(
+                           newData,
+                           update,
+                           1))),
                  s.paramLength,
                  tParams,
                  ScSubstitutor.empty,
@@ -260,16 +264,18 @@ case class ScCompoundType(components: Seq[ScType],
             types2.get(name) match {
               case None => return (false, undefinedSubst)
               case Some(bounds2) =>
-                var t = Equivalence.equivInner(bounds1.lowerBound,
-                                               bounds2.lowerBound,
-                                               undefinedSubst,
-                                               falseUndef)
+                var t = Equivalence.equivInner(
+                  bounds1.lowerBound,
+                  bounds2.lowerBound,
+                  undefinedSubst,
+                  falseUndef)
                 if (!t._1) return (false, undefinedSubst)
                 undefinedSubst = t._2
-                t = Equivalence.equivInner(bounds1.upperBound,
-                                           bounds2.upperBound,
-                                           undefinedSubst,
-                                           falseUndef)
+                t = Equivalence.equivInner(
+                  bounds1.upperBound,
+                  bounds2.upperBound,
+                  undefinedSubst,
+                  falseUndef)
                 if (!t._1) return (false, undefinedSubst)
                 undefinedSubst = t._2
             }
@@ -320,13 +326,14 @@ object ScCompoundType {
       decl match {
         case fun: ScFunction =>
           signatureMapVal +=
-            ((new Signature(fun.name,
-                            PhysicalSignature.typesEval(fun),
-                            PhysicalSignature.paramLength(fun),
-                            TypeParameter.fromArray(fun.getTypeParameters),
-                            subst,
-                            fun,
-                            PhysicalSignature.hasRepeatedParam(fun)),
+            ((new Signature(
+                fun.name,
+                PhysicalSignature.typesEval(fun),
+                PhysicalSignature.paramLength(fun),
+                TypeParameter.fromArray(fun.getTypeParameters),
+                subst,
+                fun,
+                PhysicalSignature.hasRepeatedParam(fun)),
               fun.returnType.getOrAny))
         case varDecl: ScVariable =>
           for (e <- varDecl.declaredElements) {
@@ -335,11 +342,12 @@ object ScCompoundType {
               ((new Signature(e.name, Seq.empty, 0, subst, e),
                 varType.getOrAny))
             signatureMapVal +=
-              ((new Signature(e.name + "_=",
-                              Seq(() => varType.getOrAny),
-                              1,
-                              subst,
-                              e),
+              ((new Signature(
+                  e.name + "_=",
+                  Seq(() => varType.getOrAny),
+                  1,
+                  subst,
+                  e),
                 psi.types.Unit)) //setter
           }
         case valDecl: ScValue =>

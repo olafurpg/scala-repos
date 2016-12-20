@@ -86,6 +86,7 @@ case class AckOnEntry(get: Boolean)
 case class MaxExecutePerSecond(lowerBound: Long,
                                upperBound: Long,
                                rampUptimeMS: Long) {
-  require(rampUptimeMS >= 0L,
-          "Ramp up time must greater than or equal to zero")
+  require(
+    rampUptimeMS >= 0L,
+    "Ramp up time must greater than or equal to zero")
 }

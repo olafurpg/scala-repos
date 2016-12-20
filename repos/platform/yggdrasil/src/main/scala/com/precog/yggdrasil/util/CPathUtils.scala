@@ -40,8 +40,9 @@ object CPathUtils {
         val CArrayType(elemType) = es.cType
         es.value.toList.zipWithIndex flatMap {
           case (e, i) =>
-            addComponent(JPathIndex(i),
-                         cPathToJPaths(CPath(tail), elemType(e)))
+            addComponent(
+              JPathIndex(i),
+              cPathToJPaths(CPath(tail), elemType(e)))
         }
       // case (CPathMeta(_) :: _, _) => Nil
       case (Nil, _) => List((JPath.Identity, value))
@@ -128,12 +129,12 @@ object CPathUtils {
              right: List[CPathNode],
              candidates: List[CPath]): List[CPath] = right match {
       case (p @ CPathIndex(i)) :: right =>
-        cand(p :: left,
-             right,
-             CPath(left.foldLeft(CPathIndex(i + 1) :: zero(right)) {
-               (acc, p) =>
-                 p :: acc
-             }) :: candidates)
+        cand(
+          p :: left,
+          right,
+          CPath(left.foldLeft(CPathIndex(i + 1) :: zero(right)) { (acc, p) =>
+            p :: acc
+          }) :: candidates)
 
       case p :: right =>
         cand(p :: left, right, candidates)

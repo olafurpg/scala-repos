@@ -55,10 +55,11 @@ object MathContext {
     }
 
     val roundingModeStrStart = spaceIndex + 1
-    if (!s.regionMatches(roundingModeStrStart,
-                         "roundingMode=",
-                         0,
-                         roundingModeLength))
+    if (!s.regionMatches(
+          roundingModeStrStart,
+          "roundingMode=",
+          0,
+          roundingModeLength))
       invalidMathContext("Missing rounding mode", s)
 
     val roundingModeStart = roundingModeStrStart + roundingModeLength

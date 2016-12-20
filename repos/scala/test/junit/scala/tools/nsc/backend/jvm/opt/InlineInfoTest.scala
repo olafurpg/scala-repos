@@ -23,9 +23,10 @@ object InlineInfoTest extends ClearAfterClass.Clearable {
   def clear(): Unit = { compiler = null }
 
   def notPerRun: List[Clearable] =
-    List(compiler.genBCode.bTypes.classBTypeFromInternalName,
-         compiler.genBCode.bTypes.byteCodeRepository.compilingClasses,
-         compiler.genBCode.bTypes.byteCodeRepository.parsedClasses)
+    List(
+      compiler.genBCode.bTypes.classBTypeFromInternalName,
+      compiler.genBCode.bTypes.byteCodeRepository.compilingClasses,
+      compiler.genBCode.bTypes.byteCodeRepository.parsedClasses)
   notPerRun foreach compiler.perRunCaches.unrecordCache
 }
 
@@ -72,8 +73,9 @@ class InlineInfoTest extends ClearAfterClass {
           .inlineInfo)
 
     val fromAttrs = classes.map(c => {
-      assert(c.attrs.asScala.exists(_.isInstanceOf[InlineInfoAttribute]),
-             c.attrs)
+      assert(
+        c.attrs.asScala.exists(_.isInstanceOf[InlineInfoAttribute]),
+        c.attrs)
       compiler.genBCode.bTypes.inlineInfoFromClassfile(c)
     })
 

@@ -95,8 +95,9 @@ case class Group(id: PathId,
 
   /** Removes the group with the given gid if it exists */
   def remove(gid: PathId, timestamp: Timestamp = Timestamp.now()): Group = {
-    copy(groups = groups.filter(_.id != gid).map(_.remove(gid, timestamp)),
-         version = timestamp)
+    copy(
+      groups = groups.filter(_.id != gid).map(_.remove(gid, timestamp)),
+      version = timestamp)
   }
 
   /**
@@ -313,10 +314,11 @@ object Group {
           if (ruleViolations.isEmpty) None
           else
             Some(
-              GroupViolation(app,
-                             "app contains conflicting ports",
-                             None,
-                             ruleViolations.toSet))
+              GroupViolation(
+                app,
+                "app contains conflicting ports",
+                None,
+                ruleViolations.toSet))
         }
 
         if (groupViolations.isEmpty) Success

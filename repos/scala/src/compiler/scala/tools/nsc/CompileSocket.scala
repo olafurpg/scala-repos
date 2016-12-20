@@ -211,9 +211,10 @@ class CompileSocket extends CompileOutputCommon {
     try { Some(x.toInt) } catch { case _: NumberFormatException => None }
 
   def getSocket(serverAdr: String): Option[Socket] =
-    (for ((name, portStr) <- splitWhere(serverAdr,
-                                        _ == ':',
-                                        doDropIndex = true);
+    (for ((name, portStr) <- splitWhere(
+            serverAdr,
+            _ == ':',
+            doDropIndex = true);
           port <- parseInt(portStr))
       yield getSocket(name, port)) getOrElse fatal(
       "Malformed server address: %s; exiting" format serverAdr)
@@ -222,8 +223,8 @@ class CompileSocket extends CompileOutputCommon {
     val sock = Socket(hostName, port).opt
     if (sock.isEmpty)
       warn(
-        "Unable to establish connection to server %s:%d".format(hostName,
-                                                                port))
+        "Unable to establish connection to server %s:%d"
+          .format(hostName, port))
     sock
   }
 

@@ -116,10 +116,11 @@ abstract class BasicDirectives extends BasicDirectivesBase {
   def handleReflectively(instance: AnyRef,
                          methodName: String,
                          extractions: RequestVal[_]*): Route =
-    handleReflectively(instance.getClass,
-                       instance,
-                       methodName,
-                       extractions: _*)
+    handleReflectively(
+      instance.getClass,
+      instance,
+      methodName,
+      extractions: _*)
 
   /**
     * Handles the route by reflectively calling the static method specified by `clazz`, and `methodName`.
@@ -211,14 +212,17 @@ abstract class BasicDirectives extends BasicDirectivesBase {
           (ctx, params) ⇒
             resultAdaptor(
               ctx,
-              method.invoke(instance,
-                            params.toArray.asInstanceOf[Array[AnyRef]]: _*))
+              method.invoke(
+                instance,
+                params.toArray.asInstanceOf[Array[AnyRef]]: _*))
         else
           (ctx, params) ⇒
-            resultAdaptor(ctx,
-                          method.invoke(instance,
-                                        adaptParams(ctx, params).toArray
-                                          .asInstanceOf[Array[AnyRef]]: _*))
+            resultAdaptor(
+              ctx,
+              method.invoke(
+                instance,
+                adaptParams(ctx, params).toArray
+                  .asInstanceOf[Array[AnyRef]]: _*))
       }
 
       object ParameterTypes {

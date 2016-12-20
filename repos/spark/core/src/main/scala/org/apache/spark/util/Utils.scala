@@ -289,10 +289,11 @@ private[spark] object Utils extends Logging {
         // https://bugs.openjdk.java.net/browse/JDK-7052359
         // This will lead to stream corruption issue when using sort-based shuffle (SPARK-3948).
         val finalPos = outChannel.position()
-        assert(finalPos == initialPos + size,
-               s"""
+        assert(
+          finalPos == initialPos + size,
+          s"""
              |Current position $finalPos do not equal to expected position ${initialPos +
-                    size}
+               size}
              |after transferTo, please check your kernel version to see if it is 2.6.32,
              |this is a kernel bug which will lead to unexpected behavior when using transferTo.
              |You can set spark.file.transferTo = false to disable this NIO feature.
@@ -334,13 +335,14 @@ private[spark] object Utils extends Logging {
     if (userCred == null)
       throw new Exception("Secret key is null with authentication on")
     val userInfo = securityMgr.getHttpUser() + ":" + userCred
-    new URI(uri.getScheme(),
-            userInfo,
-            uri.getHost(),
-            uri.getPort(),
-            uri.getPath(),
-            uri.getQuery(),
-            uri.getFragment())
+    new URI(
+      uri.getScheme(),
+      userInfo,
+      uri.getHost(),
+      uri.getPort(),
+      uri.getPath(),
+      uri.getQuery(),
+      uri.getFragment())
   }
 
   /**
@@ -405,12 +407,13 @@ private[spark] object Utils extends Logging {
       val cachedFile = new File(localDir, cachedFileName)
       try {
         if (!cachedFile.exists()) {
-          doFetchFile(url,
-                      localDir,
-                      cachedFileName,
-                      conf,
-                      securityMgr,
-                      hadoopConf)
+          doFetchFile(
+            url,
+            localDir,
+            cachedFileName,
+            conf,
+            securityMgr,
+            hadoopConf)
         }
       } finally {
         lock.release()
@@ -630,13 +633,14 @@ private[spark] object Utils extends Logging {
       case _ =>
         val fs = getHadoopFileSystem(uri, hadoopConf)
         val path = new Path(uri)
-        fetchHcfsFile(path,
-                      targetDir,
-                      fs,
-                      conf,
-                      hadoopConf,
-                      fileOverwrite,
-                      filename = Some(filename))
+        fetchHcfsFile(
+          path,
+          targetDir,
+          fs,
+          conf,
+          hadoopConf,
+          fileOverwrite,
+          filename = Some(filename))
     }
   }
 
@@ -665,12 +669,13 @@ private[spark] object Utils extends Logging {
       }
     } else {
       fs.listStatus(path).foreach { fileStatus =>
-        fetchHcfsFile(fileStatus.getPath(),
-                      dest,
-                      fs,
-                      conf,
-                      hadoopConf,
-                      fileOverwrite)
+        fetchHcfsFile(
+          fileStatus.getPath(),
+          dest,
+          fs,
+          conf,
+          hadoopConf,
+          fileOverwrite)
       }
     }
   }
@@ -1239,8 +1244,9 @@ private[spark] object Utils extends Logging {
           sc.stop()
         }
         if (!NonFatal(t)) {
-          logError(s"throw uncaught fatal error in thread $currentThreadName",
-                   t)
+          logError(
+            s"throw uncaught fatal error in thread $currentThreadName",
+            t)
           throw t
         }
     }
@@ -1502,17 +1508,19 @@ private[spark] object Utils extends Logging {
         val effectiveEndIndex =
           math.min(endIndex - startIndexOfFile, fileToLength(file))
         stringBuffer.append(
-          Utils.offsetBytes(file.getAbsolutePath,
-                            effectiveStartIndex,
-                            effectiveEndIndex))
+          Utils.offsetBytes(
+            file.getAbsolutePath,
+            effectiveStartIndex,
+            effectiveEndIndex))
       } else if (endIndex > startIndexOfFile && endIndex < endIndexOfFile) {
         // Case D: read from [start of file] to [end of require range]
         val effectiveStartIndex = math.max(startIndex - startIndexOfFile, 0)
         val effectiveEndIndex = endIndex - startIndexOfFile
         stringBuffer.append(
-          Utils.offsetBytes(file.getAbsolutePath,
-                            effectiveStartIndex,
-                            effectiveEndIndex))
+          Utils.offsetBytes(
+            file.getAbsolutePath,
+            effectiveStartIndex,
+            effectiveEndIndex))
       }
       sum += fileToLength(file)
       logDebug(
@@ -1918,10 +1926,11 @@ private[spark] object Utils extends Logging {
       // distributed cache)
       if (uri.getFragment() != null) {
         val absoluteURI = new File(uri.getPath()).getAbsoluteFile().toURI()
-        return new URI(absoluteURI.getScheme(),
-                       absoluteURI.getHost(),
-                       absoluteURI.getPath(),
-                       uri.getFragment())
+        return new URI(
+          absoluteURI.getScheme(),
+          absoluteURI.getHost(),
+          absoluteURI.getPath(),
+          uri.getFragment())
       }
     } catch {
       case e: URISyntaxException =>
@@ -2052,10 +2061,11 @@ private[spark] object Utils extends Logging {
       case threadInfo =>
         val stackTrace =
           threadInfo.getStackTrace.map(_.toString).mkString("\n")
-        ThreadStackTrace(threadInfo.getThreadId,
-                         threadInfo.getThreadName,
-                         threadInfo.getThreadState,
-                         stackTrace)
+        ThreadStackTrace(
+          threadInfo.getThreadId,
+          threadInfo.getThreadName,
+          threadInfo.getThreadState,
+          stackTrace)
     }
   }
 
@@ -2174,8 +2184,9 @@ private[spark] object Utils extends Logging {
     pro.put("log4j.appender.console", "org.apache.log4j.ConsoleAppender")
     pro.put("log4j.appender.console.target", "System.err")
     pro.put("log4j.appender.console.layout", "org.apache.log4j.PatternLayout")
-    pro.put("log4j.appender.console.layout.ConversionPattern",
-            "%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n")
+    pro.put(
+      "log4j.appender.console.layout.ConversionPattern",
+      "%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n")
     PropertyConfigurator.configure(pro)
   }
 

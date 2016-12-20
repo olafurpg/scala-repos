@@ -129,11 +129,12 @@ case class ScAbstractType(tpt: ScTypeParameterType,
       case (true, res) => res
       case _ =>
         try {
-          ScAbstractType(tpt
-                           .recursiveUpdate(update, newVisited)
-                           .asInstanceOf[ScTypeParameterType],
-                         lower.recursiveUpdate(update, newVisited),
-                         upper.recursiveUpdate(update, newVisited))
+          ScAbstractType(
+            tpt
+              .recursiveUpdate(update, newVisited)
+              .asInstanceOf[ScTypeParameterType],
+            lower.recursiveUpdate(update, newVisited),
+            upper.recursiveUpdate(update, newVisited))
         } catch {
           case cce: ClassCastException => throw new RecursiveUpdateException
         }

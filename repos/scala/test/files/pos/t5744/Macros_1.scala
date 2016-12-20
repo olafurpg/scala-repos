@@ -8,8 +8,9 @@ object Macros {
 
   def foo_impl[U](c: Context)(x: c.Expr[U])(numeric: c.Expr[Numeric[U]]) = {
     import c.universe._
-    val plusOne = Apply(Select(numeric.tree, newTermName("plus")),
-                        List(x.tree, Literal(Constant(1))))
+    val plusOne = Apply(
+      Select(numeric.tree, newTermName("plus")),
+      List(x.tree, Literal(Constant(1))))
     val body = Apply(
       Select(Ident(definitions.PredefModule), newTermName("println")),
       List(plusOne))
@@ -22,10 +23,12 @@ object Macros {
       viewAsString: c.Expr[Y => String],
       s: c.Expr[String]) = {
     import c.universe._
-    val plusOne = Apply(Select(numeric.tree, newTermName("plus")),
-                        List(x.tree, Literal(Constant(1))))
-    val plusLen = Apply(Select(numeric.tree, newTermName("plus")),
-                        List(plusOne, Select(s.tree, newTermName("length"))))
+    val plusOne = Apply(
+      Select(numeric.tree, newTermName("plus")),
+      List(x.tree, Literal(Constant(1))))
+    val plusLen = Apply(
+      Select(numeric.tree, newTermName("plus")),
+      List(plusOne, Select(s.tree, newTermName("length"))))
     val body = Apply(
       Select(Ident(definitions.PredefModule), newTermName("println")),
       List(plusLen))

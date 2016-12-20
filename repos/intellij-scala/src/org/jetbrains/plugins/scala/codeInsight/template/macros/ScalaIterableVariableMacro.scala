@@ -33,12 +33,13 @@ class ScalaIterableVariableMacro extends ScalaVariableOfTypeMacro {
                               scType: ScType,
                               project: Project,
                               array: ArrayBuffer[LookupElement]) =
-    super.addLookupItems(Array(ScalaVariableOfTypeMacro.iterableId),
-                         context,
-                         variant,
-                         scType,
-                         project,
-                         array)
+    super.addLookupItems(
+      Array(ScalaVariableOfTypeMacro.iterableId),
+      context,
+      variant,
+      scType,
+      project,
+      array)
 
   override def getResult(exprs: Array[Expression],
                          context: ExpressionContext,

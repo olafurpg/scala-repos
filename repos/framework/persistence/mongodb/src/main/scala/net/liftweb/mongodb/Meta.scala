@@ -41,23 +41,24 @@ private[mongodb] object Meta {
     /*
      * These don't require a conversion and can be put directly into a DBObject
      */
-    val primitives = Set[Class[_]](classOf[String],
-                                   classOf[Int],
-                                   classOf[Long],
-                                   classOf[Double],
-                                   classOf[Float],
-                                   classOf[Byte],
-                                   classOf[BigInt],
-                                   classOf[Boolean],
-                                   classOf[Short],
-                                   classOf[java.lang.Integer],
-                                   classOf[java.lang.Long],
-                                   classOf[java.lang.Double],
-                                   classOf[java.lang.Float],
-                                   classOf[java.lang.Byte],
-                                   classOf[java.lang.Boolean],
-                                   classOf[java.lang.Short],
-                                   classOf[scala.Array[Byte]])
+    val primitives = Set[Class[_]](
+      classOf[String],
+      classOf[Int],
+      classOf[Long],
+      classOf[Double],
+      classOf[Float],
+      classOf[Byte],
+      classOf[BigInt],
+      classOf[Boolean],
+      classOf[Short],
+      classOf[java.lang.Integer],
+      classOf[java.lang.Long],
+      classOf[java.lang.Double],
+      classOf[java.lang.Float],
+      classOf[java.lang.Byte],
+      classOf[java.lang.Boolean],
+      classOf[java.lang.Short],
+      classOf[scala.Array[Byte]])
 
     def primitive_?(clazz: Class[_]) = primitives contains clazz
 
@@ -87,10 +88,11 @@ private[mongodb] object Meta {
     /*
      * Date types require formatting
      */
-    val datetypes = Set[Class[_]](classOf[Calendar],
-                                  classOf[Date],
-                                  classOf[GregorianCalendar],
-                                  classOf[DateTime])
+    val datetypes = Set[Class[_]](
+      classOf[Calendar],
+      classOf[Date],
+      classOf[GregorianCalendar],
+      classOf[DateTime])
 
     def datetype_?(clazz: Class[_]) = datetypes contains clazz
 
@@ -109,10 +111,11 @@ private[mongodb] object Meta {
     /*
      * Extended Mongo types.
      */
-    val mongotypes = Set[Class[_]](classOf[DBRef],
-                                   classOf[ObjectId],
-                                   classOf[Pattern],
-                                   classOf[UUID])
+    val mongotypes = Set[Class[_]](
+      classOf[DBRef],
+      classOf[ObjectId],
+      classOf[Pattern],
+      classOf[UUID])
 
     def mongotype_?(clazz: Class[_]) = mongotypes contains clazz
 

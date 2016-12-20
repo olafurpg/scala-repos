@@ -93,13 +93,14 @@ class TungstenAggregationIterator(
     numOutputRows: LongSQLMetric,
     dataSize: LongSQLMetric,
     spillSize: LongSQLMetric)
-    extends AggregationIterator(groupingExpressions,
-                                originalInputAttributes,
-                                aggregateExpressions,
-                                aggregateAttributes,
-                                initialInputBufferOffset,
-                                resultExpressions,
-                                newMutableProjection)
+    extends AggregationIterator(
+      groupingExpressions,
+      originalInputAttributes,
+      aggregateExpressions,
+      aggregateAttributes,
+      initialInputBufferOffset,
+      resultExpressions,
+      newMutableProjection)
     with Logging {
 
   ///////////////////////////////////////////////////////////////////////////
@@ -411,8 +412,9 @@ class TungstenAggregationIterator(
           outputRow
         } else {
           // We did not fall back to sort-based aggregation.
-          val result = generateOutput(aggregationBufferMapIterator.getKey,
-                                      aggregationBufferMapIterator.getValue)
+          val result = generateOutput(
+            aggregationBufferMapIterator.getKey,
+            aggregationBufferMapIterator.getValue)
 
           // Pre-load next key-value pair form aggregationBufferMapIterator to make hasNext
           // idempotent.
@@ -462,8 +464,9 @@ class TungstenAggregationIterator(
     if (groupingExpressions.isEmpty) {
       sortBasedAggregationBuffer.copyFrom(initialAggregationBuffer)
       // We create a output row and copy it. So, we can free the map.
-      val resultCopy = generateOutput(UnsafeRow.createFromByteArray(0, 0),
-                                      sortBasedAggregationBuffer).copy()
+      val resultCopy = generateOutput(
+        UnsafeRow.createFromByteArray(0, 0),
+        sortBasedAggregationBuffer).copy()
       hashMap.free()
       resultCopy
     } else {

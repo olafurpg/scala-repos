@@ -272,15 +272,16 @@ private[sql] object JDBCRDD extends Logging {
     val dialect = JdbcDialects.get(url)
     val quotedColumns =
       requiredColumns.map(colName => dialect.quoteIdentifier(colName))
-    new JDBCRDD(sc,
-                JdbcUtils.createConnectionFactory(url, properties),
-                pruneSchema(schema, requiredColumns),
-                fqTable,
-                quotedColumns,
-                filters,
-                parts,
-                url,
-                properties)
+    new JDBCRDD(
+      sc,
+      JdbcUtils.createConnectionFactory(url, properties),
+      pruneSchema(schema, requiredColumns),
+      fqTable,
+      quotedColumns,
+      filters,
+      parts,
+      url,
+      properties)
   }
 }
 
@@ -410,9 +411,10 @@ private[sql] class JDBCRDD(sc: SparkContext,
       val myWhereClause = getWhereClause(part)
 
       val sqlText = s"SELECT $columnList FROM $fqTable $myWhereClause"
-      val stmt = conn.prepareStatement(sqlText,
-                                       ResultSet.TYPE_FORWARD_ONLY,
-                                       ResultSet.CONCUR_READ_ONLY)
+      val stmt = conn.prepareStatement(
+        sqlText,
+        ResultSet.TYPE_FORWARD_ONLY,
+        ResultSet.CONCUR_READ_ONLY)
       val fetchSize = properties.getProperty("fetchsize", "0").toInt
       stmt.setFetchSize(fetchSize)
       val rs = stmt.executeQuery()
@@ -484,8 +486,9 @@ private[sql] class JDBCRDD(sc: SparkContext,
                     case TimestampConversion =>
                       array.asInstanceOf[Array[java.sql.Timestamp]].map {
                         timestamp =>
-                          nullSafeConvert(timestamp,
-                                          DateTimeUtils.fromJavaTimestamp)
+                          nullSafeConvert(
+                            timestamp,
+                            DateTimeUtils.fromJavaTimestamp)
                       }
                     case StringConversion =>
                       array

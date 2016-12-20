@@ -117,9 +117,11 @@ trait TypeAdaptingTransformer { self: TreeDSL =>
                 // via the unboxed type would yield a NPE (see SI-5866)
                 unbox1(tree, underlying)
               } else
-                Apply(Select(adaptToType(tree, clazz.tpe),
-                             clazz.derivedValueClassUnbox),
-                      List())
+                Apply(
+                  Select(
+                    adaptToType(tree, clazz.tpe),
+                    clazz.derivedValueClassUnbox),
+                  List())
             cast(tree0, pt)
           case _ =>
             pt.typeSymbol match {
@@ -129,8 +131,9 @@ trait TypeAdaptingTransformer { self: TreeDSL =>
               case x =>
                 assert(x != ArrayClass)
                 // don't `setType pt` the Apply tree, as the Apply's fun won't be typechecked if the Apply tree already has a type
-                Apply(currentRun.runDefinitions.unboxMethod(pt.typeSymbol),
-                      tree)
+                Apply(
+                  currentRun.runDefinitions.unboxMethod(pt.typeSymbol),
+                  tree)
             }
         }
         typer.typedPos(tree.pos)(tree1)

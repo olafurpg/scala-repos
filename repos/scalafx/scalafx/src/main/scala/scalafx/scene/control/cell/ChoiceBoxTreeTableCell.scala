@@ -89,8 +89,9 @@ object ChoiceBoxTreeTableCell {
   /**
     * $SATISFY
     */
-  @deprecated(message = "Use forTreeTableColumn[S, T](ObservableBuffer[T])",
-              since = "1.0")
+  @deprecated(
+    message = "Use forTreeTableColumn[S, T](ObservableBuffer[T])",
+    since = "1.0")
   def forTreeTableColumn[S, T](items: jfxc.ObservableList[T]) =
     jfxscc.ChoiceBoxTreeTableCell.forTreeTableColumn[S, T](items)
 
@@ -142,8 +143,9 @@ object ChoiceBoxTreeTableCell {
   /**
     * $SATISFY
     */
-  @deprecated(message = "Use forTreeTableColumn[S, T](StringConverter[T], T*)",
-              since = "1.0")
+  @deprecated(
+    message = "Use forTreeTableColumn[S, T](StringConverter[T], T*)",
+    since = "1.0")
   def forTreeTableColumn[S, T](converter: jfxu.StringConverter[T], items: T*) =
     jfxscc.ChoiceBoxTreeTableCell
       .forTreeTableColumn[S, T](converter, items: _*)

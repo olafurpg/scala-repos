@@ -38,43 +38,49 @@ object IntViewOfAllocDirectByteBufferBigEndianJSTest
     extends SupportsTypedArrays
 
 class IntViewOfAllocDirectByteBufferBigEndianJSTest
-    extends IntViewOfByteBufferTest(new AllocDirectByteBufferFactory,
-                                    ByteOrder.BIG_ENDIAN)
+    extends IntViewOfByteBufferTest(
+      new AllocDirectByteBufferFactory,
+      ByteOrder.BIG_ENDIAN)
 
 object IntViewOfSlicedAllocDirectByteBufferBigEndianJSTest
     extends SupportsTypedArrays
 
 class IntViewOfSlicedAllocDirectByteBufferBigEndianJSTest
-    extends IntViewOfByteBufferTest(new SlicedAllocDirectByteBufferFactory,
-                                    ByteOrder.BIG_ENDIAN)
+    extends IntViewOfByteBufferTest(
+      new SlicedAllocDirectByteBufferFactory,
+      ByteOrder.BIG_ENDIAN)
 
 object IntViewOfWrappedTypedArrayByteBufferBigEndianJSTest
     extends SupportsTypedArrays
 
 class IntViewOfWrappedTypedArrayByteBufferBigEndianJSTest
-    extends IntViewOfByteBufferTest(new WrappedTypedArrayByteBufferFactory,
-                                    ByteOrder.BIG_ENDIAN)
+    extends IntViewOfByteBufferTest(
+      new WrappedTypedArrayByteBufferFactory,
+      ByteOrder.BIG_ENDIAN)
 
 object IntViewOfAllocDirectByteBufferLittleEndianJSTest
     extends SupportsTypedArrays
 
 class IntViewOfAllocDirectByteBufferLittleEndianJSTest
-    extends IntViewOfByteBufferTest(new AllocDirectByteBufferFactory,
-                                    ByteOrder.LITTLE_ENDIAN)
+    extends IntViewOfByteBufferTest(
+      new AllocDirectByteBufferFactory,
+      ByteOrder.LITTLE_ENDIAN)
 
 object IntViewOfSlicedAllocDirectByteBufferLittleEndianJSTest
     extends SupportsTypedArrays
 
 class IntViewOfSlicedAllocDirectByteBufferLittleEndianJSTest
-    extends IntViewOfByteBufferTest(new SlicedAllocDirectByteBufferFactory,
-                                    ByteOrder.LITTLE_ENDIAN)
+    extends IntViewOfByteBufferTest(
+      new SlicedAllocDirectByteBufferFactory,
+      ByteOrder.LITTLE_ENDIAN)
 
 object IntViewOfWrappedTypedArrayByteBufferLittleEndianJSTest
     extends SupportsTypedArrays
 
 class IntViewOfWrappedTypedArrayByteBufferLittleEndianJSTest
-    extends IntViewOfByteBufferTest(new WrappedTypedArrayByteBufferFactory,
-                                    ByteOrder.LITTLE_ENDIAN)
+    extends IntViewOfByteBufferTest(
+      new WrappedTypedArrayByteBufferFactory,
+      ByteOrder.LITTLE_ENDIAN)
 
 // Read only Int views of byte buffers
 
@@ -82,8 +88,9 @@ object ReadOnlyIntViewOfAllocDirectByteBufferBigEndianJSTest
     extends SupportsTypedArrays
 
 class ReadOnlyIntViewOfAllocDirectByteBufferBigEndianJSTest
-    extends ReadOnlyIntViewOfByteBufferTest(new AllocDirectByteBufferFactory,
-                                            ByteOrder.BIG_ENDIAN)
+    extends ReadOnlyIntViewOfByteBufferTest(
+      new AllocDirectByteBufferFactory,
+      ByteOrder.BIG_ENDIAN)
 
 object ReadOnlyIntViewOfSlicedAllocDirectByteBufferBigEndianJSTest
     extends SupportsTypedArrays
@@ -105,8 +112,9 @@ object ReadOnlyIntViewOfAllocDirectByteBufferLittleEndianJSTest
     extends SupportsTypedArrays
 
 class ReadOnlyIntViewOfAllocDirectByteBufferLittleEndianJSTest
-    extends ReadOnlyIntViewOfByteBufferTest(new AllocDirectByteBufferFactory,
-                                            ByteOrder.LITTLE_ENDIAN)
+    extends ReadOnlyIntViewOfByteBufferTest(
+      new AllocDirectByteBufferFactory,
+      ByteOrder.LITTLE_ENDIAN)
 
 object ReadOnlyIntViewOfSlicedAllocDirectByteBufferLittleEndianJSTest
     extends SupportsTypedArrays

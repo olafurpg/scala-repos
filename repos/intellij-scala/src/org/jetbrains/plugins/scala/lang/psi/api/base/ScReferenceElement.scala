@@ -388,12 +388,12 @@ trait ScReferenceElement
       this match {
         case stRef: ScStableCodeReferenceElement =>
           stRef.replace(
-            ScalaPsiElementFactory.createReferenceFromText(refText,
-                                                           stRef.getManager))
+            ScalaPsiElementFactory
+              .createReferenceFromText(refText, stRef.getManager))
         case ref: ScReferenceExpression =>
           ref.replace(
-            ScalaPsiElementFactory.createExpressionFromText(refText,
-                                                            ref.getManager))
+            ScalaPsiElementFactory
+              .createExpressionFromText(refText, ref.getManager))
         case _ => null
       }
     }

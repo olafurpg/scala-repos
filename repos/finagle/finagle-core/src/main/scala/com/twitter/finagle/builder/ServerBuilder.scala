@@ -121,9 +121,10 @@ trait ServerConfigEvidence[HasCodec, HasBindTo, HasName]
 
 private[builder] object ServerConfigEvidence {
   implicit object FullyConfigured
-      extends ServerConfigEvidence[ServerConfig.Yes,
-                                   ServerConfig.Yes,
-                                   ServerConfig.Yes]
+      extends ServerConfigEvidence[
+        ServerConfig.Yes,
+        ServerConfig.Yes,
+        ServerConfig.Yes]
 }
 
 /**
@@ -279,11 +280,12 @@ class ServerBuilder[Req, Rep, HasCodec, HasBindTo, HasName] private[builder] (
           (idle, life) match {
             case (None, None) => dispatcher
             case _ =>
-              new ExpiringService(service,
-                                  idle,
-                                  life,
-                                  timer,
-                                  sr.scope("expired")) {
+              new ExpiringService(
+                service,
+                idle,
+                life,
+                timer,
+                sr.scope("expired")) {
                 protected def onExpire() { dispatcher.close(Time.now) }
               }
           }
@@ -355,8 +357,9 @@ class ServerBuilder[Req, Rep, HasCodec, HasBindTo, HasName] private[builder] (
     : ServerBuilder[Req, Rep, HasCodec, Yes, HasName] =
     configured(BindTo(address))
 
-  @deprecated("use com.twitter.finagle.netty3.numWorkers flag instead",
-              "2015-11-18")
+  @deprecated(
+    "use com.twitter.finagle.netty3.numWorkers flag instead",
+    "2015-11-18")
   def channelFactory(cf: ServerChannelFactory): This =
     configured(Netty3Listener.ChannelFactory(cf))
 
@@ -373,11 +376,12 @@ class ServerBuilder[Req, Rep, HasCodec, HasBindTo, HasName] private[builder] (
           nextProtos: String = null): This =
     newFinagleSslEngine(
       () =>
-        Ssl.server(certificatePath,
-                   keyPath,
-                   caCertificatePath,
-                   ciphers,
-                   nextProtos))
+        Ssl.server(
+          certificatePath,
+          keyPath,
+          caCertificatePath,
+          ciphers,
+          nextProtos))
 
   /**
     * Provide a raw SSL engine that is used to establish SSL sessions.
@@ -546,8 +550,9 @@ class ServerBuilder[Req, Rep, HasCodec, HasBindTo, HasName] private[builder] (
       service: Service[Req, Rep],
       THE_BUILDER_IS_NOT_FULLY_SPECIFIED_SEE_ServerBuilder_DOCUMENTATION: ThisConfig =:= FullySpecifiedConfig)
     : Server =
-    build(ServiceFactory.const(service),
-          THE_BUILDER_IS_NOT_FULLY_SPECIFIED_SEE_ServerBuilder_DOCUMENTATION)
+    build(
+      ServiceFactory.const(service),
+      THE_BUILDER_IS_NOT_FULLY_SPECIFIED_SEE_ServerBuilder_DOCUMENTATION)
 
   /**
     * Construct the Server, given the provided Service factory.

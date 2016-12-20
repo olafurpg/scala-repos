@@ -81,12 +81,13 @@ private[spark] class MesosExecutorBackend
         ("spark.app.id", frameworkInfo.getId.getValue))
     val conf = new SparkConf(loadDefaults = true).setAll(properties)
     val port = conf.getInt("spark.executor.port", 0)
-    val env = SparkEnv.createExecutorEnv(conf,
-                                         executorId,
-                                         slaveInfo.getHostname,
-                                         port,
-                                         cpusPerTask,
-                                         isLocal = false)
+    val env = SparkEnv.createExecutorEnv(
+      conf,
+      executorId,
+      slaveInfo.getHostname,
+      port,
+      cpusPerTask,
+      isLocal = false)
 
     executor = new Executor(executorId, slaveInfo.getHostname, env)
   }
@@ -98,11 +99,12 @@ private[spark] class MesosExecutorBackend
       logError("Received launchTask but executor was null")
     } else {
       SparkHadoopUtil.get.runAsSparkUser { () =>
-        executor.launchTask(this,
-                            taskId = taskId,
-                            attemptNumber = taskData.attemptNumber,
-                            taskInfo.getName,
-                            taskData.serializedTask)
+        executor.launchTask(
+          this,
+          taskId = taskId,
+          attemptNumber = taskData.attemptNumber,
+          taskInfo.getName,
+          taskData.serializedTask)
       }
     }
   }

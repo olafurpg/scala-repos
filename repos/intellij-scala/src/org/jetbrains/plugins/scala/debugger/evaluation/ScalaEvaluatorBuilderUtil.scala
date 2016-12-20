@@ -239,13 +239,14 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
       val signature = DebuggerUtil.getFunctionJVMSignature(fun)
       val positions = DebuggerUtil.getSourcePositions(fun.getNavigationElement)
       val idx = localFunctionIndex(fun)
-      new ScalaMethodEvaluator(thisEvaluator,
-                               name,
-                               signature,
-                               evaluators,
-                               traitImplementation(fun),
-                               positions,
-                               idx)
+      new ScalaMethodEvaluator(
+        thisEvaluator,
+        name,
+        signature,
+        evaluators,
+        traitImplementation(fun),
+        positions,
+        idx)
     } else throw EvaluationException(message)
   }
 
@@ -330,12 +331,14 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
     def equalsEval(opName: String): Evaluator = {
       val rawText =
         JVMNameUtil.getJVMRawText("(Ljava/lang/Object;Ljava/lang/Object;)Z")
-      binaryEval(name,
-                 (l, r) =>
-                   new ScalaMethodEvaluator(BOXES_RUN_TIME,
-                                            "equals",
-                                            rawText,
-                                            boxed(l, r)))
+      binaryEval(
+        name,
+        (l, r) =>
+          new ScalaMethodEvaluator(
+            BOXES_RUN_TIME,
+            "equals",
+            rawText,
+            boxed(l, r)))
     }
     def isInstanceOfEval: Evaluator = {
       unaryEval("isInstanceOf", eval => {
@@ -364,22 +367,24 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
         "||",
         (first, second) => new ScalaIfEvaluator(first, trueEval, Some(second)))
     def conditionalAnd =
-      binaryEval("&&",
-                 (first, second) =>
-                   new ScalaIfEvaluator(first, second, Some(falseEval)))
+      binaryEval(
+        "&&",
+        (first,
+         second) => new ScalaIfEvaluator(first, second, Some(falseEval)))
 
     name match {
       case "isInstanceOf" => isInstanceOfEval
       case "asInstanceOf" =>
         unaryEval(name, identity) //todo: primitive type casting?
       case "##" =>
-        unaryEval(name,
-                  eval =>
-                    new ScalaMethodEvaluator(
-                      BOXES_RUN_TIME,
-                      "hashFromObject",
-                      JVMNameUtil.getJVMRawText("(Ljava/lang/Object;)I"),
-                      Seq(boxEvaluator(eval))))
+        unaryEval(
+          name,
+          eval =>
+            new ScalaMethodEvaluator(
+              BOXES_RUN_TIME,
+              "hashFromObject",
+              JVMNameUtil.getJVMRawText("(Ljava/lang/Object;)I"),
+              Seq(boxEvaluator(eval))))
       case "==" => equalsEval("==")
       case "!=" => unaryEvaluator(equalsEval("!="), "takeNot")
       case "unary_!" => unaryEvalForBoxes("!", "takeNot")
@@ -510,10 +515,12 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
     val innerJvmName =
       DebuggerUtil.getJVMStringForType(innerType, isParam = true)
     val signature = JVMNameUtil.getJVMRawText(s"($innerJvmName)V")
-    new ScalaDuplexEvaluator(new ScalaNewClassInstanceEvaluator(valueClassType,
-                                                                signature,
-                                                                Array(value)),
-                             value)
+    new ScalaDuplexEvaluator(
+      new ScalaNewClassInstanceEvaluator(
+        valueClassType,
+        signature,
+        Array(value)),
+      value)
   }
 
   def repeatedArgEvaluator(exprsForP: Seq[ScExpression],
@@ -687,40 +694,44 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
     ref.qualifier match {
       case Some(qual @ ExpressionType(tp)) if isPrimitiveScType(tp) =>
         val boxEval = boxEvaluator(evaluatorFor(qual))
-        ScalaMethodEvaluator(boxEval,
-                             method.name,
-                             signature,
-                             argEvals,
-                             None,
-                             methodPosition)
+        ScalaMethodEvaluator(
+          boxEval,
+          method.name,
+          signature,
+          argEvals,
+          None,
+          methodPosition)
       case Some(q) if method.hasModifierPropertyScala("static") =>
         val eval = new TypeEvaluator(
           JVMNameUtil.getContextClassJVMQualifiedName(
             SourcePosition.createFromElement(method)))
         val name = method.name
-        ScalaMethodEvaluator(eval,
-                             name,
-                             signature,
-                             argEvals,
-                             None,
-                             methodPosition)
+        ScalaMethodEvaluator(
+          eval,
+          name,
+          signature,
+          argEvals,
+          None,
+          methodPosition)
       case Some(q) =>
         val name = method.name
-        new ScalaMethodEvaluator(evaluatorFor(q),
-                                 name,
-                                 signature,
-                                 argEvals,
-                                 None,
-                                 methodPosition)
+        new ScalaMethodEvaluator(
+          evaluatorFor(q),
+          name,
+          signature,
+          argEvals,
+          None,
+          methodPosition)
       case _ =>
         val evaluator = thisOrImportedQualifierEvaluator(ref)
         val name = method.name
-        new ScalaMethodEvaluator(evaluator,
-                                 name,
-                                 signature,
-                                 argEvals,
-                                 None,
-                                 methodPosition)
+        new ScalaMethodEvaluator(
+          evaluator,
+          name,
+          signature,
+          argEvals,
+          None,
+          methodPosition)
     }
   }
 
@@ -732,10 +743,11 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
       case Some(q) =>
         new ScalaMethodEvaluator(evaluatorFor(q), name, null, argEvals)
       case _ =>
-        new ScalaMethodEvaluator(thisOrImportedQualifierEvaluator(ref),
-                                 name,
-                                 null,
-                                 argEvals)
+        new ScalaMethodEvaluator(
+          thisOrImportedQualifierEvaluator(ref),
+          name,
+          null,
+          argEvals)
     }
   }
 
@@ -789,10 +801,11 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
                     call.getContext,
                     call))
               val localEvals = localParamRefs.map(evaluatorFor(_))
-              functionEvaluator(ref.qualifier,
-                                ref,
-                                methodName,
-                                previousClausesEvaluators ++ localEvals)
+              functionEvaluator(
+                ref.qualifier,
+                ref,
+                methodName,
+                previousClausesEvaluators ++ localEvals)
             } else
               throw EvaluationException(
                 ScalaBundle.message("cannot.evaluate.parameter", p.name))
@@ -835,10 +848,11 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
         val traitTypeEval = new TypeEvaluator(
           DebuggerUtil.getClassJVMName(tr, withPostfix = true))
         val qualEval = qualEvaluator(r)
-        new ScalaMethodEvaluator(traitTypeEval,
-                                 name,
-                                 null,
-                                 qualEval +: argEvaluators)
+        new ScalaMethodEvaluator(
+          traitTypeEval,
+          name,
+          null,
+          qualEval +: argEvaluators)
       case Some(r) =>
         val resolve = r.element
         val qualEval = qualEvaluator(r)
@@ -950,8 +964,9 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
           case LazyVal(_) => localLazyValEvaluator(named)
           case ScalaPositionManager.InsideAsync(_) =>
             val simpleLocal = new ScalaLocalVariableEvaluator(name, fileName)
-            val fieldMacro = new ScalaFieldEvaluator(new ScalaThisEvaluator(),
-                                                     name + "$macro")
+            val fieldMacro = new ScalaFieldEvaluator(
+              new ScalaThisEvaluator(),
+              name + "$macro")
             new ScalaDuplexEvaluator(simpleLocal, fieldMacro)
           case _ => new ScalaLocalVariableEvaluator(name, fileName)
         }
@@ -995,8 +1010,9 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
     resolve match {
       case Both(isInsideLocalFunction(fun), named: PsiNamedElement)
           if isLocalValue =>
-        new ScalaDuplexEvaluator(calcLocal(named),
-                                 parameterEvaluator(fun, resolve))
+        new ScalaDuplexEvaluator(
+          calcLocal(named),
+          parameterEvaluator(fun, resolve))
       case p: ScParameter if p.isCallByNameParameter && isLocalValue =>
         val localEval = calcLocal(p)
         new ScalaMethodEvaluator(localEval, "apply", null, Nil)
@@ -1066,8 +1082,9 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
           case Some(qual) => new ScalaFieldEvaluator(evaluatorFor(qual), name)
           case None => new ScalaLocalVariableEvaluator(name, fileName)
         }
-        new ScalaDuplexEvaluator(fieldOrVarEval,
-                                 unresolvedMethodEvaluator(ref, Seq.empty))
+        new ScalaDuplexEvaluator(
+          fieldOrVarEval,
+          unresolvedMethodEvaluator(ref, Seq.empty))
     }
   }
 
@@ -1231,14 +1248,14 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
               new ScalaMethodEvaluator(getEval, "apply", null, Seq(indexEval))
             } else
               throw EvaluationException(
-                ScalaBundle.message("pattern.doesnot.resolves.to.unapply",
-                                    ref.refName))
+                ScalaBundle
+                  .message("pattern.doesnot.resolves.to.unapply", ref.refName))
           val nextPattern = pattern.subpatterns(nextPatternIndex)
           evaluateSubpatternFromPattern(newEval, nextPattern, subPattern)
         case _ =>
           throw EvaluationException(
-            ScalaBundle.message("pattern.doesnot.resolves.to.unapply",
-                                ref.refName))
+            ScalaBundle
+              .message("pattern.doesnot.resolves.to.unapply", ref.refName))
       }
     }
 
@@ -1256,9 +1273,10 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
         case naming: ScNamingPattern =>
           evaluateSubpatternFromPattern(exprEval, naming.named, subPattern)
         case typed: ScTypedPattern =>
-          evaluateSubpatternFromPattern(exprEval,
-                                        pattern.subpatterns.head,
-                                        subPattern)
+          evaluateSubpatternFromPattern(
+            exprEval,
+            pattern.subpatterns.head,
+            subPattern)
         case par: ScParenthesisedPattern =>
           val withoutPars = par.subpattern.getOrElse(
             throw new IllegalStateException("Empty parentheses pattern"))
@@ -1284,8 +1302,9 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
               .message("xml.patterns.not.supported")) //todo: xml patterns
         case _ =>
           throw EvaluationException(
-            ScalaBundle.message("kind.of.patterns.not.supported",
-                                pattern.getText)) //todo: xml patterns
+            ScalaBundle.message(
+              "kind.of.patterns.not.supported",
+              pattern.getText)) //todo: xml patterns
       }
     }
   }
@@ -1320,15 +1339,17 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
                 constr.reference.map(_.resolve()) match {
                   case Some(named: PsiNamedElement) =>
                     val signature = DebuggerUtil.constructorSignature(named)
-                    new ScalaMethodEvaluator(typeEvaluator,
-                                             "<init>",
-                                             signature,
-                                             argumentEvaluators)
+                    new ScalaMethodEvaluator(
+                      typeEvaluator,
+                      "<init>",
+                      signature,
+                      argumentEvaluators)
                   case _ =>
-                    new ScalaMethodEvaluator(typeEvaluator,
-                                             "<init>",
-                                             null,
-                                             argumentEvaluators)
+                    new ScalaMethodEvaluator(
+                      typeEvaluator,
+                      "<init>",
+                      null,
+                      argumentEvaluators)
                 }
               case _ =>
                 throw EvaluationException(
@@ -1404,9 +1425,10 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
       val qual = "scala.runtime.VolatileObjectRef"
       val typeEvaluator = new TypeEvaluator(JVMNameUtil.getJVMRawText(qual))
       val signature = JVMNameUtil.getJVMRawText("(Ljava/lang/Object;)V")
-      new ScalaNewClassInstanceEvaluator(typeEvaluator,
-                                         signature,
-                                         Array(refEval))
+      new ScalaNewClassInstanceEvaluator(
+        typeEvaluator,
+        signature,
+        Array(refEval))
     } else FromLocalArgEvaluator(refEval)
   }
 
@@ -1426,10 +1448,11 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
     val bitmapEval = new ScalaLocalVariableEvaluator(bitmapName, fileName)
     val localFunIndex = localFunctionIndex(named)
     val methodName = s"$name$$$localFunIndex"
-    new ScalaMethodEvaluator(new ScalaThisEvaluator(),
-                             methodName,
-                             null,
-                             Seq(localRefEval, bitmapEval))
+    new ScalaMethodEvaluator(
+      new ScalaThisEvaluator(),
+      methodName,
+      null,
+      Seq(localRefEval, bitmapEval))
   }
 
   def ifStmtEvaluator(stmt: ScIfStmt): Evaluator = {
@@ -1515,8 +1538,9 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
       : Evaluator = {
       if (call.isApplyOrUpdateCall) {
         if (!call.isUpdateCall) {
-          val expr = applyCall(call.getInvokedExpr.getText,
-                               call.args.getText + tailString)
+          val expr = applyCall(
+            call.getInvokedExpr.getText,
+            call.args.getText + tailString)
           return evaluatorFor(expr)
         } else {
           //should be handled on assignment
@@ -1526,9 +1550,10 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
       val message = ScalaBundle.message("cannot.evaluate.method", call.getText)
       call.getInvokedExpr match {
         case ref: ScReferenceExpression =>
-          methodCallEvaluator(methodCall,
-                              call.argumentExpressions ++ collected,
-                              matchedParameters ++ call.matchedParametersMap)
+          methodCallEvaluator(
+            methodCall,
+            call.argumentExpressions ++ collected,
+            matchedParameters ++ call.matchedParametersMap)
         case newCall: ScMethodCall =>
           collectArgumentsAndBuildEvaluator(
             newCall,
@@ -1735,10 +1760,11 @@ object ScalaEvaluatorBuilderUtil {
     val rawText =
       JVMNameUtil.getJVMRawText("(Ljava/lang/Object;)Ljava/lang/Object;")
     unboxEvaluator(
-      new ScalaMethodEvaluator(BOXES_RUN_TIME,
-                               "takeNot",
-                               rawText,
-                               boxed(eval)))
+      new ScalaMethodEvaluator(
+        BOXES_RUN_TIME,
+        "takeNot",
+        rawText,
+        boxed(eval)))
   }
   def eqEvaluator(left: Evaluator, right: Evaluator): Evaluator = {
     new ScalaEqEvaluator(left, right)
@@ -1756,10 +1782,11 @@ object ScalaEvaluatorBuilderUtil {
     val rawText =
       JVMNameUtil.getJVMRawText("(Ljava/lang/Object;)Ljava/lang/Object;")
     unboxEvaluator(
-      new ScalaMethodEvaluator(BOXES_RUN_TIME,
-                               boxesRunTimeName,
-                               rawText,
-                               boxed(eval)))
+      new ScalaMethodEvaluator(
+        BOXES_RUN_TIME,
+        boxesRunTimeName,
+        rawText,
+        boxed(eval)))
   }
 
   def binaryEvaluator(left: Evaluator,
@@ -1768,10 +1795,11 @@ object ScalaEvaluatorBuilderUtil {
     val rawText = JVMNameUtil.getJVMRawText(
       "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;")
     unboxEvaluator(
-      new ScalaMethodEvaluator(BOXES_RUN_TIME,
-                               boxesRunTimeName,
-                               rawText,
-                               boxed(left, right)))
+      new ScalaMethodEvaluator(
+        BOXES_RUN_TIME,
+        boxesRunTimeName,
+        rawText,
+        boxed(left, right)))
   }
 
   object hasDeepestInvokedReference {
@@ -1930,9 +1958,10 @@ object ScalaEvaluatorBuilderUtil {
   def isAnonfunInsideSuperCall(elem: PsiElement) = {
     def isInsideSuperCall(td: ScTypeDefinition) = {
       val extBlock = td.extendsBlock
-      PsiTreeUtil.getParentOfType(elem,
-                                  classOf[ScEarlyDefinitions],
-                                  classOf[ScConstructor]) match {
+      PsiTreeUtil.getParentOfType(
+        elem,
+        classOf[ScEarlyDefinitions],
+        classOf[ScConstructor]) match {
         case ed: ScEarlyDefinitions if ed.getParent == extBlock => true
         case c: ScConstructor if c.getParent.getParent == extBlock => true
         case _ => false
@@ -1958,9 +1987,9 @@ object ScalaEvaluatorBuilderUtil {
               ScalaPsiUtil.isArgumentOfFunctionType(e) =>
           true
         case ScalaPsiUtil.MethodValue(_) => true
-        case Both(ChildOf(argExprs: ScArgumentExprList),
-                  ScalaPositionManager.InsideAsync(call))
-            if call.args == argExprs =>
+        case Both(
+            ChildOf(argExprs: ScArgumentExprList),
+            ScalaPositionManager.InsideAsync(call)) if call.args == argExprs =>
           true
         case _ => false
       }

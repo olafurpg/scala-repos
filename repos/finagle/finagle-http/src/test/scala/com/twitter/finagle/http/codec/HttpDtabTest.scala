@@ -124,11 +124,12 @@ class HttpDtabTest extends FunSuite with AssertionsForJUnit {
     m.headers.set("Dtab-Local", "/srv=>/srv#/staging")
     m.headers.set("onetwothree", "123")
 
-    val headers = Seq("X-Dtab-00-A",
-                      "X-Dtab-00-B",
-                      "X-Dtab-01-A",
-                      "X-Dtab-01-B",
-                      "Dtab-Local")
+    val headers = Seq(
+      "X-Dtab-00-A",
+      "X-Dtab-00-B",
+      "X-Dtab-01-A",
+      "X-Dtab-01-B",
+      "Dtab-Local")
 
     for (h <- headers) assert(m.headers.contains(h), h + " not in headers")
 
@@ -136,8 +137,9 @@ class HttpDtabTest extends FunSuite with AssertionsForJUnit {
 
     HttpDtab.clear(m)
 
-    assert(m.headers.contains("onetwothree"),
-           "onetwothree was removed from headers")
+    assert(
+      m.headers.contains("onetwothree"),
+      "onetwothree was removed from headers")
     for (h <- headers)
       assert(!m.headers.contains(h), h + " was not removed from headers")
   }

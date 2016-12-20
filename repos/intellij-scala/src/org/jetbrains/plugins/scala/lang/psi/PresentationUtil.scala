@@ -48,8 +48,9 @@ object PresentationUtil {
       case tp: PsiEllipsisType =>
         presentationString(tp.getComponentType, substitutor) + "*"
       case tp: PsiType =>
-        presentationString(ScType.create(tp, DecompilerUtil.obtainProject),
-                           substitutor)
+        presentationString(
+          ScType.create(tp, DecompilerUtil.obtainProject),
+          substitutor)
       case tp: ScTypeParamClause =>
         tp.typeParameters
           .map(t => presentationString(t, substitutor))
@@ -61,14 +62,16 @@ object PresentationUtil {
         param.lowerBound foreach {
           case psi.types.Nothing =>
           case tp: ScType =>
-            paramText = paramText + " >: " + presentationString(tp,
-                                                                substitutor)
+            paramText = paramText + " >: " + presentationString(
+                tp,
+                substitutor)
         }
         param.upperBound foreach {
           case psi.types.Any =>
           case tp: ScType =>
-            paramText = paramText + " <: " + presentationString(tp,
-                                                                substitutor)
+            paramText = paramText + " <: " + presentationString(
+                tp,
+                substitutor)
         }
         param.viewBound foreach { (tp: ScType) =>
           paramText = paramText + " <% " + presentationString(tp, substitutor)

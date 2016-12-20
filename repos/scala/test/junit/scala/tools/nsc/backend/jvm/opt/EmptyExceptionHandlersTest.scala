@@ -34,10 +34,11 @@ class EmptyExceptionHandlersTest extends ClearAfterClass {
   @Test
   def eliminateEmpty(): Unit = {
     val handlers = List(
-      ExceptionHandler(Label(1),
-                       Label(2),
-                       Label(2),
-                       Some(exceptionDescriptor)))
+      ExceptionHandler(
+        Label(1),
+        Label(2),
+        Label(2),
+        Some(exceptionDescriptor)))
     val asmMethod = genMethod(handlers = handlers)(
       Label(1),
       Label(2),
@@ -51,10 +52,11 @@ class EmptyExceptionHandlersTest extends ClearAfterClass {
   @Test
   def eliminateHandlersGuardingNops(): Unit = {
     val handlers = List(
-      ExceptionHandler(Label(1),
-                       Label(2),
-                       Label(2),
-                       Some(exceptionDescriptor)))
+      ExceptionHandler(
+        Label(1),
+        Label(2),
+        Label(2),
+        Some(exceptionDescriptor)))
     val asmMethod = genMethod(handlers = handlers)(
       Label(1), // nops only
       Jump(GOTO, Label(3)),

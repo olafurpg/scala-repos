@@ -21,8 +21,9 @@ abstract class AkkaIdentityProcessorVerification[T](
     with ActorSystemLifecycle {
 
   def this(printlnDebug: Boolean) =
-    this(new TestEnvironment(Timeouts.defaultTimeoutMillis, printlnDebug),
-         Timeouts.publisherShutdownTimeoutMillis)
+    this(
+      new TestEnvironment(Timeouts.defaultTimeoutMillis, printlnDebug),
+      Timeouts.publisherShutdownTimeoutMillis)
 
   def this() = this(false)
 

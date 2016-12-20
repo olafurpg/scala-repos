@@ -49,13 +49,14 @@ import org.apache.spark.util.Utils
 class RandomForestModel @Since("1.2.0")(
     @Since("1.2.0") override val algo: Algo,
     @Since("1.2.0") override val trees: Array[DecisionTreeModel])
-    extends TreeEnsembleModel(algo,
-                              trees,
-                              Array.fill(trees.length)(1.0),
-                              combiningStrategy =
-                                if (algo == Classification)
-                                  Vote
-                                else Average)
+    extends TreeEnsembleModel(
+      algo,
+      trees,
+      Array.fill(trees.length)(1.0),
+      combiningStrategy =
+        if (algo == Classification)
+          Vote
+        else Average)
     with Saveable {
 
   require(trees.forall(_.algo == algo))
@@ -128,10 +129,11 @@ class GradientBoostedTreesModel @Since("1.2.0")(
     @Since("1.2.0") override val algo: Algo,
     @Since("1.2.0") override val trees: Array[DecisionTreeModel],
     @Since("1.2.0") override val treeWeights: Array[Double])
-    extends TreeEnsembleModel(algo,
-                              trees,
-                              treeWeights,
-                              combiningStrategy = Sum)
+    extends TreeEnsembleModel(
+      algo,
+      trees,
+      treeWeights,
+      combiningStrategy = Sum)
     with Saveable {
 
   require(trees.length == treeWeights.length)
@@ -287,9 +289,10 @@ object GradientBoostedTreesModel extends Loader[GradientBoostedTreesModel] {
         assert(metadata.combiningStrategy == Sum.toString)
         val trees =
           TreeEnsembleModel.SaveLoadV1_0.loadTrees(sc, path, metadata.treeAlgo)
-        new GradientBoostedTreesModel(Algo.fromString(metadata.algo),
-                                      trees,
-                                      metadata.treeWeights)
+        new GradientBoostedTreesModel(
+          Algo.fromString(metadata.algo),
+          trees,
+          metadata.treeWeights)
       case _ =>
         throw new Exception(
           s"GradientBoostedTreesModel.load did not recognize model" +
@@ -487,10 +490,11 @@ private[tree] object TreeEnsembleModel extends Logging {
 
       // Create JSON metadata.
       implicit val format = DefaultFormats
-      val ensembleMetadata = Metadata(model.algo.toString,
-                                      model.trees(0).algo.toString,
-                                      model.combiningStrategy.toString,
-                                      model.treeWeights)
+      val ensembleMetadata = Metadata(
+        model.algo.toString,
+        model.trees(0).algo.toString,
+        model.combiningStrategy.toString,
+        model.treeWeights)
       val metadata = compact(
         render(
           ("class" -> className) ~ ("version" -> thisFormatVersion) ~

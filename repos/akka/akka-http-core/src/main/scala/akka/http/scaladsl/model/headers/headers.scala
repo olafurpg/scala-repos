@@ -800,10 +800,12 @@ object Referer extends ModeledCompanion[Referer]
 final case class Referer(uri: Uri)
     extends jm.headers.Referer
     with RequestHeader {
-  require(uri.fragment.isEmpty,
-          "Referer header URI must not contain a fragment")
-  require(uri.authority.userinfo.isEmpty,
-          "Referer header URI must not contain a userinfo component")
+  require(
+    uri.fragment.isEmpty,
+    "Referer header URI must not contain a fragment")
+  require(
+    uri.authority.userinfo.isEmpty,
+    "Referer header URI must not contain a userinfo component")
 
   def renderValue[R <: Rendering](r: R): r.type = {
     import UriRendering.UriRenderer; r ~~ uri
@@ -859,8 +861,9 @@ private[http] object `Sec-WebSocket-Extensions`
 private[http] final case class `Sec-WebSocket-Extensions`(
     extensions: immutable.Seq[WebSocketExtension])
     extends ResponseHeader {
-  require(extensions.nonEmpty,
-          "Sec-WebSocket-Extensions.extensions must not be empty")
+  require(
+    extensions.nonEmpty,
+    "Sec-WebSocket-Extensions.extensions must not be empty")
   import `Sec-WebSocket-Extensions`.extensionsRenderer
   protected[http] def renderValue[R <: Rendering](r: R): r.type =
     r ~~ extensions
@@ -913,8 +916,9 @@ private[http] object `Sec-WebSocket-Protocol`
 private[http] final case class `Sec-WebSocket-Protocol`(
     protocols: immutable.Seq[String])
     extends RequestResponseHeader {
-  require(protocols.nonEmpty,
-          "Sec-WebSocket-Protocol.protocols must not be empty")
+  require(
+    protocols.nonEmpty,
+    "Sec-WebSocket-Protocol.protocols must not be empty")
   import `Sec-WebSocket-Protocol`.protocolsRenderer
   protected[http] def renderValue[R <: Rendering](r: R): r.type =
     r ~~ protocols
@@ -936,8 +940,9 @@ private[http] object `Sec-WebSocket-Version`
 private[http] final case class `Sec-WebSocket-Version`(
     versions: immutable.Seq[Int])
     extends RequestResponseHeader {
-  require(versions.nonEmpty,
-          "Sec-WebSocket-Version.versions must not be empty")
+  require(
+    versions.nonEmpty,
+    "Sec-WebSocket-Version.versions must not be empty")
   require(
     versions.forall(v ⇒ v >= 0 && v <= 255),
     s"Sec-WebSocket-Version.versions must be in the range 0 <= version <= 255 but were $versions")

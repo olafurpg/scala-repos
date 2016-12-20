@@ -49,8 +49,9 @@ object TupleConverterImpl {
           case m: MethodSymbol if m.isCaseAccessor => m
         }
         .map { accessorMethod =>
-          accessorMethod.returnType.asSeenFrom(outerTpe,
-                                               outerTpe.typeSymbol.asClass)
+          accessorMethod.returnType.asSeenFrom(
+            outerTpe,
+            outerTpe.typeSymbol.asClass)
         }
         .toVector
 

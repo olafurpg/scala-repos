@@ -10,17 +10,19 @@ import org.scalatest.WordSpec
 
 object DslConsistencySpec {
   class ScalaSubSource[Out, Mat]
-      extends impl.SubFlowImpl[Out,
-                               Out,
-                               Mat,
-                               scaladsl.Source[Out, Mat]#Repr,
-                               scaladsl.RunnableGraph[Mat]](null, null, null)
+      extends impl.SubFlowImpl[
+        Out,
+        Out,
+        Mat,
+        scaladsl.Source[Out, Mat]#Repr,
+        scaladsl.RunnableGraph[Mat]](null, null, null)
   class ScalaSubFlow[In, Out, Mat]
-      extends impl.SubFlowImpl[Out,
-                               Out,
-                               Mat,
-                               scaladsl.Flow[In, Out, Mat]#Repr,
-                               scaladsl.Sink[In, Mat]](null, null, null)
+      extends impl.SubFlowImpl[
+        Out,
+        Out,
+        Mat,
+        scaladsl.Flow[In, Out, Mat]#Repr,
+        scaladsl.Sink[In, Mat]](null, null, null)
 }
 
 class DslConsistencySpec extends WordSpec with Matchers {
@@ -48,18 +50,20 @@ class DslConsistencySpec extends WordSpec with Matchers {
     classOf[akka.stream.scaladsl.RunnableGraph[_]]
 
   val ignore =
-    Set("equals",
-        "hashCode",
-        "notify",
-        "notifyAll",
-        "wait",
-        "toString",
-        "getClass") ++ Set("productArity",
-                           "canEqual",
-                           "productPrefix",
-                           "copy",
-                           "productIterator",
-                           "productElement") ++ Set(
+    Set(
+      "equals",
+      "hashCode",
+      "notify",
+      "notifyAll",
+      "wait",
+      "toString",
+      "getClass") ++ Set(
+      "productArity",
+      "canEqual",
+      "productPrefix",
+      "copy",
+      "productIterator",
+      "productElement") ++ Set(
       "create",
       "apply",
       "ops",
@@ -68,19 +72,21 @@ class DslConsistencySpec extends WordSpec with Matchers {
       "andThenMat",
       "isIdentity",
       "withAttributes",
-      "transformMaterializing") ++ Set("asScala",
-                                       "asJava",
-                                       "deprecatedAndThen",
-                                       "deprecatedAndThenMat")
+      "transformMaterializing") ++ Set(
+      "asScala",
+      "asJava",
+      "deprecatedAndThen",
+      "deprecatedAndThenMat")
 
-  val graphHelpers = Set("zipGraph",
-                         "zipWithGraph",
-                         "mergeGraph",
-                         "mergeSortedGraph",
-                         "interleaveGraph",
-                         "concatGraph",
-                         "prependGraph",
-                         "alsoToGraph")
+  val graphHelpers = Set(
+    "zipGraph",
+    "zipWithGraph",
+    "mergeGraph",
+    "mergeSortedGraph",
+    "interleaveGraph",
+    "concatGraph",
+    "prependGraph",
+    "alsoToGraph")
   val allowMissing: Map[Class[_], Set[String]] = Map(
     jFlowClass -> graphHelpers,
     jSourceClass -> graphHelpers,

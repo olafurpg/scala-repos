@@ -51,8 +51,9 @@ class ScalaForStatementFixer extends ScalaFixer {
       case Some(cond)
           if rightParenthesis != null &&
             forStatement.body.exists(_.isInstanceOf[ScBlockExpr]) =>
-        placeInWholeBlock(forStatement.body.get.asInstanceOf[ScBlockExpr],
-                          editor)
+        placeInWholeBlock(
+          forStatement.body.get.asInstanceOf[ScBlockExpr],
+          editor)
       case _ => NoOperation
     }
   }

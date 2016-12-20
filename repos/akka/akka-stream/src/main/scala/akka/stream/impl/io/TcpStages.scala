@@ -34,9 +34,9 @@ private[stream] class ConnectionSourceStage(
     val halfClose: Boolean,
     val idleTimeout: Duration,
     val bindShutdownTimeout: FiniteDuration)
-    extends GraphStageWithMaterializedValue[SourceShape[
-                                              StreamTcp.IncomingConnection],
-                                            Future[StreamTcp.ServerBinding]] {
+    extends GraphStageWithMaterializedValue[
+      SourceShape[StreamTcp.IncomingConnection],
+      Future[StreamTcp.ServerBinding]] {
   import ConnectionSourceStage._
 
   val out: Outlet[StreamTcp.IncomingConnection] = Outlet(
@@ -110,9 +110,10 @@ private[stream] class ConnectionSourceStage(
 
         val tcpFlow = Flow
           .fromGraph(
-            new IncomingConnectionStage(connection,
-                                        connected.remoteAddress,
-                                        halfClose))
+            new IncomingConnectionStage(
+              connection,
+              connected.remoteAddress,
+              halfClose))
           .via(detacher[ByteString]) // must read ahead for proper completions
           .mapMaterializedValue { m ⇒
             connectionFlowsAwaitingInitialization.decrementAndGet()
@@ -127,9 +128,10 @@ private[stream] class ConnectionSourceStage(
           case _ ⇒ tcpFlow
         }
 
-        StreamTcp.IncomingConnection(connected.localAddress,
-                                     connected.remoteAddress,
-                                     handler)
+        StreamTcp.IncomingConnection(
+          connected.localAddress,
+          connected.remoteAddress,
+          handler)
       }
 
       private def tryUnbind(): Unit = {
@@ -206,9 +208,10 @@ private[stream] object TcpConnectionStage {
           setHandler(bytesOut, readHandler)
           connection = conn
           getStageActor(connected).watch(connection)
-          connection ! Register(self,
-                                keepOpenOnPeerClosed = true,
-                                useResumeWriting = false)
+          connection ! Register(
+            self,
+            keepOpenOnPeerClosed = true,
+            useResumeWriting = false)
           pull(bytesIn)
         case ob @ Outbound(manager, cmd, _, _) ⇒
           getStageActor(connecting(ob)).watch(manager)
@@ -236,9 +239,10 @@ private[stream] object TcpConnectionStage {
           stageActor.unwatch(ob.manager)
           stageActor.become(connected)
           stageActor.watch(connection)
-          connection ! Register(self,
-                                keepOpenOnPeerClosed = true,
-                                useResumeWriting = false)
+          connection ! Register(
+            self,
+            keepOpenOnPeerClosed = true,
+            useResumeWriting = false)
           if (isAvailable(bytesOut)) connection ! ResumeReading
           pull(bytesIn)
       }
@@ -364,9 +368,9 @@ private[stream] class OutgoingConnectionStage(
     options: immutable.Traversable[SocketOption] = Nil,
     halfClose: Boolean = true,
     connectTimeout: Duration = Duration.Inf)
-    extends GraphStageWithMaterializedValue[FlowShape[ByteString, ByteString],
-                                            Future[
-                                              StreamTcp.OutgoingConnection]] {
+    extends GraphStageWithMaterializedValue[
+      FlowShape[ByteString, ByteString],
+      Future[StreamTcp.OutgoingConnection]] {
   import TcpConnectionStage._
 
   val bytesIn: Inlet[ByteString] = Inlet("IncomingTCP.in")
@@ -383,15 +387,18 @@ private[stream] class OutgoingConnectionStage(
     }
 
     val localAddressPromise = Promise[InetSocketAddress]
-    val logic = new TcpStreamLogic(shape,
-                                   Outbound(manager,
-                                            Connect(remoteAddress,
-                                                    localAddress,
-                                                    options,
-                                                    connTimeout,
-                                                    pullMode = true),
-                                            localAddressPromise,
-                                            halfClose))
+    val logic = new TcpStreamLogic(
+      shape,
+      Outbound(
+        manager,
+        Connect(
+          remoteAddress,
+          localAddress,
+          options,
+          connTimeout,
+          pullMode = true),
+        localAddressPromise,
+        halfClose))
 
     (logic,
      localAddressPromise.future.map(OutgoingConnection(remoteAddress, _))(

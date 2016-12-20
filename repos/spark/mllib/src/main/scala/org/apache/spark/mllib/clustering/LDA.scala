@@ -57,13 +57,14 @@ class LDA private (private var k: Int,
     */
   @Since("1.3.0")
   def this() =
-    this(k = 10,
-         maxIterations = 20,
-         docConcentration = Vectors.dense(-1),
-         topicConcentration = -1,
-         seed = Utils.random.nextLong(),
-         checkpointInterval = 10,
-         ldaOptimizer = new EMLDAOptimizer)
+    this(
+      k = 10,
+      maxIterations = 20,
+      docConcentration = Vectors.dense(-1),
+      topicConcentration = -1,
+      seed = Utils.random.nextLong(),
+      checkpointInterval = 10,
+      ldaOptimizer = new EMLDAOptimizer)
 
   /**
     * Number of topics to infer, i.e., the number of soft cluster centers.
@@ -77,8 +78,9 @@ class LDA private (private var k: Int,
     */
   @Since("1.3.0")
   def setK(k: Int): this.type = {
-    require(k > 0,
-            s"LDA k (number of clusters) must be > 0, but was set to $k")
+    require(
+      k > 0,
+      s"LDA k (number of clusters) must be > 0, but was set to $k")
     this.k = k
     this
   }
@@ -136,8 +138,9 @@ class LDA private (private var k: Int,
     */
   @Since("1.5.0")
   def setDocConcentration(docConcentration: Vector): this.type = {
-    require(docConcentration.size > 0,
-            "docConcentration must have > 0 elements")
+    require(
+      docConcentration.size > 0,
+      "docConcentration must have > 0 elements")
     this.docConcentration = docConcentration
     this
   }

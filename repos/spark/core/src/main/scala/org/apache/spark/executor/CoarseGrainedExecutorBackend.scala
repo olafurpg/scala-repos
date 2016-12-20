@@ -101,11 +101,12 @@ private[spark] class CoarseGrainedExecutorBackend(override val rpcEnv: RpcEnv,
       } else {
         val taskDesc = ser.deserialize[TaskDescription](data.value)
         logInfo("Got assigned task " + taskDesc.taskId)
-        executor.launchTask(this,
-                            taskId = taskDesc.taskId,
-                            attemptNumber = taskDesc.attemptNumber,
-                            taskDesc.name,
-                            taskDesc.serializedTask)
+        executor.launchTask(
+          this,
+          taskId = taskDesc.taskId,
+          attemptNumber = taskDesc.attemptNumber,
+          taskDesc.name,
+          taskDesc.serializedTask)
       }
 
     case KillTask(taskId, _, interruptThread) =>
@@ -170,12 +171,13 @@ private[spark] object CoarseGrainedExecutorBackend extends Logging {
       // Bootstrap to fetch the driver's Spark properties.
       val executorConf = new SparkConf
       val port = executorConf.getInt("spark.executor.port", 0)
-      val fetcher = RpcEnv.create("driverPropsFetcher",
-                                  hostname,
-                                  port,
-                                  executorConf,
-                                  new SecurityManager(executorConf),
-                                  clientMode = true)
+      val fetcher = RpcEnv.create(
+        "driverPropsFetcher",
+        hostname,
+        port,
+        executorConf,
+        new SecurityManager(executorConf),
+        clientMode = true)
       val driver = fetcher.setupEndpointRefByURI(driverUrl)
       val props =
         driver.askWithRetry[Seq[(String, String)]](RetrieveSparkProps) ++ Seq[
@@ -199,23 +201,26 @@ private[spark] object CoarseGrainedExecutorBackend extends Logging {
         SparkHadoopUtil.get.startExecutorDelegationTokenRenewer(driverConf)
       }
 
-      val env = SparkEnv.createExecutorEnv(driverConf,
-                                           executorId,
-                                           hostname,
-                                           port,
-                                           cores,
-                                           isLocal = false)
+      val env = SparkEnv.createExecutorEnv(
+        driverConf,
+        executorId,
+        hostname,
+        port,
+        cores,
+        isLocal = false)
 
-      env.rpcEnv.setupEndpoint("Executor",
-                               new CoarseGrainedExecutorBackend(env.rpcEnv,
-                                                                driverUrl,
-                                                                executorId,
-                                                                cores,
-                                                                userClassPath,
-                                                                env))
+      env.rpcEnv.setupEndpoint(
+        "Executor",
+        new CoarseGrainedExecutorBackend(
+          env.rpcEnv,
+          driverUrl,
+          executorId,
+          cores,
+          userClassPath,
+          env))
       workerUrl.foreach { url =>
-        env.rpcEnv.setupEndpoint("WorkerWatcher",
-                                 new WorkerWatcher(env.rpcEnv, url))
+        env.rpcEnv
+          .setupEndpoint("WorkerWatcher", new WorkerWatcher(env.rpcEnv, url))
       }
       env.rpcEnv.awaitTermination()
       SparkHadoopUtil.get.stopExecutorDelegationTokenRenewer()
@@ -270,13 +275,14 @@ private[spark] object CoarseGrainedExecutorBackend extends Logging {
       printUsageAndExit()
     }
 
-    run(driverUrl,
-        executorId,
-        hostname,
-        cores,
-        appId,
-        workerUrl,
-        userClassPath)
+    run(
+      driverUrl,
+      executorId,
+      hostname,
+      cores,
+      appId,
+      workerUrl,
+      userClassPath)
     System.exit(0)
   }
 

@@ -1150,8 +1150,9 @@ class CoproductTests {
     assertTypedEquals[Option[Int :+: CNil]](None, r2)
 
     val r3 = Coproduct[Int :+: String :+: CNil](1).init
-    assertTypedEquals[Option[Int :+: CNil]](Some(Coproduct[Int :+: CNil](1)),
-                                            r3)
+    assertTypedEquals[Option[Int :+: CNil]](
+      Some(Coproduct[Int :+: CNil](1)),
+      r3)
   }
 
   @Test
@@ -1369,8 +1370,9 @@ class CoproductTests {
       assertTypedEquals[Either[I :+: S :+: CNil, D :+: CNil]](Left(is), r8)
 
       val r9 = isdc.split(2)
-      assertTypedEquals[Either[I :+: S :+: CNil, D :+: C :+: CNil]](Right(dc),
-                                                                    r9)
+      assertTypedEquals[Either[I :+: S :+: CNil, D :+: C :+: CNil]](
+        Right(dc),
+        r9)
     }
 
     {
@@ -1399,8 +1401,9 @@ class CoproductTests {
       assertTypedEquals[Either[I :+: S :+: CNil, D :+: CNil]](Left(is), r8)
 
       val r9 = isdc.split[_2]
-      assertTypedEquals[Either[I :+: S :+: CNil, D :+: C :+: CNil]](Right(dc),
-                                                                    r9)
+      assertTypedEquals[Either[I :+: S :+: CNil, D :+: C :+: CNil]](
+        Right(dc),
+        r9)
     }
   }
 

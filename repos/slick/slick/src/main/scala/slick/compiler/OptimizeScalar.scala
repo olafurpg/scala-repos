@@ -11,8 +11,9 @@ class OptimizeScalar extends Phase {
 
   def apply(state: CompilerState) =
     state.map(_.tree.replace({
-      case n @ Library.==(IfThenElse(ConstArray(p, Const(a), Const(b))),
-                          LiteralNode(null)) =>
+      case n @ Library.==(
+            IfThenElse(ConstArray(p, Const(a), Const(b))),
+            LiteralNode(null)) =>
         logger.debug("Optimizing: (if(p) a else b).isNull", n)
         val (checkTrue, checkFalse) = (a.isEmpty, b.isEmpty)
         logger.debug(s"a=$a, b=$b")
@@ -24,10 +25,10 @@ class OptimizeScalar extends Phase {
         cast(n.nodeType, res).infer()
 
       case n @ IfThenElse(
-            ConstArray(Library.Not(Library.==(v, LiteralNode(null))),
-                       v2,
-                       LiteralNode(z)))
-          if v == v2 && (z == null || z == None) =>
+            ConstArray(
+              Library.Not(Library.==(v, LiteralNode(null))),
+              v2,
+              LiteralNode(z))) if v == v2 && (z == null || z == None) =>
         logger.debug("Optimizing: if(v != null) v else null", n)
         v
 

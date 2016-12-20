@@ -136,12 +136,14 @@ class SVMSuite extends SparkFunSuite with MLlibTestSparkContext {
     val validationRDD = sc.parallelize(validationData, 2)
 
     // Test prediction on RDD.
-    validatePrediction(model.predict(validationRDD.map(_.features)).collect(),
-                       validationData)
+    validatePrediction(
+      model.predict(validationRDD.map(_.features)).collect(),
+      validationData)
 
     // Test prediction on Array.
-    validatePrediction(validationData.map(row => model.predict(row.features)),
-                       validationData)
+    validatePrediction(
+      validationData.map(row => model.predict(row.features)),
+      validationData)
   }
 
   test("SVM local random SGD with initial weights") {
@@ -172,12 +174,14 @@ class SVMSuite extends SparkFunSuite with MLlibTestSparkContext {
     val validationRDD = sc.parallelize(validationData, 2)
 
     // Test prediction on RDD.
-    validatePrediction(model.predict(validationRDD.map(_.features)).collect(),
-                       validationData)
+    validatePrediction(
+      model.predict(validationRDD.map(_.features)).collect(),
+      validationData)
 
     // Test prediction on Array.
-    validatePrediction(validationData.map(row => model.predict(row.features)),
-                       validationData)
+    validatePrediction(
+      validationData.map(row => model.predict(row.features)),
+      validationData)
   }
 
   test("SVM with invalid labels") {

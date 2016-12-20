@@ -44,9 +44,10 @@ class ScalaGenerateEqualsWizard(project: Project,
 private class ScalaGenerateEqualsWizardBuilder(aClass: PsiClass,
                                                needEquals: Boolean,
                                                needHashCode: Boolean)
-    extends AbstractGenerateEqualsWizard.Builder[PsiClass,
-                                                 ScNamedElement,
-                                                 ScalaMemberInfo] {
+    extends AbstractGenerateEqualsWizard.Builder[
+      PsiClass,
+      ScNamedElement,
+      ScalaMemberInfo] {
 
   protected def getPsiClass: PsiClass = aClass
 

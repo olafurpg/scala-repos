@@ -122,10 +122,11 @@ class SimpleAclAuthorizer extends Authorizer with Logging {
       .map(_.toString.toInt)
       .getOrElse(kafkaConfig.zkSessionTimeoutMs)
 
-    zkUtils = ZkUtils(zkUrl,
-                      zkConnectionTimeoutMs,
-                      zkSessionTimeOutMs,
-                      JaasUtils.isZkSecurityEnabled())
+    zkUtils = ZkUtils(
+      zkUrl,
+      zkConnectionTimeoutMs,
+      zkSessionTimeOutMs,
+      JaasUtils.isZkSecurityEnabled())
     zkUtils.makeSurePersistentPathExists(SimpleAclAuthorizer.AclZkPath)
 
     loadCache()

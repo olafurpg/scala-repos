@@ -14,41 +14,51 @@ trait ScalaTestWholeSuiteTest
     with FunSuiteGenerator
     with PropSpecGenerator
     with WordSpecGenerator {
-  val featureSpecTestPaths = List(List("[root]",
-                                       "FeatureSpecTest",
-                                       "Feature: Feature 1",
-                                       "Scenario: Scenario A"),
-                                  List("[root]",
-                                       "FeatureSpecTest",
-                                       "Feature: Feature 1",
-                                       "Scenario: Scenario B"),
-                                  List("[root]",
-                                       "FeatureSpecTest",
-                                       "Feature: Feature 2",
-                                       "Scenario: Scenario C"))
-  val flatSpecTestPaths = List(List("[root]",
-                                    "FlatSpecTest",
-                                    "A FlatSpecTest",
-                                    "should be able to run single test"),
-                               List("[root]",
-                                    "FlatSpecTest",
-                                    "A FlatSpecTest",
-                                    "should not run other tests"))
+  val featureSpecTestPaths = List(
+    List(
+      "[root]",
+      "FeatureSpecTest",
+      "Feature: Feature 1",
+      "Scenario: Scenario A"),
+    List(
+      "[root]",
+      "FeatureSpecTest",
+      "Feature: Feature 1",
+      "Scenario: Scenario B"),
+    List(
+      "[root]",
+      "FeatureSpecTest",
+      "Feature: Feature 2",
+      "Scenario: Scenario C"))
+  val flatSpecTestPaths = List(
+    List(
+      "[root]",
+      "FlatSpecTest",
+      "A FlatSpecTest",
+      "should be able to run single test"),
+    List(
+      "[root]",
+      "FlatSpecTest",
+      "A FlatSpecTest",
+      "should not run other tests"))
   val freeSpecTestPaths = List(
-    List("[root]",
-         "FreeSpecTest",
-         "A FreeSpecTest",
-         "should be able to run single tests"),
-    List("[root]",
-         "FreeSpecTest",
-         "A FreeSpecTest",
-         "should not run tests that are not selected"))
+    List(
+      "[root]",
+      "FreeSpecTest",
+      "A FreeSpecTest",
+      "should be able to run single tests"),
+    List(
+      "[root]",
+      "FreeSpecTest",
+      "A FreeSpecTest",
+      "should not run tests that are not selected"))
   val funSpecTestPaths = List(
     List("[root]", "FunSpecTest", "FunSpecTest", "should launch single test"),
-    List("[root]",
-         "FunSpecTest",
-         "FunSpecTest",
-         "should not launch other tests"),
+    List(
+      "[root]",
+      "FunSpecTest",
+      "FunSpecTest",
+      "should not launch other tests"),
     List("[root]", "FunSpecTest", "OtherScope", "is here"))
   val funSuiteTestPaths = List(
     List("[root]", "FunSuiteTest", "should run single test"),
@@ -64,13 +74,14 @@ trait ScalaTestWholeSuiteTest
   def testFeatureSpec() {
     addFeatureSpec()
 
-    runTestByLocation(2,
-                      10,
-                      "FeatureSpecTest.scala",
-                      checkConfigAndSettings(_, "FeatureSpecTest"),
-                      root =>
-                        featureSpecTestPaths.forall(
-                          checkResultTreeHasExactNamedPath(root, _: _*))
+    runTestByLocation(
+      2,
+      10,
+      "FeatureSpecTest.scala",
+      checkConfigAndSettings(_, "FeatureSpecTest"),
+      root =>
+        featureSpecTestPaths.forall(
+          checkResultTreeHasExactNamedPath(root, _: _*))
 //        checkResultTreeHasExactNamedPath(root, "[root]", "FeatureSpecTest", "Feature: Feature 1", "Scenario: Scenario A") &&
 //          checkResultTreeHasExactNamedPath(root, "[root]", "FeatureSpecTest", "Feature: Feature 1", "Scenario: Scenario B") &&
 //          checkResultTreeHasExactNamedPath(root, "[root]", "FeatureSpecTest", "Feature: Feature 2", "Scenario: Scenario C")

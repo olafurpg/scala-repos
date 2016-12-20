@@ -56,8 +56,9 @@ private[akka] case class ActorMaterializerImpl(
   private[this] def createFlowName(): String = flowNames.next()
 
   private val initialAttributes = Attributes(
-    Attributes.InputBuffer(settings.initialInputBufferSize,
-                           settings.maxInputBufferSize) :: ActorAttributes
+    Attributes.InputBuffer(
+      settings.initialInputBufferSize,
+      settings.maxInputBufferSize) :: ActorAttributes
       .Dispatcher(settings.dispatcher) :: ActorAttributes.SupervisionStrategy(
       settings.supervisionDecider) :: Nil)
 
@@ -115,9 +116,10 @@ private[akka] case class ActorMaterializerImpl(
           if (MaterializerSession.Debug) println(s"materializing $atomic")
 
           def newMaterializationContext() =
-            new MaterializationContext(ActorMaterializerImpl.this,
-                                       effectiveAttributes,
-                                       stageName(effectiveAttributes))
+            new MaterializationContext(
+              ActorMaterializerImpl.this,
+              effectiveAttributes,
+              stageName(effectiveAttributes))
           atomic match {
             case sink: SinkModule[_, _] ⇒
               val (sub, mat) = sink.create(newMaterializationContext())
@@ -141,12 +143,13 @@ private[akka] case class ActorMaterializerImpl(
             case tls: TlsModule ⇒
               // TODO solve this so TlsModule doesn't need special treatment here
               val es = effectiveSettings(effectiveAttributes)
-              val props = TLSActor.props(es,
-                                         tls.sslContext,
-                                         tls.firstSession,
-                                         tls.role,
-                                         tls.closing,
-                                         tls.hostInfo)
+              val props = TLSActor.props(
+                es,
+                tls.sslContext,
+                tls.firstSession,
+                tls.role,
+                tls.closing,
+                tls.hostInfo)
               val impl =
                 actorOf(props, stageName(effectiveAttributes), es.dispatcher)
               def factory(id: Int) = new ActorPublisher[Any](impl) {
@@ -158,10 +161,12 @@ private[akka] case class ActorMaterializerImpl(
               assignPort(tls.plainOut, publishers(TLSActor.UserOut))
               assignPort(tls.cipherOut, publishers(TLSActor.TransportOut))
 
-              assignPort(tls.plainIn,
-                         FanIn.SubInput[Any](impl, TLSActor.UserIn))
-              assignPort(tls.cipherIn,
-                         FanIn.SubInput[Any](impl, TLSActor.TransportIn))
+              assignPort(
+                tls.plainIn,
+                FanIn.SubInput[Any](impl, TLSActor.UserIn))
+              assignPort(
+                tls.cipherIn,
+                FanIn.SubInput[Any](impl, TLSActor.TransportIn))
 
               matVal.put(atomic, NotUsed)
 
@@ -169,12 +174,14 @@ private[akka] case class ActorMaterializerImpl(
               matGraph(graph, effectiveAttributes, matVal)
 
             case stage: GraphStageModule ⇒
-              val graph = GraphModule(GraphAssembly(stage.shape.inlets,
-                                                    stage.shape.outlets,
-                                                    stage.stage),
-                                      stage.shape,
-                                      stage.attributes,
-                                      Array(stage))
+              val graph = GraphModule(
+                GraphAssembly(
+                  stage.shape.inlets,
+                  stage.shape.outlets,
+                  stage.stage),
+                stage.shape,
+                stage.attributes,
+                Array(stage))
               matGraph(graph, effectiveAttributes, matVal)
           }
         }
@@ -189,13 +196,14 @@ private[akka] case class ActorMaterializerImpl(
             matVal,
             registerSrc)
 
-          val shell = new GraphInterpreterShell(graph.assembly,
-                                                inHandlers,
-                                                outHandlers,
-                                                logics,
-                                                graph.shape,
-                                                calculatedSettings,
-                                                ActorMaterializerImpl.this)
+          val shell = new GraphInterpreterShell(
+            graph.assembly,
+            inHandlers,
+            outHandlers,
+            logics,
+            graph.shape,
+            calculatedSettings,
+            ActorMaterializerImpl.this)
 
           val impl =
             if (subflowFuser != null &&
@@ -203,9 +211,10 @@ private[akka] case class ActorMaterializerImpl(
               subflowFuser(shell)
             } else {
               val props = ActorGraphInterpreter.props(shell)
-              actorOf(props,
-                      stageName(effectiveAttributes),
-                      calculatedSettings.dispatcher)
+              actorOf(
+                props,
+                stageName(effectiveAttributes),
+                calculatedSettings.dispatcher)
             }
 
           for ((inlet, i) ← graph.shape.inlets.iterator.zipWithIndex) {
@@ -231,9 +240,10 @@ private[akka] case class ActorMaterializerImpl(
             val (opprops, mat) = ActorProcessorFactory
               .props(ActorMaterializerImpl.this, op, effectiveAttributes)
             ActorProcessorFactory[Any, Any](
-              actorOf(opprops,
-                      stageName(effectiveAttributes),
-                      effectiveSettings.dispatcher)) -> mat
+              actorOf(
+                opprops,
+                stageName(effectiveAttributes),
+                effectiveSettings.dispatcher)) -> mat
         }
       }
 
@@ -260,16 +270,18 @@ private[akka] case class ActorMaterializerImpl(
                             dispatcher: String): ActorRef = {
     supervisor match {
       case ref: LocalActorRef ⇒
-        ref.underlying.attachChild(props.withDispatcher(dispatcher),
-                                   name,
-                                   systemService = false)
+        ref.underlying.attachChild(
+          props.withDispatcher(dispatcher),
+          name,
+          systemService = false)
       case ref: RepointableActorRef ⇒
         if (ref.isStarted)
           ref.underlying
             .asInstanceOf[ActorCell]
-            .attachChild(props.withDispatcher(dispatcher),
-                         name,
-                         systemService = false)
+            .attachChild(
+              props.withDispatcher(dispatcher),
+              name,
+              systemService = false)
         else {
           implicit val timeout = ref.system.settings.CreationTimeout
           val f = (supervisor ? StreamSupervisor.Materialize(
@@ -304,8 +316,9 @@ private[akka] class SubFusingActorMaterializerImpl(
     delegate.schedulePeriodically(initialDelay, interval, task)
 
   def withNamePrefix(name: String): SubFusingActorMaterializerImpl =
-    new SubFusingActorMaterializerImpl(delegate.withNamePrefix(name),
-                                       registerShell)
+    new SubFusingActorMaterializerImpl(
+      delegate.withNamePrefix(name),
+      registerShell)
 }
 
 /**

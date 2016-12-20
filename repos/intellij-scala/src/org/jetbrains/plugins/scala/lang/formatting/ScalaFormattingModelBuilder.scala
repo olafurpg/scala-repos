@@ -27,13 +27,14 @@ sealed class ScalaFormattingModelBuilder extends FormattingModelBuilder {
     assert(containingFile != null, element.getContainingFile)
     val astNode: ASTNode = containingFile.getNode
     assert(astNode != null)
-    val block: ScalaBlock = new ScalaBlock(null,
-                                           astNode,
-                                           null,
-                                           null,
-                                           Indent.getAbsoluteNoneIndent,
-                                           null,
-                                           settings)
+    val block: ScalaBlock = new ScalaBlock(
+      null,
+      astNode,
+      null,
+      null,
+      Indent.getAbsoluteNoneIndent,
+      null,
+      settings)
     new ScalaFormattingModel(
       containingFile,
       block,

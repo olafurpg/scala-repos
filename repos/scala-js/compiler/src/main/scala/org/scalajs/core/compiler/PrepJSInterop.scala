@@ -144,9 +144,10 @@ abstract class PrepJSInterop
       tree match {
         // Nothing is allowed in native JS classes and traits
         case idef: ImplDef if enclosingOwner is OwnerKind.JSNativeClass =>
-          reporter.error(idef.pos,
-                         "Native JS traits and classes " +
-                           "may not have inner traits, classes or objects")
+          reporter.error(
+            idef.pos,
+            "Native JS traits and classes " +
+              "may not have inner traits, classes or objects")
           super.transform(tree)
 
         // Handle js.Anys
@@ -195,9 +196,10 @@ abstract class PrepJSInterop
           val sym = cldef.symbol
 
           if (sym.hasAnnotation(JSNativeAnnotation)) {
-            reporter.error(cldef.pos,
-                           "Traits and classes not extending js.Any " +
-                             "may not have a @js.native annotation")
+            reporter.error(
+              cldef.pos,
+              "Traits and classes not extending js.Any " +
+                "may not have a @js.native annotation")
           }
 
           if (shouldPrepareExports && sym.isTrait) {
@@ -214,9 +216,10 @@ abstract class PrepJSInterop
           val sym = modDef.symbol
 
           if (sym.hasAnnotation(JSNativeAnnotation)) {
-            reporter.error(modDef.pos,
-                           "Objects not extending js.Any may not " +
-                             "have a @js.native annotation")
+            reporter.error(
+              modDef.pos,
+              "Objects not extending js.Any may not " +
+                "have a @js.native annotation")
           }
 
           if (shouldPrepareExports) registerModuleExports(sym.moduleClass)
@@ -239,8 +242,8 @@ abstract class PrepJSInterop
         case ddef: DefDef =>
           if (shouldPrepareExports) {
             // Generate exporters for this ddef if required
-            exporters.getOrElseUpdate(ddef.symbol.owner,
-                                      mutable.ListBuffer.empty) ++=
+            exporters
+              .getOrElseUpdate(ddef.symbol.owner, mutable.ListBuffer.empty) ++=
               genExportMember(ddef)
           }
           super.transform(tree)
@@ -264,8 +267,9 @@ abstract class PrepJSInterop
 
         case ScalaEnumValue.NullName()
             if noEnclosingOwner is OwnerKind.EnumImpl =>
-          reporter.warning(tree.pos,
-                           """Passing null as name to Enumeration.Value
+          reporter.warning(
+            tree.pos,
+            """Passing null as name to Enumeration.Value
               |requires reflection at runtime. The resulting
               |program is unlikely to function properly.""".stripMargin)
           super.transform(tree)
@@ -301,9 +305,10 @@ abstract class PrepJSInterop
           val ctorOf = genConstructorOf(tree, tpeArg)
           typer.typed {
             atPos(tree.pos) {
-              gen.mkMethodCall(Runtime_newConstructorTag,
-                               List(tpeArg.tpe),
-                               List(ctorOf))
+              gen.mkMethodCall(
+                Runtime_newConstructorTag,
+                List(tpeArg.tpe),
+                List(ctorOf))
             }
           }
 
@@ -388,9 +393,11 @@ abstract class PrepJSInterop
         if (!typeSym.isTrait && !typeSym.isModuleClass) {
           typer.typed {
             atPos(tree.pos) {
-              Apply(Select(Ident(RuntimePackageModule),
-                           newTermName("constructorOf")),
-                    List(classValue))
+              Apply(
+                Select(
+                  Ident(RuntimePackageModule),
+                  newTermName("constructorOf")),
+                List(classValue))
             }
           }
         } else {
@@ -504,17 +511,19 @@ abstract class PrepJSInterop
 
       // Check that we do not have a case modifier
       if (implDef.mods.hasFlag(Flag.CASE)) {
-        reporter.error(implDef.pos,
-                       "Classes and objects extending " +
-                         "js.Any may not have a case modifier")
+        reporter.error(
+          implDef.pos,
+          "Classes and objects extending " +
+            "js.Any may not have a case modifier")
       }
 
       // Check that we do not extend a trait that does not extends js.Any
       if (!isJSAnonFun && badParent.isDefined) {
         val badName = badParent.get.typeSymbol.fullName
-        reporter.error(implDef.pos,
-                       s"${sym.nameString} extends ${badName} " +
-                         "which does not extend js.Any.")
+        reporter.error(
+          implDef.pos,
+          s"${sym.nameString} extends ${badName} " +
+            "which does not extend js.Any.")
       }
 
       // Checks for Scala.js-defined JS stuff
@@ -548,17 +557,19 @@ abstract class PrepJSInterop
       if (isJSNative && !isJSAnonFun) {
         // Check if we may have a JS native here
         if (sym.isLocalToBlock) {
-          reporter.error(implDef.pos,
-                         "Local native JS classes and objects are not allowed")
+          reporter.error(
+            implDef.pos,
+            "Local native JS classes and objects are not allowed")
         } else if (anyEnclosingOwner is OwnerKind.AnyClass) {
           reporter.error(
             implDef.pos,
             "Traits and classes " +
               "may not have inner native JS traits, classes or objects")
         } else if (enclosingOwner is OwnerKind.JSMod) {
-          reporter.error(implDef.pos,
-                         "Scala.js-defined JS objects " +
-                           "may not have inner native JS classes or objects")
+          reporter.error(
+            implDef.pos,
+            "Scala.js-defined JS objects " +
+              "may not have inner native JS classes or objects")
         } else if (!sym.isTrait && (enclosingOwner is OwnerKind.JSNativeMod)) {
           /* Store the fully qualified JS name in an explicit @JSFullName
            * annotation, before `flatten` destroys the name and (in 2.10) the
@@ -567,8 +578,9 @@ abstract class PrepJSInterop
           val ownerFullJSName = jsInterop.fullJSNameOf(sym.owner)
           val jsName = jsInterop.jsNameOf(sym)
           val fullJSName = ownerFullJSName + "." + jsName
-          sym.addAnnotation(JSFullNameAnnotation,
-                            typer.typed(Literal(Constant(fullJSName))))
+          sym.addAnnotation(
+            JSFullNameAnnotation,
+            typer.typed(Literal(Constant(fullJSName))))
         } else if (!sym.isTrait && !sym.hasAnnotation(JSNameAnnotation)) {
           if (enclosingOwner is OwnerKind.ScalaMod) {
             if (sym.isModuleClass) {
@@ -743,9 +755,10 @@ abstract class PrepJSInterop
             case (param :: _) :: _ if !isScalaRepeatedParamType(param.tpe) =>
             // ok
             case _ =>
-              reporter.error(tree.pos,
-                             "@JSBracketCall methods must have at " +
-                               "least one non-repeated parameter")
+              reporter.error(
+                tree.pos,
+                "@JSBracketCall methods must have at " +
+                  "least one non-repeated parameter")
           }
         }
       }
@@ -1012,9 +1025,10 @@ abstract class PrepJSInterop
       Apply(Select(nextNameTree, nme.NE), Literal(Constant(null)) :: Nil)
     val hasNextTree = Select(nextNameTree, jsnme.hasNext)
     val condTree = Apply(Select(nullCompTree, nme.ZAND), hasNextTree :: Nil)
-    val nameTree = If(condTree,
-                      Apply(Select(nextNameTree, jsnme.next), Nil),
-                      Literal(Constant(defaultName)))
+    val nameTree = If(
+      condTree,
+      Apply(Select(nextNameTree, jsnme.next), Nil),
+      Literal(Constant(defaultName)))
     val params = intParam.toList :+ nameTree
 
     typer.typed {
@@ -1055,13 +1069,14 @@ abstract class PrepJSInterop
     }
     if (needsFix) {
       sym.resetFlag(Flag.PRIVATE)
-      treeCopy.DefDef(ddef,
-                      ddef.mods &~ Flag.PRIVATE,
-                      ddef.name,
-                      ddef.tparams,
-                      ddef.vparamss,
-                      ddef.tpt,
-                      ddef.rhs)
+      treeCopy.DefDef(
+        ddef,
+        ddef.mods &~ Flag.PRIVATE,
+        ddef.name,
+        ddef.tparams,
+        ddef.vparamss,
+        ddef.tpt,
+        ddef.rhs)
     } else {
       ddef
     }

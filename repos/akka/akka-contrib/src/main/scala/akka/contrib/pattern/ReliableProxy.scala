@@ -31,10 +31,11 @@ object ReliableProxy {
             retryAfter: FiniteDuration,
             reconnectAfter: FiniteDuration,
             maxReconnects: Int): Props = {
-    props(targetPath,
-          retryAfter,
-          Option(reconnectAfter),
-          if (maxReconnects > 0) Some(maxReconnects) else None)
+    props(
+      targetPath,
+      retryAfter,
+      Option(reconnectAfter),
+      if (maxReconnects > 0) Some(maxReconnects) else None)
   }
 
   /**
@@ -286,8 +287,9 @@ class ReliableProxy(targetPath: ActorPath,
 
   if (targetPath.address.host.isEmpty &&
       self.path.address == targetPath.address) {
-    logDebug("Unnecessary to use ReliableProxy for local target: {}",
-             targetPath)
+    logDebug(
+      "Unnecessary to use ReliableProxy for local target: {}",
+      targetPath)
   }
 
   override def supervisorStrategy = OneForOneStrategy() {
@@ -295,8 +297,9 @@ class ReliableProxy(targetPath: ActorPath,
   }
 
   override def postStop() {
-    logDebug("Stopping proxy and sending {} messages to subscribers in Unsent",
-             stateData.size)
+    logDebug(
+      "Stopping proxy and sending {} messages to subscribers in Unsent",
+      stateData.size)
     gossip(ProxyTerminated(self, Unsent(stateData)))
     super.postStop()
   }
@@ -352,9 +355,10 @@ class ReliableProxy(targetPath: ActorPath,
         logDebug("Failed to reconnect after {}", attemptedReconnects)
         stop()
       } else {
-        logDebug("{} ! {}",
-                 context.actorSelection(targetPath),
-                 Identify(targetPath))
+        logDebug(
+          "{} ! {}",
+          context.actorSelection(targetPath),
+          Identify(targetPath))
         context.actorSelection(targetPath) ! Identify(targetPath)
         scheduleReconnectTick()
         attemptedReconnects += 1

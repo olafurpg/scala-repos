@@ -83,9 +83,10 @@ class JdbcRDD[T: ClassTag](sc: SparkContext,
       }
       val part = thePart.asInstanceOf[JdbcPartition]
       val conn = getConnection()
-      val stmt = conn.prepareStatement(sql,
-                                       ResultSet.TYPE_FORWARD_ONLY,
-                                       ResultSet.CONCUR_READ_ONLY)
+      val stmt = conn.prepareStatement(
+        sql,
+        ResultSet.TYPE_FORWARD_ONLY,
+        ResultSet.CONCUR_READ_ONLY)
 
       // setFetchSize(Integer.MIN_VALUE) is a mysql driver specific way to force streaming results,
       // rather than pulling entire resultset into memory.
@@ -216,12 +217,13 @@ object JdbcRDD {
       }
     }
 
-    create(sc,
-           connectionFactory,
-           sql,
-           lowerBound,
-           upperBound,
-           numPartitions,
-           mapRow)
+    create(
+      sc,
+      connectionFactory,
+      sql,
+      lowerBound,
+      upperBound,
+      numPartitions,
+      mapRow)
   }
 }

@@ -55,12 +55,13 @@ class InMemoryAPIKeyManager[M[+ _]](clock: Clock)(implicit val M: Monad[M])
       None
     )
 
-    val rootAPIKeyRecord = APIKeyRecord(rootAPIKey,
-                                        some("root-apiKey"),
-                                        some("The root API key"),
-                                        rootAPIKey,
-                                        Set(rootGrantId),
-                                        true)
+    val rootAPIKeyRecord = APIKeyRecord(
+      rootAPIKey,
+      some("root-apiKey"),
+      some("The root API key"),
+      rootAPIKey,
+      Set(rootGrantId),
+      true)
 
     (rootAPIKeyRecord,
      mutable.Map(rootGrantId -> rootGrant),
@@ -88,12 +89,13 @@ class InMemoryAPIKeyManager[M[+ _]](clock: Clock)(implicit val M: Monad[M])
                    description: Option[String],
                    issuerKey: APIKey,
                    grants: Set[GrantId]): M[APIKeyRecord] = {
-    val record = APIKeyRecord(APIKeyManager.newAPIKey(),
-                              name,
-                              description,
-                              issuerKey,
-                              grants,
-                              false)
+    val record = APIKeyRecord(
+      APIKeyManager.newAPIKey(),
+      name,
+      description,
+      issuerKey,
+      grants,
+      false)
     apiKeys.put(record.apiKey, record)
     record.point[M]
   }
@@ -104,14 +106,15 @@ class InMemoryAPIKeyManager[M[+ _]](clock: Clock)(implicit val M: Monad[M])
                   parentIds: Set[GrantId],
                   perms: Set[Permission],
                   expiration: Option[DateTime]): M[Grant] = {
-    val grant = Grant(APIKeyManager.newGrantId(),
-                      name,
-                      description,
-                      issuerKey,
-                      parentIds,
-                      perms,
-                      clock.instant(),
-                      expiration)
+    val grant = Grant(
+      APIKeyManager.newGrantId(),
+      name,
+      description,
+      issuerKey,
+      parentIds,
+      perms,
+      clock.instant(),
+      expiration)
     grants.put(grant.grantId, grant)
     grant.point[M]
   }

@@ -33,10 +33,11 @@ private[finagle] case class BadHttpRequest(httpVersion: HttpVersion,
 
 object BadHttpRequest {
   def apply(exception: Exception) =
-    new BadHttpRequest(HttpVersion.HTTP_1_0,
-                       HttpMethod.GET,
-                       "/bad-http-request",
-                       exception)
+    new BadHttpRequest(
+      HttpVersion.HTTP_1_0,
+      HttpMethod.GET,
+      "/bad-http-request",
+      exception)
 }
 
 /** Convert exceptions to BadHttpRequests */
@@ -54,9 +55,10 @@ class SafeHttpServerCodec(maxInitialLineLength: Int,
       case ex: Exception =>
         val channel = ctx.getChannel()
         ctx.sendUpstream(
-          new UpstreamMessageEvent(channel,
-                                   BadHttpRequest(ex),
-                                   channel.getRemoteAddress()))
+          new UpstreamMessageEvent(
+            channel,
+            BadHttpRequest(ex),
+            channel.getRemoteAddress()))
     }
   }
 }
@@ -108,17 +110,18 @@ case class Http(
       _maxHeaderSize: StorageUnit,
       _streaming: Boolean
   ) =
-    this(_compressionLevel,
-         _maxRequestSize,
-         _maxResponseSize,
-         _decompressionEnabled,
-         _channelBufferUsageTracker,
-         _annotateCipherHeader,
-         _enableTracing,
-         _maxInitialLineLength,
-         _maxHeaderSize,
-         _streaming,
-         NullStatsReceiver)
+    this(
+      _compressionLevel,
+      _maxRequestSize,
+      _maxResponseSize,
+      _decompressionEnabled,
+      _channelBufferUsageTracker,
+      _annotateCipherHeader,
+      _enableTracing,
+      _maxInitialLineLength,
+      _maxHeaderSize,
+      _streaming,
+      NullStatsReceiver)
 
   require(
     _maxRequestSize < 2.gigabytes,
@@ -153,10 +156,12 @@ case class Http(
           val maxInitialLineLengthInBytes = _maxInitialLineLength.inBytes.toInt
           val maxHeaderSizeInBytes = _maxHeaderSize.inBytes.toInt
           val maxChunkSize = 8192
-          pipeline.addLast("httpCodec",
-                           new HttpClientCodec(maxInitialLineLengthInBytes,
-                                               maxHeaderSizeInBytes,
-                                               maxChunkSize))
+          pipeline.addLast(
+            "httpCodec",
+            new HttpClientCodec(
+              maxInitialLineLengthInBytes,
+              maxHeaderSizeInBytes,
+              maxChunkSize))
 
           if (!_streaming)
             pipeline.addLast(
@@ -226,29 +231,34 @@ case class Http(
           val maxRequestSizeInBytes = _maxRequestSize.inBytes.toInt
           val maxInitialLineLengthInBytes = _maxInitialLineLength.inBytes.toInt
           val maxHeaderSizeInBytes = _maxHeaderSize.inBytes.toInt
-          pipeline.addLast("httpCodec",
-                           new SafeHttpServerCodec(maxInitialLineLengthInBytes,
-                                                   maxHeaderSizeInBytes,
-                                                   maxRequestSizeInBytes))
+          pipeline.addLast(
+            "httpCodec",
+            new SafeHttpServerCodec(
+              maxInitialLineLengthInBytes,
+              maxHeaderSizeInBytes,
+              maxRequestSizeInBytes))
 
           if (_compressionLevel > 0) {
-            pipeline.addLast("httpCompressor",
-                             new HttpContentCompressor(_compressionLevel))
+            pipeline.addLast(
+              "httpCompressor",
+              new HttpContentCompressor(_compressionLevel))
           } else if (_compressionLevel == -1) {
             pipeline.addLast("httpCompressor", new TextualContentCompressor)
           }
 
           // The payload size handler should come before the RespondToExpectContinue handler so that we don't
           // send a 100 CONTINUE for oversize requests we have no intention of handling.
-          pipeline.addLast("payloadSizeHandler",
-                           new PayloadSizeHandler(maxRequestSizeInBytes))
+          pipeline.addLast(
+            "payloadSizeHandler",
+            new PayloadSizeHandler(maxRequestSizeInBytes))
 
           // Response to ``Expect: Continue'' requests.
           pipeline
             .addLast("respondToExpectContinue", new RespondToExpectContinue)
           if (!_streaming)
-            pipeline.addLast("httpDechunker",
-                             new HttpChunkAggregator(maxRequestSizeInBytes))
+            pipeline.addLast(
+              "httpDechunker",
+              new HttpChunkAggregator(maxRequestSizeInBytes))
 
           _annotateCipherHeader foreach { headerName: String =>
             pipeline.addLast("annotateCipher", new AnnotateCipher(headerName))

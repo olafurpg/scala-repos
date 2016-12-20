@@ -85,9 +85,10 @@ trait FSLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
               case col: StrColumn =>
                 val expanded: Stream[M[Stream[Path]]] =
                   Stream.tabulate(slice.size) { i =>
-                    expand_*(ctx.evalContext.apiKey,
-                             col(i),
-                             ctx.evalContext.basePath)
+                    expand_*(
+                      ctx.evalContext.apiKey,
+                      col(i),
+                      ctx.evalContext.basePath)
                   }
 
                 StreamT wrapEffect {

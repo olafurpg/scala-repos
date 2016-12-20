@@ -53,8 +53,9 @@ package object signal {
                   fs: Double = -1,
                   dt: Double = -1,
                   shifted: Boolean = false): DenseVector[Double] = {
-    require(fs > 0 || dt > 0,
-            "Must specify either a valid fs or a valid dt argument.")
+    require(
+      fs > 0 || dt > 0,
+      "Must specify either a valid fs or a valid dt argument.")
     if (fs > 0 && dt > 0)
       require(
         fs == 1d / dt,
@@ -99,13 +100,14 @@ package object signal {
       padding: OptPadding = OptPadding.Zero,
       method: OptMethod = OptMethod.Automatic
   )(implicit canConvolve: CanConvolve[Input, KernelType, Output]): Output =
-    canConvolve(data,
-                kernel,
-                range,
-                correlate = false,
-                overhang,
-                padding,
-                method)
+    canConvolve(
+      data,
+      kernel,
+      range,
+      correlate = false,
+      overhang,
+      padding,
+      method)
 
   /**Correlates DenseVectors.</p>
     * Implementation is via the implicit trait CanConvolve[ InputType,  OutputType ],
@@ -120,13 +122,14 @@ package object signal {
       padding: OptPadding = OptPadding.Zero,
       method: OptMethod = OptMethod.Automatic
   )(implicit canConvolve: CanConvolve[Input, KernelType, Output]): Output =
-    canConvolve(data,
-                kernel,
-                range,
-                correlate = true,
-                overhang,
-                padding,
-                method)
+    canConvolve(
+      data,
+      kernel,
+      range,
+      correlate = true,
+      overhang,
+      padding,
+      method)
 
   // </editor-fold>
 
@@ -174,14 +177,15 @@ package object signal {
                               overhang: OptOverhang = OptOverhang.None,
                               padding: OptPadding = OptPadding.Boundary)(
       implicit canFilterBPBS: CanFilterBPBS[Input, Output]): Output =
-    canFilterBPBS(data,
-                  omegas,
-                  sampleRate,
-                  taps,
-                  bandStop = false,
-                  kernelDesign,
-                  overhang,
-                  padding)
+    canFilterBPBS(
+      data,
+      omegas,
+      sampleRate,
+      taps,
+      bandStop = false,
+      kernelDesign,
+      overhang,
+      padding)
 
   /** Bandstop filter the input data.
     *
@@ -205,14 +209,15 @@ package object signal {
                               overhang: OptOverhang = OptOverhang.None,
                               padding: OptPadding = OptPadding.Boundary)(
       implicit canFilterBPBS: CanFilterBPBS[Input, Output]): Output =
-    canFilterBPBS(data,
-                  omegas,
-                  sampleRate,
-                  taps,
-                  bandStop = true,
-                  kernelDesign,
-                  overhang,
-                  padding)
+    canFilterBPBS(
+      data,
+      omegas,
+      sampleRate,
+      taps,
+      bandStop = true,
+      kernelDesign,
+      overhang,
+      padding)
 
   // </editor-fold>
 
@@ -240,14 +245,15 @@ package object signal {
                               overhang: OptOverhang = OptOverhang.None,
                               padding: OptPadding = OptPadding.Boundary)(
       implicit canFilterLPHP: CanFilterLPHP[Input, Output]): Output =
-    canFilterLPHP(data,
-                  omega,
-                  sampleRate,
-                  taps,
-                  lowPass = true,
-                  kernelDesign,
-                  overhang,
-                  padding)
+    canFilterLPHP(
+      data,
+      omega,
+      sampleRate,
+      taps,
+      lowPass = true,
+      kernelDesign,
+      overhang,
+      padding)
 
   /** Highpass filter the input data.
     *
@@ -271,14 +277,15 @@ package object signal {
                               overhang: OptOverhang = OptOverhang.None,
                               padding: OptPadding = OptPadding.Boundary)(
       implicit canFilterLPHP: CanFilterLPHP[Input, Output]): Output =
-    canFilterLPHP(data,
-                  omega,
-                  sampleRate,
-                  taps,
-                  lowPass = false,
-                  kernelDesign,
-                  overhang,
-                  padding)
+    canFilterLPHP(
+      data,
+      omega,
+      sampleRate,
+      taps,
+      lowPass = false,
+      kernelDesign,
+      overhang,
+      padding)
 
   // </editor-fold>
 
@@ -328,11 +335,12 @@ package object signal {
       optFilterOrder: OptFilterTaps = OptFilterTaps.Automatic)(
       implicit canDesignFilterDecimation: CanDesignFilterDecimation[Output])
     : Output =
-    canDesignFilterDecimation(factor,
-                              multiplier,
-                              optDesignMethod,
-                              optWindow,
-                              optFilterOrder)
+    canDesignFilterDecimation(
+      factor,
+      multiplier,
+      optDesignMethod,
+      optWindow,
+      optFilterOrder)
 
   // </editor-fold>
 

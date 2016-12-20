@@ -35,8 +35,9 @@ class ScalaChangeUtilSupport extends TreeCopyHandler {
           val res = original.getPsi.asInstanceOf[ScReferenceElement].bind
           res match {
             case Some(
-                resolveResult @ ScalaResolveResult(elem: PsiNamedElement,
-                                                   subst: ScSubstitutor)) => {
+                resolveResult @ ScalaResolveResult(
+                  elem: PsiNamedElement,
+                  subst: ScSubstitutor)) => {
               element.putCopyableUserData(
                 ScalaChangeUtilSupport.REFERENCED_MEMBER_KEY,
                 elem)

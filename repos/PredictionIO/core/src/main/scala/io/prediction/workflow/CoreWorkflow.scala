@@ -120,12 +120,13 @@ object CoreWorkflow {
     logger.info(s"Starting evaluation instance ID: $evaluationInstanceId")
 
     val evaluatorResult: BaseEvaluatorResult =
-      EvaluationWorkflow.runEvaluation(sc,
-                                       evaluation,
-                                       engine,
-                                       engineParamsList,
-                                       evaluator,
-                                       params)
+      EvaluationWorkflow.runEvaluation(
+        sc,
+        evaluation,
+        engine,
+        engineParamsList,
+        evaluator,
+        params)
 
     if (evaluatorResult.noSave) {
       logger.info(

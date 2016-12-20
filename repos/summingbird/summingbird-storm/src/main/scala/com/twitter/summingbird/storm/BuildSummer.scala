@@ -96,15 +96,16 @@ object BuildSummer {
         new SummerBuilder {
           def getSummer[K, V: Semigroup]
             : com.twitter.algebird.util.summer.AsyncSummer[(K, V), Map[K, V]] = {
-            new SyncSummingQueue[K, V](BufferSize(cacheSize.lowerBound),
-                                       FlushFrequency(flushFrequency.get),
-                                       MemoryFlushPercent(softMemoryFlush.get),
-                                       memoryCounter,
-                                       timeoutCounter,
-                                       sizeCounter,
-                                       insertCounter,
-                                       tupleInCounter,
-                                       tupleOutCounter)
+            new SyncSummingQueue[K, V](
+              BufferSize(cacheSize.lowerBound),
+              FlushFrequency(flushFrequency.get),
+              MemoryFlushPercent(softMemoryFlush.get),
+              memoryCounter,
+              timeoutCounter,
+              sizeCounter,
+              insertCounter,
+              tupleInCounter,
+              tupleOutCounter)
           }
         }
       } else {

@@ -58,9 +58,10 @@ class EventStream(sys: ActorSystem, private val debug: Boolean)
       throw new IllegalArgumentException("subscriber is null")
     if (debug)
       publish(
-        Logging.Debug(simpleName(this),
-                      this.getClass,
-                      "subscribing " + subscriber + " to channel " + channel))
+        Logging.Debug(
+          simpleName(this),
+          this.getClass,
+          "subscribing " + subscriber + " to channel " + channel))
     registerWithUnsubscriber(subscriber)
     super.subscribe(subscriber, channel)
   }
@@ -85,9 +86,10 @@ class EventStream(sys: ActorSystem, private val debug: Boolean)
     super.unsubscribe(subscriber)
     if (debug)
       publish(
-        Logging.Debug(simpleName(this),
-                      this.getClass,
-                      "unsubscribing " + subscriber + " from all channels"))
+        Logging.Debug(
+          simpleName(this),
+          this.getClass,
+          "unsubscribing " + subscriber + " from all channels"))
     unregisterIfNoMoreSubscribedChannels(subscriber)
   }
 

@@ -90,10 +90,10 @@ class ScSimpleTypeElementImpl(node: ASTNode)
   override def getNonValueType(
       ctx: TypingContext,
       withUnnecessaryImplicitsUpdate: Boolean = false): TypeResult[ScType] =
-    innerNonValueType(ctx,
-                      inferValueType = false,
-                      withUnnecessaryImplicitsUpdate =
-                        withUnnecessaryImplicitsUpdate)
+    innerNonValueType(
+      ctx,
+      inferValueType = false,
+      withUnnecessaryImplicitsUpdate = withUnnecessaryImplicitsUpdate)
 
   private def innerNonValueType(
       ctx: TypingContext,
@@ -125,41 +125,44 @@ class ScSimpleTypeElementImpl(node: ASTNode)
           (fun.effectiveParameterClauses.map(_.effectiveParameters.map { p =>
             val paramType: ScType =
               subst.subst(p.getType(TypingContext.empty).getOrAny)
-            new Parameter(p.name,
-                          p.deprecatedName,
-                          paramType,
-                          paramType,
-                          p.isDefaultParam,
-                          p.isRepeatedParameter,
-                          p.isCallByNameParameter,
-                          p.index,
-                          Some(p),
-                          p.getDefaultExpression.flatMap(_.getType().toOption))
+            new Parameter(
+              p.name,
+              p.deprecatedName,
+              paramType,
+              paramType,
+              p.isDefaultParam,
+              p.isRepeatedParameter,
+              p.isCallByNameParameter,
+              p.index,
+              Some(p),
+              p.getDefaultExpression.flatMap(_.getType().toOption))
           }), fun.parameterList.clauses.lastOption.exists(_.isImplicit))
         case f: ScPrimaryConstructor =>
           (f.effectiveParameterClauses.map(_.effectiveParameters.map { p =>
             val paramType: ScType =
               subst.subst(p.getType(TypingContext.empty).getOrAny)
-            new Parameter(p.name,
-                          p.deprecatedName,
-                          paramType,
-                          paramType,
-                          p.isDefaultParam,
-                          p.isRepeatedParameter,
-                          p.isCallByNameParameter,
-                          p.index,
-                          Some(p),
-                          p.getDefaultExpression.flatMap(_.getType().toOption))
+            new Parameter(
+              p.name,
+              p.deprecatedName,
+              paramType,
+              paramType,
+              p.isDefaultParam,
+              p.isRepeatedParameter,
+              p.isCallByNameParameter,
+              p.index,
+              Some(p),
+              p.getDefaultExpression.flatMap(_.getType().toOption))
           }), f.parameterList.clauses.lastOption.exists(_.isImplicit))
         case m: PsiMethod =>
           (Seq(m.getParameterList.getParameters.map { p =>
-            new Parameter("",
-                          None,
-                          p.exactParamType(),
-                          false,
-                          p.isVarArgs,
-                          false,
-                          p.index)
+            new Parameter(
+              "",
+              None,
+              p.exactParamType(),
+              false,
+              p.isVarArgs,
+              false,
+              p.index)
           }), false)
       }
     }
@@ -173,18 +176,21 @@ class ScSimpleTypeElementImpl(node: ASTNode)
         val newTp = tp match {
           case ScTypePolymorphicType(i, p) =>
             ScTypePolymorphicType(
-              ScMethodType(i, params.last, isImplicit = true)(getProject,
-                                                              getResolveScope),
+              ScMethodType(i, params.last, isImplicit = true)(
+                getProject,
+                getResolveScope),
               p)
           case _ =>
-            ScMethodType(tp, params.last, isImplicit = true)(getProject,
-                                                             getResolveScope)
+            ScMethodType(tp, params.last, isImplicit = true)(
+              getProject,
+              getResolveScope)
         }
-        val res = InferUtil.updateTypeWithImplicitParameters(newTp,
-                                                             this,
-                                                             None,
-                                                             withExpected,
-                                                             fullInfo = false)
+        val res = InferUtil.updateTypeWithImplicitParameters(
+          newTp,
+          this,
+          None,
+          withExpected,
+          fullInfo = false)
         implicitParameters = res._2
         res._1
       } else tp
@@ -210,8 +216,9 @@ class ScSimpleTypeElementImpl(node: ASTNode)
                     .map {
                       case (tpClass: ScTypeParam, tpConstr: ScTypeParam) =>
                         ((tpClass.name, ScalaPsiUtil.getPsiElementId(tpClass)),
-                         new ScTypeParameterType(tpConstr,
-                                                 ScSubstitutor.empty))
+                         new ScTypeParameterType(
+                           tpConstr,
+                           ScSubstitutor.empty))
                     }
                     .toMap,
                   Map.empty,
@@ -226,11 +233,12 @@ class ScSimpleTypeElementImpl(node: ASTNode)
         case ta: ScTypeAliasDefinition =>
           ta.aliasedType.getOrElse(return types.Nothing)
         case _ =>
-          parametrise(ScSimpleTypeElementImpl
-                        .calculateReferenceType(ref, shapesOnly = false)
-                        .getOrElse(return types.Nothing),
-                      clazz,
-                      subst)
+          parametrise(
+            ScSimpleTypeElementImpl
+              .calculateReferenceType(ref, shapesOnly = false)
+              .getOrElse(return types.Nothing),
+            clazz,
+            subst)
       }
       val res = subst.subst(tp)
 
@@ -246,10 +254,11 @@ class ScSimpleTypeElementImpl(node: ASTNode)
             if ptp.getTypeParameters.nonEmpty =>
           ptp.getTypeParameters.toSeq.map(new TypeParameter(_))
         case _ =>
-          updateImplicits(tp,
-                          withExpected = false,
-                          params = params,
-                          lastImplicit = lastImplicit)
+          updateImplicits(
+            tp,
+            withExpected = false,
+            params = params,
+            lastImplicit = lastImplicit)
           return res
       }
 
@@ -265,10 +274,11 @@ class ScSimpleTypeElementImpl(node: ASTNode)
             Map.empty,
             None)
           val newRes = appSubst.subst(res)
-          updateImplicits(newRes,
-                          withExpected = false,
-                          params = params,
-                          lastImplicit = lastImplicit)
+          updateImplicits(
+            newRes,
+            withExpected = false,
+            params = params,
+            lastImplicit = lastImplicit)
           return newRes
         case _ =>
       }
@@ -299,13 +309,14 @@ class ScSimpleTypeElementImpl(node: ASTNode)
                   nonValueType = InferUtil.localTypeInference(
                     nonValueType.internalType,
                     Seq(
-                      new Parameter("",
-                                    None,
-                                    expected,
-                                    false,
-                                    false,
-                                    false,
-                                    0)),
+                      new Parameter(
+                        "",
+                        None,
+                        expected,
+                        false,
+                        false,
+                        false,
+                        0)),
                     Seq(
                       new Expression(
                         InferUtil
@@ -419,14 +430,16 @@ class ScSimpleTypeElementImpl(node: ASTNode)
             r.map { tp =>
               ref.bind() match {
                 case Some(
-                    r @ ScalaResolveResult(method: PsiMethod,
-                                           subst: ScSubstitutor)) =>
+                    r @ ScalaResolveResult(
+                      method: PsiMethod,
+                      subst: ScSubstitutor)) =>
                   val (params, lastImplicit) =
                     getConstructorParams(method, subst.followed(ss))
-                  updateImplicits(tp,
-                                  withExpected = false,
-                                  params = params,
-                                  lastImplicit = lastImplicit)
+                  updateImplicits(
+                    tp,
+                    withExpected = false,
+                    params = params,
+                    lastImplicit = lastImplicit)
                   tp
                 case _ => tp
               }
@@ -442,8 +455,9 @@ class ScSimpleTypeElementImpl(node: ASTNode)
           case Array(ScalaResolveResult(synth: ScSyntheticClass, _)) =>
             lift(synth.t)
           case Array(
-              ScalaResolveResult(to: ScTypeParametersOwner,
-                                 subst: ScSubstitutor))
+              ScalaResolveResult(
+                to: ScTypeParametersOwner,
+                subst: ScSubstitutor))
               if constrRef && to.isInstanceOf[PsiNamedElement] &&
                 (to.typeParameters.isEmpty ||
                   getContext.isInstanceOf[ScParameterizedTypeElement]) =>
@@ -462,8 +476,9 @@ class ScSimpleTypeElementImpl(node: ASTNode)
             }
             updateImplicitsWithoutLocalTypeInference(tp, ss)
           case Array(
-              ScalaResolveResult(to: PsiTypeParameterListOwner,
-                                 subst: ScSubstitutor))
+              ScalaResolveResult(
+                to: PsiTypeParameterListOwner,
+                subst: ScSubstitutor))
               if constrRef && to.isInstanceOf[PsiNamedElement] &&
                 (to.getTypeParameters.isEmpty ||
                   getContext.isInstanceOf[ScParameterizedTypeElement]) =>
@@ -484,9 +499,9 @@ class ScSimpleTypeElementImpl(node: ASTNode)
           case _ => //resolve constructor with local type inference
             ref.bind() match {
               case Some(
-                  r @ ScalaResolveResult(method: PsiMethod,
-                                         subst: ScSubstitutor))
-                  if !noConstructor =>
+                  r @ ScalaResolveResult(
+                    method: PsiMethod,
+                    subst: ScSubstitutor)) if !noConstructor =>
                 Success(
                   typeForConstructor(ref, method, subst, r.getActualElement),
                   Some(this))
@@ -583,18 +598,22 @@ object ScSimpleTypeElementImpl {
             val obj =
               PsiTreeUtil.getContextOfType(resolvedElement, classOf[ScObject])
             if (obj != null && obj.isPackageObject) {
-              Success(ScProjectionType(ScDesignatorType(obj),
-                                       resolvedElement,
-                                       superReference = false),
-                      Some(ref))
+              Success(
+                ScProjectionType(
+                  ScDesignatorType(obj),
+                  resolvedElement,
+                  superReference = false),
+                Some(ref))
             } else {
               fromType match {
                 case Some(ScDesignatorType(obj: ScObject))
                     if obj.isPackageObject =>
-                  Success(ScProjectionType(ScDesignatorType(obj),
-                                           resolvedElement,
-                                           superReference = false),
-                          Some(ref))
+                  Success(
+                    ScProjectionType(
+                      ScDesignatorType(obj),
+                      resolvedElement,
+                      superReference = false),
+                    Some(ref))
                 case _ =>
                   Success(ScType.designator(resolvedElement), Some(ref))
               }
@@ -603,10 +622,12 @@ object ScSimpleTypeElementImpl {
             calculateReferenceType(qual, shapesOnly) match {
               case failure: Failure => failure
               case Success(tp, _) =>
-                Success(ScProjectionType(tp,
-                                         resolvedElement,
-                                         superReference = false),
-                        Some(ref))
+                Success(
+                  ScProjectionType(
+                    tp,
+                    resolvedElement,
+                    superReference = false),
+                  Some(ref))
             }
         }
       case None =>
@@ -614,25 +635,31 @@ object ScSimpleTypeElementImpl {
           case Some(thisRef: ScThisReference) =>
             thisRef.refTemplate match {
               case Some(template) =>
-                Success(ScProjectionType(ScThisType(template),
-                                         resolvedElement,
-                                         superReference = false),
-                        Some(ref))
+                Success(
+                  ScProjectionType(
+                    ScThisType(template),
+                    resolvedElement,
+                    superReference = false),
+                  Some(ref))
               case _ =>
-                Failure("Cannot find template for this reference",
-                        Some(thisRef))
+                Failure(
+                  "Cannot find template for this reference",
+                  Some(thisRef))
             }
           case Some(superRef: ScSuperReference) =>
             val template = superRef.drvTemplate match {
               case Some(x) => x
               case None =>
-                return Failure("Cannot find enclosing container",
-                               Some(superRef))
+                return Failure(
+                  "Cannot find enclosing container",
+                  Some(superRef))
             }
-            Success(ScProjectionType(ScThisType(template),
-                                     resolvedElement,
-                                     resolvedElement.isInstanceOf[PsiClass]),
-                    Some(ref))
+            Success(
+              ScProjectionType(
+                ScThisType(template),
+                resolvedElement,
+                resolvedElement.isInstanceOf[PsiClass]),
+              Some(ref))
           case _ =>
             resolvedElement match {
               case self: ScSelfTypeElement =>
@@ -642,10 +669,12 @@ object ScSimpleTypeElementImpl {
               case _ =>
                 if (fromType.isEmpty)
                   return Success(ScType.designator(resolvedElement), Some(ref))
-                Success(ScProjectionType(fromType.get,
-                                         resolvedElement,
-                                         superReference = false),
-                        Some(ref))
+                Success(
+                  ScProjectionType(
+                    fromType.get,
+                    resolvedElement,
+                    superReference = false),
+                  Some(ref))
             }
         }
     }

@@ -29,13 +29,14 @@ class SbtNoImportNotificationProvider(project: Project,
   override def createPanel(file: VirtualFile): EditorNotificationPanel = {
     val panel = new EditorNotificationPanel()
     panel.setText(SbtBundle("sbt.notification.noimport.msg", file.getName))
-    panel.createActionLabel(SbtBundle("sbt.notification.importProject"),
-                            new Runnable {
-                              override def run() = {
-                                importProject(file)
-                                notifications.updateAllNotifications()
-                              }
-                            })
+    panel.createActionLabel(
+      SbtBundle("sbt.notification.importProject"),
+      new Runnable {
+        override def run() = {
+          importProject(file)
+          notifications.updateAllNotifications()
+        }
+      })
     panel
       .createActionLabel(SbtBundle("sbt.notification.ignore"), new Runnable {
         override def run() = {

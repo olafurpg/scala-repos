@@ -94,9 +94,10 @@ trait IssuesService { self: AccountService =>
                               filterUser: Map[String, String])(
       implicit s: Session): Map[String, Int] = {
 
-    searchIssueQuery(Seq(owner -> repository),
-                     condition.copy(labels = Set.empty),
-                     false)
+    searchIssueQuery(
+      Seq(owner -> repository),
+      condition.copy(labels = Set.empty),
+      false)
       .innerJoin(IssueLabels)
       .on { (t1, t2) =>
         t1.byIssue(t2.userName, t2.repositoryName, t2.issueId)
@@ -136,16 +137,17 @@ trait IssuesService { self: AccountService =>
           }
       }
       import gitbucket.core.model.Profile.commitStateColumnType
-      val query = Q.query[Seq[(String, String, Int)],
-                          (String,
-                           String,
-                           Int,
-                           Int,
-                           Int,
-                           Option[String],
-                           Option[CommitState],
-                           Option[String],
-                           Option[String])](s"""
+      val query = Q.query[
+        Seq[(String, String, Int)],
+        (String,
+         String,
+         Int,
+         Int,
+         Int,
+         Option[String],
+         Option[CommitState],
+         Option[String],
+         Option[String])](s"""
         SELECT SUMM.USER_NAME, SUMM.REPOSITORY_NAME, SUMM.ISSUE_ID, CS_ALL, CS_SUCCESS
              , CSD.CONTEXT, CSD.STATE, CSD.TARGET_URL, CSD.DESCRIPTION
         FROM (SELECT
@@ -166,15 +168,16 @@ trait IssuesService { self: AccountService =>
           ON SUMM.CS_ALL = 1 AND SUMM.COMMIT_ID = CSD.COMMIT_ID""");
       query(issueList).list
         .map {
-          case (userName,
-                repositoryName,
-                issueId,
-                count,
-                successCount,
-                context,
-                state,
-                targetUrl,
-                description) =>
+          case (
+              userName,
+              repositoryName,
+              issueId,
+              count,
+              successCount,
+              context,
+              state,
+              targetUrl,
+              description) =>
             (userName, repositoryName, issueId) -> CommitStatusInfo(
               count,
               successCount,
@@ -250,11 +253,12 @@ trait IssuesService { self: AccountService =>
               issues
                 .flatMap { t =>
                   t._3.map(
-                    Label(issue.userName,
-                          issue.repositoryName,
-                          _,
-                          t._4.get,
-                          t._5.get)
+                    Label(
+                      issue.userName,
+                      issue.repositoryName,
+                      _,
+                      t._4.get,
+                      t._5.get)
                 )
               } toList,
               milestone,
@@ -387,18 +391,19 @@ trait IssuesService { self: AccountService =>
       .as[Int]
       .firstOption
       .filter { id =>
-        Issues insert Issue(owner,
-                            repository,
-                            id,
-                            loginUser,
-                            milestoneId,
-                            assignedUserName,
-                            title,
-                            content,
-                            false,
-                            currentDate,
-                            currentDate,
-                            isPullRequest)
+        Issues insert Issue(
+          owner,
+          repository,
+          id,
+          loginUser,
+          milestoneId,
+          assignedUserName,
+          title,
+          content,
+          false,
+          currentDate,
+          currentDate,
+          isPullRequest)
 
         // increment issue id
         IssueId
@@ -425,14 +430,15 @@ trait IssuesService { self: AccountService =>
                     issueId: Int,
                     content: String,
                     action: String)(implicit s: Session): Int =
-    IssueComments.autoInc insert IssueComment(userName = owner,
-                                              repositoryName = repository,
-                                              issueId = issueId,
-                                              action = action,
-                                              commentedUserName = loginUser,
-                                              content = content,
-                                              registeredDate = currentDate,
-                                              updatedDate = currentDate)
+    IssueComments.autoInc insert IssueComment(
+      userName = owner,
+      repositoryName = repository,
+      issueId = issueId,
+      action = action,
+      commentedUserName = loginUser,
+      content = content,
+      registeredDate = currentDate,
+      updatedDate = currentDate)
 
   def updateIssue(owner: String,
                   repository: String,
@@ -574,12 +580,13 @@ trait IssuesService { self: AccountService =>
                              repository: String)(implicit s: Session) = {
     extractCloseId(message).foreach { issueId =>
       for (issue <- getIssue(owner, repository, issueId) if !issue.closed) {
-        createComment(owner,
-                      repository,
-                      userName,
-                      issue.issueId,
-                      "Close",
-                      "close")
+        createComment(
+          owner,
+          repository,
+          userName,
+          issue.issueId,
+          "Close",
+          "close")
         updateClosed(owner, repository, issue.issueId, true)
       }
     }
@@ -597,12 +604,13 @@ trait IssuesService { self: AccountService =>
         if (!getComments(owner, repository, issueId.toInt).exists { x =>
               x.action == "refer" && x.content == content
             }) {
-          createComment(owner,
-                        repository,
-                        loginAccount.userName,
-                        issueId.toInt,
-                        content,
-                        "refer")
+          createComment(
+            owner,
+            repository,
+            loginAccount.userName,
+            issueId.toInt,
+            content,
+            "refer")
         }
       }
     }
@@ -615,12 +623,13 @@ trait IssuesService { self: AccountService =>
       if (getIssue(owner, repository, issueId).isDefined) {
         getAccountByMailAddress(commit.committerEmailAddress).foreach {
           account =>
-            createComment(owner,
-                          repository,
-                          account.userName,
-                          issueId.toInt,
-                          commit.fullMessage + " " + commit.id,
-                          "commit")
+            createComment(
+              owner,
+              repository,
+              account.userName,
+              issueId.toInt,
+              commit.fullMessage + " " + commit.id,
+              "commit")
         }
       }
     }

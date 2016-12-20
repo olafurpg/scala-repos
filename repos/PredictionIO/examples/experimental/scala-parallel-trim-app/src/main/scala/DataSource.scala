@@ -22,10 +22,11 @@ case class DataSourceParams(
 ) extends Params
 
 class DataSource(val dsp: DataSourceParams)
-    extends PDataSource[TrainingData,
-                        EmptyEvaluationInfo,
-                        Query,
-                        EmptyActualResult] {
+    extends PDataSource[
+      TrainingData,
+      EmptyEvaluationInfo,
+      Query,
+      EmptyActualResult] {
 
   @transient lazy val logger = Logger[this.type]
 

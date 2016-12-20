@@ -89,8 +89,9 @@ class TemplateExample
     Template.page(title, content, url(_, includeServletPath = false))
 
   get("/date/:year/:month/:day") {
-    displayPage("Scalatra: Date Example",
-                <ul>
+    displayPage(
+      "Scalatra: Date Example",
+      <ul>
         <li>Year: { params("year") }</li>
         <li>Month: { params("month") }</li>
         <li>Day: { params("day") }</li>
@@ -99,8 +100,9 @@ class TemplateExample
   }
 
   get("/form") {
-    displayPage("Scalatra: Form Post Example",
-                <form action={ url("/post") } method='POST'>
+    displayPage(
+      "Scalatra: Form Post Example",
+      <form action={ url("/post") } method='POST'>
         Post something:<input name="submission" type='text'/>
         <input type='submit'/>
       </form>
@@ -108,20 +110,23 @@ class TemplateExample
   }
 
   post("/post") {
-    displayPage("Scalatra: Form Post Result",
-                <p>You posted: { params("submission") }</p>
+    displayPage(
+      "Scalatra: Form Post Result",
+      <p>You posted: { params("submission") }</p>
       <pre>Route: /post</pre>)
   }
 
   get("/login") {
     (session.get("first"), session.get("last")) match {
       case (Some(first: String), Some(last: String)) =>
-        displayPage("Scalatra: Session Example",
-                    <pre>You have logged in as: { first + "-" + last }</pre>
+        displayPage(
+          "Scalatra: Session Example",
+          <pre>You have logged in as: { first + "-" + last }</pre>
           <pre>Route: /login</pre>)
       case x =>
-        displayPage("Scalatra: Session Example" + x.toString,
-                    <form action={ url("/login") } method='POST'>
+        displayPage(
+          "Scalatra: Session Example" + x.toString,
+          <form action={ url("/login") } method='POST'>
             First Name:<input name="first" type='text'/>
             Last Name:<input name="last" type='text'/>
             <input type='submit'/>
@@ -145,14 +150,16 @@ class TemplateExample
 
   get("/logout") {
     session.invalidate
-    displayPage("Scalatra: Session Example",
-                <pre>You have logged out</pre>
+    displayPage(
+      "Scalatra: Session Example",
+      <pre>You have logged out</pre>
       <pre>Route: /logout</pre>)
   }
 
   get("/") {
-    displayPage("Scalatra: Hello World",
-                <h2>Hello world!</h2>
+    displayPage(
+      "Scalatra: Hello World",
+      <h2>Hello world!</h2>
       <p>Referer: { (request referrer) map { Text(_) } getOrElse { <i>none</i> } }</p>
       <pre>Route: /</pre>)
   }
@@ -163,8 +170,9 @@ class TemplateExample
   }
 
   get("/flash-map/form") {
-    displayPage("Scalatra: Flash Map Example",
-                <span>Supports the post-then-redirect pattern</span>
+    displayPage(
+      "Scalatra: Flash Map Example",
+      <span>Supports the post-then-redirect pattern</span>
       <br/>
       <form method="post">
         <label>Message: <input type="text" name="message"/></label><br/>

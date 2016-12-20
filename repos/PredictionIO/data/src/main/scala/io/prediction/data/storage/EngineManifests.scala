@@ -71,12 +71,13 @@ class EngineManifestSerializer
     extends CustomSerializer[EngineManifest](format =>
       ({
         case JObject(fields) =>
-          val seed = EngineManifest(id = "",
-                                    version = "",
-                                    name = "",
-                                    description = None,
-                                    files = Nil,
-                                    engineFactory = "")
+          val seed = EngineManifest(
+            id = "",
+            version = "",
+            name = "",
+            description = None,
+            files = Nil,
+            engineFactory = "")
           fields.foldLeft(seed) {
             case (enginemanifest, field) =>
               field match {
@@ -109,10 +110,11 @@ class EngineManifestSerializer
               "description",
               enginemanifest.description
                 .map(x => JString(x))
-                .getOrElse(JNothing)) :: JField("files",
-                                                JArray(enginemanifest.files
-                                                  .map(x => JString(x))
-                                                  .toList)) :: JField(
+                .getOrElse(JNothing)) :: JField(
+              "files",
+              JArray(enginemanifest.files
+                .map(x => JString(x))
+                .toList)) :: JField(
               "engineFactory",
               JString(enginemanifest.engineFactory)) :: Nil)
       }))

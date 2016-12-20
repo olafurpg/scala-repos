@@ -74,15 +74,17 @@ class TakeOrderedAndProjectSuite extends SparkPlanTest with SharedSQLContext {
         generateRandomInputData(),
         input =>
           noOpFilter(
-            TakeOrderedAndProject(limit,
-                                  sortOrder,
-                                  Some(Seq(input.output.last)),
-                                  input)),
+            TakeOrderedAndProject(
+              limit,
+              sortOrder,
+              Some(Seq(input.output.last)),
+              input)),
         input =>
-          GlobalLimit(limit,
-                      LocalLimit(limit,
-                                 Project(Seq(input.output.last),
-                                         Sort(sortOrder, true, input)))),
+          GlobalLimit(
+            limit,
+            LocalLimit(
+              limit,
+              Project(Seq(input.output.last), Sort(sortOrder, true, input)))),
         sortAnswers = false)
     }
   }

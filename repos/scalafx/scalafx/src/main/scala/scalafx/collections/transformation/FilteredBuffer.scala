@@ -77,12 +77,11 @@ class FilteredBuffer[E](override val delegate: jfxct.FilteredList[E])
     * @param predicate the predicate to match the elements. Cannot be null.
     */
   def this(source: ObservableBuffer[E], predicate: (_ >: E) => Boolean) =
-    this(
-      delegate = new jfxct.FilteredList[E](source.delegate,
-                                           new ju.function.Predicate[E] {
-                                             override def test(t: E): Boolean =
-                                               predicate(t)
-                                           }))
+    this(delegate =
+      new jfxct.FilteredList[E](source.delegate, new ju.function.Predicate[E] {
+        override def test(t: E): Boolean =
+          predicate(t)
+      }))
 
   /**
     *

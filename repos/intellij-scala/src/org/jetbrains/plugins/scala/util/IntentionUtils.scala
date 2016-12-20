@@ -302,11 +302,12 @@ object IntentionUtils {
             IntentionUtils
               .replaceWithExplicit(expr, function, project, editor, secondPart)
           if (selectedValue == MakeExplicitAction.MAKE_EXPLICIT_STATICALLY)
-            IntentionUtils.replaceWithExplicitStatically(expr,
-                                                         function,
-                                                         project,
-                                                         editor,
-                                                         secondPart)
+            IntentionUtils.replaceWithExplicitStatically(
+              expr,
+              function,
+              project,
+              editor,
+              secondPart)
           return PopupStep.FINAL_CHOICE
         }
         super.onChosen(selectedValue, finalChoice)
@@ -317,7 +318,8 @@ object IntentionUtils {
     val bounds: Rectangle = getCurrentItemBounds()
 
     popup.show(
-      new RelativePoint(GoToImplicitConversionAction.getList,
-                        new Point(bounds.x + bounds.width - 20, bounds.y)))
+      new RelativePoint(
+        GoToImplicitConversionAction.getList,
+        new Point(bounds.x + bounds.width - 20, bounds.y)))
   }
 }

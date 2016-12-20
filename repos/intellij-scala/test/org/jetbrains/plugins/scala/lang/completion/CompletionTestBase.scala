@@ -95,8 +95,9 @@ abstract class CompletionTestBase
       case ScalaTokenTypes.tBLOCK_COMMENT | ScalaTokenTypes.tDOC_COMMENT =>
         text.substring(2, text.length - 2).trim
       case _ =>
-        assert(assertion = false,
-               "Test result must be in last comment statement.")
+        assert(
+          assertion = false,
+          "Test result must be in last comment statement.")
         ""
     }
   }

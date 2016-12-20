@@ -303,8 +303,9 @@ class PolyMacros(val c: whitebox.Context) {
     val value = pTpe match {
       case SingleType(_, f) => f
       case other =>
-        c.abort(c.enclosingPosition,
-                "Can only materialize cases from singleton values")
+        c.abort(
+          c.enclosingPosition,
+          "Can only materialize cases from singleton values")
     }
 
     q""" $value.caseUniv[$tTpe] """

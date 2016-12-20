@@ -136,8 +136,9 @@ class RouteDirectivesSpec extends FreeSpec with GenericRoutingSpec {
       Get() ~> {
         redirect("/foo", NotModified)
       } ~> check {
-        response shouldEqual HttpResponse(304,
-                                          headers = Location("/foo") :: Nil)
+        response shouldEqual HttpResponse(
+          304,
+          headers = Location("/foo") :: Nil)
       }
     }
   }

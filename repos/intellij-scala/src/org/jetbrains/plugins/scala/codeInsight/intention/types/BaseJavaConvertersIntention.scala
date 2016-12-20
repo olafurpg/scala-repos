@@ -71,9 +71,10 @@ abstract class BaseJavaConvertersIntention(methodName: String)
       val replacement = ScalaPsiElementFactory.createExpressionFromText(
         s"${expression.getText}.$methodName",
         expression.getManager)
-      CodeEditUtil.replaceChild(expression.getParent.getNode,
-                                expression.getNode,
-                                replacement.getNode)
+      CodeEditUtil.replaceChild(
+        expression.getParent.getNode,
+        expression.getNode,
+        replacement.getNode)
     }
     inWriteAction {
       addImport()
@@ -91,8 +92,9 @@ abstract class BaseJavaConvertersIntention(methodName: String)
       pClasses match {
         case Nil => superNames
         case head :: tail =>
-          allSuperNames(head.getSupers.toList ::: tail,
-                        superNames + head.getQualifiedName)
+          allSuperNames(
+            head.getSupers.toList ::: tail,
+            superNames + head.getQualifiedName)
       }
     }
     allSuperNames(List(psiClass))

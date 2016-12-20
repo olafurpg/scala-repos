@@ -316,11 +316,12 @@ private final case class PostPageFunctions(renderVersion: String,
     * Create a new instance based on the last seen time
     */
   def updateLastSeen =
-    new PostPageFunctions(renderVersion,
-                          functionCount,
-                          longLife,
-                          Helpers.millis,
-                          functions)
+    new PostPageFunctions(
+      renderVersion,
+      functionCount,
+      longLife,
+      Helpers.millis,
+      functions)
 }
 
 /**
@@ -619,9 +620,10 @@ class LiftSession(private[http] val _contextPath: String,
                         when: Long): Unit = {
     funcs.foreach {
       case (name, func) =>
-        nmessageCallback.put(name,
-                             if (func.owner == Full(uniqueId)) func
-                             else func.duplicate(uniqueId))
+        nmessageCallback.put(
+          name,
+          if (func.owner == Full(uniqueId)) func
+          else func.duplicate(uniqueId))
     }
   }
 
@@ -814,17 +816,19 @@ class LiftSession(private[http] val _contextPath: String,
 
         val old = postPageFunctions.getOrElse(
           rv,
-          PostPageFunctions(rv,
-                            0,
-                            S.currentCometActor.isDefined,
-                            Helpers.millis,
-                            Nil))
+          PostPageFunctions(
+            rv,
+            0,
+            S.currentCometActor.isDefined,
+            Helpers.millis,
+            Nil))
 
-        val updated = PostPageFunctions(old.renderVersion,
-                                        old.functionCount + 1,
-                                        old.longLife,
-                                        Helpers.millis,
-                                        func :: old.functions)
+        val updated = PostPageFunctions(
+          old.renderVersion,
+          old.functionCount + 1,
+          old.longLife,
+          Helpers.millis,
+          func :: old.functions)
 
         postPageFunctions += (rv -> updated)
       }
@@ -997,8 +1001,9 @@ class LiftSession(private[http] val _contextPath: String,
           val xml = merge(rawXml, request)
 
           // snapshot for ajax calls
-          nmessageCallback.put(S.renderVersion,
-                               S.PageStateHolder(Full(S.renderVersion), this))
+          nmessageCallback.put(
+            S.renderVersion,
+            S.PageStateHolder(Full(S.renderVersion), this))
 
           // But we need to update the function map because there
           // may be addition functions created during the JsToAppend processing
@@ -1094,10 +1099,11 @@ class LiftSession(private[http] val _contextPath: String,
                     LiftRules.allowParallelSnippets.doWith(() => !Props.inGAE) {
                       (request.location.flatMap(_.earlyResponse) or LiftRules.earlyResponse
                         .firstFull(request)) or
-                        (processTemplate(locTemplate,
-                                         request,
-                                         request.path,
-                                         200) or request.createNotFound {
+                        (processTemplate(
+                          locTemplate,
+                          request,
+                          request.path,
+                          200) or request.createNotFound {
                           processTemplate(Empty, request, _, 404)
                         })
                     }
@@ -1125,8 +1131,9 @@ class LiftSession(private[http] val _contextPath: String,
       case ite: java.lang.reflect.InvocationTargetException
           if (ite.getCause.isInstanceOf[ResponseShortcutException]) =>
         Full(
-          handleRedirect(ite.getCause.asInstanceOf[ResponseShortcutException],
-                         request))
+          handleRedirect(
+            ite.getCause.asInstanceOf[ResponseShortcutException],
+            request))
 
       case rd: net.liftweb.http.ResponseShortcutException =>
         Full(handleRedirect(rd, request))
@@ -1492,8 +1499,9 @@ class LiftSession(private[http] val _contextPath: String,
             case s if s.indexOf('.') > -1 =>
               findAttributeSnippet(s, processAttributes(in.next, allow), mine)
             case "snippet" =>
-              findAttributeSnippet(mine.value.text,
-                                   processAttributes(in.next, allow))
+              findAttributeSnippet(
+                mine.value.text,
+                processAttributes(in.next, allow))
             case _ => mine.copy(processAttributes(in.next, allow))
           }
         }
@@ -1691,9 +1699,10 @@ class LiftSession(private[http] val _contextPath: String,
     val isForm = !attrs.get("form").toList.isEmpty
 
     val eagerEval: Boolean =
-      (attrs.get("eager_eval").map(toBoolean) orElse findNSAttr(attrs,
-                                                                "lift",
-                                                                "eager_eval")
+      (attrs.get("eager_eval").map(toBoolean) orElse findNSAttr(
+        attrs,
+        "lift",
+        "eager_eval")
         .map(toBoolean) orElse findNSAttr(attrs, "l", "eager_eval").map(
         toBoolean)) getOrElse false
 
@@ -1870,9 +1879,10 @@ class LiftSession(private[http] val _contextPath: String,
                                 .toList
                                 .distinct
                               val methodAlts =
-                                List(method,
-                                     Helpers.camelify(method),
-                                     Helpers.camelifyMethod(method))
+                                List(
+                                  method,
+                                  Helpers.camelify(method),
+                                  Helpers.camelifyMethod(method))
                               methodNames intersect methodAlts
                             } else Nil
 
@@ -1903,36 +1913,40 @@ class LiftSession(private[http] val _contextPath: String,
                       wholeTag)
 
                   case _ =>
-                    reportSnippetError(page,
-                                       snippetName,
-                                       LiftRules.SnippetFailures.ClassNotFound,
-                                       NodeSeq.Empty,
-                                       wholeTag)
+                    reportSnippetError(
+                      page,
+                      snippetName,
+                      LiftRules.SnippetFailures.ClassNotFound,
+                      NodeSeq.Empty,
+                      wholeTag)
                 }
               })
           })
         }
         .openOr {
-          reportSnippetError(page,
-                             snippetName,
-                             LiftRules.SnippetFailures.NoNameSpecified,
-                             NodeSeq.Empty,
-                             wholeTag)
+          reportSnippetError(
+            page,
+            snippetName,
+            LiftRules.SnippetFailures.NoNameSpecified,
+            NodeSeq.Empty,
+            wholeTag)
         }
     } catch {
       case ExclosedSnippetFailure(e) =>
-        reportSnippetError(page,
-                           snippetName,
-                           e.snippetFailure,
-                           e.buildStackTrace,
-                           wholeTag)
+        reportSnippetError(
+          page,
+          snippetName,
+          e.snippetFailure,
+          e.buildStackTrace,
+          wholeTag)
 
       case e: SnippetFailureException =>
-        reportSnippetError(page,
-                           snippetName,
-                           e.snippetFailure,
-                           e.buildStackTrace,
-                           wholeTag)
+        reportSnippetError(
+          page,
+          snippetName,
+          e.snippetFailure,
+          e.buildStackTrace,
+          wholeTag)
     }
 
     def checkMultiPart(in: MetaData): MetaData =
@@ -2200,13 +2214,14 @@ class LiftSession(private[http] val _contextPath: String,
     */
   def clientActorFor(in: LiftActor): JsExp = {
     testStatefulFeature {
-      AnonFunc("x",
-               SHtml
-                 .jsonCall(JsRaw("x"), (p: JsonAST.JValue) => {
-                   in ! p
-                   JsCmds.Noop
-                 })
-                 .cmd)
+      AnonFunc(
+        "x",
+        SHtml
+          .jsonCall(JsRaw("x"), (p: JsonAST.JValue) => {
+            in ! p
+            JsCmds.Noop
+          })
+          .cmd)
     }
   }
 
@@ -2236,21 +2251,22 @@ class LiftSession(private[http] val _contextPath: String,
     */
   def clientActorFor(in: LiftActor, xlate: JsonAST.JValue => Box[Any]): JsExp = {
     testStatefulFeature {
-      AnonFunc("x",
-               SHtml
-                 .jsonCall(JsRaw("x"), (p: JsonAST.JValue) => {
-                   in.!(xlate(p) match {
-                     case Full(v) => v
-                     case Empty =>
-                       logger.error("Failed to deserialize JSON message " + p);
-                       p
-                     case Failure(msg, _, _) =>
-                       logger.error("Failed to deserialize JSON message " +
-                         p + ". Error " + msg); p
-                   })
-                   JsCmds.Noop
-                 })
-                 .cmd)
+      AnonFunc(
+        "x",
+        SHtml
+          .jsonCall(JsRaw("x"), (p: JsonAST.JValue) => {
+            in.!(xlate(p) match {
+              case Full(v) => v
+              case Empty =>
+                logger.error("Failed to deserialize JSON message " + p);
+                p
+              case Failure(msg, _, _) =>
+                logger.error("Failed to deserialize JSON message " +
+                  p + ". Error " + msg); p
+            })
+            JsCmds.Noop
+          })
+          .cmd)
     }
   }
 
@@ -2360,11 +2376,12 @@ class LiftSession(private[http] val _contextPath: String,
       nasyncById.put(ca.uniqueId, ca)
 
       ca.callInitCometActor(
-        CometCreationInfo(Helpers.nextFuncName,
-                          Full(Helpers.nextFuncName),
-                          NodeSeq.Empty,
-                          Map.empty,
-                          this))
+        CometCreationInfo(
+          Helpers.nextFuncName,
+          Full(Helpers.nextFuncName),
+          NodeSeq.Empty,
+          Map.empty,
+          this))
 
       ca ! PerformSetupComet2(Empty)
 
@@ -2408,8 +2425,9 @@ class LiftSession(private[http] val _contextPath: String,
                 S.withAttrs(attrs) {
                   processSurroundAndInclude(
                     page,
-                    NamedPF((snippetName, element, attrs, kids, page),
-                            liftTagProcessing))
+                    NamedPF(
+                      (snippetName, element, attrs, kids, page),
+                      liftTagProcessing))
                 }
               }
             }
@@ -2702,10 +2720,11 @@ class LiftSession(private[http] val _contextPath: String,
     }
 
     def buildWithCreateInfoConstructor = {
-      val constructor = cometClass.getConstructor(this.getClass,
-                                                  classOf[Box[String]],
-                                                  classOf[NodeSeq],
-                                                  classOf[Map[String, String]])
+      val constructor = cometClass.getConstructor(
+        this.getClass,
+        classOf[Box[String]],
+        classOf[NodeSeq],
+        classOf[Map[String, String]])
 
       val CometCreationInfo(_, name, defaultXml, attributes, _) = creationInfo
 
@@ -2848,11 +2867,12 @@ class LiftSession(private[http] val _contextPath: String,
       nasyncById.put(ca.uniqueId, ca)
 
       ca.callInitCometActor(
-        CometCreationInfo(Helpers.nextFuncName,
-                          Full(Helpers.nextFuncName),
-                          NodeSeq.Empty,
-                          Map.empty,
-                          this))
+        CometCreationInfo(
+          Helpers.nextFuncName,
+          Full(Helpers.nextFuncName),
+          NodeSeq.Empty,
+          Map.empty,
+          this))
 
       implicit val defaultFormats = DefaultFormats
 
@@ -2888,13 +2908,15 @@ class LiftSession(private[http] val _contextPath: String,
                 Some(payload.extract(defaultFormats, func.manifest))
               } catch {
                 case e: Exception =>
-                  logger.error("Failed to extract " + payload +
-                                 " as " + func.manifest,
-                               e)
-                  ca ! FailMsg(guid,
-                               "Failed to extract payload as " +
-                                 func.manifest + " exception " +
-                                 e.getMessage)
+                  logger.error(
+                    "Failed to extract " + payload +
+                      " as " + func.manifest,
+                    e)
+                  ca ! FailMsg(
+                    guid,
+                    "Failed to extract payload as " +
+                      func.manifest + " exception " +
+                      e.getMessage)
                   None
               }
             }
@@ -3125,12 +3147,13 @@ private object SnippetNode {
             elm)
         } yield {
           val (par, nonLift) = liftAttrsAndParallel(elm.attributes)
-          val newElm = new Elem(elm.prefix,
-                                elm.label,
-                                nonLift,
-                                elm.scope,
-                                elm.minimizeEmpty,
-                                elm.child: _*)
+          val newElm = new Elem(
+            elm.prefix,
+            elm.label,
+            nonLift,
+            elm.scope,
+            elm.minimizeEmpty,
+            elm.child: _*)
           (newElm,
            newElm,
            par ||

@@ -76,8 +76,9 @@ trait BasicProfile extends BasicActionComponent { self: BasicProfile =>
     implicit def streamableCompiledQueryActionExtensionMethods[RU, EU](
         c: StreamableCompiled[_, RU, EU])
       : StreamingQueryActionExtensionMethods[RU, EU] =
-      createStreamingQueryActionExtensionMethods[RU, EU](c.compiledQuery,
-                                                         c.param)
+      createStreamingQueryActionExtensionMethods[RU, EU](
+        c.compiledQuery,
+        c.param)
     // Applying a CompiledFunction always results in only a RunnableCompiled, not a StreamableCompiled, so we need this:
     implicit def streamableAppliedCompiledFunctionActionExtensionMethods[R,
                                                                          RU,
@@ -85,8 +86,9 @@ trait BasicProfile extends BasicActionComponent { self: BasicProfile =>
                                                                          C[_]](
         c: AppliedCompiledFunction[_, Query[R, EU, C], RU])
       : StreamingQueryActionExtensionMethods[RU, EU] =
-      createStreamingQueryActionExtensionMethods[RU, EU](c.compiledQuery,
-                                                         c.param)
+      createStreamingQueryActionExtensionMethods[RU, EU](
+        c.compiledQuery,
+        c.param)
     implicit def recordQueryActionExtensionMethods[M, R](q: M)(
         implicit shape: Shape[_ <: FlatShapeLevel, M, R, _])
       : QueryActionExtensionMethods[R, NoStream] =

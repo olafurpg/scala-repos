@@ -81,10 +81,11 @@ private[cluster] final class ClusterHeartbeatSender
   val selfHeartbeat = Heartbeat(selfAddress)
 
   var state = ClusterHeartbeatSenderState(
-    ring = HeartbeatNodeRing(selfUniqueAddress,
-                             Set(selfUniqueAddress),
-                             Set.empty,
-                             MonitoredByNrOfMembers),
+    ring = HeartbeatNodeRing(
+      selfUniqueAddress,
+      Set(selfUniqueAddress),
+      Set.empty,
+      MonitoredByNrOfMembers),
     oldReceiversNowUnreachable = Set.empty[UniqueAddress],
     failureDetector)
 
@@ -162,19 +163,22 @@ private[cluster] final class ClusterHeartbeatSender
     state.activeReceivers foreach { to ⇒
       if (cluster.failureDetector.isMonitoring(to.address)) {
         if (verboseHeartbeat)
-          log.debug("Cluster Node [{}] - Heartbeat to [{}]",
-                    selfAddress,
-                    to.address)
+          log.debug(
+            "Cluster Node [{}] - Heartbeat to [{}]",
+            selfAddress,
+            to.address)
       } else {
         if (verboseHeartbeat)
-          log.debug("Cluster Node [{}] - First Heartbeat to [{}]",
-                    selfAddress,
-                    to.address)
+          log.debug(
+            "Cluster Node [{}] - First Heartbeat to [{}]",
+            selfAddress,
+            to.address)
         // schedule the expected first heartbeat for later, which will give the
         // other side a chance to reply, and also trigger some resends if needed
-        scheduler.scheduleOnce(HeartbeatExpectedResponseAfter,
-                               self,
-                               ExpectedFirstHeartbeat(to))
+        scheduler.scheduleOnce(
+          HeartbeatExpectedResponseAfter,
+          self,
+          ExpectedFirstHeartbeat(to))
       }
       heartbeatReceiver(to.address) ! selfHeartbeat
     }
@@ -182,9 +186,10 @@ private[cluster] final class ClusterHeartbeatSender
 
   def heartbeatRsp(from: UniqueAddress): Unit = {
     if (verboseHeartbeat)
-      log.debug("Cluster Node [{}] - Heartbeat response from [{}]",
-                selfAddress,
-                from.address)
+      log.debug(
+        "Cluster Node [{}] - Heartbeat response from [{}]",
+        selfAddress,
+        from.address)
     state = state.heartbeatRsp(from)
   }
 
@@ -332,9 +337,10 @@ private[cluster] final case class HeartbeatNodeRing(
           else take(n - 1, iter, acc + next) // include the reachable
         }
 
-      val (remaining, slice1) = take(monitoredByNrOfMembers,
-                                     nodeRing.from(sender).tail.iterator,
-                                     Set.empty)
+      val (remaining, slice1) = take(
+        monitoredByNrOfMembers,
+        nodeRing.from(sender).tail.iterator,
+        Set.empty)
       val slice =
         if (remaining == 0) slice1
         else {

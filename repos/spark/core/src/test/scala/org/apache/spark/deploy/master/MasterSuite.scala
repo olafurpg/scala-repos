@@ -56,8 +56,9 @@ class MasterSuite
   test("can use a custom recovery mode factory") {
     val conf = new SparkConf(loadDefaults = false)
     conf.set("spark.deploy.recoveryMode", "CUSTOM")
-    conf.set("spark.deploy.recoveryMode.factory",
-             classOf[CustomRecoveryModeFactory].getCanonicalName)
+    conf.set(
+      "spark.deploy.recoveryMode.factory",
+      classOf[CustomRecoveryModeFactory].getCanonicalName)
     conf.set("spark.master.rest.enabled", "false")
 
     val instantiationAttempts = CustomRecoveryModeFactory.instantiationAttempts
@@ -74,14 +75,15 @@ class MasterSuite
     val appToPersist = new ApplicationInfo(
       startTime = 0,
       id = "test_app",
-      desc = new ApplicationDescription(name = "",
-                                        maxCores = None,
-                                        memoryPerExecutorMB = 0,
-                                        command = commandToPersist,
-                                        appUiUrl = "",
-                                        eventLogDir = None,
-                                        eventLogCodec = None,
-                                        coresPerExecutor = None),
+      desc = new ApplicationDescription(
+        name = "",
+        maxCores = None,
+        memoryPerExecutorMB = 0,
+        command = commandToPersist,
+        appUiUrl = "",
+        eventLogDir = None,
+        eventLogCodec = None,
+        coresPerExecutor = None),
       submitDate = new Date(),
       driver = null,
       defaultCores = 0
@@ -418,27 +420,29 @@ class MasterSuite
   private def makeAppInfo(memoryPerExecutorMb: Int,
                           coresPerExecutor: Option[Int] = None,
                           maxCores: Option[Int] = None): ApplicationInfo = {
-    val desc = new ApplicationDescription("test",
-                                          maxCores,
-                                          memoryPerExecutorMb,
-                                          null,
-                                          "",
-                                          None,
-                                          None,
-                                          coresPerExecutor)
+    val desc = new ApplicationDescription(
+      "test",
+      maxCores,
+      memoryPerExecutorMb,
+      null,
+      "",
+      None,
+      None,
+      coresPerExecutor)
     val appId = System.currentTimeMillis.toString
     new ApplicationInfo(0, appId, desc, new Date, null, Int.MaxValue)
   }
 
   private def makeWorkerInfo(memoryMb: Int, cores: Int): WorkerInfo = {
     val workerId = System.currentTimeMillis.toString
-    new WorkerInfo(workerId,
-                   "host",
-                   100,
-                   cores,
-                   memoryMb,
-                   null,
-                   "http://localhost:80")
+    new WorkerInfo(
+      workerId,
+      "host",
+      100,
+      cores,
+      memoryMb,
+      null,
+      "http://localhost:80")
   }
 
   private def scheduleExecutorsOnWorkers(master: Master,
@@ -472,27 +476,30 @@ class MasterSuite
     })
 
     master.self.ask(
-      RegisterWorker("1",
-                     "localhost",
-                     9999,
-                     fakeWorker,
-                     10,
-                     1024,
-                     "http://localhost:8080"))
+      RegisterWorker(
+        "1",
+        "localhost",
+        9999,
+        fakeWorker,
+        10,
+        1024,
+        "http://localhost:8080"))
     val executors = (0 until 3).map { i =>
-      new ExecutorDescription(appId = i.toString,
-                              execId = i,
-                              2,
-                              ExecutorState.RUNNING)
+      new ExecutorDescription(
+        appId = i.toString,
+        execId = i,
+        2,
+        ExecutorState.RUNNING)
     }
     master.self.send(
       WorkerLatestState("1", executors, driverIds = Seq("0", "1", "2")))
 
     eventually(timeout(10.seconds)) {
       assert(
-        killedExecutors.asScala.toList.sorted === List("0" -> 0,
-                                                       "1" -> 1,
-                                                       "2" -> 2))
+        killedExecutors.asScala.toList.sorted === List(
+          "0" -> 0,
+          "1" -> 1,
+          "2" -> 2))
       assert(killedDrivers.asScala.toList.sorted === List("0", "1", "2"))
     }
   }

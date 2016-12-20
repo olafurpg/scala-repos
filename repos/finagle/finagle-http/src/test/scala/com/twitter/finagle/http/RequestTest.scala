@@ -7,12 +7,13 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class RequestTest extends FunSuite {
   test("constructors") {
-    Seq(Request(),
-        Request(Version.Http11, Method.Get, "/"),
-        Request(Method.Get, "/"),
-        Request("/"),
-        Request("/", "q" -> "twitter"),
-        Request("q" -> "twitter")).foreach { request =>
+    Seq(
+      Request(),
+      Request(Version.Http11, Method.Get, "/"),
+      Request(Method.Get, "/"),
+      Request("/"),
+      Request("/", "q" -> "twitter"),
+      Request("q" -> "twitter")).foreach { request =>
       assert(request.version == Version.Http11)
       assert(request.method == Method.Get)
       assert(request.path == "/")

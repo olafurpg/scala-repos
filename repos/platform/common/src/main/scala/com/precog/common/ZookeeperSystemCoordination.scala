@@ -60,10 +60,11 @@ object ZookeeperSystemCoordination {
             yggCheckpointsEnabled: Boolean,
             createCheckpointFlag: Option[String] = None) = {
     val zkc = new ZkClient(zkHosts)
-    new ZookeeperSystemCoordination(zkc,
-                                    uid,
-                                    yggCheckpointsEnabled,
-                                    createCheckpointFlag)
+    new ZookeeperSystemCoordination(
+      zkc,
+      uid,
+      yggCheckpointsEnabled,
+      createCheckpointFlag)
   }
 
   def extractServiceUID(config: Configuration): ServiceUID = {

@@ -69,9 +69,10 @@ class CodegenContext {
     val idx = references.length
     references += obj
     val clsName = Option(className).getOrElse(obj.getClass.getName)
-    addMutableState(clsName,
-                    term,
-                    s"this.$term = ($clsName) references[$idx];")
+    addMutableState(
+      clsName,
+      term,
+      s"this.$term = ($clsName) references[$idx];")
     term
   }
 
@@ -410,12 +411,14 @@ class CodegenContext {
               } else if ($isNullB) {
                 return 1;
               } else {
-                ${javaType(elementType)} $elementA = ${getValue("a",
-                                                                elementType,
-                                                                "i")};
-                ${javaType(elementType)} $elementB = ${getValue("b",
-                                                                elementType,
-                                                                "i")};
+                ${javaType(elementType)} $elementA = ${getValue(
+          "a",
+          elementType,
+          "i")};
+                ${javaType(elementType)} $elementB = ${getValue(
+          "b",
+          elementType,
+          "i")};
                 int comp = ${genComp(elementType, elementA, elementB)};
                 if (comp != 0) {
                   return comp;
@@ -489,13 +492,14 @@ class CodegenContext {
   /**
     * List of java data types that have special accessors and setters in [[InternalRow]].
     */
-  val primitiveTypes = Seq(JAVA_BOOLEAN,
-                           JAVA_BYTE,
-                           JAVA_SHORT,
-                           JAVA_INT,
-                           JAVA_LONG,
-                           JAVA_FLOAT,
-                           JAVA_DOUBLE)
+  val primitiveTypes = Seq(
+    JAVA_BOOLEAN,
+    JAVA_BYTE,
+    JAVA_SHORT,
+    JAVA_INT,
+    JAVA_LONG,
+    JAVA_FLOAT,
+    JAVA_DOUBLE)
 
   /**
     * Returns true if the Java type has a special accessor and setter in [[InternalRow]].
@@ -593,9 +597,10 @@ class CodegenContext {
       // Currently, we will do this for all non-leaf only expression trees (i.e. expr trees with
       // at least two nodes) as the cost of doing it is expected to be low.
       addMutableState("boolean", isNull, s"$isNull = false;")
-      addMutableState(javaType(expr.dataType),
-                      value,
-                      s"$value = ${defaultValue(expr.dataType)};")
+      addMutableState(
+        javaType(expr.dataType),
+        value,
+        s"$value = ${defaultValue(expr.dataType)};")
 
       subexprFunctions += s"$fnName($INPUT_ROW);"
       val state = SubExprEliminationState(isNull, value)

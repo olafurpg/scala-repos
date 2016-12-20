@@ -15,9 +15,10 @@ object V2TestFormats {
 
   implicit lazy val DeploymentPlanReads: Reads[DeploymentPlan] = Reads { js =>
     JsSuccess(
-      DeploymentPlan(original = (js \ "original").as[Group],
-                     target = (js \ "target").as[Group],
-                     version = (js \ "version").as[Timestamp])
+      DeploymentPlan(
+        original = (js \ "original").as[Group],
+        target = (js \ "target").as[Group],
+        version = (js \ "version").as[Timestamp])
         .copy(id = (js \ "id").as[String])
     )
   }

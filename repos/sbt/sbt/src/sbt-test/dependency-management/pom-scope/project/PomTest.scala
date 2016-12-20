@@ -38,9 +38,10 @@ object PomTest extends Build {
             "Dependency '" + id + "' not written to pom:\n" + loaded))
         val actualOpt =
           java.lang.Boolean.parseBoolean((dep \\ "optional").text)
-        assert(opt == actualOpt,
-               "Invalid 'optional' section '" + (dep \\ "optional") +
-                 "' for " + id + ", expected optional=" + opt)
+        assert(
+          opt == actualOpt,
+          "Invalid 'optional' section '" + (dep \\ "optional") +
+            "' for " + id + ", expected optional=" + opt)
 
         val actualScope = (dep \\ "scope") match {
           case Seq() => None; case x => Some(x.text)
@@ -48,12 +49,14 @@ object PomTest extends Build {
         val actualClassifier = (dep \\ "classifier") match {
           case Seq() => None; case x => Some(x.text)
         }
-        assert(actualScope == scope,
-               "Invalid 'scope' section '" + (dep \\ "scope") + "' for " + id +
-                 ", expected scope=" + scope)
-        assert(actualClassifier == classifier,
-               "Invalid 'classifier' section '" + (dep \\ "classifier") +
-                 "' for " + id + ", expected classifier=" + classifier)
+        assert(
+          actualScope == scope,
+          "Invalid 'scope' section '" + (dep \\ "scope") + "' for " + id +
+            ", expected scope=" + scope)
+        assert(
+          actualClassifier == classifier,
+          "Invalid 'classifier' section '" + (dep \\ "classifier") +
+            "' for " + id + ", expected classifier=" + classifier)
     }
   }
 }

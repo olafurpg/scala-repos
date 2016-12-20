@@ -48,10 +48,11 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
   implicit val system = ActorSystem(getClass.getSimpleName, testConf)
   import system.dispatcher
 
-  val BOLT = HttpMethod.custom("BOLT",
-                               safe = false,
-                               idempotent = true,
-                               requestEntityAcceptance = Expected)
+  val BOLT = HttpMethod.custom(
+    "BOLT",
+    safe = false,
+    idempotent = true,
+    requestEntityAcceptance = Expected)
   implicit val materializer = ActorMaterializer()
 
   "The request parsing logic should" - {
@@ -72,8 +73,9 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
           Right(HttpRequest(GET, "/", protocol = `HTTP/1.0`)),
           Right(HttpRequest(POST, "/foo", protocol = `HTTP/1.0`)),
           Left(
-            MessageStartError(StatusCodes.BadRequest,
-                              ErrorInfo("Illegal HTTP message start"))))
+            MessageStartError(
+              StatusCodes.BadRequest,
+              ErrorInfo("Illegal HTTP message start"))))
         closeAfterResponseCompletion shouldEqual Seq(true, true)
       }
 
@@ -93,12 +95,12 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
           |Content-length:    17
           |
           |Shake your BOODY!""" should parseTo {
-          HttpRequest(POST,
-                      "/resource/yes",
-                      List(`User-Agent`("curl/7.19.7 xyz"),
-                           Connection("keep-alive")),
-                      "Shake your BOODY!",
-                      `HTTP/1.0`)
+          HttpRequest(
+            POST,
+            "/resource/yes",
+            List(`User-Agent`("curl/7.19.7 xyz"), Connection("keep-alive")),
+            "Shake your BOODY!",
+            `HTTP/1.0`)
         }
         closeAfterResponseCompletion shouldEqual Seq(false)
       }
@@ -111,13 +113,14 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
           |
           |Shake your BOODY!GET / HTTP/1.0
           |
-          |""" should parseTo(HttpRequest(POST,
-                                          "/resource/yes",
-                                          List(`User-Agent`("curl/7.19.7 xyz"),
-                                               Connection("keep-alive")),
-                                          "Shake your BOODY!".getBytes,
-                                          `HTTP/1.0`),
-                              HttpRequest(protocol = `HTTP/1.0`))
+          |""" should parseTo(
+          HttpRequest(
+            POST,
+            "/resource/yes",
+            List(`User-Agent`("curl/7.19.7 xyz"), Connection("keep-alive")),
+            "Shake your BOODY!".getBytes,
+            `HTTP/1.0`),
+          HttpRequest(protocol = `HTTP/1.0`))
         closeAfterResponseCompletion shouldEqual Seq(false, true)
       }
 
@@ -131,12 +134,14 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
           | fancy
           |
           |""" should parseTo {
-          HttpRequest(DELETE,
-                      "/abc",
-                      List(`User-Agent`("curl/7.19.7 abc xyz"),
-                           Accept(MediaRanges.`*/*`),
-                           Connection("close", "fancy")),
-                      protocol = `HTTP/1.0`)
+          HttpRequest(
+            DELETE,
+            "/abc",
+            List(
+              `User-Agent`("curl/7.19.7 abc xyz"),
+              Accept(MediaRanges.`*/*`),
+              Connection("close", "fancy")),
+            protocol = `HTTP/1.0`)
         }
         closeAfterResponseCompletion shouldEqual Seq(true)
       }
@@ -150,10 +155,11 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
             |ABCDPATCH"""
         }.toCharArray.map(_.toString).toSeq should generalRawMultiParseTo(
           Right(
-            HttpRequest(PUT,
-                        "/resource/yes",
-                        List(Host("x")),
-                        "ABCD".getBytes)),
+            HttpRequest(
+              PUT,
+              "/resource/yes",
+              List(Host("x")),
+              "ABCD".getBytes)),
           Left(
             MessageStartError(400, ErrorInfo("Illegal HTTP message start"))))
         closeAfterResponseCompletion shouldEqual Seq(false)
@@ -178,10 +184,12 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
           HttpRequest(
             PUT,
             "/",
-            List(`Transfer-Encoding`(TransferEncodings.Extension("foo"),
-                                     TransferEncodings.chunked,
-                                     TransferEncodings.Extension("bar")),
-                 Host("x"))))
+            List(
+              `Transfer-Encoding`(
+                TransferEncodings.Extension("foo"),
+                TransferEncodings.chunked,
+                TransferEncodings.Extension("bar")),
+              Host("x"))))
         closeAfterResponseCompletion shouldEqual Seq(false)
       }
 
@@ -193,10 +201,11 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
           |Content-Length: 0
           |
           |""" should parseTo(
-          HttpRequest(GET,
-                      "/data",
-                      List(Host("x")),
-                      HttpEntity.empty(`application/pdf`)))
+          HttpRequest(
+            GET,
+            "/data",
+            List(Host("x")),
+            HttpEntity.empty(`application/pdf`)))
         closeAfterResponseCompletion shouldEqual Seq(false)
       }
 
@@ -204,9 +213,10 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
         """GET //foo HTTP/1.0
           |
           |""" should parseTo(
-          HttpRequest(GET,
-                      Uri("http://x//foo").toHttpRequestTargetOriginForm,
-                      protocol = `HTTP/1.0`))
+          HttpRequest(
+            GET,
+            Uri("http://x//foo").toHttpRequestTargetOriginForm,
+            protocol = `HTTP/1.0`))
         closeAfterResponseCompletion shouldEqual Seq(true)
       }
     }
@@ -234,29 +244,31 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
       }
 
       "message chunk with and without extension" in new Test {
-        Seq(start + """3
+        Seq(
+          start + """3
             |abc
             |10;some=stuff;bla
             |0123456789ABCDEF
             |""",
-            "10;foo=",
-            """bar
+          "10;foo=",
+          """bar
             |0123456789ABCDEF
             |A
             |0123456789""",
-            """
+          """
             |0
             |
             |""") should generalMultiParseTo(
           Right(
             baseRequest.withEntity(
-              Chunked(`application/pdf`,
-                      source(Chunk(ByteString("abc")),
-                             Chunk(ByteString("0123456789ABCDEF"),
-                                   "some=stuff;bla"),
-                             Chunk(ByteString("0123456789ABCDEF"), "foo=bar"),
-                             Chunk(ByteString("0123456789"), ""),
-                             LastChunk)))))
+              Chunked(
+                `application/pdf`,
+                source(
+                  Chunk(ByteString("abc")),
+                  Chunk(ByteString("0123456789ABCDEF"), "some=stuff;bla"),
+                  Chunk(ByteString("0123456789ABCDEF"), "foo=bar"),
+                  Chunk(ByteString("0123456789"), ""),
+                  LastChunk)))))
         closeAfterResponseCompletion shouldEqual Seq(false)
       }
 
@@ -276,12 +288,11 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
             |Bar: xyz
             |
             |""") should generalMultiParseTo(
-          Right(
-            baseRequest.withEntity(
-              Chunked(`application/pdf`,
-                      source(LastChunk("nice=true",
-                                       List(RawHeader("Foo", "pip apo"),
-                                            RawHeader("Bar", "xyz"))))))))
+          Right(baseRequest.withEntity(Chunked(
+            `application/pdf`,
+            source(LastChunk(
+              "nice=true",
+              List(RawHeader("Foo", "pip apo"), RawHeader("Bar", "xyz"))))))))
         closeAfterResponseCompletion shouldEqual Seq(false)
       }
 
@@ -315,29 +326,30 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
         HttpRequest(
           PATCH,
           "/data",
-          List(`Transfer-Encoding`(TransferEncodings.Extension("fancy")),
-               Host("ping")),
+          List(
+            `Transfer-Encoding`(TransferEncodings.Extension("fancy")),
+            Host("ping")),
           HttpEntity.Chunked(`application/pdf`, source(LastChunk))))
       closeAfterResponseCompletion shouldEqual Seq(false)
     }
 
     "support `rawRequestUriHeader` setting" in new Test {
       override protected def newParser: HttpRequestParser =
-        new HttpRequestParser(parserSettings,
-                              rawRequestUriHeader = true,
-                              _headerParser =
-                                HttpHeaderParser(parserSettings)())
+        new HttpRequestParser(
+          parserSettings,
+          rawRequestUriHeader = true,
+          _headerParser = HttpHeaderParser(parserSettings)())
 
       """GET /f%6f%6fbar?q=b%61z HTTP/1.1
         |Host: ping
         |Content-Type: application/pdf
         |
         |""" should parseTo(
-        HttpRequest(GET,
-                    "/foobar?q=b%61z",
-                    List(`Raw-Request-URI`("/f%6f%6fbar?q=b%61z"),
-                         Host("ping")),
-                    HttpEntity.empty(`application/pdf`)))
+        HttpRequest(
+          GET,
+          "/foobar?q=b%61z",
+          List(`Raw-Request-URI`("/f%6f%6fbar?q=b%61z"), Host("ping")),
+          HttpEntity.empty(`application/pdf`)))
     }
 
     "reject a message chunk with" - {
@@ -348,10 +360,11 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
           |
           |"""
       val baseRequest =
-        HttpRequest(PATCH,
-                    "/data",
-                    List(Connection("lalelu"), Host("ping")),
-                    HttpEntity.Chunked(`application/octet-stream`, source()))
+        HttpRequest(
+          PATCH,
+          "/data",
+          List(Connection("lalelu"), Host("ping")),
+          HttpEntity.Chunked(`application/octet-stream`, source()))
 
       "an illegal char after chunk size" in new Test {
         Seq(start, """15 ;
@@ -410,11 +423,12 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
 
     "reject a request with" - {
       "an illegal HTTP method" in new Test {
-        "get " should parseToError(NotImplemented,
-                                   ErrorInfo("Unsupported HTTP method", "get"))
-        "GETX " should parseToError(NotImplemented,
-                                    ErrorInfo("Unsupported HTTP method",
-                                              "GETX"))
+        "get " should parseToError(
+          NotImplemented,
+          ErrorInfo("Unsupported HTTP method", "get"))
+        "GETX " should parseToError(
+          NotImplemented,
+          ErrorInfo("Unsupported HTTP method", "GETX"))
       }
 
       "a too long HTTP method" in new Test {
@@ -593,24 +607,28 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
             x.isInstanceOf[EntityStreamError])
         .prefixAndTail(1)
         .collect {
-          case (Seq(
-                  RequestStart(method,
-                               uri,
-                               protocol,
-                               headers,
-                               createEntity,
-                               _,
-                               close)),
-                entityParts) ⇒
+          case (
+              Seq(
+                RequestStart(
+                  method,
+                  uri,
+                  protocol,
+                  headers,
+                  createEntity,
+                  _,
+                  close)),
+              entityParts) ⇒
             closeAfterResponseCompletion :+= close
             Right(
-              HttpRequest(method,
-                          uri,
-                          headers,
-                          createEntity(entityParts),
-                          protocol))
-          case (Seq(x @ (MessageStartError(_, _) | EntityStreamError(_))),
-                rest) ⇒
+              HttpRequest(
+                method,
+                uri,
+                headers,
+                createEntity(entityParts),
+                protocol))
+          case (
+              Seq(x @ (MessageStartError(_, _) | EntityStreamError(_))),
+              rest) ⇒
             rest.runWith(Sink.cancelled)
             Left(x)
         }
@@ -632,9 +650,10 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
 
     protected def parserSettings: ParserSettings = ParserSettings(system)
     protected def newParser =
-      new HttpRequestParser(parserSettings,
-                            false,
-                            HttpHeaderParser(parserSettings)())
+      new HttpRequestParser(
+        parserSettings,
+        false,
+        HttpHeaderParser(parserSettings)())
 
     private def compactEntity(entity: RequestEntity): Future[RequestEntity] =
       entity match {

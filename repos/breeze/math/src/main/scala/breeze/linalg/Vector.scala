@@ -441,14 +441,15 @@ trait VectorOps { this: Vector.type =>
   @expand
   @expand.valify
   implicit def v_s_Op[@expand.args(Int, Double, Float, Long) T,
-                      @expand.args(OpAdd,
-                                   OpSub,
-                                   OpMulScalar,
-                                   OpMulMatrix,
-                                   OpDiv,
-                                   OpSet,
-                                   OpMod,
-                                   OpPow) Op <: OpType](
+                      @expand.args(
+                        OpAdd,
+                        OpSub,
+                        OpMulScalar,
+                        OpMulMatrix,
+                        OpDiv,
+                        OpSet,
+                        OpMod,
+                        OpPow) Op <: OpType](
       implicit @expand.sequence[Op](
         { _ + _ }, { _ - _ }, { _ * _ }, { _ * _ }, {
           _ / _
@@ -473,14 +474,15 @@ trait VectorOps { this: Vector.type =>
   @expand
   @expand.valify
   implicit def s_v_Op[@expand.args(Int, Double, Float, Long) T,
-                      @expand.args(OpAdd,
-                                   OpSub,
-                                   OpMulScalar,
-                                   OpMulMatrix,
-                                   OpDiv,
-                                   OpSet,
-                                   OpMod,
-                                   OpPow) Op <: OpType](
+                      @expand.args(
+                        OpAdd,
+                        OpSub,
+                        OpMulScalar,
+                        OpMulMatrix,
+                        OpDiv,
+                        OpSet,
+                        OpMod,
+                        OpPow) Op <: OpType](
       implicit @expand.sequence[Op](
         { _ + _ }, { _ - _ }, { _ * _ }, { _ * _ }, {
           _ / _
@@ -503,13 +505,14 @@ trait VectorOps { this: Vector.type =>
     }
 
   @expand
-  implicit def v_sField_Op[@expand.args(OpAdd,
-                                        OpSub,
-                                        OpMulScalar,
-                                        OpMulMatrix,
-                                        OpDiv,
-                                        OpMod,
-                                        OpPow) Op <: OpType,
+  implicit def v_sField_Op[@expand.args(
+                             OpAdd,
+                             OpSub,
+                             OpMulScalar,
+                             OpMulMatrix,
+                             OpDiv,
+                             OpMod,
+                             OpPow) Op <: OpType,
                            T: Field: ClassTag](implicit @expand.sequence[Op]({
     f.+(_, _)
   }, { f.-(_, _) }, { f.*(_, _) }, {
@@ -533,11 +536,12 @@ trait VectorOps { this: Vector.type =>
   @expand
   @expand.valify
   implicit def v_v_UpdateOp[@expand.args(Int, Double, Float, Long) T,
-                            @expand.args(OpMulScalar,
-                                         OpDiv,
-                                         OpSet,
-                                         OpMod,
-                                         OpPow) Op <: OpType](
+                            @expand.args(
+                              OpMulScalar,
+                              OpDiv,
+                              OpSet,
+                              OpMod,
+                              OpPow) Op <: OpType](
       implicit @expand.sequence[Op]({ _ * _ }, { _ / _ }, { (a, b) =>
         b
       }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
@@ -607,14 +611,15 @@ trait VectorOps { this: Vector.type =>
   @expand
   @expand.valify
   implicit def v_s_UpdateOp[@expand.args(Int, Double, Float, Long) T,
-                            @expand.args(OpAdd,
-                                         OpSub,
-                                         OpMulScalar,
-                                         OpMulMatrix,
-                                         OpDiv,
-                                         OpSet,
-                                         OpMod,
-                                         OpPow) Op <: OpType](
+                            @expand.args(
+                              OpAdd,
+                              OpSub,
+                              OpMulScalar,
+                              OpMulMatrix,
+                              OpDiv,
+                              OpSet,
+                              OpMod,
+                              OpPow) Op <: OpType](
       implicit @expand.sequence[Op](
         { _ + _ }, { _ - _ }, { _ * _ }, { _ * _ }, {
           _ / _
@@ -633,14 +638,15 @@ trait VectorOps { this: Vector.type =>
     }
 
   @expand
-  implicit def v_s_UpdateOp[@expand.args(OpAdd,
-                                         OpSub,
-                                         OpMulScalar,
-                                         OpMulMatrix,
-                                         OpDiv,
-                                         OpSet,
-                                         OpMod,
-                                         OpPow) Op <: OpType,
+  implicit def v_s_UpdateOp[@expand.args(
+                              OpAdd,
+                              OpSub,
+                              OpMulScalar,
+                              OpMulMatrix,
+                              OpDiv,
+                              OpSet,
+                              OpMod,
+                              OpPow) Op <: OpType,
                             T: Field: ClassTag](implicit @expand.sequence[Op]({
     f.+(_, _)
   }, { f.-(_, _) }, { f.*(_, _) }, {
@@ -668,10 +674,11 @@ trait VectorOps { this: Vector.type =>
                      Vector[T],
                      breeze.linalg.operators.OpMulInner.type,
                      T] = {
-    new BinaryRegistry[Vector[T],
-                       Vector[T],
-                       breeze.linalg.operators.OpMulInner.type,
-                       T] {
+    new BinaryRegistry[
+      Vector[T],
+      Vector[T],
+      breeze.linalg.operators.OpMulInner.type,
+      T] {
       override def bindingMissing(a: Vector[T], b: Vector[T]): T = {
         require(b.length == a.length, "Vectors must be the same length!")
         if (a.activeSize > b.activeSize) {
@@ -692,10 +699,11 @@ trait VectorOps { this: Vector.type =>
                      Vector[T],
                      breeze.linalg.operators.OpMulInner.type,
                      T] = {
-    new BinaryRegistry[Vector[T],
-                       Vector[T],
-                       breeze.linalg.operators.OpMulInner.type,
-                       T] {
+    new BinaryRegistry[
+      Vector[T],
+      Vector[T],
+      breeze.linalg.operators.OpMulInner.type,
+      T] {
       val s = implicitly[Semiring[T]]
       override def bindingMissing(a: Vector[T], b: Vector[T]): T = {
         require(b.length == a.length, "Vectors must be the same length!")
@@ -751,10 +759,11 @@ trait VectorOps { this: Vector.type =>
   @expand.valify
   implicit def zipValuesImpl_V_V[@expand.args(Int, Double, Float, Long) T]
     : BinaryRegistry[Vector[T], Vector[T], zipValues.type, ZippedValues[T, T]] = {
-    new BinaryRegistry[Vector[T],
-                       Vector[T],
-                       zipValues.type,
-                       ZippedValues[T, T]] {
+    new BinaryRegistry[
+      Vector[T],
+      Vector[T],
+      zipValues.type,
+      ZippedValues[T, T]] {
       protected override def bindingMissing(
           a: Vector[T],
           b: Vector[T]): ZippedValues[T, T] = {
@@ -866,9 +875,10 @@ trait VectorOps { this: Vector.type =>
       implicit field: Semiring[T],
       zero: Zero[T],
       ct: ClassTag[T]): OpMulScalar.Impl2[Vector[T], T, Vector[T]] =
-    binaryOpFromUpdateOp(implicitly[CanCopy[Vector[T]]],
-                         vMulScalarIntoSField,
-                         ct)
+    binaryOpFromUpdateOp(
+      implicitly[CanCopy[Vector[T]]],
+      vMulScalarIntoSField,
+      ct)
   implicit def vDivSField[T](
       implicit field: Field[T],
       zero: Zero[T],

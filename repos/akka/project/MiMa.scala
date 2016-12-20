@@ -15,9 +15,10 @@ object MiMa extends AutoPlugin {
 
   override val projectSettings = Seq(
     mimaBackwardIssueFilters ++= mimaIgnoredProblems,
-    mimaPreviousArtifacts := akkaPreviousArtifacts(name.value,
-                                                   organization.value,
-                                                   scalaBinaryVersion.value)
+    mimaPreviousArtifacts := akkaPreviousArtifacts(
+      name.value,
+      organization.value,
+      scalaBinaryVersion.value)
   )
 
   def akkaPreviousArtifacts(projectName: String,

@@ -24,9 +24,10 @@ abstract class ScalaMemberSelectionTableBase[M <: PsiElement,
     memberInfos: java.util.Collection[I],
     memberInfoModel: MemberInfoModel[M, I],
     abstractColumnHeader: String)
-    extends AbstractMemberSelectionTable[M, I](memberInfos,
-                                               memberInfoModel,
-                                               abstractColumnHeader) {
+    extends AbstractMemberSelectionTable[M, I](
+      memberInfos,
+      memberInfoModel,
+      abstractColumnHeader) {
 
   def getAbstractColumnValue(memberInfo: I): AnyRef = {
     memberInfo.getMember match {
@@ -63,8 +64,9 @@ abstract class ScalaMemberSelectionTableBase[M <: PsiElement,
           case mods: PsiModifierList =>
             VisibilityIcons.setVisibilityIcon(mods, icon)
           case _ =>
-            icon.setIcon(IconUtil.getEmptyIcon(true),
-                         AbstractMemberSelectionTable.VISIBILITY_ICON_POSITION)
+            icon.setIcon(
+              IconUtil.getEmptyIcon(true),
+              AbstractMemberSelectionTable.VISIBILITY_ICON_POSITION)
         }
       case _ =>
     }

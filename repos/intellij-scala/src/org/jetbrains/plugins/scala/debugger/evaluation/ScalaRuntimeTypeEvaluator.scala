@@ -54,8 +54,9 @@ abstract class ScalaRuntimeTypeEvaluator(@Nullable editor: Editor,
         new EvaluatingComputable[ExpressionEvaluator] {
           def compute: ExpressionEvaluator = {
             val textWithImports =
-              new TextWithImportsImpl(CodeFragmentKind.CODE_BLOCK,
-                                      expression.getText)
+              new TextWithImportsImpl(
+                CodeFragmentKind.CODE_BLOCK,
+                expression.getText)
             val codeFragment = new ScalaCodeFragmentFactory()
               .createCodeFragment(textWithImports, expression, project)
             ScalaEvaluatorBuilder.build(

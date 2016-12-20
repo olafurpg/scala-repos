@@ -49,8 +49,9 @@ class StatsTest extends WordSpec with Matchers {
 
   it should {
     "fail if verifyCounters() is false" in {
-      an[FlowException] should be thrownBy runJobTest(new StatsTestJob1(_),
-                                                      badInput)
+      an[FlowException] should be thrownBy runJobTest(
+        new StatsTestJob1(_),
+        badInput)
     }
   }
 

@@ -85,8 +85,9 @@ object TextFieldTreeTableCell {
   /**
     * Added to satisfy Spec tests.
     */
-  @deprecated(message = "Use forTreeTableColumn[S, T](StringConverter[T])",
-              since = "1.0")
+  @deprecated(
+    message = "Use forTreeTableColumn[S, T](StringConverter[T])",
+    since = "1.0")
   def forTreeTableColumn[S, T](converter: jfxu.StringConverter[T]) =
     jfxscc.TextFieldTreeTableCell.forTreeTableColumn[S, T](converter)
 }

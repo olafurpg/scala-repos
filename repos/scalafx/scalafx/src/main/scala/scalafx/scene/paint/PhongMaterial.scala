@@ -27,11 +27,12 @@ class PhongMaterial(
            bumpMap: Image,
            selfIlluminationMap: Image) =
     this(
-      new jfxsp.PhongMaterial(diffuseColor,
-                              diffuseMap,
-                              specularMap,
-                              bumpMap,
-                              selfIlluminationMap))
+      new jfxsp.PhongMaterial(
+        diffuseColor,
+        diffuseMap,
+        specularMap,
+        bumpMap,
+        selfIlluminationMap))
 
   /** The bump map of this `PhongMaterial`. */
   def bumpMap: ObjectProperty[jfxsi.Image] = delegate.bumpMapProperty

@@ -105,14 +105,15 @@ object Grant extends Logging {
         Permission.extractorV0) |@| obj.validated[Option[DateTime]](
         "permission.expirationDate")).apply {
         (gid, cid, issuer, permission, expiration) =>
-          Grant(gid,
-                None,
-                None,
-                cid,
-                issuer.toSet,
-                Set(permission),
-                new Instant(0L),
-                expiration)
+          Grant(
+            gid,
+            None,
+            None,
+            cid,
+            issuer.toSet,
+            Set(permission),
+            new Instant(0L),
+            expiration)
       }
     }
   }

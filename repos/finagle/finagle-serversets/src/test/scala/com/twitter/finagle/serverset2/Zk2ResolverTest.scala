@@ -66,8 +66,9 @@ class Zk2ResolverTest
   test("end-to-end: service endpoint") {
     val Name.Bound(va) = zk2resolve("/foo/bar")
     eventually {
-      assert(va.sample() == Addr.Neg,
-             "resolution is not negative before serverset exists")
+      assert(
+        va.sample() == Addr.Neg,
+        "resolution is not negative before serverset exists")
     }
 
     val serverSet = new ServerSetImpl(inst.zookeeperClient, "/foo/bar")
@@ -75,14 +76,16 @@ class Zk2ResolverTest
     val status = serverSet
       .join(joinAddr, Map.empty[String, InetSocketAddress].asJava, shardId)
     eventually {
-      assert(va.sample() == Addr.Bound(address(joinAddr)),
-             "resolution is not bound once the serverset exists")
+      assert(
+        va.sample() == Addr.Bound(address(joinAddr)),
+        "resolution is not bound once the serverset exists")
     }
 
     status.leave()
     eventually(stabilizationTimeout, stabilizationInterval) {
-      assert(va.sample() == Addr.Neg,
-             "resolution is not negative after the serverset disappears")
+      assert(
+        va.sample() == Addr.Neg,
+        "resolution is not negative after the serverset disappears")
     }
   }
 
@@ -90,10 +93,12 @@ class Zk2ResolverTest
     val Name.Bound(va1) = zk2resolve("/foo/bar")
     val Name.Bound(va2) = zk2resolve("/foo/bar!epep")
     eventually {
-      assert(va1.sample() == Addr.Neg,
-             "resolution is not negative before serverset exists")
-      assert(va2.sample() == Addr.Neg,
-             "resolution is not negative before serverset exists")
+      assert(
+        va1.sample() == Addr.Neg,
+        "resolution is not negative before serverset exists")
+      assert(
+        va2.sample() == Addr.Neg,
+        "resolution is not negative before serverset exists")
     }
 
     val serverSet = new ServerSetImpl(inst.zookeeperClient, "/foo/bar")
@@ -102,18 +107,22 @@ class Zk2ResolverTest
     val status =
       serverSet.join(serviceAddr, Map("epep" -> epepAddr).asJava, shardId)
     eventually {
-      assert(va1.sample() == Addr.Bound(address(serviceAddr)),
-             "resolution is not bound once the serverset exists")
-      assert(va2.sample() == Addr.Bound(address(epepAddr)),
-             "resolution is not bound once the serverset exists")
+      assert(
+        va1.sample() == Addr.Bound(address(serviceAddr)),
+        "resolution is not bound once the serverset exists")
+      assert(
+        va2.sample() == Addr.Bound(address(epepAddr)),
+        "resolution is not bound once the serverset exists")
     }
 
     status.leave()
     eventually(stabilizationTimeout, stabilizationInterval) {
-      assert(va1.sample() == Addr.Neg,
-             "resolution is not negative after the serverset disappears")
-      assert(va2.sample() == Addr.Neg,
-             "resolution is not negative after the serverset disappears")
+      assert(
+        va1.sample() == Addr.Neg,
+        "resolution is not negative after the serverset disappears")
+      assert(
+        va2.sample() == Addr.Neg,
+        "resolution is not negative after the serverset disappears")
     }
   }
 

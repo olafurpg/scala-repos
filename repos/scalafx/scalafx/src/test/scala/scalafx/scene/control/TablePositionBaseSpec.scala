@@ -39,8 +39,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class TablePositionBaseSpec[TC <: jfxsc.TableColumnBase[_, _]]
-    extends SimpleSFXDelegateSpec[jfxsc.TablePositionBase[TC],
-                                  TablePositionBase[TC]](
+    extends SimpleSFXDelegateSpec[
+      jfxsc.TablePositionBase[TC],
+      TablePositionBase[TC]](
       classOf[jfxsc.TablePositionBase[TC]],
       classOf[TablePositionBase[TC]]) {
 

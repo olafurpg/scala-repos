@@ -22,12 +22,13 @@ case class Categ(id: String, // slug
   def isTeam = team.nonEmpty
 
   def withTopic(post: Post): Categ =
-    copy(nbTopics = post.troll.fold(nbTopics, nbTopics + 1),
-         nbPosts = post.troll.fold(nbPosts, nbPosts + 1),
-         lastPostId = post.troll.fold(lastPostId, post.id),
-         nbTopicsTroll = nbTopicsTroll + 1,
-         nbPostsTroll = nbPostsTroll + 1,
-         lastPostIdTroll = post.id)
+    copy(
+      nbTopics = post.troll.fold(nbTopics, nbTopics + 1),
+      nbPosts = post.troll.fold(nbPosts, nbPosts + 1),
+      lastPostId = post.troll.fold(lastPostId, post.id),
+      nbTopicsTroll = nbTopicsTroll + 1,
+      nbPostsTroll = nbPostsTroll + 1,
+      lastPostIdTroll = post.id)
 
   def slug = id
 }

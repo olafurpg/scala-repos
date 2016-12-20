@@ -38,8 +38,9 @@ object LogManager {
           state.globalLogging.console)
       manager(data, state, task, to)
     }
-  @deprecated("Use defaultManager to explicitly specify standard out.",
-              "0.13.0")
+  @deprecated(
+    "Use defaultManager to explicitly specify standard out.",
+    "0.13.0")
   lazy val default: LogManager = defaultManager(StandardMain.console)
 
   def defaultManager(console: ConsoleOut): LogManager =
@@ -69,12 +70,13 @@ object LogManager {
                 state: State,
                 task: ScopedKey[_],
                 to: PrintWriter): Logger =
-        defaultLogger(data,
-                      state,
-                      task,
-                      screen(task, state),
-                      backed(to),
-                      extra(task).toList)
+        defaultLogger(
+          data,
+          state,
+          task,
+          screen(task, state),
+          backed(to),
+          extra(task).toList)
     }
 
   def defaultLogger(data: Settings[Scope],
@@ -93,13 +95,14 @@ object LogManager {
     val backingTrace = getOr(persistTraceLevel.key, Int.MaxValue)
     val extraBacked = state.globalLogging.backed :: Nil
     multiLogger(
-      new MultiLoggerConfig(console,
-                            backed,
-                            extraBacked ::: extra,
-                            screenLevel,
-                            backingLevel,
-                            screenTrace,
-                            backingTrace))
+      new MultiLoggerConfig(
+        console,
+        backed,
+        extraBacked ::: extra,
+        screenLevel,
+        backingLevel,
+        screenTrace,
+        backingTrace))
   }
   def defaultTraceLevel(state: State): Int =
     if (state.interactive) -1 else Int.MaxValue

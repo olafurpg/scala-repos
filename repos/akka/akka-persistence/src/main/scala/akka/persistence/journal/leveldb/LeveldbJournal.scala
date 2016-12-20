@@ -25,15 +25,17 @@ private[persistence] class LeveldbJournal extends {
   import LeveldbJournal._
 
   override def receivePluginInternal: Receive = {
-    case r @ ReplayTaggedMessages(fromSequenceNr,
-                                  toSequenceNr,
-                                  max,
-                                  tag,
-                                  replyTo) ⇒
+    case r @ ReplayTaggedMessages(
+          fromSequenceNr,
+          toSequenceNr,
+          max,
+          tag,
+          replyTo) ⇒
       import context.dispatcher
       val readHighestSequenceNrFrom = math.max(0L, fromSequenceNr - 1)
-      asyncReadHighestSequenceNr(tagAsPersistenceId(tag),
-                                 readHighestSequenceNrFrom)
+      asyncReadHighestSequenceNr(
+        tagAsPersistenceId(tag),
+        readHighestSequenceNrFrom)
         .flatMap { highSeqNr ⇒
           val toSeqNr = math.min(toSequenceNr, highSeqNr)
           if (highSeqNr == 0L || fromSequenceNr > toSeqNr)
@@ -42,10 +44,9 @@ private[persistence] class LeveldbJournal extends {
             asyncReplayTaggedMessages(tag, fromSequenceNr, toSeqNr, max) {
               case ReplayedTaggedMessage(p, tag, offset) ⇒
                 adaptFromJournal(p).foreach { adaptedPersistentRepr ⇒
-                  replyTo.tell(ReplayedTaggedMessage(adaptedPersistentRepr,
-                                                     tag,
-                                                     offset),
-                               Actor.noSender)
+                  replyTo.tell(
+                    ReplayedTaggedMessage(adaptedPersistentRepr, tag, offset),
+                    Actor.noSender)
                 }
             }.map(_ ⇒ highSeqNr)
           }

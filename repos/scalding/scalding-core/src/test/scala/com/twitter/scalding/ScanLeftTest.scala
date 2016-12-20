@@ -29,18 +29,20 @@ class ScanLeftTest extends WordSpec with Matchers {
   import Dsl._
 
   // --- A simple ranking job
-  val sampleInput1 = List(("male", "165.2"),
-                          ("female", "172.2"),
-                          ("male", "184.1"),
-                          ("male", "125.4"),
-                          ("female", "128.6"))
+  val sampleInput1 = List(
+    ("male", "165.2"),
+    ("female", "172.2"),
+    ("male", "184.1"),
+    ("male", "125.4"),
+    ("female", "128.6"))
 
   // Each group sorted and ranking added highest person to shortest
-  val expectedOutput1 = Set(("male", 184.1, 1),
-                            ("male", 165.2, 2),
-                            ("male", 125.4, 3),
-                            ("female", 172.2, 1),
-                            ("female", 128.6, 2))
+  val expectedOutput1 = Set(
+    ("male", 184.1, 1),
+    ("male", 165.2, 2),
+    ("male", 125.4, 3),
+    ("female", 172.2, 1),
+    ("female", 128.6, 2))
 
   "A simple ranking scanleft job" should {
     JobTest(new AddRankingWithScanLeft(_))

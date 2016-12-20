@@ -168,11 +168,12 @@ final class ClusterShardingSettings(
         tuningParameters,
       coordinatorSingletonSettings: ClusterSingletonManagerSettings =
         coordinatorSingletonSettings): ClusterShardingSettings =
-    new ClusterShardingSettings(role,
-                                rememberEntities,
-                                journalPluginId,
-                                snapshotPluginId,
-                                stateStoreMode,
-                                tuningParameters,
-                                coordinatorSingletonSettings)
+    new ClusterShardingSettings(
+      role,
+      rememberEntities,
+      journalPluginId,
+      snapshotPluginId,
+      stateStoreMode,
+      tuningParameters,
+      coordinatorSingletonSettings)
 }

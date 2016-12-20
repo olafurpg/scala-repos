@@ -168,9 +168,10 @@ abstract class UpdateStrategy(editor: Option[Editor]) extends Strategy {
 
     val tps: Seq[ScTypeElement] = t match {
       case ScCompoundType(comps, _, _) =>
-        val uselessTypes = Set("_root_.scala.Product",
-                               "_root_.scala.Serializable",
-                               "_root_.java.lang.Object")
+        val uselessTypes = Set(
+          "_root_.scala.Product",
+          "_root_.scala.Serializable",
+          "_root_.java.lang.Object")
         comps.map(_.canonicalText).filterNot(uselessTypes.contains) match {
           case Seq(base) => Seq(typeElemfromText(base))
           case types =>

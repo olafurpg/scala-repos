@@ -131,8 +131,9 @@ object EventJson4sSupport {
           // JField("tags", JArray(d.tags.toList.map(JString(_)))) ::
           // disable tags from API for now
           JField("prId", d.prId.map(JString(_)).getOrElse(JNothing)) :: // don't show creationTime for now
-            JField("creationTime",
-                   JString(DataUtils.dateTimeToString(d.creationTime))) :: Nil)
+            JField(
+              "creationTime",
+              JString(DataUtils.dateTimeToString(d.creationTime))) :: Nil)
     }
   }
 
@@ -157,16 +158,17 @@ object EventJson4sSupport {
       val prId = (jv \ "prId").extract[Option[String]]
       val creationTime =
         DataUtils.stringToDateTime((jv \ "creationTime").extract[String])
-      Event(event = event,
-            entityType = entityType,
-            entityId = entityId,
-            targetEntityType = targetEntityType,
-            targetEntityId = targetEntityId,
-            properties = DataMap(properties),
-            eventTime = eventTime,
-            tags = tags,
-            prId = prId,
-            creationTime = creationTime)
+      Event(
+        event = event,
+        entityType = entityType,
+        entityId = entityId,
+        targetEntityType = targetEntityType,
+        targetEntityId = targetEntityId,
+        properties = DataMap(properties),
+        eventTime = eventTime,
+        tags = tags,
+        prId = prId,
+        creationTime = creationTime)
     }
   }
 

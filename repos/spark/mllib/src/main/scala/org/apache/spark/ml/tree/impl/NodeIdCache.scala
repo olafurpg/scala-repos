@@ -193,7 +193,8 @@ private[spark] object NodeIdCache {
            numTrees: Int,
            checkpointInterval: Int,
            initVal: Int = 1): NodeIdCache = {
-    new NodeIdCache(data.map(_ => Array.fill[Int](numTrees)(initVal)),
-                    checkpointInterval)
+    new NodeIdCache(
+      data.map(_ => Array.fill[Int](numTrees)(initVal)),
+      checkpointInterval)
   }
 }

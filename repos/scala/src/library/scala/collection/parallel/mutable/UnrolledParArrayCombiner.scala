@@ -100,8 +100,9 @@ trait UnrolledParArrayCombiner[T] extends Combiner[T, ParArray[T]] {
     }
     def split = {
       val fp = howmany / 2
-      List(new CopyUnrolledToArray(array, offset, fp),
-           new CopyUnrolledToArray(array, offset + fp, howmany - fp))
+      List(
+        new CopyUnrolledToArray(array, offset, fp),
+        new CopyUnrolledToArray(array, offset + fp, howmany - fp))
     }
     def shouldSplitFurther =
       howmany > scala.collection.parallel

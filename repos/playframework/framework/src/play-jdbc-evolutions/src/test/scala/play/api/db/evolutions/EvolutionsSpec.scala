@@ -45,12 +45,13 @@ object EvolutionsSpec extends Specification {
       val scripts = evolutions.scripts(Seq(b1, a2, b3))
 
       scripts must have length (6)
-      scripts must_== Seq(DownScript(a3),
-                          DownScript(a2),
-                          DownScript(a1),
-                          UpScript(b1),
-                          UpScript(a2),
-                          UpScript(b3))
+      scripts must_== Seq(
+        DownScript(a3),
+        DownScript(a2),
+        DownScript(a1),
+        UpScript(b1),
+        UpScript(a2),
+        UpScript(b3))
 
       evolutions.evolve(scripts, autocommit = true)
 

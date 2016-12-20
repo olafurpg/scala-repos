@@ -65,10 +65,10 @@ object TypeClass {
   lazy val isEmpty = TypeClass("IsEmpty", *->*, extendsList = Seq(plusEmpty))
   lazy val optional = TypeClass("Optional", *->*)
 
-  lazy val applicativePlus = TypeClass("ApplicativePlus",
-                                       *->*,
-                                       extendsList =
-                                         Seq(applicative, plusEmpty))
+  lazy val applicativePlus = TypeClass(
+    "ApplicativePlus",
+    *->*,
+    extendsList = Seq(applicative, plusEmpty))
   lazy val monadPlus =
     TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
 
@@ -92,89 +92,95 @@ object TypeClass {
     TypeClass("Arrow", *^*->*, extendsList = Seq(split, strong, category))
 
   lazy val liftIO = TypeClass("LiftIO", *->*, pack = Seq("scalaz", "effect"))
-  lazy val monadIO = TypeClass("MonadIO",
-                               *->*,
-                               extendsList = Seq(liftIO, monad),
-                               pack = Seq("scalaz", "effect"))
+  lazy val monadIO = TypeClass(
+    "MonadIO",
+    *->*,
+    extendsList = Seq(liftIO, monad),
+    pack = Seq("scalaz", "effect"))
   lazy val liftControlIO =
     TypeClass("LiftControlIO", *->*, pack = Seq("scalaz", "effect"))
-  lazy val monadControlIO = TypeClass("MonadControlIO",
-                                      *->*,
-                                      extendsList = Seq(liftControlIO, monad),
-                                      pack = Seq("scalaz", "effect"))
+  lazy val monadControlIO = TypeClass(
+    "MonadControlIO",
+    *->*,
+    extendsList = Seq(liftControlIO, monad),
+    pack = Seq("scalaz", "effect"))
   lazy val resource = TypeClass("Resource", *, pack = Seq("scalaz", "effect"))
 
-  lazy val monadState = TypeClass("MonadState",
-                                  |*->*|->*,
-                                  extendsList = Seq(monad),
-                                  createSyntax = false)
+  lazy val monadState = TypeClass(
+    "MonadState",
+    |*->*|->*,
+    extendsList = Seq(monad),
+    createSyntax = false)
   lazy val monadError =
     TypeClass("MonadError", |*->*|->*, extendsList = Seq(monad))
   lazy val monadTell =
     TypeClass("MonadTell", |*->*|->*, extendsList = Seq(monad))
-  lazy val monadReader = TypeClass("MonadReader",
-                                   |*->*|->*,
-                                   extendsList = Seq(monad),
-                                   createSyntax = false)
-  lazy val comonadStore = TypeClass("ComonadStore",
-                                    |*->*|->*,
-                                    extendsList = Seq(comonad),
-                                    createSyntax = false)
+  lazy val monadReader = TypeClass(
+    "MonadReader",
+    |*->*|->*,
+    extendsList = Seq(monad),
+    createSyntax = false)
+  lazy val comonadStore = TypeClass(
+    "ComonadStore",
+    |*->*|->*,
+    extendsList = Seq(comonad),
+    createSyntax = false)
 
   lazy val bindRec = TypeClass("BindRec", *->*, extendsList = Seq(bind))
 
   def core: List[TypeClass] =
-    List(semigroup,
-         monoid,
-         equal,
-         show,
-         order,
-         enum,
-         plusEmpty,
-         isEmpty,
-         optional,
-         invariantFunctor,
-         functor,
-         contravariant,
-         divide,
-         divisible,
-         apply,
-         applicative,
-         align,
-         zip,
-         unzip,
-         cozip,
-         bind,
-         monad,
-         cobind,
-         comonad,
-         plus,
-         applicativePlus,
-         monadPlus,
-         foldable,
-         foldable1,
-         traverse,
-         traverse1,
-         associative,
-         bifunctor,
-         bifoldable,
-         bitraverse,
-         catchable,
-         nondeterminism,
-         compose,
-         category,
-         choice,
-         split,
-         profunctor,
-         strong,
-         proChoice,
-         arrow,
-         monadState,
-         monadError,
-         monadTell,
-         monadReader,
-         comonadStore,
-         bindRec)
+    List(
+      semigroup,
+      monoid,
+      equal,
+      show,
+      order,
+      enum,
+      plusEmpty,
+      isEmpty,
+      optional,
+      invariantFunctor,
+      functor,
+      contravariant,
+      divide,
+      divisible,
+      apply,
+      applicative,
+      align,
+      zip,
+      unzip,
+      cozip,
+      bind,
+      monad,
+      cobind,
+      comonad,
+      plus,
+      applicativePlus,
+      monadPlus,
+      foldable,
+      foldable1,
+      traverse,
+      traverse1,
+      associative,
+      bifunctor,
+      bifoldable,
+      bitraverse,
+      catchable,
+      nondeterminism,
+      compose,
+      category,
+      choice,
+      split,
+      profunctor,
+      strong,
+      proChoice,
+      arrow,
+      monadState,
+      monadError,
+      monadTell,
+      monadReader,
+      comonadStore,
+      bindRec)
   lazy val concurrent = Seq[TypeClass]()
   def effect = Seq(liftIO, monadIO, liftControlIO, monadControlIO, resource)
 }
@@ -266,15 +272,16 @@ object GenTypeClass {
 
     import TypeClass._
     val classifiedTypeIdent =
-      if (Set(arrow,
-              associative,
-              category,
-              choice,
-              split,
-              compose,
-              profunctor,
-              strong,
-              proChoice)(tc)) "=>:"
+      if (Set(
+            arrow,
+            associative,
+            category,
+            choice,
+            split,
+            compose,
+            profunctor,
+            strong,
+            proChoice)(tc)) "=>:"
       else "F"
 
     val typeShape: String = kind match {
@@ -507,9 +514,10 @@ trait ${typeClassName}Syntax[F[_], S] ${extendsListText("Syntax", cti = "F")} {
     val syntaxSourceFile =
       if (tc.createSyntax) {
         Some(
-          SourceFile(tc.syntaxPack,
-                     typeClassName + "Syntax.scala",
-                     syntaxSource))
+          SourceFile(
+            tc.syntaxPack,
+            typeClassName + "Syntax.scala",
+            syntaxSource))
       } else None
 
     TypeClassSource(mainSourceFile, syntaxSourceFile)

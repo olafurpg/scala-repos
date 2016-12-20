@@ -186,10 +186,11 @@ final class Formatter(private val dest: Appendable)
                       (if (isConversionUpperCase) FormattableFlags.UPPERCASE
                        else 0)
                   }
-                  formattable.formatTo(this,
-                                       flags,
-                                       if (hasWidth) width else -1,
-                                       if (hasPrecision) precision else -1)
+                  formattable.formatTo(
+                    this,
+                    flags,
+                    if (hasWidth) width else -1,
+                    if (hasPrecision) precision else -1)
                   None // no further processing
                 case _ =>
                   if (!hasFlag("#")) pad(String.valueOf(arg))

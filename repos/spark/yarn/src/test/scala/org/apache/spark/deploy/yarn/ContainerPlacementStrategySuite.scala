@@ -31,10 +31,11 @@ class ContainerPlacementStrategySuite
   import yarnAllocatorSuite._
 
   def createContainerRequest(nodes: Array[String]): ContainerRequest =
-    new ContainerRequest(containerResource,
-                         nodes,
-                         null,
-                         YarnSparkHadoopUtil.RM_REQUEST_PRIORITY)
+    new ContainerRequest(
+      containerResource,
+      nodes,
+      null,
+      YarnSparkHadoopUtil.RM_REQUEST_PRIORITY)
 
   override def beforeEach() {
     yarnAllocatorSuite.beforeEach()
@@ -64,9 +65,10 @@ class ContainerPlacementStrategySuite
         Seq.empty)
 
     assert(
-      localities.map(_.nodes) === Array(Array("host3", "host4", "host5"),
-                                        Array("host3", "host4", "host5"),
-                                        Array("host3", "host4")))
+      localities.map(_.nodes) === Array(
+        Array("host3", "host4", "host5"),
+        Array("host3", "host4", "host5"),
+        Array("host3", "host4")))
   }
 
   test(
@@ -93,9 +95,10 @@ class ContainerPlacementStrategySuite
         Seq.empty)
 
     assert(
-      localities.map(_.nodes) === Array(null,
-                                        Array("host2", "host3"),
-                                        Array("host2", "host3")))
+      localities.map(_.nodes) === Array(
+        null,
+        Array("host2", "host3"),
+        Array("host2", "host3")))
   }
 
   test(
@@ -180,8 +183,9 @@ class ContainerPlacementStrategySuite
       ))
 
     val pendingAllocationRequests =
-      Seq(createContainerRequest(Array("host2", "host3")),
-          createContainerRequest(Array("host1", "host4")))
+      Seq(
+        createContainerRequest(Array("host2", "host3")),
+        createContainerRequest(Array("host1", "host4")))
 
     val localities =
       handler.containerPlacementStrategy.localityOfRequestedContainers(

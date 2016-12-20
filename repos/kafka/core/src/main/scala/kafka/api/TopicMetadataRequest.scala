@@ -38,10 +38,11 @@ case class TopicMetadataRequest(versionId: Short,
     extends RequestOrResponse(Some(ApiKeys.METADATA.id)) {
 
   def this(topics: Seq[String], correlationId: Int) =
-    this(TopicMetadataRequest.CurrentVersion,
-         correlationId,
-         TopicMetadataRequest.DefaultClientId,
-         topics)
+    this(
+      TopicMetadataRequest.CurrentVersion,
+      correlationId,
+      TopicMetadataRequest.DefaultClientId,
+      topics)
 
   def writeTo(buffer: ByteBuffer) {
     buffer.putShort(versionId)

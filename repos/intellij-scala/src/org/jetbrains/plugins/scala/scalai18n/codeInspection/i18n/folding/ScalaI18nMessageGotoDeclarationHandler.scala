@@ -53,8 +53,9 @@ class ScalaI18nMessageGotoDeclarationHandler
         for (expression <- methodCall.args.exprsArray) {
           expression match {
             case literal: ScLiteral
-                if ScalaI18nUtil.isI18nProperty(expression.getProject,
-                                                literal) =>
+                if ScalaI18nUtil.isI18nProperty(
+                  expression.getProject,
+                  literal) =>
               return resolve(expression)
             case _ =>
           }

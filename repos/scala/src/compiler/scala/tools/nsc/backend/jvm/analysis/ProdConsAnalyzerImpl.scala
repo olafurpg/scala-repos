@@ -455,8 +455,8 @@ trait ProdConsAnalyzerImpl {
       val outputIndex = producedSlots.indexOf(i)
       res = res.updated(
         producer,
-        currentConsumers.updated(outputIndex,
-                                 currentConsumers(outputIndex) + insn))
+        currentConsumers
+          .updated(outputIndex, currentConsumers(outputIndex) + insn))
     }
     res
   }
@@ -520,7 +520,8 @@ class InitialProducerSourceInterpreter extends SourceInterpreter {
   override def newExceptionValue(tryCatchBlockNode: TryCatchBlockNode,
                                  handlerFrame: Frame[_ <: Value],
                                  exceptionType: Type): SourceValue = {
-    new SourceValue(1,
-                    ExceptionProducer(tryCatchBlockNode.handler, handlerFrame))
+    new SourceValue(
+      1,
+      ExceptionProducer(tryCatchBlockNode.handler, handlerFrame))
   }
 }

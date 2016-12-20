@@ -246,12 +246,14 @@ abstract class ParallelSeqCheck[T](collName: String)
     property("patches must be equal") =
       forAll(collectionTripletsWith2Indices) {
         case (s, coll, pat, from, repl) =>
-          ("with seq" |: s.patch(from, pat, repl) == coll.patch(from,
-                                                                pat,
-                                                                repl)) &&
-            ("with par" |: s.patch(from, pat, repl) == coll.patch(from,
-                                                                  fromSeq(pat),
-                                                                  repl)) &&
+          ("with seq" |: s.patch(from, pat, repl) == coll.patch(
+            from,
+            pat,
+            repl)) &&
+            ("with par" |: s.patch(from, pat, repl) == coll.patch(
+              from,
+              fromSeq(pat),
+              repl)) &&
             ("with empty" |: s.patch(from, Nil, repl) == coll
               .patch(from, fromSeq(Nil), repl)) &&
             ("with one" |:
@@ -297,8 +299,9 @@ abstract class ParallelSeqCheck[T](collName: String)
         println(sdoub)
         println(cdoub)
       }
-      ("smaller" |: s.padTo(len / 2, someValue) == coll.padTo(len / 2,
-                                                              someValue)) &&
+      ("smaller" |: s.padTo(len / 2, someValue) == coll.padTo(
+        len / 2,
+        someValue)) &&
       ("bigger" |: sdoub == cdoub)
   }
 

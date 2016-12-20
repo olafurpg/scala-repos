@@ -23,9 +23,9 @@ class AppRepositoryTest extends MarathonSpec {
     val store = mock[MarathonStore[AppDefinition]]
     val timestamp = Timestamp.now()
     val appDef =
-      AppDefinition(id = path,
-                    versionInfo =
-                      AppDefinition.VersionInfo.forNewConfig(timestamp))
+      AppDefinition(
+        id = path,
+        versionInfo = AppDefinition.VersionInfo.forNewConfig(timestamp))
     val future = Future.successful(Some(appDef))
 
     when(store.fetch(s"testApp:$timestamp")).thenReturn(future)
@@ -33,8 +33,9 @@ class AppRepositoryTest extends MarathonSpec {
     val repo = new AppRepository(store, None, metrics)
     val res = repo.app(path, timestamp)
 
-    assert(Some(appDef) == Await.result(res, 5.seconds),
-           "Should return the correct AppDefinition")
+    assert(
+      Some(appDef) == Await.result(res, 5.seconds),
+      "Should return the correct AppDefinition")
     verify(store).fetch(s"testApp:$timestamp")
   }
 
@@ -51,8 +52,9 @@ class AppRepositoryTest extends MarathonSpec {
     val repo = new AppRepository(store, None, metrics)
     val res = repo.store(appDef)
 
-    assert(appDef == Await.result(res, 5.seconds),
-           "Should return the correct AppDefinition")
+    assert(
+      appDef == Await.result(res, 5.seconds),
+      "Should return the correct AppDefinition")
     verify(store).store(versionedKey, appDef)
     verify(store).store(s"testApp", appDef)
   }
@@ -67,8 +69,9 @@ class AppRepositoryTest extends MarathonSpec {
     val repo = new AppRepository(store, None, metrics)
     val res = repo.allIds()
 
-    assert(Seq("app1", "app2") == Await.result(res, 5.seconds),
-           "Should return only unversioned names")
+    assert(
+      Seq("app1", "app2") == Await.result(res, 5.seconds),
+      "Should return only unversioned names")
     verify(store).names()
   }
 
@@ -98,8 +101,9 @@ class AppRepositoryTest extends MarathonSpec {
     val repo = new AppRepository(store, None, metrics)
     val res = repo.apps()
 
-    assert(Seq(appDef1, appDef2) == Await.result(res, 5.seconds),
-           "Should return only current versions")
+    assert(
+      Seq(appDef1, appDef2) == Await.result(res, 5.seconds),
+      "Should return only current versions")
     verify(store).names()
     verify(store).fetch(appDef1.id.toString)
     verify(store).fetch(appDef2.id.toString)
@@ -131,12 +135,14 @@ class AppRepositoryTest extends MarathonSpec {
     val repo = new AppRepository(store, None, metrics)
     val res = repo.listVersions(appDef1.id)
 
-    val expected = Seq(appDef1.version,
-                       version1.version,
-                       version2.version,
-                       version3.version)
-    assert(expected == Await.result(res, 5.seconds),
-           "Should return all versions of given app")
+    val expected = Seq(
+      appDef1.version,
+      version1.version,
+      version2.version,
+      version3.version)
+    assert(
+      expected == Await.result(res, 5.seconds),
+      "Should return all versions of given app")
     verify(store).names()
   }
 

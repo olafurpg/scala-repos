@@ -44,8 +44,9 @@ object FileVirtualFile extends (File => FileVirtualFile) {
     *  Precondition: hasExtension(file, oldExt)
     */
   def withExtension(file: File, oldExt: String, newExt: String): File = {
-    require(hasExtension(file, oldExt),
-            s"File $file does not have extension '$oldExt'")
+    require(
+      hasExtension(file, oldExt),
+      s"File $file does not have extension '$oldExt'")
     withName(file, file.getName.stripSuffix(oldExt) + newExt)
   }
 }

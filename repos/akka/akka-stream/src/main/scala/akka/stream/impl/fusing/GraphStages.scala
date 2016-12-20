@@ -133,8 +133,9 @@ object GraphStages {
   }
 
   object Breaker
-      extends GraphStageWithMaterializedValue[FlowShape[Any, Any],
-                                              Future[Breaker]] {
+      extends GraphStageWithMaterializedValue[
+        FlowShape[Any, Any],
+        Future[Breaker]] {
     sealed trait Operation
     case object Complete extends Operation
     case object Cancel extends Operation
@@ -175,15 +176,17 @@ object GraphStages {
     Breaker.asInstanceOf[Graph[FlowShape[T, T], Future[Breaker]]]
 
   object BidiBreaker
-      extends GraphStageWithMaterializedValue[BidiShape[Any, Any, Any, Any],
-                                              Future[Breaker]] {
+      extends GraphStageWithMaterializedValue[
+        BidiShape[Any, Any, Any, Any],
+        Future[Breaker]] {
     import Breaker._
 
     override val initialAttributes = Attributes.name("breaker")
-    override val shape = BidiShape(Inlet[Any]("breaker.in1"),
-                                   Outlet[Any]("breaker.out1"),
-                                   Inlet[Any]("breaker.in2"),
-                                   Outlet[Any]("breaker.out2"))
+    override val shape = BidiShape(
+      Inlet[Any]("breaker.in1"),
+      Outlet[Any]("breaker.out1"),
+      Inlet[Any]("breaker.in2"),
+      Outlet[Any]("breaker.out2"))
     override def toString: String = "BidiBreaker"
 
     override def createLogicAndMaterializedValue(attr: Attributes) = {
@@ -237,8 +240,9 @@ object GraphStages {
     BidiBreaker.asInstanceOf[Graph[BidiShape[T1, T1, T2, T2], Future[Breaker]]]
 
   private object TerminationWatcher
-      extends GraphStageWithMaterializedValue[FlowShape[Any, Any],
-                                              Future[Done]] {
+      extends GraphStageWithMaterializedValue[
+        FlowShape[Any, Any],
+        Future[Done]] {
     val in = Inlet[Any]("terminationWatcher.in")
     val out = Outlet[Any]("terminationWatcher.out")
     override val shape = FlowShape(in, out)
@@ -312,9 +316,10 @@ object GraphStages {
 
       val logic = new TimerGraphStageLogic(shape) {
         override def preStart() = {
-          schedulePeriodicallyWithInitialDelay("TickTimer",
-                                               initialDelay,
-                                               interval)
+          schedulePeriodicallyWithInitialDelay(
+            "TickTimer",
+            initialDelay,
+            interval)
           val callback = getAsyncCallback[Unit]((_) ⇒ {
             completeStage()
             cancelled.set(true)

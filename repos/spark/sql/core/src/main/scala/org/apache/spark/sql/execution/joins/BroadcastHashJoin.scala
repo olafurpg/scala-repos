@@ -56,16 +56,17 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
     with CodegenSupport {
 
   override private[sql] lazy val metrics = Map(
-    "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
-                                                   "number of output rows"))
+    "numOutputRows" -> SQLMetrics
+      .createLongMetric(sparkContext, "number of output rows"))
 
   override def outputPartitioning: Partitioning =
     streamedPlan.outputPartitioning
 
   override def requiredChildDistribution: Seq[Distribution] = {
-    val mode = HashedRelationBroadcastMode(canJoinKeyFitWithinLong,
-                                           rewriteKeyExpr(buildKeys),
-                                           buildPlan.output)
+    val mode = HashedRelationBroadcastMode(
+      canJoinKeyFitWithinLong,
+      rewriteKeyExpr(buildKeys),
+      buildPlan.output)
     buildSide match {
       case BuildLeft =>
         BroadcastDistribution(mode) :: UnspecifiedDistribution :: Nil
@@ -96,22 +97,24 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
           streamedIter.flatMap { currentRow =>
             val rowKey = keyGenerator(currentRow)
             joinedRow.withLeft(currentRow)
-            leftOuterIterator(rowKey,
-                              joinedRow,
-                              hashTable.get(rowKey),
-                              resultProj,
-                              numOutputRows)
+            leftOuterIterator(
+              rowKey,
+              joinedRow,
+              hashTable.get(rowKey),
+              resultProj,
+              numOutputRows)
           }
 
         case RightOuter =>
           streamedIter.flatMap { currentRow =>
             val rowKey = keyGenerator(currentRow)
             joinedRow.withRight(currentRow)
-            rightOuterIterator(rowKey,
-                               hashTable.get(rowKey),
-                               joinedRow,
-                               resultProj,
-                               numOutputRows)
+            rightOuterIterator(
+              rowKey,
+              hashTable.get(rowKey),
+              joinedRow,
+              resultProj,
+              numOutputRows)
           }
 
         case LeftSemi =>
@@ -155,9 +158,10 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
     val broadcast = ctx.addReferenceObj("broadcast", broadcastRelation)
     val relationTerm = ctx.freshName("relation")
     val clsName = broadcastRelation.value.getClass.getName
-    ctx.addMutableState(clsName,
-                        relationTerm,
-                        s"""
+    ctx.addMutableState(
+      clsName,
+      relationTerm,
+      s"""
          | $relationTerm = ($clsName) $broadcast.value();
          | incPeakExecutionMemory($relationTerm.getMemorySize());
        """.stripMargin)
@@ -231,9 +235,10 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
       if (condition.isDefined) {
         val expr = condition.get
         // evaluate the variables from build side that used by condition
-        val eval = evaluateRequiredVariables(buildPlan.output,
-                                             buildVars,
-                                             expr.references)
+        val eval = evaluateRequiredVariables(
+          buildPlan.output,
+          buildVars,
+          expr.references)
         // filter the output via condition
         ctx.currentVars = input ++ buildVars
         val ev = BindReferences
@@ -302,9 +307,10 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
       if (condition.isDefined) {
         val expr = condition.get
         // evaluate the variables from build side that used by condition
-        val eval = evaluateRequiredVariables(buildPlan.output,
-                                             buildVars,
-                                             expr.references)
+        val eval = evaluateRequiredVariables(
+          buildPlan.output,
+          buildVars,
+          expr.references)
         ctx.currentVars = input ++ buildVars
         val ev = BindReferences
           .bindReference(expr, streamedPlan.output ++ buildPlan.output)
@@ -384,9 +390,10 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
       if (condition.isDefined) {
         val expr = condition.get
         // evaluate the variables from build side that used by condition
-        val eval = evaluateRequiredVariables(buildPlan.output,
-                                             buildVars,
-                                             expr.references)
+        val eval = evaluateRequiredVariables(
+          buildPlan.output,
+          buildVars,
+          expr.references)
         // filter the output via condition
         ctx.currentVars = input ++ buildVars
         val ev = BindReferences

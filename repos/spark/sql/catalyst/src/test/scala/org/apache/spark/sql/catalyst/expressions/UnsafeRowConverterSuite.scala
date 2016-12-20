@@ -101,9 +101,10 @@ class UnsafeRowConverterSuite extends SparkFunSuite with Matchers {
     row.setLong(0, 0)
     row.update(1, UTF8String.fromString("Hello"))
     row.update(2, DateTimeUtils.fromJavaDate(Date.valueOf("1970-01-01")))
-    row.update(3,
-               DateTimeUtils.fromJavaTimestamp(
-                 Timestamp.valueOf("2015-05-08 08:10:25")))
+    row.update(
+      3,
+      DateTimeUtils.fromJavaTimestamp(
+        Timestamp.valueOf("2015-05-08 08:10:25")))
 
     val unsafeRow: UnsafeRow = converter.apply(row)
     assert(
@@ -124,9 +125,10 @@ class UnsafeRowConverterSuite extends SparkFunSuite with Matchers {
     assert(
       DateTimeUtils.toJavaDate(unsafeRow.getInt(2)) === Date.valueOf(
         "2015-06-22"))
-    unsafeRow.setLong(3,
-                      DateTimeUtils.fromJavaTimestamp(
-                        Timestamp.valueOf("2015-06-22 08:10:25")))
+    unsafeRow.setLong(
+      3,
+      DateTimeUtils.fromJavaTimestamp(
+        Timestamp.valueOf("2015-06-22 08:10:25")))
     DateTimeUtils.toJavaTimestamp(unsafeRow.getLong(3)) should be
     (Timestamp.valueOf("2015-06-22 08:10:25"))
   }

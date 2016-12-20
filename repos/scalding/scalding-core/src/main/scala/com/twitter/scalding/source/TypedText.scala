@@ -59,22 +59,25 @@ object TypedText {
       implicit dr: DateRange,
       td: TypeDescriptor[T]): TypedTextDelimited[T] = {
     require(prefix.last != '/', "prefix should not include trailing /")
-    new TimePathTypedText[T](TAB,
-                             prefix + TimePathedSource.YEAR_MONTH_DAY + "/*")
+    new TimePathTypedText[T](
+      TAB,
+      prefix + TimePathedSource.YEAR_MONTH_DAY + "/*")
   }
   def dailyOsv[T](prefix: String)(
       implicit dr: DateRange,
       td: TypeDescriptor[T]): TypedTextDelimited[T] = {
     require(prefix.last != '/', "prefix should not include trailing /")
-    new TimePathTypedText[T](ONE,
-                             prefix + TimePathedSource.YEAR_MONTH_DAY + "/*")
+    new TimePathTypedText[T](
+      ONE,
+      prefix + TimePathedSource.YEAR_MONTH_DAY + "/*")
   }
   def dailyCsv[T](prefix: String)(
       implicit dr: DateRange,
       td: TypeDescriptor[T]): TypedTextDelimited[T] = {
     require(prefix.last != '/', "prefix should not include trailing /")
-    new TimePathTypedText[T](COMMA,
-                             prefix + TimePathedSource.YEAR_MONTH_DAY + "/*")
+    new TimePathTypedText[T](
+      COMMA,
+      prefix + TimePathedSource.YEAR_MONTH_DAY + "/*")
   }
   def dailyPrefixSuffixOsv[T](prefix: String, suffix: String)(
       implicit dr: DateRange,
@@ -113,26 +116,28 @@ trait TypedTextDelimited[T]
   override def sourceFields = typeDescriptor.fields
 
   override def localScheme =
-    new CLTextDelimited(typeDescriptor.fields,
-                        false,
-                        false,
-                        separator.str,
-                        strict,
-                        null /* quote */,
-                        typeDescriptor.fields.getTypesClasses,
-                        safe)
+    new CLTextDelimited(
+      typeDescriptor.fields,
+      false,
+      false,
+      separator.str,
+      strict,
+      null /* quote */,
+      typeDescriptor.fields.getTypesClasses,
+      safe)
 
   override def hdfsScheme =
     HadoopSchemeInstance(
-      new CHTextDelimited(typeDescriptor.fields,
-                          null /* compression */,
-                          false,
-                          false,
-                          separator.str,
-                          strict,
-                          null /* quote */,
-                          typeDescriptor.fields.getTypesClasses,
-                          safe).asInstanceOf[Scheme[_, _, _, _, _]])
+      new CHTextDelimited(
+        typeDescriptor.fields,
+        null /* compression */,
+        false,
+        false,
+        separator.str,
+        strict,
+        null /* quote */,
+        typeDescriptor.fields.getTypesClasses,
+        safe).asInstanceOf[Scheme[_, _, _, _, _]])
 }
 
 class TimePathTypedText[T](sep: TypedSep, path: String)(implicit dr: DateRange,

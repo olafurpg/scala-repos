@@ -15,8 +15,9 @@ final class DummyTask(
               loggers: Array[Logger]): Array[Task] = {
     try {
       // Just create a new instance.
-      val inst = TestUtils.newInstance(taskDef.fullyQualifiedName,
-                                       runner.testClassLoader)(Seq())
+      val inst = TestUtils.newInstance(
+        taskDef.fullyQualifiedName,
+        runner.testClassLoader)(Seq())
 
       eventHandler.handle(new DummyEvent(taskDef, None))
       loggers.foreach(_.info(s"Success: ${taskDef.fullyQualifiedName}"))

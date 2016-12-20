@@ -83,8 +83,9 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
       grandImp.calculate() * grandImp.count -
         (left2Imp.calculate() * left2Imp.count +
           parentImp.calculate() * parentImp.count)
-    testNode(grandParent,
-             Map(0 -> feature0importance, 1 -> feature1importance))
+    testNode(
+      grandParent,
+      Map(0 -> feature0importance, 1 -> feature1importance))
 
     // Forest consisting of (full tree) + (internal node with 2 leafs)
     val trees = Array(parent, grandParent).map { root =>
@@ -95,8 +96,9 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
     }
     val importances: Vector = RandomForest.featureImportances(trees, 2)
     val tree2norm = feature0importance + feature1importance
-    val expected = Vectors.dense((1.0 + feature0importance / tree2norm) / 2.0,
-                                 (feature1importance / tree2norm) / 2.0)
+    val expected = Vectors.dense(
+      (1.0 + feature0importance / tree2norm) / 2.0,
+      (feature1importance / tree2norm) / 2.0)
     assert(importances ~== expected relTol 0.01)
   }
 

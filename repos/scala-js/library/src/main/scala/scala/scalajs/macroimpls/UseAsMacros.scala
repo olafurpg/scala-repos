@@ -307,9 +307,10 @@ private[scalajs] object UseAsMacros {
             sym.asClass.isTrait || JSObjectAncestors(sym)
 
           for (base <- sym.baseClasses if !allowedParent(base)) {
-            c.abort(c.enclosingPosition,
-                    s"Supertype ${base.fullName} of $sym " +
-                      "is a class. Cannot be used with as.")
+            c.abort(
+              c.enclosingPosition,
+              s"Supertype ${base.fullName} of $sym " +
+                "is a class. Cannot be used with as.")
           }
 
           tpe
@@ -318,9 +319,10 @@ private[scalajs] object UseAsMacros {
           parents.foreach(verifyTargetType)
 
           for (decl <- decls if !decl.isType) {
-            c.abort(c.enclosingPosition,
-                    s"Refinement ${decl.name} " +
-                      "is not a type. Only types may be refined with as.")
+            c.abort(
+              c.enclosingPosition,
+              s"Refinement ${decl.name} " +
+                "is not a type. Only types may be refined with as.")
           }
 
           tpe

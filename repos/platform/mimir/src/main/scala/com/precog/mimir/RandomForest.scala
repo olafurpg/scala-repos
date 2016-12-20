@@ -447,8 +447,9 @@ trait RandomForestLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
   trait RandomForestLib extends ColumnarTableLib {
 
     override def _libMorphism2 =
-      super._libMorphism2 ++ Set(RandomForestClassification,
-                                 RandomForestRegression)
+      super._libMorphism2 ++ Set(
+        RandomForestClassification,
+        RandomForestRegression)
 
     object RandomForestClassification
         extends RandomForest[RValue, ClassificationForest[RValue]](
@@ -509,8 +510,9 @@ trait RandomForestLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
     }
 
     object RandomForestRegression
-        extends RandomForest[Double, RegressionForest](Vector("std", "stats"),
-                                                       "rfRegression") {
+        extends RandomForest[Double, RegressionForest](
+          Vector("std", "stats"),
+          "rfRegression") {
       import trans._
 
       def extractDependent(table: Table): M[Array[Double]] = {
@@ -569,9 +571,10 @@ trait RandomForestLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
       import trans._
       import TransSpecModule._
 
-      val tpe = BinaryOperationType(JType.JUniverseT,
-                                    JType.JUniverseT,
-                                    JObjectUnfixedT)
+      val tpe = BinaryOperationType(
+        JType.JUniverseT,
+        JType.JUniverseT,
+        JObjectUnfixedT)
 
       val independent = "predictors"
       val dependent = "dependent"
@@ -707,8 +710,8 @@ trait RandomForestLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
 
           lazy val specs: Seq[TransSpec1] = models.map({
             case (modelId, (jtype, _)) =>
-              trans.WrapObject(trans.TypedSubsumes(TransSpec1.Id, jtype),
-                               modelId)
+              trans
+                .WrapObject(trans.TypedSubsumes(TransSpec1.Id, jtype), modelId)
           })(collection.breakOut)
 
           lazy val spec: TransSpec1 = liftToValues(

@@ -31,9 +31,10 @@ trait HelloQuirrelSpecs extends EvalStackSpecs {
         result must haveSize(1)
         result must contain(
           SObject(
-            Map("name" -> SString("John"),
-                "age" -> SDecimal(29),
-                "gender" -> SString("male"))))
+            Map(
+              "name" -> SString("John"),
+              "age" -> SDecimal(29),
+              "gender" -> SString("male"))))
       }
 
       "object with null" >> {
@@ -41,9 +42,10 @@ trait HelloQuirrelSpecs extends EvalStackSpecs {
         result must haveSize(1)
         result must contain(
           SObject(
-            Map("name" -> SString("John"),
-                "age" -> SDecimal(29),
-                "gender" -> SNull)))
+            Map(
+              "name" -> SString("John"),
+              "age" -> SDecimal(29),
+              "gender" -> SNull)))
       }
 
       "object with undefined" >> {

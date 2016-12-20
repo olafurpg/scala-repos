@@ -78,15 +78,16 @@ abstract class ScValueElementType[Value <: ScValue](debugName: String)
     val bindingsText = dataStream.readName
     val isImplicit = dataStream.readBoolean()
     val isLocal = dataStream.readBoolean()
-    new ScValueStubImpl(parent,
-                        this,
-                        names,
-                        isDecl,
-                        typeText,
-                        bodyText,
-                        bindingsText,
-                        isImplicit,
-                        isLocal)
+    new ScValueStubImpl(
+      parent,
+      this,
+      names,
+      isDecl,
+      typeText,
+      bodyText,
+      bindingsText,
+      isImplicit,
+      isLocal)
   }
 
   def indexStub(stub: ScValueStub, sink: IndexSink) {

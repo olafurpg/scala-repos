@@ -25,11 +25,12 @@ trait ProtectedBranchService {
       .map(p => p._1 -> p._2.flatMap(_._2))
       .map {
         case (t1, contexts) =>
-          new ProtectedBranchInfo(t1.userName,
-                                  t1.repositoryName,
-                                  true,
-                                  contexts,
-                                  t1.statusCheckAdmin)
+          new ProtectedBranchInfo(
+            t1.userName,
+            t1.repositoryName,
+            true,
+            contexts,
+            t1.statusCheckAdmin)
       }
       .headOption
 
@@ -55,10 +56,11 @@ trait ProtectedBranchService {
       contexts: Seq[String])(implicit session: Session): Unit = {
     disableBranchProtection(owner, repository, branch)
     ProtectedBranches.insert(
-      new ProtectedBranch(owner,
-                          repository,
-                          branch,
-                          includeAdministrators && contexts.nonEmpty))
+      new ProtectedBranch(
+        owner,
+        repository,
+        branch,
+        includeAdministrators && contexts.nonEmpty))
     contexts.map { context =>
       ProtectedBranchContexts.insert(
         new ProtectedBranchContext(owner, repository, branch, context))

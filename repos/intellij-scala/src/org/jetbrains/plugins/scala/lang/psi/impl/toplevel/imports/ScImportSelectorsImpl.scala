@@ -44,6 +44,7 @@ class ScImportSelectorsImpl private (stub: StubElement[ScImportSelectors],
   }
 
   def selectors: Array[ScImportSelector] =
-    getStubOrPsiChildren(ScalaElementTypes.IMPORT_SELECTOR,
-                         JavaArrayFactoryUtil.ScImportSelectorFactory)
+    getStubOrPsiChildren(
+      ScalaElementTypes.IMPORT_SELECTOR,
+      JavaArrayFactoryUtil.ScImportSelectorFactory)
 }

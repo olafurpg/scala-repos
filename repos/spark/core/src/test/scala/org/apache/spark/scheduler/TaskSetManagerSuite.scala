@@ -282,10 +282,11 @@ class TaskSetManagerSuite
     val sched =
       new FakeTaskScheduler(sc, ("exec1", "host1"), ("exec3", "host2"))
     val taskSet =
-      FakeTask.createTaskSet(3,
-                             Seq(TaskLocation("host1", "exec1")),
-                             Seq(TaskLocation("host2", "exec3")),
-                             Seq() // Last task has no locality prefs
+      FakeTask.createTaskSet(
+        3,
+        Seq(TaskLocation("host1", "exec1")),
+        Seq(TaskLocation("host2", "exec3")),
+        Seq() // Last task has no locality prefs
       )
     val clock = new ManualClock
     val manager = new TaskSetManager(sched, taskSet, MAX_TASK_FAILURES, clock)
@@ -300,16 +301,18 @@ class TaskSetManagerSuite
 
   test("delay scheduling with fallback") {
     sc = new SparkContext("local", "test")
-    val sched = new FakeTaskScheduler(sc,
-                                      ("exec1", "host1"),
-                                      ("exec2", "host2"),
-                                      ("exec3", "host3"))
-    val taskSet = FakeTask.createTaskSet(5,
-                                         Seq(TaskLocation("host1")),
-                                         Seq(TaskLocation("host2")),
-                                         Seq(TaskLocation("host2")),
-                                         Seq(TaskLocation("host3")),
-                                         Seq(TaskLocation("host2")))
+    val sched = new FakeTaskScheduler(
+      sc,
+      ("exec1", "host1"),
+      ("exec2", "host2"),
+      ("exec3", "host3"))
+    val taskSet = FakeTask.createTaskSet(
+      5,
+      Seq(TaskLocation("host1")),
+      Seq(TaskLocation("host2")),
+      Seq(TaskLocation("host2")),
+      Seq(TaskLocation("host3")),
+      Seq(TaskLocation("host2")))
     val clock = new ManualClock
     val manager = new TaskSetManager(sched, taskSet, MAX_TASK_FAILURES, clock)
 
@@ -341,14 +344,16 @@ class TaskSetManagerSuite
 
   test("delay scheduling with failed hosts") {
     sc = new SparkContext("local", "test")
-    val sched = new FakeTaskScheduler(sc,
-                                      ("exec1", "host1"),
-                                      ("exec2", "host2"),
-                                      ("exec3", "host3"))
-    val taskSet = FakeTask.createTaskSet(3,
-                                         Seq(TaskLocation("host1")),
-                                         Seq(TaskLocation("host2")),
-                                         Seq(TaskLocation("host3")))
+    val sched = new FakeTaskScheduler(
+      sc,
+      ("exec1", "host1"),
+      ("exec2", "host2"),
+      ("exec3", "host3"))
+    val taskSet = FakeTask.createTaskSet(
+      3,
+      Seq(TaskLocation("host1")),
+      Seq(TaskLocation("host2")),
+      Seq(TaskLocation("host3")))
     val clock = new ManualClock
     val manager = new TaskSetManager(sched, taskSet, MAX_TASK_FAILURES, clock)
 
@@ -409,9 +414,10 @@ class TaskSetManagerSuite
         offerResult.isDefined,
         "Expect resource offer on iteration %s to return a task".format(index))
       assert(offerResult.get.index === 0)
-      manager.handleFailedTask(offerResult.get.taskId,
-                               TaskState.FINISHED,
-                               TaskResultLost)
+      manager.handleFailedTask(
+        offerResult.get.taskId,
+        TaskState.FINISHED,
+        TaskResultLost)
       if (index < MAX_TASK_FAILURES) {
         assert(!sched.taskSetsFailed.contains(taskSet.id))
       } else {
@@ -424,18 +430,20 @@ class TaskSetManagerSuite
     "executors should be blacklisted after task failure, in spite of locality preferences") {
     val rescheduleDelay = 300L
     val conf = new SparkConf()
-      .set("spark.scheduler.executorTaskBlacklistTime",
-           rescheduleDelay.toString)
+      .set(
+        "spark.scheduler.executorTaskBlacklistTime",
+        rescheduleDelay.toString)
       .
       // don't wait to jump locality levels in this test
       set("spark.locality.wait", "0")
 
     sc = new SparkContext("local", "test", conf)
     // two executors on same host, one on different.
-    val sched = new FakeTaskScheduler(sc,
-                                      ("exec1", "host1"),
-                                      ("exec1.1", "host1"),
-                                      ("exec2", "host2"))
+    val sched = new FakeTaskScheduler(
+      sc,
+      ("exec1", "host1"),
+      ("exec1.1", "host1"),
+      ("exec2", "host2"))
     // affinity to exec1 on host1 - which we will fail.
     val taskSet =
       FakeTask.createTaskSet(1, Seq(TaskLocation("host1", "exec1")))
@@ -450,9 +458,10 @@ class TaskSetManagerSuite
       assert(offerResult.get.executorId === "exec1")
 
       // Cause exec1 to fail : failure 1
-      manager.handleFailedTask(offerResult.get.taskId,
-                               TaskState.FINISHED,
-                               TaskResultLost)
+      manager.handleFailedTask(
+        offerResult.get.taskId,
+        TaskState.FINISHED,
+        TaskResultLost)
       assert(!sched.taskSetsFailed.contains(taskSet.id))
 
       // Ensure scheduling on exec1 fails after failure 1 due to blacklist
@@ -474,9 +483,10 @@ class TaskSetManagerSuite
       assert(offerResult.get.executorId === "exec1.1")
 
       // Cause exec1.1 to fail : failure 2
-      manager.handleFailedTask(offerResult.get.taskId,
-                               TaskState.FINISHED,
-                               TaskResultLost)
+      manager.handleFailedTask(
+        offerResult.get.taskId,
+        TaskState.FINISHED,
+        TaskResultLost)
       assert(!sched.taskSetsFailed.contains(taskSet.id))
 
       // Ensure scheduling on exec1.1 fails after failure 2 due to blacklist
@@ -492,9 +502,10 @@ class TaskSetManagerSuite
       assert(offerResult.get.executorId === "exec2")
 
       // Cause exec2 to fail : failure 3
-      manager.handleFailedTask(offerResult.get.taskId,
-                               TaskState.FINISHED,
-                               TaskResultLost)
+      manager.handleFailedTask(
+        offerResult.get.taskId,
+        TaskState.FINISHED,
+        TaskResultLost)
       assert(!sched.taskSetsFailed.contains(taskSet.id))
 
       // Ensure scheduling on exec2 fails after failure 3 due to blacklist
@@ -514,9 +525,10 @@ class TaskSetManagerSuite
       assert(manager.resourceOffer("exec1", "host1", PROCESS_LOCAL).isEmpty)
 
       // Cause exec1 to fail : failure 4
-      manager.handleFailedTask(offerResult.get.taskId,
-                               TaskState.FINISHED,
-                               TaskResultLost)
+      manager.handleFailedTask(
+        offerResult.get.taskId,
+        TaskState.FINISHED,
+        TaskResultLost)
     }
 
     // we have failed the same task 4 times now : task id should now be in taskSetsFailed
@@ -528,11 +540,12 @@ class TaskSetManagerSuite
     FakeRackUtil.assignHostToRack("host2", "rack2")
     sc = new SparkContext("local", "test")
     val sched = new FakeTaskScheduler(sc)
-    val taskSet = FakeTask.createTaskSet(4,
-                                         Seq(TaskLocation("host1", "execA")),
-                                         Seq(TaskLocation("host1", "execB")),
-                                         Seq(TaskLocation("host2", "execC")),
-                                         Seq())
+    val taskSet = FakeTask.createTaskSet(
+      4,
+      Seq(TaskLocation("host1", "execA")),
+      Seq(TaskLocation("host1", "execB")),
+      Seq(TaskLocation("host2", "execC")),
+      Seq())
     val clock = new ManualClock
     val manager = new TaskSetManager(sched, taskSet, MAX_TASK_FAILURES, clock)
     // Only ANY is valid
@@ -563,11 +576,12 @@ class TaskSetManagerSuite
   test("Executors exit for reason unrelated to currently running tasks") {
     sc = new SparkContext("local", "test")
     val sched = new FakeTaskScheduler(sc)
-    val taskSet = FakeTask.createTaskSet(4,
-                                         Seq(TaskLocation("host1", "execA")),
-                                         Seq(TaskLocation("host1", "execB")),
-                                         Seq(TaskLocation("host2", "execC")),
-                                         Seq())
+    val taskSet = FakeTask.createTaskSet(
+      4,
+      Seq(TaskLocation("host1", "execA")),
+      Seq(TaskLocation("host1", "execB")),
+      Seq(TaskLocation("host2", "execC")),
+      Seq())
     val manager = new TaskSetManager(sched, taskSet, 1, new ManualClock)
     sched.addExecutor("execA", "host1")
     manager.executorAdded()
@@ -578,9 +592,10 @@ class TaskSetManagerSuite
     manager.executorLost(
       "execA",
       "host1",
-      ExecutorExited(143,
-                     false,
-                     "Terminated for reason unrelated to running tasks"))
+      ExecutorExited(
+        143,
+        false,
+        "Terminated for reason unrelated to running tasks"))
     assert(!sched.taskSetsFailed.contains(taskSet.id))
     assert(manager.resourceOffer("execC", "host2", ANY).isDefined)
     sched.removeExecutor("execC")
@@ -599,13 +614,15 @@ class TaskSetManagerSuite
     // Assign host3 to rack2
     FakeRackUtil.assignHostToRack("host3", "rack2")
     sc = new SparkContext("local", "test")
-    val sched = new FakeTaskScheduler(sc,
-                                      ("execA", "host1"),
-                                      ("execB", "host2"),
-                                      ("execC", "host3"))
-    val taskSet = FakeTask.createTaskSet(2,
-                                         Seq(TaskLocation("host1", "execA")),
-                                         Seq(TaskLocation("host1", "execA")))
+    val sched = new FakeTaskScheduler(
+      sc,
+      ("execA", "host1"),
+      ("execB", "host2"),
+      ("execC", "host3"))
+    val taskSet = FakeTask.createTaskSet(
+      2,
+      Seq(TaskLocation("host1", "execA")),
+      Seq(TaskLocation("host1", "execA")))
     val clock = new ManualClock
     val manager = new TaskSetManager(sched, taskSet, MAX_TASK_FAILURES, clock)
 
@@ -655,12 +672,14 @@ class TaskSetManagerSuite
     sc = new SparkContext("local", "test")
     val sched = new FakeTaskScheduler(sc, ("exec1", "host1"))
 
-    val taskSet = new TaskSet(Array(new NotSerializableFakeTask(1, 0),
-                                    new NotSerializableFakeTask(0, 1)),
-                              0,
-                              0,
-                              0,
-                              null)
+    val taskSet = new TaskSet(
+      Array(
+        new NotSerializableFakeTask(1, 0),
+        new NotSerializableFakeTask(0, 1)),
+      0,
+      0,
+      0,
+      null)
     val manager = new TaskSetManager(sched, taskSet, MAX_TASK_FAILURES)
 
     intercept[TaskNotSerializableException] {
@@ -700,16 +719,18 @@ class TaskSetManagerSuite
 
   test("speculative and noPref task should be scheduled after node-local") {
     sc = new SparkContext("local", "test")
-    val sched = new FakeTaskScheduler(sc,
-                                      ("execA", "host1"),
-                                      ("execB", "host2"),
-                                      ("execC", "host3"))
+    val sched = new FakeTaskScheduler(
+      sc,
+      ("execA", "host1"),
+      ("execB", "host2"),
+      ("execC", "host3"))
     val taskSet =
-      FakeTask.createTaskSet(4,
-                             Seq(TaskLocation("host1", "execA")),
-                             Seq(TaskLocation("host2"), TaskLocation("host1")),
-                             Seq(),
-                             Seq(TaskLocation("host3", "execC")))
+      FakeTask.createTaskSet(
+        4,
+        Seq(TaskLocation("host1", "execA")),
+        Seq(TaskLocation("host2"), TaskLocation("host1")),
+        Seq(),
+        Seq(TaskLocation("host3", "execC")))
     val clock = new ManualClock
     val manager = new TaskSetManager(sched, taskSet, MAX_TASK_FAILURES, clock)
 
@@ -733,15 +754,17 @@ class TaskSetManagerSuite
     "node-local tasks should be scheduled right away " +
       "when there are only node-local and no-preference tasks") {
     sc = new SparkContext("local", "test")
-    val sched = new FakeTaskScheduler(sc,
-                                      ("execA", "host1"),
-                                      ("execB", "host2"),
-                                      ("execC", "host3"))
-    val taskSet = FakeTask.createTaskSet(4,
-                                         Seq(TaskLocation("host1")),
-                                         Seq(TaskLocation("host2")),
-                                         Seq(),
-                                         Seq(TaskLocation("host3")))
+    val sched = new FakeTaskScheduler(
+      sc,
+      ("execA", "host1"),
+      ("execB", "host2"),
+      ("execC", "host3"))
+    val taskSet = FakeTask.createTaskSet(
+      4,
+      Seq(TaskLocation("host1")),
+      Seq(TaskLocation("host2")),
+      Seq(),
+      Seq(TaskLocation("host3")))
     val clock = new ManualClock
     val manager = new TaskSetManager(sched, taskSet, MAX_TASK_FAILURES, clock)
 
@@ -761,11 +784,12 @@ class TaskSetManagerSuite
     val sched =
       new FakeTaskScheduler(sc, ("execA", "host1"), ("execB", "host2"))
     val taskSet =
-      FakeTask.createTaskSet(4,
-                             Seq(TaskLocation("host1")),
-                             Seq(TaskLocation("host2")),
-                             Seq(ExecutorCacheTaskLocation("host1", "execA")),
-                             Seq(ExecutorCacheTaskLocation("host2", "execB")))
+      FakeTask.createTaskSet(
+        4,
+        Seq(TaskLocation("host1")),
+        Seq(TaskLocation("host2")),
+        Seq(ExecutorCacheTaskLocation("host1", "execA")),
+        Seq(ExecutorCacheTaskLocation("host2", "execB")))
     val clock = new ManualClock
     val manager = new TaskSetManager(sched, taskSet, MAX_TASK_FAILURES, clock)
 
@@ -785,10 +809,11 @@ class TaskSetManagerSuite
     val sched =
       new FakeTaskScheduler(sc, ("execA", "host1"), ("execB", "host2"))
     val taskSet =
-      FakeTask.createTaskSet(3,
-                             Seq(),
-                             Seq(ExecutorCacheTaskLocation("host1", "execA")),
-                             Seq(ExecutorCacheTaskLocation("host2", "execB")))
+      FakeTask.createTaskSet(
+        3,
+        Seq(),
+        Seq(ExecutorCacheTaskLocation("host1", "execA")),
+        Seq(ExecutorCacheTaskLocation("host2", "execB")))
     val clock = new ManualClock
     val manager = new TaskSetManager(sched, taskSet, MAX_TASK_FAILURES, clock)
 
@@ -808,9 +833,10 @@ class TaskSetManagerSuite
     // Regression test for SPARK-2931
     sc = new SparkContext("local", "test")
     val sched = new FakeTaskScheduler(sc)
-    val taskSet = FakeTask.createTaskSet(2,
-                                         Seq(TaskLocation("host1", "execA")),
-                                         Seq(TaskLocation("host2", "execB.1")))
+    val taskSet = FakeTask.createTaskSet(
+      2,
+      Seq(TaskLocation("host1", "execA")),
+      Seq(TaskLocation("host2", "execB.1")))
     val clock = new ManualClock
     val manager = new TaskSetManager(sched, taskSet, MAX_TASK_FAILURES, clock)
     // Only ANY is valid
@@ -842,14 +868,16 @@ class TaskSetManagerSuite
     "Test that locations with HDFSCacheTaskLocation are treated as PROCESS_LOCAL.") {
     // Regression test for SPARK-2931
     sc = new SparkContext("local", "test")
-    val sched = new FakeTaskScheduler(sc,
-                                      ("execA", "host1"),
-                                      ("execB", "host2"),
-                                      ("execC", "host3"))
-    val taskSet = FakeTask.createTaskSet(3,
-                                         Seq(TaskLocation("host1")),
-                                         Seq(TaskLocation("host2")),
-                                         Seq(TaskLocation("hdfs_cache_host3")))
+    val sched = new FakeTaskScheduler(
+      sc,
+      ("execA", "host1"),
+      ("execB", "host2"),
+      ("execC", "host3"))
+    val taskSet = FakeTask.createTaskSet(
+      3,
+      Seq(TaskLocation("host1")),
+      Seq(TaskLocation("host2")),
+      Seq(TaskLocation("hdfs_cache_host3")))
     val clock = new ManualClock
     val manager = new TaskSetManager(sched, taskSet, MAX_TASK_FAILURES, clock)
     assert(
@@ -874,8 +902,9 @@ class TaskSetManagerSuite
     assert(TaskLocation("host1") === HostTaskLocation("host1"))
     assert(TaskLocation("hdfs_cache_host1") === HDFSCacheTaskLocation("host1"))
     assert(
-      TaskLocation("executor_host1_3") === ExecutorCacheTaskLocation("host1",
-                                                                     "3"))
+      TaskLocation("executor_host1_3") === ExecutorCacheTaskLocation(
+        "host1",
+        "3"))
   }
 
   private def createTaskResult(id: Int,

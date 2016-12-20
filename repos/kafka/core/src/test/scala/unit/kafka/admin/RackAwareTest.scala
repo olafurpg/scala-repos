@@ -49,17 +49,19 @@ trait RackAwareTest {
     if (verifyLeaderDistribution) {
       val leaderCount = distribution.brokerLeaderCount
       val leaderCountPerBroker = numPartitions / numBrokers
-      assertEquals("Preferred leader count is not even for brokers",
-                   List.fill(numBrokers)(leaderCountPerBroker),
-                   leaderCount.values.toList)
+      assertEquals(
+        "Preferred leader count is not even for brokers",
+        List.fill(numBrokers)(leaderCountPerBroker),
+        leaderCount.values.toList)
     }
 
     if (verifyReplicasDistribution) {
       val replicasCount = distribution.brokerReplicasCount
       val numReplicasPerBroker = numPartitions * replicationFactor / numBrokers
-      assertEquals("Replica count is not even for broker",
-                   List.fill(numBrokers)(numReplicasPerBroker),
-                   replicasCount.values.toList)
+      assertEquals(
+        "Replica count is not even for broker",
+        List.fill(numBrokers)(numReplicasPerBroker),
+        replicasCount.values.toList)
     }
   }
 

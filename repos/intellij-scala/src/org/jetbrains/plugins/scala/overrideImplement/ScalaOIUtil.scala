@@ -40,14 +40,16 @@ object ScalaOIUtil {
     candidate match {
       case sign: PhysicalSignature =>
         val method = sign.method
-        assert(method.containingClass != null,
-               "Containing Class is null: " + method.getText)
+        assert(
+          method.containingClass != null,
+          "Containing Class is null: " + method.getText)
         Some(new ScMethodMember(sign, !isImplement))
       case (named: PsiNamedElement, subst: ScSubstitutor) =>
         ScalaPsiUtil.nameContext(named) match {
           case x: ScValue =>
-            assert(x.containingClass != null,
-                   "Containing Class is null: " + x.getText)
+            assert(
+              x.containingClass != null,
+              "Containing Class is null: " + x.getText)
             named match {
               case y: ScTypedDefinition =>
                 Some(new ScValueMember(x, y, subst, !isImplement))
@@ -56,8 +58,9 @@ object ScalaOIUtil {
                   "Not supported type:" + x)
             }
           case x: ScVariable =>
-            assert(x.containingClass != null,
-                   "Containing Class is null: " + x.getText)
+            assert(
+              x.containingClass != null,
+              "Containing Class is null: " + x.getText)
             named match {
               case y: ScTypedDefinition =>
                 Some(new ScVariableMember(x, y, subst, !isImplement))
@@ -66,8 +69,9 @@ object ScalaOIUtil {
                   "Not supported type:" + x)
             }
           case x: ScTypeAlias =>
-            assert(x.containingClass != null,
-                   "Containing Class is null: " + x.getText)
+            assert(
+              x.containingClass != null,
+              "Containing Class is null: " + x.getText)
             Some(new ScAliasMember(x, subst, !isImplement))
           case x: PsiField => Some(new JavaFieldMember(x, subst))
           case x => None
@@ -95,12 +99,13 @@ object ScalaOIUtil {
     val selectedMembers = ListBuffer[ClassMember]()
     if (!ApplicationManager.getApplication.isUnitTestMode) {
 
-      val chooser = new ScalaMemberChooser[ClassMember](classMembers.toArray,
-                                                        false,
-                                                        true,
-                                                        isImplement,
-                                                        true,
-                                                        clazz)
+      val chooser = new ScalaMemberChooser[ClassMember](
+        classMembers.toArray,
+        false,
+        true,
+        isImplement,
+        true,
+        clazz)
       chooser.setTitle(
         if (isImplement) ScalaBundle.message("select.method.implement")
         else ScalaBundle.message("select.method.override"))
@@ -137,9 +142,10 @@ object ScalaOIUtil {
             val genInfos = sortedMembers.map(new ScalaGenerationInfo(_))
             val anchor = getAnchor(editor.getCaretModel.getOffset, clazz)
             val inserted =
-              GenerateMembersUtil.insertMembersBeforeAnchor(clazz,
-                                                            anchor.orNull,
-                                                            genInfos.reverse)
+              GenerateMembersUtil.insertMembersBeforeAnchor(
+                clazz,
+                anchor.orNull,
+                genInfos.reverse)
             inserted.headOption.foreach(
               _.positionCaret(editor, toEditMethodBody = true))
           }
@@ -225,9 +231,10 @@ object ScalaOIUtil {
         false
       case x if x.isConstructor => false
       case method
-          if !ResolveUtils.isAccessible(method,
-                                        clazz.extendsBlock,
-                                        forCompletion = false) =>
+          if !ResolveUtils.isAccessible(
+            method,
+            clazz.extendsBlock,
+            forCompletion = false) =>
         false
       case method =>
         var flag = false
@@ -256,9 +263,10 @@ object ScalaOIUtil {
     m match {
       case _ if isProductAbstractMethod(m, clazz) => false
       case method
-          if !ResolveUtils.isAccessible(method,
-                                        place,
-                                        forCompletion = false) =>
+          if !ResolveUtils.isAccessible(
+            method,
+            place,
+            forCompletion = false) =>
         false
       case x if name == "$tag" || name == "$init$" => false
       case x if !withOwn && x.containingClass == clazz => false
@@ -286,9 +294,10 @@ object ScalaOIUtil {
       case x: PsiModifierListOwner if x.hasModifierPropertyScala("final") =>
         false
       case m: PsiMember
-          if !ResolveUtils.isAccessible(m,
-                                        clazz.extendsBlock,
-                                        forCompletion = false) =>
+          if !ResolveUtils.isAccessible(
+            m,
+            clazz.extendsBlock,
+            forCompletion = false) =>
         false
       case x @ (_: ScPatternDefinition | _: ScVariableDefinition)
           if x.asInstanceOf[ScMember].containingClass != clazz =>
@@ -325,9 +334,10 @@ object ScalaOIUtil {
                             withOwn: Boolean): Boolean = {
     ScalaPsiUtil.nameContext(named) match {
       case m: PsiMember
-          if !ResolveUtils.isAccessible(m,
-                                        clazz.extendsBlock,
-                                        forCompletion = false) =>
+          if !ResolveUtils.isAccessible(
+            m,
+            clazz.extendsBlock,
+            forCompletion = false) =>
         false
       case x: ScValueDeclaration if withOwn || x.containingClass != clazz =>
         true

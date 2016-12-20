@@ -265,10 +265,11 @@ object Main {
       case While(cond, body, optLabel) =>
       case DoWhile(body, cond, None) =>
       case Try(block, errVar, EmptyTree, finalizer) =>
-      case Try(block,
-               errVar @ Ident(name, originalName),
-               handler,
-               finalizer) =>
+      case Try(
+          block,
+          errVar @ Ident(name, originalName),
+          handler,
+          finalizer) =>
       case Throw(expr) =>
       case Continue(optLabel) =>
       case Match(selector, cases, default) =>

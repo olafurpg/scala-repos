@@ -35,10 +35,11 @@ private[v1] class OneStageResource(ui: SparkUI) {
   def stageData(@PathParam("stageId") stageId: Int): Seq[StageData] = {
     withStage(stageId) { stageAttempts =>
       stageAttempts.map { stage =>
-        AllStagesResource.stageUiToStageData(stage.status,
-                                             stage.info,
-                                             stage.ui,
-                                             includeDetails = true)
+        AllStagesResource.stageUiToStageData(
+          stage.status,
+          stage.info,
+          stage.ui,
+          includeDetails = true)
       }
     }
   }
@@ -49,10 +50,11 @@ private[v1] class OneStageResource(ui: SparkUI) {
       @PathParam("stageId") stageId: Int,
       @PathParam("stageAttemptId") stageAttemptId: Int): StageData = {
     withStageAttempt(stageId, stageAttemptId) { stage =>
-      AllStagesResource.stageUiToStageData(stage.status,
-                                           stage.info,
-                                           stage.ui,
-                                           includeDetails = true)
+      AllStagesResource.stageUiToStageData(
+        stage.status,
+        stage.info,
+        stage.ui,
+        includeDetails = true)
     }
   }
 
@@ -72,8 +74,9 @@ private[v1] class OneStageResource(ui: SparkUI) {
             throw new BadParameterException("quantiles", "double", s)
         }
       }
-      AllStagesResource.taskMetricDistributions(stage.ui.taskData.values,
-                                                quantiles)
+      AllStagesResource.taskMetricDistributions(
+        stage.ui.taskData.values,
+        quantiles)
     }
   }
 

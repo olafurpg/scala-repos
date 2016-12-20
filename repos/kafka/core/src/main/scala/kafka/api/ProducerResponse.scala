@@ -43,10 +43,11 @@ object ProducerResponse {
     })
 
     val throttleTime = buffer.getInt
-    ProducerResponse(correlationId,
-                     Map(statusPairs: _*),
-                     ProducerRequest.CurrentVersion,
-                     throttleTime)
+    ProducerResponse(
+      correlationId,
+      Map(statusPairs: _*),
+      ProducerRequest.CurrentVersion,
+      throttleTime)
   }
 }
 
@@ -95,8 +96,10 @@ case class ProducerResponse(
       writeShortString(buffer, topic)
       buffer.putInt(errorsAndOffsets.size) // partition count
       errorsAndOffsets.foreach {
-        case ((TopicAndPartition(_, partition),
-               ProducerResponseStatus(error, nextOffset, timestamp))) =>
+        case (
+            (
+            TopicAndPartition(_, partition),
+            ProducerResponseStatus(error, nextOffset, timestamp))) =>
           buffer.putInt(partition)
           buffer.putShort(error)
           buffer.putLong(nextOffset)

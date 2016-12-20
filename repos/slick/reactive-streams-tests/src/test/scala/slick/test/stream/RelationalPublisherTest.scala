@@ -36,10 +36,11 @@ abstract class RelationalPublisherTest[P <: RelationalProfile](val profile: P,
 
   @BeforeClass def setUpDB: Unit = {
     db = createDB
-    Await.result(db.run(
-                   data.schema.create >>
-                     (data ++= (1 to maxElementsFromPublisher.toInt))),
-                 Duration.Inf)
+    Await.result(
+      db.run(
+        data.schema.create >>
+          (data ++= (1 to maxElementsFromPublisher.toInt))),
+      Duration.Inf)
   }
 
   @AfterClass def tearDownDB: Unit =

@@ -165,19 +165,21 @@ object TestActorRef {
   def apply[T <: Actor](props: Props, supervisor: ActorRef)(
       implicit system: ActorSystem): TestActorRef[T] = {
     val sysImpl = system.asInstanceOf[ActorSystemImpl]
-    new TestActorRef(sysImpl,
-                     props,
-                     supervisor.asInstanceOf[InternalActorRef],
-                     randomName)
+    new TestActorRef(
+      sysImpl,
+      props,
+      supervisor.asInstanceOf[InternalActorRef],
+      randomName)
   }
 
   def apply[T <: Actor](props: Props, supervisor: ActorRef, name: String)(
       implicit system: ActorSystem): TestActorRef[T] = {
     val sysImpl = system.asInstanceOf[ActorSystemImpl]
-    new TestActorRef(sysImpl,
-                     props,
-                     supervisor.asInstanceOf[InternalActorRef],
-                     name)
+    new TestActorRef(
+      sysImpl,
+      props,
+      supervisor.asInstanceOf[InternalActorRef],
+      name)
   }
 
   def apply[T <: Actor](implicit t: ClassTag[T],

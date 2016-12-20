@@ -35,10 +35,11 @@ class SbtProjectDataService
       projectData: ProjectData,
       project: Project,
       modelsProvider: IdeModifiableModelsProvider): Importer[SbtProjectData] =
-    new SbtProjectDataService.Importer(toImport,
-                                       projectData,
-                                       project,
-                                       modelsProvider)
+    new SbtProjectDataService.Importer(
+      toImport,
+      projectData,
+      project,
+      modelsProvider)
 }
 
 object SbtProjectDataService {
@@ -47,10 +48,11 @@ object SbtProjectDataService {
                          projectData: ProjectData,
                          project: Project,
                          modelsProvider: IdeModifiableModelsProvider)
-      extends AbstractImporter[SbtProjectData](dataToImport,
-                                               projectData,
-                                               project,
-                                               modelsProvider) {
+      extends AbstractImporter[SbtProjectData](
+        dataToImport,
+        projectData,
+        project,
+        modelsProvider) {
 
     override def importData(): Unit =
       dataToImport.foreach(node => doImport(node.getData))
@@ -145,11 +147,12 @@ object SbtProjectDataService {
       }
 
     private def additionalOptionsFrom(options: Seq[String]): Seq[String] = {
-      val handledOptions = Set("-g:none",
-                               "-nowarn",
-                               "-Xlint:none",
-                               "-deprecation",
-                               "-Xlint:deprecation")
+      val handledOptions = Set(
+        "-g:none",
+        "-nowarn",
+        "-Xlint:none",
+        "-deprecation",
+        "-Xlint:deprecation")
 
       def removePair(name: String, options: Seq[String]): Seq[String] = {
         val index = options.indexOf(name)

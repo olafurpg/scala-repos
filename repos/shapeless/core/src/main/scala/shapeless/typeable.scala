@@ -401,8 +401,9 @@ class TypeableMacros(val c: blackbox.Context) extends SingletonTypeUtils {
         val normalizedTypeable =
           c.inferImplicitValue(appliedType(typeableTpe, List(normalized)))
         if (normalizedTypeable == EmptyTree)
-          c.abort(c.enclosingPosition,
-                  s"No default Typeable for parametrized type $tpe")
+          c.abort(
+            c.enclosingPosition,
+            s"No default Typeable for parametrized type $tpe")
         normalizedTypeable
 
       case SingletonSymbolType(c) =>
@@ -412,15 +413,17 @@ class TypeableMacros(val c: blackbox.Context) extends SingletonTypeUtils {
 
       case RefinedType(parents, decls) =>
         if (decls.nonEmpty)
-          c.abort(c.enclosingPosition,
-                  "No Typeable for a refinement with non-empty decls")
+          c.abort(
+            c.enclosingPosition,
+            "No Typeable for a refinement with non-empty decls")
         val parentTypeables = parents.filterNot(_ =:= typeOf[AnyRef]).map {
           parent =>
             c.inferImplicitValue(appliedType(typeableTpe, List(parent)))
         }
         if (parentTypeables.exists(_ == EmptyTree))
-          c.abort(c.enclosingPosition,
-                  "Missing Typeable for parent of a refinement")
+          c.abort(
+            c.enclosingPosition,
+            "Missing Typeable for parent of a refinement")
 
         q"""
           _root_.shapeless.Typeable.intersectionTypeable(
@@ -432,8 +435,9 @@ class TypeableMacros(val c: blackbox.Context) extends SingletonTypeUtils {
         val pSym = {
           val sym = pTpe.typeSymbol
           if (!sym.isClass)
-            c.abort(c.enclosingPosition,
-                    s"No default Typeable for parametrized type $tpe")
+            c.abort(
+              c.enclosingPosition,
+              s"No default Typeable for parametrized type $tpe")
 
           val pSym0 = sym.asClass
           pSym0.typeSignature // Workaround for <https://issues.scala-lang.org/browse/SI-7755>
@@ -442,8 +446,9 @@ class TypeableMacros(val c: blackbox.Context) extends SingletonTypeUtils {
         }
 
         if (!pSym.isCaseClass)
-          c.abort(c.enclosingPosition,
-                  s"No default Typeable for parametrized type $tpe")
+          c.abort(
+            c.enclosingPosition,
+            s"No default Typeable for parametrized type $tpe")
         val fields =
           tpe.decls.toList collect {
             case sym: TermSymbol if sym.isVal && sym.isCaseAccessor =>
@@ -453,8 +458,9 @@ class TypeableMacros(val c: blackbox.Context) extends SingletonTypeUtils {
           c.inferImplicitValue(appliedType(typeableTpe, List(field)))
         }
         if (fieldTypeables.exists(_ == EmptyTree))
-          c.abort(c.enclosingPosition,
-                  "Missing Typeable for field of a case class")
+          c.abort(
+            c.enclosingPosition,
+            "Missing Typeable for field of a case class")
 
         q"""
           _root_.shapeless.Typeable.caseClassTypeable(

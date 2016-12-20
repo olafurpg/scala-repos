@@ -54,9 +54,10 @@ class DictionaryEncodingSuite extends SparkFunSuite {
       // Tests encoder
       // -------------
 
-      val builder = TestCompressibleColumnBuilder(columnStats,
-                                                  columnType,
-                                                  DictionaryEncoding)
+      val builder = TestCompressibleColumnBuilder(
+        columnStats,
+        columnType,
+        DictionaryEncoding)
       val (values, rows) =
         makeUniqueValuesAndSingleValueRows(columnType, uniqueValueCount)
       val dictValues = stableDistinct(inputSeq)
@@ -131,8 +132,9 @@ class DictionaryEncodingSuite extends SparkFunSuite {
     }
 
     test(s"$DictionaryEncoding with $typeName: dictionary overflow") {
-      skeleton(DictionaryEncoding.MAX_DICT_SIZE + 1,
-               0 to DictionaryEncoding.MAX_DICT_SIZE)
+      skeleton(
+        DictionaryEncoding.MAX_DICT_SIZE + 1,
+        0 to DictionaryEncoding.MAX_DICT_SIZE)
     }
   }
 }

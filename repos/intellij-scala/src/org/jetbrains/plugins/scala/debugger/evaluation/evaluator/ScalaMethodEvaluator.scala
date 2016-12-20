@@ -74,8 +74,8 @@ case class ScalaMethodEvaluator(
     }
     if (!(obj.isInstanceOf[ObjectReference] || obj.isInstanceOf[ClassType])) {
       throw EvaluationException(
-        DebuggerBundle.message("evaluation.error.evaluating.method",
-                               methodName))
+        DebuggerBundle
+          .message("evaluation.error.evaluating.method", methodName))
     }
     val args = argumentEvaluators.flatMap { ev =>
       val result = ev.evaluate(context)
@@ -129,8 +129,9 @@ case class ScalaMethodEvaluator(
           if (!localMethod) {
             jdiMethod = referenceType
               .asInstanceOf[ClassType]
-              .concreteMethodByName(methodName,
-                                    signature.getName(debugProcess))
+              .concreteMethodByName(
+                methodName,
+                signature.getName(debugProcess))
           }
           if (jdiMethod == null && localMethod) {
             for (method <- sortedMethodCandidates if jdiMethod == null) {
@@ -190,17 +191,19 @@ case class ScalaMethodEvaluator(
             val jdiMethod = getOrUpdateMethod(referenceType, findMethod).orNull
             if (jdiMethod != null && methodName == "<init>") {
               import scala.collection.JavaConversions._
-              return debugProcess.newInstance(context,
-                                              classType,
-                                              jdiMethod,
-                                              unwrappedArgs(args, jdiMethod))
+              return debugProcess.newInstance(
+                context,
+                classType,
+                jdiMethod,
+                unwrappedArgs(args, jdiMethod))
             }
             if (jdiMethod != null && jdiMethod.isStatic) {
               import scala.collection.JavaConversions._
-              return debugProcess.invokeMethod(context,
-                                               classType,
-                                               jdiMethod,
-                                               unwrappedArgs(args, jdiMethod))
+              return debugProcess.invokeMethod(
+                context,
+                classType,
+                jdiMethod,
+                unwrappedArgs(args, jdiMethod))
             }
           case _ =>
         }
@@ -256,10 +259,11 @@ case class ScalaMethodEvaluator(
           args,
           ObjectReference.INVOKE_NONVIRTUAL)
       }
-      debugProcess.invokeMethod(context,
-                                objRef,
-                                jdiMethod,
-                                unwrappedArgs(args, jdiMethod))
+      debugProcess.invokeMethod(
+        context,
+        objRef,
+        jdiMethod,
+        unwrappedArgs(args, jdiMethod))
     } catch {
       case e: Exception => throw EvaluationException(e)
     }

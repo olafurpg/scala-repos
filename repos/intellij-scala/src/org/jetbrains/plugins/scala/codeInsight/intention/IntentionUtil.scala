@@ -35,8 +35,9 @@ object IntentionUtil {
         .toSeq
     }
 
-    CommentsAroundElement(getElements(element.prevSiblings).reverse,
-                          getElements(element.nextSiblings).reverse)
+    CommentsAroundElement(
+      getElements(element.prevSiblings).reverse,
+      getElements(element.nextSiblings).reverse)
   }
 
   def hasOtherComments(

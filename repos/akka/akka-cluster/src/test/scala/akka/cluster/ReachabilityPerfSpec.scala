@@ -51,8 +51,9 @@ class ReachabilityPerfSpec extends WordSpec with Matchers {
                             thunk: (Reachability, Reachability) ⇒ Unit,
                             times: Int): Unit = {
     for (i ← 1 to times) {
-      thunk(Reachability(r1.records, r1.versions),
-            Reachability(r2.records, r2.versions))
+      thunk(
+        Reachability(r1.records, r1.versions),
+        Reachability(r2.records, r2.versions))
     }
   }
 
@@ -114,17 +115,19 @@ class ReachabilityPerfSpec extends WordSpec with Matchers {
     }
 
     s"merge with half nodes unreachable, $iterations times" in {
-      checkThunkFor(reachability1,
-                    reachability3,
-                    merge(5 * nodesSize / 2),
-                    iterations)
+      checkThunkFor(
+        reachability1,
+        reachability3,
+        merge(5 * nodesSize / 2),
+        iterations)
     }
 
     s"merge with half nodes unreachable opposite $iterations times" in {
-      checkThunkFor(reachability3,
-                    reachability1,
-                    merge(5 * nodesSize / 2),
-                    iterations)
+      checkThunkFor(
+        reachability3,
+        reachability1,
+        merge(5 * nodesSize / 2),
+        iterations)
     }
 
     s"check status with half nodes unreachable, $iterations times" in {

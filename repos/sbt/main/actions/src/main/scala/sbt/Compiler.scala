@@ -44,15 +44,17 @@ object Compiler {
       case _ => scalaCompilerBridgeSource2_11
     }
   private[sbt] def scalaCompilerBridgeSource2_10: ModuleID =
-    ModuleID(xsbti.ArtifactInfo.SbtOrganization,
-             "compiler-bridge_2.10",
-             ComponentCompiler.incrementalVersion,
-             Some("component")).sources()
+    ModuleID(
+      xsbti.ArtifactInfo.SbtOrganization,
+      "compiler-bridge_2.10",
+      ComponentCompiler.incrementalVersion,
+      Some("component")).sources()
   private[sbt] def scalaCompilerBridgeSource2_11: ModuleID =
-    ModuleID(xsbti.ArtifactInfo.SbtOrganization,
-             "compiler-bridge_2.11",
-             ComponentCompiler.incrementalVersion,
-             Some("component")).sources()
+    ModuleID(
+      xsbti.ArtifactInfo.SbtOrganization,
+      "compiler-bridge_2.11",
+      ComponentCompiler.incrementalVersion,
+      Some("component")).sources()
 
   /** Inputs necessary to run the incremental compiler. */
   // final case class Inputs(compilers: Compilers, config: Options, incSetup: IncSetup)
@@ -150,11 +152,12 @@ object Compiler {
                 ivyConfiguration: IvyConfiguration,
                 sourcesModule: ModuleID)(implicit app: AppConfiguration,
                                          log: Logger): Compilers = {
-    val scalac = scalaCompiler(instance,
-                               cpOptions,
-                               javaHome,
-                               ivyConfiguration,
-                               sourcesModule)
+    val scalac = scalaCompiler(
+      instance,
+      cpOptions,
+      javaHome,
+      ivyConfiguration,
+      sourcesModule)
     val javac = JavaTools.directOrFork(instance, cpOptions, javaHome)
     IncrementalCompilerImpl.Compilers(scalac, javac)
   }
@@ -166,10 +169,11 @@ object Compiler {
       implicit app: AppConfiguration,
       log: Logger): AnalyzingCompiler = {
     val launcher = app.provider.scalaProvider.launcher
-    val componentManager = new ComponentManager(launcher.globalLock,
-                                                app.provider.components,
-                                                Option(launcher.ivyHome),
-                                                log)
+    val componentManager = new ComponentManager(
+      launcher.globalLock,
+      app.provider.components,
+      Option(launcher.ivyHome),
+      log)
     val provider = ComponentCompiler
       .interfaceProvider(componentManager, ivyConfiguration, sourcesModule)
     new AnalyzingCompiler(instance, provider, cpOptions)

@@ -194,8 +194,9 @@ abstract class ProductNodeShape[Level <: ShapeLevel, C, M <: C, U <: C, P <: C]
   def encodeRef(value: Mixed, path: Node) = {
     val elems = shapes.iterator.zip(getIterator(value)).zipWithIndex.map {
       case ((p, x), pos) =>
-        p.encodeRef(x.asInstanceOf[p.Mixed],
-                    Select(path, ElementSymbol(pos + 1)))
+        p.encodeRef(
+          x.asInstanceOf[p.Mixed],
+          Select(path, ElementSymbol(pos + 1)))
     }
     buildValue(elems.toIndexedSeq)
   }
@@ -215,9 +216,10 @@ abstract class MappedProductShape[
     Level <: ShapeLevel, C, M <: C, U <: C, P <: C]
     extends ProductNodeShape[Level, C, M, U, P] {
   override def toNode(value: Mixed) =
-    TypeMapping(super.toNode(value),
-                MappedScalaType.Mapper(toBase, toMapped, None),
-                classTag)
+    TypeMapping(
+      super.toNode(value),
+      MappedScalaType.Mapper(toBase, toMapped, None),
+      classTag)
   def toBase(v: Any) =
     new ProductWrapper(getIterator(v.asInstanceOf[C]).toIndexedSeq)
   def toMapped(v: Any) =
@@ -269,11 +271,12 @@ class CaseClassShape[P <: Product,
                                  PlainTuple,
                                  LiftedTuple],
     classTag: ClassTag[PlainCaseClass])
-    extends MappedScalaProductShape[FlatShapeLevel,
-                                    P,
-                                    LiftedCaseClass,
-                                    PlainCaseClass,
-                                    LiftedCaseClass] {
+    extends MappedScalaProductShape[
+      FlatShapeLevel,
+      P,
+      LiftedCaseClass,
+      PlainCaseClass,
+      LiftedCaseClass] {
   val shapes = columnShapes.asInstanceOf[TupleShape[_, _, _, _]].shapes
   override def toMapped(v: Any) = mapPlain(v.asInstanceOf[PlainTuple])
   def buildValue(elems: IndexedSeq[Any]) =
@@ -358,17 +361,20 @@ case class ShapedValue[T, U](value: T,
   def toNode = shape.toNode(value)
   def packedValue[R](
       implicit ev: Shape[_ <: FlatShapeLevel, T, _, R]): ShapedValue[R, U] =
-    ShapedValue(shape.pack(value).asInstanceOf[R],
-                shape.packedShape.asInstanceOf[Shape[FlatShapeLevel, R, U, _]])
+    ShapedValue(
+      shape.pack(value).asInstanceOf[R],
+      shape.packedShape.asInstanceOf[Shape[FlatShapeLevel, R, U, _]])
   def zip[T2, U2](s2: ShapedValue[T2, U2]) =
-    new ShapedValue[(T, T2), (U, U2)]((value, s2.value),
-                                      Shape.tuple2Shape(shape, s2.shape))
+    new ShapedValue[(T, T2), (U, U2)](
+      (value, s2.value),
+      Shape.tuple2Shape(shape, s2.shape))
   def <>[R: ClassTag](f: (U => R), g: (R => Option[U])) =
     new MappedProjection[R, U](
       shape.toNode(value),
-      MappedScalaType.Mapper(g.andThen(_.get).asInstanceOf[Any => Any],
-                             f.asInstanceOf[Any => Any],
-                             None),
+      MappedScalaType.Mapper(
+        g.andThen(_.get).asInstanceOf[Any => Any],
+        f.asInstanceOf[Any => Any],
+        None),
       implicitly[ClassTag[R]])
   @inline def shaped: ShapedValue[T, U] = this
 
@@ -525,9 +531,10 @@ class MappedProjection[T, P](child: Node,
       override def toNode = path
     }
   def genericFastPath(f: Function[Any, Any]) =
-    new MappedProjection[T, P](child,
-                               mapper.copy(fastPath = Some(f)),
-                               classTag)
+    new MappedProjection[T, P](
+      child,
+      mapper.copy(fastPath = Some(f)),
+      classTag)
 }
 
 object MappedProjection {

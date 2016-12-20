@@ -313,11 +313,12 @@ object AhcWSSpec extends PlaySpecification with Mockito {
     }
 
     "support a proxy server with basic" in new WithApplication {
-      val proxy = DefaultWSProxyServer(protocol = Some("https"),
-                                       host = "localhost",
-                                       port = 8080,
-                                       principal = Some("principal"),
-                                       password = Some("password"))
+      val proxy = DefaultWSProxyServer(
+        protocol = Some("https"),
+        host = "localhost",
+        port = 8080,
+        principal = Some("principal"),
+        password = Some("password"))
       val req: AHCRequest = WS
         .url("http://playframework.com/")
         .withProxyServer(proxy)
@@ -333,12 +334,13 @@ object AhcWSSpec extends PlaySpecification with Mockito {
     }
 
     "support a proxy server with NTLM" in new WithApplication {
-      val proxy = DefaultWSProxyServer(protocol = Some("ntlm"),
-                                       host = "localhost",
-                                       port = 8080,
-                                       principal = Some("principal"),
-                                       password = Some("password"),
-                                       ntlmDomain = Some("somentlmdomain"))
+      val proxy = DefaultWSProxyServer(
+        protocol = Some("ntlm"),
+        host = "localhost",
+        port = 8080,
+        principal = Some("principal"),
+        password = Some("password"),
+        ntlmDomain = Some("somentlmdomain"))
       val req: AHCRequest = WS
         .url("http://playframework.com/")
         .withProxyServer(proxy)
@@ -442,14 +444,15 @@ object AhcWSSpec extends PlaySpecification with Mockito {
          false,
          false)
 
-      val ahcCookie: AHCCookie = new AHCCookie(name,
-                                               value,
-                                               wrap,
-                                               domain,
-                                               path,
-                                               maxAge,
-                                               secure,
-                                               httpOnly)
+      val ahcCookie: AHCCookie = new AHCCookie(
+        name,
+        value,
+        wrap,
+        domain,
+        path,
+        maxAge,
+        secure,
+        httpOnly)
       ahcResponse.getCookies returns util.Arrays.asList(ahcCookie)
 
       val response = AhcWSResponse(ahcResponse)
@@ -477,14 +480,15 @@ object AhcWSSpec extends PlaySpecification with Mockito {
          false,
          false)
 
-      val ahcCookie: AHCCookie = new AHCCookie(name,
-                                               value,
-                                               wrap,
-                                               domain,
-                                               path,
-                                               maxAge,
-                                               secure,
-                                               httpOnly)
+      val ahcCookie: AHCCookie = new AHCCookie(
+        name,
+        value,
+        wrap,
+        domain,
+        path,
+        maxAge,
+        secure,
+        httpOnly)
       ahcResponse.getCookies returns util.Arrays.asList(ahcCookie)
 
       val response = AhcWSResponse(ahcResponse)
@@ -503,14 +507,15 @@ object AhcWSSpec extends PlaySpecification with Mockito {
     "return -1 values of expires and maxAge as None" in {
       val ahcResponse: AHCResponse = mock[AHCResponse]
 
-      val ahcCookie: AHCCookie = new AHCCookie("someName",
-                                               "value",
-                                               true,
-                                               "domain",
-                                               "path",
-                                               -1L,
-                                               false,
-                                               false)
+      val ahcCookie: AHCCookie = new AHCCookie(
+        "someName",
+        "value",
+        true,
+        "domain",
+        "path",
+        -1L,
+        false,
+        false)
       ahcResponse.getCookies returns util.Arrays.asList(ahcCookie)
 
       val response = AhcWSResponse(ahcResponse)
@@ -523,22 +528,23 @@ object AhcWSSpec extends PlaySpecification with Mockito {
 
     "get the body as bytes from the AHC response" in {
       val ahcResponse: AHCResponse = mock[AHCResponse]
-      val bytes = ByteString(-87,
-                             -72,
-                             96,
-                             -63,
-                             -32,
-                             46,
-                             -117,
-                             -40,
-                             -128,
-                             -7,
-                             61,
-                             109,
-                             80,
-                             45,
-                             44,
-                             30)
+      val bytes = ByteString(
+        -87,
+        -72,
+        96,
+        -63,
+        -32,
+        46,
+        -117,
+        -40,
+        -128,
+        -7,
+        61,
+        109,
+        80,
+        45,
+        44,
+        30)
       ahcResponse.getResponseBodyAsBytes returns bytes.toArray
       val response = AhcWSResponse(ahcResponse)
       response.bodyAsBytes must_== bytes

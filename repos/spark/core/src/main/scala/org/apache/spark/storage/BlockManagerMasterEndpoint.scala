@@ -70,17 +70,19 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
       register(blockManagerId, maxMemSize, slaveEndpoint)
       context.reply(true)
 
-    case _updateBlockInfo @ UpdateBlockInfo(blockManagerId,
-                                            blockId,
-                                            storageLevel,
-                                            deserializedSize,
-                                            size) =>
+    case _updateBlockInfo @ UpdateBlockInfo(
+          blockManagerId,
+          blockId,
+          storageLevel,
+          deserializedSize,
+          size) =>
       context.reply(
-        updateBlockInfo(blockManagerId,
-                        blockId,
-                        storageLevel,
-                        deserializedSize,
-                        size))
+        updateBlockInfo(
+          blockManagerId,
+          blockId,
+          storageLevel,
+          deserializedSize,
+          size))
       listenerBus.post(
         SparkListenerBlockUpdated(BlockUpdatedInfo(_updateBlockInfo)))
 
@@ -222,8 +224,9 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
       }
     }
     listenerBus.post(
-      SparkListenerBlockManagerRemoved(System.currentTimeMillis(),
-                                       blockManagerId))
+      SparkListenerBlockManagerRemoved(
+        System.currentTimeMillis(),
+        blockManagerId))
     logInfo(s"Removing block manager $blockManagerId")
   }
 
@@ -358,10 +361,11 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
 
       blockManagerIdByExecutor(id.executorId) = id
 
-      blockManagerInfo(id) = new BlockManagerInfo(id,
-                                                  System.currentTimeMillis(),
-                                                  maxMemSize,
-                                                  slaveEndpoint)
+      blockManagerInfo(id) = new BlockManagerInfo(
+        id,
+        System.currentTimeMillis(),
+        maxMemSize,
+        slaveEndpoint)
     }
     listenerBus.post(SparkListenerBlockManagerAdded(time, id, maxMemSize))
   }

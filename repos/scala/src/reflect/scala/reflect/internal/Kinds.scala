@@ -179,8 +179,9 @@ trait Kinds { self: SymbolTable =>
         foreach2(hkargs, hkparams) { (hkarg, hkparam) =>
           if (hkparam.typeParams.isEmpty && hkarg.typeParams.isEmpty) {
             // base-case: kind *
-            kindCheck(variancesMatch(hkarg, hkparam),
-                      _ varianceError (hkarg -> hkparam))
+            kindCheck(
+              variancesMatch(hkarg, hkparam),
+              _ varianceError (hkarg -> hkparam))
             // instantiateTypeParams(tparams, targs)
             //   higher-order bounds, may contain references to type arguments
             // substSym(hkparams, hkargs)
@@ -197,8 +198,9 @@ trait Kinds { self: SymbolTable =>
               transform(bindHKParams(declaredBounds), owner)
             val argumentBounds = transform(hkarg.info.bounds, owner)
 
-            kindCheck(declaredBoundsInst <:< argumentBounds,
-                      _ strictnessError (hkarg -> hkparam))
+            kindCheck(
+              declaredBoundsInst <:< argumentBounds,
+              _ strictnessError (hkarg -> hkparam))
 
             debuglog(
               "checkKindBoundsHK base case: " +

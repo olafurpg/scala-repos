@@ -48,12 +48,13 @@ trait ToolBox[U <: scala.reflect.api.Universe] {
                 silent: Boolean = false,
                 withImplicitViewsDisabled: Boolean = false,
                 withMacrosDisabled: Boolean = false): u.Tree =
-    typecheck(tree,
-              TERMmode,
-              pt,
-              silent,
-              withImplicitViewsDisabled,
-              withMacrosDisabled)
+    typecheck(
+      tree,
+      TERMmode,
+      pt,
+      silent,
+      withImplicitViewsDisabled,
+      withMacrosDisabled)
 
   /** Typechecks a tree against the expected type `pt`
     *  under typechecking mode specified in `mode` with [[EXPRmode]] being default.

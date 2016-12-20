@@ -109,16 +109,17 @@ class Strategy @Since("1.3.0")(
            maxBins: Int,
            categoricalFeaturesInfo: java.util.Map[java.lang.Integer,
                                                   java.lang.Integer]) {
-    this(algo,
-         impurity,
-         maxDepth,
-         numClasses,
-         maxBins,
-         Sort,
-         categoricalFeaturesInfo
-           .asInstanceOf[java.util.Map[Int, Int]]
-           .asScala
-           .toMap)
+    this(
+      algo,
+      impurity,
+      maxDepth,
+      numClasses,
+      maxBins,
+      Sort,
+      categoricalFeaturesInfo
+        .asInstanceOf[java.util.Map[Int, Int]]
+        .asScala
+        .toMap)
   }
 
   /**
@@ -193,19 +194,20 @@ class Strategy @Since("1.3.0")(
     */
   @Since("1.2.0")
   def copy: Strategy = {
-    new Strategy(algo,
-                 impurity,
-                 maxDepth,
-                 numClasses,
-                 maxBins,
-                 quantileCalculationStrategy,
-                 categoricalFeaturesInfo,
-                 minInstancesPerNode,
-                 minInfoGain,
-                 maxMemoryInMB,
-                 subsamplingRate,
-                 useNodeIdCache,
-                 checkpointInterval)
+    new Strategy(
+      algo,
+      impurity,
+      maxDepth,
+      numClasses,
+      maxBins,
+      quantileCalculationStrategy,
+      categoricalFeaturesInfo,
+      minInstancesPerNode,
+      minInfoGain,
+      maxMemoryInMB,
+      subsamplingRate,
+      useNodeIdCache,
+      checkpointInterval)
   }
 }
 
@@ -228,15 +230,17 @@ object Strategy {
   @Since("1.3.0")
   def defaultStrategy(algo: Algo): Strategy = algo match {
     case Algo.Classification =>
-      new Strategy(algo = Classification,
-                   impurity = Gini,
-                   maxDepth = 10,
-                   numClasses = 2)
+      new Strategy(
+        algo = Classification,
+        impurity = Gini,
+        maxDepth = 10,
+        numClasses = 2)
     case Algo.Regression =>
-      new Strategy(algo = Regression,
-                   impurity = Variance,
-                   maxDepth = 10,
-                   numClasses = 0)
+      new Strategy(
+        algo = Regression,
+        impurity = Variance,
+        maxDepth = 10,
+        numClasses = 0)
   }
 
   @deprecated("Use Strategy.defaultStrategy instead.", "1.5.0")

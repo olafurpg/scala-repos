@@ -143,8 +143,9 @@ private[spark] abstract class WebUI(val securityManager: SecurityManager,
 
   /** Bind to the HTTP server behind this web interface. */
   def bind() {
-    assert(!serverInfo.isDefined,
-           "Attempted to bind %s more than once!".format(className))
+    assert(
+      !serverInfo.isDefined,
+      "Attempted to bind %s more than once!".format(className))
     try {
       var host = Option(conf.getenv("SPARK_LOCAL_IP")).getOrElse("0.0.0.0")
       serverInfo = Some(

@@ -22,9 +22,10 @@ class NoTailRecursionAnnotationInspection
     case f: ScFunctionDefinition
         if f.canBeTailRecursive && !f.hasTailRecursionAnnotation &&
           f.recursionType == RecursionType.TailRecursion =>
-      holder.registerProblem(f.nameId,
-                             getDisplayName,
-                             new AddAnnotationQuickFix(f))
+      holder.registerProblem(
+        f.nameId,
+        getDisplayName,
+        new AddAnnotationQuickFix(f))
   }
 
   class AddAnnotationQuickFix(holder: ScAnnotationsHolder)

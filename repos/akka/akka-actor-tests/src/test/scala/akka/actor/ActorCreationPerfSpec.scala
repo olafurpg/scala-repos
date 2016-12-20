@@ -194,10 +194,11 @@ class ActorCreationPerfSpec
       // note: measuring per-actor-memory-use in this scenario is skewed as the Actor contains references to counters etc!
       //       for measuring actor size use refer to the `runWithoutCounter` method
       for (i ← 1 to nrOfRepeats) {
-        runWithCounterInside(name,
-                             s"${scenarioName}_driver_inside_$i",
-                             nrOfActors,
-                             propsCreator)
+        runWithCounterInside(
+          name,
+          s"${scenarioName}_driver_inside_$i",
+          nrOfActors,
+          propsCreator)
       }
 
       reportAndClearMetrics()
@@ -210,9 +211,10 @@ class ActorCreationPerfSpec
         val heapUsed = timedWithKnownOps(
           TotalTimeKey / s"creating-$nrOfActors-actors" / name,
           ops = nrOfActors) {
-          runWithoutCounter(s"${scenarioName}_driver_outside_$i",
-                            nrOfActors,
-                            propsCreator)
+          runWithoutCounter(
+            s"${scenarioName}_driver_outside_$i",
+            nrOfActors,
+            propsCreator)
         }
 
         avgMem.add(heapUsed.used / nrOfActors) // average actor size, over nrOfRepeats

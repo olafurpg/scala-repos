@@ -118,10 +118,11 @@ private[akka] class DistributedPubSubMessageSerializer(
     }
 
   private def addressFromProto(address: dm.Address): Address =
-    Address(address.getProtocol,
-            address.getSystem,
-            address.getHostname,
-            address.getPort)
+    Address(
+      address.getProtocol,
+      address.getSystem,
+      address.getHostname,
+      address.getPort)
 
   private def statusToProto(status: Status): dm.Status = {
     val versions = status.versions
@@ -182,10 +183,11 @@ private[akka] class DistributedPubSubMessageSerializer(
     Delta(delta.getBucketsList.asScala.toVector.map { b ⇒
       val content: TreeMap[String, ValueHolder] =
         b.getContentList.asScala.map { entry ⇒
-          entry.getKey -> ValueHolder(entry.getVersion,
-                                      if (entry.hasRef)
-                                        Some(resolveActorRef(entry.getRef))
-                                      else None)
+          entry.getKey -> ValueHolder(
+            entry.getVersion,
+            if (entry.hasRef)
+              Some(resolveActorRef(entry.getRef))
+            else None)
         }(breakOut)
       Bucket(addressFromProto(b.getOwner), b.getVersion, content)
     })
@@ -207,9 +209,10 @@ private[akka] class DistributedPubSubMessageSerializer(
     sendFromProto(dm.Send.parseFrom(bytes))
 
   private def sendFromProto(send: dm.Send): Send =
-    Send(send.getPath,
-         payloadFromProto(send.getPayload),
-         send.getLocalAffinity)
+    Send(
+      send.getPath,
+      payloadFromProto(send.getPayload),
+      send.getLocalAffinity)
 
   private def sendToAllToProto(sendToAll: SendToAll): dm.SendToAll = {
     dm.SendToAll
@@ -224,9 +227,10 @@ private[akka] class DistributedPubSubMessageSerializer(
     sendToAllFromProto(dm.SendToAll.parseFrom(bytes))
 
   private def sendToAllFromProto(sendToAll: dm.SendToAll): SendToAll =
-    SendToAll(sendToAll.getPath,
-              payloadFromProto(sendToAll.getPayload),
-              sendToAll.getAllButSelf)
+    SendToAll(
+      sendToAll.getPath,
+      payloadFromProto(sendToAll.getPayload),
+      sendToAll.getAllButSelf)
 
   private def publishToProto(publish: Publish): dm.Publish = {
     dm.Publish
@@ -269,9 +273,10 @@ private[akka] class DistributedPubSubMessageSerializer(
       if (payload.hasMessageManifest) payload.getMessageManifest.toStringUtf8
       else ""
     serialization
-      .deserialize(payload.getEnclosedMessage.toByteArray,
-                   payload.getSerializerId,
-                   manifest)
+      .deserialize(
+        payload.getEnclosedMessage.toByteArray,
+        payload.getSerializerId,
+        manifest)
       .get
   }
 }

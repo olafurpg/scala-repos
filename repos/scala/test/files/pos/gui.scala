@@ -3,8 +3,9 @@ object Geom {
   case class Point(x: Int, y: Int) extends Shape
   case class Rectangle(ll: Point, ur: Point) extends Shape {
     def inset(delta: Int) =
-      Rectangle(Point(ll.x - delta, ll.y - delta),
-                Point(ur.x + delta, ur.y + delta));
+      Rectangle(
+        Point(ll.x - delta, ll.y - delta),
+        Point(ur.x + delta, ur.y + delta));
   }
 }
 

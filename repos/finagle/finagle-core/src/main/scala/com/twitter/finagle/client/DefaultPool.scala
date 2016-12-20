@@ -72,9 +72,10 @@ object DefaultPool {
       }
       val role = DefaultPool.Role
       val description = "Control client connection pool"
-      val parameters = Seq(implicitly[Stack.Param[Param]],
-                           implicitly[Stack.Param[param.Stats]],
-                           implicitly[Stack.Param[param.Timer]])
+      val parameters = Seq(
+        implicitly[Stack.Param[Param]],
+        implicitly[Stack.Param[param.Stats]],
+        implicitly[Stack.Param[param.Timer]])
       def make(prms: Stack.Params, next: Stack[ServiceFactory[Req, Rep]]) = {
         val Param(low, high, bufferSize, idleTime, maxWaiters) = prms[Param]
         val param.Stats(statsReceiver) = prms[param.Stats]
@@ -95,9 +96,10 @@ object DefaultPool {
             new WatermarkPool(sf, low, high, statsReceiver, maxWaiters))
 
         if (bufferSize > 0) {
-          stack.push(Role.bufferingPool,
-                     (sf: ServiceFactory[Req, Rep]) =>
-                       new BufferingPool(sf, bufferSize))
+          stack.push(
+            Role.bufferingPool,
+            (sf: ServiceFactory[Req, Rep]) =>
+              new BufferingPool(sf, bufferSize))
         }
 
         stack.result
@@ -140,11 +142,12 @@ case class DefaultPool[Req, Rep](
       val factory =
         if (idleTime <= 0.seconds || high <= low) inputFactory
         else
-          new CachingPool(inputFactory,
-                          high - low,
-                          idleTime,
-                          timer,
-                          statsReceiver)
+          new CachingPool(
+            inputFactory,
+            high - low,
+            idleTime,
+            timer,
+            statsReceiver)
 
       // NB: WatermarkPool conceals the first "low" closes from CachingPool, so that
       // CachingPool only caches the last "high - low", and WatermarkPool caches the first

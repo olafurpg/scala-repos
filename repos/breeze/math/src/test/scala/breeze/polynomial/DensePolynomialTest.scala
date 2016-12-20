@@ -48,8 +48,8 @@ class DensePolynomialTest extends FunSuite {
     cfor(0)(j => j < M, j => j + 1)(j => {
       val t = j / M.toDouble
       x.update(j, t)
-      result.update(j,
-                    1 + 2 * t + 4 * t * t + 1 * t * t * t + 2 * t * t * t * t)
+      result
+        .update(j, 1 + 2 * t + 4 * t * t + 1 * t * t * t + 2 * t * t * t * t)
     })
     assert(norm(p(x) - result) < 1e-10)
   }

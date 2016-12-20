@@ -57,8 +57,9 @@ class NIHDBProjectionSpecs
 
   val chef = actorSystem.actorOf(
     Props(
-      new Chef(VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
-               VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
+      new Chef(
+        VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
+        VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
 
   val txLogScheduler = new ScheduledThreadPoolExecutor(
     10,
@@ -70,12 +71,13 @@ class NIHDBProjectionSpecs
 
   def newNihdb(workDir: File, threshold: Int = 1000): NIHDB =
     NIHDB
-      .create(chef,
-              authorities,
-              workDir,
-              threshold,
-              Duration(60, "seconds"),
-              txLogScheduler)(actorSystem)
+      .create(
+        chef,
+        authorities,
+        workDir,
+        threshold,
+        Duration(60, "seconds"),
+        txLogScheduler)(actorSystem)
       .unsafePerformIO
       .valueOr { e =>
         throw new Exception(e.message)
@@ -230,8 +232,9 @@ class NIHDBProjectionSpecs
       }
 
       result must awaited(maxDuration)(beLike {
-        case (Some(BlockProjectionData(min1, max1, data1)),
-              Some(BlockProjectionData(min2, max2, data2))) =>
+        case (
+            Some(BlockProjectionData(min1, max1, data1)),
+            Some(BlockProjectionData(min2, max2, data2))) =>
           min1 mustEqual 0L
           max1 mustEqual 0L
           data1.size mustEqual 1200

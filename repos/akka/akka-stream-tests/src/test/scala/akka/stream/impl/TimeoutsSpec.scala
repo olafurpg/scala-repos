@@ -19,21 +19,23 @@ class TimeoutsSpec extends AkkaSpec {
   "InitialTimeout" must {
 
     "pass through elements unmodified" in assertAllStagesStopped {
-      Await.result(Source(1 to 100)
-                     .initialTimeout(2.seconds)
-                     .grouped(200)
-                     .runWith(Sink.head),
-                   3.seconds) should ===(1 to 100)
+      Await.result(
+        Source(1 to 100)
+          .initialTimeout(2.seconds)
+          .grouped(200)
+          .runWith(Sink.head),
+        3.seconds) should ===(1 to 100)
     }
 
     "pass through error unmodified" in assertAllStagesStopped {
       a[TE] shouldBe thrownBy {
-        Await.result(Source(1 to 100)
-                       .concat(Source.failed(TE("test")))
-                       .initialTimeout(2.seconds)
-                       .grouped(200)
-                       .runWith(Sink.head),
-                     3.seconds)
+        Await.result(
+          Source(1 to 100)
+            .concat(Source.failed(TE("test")))
+            .initialTimeout(2.seconds)
+            .grouped(200)
+            .runWith(Sink.head),
+          3.seconds)
       }
     }
 
@@ -56,21 +58,23 @@ class TimeoutsSpec extends AkkaSpec {
   "CompletionTimeout" must {
 
     "pass through elements unmodified" in assertAllStagesStopped {
-      Await.result(Source(1 to 100)
-                     .completionTimeout(2.seconds)
-                     .grouped(200)
-                     .runWith(Sink.head),
-                   3.seconds) should ===(1 to 100)
+      Await.result(
+        Source(1 to 100)
+          .completionTimeout(2.seconds)
+          .grouped(200)
+          .runWith(Sink.head),
+        3.seconds) should ===(1 to 100)
     }
 
     "pass through error unmodified" in assertAllStagesStopped {
       a[TE] shouldBe thrownBy {
-        Await.result(Source(1 to 100)
-                       .concat(Source.failed(TE("test")))
-                       .completionTimeout(2.seconds)
-                       .grouped(200)
-                       .runWith(Sink.head),
-                     3.seconds)
+        Await.result(
+          Source(1 to 100)
+            .concat(Source.failed(TE("test")))
+            .completionTimeout(2.seconds)
+            .grouped(200)
+            .runWith(Sink.head),
+          3.seconds)
       }
     }
 
@@ -99,21 +103,23 @@ class TimeoutsSpec extends AkkaSpec {
   "IdleTimeout" must {
 
     "pass through elements unmodified" in assertAllStagesStopped {
-      Await.result(Source(1 to 100)
-                     .idleTimeout(2.seconds)
-                     .grouped(200)
-                     .runWith(Sink.head),
-                   3.seconds) should ===(1 to 100)
+      Await.result(
+        Source(1 to 100)
+          .idleTimeout(2.seconds)
+          .grouped(200)
+          .runWith(Sink.head),
+        3.seconds) should ===(1 to 100)
     }
 
     "pass through error unmodified" in assertAllStagesStopped {
       a[TE] shouldBe thrownBy {
-        Await.result(Source(1 to 100)
-                       .concat(Source.failed(TE("test")))
-                       .idleTimeout(2.seconds)
-                       .grouped(200)
-                       .runWith(Sink.head),
-                     3.seconds)
+        Await.result(
+          Source(1 to 100)
+            .concat(Source.failed(TE("test")))
+            .idleTimeout(2.seconds)
+            .grouped(200)
+            .runWith(Sink.head),
+          3.seconds)
       }
     }
 

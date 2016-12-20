@@ -141,8 +141,9 @@ object LazyEitherT extends LazyEitherTInstances {
 
   def lazyEitherTLeftProjectionEIso2[F[_], E]
     : LazyEitherT.LeftProjectionT[F, E, ?] <~> LazyEitherT[F, E, ?] =
-    new IsoFunctorTemplate[LazyEitherT.LeftProjectionT[F, E, ?],
-                           LazyEitherT[F, E, ?]] {
+    new IsoFunctorTemplate[
+      LazyEitherT.LeftProjectionT[F, E, ?],
+      LazyEitherT[F, E, ?]] {
       def to[A](
           fa: LazyEitherT.LeftProjectionT[F, E, A]): LazyEitherT[F, E, A] =
         fa.lazyEitherT
@@ -153,8 +154,9 @@ object LazyEitherT extends LazyEitherTInstances {
 
   def lazyEitherTLeftProjectionIso2[F[_]]
     : LazyEitherT.LeftProjectionT[F, ?, ?] <~~> LazyEitherT[F, ?, ?] =
-    new IsoBifunctorTemplate[LazyEitherT.LeftProjectionT[F, ?, ?],
-                             LazyEitherT[F, ?, ?]] {
+    new IsoBifunctorTemplate[
+      LazyEitherT.LeftProjectionT[F, ?, ?],
+      LazyEitherT[F, ?, ?]] {
       def to[A, B](
           fa: LazyEitherT.LeftProjectionT[F, A, B]): LazyEitherT[F, A, B] =
         fa.lazyEitherT
@@ -229,8 +231,9 @@ sealed abstract class LazyEitherTInstances1 {
 
   implicit def lazyEitherTLeftProjectionFunctor[F[_], L](
       implicit F0: Functor[F]): Functor[LazyEitherT.LeftProjectionT[F, L, ?]] =
-    new IsomorphismFunctor[LazyEitherT.LeftProjectionT[F, L, ?],
-                           LazyEitherT[F, L, ?]] {
+    new IsomorphismFunctor[
+      LazyEitherT.LeftProjectionT[F, L, ?],
+      LazyEitherT[F, L, ?]] {
       implicit def G = lazyEitherTFunctor[F, L]
 
       def iso = LazyEitherT.lazyEitherTLeftProjectionEIso2[F, L]
@@ -275,8 +278,9 @@ sealed abstract class LazyEitherTInstances0 extends LazyEitherTInstances1 {
   implicit def lazyEitherTLeftProjectionBifunctor[F[_]](
       implicit F0: Functor[F])
     : Bifunctor[LazyEitherT.LeftProjectionT[F, ?, ?]] =
-    new IsomorphismBifunctor[LazyEitherT.LeftProjectionT[F, ?, ?],
-                             LazyEitherT[F, ?, ?]] {
+    new IsomorphismBifunctor[
+      LazyEitherT.LeftProjectionT[F, ?, ?],
+      LazyEitherT[F, ?, ?]] {
       implicit def G = lazyEitherTBifunctor[F]
 
       def iso = LazyEitherT.lazyEitherTLeftProjectionIso2[F]
@@ -290,8 +294,9 @@ sealed abstract class LazyEitherTInstances0 extends LazyEitherTInstances1 {
 
   implicit def lazyEitherTLeftProjectionMonad[F[_], L](
       implicit F0: Monad[F]): Monad[LazyEitherT.LeftProjectionT[F, L, ?]] =
-    new IsomorphismMonad[LazyEitherT.LeftProjectionT[F, L, ?],
-                         LazyEitherT[F, L, ?]] {
+    new IsomorphismMonad[
+      LazyEitherT.LeftProjectionT[F, L, ?],
+      LazyEitherT[F, L, ?]] {
       implicit def G = lazyEitherTMonad[F, L]
 
       def iso = LazyEitherT.lazyEitherTLeftProjectionEIso2[F, L]
@@ -306,8 +311,9 @@ sealed abstract class LazyEitherTInstances0 extends LazyEitherTInstances1 {
   implicit def lazyEitherTLeftProjectionFoldable[F[_], L](
       implicit F0: Foldable[F])
     : Foldable[LazyEitherT.LeftProjectionT[F, L, ?]] =
-    new IsomorphismFoldable[LazyEitherT.LeftProjectionT[F, L, ?],
-                            LazyEitherT[F, L, ?]] {
+    new IsomorphismFoldable[
+      LazyEitherT.LeftProjectionT[F, L, ?],
+      LazyEitherT[F, L, ?]] {
       implicit def G = lazyEitherTFoldable[F, L]
 
       def naturalTrans = LazyEitherT.lazyEitherTLeftProjectionEIso2[F, L].to
@@ -325,8 +331,9 @@ sealed abstract class LazyEitherTInstances extends LazyEitherTInstances0 {
   implicit def lazyEitherTLeftProjectionBitraverse[F[_]](
       implicit F0: Traverse[F])
     : Bitraverse[LazyEitherT.LeftProjectionT[F, ?, ?]] =
-    new IsomorphismBitraverse[LazyEitherT.LeftProjectionT[F, ?, ?],
-                              LazyEitherT[F, ?, ?]] {
+    new IsomorphismBitraverse[
+      LazyEitherT.LeftProjectionT[F, ?, ?],
+      LazyEitherT[F, ?, ?]] {
       implicit def G = lazyEitherTBitraverse[F]
 
       def iso = LazyEitherT.lazyEitherTLeftProjectionIso2[F]
@@ -341,8 +348,9 @@ sealed abstract class LazyEitherTInstances extends LazyEitherTInstances0 {
   implicit def lazyEitherTLeftProjectionTraverse[F[_], L](
       implicit F0: Traverse[F])
     : Traverse[LazyEitherT.LeftProjectionT[F, L, ?]] =
-    new IsomorphismTraverse[LazyEitherT.LeftProjectionT[F, L, ?],
-                            LazyEitherT[F, L, ?]] {
+    new IsomorphismTraverse[
+      LazyEitherT.LeftProjectionT[F, L, ?],
+      LazyEitherT[F, L, ?]] {
       implicit def G = lazyEitherTTraverse[F, L]
 
       def iso = LazyEitherT.lazyEitherTLeftProjectionEIso2[F, L]
@@ -474,8 +482,9 @@ private trait LazyEitherTBindRec[F[_], E]
     LazyEitherT(
       B.tailrecM[A, LazyEither[E, B]](a =>
         F.map(f(a).run) {
-          _.fold(e => \/.right(LazyEither.lazyLeft(e)),
-                 _.map(b => LazyEither.lazyRight(b)))
+          _.fold(
+            e => \/.right(LazyEither.lazyLeft(e)),
+            _.map(b => LazyEither.lazyRight(b)))
       })(a)
     )
 }

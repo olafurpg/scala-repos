@@ -54,12 +54,14 @@ class ReceiverTrackerSuite extends TestSuiteBase {
           val activeReceiver = RateTestReceiver.getActive().get
           tracker.sendRateUpdate(inputDStream.id, newRateLimit)
           eventually(timeout(5 seconds)) {
-            assert(activeReceiver
-                     .getDefaultBlockGeneratorRateLimit() === newRateLimit,
-                   "default block generator did not receive rate update")
-            assert(activeReceiver
-                     .getCustomBlockGeneratorRateLimit() === newRateLimit,
-                   "other block generator did not receive rate update")
+            assert(
+              activeReceiver
+                .getDefaultBlockGeneratorRateLimit() === newRateLimit,
+              "default block generator did not receive rate update")
+            assert(
+              activeReceiver
+                .getCustomBlockGeneratorRateLimit() === newRateLimit,
+              "other block generator did not receive rate update")
           }
         } finally {
           tracker.stop(false)

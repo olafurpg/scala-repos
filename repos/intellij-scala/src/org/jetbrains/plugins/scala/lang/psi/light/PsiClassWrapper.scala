@@ -90,9 +90,10 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
         val res = new ArrayBuffer[PsiMethod]()
         TypeDefinitionMembers.SignatureNodes.forAllSignatureNodes(obj) {
           node =>
-            this.processPsiMethodsForNode(node,
-                                          isStatic = true,
-                                          isInterface = false)(res += _)
+            this.processPsiMethodsForNode(
+              node,
+              isStatic = true,
+              isInterface = false)(res += _)
         }
         res.toArray
 
@@ -265,9 +266,10 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
   override def getName: String = name
 
   override def copy: PsiElement = {
-    new PsiClassWrapper(definition.copy.asInstanceOf[ScTemplateDefinition],
-                        qualName,
-                        name)
+    new PsiClassWrapper(
+      definition.copy.asInstanceOf[ScTemplateDefinition],
+      qualName,
+      name)
   }
 
   override def processDeclarations(processor: PsiScopeProcessor,
@@ -280,14 +282,15 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
           methodProcessor.getLanguageLevel
         case _ => PsiUtil.getLanguageLevel(place)
       }
-      return PsiClassImplUtil.processDeclarationsInClass(this,
-                                                         processor,
-                                                         state,
-                                                         null,
-                                                         lastParent,
-                                                         place,
-                                                         languageLevel,
-                                                         false)
+      return PsiClassImplUtil.processDeclarationsInClass(
+        this,
+        processor,
+        state,
+        null,
+        lastParent,
+        place,
+        languageLevel,
+        false)
     }
     true
   }

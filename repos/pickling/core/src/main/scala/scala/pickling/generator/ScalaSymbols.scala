@@ -86,8 +86,9 @@ private[pickling] class IrScalaSymbols[U <: Universe with Singleton,
         // NOTE: primary ctor is always the first in the list
         case overloaded: TermSymbol =>
           Some(
-            new ScalaIrConstructor(overloaded.alternatives.head.asMethod,
-                                   this))
+            new ScalaIrConstructor(
+              overloaded.alternatives.head.asMethod,
+              this))
         case primaryCtor: MethodSymbol =>
           Some(new ScalaIrConstructor(primaryCtor, this))
         case NoSymbol => None

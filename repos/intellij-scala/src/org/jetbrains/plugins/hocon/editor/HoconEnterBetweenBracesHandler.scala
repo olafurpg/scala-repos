@@ -24,12 +24,13 @@ class HoconEnterBetweenBracesHandler extends EnterBetweenBracesHandler {
                                dataContext: DataContext,
                                originalHandler: EditorActionHandler): Result =
     if (file.getLanguage is HoconLanguage)
-      super.preprocessEnter(file,
-                            editor,
-                            caretOffsetRef,
-                            caretAdvance,
-                            dataContext,
-                            originalHandler)
+      super.preprocessEnter(
+        file,
+        editor,
+        caretOffsetRef,
+        caretAdvance,
+        dataContext,
+        originalHandler)
     else EnterHandlerDelegate.Result.Continue
 
   override def isBracePair(c1: Char, c2: Char): Boolean =

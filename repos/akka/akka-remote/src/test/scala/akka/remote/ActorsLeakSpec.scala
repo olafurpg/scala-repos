@@ -90,10 +90,11 @@ class ActorsLeakSpec
       for (_ ← 1 to 3) {
 
         val remoteSystem =
-          ActorSystem("remote",
-                      ConfigFactory
-                        .parseString("akka.remote.netty.tcp.port = 0")
-                        .withFallback(config))
+          ActorSystem(
+            "remote",
+            ConfigFactory
+              .parseString("akka.remote.netty.tcp.port = 0")
+              .withFallback(config))
 
         try {
           val probe = TestProbe()(remoteSystem)
@@ -111,10 +112,11 @@ class ActorsLeakSpec
       for (_ ← 1 to 3) {
 
         val remoteSystem =
-          ActorSystem("remote",
-                      ConfigFactory
-                        .parseString("akka.remote.netty.tcp.port = 0")
-                        .withFallback(config))
+          ActorSystem(
+            "remote",
+            ConfigFactory
+              .parseString("akka.remote.netty.tcp.port = 0")
+              .withFallback(config))
         val remoteAddress = RARP(remoteSystem).provider.getDefaultAddress
 
         try {
@@ -124,9 +126,10 @@ class ActorsLeakSpec
           probe.expectMsgType[ActorIdentity].ref.nonEmpty should be(true)
 
           // This will make sure that no SHUTDOWN message gets through
-          Await.ready(RARP(system).provider.transport
-                        .managementCommand(ForceDisassociate(remoteAddress)),
-                      3.seconds)
+          Await.ready(
+            RARP(system).provider.transport
+              .managementCommand(ForceDisassociate(remoteAddress)),
+            3.seconds)
         } finally {
           remoteSystem.terminate()
         }
@@ -140,10 +143,11 @@ class ActorsLeakSpec
 
       // Remote idle for too long case
       val remoteSystem =
-        ActorSystem("remote",
-                    ConfigFactory
-                      .parseString("akka.remote.netty.tcp.port = 0")
-                      .withFallback(config))
+        ActorSystem(
+          "remote",
+          ConfigFactory
+            .parseString("akka.remote.netty.tcp.port = 0")
+            .withFallback(config))
       val remoteAddress = RARP(remoteSystem).provider.getDefaultAddress
 
       remoteSystem.actorOf(Props[StoppableActor], "stoppable")
@@ -164,9 +168,10 @@ class ActorsLeakSpec
         // All system messages has been acked now on this side
 
         // This will make sure that no SHUTDOWN message gets through
-        Await.ready(RARP(system).provider.transport
-                      .managementCommand(ForceDisassociate(remoteAddress)),
-                    3.seconds)
+        Await.ready(
+          RARP(system).provider.transport
+            .managementCommand(ForceDisassociate(remoteAddress)),
+          3.seconds)
       } finally {
         remoteSystem.terminate()
       }

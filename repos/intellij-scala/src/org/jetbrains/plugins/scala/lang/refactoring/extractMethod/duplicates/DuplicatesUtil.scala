@@ -111,10 +111,11 @@ object DuplicatesUtil {
     for ((d, idx) <- duplicates.zipWithIndex) {
       if (!replaceAll) {
         previewDuplicate(project, editor, d) {
-          val dialog = showPromptDialog(settings.methodName,
-                                        idx + 1,
-                                        duplicates.size,
-                                        project)
+          val dialog = showPromptDialog(
+            settings.methodName,
+            idx + 1,
+            duplicates.size,
+            project)
           dialog.getExitCode match {
             case FindManager.PromptResult.ALL =>
               replaceDuplicate(project, settings, d)
@@ -142,10 +143,11 @@ object DuplicatesUtil {
                                idx: Int,
                                size: Int,
                                project: Project) = {
-    val title = RefactoringBundle.message("process.methods.duplicates.title",
-                                          Int.box(idx),
-                                          Int.box(size),
-                                          methodName)
+    val title = RefactoringBundle.message(
+      "process.methods.duplicates.title",
+      Int.box(idx),
+      Int.box(size),
+      methodName)
     val dialog: ReplacePromptDialog =
       new ReplacePromptDialog(false, title, project)
     dialog.show()
@@ -161,10 +163,11 @@ object DuplicatesUtil {
         "0.has.detected.1.code.fragments.in.this.file.that.can.be.replaced.with.a.call.to.extracted.method",
         ApplicationNamesInfo.getInstance.getProductName,
         Int.box(duplicates.size))
-      Messages.showYesNoDialog(project,
-                               message,
-                               "Process Duplicates",
-                               Messages.getQuestionIcon)
+      Messages.showYesNoDialog(
+        project,
+        message,
+        "Process Duplicates",
+        Messages.getQuestionIcon)
     }
 
     if (ApplicationManager.getApplication.isUnitTestMode) {
@@ -210,11 +213,12 @@ object DuplicatesUtil {
     val range = duplicate.textRange
     HighlightManager
       .getInstance(project)
-      .addRangeHighlight(editor,
-                         range.getStartOffset,
-                         range.getEndOffset,
-                         attributes,
-                         true,
-                         highlighters)
+      .addRangeHighlight(
+        editor,
+        range.getStartOffset,
+        range.getEndOffset,
+        attributes,
+        true,
+        highlighters)
   }
 }

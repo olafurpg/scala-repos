@@ -50,20 +50,22 @@ trait HandleCommentService {
           case (None, None) => None
           case (None, Some(action)) =>
             Some(
-              createComment(owner,
-                            name,
-                            userName,
-                            issue.issueId,
-                            action.capitalize,
-                            action))
+              createComment(
+                owner,
+                name,
+                userName,
+                issue.issueId,
+                action.capitalize,
+                action))
           case (Some(content), _) =>
             Some(
-              createComment(owner,
-                            name,
-                            userName,
-                            issue.issueId,
-                            content,
-                            action.map(_ + "_comment").getOrElse("comment")))
+              createComment(
+                owner,
+                name,
+                userName,
+                issue.issueId,
+                content,
+                action.map(_ + "_comment").getOrElse("comment")))
         }
 
         // record comment activity if comment is entered
@@ -77,21 +79,23 @@ trait HandleCommentService {
 
         // extract references and create refer comment
         content.map { content =>
-          createReferComment(owner,
-                             name,
-                             issue,
-                             content,
-                             context.loginAccount.get)
+          createReferComment(
+            owner,
+            name,
+            issue,
+            content,
+            context.loginAccount.get)
         }
 
         // call web hooks
         action match {
           case None =>
             commentId.map { commentIdSome =>
-              callIssueCommentWebHook(repository,
-                                      issue,
-                                      commentIdSome,
-                                      context.loginAccount.get)
+              callIssueCommentWebHook(
+                repository,
+                issue,
+                commentIdSome,
+                context.loginAccount.get)
             }
           case Some(act) =>
             val webHookAction = act match {
@@ -101,17 +105,19 @@ trait HandleCommentService {
               case _ => act
             }
             if (issue.isPullRequest) {
-              callPullRequestWebHook(webHookAction,
-                                     repository,
-                                     issue.issueId,
-                                     context.baseUrl,
-                                     context.loginAccount.get)
+              callPullRequestWebHook(
+                webHookAction,
+                repository,
+                issue.issueId,
+                context.baseUrl,
+                context.loginAccount.get)
             } else {
-              callIssuesWebHook(webHookAction,
-                                repository,
-                                issue,
-                                context.baseUrl,
-                                context.loginAccount.get)
+              callIssuesWebHook(
+                webHookAction,
+                repository,
+                issue,
+                context.baseUrl,
+                context.loginAccount.get)
             }
         }
 

@@ -21,13 +21,15 @@ private[akka] object ActorRefSourceActor {
   def props(bufferSize: Int,
             overflowStrategy: OverflowStrategy,
             settings: ActorMaterializerSettings) = {
-    require(overflowStrategy != OverflowStrategies.Backpressure,
-            "Backpressure overflowStrategy not supported")
+    require(
+      overflowStrategy != OverflowStrategies.Backpressure,
+      "Backpressure overflowStrategy not supported")
     val maxFixedBufferSize = settings.maxFixedBufferSize
     Props(
-      new ActorRefSourceActor(bufferSize,
-                              overflowStrategy,
-                              maxFixedBufferSize))
+      new ActorRefSourceActor(
+        bufferSize,
+        overflowStrategy,
+        maxFixedBufferSize))
   }
 }
 

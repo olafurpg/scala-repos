@@ -13,9 +13,10 @@ import play.core.test.FakeRequest
 
 object MessagesSpec extends Specification {
   val testMessages = Map(
-    "default" -> Map("title" -> "English Title",
-                     "foo" -> "English foo",
-                     "bar" -> "English pub"),
+    "default" -> Map(
+      "title" -> "English Title",
+      "foo" -> "English foo",
+      "bar" -> "English pub"),
     "fr" -> Map("title" -> "Titre francais", "foo" -> "foo francais"),
     "fr-CH" -> Map("title" -> "Titre suisse"))
   val api = new DefaultMessagesApi(

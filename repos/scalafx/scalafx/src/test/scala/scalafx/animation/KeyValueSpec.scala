@@ -165,18 +165,20 @@ class KeyValueSpec
   it should "support interpolators" in {
     val property = new DoubleProperty(null, name)
     val endValue = 50d
-    evaluateFromSfx(property,
-                    endValue,
-                    KeyValue(property, endValue, jfxa.Interpolator.EASE_BOTH),
-                    true)
+    evaluateFromSfx(
+      property,
+      endValue,
+      KeyValue(property, endValue, jfxa.Interpolator.EASE_BOTH),
+      true)
   }
 
   it should "support interpolators with the ->/tween operator" in {
     val property = new DoubleProperty(null, name)
     val endValue = 50
-    evaluateFromSfx(property,
-                    endValue,
-                    (property -> endValue tween Interpolator.EASE_BOTH),
-                    true)
+    evaluateFromSfx(
+      property,
+      endValue,
+      (property -> endValue tween Interpolator.EASE_BOTH),
+      true)
   }
 }

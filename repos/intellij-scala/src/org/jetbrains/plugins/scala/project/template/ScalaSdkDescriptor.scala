@@ -70,8 +70,9 @@ trait SdkDescriptor {
           .foreach(editor.addRoot(_, JavadocOrderRootType.getInstance))
 
         if (sourceFiles.isEmpty && docFiles.isEmpty) {
-          editor.addRoot(ScalaSdk.documentationUrlFor(version),
-                         JavadocOrderRootType.getInstance)
+          editor.addRoot(
+            ScalaSdk.documentationUrlFor(version),
+            JavadocOrderRootType.getInstance)
         }
       }
     }
@@ -89,11 +90,12 @@ object ScalaSdkDescriptor extends SdkDescriptorCompanion {
                                              libraryFiles: Seq[File],
                                              sourceFiles: Seq[File],
                                              docFiles: Seq[File]) = {
-    ScalaSdkDescriptor(version,
-                       compilerFiles,
-                       libraryFiles,
-                       sourceFiles,
-                       docFiles)
+    ScalaSdkDescriptor(
+      version,
+      compilerFiles,
+      libraryFiles,
+      sourceFiles,
+      docFiles)
   }
 }
 
@@ -147,11 +149,12 @@ trait SdkDescriptorCompanion {
       val libraryVersion =
         binaryComponents.find(_.artifact == ScalaLibrary).flatMap(_.version)
 
-      val descriptor = createSdkDescriptor(libraryVersion,
-                                           compilerBinaries.map(_.file),
-                                           libraryBinaries.map(_.file),
-                                           librarySources.map(_.file),
-                                           libraryDocs.map(_.file))
+      val descriptor = createSdkDescriptor(
+        libraryVersion,
+        compilerBinaries.map(_.file),
+        libraryBinaries.map(_.file),
+        librarySources.map(_.file),
+        libraryDocs.map(_.file))
 
       Right(descriptor)
     } else {

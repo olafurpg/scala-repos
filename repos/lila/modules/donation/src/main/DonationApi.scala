@@ -22,10 +22,11 @@ final class DonationApi(coll: Coll,
   // in $ cents
   private def donatedByUser(userId: String): Fu[Int] =
     coll
-      .aggregate(Match(decentAmount ++ BSONDocument("userId" -> userId)),
-                 List(
-                   Group(BSONNull)("net" -> SumField("net"))
-                 ))
+      .aggregate(
+        Match(decentAmount ++ BSONDocument("userId" -> userId)),
+        List(
+          Group(BSONNull)("net" -> SumField("net"))
+        ))
       .map {
         ~_.documents.headOption.flatMap { _.getAs[Int]("net") }
       }
@@ -44,9 +45,10 @@ final class DonationApi(coll: Coll,
     coll
       .aggregate(
         Match(BSONDocument("userId" -> BSONDocument("$exists" -> true))),
-        List(GroupField("userId")("total" -> SumField("net")),
-             Sort(Descending("total")),
-             Limit(nb)))
+        List(
+          GroupField("userId")("total" -> SumField("net")),
+          Sort(Descending("total")),
+          Limit(nb)))
       .map {
         _.documents.flatMap { _.getAs[String]("_id") }
       }
@@ -59,13 +61,14 @@ final class DonationApi(coll: Coll,
     coll insert donation recover lila.db.recoverDuplicateKey(e =>
       println(e.getMessage)) void
   } >> donation.userId.??(donorCache.remove) >>- progress.foreach { prog =>
-    bus.publish(lila.hub.actorApi.DonationEvent(
-                  userId = donation.userId,
-                  gross = donation.gross,
-                  net = donation.net,
-                  message = donation.message.trim.some.filter(_.nonEmpty),
-                  progress = prog.percent),
-                'donation)
+    bus.publish(
+      lila.hub.actorApi.DonationEvent(
+        userId = donation.userId,
+        gross = donation.gross,
+        net = donation.net,
+        message = donation.message.trim.some.filter(_.nonEmpty),
+        progress = prog.percent),
+      'donation)
   }
 
   def progress: Fu[Progress] = {

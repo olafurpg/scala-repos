@@ -514,8 +514,9 @@ class BigDecimalArithmeticTest {
     val bScale = 10
     val aNumber = new BigDecimal(new BigInteger(a), aScale)
     val bNumber = new BigDecimal(new BigInteger(b), bScale)
-    expectThrows(classOf[IllegalArgumentException],
-                 aNumber.divide(bNumber, 100))
+    expectThrows(
+      classOf[IllegalArgumentException],
+      aNumber.divide(bNumber, 100))
   }
 
   @Test def testDivideExceptionRM(): Unit = {
@@ -525,8 +526,9 @@ class BigDecimalArithmeticTest {
     val bScale = 10
     val aNumber = new BigDecimal(new BigInteger(a), aScale)
     val bNumber = new BigDecimal(new BigInteger(b), bScale)
-    expectThrows(classOf[ArithmeticException],
-                 aNumber.divide(bNumber, BigDecimal.ROUND_UNNECESSARY))
+    expectThrows(
+      classOf[ArithmeticException],
+      aNumber.divide(bNumber, BigDecimal.ROUND_UNNECESSARY))
   }
 
   @Test def testDivideExpEqualsZero(): Unit = {
@@ -574,8 +576,9 @@ class BigDecimalArithmeticTest {
   @Test def testDivideLargeScale(): Unit = {
     val arg1 = new BigDecimal("320.0E+2147483647")
     val arg2 = new BigDecimal("6E-2147483647")
-    expectThrows(classOf[ArithmeticException],
-                 arg1.divide(arg2, Int.MaxValue, RoundingMode.CEILING))
+    expectThrows(
+      classOf[ArithmeticException],
+      arg1.divide(arg2, Int.MaxValue, RoundingMode.CEILING))
   }
 
   @Test def testDivideRemainderIsZero(): Unit = {
@@ -1002,12 +1005,15 @@ class BigDecimalArithmeticTest {
     assertTrue(BigDecimal.ZERO == quotient)
     quotient = BigDecimal.ZERO.negate().divide(BigDecimal.ONE)
     assertTrue(BigDecimal.ZERO == quotient)
-    expectThrows(classOf[ArithmeticException],
-                 BigDecimal.ZERO.divide(BigDecimal.ZERO))
-    expectThrows(classOf[ArithmeticException],
-                 BigDecimal.ONE.divide(BigDecimal.ZERO))
-    expectThrows(classOf[ArithmeticException],
-                 BigDecimal.ONE.divideToIntegralValue(BigDecimal.ZERO))
+    expectThrows(
+      classOf[ArithmeticException],
+      BigDecimal.ZERO.divide(BigDecimal.ZERO))
+    expectThrows(
+      classOf[ArithmeticException],
+      BigDecimal.ONE.divide(BigDecimal.ZERO))
+    expectThrows(
+      classOf[ArithmeticException],
+      BigDecimal.ONE.divideToIntegralValue(BigDecimal.ZERO))
   }
 
   @Test

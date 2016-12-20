@@ -353,52 +353,60 @@ class SparkILoop(
 
   /** Standard commands */
   private lazy val standardCommands = List(
-    cmd("cp",
-        "<path>",
-        "add a jar or directory to the classpath",
-        addClasspath),
-    cmd("help",
-        "[command]",
-        "print this summary or command-specific help",
-        helpCommand),
+    cmd(
+      "cp",
+      "<path>",
+      "add a jar or directory to the classpath",
+      addClasspath),
+    cmd(
+      "help",
+      "[command]",
+      "print this summary or command-specific help",
+      helpCommand),
     historyCommand,
     cmd("h?", "<string>", "search the history", searchHistory),
-    cmd("imports",
-        "[name name ...]",
-        "show import history, identifying sources of names",
-        importsCommand),
+    cmd(
+      "imports",
+      "[name name ...]",
+      "show import history, identifying sources of names",
+      importsCommand),
     cmd("implicits", "[-v]", "show the implicits in scope", implicitsCommand),
-    cmd("javap",
-        "<path|class>",
-        "disassemble a file or class name",
-        javapCommand),
+    cmd(
+      "javap",
+      "<path|class>",
+      "disassemble a file or class name",
+      javapCommand),
     cmd("load", "<path>", "load and interpret a Scala file", loadCommand),
-    nullary("paste",
-            "enter paste mode: all input up to ctrl-D compiled together",
-            pasteCommand),
+    nullary(
+      "paste",
+      "enter paste mode: all input up to ctrl-D compiled together",
+      pasteCommand),
 //    nullary("power", "enable power user mode", powerCmd),
     nullary("quit", "exit the repl", () => Result(false, None)),
-    nullary("replay",
-            "reset execution and replay all previous commands",
-            replay),
+    nullary(
+      "replay",
+      "reset execution and replay all previous commands",
+      replay),
     nullary(
       "reset",
       "reset the repl to its initial state, forgetting all session entries",
       resetCommand),
     shCommand,
-    nullary("silent",
-            "disable/enable automatic printing of results",
-            verbosity),
+    nullary(
+      "silent",
+      "disable/enable automatic printing of results",
+      verbosity),
     nullary(
       "fallback",
       """
                            |disable/enable advanced repl changes, these fix some issues but may introduce others.
                            |This mode will be removed once these fixes stablize""".stripMargin,
       toggleFallbackMode),
-    cmd("type",
-        "[-v] <expr>",
-        "display the type of an expression without evaluating it",
-        typeCommand),
+    cmd(
+      "type",
+      "[-v] <expr>",
+      "display the type of an expression without evaluating it",
+      typeCommand),
     nullary(
       "warnings",
       "show the suppressed warnings from the most recent line which had any",
@@ -544,8 +552,9 @@ class SparkILoop(
   }
 
   private def newJavap() =
-    new JavapClass(addToolsJarToLoader(),
-                   new SparkIMain.ReplStrippingWriter(intp)) {
+    new JavapClass(
+      addToolsJarToLoader(),
+      new SparkIMain.ReplStrippingWriter(intp)) {
       override def tryClass(path: String): Array[Byte] = {
         val hd :: rest = path split '.' toList;
         // If there are dots in the name, the first segment is the
@@ -1039,8 +1048,9 @@ class SparkILoop(
     // we can get at it in generated code.
     addThunk(
       intp.quietBind(
-        NamedParam[SparkIMain]("$intp", intp)(tagOfSparkIMain,
-                                              classTag[SparkIMain])))
+        NamedParam[SparkIMain]("$intp", intp)(
+          tagOfSparkIMain,
+          classTag[SparkIMain])))
     addThunk({
       import scala.tools.nsc.io._
       import Properties.userHome

@@ -115,9 +115,10 @@ trait ShardQueryExecutorPlatform[M[+ _]]
     implicit def LineDecompose: Decomposer[instructions.Line] =
       new Decomposer[instructions.Line] {
         def decompose(line: instructions.Line): JValue = {
-          JObject(JField("lineNum", JNum(line.line)),
-                  JField("colNum", JNum(line.col)),
-                  JField("detail", JString(line.text)))
+          JObject(
+            JField("lineNum", JNum(line.line)),
+            JField("colNum", JNum(line.col)),
+            JField("detail", JString(line.text)))
         }
       }
 
@@ -155,10 +156,11 @@ trait ShardQueryExecutorPlatform[M[+ _]]
 
                       if (queryLogger.isDebugEnabled) {
                         eval(dag, evaluationContext, true) map {
-                          _.logged(queryLogger,
-                                   "[QID:" + qid + "]",
-                                   "begin result stream",
-                                   "end result stream") { slice =>
+                          _.logged(
+                            queryLogger,
+                            "[QID:" + qid + "]",
+                            "begin result stream",
+                            "end result stream") { slice =>
                             "size: " + slice.size
                           }
                         }
@@ -244,8 +246,9 @@ trait ShardQueryExecutorPlatform[M[+ _]]
         val constr =
           if (isWarning(err)) Fault.Warning.apply _ else Fault.Error.apply _
 
-        constr(Some(FaultPosition(loc.lineNum, loc.colNum, loc.line)),
-               tp.toString)
+        constr(
+          Some(FaultPosition(loc.lineNum, loc.colNum, loc.line)),
+          tp.toString)
       }
 
       try {

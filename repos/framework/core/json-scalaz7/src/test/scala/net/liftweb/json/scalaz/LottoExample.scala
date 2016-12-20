@@ -40,14 +40,16 @@ object LottoExample extends Specification {
         winningNumbers <- field[List[Int]]("winning-numbers")(jValue).disjunction
         _ <- len(6)(winningNumbers).disjunction
       } yield winningNumbers).validation
-    Lotto.applyJSON(field[Long]("id"),
-                    winningNumbersResult,
-                    field[List[Winner]]("winners"),
-                    field[Option[String]]("draw-date"))
+    Lotto.applyJSON(
+      field[Long]("id"),
+      winningNumbersResult,
+      field[List[Winner]]("winners"),
+      field[Option[String]]("draw-date"))
   }
 
-  val winners = List(Winner(23, List(2, 45, 34, 23, 3, 5)),
-                     Winner(54, List(52, 3, 12, 11, 18, 22)))
+  val winners = List(
+    Winner(23, List(2, 45, 34, 23, 3, 5)),
+    Winner(54, List(52, 3, 12, 11, 18, 22)))
   val lotto = Lotto(5, List(2, 45, 34, 23, 7, 5), winners, None)
 
   "Parse Lotto" in {

@@ -26,9 +26,10 @@ object AkkaHttpServerSpec extends PlaySpecification with WsTestClient {
       check: WSResponse => T)(implicit awaitTimeout: Timeout): T = {
     val app = GuiceApplicationBuilder().routes(routes).build()
     running(
-      TestServer(testServerPort,
-                 app,
-                 serverProvider = Some(AkkaHttpServer.provider))) {
+      TestServer(
+        testServerPort,
+        app,
+        serverProvider = Some(AkkaHttpServer.provider))) {
       val plainRequest = wsUrl(path)(testServerPort)
       val responseFuture = exec(plainRequest)
       val response = await(responseFuture)(awaitTimeout)
@@ -215,9 +216,10 @@ object AkkaHttpServerSpec extends PlaySpecification with WsTestClient {
             }
             .build()
           val server =
-            TestServer(testServerPort,
-                       app,
-                       serverProvider = Some(AkkaHttpServer.provider))
+            TestServer(
+              testServerPort,
+              app,
+              serverProvider = Some(AkkaHttpServer.provider))
           server.start()
           try {
             val response = await(wsUrl("/")(testServerPort).get())

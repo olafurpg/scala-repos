@@ -113,8 +113,9 @@ class ScalaDocUnknownParameterInspection extends LocalInspectionTool {
                 true,
                 ProblemHighlightType.GENERIC_ERROR,
                 isOnTheFly,
-                new ScalaDocDeleteDuplicatingParamQuickFix(duplicatingParam,
-                                                           true)))
+                new ScalaDocDeleteDuplicatingParamQuickFix(
+                  duplicatingParam,
+                  true)))
           }
         }
 
@@ -155,8 +156,9 @@ class ScalaDocUnknownParameterInspection extends LocalInspectionTool {
             }
           case _ => //we can't have params/tparams here
             for (tag <- s.findTagsByName(
-                   Set(MyScaladocParsing.PARAM_TAG,
-                       MyScaladocParsing.TYPE_PARAM_TAG).contains _)
+                   Set(
+                     MyScaladocParsing.PARAM_TAG,
+                     MyScaladocParsing.TYPE_PARAM_TAG).contains _)
                  if tag.isInstanceOf[ScDocTag]) {
               holder.registerProblem(
                 holder.getManager.createProblemDescriptor(

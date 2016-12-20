@@ -132,14 +132,15 @@ class RationalAddSubtractBenchmark {
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
 class RationalCompareBenchmark {
-  val pairs = Map("li_li" → ((Rational(12345), Rational(67890))),
-                  "lf_lf" → ((Rational(12345, 67891), Rational(67890, 12347))),
-                  "lf_lf_intermediateBig" →
-                    ((Rational(Long.MaxValue, Int.MaxValue - 1),
-                      Rational(Long.MaxValue, Int.MaxValue - 3))),
-                  "bf_bf" →
-                    ((Rational(Long.MaxValue) + Rational(1, 3),
-                      Rational(Long.MaxValue) + Rational(1, 5))))
+  val pairs = Map(
+    "li_li" → ((Rational(12345), Rational(67890))),
+    "lf_lf" → ((Rational(12345, 67891), Rational(67890, 12347))),
+    "lf_lf_intermediateBig" →
+      ((Rational(Long.MaxValue, Int.MaxValue - 1),
+        Rational(Long.MaxValue, Int.MaxValue - 3))),
+    "bf_bf" →
+      ((Rational(Long.MaxValue) + Rational(1, 3),
+        Rational(Long.MaxValue) + Rational(1, 5))))
   check(pairs)
 
   @Param(Array("li_li", "lf_lf", "lf_lf_intermediateBig", "bf_bf"))

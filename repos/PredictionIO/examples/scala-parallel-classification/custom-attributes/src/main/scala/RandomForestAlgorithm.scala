@@ -26,24 +26,26 @@ class PIORandomForestModel(
 // extends P2LAlgorithm because the MLlib's RandomForestModel doesn't
 // contain RDD.
 class RandomForestAlgorithm(val ap: RandomForestAlgorithmParams) // CHANGED
-    extends P2LAlgorithm[PreparedData,
-                         PIORandomForestModel, // CHANGED
-                         Query,
-                         PredictedResult] {
+    extends P2LAlgorithm[
+      PreparedData,
+      PIORandomForestModel, // CHANGED
+      Query,
+      PredictedResult] {
 
   def train(data: PreparedData): PIORandomForestModel = {
     // CHANGED
     // CHANGED
     // Empty categoricalFeaturesInfo indicates all features are continuous.
     val categoricalFeaturesInfo = Map[Int, Int]()
-    val m = RandomForest.trainClassifier(data.labeledPoints,
-                                         ap.numClasses,
-                                         categoricalFeaturesInfo,
-                                         ap.numTrees,
-                                         ap.featureSubsetStrategy,
-                                         ap.impurity,
-                                         ap.maxDepth,
-                                         ap.maxBins)
+    val m = RandomForest.trainClassifier(
+      data.labeledPoints,
+      ap.numClasses,
+      categoricalFeaturesInfo,
+      ap.numTrees,
+      ap.featureSubsetStrategy,
+      ap.impurity,
+      ap.maxDepth,
+      ap.maxBins)
     new PIORandomForestModel(
       gendersMap = data.gendersMap,
       educationMap = data.educationMap,
@@ -58,9 +60,10 @@ class RandomForestAlgorithm(val ap: RandomForestAlgorithmParams) // CHANGED
     val randomForestModel = model.randomForestModel
     val label = randomForestModel.predict(
       Vectors.dense(
-        Array(gendersMap(query.gender),
-              query.age.toDouble,
-              educationMap(query.education))))
+        Array(
+          gendersMap(query.gender),
+          query.age.toDouble,
+          educationMap(query.education))))
     new PredictedResult(label)
   }
 }

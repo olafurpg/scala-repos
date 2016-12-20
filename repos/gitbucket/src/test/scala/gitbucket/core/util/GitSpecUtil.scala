@@ -51,9 +51,10 @@ object GitSpecUtil {
       JGitUtil.processTree(git, headId) { (path, tree) =>
         if (name != path) {
           builder.add(
-            JGitUtil.createDirCacheEntry(path,
-                                         tree.getEntryFileMode,
-                                         tree.getEntryObjectId))
+            JGitUtil.createDirCacheEntry(
+              path,
+              tree.getEntryFileMode,
+              tree.getEntryObjectId))
         }
       }
     }
@@ -63,14 +64,15 @@ object GitSpecUtil {
         FileMode.REGULAR_FILE,
         inserter.insert(Constants.OBJ_BLOB, content.getBytes("UTF-8"))))
     builder.finish()
-    JGitUtil.createNewCommit(git,
-                             inserter,
-                             headId,
-                             builder.getDirCache.writeTree(inserter),
-                             branch,
-                             autorName,
-                             autorEmail,
-                             message)
+    JGitUtil.createNewCommit(
+      git,
+      inserter,
+      headId,
+      builder.getDirCache.writeTree(inserter),
+      branch,
+      autorName,
+      autorEmail,
+      message)
     inserter.flush()
     inserter.close()
   }

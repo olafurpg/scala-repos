@@ -185,9 +185,10 @@ trait BaseScaldingShell extends MainGenericRunner {
         val entry: JarEntry = new JarEntry(dirPath)
         jarStream.putNextEntry(entry)
         jarStream.closeEntry()
-        addVirtualDirectoryToJar(file.asInstanceOf[VirtualDirectory],
-                                 dirPath,
-                                 jarStream)
+        addVirtualDirectoryToJar(
+          file.asInstanceOf[VirtualDirectory],
+          dirPath,
+          jarStream)
       } else if (file.hasExtension("class")) {
         // Add class files as an entry in the jar file and write the class to the jar.
         val entry: JarEntry = new JarEntry(entryPath + file.name)

@@ -14,12 +14,13 @@ trait EnsimeTestData {
     }
   }
 
-  val typeInfo = new BasicTypeInfo("type1",
-                                   DeclaredAs.Method,
-                                   "FOO.type1",
-                                   List(),
-                                   List(),
-                                   None)
+  val typeInfo = new BasicTypeInfo(
+    "type1",
+    DeclaredAs.Method,
+    "FOO.type1",
+    List(),
+    List(),
+    None)
 
   val interfaceInfo = new InterfaceInfo(typeInfo, Some("DEF"))
   val typeInspectInfo = new TypeInspectInfo(typeInfo, List(interfaceInfo))
@@ -52,9 +53,10 @@ trait EnsimeTestData {
 
   val completionInfo = new CompletionInfo(
     "name",
-    new CompletionSignature(List(List(("abc", "def"), ("hij", "lmn"))),
-                            "ABC",
-                            false),
+    new CompletionSignature(
+      List(List(("abc", "def"), ("hij", "lmn"))),
+      "ABC",
+      false),
     false,
     90,
     Some("BAZ"))
@@ -76,9 +78,10 @@ trait EnsimeTestData {
   val file4 = canon("/foo/def")
   val file5 = canon("/foo/hij")
 
-  val refactorEffect = new RefactorEffect(9,
-                                          RefactorType.AddImport,
-                                          List(TextEdit(file3, 5, 7, "aaa")))
+  val refactorEffect = new RefactorEffect(
+    9,
+    RefactorType.AddImport,
+    List(TextEdit(file3, 5, 7, "aaa")))
   val refactorResult =
     new RefactorResult(7, RefactorType.AddImport, List(file3, file1))
   val refactorDiffEffect =
@@ -114,15 +117,17 @@ trait EnsimeTestData {
 
   val abd = canon("/abd")
 
-  val methodSearchRes = MethodSearchResult("abc",
-                                           "a",
-                                           DeclaredAs.Method,
-                                           Some(LineSourcePosition(abd, 10)),
-                                           "ownerStr")
-  val typeSearchRes = TypeSearchResult("abc",
-                                       "a",
-                                       DeclaredAs.Trait,
-                                       Some(LineSourcePosition(abd, 10)))
+  val methodSearchRes = MethodSearchResult(
+    "abc",
+    "a",
+    DeclaredAs.Method,
+    Some(LineSourcePosition(abd, 10)),
+    "ownerStr")
+  val typeSearchRes = TypeSearchResult(
+    "abc",
+    "a",
+    DeclaredAs.Trait,
+    Some(LineSourcePosition(abd, 10)))
 
   val importSuggestions = new ImportSuggestions(
     List(List(methodSearchRes, typeSearchRes)))
@@ -151,10 +156,11 @@ trait EnsimeTestData {
   val debugClassField =
     DebugClassField(19, "nameStr", "typeNameStr", "summaryStr")
 
-  val debugStringValue = DebugStringInstance("summaryStr",
-                                             List(debugClassField),
-                                             "typeNameStr",
-                                             DebugObjectId(6L))
+  val debugStringValue = DebugStringInstance(
+    "summaryStr",
+    List(debugClassField),
+    "typeNameStr",
+    DebugObjectId(6L))
 
   val note1 = new Note("file1", "note1", NoteError, 23, 33, 19, 8)
   val note2 = new Note("file1", "note2", NoteWarn, 23, 33, 19, 8)

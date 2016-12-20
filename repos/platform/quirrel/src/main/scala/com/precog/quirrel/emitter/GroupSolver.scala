@@ -209,10 +209,11 @@ trait GroupSolver
 
               if (commonalityM.isDefined)
                 (Some(
-                   Group(Some(where),
-                         resolveExpr(sigma, where.left),
-                         group,
-                         dtrace)),
+                   Group(
+                     Some(where),
+                     resolveExpr(sigma, where.left),
+                     group,
+                     dtrace)),
                  errors)
               else (None, errors) // TODO emit a new error
             } getOrElse (None, errors)
@@ -366,11 +367,12 @@ trait GroupSolver
     case expr @ Dispatch(_, id, actuals) => {
       expr.binding match {
         case LetBinding(let) =>
-          solveGroupCondition(b,
-                              let.left,
-                              free,
-                              enterLet(sigma, let, actuals),
-                              expr :: dtrace)
+          solveGroupCondition(
+            b,
+            let.left,
+            free,
+            enterLet(sigma, let, actuals),
+            expr :: dtrace)
 
         case FormalBinding(let) => {
           val actualM = sigma get ((id, let))
@@ -463,9 +465,10 @@ trait GroupSolver
 
       case Cond(_, pred, left, right) =>
         isTranspecable(pred, from, sigma) &&
-          isTranspecable(left, from, sigma) && isTranspecable(right,
-                                                              from,
-                                                              sigma)
+          isTranspecable(left, from, sigma) && isTranspecable(
+          right,
+          from,
+          sigma)
 
       case to @ Dispatch(_, id, actuals) => {
         to.binding match {

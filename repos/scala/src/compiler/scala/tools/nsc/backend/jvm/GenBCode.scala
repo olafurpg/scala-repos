@@ -228,14 +228,17 @@ abstract class GenBCode extends BCodeSyncAndTry {
           q2.asScala foreach {
             case Item2(_, mirror, plain, bean, _) =>
               if (mirror != null)
-                byteCodeRepository.add(mirror,
-                                       ByteCodeRepository.CompilationUnit)
+                byteCodeRepository.add(
+                  mirror,
+                  ByteCodeRepository.CompilationUnit)
               if (plain != null)
-                byteCodeRepository.add(plain,
-                                       ByteCodeRepository.CompilationUnit)
+                byteCodeRepository.add(
+                  plain,
+                  ByteCodeRepository.CompilationUnit)
               if (bean != null)
-                byteCodeRepository.add(bean,
-                                       ByteCodeRepository.CompilationUnit)
+                byteCodeRepository.add(
+                  bean,
+                  ByteCodeRepository.CompilationUnit)
           }
         if (settings.YoptBuildCallGraph)
           q2.asScala foreach { item =>
@@ -255,8 +258,9 @@ abstract class GenBCode extends BCodeSyncAndTry {
       def setInnerClasses(classNode: ClassNode): Unit =
         if (classNode != null) {
           classNode.innerClasses.clear()
-          addInnerClasses(classNode,
-                          bTypes.backendUtils.collectNestedClasses(classNode))
+          addInnerClasses(
+            classNode,
+            bTypes.backendUtils.collectNestedClasses(classNode))
         }
 
       def run() {

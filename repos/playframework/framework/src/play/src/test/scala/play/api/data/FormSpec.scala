@@ -237,15 +237,17 @@ object FormSpec extends Specification {
       .get must equalTo(("Kiki", Seq("kiki@gmail.com")))
     ScalaForms.repeatedForm
       .bindFromRequest(
-        Map("name" -> Seq("Kiki"),
-            "emails[0]" -> Seq("kiki@gmail.com"),
-            "emails[1]" -> Seq("kiki@zen.com")))
+        Map(
+          "name" -> Seq("Kiki"),
+          "emails[0]" -> Seq("kiki@gmail.com"),
+          "emails[1]" -> Seq("kiki@zen.com")))
       .get must equalTo(("Kiki", Seq("kiki@gmail.com", "kiki@zen.com")))
     ScalaForms.repeatedForm
       .bindFromRequest(
-        Map("name" -> Seq("Kiki"),
-            "emails[0]" -> Seq(),
-            "emails[1]" -> Seq("kiki@zen.com")))
+        Map(
+          "name" -> Seq("Kiki"),
+          "emails[0]" -> Seq(),
+          "emails[1]" -> Seq("kiki@zen.com")))
       .hasErrors must equalTo(true)
     ScalaForms.repeatedForm
       .bindFromRequest(
@@ -253,8 +255,9 @@ object FormSpec extends Specification {
       .get must equalTo(("Kiki", Seq("kiki@gmail.com")))
     ScalaForms.repeatedForm
       .bindFromRequest(
-        Map("name" -> Seq("Kiki"),
-            "emails[]" -> Seq("kiki@gmail.com", "kiki@zen.com")))
+        Map(
+          "name" -> Seq("Kiki"),
+          "emails[]" -> Seq("kiki@gmail.com", "kiki@zen.com")))
       .get must equalTo(("Kiki", Seq("kiki@gmail.com", "kiki@zen.com")))
   }
 
@@ -268,15 +271,17 @@ object FormSpec extends Specification {
       .get must equalTo(("Kiki", Set("kiki@gmail.com")))
     ScalaForms.repeatedFormWithSet
       .bindFromRequest(
-        Map("name" -> Seq("Kiki"),
-            "emails[0]" -> Seq("kiki@gmail.com"),
-            "emails[1]" -> Seq("kiki@zen.com")))
+        Map(
+          "name" -> Seq("Kiki"),
+          "emails[0]" -> Seq("kiki@gmail.com"),
+          "emails[1]" -> Seq("kiki@zen.com")))
       .get must equalTo(("Kiki", Set("kiki@gmail.com", "kiki@zen.com")))
     ScalaForms.repeatedFormWithSet
       .bindFromRequest(
-        Map("name" -> Seq("Kiki"),
-            "emails[0]" -> Seq(),
-            "emails[1]" -> Seq("kiki@zen.com")))
+        Map(
+          "name" -> Seq("Kiki"),
+          "emails[0]" -> Seq(),
+          "emails[1]" -> Seq("kiki@zen.com")))
       .hasErrors must equalTo(true)
     ScalaForms.repeatedFormWithSet
       .bindFromRequest(
@@ -284,13 +289,15 @@ object FormSpec extends Specification {
       .get must equalTo(("Kiki", Set("kiki@gmail.com")))
     ScalaForms.repeatedFormWithSet
       .bindFromRequest(
-        Map("name" -> Seq("Kiki"),
-            "emails[]" -> Seq("kiki@gmail.com", "kiki@zen.com")))
+        Map(
+          "name" -> Seq("Kiki"),
+          "emails[]" -> Seq("kiki@gmail.com", "kiki@zen.com")))
       .get must equalTo(("Kiki", Set("kiki@gmail.com", "kiki@zen.com")))
     ScalaForms.repeatedFormWithSet
       .bindFromRequest(
-        Map("name" -> Seq("Kiki"),
-            "emails[]" -> Seq("kiki@gmail.com", "kiki@gmail.com")))
+        Map(
+          "name" -> Seq("Kiki"),
+          "emails[]" -> Seq("kiki@gmail.com", "kiki@gmail.com")))
       .get must equalTo(("Kiki", Set("kiki@gmail.com")))
   }
 
@@ -364,16 +371,18 @@ object FormSpec extends Specification {
 
   "correctly lookup error messages when using errorsAsJson" in {
     val messagesApi =
-      new DefaultMessagesApi(Environment.simple(),
-                             Configuration.reference,
-                             new DefaultLangs(Configuration.reference))
+      new DefaultMessagesApi(
+        Environment.simple(),
+        Configuration.reference,
+        new DefaultLangs(Configuration.reference))
     implicit val messages = messagesApi.preferred(Seq.empty)
 
     val form =
-      Form(single("foo" -> Forms.text),
-           Map.empty,
-           Seq(FormError("foo", "error.custom", Seq("error.customarg"))),
-           None)
+      Form(
+        single("foo" -> Forms.text),
+        Map.empty,
+        Seq(FormError("foo", "error.custom", Seq("error.customarg"))),
+        None)
     (form.errorsAsJson \ "foo")(0).asOpt[String] must beSome(
       "This is a custom error")
   }
@@ -445,8 +454,9 @@ object ScalaForms {
 
   val form = Form(
     "foo" -> Forms.text
-      .verifying("first.digit",
-                 s => (s.headOption map { _ == '3' }) getOrElse false)
+      .verifying(
+        "first.digit",
+        s => (s.headOption map { _ == '3' }) getOrElse false)
       .transform[Int](Integer.parseInt _, _.toString)
       .verifying("number.42", _ < 42)
   )

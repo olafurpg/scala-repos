@@ -32,8 +32,9 @@ private[streaming] case class ReceivedBlockInfo(
     blockStoreResult: ReceivedBlockStoreResult
 ) {
 
-  require(numRecords.isEmpty || numRecords.get >= 0,
-          "numRecords must not be negative")
+  require(
+    numRecords.isEmpty || numRecords.get >= 0,
+    "numRecords must not be negative")
 
   @volatile private var _isBlockIdValid = true
 

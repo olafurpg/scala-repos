@@ -86,16 +86,18 @@ private[spark] class MetricsSystem private (val instance: String,
     * Get any UI handlers used by this metrics system; can only be called after start().
     */
   def getServletHandlers: Array[ServletContextHandler] = {
-    require(running,
-            "Can only call getServletHandlers on a running MetricsSystem")
+    require(
+      running,
+      "Can only call getServletHandlers on a running MetricsSystem")
     metricsServlet.map(_.getHandlers(conf)).getOrElse(Array())
   }
 
   metricsConfig.initialize()
 
   def start() {
-    require(!running,
-            "Attempting to start a MetricsSystem that is already running")
+    require(
+      !running,
+      "Attempting to start a MetricsSystem that is already running")
     running = true
     registerSources()
     registerSinks()
@@ -198,9 +200,10 @@ private[spark] class MetricsSystem private (val instance: String,
         try {
           val sink = Utils
             .classForName(classPath)
-            .getConstructor(classOf[Properties],
-                            classOf[MetricRegistry],
-                            classOf[SecurityManager])
+            .getConstructor(
+              classOf[Properties],
+              classOf[MetricRegistry],
+              classOf[SecurityManager])
             .newInstance(kv._2, registry, securityMgr)
           if (kv._1 == "servlet") {
             metricsServlet = Some(sink.asInstanceOf[MetricsServlet])

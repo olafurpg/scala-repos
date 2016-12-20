@@ -41,9 +41,9 @@ class ConcurrentActivationTest
         // future to all the futures of activation and deactivation
         val futureRegistrarLists = promiseRegistrarLists.future
 
-        val ref = system.actorOf(Props(classOf[ConsumerBroadcast],
-                                       promiseRegistrarLists),
-                                 name = "broadcaster")
+        val ref = system.actorOf(
+          Props(classOf[ConsumerBroadcast], promiseRegistrarLists),
+          name = "broadcaster")
         // create the registrars
         ref ! CreateRegistrars(number)
         // send a broadcast to all registrars, so that number * number messages are sent
@@ -112,12 +112,14 @@ class ConsumerBroadcast(
 
         allActivationFutures = allActivationFutures :+ activationListFuture
         allDeactivationFutures = allDeactivationFutures :+ deactivationListFuture
-        val routee = context.actorOf(Props(classOf[Registrar],
-                                           i,
-                                           number,
-                                           activationListPromise,
-                                           deactivationListPromise),
-                                     "registrar-" + i)
+        val routee = context.actorOf(
+          Props(
+            classOf[Registrar],
+            i,
+            number,
+            activationListPromise,
+            deactivationListPromise),
+          "registrar-" + i)
         routee.path.toString
       }
       promise.success(
@@ -125,8 +127,8 @@ class ConsumerBroadcast(
           allDeactivationFutures))
 
       broadcaster = Some(
-        context.actorOf(BroadcastGroup(routeePaths).props(),
-                        "registrarRouter"))
+        context
+          .actorOf(BroadcastGroup(routeePaths).props(), "registrarRouter"))
     case reg: Any ⇒
       broadcaster.foreach(_.forward(reg))
   }
@@ -156,10 +158,12 @@ class Registrar(val start: Int,
     case reg: RegisterConsumersAndProducers ⇒
       val i = index
       val endpoint = reg.endpointUri + start + "-" + i
-      add(new EchoConsumer(endpoint),
-          "concurrent-test-echo-consumer-" + start + "-" + i)
-      add(new TestProducer(endpoint),
-          "concurrent-test-producer-" + start + "-" + i)
+      add(
+        new EchoConsumer(endpoint),
+        "concurrent-test-echo-consumer-" + start + "-" + i)
+      add(
+        new TestProducer(endpoint),
+        "concurrent-test-producer-" + start + "-" + i)
       index = index + 1
       if (activations.size == number * 2) {
         Future.sequence(activations.toList) map activationsPromise.success
@@ -170,9 +174,10 @@ class Registrar(val start: Int,
         val result = camel.deactivationFutureFor(aref)
         result.onFailure {
           case e ⇒
-            log.error("deactivationFutureFor {} failed: {}",
-                      aref,
-                      e.getMessage)
+            log.error(
+              "deactivationFutureFor {} failed: {}",
+              aref,
+              e.getMessage)
         }
         deActivations += result
         if (deActivations.size == number * 2) {

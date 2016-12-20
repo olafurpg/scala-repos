@@ -31,34 +31,39 @@ final class Env(config: Config,
   }
   import settings._
 
-  private val socket = system.actorOf(Props(
-                                        new Socket(history = history,
-                                                   router = hub.actor.router,
-                                                   uidTtl = SocketUidTtl)),
-                                      name = SocketName)
+  private val socket = system.actorOf(
+    Props(
+      new Socket(
+        history = history,
+        router = hub.actor.router,
+        uidTtl = SocketUidTtl)),
+    name = SocketName)
 
-  lazy val seekApi = new SeekApi(coll = db(CollectionSeek),
-                                 archiveColl = db(CollectionSeekArchive),
-                                 blocking = blocking,
-                                 maxPerPage = SeekMaxPerPage,
-                                 maxPerUser = SeekMaxPerUser)
+  lazy val seekApi = new SeekApi(
+    coll = db(CollectionSeek),
+    archiveColl = db(CollectionSeekArchive),
+    blocking = blocking,
+    maxPerPage = SeekMaxPerPage,
+    maxPerUser = SeekMaxPerUser)
 
-  val lobby = system.actorOf(Props(
-                               new Lobby(
-                                 socket = socket,
-                                 seekApi = seekApi,
-                                 blocking = blocking,
-                                 playban = playban,
-                                 onStart = onStart,
-                                 broomPeriod = BroomPeriod,
-                                 resyncIdsPeriod = ResyncIdsPeriod
-                               )),
-                             name = ActorName)
+  val lobby = system.actorOf(
+    Props(
+      new Lobby(
+        socket = socket,
+        seekApi = seekApi,
+        blocking = blocking,
+        playban = playban,
+        onStart = onStart,
+        broomPeriod = BroomPeriod,
+        resyncIdsPeriod = ResyncIdsPeriod
+      )),
+    name = ActorName)
 
-  lazy val socketHandler = new SocketHandler(hub = hub,
-                                             lobby = lobby,
-                                             socket = socket,
-                                             blocking = blocking)
+  lazy val socketHandler = new SocketHandler(
+    hub = hub,
+    lobby = lobby,
+    socket = socket,
+    blocking = blocking)
 
   lazy val history = new History[actorApi.Messadata](ttl = MessageTtl)
 

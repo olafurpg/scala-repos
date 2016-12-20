@@ -76,8 +76,9 @@ class RenameJavaToScalaAction extends AnAction {
                   directory.getVirtualFile.findChild(nameWithExtension)
                 if (existingFile != null) {
                   NotificationUtil
-                    .builder(directory.getProject,
-                             s"File $nameWithExtension already exists")
+                    .builder(
+                      directory.getProject,
+                      s"File $nameWithExtension already exists")
                     .setDisplayType(NotificationDisplayType.BALLOON)
                     .setNotificationType(NotificationType.ERROR)
                     .setGroup("rename.java.to.scala")

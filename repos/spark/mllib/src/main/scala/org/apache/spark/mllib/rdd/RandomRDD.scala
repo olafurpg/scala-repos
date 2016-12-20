@@ -47,8 +47,9 @@ private[mllib] class RandomRDD[T: ClassTag](
 
   require(size > 0, "Positive RDD size required.")
   require(numPartitions > 0, "Positive number of partitions required")
-  require(math.ceil(size.toDouble / numPartitions) <= Int.MaxValue,
-          "Partition size cannot exceed Int.MaxValue")
+  require(
+    math.ceil(size.toDouble / numPartitions) <= Int.MaxValue,
+    "Partition size cannot exceed Int.MaxValue")
 
   override def compute(splitIn: Partition, context: TaskContext): Iterator[T] = {
     val split = splitIn.asInstanceOf[RandomRDDPartition[T]]
@@ -72,8 +73,9 @@ private[mllib] class RandomVectorRDD(
   require(size > 0, "Positive RDD size required.")
   require(numPartitions > 0, "Positive number of partitions required")
   require(vectorSize > 0, "Positive vector size required.")
-  require(math.ceil(size.toDouble / numPartitions) <= Int.MaxValue,
-          "Partition size cannot exceed Int.MaxValue")
+  require(
+    math.ceil(size.toDouble / numPartitions) <= Int.MaxValue,
+    "Partition size cannot exceed Int.MaxValue")
 
   override def compute(splitIn: Partition,
                        context: TaskContext): Iterator[Vector] = {

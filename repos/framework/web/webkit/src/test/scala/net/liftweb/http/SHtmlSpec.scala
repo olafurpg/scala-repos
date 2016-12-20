@@ -54,10 +54,11 @@ object SHtmlSpec extends Specification with XmlMatchers {
     }
     "Use the implicit from tuple to SelectableOption" in {
       testS("/")(
-        ("#number" #> SHtml.select(Seq("Yes" -> "Yes", "No" -> "No"),
-                                   Some("value"),
-                                   s => println(s),
-                                   "class" -> "form-control")).apply(html1))
+        ("#number" #> SHtml.select(
+          Seq("Yes" -> "Yes", "No" -> "No"),
+          Some("value"),
+          s => println(s),
+          "class" -> "form-control")).apply(html1))
       //compiling is enough for this test
       1 must_== 1
     }

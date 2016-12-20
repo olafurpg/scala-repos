@@ -86,8 +86,9 @@ object RootIsolator {
       case TransformedPoly(p, a, b, c, d) :: rest =>
         if (p(BigInt(0)) == BigInt(0)) {
           val p0 = p.mapTerms { case Term(coeff, exp) => Term(coeff, exp - 1) }
-          rec(TransformedPoly(p0, a, b, c, d) :: rest,
-              acc :+ Interval.point(Rational(b, d)))
+          rec(
+            TransformedPoly(p0, a, b, c, d) :: rest,
+            acc :+ Interval.point(Rational(b, d)))
         } else {
           p.signVariations match {
             case 0 => // No roots.
@@ -117,11 +118,12 @@ object RootIsolator {
                 rec(more reverse_::: rest, acc)
               } else {
                 val flr = BigInt(1) << lb
-                val more = split1(p.compose(x + Polynomial.constant(flr)),
-                                  a,
-                                  b + a * flr,
-                                  c,
-                                  d + c * flr)
+                val more = split1(
+                  p.compose(x + Polynomial.constant(flr)),
+                  a,
+                  b + a * flr,
+                  c,
+                  d + c * flr)
                 rec(more reverse_::: rest, acc)
               }
           }

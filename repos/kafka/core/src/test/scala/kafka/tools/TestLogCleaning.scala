@@ -80,8 +80,9 @@ object TestLogCleaning {
       .ofType(classOf[java.lang.Integer])
       .defaultsTo(1)
     val percentDeletesOpt = parser
-      .accepts("percent-deletes",
-               "The percentage of updates that are deletes.")
+      .accepts(
+        "percent-deletes",
+        "The percentage of updates that are deletes.")
       .withRequiredArg
       .describedAs("percent")
       .ofType(classOf[java.lang.Integer])
@@ -116,11 +117,12 @@ object TestLogCleaning {
       System.exit(0)
     }
 
-    CommandLineUtils.checkRequiredArgs(parser,
-                                       options,
-                                       brokerOpt,
-                                       zkConnectOpt,
-                                       numMessagesOpt)
+    CommandLineUtils.checkRequiredArgs(
+      parser,
+      options,
+      brokerOpt,
+      zkConnectOpt,
+      numMessagesOpt)
 
     // parse options
     val messages = options.valueOf(numMessagesOpt).longValue
@@ -137,12 +139,13 @@ object TestLogCleaning {
       (0 until topicCount).map("log-cleaner-test-" + testId + "-" + _).toArray
 
     println("Producing %d messages...".format(messages))
-    val producedDataFile = produceMessages(brokerUrl,
-                                           topics,
-                                           messages,
-                                           compressionType,
-                                           dups,
-                                           percentDeletes)
+    val producedDataFile = produceMessages(
+      brokerUrl,
+      topics,
+      messages,
+      compressionType,
+      dups,
+      percentDeletes)
     println("Sleeping for %d seconds...".format(sleepSecs))
     Thread.sleep(sleepSecs * 1000)
     println("Consuming messages...")
@@ -207,10 +210,12 @@ object TestLogCleaning {
     producedDeduped.close()
     consumedDeduped.close()
     println("Validated " + total + " values, " + mismatched + " mismatches.")
-    require(!produced.hasNext,
-            "Additional values produced not found in consumer log.")
-    require(!consumed.hasNext,
-            "Additional values consumed not found in producer log.")
+    require(
+      !produced.hasNext,
+      "Additional values produced not found in consumer log.")
+    require(
+      !consumed.hasNext,
+      "Additional values consumed not found in producer log.")
     require(mismatched == 0, "Non-zero number of row mismatches.")
     // if all the checks worked out we can delete the deduped files
     producedDedupedFile.delete()
@@ -270,8 +275,9 @@ object TestLogCleaning {
         }
       }
     }.start()
-    new BufferedReader(new InputStreamReader(process.getInputStream()),
-                       10 * 1024 * 1024)
+    new BufferedReader(
+      new InputStreamReader(process.getInputStream()),
+      10 * 1024 * 1024)
   }
 
   def produceMessages(brokerUrl: String,
@@ -307,13 +313,15 @@ object TestLogCleaning {
       val delete = i % 100 < percentDeletes
       val msg =
         if (delete)
-          new ProducerRecord[Array[Byte], Array[Byte]](topic,
-                                                       key.toString.getBytes(),
-                                                       null)
+          new ProducerRecord[Array[Byte], Array[Byte]](
+            topic,
+            key.toString.getBytes(),
+            null)
         else
-          new ProducerRecord[Array[Byte], Array[Byte]](topic,
-                                                       key.toString.getBytes(),
-                                                       i.toString.getBytes())
+          new ProducerRecord[Array[Byte], Array[Byte]](
+            topic,
+            key.toString.getBytes(),
+            i.toString.getBytes())
       producer.send(msg)
       producedWriter.write(TestRecord(topic, key, i, delete).toString)
       producedWriter.newLine()

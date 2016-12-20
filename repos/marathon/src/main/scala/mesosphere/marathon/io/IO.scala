@@ -38,10 +38,12 @@ object IO {
   }
 
   def copyFile(sourceFile: File, targetFile: File) {
-    require(sourceFile.exists,
-            "Source file '" + sourceFile.getAbsolutePath + "' does not exist.")
-    require(!sourceFile.isDirectory,
-            "Source file '" + sourceFile.getAbsolutePath + "' is a directory.")
+    require(
+      sourceFile.exists,
+      "Source file '" + sourceFile.getAbsolutePath + "' does not exist.")
+    require(
+      !sourceFile.isDirectory,
+      "Source file '" + sourceFile.getAbsolutePath + "' is a directory.")
     using(new FileInputStream(sourceFile)) { source =>
       using(new FileOutputStream(targetFile)) { target =>
         transfer(source, target, close = false)

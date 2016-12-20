@@ -35,11 +35,12 @@ private[spark] class WholeTextFileRDD(
     valueClass: Class[Text],
     conf: Configuration,
     minPartitions: Int)
-    extends NewHadoopRDD[Text, Text](sc,
-                                     inputFormatClass,
-                                     keyClass,
-                                     valueClass,
-                                     conf) {
+    extends NewHadoopRDD[Text, Text](
+      sc,
+      inputFormatClass,
+      keyClass,
+      valueClass,
+      conf) {
 
   override def getPartitions: Array[Partition] = {
     val inputFormat = inputFormatClass.newInstance

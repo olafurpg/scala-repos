@@ -356,8 +356,9 @@ class ScalaFileImpl(viewProvider: FileViewProvider,
   def getPackagings: Array[ScPackaging] = {
     val stub = getStub
     if (stub != null) {
-      stub.getChildrenByType(ScalaElementTypes.PACKAGING,
-                             JavaArrayFactoryUtil.ScPackagingFactory)
+      stub.getChildrenByType(
+        ScalaElementTypes.PACKAGING,
+        JavaArrayFactoryUtil.ScPackagingFactory)
     } else findChildrenByClass(classOf[ScPackaging])
   }
 

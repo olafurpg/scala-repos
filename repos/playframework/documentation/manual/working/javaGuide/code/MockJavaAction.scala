@@ -66,9 +66,10 @@ package javaguide.testhelpers {
           case null =>
             action.apply(requestBuilder.build()._underlyingRequest)
           case other =>
-            Helpers.call(action,
-                         requestBuilder.build()._underlyingRequest,
-                         other.asBytes())
+            Helpers.call(
+              action,
+              requestBuilder.build()._underlyingRequest,
+              other.asBytes())
         })
         .asJava
     }

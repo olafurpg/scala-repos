@@ -111,10 +111,11 @@ class BrokerPartitionInfo(producerConfig: ProducerConfig,
             pmd.errorCode == Errors.LEADER_NOT_AVAILABLE.code) {
           warn(
             "Error while fetching metadata %s for topic partition [%s,%d]: [%s]"
-              .format(pmd,
-                      tmd.topic,
-                      pmd.partitionId,
-                      Errors.forCode(pmd.errorCode).exception.getClass))
+              .format(
+                pmd,
+                tmd.topic,
+                pmd.partitionId,
+                Errors.forCode(pmd.errorCode).exception.getClass))
         } // any other error code (e.g. ReplicaNotAvailable) can be ignored since the producer does not need to access the replica and isr metadata
       })
     })

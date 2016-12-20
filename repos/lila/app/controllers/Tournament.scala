@@ -39,10 +39,11 @@ object Tournament extends LilaController {
             .allSortToints(10) map {
             case (((visible, scheduled), finished), leaderboard) =>
               Ok(
-                html.tournament.home(scheduled,
-                                     finished,
-                                     leaderboard,
-                                     env scheduleJsonView visible))
+                html.tournament.home(
+                  scheduled,
+                  finished,
+                  leaderboard,
+                  env scheduleJsonView visible))
           } map NoCache
       },
       api = _ =>
@@ -87,11 +88,12 @@ object Tournament extends LilaController {
               .?? { env.api.playerInfo(tour.id, _) } zip getBool(
               "socketVersion").??(env version tour.id map some) flatMap {
               case (playerInfoExt, socketVersion) =>
-                env.jsonView(tour,
-                             page,
-                             ctx.userId,
-                             playerInfoExt,
-                             socketVersion)
+                env.jsonView(
+                  tour,
+                  page,
+                  ctx.userId,
+                  playerInfoExt,
+                  socketVersion)
             } map { Ok(_) }
           }.mon(_.http.response.tournament.show.mobile)
         } map (_ as JSON)

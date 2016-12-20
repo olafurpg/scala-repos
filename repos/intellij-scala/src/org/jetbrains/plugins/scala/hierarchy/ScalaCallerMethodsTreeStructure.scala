@@ -63,9 +63,10 @@ final class ScalaCallerMethodsTreeStructure(project: Project,
           def process(reference: PsiReference): Boolean = {
             val element: PsiElement = reference.getElement
             val key: PsiMember =
-              PsiTreeUtil.getNonStrictParentOfType(element,
-                                                   classOf[PsiMethod],
-                                                   classOf[PsiClass])
+              PsiTreeUtil.getNonStrictParentOfType(
+                element,
+                classOf[PsiMethod],
+                classOf[PsiClass])
             methodToDescriptorMap synchronized {
               var d: CallHierarchyNodeDescriptor =
                 methodToDescriptorMap.get(key) match {
@@ -75,11 +76,12 @@ final class ScalaCallerMethodsTreeStructure(project: Project,
                     }
                     call
                   case _ =>
-                    val newD = new CallHierarchyNodeDescriptor(myProject,
-                                                               descriptor,
-                                                               element,
-                                                               false,
-                                                               true)
+                    val newD = new CallHierarchyNodeDescriptor(
+                      myProject,
+                      descriptor,
+                      element,
+                      false,
+                      true)
                     methodToDescriptorMap.put(key, newD)
                     newD
                 }

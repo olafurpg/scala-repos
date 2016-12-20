@@ -15,8 +15,9 @@ final class ResolutionInfo(val relPath: String,
                            val commonJSName: Option[String],
                            val relPathMinified: Option[String]) {
 
-  require(commonJSName.forall(isValidIdentifier),
-          "commonJSName must be a valid JavaScript identifier")
+  require(
+    commonJSName.forall(isValidIdentifier),
+    "commonJSName must be a valid JavaScript identifier")
 
   override def toString(): String = {
     val b = new StringBuilder

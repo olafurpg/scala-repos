@@ -95,14 +95,15 @@ class SafeLongAddSubtractBenchmark {
   check(pairs, _ - -_)
 
   @Param(
-    Array("l_l_l",
-          "l_l_b",
-          "l_b_l",
-          "l_b_b",
-          "b_l_l",
-          "b_l_b",
-          "b_b_l",
-          "b_b_b"))
+    Array(
+      "l_l_l",
+      "l_l_b",
+      "l_b_l",
+      "l_b_b",
+      "b_l_l",
+      "b_l_b",
+      "b_b_l",
+      "b_b_b"))
   var kind: String = ""
   var a: SafeLong = 0L
   var b: SafeLong = 0L

@@ -29,8 +29,9 @@ import kafka.common.{InvalidConfigException, Config}
 object ProducerConfig extends Config {
   def validate(config: ProducerConfig) {
     validateClientId(config.clientId)
-    validateBatchSize(config.batchNumMessages,
-                      config.queueBufferingMaxMessages)
+    validateBatchSize(
+      config.batchNumMessages,
+      config.queueBufferingMaxMessages)
     validateProducerType(config.producerType)
   }
 

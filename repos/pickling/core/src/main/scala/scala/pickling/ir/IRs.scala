@@ -144,10 +144,11 @@ class IRs[U <: Universe with Singleton](val uni: U) {
             case NullaryMethodType(ntpe) => ntpe; case ntpe => ntpe
           }
           val symTpe = existentialAbstraction(quantified, rawSymTpe)
-          FieldIR(sym.getter.name.toString,
-                  symTpe,
-                  None,
-                  Some(sym.getter.asMethod))
+          FieldIR(
+            sym.getter.name.toString,
+            symTpe,
+            None,
+            Some(sym.getter.asMethod))
       })
       .toList ++ javaFieldIRs
   }
@@ -230,18 +231,20 @@ class IRs[U <: Universe with Singleton](val uni: U) {
         }
         val symTpe = existentialAbstraction(quantified, rawSymTpe)
 
-        FieldIR(sym.name.toString,
-                symTpe,
-                if (sym.isVal) Some(sym) else None,
-                if (sym.isVal) None else Some(sym.getter.asMethod))
+        FieldIR(
+          sym.name.toString,
+          symTpe,
+          if (sym.isVal) Some(sym) else None,
+          if (sym.isVal) None else Some(sym.getter.asMethod))
       }
 
       // (b) non-abstract vars (also private ones)
       val allNonAbstractVars = baseClasses.flatMap { baseClass =>
-        nonAbstractVars(tpe.baseType(baseClass),
-                        quantified,
-                        rawTpe,
-                        baseClass.isJava)
+        nonAbstractVars(
+          tpe.baseType(baseClass),
+          quantified,
+          rawTpe,
+          baseClass.isJava)
       }
 
       ctorFieldIRs ++ allNonAbstractVars

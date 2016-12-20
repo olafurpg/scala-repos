@@ -150,8 +150,9 @@ object Pickler {
   }
 
   private def errorExpected(rd: Lexer, msg: => String) =
-    new UnpickleFailure("expected: " + msg + "\n" + "found   : " + rd.token,
-                        rd)
+    new UnpickleFailure(
+      "expected: " + msg + "\n" + "found   : " + rd.token,
+      rd)
 
   private def nextSuccess[T](rd: Lexer, result: T) = {
     rd.nextToken()

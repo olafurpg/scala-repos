@@ -115,20 +115,22 @@ object StackTrace {
         if (mtch1 ne null) {
           val (className, methodName) = extractClassMethod(mtch1(1).get)
           trace.push(
-            JSStackTraceElem(className,
-                             methodName,
-                             mtch1(2).get,
-                             mtch1(3).get.toInt,
-                             mtch1(4).get.toInt))
+            JSStackTraceElem(
+              className,
+              methodName,
+              mtch1(2).get,
+              mtch1(3).get.toInt,
+              mtch1(4).get.toInt))
         } else {
           val mtch2 = NormalizedFrameLine.exec(line)
           if (mtch2 ne null) {
             val (className, methodName) = extractClassMethod(mtch2(1).get)
             trace.push(
-              JSStackTraceElem(className,
-                               methodName,
-                               mtch2(2).get,
-                               mtch2(3).get.toInt))
+              JSStackTraceElem(
+                className,
+                methodName,
+                mtch2(2).get,
+                mtch2(3).get.toInt))
           } else {
             // just in case
             trace.push(JSStackTraceElem("<jscode>", line, null, -1))
@@ -149,10 +151,11 @@ object StackTrace {
     i = 0
     while (i < mappedTrace.length) {
       val jsSte = mappedTrace(i)
-      val ste = new StackTraceElement(jsSte.declaringClass,
-                                      jsSte.methodName,
-                                      jsSte.fileName,
-                                      jsSte.lineNumber)
+      val ste = new StackTraceElement(
+        jsSte.declaringClass,
+        jsSte.methodName,
+        jsSte.fileName,
+        jsSte.lineNumber)
       jsSte.columnNumber.foreach(ste.setColumnNumber)
       result(i) = ste
       i += 1
@@ -397,8 +400,9 @@ object StackTrace {
       .jsReplace("""^[\s\S]+?\s+at\s+""".re, " at ") // remove message
       .jsReplace("""^\s+(at eval )?at\s+""".re("gm"), "") // remove 'at' and indentation
       .jsReplace("""^([^\(]+?)([\n])""".re("gm"), "{anonymous}() ($1)$2") // see note
-      .jsReplace("""^Object.<anonymous>\s*\(([^\)]+)\)""".re("gm"),
-                 "{anonymous}() ($1)")
+      .jsReplace(
+        """^Object.<anonymous>\s*\(([^\)]+)\)""".re("gm"),
+        "{anonymous}() ($1)")
       .jsReplace("""^([^\(]+|\{anonymous\}\(\)) \((.+)\)$""".re("gm"), "$1@$2")
       .jsSplit("\n")
       .jsSlice(0, -1)
@@ -421,8 +425,9 @@ object StackTrace {
       .asInstanceOf[String])
       .jsReplace("""^\s*at\s+(.*)$""".re("gm"), "$1")
       .jsReplace("""^Anonymous function\s+""".re("gm"), "{anonymous}() ")
-      .jsReplace("""^([^\(]+|\{anonymous\}\(\))\s+\((.+)\)$""".re("gm"),
-                 "$1@$2")
+      .jsReplace(
+        """^([^\(]+|\{anonymous\}\(\))\s+\((.+)\)$""".re("gm"),
+        "$1@$2")
       .jsSplit("\n")
       .jsSlice(1)
   }

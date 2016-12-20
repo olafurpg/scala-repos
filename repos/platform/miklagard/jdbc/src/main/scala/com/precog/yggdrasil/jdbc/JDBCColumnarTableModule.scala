@@ -277,8 +277,9 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
                         case Failure(error) =>
                           logger.error(
                             "Failure parsing JSON column value (%s): %s"
-                              .format(truncateString(pgo.getValue),
-                                      error.getMessage))
+                              .format(
+                                truncateString(pgo.getValue),
+                                error.getMessage))
                       }
 
                     case other =>
@@ -375,8 +376,9 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
         import trans._
         val idSpec = InnerObjectConcat(
           Leaf(Source),
-          WrapObject(WrapArray(Scan(Leaf(Source), freshIdScanner)),
-                     TransSpecModule.paths.Key.name))
+          WrapObject(
+            WrapArray(Scan(Leaf(Source), freshIdScanner)),
+            TransSpecModule.paths.Key.name))
 
         Table(
           StreamT
@@ -404,11 +406,12 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
                               c =>
                                 c.split('.').head
                             }
-                            val query = Query("SELECT %s FROM %s".format(
-                                                if (columns.isEmpty) "*"
-                                                else columns.mkString(","),
-                                                tableName),
-                                              yggConfig.maxSliceSize)
+                            val query = Query(
+                              "SELECT %s FROM %s".format(
+                                if (columns.isEmpty) "*"
+                                else columns.mkString(","),
+                                tableName),
+                              yggConfig.maxSliceSize)
 
                             logger.debug("Running query: " + query)
 
@@ -417,10 +420,11 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
 
                             val (slice, nextSkip) =
                               makeSlice(connGen, query, 0)
-                            Some(slice,
-                                 nextSkip
-                                   .map(InLoad(connGen, query, _, xs))
-                                   .getOrElse(InitialLoad(xs)))
+                            Some(
+                              slice,
+                              nextSkip
+                                .map(InLoad(connGen, query, _, xs))
+                                .getOrElse(InitialLoad(xs)))
                         } getOrElse {
                           throw new Exception(
                             "Database %s is not configured" format dbName)

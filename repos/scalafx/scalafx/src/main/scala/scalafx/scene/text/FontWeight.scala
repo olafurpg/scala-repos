@@ -48,23 +48,27 @@ object FontWeight
   @deprecated("Use Light; LIGHT will be removed in a future release", "2.2.60")
   val LIGHT = Light
   val Normal = new FontWeight(jfxst.FontWeight.NORMAL)
-  @deprecated("Use Normal; NORMAL will be removed in a future release",
-              "2.2.60")
+  @deprecated(
+    "Use Normal; NORMAL will be removed in a future release",
+    "2.2.60")
   val NORMAL = Normal
   val Medium = new FontWeight(jfxst.FontWeight.MEDIUM)
-  @deprecated("Use Medium; MEDIUM will be removed in a future release",
-              "2.2.60")
+  @deprecated(
+    "Use Medium; MEDIUM will be removed in a future release",
+    "2.2.60")
   val MEDIUM = Medium
   val SemiBold = new FontWeight(jfxst.FontWeight.SEMI_BOLD)
-  @deprecated("Use SemiBold; SEMI_BOLD will be removed in a future release",
-              "2.2.60")
+  @deprecated(
+    "Use SemiBold; SEMI_BOLD will be removed in a future release",
+    "2.2.60")
   val SEMI_BOLD = SemiBold
   val Bold = new FontWeight(jfxst.FontWeight.BOLD)
   @deprecated("Use Bold; BOLD will be removed in a future release", "2.2.60")
   val BOLD = Bold
   val ExtraBold = new FontWeight(jfxst.FontWeight.EXTRA_BOLD)
-  @deprecated("Use ExtraBold; EXTRA_BOLD will be removed in a future release",
-              "2.2.60")
+  @deprecated(
+    "Use ExtraBold; EXTRA_BOLD will be removed in a future release",
+    "2.2.60")
   val EXTRA_BOLD = ExtraBold
   val Black = new FontWeight(jfxst.FontWeight.BLACK)
   @deprecated("Use Black; BLACK will be removed in a future release", "2.2.60")

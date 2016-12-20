@@ -130,10 +130,11 @@ class MessageSerializer(val system: ExtendedActorSystem)
   }
 
   private def addressFromProto(address: cm.Address): Address =
-    Address(getProtocol(address),
-            getSystem(address),
-            address.getHostname,
-            address.getPort)
+    Address(
+      getProtocol(address),
+      getSystem(address),
+      address.getHostname,
+      address.getPort)
 
   private def mapWithErrorMessage[T](map: Map[T, Int],
                                      value: T,
@@ -263,9 +264,10 @@ class MessageSerializer(val system: ExtendedActorSystem)
     }
 
     def metricFromProto(metric: cm.NodeMetrics.Metric): Metric =
-      Metric(metricNameMapping(metric.getNameIndex),
-             numberFromProto(metric.getNumber),
-             if (metric.hasEwma) ewmaFromProto(metric.getEwma) else None)
+      Metric(
+        metricNameMapping(metric.getNameIndex),
+        numberFromProto(metric.getNumber),
+        if (metric.hasEwma) ewmaFromProto(metric.getEwma) else None)
 
     def nodeMetricsFromProto(nodeMetrics: cm.NodeMetrics): NodeMetrics =
       NodeMetrics(
@@ -276,8 +278,9 @@ class MessageSerializer(val system: ExtendedActorSystem)
     val nodeMetrics: Set[NodeMetrics] =
       mgossip.getNodeMetricsList.asScala.map(nodeMetricsFromProto)(breakOut)
 
-    MetricsGossipEnvelope(addressFromProto(envelope.getFrom),
-                          MetricsGossip(nodeMetrics),
-                          envelope.getReply)
+    MetricsGossipEnvelope(
+      addressFromProto(envelope.getFrom),
+      MetricsGossip(nodeMetrics),
+      envelope.getReply)
   }
 }

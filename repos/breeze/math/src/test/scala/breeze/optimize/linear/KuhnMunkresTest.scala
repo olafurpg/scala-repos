@@ -10,9 +10,10 @@ import org.junit.runner.RunWith
 class KuhnMunkresTest extends FunSuite with Checkers {
 
   test("sanity check") {
-    val arr = Array(Seq(2.0, 4.0, 7.0, 9.0),
-                    Seq(3.0, 9.0, 5.0, 1.0),
-                    Seq(8.0, 2.0, 9.0, 7.0));
+    val arr = Array(
+      Seq(2.0, 4.0, 7.0, 9.0),
+      Seq(3.0, 9.0, 5.0, 1.0),
+      Seq(8.0, 2.0, 9.0, 7.0));
     val (matching, weight) = KuhnMunkres.extractMatching(arr.map(_.toSeq));
     assert(weight === 5.0);
     assert(matching(0) === 0)
@@ -21,10 +22,11 @@ class KuhnMunkresTest extends FunSuite with Checkers {
   }
 
   test("another test") {
-    val arr = Array(Seq(14.0, 5.0, 8.0, 7.0),
-                    Seq(1.5, 12.0, 6.0, 5.0),
-                    Seq(7.0, 8.0, 3.0, 9.0),
-                    Seq(2.0, 4.0, 6.0, 10.0));
+    val arr = Array(
+      Seq(14.0, 5.0, 8.0, 7.0),
+      Seq(1.5, 12.0, 6.0, 5.0),
+      Seq(7.0, 8.0, 3.0, 9.0),
+      Seq(2.0, 4.0, 6.0, 10.0));
     val (matching, weight) = KuhnMunkres.extractMatching(arr.map(_.toSeq));
     assert(weight === 15.0);
     assert(matching(0) === 1)
@@ -34,18 +36,20 @@ class KuhnMunkresTest extends FunSuite with Checkers {
   }
 
   test("square matrix test 1") {
-    val arr = Array(Seq(400.0, 150.0, 400.0),
-                    Seq(400.0, 450.0, 600.0),
-                    Seq(300.0, 225.0, 300.0));
+    val arr = Array(
+      Seq(400.0, 150.0, 400.0),
+      Seq(400.0, 450.0, 600.0),
+      Seq(300.0, 225.0, 300.0));
 
     val (matching, weight) = KuhnMunkres.extractMatching(arr);
     assert(weight === 850.0);
   }
 
   test("rectangular matrix test 1") {
-    val arr = Array(Seq(400.0, 150.0, 400.0, 1.0),
-                    Seq(400.0, 450.0, 600.0, 2.0),
-                    Seq(300.0, 225.0, 300.0, 3.0));
+    val arr = Array(
+      Seq(400.0, 150.0, 400.0, 1.0),
+      Seq(400.0, 450.0, 600.0, 2.0),
+      Seq(300.0, 225.0, 300.0, 3.0));
 
     val (matching, weight) = KuhnMunkres.extractMatching(arr);
     assert(weight === 452.0);
@@ -60,9 +64,10 @@ class KuhnMunkresTest extends FunSuite with Checkers {
   }
 
   test("rectangular matrix test 2") {
-    val arr = Array(Seq(10.0, 10.0, 8.0, 11.0),
-                    Seq(9.0, 8.0, 1.0, 1.0),
-                    Seq(9.0, 7.0, 4.0, 10.0));
+    val arr = Array(
+      Seq(10.0, 10.0, 8.0, 11.0),
+      Seq(9.0, 8.0, 1.0, 1.0),
+      Seq(9.0, 7.0, 4.0, 10.0));
 
     val (matching, weight) = KuhnMunkres.extractMatching(arr);
     assert(weight === 15.0);

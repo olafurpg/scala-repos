@@ -192,11 +192,12 @@ private[finagle] object MultiReaderHelper {
       val outstandingReadsGauge = _outstandingReadsGauge
     }
 
-    createReadHandle(messages.recv,
-                     error.recv,
-                     closeHandleOf,
-                     numReadHandlesGauge,
-                     outstandingReadsGauge)
+    createReadHandle(
+      messages.recv,
+      error.recv,
+      closeHandleOf,
+      numReadHandlesGauge,
+      outstandingReadsGauge)
   }
 }
 
@@ -321,9 +322,10 @@ object MultiReaderThrift {
       queueName: String,
       clientId: Option[ClientId]
   ): MultiReaderBuilderThrift = {
-    val config = MultiReaderConfig[ThriftClientRequest, Array[Byte]](va,
-                                                                     queueName,
-                                                                     clientId)
+    val config = MultiReaderConfig[ThriftClientRequest, Array[Byte]](
+      va,
+      queueName,
+      clientId)
     new MultiReaderBuilderThrift(config)
   }
 
@@ -468,13 +470,14 @@ final case class ClusterMultiReaderConfig private[kestrel] (
     * Convert to MultiReaderConfig[Command, Response] during deprecation
     */
   def toMultiReaderConfig: MultiReaderConfig[Command, Response] = {
-    MultiReaderConfig[Command, Response](this.va,
-                                         this.queueName,
-                                         None,
-                                         Duration.Top,
-                                         this.clientBuilder,
-                                         this.timer,
-                                         this.retryBackoffs)
+    MultiReaderConfig[Command, Response](
+      this.va,
+      this.queueName,
+      None,
+      Duration.Top,
+      this.clientBuilder,
+      this.timer,
+      this.retryBackoffs)
   }
 }
 
@@ -644,10 +647,11 @@ class ClusterMultiReaderBuilder private[kestrel] (
 
   private def this(config: MultiReaderConfig[Command, Response]) =
     this(
-      ClusterMultiReaderConfig(config.va,
-                               config.queueName,
-                               config.clientBuilder,
-                               config.timer))
+      ClusterMultiReaderConfig(
+        config.va,
+        config.queueName,
+        config.clientBuilder,
+        config.timer))
 
   protected[kestrel] def copy(config: MultiReaderConfig[Command, Response])
     : ClusterMultiReaderBuilder =
@@ -683,9 +687,10 @@ class MultiReaderBuilderMemcache private[kestrel] (
   */
 class MultiReaderBuilderThrift private[kestrel] (
     config: MultiReaderConfig[ThriftClientRequest, Array[Byte]])
-    extends MultiReaderBuilder[ThriftClientRequest,
-                               Array[Byte],
-                               MultiReaderBuilderThrift](config) {
+    extends MultiReaderBuilder[
+      ThriftClientRequest,
+      Array[Byte],
+      MultiReaderBuilderThrift](config) {
   type ThriftClientBuilder = ClientBuilder[ThriftClientRequest,
                                            Array[Byte],
                                            Nothing,

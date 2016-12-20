@@ -162,10 +162,11 @@ object DecisionTreeModel extends Loader[DecisionTreeModel] with Logging {
                          categories: Seq[Double]) {
       // TODO: Change to List once SPARK-3365 is fixed
       def toSplit: Split = {
-        new Split(feature,
-                  threshold,
-                  FeatureType(featureType),
-                  categories.toList)
+        new Split(
+          feature,
+          threshold,
+          FeatureType(featureType),
+          categories.toList)
       }
     }
 
@@ -175,10 +176,11 @@ object DecisionTreeModel extends Loader[DecisionTreeModel] with Logging {
       }
 
       def apply(r: Row): SplitData = {
-        SplitData(r.getInt(0),
-                  r.getDouble(1),
-                  r.getInt(2),
-                  r.getAs[Seq[Double]](3))
+        SplitData(
+          r.getInt(0),
+          r.getDouble(1),
+          r.getInt(2),
+          r.getAs[Seq[Double]](3))
       }
     }
 
@@ -195,15 +197,16 @@ object DecisionTreeModel extends Loader[DecisionTreeModel] with Logging {
 
     object NodeData {
       def apply(treeId: Int, n: Node): NodeData = {
-        NodeData(treeId,
-                 n.id,
-                 PredictData(n.predict),
-                 n.impurity,
-                 n.isLeaf,
-                 n.split.map(SplitData.apply),
-                 n.leftNode.map(_.id),
-                 n.rightNode.map(_.id),
-                 n.stats.map(_.gain))
+        NodeData(
+          treeId,
+          n.id,
+          PredictData(n.predict),
+          n.impurity,
+          n.isLeaf,
+          n.split.map(SplitData.apply),
+          n.leftNode.map(_.id),
+          n.rightNode.map(_.id),
+          n.stats.map(_.gain))
       }
 
       def apply(r: Row): NodeData = {
@@ -212,15 +215,16 @@ object DecisionTreeModel extends Loader[DecisionTreeModel] with Logging {
         val leftNodeId = if (r.isNullAt(6)) None else Some(r.getInt(6))
         val rightNodeId = if (r.isNullAt(7)) None else Some(r.getInt(7))
         val infoGain = if (r.isNullAt(8)) None else Some(r.getDouble(8))
-        NodeData(r.getInt(0),
-                 r.getInt(1),
-                 PredictData(r.getStruct(2)),
-                 r.getDouble(3),
-                 r.getBoolean(4),
-                 split,
-                 leftNodeId,
-                 rightNodeId,
-                 infoGain)
+        NodeData(
+          r.getInt(0),
+          r.getInt(1),
+          PredictData(r.getStruct(2)),
+          r.getDouble(3),
+          r.getBoolean(4),
+          split,
+          leftNodeId,
+          rightNodeId,
+          infoGain)
       }
     }
 
@@ -287,9 +291,10 @@ object DecisionTreeModel extends Loader[DecisionTreeModel] with Logging {
         trees.length == 1,
         "Decision tree should contain exactly one tree but got ${trees.size} trees.")
       val model = new DecisionTreeModel(trees(0), Algo.fromString(algo))
-      assert(model.numNodes == numNodes,
-             s"Unable to load DecisionTreeModel data from: $datapath." +
-               s" Expected $numNodes nodes but found ${model.numNodes}")
+      assert(
+        model.numNodes == numNodes,
+        s"Unable to load DecisionTreeModel data from: $datapath." +
+          s" Expected $numNodes nodes but found ${model.numNodes}")
       model
     }
 
@@ -337,20 +342,22 @@ object DecisionTreeModel extends Loader[DecisionTreeModel] with Logging {
         } else {
           val leftNode = constructNode(data.leftNodeId.get, dataMap, nodes)
           val rightNode = constructNode(data.rightNodeId.get, dataMap, nodes)
-          val stats = new InformationGainStats(data.infoGain.get,
-                                               data.impurity,
-                                               leftNode.impurity,
-                                               rightNode.impurity,
-                                               leftNode.predict,
-                                               rightNode.predict)
-          new Node(data.nodeId,
-                   data.predict.toPredict,
-                   data.impurity,
-                   data.isLeaf,
-                   data.split.map(_.toSplit),
-                   Some(leftNode),
-                   Some(rightNode),
-                   Some(stats))
+          val stats = new InformationGainStats(
+            data.infoGain.get,
+            data.impurity,
+            leftNode.impurity,
+            rightNode.impurity,
+            leftNode.predict,
+            rightNode.predict)
+          new Node(
+            data.nodeId,
+            data.predict.toPredict,
+            data.impurity,
+            data.isLeaf,
+            data.split.map(_.toSplit),
+            Some(leftNode),
+            Some(rightNode),
+            Some(stats))
         }
       nodes += node.id -> node
       node

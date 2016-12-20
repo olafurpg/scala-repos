@@ -51,8 +51,9 @@ private[stream] object Fusing {
      * Then create a copy of the original Shape with the new copied ports.
      */
     val shape = g.shape
-      .copyFromPorts(struct.newInlets(g.shape.inlets),
-                     struct.newOutlets(g.shape.outlets))
+      .copyFromPorts(
+        struct.newInlets(g.shape.inlets),
+        struct.newOutlets(g.shape.outlets))
       .asInstanceOf[S]
     /*
      * Extract the full topological information from the builder before
@@ -69,13 +70,14 @@ private[stream] object Fusing {
     /*
      * Now we have everything ready for a FusedModule.
      */
-    val module = FusedModule(modules,
-                             shape,
-                             immutable.Map.empty ++ struct.downstreams.asScala,
-                             immutable.Map.empty ++ struct.upstreams.asScala,
-                             matValue.head._2,
-                             Attributes.none,
-                             info)
+    val module = FusedModule(
+      modules,
+      shape,
+      immutable.Map.empty ++ struct.downstreams.asScala,
+      immutable.Map.empty ++ struct.upstreams.asScala,
+      matValue.head._2,
+      Attributes.none,
+      info)
 
     if (StreamLayout.Debug) validate(module)
     if (Debug) println(module)
@@ -197,8 +199,9 @@ private[stream] object Fusing {
      * Now mechanically gather together the GraphAssembly arrays from their various pieces.
      */
 
-    val shape = AmorphousShape(inlets.asScala.to[immutable.Seq],
-                               outlets.asScala.to[immutable.Seq])
+    val shape = AmorphousShape(
+      inlets.asScala.to[immutable.Seq],
+      outlets.asScala.to[immutable.Seq])
 
     val connStart = insB1.size
     val conns = insB2.size
@@ -209,12 +212,14 @@ private[stream] object Fusing {
     copyToArray(insB2.iterator, ins, copyToArray(insB1.iterator, ins, 0))
 
     val inOwners = new Array[Int](size)
-    Arrays.fill(inOwners,
-                copyToArray(inOwnersB2.iterator,
-                            inOwners,
-                            copyToArray(inOwnersB1.iterator, inOwners, 0)),
-                size,
-                -1)
+    Arrays.fill(
+      inOwners,
+      copyToArray(
+        inOwnersB2.iterator,
+        inOwners,
+        copyToArray(inOwnersB1.iterator, inOwners, 0)),
+      size,
+      -1)
 
     val outs = new Array[Outlet[_]](size)
     System.arraycopy(outsB2, 0, outs, connStart, conns)
@@ -239,15 +244,17 @@ private[stream] object Fusing {
     }
     val attr = async and disp
 
-    GraphModule(new GraphInterpreter.GraphAssembly(stages,
-                                                   attributes,
-                                                   ins,
-                                                   inOwners,
-                                                   outs,
-                                                   outOwners),
-                shape,
-                attr,
-                matValIDs)
+    GraphModule(
+      new GraphInterpreter.GraphAssembly(
+        stages,
+        attributes,
+        ins,
+        inOwners,
+        outs,
+        outOwners),
+      shape,
+      attr,
+      matValIDs)
   }
 
   @tailrec private def copyToArray[T](it: ju.Iterator[T],
@@ -353,11 +360,12 @@ private[stream] object Fusing {
 
               // need to add the module so that the structural (internal) wirings can be rewritten as well
               // but these modules must not be added to any of the groups
-              struct.addModule(copy,
-                               new ju.HashSet,
-                               inheritedAttributes,
-                               indent,
-                               shape)
+              struct.addModule(
+                copy,
+                new ju.HashSet,
+                inheritedAttributes,
+                indent,
+                shape)
               struct.registerInternals(newShape, indent)
 
               copy
@@ -368,11 +376,12 @@ private[stream] object Fusing {
             shape = oldShape.copyFromPorts(oldIns.toList, oldOuts.toList),
             matValIDs = newids)
           // make sure to add all the port mappings from old GraphModule Shape to new shape
-          struct.addModule(newgm,
-                           localGroup,
-                           inheritedAttributes,
-                           indent,
-                           _oldShape = oldShape)
+          struct.addModule(
+            newgm,
+            localGroup,
+            inheritedAttributes,
+            indent,
+            _oldShape = oldShape)
           // now compute the list of all materialized value computation updates
           var result = List.empty[(Module, MaterializedValueNode)]
           var i = 0
@@ -417,9 +426,10 @@ private[stream] object Fusing {
               subMat
                 .map(p ⇒
                   s"${p._1.getClass.getName}[${struct.hash(p._1)}] -> ${p._2}")
-                .mkString("subMat\n  " + "  " * indent,
-                          "\n  " + "  " * indent,
-                          ""))
+                .mkString(
+                  "subMat\n  " + "  " * indent,
+                  "\n  " + "  " * indent,
+                  ""))
           // we need to remove all wirings that this module copied from nested modules so that we
           // don’t do wirings twice
           val oldDownstreams = m match {
@@ -440,9 +450,10 @@ private[stream] object Fusing {
             log(
               matNodeMapping.asScala
                 .map(p ⇒ s"${p._1} -> ${p._2}")
-                .mkString("matNodeMapping\n  " + "  " * indent,
-                          "\n  " + "  " * indent,
-                          ""))
+                .mkString(
+                  "matNodeMapping\n  " + "  " * indent,
+                  "\n  " + "  " * indent,
+                  ""))
           // and finally rewire all MaterializedValueSources to their new computation nodes
           val matSrcs = struct.exitMatCtx()
           matSrcs.foreach { c ⇒
@@ -494,9 +505,10 @@ private[stream] object Fusing {
         mapping.put(mat, ret)
         ret
       case Combine(f, left, right) ⇒
-        val ret = Combine(f,
-                          rewriteMat(subMat, left, mapping),
-                          rewriteMat(subMat, right, mapping))
+        val ret = Combine(
+          f,
+          rewriteMat(subMat, left, mapping),
+          rewriteMat(subMat, right, mapping))
         mapping.put(mat, ret)
         ret
       case Transform(f, dep) ⇒
@@ -520,11 +532,12 @@ private[stream] object Fusing {
     */
   final class BuildStructuralInfo {
     def toInfo: StructuralInfo =
-      StructuralInfo(immutable.Map.empty ++ upstreams.asScala,
-                     immutable.Map.empty ++ downstreams.asScala,
-                     immutable.Map.empty ++ inOwners.asScala,
-                     immutable.Map.empty ++ outOwners.asScala,
-                     Set.empty ++ modules.asScala)
+      StructuralInfo(
+        immutable.Map.empty ++ upstreams.asScala,
+        immutable.Map.empty ++ downstreams.asScala,
+        immutable.Map.empty ++ inOwners.asScala,
+        immutable.Map.empty ++ outOwners.asScala,
+        Set.empty ++ modules.asScala)
 
     /**
       * the set of all contained modules

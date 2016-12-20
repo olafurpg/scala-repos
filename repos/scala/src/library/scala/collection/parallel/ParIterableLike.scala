@@ -524,9 +524,10 @@ trait ParIterableLike[
   def map[S, That](f: T => S)(implicit bf: CanBuildFrom[Repr, S, That]): That =
     if (bf(repr).isCombiner) {
       tasksupport.executeAndWaitResult(
-        new Map[S, That](f,
-                         combinerFactory(() => bf(repr).asCombiner),
-                         splitter) mapResult { _.resultWithTaskSupport })
+        new Map[S, That](
+          f,
+          combinerFactory(() => bf(repr).asCombiner),
+          splitter) mapResult { _.resultWithTaskSupport })
     } else setTaskSupport(seq.map(f)(bf2seq(bf)), tasksupport)
   /*bf ifParallel { pbf =>
     tasksupport.executeAndWaitResult(new Map[S, That](f, pbf, splitter) mapResult { _.result })
@@ -536,9 +537,10 @@ trait ParIterableLike[
       implicit bf: CanBuildFrom[Repr, S, That]): That =
     if (bf(repr).isCombiner) {
       tasksupport.executeAndWaitResult(
-        new Collect[S, That](pf,
-                             combinerFactory(() => bf(repr).asCombiner),
-                             splitter) mapResult { _.resultWithTaskSupport })
+        new Collect[S, That](
+          pf,
+          combinerFactory(() => bf(repr).asCombiner),
+          splitter) mapResult { _.resultWithTaskSupport })
     } else setTaskSupport(seq.collect(pf)(bf2seq(bf)), tasksupport)
   /*bf ifParallel { pbf =>
     tasksupport.executeAndWaitResult(new Collect[S, That](pf, pbf, splitter) mapResult { _.result })
@@ -548,9 +550,10 @@ trait ParIterableLike[
       implicit bf: CanBuildFrom[Repr, S, That]): That =
     if (bf(repr).isCombiner) {
       tasksupport.executeAndWaitResult(
-        new FlatMap[S, That](f,
-                             combinerFactory(() => bf(repr).asCombiner),
-                             splitter) mapResult { _.resultWithTaskSupport })
+        new FlatMap[S, That](
+          f,
+          combinerFactory(() => bf(repr).asCombiner),
+          splitter) mapResult { _.resultWithTaskSupport })
     } else setTaskSupport(seq.flatMap(f)(bf2seq(bf)), tasksupport)
   /*bf ifParallel { pbf =>
     tasksupport.executeAndWaitResult(new FlatMap[S, That](f, pbf, splitter) mapResult { _.result })
@@ -883,11 +886,12 @@ trait ParIterableLike[
       val cntx = new DefaultSignalling with AtomicIndexFlag
       cntx.setIndexFlag(Int.MaxValue)
       tasksupport.executeAndWaitResult(
-        new Span(0,
-                 pred,
-                 combinerFactory,
-                 combinerFactory,
-                 splitter assign cntx) mapResult { p =>
+        new Span(
+          0,
+          pred,
+          combinerFactory,
+          combinerFactory,
+          splitter assign cntx) mapResult { p =>
           (p._1.resultWithTaskSupport, p._2.resultWithTaskSupport)
         })
     }
@@ -929,9 +933,10 @@ trait ParIterableLike[
     if (bf(repr).isCombiner && that.isParSeq) {
       val thatseq = that.asParSeq
       tasksupport.executeAndWaitResult(
-        new Zip(combinerFactory(() => bf(repr).asCombiner),
-                splitter,
-                thatseq.splitter) mapResult { _.resultWithTaskSupport })
+        new Zip(
+          combinerFactory(() => bf(repr).asCombiner),
+          splitter,
+          thatseq.splitter) mapResult { _.resultWithTaskSupport })
     } else setTaskSupport(seq.zip(that)(bf2seq(bf)), tasksupport)
 
   def zipWithIndex[U >: T, That](
@@ -943,18 +948,20 @@ trait ParIterableLike[
     if (bf(repr).isCombiner && that.isParSeq) {
       val thatseq = that.asParSeq
       tasksupport.executeAndWaitResult(
-        new ZipAll(size max thatseq.length,
-                   thisElem,
-                   thatElem,
-                   combinerFactory(() => bf(repr).asCombiner),
-                   splitter,
-                   thatseq.splitter) mapResult {
+        new ZipAll(
+          size max thatseq.length,
+          thisElem,
+          thatElem,
+          combinerFactory(() => bf(repr).asCombiner),
+          splitter,
+          thatseq.splitter) mapResult {
           _.resultWithTaskSupport
         }
       )
     } else
-      setTaskSupport(seq.zipAll(that, thisElem, thatElem)(bf2seq(bf)),
-                     tasksupport)
+      setTaskSupport(
+        seq.zipAll(that, thisElem, thatElem)(bf2seq(bf)),
+        tasksupport)
 
   protected def toParCollection[U >: T, That](
       cbf: () => Combiner[U, That]): That = {
@@ -1375,13 +1382,15 @@ trait ParIterableLike[
       cbfTrue: CombinerFactory[U, This],
       cbfFalse: CombinerFactory[U, This],
       protected[this] val pit: IterableSplitter[T])
-      extends Transformer[(Combiner[U, This], Combiner[U, This]),
-                          Partition[U, This]] {
+      extends Transformer[
+        (Combiner[U, This], Combiner[U, This]),
+        Partition[U, This]] {
     @volatile var result: (Combiner[U, This], Combiner[U, This]) = null
     def leaf(prev: Option[(Combiner[U, This], Combiner[U, This])]) =
-      result = pit.partition2combiners(pred,
-                                       reuse(prev.map(_._1), cbfTrue()),
-                                       reuse(prev.map(_._2), cbfFalse()))
+      result = pit.partition2combiners(
+        pred,
+        reuse(prev.map(_._1), cbfTrue()),
+        reuse(prev.map(_._2), cbfFalse()))
     protected[this] def newSubtask(p: IterableSplitter[T]) =
       new Partition(pred, cbfTrue, cbfFalse, p)
     override def merge(that: Partition[U, This]) =
@@ -1491,13 +1500,15 @@ trait ParIterableLike[
       cbfBefore: CombinerFactory[U, This],
       cbfAfter: CombinerFactory[U, This],
       protected[this] val pit: IterableSplitter[T])
-      extends Transformer[(Combiner[U, This], Combiner[U, This]),
-                          SplitAt[U, This]] {
+      extends Transformer[
+        (Combiner[U, This], Combiner[U, This]),
+        SplitAt[U, This]] {
     @volatile var result: (Combiner[U, This], Combiner[U, This]) = null
     def leaf(prev: Option[(Combiner[U, This], Combiner[U, This])]) =
-      result = pit.splitAt2combiners(at,
-                                     reuse(prev.map(_._1), cbfBefore()),
-                                     reuse(prev.map(_._2), cbfAfter()))
+      result = pit.splitAt2combiners(
+        at,
+        reuse(prev.map(_._1), cbfBefore()),
+        reuse(prev.map(_._2), cbfAfter()))
     protected[this] def newSubtask(p: IterableSplitter[T]) =
       throw new UnsupportedOperationException
     override def split = {
@@ -1505,10 +1516,11 @@ trait ParIterableLike[
       val sizes = pits.scanLeft(0)(_ + _.remaining)
       for ((p, untilp) <- pits zip sizes)
         yield
-          new SplitAt((at max untilp min (untilp + p.remaining)) - untilp,
-                      cbfBefore,
-                      cbfAfter,
-                      p)
+          new SplitAt(
+            (at max untilp min (untilp + p.remaining)) - untilp,
+            cbfBefore,
+            cbfAfter,
+            p)
     }
     override def merge(that: SplitAt[U, This]) =
       result =
@@ -1547,8 +1559,9 @@ trait ParIterableLike[
       cbfBefore: CombinerFactory[U, This],
       cbfAfter: CombinerFactory[U, This],
       protected[this] val pit: IterableSplitter[T])
-      extends Transformer[(Combiner[U, This], Combiner[U, This]),
-                          Span[U, This]] {
+      extends Transformer[
+        (Combiner[U, This], Combiner[U, This]),
+        Span[U, This]] {
     @volatile var result: (Combiner[U, This], Combiner[U, This]) = null
     def leaf(prev: Option[(Combiner[U, This], Combiner[U, This])]) =
       if (pos < pit.indexFlag) {
@@ -1629,15 +1642,16 @@ trait ParIterableLike[
         val diff = len - pit.remaining
         Seq(
           new ZipAll(pit.remaining, thiselem, thatelem, pbf, pit, opits(0)), // nothing wrong will happen with the cast below - elem T is never accessed
-          new ZipAll(diff,
-                     thiselem,
-                     thatelem,
-                     pbf,
-                     immutable
-                       .repetition(thiselem, diff)
-                       .splitter
-                       .asInstanceOf[IterableSplitter[T]],
-                     opits(1))
+          new ZipAll(
+            diff,
+            thiselem,
+            thatelem,
+            pbf,
+            immutable
+              .repetition(thiselem, diff)
+              .splitter
+              .asInstanceOf[IterableSplitter[T]],
+            opits(1))
         )
       }
     override def merge(that: ZipAll[U, S, That]) =
@@ -1728,8 +1742,9 @@ trait ParIterableLike[
                            howmany: Int): ScanTree[U] =
       if (howmany > 1) {
         val half = howmany / 2
-        ScanNode(mergeTrees(trees, from, half),
-                 mergeTrees(trees, from + half, howmany - half))
+        ScanNode(
+          mergeTrees(trees, from, half),
+          mergeTrees(trees, from + half, howmany - half))
       } else trees(from)
     protected[this] def newSubtask(pit: IterableSplitter[T]) =
       throw new UnsupportedOperationException

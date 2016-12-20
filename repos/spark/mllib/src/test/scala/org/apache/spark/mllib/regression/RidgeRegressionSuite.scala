@@ -31,8 +31,9 @@ import org.apache.spark.util.Utils
 private object RidgeRegressionSuite {
 
   /** 3 features */
-  val model = new RidgeRegressionModel(weights = Vectors.dense(0.1, 0.2, 0.3),
-                                       intercept = 0.5)
+  val model = new RidgeRegressionModel(
+    weights = Vectors.dense(0.1, 0.2, 0.3),
+    intercept = 0.5)
 }
 
 class RidgeRegressionSuite extends SparkFunSuite with MLlibTestSparkContext {
@@ -86,9 +87,10 @@ class RidgeRegressionSuite extends SparkFunSuite with MLlibTestSparkContext {
       validationData)
 
     // Ridge validation error should be lower than linear regression.
-    assert(ridgeErr < linearErr,
-           "ridgeError (" + ridgeErr + ") was not less than linearError(" +
-             linearErr + ")")
+    assert(
+      ridgeErr < linearErr,
+      "ridgeError (" + ridgeErr + ") was not less than linearError(" +
+        linearErr + ")")
   }
 
   test("model save/load") {

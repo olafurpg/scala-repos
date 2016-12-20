@@ -52,10 +52,11 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
               before = new DateTime(year, month, 1, 0, 0).plusMonths(1).some
             ).map {
               _.headOption.map { champ =>
-                HistoryMonth(HistoryMonth.makeId(year, month),
-                             year,
-                             month,
-                             champ)
+                HistoryMonth(
+                  HistoryMonth.makeId(year, month),
+                  year,
+                  month,
+                  champ)
               }
             }
           }
@@ -66,9 +67,10 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
       .map(_.flatten)
       .flatMap {
         _.map { month =>
-          historyColl.update(BSONDocument("_id" -> month._id),
-                             month,
-                             upsert = true)
+          historyColl.update(
+            BSONDocument("_id" -> month._id),
+            month,
+            upsert = true)
         }.sequenceFu
       }
       .void
@@ -77,25 +79,24 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
 
   private val leaderboardsCache =
     AsyncCache
-      .single[Leaderboards](f = mixedLeaderboard(DateTime.now minusDays 1,
-                                                 none) zip mixedLeaderboard(
-                                DateTime.now minusWeeks 1,
-                                none) zip mixedLeaderboard(
-                                DateTime.now minusMonths 1,
-                                none) map {
-                              case ((daily, weekly), monthly) =>
-                                Leaderboards(daily, weekly, monthly)
-                            },
-                            timeToLive = 10 seconds)
+      .single[Leaderboards](
+        f = mixedLeaderboard(DateTime.now minusDays 1, none) zip mixedLeaderboard(
+            DateTime.now minusWeeks 1,
+            none) zip mixedLeaderboard(DateTime.now minusMonths 1, none) map {
+          case ((daily, weekly), monthly) =>
+            Leaderboards(daily, weekly, monthly)
+        },
+        timeToLive = 10 seconds)
 
   private def mixedLeaderboard(after: DateTime,
                                before: Option[DateTime]): Fu[List[ModMixed]] =
     actionLeaderboard(after, before) zip reportLeaderboard(after, before) map {
       case (actions, reports) =>
         actions.map(_.modId) intersect reports.map(_.modId) map { modId =>
-          ModMixed(modId,
-                   action = actions.find(_.modId == modId) ?? (_.count),
-                   report = reports.find(_.modId == modId) ?? (_.count))
+          ModMixed(
+            modId,
+            action = actions.find(_.modId == modId) ?? (_.count),
+            report = reports.find(_.modId == modId) ?? (_.count))
         } sortBy (-_.score)
     }
 
@@ -125,13 +126,15 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
   private def reportLeaderboard(after: DateTime,
                                 before: Option[DateTime]): Fu[List[ModCount]] =
     reportColl
-      .aggregate(Match(
-                   BSONDocument(
-                     "createdAt" -> dateRange(after, before),
-                     "processedBy" -> notLichess
-                   )),
-                 List(GroupField("processedBy")("nb" -> SumValue(1)),
-                      Sort(Descending("nb"))))
+      .aggregate(
+        Match(
+          BSONDocument(
+            "createdAt" -> dateRange(after, before),
+            "processedBy" -> notLichess
+          )),
+        List(
+          GroupField("processedBy")("nb" -> SumValue(1)),
+          Sort(Descending("nb"))))
       .map {
         _.documents.flatMap { obj =>
           obj.getAs[String]("_id") |@| obj.getAs[Int]("nb") apply ModCount.apply

@@ -288,8 +288,9 @@ class SocksConnectHandler(proxyAddr: SocketAddress,
               state = Authenticating
               writeUserNameAndPass(ctx, username, pass)
             case None =>
-              fail(e.getChannel,
-                   new ConnectionFailedException(InvalidInit, addr))
+              fail(
+                e.getChannel,
+                new ConnectionFailedException(InvalidInit, addr))
           }
 
         case Authenticating =>
@@ -297,8 +298,9 @@ class SocksConnectHandler(proxyAddr: SocketAddress,
             state = Requested
             writeRequest(ctx)
           } else {
-            fail(e.getChannel,
-                 new ConnectionFailedException(InvalidResponse, addr))
+            fail(
+              e.getChannel,
+              new ConnectionFailedException(InvalidResponse, addr))
           }
 
         case Requested =>
@@ -306,8 +308,9 @@ class SocksConnectHandler(proxyAddr: SocketAddress,
             ctx.getPipeline.remove(this)
             connectFuture.get.setSuccess()
           } else {
-            fail(e.getChannel,
-                 new ConnectionFailedException(InvalidResponse, addr))
+            fail(
+              e.getChannel,
+              new ConnectionFailedException(InvalidResponse, addr))
           }
       }
     } catch {

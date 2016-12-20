@@ -170,9 +170,10 @@ abstract class MappedPassword[T <: Mapper[T]](val fieldOwner: T)
   }
 
   def real_convertToJDBCFriendly(value: String): Object =
-    BCrypt.hashpw(value,
-                  MappedPassword.bcryptStrength
-                    .map(BCrypt.gensalt(_)) openOr BCrypt.gensalt())
+    BCrypt.hashpw(
+      value,
+      MappedPassword.bcryptStrength
+        .map(BCrypt.gensalt(_)) openOr BCrypt.gensalt())
 
   /**
     * Get the JDBC SQL Type for this field

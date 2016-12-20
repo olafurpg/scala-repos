@@ -63,11 +63,12 @@ private[spark] class LocalEndpoint(override val rpcEnv: RpcEnv,
   val localExecutorId = SparkContext.DRIVER_IDENTIFIER
   val localExecutorHostname = "localhost"
 
-  private val executor = new Executor(localExecutorId,
-                                      localExecutorHostname,
-                                      SparkEnv.get,
-                                      userClassPath,
-                                      isLocal = true)
+  private val executor = new Executor(
+    localExecutorId,
+    localExecutorHostname,
+    SparkEnv.get,
+    userClassPath,
+    isLocal = true)
 
   override def receive: PartialFunction[Any, Unit] = {
     case ReviveOffers =>
@@ -96,11 +97,12 @@ private[spark] class LocalEndpoint(override val rpcEnv: RpcEnv,
       new WorkerOffer(localExecutorId, localExecutorHostname, freeCores))
     for (task <- scheduler.resourceOffers(offers).flatten) {
       freeCores -= scheduler.CPUS_PER_TASK
-      executor.launchTask(executorBackend,
-                          taskId = task.taskId,
-                          attemptNumber = task.attemptNumber,
-                          task.name,
-                          task.serializedTask)
+      executor.launchTask(
+        executorBackend,
+        taskId = task.taskId,
+        attemptNumber = task.attemptNumber,
+        task.name,
+        task.serializedTask)
     }
   }
 }
@@ -151,9 +153,10 @@ private[spark] class LocalBackend(conf: SparkConf,
       SparkListenerExecutorAdded(
         System.currentTimeMillis,
         executorEndpoint.localExecutorId,
-        new ExecutorInfo(executorEndpoint.localExecutorHostname,
-                         totalCores,
-                         Map.empty)))
+        new ExecutorInfo(
+          executorEndpoint.localExecutorHostname,
+          totalCores,
+          Map.empty)))
     launcherBackend.setAppId(appId)
     launcherBackend.setState(SparkAppHandle.State.RUNNING)
   }

@@ -16,10 +16,11 @@ import grizzled.slf4j.Logger
 case class DataSourceParams(appId: Int) extends Params
 
 class DataSource(val dsp: DataSourceParams)
-    extends PDataSource[TrainingData,
-                        EmptyEvaluationInfo,
-                        Query,
-                        EmptyActualResult] {
+    extends PDataSource[
+      TrainingData,
+      EmptyEvaluationInfo,
+      Query,
+      EmptyActualResult] {
 
   @transient lazy val logger = Logger[this.type]
 
@@ -71,19 +72,21 @@ class DataSource(val dsp: DataSourceParams)
 
     // get all "user" "view" "item" events
     val eventsRDD: RDD[Event] =
-      eventsDb.find(appId = dsp.appId,
-                    entityType = Some("user"),
-                    eventNames = Some(List("view")),
-                    // targetEntityType is optional field of an event.
-                    targetEntityType = Some(Some("item")))(sc)
+      eventsDb.find(
+        appId = dsp.appId,
+        entityType = Some("user"),
+        eventNames = Some(List("view")),
+        // targetEntityType is optional field of an event.
+        targetEntityType = Some(Some("item")))(sc)
 
     val viewEventsRDD: RDD[ViewEvent] = eventsRDD.map { event =>
       val viewEvent = try {
         event.event match {
           case "view" =>
-            ViewEvent(user = event.entityId,
-                      item = event.targetEntityId.get,
-                      t = event.eventTime.getMillis)
+            ViewEvent(
+              user = event.entityId,
+              item = event.targetEntityId.get,
+              t = event.eventTime.getMillis)
           case _ => throw new Exception(s"Unexpected event ${event} is read.")
         }
       } catch {

@@ -63,9 +63,10 @@ object StormTestRun {
     InflightTuples.reset()
     try {
       val cluster = new LocalCluster()
-      cluster.submitTopology("test topology",
-                             plannedTopology.config,
-                             plannedTopology.topology)
+      cluster.submitTopology(
+        "test topology",
+        plannedTopology.config,
+        plannedTopology.topology)
       Thread.sleep(4500)
       cluster.killTopology("test topology")
       Thread.sleep(1500)
@@ -73,8 +74,9 @@ object StormTestRun {
     } finally {
       System.setSecurityManager(oldSecManager)
     }
-    require(InflightTuples.get == 0,
-            "Inflight tuples is: %d".format(InflightTuples.get))
+    require(
+      InflightTuples.get == 0,
+      "Inflight tuples is: %d".format(InflightTuples.get))
   }
 
   def apply(graph: TailProducer[Storm, Any])(implicit storm: Storm) {

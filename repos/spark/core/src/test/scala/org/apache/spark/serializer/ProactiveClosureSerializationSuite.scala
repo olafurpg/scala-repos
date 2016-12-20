@@ -60,8 +60,9 @@ class ProactiveClosureSerializationSuite
       val ex = intercept[SparkException] {
         xf(data, uc)
       }
-      assert(ex.getMessage.contains("Task not serializable"),
-             s"RDD.$name doesn't proactively throw NotSerializableException")
+      assert(
+        ex.getMessage.contains("Task not serializable"),
+        s"RDD.$name doesn't proactively throw NotSerializableException")
     }
   }
 

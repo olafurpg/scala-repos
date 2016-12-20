@@ -38,6 +38,7 @@ object ByteStringConverter {
 
 class ByteStringConverter(
     delegate: jfxuc.ByteStringConverter = new jfxuc.ByteStringConverter)
-    extends StringConverterDelegate[java.lang.Byte,
-                                    Byte,
-                                    jfxuc.ByteStringConverter](delegate)
+    extends StringConverterDelegate[
+      java.lang.Byte,
+      Byte,
+      jfxuc.ByteStringConverter](delegate)

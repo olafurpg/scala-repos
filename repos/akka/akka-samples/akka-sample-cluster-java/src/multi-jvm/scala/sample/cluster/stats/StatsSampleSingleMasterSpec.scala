@@ -109,11 +109,12 @@ abstract class StatsSampleSingleMasterSpec
 
       Cluster(system).unsubscribe(testActor)
 
-      system.actorOf(ClusterSingletonManager.props(
-                       Props[StatsService],
-                       terminationMessage = PoisonPill,
-                       settings = ClusterSingletonManagerSettings(system)),
-                     name = "statsService")
+      system.actorOf(
+        ClusterSingletonManager.props(
+          Props[StatsService],
+          terminationMessage = PoisonPill,
+          settings = ClusterSingletonManagerSettings(system)),
+        name = "statsService")
 
       system.actorOf(
         ClusterSingletonProxy.props(

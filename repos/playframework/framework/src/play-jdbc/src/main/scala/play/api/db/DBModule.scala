@@ -53,10 +53,11 @@ trait DBComponents {
   def connectionPool: ConnectionPool
   def applicationLifecycle: ApplicationLifecycle
 
-  lazy val dbApi: DBApi = new DBApiProvider(environment,
-                                            configuration,
-                                            connectionPool,
-                                            applicationLifecycle).get
+  lazy val dbApi: DBApi = new DBApiProvider(
+    environment,
+    configuration,
+    connectionPool,
+    applicationLifecycle).get
 }
 
 /**
@@ -73,10 +74,11 @@ class DBApiProvider @Inject()(environment: Environment,
   lazy val get: DBApi = {
     val config = configuration.underlying
     val dbKey = config.getString("play.db.config")
-    val pool = ConnectionPool.fromConfig(config.getString("play.db.pool"),
-                                         injector,
-                                         environment,
-                                         defaultConnectionPool)
+    val pool = ConnectionPool.fromConfig(
+      config.getString("play.db.pool"),
+      injector,
+      environment,
+      defaultConnectionPool)
     val configs =
       if (config.hasPath(dbKey)) {
         PlayConfig(config)

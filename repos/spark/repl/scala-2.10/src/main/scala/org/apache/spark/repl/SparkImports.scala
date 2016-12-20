@@ -235,9 +235,10 @@ private[repl] trait SparkImports { self: SparkIMain =>
     // add one extra wrapper, to prevent warnings in the common case of
     // redefining the value bound in the last interpreter request.
     addWrapper()
-    SparkComputedImports(code.toString,
-                         trailingBraces.toString,
-                         accessPath.toString)
+    SparkComputedImports(
+      code.toString,
+      trailingBraces.toString,
+      accessPath.toString)
   }
 
   private def allReqAndHandlers =

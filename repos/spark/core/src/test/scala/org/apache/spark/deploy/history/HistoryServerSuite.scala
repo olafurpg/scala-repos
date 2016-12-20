@@ -168,9 +168,10 @@ class HistoryServerSuite
 
         val exp = IOUtils.toString(
           new FileInputStream(
-            new File(expRoot,
-                     HistoryServerSuite.sanitizePath(name) +
-                       "_expectation.json")))
+            new File(
+              expRoot,
+              HistoryServerSuite.sanitizePath(name) +
+                "_expectation.json")))
         // compare the ASTs so formatting differences don't cause failures
         import org.json4s._
         import org.json4s.jackson.JsonMethods._
@@ -223,8 +224,9 @@ class HistoryServerSuite
           new File(logDir, entry.getName)
         }
         val expected = Files.toString(expectedFile, StandardCharsets.UTF_8)
-        val actual = new String(ByteStreams.toByteArray(zipStream),
-                                StandardCharsets.UTF_8)
+        val actual = new String(
+          ByteStreams.toByteArray(zipStream),
+          StandardCharsets.UTF_8)
         actual should be(expected)
         filesCompared += 1
       }
@@ -274,8 +276,9 @@ class HistoryServerSuite
     // when
     System.setProperty("spark.ui.proxyBase", uiRoot)
     val response = page.render(request)
-    System.setProperty("spark.ui.proxyBase",
-                       Option(proxyBaseBeforeTest).getOrElse(""))
+    System.setProperty(
+      "spark.ui.proxyBase",
+      Option(proxyBaseBeforeTest).getOrElse(""))
 
     // then
     val urls = response \\ "@href" map (_.toString)
@@ -433,8 +436,9 @@ class HistoryServerSuite
     getNumJobs("") should be(1)
     getNumJobs("/jobs") should be(1)
     getNumJobsRestful() should be(1)
-    assert(metrics.lookupCount.getCount > 1,
-           s"lookup count too low in $metrics")
+    assert(
+      metrics.lookupCount.getCount > 1,
+      s"lookup count too low in $metrics")
 
     // dump state before the next bit of test, which is where update
     // checking really gets stressed
@@ -460,8 +464,9 @@ class HistoryServerSuite
     d.count()
     d.count()
     eventually(stdTimeout, stdInterval) {
-      assert(4 === getNumJobsRestful(),
-             s"two jobs back-to-back not updated, server=$server\n")
+      assert(
+        4 === getNumJobsRestful(),
+        s"two jobs back-to-back not updated, server=$server\n")
     }
     val jobcount = getNumJobs("/jobs")
     assert(!provider.getListing().head.completed)
@@ -472,8 +477,9 @@ class HistoryServerSuite
     resetSparkContext()
     // check the app is now found as completed
     eventually(stdTimeout, stdInterval) {
-      assert(provider.getListing().head.completed,
-             s"application never completed, server=$server\n")
+      assert(
+        provider.getListing().head.completed,
+        s"application never completed, server=$server\n")
     }
 
     // app becomes observably complete

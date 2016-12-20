@@ -33,8 +33,9 @@ abstract class LineMarkerTestBase extends LightCodeInsightFixtureTestCase {
   def doTest() = {
     val path = getBasePath + getTestName(false) + ".test"
     val input = Source.fromFile(new File(path)).getLines().mkString("\n")
-    myFixture.configureByText(ScalaFileType.SCALA_FILE_TYPE,
-                              input.replaceAll(marker, ""))
+    myFixture.configureByText(
+      ScalaFileType.SCALA_FILE_TYPE,
+      input.replaceAll(marker, ""))
 
     DaemonCodeAnalyzerSettings.getInstance.SHOW_METHOD_SEPARATORS = true
     myFixture.asInstanceOf[JavaCodeInsightTestFixtureImpl].doHighlighting()

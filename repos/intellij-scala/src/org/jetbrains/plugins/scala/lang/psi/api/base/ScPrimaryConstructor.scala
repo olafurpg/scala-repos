@@ -95,9 +95,10 @@ trait ScPrimaryConstructor
       val parentClazz = ScalaPsiUtil.getPlaceTd(clazz)
       val designatorType: ScType =
         if (parentClazz != null)
-          ScProjectionType(ScThisType(parentClazz),
-                           clazz,
-                           superReference = false)
+          ScProjectionType(
+            ScThisType(parentClazz),
+            clazz,
+            superReference = false)
         else ScDesignatorType(clazz)
       if (typeParameters.isEmpty) designatorType
       else {
@@ -107,8 +108,9 @@ trait ScPrimaryConstructor
       }
     })
     if (clauses.isEmpty)
-      return new ScMethodType(returnType, Seq.empty, false)(getProject,
-                                                            getResolveScope)
+      return new ScMethodType(returnType, Seq.empty, false)(
+        getProject,
+        getResolveScope)
     val res = clauses.foldRight[ScType](returnType) {
       (clause: ScParameterClause, tp: ScType) =>
         new ScMethodType(tp, clause.getSmartParameters, clause.isImplicit)(
@@ -123,8 +125,9 @@ trait ScPrimaryConstructor
       getParent.asInstanceOf[ScTypeDefinition].typeParameters
     if (typeParameters.isEmpty) methodType
     else
-      ScTypePolymorphicType(methodType,
-                            typeParameters.map(new TypeParameter(_)))
+      ScTypePolymorphicType(
+        methodType,
+        typeParameters.map(new TypeParameter(_)))
   }
 
   def getParamByName(name: String,

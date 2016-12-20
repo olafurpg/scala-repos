@@ -123,11 +123,12 @@ object RunWorksheetAction {
             (className: String, addToCp: String) => {
               ApplicationManager.getApplication invokeLater new Runnable {
                 override def run() {
-                  executeWorksheet(file.getName,
-                                   project,
-                                   file.getContainingFile,
-                                   className,
-                                   addToCp)
+                  executeWorksheet(
+                    file.getName,
+                    project,
+                    file.getContainingFile,
+                    className,
+                    addToCp)
                 }
               }
             },

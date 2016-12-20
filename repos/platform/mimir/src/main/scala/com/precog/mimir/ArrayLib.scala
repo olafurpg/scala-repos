@@ -63,9 +63,11 @@ trait ArrayLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
 
               val columnTables =
                 values.columns.foldLeft(Map[ColumnRef, Array[Column]]()) {
-                  case (acc,
-                        (ColumnRef(CPath(CPathIndex(idx), ptail @ _ *), tpe),
-                         col)) => {
+                  case (
+                      acc,
+                      (
+                        ColumnRef(CPath(CPathIndex(idx), ptail @ _ *), tpe),
+                        col)) => {
                     // remap around the mod ring w.r.t. max length
                     // s.t. f(i) = f'(i * max + arrayI)
 
@@ -199,17 +201,20 @@ trait ArrayLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
         val flattenedTable =
           Table(flattenedSlices, UnknownSize).compact(TransSpec1.Id)
         val finalTable =
-          flattenedTable.canonicalize(yggConfig.minIdealSliceSize,
-                                      Some(yggConfig.maxSliceSize))
+          flattenedTable.canonicalize(
+            yggConfig.minIdealSliceSize,
+            Some(yggConfig.maxSliceSize))
 
         val spec = InnerObjectConcat(
-          WrapObject(InnerArrayConcat(
-                       DerefObjectStatic(Leaf(Source), paths.Key),
-                       WrapArray(Scan(Leaf(Source), freshIdScanner))
-                     ),
-                     paths.Key.name),
-          WrapObject(DerefObjectStatic(Leaf(Source), paths.Value),
-                     paths.Value.name))
+          WrapObject(
+            InnerArrayConcat(
+              DerefObjectStatic(Leaf(Source), paths.Key),
+              WrapArray(Scan(Leaf(Source), freshIdScanner))
+            ),
+            paths.Key.name),
+          WrapObject(
+            DerefObjectStatic(Leaf(Source), paths.Value),
+            paths.Value.name))
 
         finalTable transform spec
       }

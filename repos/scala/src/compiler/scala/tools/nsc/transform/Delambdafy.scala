@@ -182,8 +182,8 @@ abstract class Delambdafy
             targetFunctionParams,
             functionParamTypes)(
             (param, tp) =>
-              methSym.newSyntheticValueParam(boxedType(tp),
-                                             param.name.toTermName))
+              methSym
+                .newSyntheticValueParam(boxedType(tp), param.name.toTermName))
 
         val bridgeResultType: Type = {
           if (target.info.resultType == UnitTpe &&
@@ -211,9 +211,9 @@ abstract class Delambdafy
                 if (enteringErasure(
                       functionParam.typeSymbol.isDerivedValueClass)) {
                   val casted = cast(gen.mkAttributedRef(param), functionParam)
-                  val unboxed = unbox(casted,
-                                      ErasedValueType(functionParam.typeSymbol,
-                                                      targetParam.tpe))
+                  val unboxed = unbox(
+                    casted,
+                    ErasedValueType(functionParam.typeSymbol, targetParam.tpe))
                     .modifyType(postErasure.elimErasedValueType)
                   unboxed
                 } else adaptToType(gen.mkAttributedRef(param), targetParam.tpe)
@@ -291,15 +291,17 @@ abstract class Delambdafy
           newClass.newConstructor(originalFunction.pos, SYNTHETIC)
 
         val (paramSymbols, params, assigns) = (members map { member =>
-          val paramSymbol = newClass.newVariable(member.symbol.name.toTermName,
-                                                 newClass.pos,
-                                                 0)
+          val paramSymbol = newClass.newVariable(
+            member.symbol.name.toTermName,
+            newClass.pos,
+            0)
           paramSymbol.setInfo(member.symbol.info)
           val paramVal = ValDef(paramSymbol)
           val paramIdent = Ident(paramSymbol)
           val assign =
-            Assign(Select(gen.mkAttributedThis(newClass), member.symbol),
-                   paramIdent)
+            Assign(
+              Select(gen.mkAttributedThis(newClass), member.symbol),
+              paramIdent)
 
           (paramSymbol, paramVal, assign)
         }).unzip3
@@ -352,8 +354,9 @@ abstract class Delambdafy
         assert(
           !lambdaClass.isAnonymousClass && !lambdaClass.isAnonymousFunction,
           "anonymous class name: " + lambdaClass.name)
-        assert(lambdaClass.isDelambdafyFunction,
-               "not lambda class name: " + lambdaClass.name)
+        assert(
+          lambdaClass.isDelambdafyFunction,
+          "not lambda class name: " + lambdaClass.name)
 
         val captureProxies2 = new LinkedHashMap[Symbol, TermSymbol]
         captures foreach { capture =>
@@ -370,9 +373,10 @@ abstract class Delambdafy
         val thisProxy = {
           if (isStatic) NoSymbol
           else {
-            val sym = lambdaClass.newVariable(nme.FAKE_LOCAL_THIS,
-                                              originalFunction.pos,
-                                              SYNTHETIC)
+            val sym = lambdaClass.newVariable(
+              nme.FAKE_LOCAL_THIS,
+              originalFunction.pos,
+              SYNTHETIC)
             sym.setInfo(oldClass.tpe)
           }
         }
@@ -414,8 +418,9 @@ abstract class Delambdafy
              // TODO SI-6260 maybe just create the apply method with the signature (Object => Object) in all cases
              //      rather than the method+bridge pair.
              if (bm.symbol.tpe =:= applyMethodDef.symbol.tpe)
-               erasure.resolveAnonymousBridgeClash(applyMethodDef.symbol,
-                                                   bm.symbol))
+               erasure.resolveAnonymousBridgeClash(
+                 applyMethodDef.symbol,
+                 bm.symbol))
 
         val body = members ++ List(constr, applyMethodDef) ++ bridgeMethod
 
@@ -497,8 +502,9 @@ abstract class Delambdafy
       } else {
         val anonymousClassDef = makeAnonymousClass
         pkg.info.decls enter anonymousClassDef.symbol
-        val newStat = Typed(New(anonymousClassDef.symbol, allCaptureArgs: _*),
-                            TypeTree(abstractFunctionErasedType))
+        val newStat = Typed(
+          New(anonymousClassDef.symbol, allCaptureArgs: _*),
+          TypeTree(abstractFunctionErasedType))
         val typedNewStat = localTyper.typedPos(originalFunction.pos)(newStat)
         DelambdafyAnonClass(anonymousClassDef, typedNewStat)
       }
@@ -564,9 +570,11 @@ abstract class Delambdafy
         //         This triggered primitive boxing, rather than value class boxing.
         val resTp = liftedBodyDefTpe.finalResultType
         val body =
-          Apply(gen.mkAttributedSelect(gen.mkAttributedThis(newClass),
-                                       applyMethod.symbol),
-                adaptedParams) setType resTp
+          Apply(
+            gen.mkAttributedSelect(
+              gen.mkAttributedThis(newClass),
+              applyMethod.symbol),
+            adaptedParams) setType resTp
         val (needsReturnAdaptation, adaptedBody) =
           adaptAndPostErase(body, ObjectTpe)
 

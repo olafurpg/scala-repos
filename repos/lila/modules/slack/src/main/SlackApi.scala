@@ -21,10 +21,11 @@ final class SlackApi(client: SlackClient,
         channel = "general"
       )) >> event.message.?? { msg =>
       client(
-        SlackMessage(username = username,
-                     icon = "kissing_heart",
-                     text = msg,
-                     channel = "general"))
+        SlackMessage(
+          username = username,
+          icon = "kissing_heart",
+          text = msg,
+          channel = "general"))
     }
   }
 
@@ -37,31 +38,35 @@ final class SlackApi(client: SlackClient,
 
   def publishError(msg: String): Funit =
     client(
-      SlackMessage(username = "lichess error",
-                   icon = "lightning",
-                   text = msg,
-                   channel = "general"))
+      SlackMessage(
+        username = "lichess error",
+        icon = "lightning",
+        text = msg,
+        channel = "general"))
 
   def publishWarning(msg: String): Funit =
     client(
-      SlackMessage(username = "lichess warning",
-                   icon = "thinking_face",
-                   text = msg,
-                   channel = "general"))
+      SlackMessage(
+        username = "lichess warning",
+        icon = "thinking_face",
+        text = msg,
+        channel = "general"))
 
   def publishVictory(msg: String): Funit =
     client(
-      SlackMessage(username = "lichess victory",
-                   icon = "tada",
-                   text = msg,
-                   channel = "general"))
+      SlackMessage(
+        username = "lichess victory",
+        icon = "tada",
+        text = msg,
+        channel = "general"))
 
   def publishInfo(msg: String): Funit =
     client(
-      SlackMessage(username = "lichess info",
-                   icon = "monkey",
-                   text = msg,
-                   channel = "general"))
+      SlackMessage(
+        username = "lichess info",
+        icon = "monkey",
+        text = msg,
+        channel = "general"))
 
   def userMod(user: User, mod: User): Funit =
     client(
@@ -83,8 +88,9 @@ final class SlackApi(client: SlackClient,
 
   def deployPost: Funit =
     client(
-      SlackMessage(username = "deployment",
-                   icon = "rocket",
-                   text = "Lichess is being updated! Brace for impact.",
-                   channel = "general"))
+      SlackMessage(
+        username = "deployment",
+        icon = "rocket",
+        text = "Lichess is being updated! Brace for impact.",
+        channel = "general"))
 }

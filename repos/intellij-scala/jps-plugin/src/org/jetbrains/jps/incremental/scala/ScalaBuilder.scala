@@ -217,8 +217,9 @@ object ScalaBuilder {
     if (settings.isCompileServerEnabled &&
         JavaBuilderUtil.CONSTANT_SEARCH_SERVICE.get(context) != null) {
       cleanLocalServerCache()
-      new RemoteServer(InetAddress.getByName(null),
-                       settings.getCompileServerPort)
+      new RemoteServer(
+        InetAddress.getByName(null),
+        settings.getCompileServerPort)
     } else {
       localServer
     }

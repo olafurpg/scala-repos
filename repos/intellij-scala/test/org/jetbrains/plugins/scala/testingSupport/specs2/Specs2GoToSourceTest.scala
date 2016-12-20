@@ -78,11 +78,12 @@ abstract class Specs2GoToSourceTest extends Specs2TestCase {
     val testName = "FailedGoToLocationTest"
     addGoToSourceTest(testName)
 
-    runGoToSourceTest(19,
-                      8,
-                      testName + ".scala",
-                      checkConfigAndSettings(_, testName, "fail"),
-                      List("[root]", testName, "Failed test should", "fail"),
-                      19)
+    runGoToSourceTest(
+      19,
+      8,
+      testName + ".scala",
+      checkConfigAndSettings(_, testName, "fail"),
+      List("[root]", testName, "Failed test should", "fail"),
+      19)
   }
 }

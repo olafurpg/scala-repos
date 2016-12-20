@@ -9,8 +9,9 @@ import scala.util.Try
 
 class DescriptorParserSpec extends EnsimeSpec {
 
-  private val SZ = ClassName(PackageName(List("scalaz", "syntax")),
-                             "ToApplicativeOps$ApplicativeIdV$$anonfun$η$1")
+  private val SZ = ClassName(
+    PackageName(List("scalaz", "syntax")),
+    "ToApplicativeOps$ApplicativeIdV$$anonfun$η$1")
   private val S = ClassName(PackageName(List("java", "lang")), "String")
   private val A = ArrayDescriptor
   private val D = Descriptor

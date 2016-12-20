@@ -62,9 +62,10 @@ abstract class LeaderDowningAllOtherNodesSpec
         for (node ← others) testConductor.exit(node, 0).await
       }
       enterBarrier("all-other-shutdown")
-      awaitMembersUp(numberOfMembers = 1,
-                     canNotBePartOfMemberRing = shutdownAddresses,
-                     30.seconds)
+      awaitMembersUp(
+        numberOfMembers = 1,
+        canNotBePartOfMemberRing = shutdownAddresses,
+        30.seconds)
     }
   }
 }

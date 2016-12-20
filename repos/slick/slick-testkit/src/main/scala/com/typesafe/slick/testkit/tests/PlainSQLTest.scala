@@ -118,10 +118,11 @@ class PlainSQLTest extends AsyncTest[JdbcTestDB] {
       create.map(_ shouldBe 0),
       DBIO
         .fold((for {
-          (id, name) <- List((1, "szeiger"),
-                             (0, "admin"),
-                             (2, "guest"),
-                             (3, "foo"))
+          (id, name) <- List(
+            (1, "szeiger"),
+            (0, "admin"),
+            (2, "guest"),
+            (3, "foo"))
         } yield sqlu"insert into USERS values ($id, $name)"), 0)(_ + _)
         .map(_ shouldBe 4),
       sql"select id from USERS"

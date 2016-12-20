@@ -126,9 +126,10 @@ trait MemoryProfile extends RelationalProfile with MemoryQueryingProfile {
     createInterpreter(session.database, param).run(tree).asInstanceOf[R]
 
   class InsertInvokerDef[T](tree: Node) {
-    protected[this] val ResultSetMapping(_,
-                                         Insert(_, table: TableNode, _, _),
-                                         CompiledMapping(converter, _)) = tree
+    protected[this] val ResultSetMapping(
+      _,
+      Insert(_, table: TableNode, _, _),
+      CompiledMapping(converter, _)) = tree
 
     type SingleInsertResult = Unit
     type MultiInsertResult = Unit
@@ -166,10 +167,11 @@ trait MemoryProfile extends RelationalProfile with MemoryQueryingProfile {
 
   class StreamingQueryAction[R, T](tree: Node, param: Any)
       extends StreamingProfileAction[R, T, Effect.Read]
-      with SynchronousDatabaseAction[R,
-                                     Streaming[T],
-                                     Backend#This,
-                                     Effect.Read] {
+      with SynchronousDatabaseAction[
+        R,
+        Streaming[T],
+        Backend#This,
+        Effect.Read] {
     type StreamState = Iterator[T]
     protected[this] def getIterator(ctx: Backend#Context): Iterator[T] = {
       val inter = createInterpreter(ctx.session.database, param)
@@ -204,10 +206,11 @@ trait MemoryProfile extends RelationalProfile with MemoryQueryingProfile {
       }
     def headOption: ProfileAction[Option[T], NoStream, Effect.Read] =
       new ProfileAction[Option[T], NoStream, Effect.Read]
-      with SynchronousDatabaseAction[Option[T],
-                                     NoStream,
-                                     Backend#This,
-                                     Effect.Read] {
+      with SynchronousDatabaseAction[
+        Option[T],
+        NoStream,
+        Backend#This,
+        Effect.Read] {
         def run(ctx: Backend#Context): Option[T] = {
           val it = getIterator(ctx)
           if (it.hasNext) Some(it.next) else None

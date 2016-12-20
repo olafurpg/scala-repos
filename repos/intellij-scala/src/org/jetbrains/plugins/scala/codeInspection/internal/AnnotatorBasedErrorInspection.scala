@@ -60,10 +60,11 @@ class AnnotatorBasedErrorInspection extends LocalInspectionTool {
           }
 
           if (highlightInfoHolder.hasErrorResults) {
-            holder.registerProblem(element,
-                                   "Error detected",
-                                   ProblemHighlightType.ERROR,
-                                   null: TextRange)
+            holder.registerProblem(
+              element,
+              "Error detected",
+              ProblemHighlightType.ERROR,
+              null: TextRange)
           }
         } else {
           val annotator = new ScalaAnnotator {
@@ -144,9 +145,10 @@ class AnnotatorBasedErrorInspection extends LocalInspectionTool {
             def createErrorAnnotation(range: TextRange,
                                       message: String): Annotation = {
               if (message != null) {
-                holder.registerProblem(element,
-                                       s"Error detected: $message",
-                                       ProblemHighlightType.ERROR)
+                holder.registerProblem(
+                  element,
+                  s"Error detected: $message",
+                  ProblemHighlightType.ERROR)
               }
               FakeAnnotation
             }
@@ -154,9 +156,10 @@ class AnnotatorBasedErrorInspection extends LocalInspectionTool {
             def createErrorAnnotation(node: ASTNode,
                                       message: String): Annotation = {
               if (message != null) {
-                holder.registerProblem(element,
-                                       s"Error detected: $message",
-                                       ProblemHighlightType.ERROR)
+                holder.registerProblem(
+                  element,
+                  s"Error detected: $message",
+                  ProblemHighlightType.ERROR)
               }
               FakeAnnotation
             }
@@ -164,9 +167,10 @@ class AnnotatorBasedErrorInspection extends LocalInspectionTool {
             def createErrorAnnotation(elt: PsiElement,
                                       message: String): Annotation = {
               if (message != null) {
-                holder.registerProblem(element,
-                                       s"Error detected: $message",
-                                       ProblemHighlightType.ERROR)
+                holder.registerProblem(
+                  element,
+                  s"Error detected: $message",
+                  ProblemHighlightType.ERROR)
               }
               FakeAnnotation
             }

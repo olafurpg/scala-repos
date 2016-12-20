@@ -215,11 +215,12 @@ final case class AckedReceiveBuffer[T <: HasSequenceNumber](
     */
   def mergeFrom(that: AckedReceiveBuffer[T]): AckedReceiveBuffer[T] = {
     val mergedLastDelivered = max(this.lastDelivered, that.lastDelivered)
-    this.copy(lastDelivered = mergedLastDelivered,
-              cumulativeAck = max(this.cumulativeAck, that.cumulativeAck),
-              buf = (this.buf union that.buf).filter {
-                _.seq > mergedLastDelivered
-              })
+    this.copy(
+      lastDelivered = mergedLastDelivered,
+      cumulativeAck = max(this.cumulativeAck, that.cumulativeAck),
+      buf = (this.buf union that.buf).filter {
+        _.seq > mergedLastDelivered
+      })
   }
 
   override def toString = buf.map { _.seq }.mkString("[", ", ", "]")

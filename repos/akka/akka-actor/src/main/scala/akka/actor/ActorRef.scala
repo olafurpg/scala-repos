@@ -567,11 +567,12 @@ private[akka] class EmptyLocalActorRef(override val provider: ActorRefProvider,
       specialHandle(d.message, d.sender) // do NOT form endless loops, since deadLetters will resend!
     case _ if !specialHandle(message, sender) ⇒
       eventStream.publish(
-        DeadLetter(message,
-                   if (sender eq Actor.noSender)
-                     provider.deadLetters
-                   else sender,
-                   this))
+        DeadLetter(
+          message,
+          if (sender eq Actor.noSender)
+            provider.deadLetters
+          else sender,
+          this))
     case _ ⇒
   }
 
@@ -580,9 +581,10 @@ private[akka] class EmptyLocalActorRef(override val provider: ActorRefProvider,
       case w: Watch ⇒
         if (w.watchee == this && w.watcher != this)
           w.watcher.sendSystemMessage(
-            DeathWatchNotification(w.watchee,
-                                   existenceConfirmed = false,
-                                   addressTerminated = false))
+            DeathWatchNotification(
+              w.watchee,
+              existenceConfirmed = false,
+              addressTerminated = false))
         true
       case _: Unwatch ⇒ true // Just ignore
       case Identify(messageId) ⇒
@@ -595,19 +597,21 @@ private[akka] class EmptyLocalActorRef(override val provider: ActorRefProvider,
               sender ! ActorIdentity(identify.messageId, None)
           case None ⇒
             eventStream.publish(
-              DeadLetter(sel.msg,
-                         if (sender eq Actor.noSender) provider.deadLetters
-                         else sender,
-                         this))
+              DeadLetter(
+                sel.msg,
+                if (sender eq Actor.noSender) provider.deadLetters
+                else sender,
+                this))
         }
         true
       case m: DeadLetterSuppression ⇒
         eventStream.publish(
-          SuppressedDeadLetter(m,
-                               if (sender eq Actor.noSender)
-                                 provider.deadLetters
-                               else sender,
-                               this))
+          SuppressedDeadLetter(
+            m,
+            if (sender eq Actor.noSender)
+              provider.deadLetters
+            else sender,
+            this))
         true
       case _ ⇒ false
     }
@@ -633,10 +637,11 @@ private[akka] class DeadLetterActorRef(_provider: ActorRefProvider,
       case _ ⇒
         if (!specialHandle(message, sender))
           eventStream.publish(
-            DeadLetter(message,
-                       if (sender eq Actor.noSender) provider.deadLetters
-                       else sender,
-                       this))
+            DeadLetter(
+              message,
+              if (sender eq Actor.noSender) provider.deadLetters
+              else sender,
+              this))
     }
 
   override protected def specialHandle(msg: Any, sender: ActorRef): Boolean =
@@ -644,9 +649,10 @@ private[akka] class DeadLetterActorRef(_provider: ActorRefProvider,
       case w: Watch ⇒
         if (w.watchee != this && w.watcher != this)
           w.watcher.sendSystemMessage(
-            DeathWatchNotification(w.watchee,
-                                   existenceConfirmed = false,
-                                   addressTerminated = false))
+            DeathWatchNotification(
+              w.watchee,
+              existenceConfirmed = false,
+              addressTerminated = false))
         true
       case _ ⇒ super.specialHandle(msg, sender)
     }
@@ -786,8 +792,9 @@ private[akka] final class FunctionRef(override val path: ActorPath,
       case u: Unwatch ⇒ remWatcher(u.watchee, u.watcher)
       case DeathWatchNotification(actorRef, _, _) ⇒
         this.!(
-          Terminated(actorRef)(existenceConfirmed = true,
-                               addressTerminated = false))
+          Terminated(actorRef)(
+            existenceConfirmed = true,
+            addressTerminated = false))
       case _ ⇒ //ignore all other messages
     }
   }
@@ -818,9 +825,10 @@ private[akka] final class FunctionRef(override val path: ActorPath,
       watcher
         .asInstanceOf[InternalActorRef]
         .sendSystemMessage(
-          DeathWatchNotification(this,
-                                 existenceConfirmed = true,
-                                 addressTerminated = false))
+          DeathWatchNotification(
+            this,
+            existenceConfirmed = true,
+            addressTerminated = false))
 
   private def unwatchWatched(watched: ActorRef): Unit =
     watched
@@ -851,9 +859,10 @@ private[akka] final class FunctionRef(override val path: ActorPath,
               s"externally triggered watch from $watcher to $watchee is illegal on FunctionRef"))
         } else {
           publish(
-            Logging.Error(path.toString,
-                          classOf[FunctionRef],
-                          s"BUG: illegal Watch($watchee,$watcher) for $this"))
+            Logging.Error(
+              path.toString,
+              classOf[FunctionRef],
+              s"BUG: illegal Watch($watchee,$watcher) for $this"))
         }
     }
 

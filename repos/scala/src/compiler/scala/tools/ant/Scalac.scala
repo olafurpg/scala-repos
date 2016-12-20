@@ -93,24 +93,25 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
 
   /** Defines valid values for properties that refer to compiler phases. */
   object CompilerPhase extends PermissibleValue {
-    val values = List("namer",
-                      "typer",
-                      "pickler",
-                      "refchecks",
-                      "uncurry",
-                      "tailcalls",
-                      "specialize",
-                      "explicitouter",
-                      "erasure",
-                      "lazyvals",
-                      "lambdalift",
-                      "constructors",
-                      "flatten",
-                      "mixin",
-                      "delambdafy",
-                      "cleanup",
-                      "jvm",
-                      "terminal")
+    val values = List(
+      "namer",
+      "typer",
+      "pickler",
+      "refchecks",
+      "uncurry",
+      "tailcalls",
+      "specialize",
+      "explicitouter",
+      "erasure",
+      "lazyvals",
+      "lambdalift",
+      "constructors",
+      "flatten",
+      "mixin",
+      "delambdafy",
+      "cleanup",
+      "jvm",
+      "terminal")
   }
 
   /** Defines valid values for the `target` property. */

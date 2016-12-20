@@ -18,8 +18,9 @@ class SActivityImpl extends SActivity {
     onDestroy(current = OnDestroy)
     super.onCreate(savedInstanceState)
     val sld = new StateListDrawable()
-    sld.addState(Array(android.R.attr.state_pressed),
-                 android.R.drawable.btn_star_big_on)
+    sld.addState(
+      Array(android.R.attr.state_pressed),
+      android.R.drawable.btn_star_big_on)
     sld.addState(Array.empty, android.R.drawable.btn_star_big_off)
     contentView = new SVerticalLayout {
       STextView("Hello").id(1)

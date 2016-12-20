@@ -125,18 +125,19 @@ object TestOffsetManager {
       awaitShutdown()
       offsetsChannel.disconnect()
       println(
-        "Commit thread %d ended. Last committed offset: %d.".format(id,
-                                                                    offset))
+        "Commit thread %d ended. Last committed offset: %d."
+          .format(id, offset))
     }
 
     def stats = {
       "Commit thread %d :: Error count: %d; Max:%f; Min: %f; Mean: %f; Commit count: %d"
-        .format(id,
-                numErrors.get(),
-                timer.max(),
-                timer.min(),
-                timer.mean(),
-                numCommits.get())
+        .format(
+          id,
+          numErrors.get(),
+          timer.max(),
+          timer.min(),
+          timer.mean(),
+          numCommits.get())
     }
   }
 
@@ -221,11 +222,12 @@ object TestOffsetManager {
 
     def stats = {
       "Fetch thread :: Error count: %d; Max:%f; Min: %f; Mean: %f; Fetch count: %d"
-        .format(numErrors.get(),
-                timer.max(),
-                timer.min(),
-                timer.mean(),
-                timer.count())
+        .format(
+          numErrors.get(),
+          timer.max(),
+          timer.min(),
+          timer.mean(),
+          timer.count())
     }
   }
 
@@ -267,8 +269,9 @@ object TestOffsetManager {
       .defaultsTo(1)
 
     val reportingIntervalOpt = parser
-      .accepts("reporting-interval-ms",
-               "Interval at which stats are reported.")
+      .accepts(
+        "reporting-interval-ms",
+        "Interval at which stats are reported.")
       .withRequiredArg
       .describedAs("interval (ms)")
       .ofType(classOf[java.lang.Integer])
@@ -291,11 +294,12 @@ object TestOffsetManager {
     val reportingIntervalMs = options.valueOf(reportingIntervalOpt).intValue()
     println(
       "Commit thread count: %d; Partition count: %d, Commit interval: %d ms; Fetch interval: %d ms; Reporting interval: %d ms"
-        .format(threadCount,
-                partitionCount,
-                commitIntervalMs,
-                fetchIntervalMs,
-                reportingIntervalMs))
+        .format(
+          threadCount,
+          partitionCount,
+          commitIntervalMs,
+          fetchIntervalMs,
+          reportingIntervalMs))
 
     var zkUtils: ZkUtils = null
     var commitThreads: Seq[CommitThread] = Seq()

@@ -301,9 +301,10 @@ class StandardImageExtractor(httpClient: HttpClient,
         } else {
           getDepthLevel(node, parentDepthLevel, siblingDepthLevel) match {
             case Some(depthObj) => {
-              checkForLargeImages(depthObj.node,
-                                  depthObj.parentDepth,
-                                  depthObj.siblingDepth)
+              checkForLargeImages(
+                depthObj.node,
+                depthObj.parentDepth,
+                depthObj.siblingDepth)
             }
             case None => trace("Image iteration is over!")
           }
@@ -313,9 +314,10 @@ class StandardImageExtractor(httpClient: HttpClient,
 
         getDepthLevel(node, parentDepthLevel, siblingDepthLevel) match {
           case Some(depthObj) => {
-            checkForLargeImages(depthObj.node,
-                                depthObj.parentDepth,
-                                depthObj.siblingDepth)
+            checkForLargeImages(
+              depthObj.node,
+              depthObj.parentDepth,
+              depthObj.siblingDepth)
           }
           case None => trace("Image iteration is over!")
         }

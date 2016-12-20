@@ -192,9 +192,10 @@ class OuterJoinEliminationSuite extends PlanTest {
     val left = testRelation
     val right = testRelation1
     val correctAnswer = left
-      .join(right,
-            Inner,
-            Option("b".attr + 3 === "e".attr && "a".attr === "d".attr))
+      .join(
+        right,
+        Inner,
+        Option("b".attr + 3 === "e".attr && "a".attr === "d".attr))
       .analyze
 
     comparePlans(optimized, correctAnswer)

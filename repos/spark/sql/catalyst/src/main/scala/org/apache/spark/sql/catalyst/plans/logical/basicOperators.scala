@@ -253,9 +253,10 @@ case class Union(children: Seq[LogicalPlan]) extends LogicalPlan {
     children
       .map(
         child =>
-          rewriteConstraints(children.head.output,
-                             child.output,
-                             child.constraints))
+          rewriteConstraints(
+            children.head.output,
+            child.output,
+            child.constraints))
       .reduce(_ intersect _)
   }
 }
@@ -348,8 +349,9 @@ case class InsertIntoTable(table: LogicalPlan,
   override lazy val resolved: Boolean =
     childrenResolved && child.output.zip(table.output).forall {
       case (childAttr, tableAttr) =>
-        DataType.equalsIgnoreCompatibleNullability(childAttr.dataType,
-                                                   tableAttr.dataType)
+        DataType.equalsIgnoreCompatibleNullability(
+          childAttr.dataType,
+          tableAttr.dataType)
     }
 }
 

@@ -31,9 +31,10 @@ object SnapshotDirectoryFailureSpec {
 
 class SnapshotDirectoryFailureSpec
     extends AkkaSpec(
-      PersistenceSpec.config("leveldb",
-                             "SnapshotDirectoryFailureSpec",
-                             extraConfig = Some(s"""
+      PersistenceSpec.config(
+        "leveldb",
+        "SnapshotDirectoryFailureSpec",
+        extraConfig = Some(s"""
   akka.persistence.snapshot-store.local.dir = "${SnapshotDirectoryFailureSpec.inUseSnapshotPath}"
   """)))
     with ImplicitSender {
@@ -58,9 +59,10 @@ class SnapshotDirectoryFailureSpec
     "throw an exception at startup" in {
       EventFilter[ActorInitializationException](occurrences = 1).intercept {
         val p = system.actorOf(
-          Props(classOf[TestPersistentActor],
-                "SnapshotDirectoryFailureSpec-1",
-                testActor))
+          Props(
+            classOf[TestPersistentActor],
+            "SnapshotDirectoryFailureSpec-1",
+            testActor))
         p ! "blahonga"
       }
     }

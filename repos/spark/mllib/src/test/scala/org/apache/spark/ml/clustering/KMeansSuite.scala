@@ -115,10 +115,11 @@ class KMeansSuite
       assert(model.clusterCenters === model2.clusterCenters)
     }
     val kmeans = new KMeans()
-    testEstimatorAndModelReadWrite(kmeans,
-                                   dataset,
-                                   KMeansSuite.allParamSettings,
-                                   checkModelData)
+    testEstimatorAndModelReadWrite(
+      kmeans,
+      dataset,
+      KMeansSuite.allParamSettings,
+      checkModelData)
   }
 }
 

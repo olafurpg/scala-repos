@@ -40,11 +40,12 @@ class InnerProductJob(args: Args) extends Job(args) {
       input
   }
   in0
-    .blockJoinWithSmaller('y1 -> 'y2,
-                          in1,
-                          leftReplication = l,
-                          rightReplication = r,
-                          joiner = j)
+    .blockJoinWithSmaller(
+      'y1 -> 'y2,
+      in1,
+      leftReplication = l,
+      rightReplication = r,
+      joiner = j)
     .map(('s1, 's2) -> 'score) { v: (Int, Int) =>
       v._1 * v._2
     }

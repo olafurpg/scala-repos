@@ -52,10 +52,11 @@ private[akka] case class TotalMemoryUsage(init: Long,
                                           comitted: Long) {
 
   def diff(other: TotalMemoryUsage): TotalMemoryUsage =
-    TotalMemoryUsage(this.init - other.init,
-                     this.used - other.used,
-                     this.max - other.max,
-                     this.comitted - other.comitted)
+    TotalMemoryUsage(
+      this.init - other.init,
+      this.used - other.used,
+      this.max - other.max,
+      this.comitted - other.comitted)
 }
 
 private[akka] case class HeapMemoryUsage(init: Long,
@@ -65,11 +66,12 @@ private[akka] case class HeapMemoryUsage(init: Long,
                                          usage: Double) {
 
   def diff(other: HeapMemoryUsage): HeapMemoryUsage =
-    HeapMemoryUsage(this.init - other.init,
-                    this.used - other.used,
-                    this.max - other.max,
-                    this.comitted - other.comitted,
-                    this.usage - other.usage)
+    HeapMemoryUsage(
+      this.init - other.init,
+      this.used - other.used,
+      this.max - other.max,
+      this.comitted - other.comitted,
+      this.usage - other.usage)
 }
 
 private[akka] case class NonHeapMemoryUsage(init: Long,
@@ -79,9 +81,10 @@ private[akka] case class NonHeapMemoryUsage(init: Long,
                                             usage: Double) {
 
   def diff(other: NonHeapMemoryUsage): NonHeapMemoryUsage =
-    NonHeapMemoryUsage(this.init - other.init,
-                       this.used - other.used,
-                       this.max - other.max,
-                       this.comitted - other.comitted,
-                       this.usage - other.usage)
+    NonHeapMemoryUsage(
+      this.init - other.init,
+      this.used - other.used,
+      this.max - other.max,
+      this.comitted - other.comitted,
+      this.usage - other.usage)
 }

@@ -147,9 +147,10 @@ class ConnectionPoolSpec
       val settings = ConnectionPoolSettings(system)
         .withMaxConnections(4)
         .withPipeliningLimit(2)
-      val poolFlow = Http().cachedHostConnectionPool[Int](serverHostName,
-                                                          serverPort,
-                                                          settings = settings)
+      val poolFlow = Http().cachedHostConnectionPool[Int](
+        serverHostName,
+        serverPort,
+        settings = settings)
 
       val N = 500
       val requestIds = Source.fromIterator(() ⇒ Iterator.from(1)).take(N)
@@ -284,8 +285,9 @@ class ConnectionPoolSpec
 
   "The single-request client infrastructure" should {
     class LocalTestSetup
-        extends TestSetup(ServerSettings(system).withRawRequestUriHeader(true),
-                          autoAccept = true)
+        extends TestSetup(
+          ServerSettings(system).withRawRequestUriHeader(true),
+          autoAccept = true)
 
     "transform absolute request URIs into relative URIs plus host header" in new LocalTestSetup {
       val request = HttpRequest(
@@ -319,8 +321,9 @@ class ConnectionPoolSpec
       val request = HttpRequest(uri = "/foo")
       val responseFuture = Http().singleRequest(request)
       val thrown =
-        the[IllegalUriException] thrownBy Await.result(responseFuture,
-                                                       1.second)
+        the[IllegalUriException] thrownBy Await.result(
+          responseFuture,
+          1.second)
       thrown should have message "Cannot determine request scheme and target endpoint as HttpMethod(GET) request to /foo doesn't have an absolute URI"
     }
   }
@@ -385,14 +388,16 @@ class ConnectionPoolSpec
         if (autoAccept) Sink.foreach[Http.IncomingConnection](handleConnection)
         else Sink.fromSubscriber(incomingConnections)
       Tcp()
-        .bind(serverEndpoint.getHostString,
-              serverEndpoint.getPort,
-              idleTimeout = serverSettings.timeouts.idleTimeout)
+        .bind(
+          serverEndpoint.getHostString,
+          serverEndpoint.getPort,
+          idleTimeout = serverSettings.timeouts.idleTimeout)
         .map { c ⇒
           val layer = Http().serverLayer(serverSettings, log = log)
-          Http.IncomingConnection(c.localAddress,
-                                  c.remoteAddress,
-                                  layer atop rawBytesInjection join c.flow)
+          Http.IncomingConnection(
+            c.localAddress,
+            c.remoteAddress,
+            layer atop rawBytesInjection join c.flow)
         }
         .runWith(sink)
       if (autoAccept) null else incomingConnections.expectSubscription()

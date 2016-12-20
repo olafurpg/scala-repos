@@ -96,8 +96,9 @@ class RemoveInternalClusterShardingDataSpec
   import RemoveInternalClusterShardingDataSpec._
 
   val storageLocations =
-    List("akka.persistence.journal.leveldb.dir",
-         "akka.persistence.snapshot-store.local.dir").map(s ⇒
+    List(
+      "akka.persistence.journal.leveldb.dir",
+      "akka.persistence.snapshot-store.local.dir").map(s ⇒
       new File(system.settings.config.getString(s)))
 
   override protected def atStartup() {
@@ -130,16 +131,18 @@ class RemoveInternalClusterShardingDataSpec
     "setup sharding" in {
       Cluster(system).join(Cluster(system).selfAddress)
       val settings = ClusterShardingSettings(system)
-      ClusterSharding(system).start("type1",
-                                    Props[EchoActor],
-                                    settings,
-                                    extractEntityId,
-                                    extractShardId)
-      ClusterSharding(system).start("type2",
-                                    Props[EchoActor],
-                                    settings,
-                                    extractEntityId,
-                                    extractShardId)
+      ClusterSharding(system).start(
+        "type1",
+        Props[EchoActor],
+        settings,
+        extractEntityId,
+        extractShardId)
+      ClusterSharding(system).start(
+        "type2",
+        Props[EchoActor],
+        settings,
+        extractEntityId,
+        extractShardId)
     }
 
     "work when no data" in within(10.seconds) {
@@ -201,11 +204,12 @@ class RemoveInternalClusterShardingDataSpec
       Cluster(system).join(Cluster(system).selfAddress)
       val settings = ClusterShardingSettings(system)
       typeNames.foreach { typeName ⇒
-        ClusterSharding(system).start(typeName,
-                                      Props[EchoActor],
-                                      settings,
-                                      extractEntityId,
-                                      extractShardId)
+        ClusterSharding(system).start(
+          typeName,
+          Props[EchoActor],
+          settings,
+          extractEntityId,
+          extractShardId)
       }
     }
 
@@ -222,11 +226,12 @@ class RemoveInternalClusterShardingDataSpec
       }
 
       val result =
-        RemoveInternalClusterShardingData.remove(system,
-                                                 journalPluginId = "",
-                                                 typeNames.toSet,
-                                                 terminateSystem = false,
-                                                 remove2dot3Data = true)
+        RemoveInternalClusterShardingData.remove(
+          system,
+          journalPluginId = "",
+          typeNames.toSet,
+          terminateSystem = false,
+          remove2dot3Data = true)
       Await.ready(result, remaining)
 
       typeNames.foreach { typeName ⇒

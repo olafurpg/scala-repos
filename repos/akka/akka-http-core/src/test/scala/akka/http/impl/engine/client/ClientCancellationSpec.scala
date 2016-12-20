@@ -65,8 +65,8 @@ class ClientCancellationSpec
     "support cancellation in simple outgoing connection with TLS" in {
       pending
       testCase(
-        Http().outgoingConnectionHttps(addressTls.getHostName,
-                                       addressTls.getPort))
+        Http()
+          .outgoingConnectionHttps(addressTls.getHostName, addressTls.getPort))
     }
 
     "support cancellation in pooled outgoing connection with TLS" in {

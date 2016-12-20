@@ -164,8 +164,9 @@ private[hive] class HiveQl(conf: ParserConf)
     node match {
       case Token("TOK_TABLEPROPLIST", list) =>
         list.map {
-          case Token("TOK_TABLEPROPERTY",
-                     Token(key, Nil) :: Token(value, Nil) :: Nil) =>
+          case Token(
+              "TOK_TABLEPROPERTY",
+              Token(key, Nil) :: Token(value, Nil) :: Nil) =>
             unquoteString(key) -> unquoteString(value)
         }
     }
@@ -179,19 +180,20 @@ private[hive] class HiveQl(conf: ParserConf)
                          replace: Boolean): CreateViewAsSelect = {
     val tableIdentifier = extractTableIdent(viewNameParts)
     val originalText = query.source
-    val tableDesc = CatalogTable(name = tableIdentifier,
-                                 tableType = CatalogTableType.VIRTUAL_VIEW,
-                                 schema = schema,
-                                 storage = CatalogStorageFormat(
-                                   locationUri = None,
-                                   inputFormat = None,
-                                   outputFormat = None,
-                                   serde = None,
-                                   serdeProperties = Map.empty[String, String]
-                                 ),
-                                 properties = properties,
-                                 viewOriginalText = Some(originalText),
-                                 viewText = Some(originalText))
+    val tableDesc = CatalogTable(
+      name = tableIdentifier,
+      tableType = CatalogTableType.VIRTUAL_VIEW,
+      schema = schema,
+      storage = CatalogStorageFormat(
+        locationUri = None,
+        inputFormat = None,
+        outputFormat = None,
+        serde = None,
+        serdeProperties = Map.empty[String, String]
+      ),
+      properties = properties,
+      viewOriginalText = Some(originalText),
+      viewText = Some(originalText))
 
     // We need to keep the original SQL string so that if `spark.sql.nativeView` is
     // false, we can fall back to use hive native command later.
@@ -229,8 +231,9 @@ private[hive] class HiveQl(conf: ParserConf)
         AddJar(node.remainder)
 
       // Special drop table that also uncaches.
-      case Token("TOK_DROPTABLE",
-                 Token("TOK_TABNAME", tableNameParts) :: ifExists) =>
+      case Token(
+          "TOK_DROPTABLE",
+          Token("TOK_TABNAME", tableNameParts) :: ifExists) =>
         val tableName = tableNameParts
           .map { case Token(p, Nil) => p }
           .mkString(".")
@@ -259,24 +262,26 @@ private[hive] class HiveQl(conf: ParserConf)
 
       case view @ Token("TOK_ALTERVIEW", children) =>
         val Some(nameParts) :: maybeQuery :: _ = getClauses(
-          Seq("TOK_TABNAME",
-              "TOK_QUERY",
-              "TOK_ALTERVIEW_ADDPARTS",
-              "TOK_ALTERVIEW_DROPPARTS",
-              "TOK_ALTERVIEW_PROPERTIES",
-              "TOK_ALTERVIEW_RENAME"),
+          Seq(
+            "TOK_TABNAME",
+            "TOK_QUERY",
+            "TOK_ALTERVIEW_ADDPARTS",
+            "TOK_ALTERVIEW_DROPPARTS",
+            "TOK_ALTERVIEW_PROPERTIES",
+            "TOK_ALTERVIEW_RENAME"),
           children)
 
         // if ALTER VIEW doesn't have query part, let hive to handle it.
         maybeQuery
           .map { query =>
-            createView(view,
-                       nameParts,
-                       query,
-                       Nil,
-                       Map(),
-                       allowExist = false,
-                       replace = true)
+            createView(
+              view,
+              nameParts,
+              query,
+              Nil,
+              Map(),
+              allowExist = false,
+              replace = true)
           }
           .getOrElse(NativePlaceholder)
 
@@ -295,15 +300,17 @@ private[hive] class HiveQl(conf: ParserConf)
           maybeProperties,
           maybeColumns,
           maybePartCols
-        ) = getClauses(Seq("TOK_TABNAME",
-                           "TOK_QUERY",
-                           "TOK_TABLECOMMENT",
-                           "TOK_ORREPLACE",
-                           "TOK_IFNOTEXISTS",
-                           "TOK_TABLEPROPERTIES",
-                           "TOK_TABCOLNAME",
-                           "TOK_VIEWPARTCOLS"),
-                       children)
+        ) = getClauses(
+          Seq(
+            "TOK_TABNAME",
+            "TOK_QUERY",
+            "TOK_TABLECOMMENT",
+            "TOK_ORREPLACE",
+            "TOK_IFNOTEXISTS",
+            "TOK_TABLEPROPERTIES",
+            "TOK_TABCOLNAME",
+            "TOK_VIEWPARTCOLS"),
+          children)
 
         // If the view is partitioned, we let hive handle it.
         if (maybePartCols.isDefined) {
@@ -333,13 +340,14 @@ private[hive] class HiveQl(conf: ParserConf)
               }
           }
 
-          createView(view,
-                     viewNameParts,
-                     query,
-                     schema,
-                     properties.toMap,
-                     allowExisting.isDefined,
-                     replace.isDefined)
+          createView(
+            view,
+            viewNameParts,
+            query,
+            schema,
+            properties.toMap,
+            allowExisting.isDefined,
+            replace.isDefined)
         }
 
       case Token("TOK_CREATETABLE", children)
@@ -418,21 +426,24 @@ private[hive] class HiveQl(conf: ParserConf)
             val comment = unescapeSQLString(child.text)
             // TODO support the sql text
             tableDesc = tableDesc.copy(viewText = Option(comment))
-          case Token("TOK_TABLEPARTCOLS",
-                     list @ Token("TOK_TABCOLLIST", _) :: Nil) =>
+          case Token(
+              "TOK_TABLEPARTCOLS",
+              list @ Token("TOK_TABCOLLIST", _) :: Nil) =>
             val cols = nodeToColumns(list.head, lowerCase = false)
             if (cols != null) {
               tableDesc = tableDesc.copy(partitionColumns = cols)
             }
-          case Token("TOK_TABLEROWFORMAT",
-                     Token("TOK_SERDEPROPS", child :: Nil) :: Nil) =>
+          case Token(
+              "TOK_TABLEROWFORMAT",
+              Token("TOK_SERDEPROPS", child :: Nil) :: Nil) =>
             val serdeParams = new java.util.HashMap[String, String]()
             child match {
               case Token("TOK_TABLEROWFORMATFIELD", rowChild1 :: rowChild2) =>
                 val fieldDelim = unescapeSQLString(rowChild1.text)
                 serdeParams.put(serdeConstants.FIELD_DELIM, fieldDelim)
-                serdeParams.put(serdeConstants.SERIALIZATION_FORMAT,
-                                fieldDelim)
+                serdeParams.put(
+                  serdeConstants.SERIALIZATION_FORMAT,
+                  fieldDelim)
                 if (rowChild2.length > 1) {
                   val fieldEscape = unescapeSQLString(rowChild2.head.text)
                   serdeParams.put(serdeConstants.ESCAPE_CHAR, fieldEscape)
@@ -553,9 +564,9 @@ private[hive] class HiveQl(conf: ParserConf)
                   s"Unrecognized file format in STORED AS clause: ${child.text}")
             }
 
-          case Token("TOK_TABLESERIALIZER",
-                     Token("TOK_SERDENAME",
-                           Token(serdeName, Nil) :: otherProps) :: Nil) =>
+          case Token(
+              "TOK_TABLESERIALIZER",
+              Token("TOK_SERDENAME", Token(serdeName, Nil) :: otherProps) :: Nil) =>
             tableDesc = tableDesc.withNewStorage(
               serde = Option(unquoteString(serdeName)))
 
@@ -580,17 +591,19 @@ private[hive] class HiveQl(conf: ParserConf)
           case _ => // Unsupported features
         }
 
-        CreateTableAsSelect(tableDesc,
-                            nodeToPlan(query),
-                            allowExisting.isDefined)
+        CreateTableAsSelect(
+          tableDesc,
+          nodeToPlan(query),
+          allowExisting.isDefined)
 
       // If its not a "CTAS" like above then take it as a native command
       case Token("TOK_CREATETABLE", _) =>
         NativePlaceholder
 
       // Support "TRUNCATE TABLE table_name [PARTITION partition_spec]"
-      case Token("TOK_TRUNCATETABLE",
-                 Token("TOK_TABLE_PARTITION", table) :: Nil) =>
+      case Token(
+          "TOK_TRUNCATETABLE",
+          Token("TOK_TABLE_PARTITION", table) :: Nil) =>
         NativePlaceholder
 
       case _ =>
@@ -604,17 +617,17 @@ private[hive] class HiveQl(conf: ParserConf)
   protected override def nodeToTransformation(
       node: ASTNode,
       child: LogicalPlan): Option[logical.ScriptTransformation] = node match {
-    case Token("TOK_SELEXPR",
-               Token("TOK_TRANSFORM",
-                     Token("TOK_EXPLIST", inputExprs) :: Token(
-                       "TOK_SERDE",
-                       inputSerdeClause) :: Token("TOK_RECORDWRITER",
-                                                  writerClause) ::
-                       // TODO: Need to support other types of (in/out)put
-                       Token(script, Nil) :: Token("TOK_SERDE",
-                                                   outputSerdeClause) :: Token(
-                         "TOK_RECORDREADER",
-                         readerClause) :: outputClause) :: Nil) =>
+    case Token(
+        "TOK_SELEXPR",
+        Token(
+          "TOK_TRANSFORM",
+          Token("TOK_EXPLIST", inputExprs) :: Token(
+            "TOK_SERDE",
+            inputSerdeClause) :: Token("TOK_RECORDWRITER", writerClause) ::
+            // TODO: Need to support other types of (in/out)put
+            Token(script, Nil) :: Token("TOK_SERDE", outputSerdeClause) :: Token(
+              "TOK_RECORDREADER",
+              readerClause) :: outputClause) :: Nil) =>
       val (output, schemaLess) = outputClause match {
         case Token("TOK_ALIASLIST", aliases) :: Nil =>
           (aliases.map {
@@ -624,12 +637,14 @@ private[hive] class HiveQl(conf: ParserConf)
         case Token("TOK_TABCOLLIST", attributes) :: Nil =>
           (attributes.map {
             case Token("TOK_TABCOL", Token(name, Nil) :: dataType :: Nil) =>
-              AttributeReference(cleanIdentifier(name),
-                                 nodeToDataType(dataType))()
+              AttributeReference(
+                cleanIdentifier(name),
+                nodeToDataType(dataType))()
           }, false)
         case Nil =>
-          (List(AttributeReference("key", StringType)(),
-                AttributeReference("value", StringType)()),
+          (List(
+             AttributeReference("key", StringType)(),
+             AttributeReference("value", StringType)()),
            true)
         case _ =>
           noParseRule("Transform", node)
@@ -657,8 +672,9 @@ private[hive] class HiveQl(conf: ParserConf)
                 "TOK_TABLEPROPERTIES",
                 Token("TOK_TABLEPROPLIST", propsClause) :: Nil) :: Nil) :: Nil =>
           val serdeProps = propsClause.map {
-            case Token("TOK_TABLEPROPERTY",
-                       Token(name, Nil) :: Token(value, Nil) :: Nil) =>
+            case Token(
+                "TOK_TABLEPROPERTY",
+                Token(name, Nil) :: Token(value, Nil) :: Nil) =>
               (unescapeSQLString(name), unescapeSQLString(value))
           }
 
@@ -704,22 +720,24 @@ private[hive] class HiveQl(conf: ParserConf)
           None
         }
 
-      val schema = HiveScriptIOSchema(inRowFormat,
-                                      outRowFormat,
-                                      inSerdeClass,
-                                      outSerdeClass,
-                                      inSerdeProps,
-                                      outSerdeProps,
-                                      recordReaderClass,
-                                      recordWriterClass,
-                                      schemaLess)
+      val schema = HiveScriptIOSchema(
+        inRowFormat,
+        outRowFormat,
+        inSerdeClass,
+        outSerdeClass,
+        inSerdeProps,
+        outSerdeProps,
+        recordReaderClass,
+        recordWriterClass,
+        schemaLess)
 
       Some(
-        logical.ScriptTransformation(inputExprs.map(nodeToExpr),
-                                     unescapedScript,
-                                     output,
-                                     child,
-                                     schema))
+        logical.ScriptTransformation(
+          inputExprs.map(nodeToExpr),
+          unescapedScript,
+          output,
+          child,
+          schema))
     case _ => None
   }
 
@@ -730,9 +748,10 @@ private[hive] class HiveQl(conf: ParserConf)
           Option(FunctionRegistry.getFunctionInfo(functionName.toLowerCase))
             .getOrElse(sys.error(s"Couldn't find function $functionName"))
         val functionClassName = functionInfo.getFunctionClass.getName
-        HiveGenericUDTF(functionName,
-                        new HiveFunctionWrapper(functionClassName),
-                        children.map(nodeToExpr))
+        HiveGenericUDTF(
+          functionName,
+          new HiveFunctionWrapper(functionClassName),
+          children.map(nodeToExpr))
       case other => super.nodeToGenerator(node)
     }
 
@@ -743,10 +762,11 @@ private[hive] class HiveQl(conf: ParserConf)
     node.children.map(_.children).collect {
       case Token(rawColName, Nil) :: colTypeNode :: comment =>
         val colName = if (!lowerCase) rawColName else rawColName.toLowerCase
-        CatalogColumn(name = cleanIdentifier(colName),
-                      dataType = nodeToTypeString(colTypeNode),
-                      nullable = true,
-                      comment.headOption.map(n => unescapeSQLString(n.text)))
+        CatalogColumn(
+          name = cleanIdentifier(colName),
+          dataType = nodeToTypeString(colTypeNode),
+          nullable = true,
+          comment.headOption.map(n => unescapeSQLString(n.text)))
     }
   }
 
@@ -770,8 +790,9 @@ private[hive] class HiveQl(conf: ParserConf)
 
       case SparkSqlParser.TOK_STRUCT =>
         val typeNode = node.children.head
-        require(typeNode.children.nonEmpty,
-                "Struct must have one or more columns.")
+        require(
+          typeNode.children.nonEmpty,
+          "Struct must have one or more columns.")
         val structColStrings = typeNode.children.map { columnNode =>
           val Token(colName, Nil) :: colTypeNode :: Nil = columnNode.children
           cleanIdentifier(colName) + ":" + nodeToTypeString(colTypeNode)

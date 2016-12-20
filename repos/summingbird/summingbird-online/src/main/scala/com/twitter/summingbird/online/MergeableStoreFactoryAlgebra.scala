@@ -60,7 +60,8 @@ object MergeableStoreFactoryAlgebra {
       new WrappedTSInMergeable(supplier.mergeableStore())
     }
 
-    MergeableStoreFactory[K, (Timestamp, V)](mergeable,
-                                             supplier.mergeableBatcher)
+    MergeableStoreFactory[K, (Timestamp, V)](
+      mergeable,
+      supplier.mergeableBatcher)
   }
 }

@@ -122,8 +122,9 @@ object FPGrowthModel extends Loader[FPGrowthModel[_]] {
       val tpe = classSymbol.selfType
 
       val itemType = ScalaReflection.schemaFor(tpe).dataType
-      val fields = Array(StructField("items", ArrayType(itemType)),
-                         StructField("freq", LongType))
+      val fields = Array(
+        StructField("items", ArrayType(itemType)),
+        StructField("freq", LongType))
       val schema = StructType(fields)
       val rowDataRDD = model.freqItemsets.map { x =>
         Row(x.items, x.freq)

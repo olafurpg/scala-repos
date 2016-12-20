@@ -41,12 +41,13 @@ object BackoffSupervisor {
             minBackoff: FiniteDuration,
             maxBackoff: FiniteDuration,
             randomFactor: Double): Props = {
-    propsWithSupervisorStrategy(childProps,
-                                childName,
-                                minBackoff,
-                                maxBackoff,
-                                randomFactor,
-                                SupervisorStrategy.defaultStrategy)
+    propsWithSupervisorStrategy(
+      childProps,
+      childName,
+      minBackoff,
+      maxBackoff,
+      randomFactor,
+      SupervisorStrategy.defaultStrategy)
   }
 
   /**
@@ -77,15 +78,17 @@ object BackoffSupervisor {
                                   strategy: SupervisorStrategy): Props = {
     require(minBackoff > Duration.Zero, "minBackoff must be > 0")
     require(maxBackoff >= minBackoff, "maxBackoff must be >= minBackoff")
-    require(0.0 <= randomFactor && randomFactor <= 1.0,
-            "randomFactor must be between 0.0 and 1.0")
+    require(
+      0.0 <= randomFactor && randomFactor <= 1.0,
+      "randomFactor must be between 0.0 and 1.0")
     Props(
-      new BackoffSupervisor(childProps,
-                            childName,
-                            minBackoff,
-                            maxBackoff,
-                            randomFactor,
-                            strategy))
+      new BackoffSupervisor(
+        childProps,
+        childName,
+        minBackoff,
+        maxBackoff,
+        randomFactor,
+        strategy))
   }
 
   /**
@@ -191,9 +194,10 @@ final class BackoffSupervisor(val childProps: Props,
   // to keep binary compatibility with 2.4.1
   override val supervisorStrategy = strategy match {
     case oneForOne: OneForOneStrategy ⇒
-      OneForOneStrategy(oneForOne.maxNrOfRetries,
-                        oneForOne.withinTimeRange,
-                        oneForOne.loggingEnabled) {
+      OneForOneStrategy(
+        oneForOne.maxNrOfRetries,
+        oneForOne.withinTimeRange,
+        oneForOne.loggingEnabled) {
         case ex ⇒
           val defaultDirective: Directive = super.supervisorStrategy.decider
             .applyOrElse(ex, (_: Any) ⇒ Escalate)
@@ -210,13 +214,14 @@ final class BackoffSupervisor(val childProps: Props,
            maxBackoff: FiniteDuration,
            randomFactor: Double,
            supervisorStrategy: SupervisorStrategy) =
-    this(childProps,
-         childName,
-         minBackoff,
-         maxBackoff,
-         AutoReset(minBackoff),
-         randomFactor,
-         supervisorStrategy)
+    this(
+      childProps,
+      childName,
+      minBackoff,
+      maxBackoff,
+      AutoReset(minBackoff),
+      randomFactor,
+      supervisorStrategy)
 
   // for binary compatibility with 2.4.0
   def this(childProps: Props,
@@ -224,12 +229,13 @@ final class BackoffSupervisor(val childProps: Props,
            minBackoff: FiniteDuration,
            maxBackoff: FiniteDuration,
            randomFactor: Double) =
-    this(childProps,
-         childName,
-         minBackoff,
-         maxBackoff,
-         randomFactor,
-         SupervisorStrategy.defaultStrategy)
+    this(
+      childProps,
+      childName,
+      minBackoff,
+      maxBackoff,
+      randomFactor,
+      SupervisorStrategy.defaultStrategy)
 
   def onTerminated: Receive = {
     case Terminated(ref) if child.contains(ref) ⇒

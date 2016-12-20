@@ -59,10 +59,11 @@ class EnsembleBorderPane extends EnsembleExample {
     // Left content using VBox
     val leftVBox = new VBox {
       spacing = 10
-      children = List(Label("Left Hand"),
-                      Label("Choice One"),
-                      Label("Choice Two"),
-                      Label("Choice Three"))
+      children = List(
+        Label("Left Hand"),
+        Label("Choice One"),
+        Label("Choice Two"),
+        Label("Choice Three"))
     }
 
     // Center content using Anchor Pane
@@ -83,10 +84,11 @@ class EnsembleBorderPane extends EnsembleExample {
     // Right content using VBox
     val rightVBox = new VBox {
       spacing = 10
-      children = List(Label("Right Hand"),
-                      Label("Thing A"),
-                      Label("Thing B"),
-                      Label("Thing C"))
+      children = List(
+        Label("Right Hand"),
+        Label("Thing A"),
+        Label("Thing B"),
+        Label("Thing C"))
     }
 
     // Right content

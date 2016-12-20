@@ -85,8 +85,9 @@ trait ScFun extends ScTypeParametersOwner {
   def polymorphicType: ScType = {
     if (typeParameters.isEmpty) methodType
     else
-      ScTypePolymorphicType(methodType,
-                            typeParameters.map(new TypeParameter(_)))
+      ScTypePolymorphicType(
+        methodType,
+        typeParameters.map(new TypeParameter(_)))
   }
 }
 
@@ -196,8 +197,9 @@ trait ScFunction
           case Some((fun: ScSyntheticFunction, subst)) =>
             var typeParamSubst = ScSubstitutor.empty
             fun.typeParameters.zip(typeParameters).foreach {
-              case (oldParam: ScSyntheticTypeParameter,
-                    newParam: ScTypeParam) =>
+              case (
+                  oldParam: ScSyntheticTypeParameter,
+                  newParam: ScTypeParam) =>
                 typeParamSubst = typeParamSubst.bindT(
                   (oldParam.name, ScalaPsiUtil.getPsiElementId(oldParam)),
                   new ScTypeParameterType(newParam, subst))
@@ -282,8 +284,9 @@ trait ScFunction
               getProject,
               getResolveScope)
         } else
-        new ScMethodType(resultType, Seq.empty, false)(getProject,
-                                                       getResolveScope)
+        new ScMethodType(resultType, Seq.empty, false)(
+          getProject,
+          getResolveScope)
     res.asInstanceOf[ScMethodType]
   }
 
@@ -293,8 +296,9 @@ trait ScFunction
   def polymorphicType(result: Option[ScType] = None): ScType = {
     if (typeParameters.isEmpty) methodType(result)
     else
-      ScTypePolymorphicType(methodType(result),
-                            typeParameters.map(new TypeParameter(_)))
+      ScTypePolymorphicType(
+        methodType(result),
+        typeParameters.map(new TypeParameter(_)))
   }
 
   /**
@@ -468,10 +472,11 @@ trait ScFunction
   }
 
   def getTypeParameterList =
-    new FakePsiTypeParameterList(getManager,
-                                 getLanguage,
-                                 typeParameters.toArray,
-                                 this)
+    new FakePsiTypeParameterList(
+      getManager,
+      getLanguage,
+      typeParameters.toArray,
+      this)
 
   def hasTypeParameters = typeParameters.nonEmpty
 
@@ -505,20 +510,22 @@ trait ScFunction
         first <- clause.clauses.headOption if first.hasRepeatedParam
         if isJavaVarargs
       } {
-        buffer += new ScFunctionWrapper(this,
-                                        isStatic,
-                                        isInterface,
-                                        cClass,
-                                        isJavaVarargs = true)
+        buffer += new ScFunctionWrapper(
+          this,
+          isStatic,
+          isInterface,
+          cClass,
+          isJavaVarargs = true)
       }
 
       val params = parameters
       for (i <- params.indices if params(i).baseDefaultParam) {
-        buffer += new ScFunctionWrapper(this,
-                                        isStatic = isStatic || isConstructor,
-                                        isInterface,
-                                        cClass,
-                                        forDefault = Some(i + 1))
+        buffer += new ScFunctionWrapper(
+          this,
+          isStatic = isStatic || isConstructor,
+          isInterface,
+          cClass,
+          forDefault = Some(i + 1))
       }
     }
     buffer.toSeq

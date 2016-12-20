@@ -29,9 +29,10 @@ private[sbt] object ForkTests {
     val main =
       if (opts.tests.isEmpty)
         constant(
-          TestOutput(TestResult.Passed,
-                     Map.empty[String, SuiteResult],
-                     Iterable.empty))
+          TestOutput(
+            TestResult.Passed,
+            Map.empty[String, SuiteResult],
+            Iterable.empty))
       else
         mainTestTask(runners, opts, classpath, fork, log, config.parallel)
           .tagw(config.tags: _*)
@@ -56,9 +57,10 @@ private[sbt] object ForkTests {
 
       object Acceptor extends Runnable {
         val resultsAcc = mutable.Map.empty[String, SuiteResult]
-        lazy val result = TestOutput(overall(resultsAcc.values.map(_.result)),
-                                     resultsAcc.toMap,
-                                     Iterable.empty)
+        lazy val result = TestOutput(
+          overall(resultsAcc.values.map(_.result)),
+          resultsAcc.toMap,
+          Iterable.empty)
 
         def run() {
           val socket = try {
@@ -84,10 +86,11 @@ private[sbt] object ForkTests {
 
             val taskdefs = opts.tests.map(
               t =>
-                new TaskDef(t.name,
-                            forkFingerprint(t.fingerprint),
-                            t.explicitlySpecified,
-                            t.selectors))
+                new TaskDef(
+                  t.name,
+                  forkFingerprint(t.fingerprint),
+                  t.explicitlySpecified,
+                  t.selectors))
             os.writeObject(taskdefs.toArray)
 
             os.writeInt(runners.size)
@@ -111,12 +114,14 @@ private[sbt] object ForkTests {
         acceptorThread.start()
 
         val fullCp =
-          classpath ++: Seq(IO.classLocationFile[ForkMain],
-                            IO.classLocationFile[Framework])
-        val options = Seq("-classpath",
-                          fullCp mkString File.pathSeparator,
-                          classOf[ForkMain].getCanonicalName,
-                          server.getLocalPort.toString)
+          classpath ++: Seq(
+            IO.classLocationFile[ForkMain],
+            IO.classLocationFile[Framework])
+        val options = Seq(
+          "-classpath",
+          fullCp mkString File.pathSeparator,
+          classOf[ForkMain].getCanonicalName,
+          server.getLocalPort.toString)
         val ec = Fork.java(fork, options)
         val result =
           if (ec != 0)

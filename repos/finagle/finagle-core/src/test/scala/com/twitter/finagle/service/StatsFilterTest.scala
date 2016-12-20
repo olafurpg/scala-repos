@@ -51,9 +51,10 @@ class StatsFilterTest extends FunSuite {
 
   test("latency stat in microseconds") {
     val sr = new InMemoryStatsReceiver()
-    val filter = new StatsFilter[String, String](sr,
-                                                 StatsFilter.DefaultExceptions,
-                                                 TimeUnit.MICROSECONDS)
+    val filter = new StatsFilter[String, String](
+      sr,
+      StatsFilter.DefaultExceptions,
+      TimeUnit.MICROSECONDS)
     val promise = new Promise[String]
     val svc =
       filter andThen new Service[String, String] {
@@ -90,10 +91,11 @@ class StatsFilterTest extends FunSuite {
     assert(unsourced(Seq("failures")) == 1)
     assert(
       unsourced(
-        Seq("failures",
-            classOf[ChannelWriteException].getName(),
-            classOf[RequestException].getName(),
-            classOf[Exception].getName())) == 1)
+        Seq(
+          "failures",
+          classOf[ChannelWriteException].getName(),
+          classOf[RequestException].getName(),
+          classOf[Exception].getName())) == 1)
   }
 
   test("source failures") {
@@ -210,9 +212,10 @@ class StatsFilterTest extends FunSuite {
       unsourced(Seq("failures", classOf[ChannelWriteException].getName())) == 1)
     assert(
       unsourced(
-        Seq("failures",
-            classOf[ChannelWriteException].getName(),
-            classOf[Exception].getName())) == 1)
+        Seq(
+          "failures",
+          classOf[ChannelWriteException].getName(),
+          classOf[Exception].getName())) == 1)
   }
 
   test("respects ResponseClassifier") {
@@ -226,10 +229,11 @@ class StatsFilterTest extends FunSuite {
         ResponseClass.RetryableFailure
       case ReqRep(_, Throw(x)) if x.getMessage == "-5" => ResponseClass.Success
     }
-    val statsFilter = new StatsFilter[Int, Int](sr,
-                                                aClassifier,
-                                                StatsFilter.DefaultExceptions,
-                                                TimeUnit.MILLISECONDS)
+    val statsFilter = new StatsFilter[Int, Int](
+      sr,
+      aClassifier,
+      StatsFilter.DefaultExceptions,
+      TimeUnit.MILLISECONDS)
 
     val service = statsFilter.andThen(svc)
 

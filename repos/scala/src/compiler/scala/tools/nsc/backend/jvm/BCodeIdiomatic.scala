@@ -217,10 +217,11 @@ abstract class BCodeIdiomatic extends SubComponent {
      * can-multi-thread
      */
     final def genEndConcat(pos: Position): Unit = {
-      invokevirtual(JavaStringBuilderClassName,
-                    "toString",
-                    "()Ljava/lang/String;",
-                    pos)
+      invokevirtual(
+        JavaStringBuilderClassName,
+        "toString",
+        "()Ljava/lang/String;",
+        pos)
     }
 
     /*
@@ -634,24 +635,26 @@ abstract class BCodeIdiomatic extends SubComponent {
       Array(AALOAD, BALOAD, SALOAD, CALOAD, IALOAD, LALOAD, FALOAD, DALOAD)
     }
     val astoreOpcodes = {
-      Array(AASTORE,
-            BASTORE,
-            SASTORE,
-            CASTORE,
-            IASTORE,
-            LASTORE,
-            FASTORE,
-            DASTORE)
+      Array(
+        AASTORE,
+        BASTORE,
+        SASTORE,
+        CASTORE,
+        IASTORE,
+        LASTORE,
+        FASTORE,
+        DASTORE)
     }
     val returnOpcodes = {
-      Array(ARETURN,
-            IRETURN,
-            IRETURN,
-            IRETURN,
-            IRETURN,
-            LRETURN,
-            FRETURN,
-            DRETURN)
+      Array(
+        ARETURN,
+        IRETURN,
+        IRETURN,
+        IRETURN,
+        IRETURN,
+        LRETURN,
+        FRETURN,
+        DRETURN)
     }
 
     // ---------------- primitive operations ----------------

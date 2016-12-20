@@ -136,8 +136,9 @@ abstract class UnreachableNodeJoinsAgainSpec
       runOn(allButVictim: _*) {
         // eventually removed
         awaitMembersUp(roles.size - 1, Set(victim))
-        awaitAssert(clusterView.unreachableMembers should ===(Set.empty),
-                    15 seconds)
+        awaitAssert(
+          clusterView.unreachableMembers should ===(Set.empty),
+          15 seconds)
         awaitAssert(
           clusterView.members.map(_.address) should ===(
             (allButVictim map address).toSet))
@@ -177,8 +178,9 @@ abstract class UnreachableNodeJoinsAgainSpec
         Await.ready(system.whenTerminated, 10 seconds)
         // create new ActorSystem with same host:port
         val freshSystem =
-          ActorSystem(system.name,
-                      ConfigFactory.parseString(s"""
+          ActorSystem(
+            system.name,
+            ConfigFactory.parseString(s"""
             akka.remote.netty.tcp {
               hostname = ${victimAddress.host.get}
               port = ${victimAddress.port.get}
@@ -201,10 +203,9 @@ abstract class UnreachableNodeJoinsAgainSpec
 
           // signal to master node that victim is done
           val endProbe = TestProbe()(freshSystem)
-          val endActor = freshSystem.actorOf(Props(classOf[EndActor],
-                                                   endProbe.ref,
-                                                   Some(masterAddress)),
-                                             "end")
+          val endActor = freshSystem.actorOf(
+            Props(classOf[EndActor], endProbe.ref, Some(masterAddress)),
+            "end")
           endActor ! EndActor.SendEnd
           endProbe.expectMsg(EndActor.EndAck)
         } finally {

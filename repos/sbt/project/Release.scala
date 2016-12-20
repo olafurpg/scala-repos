@@ -15,11 +15,12 @@ object Release {
       s"${organization.value}/${moduleName.value}/${version.value}/${moduleName.value}.jar",
     deployLauncher := {
       val repo = bintrayRepo.value
-      repo.upload(bintrayPackage.value,
-                  version.value,
-                  launcherRemotePath.value,
-                  launcher.value,
-                  sLog.value)
+      repo.upload(
+        bintrayPackage.value,
+        version.value,
+        launcherRemotePath.value,
+        launcher.value,
+        sLog.value)
     }
   )
 

@@ -114,39 +114,43 @@ trait TransSpecableModule[M[+ _]]
     def mkTransSpec(to: DepGraph,
                     from: DepGraph,
                     ctx: EvaluationContext): Option[TransSpec1] =
-      mkTransSpecWithState[Option, (TransSpec1, DepGraph)](to,
-                                                           Some(from),
-                                                           ctx,
-                                                           identity,
-                                                           snd,
-                                                           some).map(_._1)
+      mkTransSpecWithState[Option, (TransSpec1, DepGraph)](
+        to,
+        Some(from),
+        ctx,
+        identity,
+        snd,
+        some).map(_._1)
 
     def findAncestor(to: DepGraph, ctx: EvaluationContext): Option[DepGraph] =
-      mkTransSpecWithState[Option, (TransSpec1, DepGraph)](to,
-                                                           None,
-                                                           ctx,
-                                                           identity,
-                                                           snd,
-                                                           some).map(_._2)
+      mkTransSpecWithState[Option, (TransSpec1, DepGraph)](
+        to,
+        None,
+        ctx,
+        identity,
+        snd,
+        some).map(_._2)
 
     def findTransSpecAndAncestor(
         to: DepGraph,
         ctx: EvaluationContext): Option[(TransSpec1, DepGraph)] =
-      mkTransSpecWithState[Option, (TransSpec1, DepGraph)](to,
-                                                           None,
-                                                           ctx,
-                                                           identity,
-                                                           snd,
-                                                           some)
+      mkTransSpecWithState[Option, (TransSpec1, DepGraph)](
+        to,
+        None,
+        ctx,
+        identity,
+        snd,
+        some)
 
     def findOrderAncestor(to: DepGraph,
                           ctx: EvaluationContext): Option[DepGraph] =
-      mkTransSpecOrderWithState[Option, (TransSpec1, DepGraph)](to,
-                                                                None,
-                                                                ctx,
-                                                                identity,
-                                                                snd,
-                                                                some).map(_._2)
+      mkTransSpecOrderWithState[Option, (TransSpec1, DepGraph)](
+        to,
+        None,
+        ctx,
+        identity,
+        snd,
+        some).map(_._2)
 
     def transFold[N[+ _]: Monad, S](to: DepGraph,
                                     from: Option[DepGraph],
@@ -336,10 +340,11 @@ trait TransSpecableModule[M[+ _]]
       def loop(graph: DepGraph): T = graph match {
         case node if from.map(_ == node).getOrElse(false) => alg.done(node)
 
-        case node @ Join(instructions.WrapObject,
-                         Cross(_),
-                         Const(CString(field)),
-                         right) =>
+        case node @ Join(
+              instructions.WrapObject,
+              Cross(_),
+              Const(CString(field)),
+              right) =>
           alg.WrapObject(node)(loop(right), field)
 
         case node @ Join(DerefObject, Cross(_), left, Const(CString(field))) =>
@@ -363,43 +368,48 @@ trait TransSpecableModule[M[+ _]]
       def loop(graph: DepGraph): T = graph match {
         case node if from.map(_ == node).getOrElse(false) => alg.done(node)
 
-        case node @ dag.Cond(pred,
-                             left @ dag.Const(_: CValue),
-                             Cross(_),
-                             right,
-                             IdentitySort | ValueSort(_)) => {
+        case node @ dag.Cond(
+              pred,
+              left @ dag.Const(_: CValue),
+              Cross(_),
+              right,
+              IdentitySort | ValueSort(_)) => {
           val predRes = loop(pred)
 
           alg.Cond(node)(predRes, alg.Const(left)(predRes), loop(right))
         }
 
-        case node @ dag.Cond(pred,
-                             left,
-                             IdentitySort | ValueSort(_),
-                             right @ dag.Const(_: CValue),
-                             Cross(_)) => {
+        case node @ dag.Cond(
+              pred,
+              left,
+              IdentitySort | ValueSort(_),
+              right @ dag.Const(_: CValue),
+              Cross(_)) => {
           val predRes = loop(pred)
 
           alg.Cond(node)(predRes, loop(left), alg.Const(right)(predRes))
         }
 
-        case node @ dag.Cond(pred,
-                             left @ dag.Const(_: CValue),
-                             Cross(_),
-                             right @ dag.Const(_: CValue),
-                             Cross(_)) => {
+        case node @ dag.Cond(
+              pred,
+              left @ dag.Const(_: CValue),
+              Cross(_),
+              right @ dag.Const(_: CValue),
+              Cross(_)) => {
           val predRes = loop(pred)
 
-          alg.Cond(node)(predRes,
-                         alg.Const(left)(predRes),
-                         alg.Const(right)(predRes))
+          alg.Cond(node)(
+            predRes,
+            alg.Const(left)(predRes),
+            alg.Const(right)(predRes))
         }
 
-        case node @ dag.Cond(pred,
-                             left,
-                             IdentitySort | ValueSort(_),
-                             right,
-                             IdentitySort | ValueSort(_)) =>
+        case node @ dag.Cond(
+              pred,
+              left,
+              IdentitySort | ValueSort(_),
+              right,
+              IdentitySort | ValueSort(_)) =>
           alg.Cond(node)(loop(pred), loop(left), loop(right))
 
         case node @ Join(Eq, Cross(_), left, Const(value)) =>
@@ -414,28 +424,31 @@ trait TransSpecableModule[M[+ _]]
         case node @ Join(NotEq, Cross(_), Const(value), right) =>
           alg.EqualLiteral(node)(loop(right), value, true)
 
-        case node @ Join(instructions.WrapObject,
-                         Cross(_),
-                         Const(CString(field)),
-                         right) =>
+        case node @ Join(
+              instructions.WrapObject,
+              Cross(_),
+              Const(CString(field)),
+              right) =>
           alg.WrapObject(node)(loop(right), field)
 
         case node @ Join(DerefObject, Cross(_), left, Const(CString(field))) =>
           alg.DerefObjectStatic(node)(loop(left), field)
 
-        case node @ Join(DerefMetadata,
-                         Cross(_),
-                         left,
-                         Const(CString(field))) =>
+        case node @ Join(
+              DerefMetadata,
+              Cross(_),
+              left,
+              Const(CString(field))) =>
           alg.DerefMetadataStatic(node)(loop(left), field)
 
         case node @ Join(DerefArray, Cross(_), left, ConstInt(index)) =>
           alg.DerefArrayStatic(node)(loop(left), index)
 
-        case node @ Join(instructions.ArraySwap,
-                         Cross(_),
-                         left,
-                         ConstInt(index)) =>
+        case node @ Join(
+              instructions.ArraySwap,
+              Cross(_),
+              left,
+              ConstInt(index)) =>
           alg.ArraySwap(node)(loop(left), index)
 
         case node @ Join(JoinObject, Cross(_), left, Const(RObject.empty)) =>
@@ -456,10 +469,11 @@ trait TransSpecableModule[M[+ _]]
         case node @ Join(Op2F2ForBinOp(op), Cross(_), Const(value), right) =>
           alg.Map1Right(node)(loop(right), op, right, value)
 
-        case node @ Join(op,
-                         joinSort @ (IdentitySort | ValueSort(_)),
-                         left,
-                         right) =>
+        case node @ Join(
+              op,
+              joinSort @ (IdentitySort | ValueSort(_)),
+              left,
+              right) =>
           alg.binOp(node)(loop(left), loop(right), op)
 
         case node @ dag

@@ -233,10 +233,11 @@ private[history] class ApplicationCache(
     */
   def lookupCacheEntry(appId: String, attemptId: Option[String]): CacheEntry = {
     val entry = lookupAndUpdate(appId, attemptId)._1
-    new CacheEntry(entry.ui,
-                   entry.completed,
-                   entry.updateProbe,
-                   entry.probeTime)
+    new CacheEntry(
+      entry.ui,
+      entry.completed,
+      entry.updateProbe,
+      entry.probeTime)
   }
 
   /**
@@ -341,8 +342,9 @@ private[history] class ApplicationCache(
     */
   def splitAppAndAttemptKey(appAndAttempt: String): (String, Option[String]) = {
     val parts = appAndAttempt.split("/")
-    require(parts.length == 1 || parts.length == 2,
-            s"Invalid app key $appAndAttempt")
+    require(
+      parts.length == 1 || parts.length == 2,
+      s"Invalid app key $appAndAttempt")
     val appId = parts(0)
     val attemptId = if (parts.length > 1) Some(parts(1)) else None
     (appId, attemptId)
@@ -442,17 +444,19 @@ private[history] class CacheMetrics(prefix: String) extends Source {
   val updateTriggeredCount = new Counter()
 
   /** all the counters: for registration and string conversion. */
-  private val counters = Seq(("lookup.count", lookupCount),
-                             ("lookup.failure.count", lookupFailureCount),
-                             ("eviction.count", evictionCount),
-                             ("load.count", loadCount),
-                             ("update.probe.count", updateProbeCount),
-                             ("update.triggered.count", updateTriggeredCount))
+  private val counters = Seq(
+    ("lookup.count", lookupCount),
+    ("lookup.failure.count", lookupFailureCount),
+    ("eviction.count", evictionCount),
+    ("load.count", loadCount),
+    ("update.probe.count", updateProbeCount),
+    ("update.triggered.count", updateTriggeredCount))
 
   /** all metrics, including timers */
   private val allMetrics =
-    counters ++ Seq(("load.timer", loadTimer),
-                    ("update.probe.timer", updateProbeTimer))
+    counters ++ Seq(
+      ("load.timer", loadTimer),
+      ("update.probe.timer", updateProbeTimer))
 
   /**
     * Name of metric source
@@ -678,8 +682,9 @@ private[history] object ApplicationCacheCheckFilterRelay extends Logging {
         } catch {
           case ex: Exception =>
             // something went wrong. Keep going with the existing UI
-            logWarning(s"When checking for $appId/$attemptId from $requestURI",
-                       ex)
+            logWarning(
+              s"When checking for $appId/$attemptId from $requestURI",
+              ex)
             false
         }
 

@@ -79,8 +79,8 @@ class ProtobufSerializer(val system: ExtendedActorSystem)
                 else method
               if (parsingMethodBindingRef.compareAndSet(
                     parsingMethodBinding,
-                    parsingMethodBinding.updated(clazz,
-                                                 unCachedParsingMethod)))
+                    parsingMethodBinding
+                      .updated(clazz, unCachedParsingMethod)))
                 unCachedParsingMethod
               else parsingMethod(unCachedParsingMethod)
           }
@@ -106,8 +106,8 @@ class ProtobufSerializer(val system: ExtendedActorSystem)
             else method
           if (toByteArrayMethodBindingRef.compareAndSet(
                 toByteArrayMethodBinding,
-                toByteArrayMethodBinding.updated(clazz,
-                                                 unCachedtoByteArrayMethod)))
+                toByteArrayMethodBinding
+                  .updated(clazz, unCachedtoByteArrayMethod)))
             unCachedtoByteArrayMethod
           else toByteArrayMethod(unCachedtoByteArrayMethod)
       }

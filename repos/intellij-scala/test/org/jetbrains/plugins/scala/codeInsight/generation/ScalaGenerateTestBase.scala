@@ -29,8 +29,9 @@ abstract class ScalaGenerateTestBase
     if (checkCaret) {
       val resultCaretIndex = nResult.indexOf(CARET_MARKER)
       val actualCaretIndex = caretModel.getOffset
-      assert(resultCaretIndex == actualCaretIndex,
-             "Wrong caret position after generating")
+      assert(
+        resultCaretIndex == actualCaretIndex,
+        "Wrong caret position after generating")
     }
     myFixture.checkResult(nResult.replace(CARET_MARKER, ""), true)
   }
@@ -44,8 +45,9 @@ abstract class ScalaGenerateTestBase
     val file: PsiFile = myFixture.getFile
     val message =
       s"Generate action is${if (assumedResult) " not" else ""} available"
-    assert(handler.isValidFor(myFixture.getEditor, file) == assumedResult,
-           message)
+    assert(
+      handler.isValidFor(myFixture.getEditor, file) == assumedResult,
+      message)
   }
 
   def checkIsNotAvailable(text: String) =

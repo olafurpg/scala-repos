@@ -46,10 +46,11 @@ object StreamConverters {
       in: () ⇒ InputStream,
       chunkSize: Int = 8192): Source[ByteString, Future[IOResult]] =
     new Source(
-      new InputStreamSource(in,
-                            chunkSize,
-                            DefaultAttributes.inputStreamSource,
-                            sourceShape("InputStreamSource")))
+      new InputStreamSource(
+        in,
+        chunkSize,
+        DefaultAttributes.inputStreamSource,
+        sourceShape("InputStreamSource")))
 
   /**
     * Creates a Source which when materialized will return an [[OutputStream]] which it is possible
@@ -86,10 +87,11 @@ object StreamConverters {
       out: () ⇒ OutputStream,
       autoFlush: Boolean = false): Sink[ByteString, Future[IOResult]] =
     new Sink(
-      new OutputStreamSink(out,
-                           DefaultAttributes.outputStreamSink,
-                           sinkShape("OutputStreamSink"),
-                           autoFlush))
+      new OutputStreamSink(
+        out,
+        DefaultAttributes.outputStreamSink,
+        sinkShape("OutputStreamSink"),
+        autoFlush))
 
   /**
     * Creates a Sink which when materialized will return an [[InputStream]] which it is possible

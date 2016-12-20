@@ -95,11 +95,12 @@ private[annotator] object ModifierChecker {
                 case _: ScPatternDefinition =>
                   checkDublicates(modifierPsi, "lazy")
                 case _: ScParameter =>
-                  proccessError(ScalaBundle.message(
-                                  "lazy.modifier.is.not.allowed.with.param"),
-                                modifierPsi,
-                                holder,
-                                new RemoveModifierQuickFix(owner, "lazy"))
+                  proccessError(
+                    ScalaBundle.message(
+                      "lazy.modifier.is.not.allowed.with.param"),
+                    modifierPsi,
+                    holder,
+                    new RemoveModifierQuickFix(owner, "lazy"))
                 case declaration: ScValueDeclaration =>
                   proccessError(
                     ScalaBundle.message("lazy.values.may.not.be.abstract"),
@@ -116,11 +117,12 @@ private[annotator] object ModifierChecker {
             case "final" =>
               owner match {
                 case _: ScDeclaration =>
-                  proccessError(ScalaBundle.message(
-                                  "final.modifier.not.with.declarations"),
-                                modifierPsi,
-                                holder,
-                                new RemoveModifierQuickFix(owner, "final"))
+                  proccessError(
+                    ScalaBundle.message(
+                      "final.modifier.not.with.declarations"),
+                    modifierPsi,
+                    holder,
+                    new RemoveModifierQuickFix(owner, "final"))
                 case _: ScTrait =>
                   proccessError(
                     ScalaBundle.message("final.modifier.not.with.trait"),

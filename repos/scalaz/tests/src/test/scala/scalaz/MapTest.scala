@@ -360,9 +360,10 @@ object MapTest extends SpecLite {
         )) must_== fromList(List((3, "b"), (5, "a"), (7, "C")))
 
       unions(
-        List(fromList(List(5 -> "A3", 3 -> "B3")),
-             fromList(List(5 -> "A", 7 -> "C")),
-             fromList(List(5 -> "a", 3 -> "b")))) must_==
+        List(
+          fromList(List(5 -> "A3", 3 -> "B3")),
+          fromList(List(5 -> "A", 7 -> "C")),
+          fromList(List(5 -> "a", 3 -> "b")))) must_==
         fromList(List(3 -> "B3", 5 -> "A3", 7 -> "C"))
     }
 
@@ -462,14 +463,16 @@ object MapTest extends SpecLite {
     }
 
     "commute (in one case)" in {
-      val a = Bin(1951314151,
-                  1,
-                  Bin(-1, 1271148582, Tip(), Tip()),
-                  Bin(2147483647, -1423766788, Tip(), Tip()))
-      val b = Bin(-12693552,
-                  -2147483648,
-                  Bin(-1587083834, -729342404, Tip(), Tip()),
-                  Bin(-1, 0, Tip(), Tip()))
+      val a = Bin(
+        1951314151,
+        1,
+        Bin(-1, 1271148582, Tip(), Tip()),
+        Bin(2147483647, -1423766788, Tip(), Tip()))
+      val b = Bin(
+        -12693552,
+        -2147483648,
+        Bin(-1587083834, -729342404, Tip(), Tip()),
+        Bin(-1, 0, Tip(), Tip()))
       (a intersectionWith b)(_ + _) must_=== ((b intersectionWith a)(_ + _))
     }
 
@@ -568,18 +571,21 @@ object MapTest extends SpecLite {
       val o = implicitly[Order[Int]]
       fromList(List('a' -> 1))
         .isSubmapOfBy(fromList(List('a' -> 1, 'b' -> 2)), o.equal) must_== true
-      fromList(List('a' -> 1)).isSubmapOfBy(fromList(List('a' -> 1, 'b' -> 2)),
-                                            o.lessThanOrEqual) must_== true
+      fromList(List('a' -> 1)).isSubmapOfBy(
+        fromList(List('a' -> 1, 'b' -> 2)),
+        o.lessThanOrEqual) must_== true
       fromList(List('a' -> 1, 'b' -> 2))
         .isSubmapOfBy(fromList(List('a' -> 1, 'b' -> 2)), o.equal) must_== true
     }
 
     "isSubmapOfBy -> false" in {
       val o = implicitly[Order[Int]]
-      fromList(List('a' -> 2)).isSubmapOfBy(fromList(List('a' -> 1, 'b' -> 2)),
-                                            o.equal) must_== false
-      fromList(List('a' -> 1)).isSubmapOfBy(fromList(List('a' -> 1, 'b' -> 2)),
-                                            o.lessThan) must_== false
+      fromList(List('a' -> 2)).isSubmapOfBy(
+        fromList(List('a' -> 1, 'b' -> 2)),
+        o.equal) must_== false
+      fromList(List('a' -> 1)).isSubmapOfBy(
+        fromList(List('a' -> 1, 'b' -> 2)),
+        o.lessThan) must_== false
       fromList(List('a' -> 1, 'b' -> 2))
         .isSubmapOfBy(fromList(List('a' -> 1)), o.equal) must_== false
     }

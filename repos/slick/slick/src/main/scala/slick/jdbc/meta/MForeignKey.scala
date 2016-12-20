@@ -29,25 +29,27 @@ object MForeignKey {
 
   def getCrossReference(parentTable: MQName, foreignTable: MQName) =
     createAction(
-      _.metaData.getCrossReference(parentTable.catalog_?,
-                                   parentTable.schema_?,
-                                   parentTable.name,
-                                   foreignTable.catalog_?,
-                                   foreignTable.schema_?,
-                                   foreignTable.name))
+      _.metaData.getCrossReference(
+        parentTable.catalog_?,
+        parentTable.schema_?,
+        parentTable.name,
+        foreignTable.catalog_?,
+        foreignTable.schema_?,
+        foreignTable.name))
 
   private[this] def createAction(f: JdbcBackend#Session => ResultSet) =
     ResultSetAction[MForeignKey](f) { r =>
-      MForeignKey(MQName.from(r),
-                  r.<<,
-                  MQName.from(r),
-                  r.<<,
-                  r.<<,
-                  fkActionFor(r.<<),
-                  fkActionFor(r.<<),
-                  r.<<,
-                  r.<<,
-                  r.<<)
+      MForeignKey(
+        MQName.from(r),
+        r.<<,
+        MQName.from(r),
+        r.<<,
+        r.<<,
+        fkActionFor(r.<<),
+        fkActionFor(r.<<),
+        r.<<,
+        r.<<,
+        r.<<)
     }
 
   private[this] def fkActionFor(v: Short) = v match {

@@ -24,9 +24,10 @@ class ScalaRedundantCastInspection
   def actionFor(holder: ProblemsHolder) = {
     case call: ScGenericCall =>
       call.referencedExpr.children.toList match {
-        case List(left: ScExpression,
-                  ElementText("."),
-                  ElementText("asInstanceOf")) =>
+        case List(
+            left: ScExpression,
+            ElementText("."),
+            ElementText("asInstanceOf")) =>
           for (actualType <- left.getType(TypingContext.empty).toOption;
                typeArgument <- call.arguments.headOption;
                castType <- typeArgument.getType(TypingContext.empty)

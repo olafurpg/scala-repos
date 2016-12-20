@@ -120,11 +120,12 @@ object lasso extends UFunc {
                                                 Double,
                                                 Array[Double],
                                                 LassoResult] =
-    new Impl4[DenseMatrix[Double],
-              DenseVector[Double],
-              Double,
-              Array[Double],
-              LassoResult] {
+    new Impl4[
+      DenseMatrix[Double],
+      DenseVector[Double],
+      Double,
+      Array[Double],
+      LassoResult] {
       def apply(data: DenseMatrix[Double],
                 outputs: DenseVector[Double],
                 lambda: Double,
@@ -137,11 +138,12 @@ object lasso extends UFunc {
                                                 Double,
                                                 Int,
                                                 LassoResult] =
-    new Impl4[DenseMatrix[Double],
-              DenseVector[Double],
-              Double,
-              Int,
-              LassoResult] {
+    new Impl4[
+      DenseMatrix[Double],
+      DenseVector[Double],
+      Double,
+      Int,
+      LassoResult] {
       def apply(data: DenseMatrix[Double],
                 outputs: DenseVector[Double],
                 lambda: Double,

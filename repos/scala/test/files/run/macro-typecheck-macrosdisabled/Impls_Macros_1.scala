@@ -5,9 +5,11 @@ object Macros {
     import c.universe._
 
     val ru = Select(
-      Select(Select(Select(Ident(TermName("scala")), TermName("reflect")),
-                    TermName("runtime")),
-             TermName("package")),
+      Select(
+        Select(
+          Select(Ident(TermName("scala")), TermName("reflect")),
+          TermName("runtime")),
+        TermName("package")),
       TermName("universe"))
     val tree1 =
       Apply(Select(ru, TermName("reify")), List(Literal(Constant(2))))

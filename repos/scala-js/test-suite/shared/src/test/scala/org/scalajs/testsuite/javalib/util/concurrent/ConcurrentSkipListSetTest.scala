@@ -393,8 +393,9 @@ class ConcurrentSkipListSetTest {
 
   @Test def should_throw_exception_on_non_comparable_objects(): Unit = {
     assumeTrue("Needs compliant asInstanceOf", hasCompliantAsInstanceOfs)
-    assumeFalse("Ignored on JVM due to possible race condition",
-                executingInJVM)
+    assumeFalse(
+      "Ignored on JVM due to possible race condition",
+      executingInJVM)
     // Behaviour based on JDK8 modulo (improbable) race conditions.
 
     class TestObj(num: Int)

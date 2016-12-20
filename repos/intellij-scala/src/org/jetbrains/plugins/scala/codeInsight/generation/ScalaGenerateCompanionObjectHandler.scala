@@ -28,8 +28,9 @@ class ScalaGenerateCompanionObjectHandler
       val obj = createCompanionObject(clazz)
       val parent = clazz.getParent
       val addedObj = parent.addAfter(obj, clazz)
-      parent.addAfter(ScalaPsiElementFactory.createNewLine(clazz.getManager),
-                      clazz)
+      parent.addAfter(
+        ScalaPsiElementFactory.createNewLine(clazz.getManager),
+        clazz)
       val document = editor.getDocument
       PsiDocumentManager
         .getInstance(project)

@@ -20,8 +20,9 @@ class RequestCookiesTest extends ScalatraFunSuite {
   }, "/*")
 
   test("multiCookies is a multi-map of names to values") {
-    get("/multi-cookies",
-        headers = Map("Cookie" -> "one=uno; one=eins; two=zwei")) {
+    get(
+      "/multi-cookies",
+      headers = Map("Cookie" -> "one=uno; one=eins; two=zwei")) {
       header("one") should be("uno:eins")
       header("two") should be("zwei")
       header("three") should be("")

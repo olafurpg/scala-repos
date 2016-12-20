@@ -17,9 +17,10 @@ class ScalaParameterTableModelItem(parameter: ScalaParameterInfo,
                                    typeCodeFragment: ScalaCodeFragment,
                                    defaultValue: ScalaCodeFragment,
                                    var startsNewClause: Boolean = false)
-    extends ParameterTableModelItemBase[ScalaParameterInfo](parameter,
-                                                            typeCodeFragment,
-                                                            defaultValue) {
+    extends ParameterTableModelItemBase[ScalaParameterInfo](
+      parameter,
+      typeCodeFragment,
+      defaultValue) {
 
   var typeText: String = generateTypeText(parameter)
 

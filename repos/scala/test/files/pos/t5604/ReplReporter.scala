@@ -10,9 +10,10 @@ import reporters._
 import IMain._
 
 class ReplReporter(intp: IMain)
-    extends ConsoleReporter(intp.settings,
-                            Console.in,
-                            new ReplStrippingWriter(intp)) {
+    extends ConsoleReporter(
+      intp.settings,
+      Console.in,
+      new ReplStrippingWriter(intp)) {
   override def printMessage(msg: String) {
     // Avoiding deadlock if the compiler starts logging before
     // the lazy val is complete.

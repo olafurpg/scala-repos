@@ -44,12 +44,13 @@ object TermConstructionProps
 
   property("unquote trees into block") = forAll {
     (t1: Tree, t2: Tree, t3: Tree) =>
-      blockInvariant(q"""{
+      blockInvariant(
+        q"""{
       $t1
       $t2
       $t3
     }""",
-                     List(t1, t2, t3))
+        List(t1, t2, t3))
   }
 
   property("unquote tree into new") = forAll { (tree: Tree) =>
@@ -73,8 +74,9 @@ object TermConstructionProps
       q"$fun($arg1, ..$args, $arg2)" ≈ Apply(
         fun,
         List(arg1) ++ args ++ List(arg2)) &&
-      q"$fun($arg1, $arg2, ..$args)" ≈ Apply(fun,
-                                             List(arg1) ++ List(arg2) ++ args)
+      q"$fun($arg1, $arg2, ..$args)" ≈ Apply(
+        fun,
+        List(arg1) ++ List(arg2) ++ args)
   }
 
   property("unquote into new") = forAll { (name: TypeName, body: List[Tree]) =>
@@ -101,21 +103,20 @@ object TermConstructionProps
 
   property("unquote trees into while loop") = forAll {
     (cond: Tree, body: Tree) =>
-      val LabelDef(_,
-                   List(),
-                   If(cond1,
-                      Block(List(body1), Apply(_, List())),
-                      Literal(Constant(())))) =
+      val LabelDef(
+        _,
+        List(),
+        If(cond1, Block(List(body1), Apply(_, List())), Literal(Constant(())))) =
         q"while($cond) $body"
       body1 ≈ body && cond1 ≈ cond
   }
 
   property("unquote trees into do while loop") = forAll {
     (cond: Tree, body: Tree) =>
-      val LabelDef(_,
-                   List(),
-                   Block(List(body1),
-                         If(cond1, Apply(_, List()), Literal(Constant(()))))) =
+      val LabelDef(
+        _,
+        List(),
+        Block(List(body1), If(cond1, Apply(_, List()), Literal(Constant(()))))) =
         q"do $body while($cond)"
       body1 ≈ body && cond1 ≈ cond
   }
@@ -232,10 +233,12 @@ object TermConstructionProps
 
   property("SI-6842") = test {
     val cases: List[Tree] = cq"a => b" :: cq"_ => c" :: Nil
-    assertEqAst(q"1 match { case ..$cases }",
-                "1 match { case a => b case _ => c }")
-    assertEqAst(q"try 1 catch { case ..$cases }",
-                "try 1 catch { case a => b case _ => c }")
+    assertEqAst(
+      q"1 match { case ..$cases }",
+      "1 match { case a => b case _ => c }")
+    assertEqAst(
+      q"try 1 catch { case ..$cases }",
+      "try 1 catch { case a => b case _ => c }")
   }
 
   property("SI-8009") = test {

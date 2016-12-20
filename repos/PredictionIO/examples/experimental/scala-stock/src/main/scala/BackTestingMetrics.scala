@@ -65,13 +65,14 @@ case class BacktestingResult(
 }
 
 class BacktestingEvaluator(val params: BacktestingParams)
-    extends Evaluator[DataParams,
-                      QueryDate,
-                      Prediction,
-                      AnyRef,
-                      DailyResult,
-                      Seq[DailyResult],
-                      BacktestingResult] {
+    extends Evaluator[
+      DataParams,
+      QueryDate,
+      Prediction,
+      AnyRef,
+      DailyResult,
+      Seq[DailyResult],
+      BacktestingResult] {
 
   def evaluateUnit(queryDate: QueryDate,
                    prediction: Prediction,

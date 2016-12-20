@@ -39,8 +39,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class TablePositionSpec[S, T]
-    extends SimpleSFXDelegateSpec[jfxsc.TablePosition[S, T],
-                                  TablePosition[S, T]](
+    extends SimpleSFXDelegateSpec[
+      jfxsc.TablePosition[S, T],
+      TablePosition[S, T]](
       classOf[jfxsc.TablePosition[S, T]],
       classOf[TablePosition[S, T]]) {
 

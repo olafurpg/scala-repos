@@ -13,9 +13,10 @@ final case class InvalidRepository(repo: String)
 
 final case class RepositoryIndexingException(repo: String, cause: Throwable)
     extends IOException(
-      SbtBundle("sbt.resolverIndexer.remoteRepositoryHasNotBeenIndexed",
-                repo,
-                cause.toString))
+      SbtBundle(
+        "sbt.resolverIndexer.remoteRepositoryHasNotBeenIndexed",
+        repo,
+        cause.toString))
     with ResolverException
 
 final case class CantCreateIndexDirectory(dir: File)
@@ -30,6 +31,7 @@ final case class IndexVersionMismatch(indexProperties: File)
 
 final case class CorruptedIndexException(indexFile: File)
     extends IOException(
-      SbtBundle("sbt.resolverIndexer.indexFileIsCorrupted",
-                indexFile.getAbsolutePath))
+      SbtBundle(
+        "sbt.resolverIndexer.indexFileIsCorrupted",
+        indexFile.getAbsolutePath))
     with ResolverException

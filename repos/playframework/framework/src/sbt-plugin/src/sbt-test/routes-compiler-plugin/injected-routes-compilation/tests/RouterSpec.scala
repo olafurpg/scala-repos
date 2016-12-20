@@ -60,10 +60,11 @@ object RouterSpec extends PlaySpecification {
 
     "from a list of numbers" in new WithApplication() {
       val Some(result) =
-        route(implicitApp,
-              FakeRequest(
-                GET,
-                controllers.routes.Application.takeList(List(1, 2, 3)).url))
+        route(
+          implicitApp,
+          FakeRequest(
+            GET,
+            controllers.routes.Application.takeList(List(1, 2, 3)).url))
       contentAsString(result) must equalTo("1,2,3")
     }
     "from a list of numbers and letters" in new WithApplication() {
@@ -82,16 +83,18 @@ object RouterSpec extends PlaySpecification {
     }
     "using backticked names on route params" in new WithApplication() {
       val Some(result) =
-        route(implicitApp,
-              FakeRequest(GET, "/take-list-tick-param?b[]=4&b[]=5&b[]=6"))
+        route(
+          implicitApp,
+          FakeRequest(GET, "/take-list-tick-param?b[]=4&b[]=5&b[]=6"))
       contentAsString(result) must equalTo("4,5,6")
     }
     "using backticked names urlencoded on route params" in new WithApplication() {
       val Some(result) =
         route(
           implicitApp,
-          FakeRequest(GET,
-                      "/take-list-tick-param?b%5B%5D=4&b%5B%5D=5&b%5B%5D=6"))
+          FakeRequest(
+            GET,
+            "/take-list-tick-param?b%5B%5D=4&b%5B%5D=5&b%5B%5D=6"))
       contentAsString(result) must equalTo("4,5,6")
     }
   }

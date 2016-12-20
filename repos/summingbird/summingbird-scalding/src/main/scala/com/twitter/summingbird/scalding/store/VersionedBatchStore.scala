@@ -160,11 +160,12 @@ class VersionedBatchStore[K, V, K2, V2](rootPath: String,
       implicit flowDef: FlowDef,
       mode: Mode): Unit = {
     val newVersion = batchIDToVersion(batchID)
-    val target = VersionedKeyValSource[K2, V2](rootPath,
-                                               sourceVersion = None,
-                                               sinkVersion = Some(newVersion),
-                                               maxFailures = 0,
-                                               versionsToKeep = versionsToKeep)
+    val target = VersionedKeyValSource[K2, V2](
+      rootPath,
+      sourceVersion = None,
+      sinkVersion = Some(newVersion),
+      maxFailures = 0,
+      versionsToKeep = versionsToKeep)
 
     if (!target.sinkExists(mode)) {
       logger.info(

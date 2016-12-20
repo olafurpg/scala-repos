@@ -160,13 +160,14 @@ object Dependencies {
   val testkit = l ++= Seq(Test.junit, Test.scalatest.value) ++ Test.metricsAll
 
   val actorTests =
-    l ++= Seq(Test.junit,
-              Test.scalatest.value,
-              Test.commonsCodec,
-              Test.commonsMath,
-              Test.mockito,
-              Test.scalacheck.value,
-              Test.junitIntf)
+    l ++= Seq(
+      Test.junit,
+      Test.scalatest.value,
+      Test.commonsCodec,
+      Test.commonsMath,
+      Test.mockito,
+      Test.scalacheck.value,
+      Test.junitIntf)
 
   val remote =
     l ++= Seq(netty, uncommonsMath, Test.junit, Test.scalatest.value)
@@ -178,18 +179,20 @@ object Dependencies {
   val clusterTools = l ++= Seq(Test.junit, Test.scalatest.value)
 
   val clusterSharding =
-    l ++= Seq(Provided.levelDB,
-              Provided.levelDBNative,
-              Test.junit,
-              Test.scalatest.value,
-              Test.commonsIo)
+    l ++= Seq(
+      Provided.levelDB,
+      Provided.levelDBNative,
+      Test.junit,
+      Test.scalatest.value,
+      Test.commonsIo)
 
   val clusterMetrics =
-    l ++= Seq(Provided.sigarLoader,
-              Test.slf4jJul,
-              Test.slf4jLog4j,
-              Test.logback,
-              Test.mockito)
+    l ++= Seq(
+      Provided.sigarLoader,
+      Test.slf4jJul,
+      Test.slf4jLog4j,
+      Test.logback,
+      Test.mockito)
 
   val distributedData = l ++= Seq(Test.junit, Test.scalatest.value)
 
@@ -198,50 +201,55 @@ object Dependencies {
   val agent = l ++= Seq(scalaStm.value, Test.scalatest.value, Test.junit)
 
   val persistence =
-    l ++= Seq(Provided.levelDB,
-              Provided.levelDBNative,
-              Test.scalatest.value,
-              Test.junit,
-              Test.commonsIo,
-              Test.commonsCodec,
-              Test.scalaXml)
+    l ++= Seq(
+      Provided.levelDB,
+      Provided.levelDBNative,
+      Test.scalatest.value,
+      Test.junit,
+      Test.commonsIo,
+      Test.commonsCodec,
+      Test.scalaXml)
 
   val persistenceQuery =
     l ++= Seq(Test.scalatest.value, Test.junit, Test.commonsIo)
 
   val persistenceTck =
-    l ++= Seq(Test.scalatest.value.copy(configurations = Some("compile")),
-              Test.junit.copy(configurations = Some("compile")))
+    l ++= Seq(
+      Test.scalatest.value.copy(configurations = Some("compile")),
+      Test.junit.copy(configurations = Some("compile")))
 
   val persistenceShared = l ++= Seq(Provided.levelDB, Provided.levelDBNative)
 
   val kernel = l ++= Seq(Test.scalatest.value, Test.junit)
 
   val camel =
-    l ++= Seq(camelCore,
-              Test.scalatest.value,
-              Test.junit,
-              Test.mockito,
-              Test.logback,
-              Test.commonsIo,
-              Test.junitIntf)
+    l ++= Seq(
+      camelCore,
+      Test.scalatest.value,
+      Test.junit,
+      Test.mockito,
+      Test.logback,
+      Test.commonsIo,
+      Test.junitIntf)
 
   val osgi =
-    l ++= Seq(osgiCore,
-              osgiCompendium,
-              Test.logback,
-              Test.commonsIo,
-              Test.pojosr,
-              Test.tinybundles,
-              Test.scalatest.value,
-              Test.junit)
+    l ++= Seq(
+      osgiCore,
+      osgiCompendium,
+      Test.logback,
+      Test.commonsIo,
+      Test.pojosr,
+      Test.tinybundles,
+      Test.scalatest.value,
+      Test.junit)
 
   val docs =
-    l ++= Seq(Test.scalatest.value,
-              Test.junit,
-              Test.junitIntf,
-              Docs.sprayJson,
-              Docs.gson)
+    l ++= Seq(
+      Test.scalatest.value,
+      Test.junit,
+      Test.junitIntf,
+      Docs.sprayJson,
+      Docs.gson)
 
   val contrib = l ++= Seq(Test.junitIntf, Test.commonsIo)
 
@@ -250,11 +258,12 @@ object Dependencies {
   // akka stream & http
 
   lazy val httpCore =
-    l ++= Seq(java8Compat,
-              Test.sprayJson, // for WS Autobahn test metadata
-              Test.junitIntf,
-              Test.junit,
-              Test.scalatest.value)
+    l ++= Seq(
+      java8Compat,
+      Test.sprayJson, // for WS Autobahn test metadata
+      Test.junitIntf,
+      Test.junit,
+      Test.scalatest.value)
 
   lazy val http = l ++= Seq(java8Compat)
 
@@ -270,10 +279,11 @@ object Dependencies {
 
   lazy val httpTestkit =
     l ++=
-      Seq(Test.junit,
-          Test.junitIntf,
-          Compile.junit % "provided",
-          Test.scalatest.value.copy(configurations = Some("provided; test")))
+      Seq(
+        Test.junit,
+        Test.junitIntf,
+        Compile.junit % "provided",
+        Test.scalatest.value.copy(configurations = Some("provided; test")))
 
   // TODO collapse those
   lazy val httpTests =
@@ -287,25 +297,28 @@ object Dependencies {
   lazy val httpJackson = l ++= Seq(jackson)
 
   lazy val stream =
-    l ++= Seq[sbt.ModuleID](sslConfigAkka,
-                            reactiveStreams,
-                            Test.junitIntf,
-                            Test.scalatest.value)
+    l ++= Seq[sbt.ModuleID](
+      sslConfigAkka,
+      reactiveStreams,
+      Test.junitIntf,
+      Test.scalatest.value)
 
   lazy val streamTestkit =
     l ++= Seq(Test.scalatest.value, Test.scalacheck.value, Test.junit)
 
   lazy val streamTests =
-    l ++= Seq(Test.scalatest.value,
-              Test.scalacheck.value,
-              Test.junit,
-              Test.commonsIo)
+    l ++= Seq(
+      Test.scalatest.value,
+      Test.scalacheck.value,
+      Test.junit,
+      Test.commonsIo)
 
   lazy val streamTestsTck =
-    l ++= Seq(Test.scalatest.value,
-              Test.scalacheck.value,
-              Test.junit,
-              Test.reactiveStreamsTck)
+    l ++= Seq(
+      Test.scalatest.value,
+      Test.scalacheck.value,
+      Test.junit,
+      Test.reactiveStreamsTck)
 }
 
 object DependencyHelpers {

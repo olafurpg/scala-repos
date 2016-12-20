@@ -80,11 +80,12 @@ private[spark] class OptionalConfigEntry[T](
     val rawStringConverter: T => String,
     doc: String,
     isPublic: Boolean)
-    extends ConfigEntry[Option[T]](key,
-                                   s => Some(rawValueConverter(s)),
-                                   v => v.map(rawStringConverter).orNull,
-                                   doc,
-                                   isPublic) {
+    extends ConfigEntry[Option[T]](
+      key,
+      s => Some(rawValueConverter(s)),
+      v => v.map(rawStringConverter).orNull,
+      doc,
+      isPublic) {
 
   override def defaultValueString: String = "<undefined>"
 
@@ -99,11 +100,12 @@ private class FallbackConfigEntry[T](key: String,
                                      doc: String,
                                      isPublic: Boolean,
                                      private val fallback: ConfigEntry[T])
-    extends ConfigEntry[T](key,
-                           fallback.valueConverter,
-                           fallback.stringConverter,
-                           doc,
-                           isPublic) {
+    extends ConfigEntry[T](
+      key,
+      fallback.valueConverter,
+      fallback.stringConverter,
+      doc,
+      isPublic) {
 
   override def defaultValueString: String = s"<value of ${fallback.key}>"
 

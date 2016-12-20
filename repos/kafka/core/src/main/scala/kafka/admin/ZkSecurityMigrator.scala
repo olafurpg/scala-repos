@@ -83,14 +83,16 @@ object ZkSecurityMigrator extends Logging {
       .defaultsTo("localhost:2181")
       .ofType(classOf[String])
     val zkSessionTimeoutOpt = parser
-      .accepts("zookeeper.session.timeout",
-               "Sets the ZooKeeper session timeout.")
+      .accepts(
+        "zookeeper.session.timeout",
+        "Sets the ZooKeeper session timeout.")
       .withRequiredArg()
       .ofType(classOf[java.lang.Integer])
       .defaultsTo(30000)
     val zkConnectionTimeoutOpt = parser
-      .accepts("zookeeper.connection.timeout",
-               "Sets the ZooKeeper connection timeout.")
+      .accepts(
+        "zookeeper.connection.timeout",
+        "Sets the ZooKeeper connection timeout.")
       .withRequiredArg()
       .ofType(classOf[java.lang.Integer])
       .defaultsTo(30000)
@@ -233,11 +235,12 @@ class ZkSecurityMigrator(zkUtils: ZkUtils) extends Logging {
           info("Successfully set ACLs for %s".format(path))
           promise success "done"
         case Code.CONNECTIONLOSS =>
-          zkHandle.setACL(path,
-                          ZkUtils.DefaultAcls(zkUtils.isSecure),
-                          -1,
-                          SetACLCallback,
-                          ctx)
+          zkHandle.setACL(
+            path,
+            ZkUtils.DefaultAcls(zkUtils.isSecure),
+            -1,
+            SetACLCallback,
+            ctx)
         case Code.NONODE =>
           warn(
             "Znode is gone, it could be have been legitimately deleted: %s"

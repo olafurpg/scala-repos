@@ -92,11 +92,12 @@ object ParseDriver extends Logging {
             createASTNode(tree.getChild(i).asInstanceOf[CommonTree])
           }
           .toList
-        ASTNode(tree.token,
-                tree.getTokenStartIndex,
-                tree.getTokenStopIndex,
-                children,
-                tokens)
+        ASTNode(
+          tree.token,
+          tree.getTokenStartIndex,
+          tree.getTokenStopIndex,
+          children,
+          tokens)
       }
       createASTNode(tree)
     } catch {
@@ -151,10 +152,11 @@ private[parser] class ParseErrorReporter {
     if (errors.nonEmpty) {
       val first = errors.head
       val e = first.re
-      throwError(e.line,
-                 e.charPositionInLine,
-                 first.buildMessage().toString,
-                 errors.tail)
+      throwError(
+        e.line,
+        e.charPositionInLine,
+        first.buildMessage().toString,
+        errors.tail)
     }
   }
 
@@ -169,9 +171,10 @@ private[parser] class ParseErrorReporter {
     val b = new StringBuilder
     b.append(msg).append("\n")
     errors.foreach(error => error.buildMessage(b).append("\n"))
-    throw new AnalysisException(b.toString,
-                                Option(line),
-                                Option(startPosition))
+    throw new AnalysisException(
+      b.toString,
+      Option(line),
+      Option(startPosition))
   }
 }
 

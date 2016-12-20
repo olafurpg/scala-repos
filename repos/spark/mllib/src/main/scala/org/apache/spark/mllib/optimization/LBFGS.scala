@@ -143,14 +143,15 @@ class LBFGS(private var gradient: Gradient, private var updater: Updater)
 
   override def optimize(data: RDD[(Double, Vector)],
                         initialWeights: Vector): Vector = {
-    val (weights, _) = LBFGS.runLBFGS(data,
-                                      gradient,
-                                      updater,
-                                      numCorrections,
-                                      convergenceTol,
-                                      maxNumIterations,
-                                      regParam,
-                                      initialWeights)
+    val (weights, _) = LBFGS.runLBFGS(
+      data,
+      gradient,
+      updater,
+      numCorrections,
+      convergenceTol,
+      maxNumIterations,
+      regParam,
+      initialWeights)
     weights
   }
 }
@@ -198,12 +199,14 @@ object LBFGS extends Logging {
 
     val costFun = new CostFun(data, gradient, updater, regParam, numExamples)
 
-    val lbfgs = new BreezeLBFGS[BDV[Double]](maxNumIterations,
-                                             numCorrections,
-                                             convergenceTol)
+    val lbfgs = new BreezeLBFGS[BDV[Double]](
+      maxNumIterations,
+      numCorrections,
+      convergenceTol)
 
-    val states = lbfgs.iterations(new CachedDiffFunction(costFun),
-                                  initialWeights.toBreeze.toDenseVector)
+    val states = lbfgs.iterations(
+      new CachedDiffFunction(costFun),
+      initialWeights.toBreeze.toDenseVector)
 
     /**
       * NOTE: lossSum and loss is computed using the weights from the previous iteration
@@ -284,9 +287,10 @@ object LBFGS extends Logging {
       // The following gradientTotal is actually the regularization part of gradient.
       // Will add the gradientSum computed from the data with weights in the next step.
       val gradientTotal = w.copy
-      axpy(-1.0,
-           updater.compute(w, Vectors.zeros(n), 1, 1, regParam)._1,
-           gradientTotal)
+      axpy(
+        -1.0,
+        updater.compute(w, Vectors.zeros(n), 1, 1, regParam)._1,
+        gradientTotal)
 
       // gradientTotal = gradientSum / numExamples + gradientTotal
       axpy(1.0 / numExamples, gradientSum, gradientTotal)

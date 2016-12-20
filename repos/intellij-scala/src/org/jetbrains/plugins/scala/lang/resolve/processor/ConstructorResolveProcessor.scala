@@ -29,14 +29,15 @@ class ConstructorResolveProcessor(constr: PsiElement,
                                   kinds: Set[ResolveTargets.Value],
                                   shapeResolve: Boolean,
                                   allConstructors: Boolean)
-    extends MethodResolveProcessor(constr,
-                                   refName,
-                                   args,
-                                   typeArgs,
-                                   Seq.empty,
-                                   kinds,
-                                   isShapeResolve = shapeResolve,
-                                   enableTupling = true) {
+    extends MethodResolveProcessor(
+      constr,
+      refName,
+      args,
+      typeArgs,
+      Seq.empty,
+      kinds,
+      isShapeResolve = shapeResolve,
+      enableTupling = true) {
   override def execute(element: PsiElement, state: ResolveState): Boolean = {
     val named = element.asInstanceOf[PsiNamedElement]
     val fromType = getFromType(state)
@@ -58,37 +59,39 @@ class ConstructorResolveProcessor(constr: PsiElement,
             //this is for Traits for example. They can be in constructor position.
             // But they haven't constructors.
             addResult(
-              new ScalaResolveResult(clazz,
-                                     subst,
-                                     getImports(state),
-                                     nameShadow0,
-                                     boundClass = getBoundClass(state),
-                                     fromType = fromType,
-                                     isAccessible = accessible))
+              new ScalaResolveResult(
+                clazz,
+                subst,
+                getImports(state),
+                nameShadow0,
+                boundClass = getBoundClass(state),
+                fromType = fromType,
+                isAccessible = accessible))
           } else {
             addResults(
               constructors.toSeq.map(
                 constr =>
-                  new ScalaResolveResult(constr,
-                                         subst,
-                                         getImports(state),
-                                         nameShadow0,
-                                         parentElement = Some(clazz),
-                                         boundClass = getBoundClass(state),
-                                         fromType = fromType,
-                                         isAccessible = isAccessible(constr,
-                                                                     ref) &&
-                                             accessible)))
+                  new ScalaResolveResult(
+                    constr,
+                    subst,
+                    getImports(state),
+                    nameShadow0,
+                    parentElement = Some(clazz),
+                    boundClass = getBoundClass(state),
+                    fromType = fromType,
+                    isAccessible = isAccessible(constr, ref) &&
+                        accessible)))
           }
         case ta: ScTypeAliasDeclaration =>
           addResult(
-            new ScalaResolveResult(ta,
-                                   subst,
-                                   getImports(state),
-                                   nameShadow0,
-                                   boundClass = getBoundClass(state),
-                                   fromType = fromType,
-                                   isAccessible = accessible))
+            new ScalaResolveResult(
+              ta,
+              subst,
+              getImports(state),
+              nameShadow0,
+              boundClass = getBoundClass(state),
+              fromType = fromType,
+              isAccessible = accessible))
         case ta: ScTypeAliasDefinition =>
           lazy val r = new ScalaResolveResult(
             ta,
@@ -142,12 +145,13 @@ class ConstructorResolveProcessor(constr: PsiElement,
       else {
         superCandidates.map(
           constr =>
-            new ScalaResolveResult(constr.getActualElement,
-                                   constr.substitutor,
-                                   constr.importsUsed,
-                                   boundClass = constr.boundClass,
-                                   fromType = constr.fromType,
-                                   isAccessible = constr.isAccessible))
+            new ScalaResolveResult(
+              constr.getActualElement,
+              constr.substitutor,
+              constr.importsUsed,
+              boundClass = constr.boundClass,
+              fromType = constr.fromType,
+              isAccessible = constr.isAccessible))
       }
     } else {
       super.candidatesS

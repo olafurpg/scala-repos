@@ -150,8 +150,9 @@ class MongoDirectSpec extends Specification with MongoTestKit {
 
       // range - 20 < i <= 30
       val cur4 = coll.find(
-        new BasicDBObject("i",
-                          new BasicDBObject("$gt", 20).append("$lte", 30)))
+        new BasicDBObject(
+          "i",
+          new BasicDBObject("$gt", 20).append("$lte", 30)))
 
       cur4.count must_== 10
 
@@ -222,8 +223,9 @@ class MongoDirectSpec extends Specification with MongoTestKit {
       val coll = db.getCollection("testCollection")
 
       // create a unique index on name
-      coll.createIndex(new BasicDBObject("name", 1),
-                       new BasicDBObject("unique", true))
+      coll.createIndex(
+        new BasicDBObject("name", 1),
+        new BasicDBObject("unique", true))
 
       // build the DBObjects
       val doc = new BasicDBObject

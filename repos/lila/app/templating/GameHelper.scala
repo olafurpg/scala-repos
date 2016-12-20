@@ -235,11 +235,11 @@ trait GameHelper {
                ownerLink: Boolean = false,
                tv: Boolean = false)(implicit ctx: UserContext): String = {
     val owner = ownerLink.fold(ctx.me flatMap game.player, none)
-    val url = tv.fold(routes.Tv.index,
-                      owner.fold(routes.Round.watcher(game.id, color.name)) {
-                        o =>
-                          routes.Round.player(game fullIdOf o.color)
-                      })
+    val url = tv.fold(
+      routes.Tv.index,
+      owner.fold(routes.Round.watcher(game.id, color.name)) { o =>
+        routes.Round.player(game fullIdOf o.color)
+      })
     url.toString
   }
 
@@ -268,15 +268,17 @@ trait GameHelper {
       var isLive = pov.game.isBeingPlayed
       val variant = pov.game.variant.key
       s"""<a href="%s%s" title="%s" class="mini_board mini_board_${pov.game.id} parse_fen is2d %s $variant" data-live="%s" data-color="%s" data-fen="%s" data-lastmove="%s"%s>$miniBoardContent</a>"""
-        .format(blank ?? netBaseUrl,
-                tv.fold(routes.Tv.index,
-                        routes.Round.watcher(pov.game.id, pov.color.name)),
-                gameTitle(pov.game, pov.color),
-                isLive ?? ("live live_" + pov.game.id),
-                isLive ?? pov.game.id,
-                pov.color.name,
-                Forsyth exportBoard pov.game.toChess.board,
-                ~pov.game.castleLastMoveTime.lastMoveString,
-                blank ?? """ target="_blank"""")
+        .format(
+          blank ?? netBaseUrl,
+          tv.fold(
+            routes.Tv.index,
+            routes.Round.watcher(pov.game.id, pov.color.name)),
+          gameTitle(pov.game, pov.color),
+          isLive ?? ("live live_" + pov.game.id),
+          isLive ?? pov.game.id,
+          pov.color.name,
+          Forsyth exportBoard pov.game.toChess.board,
+          ~pov.game.castleLastMoveTime.lastMoveString,
+          blank ?? """ target="_blank"""")
     }
 }

@@ -37,8 +37,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 /** Border Spec tests. */
 @RunWith(classOf[JUnitRunner])
 class BorderSpec
-    extends SimpleSFXDelegateSpec[jfxsl.Border, Border](classOf[jfxsl.Border],
-                                                        classOf[Border]) {
+    extends SimpleSFXDelegateSpec[jfxsl.Border, Border](
+      classOf[jfxsl.Border],
+      classOf[Border]) {
 
   override protected def getScalaClassInstance =
     new Border(getJavaClassInstance) {}

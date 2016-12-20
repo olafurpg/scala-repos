@@ -50,8 +50,9 @@ private[hive] class HiveSessionState(ctx: HiveContext)
     * Note that HiveUDFs will be overridden by functions registered in this context.
     */
   override lazy val functionRegistry: FunctionRegistry = {
-    new HiveFunctionRegistry(FunctionRegistry.builtin.copy(),
-                             ctx.executionHive)
+    new HiveFunctionRegistry(
+      FunctionRegistry.builtin.copy(),
+      ctx.executionHive)
   }
 
   /**

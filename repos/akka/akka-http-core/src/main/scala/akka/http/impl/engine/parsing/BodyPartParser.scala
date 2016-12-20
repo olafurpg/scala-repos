@@ -29,8 +29,9 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
   import BodyPartParser._
   import settings._
 
-  require(boundary.nonEmpty,
-          "'boundary' parameter of multipart Content-Type must be non-empty")
+  require(
+    boundary.nonEmpty,
+    "'boundary' parameter of multipart Content-Type must be non-empty")
   require(
     boundary.charAt(boundary.length - 1) != ' ',
     "'boundary' parameter of multipart Content-Type must not end with a space char")
@@ -84,8 +85,9 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
         case e: ParsingException ⇒ fail(e.info)
         case NotEnoughDataException ⇒
           // we are missing a try/catch{continue} wrapper somewhere
-          throw new IllegalStateException("unexpected NotEnoughDataException",
-                                          NotEnoughDataException)
+          throw new IllegalStateException(
+            "unexpected NotEnoughDataException",
+            NotEnoughDataException)
       }
       if (output.nonEmpty) ctx.push(dequeue())
       else if (!terminated) ctx.pull()
@@ -222,9 +224,10 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
       @tailrec def rec(index: Int): StateResult = {
         val currentPartEnd = boyerMoore.nextIndex(input, index)
         def emitFinalChunk() =
-          emitFinalPartChunk(headers,
-                             contentType,
-                             input.slice(offset, currentPartEnd))
+          emitFinalPartChunk(
+            headers,
+            contentType,
+            input.slice(offset, currentPartEnd))
         val needleEnd = currentPartEnd + needle.length
         if (crlf(input, needleEnd)) {
           emitFinalChunk()
@@ -247,10 +250,11 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
             parseEntity(null, null, simpleEmit, simpleEmit))
         } else
           continue(input, offset)(
-            parseEntity(headers,
-                        contentType,
-                        emitPartChunk,
-                        emitFinalPartChunk))
+            parseEntity(
+              headers,
+              contentType,
+              emitPartChunk,
+              emitFinalPartChunk))
     }
 
   def emit(bytes: ByteString): Unit =

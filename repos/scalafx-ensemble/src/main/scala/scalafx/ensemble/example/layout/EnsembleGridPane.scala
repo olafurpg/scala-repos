@@ -157,13 +157,14 @@ class EnsembleGridPane extends EnsembleExample {
         rowConstraints.add(rowInfo)
         columnConstraints.add(colInfo)
       }
-      children ++= Seq(category,
-                       categoryValue,
-                       company,
-                       companyValue,
-                       imageView,
-                       rating,
-                       ratingValue)
+      children ++= Seq(
+        category,
+        categoryValue,
+        company,
+        companyValue,
+        imageView,
+        rating,
+        ratingValue)
     }
 
     // grid3 places the child by influencing the rows and columns

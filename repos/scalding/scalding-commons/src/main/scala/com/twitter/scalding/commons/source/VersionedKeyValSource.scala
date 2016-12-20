@@ -48,11 +48,12 @@ object VersionedKeyValSource {
                   sinkVersion: Option[Long] = None,
                   maxFailures: Int = 0)(
       implicit codec: Injection[(K, V), (Array[Byte], Array[Byte])]) = {
-    new VersionedKeyValSource[K, V](path,
-                                    sourceVersion,
-                                    sinkVersion,
-                                    maxFailures,
-                                    defaultVersionsToKeep)
+    new VersionedKeyValSource[K, V](
+      path,
+      sourceVersion,
+      sinkVersion,
+      maxFailures,
+      defaultVersionsToKeep)
   }
 
   def apply[K, V](path: String,
@@ -61,11 +62,12 @@ object VersionedKeyValSource {
                   maxFailures: Int,
                   versionsToKeep: Int)(
       implicit codec: Injection[(K, V), (Array[Byte], Array[Byte])]) =
-    new VersionedKeyValSource[K, V](path,
-                                    sourceVersion,
-                                    sinkVersion,
-                                    maxFailures,
-                                    versionsToKeep)
+    new VersionedKeyValSource[K, V](
+      path,
+      sourceVersion,
+      sinkVersion,
+      maxFailures,
+      versionsToKeep)
 }
 
 class VersionedKeyValSource[K, V](val path: String,
@@ -103,11 +105,12 @@ class VersionedKeyValSource[K, V](val path: String,
       maxFailures: Int)(implicit @transient codec: Injection[(K, V),
                                                              (Array[Byte],
                                                               Array[Byte])]) =
-    this(path,
-         sourceVersion,
-         sinkVersion,
-         maxFailures,
-         VersionedKeyValSource.defaultVersionsToKeep)(codec)
+    this(
+      path,
+      sourceVersion,
+      sinkVersion,
+      maxFailures,
+      VersionedKeyValSource.defaultVersionsToKeep)(codec)
 
   def getTap(mode: TapMode) = {
     val tap = new VersionedTap(path, hdfsScheme, mode)

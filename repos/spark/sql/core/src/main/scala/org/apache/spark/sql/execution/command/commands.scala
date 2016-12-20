@@ -91,9 +91,10 @@ case class SetCommand(kv: Option[(String, Option[String])])
 
   private def keyValueOutput: Seq[Attribute] = {
     val schema = StructType(
-      StructField("key", StringType, false) :: StructField("value",
-                                                           StringType,
-                                                           false) :: Nil)
+      StructField("key", StringType, false) :: StructField(
+        "value",
+        StringType,
+        false) :: Nil)
     schema.toAttributes
   }
 
@@ -172,8 +173,9 @@ case class SetCommand(kv: Option[(String, Option[String])])
         (keyValueOutput, runFunc)
 
       case Some(
-          (SQLConf.Deprecated.PARQUET_UNSAFE_ROW_RECORD_READER_ENABLED,
-           Some(value))) =>
+          (
+            SQLConf.Deprecated.PARQUET_UNSAFE_ROW_RECORD_READER_ENABLED,
+            Some(value))) =>
         val runFunc = (sqlContext: SQLContext) => {
           logWarning(
             s"Property ${SQLConf.Deprecated.PARQUET_UNSAFE_ROW_RECORD_READER_ENABLED} is " +
@@ -221,8 +223,9 @@ case class SetCommand(kv: Option[(String, Option[String])])
             s"Property ${SQLConf.Deprecated.MAPRED_REDUCE_TASKS} is deprecated, " +
               s"showing ${SQLConf.SHUFFLE_PARTITIONS.key} instead.")
           Seq(
-            Row(SQLConf.SHUFFLE_PARTITIONS.key,
-                sqlContext.conf.numShufflePartitions.toString))
+            Row(
+              SQLConf.SHUFFLE_PARTITIONS.key,
+              sqlContext.conf.numShufflePartitions.toString))
         }
         (keyValueOutput, runFunc)
 
@@ -350,9 +353,10 @@ case class ShowTablesCommand(databaseName: Option[String])
   // The result of SHOW TABLES has two columns, tableName and isTemporary.
   override val output: Seq[Attribute] = {
     val schema = StructType(
-      StructField("tableName", StringType, false) :: StructField("isTemporary",
-                                                                 BooleanType,
-                                                                 false) :: Nil)
+      StructField("tableName", StringType, false) :: StructField(
+        "isTemporary",
+        BooleanType,
+        false) :: Nil)
 
     schema.toAttributes
   }

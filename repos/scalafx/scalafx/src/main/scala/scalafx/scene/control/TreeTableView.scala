@@ -161,11 +161,12 @@ object TreeTableView {
              oldValue: T,
              newValue: T) =
       this(
-        new jfxsc.TreeTableView.EditEvent[T](source,
-                                             eventType,
-                                             treeTableItem,
-                                             oldValue,
-                                             newValue))
+        new jfxsc.TreeTableView.EditEvent[T](
+          source,
+          eventType,
+          treeTableItem,
+          oldValue,
+          newValue))
 
     /**
       * Returns the new value input into the TreeItem by the end user.
@@ -731,8 +732,9 @@ class TreeTableView[S](
     delegate
       .columnResizePolicyProperty()
       .setValue(
-        new jfxu.Callback[jfxsc.TreeTableView.ResizeFeatures[_],
-                          java.lang.Boolean] {
+        new jfxu.Callback[
+          jfxsc.TreeTableView.ResizeFeatures[_],
+          java.lang.Boolean] {
           def call(
               v: jfxsc.TreeTableView.ResizeFeatures[_]): java.lang.Boolean = {
             p(v)

@@ -162,7 +162,8 @@ trait CookieContext { self: ScalatraContext =>
     request.get(SweetCookiesKey).orNull.asInstanceOf[SweetCookies]
   }
 }
-@deprecated("You can remove this mixin, it's included in core by default",
-            "2.2")
+@deprecated(
+  "You can remove this mixin, it's included in core by default",
+  "2.2")
 trait CookieSupport { self: ScalatraBase =>
 }

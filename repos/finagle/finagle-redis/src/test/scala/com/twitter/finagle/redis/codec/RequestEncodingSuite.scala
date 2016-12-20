@@ -19,8 +19,9 @@ final class RequestEncodingSuite extends RedisRequestTest {
         "*3\r\n$3\r\nSET\r\n$3\r\nfoo\r\n$%d\r\n%s\r\n".format(8, value)))
   }
 
-  test("Correctly encode a HSet request with an empty string as value",
-       CodecTest) {
+  test(
+    "Correctly encode a HSet request with an empty string as value",
+    CodecTest) {
     assert(
       codec.send(HSet(foo, bar, string2ChanBuf(""))) == List(
         "*4\r\n$4\r\nHSET\r\n$3\r\nfoo\r\n$3\r\nbar\r\n$0\r\n\r\n"))

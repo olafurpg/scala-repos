@@ -23,8 +23,9 @@ trait Printers extends scala.reflect.internal.Printers { this: Global =>
             tree match {
               case ClassDef(_, _, _, impl @ Template(ps, noSelfType, body))
                   if (tree.symbol.thisSym != tree.symbol) =>
-                ClassDef(tree.symbol,
-                         Template(ps, ValDef(tree.symbol.thisSym), body))
+                ClassDef(
+                  tree.symbol,
+                  Template(ps, ValDef(tree.symbol.thisSym), body))
               case ClassDef(_, _, _, impl) => ClassDef(tree.symbol, impl)
               case ModuleDef(_, _, impl) => ModuleDef(tree.symbol, impl)
               case ValDef(_, _, _, rhs) => ValDef(tree.symbol, rhs)
@@ -191,19 +192,21 @@ trait Printers extends scala.reflect.internal.Printers { this: Global =>
   }
 
   def asString(t: Tree): String =
-    render(t,
-           newStandardTreePrinter,
-           settings.printtypes,
-           settings.uniqid,
-           settings.Yshowsymowners,
-           settings.Yshowsymkinds)
+    render(
+      t,
+      newStandardTreePrinter,
+      settings.printtypes,
+      settings.uniqid,
+      settings.Yshowsymowners,
+      settings.Yshowsymkinds)
   def asCompactString(t: Tree): String =
-    render(t,
-           newCompactTreePrinter,
-           settings.printtypes,
-           settings.uniqid,
-           settings.Yshowsymowners,
-           settings.Yshowsymkinds)
+    render(
+      t,
+      newCompactTreePrinter,
+      settings.printtypes,
+      settings.uniqid,
+      settings.Yshowsymowners,
+      settings.Yshowsymkinds)
   def asCompactDebugString(t: Tree): String =
     render(t, newCompactTreePrinter, true, true, true, true)
 

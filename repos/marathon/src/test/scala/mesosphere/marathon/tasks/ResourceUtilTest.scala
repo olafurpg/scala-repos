@@ -23,17 +23,20 @@ class ResourceUtilTest
 
   test("resource mix") {
     val leftOvers = ResourceUtil.consumeResources(
-      Seq(MTH.scalarResource("cpus", 3),
-          ports("ports", 2 to 20),
-          set("labels", Set("a", "b"))),
-      Seq(MTH.scalarResource("cpus", 2),
-          ports("ports", 2 to 12),
-          set("labels", Set("a")))
+      Seq(
+        MTH.scalarResource("cpus", 3),
+        ports("ports", 2 to 20),
+        set("labels", Set("a", "b"))),
+      Seq(
+        MTH.scalarResource("cpus", 2),
+        ports("ports", 2 to 12),
+        set("labels", Set("a")))
     )
     assert(
-      leftOvers == Seq(MTH.scalarResource("cpus", 1),
-                       ports("ports", 13 to 20),
-                       set("labels", Set("b"))))
+      leftOvers == Seq(
+        MTH.scalarResource("cpus", 1),
+        ports("ports", 13 to 20),
+        set("labels", Set("b"))))
   }
 
   test("resource repeated consumed resources with the same name/role") {
@@ -46,15 +49,18 @@ class ResourceUtilTest
 
   test("resource consumption considers roles") {
     val leftOvers = ResourceUtil.consumeResources(
-      Seq(MTH.scalarResource("cpus", 2),
-          MTH.scalarResource("cpus", 2, role = "marathon")),
-      Seq(MTH.scalarResource("cpus", 0.5),
-          MTH.scalarResource("cpus", 1, role = "marathon"),
-          MTH.scalarResource("cpus", 0.5, role = "marathon"))
+      Seq(
+        MTH.scalarResource("cpus", 2),
+        MTH.scalarResource("cpus", 2, role = "marathon")),
+      Seq(
+        MTH.scalarResource("cpus", 0.5),
+        MTH.scalarResource("cpus", 1, role = "marathon"),
+        MTH.scalarResource("cpus", 0.5, role = "marathon"))
     )
     assert(
-      leftOvers == Seq(MTH.scalarResource("cpus", 1.5),
-                       MTH.scalarResource("cpus", 0.5, role = "marathon")))
+      leftOvers == Seq(
+        MTH.scalarResource("cpus", 1.5),
+        MTH.scalarResource("cpus", 0.5, role = "marathon")))
   }
 
   test("resource consumption considers reservation state") {
@@ -207,63 +213,77 @@ class ResourceUtilTest
   }
 
   // in the middle
-  portsTest(consumedResource = Seq(10 to 10),
-            baseResource = Seq(5 to 15),
-            expectedResult = Some(Seq(5 to 9, 11 to 15)))
-  portsTest(consumedResource = Seq(10 to 11),
-            baseResource = Seq(5 to 15),
-            expectedResult = Some(Seq(5 to 9, 12 to 15)))
-  portsTest(consumedResource = Seq(10 to 11),
-            baseResource = Seq(5 to 15, 30 to 31),
-            expectedResult = Some(Seq(5 to 9, 12 to 15, 30 to 31)))
+  portsTest(
+    consumedResource = Seq(10 to 10),
+    baseResource = Seq(5 to 15),
+    expectedResult = Some(Seq(5 to 9, 11 to 15)))
+  portsTest(
+    consumedResource = Seq(10 to 11),
+    baseResource = Seq(5 to 15),
+    expectedResult = Some(Seq(5 to 9, 12 to 15)))
+  portsTest(
+    consumedResource = Seq(10 to 11),
+    baseResource = Seq(5 to 15, 30 to 31),
+    expectedResult = Some(Seq(5 to 9, 12 to 15, 30 to 31)))
 
-  portsTest(consumedResource = Seq(),
-            baseResource = Seq(5 to 15),
-            expectedResult = Some(Seq(5 to 15)))
+  portsTest(
+    consumedResource = Seq(),
+    baseResource = Seq(5 to 15),
+    expectedResult = Some(Seq(5 to 15)))
 
-  portsTest(consumedResource = Seq(31084 to 31084),
-            baseResource = Seq(31000 to 31096, 31098 to 32000),
-            expectedResult =
-              Some(Seq(31000 to 31083, 31085 to 31096, 31098 to 32000)))
+  portsTest(
+    consumedResource = Seq(31084 to 31084),
+    baseResource = Seq(31000 to 31096, 31098 to 32000),
+    expectedResult = Some(Seq(31000 to 31083, 31085 to 31096, 31098 to 32000)))
 
   // overlapping smaller
-  portsTest(consumedResource = Seq(2 to 5),
-            baseResource = Seq(5 to 15),
-            expectedResult = Some(Seq(6 to 15)))
-  portsTest(consumedResource = Seq(2 to 6),
-            baseResource = Seq(5 to 15),
-            expectedResult = Some(Seq(7 to 15)))
+  portsTest(
+    consumedResource = Seq(2 to 5),
+    baseResource = Seq(5 to 15),
+    expectedResult = Some(Seq(6 to 15)))
+  portsTest(
+    consumedResource = Seq(2 to 6),
+    baseResource = Seq(5 to 15),
+    expectedResult = Some(Seq(7 to 15)))
 
   // overlapping bigger
-  portsTest(consumedResource = Seq(15 to 20),
-            baseResource = Seq(5 to 15),
-            expectedResult = Some(Seq(5 to 14)))
-  portsTest(consumedResource = Seq(14 to 20),
-            baseResource = Seq(5 to 15),
-            expectedResult = Some(Seq(5 to 13)))
+  portsTest(
+    consumedResource = Seq(15 to 20),
+    baseResource = Seq(5 to 15),
+    expectedResult = Some(Seq(5 to 14)))
+  portsTest(
+    consumedResource = Seq(14 to 20),
+    baseResource = Seq(5 to 15),
+    expectedResult = Some(Seq(5 to 13)))
 
   // not contained in base resource
-  portsTest(consumedResource = Seq(5 to 15),
-            baseResource = Seq(),
-            expectedResult = None)
-  portsTest(consumedResource = Seq(2 to 4),
-            baseResource = Seq(5 to 15),
-            expectedResult = Some(Seq(5 to 15)))
-  portsTest(consumedResource = Seq(16 to 20),
-            baseResource = Seq(5 to 15),
-            expectedResult = Some(Seq(5 to 15)))
+  portsTest(
+    consumedResource = Seq(5 to 15),
+    baseResource = Seq(),
+    expectedResult = None)
+  portsTest(
+    consumedResource = Seq(2 to 4),
+    baseResource = Seq(5 to 15),
+    expectedResult = Some(Seq(5 to 15)))
+  portsTest(
+    consumedResource = Seq(16 to 20),
+    baseResource = Seq(5 to 15),
+    expectedResult = Some(Seq(5 to 15)))
 
-  scalarTest(consumedResource = 3,
-             baseResource = 10,
-             expectedResult = Some(10.0 - 3.0))
+  scalarTest(
+    consumedResource = 3,
+    baseResource = 10,
+    expectedResult = Some(10.0 - 3.0))
   scalarTest(consumedResource = 3, baseResource = 2, expectedResult = None)
 
-  setResourceTest(consumedResource = Set("a", "b"),
-                  baseResource = Set("a", "b", "c"),
-                  expectedResult = Some(Set("c")))
-  setResourceTest(consumedResource = Set("a", "b", "c"),
-                  baseResource = Set("a", "b", "c"),
-                  expectedResult = None)
+  setResourceTest(
+    consumedResource = Set("a", "b"),
+    baseResource = Set("a", "b", "c"),
+    expectedResult = Some(Set("c")))
+  setResourceTest(
+    consumedResource = Set("a", "b", "c"),
+    baseResource = Set("a", "b", "c"),
+    expectedResult = None)
 
   private[this] def setResourceTest(
       consumedResource: Set[String],

@@ -25,28 +25,30 @@ private[video] final class Sheet(url: String, api: VideoApi) {
           .find(entry.youtubeId)
           .flatMap {
             case Some(video) =>
-              val updated = video.copy(title = entry.title,
-                                       author = entry.author,
-                                       targets = entry.targets,
-                                       tags = entry.tags,
-                                       lang = entry.lang,
-                                       ads = entry.ads,
-                                       startTime = entry.startTime)
+              val updated = video.copy(
+                title = entry.title,
+                author = entry.author,
+                targets = entry.targets,
+                tags = entry.tags,
+                lang = entry.lang,
+                ads = entry.ads,
+                startTime = entry.startTime)
               (video != updated) ?? {
                 logger.info(s"sheet update $updated")
                 api.video.save(updated)
               }
             case None =>
-              val video = Video(_id = entry.youtubeId,
-                                title = entry.title,
-                                author = entry.author,
-                                targets = entry.targets,
-                                tags = entry.tags,
-                                lang = entry.lang,
-                                ads = entry.ads,
-                                startTime = entry.startTime,
-                                metadata = Youtube.empty,
-                                createdAt = DateTime.now)
+              val video = Video(
+                _id = entry.youtubeId,
+                title = entry.title,
+                author = entry.author,
+                targets = entry.targets,
+                tags = entry.tags,
+                lang = entry.lang,
+                ads = entry.ads,
+                startTime = entry.startTime,
+                metadata = Youtube.empty,
+                createdAt = DateTime.now)
               logger.info(s"sheet insert $video")
               api.video.save(video)
             case _ => funit

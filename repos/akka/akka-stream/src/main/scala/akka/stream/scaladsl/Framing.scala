@@ -35,9 +35,10 @@ object Framing {
     Flow[ByteString]
       .transform(
         () ⇒
-          new DelimiterFramingStage(delimiter,
-                                    maximumFrameLength,
-                                    allowTruncation))
+          new DelimiterFramingStage(
+            delimiter,
+            maximumFrameLength,
+            allowTruncation))
       .named("delimiterFraming")
 
   /**
@@ -59,15 +60,17 @@ object Framing {
                   maximumFrameLength: Int,
                   byteOrder: ByteOrder = ByteOrder.LITTLE_ENDIAN)
     : Flow[ByteString, ByteString, NotUsed] = {
-    require(fieldLength >= 1 && fieldLength <= 4,
-            "Length field length must be 1, 2, 3 or 4.")
+    require(
+      fieldLength >= 1 && fieldLength <= 4,
+      "Length field length must be 1, 2, 3 or 4.")
     Flow[ByteString]
       .transform(
         () ⇒
-          new LengthFieldFramingStage(fieldLength,
-                                      fieldOffset,
-                                      maximumFrameLength,
-                                      byteOrder))
+          new LengthFieldFramingStage(
+            fieldLength,
+            fieldOffset,
+            maximumFrameLength,
+            byteOrder))
       .named("lengthFieldFraming")
   }
 
@@ -118,10 +121,11 @@ object Framing {
             ctx.fail(new FramingException(
               s"Maximum allowed message size is $maximumMessageLength but tried to send $msgSize bytes"))
           else {
-            val header = ByteString((msgSize >> 24) & 0xFF,
-                                    (msgSize >> 16) & 0xFF,
-                                    (msgSize >> 8) & 0xFF,
-                                    msgSize & 0xFF)
+            val header = ByteString(
+              (msgSize >> 24) & 0xFF,
+              (msgSize >> 16) & 0xFF,
+              (msgSize >> 8) & 0xFF,
+              msgSize & 0xFF)
             ctx.push(header ++ message)
           }
         }
@@ -269,8 +273,9 @@ object Framing {
       val bufSize = buffer.size
       if (bufSize >= frameSize) emitFrame(ctx)
       else if (bufSize >= minimumChunkSize) {
-        val parsedLength = intDecoder(buffer.iterator.drop(lengthFieldOffset),
-                                      lengthFieldLength)
+        val parsedLength = intDecoder(
+          buffer.iterator.drop(lengthFieldOffset),
+          lengthFieldLength)
         frameSize = parsedLength + minimumChunkSize
         if (frameSize > maximumFrameLength)
           ctx.fail(new FramingException(

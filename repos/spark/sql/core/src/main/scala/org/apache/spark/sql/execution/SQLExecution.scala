@@ -60,8 +60,9 @@ private[sql] object SQLExecution {
           body
         } finally {
           sqlContext.sparkContext.listenerBus.post(
-            SparkListenerSQLExecutionEnd(executionId,
-                                         System.currentTimeMillis()))
+            SparkListenerSQLExecutionEnd(
+              executionId,
+              System.currentTimeMillis()))
         }
       } finally {
         sc.setLocalProperty(EXECUTION_ID_KEY, null)

@@ -58,12 +58,13 @@ trait Typers { self: blackbox.Context =>
                 silent: Boolean = false,
                 withImplicitViewsDisabled: Boolean = false,
                 withMacrosDisabled: Boolean = false): Tree =
-    typecheck(tree,
-              TERMmode,
-              pt,
-              silent,
-              withImplicitViewsDisabled,
-              withMacrosDisabled)
+    typecheck(
+      tree,
+      TERMmode,
+      pt,
+      silent,
+      withImplicitViewsDisabled,
+      withMacrosDisabled)
 
   /** Typechecks the provided tree against the expected type `pt` in the macro callsite context
     *  under typechecking mode specified in `mode` with [[EXPRmode]] being default.

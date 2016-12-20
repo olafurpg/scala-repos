@@ -32,9 +32,10 @@ object MappedToBase {
     val cons = c.Expr[E#Underlying => E](
       Function(
         List(
-          ValDef(Modifiers(Flag.PARAM),
-                 TermName("v"), /*Ident(eu.tpe.typeSymbol)*/ TypeTree(),
-                 EmptyTree)),
+          ValDef(
+            Modifiers(Flag.PARAM),
+            TermName("v"), /*Ident(eu.tpe.typeSymbol)*/ TypeTree(),
+            EmptyTree)),
         Apply(
           Select(New(TypeTree(e.tpe)), termNames.CONSTRUCTOR),
           List(Ident(TermName("v")))

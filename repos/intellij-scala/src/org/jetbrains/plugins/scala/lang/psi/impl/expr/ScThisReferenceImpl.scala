@@ -91,9 +91,10 @@ object ScThisReferenceImpl {
           case Some(t) if t.isStable =>
             Success(ScThisType(td), Some(expr))
           case _ =>
-            Success(selfTypeOfClass.getOrElse(
-                      return Failure("No clazz type found", Some(expr))),
-                    Some(expr))
+            Success(
+              selfTypeOfClass.getOrElse(
+                return Failure("No clazz type found", Some(expr))),
+              Some(expr))
         }
     }
   }

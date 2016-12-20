@@ -55,10 +55,11 @@ class CoGroupTest extends WordSpec with Matchers {
       .sink[(Int, Int, Int, Int, Int)](Tsv("output")) { outputBuf =>
         "be able to work" in {
           val out = outputBuf.toSet
-          val expected = Set((0, 1, 1, 0, 9),
-                             (1, 1, 0, 1, 0),
-                             (2, 1, 5, 8, 11),
-                             (3, 2, 2, 0, 0))
+          val expected = Set(
+            (0, 1, 1, 0, 9),
+            (1, 1, 0, 1, 0),
+            (2, 1, 5, 8, 11),
+            (3, 2, 2, 0, 0))
           out shouldBe expected
         }
       }

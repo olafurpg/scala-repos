@@ -193,8 +193,9 @@ class VersionLog(logFiles: VersionLog.LogFiles,
     if (allVersions.exists(_.id == version)) {
       !isCompleted(version) whenM {
         logger.debug("Completing version " + version)
-        IOUtils.writeToFile(version.serialize.renderCompact + "\n",
-                            completedFile)
+        IOUtils.writeToFile(
+          version.serialize.renderCompact + "\n",
+          completedFile)
       } map { _ =>
         PrecogUnit
       }

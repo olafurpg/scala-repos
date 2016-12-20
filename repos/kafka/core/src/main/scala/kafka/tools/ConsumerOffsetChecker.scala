@@ -47,11 +47,12 @@ object ConsumerOffsetChecker extends Logging {
               val host = brokerInfo.get("host").get.asInstanceOf[String]
               val port = brokerInfo.get("port").get.asInstanceOf[Int]
               Some(
-                new SimpleConsumer(host,
-                                   port,
-                                   10000,
-                                   100000,
-                                   "ConsumerOffsetChecker"))
+                new SimpleConsumer(
+                  host,
+                  port,
+                  10000,
+                  100000,
+                  "ConsumerOffsetChecker"))
             case None =>
               throw new BrokerNotAvailableException(
                 "Broker id %d does not exist".format(bid))
@@ -157,14 +158,16 @@ object ConsumerOffsetChecker extends Logging {
       .withRequiredArg()
       .ofType(classOf[String])
     val channelSocketTimeoutMsOpt = parser
-      .accepts("socket.timeout.ms",
-               "Socket timeout to use when querying for offsets.")
+      .accepts(
+        "socket.timeout.ms",
+        "Socket timeout to use when querying for offsets.")
       .withRequiredArg()
       .ofType(classOf[java.lang.Integer])
       .defaultsTo(6000)
     val channelRetryBackoffMsOpt = parser
-      .accepts("retry.backoff.ms",
-               "Retry back-off to use for failed offset queries.")
+      .accepts(
+        "retry.backoff.ms",
+        "Retry back-off to use for failed offset queries.")
       .withRequiredArg()
       .ofType(classOf[java.lang.Integer])
       .defaultsTo(3000)
@@ -218,10 +221,11 @@ object ConsumerOffsetChecker extends Logging {
             partitionSeq.map(TopicAndPartition(topic, _))
         }
         .toSeq
-      val channel = ClientUtils.channelToOffsetManager(group,
-                                                       zkUtils,
-                                                       channelSocketTimeoutMs,
-                                                       channelRetryBackoffMs)
+      val channel = ClientUtils.channelToOffsetManager(
+        group,
+        zkUtils,
+        channelSocketTimeoutMs,
+        channelRetryBackoffMs)
 
       debug(
         "Sending offset fetch request to coordinator %s:%d."

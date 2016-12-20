@@ -521,9 +521,10 @@ class ObservableBufferSpec[T]
       {
         list.toList should equal(List("b", "d"))
         changes.toList should equal(
-          List(Remove(0, Buffer("a")),
-               Remove(1, Buffer("c")),
-               Remove(2, Buffer("e"))))
+          List(
+            Remove(0, Buffer("a")),
+            Remove(1, Buffer("c")),
+            Remove(2, Buffer("e"))))
       }
     }
 
@@ -553,8 +554,9 @@ class ObservableBufferSpec[T]
         changesDetected += 1
         list.toList should equal(List(5, 4, 3, 2, 1))
         changes.toList should equal(
-          List(Remove(0, Buffer(1, 2, 3, 4, 5)),
-               Add(0, Buffer(5, 4, 3, 2, 1))))
+          List(
+            Remove(0, Buffer(1, 2, 3, 4, 5)),
+            Add(0, Buffer(5, 4, 3, 2, 1))))
       }
     }
 
@@ -572,8 +574,9 @@ class ObservableBufferSpec[T]
         changesDetected += 1
         list.toList should equal(List(0, 2, 3, 0, 5))
         changes.toList should equal(
-          List(Remove(0, Buffer(1, 2, 3, 1, 5)),
-               Add(0, Buffer(0, 2, 3, 0, 5))))
+          List(
+            Remove(0, Buffer(1, 2, 3, 1, 5)),
+            Add(0, Buffer(0, 2, 3, 0, 5))))
       }
     }
 
@@ -591,8 +594,9 @@ class ObservableBufferSpec[T]
         changesDetected += 1
         list.toList should equal(List(-1, -1, -1, -1, -1))
         changes.toList should equal(
-          List(Remove(0, Buffer(1, 2, 3, 4, 5)),
-               Add(0, Buffer(-1, -1, -1, -1, -1))))
+          List(
+            Remove(0, Buffer(1, 2, 3, 4, 5)),
+            Add(0, Buffer(-1, -1, -1, -1, -1))))
       }
     }
 

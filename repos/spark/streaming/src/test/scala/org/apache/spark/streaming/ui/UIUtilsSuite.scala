@@ -53,12 +53,14 @@ class UIUtilsSuite extends SparkFunSuite with Matchers {
   }
 
   test("convertToTimeUnit") {
-    verifyConvertToTimeUnit(60.0 * 1000 * 1000 * 1000,
-                            60 * 1000,
-                            TimeUnit.NANOSECONDS)
-    verifyConvertToTimeUnit(60.0 * 1000 * 1000,
-                            60 * 1000,
-                            TimeUnit.MICROSECONDS)
+    verifyConvertToTimeUnit(
+      60.0 * 1000 * 1000 * 1000,
+      60 * 1000,
+      TimeUnit.NANOSECONDS)
+    verifyConvertToTimeUnit(
+      60.0 * 1000 * 1000,
+      60 * 1000,
+      TimeUnit.MICROSECONDS)
     verifyConvertToTimeUnit(60 * 1000, 60 * 1000, TimeUnit.MILLISECONDS)
     verifyConvertToTimeUnit(60, 60 * 1000, TimeUnit.SECONDS)
     verifyConvertToTimeUnit(1, 60 * 1000, TimeUnit.MINUTES)

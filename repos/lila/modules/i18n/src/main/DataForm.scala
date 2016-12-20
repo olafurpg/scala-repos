@@ -37,14 +37,15 @@ final class DataForm(keys: I18nKeys,
       val sorted = (keys.keys map { key =>
         messages find (_._1 == key.key)
       }).flatten
-      val translation = Translation(id = id,
-                                    code = code,
-                                    text = sorted map {
-                                      case (key, trans) => key + "=" + trans
-                                    } mkString "\n",
-                                    comment = metadata.comment,
-                                    author = user.some,
-                                    createdAt = DateTime.now)
+      val translation = Translation(
+        id = id,
+        code = code,
+        text = sorted map {
+          case (key, trans) => key + "=" + trans
+        } mkString "\n",
+        comment = metadata.comment,
+        author = user.some,
+        createdAt = DateTime.now)
       $insert(translation) >>- callApi.submit(code)
     }
   }

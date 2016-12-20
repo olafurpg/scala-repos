@@ -26,9 +26,10 @@ object DottyLibraryDescription extends ScalaLibraryDescription {
 
   override protected def mavenSdks =
     sdksIn(
-      Seq(mavenRepository / "me" / "d-d",
-          mavenRepository / "jline" / "jline",
-          mavenScalaRoot))
+      Seq(
+        mavenRepository / "me" / "d-d",
+        mavenRepository / "jline" / "jline",
+        mavenScalaRoot))
 
   override def dialog(parentComponent: JComponent,
                       provider: () => util.List[SdkChoice]) = {
@@ -46,35 +47,40 @@ object DottyLibraryDescription extends ScalaLibraryDescription {
 
     val components =
       files.filter {
-        case Component(DottyArtifact.Main,
-                       _,
-                       Some(Version(DottyVersions.DottyVersion)),
-                       _) =>
+        case Component(
+            DottyArtifact.Main,
+            _,
+            Some(Version(DottyVersions.DottyVersion)),
+            _) =>
           true
-        case Component(DottyArtifact.JLine,
-                       _,
-                       Some(Version(JLineVersion)),
-                       _) =>
+        case Component(
+            DottyArtifact.JLine,
+            _,
+            Some(Version(JLineVersion)),
+            _) =>
           true
         case Component(DottyArtifact.Interfaces, _, _, _) => true
         case _ => false
       } ++ files.filter {
-        case Component(Artifact.ScalaLibrary,
-                       _,
-                       Some(Version(ScalaVersion)),
-                       _) =>
+        case Component(
+            Artifact.ScalaLibrary,
+            _,
+            Some(Version(ScalaVersion)),
+            _) =>
           true
-        case Component(Artifact.ScalaReflect,
-                       _,
-                       Some(Version(ScalaVersion)),
-                       _) =>
+        case Component(
+            Artifact.ScalaReflect,
+            _,
+            Some(Version(ScalaVersion)),
+            _) =>
           true
         case _ => false
       } ++ files.filter {
-        case Component(Artifact.ScalaCompiler,
-                       _,
-                       Some(Version(PatchedCompilerVersion)),
-                       _) =>
+        case Component(
+            Artifact.ScalaCompiler,
+            _,
+            Some(Version(PatchedCompilerVersion)),
+            _) =>
           true
         case _ => false
       }

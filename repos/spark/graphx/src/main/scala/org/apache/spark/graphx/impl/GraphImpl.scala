@@ -76,8 +76,9 @@ class GraphImpl[VD: ClassTag, ED: ClassTag] protected (
   }
 
   override def getCheckpointFiles: Seq[String] = {
-    Seq(vertices.getCheckpointFile,
-        replicatedVertexView.edges.getCheckpointFile).flatMap {
+    Seq(
+      vertices.getCheckpointFile,
+      replicatedVertexView.edges.getCheckpointFile).flatMap {
       case Some(path) => Seq(path)
       case None => Seq()
     }
@@ -127,8 +128,9 @@ class GraphImpl[VD: ClassTag, ED: ClassTag] protected (
   }
 
   override def reverse: Graph[VD, ED] = {
-    new GraphImpl(vertices.reverseRoutingTables(),
-                  replicatedVertexView.reverse())
+    new GraphImpl(
+      vertices.reverseRoutingTables(),
+      replicatedVertexView.reverse())
   }
 
   override def mapVertices[VD2: ClassTag](f: (VertexId, VD) => VD2)(
@@ -146,8 +148,9 @@ class GraphImpl[VD: ClassTag, ED: ClassTag] protected (
       new GraphImpl(newVerts, newReplicatedVertexView)
     } else {
       // The map does not preserve type, so we must re-replicate all vertices
-      GraphImpl(vertices.mapVertexPartitions(_.map(f)),
-                replicatedVertexView.edges)
+      GraphImpl(
+        vertices.mapVertexPartitions(_.map(f)),
+        replicatedVertexView.edges)
     }
   }
 
@@ -168,7 +171,8 @@ class GraphImpl[VD: ClassTag, ED: ClassTag] protected (
     val newEdges = replicatedVertexView.edges.mapEdgePartitions {
       (pid, part) =>
         part.map(
-          f(pid,
+          f(
+            pid,
             part.tripletIterator(tripletFields.useSrc, tripletFields.useDst)))
     }
     new GraphImpl(vertices, replicatedVertexView.withEdges(newEdges))
@@ -239,23 +243,26 @@ class GraphImpl[VD: ClassTag, ED: ClassTag] protected (
           activeDirectionOpt match {
             case Some(EdgeDirection.Both) =>
               if (activeFraction < 0.8) {
-                edgePartition.aggregateMessagesIndexScan(sendMsg,
-                                                         mergeMsg,
-                                                         tripletFields,
-                                                         EdgeActiveness.Both)
+                edgePartition.aggregateMessagesIndexScan(
+                  sendMsg,
+                  mergeMsg,
+                  tripletFields,
+                  EdgeActiveness.Both)
               } else {
-                edgePartition.aggregateMessagesEdgeScan(sendMsg,
-                                                        mergeMsg,
-                                                        tripletFields,
-                                                        EdgeActiveness.Both)
+                edgePartition.aggregateMessagesEdgeScan(
+                  sendMsg,
+                  mergeMsg,
+                  tripletFields,
+                  EdgeActiveness.Both)
               }
             case Some(EdgeDirection.Either) =>
               // TODO: Because we only have a clustered index on the source vertex ID, we can't filter
               // the index here. Instead we have to scan all edges and then do the filter.
-              edgePartition.aggregateMessagesEdgeScan(sendMsg,
-                                                      mergeMsg,
-                                                      tripletFields,
-                                                      EdgeActiveness.Either)
+              edgePartition.aggregateMessagesEdgeScan(
+                sendMsg,
+                mergeMsg,
+                tripletFields,
+                EdgeActiveness.Either)
             case Some(EdgeDirection.Out) =>
               if (activeFraction < 0.8) {
                 edgePartition.aggregateMessagesIndexScan(
@@ -264,21 +271,24 @@ class GraphImpl[VD: ClassTag, ED: ClassTag] protected (
                   tripletFields,
                   EdgeActiveness.SrcOnly)
               } else {
-                edgePartition.aggregateMessagesEdgeScan(sendMsg,
-                                                        mergeMsg,
-                                                        tripletFields,
-                                                        EdgeActiveness.SrcOnly)
+                edgePartition.aggregateMessagesEdgeScan(
+                  sendMsg,
+                  mergeMsg,
+                  tripletFields,
+                  EdgeActiveness.SrcOnly)
               }
             case Some(EdgeDirection.In) =>
-              edgePartition.aggregateMessagesEdgeScan(sendMsg,
-                                                      mergeMsg,
-                                                      tripletFields,
-                                                      EdgeActiveness.DstOnly)
+              edgePartition.aggregateMessagesEdgeScan(
+                sendMsg,
+                mergeMsg,
+                tripletFields,
+                EdgeActiveness.DstOnly)
             case _ => // None
-              edgePartition.aggregateMessagesEdgeScan(sendMsg,
-                                                      mergeMsg,
-                                                      tripletFields,
-                                                      EdgeActiveness.Neither)
+              edgePartition.aggregateMessagesEdgeScan(
+                sendMsg,
+                mergeMsg,
+                tripletFields,
+                EdgeActiveness.Neither)
           }
       })
       .setName("GraphImpl.aggregateMessages - preAgg")
@@ -328,10 +338,11 @@ object GraphImpl {
       defaultVertexAttr: VD,
       edgeStorageLevel: StorageLevel,
       vertexStorageLevel: StorageLevel): GraphImpl[VD, ED] = {
-    fromEdgeRDD(EdgeRDD.fromEdges(edges),
-                defaultVertexAttr,
-                edgeStorageLevel,
-                vertexStorageLevel)
+    fromEdgeRDD(
+      EdgeRDD.fromEdges(edges),
+      defaultVertexAttr,
+      edgeStorageLevel,
+      vertexStorageLevel)
   }
 
   /** Create a graph from EdgePartitions, setting referenced vertices to `defaultVertexAttr`. */
@@ -340,10 +351,11 @@ object GraphImpl {
       defaultVertexAttr: VD,
       edgeStorageLevel: StorageLevel,
       vertexStorageLevel: StorageLevel): GraphImpl[VD, ED] = {
-    fromEdgeRDD(EdgeRDD.fromEdgePartitions(edgePartitions),
-                defaultVertexAttr,
-                edgeStorageLevel,
-                vertexStorageLevel)
+    fromEdgeRDD(
+      EdgeRDD.fromEdgePartitions(edgePartitions),
+      defaultVertexAttr,
+      edgeStorageLevel,
+      vertexStorageLevel)
   }
 
   /** Create a graph from vertices and edges, setting missing vertices to `defaultVertexAttr`. */

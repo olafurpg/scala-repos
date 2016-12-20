@@ -102,8 +102,9 @@ object ProductLike {
     import CompileTimeLengthTypes._
     val (constSize, dynamicFunctions, maybeLength, noLength) =
       elementData.foldLeft((0, Vector[c.Tree](), Vector[c.Tree](), 0)) {
-        case ((constantLength, dynamicLength, maybeLength, noLength),
-              (tpe, accessorSymbol, tBuf)) =>
+        case (
+            (constantLength, dynamicLength, maybeLength, noLength),
+            (tpe, accessorSymbol, tBuf)) =>
           tBuf.length(q"$element.$accessorSymbol") match {
             case const: ConstantLengthCalculation[_] =>
               (constantLength +

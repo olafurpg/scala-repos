@@ -77,10 +77,11 @@ private[ml] trait MultilayerPerceptronParams
   /** @group getParam */
   final def getBlockSize: Int = $(blockSize)
 
-  setDefault(maxIter -> 100,
-             tol -> 1e-4,
-             layers -> Array(1, 1),
-             blockSize -> 128)
+  setDefault(
+    maxIter -> 100,
+    tol -> 1e-4,
+    layers -> Array(1, 1),
+    blockSize -> 128)
 }
 
 /** Label to vector converter. */
@@ -125,9 +126,10 @@ private object LabelConverter {
 @Experimental
 class MultilayerPerceptronClassifier @Since("1.5.0")(
     @Since("1.5.0") override val uid: String)
-    extends Predictor[Vector,
-                      MultilayerPerceptronClassifier,
-                      MultilayerPerceptronClassificationModel]
+    extends Predictor[
+      Vector,
+      MultilayerPerceptronClassifier,
+      MultilayerPerceptronClassificationModel]
     with MultilayerPerceptronParams {
 
   @Since("1.5.0")
@@ -191,9 +193,10 @@ class MultilayerPerceptronClassifier @Since("1.5.0")(
       .setNumIterations($(maxIter))
     FeedForwardTrainer.setStackSize($(blockSize))
     val mlpModel = FeedForwardTrainer.train(data)
-    new MultilayerPerceptronClassificationModel(uid,
-                                                myLayers,
-                                                mlpModel.weights())
+    new MultilayerPerceptronClassificationModel(
+      uid,
+      myLayers,
+      mlpModel.weights())
   }
 }
 

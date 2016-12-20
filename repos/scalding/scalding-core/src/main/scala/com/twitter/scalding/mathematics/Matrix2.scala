@@ -199,20 +199,22 @@ sealed trait Matrix2[R, C, V] extends Serializable {
   }
 
   def getRow(index: R): Matrix2[Unit, C, V] =
-    MatrixLiteral(toTypedPipe
-                    .filter {
-                      case (r, c, v) => Ordering[R].equiv(r, index)
-                    }
-                    .map { case (r, c, v) => ((), c, v) },
-                  this.sizeHint.setRows(1L))
+    MatrixLiteral(
+      toTypedPipe
+        .filter {
+          case (r, c, v) => Ordering[R].equiv(r, index)
+        }
+        .map { case (r, c, v) => ((), c, v) },
+      this.sizeHint.setRows(1L))
 
   def getColumn(index: C): Matrix2[R, Unit, V] =
-    MatrixLiteral(toTypedPipe
-                    .filter {
-                      case (r, c, v) => Ordering[C].equiv(c, index)
-                    }
-                    .map { case (r, c, v) => (r, (), v) },
-                  this.sizeHint.setCols(1L))
+    MatrixLiteral(
+      toTypedPipe
+        .filter {
+          case (r, c, v) => Ordering[C].equiv(c, index)
+        }
+        .map { case (r, c, v) => (r, (), v) },
+      this.sizeHint.setCols(1L))
 
   /**
     * Consider this Matrix as the r2 row of a matrix. The current matrix must be a row,
@@ -220,13 +222,15 @@ sealed trait Matrix2[R, C, V] extends Serializable {
     */
   def asRow[R2](r2: R2)(implicit ev: R =:= Unit,
                         rowOrd: Ordering[R2]): Matrix2[R2, C, V] =
-    MatrixLiteral(toTypedPipe.map { case (r, c, v) => (r2, c, v) },
-                  this.sizeHint)
+    MatrixLiteral(
+      toTypedPipe.map { case (r, c, v) => (r2, c, v) },
+      this.sizeHint)
 
   def asCol[C2](c2: C2)(implicit ev: C =:= Unit,
                         colOrd: Ordering[C2]): Matrix2[R, C2, V] =
-    MatrixLiteral(toTypedPipe.map { case (r, c, v) => (r, c2, v) },
-                  this.sizeHint)
+    MatrixLiteral(
+      toTypedPipe.map { case (r, c, v) => (r, c2, v) },
+      this.sizeHint)
 
   // Compute the sum of the main diagonal.  Only makes sense cases where the row and col type are
   // equal
@@ -458,10 +462,11 @@ case class Product[R, C, C2, V](
     val (cost1, plan1) =
       Matrix2.optimize(this.asInstanceOf[Matrix2[Any, Any, V]])
     val (cost2, plan2) = Matrix2.optimize(
-      Product(right.asInstanceOf[Matrix2[C, R, V]],
-              left.asInstanceOf[Matrix2[R, C, V]],
-              ring,
-              None).asInstanceOf[Matrix2[Any, Any, V]])
+      Product(
+        right.asInstanceOf[Matrix2[C, R, V]],
+        left.asInstanceOf[Matrix2[R, C, V]],
+        ring,
+        None).asInstanceOf[Matrix2[Any, Any, V]])
 
     if (cost1 > cost2) {
       val product2 = plan2.asInstanceOf[Product[C, R, C, V]]
@@ -585,8 +590,9 @@ case class HadamardProduct[R, C, V](left: Matrix2[R, C, V],
   }
 
   override lazy val transpose: MatrixLiteral[C, R, V] =
-    MatrixLiteral(toTypedPipe.map(x => (x._2, x._1, x._3)),
-                  sizeHint.transpose)(colOrd, rowOrd)
+    MatrixLiteral(
+      toTypedPipe.map(x => (x._2, x._1, x._3)),
+      sizeHint.transpose)(colOrd, rowOrd)
   override val sizeHint = left.sizeHint #*# right.sizeHint
   override def negate(implicit g: Group[V]): HadamardProduct[R, C, V] =
     if (left.sizeHint.total.getOrElse(BigInt(0L)) > right.sizeHint.total
@@ -606,8 +612,9 @@ case class MatrixLiteral[R, C, V](
     extends Matrix2[R, C, V] {
 
   override lazy val transpose: MatrixLiteral[C, R, V] =
-    MatrixLiteral(toTypedPipe.map(x => (x._2, x._1, x._3)),
-                  sizeHint.transpose)(colOrd, rowOrd)
+    MatrixLiteral(
+      toTypedPipe.map(x => (x._2, x._1, x._3)),
+      sizeHint.transpose)(colOrd, rowOrd)
 
   override def negate(implicit g: Group[V]): MatrixLiteral[R, C, V] =
     MatrixLiteral(toTypedPipe.map(x => (x._1, x._2, g.negate(x._3))), sizeHint)
@@ -736,9 +743,10 @@ object Matrix2 {
         for (k <- i to (j - 1)) {
           // the original did not multiply by (k - i) and (j - k - 1) respectively (this achieves spread out trees)
           val cost =
-            (k - i) * computeCosts(p, i, k) + (j - k - 1) * computeCosts(p,
-                                                                         k + 1,
-                                                                         j) +
+            (k - i) * computeCosts(p, i, k) + (j - k - 1) * computeCosts(
+              p,
+              k + 1,
+              j) +
               (p(i).sizeHint * (p(k).sizeHint * p(j).sizeHint)).total
                 .getOrElse(BigInt(0L))
           if (cost < subchainCosts((i, j))) {

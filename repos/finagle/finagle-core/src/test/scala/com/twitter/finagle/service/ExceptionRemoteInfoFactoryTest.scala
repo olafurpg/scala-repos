@@ -31,9 +31,10 @@ class ExceptionRemoteInfoFactoryTest extends FunSuite with MockitoSugar {
     val upstreamAddr = new InetSocketAddress("2.3.4.5", 100)
     val traceId = Trace.id
 
-    val composed = new ExceptionRemoteInfoFactory(failingFactory,
-                                                  downstreamAddr,
-                                                  downstreamId)
+    val composed = new ExceptionRemoteInfoFactory(
+      failingFactory,
+      downstreamAddr,
+      downstreamId)
     val actual = intercept[HasRemoteInfo] {
       Trace.letId(traceId, true) {
         Contexts.local.let(RemoteInfo.Upstream.AddressCtx, upstreamAddr) {
@@ -44,11 +45,12 @@ class ExceptionRemoteInfoFactoryTest extends FunSuite with MockitoSugar {
       }
     }
     assert(
-      actual.remoteInfo == RemoteInfo.Available(Some(upstreamAddr),
-                                                Some(ClientId("upstream")),
-                                                Some(downstreamAddr),
-                                                Some(ClientId("downstream")),
-                                                traceId))
+      actual.remoteInfo == RemoteInfo.Available(
+        Some(upstreamAddr),
+        Some(ClientId("upstream")),
+        Some(downstreamAddr),
+        Some(ClientId("downstream")),
+        traceId))
   }
 
   test(
@@ -61,9 +63,10 @@ class ExceptionRemoteInfoFactoryTest extends FunSuite with MockitoSugar {
     val upstreamAddr = new InetSocketAddress("2.3.4.5", 100)
     val traceId = Trace.id
 
-    val composed = new ExceptionRemoteInfoFactory(serviceFactory,
-                                                  downstreamAddr,
-                                                  downstreamId)
+    val composed = new ExceptionRemoteInfoFactory(
+      serviceFactory,
+      downstreamAddr,
+      downstreamId)
     val service = Await.result(composed(), 1.second)
     val actual = intercept[HasRemoteInfo] {
       Trace.letId(traceId, true) {
@@ -75,11 +78,12 @@ class ExceptionRemoteInfoFactoryTest extends FunSuite with MockitoSugar {
       }
     }
     assert(
-      actual.remoteInfo == RemoteInfo.Available(Some(upstreamAddr),
-                                                Some(ClientId("upstream")),
-                                                Some(downstreamAddr),
-                                                Some(ClientId("downstream")),
-                                                traceId))
+      actual.remoteInfo == RemoteInfo.Available(
+        Some(upstreamAddr),
+        Some(ClientId("upstream")),
+        Some(downstreamAddr),
+        Some(ClientId("downstream")),
+        traceId))
   }
 
   test("ExceptionRemoteInfoFactory should add remote info to Failures") {
@@ -91,9 +95,10 @@ class ExceptionRemoteInfoFactoryTest extends FunSuite with MockitoSugar {
     val upstreamAddr = new InetSocketAddress("2.3.4.5", 100)
     val traceId = Trace.id
 
-    val composed = new ExceptionRemoteInfoFactory(serviceFactory,
-                                                  downstreamAddr,
-                                                  downstreamId)
+    val composed = new ExceptionRemoteInfoFactory(
+      serviceFactory,
+      downstreamAddr,
+      downstreamId)
     val service = Await.result(composed(), 1.second)
     val actual = intercept[Failure] {
       Trace.letId(traceId, true) {
@@ -106,10 +111,11 @@ class ExceptionRemoteInfoFactoryTest extends FunSuite with MockitoSugar {
     }
     assert(
       actual.getSource(Failure.Source.RemoteInfo) == Some(
-        RemoteInfo.Available(Some(upstreamAddr),
-                             Some(ClientId("upstream")),
-                             Some(downstreamAddr),
-                             Some(ClientId("downstream")),
-                             traceId)))
+        RemoteInfo.Available(
+          Some(upstreamAddr),
+          Some(ClientId("upstream")),
+          Some(downstreamAddr),
+          Some(ClientId("downstream")),
+          traceId)))
   }
 }

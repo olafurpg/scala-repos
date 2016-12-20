@@ -115,9 +115,10 @@ trait LinearRegressionLibModule[M[+ _]]
           //columns are only `removed` if they are not present in *all* slices seen so far
           //this semantic ensures that stdErr computing knows which columns to consider
           else
-            CoeffAcc(arraySum(r1.beta, r2.beta),
-                     r1.count + r2.count,
-                     r1.removed & r2.removed)
+            CoeffAcc(
+              arraySum(r1.beta, r2.beta),
+              r1.count + r2.count,
+              r1.removed & r2.removed)
         }
       }
 
@@ -316,10 +317,11 @@ trait LinearRegressionLibModule[M[+ _]]
                   val rank = retained.rank
 
                   if (rank == matrixRank0)
-                    inner(retained,
-                          idx,
-                          colDim - 1,
-                          removed + (idx + removed.size))
+                    inner(
+                      retained,
+                      idx,
+                      colDim - 1,
+                      removed + (idx + removed.size))
                   else if (rank < matrixRank0)
                     inner(matrix, idx + 1, colDim, removed)
                   else
@@ -383,10 +385,11 @@ trait LinearRegressionLibModule[M[+ _]]
             val matrixX0 = xs map { case arr => new Matrix(arr) }
             val matrixX =
               matrixX0 map { mx =>
-                removeColumns(mx,
-                              mx.getRowDimension,
-                              mx.getColumnDimension,
-                              acc.removed)
+                removeColumns(
+                  mx,
+                  mx.getRowDimension,
+                  mx.getColumnDimension,
+                  acc.removed)
               }
 
             val matrixProduct =
@@ -483,8 +486,9 @@ trait LinearRegressionLibModule[M[+ _]]
           trans.WrapObject(Leaf(Source), "coefficients"))
 
         val stdErrResult = RObject(
-          Map("estimate" -> CNum(math.sqrt(varianceEst)),
-              "degreesOfFreedom" -> CNum(degOfFreedom)))
+          Map(
+            "estimate" -> CNum(math.sqrt(varianceEst)),
+            "degreesOfFreedom" -> CNum(degOfFreedom)))
         val residualStdError = Table.fromRValues(Stream(stdErrResult))
         val stdErrorTable = residualStdError.transform(
           trans.WrapObject(Leaf(Source), "residualStandardError"))

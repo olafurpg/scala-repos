@@ -87,14 +87,14 @@ class PersistenceEngineSuite extends SparkFunSuite {
             override val rpcEnv: RpcEnv = testRpcEnv
           })
 
-        val workerToPersist = new WorkerInfo(id = "test_worker",
-                                             host = "127.0.0.1",
-                                             port = 10000,
-                                             cores = 0,
-                                             memory = 0,
-                                             endpoint = workerEndpoint,
-                                             webUiAddress =
-                                               "http://localhost:80")
+        val workerToPersist = new WorkerInfo(
+          id = "test_worker",
+          host = "127.0.0.1",
+          port = 10000,
+          cores = 0,
+          memory = 0,
+          endpoint = workerEndpoint,
+          webUiAddress = "http://localhost:80")
 
         persistenceEngine.addWorker(workerToPersist)
 

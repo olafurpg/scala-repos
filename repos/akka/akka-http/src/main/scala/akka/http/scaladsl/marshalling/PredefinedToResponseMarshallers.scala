@@ -25,9 +25,11 @@ trait PredefinedToResponseMarshallers
 
   implicit val fromStatusCode: TRM[StatusCode] =
     Marshaller.withOpenCharset(`text/plain`) { (status, charset) ⇒
-      HttpResponse(status,
-                   entity = HttpEntity(ContentType(`text/plain`, charset),
-                                       status.defaultMessage))
+      HttpResponse(
+        status,
+        entity = HttpEntity(
+          ContentType(`text/plain`, charset),
+          status.defaultMessage))
     }
 
   implicit def fromStatusCodeAndValue[S, T](

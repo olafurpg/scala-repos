@@ -62,10 +62,11 @@ sealed trait Multipart extends jm.Multipart {
     val chunks = parts
       .transform(
         () ⇒
-          BodyPartRenderer.streamed(boundary,
-                                    charset.nioCharset,
-                                    partHeadersSizeHint = 128,
-                                    log))
+          BodyPartRenderer.streamed(
+            boundary,
+            charset.nioCharset,
+            partHeadersSizeHint = 128,
+            log))
       .flatMapConcat(ConstantFun.scalaIdentityFunction)
     HttpEntity
       .Chunked(mediaType withBoundary boundary withCharset charset, chunks)
@@ -107,11 +108,12 @@ object Multipart {
 
     override def toEntity(charset: HttpCharset, boundary: String)(
         implicit log: LoggingAdapter = NoLogging): HttpEntity.Strict = {
-      val data = BodyPartRenderer.strict(strictParts,
-                                         boundary,
-                                         charset.nioCharset,
-                                         partHeadersSizeHint = 128,
-                                         log)
+      val data = BodyPartRenderer.strict(
+        strictParts,
+        boundary,
+        charset.nioCharset,
+        partHeadersSizeHint = 128,
+        log)
       HttpEntity(mediaType withBoundary boundary withCharset charset, data)
     }
 
@@ -324,7 +326,8 @@ object Multipart {
         params.get("name") match {
           case Some(name) ⇒
             Success(
-              f(name,
+              f(
+                name,
                 params - "name",
                 headers.filterNot(_ is "content-disposition")))
           case None ⇒
@@ -566,9 +569,10 @@ object Multipart {
                    contentType: ContentType,
                    file: File,
                    chunkSize: Int = -1): BodyPart =
-        BodyPart(name,
-                 HttpEntity(contentType, file, chunkSize),
-                 Map("filename" -> file.getName))
+        BodyPart(
+          name,
+          HttpEntity(contentType, file, chunkSize),
+          Map("filename" -> file.getName))
 
       def unapply(value: BodyPart): Option[(String,
                                             BodyPartEntity,

@@ -500,10 +500,11 @@ abstract class ClassfileParser {
     skipMembers() // methods
     if (!isScala) {
       clazz setFlag sflags
-      propagatePackageBoundary(jflags,
-                               clazz,
-                               staticModule,
-                               staticModule.moduleClass)
+      propagatePackageBoundary(
+        jflags,
+        clazz,
+        staticModule,
+        staticModule.moduleClass)
       clazz setInfo classInfo
       moduleClass setInfo staticInfo
       staticModule setInfo moduleClass.tpe
@@ -617,9 +618,10 @@ abstract class ClassfileParser {
                    * If symbol 1 gets completed (e.g. because the compiled source mentions `A$B`, not `A#B`), the
                    * ClassfileParser for 1 executes, and clazz.owner is the package.
                    */
-                  assert(params.head.tpe.typeSymbol == clazz.owner ||
-                           clazz.owner.hasPackageFlag,
-                         params.head.tpe.typeSymbol + ": " + clazz.owner)
+                  assert(
+                    params.head.tpe.typeSymbol == clazz.owner ||
+                      clazz.owner.hasPackageFlag,
+                    params.head.tpe.typeSymbol + ": " + clazz.owner)
                   params.tail
                 case _ =>
                   params
@@ -714,8 +716,9 @@ abstract class ClassfileParser {
                 accept('>')
                 assert(xs.length > 0, tp)
                 debuglogResult("new existential")(
-                  newExistentialType(existentials.toList,
-                                     typeRef(pre, classSym, xs.toList)))
+                  newExistentialType(
+                    existentials.toList,
+                    typeRef(pre, classSym, xs.toList)))
               }
               // isMonomorphicType is false if the info is incomplete, as it usually is here
               // so have to check unsafeTypeParams.isEmpty before worrying about raw type case below,
@@ -726,15 +729,17 @@ abstract class ClassfileParser {
                 debuglogResult(s"raw type from $classSym") {
                   // raw type - existentially quantify all type parameters
                   val eparams =
-                    typeParamsToExistentials(classSym,
-                                             classSym.unsafeTypeParams)
+                    typeParamsToExistentials(
+                      classSym,
+                      classSym.unsafeTypeParams)
                   newExistentialType(
                     eparams,
                     typeRef(pre, classSym, eparams.map(_.tpeHK)))
                 }
             case tp =>
-              assert(sig.charAt(index) != '<',
-                     s"sig=$sig, index=$index, tp=$tp")
+              assert(
+                sig.charAt(index) != '<',
+                s"sig=$sig, index=$index, tp=$tp")
               tp
           }
 
@@ -781,8 +786,9 @@ abstract class ClassfileParser {
               accept('V')
               clazz.tpe_*
             } else sig2type(tparams, skiptvs)
-          JavaMethodType(sym.newSyntheticValueParams(paramtypes.toList),
-                         restype)
+          JavaMethodType(
+            sym.newSyntheticValueParams(paramtypes.toList),
+            restype)
         case 'T' =>
           val n = subName(';'.==).toTypeName
           index += 1
@@ -1114,8 +1120,9 @@ abstract class ClassfileParser {
       val scope = getScope(jflags)
       def newStub(name: Name) =
         owner
-          .newStubSymbol(name,
-                         s"Class file for ${entry.externalName} not found")
+          .newStubSymbol(
+            name,
+            s"Class file for ${entry.externalName} not found")
           .setFlag(JAVA)
 
       val (innerClass, innerModule) =
@@ -1186,10 +1193,11 @@ abstract class ClassfileParser {
             val innerIndex, outerIndex, nameIndex = u2
             val jflags = readInnerClassFlags()
             if (innerIndex != 0 && outerIndex != 0 && nameIndex != 0)
-              innerClasses add InnerClassEntry(innerIndex,
-                                               outerIndex,
-                                               nameIndex,
-                                               jflags)
+              innerClasses add InnerClassEntry(
+                innerIndex,
+                outerIndex,
+                nameIndex,
+                jflags)
           }
         case _ =>
           in.skip(attrLen)
@@ -1269,8 +1277,9 @@ abstract class ClassfileParser {
       extends LazyType
       with FlagAgnosticCompleter {
     override def complete(sym: Symbol) {
-      sym setInfo createFromClonedSymbols(alias.initialize.typeParams,
-                                          alias.tpe)(typeFun)
+      sym setInfo createFromClonedSymbols(
+        alias.initialize.typeParams,
+        alias.tpe)(typeFun)
     }
   }
 

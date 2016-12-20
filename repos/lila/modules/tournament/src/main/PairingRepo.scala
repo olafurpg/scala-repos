@@ -106,12 +106,13 @@ object PairingRepo {
   def countByTourIdAndUserIds(tourId: String): Fu[Map[String, Int]] = {
     import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework._
     coll
-      .aggregate(Match(selectTour(tourId)),
-                 List(
-                   Project(BSONDocument("u" -> true, "_id" -> false)),
-                   Unwind("u"),
-                   GroupField("u")("nb" -> SumValue(1))
-                 ))
+      .aggregate(
+        Match(selectTour(tourId)),
+        List(
+          Project(BSONDocument("u" -> true, "_id" -> false)),
+          Unwind("u"),
+          GroupField("u")("nb" -> SumValue(1))
+        ))
       .map {
         _.documents
           .flatMap { doc =>
@@ -154,11 +155,13 @@ object PairingRepo {
 
   def finish(g: lila.game.Game) =
     coll
-      .update(selectId(g.id),
-              BSONDocument(
-                "$set" -> BSONDocument("s" -> g.status.id,
-                                       "w" -> g.winnerColor.map(_.white),
-                                       "t" -> g.turns)))
+      .update(
+        selectId(g.id),
+        BSONDocument(
+          "$set" -> BSONDocument(
+            "s" -> g.status.id,
+            "w" -> g.winnerColor.map(_.white),
+            "t" -> g.turns)))
       .void
 
   def setBerserk(pairing: Pairing, userId: String, value: Int) =
@@ -168,8 +171,9 @@ object PairingRepo {
       case _ => none
     }) ?? { field =>
       coll
-        .update(selectId(pairing.id),
-                BSONDocument("$set" -> BSONDocument(field -> value)))
+        .update(
+          selectId(pairing.id),
+          BSONDocument("$set" -> BSONDocument(field -> value)))
         .void
     }
 
@@ -178,12 +182,15 @@ object PairingRepo {
 
   def playingUserIds(tour: Tournament): Fu[Set[String]] =
     coll
-      .aggregate(Match(selectTour(tour.id) ++ selectPlaying),
-                 List(Project(
-                        BSONDocument("u" -> BSONBoolean(true),
-                                     "_id" -> BSONBoolean(false))),
-                      Unwind("u"),
-                      Group(BSONBoolean(true))("ids" -> AddToSet("u"))))
+      .aggregate(
+        Match(selectTour(tour.id) ++ selectPlaying),
+        List(
+          Project(
+            BSONDocument(
+              "u" -> BSONBoolean(true),
+              "_id" -> BSONBoolean(false))),
+          Unwind("u"),
+          Group(BSONBoolean(true))("ids" -> AddToSet("u"))))
       .map(
         _.documents.headOption
           .flatMap(_.getAs[Set[String]]("ids"))
@@ -191,8 +198,9 @@ object PairingRepo {
 
   def playingGameIds(tourId: String): Fu[List[String]] =
     coll
-      .aggregate(Match(selectTour(tourId) ++ selectPlaying),
-                 List(Group(BSONBoolean(true))("ids" -> Push("_id"))))
+      .aggregate(
+        Match(selectTour(tourId) ++ selectPlaying),
+        List(Group(BSONBoolean(true))("ids" -> Push("_id"))))
       .map(
         _.documents.headOption
           .flatMap(_.getAs[List[String]]("ids"))

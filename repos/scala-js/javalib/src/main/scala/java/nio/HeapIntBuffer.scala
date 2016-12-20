@@ -93,12 +93,13 @@ private[nio] object HeapIntBuffer {
               initialPosition: Int,
               initialLimit: Int,
               readOnly: Boolean): IntBuffer = {
-      new HeapIntBuffer(capacity,
-                        array,
-                        arrayOffset,
-                        initialPosition,
-                        initialLimit,
-                        readOnly)
+      new HeapIntBuffer(
+        capacity,
+        array,
+        arrayOffset,
+        initialPosition,
+        initialLimit,
+        readOnly)
     }
   }
 
@@ -109,11 +110,12 @@ private[nio] object HeapIntBuffer {
                         initialPosition: Int,
                         initialLength: Int,
                         isReadOnly: Boolean): IntBuffer = {
-    GenHeapBuffer.generic_wrap(array,
-                               arrayOffset,
-                               capacity,
-                               initialPosition,
-                               initialLength,
-                               isReadOnly)
+    GenHeapBuffer.generic_wrap(
+      array,
+      arrayOffset,
+      capacity,
+      initialPosition,
+      initialLength,
+      isReadOnly)
   }
 }

@@ -109,10 +109,11 @@ class CircuitBreaker(
     */
   @inline
   private[this] def swapState(oldState: State, newState: State): Boolean =
-    Unsafe.instance.compareAndSwapObject(this,
-                                         AbstractCircuitBreaker.stateOffset,
-                                         oldState,
-                                         newState)
+    Unsafe.instance.compareAndSwapObject(
+      this,
+      AbstractCircuitBreaker.stateOffset,
+      oldState,
+      newState)
 
   /**
     * Helper method for accessing underlying state via Unsafe
@@ -159,12 +160,13 @@ class CircuitBreaker(
     * @return The result of the call
     */
   def withSyncCircuitBreaker[T](body: ⇒ T): T =
-    Await.result(withCircuitBreaker(
-                   try Future.successful(body)
-                   catch {
-                     case NonFatal(t) ⇒ Future.failed(t)
-                   }),
-                 callTimeout)
+    Await.result(
+      withCircuitBreaker(
+        try Future.successful(body)
+        catch {
+          case NonFatal(t) ⇒ Future.failed(t)
+        }),
+      callTimeout)
 
   /**
     * Java API for [[#withSyncCircuitBreaker]]. Throws [[java.util.concurrent.TimeoutException]] if the call timed out.

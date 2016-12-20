@@ -304,8 +304,9 @@ case class Netty3Listener[In, Out](
           pipeline.addFirst("channelLogger", channelSnooper)
 
         if (!statsReceiver.isNull)
-          pipeline.addFirst("channelStatsHandler",
-                            channelStatsHandler(statsReceiver))
+          pipeline.addFirst(
+            "channelStatsHandler",
+            channelStatsHandler(statsReceiver))
 
         // Apply read timeouts *after* request decoding, preventing
         // death from clients trying to DoS by slowly trickling in
@@ -320,16 +321,18 @@ case class Netty3Listener[In, Out](
         if (channelWriteCompletionTimeout < Duration.Top) {
           pipeline.addLast(
             "writeCompletionTimeout",
-            new WriteCompletionTimeoutHandler(timer,
-                                              channelWriteCompletionTimeout))
+            new WriteCompletionTimeoutHandler(
+              timer,
+              channelWriteCompletionTimeout))
         }
 
         for (Netty3ListenerTLSConfig(newEngine) <- tlsConfig)
           addTlsToPipeline(pipeline, newEngine)
 
         if (!statsReceiver.isNull) {
-          pipeline.addLast("channelRequestStatsHandler",
-                           new ChannelRequestStatsHandler(statsReceiver))
+          pipeline.addLast(
+            "channelRequestStatsHandler",
+            new ChannelRequestStatsHandler(statsReceiver))
         }
 
         pipeline.addLast("finagleBridge", newBridge())
@@ -370,11 +373,12 @@ case class Netty3Listener[In, Out](
 }
 
 private[netty3] object ServerBridge {
-  private val FinestIOExceptionMessages = Set("Connection reset by peer",
-                                              "Broken pipe",
-                                              "Connection timed out",
-                                              "No route to host",
-                                              "")
+  private val FinestIOExceptionMessages = Set(
+    "Connection reset by peer",
+    "Broken pipe",
+    "Connection timed out",
+    "No route to host",
+    "")
 }
 
 /**

@@ -156,18 +156,20 @@ class AppDefinitionValidatorTest
   }
 
   test("only cmd + acceptedResourceRoles") {
-    val app = AppDefinition(id = PathId("/test"),
-                            cmd = Some("true"),
-                            acceptedResourceRoles = Some(Set("*")))
+    val app = AppDefinition(
+      id = PathId("/test"),
+      cmd = Some("true"),
+      acceptedResourceRoles = Some(Set("*")))
     assert(validate(app).isSuccess)
     MarathonTestHelper.validateJsonSchema(app)
   }
 
   test("only cmd + acceptedResourceRoles 2") {
     val app =
-      AppDefinition(id = PathId("/test"),
-                    cmd = Some("true"),
-                    acceptedResourceRoles = Some(Set("*", "production")))
+      AppDefinition(
+        id = PathId("/test"),
+        cmd = Some("true"),
+        acceptedResourceRoles = Some(Set("*", "production")))
     assert(validate(app).isSuccess)
     MarathonTestHelper.validateJsonSchema(app)
   }
@@ -180,8 +182,9 @@ class AppDefinitionValidatorTest
 
   test("only container") {
     val f = new Fixture
-    val app = AppDefinition(id = PathId("/test"),
-                            container = Some(f.validDockerContainer))
+    val app = AppDefinition(
+      id = PathId("/test"),
+      container = Some(f.validDockerContainer))
     assert(validate(app).isSuccess)
     MarathonTestHelper.validateJsonSchema(app)
   }
@@ -195,63 +198,70 @@ class AppDefinitionValidatorTest
 
   test("container with type DOCKER and empty docker field is invalid") {
     val f = new Fixture
-    val app = AppDefinition(id = PathId("/test"),
-                            cmd = Some("true"),
-                            container = Some(f.invalidDockerContainer))
+    val app = AppDefinition(
+      id = PathId("/test"),
+      cmd = Some("true"),
+      container = Some(f.invalidDockerContainer))
     assert(validate(app).isFailure)
     MarathonTestHelper.validateJsonSchema(app, valid = true)
   }
 
   test("container and cmd") {
     val f = new Fixture
-    val app = AppDefinition(id = PathId("/test"),
-                            cmd = Some("true"),
-                            container = Some(f.validDockerContainer))
+    val app = AppDefinition(
+      id = PathId("/test"),
+      cmd = Some("true"),
+      container = Some(f.validDockerContainer))
     assert(validate(app).isSuccess)
     MarathonTestHelper.validateJsonSchema(app)
   }
 
   test("container and args") {
     val f = new Fixture
-    val app = AppDefinition(id = PathId("/test"),
-                            args = Some("test" :: Nil),
-                            container = Some(f.validDockerContainer))
+    val app = AppDefinition(
+      id = PathId("/test"),
+      args = Some("test" :: Nil),
+      container = Some(f.validDockerContainer))
     assert(validate(app).isSuccess)
     MarathonTestHelper.validateJsonSchema(app)
   }
 
   test("container, cmd and args is not valid") {
     val f = new Fixture
-    val app = AppDefinition(id = PathId("/test"),
-                            cmd = Some("true"),
-                            args = Some("test" :: Nil),
-                            container = Some(f.validDockerContainer))
+    val app = AppDefinition(
+      id = PathId("/test"),
+      cmd = Some("true"),
+      args = Some("test" :: Nil),
+      container = Some(f.validDockerContainer))
     assert(validate(app).isFailure)
     MarathonTestHelper.validateJsonSchema(app, valid = false)
   }
 
   test("container with type MESOS and nonEmpty docker field is invalid") {
     val f = new Fixture
-    val app = AppDefinition(id = PathId("/test"),
-                            cmd = Some("true"),
-                            container = Some(f.invalidMesosContainer))
+    val app = AppDefinition(
+      id = PathId("/test"),
+      cmd = Some("true"),
+      container = Some(f.invalidMesosContainer))
     assert(validate(app).isFailure)
     MarathonTestHelper.validateJsonSchema(app, valid = true)
   }
 
   test("container with type MESOS and empty docker field is valid") {
     val f = new Fixture
-    val app = AppDefinition(id = PathId("/test"),
-                            cmd = Some("true"),
-                            container = Some(f.validMesosContainer))
+    val app = AppDefinition(
+      id = PathId("/test"),
+      cmd = Some("true"),
+      container = Some(f.validMesosContainer))
     assert(validate(app).isSuccess)
     MarathonTestHelper.validateJsonSchema(app, valid = true)
   }
 
   test("valid docker volume") {
-    AllConf.SuppliedOptionNames = Set("mesos_authentication_principal",
-                                      "mesos_role",
-                                      "mesos_authentication_secret_file")
+    AllConf.SuppliedOptionNames = Set(
+      "mesos_authentication_principal",
+      "mesos_role",
+      "mesos_authentication_secret_file")
     val f = new Fixture
     val container = f.validDockerContainer.copy(
       volumes = Seq(f.validPersistentVolume)
@@ -373,9 +383,10 @@ class AppDefinitionValidatorTest
     Given("A resident app definition")
     val f = new Fixture
     val from = f.validResident
-    AllConf.SuppliedOptionNames = Set("mesos_authentication_principal",
-                                      "mesos_role",
-                                      "mesos_authentication_secret_file")
+    AllConf.SuppliedOptionNames = Set(
+      "mesos_authentication_principal",
+      "mesos_role",
+      "mesos_authentication_secret_file")
 
     When(
       "Check if only defining residency without persistent volumes is valid")
@@ -425,14 +436,16 @@ class AppDefinitionValidatorTest
 
     // scalastyle:off magic.number
     def validPersistentVolume: PersistentVolume =
-      PersistentVolume(containerPath = "/test",
-                       persistent = PersistentVolumeInfo(10),
-                       mode = mesos.Volume.Mode.RW)
+      PersistentVolume(
+        containerPath = "/test",
+        persistent = PersistentVolumeInfo(10),
+        mode = mesos.Volume.Mode.RW)
 
     def validDockerVolume: DockerVolume =
-      DockerVolume(containerPath = "/test",
-                   hostPath = "/etc/foo",
-                   mode = mesos.Volume.Mode.RW)
+      DockerVolume(
+        containerPath = "/test",
+        hostPath = "/etc/foo",
+        mode = mesos.Volume.Mode.RW)
 
     def persistentVolume(path: String) =
       PersistentVolume(path, PersistentVolumeInfo(123), mesos.Volume.Mode.RW)

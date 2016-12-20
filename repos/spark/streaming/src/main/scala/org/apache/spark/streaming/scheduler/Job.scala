@@ -98,13 +98,14 @@ private[streaming] class Job(val time: Time, func: () => _) {
       } else {
         None
       }
-    OutputOperationInfo(time,
-                        outputOpId,
-                        callSite.shortForm,
-                        callSite.longForm,
-                        _startTime,
-                        _endTime,
-                        failureReason)
+    OutputOperationInfo(
+      time,
+      outputOpId,
+      callSite.shortForm,
+      callSite.longForm,
+      _startTime,
+      _endTime,
+      failureReason)
   }
 
   override def toString: String = id

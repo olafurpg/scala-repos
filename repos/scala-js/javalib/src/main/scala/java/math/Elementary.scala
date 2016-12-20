@@ -143,28 +143,32 @@ private[math] object Elementary {
     } else if (op2.sign == 0) {
       return
     } else if (op1.sign == op2.sign) {
-      add(op1.digits,
+      add(
+        op1.digits,
+        op1.digits,
+        op1.numberLength,
+        op2.digits,
+        op2.numberLength)
+    } else {
+      val sign = unsignedArraysCompare(
+        op1.digits,
+        op2.digits,
+        op1.numberLength,
+        op2.numberLength)
+      if (sign > 0) {
+        subtract(
+          op1.digits,
           op1.digits,
           op1.numberLength,
           op2.digits,
           op2.numberLength)
-    } else {
-      val sign = unsignedArraysCompare(op1.digits,
-                                       op2.digits,
-                                       op1.numberLength,
-                                       op2.numberLength)
-      if (sign > 0) {
-        subtract(op1.digits,
-                 op1.digits,
-                 op1.numberLength,
-                 op2.digits,
-                 op2.numberLength)
       } else {
-        inverseSubtract(op1.digits,
-                        op1.digits,
-                        op1.numberLength,
-                        op2.digits,
-                        op2.numberLength)
+        inverseSubtract(
+          op1.digits,
+          op1.digits,
+          op1.numberLength,
+          op2.digits,
+          op2.numberLength)
         op1.sign = -op1.sign
       }
     }
@@ -188,29 +192,33 @@ private[math] object Elementary {
       System.arraycopy(op2.digits, 0, op1.digits, 0, op2.numberLength)
       op1.sign = -op2.sign
     } else if (op1.sign != op2.sign) {
-      add(op1.digits,
+      add(
+        op1.digits,
+        op1.digits,
+        op1.numberLength,
+        op2.digits,
+        op2.numberLength)
+      op1.sign = resultSign
+    } else {
+      val sign = unsignedArraysCompare(
+        op1.digits,
+        op2.digits,
+        op1.numberLength,
+        op2.numberLength)
+      if (sign > 0) {
+        subtract(
+          op1.digits,
           op1.digits,
           op1.numberLength,
           op2.digits,
           op2.numberLength)
-      op1.sign = resultSign
-    } else {
-      val sign = unsignedArraysCompare(op1.digits,
-                                       op2.digits,
-                                       op1.numberLength,
-                                       op2.numberLength)
-      if (sign > 0) {
-        subtract(op1.digits,
-                 op1.digits,
-                 op1.numberLength,
-                 op2.digits,
-                 op2.numberLength)
       } else {
-        inverseSubtract(op1.digits,
-                        op1.digits,
-                        op1.numberLength,
-                        op2.digits,
-                        op2.numberLength)
+        inverseSubtract(
+          op1.digits,
+          op1.digits,
+          op1.numberLength,
+          op2.digits,
+          op2.numberLength)
         op1.sign = -op1.sign
       }
     }
@@ -275,11 +283,12 @@ private[math] object Elementary {
     *  @param op2 the subtrahend
     */
   def inplaceSubtract(op1: BigInteger, op2: BigInteger): Unit = {
-    subtract(op1.digits,
-             op1.digits,
-             op1.numberLength,
-             op2.digits,
-             op2.numberLength)
+    subtract(
+      op1.digits,
+      op1.digits,
+      op1.numberLength,
+      op2.digits,
+      op2.numberLength)
     op1.cutOffLeadingZeroes()
     op1.unCache()
   }

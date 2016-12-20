@@ -133,8 +133,9 @@ object JdbcUtils extends Logging {
       case DateType => Option(JdbcType("DATE", java.sql.Types.DATE))
       case t: DecimalType =>
         Option(
-          JdbcType(s"DECIMAL(${t.precision},${t.scale})",
-                   java.sql.Types.DECIMAL))
+          JdbcType(
+            s"DECIMAL(${t.precision},${t.scale})",
+            java.sql.Types.DECIMAL))
       case _ => None
     }
   }
@@ -301,13 +302,14 @@ object JdbcUtils extends Logging {
       createConnectionFactory(url, properties)
     val batchSize = properties.getProperty("batchsize", "1000").toInt
     df.foreachPartition { iterator =>
-      savePartition(getConnection,
-                    table,
-                    iterator,
-                    rddSchema,
-                    nullTypes,
-                    batchSize,
-                    dialect)
+      savePartition(
+        getConnection,
+        table,
+        iterator,
+        rddSchema,
+        nullTypes,
+        batchSize,
+        dialect)
     }
   }
 }

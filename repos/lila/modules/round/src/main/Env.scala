@@ -61,24 +61,25 @@ final class Env(config: Config,
 
   val roundMap = system.actorOf(Props(new lila.hub.ActorMap {
     def mkActor(id: String) =
-      new Round(gameId = id,
-                messenger = messenger,
-                takebacker = takebacker,
-                finisher = finisher,
-                rematcher = rematcher,
-                player = player,
-                drawer = drawer,
-                forecastApi = forecastApi,
-                socketHub = socketHub,
-                monitorMove = moveMonitor.record,
-                moretimeDuration = Moretime,
-                activeTtl = ActiveTtl)
+      new Round(
+        gameId = id,
+        messenger = messenger,
+        takebacker = takebacker,
+        finisher = finisher,
+        rematcher = rematcher,
+        player = player,
+        drawer = drawer,
+        forecastApi = forecastApi,
+        socketHub = socketHub,
+        monitorMove = moveMonitor.record,
+        moretimeDuration = Moretime,
+        activeTtl = ActiveTtl)
     def receive: Receive =
       ({
         case actorApi.GetNbRounds =>
           nbRounds = size
-          system.lilaBus.publish(lila.hub.actorApi.round.NbRounds(nbRounds),
-                                 'nbRounds)
+          system.lilaBus
+            .publish(lila.hub.actorApi.round.NbRounds(nbRounds), 'nbRounds)
       }: Receive) orElse actorMapReceive
   }), name = ActorMapName)
 
@@ -89,14 +90,15 @@ final class Env(config: Config,
     val actor = system.actorOf(Props(new lila.socket.SocketHubActor[Socket] {
       private var historyPersistenceEnabled = false
       def mkActor(id: String) =
-        new Socket(gameId = id,
-                   history = eventHistory(id, historyPersistenceEnabled),
-                   lightUser = lightUser,
-                   uidTimeout = UidTimeout,
-                   socketTimeout = SocketTimeout,
-                   disconnectTimeout = PlayerDisconnectTimeout,
-                   ragequitTimeout = PlayerRagequitTimeout,
-                   simulActor = hub.actor.simul)
+        new Socket(
+          gameId = id,
+          history = eventHistory(id, historyPersistenceEnabled),
+          lightUser = lightUser,
+          uidTimeout = UidTimeout,
+          socketTimeout = SocketTimeout,
+          disconnectTimeout = PlayerDisconnectTimeout,
+          ragequitTimeout = PlayerRagequitTimeout,
+          simulActor = hub.actor.simul)
       def receive: Receive =
         ({
           case msg @ lila.chat.actorApi.ChatLine(id, line) =>
@@ -117,11 +119,12 @@ final class Env(config: Config,
     actor
   }
 
-  lazy val socketHandler = new SocketHandler(hub = hub,
-                                             roundMap = roundMap,
-                                             socketHub = socketHub,
-                                             messenger = messenger,
-                                             bus = system.lilaBus)
+  lazy val socketHandler = new SocketHandler(
+    hub = hub,
+    roundMap = roundMap,
+    socketHub = socketHub,
+    messenger = messenger,
+    bus = system.lilaBus)
 
   lazy val perfsUpdater = new PerfsUpdater(historyApi, rankingApi)
 
@@ -129,24 +132,27 @@ final class Env(config: Config,
     coll = db(CollectionForecast),
     roundMap = hub.actor.roundMap)
 
-  private lazy val finisher = new Finisher(messenger = messenger,
-                                           perfsUpdater = perfsUpdater,
-                                           crosstableApi = crosstableApi,
-                                           playban = playban,
-                                           bus = system.lilaBus,
-                                           timeline = hub.actor.timeline,
-                                           casualOnly = CasualOnly)
+  private lazy val finisher = new Finisher(
+    messenger = messenger,
+    perfsUpdater = perfsUpdater,
+    crosstableApi = crosstableApi,
+    playban = playban,
+    bus = system.lilaBus,
+    timeline = hub.actor.timeline,
+    casualOnly = CasualOnly)
 
-  private lazy val rematcher = new Rematcher(messenger = messenger,
-                                             onStart = onStart,
-                                             rematch960Cache = rematch960Cache,
-                                             isRematchCache = isRematchCache)
+  private lazy val rematcher = new Rematcher(
+    messenger = messenger,
+    onStart = onStart,
+    rematch960Cache = rematch960Cache,
+    isRematchCache = isRematchCache)
 
-  private lazy val player: Player = new Player(fishnetPlayer = fishnetPlayer,
-                                               bus = system.lilaBus,
-                                               finisher = finisher,
-                                               cheatDetector = cheatDetector,
-                                               uciMemo = uciMemo)
+  private lazy val player: Player = new Player(
+    fishnetPlayer = fishnetPlayer,
+    bus = system.lilaBus,
+    finisher = finisher,
+    cheatDetector = cheatDetector,
+    uciMemo = uciMemo)
 
   private lazy val drawer =
     new Drawer(prefApi = prefApi, messenger = messenger, finisher = finisher)
@@ -156,9 +162,10 @@ final class Env(config: Config,
 
   lazy val cli = new Cli(db, roundMap = roundMap, system = system)
 
-  lazy val messenger = new Messenger(socketHub = socketHub,
-                                     chat = hub.actor.chat,
-                                     i18nKeys = i18nKeys)
+  lazy val messenger = new Messenger(
+    socketHub = socketHub,
+    chat = hub.actor.chat,
+    i18nKeys = i18nKeys)
 
   def version(gameId: String): Fu[Int] =
     socketHub ? Ask(gameId, GetVersion) mapTo manifest[Int]
@@ -166,20 +173,22 @@ final class Env(config: Config,
   private def getSocketStatus(gameId: String): Fu[SocketStatus] =
     socketHub ? Ask(gameId, GetSocketStatus) mapTo manifest[SocketStatus]
 
-  lazy val jsonView = new JsonView(chatApi = chatApi,
-                                   noteApi = noteApi,
-                                   userJsonView = userJsonView,
-                                   getSocketStatus = getSocketStatus,
-                                   canTakeback = takebacker.isAllowedByPrefs,
-                                   baseAnimationDuration = AnimationDuration,
-                                   moretimeSeconds = Moretime.toSeconds.toInt)
+  lazy val jsonView = new JsonView(
+    chatApi = chatApi,
+    noteApi = noteApi,
+    userJsonView = userJsonView,
+    getSocketStatus = getSocketStatus,
+    canTakeback = takebacker.isAllowedByPrefs,
+    baseAnimationDuration = AnimationDuration,
+    moretimeSeconds = Moretime.toSeconds.toInt)
 
   lazy val noteApi = new NoteApi(db(CollectionNote))
 
   scheduler.message(2.1 seconds)(roundMap -> actorApi.GetNbRounds)
 
-  system.actorOf(Props(classOf[Titivate], roundMap, hub.actor.bookmark),
-                 name = "titivate")
+  system.actorOf(
+    Props(classOf[Titivate], roundMap, hub.actor.bookmark),
+    name = "titivate")
 
   lazy val takebacker =
     new Takebacker(messenger = messenger, uciMemo = uciMemo, prefApi = prefApi)

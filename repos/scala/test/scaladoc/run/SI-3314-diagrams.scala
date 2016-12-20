@@ -17,9 +17,10 @@ object Test extends ScaladocModelTest {
       rootPackage._package("scala")._package("test")._package("scaladoc")
 
     val diagrams = base._package("diagrams")
-    val templates = List(diagrams._trait("WeekDayTraitWithDiagram"),
-                         diagrams._class("WeekDayClassWithDiagram"),
-                         diagrams._object("WeekDayObjectWithDiagram"))
+    val templates = List(
+      diagrams._trait("WeekDayTraitWithDiagram"),
+      diagrams._class("WeekDayClassWithDiagram"),
+      diagrams._object("WeekDayObjectWithDiagram"))
 
     for (template <- templates) {
       testDiagram(template, template.contentDiagram, 8, 7)

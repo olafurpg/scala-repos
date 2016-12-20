@@ -71,28 +71,34 @@ abstract class IntViewOfByteBufferTest(
 }
 
 class IntViewOfAllocByteBufferBigEndianTest
-    extends IntViewOfByteBufferTest(new AllocByteBufferFactory,
-                                    ByteOrder.BIG_ENDIAN)
+    extends IntViewOfByteBufferTest(
+      new AllocByteBufferFactory,
+      ByteOrder.BIG_ENDIAN)
 
 class IntViewOfWrappedByteBufferBigEndianTest
-    extends IntViewOfByteBufferTest(new WrappedByteBufferFactory,
-                                    ByteOrder.BIG_ENDIAN)
+    extends IntViewOfByteBufferTest(
+      new WrappedByteBufferFactory,
+      ByteOrder.BIG_ENDIAN)
 
 class IntViewOfSlicedAllocByteBufferBigEndianTest
-    extends IntViewOfByteBufferTest(new SlicedAllocByteBufferFactory,
-                                    ByteOrder.BIG_ENDIAN)
+    extends IntViewOfByteBufferTest(
+      new SlicedAllocByteBufferFactory,
+      ByteOrder.BIG_ENDIAN)
 
 class IntViewOfAllocByteBufferLittleEndianTest
-    extends IntViewOfByteBufferTest(new AllocByteBufferFactory,
-                                    ByteOrder.LITTLE_ENDIAN)
+    extends IntViewOfByteBufferTest(
+      new AllocByteBufferFactory,
+      ByteOrder.LITTLE_ENDIAN)
 
 class IntViewOfWrappedByteBufferLittleEndianTest
-    extends IntViewOfByteBufferTest(new WrappedByteBufferFactory,
-                                    ByteOrder.LITTLE_ENDIAN)
+    extends IntViewOfByteBufferTest(
+      new WrappedByteBufferFactory,
+      ByteOrder.LITTLE_ENDIAN)
 
 class IntViewOfSlicedAllocByteBufferLittleEndianTest
-    extends IntViewOfByteBufferTest(new SlicedAllocByteBufferFactory,
-                                    ByteOrder.LITTLE_ENDIAN)
+    extends IntViewOfByteBufferTest(
+      new SlicedAllocByteBufferFactory,
+      ByteOrder.LITTLE_ENDIAN)
 
 // Read only Int views of byte buffers
 
@@ -108,25 +114,31 @@ abstract class ReadOnlyIntViewOfByteBufferTest(
 }
 
 class ReadOnlyIntViewOfAllocByteBufferBigEndianTest
-    extends ReadOnlyIntViewOfByteBufferTest(new AllocByteBufferFactory,
-                                            ByteOrder.BIG_ENDIAN)
+    extends ReadOnlyIntViewOfByteBufferTest(
+      new AllocByteBufferFactory,
+      ByteOrder.BIG_ENDIAN)
 
 class ReadOnlyIntViewOfWrappedByteBufferBigEndianTest
-    extends ReadOnlyIntViewOfByteBufferTest(new WrappedByteBufferFactory,
-                                            ByteOrder.BIG_ENDIAN)
+    extends ReadOnlyIntViewOfByteBufferTest(
+      new WrappedByteBufferFactory,
+      ByteOrder.BIG_ENDIAN)
 
 class ReadOnlyIntViewOfSlicedAllocByteBufferBigEndianTest
-    extends ReadOnlyIntViewOfByteBufferTest(new SlicedAllocByteBufferFactory,
-                                            ByteOrder.BIG_ENDIAN)
+    extends ReadOnlyIntViewOfByteBufferTest(
+      new SlicedAllocByteBufferFactory,
+      ByteOrder.BIG_ENDIAN)
 
 class ReadOnlyIntViewOfAllocByteBufferFactoryEndianTest
-    extends ReadOnlyIntViewOfByteBufferTest(new AllocByteBufferFactory,
-                                            ByteOrder.LITTLE_ENDIAN)
+    extends ReadOnlyIntViewOfByteBufferTest(
+      new AllocByteBufferFactory,
+      ByteOrder.LITTLE_ENDIAN)
 
 class ReadOnlyIntViewOfWrappedByteBufferLittleEndianTest
-    extends ReadOnlyIntViewOfByteBufferTest(new WrappedByteBufferFactory,
-                                            ByteOrder.LITTLE_ENDIAN)
+    extends ReadOnlyIntViewOfByteBufferTest(
+      new WrappedByteBufferFactory,
+      ByteOrder.LITTLE_ENDIAN)
 
 class ReadOnlyIntViewOfSlicedAllocByteBufferLittleEndianTest
-    extends ReadOnlyIntViewOfByteBufferTest(new SlicedAllocByteBufferFactory,
-                                            ByteOrder.LITTLE_ENDIAN)
+    extends ReadOnlyIntViewOfByteBufferTest(
+      new SlicedAllocByteBufferFactory,
+      ByteOrder.LITTLE_ENDIAN)

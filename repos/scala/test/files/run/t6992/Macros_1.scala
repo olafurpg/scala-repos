@@ -19,12 +19,13 @@ object Macros {
             Nil,
             noSelfType,
             List(
-              DefDef(Modifiers(),
-                     termNames.CONSTRUCTOR,
-                     List(),
-                     List(List()),
-                     TypeTree(),
-                     Block(List(pendingSuperCall), Literal(Constant(())))),
+              DefDef(
+                Modifiers(),
+                termNames.CONSTRUCTOR,
+                List(),
+                List(List()),
+                TypeTree(),
+                Block(List(pendingSuperCall), Literal(Constant(())))),
               TypeDef(Modifiers(), TypeName(lit), Nil, TypeTree(typeOf[Int]))
             )
           )
@@ -50,12 +51,13 @@ object Macros {
             Nil,
             noSelfType,
             List(
-              DefDef(Modifiers(),
-                     termNames.CONSTRUCTOR,
-                     List(),
-                     List(List()),
-                     TypeTree(),
-                     Block(List(pendingSuperCall), Literal(Constant(())))),
+              DefDef(
+                Modifiers(),
+                termNames.CONSTRUCTOR,
+                List(),
+                List(List()),
+                TypeTree(),
+                Block(List(pendingSuperCall), Literal(Constant(())))),
               DefDef(
                 Modifiers(),
                 TermName(lit),
@@ -89,12 +91,13 @@ object Macros {
             Nil,
             emptyValDef,
             List(
-              DefDef(Modifiers(),
-                     termNames.CONSTRUCTOR,
-                     List(),
-                     List(List()),
-                     TypeTree(),
-                     Block(List(pendingSuperCall), Literal(Constant(())))),
+              DefDef(
+                Modifiers(),
+                termNames.CONSTRUCTOR,
+                List(),
+                List(List()),
+                TypeTree(),
+                Block(List(pendingSuperCall), Literal(Constant(())))),
               DefDef(
                 Modifiers(),
                 TermName(lit),

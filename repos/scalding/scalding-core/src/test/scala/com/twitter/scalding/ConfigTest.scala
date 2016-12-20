@@ -69,14 +69,15 @@ class ConfigTest extends WordSpec with Matchers {
       // the only Kryo classes we don't assign tokens for are the primitives + array
       (kryoClasses -- tokenClasses).forall { c =>
         // primitives cannot be forName'd
-        val prim = Set(classOf[Boolean],
-                       classOf[Byte],
-                       classOf[Short],
-                       classOf[Int],
-                       classOf[Long],
-                       classOf[Float],
-                       classOf[Double],
-                       classOf[Char]).map(_.getName)
+        val prim = Set(
+          classOf[Boolean],
+          classOf[Byte],
+          classOf[Short],
+          classOf[Int],
+          classOf[Long],
+          classOf[Float],
+          classOf[Double],
+          classOf[Char]).map(_.getName)
 
         prim(c) || Class.forName(c).isArray
       } shouldBe true

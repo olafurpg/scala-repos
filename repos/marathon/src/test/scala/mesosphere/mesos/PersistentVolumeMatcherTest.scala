@@ -113,10 +113,11 @@ class PersistentVolumeMatcherTest
     val app = f.appWithPersistentVolume()
     val localVolumeId = Task.LocalVolumeId(app.id, "persistent-volume", "uuid")
     val tasks = Seq(
-      f.makeTask(app.id,
-                 Task.Reservation(
-                   Seq(Task.LocalVolumeId(app.id, "other-container", "uuid")),
-                   f.taskReservationStateNew)))
+      f.makeTask(
+        app.id,
+        Task.Reservation(
+          Seq(Task.LocalVolumeId(app.id, "other-container", "uuid")),
+          f.taskReservationStateNew)))
     val offer = f.offerWithVolumes(tasks.head.taskId, localVolumeId)
 
     When("We ask for a volume match")

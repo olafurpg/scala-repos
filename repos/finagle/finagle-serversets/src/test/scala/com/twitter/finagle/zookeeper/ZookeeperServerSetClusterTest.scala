@@ -132,8 +132,9 @@ class ZookeeperServerSetClusterSpec extends FunSuite with MockitoSugar {
 
         val remoteAddress = new InetSocketAddress("host", port1)
         val otherRemoteAddress = new InetSocketAddress("host", port2)
-        registerHost(remoteAddress,
-                     Map("other-endpoint" -> otherRemoteAddress))
+        registerHost(
+          remoteAddress,
+          Map("other-endpoint" -> otherRemoteAddress))
 
         val changes = Await.result(futureChanges, 1.minute)
         assert(changes.head == Cluster.Add(otherRemoteAddress: SocketAddress))

@@ -64,8 +64,8 @@ trait ZKAccountIdSource extends AccountManager[Future] {
       zkc.createPersistent(settings.zkAccountIdPath, true)
     }
 
-    val createdPath = zkc.createPersistentSequential(settings.zkAccountIdPath,
-                                                     Array.empty[Byte])
+    val createdPath = zkc
+      .createPersistentSequential(settings.zkAccountIdPath, Array.empty[Byte])
     createdPath
       .substring(createdPath.length - 10) //last 10 characters are a sequential int
   }
@@ -116,17 +116,18 @@ abstract class MongoAccountManager(
       apiKey <- f(accountId)
       account <- {
         val salt = randomSalt()
-        val account0 = Account(accountId,
-                               email,
-                               saltAndHashSHA256(password, salt),
-                               salt,
-                               creationDate,
-                               apiKey,
-                               path,
-                               plan,
-                               parent,
-                               Some(creationDate),
-                               profile)
+        val account0 = Account(
+          accountId,
+          email,
+          saltAndHashSHA256(password, salt),
+          salt,
+          creationDate,
+          apiKey,
+          path,
+          plan,
+          parent,
+          Some(creationDate),
+          profile)
 
         database(
           insert(account0.serialize.asInstanceOf[JObject])

@@ -25,11 +25,12 @@ trait JValueGen {
   def genJValue: Gen[JValue] =
     frequency((5, genSimple), (1, wrap(genArray)), (1, wrap(genObject)))
   def genSimple: Gen[JValue] =
-    oneOf(const(JNull),
-          arbitrary[Int].map(JInt(_)),
-          arbitrary[Double].map(JDouble(_)),
-          arbitrary[Boolean].map(JBool(_)),
-          arbitrary[String].map(JString(_)))
+    oneOf(
+      const(JNull),
+      arbitrary[Int].map(JInt(_)),
+      arbitrary[Double].map(JDouble(_)),
+      arbitrary[Boolean].map(JBool(_)),
+      arbitrary[String].map(JString(_)))
 
   def genArray: Gen[JValue] = for (l <- genList) yield JArray(l)
   def genObject: Gen[JObject] = for (l <- genFieldList) yield JObject(l)
@@ -41,14 +42,15 @@ trait JValueGen {
       yield JField(name + id, value)
 
   def genJValueClass: Gen[Class[_ <: JValue]] =
-    oneOf(JNull.getClass.asInstanceOf[Class[JValue]],
-          JNothing.getClass.asInstanceOf[Class[JValue]],
-          classOf[JInt],
-          classOf[JDouble],
-          classOf[JBool],
-          classOf[JString],
-          classOf[JArray],
-          classOf[JObject])
+    oneOf(
+      JNull.getClass.asInstanceOf[Class[JValue]],
+      JNothing.getClass.asInstanceOf[Class[JValue]],
+      classOf[JInt],
+      classOf[JDouble],
+      classOf[JBool],
+      classOf[JString],
+      classOf[JArray],
+      classOf[JObject])
 
   def listSize = choose(0, 5).sample.get
 }

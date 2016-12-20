@@ -28,8 +28,9 @@ class ScalaAnnotatedMembersSearcher
   def execute(p: AnnotatedElementsSearch.Parameters,
               consumer: Processor[PsiMember]): Boolean = {
     val annClass = p.getAnnotationClass
-    assert(annClass.isAnnotationType,
-           "Annotation type should be passed to annotated members search")
+    assert(
+      annClass.isAnnotationType,
+      "Annotation type should be passed to annotated members search")
     val annotationFQN = annClass.qualifiedName
     assert(annotationFQN != null)
 
@@ -41,11 +42,12 @@ class ScalaAnnotatedMembersSearcher
     ApplicationManager.getApplication.runReadAction(new Computable[Boolean] {
       def compute: Boolean = {
         val candidates: java.util.Collection[ScAnnotation] =
-          StubIndex.getElements(ScAnnotatedMemberIndex.KEY,
-                                annClass.name,
-                                annClass.getProject,
-                                scope,
-                                classOf[ScAnnotation])
+          StubIndex.getElements(
+            ScAnnotatedMemberIndex.KEY,
+            annClass.name,
+            annClass.getProject,
+            scope,
+            classOf[ScAnnotation])
         val iter = candidates.iterator
         while (iter.hasNext) {
           val annotation = iter.next

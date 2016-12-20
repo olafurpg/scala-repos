@@ -72,18 +72,18 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
             _.getClass == classOf[GenericDebuggerRunner]
           }
           .get
-        processHandler = runProcess(mainClass,
-                                    getModule,
-                                    classOf[DefaultDebugExecutor],
-                                    new ProcessAdapter {
-                                      override def onTextAvailable(
-                                          event: ProcessEvent,
-                                          outputType: Key[_]) {
-                                        val text = event.getText
-                                        if (debug) print(text)
-                                      }
-                                    },
-                                    runner)
+        processHandler = runProcess(
+          mainClass,
+          getModule,
+          classOf[DefaultDebugExecutor],
+          new ProcessAdapter {
+            override def onTextAvailable(event: ProcessEvent,
+                                         outputType: Key[_]) {
+              val text = event.getText
+              if (debug) print(text)
+            }
+          },
+          runner)
       }
     })
     callback
@@ -158,10 +158,11 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
         val properties = new JavaLineBreakpointProperties
         properties.setLambdaOrdinal(ordinal)
         inWriteAction {
-          xBreakpointManager.addLineBreakpoint(scalaLineBreakpointType,
-                                               file.getUrl,
-                                               line,
-                                               properties)
+          xBreakpointManager.addLineBreakpoint(
+            scalaLineBreakpointType,
+            file.getUrl,
+            line,
+            properties)
         }
     }
   }
@@ -186,8 +187,9 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
   protected def waitForBreakpoint(): SuspendContextImpl = {
     val (suspendContext, processTerminated) = waitForBreakpointInner()
 
-    assert(suspendContext != null,
-           "too long process, terminated=" + processTerminated)
+    assert(
+      suspendContext != null,
+      "too long process, terminated=" + processTerminated)
     suspendContext
   }
 
@@ -231,9 +233,10 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
   protected def suspendContext = suspendManager.getPausedContext
 
   protected def evaluationContext() =
-    new EvaluationContextImpl(suspendContext,
-                              suspendContext.getFrameProxy,
-                              suspendContext.getFrameProxy.thisObject())
+    new EvaluationContextImpl(
+      suspendContext,
+      suspendContext.getFrameProxy,
+      suspendContext.getFrameProxy.thisObject())
 
   protected def currentSourcePosition =
     ContextUtil.getSourcePosition(suspendContext)
@@ -273,8 +276,9 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
       semaphore.up()
       res
     }
-    assert(semaphore.waitFor(10000),
-           "Too long evaluate expression: " + codeText)
+    assert(
+      semaphore.waitFor(10000),
+      "Too long evaluate expression: " + codeText)
     result
   }
 

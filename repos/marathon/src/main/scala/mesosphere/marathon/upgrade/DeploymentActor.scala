@@ -60,9 +60,10 @@ private class DeploymentActor(parent: ActorRef,
       val step = steps.next()
       currentStepNr += 1
       currentStep = Some(step)
-      parent ! DeploymentStepInfo(plan,
-                                  currentStep.getOrElse(DeploymentStep(Nil)),
-                                  currentStepNr)
+      parent ! DeploymentStepInfo(
+        plan,
+        currentStep.getOrElse(DeploymentStep(Nil)),
+        currentStepNr)
 
       performStep(step) onComplete {
         case Success(_) => self ! NextStep
@@ -168,24 +169,26 @@ private class DeploymentActor(parent: ActorRef,
   def killTasks(appId: PathId, tasks: Seq[Task]): Future[Unit] = {
     val promise = Promise[Unit]()
     context.actorOf(
-      TaskKillActor.props(driver,
-                          appId,
-                          taskTracker,
-                          eventBus,
-                          tasks.map(_.taskId),
-                          promise))
+      TaskKillActor.props(
+        driver,
+        appId,
+        taskTracker,
+        eventBus,
+        tasks.map(_.taskId),
+        promise))
     promise.future
   }
 
   def stopApp(app: AppDefinition): Future[Unit] = {
     val promise = Promise[Unit]()
     context.actorOf(
-      Props(classOf[AppStopActor],
-            driver,
-            taskTracker,
-            eventBus,
-            app,
-            promise))
+      Props(
+        classOf[AppStopActor],
+        driver,
+        taskTracker,
+        eventBus,
+        app,
+        promise))
     promise.future.andThen {
       case Success(_) => scheduler.stopApp(driver, app)
     }
@@ -198,12 +201,13 @@ private class DeploymentActor(parent: ActorRef,
       val promise = Promise[Unit]()
       context.actorOf(
         Props(
-          new TaskReplaceActor(driver,
-                               taskQueue,
-                               taskTracker,
-                               eventBus,
-                               app,
-                               promise)))
+          new TaskReplaceActor(
+            driver,
+            taskQueue,
+            taskTracker,
+            eventBus,
+            app,
+            promise)))
       promise.future
     }
   }

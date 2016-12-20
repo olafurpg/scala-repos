@@ -76,10 +76,11 @@ class DeploymentManagerTest
     scheduler = mock[SchedulerActions]
     storage = mock[StorageProvider]
     appRepo = new AppRepository(
-      new MarathonStore[AppDefinition](new InMemoryStore,
-                                       metrics,
-                                       () => AppDefinition(),
-                                       prefix = "app:"),
+      new MarathonStore[AppDefinition](
+        new InMemoryStore,
+        metrics,
+        () => AppDefinition(),
+        prefix = "app:"),
       None,
       metrics
     )
@@ -88,14 +89,15 @@ class DeploymentManagerTest
 
   test("deploy") {
     val manager = TestActorRef[DeploymentManager](
-      Props(classOf[DeploymentManager],
-            appRepo,
-            taskTracker,
-            taskQueue,
-            scheduler,
-            storage,
-            hcManager,
-            eventBus)
+      Props(
+        classOf[DeploymentManager],
+        appRepo,
+        taskTracker,
+        taskQueue,
+        scheduler,
+        storage,
+        hcManager,
+        eventBus)
     )
 
     val app = AppDefinition("app".toRootPath)
@@ -115,14 +117,15 @@ class DeploymentManagerTest
 
   test("StopActor") {
     val manager = TestActorRef[DeploymentManager](
-      Props(classOf[DeploymentManager],
-            appRepo,
-            taskTracker,
-            taskQueue,
-            scheduler,
-            storage,
-            hcManager,
-            eventBus)
+      Props(
+        classOf[DeploymentManager],
+        appRepo,
+        taskTracker,
+        taskQueue,
+        scheduler,
+        storage,
+        hcManager,
+        eventBus)
     )
     val probe = TestProbe()
 
@@ -143,14 +146,15 @@ class DeploymentManagerTest
 
   test("Cancel deployment") {
     val manager = TestActorRef[DeploymentManager](
-      Props(classOf[DeploymentManager],
-            appRepo,
-            taskTracker,
-            taskQueue,
-            scheduler,
-            storage,
-            hcManager,
-            eventBus)
+      Props(
+        classOf[DeploymentManager],
+        appRepo,
+        taskTracker,
+        taskQueue,
+        scheduler,
+        storage,
+        hcManager,
+        eventBus)
     )
 
     implicit val timeout = Timeout(1.minute)

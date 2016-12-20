@@ -44,13 +44,14 @@ class SbtReImportNotificationProvider(project: Project,
   override def createPanel(file: VirtualFile): EditorNotificationPanel = {
     val panel = new EditorNotificationPanel()
     panel.setText(SbtBundle("sbt.notification.reimport.msg", file.getName))
-    panel.createActionLabel(SbtBundle("sbt.notification.refreshProject"),
-                            new Runnable {
-                              override def run() = {
-                                refreshProject()
-                                notifications.updateAllNotifications()
-                              }
-                            })
+    panel.createActionLabel(
+      SbtBundle("sbt.notification.refreshProject"),
+      new Runnable {
+        override def run() = {
+          refreshProject()
+          notifications.updateAllNotifications()
+        }
+      })
     panel.createActionLabel(
       SbtBundle("sbt.notification.enableAutoImport"),
       new Runnable {

@@ -158,10 +158,11 @@ object SnapshotSelectionCriteria {
              maxTimestamp: Long,
              minSequenceNr: Long,
              minTimestamp: Long) =
-    SnapshotSelectionCriteria(maxSequenceNr,
-                              maxTimestamp,
-                              minSequenceNr,
-                              minTimestamp)
+    SnapshotSelectionCriteria(
+      maxSequenceNr,
+      maxTimestamp,
+      minSequenceNr,
+      minTimestamp)
 
   /**
     * Java API.

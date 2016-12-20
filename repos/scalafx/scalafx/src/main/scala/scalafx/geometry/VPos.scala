@@ -36,20 +36,23 @@ object VPos extends SFXEnumDelegateCompanion[jfxg.VPos, VPos] {
 
   /** Indicates baseline vertical position. */
   val Baseline = new VPos(jfxg.VPos.BASELINE)
-  @deprecated("Use Baseline; BASELINE will be removed in a future release",
-              "2.2.60")
+  @deprecated(
+    "Use Baseline; BASELINE will be removed in a future release",
+    "2.2.60")
   val BASELINE = Baseline
 
   /** Indicates bottom vertical position. */
   val Bottom = new VPos(jfxg.VPos.BOTTOM)
-  @deprecated("Use Bottom; BOTTOM will be removed in a future release",
-              "2.2.60")
+  @deprecated(
+    "Use Bottom; BOTTOM will be removed in a future release",
+    "2.2.60")
   val BOTTOM = Bottom
 
   /** Indicates centered vertical position. */
   val Center = new VPos(jfxg.VPos.CENTER)
-  @deprecated("Use Center; CENTER will be removed in a future release",
-              "2.2.60")
+  @deprecated(
+    "Use Center; CENTER will be removed in a future release",
+    "2.2.60")
   val CENTER = Center
 
   /** Indicates top vertical position. */

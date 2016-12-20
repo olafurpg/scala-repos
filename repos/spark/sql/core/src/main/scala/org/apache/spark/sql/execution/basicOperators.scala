@@ -68,9 +68,10 @@ case class Project(projectList: Seq[NamedExpression], child: SparkPlan)
     val nonDeterministicAttrs =
       projectList.filterNot(_.deterministic).map(_.toAttribute)
     s"""
-       |${evaluateRequiredVariables(output,
-                                    resultVars,
-                                    AttributeSet(nonDeterministicAttrs))}
+       |${evaluateRequiredVariables(
+         output,
+         resultVars,
+         AttributeSet(nonDeterministicAttrs))}
        |${consume(ctx, resultVars)}
      """.stripMargin
   }
@@ -112,8 +113,8 @@ case class Filter(condition: Expression, child: SparkPlan)
   }
 
   private[sql] override lazy val metrics = Map(
-    "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
-                                                   "number of output rows"))
+    "numOutputRows" -> SQLMetrics
+      .createLongMetric(sparkContext, "number of output rows"))
 
   override def upstreams(): Seq[RDD[InternalRow]] = {
     child.asInstanceOf[CodegenSupport].upstreams()
@@ -211,8 +212,9 @@ case class Sample(lowerBound: Double,
       // requiring us to copy the row, which is more expensive than the random number generator.
       new PartitionwiseSampledRDD[InternalRow, InternalRow](
         child.execute(),
-        new PoissonSampler[InternalRow](upperBound - lowerBound,
-                                        useGapSamplingIfPossible = false),
+        new PoissonSampler[InternalRow](
+          upperBound - lowerBound,
+          useGapSamplingIfPossible = false),
         preservesPartitioning = true,
         seed)
     } else {
@@ -230,8 +232,8 @@ case class Range(start: Long,
     with CodegenSupport {
 
   private[sql] override lazy val metrics = Map(
-    "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
-                                                   "number of output rows"))
+    "numOutputRows" -> SQLMetrics
+      .createLongMetric(sparkContext, "number of output rows"))
 
   // output attributes should not affect the results
   override lazy val cleanArgs: Seq[Any] =
@@ -265,8 +267,9 @@ case class Range(start: Long,
         s"$number > $partitionEnd"
       }
 
-    ctx.addNewFunction("initRange",
-                       s"""
+    ctx.addNewFunction(
+      "initRange",
+      s"""
         | private void initRange(int idx) {
         |   $BigInt index = $BigInt.valueOf(idx);
         |   $BigInt numSlice = $BigInt.valueOf(${numSlices}L);
@@ -299,9 +302,10 @@ case class Range(start: Long,
 
     val input = ctx.freshName("input")
     // Right now, Range is only used when there is one upstream.
-    ctx.addMutableState("scala.collection.Iterator",
-                        input,
-                        s"$input = inputs[0];")
+    ctx.addMutableState(
+      "scala.collection.Iterator",
+      input,
+      s"$input = inputs[0];")
     s"""
       | // initialize Range
       | if (!$initTerm) {

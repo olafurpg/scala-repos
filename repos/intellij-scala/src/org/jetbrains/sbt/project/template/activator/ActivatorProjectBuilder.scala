@@ -150,13 +150,15 @@ class ActivatorProjectBuilder
     val moduleDir = new File(path)
     if (!moduleDir.exists()) moduleDir.mkdirs()
 
-    doWithProgress(repoProcessor.createTemplate(id, moduleDir, error),
-                   "Downloading template...")
+    doWithProgress(
+      repoProcessor.createTemplate(id, moduleDir, error),
+      "Downloading template...")
   }
 
   private def downloadTemplateList() {
-    doWithProgress({ allTemplates = repoProcessor.extractRepoData() },
-                   "Downloading list of templates...")
+    doWithProgress(
+      { allTemplates = repoProcessor.extractRepoData() },
+      "Downloading list of templates...")
   }
 
   private def doWithProgress(body: => Unit, title: String) {

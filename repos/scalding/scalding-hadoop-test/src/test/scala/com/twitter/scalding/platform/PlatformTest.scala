@@ -523,8 +523,9 @@ class PlatformTest
 
   "A TypedPipeForceToDiskWithDescriptionPipe" should {
     "have a custom step name from withDescription" in {
-      HadoopPlatformJobTest(new TypedPipeForceToDiskWithDescriptionJob(_),
-                            cluster)
+      HadoopPlatformJobTest(
+        new TypedPipeForceToDiskWithDescriptionJob(_),
+        cluster)
         .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
           val firstStep = steps.filter(_.getName.startsWith("(1/2"))
@@ -569,8 +570,9 @@ class PlatformTest
   //expect two jobs - one for the map prior to the Checkpoint and one for the hashJoin
   "A TypedPipeHashJoinWithForceToDiskJob" should {
     "have a custom step name from withDescription and only one user provided forceToDisk on hashJoin's rhs" in {
-      HadoopPlatformJobTest(new TypedPipeHashJoinWithForceToDiskJob(_),
-                            cluster)
+      HadoopPlatformJobTest(
+        new TypedPipeHashJoinWithForceToDiskJob(_),
+        cluster)
         .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
           steps should have size 2
@@ -586,8 +588,9 @@ class PlatformTest
   //expect 3 jobs - one extra compared to previous as there's a new forceToDisk added
   "A TypedPipeHashJoinWithForceToDiskFilterJob" should {
     "have a custom step name from withDescription and an extra forceToDisk due to a filter operation on hashJoin's rhs" in {
-      HadoopPlatformJobTest(new TypedPipeHashJoinWithForceToDiskFilterJob(_),
-                            cluster)
+      HadoopPlatformJobTest(
+        new TypedPipeHashJoinWithForceToDiskFilterJob(_),
+        cluster)
         .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
           steps should have size 3
@@ -621,8 +624,9 @@ class PlatformTest
   //expect two jobs - one for the map prior to the Checkpoint and one for the rest
   "A TypedPipeHashJoinWithForceToDiskMapJob" should {
     "have a custom step name from withDescription and no extra forceToDisk due to map (autoForce = false) on forceToDisk operation on hashJoin's rhs" in {
-      HadoopPlatformJobTest(new TypedPipeHashJoinWithForceToDiskMapJob(_),
-                            cluster)
+      HadoopPlatformJobTest(
+        new TypedPipeHashJoinWithForceToDiskMapJob(_),
+        cluster)
         .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
           steps should have size 2
@@ -657,12 +661,14 @@ class PlatformTest
     "have a custom step name from withDescription and no extra forceToDisk after groupBy on hashJoin's rhs" in {
       HadoopPlatformJobTest(new TypedPipeHashJoinWithGroupByJob(_), cluster)
         .source(TypedTsv[(String, Int)]("input1"), Seq(("first", 45)))
-        .source(TypedTsv[(String, Int)]("input2"),
-                Seq(("first", 1),
-                    ("first", 2),
-                    ("first", 3),
-                    ("second", 1),
-                    ("second", 2)))
+        .source(
+          TypedTsv[(String, Int)]("input2"),
+          Seq(
+            ("first", 1),
+            ("first", 2),
+            ("first", 3),
+            ("second", 1),
+            ("second", 2)))
         .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
           steps should have size 2
@@ -678,8 +684,9 @@ class PlatformTest
   "A TypedPipeHashJoinWithCoGroupJob" should {
     "have a custom step name from withDescription and no extra forceToDisk after coGroup + map on hashJoin's rhs" in {
       HadoopPlatformJobTest(new TypedPipeHashJoinWithCoGroupJob(_), cluster)
-        .source(TypedTsv[(Int, Int)]("input0"),
-                List((0, 1), (1, 1), (2, 1), (3, 2)))
+        .source(
+          TypedTsv[(Int, Int)]("input0"),
+          List((0, 1), (1, 1), (2, 1), (3, 2)))
         .source(TypedTsv[(Int, Int)]("input1"), List((0, 1), (2, 5), (3, 2)))
         .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
@@ -697,8 +704,9 @@ class PlatformTest
     "have a custom step name from withDescription and no extra forceToDisk after an Every on hashJoin's rhs" in {
       HadoopPlatformJobTest(new TypedPipeHashJoinWithEveryJob(_), cluster)
         .source(TypedTsv[(Int, String)]("input1"), Seq((1, "foo")))
-        .source(TypedTsv[(Int, Int)]("input2"),
-                Seq((1, 30), (1, 10), (1, 20), (2, 20)))
+        .source(
+          TypedTsv[(Int, Int)]("input2"),
+          Seq((1, 30), (1, 10), (1, 20), (2, 20)))
         .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
           steps should have size 2
@@ -798,10 +806,12 @@ class PlatformTest
   "Methods called from a Joiner" should {
     "have access to a FlowProcess from a join in the Fields-based API" in {
       HadoopPlatformJobTest(new CheckForFlowProcessInFieldsJob(_), cluster)
-        .source(TypedTsv[(String, String)]("inputA"),
-                Seq(("1", "alpha"), ("2", "beta")))
-        .source(TypedTsv[(String, String)]("inputB"),
-                Seq(("1", "first"), ("2", "second")))
+        .source(
+          TypedTsv[(String, String)]("inputA"),
+          Seq(("1", "alpha"), ("2", "beta")))
+        .source(
+          TypedTsv[(String, String)]("inputB"),
+          Seq(("1", "first"), ("2", "second")))
         .sink(TypedTsv[(String, String)]("output")) { _ =>
           // The job will fail with an exception if the FlowProcess is unavailable.
         }
@@ -814,10 +824,12 @@ class PlatformTest
 
     "have access to a FlowProcess from a join in the Typed API" in {
       HadoopPlatformJobTest(new CheckForFlowProcessInTypedJob(_), cluster)
-        .source(TypedTsv[(String, String)]("inputA"),
-                Seq(("1", "alpha"), ("2", "beta")))
-        .source(TypedTsv[(String, String)]("inputB"),
-                Seq(("1", "first"), ("2", "second")))
+        .source(
+          TypedTsv[(String, String)]("inputA"),
+          Seq(("1", "alpha"), ("2", "beta")))
+        .source(
+          TypedTsv[(String, String)]("inputB"),
+          Seq(("1", "first"), ("2", "second")))
         .sink[(String, String)](TypedTsv[(String, String)]("output")) { _ =>
           // The job will fail with an exception if the FlowProcess is unavailable.
         }

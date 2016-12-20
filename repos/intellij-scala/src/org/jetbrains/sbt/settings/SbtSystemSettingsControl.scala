@@ -27,8 +27,9 @@ class SbtSystemSettingsControl(settings: SbtSystemSettings)
     pane.getContentPanel.setVisible(show)
 
   def fillUi(canvas: PaintAwarePanel, indentLevel: Int): Unit =
-    canvas.add(pane.getContentPanel,
-               ExternalSystemUiUtil.getFillLineConstraints(indentLevel))
+    canvas.add(
+      pane.getContentPanel,
+      ExternalSystemUiUtil.getFillLineConstraints(indentLevel))
 
   def disposeUIResources() {}
 

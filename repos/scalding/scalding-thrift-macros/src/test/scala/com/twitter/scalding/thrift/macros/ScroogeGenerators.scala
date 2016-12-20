@@ -120,11 +120,12 @@ object ScroogeGenerators {
 
   implicit def arbitraryTestEnum: Arbitrary[TestEnum] = Arbitrary {
     for {
-      aEnum <- Gen.oneOf(TestEnum.Zero,
-                         TestEnum.One,
-                         TestEnum.Two,
-                         TestEnum.Large,
-                         TestEnum.Huge)
+      aEnum <- Gen.oneOf(
+        TestEnum.Zero,
+        TestEnum.One,
+        TestEnum.Two,
+        TestEnum.Large,
+        TestEnum.Huge)
     } yield aEnum
   }
 
@@ -137,22 +138,24 @@ object ScroogeGenerators {
       aI64 <- arb[Long]
       aDouble <- arb[Double]
       aString <- Gen.alphaStr
-      aEnum <- Gen.oneOf(TestEnum.Zero,
-                         TestEnum.One,
-                         TestEnum.Two,
-                         TestEnum.Large,
-                         TestEnum.Huge)
+      aEnum <- Gen.oneOf(
+        TestEnum.Zero,
+        TestEnum.One,
+        TestEnum.Two,
+        TestEnum.Large,
+        TestEnum.Huge)
       aBinary <- Gen.alphaStr.map(s => ByteBuffer.wrap(s.getBytes("UTF-8")))
     } yield
-      TestTypes(aBool,
-                aByte,
-                aI16,
-                aI32,
-                aI64,
-                aDouble,
-                aString,
-                aEnum,
-                aBinary)
+      TestTypes(
+        aBool,
+        aByte,
+        aI16,
+        aI32,
+        aI64,
+        aDouble,
+        aString,
+        aEnum,
+        aBinary)
   }
 
   implicit def arbitraryTestUnion: Arbitrary[TestUnion] = Arbitrary {
@@ -185,17 +188,18 @@ object ScroogeGenerators {
       aSetList <- Gen.listOf(Gen.listOf(Gen.alphaStr).map(_.toSet))
       aMapList <- Gen.listOf(Gen.listOf(arb[(Int, Int)]).map(_.toMap))
     } yield
-      TestLists(aBoolList,
-                aByteList,
-                aI16List,
-                aI32List,
-                aI64List,
-                aDoubleList,
-                aStringList,
-                aStructList,
-                aListList,
-                aSetList,
-                aMapList)
+      TestLists(
+        aBoolList,
+        aByteList,
+        aI16List,
+        aI32List,
+        aI64List,
+        aDoubleList,
+        aStringList,
+        aStructList,
+        aListList,
+        aSetList,
+        aMapList)
   }
   case class TestListsPair(a: TestLists, b: TestLists)
   implicit def arbitraryTestListsPair: Arbitrary[TestListsPair] = Arbitrary {
@@ -228,17 +232,18 @@ object ScroogeGenerators {
             .map(l => l.toMap.asInstanceOf[collection.Map[Int, Int]]))
         .map(_.to[collection.Set])
     } yield
-      TestSets(aBoolSet,
-               aByteSet,
-               aI16Set,
-               aI32Set,
-               aI64Set,
-               aDoubleSet,
-               aStringSet,
-               aStructSet,
-               aListSet,
-               aSetSet,
-               aMapSet)
+      TestSets(
+        aBoolSet,
+        aByteSet,
+        aI16Set,
+        aI32Set,
+        aI64Set,
+        aDoubleSet,
+        aStringSet,
+        aStructSet,
+        aListSet,
+        aSetSet,
+        aMapSet)
   }
   case class TestSetsPair(a: TestSets, b: TestSets)
   implicit def arbitraryTestSetsPair: Arbitrary[TestSetsPair] = Arbitrary {
@@ -286,17 +291,18 @@ object ScroogeGenerators {
             .asInstanceOf[collection.Map[collection.Map[Int, Int],
                                          collection.Map[Int, Int]]])
     } yield
-      TestMaps(aBoolMap,
-               aByteMap,
-               aI16Map,
-               aI32Map,
-               aI64Map,
-               aDoubleMap,
-               aStringMap,
-               aStructMap,
-               aListMap,
-               aSetMap,
-               aMapMap)
+      TestMaps(
+        aBoolMap,
+        aByteMap,
+        aI16Map,
+        aI32Map,
+        aI64Map,
+        aDoubleMap,
+        aStringMap,
+        aStructMap,
+        aListMap,
+        aSetMap,
+        aMapMap)
   }
   case class TestMapsPair(a: TestMaps, b: TestMaps)
   implicit def arbitraryTestMapsPair: Arbitrary[TestMapsPair] = Arbitrary {

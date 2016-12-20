@@ -115,17 +115,19 @@ final class PersistencePluginProxy(config: Config)
       val targetAddress = config.getString(targetAddressKey)
       if (targetAddress != "") {
         try {
-          log.info("Setting target {} address to {}",
-                   pluginType.qualifier,
-                   targetAddress)
+          log.info(
+            "Setting target {} address to {}",
+            pluginType.qualifier,
+            targetAddress)
           PersistencePluginProxy.setTargetLocation(
             context.system,
             AddressFromURIString(targetAddress))
         } catch {
           case _: URISyntaxException ⇒
-            log.warning("Invalid URL provided for target {} address: {}",
-                        pluginType.qualifier,
-                        targetAddress)
+            log.warning(
+              "Invalid URL provided for target {} address: {}",
+              pluginType.qualifier,
+              targetAddress)
         }
       }
 
@@ -209,22 +211,25 @@ final class PersistencePluginProxy(config: Config)
           messages.foreach {
             case a: AtomicWrite ⇒
               a.payload.foreach { p ⇒
-                persistentActor ! WriteMessageFailure(p,
-                                                      timeoutException,
-                                                      actorInstanceId)
+                persistentActor ! WriteMessageFailure(
+                  p,
+                  timeoutException,
+                  actorInstanceId)
               }
             case r: NonPersistentRepr ⇒
               persistentActor ! LoopMessageSuccess(r.payload, actorInstanceId)
           }
-        case ReplayMessages(fromSequenceNr,
-                            toSequenceNr,
-                            max,
-                            persistenceId,
-                            persistentActor) ⇒
+        case ReplayMessages(
+            fromSequenceNr,
+            toSequenceNr,
+            max,
+            persistenceId,
+            persistentActor) ⇒
           persistentActor ! ReplayMessagesFailure(timeoutException)
         case DeleteMessagesTo(persistenceId, toSequenceNr, persistentActor) ⇒
-          persistentActor ! DeleteMessagesFailure(timeoutException,
-                                                  toSequenceNr)
+          persistentActor ! DeleteMessagesFailure(
+            timeoutException,
+            toSequenceNr)
       }
 
     case req: SnapshotProtocol.Request ⇒

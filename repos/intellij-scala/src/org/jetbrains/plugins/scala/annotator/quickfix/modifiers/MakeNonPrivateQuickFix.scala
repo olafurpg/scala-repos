@@ -23,8 +23,9 @@ class MakeNonPrivateQuickFix(member: ScModifierListOwner, toProtected: Boolean)
       .doPostponedOperationsAndUnblockDocument(editor.getDocument)
     CodeStyleManager
       .getInstance(project)
-      .adjustLineIndent(file,
-                        member.getModifierList.getTextRange.getStartOffset)
+      .adjustLineIndent(
+        file,
+        member.getModifierList.getTextRange.getStartOffset)
   }
 
   def getText: String =

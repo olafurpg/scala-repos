@@ -136,11 +136,14 @@ class PredicateSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(
       In(Literal.create(null, IntegerType), Seq(Literal(1), Literal(2))),
       null)
-    checkEvaluation(In(Literal.create(null, IntegerType),
-                       Seq(Literal.create(null, IntegerType))),
-                    null)
-    checkEvaluation(In(Literal(1), Seq(Literal.create(null, IntegerType))),
-                    null)
+    checkEvaluation(
+      In(
+        Literal.create(null, IntegerType),
+        Seq(Literal.create(null, IntegerType))),
+      null)
+    checkEvaluation(
+      In(Literal(1), Seq(Literal.create(null, IntegerType))),
+      null)
     checkEvaluation(
       In(Literal(1), Seq(Literal(1), Literal.create(null, IntegerType))),
       true)
@@ -150,31 +153,36 @@ class PredicateSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(In(Literal(1), Seq(Literal(1), Literal(2))), true)
     checkEvaluation(In(Literal(2), Seq(Literal(1), Literal(2))), true)
     checkEvaluation(In(Literal(3), Seq(Literal(1), Literal(2))), false)
-    checkEvaluation(And(In(Literal(1), Seq(Literal(1), Literal(2))),
-                        In(Literal(2), Seq(Literal(1), Literal(2)))),
-                    true)
+    checkEvaluation(
+      And(
+        In(Literal(1), Seq(Literal(1), Literal(2))),
+        In(Literal(2), Seq(Literal(1), Literal(2)))),
+      true)
 
     val ns = Literal.create(null, StringType)
     checkEvaluation(In(ns, Seq(Literal("1"), Literal("2"))), null)
     checkEvaluation(In(ns, Seq(ns)), null)
     checkEvaluation(In(Literal("a"), Seq(ns)), null)
     checkEvaluation(In(Literal("^Ba*n"), Seq(Literal("^Ba*n"), ns)), true)
-    checkEvaluation(In(Literal("^Ba*n"), Seq(Literal("aa"), Literal("^Ba*n"))),
-                    true)
-    checkEvaluation(In(Literal("^Ba*n"), Seq(Literal("aa"), Literal("^n"))),
-                    false)
+    checkEvaluation(
+      In(Literal("^Ba*n"), Seq(Literal("aa"), Literal("^Ba*n"))),
+      true)
+    checkEvaluation(
+      In(Literal("^Ba*n"), Seq(Literal("aa"), Literal("^n"))),
+      false)
 
-    val primitiveTypes = Seq(IntegerType,
-                             FloatType,
-                             DoubleType,
-                             StringType,
-                             ByteType,
-                             ShortType,
-                             LongType,
-                             BinaryType,
-                             BooleanType,
-                             DecimalType.USER_DEFAULT,
-                             TimestampType)
+    val primitiveTypes = Seq(
+      IntegerType,
+      FloatType,
+      DoubleType,
+      StringType,
+      ByteType,
+      ShortType,
+      LongType,
+      BinaryType,
+      BooleanType,
+      DecimalType.USER_DEFAULT,
+      TimestampType)
     primitiveTypes.map { t =>
       val dataGen = RandomDataGenerator.forType(t, nullable = true).get
       val inputData = Seq.fill(10) {
@@ -215,17 +223,18 @@ class PredicateSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(InSet(nl, hS), null)
     checkEvaluation(InSet(nl, nS), null)
 
-    val primitiveTypes = Seq(IntegerType,
-                             FloatType,
-                             DoubleType,
-                             StringType,
-                             ByteType,
-                             ShortType,
-                             LongType,
-                             BinaryType,
-                             BooleanType,
-                             DecimalType.USER_DEFAULT,
-                             TimestampType)
+    val primitiveTypes = Seq(
+      IntegerType,
+      FloatType,
+      DoubleType,
+      StringType,
+      ByteType,
+      ShortType,
+      LongType,
+      BinaryType,
+      BooleanType,
+      DecimalType.USER_DEFAULT,
+      TimestampType)
     primitiveTypes.map { t =>
       val dataGen = RandomDataGenerator.forType(t, nullable = true).get
       val inputData = Seq.fill(10) {
@@ -299,10 +308,12 @@ class PredicateSuite extends SparkFunSuite with ExpressionEvalHelper {
 
   test("BinaryComparison: GreaterThanOrEqual") {
     for (i <- 0 until smallValues.length) {
-      checkEvaluation(GreaterThanOrEqual(smallValues(i), largeValues(i)),
-                      false)
-      checkEvaluation(GreaterThanOrEqual(equalValues1(i), equalValues2(i)),
-                      true)
+      checkEvaluation(
+        GreaterThanOrEqual(smallValues(i), largeValues(i)),
+        false)
+      checkEvaluation(
+        GreaterThanOrEqual(equalValues1(i), equalValues2(i)),
+        true)
       checkEvaluation(GreaterThanOrEqual(largeValues(i), smallValues(i)), true)
     }
   }

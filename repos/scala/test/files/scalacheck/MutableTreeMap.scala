@@ -335,9 +335,10 @@ package scala.collection.mutable {
 
         val mapView = map.rangeImpl(from, until)
         val newLower = Some(from.fold(k)(ord.max(_, k)))
-        mapView.iteratorFrom(k).toSeq == entriesInView(entries,
-                                                       newLower,
-                                                       until).toSeq.sorted
+        mapView.iteratorFrom(k).toSeq == entriesInView(
+          entries,
+          newLower,
+          until).toSeq.sorted
     }
 
     property("keysIteratorFrom") = forAll {

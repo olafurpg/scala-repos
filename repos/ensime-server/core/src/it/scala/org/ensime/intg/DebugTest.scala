@@ -39,9 +39,10 @@ class DebugTest
           ) { breakpointsFile =>
             import testkit._
 
-            checkTopStackFrame("stepping.ForComprehensionListString$",
-                               "main",
-                               9)
+            checkTopStackFrame(
+              "stepping.ForComprehensionListString$",
+              "main",
+              9)
             project ! DebugNextReq(DebugThreadId(1))
             expectMsg(VoidResponse)
 
@@ -72,32 +73,36 @@ class DebugTest
             expectMsgType[DebugBacktrace] should matchPattern {
               case DebugBacktrace(
                   List(
-                    DebugStackFrame(0,
-                                    List(),
-                                    0,
-                                    "breakpoints.Breakpoints",
-                                    "mainTest",
-                                    LineSourcePosition(`breakpointsFile`, 32),
-                                    _),
-                    DebugStackFrame(1,
-                                    List(
-                                      DebugStackLocal(0,
-                                                      "args",
-                                                      "Array[]",
-                                                      "java.lang.String[]")
-                                    ),
-                                    1,
-                                    "breakpoints.Breakpoints$",
-                                    "main",
-                                    LineSourcePosition(`breakpointsFile`, 41),
-                                    _),
-                    DebugStackFrame(2,
-                                    List(),
-                                    1,
-                                    "breakpoints.Breakpoints",
-                                    "main",
-                                    LineSourcePosition(`breakpointsFile`, _),
-                                    _)
+                    DebugStackFrame(
+                      0,
+                      List(),
+                      0,
+                      "breakpoints.Breakpoints",
+                      "mainTest",
+                      LineSourcePosition(`breakpointsFile`, 32),
+                      _),
+                    DebugStackFrame(
+                      1,
+                      List(
+                        DebugStackLocal(
+                          0,
+                          "args",
+                          "Array[]",
+                          "java.lang.String[]")
+                      ),
+                      1,
+                      "breakpoints.Breakpoints$",
+                      "main",
+                      LineSourcePosition(`breakpointsFile`, 41),
+                      _),
+                    DebugStackFrame(
+                      2,
+                      List(),
+                      1,
+                      "breakpoints.Breakpoints",
+                      "main",
+                      LineSourcePosition(`breakpointsFile`, _),
+                      _)
                   ),
                   DebugThreadId(1),
                   "main") =>
@@ -280,15 +285,17 @@ class DebugTest
 
             // String local
             inside(getVariableValue(DebugThreadId(1), "h")) {
-              case DebugStringInstance("\"test\"",
-                                       debugFields,
-                                       "java.lang.String",
-                                       _) =>
+              case DebugStringInstance(
+                  "\"test\"",
+                  debugFields,
+                  "java.lang.String",
+                  _) =>
                 exactly(1, debugFields) should matchPattern {
-                  case DebugClassField(_,
-                                       "value",
-                                       "char[]",
-                                       "Array['t', 'e', 's',...]") =>
+                  case DebugClassField(
+                      _,
+                      "value",
+                      "char[]",
+                      "Array['t', 'e', 's',...]") =>
                 }
             }
 
@@ -305,20 +312,22 @@ class DebugTest
                   "scala.collection.immutable.$colon$colon",
                   _) =>
                 exactly(1, debugFields) should matchPattern {
-                  case DebugClassField(_,
-                                       head,
-                                       "java.lang.Object",
-                                       "Instance of Integer")
+                  case DebugClassField(
+                      _,
+                      head,
+                      "java.lang.Object",
+                      "Instance of Integer")
                       if head == "head" | head == "scala$collection$immutable$$colon$colon$$hd" =>
                 }
             }
 
             // object array local
             getVariableValue(DebugThreadId(1), "k") should matchPattern {
-              case DebugArrayInstance(3,
-                                      "java.lang.Object[]",
-                                      "java.lang.Object",
-                                      _) =>
+              case DebugArrayInstance(
+                  3,
+                  "java.lang.Object[]",
+                  "java.lang.Object",
+                  _) =>
             }
           }
         }
@@ -404,16 +413,18 @@ trait DebugTestUtils {
 
     project ! DebugBacktraceReq(DebugThreadId(1), 0, 1)
     expectMsgType[DebugBacktrace] should matchPattern {
-      case DebugBacktrace(List(
-                            DebugStackFrame(0,
-                                            _,
-                                            1,
-                                            `className`,
-                                            `method`,
-                                            LineSourcePosition(_, `line`),
-                                            _)),
-                          DebugThreadId(1),
-                          "main") =>
+      case DebugBacktrace(
+          List(
+            DebugStackFrame(
+              0,
+              _,
+              1,
+              `className`,
+              `method`,
+              LineSourcePosition(_, `line`),
+              _)),
+          DebugThreadId(1),
+          "main") =>
     }
   }
 }

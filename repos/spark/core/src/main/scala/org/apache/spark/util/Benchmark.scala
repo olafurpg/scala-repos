@@ -64,23 +64,25 @@ private[spark] class Benchmark(name: String,
     val firstBest = results.head.bestMs
     // The results are going to be processor specific so it is useful to include that.
     println(Benchmark.getProcessorName())
-    printf("%-35s %16s %12s %13s %10s\n",
-           name + ":",
-           "Best/Avg Time(ms)",
-           "Rate(M/s)",
-           "Per Row(ns)",
-           "Relative")
+    printf(
+      "%-35s %16s %12s %13s %10s\n",
+      name + ":",
+      "Best/Avg Time(ms)",
+      "Rate(M/s)",
+      "Per Row(ns)",
+      "Relative")
     println(
       "-----------------------------------------------------------------------------------" +
         "--------")
     results.zip(benchmarks).foreach {
       case (result, benchmark) =>
-        printf("%-35s %16s %12s %13s %10s\n",
-               benchmark.name,
-               "%5.0f / %4.0f" format (result.bestMs, result.avgMs),
-               "%10.1f" format result.bestRate,
-               "%6.1f" format (1000 / result.bestRate),
-               "%3.1fX" format (firstBest / result.bestMs))
+        printf(
+          "%-35s %16s %12s %13s %10s\n",
+          benchmark.name,
+          "%5.0f / %4.0f" format (result.bestMs, result.avgMs),
+          "%10.1f" format result.bestRate,
+          "%6.1f" format (1000 / result.bestRate),
+          "%3.1fX" format (firstBest / result.bestMs))
     }
     println
     // scalastyle:on

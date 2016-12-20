@@ -285,10 +285,10 @@ package object extensions {
 
       node.info.namedElement match {
         case fun: ScFunction if !fun.isConstructor =>
-          val wrappers = fun.getFunctionWrappers(isStatic,
-                                                 isInterface =
-                                                   fun.isAbstractMember,
-                                                 concreteClassFor(fun))
+          val wrappers = fun.getFunctionWrappers(
+            isStatic,
+            isInterface = fun.isAbstractMember,
+            concreteClassFor(fun))
           wrappers.foreach(processMethod)
           wrappers.foreach(w => processName(w.name))
         case method: PsiMethod if !method.isConstructor =>
@@ -306,13 +306,14 @@ package object extensions {
             if t.isVal || t.isVar ||
               (t.isInstanceOf[ScClassParameter] &&
                 t.asInstanceOf[ScClassParameter].isCaseClassVal) =>
-          PsiTypedDefinitionWrapper.processWrappersFor(t,
-                                                       concreteClassFor(t),
-                                                       node.info.name,
-                                                       isStatic,
-                                                       isInterface,
-                                                       processMethod,
-                                                       processName)
+          PsiTypedDefinitionWrapper.processWrappersFor(
+            t,
+            concreteClassFor(t),
+            node.info.name,
+            isStatic,
+            isInterface,
+            processMethod,
+            processName)
         case _ =>
       }
     }
@@ -555,10 +556,11 @@ package object extensions {
         case f: FakePsiParameter => f.parameter.paramType
         case param: ScParameter => param.getType(TypingContext.empty).getOrAny
         case _ =>
-          ScType.create(param.getType,
-                        param.getProject,
-                        param.getResolveScope,
-                        paramTopLevel = true)
+          ScType.create(
+            param.getType,
+            param.getProject,
+            param.getResolveScope,
+            paramTopLevel = true)
       }
     }
 
@@ -571,11 +573,12 @@ package object extensions {
             case p: PsiArrayType if param.isVarArgs => p.getComponentType
             case tp => tp
           }
-          ScType.create(paramType,
-                        param.getProject,
-                        param.getResolveScope,
-                        paramTopLevel = true,
-                        treatJavaObjectAsAny = treatJavaObjectAsAny)
+          ScType.create(
+            paramType,
+            param.getProject,
+            param.getResolveScope,
+            paramTopLevel = true,
+            treatJavaObjectAsAny = treatJavaObjectAsAny)
       }
     }
 

@@ -63,23 +63,25 @@ object Utils {
     val usesTungstenAggregate = TungstenAggregate.supportsAggregate(
       aggregateExpressions.flatMap(_.aggregateFunction.aggBufferAttributes))
     if (usesTungstenAggregate) {
-      TungstenAggregate(requiredChildDistributionExpressions =
-                          requiredChildDistributionExpressions,
-                        groupingExpressions = groupingExpressions,
-                        aggregateExpressions = aggregateExpressions,
-                        aggregateAttributes = aggregateAttributes,
-                        initialInputBufferOffset = initialInputBufferOffset,
-                        resultExpressions = resultExpressions,
-                        child = child)
+      TungstenAggregate(
+        requiredChildDistributionExpressions =
+          requiredChildDistributionExpressions,
+        groupingExpressions = groupingExpressions,
+        aggregateExpressions = aggregateExpressions,
+        aggregateAttributes = aggregateAttributes,
+        initialInputBufferOffset = initialInputBufferOffset,
+        resultExpressions = resultExpressions,
+        child = child)
     } else {
-      SortBasedAggregate(requiredChildDistributionExpressions =
-                           requiredChildDistributionExpressions,
-                         groupingExpressions = groupingExpressions,
-                         aggregateExpressions = aggregateExpressions,
-                         aggregateAttributes = aggregateAttributes,
-                         initialInputBufferOffset = initialInputBufferOffset,
-                         resultExpressions = resultExpressions,
-                         child = child)
+      SortBasedAggregate(
+        requiredChildDistributionExpressions =
+          requiredChildDistributionExpressions,
+        groupingExpressions = groupingExpressions,
+        aggregateExpressions = aggregateExpressions,
+        aggregateAttributes = aggregateAttributes,
+        initialInputBufferOffset = initialInputBufferOffset,
+        resultExpressions = resultExpressions,
+        child = child)
     }
   }
 

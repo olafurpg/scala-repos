@@ -37,8 +37,9 @@ object SSLContextUtil {
 
     // acquire X509 trust manager from factory
     val context = SSLContext.getInstance("TLS")
-    context.init( /* no key managers */ null,
-                 tmf.getTrustManagers, /* no secure random */ null)
+    context.init(
+      /* no key managers */ null,
+      tmf.getTrustManagers, /* no secure random */ null)
     context
   }
 }

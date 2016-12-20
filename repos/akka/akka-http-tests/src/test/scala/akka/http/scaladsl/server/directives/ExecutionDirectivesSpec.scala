@@ -84,8 +84,9 @@ class ExecutionDirectivesSpec extends RoutingSpec {
         responseAs[String] shouldEqual "There was an internal server error."
       }
 
-      Get("/abc") ~> Accept(MediaTypes.`text/xml`,
-                            MediaRanges.`*/*`.withQValue(0f)) ~> get {
+      Get("/abc") ~> Accept(
+        MediaTypes.`text/xml`,
+        MediaRanges.`*/*`.withQValue(0f)) ~> get {
         handleExceptions(handler) {
           throw new RuntimeException("buh2")
         }

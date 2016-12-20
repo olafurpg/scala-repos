@@ -65,11 +65,12 @@ class ScalaCalleeMethodsTreeStructure(project: Project,
       methodToDescriptorMap.get(calledMethod) match {
         case Some(d) => d.incrementUsageCount()
         case _ =>
-          val d = new CallHierarchyNodeDescriptor(myProject,
-                                                  descriptor,
-                                                  calledMethod,
-                                                  false,
-                                                  false)
+          val d = new CallHierarchyNodeDescriptor(
+            myProject,
+            descriptor,
+            calledMethod,
+            false,
+            false)
           methodToDescriptorMap.put(calledMethod, d)
           result += d
       }

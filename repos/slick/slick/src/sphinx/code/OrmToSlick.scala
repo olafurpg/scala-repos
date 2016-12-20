@@ -149,11 +149,11 @@ object OrmToSlick extends App {
     };
     {
       Await.result(
-                   //#slickRun
-                   db.run(people.filter(_.id === 5).result)
-                   //#slickRun
-                   ,
-                   Duration.Inf)
+        //#slickRun
+        db.run(people.filter(_.id === 5).result)
+        //#slickRun
+        ,
+        Duration.Inf)
     };
     {
       //#ormWriteCaching

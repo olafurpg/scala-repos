@@ -53,21 +53,26 @@ class WebSocketServerSpec
               |
               |""")
 
-            expectWSFrame(Protocol.Opcode.Text,
-                          ByteString("Message 1"),
-                          fin = true)
-            expectWSFrame(Protocol.Opcode.Text,
-                          ByteString("Message 2"),
-                          fin = true)
-            expectWSFrame(Protocol.Opcode.Text,
-                          ByteString("Message 3"),
-                          fin = true)
-            expectWSFrame(Protocol.Opcode.Text,
-                          ByteString("Message 4"),
-                          fin = true)
-            expectWSFrame(Protocol.Opcode.Text,
-                          ByteString("Message 5"),
-                          fin = true)
+            expectWSFrame(
+              Protocol.Opcode.Text,
+              ByteString("Message 1"),
+              fin = true)
+            expectWSFrame(
+              Protocol.Opcode.Text,
+              ByteString("Message 2"),
+              fin = true)
+            expectWSFrame(
+              Protocol.Opcode.Text,
+              ByteString("Message 3"),
+              fin = true)
+            expectWSFrame(
+              Protocol.Opcode.Text,
+              ByteString("Message 4"),
+              fin = true)
+            expectWSFrame(
+              Protocol.Opcode.Text,
+              ByteString("Message 5"),
+              fin = true)
             expectWSCloseFrame(Protocol.CloseCodes.Regular)
 
             sendWSCloseFrame(Protocol.CloseCodes.Regular, mask = true)
@@ -106,41 +111,51 @@ class WebSocketServerSpec
               |
               |""")
 
-          sendWSFrame(Protocol.Opcode.Text,
-                      ByteString("Message 1"),
-                      fin = true,
-                      mask = true)
-          expectWSFrame(Protocol.Opcode.Text,
-                        ByteString("Message 1"),
-                        fin = true)
-          sendWSFrame(Protocol.Opcode.Text,
-                      ByteString("Message 2"),
-                      fin = true,
-                      mask = true)
-          expectWSFrame(Protocol.Opcode.Text,
-                        ByteString("Message 2"),
-                        fin = true)
-          sendWSFrame(Protocol.Opcode.Text,
-                      ByteString("Message 3"),
-                      fin = true,
-                      mask = true)
-          expectWSFrame(Protocol.Opcode.Text,
-                        ByteString("Message 3"),
-                        fin = true)
-          sendWSFrame(Protocol.Opcode.Text,
-                      ByteString("Message 4"),
-                      fin = true,
-                      mask = true)
-          expectWSFrame(Protocol.Opcode.Text,
-                        ByteString("Message 4"),
-                        fin = true)
-          sendWSFrame(Protocol.Opcode.Text,
-                      ByteString("Message 5"),
-                      fin = true,
-                      mask = true)
-          expectWSFrame(Protocol.Opcode.Text,
-                        ByteString("Message 5"),
-                        fin = true)
+          sendWSFrame(
+            Protocol.Opcode.Text,
+            ByteString("Message 1"),
+            fin = true,
+            mask = true)
+          expectWSFrame(
+            Protocol.Opcode.Text,
+            ByteString("Message 1"),
+            fin = true)
+          sendWSFrame(
+            Protocol.Opcode.Text,
+            ByteString("Message 2"),
+            fin = true,
+            mask = true)
+          expectWSFrame(
+            Protocol.Opcode.Text,
+            ByteString("Message 2"),
+            fin = true)
+          sendWSFrame(
+            Protocol.Opcode.Text,
+            ByteString("Message 3"),
+            fin = true,
+            mask = true)
+          expectWSFrame(
+            Protocol.Opcode.Text,
+            ByteString("Message 3"),
+            fin = true)
+          sendWSFrame(
+            Protocol.Opcode.Text,
+            ByteString("Message 4"),
+            fin = true,
+            mask = true)
+          expectWSFrame(
+            Protocol.Opcode.Text,
+            ByteString("Message 4"),
+            fin = true)
+          sendWSFrame(
+            Protocol.Opcode.Text,
+            ByteString("Message 5"),
+            fin = true,
+            mask = true)
+          expectWSFrame(
+            Protocol.Opcode.Text,
+            ByteString("Message 5"),
+            fin = true)
 
           sendWSCloseFrame(Protocol.CloseCodes.Regular, mask = true)
           expectWSCloseFrame(Protocol.CloseCodes.Regular)

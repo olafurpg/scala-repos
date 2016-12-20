@@ -190,10 +190,12 @@ object SparkEnv extends Logging {
       numCores: Int,
       mockOutputCommitCoordinator: Option[OutputCommitCoordinator] = None)
     : SparkEnv = {
-    assert(conf.contains("spark.driver.host"),
-           "spark.driver.host is not set on the driver!")
-    assert(conf.contains("spark.driver.port"),
-           "spark.driver.port is not set on the driver!")
+    assert(
+      conf.contains("spark.driver.host"),
+      "spark.driver.host is not set on the driver!")
+    assert(
+      conf.contains("spark.driver.port"),
+      "spark.driver.port is not set on the driver!")
     val hostname = conf.get("spark.driver.host")
     val port = conf.get("spark.driver.port").toInt
     create(
@@ -249,19 +251,21 @@ object SparkEnv extends Logging {
 
     // Listener bus is only used on the driver
     if (isDriver) {
-      assert(listenerBus != null,
-             "Attempted to create driver SparkEnv with null listener bus!")
+      assert(
+        listenerBus != null,
+        "Attempted to create driver SparkEnv with null listener bus!")
     }
 
     val securityManager = new SecurityManager(conf)
 
     val systemName = if (isDriver) driverSystemName else executorSystemName
-    val rpcEnv = RpcEnv.create(systemName,
-                               hostname,
-                               port,
-                               conf,
-                               securityManager,
-                               clientMode = !isDriver)
+    val rpcEnv = RpcEnv.create(
+      systemName,
+      hostname,
+      port,
+      conf,
+      securityManager,
+      clientMode = !isDriver)
 
     // Figure out which port RpcEnv actually bound to in case the original port is 0 or occupied.
     // In the non-driver case, the RPC env's address may be null since it may not be listening
@@ -369,17 +373,18 @@ object SparkEnv extends Logging {
       isDriver)
 
     // NB: blockManager is not valid until initialize() is called later.
-    val blockManager = new BlockManager(executorId,
-                                        rpcEnv,
-                                        blockManagerMaster,
-                                        serializer,
-                                        conf,
-                                        memoryManager,
-                                        mapOutputTracker,
-                                        shuffleManager,
-                                        blockTransferService,
-                                        securityManager,
-                                        numUsableCores)
+    val blockManager = new BlockManager(
+      executorId,
+      rpcEnv,
+      blockManagerMaster,
+      serializer,
+      conf,
+      memoryManager,
+      mapOutputTracker,
+      shuffleManager,
+      blockTransferService,
+      securityManager,
+      numUsableCores)
 
     val broadcastManager =
       new BroadcastManager(isDriver, conf, securityManager)
@@ -421,22 +426,23 @@ object SparkEnv extends Logging {
       new OutputCommitCoordinatorEndpoint(rpcEnv, outputCommitCoordinator))
     outputCommitCoordinator.coordinatorRef = Some(outputCommitCoordinatorRef)
 
-    val envInstance = new SparkEnv(executorId,
-                                   rpcEnv,
-                                   serializer,
-                                   closureSerializer,
-                                   serializerManager,
-                                   mapOutputTracker,
-                                   shuffleManager,
-                                   broadcastManager,
-                                   blockTransferService,
-                                   blockManager,
-                                   securityManager,
-                                   sparkFilesDir,
-                                   metricsSystem,
-                                   memoryManager,
-                                   outputCommitCoordinator,
-                                   conf)
+    val envInstance = new SparkEnv(
+      executorId,
+      rpcEnv,
+      serializer,
+      closureSerializer,
+      serializerManager,
+      mapOutputTracker,
+      shuffleManager,
+      broadcastManager,
+      blockTransferService,
+      blockManager,
+      securityManager,
+      sparkFilesDir,
+      metricsSystem,
+      memoryManager,
+      outputCommitCoordinator,
+      conf)
 
     // Add a reference to tmp dir created by driver, we will delete this tmp dir when stop() is
     // called, and we only need to do it for driver. Because driver may run as a service, and if we
@@ -493,9 +499,10 @@ object SparkEnv extends Logging {
     val addedJarsAndFiles = (addedJars ++ addedFiles).map((_, "Added By User"))
     val classPaths = (addedJarsAndFiles ++ classPathEntries).sorted
 
-    Map[String, Seq[(String, String)]]("JVM Information" -> jvmInformation,
-                                       "Spark Properties" -> sparkProperties,
-                                       "System Properties" -> otherProperties,
-                                       "Classpath Entries" -> classPaths)
+    Map[String, Seq[(String, String)]](
+      "JVM Information" -> jvmInformation,
+      "Spark Properties" -> sparkProperties,
+      "System Properties" -> otherProperties,
+      "Classpath Entries" -> classPaths)
   }
 }

@@ -127,10 +127,12 @@ class SbtModuleBuilder
     resolveJavadocsCheckBox.setSelected(false)
     resolveSbtClassifiersCheckBox.setSelected(true)
 
-    settingsStep.addSettingsField(SbtBundle("sbt.settings.sbtVersion"),
-                                  sbtVersionComboBox)
-    settingsStep.addSettingsField(SbtBundle("sbt.settings.scalaVersion"),
-                                  scalaVersionComboBox)
+    settingsStep.addSettingsField(
+      SbtBundle("sbt.settings.sbtVersion"),
+      sbtVersionComboBox)
+    settingsStep.addSettingsField(
+      SbtBundle("sbt.settings.scalaVersion"),
+      scalaVersionComboBox)
     settingsStep.addSettingsField("", useAutoImportCheckBox)
     settingsStep.addSettingsField("", createContentDirsCheckBox)
 
@@ -155,11 +157,13 @@ class SbtModuleBuilder
     if (!buildFile.createNewFile() || !projectDir.mkdir() ||
         !pluginsFile.createNewFile()) return
 
-    writeToFile(buildFile,
-                SbtModuleBuilder.formatProjectDefinition(name, scalaVersion))
+    writeToFile(
+      buildFile,
+      SbtModuleBuilder.formatProjectDefinition(name, scalaVersion))
     writeToFile(pluginsFile, SbtModuleBuilder.PluginsDefinition)
-    writeToFile(propertiesFile,
-                SbtModuleBuilder.formatSbtProperties(sbtVersion))
+    writeToFile(
+      propertiesFile,
+      SbtModuleBuilder.formatSbtProperties(sbtVersion))
   }
 
   override def getNodeIcon = Sbt.Icon

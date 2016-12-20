@@ -75,8 +75,9 @@ object ComboBoxTableCell {
   /**
     * $FTCINITDEPREC
     */
-  @deprecated(message = "Use forTableColumn[S, T](ObservableBuffer[T])",
-              since = "1.0")
+  @deprecated(
+    message = "Use forTableColumn[S, T](ObservableBuffer[T])",
+    since = "1.0")
   def forTableColumn[S, T](items: jfxc.ObservableList[T]) =
     jfxscc.ComboBoxTableCell.forTableColumn[S, T](items)
 
@@ -125,8 +126,9 @@ object ComboBoxTableCell {
   /**
     * $FTCINITDEPREC
     */
-  @deprecated(message = "Use forTableColumn[S, T](StringConverter[T], T*)",
-              since = "1.0")
+  @deprecated(
+    message = "Use forTableColumn[S, T](StringConverter[T], T*)",
+    since = "1.0")
   def forTableColumn[S, T](converter: jfxu.StringConverter[T], items: T*) =
     jfxscc.ComboBoxTableCell.forTableColumn[S, T](converter, items: _*)
 

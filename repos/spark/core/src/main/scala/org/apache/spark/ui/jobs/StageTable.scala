@@ -222,11 +222,12 @@ private[ui] class FailedStageTable(stages: Seq[StageInfo],
                                    basePath: String,
                                    listener: JobProgressListener,
                                    isFairScheduler: Boolean)
-    extends StageTableBase(stages,
-                           basePath,
-                           listener,
-                           isFairScheduler,
-                           killEnabled = false) {
+    extends StageTableBase(
+      stages,
+      basePath,
+      listener,
+      isFairScheduler,
+      killEnabled = false) {
 
   override protected def columns: Seq[Node] =
     super.columns ++ <th>Failure Reason</th>

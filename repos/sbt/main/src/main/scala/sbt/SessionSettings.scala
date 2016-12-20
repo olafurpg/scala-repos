@@ -38,9 +38,10 @@ final case class SessionSettings(currentBuild: URI,
                                  append: SessionMap,
                                  rawAppend: Seq[Setting[_]],
                                  currentEval: () => Eval) {
-  assert(currentProject contains currentBuild,
-         "Current build (" + currentBuild +
-           ") not associated with a current project.")
+  assert(
+    currentProject contains currentBuild,
+    "Current build (" + currentBuild +
+      ") not associated with a current project.")
 
   /**
     * Modifiy the current state.
@@ -53,9 +54,10 @@ final case class SessionSettings(currentBuild: URI,
   def setCurrent(build: URI,
                  project: String,
                  eval: () => Eval): SessionSettings =
-    copy(currentBuild = build,
-         currentProject = currentProject.updated(build, project),
-         currentEval = eval)
+    copy(
+      currentBuild = build,
+      currentProject = currentProject.updated(build, project),
+      currentEval = eval)
 
   /**
     * @return  The current ProjectRef with which we scope settings.
@@ -203,18 +205,21 @@ object SessionSettings {
       val newSettings = for ((ref, settings) <- session.append
                              if settings.nonEmpty &&
                                include(ref)) yield {
-        val (news, olds) = writeSettings(ref,
-                                         settings.toList,
-                                         session.original,
-                                         Project.structure(s))
+        val (news, olds) = writeSettings(
+          ref,
+          settings.toList,
+          session.original,
+          Project.structure(s))
         (ref -> news, olds)
       }
       val (newAppend, newOriginal) = newSettings.unzip
-      val newSession = session.copy(append = newAppend.toMap,
-                                    original = newOriginal.flatten.toSeq)
-      reapply(newSession.copy(original = newSession.mergeSettings,
-                              append = Map.empty),
-              s)
+      val newSession = session.copy(
+        append = newAppend.toMap,
+        original = newOriginal.flatten.toSeq)
+      reapply(
+        newSession
+          .copy(original = newSession.mergeSettings, append = Map.empty),
+        s)
     }
 
   @deprecated("This method will no longer be public", "0.13.7")

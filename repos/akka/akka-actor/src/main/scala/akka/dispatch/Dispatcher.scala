@@ -83,10 +83,11 @@ class Dispatcher(
         } catch {
           case e2: RejectedExecutionException ⇒
             eventStream.publish(
-              Error(e,
-                    getClass.getName,
-                    getClass,
-                    "executeTask was rejected twice!"))
+              Error(
+                e,
+                getClass.getName,
+                getClass,
+                "executeTask was rejected twice!"))
             throw e2
         }
     }
@@ -141,10 +142,11 @@ class Dispatcher(
               case e: RejectedExecutionException ⇒
                 mbox.setAsIdle()
                 eventStream.publish(
-                  Error(e,
-                        getClass.getName,
-                        getClass,
-                        "registerForExecution was rejected twice!"))
+                  Error(
+                    e,
+                    getClass.getName,
+                    getClass,
+                    "registerForExecution was rejected twice!"))
                 throw e
             }
         }

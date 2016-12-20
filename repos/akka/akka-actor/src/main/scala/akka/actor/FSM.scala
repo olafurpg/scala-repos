@@ -134,11 +134,12 @@ object FSM {
                                         _timeout: Option[FiniteDuration],
                                         _stopReason: Option[Reason],
                                         _replies: List[Any])
-      extends State[S, D](_stateName,
-                          _stateData,
-                          _timeout,
-                          _stopReason,
-                          _replies) {
+      extends State[S, D](
+        _stateName,
+        _stateData,
+        _timeout,
+        _stopReason,
+        _replies) {
 
     /**
       * INTERNAL API

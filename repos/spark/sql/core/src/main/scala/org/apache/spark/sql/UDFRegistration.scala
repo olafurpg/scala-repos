@@ -1182,9 +1182,10 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
     functionRegistry.registerFunction(
       name,
       (e: Seq[Expression]) =>
-        ScalaUDF(f.asInstanceOf[UDF2[Any, Any, Any]].call(_: Any, _: Any),
-                 returnType,
-                 e))
+        ScalaUDF(
+          f.asInstanceOf[UDF2[Any, Any, Any]].call(_: Any, _: Any),
+          returnType,
+          e))
   }
 
   /**
@@ -1195,10 +1196,11 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
     functionRegistry.registerFunction(
       name,
       (e: Seq[Expression]) =>
-        ScalaUDF(f.asInstanceOf[UDF3[Any, Any, Any, Any]]
-                   .call(_: Any, _: Any, _: Any),
-                 returnType,
-                 e))
+        ScalaUDF(
+          f.asInstanceOf[UDF3[Any, Any, Any, Any]]
+            .call(_: Any, _: Any, _: Any),
+          returnType,
+          e))
   }
 
   /**
@@ -1211,10 +1213,11 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
     functionRegistry.registerFunction(
       name,
       (e: Seq[Expression]) =>
-        ScalaUDF(f.asInstanceOf[UDF4[Any, Any, Any, Any, Any]]
-                   .call(_: Any, _: Any, _: Any, _: Any),
-                 returnType,
-                 e))
+        ScalaUDF(
+          f.asInstanceOf[UDF4[Any, Any, Any, Any, Any]]
+            .call(_: Any, _: Any, _: Any, _: Any),
+          returnType,
+          e))
   }
 
   /**
@@ -1227,10 +1230,11 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
     functionRegistry.registerFunction(
       name,
       (e: Seq[Expression]) =>
-        ScalaUDF(f.asInstanceOf[UDF5[Any, Any, Any, Any, Any, Any]]
-                   .call(_: Any, _: Any, _: Any, _: Any, _: Any),
-                 returnType,
-                 e))
+        ScalaUDF(
+          f.asInstanceOf[UDF5[Any, Any, Any, Any, Any, Any]]
+            .call(_: Any, _: Any, _: Any, _: Any, _: Any),
+          returnType,
+          e))
   }
 
   /**
@@ -1243,10 +1247,11 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
     functionRegistry.registerFunction(
       name,
       (e: Seq[Expression]) =>
-        ScalaUDF(f.asInstanceOf[UDF6[Any, Any, Any, Any, Any, Any, Any]]
-                   .call(_: Any, _: Any, _: Any, _: Any, _: Any, _: Any),
-                 returnType,
-                 e))
+        ScalaUDF(
+          f.asInstanceOf[UDF6[Any, Any, Any, Any, Any, Any, Any]]
+            .call(_: Any, _: Any, _: Any, _: Any, _: Any, _: Any),
+          returnType,
+          e))
   }
 
   /**
@@ -1278,14 +1283,15 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
       (e: Seq[Expression]) =>
         ScalaUDF(
           f.asInstanceOf[UDF8[Any, Any, Any, Any, Any, Any, Any, Any, Any]]
-            .call(_: Any,
-                  _: Any,
-                  _: Any,
-                  _: Any,
-                  _: Any,
-                  _: Any,
-                  _: Any,
-                  _: Any),
+            .call(
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any),
           returnType,
           e))
   }
@@ -1300,19 +1306,21 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
     functionRegistry.registerFunction(
       name,
       (e: Seq[Expression]) =>
-        ScalaUDF(f.asInstanceOf[
-                     UDF9[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
-                   .call(_: Any,
-                         _: Any,
-                         _: Any,
-                         _: Any,
-                         _: Any,
-                         _: Any,
-                         _: Any,
-                         _: Any,
-                         _: Any),
-                 returnType,
-                 e))
+        ScalaUDF(
+          f.asInstanceOf[
+              UDF9[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
+            .call(
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any),
+          returnType,
+          e))
   }
 
   /**
@@ -1328,16 +1336,17 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
         ScalaUDF(
           f.asInstanceOf[
               UDF10[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]
-            .call(_: Any,
-                  _: Any,
-                  _: Any,
-                  _: Any,
-                  _: Any,
-                  _: Any,
-                  _: Any,
-                  _: Any,
-                  _: Any,
-                  _: Any),
+            .call(
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any),
           returnType,
           e))
   }
@@ -1349,33 +1358,36 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
   def register(name: String,
                f: UDF11[_, _, _, _, _, _, _, _, _, _, _, _],
                returnType: DataType): Unit = {
-    functionRegistry.registerFunction(name,
-                                      (e: Seq[Expression]) =>
-                                        ScalaUDF(f.asInstanceOf[UDF11[Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any]]
-                                                   .call(_: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any),
-                                                 returnType,
-                                                 e))
+    functionRegistry.registerFunction(
+      name,
+      (e: Seq[Expression]) =>
+        ScalaUDF(
+          f.asInstanceOf[UDF11[Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any]]
+            .call(
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any),
+          returnType,
+          e))
   }
 
   /**
@@ -1385,35 +1397,38 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
   def register(name: String,
                f: UDF12[_, _, _, _, _, _, _, _, _, _, _, _, _],
                returnType: DataType): Unit = {
-    functionRegistry.registerFunction(name,
-                                      (e: Seq[Expression]) =>
-                                        ScalaUDF(f.asInstanceOf[UDF12[Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any]]
-                                                   .call(_: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any),
-                                                 returnType,
-                                                 e))
+    functionRegistry.registerFunction(
+      name,
+      (e: Seq[Expression]) =>
+        ScalaUDF(
+          f.asInstanceOf[UDF12[Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any]]
+            .call(
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any),
+          returnType,
+          e))
   }
 
   /**
@@ -1423,37 +1438,40 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
   def register(name: String,
                f: UDF13[_, _, _, _, _, _, _, _, _, _, _, _, _, _],
                returnType: DataType): Unit = {
-    functionRegistry.registerFunction(name,
-                                      (e: Seq[Expression]) =>
-                                        ScalaUDF(f.asInstanceOf[UDF13[Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any]]
-                                                   .call(_: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any),
-                                                 returnType,
-                                                 e))
+    functionRegistry.registerFunction(
+      name,
+      (e: Seq[Expression]) =>
+        ScalaUDF(
+          f.asInstanceOf[UDF13[Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any]]
+            .call(
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any),
+          returnType,
+          e))
   }
 
   /**
@@ -1463,39 +1481,42 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
   def register(name: String,
                f: UDF14[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
                returnType: DataType): Unit = {
-    functionRegistry.registerFunction(name,
-                                      (e: Seq[Expression]) =>
-                                        ScalaUDF(f.asInstanceOf[UDF14[Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any]]
-                                                   .call(_: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any),
-                                                 returnType,
-                                                 e))
+    functionRegistry.registerFunction(
+      name,
+      (e: Seq[Expression]) =>
+        ScalaUDF(
+          f.asInstanceOf[UDF14[Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any]]
+            .call(
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any),
+          returnType,
+          e))
   }
 
   /**
@@ -1505,41 +1526,44 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
   def register(name: String,
                f: UDF15[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
                returnType: DataType): Unit = {
-    functionRegistry.registerFunction(name,
-                                      (e: Seq[Expression]) =>
-                                        ScalaUDF(f.asInstanceOf[UDF15[Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any]]
-                                                   .call(_: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any),
-                                                 returnType,
-                                                 e))
+    functionRegistry.registerFunction(
+      name,
+      (e: Seq[Expression]) =>
+        ScalaUDF(
+          f.asInstanceOf[UDF15[Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any]]
+            .call(
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any),
+          returnType,
+          e))
   }
 
   /**
@@ -1549,43 +1573,46 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
   def register(name: String,
                f: UDF16[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
                returnType: DataType): Unit = {
-    functionRegistry.registerFunction(name,
-                                      (e: Seq[Expression]) =>
-                                        ScalaUDF(f.asInstanceOf[UDF16[Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any,
-                                                                       Any]]
-                                                   .call(_: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any),
-                                                 returnType,
-                                                 e))
+    functionRegistry.registerFunction(
+      name,
+      (e: Seq[Expression]) =>
+        ScalaUDF(
+          f.asInstanceOf[UDF16[Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any,
+                                Any]]
+            .call(
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any),
+          returnType,
+          e))
   }
 
   /**
@@ -1595,46 +1622,49 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
   def register(name: String,
                f: UDF17[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
                returnType: DataType): Unit = {
-    functionRegistry.registerFunction(name,
-                                      (e: Seq[Expression]) =>
-                                        ScalaUDF(f.asInstanceOf[
-                                                     UDF17[Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any]]
-                                                   .call(_: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any),
-                                                 returnType,
-                                                 e))
+    functionRegistry.registerFunction(
+      name,
+      (e: Seq[Expression]) =>
+        ScalaUDF(
+          f.asInstanceOf[
+              UDF17[Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any]]
+            .call(
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any),
+          returnType,
+          e))
   }
 
   /**
@@ -1645,48 +1675,51 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
       name: String,
       f: UDF18[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
       returnType: DataType): Unit = {
-    functionRegistry.registerFunction(name,
-                                      (e: Seq[Expression]) =>
-                                        ScalaUDF(f.asInstanceOf[
-                                                     UDF18[Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any]]
-                                                   .call(_: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any),
-                                                 returnType,
-                                                 e))
+    functionRegistry.registerFunction(
+      name,
+      (e: Seq[Expression]) =>
+        ScalaUDF(
+          f.asInstanceOf[
+              UDF18[Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any]]
+            .call(
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any),
+          returnType,
+          e))
   }
 
   /**
@@ -1697,50 +1730,53 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
       name: String,
       f: UDF19[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
       returnType: DataType): Unit = {
-    functionRegistry.registerFunction(name,
-                                      (e: Seq[Expression]) =>
-                                        ScalaUDF(f.asInstanceOf[
-                                                     UDF19[Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any]]
-                                                   .call(_: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any),
-                                                 returnType,
-                                                 e))
+    functionRegistry.registerFunction(
+      name,
+      (e: Seq[Expression]) =>
+        ScalaUDF(
+          f.asInstanceOf[
+              UDF19[Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any]]
+            .call(
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any),
+          returnType,
+          e))
   }
 
   /**
@@ -1751,52 +1787,55 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
       name: String,
       f: UDF20[_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
       returnType: DataType): Unit = {
-    functionRegistry.registerFunction(name,
-                                      (e: Seq[Expression]) =>
-                                        ScalaUDF(f.asInstanceOf[
-                                                     UDF20[Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any]]
-                                                   .call(_: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any),
-                                                 returnType,
-                                                 e))
+    functionRegistry.registerFunction(
+      name,
+      (e: Seq[Expression]) =>
+        ScalaUDF(
+          f.asInstanceOf[
+              UDF20[Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any]]
+            .call(
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any),
+          returnType,
+          e))
   }
 
   /**
@@ -1827,54 +1866,57 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
                         _,
                         _],
                returnType: DataType): Unit = {
-    functionRegistry.registerFunction(name,
-                                      (e: Seq[Expression]) =>
-                                        ScalaUDF(f.asInstanceOf[
-                                                     UDF21[Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any]]
-                                                   .call(_: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any),
-                                                 returnType,
-                                                 e))
+    functionRegistry.registerFunction(
+      name,
+      (e: Seq[Expression]) =>
+        ScalaUDF(
+          f.asInstanceOf[
+              UDF21[Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any]]
+            .call(
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any),
+          returnType,
+          e))
   }
 
   /**
@@ -1906,56 +1948,59 @@ class UDFRegistration private[sql] (functionRegistry: FunctionRegistry)
                         _,
                         _],
                returnType: DataType): Unit = {
-    functionRegistry.registerFunction(name,
-                                      (e: Seq[Expression]) =>
-                                        ScalaUDF(f.asInstanceOf[
-                                                     UDF22[Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any,
-                                                           Any]]
-                                                   .call(_: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any,
-                                                         _: Any),
-                                                 returnType,
-                                                 e))
+    functionRegistry.registerFunction(
+      name,
+      (e: Seq[Expression]) =>
+        ScalaUDF(
+          f.asInstanceOf[
+              UDF22[Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any,
+                    Any]]
+            .call(
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any,
+              _: Any),
+          returnType,
+          e))
   }
 
   // scalastyle:on line.size.limit

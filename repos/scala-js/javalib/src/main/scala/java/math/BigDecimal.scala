@@ -570,8 +570,9 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
       if (Math.max(this._bitLength, augend._bitLength) + 1 < 64)
         valueOf(this._smallValue + augend._smallValue, this._scale)
       else
-        new BigDecimal(this.getUnscaledValue.add(augend.getUnscaledValue),
-                       this._scale)
+        new BigDecimal(
+          this.getUnscaledValue.add(augend.getUnscaledValue),
+          this._scale)
     } else if (diffScale > 0) {
       addAndMult10(this, augend, diffScale)
     } else {
@@ -625,8 +626,9 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
       if (Math.max(this._bitLength, subtrahend._bitLength) + 1 < 64)
         valueOf(this._smallValue - subtrahend._smallValue, this._scale)
       else
-        new BigDecimal(getUnscaledValue.subtract(subtrahend.getUnscaledValue),
-                       _scale)
+        new BigDecimal(
+          getUnscaledValue.subtract(subtrahend.getUnscaledValue),
+          _scale)
     } else if (diffScale > 0) {
       def powTenLen = LongTenPowsBitLength(diffScale)
       def maxLen =
@@ -634,8 +636,9 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
 
       if (diffScale < LongTenPows.length && maxLen < 64) {
         val powTen = LongTenPows(diffScale)
-        valueOf(this._smallValue - subtrahend._smallValue * powTen,
-                this._scale)
+        valueOf(
+          this._smallValue - subtrahend._smallValue * powTen,
+          this._scale)
       } else {
         val mult = multiplyByTenPow(subtrahend.getUnscaledValue, diffScale)
         new BigDecimal(getUnscaledValue.subtract(mult), this._scale)
@@ -648,8 +651,9 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
 
       if (negDiffScale < LongTenPows.length && maxLen < 64) {
         val powTen = LongTenPows(negDiffScale)
-        valueOf(_smallValue * powTen - subtrahend._smallValue,
-                subtrahend._scale)
+        valueOf(
+          _smallValue * powTen - subtrahend._smallValue,
+          subtrahend._scale)
       } else {
         val mult = multiplyByTenPow(this.getUnscaledValue, negDiffScale)
         val multSub = mult.subtract(subtrahend.getUnscaledValue)
@@ -688,8 +692,9 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
     if (this.isZero || multiplicand.isZero) {
       zeroScaledBy(newScale)
     } else if (this._bitLength + multiplicand._bitLength < 64) {
-      valueOf(this._smallValue * multiplicand._smallValue,
-              safeLongToInt(newScale))
+      valueOf(
+        this._smallValue * multiplicand._smallValue,
+        safeLongToInt(newScale))
     } else {
       val unscaled =
         this.getUnscaledValue.multiply(multiplicand.getUnscaledValue)
@@ -1157,8 +1162,9 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
       if (diffScale < LongTenPows.length && cmp < 64) {
         valueOf(this._smallValue * LongTenPows(diffScale.toInt), newScale)
       } else {
-        new BigDecimal(multiplyByTenPow(getUnscaledValue, diffScale.toInt),
-                       newScale)
+        new BigDecimal(
+          multiplyByTenPow(getUnscaledValue, diffScale.toInt),
+          newScale)
       }
     } else if (this._bitLength < 64 && -diffScale < LongTenPows.length) {
       val lpt = LongTenPows(-diffScale.toInt)
@@ -1722,9 +1728,10 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
         // To look if there is a carry
         val frac = java.lang.Long.signum(fraction) * (5 + compRem)
         val intPart1 =
-          intPart0 + roundingBehavior(intPart0.toInt & 1,
-                                      frac,
-                                      mc.roundingMode)
+          intPart0 + roundingBehavior(
+            intPart0.toInt & 1,
+            frac,
+            mc.roundingMode)
         // If after to add the increment the precision changed, we normalize the size
         if (Math.log10(Math.abs(intPart1)) >= mc.precision)
           (newScale0 - 1, intPart1 / 10)

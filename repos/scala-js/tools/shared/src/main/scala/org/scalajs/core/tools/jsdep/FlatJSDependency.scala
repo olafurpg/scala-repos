@@ -20,8 +20,9 @@ final class FlatJSDependency(val origin: Origin,
                              val commonJSName: Option[String] = None,
                              val relPathMinified: Option[String] = None) {
 
-  require(commonJSName.forall(isValidIdentifier),
-          "commonJSName must be a valid JavaScript identifier")
+  require(
+    commonJSName.forall(isValidIdentifier),
+    "commonJSName must be a valid JavaScript identifier")
 
   override def toString(): String = {
     val b = new StringBuilder

@@ -29,10 +29,11 @@ class HoconCommentJoinLinesHandler extends JoinLinesHandlerDelegate {
             document.getCharsSequence.subSequence(end, document.getTextLength)
           List("#", "//").find(joinedSequence.startsWith).map { nextPrefix =>
             val toRemoveEnd =
-              CharArrayUtil.shiftForward(document.getCharsSequence,
-                                         end + nextPrefix.length,
-                                         element.getTextRange.getEndOffset,
-                                         " \t")
+              CharArrayUtil.shiftForward(
+                document.getCharsSequence,
+                end + nextPrefix.length,
+                element.getTextRange.getEndOffset,
+                " \t")
             document.replaceString(start + 1, toRemoveEnd, " ")
             start + 1
           } getOrElse CANNOT_JOIN

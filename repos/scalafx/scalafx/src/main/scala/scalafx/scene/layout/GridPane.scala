@@ -49,8 +49,9 @@ object GridPane {
     * remaining rows/columns.
     */
   val Remaining = jfxsl.GridPane.REMAINING
-  @deprecated("Use Remaining; REMAINING will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Remaining; REMAINING will be removed in a future release",
+    "8.0.60-R10")
   val REMAINING = Remaining
 
   /**
@@ -203,13 +204,14 @@ object GridPane {
                      rowspan: Int,
                      halignment: HPos,
                      valignment: VPos) {
-    jfxsl.GridPane.setConstraints(child,
-                                  columnIndex,
-                                  rowIndex,
-                                  columnspan,
-                                  rowspan,
-                                  halignment,
-                                  valignment)
+    jfxsl.GridPane.setConstraints(
+      child,
+      columnIndex,
+      rowIndex,
+      columnspan,
+      rowspan,
+      halignment,
+      valignment)
   }
 
   /**
@@ -224,15 +226,16 @@ object GridPane {
                      valignment: VPos,
                      hgrow: Priority,
                      vgrow: Priority) {
-    jfxsl.GridPane.setConstraints(child,
-                                  columnIndex,
-                                  rowIndex,
-                                  columnspan,
-                                  rowspan,
-                                  halignment,
-                                  valignment,
-                                  hgrow,
-                                  vgrow)
+    jfxsl.GridPane.setConstraints(
+      child,
+      columnIndex,
+      rowIndex,
+      columnspan,
+      rowspan,
+      halignment,
+      valignment,
+      hgrow,
+      vgrow)
   }
 
   /**
@@ -249,16 +252,17 @@ object GridPane {
                      hgrow: Priority,
                      vgrow: Priority,
                      margin: Insets) {
-    jfxsl.GridPane.setConstraints(child,
-                                  columnIndex,
-                                  rowIndex,
-                                  columnspan,
-                                  rowspan,
-                                  halignment,
-                                  valignment,
-                                  hgrow,
-                                  vgrow,
-                                  margin)
+    jfxsl.GridPane.setConstraints(
+      child,
+      columnIndex,
+      rowIndex,
+      columnspan,
+      rowspan,
+      halignment,
+      valignment,
+      hgrow,
+      vgrow,
+      margin)
   }
 }
 

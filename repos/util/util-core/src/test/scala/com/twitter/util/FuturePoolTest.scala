@@ -106,11 +106,12 @@ class FuturePoolTest extends FunSuite with Eventually {
   }
 
   test("returns exceptions that result from submitting a task to the pool") {
-    val executor = new ThreadPoolExecutor(1,
-                                          1,
-                                          60,
-                                          TimeUnit.SECONDS,
-                                          new LinkedBlockingQueue(1))
+    val executor = new ThreadPoolExecutor(
+      1,
+      1,
+      60,
+      TimeUnit.SECONDS,
+      new LinkedBlockingQueue(1))
     val pool = FuturePool(executor)
 
     val source = new Promise[Int]

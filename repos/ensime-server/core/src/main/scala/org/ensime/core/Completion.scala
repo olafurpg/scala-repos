@@ -134,18 +134,20 @@ trait CompletionControl { self: RichPresentationCompiler =>
               fun match {
                 case Select(qualifier: New, name) =>
                   Some(
-                    ScopeContext(src,
-                                 qualifier.pos.endOrCursor,
-                                 defaultPrefix,
-                                 constructing = true))
+                    ScopeContext(
+                      src,
+                      qualifier.pos.endOrCursor,
+                      defaultPrefix,
+                      constructing = true))
                 case Select(qual, name)
                     if qual.pos.isDefined && qual.pos.isRange =>
                   val prefix = if (patched) "" else name.decoded
                   Some(
-                    MemberContext(src,
-                                  qual.pos.endOrCursor,
-                                  prefix,
-                                  constructing))
+                    MemberContext(
+                      src,
+                      qual.pos.endOrCursor,
+                      prefix,
+                      constructing))
                 case _ =>
                   val prefix =
                     if (patched) ""
@@ -154,40 +156,45 @@ trait CompletionControl { self: RichPresentationCompiler =>
                         .slice(fun.pos.startOrCursor, fun.pos.endOrCursor)
                         .mkString
                   Some(
-                    ScopeContext(src,
-                                 fun.pos.endOrCursor,
-                                 prefix,
-                                 constructing))
+                    ScopeContext(
+                      src,
+                      fun.pos.endOrCursor,
+                      prefix,
+                      constructing))
               }
             case Literal(Constant(_)) => None
             case New(name) =>
               Some(
-                ScopeContext(src,
-                             name.pos.endOrCursor,
-                             defaultPrefix,
-                             constructing = true))
+                ScopeContext(
+                  src,
+                  name.pos.endOrCursor,
+                  defaultPrefix,
+                  constructing = true))
             case Select(qualifier, name)
                 if qualifier.pos.isDefined && qualifier.pos.isRange =>
               Some(
-                MemberContext(src,
-                              qualifier.pos.endOrCursor,
-                              defaultPrefix,
-                              constructing))
+                MemberContext(
+                  src,
+                  qualifier.pos.endOrCursor,
+                  defaultPrefix,
+                  constructing))
             case Import(expr, _) =>
               val topLevel =
                 ImportTopLevelRegexp.findFirstMatchIn(preceding).isDefined
               if (topLevel) {
                 Some(
-                  ScopeContext(src,
-                               expr.pos.endOrCursor,
-                               defaultPrefix,
-                               constructing = false))
+                  ScopeContext(
+                    src,
+                    expr.pos.endOrCursor,
+                    defaultPrefix,
+                    constructing = false))
               } else {
                 Some(
-                  MemberContext(src,
-                                expr.pos.endOrCursor,
-                                defaultPrefix,
-                                constructing = false))
+                  MemberContext(
+                    src,
+                    expr.pos.endOrCursor,
+                    defaultPrefix,
+                    constructing = false))
               }
             case other =>
               Some(ScopeContext(src, p.point, defaultPrefix, constructing))
@@ -287,10 +294,11 @@ trait CompletionControl { self: RichPresentationCompiler =>
     askOption[Unit] {
       val filtered = members.filter { m =>
         val s = m.sym.nameString
-        matchesPrefix(s,
-                      context.prefix,
-                      matchEntire = false,
-                      caseSens = caseSens) &&
+        matchesPrefix(
+          s,
+          context.prefix,
+          matchEntire = false,
+          caseSens = caseSens) &&
         !s.contains("$")
       }
       logger.info("Filtered down to " + filtered.size + ".")
@@ -303,11 +311,12 @@ trait CompletionControl { self: RichPresentationCompiler =>
                 (context.offset >= p.startOrCursor &&
                   context.offset <= p.endOrCursor)
             if (!sym.isConstructor && !inSymbol) {
-              buff ++= toCompletionInfo(context,
-                                        sym,
-                                        tpe,
-                                        inherited = false,
-                                        NoSymbol)
+              buff ++= toCompletionInfo(
+                context,
+                sym,
+                tpe,
+                inherited = false,
+                NoSymbol)
             }
           case m @ TypeMember(sym, tpe, accessible, inherited, viaView) =>
             if (!sym.isConstructor) {
@@ -377,11 +386,12 @@ object Keywords {
 
   val keywordCompletions =
     keywords map {
-      CompletionInfo(_,
-                     CompletionSignature(List(), "", hasImplicit = false),
-                     false,
-                     100,
-                     None)
+      CompletionInfo(
+        _,
+        CompletionSignature(List(), "", hasImplicit = false),
+        false,
+        100,
+        None)
     }
 }
 
@@ -400,11 +410,12 @@ trait Completion { self: RichPresentationCompiler =>
               if (s.hasPackageFlag) { s.nameString } else { typeShortName(s) }
             if (name.startsWith(prefix))
               Some(
-                CompletionInfo(name,
-                               CompletionSignature(List.empty, "", false),
-                               isCallable = false,
-                               50,
-                               None))
+                CompletionInfo(
+                  name,
+                  CompletionSignature(List.empty, "", false),
+                  isCallable = false,
+                  50,
+                  None))
             else None
           }
           .toList

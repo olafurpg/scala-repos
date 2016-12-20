@@ -43,17 +43,19 @@ class CookieDirectivesSpec extends RoutingSpec {
         status shouldEqual OK
         header[`Set-Cookie`] shouldEqual Some(
           `Set-Cookie`(
-            HttpCookie("myCookie",
-                       "deleted",
-                       expires = deletedTimeStamp,
-                       domain = Some("test.com"))))
+            HttpCookie(
+              "myCookie",
+              "deleted",
+              expires = deletedTimeStamp,
+              domain = Some("test.com"))))
       }
     }
 
     "support deleting multiple cookies at a time" in {
       Get() ~> {
-        deleteCookie(HttpCookie("myCookie", "test.com"),
-                     HttpCookie("myCookie2", "foobar.com")) { completeOk }
+        deleteCookie(
+          HttpCookie("myCookie", "test.com"),
+          HttpCookie("myCookie2", "foobar.com")) { completeOk }
       } ~> check {
         status shouldEqual OK
         headers.collect { case `Set-Cookie`(x) ⇒ x } shouldEqual List(
@@ -96,8 +98,9 @@ class CookieDirectivesSpec extends RoutingSpec {
 
     "support setting multiple cookies at a time" in {
       Get() ~> {
-        setCookie(HttpCookie("myCookie", "test.com"),
-                  HttpCookie("myCookie2", "foobar.com")) { completeOk }
+        setCookie(
+          HttpCookie("myCookie", "test.com"),
+          HttpCookie("myCookie2", "foobar.com")) { completeOk }
       } ~> check {
         status shouldEqual OK
         headers.collect { case `Set-Cookie`(x) ⇒ x } shouldEqual List(

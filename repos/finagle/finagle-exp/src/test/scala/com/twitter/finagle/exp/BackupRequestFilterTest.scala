@@ -28,14 +28,15 @@ class BackupRequestFilterTest
     val statsReceiver = new InMemoryStatsReceiver
     val underlying = mock[Service[String, String]]
     when(underlying.close(anyObject())).thenReturn(Future.Done)
-    val filter = new BackupRequestFilter[String, String](95,
-                                                         maxDuration,
-                                                         timer,
-                                                         statsReceiver,
-                                                         Duration.Top,
-                                                         Stopwatch.timeMillis,
-                                                         1,
-                                                         0.05)
+    val filter = new BackupRequestFilter[String, String](
+      95,
+      maxDuration,
+      timer,
+      statsReceiver,
+      Duration.Top,
+      Stopwatch.timeMillis,
+      1,
+      0.05)
     val service = filter andThen underlying
 
     def cutoff() =

@@ -9,10 +9,11 @@ case class MultipartConfig(location: Option[String] = None,
     extends MountConfig {
 
   def toMultipartConfigElement = {
-    new MultipartConfigElement(location.getOrElse(""),
-                               maxFileSize.getOrElse(-1),
-                               maxRequestSize.getOrElse(-1),
-                               fileSizeThreshold.getOrElse(0))
+    new MultipartConfigElement(
+      location.getOrElse(""),
+      maxFileSize.getOrElse(-1),
+      maxRequestSize.getOrElse(-1),
+      fileSizeThreshold.getOrElse(0))
   }
 
   def apply(ctxt: ServletContext) {

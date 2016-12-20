@@ -38,14 +38,15 @@ import scala.collection.JavaConversions
 import com.yammer.metrics.core.Gauge
 
 object LogAppendInfo {
-  val UnknownLogAppendInfo = LogAppendInfo(-1,
-                                           -1,
-                                           Message.NoTimestamp,
-                                           NoCompressionCodec,
-                                           NoCompressionCodec,
-                                           -1,
-                                           -1,
-                                           false)
+  val UnknownLogAppendInfo = LogAppendInfo(
+    -1,
+    -1,
+    Message.NoTimestamp,
+    NoCompressionCodec,
+    NoCompressionCodec,
+    -1,
+    -1,
+    false)
 }
 
 /**
@@ -119,11 +120,12 @@ class Log(val dir: File,
   val topicAndPartition: TopicAndPartition = Log.parseTopicPartitionName(dir)
 
   info(
-    "Completed load of log %s with log end offset %d".format(name,
-                                                             logEndOffset))
+    "Completed load of log %s with log end offset %d"
+      .format(name, logEndOffset))
 
-  val tags = Map("topic" -> topicAndPartition.topic,
-                 "partition" -> topicAndPartition.partition.toString)
+  val tags = Map(
+    "topic" -> topicAndPartition.topic,
+    "partition" -> topicAndPartition.partition.toString)
 
   newGauge("NumLogSegments", new Gauge[Int] {
     def value = numberOfSegments
@@ -196,13 +198,14 @@ class Log(val dir: File,
         val start =
           filename.substring(0, filename.length - LogFileSuffix.length).toLong
         val indexFile = Log.indexFilename(dir, start)
-        val segment = new LogSegment(dir = dir,
-                                     startOffset = start,
-                                     indexIntervalBytes = config.indexInterval,
-                                     maxIndexSize = config.maxIndexSize,
-                                     rollJitterMs = config.randomSegmentJitter,
-                                     time = time,
-                                     fileAlreadyExists = true)
+        val segment = new LogSegment(
+          dir = dir,
+          startOffset = start,
+          indexIntervalBytes = config.indexInterval,
+          maxIndexSize = config.maxIndexSize,
+          rollJitterMs = config.randomSegmentJitter,
+          time = time,
+          fileAlreadyExists = true)
 
         if (indexFile.exists()) {
           try {
@@ -235,12 +238,14 @@ class Log(val dir: File,
       val startOffset =
         fileName.substring(0, fileName.length - LogFileSuffix.length).toLong
       val indexFile = new File(
-        CoreUtils.replaceSuffix(logFile.getPath,
-                                LogFileSuffix,
-                                IndexFileSuffix) + SwapFileSuffix)
-      val index = new OffsetIndex(file = indexFile,
-                                  baseOffset = startOffset,
-                                  maxIndexSize = config.maxIndexSize)
+        CoreUtils.replaceSuffix(
+          logFile.getPath,
+          LogFileSuffix,
+          IndexFileSuffix) + SwapFileSuffix)
+      val index = new OffsetIndex(
+        file = indexFile,
+        baseOffset = startOffset,
+        maxIndexSize = config.maxIndexSize)
       val swapSegment = new LogSegment(
         new FileMessageSet(file = swapFile),
         index = index,
@@ -254,23 +259,26 @@ class Log(val dir: File,
       swapSegment.recover(config.maxMessageSize)
       val oldSegments =
         logSegments(swapSegment.baseOffset, swapSegment.nextOffset)
-      replaceSegments(swapSegment,
-                      oldSegments.toSeq,
-                      isRecoveredSwapFile = true)
+      replaceSegments(
+        swapSegment,
+        oldSegments.toSeq,
+        isRecoveredSwapFile = true)
     }
 
     if (logSegments.size == 0) {
       // no existing segments, create a new mutable segment beginning at offset 0
-      segments.put(0L,
-                   new LogSegment(dir = dir,
-                                  startOffset = 0,
-                                  indexIntervalBytes = config.indexInterval,
-                                  maxIndexSize = config.maxIndexSize,
-                                  rollJitterMs = config.randomSegmentJitter,
-                                  time = time,
-                                  fileAlreadyExists = false,
-                                  initFileSize = this.initFileSize(),
-                                  preallocate = config.preallocate))
+      segments.put(
+        0L,
+        new LogSegment(
+          dir = dir,
+          startOffset = 0,
+          indexIntervalBytes = config.indexInterval,
+          maxIndexSize = config.maxIndexSize,
+          rollJitterMs = config.randomSegmentJitter,
+          time = time,
+          fileAlreadyExists = false,
+          initFileSize = this.initFileSize(),
+          preallocate = config.preallocate))
     } else {
       recoverLog()
       // reset the index size of the currently active log segment to allow more entries
@@ -279,9 +287,10 @@ class Log(val dir: File,
   }
 
   private def updateLogEndOffset(messageOffset: Long) {
-    nextOffsetMetadata = new LogOffsetMetadata(messageOffset,
-                                               activeSegment.baseOffset,
-                                               activeSegment.size.toInt)
+    nextOffsetMetadata = new LogOffsetMetadata(
+      messageOffset,
+      activeSegment.baseOffset,
+      activeSegment.size.toInt)
   }
 
   private def recoverLog() {
@@ -296,8 +305,8 @@ class Log(val dir: File,
     while (unflushed.hasNext) {
       val curr = unflushed.next
       info(
-        "Recovering unflushed segment %d in log %s.".format(curr.baseOffset,
-                                                            name))
+        "Recovering unflushed segment %d in log %s."
+          .format(curr.baseOffset, name))
       val truncatedBytes = try {
         curr.recover(config.maxMessageSize)
       } catch {
@@ -410,8 +419,9 @@ class Log(val dir: File,
                   .mark(messages.sizeInBytes)
                 throw new RecordTooLargeException(
                   "Message size is %d bytes which exceeds the maximum configured message size of %d."
-                    .format(MessageSet.entrySize(messageAndOffset.message),
-                            config.maxMessageSize))
+                    .format(
+                      MessageSet.entrySize(messageAndOffset.message),
+                      config.maxMessageSize))
               }
             }
           }
@@ -441,10 +451,11 @@ class Log(val dir: File,
 
         trace(
           "Appended message set to log %s with first offset: %d, next offset: %d, and messages: %s"
-            .format(this.name,
-                    appendInfo.firstOffset,
-                    nextOffsetMetadata.messageOffset,
-                    validMessages))
+            .format(
+              this.name,
+              appendInfo.firstOffset,
+              nextOffsetMetadata.messageOffset,
+              validMessages))
 
         if (unflushedMessages >= config.flushInterval) flush()
 
@@ -520,14 +531,15 @@ class Log(val dir: File,
     val targetCodec = BrokerCompressionCodec
       .getTargetCompressionCodec(config.compressionType, sourceCodec)
 
-    LogAppendInfo(firstOffset,
-                  lastOffset,
-                  Message.NoTimestamp,
-                  sourceCodec,
-                  targetCodec,
-                  shallowMessageCount,
-                  validBytesCount,
-                  monotonic)
+    LogAppendInfo(
+      firstOffset,
+      lastOffset,
+      Message.NoTimestamp,
+      sourceCodec,
+      targetCodec,
+      shallowMessageCount,
+      validBytesCount,
+      monotonic)
   }
 
   /**
@@ -699,13 +711,14 @@ class Log(val dir: File,
           segment.rollJitterMs || segment.index.isFull) {
       debug(
         "Rolling new log segment in %s (log_size = %d/%d, index_size = %d/%d, age_ms = %d/%d)."
-          .format(name,
-                  segment.size,
-                  config.segmentSize,
-                  segment.index.entries,
-                  segment.index.maxEntries,
-                  time.milliseconds - segment.created,
-                  config.segmentMs - segment.rollJitterMs))
+          .format(
+            name,
+            segment.size,
+            config.segmentSize,
+            segment.index.entries,
+            segment.index.maxEntries,
+            time.milliseconds - segment.created,
+            config.segmentMs - segment.rollJitterMs))
       roll()
     } else {
       segment
@@ -737,15 +750,16 @@ class Log(val dir: File,
           entry.getValue.log.trim()
         }
       }
-      val segment = new LogSegment(dir,
-                                   startOffset = newOffset,
-                                   indexIntervalBytes = config.indexInterval,
-                                   maxIndexSize = config.maxIndexSize,
-                                   rollJitterMs = config.randomSegmentJitter,
-                                   time = time,
-                                   fileAlreadyExists = false,
-                                   initFileSize = initFileSize,
-                                   preallocate = config.preallocate)
+      val segment = new LogSegment(
+        dir,
+        startOffset = newOffset,
+        indexIntervalBytes = config.indexInterval,
+        maxIndexSize = config.maxIndexSize,
+        rollJitterMs = config.randomSegmentJitter,
+        time = time,
+        fileAlreadyExists = false,
+        initFileSize = initFileSize,
+        preallocate = config.preallocate)
       val prev = addSegment(segment)
       if (prev != null)
         throw new KafkaException(
@@ -845,15 +859,16 @@ class Log(val dir: File,
       val segmentsToDelete = logSegments.toList
       segmentsToDelete.foreach(deleteSegment(_))
       addSegment(
-        new LogSegment(dir,
-                       newOffset,
-                       indexIntervalBytes = config.indexInterval,
-                       maxIndexSize = config.maxIndexSize,
-                       rollJitterMs = config.randomSegmentJitter,
-                       time = time,
-                       fileAlreadyExists = false,
-                       initFileSize = initFileSize,
-                       preallocate = config.preallocate))
+        new LogSegment(
+          dir,
+          newOffset,
+          indexIntervalBytes = config.indexInterval,
+          maxIndexSize = config.maxIndexSize,
+          rollJitterMs = config.randomSegmentJitter,
+          time = time,
+          fileAlreadyExists = false,
+          initFileSize = initFileSize,
+          preallocate = config.preallocate))
       updateLogEndOffset(newOffset)
       this.recoveryPoint = math.min(newOffset, this.recoveryPoint)
     }
@@ -959,8 +974,9 @@ class Log(val dir: File,
       // need to do this in two phases to be crash safe AND do the delete asynchronously
       // if we crash in the middle of this we complete the swap in loadSegments()
       if (!isRecoveredSwapFile)
-        newSegment.changeFileSuffixes(Log.CleanedFileSuffix,
-                                      Log.SwapFileSuffix)
+        newSegment.changeFileSuffixes(
+          Log.CleanedFileSuffix,
+          Log.SwapFileSuffix)
       addSegment(newSegment)
 
       // delete the old files

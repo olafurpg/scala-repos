@@ -300,9 +300,10 @@ final class Vector[+A] private[immutable] (
           if (depth > 1) {
             val newBlockIndex = blockIndex + shift
             val newFocus = focus + shift
-            val s = new Vector(startIndex - 1 + shift,
-                               endIndex + shift,
-                               newBlockIndex)
+            val s = new Vector(
+              startIndex - 1 + shift,
+              endIndex + shift,
+              newBlockIndex)
             s.initFrom(this)
             s.dirty = dirty
             s.shiftTopLevel(0, shiftBlocks) // shift right by n blocks
@@ -321,15 +322,17 @@ final class Vector[+A] private[immutable] (
             //assert(newBlockIndex == 0)
             //assert(newFocus == 0)
 
-            val s = new Vector(startIndex - 1 + shift,
-                               endIndex + shift,
-                               newBlockIndex)
+            val s = new Vector(
+              startIndex - 1 + shift,
+              endIndex + shift,
+              newBlockIndex)
             s.initFrom(this)
             s.dirty = dirty
             s.shiftTopLevel(0, shiftBlocks) // shift right by n elements
-            s.gotoPosWritable(newFocus,
-                              newBlockIndex,
-                              newFocus ^ newBlockIndex) // prepare for writing
+            s.gotoPosWritable(
+              newFocus,
+              newBlockIndex,
+              newFocus ^ newBlockIndex) // prepare for writing
             s.display0(shift - 1) = value.asInstanceOf[AnyRef]
             s.debug()
             s
@@ -362,9 +365,10 @@ final class Vector[+A] private[immutable] (
           val s = new Vector(startIndex - 1, endIndex, newBlockIndex)
           s.initFrom(this)
           s.dirty = dirty
-          s.gotoFreshPosWritable(newFocus,
-                                 newBlockIndex,
-                                 newFocus ^ newBlockIndex)
+          s.gotoFreshPosWritable(
+            newFocus,
+            newBlockIndex,
+            newFocus ^ newBlockIndex)
           s.display0(lo) = value.asInstanceOf[AnyRef]
           //assert(s.depth == depth)
           s
@@ -408,16 +412,18 @@ final class Vector[+A] private[immutable] (
           if (depth > 1) {
             val newBlockIndex = blockIndex - shift
             val newFocus = focus - shift
-            val s = new Vector(startIndex - shift,
-                               endIndex + 1 - shift,
-                               newBlockIndex)
+            val s = new Vector(
+              startIndex - shift,
+              endIndex + 1 - shift,
+              newBlockIndex)
             s.initFrom(this)
             s.dirty = dirty
             s.shiftTopLevel(shiftBlocks, 0) // shift left by n blocks
             s.debug()
-            s.gotoFreshPosWritable(newFocus,
-                                   newBlockIndex,
-                                   newFocus ^ newBlockIndex)
+            s.gotoFreshPosWritable(
+              newFocus,
+              newBlockIndex,
+              newFocus ^ newBlockIndex)
             s.display0(lo) = value.asInstanceOf[AnyRef]
             s.debug()
             //assert(depth == s.depth)
@@ -429,15 +435,17 @@ final class Vector[+A] private[immutable] (
             //assert(newBlockIndex == 0)
             //assert(newFocus == 0)
 
-            val s = new Vector(startIndex - shift,
-                               endIndex + 1 - shift,
-                               newBlockIndex)
+            val s = new Vector(
+              startIndex - shift,
+              endIndex + 1 - shift,
+              newBlockIndex)
             s.initFrom(this)
             s.dirty = dirty
             s.shiftTopLevel(shiftBlocks, 0) // shift right by n elements
-            s.gotoPosWritable(newFocus,
-                              newBlockIndex,
-                              newFocus ^ newBlockIndex)
+            s.gotoPosWritable(
+              newFocus,
+              newBlockIndex,
+              newFocus ^ newBlockIndex)
             s.display0(32 - shift) = value.asInstanceOf[AnyRef]
             s.debug()
             s
@@ -449,9 +457,10 @@ final class Vector[+A] private[immutable] (
           val s = new Vector(startIndex, endIndex + 1, newBlockIndex)
           s.initFrom(this)
           s.dirty = dirty
-          s.gotoFreshPosWritable(newFocus,
-                                 newBlockIndex,
-                                 newFocus ^ newBlockIndex)
+          s.gotoFreshPosWritable(
+            newFocus,
+            newBlockIndex,
+            newFocus ^ newBlockIndex)
           s.display0(lo) = value.asInstanceOf[AnyRef]
           //assert(s.depth == depth+1) might or might not create new level!
           if (s.depth == depth + 1) {
@@ -1201,11 +1210,12 @@ private[immutable] trait VectorPointer[T] {
                                          oldLeft: Int,
                                          newLeft: Int) = {
     val elems = new Array[AnyRef](32)
-    Platform.arraycopy(array,
-                       oldLeft,
-                       elems,
-                       newLeft,
-                       32 - math.max(newLeft, oldLeft))
+    Platform.arraycopy(
+      array,
+      oldLeft,
+      elems,
+      newLeft,
+      32 - math.max(newLeft, oldLeft))
     elems
   }
 

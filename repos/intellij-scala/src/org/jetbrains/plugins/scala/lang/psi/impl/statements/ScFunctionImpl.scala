@@ -38,8 +38,9 @@ abstract class ScFunctionImpl protected (stub: StubElement[ScFunction],
     }
     if (n == null) {
       return ScalaPsiElementFactory
-        .createIdentifier(getStub.asInstanceOf[ScFunctionStub].getName,
-                          getManager)
+        .createIdentifier(
+          getStub.asInstanceOf[ScFunctionStub].getName,
+          getManager)
         .getPsi
     }
     n.getPsi

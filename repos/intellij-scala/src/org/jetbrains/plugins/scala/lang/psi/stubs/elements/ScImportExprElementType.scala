@@ -47,10 +47,11 @@ class ScImportExprElementType[Func <: ScImportExpr]
                       parentStub: Any): ScImportExprStub = {
     val refText: String = StringRef.toString(dataStream.readName)
     val singleW: Boolean = dataStream.readBoolean
-    new ScImportExprStubImpl(parentStub.asInstanceOf[StubElement[PsiElement]],
-                             this,
-                             refText,
-                             singleW)
+    new ScImportExprStubImpl(
+      parentStub.asInstanceOf[StubElement[PsiElement]],
+      this,
+      refText,
+      singleW)
   }
 
   def indexStub(stub: ScImportExprStub, sink: IndexSink): Unit = {}

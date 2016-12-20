@@ -36,11 +36,12 @@ class RelationalTypeTest extends AsyncTest[RelationalTestDB] {
       testStore[Double](-1.0, 0.0, 1.0),
       testStore[Float](-1.0f, 0.0f, 1.0f),
       ifCap(rcap.typeBigDecimal) {
-        testStore[BigDecimal](BigDecimal("-1"),
-                              BigDecimal("0"),
-                              BigDecimal("1"),
-                              BigDecimal(Long.MinValue),
-                              BigDecimal(Long.MaxValue))
+        testStore[BigDecimal](
+          BigDecimal("-1"),
+          BigDecimal("0"),
+          BigDecimal("1"),
+          BigDecimal(Long.MinValue),
+          BigDecimal(Long.MaxValue))
       }
     )
   }

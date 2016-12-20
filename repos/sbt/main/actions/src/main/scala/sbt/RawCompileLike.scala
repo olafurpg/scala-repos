@@ -78,12 +78,13 @@ object RawCompileLike {
           outputChanged(cache / "output") {
             (outChanged, outputs: FilesInfo[PlainFileInfo]) =>
               if (inChanged || outChanged)
-                doCompile(sources,
-                          classpath,
-                          outputDirectory,
-                          options,
-                          maxErrors,
-                          log)
+                doCompile(
+                  sources,
+                  classpath,
+                  outputDirectory,
+                  options,
+                  maxErrors,
+                  log)
               else log.debug("Uptodate: " + outputDirectory.getAbsolutePath)
           }
       }
@@ -105,12 +106,13 @@ object RawCompileLike {
     }
   def filterSources(f: File => Boolean, doCompile: Gen): Gen =
     (sources, classpath, outputDirectory, options, maxErrors, log) =>
-      doCompile(sources filter f,
-                classpath,
-                outputDirectory,
-                options,
-                maxErrors,
-                log)
+      doCompile(
+        sources filter f,
+        classpath,
+        outputDirectory,
+        options,
+        maxErrors,
+        log)
 
   def rawCompile(instance: ScalaInstance, cpOptions: ClasspathOptions): Gen =
     (sources, classpath, outputDirectory, options, maxErrors, log) => {

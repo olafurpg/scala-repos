@@ -200,9 +200,10 @@ class PolyTests {
 
     val m2 = pairMap(list)
     typed[(List[List[Int]], List[List[String]])](m2)
-    assertEquals((List(List(1), List(2), List(3)),
-                  List(List("foo"), List("bar"), List("baz"))),
-                 m2)
+    assertEquals(
+      (List(List(1), List(2), List(3)),
+       List(List("foo"), List("bar"), List("baz"))),
+      m2)
 
     val l5 = List(1, 2, 3)
     val l6 = l5 map option

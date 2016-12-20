@@ -47,11 +47,12 @@ abstract class Specs2SpecialCharactersTest extends Specs2TestCase {
       testName + ".scala",
       checkConfigAndSettings(_, testName, "Comma , test"),
       root =>
-        checkResultTreeHasExactNamedPath(root,
-                                         "[root]",
-                                         testName,
-                                         "Special characters test should",
-                                         "Comma , " + "test"))
+        checkResultTreeHasExactNamedPath(
+          root,
+          "[root]",
+          testName,
+          "Special characters test should",
+          "Comma , " + "test"))
   }
 
   def testExclamation(): Unit = {
@@ -65,11 +66,12 @@ abstract class Specs2SpecialCharactersTest extends Specs2TestCase {
       testName + ".scala",
       checkConfigAndSettings(_, testName, "! test"),
       root =>
-        checkResultTreeHasExactNamedPath(root,
-                                         "[root]",
-                                         testName,
-                                         "Special characters test should",
-                                         "! test"))
+        checkResultTreeHasExactNamedPath(
+          root,
+          "[root]",
+          testName,
+          "Special characters test should",
+          "! test"))
   }
 
   def testTick(): Unit = {
@@ -83,11 +85,12 @@ abstract class Specs2SpecialCharactersTest extends Specs2TestCase {
       testName + ".scala",
       checkConfigAndSettings(_, testName, "tick ' test"),
       root =>
-        checkResultTreeHasExactNamedPath(root,
-                                         "[root]",
-                                         testName,
-                                         "Special characters test should",
-                                         "tick ' " + "test"))
+        checkResultTreeHasExactNamedPath(
+          root,
+          "[root]",
+          testName,
+          "Special characters test should",
+          "tick ' " + "test"))
   }
 
   def testBacktick(): Unit = {
@@ -101,11 +104,12 @@ abstract class Specs2SpecialCharactersTest extends Specs2TestCase {
       testName + ".scala",
       checkConfigAndSettings(_, testName, "backtick ` test"),
       root =>
-        checkResultTreeHasExactNamedPath(root,
-                                         "[root]",
-                                         testName,
-                                         "Special characters test should",
-                                         "backtick " + "` test"))
+        checkResultTreeHasExactNamedPath(
+          root,
+          "[root]",
+          testName,
+          "Special characters test should",
+          "backtick " + "` test"))
   }
 
   def testTilde(): Unit = {
@@ -119,10 +123,11 @@ abstract class Specs2SpecialCharactersTest extends Specs2TestCase {
       testName + ".scala",
       checkConfigAndSettings(_, testName, "tilde ~ test"),
       root =>
-        checkResultTreeHasExactNamedPath(root,
-                                         "[root]",
-                                         testName,
-                                         "Special characters test should",
-                                         "tilde ~ " + "test"))
+        checkResultTreeHasExactNamedPath(
+          root,
+          "[root]",
+          testName,
+          "Special characters test should",
+          "tilde ~ " + "test"))
   }
 }

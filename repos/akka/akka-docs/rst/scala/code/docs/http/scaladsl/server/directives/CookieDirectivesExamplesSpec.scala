@@ -52,9 +52,10 @@ class CookieDirectivesExamplesSpec extends RoutingSpec {
       responseAs[String] shouldEqual "The user was logged out"
       header[`Set-Cookie`] shouldEqual Some(
         `Set-Cookie`(
-          HttpCookie("userName",
-                     value = "deleted",
-                     expires = Some(DateTime.MinValue))))
+          HttpCookie(
+            "userName",
+            value = "deleted",
+            expires = Some(DateTime.MinValue))))
     }
   }
   "setCookie" in {

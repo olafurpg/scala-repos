@@ -529,8 +529,9 @@ class CryptoConfigParser @Inject()(environment: Environment,
           "The application secret has not been set, and we are in prod mode. Your application is not secure.")
         logger.error(
           "To set the application secret, please read http://playframework.com/documentation/latest/ApplicationSecret")
-        throw new PlayException("Configuration error",
-                                "Application secret not set")
+        throw new PlayException(
+          "Configuration error",
+          "Application secret not set")
       case Some("changeme") | Some(Blank()) | None =>
         val appConfLocation = environment.resource("application.conf")
         // Try to generate a stable secret. Security is not the issue here, since this is just for tests and dev mode.

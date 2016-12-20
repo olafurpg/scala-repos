@@ -16,8 +16,9 @@ object $save {
     apply[String, A](doc)
 
   def apply[ID: Writes, A: InColl](id: ID, doc: JsObject): Funit =
-    $update($select(id),
-            doc + ("_id" -> Json.toJson(id)),
-            upsert = true,
-            multi = false)
+    $update(
+      $select(id),
+      doc + ("_id" -> Json.toJson(id)),
+      upsert = true,
+      multi = false)
 }

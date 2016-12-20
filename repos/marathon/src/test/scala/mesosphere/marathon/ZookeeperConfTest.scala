@@ -22,8 +22,9 @@ class ZookeeperConfTest extends MarathonSpec {
   }
 
   test("wrongURLIsNotParsed") {
-    assert(Try(conf("--zk", "zk://host1:foo/path")).isFailure,
-           "No port number")
+    assert(
+      Try(conf("--zk", "zk://host1:foo/path")).isFailure,
+      "No port number")
     assert(Try(conf("--zk", "zk://host1")).isFailure, "No path")
   }
 

@@ -76,8 +76,9 @@ private[http] abstract class HttpMessageParser[
         case e: ParsingException ⇒ failMessageStart(e.status, e.info)
         case NotEnoughDataException ⇒
           // we are missing a try/catch{continue} wrapper somewhere
-          throw new IllegalStateException("unexpected NotEnoughDataException",
-                                          NotEnoughDataException)
+          throw new IllegalStateException(
+            "unexpected NotEnoughDataException",
+            NotEnoughDataException)
       }) match {
         case Trampoline(x) ⇒ run(x)
         case x ⇒ x
@@ -154,53 +155,57 @@ private[http] abstract class HttpMessageParser[
       resultHeader match {
         case null ⇒
           continue(input, lineStart)(
-            parseHeaderLinesAux(headers,
-                                headerCount,
-                                ch,
-                                clh,
-                                cth,
-                                teh,
-                                e100c,
-                                hh))
+            parseHeaderLinesAux(
+              headers,
+              headerCount,
+              ch,
+              clh,
+              cth,
+              teh,
+              e100c,
+              hh))
 
         case EmptyHeader ⇒
           val close = HttpMessage.connectionCloseExpected(protocol, ch)
           setCompletionHandling(CompletionIsEntityStreamError)
-          parseEntity(headers.toList,
-                      protocol,
-                      input,
-                      lineEnd,
-                      clh,
-                      cth,
-                      teh,
-                      e100c,
-                      hh,
-                      close)
+          parseEntity(
+            headers.toList,
+            protocol,
+            input,
+            lineEnd,
+            clh,
+            cth,
+            teh,
+            e100c,
+            hh,
+            close)
 
         case h: `Content-Length` ⇒
           clh match {
             case None ⇒
-              parseHeaderLines(input,
-                               lineEnd,
-                               headers,
-                               headerCount + 1,
-                               ch,
-                               Some(h),
-                               cth,
-                               teh,
-                               e100c,
-                               hh)
+              parseHeaderLines(
+                input,
+                lineEnd,
+                headers,
+                headerCount + 1,
+                ch,
+                Some(h),
+                cth,
+                teh,
+                e100c,
+                hh)
             case Some(`h`) ⇒
-              parseHeaderLines(input,
-                               lineEnd,
-                               headers,
-                               headerCount,
-                               ch,
-                               clh,
-                               cth,
-                               teh,
-                               e100c,
-                               hh)
+              parseHeaderLines(
+                input,
+                lineEnd,
+                headers,
+                headerCount,
+                ch,
+                clh,
+                cth,
+                teh,
+                e100c,
+                hh)
             case _ ⇒
               failMessageStart(
                 "HTTP message must not contain more than one Content-Length header")
@@ -208,27 +213,29 @@ private[http] abstract class HttpMessageParser[
         case h: `Content-Type` ⇒
           cth match {
             case None ⇒
-              parseHeaderLines(input,
-                               lineEnd,
-                               headers,
-                               headerCount + 1,
-                               ch,
-                               clh,
-                               Some(h),
-                               teh,
-                               e100c,
-                               hh)
+              parseHeaderLines(
+                input,
+                lineEnd,
+                headers,
+                headerCount + 1,
+                ch,
+                clh,
+                Some(h),
+                teh,
+                e100c,
+                hh)
             case Some(`h`) ⇒
-              parseHeaderLines(input,
-                               lineEnd,
-                               headers,
-                               headerCount,
-                               ch,
-                               clh,
-                               cth,
-                               teh,
-                               e100c,
-                               hh)
+              parseHeaderLines(
+                input,
+                lineEnd,
+                headers,
+                headerCount,
+                ch,
+                clh,
+                cth,
+                teh,
+                e100c,
+                hh)
             case _ ⇒
               failMessageStart(
                 "HTTP message must not contain more than one Content-Type header")
@@ -236,92 +243,99 @@ private[http] abstract class HttpMessageParser[
         case h: `Transfer-Encoding` ⇒
           teh match {
             case None ⇒
-              parseHeaderLines(input,
-                               lineEnd,
-                               headers,
-                               headerCount + 1,
-                               ch,
-                               clh,
-                               cth,
-                               Some(h),
-                               e100c,
-                               hh)
+              parseHeaderLines(
+                input,
+                lineEnd,
+                headers,
+                headerCount + 1,
+                ch,
+                clh,
+                cth,
+                Some(h),
+                e100c,
+                hh)
             case Some(x) ⇒
-              parseHeaderLines(input,
-                               lineEnd,
-                               headers,
-                               headerCount,
-                               ch,
-                               clh,
-                               cth,
-                               Some(x append h.encodings),
-                               e100c,
-                               hh)
+              parseHeaderLines(
+                input,
+                lineEnd,
+                headers,
+                headerCount,
+                ch,
+                clh,
+                cth,
+                Some(x append h.encodings),
+                e100c,
+                hh)
           }
         case h: Connection ⇒
           ch match {
             case None ⇒
-              parseHeaderLines(input,
-                               lineEnd,
-                               headers += h,
-                               headerCount + 1,
-                               Some(h),
-                               clh,
-                               cth,
-                               teh,
-                               e100c,
-                               hh)
+              parseHeaderLines(
+                input,
+                lineEnd,
+                headers += h,
+                headerCount + 1,
+                Some(h),
+                clh,
+                cth,
+                teh,
+                e100c,
+                hh)
             case Some(x) ⇒
-              parseHeaderLines(input,
-                               lineEnd,
-                               headers,
-                               headerCount,
-                               Some(x append h.tokens),
-                               clh,
-                               cth,
-                               teh,
-                               e100c,
-                               hh)
+              parseHeaderLines(
+                input,
+                lineEnd,
+                headers,
+                headerCount,
+                Some(x append h.tokens),
+                clh,
+                cth,
+                teh,
+                e100c,
+                hh)
           }
         case h: Host ⇒
           if (!hh)
-            parseHeaderLines(input,
-                             lineEnd,
-                             headers += h,
-                             headerCount + 1,
-                             ch,
-                             clh,
-                             cth,
-                             teh,
-                             e100c,
-                             hh = true)
+            parseHeaderLines(
+              input,
+              lineEnd,
+              headers += h,
+              headerCount + 1,
+              ch,
+              clh,
+              cth,
+              teh,
+              e100c,
+              hh = true)
           else
             failMessageStart(
               "HTTP message must not contain more than one Host header")
 
         case h: Expect ⇒
-          parseHeaderLines(input,
-                           lineEnd,
-                           headers += h,
-                           headerCount + 1,
-                           ch,
-                           clh,
-                           cth,
-                           teh,
-                           e100c = true,
-                           hh)
+          parseHeaderLines(
+            input,
+            lineEnd,
+            headers += h,
+            headerCount + 1,
+            ch,
+            clh,
+            cth,
+            teh,
+            e100c = true,
+            hh)
 
         case h ⇒
-          parseHeaderLines(input,
-                           lineEnd,
-                           headers += h,
-                           headerCount + 1,
-                           ch,
-                           clh,
-                           cth,
-                           teh,
-                           e100c,
-                           hh)
+          parseHeaderLines(
+            input,
+            lineEnd,
+            headers += h,
+            headerCount + 1,
+            ch,
+            clh,
+            cth,
+            teh,
+            e100c,
+            hh)
       }
     } else
       failMessageStart(
@@ -337,16 +351,17 @@ private[http] abstract class HttpMessageParser[
       teh: Option[`Transfer-Encoding`],
       e100c: Boolean,
       hh: Boolean)(input: ByteString, lineStart: Int): StateResult =
-    parseHeaderLines(input,
-                     lineStart,
-                     headers,
-                     headerCount,
-                     ch,
-                     clh,
-                     cth,
-                     teh,
-                     e100c,
-                     hh)
+    parseHeaderLines(
+      input,
+      lineStart,
+      headers,
+      headerCount,
+      ch,
+      clh,
+      cth,
+      teh,
+      e100c,
+      hh)
 
   def parseEntity(headers: List[HttpHeader],
                   protocol: HttpProtocol,
@@ -367,8 +382,9 @@ private[http] abstract class HttpMessageParser[
       if (remainingInputBytes < remainingBodyBytes) {
         emit(EntityPart(input.drop(bodyStart).compact))
         continue(
-          parseFixedLengthBody(remainingBodyBytes - remainingInputBytes,
-                               isLastMessage))
+          parseFixedLengthBody(
+            remainingBodyBytes - remainingInputBytes,
+            isLastMessage))
       } else {
         val offset = bodyStart + remainingBodyBytes.toInt
         emit(EntityPart(input.slice(bodyStart, offset).compact))
@@ -409,10 +425,11 @@ private[http] abstract class HttpMessageParser[
             if (isLastMessage) terminate()
             else startNewMessage(input, lineEnd)
           case header if headerCount < maxHeaderCount ⇒
-            parseTrailer(extension,
-                         lineEnd,
-                         header :: headers,
-                         headerCount + 1)
+            parseTrailer(
+              extension,
+              lineEnd,
+              header :: headers,
+              headerCount + 1)
           case _ ⇒
             failEntityStream(
               s"Chunk trailer contains more than the configured limit of $maxHeaderCount headers")
@@ -428,14 +445,15 @@ private[http] abstract class HttpMessageParser[
         def result(terminatorLen: Int) = {
           emit(
             EntityChunk(
-              HttpEntity.Chunk(input.slice(cursor, chunkBodyEnd).compact,
-                               extension)))
+              HttpEntity
+                .Chunk(input.slice(cursor, chunkBodyEnd).compact, extension)))
           Trampoline(
             _ ⇒
-              parseChunk(input,
-                         chunkBodyEnd + terminatorLen,
-                         isLastMessage,
-                         totalBytesRead + chunkSize))
+              parseChunk(
+                input,
+                chunkBodyEnd + terminatorLen,
+                isLastMessage,
+                totalBytesRead + chunkSize))
         }
         byteChar(input, chunkBodyEnd) match {
           case '\r' if byteChar(input, chunkBodyEnd + 1) == '\n' ⇒ result(2)
@@ -555,8 +573,9 @@ private[http] abstract class HttpMessageParser[
                    bodyStart: Int,
                    contentLength: Int) =
     StrictEntityCreator(
-      HttpEntity.Strict(contentType(cth),
-                        input.slice(bodyStart, bodyStart + contentLength)))
+      HttpEntity.Strict(
+        contentType(cth),
+        input.slice(bodyStart, bodyStart + contentLength)))
 
   def defaultEntity[A <: ParserOutput](cth: Option[`Content-Type`],
                                        contentLength: Long) =
@@ -565,9 +584,10 @@ private[http] abstract class HttpMessageParser[
         case EntityPart(bytes) ⇒ bytes
         case EntityStreamError(info) ⇒ throw EntityStreamException(info)
       }
-      HttpEntity.Default(contentType(cth),
-                         contentLength,
-                         HttpEntity.limitableByteSource(data))
+      HttpEntity.Default(
+        contentType(cth),
+        contentLength,
+        HttpEntity.limitableByteSource(data))
     }
 
   def chunkedEntity[A <: ParserOutput](cth: Option[`Content-Type`]) =
@@ -576,8 +596,9 @@ private[http] abstract class HttpMessageParser[
         case EntityChunk(chunk) ⇒ chunk
         case EntityStreamError(info) ⇒ throw EntityStreamException(info)
       }
-      HttpEntity.Chunked(contentType(cth),
-                         HttpEntity.limitableChunkSource(chunks))
+      HttpEntity.Chunked(
+        contentType(cth),
+        HttpEntity.limitableChunkSource(chunks))
     }
 
   def addTransferEncodingWithChunkedPeeled(
@@ -600,8 +621,9 @@ private[http] object HttpMessageParser {
   val CompletionOk: CompletionHandling = () ⇒ None
   val CompletionIsMessageStartError: CompletionHandling = () ⇒
     Some(
-      ParserOutput.MessageStartError(StatusCodes.BadRequest,
-                                     ErrorInfo("Illegal HTTP message start")))
+      ParserOutput.MessageStartError(
+        StatusCodes.BadRequest,
+        ErrorInfo("Illegal HTTP message start")))
   val CompletionIsEntityStreamError: CompletionHandling = () ⇒
     Some(ParserOutput.EntityStreamError(ErrorInfo("Entity stream truncation")))
 }

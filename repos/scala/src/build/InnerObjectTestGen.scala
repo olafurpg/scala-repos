@@ -308,8 +308,9 @@ object Test {
     generate(depth, payloadMT, "runTest", List(), allowMT)
 
     println(
-      template.format(header,
-                      bodies.mkString("", "\n", ""),
-                      triggers.mkString("", "\n", "")))
+      template.format(
+        header,
+        bodies.mkString("", "\n", ""),
+        triggers.mkString("", "\n", "")))
   }
 }

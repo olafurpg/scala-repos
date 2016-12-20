@@ -31,19 +31,22 @@ object TestOptions {
       if (extractInTargetFolder)
         kdc.unpackDirectory(new File("target/paxexam/unpack/"))
       else kdc,
-      editConfigurationFilePut("etc/config.properties",
-                               "karaf.framework",
-                               "equinox"))
+      editConfigurationFilePut(
+        "etc/config.properties",
+        "karaf.framework",
+        "equinox"))
   }
 
   def testBundles(): PaxOption = {
     new DefaultCompositeOption(
-      mavenBundle("com.typesafe.akka",
-                  "akka-testkit_%s"
-                    .format(scalaDepVersion)).versionAsInProject,
-      mavenBundle("org.scalatest",
-                  "scalatest_%s"
-                    .format(scalaDepVersion)).versionAsInProject,
+      mavenBundle(
+        "com.typesafe.akka",
+        "akka-testkit_%s"
+          .format(scalaDepVersion)).versionAsInProject,
+      mavenBundle(
+        "org.scalatest",
+        "scalatest_%s"
+          .format(scalaDepVersion)).versionAsInProject,
       junitBundles)
   }
 
@@ -51,9 +54,10 @@ object TestOptions {
                      LogLevelOption.LogLevel.INFO,
                    debugPort: Option[Int] = None): PaxOption = {
     val options: List[PaxOption] =
-      List(logLevel(level),
-           configureConsole().startLocalConsole(),
-           configureConsole().startRemoteShell()) ++ debugPort.toList.map(p =>
+      List(
+        logLevel(level),
+        configureConsole().startLocalConsole(),
+        configureConsole().startRemoteShell()) ++ debugPort.toList.map(p =>
         debugConfiguration(String.valueOf(p), true))
     new DefaultCompositeOption(options: _*)
   }

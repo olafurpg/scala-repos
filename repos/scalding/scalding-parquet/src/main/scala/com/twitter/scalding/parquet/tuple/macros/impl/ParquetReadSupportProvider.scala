@@ -18,8 +18,9 @@ object ParquetReadSupportProvider {
     import ctx.universe._
 
     if (!IsCaseClassImpl.isCaseClassType(ctx)(T.tpe))
-      ctx.abort(ctx.enclosingPosition,
-                s"""We cannot enforce ${T.tpe} is a case class,
+      ctx.abort(
+        ctx.enclosingPosition,
+        s"""We cannot enforce ${T.tpe} is a case class,
             either it is not a case class or this macro call is possibly enclosed in a class.
             This will mean the macro is operating on a non-resolved type.""")
 
@@ -141,11 +142,12 @@ object ParquetReadSupportProvider {
                         keyConverter: Tree,
                         valueConverter: Tree): (Tree, Tree, Tree, Tree) = {
         val converterName = newTermName(ctx.fresh(s"fieldConverter"))
-        val mapConverter = createMapFieldConverter(converterName,
-                                                   K,
-                                                   V,
-                                                   keyConverter,
-                                                   valueConverter)
+        val mapConverter = createMapFieldConverter(
+          converterName,
+          K,
+          V,
+          keyConverter,
+          valueConverter)
         createFieldMatchResult(converterName, mapConverter)
       }
 
@@ -181,10 +183,11 @@ object ParquetReadSupportProvider {
           val (valueConverter, _, _, _) = matchField(0, valueType, MAP)
           matchMapField(keyType, valueType, keyConverter, valueConverter)
         case tpe if IsCaseClassImpl.isCaseClassType(ctx)(tpe) =>
-          val (innerConverters,
-               innerConvertersGetters,
-               innerConvertersResetCalls,
-               innerFieldValues) = unzip(expandMethod(tpe))
+          val (
+            innerConverters,
+            innerConvertersGetters,
+            innerConvertersResetCalls,
+            innerFieldValues) = unzip(expandMethod(tpe))
           val innerValueBuilderTree = buildTupleValue(tpe, innerFieldValues)
           val converterTree: Tree = buildGroupConverter(
             tpe,
@@ -194,8 +197,9 @@ object ParquetReadSupportProvider {
             innerValueBuilderTree)
           matchCaseClassField(converterTree)
         case _ =>
-          ctx.abort(ctx.enclosingPosition,
-                    s"Case class $T has unsupported field type : $fieldType ")
+          ctx.abort(
+            ctx.enclosingPosition,
+            s"Case class $T has unsupported field type : $fieldType ")
       }
     }
 
@@ -215,10 +219,11 @@ object ParquetReadSupportProvider {
     def unzip(treeTuples: List[(Tree, Tree, Tree, Tree)])
       : (List[Tree], List[Tree], List[Tree], List[Tree]) = {
       val emptyTreeList = List[Tree]()
-      treeTuples.foldRight(emptyTreeList,
-                           emptyTreeList,
-                           emptyTreeList,
-                           emptyTreeList) {
+      treeTuples.foldRight(
+        emptyTreeList,
+        emptyTreeList,
+        emptyTreeList,
+        emptyTreeList) {
         case ((t1, t2, t3, t4), (l1, l2, l3, l4)) =>
           (t1 :: l1, t2 :: l2, t3 :: l3, t4 :: l4)
       }

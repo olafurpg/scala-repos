@@ -19,8 +19,9 @@ class DataSourceTest {
     try {
       assertEquals(
         1,
-        Await.result(dc.db.run(sql"select lock_mode()".as[Int].head),
-                     Duration.Inf))
+        Await.result(
+          dc.db.run(sql"select lock_mode()".as[Int].head),
+          Duration.Inf))
     } finally dc.db.close
   }
 
@@ -30,8 +31,9 @@ class DataSourceTest {
     try {
       assertEquals(
         2,
-        Await.result(dc.db.run(sql"select lock_mode()".as[Int].head),
-                     Duration.Inf))
+        Await.result(
+          dc.db.run(sql"select lock_mode()".as[Int].head),
+          Duration.Inf))
     } finally dc.db.close
   }
 

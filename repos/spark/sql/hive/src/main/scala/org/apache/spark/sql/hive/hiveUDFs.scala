@@ -75,49 +75,56 @@ private[hive] class HiveFunctionRegistry(underlying: analysis.FunctionRegistry,
         if (classOf[GenericUDFMacro].isAssignableFrom(
               functionInfo.getFunctionClass)) {
           val udf =
-            HiveGenericUDF(name,
-                           new HiveFunctionWrapper(functionClassName,
-                                                   functionInfo.getGenericUDF),
-                           children)
+            HiveGenericUDF(
+              name,
+              new HiveFunctionWrapper(
+                functionClassName,
+                functionInfo.getGenericUDF),
+              children)
           udf.dataType // Force it to check input data types.
           udf
         } else if (classOf[UDF].isAssignableFrom(
                      functionInfo.getFunctionClass)) {
-          val udf = HiveSimpleUDF(name,
-                                  new HiveFunctionWrapper(functionClassName),
-                                  children)
+          val udf = HiveSimpleUDF(
+            name,
+            new HiveFunctionWrapper(functionClassName),
+            children)
           udf.dataType // Force it to check input data types.
           udf
         } else if (classOf[GenericUDF].isAssignableFrom(
                      functionInfo.getFunctionClass)) {
-          val udf = HiveGenericUDF(name,
-                                   new HiveFunctionWrapper(functionClassName),
-                                   children)
+          val udf = HiveGenericUDF(
+            name,
+            new HiveFunctionWrapper(functionClassName),
+            children)
           udf.dataType // Force it to check input data types.
           udf
         } else if (classOf[AbstractGenericUDAFResolver].isAssignableFrom(
                      functionInfo.getFunctionClass)) {
           val udaf =
-            HiveUDAFFunction(name,
-                             new HiveFunctionWrapper(functionClassName),
-                             children)
+            HiveUDAFFunction(
+              name,
+              new HiveFunctionWrapper(functionClassName),
+              children)
           udaf.dataType // Force it to check input data types.
           udaf
         } else if (classOf[UDAF].isAssignableFrom(
                      functionInfo.getFunctionClass)) {
           val udaf =
-            HiveUDAFFunction(name,
-                             new HiveFunctionWrapper(functionClassName),
-                             children,
-                             isUDAFBridgeRequired = true)
+            HiveUDAFFunction(
+              name,
+              new HiveFunctionWrapper(functionClassName),
+              children,
+              isUDAFBridgeRequired = true)
           udaf.dataType // Force it to check input data types.
           udaf
         } else if (classOf[GenericUDTF].isAssignableFrom(
                      functionInfo.getFunctionClass)) {
           val udtf =
-            HiveGenericUDTF(name,
-                            new HiveFunctionWrapper(functionClassName),
-                            children)
+            HiveGenericUDTF(
+              name,
+              new HiveFunctionWrapper(functionClassName),
+              children)
           udtf.elementTypes // Force it to check input data types.
           udtf
         } else {
@@ -159,16 +166,18 @@ private[hive] class HiveFunctionRegistry(underlying: analysis.FunctionRegistry,
           info.getFunctionClass.getAnnotation(classOf[Description])
         if (annotation != null) {
           Some(
-            new ExpressionInfo(info.getFunctionClass.getCanonicalName,
-                               annotation.name(),
-                               annotation.value(),
-                               annotation.extended()))
+            new ExpressionInfo(
+              info.getFunctionClass.getCanonicalName,
+              annotation.name(),
+              annotation.value(),
+              annotation.extended()))
         } else {
           Some(
-            new ExpressionInfo(info.getFunctionClass.getCanonicalName,
-                               name,
-                               null,
-                               null))
+            new ExpressionInfo(
+              info.getFunctionClass.getCanonicalName,
+              name,
+              null,
+              null))
         }
       }.getOrElse(None))
   }

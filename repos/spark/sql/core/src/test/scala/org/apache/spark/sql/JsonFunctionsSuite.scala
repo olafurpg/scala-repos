@@ -25,9 +25,11 @@ class JsonFunctionsSuite extends QueryTest with SharedSQLContext {
   test("function get_json_object") {
     val df: DataFrame =
       Seq(("""{"name": "alice", "age": 5}""", "")).toDF("a", "b")
-    checkAnswer(df.selectExpr("get_json_object(a, '$.name')",
-                              "get_json_object(a, '$.age')"),
-                Row("alice", "5"))
+    checkAnswer(
+      df.selectExpr(
+        "get_json_object(a, '$.name')",
+        "get_json_object(a, '$.age')"),
+      Row("alice", "5"))
   }
 
   val tuples: Seq[(String, String)] =
@@ -53,20 +55,23 @@ class JsonFunctionsSuite extends QueryTest with SharedSQLContext {
         null,
         null,
         null,
-        null) :: Row("5", "", null, null, null, null) :: Row("6",
-                                                             null,
-                                                             null,
-                                                             null,
-                                                             null,
-                                                             null) :: Nil
+        null) :: Row("5", "", null, null, null, null) :: Row(
+        "6",
+        null,
+        null,
+        null,
+        null,
+        null) :: Nil
 
-    checkAnswer(df.select($"key",
-                          functions.get_json_object($"jstring", "$.f1"),
-                          functions.get_json_object($"jstring", "$.f2"),
-                          functions.get_json_object($"jstring", "$.f3"),
-                          functions.get_json_object($"jstring", "$.f4"),
-                          functions.get_json_object($"jstring", "$.f5")),
-                expected)
+    checkAnswer(
+      df.select(
+        $"key",
+        functions.get_json_object($"jstring", "$.f1"),
+        functions.get_json_object($"jstring", "$.f2"),
+        functions.get_json_object($"jstring", "$.f3"),
+        functions.get_json_object($"jstring", "$.f4"),
+        functions.get_json_object($"jstring", "$.f5")),
+      expected)
   }
 
   test("json_tuple select") {
@@ -84,12 +89,13 @@ class JsonFunctionsSuite extends QueryTest with SharedSQLContext {
         null,
         null,
         null,
-        null) :: Row("5", "", null, null, null, null) :: Row("6",
-                                                             null,
-                                                             null,
-                                                             null,
-                                                             null,
-                                                             null) :: Nil
+        null) :: Row("5", "", null, null, null, null) :: Row(
+        "6",
+        null,
+        null,
+        null,
+        null,
+        null) :: Nil
 
     checkAnswer(
       df.select(
@@ -98,8 +104,9 @@ class JsonFunctionsSuite extends QueryTest with SharedSQLContext {
       expected)
 
     checkAnswer(
-      df.selectExpr("key",
-                    "json_tuple(jstring, 'f1', 'f2', 'f3', 'f4', 'f5')"),
+      df.selectExpr(
+        "key",
+        "json_tuple(jstring, 'f1', 'f2', 'f3', 'f4', 'f5')"),
       expected)
   }
 

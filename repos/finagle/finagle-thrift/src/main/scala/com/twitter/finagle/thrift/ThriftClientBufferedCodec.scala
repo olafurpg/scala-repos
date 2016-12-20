@@ -9,9 +9,10 @@ private[finagle] case class ThriftClientBufferedPipelineFactory(
     extends ChannelPipelineFactory {
   def getPipeline() = {
     val pipeline = ThriftClientFramedPipelineFactory.getPipeline()
-    pipeline.replace("thriftFrameCodec",
-                     "thriftBufferDecoder",
-                     new ThriftBufferDecoder(protocolFactory))
+    pipeline.replace(
+      "thriftFrameCodec",
+      "thriftBufferDecoder",
+      new ThriftBufferDecoder(protocolFactory))
     pipeline
   }
 }

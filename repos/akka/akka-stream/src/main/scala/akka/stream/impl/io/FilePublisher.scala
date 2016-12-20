@@ -26,17 +26,20 @@ private[akka] object FilePublisher {
             initialBuffer: Int,
             maxBuffer: Int) = {
     require(chunkSize > 0, s"chunkSize must be > 0 (was $chunkSize)")
-    require(initialBuffer > 0,
-            s"initialBuffer must be > 0 (was $initialBuffer)")
-    require(maxBuffer >= initialBuffer,
-            s"maxBuffer must be >= initialBuffer (was $maxBuffer)")
+    require(
+      initialBuffer > 0,
+      s"initialBuffer must be > 0 (was $initialBuffer)")
+    require(
+      maxBuffer >= initialBuffer,
+      s"maxBuffer must be >= initialBuffer (was $maxBuffer)")
 
-    Props(classOf[FilePublisher],
-          f,
-          completionPromise,
-          chunkSize,
-          initialBuffer,
-          maxBuffer).withDeploy(Deploy.local)
+    Props(
+      classOf[FilePublisher],
+      f,
+      completionPromise,
+      chunkSize,
+      initialBuffer,
+      maxBuffer).withDeploy(Deploy.local)
   }
 
   private case object Continue extends DeadLetterSuppression

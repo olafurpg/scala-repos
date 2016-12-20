@@ -40,10 +40,12 @@ class SymbolTableTest {
     val fooTypeRef = TypeRef(fooSymbol.owner.tpe, fooSymbol, Nil)
     val barType = new ClassInfoType(List(fooTypeRef), EmptyScope, barSymbol)
     barSymbol.info = barType
-    assertTrue("Bar should be subclass of Foo",
-               barSymbol.tpe <:< fooSymbol.tpe)
-    assertFalse("Foo should be a superclass of Foo",
-                fooSymbol.tpe <:< barSymbol.tpe)
+    assertTrue(
+      "Bar should be subclass of Foo",
+      barSymbol.tpe <:< fooSymbol.tpe)
+    assertFalse(
+      "Foo should be a superclass of Foo",
+      fooSymbol.tpe <:< barSymbol.tpe)
   }
 
   @Test

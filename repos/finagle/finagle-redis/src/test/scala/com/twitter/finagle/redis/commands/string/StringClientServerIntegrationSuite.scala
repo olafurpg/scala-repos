@@ -191,14 +191,16 @@ final class StringClientServerIntegrationSuite
       assert(Await.result(client(MSet(input))) == StatusReply("OK"))
       val req = client(
         MGet(
-          List(StringToChannelBuffer("thing"),
-               foo,
-               StringToChannelBuffer("noexists"),
-               StringToChannelBuffer("stuff"))))
-      val expects = List("thang",
-                         "bar",
-                         BytesToString(RedisCodec.NIL_VALUE_BA.array),
-                         "bleh")
+          List(
+            StringToChannelBuffer("thing"),
+            foo,
+            StringToChannelBuffer("noexists"),
+            StringToChannelBuffer("stuff"))))
+      val expects = List(
+        "thang",
+        "bar",
+        BytesToString(RedisCodec.NIL_VALUE_BA.array),
+        "bleh")
       assertMBulkReply(req, expects)
     }
   }
@@ -217,12 +219,14 @@ final class StringClientServerIntegrationSuite
       assert(Await.result(client(MSetNx(input2))) == IntegerReply(0))
       val expects =
         List("Hello", "there", BytesToString(RedisCodec.NIL_VALUE_BA.array))
-      assertMBulkReply(client(
-                         MGet(
-                           List(StringToChannelBuffer("msnx.key1"),
-                                StringToChannelBuffer("msnx.key2"),
-                                StringToChannelBuffer("msnx.key3")))),
-                       expects)
+      assertMBulkReply(
+        client(
+          MGet(
+            List(
+              StringToChannelBuffer("msnx.key1"),
+              StringToChannelBuffer("msnx.key2"),
+              StringToChannelBuffer("msnx.key3")))),
+        expects)
     }
   }
 

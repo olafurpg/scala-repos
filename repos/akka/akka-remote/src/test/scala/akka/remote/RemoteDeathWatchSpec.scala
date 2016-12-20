@@ -35,10 +35,11 @@ akka {
     with DefaultTimeout
     with DeathWatchSpec {
 
-  val other = ActorSystem("other",
-                          ConfigFactory
-                            .parseString("akka.remote.netty.tcp.port=2666")
-                            .withFallback(system.settings.config))
+  val other = ActorSystem(
+    "other",
+    ConfigFactory
+      .parseString("akka.remote.netty.tcp.port=2666")
+      .withFallback(system.settings.config))
 
   override def beforeTermination() {
     system.eventStream.publish(
@@ -109,12 +110,13 @@ akka {
           SocketUtil.temporaryServerAddress().getPort)) / "user" / "noone"
     val transport = RARP(system).provider.transport
     val extinctRef =
-      new RemoteActorRef(transport,
-                         transport.localAddressForRemote(extinctPath.address),
-                         extinctPath,
-                         Nobody,
-                         props = None,
-                         deploy = None)
+      new RemoteActorRef(
+        transport,
+        transport.localAddressForRemote(extinctPath.address),
+        extinctPath,
+        Nobody,
+        props = None,
+        deploy = None)
 
     val probe = TestProbe()
     probe.watch(extinctRef)

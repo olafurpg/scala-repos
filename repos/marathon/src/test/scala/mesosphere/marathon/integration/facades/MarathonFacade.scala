@@ -108,8 +108,9 @@ class MarathonFacade(
   }
 
   def requireInBaseGroup(pathId: PathId): Unit = {
-    require(isInBaseGroup(pathId),
-            s"pathId $pathId must be in baseGroup ($baseGroup)")
+    require(
+      isInBaseGroup(pathId),
+      s"pathId $pathId must be in baseGroup ($baseGroup)")
   }
 
   def marathonSendReceive: SendReceive = {
@@ -188,8 +189,9 @@ class MarathonFacade(
                    scale: Boolean = false): RestResult[ITListTasks] = {
     requireInBaseGroup(appId)
     val pipeline = marathonSendReceive ~> read[ITListTasks]
-    result(pipeline(Delete(s"$url/v2/apps$appId/tasks?scale=$scale")),
-           waitTime)
+    result(
+      pipeline(Delete(s"$url/v2/apps$appId/tasks?scale=$scale")),
+      waitTime)
   }
 
   def killAllTasksAndScale(appId: PathId): RestResult[ITDeploymentPlan] = {
@@ -203,8 +205,9 @@ class MarathonFacade(
                scale: Boolean = false): RestResult[HttpResponse] = {
     requireInBaseGroup(appId)
     val pipeline = marathonSendReceive ~> responseResult
-    result(pipeline(Delete(s"$url/v2/apps$appId/tasks/$taskId?scale=$scale")),
-           waitTime)
+    result(
+      pipeline(Delete(s"$url/v2/apps$appId/tasks/$taskId?scale=$scale")),
+      waitTime)
   }
 
   //group resource -------------------------------------------

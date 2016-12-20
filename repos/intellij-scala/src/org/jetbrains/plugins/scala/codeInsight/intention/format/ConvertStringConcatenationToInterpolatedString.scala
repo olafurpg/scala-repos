@@ -15,10 +15,11 @@ import org.jetbrains.plugins.scala.project._
   * Pavel Fatin
   */
 class ConvertStringConcatenationToInterpolatedString
-    extends AbstractFormatConversionIntention("Convert to interpolated string",
-                                              StringConcatenationParser,
-                                              InterpolatedStringFormatter,
-                                              eager = true) {
+    extends AbstractFormatConversionIntention(
+      "Convert to interpolated string",
+      StringConcatenationParser,
+      InterpolatedStringFormatter,
+      eager = true) {
 
   override def isAvailable(project: Project,
                            editor: Editor,

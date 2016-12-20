@@ -34,9 +34,10 @@ private[spark] case class ExecutorExited(exitCode: Int,
 
 private[spark] object ExecutorExited {
   def apply(exitCode: Int, exitCausedByApp: Boolean): ExecutorExited = {
-    ExecutorExited(exitCode,
-                   exitCausedByApp,
-                   ExecutorExitCode.explainExitCode(exitCode))
+    ExecutorExited(
+      exitCode,
+      exitCausedByApp,
+      ExecutorExitCode.explainExitCode(exitCode))
   }
 }
 

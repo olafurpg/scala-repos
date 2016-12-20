@@ -120,10 +120,11 @@ class PackageCollectionFillerSpec
     if (newContent == null || newContent.isEmpty) {
       this.emptyEvaluation(analyzer, originalList)
     } else {
-      this.filledEvaluation(analyzer,
-                            originalList,
-                            newContent.map(_.delegate),
-                            (an, li) => ())
+      this.filledEvaluation(
+        analyzer,
+        originalList,
+        newContent.map(_.delegate),
+        (an, li) => ())
       analyzer.addedElements.toList should be(
         newContent.map(_.delegate).toList)
     }
@@ -134,17 +135,19 @@ class PackageCollectionFillerSpec
     jfxc.FXCollections.observableArrayList("A", "B", "C")
 
   private def getOriginalNodeObservableList: jfxc.ObservableList[jfxs.Node] =
-    jfxc.FXCollections.observableArrayList(new jfxsc.Button("Button 1"),
-                                           new jfxsc.TextField("TextField 2"),
-                                           new jfxsc.Hyperlink("Hyperlink 3"))
+    jfxc.FXCollections.observableArrayList(
+      new jfxsc.Button("Button 1"),
+      new jfxsc.TextField("TextField 2"),
+      new jfxsc.Hyperlink("Hyperlink 3"))
 
   "fillCollection" should "clean originalCollection if receives null" in {
     executeAndTestChanges(getOriginalStringObservableList, null)
   }
 
   it should "clean originalCollection if receives a empty Iterable" in {
-    executeAndTestChanges(getOriginalStringObservableList,
-                          Iterable.empty[String])
+    executeAndTestChanges(
+      getOriginalStringObservableList,
+      Iterable.empty[String])
   }
 
   it should "replace new content" in {
@@ -168,10 +171,11 @@ class PackageCollectionFillerSpec
     val newValue = "1"
     fillCollectionWithOne(originalList, newValue)
 
-    this.filledEvaluation(analyzer,
-                          originalList,
-                          List(newValue),
-                          (an, li) => an.addedElements.size should be(1))
+    this.filledEvaluation(
+      analyzer,
+      originalList,
+      List(newValue),
+      (an, li) => an.addedElements.size should be(1))
     this.finalEvaluation(analyzer)
   }
 
@@ -180,13 +184,15 @@ class PackageCollectionFillerSpec
   }
 
   it should "clean originalCollection if receives a empty Iterable" in {
-    executeAndTestChangesFX(getOriginalNodeObservableList,
-                            Iterable.empty[Node])
+    executeAndTestChangesFX(
+      getOriginalNodeObservableList,
+      Iterable.empty[Node])
   }
 
   it should "replace new content" in {
-    executeAndTestChangesFX(getOriginalNodeObservableList,
-                            List(new ChoiceBox, new Slider))
+    executeAndTestChangesFX(
+      getOriginalNodeObservableList,
+      List(new ChoiceBox, new Slider))
   }
 
   "fillSFXCollectionWithOne" should "clean originalCollection if receives null" in {
@@ -206,10 +212,11 @@ class PackageCollectionFillerSpec
     val newValue = new Slider
     fillSFXCollectionWithOne(originalList, newValue)
 
-    this.filledEvaluation(analyzer,
-                          originalList,
-                          List(newValue.delegate),
-                          (an, li) => an.addedElements.size should be(1))
+    this.filledEvaluation(
+      analyzer,
+      originalList,
+      List(newValue.delegate),
+      (an, li) => an.addedElements.size should be(1))
     this.finalEvaluation(analyzer)
   }
 }

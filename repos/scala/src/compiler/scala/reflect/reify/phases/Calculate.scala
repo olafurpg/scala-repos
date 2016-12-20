@@ -29,9 +29,10 @@ trait Calculate { self: Reifier =>
   private def registerLocalSymbol(sym: Symbol, metalevel: Int): Unit =
     if (sym != null && sym != NoSymbol) {
       if (localSymbols contains sym)
-        assert(localSymbols(sym) == metalevel,
-               "metalevel mismatch: expected %s, actual %s"
-                 .format(localSymbols(sym), metalevel))
+        assert(
+          localSymbols(sym) == metalevel,
+          "metalevel mismatch: expected %s, actual %s"
+            .format(localSymbols(sym), metalevel))
       else localSymbols += (sym -> metalevel)
     }
 

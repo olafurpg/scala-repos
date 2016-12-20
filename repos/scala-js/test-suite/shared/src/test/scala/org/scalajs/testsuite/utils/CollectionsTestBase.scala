@@ -28,14 +28,17 @@ trait CollectionsTestBase {
 
   def testCollectionUnmodifiability[E](coll: ju.Collection[E], elem: E): Unit = {
     expectThrows(classOf[UnsupportedOperationException], coll.add(elem))
-    expectThrows(classOf[UnsupportedOperationException],
-                 coll.addAll(Seq.empty[E]))
+    expectThrows(
+      classOf[UnsupportedOperationException],
+      coll.addAll(Seq.empty[E]))
     expectThrows(classOf[UnsupportedOperationException], coll.clear())
     expectThrows(classOf[UnsupportedOperationException], coll.remove(elem))
-    expectThrows(classOf[UnsupportedOperationException],
-                 coll.removeAll(Seq.empty[E]))
-    expectThrows(classOf[UnsupportedOperationException],
-                 coll.retainAll(Seq.empty[E]))
+    expectThrows(
+      classOf[UnsupportedOperationException],
+      coll.removeAll(Seq.empty[E]))
+    expectThrows(
+      classOf[UnsupportedOperationException],
+      coll.retainAll(Seq.empty[E]))
     testIteratorsUnmodifiability(() => coll.iterator())
   }
 
@@ -60,8 +63,9 @@ trait CollectionsTestBase {
                                  recursive: Boolean = false): Unit = {
     testCollectionUnmodifiability(list, elem)
     expectThrows(classOf[UnsupportedOperationException], list.add(0, elem))
-    expectThrows(classOf[UnsupportedOperationException],
-                 list.addAll(0, Seq.empty[E]))
+    expectThrows(
+      classOf[UnsupportedOperationException],
+      list.addAll(0, Seq.empty[E]))
     expectThrows(classOf[UnsupportedOperationException], list.remove(0))
     expectThrows(classOf[UnsupportedOperationException], list.set(0, elem))
     def testSublist(sl: ju.List[E]): Unit = {
@@ -90,10 +94,12 @@ trait CollectionsTestBase {
   def testMapUnmodifiability[K, V](map: ju.Map[K, V], key: K, value: V): Unit = {
     expectThrows(classOf[UnsupportedOperationException], map.clear())
     expectThrows(classOf[UnsupportedOperationException], map.put(key, value))
-    expectThrows(classOf[UnsupportedOperationException],
-                 map.putAll(Map.empty[K, V]))
-    testSetUnmodifiability(map.entrySet(),
-                           new ju.AbstractMap.SimpleImmutableEntry(key, value))
+    expectThrows(
+      classOf[UnsupportedOperationException],
+      map.putAll(Map.empty[K, V]))
+    testSetUnmodifiability(
+      map.entrySet(),
+      new ju.AbstractMap.SimpleImmutableEntry(key, value))
     testSetUnmodifiability(map.keySet(), key)
     testCollectionUnmodifiability(map.values(), value)
   }

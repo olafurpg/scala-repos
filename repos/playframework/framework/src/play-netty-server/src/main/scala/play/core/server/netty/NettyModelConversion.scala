@@ -73,12 +73,13 @@ private[server] class NettyModelConversion(
       }
       // wrapping into URI to handle absoluteURI
       val path = new URI(uri.path()).getRawPath
-      createRequestHeader(request,
-                          requestId,
-                          path,
-                          parameters,
-                          remoteAddress,
-                          sslHandler)
+      createRequestHeader(
+        request,
+        requestId,
+        path,
+        parameters,
+        remoteAddress,
+        sslHandler)
     }
   }
 
@@ -101,9 +102,10 @@ private[server] class NettyModelConversion(
       override def queryString = parameters
       override val headers = new NettyHeadersWrapper(request.headers)
       private lazy val remoteConnection: ConnectionInfo = {
-        forwardedHeaderHandler.remoteConnection(_remoteAddress.getAddress,
-                                                sslHandler.isDefined,
-                                                headers)
+        forwardedHeaderHandler.remoteConnection(
+          _remoteAddress.getAddress,
+          sslHandler.isDefined,
+          headers)
       }
       override def remoteAddress = remoteConnection.address.getHostAddress
       override def secure = remoteConnection.secure
@@ -207,14 +209,16 @@ private[server] class NettyModelConversion(
 
       case any if skipEntity =>
         ServerResultUtils.cancelEntity(any)
-        new DefaultFullHttpResponse(httpVersion,
-                                    responseStatus,
-                                    Unpooled.EMPTY_BUFFER)
+        new DefaultFullHttpResponse(
+          httpVersion,
+          responseStatus,
+          Unpooled.EMPTY_BUFFER)
 
       case HttpEntity.Strict(data, _) =>
-        new DefaultFullHttpResponse(httpVersion,
-                                    responseStatus,
-                                    byteStringToByteBuf(data))
+        new DefaultFullHttpResponse(
+          httpVersion,
+          responseStatus,
+          byteStringToByteBuf(data))
 
       case HttpEntity.Streamed(stream, _, _) =>
         createStreamedResponse(stream, httpVersion, responseStatus)
@@ -321,9 +325,10 @@ private[server] class NettyModelConversion(
           lastChunk
       })
 
-    val response = new DefaultStreamedHttpResponse(httpVersion,
-                                                   responseStatus,
-                                                   httpContentPublisher)
+    val response = new DefaultStreamedHttpResponse(
+      httpVersion,
+      responseStatus,
+      httpContentPublisher)
     HttpHeaders.setTransferEncodingChunked(response)
     response
   }

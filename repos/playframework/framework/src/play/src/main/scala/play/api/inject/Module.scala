@@ -119,23 +119,25 @@ object Modules {
             .loadClass(DefaultModuleName)
             .asInstanceOf[Class[Any]]
           Some(
-            constructModule(environment,
-                            configuration,
-                            DefaultModuleName,
-                            () => defaultModuleClass))
+            constructModule(
+              environment,
+              configuration,
+              DefaultModuleName,
+              () => defaultModuleClass))
         } catch {
           case e: ClassNotFoundException => None
         }
 
     moduleClassNames
       .map { className =>
-        constructModule(environment,
-                        configuration,
-                        className,
-                        () =>
-                          environment.classLoader
-                            .loadClass(className)
-                            .asInstanceOf[Class[Any]])
+        constructModule(
+          environment,
+          configuration,
+          className,
+          () =>
+            environment.classLoader
+              .loadClass(className)
+              .asInstanceOf[Class[Any]])
       }
       .toSeq ++ defaultModule
   }
@@ -161,8 +163,9 @@ object Modules {
       {
         tryConstruct(environment, configuration)
       } orElse {
-        tryConstruct(new JavaEnvironment(environment),
-                     new JavaConfiguration(configuration))
+        tryConstruct(
+          new JavaEnvironment(environment),
+          new JavaConfiguration(configuration))
       } orElse {
         tryConstruct()
       } getOrElse {

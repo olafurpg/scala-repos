@@ -140,22 +140,24 @@ trait Erasure {
       case ExistentialType(tparams, restpe) =>
         apply(restpe)
       case mt @ MethodType(params, restpe) =>
-        MethodType(cloneSymbolsAndModify(params, ErasureMap.this),
-                   if (restpe.typeSymbol == UnitClass) UnitTpe
-                   // this replaces each typeref that refers to an argument
-                   // by the type `p.tpe` of the actual argument p (p in params)
-                   else apply(mt.resultType(mt.paramTypes)))
+        MethodType(
+          cloneSymbolsAndModify(params, ErasureMap.this),
+          if (restpe.typeSymbol == UnitClass) UnitTpe
+          // this replaces each typeref that refers to an argument
+          // by the type `p.tpe` of the actual argument p (p in params)
+          else apply(mt.resultType(mt.paramTypes)))
       case RefinedType(parents, decls) =>
         apply(mergeParents(parents))
       case AnnotatedType(_, atp) =>
         apply(atp)
       case ClassInfoType(parents, decls, clazz) =>
-        ClassInfoType(if (clazz == ObjectClass || isPrimitiveValueClass(clazz))
-                        Nil
-                      else if (clazz == ArrayClass) ObjectTpe :: Nil
-                      else removeLaterObjects(parents map this),
-                      decls,
-                      clazz)
+        ClassInfoType(
+          if (clazz == ObjectClass || isPrimitiveValueClass(clazz))
+            Nil
+          else if (clazz == ArrayClass) ObjectTpe :: Nil
+          else removeLaterObjects(parents map this),
+          decls,
+          clazz)
       case _ =>
         mapOver(tp)
     }
@@ -217,14 +219,16 @@ trait Erasure {
       case ExistentialType(tparams, restpe) =>
         specialConstructorErasure(clazz, restpe)
       case mt @ MethodType(params, restpe) =>
-        MethodType(cloneSymbolsAndModify(params, specialScalaErasure),
-                   specialConstructorErasure(clazz, restpe))
+        MethodType(
+          cloneSymbolsAndModify(params, specialScalaErasure),
+          specialConstructorErasure(clazz, restpe))
       case TypeRef(pre, `clazz`, args) =>
         typeRef(pre, clazz, List())
       case tp =>
         if (!(clazz == ArrayClass || tp.isError))
-          assert(clazz == ArrayClass || tp.isError,
-                 s"!!! unexpected constructor erasure $tp for $clazz")
+          assert(
+            clazz == ArrayClass || tp.isError,
+            s"!!! unexpected constructor erasure $tp for $clazz")
         specialScalaErasure(tp)
     }
   }
@@ -362,15 +366,17 @@ trait Erasure {
       if (sym.isClassConstructor)
         tp match {
           case MethodType(params, TypeRef(pre, sym1, args)) =>
-            MethodType(cloneSymbolsAndModify(params, specialErasure(sym)),
-                       typeRef(specialErasure(sym)(pre), sym1, args))
+            MethodType(
+              cloneSymbolsAndModify(params, specialErasure(sym)),
+              typeRef(specialErasure(sym)(pre), sym1, args))
         } else if (sym.name == nme.apply) tp
       else if (sym.name == nme.update)
         (tp: @unchecked) match {
           case MethodType(List(index, tvar), restpe) =>
             MethodType(
-              List(index.cloneSymbol.setInfo(specialErasure(sym)(index.tpe)),
-                   tvar),
+              List(
+                index.cloneSymbol.setInfo(specialErasure(sym)(index.tpe)),
+                tvar),
               UnitTpe)
         } else specialErasure(sym)(tp)
     } else if (sym.owner != NoSymbol && sym.owner.owner == ArrayClass &&

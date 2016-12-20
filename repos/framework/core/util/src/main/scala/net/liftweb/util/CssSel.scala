@@ -72,8 +72,9 @@ private final case class AggregatedCssBindFunc(binds: List[CssBind])
   * class="clearable" and this Bind will make them go away
   */
 class ClearClearable
-    extends CssBindImpl(Full(".clearable"),
-                        CssSelectorParser.parse(".clearable")) {
+    extends CssBindImpl(
+      Full(".clearable"),
+      CssSelectorParser.parse(".clearable")) {
 
   def calculate(in: NodeSeq): Seq[NodeSeq] = Nil
 }
@@ -106,13 +107,14 @@ private class SelectorMap(binds: List[CssBind])
     }
   }
 
-  private val (idMap,
-               nameMap,
-               clzMap,
-               attrMap,
-               elemMap,
-               starFunc,
-               selectThis: Box[CssBind]) = {
+  private val (
+    idMap,
+    nameMap,
+    clzMap,
+    attrMap,
+    elemMap,
+    starFunc,
+    selectThis: Box[CssBind]) = {
     var idMap: Map[String, List[CssBind]] = Map()
     var nameMap: Map[String, List[CssBind]] = Map()
     var clzMap: Map[String, List[CssBind]] = Map()
@@ -263,12 +265,13 @@ private class SelectorMap(binds: List[CssBind])
 
               val newAttr = new UnprefixedAttribute(attr, flat, filtered)
 
-              new Elem(elem.prefix,
-                       elem.label,
-                       newAttr,
-                       elem.scope,
-                       elem.minimizeEmpty,
-                       elem.child: _*)
+              new Elem(
+                elem.prefix,
+                elem.label,
+                newAttr,
+                elem.scope,
+                elem.minimizeEmpty,
+                elem.child: _*)
             }
           }
 
@@ -307,12 +310,13 @@ private class SelectorMap(binds: List[CssBind])
                 case _ => filtered
               }
 
-              new Elem(elem.prefix,
-                       elem.label,
-                       newAttr,
-                       elem.scope,
-                       elem.minimizeEmpty,
-                       elem.child: _*)
+              new Elem(
+                elem.prefix,
+                elem.label,
+                newAttr,
+                elem.scope,
+                elem.minimizeEmpty,
+                elem.child: _*)
             }
           }
         }
@@ -408,45 +412,50 @@ private class SelectorMap(binds: List[CssBind])
           val calced = bind.calculate(realE.child)
           calced.length match {
             case 0 =>
-              new Elem(realE.prefix,
-                       realE.label,
-                       realE.attributes,
-                       realE.scope,
-                       realE.minimizeEmpty)
+              new Elem(
+                realE.prefix,
+                realE.label,
+                realE.attributes,
+                realE.scope,
+                realE.minimizeEmpty)
             case 1 =>
-              new Elem(realE.prefix,
-                       realE.label,
-                       realE.attributes,
-                       realE.scope,
-                       realE.minimizeEmpty,
-                       todo.transform(realE.child, calced.head): _*)
+              new Elem(
+                realE.prefix,
+                realE.label,
+                realE.attributes,
+                realE.scope,
+                realE.minimizeEmpty,
+                todo.transform(realE.child, calced.head): _*)
             case _ if id.isEmpty =>
               calced.map(
                 kids =>
-                  new Elem(realE.prefix,
-                           realE.label,
-                           realE.attributes,
-                           realE.scope,
-                           realE.minimizeEmpty,
-                           todo.transform(realE.child, kids): _*))
+                  new Elem(
+                    realE.prefix,
+                    realE.label,
+                    realE.attributes,
+                    realE.scope,
+                    realE.minimizeEmpty,
+                    todo.transform(realE.child, kids): _*))
 
             case _ => {
               val noId = removeId(realE.attributes)
               calced.toList.zipWithIndex.map {
                 case (kids, 0) =>
-                  new Elem(realE.prefix,
-                           realE.label,
-                           realE.attributes,
-                           realE.scope,
-                           realE.minimizeEmpty,
-                           todo.transform(realE.child, kids): _*)
+                  new Elem(
+                    realE.prefix,
+                    realE.label,
+                    realE.attributes,
+                    realE.scope,
+                    realE.minimizeEmpty,
+                    todo.transform(realE.child, kids): _*)
                 case (kids, _) =>
-                  new Elem(realE.prefix,
-                           realE.label,
-                           noId,
-                           realE.scope,
-                           realE.minimizeEmpty,
-                           todo.transform(realE.child, kids): _*)
+                  new Elem(
+                    realE.prefix,
+                    realE.label,
+                    noId,
+                    realE.scope,
+                    realE.minimizeEmpty,
+                    todo.transform(realE.child, kids): _*)
               }
             }
           }
@@ -462,14 +471,16 @@ private class SelectorMap(binds: List[CssBind])
               calced.head match {
                 case Group(g) => g
                 case e: Elem =>
-                  new Elem(e.prefix,
-                           e.label,
-                           mergeAll(e.attributes,
-                                    false,
-                                    x == Full(DontMergeAttributes)),
-                           e.scope,
-                           e.minimizeEmpty,
-                           e.child: _*)
+                  new Elem(
+                    e.prefix,
+                    e.label,
+                    mergeAll(
+                      e.attributes,
+                      false,
+                      x == Full(DontMergeAttributes)),
+                    e.scope,
+                    e.minimizeEmpty,
+                    e.child: _*)
                 case x => x
               }
             }
@@ -502,14 +513,16 @@ private class SelectorMap(binds: List[CssBind])
                                                             ids - i) getOrElse
                             (ids)
                         val newElem =
-                          new Elem(e.prefix,
-                                   e.label,
-                                   mergeAll(e.attributes,
-                                            !keepId,
-                                            x == Full(DontMergeAttributes)),
-                                   e.scope,
-                                   e.minimizeEmpty,
-                                   e.child: _*)
+                          new Elem(
+                            e.prefix,
+                            e.label,
+                            mergeAll(
+                              e.attributes,
+                              !keepId,
+                              x == Full(DontMergeAttributes)),
+                            e.scope,
+                            e.minimizeEmpty,
+                            e.child: _*)
                         (newIds, newElem :: result)
                       }
                       case x => (ids, x :: result)
@@ -648,31 +661,34 @@ private class SelectorMap(binds: List[CssBind])
     } else {
       lb.toList.filterNot(_.selectThis_?) match {
         case Nil =>
-          new Elem(e.prefix,
-                   e.label,
-                   e.attributes,
-                   e.scope,
-                   e.minimizeEmpty,
-                   run(e.child, onlySel, depth + 1): _*)
+          new Elem(
+            e.prefix,
+            e.label,
+            e.attributes,
+            e.scope,
+            e.minimizeEmpty,
+            run(e.child, onlySel, depth + 1): _*)
         case csb =>
           // do attributes first, then the body
           csb.partition(_.attrSel_?) match {
             case (Nil, rules) => slurp.applyRule(rules, e, onlySel, depth)
             case (attrs, Nil) => {
               val elem = slurp.applyAttributeRules(attrs, e)
-              new Elem(elem.prefix,
-                       elem.label,
-                       elem.attributes,
-                       elem.scope,
-                       e.minimizeEmpty,
-                       run(elem.child, onlySel, depth + 1): _*)
+              new Elem(
+                elem.prefix,
+                elem.label,
+                elem.attributes,
+                elem.scope,
+                e.minimizeEmpty,
+                run(elem.child, onlySel, depth + 1): _*)
             }
 
             case (attrs, rules) => {
-              slurp.applyRule(rules,
-                              slurp.applyAttributeRules(attrs, e),
-                              onlySel,
-                              depth)
+              slurp.applyRule(
+                rules,
+                slurp.applyAttributeRules(attrs, e),
+                onlySel,
+                depth)
             }
           }
         // slurp.applyRule(csb, e, onlySel)
@@ -745,8 +761,9 @@ trait CssBindImplicits {
     }
   }
   implicit class StringToCssBindPromoter(stringSelector: String)
-      extends CssBindPromoter(Full(stringSelector),
-                              CssSelectorParser.parse(stringSelector))
+      extends CssBindPromoter(
+        Full(stringSelector),
+        CssSelectorParser.parse(stringSelector))
   implicit class CssSelectorToCssBindPromoter(cssSelector: CssSelector)
       extends CssBindPromoter(Empty, Full(cssSelector))
 }

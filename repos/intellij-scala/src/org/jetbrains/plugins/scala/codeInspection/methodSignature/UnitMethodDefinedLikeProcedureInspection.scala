@@ -22,8 +22,9 @@ class UnitMethodDefinedLikeProcedureInspection
         if funDef.hasUnitResultType && !funDef.hasAssign &&
           !funDef.isSecondaryConstructor &&
           IntentionAvailabilityChecker.checkInspection(this, funDef) =>
-      holder.registerProblem(funDef.nameId,
-                             getDisplayName,
-                             new InsertReturnTypeAndEquals(funDef))
+      holder.registerProblem(
+        funDef.nameId,
+        getDisplayName,
+        new InsertReturnTypeAndEquals(funDef))
   }
 }

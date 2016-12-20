@@ -16,7 +16,7 @@ class ScInterpolatedPrefixReference(node: ASTNode)
 
   override def handleElementRename(newElementName: String): PsiElement = {
     replace(
-      ScalaPsiElementFactory.createInterpolatedStringPrefix(newElementName,
-                                                            getManager))
+      ScalaPsiElementFactory
+        .createInterpolatedStringPrefix(newElementName, getManager))
   }
 }

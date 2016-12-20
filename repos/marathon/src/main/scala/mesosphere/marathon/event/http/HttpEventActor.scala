@@ -32,8 +32,9 @@ object HttpEventActor {
                                     backoffUntil: Option[Deadline]) {
     def nextFailed: EventNotificationLimit = {
       val next = failedCount + 1
-      EventNotificationLimit(next,
-                             Some(math.pow(2, next.toDouble).seconds.fromNow))
+      EventNotificationLimit(
+        next,
+        Some(math.pow(2, next.toDouble).seconds.fromNow))
     }
     def notLimited: Boolean = backoffUntil.fold(true)(_.isOverdue())
     def limited: Boolean = !notLimited

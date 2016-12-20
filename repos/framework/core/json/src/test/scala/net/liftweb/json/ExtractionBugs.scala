@@ -91,9 +91,10 @@ object ExtractionBugs extends Specification {
 
   "Extraction should handle List[Option[String]]" in {
     val json = JsonParser.parse("""["one", "two", null]""")
-    json.extract[List[Option[String]]] mustEqual List(Some("one"),
-                                                      Some("two"),
-                                                      None)
+    json.extract[List[Option[String]]] mustEqual List(
+      Some("one"),
+      Some("two"),
+      None)
   }
 
   "Extraction should fail if you're attempting to extract an option and you're given data of the wrong type" in {

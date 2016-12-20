@@ -147,8 +147,9 @@ private[storage] class BlockInfoManager extends Logging {
     * This must be called prior to calling any other BlockInfoManager methods from that task.
     */
   def registerTask(taskAttemptId: TaskAttemptId): Unit = synchronized {
-    require(!readLocksByTask.contains(taskAttemptId),
-            s"Task attempt $taskAttemptId is already registered")
+    require(
+      !readLocksByTask.contains(taskAttemptId),
+      s"Task attempt $taskAttemptId is already registered")
     readLocksByTask(taskAttemptId) = ConcurrentHashMultiset.create()
   }
 

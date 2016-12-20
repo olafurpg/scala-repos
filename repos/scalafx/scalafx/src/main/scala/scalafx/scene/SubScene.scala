@@ -66,11 +66,12 @@ class SubScene(override val delegate: jfxs.SubScene)
            depthBuffer: Boolean,
            antiAliasing: SceneAntialiasing) =
     this(
-      new jfxs.SubScene(new jfxs.Group(),
-                        width,
-                        height,
-                        depthBuffer,
-                        antiAliasing))
+      new jfxs.SubScene(
+        new jfxs.Group(),
+        width,
+        height,
+        depthBuffer,
+        antiAliasing))
 
   /** Creates a SubScene for a specific root Node with a specific size. */
   def this(root: Parent, width: Double, height: Double) =

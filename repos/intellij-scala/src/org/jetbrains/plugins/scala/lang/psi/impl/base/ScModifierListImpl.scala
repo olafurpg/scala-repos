@@ -300,14 +300,15 @@ class ScModifierListImpl private (stub: StubElement[ScModifierList],
 }
 
 object ScModifierListImpl {
-  private val AllModifiers: Array[String] = Array("override",
-                                                  "private",
-                                                  "protected",
-                                                  "public",
-                                                  "final",
-                                                  "implicit",
-                                                  "abstract",
-                                                  "sealed",
-                                                  "lazy",
-                                                  "case")
+  private val AllModifiers: Array[String] = Array(
+    "override",
+    "private",
+    "protected",
+    "public",
+    "final",
+    "implicit",
+    "abstract",
+    "sealed",
+    "lazy",
+    "case")
 }

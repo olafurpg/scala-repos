@@ -50,8 +50,8 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
     with CodegenSupport {
 
   override private[sql] lazy val metrics = Map(
-    "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
-                                                   "number of output rows"))
+    "numOutputRows" -> SQLMetrics
+      .createLongMetric(sparkContext, "number of output rows"))
 
   override def output: Seq[Attribute] = {
     joinType match {
@@ -190,11 +190,12 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
             bufferedIter = RowIterator.fromScala(rightIter)
           )
           val rightNullRow = new GenericInternalRow(right.output.length)
-          new LeftOuterIterator(smjScanner,
-                                rightNullRow,
-                                boundCondition,
-                                resultProj,
-                                numOutputRows).toScala
+          new LeftOuterIterator(
+            smjScanner,
+            rightNullRow,
+            boundCondition,
+            resultProj,
+            numOutputRows).toScala
 
         case RightOuter =>
           val smjScanner = new SortMergeJoinScanner(
@@ -205,11 +206,12 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
             bufferedIter = RowIterator.fromScala(leftIter)
           )
           val leftNullRow = new GenericInternalRow(left.output.length)
-          new RightOuterIterator(smjScanner,
-                                 leftNullRow,
-                                 boundCondition,
-                                 resultProj,
-                                 numOutputRows).toScala
+          new RightOuterIterator(
+            smjScanner,
+            leftNullRow,
+            boundCondition,
+            resultProj,
+            numOutputRows).toScala
 
         case FullOuter =>
           val leftNullRow = new GenericInternalRow(left.output.length)
@@ -305,8 +307,9 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
     // Copy the left keys as class members so they could be used in next function call.
     val matchedKeyVars = copyKeys(ctx, leftKeyVars)
 
-    ctx.addNewFunction("findNextInnerJoinRows",
-                       s"""
+    ctx.addNewFunction(
+      "findNextInnerJoinRows",
+      s"""
          |private boolean findNextInnerJoinRows(
          |    scala.collection.Iterator leftIter,
          |    scala.collection.Iterator rightIter) {
@@ -435,13 +438,15 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
   override def doProduce(ctx: CodegenContext): String = {
     ctx.copyResult = true
     val leftInput = ctx.freshName("leftInput")
-    ctx.addMutableState("scala.collection.Iterator",
-                        leftInput,
-                        s"$leftInput = inputs[0];")
+    ctx.addMutableState(
+      "scala.collection.Iterator",
+      leftInput,
+      s"$leftInput = inputs[0];")
     val rightInput = ctx.freshName("rightInput")
-    ctx.addMutableState("scala.collection.Iterator",
-                        rightInput,
-                        s"$rightInput = inputs[1];")
+    ctx.addMutableState(
+      "scala.collection.Iterator",
+      rightInput,
+      s"$rightInput = inputs[1];")
 
     val (leftRow, matches) = genScanner(ctx)
 
@@ -711,11 +716,12 @@ private class LeftOuterIterator(smjScanner: SortMergeJoinScanner,
                                 boundCondition: InternalRow => Boolean,
                                 resultProj: InternalRow => InternalRow,
                                 numOutputRows: LongSQLMetric)
-    extends OneSideOuterIterator(smjScanner,
-                                 rightNullRow,
-                                 boundCondition,
-                                 resultProj,
-                                 numOutputRows) {
+    extends OneSideOuterIterator(
+      smjScanner,
+      rightNullRow,
+      boundCondition,
+      resultProj,
+      numOutputRows) {
 
   protected override def setStreamSideOutput(row: InternalRow): Unit =
     joinedRow.withLeft(row)
@@ -731,11 +737,12 @@ private class RightOuterIterator(smjScanner: SortMergeJoinScanner,
                                  boundCondition: InternalRow => Boolean,
                                  resultProj: InternalRow => InternalRow,
                                  numOutputRows: LongSQLMetric)
-    extends OneSideOuterIterator(smjScanner,
-                                 leftNullRow,
-                                 boundCondition,
-                                 resultProj,
-                                 numOutputRows) {
+    extends OneSideOuterIterator(
+      smjScanner,
+      leftNullRow,
+      boundCondition,
+      resultProj,
+      numOutputRows) {
 
   protected override def setStreamSideOutput(row: InternalRow): Unit =
     joinedRow.withRight(row)

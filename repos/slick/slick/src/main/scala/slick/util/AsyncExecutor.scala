@@ -49,12 +49,13 @@ object AsyncExecutor extends Logging {
             }
         }
         val tf = new DaemonThreadFactory(name + "-")
-        executor = new ThreadPoolExecutor(numThreads,
-                                          numThreads,
-                                          1,
-                                          TimeUnit.MINUTES,
-                                          queue,
-                                          tf)
+        executor = new ThreadPoolExecutor(
+          numThreads,
+          numThreads,
+          1,
+          TimeUnit.MINUTES,
+          queue,
+          tf)
         if (!state.compareAndSet(1, 2)) {
           executor.shutdownNow()
           throw new IllegalStateException(

@@ -86,10 +86,11 @@ object CassandraTest {
       .setOutputPartitioner(job.getConfiguration(), "Murmur3Partitioner")
 
     // Make a new Hadoop RDD
-    val casRdd = sc.newAPIHadoopRDD(job.getConfiguration(),
-                                    classOf[ColumnFamilyInputFormat],
-                                    classOf[ByteBuffer],
-                                    classOf[SortedMap[ByteBuffer, IColumn]])
+    val casRdd = sc.newAPIHadoopRDD(
+      job.getConfiguration(),
+      classOf[ColumnFamilyInputFormat],
+      classOf[ByteBuffer],
+      classOf[SortedMap[ByteBuffer, IColumn]])
 
     // Let us first get all the paragraphs from the retrieved rows
     val paraRdd = casRdd.map {
@@ -132,11 +133,12 @@ object CassandraTest {
           (outputkey, mutations)
         }
       }
-      .saveAsNewAPIHadoopFile("casDemo",
-                              classOf[ByteBuffer],
-                              classOf[List[Mutation]],
-                              classOf[ColumnFamilyOutputFormat],
-                              job.getConfiguration)
+      .saveAsNewAPIHadoopFile(
+        "casDemo",
+        classOf[ByteBuffer],
+        classOf[List[Mutation]],
+        classOf[ColumnFamilyOutputFormat],
+        job.getConfiguration)
 
     sc.stop()
   }

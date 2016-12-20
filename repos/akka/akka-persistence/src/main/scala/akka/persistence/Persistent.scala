@@ -146,13 +146,14 @@ object PersistentRepr {
             deleted: Boolean = false,
             sender: ActorRef = null,
             writerUuid: String = PersistentRepr.Undefined): PersistentRepr =
-    PersistentImpl(payload,
-                   sequenceNr,
-                   persistenceId,
-                   manifest,
-                   deleted,
-                   sender,
-                   writerUuid)
+    PersistentImpl(
+      payload,
+      sequenceNr,
+      persistenceId,
+      manifest,
+      deleted,
+      sender,
+      writerUuid)
 
   /**
     * Java API, Plugin API.
@@ -192,9 +193,10 @@ private[persistence] final case class PersistentImpl(
              deleted: Boolean,
              sender: ActorRef,
              writerUuid: String) =
-    copy(sequenceNr = sequenceNr,
-         persistenceId = persistenceId,
-         deleted = deleted,
-         sender = sender,
-         writerUuid = writerUuid)
+    copy(
+      sequenceNr = sequenceNr,
+      persistenceId = persistenceId,
+      deleted = deleted,
+      sender = sender,
+      writerUuid = writerUuid)
 }

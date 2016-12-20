@@ -18,10 +18,11 @@ class TestResultListener(private val testConfigurationName: String)
       i += 1
     }
 
-    assert(terminated,
-           "test " + testConfigurationName +
-             " did not terminate correctly; captured outputs:\n" +
-             builder.toString())
+    assert(
+      terminated,
+      "test " + testConfigurationName +
+        " did not terminate correctly; captured outputs:\n" +
+        builder.toString())
     builder.toString()
   }
 

@@ -220,9 +220,10 @@ class AskSpec extends AkkaSpec {
       val f = echo ? "hi"
       intercept[AskTimeoutException] {
         Await.result(f, 1 seconds) should ===(
-          ActorSelectionMessage("hi",
-                                Vector(SelectChildName("missing")),
-                                false))
+          ActorSelectionMessage(
+            "hi",
+            Vector(SelectChildName("missing")),
+            false))
       }
       deadListener.expectMsgClass(200 milliseconds, classOf[DeadLetter])
     }

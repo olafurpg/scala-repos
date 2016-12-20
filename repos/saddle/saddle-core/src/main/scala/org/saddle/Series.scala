@@ -101,9 +101,10 @@ class Series[X: ST: ORD, T: ST](val values: Vec[T], val index: Index[X])
     extends NumericOps[Series[X, T]]
     with Serializable {
 
-  require(values.length == index.length,
-          "Values length %d != index length %d" format
-            (values.length, index.length))
+  require(
+    values.length == index.length,
+    "Values length %d != index length %d" format
+      (values.length, index.length))
 
   /**
     * The length shared by both the index and the values array
@@ -795,10 +796,11 @@ class Series[X: ST: ORD, T: ST](val values: Vec[T], val index: Index[X])
   def joinF(other: Frame[X, _, T],
             how: JoinType = LeftJoin): Frame[X, Int, T] = {
     val tmpFrame = other.joinS(this, how)
-    Frame(tmpFrame.values.last +: tmpFrame.values
-            .slice(0, tmpFrame.values.length - 1),
-          tmpFrame.rowIx,
-          IndexIntRange(other.colIx.length + 1))
+    Frame(
+      tmpFrame.values.last +: tmpFrame.values
+        .slice(0, tmpFrame.values.length - 1),
+      tmpFrame.rowIx,
+      IndexIntRange(other.colIx.length + 1))
   }
 
   /**
@@ -814,10 +816,11 @@ class Series[X: ST: ORD, T: ST](val values: Vec[T], val index: Index[X])
   def hjoinF(other: Frame[X, _, _],
              how: JoinType = LeftJoin): Frame[X, Int, Any] = {
     val tmpFrame = other.joinAnyS(this, how)
-    Panel(tmpFrame.values.last +: tmpFrame.values
-            .slice(0, tmpFrame.values.length - 1),
-          tmpFrame.rowIx,
-          IndexIntRange(other.colIx.length + 1))
+    Panel(
+      tmpFrame.values.last +: tmpFrame.values
+        .slice(0, tmpFrame.values.length - 1),
+      tmpFrame.rowIx,
+      IndexIntRange(other.colIx.length + 1))
   }
 
   /**
@@ -920,11 +923,12 @@ class Series[X: ST: ORD, T: ST](val values: Vec[T], val index: Index[X])
         ("%" + vlen + "s\n").format(vsca.show(values.raw(r)))
 
       buf.append(
-        util.buildStr(len,
-                      length,
-                      (i: Int) => createIx(i) + " -> " + createVal(i), {
-                        resetRowLabels(0); " ... \n"
-                      }))
+        util.buildStr(
+          len,
+          length,
+          (i: Int) => createIx(i) + " -> " + createVal(i), {
+            resetRowLabels(0); " ... \n"
+          }))
     }
 
     buf.toString()
@@ -1047,6 +1051,7 @@ object Series extends BinOpSeries {
     * @tparam X Type of key
     */
   def apply[X: ST: ORD, T: ST](values: (X, T)*): Series[X, T] =
-    new Series[X, T](Vec(values.map(_._2).toArray),
-                     Index(values.map(_._1).toArray))
+    new Series[X, T](
+      Vec(values.map(_._2).toArray),
+      Index(values.map(_._1).toArray))
 }

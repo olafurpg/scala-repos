@@ -202,12 +202,13 @@ object SexpExamples extends App {
     SexpProp("s", SexpAtom("blah"))
   )
   val baz = Baz(13, "blah")
-  val bazSexp = SexpCons(SexpAtom("Baz"),
-                         SexpCons(
-                           // order is important --- how can we address this?
-                           SexpProp("i", SexpAtom("13")),
-                           SexpProp("s", SexpAtom("blah"))
-                         ))
+  val bazSexp = SexpCons(
+    SexpAtom("Baz"),
+    SexpCons(
+      // order is important --- how can we address this?
+      SexpProp("i", SexpAtom("13")),
+      SexpProp("s", SexpAtom("blah"))
+    ))
   val wibble = Wibble(Foo(13))
   val wibbleSexp = SexpCons(
     SexpAtom("Wibble"),
@@ -236,8 +237,9 @@ object SexpExamples extends App {
   val token = QualifierToken("thing", DatabaseField("Source.THING"))
   val tokenSexp = SexpCons(
     SexpAtom("QualifierToken"),
-    SexpCons(SexpProp("text", SexpAtom("thing")),
-             SexpProp("field", SexpProp("column", SexpAtom("Source.THING")))))
+    SexpCons(
+      SexpProp("text", SexpAtom("thing")),
+      SexpProp("field", SexpProp("column", SexpAtom("Source.THING")))))
 
   assert(complex.deser(tokenSexp) == Some(token))
   assert(complex.ser(token) == tokenSexp)

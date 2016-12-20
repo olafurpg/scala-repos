@@ -35,11 +35,12 @@ object LilaCookie {
       value: String,
       maxAge: Option[Int] = None,
       httpOnly: Option[Boolean] = None)(implicit req: RequestHeader): Cookie =
-    Cookie(name,
-           value,
-           maxAge orElse Session.maxAge orElse 86400.some,
-           "/",
-           domain(req).some,
-           Session.secure,
-           httpOnly | Session.httpOnly)
+    Cookie(
+      name,
+      value,
+      maxAge orElse Session.maxAge orElse 86400.some,
+      "/",
+      domain(req).some,
+      Session.secure,
+      httpOnly | Session.httpOnly)
 }

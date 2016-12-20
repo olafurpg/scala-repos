@@ -52,36 +52,41 @@ class MetadataSpec
           }
 
         forall(prepared) {
-          case (BooleanValueStats(c1, t1),
-                BooleanValueStats(c2, t2),
-                Some(BooleanValueStats(c3, t3))) => {
+          case (
+              BooleanValueStats(c1, t1),
+              BooleanValueStats(c2, t2),
+              Some(BooleanValueStats(c3, t3))) => {
             c3 must_== c1 + c2
             t3 must_== t1 + t2
           }
-          case (LongValueStats(c1, mn1, mx1),
-                LongValueStats(c2, mn2, mx2),
-                Some(LongValueStats(c3, mn3, mx3))) => {
+          case (
+              LongValueStats(c1, mn1, mx1),
+              LongValueStats(c2, mn2, mx2),
+              Some(LongValueStats(c3, mn3, mx3))) => {
             c3 must_== c1 + c2
             mn3 must_== (mn1 min mn2)
             mx3 must_== (mx1 max mx2)
           }
-          case (DoubleValueStats(c1, mn1, mx1),
-                DoubleValueStats(c2, mn2, mx2),
-                Some(DoubleValueStats(c3, mn3, mx3))) => {
+          case (
+              DoubleValueStats(c1, mn1, mx1),
+              DoubleValueStats(c2, mn2, mx2),
+              Some(DoubleValueStats(c3, mn3, mx3))) => {
             c3 must_== c1 + c2
             mn3 must_== (mn1 min mn2)
             mx3 must_== (mx1 max mx2)
           }
-          case (BigDecimalValueStats(c1, mn1, mx1),
-                BigDecimalValueStats(c2, mn2, mx2),
-                Some(BigDecimalValueStats(c3, mn3, mx3))) => {
+          case (
+              BigDecimalValueStats(c1, mn1, mx1),
+              BigDecimalValueStats(c2, mn2, mx2),
+              Some(BigDecimalValueStats(c3, mn3, mx3))) => {
             c3 must_== c1 + c2
             mn3 must_== (mn1 min mn2)
             mx3 must_== (mx1 max mx2)
           }
-          case (StringValueStats(c1, mn1, mx1),
-                StringValueStats(c2, mn2, mx2),
-                Some(StringValueStats(c3, mn3, mx3))) => {
+          case (
+              StringValueStats(c1, mn1, mx1),
+              StringValueStats(c2, mn2, mx2),
+              Some(StringValueStats(c3, mn3, mx3))) => {
             c3 must_== c1 + c2
             mn3 must_== Order[String].min(mn1, mn2)
             mx3 must_== Order[String].max(mx1, mx2)
@@ -135,11 +140,12 @@ trait MetadataGenerators extends util.ArbitraryJValue {
   implicit val arbMetadataMap: Arbitrary[Map[MetadataType, Metadata]] =
     Arbitrary(genMetadataMap)
 
-  val metadataGenerators = List[Gen[Metadata]](genBooleanMetadata,
-                                               genLongMetadata,
-                                               genDoubleMetadata,
-                                               genBigDecimalMetadata,
-                                               genStringMetadata)
+  val metadataGenerators = List[Gen[Metadata]](
+    genBooleanMetadata,
+    genLongMetadata,
+    genDoubleMetadata,
+    genBigDecimalMetadata,
+    genStringMetadata)
 
   def genMetadataList: Gen[List[Metadata]] =
     for (cnt <- choose(0, 10); l <- listOfN(cnt, genMetadata)) yield { l }
@@ -170,7 +176,8 @@ trait MetadataGenerators extends util.ArbitraryJValue {
     for (count <- choose(0, 1000); a <- arbString.arbitrary;
          b <- arbString.arbitrary)
       yield
-        StringValueStats(count,
-                         Order[String].min(a, b),
-                         Order[String].max(a, b))
+        StringValueStats(
+          count,
+          Order[String].min(a, b),
+          Order[String].max(a, b))
 }

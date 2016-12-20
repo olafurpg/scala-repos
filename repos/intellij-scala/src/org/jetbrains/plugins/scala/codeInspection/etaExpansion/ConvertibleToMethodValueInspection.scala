@@ -50,10 +50,11 @@ class ConvertibleToMethodValueInspection
     //do nothing if implicit conversions are involved
     case MethodRepr(expr, Some(qual), Some(_), args) =>
       if (allArgsUnderscores(args) && onlyStableValuesUsed(qual))
-        registerProblem(holder,
-                        expr,
-                        InspectionBundle.message(
-                          "convertible.to.method.value.anonymous.hint"))
+        registerProblem(
+          holder,
+          expr,
+          InspectionBundle.message(
+            "convertible.to.method.value.anonymous.hint"))
     case und: ScUnderscoreSection if und.bindingExpr.isDefined =>
       val isInParameterOfParameterizedClass =
         PsiTreeUtil.getParentOfType(und, classOf[ScClassParameter]) match {
@@ -91,8 +92,9 @@ class ConvertibleToMethodValueInspection
 
     qual.depthFirst(e => !e.isInstanceOf[ScImportStmt]).forall {
       case _: ScNewTemplateDefinition => false
-      case Both(_: ScReferenceExpression | ScConstructor.byReference(_),
-                ResolvesTo(named: PsiNamedElement)) =>
+      case Both(
+          _: ScReferenceExpression | ScConstructor.byReference(_),
+          ResolvesTo(named: PsiNamedElement)) =>
         isStable(named)
       case _ => true
     }

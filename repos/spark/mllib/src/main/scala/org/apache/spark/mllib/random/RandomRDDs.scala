@@ -52,11 +52,12 @@ object RandomRDDs {
                  numPartitions: Int = 0,
                  seed: Long = Utils.random.nextLong()): RDD[Double] = {
     val uniform = new UniformGenerator()
-    randomRDD(sc,
-              uniform,
-              size,
-              numPartitionsOrDefault(sc, numPartitions),
-              seed)
+    randomRDD(
+      sc,
+      uniform,
+      size,
+      numPartitionsOrDefault(sc, numPartitions),
+      seed)
   }
 
   /**
@@ -106,11 +107,12 @@ object RandomRDDs {
                 numPartitions: Int = 0,
                 seed: Long = Utils.random.nextLong()): RDD[Double] = {
     val normal = new StandardNormalGenerator()
-    randomRDD(sc,
-              normal,
-              size,
-              numPartitionsOrDefault(sc, numPartitions),
-              seed)
+    randomRDD(
+      sc,
+      normal,
+      size,
+      numPartitionsOrDefault(sc, numPartitions),
+      seed)
   }
 
   /**
@@ -160,11 +162,12 @@ object RandomRDDs {
                  numPartitions: Int = 0,
                  seed: Long = Utils.random.nextLong()): RDD[Double] = {
     val poisson = new PoissonGenerator(mean)
-    randomRDD(sc,
-              poisson,
-              size,
-              numPartitionsOrDefault(sc, numPartitions),
-              seed)
+    randomRDD(
+      sc,
+      poisson,
+      size,
+      numPartitionsOrDefault(sc, numPartitions),
+      seed)
   }
 
   /**
@@ -218,11 +221,12 @@ object RandomRDDs {
                      numPartitions: Int = 0,
                      seed: Long = Utils.random.nextLong()): RDD[Double] = {
     val exponential = new ExponentialGenerator(mean)
-    randomRDD(sc,
-              exponential,
-              size,
-              numPartitionsOrDefault(sc, numPartitions),
-              seed)
+    randomRDD(
+      sc,
+      exponential,
+      size,
+      numPartitionsOrDefault(sc, numPartitions),
+      seed)
   }
 
   /**
@@ -339,11 +343,12 @@ object RandomRDDs {
                    numPartitions: Int = 0,
                    seed: Long = Utils.random.nextLong()): RDD[Double] = {
     val logNormal = new LogNormalGenerator(mean, std)
-    randomRDD(sc,
-              logNormal,
-              size,
-              numPartitionsOrDefault(sc, numPartitions),
-              seed)
+    randomRDD(
+      sc,
+      logNormal,
+      size,
+      numPartitionsOrDefault(sc, numPartitions),
+      seed)
   }
 
   /**
@@ -401,11 +406,12 @@ object RandomRDDs {
                              size: Long,
                              numPartitions: Int = 0,
                              seed: Long = Utils.random.nextLong()): RDD[T] = {
-    new RandomRDD[T](sc,
-                     size,
-                     numPartitionsOrDefault(sc, numPartitions),
-                     generator,
-                     seed)
+    new RandomRDD[T](
+      sc,
+      size,
+      numPartitionsOrDefault(sc, numPartitions),
+      generator,
+      seed)
   }
 
   /**
@@ -474,12 +480,13 @@ object RandomRDDs {
                        numPartitions: Int = 0,
                        seed: Long = Utils.random.nextLong()): RDD[Vector] = {
     val uniform = new UniformGenerator()
-    randomVectorRDD(sc,
-                    uniform,
-                    numRows,
-                    numCols,
-                    numPartitionsOrDefault(sc, numPartitions),
-                    seed)
+    randomVectorRDD(
+      sc,
+      uniform,
+      numRows,
+      numCols,
+      numPartitionsOrDefault(sc, numPartitions),
+      seed)
   }
 
   /**
@@ -533,12 +540,13 @@ object RandomRDDs {
                       numPartitions: Int = 0,
                       seed: Long = Utils.random.nextLong()): RDD[Vector] = {
     val normal = new StandardNormalGenerator()
-    randomVectorRDD(sc,
-                    normal,
-                    numRows,
-                    numCols,
-                    numPartitionsOrDefault(sc, numPartitions),
-                    seed)
+    randomVectorRDD(
+      sc,
+      normal,
+      numRows,
+      numCols,
+      numPartitionsOrDefault(sc, numPartitions),
+      seed)
   }
 
   /**
@@ -596,12 +604,13 @@ object RandomRDDs {
                          numPartitions: Int = 0,
                          seed: Long = Utils.random.nextLong()): RDD[Vector] = {
     val logNormal = new LogNormalGenerator(mean, std)
-    randomVectorRDD(sc,
-                    logNormal,
-                    numRows,
-                    numCols,
-                    numPartitionsOrDefault(sc, numPartitions),
-                    seed)
+    randomVectorRDD(
+      sc,
+      logNormal,
+      numRows,
+      numCols,
+      numPartitionsOrDefault(sc, numPartitions),
+      seed)
   }
 
   /**
@@ -615,13 +624,14 @@ object RandomRDDs {
                              numCols: Int,
                              numPartitions: Int,
                              seed: Long): JavaRDD[Vector] = {
-    logNormalVectorRDD(jsc.sc,
-                       mean,
-                       std,
-                       numRows,
-                       numCols,
-                       numPartitions,
-                       seed).toJavaRDD()
+    logNormalVectorRDD(
+      jsc.sc,
+      mean,
+      std,
+      numRows,
+      numCols,
+      numPartitions,
+      seed).toJavaRDD()
   }
 
   /**
@@ -671,12 +681,13 @@ object RandomRDDs {
                        numPartitions: Int = 0,
                        seed: Long = Utils.random.nextLong()): RDD[Vector] = {
     val poisson = new PoissonGenerator(mean)
-    randomVectorRDD(sc,
-                    poisson,
-                    numRows,
-                    numCols,
-                    numPartitionsOrDefault(sc, numPartitions),
-                    seed)
+    randomVectorRDD(
+      sc,
+      poisson,
+      numRows,
+      numCols,
+      numPartitionsOrDefault(sc, numPartitions),
+      seed)
   }
 
   /**
@@ -737,12 +748,13 @@ object RandomRDDs {
       numPartitions: Int = 0,
       seed: Long = Utils.random.nextLong()): RDD[Vector] = {
     val exponential = new ExponentialGenerator(mean)
-    randomVectorRDD(sc,
-                    exponential,
-                    numRows,
-                    numCols,
-                    numPartitionsOrDefault(sc, numPartitions),
-                    seed)
+    randomVectorRDD(
+      sc,
+      exponential,
+      numRows,
+      numCols,
+      numPartitionsOrDefault(sc, numPartitions),
+      seed)
   }
 
   /**
@@ -806,12 +818,13 @@ object RandomRDDs {
                      numPartitions: Int = 0,
                      seed: Long = Utils.random.nextLong()): RDD[Vector] = {
     val gamma = new GammaGenerator(shape, scale)
-    randomVectorRDD(sc,
-                    gamma,
-                    numRows,
-                    numCols,
-                    numPartitionsOrDefault(sc, numPartitions),
-                    seed)
+    randomVectorRDD(
+      sc,
+      gamma,
+      numRows,
+      numCols,
+      numPartitionsOrDefault(sc, numPartitions),
+      seed)
   }
 
   /**
@@ -876,12 +889,13 @@ object RandomRDDs {
                       numCols: Int,
                       numPartitions: Int = 0,
                       seed: Long = Utils.random.nextLong()): RDD[Vector] = {
-    new RandomVectorRDD(sc,
-                        numRows,
-                        numCols,
-                        numPartitionsOrDefault(sc, numPartitions),
-                        generator,
-                        seed)
+    new RandomVectorRDD(
+      sc,
+      numRows,
+      numCols,
+      numPartitionsOrDefault(sc, numPartitions),
+      generator,
+      seed)
   }
 
   /**

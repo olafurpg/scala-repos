@@ -105,10 +105,11 @@ abstract class CommonWriteAheadLogTests(allowBatching: Boolean,
   test(testPrefix + "write logs") {
     // Write data with rotation using WriteAheadLog class
     val dataToWrite = generateRandomData()
-    writeDataUsingWriteAheadLog(testDir,
-                                dataToWrite,
-                                closeFileAfterWrite = closeFileAfterWrite,
-                                allowBatching = allowBatching)
+    writeDataUsingWriteAheadLog(
+      testDir,
+      dataToWrite,
+      closeFileAfterWrite = closeFileAfterWrite,
+      allowBatching = allowBatching)
 
     // Read data manually to verify the written data
     val logFiles = getLogFilesInDirectory(testDir)
@@ -120,10 +121,11 @@ abstract class CommonWriteAheadLogTests(allowBatching: Boolean,
   test(testPrefix + "read all logs after write") {
     // Write data with manager, recover with new manager and verify
     val dataToWrite = generateRandomData()
-    writeDataUsingWriteAheadLog(testDir,
-                                dataToWrite,
-                                closeFileAfterWrite,
-                                allowBatching)
+    writeDataUsingWriteAheadLog(
+      testDir,
+      dataToWrite,
+      closeFileAfterWrite,
+      allowBatching)
     val logFiles = getLogFilesInDirectory(testDir)
     assert(logFiles.size > 1)
     val readData =
@@ -143,12 +145,13 @@ abstract class CommonWriteAheadLogTests(allowBatching: Boolean,
     // Write data with manager, recover with new manager and verify
     val manualClock = new ManualClock
     val dataToWrite = generateRandomData()
-    writeAheadLog = writeDataUsingWriteAheadLog(testDir,
-                                                dataToWrite,
-                                                closeFileAfterWrite,
-                                                allowBatching,
-                                                manualClock,
-                                                closeLog = false)
+    writeAheadLog = writeDataUsingWriteAheadLog(
+      testDir,
+      dataToWrite,
+      closeFileAfterWrite,
+      allowBatching,
+      manualClock,
+      closeLog = false)
     val logFiles = getLogFilesInDirectory(testDir)
     assert(logFiles.size > 1)
 
@@ -167,22 +170,24 @@ abstract class CommonWriteAheadLogTests(allowBatching: Boolean,
     // Generate a set of log files
     val manualClock = new ManualClock
     val dataToWrite1 = generateRandomData()
-    writeDataUsingWriteAheadLog(testDir,
-                                dataToWrite1,
-                                closeFileAfterWrite,
-                                allowBatching,
-                                manualClock)
+    writeDataUsingWriteAheadLog(
+      testDir,
+      dataToWrite1,
+      closeFileAfterWrite,
+      allowBatching,
+      manualClock)
     val logFiles1 = getLogFilesInDirectory(testDir)
     assert(logFiles1.size > 1)
 
     // Recover old files and generate a second set of log files
     val dataToWrite2 = generateRandomData()
     manualClock.advance(100000)
-    writeDataUsingWriteAheadLog(testDir,
-                                dataToWrite2,
-                                closeFileAfterWrite,
-                                allowBatching,
-                                manualClock)
+    writeDataUsingWriteAheadLog(
+      testDir,
+      dataToWrite2,
+      closeFileAfterWrite,
+      allowBatching,
+      manualClock)
     val logFiles2 = getLogFilesInDirectory(testDir)
     assert(logFiles2.size > logFiles1.size)
 
@@ -212,15 +217,17 @@ abstract class CommonWriteAheadLogTests(allowBatching: Boolean,
     val writtenSegment =
       writeDataManually(generateRandomData(), testFile, allowBatching)
     val wal = createWriteAheadLog(testDir, closeFileAfterWrite, allowBatching)
-    assert(!nonexistentTempPath.exists(),
-           "Directory created just by creating log object")
+    assert(
+      !nonexistentTempPath.exists(),
+      "Directory created just by creating log object")
     if (allowBatching) {
       intercept[UnsupportedOperationException](wal.read(writtenSegment.head))
     } else {
       wal.read(writtenSegment.head)
     }
-    assert(!nonexistentTempPath.exists(),
-           "Directory created just by attempting to read segment")
+    assert(
+      !nonexistentTempPath.exists(),
+      "Directory created just by attempting to read segment")
   }
 
   test(
@@ -435,9 +442,10 @@ class FileBasedWriteAheadLogSuite
 
 abstract class CloseFileAfterWriteTests(allowBatching: Boolean,
                                         testTag: String)
-    extends CommonWriteAheadLogTests(allowBatching,
-                                     closeFileAfterWrite = true,
-                                     testTag) {
+    extends CommonWriteAheadLogTests(
+      allowBatching,
+      closeFileAfterWrite = true,
+      testTag) {
 
   import WriteAheadLogSuite._
   test(testPrefix + "close after write flag") {
@@ -445,12 +453,13 @@ abstract class CloseFileAfterWriteTests(allowBatching: Boolean,
     val numFiles = 3
     val dataToWrite = Seq.tabulate(numFiles)(_.toString)
     // total advance time is less than 1000, therefore log shouldn't be rolled, but manually closed
-    writeDataUsingWriteAheadLog(testDir,
-                                dataToWrite,
-                                closeLog = false,
-                                clockAdvanceTime = 100,
-                                closeFileAfterWrite = true,
-                                allowBatching = allowBatching)
+    writeDataUsingWriteAheadLog(
+      testDir,
+      dataToWrite,
+      closeLog = false,
+      clockAdvanceTime = 100,
+      closeFileAfterWrite = true,
+      allowBatching = allowBatching)
 
     // Read data manually to verify the written data
     val logFiles = getLogFilesInDirectory(testDir)
@@ -462,13 +471,15 @@ abstract class CloseFileAfterWriteTests(allowBatching: Boolean,
 }
 
 class FileBasedWriteAheadLogWithFileCloseAfterWriteSuite
-    extends CloseFileAfterWriteTests(allowBatching = false,
-                                     "FileBasedWriteAheadLog")
+    extends CloseFileAfterWriteTests(
+      allowBatching = false,
+      "FileBasedWriteAheadLog")
 
 class BatchedWriteAheadLogSuite
-    extends CommonWriteAheadLogTests(allowBatching = true,
-                                     closeFileAfterWrite = false,
-                                     "BatchedWriteAheadLog")
+    extends CommonWriteAheadLogTests(
+      allowBatching = true,
+      closeFileAfterWrite = false,
+      "BatchedWriteAheadLog")
     with MockitoSugar
     with BeforeAndAfterEach
     with Eventually
@@ -643,8 +654,9 @@ class BatchedWriteAheadLogSuite
 }
 
 class BatchedWriteAheadLogWithCloseFileAfterWriteSuite
-    extends CloseFileAfterWriteTests(allowBatching = true,
-                                     "BatchedWriteAheadLog")
+    extends CloseFileAfterWriteTests(
+      allowBatching = true,
+      "BatchedWriteAheadLog")
 
 object WriteAheadLogSuite {
 
@@ -794,12 +806,13 @@ object WriteAheadLogSuite {
                           closeFileAfterWrite: Boolean,
                           allowBatching: Boolean): WriteAheadLog = {
     val sparkConf = new SparkConf
-    val wal = new FileBasedWriteAheadLog(sparkConf,
-                                         logDirectory,
-                                         hadoopConf,
-                                         1,
-                                         1,
-                                         closeFileAfterWrite)
+    val wal = new FileBasedWriteAheadLog(
+      sparkConf,
+      logDirectory,
+      hadoopConf,
+      1,
+      1,
+      closeFileAfterWrite)
     if (allowBatching) new BatchedWriteAheadLog(wal, sparkConf) else wal
   }
 

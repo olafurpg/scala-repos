@@ -161,13 +161,15 @@ class CoarseMesosSchedulerBackendSuite
     val executorCores = 4
     val maxCores = executorCores * 2
     setBackend(
-      Map("spark.executor.cores" -> executorCores.toString,
-          "spark.cores.max" -> maxCores.toString))
+      Map(
+        "spark.executor.cores" -> executorCores.toString,
+        "spark.cores.max" -> maxCores.toString))
 
     val executorMemory = backend.executorMemory(sc)
     offerResources(
-      List((executorMemory * 2, executorCores * 2),
-           (executorMemory * 2, executorCores * 2)))
+      List(
+        (executorMemory * 2, executorCores * 2),
+        (executorMemory * 2, executorCores * 2)))
 
     verifyTaskLaunched("o1")
     verifyTaskLaunched("o2")
@@ -228,10 +230,11 @@ class CoarseMesosSchedulerBackendSuite
     when(driver.start()).thenReturn(Protos.Status.DRIVER_RUNNING)
     val securityManager = mock[SecurityManager]
 
-    val backend = new CoarseMesosSchedulerBackend(taskScheduler,
-                                                  sc,
-                                                  "master",
-                                                  securityManager) {
+    val backend = new CoarseMesosSchedulerBackend(
+      taskScheduler,
+      sc,
+      "master",
+      securityManager) {
       override protected def createSchedulerDriver(
           masterUrl: String,
           scheduler: Scheduler,
@@ -340,10 +343,11 @@ class CoarseMesosSchedulerBackendSuite
       endpoint: RpcEndpointRef): CoarseMesosSchedulerBackend = {
     val securityManager = mock[SecurityManager]
 
-    val backend = new CoarseMesosSchedulerBackend(taskScheduler,
-                                                  sc,
-                                                  "master",
-                                                  securityManager) {
+    val backend = new CoarseMesosSchedulerBackend(
+      taskScheduler,
+      sc,
+      "master",
+      securityManager) {
       override protected def createSchedulerDriver(
           masterUrl: String,
           scheduler: Scheduler,
@@ -394,9 +398,10 @@ class CoarseMesosSchedulerBackendSuite
     externalShuffleClient = mock[MesosExternalShuffleClient]
     driverEndpoint = mock[RpcEndpointRef]
 
-    backend = createSchedulerBackend(taskScheduler,
-                                     driver,
-                                     externalShuffleClient,
-                                     driverEndpoint)
+    backend = createSchedulerBackend(
+      taskScheduler,
+      driver,
+      externalShuffleClient,
+      driverEndpoint)
   }
 }

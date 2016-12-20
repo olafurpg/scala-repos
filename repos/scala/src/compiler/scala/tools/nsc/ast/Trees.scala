@@ -65,18 +65,21 @@ trait Trees extends scala.reflect.internal.Trees { self: Global =>
                body: List[Tree],
                superPos: Position): ClassDef = {
     // "if they have symbols they should be owned by `sym`"
-    assert(mforall(vparamss)(_.symbol.owner == sym),
-           (mmap(vparamss)(_.symbol), sym))
+    assert(
+      mforall(vparamss)(_.symbol.owner == sym),
+      (mmap(vparamss)(_.symbol), sym))
 
-    ClassDef(sym,
-             gen.mkTemplate(sym.info.parents map TypeTree,
-                            if (sym.thisSym == sym || phase.erasedTypes)
-                              noSelfType
-                            else ValDef(sym.thisSym),
-                            constrMods,
-                            vparamss,
-                            body,
-                            superPos))
+    ClassDef(
+      sym,
+      gen.mkTemplate(
+        sym.info.parents map TypeTree,
+        if (sym.thisSym == sym || phase.erasedTypes)
+          noSelfType
+        else ValDef(sym.thisSym),
+        constrMods,
+        vparamss,
+        body,
+        superPos))
   }
 
   // --- subcomponents --------------------------------------------------
@@ -186,10 +189,11 @@ trait Trees extends scala.reflect.internal.Trees { self: Global =>
       transformer.treeCopy
         .DocDef(tree, comment, transformer.transform(definition))
     case SelectFromArray(qualifier, selector, erasure) =>
-      transformer.treeCopy.SelectFromArray(tree,
-                                           transformer.transform(qualifier),
-                                           selector,
-                                           erasure)
+      transformer.treeCopy.SelectFromArray(
+        tree,
+        transformer.transform(qualifier),
+        selector,
+        erasure)
     case InjectDerivedValue(arg) =>
       transformer.treeCopy.InjectDerivedValue(tree, transformer.transform(arg))
     case TypeTreeWithDeferredRefCheck() =>

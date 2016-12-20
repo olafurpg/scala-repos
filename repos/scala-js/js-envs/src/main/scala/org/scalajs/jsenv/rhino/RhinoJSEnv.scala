@@ -87,13 +87,14 @@ final class RhinoJSEnv private (
                        code: VirtualJSFile)
       extends JSRunner {
     def run(logger: Logger, console: JSConsole): Unit =
-      internalRunJS(preLibs,
-                    optLinkingUnit,
-                    postLibs,
-                    code,
-                    logger,
-                    console,
-                    None)
+      internalRunJS(
+        preLibs,
+        optLinkingUnit,
+        postLibs,
+        code,
+        logger,
+        console,
+        None)
   }
 
   override def asyncRunner(libs: Seq[ResolvedJSDependency],
@@ -124,13 +125,14 @@ final class RhinoJSEnv private (
       _thread = new Thread {
         override def run(): Unit = {
           try {
-            internalRunJS(preLibs,
-                          optLinkingUnit,
-                          postLibs,
-                          code,
-                          logger,
-                          console,
-                          optChannel)
+            internalRunJS(
+              preLibs,
+              optLinkingUnit,
+              postLibs,
+              code,
+              logger,
+              console,
+              optChannel)
             promise.success(())
           } catch {
             case t: Throwable =>
@@ -211,11 +213,12 @@ final class RhinoJSEnv private (
       // Optionally setup scalaJSCom
       var recvCallback: Option[String => Unit] = None
       for (channel <- optChannel) {
-        setupCom(context,
-                 scope,
-                 channel,
-                 setCallback = cb => recvCallback = Some(cb),
-                 clrCallback = () => recvCallback = None)
+        setupCom(
+          context,
+          scope,
+          channel,
+          setCallback = cb => recvCallback = Some(cb),
+          clrCallback = () => recvCallback = None)
       }
 
       try {
@@ -234,10 +237,11 @@ final class RhinoJSEnv private (
         // Start the event loop
 
         for (channel <- optChannel) {
-          comEventLoop(taskQ,
-                       channel,
-                       () => recvCallback.get,
-                       () => recvCallback.isDefined)
+          comEventLoop(
+            taskQ,
+            channel,
+            () => recvCallback.get,
+            () => recvCallback.isDefined)
         }
 
         // Channel is closed. Fall back to basic event loop
@@ -307,8 +311,9 @@ final class RhinoJSEnv private (
 
     scope.addFunction("setTimeout", args => {
       val cb =
-        ensure[Function](args(0),
-                         "First argument to setTimeout must be a function")
+        ensure[Function](
+          args(0),
+          "First argument to setTimeout must be a function")
 
       val deadline = Context.toNumber(args(1)).toInt.millis.fromNow
 
@@ -323,8 +328,9 @@ final class RhinoJSEnv private (
 
     scope.addFunction("setInterval", args => {
       val cb =
-        ensure[Function](args(0),
-                         "First argument to setInterval must be a function")
+        ensure[Function](
+          args(0),
+          "First argument to setInterval must be a function")
 
       val interval = Context.toNumber(args(1)).toInt.millis
       val firstDeadline = interval.fromNow
@@ -518,8 +524,9 @@ final class RhinoJSEnv private (
   }
 
   private def verifyUnit(linkingUnit: LinkingUnit) = {
-    require(linkingUnit.semantics == semantics,
-            "RhinoJSEnv and LinkingUnit must agree on semantics")
+    require(
+      linkingUnit.semantics == semantics,
+      "RhinoJSEnv and LinkingUnit must agree on semantics")
     require(linkingUnit.esLevel == ESLevel.ES5, "RhinoJSEnv only supports ES5")
   }
 }

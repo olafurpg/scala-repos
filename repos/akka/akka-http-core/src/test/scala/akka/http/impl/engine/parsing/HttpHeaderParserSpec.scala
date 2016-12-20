@@ -173,8 +173,9 @@ class HttpHeaderParserSpec
     }
 
     "parse and cache a header with a tab char in the value" in new TestSetup() {
-      parseAndCache("Fancy: foo\tbar\r\nx")() shouldEqual RawHeader("Fancy",
-                                                                    "foo bar")
+      parseAndCache("Fancy: foo\tbar\r\nx")() shouldEqual RawHeader(
+        "Fancy",
+        "foo bar")
     }
 
     "parse and cache a header with UTF8 chars in the value" in new TestSetup() {
@@ -226,9 +227,9 @@ class HttpHeaderParserSpec
 
     "continue parsing modelled headers even if the overall cache value capacity is reached" in new TestSetup() {
       val randomHostHeaders = Stream.continually {
-        Host(host =
-               nextRandomString(nextRandomAlphaNumChar, nextRandomInt(4, 8)),
-             port = nextRandomInt(1000, 10000))
+        Host(
+          host = nextRandomString(nextRandomAlphaNumChar, nextRandomInt(4, 8)),
+          port = nextRandomInt(1000, 10000))
       }
       randomHostHeaders.take(300).foldLeft(0) {
         case (acc, header) ⇒
@@ -238,8 +239,9 @@ class HttpHeaderParserSpec
 
     "continue parsing headers even if the overall cache node capacity is reached" in new TestSetup() {
       val randomHostHeaders = Stream.continually {
-        RawHeader(name = nextRandomString(nextRandomAlphaNumChar, 60),
-                  value = nextRandomString(nextRandomAlphaNumChar, 1000))
+        RawHeader(
+          name = nextRandomString(nextRandomAlphaNumChar, 60),
+          value = nextRandomString(nextRandomAlphaNumChar, 1000))
       }
       randomHostHeaders.take(100).foldLeft(0) {
         case (acc, header) ⇒

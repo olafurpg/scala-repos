@@ -31,8 +31,9 @@ trait ScInterpolated extends ScalaPsiElement {
   def isMultiLineString: Boolean
 
   def getReferencesToStringParts: Array[PsiReference] = {
-    val accepted = List(ScalaTokenTypes.tINTERPOLATED_STRING,
-                        ScalaTokenTypes.tINTERPOLATED_MULTILINE_STRING)
+    val accepted = List(
+      ScalaTokenTypes.tINTERPOLATED_STRING,
+      ScalaTokenTypes.tINTERPOLATED_MULTILINE_STRING)
     val res = ListBuffer[PsiReference]()
     val children: Array[PsiElement] = this match {
       case ip: ScInterpolationPattern => ip.args.children.toArray

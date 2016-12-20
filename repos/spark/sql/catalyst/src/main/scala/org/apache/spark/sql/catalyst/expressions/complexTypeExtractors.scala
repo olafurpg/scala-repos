@@ -60,15 +60,17 @@ object ExtractValue {
         val ordinal = findField(fields, fieldName, resolver)
         GetStructField(child, ordinal, Some(fieldName))
 
-      case (ArrayType(StructType(fields), containsNull),
-            NonNullLiteral(v, StringType)) =>
+      case (
+          ArrayType(StructType(fields), containsNull),
+          NonNullLiteral(v, StringType)) =>
         val fieldName = v.toString
         val ordinal = findField(fields, fieldName, resolver)
-        GetArrayStructFields(child,
-                             fields(ordinal).copy(name = fieldName),
-                             ordinal,
-                             fields.length,
-                             containsNull)
+        GetArrayStructFields(
+          child,
+          fields(ordinal).copy(name = fieldName),
+          ordinal,
+          fields.length,
+          containsNull)
 
       case (_: ArrayType, _) => GetArrayItem(child, extraction)
 

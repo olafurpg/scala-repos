@@ -11,15 +11,17 @@ trait WordSpecScopeTest extends WordSpecGenerator {
     addWordSpec()
 
     assert(
-      checkConfigAndSettings(createTestFromLocation(13, 10, wordSpecFileName),
-                             wordSpecClassName))
+      checkConfigAndSettings(
+        createTestFromLocation(13, 10, wordSpecFileName),
+        wordSpecClassName))
   }
 
   def testWordSpecScope() {
     addWordSpec()
 
-    val testNames = Seq("WordSpecTest should Run single test",
-                        "WordSpecTest should ignore other tests")
+    val testNames = Seq(
+      "WordSpecTest should Run single test",
+      "WordSpecTest should ignore other tests")
 
     val path1 =
       List("[root]", "WordSpecTest", "WordSpecTest", "Run single test")

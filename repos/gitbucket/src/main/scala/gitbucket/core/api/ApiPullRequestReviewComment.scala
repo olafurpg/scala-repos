@@ -45,9 +45,10 @@ case class ApiPullRequestReviewComment(
       }
     }
    */
-  val _links = Map("self" -> Map("href" -> url),
-                   "html" -> Map("href" -> html_url),
-                   "pull_request" -> Map("href" -> pull_request_url))
+  val _links = Map(
+    "self" -> Map("href" -> url),
+    "html" -> Map("href" -> html_url),
+    "pull_request" -> Map("href" -> pull_request_url))
 }
 
 object ApiPullRequestReviewComment {

@@ -37,9 +37,10 @@ private[simul] final class SimulApi(system: ActorSystem,
 
   def create(setup: SimulSetup, me: User): Fu[Simul] = {
     val simul = Simul.make(
-      clock = SimulClock(limit = setup.clockTime * 60,
-                         increment = setup.clockIncrement,
-                         hostExtraTime = setup.clockExtra * 60),
+      clock = SimulClock(
+        limit = setup.clockTime * 60,
+        increment = setup.clockIncrement,
+        hostExtraTime = setup.clockExtra * 60),
       variants = setup.variants.flatMap { chess.variant.Variant(_) },
       host = me,
       color = setup.color)
@@ -86,8 +87,9 @@ private[simul] final class SimulApi(system: ActorSystem,
                   games =>
                     games.headOption foreach {
                       case (game, _) =>
-                        sendTo(simul.id,
-                               actorApi.StartSimul(game, simul.hostId))
+                        sendTo(
+                          simul.id,
+                          actorApi.StartSimul(game, simul.hostId))
                     }
                     games.foldLeft(started) {
                       case (s, (g, hostColor)) =>
@@ -131,11 +133,12 @@ private[simul] final class SimulApi(system: ActorSystem,
               if (simul2.isFinished)
                 userRegister ! lila.hub.actorApi.SendTo(
                   simul2.hostId,
-                  lila.socket.Socket.makeMessage("simulEnd",
-                                                 Json.obj(
-                                                   "id" -> simul.id,
-                                                   "name" -> simul.name
-                                                 )))
+                  lila.socket.Socket.makeMessage(
+                    "simulEnd",
+                    Json.obj(
+                      "id" -> simul.id,
+                      "name" -> simul.name
+                    )))
             }
           }
         }
@@ -167,9 +170,9 @@ private[simul] final class SimulApi(system: ActorSystem,
       whiteUser = hostColor.fold(host, user)
       blackUser = hostColor.fold(user, host)
       game1 = Game.make(
-        game = chess.Game(board = chess.Board init pairing.player.variant,
-                          clock =
-                            simul.clock.chessClockOf(hostColor).start.some),
+        game = chess.Game(
+          board = chess.Board init pairing.player.variant,
+          clock = simul.clock.chessClockOf(hostColor).start.some),
         whitePlayer = lila.game.Player.white,
         blackPlayer = lila.game.Player.black,
         mode = chess.Mode.Casual,
@@ -177,14 +180,16 @@ private[simul] final class SimulApi(system: ActorSystem,
         source = lila.game.Source.Simul,
         pgnImport = None)
       game2 = game1
-        .updatePlayer(chess.White,
-                      _.withUser(whiteUser.id,
-                                 lila.game.PerfPicker.mainOrDefault(game1)(
-                                   whiteUser.perfs)))
-        .updatePlayer(chess.Black,
-                      _.withUser(blackUser.id,
-                                 lila.game.PerfPicker.mainOrDefault(game1)(
-                                   blackUser.perfs)))
+        .updatePlayer(
+          chess.White,
+          _.withUser(
+            whiteUser.id,
+            lila.game.PerfPicker.mainOrDefault(game1)(whiteUser.perfs)))
+        .updatePlayer(
+          chess.Black,
+          _.withUser(
+            blackUser.id,
+            lila.game.PerfPicker.mainOrDefault(game1)(blackUser.perfs)))
         .withSimulId(simul.id)
         .withId(pairing.gameId)
         .start

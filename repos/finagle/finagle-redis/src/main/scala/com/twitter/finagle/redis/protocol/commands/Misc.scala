@@ -69,8 +69,9 @@ object ConfigSet extends ConfigHelper {
   val command = "SET"
   def apply(args: Seq[Array[Byte]]): ConfigSet = {
     val list = trimList(args, 2, "CONFIG SET")
-    new ConfigSet(ChannelBuffers.wrappedBuffer(list(0)),
-                  ChannelBuffers.wrappedBuffer(list(1)))
+    new ConfigSet(
+      ChannelBuffers.wrappedBuffer(list(0)),
+      ChannelBuffers.wrappedBuffer(list(1)))
   }
 }
 
@@ -129,8 +130,9 @@ case class SlaveOf(host: ChannelBuffer, port: ChannelBuffer) extends Command {
 
 object SlaveOf {
   def apply(args: Seq[Array[Byte]]) = {
-    new SlaveOf(ChannelBuffers.wrappedBuffer(args(0)),
-                ChannelBuffers.wrappedBuffer(args(1)))
+    new SlaveOf(
+      ChannelBuffers.wrappedBuffer(args(0)),
+      ChannelBuffers.wrappedBuffer(args(1)))
   }
   val noOne = apply(Seq(StringToBytes("NO"), StringToBytes("ONE")))
 }

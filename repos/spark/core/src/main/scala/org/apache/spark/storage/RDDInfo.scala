@@ -41,13 +41,14 @@ class RDDInfo(val id: Int,
   override def toString: String = {
     import Utils.bytesToString
     ("RDD \"%s\" (%d) StorageLevel: %s; CachedPartitions: %d; TotalPartitions: %d; " +
-      "MemorySize: %s; DiskSize: %s").format(name,
-                                             id,
-                                             storageLevel.toString,
-                                             numCachedPartitions,
-                                             numPartitions,
-                                             bytesToString(memSize),
-                                             bytesToString(diskSize))
+      "MemorySize: %s; DiskSize: %s").format(
+      name,
+      id,
+      storageLevel.toString,
+      numCachedPartitions,
+      numPartitions,
+      bytesToString(memSize),
+      bytesToString(diskSize))
   }
 
   override def compare(that: RDDInfo): Int = {
@@ -59,12 +60,13 @@ private[spark] object RDDInfo {
   def fromRdd(rdd: RDD[_]): RDDInfo = {
     val rddName = Option(rdd.name).getOrElse(Utils.getFormattedClassName(rdd))
     val parentIds = rdd.dependencies.map(_.rdd.id)
-    new RDDInfo(rdd.id,
-                rddName,
-                rdd.partitions.length,
-                rdd.getStorageLevel,
-                parentIds,
-                rdd.creationSite.shortForm,
-                rdd.scope)
+    new RDDInfo(
+      rdd.id,
+      rddName,
+      rdd.partitions.length,
+      rdd.getStorageLevel,
+      parentIds,
+      rdd.creationSite.shortForm,
+      rdd.scope)
   }
 }

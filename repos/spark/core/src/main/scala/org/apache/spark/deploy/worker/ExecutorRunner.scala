@@ -145,11 +145,12 @@ private[deploy] class ExecutorRunner(val appId: String,
   private def fetchAndRunExecutor() {
     try {
       // Launch the process
-      val builder = CommandUtils.buildProcessBuilder(appDesc.command,
-                                                     new SecurityManager(conf),
-                                                     memory,
-                                                     sparkHome.getAbsolutePath,
-                                                     substituteVariables)
+      val builder = CommandUtils.buildProcessBuilder(
+        appDesc.command,
+        new SecurityManager(conf),
+        memory,
+        sparkHome.getAbsolutePath,
+        substituteVariables)
       val command = builder.command()
       val formattedCommand = command.asScala.mkString("\"", "\" \"", "\"")
       logInfo(s"Launch command: $formattedCommand")
@@ -185,11 +186,12 @@ private[deploy] class ExecutorRunner(val appId: String,
       state = ExecutorState.EXITED
       val message = "Command exited with code " + exitCode
       worker.send(
-        ExecutorStateChanged(appId,
-                             execId,
-                             state,
-                             Some(message),
-                             Some(exitCode)))
+        ExecutorStateChanged(
+          appId,
+          execId,
+          state,
+          Some(message),
+          Some(exitCode)))
     } catch {
       case interrupted: InterruptedException => {
         logInfo("Runner thread for executor " + fullId + " interrupted")

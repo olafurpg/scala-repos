@@ -40,14 +40,15 @@ class AllStagesResourceSuite extends SparkFunSuite {
     val stageUiData = new StageUIData()
     stageUiData.taskData = tasks
     val status = StageStatus.ACTIVE
-    val stageInfo = new StageInfo(1,
-                                  1,
-                                  "stage 1",
-                                  10,
-                                  Seq.empty,
-                                  Seq.empty,
-                                  "details abc",
-                                  Seq.empty)
+    val stageInfo = new StageInfo(
+      1,
+      1,
+      "stage 1",
+      10,
+      Seq.empty,
+      Seq.empty,
+      "details abc",
+      Seq.empty)
     val stageData = AllStagesResource
       .stageUiToStageData(status, stageInfo, stageUiData, false)
 

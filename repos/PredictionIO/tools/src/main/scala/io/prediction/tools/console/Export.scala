@@ -25,14 +25,16 @@ object Export {
   def eventsToFile(ca: ConsoleArgs): Int = {
     val channelArg =
       ca.export.channel.map(ch => Seq("--channel", ch)).getOrElse(Nil)
-    Runner.runOnSpark("io.prediction.tools.export.EventsToFile",
-                      Seq("--appid",
-                          ca.export.appId.toString,
-                          "--output",
-                          ca.export.outputPath,
-                          "--format",
-                          ca.export.format) ++ channelArg,
-                      ca,
-                      Nil)
+    Runner.runOnSpark(
+      "io.prediction.tools.export.EventsToFile",
+      Seq(
+        "--appid",
+        ca.export.appId.toString,
+        "--output",
+        ca.export.outputPath,
+        "--format",
+        ca.export.format) ++ channelArg,
+      ca,
+      Nil)
   }
 }

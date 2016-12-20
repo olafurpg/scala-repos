@@ -49,10 +49,11 @@ class DotRunner(settings: doc.Settings) {
         settings.printMsg(
           "has malfunctioned too many times. These scaladoc flags may help:")
         settings.printMsg("")
-        val baseList = List(settings.docDiagramsDebug,
-                            settings.docDiagramsDotPath,
-                            settings.docDiagramsDotRestart,
-                            settings.docDiagramsDotTimeout)
+        val baseList = List(
+          settings.docDiagramsDebug,
+          settings.docDiagramsDotPath,
+          settings.docDiagramsDotRestart,
+          settings.docDiagramsDotTimeout)
         val width = (baseList map (_.helpSyntax.length)).max
         def helpStr(s: doc.Settings#Setting) =
           ("%-" + width + "s") format (s.helpSyntax) + "  " + s.helpDescription

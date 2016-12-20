@@ -56,8 +56,9 @@ class TestChannel[A](defaultTimeout: Duration) extends Concurrent.Channel[A] {
       case null =>
         throw new AssertionError(s"timeout ($timeout) waiting for $expected")
       case Input.El(input) =>
-        assert(test(expected, input),
-               s"expected [$expected] but found [$input]")
+        assert(
+          test(expected, input),
+          s"expected [$expected] but found [$input]")
         input
       case other =>
         throw new AssertionError(
@@ -86,12 +87,14 @@ class TestChannel[A](defaultTimeout: Duration) extends Concurrent.Channel[A] {
 
   def expectEnd[T](expected: Class[T], timeout: Duration): T = {
     val end = takeEnd(timeout)
-    assert(end ne null,
-           s"timeout ($timeout) waiting for end with failure [$expected]")
+    assert(
+      end ne null,
+      s"timeout ($timeout) waiting for end with failure [$expected]")
     end match {
       case Some(throwable) =>
-        assert(expected isInstance throwable,
-               s"expected end with failure [$expected] but found [$throwable]")
+        assert(
+          expected isInstance throwable,
+          s"expected end with failure [$expected] but found [$throwable]")
         throwable.asInstanceOf[T]
       case None =>
         throw new AssertionError(

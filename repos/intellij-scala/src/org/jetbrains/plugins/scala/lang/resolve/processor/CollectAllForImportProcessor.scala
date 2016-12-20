@@ -20,18 +20,20 @@ class CollectAllForImportProcessor(
       if (accessibility && !accessible) return true
       named match {
         case pack: PsiPackage =>
-          candidatesSet += new ScalaResolveResult(ScPackageImpl(pack),
-                                                  getSubst(state),
-                                                  getImports(state),
-                                                  isAccessible = true)
+          candidatesSet += new ScalaResolveResult(
+            ScPackageImpl(pack),
+            getSubst(state),
+            getImports(state),
+            isAccessible = true)
         case _ =>
           candidatesSet +=
-            new ScalaResolveResult(named,
-                                   getSubst(state),
-                                   getImports(state),
-                                   boundClass = getBoundClass(state),
-                                   fromType = getFromType(state),
-                                   isAccessible = true)
+            new ScalaResolveResult(
+              named,
+              getSubst(state),
+              getImports(state),
+              boundClass = getBoundClass(state),
+              fromType = getFromType(state),
+              isAccessible = true)
       }
     }
     true

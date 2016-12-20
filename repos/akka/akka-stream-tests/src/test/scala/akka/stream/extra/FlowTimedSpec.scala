@@ -47,8 +47,9 @@ class FlowTimedSpec extends AkkaSpec with ScriptedTest {
            runScript(script, settings) { flow ⇒
              flow
                .map(identity)
-               .timedIntervalBetween(_ % measureBetweenEvery == 0,
-                                     onInterval = printInfo)
+               .timedIntervalBetween(
+                 _ % measureBetweenEvery == 0,
+                 onInterval = printInfo)
            })
 
       val expectedNrOfOnIntervalCalls =
@@ -117,8 +118,9 @@ class FlowTimedSpec extends AkkaSpec with ScriptedTest {
 
       // making sure the types come out as expected
       val flow: Flow[Int, String, _] = Flow[Int]
-        .timed(_.map(_.toDouble).map(_.toInt).map(_.toString),
-               duration ⇒ probe.ref ! duration)
+        .timed(
+          _.map(_.toDouble).map(_.toInt).map(_.toString),
+          duration ⇒ probe.ref ! duration)
         .map { s: String ⇒
           s + "!"
         }

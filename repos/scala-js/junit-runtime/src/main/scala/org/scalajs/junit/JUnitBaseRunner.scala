@@ -48,12 +48,13 @@ object JUnitBaseRunner {
       if (split.length != 6) {
         throw new IllegalArgumentException(str)
       } else {
-        Done(split(0).toInt,
-             split(1).toInt,
-             split(2).toInt,
-             split(3).toInt,
-             split(4).toInt,
-             split(5).toInt)
+        Done(
+          split(0).toInt,
+          split(1).toInt,
+          split(2).toInt,
+          split(3).toInt,
+          split(4).toInt,
+          split(5).toInt)
       }
     }
   }

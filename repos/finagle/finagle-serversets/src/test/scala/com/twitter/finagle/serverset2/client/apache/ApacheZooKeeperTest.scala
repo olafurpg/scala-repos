@@ -129,12 +129,13 @@ class ApacheZooKeeperTest
   "create" should "submit properly constructed empty znode create" in {
     val created = zk.create(path, None, List(acl), mode)
 
-    verify(mockZK).create(meq(path),
-                          meq(null),
-                          meq(apacheACLS),
-                          meq(apacheMode),
-                          stringCB.capture,
-                          meq(null))
+    verify(mockZK).create(
+      meq(path),
+      meq(null),
+      meq(apacheACLS),
+      meq(apacheMode),
+      stringCB.capture,
+      meq(null))
 
     val expected = path + "_expected"
     stringCB.getValue.processResult(apacheOk, path, null, expected)
@@ -145,12 +146,13 @@ class ApacheZooKeeperTest
   "create" should "submit properly constructed ephemeral empty znode create" in {
     val created = zk.create(path, None, List(acl), ephMode)
 
-    verify(mockZK).create(meq(path),
-                          meq(null),
-                          meq(apacheACLS),
-                          meq(apacheEphMode),
-                          stringCB.capture,
-                          meq(null))
+    verify(mockZK).create(
+      meq(path),
+      meq(null),
+      meq(apacheACLS),
+      meq(apacheEphMode),
+      stringCB.capture,
+      meq(null))
 
     val expected = path + "_expected"
     stringCB.getValue.processResult(apacheOk, path, null, expected)
@@ -161,12 +163,13 @@ class ApacheZooKeeperTest
   "create" should "submit properly constructed create" in {
     val created = zk.create(path, Some(data), List(acl), mode)
 
-    verify(mockZK).create(meq(path),
-                          meq(_data),
-                          meq(apacheACLS),
-                          meq(apacheMode),
-                          stringCB.capture,
-                          meq(null))
+    verify(mockZK).create(
+      meq(path),
+      meq(_data),
+      meq(apacheACLS),
+      meq(apacheMode),
+      stringCB.capture,
+      meq(null))
 
     val expected = path + "_expected"
     stringCB.getValue.processResult(apacheOk, path, null, expected)
@@ -177,12 +180,13 @@ class ApacheZooKeeperTest
   "create" should "handle ZK error" in {
     val created = zk.create(path, Some(data), List(acl), mode)
 
-    verify(mockZK).create(meq(path),
-                          meq(_data),
-                          meq(apacheACLS),
-                          meq(apacheMode),
-                          stringCB.capture,
-                          meq(null))
+    verify(mockZK).create(
+      meq(path),
+      meq(_data),
+      meq(apacheACLS),
+      meq(apacheMode),
+      stringCB.capture,
+      meq(null))
 
     stringCB.getValue.processResult(apacheConnLoss, path, null, null)
     intercept[KeeperException.ConnectionLoss] {
@@ -193,20 +197,22 @@ class ApacheZooKeeperTest
 
   "create" should "handle synchronous error" in {
     when(
-      mockZK.create(meq(path),
-                    meq(_data),
-                    meq(apacheACLS),
-                    meq(apacheMode),
-                    stringCB.capture,
-                    meq(null))).thenThrow(new IllegalArgumentException)
+      mockZK.create(
+        meq(path),
+        meq(_data),
+        meq(apacheACLS),
+        meq(apacheMode),
+        stringCB.capture,
+        meq(null))).thenThrow(new IllegalArgumentException)
     val created = zk.create(path, Some(data), List(acl), mode)
 
-    verify(mockZK).create(meq(path),
-                          meq(_data),
-                          meq(apacheACLS),
-                          meq(apacheMode),
-                          stringCB.capture,
-                          meq(null))
+    verify(mockZK).create(
+      meq(path),
+      meq(_data),
+      meq(apacheACLS),
+      meq(apacheMode),
+      stringCB.capture,
+      meq(null))
 
     intercept[IllegalArgumentException] {
       Await.result(created)
@@ -534,11 +540,12 @@ class ApacheZooKeeperTest
   "setACL" should "submit properly constructed versioned setACL" in {
     val nodeStat = zk.setACL(path, acls, Some(version))
 
-    verify(mockZK).setACL(meq(path),
-                          meq(apacheACLS),
-                          meq(version),
-                          statCB.capture,
-                          meq(null))
+    verify(mockZK).setACL(
+      meq(path),
+      meq(apacheACLS),
+      meq(version),
+      statCB.capture,
+      meq(null))
 
     statCB.getValue.processResult(apacheOk, path, null, apacheStat)
     assert(Await.result(nodeStat) == stat)
@@ -559,11 +566,12 @@ class ApacheZooKeeperTest
   "setACL" should "handle ZK error" in {
     val nodeStat = zk.setACL(path, acls, Some(version))
 
-    verify(mockZK).setACL(meq(path),
-                          meq(apacheACLS),
-                          meq(version),
-                          statCB.capture,
-                          meq(null))
+    verify(mockZK).setACL(
+      meq(path),
+      meq(apacheACLS),
+      meq(version),
+      statCB.capture,
+      meq(null))
 
     statCB.getValue.processResult(apacheConnLoss, path, null, apacheStat)
     intercept[KeeperException.ConnectionLoss] {
@@ -574,18 +582,20 @@ class ApacheZooKeeperTest
 
   "setACL" should "handle synchronous error" in {
     when(
-      mockZK.setACL(meq(path),
-                    meq(apacheACLS),
-                    meq(version),
-                    statCB.capture,
-                    meq(null))).thenThrow(new IllegalArgumentException)
+      mockZK.setACL(
+        meq(path),
+        meq(apacheACLS),
+        meq(version),
+        statCB.capture,
+        meq(null))).thenThrow(new IllegalArgumentException)
     val nodeStat = zk.setACL(path, acls, Some(version))
 
-    verify(mockZK).setACL(meq(path),
-                          meq(apacheACLS),
-                          meq(version),
-                          statCB.capture,
-                          meq(null))
+    verify(mockZK).setACL(
+      meq(path),
+      meq(apacheACLS),
+      meq(version),
+      statCB.capture,
+      meq(null))
 
     intercept[IllegalArgumentException] {
       Await.result(nodeStat)

@@ -257,10 +257,11 @@ class LDASuite
           Vectors.dense(model2.getDocConcentration) absTol 1e-6)
     }
     val lda = new LDA()
-    testEstimatorAndModelReadWrite(lda,
-                                   dataset,
-                                   LDASuite.allParamSettings,
-                                   checkModelData)
+    testEstimatorAndModelReadWrite(
+      lda,
+      dataset,
+      LDASuite.allParamSettings,
+      checkModelData)
   }
 
   test("read/write DistributedLDAModel") {

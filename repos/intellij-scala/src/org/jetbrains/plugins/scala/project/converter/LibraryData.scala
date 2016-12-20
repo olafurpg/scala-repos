@@ -20,10 +20,11 @@ private case class LibraryData(name: String,
 
 private object LibraryData {
   def apply(prototype: Library): LibraryData = {
-    LibraryData(prototype.getName,
-                prototype.getUrls(OrderRootType.CLASSES).toSeq,
-                prototype.getUrls(OrderRootType.SOURCES).toSeq,
-                prototype.getUrls(JavadocOrderRootType.getInstance).toSeq)
+    LibraryData(
+      prototype.getName,
+      prototype.getUrls(OrderRootType.CLASSES).toSeq,
+      prototype.getUrls(OrderRootType.SOURCES).toSeq,
+      prototype.getUrls(JavadocOrderRootType.getInstance).toSeq)
   }
 
   def apply(element: Element): LibraryData = {
@@ -33,10 +34,11 @@ private object LibraryData {
         .asScala
         .map(_.asInstanceOf[Attribute].getValue)
 
-    LibraryData(element.getAttributeValue("name"),
-                urls("CLASSES"),
-                urls("SOURCES"),
-                urls("JAVADOC"))
+    LibraryData(
+      element.getAttributeValue("name"),
+      urls("CLASSES"),
+      urls("SOURCES"),
+      urls("JAVADOC"))
   }
 
   def empty: LibraryData = LibraryData("", Seq.empty, Seq.empty, Seq.empty)

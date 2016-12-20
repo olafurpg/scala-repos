@@ -74,8 +74,9 @@ private[lobby] final class Socket(val history: History[Messadata],
       withMember(uid)(notifyPlayerStart(game, !creatorColor))
 
     case JoinSeek(userId, seek, game, creatorColor) =>
-      membersByUserId(seek.user.id) foreach notifyPlayerStart(game,
-                                                              creatorColor)
+      membersByUserId(seek.user.id) foreach notifyPlayerStart(
+        game,
+        creatorColor)
       membersByUserId(userId) foreach notifyPlayerStart(game, !creatorColor)
 
     case HookIds(ids) => notifyVersion("hli", ids mkString ",", Messadata())
@@ -91,14 +92,15 @@ private[lobby] final class Socket(val history: History[Messadata],
   }
 
   private def notifyPlayerStart(game: lila.game.Game, color: chess.Color) =
-    notifyMember("redirect",
-                 Json
-                   .obj(
-                     "id" -> (game fullIdOf color),
-                     "url" -> playerUrl(game fullIdOf color),
-                     "cookie" -> AnonCookie.json(game, color)
-                   )
-                   .noNull) _
+    notifyMember(
+      "redirect",
+      Json
+        .obj(
+          "id" -> (game fullIdOf color),
+          "url" -> playerUrl(game fullIdOf color),
+          "cookie" -> AnonCookie.json(game, color)
+        )
+        .noNull) _
 
   protected def shouldSkipMessageFor(message: Message, member: Member) =
     message.metadata.hook ?? { hook =>

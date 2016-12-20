@@ -14,18 +14,19 @@ package object swagger {
     val Description = Symbol("swagger.description")
     val Produces = Symbol("swagger.produces")
     val Consumes = Symbol("swagger.consumes")
-    val AllSymbols = Set(Summary,
-                         Notes,
-                         Nickname,
-                         ResponseClass,
-                         Parameters,
-                         Errors,
-                         Endpoint,
-                         Allows,
-                         Operation,
-                         Description,
-                         Consumes,
-                         Produces)
+    val AllSymbols = Set(
+      Summary,
+      Notes,
+      Nickname,
+      ResponseClass,
+      Parameters,
+      Errors,
+      Endpoint,
+      Allows,
+      Operation,
+      Description,
+      Consumes,
+      Produces)
   }
 
   object annotations {

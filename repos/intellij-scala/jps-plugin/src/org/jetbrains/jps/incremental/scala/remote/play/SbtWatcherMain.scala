@@ -28,11 +28,12 @@ object SbtWatcherMain {
       override def consume(message: String) {
         out.write(
           Base64Converter
-            .encode(MessageEvent(BuildMessage.Kind.INFO,
-                                 message,
-                                 None,
-                                 None,
-                                 None).toBytes)
+            .encode(MessageEvent(
+              BuildMessage.Kind.INFO,
+              message,
+              None,
+              None,
+              None).toBytes)
             .getBytes)
       }
     }

@@ -150,8 +150,9 @@ private[streaming] class StreamingJobProgressListener(ssc: StreamingContext)
           if (outputOpIdToSparkJobIds == null) {
             outputOpIdToSparkJobIds =
               new ConcurrentLinkedQueue[OutputOpIdAndSparkJobId]()
-            batchTimeToOutputOpIdSparkJobIdPair.put(batchTime,
-                                                    outputOpIdToSparkJobIds)
+            batchTimeToOutputOpIdSparkJobIdPair.put(
+              batchTime,
+              outputOpIdToSparkJobIds)
           }
           outputOpIdToSparkJobIds.add(
             OutputOpIdAndSparkJobId(outputOpId, jobStart.jobId))

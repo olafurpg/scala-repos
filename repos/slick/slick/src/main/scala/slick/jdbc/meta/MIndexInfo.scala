@@ -20,25 +20,27 @@ object MIndexInfo {
                    unique: Boolean = false,
                    approximate: Boolean = false) =
     ResultSetAction[MIndexInfo](
-      _.metaData.getIndexInfo(table.catalog_?,
-                              table.schema_?,
-                              table.name,
-                              unique,
-                              approximate)) { r =>
-      MIndexInfo(MQName.from(r),
-                 r.<<,
-                 r.<<,
-                 r.<<,
-                 r.<<,
-                 r.<<,
-                 r.<<,
-                 r.nextStringOption match {
-                   case Some("A") => Some(true)
-                   case Some("D") => Some(false)
-                   case _ => None
-                 },
-                 r.<<,
-                 r.<<,
-                 r.<<)
+      _.metaData.getIndexInfo(
+        table.catalog_?,
+        table.schema_?,
+        table.name,
+        unique,
+        approximate)) { r =>
+      MIndexInfo(
+        MQName.from(r),
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.nextStringOption match {
+          case Some("A") => Some(true)
+          case Some("D") => Some(false)
+          case _ => None
+        },
+        r.<<,
+        r.<<,
+        r.<<)
     }
 }

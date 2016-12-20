@@ -35,8 +35,9 @@ class ScalaMethodCompletionWeigher extends CompletionWeigher {
       case psi: ScFunction =>
         MethodNameComparable(psi.name, psi.parameters.nonEmpty)
       case psi: PsiMethod =>
-        MethodNameComparable(psi.name,
-                             psi.getParameterList.getParametersCount > 0)
+        MethodNameComparable(
+          psi.name,
+          psi.getParameterList.getParametersCount > 0)
       case _ => null
     }
   }

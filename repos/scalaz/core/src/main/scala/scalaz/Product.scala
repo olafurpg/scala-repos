@@ -127,8 +127,9 @@ private trait ProductFoldable1L[F[_], G[_]]
 
   override def foldMapRight1[A, B](fa: (F[A], G[A]))(z: A => B)(
       f: (A, => B) => B): B =
-    cata(G.foldMapRight1Opt(fa._2)(z)(f))(F.foldRight(fa._1, _)(f),
-                                          F.foldMapRight1(fa._1)(z)(f))
+    cata(G.foldMapRight1Opt(fa._2)(z)(f))(
+      F.foldRight(fa._1, _)(f),
+      F.foldMapRight1(fa._1)(z)(f))
 
   override def foldMap1[A, B](fa: (F[A], G[A]))(f: A => B)(
       implicit S: Semigroup[B]): B = {
@@ -158,8 +159,9 @@ private trait ProductFoldable1R[F[_], G[_]]
 
   override def foldMapLeft1[A, B](fa: (F[A], G[A]))(z: A => B)(
       f: (B, A) => B): B =
-    cata(F.foldMapLeft1Opt(fa._1)(z)(f))(G.foldLeft(fa._2, _)(f),
-                                         G.foldMapLeft1(fa._2)(z)(f))
+    cata(F.foldMapLeft1Opt(fa._1)(z)(f))(
+      G.foldLeft(fa._2, _)(f),
+      G.foldMapLeft1(fa._2)(z)(f))
 }
 
 private trait ProductFoldable1[F[_], G[_]]

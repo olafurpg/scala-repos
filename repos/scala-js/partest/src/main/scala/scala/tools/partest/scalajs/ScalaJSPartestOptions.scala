@@ -103,9 +103,10 @@ object ScalaJSPartestOptions {
     if (failed) None
     else
       Some {
-        new ScalaJSPartestOptions(filter.getOrElse(WhitelistedTests),
-                                  optMode,
-                                  showDiff)
+        new ScalaJSPartestOptions(
+          filter.getOrElse(WhitelistedTests),
+          optMode,
+          showDiff)
       }
   }
 }

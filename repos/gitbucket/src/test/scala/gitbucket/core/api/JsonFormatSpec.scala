@@ -23,11 +23,12 @@ class JsonFormatSpec extends FunSuite {
   val repo1Name = RepositoryName("octocat/Hello-World")
   implicit val context = JsonFormat.Context("http://gitbucket.exmple.com")
 
-  val apiUser = ApiUser(login = "octocat",
-                        email = "octocat@example.com",
-                        `type` = "User",
-                        site_admin = false,
-                        created_at = date1)
+  val apiUser = ApiUser(
+    login = "octocat",
+    email = "octocat@example.com",
+    `type` = "User",
+    site_admin = false,
+    created_at = date1)
   val apiUserJson = """{
     "login":"octocat",
     "email":"octocat@example.com",
@@ -38,14 +39,15 @@ class JsonFormatSpec extends FunSuite {
     "html_url":"http://gitbucket.exmple.com/octocat"
   }"""
 
-  val repository = ApiRepository(name = repo1Name.name,
-                                 full_name = repo1Name.fullName,
-                                 description = "This your first repo!",
-                                 watchers = 0,
-                                 forks = 0,
-                                 `private` = false,
-                                 default_branch = "master",
-                                 owner = apiUser)(urlIsHtmlUrl = false)
+  val repository = ApiRepository(
+    name = repo1Name.name,
+    full_name = repo1Name.fullName,
+    description = "This your first repo!",
+    watchers = 0,
+    forks = 0,
+    `private` = false,
+    default_branch = "master",
+    owner = apiUser)(urlIsHtmlUrl = false)
   val repositoryJson = s"""{
     "name" : "Hello-World",
     "full_name" : "octocat/Hello-World",
@@ -86,20 +88,21 @@ class JsonFormatSpec extends FunSuite {
   }"""
 
   val apiPushCommit =
-    ApiCommit(id = "0d1a26e67d8f5eaf1f6ba5c57fc3c7d91ac0fd1c",
-              message = "Update README.md",
-              timestamp = date1,
-              added = Nil,
-              removed = Nil,
-              modified = List("README.md"),
-              author =
-                ApiPersonIdent("baxterthehacker",
-                               "baxterthehacker@users.noreply.github.com",
-                               date1),
-              committer = ApiPersonIdent(
-                "baxterthehacker",
-                "baxterthehacker@users.noreply.github.com",
-                date1))(RepositoryName("baxterthehacker", "public-repo"), true)
+    ApiCommit(
+      id = "0d1a26e67d8f5eaf1f6ba5c57fc3c7d91ac0fd1c",
+      message = "Update README.md",
+      timestamp = date1,
+      added = Nil,
+      removed = Nil,
+      modified = List("README.md"),
+      author = ApiPersonIdent(
+        "baxterthehacker",
+        "baxterthehacker@users.noreply.github.com",
+        date1),
+      committer = ApiPersonIdent(
+        "baxterthehacker",
+        "baxterthehacker@users.noreply.github.com",
+        date1))(RepositoryName("baxterthehacker", "public-repo"), true)
   val apiPushCommitJson = s"""{
       "id": "0d1a26e67d8f5eaf1f6ba5c57fc3c7d91ac0fd1c",
       // "distinct": true,
@@ -372,8 +375,9 @@ class JsonFormatSpec extends FunSuite {
   val apiBranchProtection = ApiBranchProtection(
     true,
     Some(
-      ApiBranchProtection.Status(ApiBranchProtection.Everyone,
-                                 Seq("continuous-integration/travis-ci"))))
+      ApiBranchProtection.Status(
+        ApiBranchProtection.Everyone,
+        Seq("continuous-integration/travis-ci"))))
   val apiBranchProtectionJson = """{
     "enabled": true,
     "required_status_checks": {
@@ -427,8 +431,9 @@ class JsonFormatSpec extends FunSuite {
     assertJson(JsonFormat(apiCommitStatus), apiCommitStatusJson)
   }
   test("apiCombinedCommitStatus") {
-    assertJson(JsonFormat(apiCombinedCommitStatus),
-               apiCombinedCommitStatusJson)
+    assertJson(
+      JsonFormat(apiCombinedCommitStatus),
+      apiCombinedCommitStatusJson)
   }
   test("apiLabel") {
     assertJson(JsonFormat(apiLabel), apiLabelJson)
@@ -441,8 +446,9 @@ class JsonFormatSpec extends FunSuite {
     assertJson(JsonFormat(apiPullRequest), apiPullRequestJson)
   }
   test("apiPullRequestReviewComment") {
-    assertJson(JsonFormat(apiPullRequestReviewComment),
-               apiPullRequestReviewCommentJson)
+    assertJson(
+      JsonFormat(apiPullRequestReviewComment),
+      apiPullRequestReviewCommentJson)
   }
   test("apiBranchProtection") {
     assertJson(JsonFormat(apiBranchProtection), apiBranchProtectionJson)

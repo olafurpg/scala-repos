@@ -77,8 +77,9 @@ class JavaUniverse
                   val tags =
                     manifest.typeArguments map
                       (targ => ju.internal.manifestToTypeTag(jm, targ))
-                  ju.appliedType(sym.toTypeConstructor,
-                                 tags map (_.in(jm).tpe))
+                  ju.appliedType(
+                    sym.toTypeConstructor,
+                    tags map (_.in(jm).tpe))
                 }
               tpe.asInstanceOf[U#Type]
             case u =>

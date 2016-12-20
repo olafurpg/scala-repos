@@ -69,13 +69,14 @@ object Unidoc {
       (compilers, cache, sources, classpath, target, options, s) =>
         {
           val scaladoc = new Scaladoc(100, compilers.scalac)
-          scaladoc.cached(cache / "unidoc",
-                          "main",
-                          sources,
-                          classpath,
-                          target,
-                          options,
-                          s.log)
+          scaladoc.cached(
+            cache / "unidoc",
+            "main",
+            sources,
+            classpath,
+            target,
+            options,
+            s.log)
           target
         }
     }

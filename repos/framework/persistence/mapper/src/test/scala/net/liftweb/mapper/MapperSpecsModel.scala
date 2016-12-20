@@ -90,22 +90,24 @@ object MapperSpecsModel {
       if (doLog) Schemifier.infoF _ else ignoreLogger _,
       SampleTagSnake,
       SampleModelSnake)
-    Schemifier.schemify(true,
-                        if (doLog) Schemifier.infoF _ else ignoreLogger _,
-                        DefaultConnectionIdentifier,
-                        SampleModel,
-                        SampleTag,
-                        User,
-                        Dog,
-                        Mixer,
-                        Dog2,
-                        TstItem,
-                        Thing)
-    Schemifier.schemify(true,
-                        if (doLog) Schemifier.infoF _ else ignoreLogger _,
-                        DbProviders.SnakeConnectionIdentifier,
-                        SampleModelSnake,
-                        SampleTagSnake)
+    Schemifier.schemify(
+      true,
+      if (doLog) Schemifier.infoF _ else ignoreLogger _,
+      DefaultConnectionIdentifier,
+      SampleModel,
+      SampleTag,
+      User,
+      Dog,
+      Mixer,
+      Dog2,
+      TstItem,
+      Thing)
+    Schemifier.schemify(
+      true,
+      if (doLog) Schemifier.infoF _ else ignoreLogger _,
+      DbProviders.SnakeConnectionIdentifier,
+      SampleModelSnake,
+      SampleTagSnake)
   }
 }
 

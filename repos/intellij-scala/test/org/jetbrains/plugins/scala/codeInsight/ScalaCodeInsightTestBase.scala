@@ -32,11 +32,12 @@ abstract class ScalaCodeInsightTestBase
       time: Int = 1,
       completionType: CompletionType = CompletionType.BASIC) = {
     new CodeCompletionHandlerBase(completionType, false, false, true)
-      .invokeCompletion(getProjectAdapter,
-                        getEditorAdapter,
-                        time,
-                        false,
-                        false)
+      .invokeCompletion(
+        getProjectAdapter,
+        getEditorAdapter,
+        time,
+        false,
+        false)
     val lookup: LookupImpl = getActiveLookup
     (if (lookup == null) null
      else lookup.getItems.toArray(LookupElement.EMPTY_ARRAY),

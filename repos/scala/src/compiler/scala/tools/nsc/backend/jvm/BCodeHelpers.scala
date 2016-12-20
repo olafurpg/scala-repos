@@ -215,9 +215,10 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
           case none => none
         }
       Some(
-        EnclosingMethodEntry(classDesc(enclosingClass),
-                             methodOpt.map(_.javaSimpleName.toString).orNull,
-                             methodOpt.map(methodDesc).orNull))
+        EnclosingMethodEntry(
+          classDesc(enclosingClass),
+          methodOpt.map(_.javaSimpleName.toString).orNull,
+          methodOpt.map(methodDesc).orNull))
     } else {
       None
     }
@@ -325,11 +326,12 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
       })
       .toMap
 
-    InlineInfo(traitSelfType,
-               isEffectivelyFinal,
-               sam,
-               methodInlineInfos,
-               warning)
+    InlineInfo(
+      traitSelfType,
+      isEffectivelyFinal,
+      sam,
+      methodInlineInfos,
+      warning)
   }
 
   /*
@@ -585,10 +587,11 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
      * can-multi-thread
      */
     def pickleMarkerLocal = {
-      createJAttribute(tpnme.ScalaSignatureATTR.toString,
-                       versionPickle.bytes,
-                       0,
-                       versionPickle.writeIndex)
+      createJAttribute(
+        tpnme.ScalaSignatureATTR.toString,
+        versionPickle.bytes,
+        0,
+        versionPickle.writeIndex)
     }
 
     /*
@@ -625,9 +628,10 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
         case Some(pickle) if !nme.isModuleName(newTermName(jclassName)) =>
           val scalaAnnot = {
             val sigBytes = ScalaSigBytes(pickle.bytes.take(pickle.writeIndex))
-            AnnotationInfo(sigBytes.sigAnnot,
-                           Nil,
-                           (nme.bytes, sigBytes) :: Nil)
+            AnnotationInfo(
+              sigBytes.sigAnnot,
+              Nil,
+              (nme.bytes, sigBytes) :: Nil)
           }
           pickledBytes += pickle.writeIndex
           currentRun.symData -= sym
@@ -891,9 +895,10 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
         val AnnotationInfo(typ, args, assocs) = annot
         assert(args.isEmpty, args)
         val pannVisitor: asm.AnnotationVisitor =
-          jmethod.visitParameterAnnotation(idx,
-                                           descriptor(typ),
-                                           isRuntimeVisible(annot))
+          jmethod.visitParameterAnnotation(
+            idx,
+            descriptor(typ),
+            isRuntimeVisible(annot))
         emitAssocs(pannVisitor, assocs)
       }
     }
@@ -986,12 +991,13 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
                  |normalized type: %s
                  |erasure type: %s
                  |if this is reproducible, please report bug at http://issues.scala-lang.org/
-              """.trim.stripMargin.format(sym,
-                                          sym.owner.skipPackageObject.fullName,
-                                          sig,
-                                          memberTpe,
-                                          normalizedTpe,
-                                          bytecodeTpe))
+              """.trim.stripMargin.format(
+              sym,
+              sym.owner.skipPackageObject.fullName,
+              sig,
+              memberTpe,
+              normalizedTpe,
+              bytecodeTpe))
           return null
         }
       }
@@ -1091,10 +1097,11 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
 
       mirrorMethod.visitCode()
 
-      mirrorMethod.visitFieldInsn(asm.Opcodes.GETSTATIC,
-                                  moduleName,
-                                  strMODULE_INSTANCE_FIELD,
-                                  descriptor(module))
+      mirrorMethod.visitFieldInsn(
+        asm.Opcodes.GETSTATIC,
+        moduleName,
+        strMODULE_INSTANCE_FIELD,
+        descriptor(module))
 
       var index = 0
       for (jparamType <- paramJavaTypes) {
@@ -1104,11 +1111,12 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
         index += jparamType.size
       }
 
-      mirrorMethod.visitMethodInsn(asm.Opcodes.INVOKEVIRTUAL,
-                                   moduleName,
-                                   mirrorMethodName,
-                                   methodBTypeFromSymbol(m).descriptor,
-                                   false)
+      mirrorMethod.visitMethodInsn(
+        asm.Opcodes.INVOKEVIRTUAL,
+        moduleName,
+        mirrorMethodName,
+        methodBTypeFromSymbol(m).descriptor,
+        false)
       mirrorMethod.visitInsn(jReturnType.typedOpcode(asm.Opcodes.IRETURN))
 
       mirrorMethod.visitMaxs(0, 0) // just to follow protocol, dummy arguments
@@ -1245,10 +1253,11 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
         if (ssa.isDefined) pickleMarkerLocal else pickleMarkerForeign)
       emitAnnotations(mirrorClass, moduleClass.annotations ++ ssa)
 
-      addForwarders(isRemote(moduleClass),
-                    mirrorClass,
-                    bType.internalName,
-                    moduleClass)
+      addForwarders(
+        isRemote(moduleClass),
+        mirrorClass,
+        bType.internalName,
+        moduleClass)
 
       mirrorClass.visitEnd()
 
@@ -1355,11 +1364,12 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
 
       // invoke the superclass constructor, which will do the
       // necessary java reflection and create Method objects.
-      constructor.visitMethodInsn(asm.Opcodes.INVOKESPECIAL,
-                                  "scala/beans/ScalaBeanInfo",
-                                  INSTANCE_CONSTRUCTOR_NAME,
-                                  conJType.descriptor,
-                                  false)
+      constructor.visitMethodInsn(
+        asm.Opcodes.INVOKESPECIAL,
+        "scala/beans/ScalaBeanInfo",
+        INSTANCE_CONSTRUCTOR_NAME,
+        conJType.descriptor,
+        false)
       constructor.visitInsn(asm.Opcodes.RETURN)
 
       constructor.visitMaxs(0, 0) // just to follow protocol, dummy arguments

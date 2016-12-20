@@ -204,22 +204,27 @@ class FilteredScanSuite
               'a').toChar.toString * 5 + (i - 1 + 'a').toChar.toString.toUpperCase * 5))
       .toSeq)
 
-  sqlTest("SELECT a, b FROM oneToTenFiltered",
-          (1 to 10).map(i => Row(i, i * 2)).toSeq)
+  sqlTest(
+    "SELECT a, b FROM oneToTenFiltered",
+    (1 to 10).map(i => Row(i, i * 2)).toSeq)
 
-  sqlTest("SELECT b, a FROM oneToTenFiltered",
-          (1 to 10).map(i => Row(i * 2, i)).toSeq)
+  sqlTest(
+    "SELECT b, a FROM oneToTenFiltered",
+    (1 to 10).map(i => Row(i * 2, i)).toSeq)
 
   sqlTest("SELECT a FROM oneToTenFiltered", (1 to 10).map(i => Row(i)).toSeq)
 
-  sqlTest("SELECT b FROM oneToTenFiltered",
-          (1 to 10).map(i => Row(i * 2)).toSeq)
+  sqlTest(
+    "SELECT b FROM oneToTenFiltered",
+    (1 to 10).map(i => Row(i * 2)).toSeq)
 
-  sqlTest("SELECT a * 2 FROM oneToTenFiltered",
-          (1 to 10).map(i => Row(i * 2)).toSeq)
+  sqlTest(
+    "SELECT a * 2 FROM oneToTenFiltered",
+    (1 to 10).map(i => Row(i * 2)).toSeq)
 
-  sqlTest("SELECT A AS b FROM oneToTenFiltered",
-          (1 to 10).map(i => Row(i)).toSeq)
+  sqlTest(
+    "SELECT A AS b FROM oneToTenFiltered",
+    (1 to 10).map(i => Row(i)).toSeq)
 
   sqlTest(
     "SELECT x.b, y.a FROM oneToTenFiltered x JOIN oneToTenFiltered y ON x.a = y.b",
@@ -229,134 +234,171 @@ class FilteredScanSuite
     "SELECT x.a, y.b FROM oneToTenFiltered x JOIN oneToTenFiltered y ON x.a = y.b",
     (2 to 10 by 2).map(i => Row(i, i)).toSeq)
 
-  sqlTest("SELECT a, b FROM oneToTenFiltered WHERE a = 1",
-          Seq(1).map(i => Row(i, i * 2)))
+  sqlTest(
+    "SELECT a, b FROM oneToTenFiltered WHERE a = 1",
+    Seq(1).map(i => Row(i, i * 2)))
 
-  sqlTest("SELECT a, b FROM oneToTenFiltered WHERE a IN (1,3,5)",
-          Seq(1, 3, 5).map(i => Row(i, i * 2)))
+  sqlTest(
+    "SELECT a, b FROM oneToTenFiltered WHERE a IN (1,3,5)",
+    Seq(1, 3, 5).map(i => Row(i, i * 2)))
 
-  sqlTest("SELECT a, b FROM oneToTenFiltered WHERE A = 1",
-          Seq(1).map(i => Row(i, i * 2)))
+  sqlTest(
+    "SELECT a, b FROM oneToTenFiltered WHERE A = 1",
+    Seq(1).map(i => Row(i, i * 2)))
 
-  sqlTest("SELECT a, b FROM oneToTenFiltered WHERE b = 2",
-          Seq(1).map(i => Row(i, i * 2)))
+  sqlTest(
+    "SELECT a, b FROM oneToTenFiltered WHERE b = 2",
+    Seq(1).map(i => Row(i, i * 2)))
 
   sqlTest("SELECT a, b FROM oneToTenFiltered WHERE a IS NULL", Seq.empty[Row])
 
-  sqlTest("SELECT a, b FROM oneToTenFiltered WHERE a IS NOT NULL",
-          (1 to 10).map(i => Row(i, i * 2)).toSeq)
+  sqlTest(
+    "SELECT a, b FROM oneToTenFiltered WHERE a IS NOT NULL",
+    (1 to 10).map(i => Row(i, i * 2)).toSeq)
 
-  sqlTest("SELECT a, b FROM oneToTenFiltered WHERE a < 5 AND a > 1",
-          (2 to 4).map(i => Row(i, i * 2)).toSeq)
+  sqlTest(
+    "SELECT a, b FROM oneToTenFiltered WHERE a < 5 AND a > 1",
+    (2 to 4).map(i => Row(i, i * 2)).toSeq)
 
-  sqlTest("SELECT a, b FROM oneToTenFiltered WHERE a < 3 OR a > 8",
-          Seq(1, 2, 9, 10).map(i => Row(i, i * 2)))
+  sqlTest(
+    "SELECT a, b FROM oneToTenFiltered WHERE a < 3 OR a > 8",
+    Seq(1, 2, 9, 10).map(i => Row(i, i * 2)))
 
-  sqlTest("SELECT a, b FROM oneToTenFiltered WHERE NOT (a < 6)",
-          (6 to 10).map(i => Row(i, i * 2)).toSeq)
+  sqlTest(
+    "SELECT a, b FROM oneToTenFiltered WHERE NOT (a < 6)",
+    (6 to 10).map(i => Row(i, i * 2)).toSeq)
 
-  sqlTest("SELECT a, b, c FROM oneToTenFiltered WHERE c like 'c%'",
-          Seq(Row(3, 3 * 2, "c" * 5 + "C" * 5)))
+  sqlTest(
+    "SELECT a, b, c FROM oneToTenFiltered WHERE c like 'c%'",
+    Seq(Row(3, 3 * 2, "c" * 5 + "C" * 5)))
 
-  sqlTest("SELECT a, b, c FROM oneToTenFiltered WHERE c like '%D'",
-          Seq(Row(4, 4 * 2, "d" * 5 + "D" * 5)))
+  sqlTest(
+    "SELECT a, b, c FROM oneToTenFiltered WHERE c like '%D'",
+    Seq(Row(4, 4 * 2, "d" * 5 + "D" * 5)))
 
-  sqlTest("SELECT a, b, c FROM oneToTenFiltered WHERE c like '%eE%'",
-          Seq(Row(5, 5 * 2, "e" * 5 + "E" * 5)))
+  sqlTest(
+    "SELECT a, b, c FROM oneToTenFiltered WHERE c like '%eE%'",
+    Seq(Row(5, 5 * 2, "e" * 5 + "E" * 5)))
 
-  testPushDown("SELECT * FROM oneToTenFiltered WHERE A = 1",
-               1,
-               Set("a", "b", "c"))
+  testPushDown(
+    "SELECT * FROM oneToTenFiltered WHERE A = 1",
+    1,
+    Set("a", "b", "c"))
   testPushDown("SELECT a FROM oneToTenFiltered WHERE A = 1", 1, Set("a"))
   testPushDown("SELECT b FROM oneToTenFiltered WHERE A = 1", 1, Set("b"))
-  testPushDown("SELECT a, b FROM oneToTenFiltered WHERE A = 1",
-               1,
-               Set("a", "b"))
-  testPushDown("SELECT * FROM oneToTenFiltered WHERE a = 1",
-               1,
-               Set("a", "b", "c"))
-  testPushDown("SELECT * FROM oneToTenFiltered WHERE 1 = a",
-               1,
-               Set("a", "b", "c"))
+  testPushDown(
+    "SELECT a, b FROM oneToTenFiltered WHERE A = 1",
+    1,
+    Set("a", "b"))
+  testPushDown(
+    "SELECT * FROM oneToTenFiltered WHERE a = 1",
+    1,
+    Set("a", "b", "c"))
+  testPushDown(
+    "SELECT * FROM oneToTenFiltered WHERE 1 = a",
+    1,
+    Set("a", "b", "c"))
 
-  testPushDown("SELECT * FROM oneToTenFiltered WHERE a > 1",
-               9,
-               Set("a", "b", "c"))
-  testPushDown("SELECT * FROM oneToTenFiltered WHERE a >= 2",
-               9,
-               Set("a", "b", "c"))
+  testPushDown(
+    "SELECT * FROM oneToTenFiltered WHERE a > 1",
+    9,
+    Set("a", "b", "c"))
+  testPushDown(
+    "SELECT * FROM oneToTenFiltered WHERE a >= 2",
+    9,
+    Set("a", "b", "c"))
 
-  testPushDown("SELECT * FROM oneToTenFiltered WHERE 1 < a",
-               9,
-               Set("a", "b", "c"))
-  testPushDown("SELECT * FROM oneToTenFiltered WHERE 2 <= a",
-               9,
-               Set("a", "b", "c"))
+  testPushDown(
+    "SELECT * FROM oneToTenFiltered WHERE 1 < a",
+    9,
+    Set("a", "b", "c"))
+  testPushDown(
+    "SELECT * FROM oneToTenFiltered WHERE 2 <= a",
+    9,
+    Set("a", "b", "c"))
 
-  testPushDown("SELECT * FROM oneToTenFiltered WHERE 1 > a",
-               0,
-               Set("a", "b", "c"))
-  testPushDown("SELECT * FROM oneToTenFiltered WHERE 2 >= a",
-               2,
-               Set("a", "b", "c"))
+  testPushDown(
+    "SELECT * FROM oneToTenFiltered WHERE 1 > a",
+    0,
+    Set("a", "b", "c"))
+  testPushDown(
+    "SELECT * FROM oneToTenFiltered WHERE 2 >= a",
+    2,
+    Set("a", "b", "c"))
 
-  testPushDown("SELECT * FROM oneToTenFiltered WHERE a < 1",
-               0,
-               Set("a", "b", "c"))
-  testPushDown("SELECT * FROM oneToTenFiltered WHERE a <= 2",
-               2,
-               Set("a", "b", "c"))
+  testPushDown(
+    "SELECT * FROM oneToTenFiltered WHERE a < 1",
+    0,
+    Set("a", "b", "c"))
+  testPushDown(
+    "SELECT * FROM oneToTenFiltered WHERE a <= 2",
+    2,
+    Set("a", "b", "c"))
 
-  testPushDown("SELECT * FROM oneToTenFiltered WHERE a > 1 AND a < 10",
-               8,
-               Set("a", "b", "c"))
+  testPushDown(
+    "SELECT * FROM oneToTenFiltered WHERE a > 1 AND a < 10",
+    8,
+    Set("a", "b", "c"))
 
-  testPushDown("SELECT * FROM oneToTenFiltered WHERE a IN (1,3,5)",
-               3,
-               Set("a", "b", "c"))
+  testPushDown(
+    "SELECT * FROM oneToTenFiltered WHERE a IN (1,3,5)",
+    3,
+    Set("a", "b", "c"))
 
-  testPushDown("SELECT * FROM oneToTenFiltered WHERE a = 20",
-               0,
-               Set("a", "b", "c"))
-  testPushDown("SELECT * FROM oneToTenFiltered WHERE b = 1",
-               10,
-               Set("a", "b", "c"),
-               Set(EqualTo("b", 1)))
+  testPushDown(
+    "SELECT * FROM oneToTenFiltered WHERE a = 20",
+    0,
+    Set("a", "b", "c"))
+  testPushDown(
+    "SELECT * FROM oneToTenFiltered WHERE b = 1",
+    10,
+    Set("a", "b", "c"),
+    Set(EqualTo("b", 1)))
 
-  testPushDown("SELECT * FROM oneToTenFiltered WHERE a < 5 AND a > 1",
-               3,
-               Set("a", "b", "c"))
-  testPushDown("SELECT * FROM oneToTenFiltered WHERE a < 3 OR a > 8",
-               4,
-               Set("a", "b", "c"))
-  testPushDown("SELECT * FROM oneToTenFiltered WHERE NOT (a < 6)",
-               5,
-               Set("a", "b", "c"))
+  testPushDown(
+    "SELECT * FROM oneToTenFiltered WHERE a < 5 AND a > 1",
+    3,
+    Set("a", "b", "c"))
+  testPushDown(
+    "SELECT * FROM oneToTenFiltered WHERE a < 3 OR a > 8",
+    4,
+    Set("a", "b", "c"))
+  testPushDown(
+    "SELECT * FROM oneToTenFiltered WHERE NOT (a < 6)",
+    5,
+    Set("a", "b", "c"))
 
-  testPushDown("SELECT a, b, c FROM oneToTenFiltered WHERE c like 'c%'",
-               1,
-               Set("a", "b", "c"))
-  testPushDown("SELECT a, b, c FROM oneToTenFiltered WHERE c like 'C%'",
-               0,
-               Set("a", "b", "c"))
+  testPushDown(
+    "SELECT a, b, c FROM oneToTenFiltered WHERE c like 'c%'",
+    1,
+    Set("a", "b", "c"))
+  testPushDown(
+    "SELECT a, b, c FROM oneToTenFiltered WHERE c like 'C%'",
+    0,
+    Set("a", "b", "c"))
 
-  testPushDown("SELECT a, b, c FROM oneToTenFiltered WHERE c like '%D'",
-               1,
-               Set("a", "b", "c"))
-  testPushDown("SELECT a, b, c FROM oneToTenFiltered WHERE c like '%d'",
-               0,
-               Set("a", "b", "c"))
+  testPushDown(
+    "SELECT a, b, c FROM oneToTenFiltered WHERE c like '%D'",
+    1,
+    Set("a", "b", "c"))
+  testPushDown(
+    "SELECT a, b, c FROM oneToTenFiltered WHERE c like '%d'",
+    0,
+    Set("a", "b", "c"))
 
-  testPushDown("SELECT a, b, c FROM oneToTenFiltered WHERE c like '%eE%'",
-               1,
-               Set("a", "b", "c"))
-  testPushDown("SELECT a, b, c FROM oneToTenFiltered WHERE c like '%Ee%'",
-               0,
-               Set("a", "b", "c"))
+  testPushDown(
+    "SELECT a, b, c FROM oneToTenFiltered WHERE c like '%eE%'",
+    1,
+    Set("a", "b", "c"))
+  testPushDown(
+    "SELECT a, b, c FROM oneToTenFiltered WHERE c like '%Ee%'",
+    0,
+    Set("a", "b", "c"))
 
-  testPushDown("SELECT c FROM oneToTenFiltered WHERE c = 'aaaaaAAAAA'",
-               1,
-               Set("c"))
+  testPushDown(
+    "SELECT c FROM oneToTenFiltered WHERE c = 'aaaaaAAAAA'",
+    1,
+    Set("c"))
   testPushDown(
     "SELECT c FROM oneToTenFiltered WHERE c IN ('aaaaaAAAAA', 'foo')",
     1,
@@ -364,28 +406,31 @@ class FilteredScanSuite
 
   // Filters referencing multiple columns are not convertible, all referenced columns must be
   // required.
-  testPushDown("SELECT c FROM oneToTenFiltered WHERE A + b > 9",
-               10,
-               Set("a", "b", "c"))
+  testPushDown(
+    "SELECT c FROM oneToTenFiltered WHERE A + b > 9",
+    10,
+    Set("a", "b", "c"))
 
   // A query with an inconvertible filter, an unhandled filter, and a handled filter.
-  testPushDown("""SELECT a
+  testPushDown(
+    """SELECT a
       |  FROM oneToTenFiltered
       | WHERE a + b > 9
       |   AND b < 16
       |   AND c IN ('bbbbbBBBBB', 'cccccCCCCC', 'dddddDDDDD', 'foo')
     """.stripMargin.split("\n").map(_.trim).mkString(" "),
-               3,
-               Set("a", "b"),
-               Set(LessThan("b", 16)))
+    3,
+    Set("a", "b"),
+    Set(LessThan("b", 16)))
 
   def testPushDown(sqlString: String,
                    expectedCount: Int,
                    requiredColumnNames: Set[String]): Unit = {
-    testPushDown(sqlString,
-                 expectedCount,
-                 requiredColumnNames,
-                 Set.empty[Filter])
+    testPushDown(
+      sqlString,
+      expectedCount,
+      requiredColumnNames,
+      Set.empty[Filter])
   }
 
   def testPushDown(sqlString: String,

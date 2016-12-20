@@ -33,8 +33,9 @@ class AddReplaceSlashRToMLStringIntention
 
   override def invoke(project: Project, editor: Editor, element: PsiElement) {
     extensions.inWriteAction {
-      editor.getDocument.insertString(element.getTextRange.getEndOffset,
-                                      ".replace(\"\\r\", \"\")")
+      editor.getDocument.insertString(
+        element.getTextRange.getEndOffset,
+        ".replace(\"\\r\", \"\")")
     }
   }
 }

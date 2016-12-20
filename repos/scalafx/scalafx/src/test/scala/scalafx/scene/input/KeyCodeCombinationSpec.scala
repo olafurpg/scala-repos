@@ -41,8 +41,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class KeyCodeCombinationSpec
-    extends SimpleSFXDelegateSpec[jfxsi.KeyCodeCombination,
-                                  KeyCodeCombination](
+    extends SimpleSFXDelegateSpec[
+      jfxsi.KeyCodeCombination,
+      KeyCodeCombination](
       classOf[jfxsi.KeyCodeCombination],
       classOf[KeyCodeCombination]) {
 

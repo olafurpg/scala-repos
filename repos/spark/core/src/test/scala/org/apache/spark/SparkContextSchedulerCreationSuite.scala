@@ -56,9 +56,10 @@ class SparkContextSchedulerCreationSuite
       PrivateMethod[Tuple2[SchedulerBackend, TaskScheduler]](
         'createTaskScheduler)
     val (_, sched) =
-      SparkContext invokePrivate createTaskSchedulerMethod(sc,
-                                                           master,
-                                                           deployMode)
+      SparkContext invokePrivate createTaskSchedulerMethod(
+        sc,
+        master,
+        deployMode)
     sched.asInstanceOf[TaskSchedulerImpl]
   }
 
@@ -159,15 +160,17 @@ class SparkContextSchedulerCreationSuite
   }
 
   test("yarn-cluster") {
-    testYarn("yarn",
-             "cluster",
-             "org.apache.spark.scheduler.cluster.YarnClusterScheduler")
+    testYarn(
+      "yarn",
+      "cluster",
+      "org.apache.spark.scheduler.cluster.YarnClusterScheduler")
   }
 
   test("yarn-client") {
-    testYarn("yarn",
-             "client",
-             "org.apache.spark.scheduler.cluster.YarnScheduler")
+    testYarn(
+      "yarn",
+      "client",
+      "org.apache.spark.scheduler.cluster.YarnScheduler")
   }
 
   def testMesos(master: String, expectedClass: Class[_], coarse: Boolean) {
@@ -185,26 +188,30 @@ class SparkContextSchedulerCreationSuite
   }
 
   test("mesos fine-grained") {
-    testMesos("mesos://localhost:1234",
-              classOf[MesosSchedulerBackend],
-              coarse = false)
+    testMesos(
+      "mesos://localhost:1234",
+      classOf[MesosSchedulerBackend],
+      coarse = false)
   }
 
   test("mesos coarse-grained") {
-    testMesos("mesos://localhost:1234",
-              classOf[CoarseMesosSchedulerBackend],
-              coarse = true)
+    testMesos(
+      "mesos://localhost:1234",
+      classOf[CoarseMesosSchedulerBackend],
+      coarse = true)
   }
 
   test("mesos with zookeeper") {
-    testMesos("mesos://zk://localhost:1234,localhost:2345",
-              classOf[MesosSchedulerBackend],
-              coarse = false)
+    testMesos(
+      "mesos://zk://localhost:1234,localhost:2345",
+      classOf[MesosSchedulerBackend],
+      coarse = false)
   }
 
   test("mesos with zookeeper and Master URL starting with zk://") {
-    testMesos("zk://localhost:1234,localhost:2345",
-              classOf[MesosSchedulerBackend],
-              coarse = false)
+    testMesos(
+      "zk://localhost:1234,localhost:2345",
+      classOf[MesosSchedulerBackend],
+      coarse = false)
   }
 }

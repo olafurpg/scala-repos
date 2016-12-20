@@ -75,9 +75,10 @@ abstract class TimePathedLongThriftSequenceFile[V <: TBase[_, _]: Manifest](
     prefix: String,
     dateFormat: String,
     dateRange: DateRange)
-    extends TimePathedSource(prefix + dateFormat + "/*",
-                             dateRange,
-                             DateOps.UTC)
+    extends TimePathedSource(
+      prefix + dateFormat + "/*",
+      dateRange,
+      DateOps.UTC)
     with WritableSequenceFileScheme
     with Serializable
     with Mappable[(Long, V)]

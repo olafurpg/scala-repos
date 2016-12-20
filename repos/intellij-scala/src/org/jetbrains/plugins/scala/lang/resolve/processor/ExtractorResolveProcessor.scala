@@ -38,8 +38,9 @@ class ExtractorResolveProcessor(ref: ScReferenceElement,
         def resultsFor(unapplyName: String) = {
           val typeResult = getFromType(state) match {
             case Some(tp) =>
-              Success(ScProjectionType(tp, obj, superReference = false),
-                      Some(obj))
+              Success(
+                ScProjectionType(tp, obj, superReference = false),
+                Some(obj))
             case _ => obj.getType(TypingContext.empty)
           }
           val processor = new CollectMethodsProcessor(ref, unapplyName)
@@ -54,19 +55,21 @@ class ExtractorResolveProcessor(ref: ScReferenceElement,
           addResults(sigs.map {
             case (m, subst, parent) =>
               val resolveToMethod =
-                new ScalaResolveResult(m,
-                                       subst,
-                                       getImports(state),
-                                       fromType = getFromType(state),
-                                       parentElement = parent,
-                                       isAccessible = accessible)
+                new ScalaResolveResult(
+                  m,
+                  subst,
+                  getImports(state),
+                  fromType = getFromType(state),
+                  parentElement = parent,
+                  isAccessible = accessible)
               val resolveToNamed =
-                new ScalaResolveResult(named,
-                                       subst,
-                                       getImports(state),
-                                       fromType = getFromType(state),
-                                       parentElement = parent,
-                                       isAccessible = accessible)
+                new ScalaResolveResult(
+                  named,
+                  subst,
+                  getImports(state),
+                  fromType = getFromType(state),
+                  parentElement = parent,
+                  isAccessible = accessible)
 
               resolveToMethod.copy(innerResolveResult = Option(resolveToNamed))
           })
@@ -82,12 +85,13 @@ class ExtractorResolveProcessor(ref: ScReferenceElement,
                 if cl.tooBigForUnapply &&
                   cl.scalaLanguageLevel.exists(_ >= Scala_2_11) =>
               addResult(
-                new ScalaResolveResult(named,
-                                       ScSubstitutor.empty,
-                                       getImports(state),
-                                       fromType = getFromType(state),
-                                       parentElement = Option(obj),
-                                       isAccessible = accessible))
+                new ScalaResolveResult(
+                  named,
+                  ScSubstitutor.empty,
+                  getImports(state),
+                  fromType = getFromType(state),
+                  parentElement = Option(obj),
+                  isAccessible = accessible))
             case _ =>
           }
         }

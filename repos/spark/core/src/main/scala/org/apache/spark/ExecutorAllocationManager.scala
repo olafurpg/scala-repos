@@ -242,14 +242,16 @@ private[spark] class ExecutorAllocationManager(
         }
       }
     }
-    executor.scheduleAtFixedRate(scheduleTask,
-                                 0,
-                                 intervalMillis,
-                                 TimeUnit.MILLISECONDS)
+    executor.scheduleAtFixedRate(
+      scheduleTask,
+      0,
+      intervalMillis,
+      TimeUnit.MILLISECONDS)
 
-    client.requestTotalExecutors(numExecutorsTarget,
-                                 localityAwareTasks,
-                                 hostToLocalTaskCount)
+    client.requestTotalExecutors(
+      numExecutorsTarget,
+      localityAwareTasks,
+      hostToLocalTaskCount)
   }
 
   /**
@@ -336,9 +338,10 @@ private[spark] class ExecutorAllocationManager(
 
       // If the new target has not changed, avoid sending a message to the cluster manager
       if (numExecutorsTarget < oldNumExecutorsTarget) {
-        client.requestTotalExecutors(numExecutorsTarget,
-                                     localityAwareTasks,
-                                     hostToLocalTaskCount)
+        client.requestTotalExecutors(
+          numExecutorsTarget,
+          localityAwareTasks,
+          hostToLocalTaskCount)
         logDebug(
           s"Lowering target number of executors to $numExecutorsTarget (previously " +
             s"$oldNumExecutorsTarget) because not all requested executors are actually needed")
@@ -397,9 +400,10 @@ private[spark] class ExecutorAllocationManager(
     }
 
     val addRequestAcknowledged =
-      testing || client.requestTotalExecutors(numExecutorsTarget,
-                                              localityAwareTasks,
-                                              hostToLocalTaskCount)
+      testing || client.requestTotalExecutors(
+        numExecutorsTarget,
+        localityAwareTasks,
+        hostToLocalTaskCount)
     if (addRequestAcknowledged) {
       val executorsString = "executor" + { if (delta > 1) "s" else "" }
       logInfo(
@@ -802,9 +806,10 @@ private[spark] class ExecutorAllocationManager(
     }
 
     registerGauge("numberExecutorsToAdd", numExecutorsToAdd, 0)
-    registerGauge("numberExecutorsPendingToRemove",
-                  executorsPendingToRemove.size,
-                  0)
+    registerGauge(
+      "numberExecutorsPendingToRemove",
+      executorsPendingToRemove.size,
+      0)
     registerGauge("numberAllExecutors", executorIds.size, 0)
     registerGauge("numberTargetExecutors", numExecutorsTarget, 0)
     registerGauge("numberMaxNeededExecutors", maxNumExecutorsNeeded(), 0)

@@ -124,9 +124,10 @@ object SpinnerValueFactory {
       */
     def this(min: Int, max: Int, initialValue: Int) {
       this(
-        new jfxsc.SpinnerValueFactory.IntegerSpinnerValueFactory(min,
-                                                                 max,
-                                                                 initialValue))
+        new jfxsc.SpinnerValueFactory.IntegerSpinnerValueFactory(
+          min,
+          max,
+          initialValue))
     }
 
     /**
@@ -213,9 +214,10 @@ object SpinnerValueFactory {
       */
     def this(min: Double, max: Double, initialValue: Double) {
       this(
-        new jfxsc.SpinnerValueFactory.DoubleSpinnerValueFactory(min,
-                                                                max,
-                                                                initialValue))
+        new jfxsc.SpinnerValueFactory.DoubleSpinnerValueFactory(
+          min,
+          max,
+          initialValue))
     }
 
     /**

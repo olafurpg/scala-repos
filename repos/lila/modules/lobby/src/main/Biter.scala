@@ -28,9 +28,10 @@ private[lobby] object Biter {
     for {
       userOption ← lobbyUserOption.map(_.id) ?? UserRepo.byId
       ownerOption ← hook.userId ?? UserRepo.byId
-      creatorColor <- assignCreatorColor(ownerOption,
-                                         userOption,
-                                         hook.realColor)
+      creatorColor <- assignCreatorColor(
+        ownerOption,
+        userOption,
+        hook.realColor)
       game = blame(
         !creatorColor,
         userOption,
@@ -70,25 +71,27 @@ private[lobby] object Biter {
     }
 
   private def makeGame(hook: Hook) =
-    Game.make(game = ChessGame(board = Board init hook.realVariant,
-                               clock = hook.clock.some),
-              whitePlayer = Player.white,
-              blackPlayer = Player.black,
-              mode = hook.realMode,
-              variant = hook.realVariant,
-              source = lila.game.Source.Lobby,
-              pgnImport = None)
+    Game.make(
+      game = ChessGame(
+        board = Board init hook.realVariant,
+        clock = hook.clock.some),
+      whitePlayer = Player.white,
+      blackPlayer = Player.black,
+      mode = hook.realMode,
+      variant = hook.realVariant,
+      source = lila.game.Source.Lobby,
+      pgnImport = None)
 
   private def makeGame(seek: Seek) =
-    Game.make(game =
-                ChessGame(board = Board init seek.realVariant, clock = none),
-              whitePlayer = Player.white,
-              blackPlayer = Player.black,
-              mode = seek.realMode,
-              variant = seek.realVariant,
-              source = lila.game.Source.Lobby,
-              daysPerTurn = seek.daysPerTurn,
-              pgnImport = None)
+    Game.make(
+      game = ChessGame(board = Board init seek.realVariant, clock = none),
+      whitePlayer = Player.white,
+      blackPlayer = Player.black,
+      mode = seek.realMode,
+      variant = seek.realVariant,
+      source = lila.game.Source.Lobby,
+      daysPerTurn = seek.daysPerTurn,
+      pgnImport = None)
 
   def canJoin(hook: Hook, user: Option[LobbyUser]): Boolean =
     hook.realMode.casual.fold(

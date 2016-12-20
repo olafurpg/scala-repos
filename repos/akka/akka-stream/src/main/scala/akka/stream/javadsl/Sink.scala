@@ -218,11 +218,12 @@ object Sink {
       onCompleteMessage: Any,
       onFailureMessage: function.Function[Throwable, Any]): Sink[In, NotUsed] =
     new Sink(
-      scaladsl.Sink.actorRefWithAck[In](ref,
-                                        onInitMessage,
-                                        ackMessage,
-                                        onCompleteMessage,
-                                        onFailureMessage.apply))
+      scaladsl.Sink.actorRefWithAck[In](
+        ref,
+        onInitMessage,
+        ackMessage,
+        onCompleteMessage,
+        onFailureMessage.apply))
 
   /**
     * Creates a `Sink` that is materialized to an [[akka.actor.ActorRef]] which points to an Actor

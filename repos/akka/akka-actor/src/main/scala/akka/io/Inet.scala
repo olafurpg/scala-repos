@@ -140,8 +140,9 @@ object Inet {
       * For more information see [[java.net.Socket#setTrafficClass]]
       */
     final case class TrafficClass(tc: Int) extends SocketOption {
-      require(0 <= tc && tc <= 255,
-              "TrafficClass needs to be in the interval [0, 255]")
+      require(
+        0 <= tc && tc <= 255,
+        "TrafficClass needs to be in the interval [0, 255]")
       override def afterConnect(s: Socket): Unit = s.setTrafficClass(tc)
     }
   }

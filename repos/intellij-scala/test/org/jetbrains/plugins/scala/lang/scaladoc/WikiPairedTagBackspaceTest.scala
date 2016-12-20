@@ -17,8 +17,9 @@ class WikiPairedTagBackspaceTest
   }
 
   def testDeleteMonospaceTag() {
-    checkGeneratedTextAfterBackspace("/** `" + CARET_MARKER + "blahblah` */",
-                                     "/** blahblah */")
+    checkGeneratedTextAfterBackspace(
+      "/** `" + CARET_MARKER + "blahblah` */",
+      "/** blahblah */")
   }
 
   def testDeleteItalicTag() {
@@ -84,7 +85,8 @@ class WikiPairedTagBackspaceTest
   }
 
   def testDeleteEmptyItalicTag() {
-    checkGeneratedTextAfterBackspace("/** ''" + CARET_MARKER + "'' */",
-                                     "/** ' */")
+    checkGeneratedTextAfterBackspace(
+      "/** ''" + CARET_MARKER + "'' */",
+      "/** ' */")
   }
 }

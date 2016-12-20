@@ -75,14 +75,14 @@ class NodeMetricsSpec extends WordSpec with Matchers {
     }
 
     "merge 2 NodeMetrics by most recent" in {
-      val sample1 = NodeMetrics(node1,
-                                1,
-                                Set(Metric.create("a", 10, None),
-                                    Metric.create("b", 20, None)).flatten)
-      val sample2 = NodeMetrics(node1,
-                                2,
-                                Set(Metric.create("a", 11, None),
-                                    Metric.create("c", 30, None)).flatten)
+      val sample1 = NodeMetrics(
+        node1,
+        1,
+        Set(Metric.create("a", 10, None), Metric.create("b", 20, None)).flatten)
+      val sample2 = NodeMetrics(
+        node1,
+        2,
+        Set(Metric.create("a", 11, None), Metric.create("c", 30, None)).flatten)
 
       val merged = sample1 merge sample2
       merged.timestamp should ===(sample2.timestamp)
@@ -92,14 +92,14 @@ class NodeMetricsSpec extends WordSpec with Matchers {
     }
 
     "not merge 2 NodeMetrics if master is more recent" in {
-      val sample1 = NodeMetrics(node1,
-                                1,
-                                Set(Metric.create("a", 10, None),
-                                    Metric.create("b", 20, None)).flatten)
-      val sample2 = NodeMetrics(node1,
-                                0,
-                                Set(Metric.create("a", 11, None),
-                                    Metric.create("c", 30, None)).flatten)
+      val sample1 = NodeMetrics(
+        node1,
+        1,
+        Set(Metric.create("a", 10, None), Metric.create("b", 20, None)).flatten)
+      val sample2 = NodeMetrics(
+        node1,
+        0,
+        Set(Metric.create("a", 11, None), Metric.create("c", 30, None)).flatten)
 
       val merged = sample1 merge sample2 // older and not same
       merged.timestamp should ===(sample1.timestamp)
@@ -107,14 +107,14 @@ class NodeMetricsSpec extends WordSpec with Matchers {
     }
 
     "update 2 NodeMetrics by most recent" in {
-      val sample1 = NodeMetrics(node1,
-                                1,
-                                Set(Metric.create("a", 10, None),
-                                    Metric.create("b", 20, None)).flatten)
-      val sample2 = NodeMetrics(node1,
-                                2,
-                                Set(Metric.create("a", 11, None),
-                                    Metric.create("c", 30, None)).flatten)
+      val sample1 = NodeMetrics(
+        node1,
+        1,
+        Set(Metric.create("a", 10, None), Metric.create("b", 20, None)).flatten)
+      val sample2 = NodeMetrics(
+        node1,
+        2,
+        Set(Metric.create("a", 11, None), Metric.create("c", 30, None)).flatten)
 
       val updated = sample1 update sample2
 
@@ -131,18 +131,18 @@ class NodeMetricsSpec extends WordSpec with Matchers {
       val decay = Some(defaultDecayFactor)
       val epsilon = 0.001
 
-      val sample1 = NodeMetrics(node1,
-                                1,
-                                Set(Metric.create("a", 1, decay),
-                                    Metric.create("b", 4, decay)).flatten)
-      val sample2 = NodeMetrics(node1,
-                                2,
-                                Set(Metric.create("a", 2, decay),
-                                    Metric.create("c", 5, decay)).flatten)
-      val sample3 = NodeMetrics(node1,
-                                3,
-                                Set(Metric.create("a", 3, decay),
-                                    Metric.create("d", 6, decay)).flatten)
+      val sample1 = NodeMetrics(
+        node1,
+        1,
+        Set(Metric.create("a", 1, decay), Metric.create("b", 4, decay)).flatten)
+      val sample2 = NodeMetrics(
+        node1,
+        2,
+        Set(Metric.create("a", 2, decay), Metric.create("c", 5, decay)).flatten)
+      val sample3 = NodeMetrics(
+        node1,
+        3,
+        Set(Metric.create("a", 3, decay), Metric.create("d", 6, decay)).flatten)
 
       val updated = sample1 update sample2 update sample3
 
@@ -181,12 +181,14 @@ class MetricsGossipSpec
 
   "A MetricsGossip" must {
     "add new NodeMetrics" in {
-      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
-                           newTimestamp,
-                           collector.sample.metrics)
-      val m2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555),
-                           newTimestamp,
-                           collector.sample.metrics)
+      val m1 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2554),
+        newTimestamp,
+        collector.sample.metrics)
+      val m2 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2555),
+        newTimestamp,
+        collector.sample.metrics)
 
       m1.metrics.size should be > (3)
       m2.metrics.size should be > (3)
@@ -202,12 +204,14 @@ class MetricsGossipSpec
     }
 
     "merge peer metrics" in {
-      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
-                           newTimestamp,
-                           collector.sample.metrics)
-      val m2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555),
-                           newTimestamp,
-                           collector.sample.metrics)
+      val m1 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2554),
+        newTimestamp,
+        collector.sample.metrics)
+      val m2 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2555),
+        newTimestamp,
+        collector.sample.metrics)
 
       val g1 = MetricsGossip.empty :+ m1 :+ m2
       g1.nodes.size should ===(2)
@@ -228,15 +232,18 @@ class MetricsGossipSpec
     }
 
     "merge an existing metric set for a node and update node ring" in {
-      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
-                           newTimestamp,
-                           collector.sample.metrics)
-      val m2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555),
-                           newTimestamp,
-                           collector.sample.metrics)
-      val m3 = NodeMetrics(Address("akka.tcp", "sys", "a", 2556),
-                           newTimestamp,
-                           collector.sample.metrics)
+      val m1 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2554),
+        newTimestamp,
+        collector.sample.metrics)
+      val m2 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2555),
+        newTimestamp,
+        collector.sample.metrics)
+      val m3 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2556),
+        newTimestamp,
+        collector.sample.metrics)
       val m2Updated =
         m2 copy
           (metrics = newSample(m2.metrics), timestamp = m2.timestamp + 1000)
@@ -262,20 +269,23 @@ class MetricsGossipSpec
     }
 
     "get the current NodeMetrics if it exists in the local nodes" in {
-      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
-                           newTimestamp,
-                           collector.sample.metrics)
+      val m1 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2554),
+        newTimestamp,
+        collector.sample.metrics)
       val g1 = MetricsGossip.empty :+ m1
       g1.nodeMetricsFor(m1.address).map(_.metrics) should ===(Some(m1.metrics))
     }
 
     "remove a node if it is no longer Up" in {
-      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
-                           newTimestamp,
-                           collector.sample.metrics)
-      val m2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555),
-                           newTimestamp,
-                           collector.sample.metrics)
+      val m1 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2554),
+        newTimestamp,
+        collector.sample.metrics)
+      val m2 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2555),
+        newTimestamp,
+        collector.sample.metrics)
 
       val g1 = MetricsGossip.empty :+ m1 :+ m2
       g1.nodes.size should ===(2)
@@ -287,12 +297,14 @@ class MetricsGossipSpec
     }
 
     "filter nodes" in {
-      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
-                           newTimestamp,
-                           collector.sample.metrics)
-      val m2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555),
-                           newTimestamp,
-                           collector.sample.metrics)
+      val m1 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2554),
+        newTimestamp,
+        collector.sample.metrics)
+      val m2 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2555),
+        newTimestamp,
+        collector.sample.metrics)
 
       val g1 = MetricsGossip.empty :+ m1 :+ m2
       g1.nodes.size should ===(2)
@@ -313,12 +325,14 @@ class MetricValuesSpec
 
   val collector = createMetricsCollector
 
-  val node1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
-                          1,
-                          collector.sample.metrics)
-  val node2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555),
-                          1,
-                          collector.sample.metrics)
+  val node1 = NodeMetrics(
+    Address("akka.tcp", "sys", "a", 2554),
+    1,
+    collector.sample.metrics)
+  val node2 = NodeMetrics(
+    Address("akka.tcp", "sys", "a", 2555),
+    1,
+    collector.sample.metrics)
 
   val nodes: Seq[NodeMetrics] = {
     (1 to 100).foldLeft(List(node1, node2)) { (nodes, _) ⇒
@@ -352,12 +366,13 @@ class MetricValuesSpec
         }
 
         node match {
-          case Cpu(address,
-                   _,
-                   systemLoadAverageOption,
-                   cpuCombinedOption,
-                   cpuStolenOption,
-                   processors) ⇒
+          case Cpu(
+              address,
+              _,
+              systemLoadAverageOption,
+              cpuCombinedOption,
+              cpuStolenOption,
+              processors) ⇒
             processors should be > (0)
             if (systemLoadAverageOption.isDefined)
               systemLoadAverageOption.get should be >= (0.0)

@@ -37,10 +37,11 @@ case class TaskCounts(tasksStaged: Int,
 
 object TaskCounts {
   def zero: TaskCounts =
-    TaskCounts(tasksStaged = 0,
-               tasksRunning = 0,
-               tasksHealthy = 0,
-               tasksUnhealthy = 0)
+    TaskCounts(
+      tasksStaged = 0,
+      tasksRunning = 0,
+      tasksHealthy = 0,
+      tasksUnhealthy = 0)
 
   def apply(appTasks: Iterable[Task],
             healthStatuses: Map[Task.Id, Seq[Health]]): TaskCounts = {

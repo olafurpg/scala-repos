@@ -12,15 +12,16 @@ object JavaScriptRouterGenerator extends App {
   val host = if (args.length > 1) args(1) else "localhost"
 
   val jsFile = play.api.routing
-    .JavaScriptReverseRouter("jsRoutes",
-                             None,
-                             host,
-                             Application.index,
-                             Application.post,
-                             Application.withParam,
-                             Application.takeBool,
-                             Application.takeListTickedParam,
-                             Application.takeTickedParams)
+    .JavaScriptReverseRouter(
+      "jsRoutes",
+      None,
+      host,
+      Application.index,
+      Application.post,
+      Application.withParam,
+      Application.takeBool,
+      Application.takeListTickedParam,
+      Application.takeTickedParams)
     .body
 
   // Add module exports for node

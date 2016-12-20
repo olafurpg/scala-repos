@@ -289,9 +289,10 @@ object CamelMessage extends ((Any, Map[String, Any]) ⇒ CamelMessage) {
     */
   private[camel] def from(camelMessage: JCamelMessage,
                           headers: Map[String, Any]): CamelMessage =
-    CamelMessage(camelMessage.getBody,
-                 headers ++ camelMessage.getHeaders,
-                 camelMessage.getAttachments.toMap)
+    CamelMessage(
+      camelMessage.getBody,
+      headers ++ camelMessage.getHeaders,
+      camelMessage.getAttachments.toMap)
 
   /**
     * Creates a new CamelMessageWithAttachments object from the Camel message.
@@ -305,9 +306,10 @@ object CamelMessage extends ((Any, Map[String, Any]) ⇒ CamelMessage) {
       camelMessage: JCamelMessage,
       headers: Map[String, Any],
       attachments: Map[String, DataHandler]): CamelMessage =
-    CamelMessage(camelMessage.getBody,
-                 headers ++ camelMessage.getHeaders,
-                 attachments ++ camelMessage.getAttachments)
+    CamelMessage(
+      camelMessage.getBody,
+      headers ++ camelMessage.getHeaders,
+      attachments ++ camelMessage.getAttachments)
 
   /**
     * INTERNAL API

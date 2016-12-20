@@ -12,11 +12,13 @@ import org.scalatra.servlet.ServletApiImplicits._
 import org.scalatra.util.RicherString._
 
 object ScalatraAtmosphereHandler {
-  @deprecated("Use `org.scalatra.atmosphere.AtmosphereClientKey` instead",
-              "2.2.1")
+  @deprecated(
+    "Use `org.scalatra.atmosphere.AtmosphereClientKey` instead",
+    "2.2.1")
   val AtmosphereClientKey = org.scalatra.atmosphere.AtmosphereClientKey
-  @deprecated("Use `org.scalatra.atmosphere.AtmosphereRouteKey` instead",
-              "2.2.1")
+  @deprecated(
+    "Use `org.scalatra.atmosphere.AtmosphereRouteKey` instead",
+    "2.2.1")
   val AtmosphereRouteKey = org.scalatra.atmosphere.AtmosphereRouteKey
 
   private class ScalatraResourceEventListener

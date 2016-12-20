@@ -168,17 +168,19 @@ object Retries {
 
         val filters =
           if (retryPolicy eq RetryPolicy.Never) {
-            newRequeueFilter(retryBudget,
-                             budgetP.requeueBackoffs,
-                             withdrawsOnly = false,
-                             scoped,
-                             timerP.timer,
-                             next)
+            newRequeueFilter(
+              retryBudget,
+              budgetP.requeueBackoffs,
+              withdrawsOnly = false,
+              scoped,
+              timerP.timer,
+              next)
           } else {
-            val retryFilter = new RetryExceptionsFilter[Req, Rep](retryPolicy,
-                                                                  timerP.timer,
-                                                                  statsRecv,
-                                                                  retryBudget)
+            val retryFilter = new RetryExceptionsFilter[Req, Rep](
+              retryPolicy,
+              timerP.timer,
+              statsRecv,
+              retryBudget)
             // note that we wrap the budget, since the retry filter wraps this
             val requeueFilter = newRequeueFilter(
               retryBudget,
@@ -206,14 +208,15 @@ object Retries {
     val budget =
       if (withdrawsOnly) new WithdrawOnlyRetryBudget(retryBudget)
       else retryBudget
-    new RequeueFilter[Req, Rep](budget,
-                                retrySchedule,
-                                statsReceiver,
-                                // TODO: If we ensure that the stack doesn't return restartable
-                                // failures when it isn't Open, we wouldn't need to gate on status.
-                                () => next.status == Status.Open,
-                                MaxRequeuesPerReq,
-                                timer)
+    new RequeueFilter[Req, Rep](
+      budget,
+      retrySchedule,
+      statsReceiver,
+      // TODO: If we ensure that the stack doesn't return restartable
+      // failures when it isn't Open, we wouldn't need to gate on status.
+      () => next.status == Status.Open,
+      MaxRequeuesPerReq,
+      timer)
   }
 
   private[this] def svcFactory[Req, Rep](

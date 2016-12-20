@@ -52,8 +52,9 @@ object DriverRegistrationSpec extends Specification {
 
   lazy val dbApi: DefaultDBApi = {
     // Fake driver
-    acolyte.jdbc.Driver.register("DriverRegistrationSpec",
-                                 acolyte.jdbc.CompositeHandler.empty())
+    acolyte.jdbc.Driver.register(
+      "DriverRegistrationSpec",
+      acolyte.jdbc.CompositeHandler.empty())
 
     new DefaultDBApi(
       Map(

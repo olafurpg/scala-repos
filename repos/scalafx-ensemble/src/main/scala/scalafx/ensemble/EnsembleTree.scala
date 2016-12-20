@@ -66,8 +66,9 @@ object EnsembleTree {
 
   private def loadExampleNames(): Array[(String, Array[String])] = {
 
-    require(examplListURL != null,
-            "Failed to locate resource in classpath: " + exampleListPath)
+    require(
+      examplListURL != null,
+      "Failed to locate resource in classpath: " + exampleListPath)
 
     val lines = scala.io.Source.fromURL(examplListURL).getLines()
 

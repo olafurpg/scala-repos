@@ -374,9 +374,10 @@ final class Algebraic private (val expr: Algebraic.Expr)
           .round(new MathContext(digits, roundingMode))
       case KRoot(sub, k) =>
         Algebraic
-          .nroot(rec(sub, digits + 2),
-                 k,
-                 new MathContext(digits + 2, roundingMode))
+          .nroot(
+            rec(sub, digits + 2),
+            k,
+            new MathContext(digits + 2, roundingMode))
           .round(new MathContext(digits, roundingMode))
       case Pow(sub, k) =>
         val subValue = rec(sub, digits + ceil(log(k.toDouble)).toInt)
@@ -1286,10 +1287,11 @@ object Algebraic extends AlgebraicInstances {
     } else if (cutoff > 18) {
       // We'd like to work with Long arithmetic, if possible. Our rounding is
       // exact anyways, so it doesn't hurt to remove some digits.
-      roundPositive(exact,
-                    approx.setScale(scale + 18, RoundingMode.DOWN),
-                    scale,
-                    mode)
+      roundPositive(
+        exact,
+        approx.setScale(scale + 18, RoundingMode.DOWN),
+        scale,
+        mode)
     } else {
       val unscale = spire.math.pow(10L, cutoff.toLong)
       val Array(truncatedUnscaledValue, bigRemainder) =
@@ -1489,11 +1491,12 @@ object Algebraic extends AlgebraicInstances {
 
         case Pow(subExpr, k) =>
           val sub = subExpr.getBound(this)
-          Bound(sub.lc * k,
-                sub.tc * k,
-                sub.measure * k,
-                sub.lb * k,
-                sub.ub * k)
+          Bound(
+            sub.lc * k,
+            sub.tc * k,
+            sub.measure * k,
+            sub.lb * k,
+            sub.ub * k)
       }
     }
 

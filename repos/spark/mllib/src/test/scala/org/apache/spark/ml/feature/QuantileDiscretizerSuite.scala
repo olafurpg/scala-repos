@@ -45,44 +45,51 @@ class QuantileDiscretizerSuite
       Array[Double](1, 2, 3, 3, 3, 3, 3, 3, 3),
       Array("-Infinity, 1.0", "1.0, 2.0", "2.0, 3.0", "3.0, Infinity"))
 
-    checkDiscretizedData(sc,
-                         Array[Double](1, 2, 3, 3, 3, 3, 3, 3, 3),
-                         3,
-                         Array[Double](0, 1, 2, 2, 2, 2, 2, 2, 2),
-                         Array("-Infinity, 2.0", "2.0, 3.0", "3.0, Infinity"))
+    checkDiscretizedData(
+      sc,
+      Array[Double](1, 2, 3, 3, 3, 3, 3, 3, 3),
+      3,
+      Array[Double](0, 1, 2, 2, 2, 2, 2, 2, 2),
+      Array("-Infinity, 2.0", "2.0, 3.0", "3.0, Infinity"))
 
-    checkDiscretizedData(sc,
-                         Array[Double](1, 2, 3, 3, 3, 3, 3, 3, 3),
-                         2,
-                         Array[Double](0, 1, 1, 1, 1, 1, 1, 1, 1),
-                         Array("-Infinity, 2.0", "2.0, Infinity"))
+    checkDiscretizedData(
+      sc,
+      Array[Double](1, 2, 3, 3, 3, 3, 3, 3, 3),
+      2,
+      Array[Double](0, 1, 1, 1, 1, 1, 1, 1, 1),
+      Array("-Infinity, 2.0", "2.0, Infinity"))
   }
 
   test("Test getting splits") {
     val splitTestPoints = Array(
-      Array[Double]() -> Array(Double.NegativeInfinity,
-                               0,
-                               Double.PositiveInfinity),
-      Array(Double.NegativeInfinity) -> Array(Double.NegativeInfinity,
-                                              0,
-                                              Double.PositiveInfinity),
-      Array(Double.PositiveInfinity) -> Array(Double.NegativeInfinity,
-                                              0,
-                                              Double.PositiveInfinity),
+      Array[Double]() -> Array(
+        Double.NegativeInfinity,
+        0,
+        Double.PositiveInfinity),
+      Array(Double.NegativeInfinity) -> Array(
+        Double.NegativeInfinity,
+        0,
+        Double.PositiveInfinity),
+      Array(Double.PositiveInfinity) -> Array(
+        Double.NegativeInfinity,
+        0,
+        Double.PositiveInfinity),
       Array(Double.NegativeInfinity, Double.PositiveInfinity) -> Array(
         Double.NegativeInfinity,
         0,
         Double.PositiveInfinity),
       Array(0.0) -> Array(Double.NegativeInfinity, 0, Double.PositiveInfinity),
       Array(1.0) -> Array(Double.NegativeInfinity, 1, Double.PositiveInfinity),
-      Array(0.0, 1.0) -> Array(Double.NegativeInfinity,
-                               0,
-                               1,
-                               Double.PositiveInfinity)
+      Array(0.0, 1.0) -> Array(
+        Double.NegativeInfinity,
+        0,
+        1,
+        Double.PositiveInfinity)
     )
     for ((ori, res) <- splitTestPoints) {
-      assert(QuantileDiscretizer.getSplits(ori) === res,
-             "Returned splits are invalid.")
+      assert(
+        QuantileDiscretizer.getSplits(ori) === res,
+        "Returned splits are invalid.")
     }
   }
 
@@ -147,9 +154,11 @@ private object QuantileDiscretizerSuite extends SparkFunSuite {
       .values
       .get
 
-    assert(transformedFeatures === expectedResult,
-           "Transformed features do not equal expected features.")
-    assert(transformedAttrs === expectedAttrs,
-           "Transformed attributes do not equal expected attributes.")
+    assert(
+      transformedFeatures === expectedResult,
+      "Transformed features do not equal expected features.")
+    assert(
+      transformedAttrs === expectedAttrs,
+      "Transformed attributes do not equal expected attributes.")
   }
 }

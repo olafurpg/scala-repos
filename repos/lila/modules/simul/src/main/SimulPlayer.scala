@@ -26,9 +26,10 @@ private[simul] object SimulPlayer {
       } else
         Perfs.variantLens(variant).fold(user.perfs.standard)(_(user.perfs))
 
-    new SimulPlayer(user = user.id,
-                    variant = variant,
-                    rating = perf.intRating,
-                    provisional = perf.provisional.some)
+    new SimulPlayer(
+      user = user.id,
+      variant = variant,
+      rating = perf.intRating,
+      provisional = perf.provisional.some)
   }
 }

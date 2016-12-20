@@ -7,5 +7,6 @@ import org.jboss.netty.handler.codec.http.{
 }
 
 private[finagle] object OneHundredContinueResponse
-    extends DefaultHttpResponse(HttpVersion.HTTP_1_1,
-                                HttpResponseStatus.CONTINUE)
+    extends DefaultHttpResponse(
+      HttpVersion.HTTP_1_1,
+      HttpResponseStatus.CONTINUE)

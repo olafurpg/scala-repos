@@ -17,20 +17,24 @@ class IorTests extends CatsSuite {
 
   implicit val iso = CartesianTests.Isomorphisms.invariant[Ior[String, ?]]
 
-  checkAll("Ior[String, Int]",
-           CartesianTests[Ior[String, ?]].cartesian[Int, Int, Int])
-  checkAll("Cartesian[String Ior ?]]",
-           SerializableTests.serializable(Cartesian[String Ior ?]))
+  checkAll(
+    "Ior[String, Int]",
+    CartesianTests[Ior[String, ?]].cartesian[Int, Int, Int])
+  checkAll(
+    "Cartesian[String Ior ?]]",
+    SerializableTests.serializable(Cartesian[String Ior ?]))
 
   checkAll("Ior[String, Int]", MonadTests[String Ior ?].monad[Int, Int, Int])
-  checkAll("Monad[String Ior ?]]",
-           SerializableTests.serializable(Monad[String Ior ?]))
+  checkAll(
+    "Monad[String Ior ?]]",
+    SerializableTests.serializable(Monad[String Ior ?]))
 
   checkAll(
     "Ior[String, Int] with Option",
     TraverseTests[String Ior ?].traverse[Int, Int, Int, Int, Option, Option])
-  checkAll("Traverse[String Ior ?]",
-           SerializableTests.serializable(Traverse[String Ior ?]))
+  checkAll(
+    "Traverse[String Ior ?]",
+    SerializableTests.serializable(Traverse[String Ior ?]))
   checkAll(
     "? Ior ?",
     BifunctorTests[Ior].bifunctor[Int, Int, Int, String, String, String])

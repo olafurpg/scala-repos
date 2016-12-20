@@ -117,9 +117,10 @@ class SbtRunConfiguration(val project: Project,
         case _: NoClassDefFoundError => // no android plugin, do nothing
       }
       params.setWorkingDirectory(project.getBaseDir.getPath)
-      params.configureByProject(configuration.getProject,
-                                JavaParameters.JDK_ONLY,
-                                jdk)
+      params.configureByProject(
+        configuration.getProject,
+        JavaParameters.JDK_ONLY,
+        jdk)
       val sbtSystemSettings: SbtSystemSettings =
         SbtSystemSettings.getInstance(configuration.getProject)
       if (sbtSystemSettings.getCustomLauncherEnabled) {

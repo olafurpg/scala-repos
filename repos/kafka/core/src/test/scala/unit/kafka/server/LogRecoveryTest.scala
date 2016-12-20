@@ -94,10 +94,11 @@ class LogRecoveryTest extends ZooKeeperTestHarness {
     servers = List(server1, server2)
 
     // create topic with 1 partition, 2 replicas, one on each broker
-    createTopic(zkUtils,
-                topic,
-                partitionReplicaAssignment = Map(0 -> Seq(0, 1)),
-                servers = servers)
+    createTopic(
+      zkUtils,
+      topic,
+      partitionReplicaAssignment = Map(0 -> Seq(0, 1)),
+      servers = servers)
 
     // create the producer
     updateProducer()
@@ -150,10 +151,11 @@ class LogRecoveryTest extends ZooKeeperTestHarness {
     assertEquals(hw, hwFile1.read.getOrElse(TopicAndPartition(topic, 0), 0L))
 
     // check if leader moves to the other server
-    leader = waitUntilLeaderIsElectedOrChanged(zkUtils,
-                                               topic,
-                                               partitionId,
-                                               oldLeaderOpt = leader)
+    leader = waitUntilLeaderIsElectedOrChanged(
+      zkUtils,
+      topic,
+      partitionId,
+      oldLeaderOpt = leader)
     assertEquals("Leader must move to broker 1", 1, leader.getOrElse(-1))
 
     // bring the preferred replica back
@@ -173,10 +175,11 @@ class LogRecoveryTest extends ZooKeeperTestHarness {
 
     server2.startup()
     updateProducer()
-    leader = waitUntilLeaderIsElectedOrChanged(zkUtils,
-                                               topic,
-                                               partitionId,
-                                               oldLeaderOpt = leader)
+    leader = waitUntilLeaderIsElectedOrChanged(
+      zkUtils,
+      topic,
+      partitionId,
+      oldLeaderOpt = leader)
     assertTrue(
       "Leader must remain on broker 0, in case of zookeeper session expiration it can move to broker 1",
       leader.isDefined && (leader.get == 0 || leader.get == 1))
@@ -245,10 +248,11 @@ class LogRecoveryTest extends ZooKeeperTestHarness {
     server2.startup()
     updateProducer()
     // check if leader moves to the other server
-    leader = waitUntilLeaderIsElectedOrChanged(zkUtils,
-                                               topic,
-                                               partitionId,
-                                               oldLeaderOpt = leader)
+    leader = waitUntilLeaderIsElectedOrChanged(
+      zkUtils,
+      topic,
+      partitionId,
+      oldLeaderOpt = leader)
     assertEquals("Leader must move to broker 1", 1, leader.getOrElse(-1))
 
     assertEquals(hw, hwFile1.read.getOrElse(TopicAndPartition(topic, 0), 0L))

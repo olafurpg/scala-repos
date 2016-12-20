@@ -68,8 +68,9 @@ class JsonHadoopFsRelationSuite extends HadoopFsRelationTest {
 
       val schema = new StructType()
         .add("array", ArrayType(LongType))
-        .add("map",
-             MapType(StringType, new StructType().add("innerField", LongType)))
+        .add(
+          "map",
+          MapType(StringType, new StructType().add("innerField", LongType)))
 
       val data =
         Row(Seq(1L, 2L, 3L), Map("m1" -> Row(4L))) :: Row(

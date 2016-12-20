@@ -120,9 +120,10 @@ private[io] object SelectionHandler {
                               decision: SupervisorStrategy.Directive): Unit =
         if (cause.isInstanceOf[DeathPactException]) {
           try context.system.eventStream.publish {
-            Logging.Debug(child.path.toString,
-                          getClass,
-                          "Closed after handler termination")
+            Logging.Debug(
+              child.path.toString,
+              getClass,
+              "Closed after handler termination")
           } catch { case NonFatal(_) ⇒ }
         } else super.logFailure(context, child, cause, decision)
     }
@@ -328,19 +329,21 @@ private[io] class SelectionHandler(settings: SelectionHandlerSettings)
     if (MaxChannelsPerSelector == -1 || childCount < MaxChannelsPerSelector) {
       val newName = sequenceNumber.toString
       sequenceNumber += 1
-      val child = context.actorOf(props = cmd
-                                    .childProps(registry)
-                                    .withDispatcher(WorkerDispatcher)
-                                    .withDeploy(Deploy.local),
-                                  name = newName)
+      val child = context.actorOf(
+        props = cmd
+          .childProps(registry)
+          .withDispatcher(WorkerDispatcher)
+          .withDeploy(Deploy.local),
+        name = newName)
       childCount += 1
       if (MaxChannelsPerSelector > 0)
         context.watch(child) // we don't need to watch if we aren't limited
     } else {
       if (retriesLeft >= 1) {
-        log.debug("Rejecting [{}] with [{}] retries left, retrying...",
-                  cmd,
-                  retriesLeft)
+        log.debug(
+          "Rejecting [{}] with [{}] retries left, retrying...",
+          cmd,
+          retriesLeft)
         context.parent forward Retry(cmd, retriesLeft - 1)
       } else {
         log.warning("Rejecting [{}] with no retries left, aborting...", cmd)

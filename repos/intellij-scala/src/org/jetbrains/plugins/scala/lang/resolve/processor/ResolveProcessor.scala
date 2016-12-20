@@ -178,24 +178,26 @@ class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
             if !isThisOrSuperResolve ||
               PsiTreeUtil.isContextAncestor(clazz, ref, true) =>
           addResult(
-            new ScalaResolveResult(named,
-                                   getSubst(state),
-                                   getImports(state),
-                                   nameShadow,
-                                   boundClass = getBoundClass(state),
-                                   fromType = getFromType(state),
-                                   isAccessible = accessible))
+            new ScalaResolveResult(
+              named,
+              getSubst(state),
+              getImports(state),
+              nameShadow,
+              boundClass = getBoundClass(state),
+              fromType = getFromType(state),
+              isAccessible = accessible))
         case clazz: PsiClass => //do nothing, it's wrong class or object
         case _ if isThisOrSuperResolve => //do nothing for type alias
         case _ =>
           addResult(
-            new ScalaResolveResult(named,
-                                   getSubst(state),
-                                   getImports(state),
-                                   nameShadow,
-                                   boundClass = getBoundClass(state),
-                                   fromType = getFromType(state),
-                                   isAccessible = accessible))
+            new ScalaResolveResult(
+              named,
+              getSubst(state),
+              getImports(state),
+              nameShadow,
+              boundClass = getBoundClass(state),
+              fromType = getFromType(state),
+              isAccessible = accessible))
       }
     }
     true
@@ -252,14 +254,16 @@ class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
     }
      */
     res.filter {
-      case r @ ScalaResolveResult(_: ScTypeAlias | _: ScClass | _: ScTrait,
-                                  _) =>
+      case r @ ScalaResolveResult(
+            _: ScTypeAlias | _: ScClass | _: ScTrait,
+            _) =>
         res.foldLeft(true) {
           case (false, _) => false
-          case (true,
-                rr @ ScalaResolveResult(_: ScTypeAlias | _: ScClass |
-                                        _: ScTrait,
-                                        _)) =>
+          case (
+              true,
+              rr @ ScalaResolveResult(
+                _: ScTypeAlias | _: ScClass | _: ScTrait,
+                _)) =>
             rr.element.name != r.element.name || ScalaPsiUtil
               .superTypeMembers(rr.element)
               .find(_ == r.element) == None

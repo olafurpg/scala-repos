@@ -39,8 +39,8 @@ class WebSocketIntegrationSpec
             val upgrade =
               headers.collectFirst { case u: UpgradeToWebSocket ⇒ u }.get
             upgrade.handleMessages(
-              Flow.fromSinkAndSource(Sink.ignore,
-                                     Source.fromPublisher(source)),
+              Flow
+                .fromSinkAndSource(Sink.ignore, Source.fromPublisher(source)),
               None)
         }, interface = "localhost", port = 0)
         val binding = Await.result(bindingFuture, 3.seconds)
@@ -68,8 +68,8 @@ class WebSocketIntegrationSpec
             val upgrade =
               headers.collectFirst { case u: UpgradeToWebSocket ⇒ u }.get
             upgrade.handleMessages(
-              Flow.fromSinkAndSource(Sink.ignore,
-                                     Source.fromPublisher(source)),
+              Flow
+                .fromSinkAndSource(Sink.ignore, Source.fromPublisher(source)),
               None)
         }, interface = "localhost", port = 0)
         val binding = Await.result(bindingFuture, 3.seconds)
@@ -116,9 +116,9 @@ class WebSocketIntegrationSpec
 
         val N = 100
 
-        EventFilter.warning(pattern =
-                              "HTTP header .* is not allowed in responses",
-                            occurrences = 0) intercept {
+        EventFilter.warning(
+          pattern = "HTTP header .* is not allowed in responses",
+          occurrences = 0) intercept {
           val (response, count) = Http().singleWebSocketRequest(
             WebSocketRequest("ws://127.0.0.1:" + myPort),
             Flow.fromSinkAndSourceMat(
@@ -170,9 +170,9 @@ class WebSocketIntegrationSpec
               // the resource leak of #19398 existed only for severed websocket connections
               .atopMat(GraphStages.bidiBreaker[ByteString, ByteString])(
                 Keep.right)
-              .join(Tcp().outgoingConnection(new InetSocketAddress("localhost",
-                                                                   myPort),
-                                             halfClose = true))
+              .join(Tcp().outgoingConnection(
+                new InetSocketAddress("localhost", myPort),
+                halfClose = true))
           }(Keep.right)
           .toMat(Sink.foreach(_ ⇒ messages += 1))(Keep.both)
           .run()

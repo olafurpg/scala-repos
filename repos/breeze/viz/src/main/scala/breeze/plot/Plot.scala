@@ -179,12 +179,13 @@ class Plot() {
     rv.setRangeAxis(yaxis)
 
     rv.setDrawingSupplier(
-      new DefaultDrawingSupplier(Plot.paints,
-                                 Plot.fillPaints,
-                                 Plot.outlinePaints,
-                                 Plot.strokes,
-                                 Plot.outlineStrokes,
-                                 Plot.shapes))
+      new DefaultDrawingSupplier(
+        Plot.paints,
+        Plot.fillPaints,
+        Plot.outlinePaints,
+        Plot.strokes,
+        Plot.outlineStrokes,
+        Plot.shapes))
 
     rv
   }
@@ -293,7 +294,8 @@ object Plot {
     private val seriesDelegates = ArrayBuffer[Int]()
 
     private def delegate[A](series: Int)(f: (xy.XYDataset, Int) => A) = {
-      f(datasets(seriesDelegates(series)),
+      f(
+        datasets(seriesDelegates(series)),
         series - datasetSeriesOffsets(seriesDelegates(series)))
     }
 
@@ -340,7 +342,8 @@ object Plot {
     private val autostroke = ArrayBuffer[Boolean]()
 
     private def delegate[A](series: Int)(f: (xy.XYItemRenderer, Int) => A) = {
-      f(renderers(seriesDelegates(series)),
+      f(
+        renderers(seriesDelegates(series)),
         series - datasetSeriesOffsets(seriesDelegates(series)))
     }
 

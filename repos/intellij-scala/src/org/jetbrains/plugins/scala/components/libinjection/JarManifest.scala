@@ -80,10 +80,11 @@ object JarManifest {
           elem,
           "<intellij-compat> with plugin descriptors")
       case xss: NodeSeq =>
-        JarManifest((xss \\ "scala-plugin").map(buildPluginDescriptor),
-                    containingJar.getPath.replaceAll("!/", ""),
-                    new File(containingJar.getPath.replaceAll("!/", ""))
-                      .lastModified())(isBlackListed = false)
+        JarManifest(
+          (xss \\ "scala-plugin").map(buildPluginDescriptor),
+          containingJar.getPath.replaceAll("!/", ""),
+          new File(containingJar.getPath.replaceAll("!/", ""))
+            .lastModified())(isBlackListed = false)
     }
   }
 }

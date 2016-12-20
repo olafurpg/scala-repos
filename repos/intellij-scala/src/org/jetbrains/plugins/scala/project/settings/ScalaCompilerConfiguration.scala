@@ -83,12 +83,14 @@ class ScalaCompilerConfiguration(project: Project)
 
     customProfiles.foreach { profile =>
       val profileElement =
-        XmlSerializer.serialize(profile.getSettings.getState,
-                                new SkipDefaultValuesSerializationFilters())
+        XmlSerializer.serialize(
+          profile.getSettings.getState,
+          new SkipDefaultValuesSerializationFilters())
       profileElement.setName("profile")
       profileElement.setAttribute("name", profile.getName)
-      profileElement.setAttribute("modules",
-                                  profile.getModuleNames.asScala.mkString(","))
+      profileElement.setAttribute(
+        "modules",
+        profile.getModuleNames.asScala.mkString(","))
 
       configurationElement.addContent(profileElement)
     }
@@ -104,10 +106,8 @@ class ScalaCompilerConfiguration(project: Project)
       .map(it => IncrementalityType.valueOf(it.getAttributeValue("value")))
       .getOrElse(IncrementalityType.IDEA)
 
-    defaultProfile.setSettings(
-      new ScalaCompilerSettings(
-        XmlSerializer.deserialize(configurationElement,
-                                  classOf[ScalaCompilerSettingsState])))
+    defaultProfile.setSettings(new ScalaCompilerSettings(XmlSerializer
+      .deserialize(configurationElement, classOf[ScalaCompilerSettingsState])))
 
     customProfiles = configurationElement.getChildren("profile").asScala.map {
       profileElement =>
@@ -115,8 +115,8 @@ class ScalaCompilerConfiguration(project: Project)
           profileElement.getAttributeValue("name"))
 
         val settings = new ScalaCompilerSettings(
-          XmlSerializer.deserialize(profileElement,
-                                    classOf[ScalaCompilerSettingsState]))
+          XmlSerializer
+            .deserialize(profileElement, classOf[ScalaCompilerSettingsState]))
         profile.setSettings(settings)
 
         val moduleNames = profileElement

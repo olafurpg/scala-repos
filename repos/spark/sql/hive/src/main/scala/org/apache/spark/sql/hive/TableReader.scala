@@ -77,8 +77,9 @@ private[hive] class HadoopTableReader(
     if (sc.sparkContext.isLocal) {
       0 // will splitted based on block by default.
     } else {
-      math.max(sc.hiveconf.getInt("mapred.map.tasks", 1),
-               sc.sparkContext.defaultMinPartitions)
+      math.max(
+        sc.hiveconf.getInt("mapred.map.tasks", 1),
+        sc.sparkContext.defaultMinPartitions)
     }
 
   // TODO: set aws s3 credentials.
@@ -87,11 +88,12 @@ private[hive] class HadoopTableReader(
     sc.sparkContext.broadcast(new SerializableConfiguration(hiveExtraConf))
 
   override def makeRDDForTable(hiveTable: HiveTable): RDD[InternalRow] =
-    makeRDDForTable(hiveTable,
-                    Utils
-                      .classForName(relation.tableDesc.getSerdeClassName)
-                      .asInstanceOf[Class[Deserializer]],
-                    filterOpt = None)
+    makeRDDForTable(
+      hiveTable,
+      Utils
+        .classForName(relation.tableDesc.getSerdeClassName)
+        .asInstanceOf[Class[Deserializer]],
+      filterOpt = None)
 
   /**
     * Creates a Hadoop RDD to read data from the target table's data directory. Returns a transformed
@@ -131,11 +133,12 @@ private[hive] class HadoopTableReader(
       val hconf = broadcastedHiveConf.value.value
       val deserializer = deserializerClass.newInstance()
       deserializer.initialize(hconf, tableDesc.getProperties)
-      HadoopTableReader.fillObject(iter,
-                                   deserializer,
-                                   attrsWithIndex,
-                                   mutableRow,
-                                   deserializer)
+      HadoopTableReader.fillObject(
+        iter,
+        deserializer,
+        attrsWithIndex,
+        mutableRow,
+        deserializer)
     }
 
     deserializedHadoopRDD
@@ -248,8 +251,9 @@ private[hive] class HadoopTableReader(
             partitionKeyAttrs.foreach {
               case (attr, ordinal) =>
                 val partOrdinal = relation.partitionKeys.indexOf(attr)
-                row(ordinal) = Cast(Literal(rawPartValues(partOrdinal)),
-                                    attr.dataType).eval(null)
+                row(ordinal) =
+                  Cast(Literal(rawPartValues(partOrdinal)), attr.dataType)
+                    .eval(null)
             }
           }
 
@@ -265,11 +269,12 @@ private[hive] class HadoopTableReader(
             tableSerDe.initialize(hconf, tableDesc.getProperties)
 
             // fill the non partition key attributes
-            HadoopTableReader.fillObject(iter,
-                                         deserializer,
-                                         nonPartitionKeyAttrs,
-                                         mutableRow,
-                                         tableSerDe)
+            HadoopTableReader.fillObject(
+              iter,
+              deserializer,
+              nonPartitionKeyAttrs,
+              mutableRow,
+              tableSerDe)
           }
       }
       .toSeq
@@ -388,8 +393,9 @@ private[hive] object HadoopTableReader extends HiveInspectors with Logging {
         rawDeser.getObjectInspector.asInstanceOf[StructObjectInspector]
       } else {
         ObjectInspectorConverters
-          .getConvertedOI(rawDeser.getObjectInspector,
-                          tableDeser.getObjectInspector)
+          .getConvertedOI(
+            rawDeser.getObjectInspector,
+            tableDeser.getObjectInspector)
           .asInstanceOf[StructObjectInspector]
       }
 
@@ -444,9 +450,10 @@ private[hive] object HadoopTableReader extends HiveInspectors with Logging {
             row.update(ordinal, HiveShim.toCatalystDecimal(oi, value))
         case oi: TimestampObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
-            row.setLong(ordinal,
-                        DateTimeUtils.fromJavaTimestamp(
-                          oi.getPrimitiveJavaObject(value)))
+            row.setLong(
+              ordinal,
+              DateTimeUtils.fromJavaTimestamp(
+                oi.getPrimitiveJavaObject(value)))
         case oi: DateObjectInspector =>
           (value: Any, row: MutableRow, ordinal: Int) =>
             row.setInt(

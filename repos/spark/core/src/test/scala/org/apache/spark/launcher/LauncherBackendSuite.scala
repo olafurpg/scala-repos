@@ -44,11 +44,13 @@ class LauncherBackendSuite extends SparkFunSuite with Matchers {
     env.put("SPARK_PRINT_LAUNCH_COMMAND", "1")
     val handle = new SparkLauncher(env)
       .setSparkHome(sys.props("spark.test.home"))
-      .setConf(SparkLauncher.DRIVER_EXTRA_CLASSPATH,
-               System.getProperty("java.class.path"))
+      .setConf(
+        SparkLauncher.DRIVER_EXTRA_CLASSPATH,
+        System.getProperty("java.class.path"))
       .setConf("spark.ui.enabled", "false")
-      .setConf(SparkLauncher.DRIVER_EXTRA_JAVA_OPTIONS,
-               s"-Dtest.appender=console")
+      .setConf(
+        SparkLauncher.DRIVER_EXTRA_JAVA_OPTIONS,
+        s"-Dtest.appender=console")
       .setMaster(master)
       .setAppResource("spark-internal")
       .setMainClass(TestApp.getClass.getName().stripSuffix("$"))

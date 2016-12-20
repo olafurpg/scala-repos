@@ -44,11 +44,12 @@ object TopicCommand extends Logging {
         "Create, delete, describe, or change a topic.")
 
     // should have exactly one action
-    val actions = Seq(opts.createOpt,
-                      opts.listOpt,
-                      opts.alterOpt,
-                      opts.describeOpt,
-                      opts.deleteOpt).count(opts.options.has _)
+    val actions = Seq(
+      opts.createOpt,
+      opts.listOpt,
+      opts.alterOpt,
+      opts.describeOpt,
+      opts.deleteOpt).count(opts.options.has _)
     if (actions != 1)
       CommandLineUtils.printUsageAndDie(
         opts.parser,
@@ -56,10 +57,11 @@ object TopicCommand extends Logging {
 
     opts.checkArgs()
 
-    val zkUtils = ZkUtils(opts.options.valueOf(opts.zkConnectOpt),
-                          30000,
-                          30000,
-                          JaasUtils.isZkSecurityEnabled())
+    val zkUtils = ZkUtils(
+      opts.options.valueOf(opts.zkConnectOpt),
+      30000,
+      30000,
+      JaasUtils.isZkSecurityEnabled())
     var exitCode = 0
     try {
       if (opts.options.has(opts.createOpt)) createTopic(zkUtils, opts)
@@ -101,31 +103,34 @@ object TopicCommand extends Logging {
       if (opts.options.has(opts.replicaAssignmentOpt)) {
         val assignment = parseReplicaAssignment(
           opts.options.valueOf(opts.replicaAssignmentOpt))
-        warnOnMaxMessagesChange(configs,
-                                assignment.valuesIterator.next().length)
-        AdminUtils.createOrUpdateTopicPartitionAssignmentPathInZK(zkUtils,
-                                                                  topic,
-                                                                  assignment,
-                                                                  configs,
-                                                                  update =
-                                                                    false)
+        warnOnMaxMessagesChange(
+          configs,
+          assignment.valuesIterator.next().length)
+        AdminUtils.createOrUpdateTopicPartitionAssignmentPathInZK(
+          zkUtils,
+          topic,
+          assignment,
+          configs,
+          update = false)
       } else {
-        CommandLineUtils.checkRequiredArgs(opts.parser,
-                                           opts.options,
-                                           opts.partitionsOpt,
-                                           opts.replicationFactorOpt)
+        CommandLineUtils.checkRequiredArgs(
+          opts.parser,
+          opts.options,
+          opts.partitionsOpt,
+          opts.replicationFactorOpt)
         val partitions = opts.options.valueOf(opts.partitionsOpt).intValue
         val replicas = opts.options.valueOf(opts.replicationFactorOpt).intValue
         warnOnMaxMessagesChange(configs, replicas)
         val rackAwareMode =
           if (opts.options.has(opts.disableRackAware)) RackAwareMode.Disabled
           else RackAwareMode.Enforced
-        AdminUtils.createTopic(zkUtils,
-                               topic,
-                               partitions,
-                               replicas,
-                               configs,
-                               rackAwareMode)
+        AdminUtils.createTopic(
+          zkUtils,
+          topic,
+          partitions,
+          replicas,
+          configs,
+          rackAwareMode)
       }
       println("Created topic \"%s\".".format(topic))
     } catch {
@@ -439,19 +444,21 @@ object TopicCommand extends Logging {
         options,
         configOpt,
         allTopicLevelOpts -- Set(alterOpt, createOpt))
-      CommandLineUtils.checkInvalidArgs(parser,
-                                        options,
-                                        deleteConfigOpt,
-                                        allTopicLevelOpts -- Set(alterOpt))
+      CommandLineUtils.checkInvalidArgs(
+        parser,
+        options,
+        deleteConfigOpt,
+        allTopicLevelOpts -- Set(alterOpt))
       CommandLineUtils.checkInvalidArgs(
         parser,
         options,
         partitionsOpt,
         allTopicLevelOpts -- Set(alterOpt, createOpt))
-      CommandLineUtils.checkInvalidArgs(parser,
-                                        options,
-                                        replicationFactorOpt,
-                                        allTopicLevelOpts -- Set(createOpt))
+      CommandLineUtils.checkInvalidArgs(
+        parser,
+        options,
+        replicationFactorOpt,
+        allTopicLevelOpts -- Set(createOpt))
       CommandLineUtils.checkInvalidArgs(
         parser,
         options,
@@ -486,10 +493,11 @@ object TopicCommand extends Logging {
         options,
         ifExistsOpt,
         allTopicLevelOpts -- Set(alterOpt, deleteOpt))
-      CommandLineUtils.checkInvalidArgs(parser,
-                                        options,
-                                        ifNotExistsOpt,
-                                        allTopicLevelOpts -- Set(createOpt))
+      CommandLineUtils.checkInvalidArgs(
+        parser,
+        options,
+        ifNotExistsOpt,
+        allTopicLevelOpts -- Set(createOpt))
     }
   }
   def warnOnMaxMessagesChange(configs: Properties, replicas: Integer): Unit = {

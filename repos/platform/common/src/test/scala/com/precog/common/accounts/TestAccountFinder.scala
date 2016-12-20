@@ -58,17 +58,18 @@ object TestAccounts {
       apiKey <- f(accountId)
     } yield {
       val salt = Account.randomSalt()
-      Account(accountId,
-              email,
-              Account.saltAndHashSHA256(password, salt),
-              salt,
-              creationDate,
-              apiKey,
-              path,
-              plan,
-              None,
-              None,
-              profile)
+      Account(
+        accountId,
+        email,
+        Account.saltAndHashSHA256(password, salt),
+        salt,
+        creationDate,
+        apiKey,
+        path,
+        plan,
+        None,
+        None,
+        profile)
     }
   }
 }

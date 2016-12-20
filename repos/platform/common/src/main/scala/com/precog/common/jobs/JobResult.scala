@@ -62,8 +62,9 @@ trait JobResultSerialization {
     override def decompose(result: JobResult): JValue =
       JObject(
         List(
-          JField("content",
-                 JString(Base64.encodeBase64String(result.content))),
+          JField(
+            "content",
+            JString(Base64.encodeBase64String(result.content))),
           JField("mimeTypes", JArray(result.mimeTypes map { mimeType =>
             JString(mimeType.value)
           }))

@@ -138,8 +138,9 @@ class SQLConfEntrySuite extends SparkFunSuite {
   test("stringSeqConf") {
     val key = "spark.sql.SQLConfEntrySuite.stringSeq"
     val confEntry =
-      SQLConfEntry.stringSeqConf("spark.sql.SQLConfEntrySuite.stringSeq",
-                                 defaultValue = Some(Nil))
+      SQLConfEntry.stringSeqConf(
+        "spark.sql.SQLConfEntrySuite.stringSeq",
+        defaultValue = Some(Nil))
     assert(conf.getConf(confEntry, Seq("a", "b", "c")) === Seq("a", "b", "c"))
 
     conf.setConf(confEntry, Seq("a", "b", "c", "d"))

@@ -55,11 +55,12 @@ private[spark] class BlockManagerMaster(var driverEndpoint: RpcEndpointRef,
                       memSize: Long,
                       diskSize: Long): Boolean = {
     val res = driverEndpoint.askWithRetry[Boolean](
-      UpdateBlockInfo(blockManagerId,
-                      blockId,
-                      storageLevel,
-                      memSize,
-                      diskSize))
+      UpdateBlockInfo(
+        blockManagerId,
+        blockId,
+        storageLevel,
+        memSize,
+        diskSize))
     logDebug(s"Updated info of block $blockId")
     res
   }

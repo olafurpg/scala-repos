@@ -267,8 +267,9 @@ private trait CofreeBind[F[_]]
 
   def bind[A, B](fa: Cofree[F, A])(f: A => Cofree[F, B]): Cofree[F, B] = {
     val c = f(fa.head)
-    Cofree.applyT(c.head,
-                  c.t.map(ct => G.plus(c.tail, F.map(fa.tail)(bind(_)(f)))))
+    Cofree.applyT(
+      c.head,
+      c.t.map(ct => G.plus(c.tail, F.map(fa.tail)(bind(_)(f)))))
   }
 }
 
@@ -339,8 +340,9 @@ private trait CofreeTraverse[F[_]]
       implicit G: Apply[G]): G[Cofree[F, B]] =
     G.applyApplicative
       .traverse(fa.tail)(a => -\/(traverse1(a)(f)))
-      .fold(ftl => G.apply2(f(fa.head), ftl)(Cofree(_, _)),
-            tl => G.map(f(fa.head))(Cofree.apply(_, tl)))
+      .fold(
+        ftl => G.apply2(f(fa.head), ftl)(Cofree(_, _)),
+        tl => G.map(f(fa.head))(Cofree.apply(_, tl)))
 }
 
 private trait CofreeTraverse1[F[_]]

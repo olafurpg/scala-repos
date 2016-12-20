@@ -27,9 +27,10 @@ import com.typesafe.config.ConfigFactory
 
 class ReplicatedDataSerializerSpec
     extends TestKit(
-      ActorSystem("ReplicatedDataSerializerSpec",
-                  ConfigFactory.parseString(
-                    """
+      ActorSystem(
+        "ReplicatedDataSerializerSpec",
+        ConfigFactory.parseString(
+          """
     akka.actor.provider=akka.cluster.ClusterActorRefProvider
     akka.remote.netty.tcp.port=0
     """)))
@@ -78,10 +79,12 @@ class ReplicatedDataSerializerSpec
 
       checkSameContent(GSet() + "a" + "b", GSet() + "a" + "b")
       checkSameContent(GSet() + "a" + "b", GSet() + "b" + "a")
-      checkSameContent(GSet() + address1 + address2 + address3,
-                       GSet() + address2 + address1 + address3)
-      checkSameContent(GSet() + address1 + address2 + address3,
-                       GSet() + address3 + address2 + address1)
+      checkSameContent(
+        GSet() + address1 + address2 + address3,
+        GSet() + address2 + address1 + address3)
+      checkSameContent(
+        GSet() + address1 + address2 + address3,
+        GSet() + address3 + address2 + address1)
     }
 
     "serialize ORSet" in {
@@ -164,14 +167,15 @@ class ReplicatedDataSerializerSpec
       checkSameContent(
         PNCounter().increment(address1, 2).increment(address3, 5),
         PNCounter().increment(address3, 5).increment(address1, 2))
-      checkSameContent(PNCounter()
-                         .increment(address1, 2)
-                         .decrement(address1, 1)
-                         .increment(address3, 5),
-                       PNCounter()
-                         .increment(address3, 5)
-                         .increment(address1, 2)
-                         .decrement(address1, 1))
+      checkSameContent(
+        PNCounter()
+          .increment(address1, 2)
+          .decrement(address1, 1)
+          .increment(address3, 5),
+        PNCounter()
+          .increment(address3, 5)
+          .increment(address1, 2)
+          .decrement(address1, 1))
     }
 
     "serialize ORMap" in {

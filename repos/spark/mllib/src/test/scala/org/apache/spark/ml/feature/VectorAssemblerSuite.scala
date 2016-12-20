@@ -111,10 +111,11 @@ class VectorAssemblerSuite
     val hour = NumericAttribute.defaultAttr.withMin(0.0).withMax(24.0)
     val user = new AttributeGroup(
       "user",
-      Array(NominalAttribute.defaultAttr
-              .withName("gender")
-              .withValues("male", "female"),
-            NumericAttribute.defaultAttr.withName("salary")))
+      Array(
+        NominalAttribute.defaultAttr
+          .withName("gender")
+          .withValues("male", "female"),
+        NumericAttribute.defaultAttr.withName("salary")))
     val row = (1.0,
                0.5,
                1,

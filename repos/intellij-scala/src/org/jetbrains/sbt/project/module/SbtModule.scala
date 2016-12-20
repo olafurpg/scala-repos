@@ -37,6 +37,7 @@ object SbtModule {
 
   def setResolversTo(module: Module, resolvers: Set[SbtResolver]) =
     Option(
-      module.setOption(ResolversKey,
-                       resolvers.map(_.toString).mkString(Delimiter)))
+      module.setOption(
+        ResolversKey,
+        resolvers.map(_.toString).mkString(Delimiter)))
 }

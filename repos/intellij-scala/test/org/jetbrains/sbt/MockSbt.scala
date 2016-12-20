@@ -18,15 +18,16 @@ import scala.collection.JavaConverters._
   */
 trait MockSbt {
   def addSbtAsModuleDependency(module: Module): Unit = {
-    val sbtLibraries = Seq("collections",
-                           "interface",
-                           "io",
-                           "ivy",
-                           "logging",
-                           "main",
-                           "main-settings",
-                           "process",
-                           "sbt").map(
+    val sbtLibraries = Seq(
+      "collections",
+      "interface",
+      "io",
+      "ivy",
+      "logging",
+      "main",
+      "main-settings",
+      "process",
+      "sbt").map(
       n =>
         new File(
           TestUtils.getIvyCachePath +

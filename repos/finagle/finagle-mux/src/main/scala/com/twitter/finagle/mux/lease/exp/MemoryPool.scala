@@ -73,8 +73,9 @@ private[lease] class JvmInfo(val pool: MemoryPool,
 
     lr.record("com_%s".format(state), snap.committed().toString)
     lr.record("use_%s".format(state), snap.used().toString)
-    lr.record("byte_%s".format(state),
-              (snap.committed() - snap.used()).toString)
+    lr.record(
+      "byte_%s".format(state),
+      (snap.committed() - snap.used()).toString)
     lr.record("gen_%s".format(state), generation().toString)
   }
 

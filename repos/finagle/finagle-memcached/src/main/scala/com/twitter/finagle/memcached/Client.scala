@@ -212,8 +212,9 @@ trait BaseClient[T] {
     * @note this is superceded by `checkAndSet` which returns a higher fidelity
     *       return value
     */
-  @deprecated("BaseClient.cas deprecated in favor of checkAndSet",
-              "2015-12-10")
+  @deprecated(
+    "BaseClient.cas deprecated in favor of checkAndSet",
+    "2015-12-10")
   final def cas(
       key: String,
       flags: Int,
@@ -234,8 +235,9 @@ trait BaseClient[T] {
     * @note this is superceded by `checkAndSet` which returns a higher fidelity
     *       return value
     */
-  @deprecated("BaseClient.cas deprecated in favor of checkAndSet",
-              "2015-12-10")
+  @deprecated(
+    "BaseClient.cas deprecated in favor of checkAndSet",
+    "2015-12-10")
   final def cas(key: String, value: T, casUnique: Buf): Future[JBoolean] =
     cas(key, 0, Time.epoch, value, casUnique)
 
@@ -706,9 +708,10 @@ protected class ConnectedClient(
             val key = line.key
             val values = line.values
             val Buf.Utf8(keyStr) = key
-            "%s %s".format(keyStr,
-                           values.map { case Buf.Utf8(str) => str } mkString
-                             (" "))
+            "%s %s".format(
+              keyStr,
+              values.map { case Buf.Utf8(str) => str } mkString
+                (" "))
           }
         }
       case Error(e) => Future.exception(e)
@@ -841,12 +844,13 @@ private[finagle] object KetamaFailureAccrualFactory {
       key: KetamaClientKey,
       healthBroker: Broker[NodeHealth]
   ): Stackable[ServiceFactory[Req, Rep]] =
-    new Stack.Module5[FailureAccrualFactory.Param,
-                      Memcached.param.EjectFailedHost,
-                      finagle.param.Label,
-                      finagle.param.Timer,
-                      finagle.param.Stats,
-                      ServiceFactory[Req, Rep]] {
+    new Stack.Module5[
+      FailureAccrualFactory.Param,
+      Memcached.param.EjectFailedHost,
+      finagle.param.Label,
+      finagle.param.Timer,
+      finagle.param.Stats,
+      ServiceFactory[Req, Rep]] {
       import FailureAccrualFactory.Param
       val role = FailureAccrualFactory.role
       val description = "Memcached ketama failure accrual"
@@ -865,14 +869,15 @@ private[finagle] object KetamaFailureAccrualFactory {
           val finagle.param.Timer(timer) = _timer
           val finagle.param.Stats(stats) = _stats
           val finagle.param.Label(label) = _label
-          new KetamaFailureAccrualFactory[Req, Rep](next,
-                                                    policy(),
-                                                    timer,
-                                                    key,
-                                                    healthBroker,
-                                                    ejectFailedHost,
-                                                    label,
-                                                    stats)
+          new KetamaFailureAccrualFactory[Req, Rep](
+            next,
+            policy(),
+            timer,
+            key,
+            healthBroker,
+            ejectFailedHost,
+            label,
+            stats)
 
         case Param.Replaced(f) =>
           val param.Timer(timer) = _timer
@@ -897,10 +902,11 @@ private[finagle] class KetamaFailureAccrualFactory[Req, Rep](
     ejectFailedHost: Boolean,
     label: String,
     statsReceiver: StatsReceiver)
-    extends FailureAccrualFactory[Req, Rep](underlying,
-                                            failureAccrualPolicy,
-                                            timer,
-                                            statsReceiver) {
+    extends FailureAccrualFactory[Req, Rep](
+      underlying,
+      failureAccrualPolicy,
+      timer,
+      statsReceiver) {
   import FailureAccrualFactory._
 
   def this(
@@ -1056,9 +1062,10 @@ private[finagle] class KetamaPartitionedClient(
     synchronized {
       if (nodes.isEmpty) shardNotAvailableDistributor
       else
-        new KetamaDistributor(nodes,
-                              numReps,
-                              oldLibMemcachedVersionComplianceMode)
+        new KetamaDistributor(
+          nodes,
+          numReps,
+          oldLibMemcachedVersionComplianceMode)
     }
 
   override def clientOf(key: String): Client = {
@@ -1171,8 +1178,9 @@ object KetamaClient {
   val DefaultNumReps = KetamaPartitionedClient.DefaultNumReps
 }
 
-@deprecated(message = "Use the `com.twitter.finagle.Memcached builder",
-            since = "2015-02-22")
+@deprecated(
+  message = "Use the `com.twitter.finagle.Memcached builder",
+  since = "2015-02-22")
 case class KetamaClientBuilder private[memcached] (
     _group: Group[CacheNode],
     _hashName: Option[String],
@@ -1310,13 +1318,14 @@ case class KetamaClientBuilder private[memcached] (
         .newClient(mkDestination(node.host, node.port))
         .toService
 
-    new KetamaPartitionedClient(_group,
-                                newService,
-                                healthBroker,
-                                stats,
-                                keyHasher,
-                                numReps,
-                                oldLibMemcachedVersionComplianceMode)
+    new KetamaPartitionedClient(
+      _group,
+      newService,
+      healthBroker,
+      stats,
+      keyHasher,
+      numReps,
+      oldLibMemcachedVersionComplianceMode)
   }
 }
 

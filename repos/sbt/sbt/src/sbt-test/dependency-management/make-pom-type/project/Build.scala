@@ -43,8 +43,9 @@ object build extends Build {
       val pp = new xml.PrettyPrinter(Int.MaxValue, 0)
       val expectedString = dropTopElem(pp.format(expected))
       val actualString = dropTopElem(pp.formatNodes(actual))
-      assert(expectedString == actualString,
-             "Expected dependencies section:\n" + expectedString +
-               "\n\nActual:\n" + actualString)
+      assert(
+        expectedString == actualString,
+        "Expected dependencies section:\n" + expectedString +
+          "\n\nActual:\n" + actualString)
     }
 }

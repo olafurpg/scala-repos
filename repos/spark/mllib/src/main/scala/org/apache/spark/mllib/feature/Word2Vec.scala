@@ -111,8 +111,9 @@ class Word2Vec extends Serializable with Logging {
     */
   @Since("1.1.0")
   def setNumPartitions(numPartitions: Int): this.type = {
-    require(numPartitions > 0,
-            s"numPartitions must be greater than 0 but got $numPartitions")
+    require(
+      numPartitions > 0,
+      s"numPartitions must be greater than 0 but got $numPartitions")
     this.numPartitions = numPartitions
     this
   }
@@ -176,11 +177,12 @@ class Word2Vec extends Serializable with Logging {
       .filter(_._2 >= minCount)
       .map(
         x =>
-          VocabWord(x._1,
-                    x._2,
-                    new Array[Int](MAX_CODE_LENGTH),
-                    new Array[Int](MAX_CODE_LENGTH),
-                    0))
+          VocabWord(
+            x._1,
+            x._2,
+            new Array[Int](MAX_CODE_LENGTH),
+            new Array[Int](MAX_CODE_LENGTH),
+            0))
       .collect()
       .sortWith((a, b) => a.cn > b.cn)
 
@@ -409,8 +411,8 @@ class Word2Vec extends Serializable with Logging {
               if (syn0Modify(index) > 0) {
                 Some(
                   (index,
-                   syn0Local.slice(index * vectorSize,
-                                   (index + 1) * vectorSize)))
+                   syn0Local
+                     .slice(index * vectorSize, (index + 1) * vectorSize)))
               } else {
                 None
               }
@@ -420,8 +422,8 @@ class Word2Vec extends Serializable with Logging {
               if (syn1Modify(index) > 0) {
                 Some(
                   (index + vocabSize,
-                   syn1Local.slice(index * vectorSize,
-                                   (index + 1) * vectorSize)))
+                   syn1Local
+                     .slice(index * vectorSize, (index + 1) * vectorSize)))
               } else {
                 None
               }
@@ -442,11 +444,12 @@ class Word2Vec extends Serializable with Logging {
           Array
             .copy(synAgg(i)._2, 0, syn0Global, index * vectorSize, vectorSize)
         } else {
-          Array.copy(synAgg(i)._2,
-                     0,
-                     syn1Global,
-                     (index - vocabSize) * vectorSize,
-                     vectorSize)
+          Array.copy(
+            synAgg(i)._2,
+            0,
+            syn1Global,
+            (index - vocabSize) * vectorSize,
+            vectorSize)
         }
         i += 1
       }
@@ -510,8 +513,9 @@ class Word2VecModel private[spark] (
 
   @Since("1.5.0")
   def this(model: Map[String, Array[Float]]) = {
-    this(Word2VecModel.buildWordIndex(model),
-         Word2VecModel.buildWordVectors(model))
+    this(
+      Word2VecModel.buildWordIndex(model),
+      Word2VecModel.buildWordVectors(model))
   }
 
   override protected def formatVersion = "1.0"
@@ -565,17 +569,18 @@ class Word2VecModel private[spark] (
     val alpha: Float = 1
     val beta: Float = 0
 
-    blas.sgemv("T",
-               vectorSize,
-               numWords,
-               alpha,
-               wordVectors,
-               vectorSize,
-               fVector,
-               1,
-               beta,
-               cosineVec,
-               1)
+    blas.sgemv(
+      "T",
+      vectorSize,
+      numWords,
+      alpha,
+      wordVectors,
+      vectorSize,
+      fVector,
+      1,
+      beta,
+      cosineVec,
+      1)
 
     // Need not divide with the norm of the given vector since it is constant.
     val cosVec = cosineVec.map(_.toDouble)

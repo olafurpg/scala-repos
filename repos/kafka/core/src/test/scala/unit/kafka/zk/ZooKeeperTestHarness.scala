@@ -62,10 +62,11 @@ trait ZooKeeperTestHarness extends JUnitSuite with Logging {
   def setUp() {
     zookeeper = new EmbeddedZookeeper()
     zkPort = zookeeper.port
-    zkUtils = ZkUtils(zkConnect,
-                      zkSessionTimeout,
-                      zkConnectionTimeout,
-                      JaasUtils.isZkSecurityEnabled())
+    zkUtils = ZkUtils(
+      zkConnect,
+      zkSessionTimeout,
+      zkConnectionTimeout,
+      JaasUtils.isZkSecurityEnabled())
   }
 
   @After

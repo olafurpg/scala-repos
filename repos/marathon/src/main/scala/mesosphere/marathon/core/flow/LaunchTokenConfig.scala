@@ -11,7 +11,8 @@ trait LaunchTokenConfig extends ScallopConf {
       "The interval (ms) in which to refresh the launch tokens to --launch_token_count",
     default = Some(30000))
 
-  lazy val launchTokens = opt[Int]("launch_tokens",
-                                   descr = "Launch tokens per interval",
-                                   default = Some(100))
+  lazy val launchTokens = opt[Int](
+    "launch_tokens",
+    descr = "Launch tokens per interval",
+    default = Some(100))
 }

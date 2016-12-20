@@ -52,8 +52,9 @@ class ScUnderscoreSectionImpl(node: ASTNode)
                   getResolveScope),
                 typeParameters)
             case tp: ScType =>
-              ScMethodType(tp, Nil, isImplicit = false)(getProject,
-                                                        getResolveScope)
+              ScMethodType(tp, Nil, isImplicit = false)(
+                getProject,
+                getResolveScope)
           }
         }
         ref.bind() match {

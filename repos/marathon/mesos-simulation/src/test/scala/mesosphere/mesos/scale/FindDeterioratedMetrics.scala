@@ -34,9 +34,10 @@ object FindDeterioratedMetrics {
                          after: URL,
                          deterioration: Double): Map[Metric, Metric] = {
     //only compare last
-    filterDeteriorated(readMetrics(before).last,
-                       readMetrics(after).last,
-                       deterioration)
+    filterDeteriorated(
+      readMetrics(before).last,
+      readMetrics(after).last,
+      deterioration)
   }
 
   /**
@@ -56,8 +57,9 @@ object FindDeterioratedMetrics {
           Vector(a.name, a.mean, b.mean, (b.mean / a.mean * 100).toInt - 100)
             .map(_.toString)
       }
-      printTable(Seq(left, right, right, right),
-                 withUnderline(header) ++ rows.toSeq)
+      printTable(
+        Seq(left, right, right, right),
+        withUnderline(header) ++ rows.toSeq)
     }
 
     if (args.length == 3) {
@@ -65,9 +67,10 @@ object FindDeterioratedMetrics {
       printSlope(filterDeteriorated(new URL(args(0)), new URL(args(1)), 1))
       println(
         s"\n\nMetrics that got deteriorated (deterioration factor == ${args(2)}):")
-      val deteriorated = filterDeteriorated(new URL(args(0)),
-                                            new URL(args(1)),
-                                            args(2).toDouble)
+      val deteriorated = filterDeteriorated(
+        new URL(args(0)),
+        new URL(args(1)),
+        args(2).toDouble)
       if (deteriorated.nonEmpty) {
         printSlope(deteriorated)
         throw new IllegalStateException(

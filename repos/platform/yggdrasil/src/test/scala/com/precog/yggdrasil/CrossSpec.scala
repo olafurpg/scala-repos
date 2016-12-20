@@ -60,8 +60,9 @@ trait CrossSpec[M[+ _]]
     }
 
     val result = ltable.cross(rtable)(
-      InnerObjectConcat(WrapObject(Leaf(SourceLeft), "left"),
-                        WrapObject(Leaf(SourceRight), "right"))
+      InnerObjectConcat(
+        WrapObject(Leaf(SourceLeft), "left"),
+        WrapObject(Leaf(SourceRight), "right"))
     )
 
     val jsonResult: M[Stream[JValue]] = toJson(result)
@@ -70,11 +71,13 @@ trait CrossSpec[M[+ _]]
 
   def testSimpleCross = {
     val s1 = SampleData(
-      Stream(toRecord(Array(1), JParser.parseUnsafe("""{"a":[]}""")),
-             toRecord(Array(2), JParser.parseUnsafe("""{"a":[]}"""))))
+      Stream(
+        toRecord(Array(1), JParser.parseUnsafe("""{"a":[]}""")),
+        toRecord(Array(2), JParser.parseUnsafe("""{"a":[]}"""))))
     val s2 = SampleData(
-      Stream(toRecord(Array(1), JParser.parseUnsafe("""{"b":0}""")),
-             toRecord(Array(2), JParser.parseUnsafe("""{"b":1}"""))))
+      Stream(
+        toRecord(Array(1), JParser.parseUnsafe("""{"b":0}""")),
+        toRecord(Array(2), JParser.parseUnsafe("""{"b":1}"""))))
 
     testCross(s1, s2)
   }
@@ -96,8 +99,9 @@ trait CrossSpec[M[+ _]]
       ))
 
     val s2 = SampleData(
-      Stream(toRecord(Array(1), JParser.parseUnsafe("""{"b":1}""")),
-             toRecord(Array(2), JParser.parseUnsafe("""{"b":2}"""))))
+      Stream(
+        toRecord(Array(1), JParser.parseUnsafe("""{"b":1}""")),
+        toRecord(Array(2), JParser.parseUnsafe("""{"b":2}"""))))
 
     testCross(s1, s2)
     testCross(s2, s1)

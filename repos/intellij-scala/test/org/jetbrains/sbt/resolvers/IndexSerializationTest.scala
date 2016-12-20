@@ -13,9 +13,10 @@ class IndexSerializationTest extends ScalaFixtureTestCase {
 
   import _root_.junit.framework.Assert._
 
-  val testResolver = new SbtResolver(SbtResolver.Kind.Maven,
-                                     "some cool repo name",
-                                     "http://some.cool.repo/")
+  val testResolver = new SbtResolver(
+    SbtResolver.Kind.Maven,
+    "some cool repo name",
+    "http://some.cool.repo/")
 
   def testIndexStoring() = {
     val tmpPath = new File(myFixture.getTempDirPath)

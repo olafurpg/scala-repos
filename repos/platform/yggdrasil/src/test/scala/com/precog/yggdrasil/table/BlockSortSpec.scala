@@ -155,10 +155,11 @@ trait BlockSortSpec[M[+ _]]
       ]""") --> classOf[JArray]).elements.toStream,
       Some(
         (1,
-         List(JPath(".uid") -> CString,
-              JPath(".u") -> CBoolean,
-              JPath(".md") -> CString,
-              JPath(".l") -> CEmptyArray))
+         List(
+           JPath(".uid") -> CString,
+           JPath(".u") -> CBoolean,
+           JPath(".md") -> CString,
+           JPath(".l") -> CEmptyArray))
       )
     )
 
@@ -204,18 +205,20 @@ trait BlockSortSpec[M[+ _]]
       ]""") --> classOf[JArray]).elements.toStream,
       Some(
         (1,
-         List(JPath(".uid") -> CString,
-              JPath(".fa") -> CNull,
-              JPath(".hW") -> CDouble,
-              JPath(".rzp") -> CEmptyObject))
+         List(
+           JPath(".uid") -> CString,
+           JPath(".fa") -> CNull,
+           JPath(".hW") -> CDouble,
+           JPath(".rzp") -> CEmptyObject))
       )
     )
 
-    testSortDense(sampleData,
-                  SortAscending,
-                  false,
-                  JPath(".uid"),
-                  JPath(".hW"))
+    testSortDense(
+      sampleData,
+      SortAscending,
+      false,
+      JPath(".uid"),
+      JPath(".hW"))
   }
 
   def heterogeneousBaseValueTypeSample = {
@@ -235,10 +238,11 @@ trait BlockSortSpec[M[+ _]]
       ]""") --> classOf[JArray]).elements.toStream,
       Some(
         (1,
-         List(JPath("[0]") -> CLong,
-              JPath("[1]") -> CLong,
-              JPath(".uid") -> CString,
-              JPath("abc") -> CLong))
+         List(
+           JPath("[0]") -> CLong,
+           JPath("[1]") -> CLong,
+           JPath(".uid") -> CString,
+           JPath("abc") -> CLong))
       )
     )
 
@@ -274,11 +278,12 @@ trait BlockSortSpec[M[+ _]]
       ]""") --> classOf[JArray]).elements.toStream,
       Some(
         (2,
-         List(JPath(".m") -> CEmptyArray,
-              JPath(".f") -> CBoolean,
-              JPath(".u") -> CDouble,
-              JPath(".q") -> CNum,
-              JPath(".vxu") -> CEmptyArray))))
+         List(
+           JPath(".m") -> CEmptyArray,
+           JPath(".f") -> CBoolean,
+           JPath(".u") -> CDouble,
+           JPath(".q") -> CNum,
+           JPath(".vxu") -> CEmptyArray))))
     testSortDense(sampleData, SortAscending, false, JPath("q"))
   }
 
@@ -351,14 +356,15 @@ trait BlockSortSpec[M[+ _]]
       ]""") --> classOf[JArray]).elements.toStream,
       Some(
         (3,
-         List(JPath(".uid") -> CLong,
-              JPath(".uid") -> CDouble,
-              JPath(".f.bn[0]") -> CNull,
-              JPath(".f.wei") -> CDouble,
-              JPath(".ljz[0]") -> CNull,
-              JPath(".ljz[1][0]") -> CString,
-              JPath(".ljz[2]") -> CBoolean,
-              JPath(".jmy") -> CDouble))
+         List(
+           JPath(".uid") -> CLong,
+           JPath(".uid") -> CDouble,
+           JPath(".f.bn[0]") -> CNull,
+           JPath(".f.wei") -> CDouble,
+           JPath(".ljz[0]") -> CNull,
+           JPath(".ljz[1][0]") -> CString,
+           JPath(".ljz[2]") -> CBoolean,
+           JPath(".jmy") -> CDouble))
       )
     )
 
@@ -390,12 +396,13 @@ trait BlockSortSpec[M[+ _]]
         }]""") --> classOf[JArray]).elements.toStream,
       Some(
         (1,
-         List(JPath(".e") -> CNull,
-              JPath(".chl") -> CNum,
-              JPath(".zw1") -> CNum,
-              JPath("[0]") -> CLong,
-              JPath("[1]") -> CLong,
-              JPath("[2]") -> CEmptyObject))
+         List(
+           JPath(".e") -> CNull,
+           JPath(".chl") -> CNum,
+           JPath(".zw1") -> CNum,
+           JPath("[0]") -> CLong,
+           JPath("[1]") -> CLong,
+           JPath("[2]") -> CEmptyObject))
       )
     )
 
@@ -546,9 +553,10 @@ trait BlockSortSpec[M[+ _]]
       ]""") --> classOf[JArray]).elements.toStream,
       Some(
         (3,
-         List(JPath(".zbtQhnpnun") -> CLong,
-              JPath(".ohvhwN") -> CNum,
-              JPath(".viip") -> CNum))
+         List(
+           JPath(".zbtQhnpnun") -> CLong,
+           JPath(".ohvhwN") -> CNum,
+           JPath(".viip") -> CNum))
       )
     )
 

@@ -95,14 +95,15 @@ object NIHDBShardServer
       val platform =
         nihdbPlatform(config, apiKeyFinder, accountFinder, jobManager)
 
-      ShardState(platform,
-                 apiKeyFinder,
-                 accountFinder,
-                 platform.scheduler,
-                 jobManager,
-                 clock,
-                 Stoppable.fromFuture(platform.shutdown),
-                 asyncQueries)
+      ShardState(
+        platform,
+        apiKeyFinder,
+        accountFinder,
+        platform.scheduler,
+        jobManager,
+        clock,
+        Stoppable.fromFuture(platform.shutdown),
+        asyncQueries)
     } recoverWith {
       case ex: Throwable =>
         System.err.println("Could not start NIHDB Shard server!!!")

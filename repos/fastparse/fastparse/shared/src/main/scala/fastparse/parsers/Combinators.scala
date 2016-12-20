@@ -200,11 +200,12 @@ object Combinators {
     def parseRec(cfg: ParseCtx, index: Int) = {
       p.parseRec(cfg, index) match {
         case s: Mutable.Success[_] =>
-          success(cfg.success,
-                  ev.some(s.value),
-                  s.index,
-                  s.traceParsers,
-                  s.cut)
+          success(
+            cfg.success,
+            ev.some(s.value),
+            s.index,
+            s.traceParsers,
+            s.cut)
         case f: Mutable.Failure if f.cut => failMore(f, index, cfg.logDepth)
         case _ => success(cfg.success, ev.none, index, Set.empty, false)
       }
@@ -421,18 +422,20 @@ object Combinators {
                 ev.accumulate(value1, acc)
                 val counted = count + 1
                 if (counted < max)
-                  rec(index1,
-                      delimiter,
-                      lastFailure,
-                      acc,
-                      cut0 | cut1,
-                      counted)
+                  rec(
+                    index1,
+                    delimiter,
+                    lastFailure,
+                    acc,
+                    cut0 | cut1,
+                    counted)
                 else
-                  passInRange(cut0 | cut1,
-                              lastFailure,
-                              index1,
-                              ev.result(acc),
-                              counted)
+                  passInRange(
+                    cut0 | cut1,
+                    lastFailure,
+                    index1,
+                    ev.result(acc),
+                    counted)
             }
         }
       }
@@ -452,11 +455,12 @@ object Combinators {
 
       // don't call the parseRec at all, if max is "0", as our parser corresponds to `Pass` in that case.
       if (max == 0) {
-        success(cfg.success,
-                ev.result(ev.initial),
-                index,
-                Set.empty[Parser[_]],
-                false)
+        success(
+          cfg.success,
+          ev.result(ev.initial),
+          index,
+          Set.empty[Parser[_]],
+          false)
       } else {
         rec(index, Pass, null, ev.initial, false, 0)
       }

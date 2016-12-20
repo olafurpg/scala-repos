@@ -99,12 +99,13 @@ class LocalCluster(mutex: Boolean = true) {
     val conf = new Configuration
     val dfs = new MiniDFSCluster(conf, 4, true, null)
     val fileSystem = dfs.getFileSystem
-    val cluster = new MiniMRCluster(4,
-                                    fileSystem.getUri.toString,
-                                    1,
-                                    null,
-                                    null,
-                                    new JobConf(conf))
+    val cluster = new MiniMRCluster(
+      4,
+      fileSystem.getUri.toString,
+      1,
+      null,
+      null,
+      new JobConf(conf))
     val mrJobConf = cluster.createJobConf()
     mrJobConf.setInt("mapred.submit.replication", 2)
     mrJobConf.set("mapred.map.max.attempts", "2")

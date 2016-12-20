@@ -171,11 +171,12 @@ class BufferingOutputStream(segmentSize: Int) extends OutputStream {
         if (currentSegment.freeSpace <= 0) addSegment()
 
         val amount = math.min(currentSegment.freeSpace, remaining)
-        System.arraycopy(b,
-                         offset,
-                         currentSegment.bytes,
-                         currentSegment.written,
-                         amount)
+        System.arraycopy(
+          b,
+          offset,
+          currentSegment.bytes,
+          currentSegment.written,
+          amount)
         currentSegment.written += amount
         offset += amount
         remaining -= amount
@@ -190,9 +191,10 @@ class BufferingOutputStream(segmentSize: Int) extends OutputStream {
     while (amount >= 0) {
       currentSegment.written += amount
       if (currentSegment.freeSpace <= 0) addSegment()
-      amount = in.read(currentSegment.bytes,
-                       currentSegment.written,
-                       currentSegment.freeSpace)
+      amount = in.read(
+        currentSegment.bytes,
+        currentSegment.written,
+        currentSegment.freeSpace)
     }
   }
 

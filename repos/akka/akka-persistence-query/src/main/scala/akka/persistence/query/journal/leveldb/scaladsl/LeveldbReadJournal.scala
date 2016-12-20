@@ -123,12 +123,13 @@ class LeveldbReadJournal(system: ExtendedActorSystem, config: Config)
       toSequenceNr: Long = Long.MaxValue): Source[EventEnvelope, NotUsed] = {
     Source
       .actorPublisher[EventEnvelope](
-        EventsByPersistenceIdPublisher.props(persistenceId,
-                                             fromSequenceNr,
-                                             toSequenceNr,
-                                             refreshInterval,
-                                             maxBufSize,
-                                             writeJournalPluginId))
+        EventsByPersistenceIdPublisher.props(
+          persistenceId,
+          fromSequenceNr,
+          toSequenceNr,
+          refreshInterval,
+          maxBufSize,
+          writeJournalPluginId))
       .mapMaterializedValue(_ ⇒ NotUsed)
       .named("eventsByPersistenceId-" + persistenceId)
   }
@@ -144,12 +145,13 @@ class LeveldbReadJournal(system: ExtendedActorSystem, config: Config)
       toSequenceNr: Long = Long.MaxValue): Source[EventEnvelope, NotUsed] = {
     Source
       .actorPublisher[EventEnvelope](
-        EventsByPersistenceIdPublisher.props(persistenceId,
-                                             fromSequenceNr,
-                                             toSequenceNr,
-                                             None,
-                                             maxBufSize,
-                                             writeJournalPluginId))
+        EventsByPersistenceIdPublisher.props(
+          persistenceId,
+          fromSequenceNr,
+          toSequenceNr,
+          None,
+          maxBufSize,
+          writeJournalPluginId))
       .mapMaterializedValue(_ ⇒ NotUsed)
       .named("currentEventsByPersistenceId-" + persistenceId)
   }
@@ -194,12 +196,13 @@ class LeveldbReadJournal(system: ExtendedActorSystem, config: Config)
       offset: Long = 0L): Source[EventEnvelope, NotUsed] = {
     Source
       .actorPublisher[EventEnvelope](
-        EventsByTagPublisher.props(tag,
-                                   offset,
-                                   Long.MaxValue,
-                                   refreshInterval,
-                                   maxBufSize,
-                                   writeJournalPluginId))
+        EventsByTagPublisher.props(
+          tag,
+          offset,
+          Long.MaxValue,
+          refreshInterval,
+          maxBufSize,
+          writeJournalPluginId))
       .mapMaterializedValue(_ ⇒ NotUsed)
       .named("eventsByTag-" + URLEncoder.encode(tag, ByteString.UTF_8))
   }
@@ -214,12 +217,13 @@ class LeveldbReadJournal(system: ExtendedActorSystem, config: Config)
       offset: Long = 0L): Source[EventEnvelope, NotUsed] = {
     Source
       .actorPublisher[EventEnvelope](
-        EventsByTagPublisher.props(tag,
-                                   offset,
-                                   Long.MaxValue,
-                                   None,
-                                   maxBufSize,
-                                   writeJournalPluginId))
+        EventsByTagPublisher.props(
+          tag,
+          offset,
+          Long.MaxValue,
+          None,
+          maxBufSize,
+          writeJournalPluginId))
       .mapMaterializedValue(_ ⇒ NotUsed)
       .named("currentEventsByTag-" + URLEncoder.encode(tag, ByteString.UTF_8))
   }

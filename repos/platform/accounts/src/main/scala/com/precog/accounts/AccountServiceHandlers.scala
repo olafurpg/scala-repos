@@ -80,8 +80,9 @@ object Responses {
     HttpResponse[JValue](HttpStatus(error), content = Some(JString(message)))
 
   def failure(error: HttpStatusCode, statMessage: String, message: String) =
-    HttpResponse[JValue](HttpStatus(error, statMessage),
-                         content = Some(JString(message)))
+    HttpResponse[JValue](
+      HttpStatus(error, statMessage),
+      content = Some(JString(message)))
 
   def failure(error: HttpStatus, message: String) =
     HttpResponse[JValue](error, content = Some(JString(message)))
@@ -180,8 +181,9 @@ class AccountServiceHandlers(
   }
 
   object ListAccountsHandler
-      extends CustomHttpService[Future[JValue],
-                                Account => Future[HttpResponse[JValue]]] {
+      extends CustomHttpService[
+        Future[JValue],
+        Account => Future[HttpResponse[JValue]]] {
     val service: HttpRequest[Future[JValue]] => Validation[
       NotServed,
       Account => Future[HttpResponse[JValue]]] =
@@ -203,8 +205,8 @@ class AccountServiceHandlers(
               currentKey: APIKey,
               remaining: List[APIKey]): Future[Option[AccountId]] = {
             logger.debug(
-              "Finding account for %s with remaining %s".format(currentKey,
-                                                                remaining))
+              "Finding account for %s with remaining %s"
+                .format(currentKey, remaining))
             accountManager.findAccountByAPIKey(currentKey).flatMap {
               case Some(accountId) =>
                 logger.debug(
@@ -262,8 +264,9 @@ class AccountServiceHandlers(
       }
 
     val metadata = AboutMetadata(
-      ParameterMetadata('apiKey,
-                        Some("<api key associated with authorizing account>")),
+      ParameterMetadata(
+        'apiKey,
+        Some("<api key associated with authorizing account>")),
       DescriptionMetadata(
         "Returns the list of accounts associated with the authorized account's API key, or the API key specified by the apiKey request parameter if the authorized account has elevated account management privileges.")
     )
@@ -299,12 +302,13 @@ class AccountServiceHandlers(
                             "An account already exists with the email address %s. If you feel this is in error, please contact support@precog.com"
                               .format(email)))
                     } getOrElse {
-                      accountManager.createAccount(email,
-                                                   password,
-                                                   clock.now(),
-                                                   AccountPlan.Free,
-                                                   Some(rootAccountId),
-                                                   profile.minimize) {
+                      accountManager.createAccount(
+                        email,
+                        password,
+                        clock.now(),
+                        AccountPlan.Free,
+                        Some(rootAccountId),
+                        profile.minimize) {
                         accountId =>
                           logger.info(
                             "Created new account for " + email +
@@ -334,8 +338,9 @@ class AccountServiceHandlers(
                     "Missing email and/or password fields from request body."
                   logger.warn(errmsg + ": " + jv)
                   Future(
-                    HttpResponse[JValue](HttpStatus(BadRequest, errmsg),
-                                         content = Some(JString(errmsg))))
+                    HttpResponse[JValue](
+                      HttpStatus(BadRequest, errmsg),
+                      content = Some(JString(errmsg))))
               }
             }
           )
@@ -375,9 +380,10 @@ class AccountServiceHandlers(
                           case false =>
                             logger.error(
                               "Grant added to %s (from %s) failed for %s"
-                                .format(accountId,
-                                        remoteIpFrom(request),
-                                        grantId))
+                                .format(
+                                  accountId,
+                                  remoteIpFrom(request),
+                                  grantId))
                             HttpResponse(
                               InternalServerError,
                               content = Some(JString(
@@ -411,8 +417,9 @@ class AccountServiceHandlers(
 
   //returns plan for account
   object GetAccountPlanHandler
-      extends CustomHttpService[Future[JValue],
-                                Account => Future[HttpResponse[JValue]]] {
+      extends CustomHttpService[
+        Future[JValue],
+        Account => Future[HttpResponse[JValue]]] {
     val service: HttpRequest[Future[JValue]] => Validation[
       NotServed,
       Account => Future[HttpResponse[JValue]]] =
@@ -495,11 +502,10 @@ class AccountServiceHandlers(
                           logger.warn(
                             "Password reset request on non-existent account " +
                               accountId)
-                          Future(
-                            HttpResponse[JValue](HttpStatus(NotFound),
-                                                 content = Some(JString(
-                                                   "Unable to find Account " +
-                                                     accountId))))
+                          Future(HttpResponse[JValue](
+                            HttpStatus(NotFound),
+                            content = Some(JString("Unable to find Account " +
+                              accountId))))
                       }
 
                     case Failure(error) =>
@@ -601,8 +607,9 @@ class AccountServiceHandlers(
 
   //update account password
   object PutAccountPasswordHandler
-      extends CustomHttpService[Future[JValue],
-                                Account => Future[HttpResponse[JValue]]] {
+      extends CustomHttpService[
+        Future[JValue],
+        Account => Future[HttpResponse[JValue]]] {
     val service: HttpRequest[Future[JValue]] => Validation[
       NotServed,
       Account => Future[HttpResponse[JValue]]] =
@@ -632,10 +639,11 @@ class AccountServiceHandlers(
                   case Failure(error) =>
                     logger.warn(
                       "Invalid password update body \"%s\" for account %s from %s: %s"
-                        .format(jvalue.renderCompact,
-                                account.accountId,
-                                remoteIpFrom(request),
-                                error))
+                        .format(
+                          jvalue.renderCompact,
+                          account.accountId,
+                          remoteIpFrom(request),
+                          error))
                     Future(
                       HttpResponse[JValue](
                         HttpStatus(BadRequest, "Invalid request body."),
@@ -662,8 +670,9 @@ class AccountServiceHandlers(
 
   //update account Plan
   object PutAccountPlanHandler
-      extends CustomHttpService[Future[JValue],
-                                Account => Future[HttpResponse[JValue]]] {
+      extends CustomHttpService[
+        Future[JValue],
+        Account => Future[HttpResponse[JValue]]] {
     val service: HttpRequest[Future[JValue]] => Validation[
       NotServed,
       Account => Future[HttpResponse[JValue]]] =
@@ -686,9 +695,10 @@ class AccountServiceHandlers(
                       case _ =>
                         logger.error(
                           "Plan change to %s for account %s by %s failed"
-                            .format(planType,
-                                    account.accountId,
-                                    remoteIpFrom(request)))
+                            .format(
+                              planType,
+                              account.accountId,
+                              remoteIpFrom(request)))
                         Responses.failure(
                           InternalServerError,
                           "Account update failed, please contact support.")
@@ -718,8 +728,9 @@ class AccountServiceHandlers(
 
   //sets plan to "free"
   object DeleteAccountPlanHandler
-      extends CustomHttpService[Future[JValue],
-                                Account => Future[HttpResponse[JValue]]] {
+      extends CustomHttpService[
+        Future[JValue],
+        Account => Future[HttpResponse[JValue]]] {
     val service: HttpRequest[Future[JValue]] => Validation[
       NotServed,
       Account => Future[HttpResponse[JValue]]] =
@@ -752,8 +763,9 @@ class AccountServiceHandlers(
   }
 
   object GetAccountDetailsHandler
-      extends CustomHttpService[Future[JValue],
-                                Account => Future[HttpResponse[JValue]]] {
+      extends CustomHttpService[
+        Future[JValue],
+        Account => Future[HttpResponse[JValue]]] {
     val service: HttpRequest[Future[JValue]] => Validation[
       NotServed,
       Account => Future[HttpResponse[JValue]]] =
@@ -762,9 +774,9 @@ class AccountServiceHandlers(
         Success { (auth: Account) =>
           withAccountAdmin(request, auth) { account =>
             Future(
-              HttpResponse[JValue](OK,
-                                   content =
-                                     Some(AccountDetails.from(account).jv)))
+              HttpResponse[JValue](
+                OK,
+                content = Some(AccountDetails.from(account).jv)))
           }
         }
       }
@@ -774,8 +786,9 @@ class AccountServiceHandlers(
   }
 
   object DeleteAccountHandler
-      extends CustomHttpService[Future[JValue],
-                                Account => Future[HttpResponse[JValue]]] {
+      extends CustomHttpService[
+        Future[JValue],
+        Account => Future[HttpResponse[JValue]]] {
     val service: HttpRequest[Future[JValue]] => Validation[
       NotServed,
       Account => Future[HttpResponse[JValue]]] =
@@ -784,9 +797,8 @@ class AccountServiceHandlers(
           withAccountAdmin(request, auth) { account =>
             accountManager.deleteAccount(account.accountId).map {
               case Some(_) =>
-                logger.warn(
-                  "Account %s deleted by %s".format(account.accountId,
-                                                    remoteIpFrom(request)))
+                logger.warn("Account %s deleted by %s"
+                  .format(account.accountId, remoteIpFrom(request)))
                 HttpResponse[JValue](HttpStatus(NoContent))
               case None =>
                 logger.error("Account %s deletion by %s failed"

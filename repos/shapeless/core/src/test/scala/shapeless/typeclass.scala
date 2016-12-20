@@ -185,9 +185,10 @@ class TypeClassTests {
       "CaseA",
       Sum(
         Project(
-          Product(Atom("string"),
-                  "b1",
-                  Product(Atom("string"), "b2", EmptyProduct))),
+          Product(
+            Atom("string"),
+            "b1",
+            Product(Atom("string"), "b2", EmptyProduct))),
         "CaseB",
         EmptyCoproduct
       )

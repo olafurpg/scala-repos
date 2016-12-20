@@ -304,8 +304,9 @@ class SQLiteTestDB(dburl: String, confName: String)
 abstract class DerbyDB(confName: String) extends InternalJdbcTestDB(confName) {
   import profile.api.actionBasedSQLInterpolation
   val profile = DerbyProfile
-  System.setProperty("derby.stream.error.method",
-                     classOf[DerbyDB].getName + ".DEV_NULL")
+  System.setProperty(
+    "derby.stream.error.method",
+    classOf[DerbyDB].getName + ".DEV_NULL")
   val jdbcDriver = "org.apache.derby.jdbc.EmbeddedDriver"
   override def localTables(
       implicit ec: ExecutionContext): DBIO[Vector[String]] =

@@ -66,10 +66,11 @@ private[spark] class HashShuffleManager(conf: SparkConf)
   override def getWriter[K, V](handle: ShuffleHandle,
                                mapId: Int,
                                context: TaskContext): ShuffleWriter[K, V] = {
-    new HashShuffleWriter(shuffleBlockResolver,
-                          handle.asInstanceOf[BaseShuffleHandle[K, V, _]],
-                          mapId,
-                          context)
+    new HashShuffleWriter(
+      shuffleBlockResolver,
+      handle.asInstanceOf[BaseShuffleHandle[K, V, _]],
+      mapId,
+      context)
   }
 
   /** Remove a shuffle's metadata from the ShuffleManager. */

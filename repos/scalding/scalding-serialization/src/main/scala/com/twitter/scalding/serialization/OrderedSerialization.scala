@@ -197,10 +197,11 @@ object OrderedSerialization {
     })
 
   def allLaws[T: OrderedSerialization]: Iterable[Law[T]] =
-    Serialization.allLaws ++ List(compareBinaryMatchesCompare[T],
-                                  orderingTransitive[T],
-                                  orderingAntisymmetry[T],
-                                  orderingTotality[T])
+    Serialization.allLaws ++ List(
+      compareBinaryMatchesCompare[T],
+      orderingTransitive[T],
+      orderingAntisymmetry[T],
+      orderingTotality[T])
 }
 
 /**

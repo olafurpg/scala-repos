@@ -118,19 +118,21 @@ object DumpLogSegments {
       val file = new File(arg)
       if (file.getName.endsWith(Log.LogFileSuffix)) {
         println("Dumping " + file)
-        dumpLog(file,
-                print,
-                nonConsecutivePairsForLogFilesMap,
-                isDeepIteration,
-                maxMessageSize,
-                messageParser)
+        dumpLog(
+          file,
+          print,
+          nonConsecutivePairsForLogFilesMap,
+          isDeepIteration,
+          maxMessageSize,
+          messageParser)
       } else if (file.getName.endsWith(Log.IndexFileSuffix)) {
         println("Dumping " + file)
-        dumpIndex(file,
-                  indexSanityOnly,
-                  verifyOnly,
-                  misMatchesForIndexFilesMap,
-                  maxMessageSize)
+        dumpIndex(
+          file,
+          indexSanityOnly,
+          verifyOnly,
+          misMatchesForIndexFilesMap,
+          maxMessageSize)
       }
     }
     misMatchesForIndexFilesMap.foreach {
@@ -160,8 +162,9 @@ object DumpLogSegments {
       misMatchesForIndexFilesMap: mutable.HashMap[String, List[(Long, Long)]],
       maxMessageSize: Int) {
     val startOffset = file.getName().split("\\.")(0).toLong
-    val logFile = new File(file.getAbsoluteFile.getParent,
-                           file.getName.split("\\.")(0) + Log.LogFileSuffix)
+    val logFile = new File(
+      file.getAbsoluteFile.getParent,
+      file.getName.split("\\.")(0) + Log.LogFileSuffix)
     val messageSet = new FileMessageSet(logFile, false)
     val index = new OffsetIndex(file = file, baseOffset = startOffset)
 
@@ -189,8 +192,8 @@ object DumpLogSegments {
       if (entry.offset == 0 && i > 0) return
       if (!verifyOnly)
         println(
-          "offset: %d position: %d".format(entry.offset + index.baseOffset,
-                                           entry.position))
+          "offset: %d position: %d"
+            .format(entry.offset + index.baseOffset, entry.position))
     }
   }
 
@@ -338,8 +341,8 @@ object DumpLogSegments {
     val trailingBytes = messageSet.sizeInBytes - validBytes
     if (trailingBytes > 0)
       println(
-        "Found %d invalid bytes at the end of %s".format(trailingBytes,
-                                                         file.getName))
+        "Found %d invalid bytes at the end of %s"
+          .format(trailingBytes, file.getName))
   }
 
   private def getIterator(messageAndOffset: MessageAndOffset,

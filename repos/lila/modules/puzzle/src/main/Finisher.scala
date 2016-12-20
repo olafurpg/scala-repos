@@ -20,9 +20,10 @@ private[puzzle] final class Finisher(api: PuzzleApi, puzzleColl: Coll) {
       case None =>
         val userRating = user.perfs.puzzle.toRating
         val puzzleRating = puzzle.perf.toRating
-        updateRatings(userRating,
-                      puzzleRating,
-                      data.isWin.fold(Glicko.Result.Win, Glicko.Result.Loss))
+        updateRatings(
+          userRating,
+          puzzleRating,
+          data.isWin.fold(Glicko.Result.Win, Glicko.Result.Loss))
         val date = DateTime.now
         val puzzlePerf = puzzle.perf.addOrReset(
           _.puzzle.crazyGlicko,
@@ -60,10 +61,11 @@ private[puzzle] final class Finisher(api: PuzzleApi, puzzleColl: Coll) {
   private val system = new RatingCalculator(VOLATILITY, TAU)
 
   private def mkRating(perf: Perf) =
-    new Rating(math.max(1000, perf.glicko.rating),
-               perf.glicko.deviation,
-               perf.glicko.volatility,
-               perf.nb)
+    new Rating(
+      math.max(1000, perf.glicko.rating),
+      perf.glicko.deviation,
+      perf.glicko.volatility,
+      perf.nb)
 
   private def updateRatings(u1: Rating, u2: Rating, result: Glicko.Result) {
     val results = new RatingPeriodResults()

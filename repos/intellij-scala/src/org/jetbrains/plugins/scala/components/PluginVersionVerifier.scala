@@ -121,8 +121,9 @@ class ScalaPluginVersionVerifierApplicationComponent
                     if (!app.isDisposed) {
                       app.getMessageBus
                         .syncPublisher(Notifications.TOPIC)
-                        .register(Scala_Group,
-                                  NotificationDisplayType.STICKY_BALLOON)
+                        .register(
+                          Scala_Group,
+                          NotificationDisplayType.STICKY_BALLOON)
                     }
                     NotificationGroup.balloonGroup(Scala_Group)
                     val notification = new Notification(

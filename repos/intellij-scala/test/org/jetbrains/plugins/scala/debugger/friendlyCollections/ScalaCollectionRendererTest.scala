@@ -46,8 +46,9 @@ class ScalaCollectionRendererTest
       val testVariable = localVar(frameTree, context, variableName)
       val renderer = testVariable.getRenderer(getDebugProcess)
       testVariable.setRenderer(renderer)
-      testVariable.updateRepresentation(context,
-                                        DescriptorLabelListener.DUMMY_LISTENER)
+      testVariable.updateRepresentation(
+        context,
+        DescriptorLabelListener.DUMMY_LISTENER)
       val value = testVariable.calcValue(context)
       renderer.buildChildren(value, new ChildrenBuilder {
         def setChildren(children: util.List[DebuggerTreeNode]) {
@@ -72,8 +73,9 @@ class ScalaCollectionRendererTest
     managed {
       testVariableChildren map (_.getDescriptor) foreach {
         case impl: NodeDescriptorImpl =>
-          impl.updateRepresentation(evaluationContext(),
-                                    DescriptorLabelListener.DUMMY_LISTENER)
+          impl.updateRepresentation(
+            evaluationContext(),
+            DescriptorLabelListener.DUMMY_LISTENER)
         case a => println(a)
       }
     }
@@ -132,8 +134,9 @@ class ScalaCollectionRendererTest
     }
   }
 
-  addFileWithBreakpoints("ShortList.scala",
-                         s"""
+  addFileWithBreakpoints(
+    "ShortList.scala",
+    s"""
        |object ShortList {
        |  def main(args: Array[String]) {
        |    val lst = List(1, 2, 3, 4, 5, 6)
@@ -142,13 +145,15 @@ class ScalaCollectionRendererTest
        |}
       """.replace("\r", "").stripMargin.trim)
   def testShortList() {
-    testScalaCollectionRenderer("lst",
-                                6,
-                                "scala.collection.immutable.$colon$colon")
+    testScalaCollectionRenderer(
+      "lst",
+      6,
+      "scala.collection.immutable.$colon$colon")
   }
 
-  addFileWithBreakpoints("Stack.scala",
-                         s"""
+  addFileWithBreakpoints(
+    "Stack.scala",
+    s"""
        |object Stack {
        |  def main(args: Array[String]) {
        |    import scala.collection.mutable
@@ -161,8 +166,9 @@ class ScalaCollectionRendererTest
     testScalaCollectionRenderer("stack", 8, "scala.collection.mutable.Stack")
   }
 
-  addFileWithBreakpoints("MutableList.scala",
-                         s"""
+  addFileWithBreakpoints(
+    "MutableList.scala",
+    s"""
        |object MutableList {
        |  def main(args: Array[String]) {
        |    val mutableList = scala.collection.mutable.MutableList(1,2,3,4,5)
@@ -171,13 +177,15 @@ class ScalaCollectionRendererTest
        |}
     """.stripMargin.replace("\r", "").trim)
   def testMutableList() {
-    testScalaCollectionRenderer("mutableList",
-                                5,
-                                "scala.collection.mutable.MutableList")
+    testScalaCollectionRenderer(
+      "mutableList",
+      5,
+      "scala.collection.mutable.MutableList")
   }
 
-  addFileWithBreakpoints("Queue.scala",
-                         s"""
+  addFileWithBreakpoints(
+    "Queue.scala",
+    s"""
        |object Queue {
        |  def main(args: Array[String]) {
        |    val queue = scala.collection.immutable.Queue(1,2,3,4)
@@ -189,8 +197,9 @@ class ScalaCollectionRendererTest
     testScalaCollectionRenderer("queue", 4, "scala.collection.immutable.Queue")
   }
 
-  addFileWithBreakpoints("LongList.scala",
-                         s"""
+  addFileWithBreakpoints(
+    "LongList.scala",
+    s"""
        |object LongList {
        |  def main(args: Array[String]) {
        |    val longList = (1 to 50).toList
@@ -199,8 +208,9 @@ class ScalaCollectionRendererTest
        |}
       """.stripMargin.replace("\r", "").trim)
   def testLongList() {
-    testScalaCollectionRenderer("longList",
-                                50,
-                                "scala.collection.immutable.$colon$colon")
+    testScalaCollectionRenderer(
+      "longList",
+      50,
+      "scala.collection.immutable.$colon$colon")
   }
 }

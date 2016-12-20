@@ -123,8 +123,9 @@ class VectorIndexer(override val uid: String)
   override def fit(dataset: DataFrame): VectorIndexerModel = {
     transformSchema(dataset.schema, logging = true)
     val firstRow = dataset.select($(inputCol)).take(1)
-    require(firstRow.length == 1,
-            s"VectorIndexer cannot be fit on an empty dataset.")
+    require(
+      firstRow.length == 1,
+      s"VectorIndexer cannot be fit on an empty dataset.")
     val numFeatures = firstRow(0).getAs[Vector](0).size
     val vectorDataset =
       dataset.select($(inputCol)).rdd.map { case Row(v: Vector) => v }
@@ -148,10 +149,12 @@ class VectorIndexer(override val uid: String)
     // We do not transfer feature metadata since we do not know what types of features we will
     // produce in transform().
     val dataType = new VectorUDT
-    require(isDefined(inputCol),
-            s"VectorIndexer requires input column parameter: $inputCol")
-    require(isDefined(outputCol),
-            s"VectorIndexer requires output column parameter: $outputCol")
+    require(
+      isDefined(inputCol),
+      s"VectorIndexer requires input column parameter: $inputCol")
+    require(
+      isDefined(outputCol),
+      s"VectorIndexer requires output column parameter: $outputCol")
     SchemaUtils.checkColumnType(schema, $(inputCol), dataType)
     SchemaUtils.appendColumn(schema, $(outputCol), dataType)
   }
@@ -196,9 +199,10 @@ object VectorIndexer extends DefaultParamsReadable[VectorIndexer] {
 
     /** Add a new vector to this index, updating sets of unique feature values */
     def addVector(v: Vector): Unit = {
-      require(v.size == numFeatures,
-              s"VectorIndexer expected $numFeatures features but" +
-                s" found vector of size ${v.size}.")
+      require(
+        v.size == numFeatures,
+        s"VectorIndexer expected $numFeatures features but" +
+          s" found vector of size ${v.size}.")
       v match {
         case dv: DenseVector => addDenseVector(dv)
         case sv: SparseVector => addSparseVector(sv)
@@ -320,9 +324,9 @@ class VectorIndexerModel private[ml] (
           .map(_._1)
           .map(_.toString)
         if (featureValues.length == 2) {
-          attrs(featureIndex) = new BinaryAttribute(index = Some(featureIndex),
-                                                    values =
-                                                      Some(featureValues))
+          attrs(featureIndex) = new BinaryAttribute(
+            index = Some(featureIndex),
+            values = Some(featureValues))
         } else {
           attrs(featureIndex) = new NominalAttribute(
             index = Some(featureIndex),
@@ -351,9 +355,10 @@ class VectorIndexerModel private[ml] (
     val localVectorMap = categoryMaps
     val localNumFeatures = numFeatures
     val f: Vector => Vector = { (v: Vector) =>
-      assert(v.size == localNumFeatures,
-             "VectorIndexerModel expected vector of length" +
-               s" $numFeatures but found length ${v.size}")
+      assert(
+        v.size == localNumFeatures,
+        "VectorIndexerModel expected vector of length" +
+          s" $numFeatures but found length ${v.size}")
       v match {
         case dv: DenseVector =>
           val tmpv = dv.copy
@@ -404,10 +409,12 @@ class VectorIndexerModel private[ml] (
 
   override def transformSchema(schema: StructType): StructType = {
     val dataType = new VectorUDT
-    require(isDefined(inputCol),
-            s"VectorIndexerModel requires input column parameter: $inputCol")
-    require(isDefined(outputCol),
-            s"VectorIndexerModel requires output column parameter: $outputCol")
+    require(
+      isDefined(inputCol),
+      s"VectorIndexerModel requires input column parameter: $inputCol")
+    require(
+      isDefined(outputCol),
+      s"VectorIndexerModel requires output column parameter: $outputCol")
     SchemaUtils.checkColumnType(schema, $(inputCol), dataType)
 
     // If the input metadata specifies numFeatures, compare with expected numFeatures.

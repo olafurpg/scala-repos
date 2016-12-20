@@ -63,13 +63,14 @@ case class Simul(_id: Simul.ID,
   def startable = isCreated && applicants.count(_.accepted) > 1
 
   def start =
-    startable option copy(status = SimulStatus.Started,
-                          startedAt = DateTime.now.some,
-                          applicants = Nil,
-                          pairings = applicants collect {
-                            case a if a.accepted => SimulPairing(a.player)
-                          },
-                          hostSeenAt = none)
+    startable option copy(
+      status = SimulStatus.Started,
+      startedAt = DateTime.now.some,
+      applicants = Nil,
+      pairings = applicants collect {
+        case a if a.accepted => SimulPairing(a.player)
+      },
+      hostSeenAt = none)
 
   def updatePairing(gameId: String, f: SimulPairing => SimulPairing) =
     copy(pairings = pairings collect {
@@ -82,17 +83,19 @@ case class Simul(_id: Simul.ID,
 
   private def finishIfDone =
     if (pairings.forall(_.finished))
-      copy(status = SimulStatus.Finished,
-           finishedAt = DateTime.now.some,
-           hostGameId = none)
+      copy(
+        status = SimulStatus.Finished,
+        finishedAt = DateTime.now.some,
+        hostGameId = none)
     else this
 
   def gameIds = pairings.map(_.gameId)
 
   def perfTypes: List[lila.rating.PerfType] = variants.flatMap { variant =>
-    lila.game.PerfPicker.perfType(speed = chess.Speed(clock.chessClock.some),
-                                  variant = variant,
-                                  daysPerTurn = none)
+    lila.game.PerfPicker.perfType(
+      speed = chess.Speed(clock.chessClock.some),
+      variant = variant,
+      daysPerTurn = none)
   }
 
   def applicantRatio = s"${applicants.count(_.accepted)}/${applicants.size}"
@@ -131,10 +134,10 @@ object Simul {
       hostId = host.id,
       hostRating = host.perfs.bestRatingIn {
         variants flatMap { variant =>
-          lila.game.PerfPicker.perfType(speed =
-                                          chess.Speed(clock.chessClock.some),
-                                        variant = variant,
-                                        daysPerTurn = none)
+          lila.game.PerfPicker.perfType(
+            speed = chess.Speed(clock.chessClock.some),
+            variant = variant,
+            daysPerTurn = none)
         }
       },
       hostGameId = none,

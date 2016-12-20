@@ -382,12 +382,13 @@ abstract class AbstractStage[-In,
   */
 @deprecated("Please use GraphStage instead.", "2.4.2")
 abstract class PushPullStage[In, Out]
-    extends AbstractStage[In,
-                          Out,
-                          SyncDirective,
-                          SyncDirective,
-                          Context[Out],
-                          LifecycleContext]
+    extends AbstractStage[
+      In,
+      Out,
+      SyncDirective,
+      SyncDirective,
+      Context[Out],
+      LifecycleContext]
 
 /**
   * `PushStage` is a [[PushPullStage]] that always perform transitive pull by calling `ctx.pull` from `onPull`.
@@ -425,12 +426,13 @@ abstract class PushStage[In, Out] extends PushPullStage[In, Out] {
   */
 @deprecated("Please use GraphStage instead.", "2.4.2")
 abstract class DetachedStage[In, Out]
-    extends AbstractStage[In,
-                          Out,
-                          UpstreamDirective,
-                          DownstreamDirective,
-                          DetachedContext[Out],
-                          LifecycleContext] {
+    extends AbstractStage[
+      In,
+      Out,
+      UpstreamDirective,
+      DownstreamDirective,
+      DetachedContext[Out],
+      LifecycleContext] {
   private[stream] override def isDetached = true
 
   /**
@@ -476,8 +478,9 @@ private[akka] object StatefulStage {
   *
   * Use [[#terminationEmit]] to push final elements from [[#onUpstreamFinish]] or [[#onUpstreamFailure]].
   */
-@deprecated("StatefulStage is deprecated, please use GraphStage instead.",
-            "2.0-M2")
+@deprecated(
+  "StatefulStage is deprecated, please use GraphStage instead.",
+  "2.0-M2")
 abstract class StatefulStage[In, Out] extends PushPullStage[In, Out] {
   import StatefulStage._
 

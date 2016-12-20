@@ -73,8 +73,9 @@ object ParquetSchemaProvider {
         case tpe if IsCaseClassImpl.isCaseClassType(c)(tpe) =>
           q"new _root_.org.apache.parquet.schema.GroupType($repetition, $fieldName, ..${expandMethod(tpe)})"
         case _ =>
-          c.abort(c.enclosingPosition,
-                  s"Case class $T has unsupported field type : $fieldType ")
+          c.abort(
+            c.enclosingPosition,
+            s"Case class $T has unsupported field type : $fieldType ")
       }
     }
 
@@ -94,8 +95,9 @@ object ParquetSchemaProvider {
     val expanded = expandMethod(T.tpe)
 
     if (expanded.isEmpty)
-      c.abort(c.enclosingPosition,
-              s"Case class $T.tpe has no fields we were able to extract")
+      c.abort(
+        c.enclosingPosition,
+        s"Case class $T.tpe has no fields we were able to extract")
 
     val messageTypeName = s"${T.tpe}".split("\\.").last
     val schema =

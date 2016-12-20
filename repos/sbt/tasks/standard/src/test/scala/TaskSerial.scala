@@ -60,8 +60,9 @@ object TaskSerial extends Properties("task serial") {
     }
     val tasks = (0 until size).map(_ => mktask).toList.join.map { results =>
       val success = results.forall(idFun[Boolean])
-      assert(success == shouldSucceed,
-             if (shouldSucceed) unschedulableMsg else scheduledMsg)
+      assert(
+        success == shouldSucceed,
+        if (shouldSucceed) unschedulableMsg else scheduledMsg)
     }
     checkResult(evalRestricted(tasks)(restrictions), ())
   }
@@ -84,9 +85,10 @@ object TaskTest {
       (x: String) => System.err.println(x))
 
     val x =
-      new Execute[Task](Execute.config(checkCycles),
-                        Execute.noTriggers,
-                        ExecuteProgress.empty[Task])(taskToNode(idK[Task]))
+      new Execute[Task](
+        Execute.config(checkCycles),
+        Execute.noTriggers,
+        ExecuteProgress.empty[Task])(taskToNode(idK[Task]))
     try { x.run(root)(service) } finally { shutdown() }
   }
   def tryRun[T](root: Task[T],

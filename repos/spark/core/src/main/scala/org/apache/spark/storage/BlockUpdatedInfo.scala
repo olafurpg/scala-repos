@@ -35,10 +35,11 @@ private[spark] object BlockUpdatedInfo {
 
   private[spark] def apply(
       updateBlockInfo: UpdateBlockInfo): BlockUpdatedInfo = {
-    BlockUpdatedInfo(updateBlockInfo.blockManagerId,
-                     updateBlockInfo.blockId,
-                     updateBlockInfo.storageLevel,
-                     updateBlockInfo.memSize,
-                     updateBlockInfo.diskSize)
+    BlockUpdatedInfo(
+      updateBlockInfo.blockManagerId,
+      updateBlockInfo.blockId,
+      updateBlockInfo.storageLevel,
+      updateBlockInfo.memSize,
+      updateBlockInfo.diskSize)
   }
 }

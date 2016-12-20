@@ -211,8 +211,9 @@ class HiveQlSuite extends SparkFunSuite with BeforeAndAfterAll {
     assert(desc.schema == Seq.empty[CatalogColumn])
     assert(desc.viewText == None) // TODO will be SQLText
     assert(
-      desc.storage.serdeProperties == Map(("serde_p1" -> "p1"),
-                                          ("serde_p2" -> "p2")))
+      desc.storage.serdeProperties == Map(
+        ("serde_p1" -> "p1"),
+        ("serde_p2" -> "p2")))
     assert(
       desc.storage.inputFormat == Some(
         "org.apache.hadoop.hive.ql.io.RCFileInputFormat"))
@@ -232,12 +233,15 @@ class HiveQlSuite extends SparkFunSuite with BeforeAndAfterAll {
       }
       assert(e.getMessage.contains(errorMessage))
     }
-    assertError("select interval '42-32' year to month",
-                "month 32 outside range [0, 11]")
-    assertError("select interval '5 49:12:15' day to second",
-                "hour 49 outside range [0, 23]")
-    assertError("select interval '.1111111111' second",
-                "nanosecond 1111111111 outside range")
+    assertError(
+      "select interval '42-32' year to month",
+      "month 32 outside range [0, 11]")
+    assertError(
+      "select interval '5 49:12:15' day to second",
+      "hour 49 outside range [0, 23]")
+    assertError(
+      "select interval '.1111111111' second",
+      "nanosecond 1111111111 outside range")
   }
 
   test("use native json_tuple instead of hive's UDTF in LATERAL VIEW") {

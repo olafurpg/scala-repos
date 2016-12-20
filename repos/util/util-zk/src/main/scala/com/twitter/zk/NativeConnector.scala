@@ -27,12 +27,13 @@ case class NativeConnector(connectString: String,
   override val name = "native-zk-connector"
 
   protected[this] def mkConnection = {
-    new NativeConnector.Connection(connectString,
-                                   connectTimeout,
-                                   sessionTimeout,
-                                   authenticate,
-                                   timer,
-                                   log)
+    new NativeConnector.Connection(
+      connectString,
+      connectTimeout,
+      sessionTimeout,
+      authenticate,
+      timer,
+      log)
   }
 
   onSessionEvent {
@@ -103,11 +104,12 @@ object NativeConnector {
             sessionTimeout: Duration,
             authenticate: Option[AuthInfo])(
       implicit timer: Timer): NativeConnector = {
-    NativeConnector(connectString,
-                    Some(connectTimeout),
-                    sessionTimeout,
-                    timer,
-                    authenticate)
+    NativeConnector(
+      connectString,
+      Some(connectTimeout),
+      sessionTimeout,
+      timer,
+      authenticate)
   }
 
   case class ConnectTimeoutException(connectString: String, timeout: Duration)
@@ -182,9 +184,10 @@ object NativeConnector {
     }
 
     protected[this] def mkZooKeeper = {
-      new ZooKeeper(connectString,
-                    sessionTimeout.inMillis.toInt,
-                    sessionBroker)
+      new ZooKeeper(
+        connectString,
+        sessionTimeout.inMillis.toInt,
+        sessionBroker)
     }
 
     def release(): Future[Unit] = Future {

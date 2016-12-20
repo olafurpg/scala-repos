@@ -168,9 +168,10 @@ private[spark] class DiskBlockObjectWriter(
       }
     } catch {
       case e: Exception =>
-        logError("Uncaught exception while reverting partial writes to file " +
-                   file,
-                 e)
+        logError(
+          "Uncaught exception while reverting partial writes to file " +
+            file,
+          e)
         file
     }
   }

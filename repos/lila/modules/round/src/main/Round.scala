@@ -80,18 +80,20 @@ private[round] final class Round(gameId: String,
 
     case Resign(playerId) =>
       handle(playerId) { pov =>
-        pov.game.resignable ?? finisher.other(pov.game,
-                                              _.Resign,
-                                              Some(!pov.color))
+        pov.game.resignable ?? finisher.other(
+          pov.game,
+          _.Resign,
+          Some(!pov.color))
       }
 
     case GoBerserk(color) =>
       handle(color) { pov =>
         pov.game.goBerserk(color) ?? { progress =>
-          messenger.system(pov.game,
-                           (_.untranslated(
-                             s"${pov.color.name.capitalize} is going berserk!"
-                           )))
+          messenger.system(
+            pov.game,
+            (_.untranslated(
+              s"${pov.color.name.capitalize} is going berserk!"
+            )))
           GameRepo.save(progress) >> GameRepo.goBerserk(pov) inject progress.events
         }
       }
@@ -211,11 +213,13 @@ private[round] final class Round(gameId: String,
             .giveTime(Color.Black, freeSeconds)
           val progress = (game withClock newClock) + Event.Clock(newClock)
           messenger.system(game, (_.untranslated("Lichess has been updated")))
-          messenger.system(game,
-                           (_.untranslated("Sorry for the inconvenience!")))
+          messenger.system(
+            game,
+            (_.untranslated("Sorry for the inconvenience!")))
           Color.all.foreach { c =>
-            messenger.system(game,
-                             (_.untranslated(s"$c + $freeSeconds seconds")))
+            messenger.system(
+              game,
+              (_.untranslated(s"$c + $freeSeconds seconds")))
           }
           GameRepo save progress inject progress.events
         }
@@ -226,8 +230,9 @@ private[round] final class Round(gameId: String,
         messenger.system(
           game,
           (_.untranslated("Game aborted for server maintenance")))
-        messenger.system(game,
-                         (_.untranslated("Sorry for the inconvenience!")))
+        messenger.system(
+          game,
+          (_.untranslated("Sorry for the inconvenience!")))
         game.playable ?? finisher.other(game, _.Aborted)
       }
   }

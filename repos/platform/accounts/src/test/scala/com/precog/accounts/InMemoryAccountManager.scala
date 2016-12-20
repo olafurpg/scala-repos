@@ -54,12 +54,13 @@ class InMemoryAccountManager[M[+ _]](resetExpiration: Int = 1)(
       plan: AccountPlan,
       parentId: Option[AccountId],
       profile: Option[JValue])(f: AccountId => M[APIKey]): M[Account] = {
-    TestAccounts.createAccount(email,
-                               password,
-                               creationDate,
-                               plan,
-                               parentId,
-                               profile)(f) map { account =>
+    TestAccounts.createAccount(
+      email,
+      password,
+      creationDate,
+      plan,
+      parentId,
+      profile)(f) map { account =>
       accounts.put(account.accountId, account)
       account
     }

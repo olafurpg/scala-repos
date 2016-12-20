@@ -117,8 +117,9 @@ class SecurityDirectivesExamplesSpec extends RoutingSpec {
 
     val route = Route.seal {
       path("secured") {
-        authenticateBasicPFAsync(realm = "secure site",
-                                 myUserPassAuthenticator) { user =>
+        authenticateBasicPFAsync(
+          realm = "secure site",
+          myUserPassAuthenticator) { user =>
           complete(s"The user is '${user.id}'")
         }
       }

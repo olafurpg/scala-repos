@@ -48,8 +48,9 @@ class ScTemplateBodyImpl private (stub: StubElement[ScTemplateBody],
   def aliases: Array[ScTypeAlias] = {
     val stub = getStub
     if (stub != null) {
-      stub.getChildrenByType(TokenSets.ALIASES_SET,
-                             JavaArrayFactoryUtil.ScTypeAliasFactory)
+      stub.getChildrenByType(
+        TokenSets.ALIASES_SET,
+        JavaArrayFactoryUtil.ScTypeAliasFactory)
     } else findChildrenByClass(classOf[ScTypeAlias])
   }
 
@@ -77,8 +78,9 @@ class ScTemplateBodyImpl private (stub: StubElement[ScTemplateBody],
     }
 
   def exprs: Array[ScExpression] =
-    getStubOrPsiChildren(TokenSets.EXPRESSION_BIT_SET,
-                         JavaArrayFactoryUtil.ScExpressionFactory).filterNot {
+    getStubOrPsiChildren(
+      TokenSets.EXPRESSION_BIT_SET,
+      JavaArrayFactoryUtil.ScExpressionFactory).filterNot {
       case s: ScMember => s.isLocal
       case _ => false
     }
@@ -100,10 +102,11 @@ class ScTemplateBodyImpl private (stub: StubElement[ScTemplateBody],
                                    place: PsiElement): Boolean = {
     val td = PsiTreeUtil.getContextOfType(this, classOf[ScTemplateDefinition])
     if (td != null) {
-      if (!td.processDeclarationsForTemplateBody(processor,
-                                                 state,
-                                                 td.extendsBlock,
-                                                 place)) return false
+      if (!td.processDeclarationsForTemplateBody(
+            processor,
+            state,
+            td.extendsBlock,
+            place)) return false
     }
     super.processDeclarations(processor, state, lastParent, place)
   }

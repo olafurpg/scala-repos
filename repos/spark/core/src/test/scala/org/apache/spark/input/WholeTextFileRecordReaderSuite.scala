@@ -109,16 +109,18 @@ class WholeTextFileRecordReaderSuite
 
     val res = sc.wholeTextFiles(dir.toString, 3).collect()
 
-    assert(res.size === WholeTextFileRecordReaderSuite.fileNames.size,
-           "Number of files read out does not fit with the actual value.")
+    assert(
+      res.size === WholeTextFileRecordReaderSuite.fileNames.size,
+      "Number of files read out does not fit with the actual value.")
 
     for ((filename, contents) <- res) {
       val shortName = filename.split('/').last
-      assert(WholeTextFileRecordReaderSuite.fileNames.contains(shortName),
-             s"Missing file name $filename.")
-      assert(contents === new Text(
-               WholeTextFileRecordReaderSuite.files(shortName)).toString,
-             s"file $filename contents can not match.")
+      assert(
+        WholeTextFileRecordReaderSuite.fileNames.contains(shortName),
+        s"Missing file name $filename.")
+      assert(
+        contents === new Text(WholeTextFileRecordReaderSuite.files(shortName)).toString,
+        s"file $filename contents can not match.")
     }
 
     Utils.deleteRecursively(dir)
@@ -135,17 +137,19 @@ class WholeTextFileRecordReaderSuite
 
     val res = sc.wholeTextFiles(dir.toString, 3).collect()
 
-    assert(res.size === WholeTextFileRecordReaderSuite.fileNames.size,
-           "Number of files read out does not fit with the actual value.")
+    assert(
+      res.size === WholeTextFileRecordReaderSuite.fileNames.size,
+      "Number of files read out does not fit with the actual value.")
 
     for ((filename, contents) <- res) {
       val shortName = filename.split('/').last.split('.')(0)
 
-      assert(WholeTextFileRecordReaderSuite.fileNames.contains(shortName),
-             s"Missing file name $filename.")
-      assert(contents === new Text(
-               WholeTextFileRecordReaderSuite.files(shortName)).toString,
-             s"file $filename contents can not match.")
+      assert(
+        WholeTextFileRecordReaderSuite.fileNames.contains(shortName),
+        s"Missing file name $filename.")
+      assert(
+        contents === new Text(WholeTextFileRecordReaderSuite.files(shortName)).toString,
+        s"file $filename contents can not match.")
     }
 
     Utils.deleteRecursively(dir)

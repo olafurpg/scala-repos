@@ -157,11 +157,12 @@ private[sbt] object PluginsDebug {
       structure.units.mapValues(unit => availableAutoPlugins(unit).toSet)
     val pluginsThisBuild =
       perBuild.getOrElse(currentRef.build, Set.empty).toList
-    lazy val context = Context(currentProject.plugins,
-                               currentProject.autoPlugins,
-                               Plugins.deducer(pluginsThisBuild),
-                               pluginsThisBuild,
-                               s.log)
+    lazy val context = Context(
+      currentProject.plugins,
+      currentProject.autoPlugins,
+      Plugins.deducer(pluginsThisBuild),
+      pluginsThisBuild,
+      s.log)
     lazy val debug = PluginsDebug(context.available)
     if (!pluginsThisBuild.contains(plugin)) {
       val availableInBuilds: List[URI] =
@@ -340,13 +341,14 @@ private[sbt] object PluginsDebug {
         DeactivatePlugin(d, removeToDeactivate, newlySelected)
       }
 
-      PluginRequirements(plugin,
-                         context,
-                         blockingExcludes,
-                         addToExistingPlugins,
-                         extraPlugins,
-                         willRemove,
-                         deactivate)
+      PluginRequirements(
+        plugin,
+        context,
+        blockingExcludes,
+        addToExistingPlugins,
+        extraPlugins,
+        willRemove,
+        deactivate)
     }
   }
 
@@ -373,13 +375,14 @@ private[sbt] object PluginsDebug {
   /** String representation of [[PluginEnable]], intended for end users. */
   def explainPluginEnable(ps: PluginEnable): String =
     ps match {
-      case PluginRequirements(plugin,
-                              context,
-                              blockingExcludes,
-                              enablingPlugins,
-                              extraEnabledPlugins,
-                              toBeRemoved,
-                              deactivate) =>
+      case PluginRequirements(
+          plugin,
+          context,
+          blockingExcludes,
+          enablingPlugins,
+          extraEnabledPlugins,
+          toBeRemoved,
+          deactivate) =>
         def indent(str: String) = if (str.isEmpty) "" else s"\t$str"
         def note(str: String) = if (str.isEmpty) "" else s"Note: $str"
         val parts =
@@ -409,8 +412,9 @@ private[sbt] object PluginsDebug {
 
   private[this] def excludedError(transitive: Boolean,
                                   dependencies: List[AutoPlugin]): String =
-    str(dependencies)(excludedPluginError(transitive),
-                      excludedPluginsError(transitive))
+    str(dependencies)(
+      excludedPluginError(transitive),
+      excludedPluginsError(transitive))
 
   private[this] def excludedPluginError(transitive: Boolean)(
       dependency: AutoPlugin) =
@@ -481,8 +485,9 @@ private[sbt] object PluginsDebug {
 
   private[this] def pluginImpossible(plugin: AutoPlugin,
                                      contradictions: Set[AutoPlugin]): String =
-    str(contradictions.toList)(pluginImpossible1(plugin),
-                               pluginImpossibleN(plugin))
+    str(contradictions.toList)(
+      pluginImpossible1(plugin),
+      pluginImpossibleN(plugin))
 
   private[this] def pluginImpossible1(plugin: AutoPlugin)(
       contradiction: AutoPlugin): String =

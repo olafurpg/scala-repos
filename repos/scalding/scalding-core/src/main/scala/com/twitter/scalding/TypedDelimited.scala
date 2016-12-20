@@ -47,11 +47,12 @@ trait TypedSeperatedFile extends Serializable {
   def apply[T: Manifest: TupleConverter: TupleSetter](
       paths: Seq[String],
       f: Fields): FixedPathTypedDelimited[T] =
-    new FixedPathTypedDelimited[T](paths,
-                                   f,
-                                   skipHeader,
-                                   writeHeader,
-                                   separator)
+    new FixedPathTypedDelimited[T](
+      paths,
+      f,
+      skipHeader,
+      writeHeader,
+      separator)
 }
 
 /**

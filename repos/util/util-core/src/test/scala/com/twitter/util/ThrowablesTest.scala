@@ -17,9 +17,10 @@ class ThrowablesTest extends FunSuite {
     val c = new Throwable(b)
 
     assert(
-      Throwables.mkString(c) == Seq(c.getClass.getName,
-                                    b.getClass.getName,
-                                    a.getClass.getName))
+      Throwables.mkString(c) == Seq(
+        c.getClass.getName,
+        b.getClass.getName,
+        a.getClass.getName))
   }
 
   test("Throwables.mkString: return empty Seq on null exception") {

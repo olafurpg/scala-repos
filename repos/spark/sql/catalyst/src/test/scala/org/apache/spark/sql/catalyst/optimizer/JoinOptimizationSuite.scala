@@ -61,16 +61,20 @@ class JoinOptimizationSuite extends PlanTest {
     testExtract(x, None)
     testExtract(x.where("x.b".attr === 1), None)
     testExtract(x.join(y), Some(Seq(x, y), Seq()))
-    testExtract(x.join(y, condition = Some("x.b".attr === "y.d".attr)),
-                Some(Seq(x, y), Seq("x.b".attr === "y.d".attr)))
-    testExtract(x.join(y).where("x.b".attr === "y.d".attr),
-                Some(Seq(x, y), Seq("x.b".attr === "y.d".attr)))
+    testExtract(
+      x.join(y, condition = Some("x.b".attr === "y.d".attr)),
+      Some(Seq(x, y), Seq("x.b".attr === "y.d".attr)))
+    testExtract(
+      x.join(y).where("x.b".attr === "y.d".attr),
+      Some(Seq(x, y), Seq("x.b".attr === "y.d".attr)))
     testExtract(x.join(y).join(z), Some(Seq(x, y, z), Seq()))
-    testExtract(x.join(y).where("x.b".attr === "y.d".attr).join(z),
-                Some(Seq(x, y, z), Seq("x.b".attr === "y.d".attr)))
+    testExtract(
+      x.join(y).where("x.b".attr === "y.d".attr).join(z),
+      Some(Seq(x, y, z), Seq("x.b".attr === "y.d".attr)))
     testExtract(x.join(y).join(x.join(z)), Some(Seq(x, y, x.join(z)), Seq()))
-    testExtract(x.join(y).join(x.join(z)).where("x.b".attr === "y.d".attr),
-                Some(Seq(x, y, x.join(z)), Seq("x.b".attr === "y.d".attr)))
+    testExtract(
+      x.join(y).join(x.join(z)).where("x.b".attr === "y.d".attr),
+      Some(Seq(x, y, x.join(z)), Seq("x.b".attr === "y.d".attr)))
   }
 
   test("reorder inner joins") {
@@ -96,19 +100,22 @@ class JoinOptimizationSuite extends PlanTest {
   test("broadcasthint sets relation statistics to smallest value") {
     val input = LocalRelation('key.int, 'value.string)
 
-    val query = Project(Seq($"x.key", $"y.key"),
-                        Join(SubqueryAlias("x", input),
-                             BroadcastHint(SubqueryAlias("y", input)),
-                             Inner,
-                             None)).analyze
+    val query = Project(
+      Seq($"x.key", $"y.key"),
+      Join(
+        SubqueryAlias("x", input),
+        BroadcastHint(SubqueryAlias("y", input)),
+        Inner,
+        None)).analyze
 
     val optimized = Optimize.execute(query)
 
     val expected =
-      Join(Project(Seq($"x.key"), SubqueryAlias("x", input)),
-           BroadcastHint(Project(Seq($"y.key"), SubqueryAlias("y", input))),
-           Inner,
-           None).analyze
+      Join(
+        Project(Seq($"x.key"), SubqueryAlias("x", input)),
+        BroadcastHint(Project(Seq($"y.key"), SubqueryAlias("y", input))),
+        Inner,
+        None).analyze
 
     comparePlans(optimized, expected)
 

@@ -34,11 +34,10 @@ import scala.collection.JavaConverters._
   storages = Array(new Storage("sbt.xml"))
 )
 class SbtSystemSettings(project: Project)
-    extends AbstractExternalSystemSettings[SbtSystemSettings,
-                                           SbtProjectSettings,
-                                           SbtProjectSettingsListener](
-      SbtTopic,
-      project)
+    extends AbstractExternalSystemSettings[
+      SbtSystemSettings,
+      SbtProjectSettings,
+      SbtProjectSettingsListener](SbtTopic, project)
     with PersistentStateComponent[SbtSystemSettingsState] {
 
   @BeanProperty
@@ -67,8 +66,9 @@ class SbtSystemSettings(project: Project)
       getPublisher.onJdkChanged(old.jdk, current.jdk)
     }
     if (old.resolveClassifiers != current.resolveClassifiers) {
-      getPublisher.onResolveClassifiersChanged(old.resolveClassifiers,
-                                               current.resolveClassifiers)
+      getPublisher.onResolveClassifiersChanged(
+        old.resolveClassifiers,
+        current.resolveClassifiers)
     }
     if (old.resolveSbtClassifiers != current.resolveSbtClassifiers) {
       getPublisher.onResolveSbtClassifiersChanged(
@@ -166,8 +166,9 @@ class SbtSystemSettingsState
   @BeanProperty
   var customSbtStructureDir: String = ""
 
-  @AbstractCollection(surroundWithTag = false,
-                      elementTypes = Array(classOf[SbtProjectSettings]))
+  @AbstractCollection(
+    surroundWithTag = false,
+    elementTypes = Array(classOf[SbtProjectSettings]))
   def getLinkedExternalProjectsSettings: util.Set[SbtProjectSettings] = {
     projectSettings
   }

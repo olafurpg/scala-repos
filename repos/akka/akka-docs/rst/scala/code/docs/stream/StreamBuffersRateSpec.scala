@@ -28,8 +28,8 @@ class StreamBuffersRateSpec extends AkkaSpec {
   "Demonstrate buffer sizes" in {
     //#materializer-buffer
     val materializer = ActorMaterializer(
-      ActorMaterializerSettings(system).withInputBuffer(initialSize = 64,
-                                                        maxSize = 64))
+      ActorMaterializerSettings(system)
+        .withInputBuffer(initialSize = 64, maxSize = 64))
     //#materializer-buffer
 
     //#section-buffer

@@ -41,8 +41,9 @@ import scalafx.testutil.SFXEnumDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class ButtonDataSpec
-    extends SFXEnumDelegateSpec[jfxsc.ButtonBar.ButtonData,
-                                ButtonBar.ButtonData](
+    extends SFXEnumDelegateSpec[
+      jfxsc.ButtonBar.ButtonData,
+      ButtonBar.ButtonData](
       javaClass = classOf[jfxsc.ButtonBar.ButtonData],
       scalaClass = classOf[ButtonBar.ButtonData],
       companion = ButtonBar.ButtonData)

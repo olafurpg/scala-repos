@@ -26,9 +26,10 @@ trait HeaderDirectives {
         case NonFatal(e) ⇒
           Some(
             Left(
-              MalformedHeaderRejection(header.name,
-                                       e.getMessage.nullAsEmpty,
-                                       Some(e))))
+              MalformedHeaderRejection(
+                header.name,
+                e.getMessage.nullAsEmpty,
+                Some(e))))
     }
 
     extract(_.request.headers.collectFirst(Function.unlift(protectedF)))

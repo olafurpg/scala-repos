@@ -63,9 +63,10 @@ class RetryFilterTest extends FunSpec with MockitoSugar with BeforeAndAfter {
           timer,
           stats)
       else
-        new RetryFilter[Int, Int](RetryPolicy.tries(3, shouldRetryResponse),
-                                  timer,
-                                  stats)
+        new RetryFilter[Int, Int](
+          RetryPolicy.tries(3, shouldRetryResponse),
+          timer,
+          stats)
     val retryingService = filter andThen service
   }
 
@@ -98,17 +99,19 @@ class RetryFilterTest extends FunSpec with MockitoSugar with BeforeAndAfter {
 
       // use a budget that just gets 2 retries
       val budgetRetries = 2
-      val budget = RetryBudget(1.second,
-                               minRetriesPerSec = budgetRetries,
-                               percentCanRetry = 0.0)
+      val budget = RetryBudget(
+        1.second,
+        minRetriesPerSec = budgetRetries,
+        percentCanRetry = 0.0)
 
       // have a policy that allows for way more retries than the budgets allows for
       val policy = RetryPolicy.tries(10, RetryPolicy.WriteExceptionsOnly)
 
-      val filter = new RetryExceptionsFilter[Throwable, Int](policy,
-                                                             Timer.Nil,
-                                                             stats,
-                                                             budget)
+      val filter = new RetryExceptionsFilter[Throwable, Int](
+        policy,
+        Timer.Nil,
+        stats,
+        budget)
       val service: Service[Throwable, Int] = Service.mk(Future.exception)
 
       val svc = filter.andThen(service)
@@ -228,8 +231,9 @@ class RetryFilterTest extends FunSpec with MockitoSugar with BeforeAndAfter {
 
     describe("with RetryPolicy.backoff: Exception cases") {
       describe("using RetryPolicy[(Req, Try[Rep])]") {
-        testExceptionPolicy(RetryPolicy.backoff(backoffs)(shouldRetryResponse),
-                            retryExceptionsOnly = false)
+        testExceptionPolicy(
+          RetryPolicy.backoff(backoffs)(shouldRetryResponse),
+          retryExceptionsOnly = false)
       }
       describe("using RetryPolicy[Try[Nothing]]") {
         testExceptionPolicy(
@@ -240,14 +244,16 @@ class RetryFilterTest extends FunSpec with MockitoSugar with BeforeAndAfter {
 
     describe("with RetryPolicy.backoffJava: Exception cases") {
       describe("using RetryPolicy[(Req, Try[Rep])]") {
-        testExceptionPolicy(RetryPolicy.backoffJava(Backoff.toJava(backoffs),
-                                                    shouldRetryResponse),
-                            retryExceptionsOnly = false)
+        testExceptionPolicy(
+          RetryPolicy
+            .backoffJava(Backoff.toJava(backoffs), shouldRetryResponse),
+          retryExceptionsOnly = false)
       }
       describe("using RetryPolicy[Try[Nothing]]") {
-        testExceptionPolicy(RetryPolicy.backoffJava(Backoff.toJava(backoffs),
-                                                    shouldRetryException),
-                            retryExceptionsOnly = true)
+        testExceptionPolicy(
+          RetryPolicy
+            .backoffJava(Backoff.toJava(backoffs), shouldRetryException),
+          retryExceptionsOnly = true)
       }
     }
 

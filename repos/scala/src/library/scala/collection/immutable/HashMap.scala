@@ -424,11 +424,12 @@ object HashMap extends ImmutableMapFactory[HashMap] with BitOperations.Int {
           if (bitmapNew != 0) {
             val elemsNew = new Array[HashMap[A, B]](elems.length - 1)
             Array.copy(elems, 0, elemsNew, 0, offset)
-            Array.copy(elems,
-                       offset + 1,
-                       elemsNew,
-                       offset,
-                       elems.length - offset - 1)
+            Array.copy(
+              elems,
+              offset + 1,
+              elemsNew,
+              offset,
+              elems.length - offset - 1)
             val sizeNew = size - sub.size
             // if we have only one child, which is not a HashTrieSet but a self-contained set like
             // HashSet1 or HashSetCollision1, return the child instead
@@ -552,12 +553,13 @@ object HashMap extends ImmutableMapFactory[HashMap] with BitOperations.Int {
         level: Int,
         merger: Merger[A, B1]): HashMap[A, B1] = that match {
       case hm: HashMap1[_, _] =>
-        this.updated0(hm.key,
-                      hm.hash,
-                      level,
-                      hm.value.asInstanceOf[B1],
-                      hm.kv,
-                      merger)
+        this.updated0(
+          hm.key,
+          hm.hash,
+          level,
+          hm.value.asInstanceOf[B1],
+          hm.kv,
+          merger)
       case hm: HashTrieMap[_, _] =>
         val that = hm.asInstanceOf[HashTrieMap[A, B1]]
         val thiselems = this.elems

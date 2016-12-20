@@ -43,11 +43,12 @@ object CompressionCodec {
 
 object BrokerCompressionCodec {
 
-  val brokerCompressionCodecs = List(UncompressedCodec,
-                                     SnappyCompressionCodec,
-                                     LZ4CompressionCodec,
-                                     GZIPCompressionCodec,
-                                     ProducerCompressionCodec)
+  val brokerCompressionCodecs = List(
+    UncompressedCodec,
+    SnappyCompressionCodec,
+    LZ4CompressionCodec,
+    GZIPCompressionCodec,
+    ProducerCompressionCodec)
   val brokerCompressionOptions =
     brokerCompressionCodecs.map(codec => codec.name)
 

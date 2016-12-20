@@ -30,18 +30,19 @@ object SwaggerCommandSupport {
         // remove if statement below to include header params in description again
         if (f.valueSource == ValueSource.Header) lst
         else {
-          Parameter(f.displayName | f.name,
-                    DataType(f.binding.valueManifest),
-                    f.description.blankOption,
-                    f.notes.blankOption,
-                    paramtypeMapping(f.valueSource),
-                    if (f.isRequired) None
-                    else f.defaultValue.flatMap(_.toString.blankOption),
-                    if (f.allowableValues.nonEmpty)
-                      AllowableValues(f.allowableValues)
-                    else AllowableValues.AnyValue,
-                    required = f.isRequired,
-                    position = f.position) :: lst
+          Parameter(
+            f.displayName | f.name,
+            DataType(f.binding.valueManifest),
+            f.description.blankOption,
+            f.notes.blankOption,
+            paramtypeMapping(f.valueSource),
+            if (f.isRequired) None
+            else f.defaultValue.flatMap(_.toString.blankOption),
+            if (f.allowableValues.nonEmpty)
+              AllowableValues(f.allowableValues)
+            else AllowableValues.AnyValue,
+            required = f.isRequired,
+            position = f.position) :: lst
         }
       } else lst
     }
@@ -53,12 +54,13 @@ object SwaggerCommandSupport {
     val (fields, parameters) = pars.partition(_.paramType == ParamType.Body)
     if (fields.nonEmpty) {
       val model = modelFromCommand(obj, fields)
-      val bodyParam = Parameter("body",
-                                DataType(model.id),
-                                model.description,
-                                None,
-                                ParamType.Body,
-                                None)
+      val bodyParam = Parameter(
+        "body",
+        DataType(model.id),
+        model.description,
+        None,
+        ParamType.Body,
+        None)
       (bodyParam :: parameters, Some(model))
     } else (parameters, None)
   }
@@ -67,16 +69,18 @@ object SwaggerCommandSupport {
                                                    fields: List[Parameter]) = {
     val modelFields =
       fields map { f =>
-        f.name -> ModelProperty(f.`type`,
-                                f.position,
-                                required = f.required,
-                                allowableValues = f.allowableValues)
+        f.name -> ModelProperty(
+          f.`type`,
+          f.position,
+          required = f.required,
+          allowableValues = f.allowableValues)
       }
-    Model(cmd.commandName,
-          cmd.commandName,
-          None,
-          cmd.commandDescription.blankOption,
-          modelFields)
+    Model(
+      cmd.commandName,
+      cmd.commandName,
+      None,
+      cmd.commandDescription.blankOption,
+      modelFields)
   }
 
   class CommandOperationBuilder[B <: SwaggerOperationBuilder[_]](

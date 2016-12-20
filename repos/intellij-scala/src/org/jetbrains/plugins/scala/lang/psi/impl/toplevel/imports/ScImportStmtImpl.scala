@@ -67,8 +67,9 @@ class ScImportStmtImpl private (stub: StubElement[ScImportStmt],
   import com.intellij.psi.scope._
 
   def importExprs: Array[ScImportExpr] =
-    getStubOrPsiChildren(ScalaElementTypes.IMPORT_EXPR,
-                         JavaArrayFactoryUtil.ScImportExprFactory)
+    getStubOrPsiChildren(
+      ScalaElementTypes.IMPORT_EXPR,
+      JavaArrayFactoryUtil.ScImportExprFactory)
 
   override def processDeclarations(processor: PsiScopeProcessor,
                                    state: ResolveState,
@@ -148,9 +149,10 @@ class ScImportStmtImpl private (stub: StubElement[ScImportStmt],
         def checkResolve(resolve: ResolveResult): Boolean = {
           resolve match {
             case ScalaResolveResult(elem, _) =>
-              PsiTreeUtil.getContextOfType(elem,
-                                           true,
-                                           classOf[ScTypeDefinition]) match {
+              PsiTreeUtil.getContextOfType(
+                elem,
+                true,
+                classOf[ScTypeDefinition]) match {
                 case obj: ScObject if obj.isPackageObject => true
                 case _ => false
               }
@@ -203,8 +205,9 @@ class ScImportStmtImpl private (stub: StubElement[ScImportStmt],
               val excludeImports = settings.getImportsWithPrefix.filter(
                 s =>
                   s.startsWith(ScalaCodeStyleSettings.EXCLUDE_PREFIX) &&
-                    s.substring(ScalaCodeStyleSettings.EXCLUDE_PREFIX.length,
-                                s.lastIndexOf(".")) == pack.getQualifiedName)
+                    s.substring(
+                      ScalaCodeStyleSettings.EXCLUDE_PREFIX.length,
+                      s.lastIndexOf(".")) == pack.getQualifiedName)
               val names = new mutable.HashSet[String]()
               for (prefixImport <- prefixImports) {
                 names +=
@@ -265,18 +268,20 @@ class ScImportStmtImpl private (stub: StubElement[ScImportStmt],
                 (elem, processor) match {
                   case (cl: PsiClass, processor: BaseProcessor)
                       if !cl.isInstanceOf[ScTemplateDefinition] =>
-                    if (!processor.processType(new ScDesignatorType(cl, true),
-                                               place,
-                                               newState))
+                    if (!processor.processType(
+                          new ScDesignatorType(cl, true),
+                          place,
+                          newState))
                       return false
                   case (_, processor: BaseProcessor) if refType.isDefined =>
                     if (!processor.processType(refType.get, place, newState))
                       return false
                   case _ =>
-                    if (!elem.processDeclarations(processor,
-                                                  newState,
-                                                  this,
-                                                  place)) return false
+                    if (!elem.processDeclarations(
+                          processor,
+                          newState,
+                          this,
+                          place)) return false
                 }
               } else if (!processor.execute(elem, newState)) return false
             case Some(set) =>
@@ -296,9 +301,10 @@ class ScImportStmtImpl private (stub: StubElement[ScImportStmt],
                     newState =
                       state.put(ResolverEnv.nameKey, selector.importedName)
                     newState = newState
-                      .put(ImportUsed.key,
-                           Set(importsUsed.toSeq: _*) +
-                             ImportSelectorUsed(selector))
+                      .put(
+                        ImportUsed.key,
+                        Set(importsUsed.toSeq: _*) +
+                          ImportSelectorUsed(selector))
                       .put(ScSubstitutor.key, subst)
                     calculateRefType(checkResolve(result)).foreach { tp =>
                       newState = newState.put(BaseProcessor.FROM_TYPE_KEY, tp)
@@ -338,8 +344,8 @@ class ScImportStmtImpl private (stub: StubElement[ScImportStmt],
                       override def execute(element: PsiElement,
                                            state: ResolveState): Boolean = {
                         if (shadowed.exists(p =>
-                              ScEquivalenceUtil.smartEquivalence(element,
-                                                                 p._2)))
+                              ScEquivalenceUtil
+                                .smartEquivalence(element, p._2)))
                           return true
 
                         var newState = state.put(ScSubstitutor.key, subst)
@@ -381,11 +387,12 @@ class ScImportStmtImpl private (stub: StubElement[ScImportStmt],
                               place,
                               newState)) return false
                       case _ =>
-                        if (!elem.processDeclarations(p1,
-                                                      // In this case import optimizer should check for used selectors
-                                                      newState,
-                                                      this,
-                                                      place)) return false
+                        if (!elem.processDeclarations(
+                              p1,
+                              // In this case import optimizer should check for used selectors
+                              newState,
+                              this,
+                              place)) return false
                     }
                   case _ => true
                 }
@@ -405,9 +412,10 @@ class ScImportStmtImpl private (stub: StubElement[ScImportStmt],
                       case _ => ScSubstitutor.empty
                     }
                     newState = newState
-                      .put(ImportUsed.key,
-                           Set(importsUsed.toSeq: _*) +
-                             ImportSelectorUsed(selector))
+                      .put(
+                        ImportUsed.key,
+                        Set(importsUsed.toSeq: _*) +
+                          ImportSelectorUsed(selector))
                       .put(ScSubstitutor.key, subst.followed(rSubst))
                     calculateRefType(checkResolve(result)).foreach { tp =>
                       newState = newState.put(BaseProcessor.FROM_TYPE_KEY, tp)

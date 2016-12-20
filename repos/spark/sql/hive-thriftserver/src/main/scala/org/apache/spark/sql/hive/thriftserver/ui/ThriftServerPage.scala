@@ -72,15 +72,16 @@ private[ui] class ThriftServerPage(parent: ThriftServerTab)
     val numStatement = listener.getExecutionList.size
     val table =
       if (numStatement > 0) {
-        val headerRow = Seq("User",
-                            "JobID",
-                            "GroupID",
-                            "Start Time",
-                            "Finish Time",
-                            "Duration",
-                            "Statement",
-                            "State",
-                            "Detail")
+        val headerRow = Seq(
+          "User",
+          "JobID",
+          "GroupID",
+          "Start Time",
+          "Finish Time",
+          "Duration",
+          "Statement",
+          "State",
+          "Detail")
         val dataRows = listener.getExecutionList
 
         def generateDataRow(info: ExecutionInfo): Seq[Node] = {
@@ -108,13 +109,14 @@ private[ui] class ThriftServerPage(parent: ThriftServerTab)
         }
 
         Some(
-          UIUtils.listingTable(headerRow,
-                               generateDataRow,
-                               dataRows,
-                               false,
-                               None,
-                               Seq(null),
-                               false))
+          UIUtils.listingTable(
+            headerRow,
+            generateDataRow,
+            dataRows,
+            false,
+            None,
+            Seq(null),
+            false))
       } else {
         None
       }
@@ -158,13 +160,14 @@ private[ui] class ThriftServerPage(parent: ThriftServerTab)
     val table =
       if (numBatches > 0) {
         val dataRows = sessionList
-        val headerRow = Seq("User",
-                            "IP",
-                            "Session ID",
-                            "Start Time",
-                            "Finish Time",
-                            "Duration",
-                            "Total Execute")
+        val headerRow = Seq(
+          "User",
+          "IP",
+          "Session ID",
+          "Start Time",
+          "Finish Time",
+          "Duration",
+          "Total Execute")
         def generateDataRow(session: SessionInfo): Seq[Node] = {
           val sessionLink = "%s/%s/session?id=%s".format(
             UIUtils.prependBaseUri(parent.basePath),
@@ -181,13 +184,14 @@ private[ui] class ThriftServerPage(parent: ThriftServerTab)
         </tr>
         }
         Some(
-          UIUtils.listingTable(headerRow,
-                               generateDataRow,
-                               dataRows,
-                               true,
-                               None,
-                               Seq(null),
-                               false))
+          UIUtils.listingTable(
+            headerRow,
+            generateDataRow,
+            dataRows,
+            true,
+            None,
+            Seq(null),
+            false))
       } else {
         None
       }

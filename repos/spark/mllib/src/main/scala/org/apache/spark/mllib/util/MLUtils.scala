@@ -305,15 +305,17 @@ object MLUtils {
     val numFoldsF = numFolds.toFloat
     (1 to numFolds)
       .map { fold =>
-        val sampler = new BernoulliCellSampler[T]((fold - 1) / numFoldsF,
-                                                  fold / numFoldsF,
-                                                  complement = false)
+        val sampler = new BernoulliCellSampler[T](
+          (fold - 1) / numFoldsF,
+          fold / numFoldsF,
+          complement = false)
         val validation = new PartitionwiseSampledRDD(rdd, sampler, true, seed)
         val training =
-          new PartitionwiseSampledRDD(rdd,
-                                      sampler.cloneComplement(),
-                                      true,
-                                      seed)
+          new PartitionwiseSampledRDD(
+            rdd,
+            sampler.cloneComplement(),
+            true,
+            seed)
         (training, validation)
       }
       .toArray

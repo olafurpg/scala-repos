@@ -122,10 +122,11 @@ object ExtractCssSelectorExamples extends App {
 
           (labelExtractor & partExtractor)(exampleNodes)
 
-          exampleContents ::= ExampleContents(fileContents.filename,
-                                              exampleLabel,
-                                              setupCode,
-                                              parts.reverse)
+          exampleContents ::= ExampleContents(
+            fileContents.filename,
+            exampleLabel,
+            setupCode,
+            parts.reverse)
 
           exampleNodes
         }

@@ -171,8 +171,9 @@ class ExampleInfo(exampleName: String, exampleGroupName: String) {
       require(start >= 0, "Internal error, failed to find `stageHeader`.")
       source.indexOf("{", start + stageHeader.length)
     }
-    require(openingBraceIndex >= 0,
-            "Internal error, failed to find `stageHeader`.")
+    require(
+      openingBraceIndex >= 0,
+      "Internal error, failed to find `stageHeader`.")
     // Get index of closing brace
     val closingBraceIndex = {
       var braceCount = 1

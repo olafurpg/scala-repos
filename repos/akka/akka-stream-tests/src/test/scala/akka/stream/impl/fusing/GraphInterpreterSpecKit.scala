@@ -96,15 +96,16 @@ trait GraphInterpreterSpecKit extends AkkaSpec {
           assembly.stages.map(_.module),
           new java.util.HashMap,
           _ ⇒ ())
-        _interpreter = new GraphInterpreter(assembly,
-                                            NoMaterializer,
-                                            logger,
-                                            inHandlers,
-                                            outHandlers,
-                                            logics,
-                                            (_, _, _) ⇒ (),
-                                            fuzzingMode = false,
-                                            null)
+        _interpreter = new GraphInterpreter(
+          assembly,
+          NoMaterializer,
+          logger,
+          inHandlers,
+          outHandlers,
+          logics,
+          (_, _, _) ⇒ (),
+          fuzzingMode = false,
+          null)
 
         for ((upstream, i) ← upstreams.zipWithIndex) {
           _interpreter.attachUpstreamBoundary(i, upstream._1)
@@ -126,15 +127,16 @@ trait GraphInterpreterSpecKit extends AkkaSpec {
         assembly.stages.map(_.module),
         new java.util.HashMap,
         _ ⇒ ())
-      _interpreter = new GraphInterpreter(assembly,
-                                          NoMaterializer,
-                                          logger,
-                                          inHandlers,
-                                          outHandlers,
-                                          logics,
-                                          (_, _, _) ⇒ (),
-                                          fuzzingMode = false,
-                                          null)
+      _interpreter = new GraphInterpreter(
+        assembly,
+        NoMaterializer,
+        logger,
+        inHandlers,
+        outHandlers,
+        logics,
+        (_, _, _) ⇒ (),
+        fuzzingMode = false,
+        null)
     }
 
     def builder(stages: GraphStageWithMaterializedValue[_ <: Shape, _]*)
@@ -268,12 +270,13 @@ trait GraphInterpreterSpecKit extends AkkaSpec {
       })
     }
 
-    private val assembly = new GraphAssembly(stages = Array.empty,
-                                             originalAttributes = Array.empty,
-                                             ins = Array(null),
-                                             inOwners = Array(-1),
-                                             outs = Array(null),
-                                             outOwners = Array(-1))
+    private val assembly = new GraphAssembly(
+      stages = Array.empty,
+      originalAttributes = Array.empty,
+      ins = Array(null),
+      inOwners = Array(-1),
+      outs = Array(null),
+      outOwners = Array(-1))
 
     manualInit(assembly)
     interpreter.attachDownstreamBoundary(0, in)

@@ -119,8 +119,9 @@ class JepsenInspiredInsertSpec
       val writeProbe = TestProbe()
       val writeAcks = myData.map { i ⇒
         sleepDelay()
-        replicator.tell(Update(key, ORSet(), WriteLocal, Some(i))(_ + i),
-                        writeProbe.ref)
+        replicator.tell(
+          Update(key, ORSet(), WriteLocal, Some(i))(_ + i),
+          writeProbe.ref)
         writeProbe.receiveOne(3.seconds)
       }
       val successWriteAcks = writeAcks.collect {
@@ -158,8 +159,9 @@ class JepsenInspiredInsertSpec
       val writeProbe = TestProbe()
       val writeAcks = myData.map { i ⇒
         sleepDelay()
-        replicator.tell(Update(key, ORSet(), writeMajority, Some(i))(_ + i),
-                        writeProbe.ref)
+        replicator.tell(
+          Update(key, ORSet(), writeMajority, Some(i))(_ + i),
+          writeProbe.ref)
         writeProbe.receiveOne(timeout + 1.second)
       }
       val successWriteAcks = writeAcks.collect {
@@ -208,8 +210,9 @@ class JepsenInspiredInsertSpec
       val writeProbe = TestProbe()
       val writeAcks = myData.map { i ⇒
         sleepDelay()
-        replicator.tell(Update(key, ORSet(), WriteLocal, Some(i))(_ + i),
-                        writeProbe.ref)
+        replicator.tell(
+          Update(key, ORSet(), WriteLocal, Some(i))(_ + i),
+          writeProbe.ref)
         writeProbe.receiveOne(3.seconds)
       }
       val successWriteAcks = writeAcks.collect {
@@ -259,8 +262,9 @@ class JepsenInspiredInsertSpec
       val writeProbe = TestProbe()
       val writeAcks = myData.map { i ⇒
         sleepDelay()
-        replicator.tell(Update(key, ORSet(), writeMajority, Some(i))(_ + i),
-                        writeProbe.ref)
+        replicator.tell(
+          Update(key, ORSet(), writeMajority, Some(i))(_ + i),
+          writeProbe.ref)
         writeProbe.receiveOne(timeout + 1.second)
       }
       val successWriteAcks = writeAcks.collect {

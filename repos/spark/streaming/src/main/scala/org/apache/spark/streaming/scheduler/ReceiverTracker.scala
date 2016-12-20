@@ -310,22 +310,24 @@ private[streaming] class ReceiverTracker(ssc: StreamingContext,
     val lastErrorTime =
       if (error == null || error == "") -1
       else ssc.scheduler.clock.getTimeMillis()
-    val errorInfo = ReceiverErrorInfo(lastErrorMessage = message,
-                                      lastError = error,
-                                      lastErrorTime = lastErrorTime)
+    val errorInfo = ReceiverErrorInfo(
+      lastErrorMessage = message,
+      lastError = error,
+      lastErrorTime = lastErrorTime)
     val newReceiverTrackingInfo = receiverTrackingInfos.get(streamId) match {
       case Some(oldInfo) =>
         oldInfo
           .copy(state = ReceiverState.INACTIVE, errorInfo = Some(errorInfo))
       case None =>
         logWarning("No prior receiver info")
-        ReceiverTrackingInfo(streamId,
-                             ReceiverState.INACTIVE,
-                             None,
-                             None,
-                             None,
-                             None,
-                             Some(errorInfo))
+        ReceiverTrackingInfo(
+          streamId,
+          ReceiverState.INACTIVE,
+          None,
+          None,
+          None,
+          None,
+          Some(errorInfo))
     }
     receiverTrackingInfos(streamId) = newReceiverTrackingInfo
     listenerBus.post(
@@ -368,13 +370,14 @@ private[streaming] class ReceiverTracker(ssc: StreamingContext,
           lastErrorMessage = message,
           lastError = error,
           lastErrorTime = ssc.scheduler.clock.getTimeMillis())
-        ReceiverTrackingInfo(streamId,
-                             ReceiverState.INACTIVE,
-                             None,
-                             None,
-                             None,
-                             None,
-                             Some(errorInfo))
+        ReceiverTrackingInfo(
+          streamId,
+          ReceiverState.INACTIVE,
+          None,
+          None,
+          None,
+          None,
+          Some(errorInfo))
     }
 
     receiverTrackingInfos(streamId) = newReceiverTrackingInfo
@@ -407,13 +410,15 @@ private[streaming] class ReceiverTracker(ssc: StreamingContext,
       scheduledLocations: Seq[TaskLocation]): Unit = {
     val newReceiverTrackingInfo = receiverTrackingInfos.get(receiverId) match {
       case Some(oldInfo) =>
-        oldInfo.copy(state = ReceiverState.SCHEDULED,
-                     scheduledLocations = Some(scheduledLocations))
+        oldInfo.copy(
+          state = ReceiverState.SCHEDULED,
+          scheduledLocations = Some(scheduledLocations))
       case None =>
-        ReceiverTrackingInfo(receiverId,
-                             ReceiverState.SCHEDULED,
-                             Some(scheduledLocations),
-                             runningExecutor = None)
+        ReceiverTrackingInfo(
+          receiverId,
+          ReceiverState.SCHEDULED,
+          Some(scheduledLocations),
+          runningExecutor = None)
     }
     receiverTrackingInfos.put(receiverId, newReceiverTrackingInfo)
   }
@@ -430,8 +435,9 @@ private[streaming] class ReceiverTracker(ssc: StreamingContext,
     if (ssc.sc.isLocal) {
       val blockManagerId = ssc.sparkContext.env.blockManager.blockManagerId
       Seq(
-        ExecutorCacheTaskLocation(blockManagerId.host,
-                                  blockManagerId.executorId))
+        ExecutorCacheTaskLocation(
+          blockManagerId.host,
+          blockManagerId.executorId))
     } else {
       ssc.sparkContext.env.blockManager.master.getMemoryStatus
         .filter {
@@ -440,8 +446,9 @@ private[streaming] class ReceiverTracker(ssc: StreamingContext,
         }
         .map {
           case (blockManagerId, _) =>
-            ExecutorCacheTaskLocation(blockManagerId.host,
-                                      blockManagerId.executorId)
+            ExecutorCacheTaskLocation(
+              blockManagerId.host,
+              blockManagerId.executorId)
         }
         .toSeq
     }
@@ -527,10 +534,11 @@ private[streaming] class ReceiverTracker(ssc: StreamingContext,
             val newReceiverInfo = oldReceiverInfo
               .copy(state = ReceiverState.INACTIVE, scheduledLocations = None)
             receiverTrackingInfos(receiver.streamId) = newReceiverInfo
-            schedulingPolicy.rescheduleReceiver(receiver.streamId,
-                                                receiver.preferredLocation,
-                                                receiverTrackingInfos,
-                                                getExecutors)
+            schedulingPolicy.rescheduleReceiver(
+              receiver.streamId,
+              receiver.preferredLocation,
+              receiverTrackingInfos,
+              getExecutors)
           }
         // Assume there is one receiver restarting at one time, so we don't need to update
         // receiverTrackingInfos
@@ -549,17 +557,19 @@ private[streaming] class ReceiverTracker(ssc: StreamingContext,
     override def receiveAndReply(
         context: RpcCallContext): PartialFunction[Any, Unit] = {
       // Remote messages
-      case RegisterReceiver(streamId,
-                            typ,
-                            host,
-                            executorId,
-                            receiverEndpoint) =>
-        val successful = registerReceiver(streamId,
-                                          typ,
-                                          host,
-                                          executorId,
-                                          receiverEndpoint,
-                                          context.senderAddress)
+      case RegisterReceiver(
+          streamId,
+          typ,
+          host,
+          executorId,
+          receiverEndpoint) =>
+        val successful = registerReceiver(
+          streamId,
+          typ,
+          host,
+          executorId,
+          receiverEndpoint,
+          context.senderAddress)
         context.reply(successful)
       case AddBlock(receivedBlockInfo) =>
         if (WriteAheadLogUtils.isBatchingEnabled(ssc.conf, isDriver = true)) {

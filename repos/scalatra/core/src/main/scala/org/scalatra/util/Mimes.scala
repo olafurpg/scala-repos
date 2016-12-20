@@ -22,11 +22,12 @@ object Mimes {
   private def registerEncodingsIfNotSet(): Unit = {
     synchronized {
       if (EncodingGuesser.getSupportedEncodings.isEmpty) {
-        val enc = Set("UTF-8",
-                      "ISO-8859-1",
-                      "windows-1252",
-                      "MacRoman",
-                      EncodingGuesser.getDefaultEncoding)
+        val enc = Set(
+          "UTF-8",
+          "ISO-8859-1",
+          "windows-1252",
+          "MacRoman",
+          EncodingGuesser.getDefaultEncoding)
         EncodingGuesser.setSupportedEncodings(enc)
       }
     }

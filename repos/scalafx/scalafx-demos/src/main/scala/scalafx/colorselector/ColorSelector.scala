@@ -77,10 +77,11 @@ object ColorSelector extends JFXApp {
       if (controlAlpha.disabled.value) 1.0
       else (controlAlpha.value.toDouble / colorselector.Max)
 
-    this.currentColor() = Color.rgb(controlRed.value.toInt,
-                                    controlGreen.value.toInt,
-                                    controlBlue.value.toInt,
-                                    newAlphaValue)
+    this.currentColor() = Color.rgb(
+      controlRed.value.toInt,
+      controlGreen.value.toInt,
+      controlBlue.value.toInt,
+      newAlphaValue)
   }
 
   private def synchronizeValues(buffer: ObservableBuffer[SliderControl],
@@ -159,32 +160,36 @@ object ColorSelector extends JFXApp {
   }
   controlRed.value.onChange({
     changeColor()
-    controlRed.changeColor(Color.rgb(controlRed.value.value.toInt, 0, 0),
-                           getForegroundColor(controlRed.value.value))
+    controlRed.changeColor(
+      Color.rgb(controlRed.value.value.toInt, 0, 0),
+      getForegroundColor(controlRed.value.value))
   })
   controlRed.selectedControl.onChange(controlSelected(controlRed))
-  controlRed.changeColor(Color.rgb(controlRed.value.value.toInt, 0, 0),
-                         getForegroundColor(controlRed.value.value))
+  controlRed.changeColor(
+    Color.rgb(controlRed.value.value.toInt, 0, 0),
+    getForegroundColor(controlRed.value.value))
 
   val controlGreen = new SliderControl("G") {
     value = 255
   }
   controlGreen.value.onChange({
     changeColor()
-    controlGreen.changeColor(Color.rgb(0, controlGreen.value.value.toInt, 0),
-                             getForegroundColor(controlGreen.value.value))
+    controlGreen.changeColor(
+      Color.rgb(0, controlGreen.value.value.toInt, 0),
+      getForegroundColor(controlGreen.value.value))
   })
   controlGreen.selectedControl.onChange(controlSelected(controlGreen))
-  controlGreen.changeColor(Color.rgb(0, controlGreen.value.value.toInt, 0),
-                           getForegroundColor(controlGreen.value.value))
+  controlGreen.changeColor(
+    Color.rgb(0, controlGreen.value.value.toInt, 0),
+    getForegroundColor(controlGreen.value.value))
 
   val controlBlue = new SliderControl("B") {
     value = 255
   }
   controlBlue.value.onChange({
     changeColor()
-    controlBlue.changeColor(Color.rgb(0, 0, controlBlue.value.value.toInt),
-                            Color.White)
+    controlBlue
+      .changeColor(Color.rgb(0, 0, controlBlue.value.value.toInt), Color.White)
   })
   controlBlue.selectedControl.onChange(controlSelected(controlBlue))
   controlBlue
@@ -258,11 +263,12 @@ object ColorSelector extends JFXApp {
   val pnlMain = new GridPane {
     hgap = 5.0
     vgap = 5.0
-    rowConstraints = List(rectangleRowsConstraint,
-                          otherRowsConstraint,
-                          otherRowsConstraint,
-                          otherRowsConstraint,
-                          otherRowsConstraint)
+    rowConstraints = List(
+      rectangleRowsConstraint,
+      otherRowsConstraint,
+      otherRowsConstraint,
+      otherRowsConstraint,
+      otherRowsConstraint)
     columnConstraints = List(column0Constraint, column1Constraint)
     padding = colorselector.insets
 

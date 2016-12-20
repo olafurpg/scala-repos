@@ -249,26 +249,29 @@ object CssSelectorSpec extends Specification with XmlMatchers {
       CssSelectorParser
         .parse("div .foo [woof] ")
         .openOrThrowException("If the box is empty, we want a failure") must_==
-        EnclosedSelector(ElemSelector("div", Empty),
-                         ClassSelector("foo", Full(AttrSubNode("woof"))))
+        EnclosedSelector(
+          ElemSelector("div", Empty),
+          ClassSelector("foo", Full(AttrSubNode("woof"))))
     }
 
     "select multiple depth with star" in {
       CssSelectorParser
         .parse("div .foo * ")
         .openOrThrowException("If the box is empty, we want a failure") must_==
-        EnclosedSelector(ElemSelector("div", Empty),
-                         ClassSelector("foo", Full(KidsSubNode())))
+        EnclosedSelector(
+          ElemSelector("div", Empty),
+          ClassSelector("foo", Full(KidsSubNode())))
     }
 
     "select multiple super depth with star" in {
       CssSelectorParser
         .parse("span div .foo * ")
         .openOrThrowException("If the box is empty, we want a failure") must_==
-        EnclosedSelector(ElemSelector("span", Empty),
-                         EnclosedSelector(ElemSelector("div", Empty),
-                                          ClassSelector("foo",
-                                                        Full(KidsSubNode()))))
+        EnclosedSelector(
+          ElemSelector("span", Empty),
+          EnclosedSelector(
+            ElemSelector("div", Empty),
+            ClassSelector("foo", Full(KidsSubNode()))))
     }
   }
 }
@@ -819,10 +822,11 @@ object CssBindHelpersSpec extends Specification with XmlMatchers {
 
     "list of Nodes" in {
       val answer =
-        ("#moose *" #> List[NodeSeq](<i>"a"</i>,
-                                     Text("b"),
-                                     Text("c"),
-                                     <b>woof</b>) & ClearClearable).apply(<ul>
+        ("#moose *" #> List[NodeSeq](
+          <i>"a"</i>,
+          Text("b"),
+          Text("c"),
+          <b>woof</b>) & ClearClearable).apply(<ul>
           <li id="moose">first</li>
           <li class="clearable">second</li>
           <li class="clearable">Third</li>
@@ -886,10 +890,11 @@ object CssBindHelpersSpec extends Specification with XmlMatchers {
 
     "list of Nodes" in {
       val answer =
-        (("#moose *" replaceWith List[NodeSeq](<i>"a"</i>,
-                                               Text("b"),
-                                               Text("c"),
-                                               <b>woof</b>)) & ClearClearable)
+        (("#moose *" replaceWith List[NodeSeq](
+          <i>"a"</i>,
+          Text("b"),
+          Text("c"),
+          <b>woof</b>)) & ClearClearable)
           .apply(<ul>
           <li id="moose">first</li>
           <li class="clearable">second</li>

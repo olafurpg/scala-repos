@@ -369,11 +369,12 @@ private[persistence] trait Eventsourced
       event,
       handler.asInstanceOf[Any ⇒ Unit])
     eventBatch ::= AtomicWrite(
-      PersistentRepr(event,
-                     persistenceId = persistenceId,
-                     sequenceNr = nextSequenceNr(),
-                     writerUuid = writerUuid,
-                     sender = sender()))
+      PersistentRepr(
+        event,
+        persistenceId = persistenceId,
+        sequenceNr = nextSequenceNr(),
+        writerUuid = writerUuid,
+        sender = sender()))
   }
 
   /**
@@ -394,11 +395,12 @@ private[persistence] trait Eventsourced
       }
       eventBatch ::= AtomicWrite(
         events.map(
-          PersistentRepr.apply(_,
-                               persistenceId = persistenceId,
-                               sequenceNr = nextSequenceNr(),
-                               writerUuid = writerUuid,
-                               sender = sender())))
+          PersistentRepr.apply(
+            _,
+            persistenceId = persistenceId,
+            sequenceNr = nextSequenceNr(),
+            writerUuid = writerUuid,
+            sender = sender())))
     }
   }
 
@@ -434,11 +436,12 @@ private[persistence] trait Eventsourced
       event,
       handler.asInstanceOf[Any ⇒ Unit])
     eventBatch ::= AtomicWrite(
-      PersistentRepr(event,
-                     persistenceId = persistenceId,
-                     sequenceNr = nextSequenceNr(),
-                     writerUuid = writerUuid,
-                     sender = sender()))
+      PersistentRepr(
+        event,
+        persistenceId = persistenceId,
+        sequenceNr = nextSequenceNr(),
+        writerUuid = writerUuid,
+        sender = sender()))
   }
 
   /**
@@ -458,11 +461,12 @@ private[persistence] trait Eventsourced
       }
       eventBatch ::= AtomicWrite(
         events.map(
-          PersistentRepr(_,
-                         persistenceId = persistenceId,
-                         sequenceNr = nextSequenceNr(),
-                         writerUuid = writerUuid,
-                         sender = sender())))
+          PersistentRepr(
+            _,
+            persistenceId = persistenceId,
+            sequenceNr = nextSequenceNr(),
+            writerUuid = writerUuid,
+            sender = sender())))
     }
 
   @deprecated("use persistAllAsync instead", "2.4")
@@ -570,11 +574,12 @@ private[persistence] trait Eventsourced
               SnapshotOffer(metadata, snapshot))
         }
         changeState(recovering(recoveryBehavior))
-        journal ! ReplayMessages(lastSequenceNr + 1L,
-                                 toSnr,
-                                 replayMax,
-                                 persistenceId,
-                                 self)
+        journal ! ReplayMessages(
+          lastSequenceNr + 1L,
+          toSnr,
+          replayMax,
+          persistenceId,
+          self)
       case other ⇒
         stashInternally(other)
     }

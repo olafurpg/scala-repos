@@ -19,8 +19,9 @@ class MacrosheetFileHook(private val project: Project)
   override def projectOpened() {
     project.getMessageBus
       .connect(project)
-      .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER,
-                 MacrosheetEditorListener)
+      .subscribe(
+        FileEditorManagerListener.FILE_EDITOR_MANAGER,
+        MacrosheetEditorListener)
   }
 
   override def projectClosed() {

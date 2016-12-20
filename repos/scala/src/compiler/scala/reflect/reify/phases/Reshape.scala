@@ -73,9 +73,9 @@ trait Reshape { self: Reifier =>
         case block @ Block(stats, expr) =>
           val stats1 = reshapeLazyVals(trimSyntheticCaseClassCompanions(stats))
           Block(stats1, expr).copyAttrs(block)
-        case unapply @ UnApply(Unapplied(
-                                 Select(fun, nme.unapply | nme.unapplySeq)),
-                               args) =>
+        case unapply @ UnApply(
+              Unapplied(Select(fun, nme.unapply | nme.unapplySeq)),
+              args) =>
           if (reifyDebug) println("unapplying unapply: " + tree)
           Apply(fun, args).copyAttrs(unapply)
         case _ =>
@@ -233,8 +233,9 @@ trait Reshape { self: Reifier =>
         }
       case at @ Annotated(annot, arg) =>
         if (reifyDebug) println("reify type annotations for: " + tree)
-        assert(at.tpe.isInstanceOf[AnnotatedType],
-               "%s (%s)".format(at.tpe, at.tpe.kind))
+        assert(
+          at.tpe.isInstanceOf[AnnotatedType],
+          "%s (%s)".format(at.tpe, at.tpe.kind))
         val annot1 = toPreTyperAnnotation(
           at.tpe.asInstanceOf[AnnotatedType].annotations(0))
         if (reifyDebug) println("originals are: " + annot1)
@@ -254,8 +255,9 @@ trait Reshape { self: Reifier =>
             (jann: @unchecked) match {
               case LiteralAnnotArg(const) => Literal(const)
               case ArrayAnnotArg(arr) =>
-                Apply(Ident(definitions.ArrayModule),
-                      arr.toList map toScalaAnnotation)
+                Apply(
+                  Ident(definitions.ArrayModule),
+                  arr.toList map toScalaAnnotation)
               case NestedAnnotArg(ann) => toPreTyperAnnotation(ann)
             }
 
@@ -269,8 +271,9 @@ trait Reshape { self: Reifier =>
         case Apply(Select(New(tpt), _), _) => tpt
       }
       assert(extractOriginal.isDefinedAt(ann.original), showRaw(ann.original))
-      New(TypeTree(ann.atp) setOriginal extractOriginal(ann.original),
-          List(args))
+      New(
+        TypeTree(ann.atp) setOriginal extractOriginal(ann.original),
+        List(args))
     }
 
     private def toPreTyperLazyVal(ddef: DefDef): ValDef = {

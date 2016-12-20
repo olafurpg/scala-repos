@@ -114,29 +114,30 @@ object RunWorkflow extends Logging {
            Seq()
          }) ++
         (if (ca.common.sparkKryo) {
-           Seq("--conf",
-               "spark.serializer=org.apache.spark.serializer.KryoSerializer")
+           Seq(
+             "--conf",
+             "spark.serializer=org.apache.spark.serializer.KryoSerializer")
          } else {
            Seq()
-         }) ++ Seq(mainJar,
-                   "--env",
-                   pioEnvVars,
-                   "--engine-id",
-                   em.id,
-                   "--engine-version",
-                   em.version,
-                   "--engine-variant",
-                   if (deployMode == "cluster") {
-                     hdfs
-                       .makeQualified(
-                         new Path((engineLocation :+ variantJson.getName)
-                           .mkString(Path.SEPARATOR)))
-                       .toString
-                   } else {
-                     variantJson.getCanonicalPath
-                   },
-                   "--verbosity",
-                   ca.common.verbosity.toString) ++ ca.common.engineFactory
+         }) ++ Seq(
+        mainJar,
+        "--env",
+        pioEnvVars,
+        "--engine-id",
+        em.id,
+        "--engine-version",
+        em.version,
+        "--engine-variant",
+        if (deployMode == "cluster") {
+          hdfs
+            .makeQualified(new Path((engineLocation :+ variantJson.getName)
+              .mkString(Path.SEPARATOR)))
+            .toString
+        } else {
+          variantJson.getCanonicalPath
+        },
+        "--verbosity",
+        ca.common.verbosity.toString) ++ ca.common.engineFactory
         .map(x => Seq("--engine-factory", x))
         .getOrElse(Seq()) ++ ca.common.engineParamsKey
         .map(x => Seq("--engine-params-key", x))
@@ -167,23 +168,25 @@ object RunWorkflow extends Logging {
            Seq()) ++ Seq("--json-extractor", ca.common.jsonExtractor.toString)
 
     info(s"Submission command: ${sparkSubmit.mkString(" ")}")
-    Process(sparkSubmit,
-            None,
-            "CLASSPATH" -> "",
-            "SPARK_YARN_USER_ENV" -> pioEnvVars).!
+    Process(
+      sparkSubmit,
+      None,
+      "CLASSPATH" -> "",
+      "SPARK_YARN_USER_ENV" -> pioEnvVars).!
   }
 
   def newRunWorkflow(ca: ConsoleArgs, em: EngineManifest): Int = {
     val jarFiles = em.files.map(new URI(_))
     val args =
-      Seq("--engine-id",
-          em.id,
-          "--engine-version",
-          em.version,
-          "--engine-variant",
-          ca.common.variantJson.toURI.toString,
-          "--verbosity",
-          ca.common.verbosity.toString) ++ ca.common.engineFactory
+      Seq(
+        "--engine-id",
+        em.id,
+        "--engine-version",
+        em.version,
+        "--engine-variant",
+        ca.common.variantJson.toURI.toString,
+        "--verbosity",
+        ca.common.verbosity.toString) ++ ca.common.engineFactory
         .map(x => Seq("--engine-factory", x))
         .getOrElse(Seq()) ++ ca.common.engineParamsKey
         .map(x => Seq("--engine-params-key", x))

@@ -129,11 +129,12 @@ object build extends Build {
         }),
       scalacOptions in (Compile, doc) ++= {
         val base = (baseDirectory in LocalRootProject).value.getAbsolutePath
-        Seq("-sourcepath",
-            base,
-            "-doc-source-url",
-            "https://github.com/scalaz/scalaz/tree/" + tagOrHash.value +
-              "€{FILE_PATH}.scala")
+        Seq(
+          "-sourcepath",
+          base,
+          "-doc-source-url",
+          "https://github.com/scalaz/scalaz/tree/" + tagOrHash.value +
+            "€{FILE_PATH}.scala")
       },
       // retronym: I was seeing intermittent heap exhaustion in scalacheck based tests, so opting for determinism.
       parallelExecution in Test := false,
@@ -171,8 +172,8 @@ object build extends Build {
       genToSyntax <<= typeClasses map { (tcs: Seq[TypeClass]) =>
         val objects = tcs
           .map(tc =>
-            "object %s extends To%sSyntax".format(Util.initLower(tc.name),
-                                                  tc.name))
+            "object %s extends To%sSyntax"
+              .format(Util.initLower(tc.name), tc.name))
           .mkString("\n")
         val all =
           "object all extends " +
@@ -387,14 +388,16 @@ object build extends Build {
       )
   )
 
-  lazy val scalacheckBinding = CrossProject("scalacheck-binding",
-                                            file("scalacheck-binding"),
-                                            ScalazCrossType)
+  lazy val scalacheckBinding = CrossProject(
+    "scalacheck-binding",
+    file("scalacheck-binding"),
+    ScalazCrossType)
     .settings(standardSettings: _*)
-    .settings(name := "scalaz-scalacheck-binding",
-              libraryDependencies +=
-                "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value,
-              osgiExport("scalaz.scalacheck"))
+    .settings(
+      name := "scalaz-scalacheck-binding",
+      libraryDependencies +=
+        "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value,
+      osgiExport("scalaz.scalacheck"))
     .dependsOn(core, iteratee)
     .jvmConfigure(_ dependsOn concurrent)
     .jsSettings(scalajsProjectSettings: _*)
@@ -433,10 +436,11 @@ object build extends Build {
     credentials += {
       Seq("build.publish.user", "build.publish.password") map sys.props.get match {
         case Seq(Some(user), Some(pass)) =>
-          Credentials("Sonatype Nexus Repository Manager",
-                      "oss.sonatype.org",
-                      user,
-                      pass)
+          Credentials(
+            "Sonatype Nexus Repository Manager",
+            "oss.sonatype.org",
+            user,
+            pass)
         case _ =>
           Credentials(Path.userHome / ".ivy2" / ".credentials")
       }

@@ -27,54 +27,58 @@ class ConfigCommandTest extends ZooKeeperTestHarness with Logging {
   def testArgumentParse() {
     // Should parse correctly
     var createOpts = new ConfigCommandOptions(
-      Array("--zookeeper",
-            zkConnect,
-            "--entity-name",
-            "x",
-            "--entity-type",
-            "clients",
-            "--describe"))
+      Array(
+        "--zookeeper",
+        zkConnect,
+        "--entity-name",
+        "x",
+        "--entity-type",
+        "clients",
+        "--describe"))
     createOpts.checkArgs()
 
     // For --alter and added config
     createOpts = new ConfigCommandOptions(
-      Array("--zookeeper",
-            zkConnect,
-            "--entity-name",
-            "x",
-            "--entity-type",
-            "clients",
-            "--alter",
-            "--add-config",
-            "a=b,c=d"))
+      Array(
+        "--zookeeper",
+        zkConnect,
+        "--entity-name",
+        "x",
+        "--entity-type",
+        "clients",
+        "--alter",
+        "--add-config",
+        "a=b,c=d"))
     createOpts.checkArgs()
 
     // For alter and deleted config
     createOpts = new ConfigCommandOptions(
-      Array("--zookeeper",
-            zkConnect,
-            "--entity-name",
-            "x",
-            "--entity-type",
-            "clients",
-            "--alter",
-            "--delete-config",
-            "a,b,c"))
+      Array(
+        "--zookeeper",
+        zkConnect,
+        "--entity-name",
+        "x",
+        "--entity-type",
+        "clients",
+        "--alter",
+        "--delete-config",
+        "a,b,c"))
     createOpts.checkArgs()
 
     // For alter and both added, deleted config
     createOpts = new ConfigCommandOptions(
-      Array("--zookeeper",
-            zkConnect,
-            "--entity-name",
-            "x",
-            "--entity-type",
-            "clients",
-            "--alter",
-            "--add-config",
-            "a=b,c=d",
-            "--delete-config",
-            "a"))
+      Array(
+        "--zookeeper",
+        zkConnect,
+        "--entity-name",
+        "x",
+        "--entity-type",
+        "clients",
+        "--alter",
+        "--add-config",
+        "a=b,c=d",
+        "--delete-config",
+        "a"))
     createOpts.checkArgs()
     val addedProps = ConfigCommand.parseConfigsToBeAdded(createOpts)
     assertEquals(2, addedProps.size())

@@ -235,10 +235,11 @@ object HiveThriftServer2 extends Logging {
                          statement: String,
                          groupId: String,
                          userName: String = "UNKNOWN"): Unit = synchronized {
-      val info = new ExecutionInfo(statement,
-                                   sessionId,
-                                   System.currentTimeMillis,
-                                   userName)
+      val info = new ExecutionInfo(
+        statement,
+        sessionId,
+        System.currentTimeMillis,
+        userName)
       info.state = ExecutionState.STARTED
       executionList.put(id, info)
       trimExecutionIfNecessary()

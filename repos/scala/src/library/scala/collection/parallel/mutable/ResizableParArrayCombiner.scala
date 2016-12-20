@@ -84,8 +84,9 @@ trait ResizableParArrayCombiner[T]
     }
     def split = {
       val fp = howmany / 2
-      List(new CopyChainToArray(array, offset, fp),
-           new CopyChainToArray(array, offset + fp, howmany - fp))
+      List(
+        new CopyChainToArray(array, offset, fp),
+        new CopyChainToArray(array, offset + fp, howmany - fp))
     }
     def shouldSplitFurther =
       howmany > scala.collection.parallel

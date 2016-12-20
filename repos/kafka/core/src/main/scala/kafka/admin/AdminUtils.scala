@@ -123,20 +123,22 @@ object AdminUtils extends Logging {
       throw new AdminOperationException(
         s"replication factor: $replicationFactor larger than available brokers: ${brokerMetadatas.size}")
     if (brokerMetadatas.forall(_.rack.isEmpty))
-      assignReplicasToBrokersRackUnaware(nPartitions,
-                                         replicationFactor,
-                                         brokerMetadatas.map(_.id),
-                                         fixedStartIndex,
-                                         startPartitionId)
+      assignReplicasToBrokersRackUnaware(
+        nPartitions,
+        replicationFactor,
+        brokerMetadatas.map(_.id),
+        fixedStartIndex,
+        startPartitionId)
     else {
       if (brokerMetadatas.exists(_.rack.isEmpty))
         throw new AdminOperationException(
           "Not all brokers have rack information for replica rack aware assignment")
-      assignReplicasToBrokersRackAware(nPartitions,
-                                       replicationFactor,
-                                       brokerMetadatas,
-                                       fixedStartIndex,
-                                       startPartitionId)
+      assignReplicasToBrokersRackAware(
+        nPartitions,
+        replicationFactor,
+        brokerMetadatas,
+        fixedStartIndex,
+        startPartitionId)
     }
   }
 
@@ -163,10 +165,11 @@ object AdminUtils extends Logging {
       val replicaBuffer = mutable.ArrayBuffer(brokerArray(firstReplicaIndex))
       for (j <- 0 until replicationFactor - 1)
         replicaBuffer += brokerArray(
-          replicaIndex(firstReplicaIndex,
-                       nextReplicaShift,
-                       j,
-                       brokerArray.length))
+          replicaIndex(
+            firstReplicaIndex,
+            nextReplicaShift,
+            j,
+            brokerArray.length))
       ret.put(currentPartitionId, replicaBuffer)
       currentPartitionId += 1
     }
@@ -211,10 +214,11 @@ object AdminUtils extends Logging {
         var done = false
         while (!done) {
           val broker = arrangedBrokerList(
-            replicaIndex(firstReplicaIndex,
-                         nextReplicaShift * numRacks,
-                         k,
-                         arrangedBrokerList.size))
+            replicaIndex(
+              firstReplicaIndex,
+              nextReplicaShift * numRacks,
+              k,
+              arrangedBrokerList.size))
           val rack = brokerRackMap(broker)
           // Skip this broker if
           // 1. there is already a broker in the same rack that has assigned a replica AND there is one or more racks
@@ -331,10 +335,11 @@ object AdminUtils extends Logging {
           startIndex,
           existingPartitionsReplicaList.size)
       } else
-        getManualReplicaAssignment(replicaAssignmentStr,
-                                   brokerMetadatas.map(_.id).toSet,
-                                   existingPartitionsReplicaList.size,
-                                   checkBrokerAvailable)
+        getManualReplicaAssignment(
+          replicaAssignmentStr,
+          brokerMetadatas.map(_.id).toSet,
+          existingPartitionsReplicaList.size,
+          checkBrokerAvailable)
 
     // check if manual assignment has the right replication factor
     val unmatchedRepFactorList = newPartitionReplicaList.values.filter(p =>
@@ -508,8 +513,9 @@ object AdminUtils extends Logging {
       update: Boolean = false) {
     // validate arguments
     Topic.validate(topic)
-    require(partitionReplicaAssignment.values.map(_.size).toSet.size == 1,
-            "All partitions should have the same number of replicas.")
+    require(
+      partitionReplicaAssignment.values.map(_.size).toSet.size == 1,
+      "All partitions should have the same number of replicas.")
 
     val topicPath = getTopicPath(topic)
 
@@ -531,9 +537,10 @@ object AdminUtils extends Logging {
 
     partitionReplicaAssignment.values.foreach(
       reps =>
-        require(reps.size == reps.toSet.size,
-                "Duplicate replica assignment found: " +
-                  partitionReplicaAssignment))
+        require(
+          reps.size == reps.toSet.size,
+          "Duplicate replica assignment found: " +
+            partitionReplicaAssignment))
 
     // Configs only matter if a topic is being created. Changing configs via AlterTopic is not supported
     if (!update) {
@@ -543,10 +550,11 @@ object AdminUtils extends Logging {
     }
 
     // create the partition assignment
-    writeTopicPartitionAssignment(zkUtils,
-                                  topic,
-                                  partitionReplicaAssignment,
-                                  update)
+    writeTopicPartitionAssignment(
+      zkUtils,
+      topic,
+      partitionReplicaAssignment,
+      update)
   }
 
   private def writeTopicPartitionAssignment(
@@ -625,9 +633,10 @@ object AdminUtils extends Logging {
 
   def getConfigChangeZnodeData(entityType: String,
                                entityName: String): Map[String, Any] = {
-    Map("version" -> 1,
-        "entity_type" -> entityType,
-        "entity_name" -> entityName)
+    Map(
+      "version" -> 1,
+      "entity_type" -> entityType,
+      "entity_name" -> entityName)
   }
 
   /**
@@ -642,8 +651,9 @@ object AdminUtils extends Logging {
       config
     }
     val map = Map("version" -> 1, "config" -> configMap)
-    zkUtils.updatePersistentPath(getEntityConfigPath(entityType, entityName),
-                                 Json.encode(map))
+    zkUtils.updatePersistentPath(
+      getEntityConfigPath(entityType, entityName),
+      Json.encode(map))
   }
 
   /**
@@ -774,31 +784,36 @@ object AdminUtils extends Logging {
                 inSyncReplicas
                   .filterNot(isrInfo.map(_.id).contains(_))
                   .mkString(","))
-          new MetadataResponse.PartitionMetadata(Errors.NONE,
-                                                 partition,
-                                                 leaderInfo,
-                                                 replicaInfo.asJava,
-                                                 isrInfo.asJava)
+          new MetadataResponse.PartitionMetadata(
+            Errors.NONE,
+            partition,
+            leaderInfo,
+            replicaInfo.asJava,
+            isrInfo.asJava)
         } catch {
           case e: Throwable =>
-            debug("Error while fetching metadata for partition [%s,%d]"
-                    .format(topic, partition),
-                  e)
-            new MetadataResponse.PartitionMetadata(Errors.forException(e),
-                                                   partition,
-                                                   leaderInfo,
-                                                   replicaInfo.asJava,
-                                                   isrInfo.asJava)
+            debug(
+              "Error while fetching metadata for partition [%s,%d]"
+                .format(topic, partition),
+              e)
+            new MetadataResponse.PartitionMetadata(
+              Errors.forException(e),
+              partition,
+              leaderInfo,
+              replicaInfo.asJava,
+              isrInfo.asJava)
         }
       }
-      new MetadataResponse.TopicMetadata(Errors.NONE,
-                                         topic,
-                                         partitionMetadata.toList.asJava)
+      new MetadataResponse.TopicMetadata(
+        Errors.NONE,
+        topic,
+        partitionMetadata.toList.asJava)
     } else {
       // topic doesn't exist, send appropriate error code
-      new MetadataResponse.TopicMetadata(Errors.UNKNOWN_TOPIC_OR_PARTITION,
-                                         topic,
-                                         java.util.Collections.emptyList())
+      new MetadataResponse.TopicMetadata(
+        Errors.UNKNOWN_TOPIC_OR_PARTITION,
+        topic,
+        java.util.Collections.emptyList())
     }
   }
 

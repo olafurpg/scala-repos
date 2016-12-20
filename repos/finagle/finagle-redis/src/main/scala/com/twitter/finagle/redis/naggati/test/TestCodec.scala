@@ -108,10 +108,11 @@ class TestCodec[A](val codec: Codec[A]) {
     downstreamOutput.clear()
     codec.handleDownstream(
       context,
-      new DownstreamMessageEvent(pipeline.getChannel,
-                                 Channels.future(pipeline.getChannel),
-                                 obj,
-                                 null))
+      new DownstreamMessageEvent(
+        pipeline.getChannel,
+        Channels.future(pipeline.getChannel),
+        obj,
+        null))
     getDownstream
   }
 

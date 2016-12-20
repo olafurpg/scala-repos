@@ -124,9 +124,10 @@ class MessageSerializer(val system: ExtendedActorSystem)
       .iterator()
       .asScala foreach { next ⇒
       unconfirmedDeliveries +=
-        UnconfirmedDelivery(next.getDeliveryId,
-                            ActorPath.fromString(next.getDestination),
-                            payload(next.getPayload))
+        UnconfirmedDelivery(
+          next.getDeliveryId,
+          ActorPath.fromString(next.getDestination),
+          payload(next.getPayload))
     }
 
     AtLeastOnceDeliverySnapshot(
@@ -136,12 +137,13 @@ class MessageSerializer(val system: ExtendedActorSystem)
 
   def stateChange(persistentStateChange: mf.PersistentStateChangeEvent)
     : StateChangeEvent = {
-    StateChangeEvent(persistentStateChange.getStateIdentifier,
-                     if (persistentStateChange.hasTimeout)
-                       Some(
-                         Duration(persistentStateChange.getTimeout)
-                           .asInstanceOf[duration.FiniteDuration])
-                     else None)
+    StateChangeEvent(
+      persistentStateChange.getStateIdentifier,
+      if (persistentStateChange.hasTimeout)
+        Some(
+          Duration(persistentStateChange.getTimeout)
+            .asInstanceOf[duration.FiniteDuration])
+      else None)
   }
 
   private def atomicWriteBuilder(a: AtomicWrite) = {
@@ -240,9 +242,10 @@ class MessageSerializer(val system: ExtendedActorSystem)
       else ""
 
     serialization
-      .deserialize(persistentPayload.getPayload.toByteArray,
-                   persistentPayload.getSerializerId,
-                   manifest)
+      .deserialize(
+        persistentPayload.getPayload.toByteArray,
+        persistentPayload.getSerializerId,
+        manifest)
       .get
   }
 }

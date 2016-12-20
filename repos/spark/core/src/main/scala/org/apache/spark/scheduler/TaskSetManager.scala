@@ -191,8 +191,9 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
     for (loc <- tasks(index).preferredLocations) {
       loc match {
         case e: ExecutorCacheTaskLocation =>
-          pendingTasksForExecutor.getOrElseUpdate(e.executorId,
-                                                  new ArrayBuffer) += index
+          pendingTasksForExecutor.getOrElseUpdate(
+            e.executorId,
+            new ArrayBuffer) += index
         case e: HDFSCacheTaskLocation => {
           val exe = sched.getExecutorsAliveOnHost(loc.host)
           exe match {
@@ -383,8 +384,9 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
                           host: String,
                           maxLocality: TaskLocality.Value)
     : Option[(Int, TaskLocality.Value, Boolean)] = {
-    for (index <- dequeueTaskFromList(execId,
-                                      getPendingTasksForExecutor(execId))) {
+    for (index <- dequeueTaskFromList(
+           execId,
+           getPendingTasksForExecutor(execId))) {
       return Some((index, TaskLocality.PROCESS_LOCAL, false))
     }
 
@@ -459,14 +461,15 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
           // Do various bookkeeping
           copiesRunning(index) += 1
           val attemptNum = taskAttempts(index).size
-          val info = new TaskInfo(taskId,
-                                  index,
-                                  attemptNum,
-                                  curTime,
-                                  execId,
-                                  host,
-                                  taskLocality,
-                                  speculative)
+          val info = new TaskInfo(
+            taskId,
+            index,
+            attemptNum,
+            curTime,
+            execId,
+            host,
+            taskLocality,
+            speculative)
           taskInfos(taskId) = info
           taskAttempts(index) = info :: taskAttempts(index)
           // Update our locality level for delay scheduling
@@ -478,10 +481,11 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
           // Serialize and return the task
           val startTime = clock.getTimeMillis()
           val serializedTask: ByteBuffer = try {
-            Task.serializeWithDependencies(task,
-                                           sched.sc.addedFiles,
-                                           sched.sc.addedJars,
-                                           ser)
+            Task.serializeWithDependencies(
+              task,
+              sched.sc.addedFiles,
+              sched.sc.addedJars,
+              ser)
           } catch {
             // If the task cannot be serialized, then there's no point to re-attempt the task,
             // as it will always fail. So just abort the whole task-set.
@@ -512,12 +516,13 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
 
           sched.dagScheduler.taskStarted(task, info)
           return Some(
-            new TaskDescription(taskId = taskId,
-                                attemptNumber = attemptNum,
-                                execId,
-                                taskName,
-                                index,
-                                serializedTask))
+            new TaskDescription(
+              taskId = taskId,
+              attemptNumber = attemptNum,
+              execId,
+              taskName,
+              index,
+              serializedTask))
         }
         case _ =>
       }
@@ -658,11 +663,12 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
     // "result.value()" in "TaskResultGetter.enqueueSuccessfulTask" before reaching here.
     // Note: "result.value()" only deserializes the value when it's called at the first time, so
     // here "result.value()" just returns the value and won't block other threads.
-    sched.dagScheduler.taskEnded(tasks(index),
-                                 Success,
-                                 result.value(),
-                                 result.accumUpdates,
-                                 info)
+    sched.dagScheduler.taskEnded(
+      tasks(index),
+      Success,
+      result.value(),
+      result.accumUpdates,
+      info)
     if (!successful(index)) {
       tasksSuccessful += 1
       logInfo(
@@ -855,11 +861,12 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
           addPendingTask(index)
           // Tell the DAGScheduler that this task was resubmitted so that it doesn't think our
           // stage finishes when a total of tasks.size tasks finish.
-          sched.dagScheduler.taskEnded(tasks(index),
-                                       Resubmitted,
-                                       null,
-                                       Seq.empty[AccumulableInfo],
-                                       info)
+          sched.dagScheduler.taskEnded(
+            tasks(index),
+            Resubmitted,
+            null,
+            Seq.empty[AccumulableInfo],
+            info)
         }
       }
     }
@@ -870,11 +877,13 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
         case ExecutorKilled => false
         case _ => true
       }
-      handleFailedTask(tid,
-                       TaskState.FAILED,
-                       ExecutorLostFailure(info.executorId,
-                                           exitCausedByApp,
-                                           Some(reason.toString)))
+      handleFailedTask(
+        tid,
+        TaskState.FAILED,
+        ExecutorLostFailure(
+          info.executorId,
+          exitCausedByApp,
+          Some(reason.toString)))
     }
     // recalculate valid locality levels and waits when executor is lost
     recomputeLocality()

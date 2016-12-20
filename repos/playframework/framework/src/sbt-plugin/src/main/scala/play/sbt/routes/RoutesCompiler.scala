@@ -90,12 +90,12 @@ object RoutesCompiler extends AutoPlugin {
 
             // Find the routes compile tasks for this project
             val thisProjectTasks = (sources in routes).value.map { file =>
-              RoutesCompilerTask(file,
-                                 routesImport.value,
-                                 forwardsRouter = true,
-                                 reverseRouter = generateReverseRouter.value,
-                                 namespaceReverseRouter =
-                                   namespaceReverseRouter.value)
+              RoutesCompilerTask(
+                file,
+                routesImport.value,
+                forwardsRouter = true,
+                reverseRouter = generateReverseRouter.value,
+                namespaceReverseRouter = namespaceReverseRouter.value)
             }
 
             thisProjectTasks ++ reverseRouterTasks
@@ -140,11 +140,12 @@ object RoutesCompiler extends AutoPlugin {
   )
 
   private val compileRoutesFiles = Def.task[Seq[File]] {
-    compileRoutes(routesCompilerTasks.value,
-                  routesGenerator.value,
-                  (target in routes).value,
-                  streams.value.cacheDirectory,
-                  state.value.log)
+    compileRoutes(
+      routesCompilerTasks.value,
+      routesGenerator.value,
+      (target in routes).value,
+      streams.value.cacheDirectory,
+      state.value.log)
   }
 
   def compileRoutes(tasks: Seq[RoutesCompilerTask],
@@ -178,11 +179,13 @@ object RoutesCompiler extends AutoPlugin {
     if (errors.nonEmpty) {
       val exceptions = errors.map {
         case RoutesCompilationError(source, message, line, column) =>
-          reportCompilationError(log,
-                                 RoutesCompilationException(source,
-                                                            message,
-                                                            line,
-                                                            column.map(_ - 1)))
+          reportCompilationError(
+            log,
+            RoutesCompilationException(
+              source,
+              message,
+              line,
+              column.map(_ - 1)))
       }
       throw exceptions.head
     }

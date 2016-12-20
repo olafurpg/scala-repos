@@ -33,16 +33,18 @@ class ExpandTables extends Phase {
       case tpe: NominalType =>
         createResult(expansions, path, tpe.structuralView)
       case m: MappedScalaType =>
-        TypeMapping(createResult(expansions, path, m.baseType),
-                    m.mapper,
-                    m.classTag)
+        TypeMapping(
+          createResult(expansions, path, m.baseType),
+          m.mapper,
+          m.classTag)
       case OptionType(el) =>
         val gen = new AnonSymbol
         createdOption = true
-        OptionFold(path,
-                   LiteralNode.nullOption,
-                   OptionApply(createResult(expansions, Ref(gen), el)),
-                   gen)
+        OptionFold(
+          path,
+          LiteralNode.nullOption,
+          OptionApply(createResult(expansions, Ref(gen), el)),
+          gen)
       case _ => path
     }
 
@@ -60,8 +62,9 @@ class ExpandTables extends Phase {
             .map {
               case (ts, v) =>
                 (ts,
-                 NominalType(ts,
-                             StructType(ConstArray.from(v.map(_._2).toMap))))
+                 NominalType(
+                   ts,
+                   StructType(ConstArray.from(v.map(_._2).toMap))))
             }
           logger.debug(
             "Found Selects for NominalTypes: " + structs.keySet.mkString(", "))
@@ -73,8 +76,9 @@ class ExpandTables extends Phase {
             case t: TableExpansion =>
               val ts = t.table.asInstanceOf[TableNode].identity
               tables += ((ts, (t.generator, t.columns)))
-              t.table :@ CollectionType(t.nodeType.asCollectionType.cons,
-                                        structs(ts))
+              t.table :@ CollectionType(
+                t.nodeType.asCollectionType.cons,
+                structs(ts))
             case r: Ref => r.untyped
             case d: Distinct =>
               if (d.nodeType.existsType {
@@ -110,9 +114,10 @@ class ExpandTables extends Phase {
             // Create a mapping that expands the tables
             val sym = new AnonSymbol
             val mapping =
-              createResult(tables,
-                           Ref(sym),
-                           tree3.nodeType.asCollectionType.elementType).infer(
+              createResult(
+                tables,
+                Ref(sym),
+                tree3.nodeType.asCollectionType.elementType).infer(
                 Type.Scope(sym -> tree3.nodeType.asCollectionType.elementType))
             Bind(sym, tree3, Pure(mapping)).infer()
           }

@@ -200,24 +200,27 @@ class HoconObjectEntryMover extends LineMover {
               new LineRange(sourceRange.endLine, endLine(enclosingField) + 1)
             else
               new LineRange(startLine(enclosingField), sourceRange.startLine)
-          val mod = PrefixModification(objField.getTextOffset,
-                                       0,
-                                       prefixToAdd.mkString("", ".", "."))
+          val mod = PrefixModification(
+            objField.getTextOffset,
+            0,
+            prefixToAdd.mkString("", ".", "."))
           (sourceRange, targetRange, Some(mod))
       } orElse fieldToDescendInto(objField).map {
         case (adjacentField, prefixToRemove) =>
           val targetRange =
             if (down)
-              new LineRange(sourceRange.endLine,
-                            firstNonCommentLine(adjacentField) + 1)
+              new LineRange(
+                sourceRange.endLine,
+                firstNonCommentLine(adjacentField) + 1)
             else new LineRange(endLine(adjacentField), sourceRange.startLine)
           val prefixStr = prefixToRemove.mkString("", ".", ".")
           val needsGuard = document.getCharsSequence
             .charAt(objField.getTextOffset + prefixStr.length)
             .isWhitespace
-          val mod = PrefixModification(objField.getTextOffset,
-                                       prefixStr.length,
-                                       if (needsGuard) "\"\"" else "")
+          val mod = PrefixModification(
+            objField.getTextOffset,
+            prefixStr.length,
+            if (needsGuard) "\"\"" else "")
           (sourceRange, targetRange, Some(mod))
       }
     }

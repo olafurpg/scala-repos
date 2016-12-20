@@ -32,9 +32,10 @@ final class ResponseHeader(val status: Int,
   private[play] def this(status: Int,
                          _headers: java.util.Map[String, String],
                          reasonPhrase: Option[String]) =
-    this(status,
-         collection.JavaConversions.mapAsScalaMap(_headers).toMap,
-         reasonPhrase)
+    this(
+      status,
+      collection.JavaConversions.mapAsScalaMap(_headers).toMap,
+      reasonPhrase)
 
   val headers: Map[String, String] =
     TreeMap[String, String]()(CaseInsensitiveOrdered) ++ _headers
@@ -317,8 +318,9 @@ object Codec {
     * Create a Codec from an encoding already supported by the JVM.
     */
   def javaSupported(charset: String) =
-    Codec(charset)(str => ByteString.apply(str, charset),
-                   bytes => bytes.decodeString(charset))
+    Codec(charset)(
+      str => ByteString.apply(str, charset),
+      bytes => bytes.decodeString(charset))
 
   /**
     * Codec for UTF-8
@@ -389,8 +391,9 @@ trait Results {
     * @param status the HTTP response status, e.g ‘200 OK’
     */
   class Status(status: Int)
-      extends Result(header = ResponseHeader(status),
-                     body = HttpEntity.NoEntity) {
+      extends Result(
+        header = ResponseHeader(status),
+        body = HttpEntity.NoEntity) {
 
     /**
       * Set the result's content.
@@ -409,14 +412,15 @@ trait Results {
                            length: Long,
                            inline: Boolean): Result = {
       Result(
-        ResponseHeader(status,
-                       Map(
-                         CONTENT_DISPOSITION -> {
-                           val dispositionType =
-                             if (inline) "inline" else "attachment"
-                           dispositionType + "; filename=\"" + name + "\""
-                         }
-                       )),
+        ResponseHeader(
+          status,
+          Map(
+            CONTENT_DISPOSITION -> {
+              val dispositionType =
+                if (inline) "inline" else "attachment"
+              dispositionType + "; filename=\"" + name + "\""
+            }
+          )),
         HttpEntity.Streamed(
           file,
           Some(length),
@@ -438,11 +442,12 @@ trait Results {
                  inline: Boolean = false,
                  fileName: java.io.File => String = _.getName,
                  onClose: () => Unit = () => ()): Result = {
-      streamFile(StreamConverters.fromInputStream(() =>
-                   Files.newInputStream(content.toPath)),
-                 fileName(content),
-                 content.length,
-                 inline)
+      streamFile(
+        StreamConverters.fromInputStream(() =>
+          Files.newInputStream(content.toPath)),
+        fileName(content),
+        content.length,
+        inline)
     }
 
     /**
@@ -476,10 +481,11 @@ trait Results {
         inline: Boolean = true): Result = {
       val stream = classLoader.getResourceAsStream(resource)
       val fileName = resource.split('/').last
-      streamFile(StreamConverters.fromInputStream(() => stream),
-                 fileName,
-                 stream.available(),
-                 inline)
+      streamFile(
+        StreamConverters.fromInputStream(() => stream),
+        fileName,
+        stream.available(),
+        inline)
     }
 
     /**

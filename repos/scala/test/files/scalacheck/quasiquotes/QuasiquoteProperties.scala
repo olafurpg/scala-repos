@@ -128,8 +128,9 @@ trait Helpers {
     } catch {
       case ToolBoxError(emsg, _) =>
         if (!emsg.contains(msg))
-          result(false,
-                 s"error message '${emsg}' is not the same as expected '$msg'")
+          result(
+            false,
+            s"error message '${emsg}' is not the same as expected '$msg'")
         else result(true)
     }
   }

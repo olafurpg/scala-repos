@@ -29,18 +29,19 @@ final class StreamerList(val store: {
         .toList
         .map { c =>
           Try {
-            Streamer(service = c getString "service" match {
-                       case s if s == "twitch" => Twitch
-                       case s if s == "hitbox" => Hitbox
-                       case s if s == "youtube" => Youtube
-                       case s => sys error s"Invalid service name: $s"
-                     },
-                     streamerName = c getString "streamer_name",
-                     streamerNameForDisplay =
-                       Try(c getString "streamer_name_for_display").toOption,
-                     lichessName = c getString "lichess_name",
-                     featured = c.getBoolean("featured"),
-                     chat = c.getBoolean("chat"))
+            Streamer(
+              service = c getString "service" match {
+                case s if s == "twitch" => Twitch
+                case s if s == "hitbox" => Hitbox
+                case s if s == "youtube" => Youtube
+                case s => sys error s"Invalid service name: $s"
+              },
+              streamerName = c getString "streamer_name",
+              streamerNameForDisplay =
+                Try(c getString "streamer_name_for_display").toOption,
+              lichessName = c getString "lichess_name",
+              featured = c.getBoolean("featured"),
+              chat = c.getBoolean("chat"))
           }
         }
         .foldLeft(List.empty[Streamer] -> List.empty[Exception]) {

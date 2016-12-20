@@ -191,10 +191,11 @@ trait WSSpec extends PlaySpecification with ServerIntegrationSpecification {
         new File(this.getClass.getResource("/testassets/bar.txt").toURI)
       val dp = new Http.MultipartFormData.DataPart("hello", "world")
       val fp =
-        new Http.MultipartFormData.FilePart("upload",
-                                            "bar.txt",
-                                            "text/plain",
-                                            FileIO.fromFile(file).asJava)
+        new Http.MultipartFormData.FilePart(
+          "upload",
+          "bar.txt",
+          "text/plain",
+          FileIO.fromFile(file).asJava)
       val source = akka.stream.javadsl.Source.from(util.Arrays.asList(dp, fp))
 
       val res = ws.url("/post").post(source)
@@ -308,10 +309,11 @@ trait WSSpec extends PlaySpecification with ServerIntegrationSpecification {
       val file =
         new File(this.getClass.getResource("/testassets/foo.txt").toURI)
       val dp = MultipartFormData.DataPart("hello", "world")
-      val fp = MultipartFormData.FilePart("upload",
-                                          "foo.txt",
-                                          None,
-                                          FileIO.fromFile(file))
+      val fp = MultipartFormData.FilePart(
+        "upload",
+        "foo.txt",
+        None,
+        FileIO.fromFile(file))
       val source = Source(List(dp, fp))
       val res = ws.url("/post").post(source)
       val body = await(res).json

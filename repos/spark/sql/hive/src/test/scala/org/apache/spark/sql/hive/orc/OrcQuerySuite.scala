@@ -217,11 +217,13 @@ class OrcQuerySuite extends QueryTest with BeforeAndAfterAll with OrcTest {
 
   test("simple select queries") {
     withOrcTable((0 until 10).map(i => (i, i.toString)), "t") {
-      checkAnswer(sql("SELECT `_1` FROM t where t.`_1` > 5"),
-                  (6 until 10).map(Row.apply(_)))
+      checkAnswer(
+        sql("SELECT `_1` FROM t where t.`_1` > 5"),
+        (6 until 10).map(Row.apply(_)))
 
-      checkAnswer(sql("SELECT `_1` FROM t as tmp where tmp.`_1` < 5"),
-                  (0 until 5).map(Row.apply(_)))
+      checkAnswer(
+        sql("SELECT `_1` FROM t as tmp where tmp.`_1` < 5"),
+        (0 until 5).map(Row.apply(_)))
     }
   }
 
@@ -285,8 +287,9 @@ class OrcQuerySuite extends QueryTest with BeforeAndAfterAll with OrcTest {
 
   test("columns only referenced by pushed down filters should remain") {
     withOrcTable((1 to 10).map(Tuple1.apply), "t") {
-      checkAnswer(sql("SELECT `_1` FROM t WHERE `_1` < 10"),
-                  (1 to 9).map(Row.apply(_)))
+      checkAnswer(
+        sql("SELECT `_1` FROM t WHERE `_1` < 10"),
+        (1 to 9).map(Row.apply(_)))
     }
   }
 
@@ -395,8 +398,9 @@ class OrcQuerySuite extends QueryTest with BeforeAndAfterAll with OrcTest {
           // A tricky part is, ORC does not process filter rows fully but return some possible
           // results. So, this checks if the number of result is less than the original count
           // of data, and then checks if it contains the expected data.
-          assert(sourceDf.count < 10 && expectedData.subsetOf(data),
-                 s"No data was filtered for predicate: $pred")
+          assert(
+            sourceDf.count < 10 && expectedData.subsetOf(data),
+            s"No data was filtered for predicate: $pred")
         }
 
         checkPredicate('a === 5, List(5).map(Row(_, null)))

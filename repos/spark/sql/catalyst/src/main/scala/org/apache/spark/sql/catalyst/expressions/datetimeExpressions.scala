@@ -291,9 +291,10 @@ case class WeekOfYear(child: Expression)
     nullSafeCodeGen(ctx, ev, time => {
       val cal = classOf[Calendar].getName
       val c = ctx.freshName("cal")
-      ctx.addMutableState(cal,
-                          c,
-                          s"""
+      ctx.addMutableState(
+        cal,
+        c,
+        s"""
           $c = $cal.getInstance(java.util.TimeZone.getTimeZone("UTC"));
           $c.setFirstDayOfWeek($cal.MONDAY);
           $c.setMinimalDaysInFirstWeek(4);
@@ -689,9 +690,10 @@ case class TimeAdd(start: Expression, interval: Expression)
 
   override def nullSafeEval(start: Any, interval: Any): Any = {
     val itvl = interval.asInstanceOf[CalendarInterval]
-    DateTimeUtils.timestampAddInterval(start.asInstanceOf[Long],
-                                       itvl.months,
-                                       itvl.microseconds)
+    DateTimeUtils.timestampAddInterval(
+      start.asInstanceOf[Long],
+      itvl.months,
+      itvl.microseconds)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
@@ -715,8 +717,9 @@ case class FromUTCTimestamp(left: Expression, right: Expression)
   override def prettyName: String = "from_utc_timestamp"
 
   override def nullSafeEval(time: Any, timezone: Any): Any = {
-    DateTimeUtils.fromUTCTime(time.asInstanceOf[Long],
-                              timezone.asInstanceOf[UTF8String].toString)
+    DateTimeUtils.fromUTCTime(
+      time.asInstanceOf[Long],
+      timezone.asInstanceOf[UTF8String].toString)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
@@ -731,9 +734,10 @@ case class FromUTCTimestamp(left: Expression, right: Expression)
       } else {
         val tzTerm = ctx.freshName("tz")
         val tzClass = classOf[TimeZone].getName
-        ctx.addMutableState(tzClass,
-                            tzTerm,
-                            s"""$tzTerm = $tzClass.getTimeZone("$tz");""")
+        ctx.addMutableState(
+          tzClass,
+          tzTerm,
+          s"""$tzTerm = $tzClass.getTimeZone("$tz");""")
         val eval = left.gen(ctx)
         s"""
            |${eval.code}
@@ -771,9 +775,10 @@ case class TimeSub(start: Expression, interval: Expression)
 
   override def nullSafeEval(start: Any, interval: Any): Any = {
     val itvl = interval.asInstanceOf[CalendarInterval]
-    DateTimeUtils.timestampAddInterval(start.asInstanceOf[Long],
-                                       0 - itvl.months,
-                                       0 - itvl.microseconds)
+    DateTimeUtils.timestampAddInterval(
+      start.asInstanceOf[Long],
+      0 - itvl.months,
+      0 - itvl.microseconds)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
@@ -855,8 +860,9 @@ case class ToUTCTimestamp(left: Expression, right: Expression)
   override def prettyName: String = "to_utc_timestamp"
 
   override def nullSafeEval(time: Any, timezone: Any): Any = {
-    DateTimeUtils.toUTCTime(time.asInstanceOf[Long],
-                            timezone.asInstanceOf[UTF8String].toString)
+    DateTimeUtils.toUTCTime(
+      time.asInstanceOf[Long],
+      timezone.asInstanceOf[UTF8String].toString)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
@@ -871,9 +877,10 @@ case class ToUTCTimestamp(left: Expression, right: Expression)
       } else {
         val tzTerm = ctx.freshName("tz")
         val tzClass = classOf[TimeZone].getName
-        ctx.addMutableState(tzClass,
-                            tzTerm,
-                            s"""$tzTerm = $tzClass.getTimeZone("$tz");""")
+        ctx.addMutableState(
+          tzClass,
+          tzTerm,
+          s"""$tzTerm = $tzClass.getTimeZone("$tz");""")
         val eval = left.gen(ctx)
         s"""
            |${eval.code}

@@ -126,14 +126,13 @@ private[sql] case class InsertIntoHadoopFsRelation(
         Dataset.newDataFrame(sqlContext, query).queryExecution
       SQLExecution.withNewExecutionId(sqlContext, queryExecution) {
         val relation =
-          WriteRelation(sqlContext,
-                        dataColumns.toStructType,
-                        qualifiedOutputPath.toString,
-                        fileFormat.prepareWrite(sqlContext,
-                                                _,
-                                                options,
-                                                dataColumns.toStructType),
-                        bucketSpec)
+          WriteRelation(
+            sqlContext,
+            dataColumns.toStructType,
+            qualifiedOutputPath.toString,
+            fileFormat
+              .prepareWrite(sqlContext, _, options, dataColumns.toStructType),
+            bucketSpec)
 
         val writerContainer =
           if (partitionColumns.isEmpty && bucketSpec.isEmpty) {

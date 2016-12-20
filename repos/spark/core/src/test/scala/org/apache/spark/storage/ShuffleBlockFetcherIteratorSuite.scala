@@ -56,8 +56,9 @@ class ShuffleBlockFetcherIteratorSuite
             if (data.contains(BlockId(blockId))) {
               listener.onBlockFetchSuccess(blockId, data(BlockId(blockId)))
             } else {
-              listener.onBlockFetchFailure(blockId,
-                                           new BlockNotFoundException(blockId))
+              listener.onBlockFetchFailure(
+                blockId,
+                new BlockNotFoundException(blockId))
             }
           }
         }
@@ -103,19 +104,21 @@ class ShuffleBlockFetcherIteratorSuite
        remoteBlocks.keys.map(blockId => (blockId, 1.asInstanceOf[Long])).toSeq)
     )
 
-    val iterator = new ShuffleBlockFetcherIterator(TaskContext.empty(),
-                                                   transfer,
-                                                   blockManager,
-                                                   blocksByAddress,
-                                                   48 * 1024 * 1024,
-                                                   Int.MaxValue)
+    val iterator = new ShuffleBlockFetcherIterator(
+      TaskContext.empty(),
+      transfer,
+      blockManager,
+      blocksByAddress,
+      48 * 1024 * 1024,
+      Int.MaxValue)
 
     // 3 local blocks fetched in initialization
     verify(blockManager, times(3)).getBlockData(any())
 
     for (i <- 0 until 5) {
-      assert(iterator.hasNext,
-             s"iterator should have 5 elements but actually has $i elements")
+      assert(
+        iterator.hasNext,
+        s"iterator should have 5 elements but actually has $i elements")
       val (blockId, inputStream) = iterator.next()
 
       // Make sure we release buffers when a wrapped input stream is closed.
@@ -167,13 +170,16 @@ class ShuffleBlockFetcherIteratorSuite
             invocation.getArguments()(4).asInstanceOf[BlockFetchingListener]
           Future {
             // Return the first two blocks, and wait till task completion before returning the 3rd one
-            listener.onBlockFetchSuccess(ShuffleBlockId(0, 0, 0).toString,
-                                         blocks(ShuffleBlockId(0, 0, 0)))
-            listener.onBlockFetchSuccess(ShuffleBlockId(0, 1, 0).toString,
-                                         blocks(ShuffleBlockId(0, 1, 0)))
+            listener.onBlockFetchSuccess(
+              ShuffleBlockId(0, 0, 0).toString,
+              blocks(ShuffleBlockId(0, 0, 0)))
+            listener.onBlockFetchSuccess(
+              ShuffleBlockId(0, 1, 0).toString,
+              blocks(ShuffleBlockId(0, 1, 0)))
             sem.acquire()
-            listener.onBlockFetchSuccess(ShuffleBlockId(0, 2, 0).toString,
-                                         blocks(ShuffleBlockId(0, 2, 0)))
+            listener.onBlockFetchSuccess(
+              ShuffleBlockId(0, 2, 0).toString,
+              blocks(ShuffleBlockId(0, 2, 0)))
           }
         }
       })
@@ -183,12 +189,13 @@ class ShuffleBlockFetcherIteratorSuite
        blocks.keys.map(blockId => (blockId, 1.asInstanceOf[Long])).toSeq))
 
     val taskContext = TaskContext.empty()
-    val iterator = new ShuffleBlockFetcherIterator(taskContext,
-                                                   transfer,
-                                                   blockManager,
-                                                   blocksByAddress,
-                                                   48 * 1024 * 1024,
-                                                   Int.MaxValue)
+    val iterator = new ShuffleBlockFetcherIterator(
+      taskContext,
+      transfer,
+      blockManager,
+      blocksByAddress,
+      48 * 1024 * 1024,
+      Int.MaxValue)
 
     verify(blocks(ShuffleBlockId(0, 0, 0)), times(0)).release()
     iterator.next()._2.close() // close() first block's input stream
@@ -232,12 +239,15 @@ class ShuffleBlockFetcherIteratorSuite
             invocation.getArguments()(4).asInstanceOf[BlockFetchingListener]
           Future {
             // Return the first block, and then fail.
-            listener.onBlockFetchSuccess(ShuffleBlockId(0, 0, 0).toString,
-                                         blocks(ShuffleBlockId(0, 0, 0)))
-            listener.onBlockFetchFailure(ShuffleBlockId(0, 1, 0).toString,
-                                         new BlockNotFoundException("blah"))
-            listener.onBlockFetchFailure(ShuffleBlockId(0, 2, 0).toString,
-                                         new BlockNotFoundException("blah"))
+            listener.onBlockFetchSuccess(
+              ShuffleBlockId(0, 0, 0).toString,
+              blocks(ShuffleBlockId(0, 0, 0)))
+            listener.onBlockFetchFailure(
+              ShuffleBlockId(0, 1, 0).toString,
+              new BlockNotFoundException("blah"))
+            listener.onBlockFetchFailure(
+              ShuffleBlockId(0, 2, 0).toString,
+              new BlockNotFoundException("blah"))
             sem.release()
           }
         }
@@ -248,12 +258,13 @@ class ShuffleBlockFetcherIteratorSuite
        blocks.keys.map(blockId => (blockId, 1.asInstanceOf[Long])).toSeq))
 
     val taskContext = TaskContext.empty()
-    val iterator = new ShuffleBlockFetcherIterator(taskContext,
-                                                   transfer,
-                                                   blockManager,
-                                                   blocksByAddress,
-                                                   48 * 1024 * 1024,
-                                                   Int.MaxValue)
+    val iterator = new ShuffleBlockFetcherIterator(
+      taskContext,
+      transfer,
+      blockManager,
+      blocksByAddress,
+      48 * 1024 * 1024,
+      Int.MaxValue)
 
     // Continue only after the mock calls onBlockFetchFailure
     sem.acquire()

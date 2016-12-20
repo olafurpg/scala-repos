@@ -39,9 +39,10 @@ trait MarathonCallbackTestSupport extends ExternalMarathonIntegrationTest {
   def waitForDeploymentId(
       deploymentId: String,
       maxWait: FiniteDuration = 30.seconds): CallbackEvent = {
-    waitForEventWith("deployment_success",
-                     _.info.getOrElse("id", "") == deploymentId,
-                     maxWait)
+    waitForEventWith(
+      "deployment_success",
+      _.info.getOrElse("id", "") == deploymentId,
+      maxWait)
   }
 
   def waitForChange(change: RestResult[ITDeploymentResult],
@@ -88,8 +89,9 @@ trait MarathonCallbackTestSupport extends ExternalMarathonIntegrationTest {
       val receivedEvents = Vector.newBuilder[CallbackEvent]
 
       while (eventsToWaitFor.nonEmpty) {
-        val event = waitForEventMatching(s"event $eventsToWaitFor to arrive",
-                                         deadline.timeLeft) { event =>
+        val event = waitForEventMatching(
+          s"event $eventsToWaitFor to arrive",
+          deadline.timeLeft) { event =>
           eventsToWaitFor.contains(event.eventType)
         }
         receivedEvents += event

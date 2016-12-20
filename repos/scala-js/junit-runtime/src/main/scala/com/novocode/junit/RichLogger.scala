@@ -68,12 +68,13 @@ final class RichLogger private (loggers: Array[Logger], settings: RunSettings) {
         p.getFileName.contains("JUnitExecuteTest.scala")
       } - 1
     val m = if (i > 0) i else trace.length - 1
-    logStackTracePart(trace,
-                      m,
-                      trace.length - m - 1,
-                      t,
-                      testClassName,
-                      testFileName)
+    logStackTracePart(
+      trace,
+      m,
+      trace.length - m - 1,
+      t,
+      testClassName,
+      testFileName)
   }
 
   private def logStackTracePart(trace: Array[StackTraceElement],
@@ -111,9 +112,10 @@ final class RichLogger private (loggers: Array[Logger], settings: RunSettings) {
 
     for (i <- top to m2) {
       error(
-        "    at " + stackTraceElementToString(trace(i),
-                                              testClassName,
-                                              testFileName))
+        "    at " + stackTraceElementToString(
+          trace(i),
+          testClassName,
+          testFileName))
     }
     if (m0 != m2) {
       // skip junit-related frames
@@ -138,12 +140,13 @@ final class RichLogger private (loggers: Array[Logger], settings: RunSettings) {
         n -= 1
       }
       error("Caused by: " + t)
-      logStackTracePart(trace,
-                        m,
-                        trace.length - 1 - m,
-                        t,
-                        testClassName,
-                        testFileName)
+      logStackTracePart(
+        trace,
+        m,
+        trace.length - 1 - m,
+        t,
+        testClassName,
+        testFileName)
     }
   }
 
@@ -176,8 +179,9 @@ final class RichLogger private (loggers: Array[Logger], settings: RunSettings) {
       r += c(e.getFileName, if (highlight) TESTFILE1 else null)
       if (e.getLineNumber >= 0) {
         r += ':'
-        r += c(String.valueOf(e.getLineNumber),
-               if (highlight) TESTFILE2 else null)
+        r += c(
+          String.valueOf(e.getLineNumber),
+          if (highlight) TESTFILE2 else null)
       }
     }
     r += ')'

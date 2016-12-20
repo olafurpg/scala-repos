@@ -167,10 +167,11 @@ class ScalaConstructorInsertHandler extends InsertHandler[LookupElement] {
                 case (_: ScTemplateBody) childOf ((_: ScExtendsBlock) childOf (newTemplateDef: ScNewTemplateDefinition)) =>
                   val members =
                     ScalaOIUtil.getMembersToImplement(newTemplateDef)
-                  ScalaOIUtil.runAction(members.toSeq,
-                                        isImplement = true,
-                                        newTemplateDef,
-                                        editor)
+                  ScalaOIUtil.runAction(
+                    members.toSeq,
+                    isImplement = true,
+                    newTemplateDef,
+                    editor)
                 case _ =>
               }
             }

@@ -167,11 +167,13 @@ final class HttpRequest(val method: HttpMethod,
     with HttpMessage {
 
   HttpRequest.verifyUri(uri)
-  require(entity.isKnownEmpty || method.isEntityAccepted,
-          s"Requests with method '${method.value}' must have an empty entity")
-  require(protocol != HttpProtocols.`HTTP/1.0` ||
-            !entity.isInstanceOf[HttpEntity.Chunked],
-          "HTTP/1.0 requests must not have a chunked entity")
+  require(
+    entity.isKnownEmpty || method.isEntityAccepted,
+    s"Requests with method '${method.value}' must have an empty entity")
+  require(
+    protocol != HttpProtocols.`HTTP/1.0` ||
+      !entity.isInstanceOf[HttpEntity.Chunked],
+    "HTTP/1.0 requests must not have a chunked entity")
 
   type Self = HttpRequest
   def self = this
@@ -360,11 +362,13 @@ final class HttpResponse(val status: StatusCode,
     extends jm.HttpResponse
     with HttpMessage {
 
-  require(entity.isKnownEmpty || status.allowsEntity,
-          "Responses with this status code must have an empty entity")
-  require(protocol == HttpProtocols.`HTTP/1.1` ||
-            !entity.isInstanceOf[HttpEntity.Chunked],
-          "HTTP/1.0 responses must not have a chunked entity")
+  require(
+    entity.isKnownEmpty || status.allowsEntity,
+    "Responses with this status code must have an empty entity")
+  require(
+    protocol == HttpProtocols.`HTTP/1.1` ||
+      !entity.isInstanceOf[HttpEntity.Chunked],
+    "HTTP/1.0 responses must not have a chunked entity")
 
   type Self = HttpResponse
   def self = this

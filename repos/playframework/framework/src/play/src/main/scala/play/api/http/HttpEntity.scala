@@ -128,8 +128,9 @@ object HttpEntity {
       case HttpChunk.Chunk(data) => data
     }
     def asJava =
-      new JHttpEntity.Chunked(chunks.asJava,
-                              OptionConverters.toJava(contentType))
+      new JHttpEntity.Chunked(
+        chunks.asJava,
+        OptionConverters.toJava(contentType))
     def as(contentType: String) = copy(contentType = Some(contentType))
   }
 }

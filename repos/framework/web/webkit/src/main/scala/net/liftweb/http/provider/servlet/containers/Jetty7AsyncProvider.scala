@@ -33,16 +33,17 @@ object Jetty7AsyncProvider extends AsyncProviderMeta {
   // contSupport below gets inferred as a Class[?0] existential.
   import scala.language.existentials
 
-  private val (hasContinuations_?,
-               contSupport,
-               getContinuation,
-               getAttribute,
-               setAttribute,
-               suspendMeth,
-               setTimeout,
-               resumeMeth,
-               isExpired,
-               isResumed) = {
+  private val (
+    hasContinuations_?,
+    contSupport,
+    getContinuation,
+    getAttribute,
+    setAttribute,
+    suspendMeth,
+    setTimeout,
+    resumeMeth,
+    isExpired,
+    isResumed) = {
     try {
       val cc =
         Class.forName("org.eclipse.jetty.continuation.ContinuationSupport")

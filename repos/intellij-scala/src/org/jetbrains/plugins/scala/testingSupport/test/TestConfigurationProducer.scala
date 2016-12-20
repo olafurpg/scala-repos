@@ -30,9 +30,10 @@ abstract class TestConfigurationProducer(configurationType: ConfigurationType)
                                   fqn: String): Boolean = {
     val suiteClazz = ScalaPsiManager
       .instance(clazz.getProject)
-      .getCachedClass(fqn,
-                      clazz.getResolveScope,
-                      ScalaPsiManager.ClassCategory.OBJECT)
+      .getCachedClass(
+        fqn,
+        clazz.getResolveScope,
+        ScalaPsiManager.ClassCategory.OBJECT)
     if (suiteClazz == null) return false
     ScalaPsiUtil.cachedDeepIsInheritor(clazz, suiteClazz)
   }

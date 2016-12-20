@@ -479,8 +479,9 @@ trait CaseClassMacros extends ReprTypes {
     }
 
   def mkLabelTpe(name: Name): Type =
-    appliedType(atatTpe,
-                List(typeOf[scala.Symbol], constantType(nameAsValue(name))))
+    appliedType(
+      atatTpe,
+      List(typeOf[scala.Symbol], constantType(nameAsValue(name))))
 
   def mkFieldTpe(name: Name, valueTpe: Type): Type = {
     appliedType(fieldTypeTpe, List(mkLabelTpe(name), valueTpe))
@@ -571,8 +572,9 @@ trait CaseClassMacros extends ReprTypes {
                          arg: TypeName): Tree =
     items.foldRight(mkAttributedRef(nil): Tree) {
       case (tpe, acc) =>
-        AppliedTypeTree(mkAttributedRef(cons),
-                        List(appliedTypTree1(tpe, param, arg), acc))
+        AppliedTypeTree(
+          mkAttributedRef(cons),
+          List(appliedTypTree1(tpe, param, arg), acc))
     }
 
   def mkHListTypTree(items: List[Type]): Tree =
@@ -756,8 +758,9 @@ trait CaseClassMacros extends ReprTypes {
           }
       }
       ctx
-        .patchedLookup(original.asInstanceOf[global.Symbol].name.companionName,
-                       owner.asInstanceOf[global.Symbol])
+        .patchedLookup(
+          original.asInstanceOf[global.Symbol].name.companionName,
+          owner.asInstanceOf[global.Symbol])
         .suchThat(sym =>
           (original.isTerm || sym.hasModuleFlag) &&
             (sym isCoDefinedWith original.asInstanceOf[global.Symbol]))
@@ -896,8 +899,9 @@ trait CaseClassMacros extends ReprTypes {
         case Some(ctorSym) if !isNonGeneric(ctorSym) =>
           val ctorParamss = ctorSym.asMethod.infoIn(tpe).paramLists
           if (ctorParamss.length == 1)
-            alignFields(tpe,
-                        ctorParamss.head.map(param => unByName(param.info)))
+            alignFields(
+              tpe,
+              ctorParamss.head.map(param => unByName(param.info)))
           else None
         case _ => None
       }

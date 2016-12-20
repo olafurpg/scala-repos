@@ -55,12 +55,13 @@ object HiveTypeCoercion {
 
   // See https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types.
   // The conversion for integral and floating point types have a linear widening hierarchy:
-  private[sql] val numericPrecedence = IndexedSeq(ByteType,
-                                                  ShortType,
-                                                  IntegerType,
-                                                  LongType,
-                                                  FloatType,
-                                                  DoubleType)
+  private[sql] val numericPrecedence = IndexedSeq(
+    ByteType,
+    ShortType,
+    IntegerType,
+    LongType,
+    FloatType,
+    DoubleType)
 
   /**
     * Case 1 type widening (see the classdoc comment above for HiveTypeCoercion).
@@ -296,11 +297,13 @@ object HiveTypeCoercion {
       // Skip nodes who's children have not been resolved yet.
       case e if !e.childrenResolved => e
 
-      case a @ BinaryArithmetic(left @ StringType(),
-                                right @ DecimalType.Expression(_, _)) =>
+      case a @ BinaryArithmetic(
+            left @ StringType(),
+            right @ DecimalType.Expression(_, _)) =>
         a.makeCopy(Array(Cast(left, DecimalType.SYSTEM_DEFAULT), right))
-      case a @ BinaryArithmetic(left @ DecimalType.Expression(_, _),
-                                right @ StringType()) =>
+      case a @ BinaryArithmetic(
+            left @ DecimalType.Expression(_, _),
+            right @ StringType()) =>
         a.makeCopy(Array(left, Cast(right, DecimalType.SYSTEM_DEFAULT)))
 
       case a @ BinaryArithmetic(left @ StringType(), right) =>
@@ -322,11 +325,13 @@ object HiveTypeCoercion {
         p.makeCopy(Array(left, Cast(right, StringType)))
       case p @ BinaryComparison(left @ DateType(), right @ StringType()) =>
         p.makeCopy(Array(Cast(left, StringType), right))
-      case p @ BinaryComparison(left @ StringType(),
-                                right @ TimestampType()) =>
+      case p @ BinaryComparison(
+            left @ StringType(),
+            right @ TimestampType()) =>
         p.makeCopy(Array(left, Cast(right, StringType)))
-      case p @ BinaryComparison(left @ TimestampType(),
-                                right @ StringType()) =>
+      case p @ BinaryComparison(
+            left @ TimestampType(),
+            right @ StringType()) =>
         p.makeCopy(Array(Cast(left, StringType), right))
 
       // Comparisons between dates and timestamps.

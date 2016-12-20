@@ -83,27 +83,29 @@ private[ui] class MasterPage(parent: MasterWebUI) extends WebUIPage("") {
     val aliveWorkers = state.workers.filter(_.state == WorkerState.ALIVE)
     val workerTable = UIUtils.listingTable(workerHeaders, workerRow, workers)
 
-    val appHeaders = Seq("Application ID",
-                         "Name",
-                         "Cores",
-                         "Memory per Node",
-                         "Submitted Time",
-                         "User",
-                         "State",
-                         "Duration")
+    val appHeaders = Seq(
+      "Application ID",
+      "Name",
+      "Cores",
+      "Memory per Node",
+      "Submitted Time",
+      "User",
+      "State",
+      "Duration")
     val activeApps = state.activeApps.sortBy(_.startTime).reverse
     val activeAppsTable = UIUtils.listingTable(appHeaders, appRow, activeApps)
     val completedApps = state.completedApps.sortBy(_.endTime).reverse
     val completedAppsTable =
       UIUtils.listingTable(appHeaders, appRow, completedApps)
 
-    val driverHeaders = Seq("Submission ID",
-                            "Submitted Time",
-                            "Worker",
-                            "State",
-                            "Cores",
-                            "Memory",
-                            "Main Class")
+    val driverHeaders = Seq(
+      "Submission ID",
+      "Submitted Time",
+      "Worker",
+      "State",
+      "Cores",
+      "Memory",
+      "Main Class")
     val activeDrivers = state.activeDrivers.sortBy(_.startTime).reverse
     val activeDriversTable =
       UIUtils.listingTable(driverHeaders, driverRow, activeDrivers)

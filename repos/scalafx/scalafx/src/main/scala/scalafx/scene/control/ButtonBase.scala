@@ -75,22 +75,24 @@ abstract class ButtonBase(override val delegate: jfxsc.ButtonBase)
   // for now only a few examples
 
   def addOnMouseEnteredHandler(handler: (MouseEvent) => Unit) {
-    delegate.addEventHandler(jfxsi.MouseEvent.MOUSE_ENTERED,
-                             new jfxe.EventHandler[jfxsi.MouseEvent]() {
-                               @Override
-                               def handle(me: jfxsi.MouseEvent) {
-                                 handler(new MouseEvent(me))
-                               }
-                             })
+    delegate.addEventHandler(
+      jfxsi.MouseEvent.MOUSE_ENTERED,
+      new jfxe.EventHandler[jfxsi.MouseEvent]() {
+        @Override
+        def handle(me: jfxsi.MouseEvent) {
+          handler(new MouseEvent(me))
+        }
+      })
   }
 
   def addOnMouseExitedHandler(handler: (MouseEvent) => Unit) {
-    delegate.addEventHandler(jfxsi.MouseEvent.MOUSE_EXITED,
-                             new jfxe.EventHandler[jfxsi.MouseEvent]() {
-                               @Override
-                               def handle(me: jfxsi.MouseEvent) {
-                                 handler(new MouseEvent(me))
-                               }
-                             })
+    delegate.addEventHandler(
+      jfxsi.MouseEvent.MOUSE_EXITED,
+      new jfxe.EventHandler[jfxsi.MouseEvent]() {
+        @Override
+        def handle(me: jfxsi.MouseEvent) {
+          handler(new MouseEvent(me))
+        }
+      })
   }
 }

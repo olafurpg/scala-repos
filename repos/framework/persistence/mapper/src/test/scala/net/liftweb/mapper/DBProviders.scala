@@ -165,9 +165,10 @@ object DbProviders {
     def name = "Microsoft SQL Server"
     def vendor = new Vendor("net.sourceforge.jtds.jdbc.Driver") {
       def mkConn =
-        DriverManager.getConnection("jdbc:jtds:sqlserver://localhost/lift",
-                                    "lift",
-                                    "lift")
+        DriverManager.getConnection(
+          "jdbc:jtds:sqlserver://localhost/lift",
+          "lift",
+          "lift")
     }
     def propName: String = "ms_sqlserver"
   }

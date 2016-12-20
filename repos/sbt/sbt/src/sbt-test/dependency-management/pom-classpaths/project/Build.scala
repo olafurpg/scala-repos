@@ -41,8 +41,9 @@ object MyBuild extends Build {
       fs filter { f =>
         names exists { f.getName startsWith _ }
       }
-    assert(intersect == fs,
-           "Expected:" + seqStr(names.toSeq) + "Got: " + seqStr(fs))
+    assert(
+      intersect == fs,
+      "Expected:" + seqStr(names.toSeq) + "Got: " + seqStr(fs))
     ()
   }
   def seqStr(s: Seq[_]) = s.mkString("\n\t", "\n\t", "\n")

@@ -67,10 +67,10 @@ object KafkaEventStore {
       .toSuccess(NEL("central.zk.connect configuration parameter is required")) map {
       centralZookeeperHosts =>
         val serviceUID = ZookeeperSystemCoordination.extractServiceUID(config)
-        val coordination = ZookeeperSystemCoordination(centralZookeeperHosts,
-                                                       serviceUID,
-                                                       yggCheckpointsEnabled =
-                                                         true)
+        val coordination = ZookeeperSystemCoordination(
+          centralZookeeperHosts,
+          serviceUID,
+          yggCheckpointsEnabled = true)
         val agent = serviceUID.hostId + serviceUID.serviceId
 
         val eventIdSeq = SystemEventIdSequence(agent, coordination)
@@ -78,10 +78,11 @@ object KafkaEventStore {
 
         val stoppables =
           if (config[Boolean]("relay_data", true)) {
-            val (_, raStop) = KafkaRelayAgent(permissionsFinder,
-                                              eventIdSeq,
-                                              localConfig,
-                                              centralConfig)
+            val (_, raStop) = KafkaRelayAgent(
+              permissionsFinder,
+              eventIdSeq,
+              localConfig,
+              centralConfig)
             esStop.parent(raStop)
           } else esStop
 
@@ -170,9 +171,10 @@ object LocalKafkaEventStore {
     val stoppable = Stoppable.fromFuture(Future { producer.close })
 
     Some(
-      new LocalKafkaEventStore(producer,
-                               localTopic,
-                               maxMessageSize,
-                               messagePadding) -> stoppable)
+      new LocalKafkaEventStore(
+        producer,
+        localTopic,
+        maxMessageSize,
+        messagePadding) -> stoppable)
   }
 }

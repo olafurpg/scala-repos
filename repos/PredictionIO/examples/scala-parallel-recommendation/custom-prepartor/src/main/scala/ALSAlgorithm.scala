@@ -26,19 +26,21 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
 
   def train(sc: SparkContext, data: PreparedData): ALSModel = {
     // MLLib ALS cannot handle empty training data.
-    require(!data.ratings.take(1).isEmpty,
-            s"RDD[Rating] in PreparedData cannot be empty." +
-              " Please check if DataSource generates TrainingData" +
-              " and Preprator generates PreparedData correctly.")
+    require(
+      !data.ratings.take(1).isEmpty,
+      s"RDD[Rating] in PreparedData cannot be empty." +
+        " Please check if DataSource generates TrainingData" +
+        " and Preprator generates PreparedData correctly.")
     // Convert user and item String IDs to Int index for MLlib
     val userStringIntMap = BiMap.stringInt(data.ratings.map(_.user))
     val itemStringIntMap = BiMap.stringInt(data.ratings.map(_.item))
     val mllibRatings = data.ratings.map(
       r =>
         // MLlibRating requires integer index for user and item
-        MLlibRating(userStringIntMap(r.user),
-                    itemStringIntMap(r.item),
-                    r.rating))
+        MLlibRating(
+          userStringIntMap(r.user),
+          itemStringIntMap(r.item),
+          r.rating))
 
     // seed for MLlib ALS
     val seed = ap.seed.getOrElse(System.nanoTime)
@@ -54,18 +56,20 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     //alpha = 1.0,
     //seed = seed)
 
-    val m = ALS.train(ratings = mllibRatings,
-                      rank = ap.rank,
-                      iterations = ap.numIterations,
-                      lambda = ap.lambda,
-                      blocks = -1,
-                      seed = seed)
+    val m = ALS.train(
+      ratings = mllibRatings,
+      rank = ap.rank,
+      iterations = ap.numIterations,
+      lambda = ap.lambda,
+      blocks = -1,
+      seed = seed)
 
-    new ALSModel(rank = m.rank,
-                 userFeatures = m.userFeatures,
-                 productFeatures = m.productFeatures,
-                 userStringIntMap = userStringIntMap,
-                 itemStringIntMap = itemStringIntMap)
+    new ALSModel(
+      rank = m.rank,
+      userFeatures = m.userFeatures,
+      productFeatures = m.productFeatures,
+      userStringIntMap = userStringIntMap,
+      itemStringIntMap = itemStringIntMap)
   }
 
   def predict(model: ALSModel, query: Query): PredictedResult = {

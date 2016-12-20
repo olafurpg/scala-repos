@@ -50,8 +50,9 @@ class RuntimeTypesTest {
       } catch {
         case th: Throwable =>
           assertTrue(th.isInstanceOf[ClassCastException])
-          assertEquals(x + " is not an instance of scala.runtime.Nothing$",
-                       th.getMessage)
+          assertEquals(
+            x + " is not an instance of scala.runtime.Nothing$",
+            th.getMessage)
       }
     }
     test("a")
@@ -68,8 +69,9 @@ class RuntimeTypesTest {
       } catch {
         case th: Throwable =>
           assertTrue(th.isInstanceOf[ClassCastException])
-          assertEquals(x + " is not an instance of scala.runtime.Nothing$",
-                       th.getMessage)
+          assertEquals(
+            x + " is not an instance of scala.runtime.Nothing$",
+            th.getMessage)
       }
     }
     test("a")

@@ -53,11 +53,12 @@ class RenameElementQuickfix(myRef: PsiElement, name: String)
     val dataContext = SimpleDataContext.getSimpleContext(
       map,
       DataManager.getInstance.getDataContext(editor.getComponent))
-    new AnActionEvent(null,
-                      dataContext,
-                      "",
-                      action.getTemplatePresentation,
-                      ActionManager.getInstance,
-                      0)
+    new AnActionEvent(
+      null,
+      dataContext,
+      "",
+      action.getTemplatePresentation,
+      ActionManager.getInstance,
+      0)
   }
 }

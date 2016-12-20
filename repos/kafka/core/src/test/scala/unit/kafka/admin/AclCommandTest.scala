@@ -53,12 +53,13 @@ class AclCommandTest extends ZooKeeperTestHarness with Logging {
   private val ResourceToOperations =
     Map[Set[Resource], (Set[Operation], Array[String])](
       TopicResources ->
-        (Set(Read, Write, Describe), Array("--operation",
-                                           "Read",
-                                           "--operation",
-                                           "Write",
-                                           "--operation",
-                                           "Describe")),
+        (Set(Read, Write, Describe), Array(
+          "--operation",
+          "Read",
+          "--operation",
+          "Write",
+          "--operation",
+          "Describe")),
       Set(Resource.ClusterResource) ->
         (Set(Create, ClusterAction),
         Array("--operation", "Create", "--operation", "ClusterAction")),
@@ -92,8 +93,9 @@ class AclCommandTest extends ZooKeeperTestHarness with Logging {
   @Test
   def testAclCli() {
     val brokerProps = TestUtils.createBrokerConfig(0, zkConnect)
-    brokerProps.put(KafkaConfig.AuthorizerClassNameProp,
-                    "kafka.security.auth.SimpleAclAuthorizer")
+    brokerProps.put(
+      KafkaConfig.AuthorizerClassNameProp,
+      "kafka.security.auth.SimpleAclAuthorizer")
     val args =
       Array("--authorizer-properties", "zookeeper.connect=" + zkConnect)
 
@@ -117,8 +119,9 @@ class AclCommandTest extends ZooKeeperTestHarness with Logging {
   @Test
   def testProducerConsumerCli() {
     val brokerProps = TestUtils.createBrokerConfig(0, zkConnect)
-    brokerProps.put(KafkaConfig.AuthorizerClassNameProp,
-                    "kafka.security.auth.SimpleAclAuthorizer")
+    brokerProps.put(
+      KafkaConfig.AuthorizerClassNameProp,
+      "kafka.security.auth.SimpleAclAuthorizer")
     val args =
       Array("--authorizer-properties", "zookeeper.connect=" + zkConnect)
 
@@ -135,10 +138,11 @@ class AclCommandTest extends ZooKeeperTestHarness with Logging {
           }
         }
       }
-      testRemove(resourcesToAcls.keys.flatten.toSet,
-                 resourceCommand,
-                 args,
-                 brokerProps)
+      testRemove(
+        resourcesToAcls.keys.flatten.toSet,
+        resourceCommand,
+        args,
+        brokerProps)
     }
   }
 

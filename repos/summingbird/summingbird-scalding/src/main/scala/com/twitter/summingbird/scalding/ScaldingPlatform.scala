@@ -73,8 +73,9 @@ object Scalding {
     new AbstractInjection[DateRange, Interval[Timestamp]] {
       override def apply(dr: DateRange) = {
         val DateRange(l, u) = dr
-        Intersection(InclusiveLower(Timestamp(l.timestamp)),
-                     ExclusiveUpper(Timestamp(u.timestamp + 1L)))
+        Intersection(
+          InclusiveLower(Timestamp(l.timestamp)),
+          ExclusiveUpper(Timestamp(u.timestamp + 1L)))
       }
       override def invert(in: Interval[Timestamp]) = in match {
         case Intersection(lb, ub) =>
@@ -103,8 +104,8 @@ object Scalding {
     val commutativity = getOrElse(options, names, s, {
       val default = MonoidIsCommutative.default
       logger.warn(
-        "Store: %s has no commutativity setting. Assuming %s".format(names,
-                                                                     default))
+        "Store: %s has no commutativity setting. Assuming %s"
+          .format(names, default))
       default
     }).commutativity
 
@@ -173,8 +174,9 @@ object Scalding {
       if (isGood(end.timestamp)) Some(desired)
       else
         Some(
-          DateRange(desired.start,
-                    RichDate(findEnd(start.timestamp, end.timestamp))))
+          DateRange(
+            desired.start,
+            RichDate(findEnd(start.timestamp, end.timestamp))))
     } else {
       // No good data
       None
@@ -208,9 +210,10 @@ object Scalding {
     */
   def optionMappedPipeFactory[T, U](factory: (DateRange) => Mappable[T])(
       fn: T => Option[U])(implicit timeOf: TimeExtractor[U]): PipeFactory[U] =
-    StateWithError[(Interval[Timestamp], Mode),
-                   List[FailureReason],
-                   FlowToPipe[U]] { (timeMode: (Interval[Timestamp], Mode)) =>
+    StateWithError[
+      (Interval[Timestamp], Mode),
+      List[FailureReason],
+      FlowToPipe[U]] { (timeMode: (Interval[Timestamp], Mode)) =>
       {
         val (timeSpan, mode) = timeMode
 
@@ -233,9 +236,10 @@ object Scalding {
 
   def pipeFactoryExact[T](factory: (DateRange) => Mappable[T])(
       implicit timeOf: TimeExtractor[T]): PipeFactory[T] =
-    StateWithError[(Interval[Timestamp], Mode),
-                   List[FailureReason],
-                   FlowToPipe[T]] { (timeMode: (Interval[Timestamp], Mode)) =>
+    StateWithError[
+      (Interval[Timestamp], Mode),
+      List[FailureReason],
+      FlowToPipe[T]] { (timeMode: (Interval[Timestamp], Mode)) =>
       {
         val (timeSpan, mode) = timeMode
 
@@ -401,9 +405,10 @@ object Scalding {
             val commutativity = getCommutativity(names, options, summer)
             val storeReducers =
               getOrElse(options, names, producer, Reducers.default).count
-            logger.info("Store {} using {} reducers (-1 means unset)",
-                        store,
-                        storeReducers)
+            logger.info(
+              "Store {} using {} reducers (-1 means unset)",
+              store,
+              storeReducers)
             (store.merge(in, semigroup, commutativity, storeReducers), m)
           case LeftJoinedProducer(left, service: ExternalService[_, _]) =>
             /**
@@ -414,9 +419,10 @@ object Scalding {
             val (pf, m) = recurse(left)
             (service.lookup(pf), m)
           case ljp @ LeftJoinedProducer(left, StoreService(store))
-              if InternalService.storeDoesNotDependOnJoin(dependants,
-                                                          ljp,
-                                                          store) =>
+              if InternalService.storeDoesNotDependOnJoin(
+                dependants,
+                ljp,
+                store) =>
             /*
              * This is the simplest case of joining against a store. Here we just need the input to
              * the store and call LookupJoin
@@ -479,9 +485,10 @@ object Scalding {
                     "join %s is against store not in the entire job's Dag"
                       .format(ljp)))
               implicit val semigroup: Semigroup[U] = sg
-              logger.info("Service {} using {} reducers (-1 means unset)",
-                          ljp,
-                          reducers)
+              logger.info(
+                "Service {} using {} reducers (-1 means unset)",
+                ljp,
+                reducers)
 
               val res: PipeFactory[(K, (V, Option[U]))] = for {
                 // Handle the Option[Producer] return value from getLoopInputs properly.
@@ -741,16 +748,18 @@ class Scalding(val jobName: String,
     Scalding.plan(options, prod)
 
   def withRegistrars(newRegs: List[IKryoRegistrar]) =
-    new Scalding(jobName,
-                 options,
-                 transformConfig,
-                 newRegs ++ passedRegistrars)
+    new Scalding(
+      jobName,
+      options,
+      transformConfig,
+      newRegs ++ passedRegistrars)
 
   def withConfigUpdater(fn: Config => Config) =
-    new Scalding(jobName,
-                 options,
-                 transformConfig.andThen(fn),
-                 passedRegistrars)
+    new Scalding(
+      jobName,
+      options,
+      transformConfig.andThen(fn),
+      passedRegistrars)
 
   def configProvider(hConf: Configuration): Config = {
     import com.twitter.scalding._
@@ -767,10 +776,11 @@ class Scalding(val jobName: String,
         case Some(kryo) => kryo
       }
 
-      conf.setSerialization(Left(
-                              (classOf[serialization.KryoHadoop],
-                               initKryo.withRegistrar(kryoReg))),
-                            Nil)
+      conf.setSerialization(
+        Left(
+          (classOf[serialization.KryoHadoop],
+           initKryo.withRegistrar(kryoReg))),
+        Nil)
     }
   }
 

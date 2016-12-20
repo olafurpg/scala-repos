@@ -45,10 +45,11 @@ class ScalaMoveDirectoryWithClassesHelper
 
           for {
             aClass <- classes
-            usage <- MoveClassesOrPackagesUtil.findUsages(aClass,
-                                                          searchInComments,
-                                                          searchInNonJavaFiles,
-                                                          aClass.name)
+            usage <- MoveClassesOrPackagesUtil.findUsages(
+              aClass,
+              searchInComments,
+              searchInNonJavaFiles,
+              aClass.name)
           } {
             usages.add(usage)
           }
@@ -60,12 +61,13 @@ class ScalaMoveDirectoryWithClassesHelper
           } {
             val range = ref.getRangeInElement
             usages.add(
-              new MoveRenameUsageInfo(ref.getElement,
-                                      ref,
-                                      range.getStartOffset,
-                                      range.getEndOffset,
-                                      named,
-                                      false))
+              new MoveRenameUsageInfo(
+                ref.getElement,
+                ref,
+                range.getStartOffset,
+                range.getEndOffset,
+                named,
+                false))
           }
 
           packageNames.add(packageName(sf))

@@ -88,9 +88,10 @@ object DefaultOptions {
 
   def shellPrompt(version: String): State => String =
     s =>
-      "%s:%s:%s> ".format(s.configuration.provider.id.name,
-                          extract(s).currentProject.id,
-                          version)
+      "%s:%s:%s> ".format(
+        s.configuration.provider.id.name,
+        extract(s).currentProject.id,
+        version)
   def setupShellPrompt: Setting[_] =
     Keys.shellPrompt <<= Keys.version apply shellPrompt
 }

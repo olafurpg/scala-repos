@@ -62,21 +62,24 @@ trait IngestSupport extends Logging {
     } yield auths
 
     requestAuthorities map { authorities =>
-      permissionsFinder.checkWriteAuthorities(authorities,
-                                              apiKey,
-                                              path,
-                                              timestamp.toInstant) map {
+      permissionsFinder.checkWriteAuthorities(
+        authorities,
+        apiKey,
+        path,
+        timestamp.toInstant) map {
         _.option(authorities)
       }
     } getOrElse {
-      permissionsFinder.inferWriteAuthorities(apiKey,
-                                              path,
-                                              Some(timestamp.toInstant))
+      permissionsFinder.inferWriteAuthorities(
+        apiKey,
+        path,
+        Some(timestamp.toInstant))
     } onFailure {
       case ex: Exception =>
-        logger.error("Request " + request.shows +
-                       " failed due to unavailability of security subsystem.",
-                     ex)
+        logger.error(
+          "Request " + request.shows +
+            " failed due to unavailability of security subsystem.",
+          ex)
       // FIXME: Provisionally accept data for ingest if one of the permissions-checking services is unavailable
     } flatMap {
       case Some(authorities) =>

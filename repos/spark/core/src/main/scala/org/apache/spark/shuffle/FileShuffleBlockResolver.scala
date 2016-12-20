@@ -95,11 +95,12 @@ private[spark] class FileShuffleBlockResolver(conf: SparkConf)
           val blockId = ShuffleBlockId(shuffleId, mapId, bucketId)
           val blockFile = blockManager.diskBlockManager.getFile(blockId)
           val tmp = Utils.tempFileWith(blockFile)
-          blockManager.getDiskWriter(blockId,
-                                     tmp,
-                                     serializerInstance,
-                                     bufferSize,
-                                     writeMetrics)
+          blockManager.getDiskWriter(
+            blockId,
+            tmp,
+            serializerInstance,
+            bufferSize,
+            writeMetrics)
         }
       }
       // Creating the file to write to and creating a disk writer both involve interacting with

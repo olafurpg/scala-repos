@@ -23,10 +23,11 @@ private[streams] trait EnumeratorSubscriptionFactory[T]
   override def createSubscription[U >: T](
       subr: Subscriber[U],
       onSubscriptionEnded: SubscriptionHandle[U] => Unit) = {
-    new EnumeratorSubscription[T, U](enum,
-                                     emptyElement,
-                                     subr,
-                                     onSubscriptionEnded)
+    new EnumeratorSubscription[T, U](
+      enum,
+      emptyElement,
+      subr,
+      onSubscriptionEnded)
   }
 }
 

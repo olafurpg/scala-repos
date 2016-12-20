@@ -170,15 +170,17 @@ object TypedActor
     @throws(classOf[ObjectStreamException])
     private def writeReplace(): AnyRef = parameters match {
       case null ⇒
-        SerializedMethodCall(method.getDeclaringClass,
-                             method.getName,
-                             method.getParameterTypes,
-                             null)
+        SerializedMethodCall(
+          method.getDeclaringClass,
+          method.getName,
+          method.getParameterTypes,
+          null)
       case ps if ps.length == 0 ⇒
-        SerializedMethodCall(method.getDeclaringClass,
-                             method.getName,
-                             method.getParameterTypes,
-                             Array())
+        SerializedMethodCall(
+          method.getDeclaringClass,
+          method.getName,
+          method.getParameterTypes,
+          Array())
       case ps ⇒
         val serialization = SerializationExtension(
           akka.serialization.JavaSerializer.currentSystem.value)
@@ -191,10 +193,11 @@ object TypedActor
           serializedParameters(i) = (s.identifier, m, s toBinary parameters(i)) //Mutable for the sake of sanity
         }
 
-        SerializedMethodCall(method.getDeclaringClass,
-                             method.getName,
-                             method.getParameterTypes,
-                             serializedParameters)
+        SerializedMethodCall(
+          method.getDeclaringClass,
+          method.getName,
+          method.getParameterTypes,
+          serializedParameters)
     }
   }
 
@@ -300,9 +303,10 @@ object TypedActor
     if (!context.parent.asInstanceOf[InternalActorRef].isLocal)
       TypedActor
         .get(context.system)
-        .createActorRefProxy(TypedProps(interfaces, createInstance),
-                             proxyVar,
-                             context.self)
+        .createActorRefProxy(
+          TypedProps(interfaces, createInstance),
+          proxyVar,
+          context.self)
 
     private val me = withContext[T](createInstance)
 
@@ -538,9 +542,10 @@ object TypedActor
 
     def toTypedActorInvocationHandler(
         system: ActorSystem): TypedActorInvocationHandler =
-      new TypedActorInvocationHandler(TypedActor(system),
-                                      new AtomVar[ActorRef](actor),
-                                      new Timeout(timeout))
+      new TypedActorInvocationHandler(
+        TypedActor(system),
+        new AtomVar[ActorRef](actor),
+        new Timeout(timeout))
   }
 }
 
@@ -581,8 +586,9 @@ object TypedProps {
     */
   def apply[T <: AnyRef](interface: Class[_ >: T],
                          implementation: Class[T]): TypedProps[T] =
-    new TypedProps[T](extractInterfaces(interface),
-                      instantiator(implementation))
+    new TypedProps[T](
+      extractInterfaces(interface),
+      instantiator(implementation))
 
   /**
     * Uses the supplied thunk as the factory for the TypedActor implementation,
@@ -634,8 +640,9 @@ final case class TypedProps[T <: AnyRef] protected[TypedProps] (
     * appended in the sequence of interfaces.
     */
   def this(implementation: Class[T]) =
-    this(interfaces = TypedProps.extractInterfaces(implementation),
-         creator = instantiator(implementation))
+    this(
+      interfaces = TypedProps.extractInterfaces(implementation),
+      creator = instantiator(implementation))
 
   /**
     * Java API: Uses the supplied Creator as the factory for the TypedActor implementation,
@@ -644,8 +651,9 @@ final case class TypedProps[T <: AnyRef] protected[TypedProps] (
     * appended in the sequence of interfaces.
     */
   def this(interface: Class[_ >: T], implementation: Creator[T]) =
-    this(interfaces = TypedProps.extractInterfaces(interface),
-         creator = implementation.create _)
+    this(
+      interfaces = TypedProps.extractInterfaces(interface),
+      creator = implementation.create _)
 
   /**
     * Java API: Uses the supplied class as the factory for the TypedActor implementation,
@@ -654,8 +662,9 @@ final case class TypedProps[T <: AnyRef] protected[TypedProps] (
     * appended in the sequence of interfaces.
     */
   def this(interface: Class[_ >: T], implementation: Class[T]) =
-    this(interfaces = TypedProps.extractInterfaces(interface),
-         creator = instantiator(implementation))
+    this(
+      interfaces = TypedProps.extractInterfaces(interface),
+      creator = instantiator(implementation))
 
   /**
     * Returns a new TypedProps with the specified dispatcher set.

@@ -34,14 +34,16 @@ class InitializeListener
 
       // Migration
       logger.debug("Start schema update")
-      Versions.update(conn,
-                      headVersion,
-                      getCurrentVersion(),
-                      versions,
-                      Thread.currentThread.getContextClassLoader) { conn =>
-        FileUtils.writeStringToFile(versionFile,
-                                    headVersion.versionString,
-                                    "UTF-8")
+      Versions.update(
+        conn,
+        headVersion,
+        getCurrentVersion(),
+        versions,
+        Thread.currentThread.getContextClassLoader) { conn =>
+        FileUtils.writeStringToFile(
+          versionFile,
+          headVersion.versionString,
+          "UTF-8")
       }
 
       // Load plugins
@@ -67,9 +69,10 @@ class InitializeListener
 
     val scheduler = QuartzSchedulerExtension(system)
 
-    scheduler.schedule("Daily",
-                       system.actorOf(Props[DeleteOldActivityActor]),
-                       "DeleteOldActivity")
+    scheduler.schedule(
+      "Daily",
+      system.actorOf(Props[DeleteOldActivityActor]),
+      "DeleteOldActivity")
   }
 
   override def contextDestroyed(event: ServletContextEvent): Unit = {

@@ -119,15 +119,17 @@ trait MetricsCollectorFactory { this: AkkaSpec ⇒
 
   /** Create Sigar collector. Rely on sigar-loader provisioner. */
   def collectorSigarProvision: MetricsCollector =
-    new SigarMetricsCollector(selfAddress,
-                              defaultDecayFactor,
-                              SimpleSigarProvider().createSigarInstance)
+    new SigarMetricsCollector(
+      selfAddress,
+      defaultDecayFactor,
+      SimpleSigarProvider().createSigarInstance)
 
   /** Create Sigar collector. Rely on static sigar library mock. */
   def collectorSigarMockito: MetricsCollector =
-    new SigarMetricsCollector(selfAddress,
-                              defaultDecayFactor,
-                              MockitoSigarProvider().createSigarInstance)
+    new SigarMetricsCollector(
+      selfAddress,
+      defaultDecayFactor,
+      MockitoSigarProvider().createSigarInstance)
 
   def isSigar(collector: MetricsCollector): Boolean =
     collector.isInstanceOf[SigarMetricsCollector]

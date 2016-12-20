@@ -21,16 +21,17 @@ private[qa] final class DataForm(val captcher: akka.actor.ActorSelection,
       .verifying(captchaFailMessage, validateCaptcha _))
 
   def editQuestion(q: Question) =
-    question fill QuestionData(title = q.title,
-                               body = q.body,
-                               `hidden-tags` = q.tags mkString ",",
-                               gameId = "",
-                               move = "")
+    question fill QuestionData(
+      title = q.title,
+      body = q.body,
+      `hidden-tags` = q.tags mkString ",",
+      gameId = "",
+      move = "")
 
   lazy val answer = Form(
     mapping(
-      "body" -> nonEmptyText(minLength = 30).verifying(languageMessage,
-                                                       validateLanguage _),
+      "body" -> nonEmptyText(minLength = 30)
+        .verifying(languageMessage, validateLanguage _),
       "gameId" -> text,
       "move" -> text
     )(AnswerData.apply)(AnswerData.unapply)
@@ -38,8 +39,8 @@ private[qa] final class DataForm(val captcher: akka.actor.ActorSelection,
 
   lazy val editAnswer = Form(
     single(
-      "body" -> nonEmptyText(minLength = 30).verifying(languageMessage,
-                                                       validateLanguage _)
+      "body" -> nonEmptyText(minLength = 30)
+        .verifying(languageMessage, validateLanguage _)
     ))
 
   lazy val moveAnswer = Form(
@@ -49,8 +50,8 @@ private[qa] final class DataForm(val captcher: akka.actor.ActorSelection,
 
   lazy val comment = Form(
     mapping(
-      "body" -> nonEmptyText(minLength = 20).verifying(languageMessage,
-                                                       validateLanguage _)
+      "body" -> nonEmptyText(minLength = 20)
+        .verifying(languageMessage, validateLanguage _)
     )(CommentData.apply)(CommentData.unapply)
   )
 

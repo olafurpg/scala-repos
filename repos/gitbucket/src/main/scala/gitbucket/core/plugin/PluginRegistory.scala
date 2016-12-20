@@ -154,8 +154,9 @@ object PluginRegistry {
         })
         .foreach { pluginJar =>
           val classLoader =
-            new URLClassLoader(Array(pluginJar.toURI.toURL),
-                               Thread.currentThread.getContextClassLoader)
+            new URLClassLoader(
+              Array(pluginJar.toURI.toURL),
+              Thread.currentThread.getContextClassLoader)
           try {
             val plugin = classLoader
               .loadClass("Plugin")
@@ -165,8 +166,9 @@ object PluginRegistry {
             // Migration
             val headVersion = plugin.versions.head
             val currentVersion =
-              conn.find("SELECT * FROM PLUGIN WHERE PLUGIN_ID = ?",
-                        plugin.pluginId)(_.getString("VERSION")) match {
+              conn.find(
+                "SELECT * FROM PLUGIN WHERE PLUGIN_ID = ?",
+                plugin.pluginId)(_.getString("VERSION")) match {
                 case Some(x) => {
                   val dim = x.split("\\.")
                   Version(dim(0).toInt, dim(1).toInt)
@@ -174,24 +176,24 @@ object PluginRegistry {
                 case None => Version(0, 0)
               }
 
-            Versions.update(conn,
-                            headVersion,
-                            currentVersion,
-                            plugin.versions,
-                            new URLClassLoader(Array(pluginJar.toURI.toURL))) {
-              conn =>
-                currentVersion.versionString match {
-                  case "0.0" =>
-                    conn.update(
-                      "INSERT INTO PLUGIN (PLUGIN_ID, VERSION) VALUES (?, ?)",
-                      plugin.pluginId,
-                      headVersion.versionString)
-                  case _ =>
-                    conn.update(
-                      "UPDATE PLUGIN SET VERSION = ? WHERE PLUGIN_ID = ?",
-                      headVersion.versionString,
-                      plugin.pluginId)
-                }
+            Versions.update(
+              conn,
+              headVersion,
+              currentVersion,
+              plugin.versions,
+              new URLClassLoader(Array(pluginJar.toURI.toURL))) { conn =>
+              currentVersion.versionString match {
+                case "0.0" =>
+                  conn.update(
+                    "INSERT INTO PLUGIN (PLUGIN_ID, VERSION) VALUES (?, ?)",
+                    plugin.pluginId,
+                    headVersion.versionString)
+                case _ =>
+                  conn.update(
+                    "UPDATE PLUGIN SET VERSION = ? WHERE PLUGIN_ID = ?",
+                    headVersion.versionString,
+                    plugin.pluginId)
+              }
             }
 
             // Initialize

@@ -43,8 +43,9 @@ abstract class TreeIteratorTestBase extends IteratorTestCase {
   }
 
   def testPredicateOnFirstChild() = {
-    assertIterates("0, 1.1",
-                   createIterator(parse("0 (1.1)"), _.toString != "1.1"))
+    assertIterates(
+      "0, 1.1",
+      createIterator(parse("0 (1.1)"), _.toString != "1.1"))
   }
 
   def testPredicateOnMiddleChild() = {

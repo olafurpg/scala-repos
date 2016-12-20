@@ -397,9 +397,10 @@ abstract class ExplicitOuter
     def mixinOuterAccessorDef(mixinClass: Symbol): Tree = {
       val outerAcc = outerAccessor(mixinClass) overridingSymbol currentClass
       def mixinPrefix = (currentClass.thisType baseType mixinClass).prefix
-      assert(outerAcc != NoSymbol,
-             "No outer accessor for inner mixin " + mixinClass + " in " +
-               currentClass)
+      assert(
+        outerAcc != NoSymbol,
+        "No outer accessor for inner mixin " + mixinClass + " in " +
+          currentClass)
       assert(
         outerAcc.alternatives.size == 1,
         s"Multiple outer accessors match inner mixin $mixinClass in $currentClass : ${outerAcc.alternatives
@@ -517,10 +518,11 @@ abstract class ExplicitOuter
         // for the new pattern matcher
         // base.<outer>.eq(o) --> base.$outer().eq(o) if there's an accessor, else the whole tree becomes TRUE
         // TODO remove the synthetic `<outer>` method from outerFor??
-        case Apply(eqsel @ Select(
-                     eqapp @ Apply(sel @ Select(base, nme.OUTER_SYNTH), Nil),
-                     eq),
-                   args) =>
+        case Apply(
+            eqsel @ Select(
+              eqapp @ Apply(sel @ Select(base, nme.OUTER_SYNTH), Nil),
+              eq),
+            args) =>
           val outerFor = sel.symbol.owner
           val acc = outerAccessor(outerFor)
 

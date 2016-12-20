@@ -45,8 +45,9 @@ abstract class HadoopFsRelationTest
   protected def supportsDataType(dataType: DataType): Boolean = true
 
   val dataSchema = StructType(
-    Seq(StructField("a", IntegerType, nullable = false),
-        StructField("b", StringType, nullable = false)))
+    Seq(
+      StructField("a", IntegerType, nullable = false),
+      StructField("b", StringType, nullable = false)))
 
   lazy val testDF = (1 to 3).map(i => (i, s"val_$i")).toDF("a", "b")
 
@@ -64,24 +65,28 @@ abstract class HadoopFsRelationTest
 
   def checkQueries(df: DataFrame): Unit = {
     // Selects everything
-    checkAnswer(df,
-                for (i <- 1 to 3; p1 <- 1 to 2; p2 <- Seq("foo", "bar"))
-                  yield Row(i, s"val_$i", p1, p2))
+    checkAnswer(
+      df,
+      for (i <- 1 to 3; p1 <- 1 to 2; p2 <- Seq("foo", "bar"))
+        yield Row(i, s"val_$i", p1, p2))
 
     // Simple filtering and partition pruning
-    checkAnswer(df.filter('a > 1 && 'p1 === 2),
-                for (i <- 2 to 3; p2 <- Seq("foo", "bar"))
-                  yield Row(i, s"val_$i", 2, p2))
+    checkAnswer(
+      df.filter('a > 1 && 'p1 === 2),
+      for (i <- 2 to 3; p2 <- Seq("foo", "bar"))
+        yield Row(i, s"val_$i", 2, p2))
 
     // Simple projection and filtering
-    checkAnswer(df.filter('a > 1).select('b, 'a + 1),
-                for (i <- 2 to 3; _ <- 1 to 2; _ <- Seq("foo", "bar"))
-                  yield Row(s"val_$i", i + 1))
+    checkAnswer(
+      df.filter('a > 1).select('b, 'a + 1),
+      for (i <- 2 to 3; _ <- 1 to 2; _ <- Seq("foo", "bar"))
+        yield Row(s"val_$i", i + 1))
 
     // Simple projection and partition pruning
-    checkAnswer(df.filter('a > 1 && 'p1 < 2).select('b, 'p1),
-                for (i <- 2 to 3; _ <- Seq("foo", "bar"))
-                  yield Row(s"val_$i", 1))
+    checkAnswer(
+      df.filter('a > 1 && 'p1 < 2).select('b, 'p1),
+      for (i <- 2 to 3; _ <- Seq("foo", "bar"))
+        yield Row(s"val_$i", 1))
 
     // Project many copies of columns with different types (reproduction for SPARK-7858)
     checkAnswer(
@@ -92,12 +97,13 @@ abstract class HadoopFsRelationTest
     // Self-join
     df.registerTempTable("t")
     withTempTable("t") {
-      checkAnswer(sql("""SELECT l.a, r.b, l.p1, r.p2
+      checkAnswer(
+        sql("""SELECT l.a, r.b, l.p1, r.p2
             |FROM t l JOIN t r
             |ON l.a = r.a AND l.p1 = r.p1 AND l.p2 = r.p2
           """.stripMargin),
-                  for (i <- 1 to 3; p1 <- 1 to 2; p2 <- Seq("foo", "bar"))
-                    yield Row(i, s"val_$i", p1, p2))
+        for (i <- 1 to 3; p1 <- 1 to 2; p2 <- Seq("foo", "bar"))
+          yield Row(i, s"val_$i", p1, p2))
     }
   }
 
@@ -178,12 +184,13 @@ abstract class HadoopFsRelationTest
         .format(dataSourceName)
         .save(file.getCanonicalPath)
 
-      checkAnswer(sqlContext.read
-                    .format(dataSourceName)
-                    .option("path", file.getCanonicalPath)
-                    .option("dataSchema", dataSchema.json)
-                    .load(),
-                  testDF.collect())
+      checkAnswer(
+        sqlContext.read
+          .format(dataSourceName)
+          .option("path", file.getCanonicalPath)
+          .option("dataSchema", dataSchema.json)
+          .load(),
+        testDF.collect())
     }
   }
 
@@ -198,12 +205,13 @@ abstract class HadoopFsRelationTest
         .format(dataSourceName)
         .save(file.getCanonicalPath)
 
-      checkAnswer(sqlContext.read
-                    .format(dataSourceName)
-                    .option("dataSchema", dataSchema.json)
-                    .load(file.getCanonicalPath)
-                    .orderBy("a"),
-                  testDF.unionAll(testDF).orderBy("a").collect())
+      checkAnswer(
+        sqlContext.read
+          .format(dataSourceName)
+          .option("dataSchema", dataSchema.json)
+          .load(file.getCanonicalPath)
+          .orderBy("a"),
+        testDF.unionAll(testDF).orderBy("a").collect())
     }
   }
 
@@ -261,11 +269,12 @@ abstract class HadoopFsRelationTest
         .partitionBy("p1", "p2")
         .save(file.getCanonicalPath)
 
-      checkAnswer(sqlContext.read
-                    .format(dataSourceName)
-                    .option("dataSchema", dataSchema.json)
-                    .load(file.getCanonicalPath),
-                  partitionedTestDF.collect())
+      checkAnswer(
+        sqlContext.read
+          .format(dataSourceName)
+          .option("dataSchema", dataSchema.json)
+          .load(file.getCanonicalPath),
+        partitionedTestDF.collect())
     }
   }
 
@@ -283,11 +292,12 @@ abstract class HadoopFsRelationTest
         .partitionBy("p1", "p2")
         .save(file.getCanonicalPath)
 
-      checkAnswer(sqlContext.read
-                    .format(dataSourceName)
-                    .option("dataSchema", dataSchema.json)
-                    .load(file.getCanonicalPath),
-                  partitionedTestDF.unionAll(partitionedTestDF).collect())
+      checkAnswer(
+        sqlContext.read
+          .format(dataSourceName)
+          .option("dataSchema", dataSchema.json)
+          .load(file.getCanonicalPath),
+        partitionedTestDF.unionAll(partitionedTestDF).collect())
     }
   }
 
@@ -305,11 +315,12 @@ abstract class HadoopFsRelationTest
         .partitionBy("p1", "p2")
         .save(file.getCanonicalPath)
 
-      checkAnswer(sqlContext.read
-                    .format(dataSourceName)
-                    .option("dataSchema", dataSchema.json)
-                    .load(file.getCanonicalPath),
-                  partitionedTestDF.collect())
+      checkAnswer(
+        sqlContext.read
+          .format(dataSourceName)
+          .option("dataSchema", dataSchema.json)
+          .load(file.getCanonicalPath),
+        partitionedTestDF.collect())
     }
   }
 
@@ -358,8 +369,9 @@ abstract class HadoopFsRelationTest
     testDF.write.format(dataSourceName).mode(SaveMode.Append).saveAsTable("t")
 
     withTable("t") {
-      checkAnswer(sqlContext.table("t"),
-                  testDF.unionAll(testDF).orderBy("a").collect())
+      checkAnswer(
+        sqlContext.table("t"),
+        testDF.unionAll(testDF).orderBy("a").collect())
     }
   }
 
@@ -452,8 +464,9 @@ abstract class HadoopFsRelationTest
       .saveAsTable("t")
 
     withTable("t") {
-      checkAnswer(sqlContext.table("t"),
-                  partitionedTestDF.unionAll(partitionedTestDF).collect())
+      checkAnswer(
+        sqlContext.table("t"),
+        partitionedTestDF.unionAll(partitionedTestDF).collect())
     }
   }
 
@@ -576,12 +589,13 @@ abstract class HadoopFsRelationTest
       } yield (i, s"val_$i", 1.0d, p2, 123, 123.123f))
         .toDF("a", "b", "p1", "p2", "p3", "f")
 
-      val input = df.select('a,
-                            'b,
-                            'p1.cast(StringType).as('ps1),
-                            'p2,
-                            'p3.cast(FloatType).as('pf1),
-                            'f)
+      val input = df.select(
+        'a,
+        'b,
+        'p1.cast(StringType).as('ps1),
+        'p2,
+        'p3.cast(FloatType).as('pf1),
+        'f)
 
       withTempTable("t") {
         input.write
@@ -614,8 +628,9 @@ abstract class HadoopFsRelationTest
       .saveAsTable("t")
 
     withTable("t") {
-      checkAnswer(sqlContext.table("t").select('b, 'c, 'a),
-                  df.select('b, 'c, 'a).collect())
+      checkAnswer(
+        sqlContext.table("t").select('b, 'c, 'a),
+        df.select('b, 'c, 'a).collect())
     }
   }
 
@@ -638,8 +653,9 @@ abstract class HadoopFsRelationTest
       assertResult(10000) {
         sqlContext.read
           .format(dataSourceName)
-          .option("dataSchema",
-                  StructType(StructField("id", LongType) :: Nil).json)
+          .option(
+            "dataSchema",
+            StructType(StructField("id", LongType) :: Nil).json)
           .load(path)
           .count()
       }
@@ -656,8 +672,9 @@ abstract class HadoopFsRelationTest
           .mode("append")
           .format(dataSourceName)
           .save(dir.getCanonicalPath)
-        hadoopConfiguration.set(SQLConf.OUTPUT_COMMITTER_CLASS.key,
-                                classOf[AlwaysFailOutputCommitter].getName)
+        hadoopConfiguration.set(
+          SQLConf.OUTPUT_COMMITTER_CLASS.key,
+          classOf[AlwaysFailOutputCommitter].getName)
         // Since Parquet has its own output committer setting, also set it
         // to AlwaysFailParquetOutputCommitter at here.
         hadoopConfiguration.set(
@@ -670,11 +687,12 @@ abstract class HadoopFsRelationTest
           .mode("append")
           .format(dataSourceName)
           .save(dir.getCanonicalPath)
-        checkAnswer(sqlContext.read
-                      .format(dataSourceName)
-                      .option("dataSchema", df.schema.json)
-                      .load(dir.getCanonicalPath),
-                    df.unionAll(df))
+        checkAnswer(
+          sqlContext.read
+            .format(dataSourceName)
+            .option("dataSchema", df.schema.json)
+            .load(dir.getCanonicalPath),
+          df.unionAll(df))
 
         // This will fail because AlwaysFailOutputCommitter is used when we do append.
         intercept[Exception] {
@@ -685,8 +703,9 @@ abstract class HadoopFsRelationTest
         }
       }
       withTempPath { dir =>
-        hadoopConfiguration.set(SQLConf.OUTPUT_COMMITTER_CLASS.key,
-                                classOf[AlwaysFailOutputCommitter].getName)
+        hadoopConfiguration.set(
+          SQLConf.OUTPUT_COMMITTER_CLASS.key,
+          classOf[AlwaysFailOutputCommitter].getName)
         // Since Parquet has its own output committer setting, also set it
         // to AlwaysFailParquetOutputCommitter at here.
         hadoopConfiguration.set(
@@ -712,9 +731,10 @@ abstract class HadoopFsRelationTest
 
   test(
     "SPARK-8887: Explicitly define which data types can be used as dynamic partition columns") {
-    val df = Seq((1, "v1", Array(1, 2, 3), Map("k1" -> "v1"), Tuple2(1, "4")),
-                 (2, "v2", Array(4, 5, 6), Map("k2" -> "v2"), Tuple2(2, "5")),
-                 (3, "v3", Array(7, 8, 9), Map("k3" -> "v3"), Tuple2(3, "6")))
+    val df = Seq(
+      (1, "v1", Array(1, 2, 3), Map("k1" -> "v1"), Tuple2(1, "4")),
+      (2, "v2", Array(4, 5, 6), Map("k2" -> "v2"), Tuple2(2, "5")),
+      (3, "v3", Array(7, 8, 9), Map("k3" -> "v3"), Tuple2(3, "6")))
       .toDF("a", "b", "c", "d", "e")
     withTempDir { file =>
       intercept[AnalysisException] {
@@ -743,17 +763,19 @@ abstract class HadoopFsRelationTest
         sqlContext.sparkContext.conf.set("spark.speculation", "true")
 
         // Uses a customized output committer which always fails
-        hadoopConfiguration.set(SQLConf.OUTPUT_COMMITTER_CLASS.key,
-                                classOf[AlwaysFailOutputCommitter].getName)
+        hadoopConfiguration.set(
+          SQLConf.OUTPUT_COMMITTER_CLASS.key,
+          classOf[AlwaysFailOutputCommitter].getName)
 
         // Code below shouldn't throw since customized output committer should be disabled.
         val df = sqlContext.range(10).toDF().coalesce(1)
         df.write.format(dataSourceName).save(dir.getCanonicalPath)
-        checkAnswer(sqlContext.read
-                      .format(dataSourceName)
-                      .option("dataSchema", df.schema.json)
-                      .load(dir.getCanonicalPath),
-                    df)
+        checkAnswer(
+          sqlContext.read
+            .format(dataSourceName)
+            .option("dataSchema", df.schema.json)
+            .load(dir.getCanonicalPath),
+          df)
       }
     } finally {
       // Hadoop 1 doesn't have `Configuration.unset`

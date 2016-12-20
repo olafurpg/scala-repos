@@ -114,9 +114,10 @@ object MultilineStringUtil {
                         literal: ScLiteral,
                         marginChar: Char) {
     if (needAddStripMargin(literal, "" + marginChar)) {
-      document.insertString(literal.getTextRange.getEndOffset,
-                            if (marginChar == '|') ".stripMargin"
-                            else ".stripMargin(\'" + marginChar + "\')")
+      document.insertString(
+        literal.getTextRange.getEndOffset,
+        if (marginChar == '|') ".stripMargin"
+        else ".stripMargin(\'" + marginChar + "\')")
     }
   }
 
@@ -231,8 +232,9 @@ object MultilineStringUtil {
     element match {
       case literal: ScLiteral if literal.isMultiLineString =>
         val firstMLQuote = interpolatorPrefix(literal) + multilineQuotes
-        val literalOffsets = Seq(literal.getTextRange.getStartOffset,
-                                 literal.getTextRange.getEndOffset)
+        val literalOffsets = Seq(
+          literal.getTextRange.getStartOffset,
+          literal.getTextRange.getEndOffset)
         val Seq(startLineNumber, endLineNumber) =
           literalOffsets.map(document.getLineNumber)
         val literalStart = literalOffsets(0)

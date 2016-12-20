@@ -30,9 +30,9 @@ final class Env(config: Config,
 
   private[i18n] lazy val translationColl = db(CollectionTranslation)
 
-  lazy val pool = new I18nPool(langs =
-                                 Lang.availables(play.api.Play.current).toSet,
-                               default = I18nKey.en)
+  lazy val pool = new I18nPool(
+    langs = Lang.availables(play.api.Play.current).toSet,
+    default = I18nKey.en)
 
   lazy val translator = new Translator(messages = messages, pool = pool)
 
@@ -41,14 +41,16 @@ final class Env(config: Config,
   lazy val requestHandler =
     new I18nRequestHandler(pool, RequestHandlerProtocol, CdnDomain)
 
-  lazy val jsDump = new JsDump(path = appPath + "/" + WebPathRelative,
-                               pool = pool,
-                               keys = keys)
+  lazy val jsDump = new JsDump(
+    path = appPath + "/" + WebPathRelative,
+    pool = pool,
+    keys = keys)
 
-  lazy val fileFix = new FileFix(path = appPath + "/" + FilePathRelative,
-                                 pool = pool,
-                                 keys = keys,
-                                 messages = messages)
+  lazy val fileFix = new FileFix(
+    path = appPath + "/" + FilePathRelative,
+    pool = pool,
+    keys = keys,
+    messages = messages)
 
   lazy val transInfos = TransInfos(messages = messages, keys = keys)
 
@@ -57,16 +59,17 @@ final class Env(config: Config,
 
   def upstreamFetch = new UpstreamFetch(id => UpstreamUrlPattern format id)
 
-  lazy val gitWrite = new GitWrite(transRelPath = FilePathRelative,
-                                   repoPath = appPath,
-                                   system = system)
+  lazy val gitWrite = new GitWrite(
+    transRelPath = FilePathRelative,
+    repoPath = appPath,
+    system = system)
 
   lazy val context = new Context(ContextGitUrl, ContextGitFile, keys)
 
-  private lazy val callApi = new CallApi(hideCallsCookieName =
-                                           hideCallsCookieName,
-                                         minGames = CallThreshold,
-                                         transInfos = transInfos)
+  private lazy val callApi = new CallApi(
+    hideCallsCookieName = hideCallsCookieName,
+    minGames = CallThreshold,
+    transInfos = transInfos)
 
   val call = callApi.apply _
 

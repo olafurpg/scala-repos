@@ -151,16 +151,17 @@ final case class GuiceApplicationBuilder(
       global: Option[GlobalSettings] = global,
       loadModules: (Environment, Configuration) => Seq[GuiceableModule] =
         loadModules): GuiceApplicationBuilder =
-    new GuiceApplicationBuilder(environment,
-                                configuration,
-                                modules,
-                                overrides,
-                                disabled,
-                                binderOptions,
-                                eagerly,
-                                loadConfiguration,
-                                global,
-                                loadModules)
+    new GuiceApplicationBuilder(
+      environment,
+      configuration,
+      modules,
+      overrides,
+      disabled,
+      binderOptions,
+      eagerly,
+      loadConfiguration,
+      global,
+      loadModules)
 
   /**
     * Implementation of Self creation for GuiceBuilder.
@@ -172,13 +173,14 @@ final case class GuiceApplicationBuilder(
                            disabled: Seq[Class[_]],
                            binderOptions: Set[BinderOption] = binderOptions,
                            eagerly: Boolean): GuiceApplicationBuilder =
-    copy(environment,
-         configuration,
-         modules,
-         overrides,
-         disabled,
-         binderOptions,
-         eagerly)
+    copy(
+      environment,
+      configuration,
+      modules,
+      overrides,
+      disabled,
+      binderOptions,
+      eagerly)
 
   /**
     * Checks if the path contains the logger path
@@ -238,8 +240,9 @@ private class FakeRoutes(injected: PartialFunction[(String, String), Handler],
       override def applyOrElse[A <: RequestHeader, B >: Handler](
           rh: A,
           default: A => B) =
-        injected.applyOrElse((rh.method, rh.path),
-                             (_: (String, String)) => default(rh))
+        injected.applyOrElse(
+          (rh.method, rh.path),
+          (_: (String, String)) => default(rh))
       def isDefinedAt(rh: RequestHeader) =
         injected.isDefinedAt((rh.method, rh.path))
     } orElse new AbstractPartialFunction[RequestHeader, Handler] {

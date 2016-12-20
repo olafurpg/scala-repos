@@ -53,9 +53,10 @@ abstract class ContentEncodingSupportTest(e: ContentEncoding)
   implicit val encoding = e
 
   test("should decode request if Content-Encoding is supported") {
-    post("/",
-         Helper.compress(Helper.body),
-         Map("Content-Encoding" -> encoding.name)) {
+    post(
+      "/",
+      Helper.compress(Helper.body),
+      Map("Content-Encoding" -> encoding.name)) {
       response.body should equal(Helper.body)
     }
   }

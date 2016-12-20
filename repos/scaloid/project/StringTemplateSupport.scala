@@ -54,10 +54,12 @@ class StringTemplateSupport(version: Int,
   private def baseGroup = {
     val g = new STGroup('$', '$')
     g.defineTemplate("license", ScaloidCodeGenerator.license)
-    g.registerRenderer(classOf[AndroidClass],
-                       new AndroidClassRenderer(companionTemplate))
-    g.registerRenderer(classOf[AndroidPackage],
-                       new AndroidPackageRenderer(companionTemplate))
+    g.registerRenderer(
+      classOf[AndroidClass],
+      new AndroidClassRenderer(companionTemplate))
+    g.registerRenderer(
+      classOf[AndroidPackage],
+      new AndroidPackageRenderer(companionTemplate))
     g.registerRenderer(classOf[String], new StringRenderer())
     g.registerModelAdaptor(classOf[AndroidPackage], new AndroidPackageAdaptor)
     g.defineDictionary("ver", verDic)
@@ -85,8 +87,9 @@ class StringTemplateSupport(version: Int,
         .mapValues(_.map { case (k, v) => k.tail -> v })
         .mapValues { m: Map[List[String], Any] =>
           val (leaves, branches) = m.partition(_._1.length == 1)
-          leaves.map { case (k, v) => k.head -> v } ++ expand(branches,
-                                                              level + 1)
+          leaves.map { case (k, v) => k.head -> v } ++ expand(
+            branches,
+            level + 1)
         }
         .map(identity)
     }

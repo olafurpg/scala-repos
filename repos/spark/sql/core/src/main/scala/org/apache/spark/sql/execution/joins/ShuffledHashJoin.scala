@@ -40,8 +40,8 @@ case class ShuffledHashJoin(leftKeys: Seq[Expression],
     with HashJoin {
 
   override private[sql] lazy val metrics = Map(
-    "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
-                                                   "number of output rows"))
+    "numOutputRows" -> SQLMetrics
+      .createLongMetric(sparkContext, "number of output rows"))
 
   override def outputPartitioning: Partitioning = joinType match {
     case Inner =>
@@ -81,11 +81,12 @@ case class ShuffledHashJoin(leftKeys: Seq[Expression],
             streamIter.flatMap(currentRow => {
               val rowKey = keyGenerator(currentRow)
               joinedRow.withLeft(currentRow)
-              leftOuterIterator(rowKey,
-                                joinedRow,
-                                hashed.get(rowKey),
-                                resultProj,
-                                numOutputRows)
+              leftOuterIterator(
+                rowKey,
+                joinedRow,
+                hashed.get(rowKey),
+                resultProj,
+                numOutputRows)
             })
 
           case RightOuter =>
@@ -94,11 +95,12 @@ case class ShuffledHashJoin(leftKeys: Seq[Expression],
             streamIter.flatMap(currentRow => {
               val rowKey = keyGenerator(currentRow)
               joinedRow.withRight(currentRow)
-              rightOuterIterator(rowKey,
-                                 hashed.get(rowKey),
-                                 joinedRow,
-                                 resultProj,
-                                 numOutputRows)
+              rightOuterIterator(
+                rowKey,
+                hashed.get(rowKey),
+                joinedRow,
+                resultProj,
+                numOutputRows)
             })
 
           case x =>

@@ -4,8 +4,9 @@ object Macros {
   def impl_with_implicits_enabled(c: Context) = {
     import c.universe._
 
-    val tree1 = Apply(Select(Literal(Constant(1)), TermName("$minus$greater")),
-                      List(Literal(Constant(2))))
+    val tree1 = Apply(
+      Select(Literal(Constant(1)), TermName("$minus$greater")),
+      List(Literal(Constant(2))))
     val ttree1 = c.typecheck(tree1, withImplicitViewsDisabled = false)
     c.Expr[String](Literal(Constant(ttree1.toString)))
   }

@@ -106,9 +106,9 @@ trait JavaRDDLike[T, This <: JavaRDDLike[T, This]] extends Serializable {
       f: JFunction2[jl.Integer, java.util.Iterator[T], java.util.Iterator[R]],
       preservesPartitioning: Boolean = false): JavaRDD[R] =
     new JavaRDD(
-      rdd.mapPartitionsWithIndex((a, b) => f.call(a, b.asJava).asScala,
-                                 preservesPartitioning)(fakeClassTag))(
-      fakeClassTag)
+      rdd.mapPartitionsWithIndex(
+        (a, b) => f.call(a, b.asJava).asScala,
+        preservesPartitioning)(fakeClassTag))(fakeClassTag)
 
   /**
     * Return a new RDD by applying a function to all elements of this RDD.
@@ -122,8 +122,9 @@ trait JavaRDDLike[T, This <: JavaRDDLike[T, This]] extends Serializable {
     */
   def mapToPair[K2, V2](f: PairFunction[T, K2, V2]): JavaPairRDD[K2, V2] = {
     def cm: ClassTag[(K2, V2)] = implicitly[ClassTag[(K2, V2)]]
-    new JavaPairRDD(rdd.map[(K2, V2)](f)(cm))(fakeClassTag[K2],
-                                              fakeClassTag[V2])
+    new JavaPairRDD(rdd.map[(K2, V2)](f)(cm))(
+      fakeClassTag[K2],
+      fakeClassTag[V2])
   }
 
   /**
@@ -152,8 +153,9 @@ trait JavaRDDLike[T, This <: JavaRDDLike[T, This]] extends Serializable {
       f: PairFlatMapFunction[T, K2, V2]): JavaPairRDD[K2, V2] = {
     def fn: (T) => Iterator[(K2, V2)] = (x: T) => f.call(x).asScala
     def cm: ClassTag[(K2, V2)] = implicitly[ClassTag[(K2, V2)]]
-    JavaPairRDD.fromRDD(rdd.flatMap(fn)(cm))(fakeClassTag[K2],
-                                             fakeClassTag[V2])
+    JavaPairRDD.fromRDD(rdd.flatMap(fn)(cm))(
+      fakeClassTag[K2],
+      fakeClassTag[V2])
   }
 
   /**
@@ -201,8 +203,9 @@ trait JavaRDDLike[T, This <: JavaRDDLike[T, This]] extends Serializable {
     def fn: (Iterator[T]) => Iterator[(K2, V2)] = { (x: Iterator[T]) =>
       f.call(x.asJava).asScala
     }
-    JavaPairRDD.fromRDD(rdd.mapPartitions(fn))(fakeClassTag[K2],
-                                               fakeClassTag[V2])
+    JavaPairRDD.fromRDD(rdd.mapPartitions(fn))(
+      fakeClassTag[K2],
+      fakeClassTag[V2])
   }
 
   /**
@@ -302,8 +305,9 @@ trait JavaRDDLike[T, This <: JavaRDDLike[T, This]] extends Serializable {
     * a map on the other).
     */
   def zip[U](other: JavaRDDLike[U, _]): JavaPairRDD[T, U] = {
-    JavaPairRDD.fromRDD(rdd.zip(other.rdd)(other.classTag))(classTag,
-                                                            other.classTag)
+    JavaPairRDD.fromRDD(rdd.zip(other.rdd)(other.classTag))(
+      classTag,
+      other.classTag)
   }
 
   /**
@@ -684,8 +688,9 @@ trait JavaRDDLike[T, This <: JavaRDDLike[T, This]] extends Serializable {
     * future for counting the number of elements in this RDD.
     */
   def countAsync(): JavaFutureAction[jl.Long] = {
-    new JavaFutureActionWrapper[Long, jl.Long](rdd.countAsync(),
-                                               jl.Long.valueOf)
+    new JavaFutureActionWrapper[Long, jl.Long](
+      rdd.countAsync(),
+      jl.Long.valueOf)
   }
 
   /**

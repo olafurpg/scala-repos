@@ -163,8 +163,9 @@ object EitherOrderedBuf {
 
         (leftBuf.length(q"$element.left.get"),
          rightBuf.length(q"$element.right.get")) match {
-          case (lconst: ConstantLengthCalculation[_],
-                rconst: ConstantLengthCalculation[_])
+          case (
+              lconst: ConstantLengthCalculation[_],
+              rconst: ConstantLengthCalculation[_])
               if lconst.toInt == rconst.toInt =>
             // We got lucky, they are the same size:
             ConstantLengthCalculation(c)(1 + rconst.toInt)
@@ -172,8 +173,9 @@ object EitherOrderedBuf {
             NoLengthCalculationAvailable(c)
           case (_, _: NoLengthCalculationAvailable[_]) =>
             NoLengthCalculationAvailable(c)
-          case (left: MaybeLengthCalculation[_],
-                right: MaybeLengthCalculation[_]) =>
+          case (
+              left: MaybeLengthCalculation[_],
+              right: MaybeLengthCalculation[_]) =>
             MaybeLengthCalculation(c)(q"""
             if ($element.isLeft) { ${tree(left)} + $dyn(1) }
             else { ${tree(right)} + $dyn(1) }

@@ -65,8 +65,9 @@ trait SecurityDirectives {
   def authenticateBasic[T](
       realm: String,
       authenticator: Authenticator[T]): AuthenticationDirective[T] =
-    authenticateBasicAsync(realm,
-                           cred ⇒ FastFuture.successful(authenticator(cred)))
+    authenticateBasicAsync(
+      realm,
+      cred ⇒ FastFuture.successful(authenticator(cred)))
 
   /**
     * Wraps the inner route with Http Basic authentication support.
@@ -105,11 +106,12 @@ trait SecurityDirectives {
       realm: String,
       authenticator: AsyncAuthenticatorPF[T]): AuthenticationDirective[T] =
     extractExecutionContext.flatMap { implicit ec ⇒
-      authenticateBasicAsync(realm,
-                             credentials ⇒
-                               if (authenticator isDefinedAt credentials)
-                                 authenticator(credentials).fast.map(Some(_))
-                               else FastFuture.successful(None))
+      authenticateBasicAsync(
+        realm,
+        credentials ⇒
+          if (authenticator isDefinedAt credentials)
+            authenticator(credentials).fast.map(Some(_))
+          else FastFuture.successful(None))
     }
 
   /**
@@ -120,8 +122,9 @@ trait SecurityDirectives {
   def authenticateOAuth2[T](
       realm: String,
       authenticator: Authenticator[T]): AuthenticationDirective[T] =
-    authenticateOAuth2Async(realm,
-                            cred ⇒ FastFuture.successful(authenticator(cred)))
+    authenticateOAuth2Async(
+      realm,
+      cred ⇒ FastFuture.successful(authenticator(cred)))
 
   /**
     * A directive that wraps the inner route with OAuth2 Bearer Token authentication support.
@@ -160,11 +163,12 @@ trait SecurityDirectives {
       realm: String,
       authenticator: AsyncAuthenticatorPF[T]): AuthenticationDirective[T] =
     extractExecutionContext.flatMap { implicit ec ⇒
-      authenticateOAuth2Async(realm,
-                              credentials ⇒
-                                if (authenticator isDefinedAt credentials)
-                                  authenticator(credentials).fast.map(Some(_))
-                                else FastFuture.successful(None))
+      authenticateOAuth2Async(
+        realm,
+        credentials ⇒
+          if (authenticator isDefinedAt credentials)
+            authenticator(credentials).fast.map(Some(_))
+          else FastFuture.successful(None))
     }
 
   /**

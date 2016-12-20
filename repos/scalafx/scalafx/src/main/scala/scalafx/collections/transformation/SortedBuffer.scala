@@ -80,8 +80,9 @@ class SortedBuffer[E](override val delegate: jfxct.SortedList[E])
   def this(source: ObservableBuffer[E],
            lessThan: (_ >: E, _ >: E) => Boolean) =
     this(
-      delegate = new jfxct.SortedList[E](source.delegate,
-                                         Ordering.fromLessThan(lessThan)))
+      delegate = new jfxct.SortedList[E](
+        source.delegate,
+        Ordering.fromLessThan(lessThan)))
 
   /**
     * The comparator that denotes the order of this SortedList.
@@ -102,7 +103,8 @@ class SortedBuffer[E](override val delegate: jfxct.SortedList[E])
       def compare(p1: T, p2: T) =
         if (lessThan(p1, p2)) -1 else if (lessThan(p2, p1)) 1 else 0
     }
-    ObjectProperty.fillProperty(delegate.comparatorProperty(),
-                                Ordering.fromLessThan(lessThan))
+    ObjectProperty.fillProperty(
+      delegate.comparatorProperty(),
+      Ordering.fromLessThan(lessThan))
   }
 }

@@ -166,9 +166,10 @@ class UpgradedImageIExtractor(httpClient: HttpClient,
             trace("No good images found after filtering")
             getDepthLevel(node, parentDepthLevel, siblingDepthLevel) match {
               case Some(depthObj) => {
-                return checkForLargeImages(depthObj.node,
-                                           depthObj.parentDepth,
-                                           depthObj.siblingDepth)
+                return checkForLargeImages(
+                  depthObj.node,
+                  depthObj.parentDepth,
+                  depthObj.siblingDepth)
               }
               case None => trace("Image iteration is over!")
             }
@@ -178,9 +179,10 @@ class UpgradedImageIExtractor(httpClient: HttpClient,
       case None => {
         getDepthLevel(node, parentDepthLevel, siblingDepthLevel) match {
           case Some(depthObj) => {
-            return checkForLargeImages(depthObj.node,
-                                       depthObj.parentDepth,
-                                       depthObj.siblingDepth)
+            return checkForLargeImages(
+              depthObj.node,
+              depthObj.parentDepth,
+              depthObj.siblingDepth)
           }
           case None => trace("Image iteration is over!")
         }
@@ -604,8 +606,9 @@ object UpgradedImageIExtractor {
     }).toMap
   }
 
-  val KNOWN_IMG_DOM_NAMES = ListBuffer("yn-story-related-media",
-                                       "cnn_strylccimg300cntr",
-                                       "big_photo",
-                                       "ap-smallphoto-a")
+  val KNOWN_IMG_DOM_NAMES = ListBuffer(
+    "yn-story-related-media",
+    "cnn_strylccimg300cntr",
+    "big_photo",
+    "ap-smallphoto-a")
 }

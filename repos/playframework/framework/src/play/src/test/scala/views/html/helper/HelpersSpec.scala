@@ -78,9 +78,10 @@ object HelpersSpec extends Specification {
     "allow setting a custom id" in {
 
       val body = select
-        .apply(Form(single("foo" -> Forms.text))("foo"),
-               Seq(("0", "test")),
-               'id -> "someid")
+        .apply(
+          Form(single("foo" -> Forms.text))("foo"),
+          Seq(("0", "test")),
+          'id -> "someid")
         .body
 
       val idAttr = "id=\"someid\""
@@ -95,9 +96,10 @@ object HelpersSpec extends Specification {
       import Implicits.toAttributePair
 
       val body = select
-        .apply(Form(single("foo" -> Forms.text))("foo"),
-               Seq(("0", "test")),
-               "data-test" -> "test")
+        .apply(
+          Form(single("foo" -> Forms.text))("foo"),
+          Seq(("0", "test")),
+          "data-test" -> "test")
         .body
 
       val dataTestAttr = "data-test=\"test\""
@@ -123,9 +125,10 @@ object HelpersSpec extends Specification {
       val form =
         Form(single("foo" -> Forms.list(Forms.text))).fill(List("0", "1"))
       val body = select
-        .apply(form("foo"),
-               Seq(("0", "test"), ("1", "test")),
-               'multiple -> None)
+        .apply(
+          form("foo"),
+          Seq(("0", "test"), ("1", "test")),
+          'multiple -> None)
         .body
 
       // Append [] to the name for the form binding
@@ -140,9 +143,10 @@ object HelpersSpec extends Specification {
       val form =
         Form(single("foo" -> Forms.list(Forms.text))).fill(List("0", "1"))
       val body = select
-        .apply(form("foo"),
-               Seq("0" -> "test0", "1" -> "test1", "2" -> "test2"),
-               '_disabled -> Seq("0", "2"))
+        .apply(
+          form("foo"),
+          Seq("0" -> "test0", "1" -> "test1", "2" -> "test2"),
+          '_disabled -> Seq("0", "2"))
         .body
 
       body must contain("""<option value="0" disabled>test0</option>""")
@@ -178,23 +182,26 @@ object HelpersSpec extends Specification {
         .map(_.toString)
 
     "render a sequence of fields" in {
-      renderFoo(form.fill(Seq("a", "b", "c"))) must exactly("foo[0]:a",
-                                                            "foo[1]:b",
-                                                            "foo[2]:c").inOrder
+      renderFoo(form.fill(Seq("a", "b", "c"))) must exactly(
+        "foo[0]:a",
+        "foo[1]:b",
+        "foo[2]:c").inOrder
     }
 
     "render a sequence of fields in an unfilled form" in {
-      renderFoo(form, 4) must exactly("foo[0]:",
-                                      "foo[1]:",
-                                      "foo[2]:",
-                                      "foo[3]:").inOrder
+      renderFoo(form, 4) must exactly(
+        "foo[0]:",
+        "foo[1]:",
+        "foo[2]:",
+        "foo[3]:").inOrder
     }
 
     "fill the fields out if less than the min" in {
-      renderFoo(form.fill(Seq("a", "b")), 4) must exactly("foo[0]:a",
-                                                          "foo[1]:b",
-                                                          "foo[2]:",
-                                                          "foo[3]:").inOrder
+      renderFoo(form.fill(Seq("a", "b")), 4) must exactly(
+        "foo[0]:a",
+        "foo[1]:b",
+        "foo[2]:",
+        "foo[3]:").inOrder
     }
 
     "fill the fields out if less than the min but the maximum is high" in {
@@ -237,12 +244,13 @@ object HelpersSpec extends Specification {
     "correctly lookup constraint, error and format messages" in {
 
       val field =
-        Field(Form(single("foo" -> Forms.text)),
-              "foo",
-              Seq(("constraint.custom", Seq("constraint.customarg"))),
-              Some("format.custom", Seq("format.customarg")),
-              Seq(FormError("foo", "error.custom", Seq("error.customarg"))),
-              None)
+        Field(
+          Form(single("foo" -> Forms.text)),
+          "foo",
+          Seq(("constraint.custom", Seq("constraint.customarg"))),
+          Some("format.custom", Seq("format.customarg")),
+          Seq(FormError("foo", "error.custom", Seq("error.customarg"))),
+          None)
 
       val body = inputText.apply(field).body
 

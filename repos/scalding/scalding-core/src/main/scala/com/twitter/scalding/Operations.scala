@@ -709,12 +709,13 @@ package com.twitter.scalding {
       extends AggregateBy(
         arguments,
         new MRMFunctor[T, X](mfn, rfn, middleFields, startConv, midSet),
-        new MRMAggregator[X, X, U](args => args,
-                                   rfn,
-                                   mfn2,
-                                   declaredFields,
-                                   midConv,
-                                   endSet))
+        new MRMAggregator[X, X, U](
+          args => args,
+          rfn,
+          mfn2,
+          declaredFields,
+          midConv,
+          endSet))
 
   class BufferOp[I, T, X](
       @transient init: I,

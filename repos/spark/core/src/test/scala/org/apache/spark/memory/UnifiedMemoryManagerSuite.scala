@@ -149,8 +149,9 @@ class UnifiedMemoryManagerSuite
     evictedBlocks.clear()
     mm.releaseAllStorageMemory()
     require(mm.executionMemoryUsed === 300L)
-    require(mm.storageMemoryUsed === 0,
-            "bad test: all storage memory should have been released")
+    require(
+      mm.storageMemoryUsed === 0,
+      "bad test: all storage memory should have been released")
     // Acquire some storage memory again, but this time keep it within the storage region
     assert(mm.acquireStorageMemory(dummyBlock, 400L))
     assertEvictBlocksToFreeSpaceNotCalled(ms)

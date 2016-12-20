@@ -43,8 +43,9 @@ private[finagle] class RequeueFilter[Req, Rep](retryBudget: RetryBudget,
                                                timer: Timer)
     extends SimpleFilter[Req, Rep] {
 
-  require(maxRetriesPerReq >= 0,
-          s"maxRetriesPerReq must be non-negative: $maxRetriesPerReq")
+  require(
+    maxRetriesPerReq >= 0,
+    s"maxRetriesPerReq must be non-negative: $maxRetriesPerReq")
 
   private[this] val requeueCounter = statsReceiver.counter("requeues")
   private[this] val budgetExhaustCounter =
@@ -79,21 +80,23 @@ private[finagle] class RequeueFilter[Req, Rep](retryBudget: RetryBudget,
             case Duration.Zero #:: rest =>
               // no delay between retries. Retry immediately.
               requeueCounter.incr()
-              applyService(req,
-                           service,
-                           attempt + 1,
-                           retriesRemaining - 1,
-                           rest)
+              applyService(
+                req,
+                service,
+                attempt + 1,
+                retriesRemaining - 1,
+                rest)
             case delay #:: rest =>
               // Delay and then retry.
               timer
                 .doLater(delay) {
                   requeueCounter.incr()
-                  applyService(req,
-                               service,
-                               attempt + 1,
-                               retriesRemaining - 1,
-                               rest)
+                  applyService(
+                    req,
+                    service,
+                    attempt + 1,
+                    retriesRemaining - 1,
+                    rest)
                 }
                 .flatten
             case _ =>

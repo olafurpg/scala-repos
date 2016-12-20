@@ -72,15 +72,17 @@ class HttpConnectHandler(proxyAddr: SocketAddress,
   private[this] def writeRequest(ctx: ChannelHandlerContext,
                                  e: ChannelStateEvent) {
     val hostNameWithPort = addr.getAddress.getHostName + ":" + addr.getPort
-    val req = new DefaultHttpRequest(HttpVersion.HTTP_1_1,
-                                     HttpMethod.CONNECT,
-                                     hostNameWithPort)
+    val req = new DefaultHttpRequest(
+      HttpVersion.HTTP_1_1,
+      HttpMethod.CONNECT,
+      hostNameWithPort)
     req.headers().set("Host", hostNameWithPort)
     proxyCredentials.foreach { creds =>
       req
         .headers()
-        .set(HttpHeaders.Names.PROXY_AUTHORIZATION,
-             proxyAuthorizationHeader(creds))
+        .set(
+          HttpHeaders.Names.PROXY_AUTHORIZATION,
+          proxyAuthorizationHeader(creds))
     }
     Channels.write(ctx, Channels.future(ctx.getChannel), req, null)
   }

@@ -26,9 +26,10 @@ class ScalatraListener extends ServletContextListener {
       configureCycleClass(Thread.currentThread.getContextClassLoader)
     } catch {
       case e: Throwable =>
-        logger.error("Failed to initialize scalatra application at " +
-                       sce.getServletContext.getContextPath,
-                     e)
+        logger.error(
+          "Failed to initialize scalatra application at " +
+            sce.getServletContext.getContextPath,
+          e)
         throw e
     }
   }
@@ -65,8 +66,9 @@ class ScalatraListener extends ServletContextListener {
       if (lifeCycleClass != null) lifeCycleClass else oldLifeCycleClass
 
     assert(cycleClass != null, "No lifecycle class found!")
-    assert(classOf[LifeCycle].isAssignableFrom(cycleClass),
-           "This is no lifecycle class.")
+    assert(
+      classOf[LifeCycle].isAssignableFrom(cycleClass),
+      "This is no lifecycle class.")
     logger debug "Loaded lifecycle class: %s".format(cycleClass)
 
     if (cycleClass.getName == OldDefaultLifeCycle)

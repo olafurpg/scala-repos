@@ -66,13 +66,14 @@ class MapWithStateRDDSuite
       sc.parallelize(data),
       partitioner,
       Time(123))
-    assertRDD[Int, Int, String, Int](rdd,
-                                     data
-                                       .map { x =>
-                                         (x._1, x._2, 123)
-                                       }
-                                       .toSet,
-                                     Set.empty)
+    assertRDD[Int, Int, String, Int](
+      rdd,
+      data
+        .map { x =>
+          (x._1, x._2, 123)
+        }
+        .toSet,
+      Set.empty)
     assert(rdd.partitions.size === partitioner.numPartitions)
 
     assert(rdd.partitioner === Some(partitioner))
@@ -124,8 +125,9 @@ class MapWithStateRDDSuite
                    state: State[Int]): Option[Int] = {
         functionCalled = true
 
-        assert(t.milliseconds === updatedTime,
-               "mapping func called with wrong time")
+        assert(
+          t.milliseconds === updatedTime,
+          "mapping func called with wrong time")
 
         data match {
           case Some("noop") =>
@@ -140,8 +142,9 @@ class MapWithStateRDDSuite
             state.remove()
             None
           case None =>
-            assert(state.isTimingOut() === true,
-                   "State is not timing out when data = None")
+            assert(
+              state.isTimingOut() === true,
+              "State is not timing out when data = None")
             timingOutStates += state.get()
             None
           case _ =>
@@ -161,8 +164,9 @@ class MapWithStateRDDSuite
       val updatedStateData = updatedRecord.stateMap.getAll().map { x =>
         (x._2, x._3)
       }
-      assert(updatedStateData.toSet === expectedStates.toSet,
-             "states do not match after updating the MapWithStateRDDRecord")
+      assert(
+        updatedStateData.toSet === expectedStates.toSet,
+        "states do not match after updating the MapWithStateRDDRecord")
 
       assert(
         updatedRecord.mappedData.toSet === expectedOutput.toSet,
@@ -182,83 +186,96 @@ class MapWithStateRDDSuite
     // No data, no state should be changed, function should not be called,
     assertRecordUpdate(initStates = Nil, data = None, expectedStates = Nil)
     assert(functionCalled === false)
-    assertRecordUpdate(initStates = Seq(0),
-                       data = None,
-                       expectedStates = Seq((0, initialTime)))
+    assertRecordUpdate(
+      initStates = Seq(0),
+      data = None,
+      expectedStates = Seq((0, initialTime)))
     assert(functionCalled === false)
 
     // Data present, function should be called irrespective of whether state exists
-    assertRecordUpdate(initStates = Seq(0),
-                       data = Seq("noop"),
-                       expectedStates = Seq((0, initialTime)))
+    assertRecordUpdate(
+      initStates = Seq(0),
+      data = Seq("noop"),
+      expectedStates = Seq((0, initialTime)))
     assert(functionCalled === true)
-    assertRecordUpdate(initStates = None,
-                       data = Some("noop"),
-                       expectedStates = None)
+    assertRecordUpdate(
+      initStates = None,
+      data = Some("noop"),
+      expectedStates = None)
     assert(functionCalled === true)
 
     // Function called with right state data
-    assertRecordUpdate(initStates = None,
-                       data = Seq("get-state"),
-                       expectedStates = None,
-                       expectedOutput = Seq(-1))
-    assertRecordUpdate(initStates = Seq(123),
-                       data = Seq("get-state"),
-                       expectedStates = Seq((123, initialTime)),
-                       expectedOutput = Seq(123))
+    assertRecordUpdate(
+      initStates = None,
+      data = Seq("get-state"),
+      expectedStates = None,
+      expectedOutput = Seq(-1))
+    assertRecordUpdate(
+      initStates = Seq(123),
+      data = Seq("get-state"),
+      expectedStates = Seq((123, initialTime)),
+      expectedOutput = Seq(123))
 
     // Update state and timestamp, when timeout not present
-    assertRecordUpdate(initStates = Nil,
-                       data = Seq("update-state"),
-                       expectedStates = Seq((0, updatedTime)))
-    assertRecordUpdate(initStates = Seq(0),
-                       data = Seq("update-state"),
-                       expectedStates = Seq((1, updatedTime)))
+    assertRecordUpdate(
+      initStates = Nil,
+      data = Seq("update-state"),
+      expectedStates = Seq((0, updatedTime)))
+    assertRecordUpdate(
+      initStates = Seq(0),
+      data = Seq("update-state"),
+      expectedStates = Seq((1, updatedTime)))
 
     // Remove state
-    assertRecordUpdate(initStates = Seq(345),
-                       data = Seq("remove-state"),
-                       expectedStates = Nil,
-                       expectedRemovedStates = Seq(345))
+    assertRecordUpdate(
+      initStates = Seq(345),
+      data = Seq("remove-state"),
+      expectedStates = Nil,
+      expectedRemovedStates = Seq(345))
 
     // State strictly older than timeout threshold should be timed out
-    assertRecordUpdate(initStates = Seq(123),
-                       data = Nil,
-                       timeoutThreshold = Some(initialTime),
-                       removeTimedoutData = true,
-                       expectedStates = Seq((123, initialTime)),
-                       expectedTimingOutStates = Nil)
+    assertRecordUpdate(
+      initStates = Seq(123),
+      data = Nil,
+      timeoutThreshold = Some(initialTime),
+      removeTimedoutData = true,
+      expectedStates = Seq((123, initialTime)),
+      expectedTimingOutStates = Nil)
 
-    assertRecordUpdate(initStates = Seq(123),
-                       data = Nil,
-                       timeoutThreshold = Some(initialTime + 1),
-                       removeTimedoutData = true,
-                       expectedStates = Nil,
-                       expectedTimingOutStates = Seq(123))
+    assertRecordUpdate(
+      initStates = Seq(123),
+      data = Nil,
+      timeoutThreshold = Some(initialTime + 1),
+      removeTimedoutData = true,
+      expectedStates = Nil,
+      expectedTimingOutStates = Seq(123))
 
     // State should not be timed out after it has received data
-    assertRecordUpdate(initStates = Seq(123),
-                       data = Seq("noop"),
-                       timeoutThreshold = Some(initialTime + 1),
-                       removeTimedoutData = true,
-                       expectedStates = Seq((123, updatedTime)),
-                       expectedTimingOutStates = Nil)
-    assertRecordUpdate(initStates = Seq(123),
-                       data = Seq("remove-state"),
-                       timeoutThreshold = Some(initialTime + 1),
-                       removeTimedoutData = true,
-                       expectedStates = Nil,
-                       expectedTimingOutStates = Nil,
-                       expectedRemovedStates = Seq(123))
+    assertRecordUpdate(
+      initStates = Seq(123),
+      data = Seq("noop"),
+      timeoutThreshold = Some(initialTime + 1),
+      removeTimedoutData = true,
+      expectedStates = Seq((123, updatedTime)),
+      expectedTimingOutStates = Nil)
+    assertRecordUpdate(
+      initStates = Seq(123),
+      data = Seq("remove-state"),
+      timeoutThreshold = Some(initialTime + 1),
+      removeTimedoutData = true,
+      expectedStates = Nil,
+      expectedTimingOutStates = Nil,
+      expectedRemovedStates = Seq(123))
 
     // If a state is not set but timeoutThreshold is defined, we should ignore this state.
     // Previously it threw NoSuchElementException (SPARK-13195).
-    assertRecordUpdate(initStates = Seq(),
-                       data = Seq("noop"),
-                       timeoutThreshold = Some(initialTime + 1),
-                       removeTimedoutData = true,
-                       expectedStates = Nil,
-                       expectedTimingOutStates = Nil)
+    assertRecordUpdate(
+      initStates = Seq(),
+      data = Seq("noop"),
+      timeoutThreshold = Some(initialTime + 1),
+      removeTimedoutData = true,
+      expectedStates = Nil,
+      expectedTimingOutStates = Nil)
   }
 
   test("states generated by MapWithStateRDD") {
@@ -271,9 +288,10 @@ class MapWithStateRDDSuite
       .toSet
     val partitioner = new HashPartitioner(2)
     val initStateRDD = MapWithStateRDD
-      .createFromPairRDD[String, Int, Int, Int](sc.parallelize(initStates),
-                                                partitioner,
-                                                Time(initTime))
+      .createFromPairRDD[String, Int, Int, Int](
+        sc.parallelize(initStates),
+        partitioner,
+        Time(initTime))
       .persist()
     assertRDD(initStateRDD, initStateWthTime, Set.empty)
 
@@ -318,16 +336,18 @@ class MapWithStateRDDSuite
         sc.makeRDD(testData).partitionBy(testStateRDD.partitioner.get)
 
       // Assert that the new state RDD has expected state data
-      val newStateRDD = assertOperation(testStateRDD,
-                                        newDataRDD,
-                                        mappingFunction,
-                                        updateTime,
-                                        expectedStates,
-                                        Set.empty)
+      val newStateRDD = assertOperation(
+        testStateRDD,
+        newDataRDD,
+        mappingFunction,
+        updateTime,
+        expectedStates,
+        Set.empty)
 
       // Assert that the function was called only for the keys present in the data
-      assert(MapWithStateRDDSuite.touchedStateKeys.size === testData.size,
-             "More number of keys are being touched than that is expected")
+      assert(
+        MapWithStateRDDSuite.touchedStateKeys.size === testData.size,
+        "More number of keys are being touched than that is expected")
       assert(
         MapWithStateRDDSuite.touchedStateKeys.toSet === testData.toMap.keys,
         "Keys not in the data are being touched unexpectedly")
@@ -349,18 +369,21 @@ class MapWithStateRDDSuite
       Set(("k1", 0, initTime), ("k2", 0, initTime), ("k3", 0, updateTime)))
 
     val rdd2 =
-      testStateUpdates(rdd1,
-                       Seq(("k4", 1)), // should create k4's state as 0
-                       Set(("k1", 0, initTime),
-                           ("k2", 0, initTime),
-                           ("k3", 0, updateTime),
-                           ("k4", 0, updateTime)))
+      testStateUpdates(
+        rdd1,
+        Seq(("k4", 1)), // should create k4's state as 0
+        Set(
+          ("k1", 0, initTime),
+          ("k2", 0, initTime),
+          ("k3", 0, updateTime),
+          ("k4", 0, updateTime)))
 
     // Test updating of state
     val rdd3 =
-      testStateUpdates(initStateRDD,
-                       Seq(("k1", 1)), // should increment k1's state 0 -> 1
-                       Set(("k1", 1, updateTime), ("k2", 0, initTime)))
+      testStateUpdates(
+        initStateRDD,
+        Seq(("k1", 1)), // should increment k1's state 0 -> 1
+        Set(("k1", 1, updateTime), ("k2", 0, initTime)))
 
     val rdd4 = testStateUpdates(
       rdd3,
@@ -368,27 +391,29 @@ class MapWithStateRDDSuite
       Set(("k1", 1, updateTime), ("k2", 2, updateTime), ("k3", 0, updateTime)))
 
     val rdd5 =
-      testStateUpdates(rdd4,
-                       Seq(("k3", 1)), // should update k3's state 0 -> 2
-                       Set(("k1", 1, updateTime),
-                           ("k2", 2, updateTime),
-                           ("k3", 1, updateTime)))
+      testStateUpdates(
+        rdd4,
+        Seq(("k3", 1)), // should update k3's state 0 -> 2
+        Set(
+          ("k1", 1, updateTime),
+          ("k2", 2, updateTime),
+          ("k3", 1, updateTime)))
 
     // Test removing of state
     val rdd6 = testStateUpdates( // should remove k1's state
-                                initStateRDD,
-                                Seq(("k1", 2)),
-                                Set(("k2", 0, initTime)))
+      initStateRDD,
+      Seq(("k1", 2)),
+      Set(("k2", 0, initTime)))
 
     val rdd7 = testStateUpdates( // should remove k2's state
-                                rdd6,
-                                Seq(("k2", 2), ("k0", 2), ("k3", 1)),
-                                Set(("k3", 0, updateTime)))
+      rdd6,
+      Seq(("k2", 2), ("k0", 2), ("k3", 1)),
+      Set(("k3", 0, updateTime)))
 
     val rdd8 = testStateUpdates( // should remove k3's state
-                                rdd7,
-                                Seq(("k3", 2)),
-                                Set())
+      rdd7,
+      Seq(("k3", 2)),
+      Set())
   }
 
   test("checkpointing") {
@@ -414,12 +439,14 @@ class MapWithStateRDDSuite
         .createFromPairRDD(longLineageRDD.map { _ -> 1 }, partitioner, Time(0))
     }
 
-    testRDD(makeStateRDDWithLongLineageDataRDD,
-            reliableCheckpoint = true,
-            rddCollectFunc _)
-    testRDDPartitions(makeStateRDDWithLongLineageDataRDD,
-                      reliableCheckpoint = true,
-                      rddCollectFunc _)
+    testRDD(
+      makeStateRDDWithLongLineageDataRDD,
+      reliableCheckpoint = true,
+      rddCollectFunc _)
+    testRDDPartitions(
+      makeStateRDDWithLongLineageDataRDD,
+      reliableCheckpoint = true,
+      rddCollectFunc _)
 
     /** Generate MapWithStateRDD with parent state RDD having a long lineage */
     def makeStateRDDWithLongLineageParenttateRDD(
@@ -441,12 +468,14 @@ class MapWithStateRDDSuite
       )
     }
 
-    testRDD(makeStateRDDWithLongLineageParenttateRDD,
-            reliableCheckpoint = true,
-            rddCollectFunc _)
-    testRDDPartitions(makeStateRDDWithLongLineageParenttateRDD,
-                      reliableCheckpoint = true,
-                      rddCollectFunc _)
+    testRDD(
+      makeStateRDDWithLongLineageParenttateRDD,
+      reliableCheckpoint = true,
+      rddCollectFunc _)
+    testRDDPartitions(
+      makeStateRDDWithLongLineageParenttateRDD,
+      reliableCheckpoint = true,
+      rddCollectFunc _)
   }
 
   test("checkpointing empty state RDD") {
@@ -482,11 +511,12 @@ class MapWithStateRDDSuite
         newDataRDD
       }
 
-    val newStateRDD = new MapWithStateRDD[K, V, S, T](testStateRDD,
-                                                      newDataRDD,
-                                                      mappingFunction,
-                                                      Time(currentTime),
-                                                      None)
+    val newStateRDD = new MapWithStateRDD[K, V, S, T](
+      testStateRDD,
+      newDataRDD,
+      mappingFunction,
+      Time(currentTime),
+      None)
     if (doFullScan) newStateRDD.setFullScan()
 
     // Persist to make sure that it gets computed only once and we can track precisely how many
@@ -503,10 +533,12 @@ class MapWithStateRDDSuite
       expectedMappedData: Set[T]): Unit = {
     val states = stateRDD.flatMap { _.stateMap.getAll() }.collect().toSet
     val mappedData = stateRDD.flatMap { _.mappedData }.collect().toSet
-    assert(states === expectedStates,
-           "states after mapWithState operation were not as expected")
-    assert(mappedData === expectedMappedData,
-           "mapped data after mapWithState operation were not as expected")
+    assert(
+      states === expectedStates,
+      "states after mapWithState operation were not as expected")
+    assert(
+      mappedData === expectedMappedData,
+      "mapped data after mapWithState operation were not as expected")
   }
 }
 

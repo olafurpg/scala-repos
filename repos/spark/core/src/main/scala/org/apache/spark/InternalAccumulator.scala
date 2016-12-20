@@ -124,15 +124,16 @@ private[spark] object InternalAccumulator {
     * Accumulators for tracking internal metrics.
     */
   def createAll(): Seq[Accumulator[_]] = {
-    Seq[String](EXECUTOR_DESERIALIZE_TIME,
-                EXECUTOR_RUN_TIME,
-                RESULT_SIZE,
-                JVM_GC_TIME,
-                RESULT_SERIALIZATION_TIME,
-                MEMORY_BYTES_SPILLED,
-                DISK_BYTES_SPILLED,
-                PEAK_EXECUTION_MEMORY,
-                UPDATED_BLOCK_STATUSES)
+    Seq[String](
+      EXECUTOR_DESERIALIZE_TIME,
+      EXECUTOR_RUN_TIME,
+      RESULT_SIZE,
+      JVM_GC_TIME,
+      RESULT_SERIALIZATION_TIME,
+      MEMORY_BYTES_SPILLED,
+      DISK_BYTES_SPILLED,
+      PEAK_EXECUTION_MEMORY,
+      UPDATED_BLOCK_STATUSES)
       .map(create) ++ createShuffleReadAccums() ++ createShuffleWriteAccums() ++ createInputAccums() ++ createOutputAccums() ++ sys.props
       .get("spark.testing")
       .map(_ => create(TEST_ACCUM))
@@ -143,21 +144,23 @@ private[spark] object InternalAccumulator {
     * Accumulators for tracking shuffle read metrics.
     */
   def createShuffleReadAccums(): Seq[Accumulator[_]] = {
-    Seq[String](shuffleRead.REMOTE_BLOCKS_FETCHED,
-                shuffleRead.LOCAL_BLOCKS_FETCHED,
-                shuffleRead.REMOTE_BYTES_READ,
-                shuffleRead.LOCAL_BYTES_READ,
-                shuffleRead.FETCH_WAIT_TIME,
-                shuffleRead.RECORDS_READ).map(create)
+    Seq[String](
+      shuffleRead.REMOTE_BLOCKS_FETCHED,
+      shuffleRead.LOCAL_BLOCKS_FETCHED,
+      shuffleRead.REMOTE_BYTES_READ,
+      shuffleRead.LOCAL_BYTES_READ,
+      shuffleRead.FETCH_WAIT_TIME,
+      shuffleRead.RECORDS_READ).map(create)
   }
 
   /**
     * Accumulators for tracking shuffle write metrics.
     */
   def createShuffleWriteAccums(): Seq[Accumulator[_]] = {
-    Seq[String](shuffleWrite.BYTES_WRITTEN,
-                shuffleWrite.RECORDS_WRITTEN,
-                shuffleWrite.WRITE_TIME).map(create)
+    Seq[String](
+      shuffleWrite.BYTES_WRITTEN,
+      shuffleWrite.RECORDS_WRITTEN,
+      shuffleWrite.WRITE_TIME).map(create)
   }
 
   /**
@@ -172,9 +175,10 @@ private[spark] object InternalAccumulator {
     * Accumulators for tracking output metrics.
     */
   def createOutputAccums(): Seq[Accumulator[_]] = {
-    Seq[String](output.WRITE_METHOD,
-                output.BYTES_WRITTEN,
-                output.RECORDS_WRITTEN).map(create)
+    Seq[String](
+      output.WRITE_METHOD,
+      output.BYTES_WRITTEN,
+      output.RECORDS_WRITTEN).map(create)
   }
 
   /**
@@ -199,10 +203,11 @@ private[spark] object InternalAccumulator {
   private def newMetric[T](initialValue: T,
                            name: String,
                            param: AccumulatorParam[T]): Accumulator[T] = {
-    new Accumulator[T](initialValue,
-                       param,
-                       Some(name),
-                       internal = true,
-                       countFailedValues = true)
+    new Accumulator[T](
+      initialValue,
+      param,
+      Some(name),
+      internal = true,
+      countFailedValues = true)
   }
 }

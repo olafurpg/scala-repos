@@ -29,9 +29,10 @@ class ScalaJSPlugin(val global: Global) extends NscPlugin {
     if (global.forScaladoc) {
       List[NscPluginComponent](PrepInteropComponent)
     } else {
-      List[NscPluginComponent](PreTyperComponentComponent,
-                               PrepInteropComponent,
-                               GenCodeComponent)
+      List[NscPluginComponent](
+        PreTyperComponentComponent,
+        PrepInteropComponent,
+        GenCodeComponent)
     }
   }
 

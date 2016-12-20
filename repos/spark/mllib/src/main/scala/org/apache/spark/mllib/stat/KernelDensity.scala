@@ -94,10 +94,11 @@ class KernelDensity extends Serializable {
       sample.aggregate((new Array[Double](n), 0L))((x, y) => {
         var i = 0
         while (i < n) {
-          x._1(i) += normPdf(y,
-                             bandwidth,
-                             logStandardDeviationPlusHalfLog2Pi,
-                             points(i))
+          x._1(i) += normPdf(
+            y,
+            bandwidth,
+            logStandardDeviationPlusHalfLog2Pi,
+            points(i))
           i += 1
         }
         (x._1, x._2 + 1)

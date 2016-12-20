@@ -173,8 +173,9 @@ class FilterPushdownSuite extends PlanTest {
     val left = testRelation.where('a === 1)
     val right = testRelation1
     val correctAnswer = left
-      .join(right,
-            condition = Some("d".attr === "b".attr || "d".attr === "c".attr))
+      .join(
+        right,
+        condition = Some("d".attr === "b".attr || "d".attr === "c".attr))
       .analyze
 
     comparePlans(optimized, correctAnswer)
@@ -416,8 +417,9 @@ class FilterPushdownSuite extends PlanTest {
     }
     val optimized = Optimize.execute(originalQuery.analyze)
 
-    comparePlans(analysis.EliminateSubqueryAliases(originalQuery.analyze),
-                 optimized)
+    comparePlans(
+      analysis.EliminateSubqueryAliases(originalQuery.analyze),
+      optimized)
   }
 
   test("joins: conjunctive predicates") {
@@ -472,8 +474,9 @@ class FilterPushdownSuite extends PlanTest {
     val left = testRelation.where('a === 1).subquery('x)
     val right = testRelation.subquery('y)
     val correctAnswer = lleft
-      .join(left.join(right, condition = Some("x.b".attr === "y.b".attr)),
-            condition = Some("z.a".attr === "x.b".attr))
+      .join(
+        left.join(right, condition = Some("x.b".attr === "y.b".attr)),
+        condition = Some("z.a".attr === "x.b".attr))
       .analyze
 
     comparePlans(optimized, analysis.EliminateSubqueryAliases(correctAnswer))

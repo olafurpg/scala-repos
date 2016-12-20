@@ -149,8 +149,9 @@ trait EvaluatorMethodsModule[M[+ _]]
       if (valueKeySpecs.isEmpty) {
         keyValueSpec
       } else {
-        InnerObjectConcat(keyValueSpec,
-                          OuterObjectConcat(valueKeySpecs.toList: _*))
+        InnerObjectConcat(
+          keyValueSpec,
+          OuterObjectConcat(valueKeySpecs.toList: _*))
       }
     }
 

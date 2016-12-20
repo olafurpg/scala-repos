@@ -179,24 +179,26 @@ private[http] class HttpResponseParser(_settings: ParserSettings,
           if (te.isChunked) {
             if (clh.isEmpty) {
               emitResponseStart(chunkedEntity(cth), completedHeaders)
-              parseChunk(input,
-                         bodyStart,
-                         closeAfterResponseCompletion,
-                         totalBytesRead = 0L)
+              parseChunk(
+                input,
+                bodyStart,
+                closeAfterResponseCompletion,
+                totalBytesRead = 0L)
             } else
               failMessageStart(
                 "A chunked response must not contain a Content-Length header.")
           } else
-            parseEntity(completedHeaders,
-                        protocol,
-                        input,
-                        bodyStart,
-                        clh,
-                        cth,
-                        teh = None,
-                        expect100continue,
-                        hostHeaderPresent,
-                        closeAfterResponseCompletion)
+            parseEntity(
+              completedHeaders,
+              protocol,
+              input,
+              bodyStart,
+              clh,
+              cth,
+              teh = None,
+              expect100continue,
+              hostHeaderPresent,
+              closeAfterResponseCompletion)
       }
     } else finishEmptyResponse()
   }

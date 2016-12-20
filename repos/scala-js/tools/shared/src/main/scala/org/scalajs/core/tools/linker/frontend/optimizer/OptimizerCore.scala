@@ -15,7 +15,10 @@ import scala.annotation.{switch, tailrec}
 import scala.collection.mutable
 
 import scala.util.control.{NonFatal, ControlThrowable, TailCalls}
-import scala.util.control.TailCalls.{done => _, _} // done is a too generic term
+import scala.util.control.TailCalls.{
+  done => _,
+  _
+} // done is a too generic term
 
 import org.scalajs.core.ir._
 import Definitions.{ObjectClass, isConstructorName, isReflProxyName}
@@ -34,8 +37,8 @@ import org.scalajs.core.tools.linker.backend.emitter.LongImpl
   *  optimizer does. To perform inlining, it relies on abstract protected
   *  methods to identify the target of calls.
   */
-private[optimizer] abstract class OptimizerCore(
-    semantics: Semantics, esLevel: ESLevel) {
+private[optimizer] abstract class OptimizerCore(semantics: Semantics,
+                                                esLevel: ESLevel) {
   import OptimizerCore._
 
   type MethodID <: AbstractMethodID
@@ -46,16 +49,16 @@ private[optimizer] abstract class OptimizerCore(
   protected def getMethodBody(method: MethodID): MethodDef
 
   /** Returns the list of possible targets for a dynamically linked call. */
-  protected def dynamicCall(
-      intfName: String, methodName: String): List[MethodID]
+  protected def dynamicCall(intfName: String,
+                            methodName: String): List[MethodID]
 
   /** Returns the target of a static call. */
-  protected def staticCall(
-      className: String, methodName: String): Option[MethodID]
+  protected def staticCall(className: String,
+                           methodName: String): Option[MethodID]
 
   /** Returns the target of a call to a static method. */
-  protected def callStatic(
-      className: String, methodName: String): Option[MethodID]
+  protected def callStatic(className: String,
+                           methodName: String): Option[MethodID]
 
   /** Returns the list of ancestors of a class or interface. */
   protected def getAncestorsOf(encodedName: String): List[String]
@@ -99,8 +102,8 @@ private[optimizer] abstract class OptimizerCore(
 
   private var curTrampolineId = 0
 
-  def optimize(
-      thisType: Type, originalDef: MethodDef): LinkedMember[MethodDef] = {
+  def optimize(thisType: Type,
+               originalDef: MethodDef): LinkedMember[MethodDef] = {
     try {
       val MethodDef(static, name, params, resultType, body) = originalDef
       val (newParams, newBody1) = try {
@@ -112,24 +115,31 @@ private[optimizer] abstract class OptimizerCore(
           statesInUse = Nil
           disableOptimisticOptimizations = true
           transformIsolatedBody(
-              Some(myself), thisType, params, resultType, body)
+            Some(myself),
+            thisType,
+            params,
+            resultType,
+            body)
       }
       val newBody =
         if (name.name == "init___") tryElimStoreModule(newBody1)
         else newBody1
       val m = MethodDef(static, name, newParams, resultType, newBody)(
-          originalDef.optimizerHints, None)(originalDef.pos)
+        originalDef.optimizerHints,
+        None)(originalDef.pos)
       val info = Infos.generateMethodInfo(m)
 
       new LinkedMember(info, m, None)
     } catch {
       case NonFatal(cause) =>
         throw new OptimizeException(
-            myself, attemptedInlining.distinct.toList, cause)
+          myself,
+          attemptedInlining.distinct.toList,
+          cause)
       case e: Throwable =>
         // This is a fatal exception. Don't wrap, just output debug info error
         Console.err.println(
-            exceptionMsg(myself, attemptedInlining.distinct.toList, e))
+          exceptionMsg(myself, attemptedInlining.distinct.toList, e))
         throw e
     }
   }
@@ -180,8 +190,8 @@ private[optimizer] abstract class OptimizerCore(
 
   private val isReserved = isKeyword ++ Seq("arguments", "eval", "ScalaJS")
 
-  private def freshNameGeneric(
-      nameUsed: String => Boolean, base: String): String = {
+  private def freshNameGeneric(nameUsed: String => Boolean,
+                               base: String): String = {
     if (!nameUsed(base) && !isReserved(base)) {
       base
     } else {
@@ -206,12 +216,13 @@ private[optimizer] abstract class OptimizerCore(
       val stateBackups = statesInUse.map(_.makeBackup())
 
       body { () =>
-        throw new RollbackException(trampolineId,
-                                    savedUsedLocalNames,
-                                    savedUsedLabelNames,
-                                    savedStatesInUse,
-                                    stateBackups,
-                                    fallbackFun)
+        throw new RollbackException(
+          trampolineId,
+          savedUsedLocalNames,
+          savedUsedLabelNames,
+          savedStatesInUse,
+          stateBackups,
+          fallbackFun)
       }
     }
   }
@@ -279,11 +290,12 @@ private[optimizer] abstract class OptimizerCore(
 
       case Labeled(ident @ Ident(label, _), tpe, body) =>
         trampoline {
-          returnable(label,
-                     if (isStat) NoType else tpe,
-                     body,
-                     isStat,
-                     usePreTransform = false)(finishTransform(isStat))
+          returnable(
+            label,
+            if (isStat) NoType else tpe,
+            body,
+            isStat,
+            usePreTransform = false)(finishTransform(isStat))
         }
 
       case Assign(lhs, rhs) =>
@@ -326,7 +338,7 @@ private[optimizer] abstract class OptimizerCore(
           if (!info.acceptRecords) {
             val newExpr = transformExpr(expr)
             info.returnedTypes.value ::=
-            (newExpr.tpe, RefinedType(newExpr.tpe))
+              (newExpr.tpe, RefinedType(newExpr.tpe))
             Return(newExpr, newOptLabel)
           } else
             trampoline {
@@ -352,8 +364,8 @@ private[optimizer] abstract class OptimizerCore(
           case _ =>
             val newThenp = transform(thenp, isStat)
             val newElsep = transform(elsep, isStat)
-            val refinedType = constrainedLub(
-                newThenp.tpe, newElsep.tpe, tree.tpe)
+            val refinedType =
+              constrainedLub(newThenp.tpe, newElsep.tpe, tree.tpe)
             foldIf(newCond, newThenp, newElsep)(refinedType)
         }
 
@@ -368,9 +380,10 @@ private[optimizer] abstract class OptimizerCore(
 
               case Some(labelIdent @ Ident(label, _)) =>
                 val newLabel = freshLabelName(label)
-                val info = new LabelInfo(newLabel,
-                                         acceptRecords = false,
-                                         returnedTypes = newSimpleState(Nil))
+                val info = new LabelInfo(
+                  newLabel,
+                  acceptRecords = false,
+                  returnedTypes = newSimpleState(Nil))
                 While(newCond, {
                   val bodyScope =
                     scope.withEnv(scope.env.withLabelInfo(label, info))
@@ -393,16 +406,22 @@ private[optimizer] abstract class OptimizerCore(
         Try(newBlock, errVar, EmptyTree, newFinalizer)(newBlock.tpe)
 
       case Try(
-          block, errVar @ Ident(name, originalName), handler, finalizer) =>
+          block,
+          errVar @ Ident(name, originalName),
+          handler,
+          finalizer) =>
         val newBlock = transform(block, isStat)
 
         val newName = freshLocalName(name, false)
         val newOriginalName = originalName.orElse(Some(name))
         val localDef = LocalDef(
-            RefinedType(AnyType),
-            true,
-            ReplaceWithVarRef(
-                newName, newOriginalName, newSimpleState(true), None))
+          RefinedType(AnyType),
+          true,
+          ReplaceWithVarRef(
+            newName,
+            newOriginalName,
+            newSimpleState(true),
+            None))
         val newHandler = {
           val handlerScope =
             scope.withEnv(scope.env.withLocalDef(name, localDef))
@@ -411,12 +430,13 @@ private[optimizer] abstract class OptimizerCore(
 
         val newFinalizer = transformStat(finalizer)
 
-        val refinedType = constrainedLub(
-            newBlock.tpe, newHandler.tpe, tree.tpe)
-        Try(newBlock,
-            Ident(newName, newOriginalName)(errVar.pos),
-            newHandler,
-            newFinalizer)(refinedType)
+        val refinedType =
+          constrainedLub(newBlock.tpe, newHandler.tpe, tree.tpe)
+        Try(
+          newBlock,
+          Ident(newName, newOriginalName)(errVar.pos),
+          newHandler,
+          newFinalizer)(refinedType)
 
       case Throw(expr) =>
         Throw(transformExpr(expr))
@@ -440,9 +460,10 @@ private[optimizer] abstract class OptimizerCore(
               } getOrElse default
             transform(body, isStat)
           case _ =>
-            Match(newSelector,
-                  cases map (c => (c._1, transform(c._2, isStat))),
-                  transform(default, isStat))(tree.tpe)
+            Match(
+              newSelector,
+              cases map (c => (c._1, transform(c._2, isStat))),
+              transform(default, isStat))(tree.tpe)
         }
 
       // Scala expressions
@@ -456,25 +477,25 @@ private[optimizer] abstract class OptimizerCore(
       case tree: Select =>
         trampoline {
           pretransformSelectCommon(tree, isLhsOfAssign = false)(
-              finishTransform(isStat = false))
+            finishTransform(isStat = false))
         }
 
       case tree: Apply =>
         trampoline {
           pretransformApply(tree, isStat, usePreTransform = false)(
-              finishTransform(isStat))
+            finishTransform(isStat))
         }
 
       case tree: ApplyStatically =>
         trampoline {
           pretransformStaticApply(tree, isStat, usePreTransform = false)(
-              finishTransform(isStat))
+            finishTransform(isStat))
         }
 
       case tree: ApplyStatic =>
         trampoline {
           pretransformApplyStatic(tree, isStat, usePreTransform = false)(
-              finishTransform(isStat))
+            finishTransform(isStat))
         }
 
       case tree @ UnaryOp(_, arg) =>
@@ -543,7 +564,7 @@ private[optimizer] abstract class OptimizerCore(
             texpr.tpe match {
               case RefinedType(base: ReferenceType, true, false) =>
                 TailCalls.done(
-                    Block(finishTransformStat(texpr), ClassOf(base)))
+                  Block(finishTransformStat(texpr), ClassOf(base)))
               case _ =>
                 TailCalls.done(GetClass(finishTransformExpr(texpr)))
             }
@@ -564,27 +585,33 @@ private[optimizer] abstract class OptimizerCore(
       case tree: JSFunctionApply =>
         trampoline {
           pretransformJSFunctionApply(tree, isStat, usePreTransform = false)(
-              finishTransform(isStat))
+            finishTransform(isStat))
         }
 
       case JSDotMethodApply(receiver, method, args) =>
         JSDotMethodApply(
-            transformExpr(receiver), method, args map transformExprOrSpread)
+          transformExpr(receiver),
+          method,
+          args map transformExprOrSpread)
 
       case JSBracketMethodApply(receiver, method, args) =>
-        JSBracketMethodApply(transformExpr(receiver),
-                             transformExpr(method),
-                             args map transformExprOrSpread)
+        JSBracketMethodApply(
+          transformExpr(receiver),
+          transformExpr(method),
+          args map transformExprOrSpread)
 
       case JSSuperBracketSelect(cls, qualifier, item) =>
         JSSuperBracketSelect(
-            cls, transformExpr(qualifier), transformExpr(item))
+          cls,
+          transformExpr(qualifier),
+          transformExpr(item))
 
       case JSSuperBracketCall(cls, receiver, method, args) =>
-        JSSuperBracketCall(cls,
-                           transformExpr(receiver),
-                           transformExpr(method),
-                           args map transformExprOrSpread)
+        JSSuperBracketCall(
+          cls,
+          transformExpr(receiver),
+          transformExpr(method),
+          args map transformExprOrSpread)
 
       case JSSuperConstructorCall(args) =>
         JSSuperConstructorCall(args map transformExprOrSpread)
@@ -605,8 +632,7 @@ private[optimizer] abstract class OptimizerCore(
         JSArrayConstr(items map transformExprOrSpread)
 
       case JSObjectConstr(fields) =>
-        JSObjectConstr(
-            fields map {
+        JSObjectConstr(fields map {
           case (name, value) => (name, transformExpr(value))
         })
 
@@ -619,7 +645,10 @@ private[optimizer] abstract class OptimizerCore(
 
       case Closure(captureParams, params, body, captureValues) =>
         transformClosureCommon(
-            captureParams, params, body, captureValues.map(transformExpr))
+          captureParams,
+          params,
+          body,
+          captureValues.map(transformExpr))
 
       // Trees that need not be transformed
 
@@ -629,21 +658,25 @@ private[optimizer] abstract class OptimizerCore(
 
       case _ =>
         sys.error(
-            s"Invalid tree in transform of class ${tree.getClass.getName}: $tree")
+          s"Invalid tree in transform of class ${tree.getClass.getName}: $tree")
     }
 
     if (isStat) keepOnlySideEffects(result)
     else result
   }
 
-  private def transformClosureCommon(captureParams: List[ParamDef],
-                                     params: List[ParamDef],
-                                     body: Tree,
-                                     newCaptureValues: List[Tree])(
-      implicit pos: Position): Closure = {
+  private def transformClosureCommon(
+      captureParams: List[ParamDef],
+      params: List[ParamDef],
+      body: Tree,
+      newCaptureValues: List[Tree])(implicit pos: Position): Closure = {
 
     val (allNewParams, newBody) = transformIsolatedBody(
-        None, AnyType, captureParams ++ params, AnyType, body)
+      None,
+      AnyType,
+      captureParams ++ params,
+      AnyType,
+      body)
     val (newCaptureParams, newParams) =
       allNewParams.splitAt(captureParams.size)
 
@@ -737,18 +770,20 @@ private[optimizer] abstract class OptimizerCore(
 
       case VarRef(Ident(name, _)) =>
         val localDef = scope.env.localDefs.getOrElse(
-            name,
-            sys.error(s"Cannot find local def '$name' at $pos\n" +
-                s"While optimizing $myself\n" +
-                s"Env is ${scope.env}\nInlining ${scope.implsBeingInlined}"))
+          name,
+          sys.error(
+            s"Cannot find local def '$name' at $pos\n" +
+              s"While optimizing $myself\n" +
+              s"Env is ${scope.env}\nInlining ${scope.implsBeingInlined}"))
         cont(PreTransLocalDef(localDef))
 
       case This() =>
         val localDef = scope.env.localDefs.getOrElse(
-            "this",
-            sys.error(s"Found invalid 'this' at $pos\n" +
-                s"While optimizing $myself\n" +
-                s"Env is ${scope.env}\nInlining ${scope.implsBeingInlined}"))
+          "this",
+          sys.error(
+            s"Found invalid 'this' at $pos\n" +
+              s"While optimizing $myself\n" +
+              s"Env is ${scope.env}\nInlining ${scope.implsBeingInlined}"))
         cont(PreTransLocalDef(localDef))
 
       case If(cond, thenp, elsep) =>
@@ -762,53 +797,61 @@ private[optimizer] abstract class OptimizerCore(
               pretransformNoLocalDef(thenp) { tthenp =>
                 pretransformNoLocalDef(elsep) { telsep =>
                   (tthenp, telsep) match {
-                    case (PreTransRecordTree(thenTree,
-                                             thenOrigType,
-                                             thenCancelFun),
-                          PreTransRecordTree(elseTree,
-                                             elseOrigType,
-                                             elseCancelFun)) =>
+                    case (
+                        PreTransRecordTree(
+                          thenTree,
+                          thenOrigType,
+                          thenCancelFun),
+                        PreTransRecordTree(
+                          elseTree,
+                          elseOrigType,
+                          elseCancelFun)) =>
                       val commonType =
                         if (thenTree.tpe == elseTree.tpe &&
                             thenOrigType == elseOrigType) thenTree.tpe
                         else cancelFun()
                       val refinedOrigType =
                         constrainedLub(thenOrigType, elseOrigType, tree.tpe)
-                      cont(PreTransRecordTree(
-                              If(newCond, thenTree, elseTree)(commonType),
-                              refinedOrigType,
-                              cancelFun))
+                      cont(
+                        PreTransRecordTree(
+                          If(newCond, thenTree, elseTree)(commonType),
+                          refinedOrigType,
+                          cancelFun))
 
                     case (
-                        PreTransRecordTree(thenTree,
-                                           thenOrigType,
-                                           thenCancelFun),
+                        PreTransRecordTree(
+                          thenTree,
+                          thenOrigType,
+                          thenCancelFun),
                         _) if telsep.tpe.isNothingType =>
-                      cont(PreTransRecordTree(
-                              If(
-                                  newCond, thenTree, finishTransformExpr(telsep))(
-                                  thenTree.tpe),
-                              thenOrigType,
-                              thenCancelFun))
+                      cont(
+                        PreTransRecordTree(
+                          If(newCond, thenTree, finishTransformExpr(telsep))(
+                            thenTree.tpe),
+                          thenOrigType,
+                          thenCancelFun))
 
-                    case (_,
-                          PreTransRecordTree(elseTree,
-                                             elseOrigType,
-                                             elseCancelFun))
-                        if tthenp.tpe.isNothingType =>
-                      cont(PreTransRecordTree(If(newCond,
-                                                 finishTransformExpr(tthenp),
-                                                 elseTree)(elseTree.tpe),
-                                              elseOrigType,
-                                              elseCancelFun))
+                    case (
+                        _,
+                        PreTransRecordTree(
+                          elseTree,
+                          elseOrigType,
+                          elseCancelFun)) if tthenp.tpe.isNothingType =>
+                      cont(
+                        PreTransRecordTree(
+                          If(newCond, finishTransformExpr(tthenp), elseTree)(
+                            elseTree.tpe),
+                          elseOrigType,
+                          elseCancelFun))
 
                     case _ =>
                       val newThenp = finishTransformExpr(tthenp)
                       val newElsep = finishTransformExpr(telsep)
                       val refinedType =
                         constrainedLub(newThenp.tpe, newElsep.tpe, tree.tpe)
-                      cont(PreTransTree(foldIf(newCond, newThenp, newElsep)(
-                                  refinedType)))
+                      cont(
+                        PreTransTree(
+                          foldIf(newCond, newThenp, newElsep)(refinedType)))
                   }
                 }
               }
@@ -817,8 +860,8 @@ private[optimizer] abstract class OptimizerCore(
               val newElsep = transformExpr(elsep)
               val refinedType =
                 constrainedLub(newThenp.tpe, newElsep.tpe, tree.tpe)
-              cont(PreTransTree(
-                      foldIf(newCond, newThenp, newElsep)(refinedType)))
+              cont(
+                PreTransTree(foldIf(newCond, newThenp, newElsep)(refinedType)))
             }
         }
 
@@ -835,15 +878,16 @@ private[optimizer] abstract class OptimizerCore(
             pretransformExpr(body)(cont)
           case _ =>
             cont(
-                PreTransTree(
-                    Match(newSelector,
-                          cases map (c => (c._1, transformExpr(c._2))),
-                          transformExpr(default))(tree.tpe)))
+              PreTransTree(
+                Match(
+                  newSelector,
+                  cases map (c => (c._1, transformExpr(c._2))),
+                  transformExpr(default))(tree.tpe)))
         }
 
       case Labeled(ident @ Ident(label, _), tpe, body) =>
         returnable(label, tpe, body, isStat = false, usePreTransform = true)(
-            cont)
+          cont)
 
       case New(cls, ctor, args) =>
         pretransformExprs(args) { targs =>
@@ -858,15 +902,17 @@ private[optimizer] abstract class OptimizerCore(
 
       case tree: ApplyStatically =>
         pretransformStaticApply(tree, isStat = false, usePreTransform = true)(
-            cont)
+          cont)
 
       case tree: ApplyStatic =>
         pretransformApplyStatic(tree, isStat = false, usePreTransform = true)(
-            cont)
+          cont)
 
       case tree: JSFunctionApply =>
         pretransformJSFunctionApply(
-            tree, isStat = false, usePreTransform = true)(cont)
+          tree,
+          isStat = false,
+          usePreTransform = true)(cont)
 
       case AsInstanceOf(expr, tpe) =>
         pretransformExpr(expr) { texpr =>
@@ -878,8 +924,8 @@ private[optimizer] abstract class OptimizerCore(
               if (isSubtype(texpr.tpe.base, tpe.asInstanceOf[Type])) {
                 cont(texpr)
               } else {
-                cont(PreTransTree(
-                        AsInstanceOf(finishTransformExpr(texpr), tpe)))
+                cont(
+                  PreTransTree(AsInstanceOf(finishTransformExpr(texpr), tpe)))
               }
           }
         }
@@ -895,28 +941,29 @@ private[optimizer] abstract class OptimizerCore(
             }
             withNewLocalDefs(captureBindings) { (captureLocalDefs, cont1) =>
               val replacement = TentativeClosureReplacement(
-                  captureParams,
-                  params,
-                  body,
-                  captureLocalDefs,
-                  alreadyUsed = newSimpleState(false),
-                  cancelFun)
-              val localDef = LocalDef(RefinedType(AnyType,
-                                                  isExact = false,
-                                                  isNullable = false),
-                                      mutable = false,
-                                      replacement)
+                captureParams,
+                params,
+                body,
+                captureLocalDefs,
+                alreadyUsed = newSimpleState(false),
+                cancelFun)
+              val localDef = LocalDef(
+                RefinedType(AnyType, isExact = false, isNullable = false),
+                mutable = false,
+                replacement)
               cont1(PreTransLocalDef(localDef))
             }(cont)
           } { () =>
             val newClosure =
-              transformClosureCommon(captureParams,
-                                     params,
-                                     body,
-                                     tcaptureValues.map(finishTransformExpr))
-            cont(PreTransTree(
-                    newClosure,
-                    RefinedType(AnyType, isExact = false, isNullable = false)))
+              transformClosureCommon(
+                captureParams,
+                params,
+                body,
+                tcaptureValues.map(finishTransformExpr))
+            cont(
+              PreTransTree(
+                newClosure,
+                RefinedType(AnyType, isExact = false, isNullable = false)))
           }
         }
 
@@ -968,7 +1015,7 @@ private[optimizer] abstract class OptimizerCore(
     val Select(qualifier, item) = tree
     pretransformExpr(qualifier) { preTransQual =>
       pretransformSelectCommon(tree.tpe, preTransQual, item, isLhsOfAssign)(
-          cont)(scope, tree.pos)
+        cont)(scope, tree.pos)
     }
   }
 
@@ -977,13 +1024,16 @@ private[optimizer] abstract class OptimizerCore(
       preTransQual: PreTransform,
       item: Ident,
       isLhsOfAssign: Boolean)(cont: PreTransCont)(
-      implicit scope: Scope, pos: Position): TailRec[Tree] = {
+      implicit scope: Scope,
+      pos: Position): TailRec[Tree] = {
     preTransQual match {
       case PreTransLocalDef(
-          LocalDef(_,
-                   _,
-                   InlineClassBeingConstructedReplacement(
-                   fieldLocalDefs, cancelFun))) =>
+          LocalDef(
+            _,
+            _,
+            InlineClassBeingConstructedReplacement(
+              fieldLocalDefs,
+              cancelFun))) =>
         val fieldLocalDef = fieldLocalDefs(item.name)
         if (!isLhsOfAssign || fieldLocalDef.mutable) {
           cont(PreTransLocalDef(fieldLocalDef))
@@ -997,10 +1047,10 @@ private[optimizer] abstract class OptimizerCore(
           cancelFun()
         }
       case PreTransLocalDef(
-          LocalDef(_,
-                   _,
-                   InlineClassInstanceReplacement(
-                   _, fieldLocalDefs, cancelFun))) =>
+          LocalDef(
+            _,
+            _,
+            InlineClassInstanceReplacement(_, fieldLocalDefs, cancelFun))) =>
         val fieldLocalDef = fieldLocalDefs(item.name)
         if (!isLhsOfAssign || fieldLocalDef.mutable) {
           cont(PreTransLocalDef(fieldLocalDef))
@@ -1023,43 +1073,52 @@ private[optimizer] abstract class OptimizerCore(
             val sel = Select(newQual, item)(field.tpe)
             sel.tpe match {
               case _: RecordType =>
-                cont(PreTransRecordTree(
-                        sel, RefinedType(expectedType), cancelFun))
+                cont(
+                  PreTransRecordTree(
+                    sel,
+                    RefinedType(expectedType),
+                    cancelFun))
               case _ =>
                 cont(PreTransTree(sel, RefinedType(sel.tpe)))
             }
 
           case PreTransTree(newQual, _) =>
             cont(
-                PreTransTree(Select(newQual, item)(expectedType),
-                             RefinedType(expectedType)))
+              PreTransTree(
+                Select(newQual, item)(expectedType),
+                RefinedType(expectedType)))
         }
     }
   }
 
-  private def pretransformNew(
-      tree: Tree, cls: ClassType, ctor: Ident, targs: List[PreTransform])(
-      cont: PreTransCont)(
-      implicit scope: Scope, pos: Position): TailRec[Tree] = {
+  private def pretransformNew(tree: Tree,
+                              cls: ClassType,
+                              ctor: Ident,
+                              targs: List[PreTransform])(cont: PreTransCont)(
+      implicit scope: Scope,
+      pos: Position): TailRec[Tree] = {
 
     tryNewInlineableClass(cls.className) match {
       case Some(initialValue) =>
         tryOrRollback { cancelFun =>
-          inlineClassConstructor(new AllocationSite(tree),
-                                 cls,
-                                 initialValue,
-                                 ctor,
-                                 targs,
-                                 cancelFun)(cont)
+          inlineClassConstructor(
+            new AllocationSite(tree),
+            cls,
+            initialValue,
+            ctor,
+            targs,
+            cancelFun)(cont)
         } { () =>
-          cont(PreTransTree(
-                  New(cls, ctor, targs.map(finishTransformExpr)),
-                  RefinedType(cls, isExact = true, isNullable = false)))
+          cont(
+            PreTransTree(
+              New(cls, ctor, targs.map(finishTransformExpr)),
+              RefinedType(cls, isExact = true, isNullable = false)))
         }
       case None =>
         cont(
-            PreTransTree(New(cls, ctor, targs.map(finishTransformExpr)),
-                         RefinedType(cls, isExact = true, isNullable = false)))
+          PreTransTree(
+            New(cls, ctor, targs.map(finishTransformExpr)),
+            RefinedType(cls, isExact = true, isNullable = false)))
     }
   }
 
@@ -1078,20 +1137,29 @@ private[optimizer] abstract class OptimizerCore(
       case PreTransLocalDef(localDef @ LocalDef(tpe, _, replacement)) =>
         replacement match {
           case ReplaceWithRecordVarRef(
-              name, originalName, recordType, used, cancelFun) =>
+              name,
+              originalName,
+              recordType,
+              used,
+              cancelFun) =>
             used.value = true
             PreTransRecordTree(
-                VarRef(Ident(name, originalName))(recordType), tpe, cancelFun)
+              VarRef(Ident(name, originalName))(recordType),
+              tpe,
+              cancelFun)
 
           case InlineClassInstanceReplacement(
-              recordType, fieldLocalDefs, cancelFun) =>
+              recordType,
+              fieldLocalDefs,
+              cancelFun) =>
             if (!isImmutableType(recordType)) cancelFun()
             PreTransRecordTree(
-                RecordValue(recordType,
-                            recordType.fields.map(
-                                f => fieldLocalDefs(f.name).newReplacement)),
-                tpe,
-                cancelFun)
+              RecordValue(
+                recordType,
+                recordType.fields.map(f =>
+                  fieldLocalDefs(f.name).newReplacement)),
+              tpe,
+              cancelFun)
 
           case _ =>
             PreTransTree(localDef.newReplacement, localDef.tpe)
@@ -1189,30 +1257,36 @@ private[optimizer] abstract class OptimizerCore(
       stat
   }
 
-  private def pretransformApply(
-      tree: Apply, isStat: Boolean, usePreTransform: Boolean)(
-      cont: PreTransCont)(implicit scope: Scope): TailRec[Tree] = {
+  private def pretransformApply(tree: Apply,
+                                isStat: Boolean,
+                                usePreTransform: Boolean)(cont: PreTransCont)(
+      implicit scope: Scope): TailRec[Tree] = {
     val Apply(receiver, methodIdent @ Ident(methodName, _), args) = tree
     implicit val pos = tree.pos
 
     pretransformExprs(receiver, args) { (treceiver, targs) =>
       def treeNotInlined =
         cont(
-            PreTransTree(Apply(finishTransformExpr(treceiver),
-                               methodIdent,
-                               targs.map(finishTransformExpr))(tree.tpe),
-                         RefinedType(tree.tpe)))
+          PreTransTree(
+            Apply(
+              finishTransformExpr(treceiver),
+              methodIdent,
+              targs.map(finishTransformExpr))(tree.tpe),
+            RefinedType(tree.tpe)))
 
       treceiver.tpe.base match {
         case NothingType =>
           cont(treceiver)
         case NullType =>
           cont(
-              PreTransTree(
-                  Block(finishTransformStat(treceiver),
-                        Throw(New(ClassType("jl_NullPointerException"),
-                                  Ident("init___", Some("<init>")),
-                                  Nil)))))
+            PreTransTree(
+              Block(
+                finishTransformStat(treceiver),
+                Throw(
+                  New(
+                    ClassType("jl_NullPointerException"),
+                    Ident("init___", Some("<init>")),
+                    Nil)))))
         case _ =>
           if (isReflProxyName(methodName)) {
             // Never inline reflective proxies
@@ -1224,28 +1298,31 @@ private[optimizer] abstract class OptimizerCore(
               else dynamicCall(cls, methodName)
             val allocationSites =
               (treceiver :: targs).map(_.tpe.allocationSite)
-            if (impls.isEmpty || impls.exists(impl =>
-                      scope.implsBeingInlined((allocationSites, impl)))) {
+            if (impls.isEmpty || impls.exists(
+                  impl => scope.implsBeingInlined((allocationSites, impl)))) {
               // isEmpty could happen, have to leave it as is for the TypeError
               treeNotInlined
             } else if (impls.size == 1) {
               val target = impls.head
               val intrinsicCode = getIntrinsicCode(target)
               if (intrinsicCode >= 0) {
-                callIntrinsic(intrinsicCode,
-                              Some(treceiver),
-                              targs,
-                              isStat,
-                              usePreTransform)(cont)
+                callIntrinsic(
+                  intrinsicCode,
+                  Some(treceiver),
+                  targs,
+                  isStat,
+                  usePreTransform)(cont)
               } else if (target.inlineable &&
                          (target.shouldInline || shouldInlineBecauseOfArgs(
-                                 target, treceiver :: targs))) {
-                inline(allocationSites,
-                       Some(treceiver),
-                       targs,
-                       target,
-                       isStat,
-                       usePreTransform)(cont)
+                           target,
+                           treceiver :: targs))) {
+                inline(
+                  allocationSites,
+                  Some(treceiver),
+                  targs,
+                  target,
+                  isStat,
+                  usePreTransform)(cont)
               } else {
                 treeNotInlined
               }
@@ -1255,11 +1332,14 @@ private[optimizer] abstract class OptimizerCore(
                 val areAllTheSame = getMethodBody(reference).body match {
                   // Trait impl forwarder
                   case ApplyStatic(
-                      ClassType(staticCls), Ident(methodName, _), _) =>
-                    impls.tail.forall(
-                        getMethodBody(_).body match {
+                      ClassType(staticCls),
+                      Ident(methodName, _),
+                      _) =>
+                    impls.tail.forall(getMethodBody(_).body match {
                       case ApplyStatic(
-                          ClassType(`staticCls`), Ident(`methodName`, _), _) =>
+                          ClassType(`staticCls`),
+                          Ident(`methodName`, _),
+                          _) =>
                         true
                       case _ => false
                     })
@@ -1273,8 +1353,9 @@ private[optimizer] abstract class OptimizerCore(
                           Apply(This(), Ident(`methodName`, _), implArgs),
                           `boxID`) =>
                         referenceArgs.zip(implArgs) forall {
-                          case (MaybeUnbox(_, unboxID1),
-                                MaybeUnbox(_, unboxID2)) =>
+                          case (
+                              MaybeUnbox(_, unboxID1),
+                              MaybeUnbox(_, unboxID2)) =>
                             unboxID1 == unboxID2
                         }
                       case _ => false
@@ -1282,18 +1363,19 @@ private[optimizer] abstract class OptimizerCore(
 
                   case body =>
                     throw new AssertionError(
-                        "Invalid forwarder shape: " + body)
+                      "Invalid forwarder shape: " + body)
                 }
                 if (!areAllTheSame) {
                   // Not all doing the same thing
                   treeNotInlined
                 } else {
-                  inline(allocationSites,
-                         Some(treceiver),
-                         targs,
-                         reference,
-                         isStat,
-                         usePreTransform)(cont)
+                  inline(
+                    allocationSites,
+                    Some(treceiver),
+                    targs,
+                    reference,
+                    isStat,
+                    usePreTransform)(cont)
                 }
               } else {
                 // TODO? Inline multiple non-trait-impl-forwarder with the exact same body?
@@ -1318,23 +1400,27 @@ private[optimizer] abstract class OptimizerCore(
     case ArrayType(_, _) => Definitions.ObjectClass
   }
 
-  private def pretransformStaticApply(
-      tree: ApplyStatically, isStat: Boolean, usePreTransform: Boolean)(
+  private def pretransformStaticApply(tree: ApplyStatically,
+                                      isStat: Boolean,
+                                      usePreTransform: Boolean)(
       cont: PreTransCont)(implicit scope: Scope): TailRec[Tree] = {
-    val ApplyStatically(receiver,
-                        clsType @ ClassType(cls),
-                        methodIdent @ Ident(methodName, _),
-                        args) = tree
+    val ApplyStatically(
+      receiver,
+      clsType @ ClassType(cls),
+      methodIdent @ Ident(methodName, _),
+      args) = tree
     implicit val pos = tree.pos
 
-    def treeNotInlined0(
-        transformedReceiver: Tree, transformedArgs: List[Tree]) =
+    def treeNotInlined0(transformedReceiver: Tree,
+                        transformedArgs: List[Tree]) =
       cont(
-          PreTransTree(ApplyStatically(transformedReceiver,
-                                       clsType,
-                                       methodIdent,
-                                       transformedArgs)(tree.tpe),
-                       RefinedType(tree.tpe)))
+        PreTransTree(
+          ApplyStatically(
+            transformedReceiver,
+            clsType,
+            methodIdent,
+            transformedArgs)(tree.tpe),
+          RefinedType(tree.tpe)))
 
     def treeNotInlined =
       treeNotInlined0(transformExpr(receiver), args.map(transformExpr))
@@ -1352,15 +1438,16 @@ private[optimizer] abstract class OptimizerCore(
         pretransformExprs(receiver, args) { (treceiver, targs) =>
           val intrinsicCode = getIntrinsicCode(target)
           if (intrinsicCode >= 0) {
-            callIntrinsic(intrinsicCode,
-                          Some(treceiver),
-                          targs,
-                          isStat,
-                          usePreTransform)(cont)
+            callIntrinsic(
+              intrinsicCode,
+              Some(treceiver),
+              targs,
+              isStat,
+              usePreTransform)(cont)
           } else {
             val shouldInline =
               target.inlineable &&
-              (target.shouldInline ||
+                (target.shouldInline ||
                   shouldInlineBecauseOfArgs(target, treceiver :: targs))
             val allocationSites =
               (treceiver :: targs).map(_.tpe.allocationSite)
@@ -1368,15 +1455,17 @@ private[optimizer] abstract class OptimizerCore(
               scope.implsBeingInlined((allocationSites, target))
 
             if (shouldInline && !beingInlined) {
-              inline(allocationSites,
-                     Some(treceiver),
-                     targs,
-                     target,
-                     isStat,
-                     usePreTransform)(cont)
+              inline(
+                allocationSites,
+                Some(treceiver),
+                targs,
+                target,
+                isStat,
+                usePreTransform)(cont)
             } else {
-              treeNotInlined0(finishTransformExpr(treceiver),
-                              targs.map(finishTransformExpr))
+              treeNotInlined0(
+                finishTransformExpr(treceiver),
+                targs.map(finishTransformExpr))
             }
           }
         }
@@ -1384,19 +1473,22 @@ private[optimizer] abstract class OptimizerCore(
     }
   }
 
-  private def pretransformApplyStatic(
-      tree: ApplyStatic, isStat: Boolean, usePreTransform: Boolean)(
+  private def pretransformApplyStatic(tree: ApplyStatic,
+                                      isStat: Boolean,
+                                      usePreTransform: Boolean)(
       cont: PreTransCont)(implicit scope: Scope): TailRec[Tree] = {
     val ApplyStatic(
-    classType @ ClassType(cls), methodIdent @ Ident(methodName, _), args) =
+      classType @ ClassType(cls),
+      methodIdent @ Ident(methodName, _),
+      args) =
       tree
     implicit val pos = tree.pos
 
     def treeNotInlined0(transformedArgs: List[Tree]) =
       cont(
-          PreTransTree(
-              ApplyStatic(classType, methodIdent, transformedArgs)(tree.tpe),
-              RefinedType(tree.tpe)))
+        PreTransTree(
+          ApplyStatic(classType, methodIdent, transformedArgs)(tree.tpe),
+          RefinedType(tree.tpe)))
 
     def treeNotInlined = treeNotInlined0(args.map(transformExpr))
 
@@ -1410,18 +1502,22 @@ private[optimizer] abstract class OptimizerCore(
         val intrinsicCode = getIntrinsicCode(target)
         if (intrinsicCode >= 0) {
           callIntrinsic(intrinsicCode, None, targs, isStat, usePreTransform)(
-              cont)
+            cont)
         } else {
           val shouldInline =
             target.inlineable &&
-            (target.shouldInline || shouldInlineBecauseOfArgs(target, targs))
+              (target.shouldInline || shouldInlineBecauseOfArgs(target, targs))
           val allocationSites = targs.map(_.tpe.allocationSite)
           val beingInlined = scope.implsBeingInlined((allocationSites, target))
 
           if (shouldInline && !beingInlined) {
             inline(
-                allocationSites, None, targs, target, isStat, usePreTransform)(
-                cont)
+              allocationSites,
+              None,
+              targs,
+              target,
+              isStat,
+              usePreTransform)(cont)
           } else {
             treeNotInlined0(targs.map(finishTransformExpr))
           }
@@ -1431,70 +1527,76 @@ private[optimizer] abstract class OptimizerCore(
   }
 
   private def pretransformJSFunctionApply(
-      tree: JSFunctionApply, isStat: Boolean, usePreTransform: Boolean)(
-      cont: PreTransCont)(
-      implicit scope: Scope, pos: Position): TailRec[Tree] = {
+      tree: JSFunctionApply,
+      isStat: Boolean,
+      usePreTransform: Boolean)(cont: PreTransCont)(
+      implicit scope: Scope,
+      pos: Position): TailRec[Tree] = {
     val JSFunctionApply(fun, args) = tree
     implicit val pos = tree.pos
 
     if (args.exists(_.isInstanceOf[JSSpread])) {
-      cont(
-          PreTransTree(JSFunctionApply(transformExpr(fun),
-                                       args.map(transformExprOrSpread))))
+      cont(PreTransTree(
+        JSFunctionApply(transformExpr(fun), args.map(transformExprOrSpread))))
     } else {
       pretransformExpr(fun) { tfun =>
         tfun match {
           case PreTransLocalDef(
-              LocalDef(_,
-                       false,
-                       closure @ TentativeClosureReplacement(captureParams,
-                                                             params,
-                                                             body,
-                                                             captureLocalDefs,
-                                                             alreadyUsed,
-                                                             cancelFun)))
-              if !alreadyUsed.value =>
+              LocalDef(
+                _,
+                false,
+                closure @ TentativeClosureReplacement(
+                  captureParams,
+                  params,
+                  body,
+                  captureLocalDefs,
+                  alreadyUsed,
+                  cancelFun))) if !alreadyUsed.value =>
             alreadyUsed.value = true
             pretransformExprs(args) { targs =>
               inlineBody(
-                  Some(PreTransTree(Undefined())), // `this` is `undefined`
-                  captureParams ++ params,
-                  AnyType,
-                  body,
-                  captureLocalDefs.map(PreTransLocalDef(_)) ++ targs,
-                  isStat,
-                  usePreTransform)(cont)
+                Some(PreTransTree(Undefined())), // `this` is `undefined`
+                captureParams ++ params,
+                AnyType,
+                body,
+                captureLocalDefs.map(PreTransLocalDef(_)) ++ targs,
+                isStat,
+                usePreTransform)(cont)
             }
 
           case _ =>
-            cont(PreTransTree(JSFunctionApply(finishTransformExpr(tfun),
-                                              args.map(transformExpr))))
+            cont(
+              PreTransTree(
+                JSFunctionApply(
+                  finishTransformExpr(tfun),
+                  args.map(transformExpr))))
         }
       }
     }
   }
 
   private val ClassNamesThatShouldBeInlined = Set(
-      "s_Predef$$less$colon$less",
-      "s_Predef$$eq$colon$eq",
-      "s_reflect_ManifestFactory$ByteManifest$",
-      "s_reflect_ManifestFactory$ShortManifest$",
-      "s_reflect_ManifestFactory$CharManifest$",
-      "s_reflect_ManifestFactory$IntManifest$",
-      "s_reflect_ManifestFactory$LongManifest$",
-      "s_reflect_ManifestFactory$FloatManifest$",
-      "s_reflect_ManifestFactory$DoubleManifest$",
-      "s_reflect_ManifestFactory$BooleanManifest$",
-      "s_reflect_ManifestFactory$UnitManifest$",
-      "s_reflect_ManifestFactory$AnyManifest$",
-      "s_reflect_ManifestFactory$ObjectManifest$",
-      "s_reflect_ManifestFactory$AnyValManifest$",
-      "s_reflect_ManifestFactory$NullManifest$",
-      "s_reflect_ManifestFactory$NothingManifest$"
+    "s_Predef$$less$colon$less",
+    "s_Predef$$eq$colon$eq",
+    "s_reflect_ManifestFactory$ByteManifest$",
+    "s_reflect_ManifestFactory$ShortManifest$",
+    "s_reflect_ManifestFactory$CharManifest$",
+    "s_reflect_ManifestFactory$IntManifest$",
+    "s_reflect_ManifestFactory$LongManifest$",
+    "s_reflect_ManifestFactory$FloatManifest$",
+    "s_reflect_ManifestFactory$DoubleManifest$",
+    "s_reflect_ManifestFactory$BooleanManifest$",
+    "s_reflect_ManifestFactory$UnitManifest$",
+    "s_reflect_ManifestFactory$AnyManifest$",
+    "s_reflect_ManifestFactory$ObjectManifest$",
+    "s_reflect_ManifestFactory$AnyValManifest$",
+    "s_reflect_ManifestFactory$NullManifest$",
+    "s_reflect_ManifestFactory$NothingManifest$"
   )
 
   private def shouldInlineBecauseOfArgs(
-      target: MethodID, receiverAndArgs: List[PreTransform]): Boolean = {
+      target: MethodID,
+      receiverAndArgs: List[PreTransform]): Boolean = {
     def isTypeLikelyOptimizable(tpe: RefinedType): Boolean = tpe.base match {
       case ClassType(className) =>
         ClassNamesThatShouldBeInlined.contains(className)
@@ -1535,9 +1637,9 @@ private[optimizer] abstract class OptimizerCore(
     receiverAndArgs.exists(isLikelyOptimizable) || {
       target.toString == "s_reflect_ClassTag$.apply__jl_Class__s_reflect_ClassTag" &&
       (receiverAndArgs.tail.head match {
-            case PreTransTree(ClassOf(_), _) => true
-            case _ => false
-          })
+        case PreTransTree(ClassOf(_), _) => true
+        case _ => false
+      })
     }
   }
 
@@ -1547,65 +1649,78 @@ private[optimizer] abstract class OptimizerCore(
                      target: MethodID,
                      isStat: Boolean,
                      usePreTransform: Boolean)(cont: PreTransCont)(
-      implicit scope: Scope, pos: Position): TailRec[Tree] = {
+      implicit scope: Scope,
+      pos: Position): TailRec[Tree] = {
 
     require(target.inlineable)
 
     attemptedInlining += target
 
     val MethodDef(static, _, formals, resultType, body) = getMethodBody(target)
-    assert(static == optReceiver.isEmpty,
-           "There must be receiver if and only if the method is not static")
+    assert(
+      static == optReceiver.isEmpty,
+      "There must be receiver if and only if the method is not static")
 
     body match {
       case Skip() =>
         assert(isStat, "Found Skip() in expression position")
         cont(
-            PreTransTree(
-                Block((optReceiver ++: args).map(finishTransformStat)),
-                RefinedType.NoRefinedType))
+          PreTransTree(
+            Block((optReceiver ++: args).map(finishTransformStat)),
+            RefinedType.NoRefinedType))
 
       case _: Literal =>
         cont(
-            PreTransTree(
-                Block((optReceiver ++: args).map(finishTransformStat) :+ body),
-                RefinedType(body.tpe)))
+          PreTransTree(
+            Block((optReceiver ++: args).map(finishTransformStat) :+ body),
+            RefinedType(body.tpe)))
 
       case This() if args.isEmpty =>
-        assert(optReceiver.isDefined,
-               "There was a This(), there should be a receiver")
+        assert(
+          optReceiver.isDefined,
+          "There was a This(), there should be a receiver")
         cont(optReceiver.get)
 
       case Select(This(), field) if formals.isEmpty =>
-        assert(optReceiver.isDefined,
-               "There was a This(), there should be a receiver")
+        assert(
+          optReceiver.isDefined,
+          "There was a This(), there should be a receiver")
         pretransformSelectCommon(
-            body.tpe, optReceiver.get, field, isLhsOfAssign = false)(cont)
+          body.tpe,
+          optReceiver.get,
+          field,
+          isLhsOfAssign = false)(cont)
 
       case Assign(lhs @ Select(This(), field), VarRef(Ident(rhsName, _)))
           if formals.size == 1 && formals.head.name.name == rhsName =>
         assert(isStat, "Found Assign in expression position")
-        assert(optReceiver.isDefined,
-               "There was a This(), there should be a receiver")
+        assert(
+          optReceiver.isDefined,
+          "There was a This(), there should be a receiver")
         pretransformSelectCommon(
-            lhs.tpe, optReceiver.get, field, isLhsOfAssign = true) {
-          preTransLhs =>
-            // TODO Support assignment of record
-            cont(
-                PreTransTree(Assign(finishTransformExpr(preTransLhs),
-                                    finishTransformExpr(args.head)),
-                             RefinedType.NoRefinedType))
+          lhs.tpe,
+          optReceiver.get,
+          field,
+          isLhsOfAssign = true) { preTransLhs =>
+          // TODO Support assignment of record
+          cont(
+            PreTransTree(
+              Assign(
+                finishTransformExpr(preTransLhs),
+                finishTransformExpr(args.head)),
+              RefinedType.NoRefinedType))
         }
 
       case _ =>
         val targetID = (allocationSites, target)
-        inlineBody(optReceiver,
-                   formals,
-                   resultType,
-                   body,
-                   args,
-                   isStat,
-                   usePreTransform)(cont)(scope.inlining(targetID), pos)
+        inlineBody(
+          optReceiver,
+          formals,
+          resultType,
+          body,
+          args,
+          isStat,
+          usePreTransform)(cont)(scope.inlining(targetID), pos)
     }
   }
 
@@ -1616,7 +1731,8 @@ private[optimizer] abstract class OptimizerCore(
                          args: List[PreTransform],
                          isStat: Boolean,
                          usePreTransform: Boolean)(cont: PreTransCont)(
-      implicit scope: Scope, pos: Position): TailRec[Tree] = tailcall {
+      implicit scope: Scope,
+      pos: Position): TailRec[Tree] = tailcall {
 
     val optReceiverBinding =
       optReceiver map { receiver =>
@@ -1632,7 +1748,8 @@ private[optimizer] abstract class OptimizerCore(
 
     withBindings(optReceiverBinding ++: argsBindings) { (bodyScope, cont1) =>
       returnable("", resultType, body, isStat, usePreTransform)(cont1)(
-          bodyScope, pos)
+        bodyScope,
+        pos)
     }(cont)(scope.withEnv(OptEnv.Empty))
   }
 
@@ -1641,7 +1758,8 @@ private[optimizer] abstract class OptimizerCore(
                             targs: List[PreTransform],
                             isStat: Boolean,
                             usePreTransform: Boolean)(cont: PreTransCont)(
-      implicit scope: Scope, pos: Position): TailRec[Tree] = {
+      implicit scope: Scope,
+      pos: Position): TailRec[Tree] = {
 
     import Intrinsics._
 
@@ -1737,8 +1855,7 @@ private[optimizer] abstract class OptimizerCore(
       // java.lang.Integer
 
       case IntegerNLZ =>
-        contTree(
-            newArgs.head match {
+        contTree(newArgs.head match {
           case IntLiteral(value) =>
             IntLiteral(Integer.numberOfLeadingZeros(value))
           case newArg => CallHelper("clz32", newArg)(IntType)
@@ -1750,19 +1867,22 @@ private[optimizer] abstract class OptimizerCore(
         contTree(Apply(firstArgAsRTLong, "toString__T", Nil)(StringClassType))
       case LongCompare =>
         contTree(
-            Apply(firstArgAsRTLong,
-                  "compareTo__sjsr_RuntimeLong__I",
-                  List(asRTLong(newArgs(1))))(IntType))
+          Apply(
+            firstArgAsRTLong,
+            "compareTo__sjsr_RuntimeLong__I",
+            List(asRTLong(newArgs(1))))(IntType))
       case LongDivideUnsigned =>
         contTree(
-            Apply(firstArgAsRTLong,
-                  LongImpl.divideUnsigned,
-                  List(asRTLong(newArgs(1))))(LongType))
+          Apply(
+            firstArgAsRTLong,
+            LongImpl.divideUnsigned,
+            List(asRTLong(newArgs(1))))(LongType))
       case LongRemainderUnsigned =>
         contTree(
-            Apply(firstArgAsRTLong,
-                  LongImpl.remainderUnsigned,
-                  List(asRTLong(newArgs(1))))(LongType))
+          Apply(
+            firstArgAsRTLong,
+            LongImpl.remainderUnsigned,
+            List(asRTLong(newArgs(1))))(LongType))
 
       // scala.collection.mutable.ArrayBuilder
 
@@ -1773,14 +1893,14 @@ private[optimizer] abstract class OptimizerCore(
           case _ => (AnyType, false)
         }
         cont(
-            PreTransTree(
-                CallHelper("makeNativeArrayWrapper",
-                           CallHelper("arrayDataOf",
-                                      CallHelper("classDataOf", runtimeClass)(
-                                          AnyType))(AnyType),
-                           array)(resultType),
-                RefinedType(
-                    resultType, isExact = isExact, isNullable = false)))
+          PreTransTree(
+            CallHelper(
+              "makeNativeArrayWrapper",
+              CallHelper(
+                "arrayDataOf",
+                CallHelper("classDataOf", runtimeClass)(AnyType))(AnyType),
+              array)(resultType),
+            RefinedType(resultType, isExact = isExact, isNullable = false)))
 
       case ArrayBuilderZeroOf =>
         contTree(finishTransformExpr(targs.head) match {
@@ -1805,13 +1925,15 @@ private[optimizer] abstract class OptimizerCore(
         newReceiver match {
           case ClassOf(ArrayType(base, depth)) =>
             contTree(
-                ClassOf(if (depth == 1) ClassType(base)
-                    else ArrayType(base, depth - 1)))
+              ClassOf(
+                if (depth == 1) ClassType(base)
+                else ArrayType(base, depth - 1)))
           case ClassOf(ClassType(_)) =>
             contTree(Null())
           case receiver =>
-            defaultApply("getComponentType__jl_Class",
-                         ClassType(Definitions.ClassClass))
+            defaultApply(
+              "getComponentType__jl_Class",
+              ClassType(Definitions.ClassClass))
         }
 
       // java.lang.reflect.Array
@@ -1855,30 +1977,34 @@ private[optimizer] abstract class OptimizerCore(
   }
 
   private def boxChar(value: Tree)(cont: PreTransCont)(
-      implicit scope: Scope, pos: Position): TailRec[Tree] = {
-    pretransformNew(value,
-                    ClassType(Definitions.BoxedCharacterClass),
-                    Ident("init___C"),
-                    List(PreTransTree(value)))(cont)
+      implicit scope: Scope,
+      pos: Position): TailRec[Tree] = {
+    pretransformNew(
+      value,
+      ClassType(Definitions.BoxedCharacterClass),
+      Ident("init___C"),
+      List(PreTransTree(value)))(cont)
   }
 
   private def unboxChar(tvalue: PreTransform)(cont: PreTransCont)(
-      implicit scope: Scope, pos: Position): TailRec[Tree] = {
+      implicit scope: Scope,
+      pos: Position): TailRec[Tree] = {
     val BoxesRunTimeModuleClassName = "sr_BoxesRunTime$"
     val treceiver = PreTransTree(
-        LoadModule(ClassType(BoxesRunTimeModuleClassName)))
+      LoadModule(ClassType(BoxesRunTimeModuleClassName)))
     val target =
       staticCall(BoxesRunTimeModuleClassName, "unboxToChar__O__C").getOrElse {
         throw new AssertionError(
-            "Cannot find method sr_BoxesRunTime$.unboxToChar__O__C")
+          "Cannot find method sr_BoxesRunTime$.unboxToChar__O__C")
       }
     val allocationSites = List(treceiver, tvalue).map(_.tpe.allocationSite)
-    inline(allocationSites,
-           Some(treceiver),
-           List(tvalue),
-           target,
-           isStat = false,
-           usePreTransform = true)(cont)
+    inline(
+      allocationSites,
+      Some(treceiver),
+      List(tvalue),
+      target,
+      isStat = false,
+      usePreTransform = true)(cont)
   }
 
   private def inlineClassConstructor(allocationSite: AllocationSite,
@@ -1887,7 +2013,8 @@ private[optimizer] abstract class OptimizerCore(
                                      ctor: Ident,
                                      args: List[PreTransform],
                                      cancelFun: CancelFun)(cont: PreTransCont)(
-      implicit scope: Scope, pos: Position): TailRec[Tree] = {
+      implicit scope: Scope,
+      pos: Position): TailRec[Tree] = {
 
     val RecordValue(recordType, initialFieldValues) = initialValue
 
@@ -1904,23 +2031,27 @@ private[optimizer] abstract class OptimizerCore(
           val initialFieldLocalDefs =
             Map(fieldNames zip initialFieldLocalDefList: _*)
 
-          inlineClassConstructorBody(allocationSite,
-                                     initialFieldLocalDefs,
-                                     cls,
-                                     cls,
-                                     ctor,
-                                     args,
-                                     cancelFun) {
-            (finalFieldLocalDefs, cont2) =>
-              cont2(
-                  PreTransLocalDef(LocalDef(
-                          RefinedType(cls,
-                                      isExact = true,
-                                      isNullable = false,
-                                      allocationSite = Some(allocationSite)),
-                          mutable = false,
-                          InlineClassInstanceReplacement(
-                              recordType, finalFieldLocalDefs, cancelFun))))
+          inlineClassConstructorBody(
+            allocationSite,
+            initialFieldLocalDefs,
+            cls,
+            cls,
+            ctor,
+            args,
+            cancelFun) { (finalFieldLocalDefs, cont2) =>
+            cont2(
+              PreTransLocalDef(
+                LocalDef(
+                  RefinedType(
+                    cls,
+                    isExact = true,
+                    isNullable = false,
+                    allocationSite = Some(allocationSite)),
+                  mutable = false,
+                  InlineClassInstanceReplacement(
+                    recordType,
+                    finalFieldLocalDefs,
+                    cancelFun))))
           }(cont1)
       }(cont)
     }
@@ -1933,8 +2064,8 @@ private[optimizer] abstract class OptimizerCore(
       ctorClass: ClassType,
       ctor: Ident,
       args: List[PreTransform],
-      cancelFun: CancelFun)(
-      buildInner: (Map[String, LocalDef], PreTransCont) => TailRec[Tree])(
+      cancelFun: CancelFun)(buildInner: (Map[String, LocalDef],
+                                         PreTransCont) => TailRec[Tree])(
       cont: PreTransCont)(implicit scope: Scope): TailRec[Tree] = tailcall {
 
     val target =
@@ -1958,19 +2089,22 @@ private[optimizer] abstract class OptimizerCore(
 
     withBindings(argsBindings) { (bodyScope, cont1) =>
       val thisLocalDef =
-        LocalDef(RefinedType(cls, isExact = true, isNullable = false),
-                 false,
-                 InlineClassBeingConstructedReplacement(inputFieldsLocalDefs,
-                                                        cancelFun))
+        LocalDef(
+          RefinedType(cls, isExact = true, isNullable = false),
+          false,
+          InlineClassBeingConstructedReplacement(
+            inputFieldsLocalDefs,
+            cancelFun))
       val statsScope = bodyScope
         .inlining(targetID)
         .withEnv(bodyScope.env.withLocalDef("this", thisLocalDef))
-      inlineClassConstructorBodyList(allocationSite,
-                                     thisLocalDef,
-                                     inputFieldsLocalDefs,
-                                     cls,
-                                     stats,
-                                     cancelFun)(buildInner)(cont1)(statsScope)
+      inlineClassConstructorBodyList(
+        allocationSite,
+        thisLocalDef,
+        inputFieldsLocalDefs,
+        cls,
+        stats,
+        cancelFun)(buildInner)(cont1)(statsScope)
     }(cont)(scope.withEnv(OptEnv.Empty))
   }
 
@@ -1980,23 +2114,25 @@ private[optimizer] abstract class OptimizerCore(
       inputFieldsLocalDefs: Map[String, LocalDef],
       cls: ClassType,
       stats: List[Tree],
-      cancelFun: CancelFun)(
-      buildInner: (Map[String, LocalDef], PreTransCont) => TailRec[Tree])(
+      cancelFun: CancelFun)(buildInner: (Map[String, LocalDef],
+                                         PreTransCont) => TailRec[Tree])(
       cont: PreTransCont)(implicit scope: Scope): TailRec[Tree] = {
     stats match {
       case This() :: rest =>
-        inlineClassConstructorBodyList(allocationSite,
-                                       thisLocalDef,
-                                       inputFieldsLocalDefs,
-                                       cls,
-                                       rest,
-                                       cancelFun)(buildInner)(cont)
+        inlineClassConstructorBodyList(
+          allocationSite,
+          thisLocalDef,
+          inputFieldsLocalDefs,
+          cls,
+          rest,
+          cancelFun)(buildInner)(cont)
 
-      case Assign(s @ Select(ths: This, Ident(fieldName, fieldOrigName)),
-                  value) :: rest if !inputFieldsLocalDefs(fieldName).mutable =>
+      case Assign(
+            s @ Select(ths: This, Ident(fieldName, fieldOrigName)),
+            value) :: rest if !inputFieldsLocalDefs(fieldName).mutable =>
         pretransformExpr(value) { tvalue =>
           withNewLocalDef(
-              Binding(fieldName, fieldOrigName, s.tpe, false, tvalue)) {
+            Binding(fieldName, fieldOrigName, s.tpe, false, tvalue)) {
             (localDef, cont1) =>
               if (localDef.contains(thisLocalDef)) {
                 /* Uh oh, there is a `val x = ...this...`. We can't keep it,
@@ -2007,19 +2143,21 @@ private[optimizer] abstract class OptimizerCore(
               val newFieldsLocalDefs =
                 inputFieldsLocalDefs.updated(fieldName, localDef)
               val newThisLocalDef =
-                LocalDef(RefinedType(cls, isExact = true, isNullable = false),
-                         false,
-                         InlineClassBeingConstructedReplacement(
-                             newFieldsLocalDefs, cancelFun))
+                LocalDef(
+                  RefinedType(cls, isExact = true, isNullable = false),
+                  false,
+                  InlineClassBeingConstructedReplacement(
+                    newFieldsLocalDefs,
+                    cancelFun))
               val restScope =
                 scope.withEnv(scope.env.withLocalDef("this", newThisLocalDef))
-              inlineClassConstructorBodyList(allocationSite,
-                                             newThisLocalDef,
-                                             newFieldsLocalDefs,
-                                             cls,
-                                             rest,
-                                             cancelFun)(buildInner)(cont1)(
-                  restScope)
+              inlineClassConstructorBodyList(
+                allocationSite,
+                newThisLocalDef,
+                newFieldsLocalDefs,
+                cls,
+                rest,
+                cancelFun)(buildInner)(cont1)(restScope)
           }(cont)
         }
 
@@ -2041,40 +2179,41 @@ private[optimizer] abstract class OptimizerCore(
         val stat = stats.head.asInstanceOf[If]
         val ass = stat.elsep.asInstanceOf[Assign]
         val lhs = ass.lhs
-        inlineClassConstructorBodyList(allocationSite,
-                                       thisLocalDef,
-                                       inputFieldsLocalDefs,
-                                       cls,
-                                       Assign(lhs,
-                                              If(cond, th, value)(lhs.tpe)(
-                                                  stat.pos))(ass.pos) :: rest,
-                                       cancelFun)(buildInner)(cont)
+        inlineClassConstructorBodyList(
+          allocationSite,
+          thisLocalDef,
+          inputFieldsLocalDefs,
+          cls,
+          Assign(lhs, If(cond, th, value)(lhs.tpe)(stat.pos))(ass.pos) :: rest,
+          cancelFun)(buildInner)(cont)
 
       case ApplyStatically(ths: This, superClass, superCtor, args) :: rest
           if isConstructorName(superCtor.name) =>
         pretransformExprs(args) { targs =>
-          inlineClassConstructorBody(allocationSite,
-                                     inputFieldsLocalDefs,
-                                     cls,
-                                     superClass,
-                                     superCtor,
-                                     targs,
-                                     cancelFun) {
-            (outputFieldsLocalDefs, cont1) =>
-              val newThisLocalDef =
-                LocalDef(RefinedType(cls, isExact = true, isNullable = false),
-                         false,
-                         InlineClassBeingConstructedReplacement(
-                             outputFieldsLocalDefs, cancelFun))
-              val restScope =
-                scope.withEnv(scope.env.withLocalDef("this", newThisLocalDef))
-              inlineClassConstructorBodyList(allocationSite,
-                                             newThisLocalDef,
-                                             outputFieldsLocalDefs,
-                                             cls,
-                                             rest,
-                                             cancelFun)(buildInner)(cont1)(
-                  restScope)
+          inlineClassConstructorBody(
+            allocationSite,
+            inputFieldsLocalDefs,
+            cls,
+            superClass,
+            superCtor,
+            targs,
+            cancelFun) { (outputFieldsLocalDefs, cont1) =>
+            val newThisLocalDef =
+              LocalDef(
+                RefinedType(cls, isExact = true, isNullable = false),
+                false,
+                InlineClassBeingConstructedReplacement(
+                  outputFieldsLocalDefs,
+                  cancelFun))
+            val restScope =
+              scope.withEnv(scope.env.withLocalDef("this", newThisLocalDef))
+            inlineClassConstructorBodyList(
+              allocationSite,
+              newThisLocalDef,
+              outputFieldsLocalDefs,
+              cls,
+              rest,
+              cancelFun)(buildInner)(cont1)(restScope)
           }(cont)
         }
 
@@ -2082,13 +2221,13 @@ private[optimizer] abstract class OptimizerCore(
         pretransformExpr(rhs) { trhs =>
           withBinding(Binding(name, originalName, tpe, mutable, trhs)) {
             (restScope, cont1) =>
-              inlineClassConstructorBodyList(allocationSite,
-                                             thisLocalDef,
-                                             inputFieldsLocalDefs,
-                                             cls,
-                                             rest,
-                                             cancelFun)(buildInner)(cont1)(
-                  restScope)
+              inlineClassConstructorBodyList(
+                allocationSite,
+                thisLocalDef,
+                inputFieldsLocalDefs,
+                cls,
+                rest,
+                cancelFun)(buildInner)(cont1)(restScope)
           }(cont)
         }
 
@@ -2096,22 +2235,24 @@ private[optimizer] abstract class OptimizerCore(
         val transformedStat = transformStat(stat)
         transformedStat match {
           case Skip() =>
-            inlineClassConstructorBodyList(allocationSite,
-                                           thisLocalDef,
-                                           inputFieldsLocalDefs,
-                                           cls,
-                                           rest,
-                                           cancelFun)(buildInner)(cont)
+            inlineClassConstructorBodyList(
+              allocationSite,
+              thisLocalDef,
+              inputFieldsLocalDefs,
+              cls,
+              rest,
+              cancelFun)(buildInner)(cont)
           case _ =>
             if (transformedStat.tpe == NothingType)
               cont(PreTransTree(transformedStat, RefinedType.Nothing))
             else {
-              inlineClassConstructorBodyList(allocationSite,
-                                             thisLocalDef,
-                                             inputFieldsLocalDefs,
-                                             cls,
-                                             rest,
-                                             cancelFun)(buildInner) { tinner =>
+              inlineClassConstructorBodyList(
+                allocationSite,
+                thisLocalDef,
+                inputFieldsLocalDefs,
+                cls,
+                rest,
+                cancelFun)(buildInner) { tinner =>
                 cont(PreTransBlock(transformedStat :: Nil, tinner))
               }
             }
@@ -2122,8 +2263,8 @@ private[optimizer] abstract class OptimizerCore(
     }
   }
 
-  private def foldIf(cond: Tree, thenp: Tree, elsep: Tree)(
-      tpe: Type)(implicit pos: Position): Tree = {
+  private def foldIf(cond: Tree, thenp: Tree, elsep: Tree)(tpe: Type)(
+      implicit pos: Position): Tree = {
     import BinaryOp._
 
     @inline def default = If(cond, thenp, elsep)(tpe)
@@ -2152,65 +2293,74 @@ private[optimizer] abstract class OptimizerCore(
              * the equals() method has been inlined as a reference
              * equality test.
              */
-            case (BinaryOp(BinaryOp.===, VarRef(lhsIdent), Null()),
-                  BinaryOp(BinaryOp.===, VarRef(rhsIdent), Null()),
-                  BinaryOp(BinaryOp.===, VarRef(lhsIdent2), VarRef(rhsIdent2)))
+            case (
+                BinaryOp(BinaryOp.===, VarRef(lhsIdent), Null()),
+                BinaryOp(BinaryOp.===, VarRef(rhsIdent), Null()),
+                BinaryOp(BinaryOp.===, VarRef(lhsIdent2), VarRef(rhsIdent2)))
                 if lhsIdent2 == lhsIdent && rhsIdent2 == rhsIdent =>
               elsep
 
             // Example: (x > y) || (x == y)  ->  (x >= y)
-            case (BinaryOp(op1 @ (Num_== | Num_!= | Num_< | Num_<= | Num_> |
-                           Num_>=),
-                           l1,
-                           r1),
-                  BooleanLiteral(true),
-                  BinaryOp(
+            case (
+                BinaryOp(
+                  op1 @ (Num_== | Num_!= | Num_< | Num_<= | Num_> | Num_>=),
+                  l1,
+                  r1),
+                BooleanLiteral(true),
+                BinaryOp(
                   op2 @ (Num_== | Num_!= | Num_< | Num_<= | Num_> | Num_>=),
                   l2,
                   r2))
-                if
-                ((l1.isInstanceOf[Literal] || l1.isInstanceOf[VarRef]) &&
-                    (r1.isInstanceOf[Literal] || r1.isInstanceOf[VarRef]) &&
-                    (l1 == l2 && r1 == r2)) =>
+                if ((l1.isInstanceOf[Literal] || l1.isInstanceOf[VarRef]) &&
+                  (r1.isInstanceOf[Literal] || r1.isInstanceOf[VarRef]) &&
+                  (l1 == l2 && r1 == r2)) =>
               val canBeEqual =
                 ((op1 == Num_==) || (op1 == Num_<=) || (op1 == Num_>=)) ||
-                ((op2 == Num_==) || (op2 == Num_<=) || (op2 == Num_>=))
+                  ((op2 == Num_==) || (op2 == Num_<=) || (op2 == Num_>=))
               val canBeLessThan =
                 ((op1 == Num_!=) || (op1 == Num_<) || (op1 == Num_<=)) ||
-                ((op2 == Num_!=) || (op2 == Num_<) || (op2 == Num_<=))
+                  ((op2 == Num_!=) || (op2 == Num_<) || (op2 == Num_<=))
               val canBeGreaterThan =
                 ((op1 == Num_!=) || (op1 == Num_>) || (op1 == Num_>=)) ||
-                ((op2 == Num_!=) || (op2 == Num_>) || (op2 == Num_>=))
+                  ((op2 == Num_!=) || (op2 == Num_>) || (op2 == Num_>=))
 
               fold3WayComparison(
-                  canBeEqual, canBeLessThan, canBeGreaterThan, l1, r1)
+                canBeEqual,
+                canBeLessThan,
+                canBeGreaterThan,
+                l1,
+                r1)
 
             // Example: (x >= y) && (x <= y)  ->  (x == y)
-            case (BinaryOp(op1 @ (Num_== | Num_!= | Num_< | Num_<= | Num_> |
-                           Num_>=),
-                           l1,
-                           r1),
-                  BinaryOp(
+            case (
+                BinaryOp(
+                  op1 @ (Num_== | Num_!= | Num_< | Num_<= | Num_> | Num_>=),
+                  l1,
+                  r1),
+                BinaryOp(
                   op2 @ (Num_== | Num_!= | Num_< | Num_<= | Num_> | Num_>=),
                   l2,
                   r2),
-                  BooleanLiteral(false))
-                if
-                ((l1.isInstanceOf[Literal] || l1.isInstanceOf[VarRef]) &&
-                    (r1.isInstanceOf[Literal] || r1.isInstanceOf[VarRef]) &&
-                    (l1 == l2 && r1 == r2)) =>
+                BooleanLiteral(false))
+                if ((l1.isInstanceOf[Literal] || l1.isInstanceOf[VarRef]) &&
+                  (r1.isInstanceOf[Literal] || r1.isInstanceOf[VarRef]) &&
+                  (l1 == l2 && r1 == r2)) =>
               val canBeEqual =
                 ((op1 == Num_==) || (op1 == Num_<=) || (op1 == Num_>=)) &&
-                ((op2 == Num_==) || (op2 == Num_<=) || (op2 == Num_>=))
+                  ((op2 == Num_==) || (op2 == Num_<=) || (op2 == Num_>=))
               val canBeLessThan =
                 ((op1 == Num_!=) || (op1 == Num_<) || (op1 == Num_<=)) &&
-                ((op2 == Num_!=) || (op2 == Num_<) || (op2 == Num_<=))
+                  ((op2 == Num_!=) || (op2 == Num_<) || (op2 == Num_<=))
               val canBeGreaterThan =
                 ((op1 == Num_!=) || (op1 == Num_>) || (op1 == Num_>=)) &&
-                ((op2 == Num_!=) || (op2 == Num_>) || (op2 == Num_>=))
+                  ((op2 == Num_!=) || (op2 == Num_>) || (op2 == Num_>=))
 
               fold3WayComparison(
-                  canBeEqual, canBeLessThan, canBeGreaterThan, l1, r1)
+                canBeEqual,
+                canBeLessThan,
+                canBeGreaterThan,
+                l1,
+                r1)
 
             case _ => default
           }
@@ -2266,13 +2416,15 @@ private[optimizer] abstract class OptimizerCore(
             TailCalls.done {
               if (isLiteralOrOptimizableLong(tlhs) &&
                   isLiteralOrOptimizableLong(trhs)) {
-                foldBinaryOp(op,
-                             finishTransformOptLongExpr(tlhs),
-                             finishTransformOptLongExpr(trhs))
+                foldBinaryOp(
+                  op,
+                  finishTransformOptLongExpr(tlhs),
+                  finishTransformOptLongExpr(trhs))
               } else {
-                foldBinaryOp(op,
-                             finishTransformExpr(tlhs),
-                             finishTransformExpr(trhs))
+                foldBinaryOp(
+                  op,
+                  finishTransformExpr(tlhs),
+                  finishTransformExpr(trhs))
               }
             }
           }
@@ -2359,16 +2511,20 @@ private[optimizer] abstract class OptimizerCore(
           case UnaryOp(IntToLong, x) => x
 
           case BinaryOp(BinaryOp.Long_+, x, y) =>
-            foldBinaryOp(BinaryOp.Int_+,
-                         foldUnaryOp(LongToInt, x),
-                         foldUnaryOp(LongToInt, y))
+            foldBinaryOp(
+              BinaryOp.Int_+,
+              foldUnaryOp(LongToInt, x),
+              foldUnaryOp(LongToInt, y))
           case BinaryOp(BinaryOp.Long_-, x, y) =>
-            foldBinaryOp(BinaryOp.Int_-,
-                         foldUnaryOp(LongToInt, x),
-                         foldUnaryOp(LongToInt, y))
+            foldBinaryOp(
+              BinaryOp.Int_-,
+              foldUnaryOp(LongToInt, x),
+              foldUnaryOp(LongToInt, y))
 
           case BinaryOp(
-              BinaryOp.Long_>> | BinaryOp.Long_>>>, x, IntLiteral(32)) =>
+              BinaryOp.Long_>> | BinaryOp.Long_>>>,
+              x,
+              IntLiteral(32)) =>
             // x.hi__I()
             staticCall(LongImpl.RuntimeLongClass, LongImpl.hi).fold[Tree] {
               default
@@ -2384,12 +2540,12 @@ private[optimizer] abstract class OptimizerCore(
                  */
                 implicit val scope = Scope.Empty
                 inline(
-                    Nil,
-                    Some(PreTransTree(x)),
-                    Nil,
-                    target,
-                    isStat = false,
-                    usePreTransform = false)(finishTransform(isStat = false))
+                  Nil,
+                  Some(PreTransTree(x)),
+                  Nil,
+                  target,
+                  isStat = false,
+                  usePreTransform = false)(finishTransform(isStat = false))
               }
             }
 
@@ -2405,12 +2561,12 @@ private[optimizer] abstract class OptimizerCore(
                  */
                 implicit val scope = Scope.Empty
                 inline(
-                    Nil,
-                    Some(PreTransTree(arg)),
-                    Nil,
-                    target,
-                    isStat = false,
-                    usePreTransform = false)(finishTransform(isStat = false))
+                  Nil,
+                  Some(PreTransTree(arg)),
+                  Nil,
+                  target,
+                  isStat = false,
+                  usePreTransform = false)(finishTransform(isStat = false))
               }
             }
         }
@@ -2537,8 +2693,9 @@ private[optimizer] abstract class OptimizerCore(
           case (_, IntLiteral(_)) => foldBinaryOp(Int_+, rhs, lhs)
           case (IntLiteral(0), _) => rhs
 
-          case (IntLiteral(x),
-                BinaryOp(innerOp @ (Int_+ | Int_-), IntLiteral(y), z)) =>
+          case (
+              IntLiteral(x),
+              BinaryOp(innerOp @ (Int_+ | Int_-), IntLiteral(y), z)) =>
             foldBinaryOp(innerOp, IntLiteral(x + y), z)
 
           case _ => default
@@ -2651,8 +2808,9 @@ private[optimizer] abstract class OptimizerCore(
           case (_, LongLiteral(_)) => foldBinaryOp(Long_+, rhs, lhs)
           case (LongLiteral(0), _) => rhs
 
-          case (LongLiteral(x),
-                BinaryOp(innerOp @ (Long_+ | Long_-), LongLiteral(y), z)) =>
+          case (
+              LongLiteral(x),
+              BinaryOp(innerOp @ (Long_+ | Long_-), LongLiteral(y), z)) =>
             foldBinaryOp(innerOp, LongLiteral(x + y), z)
 
           case _ => default
@@ -2844,10 +3002,11 @@ private[optimizer] abstract class OptimizerCore(
            *      requires x + y.toLong not to overflow, and z - x likewise
            * y.toLong > z - x
            */
-          case (BinaryOp(Long_+, LongLiteral(x), y @ LongFromInt(_)),
-                LongLiteral(z))
+          case (
+              BinaryOp(Long_+, LongLiteral(x), y @ LongFromInt(_)),
+              LongLiteral(z))
               if canAddLongs(x, Int.MinValue) &&
-              canAddLongs(x, Int.MaxValue) && canSubtractLongs(z, x) =>
+                canAddLongs(x, Int.MaxValue) && canSubtractLongs(z, x) =>
             foldBinaryOp(op, y, LongLiteral(z - x))
 
           /* x - y.toLong > z
@@ -2855,10 +3014,11 @@ private[optimizer] abstract class OptimizerCore(
            *      requires x - y.toLong not to overflow, and z - x likewise
            * -(y.toLong) > z - x
            */
-          case (BinaryOp(Long_-, LongLiteral(x), y @ LongFromInt(_)),
-                LongLiteral(z))
+          case (
+              BinaryOp(Long_-, LongLiteral(x), y @ LongFromInt(_)),
+              LongLiteral(z))
               if canSubtractLongs(x, Int.MinValue) &&
-              canSubtractLongs(x, Int.MaxValue) && canSubtractLongs(z, x) =>
+                canSubtractLongs(x, Int.MaxValue) && canSubtractLongs(z, x) =>
             if (z - x != Long.MinValue) {
               // Since -(y.toLong) does not overflow, we can negate both sides
               foldBinaryOp(flippedOp, y, LongLiteral(-(z - x)))
@@ -2882,23 +3042,28 @@ private[optimizer] abstract class OptimizerCore(
            *
            * This requires to evaluate x and y once.
            */
-          case (BinaryOp(Long_+, LongFromInt(x), LongFromInt(y)),
-                LongLiteral(Int.MaxValue)) =>
+          case (
+              BinaryOp(Long_+, LongFromInt(x), LongFromInt(y)),
+              LongLiteral(Int.MaxValue)) =>
             trampoline {
               withNewLocalDefs(
-                  List(Binding("x", None, IntType, false, PreTransTree(x)),
-                       Binding("y", None, IntType, false, PreTransTree(y)))) {
+                List(
+                  Binding("x", None, IntType, false, PreTransTree(x)),
+                  Binding("y", None, IntType, false, PreTransTree(y)))) {
                 (tempsLocalDefs, cont) =>
                   val List(tempXDef, tempYDef) = tempsLocalDefs
                   val tempX = tempXDef.newReplacement
                   val tempY = tempYDef.newReplacement
                   cont(
-                      PreTransTree(AndThen(
-                              AndThen(BinaryOp(Num_>, tempX, IntLiteral(0)),
-                                      BinaryOp(Num_>, tempY, IntLiteral(0))),
-                              BinaryOp(Num_<,
-                                       BinaryOp(Int_+, tempX, tempY),
-                                       IntLiteral(0)))))
+                    PreTransTree(
+                      AndThen(
+                        AndThen(
+                          BinaryOp(Num_>, tempX, IntLiteral(0)),
+                          BinaryOp(Num_>, tempY, IntLiteral(0))),
+                        BinaryOp(
+                          Num_<,
+                          BinaryOp(Int_+, tempX, tempY),
+                          IntLiteral(0)))))
               }(finishTransform(isStat = false))
             }
 
@@ -2912,8 +3077,9 @@ private[optimizer] abstract class OptimizerCore(
           case (FloatLiteral(0), _) => rhs
           case (_, FloatLiteral(_)) => foldBinaryOp(Float_+, rhs, lhs)
 
-          case (FloatLiteral(x),
-                BinaryOp(innerOp @ (Float_+ | Float_-), FloatLiteral(y), z)) =>
+          case (
+              FloatLiteral(x),
+              BinaryOp(innerOp @ (Float_+ | Float_-), FloatLiteral(y), z)) =>
             foldBinaryOp(innerOp, FloatLiteral(x + y), z)
 
           case _ => default
@@ -2970,9 +3136,12 @@ private[optimizer] abstract class OptimizerCore(
           case (NumberLiteral(0), _) => rhs
           case (_, NumberLiteral(_)) => foldBinaryOp(Double_+, rhs, lhs)
 
-          case (NumberLiteral(x),
-                BinaryOp(
-                innerOp @ (Double_+ | Double_-), NumberLiteral(y), z)) =>
+          case (
+              NumberLiteral(x),
+              BinaryOp(
+                innerOp @ (Double_+ | Double_-),
+                NumberLiteral(y),
+                z)) =>
             foldBinaryOp(innerOp, DoubleLiteral(x + y), z)
 
           case _ => default
@@ -3126,9 +3295,10 @@ private[optimizer] abstract class OptimizerCore(
     if (canBeEqual) {
       if (canBeLessThan) {
         if (canBeGreaterThan)
-          Block(keepOnlySideEffects(lhs),
-                keepOnlySideEffects(rhs),
-                BooleanLiteral(true))
+          Block(
+            keepOnlySideEffects(lhs),
+            keepOnlySideEffects(rhs),
+            BooleanLiteral(true))
         else foldBinaryOp(Num_<=, lhs, rhs)
       } else {
         if (canBeGreaterThan) foldBinaryOp(Num_>=, lhs, rhs)
@@ -3141,9 +3311,10 @@ private[optimizer] abstract class OptimizerCore(
       } else {
         if (canBeGreaterThan) foldBinaryOp(Num_>, lhs, rhs)
         else
-          Block(keepOnlySideEffects(lhs),
-                keepOnlySideEffects(rhs),
-                BooleanLiteral(false))
+          Block(
+            keepOnlySideEffects(lhs),
+            keepOnlySideEffects(rhs),
+            BooleanLiteral(false))
       }
     }
   }
@@ -3157,7 +3328,7 @@ private[optimizer] abstract class OptimizerCore(
       case 'J' if arg.tpe.base == LongType => cont(arg)
       case 'D'
           if arg.tpe.base == DoubleType || arg.tpe.base == IntType ||
-          arg.tpe.base == FloatType =>
+            arg.tpe.base == FloatType =>
         cont(arg)
       case _ =>
         cont(PreTransTree(Unbox(finishTransformExpr(arg), charCode)(arg.pos)))
@@ -3165,17 +3336,19 @@ private[optimizer] abstract class OptimizerCore(
   }
 
   private def foldReferenceEquality(
-      tlhs: PreTransform, trhs: PreTransform, positive: Boolean = true)(
-      implicit pos: Position): Tree = {
+      tlhs: PreTransform,
+      trhs: PreTransform,
+      positive: Boolean = true)(implicit pos: Position): Tree = {
     (tlhs, trhs) match {
       case (_, PreTransTree(Null(), _)) if !tlhs.tpe.isNullable =>
         Block(finishTransformStat(tlhs), BooleanLiteral(!positive))
       case (PreTransTree(Null(), _), _) if !trhs.tpe.isNullable =>
         Block(finishTransformStat(trhs), BooleanLiteral(!positive))
       case _ =>
-        foldBinaryOp(if (positive) BinaryOp.=== else BinaryOp.!==,
-                     finishTransformExpr(tlhs),
-                     finishTransformExpr(trhs))
+        foldBinaryOp(
+          if (positive) BinaryOp.=== else BinaryOp.!==,
+          finishTransformExpr(tlhs),
+          finishTransformExpr(trhs))
     }
   }
 
@@ -3187,11 +3360,11 @@ private[optimizer] abstract class OptimizerCore(
       JSBracketSelect(qualifier, item)
 
     (qualifier, item) match {
-      case (JSBracketSelect(JSLinkingInfo(), StringLiteral("semantics")),
-            StringLiteral(semanticsStr)) =>
+      case (
+          JSBracketSelect(JSLinkingInfo(), StringLiteral("semantics")),
+          StringLiteral(semanticsStr)) =>
         def behavior2IntLiteral(behavior: CheckedBehavior) = {
-          IntLiteral(
-              behavior match {
+          IntLiteral(behavior match {
             case CheckedBehavior.Compliant => 0
             case CheckedBehavior.Fatal => 1
             case CheckedBehavior.Unchecked => 2
@@ -3211,8 +3384,7 @@ private[optimizer] abstract class OptimizerCore(
         }
 
       case (JSLinkingInfo(), StringLiteral("assumingES6")) =>
-        BooleanLiteral(
-            esLevel match {
+        BooleanLiteral(esLevel match {
           case ESLevel.ES5 => false
           case ESLevel.ES6 => true
         })
@@ -3236,14 +3408,18 @@ private[optimizer] abstract class OptimizerCore(
       val newName = freshLocalName(name, mutable)
       val newOriginalName = originalName.orElse(Some(newName))
       val localDef = LocalDef(
-          RefinedType(ptpe),
-          mutable,
-          ReplaceWithVarRef(
-              newName, newOriginalName, newSimpleState(true), None))
-      val newParamDef = ParamDef(Ident(newName, newOriginalName)(ident.pos),
-                                 ptpe,
-                                 mutable,
-                                 rest)(p.pos)
+        RefinedType(ptpe),
+        mutable,
+        ReplaceWithVarRef(
+          newName,
+          newOriginalName,
+          newSimpleState(true),
+          None))
+      val newParamDef = ParamDef(
+        Ident(newName, newOriginalName)(ident.pos),
+        ptpe,
+        mutable,
+        rest)(p.pos)
       ((name -> localDef), newParamDef)
     }).unzip
 
@@ -3251,17 +3427,17 @@ private[optimizer] abstract class OptimizerCore(
       if (thisType == NoType) None
       else {
         Some(
-            "this" -> LocalDef(
-                RefinedType(thisType, isExact = false, isNullable = false),
-                false,
-                ReplaceWithThis()))
+          "this" -> LocalDef(
+            RefinedType(thisType, isExact = false, isNullable = false),
+            false,
+            ReplaceWithThis()))
       }
 
     val allLocalDefs = thisLocalDef ++: paramLocalDefs
 
     val allocationSites = List.fill(allLocalDefs.size)(None)
-    val scope0 = optTarget.fold(Scope.Empty)(
-        target => Scope.Empty.inlining((allocationSites, target)))
+    val scope0 = optTarget.fold(Scope.Empty)(target =>
+      Scope.Empty.inlining((allocationSites, target)))
     val scope = scope0.withEnv(OptEnv.Empty.withLocalDefs(allLocalDefs))
     val newBody = transform(body, resultType == NoType)(scope)
 
@@ -3273,9 +3449,10 @@ private[optimizer] abstract class OptimizerCore(
                          body: Tree,
                          isStat: Boolean,
                          usePreTransform: Boolean)(cont: PreTransCont)(
-      implicit scope: Scope, pos: Position): TailRec[Tree] = tailcall {
+      implicit scope: Scope,
+      pos: Position): TailRec[Tree] = tailcall {
     val newLabel = freshLabelName(
-        if (oldLabelName.isEmpty) "inlinereturn" else oldLabelName)
+      if (oldLabelName.isEmpty) "inlinereturn" else oldLabelName)
 
     def doMakeTree(newBody: Tree, returnedTypes: List[Type]): Tree = {
       val refinedType = returnedTypes.reduce(constrainedLub(_, _, resultType))
@@ -3286,9 +3463,10 @@ private[optimizer] abstract class OptimizerCore(
       }
     }
 
-    val info = new LabelInfo(newLabel,
-                             acceptRecords = usePreTransform,
-                             returnedTypes = newSimpleState(Nil))
+    val info = new LabelInfo(
+      newLabel,
+      acceptRecords = usePreTransform,
+      returnedTypes = newSimpleState(Nil))
     val bodyScope = scope.withEnv(scope.env.withLabelInfo(oldLabelName, info))
 
     if (usePreTransform) {
@@ -3310,32 +3488,39 @@ private[optimizer] abstract class OptimizerCore(
             val (actualTypes, origTypes) = returnedTypes.unzip
             val refinedOrigType =
               origTypes.reduce(constrainedLub(_, _, resultType))
-            actualTypes.collectFirst {
-              case actualType: RecordType => actualType
-            }.fold[TailRec[Tree]] {
-              // None of the returned types are records
-              cont(PreTransTree(doMakeTree(newBody, actualTypes),
-                                refinedOrigType))
-            } { recordType =>
-              if (actualTypes.exists(t => t != recordType && t != NothingType))
-                cancelFun()
+            actualTypes
+              .collectFirst {
+                case actualType: RecordType => actualType
+              }
+              .fold[TailRec[Tree]] {
+                // None of the returned types are records
+                cont(
+                  PreTransTree(
+                    doMakeTree(newBody, actualTypes),
+                    refinedOrigType))
+              } { recordType =>
+                if (actualTypes.exists(
+                      t => t != recordType && t != NothingType))
+                  cancelFun()
 
-              val resultTree = doMakeTree(newBody, actualTypes)
+                val resultTree = doMakeTree(newBody, actualTypes)
 
-              if (origTypes.exists(
+                if (origTypes.exists(
                       t => t != refinedOrigType && !t.isNothingType))
-                cancelFun()
+                  cancelFun()
 
-              cont(PreTransRecordTree(resultTree, refinedOrigType, cancelFun))
-            }
+                cont(
+                  PreTransRecordTree(resultTree, refinedOrigType, cancelFun))
+              }
           }
         }(bodyScope)
       } { () =>
-        returnable(oldLabelName,
-                   resultType,
-                   body,
-                   isStat,
-                   usePreTransform = false)(cont)
+        returnable(
+          oldLabelName,
+          resultType,
+          body,
+          isStat,
+          usePreTransform = false)(cont)
       }
     } else {
       val newBody = transform(body, isStat)(bodyScope)
@@ -3365,8 +3550,8 @@ private[optimizer] abstract class OptimizerCore(
       newBody match {
         case Block(stats) =>
           @tailrec
-          def createRevAlts(
-              xs: List[Tree], acc: List[(Tree, Tree)]): List[(Tree, Tree)] =
+          def createRevAlts(xs: List[Tree],
+                            acc: List[(Tree, Tree)]): List[(Tree, Tree)] =
             xs match {
               case If(cond, body, Skip()) :: xr =>
                 createRevAlts(xr, (cond, body) :: acc)
@@ -3377,13 +3562,14 @@ private[optimizer] abstract class OptimizerCore(
 
           if (revAlts.size == returnCount) {
             @tailrec
-            def constructOptimized(
-                revAlts: List[(Tree, Tree)], elsep: Tree): Option[Tree] = {
+            def constructOptimized(revAlts: List[(Tree, Tree)],
+                                   elsep: Tree): Option[Tree] = {
               revAlts match {
                 case (cond, body) :: revAltsRest =>
                   body match {
                     case BlockOrAlone(
-                        prep, Return(result, Some(Ident(newLabel, _)))) =>
+                        prep,
+                        Return(result, Some(Ident(newLabel, _)))) =>
                       val result1 =
                         if (refinedType == NoType) keepOnlySideEffects(result)
                         else result
@@ -3393,9 +3579,10 @@ private[optimizer] abstract class OptimizerCore(
                         constructOptimized(revAltsRest, prepAndResult)
                       } else {
                         assert(elsep != EmptyTree)
-                        constructOptimized(revAltsRest,
-                                           foldIf(cond, prepAndResult, elsep)(
-                                               refinedType)(cond.pos))
+                        constructOptimized(
+                          revAltsRest,
+                          foldIf(cond, prepAndResult, elsep)(refinedType)(
+                            cond.pos))
                       }
                     case _ =>
                       None
@@ -3429,8 +3616,9 @@ private[optimizer] abstract class OptimizerCore(
       buildInner: (Scope, PreTransCont) => TailRec[Tree])(cont: PreTransCont)(
       implicit scope: Scope): TailRec[Tree] = {
     withNewLocalDef(binding) { (localDef, cont1) =>
-      buildInner(scope.withEnv(scope.env.withLocalDef(binding.name, localDef)),
-                 cont1)
+      buildInner(
+        scope.withEnv(scope.env.withLocalDef(binding.name, localDef)),
+        cont1)
     }(cont)
   }
 
@@ -3457,8 +3645,8 @@ private[optimizer] abstract class OptimizerCore(
       true
   }
 
-  private def withNewLocalDef(
-      binding: Binding)(buildInner: (LocalDef, PreTransCont) => TailRec[Tree])(
+  private def withNewLocalDef(binding: Binding)(
+      buildInner: (LocalDef, PreTransCont) => TailRec[Tree])(
       cont: PreTransCont): TailRec[Tree] = tailcall {
     val Binding(name, originalName, declaredType, mutable, value) = binding
     implicit val pos = value.pos
@@ -3469,8 +3657,8 @@ private[optimizer] abstract class OptimizerCore(
 
       val used = newSimpleState(false)
 
-      def doBuildInner(localDef: LocalDef)(
-          varDef: => VarDef)(cont: PreTransCont): TailRec[Tree] = {
+      def doBuildInner(localDef: LocalDef)(varDef: => VarDef)(
+          cont: PreTransCont): TailRec[Tree] = {
         buildInner(localDef, { tinner =>
           if (used.value) {
             cont(PreTransBlock(varDef :: Nil, tinner))
@@ -3500,30 +3688,40 @@ private[optimizer] abstract class OptimizerCore(
           val recordType = valueTree.tpe.asInstanceOf[RecordType]
           if (!isImmutableType(recordType)) cancelFun()
           val localDef = LocalDef(
-              valueTpe,
-              mutable,
-              ReplaceWithRecordVarRef(
-                  newName, newOriginalName, recordType, used, cancelFun))
+            valueTpe,
+            mutable,
+            ReplaceWithRecordVarRef(
+              newName,
+              newOriginalName,
+              recordType,
+              used,
+              cancelFun))
           doBuildInner(localDef) {
-            VarDef(Ident(newName, newOriginalName),
-                   recordType,
-                   mutable,
-                   valueTree)
+            VarDef(
+              Ident(newName, newOriginalName),
+              recordType,
+              mutable,
+              valueTree)
           }(cont)
 
         case PreTransTree(valueTree, valueTpe) =>
           def doDoBuildInner(optValueTree: Option[() => Tree])(
               cont1: PreTransCont) = {
             val localDef =
-              LocalDef(tpe,
-                       mutable,
-                       ReplaceWithVarRef(
-                           newName, newOriginalName, used, optValueTree))
+              LocalDef(
+                tpe,
+                mutable,
+                ReplaceWithVarRef(
+                  newName,
+                  newOriginalName,
+                  used,
+                  optValueTree))
             doBuildInner(localDef) {
-              VarDef(Ident(newName, newOriginalName),
-                     tpe.base,
-                     mutable,
-                     optValueTree.fold(valueTree)(_ ()))
+              VarDef(
+                Ident(newName, newOriginalName),
+                tpe.base,
+                mutable,
+                optValueTree.fold(valueTree)(_()))
             }(cont1)
           }
           if (mutable) {
@@ -3532,32 +3730,28 @@ private[optimizer] abstract class OptimizerCore(
             (valueTree match {
               case LongFromInt(arg) =>
                 withNewLocalDef(
-                    Binding("x", None, IntType, false, PreTransTree(arg))) {
+                  Binding("x", None, IntType, false, PreTransTree(arg))) {
                   (intLocalDef, cont1) =>
-                    doDoBuildInner(
-                        Some(() => LongFromInt(intLocalDef.newReplacement)))(
-                        cont1)
+                    doDoBuildInner(Some(() =>
+                      LongFromInt(intLocalDef.newReplacement)))(cont1)
                 }(cont)
 
-              case BinaryOp(op @ (BinaryOp.Long_+ | BinaryOp.Long_-),
-                            LongFromInt(intLhs),
-                            LongFromInt(intRhs)) =>
-                withNewLocalDefs(
-                    List(Binding(
-                             "x", None, IntType, false, PreTransTree(intLhs)),
-                         Binding("y",
-                                 None,
-                                 IntType,
-                                 false,
-                                 PreTransTree(intRhs)))) {
+              case BinaryOp(
+                  op @ (BinaryOp.Long_+ | BinaryOp.Long_-),
+                  LongFromInt(intLhs),
+                  LongFromInt(intRhs)) =>
+                withNewLocalDefs(List(
+                  Binding("x", None, IntType, false, PreTransTree(intLhs)),
+                  Binding("y", None, IntType, false, PreTransTree(intRhs)))) {
                   (intLocalDefs, cont1) =>
                     val List(lhsLocalDef, rhsLocalDef) = intLocalDefs
-                    doDoBuildInner(Some(() =>
-                              BinaryOp(
-                                  op,
-                                  LongFromInt(lhsLocalDef.newReplacement),
-                                  LongFromInt(rhsLocalDef.newReplacement))))(
-                        cont1)
+                    doDoBuildInner(
+                      Some(
+                        () =>
+                          BinaryOp(
+                            op,
+                            LongFromInt(lhsLocalDef.newReplacement),
+                            LongFromInt(rhsLocalDef.newReplacement))))(cont1)
                 }(cont)
 
               case _ =>
@@ -3584,17 +3778,21 @@ private[optimizer] abstract class OptimizerCore(
 
         case PreTransTree(literal: Literal, _) =>
           buildInner(
-              LocalDef(refinedType, false, ReplaceWithConstant(literal)), cont)
+            LocalDef(refinedType, false, ReplaceWithConstant(literal)),
+            cont)
 
         case PreTransTree(VarRef(Ident(refName, refOriginalName)), _)
             if !localIsMutable(refName) =>
-          buildInner(LocalDef(refinedType,
-                              false,
-                              ReplaceWithVarRef(refName,
-                                                refOriginalName,
-                                                newSimpleState(true),
-                                                None)),
-                     cont)
+          buildInner(
+            LocalDef(
+              refinedType,
+              false,
+              ReplaceWithVarRef(
+                refName,
+                refOriginalName,
+                newSimpleState(true),
+                None)),
+            cont)
 
         case _ =>
           withDedicatedVar(refinedType)
@@ -3606,16 +3804,18 @@ private[optimizer] abstract class OptimizerCore(
     *  but still a subtype of upperBound.
     *  Requires that lhs and rhs be subtypes of upperBound, obviously.
     */
-  private def constrainedLub(
-      lhs: RefinedType, rhs: RefinedType, upperBound: Type): RefinedType = {
+  private def constrainedLub(lhs: RefinedType,
+                             rhs: RefinedType,
+                             upperBound: Type): RefinedType = {
     if (upperBound == NoType) RefinedType(upperBound)
     else if (lhs == rhs) lhs
     else if (lhs.isNothingType) rhs
     else if (rhs.isNothingType) lhs
     else {
-      RefinedType(constrainedLub(lhs.base, rhs.base, upperBound),
-                  false,
-                  lhs.isNullable || rhs.isNullable)
+      RefinedType(
+        constrainedLub(lhs.base, rhs.base, upperBound),
+        false,
+        lhs.isNullable || rhs.isNullable)
     }
   }
 
@@ -3680,9 +3880,11 @@ private[optimizer] object OptimizerCore {
   private type CancelFun = () => Nothing
   private type PreTransCont = PreTransform => TailRec[Tree]
 
-  private case class RefinedType private (
-      base: Type, isExact: Boolean, isNullable: Boolean)(
-      val allocationSite: Option[AllocationSite], dummy: Int = 0) {
+  private case class RefinedType private (base: Type,
+                                          isExact: Boolean,
+                                          isNullable: Boolean)(
+      val allocationSite: Option[AllocationSite],
+      dummy: Int = 0) {
 
     def isNothingType: Boolean = base == NothingType
   }
@@ -3757,14 +3959,13 @@ private[optimizer] object OptimizerCore {
     def contains(that: LocalDef): Boolean = {
       (this eq that) ||
       (replacement match {
-            case TentativeClosureReplacement(
-                _, _, _, captureLocalDefs, _, _) =>
-              captureLocalDefs.exists(_.contains(that))
-            case InlineClassInstanceReplacement(_, fieldLocalDefs, _) =>
-              fieldLocalDefs.valuesIterator.exists(_.contains(that))
-            case _ =>
-              false
-          })
+        case TentativeClosureReplacement(_, _, _, captureLocalDefs, _, _) =>
+          captureLocalDefs.exists(_.contains(that))
+        case InlineClassInstanceReplacement(_, fieldLocalDefs, _) =>
+          fieldLocalDefs.valuesIterator.exists(_.contains(that))
+        case _ =>
+          false
+      })
     }
   }
 
@@ -3799,7 +4000,8 @@ private[optimizer] object OptimizerCore {
       extends LocalDefReplacement
 
   private final case class InlineClassBeingConstructedReplacement(
-      fieldLocalDefs: Map[String, LocalDef], cancelFun: CancelFun)
+      fieldLocalDefs: Map[String, LocalDef],
+      cancelFun: CancelFun)
       extends LocalDefReplacement
 
   private final case class InlineClassInstanceReplacement(
@@ -3831,7 +4033,7 @@ private[optimizer] object OptimizerCore {
 
     override def toString(): String = {
       "localDefs:" + localDefs.mkString("\n  ", "\n  ", "\n") + "labelInfos:" +
-      labelInfos.mkString("\n  ", "\n  ", "")
+        labelInfos.mkString("\n  ", "\n  ", "")
     }
   }
 
@@ -3840,8 +4042,8 @@ private[optimizer] object OptimizerCore {
   }
 
   private class Scope(val env: OptEnv,
-                      val implsBeingInlined: Set[
-                          (List[Option[AllocationSite]], AbstractMethodID)]) {
+                      val implsBeingInlined: Set[(List[Option[AllocationSite]],
+                                                  AbstractMethodID)]) {
     def withEnv(env: OptEnv): Scope =
       new Scope(env, implsBeingInlined)
 
@@ -3876,8 +4078,8 @@ private[optimizer] object OptimizerCore {
     }
   }
 
-  private final class PreTransBlock private (
-      val stats: List[Tree], val result: PreTransLocalDef)
+  private final class PreTransBlock private (val stats: List[Tree],
+                                             val result: PreTransLocalDef)
       extends PreTransform {
     def pos = result.pos
     val tpe = result.tpe
@@ -3912,38 +4114,41 @@ private[optimizer] object OptimizerCore {
 
   private sealed abstract class PreTransNoBlock extends PreTransform
 
-  private final case class PreTransLocalDef(
-      localDef: LocalDef)(implicit val pos: Position)
+  private final case class PreTransLocalDef(localDef: LocalDef)(
+      implicit val pos: Position)
       extends PreTransNoBlock {
     val tpe: RefinedType = localDef.tpe
   }
 
   private sealed abstract class PreTransGenTree extends PreTransNoBlock
 
-  private final case class PreTransRecordTree(
-      tree: Tree, tpe: RefinedType, cancelFun: CancelFun)
+  private final case class PreTransRecordTree(tree: Tree,
+                                              tpe: RefinedType,
+                                              cancelFun: CancelFun)
       extends PreTransGenTree {
     def pos = tree.pos
 
     assert(
-        tree.tpe.isInstanceOf[RecordType],
-        s"Cannot create a PreTransRecordTree with non-record type ${tree.tpe}")
+      tree.tpe.isInstanceOf[RecordType],
+      s"Cannot create a PreTransRecordTree with non-record type ${tree.tpe}")
   }
 
   private final case class PreTransTree(tree: Tree, tpe: RefinedType)
       extends PreTransGenTree {
     def pos: Position = tree.pos
 
-    assert(!tree.tpe.isInstanceOf[RecordType],
-           s"Cannot create a Tree with record type ${tree.tpe}")
+    assert(
+      !tree.tpe.isInstanceOf[RecordType],
+      s"Cannot create a Tree with record type ${tree.tpe}")
   }
 
   private object PreTransTree {
     def apply(tree: Tree): PreTransTree = {
       val refinedTpe: RefinedType = tree match {
-        case BlockOrAlone(_,
-                          _: LoadModule | _: NewArray | _: ArrayValue |
-                          _: GetClass | _: ClassOf) =>
+        case BlockOrAlone(
+            _,
+            _: LoadModule | _: NewArray | _: ArrayValue | _: GetClass |
+            _: ClassOf) =>
           RefinedType(tree.tpe, isExact = true, isNullable = false)
         case _ =>
           RefinedType(tree.tpe)
@@ -4039,33 +4244,33 @@ private[optimizer] object OptimizerCore {
     final val Float64ArrayToDoubleArray = Float32ArrayToFloatArray + 1
 
     val intrinsics: Map[String, Int] = Map(
-        "jl_System$.arraycopy__O__I__O__I__I__V" -> ArrayCopy,
-        "jl_System$.identityHashCode__O__I" -> IdentityHashCode,
-        "sr_ScalaRunTime$.array$undapply__O__I__O" -> ArrayApply,
-        "sr_ScalaRunTime$.array$undupdate__O__I__O__V" -> ArrayUpdate,
-        "sr_ScalaRunTime$.array$undlength__O__I" -> ArrayLength,
-        "sjsr_package$.propertiesOf__sjs_js_Any__sjs_js_Array" -> PropertiesOf,
-        "jl_Integer$.numberOfLeadingZeros__I__I" -> IntegerNLZ,
-        "jl_Long$.toString__J__T" -> LongToString,
-        "jl_Long$.compare__J__J__I" -> LongCompare,
-        "jl_Long$.divideUnsigned__J__J__J" -> LongDivideUnsigned,
-        "jl_Long$.remainderUnsigned__J__J__J" -> LongRemainderUnsigned,
-        "scm_ArrayBuilder$.scala$collection$mutable$ArrayBuilder$$zeroOf__jl_Class__O" -> ArrayBuilderZeroOf,
-        "scm_ArrayBuilder$.scala$collection$mutable$ArrayBuilder$$genericArrayBuilderResult__jl_Class__sjs_js_Array__O" -> GenericArrayBuilderResult,
-        "jl_Class.getComponentType__jl_Class" -> ClassGetComponentType,
-        "jl_reflect_Array$.newInstance__jl_Class__I__O" -> ArrayNewInstance,
-        "sjs_js_typedarray_package$.byteArray2Int8Array__AB__sjs_js_typedarray_Int8Array" -> ByteArrayToInt8Array,
-        "sjs_js_typedarray_package$.shortArray2Int16Array__AS__sjs_js_typedarray_Int16Array" -> ShortArrayToInt16Array,
-        "sjs_js_typedarray_package$.charArray2Uint16Array__AC__sjs_js_typedarray_Uint16Array" -> CharArrayToUint16Array,
-        "sjs_js_typedarray_package$.intArray2Int32Array__AI__sjs_js_typedarray_Int32Array" -> IntArrayToInt32Array,
-        "sjs_js_typedarray_package$.floatArray2Float32Array__AF__sjs_js_typedarray_Float32Array" -> FloatArrayToFloat32Array,
-        "sjs_js_typedarray_package$.doubleArray2Float64Array__AD__sjs_js_typedarray_Float64Array" -> DoubleArrayToFloat64Array,
-        "sjs_js_typedarray_package$.int8Array2ByteArray__sjs_js_typedarray_Int8Array__AB" -> Int8ArrayToByteArray,
-        "sjs_js_typedarray_package$.int16Array2ShortArray__sjs_js_typedarray_Int16Array__AS" -> Int16ArrayToShortArray,
-        "sjs_js_typedarray_package$.uint16Array2CharArray__sjs_js_typedarray_Uint16Array__AC" -> Uint16ArrayToCharArray,
-        "sjs_js_typedarray_package$.int32Array2IntArray__sjs_js_typedarray_Int32Array__AI" -> Int32ArrayToIntArray,
-        "sjs_js_typedarray_package$.float32Array2FloatArray__sjs_js_typedarray_Float32Array__AF" -> Float32ArrayToFloatArray,
-        "sjs_js_typedarray_package$.float64Array2DoubleArray__sjs_js_typedarray_Float64Array__AD" -> Float64ArrayToDoubleArray
+      "jl_System$.arraycopy__O__I__O__I__I__V" -> ArrayCopy,
+      "jl_System$.identityHashCode__O__I" -> IdentityHashCode,
+      "sr_ScalaRunTime$.array$undapply__O__I__O" -> ArrayApply,
+      "sr_ScalaRunTime$.array$undupdate__O__I__O__V" -> ArrayUpdate,
+      "sr_ScalaRunTime$.array$undlength__O__I" -> ArrayLength,
+      "sjsr_package$.propertiesOf__sjs_js_Any__sjs_js_Array" -> PropertiesOf,
+      "jl_Integer$.numberOfLeadingZeros__I__I" -> IntegerNLZ,
+      "jl_Long$.toString__J__T" -> LongToString,
+      "jl_Long$.compare__J__J__I" -> LongCompare,
+      "jl_Long$.divideUnsigned__J__J__J" -> LongDivideUnsigned,
+      "jl_Long$.remainderUnsigned__J__J__J" -> LongRemainderUnsigned,
+      "scm_ArrayBuilder$.scala$collection$mutable$ArrayBuilder$$zeroOf__jl_Class__O" -> ArrayBuilderZeroOf,
+      "scm_ArrayBuilder$.scala$collection$mutable$ArrayBuilder$$genericArrayBuilderResult__jl_Class__sjs_js_Array__O" -> GenericArrayBuilderResult,
+      "jl_Class.getComponentType__jl_Class" -> ClassGetComponentType,
+      "jl_reflect_Array$.newInstance__jl_Class__I__O" -> ArrayNewInstance,
+      "sjs_js_typedarray_package$.byteArray2Int8Array__AB__sjs_js_typedarray_Int8Array" -> ByteArrayToInt8Array,
+      "sjs_js_typedarray_package$.shortArray2Int16Array__AS__sjs_js_typedarray_Int16Array" -> ShortArrayToInt16Array,
+      "sjs_js_typedarray_package$.charArray2Uint16Array__AC__sjs_js_typedarray_Uint16Array" -> CharArrayToUint16Array,
+      "sjs_js_typedarray_package$.intArray2Int32Array__AI__sjs_js_typedarray_Int32Array" -> IntArrayToInt32Array,
+      "sjs_js_typedarray_package$.floatArray2Float32Array__AF__sjs_js_typedarray_Float32Array" -> FloatArrayToFloat32Array,
+      "sjs_js_typedarray_package$.doubleArray2Float64Array__AD__sjs_js_typedarray_Float64Array" -> DoubleArrayToFloat64Array,
+      "sjs_js_typedarray_package$.int8Array2ByteArray__sjs_js_typedarray_Int8Array__AB" -> Int8ArrayToByteArray,
+      "sjs_js_typedarray_package$.int16Array2ShortArray__sjs_js_typedarray_Int16Array__AS" -> Int16ArrayToShortArray,
+      "sjs_js_typedarray_package$.uint16Array2CharArray__sjs_js_typedarray_Uint16Array__AC" -> Uint16ArrayToCharArray,
+      "sjs_js_typedarray_package$.int32Array2IntArray__sjs_js_typedarray_Int32Array__AI" -> Int32ArrayToIntArray,
+      "sjs_js_typedarray_package$.float32Array2FloatArray__sjs_js_typedarray_Float32Array__AF" -> Float32ArrayToFloatArray,
+      "sjs_js_typedarray_package$.float64Array2DoubleArray__sjs_js_typedarray_Float64Array__AD" -> Float64ArrayToDoubleArray
     ).withDefaultValue(-1)
   }
 
@@ -4112,20 +4317,22 @@ private[optimizer] object OptimizerCore {
         // Shape of forwarders to trait impls
         case ApplyStatic(impl, method, args) =>
           ((args.size == params.size + 1) && (args.head.isInstanceOf[This]) &&
-              (args.tail
-                    .zip(params)
-                    .forall {
-                      case (VarRef(Ident(aname, _)),
-                            ParamDef(Ident(pname, _), _, _, _)) =>
-                        aname == pname
-                      case _ => false
-                    }))
+            (args.tail
+              .zip(params)
+              .forall {
+                case (
+                    VarRef(Ident(aname, _)),
+                    ParamDef(Ident(pname, _), _, _, _)) =>
+                  aname == pname
+                case _ => false
+              }))
 
         // Shape of bridges for generic methods
         case MaybeBox(Apply(This(), method, args), _) =>
           (args.size == params.size) && args.zip(params).forall {
-            case (MaybeUnbox(VarRef(Ident(aname, _)), _),
-                  ParamDef(Ident(pname, _), _, _, _)) =>
+            case (
+                MaybeUnbox(VarRef(Ident(aname, _)), _),
+                ParamDef(Ident(pname, _), _, _, _)) =>
               aname == pname
             case _ => false
           }
@@ -4148,7 +4355,7 @@ private[optimizer] object OptimizerCore {
             // Shape of trivial call-super constructors
             case Block(stats)
                 if params.isEmpty && isConstructorName(encodedName) &&
-                stats.forall(isTrivialConstructorStat) =>
+                  stats.forall(isTrivialConstructorStat) =>
               true
 
             // Simple method
@@ -4163,9 +4370,10 @@ private[optimizer] object OptimizerCore {
 
   private object MaybeBox {
     def unapply(tree: Tree): Some[(Tree, Any)] = tree match {
-      case Apply(LoadModule(ClassType("sr_BoxesRunTime$")),
-                 Ident("boxToCharacter__C__jl_Character", _),
-                 List(arg)) =>
+      case Apply(
+          LoadModule(ClassType("sr_BoxesRunTime$")),
+          Ident("boxToCharacter__C__jl_Character", _),
+          List(arg)) =>
         Some((arg, "C"))
       case _ =>
         Some((tree, ()))
@@ -4178,9 +4386,10 @@ private[optimizer] object OptimizerCore {
         Some((arg, tpe))
       case Unbox(arg, charCode) =>
         Some((arg, charCode))
-      case Apply(LoadModule(ClassType("sr_BoxesRunTime$")),
-                 Ident("unboxToChar__O__C", _),
-                 List(arg)) =>
+      case Apply(
+          LoadModule(ClassType("sr_BoxesRunTime$")),
+          Ident("unboxToChar__O__C", _),
+          List(arg)) =>
         Some((arg, "C"))
       case _ =>
         Some((tree, ()))
@@ -4249,8 +4458,7 @@ private[optimizer] object OptimizerCore {
 
   private object BlockOrAlone {
     def unapply(tree: Tree): Some[(List[Tree], Tree)] =
-      Some(
-          tree match {
+      Some(tree match {
         case Block(init :+ last) => (init, last)
         case _ => (Nil, tree)
       })
@@ -4261,7 +4469,8 @@ private[optimizer] object OptimizerCore {
                            cause: Throwable) = {
     val buf = new StringBuilder()
 
-    buf.append("The Scala.js optimizer crashed while optimizing " + myself +
+    buf.append(
+      "The Scala.js optimizer crashed while optimizing " + myself +
         ": " + cause.toString)
 
     buf.append("\nMethods attempted to inline:\n")

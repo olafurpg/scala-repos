@@ -69,8 +69,9 @@ private[akka] class TestConductorPipelineFactory(
     handler: ChannelUpstreamHandler)
     extends ChannelPipelineFactory {
   def getPipeline: ChannelPipeline = {
-    val encap = List(new LengthFieldPrepender(4),
-                     new LengthFieldBasedFrameDecoder(10000, 0, 4, 0, 4))
+    val encap = List(
+      new LengthFieldPrepender(4),
+      new LengthFieldBasedFrameDecoder(10000, 0, 4, 0, 4))
     val proto = List(
       new ProtobufEncoder,
       new ProtobufDecoder(TestConductorProtocol.Wrapper.getDefaultInstance))

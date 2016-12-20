@@ -90,9 +90,10 @@ case class LogicalRelation(
     output.map(o => (o, o)))
 
   def newInstance(): this.type =
-    LogicalRelation(relation,
-                    expectedOutputAttributes,
-                    metastoreTableIdentifier).asInstanceOf[this.type]
+    LogicalRelation(
+      relation,
+      expectedOutputAttributes,
+      metastoreTableIdentifier).asInstanceOf[this.type]
 
   override def simpleString: String =
     s"Relation[${output.mkString(",")}] $relation"

@@ -168,15 +168,16 @@ private final class ExplorerIndexer(endpoint: String,
             s"${c.limit}+${c.increment}"
           }
           val otherTags =
-            List(s"[LichessID ${game.id}]",
-                 s"[Variant ${game.variant.name}]",
-                 s"[TimeControl $timeControl]",
-                 s"[White ${username(chess.White)}]",
-                 s"[Black ${username(chess.Black)}]",
-                 s"[WhiteElo $whiteRating]",
-                 s"[BlackElo $blackRating]",
-                 s"[Result ${PgnDump.result(game)}]",
-                 s"[Date ${pgnDateFormat.print(game.createdAt)}]")
+            List(
+              s"[LichessID ${game.id}]",
+              s"[Variant ${game.variant.name}]",
+              s"[TimeControl $timeControl]",
+              s"[White ${username(chess.White)}]",
+              s"[Black ${username(chess.Black)}]",
+              s"[WhiteElo $whiteRating]",
+              s"[BlackElo $blackRating]",
+              s"[Result ${PgnDump.result(game)}]",
+              s"[Date ${pgnDateFormat.print(game.createdAt)}]")
           val allTags = fenTags ::: otherTags
           s"${allTags.mkString("\n")}\n\n${game.pgnMoves.take(maxPlies).mkString(" ")}".some
         }

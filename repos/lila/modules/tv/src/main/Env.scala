@@ -27,11 +27,12 @@ final class Env(config: Config,
     Props(classOf[TvActor], hub.actor.renderer, hub.socket.round, lightUser),
     name = "tv")
 
-  private lazy val streaming = new Streaming(system = system,
-                                             renderer = hub.actor.renderer,
-                                             streamerList = streamerList,
-                                             keyword = Keyword,
-                                             googleApiKey = GoogleApiKey)
+  private lazy val streaming = new Streaming(
+    system = system,
+    renderer = hub.actor.renderer,
+    streamerList = streamerList,
+    keyword = Keyword,
+    googleApiKey = GoogleApiKey)
 
   lazy val streamerList = new StreamerList(new {
     import reactivemongo.bson._
@@ -42,9 +43,10 @@ final class Env(config: Config,
       }
     def set(text: String) =
       coll
-        .update(BSONDocument("_id" -> "streamer"),
-                BSONDocument("text" -> text),
-                upsert = true)
+        .update(
+          BSONDocument("_id" -> "streamer"),
+          BSONDocument("text" -> text),
+          upsert = true)
         .void
   })
 
@@ -82,11 +84,12 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "tv" boot new Env(config = lila.common.PlayApp loadConfig "tv",
-                      db = lila.db.Env.current,
-                      hub = lila.hub.Env.current,
-                      lightUser = lila.user.Env.current.lightUser,
-                      system = lila.common.PlayApp.system,
-                      scheduler = lila.common.PlayApp.scheduler,
-                      isProd = lila.common.PlayApp.isProd)
+    "tv" boot new Env(
+      config = lila.common.PlayApp loadConfig "tv",
+      db = lila.db.Env.current,
+      hub = lila.hub.Env.current,
+      lightUser = lila.user.Env.current.lightUser,
+      system = lila.common.PlayApp.system,
+      scheduler = lila.common.PlayApp.scheduler,
+      isProd = lila.common.PlayApp.isProd)
 }

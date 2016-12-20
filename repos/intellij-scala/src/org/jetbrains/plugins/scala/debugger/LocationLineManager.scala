@@ -138,9 +138,10 @@ trait LocationLineManager { self: ScalaPositionManager =>
         val linePosition =
           SourcePosition.createFromLine(containingFile, lineNumber)
         val elem = nonWhitespaceElement(linePosition)
-        val parent = PsiTreeUtil.getParentOfType(elem,
-                                                 classOf[ScBlockStatement],
-                                                 classOf[ScEarlyDefinitions])
+        val parent = PsiTreeUtil.getParentOfType(
+          elem,
+          classOf[ScBlockStatement],
+          classOf[ScEarlyDefinitions])
         parent == null ||
         !PsiTreeUtil.isAncestor(generatingElem, parent, false)
       }

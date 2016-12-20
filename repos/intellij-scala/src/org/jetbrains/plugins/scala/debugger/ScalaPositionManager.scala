@@ -81,8 +81,9 @@ class ScalaPositionManager(val debugProcess: DebugProcess)
 
     val position = for {
       loc <- location.toOption
-      psiFile <- getPsiFileByReferenceType(debugProcess.getProject,
-                                           loc.declaringType).toOption
+      psiFile <- getPsiFileByReferenceType(
+        debugProcess.getProject,
+        loc.declaringType).toOption
       lineNumber = exactLineNumber(location) if lineNumber >= 0
     } yield {
       calcPosition(psiFile, location, lineNumber).getOrElse {
@@ -235,8 +236,9 @@ class ScalaPositionManager(val debugProcess: DebugProcess)
           qName.set(SCRIPT_HOLDER_CLASS_NAME + "*")
         }
         waitRequestor.set(
-          new ScalaPositionManager.MyClassPrepareRequestor(position,
-                                                           requestor))
+          new ScalaPositionManager.MyClassPrepareRequestor(
+            position,
+            requestor))
       }
 
       debugProcess.getRequestsManager
@@ -641,8 +643,9 @@ class ScalaPositionManager(val debugProcess: DebugProcess)
             qName.stripSuffix(packageSuffix),
             GlobalSearchScope.allScope(project))).toSeq
       else
-        cacheManager.getClassesByFQName(qName.replace(packageSuffix, "."),
-                                        debugProcess.getSearchScope)
+        cacheManager.getClassesByFQName(
+          qName.replace(packageSuffix, "."),
+          debugProcess.getSearchScope)
 
     val clazz =
       if (classes.length == 1) classes.headOption
@@ -1050,11 +1053,12 @@ object ScalaPositionManager {
       val lastParts =
         Seq.fill(anonfunCount - 1)(Seq("$apply", "$anonfun")).flatten
       val containingClass = findGeneratingClassOrMethodParent(elem.getParent)
-      val owner = PsiTreeUtil.getParentOfType(elem,
-                                              classOf[ScFunctionDefinition],
-                                              classOf[ScTypeDefinition],
-                                              classOf[ScPatternDefinition],
-                                              classOf[ScVariableDefinition])
+      val owner = PsiTreeUtil.getParentOfType(
+        elem,
+        classOf[ScFunctionDefinition],
+        classOf[ScTypeDefinition],
+        classOf[ScPatternDefinition],
+        classOf[ScVariableDefinition])
       val firstParts =
         if (PsiTreeUtil.isAncestor(owner, containingClass, true))
           Seq("$anonfun")

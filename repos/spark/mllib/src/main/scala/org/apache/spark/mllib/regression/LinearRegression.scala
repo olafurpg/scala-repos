@@ -150,10 +150,11 @@ object LinearRegressionWithSGD {
             stepSize: Double,
             miniBatchFraction: Double,
             initialWeights: Vector): LinearRegressionModel = {
-    new LinearRegressionWithSGD(stepSize,
-                                numIterations,
-                                0.0,
-                                miniBatchFraction).run(input, initialWeights)
+    new LinearRegressionWithSGD(
+      stepSize,
+      numIterations,
+      0.0,
+      miniBatchFraction).run(input, initialWeights)
   }
 
   /**
@@ -173,10 +174,11 @@ object LinearRegressionWithSGD {
             numIterations: Int,
             stepSize: Double,
             miniBatchFraction: Double): LinearRegressionModel = {
-    new LinearRegressionWithSGD(stepSize,
-                                numIterations,
-                                0.0,
-                                miniBatchFraction).run(input)
+    new LinearRegressionWithSGD(
+      stepSize,
+      numIterations,
+      0.0,
+      miniBatchFraction).run(input)
   }
 
   /**

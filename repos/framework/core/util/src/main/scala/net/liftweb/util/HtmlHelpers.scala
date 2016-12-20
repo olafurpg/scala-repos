@@ -340,10 +340,11 @@ trait HtmlHelpers extends CssBindImplicits {
   def makeMetaData(key: String, value: String, rest: MetaData): MetaData =
     key.indexOf(":") match {
       case x if x > 0 =>
-        new PrefixedAttribute(key.substring(0, x),
-                              key.substring(x + 1),
-                              value,
-                              rest)
+        new PrefixedAttribute(
+          key.substring(0, x),
+          key.substring(x + 1),
+          value,
+          rest)
 
       case _ => new UnprefixedAttribute(key, value, rest)
     }

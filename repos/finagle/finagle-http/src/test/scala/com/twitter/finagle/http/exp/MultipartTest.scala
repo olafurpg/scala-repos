@@ -40,11 +40,12 @@ class MultipartTest extends FunSuite {
 
     assert(
       req.multipart == Some(
-        Multipart(Map(
-                    "abc" -> Seq("foo", "bar"),
-                    "def" -> Seq("123")
-                  ),
-                  Map.empty[String, Seq[Multipart.FileUpload]])))
+        Multipart(
+          Map(
+            "abc" -> Seq("foo", "bar"),
+            "def" -> Seq("123")
+          ),
+          Map.empty[String, Seq[Multipart.FileUpload]])))
   }
 
   test("Attribute") {
@@ -56,10 +57,11 @@ class MultipartTest extends FunSuite {
     val foo = Buf.Utf8("foo")
     val multipart = newRequest(foo).multipart.get
 
-    val Multipart.InMemoryFileUpload(buf,
-                                     contentType,
-                                     fileName,
-                                     contentTransferEncoding) =
+    val Multipart.InMemoryFileUpload(
+      buf,
+      contentType,
+      fileName,
+      contentTransferEncoding) =
       multipart.files("groups").head
     val attr = multipart.attributes("type").head
 

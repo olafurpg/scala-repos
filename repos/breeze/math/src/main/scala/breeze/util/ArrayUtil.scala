@@ -51,10 +51,11 @@ object ArrayUtil {
       case x: Array[Boolean] =>
         Arrays.fill(x, offset, offset + length, v.asInstanceOf[Boolean])
       case x: Array[_] =>
-        Arrays.fill(x.asInstanceOf[Array[AnyRef]],
-                    offset,
-                    offset + length,
-                    v.asInstanceOf[AnyRef])
+        Arrays.fill(
+          x.asInstanceOf[Array[AnyRef]],
+          offset,
+          offset + length,
+          v.asInstanceOf[AnyRef])
       case _ => throw new RuntimeException("shouldn't be here!")
     }
   }
@@ -177,16 +178,18 @@ object ArrayUtil {
     else {
       a match {
         case x: Array[Double] =>
-          Arrays.equals(a.asInstanceOf[Array[Double]],
-                        b.asInstanceOf[Array[Double]])
+          Arrays.equals(
+            a.asInstanceOf[Array[Double]],
+            b.asInstanceOf[Array[Double]])
         case x: Array[Int] =>
           Arrays.equals(a.asInstanceOf[Array[Int]], b.asInstanceOf[Array[Int]])
         case x: Array[Float] =>
           Arrays
             .equals(a.asInstanceOf[Array[Float]], b.asInstanceOf[Array[Float]])
         case x: Array[Boolean] =>
-          Arrays.equals(a.asInstanceOf[Array[Boolean]],
-                        b.asInstanceOf[Array[Boolean]])
+          Arrays.equals(
+            a.asInstanceOf[Array[Boolean]],
+            b.asInstanceOf[Array[Boolean]])
         case x: Array[Long] =>
           Arrays
             .equals(a.asInstanceOf[Array[Long]], b.asInstanceOf[Array[Long]])
@@ -200,8 +203,9 @@ object ArrayUtil {
           Arrays
             .equals(a.asInstanceOf[Array[Byte]], b.asInstanceOf[Array[Byte]])
         case x: Array[_] =>
-          Arrays.equals(a.asInstanceOf[Array[AnyRef]],
-                        b.asInstanceOf[Array[AnyRef]])
+          Arrays.equals(
+            a.asInstanceOf[Array[AnyRef]],
+            b.asInstanceOf[Array[AnyRef]])
         case _ => throw new RuntimeException("shouldn't be here!")
       }
     }
@@ -388,18 +392,15 @@ object ArrayUtil {
   }
 
   @expand
-  private def zeroSkippingHashCodeImpl[@expand.args(Int,
-                                                    Float,
-                                                    Double,
-                                                    Long,
-                                                    Byte,
-                                                    Short,
-                                                    Char,
-                                                    Boolean) V](
-      data: Array[V],
-      offset: Int,
-      stride: Int,
-      length: Int): Int = {
+  private def zeroSkippingHashCodeImpl[@expand.args(
+    Int,
+    Float,
+    Double,
+    Long,
+    Byte,
+    Short,
+    Char,
+    Boolean) V](data: Array[V], offset: Int, stride: Int, length: Int): Int = {
     var hash = 43
     var i = offset
     cforRange(0 until length) { _ =>

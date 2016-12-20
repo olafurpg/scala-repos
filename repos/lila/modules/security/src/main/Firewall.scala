@@ -42,9 +42,10 @@ final class Firewall(cookieName: Option[String],
   def accepts(req: RequestHeader): Fu[Boolean] = blocks(req) map (!_)
 
   def blockIp(ip: String): Funit = validIp(ip) ?? {
-    $update(Json.obj("_id" -> ip),
-            Json.obj("_id" -> ip, "date" -> $date(DateTime.now)),
-            upsert = true) >>- refresh
+    $update(
+      Json.obj("_id" -> ip),
+      Json.obj("_id" -> ip, "date" -> $date(DateTime.now)),
+      upsert = true) >>- refresh
   }
 
   def unblockIps(ips: Iterable[String]): Funit =

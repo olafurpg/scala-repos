@@ -80,9 +80,10 @@ object ReplVals {
                         m2: ru.TypeTag[M2]): Type =
         if (sym eq NoSymbol) NoType
         else
-          appliedType(sym,
-                      compilerTypeFromTag(m1).asInstanceOf[Type],
-                      compilerTypeFromTag(m2).asInstanceOf[Type])
+          appliedType(
+            sym,
+            compilerTypeFromTag(m1).asInstanceOf[Type],
+            compilerTypeFromTag(m2).asInstanceOf[Type])
     }
 
     (sym: Symbol) =>

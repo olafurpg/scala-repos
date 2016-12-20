@@ -276,10 +276,11 @@ class ScalaImportOptimizer extends ImportOptimizer {
       if (rangeStart != -1) {
         val usedImportedNames =
           allUsedImportedNames.dropWhile(_._2 < rangeStart).map(_._1).toSet
-        val rangeInfo = RangeInfo(namesAtStart,
-                                  infos.to[Seq],
-                                  usedImportedNames,
-                                  isLocalRange)
+        val rangeInfo = RangeInfo(
+          namesAtStart,
+          infos.to[Seq],
+          usedImportedNames,
+          isLocalRange)
         result += (new TextRange(rangeStart, rangeEnd) -> rangeInfo)
         rangeStart = -1
         rangeEnd = -1
@@ -412,20 +413,22 @@ object ScalaImportOptimizer {
 
     def getImportText(importInfo: ImportInfo,
                       settings: OptimizeImportSettings): String =
-      getImportText(importInfo,
-                    settings.isUnicodeArrow,
-                    settings.spacesInImports,
-                    settings.sortImports)
+      getImportText(
+        importInfo,
+        settings.isUnicodeArrow,
+        settings.spacesInImports,
+        settings.sortImports)
   }
 
   def optimizedImportInfos(
       rangeInfo: RangeInfo,
       settings: OptimizeImportSettings): Seq[ImportInfo] = {
     import settings._
-    val RangeInfo(namesAtRangeStart,
-                  importInfos,
-                  usedImportedNames,
-                  isLocalRange) =
+    val RangeInfo(
+      namesAtRangeStart,
+      importInfos,
+      usedImportedNames,
+      isLocalRange) =
       rangeInfo
 
     val buffer = new ArrayBuffer[ImportInfo]()
@@ -443,10 +446,11 @@ object ScalaImportOptimizer {
       if (collectImports) mergeImportInfos(buffer)
       else buffer.flatMap(_.split)
 
-    updateToWildcardImports(result,
-                            namesAtRangeStart,
-                            usedImportedNames,
-                            settings)
+    updateToWildcardImports(
+      result,
+      namesAtRangeStart,
+      usedImportedNames,
+      settings)
     updateRootPrefix(result, namesAtRangeStart)
 
     result.to[immutable.Seq]
@@ -566,9 +570,10 @@ object ScalaImportOptimizer {
           val stripped = info.prefixQualifier.stripPrefix(oldPrefix)
           val newRelative = s"$newName$stripped"
           val newPrefix = s"$renamerPrefix.$newRelative"
-          return info.copy(prefixQualifier = newPrefix,
-                           relative = Some(newRelative),
-                           rootUsed = false)
+          return info.copy(
+            prefixQualifier = newPrefix,
+            relative = Some(newRelative),
+            rootUsed = false)
         }
       }
 

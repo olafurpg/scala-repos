@@ -81,23 +81,25 @@ class FieldImpsTest extends WordSpec with Matchers with FieldConversions {
       val comparator = implicitly[Ordering[String]]
       fields.setComparators(comparator, comparator)
       val fieldList: List[Field[_]] = fields.toFieldList
-      fieldList shouldBe List(new StringField[String]("foo")(comparator, None),
-                              new StringField[String]("bar")(comparator, None))
+      fieldList shouldBe List(
+        new StringField[String]("foo")(comparator, None),
+        new StringField[String]("bar")(comparator, None))
     }
     "throw an exception on when converting a virtual Fields instance" in {
 
       import Fields._
-      List(ALL,
-           ARGS,
-           FIRST,
-           GROUP,
-           LAST,
-           NONE,
-           REPLACE,
-           RESULTS,
-           SWAP,
-           UNKNOWN,
-           VALUES).foreach { fields =>
+      List(
+        ALL,
+        ARGS,
+        FIRST,
+        GROUP,
+        LAST,
+        NONE,
+        REPLACE,
+        RESULTS,
+        SWAP,
+        UNKNOWN,
+        VALUES).foreach { fields =>
         an[Exception] should be thrownBy fields.toFieldList
       }
     }
@@ -134,8 +136,9 @@ class FieldImpsTest extends WordSpec with Matchers with FieldConversions {
           ord,
           implicitly[Manifest[java.math.BigInteger]]))
       setAndCheckFieldS(
-        List(Field[java.math.BigInteger](0),
-             Field[java.math.BigDecimal]("bar")))
+        List(
+          Field[java.math.BigInteger](0),
+          Field[java.math.BigDecimal]("bar")))
     }
     "convert from enumeration values" in {
       object Schema extends Enumeration {
@@ -161,10 +164,11 @@ class FieldImpsTest extends WordSpec with Matchers with FieldConversions {
       vf shouldBe (new Fields(int2Integer(1), int2Integer(2), int2Integer(3)))
       vf = (1, 2, 3, 4)
       vf shouldBe
-        (new Fields(int2Integer(1),
-                    int2Integer(2),
-                    int2Integer(3),
-                    int2Integer(4)))
+        (new Fields(
+          int2Integer(1),
+          int2Integer(2),
+          int2Integer(3),
+          int2Integer(4)))
     }
     "convert from general string tuples" in {
       var vf: Fields = Tuple1("hey")

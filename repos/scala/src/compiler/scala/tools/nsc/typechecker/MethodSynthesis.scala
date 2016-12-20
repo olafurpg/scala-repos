@@ -99,8 +99,9 @@ trait MethodSynthesis { self: Analyzer =>
       createMethod(name, List(IntTpe), returnType) { m =>
         val arg0 = Ident(m.firstParam)
         val default =
-          DEFAULT ==> Throw(IndexOutOfBoundsExceptionClass.tpe_*,
-                            fn(arg0, nme.toString_))
+          DEFAULT ==> Throw(
+            IndexOutOfBoundsExceptionClass.tpe_*,
+            fn(arg0, nme.toString_))
         val cases =
           range.map(num => CASE(LIT(num)) ==> f(num)).toList :+ default
 
@@ -173,8 +174,9 @@ trait MethodSynthesis { self: Analyzer =>
       val annotations = tree.symbol.initialize.annotations
       val targetClass = defaultAnnotationTarget(tree)
       val retained =
-        annotations filter annotationFilter(targetClass,
-                                            defaultRetention = true)
+        annotations filter annotationFilter(
+          targetClass,
+          defaultRetention = true)
 
       annotations filterNot (retained contains _) foreach
         (ann => issueAnnotationWarning(tree, ann, targetClass))
@@ -222,11 +224,13 @@ trait MethodSynthesis { self: Analyzer =>
           case Some(mdef) =>
             context.unit.synthetics -= meth
             meth setAnnotations
-              (annotations filter annotationFilter(MethodTargetClass,
-                                                   defaultRetention = false))
+              (annotations filter annotationFilter(
+                MethodTargetClass,
+                defaultRetention = false))
             cd.symbol setAnnotations
-              (annotations filter annotationFilter(ClassTargetClass,
-                                                   defaultRetention = true))
+              (annotations filter annotationFilter(
+                ClassTargetClass,
+                defaultRetention = true))
             List(cd, mdef)
           case _ =>
             // Shouldn't happen, but let's give ourselves a reasonable error when it does
@@ -332,9 +336,10 @@ trait MethodSynthesis { self: Analyzer =>
       }
       private def logDerived(result: Tree): Tree = {
         debuglog(
-          "[+derived] " + ojoin(mods.flagString,
-                                basisSym.accurateKindString,
-                                basisSym.getterName.decode) + " (" +
+          "[+derived] " + ojoin(
+            mods.flagString,
+            basisSym.accurateKindString,
+            basisSym.getterName.decode) + " (" +
             derivedSym + ")\n        " + result)
 
         result
@@ -355,8 +360,9 @@ trait MethodSynthesis { self: Analyzer =>
             annotationFilter(ParamTargetClass, defaultRetention = true)
           // By default annotations go to the field, except if the field is generated for a class parameter (PARAMACCESSOR).
           case _: Field =>
-            annotationFilter(FieldTargetClass,
-                             defaultRetention = !mods.isParamAccessor)
+            annotationFilter(
+              FieldTargetClass,
+              defaultRetention = !mods.isParamAccessor)
           case _: BaseGetter =>
             annotationFilter(GetterTargetClass, defaultRetention = false)
           case _: Setter =>
@@ -545,9 +551,10 @@ trait MethodSynthesis { self: Analyzer =>
       // handle lazy val first for now (we emit a Field even though we probably shouldn't...)
       override def derivedTree =
         if (mods.isLazy)
-          copyValDef(tree)(mods = mods | flagsExtra,
-                           name = this.name,
-                           rhs = EmptyTree).setPos(tree.pos.focus)
+          copyValDef(tree)(
+            mods = mods | flagsExtra,
+            name = this.name,
+            rhs = EmptyTree).setPos(tree.pos.focus)
         else if (Field.noFieldFor(tree)) EmptyTree
         else copyValDef(tree)(mods = mods | flagsExtra, name = this.name)
     }
@@ -582,12 +589,13 @@ trait MethodSynthesis { self: Analyzer =>
       // Derives a tree without attempting to use the original tree's symbol.
       override def derivedTree = {
         atPos(tree.pos.focus) {
-          DefDef(derivedMods mapAnnotations (_ => Nil),
-                 name,
-                 Nil,
-                 ListOfNil,
-                 tree.tpt.duplicate,
-                 if (isDeferred) EmptyTree else Select(This(owner), tree.name))
+          DefDef(
+            derivedMods mapAnnotations (_ => Nil),
+            name,
+            Nil,
+            ListOfNil,
+            tree.tpt.duplicate,
+            if (isDeferred) EmptyTree else Select(This(owner), tree.name))
         }
       }
       override def createAndEnterSymbol(): MethodSymbol =

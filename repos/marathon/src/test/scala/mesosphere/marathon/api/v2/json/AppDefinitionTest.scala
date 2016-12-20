@@ -319,8 +319,9 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
     MarathonTestHelper.validateJsonSchema(app)
 
     app = correct.copy(
-      fetch = Seq(FetchUri(uri = "http://example.com/valid"),
-                  FetchUri(uri = "d://\not-a-uri"))
+      fetch = Seq(
+        FetchUri(uri = "http://example.com/valid"),
+        FetchUri(uri = "d://\not-a-uri"))
     )
 
     shouldViolate(
@@ -332,24 +333,29 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
     MarathonTestHelper.validateJsonSchema(app)
 
     app = correct.copy(
-      fetch = Seq(FetchUri(uri = "http://example.com/valid"),
-                  FetchUri(uri = "/root/file"))
+      fetch = Seq(
+        FetchUri(uri = "http://example.com/valid"),
+        FetchUri(uri = "/root/file"))
     )
 
     shouldNotViolate(app, "/fetch(1)", "URI has invalid syntax.")
 
-    shouldViolate(app.copy(mem = -3.0),
-                  "/mem",
-                  "got -3.0, expected 0.0 or more")
-    shouldViolate(app.copy(cpus = -3.0),
-                  "/cpus",
-                  "got -3.0, expected 0.0 or more")
-    shouldViolate(app.copy(disk = -3.0),
-                  "/disk",
-                  "got -3.0, expected 0.0 or more")
-    shouldViolate(app.copy(instances = -3),
-                  "/instances",
-                  "got -3, expected 0 or more")
+    shouldViolate(
+      app.copy(mem = -3.0),
+      "/mem",
+      "got -3.0, expected 0.0 or more")
+    shouldViolate(
+      app.copy(cpus = -3.0),
+      "/cpus",
+      "got -3.0, expected 0.0 or more")
+    shouldViolate(
+      app.copy(disk = -3.0),
+      "/disk",
+      "got -3.0, expected 0.0 or more")
+    shouldViolate(
+      app.copy(instances = -3),
+      "/instances",
+      "got -3, expected 0 or more")
   }
 
   test("SerializationRoundtrip empty") {
@@ -543,10 +549,11 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
               network = Some(Network.BRIDGE),
               portMappings = Some(
                 Seq(
-                  PortMapping(containerPort = 8080,
-                              hostPort = 0,
-                              servicePort = 9000,
-                              protocol = "tcp")
+                  PortMapping(
+                    containerPort = 8080,
+                    hostPort = 0,
+                    servicePort = 9000,
+                    protocol = "tcp")
                 ))
             ))
         ))
@@ -580,14 +587,16 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
       id = "app-with-fetch".toPath,
       cmd = Some("brew update"),
       fetch = Seq(
-        new FetchUri(uri = "http://example.com/file1",
-                     executable = false,
-                     extract = true,
-                     cache = true),
-        new FetchUri(uri = "http://example.com/file2",
-                     executable = true,
-                     extract = false,
-                     cache = false)
+        new FetchUri(
+          uri = "http://example.com/file1",
+          executable = false,
+          extract = true,
+          cache = true),
+        new FetchUri(
+          uri = "http://example.com/file2",
+          executable = true,
+          extract = false,
+          cache = false)
       )
     )
 
@@ -639,14 +648,16 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
       id = "app-with-fetch".toPath,
       cmd = Some("brew update"),
       fetch = Seq(
-        new FetchUri(uri = "http://example.com/file1",
-                     executable = false,
-                     extract = true,
-                     cache = true),
-        new FetchUri(uri = "http://example.com/file2",
-                     executable = true,
-                     extract = false,
-                     cache = false)
+        new FetchUri(
+          uri = "http://example.com/file1",
+          executable = false,
+          extract = true,
+          cache = true),
+        new FetchUri(
+          uri = "http://example.com/file2",
+          executable = true,
+          extract = false,
+          cache = false)
       )
     )
 
@@ -810,9 +821,10 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
     val app = AppDefinition(
       id = "/test".toRootPath,
       residency = Some(
-        Residency(relaunchEscalationTimeoutSeconds = 3600,
-                  taskLostBehavior =
-                    Protos.ResidencyDefinition.TaskLostBehavior.WAIT_FOREVER)))
+        Residency(
+          relaunchEscalationTimeoutSeconds = 3600,
+          taskLostBehavior =
+            Protos.ResidencyDefinition.TaskLostBehavior.WAIT_FOREVER)))
     val proto = app.toProto
 
     proto.hasResidency shouldBe true

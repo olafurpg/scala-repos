@@ -18,6 +18,7 @@ object ScalaD {
     resource("/c/test-resource-c")
   }
   def resource(s: String) =
-    assert(getClass.getResource(s) != null,
-           "Could not find resource '" + s + "'")
+    assert(
+      getClass.getResource(s) != null,
+      "Could not find resource '" + s + "'")
 }

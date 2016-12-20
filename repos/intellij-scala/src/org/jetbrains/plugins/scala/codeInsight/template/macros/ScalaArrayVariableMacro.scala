@@ -32,23 +32,25 @@ class ScalaArrayVariableMacro extends ScalaVariableOfTypeMacro {
                               scType: ScType,
                               project: Project,
                               array: ArrayBuffer[LookupElement]) =
-    super.addLookupItems(Array("scala.Array"),
-                         context,
-                         variant,
-                         scType,
-                         project,
-                         array)
+    super.addLookupItems(
+      Array("scala.Array"),
+      context,
+      variant,
+      scType,
+      project,
+      array)
 
   override def getResult(exprs: Array[Expression],
                          context: ExpressionContext,
                          variant: ScalaResolveResult,
                          scType: ScType,
                          project: Project): Option[Result] =
-    super.getResult(Array(new TextExpression("scala.Array")),
-                    context,
-                    variant,
-                    scType,
-                    project)
+    super.getResult(
+      Array(new TextExpression("scala.Array")),
+      context,
+      variant,
+      scType,
+      project)
 
   override def validExprsCount(exprsCount: Int): Boolean = exprsCount == 0
 }

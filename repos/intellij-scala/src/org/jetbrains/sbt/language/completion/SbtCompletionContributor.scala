@@ -81,8 +81,9 @@ class SbtCompletionContributor extends ScalaCompletionContributor {
                 case ScParameterizedType(settingType, Seq(seqFullType))
                     if qualifiedName(settingType) == "sbt.Init.Setting" =>
                   val collectionTypeNames =
-                    Seq("scala.collection.Seq",
-                        "scala.collection.immutable.Set")
+                    Seq(
+                      "scala.collection.Seq",
+                      "scala.collection.immutable.Set")
                   seqFullType match {
                     case ScParameterizedType(seqType, Seq(valType))
                         if collectionTypeNames contains qualifiedName(
@@ -99,9 +100,10 @@ class SbtCompletionContributor extends ScalaCompletionContributor {
         def getScopeType: Option[ScType] = {
           if (operator.getText != "in") return None
           val manager = ScalaPsiManager.instance(place.getProject)
-          val scopeClass = manager.getCachedClass("sbt.Scope",
-                                                  place.getResolveScope,
-                                                  ClassCategory.TYPE)
+          val scopeClass = manager.getCachedClass(
+            "sbt.Scope",
+            place.getResolveScope,
+            ClassCategory.TYPE)
           if (scopeClass != null) Some(ScDesignatorType(scopeClass))
           else None
         }
@@ -125,11 +127,12 @@ class SbtCompletionContributor extends ScalaCompletionContributor {
               if isAccessible(obj) && ScalaPsiUtil.hasStablePath(obj) =>
             def fetchAndApply(element: ScTypedDefinition) {
               val lookup = LookupElementManager
-                .getLookupElement(new ScalaResolveResult(element),
-                                  isClassName = true,
-                                  isOverloadedForClassName = false,
-                                  shouldImport = true,
-                                  isInStableCodeReference = false)
+                .getLookupElement(
+                  new ScalaResolveResult(element),
+                  isClassName = true,
+                  isOverloadedForClassName = false,
+                  shouldImport = true,
+                  isInStableCodeReference = false)
                 .head
               lookup.addLookupStrings(obj.name + "." + element.name)
               applyVariant(lookup)
@@ -173,9 +176,10 @@ class SbtCompletionContributor extends ScalaCompletionContributor {
         ScType.extractClass(expectedType) match {
           case Some(clazz: ScTypeDefinition) =>
             expectedType match {
-              case ScProjectionType(proj,
-                                    _: ScTypeAlias | _: ScClass | _: ScTrait,
-                                    _) =>
+              case ScProjectionType(
+                  proj,
+                  _: ScTypeAlias | _: ScClass | _: ScTrait,
+                  _) =>
                 ScType.extractClass(proj) foreach collectAndApplyVariants
               case _ => // do nothing
             }
@@ -186,11 +190,12 @@ class SbtCompletionContributor extends ScalaCompletionContributor {
               if (field.hasModifierProperty("static") &&
                   isAccessible(field)) {
                 val lookup = LookupElementManager
-                  .getLookupElement(new ScalaResolveResult(field),
-                                    isClassName = true,
-                                    isOverloadedForClassName = false,
-                                    shouldImport = true,
-                                    isInStableCodeReference = false)
+                  .getLookupElement(
+                    new ScalaResolveResult(field),
+                    isClassName = true,
+                    isOverloadedForClassName = false,
+                    shouldImport = true,
+                    isInStableCodeReference = false)
                   .head
                 lookup.addLookupStrings(p.getName + "." + field.getName)
                 applyVariant(lookup)

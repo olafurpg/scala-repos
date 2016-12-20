@@ -93,22 +93,24 @@ object TaskSerializer {
     (reservationOpt, launchedOpt) match {
 
       case (Some(reservation), Some(launched)) =>
-        Task.LaunchedOnReservation(taskId,
-                                   agentInfo,
-                                   launched.appVersion,
-                                   launched.status,
-                                   launched.networking,
-                                   reservation)
+        Task.LaunchedOnReservation(
+          taskId,
+          agentInfo,
+          launched.appVersion,
+          launched.status,
+          launched.networking,
+          reservation)
 
       case (Some(reservation), None) =>
         Task.Reserved(taskId, agentInfo, reservation)
 
       case (None, Some(launched)) =>
-        Task.LaunchedEphemeral(taskId,
-                               agentInfo,
-                               launched.appVersion,
-                               launched.status,
-                               launched.networking)
+        Task.LaunchedEphemeral(
+          taskId,
+          agentInfo,
+          launched.appVersion,
+          launched.status,
+          launched.networking)
 
       case (None, None) =>
         val msg =
@@ -159,9 +161,10 @@ object TaskSerializer {
         setReservation(reserved.reservation)
 
       case launchedOnR: Task.LaunchedOnReservation =>
-        setLaunched(launchedOnR.appVersion,
-                    launchedOnR.status,
-                    launchedOnR.networking)
+        setLaunched(
+          launchedOnR.appVersion,
+          launchedOnR.status,
+          launchedOnR.networking)
         setReservation(launchedOnR.reservation)
     }
 

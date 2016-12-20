@@ -253,8 +253,8 @@ private[sql] class ExchangeCoordinator(
       var k = 0
       while (k < numExchanges) {
         val exchange = exchanges(k)
-        val rdd = exchange.preparePostShuffleRDD(shuffleDependencies(k),
-                                                 partitionStartIndices)
+        val rdd = exchange
+          .preparePostShuffleRDD(shuffleDependencies(k), partitionStartIndices)
         newPostShuffleRDDs.put(exchange, rdd)
 
         k += 1

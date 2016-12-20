@@ -142,8 +142,9 @@ class ScalaGenerateAnonymousFunctionInsertHandler(params: Seq[ScType],
       template.addVariable(name, actualName, actualName, false)
     }
 
-    document.deleteString(commonParent.getTextRange.getStartOffset,
-                          commonParent.getTextRange.getEndOffset)
+    document.deleteString(
+      commonParent.getTextRange.getStartOffset,
+      commonParent.getTextRange.getEndOffset)
     TemplateManager
       .getInstance(context.getProject)
       .startTemplate(editor, template, new TemplateEditingAdapter {

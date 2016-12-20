@@ -30,12 +30,13 @@ final class NoteApi(coll: lila.db.Types.Coll,
 
   def write(to: User, text: String, from: User) = {
 
-    val note = Note(_id = ornicar.scalalib.Random nextStringUppercase 8,
-                    from = from.id,
-                    to = to.id,
-                    text = text,
-                    troll = from.troll,
-                    date = DateTime.now)
+    val note = Note(
+      _id = ornicar.scalalib.Random nextStringUppercase 8,
+      from = from.id,
+      to = to.id,
+      text = text,
+      troll = from.troll,
+      date = DateTime.now)
 
     import lila.hub.actorApi.timeline.{Propagate, NoteCreate}
     timeline !

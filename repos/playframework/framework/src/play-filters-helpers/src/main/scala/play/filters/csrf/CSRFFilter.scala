@@ -42,10 +42,11 @@ class CSRFFilter(config: => CSRFConfig,
            tokenSigner: play.libs.crypto.CSRFTokenSigner,
            tokenProvider: TokenProvider,
            errorHandler: CSRFErrorHandler)(mat: Materializer) = {
-    this(config,
-         tokenSigner.asScala,
-         tokenProvider,
-         new JavaCSRFErrorHandlerAdapter(errorHandler))(mat)
+    this(
+      config,
+      tokenSigner.asScala,
+      tokenProvider,
+      new JavaCSRFErrorHandlerAdapter(errorHandler))(mat)
   }
 
   /**
@@ -55,10 +56,11 @@ class CSRFFilter(config: => CSRFConfig,
     */
   @Deprecated
   def this()(implicit mat: Materializer) =
-    this(CSRFConfig.global,
-         Crypto.crypto,
-         new ConfigTokenProvider(CSRFConfig.global, Crypto.crypto),
-         DefaultErrorHandler)
+    this(
+      CSRFConfig.global,
+      Crypto.crypto,
+      new ConfigTokenProvider(CSRFConfig.global, Crypto.crypto),
+      DefaultErrorHandler)
 
   def apply(next: EssentialAction): EssentialAction =
     new CSRFAction(next, config, tokenSigner, tokenProvider, errorHandler)

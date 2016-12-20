@@ -47,19 +47,21 @@ case class Statistics private[ragnarok] (tails: Int,
     */
   def *(x: Double): Statistics =
     if (x >= 0.0) {
-      Statistics(tails,
-                 allMin map (_ * x),
-                 allMax map (_ * x),
-                 m * x,
-                 vn * x * x,
-                 n)
+      Statistics(
+        tails,
+        allMin map (_ * x),
+        allMax map (_ * x),
+        m * x,
+        vn * x * x,
+        n)
     } else {
-      Statistics(tails,
-                 allMax map (_ * x),
-                 allMin map (_ * x),
-                 m * x,
-                 vn * math.abs(x) * math.abs(x),
-                 n)
+      Statistics(
+        tails,
+        allMax map (_ * x),
+        allMin map (_ * x),
+        m * x,
+        vn * math.abs(x) * math.abs(x),
+        n)
     }
 
   def +(x: Double): Statistics = this + Statistics(x, tails = tails)
@@ -96,12 +98,13 @@ case class Statistics private[ragnarok] (tails: Int,
 
   def toJson: JObject =
     JObject(
-      List(JField("mean", JNum(mean)),
-           JField("variance", JNum(variance)),
-           JField("stdDev", JNum(stdDev)),
-           JField("min", JNum(min)),
-           JField("max", JNum(max)),
-           JField("count", JNum(count))))
+      List(
+        JField("mean", JNum(mean)),
+        JField("variance", JNum(variance)),
+        JField("stdDev", JNum(stdDev)),
+        JField("min", JNum(min)),
+        JField("max", JNum(max)),
+        JField("count", JNum(count))))
 }
 
 object Statistics {
@@ -121,12 +124,13 @@ object Statistics {
       val z_vn = x.vn + y.vn + y.n * (y.m - x.m) * (y.m - z_m)
       val z_tails = x.tails min y.tails
 
-      Statistics(z_tails,
-                 (x.allMin ++ y.allMin).sorted take (z_tails + 1),
-                 (x.allMax ++ y.allMax).sorted takeRight (z_tails + 1),
-                 z_m,
-                 z_vn,
-                 x.n + y.n)
+      Statistics(
+        z_tails,
+        (x.allMin ++ y.allMin).sorted take (z_tails + 1),
+        (x.allMax ++ y.allMax).sorted takeRight (z_tails + 1),
+        z_m,
+        z_vn,
+        x.n + y.n)
     }
   }
 }

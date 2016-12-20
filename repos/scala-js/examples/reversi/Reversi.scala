@@ -64,19 +64,21 @@ class Reversi(jQuery: JQueryStatic, playground: JQuery) {
   buildUI()
 
   def createResetButton() = {
-    jQuery("<input>",
-           js.Dynamic.literal(
-             `type` = "button",
-             value = "Reset"
-           )).click(reset _)
+    jQuery(
+      "<input>",
+      js.Dynamic.literal(
+        `type` = "button",
+        value = "Reset"
+      )).click(reset _)
   }
 
   def createPassButton() = {
-    jQuery("<input>",
-           js.Dynamic.literal(
-             `type` = "button",
-             value = "Pass"
-           )).click(pass _)
+    jQuery(
+      "<input>",
+      js.Dynamic.literal(
+        `type` = "button",
+        value = "Pass"
+      )).click(pass _)
   }
 
   def createStatus() = {
@@ -118,12 +120,13 @@ class Reversi(jQuery: JQueryStatic, playground: JQuery) {
       if (square.owner != NoPlayer) {
         context.fillStyle = if (square.owner == White) "white" else "black"
         context.beginPath()
-        context.arc(x + HalfSquareSizePx,
-                    y + HalfSquareSizePx,
-                    PawnRadiusPx,
-                    0,
-                    2 * Math.PI,
-                    true)
+        context.arc(
+          x + HalfSquareSizePx,
+          y + HalfSquareSizePx,
+          PawnRadiusPx,
+          0,
+          2 * Math.PI,
+          true)
         context.fill()
       }
     }

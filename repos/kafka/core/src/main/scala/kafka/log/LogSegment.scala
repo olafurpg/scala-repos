@@ -62,17 +62,20 @@ class LogSegment(val log: FileMessageSet,
            fileAlreadyExists: Boolean = false,
            initFileSize: Int = 0,
            preallocate: Boolean = false) =
-    this(new FileMessageSet(file = Log.logFilename(dir, startOffset),
-                            fileAlreadyExists = fileAlreadyExists,
-                            initFileSize = initFileSize,
-                            preallocate = preallocate),
-         new OffsetIndex(file = Log.indexFilename(dir, startOffset),
-                         baseOffset = startOffset,
-                         maxIndexSize = maxIndexSize),
-         startOffset,
-         indexIntervalBytes,
-         rollJitterMs,
-         time)
+    this(
+      new FileMessageSet(
+        file = Log.logFilename(dir, startOffset),
+        fileAlreadyExists = fileAlreadyExists,
+        initFileSize = initFileSize,
+        preallocate = preallocate),
+      new OffsetIndex(
+        file = Log.indexFilename(dir, startOffset),
+        baseOffset = startOffset,
+        maxIndexSize = maxIndexSize),
+      startOffset,
+      indexIntervalBytes,
+      rollJitterMs,
+      time)
 
   /* Return the size in bytes of this log segment */
   def size: Long = log.sizeInBytes()
@@ -151,9 +154,10 @@ class LogSegment(val log: FileMessageSet,
     // if the start position is already off the end of the log, return null
     if (startPosition == null) return null
 
-    val offsetMetadata = new LogOffsetMetadata(startOffset,
-                                               this.baseOffset,
-                                               startPosition.position)
+    val offsetMetadata = new LogOffsetMetadata(
+      startOffset,
+      this.baseOffset,
+      startPosition.position)
 
     // if the size is zero, still return a log segment but with zero size
     if (maxSize == 0) return FetchDataInfo(offsetMetadata, MessageSet.Empty)

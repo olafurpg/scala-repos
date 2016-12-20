@@ -62,10 +62,11 @@ class KinesisCheckpointerSuite
     receiverMock = mock[KinesisReceiver[Array[Byte]]]
     checkpointerMock = mock[IRecordProcessorCheckpointer]
     clock = new ManualClock()
-    kinesisCheckpointer = new KinesisCheckpointer(receiverMock,
-                                                  checkpointInterval,
-                                                  workerId,
-                                                  clock)
+    kinesisCheckpointer = new KinesisCheckpointer(
+      receiverMock,
+      checkpointInterval,
+      workerId,
+      clock)
   }
 
   test("checkpoint is not called twice for the same sequence number") {

@@ -416,14 +416,15 @@ final class LongMap[V] private[collection] (defaultEntry: Long => V,
     val kz = java.util.Arrays.copyOf(_keys, _keys.length)
     val vz = java.util.Arrays.copyOf(_values, _values.length)
     val lm = new LongMap[V](defaultEntry, 1, false)
-    lm.initializeTo(mask,
-                    extraKeys,
-                    zeroValue,
-                    minValue,
-                    _size,
-                    _vacant,
-                    kz,
-                    vz)
+    lm.initializeTo(
+      mask,
+      extraKeys,
+      zeroValue,
+      minValue,
+      _size,
+      _vacant,
+      kz,
+      vz)
     lm
   }
 

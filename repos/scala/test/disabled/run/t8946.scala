@@ -23,7 +23,8 @@ object Test {
     }
     forceGc()
     val nonGCdThreads = threads.filter(_.get.nonEmpty).length
-    assert(nonGCdThreads == 0,
-           s"${nonGCdThreads} threads were retained; expected 0.")
+    assert(
+      nonGCdThreads == 0,
+      s"${nonGCdThreads} threads were retained; expected 0.")
   }
 }

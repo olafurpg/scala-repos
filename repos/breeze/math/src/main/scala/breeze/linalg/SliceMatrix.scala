@@ -69,11 +69,12 @@ object SliceMatrix {
                           V,
                           V2,
                           DenseMatrix[V2]] = {
-    new CanMapKeyValuePairs[SliceMatrix[K1, K2, V],
-                            (Int, Int),
-                            V,
-                            V2,
-                            DenseMatrix[V2]] {
+    new CanMapKeyValuePairs[
+      SliceMatrix[K1, K2, V],
+      (Int, Int),
+      V,
+      V2,
+      DenseMatrix[V2]] {
       override def map(from: SliceMatrix[K1, K2, V],
                        fn: ((Int, Int), V) => V2): DenseMatrix[V2] = {
         DenseMatrix.tabulate(from.rows, from.cols)((i, j) =>

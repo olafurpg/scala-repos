@@ -285,8 +285,9 @@ class MongoFieldTypeTestRecord private ()
   }
 
   object mandatoryMongoCaseClassField
-      extends MongoCaseClassField[MongoFieldTypeTestRecord,
-                                  MongoCaseClassTestObject](this) {
+      extends MongoCaseClassField[
+        MongoFieldTypeTestRecord,
+        MongoCaseClassTestObject](this) {
     override def formats = owner.meta.formats
   }
 }
@@ -347,8 +348,9 @@ class ListTestRecord private ()
   object mandatoryMongoJsonObjectListField
       extends MongoJsonObjectListField(this, TypeTestJsonObject)
   object mongoCaseClassListField
-      extends MongoCaseClassListField[ListTestRecord,
-                                      MongoCaseClassTestObject](this) {
+      extends MongoCaseClassListField[
+        ListTestRecord,
+        MongoCaseClassTestObject](this) {
     override def formats = owner.meta.formats
   }
 }
@@ -523,8 +525,9 @@ class BoxTestRecord private ()
   def meta = BoxTestRecord
 
   object jsonobj
-      extends JsonObjectField[BoxTestRecord, BoxTestJsonObj](this,
-                                                             BoxTestJsonObj) {
+      extends JsonObjectField[BoxTestRecord, BoxTestJsonObj](
+        this,
+        BoxTestJsonObj) {
     def defaultValue =
       BoxTestJsonObj("0", Empty, Full("Full String"), Failure("Failure"))
   }

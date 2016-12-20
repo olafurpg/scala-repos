@@ -95,9 +95,10 @@ class ConsumerIterator[K, V](
         throw new MessageSizeTooLargeException(
           "Found a message larger than the maximum fetch size of this consumer on topic " +
             "%s partition %d at fetch offset %d. Increase the fetch size, or decrease the maximum message size the broker will allow."
-              .format(currentDataChunk.topicInfo.topic,
-                      currentDataChunk.topicInfo.partitionId,
-                      currentDataChunk.fetchOffset))
+              .format(
+                currentDataChunk.topicInfo.topic,
+                currentDataChunk.topicInfo.partitionId,
+                currentDataChunk.fetchOffset))
     }
     var item = localCurrent.next()
     // reject the messages that have already been consumed
@@ -110,14 +111,15 @@ class ConsumerIterator[K, V](
     item.message
       .ensureValid() // validate checksum of message to ensure it is valid
 
-    new MessageAndMetadata(currentTopicInfo.topic,
-                           currentTopicInfo.partitionId,
-                           item.message,
-                           item.offset,
-                           item.message.timestamp,
-                           item.message.timestampType,
-                           keyDecoder,
-                           valueDecoder)
+    new MessageAndMetadata(
+      currentTopicInfo.topic,
+      currentTopicInfo.partitionId,
+      item.message,
+      item.offset,
+      item.message.timestamp,
+      item.message.timestampType,
+      keyDecoder,
+      valueDecoder)
   }
 
   def clearCurrentChunk() {

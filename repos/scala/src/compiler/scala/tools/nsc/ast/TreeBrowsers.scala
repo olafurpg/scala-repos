@@ -257,8 +257,9 @@ abstract class TreeBrowsers {
 
       val jmiExit = new JMenuItem(
         new AbstractAction("Exit") {
-          putValue(Action.ACCELERATOR_KEY,
-                   KeyStroke.getKeyStroke(KeyEvent.VK_Q, menuKey, false))
+          putValue(
+            Action.ACCELERATOR_KEY,
+            KeyStroke.getKeyStroke(KeyEvent.VK_Q, menuKey, false))
           override def actionPerformed(e: ActionEvent) = closeWindow()
         }
       )
@@ -268,8 +269,9 @@ abstract class TreeBrowsers {
       val jmView = new JMenu("View")
       val jmiExpand = new JMenuItem(
         new AbstractAction("Expand All Nodes") {
-          putValue(Action.ACCELERATOR_KEY,
-                   KeyStroke.getKeyStroke(KeyEvent.VK_E, menuKey, false))
+          putValue(
+            Action.ACCELERATOR_KEY,
+            KeyStroke.getKeyStroke(KeyEvent.VK_E, menuKey, false))
           override def actionPerformed(e: ActionEvent) {
             expandAll(jTree)
           }
@@ -278,8 +280,9 @@ abstract class TreeBrowsers {
       jmView add jmiExpand
       val jmiCollapse = new JMenuItem(
         new AbstractAction("Collapse All Nodes") {
-          putValue(Action.ACCELERATOR_KEY,
-                   KeyStroke.getKeyStroke(KeyEvent.VK_L, menuKey, false))
+          putValue(
+            Action.ACCELERATOR_KEY,
+            KeyStroke.getKeyStroke(KeyEvent.VK_L, menuKey, false))
           override def actionPerformed(e: ActionEvent) {
             collapseAll(jTree)
           }

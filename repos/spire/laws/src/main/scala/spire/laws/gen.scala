@@ -121,9 +121,10 @@ object gen {
     } yield Quaternion(r, i, j, k)
 
   def bound[A: Arbitrary]: Gen[Bound[A]] =
-    Gen.oneOf(arbitrary[A].map(Open(_)),
-              arbitrary[A].map(Closed(_)),
-              Gen.const(Unbound[A]))
+    Gen.oneOf(
+      arbitrary[A].map(Open(_)),
+      arbitrary[A].map(Closed(_)),
+      Gen.const(Unbound[A]))
 
   def bounds[A: Arbitrary: Order]: Gen[(A, A)] =
     arbitrary[(A, A)].map { case (x, y) => if (x <= y) (x, y) else (y, x) }
@@ -145,18 +146,20 @@ object gen {
     makeBoundedInterval[A](Interval.closed(_, _))
 
   def boundedInterval[A: Arbitrary: Order]: Gen[Interval[A]] =
-    Gen.oneOf(openInterval[A],
-              openLowerInterval[A],
-              openUpperInterval[A],
-              closedInterval[A])
+    Gen.oneOf(
+      openInterval[A],
+      openLowerInterval[A],
+      openUpperInterval[A],
+      closedInterval[A])
 
   def interval[A: Arbitrary: Order: AdditiveMonoid]: Gen[Interval[A]] =
-    Gen.frequency[Interval[A]]((1, Gen.const(Interval.all[A])),
-                               (1, arbitrary[A].map(Interval.above(_))),
-                               (1, arbitrary[A].map(Interval.atOrAbove(_))),
-                               (1, arbitrary[A].map(Interval.below(_))),
-                               (1, arbitrary[A].map(Interval.atOrBelow(_))),
-                               (15, boundedInterval[A]))
+    Gen.frequency[Interval[A]](
+      (1, Gen.const(Interval.all[A])),
+      (1, arbitrary[A].map(Interval.above(_))),
+      (1, arbitrary[A].map(Interval.atOrAbove(_))),
+      (1, arbitrary[A].map(Interval.below(_))),
+      (1, arbitrary[A].map(Interval.atOrBelow(_))),
+      (15, boundedInterval[A]))
 
   def freeMonoid[A: Arbitrary]: Gen[FreeMonoid[A]] =
     for {

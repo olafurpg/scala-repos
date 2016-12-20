@@ -89,10 +89,11 @@ trait GenSymbols { self: Reifier =>
                  sym.owner.info.decl(sym.name).isOverloaded) {
           val index = sym.owner.info.decl(sym.name).alternatives indexOf sym
           assert(index >= 0, sym)
-          mirrorBuildCall(nme.selectOverloadedMethod,
-                          rowner,
-                          rname,
-                          reify(index))
+          mirrorBuildCall(
+            nme.selectOverloadedMethod,
+            rowner,
+            rname,
+            reify(index))
         } else mirrorBuildCall(nme.selectTerm, rowner, rname)
       }
     } else {
@@ -145,20 +146,22 @@ trait GenSymbols { self: Reifier =>
         Reification(
           name,
           capturedBinding,
-          mirrorBuildCall(nme.newFreeTerm,
-                          reify(sym.name.toString),
-                          capturedBinding,
-                          mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)),
-                          reify(origin(sym))))
+          mirrorBuildCall(
+            nme.newFreeTerm,
+            reify(sym.name.toString),
+            capturedBinding,
+            mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)),
+            reify(origin(sym))))
       } else {
         Reification(
           name,
           binding,
-          mirrorBuildCall(nme.newFreeTerm,
-                          reify(sym.name.toString),
-                          binding,
-                          mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)),
-                          reify(origin(sym))))
+          mirrorBuildCall(
+            nme.newFreeTerm,
+            reify(sym.name.toString),
+            binding,
+            mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)),
+            reify(origin(sym))))
       }
     }
 
@@ -171,10 +174,11 @@ trait GenSymbols { self: Reifier =>
       Reification(
         name,
         binding,
-        mirrorBuildCall(nme.newFreeType,
-                        reify(sym.name.toString),
-                        mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)),
-                        reify(origin(sym))))
+        mirrorBuildCall(
+          nme.newFreeType,
+          reify(sym.name.toString),
+          mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)),
+          reify(origin(sym))))
     }
 
   def reifySymDef(sym: Symbol): Tree =
@@ -187,12 +191,13 @@ trait GenSymbols { self: Reifier =>
       Reification(
         name,
         Ident(sym),
-        mirrorBuildCall(nme.newNestedSymbol,
-                        reifiedOwner,
-                        reify(sym.name),
-                        reify(sym.pos),
-                        mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)),
-                        reify(sym.isClass)))
+        mirrorBuildCall(
+          nme.newNestedSymbol,
+          reifiedOwner,
+          reify(sym.name),
+          reify(sym.pos),
+          mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)),
+          reify(sym.isClass)))
     }
 
   case class Reification(name: Name, binding: Tree, tree: Tree)

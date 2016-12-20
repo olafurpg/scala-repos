@@ -32,9 +32,10 @@ import javafx.{collections => jfxc}
   * Companion Object for [[scalafx.collections.ObservableFloatArray]].
   */
 object ObservableFloatArray
-    extends ObservableArrayCompanionBase[Float,
-                                         ObservableFloatArray,
-                                         jfxc.ObservableFloatArray] {
+    extends ObservableArrayCompanionBase[
+      Float,
+      ObservableFloatArray,
+      jfxc.ObservableFloatArray] {
 
   /**
     * @inheritdoc
@@ -55,9 +56,10 @@ object ObservableFloatArray
 class ObservableFloatArray(
     delegate: jfxc.ObservableFloatArray =
       jfxc.FXCollections.observableFloatArray())
-    extends ObservableArray[Float,
-                            ObservableFloatArray,
-                            jfxc.ObservableFloatArray](delegate) {
+    extends ObservableArray[
+      Float,
+      ObservableFloatArray,
+      jfxc.ObservableFloatArray](delegate) {
 
   /**
     * Create $OFA with specified capacity.

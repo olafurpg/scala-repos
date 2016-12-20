@@ -96,16 +96,18 @@ class OutputMetrics private (_bytesWritten: Accumulator[Long],
   */
 object OutputMetrics {
 
-  @deprecated("matching on OutputMetrics will not be supported in the future",
-              "2.0.0")
+  @deprecated(
+    "matching on OutputMetrics will not be supported in the future",
+    "2.0.0")
   def apply(writeMethod: DataWriteMethod.Value): OutputMetrics = {
     val om = new OutputMetrics
     om.setWriteMethod(writeMethod)
     om
   }
 
-  @deprecated("matching on OutputMetrics will not be supported in the future",
-              "2.0.0")
+  @deprecated(
+    "matching on OutputMetrics will not be supported in the future",
+    "2.0.0")
   def unapply(output: OutputMetrics): Option[DataWriteMethod.Value] = {
     Some(output.writeMethod)
   }

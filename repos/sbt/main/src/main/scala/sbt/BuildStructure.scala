@@ -66,8 +66,9 @@ final class LoadedBuildUnit(val unit: BuildUnit,
                             val rootProjects: Seq[String],
                             val buildSettings: Seq[Setting[_]])
     extends BuildUnitBase {
-  assert(rootProjects.nonEmpty,
-         "No root projects defined for build unit " + unit)
+  assert(
+    rootProjects.nonEmpty,
+    "No root projects defined for build unit " + unit)
 
   /**
     * The project to use as the default when one is not otherwise selected.
@@ -125,13 +126,14 @@ final class LoadedDefinitions(val base: File,
            builds: Seq[Build],
            projects: Seq[Project],
            buildNames: Seq[String]) =
-    this(base,
-         target,
-         loader,
-         builds,
-         projects,
-         buildNames,
-         DefinedSbtValues.empty)
+    this(
+      base,
+      target,
+      loader,
+      builds,
+      projects,
+      buildNames,
+      DefinedSbtValues.empty)
 }
 
 /** Auto-detected top-level modules (as in `object X`) of type `T` paired with their source names. */
@@ -222,12 +224,14 @@ final class LoadedPlugins(val base: File,
            loader: ClassLoader,
            plugins: Seq[Plugin],
            pluginNames: Seq[String]) =
-    this(base,
-         pluginData,
-         loader,
-         new DetectedPlugins(new DetectedModules(pluginNames zip plugins),
-                             Nil,
-                             new DetectedModules(Nil)))
+    this(
+      base,
+      pluginData,
+      loader,
+      new DetectedPlugins(
+        new DetectedModules(pluginNames zip plugins),
+        Nil,
+        new DetectedModules(Nil)))
 
   @deprecated("Use detected.plugins.values.", "0.13.2")
   val plugins: Seq[Plugin] = detected.plugins.values
@@ -274,10 +278,11 @@ final class PartBuildUnit(val unit: BuildUnit,
                           val buildSettings: Seq[Setting[_]])
     extends BuildUnitBase {
   def resolve(f: Project => ResolvedProject): LoadedBuildUnit =
-    new LoadedBuildUnit(unit,
-                        defined mapValues f toMap,
-                        rootProjects,
-                        buildSettings)
+    new LoadedBuildUnit(
+      unit,
+      defined mapValues f toMap,
+      rootProjects,
+      buildSettings)
   def resolveRefs(f: ProjectReference => ProjectRef): LoadedBuildUnit =
     resolve(_ resolve f)
 }

@@ -194,9 +194,10 @@ object JsonExtensionSpec extends Specification {
           "cat" -> Json.obj("name" -> "minou"),
           "hobbies" -> Json.arr("bobsleig", "manhunting"),
           "friends" -> Json.arr(
-            Json.obj("name" -> "tom",
-                     "hobbies" -> Json.arr(),
-                     "friends" -> Json.arr()))
+            Json.obj(
+              "name" -> "tom",
+              "hobbies" -> Json.arr(),
+              "friends" -> Json.arr()))
         )
       ) must beEqualTo(
         JsSuccess(
@@ -229,9 +230,10 @@ object JsonExtensionSpec extends Specification {
           "cat" -> Json.obj("name" -> "minou"),
           "hobbies" -> Json.arr("bobsleig", "manhunting"),
           "friends" -> Json.arr(
-            Json.obj("name" -> "tom",
-                     "hobbies" -> Json.arr(),
-                     "friends" -> Json.arr()))
+            Json.obj(
+              "name" -> "tom",
+              "hobbies" -> Json.arr(),
+              "friends" -> Json.arr()))
         )
       )
     }
@@ -248,9 +250,10 @@ object JsonExtensionSpec extends Specification {
           "cat" -> Json.obj("name" -> "minou"),
           "hobbies" -> Json.arr("bobsleig", "manhunting"),
           "friends" -> Json.arr(
-            Json.obj("name" -> "tom",
-                     "hobbies" -> Json.arr(),
-                     "friends" -> Json.arr()))
+            Json.obj(
+              "name" -> "tom",
+              "hobbies" -> Json.arr(),
+              "friends" -> Json.arr()))
         )
       ) must beEqualTo(
         JsSuccess(
@@ -276,9 +279,10 @@ object JsonExtensionSpec extends Specification {
           "cat" -> Json.obj("name" -> "minou"),
           "hobbies" -> Json.arr("bobsleig", "manhunting"),
           "friends" -> Json.arr(
-            Json.obj("name" -> "tom",
-                     "hobbies" -> Json.arr(),
-                     "friends" -> Json.arr()))
+            Json.obj(
+              "name" -> "tom",
+              "hobbies" -> Json.arr(),
+              "friends" -> Json.arr()))
         )
       )
     }

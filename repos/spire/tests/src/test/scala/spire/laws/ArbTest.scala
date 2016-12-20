@@ -39,16 +39,17 @@ class ArbTest extends FunSuite {
       }
     }
     val kinds = samples.map(classify).toSet
-    val expected = Set("zero",
-                       "one",
-                       "long",
-                       "big",
-                       "1/long",
-                       "1/big",
-                       "long/big",
-                       "long/long",
-                       "big/long",
-                       "big/big")
+    val expected = Set(
+      "zero",
+      "one",
+      "long",
+      "big",
+      "1/long",
+      "1/big",
+      "long/big",
+      "long/long",
+      "big/long",
+      "big/big")
     val missing = expected diff kinds
     assert(missing.isEmpty)
   }

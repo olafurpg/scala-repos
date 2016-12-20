@@ -68,8 +68,9 @@ object SortPrefixUtils {
     if (schema.nonEmpty) {
       val field = schema.head
       getPrefixComparator(
-        SortOrder(BoundReference(0, field.dataType, field.nullable),
-                  Ascending))
+        SortOrder(
+          BoundReference(0, field.dataType, field.nullable),
+          Ascending))
     } else {
       new PrefixComparator {
         override def compare(prefix1: Long, prefix2: Long): Int = 0

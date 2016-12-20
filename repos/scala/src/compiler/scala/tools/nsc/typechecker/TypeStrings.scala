@@ -163,15 +163,16 @@ trait StructuredTypeStrings extends DestructureTypes {
 trait TypeStrings {
   private type JClass = java.lang.Class[_]
   private val ObjectClass = classOf[java.lang.Object]
-  private val primitives = Set[String]("byte",
-                                       "char",
-                                       "short",
-                                       "int",
-                                       "long",
-                                       "float",
-                                       "double",
-                                       "boolean",
-                                       "void")
+  private val primitives = Set[String](
+    "byte",
+    "char",
+    "short",
+    "int",
+    "long",
+    "float",
+    "double",
+    "boolean",
+    "void")
   private val primitiveMap = (primitives.toList map { x =>
     val key = x match {
       case "int" => "Integer"

@@ -13,15 +13,17 @@ final class Env(config: Config,
 
   lazy val api = new HistoryApi(db(Collectionhistory))
 
-  lazy val ratingChartApi = new RatingChartApi(historyApi = api,
-                                               mongoCache = mongoCache,
-                                               cacheTtl = CachedRatingChartTtl)
+  lazy val ratingChartApi = new RatingChartApi(
+    historyApi = api,
+    mongoCache = mongoCache,
+    cacheTtl = CachedRatingChartTtl)
 }
 
 object Env {
 
   lazy val current =
-    "history" boot new Env(config = lila.common.PlayApp loadConfig "history",
-                           mongoCache = lila.memo.Env.current.mongoCache,
-                           db = lila.db.Env.current)
+    "history" boot new Env(
+      config = lila.common.PlayApp loadConfig "history",
+      mongoCache = lila.memo.Env.current.mongoCache,
+      db = lila.db.Env.current)
 }

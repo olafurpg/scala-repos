@@ -15,8 +15,9 @@ class ScClassFileDecompiler extends ClassFileDecompilers.Full {
   override def createFileViewProvider(file: VirtualFile,
                                       manager: PsiManager,
                                       physical: Boolean) =
-    new ScClassFileViewProvider(manager,
-                                file,
-                                physical,
-                                DecompilerUtil.isScalaFile(file))
+    new ScClassFileViewProvider(
+      manager,
+      file,
+      physical,
+      DecompilerUtil.isScalaFile(file))
 }

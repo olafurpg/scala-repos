@@ -31,9 +31,9 @@ trait JsonConverters {
     def values(path: List[JString], test: Tree[(PerfTest, A)]): List[JValue] =
       test match {
         case Tree.Node((RunQuery(query), a), _) =>
-          JObject(JField("path", JArray(path)) :: JField("query",
-                                                         JString(query)) :: f(
-            a)) :: Nil
+          JObject(JField("path", JArray(path)) :: JField(
+            "query",
+            JString(query)) :: f(a)) :: Nil
 
         case Tree.Node((Group(name), a), kids) =>
           val newPath = path :+ JString(name)

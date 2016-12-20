@@ -16,8 +16,9 @@ class RingTest extends FunSuite {
       val a = histo(i).toDouble
       val b = histo(j).toDouble
 
-      assert(math.abs(a - b) / math.max(a, b) < 0.15,
-             s"$i=$a,$j=$b is unbalanced. " + s"Histo:${histo.mkString(",")}")
+      assert(
+        math.abs(a - b) / math.max(a, b) < 0.15,
+        s"$i=$a,$j=$b is unbalanced. " + s"Histo:${histo.mkString(",")}")
     }
   }
 

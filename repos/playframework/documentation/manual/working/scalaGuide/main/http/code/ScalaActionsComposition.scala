@@ -158,8 +158,9 @@ package scalaguide.http.scalaactionscomposition {
         }
         //#block-request
 
-        testAction(action = onlyHttps(Action(Ok)),
-                   expectedResponse = FORBIDDEN)
+        testAction(
+          action = onlyHttps(Action(Ok)),
+          expectedResponse = FORBIDDEN)
       }
 
       "allow modifying the result" in {

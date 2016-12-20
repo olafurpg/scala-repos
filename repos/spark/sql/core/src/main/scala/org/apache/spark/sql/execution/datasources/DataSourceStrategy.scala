@@ -99,21 +99,24 @@ private[sql] object DataSourceAnalysis extends Rule[LogicalPlan] {
   */
 private[sql] object DataSourceStrategy extends Strategy with Logging {
   def apply(plan: LogicalPlan): Seq[execution.SparkPlan] = plan match {
-    case PhysicalOperation(projects,
-                           filters,
-                           l @ LogicalRelation(t: CatalystScan, _, _)) =>
+    case PhysicalOperation(
+        projects,
+        filters,
+        l @ LogicalRelation(t: CatalystScan, _, _)) =>
       pruneFilterProjectRaw(
         l,
         projects,
         filters,
         (requestedColumns, allPredicates, _) =>
-          toCatalystRDD(l,
-                        requestedColumns,
-                        t.buildScan(requestedColumns, allPredicates))) :: Nil
+          toCatalystRDD(
+            l,
+            requestedColumns,
+            t.buildScan(requestedColumns, allPredicates))) :: Nil
 
-    case PhysicalOperation(projects,
-                           filters,
-                           l @ LogicalRelation(t: PrunedFilteredScan, _, _)) =>
+    case PhysicalOperation(
+        projects,
+        filters,
+        l @ LogicalRelation(t: PrunedFilteredScan, _, _)) =>
       pruneFilterProject(
         l,
         projects,
@@ -121,9 +124,10 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
         (a, f) =>
           toCatalystRDD(l, a, t.buildScan(a.map(_.name).toArray, f))) :: Nil
 
-    case PhysicalOperation(projects,
-                           filters,
-                           l @ LogicalRelation(t: PrunedScan, _, _)) =>
+    case PhysicalOperation(
+        projects,
+        filters,
+        l @ LogicalRelation(t: PrunedScan, _, _)) =>
       pruneFilterProject(
         l,
         projects,
@@ -132,9 +136,10 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
          _) => toCatalystRDD(l, a, t.buildScan(a.map(_.name).toArray))) :: Nil
 
     // Scanning partitioned HadoopFsRelation
-    case PhysicalOperation(projects,
-                           filters,
-                           l @ LogicalRelation(t: HadoopFsRelation, _, _))
+    case PhysicalOperation(
+        projects,
+        filters,
+        l @ LogicalRelation(t: HadoopFsRelation, _, _))
         if t.partitionSchema.nonEmpty =>
       // We divide the filter expressions into 3 parts
       val partitionColumns = AttributeSet(
@@ -174,13 +179,14 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
       // Prune the buckets based on the pushed filters that do not contain partitioning key
       // since the bucketing key is not allowed to use the columns in partitioning key
       val bucketSet = getBuckets(pushedFilters, t.bucketSpec)
-      val scan = buildPartitionedTableScan(l,
-                                           partitionAndNormalColumnProjs,
-                                           pushedFilters,
-                                           bucketSet,
-                                           t.partitionSpec.partitionColumns,
-                                           selectedPartitions,
-                                           t.options)
+      val scan = buildPartitionedTableScan(
+        l,
+        partitionAndNormalColumnProjs,
+        pushedFilters,
+        bucketSet,
+        t.partitionSpec.partitionColumns,
+        selectedPartitions,
+        t.options)
 
       // Add a Projection to guarantee the original projection:
       // this is because "partitionAndNormalColumnAttrs" may be different
@@ -202,9 +208,10 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
     // a lot of duplication and produces overly complicated RDDs.
 
     // Scanning non-partitioned HadoopFsRelation
-    case PhysicalOperation(projects,
-                           filters,
-                           l @ LogicalRelation(t: HadoopFsRelation, _, _)) =>
+    case PhysicalOperation(
+        projects,
+        filters,
+        l @ LogicalRelation(t: HadoopFsRelation, _, _)) =>
       // See buildPartitionedTableScan for the reason that we need to create a shard
       // broadcast HadoopConf.
       val sharedHadoopConf = SparkHadoopUtil.get.conf
@@ -229,14 +236,15 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
 
                 val bucketedDataMap = bucketed.mapValues { bucketFiles =>
                   t.fileFormat
-                    .buildInternalScan(t.sqlContext,
-                                       t.dataSchema,
-                                       requiredColumns.map(_.name).toArray,
-                                       filters,
-                                       None,
-                                       bucketFiles,
-                                       confBroadcast,
-                                       t.options)
+                    .buildInternalScan(
+                      t.sqlContext,
+                      t.dataSchema,
+                      requiredColumns.map(_.name).toArray,
+                      filters,
+                      None,
+                      bucketFiles,
+                      confBroadcast,
+                      t.options)
                     .coalesce(1)
                 }
 
@@ -259,20 +267,22 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
             projects,
             filters,
             (a, f) =>
-              t.fileFormat.buildInternalScan(t.sqlContext,
-                                             t.dataSchema,
-                                             a.map(_.name).toArray,
-                                             f,
-                                             None,
-                                             t.location.allFiles(),
-                                             confBroadcast,
-                                             t.options)) :: Nil
+              t.fileFormat.buildInternalScan(
+                t.sqlContext,
+                t.dataSchema,
+                a.map(_.name).toArray,
+                f,
+                None,
+                t.location.allFiles(),
+                confBroadcast,
+                t.options)) :: Nil
       }
 
     case l @ LogicalRelation(baseRelation: TableScan, _, _) =>
-      execution.DataSourceScan(l.output,
-                               toCatalystRDD(l, baseRelation.buildScan()),
-                               baseRelation) :: Nil
+      execution.DataSourceScan(
+        l.output,
+        toCatalystRDD(l, baseRelation.buildScan()),
+        baseRelation) :: Nil
 
     case i @ logical.InsertIntoTable(
           l @ LogicalRelation(t: InsertableRelation, _, _),
@@ -381,11 +391,12 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
                     options)
 
                   // Merges data values with partition values.
-                  mergeWithPartitionValues(requiredColumns,
-                                           requiredDataColumns,
-                                           partitionColumns,
-                                           partitionValues,
-                                           dataRows)
+                  mergeWithPartitionValues(
+                    requiredColumns,
+                    requiredDataColumns,
+                    partitionColumns,
+                    partitionValues,
+                    dataRows)
               }
               new UnionRDD(relation.sqlContext.sparkContext, perPartitionRows)
           }
@@ -435,9 +446,10 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
         partitionColumnSchema.fields.foreach { f =>
           {
             if (f.name.equals(attr.name)) {
-              ColumnVectorUtils.populate(result.column(resultIdx),
-                                         partitionValues,
-                                         partitionIdx)
+              ColumnVectorUtils.populate(
+                result.column(resultIdx),
+                partitionValues,
+                partitionIdx)
             }
             partitionIdx += 1
           }
@@ -486,18 +498,20 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
           {
             if (input.isInstanceOf[InternalRow]) {
               unsafeProjection(
-                mutableJoinedRow(input.asInstanceOf[InternalRow],
-                                 unsafePartitionValues))
+                mutableJoinedRow(
+                  input.asInstanceOf[InternalRow],
+                  unsafePartitionValues))
             } else {
               require(input.isInstanceOf[ColumnarBatch])
               val inputBatch = input.asInstanceOf[ColumnarBatch]
               if (inputBatch != mergedBatch) {
                 mergedBatch = inputBatch
-                columnBatch = projectedColumnBatch(inputBatch,
-                                                   requiredColumns,
-                                                   dataColumns,
-                                                   partitionColumnSchema,
-                                                   partitionValues)
+                columnBatch = projectedColumnBatch(
+                  inputBatch,
+                  requiredColumns,
+                  dataColumns,
+                  partitionColumnSchema,
+                  partitionValues)
               }
               columnBatch.setNumRows(inputBatch.numRows())
               columnBatch
@@ -511,9 +525,10 @@ private[sql] object DataSourceStrategy extends Strategy with Logging {
       // the call site may add up.
       Utils
         .withDummyCallSite(dataRows.sparkContext) {
-          new MapPartitionsRDD(dataRows,
-                               mapPartitionsFunc,
-                               preservesPartitioning = false)
+          new MapPartitionsRDD(
+            dataRows,
+            mapPartitionsFunc,
+            preservesPartitioning = false)
         }
         .asInstanceOf[RDD[InternalRow]]
     } else {

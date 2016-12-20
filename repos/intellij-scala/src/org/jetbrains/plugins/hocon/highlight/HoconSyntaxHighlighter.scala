@@ -54,8 +54,9 @@ object HoconSyntaxHighlighter extends SyntaxHighlighter {
     tokenHighlights.getOrElse(tokenType, Array.empty)
 
   def getHighlightingLexer = new LayeredLexer(new HoconLexer) {
-    registerSelfStoppingLayer(new StringLiteralLexer('\"', QuotedString),
-                              Array(QuotedString),
-                              IElementType.EMPTY_ARRAY)
+    registerSelfStoppingLayer(
+      new StringLiteralLexer('\"', QuotedString),
+      Array(QuotedString),
+      IElementType.EMPTY_ARRAY)
   }
 }

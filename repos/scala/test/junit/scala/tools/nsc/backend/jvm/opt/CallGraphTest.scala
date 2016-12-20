@@ -136,23 +136,25 @@ class CallGraphTest extends ClearAfterClass {
     val g1 = findAsmMethod(cMod, "g1")
     val List(t1, t2) = findAsmMethods(testCls, _.startsWith("t"))
 
-    val List(cf1Call,
-             cf2Call,
-             cf3Call,
-             cf4Call,
-             cf5Call,
-             cf6Call,
-             cf7Call,
-             cg1Call) =
+    val List(
+      cf1Call,
+      cf2Call,
+      cf3Call,
+      cf4Call,
+      cf5Call,
+      cf6Call,
+      cf7Call,
+      cg1Call) =
       callsInMethod(t1)
-    val List(df1Call,
-             df2Call,
-             df3Call,
-             df4Call,
-             df5Call,
-             df6Call,
-             df7Call,
-             dg1Call) =
+    val List(
+      df1Call,
+      df2Call,
+      df3Call,
+      df4Call,
+      df5Call,
+      df6Call,
+      df7Call,
+      dg1Call) =
       callsInMethod(t2)
 
     val cClassBType = classBTypeFromClassNode(cCls)
@@ -188,20 +190,22 @@ class CallGraphTest extends ClearAfterClass {
     val m = findAsmMethod(c, "m")
     val List(fn) = callsInMethod(m)
     val forNameMeth = byteCodeRepository
-      .methodNode("java/lang/Class",
-                  "forName",
-                  "(Ljava/lang/String;)Ljava/lang/Class;")
+      .methodNode(
+        "java/lang/Class",
+        "forName",
+        "(Ljava/lang/String;)Ljava/lang/Class;")
       .get
       ._1
     val classTp = classBTypeFromInternalName("java/lang/Class")
     val r = callGraph.callsites(m)(fn)
-    checkCallsite(fn,
-                  m,
-                  forNameMeth,
-                  classTp,
-                  safeToInline = false,
-                  atInline = false,
-                  atNoInline = false)
+    checkCallsite(
+      fn,
+      m,
+      forNameMeth,
+      classTp,
+      safeToInline = false,
+      atInline = false,
+      atNoInline = false)
   }
 
   @Test

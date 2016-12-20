@@ -18,15 +18,16 @@ final class Env(config: Config, hub: lila.hub.Env, db: lila.db.Env) {
 
   lazy val forms = new DataForm(hub.actor.captcher)
 
-  lazy val api = new TeamApi(cached = cached,
-                             notifier = notifier,
-                             forum = hub.actor.forum,
-                             indexer = hub.actor.teamSearch,
-                             timeline = hub.actor.timeline)
+  lazy val api = new TeamApi(
+    cached = cached,
+    notifier = notifier,
+    forum = hub.actor.forum,
+    indexer = hub.actor.teamSearch,
+    timeline = hub.actor.timeline)
 
-  lazy val paginator = new PaginatorBuilder(maxPerPage = PaginatorMaxPerPage,
-                                            maxUserPerPage =
-                                              PaginatorMaxUserPerPage)
+  lazy val paginator = new PaginatorBuilder(
+    maxPerPage = PaginatorMaxPerPage,
+    maxUserPerPage = PaginatorMaxUserPerPage)
 
   lazy val cli = new Cli(api)
 
@@ -36,15 +37,17 @@ final class Env(config: Config, hub: lila.hub.Env, db: lila.db.Env) {
   private[team] lazy val requestColl = db(CollectionRequest)
   private[team] lazy val memberColl = db(CollectionMember)
 
-  private lazy val notifier = new Notifier(sender = NotifierSender,
-                                           messenger = hub.actor.messenger,
-                                           router = hub.actor.router)
+  private lazy val notifier = new Notifier(
+    sender = NotifierSender,
+    messenger = hub.actor.messenger,
+    router = hub.actor.router)
 }
 
 object Env {
 
   lazy val current =
-    "team" boot new Env(config = lila.common.PlayApp loadConfig "team",
-                        hub = lila.hub.Env.current,
-                        db = lila.db.Env.current)
+    "team" boot new Env(
+      config = lila.common.PlayApp loadConfig "team",
+      hub = lila.hub.Env.current,
+      db = lila.db.Env.current)
 }

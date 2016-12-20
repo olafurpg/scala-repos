@@ -229,9 +229,10 @@ trait SwaggerAuthBase[TypeForUser <: AnyRef] extends SwaggerBaseBase {
               s.apis.exists(_.operations.exists(_.allows(userOption))))
           .toList map { doc =>
           ("path" ->
-            (url(doc.resourcePath,
-                 includeServletPath = false,
-                 includeContextPath = false) +
+            (url(
+              doc.resourcePath,
+              includeServletPath = false,
+              includeContextPath = false) +
               (if (includeFormatParameter) ".{format}" else ""))) ~
             ("description" -> doc.description)
         })) ~
@@ -363,9 +364,10 @@ trait SwaggerAuthSupport[TypeForUser <: AnyRef]
         val desc = _description.lift apply name
         val pth = if (basePath endsWith "/") basePath else basePath + "/"
         val nm = if (name startsWith "/") name.substring(1) else name
-        new AuthEndpoint[TypeForUser](pth + nm,
-                                      desc,
-                                      entries.toList map (_.value))
+        new AuthEndpoint[TypeForUser](
+          pth + nm,
+          desc,
+          entries.toList map (_.value))
     } sortBy (_.path)
   }
 

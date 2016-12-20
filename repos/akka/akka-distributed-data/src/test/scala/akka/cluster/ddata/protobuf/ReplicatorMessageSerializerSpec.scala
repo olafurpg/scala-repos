@@ -25,9 +25,10 @@ import com.typesafe.config.ConfigFactory
 
 class ReplicatorMessageSerializerSpec
     extends TestKit(
-      ActorSystem("ReplicatorMessageSerializerSpec",
-                  ConfigFactory.parseString(
-                    """
+      ActorSystem(
+        "ReplicatorMessageSerializerSpec",
+        ConfigFactory.parseString(
+          """
     akka.actor.provider=akka.cluster.ClusterActorRefProvider
     akka.remote.netty.tcp.port=0
     """)))
@@ -76,24 +77,29 @@ class ReplicatorMessageSerializerSpec
       checkSerialization(
         DataEnvelope(
           data1,
-          pruning = Map(address1 -> PruningState(address2, PruningPerformed),
-                        address3 -> PruningState(
-                          address2,
-                          PruningInitialized(Set(address1.address))))))
+          pruning = Map(
+            address1 -> PruningState(address2, PruningPerformed),
+            address3 -> PruningState(
+              address2,
+              PruningInitialized(Set(address1.address))))))
       checkSerialization(Write("A", DataEnvelope(data1)))
       checkSerialization(WriteAck)
       checkSerialization(Read("A"))
       checkSerialization(ReadResult(Some(DataEnvelope(data1))))
       checkSerialization(ReadResult(None))
       checkSerialization(
-        Status(Map("A" -> ByteString.fromString("a"),
-                   "B" -> ByteString.fromString("b")),
-               chunk = 3,
-               totChunks = 10))
+        Status(
+          Map(
+            "A" -> ByteString.fromString("a"),
+            "B" -> ByteString.fromString("b")),
+          chunk = 3,
+          totChunks = 10))
       checkSerialization(
-        Gossip(Map("A" -> DataEnvelope(data1),
-                   "B" -> DataEnvelope(GSet() + "b" + "c")),
-               sendBack = true))
+        Gossip(
+          Map(
+            "A" -> DataEnvelope(data1),
+            "B" -> DataEnvelope(GSet() + "b" + "c")),
+          sendBack = true))
     }
   }
 

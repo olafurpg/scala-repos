@@ -49,11 +49,12 @@ private[manager] object OfferMatcherManagerActor {
             offerMatcherConfig: OfferMatcherManagerConfig,
             offersWanted: Observer[Boolean]): Props = {
     Props(
-      new OfferMatcherManagerActor(metrics,
-                                   random,
-                                   clock,
-                                   offerMatcherConfig,
-                                   offersWanted))
+      new OfferMatcherManagerActor(
+        metrics,
+        random,
+        clock,
+        offerMatcherConfig,
+        offersWanted))
   }
 
   private val log = LoggerFactory.getLogger(getClass)
@@ -189,9 +190,10 @@ private[impl] class OfferMatcherManagerActor private (
 
       // deal with the timeout
       import context.dispatcher
-      context.system.scheduler.scheduleOnce(clock.now().until(deadline),
-                                            self,
-                                            MatchTimeout(offer.getId))
+      context.system.scheduler.scheduleOnce(
+        clock.now().until(deadline),
+        self,
+        MatchTimeout(offer.getId))
 
       // process offer for the first time
       scheduleNextMatcherOrFinish(data)
@@ -202,9 +204,10 @@ private[impl] class OfferMatcherManagerActor private (
       def processAddedTasks(data: OfferData): OfferData = {
         val dataWithTasks = try {
           val (acceptedOps, rejectedOps) = addedOps.splitAt(
-            Seq(launchTokens,
-                addedOps.size,
-                conf.maxTasksPerOffer() - data.ops.size).min)
+            Seq(
+              launchTokens,
+              addedOps.size,
+              conf.maxTasksPerOffer() - data.ops.size).min)
 
           rejectedOps.foreach(_.reject(
             "not enough launch tokens OR already scheduled sufficient tasks on offer"))
@@ -239,8 +242,9 @@ private[impl] class OfferMatcherManagerActor private (
         case Some(data) =>
           val resend = data.resendThisOffer | resendOffer
           val nextData = processAddedTasks(
-            data.copy(matchPasses = data.matchPasses + 1,
-                      resendThisOffer = resend))
+            data.copy(
+              matchPasses = data.matchPasses + 1,
+              resendThisOffer = resend))
           scheduleNextMatcherOrFinish(nextData)
 
         case None =>
@@ -279,17 +283,19 @@ private[impl] class OfferMatcherManagerActor private (
     nextMatcherOpt match {
       case Some((nextMatcher, newData)) =>
         import context.dispatcher
-        log.debug(s"query next offer matcher {} for offer id {}",
-                  nextMatcher,
-                  data.offer.getId.getValue)
+        log.debug(
+          s"query next offer matcher {} for offer id {}",
+          nextMatcher,
+          data.offer.getId.getValue)
         nextMatcher
           .matchOffer(newData.deadline, newData.offer)
           .recover {
             case NonFatal(e) =>
               log.warning("Received error from {}", e)
-              MatchedTaskOps(data.offer.getId,
-                             Seq.empty,
-                             resendThisOffer = true)
+              MatchedTaskOps(
+                data.offer.getId,
+                Seq.empty,
+                resendThisOffer = true)
           }
           .pipeTo(self)
       case None => sendMatchResult(data, data.resendThisOffer)

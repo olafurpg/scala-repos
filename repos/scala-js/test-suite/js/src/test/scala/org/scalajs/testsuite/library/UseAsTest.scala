@@ -329,8 +329,9 @@ class UseAsScalaTypesTest {
   }
 
   @Test def fails_with_non_trait(): Unit = {
-    typeErrorWithMsg("js.use(???).as[js.Date]",
-                     "Only traits can be used with as")
+    typeErrorWithMsg(
+      "js.use(???).as[js.Date]",
+      "Only traits can be used with as")
   }
 
   @Test def fails_with_class_parents(): Unit = {
@@ -425,8 +426,9 @@ class UseAsScalaTypesTest {
       def sum2(a: Int, b: Int): Int = a + b // should have default
     }
 
-    typeErrorWithMsg("js.use(new A).as[JSDefaultArgs]",
-                     "A does not export a method sum2(Int, Int = ???): Int.")
+    typeErrorWithMsg(
+      "js.use(new A).as[JSDefaultArgs]",
+      "A does not export a method sum2(Int, Int = ???): Int.")
   }
 
   @Test def fails_with_a_mismatching_repeated_argument(): Unit = {
@@ -436,8 +438,9 @@ class UseAsScalaTypesTest {
       def rep(a: Int*): Unit = ???
     }
 
-    typeErrorWithMsg("js.use(new A).as[JSRepeated]",
-                     "A does not export a method rep(Int, String*): Unit.")
+    typeErrorWithMsg(
+      "js.use(new A).as[JSRepeated]",
+      "A does not export a method rep(Int, String*): Unit.")
 
     class B {
       @JSExport
@@ -452,9 +455,10 @@ class UseAsScalaTypesTest {
   // js.use(x).as[T] - Raw JS Types - failure cases
 
   @Test def fails_with_a_missing_apply(): Unit = {
-    typeErrorWithMsg("js.use(new js.Object).as[JSWithApply]",
-                     "scala.scalajs.js.Object does not have a method " +
-                       "<apply>(String): Int. (type is not callable)")
+    typeErrorWithMsg(
+      "js.use(new js.Object).as[JSWithApply]",
+      "scala.scalajs.js.Object does not have a method " +
+        "<apply>(String): Int. (type is not callable)")
   }
 
   @Test def fails_with_a_missing_atJSBracketAccess(): Unit = {
@@ -476,9 +480,10 @@ class UseAsScalaTypesTest {
   }
 
   @Test def fails_with_a_missing_method(): Unit = {
-    typeErrorWithMsg("js.use(new js.Object).as[JSBasic]",
-                     "scala.scalajs.js.Object does not have a method " +
-                       "m(Int, String): scala.scalajs.js.Object.")
+    typeErrorWithMsg(
+      "js.use(new js.Object).as[JSBasic]",
+      "scala.scalajs.js.Object does not have a method " +
+        "m(Int, String): scala.scalajs.js.Object.")
   }
 
   @Test def fails_with_a_missing_overload(): Unit = {

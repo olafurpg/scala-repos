@@ -131,9 +131,10 @@ private[netty] class Dispatcher(nettyEnv: NettyRpcEnv) extends Logging {
       new RemoteNettyRpcCallContext(nettyEnv, callback, message.senderAddress)
     val rpcMessage =
       RpcMessage(message.senderAddress, message.content, rpcCallContext)
-    postMessage(message.receiver.name,
-                rpcMessage,
-                (e) => callback.onFailure(e))
+    postMessage(
+      message.receiver.name,
+      rpcMessage,
+      (e) => callback.onFailure(e))
   }
 
   /** Posts a message sent by a local endpoint. */
@@ -146,9 +147,10 @@ private[netty] class Dispatcher(nettyEnv: NettyRpcEnv) extends Logging {
 
   /** Posts a one-way message. */
   def postOneWayMessage(message: RequestMessage): Unit = {
-    postMessage(message.receiver.name,
-                OneWayMessage(message.senderAddress, message.content),
-                (e) => throw e)
+    postMessage(
+      message.receiver.name,
+      OneWayMessage(message.senderAddress, message.content),
+      (e) => throw e)
   }
 
   /**

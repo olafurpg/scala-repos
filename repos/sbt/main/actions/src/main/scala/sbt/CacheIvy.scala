@@ -86,8 +86,9 @@ object CacheIvy {
 
   implicit lazy val updateReportFormat: Format[UpdateReport] = {
     import DefaultProtocol.{StringFormat, FileFormat}
-    wrap[UpdateReport,
-         (File, Seq[ConfigurationReport], UpdateStats, Map[File, Long])](
+    wrap[
+      UpdateReport,
+      (File, Seq[ConfigurationReport], UpdateStats, Map[File, Long])](
       rep =>
         (rep.cachedDescriptor, rep.configurations, rep.stats, rep.stamps), {
         case (cd, cs, stats, stamps) =>
@@ -103,32 +104,34 @@ object CacheIvy {
                                 mr: Format[Seq[ModuleReport]],
                                 oar: Format[Seq[OrganizationArtifactReport]])
     : Format[ConfigurationReport] =
-    wrap[ConfigurationReport,
-         (String, Seq[ModuleReport], Seq[OrganizationArtifactReport])](
+    wrap[
+      ConfigurationReport,
+      (String, Seq[ModuleReport], Seq[OrganizationArtifactReport])](
       r => (r.configuration, r.modules, r.details), {
         case (c, m, d) => new ConfigurationReport(c, m, d)
       })
   implicit def moduleReportFormat(implicit cf: Format[Seq[Caller]],
                                   ff: Format[File]): Format[ModuleReport] = {
-    wrap[ModuleReport,
-         (ModuleID,
-          Seq[(Artifact, File)],
-          Seq[Artifact],
-          Option[String],
-          Option[Long],
-          Option[String],
-          Option[String],
-          Boolean,
-          Option[String],
-          Option[String],
-          Option[String],
-          Option[String],
-          Map[String, String],
-          Option[Boolean],
-          Option[String],
-          Seq[String],
-          Seq[(String, Option[String])],
-          Seq[Caller])](
+    wrap[
+      ModuleReport,
+      (ModuleID,
+       Seq[(Artifact, File)],
+       Seq[Artifact],
+       Option[String],
+       Option[Long],
+       Option[String],
+       Option[String],
+       Boolean,
+       Option[String],
+       Option[String],
+       Option[String],
+       Option[String],
+       Map[String, String],
+       Option[Boolean],
+       Option[String],
+       Seq[String],
+       Seq[(String, Option[String])],
+       Seq[Caller])](
       m =>
         (m.module,
          m.artifacts,
@@ -156,14 +159,15 @@ object CacheIvy {
   }
   implicit def artifactFormat(implicit sf: Format[String],
                               uf: Format[Option[URL]]): Format[Artifact] = {
-    wrap[Artifact,
-         (String,
-          String,
-          String,
-          Option[String],
-          Seq[Configuration],
-          Option[URL],
-          Map[String, String])](
+    wrap[
+      Artifact,
+      (String,
+       String,
+       String,
+       Option[String],
+       Seq[Configuration],
+       Option[URL],
+       Map[String, String])](
       a =>
         (a.name,
          a.`type`,
@@ -185,24 +189,26 @@ object CacheIvy {
         case (o, n, r) => OrganizationArtifactReport(o, n, r)
       })
   implicit def callerFormat: Format[Caller] =
-    wrap[Caller,
-         (ModuleID,
-          Seq[String],
-          Map[String, String],
-          Boolean,
-          Boolean,
-          Boolean,
-          Boolean)](c =>
-                      (c.caller,
-                       c.callerConfigurations,
-                       c.callerExtraAttributes,
-                       c.isForceDependency,
-                       c.isChangingDependency,
-                       c.isTransitiveDependency,
-                       c.isDirectlyForceDependency), {
-                      case (c, cc, ea, fd, cd, td, df) =>
-                        new Caller(c, cc, ea, fd, cd, td, df)
-                    })
+    wrap[
+      Caller,
+      (ModuleID,
+       Seq[String],
+       Map[String, String],
+       Boolean,
+       Boolean,
+       Boolean,
+       Boolean)](
+      c =>
+        (c.caller,
+         c.callerConfigurations,
+         c.callerExtraAttributes,
+         c.isForceDependency,
+         c.isChangingDependency,
+         c.isTransitiveDependency,
+         c.isDirectlyForceDependency), {
+        case (c, cc, ea, fd, cd, td, df) =>
+          new Caller(c, cc, ea, fd, cd, td, df)
+      })
   implicit def exclusionRuleFormat(
       implicit sf: Format[String]): Format[InclExclRule] =
     wrap[InclExclRule, (String, String, String, Seq[String])](
@@ -239,16 +245,17 @@ object CacheIvy {
 
   implicit def moduleIDFormat(implicit sf: Format[String],
                               bf: Format[Boolean]): Format[ModuleID] =
-    wrap[ModuleID,
-         ((String, String, String, Option[String], Option[String]),
-          (Boolean,
-           Boolean,
-           Boolean,
-           Seq[Artifact],
-           Seq[InclusionRule],
-           Seq[ExclusionRule],
-           Map[String, String],
-           CrossVersion))](
+    wrap[
+      ModuleID,
+      ((String, String, String, Option[String], Option[String]),
+       (Boolean,
+        Boolean,
+        Boolean,
+        Seq[Artifact],
+        Seq[InclusionRule],
+        Seq[ExclusionRule],
+        Map[String, String],
+        CrossVersion))](
       m =>
         ((m.organization, m.name, m.revision, m.configurations, m.branchName),
          (m.isChanging,
@@ -432,6 +439,7 @@ object CacheIvy {
   implicit def confIC: InputCache[Configuration] = wrapIn
 
   implicit def authIC: InputCache[SshAuthentication] =
-    unionInputCache[SshAuthentication,
-                    PasswordAuthentication :+: KeyFileAuthentication :+: HNil]
+    unionInputCache[
+      SshAuthentication,
+      PasswordAuthentication :+: KeyFileAuthentication :+: HNil]
 }

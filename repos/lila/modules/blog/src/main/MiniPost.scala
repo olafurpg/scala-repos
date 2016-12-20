@@ -18,10 +18,11 @@ object MiniPost {
       date <- doc getDate s"$coll.date" map (_.value)
       image = ~doc.getImage(s"$coll.image", "column").map(_.url)
     } yield
-      MiniPost(doc.id,
-               doc.slug,
-               title,
-               shortlede,
-               date.toDateTimeAtStartOfDay,
-               image)
+      MiniPost(
+        doc.id,
+        doc.slug,
+        title,
+        shortlede,
+        date.toDateTimeAtStartOfDay,
+        image)
 }

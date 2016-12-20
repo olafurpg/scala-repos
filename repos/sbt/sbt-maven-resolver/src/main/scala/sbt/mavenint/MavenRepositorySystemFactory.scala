@@ -42,22 +42,27 @@ object MavenRepositorySystemFactory {
     locator
       .addService(classOf[TransporterFactory], classOf[MyTransportFactory])
     // This connects the download mechanism to our transports.  Why is it needed? no clue.
-    locator.addService(classOf[RepositoryConnectorFactory],
-                       classOf[BasicRepositoryConnectorFactory])
+    locator.addService(
+      classOf[RepositoryConnectorFactory],
+      classOf[BasicRepositoryConnectorFactory])
 
     // Plugins cause issues here, as their layout is super odd.  Here we inject a new plugin layout
-    locator.addService(classOf[RepositoryLayoutFactory],
-                       classOf[SbtPluginLayoutFactory])
+    locator.addService(
+      classOf[RepositoryLayoutFactory],
+      classOf[SbtPluginLayoutFactory])
 
     // Here we add the metadata services so aether will automatically add maven-metadata.xml files.
-    locator.addService(classOf[MetadataGeneratorFactory],
-                       classOf[SnapshotMetadataGeneratorFactory])
-    locator.addService(classOf[MetadataGeneratorFactory],
-                       classOf[VersionsMetadataGeneratorFactory])
+    locator.addService(
+      classOf[MetadataGeneratorFactory],
+      classOf[SnapshotMetadataGeneratorFactory])
+    locator.addService(
+      classOf[MetadataGeneratorFactory],
+      classOf[VersionsMetadataGeneratorFactory])
 
     // Add our hook for parsing pom.xml files.
-    locator.setService(classOf[ArtifactDescriptorReader],
-                       classOf[SbtArtifactDescriptorReader])
+    locator.setService(
+      classOf[ArtifactDescriptorReader],
+      classOf[SbtArtifactDescriptorReader])
     // Finally, use the DI to create our repository system.
     locator.getService(classOf[RepositorySystem])
   }

@@ -176,8 +176,9 @@ class Pipeline @Since("1.4.0")(@Since("1.4.0") override val uid: String)
   @Since("1.2.0")
   override def transformSchema(schema: StructType): StructType = {
     val theStages = $(stages)
-    require(theStages.toSet.size == theStages.length,
-            "Cannot have duplicate components in a pipeline.")
+    require(
+      theStages.toSet.size == theStages.length,
+      "Cannot have duplicate components in a pipeline.")
     theStages.foldLeft(schema)((cur, stage) => stage.transformSchema(cur))
   }
 

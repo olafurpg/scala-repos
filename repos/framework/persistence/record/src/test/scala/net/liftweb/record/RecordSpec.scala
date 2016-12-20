@@ -286,8 +286,9 @@ object RecordSpec extends Specification {
             JField("mandatoryCountryField", JInt(Countries.USA.id)),
             JField("legacyOptionalCountryField", JNothing),
             JField("optionalCountryField", JNothing),
-            JField("mandatoryDateTimeField",
-                   JString(Helpers.toInternetDate(cal.getTime))),
+            JField(
+              "mandatoryDateTimeField",
+              JString(Helpers.toInternetDate(cal.getTime))),
             JField("legacyOptionalDateTimeField", JNothing),
             JField("optionalDateTimeField", JNothing),
             JField("mandatoryDecimalField", JString("3.14")),
@@ -344,9 +345,10 @@ object RecordSpec extends Specification {
 
   "basic record" should {
     "order fields according to fieldOrder" in {
-      BasicTestRecord.metaFields must_== List(BasicTestRecord.field2,
-                                              BasicTestRecord.field1,
-                                              BasicTestRecord.fieldThree)
+      BasicTestRecord.metaFields must_== List(
+        BasicTestRecord.field2,
+        BasicTestRecord.field1,
+        BasicTestRecord.fieldThree)
     }
   }
 }

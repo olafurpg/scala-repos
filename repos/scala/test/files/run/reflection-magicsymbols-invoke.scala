@@ -101,8 +101,9 @@ object Test extends App {
   println("============\nCTM")
   test(PredefModule.moduleClass.info, Predef, "classOf")
   test(PredefModule.moduleClass.info, Predef, "classOf", typeOf[String])
-  test(typeOf[scala.reflect.api.Universe],
-       scala.reflect.runtime.universe,
-       "reify",
-       "2")
+  test(
+    typeOf[scala.reflect.api.Universe],
+    scala.reflect.runtime.universe,
+    "reify",
+    "2")
 }

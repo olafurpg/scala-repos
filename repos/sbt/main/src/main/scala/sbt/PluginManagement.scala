@@ -13,11 +13,12 @@ final case class PluginManagement(overrides: Set[ModuleID],
                                   initialLoader: ClassLoader,
                                   context: Context) {
   def shift: PluginManagement =
-    PluginManagement(Set.empty,
-                     overrides,
-                     new PluginClassLoader(initialLoader),
-                     initialLoader,
-                     context)
+    PluginManagement(
+      Set.empty,
+      overrides,
+      new PluginClassLoader(initialLoader),
+      initialLoader,
+      context)
 
   def addOverrides(os: Set[ModuleID]): PluginManagement =
     copy(overrides = overrides ++ os)
@@ -45,11 +46,12 @@ object PluginManagement {
   val emptyContext: Context = Context(false, 0)
 
   def apply(initialLoader: ClassLoader): PluginManagement =
-    PluginManagement(Set.empty,
-                     Set.empty,
-                     new PluginClassLoader(initialLoader),
-                     initialLoader,
-                     emptyContext)
+    PluginManagement(
+      Set.empty,
+      Set.empty,
+      new PluginClassLoader(initialLoader),
+      initialLoader,
+      emptyContext)
 
   def extractOverrides(classpath: Classpath): Set[ModuleID] =
     classpath flatMap { _.metadata get Keys.moduleID.key map keepOverrideInfo } toSet;

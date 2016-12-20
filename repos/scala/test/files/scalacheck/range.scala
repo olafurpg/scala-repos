@@ -225,9 +225,10 @@ abstract class RangeTest(kind: String) extends Properties("Range " + kind) {
     ((within(r, x) && multiple(r, x)) == r.contains(x)) :| str(r) + ": " + x
   }
 
-  property("take") = forAll(myGen suchThat
-                              (r => expectedSize(r).toInt == expectedSize(r)),
-                            arbInt.arbitrary) { (r, x) =>
+  property("take") = forAll(
+    myGen suchThat
+      (r => expectedSize(r).toInt == expectedSize(r)),
+    arbInt.arbitrary) { (r, x) =>
 //    println("take "+str(r))
     val t = r take x
     (t.size == (0 max x min r.size) && t.start == r.start &&
@@ -244,21 +245,21 @@ abstract class RangeTest(kind: String) extends Properties("Range " + kind) {
         }
     }
 
-  property("takeWhile") =
-    forAll(myGen suchThat (r => expectedSize(r).toInt == expectedSize(r)),
-           arbInt.arbitrary) { (r, x) =>
+  property("takeWhile") = forAll(
+    myGen suchThat (r => expectedSize(r).toInt == expectedSize(r)),
+    arbInt.arbitrary) { (r, x) =>
 //    println("takeWhile "+str(r))
-      val t = (if (r.step > 0) r takeWhile (_ <= x) else r takeWhile (_ >= x))
-      if (r.size == 0) {
-        (t.size == 0) :| str(r) + " / " + str(t) + ": " + x
-      } else {
-        val t2 =
-          (if (r.step > 0) Range(r.start, x min r.last, r.step).inclusive
-           else Range(r.start, x max r.last, r.step).inclusive)
-        (t.start == r.start && t.size == t2.size && t.step == r.step) :| str(r) +
-          " / " + str(t) + " / " + str(t2) + ": " + x
-      }
+    val t = (if (r.step > 0) r takeWhile (_ <= x) else r takeWhile (_ >= x))
+    if (r.size == 0) {
+      (t.size == 0) :| str(r) + " / " + str(t) + ": " + x
+    } else {
+      val t2 =
+        (if (r.step > 0) Range(r.start, x min r.last, r.step).inclusive
+         else Range(r.start, x max r.last, r.step).inclusive)
+      (t.start == r.start && t.size == t2.size && t.step == r.step) :| str(r) +
+        " / " + str(t) + " / " + str(t2) + ": " + x
     }
+  }
 
   property("reverse.toSet.equal") = forAll(myGen) { r =>
 //    println("reverse.toSet.equal "+str(r))

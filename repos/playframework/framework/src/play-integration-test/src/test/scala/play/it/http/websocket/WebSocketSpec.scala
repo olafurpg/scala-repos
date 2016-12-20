@@ -185,8 +185,9 @@ trait WebSocketSpec
     "allow handling WebSockets using Akka streams" in {
       "allow consuming messages" in allowConsumingMessages { _ => consumed =>
         WebSocket.accept[String, String] { req =>
-          Flow.fromSinkAndSource(onFramesConsumed[String](consumed.success(_)),
-                                 Source.maybe[String])
+          Flow.fromSinkAndSource(
+            onFramesConsumed[String](consumed.success(_)),
+            Source.maybe[String])
         }
       }
 
@@ -459,14 +460,15 @@ trait WebSocketSpec
           implicit factory: HandlerInvokerFactory[J]): Handler = {
         val invoker = factory.createInvoker(
           javaHandler,
-          new HandlerDef(javaHandler.getClass.getClassLoader,
-                         "package",
-                         "controller",
-                         "method",
-                         Nil,
-                         "GET",
-                         "",
-                         "/stream")
+          new HandlerDef(
+            javaHandler.getClass.getClassLoader,
+            "package",
+            "controller",
+            "method",
+            Nil,
+            "GET",
+            "",
+            "/stream")
         )
         invoker.call(javaHandler)
       }
@@ -507,14 +509,15 @@ trait WebSocketSpec
           implicit factory: HandlerInvokerFactory[J]): Handler = {
         val invoker = factory.createInvoker(
           javaHandler,
-          new HandlerDef(javaHandler.getClass.getClassLoader,
-                         "package",
-                         "controller",
-                         "method",
-                         Nil,
-                         "GET",
-                         "",
-                         "/stream")
+          new HandlerDef(
+            javaHandler.getClass.getClassLoader,
+            "package",
+            "controller",
+            "method",
+            Nil,
+            "GET",
+            "",
+            "/stream")
         )
         invoker.call(javaHandler)
       }

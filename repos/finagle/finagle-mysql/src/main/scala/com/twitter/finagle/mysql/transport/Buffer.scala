@@ -39,8 +39,9 @@ object Buffer {
 
   def fromChannelBuffer(cb: ChannelBuffer): Buffer = {
     require(cb != null)
-    require(cb.order == ByteOrder.LITTLE_ENDIAN,
-            "Invalid ChannelBuffer ByteOrder")
+    require(
+      cb.order == ByteOrder.LITTLE_ENDIAN,
+      "Invalid ChannelBuffer ByteOrder")
     new Buffer { val underlying = cb }
   }
 }

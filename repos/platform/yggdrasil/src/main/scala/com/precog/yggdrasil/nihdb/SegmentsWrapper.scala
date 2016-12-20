@@ -57,8 +57,9 @@ case class SegmentsWrapper(segments: Seq[Segment],
       def apply(row: Int) = loId(row)
     }
 
-    Set((ColumnRef(CPath(paths.Key) \ 0 \ 0, CLong), loKey),
-        (ColumnRef(CPath(paths.Key) \ 0 \ 1, CLong), hoKey))
+    Set(
+      (ColumnRef(CPath(paths.Key) \ 0 \ 0, CLong), loKey),
+      (ColumnRef(CPath(paths.Key) \ 0 \ 1, CLong), hoKey))
   }
 
   private def buildKeyColumn(length: Int): (ColumnRef, Column) = {

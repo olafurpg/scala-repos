@@ -73,13 +73,14 @@ class ParquetAvroCompatibilitySuite
       logParquetSchema(path)
 
       checkAnswer(sqlContext.read.parquet(path), (0 until 10).map { i =>
-        Row(i % 2 == 0,
-            i,
-            i.toLong * 10,
-            i.toFloat + 0.1f,
-            i.toDouble + 0.2d,
-            s"val_$i".getBytes(StandardCharsets.UTF_8),
-            s"val_$i")
+        Row(
+          i % 2 == 0,
+          i,
+          i.toLong * 10,
+          i.toFloat + 0.1f,
+          i.toDouble + 0.2d,
+          s"val_$i".getBytes(StandardCharsets.UTF_8),
+          s"val_$i")
       })
     }
   }
@@ -128,13 +129,14 @@ class ParquetAvroCompatibilitySuite
         if (i % 3 == 0) {
           Row.apply(Seq.fill(7)(null): _*)
         } else {
-          Row(i % 2 == 0,
-              i,
-              i.toLong * 10,
-              i.toFloat + 0.1f,
-              i.toDouble + 0.2d,
-              s"val_$i".getBytes(StandardCharsets.UTF_8),
-              s"val_$i")
+          Row(
+            i % 2 == 0,
+            i,
+            i.toLong * 10,
+            i.toFloat + 0.1f,
+            i.toDouble + 0.2d,
+            s"val_$i".getBytes(StandardCharsets.UTF_8),
+            s"val_$i")
         }
       })
     }
@@ -144,33 +146,34 @@ class ParquetAvroCompatibilitySuite
     withTempPath { dir =>
       val path = dir.getCanonicalPath
 
-      withWriter[AvroNonNullableArrays](path,
-                                        AvroNonNullableArrays.getClassSchema) {
-        writer =>
-          (0 until 10).foreach { i =>
-            val record = {
-              val builder = AvroNonNullableArrays
-                .newBuilder()
-                .setStringsColumn(Seq.tabulate(3)(i => s"val_$i").asJava)
+      withWriter[AvroNonNullableArrays](
+        path,
+        AvroNonNullableArrays.getClassSchema) { writer =>
+        (0 until 10).foreach { i =>
+          val record = {
+            val builder = AvroNonNullableArrays
+              .newBuilder()
+              .setStringsColumn(Seq.tabulate(3)(i => s"val_$i").asJava)
 
-              if (i % 3 == 0) {
-                builder.setMaybeIntsColumn(null).build()
-              } else {
-                builder
-                  .setMaybeIntsColumn(Seq.tabulate(3)(Int.box).asJava)
-                  .build()
-              }
+            if (i % 3 == 0) {
+              builder.setMaybeIntsColumn(null).build()
+            } else {
+              builder
+                .setMaybeIntsColumn(Seq.tabulate(3)(Int.box).asJava)
+                .build()
             }
-
-            writer.write(record)
           }
+
+          writer.write(record)
+        }
       }
 
       logParquetSchema(path)
 
       checkAnswer(sqlContext.read.parquet(path), (0 until 10).map { i =>
-        Row(Seq.tabulate(3)(i => s"val_$i"),
-            if (i % 3 == 0) null else Seq.tabulate(3)(identity))
+        Row(
+          Seq.tabulate(3)(i => s"val_$i"),
+          if (i % 3 == 0) null else Seq.tabulate(3)(identity))
       })
     }
   }
@@ -249,15 +252,16 @@ class ParquetAvroCompatibilitySuite
       logParquetSchema(path)
 
       checkAnswer(sqlContext.read.parquet(path), (0 until 10).map { i =>
-        Row(Seq.tabulate(3)(n => s"arr_${i + n}"),
-            Seq.tabulate(3)(n => n.toString -> (i + n: Integer)).toMap,
-            Seq
-              .tabulate(3) { n =>
-                (i + n).toString -> Seq.tabulate(3) { m =>
-                  Row(Seq.tabulate(3)(j => i + j + m), s"val_${i + m}")
-                }
+        Row(
+          Seq.tabulate(3)(n => s"arr_${i + n}"),
+          Seq.tabulate(3)(n => n.toString -> (i + n: Integer)).toMap,
+          Seq
+            .tabulate(3) { n =>
+              (i + n).toString -> Seq.tabulate(3) { m =>
+                Row(Seq.tabulate(3)(j => i + j + m), s"val_${i + m}")
               }
-              .toMap)
+            }
+            .toMap)
       })
     }
   }
@@ -303,8 +307,9 @@ class ParquetAvroCompatibilitySuite
         }
       }
 
-      checkAnswer(sqlContext.read.parquet(path).filter('suit === "SPADES"),
-                  Row("SPADES"))
+      checkAnswer(
+        sqlContext.read.parquet(path).filter('suit === "SPADES"),
+        Row("SPADES"))
     }
   }
 }

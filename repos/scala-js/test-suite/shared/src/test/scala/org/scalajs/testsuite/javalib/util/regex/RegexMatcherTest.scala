@@ -240,8 +240,9 @@ class RegexMatcherTest {
         case e: Throwable => e
       }
 
-      assertEquals("java.lang.IllegalStateException",
-                   exception.getClass.getName)
+      assertEquals(
+        "java.lang.IllegalStateException",
+        exception.getClass.getName)
       if (!executingInJVM) // On JVM the message is "No match found"
         assertEquals("No match available", exception.getMessage)
     }

@@ -33,8 +33,9 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/input/InputMethodHighlight.html javafx.scene.input.InputMethodHighlight]] */
 object InputMethodHighlight
-    extends SFXEnumDelegateCompanion[jfxsi.InputMethodHighlight,
-                                     InputMethodHighlight] {
+    extends SFXEnumDelegateCompanion[
+      jfxsi.InputMethodHighlight,
+      InputMethodHighlight] {
 
   val UnselectedRaw = new InputMethodHighlight(
     jfxsi.InputMethodHighlight.UNSELECTED_RAW)

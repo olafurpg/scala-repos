@@ -156,7 +156,8 @@ abstract class ExtensionKey[T <: Extension](implicit m: ClassTag[T])
   override def lookup(): ExtensionId[T] = this
   def createExtension(system: ExtendedActorSystem): T =
     system.dynamicAccess
-      .createInstanceFor[T](m.runtimeClass,
-                            List(classOf[ExtendedActorSystem] -> system))
+      .createInstanceFor[T](
+        m.runtimeClass,
+        List(classOf[ExtendedActorSystem] -> system))
       .get
 }

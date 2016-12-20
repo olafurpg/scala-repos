@@ -35,16 +35,18 @@ object Test extends App {
     subsetTest(HashSet.empty[Int], ListSet.empty[Int], identity, 100)
 
     // test the HashSet/HashSet case for Collision keys
-    subsetTest(HashSet.empty[Collision],
-               HashSet.empty[Collision],
-               Collision,
-               100)
+    subsetTest(
+      HashSet.empty[Collision],
+      HashSet.empty[Collision],
+      Collision,
+      100)
 
     // test the HashSet/other set case for Collision keys
-    subsetTest(HashSet.empty[Collision],
-               ListSet.empty[Collision],
-               Collision,
-               100)
+    subsetTest(
+      HashSet.empty[Collision],
+      ListSet.empty[Collision],
+      Collision,
+      100)
   }
 
   /**
@@ -65,8 +67,9 @@ object Test extends App {
     val b = HashSet.empty ++ (0 until 50).map(HashCodeCounter)
     val count0 = count
     val result = b.subsetOf(a)
-    require(count == count0,
-            "key.hashCode must not be called during subsetOf of two HashSets")
+    require(
+      count == count0,
+      "key.hashCode must not be called during subsetOf of two HashSets")
     result
   }
   testCorrectness()

@@ -105,8 +105,9 @@ class ClientServerSpec
       if (!akka.util.Helpers.isWindows) {
         val probe4 = TestSubscriber.manualProbe[Http.IncomingConnection]()
         // Bind succeeded, we have a local address
-        val b2 = Await.result(binding.to(Sink.fromSubscriber(probe4)).run(),
-                              3.seconds)
+        val b2 = Await.result(
+          binding.to(Sink.fromSubscriber(probe4)).run(),
+          3.seconds)
         probe4.expectSubscription()
 
         // clean up
@@ -119,12 +120,13 @@ class ClientServerSpec
         for (i ← 1 to 10) withClue(s"iterator $i: ") {
           Source
             .single(
-              HttpRequest(HttpMethods.POST,
-                          "/test",
-                          List.empty,
-                          HttpEntity(MediaTypes.`text/plain`.withCharset(
-                                       HttpCharsets.`UTF-8`),
-                                     "buh")))
+              HttpRequest(
+                HttpMethods.POST,
+                "/test",
+                List.empty,
+                HttpEntity(
+                  MediaTypes.`text/plain`.withCharset(HttpCharsets.`UTF-8`),
+                  "buh")))
             .via(Http(actorSystem).outgoingConnection("localhost", 7777))
             .runWith(Sink.head)
             .failed
@@ -221,8 +223,9 @@ class ClientServerSpec
           try {
             def runIdleRequest(uri: Uri): Future[HttpResponse] = {
               val itNeverEnds =
-                Chunked.fromData(ContentTypes.`text/plain(UTF-8)`,
-                                 Source.maybe[ByteString])
+                Chunked.fromData(
+                  ContentTypes.`text/plain(UTF-8)`,
+                  Source.maybe[ByteString])
               Http()
                 .outgoingConnection(hostname, port)
                 .runWith(
@@ -263,8 +266,9 @@ class ClientServerSpec
           try {
             def runRequest(uri: Uri): Future[HttpResponse] = {
               val itNeverSends =
-                Chunked.fromData(ContentTypes.`text/plain(UTF-8)`,
-                                 Source.maybe[ByteString])
+                Chunked.fromData(
+                  ContentTypes.`text/plain(UTF-8)`,
+                  Source.maybe[ByteString])
               Http()
                 .outgoingConnection(hostname, port, settings = clientSettings)
                 .runWith(
@@ -302,14 +306,16 @@ class ClientServerSpec
             bindServer(hostname, port, serverTimeout)
 
           try {
-            val pool = Http().cachedHostConnectionPool[Int](hostname,
-                                                            port,
-                                                            clientPoolSettings)
+            val pool = Http().cachedHostConnectionPool[Int](
+              hostname,
+              port,
+              clientPoolSettings)
 
             def runRequest(uri: Uri): Future[(Try[HttpResponse], Int)] = {
               val itNeverSends =
-                Chunked.fromData(ContentTypes.`text/plain(UTF-8)`,
-                                 Source.maybe[ByteString])
+                Chunked.fromData(
+                  ContentTypes.`text/plain(UTF-8)`,
+                  Source.maybe[ByteString])
               Source
                 .single(HttpRequest(POST, uri, entity = itNeverSends) -> 1)
                 .via(pool)
@@ -347,12 +353,12 @@ class ClientServerSpec
           try {
             def runRequest(uri: Uri): Future[HttpResponse] = {
               val itNeverSends =
-                Chunked.fromData(ContentTypes.`text/plain(UTF-8)`,
-                                 Source.maybe[ByteString])
-              Http().singleRequest(HttpRequest(POST,
-                                               uri,
-                                               entity = itNeverSends),
-                                   settings = clientPoolSettings)
+                Chunked.fromData(
+                  ContentTypes.`text/plain(UTF-8)`,
+                  Source.maybe[ByteString])
+              Http().singleRequest(
+                HttpRequest(POST, uri, entity = itNeverSends),
+                settings = clientPoolSettings)
             }
 
             val clientsResponseFuture = runRequest(s"http://$hostname:$port/")
@@ -478,10 +484,11 @@ class ClientServerSpec
 
           val clientOutSub = clientOut.expectSubscription()
           clientOutSub.sendNext(
-            HttpRequest(POST,
-                        "/chunked",
-                        List(Accept(MediaRanges.`*/*`)),
-                        chunkedEntity))
+            HttpRequest(
+              POST,
+              "/chunked",
+              List(Accept(MediaRanges.`*/*`)),
+              chunkedEntity))
 
           val serverInSub = serverIn.expectSubscription()
           serverInSub.request(1)
@@ -501,10 +508,11 @@ class ClientServerSpec
 
           val clientInSub = clientIn.expectSubscription()
           clientInSub.request(1)
-          val HttpResponse(StatusCodes.PartialContent,
-                           List(Age(42), Server(_), Date(_)),
-                           Chunked(`chunkedContentType`, chunkStream2),
-                           HttpProtocols.`HTTP/1.1`) = clientIn.expectNext()
+          val HttpResponse(
+            StatusCodes.PartialContent,
+            List(Age(42), Server(_), Date(_)),
+            Chunked(`chunkedContentType`, chunkStream2),
+            HttpProtocols.`HTTP/1.1`) = clientIn.expectNext()
           Await.result(chunkStream2.limit(1000).runWith(Sink.seq), 100.millis) shouldEqual chunks
 
           clientOutSub.sendComplete()

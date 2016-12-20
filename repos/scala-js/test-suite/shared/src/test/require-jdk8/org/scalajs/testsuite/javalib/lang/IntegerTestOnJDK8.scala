@@ -38,8 +38,9 @@ class IntegerTestOnJDK8 {
 
   @Test def should_reject_invalid_uInt_strings_when_parsing(): Unit = {
     def test(s: String, radix: Int = 10): Unit =
-      expectThrows(classOf[NumberFormatException],
-                   Integer.parseUnsignedInt(s, radix))
+      expectThrows(
+        classOf[NumberFormatException],
+        Integer.parseUnsignedInt(s, radix))
 
     test("abc")
     test("5a")
@@ -128,8 +129,9 @@ class IntegerTestOnJDK8 {
   @Test def should_provide_toUnsignedString_with_radix(): Unit = {
     assertEquals("17777777777", Integer.toUnsignedString(2147483647, 8))
     assertEquals("7fffffff", Integer.toUnsignedString(2147483647, 16))
-    assertEquals("1111111111111111111111111111111",
-                 Integer.toUnsignedString(2147483647, 2))
+    assertEquals(
+      "1111111111111111111111111111111",
+      Integer.toUnsignedString(2147483647, 2))
     assertEquals("2147483647", Integer.toUnsignedString(2147483647, 10))
     assertEquals("ffffffff", Integer.toUnsignedString(0xFFFFFFFF, 16))
     assertEquals("4294967295", Integer.toUnsignedString(0xFFFFFFFF, 10))

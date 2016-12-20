@@ -114,8 +114,9 @@ final class JsonView(getLightUser: String => Option[LightUser],
                 .obj(
                   "id" -> pov.gameId,
                   "color" -> pov.color.name,
-                  "op" -> gameUserJson(pov.opponent.userId,
-                                       pov.opponent.rating),
+                  "op" -> gameUserJson(
+                    pov.opponent.userId,
+                    pov.opponent.rating),
                   "win" -> pov.win,
                   "status" -> pov.game.status.id,
                   "berserk" -> pov.player.berserk.option(true)
@@ -131,16 +132,16 @@ final class JsonView(getLightUser: String => Option[LightUser],
         GameRepo game pairing.gameId flatMap {
           _ ?? { game =>
             cached ranking tour flatMap { ranking =>
-              PlayerRepo.pairByTourAndUserIds(tour.id,
-                                              pairing.user1,
-                                              pairing.user2) map {
-                pairOption =>
-                  for {
-                    players <- pairOption
-                    (p1, p2) = players
-                    rp1 <- RankedPlayer(ranking)(p1)
-                    rp2 <- RankedPlayer(ranking)(p2)
-                  } yield FeaturedGame(game, rp1, rp2)
+              PlayerRepo.pairByTourAndUserIds(
+                tour.id,
+                pairing.user1,
+                pairing.user2) map { pairOption =>
+                for {
+                  players <- pairOption
+                  (p1, p2) = players
+                  rp1 <- RankedPlayer(ranking)(p1)
+                  rp2 <- RankedPlayer(ranking)(p2)
+                } yield FeaturedGame(game, rp1, rp2)
               }
             }
           }
@@ -193,9 +194,10 @@ final class JsonView(getLightUser: String => Option[LightUser],
         featured <- tour ?? fetchFeaturedGame
         podium <- podiumJson(id)
       } yield
-        CachableData(JsArray(pairings map pairingJson),
-                     featured map featuredJson,
-                     podium),
+        CachableData(
+          JsArray(pairings map pairingJson),
+          featured map featuredJson,
+          podium),
     timeToLive = 1 second)
 
   private def featuredJson(featured: FeaturedGame) = {
@@ -213,15 +215,16 @@ final class JsonView(getLightUser: String => Option[LightUser],
         )
         .noNull
     }
-    Json.obj("id" -> game.id,
-             "fen" -> (chess.format.Forsyth exportBoard game.toChess.board),
-             "color" -> (game.variant match {
-               case chess.variant.RacingKings => chess.White
-               case _ => game.firstColor
-             }).name,
-             "lastMove" -> ~game.castleLastMoveTime.lastMoveString,
-             "white" -> playerJson(featured.white, game player chess.White),
-             "black" -> playerJson(featured.black, game player chess.Black))
+    Json.obj(
+      "id" -> game.id,
+      "fen" -> (chess.format.Forsyth exportBoard game.toChess.board),
+      "color" -> (game.variant match {
+        case chess.variant.RacingKings => chess.White
+        case _ => game.firstColor
+      }).name,
+      "lastMove" -> ~game.castleLastMoveTime.lastMoveString,
+      "white" -> playerJson(featured.white, game player chess.White),
+      "black" -> playerJson(featured.black, game player chess.Black))
   }
 
   private def myInfoJson(i: PlayerInfo) =
@@ -284,9 +287,8 @@ final class JsonView(getLightUser: String => Option[LightUser],
               for {
                 pairings <- PairingRepo
                   .finishedByPlayerChronological(tour.id, player.userId)
-                sheet = tour.system.scoringSystem.sheet(tour,
-                                                        player.userId,
-                                                        pairings)
+                sheet = tour.system.scoringSystem
+                  .sheet(tour, player.userId, pairings)
                 tpr <- performance(tour, player, pairings)
               } yield
                 playerJson(sheet.some, tour, rp) ++ Json.obj(

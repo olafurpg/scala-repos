@@ -61,14 +61,15 @@ class ListJobsHandler(jobs: JobManager[Future])(implicit ctx: ExecutionContext)
     (request: HttpRequest[Future[JValue]]) => {
       Success(request.parameters get 'apiKey map { apiKey =>
         jobs.listJobs(apiKey) map { jobs =>
-          HttpResponse(OK,
-                       content = Some(JArray((jobs map (_.serialize)).toList)))
+          HttpResponse(
+            OK,
+            content = Some(JArray((jobs map (_.serialize)).toList)))
         }
       } getOrElse {
         Future(
-          HttpResponse(BadRequest,
-                       content =
-                         Some(JString("Missing required parameter 'apiKey"))))
+          HttpResponse(
+            BadRequest,
+            content = Some(JString("Missing required parameter 'apiKey"))))
       })
     }
 
@@ -94,8 +95,9 @@ class CreateJobHandler(jobs: JobManager[Future],
                 auth.isValid(apiKey) flatMap {
                   case true =>
                     jobs.createJob(apiKey, name, tpe, data, None) map { job =>
-                      HttpResponse[JValue](Created,
-                                           content = Some(job.serialize))
+                      HttpResponse[JValue](
+                        Created,
+                        content = Some(job.serialize))
                     }
                   case false =>
                     Future(HttpResponse[JValue](Forbidden))
@@ -165,8 +167,9 @@ class GetJobHandler(jobs: JobManager[Future])(implicit ctx: ExecutionContext)
       }
     }
 
-  val metadata = AboutMetadata(ParameterMetadata('jobId, None),
-                               DescriptionMetadata("Retrieve jobs by job ID."))
+  val metadata = AboutMetadata(
+    ParameterMetadata('jobId, None),
+    DescriptionMetadata("Retrieve jobs by job ID."))
 }
 
 class GetJobStatusHandler(jobs: JobManager[Future])(
@@ -180,9 +183,9 @@ class GetJobStatusHandler(jobs: JobManager[Future])(
       request.parameters.get('jobId) map { jobId =>
         Success(jobs.getStatus(jobId) map
           (_ map { status =>
-            HttpResponse[JValue](OK,
-                                 content =
-                                   Some(Status.toMessage(status).serialize))
+            HttpResponse[JValue](
+              OK,
+              content = Some(Status.toMessage(status).serialize))
           } getOrElse {
             HttpResponse[JValue](
               NotFound,
@@ -221,12 +224,13 @@ class UpdateJobStatusHandler(jobs: JobManager[Future])(
                 case None => Right(None)
               }
               val result = prevId.right map { prevId =>
-                jobs.updateStatus(jobId,
-                                  prevId,
-                                  msg,
-                                  progress,
-                                  unit,
-                                  content \? "info")
+                jobs.updateStatus(
+                  jobId,
+                  prevId,
+                  msg,
+                  progress,
+                  unit,
+                  content \? "info")
               } match {
                 case Right(resultM) => resultM
                 case Left(error) => Future(Left(error))
@@ -237,8 +241,9 @@ class UpdateJobStatusHandler(jobs: JobManager[Future])(
                   val msg = Status.toMessage(status)
                   HttpResponse[JValue](OK, content = Some(msg.serialize))
                 case Left(error) =>
-                  HttpResponse[JValue](Conflict,
-                                       content = Some(JString(error)))
+                  HttpResponse[JValue](
+                    Conflict,
+                    content = Some(JString(error)))
               }
 
             case (_, _, _) =>
@@ -280,9 +285,9 @@ class ListChannelsHandler(jobs: JobManager[Future])(
         }
       } getOrElse {
         Future(
-          HttpResponse(BadRequest,
-                       content =
-                         Some(JString("Missing required paramter 'jobId"))))
+          HttpResponse(
+            BadRequest,
+            content = Some(JString("Missing required paramter 'jobId"))))
       })
     }
 
@@ -312,8 +317,9 @@ class AddMessageHandler(jobs: JobManager[Future])(
         })
       }) getOrElse {
         Failure(
-          DispatchError(BadRequest,
-                        "Messages require a JSON body in the request."))
+          DispatchError(
+            BadRequest,
+            "Messages require a JSON body in the request."))
       }
     }
 
@@ -348,8 +354,9 @@ class ListMessagesHandler(jobs: JobManager[Future])(
         Success(prevId match {
           case Right(prevId) =>
             jobs.listMessages(jobId, channel, prevId) map { messages =>
-              HttpResponse[JValue](OK,
-                                   content = Some(messages.toList.serialize))
+              HttpResponse[JValue](
+                OK,
+                content = Some(messages.toList.serialize))
             }
           case Left(error) =>
             Future(
@@ -357,8 +364,9 @@ class ListMessagesHandler(jobs: JobManager[Future])(
         })
       }) getOrElse {
         Failure(
-          DispatchError(BadRequest,
-                        "Messages require a 'jobId and a 'channel."))
+          DispatchError(
+            BadRequest,
+            "Messages require a 'jobId and a 'channel."))
       }
     }
 
@@ -390,9 +398,9 @@ class GetJobStateHandler(jobs: JobManager[Future])(
         }
       } getOrElse {
         Future(
-          HttpResponse[JValue](BadRequest,
-                               content =
-                                 Some(JString("Missing required 'jobId"))))
+          HttpResponse[JValue](
+            BadRequest,
+            content = Some(JString("Missing required 'jobId"))))
       })
     }
 
@@ -432,8 +440,9 @@ class PutJobStateHandler(jobs: JobManager[Future])(
         }
       case Failure(error) =>
         Future(
-          HttpResponse[JValue](BadRequest,
-                               content = Some(JString(error.toString))))
+          HttpResponse[JValue](
+            BadRequest,
+            content = Some(JString(error.toString))))
     }
   }
 
@@ -499,9 +508,9 @@ class PutJobStateHandler(jobs: JobManager[Future])(
 
               case JUndefined =>
                 Future(
-                  HttpResponse[JValue](BadRequest,
-                                       content =
-                                         Some(JString("No 'state given."))))
+                  HttpResponse[JValue](
+                    BadRequest,
+                    content = Some(JString("No 'state given."))))
 
               case other =>
                 Future(
@@ -550,9 +559,9 @@ class CreateResultHandler(jobs: JobManager[Future])(
           case Right(_) =>
             HttpResponse[ByteChunk](OK)
           case Left(error) =>
-            HttpResponse[ByteChunk](NotFound,
-                                    content =
-                                      Some(ByteChunk(error.getBytes("UTF-8"))))
+            HttpResponse[ByteChunk](
+              NotFound,
+              content = Some(ByteChunk(error.getBytes("UTF-8"))))
         }
       }) getOrElse {
         Future(

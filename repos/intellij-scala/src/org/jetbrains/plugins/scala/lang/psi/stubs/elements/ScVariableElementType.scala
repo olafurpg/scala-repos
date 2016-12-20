@@ -79,14 +79,15 @@ abstract class ScVariableElementType[Variable <: ScVariable](debugName: String)
     val bodyText = StringRef.toString(dataStream.readName)
     val bindingsText = StringRef.toString(dataStream.readName)
     val isLocal = dataStream.readBoolean()
-    new ScVariableStubImpl(parent,
-                           this,
-                           names,
-                           isDecl,
-                           typeText,
-                           bodyText,
-                           bindingsText,
-                           isLocal)
+    new ScVariableStubImpl(
+      parent,
+      this,
+      names,
+      isDecl,
+      typeText,
+      bodyText,
+      bindingsText,
+      isLocal)
   }
 
   def indexStub(stub: ScVariableStub, sink: IndexSink) {

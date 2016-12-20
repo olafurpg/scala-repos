@@ -119,8 +119,9 @@ abstract class AggregationIterator(
   }
 
   protected val aggregateFunctions: Array[AggregateFunction] =
-    initializeAggregateFunctions(aggregateExpressions,
-                                 initialInputBufferOffset)
+    initializeAggregateFunctions(
+      aggregateExpressions,
+      initialInputBufferOffset)
 
   // Positions of those imperative aggregate functions in allAggregateFunctions.
   // For example, we have func1, func2, func3, func4 in aggregateFunctions, and
@@ -187,8 +188,9 @@ abstract class AggregationIterator(
       // This projection is used to merge buffer values for all expression-based aggregates.
       val aggregationBufferSchema = functions.flatMap(_.aggBufferAttributes)
       val updateProjection =
-        newMutableProjection(mergeExpressions,
-                             aggregationBufferSchema ++ inputAttributes)()
+        newMutableProjection(
+          mergeExpressions,
+          aggregationBufferSchema ++ inputAttributes)()
 
       (currentBuffer: MutableRow, row: InternalRow) =>
         {
@@ -209,9 +211,10 @@ abstract class AggregationIterator(
   }
 
   protected val processRow: (MutableRow, InternalRow) => Unit =
-    generateProcessRow(aggregateExpressions,
-                       aggregateFunctions,
-                       inputAttributes)
+    generateProcessRow(
+      aggregateExpressions,
+      aggregateFunctions,
+      inputAttributes)
 
   protected val groupingProjection: UnsafeProjection =
     UnsafeProjection.create(groupingExpressions, inputAttributes)

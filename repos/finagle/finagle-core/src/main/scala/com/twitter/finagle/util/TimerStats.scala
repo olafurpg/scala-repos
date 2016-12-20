@@ -41,9 +41,10 @@ private[finagle] object TimerStats {
           .newTimeout(this, tickDuration.inMilliseconds, TimeUnit.MILLISECONDS)
       }
     }
-    hwt.newTimeout(timerTask,
-                   tickDuration.inMilliseconds,
-                   TimeUnit.MILLISECONDS)
+    hwt.newTimeout(
+      timerTask,
+      tickDuration.inMilliseconds,
+      TimeUnit.MILLISECONDS)
   }
 
   /**

@@ -30,22 +30,24 @@ final class Env(config: Config,
 
   private lazy val aggregationPipeline = new AggregationPipeline
 
-  private lazy val indexer = new Indexer(storage = storage,
-                                         sequencer = system.actorOf(
-                                           Props(
-                                             classOf[lila.hub.Sequencer],
-                                             None,
-                                             None,
-                                             logger
-                                           )))
+  private lazy val indexer = new Indexer(
+    storage = storage,
+    sequencer = system.actorOf(
+      Props(
+        classOf[lila.hub.Sequencer],
+        None,
+        None,
+        logger
+      )))
 
   private lazy val userCacheApi = new UserCacheApi(
     coll = db(CollectionUserCache))
 
-  lazy val api = new InsightApi(storage = storage,
-                                userCacheApi = userCacheApi,
-                                pipeline = aggregationPipeline,
-                                indexer = indexer)
+  lazy val api = new InsightApi(
+    storage = storage,
+    userCacheApi = userCacheApi,
+    pipeline = aggregationPipeline,
+    indexer = indexer)
 
   system.actorOf(Props(new Actor {
     system.lilaBus.subscribe(self, 'analysisReady)
@@ -58,11 +60,11 @@ final class Env(config: Config,
 object Env {
 
   lazy val current: Env =
-    "insight" boot new Env(config = lila.common.PlayApp loadConfig "insight",
-                           getPref = lila.pref.Env.current.api.getPrefById,
-                           areFriends =
-                             lila.relation.Env.current.api.fetchAreFriends,
-                           lightUser = lila.user.Env.current.lightUser,
-                           system = lila.common.PlayApp.system,
-                           lifecycle = lila.common.PlayApp.lifecycle)
+    "insight" boot new Env(
+      config = lila.common.PlayApp loadConfig "insight",
+      getPref = lila.pref.Env.current.api.getPrefById,
+      areFriends = lila.relation.Env.current.api.fetchAreFriends,
+      lightUser = lila.user.Env.current.lightUser,
+      system = lila.common.PlayApp.system,
+      lifecycle = lila.common.PlayApp.lifecycle)
 }

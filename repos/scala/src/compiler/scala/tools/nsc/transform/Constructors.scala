@@ -287,14 +287,16 @@ abstract class Constructors extends Statics with Transform with ast.TreeDSL {
         delayedEndPointSym: MethodSymbol): ClassDef = {
       val satelliteClass = localTyper.typed {
         atPos(impl.pos) {
-          val closureClass = clazz.newClass(nme.delayedInitArg.toTypeName,
-                                            impl.pos,
-                                            SYNTHETIC | FINAL)
+          val closureClass = clazz.newClass(
+            nme.delayedInitArg.toTypeName,
+            impl.pos,
+            SYNTHETIC | FINAL)
           val closureParents = List(AbstractFunctionClass(0).tpe)
 
-          closureClass setInfoAndEnter new ClassInfoType(closureParents,
-                                                         newScope,
-                                                         closureClass)
+          closureClass setInfoAndEnter new ClassInfoType(
+            closureParents,
+            newScope,
+            closureClass)
 
           val outerField: TermSymbol =
             (closureClass newValue
@@ -317,16 +319,17 @@ abstract class Constructors extends Statics with Transform with ast.TreeDSL {
             }
 
           val applyMethodDef =
-            DefDef(sym = applyMethod,
-                   vparamss = ListOfNil,
-                   rhs = Block(applyMethodStat,
-                               gen.mkAttributedRef(BoxedUnit_UNIT)))
+            DefDef(
+              sym = applyMethod,
+              vparamss = ListOfNil,
+              rhs = Block(applyMethodStat, gen.mkAttributedRef(BoxedUnit_UNIT)))
 
-          ClassDef(sym = closureClass,
-                   constrMods = Modifiers(0),
-                   vparamss = List(List(outerFieldDef)),
-                   body = applyMethodDef :: Nil,
-                   superPos = impl.pos)
+          ClassDef(
+            sym = closureClass,
+            constrMods = Modifiers(0),
+            vparamss = List(List(outerFieldDef)),
+            body = applyMethodDef :: Nil,
+            superPos = impl.pos)
         }
       }
 
@@ -345,10 +348,11 @@ abstract class Constructors extends Statics with Transform with ast.TreeDSL {
         (new ConstructorTransformer(unit)) transform delayedInitClosure(
           delayedHookSym)
       val delayedInitCall = localTyper.typedPos(impl.pos) {
-        gen.mkMethodCall(This(clazz),
-                         delayedInitMethod,
-                         Nil,
-                         List(New(hookCallerClass.symbol.tpe, This(clazz))))
+        gen.mkMethodCall(
+          This(clazz),
+          delayedInitMethod,
+          Nil,
+          List(New(hookCallerClass.symbol.tpe, This(clazz))))
       }
 
       (List(delayedHook, hookCallerClass), List(delayedInitCall))
@@ -397,8 +401,9 @@ abstract class Constructors extends Statics with Transform with ast.TreeDSL {
             case Apply(fun @ Select(receiver, method), List(xs, idx, v))
                 if fun.symbol == arrayUpdateMethod =>
               localTyper.typed(
-                Apply(gen.mkAttributedSelect(xs, arrayUpdateMethod),
-                      List(idx, v)))
+                Apply(
+                  gen.mkAttributedSelect(xs, arrayUpdateMethod),
+                  List(idx, v)))
             case _ => super.transform(t)
           }
         }
@@ -423,21 +428,23 @@ abstract class Constructors extends Statics with Transform with ast.TreeDSL {
         if (stat1 eq stat) {
           assert(ctorParams(genericClazz).length == primaryConstrParams.length)
           // this is just to make private fields public
-          (new specializeTypes.ImplementationAdapter(ctorParams(genericClazz),
-                                                     primaryConstrParams,
-                                                     null,
-                                                     true))(stat1)
+          (new specializeTypes.ImplementationAdapter(
+            ctorParams(genericClazz),
+            primaryConstrParams,
+            null,
+            true))(stat1)
 
           val stat2 = rewriteArrayUpdate(stat1)
           // statements coming from the original class need retyping in the current context
           debuglog("retyping " + stat2)
 
           val d = new specializeTypes.Duplicator(Map[Symbol, Type]())
-          d.retyped(localTyper.context1.asInstanceOf[d.Context],
-                    stat2,
-                    genericClazz,
-                    clazz,
-                    Map.empty)
+          d.retyped(
+            localTyper.context1.asInstanceOf[d.Context],
+            stat2,
+            genericClazz,
+            clazz,
+            Map.empty)
         } else stat1
       }
 //      if (specBuf.nonEmpty)
@@ -734,11 +741,12 @@ abstract class Constructors extends Statics with Transform with ast.TreeDSL {
     }
 
     def transformed = {
-      val (defs,
-           auxConstructors,
-           constructorPrefix,
-           constructorStats,
-           classInitStats) = triageStats
+      val (
+        defs,
+        auxConstructors,
+        constructorPrefix,
+        constructorStats,
+        classInitStats) = triageStats
 
       // omit unused outers
       val omittableAccessor: Set[Symbol] =

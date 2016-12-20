@@ -64,9 +64,10 @@ class ScalaArrayAccessEvaluator(arrayReferenceEvaluator: Evaluator,
           }
         }
         def getInspectItem(project: Project): NodeDescriptorImpl = {
-          new ArrayElementDescriptorImpl(project,
-                                         myEvaluatedArrayReference,
-                                         myEvaluatedIndex)
+          new ArrayElementDescriptorImpl(
+            project,
+            myEvaluatedArrayReference,
+            myEvaluatedIndex)
         }
       }
     }

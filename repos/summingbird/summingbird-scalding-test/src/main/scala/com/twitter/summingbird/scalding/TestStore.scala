@@ -41,12 +41,13 @@ object TestStore {
       tconv: TupleConverter[(K, V)]) = {
     val startBatch = inBatcher.batchOf(Timestamp(0)).prev
     val endBatch = inBatcher.batchOf(Timestamp(lastTime)).next
-    new TestStore[K, V](store,
-                        inBatcher,
-                        startBatch,
-                        initStore,
-                        endBatch,
-                        pruning)
+    new TestStore[K, V](
+      store,
+      inBatcher,
+      startBatch,
+      initStore,
+      endBatch,
+      pruning)
   }
 }
 

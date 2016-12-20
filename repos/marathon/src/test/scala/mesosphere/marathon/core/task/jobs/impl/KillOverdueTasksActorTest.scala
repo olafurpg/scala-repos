@@ -68,8 +68,9 @@ class KillOverdueTasksActorTest
 
     When("a check is performed")
     val testProbe = TestProbe()
-    testProbe.send(checkActor,
-                   KillOverdueTasksActor.Check(maybeAck = Some(testProbe.ref)))
+    testProbe.send(
+      checkActor,
+      KillOverdueTasksActor.Check(maybeAck = Some(testProbe.ref)))
     testProbe.expectMsg(3.seconds, Status.Success(()))
 
     Then("eventually list was called")
@@ -110,8 +111,9 @@ class KillOverdueTasksActorTest
         .setState(state)
 
     val overdueUnstagedTask = MarathonTestHelper.startingTaskProto("unstaged")
-    assert(overdueUnstagedTask.getStartedAt == 0,
-           "The startedAt property of an unstaged task has a value of 0")
+    assert(
+      overdueUnstagedTask.getStartedAt == 0,
+      "The startedAt property of an unstaged task has a value of 0")
 
     val unconfirmedNotOverdueTask = MarathonTestHelper.startingTaskProto(
       "unconfirmed",
@@ -133,9 +135,10 @@ class KillOverdueTasksActorTest
     )
 
     val runningTask =
-      MarathonTestHelper.runningTaskProto("running",
-                                          stagedAt = now - 5.seconds,
-                                          startedAt = now - 2.seconds)
+      MarathonTestHelper.runningTaskProto(
+        "running",
+        stagedAt = now - 5.seconds,
+        startedAt = now - 2.seconds)
 
     Given("Several somehow overdue tasks plus some not overdue tasks")
     val appId = PathId("/ignored")
@@ -155,8 +158,9 @@ class KillOverdueTasksActorTest
     When(
       "We check which tasks should be killed because they're not yet staged or unconfirmed")
     val testProbe = TestProbe()
-    testProbe.send(checkActor,
-                   KillOverdueTasksActor.Check(maybeAck = Some(testProbe.ref)))
+    testProbe.send(
+      checkActor,
+      KillOverdueTasksActor.Check(maybeAck = Some(testProbe.ref)))
     testProbe.expectMsg(3.seconds, Status.Success(()))
 
     Then("The task tracker gets queried")

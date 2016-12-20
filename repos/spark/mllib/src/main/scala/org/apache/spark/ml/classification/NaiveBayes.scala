@@ -231,8 +231,9 @@ class NaiveBayesModel private[ml] (@Since("1.5.0") override val uid: String,
 
   @Since("1.5.0")
   override def copy(extra: ParamMap): NaiveBayesModel = {
-    copyValues(new NaiveBayesModel(uid, pi, theta).setParent(this.parent),
-               extra)
+    copyValues(
+      new NaiveBayesModel(uid, pi, theta).setParent(this.parent),
+      extra)
   }
 
   @Since("1.5.0")
@@ -254,10 +255,11 @@ object NaiveBayesModel extends MLReadable[NaiveBayesModel] {
     val uid = if (parent != null) parent.uid else Identifiable.randomUID("nb")
     val labels = Vectors.dense(oldModel.labels)
     val pi = Vectors.dense(oldModel.pi)
-    val theta = new DenseMatrix(oldModel.labels.length,
-                                oldModel.theta(0).length,
-                                oldModel.theta.flatten,
-                                true)
+    val theta = new DenseMatrix(
+      oldModel.labels.length,
+      oldModel.theta(0).length,
+      oldModel.theta.flatten,
+      true)
     new NaiveBayesModel(uid, pi, theta)
   }
 

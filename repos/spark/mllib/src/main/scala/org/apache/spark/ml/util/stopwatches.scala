@@ -127,8 +127,9 @@ private[spark] class MultiStopwatch(@transient private val sc: SparkContext)
     * @param name stopwatch name
     */
   def addLocal(name: String): this.type = {
-    require(!stopwatches.contains(name),
-            s"Stopwatch with name $name already exists.")
+    require(
+      !stopwatches.contains(name),
+      s"Stopwatch with name $name already exists.")
     stopwatches(name) = new LocalStopwatch(name)
     this
   }
@@ -138,8 +139,9 @@ private[spark] class MultiStopwatch(@transient private val sc: SparkContext)
     * @param name stopwatch name
     */
   def addDistributed(name: String): this.type = {
-    require(!stopwatches.contains(name),
-            s"Stopwatch with name $name already exists.")
+    require(
+      !stopwatches.contains(name),
+      s"Stopwatch with name $name already exists.")
     stopwatches(name) = new DistributedStopwatch(sc, name)
     this
   }

@@ -142,9 +142,10 @@ private[finagle] case class Netty4Listener[In, Out](
         // The boss loop immediately starts refusing new work.
         // Existing tasks have ``deadline`` time to finish executing.
         bossLoop
-          .shutdownGracefully(0 /* quietPeriod */,
-                              deadline.inMillis /* timeout */,
-                              TimeUnit.MILLISECONDS)
+          .shutdownGracefully(
+            0 /* quietPeriod */,
+            deadline.inMillis /* timeout */,
+            TimeUnit.MILLISECONDS)
           .addListener(new GenericFutureListener[Nothing] {
             def operationComplete(future: Nothing): Unit = p.setDone()
           })

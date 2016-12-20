@@ -47,13 +47,14 @@ object CircuitBreakerProxy {
             failureDetector: Any ⇒ Boolean,
             failureMap: CircuitOpenFailure ⇒ Any) =
     Props(
-      new CircuitBreakerProxy(target,
-                              maxFailures,
-                              callTimeout,
-                              resetTimeout,
-                              circuitEventListener,
-                              failureDetector,
-                              failureMap))
+      new CircuitBreakerProxy(
+        target,
+        maxFailures,
+        callTimeout,
+        resetTimeout,
+        circuitEventListener,
+        failureDetector,
+        failureMap))
 
   sealed trait CircuitBreakerCommand
 
@@ -105,13 +106,14 @@ object CircuitBreakerProxy {
       * @param target the target actor ref
       */
     def props(target: ActorRef) =
-      CircuitBreakerProxy.props(target,
-                                maxFailures,
-                                callTimeout,
-                                resetTimeout,
-                                circuitEventListener,
-                                failureDetector,
-                                openCircuitFailureConverter)
+      CircuitBreakerProxy.props(
+        target,
+        maxFailures,
+        callTimeout,
+        resetTimeout,
+        circuitEventListener,
+        failureDetector,
+        openCircuitFailureConverter)
   }
 
   private[CircuitBreakerProxy] object CircuitBreakerInternalEvents {
@@ -145,9 +147,9 @@ final class CircuitBreakerProxy(target: ActorRef,
       log.debug(
         "Received call succeeded notification in state {} resetting counter",
         state)
-      goto(Closed) using CircuitBreakerStateData(failureCount = 0,
-                                                 firstHalfOpenMessageSent =
-                                                   false)
+      goto(Closed) using CircuitBreakerStateData(
+        failureCount = 0,
+        firstHalfOpenMessageSent = false)
   }
 
   def passthroughHandling: StateFunction = {
@@ -175,8 +177,9 @@ final class CircuitBreakerProxy(target: ActorRef,
   when(Closed) {
     commonStateHandling orElse {
       case Event(TellOnly(message), _) ⇒
-        log.debug("Closed: Sending message {} without expecting any response",
-                  message)
+        log.debug(
+          "Closed: Sending message {} without expecting any response",
+          message)
         target ! message
         stay
 
@@ -234,8 +237,9 @@ final class CircuitBreakerProxy(target: ActorRef,
   when(HalfOpen) {
     commonStateHandling orElse {
       case Event(TellOnly(message), _) ⇒
-        log.debug("HalfOpen: Dropping TellOnly request for message {}",
-                  message)
+        log.debug(
+          "HalfOpen: Dropping TellOnly request for message {}",
+          message)
         stay
 
       case Event(CallFailed, CircuitBreakerStateData(_, true)) ⇒

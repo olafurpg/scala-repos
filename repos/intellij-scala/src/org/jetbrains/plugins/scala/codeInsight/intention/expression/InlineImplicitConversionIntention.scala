@@ -49,10 +49,11 @@ class InlineImplicitConversionIntention extends PsiElementBaseIntentionAction {
       return
     val secondPart = implicitConversions._4.getOrElse(Seq.empty)
 
-    IntentionUtils.replaceWithExplicit(expr,
-                                       conversionFun.asInstanceOf[ScFunction],
-                                       project,
-                                       editor,
-                                       secondPart)
+    IntentionUtils.replaceWithExplicit(
+      expr,
+      conversionFun.asInstanceOf[ScFunction],
+      project,
+      editor,
+      secondPart)
   }
 }

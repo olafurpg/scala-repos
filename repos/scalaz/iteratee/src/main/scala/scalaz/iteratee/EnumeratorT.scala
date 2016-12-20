@@ -218,18 +218,20 @@ trait EnumeratorTFunctions {
       implicit MO: MonadPartialOrder[F, IO])
     : EnumeratorT[IoExceptionOr[Char], F] = {
     lazy val src = r
-    enumIoSource(get = () => IoExceptionOr(src.read),
-                 gotdata = (i: IoExceptionOr[Int]) => i exists (_ != -1),
-                 render = ((n: Int) => n.toChar))
+    enumIoSource(
+      get = () => IoExceptionOr(src.read),
+      gotdata = (i: IoExceptionOr[Int]) => i exists (_ != -1),
+      render = ((n: Int) => n.toChar))
   }
 
   def enumInputStream[F[_]](is: => java.io.InputStream)(
       implicit MO: MonadPartialOrder[F, IO])
     : EnumeratorT[IoExceptionOr[Byte], F] = {
     lazy val src = is
-    enumIoSource(get = () => IoExceptionOr(src.read),
-                 gotdata = (i: IoExceptionOr[Int]) => i exists (_ != -1),
-                 render = ((n: Int) => n.toByte))
+    enumIoSource(
+      get = () => IoExceptionOr(src.read),
+      gotdata = (i: IoExceptionOr[Int]) => i exists (_ != -1),
+      render = ((n: Int) => n.toByte))
   }
 
   def enumIndexedSeq[E, F[_]: Monad](
@@ -280,9 +282,10 @@ trait EnumeratorTFunctions {
           step(lastState)
         }
 
-        checkCont1(contFactory =>
-                     state => k => k(elInput(e)) >>== contFactory(f(state)),
-                   e)
+        checkCont1(
+          contFactory =>
+            state => k => k(elInput(e)) >>== contFactory(f(state)),
+          e)
       }
     }
 }

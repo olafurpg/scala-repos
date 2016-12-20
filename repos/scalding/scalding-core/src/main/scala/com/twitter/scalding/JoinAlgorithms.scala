@@ -92,9 +92,10 @@ trait JoinAlgorithms {
       .map(() -> '__joinBig__) { (u: Unit) =>
         1
       }
-      .blockJoinWithSmaller('__joinBig__ -> '__joinSmall__,
-                            smallJoin,
-                            rightReplication = replication)
+      .blockJoinWithSmaller(
+        '__joinBig__ -> '__joinSmall__,
+        smallJoin,
+        rightReplication = replication)
       .discard('__joinBig__, '__joinSmall__)
   }
 
@@ -248,29 +249,32 @@ trait JoinAlgorithms {
   def joinWithTiny(fs: (Fields, Fields), that: Pipe) = {
     val intersection = asSet(fs._1).intersect(asSet(fs._2))
     if (intersection.isEmpty) {
-      new HashJoin(assignName(pipe),
-                   fs._1,
-                   assignName(that),
-                   fs._2,
-                   WrappedJoiner(new InnerJoin))
+      new HashJoin(
+        assignName(pipe),
+        fs._1,
+        assignName(that),
+        fs._2,
+        WrappedJoiner(new InnerJoin))
     } else {
       val (renamedThat, newJoinFields, temp) =
         renameCollidingFields(that, fs._2, intersection)
-      (new HashJoin(assignName(pipe),
-                    fs._1,
-                    assignName(renamedThat),
-                    newJoinFields,
-                    WrappedJoiner(new InnerJoin))).discard(temp)
+      (new HashJoin(
+        assignName(pipe),
+        fs._1,
+        assignName(renamedThat),
+        newJoinFields,
+        WrappedJoiner(new InnerJoin))).discard(temp)
     }
   }
 
   def leftJoinWithTiny(fs: (Fields, Fields), that: Pipe) = {
     //Rename these pipes to avoid cascading name conflicts
-    new HashJoin(assignName(pipe),
-                 fs._1,
-                 assignName(that),
-                 fs._2,
-                 WrappedJoiner(new LeftJoin))
+    new HashJoin(
+      assignName(pipe),
+      fs._1,
+      assignName(that),
+      fs._2,
+      WrappedJoiner(new LeftJoin))
   }
 
   /**
@@ -322,20 +326,22 @@ trait JoinAlgorithms {
     // Add the new dummy replication fields
     val newLeft =
       addReplicationFields(pipe, leftFields, leftReplication, rightReplication)
-    val newRight = addReplicationFields(otherPipe,
-                                        rightFields,
-                                        rightReplication,
-                                        leftReplication,
-                                        swap = true)
+    val newRight = addReplicationFields(
+      otherPipe,
+      rightFields,
+      rightReplication,
+      leftReplication,
+      swap = true)
 
     val leftJoinFields = Fields.join(fs._1, leftFields)
     val rightJoinFields = Fields.join(fs._2, rightFields)
 
     newLeft
-      .joinWithSmaller((leftJoinFields, rightJoinFields),
-                       newRight,
-                       joiner,
-                       reducers)
+      .joinWithSmaller(
+        (leftJoinFields, rightJoinFields),
+        newRight,
+        joiner,
+        reducers)
       .discard(leftFields)
       .discard(rightFields)
   }
@@ -387,8 +393,9 @@ trait JoinAlgorithms {
       r: Random,
       replication: Int,
       otherReplication: Int): IndexedSeq[(Int, Int)] = {
-    assert(replication >= 1 && otherReplication >= 1,
-           "Replication counts must be >= 1")
+    assert(
+      replication >= 1 && otherReplication >= 1,
+      "Replication counts must be >= 1")
 
     val rand = r.nextInt(otherReplication)
     (0 until replication).map { rep =>
@@ -439,8 +446,9 @@ trait JoinAlgorithms {
       reducers: Int = -1,
       replicator: SkewReplication = SkewReplicationA()): Pipe = {
 
-    assert(sampleRate > 0 && sampleRate < 1,
-           "Sampling rate for skew joins must lie strictly between 0 and 1")
+    assert(
+      sampleRate > 0 && sampleRate < 1,
+      "Sampling rate for skew joins must lie strictly between 0 and 1")
 
     val intersection = asSet(fs._1).intersect(asSet(fs._2))
 
@@ -473,9 +481,10 @@ trait JoinAlgorithms {
         _.size(rightSampledCountField)
       }
     val sampledCounts = sampledLeft
-      .joinWithSmaller(fs._1 -> rightResolvedJoinFields,
-                       sampledRight,
-                       joiner = new OuterJoin)
+      .joinWithSmaller(
+        fs._1 -> rightResolvedJoinFields,
+        sampledRight,
+        joiner = new OuterJoin)
       .project(Fields.join(mergedJoinKeys, sampledCountFields))
       .map(mergedJoinKeys -> mergedJoinKeys) { t: cascading.tuple.Tuple =>
         // Make the outer join look like an inner join so that we can join
@@ -505,21 +514,23 @@ trait JoinAlgorithms {
     val leftReplicationFields = new Fields("__LEFT_RAND__", "__LEFT_REP__")
     val rightReplicationFields = new Fields("__RIGHT_REP__", "__RIGHT_RAND__")
 
-    val replicatedLeft = skewReplicate(pipe,
-                                       sampledCounts,
-                                       fs._1,
-                                       sampledCountFields,
-                                       leftReplicationFields,
-                                       replicator,
-                                       reducers)
-    val replicatedRight = skewReplicate(rightPipe,
-                                        sampledCounts,
-                                        rightResolvedJoinFields,
-                                        sampledCountFields,
-                                        rightReplicationFields,
-                                        replicator,
-                                        reducers,
-                                        true)
+    val replicatedLeft = skewReplicate(
+      pipe,
+      sampledCounts,
+      fs._1,
+      sampledCountFields,
+      leftReplicationFields,
+      replicator,
+      reducers)
+    val replicatedRight = skewReplicate(
+      rightPipe,
+      sampledCounts,
+      rightResolvedJoinFields,
+      sampledCountFields,
+      rightReplicationFields,
+      replicator,
+      reducers,
+      true)
 
     // 3. Finally, join the replicated pipes together.
     val leftJoinFields = Fields.join(fs._1, leftReplicationFields)
@@ -527,10 +538,11 @@ trait JoinAlgorithms {
       Fields.join(rightResolvedJoinFields, rightReplicationFields)
 
     val joinedPipe = replicatedLeft
-      .joinWithSmaller(leftJoinFields -> rightJoinFields,
-                       replicatedRight,
-                       joiner = new InnerJoin,
-                       reducers)
+      .joinWithSmaller(
+        leftJoinFields -> rightJoinFields,
+        replicatedRight,
+        joiner = new InnerJoin,
+        reducers)
       .discard(leftReplicationFields)
       .discard(rightReplicationFields)
 
@@ -544,11 +556,12 @@ trait JoinAlgorithms {
       sampleRate: Double = 0.001,
       reducers: Int = -1,
       replicator: SkewReplication = SkewReplicationA()): Pipe = {
-    otherPipe.skewJoinWithSmaller((fs._2, fs._1),
-                                  pipe,
-                                  sampleRate,
-                                  reducers,
-                                  replicator)
+    otherPipe.skewJoinWithSmaller(
+      (fs._2, fs._1),
+      pipe,
+      sampleRate,
+      reducers,
+      replicator)
   }
 
   /**

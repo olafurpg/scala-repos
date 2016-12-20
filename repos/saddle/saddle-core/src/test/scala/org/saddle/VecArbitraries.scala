@@ -29,9 +29,11 @@ object VecArbitraries {
   def vecDoubleWithNA: Gen[Vec[Double]] =
     for {
       n <- Gen.choose(0, 10)
-      lst <- Gen.listOfN(n,
-                         Gen.frequency[Double]((9, Gen.chooseNum(-1e3, 1e3)),
-                                               (1, na.to[Double])))
+      lst <- Gen.listOfN(
+        n,
+        Gen.frequency[Double](
+          (9, Gen.chooseNum(-1e3, 1e3)),
+          (1, na.to[Double])))
     } yield Vec(lst: _*)
 
   // Generates vec of length of up to 20 entries w/o NA's
@@ -60,9 +62,11 @@ object VecArbitraries {
   def vecFloatWithNA: Gen[Vec[Float]] =
     for {
       n <- Gen.choose(0, 20)
-      lst <- Gen.listOfN(n,
-                         Gen.frequency[Float]((9, Gen.chooseNum(-1e3f, 1e3f)),
-                                              (1, na.to[Float])))
+      lst <- Gen.listOfN(
+        n,
+        Gen.frequency[Float](
+          (9, Gen.chooseNum(-1e3f, 1e3f)),
+          (1, na.to[Float])))
     } yield Vec(lst: _*)
 
   def vecFloatWithoutNA: Gen[Vec[Float]] =

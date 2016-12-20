@@ -39,19 +39,19 @@ class AsyncRDDActions[T: ClassTag](self: RDD[T])
     */
   def countAsync(): FutureAction[Long] = self.withScope {
     val totalCount = new AtomicLong
-    self.context.submitJob(self,
-                           (iter: Iterator[T]) => {
-                             var result = 0L
-                             while (iter.hasNext) {
-                               result += 1L
-                               iter.next()
-                             }
-                             result
-                           },
-                           Range(0, self.partitions.length),
-                           (index: Int,
-                            data: Long) => totalCount.addAndGet(data),
-                           totalCount.get())
+    self.context.submitJob(
+      self,
+      (iter: Iterator[T]) => {
+        var result = 0L
+        while (iter.hasNext) {
+          result += 1L
+          iter.next()
+        }
+        result
+      },
+      Range(0, self.partitions.length),
+      (index: Int, data: Long) => totalCount.addAndGet(data),
+      totalCount.get())
   }
 
   /**
@@ -115,12 +115,12 @@ class AsyncRDDActions[T: ClassTag](self: RDD[T])
         self.context.setCallSite(callSite)
         self.context.setLocalProperties(localProperties)
         val job =
-          jobSubmitter.submitJob(self,
-                                 (it: Iterator[T]) => it.take(left).toArray,
-                                 p,
-                                 (index: Int,
-                                  data: Array[T]) => buf(index) = data,
-                                 Unit)
+          jobSubmitter.submitJob(
+            self,
+            (it: Iterator[T]) => it.take(left).toArray,
+            p,
+            (index: Int, data: Array[T]) => buf(index) = data,
+            Unit)
         job.flatMap { _ =>
           buf.foreach(results ++= _.take(num - results.size))
           continue(partsScanned + p.size)
@@ -135,11 +135,12 @@ class AsyncRDDActions[T: ClassTag](self: RDD[T])
     */
   def foreachAsync(f: T => Unit): FutureAction[Unit] = self.withScope {
     val cleanF = self.context.clean(f)
-    self.context.submitJob[T, Unit, Unit](self,
-                                          _.foreach(cleanF),
-                                          Range(0, self.partitions.length),
-                                          (index, data) => Unit,
-                                          Unit)
+    self.context.submitJob[T, Unit, Unit](
+      self,
+      _.foreach(cleanF),
+      Range(0, self.partitions.length),
+      (index, data) => Unit,
+      Unit)
   }
 
   /**
@@ -147,11 +148,12 @@ class AsyncRDDActions[T: ClassTag](self: RDD[T])
     */
   def foreachPartitionAsync(f: Iterator[T] => Unit): FutureAction[Unit] =
     self.withScope {
-      self.context.submitJob[T, Unit, Unit](self,
-                                            f,
-                                            Range(0, self.partitions.length),
-                                            (index, data) => Unit,
-                                            Unit)
+      self.context.submitJob[T, Unit, Unit](
+        self,
+        f,
+        Range(0, self.partitions.length),
+        (index, data) => Unit,
+        Unit)
     }
 }
 

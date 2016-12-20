@@ -263,8 +263,9 @@ object M8 {
     def intersect0(that: IntSet, accu: IntSet): IntSet =
       right.intersect0(
         that,
-        left.intersect0(that,
-                        if (that.contains(elem)) accu.incl(elem) else accu));
+        left.intersect0(
+          that,
+          if (that.contains(elem)) accu.incl(elem) else accu));
 
     def filter0(f: Int => Boolean, accu: IntSet): IntSet =
       right

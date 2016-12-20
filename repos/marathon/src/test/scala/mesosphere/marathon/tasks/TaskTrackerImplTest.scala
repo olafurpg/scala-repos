@@ -84,8 +84,9 @@ class TaskTrackerImplTest
 
     val fetchedTask = call(taskTracker, sampleTask.taskId)
 
-    assert(fetchedTask.get.equals(sampleTask.marathonTask),
-           "Tasks are not properly stored")
+    assert(
+      fetchedTask.get.equals(sampleTask.marathonTask),
+      "Tasks are not properly stored")
   }
 
   test("List") {
@@ -255,8 +256,9 @@ class TaskTrackerImplTest
       .failed
       .futureValue
     assert(failure.getCause != null)
-    assert(failure.getCause.getMessage.contains("does not exist"),
-           s"message: ${failure.getMessage}")
+    assert(
+      failure.getCause.getMessage.contains("does not exist"),
+      s"message: ${failure.getMessage}")
   }
 
   test("TASK_FAILED status update will expunge task") {
@@ -348,8 +350,9 @@ class TaskTrackerImplTest
       .statusUpdate(appName3, makeTaskStatus(app3_task3.taskId))
       .futureValue
 
-    assert(state.allIds().futureValue.size == 6,
-           "Incorrect number of tasks in state")
+    assert(
+      state.allIds().futureValue.size == 6,
+      "Incorrect number of tasks in state")
 
     val app1Tasks = taskTracker.appTasksSync(appName1).toSet
 
@@ -522,8 +525,9 @@ class TaskTrackerImplTest
     MarathonTestHelper
       .stagedTaskForApp(appId)
       .withAgentInfo(
-        _.copy(host = "host",
-               attributes = Iterable(TextAttribute("attr1", "bar"))))
+        _.copy(
+          host = "host",
+          attributes = Iterable(TextAttribute("attr1", "bar"))))
       .withNetworking(Task.HostPorts(Iterable(999)))
   }
 
@@ -550,13 +554,15 @@ class TaskTrackerImplTest
 
   def stateShouldNotContainKey(state: PersistentStore, key: Task.Id) {
     val keyWithPrefix = TaskRepository.storePrefix + key.idString
-    assert(!state.allIds().futureValue.toSet.contains(keyWithPrefix),
-           s"Key $keyWithPrefix was found in state")
+    assert(
+      !state.allIds().futureValue.toSet.contains(keyWithPrefix),
+      s"Key $keyWithPrefix was found in state")
   }
 
   def stateShouldContainKey(state: PersistentStore, key: Task.Id) {
     val keyWithPrefix = TaskRepository.storePrefix + key.idString
-    assert(state.allIds().futureValue.toSet.contains(keyWithPrefix),
-           s"Key $keyWithPrefix was not found in state")
+    assert(
+      state.allIds().futureValue.toSet.contains(keyWithPrefix),
+      s"Key $keyWithPrefix was not found in state")
   }
 }

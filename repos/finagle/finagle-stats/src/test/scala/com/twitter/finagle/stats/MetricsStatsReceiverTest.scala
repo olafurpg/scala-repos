@@ -106,12 +106,13 @@ private[twitter] object MetricsStatsReceiverTest {
     tid <- arbitrary[Long]
     sid <- arbitrary[Long]
   } yield {
-    events.Event(CounterIncr,
-                 Time.now,
-                 longVal = value,
-                 objectVal = name,
-                 traceIdVal = tid,
-                 spanIdVal = sid)
+    events.Event(
+      CounterIncr,
+      Time.now,
+      longVal = value,
+      objectVal = name,
+      traceIdVal = tid,
+      spanIdVal = sid)
   }
 
   val genStatAdd = for {
@@ -120,11 +121,12 @@ private[twitter] object MetricsStatsReceiverTest {
     tid <- arbitrary[Long]
     sid <- arbitrary[Long]
   } yield {
-    events.Event(StatAdd,
-                 Time.now,
-                 longVal = delta,
-                 objectVal = name,
-                 traceIdVal = tid,
-                 spanIdVal = sid)
+    events.Event(
+      StatAdd,
+      Time.now,
+      longVal = delta,
+      objectVal = name,
+      traceIdVal = tid,
+      spanIdVal = sid)
   }
 }

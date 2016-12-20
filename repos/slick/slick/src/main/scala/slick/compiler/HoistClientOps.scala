@@ -37,10 +37,12 @@ class HoistClientOps extends Phase {
             }
             .toMap
           val bind2 = rewriteDBSide(
-            Bind(s2,
-                 from2,
-                 Pure(StructNode(ConstArray.from(newDefsM.map(_.swap))),
-                      new AnonTypeSymbol)).infer())
+            Bind(
+              s2,
+              from2,
+              Pure(
+                StructNode(ConstArray.from(newDefsM.map(_.swap))),
+                new AnonTypeSymbol)).infer())
           val rsm2 = rsm
             .copy(from = bind2, map = rsm.map.replace {
               case Select(Ref(s), f) if s == rsm.generator => oldDefsM(f)
@@ -61,8 +63,9 @@ class HoistClientOps extends Phase {
         // Merge nested Binds
         case bind2 @ Bind(s2, from2, sel2 @ Pure(StructNode(elems2), ts2))
             if !from2.isInstanceOf[GroupBy] =>
-          logger.debug("Merging top-level Binds",
-                       Ellipsis(n.copy(from = bind2), List(0, 0)))
+          logger.debug(
+            "Merging top-level Binds",
+            Ellipsis(n.copy(from = bind2), List(0, 0)))
           val defs = elems2.iterator.toMap
           bind2
             .copy(select = sel1.replace {
@@ -70,14 +73,16 @@ class HoistClientOps extends Phase {
             })
             .infer()
         // Hoist operations out of the non-Option sides of inner and left and right outer joins
-        case from2 @ Join(sl1,
-                          sr1,
-                          bl @ Bind(bsl, lfrom, Pure(StructNode(ldefs), tsl)),
-                          br @ Bind(bsr, rfrom, Pure(StructNode(rdefs), tsr)),
-                          jt,
-                          on1) if jt != JoinType.Outer =>
-          logger.debug("Hoisting operations from Join:",
-                       Ellipsis(from2, List(0, 0), List(1, 0)))
+        case from2 @ Join(
+              sl1,
+              sr1,
+              bl @ Bind(bsl, lfrom, Pure(StructNode(ldefs), tsl)),
+              br @ Bind(bsr, rfrom, Pure(StructNode(rdefs), tsr)),
+              jt,
+              on1) if jt != JoinType.Outer =>
+          logger.debug(
+            "Hoisting operations from Join:",
+            Ellipsis(from2, List(0, 0), List(1, 0)))
           val (bl2: Bind, lrepl: Map[TermSymbol, (Node => Node, AnonSymbol)]) =
             if (jt != JoinType.Right) {
               val hoisted = ldefs.map {
@@ -182,8 +187,9 @@ class HoistClientOps extends Phase {
           val res = Bind(s1, CollectionCast(bfrom1, cons2), sel1.replace {
             case Ref(s) if s == s1 => Ref(s)
           }).infer()
-          logger.debug("Pulled Bind out of CollectionCast",
-                       Ellipsis(res, List(0, 0)))
+          logger.debug(
+            "Pulled Bind out of CollectionCast",
+            Ellipsis(res, List(0, 0)))
           res
         case from2 =>
           if (from2 eq from1) n else n.copy(child = from2) :@ n.nodeType
@@ -193,8 +199,9 @@ class HoistClientOps extends Phase {
       shuffle(from1) match {
         case from2 @ Bind(bs1, bfrom1, sel1 @ Pure(StructNode(elems1), ts1))
             if !bfrom1.isInstanceOf[GroupBy] =>
-          logger.debug("Pulling Bind out of Filter",
-                       Ellipsis(n.copy(from = from2), List(0, 0)))
+          logger.debug(
+            "Pulling Bind out of Filter",
+            Ellipsis(n.copy(from = from2), List(0, 0)))
           val s3 = new AnonSymbol
           val defs = elems1.iterator.toMap
           val res = Bind(bs1, Filter(s3, bfrom1, pred1.replace {
@@ -224,18 +231,20 @@ class HoistClientOps extends Phase {
         OptionApply(recTr(sym))
       })
     case IfThenElse(
-          ConstArray(Library.==(ch, LiteralNode(null)),
-                     r1 @ LiteralNode(None),
-                     r2 @ LiteralNode(Some(1)))) :@ OptionType(t)
+          ConstArray(
+            Library.==(ch, LiteralNode(null)),
+            r1 @ LiteralNode(None),
+            r2 @ LiteralNode(Some(1)))) :@ OptionType(t)
         if t == ScalaBaseType.optionDiscType =>
       val (recCh, recTr) = unwrap(ch, topLevel)
       if (topLevel) (recCh, recTr)
       else
         (recCh, { n =>
           IfThenElse(
-            ConstArray(Library.==.typed[Boolean](recTr(n), LiteralNode(null)),
-                       r1,
-                       r2))
+            ConstArray(
+              Library.==.typed[Boolean](recTr(n), LiteralNode(null)),
+              r1,
+              r2))
         })
     case Library.SilentCast(ch) :@ tpe if !topLevel =>
       val (recCh, recTr) = unwrap(ch, topLevel)

@@ -29,9 +29,10 @@ package scalaguide.forms.scalaforms {
 
     val conf = Configuration.reference
     implicit val messages: Messages =
-      new DefaultMessagesApi(Environment.simple(),
-                             conf,
-                             new DefaultLangs(conf)).preferred(Seq.empty)
+      new DefaultMessagesApi(
+        Environment.simple(),
+        conf,
+        new DefaultLangs(conf)).preferred(Seq.empty)
 
     "A scala forms" should {
 
@@ -245,14 +246,14 @@ package scalaguide.forms.scalaforms {
 
       // #form-bodyparser-errors
       val userPostWithErrors = Action(
-        parse.form(userForm,
-                   onErrors = (formWithErrors: Form[UserData]) =>
-                     BadRequest(views.html.user(formWithErrors)))) {
-        implicit request =>
-          val userData = request.body
-          val newUser = models.User(userData.name, userData.age)
-          val id = models.User.create(newUser)
-          Redirect(routes.Application.home(id))
+        parse.form(
+          userForm,
+          onErrors = (formWithErrors: Form[UserData]) =>
+            BadRequest(views.html.user(formWithErrors)))) { implicit request =>
+        val userData = request.body
+        val newUser = models.User(userData.name, userData.age)
+        val id = models.User.create(newUser)
+        Redirect(routes.Application.home(id))
       }
       // #form-bodyparser-errors
 
@@ -364,9 +365,10 @@ package scalaguide.forms.scalaforms {
       //#userForm-nested
 
       val userFormNestedCity = {
-        val anyData = Map("name" -> "bob@gmail.com",
-                          "address.street" -> "Century Road.",
-                          "address.city" -> "Shanghai")
+        val anyData = Map(
+          "name" -> "bob@gmail.com",
+          "address.street" -> "Century Road.",
+          "address.city" -> "Shanghai")
         val user = userFormNested.bind(anyData).get
         user.address.city
       }
@@ -381,9 +383,10 @@ package scalaguide.forms.scalaforms {
       //#userForm-repeated
 
       val userFormRepeatedEmails = {
-        val anyData = Map("name" -> "bob",
-                          "emails[0]" -> "benewu@gmail.com",
-                          "emails[1]" -> "bob@gmail.com")
+        val anyData = Map(
+          "name" -> "bob",
+          "emails[0]" -> "benewu@gmail.com",
+          "emails[1]" -> "bob@gmail.com")
         val user = userFormRepeated.bind(anyData).get
 
         user.emails
@@ -454,9 +457,9 @@ package scalaguide.forms.scalaforms {
               "label" -> nonEmptyText,
               "email" -> optional(email),
               "phones" -> list(
-                text verifying pattern("""[0-9.+]+""".r,
-                                       error =
-                                         "A valid phone number is required")
+                text verifying pattern(
+                  """[0-9.+]+""".r,
+                  error = "A valid phone number is required")
               )
             )(ContactInformation.apply)(ContactInformation.unapply)
           )

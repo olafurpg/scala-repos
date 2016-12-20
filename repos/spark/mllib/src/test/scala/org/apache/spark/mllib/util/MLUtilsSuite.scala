@@ -56,30 +56,36 @@ class MLUtilsSuite extends SparkFunSuite with MLlibTestSparkContext {
       val squaredDist = breezeSquaredDistance(v1.toBreeze, v2.toBreeze)
       val fastSquaredDist1 =
         fastSquaredDistance(v1, norm1, v2, norm2, precision)
-      assert((fastSquaredDist1 - squaredDist) <= precision * squaredDist,
-             s"failed with m = $m")
-      val fastSquaredDist2 = fastSquaredDistance(v1,
-                                                 norm1,
-                                                 Vectors.dense(v2.toArray),
-                                                 norm2,
-                                                 precision)
-      assert((fastSquaredDist2 - squaredDist) <= precision * squaredDist,
-             s"failed with m = $m")
+      assert(
+        (fastSquaredDist1 - squaredDist) <= precision * squaredDist,
+        s"failed with m = $m")
+      val fastSquaredDist2 = fastSquaredDistance(
+        v1,
+        norm1,
+        Vectors.dense(v2.toArray),
+        norm2,
+        precision)
+      assert(
+        (fastSquaredDist2 - squaredDist) <= precision * squaredDist,
+        s"failed with m = $m")
       val squaredDist2 = breezeSquaredDistance(v2.toBreeze, v3.toBreeze)
       val fastSquaredDist3 =
         fastSquaredDistance(v2, norm2, v3, norm3, precision)
-      assert((fastSquaredDist3 - squaredDist2) <= precision * squaredDist2,
-             s"failed with m = $m")
+      assert(
+        (fastSquaredDist3 - squaredDist2) <= precision * squaredDist2,
+        s"failed with m = $m")
       if (m > 10) {
-        val v4 = Vectors.sparse(n,
-                                indices.slice(0, m - 10),
-                                indices.map(i => a(i) + 0.5).slice(0, m - 10))
+        val v4 = Vectors.sparse(
+          n,
+          indices.slice(0, m - 10),
+          indices.map(i => a(i) + 0.5).slice(0, m - 10))
         val norm4 = Vectors.norm(v4, 2.0)
         val squaredDist = breezeSquaredDistance(v2.toBreeze, v4.toBreeze)
         val fastSquaredDist =
           fastSquaredDistance(v2, norm2, v4, norm4, precision)
-        assert((fastSquaredDist - squaredDist) <= precision * squaredDist,
-               s"failed with m = $m")
+        assert(
+          (fastSquaredDist - squaredDist) <= precision * squaredDist,
+          s"failed with m = $m")
       }
     }
   }
@@ -234,12 +240,13 @@ class MLUtilsSuite extends SparkFunSuite with MLlibTestSparkContext {
   }
 
   test("loadVectors") {
-    val vectors = sc.parallelize(Seq(
-                                   Vectors.dense(1.0, 2.0),
-                                   Vectors.sparse(2, Array(1), Array(-1.0)),
-                                   Vectors.dense(0.0, 1.0)
-                                 ),
-                                 2)
+    val vectors = sc.parallelize(
+      Seq(
+        Vectors.dense(1.0, 2.0),
+        Vectors.sparse(2, Array(1), Array(-1.0)),
+        Vectors.dense(0.0, 1.0)
+      ),
+      2)
     val tempDir = Utils.createTempDir()
     val outputDir = new File(tempDir, "vectors")
     val path = outputDir.toURI.toString

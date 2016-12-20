@@ -23,13 +23,14 @@ trait RepositorySearchService { self: IssuesService =>
       implicit session: Session): List[IssueSearchResult] =
     searchIssuesByKeyword(owner, repository, query).map {
       case (issue, commentCount, content) =>
-        IssueSearchResult(issue.issueId,
-                          issue.isPullRequest,
-                          issue.title,
-                          issue.openedUserName,
-                          issue.registeredDate,
-                          commentCount,
-                          getHighlightText(content, query)._1)
+        IssueSearchResult(
+          issue.issueId,
+          issue.isPullRequest,
+          issue.title,
+          issue.openedUserName,
+          issue.registeredDate,
+          commentCount,
+          getHighlightText(content, query)._1)
     }
 
   def countFiles(owner: String, repository: String, query: String): Int =
@@ -51,10 +52,11 @@ trait RepositorySearchService { self: IssuesService =>
         files.map {
           case (path, text) =>
             val (highlightText, lineNumber) = getHighlightText(text, query)
-            FileSearchResult(path,
-                             commits(path).getCommitterIdent.getWhen,
-                             highlightText,
-                             lineNumber)
+            FileSearchResult(
+              path,
+              commits(path).getCommitterIdent.getWhen,
+              highlightText,
+              lineNumber)
         }
       }
     }

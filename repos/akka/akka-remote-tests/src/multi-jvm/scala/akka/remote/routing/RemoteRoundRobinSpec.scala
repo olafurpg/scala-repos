@@ -108,9 +108,10 @@ class RemoteRoundRobinSpec
           messages = connectionCount * iterationCount) {
           case ref: ActorRef ⇒ ref.path.address
         }).foldLeft(
-          Map(node(first).address -> 0,
-              node(second).address -> 0,
-              node(third).address -> 0)) {
+          Map(
+            node(first).address -> 0,
+            node(second).address -> 0,
+            node(third).address -> 0)) {
           case (replyMap, address) ⇒
             replyMap + (address -> (replyMap(address) + 1))
         }
@@ -142,10 +143,10 @@ class RemoteRoundRobinSpec
       runOn(fourth) {
         enterBarrier("start")
         val actor =
-          system.actorOf(RoundRobinPool(nrOfInstances = 1,
-                                        resizer = Some(new TestResizer))
-                           .props(Props[SomeActor]),
-                         "service-hello2")
+          system.actorOf(
+            RoundRobinPool(nrOfInstances = 1, resizer = Some(new TestResizer))
+              .props(Props[SomeActor]),
+            "service-hello2")
         actor.isInstanceOf[RoutedActorRef] should ===(true)
 
         actor ! GetRoutees
@@ -206,9 +207,10 @@ class RemoteRoundRobinSpec
           messages = connectionCount * iterationCount) {
           case ref: ActorRef ⇒ ref.path.address
         }).foldLeft(
-          Map(node(first).address -> 0,
-              node(second).address -> 0,
-              node(third).address -> 0)) {
+          Map(
+            node(first).address -> 0,
+            node(second).address -> 0,
+            node(third).address -> 0)) {
           case (replyMap, address) ⇒
             replyMap + (address -> (replyMap(address) + 1))
         }

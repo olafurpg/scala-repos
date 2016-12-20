@@ -23,8 +23,9 @@ case class ParseError(position: Position,
                       principalPosition: Position,
                       traces: immutable.Seq[RuleTrace])
     extends RuntimeException {
-  require(principalPosition.index >= position.index,
-          "principalPosition must be > position")
+  require(
+    principalPosition.index >= position.index,
+    "principalPosition must be > position")
   def format(parser: Parser): String = format(parser.input)
   def format(parser: Parser, formatter: ErrorFormatter): String =
     format(parser.input, formatter)

@@ -47,9 +47,10 @@ class Finagle6APITest extends FunSuite with BeforeAndAfter {
       ZooKeeperClient.digestCredentials("user", "pass"))
 
     // create serverset
-    val serverSet = ServerSets.create(zookeeperClient,
-                                      ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
-                                      zkPath)
+    val serverSet = ServerSets.create(
+      zookeeperClient,
+      ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
+      zkPath)
     zkServerSetCluster = new ZookeeperServerSetCluster(serverSet)
 
     // start five memcached server and join the cluster

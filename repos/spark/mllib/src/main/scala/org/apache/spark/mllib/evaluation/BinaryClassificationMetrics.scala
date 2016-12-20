@@ -143,8 +143,9 @@ class BinaryClassificationMetrics @Since("1.3.0")(
   @Since("1.0.0")
   def recallByThreshold(): RDD[(Double, Double)] = createCurve(Recall)
 
-  private lazy val (cumulativeCounts: RDD[(Double, BinaryLabelCounter)],
-                    confusions: RDD[(Double, BinaryConfusionMatrix)]) = {
+  private lazy val (
+    cumulativeCounts: RDD[(Double, BinaryLabelCounter)],
+    confusions: RDD[(Double, BinaryConfusionMatrix)]) = {
     // Create a bin for each distinct score value, count positives and negatives within each bin,
     // and then sort by score values in descending order.
     val counts = scoreAndLabels

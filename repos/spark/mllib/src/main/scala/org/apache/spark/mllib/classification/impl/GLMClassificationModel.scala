@@ -81,11 +81,13 @@ private[classification] object GLMClassificationModel {
       val dataRDD = sqlContext.read.parquet(datapath)
       val dataArray =
         dataRDD.select("weights", "intercept", "threshold").take(1)
-      assert(dataArray.length == 1,
-             s"Unable to load $modelClass data from: $datapath")
+      assert(
+        dataArray.length == 1,
+        s"Unable to load $modelClass data from: $datapath")
       val data = dataArray(0)
-      assert(data.size == 3,
-             s"Unable to load $modelClass data from: $datapath")
+      assert(
+        data.size == 3,
+        s"Unable to load $modelClass data from: $datapath")
       val (weights, intercept) = data match {
         case Row(weights: Vector, intercept: Double, _) =>
           (weights, intercept)

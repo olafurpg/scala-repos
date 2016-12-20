@@ -44,18 +44,18 @@ object ClusterSingletonProxySpec {
 
     cluster.registerOnMemberUp {
       system.actorOf(
-        ClusterSingletonManager.props(singletonProps = Props[Singleton],
-                                      terminationMessage = PoisonPill,
-                                      settings =
-                                        ClusterSingletonManagerSettings(system)
-                                          .withRemovalMargin(5.seconds)),
+        ClusterSingletonManager.props(
+          singletonProps = Props[Singleton],
+          terminationMessage = PoisonPill,
+          settings = ClusterSingletonManagerSettings(system)
+            .withRemovalMargin(5.seconds)),
         name = "singletonManager")
     }
 
     val proxy = system.actorOf(
-      ClusterSingletonProxy.props("user/singletonManager",
-                                  settings =
-                                    ClusterSingletonProxySettings(system)),
+      ClusterSingletonProxy.props(
+        "user/singletonManager",
+        settings = ClusterSingletonProxySettings(system)),
       s"singletonProxy-${cluster.selfAddress.port.getOrElse(0)}")
 
     def testProxy(msg: String) {

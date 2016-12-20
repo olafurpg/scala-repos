@@ -50,9 +50,9 @@ import scalaz.effect.IO
 class DataServiceHandler[A](
     platform: Platform[Future, Slice, StreamT[Future, Slice]])(
     implicit M: Monad[Future])
-    extends CustomHttpService[A,
-                              (APIKey,
-                               Path) => Future[HttpResponse[ByteChunk]]]
+    extends CustomHttpService[
+      A,
+      (APIKey, Path) => Future[HttpResponse[ByteChunk]]]
     with Logging {
 
   val service = (request: HttpRequest[A]) =>
@@ -104,43 +104,44 @@ class DataServiceHandler[A](
                         fatal => {
                           logger.error(
                             "Multiple errors encountered serving readResource of path %s: %s"
-                              .format(path.path,
-                                      fatal.messages.list.mkString("[\n",
-                                                                   ",\n",
-                                                                   "]")))
+                              .format(
+                                path.path,
+                                fatal.messages.list
+                                  .mkString("[\n", ",\n", "]")))
                           HttpResponse(InternalServerError)
                         },
                         userError =>
-                          HttpResponse(HttpStatus(
-                                         BadRequest,
-                                         "Multiple errors encountered reading resource at path %s"
-                                           .format(path.path)),
-                                       // although the returned content is actually application/json, the HTTP spec only allows for text/plain to be returned
-                                       // in violation of accept headers, so I think the best thing to do here is lie.
-                                       headers = HttpHeaders(
-                                         `Content-Type`(text / plain)),
-                                       content = Some(
-                                         Left(
-                                           JObject("errors" -> JArray(
-                                             userError.messages.list.map(
-                                               JString(_)): _*)).renderPretty
-                                             .getBytes("UTF-8"))))
+                          HttpResponse(
+                            HttpStatus(
+                              BadRequest,
+                              "Multiple errors encountered reading resource at path %s"
+                                .format(path.path)),
+                            // although the returned content is actually application/json, the HTTP spec only allows for text/plain to be returned
+                            // in violation of accept headers, so I think the best thing to do here is lie.
+                            headers = HttpHeaders(`Content-Type`(text / plain)),
+                            content = Some(
+                              Left(
+                                JObject(
+                                  "errors" -> JArray(userError.messages.list
+                                    .map(JString(_)): _*)).renderPretty
+                                  .getBytes("UTF-8"))))
                       )
                   }
               },
               resource =>
                 resource.byteStream(mimeTypes).run map {
                   case Some((reportedType, byteStream)) =>
-                    HttpResponse(OK,
-                                 headers =
-                                   HttpHeaders(`Content-Type`(reportedType)),
-                                 content = Some(Right(byteStream)))
+                    HttpResponse(
+                      OK,
+                      headers = HttpHeaders(`Content-Type`(reportedType)),
+                      content = Some(Right(byteStream)))
 
                   case None =>
                     HttpResponse(
-                      HttpStatus(HttpStatusCodes.NotFound,
-                                 "Could not locate content for path " +
-                                   path))
+                      HttpStatus(
+                        HttpStatusCodes.NotFound,
+                        "Could not locate content for path " +
+                          path))
               }
             )
           } recover {

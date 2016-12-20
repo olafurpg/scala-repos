@@ -29,10 +29,11 @@ abstract class FirstOrderMinimizer[T, DF <: StochasticDiffFunction[T]](
            relativeTolerance: Boolean = true)(
       implicit space: NormedModule[T, Double]) =
     this(
-      FirstOrderMinimizer.defaultConvergenceCheck[T](maxIter,
-                                                     tolerance,
-                                                     relativeTolerance,
-                                                     fvalMemory))
+      FirstOrderMinimizer.defaultConvergenceCheck[T](
+        maxIter,
+        tolerance,
+        relativeTolerance,
+        fvalMemory))
 
   /**
     * Any history the derived minimization function needs to do its updates. typically an approximation
@@ -61,15 +62,16 @@ abstract class FirstOrderMinimizer[T, DF <: StochasticDiffFunction[T]](
     val history = initialHistory(f, init)
     val (value, grad) = calculateObjective(f, x, history)
     val (adjValue, adjGrad) = adjust(x, grad, value)
-    FirstOrderMinimizer.State(x,
-                              value,
-                              grad,
-                              adjValue,
-                              adjGrad,
-                              0,
-                              adjValue,
-                              history,
-                              convergenceCheck.initialInfo)
+    FirstOrderMinimizer.State(
+      x,
+      value,
+      grad,
+      adjValue,
+      adjGrad,
+      0,
+      adjValue,
+      history,
+      convergenceCheck.initialInfo)
   }
 
   protected def calculateObjective(f: DF,
@@ -99,15 +101,16 @@ abstract class FirstOrderMinimizer[T, DF <: StochasticDiffFunction[T]](
         val newCInfo =
           convergenceCheck.update(x, grad, value, state, state.convergenceInfo)
         failedOnce = false
-        FirstOrderMinimizer.State(x,
-                                  value,
-                                  grad,
-                                  adjValue,
-                                  adjGrad,
-                                  state.iter + 1,
-                                  state.initialAdjVal,
-                                  history,
-                                  newCInfo)
+        FirstOrderMinimizer.State(
+          x,
+          value,
+          grad,
+          adjValue,
+          adjGrad,
+          state.iter + 1,
+          state.initialAdjVal,
+          history,
+          newCInfo)
       } catch {
         case x: FirstOrderException if !failedOnce =>
           failedOnce = true
@@ -319,11 +322,12 @@ object FirstOrderMinimizer {
     import space.normImpl
     ConvergenceCheck.fromPartialFunction[T] {
       case s: State[T, _, _]
-          if (norm(s.adjustedGradient) <= math.max(tolerance *
-                                                     (if (relative)
-                                                        s.adjustedValue
-                                                      else 1.0),
-                                                   1E-8)) =>
+          if (norm(s.adjustedGradient) <= math.max(
+            tolerance *
+              (if (relative)
+                 s.adjustedValue
+               else 1.0),
+            1E-8)) =>
         GradientConverged
     }
   }
@@ -346,10 +350,11 @@ object FirstOrderMinimizer {
                                numFailures: Int = 5,
                                improvementRequirement: Double = 1E-2,
                                evalFrequency: Int = 10): ConvergenceCheck[T] =
-    new MonitorFunctionValuesCheck(f,
-                                   numFailures,
-                                   improvementRequirement,
-                                   evalFrequency)
+    new MonitorFunctionValuesCheck(
+      f,
+      numFailures,
+      improvementRequirement,
+      evalFrequency)
 
   case class MonitorFunctionValuesCheck[T](f: T => Double,
                                            numFailures: Int,
@@ -431,22 +436,25 @@ object FirstOrderMinimizer {
     private implicit val random = new RandBasis(
       new ThreadLocalRandomGenerator(new MersenneTwister(randomSeed)))
 
-    @deprecated("Use breeze.optimize.minimize(f, init, params) instead.",
-                "0.10")
+    @deprecated(
+      "Use breeze.optimize.minimize(f, init, params) instead.",
+      "0.10")
     def minimize[T](f: BatchDiffFunction[T], init: T)(
         implicit space: MutableFiniteCoordinateField[T, _, Double]): T = {
       this.iterations(f, init).last.x
     }
 
-    @deprecated("Use breeze.optimize.minimize(f, init, params) instead.",
-                "0.10")
+    @deprecated(
+      "Use breeze.optimize.minimize(f, init, params) instead.",
+      "0.10")
     def minimize[T](f: DiffFunction[T], init: T)(
         implicit space: MutableEnumeratedCoordinateField[T, _, Double]): T = {
       this.iterations(f, init).last.x
     }
 
-    @deprecated("Use breeze.optimize.iterations(f, init, params) instead.",
-                "0.10")
+    @deprecated(
+      "Use breeze.optimize.iterations(f, init, params) instead.",
+      "0.10")
     def iterations[T](f: BatchDiffFunction[T], init: T)(
         implicit space: MutableFiniteCoordinateField[T, _, Double])
       : Iterator[FirstOrderMinimizer[T, BatchDiffFunction[T]]#State] = {
@@ -461,8 +469,9 @@ object FirstOrderMinimizer {
         FirstOrderMinimizer[T, BatchDiffFunction[T]]#State]]
     }
 
-    @deprecated("Use breeze.optimize.iterations(f, init, params) instead.",
-                "0.10")
+    @deprecated(
+      "Use breeze.optimize.iterations(f, init, params) instead.",
+      "0.10")
     def iterations[T](f: StochasticDiffFunction[T], init: T)(
         implicit space: MutableFiniteCoordinateField[T, _, Double])
       : Iterator[FirstOrderMinimizer[T, StochasticDiffFunction[T]]#State] = {
@@ -482,8 +491,9 @@ object FirstOrderMinimizer {
       r.iterations(f, init)
     }
 
-    @deprecated("Use breeze.optimize.iterations(f, init, params) instead.",
-                "0.10")
+    @deprecated(
+      "Use breeze.optimize.iterations(f, init, params) instead.",
+      "0.10")
     def iterations[T, K](f: DiffFunction[T], init: T)(
         implicit space: MutableEnumeratedCoordinateField[T, K, Double])
       : Iterator[LBFGS[T]#State] = {
@@ -492,8 +502,9 @@ object FirstOrderMinimizer {
           .iterations(f, init)
       else
         (new LBFGS[T](maxIterations, 5, tolerance = tolerance)(space))
-          .iterations(DiffFunction.withL2Regularization(f, regularization),
-                      init)
+          .iterations(
+            DiffFunction.withL2Regularization(f, regularization),
+            init)
     }
   }
 }

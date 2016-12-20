@@ -356,9 +356,10 @@ class ActorRefSpec extends AkkaSpec with DefaultTimeout {
         val in =
           new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray))
         in.readObject should ===(
-          new EmptyLocalActorRef(sysImpl.provider,
-                                 ref.path,
-                                 system.eventStream))
+          new EmptyLocalActorRef(
+            sysImpl.provider,
+            ref.path,
+            system.eventStream))
       }
     }
 

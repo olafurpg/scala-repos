@@ -41,8 +41,9 @@ class ScalaKeywordCompletionContributor extends ScalaCompletionContributor {
       CompletionType.BASIC,
       PlatformPatterns.psiElement.and(
         new FilterPattern(
-          new AndFilter(new NotFilter(new LeftNeighbour(new TextFilter("."))),
-                        filter))),
+          new AndFilter(
+            new NotFilter(new LeftNeighbour(new TextFilter("."))),
+            filter))),
       new CompletionProvider[CompletionParameters] {
         def addCompletions(parameters: CompletionParameters,
                            context: ProcessingContext,
@@ -59,41 +60,44 @@ class ScalaKeywordCompletionContributor extends ScalaCompletionContributor {
 
   private def registerTypeAfterDotCompletion(filter: ElementFilter,
                                              keywords: String*) {
-    extend(CompletionType.BASIC,
-           PlatformPatterns.psiElement.and(
-             new FilterPattern(
-               new AndFilter(new LeftNeighbour(new TextFilter(".")), filter))),
-           new CompletionProvider[CompletionParameters] {
-             def addCompletions(parameters: CompletionParameters,
-                                context: ProcessingContext,
-                                result: CompletionResultSet) {
-               for (keyword <- keywords) {
-                 result.addElement(
-                   LookupElementManager.getKeywrodLookupElement(
-                     keyword,
-                     positionFromParameters(parameters)))
-               }
-             }
-           })
+    extend(
+      CompletionType.BASIC,
+      PlatformPatterns.psiElement.and(
+        new FilterPattern(
+          new AndFilter(new LeftNeighbour(new TextFilter(".")), filter))),
+      new CompletionProvider[CompletionParameters] {
+        def addCompletions(parameters: CompletionParameters,
+                           context: ProcessingContext,
+                           result: CompletionResultSet) {
+          for (keyword <- keywords) {
+            result.addElement(
+              LookupElementManager.getKeywrodLookupElement(
+                keyword,
+                positionFromParameters(parameters)))
+          }
+        }
+      })
   }
 
   registerStandardCompletion(new PackageFilter, "package")
-  registerStandardCompletion(new ExpressionFilter,
-                             "true",
-                             "false",
-                             "null",
-                             "new",
-                             "super",
-                             "this")
-  registerStandardCompletion(new ModifiersFilter,
-                             "private",
-                             "protected",
-                             "override",
-                             "abstract",
-                             "final",
-                             "sealed",
-                             "implicit",
-                             "lazy")
+  registerStandardCompletion(
+    new ExpressionFilter,
+    "true",
+    "false",
+    "null",
+    "new",
+    "super",
+    "this")
+  registerStandardCompletion(
+    new ModifiersFilter,
+    "private",
+    "protected",
+    "override",
+    "abstract",
+    "final",
+    "sealed",
+    "implicit",
+    "lazy")
   registerStandardCompletion(new ImplicitFilter, "implicit")
   registerStandardCompletion(new CaseFilter, "case")
   registerStandardCompletion(new ImportFilter, "import")
@@ -101,14 +105,15 @@ class ScalaKeywordCompletionContributor extends ScalaCompletionContributor {
   registerStandardCompletion(new TraitFilter, "trait")
   registerStandardCompletion(new DefinitionsFilter, "val", "var")
   registerStandardCompletion(new ValueDefinitionFilter, "val")
-  registerStandardCompletion(new StatementFilter,
-                             "for",
-                             "while",
-                             "do",
-                             "try",
-                             "return",
-                             "throw",
-                             "if")
+  registerStandardCompletion(
+    new StatementFilter,
+    "for",
+    "while",
+    "do",
+    "try",
+    "return",
+    "throw",
+    "if")
   registerStandardCompletion(new WhileFilter, "while")
   registerStandardCompletion(new CatchFilter, "catch")
   registerStandardCompletion(new FinallyFilter, "finally")

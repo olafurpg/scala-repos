@@ -78,9 +78,10 @@ class StaticMemoryManagerSuite extends MemoryManagerSuite {
       mm.acquireExecutionMemory(1L, taskAttemptId, MemoryMode.ON_HEAP) === 1L)
     assert(mm.executionMemoryUsed === 201L)
     // Release beyond what was acquired
-    mm.releaseExecutionMemory(maxExecutionMem,
-                              taskAttemptId,
-                              MemoryMode.ON_HEAP)
+    mm.releaseExecutionMemory(
+      maxExecutionMem,
+      taskAttemptId,
+      MemoryMode.ON_HEAP)
     assert(mm.executionMemoryUsed === 0L)
   }
 

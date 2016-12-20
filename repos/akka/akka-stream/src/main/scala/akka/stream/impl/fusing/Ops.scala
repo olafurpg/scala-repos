@@ -867,11 +867,12 @@ private[akka] final case class Log[T](name: String,
         case Logging.ErrorLevel ⇒
           log.error(cause, "[{}] Upstream failed.", name)
         case level ⇒
-          log.log(level,
-                  "[{}] Upstream failed, cause: {}: {}",
-                  name,
-                  Logging.simpleName(cause.getClass),
-                  cause.getMessage)
+          log.log(
+            level,
+            "[{}] Upstream failed, cause: {}: {}",
+            name,
+            Logging.simpleName(cause.getClass),
+            cause.getMessage)
       }
 
     super.onUpstreamFailure(cause, ctx)

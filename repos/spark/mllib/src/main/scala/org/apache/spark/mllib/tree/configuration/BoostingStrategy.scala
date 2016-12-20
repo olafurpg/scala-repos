@@ -63,8 +63,9 @@ case class BoostingStrategy @Since("1.4.0")(
   private[spark] def assertValid(): Unit = {
     treeStrategy.algo match {
       case Classification =>
-        require(treeStrategy.numClasses == 2,
-                "Only binary classification is supported for boosting.")
+        require(
+          treeStrategy.numClasses == 2,
+          "Only binary classification is supported for boosting.")
       case Regression =>
       // nothing
       case _ =>

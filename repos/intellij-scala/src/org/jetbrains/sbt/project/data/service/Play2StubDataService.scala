@@ -20,10 +20,11 @@ class Play2StubDataService
                               project: Project,
                               modelsProvider: IdeModifiableModelsProvider)
     : Importer[Play2ProjectData] =
-    new AbstractImporter[Play2ProjectData](toImport,
-                                           projectData,
-                                           project,
-                                           modelsProvider) {
+    new AbstractImporter[Play2ProjectData](
+      toImport,
+      projectData,
+      project,
+      modelsProvider) {
       override def importData(): Unit = {}
     }
 }

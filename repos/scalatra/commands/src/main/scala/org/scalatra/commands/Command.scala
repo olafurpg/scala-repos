@@ -153,9 +153,10 @@ trait Command extends BindingSyntax with ParamsValueReaderProperties {
           case ValueSource.Header =>
             val tc: TypeConverter[String, _] = tcf.resolveStringParams
             val headersBinding =
-              Binding(b.field,
-                      tc.asInstanceOf[TypeConverter[String, b.T]],
-                      tcf)(manifest[String], b.valueManifest)
+              Binding(
+                b.field,
+                tc.asInstanceOf[TypeConverter[String, b.T]],
+                tcf)(manifest[String], b.valueManifest)
             headersBinding(
               Right(headers.get(name).map(_.asInstanceOf[headersBinding.S])))
           case ValueSource.Path | ValueSource.Query =>

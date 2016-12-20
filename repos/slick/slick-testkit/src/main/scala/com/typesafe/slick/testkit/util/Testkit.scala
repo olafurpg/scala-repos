@@ -52,10 +52,11 @@ class Testkit(clazz: Class[_ <: ProfileTest], runnerBuilder: RunnerBuilder)
         }
         ms.map { m =>
           val tname = m.getName + '[' + tdb.confName + ']'
-          new TestMethod(tname,
-                         Description.createTestDescription(t, tname),
-                         m,
-                         t)
+          new TestMethod(
+            tname,
+            Description.createTestDescription(t, tname),
+            m,
+            t)
         }
       }
     } else Nil
@@ -260,30 +261,33 @@ abstract class AsyncTest[TDB >: Null <: TestDB](
 
   /** Test Action: Get the current database session */
   object GetSession
-      extends SynchronousDatabaseAction[TDB#Profile#Backend#Session,
-                                        NoStream,
-                                        TDB#Profile#Backend,
-                                        Effect] {
+      extends SynchronousDatabaseAction[
+        TDB#Profile#Backend#Session,
+        NoStream,
+        TDB#Profile#Backend,
+        Effect] {
     def run(context: TDB#Profile#Backend#Context) = context.session
     def getDumpInfo = DumpInfo(name = "<GetSession>")
   }
 
   /** Test Action: Check if the current database session is pinned */
   object IsPinned
-      extends SynchronousDatabaseAction[Boolean,
-                                        NoStream,
-                                        TDB#Profile#Backend,
-                                        Effect] {
+      extends SynchronousDatabaseAction[
+        Boolean,
+        NoStream,
+        TDB#Profile#Backend,
+        Effect] {
     def run(context: TDB#Profile#Backend#Context) = context.isPinned
     def getDumpInfo = DumpInfo(name = "<IsPinned>")
   }
 
   /** Test Action: Get the current transactionality level and autoCommit flag */
   object GetTransactionality
-      extends SynchronousDatabaseAction[(Int, Boolean),
-                                        NoStream,
-                                        JdbcBackend,
-                                        Effect] {
+      extends SynchronousDatabaseAction[
+        (Int, Boolean),
+        NoStream,
+        JdbcBackend,
+        Effect] {
     def run(context: JdbcBackend#Context) =
       context.session.asInstanceOf[JdbcBackend#BaseSession].getTransactionality
     def getDumpInfo = DumpInfo(name = "<GetTransactionality>")
@@ -291,17 +295,19 @@ abstract class AsyncTest[TDB >: Null <: TestDB](
 
   /** Test Action: Get the current statement parameters, except for `statementInit` which is always set to null */
   object GetStatementParameters
-      extends SynchronousDatabaseAction[JdbcBackend.StatementParameters,
-                                        NoStream,
-                                        JdbcBackend,
-                                        Effect] {
+      extends SynchronousDatabaseAction[
+        JdbcBackend.StatementParameters,
+        NoStream,
+        JdbcBackend,
+        Effect] {
     def run(context: JdbcBackend#Context) = {
       val s = context.session
-      JdbcBackend.StatementParameters(s.resultSetType,
-                                      s.resultSetConcurrency,
-                                      s.resultSetHoldability,
-                                      null,
-                                      s.fetchSize)
+      JdbcBackend.StatementParameters(
+        s.resultSetType,
+        s.resultSetConcurrency,
+        s.resultSetHoldability,
+        null,
+        s.fetchSize)
     }
     def getDumpInfo = DumpInfo(name = "<GetStatementParameters>")
   }
@@ -369,11 +375,12 @@ abstract class AsyncTest[TDB >: Null <: TestDB](
                              delay: Duration = Duration(
                                100L,
                                TimeUnit.MILLISECONDS)): Future[Vector[R]] = {
-    val exe = new ThreadPoolExecutor(1,
-                                     1,
-                                     1L,
-                                     TimeUnit.SECONDS,
-                                     new LinkedBlockingQueue[Runnable]())
+    val exe = new ThreadPoolExecutor(
+      1,
+      1,
+      1L,
+      TimeUnit.SECONDS,
+      new LinkedBlockingQueue[Runnable]())
     val ec = ExecutionContext.fromExecutor(exe)
     val builder = Vector.newBuilder[R]
     val pr = Promise[Vector[R]]()

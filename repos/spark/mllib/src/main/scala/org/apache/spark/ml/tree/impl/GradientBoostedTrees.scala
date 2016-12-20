@@ -53,10 +53,11 @@ private[ml] object GradientBoostedTrees extends Logging {
         // Map labels to -1, +1 so binary classification can be treated as regression.
         val remappedInput =
           input.map(x => new LabeledPoint((x.label * 2) - 1, x.features))
-        GradientBoostedTrees.boost(remappedInput,
-                                   remappedInput,
-                                   boostingStrategy,
-                                   validate = false)
+        GradientBoostedTrees.boost(
+          remappedInput,
+          remappedInput,
+          boostingStrategy,
+          validate = false)
       case _ =>
         throw new IllegalArgumentException(
           s"$algo is not supported by gradient boosting.")
@@ -90,10 +91,11 @@ private[ml] object GradientBoostedTrees extends Logging {
           input.map(x => new LabeledPoint((x.label * 2) - 1, x.features))
         val remappedValidationInput = validationInput.map(x =>
           new LabeledPoint((x.label * 2) - 1, x.features))
-        GradientBoostedTrees.boost(remappedInput,
-                                   remappedValidationInput,
-                                   boostingStrategy,
-                                   validate = true)
+        GradientBoostedTrees.boost(
+          remappedInput,
+          remappedValidationInput,
+          boostingStrategy,
+          validate = true)
       case _ =>
         throw new IllegalArgumentException(
           s"$algo is not supported by the gradient boosting.")
@@ -230,10 +232,11 @@ private[ml] object GradientBoostedTrees extends Logging {
     timer.stop("building tree 0")
 
     var validatePredError: RDD[(Double, Double)] =
-      computeInitialPredictionAndError(validationInput,
-                                       firstTreeWeight,
-                                       firstTreeModel,
-                                       loss)
+      computeInitialPredictionAndError(
+        validationInput,
+        firstTreeWeight,
+        firstTreeModel,
+        loss)
     if (validate) validatePredErrorCheckpointer.update(validatePredError)
     var bestValidateError =
       if (validate) validatePredError.values.mean() else 0.0
@@ -262,11 +265,12 @@ private[ml] object GradientBoostedTrees extends Logging {
       //       However, the behavior should be reasonable, though not optimal.
       baseLearnerWeights(m) = learningRate
 
-      predError = updatePredictionError(input,
-                                        predError,
-                                        baseLearnerWeights(m),
-                                        baseLearners(m),
-                                        loss)
+      predError = updatePredictionError(
+        input,
+        predError,
+        baseLearnerWeights(m),
+        baseLearners(m),
+        loss)
       predErrorCheckpointer.update(predError)
       logDebug("error of gbt = " + predError.values.mean())
 
@@ -276,11 +280,12 @@ private[ml] object GradientBoostedTrees extends Logging {
         // 2. If the error increases, that is if the model is overfit.
         // We want the model returned corresponding to the best validation error.
 
-        validatePredError = updatePredictionError(validationInput,
-                                                  validatePredError,
-                                                  baseLearnerWeights(m),
-                                                  baseLearners(m),
-                                                  loss)
+        validatePredError = updatePredictionError(
+          validationInput,
+          validatePredError,
+          baseLearnerWeights(m),
+          baseLearners(m),
+          loss)
         validatePredErrorCheckpointer.update(validatePredError)
         val currentValidateError = validatePredError.values.mean()
         if (bestValidateError - currentValidateError < validationTol * Math

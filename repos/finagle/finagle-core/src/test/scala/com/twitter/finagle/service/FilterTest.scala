@@ -51,8 +51,10 @@ class FilterTest extends FunSuite {
     }
 
     assert(
-      Try(Await.result(intToString.andThen(exceptionThrowingService)("1"),
-                       1.second)) == Throw(e))
+      Try(
+        Await.result(
+          intToString.andThen(exceptionThrowingService)("1"),
+          1.second)) == Throw(e))
   }
 
   test(
@@ -69,10 +71,9 @@ class FilterTest extends FunSuite {
     }
 
     assert(
-      Try(
-        Await.result(stringToInt.andThen(
-                       intToString.andThen(exceptionThrowingService))(1),
-                     1.second)) == Throw(e))
+      Try(Await.result(
+        stringToInt.andThen(intToString.andThen(exceptionThrowingService))(1),
+        1.second)) == Throw(e))
     assert(
       Try(Await.result(
         stringToInt.andThen(intToString).andThen(exceptionThrowingService)(1),

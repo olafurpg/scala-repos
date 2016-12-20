@@ -28,9 +28,10 @@ private[akka] class EventStreamUnsubscriber(eventStream: EventStream,
   override def preStart() {
     if (debug)
       eventStream.publish(
-        Logging.Debug(simpleName(getClass),
-                      getClass,
-                      s"registering unsubscriber with $eventStream"))
+        Logging.Debug(
+          simpleName(getClass),
+          getClass,
+          s"registering unsubscriber with $eventStream"))
     eventStream initUnsubscriber self
   }
 
@@ -52,9 +53,10 @@ private[akka] class EventStreamUnsubscriber(eventStream: EventStream,
     case UnregisterIfNoMoreSubscribedChannels(actor) ⇒
       if (debug)
         eventStream.publish(
-          Logging.Debug(simpleName(getClass),
-                        getClass,
-                        s"unwatching $actor, since has no subscriptions"))
+          Logging.Debug(
+            simpleName(getClass),
+            getClass,
+            s"unwatching $actor, since has no subscriptions"))
       context unwatch actor
 
     case Terminated(actor) ⇒
@@ -123,9 +125,10 @@ private[akka] class ActorClassificationUnsubscriber(
     case Register(actor, seq) if seq == nextSeq ⇒
       if (debug)
         context.system.eventStream.publish(
-          Logging.Debug(simpleName(getClass),
-                        getClass,
-                        s"registered watch for $actor in $bus"))
+          Logging.Debug(
+            simpleName(getClass),
+            getClass,
+            s"registered watch for $actor in $bus"))
       context watch actor
       atSeq = nextSeq
       unstashAll()
@@ -136,9 +139,10 @@ private[akka] class ActorClassificationUnsubscriber(
     case Unregister(actor, seq) if seq == nextSeq ⇒
       if (debug)
         context.system.eventStream.publish(
-          Logging.Debug(simpleName(getClass),
-                        getClass,
-                        s"unregistered watch of $actor in $bus"))
+          Logging.Debug(
+            simpleName(getClass),
+            getClass,
+            s"unregistered watch of $actor in $bus"))
       context unwatch actor
       atSeq = nextSeq
       unstashAll()
@@ -178,9 +182,10 @@ private[akka] object ActorClassificationUnsubscriber {
       system.settings.config.getBoolean("akka.actor.debug.event-stream")
     system
       .asInstanceOf[ExtendedActorSystem]
-      .systemActorOf(props(bus, debug),
-                     "actorClassificationUnsubscriber-" +
-                       unsubscribersCount.incrementAndGet())
+      .systemActorOf(
+        props(bus, debug),
+        "actorClassificationUnsubscriber-" +
+          unsubscribersCount.incrementAndGet())
   }
 
   private def props(eventBus: ManagedActorClassification, debug: Boolean) =

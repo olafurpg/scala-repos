@@ -347,10 +347,11 @@ trait RestHelper extends LiftRules.DispatchPF {
                 Full(cvt((selType, resp, r)))
               else
                 emptyToResp(
-                  ParamFailure("Unabled to convert the message",
-                               Empty,
-                               Empty,
-                               500))
+                  ParamFailure(
+                    "Unabled to convert the message",
+                    Empty,
+                    Empty,
+                    500))
 
             case e: EmptyBox => emptyToResp(e)
           }

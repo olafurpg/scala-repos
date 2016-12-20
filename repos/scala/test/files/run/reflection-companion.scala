@@ -12,7 +12,8 @@ object Test extends App {
   println(showRaw(symbolOf[C.type].companion, printKinds = true))
   println(showRaw(symbolOf[T].companion, printKinds = true))
   println(
-    showRaw(cm.staticPackage("scala").moduleClass.companion,
-            printKinds = true))
+    showRaw(
+      cm.staticPackage("scala").moduleClass.companion,
+      printKinds = true))
   println(showRaw(cm.staticPackage("scala").companion, printKinds = true))
 }

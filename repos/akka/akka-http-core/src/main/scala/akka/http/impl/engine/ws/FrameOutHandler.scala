@@ -57,8 +57,9 @@ private[http] class FrameOutHandler(serverSide: Boolean,
           log.error(e, s"WebSocket handler failed with ${e.getMessage}")
           become(new WaitingForPeerCloseFrame())
           ctx.push(
-            FrameEvent.closeFrame(Protocol.CloseCodes.UnexpectedCondition,
-                                  "internal error"))
+            FrameEvent.closeFrame(
+              Protocol.CloseCodes.UnexpectedCondition,
+              "internal error"))
         case Tick ⇒ ctx.pull() // ignore
       }
 

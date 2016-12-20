@@ -93,27 +93,30 @@ object MovedPermanently {
   def apply(location: String,
             headers: Map[String, String] = Map.empty,
             reason: String = "") =
-    ActionResult(responseStatus(301, reason),
-                 Unit,
-                 Map("Location" -> location) ++ headers)
+    ActionResult(
+      responseStatus(301, reason),
+      Unit,
+      Map("Location" -> location) ++ headers)
 }
 
 object Found {
   def apply(location: String,
             headers: Map[String, String] = Map.empty,
             reason: String = "") =
-    ActionResult(responseStatus(302, reason),
-                 Unit,
-                 Map("Location" -> location) ++ headers)
+    ActionResult(
+      responseStatus(302, reason),
+      Unit,
+      Map("Location" -> location) ++ headers)
 }
 
 object SeeOther {
   def apply(location: String,
             headers: Map[String, String] = Map.empty,
             reason: String = "") =
-    ActionResult(responseStatus(303, reason),
-                 Unit,
-                 Map("Location" -> location) ++ headers)
+    ActionResult(
+      responseStatus(303, reason),
+      Unit,
+      Map("Location" -> location) ++ headers)
 }
 
 object NotModified {
@@ -125,27 +128,30 @@ object UseProxy {
   def apply(location: String,
             headers: Map[String, String] = Map.empty,
             reason: String = "") =
-    ActionResult(responseStatus(305, reason),
-                 Unit,
-                 Map("Location" -> location) ++ headers)
+    ActionResult(
+      responseStatus(305, reason),
+      Unit,
+      Map("Location" -> location) ++ headers)
 }
 
 object TemporaryRedirect {
   def apply(location: String,
             headers: Map[String, String] = Map.empty,
             reason: String = "") =
-    ActionResult(responseStatus(307, reason),
-                 Unit,
-                 Map("Location" -> location) ++ headers)
+    ActionResult(
+      responseStatus(307, reason),
+      Unit,
+      Map("Location" -> location) ++ headers)
 }
 
 object PermanentRedirect {
   def apply(location: String,
             headers: Map[String, String] = Map.empty,
             reason: String = "") =
-    ActionResult(responseStatus(308, reason),
-                 Unit,
-                 Map("Location" -> location) ++ headers)
+    ActionResult(
+      responseStatus(308, reason),
+      Unit,
+      Map("Location" -> location) ++ headers)
 }
 
 object BadRequest {

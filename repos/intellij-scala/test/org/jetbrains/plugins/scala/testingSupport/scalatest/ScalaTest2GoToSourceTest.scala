@@ -6,20 +6,23 @@ package org.jetbrains.plugins.scala.testingSupport.scalatest
   */
 trait ScalaTest2GoToSourceTest extends ScalaTestGoToSourceTest {
   def getSuccessfulTestPath: List[String] =
-    List("[root]",
-         "SuccessfulGoToLocationTest",
-         "Successful test",
-         "should run fine")
+    List(
+      "[root]",
+      "SuccessfulGoToLocationTest",
+      "Successful test",
+      "should run fine")
   def getPendingTestPath: List[String] =
-    List("[root]",
-         "PendingGoToLocationTest",
-         "pending test",
-         "should be pending")
+    List(
+      "[root]",
+      "PendingGoToLocationTest",
+      "pending test",
+      "should be pending")
   def getIgnoredTestPath: List[String] =
-    List("[root]",
-         "IgnoredGoToLocationTest",
-         "pending test",
-         "should be ignored !!! IGNORED !!!")
+    List(
+      "[root]",
+      "IgnoredGoToLocationTest",
+      "pending test",
+      "should be ignored !!! IGNORED !!!")
   def getFailedTestPath: List[String] =
     List("[root]", "FailedGoToLocationTest", "failed test", "should fail")
 

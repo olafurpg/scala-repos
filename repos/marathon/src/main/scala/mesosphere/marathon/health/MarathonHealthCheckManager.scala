@@ -79,17 +79,19 @@ class MarathonHealthCheckManager @Inject()(
       else {
         log.info(
           s"Adding health check for app [$appId] and version [$appVersion]: [$healthCheck]")
-        Await.result(appRepository.app(appId, appVersion),
-                     zkConf.zkTimeoutDuration) match {
+        Await.result(
+          appRepository.app(appId, appVersion),
+          zkConf.zkTimeoutDuration) match {
           case Some(app: AppDefinition) =>
             val ref = system.actorOf(
-              Props(classOf[HealthCheckActor],
-                    app,
-                    driverHolder,
-                    scheduler,
-                    healthCheck,
-                    taskTracker,
-                    eventBus))
+              Props(
+                classOf[HealthCheckActor],
+                app,
+                driverHolder,
+                scheduler,
+                healthCheck,
+                taskTracker,
+                eventBus))
             val newHealthChecksForApp =
               healthChecksForApp + ActiveHealthCheck(healthCheck, ref)
 

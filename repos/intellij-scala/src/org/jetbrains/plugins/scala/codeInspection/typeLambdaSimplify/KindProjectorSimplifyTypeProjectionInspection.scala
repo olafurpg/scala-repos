@@ -162,14 +162,16 @@ class KindProjectorSimplifyTypeProjectionInspection
                                           }
                                           if (parameters.length > 1) {
                                             builder.append(
-                                              parameters.mkString(start = "(",
-                                                                  sep = ",",
-                                                                  end = ")"))
+                                              parameters.mkString(
+                                                start = "(",
+                                                sep = ",",
+                                                end = ")"))
                                           } else
                                             builder.append(
-                                              parameters.mkString(start = "",
-                                                                  sep = "",
-                                                                  end = ""))
+                                              parameters.mkString(
+                                                start = "",
+                                                sep = "",
+                                                end = ""))
                                           builder.append(" => ")
                                           builder.append(
                                             alias.aliasedType.getOrAny)
@@ -181,9 +183,10 @@ class KindProjectorSimplifyTypeProjectionInspection
                                       new KindProjectorSimplifyTypeProjectionQuickFix(
                                         projection,
                                         simplified())
-                                    holder.registerProblem(projection,
-                                                           inspectionName,
-                                                           fix)
+                                    holder.registerProblem(
+                                      projection,
+                                      inspectionName,
+                                      fix)
                                   }
                                 case _ =>
                               }

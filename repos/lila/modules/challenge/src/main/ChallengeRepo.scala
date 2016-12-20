@@ -64,8 +64,9 @@ private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
     } yield
       coll
         .find(
-          selectCreated ++ BSONDocument("challenger.id" -> challengerId,
-                                        "destUser.id" -> destUserId))
+          selectCreated ++ BSONDocument(
+            "challenger.id" -> challengerId,
+            "destUser.id" -> destUserId))
         .one[Challenge])
 
   private[challenge] def countCreatedByDestId(userId: String): Fu[Int] =
@@ -92,9 +93,10 @@ private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
       .update(
         selectId(id),
         BSONDocument(
-          "$set" -> BSONDocument("status" -> Status.Created.id,
-                                 "seenAt" -> DateTime.now,
-                                 "expiresAt" -> inTwoWeeks))
+          "$set" -> BSONDocument(
+            "status" -> Status.Created.id,
+            "seenAt" -> DateTime.now,
+            "expiresAt" -> inTwoWeeks))
       )
       .void
 

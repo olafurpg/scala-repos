@@ -551,8 +551,9 @@ class EndToEndTest extends FunSuite with BeforeAndAfter {
         response.contentString.split('.').toSeq
       assert(innerTrace == outerTrace, "traceId")
       assert(outerSpan == innerParent, "outer span vs inner parent")
-      assert(innerSpan != outerSpan,
-             "inner (%s) vs outer (%s) spanId".format(innerSpan, outerSpan))
+      assert(
+        innerSpan != outerSpan,
+        "inner (%s) vs outer (%s) spanId".format(innerSpan, outerSpan))
 
       outer.close()
       inner.close()

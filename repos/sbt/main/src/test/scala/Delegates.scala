@@ -61,10 +61,11 @@ object Delegates extends Properties("delegates") {
   def allAxes(f: (Scope, Seq[Scope], Scope => ScopeAxis[_]) => Prop): Prop =
     forAll { (keys: Keys) =>
       allDelegates(keys) { (s, ds) =>
-        all(f(s, ds, _.project),
-            f(s, ds, _.config),
-            f(s, ds, _.task),
-            f(s, ds, _.extra))
+        all(
+          f(s, ds, _.project),
+          f(s, ds, _.config),
+          f(s, ds, _.task),
+          f(s, ds, _.extra))
       }
     }
   def allDelegates(keys: Keys)(f: (Scope, Seq[Scope]) => Prop): Prop =
@@ -85,10 +86,11 @@ object Delegates extends Properties("delegates") {
                          ds: Seq[Scope],
                          axis: Scope => ScopeAxis[_]): Prop = {
     val value = axis(s)
-    val mods = List[Scope => Scope](_.copy(project = Global),
-                                    _.copy(config = Global),
-                                    _.copy(task = Global),
-                                    _.copy(extra = Global))
+    val mods = List[Scope => Scope](
+      _.copy(project = Global),
+      _.copy(config = Global),
+      _.copy(task = Global),
+      _.copy(extra = Global))
     val modAndIdent = mods.map(_ :: idFun[Scope] :: Nil)
 
     def loop(cur: Scope,

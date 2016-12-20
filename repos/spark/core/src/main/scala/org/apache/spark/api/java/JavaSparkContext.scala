@@ -113,11 +113,12 @@ class JavaSparkContext(val sc: SparkContext)
            jars: Array[String],
            environment: JMap[String, String]) =
     this(
-      new SparkContext(master,
-                       appName,
-                       sparkHome,
-                       jars.toSeq,
-                       environment.asScala))
+      new SparkContext(
+        master,
+        appName,
+        sparkHome,
+        jars.toSeq,
+        environment.asScala))
 
   private[spark] val env = sc.env
 

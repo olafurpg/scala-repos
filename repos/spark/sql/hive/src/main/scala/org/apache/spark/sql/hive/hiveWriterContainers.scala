@@ -152,8 +152,9 @@ private[hive] class SparkHiveWriterContainer(
     jID = new SerializableWritable[JobID](
       SparkHadoopWriter.createJobID(now, jobId))
     taID = new SerializableWritable[TaskAttemptID](
-      new TaskAttemptID(new TaskID(jID.value, TaskType.MAP, splitID),
-                        attemptID))
+      new TaskAttemptID(
+        new TaskID(jID.value, TaskType.MAP, splitID),
+        attemptID))
   }
 
   private def setConfParams() {
@@ -194,9 +195,10 @@ private[hive] class SparkHiveWriterContainer(
                   iterator: Iterator[InternalRow]): Unit = {
     val (serializer, standardOI, fieldOIs, dataTypes, wrappers, outputData) =
       prepareForWrite()
-    executorSideSetup(context.stageId,
-                      context.partitionId,
-                      context.attemptNumber)
+    executorSideSetup(
+      context.stageId,
+      context.partitionId,
+      context.attemptNumber)
 
     iterator.foreach { row =>
       var i = 0
@@ -274,9 +276,10 @@ private[spark] class SparkHiveDynamicPartitionWriterContainer(
                            iterator: Iterator[InternalRow]): Unit = {
     val (serializer, standardOI, fieldOIs, dataTypes, wrappers, outputData) =
       prepareForWrite()
-    executorSideSetup(context.stageId,
-                      context.partitionId,
-                      context.attemptNumber)
+    executorSideSetup(
+      context.stageId,
+      context.partitionId,
+      context.attemptNumber)
 
     val partitionOutput = inputSchema.takeRight(dynamicPartColNames.length)
     val dataOutput = inputSchema.take(fieldOIs.length)

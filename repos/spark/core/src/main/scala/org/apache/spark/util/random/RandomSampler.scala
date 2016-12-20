@@ -98,12 +98,15 @@ class BernoulliCellSampler[T](lb: Double,
     extends RandomSampler[T, T] {
 
   /** epsilon slop to avoid failure from floating point jitter. */
-  require(lb <= (ub + RandomSampler.roundingEpsilon),
-          s"Lower bound ($lb) must be <= upper bound ($ub)")
-  require(lb >= (0.0 - RandomSampler.roundingEpsilon),
-          s"Lower bound ($lb) must be >= 0.0")
-  require(ub <= (1.0 + RandomSampler.roundingEpsilon),
-          s"Upper bound ($ub) must be <= 1.0")
+  require(
+    lb <= (ub + RandomSampler.roundingEpsilon),
+    s"Lower bound ($lb) must be <= upper bound ($ub)")
+  require(
+    lb >= (0.0 - RandomSampler.roundingEpsilon),
+    s"Lower bound ($lb) must be >= 0.0")
+  require(
+    ub <= (1.0 + RandomSampler.roundingEpsilon),
+    s"Upper bound ($ub) must be <= 1.0")
 
   private val rng: Random = new XORShiftRandom
 
@@ -153,9 +156,10 @@ class BernoulliSampler[T: ClassTag](fraction: Double)
     extends RandomSampler[T, T] {
 
   /** epsilon slop to avoid failure from floating point jitter */
-  require(fraction >= (0.0 - RandomSampler.roundingEpsilon) &&
-            fraction <= (1.0 + RandomSampler.roundingEpsilon),
-          s"Sampling fraction ($fraction) must be on interval [0, 1]")
+  require(
+    fraction >= (0.0 - RandomSampler.roundingEpsilon) &&
+      fraction <= (1.0 + RandomSampler.roundingEpsilon),
+    s"Sampling fraction ($fraction) must be on interval [0, 1]")
 
   private val rng: Random = RandomSampler.newDefaultRNG
 
@@ -194,8 +198,9 @@ class PoissonSampler[T: ClassTag](fraction: Double,
   def this(fraction: Double) = this(fraction, useGapSamplingIfPossible = true)
 
   /** Epsilon slop to avoid failure from floating point jitter. */
-  require(fraction >= (0.0 - RandomSampler.roundingEpsilon),
-          s"Sampling fraction ($fraction) must be >= 0")
+  require(
+    fraction >= (0.0 - RandomSampler.roundingEpsilon),
+    s"Sampling fraction ($fraction) must be >= 0")
 
   // PoissonDistribution throws an exception when fraction <= 0
   // If fraction is <= 0, Iterator.empty is used below, so we can use any placeholder value.
@@ -213,10 +218,11 @@ class PoissonSampler[T: ClassTag](fraction: Double,
       Iterator.empty
     } else if (useGapSamplingIfPossible &&
                fraction <= RandomSampler.defaultMaxGapSamplingFraction) {
-      new GapSamplingReplacementIterator(items,
-                                         fraction,
-                                         rngGap,
-                                         RandomSampler.rngEpsilon)
+      new GapSamplingReplacementIterator(
+        items,
+        fraction,
+        rngGap,
+        RandomSampler.rngEpsilon)
     } else {
       items.flatMap { item =>
         val count = rng.sample()
@@ -236,8 +242,9 @@ private[spark] class GapSamplingIterator[T: ClassTag](
     epsilon: Double = RandomSampler.rngEpsilon)
     extends Iterator[T] {
 
-  require(f > 0.0 && f < 1.0,
-          s"Sampling fraction ($f) must reside on open interval (0, 1)")
+  require(
+    f > 0.0 && f < 1.0,
+    s"Sampling fraction ($f) must reside on open interval (0, 1)")
   require(epsilon > 0.0, s"epsilon ($epsilon) must be > 0")
 
   /** implement efficient linear-sequence drop until Scala includes fix for jira SI-8835. */

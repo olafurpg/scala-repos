@@ -132,22 +132,24 @@ class UISeleniumSuite
         findAll(cssSelector("""#active-batches-table th"""))
           .map(_.text)
           .toSeq should be {
-          List("Batch Time",
-               "Input Size",
-               "Scheduling Delay (?)",
-               "Processing Time (?)",
-               "Output Ops: Succeeded/Total",
-               "Status")
+          List(
+            "Batch Time",
+            "Input Size",
+            "Scheduling Delay (?)",
+            "Processing Time (?)",
+            "Output Ops: Succeeded/Total",
+            "Status")
         }
         findAll(cssSelector("""#completed-batches-table th"""))
           .map(_.text)
           .toSeq should be {
-          List("Batch Time",
-               "Input Size",
-               "Scheduling Delay (?)",
-               "Processing Time (?)",
-               "Total Delay (?)",
-               "Output Ops: Succeeded/Total")
+          List(
+            "Batch Time",
+            "Input Size",
+            "Scheduling Delay (?)",
+            "Processing Time (?)",
+            "Total Delay (?)",
+            "Output Ops: Succeeded/Total")
         }
 
         val batchLinks = findAll(cssSelector("""#completed-batches-table a"""))
@@ -167,15 +169,16 @@ class UISeleniumSuite
         findAll(cssSelector("""#batch-job-table th"""))
           .map(_.text)
           .toSeq should be {
-          List("Output Op Id",
-               "Description",
-               "Output Op Duration",
-               "Status",
-               "Job Id",
-               "Job Duration",
-               "Stages: Succeeded/Total",
-               "Tasks (for all stages): Succeeded/Total",
-               "Error")
+          List(
+            "Output Op Id",
+            "Description",
+            "Output Op Duration",
+            "Status",
+            "Job Id",
+            "Job Duration",
+            "Stages: Succeeded/Total",
+            "Tasks (for all stages): Succeeded/Total",
+            "Error")
         }
 
         // Check we have 2 output op ids

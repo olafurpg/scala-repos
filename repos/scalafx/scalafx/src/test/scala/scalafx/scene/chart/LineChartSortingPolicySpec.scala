@@ -38,8 +38,9 @@ import scalafx.testutil.SFXEnumDelegateSpec
 /** Test for [[scalafx.scene.layout.Priority]] */
 @RunWith(classOf[JUnitRunner])
 class LineChartSortingPolicySpec
-    extends SFXEnumDelegateSpec[jfxsc.LineChart.SortingPolicy,
-                                LineChart.SortingPolicy](
+    extends SFXEnumDelegateSpec[
+      jfxsc.LineChart.SortingPolicy,
+      LineChart.SortingPolicy](
       javaClass = classOf[jfxsc.LineChart.SortingPolicy],
       scalaClass = classOf[LineChart.SortingPolicy],
       companion = LineChart.SortingPolicy)

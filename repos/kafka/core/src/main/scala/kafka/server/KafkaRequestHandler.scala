@@ -87,12 +87,13 @@ class KafkaRequestHandlerPool(val brokerId: Int,
   val threads = new Array[Thread](numThreads)
   val runnables = new Array[KafkaRequestHandler](numThreads)
   for (i <- 0 until numThreads) {
-    runnables(i) = new KafkaRequestHandler(i,
-                                           brokerId,
-                                           aggregateIdleMeter,
-                                           numThreads,
-                                           requestChannel,
-                                           apis)
+    runnables(i) = new KafkaRequestHandler(
+      i,
+      brokerId,
+      aggregateIdleMeter,
+      numThreads,
+      requestChannel,
+      apis)
     threads(i) = Utils.daemonThread("kafka-request-handler-" + i, runnables(i))
     threads(i).start()
   }

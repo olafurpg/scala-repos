@@ -75,11 +75,12 @@ trait Validators { self: DefaultMacroCompiler =>
         val maxLubDepth =
           lubDepth(aparamss.flatten map (_.tpe)) max lubDepth(
             rparamss.flatten map (_.tpe))
-        val atargs = solvedTypes(atvars,
-                                 atparams,
-                                 atparams map varianceInType(aret),
-                                 upper = false,
-                                 maxLubDepth)
+        val atargs = solvedTypes(
+          atvars,
+          atparams,
+          atparams map varianceInType(aret),
+          upper = false,
+          maxLubDepth)
         val boundsOk = typer.silent(
           _.infer
             .checkBounds(macroDdef, NoPrefix, NoSymbol, atparams, atargs, ""))
@@ -144,8 +145,9 @@ trait Validators { self: DefaultMacroCompiler =>
       */
     private lazy val macroImplSig: MacroImplSig = {
       val tparams = macroImpl.typeParams
-      val paramss = transformTypeTagEvidenceParams(macroImplRef,
-                                                   (param, tparam) => NoSymbol)
+      val paramss = transformTypeTagEvidenceParams(
+        macroImplRef,
+        (param, tparam) => NoSymbol)
       val ret = macroImpl.info.finalResultType
       MacroImplSig(tparams, paramss, ret)
     }
@@ -188,8 +190,9 @@ trait Validators { self: DefaultMacroCompiler =>
               NoPrefix,
               makeParam(nme.macroContext, macroDdef.pos, ctxTpe, SYNTHETIC))
           else
-            singleType(ThisType(macroImpl.owner),
-                       macroImpl.owner.tpe.member(nme.c))
+            singleType(
+              ThisType(macroImpl.owner),
+              macroImpl.owner.tpe.member(nme.c))
         val paramss =
           if (isImplMethod)
             List(ctxPrefix.termSymbol) :: mmap(macroDdef.vparamss)(param)
@@ -228,10 +231,11 @@ trait Validators { self: DefaultMacroCompiler =>
           cache.getOrElseUpdate(tree.symbol, {
             val sym = tree.symbol
             assert(sym.isTerm, s"sym = $sym, tree = $tree")
-            makeParam(sym.name,
-                      sym.pos,
-                      sigma(increaseMetalevel(ctxPrefix, sym.tpe)),
-                      sym.flags)
+            makeParam(
+              sym.name,
+              sym.pos,
+              sigma(increaseMetalevel(ctxPrefix, sym.tpe)),
+              sym.flags)
           })
         )
       }

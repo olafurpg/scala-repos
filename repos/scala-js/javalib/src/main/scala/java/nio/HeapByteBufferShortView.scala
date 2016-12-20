@@ -87,13 +87,14 @@ private[nio] object HeapByteBufferShortView {
               initialLimit: Int,
               readOnly: Boolean,
               isBigEndian: Boolean): ShortBuffer = {
-      new HeapByteBufferShortView(capacity,
-                                  byteArray,
-                                  byteArrayOffset,
-                                  initialPosition,
-                                  initialLimit,
-                                  readOnly,
-                                  isBigEndian)
+      new HeapByteBufferShortView(
+        capacity,
+        byteArray,
+        byteArrayOffset,
+        initialPosition,
+        initialLimit,
+        readOnly,
+        isBigEndian)
     }
   }
 

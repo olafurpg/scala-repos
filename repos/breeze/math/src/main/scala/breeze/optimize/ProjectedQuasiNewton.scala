@@ -86,8 +86,9 @@ class CompactHessian(M: DenseMatrix[Double],
       v * sigma - u
     }
   }
-  lazy val N = DenseMatrix.horzcat(collectionOfVectorsToMatrix(S).t * sigma,
-                                   collectionOfVectorsToMatrix(Y).t)
+  lazy val N = DenseMatrix.horzcat(
+    collectionOfVectorsToMatrix(S).t * sigma,
+    collectionOfVectorsToMatrix(Y).t)
 }
 
 class ProjectedQuasiNewton(
@@ -100,9 +101,9 @@ class ProjectedQuasiNewton(
     val gamma: Double,
     val projection: DenseVector[Double] => DenseVector[Double])(
     implicit space: MutableInnerProductModule[DenseVector[Double], Double])
-    extends FirstOrderMinimizer[DenseVector[Double],
-                                DiffFunction[DenseVector[Double]]](
-      convergenceCheck)
+    extends FirstOrderMinimizer[
+      DenseVector[Double],
+      DiffFunction[DenseVector[Double]]](convergenceCheck)
     with Projecting[DenseVector[Double]]
     with SerializableLogging {
   type BDV = DenseVector[Double]
@@ -196,12 +197,13 @@ class ProjectedQuasiNewton(
     val grad = state.grad
 
     val ff = LineSearch.functionFromSearchDirection(f, x, dir)
-    val search = new BacktrackingLineSearch(state.value,
-                                            maxIterations = maxSrchIt,
-                                            shrinkStep =
-                                              if (state.iter < 1)
-                                                0.1
-                                              else 0.5)
+    val search = new BacktrackingLineSearch(
+      state.value,
+      maxIterations = maxSrchIt,
+      shrinkStep =
+        if (state.iter < 1)
+          0.1
+        else 0.5)
     var alpha = if (state.iter == 0.0) min(1.0, 1.0 / norm(dir)) else 1.0
     alpha = search.minimize(ff, alpha)
 

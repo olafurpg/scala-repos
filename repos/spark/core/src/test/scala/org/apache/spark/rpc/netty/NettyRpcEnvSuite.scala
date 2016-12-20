@@ -26,12 +26,13 @@ class NettyRpcEnvSuite extends RpcEnvSuite {
                             name: String,
                             port: Int,
                             clientMode: Boolean = false): RpcEnv = {
-    val config = RpcEnvConfig(conf,
-                              "test",
-                              "localhost",
-                              port,
-                              new SecurityManager(conf),
-                              clientMode)
+    val config = RpcEnvConfig(
+      conf,
+      "test",
+      "localhost",
+      port,
+      new SecurityManager(conf),
+      clientMode)
     new NettyRpcEnvFactory().create(config)
   }
 

@@ -164,13 +164,15 @@ histogram
     "insert" in {
       val tests = 100000
       val batchSize = 1000
-      val result = Performance().benchmark(insert(bifrost,
-                                                  Path("/test/insert/"),
-                                                  0,
-                                                  batchSize,
-                                                  tests / batchSize),
-                                           singleParams,
-                                           singleParams)
+      val result = Performance().benchmark(
+        insert(
+          bifrost,
+          Path("/test/insert/"),
+          0,
+          batchSize,
+          tests / batchSize),
+        singleParams,
+        singleParams)
       perfUtil.uploadResults("insert_100k", result)
       //val result = Performance().profile(insert(bifrost, Path("/test/insert/"), 0, batchSize, tests / batchSize))
 

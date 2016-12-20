@@ -113,12 +113,13 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
 
     def parents = if (inheritFromFun) List(createFun) else Nil
     def toString =
-      DefDef(Modifiers(OVERRIDE | FINAL | SYNTHETIC),
-             nme.toString_,
-             Nil,
-             ListOfNil,
-             TypeTree(),
-             Literal(Constant(cdef.name.decode)))
+      DefDef(
+        Modifiers(OVERRIDE | FINAL | SYNTHETIC),
+        nme.toString_,
+        Nil,
+        ListOfNil,
+        TypeTree(),
+        Literal(Constant(cdef.name.decode)))
 
     companionModuleDef(cdef, parents, List(toString))
   }
@@ -127,15 +128,18 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
                          parents: List[Tree] = Nil,
                          body: List[Tree] = Nil): ModuleDef =
     atPos(cdef.pos.focus) {
-      ModuleDef(Modifiers(cdef.mods.flags & AccessFlags | SYNTHETIC,
-                          cdef.mods.privateWithin),
-                cdef.name.toTermName,
-                gen.mkTemplate(parents,
-                               noSelfType,
-                               NoMods,
-                               Nil,
-                               body,
-                               cdef.impl.pos.focus))
+      ModuleDef(
+        Modifiers(
+          cdef.mods.flags & AccessFlags | SYNTHETIC,
+          cdef.mods.privateWithin),
+        cdef.name.toTermName,
+        gen.mkTemplate(
+          parents,
+          noSelfType,
+          NoMods,
+          Nil,
+          body,
+          cdef.impl.pos.focus))
     }
 
   /** The apply method corresponding to a case class
@@ -145,12 +149,13 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
     val cparamss = constrParamss(cdef)
     def classtpe = classType(cdef, tparams)
     atPos(cdef.pos.focus)(
-      DefDef(mods,
-             name,
-             tparams,
-             cparamss,
-             classtpe,
-             New(classtpe, mmap(cparamss)(gen.paramToArg)))
+      DefDef(
+        mods,
+        name,
+        tparams,
+        cparamss,
+        classtpe,
+        New(classtpe, mmap(cparamss)(gen.paramToArg)))
     )
   }
 
@@ -169,17 +174,19 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
       case _ => nme.unapply
     }
     val cparams = List(
-      ValDef(Modifiers(PARAM | SYNTHETIC),
-             unapplyParamName,
-             classType(cdef, tparams),
-             EmptyTree))
+      ValDef(
+        Modifiers(PARAM | SYNTHETIC),
+        unapplyParamName,
+        classType(cdef, tparams),
+        EmptyTree))
     val resultType =
       if (!settings.isScala212) TypeTree()
       else {
         // fix for SI-6541 under -Xsource:2.12
         def repeatedToSeq(tp: Tree) = tp match {
-          case AppliedTypeTree(Select(_, tpnme.REPEATED_PARAM_CLASS_NAME),
-                               tps) =>
+          case AppliedTypeTree(
+              Select(_, tpnme.REPEATED_PARAM_CLASS_NAME),
+              tps) =>
             AppliedTypeTree(gen.rootScalaDot(tpnme.Seq), tps)
           case _ => tp
         }
@@ -189,8 +196,9 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
           case params :: _ =>
             val constrParamTypes =
               params.map(param => repeatedToSeq(param.tpt))
-            AppliedTypeTree(gen.rootScalaDot(tpnme.Option),
-                            List(treeBuilder.makeTupleType(constrParamTypes)))
+            AppliedTypeTree(
+              gen.rootScalaDot(tpnme.Option),
+              List(treeBuilder.makeTupleType(constrParamTypes)))
         }
       }
     val ifNull =
@@ -261,12 +269,13 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
       val argss = mmap(paramss)(toIdent)
       val body: Tree = New(classTpe, argss)
       val copyDefDef = atPos(cdef.pos.focus)(
-        DefDef(Modifiers(SYNTHETIC),
-               nme.copy,
-               tparams,
-               paramss,
-               TypeTree(),
-               body)
+        DefDef(
+          Modifiers(SYNTHETIC),
+          nme.copy,
+          tparams,
+          paramss,
+          TypeTree(),
+          body)
       )
       Some(copyDefDef)
     }

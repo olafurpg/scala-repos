@@ -56,15 +56,18 @@ class SimplifyConditionalSuite extends PlanTest with PredicateHelper {
   test("remove unreachable branches") {
     // i.e. removing branches whose conditions are always false
     assertEquivalent(
-      CaseWhen(unreachableBranch :: normalBranch :: unreachableBranch :: Nil,
-               None),
+      CaseWhen(
+        unreachableBranch :: normalBranch :: unreachableBranch :: Nil,
+        None),
       CaseWhen(normalBranch :: Nil, None))
   }
 
   test("remove entire CaseWhen if only the else branch is reachable") {
-    assertEquivalent(CaseWhen(unreachableBranch :: unreachableBranch :: Nil,
-                              Some(Literal(30))),
-                     Literal(30))
+    assertEquivalent(
+      CaseWhen(
+        unreachableBranch :: unreachableBranch :: Nil,
+        Some(Literal(30))),
+      Literal(30))
 
     assertEquivalent(
       CaseWhen(unreachableBranch :: unreachableBranch :: Nil, None),
@@ -72,8 +75,9 @@ class SimplifyConditionalSuite extends PlanTest with PredicateHelper {
   }
 
   test("remove entire CaseWhen if the first branch is always true") {
-    assertEquivalent(CaseWhen(trueBranch :: normalBranch :: Nil, None),
-                     Literal(5))
+    assertEquivalent(
+      CaseWhen(trueBranch :: normalBranch :: Nil, None),
+      Literal(5))
 
     // Test branch elimination and simplification in combination
     assertEquivalent(

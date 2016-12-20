@@ -277,13 +277,14 @@ class WsDiscovery @Inject()(ws: WSClient) extends Discovery {
 
         val uri = (if (url.matches("^(http|HTTP)(s|S)?:.*")) new URI(url)
                    else new URI("http://" + url)).normalize()
-        new URI(scheme(uri),
-                uri.getUserInfo,
-                uri.getHost.toLowerCase(java.util.Locale.ENGLISH),
-                port(uri.getPort),
-                path(uri.getPath),
-                uri.getQuery,
-                null).toURL.toExternalForm
+        new URI(
+          scheme(uri),
+          uri.getUserInfo,
+          uri.getHost.toLowerCase(java.util.Locale.ENGLISH),
+          port(uri.getPort),
+          path(uri.getPath),
+          uri.getQuery,
+          null).toURL.toExternalForm
       }
   }
 
@@ -318,10 +319,11 @@ private[openid] object Discovery {
   class XrdsResolver extends Resolver {
     // http://openid.net/specs/openid-authentication-2_0.html#service_elements and
     // OpenID 1 compatibility: http://openid.net/specs/openid-authentication-2_0.html#anchor38
-    private val serviceTypeId = Seq("http://specs.openid.net/auth/2.0/server",
-                                    "http://specs.openid.net/auth/2.0/signon",
-                                    "http://openid.net/server/1.0",
-                                    "http://openid.net/server/1.1")
+    private val serviceTypeId = Seq(
+      "http://specs.openid.net/auth/2.0/server",
+      "http://specs.openid.net/auth/2.0/signon",
+      "http://openid.net/server/1.0",
+      "http://openid.net/server/1.1")
 
     def resolve(response: WSResponse) =
       for {

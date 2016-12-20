@@ -42,13 +42,14 @@ trait SampleSet[T] {
 
 object AdSamples {
   val genders = List("male", "female")
-  val employees = List("0-25",
-                       "25-100",
-                       "100-250",
-                       "250-1000",
-                       "1000-5000",
-                       "5000-10000",
-                       "10000+")
+  val employees = List(
+    "0-25",
+    "25-100",
+    "100-250",
+    "250-1000",
+    "1000-5000",
+    "5000-10000",
+    "10000+")
   val revenue =
     List("<500K", "500K-5M", "5-50M", "50-250M", "250-500M", "500M+")
   val category =
@@ -63,100 +64,104 @@ object AdSamples {
   val pageId = for (i <- 0 to 4) yield "page-" + i
   val userId = for (i <- 1000 to 1020) yield "user-" + i
   val eventNames = List("impression", "click", "conversion")
-  val timeISO8601 = List("2010-11-04T15:38:12.782+03:00",
-                         "2010-04-22T06:22:38.039+06:30",
-                         "2009-05-30T12:31:42.462-09:00",
-                         "2009-02-11T22:12:18.493-02:00",
-                         "2008-09-19T06:28:31.325+10:00")
-  val timeZone = List("-12:00",
-                      "-11:00",
-                      "-10:00",
-                      "-09:00",
-                      "-08:00",
-                      "-07:00",
-                      "-06:00",
-                      "-05:00",
-                      "-04:00",
-                      "-03:00",
-                      "-02:00",
-                      "-01:00",
-                      "+00:00",
-                      "+01:00",
-                      "+02:00",
-                      "+03:00",
-                      "+04:00",
-                      "+05:00",
-                      "+06:00",
-                      "+07:00",
-                      "+08:00",
-                      "+09:00",
-                      "+10:00",
-                      "+11:00",
-                      "+12:00",
-                      "+13:00",
-                      "+14:00")
+  val timeISO8601 = List(
+    "2010-11-04T15:38:12.782+03:00",
+    "2010-04-22T06:22:38.039+06:30",
+    "2009-05-30T12:31:42.462-09:00",
+    "2009-02-11T22:12:18.493-02:00",
+    "2008-09-19T06:28:31.325+10:00")
+  val timeZone = List(
+    "-12:00",
+    "-11:00",
+    "-10:00",
+    "-09:00",
+    "-08:00",
+    "-07:00",
+    "-06:00",
+    "-05:00",
+    "-04:00",
+    "-03:00",
+    "-02:00",
+    "-01:00",
+    "+00:00",
+    "+01:00",
+    "+02:00",
+    "+03:00",
+    "+04:00",
+    "+05:00",
+    "+06:00",
+    "+07:00",
+    "+08:00",
+    "+09:00",
+    "+10:00",
+    "+11:00",
+    "+12:00",
+    "+13:00",
+    "+14:00")
 
-  val states = List("AL",
-                    "AK",
-                    "AZ",
-                    "AR",
-                    "CA",
-                    "CO",
-                    "CT",
-                    "DE",
-                    "DC",
-                    "FL",
-                    "GA",
-                    "HI",
-                    "ID",
-                    "IL",
-                    "IN",
-                    "IA",
-                    "KS",
-                    "KY",
-                    "LA",
-                    "ME",
-                    "MT",
-                    "NE",
-                    "NV",
-                    "NH",
-                    "NJ",
-                    "NM",
-                    "NY",
-                    "NC",
-                    "ND",
-                    "OH",
-                    "OK",
-                    "OR",
-                    "MD",
-                    "MA",
-                    "MI",
-                    "MN",
-                    "MS",
-                    "MO",
-                    "PA",
-                    "RI",
-                    "SC",
-                    "SD",
-                    "TN",
-                    "TX",
-                    "UT",
-                    "VT",
-                    "VA",
-                    "WA",
-                    "WV",
-                    "WI",
-                    "WY")
+  val states = List(
+    "AL",
+    "AK",
+    "AZ",
+    "AR",
+    "CA",
+    "CO",
+    "CT",
+    "DE",
+    "DC",
+    "FL",
+    "GA",
+    "HI",
+    "ID",
+    "IL",
+    "IN",
+    "IA",
+    "KS",
+    "KY",
+    "LA",
+    "ME",
+    "MT",
+    "NE",
+    "NV",
+    "NH",
+    "NJ",
+    "NM",
+    "NY",
+    "NC",
+    "ND",
+    "OH",
+    "OK",
+    "OR",
+    "MD",
+    "MA",
+    "MI",
+    "MN",
+    "MS",
+    "MO",
+    "PA",
+    "RI",
+    "SC",
+    "SD",
+    "TN",
+    "TX",
+    "UT",
+    "VT",
+    "VA",
+    "WA",
+    "WV",
+    "WI",
+    "WY")
 
   val shippingRates = List(5.95, 6.95, 10.95, 24.95)
   val handlingCharges = List(5.00, 7.00, 10.00, 0)
 
-  val departments = List("sales",
-                         "marketing",
-                         "operations",
-                         "engineering",
-                         "manufacturing",
-                         "research")
+  val departments = List(
+    "sales",
+    "marketing",
+    "operations",
+    "engineering",
+    "manufacturing",
+    "research")
 
   def gaussianIndex(size: Int): Gen[Int] = {
     Gen(p => {
@@ -313,9 +318,10 @@ object AdSamples {
       amount <- chooseNum(500, 5000).map(_.toDouble / 100)
     } yield {
       JObject(
-        Map("date" -> JNum(date),
-            "recipients" -> recipients,
-            "amount" -> JNum(amount)))
+        Map(
+          "date" -> JNum(date),
+          "recipients" -> recipients,
+          "amount" -> JNum(amount)))
     }
 
   def pageViewsSample =
@@ -343,11 +349,13 @@ object AdSamples {
   val millisPerDay: Long = 24L * 60 * 60 * 1000
 
   def earlierTimeFrame =
-    chooseNum(System.currentTimeMillis - (20 * millisPerDay),
-              System.currentTimeMillis - (10 * millisPerDay))
+    chooseNum(
+      System.currentTimeMillis - (20 * millisPerDay),
+      System.currentTimeMillis - (10 * millisPerDay))
   def laterTimeFrame =
-    chooseNum(System.currentTimeMillis - (10 * millisPerDay),
-              System.currentTimeMillis)
+    chooseNum(
+      System.currentTimeMillis - (10 * millisPerDay),
+      System.currentTimeMillis)
 
   def ISO8601(timeGen: Gen[Long], timeZoneGen: Gen[String]) =
     for {

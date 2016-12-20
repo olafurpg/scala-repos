@@ -23,8 +23,9 @@ package breeze.util
 object ReflectionUtil {
   def boxedFromPrimitive(c: Class[_]): Class[_] = {
     import java.lang._
-    require(c.isPrimitive,
-            "can't get boxed representation of non-primitive type")
+    require(
+      c.isPrimitive,
+      "can't get boxed representation of non-primitive type")
     if (c == Float.TYPE) classOf[java.lang.Float]
     else if (c == Long.TYPE) classOf[java.lang.Long]
     else if (c == Double.TYPE) classOf[java.lang.Double]

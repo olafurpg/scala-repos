@@ -128,12 +128,13 @@ class WorksheetCompiler {
             val file = errorMessage.getContainingFile.getVirtualFile
             if (file == null || !file.isValid) return
 
-            treeError.addMessage(MessageCategory.ERROR,
-                                 Array(errorMessage.getErrorDescription),
-                                 file,
-                                 pos.line,
-                                 pos.column,
-                                 null)
+            treeError.addMessage(
+              MessageCategory.ERROR,
+              Array(errorMessage.getErrorDescription),
+              file,
+              pos.line,
+              pos.column,
+              null)
 
             val errorContent = ContentFactory.SERVICE.getInstance
               .createContent(treeError.getComponent, ERROR_CONTENT_NAME, true)

@@ -129,9 +129,10 @@ trait CogroupSpec[M[+ _]]
       computeCogroup(l.data, r.data, Stream())(keyOrder) map {
         case Left3(jv) => jv
         case Middle3((jv1, jv2)) =>
-          JObject(JField("key", jv1 \ "key"),
-                  JField("valueLeft", jv1 \ "value"),
-                  JField("valueRight", jv2 \ "value"))
+          JObject(
+            JField("key", jv1 \ "key"),
+            JField("valueLeft", jv1 \ "value"),
+            JField("valueRight", jv2 \ "value"))
         case Right3(jv) => jv
       }
 
@@ -141,8 +142,9 @@ trait CogroupSpec[M[+ _]]
         Leaf(Source),
         OuterObjectConcat(
           WrapObject(SourceKey.Left, "key"),
-          OuterObjectConcat(WrapObject(SourceValue.Left, "valueLeft"),
-                            WrapObject(SourceValue.Right, "valueRight"))))
+          OuterObjectConcat(
+            WrapObject(SourceValue.Left, "valueLeft"),
+            WrapObject(SourceValue.Right, "valueRight"))))
 
     val jsonResult = toJson(result)
 
@@ -165,8 +167,9 @@ trait CogroupSpec[M[+ _]]
         Leaf(Source),
         OuterObjectConcat(
           WrapObject(SourceKey.Left, "key"),
-          WrapObject(OuterArrayConcat(SourceValue.Left, SourceValue.Right),
-                     "value"))
+          WrapObject(
+            OuterArrayConcat(SourceValue.Left, SourceValue.Right),
+            "value"))
       )
 
     val jsonResult = toJson(f(result))
@@ -179,32 +182,36 @@ trait CogroupSpec[M[+ _]]
     def recr(i: Int) =
       toRecord(Array(i), JObject(List(JField("right", JString(i.toString)))))
     def recBoth(i: Int) =
-      toRecord(Array(i),
-               JObject(
-                 List(JField("left", JString(i.toString)),
-                      JField("right", JString(i.toString)))))
+      toRecord(
+        Array(i),
+        JObject(
+          List(
+            JField("left", JString(i.toString)),
+            JField("right", JString(i.toString)))))
 
     val ltable = fromSample(
       SampleData(
-        Stream(recl(0),
-               recl(1),
-               recl(3),
-               recl(3),
-               recl(5),
-               recl(7),
-               recl(8),
-               recl(8))))
+        Stream(
+          recl(0),
+          recl(1),
+          recl(3),
+          recl(3),
+          recl(5),
+          recl(7),
+          recl(8),
+          recl(8))))
     val rtable = fromSample(
       SampleData(
-        Stream(recr(0),
-               recr(2),
-               recr(3),
-               recr(4),
-               recr(5),
-               recr(5),
-               recr(6),
-               recr(8),
-               recr(8))))
+        Stream(
+          recr(0),
+          recr(2),
+          recr(3),
+          recr(4),
+          recr(5),
+          recr(5),
+          recr(6),
+          recr(8),
+          recr(8))))
 
     val expected = Vector(
       recBoth(0),
@@ -229,8 +236,9 @@ trait CogroupSpec[M[+ _]]
         Leaf(Source),
         OuterObjectConcat(
           WrapObject(SourceKey.Left, "key"),
-          WrapObject(OuterObjectConcat(SourceValue.Left, SourceValue.Right),
-                     "value"))
+          WrapObject(
+            OuterObjectConcat(SourceValue.Left, SourceValue.Right),
+            "value"))
       )
 
     val jsonResult = toJson(f(result))
@@ -271,8 +279,9 @@ trait CogroupSpec[M[+ _]]
         Leaf(Source),
         OuterObjectConcat(
           WrapObject(SourceKey.Left, "key"),
-          WrapObject(OuterObjectConcat(SourceValue.Left, SourceValue.Right),
-                     "value"))
+          WrapObject(
+            OuterObjectConcat(SourceValue.Left, SourceValue.Right),
+            "value"))
       )
 
     val jsonResult = toJson(result)
@@ -285,10 +294,12 @@ trait CogroupSpec[M[+ _]]
     def recr(i: Int) =
       toRecord(Array(i), JObject(List(JField("right", JString(i.toString)))))
     def recBoth(i: Int) =
-      toRecord(Array(i),
-               JObject(
-                 List(JField("left", JString(i.toString)),
-                      JField("right", JString(i.toString)))))
+      toRecord(
+        Array(i),
+        JObject(
+          List(
+            JField("left", JString(i.toString)),
+            JField("right", JString(i.toString)))))
 
     val ltable = fromSample(
       SampleData(Stream(recl(2), recl(3), recl(4), recl(6), recl(7))))
@@ -312,8 +323,9 @@ trait CogroupSpec[M[+ _]]
         Leaf(Source),
         OuterObjectConcat(
           WrapObject(SourceKey.Left, "key"),
-          WrapObject(OuterObjectConcat(SourceValue.Left, SourceValue.Right),
-                     "value"))
+          WrapObject(
+            OuterObjectConcat(SourceValue.Left, SourceValue.Right),
+            "value"))
       )
 
     val jsonResult = toJson(result)
@@ -326,10 +338,12 @@ trait CogroupSpec[M[+ _]]
     def recr(i: Int) =
       toRecord(Array(i), JObject(List(JField("right", JString(i.toString)))))
     def recBoth(i: Int) =
-      toRecord(Array(i),
-               JObject(
-                 List(JField("left", JString(i.toString)),
-                      JField("right", JString(i.toString)))))
+      toRecord(
+        Array(i),
+        JObject(
+          List(
+            JField("left", JString(i.toString)),
+            JField("right", JString(i.toString)))))
 
     val rtable = fromSample(
       SampleData(Stream(recr(2), recr(3), recr(4), recr(6), recr(7))))
@@ -353,8 +367,9 @@ trait CogroupSpec[M[+ _]]
         Leaf(Source),
         OuterObjectConcat(
           WrapObject(SourceKey.Left, "key"),
-          WrapObject(OuterObjectConcat(SourceValue.Left, SourceValue.Right),
-                     "value"))
+          WrapObject(
+            OuterObjectConcat(SourceValue.Left, SourceValue.Right),
+            "value"))
       )
 
     val jsonResult = toJson(result)
@@ -367,10 +382,12 @@ trait CogroupSpec[M[+ _]]
     def recr(i: Int) =
       toRecord(Array(i), JObject(List(JField("right", JString(i.toString)))))
     def recBoth(i: Int) =
-      toRecord(Array(i),
-               JObject(
-                 List(JField("left", JString(i.toString)),
-                      JField("right", JString(i.toString)))))
+      toRecord(
+        Array(i),
+        JObject(
+          List(
+            JField("left", JString(i.toString)),
+            JField("right", JString(i.toString)))))
 
     val ltable = fromSample(SampleData(Stream(recl(0), recl(1))))
     val rtable = fromSample(SampleData(Stream(recr(1), recr(0))))
@@ -379,10 +396,11 @@ trait CogroupSpec[M[+ _]]
       ltable.cogroup(SourceKey.Single, SourceKey.Single, rtable)(
         Leaf(Source),
         Leaf(Source),
-        OuterObjectConcat(WrapObject(SourceKey.Left, "key"),
-                          WrapObject(OuterObjectConcat(SourceValue.Left,
-                                                       SourceValue.Right),
-                                     "value"))
+        OuterObjectConcat(
+          WrapObject(SourceKey.Left, "key"),
+          WrapObject(
+            OuterObjectConcat(SourceValue.Left, SourceValue.Right),
+            "value"))
       )).copoint must throwAn[Exception]
   }
 
@@ -402,47 +420,63 @@ trait CogroupSpec[M[+ _]]
     val s1 = SampleData(
       Stream(
         toRecord(Array(1), parseUnsafe("""{ "ruoh5A25Jaxa":-1.0 }""")),
-        toRecord(Array(2),
-                 parseUnsafe("""{ "ruoh5A25Jaxa":-2.735023101944097E37 }""")),
-        toRecord(Array(3),
-                 parseUnsafe("""{ "ruoh5A25Jaxa":2.12274644226519E38 }""")),
-        toRecord(Array(4),
-                 parseUnsafe("""{ "ruoh5A25Jaxa":1.085656944502855E38 }""")),
-        toRecord(Array(5),
-                 parseUnsafe("""{ "ruoh5A25Jaxa":-3.4028234663852886E38 }""")),
+        toRecord(
+          Array(2),
+          parseUnsafe("""{ "ruoh5A25Jaxa":-2.735023101944097E37 }""")),
+        toRecord(
+          Array(3),
+          parseUnsafe("""{ "ruoh5A25Jaxa":2.12274644226519E38 }""")),
+        toRecord(
+          Array(4),
+          parseUnsafe("""{ "ruoh5A25Jaxa":1.085656944502855E38 }""")),
+        toRecord(
+          Array(5),
+          parseUnsafe("""{ "ruoh5A25Jaxa":-3.4028234663852886E38 }""")),
         toRecord(Array(6), parseUnsafe("""{ "ruoh5A25Jaxa":-1.0 }""")),
-        toRecord(Array(7),
-                 parseUnsafe("""{ "ruoh5A25Jaxa":-3.4028234663852886E38 }""")),
-        toRecord(Array(8),
-                 parseUnsafe("""{ "ruoh5A25Jaxa":2.4225587899613125E38 }""")),
-        toRecord(Array(9),
-                 parseUnsafe("""{ "ruoh5A25Jaxa":-3.078101074510345E38 }""")),
+        toRecord(
+          Array(7),
+          parseUnsafe("""{ "ruoh5A25Jaxa":-3.4028234663852886E38 }""")),
+        toRecord(
+          Array(8),
+          parseUnsafe("""{ "ruoh5A25Jaxa":2.4225587899613125E38 }""")),
+        toRecord(
+          Array(9),
+          parseUnsafe("""{ "ruoh5A25Jaxa":-3.078101074510345E38 }""")),
         toRecord(Array(10), parseUnsafe("""{ "ruoh5A25Jaxa":0.0 }""")),
-        toRecord(Array(11),
-                 parseUnsafe("""{ "ruoh5A25Jaxa":-2.049657967962047E38 }"""))
+        toRecord(
+          Array(11),
+          parseUnsafe("""{ "ruoh5A25Jaxa":-2.049657967962047E38 }"""))
       ))
 
     val s2 = SampleData(
       Stream(
-        toRecord(Array(1),
-                 parseUnsafe("""{ "mbsn8ya":-629648309198725501 }""")),
-        toRecord(Array(2),
-                 parseUnsafe("""{ "mbsn8ya":-1642079669762657762 }""")),
-        toRecord(Array(3),
-                 parseUnsafe("""{ "mbsn8ya":-75462980385303464 }""")),
-        toRecord(Array(4),
-                 parseUnsafe("""{ "mbsn8ya":-4407493923710190330 }""")),
-        toRecord(Array(5),
-                 parseUnsafe("""{ "mbsn8ya":4611686018427387903 }""")),
-        toRecord(Array(6),
-                 parseUnsafe("""{ "mbsn8ya":-4374327062386862583 }""")),
-        toRecord(Array(7),
-                 parseUnsafe("""{ "mbsn8ya":1920642186250198767 }""")),
+        toRecord(
+          Array(1),
+          parseUnsafe("""{ "mbsn8ya":-629648309198725501 }""")),
+        toRecord(
+          Array(2),
+          parseUnsafe("""{ "mbsn8ya":-1642079669762657762 }""")),
+        toRecord(
+          Array(3),
+          parseUnsafe("""{ "mbsn8ya":-75462980385303464 }""")),
+        toRecord(
+          Array(4),
+          parseUnsafe("""{ "mbsn8ya":-4407493923710190330 }""")),
+        toRecord(
+          Array(5),
+          parseUnsafe("""{ "mbsn8ya":4611686018427387903 }""")),
+        toRecord(
+          Array(6),
+          parseUnsafe("""{ "mbsn8ya":-4374327062386862583 }""")),
+        toRecord(
+          Array(7),
+          parseUnsafe("""{ "mbsn8ya":1920642186250198767 }""")),
         toRecord(Array(8), parseUnsafe("""{ "mbsn8ya":1 }""")),
         toRecord(Array(9), parseUnsafe("""{ "mbsn8ya":0 }""")),
         toRecord(Array(10), parseUnsafe("""{ "mbsn8ya":1 }""")),
-        toRecord(Array(11),
-                 parseUnsafe("""{ "mbsn8ya":758880641626989193 }"""))
+        toRecord(
+          Array(11),
+          parseUnsafe("""{ "mbsn8ya":758880641626989193 }"""))
       ))
 
     testCogroup(s1, s2)
@@ -451,77 +485,102 @@ trait CogroupSpec[M[+ _]]
   def testCogroupPathology2 = {
     val s1 = SampleData(
       Stream(
-        toRecord(Array(19, 49, 71),
-                 JArray(JNum(-4611686018427387904l) :: Nil)),
-        toRecord(Array(28, 15, 27),
-                 JArray(JNum(-4611686018427387904l) :: Nil)),
-        toRecord(Array(33, 11, 79),
-                 JArray(JNum(-1330862996622233403l) :: Nil)),
+        toRecord(
+          Array(19, 49, 71),
+          JArray(JNum(-4611686018427387904l) :: Nil)),
+        toRecord(
+          Array(28, 15, 27),
+          JArray(JNum(-4611686018427387904l) :: Nil)),
+        toRecord(
+          Array(33, 11, 79),
+          JArray(JNum(-1330862996622233403l) :: Nil)),
         toRecord(Array(38, 9, 3), JArray(JNum(483746605685223474l) :: Nil)),
         toRecord(Array(44, 75, 87), JArray(JNum(4611686018427387903l) :: Nil)),
-        toRecord(Array(46, 47, 10),
-                 JArray(JNum(-4611686018427387904l) :: Nil)),
+        toRecord(
+          Array(46, 47, 10),
+          JArray(JNum(-4611686018427387904l) :: Nil)),
         toRecord(Array(47, 17, 78), JArray(JNum(3385965380985908250l) :: Nil)),
-        toRecord(Array(47, 89, 84),
-                 JArray(JNum(-3713232335731560170l) :: Nil)),
+        toRecord(
+          Array(47, 89, 84),
+          JArray(JNum(-3713232335731560170l) :: Nil)),
         toRecord(Array(48, 47, 76), JArray(JNum(4611686018427387903l) :: Nil)),
-        toRecord(Array(49, 66, 33),
-                 JArray(JNum(-1592288472435607010l) :: Nil)),
+        toRecord(
+          Array(49, 66, 33),
+          JArray(JNum(-1592288472435607010l) :: Nil)),
         toRecord(Array(50, 9, 89), JArray(JNum(-3610518022153967388l) :: Nil)),
         toRecord(Array(59, 54, 72), JArray(JNum(4178019033671378504l) :: Nil)),
         toRecord(Array(59, 80, 38), JArray(JNum(0) :: Nil)),
         toRecord(Array(61, 59, 15), JArray(JNum(1056424478602208129l) :: Nil)),
         toRecord(Array(65, 34, 89), JArray(JNum(4611686018427387903l) :: Nil)),
-        toRecord(Array(73, 52, 67),
-                 JArray(JNum(-4611686018427387904l) :: Nil)),
-        toRecord(Array(74, 60, 85),
-                 JArray(JNum(-4477191148386604184l) :: Nil)),
-        toRecord(Array(76, 41, 86),
-                 JArray(JNum(-2686421995147680512l) :: Nil)),
+        toRecord(
+          Array(73, 52, 67),
+          JArray(JNum(-4611686018427387904l) :: Nil)),
+        toRecord(
+          Array(74, 60, 85),
+          JArray(JNum(-4477191148386604184l) :: Nil)),
+        toRecord(
+          Array(76, 41, 86),
+          JArray(JNum(-2686421995147680512l) :: Nil)),
         toRecord(Array(77, 46, 75), JArray(JNum(-1) :: Nil)),
-        toRecord(Array(77, 65, 58),
-                 JArray(JNum(-4032275398385636682l) :: Nil)),
+        toRecord(
+          Array(77, 65, 58),
+          JArray(JNum(-4032275398385636682l) :: Nil)),
         toRecord(Array(86, 50, 9), JArray(JNum(4163435383002324073l) :: Nil))
       ))
 
     val s2 = SampleData(
       Stream(
-        toRecord(Array(19, 49, 71),
-                 JArray(JUndefined :: JNum(2.2447601450142614E38) :: Nil)),
+        toRecord(
+          Array(19, 49, 71),
+          JArray(JUndefined :: JNum(2.2447601450142614E38) :: Nil)),
         toRecord(Array(28, 15, 27), JArray(JUndefined :: JNum(-1.0) :: Nil)),
-        toRecord(Array(33, 11, 79),
-                 JArray(JUndefined :: JNum(-3.4028234663852886E38) :: Nil)),
-        toRecord(Array(38, 9, 3),
-                 JArray(JUndefined :: JNum(3.4028234663852886E38) :: Nil)),
-        toRecord(Array(44, 75, 87),
-                 JArray(JUndefined :: JNum(3.4028234663852886E38) :: Nil)),
-        toRecord(Array(46, 47, 10),
-                 JArray(JUndefined :: JNum(-7.090379511750481E37) :: Nil)),
-        toRecord(Array(47, 17, 78),
-                 JArray(JUndefined :: JNum(2.646265046453461E38) :: Nil)),
+        toRecord(
+          Array(33, 11, 79),
+          JArray(JUndefined :: JNum(-3.4028234663852886E38) :: Nil)),
+        toRecord(
+          Array(38, 9, 3),
+          JArray(JUndefined :: JNum(3.4028234663852886E38) :: Nil)),
+        toRecord(
+          Array(44, 75, 87),
+          JArray(JUndefined :: JNum(3.4028234663852886E38) :: Nil)),
+        toRecord(
+          Array(46, 47, 10),
+          JArray(JUndefined :: JNum(-7.090379511750481E37) :: Nil)),
+        toRecord(
+          Array(47, 17, 78),
+          JArray(JUndefined :: JNum(2.646265046453461E38) :: Nil)),
         toRecord(Array(47, 89, 84), JArray(JUndefined :: JNum(0.0) :: Nil)),
-        toRecord(Array(48, 47, 76),
-                 JArray(JUndefined :: JNum(1.3605700991092947E38) :: Nil)),
-        toRecord(Array(49, 66, 33),
-                 JArray(JUndefined :: JNum(-1.4787158449349019E38) :: Nil)),
+        toRecord(
+          Array(48, 47, 76),
+          JArray(JUndefined :: JNum(1.3605700991092947E38) :: Nil)),
+        toRecord(
+          Array(49, 66, 33),
+          JArray(JUndefined :: JNum(-1.4787158449349019E38) :: Nil)),
         toRecord(Array(50, 9, 89), JArray(JUndefined :: JNum(-1.0) :: Nil)),
-        toRecord(Array(59, 54, 72),
-                 JArray(JUndefined :: JNum(-3.4028234663852886E38) :: Nil)),
-        toRecord(Array(59, 80, 38),
-                 JArray(JUndefined :: JNum(8.51654525599509E37) :: Nil)),
-        toRecord(Array(61, 59, 15),
-                 JArray(JUndefined :: JNum(3.4028234663852886E38) :: Nil)),
+        toRecord(
+          Array(59, 54, 72),
+          JArray(JUndefined :: JNum(-3.4028234663852886E38) :: Nil)),
+        toRecord(
+          Array(59, 80, 38),
+          JArray(JUndefined :: JNum(8.51654525599509E37) :: Nil)),
+        toRecord(
+          Array(61, 59, 15),
+          JArray(JUndefined :: JNum(3.4028234663852886E38) :: Nil)),
         toRecord(Array(65, 34, 89), JArray(JUndefined :: JNum(-1.0) :: Nil)),
-        toRecord(Array(73, 52, 67),
-                 JArray(JUndefined :: JNum(5.692401753312787E37) :: Nil)),
-        toRecord(Array(74, 60, 85),
-                 JArray(JUndefined :: JNum(2.5390881291535566E38) :: Nil)),
-        toRecord(Array(76, 41, 86),
-                 JArray(JUndefined :: JNum(-6.05866505535721E37) :: Nil)),
+        toRecord(
+          Array(73, 52, 67),
+          JArray(JUndefined :: JNum(5.692401753312787E37) :: Nil)),
+        toRecord(
+          Array(74, 60, 85),
+          JArray(JUndefined :: JNum(2.5390881291535566E38) :: Nil)),
+        toRecord(
+          Array(76, 41, 86),
+          JArray(JUndefined :: JNum(-6.05866505535721E37) :: Nil)),
         toRecord(Array(77, 46, 75), JArray(JUndefined :: JNum(0.0) :: Nil)),
         toRecord(Array(77, 65, 58), JArray(JUndefined :: JNum(1.0) :: Nil)),
-        toRecord(Array(86, 50, 9),
-                 JArray(JUndefined :: JNum(-3.4028234663852886E38) :: Nil))
+        toRecord(
+          Array(86, 50, 9),
+          JArray(JUndefined :: JNum(-3.4028234663852886E38) :: Nil))
       ))
 
     testCogroup(s1, s2)
@@ -592,9 +651,10 @@ trait CogroupSpec[M[+ _]]
 
     val rtable = fromSample(
       SampleData(
-        Stream(parseUnsafe("""{ "id" : "foo", "val" : 2 }"""),
-               parseUnsafe("""{ "val" : 3 }"""),
-               parseUnsafe("""{ "id" : "foo", "val" : 4 }"""))))
+        Stream(
+          parseUnsafe("""{ "id" : "foo", "val" : 2 }"""),
+          parseUnsafe("""{ "val" : 3 }"""),
+          parseUnsafe("""{ "id" : "foo", "val" : 4 }"""))))
 
     val expected = Stream(
       parseUnsafe("""{ "id": "foo", "left": 4, "right": 2 }"""),
@@ -606,12 +666,15 @@ trait CogroupSpec[M[+ _]]
       Leaf(Source),
       Leaf(Source),
       OuterObjectConcat(
-        WrapObject(DerefObjectStatic(Leaf(SourceLeft), CPathField("id")),
-                   "id"),
-        WrapObject(DerefObjectStatic(Leaf(SourceLeft), CPathField("val")),
-                   "left"),
-        WrapObject(DerefObjectStatic(Leaf(SourceRight), CPathField("val")),
-                   "right")))
+        WrapObject(
+          DerefObjectStatic(Leaf(SourceLeft), CPathField("id")),
+          "id"),
+        WrapObject(
+          DerefObjectStatic(Leaf(SourceLeft), CPathField("val")),
+          "left"),
+        WrapObject(
+          DerefObjectStatic(Leaf(SourceRight), CPathField("val")),
+          "right")))
 
     toJson(result).copoint must_== expected
   }
@@ -674,10 +737,12 @@ trait CogroupSpec[M[+ _]]
       WrapObject(Leaf(Source), "blah!"),
       WrapObject(Leaf(Source), "argh!"),
       InnerObjectConcat(
-        WrapObject(DerefObjectStatic(Leaf(SourceRight), CPathField("value")),
-                   "right"),
-        WrapObject(DerefObjectStatic(Leaf(SourceLeft), CPathField("value")),
-                   "left")
+        WrapObject(
+          DerefObjectStatic(Leaf(SourceRight), CPathField("value")),
+          "right"),
+        WrapObject(
+          DerefObjectStatic(Leaf(SourceLeft), CPathField("value")),
+          "left")
       )
     )
 
@@ -704,13 +769,16 @@ trait CogroupSpec[M[+ _]]
     val keySpec = DerefObjectStatic(Leaf(Source), CPathField("key"))
     val result: Table = ltable.cogroup(keySpec, keySpec, rtable)(
       WrapObject(DerefObjectStatic(Leaf(Source), CPathField("value")), "left"),
-      WrapObject(DerefObjectStatic(Leaf(Source), CPathField("value")),
-                 "right"),
+      WrapObject(
+        DerefObjectStatic(Leaf(Source), CPathField("value")),
+        "right"),
       InnerObjectConcat(
-        WrapObject(DerefObjectStatic(Leaf(SourceRight), CPathField("value")),
-                   "right"),
-        WrapObject(DerefObjectStatic(Leaf(SourceLeft), CPathField("value")),
-                   "left")
+        WrapObject(
+          DerefObjectStatic(Leaf(SourceRight), CPathField("value")),
+          "right"),
+        WrapObject(
+          DerefObjectStatic(Leaf(SourceLeft), CPathField("value")),
+          "left")
       )
     )
 

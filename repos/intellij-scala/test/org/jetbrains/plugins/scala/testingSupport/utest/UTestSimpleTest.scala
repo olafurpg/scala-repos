@@ -13,8 +13,9 @@ trait UTestSimpleTest extends UTestTestCase {
   protected def uTestFileName = uTestTestName + ".scala"
 
   protected def addUTestTest(): Unit = {
-    addFileToProject(uTestFileName,
-                     """
+    addFileToProject(
+      uTestFileName,
+      """
         |import utest._
         |import utest.framework.TestSuite
         |
@@ -117,21 +118,23 @@ trait UTestSimpleTest extends UTestTestCase {
     addUTestTest()
     //notice that we only test here nodes that produce TestStructureViewElement in file structure view
     //this means that root test scopes (methods) are not tested here; instead, they are tested in testFileStructureViewHierarchy
-    runFileStructureViewTest(uTestTestName,
-                             TestStructureViewElement.normalStatusId,
-                             "\"outer1\"",
-                             "\"outer2\"",
-                             "\"inner2_1\"",
-                             "\"inner1_1\"",
-                             "\"sameName\"")
+    runFileStructureViewTest(
+      uTestTestName,
+      TestStructureViewElement.normalStatusId,
+      "\"outer1\"",
+      "\"outer2\"",
+      "\"inner2_1\"",
+      "\"inner1_1\"",
+      "\"sameName\"")
   }
 
   def testFileStructureViewHierarchy(): Unit = {
     addUTestTest()
     runFileStructureViewTest(uTestTestName, "\"sameName\"", Some("sameName"))
-    runFileStructureViewTest(uTestTestName,
-                             "\"sameName\"",
-                             Some("\"sameName\""))
+    runFileStructureViewTest(
+      uTestTestName,
+      "\"sameName\"",
+      Some("\"sameName\""))
     runFileStructureViewTest(uTestTestName, "\"outer2\"", Some("tests"))
     runFileStructureViewTest(uTestTestName, "\"inner2_1\"", Some("\"outer2\""))
   }
@@ -147,12 +150,13 @@ trait UTestSimpleTest extends UTestTestCase {
 
   def testGoToSourceSuccessful(): Unit = {
     addUTestTest()
-    runGoToSourceTest(4,
-                      7,
-                      uTestFileName,
-                      checkConfigAndSettings(_, uTestTestName, "tests"),
-                      List("[root]", uTestTestName, "tests"),
-                      4)
+    runGoToSourceTest(
+      4,
+      7,
+      uTestFileName,
+      checkConfigAndSettings(_, uTestTestName, "tests"),
+      List("[root]", uTestTestName, "tests"),
+      4)
   }
 
   def testGoToSourceFailed(): Unit = {

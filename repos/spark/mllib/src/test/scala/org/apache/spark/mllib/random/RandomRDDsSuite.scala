@@ -111,11 +111,12 @@ class RandomRDDsSuite
 
     // partition size needs to be <= Int.MaxValue
     intercept[IllegalArgumentException] {
-      new RandomRDD(sc,
-                    Int.MaxValue.toLong * 100L,
-                    99,
-                    new UniformGenerator,
-                    0L)
+      new RandomRDD(
+        sc,
+        Int.MaxValue.toLong * 100L,
+        99,
+        new UniformGenerator,
+        0L)
     }
   }
 
@@ -145,30 +146,33 @@ class RandomRDDsSuite
 
       val logNormal =
         RandomRDDs.logNormalRDD(sc, 0.0, 1.0, size, numPartitions, seed)
-      testGeneratedRDD(logNormal,
-                       size,
-                       numPartitions,
-                       logNormalMean,
-                       logNormalStd,
-                       0.1)
+      testGeneratedRDD(
+        logNormal,
+        size,
+        numPartitions,
+        logNormalMean,
+        logNormalStd,
+        0.1)
 
       val poisson =
         RandomRDDs.poissonRDD(sc, poissonMean, size, numPartitions, seed)
-      testGeneratedRDD(poisson,
-                       size,
-                       numPartitions,
-                       poissonMean,
-                       math.sqrt(poissonMean),
-                       0.1)
+      testGeneratedRDD(
+        poisson,
+        size,
+        numPartitions,
+        poissonMean,
+        math.sqrt(poissonMean),
+        0.1)
 
       val exponential = RandomRDDs
         .exponentialRDD(sc, exponentialMean, size, numPartitions, seed)
-      testGeneratedRDD(exponential,
-                       size,
-                       numPartitions,
-                       exponentialMean,
-                       exponentialMean,
-                       0.1)
+      testGeneratedRDD(
+        exponential,
+        size,
+        numPartitions,
+        exponentialMean,
+        exponentialMean,
+        0.1)
 
       val gamma = RandomRDDs
         .gammaRDD(sc, gammaShape, gammaScale, size, numPartitions, seed)
@@ -200,55 +204,60 @@ class RandomRDDsSuite
 
     for (seed <- 0 until 5) {
       val uniform = RandomRDDs.uniformVectorRDD(sc, rows, cols, parts, seed)
-      testGeneratedVectorRDD(uniform,
-                             rows,
-                             cols,
-                             parts,
-                             0.5,
-                             1 / math.sqrt(12))
+      testGeneratedVectorRDD(
+        uniform,
+        rows,
+        cols,
+        parts,
+        0.5,
+        1 / math.sqrt(12))
 
       val normal = RandomRDDs.normalVectorRDD(sc, rows, cols, parts, seed)
       testGeneratedVectorRDD(normal, rows, cols, parts, 0.0, 1.0)
 
       val logNormal =
         RandomRDDs.logNormalVectorRDD(sc, 0.0, 1.0, rows, cols, parts, seed)
-      testGeneratedVectorRDD(logNormal,
-                             rows,
-                             cols,
-                             parts,
-                             logNormalMean,
-                             logNormalStd,
-                             0.1)
+      testGeneratedVectorRDD(
+        logNormal,
+        rows,
+        cols,
+        parts,
+        logNormalMean,
+        logNormalStd,
+        0.1)
 
       val poisson =
         RandomRDDs.poissonVectorRDD(sc, poissonMean, rows, cols, parts, seed)
-      testGeneratedVectorRDD(poisson,
-                             rows,
-                             cols,
-                             parts,
-                             poissonMean,
-                             math.sqrt(poissonMean),
-                             0.1)
+      testGeneratedVectorRDD(
+        poisson,
+        rows,
+        cols,
+        parts,
+        poissonMean,
+        math.sqrt(poissonMean),
+        0.1)
 
       val exponential = RandomRDDs
         .exponentialVectorRDD(sc, exponentialMean, rows, cols, parts, seed)
-      testGeneratedVectorRDD(exponential,
-                             rows,
-                             cols,
-                             parts,
-                             exponentialMean,
-                             exponentialMean,
-                             0.1)
+      testGeneratedVectorRDD(
+        exponential,
+        rows,
+        cols,
+        parts,
+        exponentialMean,
+        exponentialMean,
+        0.1)
 
       val gamma = RandomRDDs
         .gammaVectorRDD(sc, gammaShape, gammaScale, rows, cols, parts, seed)
-      testGeneratedVectorRDD(gamma,
-                             rows,
-                             cols,
-                             parts,
-                             gammaMean,
-                             gammaStd,
-                             0.1)
+      testGeneratedVectorRDD(
+        gamma,
+        rows,
+        cols,
+        parts,
+        gammaMean,
+        gammaStd,
+        0.1)
     }
   }
 }

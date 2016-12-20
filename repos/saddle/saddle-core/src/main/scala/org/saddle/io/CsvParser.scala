@@ -66,8 +66,9 @@ object CsvParser {
   def parse(cols: Seq[Int] = List(), params: CsvParams = CsvParams())(
       source: CsvSource): Frame[Int, Int, String] = {
 
-    require(params.separChar != params.quoteChar,
-            "Separator character and quote character cannot be the same")
+    require(
+      params.separChar != params.quoteChar,
+      "Separator character and quote character cannot be the same")
 
     // sorted, unique column locations to parse
     var locs = Set(cols: _*).toArray[Int].sorted
@@ -150,8 +151,9 @@ object CsvParser {
         // we're not in quoted field & we hit a separator
         if (curFld == locs(locIdx)) {
           // we want this field
-          callback(String.valueOf(carr, curBeg, curEnd - curBeg - inQoff),
-                   locIdx)
+          callback(
+            String.valueOf(carr, curBeg, curEnd - curBeg - inQoff),
+            locIdx)
           locIdx += 1
         }
         inQoff = 0

@@ -1252,10 +1252,11 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       implicit timer: Timer
   ): Batcher[In, Out] = {
     new Batcher[In, Out](
-      new BatchExecutor[In, Out](sizeThreshold,
-                                 timeThreshold,
-                                 sizePercentile,
-                                 f))
+      new BatchExecutor[In, Out](
+        sizeThreshold,
+        timeThreshold,
+        sizePercentile,
+        f))
   }
 }
 
@@ -2709,28 +2710,29 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       u: Future[U],
       v: Future[V]): Future[
     (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] =
-    Future.join(Seq(a,
-                    b,
-                    c,
-                    d,
-                    e,
-                    f,
-                    g,
-                    h,
-                    i,
-                    j,
-                    k,
-                    l,
-                    m,
-                    n,
-                    o,
-                    p,
-                    q,
-                    r,
-                    s,
-                    t,
-                    u,
-                    v)) map { _ =>
+    Future.join(Seq(
+      a,
+      b,
+      c,
+      d,
+      e,
+      f,
+      g,
+      h,
+      i,
+      j,
+      k,
+      l,
+      m,
+      n,
+      o,
+      p,
+      q,
+      r,
+      s,
+      t,
+      u,
+      v)) map { _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),

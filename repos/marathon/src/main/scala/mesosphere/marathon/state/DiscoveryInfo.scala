@@ -22,8 +22,9 @@ object DiscoveryInfo {
   }
 
   case class Port(number: Int, name: String, protocol: String) {
-    require(Port.AllowedProtocols(protocol),
-            "protocol can only be 'tcp' or 'udp'")
+    require(
+      Port.AllowedProtocols(protocol),
+      "protocol can only be 'tcp' or 'udp'")
 
     def toProto: MesosProtos.Port = {
       MesosProtos.Port.newBuilder

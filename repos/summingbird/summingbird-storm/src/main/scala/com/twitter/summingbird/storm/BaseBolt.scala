@@ -196,9 +196,10 @@ case class BaseBolt[I, O](jobID: JobId,
     // Always ack a tuple on completion:
     if (!earlyAck) { inputs.foreach(_.ack(collector.ack(_))) }
 
-    logger.debug("bolt finished processed {} linked tuples, emitted: {}",
-                 inputs.size,
-                 emitCount)
+    logger.debug(
+      "bolt finished processed {} linked tuples, emitted: {}",
+      inputs.size,
+      emitCount)
   }
 
   override def prepare(conf: JMap[_, _],

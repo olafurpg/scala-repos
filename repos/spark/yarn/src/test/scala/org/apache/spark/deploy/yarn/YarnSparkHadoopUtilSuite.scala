@@ -72,9 +72,10 @@ class YarnSparkHadoopUtilSuite
     try {
       val argLine =
         args.map(a => YarnSparkHadoopUtil.escapeForShell(a)).mkString(" ")
-      Files.write(("bash -c \"echo " + argLine +
-                    "\"").getBytes(StandardCharsets.UTF_8),
-                  scriptFile)
+      Files.write(
+        ("bash -c \"echo " + argLine +
+          "\"").getBytes(StandardCharsets.UTF_8),
+        scriptFile)
       scriptFile.setExecutable(true)
 
       val proc = Runtime.getRuntime().exec(Array(scriptFile.getAbsolutePath()))
@@ -228,8 +229,9 @@ class YarnSparkHadoopUtilSuite
 
   test("check access two nns") {
     val sparkConf = new SparkConf()
-    sparkConf.set("spark.yarn.access.namenodes",
-                  "hdfs://nn1:8032,hdfs://nn2:8032")
+    sparkConf.set(
+      "spark.yarn.access.namenodes",
+      "hdfs://nn1:8032,hdfs://nn2:8032")
     val util = new YarnSparkHadoopUtil
     val nns = util.getNameNodesToAccess(sparkConf)
     nns should be(
@@ -239,8 +241,9 @@ class YarnSparkHadoopUtilSuite
   test("check token renewer") {
     val hadoopConf = new Configuration()
     hadoopConf.set("yarn.resourcemanager.address", "myrm:8033")
-    hadoopConf.set("yarn.resourcemanager.principal",
-                   "yarn/myrm:8032@SPARKTEST.COM")
+    hadoopConf.set(
+      "yarn.resourcemanager.principal",
+      "yarn/myrm:8032@SPARKTEST.COM")
     val util = new YarnSparkHadoopUtil
     val renewer = util.getTokenRenewer(hadoopConf)
     renewer should be("yarn/myrm:8032@SPARKTEST.COM")

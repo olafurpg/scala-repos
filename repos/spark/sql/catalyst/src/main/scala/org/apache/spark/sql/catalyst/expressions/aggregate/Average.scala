@@ -62,9 +62,10 @@ case class Average(child: Expression) extends DeclarativeAggregate {
 
   override lazy val updateExpressions = Seq(
     /* sum = */
-    Add(sum,
-        Coalesce(
-          Cast(child, sumDataType) :: Cast(Literal(0), sumDataType) :: Nil)),
+    Add(
+      sum,
+      Coalesce(
+        Cast(child, sumDataType) :: Cast(Literal(0), sumDataType) :: Nil)),
     /* count = */ If(IsNull(child), count, count + 1L)
   )
 

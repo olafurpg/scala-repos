@@ -84,8 +84,9 @@ trait BinOpMat {
       extends BinOp[OP, Mat[A], Mat[B], Mat[C]] {
 
     def apply(v1: Mat[A], v2: Mat[B]) = {
-      require(v1.numRows == v2.numRows && v1.numCols == v2.numCols,
-              "Mats must have the same size!")
+      require(
+        v1.numRows == v2.numRows && v1.numCols == v2.numCols,
+        "Mats must have the same size!")
       val sz = v1.length
       val ar = new Array[C](sz)
       var i = 0

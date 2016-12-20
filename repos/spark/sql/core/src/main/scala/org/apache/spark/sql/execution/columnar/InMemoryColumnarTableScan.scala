@@ -40,12 +40,13 @@ private[sql] object InMemoryRelation {
             storageLevel: StorageLevel,
             child: SparkPlan,
             tableName: Option[String]): InMemoryRelation =
-    new InMemoryRelation(child.output,
-                         useCompression,
-                         batchSize,
-                         storageLevel,
-                         child,
-                         tableName)()
+    new InMemoryRelation(
+      child.output,
+      useCompression,
+      batchSize,
+      storageLevel,
+      child,
+      tableName)()
 }
 
 /**
@@ -145,10 +146,11 @@ private[sql] case class InMemoryRelation(output: Seq[Attribute],
           def next(): CachedBatch = {
             val columnBuilders = output
               .map { attribute =>
-                ColumnBuilder(attribute.dataType,
-                              batchSize,
-                              attribute.name,
-                              useCompression)
+                ColumnBuilder(
+                  attribute.dataType,
+                  batchSize,
+                  attribute.name,
+                  useCompression)
               }
               .toArray
 
@@ -238,8 +240,8 @@ private[sql] case class InMemoryColumnarTableScan(
     extends LeafNode {
 
   private[sql] override lazy val metrics = Map(
-    "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
-                                                   "number of output rows"))
+    "numOutputRows" -> SQLMetrics
+      .createLongMetric(sparkContext, "number of output rows"))
 
   override def output: Seq[Attribute] = attributes
 
@@ -298,9 +300,10 @@ private[sql] case class InMemoryColumnarTableScan(
     predicates.flatMap { p =>
       val filter = buildFilter.lift(p)
       val boundFilter = filter.map(
-        BindReferences.bindReference(_,
-                                     relation.partitionStatistics.schema,
-                                     allowFailures = true))
+        BindReferences.bindReference(
+          _,
+          relation.partitionStatistics.schema,
+          allowFailures = true))
 
       boundFilter.foreach(_ =>
         filter.foreach(f =>

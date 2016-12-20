@@ -73,8 +73,9 @@ class ScalaApplicationUsagesCollector
         checkLibrary("com.sksamuel.elastic4s", "Elastic4s")
         checkLibrary("securesocial", "SecureSocial")
         checkLibrary("com.github.dwhjames.awswrap", "AWSWrap")
-        checkLibrary("com.github.mauricio.async.db.postgresql",
-                     "postgresql-async")
+        checkLibrary(
+          "com.github.mauricio.async.db.postgresql",
+          "postgresql-async")
         checkLibrary("com.netflix.edda", "Edda")
         checkLibrary("redis", "Rediscala")
         checkLibrary("scalaz", "Scalaz")

@@ -18,15 +18,17 @@ final case class Coproduct[F[_], G[_], A](run: F[A] Xor G[A]) {
       implicit F: CoflatMap[F],
       G: CoflatMap[G]): Coproduct[F, G, B] =
     Coproduct(
-      run.bimap(a => F.coflatMap(a)(x => f(leftc(x))),
-                a => G.coflatMap(a)(x => f(rightc(x))))
+      run.bimap(
+        a => F.coflatMap(a)(x => f(leftc(x))),
+        a => G.coflatMap(a)(x => f(rightc(x))))
     )
 
   def coflatten(implicit F: CoflatMap[F],
                 G: CoflatMap[G]): Coproduct[F, G, Coproduct[F, G, A]] =
     Coproduct(
-      run.bimap(x => F.coflatMap(x)(a => leftc(a)),
-                x => G.coflatMap(x)(a => rightc(a))))
+      run.bimap(
+        x => F.coflatMap(x)(a => leftc(a)),
+        x => G.coflatMap(x)(a => rightc(a))))
 
   def extract(implicit F: Comonad[F], G: Comonad[G]): A =
     run.fold(F.extract, G.extract)

@@ -129,9 +129,10 @@ private[spark] class RollingFileAppender(
       }
     } catch {
       case e: Exception =>
-        logError("Error cleaning logs in directory " +
-                   activeFile.getParentFile.getAbsolutePath,
-                 e)
+        logError(
+          "Error cleaning logs in directory " +
+            activeFile.getParentFile.getAbsolutePath,
+          e)
     }
   }
 }

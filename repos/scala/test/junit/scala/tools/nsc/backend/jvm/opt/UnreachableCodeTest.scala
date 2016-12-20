@@ -146,8 +146,9 @@ class UnreachableCodeTest extends ClearAfterClass {
     //
     // Finally, instructions in the dead basic blocks are replaced by ATHROW, as explained in
     // a comment in BCodeBodyBuilder.
-    assertSameCode(noDce.dropNonOp,
-                   List(Op(ICONST_1), Op(IRETURN), Op(ATHROW), Op(ATHROW)))
+    assertSameCode(
+      noDce.dropNonOp,
+      List(Op(ICONST_1), Op(IRETURN), Op(ATHROW), Op(ATHROW)))
   }
 
   @Test
@@ -166,21 +167,24 @@ class UnreachableCodeTest extends ClearAfterClass {
     val code2 =
       "def f: Unit = { try { } catch { case _: Exception => () }; () }"
     // requires fixpoint optimization of methodOptCompiler (dce alone is not enough): first the handler is eliminated, then it's dead catch block.
-    assertSameCode(singleMethodInstructions(methodOptCompiler)(code2),
-                   wrapInDefault(Op(RETURN)))
+    assertSameCode(
+      singleMethodInstructions(methodOptCompiler)(code2),
+      wrapInDefault(Op(RETURN)))
 
     val code3 =
       "def f: Unit = { try { } catch { case _: Exception => try { } catch { case _: Exception => () } }; () }"
-    assertSameCode(singleMethodInstructions(methodOptCompiler)(code3),
-                   wrapInDefault(Op(RETURN)))
+    assertSameCode(
+      singleMethodInstructions(methodOptCompiler)(code3),
+      wrapInDefault(Op(RETURN)))
 
     // this example requires two iterations to get rid of the outer handler.
     // the first iteration of DCE cannot remove the inner handler. then the inner (empty) handler is removed.
     // then the second iteration of DCE removes the inner catch block, and then the outer handler is removed.
     val code4 =
       "def f: Unit = { try { try { } catch { case _: Exception => () } } catch { case _: Exception => () }; () }"
-    assertSameCode(singleMethodInstructions(methodOptCompiler)(code4),
-                   wrapInDefault(Op(RETURN)))
+    assertSameCode(
+      singleMethodInstructions(methodOptCompiler)(code4),
+      wrapInDefault(Op(RETURN)))
   }
 
   @Test // test the dce-testing tools
@@ -201,50 +205,61 @@ class UnreachableCodeTest extends ClearAfterClass {
   def bytecodeEquivalence: Unit = {
     assertTrue(List(VarOp(ILOAD, 1)) === List(VarOp(ILOAD, 2)))
     assertTrue(
-      List(VarOp(ILOAD, 1), VarOp(ISTORE, 1)) === List(VarOp(ILOAD, 2),
-                                                       VarOp(ISTORE, 2)))
+      List(VarOp(ILOAD, 1), VarOp(ISTORE, 1)) === List(
+        VarOp(ILOAD, 2),
+        VarOp(ISTORE, 2)))
 
     // the first Op will associate 1->2, then the 2->2 will fail
     assertFalse(
-      List(VarOp(ILOAD, 1), VarOp(ISTORE, 2)) === List(VarOp(ILOAD, 2),
-                                                       VarOp(ISTORE, 2)))
+      List(VarOp(ILOAD, 1), VarOp(ISTORE, 2)) === List(
+        VarOp(ILOAD, 2),
+        VarOp(ISTORE, 2)))
 
     // will associate 1->2 and 2->1, which is OK
     assertTrue(
-      List(VarOp(ILOAD, 1), VarOp(ISTORE, 2)) === List(VarOp(ILOAD, 2),
-                                                       VarOp(ISTORE, 1)))
+      List(VarOp(ILOAD, 1), VarOp(ISTORE, 2)) === List(
+        VarOp(ILOAD, 2),
+        VarOp(ISTORE, 1)))
 
     assertTrue(
-      List(Label(1), Label(2), Label(1)) === List(Label(2),
-                                                  Label(4),
-                                                  Label(2)))
+      List(Label(1), Label(2), Label(1)) === List(
+        Label(2),
+        Label(4),
+        Label(2)))
     assertTrue(
-      List(LineNumber(1, Label(1)), Label(1)) === List(LineNumber(1, Label(3)),
-                                                       Label(3)))
+      List(LineNumber(1, Label(1)), Label(1)) === List(
+        LineNumber(1, Label(3)),
+        Label(3)))
     assertFalse(
-      List(LineNumber(1, Label(1)), Label(1)) === List(LineNumber(1, Label(3)),
-                                                       Label(1)))
+      List(LineNumber(1, Label(1)), Label(1)) === List(
+        LineNumber(1, Label(3)),
+        Label(1)))
 
     assertTrue(
-      List(TableSwitch(TABLESWITCH, 1, 3, Label(4), List(Label(5), Label(6))),
-           Label(4),
-           Label(5),
-           Label(6)) === List(
+      List(
+        TableSwitch(TABLESWITCH, 1, 3, Label(4), List(Label(5), Label(6))),
+        Label(4),
+        Label(5),
+        Label(6)) === List(
         TableSwitch(TABLESWITCH, 1, 3, Label(9), List(Label(3), Label(4))),
         Label(9),
         Label(3),
         Label(4)))
 
     assertTrue(
-      List(FrameEntry(F_FULL,
-                      List(INTEGER, DOUBLE, Label(3)),
-                      List("java/lang/Object", Label(4))),
-           Label(3),
-           Label(4)) === List(FrameEntry(F_FULL,
-                                         List(INTEGER, DOUBLE, Label(1)),
-                                         List("java/lang/Object", Label(3))),
-                              Label(1),
-                              Label(3)))
+      List(
+        FrameEntry(
+          F_FULL,
+          List(INTEGER, DOUBLE, Label(3)),
+          List("java/lang/Object", Label(4))),
+        Label(3),
+        Label(4)) === List(
+        FrameEntry(
+          F_FULL,
+          List(INTEGER, DOUBLE, Label(1)),
+          List("java/lang/Object", Label(3))),
+        Label(1),
+        Label(3)))
   }
 
   @Test
@@ -264,11 +279,13 @@ class UnreachableCodeTest extends ClearAfterClass {
 
     assertSameSummary(getSingleMethod(c, "nl"), List(ACONST_NULL, ARETURN))
 
-    assertSameSummary(getSingleMethod(c, "nt"),
-                      List(NEW, DUP, LDC, "<init>", ATHROW))
+    assertSameSummary(
+      getSingleMethod(c, "nt"),
+      List(NEW, DUP, LDC, "<init>", ATHROW))
 
-    assertSameSummary(getSingleMethod(c, "t1"),
-                      List(ALOAD, ACONST_NULL, "cons", RETURN))
+    assertSameSummary(
+      getSingleMethod(c, "t1"),
+      List(ALOAD, ACONST_NULL, "cons", RETURN))
 
     // GenBCode introduces POP; ACONST_NULL after loading an expression of type scala.runtime.Null$,
     // see comment in BCodeBodyBuilder.adapt
@@ -286,13 +303,16 @@ class UnreachableCodeTest extends ClearAfterClass {
 
     // GenBCode introduces an ATHROW after the invocation of C.nt, see BCodeBodyBuilder.adapt
     // NOTE: DCE is enabled by default and gets rid of the redundant code (tested below)
-    assertSameSummary(getSingleMethod(c, "t4"),
-                      List(ALOAD, ALOAD, "nt", ATHROW, NOP, NOP, NOP, ATHROW))
+    assertSameSummary(
+      getSingleMethod(c, "t4"),
+      List(ALOAD, ALOAD, "nt", ATHROW, NOP, NOP, NOP, ATHROW))
 
     val List(cDCE) = compileClasses(dceCompiler)(code)
-    assertSameSummary(getSingleMethod(cDCE, "t3"),
-                      List(ALOAD, NEW, DUP, LDC, "<init>", ATHROW))
-    assertSameSummary(getSingleMethod(cDCE, "t4"),
-                      List(ALOAD, ALOAD, "nt", ATHROW))
+    assertSameSummary(
+      getSingleMethod(cDCE, "t3"),
+      List(ALOAD, NEW, DUP, LDC, "<init>", ATHROW))
+    assertSameSummary(
+      getSingleMethod(cDCE, "t4"),
+      List(ALOAD, ALOAD, "nt", ATHROW))
   }
 }

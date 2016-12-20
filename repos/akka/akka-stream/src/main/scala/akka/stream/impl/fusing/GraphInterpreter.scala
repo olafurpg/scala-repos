@@ -253,9 +253,10 @@ private[akka] object GraphInterpreter {
         stages.toArray,
         GraphInterpreter.singleNoAttribute,
         add(inlets.iterator, Array.ofDim(connectionCount), 0),
-        markBoundary(Array.ofDim(connectionCount),
-                     inletsSize,
-                     connectionCount),
+        markBoundary(
+          Array.ofDim(connectionCount),
+          inletsSize,
+          connectionCount),
         add(outlets.iterator, Array.ofDim(connectionCount), inletsSize),
         markBoundary(Array.ofDim(connectionCount), 0, inletsSize))
 
@@ -500,9 +501,10 @@ private[stream] final class GraphInterpreter(
         logic.preStart()
       } catch {
         case NonFatal(e) ⇒
-          log.error(e,
-                    "Error during preStart in [{}]",
-                    assembly.stages(logic.stageId))
+          log.error(
+            e,
+            "Error during preStart in [{}]",
+            assembly.stages(logic.stageId))
           logic.failStage(e)
       }
       afterStageHasRun(logic)
@@ -743,10 +745,11 @@ private[stream] final class GraphInterpreter(
       logic.afterPostStop()
     } catch {
       case NonFatal(e) ⇒
-        log.error(e,
-                  s"Error during postStop in [{}]: {}",
-                  assembly.stages(logic.stageId),
-                  e.getMessage)
+        log.error(
+          e,
+          s"Error during postStop in [{}]: {}",
+          assembly.stages(logic.stageId),
+          e.getMessage)
     }
   }
 

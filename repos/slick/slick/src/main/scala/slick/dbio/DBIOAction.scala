@@ -240,10 +240,11 @@ object DBIOAction {
       if (g.length == 1) {
         if (g.head.isInstanceOf[SynchronousDatabaseAction[_, _, _, _]]) {
           // fuse synchronous group
-          new SynchronousDatabaseAction.Fused[Seq[R],
-                                              NoStream,
-                                              BasicBackend,
-                                              E] {
+          new SynchronousDatabaseAction.Fused[
+            Seq[R],
+            NoStream,
+            BasicBackend,
+            E] {
             def run(context: BasicBackend#Context) =
               g.head
                 .asInstanceOf[SynchronousDatabaseAction[R,
@@ -257,10 +258,11 @@ object DBIOAction {
       } else {
         if (g.head.isInstanceOf[SynchronousDatabaseAction[_, _, _, _]]) {
           // fuse synchronous group
-          new SynchronousDatabaseAction.Fused[Seq[R],
-                                              NoStream,
-                                              BasicBackend,
-                                              E] {
+          new SynchronousDatabaseAction.Fused[
+            Seq[R],
+            NoStream,
+            BasicBackend,
+            E] {
             def run(context: BasicBackend#Context) = {
               val b = new ArrayBuffer[R](g.length)
               g.foreach(
@@ -688,8 +690,9 @@ object SynchronousDatabaseAction {
   trait Fused[+R, +S <: NoStream, B <: BasicBackend, -E <: Effect]
       extends SynchronousDatabaseAction[R, S, B, E] {
     def getDumpInfo =
-      DumpInfo(name = "SynchronousDatabaseAction.Fused",
-               children = Vector(("non-fused", nonFusedEquivalentAction)))
+      DumpInfo(
+        name = "SynchronousDatabaseAction.Fused",
+        children = Vector(("non-fused", nonFusedEquivalentAction)))
     override def supportsStreaming: Boolean = false
   }
 
@@ -742,10 +745,11 @@ object SynchronousDatabaseAction {
           override def nonFusedEquivalentAction = a
         }
 
-      case CleanUpAction(base: SynchronousDatabaseAction[_, _, _, _],
-                         f,
-                         keepFailure,
-                         ec) if ec eq DBIO.sameThreadExecutionContext =>
+      case CleanUpAction(
+          base: SynchronousDatabaseAction[_, _, _, _],
+          f,
+          keepFailure,
+          ec) if ec eq DBIO.sameThreadExecutionContext =>
         new SynchronousDatabaseAction.Fused[R, S, BasicBackend, E] {
           def run(context: BasicBackend#Context): R = {
             val res = try {

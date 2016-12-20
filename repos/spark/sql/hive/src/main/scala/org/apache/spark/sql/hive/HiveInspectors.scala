@@ -626,11 +626,13 @@ private[hive] trait HiveInspectors {
         while (i < fieldRefs.size) {
           // 2. set the property for the pojo
           val tpe = structType(i).dataType
-          x.setStructFieldData(result,
-                               fieldRefs.get(i),
-                               wrap(row.get(i, tpe),
-                                    fieldRefs.get(i).getFieldObjectInspector,
-                                    tpe))
+          x.setStructFieldData(
+            result,
+            fieldRefs.get(i),
+            wrap(
+              row.get(i, tpe),
+              fieldRefs.get(i).getFieldObjectInspector,
+              tpe))
           i += 1
         }
 
@@ -644,9 +646,10 @@ private[hive] trait HiveInspectors {
         while (i < fieldRefs.size) {
           val tpe = structType(i).dataType
           result.add(
-            wrap(row.get(i, tpe),
-                 fieldRefs.get(i).getFieldObjectInspector,
-                 tpe))
+            wrap(
+              row.get(i, tpe),
+              fieldRefs.get(i).getFieldObjectInspector,
+              tpe))
           i += 1
         }
 
@@ -668,8 +671,9 @@ private[hive] trait HiveInspectors {
         val hashMap = new java.util.HashMap[Any, Any](map.numElements())
 
         map.foreach(keyType, valueType, (k, v) => {
-          hashMap.put(wrap(k, x.getMapKeyObjectInspector, keyType),
-                      wrap(v, x.getMapValueObjectInspector, valueType))
+          hashMap.put(
+            wrap(k, x.getMapKeyObjectInspector, keyType),
+            wrap(v, x.getMapValueObjectInspector, valueType))
         })
 
         hashMap
@@ -820,14 +824,16 @@ private[hive] trait HiveInspectors {
         StructType(
           s.getAllStructFieldRefs.asScala.map(
             f =>
-              types.StructField(f.getFieldName,
-                                inspectorToDataType(f.getFieldObjectInspector),
-                                nullable = true)))
+              types.StructField(
+                f.getFieldName,
+                inspectorToDataType(f.getFieldObjectInspector),
+                nullable = true)))
       case l: ListObjectInspector =>
         ArrayType(inspectorToDataType(l.getListElementObjectInspector))
       case m: MapObjectInspector =>
-        MapType(inspectorToDataType(m.getMapKeyObjectInspector),
-                inspectorToDataType(m.getMapValueObjectInspector))
+        MapType(
+          inspectorToDataType(m.getMapKeyObjectInspector),
+          inspectorToDataType(m.getMapValueObjectInspector))
       case _: WritableStringObjectInspector => StringType
       case _: JavaStringObjectInspector => StringType
       case _: WritableHiveVarcharObjectInspector => StringType
@@ -877,8 +883,9 @@ private[hive] trait HiveInspectors {
   private def getIntWritableConstantObjectInspector(
       value: Any): ObjectInspector =
     PrimitiveObjectInspectorFactory
-      .getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.intTypeInfo,
-                                                   getIntWritable(value))
+      .getPrimitiveWritableConstantObjectInspector(
+        TypeInfoFactory.intTypeInfo,
+        getIntWritable(value))
 
   private def getDoubleWritableConstantObjectInspector(
       value: Any): ObjectInspector =

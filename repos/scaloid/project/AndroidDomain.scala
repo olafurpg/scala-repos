@@ -12,12 +12,13 @@ object ScalaType {
             params: List[ScalaType] = Nil,
             bounds: List[ScalaType] = Nil,
             isVar: Boolean = false): ScalaType =
-    ScalaType(name,
-              name.split('.').last,
-              params,
-              bounds,
-              isVar,
-              name /* reuse scala name by default */ )
+    ScalaType(
+      name,
+      name.split('.').last,
+      params,
+      bounds,
+      isVar,
+      name /* reuse scala name by default */ )
 }
 
 case class Argument(

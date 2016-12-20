@@ -42,11 +42,12 @@ object StressTestLog {
     logProprties
       .put(LogConfig.SegmentIndexBytesProp, 1024 * 1024: java.lang.Integer)
 
-    val log = new Log(dir = dir,
-                      config = LogConfig(logProprties),
-                      recoveryPoint = 0L,
-                      scheduler = time.scheduler,
-                      time = time)
+    val log = new Log(
+      dir = dir,
+      config = LogConfig(logProprties),
+      recoveryPoint = 0L,
+      scheduler = time.scheduler,
+      time = time)
     val writer = new WriterThread(log)
     writer.start()
     val reader = new ReaderThread(log)
@@ -65,8 +66,8 @@ object StressTestLog {
 
     while (running.get) {
       println(
-        "Reader offset = %d, writer offset = %d".format(reader.offset,
-                                                        writer.offset))
+        "Reader offset = %d, writer offset = %d"
+          .format(reader.offset, writer.offset))
       Thread.sleep(1000)
     }
   }

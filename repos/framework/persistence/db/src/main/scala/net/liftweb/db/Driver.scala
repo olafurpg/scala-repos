@@ -328,8 +328,9 @@ object PostgreSqlDriver extends BasePostgreSQLDriver {
       tableName: String,
       genKeyNames: List[String],
       handler: Either[ResultSet, Int] => T): T =
-    DB.prepareStatement(query + " RETURNING " + genKeyNames.mkString(","),
-                        conn) { stmt =>
+    DB.prepareStatement(
+      query + " RETURNING " + genKeyNames.mkString(","),
+      conn) { stmt =>
       setter(stmt)
       handler(Left(stmt.executeQuery))
     }

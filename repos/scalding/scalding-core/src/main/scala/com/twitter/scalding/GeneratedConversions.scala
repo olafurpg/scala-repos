@@ -60,11 +60,12 @@ trait GeneratedTupleConverters extends LowPriorityTupleConverters {
     new TupleConverter[Tuple5[A, B, C, D, E]] {
       def apply(te: TupleEntry) = {
         val tup = te.getTuple
-        Tuple5(gA.get(tup, 0),
-               gB.get(tup, 1),
-               gC.get(tup, 2),
-               gD.get(tup, 3),
-               gE.get(tup, 4))
+        Tuple5(
+          gA.get(tup, 0),
+          gB.get(tup, 1),
+          gC.get(tup, 2),
+          gD.get(tup, 3),
+          gE.get(tup, 4))
       }
       def arity = 5
     }
@@ -79,12 +80,13 @@ trait GeneratedTupleConverters extends LowPriorityTupleConverters {
     new TupleConverter[Tuple6[A, B, C, D, E, F]] {
       def apply(te: TupleEntry) = {
         val tup = te.getTuple
-        Tuple6(gA.get(tup, 0),
-               gB.get(tup, 1),
-               gC.get(tup, 2),
-               gD.get(tup, 3),
-               gE.get(tup, 4),
-               gF.get(tup, 5))
+        Tuple6(
+          gA.get(tup, 0),
+          gB.get(tup, 1),
+          gC.get(tup, 2),
+          gD.get(tup, 3),
+          gE.get(tup, 4),
+          gF.get(tup, 5))
       }
       def arity = 6
     }
@@ -100,13 +102,14 @@ trait GeneratedTupleConverters extends LowPriorityTupleConverters {
     new TupleConverter[Tuple7[A, B, C, D, E, F, G]] {
       def apply(te: TupleEntry) = {
         val tup = te.getTuple
-        Tuple7(gA.get(tup, 0),
-               gB.get(tup, 1),
-               gC.get(tup, 2),
-               gD.get(tup, 3),
-               gE.get(tup, 4),
-               gF.get(tup, 5),
-               gG.get(tup, 6))
+        Tuple7(
+          gA.get(tup, 0),
+          gB.get(tup, 1),
+          gC.get(tup, 2),
+          gD.get(tup, 3),
+          gE.get(tup, 4),
+          gF.get(tup, 5),
+          gG.get(tup, 6))
       }
       def arity = 7
     }
@@ -123,14 +126,15 @@ trait GeneratedTupleConverters extends LowPriorityTupleConverters {
     new TupleConverter[Tuple8[A, B, C, D, E, F, G, H]] {
       def apply(te: TupleEntry) = {
         val tup = te.getTuple
-        Tuple8(gA.get(tup, 0),
-               gB.get(tup, 1),
-               gC.get(tup, 2),
-               gD.get(tup, 3),
-               gE.get(tup, 4),
-               gF.get(tup, 5),
-               gG.get(tup, 6),
-               gH.get(tup, 7))
+        Tuple8(
+          gA.get(tup, 0),
+          gB.get(tup, 1),
+          gC.get(tup, 2),
+          gD.get(tup, 3),
+          gE.get(tup, 4),
+          gF.get(tup, 5),
+          gG.get(tup, 6),
+          gH.get(tup, 7))
       }
       def arity = 8
     }
@@ -148,15 +152,16 @@ trait GeneratedTupleConverters extends LowPriorityTupleConverters {
     new TupleConverter[Tuple9[A, B, C, D, E, F, G, H, I]] {
       def apply(te: TupleEntry) = {
         val tup = te.getTuple
-        Tuple9(gA.get(tup, 0),
-               gB.get(tup, 1),
-               gC.get(tup, 2),
-               gD.get(tup, 3),
-               gE.get(tup, 4),
-               gF.get(tup, 5),
-               gG.get(tup, 6),
-               gH.get(tup, 7),
-               gI.get(tup, 8))
+        Tuple9(
+          gA.get(tup, 0),
+          gB.get(tup, 1),
+          gC.get(tup, 2),
+          gD.get(tup, 3),
+          gE.get(tup, 4),
+          gF.get(tup, 5),
+          gG.get(tup, 6),
+          gH.get(tup, 7),
+          gI.get(tup, 8))
       }
       def arity = 9
     }
@@ -176,16 +181,17 @@ trait GeneratedTupleConverters extends LowPriorityTupleConverters {
     new TupleConverter[Tuple10[A, B, C, D, E, F, G, H, I, J]] {
       def apply(te: TupleEntry) = {
         val tup = te.getTuple
-        Tuple10(gA.get(tup, 0),
-                gB.get(tup, 1),
-                gC.get(tup, 2),
-                gD.get(tup, 3),
-                gE.get(tup, 4),
-                gF.get(tup, 5),
-                gG.get(tup, 6),
-                gH.get(tup, 7),
-                gI.get(tup, 8),
-                gJ.get(tup, 9))
+        Tuple10(
+          gA.get(tup, 0),
+          gB.get(tup, 1),
+          gC.get(tup, 2),
+          gD.get(tup, 3),
+          gE.get(tup, 4),
+          gF.get(tup, 5),
+          gG.get(tup, 6),
+          gH.get(tup, 7),
+          gI.get(tup, 8),
+          gJ.get(tup, 9))
       }
       def arity = 10
     }
@@ -206,17 +212,18 @@ trait GeneratedTupleConverters extends LowPriorityTupleConverters {
     new TupleConverter[Tuple11[A, B, C, D, E, F, G, H, I, J, K]] {
       def apply(te: TupleEntry) = {
         val tup = te.getTuple
-        Tuple11(gA.get(tup, 0),
-                gB.get(tup, 1),
-                gC.get(tup, 2),
-                gD.get(tup, 3),
-                gE.get(tup, 4),
-                gF.get(tup, 5),
-                gG.get(tup, 6),
-                gH.get(tup, 7),
-                gI.get(tup, 8),
-                gJ.get(tup, 9),
-                gK.get(tup, 10))
+        Tuple11(
+          gA.get(tup, 0),
+          gB.get(tup, 1),
+          gC.get(tup, 2),
+          gD.get(tup, 3),
+          gE.get(tup, 4),
+          gF.get(tup, 5),
+          gG.get(tup, 6),
+          gH.get(tup, 7),
+          gI.get(tup, 8),
+          gJ.get(tup, 9),
+          gK.get(tup, 10))
       }
       def arity = 11
     }
@@ -238,18 +245,19 @@ trait GeneratedTupleConverters extends LowPriorityTupleConverters {
     new TupleConverter[Tuple12[A, B, C, D, E, F, G, H, I, J, K, L]] {
       def apply(te: TupleEntry) = {
         val tup = te.getTuple
-        Tuple12(gA.get(tup, 0),
-                gB.get(tup, 1),
-                gC.get(tup, 2),
-                gD.get(tup, 3),
-                gE.get(tup, 4),
-                gF.get(tup, 5),
-                gG.get(tup, 6),
-                gH.get(tup, 7),
-                gI.get(tup, 8),
-                gJ.get(tup, 9),
-                gK.get(tup, 10),
-                gL.get(tup, 11))
+        Tuple12(
+          gA.get(tup, 0),
+          gB.get(tup, 1),
+          gC.get(tup, 2),
+          gD.get(tup, 3),
+          gE.get(tup, 4),
+          gF.get(tup, 5),
+          gG.get(tup, 6),
+          gH.get(tup, 7),
+          gI.get(tup, 8),
+          gJ.get(tup, 9),
+          gK.get(tup, 10),
+          gL.get(tup, 11))
       }
       def arity = 12
     }
@@ -272,19 +280,20 @@ trait GeneratedTupleConverters extends LowPriorityTupleConverters {
     new TupleConverter[Tuple13[A, B, C, D, E, F, G, H, I, J, K, L, M]] {
       def apply(te: TupleEntry) = {
         val tup = te.getTuple
-        Tuple13(gA.get(tup, 0),
-                gB.get(tup, 1),
-                gC.get(tup, 2),
-                gD.get(tup, 3),
-                gE.get(tup, 4),
-                gF.get(tup, 5),
-                gG.get(tup, 6),
-                gH.get(tup, 7),
-                gI.get(tup, 8),
-                gJ.get(tup, 9),
-                gK.get(tup, 10),
-                gL.get(tup, 11),
-                gM.get(tup, 12))
+        Tuple13(
+          gA.get(tup, 0),
+          gB.get(tup, 1),
+          gC.get(tup, 2),
+          gD.get(tup, 3),
+          gE.get(tup, 4),
+          gF.get(tup, 5),
+          gG.get(tup, 6),
+          gH.get(tup, 7),
+          gI.get(tup, 8),
+          gJ.get(tup, 9),
+          gK.get(tup, 10),
+          gL.get(tup, 11),
+          gM.get(tup, 12))
       }
       def arity = 13
     }
@@ -308,20 +317,21 @@ trait GeneratedTupleConverters extends LowPriorityTupleConverters {
     new TupleConverter[Tuple14[A, B, C, D, E, F, G, H, I, J, K, L, M, N]] {
       def apply(te: TupleEntry) = {
         val tup = te.getTuple
-        Tuple14(gA.get(tup, 0),
-                gB.get(tup, 1),
-                gC.get(tup, 2),
-                gD.get(tup, 3),
-                gE.get(tup, 4),
-                gF.get(tup, 5),
-                gG.get(tup, 6),
-                gH.get(tup, 7),
-                gI.get(tup, 8),
-                gJ.get(tup, 9),
-                gK.get(tup, 10),
-                gL.get(tup, 11),
-                gM.get(tup, 12),
-                gN.get(tup, 13))
+        Tuple14(
+          gA.get(tup, 0),
+          gB.get(tup, 1),
+          gC.get(tup, 2),
+          gD.get(tup, 3),
+          gE.get(tup, 4),
+          gF.get(tup, 5),
+          gG.get(tup, 6),
+          gH.get(tup, 7),
+          gI.get(tup, 8),
+          gJ.get(tup, 9),
+          gK.get(tup, 10),
+          gL.get(tup, 11),
+          gM.get(tup, 12),
+          gN.get(tup, 13))
       }
       def arity = 14
     }
@@ -346,21 +356,22 @@ trait GeneratedTupleConverters extends LowPriorityTupleConverters {
     new TupleConverter[Tuple15[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O]] {
       def apply(te: TupleEntry) = {
         val tup = te.getTuple
-        Tuple15(gA.get(tup, 0),
-                gB.get(tup, 1),
-                gC.get(tup, 2),
-                gD.get(tup, 3),
-                gE.get(tup, 4),
-                gF.get(tup, 5),
-                gG.get(tup, 6),
-                gH.get(tup, 7),
-                gI.get(tup, 8),
-                gJ.get(tup, 9),
-                gK.get(tup, 10),
-                gL.get(tup, 11),
-                gM.get(tup, 12),
-                gN.get(tup, 13),
-                gO.get(tup, 14))
+        Tuple15(
+          gA.get(tup, 0),
+          gB.get(tup, 1),
+          gC.get(tup, 2),
+          gD.get(tup, 3),
+          gE.get(tup, 4),
+          gF.get(tup, 5),
+          gG.get(tup, 6),
+          gH.get(tup, 7),
+          gI.get(tup, 8),
+          gJ.get(tup, 9),
+          gK.get(tup, 10),
+          gL.get(tup, 11),
+          gM.get(tup, 12),
+          gN.get(tup, 13),
+          gO.get(tup, 14))
       }
       def arity = 15
     }
@@ -400,22 +411,23 @@ trait GeneratedTupleConverters extends LowPriorityTupleConverters {
     new TupleConverter[Tuple16[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P]] {
       def apply(te: TupleEntry) = {
         val tup = te.getTuple
-        Tuple16(gA.get(tup, 0),
-                gB.get(tup, 1),
-                gC.get(tup, 2),
-                gD.get(tup, 3),
-                gE.get(tup, 4),
-                gF.get(tup, 5),
-                gG.get(tup, 6),
-                gH.get(tup, 7),
-                gI.get(tup, 8),
-                gJ.get(tup, 9),
-                gK.get(tup, 10),
-                gL.get(tup, 11),
-                gM.get(tup, 12),
-                gN.get(tup, 13),
-                gO.get(tup, 14),
-                gP.get(tup, 15))
+        Tuple16(
+          gA.get(tup, 0),
+          gB.get(tup, 1),
+          gC.get(tup, 2),
+          gD.get(tup, 3),
+          gE.get(tup, 4),
+          gF.get(tup, 5),
+          gG.get(tup, 6),
+          gH.get(tup, 7),
+          gI.get(tup, 8),
+          gJ.get(tup, 9),
+          gK.get(tup, 10),
+          gL.get(tup, 11),
+          gM.get(tup, 12),
+          gN.get(tup, 13),
+          gO.get(tup, 14),
+          gP.get(tup, 15))
       }
       def arity = 16
     }
@@ -458,23 +470,24 @@ trait GeneratedTupleConverters extends LowPriorityTupleConverters {
       Tuple17[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q]] {
       def apply(te: TupleEntry) = {
         val tup = te.getTuple
-        Tuple17(gA.get(tup, 0),
-                gB.get(tup, 1),
-                gC.get(tup, 2),
-                gD.get(tup, 3),
-                gE.get(tup, 4),
-                gF.get(tup, 5),
-                gG.get(tup, 6),
-                gH.get(tup, 7),
-                gI.get(tup, 8),
-                gJ.get(tup, 9),
-                gK.get(tup, 10),
-                gL.get(tup, 11),
-                gM.get(tup, 12),
-                gN.get(tup, 13),
-                gO.get(tup, 14),
-                gP.get(tup, 15),
-                gQ.get(tup, 16))
+        Tuple17(
+          gA.get(tup, 0),
+          gB.get(tup, 1),
+          gC.get(tup, 2),
+          gD.get(tup, 3),
+          gE.get(tup, 4),
+          gF.get(tup, 5),
+          gG.get(tup, 6),
+          gH.get(tup, 7),
+          gI.get(tup, 8),
+          gJ.get(tup, 9),
+          gK.get(tup, 10),
+          gL.get(tup, 11),
+          gM.get(tup, 12),
+          gN.get(tup, 13),
+          gO.get(tup, 14),
+          gP.get(tup, 15),
+          gQ.get(tup, 16))
       }
       def arity = 17
     }
@@ -519,24 +532,25 @@ trait GeneratedTupleConverters extends LowPriorityTupleConverters {
       Tuple18[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R]] {
       def apply(te: TupleEntry) = {
         val tup = te.getTuple
-        Tuple18(gA.get(tup, 0),
-                gB.get(tup, 1),
-                gC.get(tup, 2),
-                gD.get(tup, 3),
-                gE.get(tup, 4),
-                gF.get(tup, 5),
-                gG.get(tup, 6),
-                gH.get(tup, 7),
-                gI.get(tup, 8),
-                gJ.get(tup, 9),
-                gK.get(tup, 10),
-                gL.get(tup, 11),
-                gM.get(tup, 12),
-                gN.get(tup, 13),
-                gO.get(tup, 14),
-                gP.get(tup, 15),
-                gQ.get(tup, 16),
-                gR.get(tup, 17))
+        Tuple18(
+          gA.get(tup, 0),
+          gB.get(tup, 1),
+          gC.get(tup, 2),
+          gD.get(tup, 3),
+          gE.get(tup, 4),
+          gF.get(tup, 5),
+          gG.get(tup, 6),
+          gH.get(tup, 7),
+          gI.get(tup, 8),
+          gJ.get(tup, 9),
+          gK.get(tup, 10),
+          gL.get(tup, 11),
+          gM.get(tup, 12),
+          gN.get(tup, 13),
+          gO.get(tup, 14),
+          gP.get(tup, 15),
+          gQ.get(tup, 16),
+          gR.get(tup, 17))
       }
       def arity = 18
     }
@@ -583,25 +597,26 @@ trait GeneratedTupleConverters extends LowPriorityTupleConverters {
       Tuple19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]] {
       def apply(te: TupleEntry) = {
         val tup = te.getTuple
-        Tuple19(gA.get(tup, 0),
-                gB.get(tup, 1),
-                gC.get(tup, 2),
-                gD.get(tup, 3),
-                gE.get(tup, 4),
-                gF.get(tup, 5),
-                gG.get(tup, 6),
-                gH.get(tup, 7),
-                gI.get(tup, 8),
-                gJ.get(tup, 9),
-                gK.get(tup, 10),
-                gL.get(tup, 11),
-                gM.get(tup, 12),
-                gN.get(tup, 13),
-                gO.get(tup, 14),
-                gP.get(tup, 15),
-                gQ.get(tup, 16),
-                gR.get(tup, 17),
-                gS.get(tup, 18))
+        Tuple19(
+          gA.get(tup, 0),
+          gB.get(tup, 1),
+          gC.get(tup, 2),
+          gD.get(tup, 3),
+          gE.get(tup, 4),
+          gF.get(tup, 5),
+          gG.get(tup, 6),
+          gH.get(tup, 7),
+          gI.get(tup, 8),
+          gJ.get(tup, 9),
+          gK.get(tup, 10),
+          gL.get(tup, 11),
+          gM.get(tup, 12),
+          gN.get(tup, 13),
+          gO.get(tup, 14),
+          gP.get(tup, 15),
+          gQ.get(tup, 16),
+          gR.get(tup, 17),
+          gS.get(tup, 18))
       }
       def arity = 19
     }
@@ -650,26 +665,27 @@ trait GeneratedTupleConverters extends LowPriorityTupleConverters {
       Tuple20[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]] {
       def apply(te: TupleEntry) = {
         val tup = te.getTuple
-        Tuple20(gA.get(tup, 0),
-                gB.get(tup, 1),
-                gC.get(tup, 2),
-                gD.get(tup, 3),
-                gE.get(tup, 4),
-                gF.get(tup, 5),
-                gG.get(tup, 6),
-                gH.get(tup, 7),
-                gI.get(tup, 8),
-                gJ.get(tup, 9),
-                gK.get(tup, 10),
-                gL.get(tup, 11),
-                gM.get(tup, 12),
-                gN.get(tup, 13),
-                gO.get(tup, 14),
-                gP.get(tup, 15),
-                gQ.get(tup, 16),
-                gR.get(tup, 17),
-                gS.get(tup, 18),
-                gT.get(tup, 19))
+        Tuple20(
+          gA.get(tup, 0),
+          gB.get(tup, 1),
+          gC.get(tup, 2),
+          gD.get(tup, 3),
+          gE.get(tup, 4),
+          gF.get(tup, 5),
+          gG.get(tup, 6),
+          gH.get(tup, 7),
+          gI.get(tup, 8),
+          gJ.get(tup, 9),
+          gK.get(tup, 10),
+          gL.get(tup, 11),
+          gM.get(tup, 12),
+          gN.get(tup, 13),
+          gO.get(tup, 14),
+          gP.get(tup, 15),
+          gQ.get(tup, 16),
+          gR.get(tup, 17),
+          gS.get(tup, 18),
+          gT.get(tup, 19))
       }
       def arity = 20
     }
@@ -720,27 +736,28 @@ trait GeneratedTupleConverters extends LowPriorityTupleConverters {
       Tuple21[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]] {
       def apply(te: TupleEntry) = {
         val tup = te.getTuple
-        Tuple21(gA.get(tup, 0),
-                gB.get(tup, 1),
-                gC.get(tup, 2),
-                gD.get(tup, 3),
-                gE.get(tup, 4),
-                gF.get(tup, 5),
-                gG.get(tup, 6),
-                gH.get(tup, 7),
-                gI.get(tup, 8),
-                gJ.get(tup, 9),
-                gK.get(tup, 10),
-                gL.get(tup, 11),
-                gM.get(tup, 12),
-                gN.get(tup, 13),
-                gO.get(tup, 14),
-                gP.get(tup, 15),
-                gQ.get(tup, 16),
-                gR.get(tup, 17),
-                gS.get(tup, 18),
-                gT.get(tup, 19),
-                gU.get(tup, 20))
+        Tuple21(
+          gA.get(tup, 0),
+          gB.get(tup, 1),
+          gC.get(tup, 2),
+          gD.get(tup, 3),
+          gE.get(tup, 4),
+          gF.get(tup, 5),
+          gG.get(tup, 6),
+          gH.get(tup, 7),
+          gI.get(tup, 8),
+          gJ.get(tup, 9),
+          gK.get(tup, 10),
+          gL.get(tup, 11),
+          gM.get(tup, 12),
+          gN.get(tup, 13),
+          gO.get(tup, 14),
+          gP.get(tup, 15),
+          gQ.get(tup, 16),
+          gR.get(tup, 17),
+          gS.get(tup, 18),
+          gT.get(tup, 19),
+          gU.get(tup, 20))
       }
       def arity = 21
     }
@@ -836,28 +853,29 @@ trait GeneratedTupleConverters extends LowPriorityTupleConverters {
               V]] {
       def apply(te: TupleEntry) = {
         val tup = te.getTuple
-        Tuple22(gA.get(tup, 0),
-                gB.get(tup, 1),
-                gC.get(tup, 2),
-                gD.get(tup, 3),
-                gE.get(tup, 4),
-                gF.get(tup, 5),
-                gG.get(tup, 6),
-                gH.get(tup, 7),
-                gI.get(tup, 8),
-                gJ.get(tup, 9),
-                gK.get(tup, 10),
-                gL.get(tup, 11),
-                gM.get(tup, 12),
-                gN.get(tup, 13),
-                gO.get(tup, 14),
-                gP.get(tup, 15),
-                gQ.get(tup, 16),
-                gR.get(tup, 17),
-                gS.get(tup, 18),
-                gT.get(tup, 19),
-                gU.get(tup, 20),
-                gV.get(tup, 21))
+        Tuple22(
+          gA.get(tup, 0),
+          gB.get(tup, 1),
+          gC.get(tup, 2),
+          gD.get(tup, 3),
+          gE.get(tup, 4),
+          gF.get(tup, 5),
+          gG.get(tup, 6),
+          gH.get(tup, 7),
+          gI.get(tup, 8),
+          gJ.get(tup, 9),
+          gK.get(tup, 10),
+          gL.get(tup, 11),
+          gM.get(tup, 12),
+          gN.get(tup, 13),
+          gO.get(tup, 14),
+          gP.get(tup, 15),
+          gQ.get(tup, 16),
+          gR.get(tup, 17),
+          gS.get(tup, 18),
+          gT.get(tup, 19),
+          gU.get(tup, 20),
+          gV.get(tup, 21))
       }
       def arity = 22
     }

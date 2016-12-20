@@ -72,9 +72,10 @@ class MemoryLaws extends WordSpec {
   def diamondLaw[T: Manifest: Arbitrary,
                  K: Arbitrary,
                  V: Monoid: Arbitrary: Equiv] =
-    testGraph[T, K, V].diamondChecker(sample[List[T]],
-                                      sample[T => List[(K, V)]],
-                                      sample[T => List[(K, V)]])
+    testGraph[T, K, V].diamondChecker(
+      sample[List[T]],
+      sample[T => List[(K, V)]],
+      sample[T => List[(K, V)]])
 
   /**
     * Tests the in-memory planner by generating arbitrary flatMap and

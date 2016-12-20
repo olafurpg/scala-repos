@@ -81,8 +81,9 @@ class DecimalPrecisionSuite extends PlanTest with BeforeAndAfter {
   private def checkUnion(left: Expression,
                          right: Expression,
                          expectedType: DataType): Unit = {
-    val plan = Union(Project(Seq(Alias(left, "l")()), relation),
-                     Project(Seq(Alias(right, "r")()), relation))
+    val plan = Union(
+      Project(Seq(Alias(left, "l")()), relation),
+      Project(Seq(Alias(right, "r")()), relation))
     val (l, r) = analyzer
       .execute(plan)
       .collect {

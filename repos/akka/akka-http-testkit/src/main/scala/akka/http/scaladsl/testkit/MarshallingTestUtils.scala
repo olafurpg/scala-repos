@@ -17,8 +17,9 @@ trait MarshallingTestUtils {
   def marshal[T: ToEntityMarshaller](value: T)(
       implicit ec: ExecutionContext,
       mat: Materializer): HttpEntity.Strict =
-    Await.result(Marshal(value).to[HttpEntity].flatMap(_.toStrict(1.second)),
-                 1.second)
+    Await.result(
+      Marshal(value).to[HttpEntity].flatMap(_.toStrict(1.second)),
+      1.second)
 
   def unmarshalValue[T: FromEntityUnmarshaller](entity: HttpEntity)(
       implicit ec: ExecutionContext,

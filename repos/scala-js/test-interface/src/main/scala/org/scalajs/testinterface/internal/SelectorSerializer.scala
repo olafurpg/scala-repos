@@ -14,9 +14,10 @@ object SelectorSerializer {
     case sel: NestedSuiteSelector =>
       lit(selType = "NestedSuiteSelector", suiteId = sel.suiteId)
     case sel: NestedTestSelector =>
-      lit(selType = "NestedTestSelector",
-          suiteId = sel.suiteId,
-          testName = sel.testName)
+      lit(
+        selType = "NestedTestSelector",
+        suiteId = sel.suiteId,
+        testName = sel.testName)
     case sel: TestWildcardSelector =>
       lit(selType = "TestWildcardSelector", testWildcard = sel.testWildcard)
     case _ =>
@@ -33,8 +34,9 @@ object SelectorSerializer {
       case "NestedSuiteSelector" =>
         new NestedSuiteSelector(obj.suiteId.asInstanceOf[String])
       case "NestedTestSelector" =>
-        new NestedTestSelector(obj.suiteId.asInstanceOf[String],
-                               obj.testName.asInstanceOf[String])
+        new NestedTestSelector(
+          obj.suiteId.asInstanceOf[String],
+          obj.testName.asInstanceOf[String])
       case "TestWildcardSelector" =>
         new TestWildcardSelector(obj.testWildcard.asInstanceOf[String])
       case tpe =>

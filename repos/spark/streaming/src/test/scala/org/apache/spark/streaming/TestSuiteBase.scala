@@ -407,10 +407,12 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
       numBatches: Int,
       numExpectedOutput: Int
   ): Seq[Seq[Seq[V]]] = {
-    assert(numBatches > 0,
-           "Number of batches to run stream computation is zero")
-    assert(numExpectedOutput > 0,
-           "Number of expected outputs after " + numBatches + " is zero")
+    assert(
+      numBatches > 0,
+      "Number of batches to run stream computation is zero")
+    assert(
+      numExpectedOutput > 0,
+      "Number of expected outputs after " + numBatches + " is zero")
     logInfo(
       "numBatches = " + numBatches + ", numExpectedOutput = " +
         numExpectedOutput)
@@ -452,10 +454,12 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
       val timeTaken = System.currentTimeMillis() - startTime
       logInfo("Output generated in " + timeTaken + " milliseconds")
       output.asScala.foreach(x => logInfo("[" + x.mkString(",") + "]"))
-      assert(timeTaken < maxWaitTimeMillis,
-             "Operation timed out after " + timeTaken + " ms")
-      assert(output.size === numExpectedOutput,
-             "Unexpected number of outputs generated")
+      assert(
+        timeTaken < maxWaitTimeMillis,
+        "Operation timed out after " + timeTaken + " ms")
+      assert(
+        output.size === numExpectedOutput,
+        "Unexpected number of outputs generated")
 
       Thread.sleep(100) // Give some time for the forgetting old RDDs to complete
     } finally {
@@ -553,12 +557,13 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
       expectedOutput: Seq[Seq[W]],
       useSet: Boolean
   ) {
-    testOperation[U, V, W](input1,
-                           input2,
-                           operation,
-                           expectedOutput,
-                           -1,
-                           useSet)
+    testOperation[U, V, W](
+      input1,
+      input2,
+      operation,
+      expectedOutput,
+      -1,
+      useSet)
   }
 
   /**

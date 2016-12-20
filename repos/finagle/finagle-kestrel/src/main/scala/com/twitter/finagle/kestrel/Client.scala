@@ -610,10 +610,11 @@ protected[kestrel] class ThriftConnectedClient(
 
   private def openRead(queueName: String)(
       client: FinagledClosableClient): Future[Seq[Item]] =
-    client.get(queueName,
-               1,
-               Int.MaxValue,
-               safeLongToInt(txnAbortTimeout.inMilliseconds.toLong))
+    client.get(
+      queueName,
+      1,
+      Int.MaxValue,
+      safeLongToInt(txnAbortTimeout.inMilliseconds.toLong))
 
   private def confirmAndOpenRead(queueName: String)(id: Long)(
       client: FinagledClosableClient): Future[Seq[Item]] =

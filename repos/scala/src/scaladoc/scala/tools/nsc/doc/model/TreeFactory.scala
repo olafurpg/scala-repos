@@ -30,9 +30,10 @@ trait TreeFactory { thisTreeFactory: ModelFactory with TreeFactory =>
         val firstIndex = pos.start
         val lastIndex = pos.end
 
-        assert(firstIndex < lastIndex,
-               "Invalid position indices for tree " + rhs + " (" +
-                 firstIndex + ", " + lastIndex + ")")
+        assert(
+          firstIndex < lastIndex,
+          "Invalid position indices for tree " + rhs + " (" +
+            firstIndex + ", " + lastIndex + ")")
         expr.appendAll(source.content, firstIndex, lastIndex - firstIndex)
 
         val traverser = new Traverser {

@@ -32,9 +32,10 @@ class UTestRunConfiguration(
     if (parentTypeDef == null) {
       currentClass.qualifiedName + acc
     } else {
-      getClassPath(parentTypeDef,
-                   acc + (if (parentTypeDef.isObject) "$" else ".") +
-                     currentClass.getName)
+      getClassPath(
+        parentTypeDef,
+        acc + (if (parentTypeDef.isObject) "$" else ".") +
+          currentClass.getName)
     }
   }
 

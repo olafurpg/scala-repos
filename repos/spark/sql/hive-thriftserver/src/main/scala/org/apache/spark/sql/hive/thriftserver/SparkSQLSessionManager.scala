@@ -48,9 +48,10 @@ private[hive] class SparkSQLSessionManager(hiveServer: HiveServer2,
 
     val backgroundPoolSize =
       hiveConf.getIntVar(ConfVars.HIVE_SERVER2_ASYNC_EXEC_THREADS)
-    setSuperField(this,
-                  "backgroundOperationPool",
-                  Executors.newFixedThreadPool(backgroundPoolSize))
+    setSuperField(
+      this,
+      "backgroundOperationPool",
+      Executors.newFixedThreadPool(backgroundPoolSize))
     getAncestorField[Log](this, 3, "LOG")
       .info(s"HiveServer2: Async execution pool size $backgroundPoolSize")
 
@@ -67,13 +68,14 @@ private[hive] class SparkSQLSessionManager(hiveServer: HiveServer2,
                            sessionConf: java.util.Map[String, String],
                            withImpersonation: Boolean,
                            delegationToken: String): SessionHandle = {
-    val sessionHandle = super.openSession(protocol,
-                                          username,
-                                          passwd,
-                                          ipAddress,
-                                          sessionConf,
-                                          withImpersonation,
-                                          delegationToken)
+    val sessionHandle = super.openSession(
+      protocol,
+      username,
+      passwd,
+      ipAddress,
+      sessionConf,
+      withImpersonation,
+      delegationToken)
     val session = super.getSession(sessionHandle)
     HiveThriftServer2.listener.onSessionCreated(
       session.getIpAddress,

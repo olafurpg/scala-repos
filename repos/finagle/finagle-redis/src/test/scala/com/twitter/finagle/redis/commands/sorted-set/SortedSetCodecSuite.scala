@@ -94,12 +94,14 @@ final class SortedSetCodecSuite extends RedisRequestTest {
 
   test("Correctly encode ZCOUNT") {
     Map(
-      "foo -inf +inf" -> ZCount(StringToChannelBuffer("foo"),
-                                ZInterval.MIN,
-                                ZInterval.MAX),
-      "foo (1.0 3.0" -> ZCount(StringToChannelBuffer("foo"),
-                               ZInterval.exclusive(1),
-                               ZInterval(3))
+      "foo -inf +inf" -> ZCount(
+        StringToChannelBuffer("foo"),
+        ZInterval.MIN,
+        ZInterval.MAX),
+      "foo (1.0 3.0" -> ZCount(
+        StringToChannelBuffer("foo"),
+        ZInterval.exclusive(1),
+        ZInterval(3))
     ).foreach {
       case (s, v) =>
         unwrap(codec(wrap("ZCOUNT %s\r\n".format(s)))) {
@@ -251,8 +253,9 @@ final class SortedSetCodecSuite extends RedisRequestTest {
     }
   }
 
-  test("Throw a ClientError for ZRANGE and ZREVRANGE with invalid arguments",
-       CodecTest) {
+  test(
+    "Throw a ClientError for ZRANGE and ZREVRANGE with invalid arguments",
+    CodecTest) {
     val bad = List(
       "%s",
       "%s myset",
@@ -410,10 +413,11 @@ final class SortedSetCodecSuite extends RedisRequestTest {
     "Correctly encode ZRANGEBYSCORE and ZREVRANGEBYSCORE from 1 (excl.) to 2 (excl.)") {
     List("ZRANGEBYSCORE", "ZREVRANGEBYSCORE").foreach { cmd =>
       unwrap(doCmd(cmd, "%s myzset (1 (2\r\n")) {
-        verifyRangeByScore(cmd,
-                           "myzset",
-                           ZInterval.exclusive(1),
-                           ZInterval.exclusive(2)) { (s, l) =>
+        verifyRangeByScore(
+          cmd,
+          "myzset",
+          ZInterval.exclusive(1),
+          ZInterval.exclusive(2)) { (s, l) =>
           assert(s == None)
           assert(l == None)
         }
@@ -446,8 +450,9 @@ final class SortedSetCodecSuite extends RedisRequestTest {
     }
   }
 
-  test("Throw a ClientError for ZRANK and ZREVRANK with invalid arguments",
-       CodecTest) {
+  test(
+    "Throw a ClientError for ZRANK and ZREVRANK with invalid arguments",
+    CodecTest) {
     val bad = List("%s", "%s key", "%s key member member")
 
     List("ZRANK", "ZREVRANK").foreach { cmd =>
@@ -510,14 +515,16 @@ final class SortedSetCodecSuite extends RedisRequestTest {
     }
   }
 
-  test("Throw a ClientError for ZREMRANGEBYRANK with invalid arguments",
-       CodecTest) {
-    List("%s",
-         "%s key",
-         "%s key start",
-         "%s key 1",
-         "%s key 1 stop",
-         "%s key start 2").foreach { b =>
+  test(
+    "Throw a ClientError for ZREMRANGEBYRANK with invalid arguments",
+    CodecTest) {
+    List(
+      "%s",
+      "%s key",
+      "%s key start",
+      "%s key 1",
+      "%s key 1 stop",
+      "%s key start 2").foreach { b =>
       intercept[ClientError] {
         codec(wrap("%s\r\n".format(b.format("ZREMRANGEBYRANK"))))
       }
@@ -533,14 +540,16 @@ final class SortedSetCodecSuite extends RedisRequestTest {
     }
   }
 
-  test("Throw a ClientError for ZREMRANGEBYSCORE with invalid arguments",
-       CodecTest) {
-    List("%s",
-         "%s key",
-         "%s key min",
-         "%s key min max",
-         "%s key ( 1",
-         "%s key (1 max").foreach { b =>
+  test(
+    "Throw a ClientError for ZREMRANGEBYSCORE with invalid arguments",
+    CodecTest) {
+    List(
+      "%s",
+      "%s key",
+      "%s key min",
+      "%s key min max",
+      "%s key ( 1",
+      "%s key (1 max").foreach { b =>
       intercept[ClientError] {
         codec(wrap("%s\r\n".format(b.format("ZREMRANGEBYSCORE"))))
       }

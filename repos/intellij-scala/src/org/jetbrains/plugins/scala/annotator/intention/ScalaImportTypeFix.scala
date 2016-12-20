@@ -129,8 +129,9 @@ class ScalaImportTypeFix(private var classes: Array[TypeToImport],
       new Point(visibleRectangle.x, visibleRectangle.y))
     val myStartOffset = editor.logicalPositionToOffset(startPosition)
     val endPosition = editor.xyToLogicalPosition(
-      new Point(visibleRectangle.x + visibleRectangle.width,
-                visibleRectangle.y + visibleRectangle.height))
+      new Point(
+        visibleRectangle.x + visibleRectangle.width,
+        visibleRectangle.y + visibleRectangle.height))
     val myEndOffset = editor.logicalPositionToOffset(
       new LogicalPosition(endPosition.line + 1, 0))
     new TextRange(myStartOffset, myEndOffset)
@@ -157,15 +158,16 @@ class ScalaImportTypeFix(private var classes: Array[TypeToImport],
             offset <= editor.getDocument.getTextLength) {
           HintManager
             .getInstance()
-            .showQuestionHint(editor,
-                              if (classes.length == 1)
-                                classes(0).qualifiedName + "? Alt+Enter"
-                              else
-                                classes(0).qualifiedName +
-                                  "? (multiple choices...) Alt+Enter",
-                              offset,
-                              offset + ref.getTextLength,
-                              action)
+            .showQuestionHint(
+              editor,
+              if (classes.length == 1)
+                classes(0).qualifiedName + "? Alt+Enter"
+              else
+                classes(0).qualifiedName +
+                  "? (multiple choices...) Alt+Enter",
+              offset,
+              offset + ref.getTextLength,
+              action)
           return
         }
       }

@@ -142,10 +142,11 @@ class ScopeAnnotatorTest extends SimpleTestCase {
   }
 
   def testGroups() {
-    assertClashes("def f(a: Any, a: Any); def f(b: Any, b: Any)",
-                  "f",
-                  "a",
-                  "b")
+    assertClashes(
+      "def f(a: Any, a: Any); def f(b: Any, b: Any)",
+      "f",
+      "a",
+      "b")
   }
 
   def testScopeInspection() {
@@ -165,8 +166,9 @@ class ScopeAnnotatorTest extends SimpleTestCase {
     assertClashes("while(true) { class C; class C }", "C")
     assertClashes("do { class C; class C } while(true)", "C")
     assertClashes("try { class C; class C } catch { case _ => }", "C")
-    assertClashes("try {} catch { case _ => } finally { class C; class C }",
-                  "C")
+    assertClashes(
+      "try {} catch { case _ => } finally { class C; class C }",
+      "C")
     assertClashes("new { class C; class C }", "C")
     assertClashes("null match { case _ => class C; class C }", "C")
     assertClashes("val x: (Any => Unit) = { case _ => class C; class C }", "C")
@@ -435,8 +437,9 @@ class ScopeAnnotatorTest extends SimpleTestCase {
   def testTypeErasure() {
     // precheck
     assertFine("def f(a: Foo) {}; def f(a: Bar) {}")
-    assertClashes("class Holder[T]; def f(a: Holder) {}; def f(a: Holder) {}",
-                  "f")
+    assertClashes(
+      "class Holder[T]; def f(a: Holder) {}; def f(a: Holder) {}",
+      "f")
     assertClashes(
       "class Holder[T]; def f(a: Holder[Any]) {}; def f(a: Holder[Any]) {}",
       "f")
@@ -537,9 +540,10 @@ class ScopeAnnotatorTest extends SimpleTestCase {
   def assertClashes(@Language(value = "Scala", prefix = Header) code: String,
                     pairs: String*) {
     val expectation = pairs.flatMap(p => List(p, p))
-    Assert.assertEquals("Incorrect clashed elements",
-                        expectation.mkString(", "),
-                        clashesOf(code).mkString(", "))
+    Assert.assertEquals(
+      "Incorrect clashed elements",
+      expectation.mkString(", "),
+      clashesOf(code).mkString(", "))
   }
 
   def assertFine(@Language(value = "Scala", prefix = Header) code: String) {

@@ -73,9 +73,10 @@ object MacroUtil {
       .map {
         case typeDef: ScTypeDefinition =>
           val lookupItem =
-            new ScalaLookupItem(typeDef,
-                                typeDef.getTruncedQualifiedName,
-                                Option(typeDef.getContainingClass))
+            new ScalaLookupItem(
+              typeDef,
+              typeDef.getTruncedQualifiedName,
+              Option(typeDef.getContainingClass))
           lookupItem.shouldImport = true
           lookupItem
       }
@@ -83,8 +84,9 @@ object MacroUtil {
 
   def getPrimaryConbstructorParams(context: ExpressionContext) =
     Option(
-      PsiTreeUtil.getParentOfType(context.getPsiElementAtStartOffset,
-                                  classOf[PsiClass]))
+      PsiTreeUtil.getParentOfType(
+        context.getPsiElementAtStartOffset,
+        classOf[PsiClass]))
       .map {
         case obj: ScObject => obj.fakeCompanionClassOrCompanionClass
         case other => other

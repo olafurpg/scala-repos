@@ -30,9 +30,10 @@ class ControllerSpec
 
     "publish its nodes" in {
       val c = system.actorOf(
-        Props(classOf[Controller],
-              1,
-              new InetSocketAddress(InetAddress.getLocalHost, 0)))
+        Props(
+          classOf[Controller],
+          1,
+          new InetSocketAddress(InetAddress.getLocalHost, 0)))
       c ! NodeInfo(A, AddressFromURIString("akka://sys"), testActor)
       expectMsg(ToClient(Done))
       c ! NodeInfo(B, AddressFromURIString("akka://sys"), testActor)

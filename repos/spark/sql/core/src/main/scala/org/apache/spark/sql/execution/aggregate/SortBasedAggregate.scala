@@ -52,8 +52,8 @@ case class SortBasedAggregate(
         .map(_.toAttribute)) ++ AttributeSet(aggregateBufferAttributes)
 
   override private[sql] lazy val metrics = Map(
-    "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
-                                                   "number of output rows"))
+    "numOutputRows" -> SQLMetrics
+      .createLongMetric(sparkContext, "number of output rows"))
 
   override def output: Seq[Attribute] = resultExpressions.map(_.toAttribute)
 
@@ -95,9 +95,10 @@ case class SortBasedAggregate(
             initialInputBufferOffset,
             resultExpressions,
             (expressions, inputSchema) =>
-              newMutableProjection(expressions,
-                                   inputSchema,
-                                   subexpressionEliminationEnabled),
+              newMutableProjection(
+                expressions,
+                inputSchema,
+                subexpressionEliminationEnabled),
             numOutputRows)
           if (!hasInput && groupingExpressions.isEmpty) {
             // There is no input and there is no grouping expressions.

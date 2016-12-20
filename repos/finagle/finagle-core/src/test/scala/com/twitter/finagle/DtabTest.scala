@@ -39,8 +39,9 @@ class DtabTest extends FunSuite with AssertionsForJUnit {
     assert(d1.stripPrefix(d1).isEmpty)
     assert(d1.stripPrefix(d2).isEmpty)
 
-    assertEquiv((d1 + Dentry.read("/foo => /123")).stripPrefix(d1),
-                Dtab.read("/foo=>/123"))
+    assertEquiv(
+      (d1 + Dentry.read("/foo => /123")).stripPrefix(d1),
+      Dtab.read("/foo=>/123"))
 
     assertEquiv(d1.stripPrefix(d1 + Dentry.read("/s => /b")), d1)
     assert(Dtab.empty.stripPrefix(d1).isEmpty)

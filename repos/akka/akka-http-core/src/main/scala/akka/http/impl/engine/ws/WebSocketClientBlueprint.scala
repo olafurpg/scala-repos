@@ -49,9 +49,10 @@ object WebSocketClientBlueprint {
             settings: ClientConnectionSettings,
             log: LoggingAdapter): Http.WebSocketClientLayer =
     (simpleTls.atopMat(handshake(request, settings, log))(Keep.right) atop WebSocket.framing atop WebSocket
-      .stack(serverSide = false,
-             maskingRandomFactory = settings.websocketRandomFactory,
-             log = log)).reversed
+      .stack(
+        serverSide = false,
+        maskingRandomFactory = settings.websocketRandomFactory,
+        log = log)).reversed
 
   /**
     * A bidi flow that injects and inspects the WS handshake and then goes out of the way. This BidiFlow
@@ -166,10 +167,11 @@ object WebSocketClientBlueprint {
       handshakeRequestSource ~> httpRequestBytesAndThenWSBytes
       wsIn.outlet ~> httpRequestBytesAndThenWSBytes
 
-      BidiShape(networkIn.in,
-                networkIn.out,
-                wsIn.in,
-                httpRequestBytesAndThenWSBytes.out)
+      BidiShape(
+        networkIn.in,
+        networkIn.out,
+        wsIn.in,
+        httpRequestBytesAndThenWSBytes.out)
     }) mapMaterializedValue (_ ⇒ result.future)
   }
 

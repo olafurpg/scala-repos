@@ -526,8 +526,9 @@ final class ConstArrayBuilder[T](initialCapacity: Int = 16,
     val total = len + i
     if (a.length < total)
       a = Arrays
-        .copyOf[Any](a.asInstanceOf[Array[AnyRef]],
-                     math.max((a.length * growFactor).toInt, total))
+        .copyOf[Any](
+          a.asInstanceOf[Array[AnyRef]],
+          math.max((a.length * growFactor).toInt, total))
         .asInstanceOf[Array[Any]]
   }
 

@@ -188,8 +188,9 @@ abstract class BTypes {
                                         classBType: ClassBType): ClassBType = {
     val superClass = classNode.superName match {
       case null =>
-        assert(classNode.name == ObjectRef.internalName,
-               s"class with missing super type: ${classNode.name}")
+        assert(
+          classNode.name == ObjectRef.internalName,
+          s"class with missing super type: ${classNode.name}")
         None
       case superName =>
         Some(classBTypeFromParsedClassfile(superName))
@@ -243,21 +244,23 @@ abstract class BTypes {
               classBTypeFromParsedClassfile(classNode.outerClass)
             }
           val staticFlag = (innerEntry.access & Opcodes.ACC_STATIC) != 0
-          NestedInfo(enclosingClass,
-                     Option(innerEntry.outerName),
-                     Option(innerEntry.innerName),
-                     staticFlag)
+          NestedInfo(
+            enclosingClass,
+            Option(innerEntry.outerName),
+            Option(innerEntry.innerName),
+            staticFlag)
       }
 
     val inlineInfo = inlineInfoFromClassfile(classNode)
 
     classBType.info = Right(
-      ClassInfo(superClass,
-                interfaces,
-                flags,
-                nestedClasses,
-                nestedInfo,
-                inlineInfo))
+      ClassInfo(
+        superClass,
+        interfaces,
+        flags,
+        nestedClasses,
+        nestedInfo,
+        inlineInfo))
     classBType
   }
 
@@ -301,11 +304,12 @@ abstract class BTypes {
           (methodNode.name + methodNode.desc, info)
         })
         .toMap
-      InlineInfo(traitImplClassSelfType = None,
-                 isEffectivelyFinal = BytecodeUtils.isFinalClass(classNode),
-                 sam = inlinerHeuristics.javaSam(classNode.name),
-                 methodInfos = methodInfos,
-                 warning)
+      InlineInfo(
+        traitImplClassSelfType = None,
+        isEffectivelyFinal = BytecodeUtils.isFinalClass(classNode),
+        sam = inlinerHeuristics.javaSam(classNode.name),
+        methodInfos = methodInfos,
+        warning)
     }
 
     // The InlineInfo is built from the classfile (not from the symbol) for all classes that are NOT
@@ -384,8 +388,9 @@ abstract class BTypes {
     final def conformsTo(other: BType): Either[NoClassBTypeInfo, Boolean] =
       tryEither(Right({
         assert(isRef || isPrimitive, s"conformsTo cannot handle $this")
-        assert(other.isRef || other.isPrimitive,
-               s"conformsTo cannot handle $other")
+        assert(
+          other.isRef || other.isPrimitive,
+          s"conformsTo cannot handle $other")
 
         this match {
           case ArrayBType(component) =>
@@ -432,8 +437,9 @@ abstract class BTypes {
             this == other || other == INT ||
               other == LONG // TODO Actually, BOOL does NOT conform to LONG. Even with adapt().
           case _ =>
-            assert(isPrimitive && other.isPrimitive,
-                   s"Expected primitive types $this - $other")
+            assert(
+              isPrimitive && other.isPrimitive,
+              s"Expected primitive types $this - $other")
             this == other
         }
       }))
@@ -911,8 +917,9 @@ abstract class BTypes {
     }
 
     def info_=(i: Either[NoClassBTypeInfo, ClassInfo]): Unit = {
-      assert(_info == null,
-             s"Cannot set ClassBType.info multiple times: $this")
+      assert(
+        _info == null,
+        s"Cannot set ClassBType.info multiple times: $this")
       _info = i
       checkInfoConsistency()
     }
@@ -930,8 +937,9 @@ abstract class BTypes {
 
       def isJLO(t: ClassBType) = t.internalName == ObjectRef.internalName
 
-      assert(!ClassBType.isInternalPhantomType(internalName),
-             s"Cannot create ClassBType for phantom type $this")
+      assert(
+        !ClassBType.isInternalPhantomType(internalName),
+        s"Cannot create ClassBType for phantom type $this")
 
       assert(
         if (info.get.superClass.isEmpty) {
@@ -1057,8 +1065,9 @@ abstract class BTypes {
       */
     def jvmWiseLUB(other: ClassBType): Either[NoClassBTypeInfo, ClassBType] = {
       def isNotNullOrNothing(c: ClassBType) = !c.isNullType && !c.isNothingType
-      assert(isNotNullOrNothing(this) && isNotNullOrNothing(other),
-             s"jvmWiseLUB for null or nothing: $this - $other")
+      assert(
+        isNotNullOrNothing(this) && isNotNullOrNothing(other),
+        s"jvmWiseLUB for null or nothing: $this - $other")
 
       tryEither {
         val res: ClassBType =
@@ -1081,8 +1090,9 @@ abstract class BTypes {
               // finds the first common one.
               // MOST LIKELY the answer can be found here, see the comments and links by Miguel:
               //  - https://issues.scala-lang.org/browse/SI-3872
-              firstCommonSuffix(this :: this.superClassesTransitive.orThrow,
-                                other :: other.superClassesTransitive.orThrow)
+              firstCommonSuffix(
+                this :: this.superClassesTransitive.orThrow,
+                other :: other.superClassesTransitive.orThrow)
           }
 
         assert(isNotNullOrNothing(res), s"jvmWiseLUB computed: $res")

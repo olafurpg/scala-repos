@@ -13,11 +13,12 @@ object LevelColorizer {
   private val InfoColor = "\u001b[0;32m"
   private val DebugColor = "\u001b[0;37m"
 
-  private val colors = Map(Level.TRACE -> DebugColor,
-                           Level.DEBUG -> DebugColor,
-                           Level.INFO -> InfoColor,
-                           Level.WARN -> WarnColor,
-                           Level.ERROR -> ErrorColor)
+  private val colors = Map(
+    Level.TRACE -> DebugColor,
+    Level.DEBUG -> DebugColor,
+    Level.INFO -> InfoColor,
+    Level.WARN -> WarnColor,
+    Level.ERROR -> ErrorColor)
 }
 
 /**

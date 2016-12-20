@@ -100,8 +100,9 @@ object MongoAccountServer
     require(
       templateDir.canRead,
       "Provided template directory %s is not readable".format(templateDir))
-    new DirectoryTemplateEmailer(templateDir,
-                                 config.detach("params").data,
-                                 Some(emailProps))
+    new DirectoryTemplateEmailer(
+      templateDir,
+      config.detach("params").data,
+      Some(emailProps))
   }
 }

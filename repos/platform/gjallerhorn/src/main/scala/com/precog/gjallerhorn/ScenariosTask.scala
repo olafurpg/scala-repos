@@ -178,11 +178,11 @@ class ScenariosTask(settings: Settings)
       delegateAPIKey must_!= account1.apiKey
       delegateAPIKey must_!= account2.apiKey
 
-      val res = ingestString(delegateAPIKey,
-                             account1,
-                             dummyEvents,
-                             "application/json")(
-        _ / account1.bareRootPath / "foo") match {
+      val res = ingestString(
+        delegateAPIKey,
+        account1,
+        dummyEvents,
+        "application/json")(_ / account1.bareRootPath / "foo") match {
         case Left(thr) => Failure(thr)
         case Right(s) => JParser.parseFromString(s)
       }

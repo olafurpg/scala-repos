@@ -37,8 +37,9 @@ case class AppUpdate(id: Option[PathId] = None,
                      ipAddress: Option[IpAddress] = None,
                      residency: Option[Residency] = None) {
 
-  require(version.isEmpty || onlyVersionOrIdSet,
-          "The 'version' field may only be combined with the 'id' field.")
+  require(
+    version.isEmpty || onlyVersionOrIdSet,
+    "The 'version' field may only be combined with the 'id' field.")
 
   protected[api] def onlyVersionOrIdSet: Boolean = productIterator forall {
     case x @ Some(_) => x == version || x == id

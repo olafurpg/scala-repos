@@ -196,7 +196,8 @@ class DiscoveryInfoTest extends MarathonSpec with Matchers {
 
     val readResult = Json.fromJson[DiscoveryInfo](Json.parse(json))
     readResult should be(
-      JsError((JsPath() \ "ports")(0) \ "protocol",
-              "Invalid protocol. Only 'udp' or 'tcp' are allowed."))
+      JsError(
+        (JsPath() \ "ports")(0) \ "protocol",
+        "Invalid protocol. Only 'udp' or 'tcp' are allowed."))
   }
 }

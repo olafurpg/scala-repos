@@ -1326,9 +1326,9 @@ object Boxed {
   def allClasses: Seq[Class[_ <: Boxed[_]]] = allBoxes.map(_._2)
 
   private[this] val boxedCache =
-    new java.util.concurrent.ConcurrentHashMap[AnyRef,
-                                               (Any => Boxed[Any],
-                                                Class[Boxed[Any]])]()
+    new java.util.concurrent.ConcurrentHashMap[
+      AnyRef,
+      (Any => Boxed[Any], Class[Boxed[Any]])]()
 
   private[scalding] def nextCached[K](
       cacheKey: Option[AnyRef]): (K => Boxed[K], Class[Boxed[K]]) =

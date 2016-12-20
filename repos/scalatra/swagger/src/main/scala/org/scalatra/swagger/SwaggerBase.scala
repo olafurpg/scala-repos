@@ -59,11 +59,10 @@ trait SwaggerBaseBase extends Initializable with ScalatraBase {
   protected def renderDoc(doc: ApiType): JValue = {
     val json =
       docToJson(doc) merge
-        ("basePath" -> fullUrl("/",
-                               includeContextPath =
-                                 swagger.baseUrlIncludeContextPath,
-                               includeServletPath =
-                                 swagger.baseUrlIncludeServletPath)) ~
+        ("basePath" -> fullUrl(
+          "/",
+          includeContextPath = swagger.baseUrlIncludeContextPath,
+          includeServletPath = swagger.baseUrlIncludeServletPath)) ~
           ("swaggerVersion" -> swagger.swaggerVersion) ~
           ("apiVersion" -> swagger.apiVersion)
     val consumes = dontAddOnEmpty("consumes", doc.consumes) _
@@ -89,9 +88,10 @@ trait SwaggerBaseBase extends Initializable with ScalatraBase {
       ("apis" ->
         (docs.filter(_.apis.nonEmpty).toList map { doc =>
           ("path" ->
-            (url(doc.resourcePath,
-                 includeServletPath = false,
-                 includeContextPath = false) +
+            (url(
+              doc.resourcePath,
+              includeServletPath = false,
+              includeContextPath = false) +
               (if (includeFormatParameter) ".{format}" else ""))) ~
             ("description" -> doc.description)
         })) ~

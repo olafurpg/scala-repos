@@ -38,16 +38,18 @@ object DotGraph {
             externalToString: File => String): Unit = {
     def file(name: String) = new File(outputDir, name)
     IO.createDirectory(outputDir)
-    generateGraph(file("int-source-deps"),
-                  "dependencies",
-                  relations.internalSrcDep,
-                  sourceToString,
-                  sourceToString)
-    generateGraph(file("binary-dependencies"),
-                  "externalDependencies",
-                  relations.binaryDep,
-                  externalToString,
-                  sourceToString)
+    generateGraph(
+      file("int-source-deps"),
+      "dependencies",
+      relations.internalSrcDep,
+      sourceToString,
+      sourceToString)
+    generateGraph(
+      file("binary-dependencies"),
+      "externalDependencies",
+      relations.binaryDep,
+      externalToString,
+      sourceToString)
   }
 
   def generateGraph[Key, Value](file: File,

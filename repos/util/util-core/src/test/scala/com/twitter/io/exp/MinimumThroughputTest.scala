@@ -67,9 +67,10 @@ class MinimumThroughputTest extends FunSuite with MockitoSugar {
         }
       }
 
-      val reader = MinimumThroughput.reader(underlying,
-                                            1d, // min bytes per second
-                                            Timer.Nil)
+      val reader = MinimumThroughput.reader(
+        underlying,
+        1d, // min bytes per second
+        Timer.Nil)
 
       // do a read of 1 byte in 0 time — which is ok.
       Await.result(reader.read(1)) match {
@@ -92,9 +93,10 @@ class MinimumThroughputTest extends FunSuite with MockitoSugar {
     when(underlying.read(1)).thenReturn(Future.never)
 
     val timer = new MockTimer()
-    val reader = MinimumThroughput.reader(underlying,
-                                          1d, // min bytes per second
-                                          timer)
+    val reader = MinimumThroughput.reader(
+      underlying,
+      1d, // min bytes per second
+      timer)
 
     Time.withCurrentTimeFrozen { tc =>
       val f = reader.read(1)
@@ -115,9 +117,10 @@ class MinimumThroughputTest extends FunSuite with MockitoSugar {
     val underlying = mock[Reader]
     when(underlying.read(1)).thenReturn(Future.exception(ex))
 
-    val reader = MinimumThroughput.reader(underlying,
-                                          1d, // min bytes per second
-                                          Timer.Nil)
+    val reader = MinimumThroughput.reader(
+      underlying,
+      1d, // min bytes per second
+      Timer.Nil)
 
     val thrown = intercept[RuntimeException] {
       Await.result(reader.read(1))
@@ -126,9 +129,10 @@ class MinimumThroughputTest extends FunSuite with MockitoSugar {
   }
 
   test("Reader - pass through EOFs from underlying") {
-    val reader = MinimumThroughput.reader(Reader.Null,
-                                          1d, // min bytes per second
-                                          Timer.Nil)
+    val reader = MinimumThroughput.reader(
+      Reader.Null,
+      1d, // min bytes per second
+      Timer.Nil)
 
     Await.result(reader.read(1)) match {
       case None =>
@@ -181,9 +185,10 @@ class MinimumThroughputTest extends FunSuite with MockitoSugar {
         }
       }
 
-      val writer = MinimumThroughput.writer(underlying,
-                                            1d, // min bytes per second
-                                            Timer.Nil)
+      val writer = MinimumThroughput.writer(
+        underlying,
+        1d, // min bytes per second
+        Timer.Nil)
 
       // do a write of 1 byte in 0 time — which is ok.
       val w1 = writer.write(buf)

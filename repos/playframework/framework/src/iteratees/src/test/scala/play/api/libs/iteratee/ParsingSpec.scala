@@ -45,13 +45,14 @@ object ParsingSpec
     "split case 1" in {
       mustExecute(11) { foldEC =>
         val data = Enumerator(
-          List("xx",
-               "kxckikixcki",
-               "k",
-               "kicockik",
-               "isdkikodskikisd",
-               "ksdlokiikik",
-               "i").map(_.getBytes): _*)
+          List(
+            "xx",
+            "kxckikixcki",
+            "k",
+            "kicockik",
+            "isdkikodskikisd",
+            "ksdlokiikik",
+            "i").map(_.getBytes): _*)
         val parsed =
           data |>>> Parsing
             .search("kiki".getBytes)

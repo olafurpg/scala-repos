@@ -9,23 +9,25 @@ trait JdbcDriver {
   def getTableDesc(tableName: TableName,
                    columnNames: Array[ColumnName],
                    columnDefinitions: Array[Definition]) =
-    new TableDesc(tableName.get,
-                  columnNames.map(_.get),
-                  columnDefinitions.map(_.get),
-                  null,
-                  null)
+    new TableDesc(
+      tableName.get,
+      columnNames.map(_.get),
+      columnDefinitions.map(_.get),
+      null,
+      null)
   def getJDBCScheme(columnNames: Array[ColumnName],
                     filterCondition: Option[String],
                     updateBy: Iterable[String],
                     replaceOnInsert: Boolean) = {
     if (replaceOnInsert)
       sys.error("replaceOnInsert functionality only supported by MySql")
-    new JDBCScheme(null, // inputFormatClass
-                   null, // outputFormatClass
-                   columnNames.map(_.get),
-                   null, // orderBy
-                   filterCondition.orNull,
-                   updateBy.toArray)
+    new JDBCScheme(
+      null, // inputFormatClass
+      null, // outputFormatClass
+      columnNames.map(_.get),
+      null, // orderBy
+      filterCondition.orNull,
+      updateBy.toArray)
   }
 }
 
@@ -34,21 +36,23 @@ trait MysqlDriver extends JdbcDriver with MysqlTableCreationImplicits {
   override def getTableDesc(tableName: TableName,
                             columnNames: Array[ColumnName],
                             columnDefinitions: Array[Definition]) =
-    new TableDesc(tableName.get,
-                  columnNames.map(_.get),
-                  columnDefinitions.map(_.get),
-                  null,
-                  "SHOW TABLES LIKE '%s'")
+    new TableDesc(
+      tableName.get,
+      columnNames.map(_.get),
+      columnDefinitions.map(_.get),
+      null,
+      "SHOW TABLES LIKE '%s'")
   override def getJDBCScheme(columnNames: Array[ColumnName],
                              filterCondition: Option[String],
                              updateBy: Iterable[String],
                              replaceOnInsert: Boolean) = {
-    new MySqlScheme(null, // inputFormatClass
-                    columnNames.map(_.get),
-                    null, // orderBy
-                    filterCondition.orNull,
-                    updateBy.toArray,
-                    replaceOnInsert)
+    new MySqlScheme(
+      null, // inputFormatClass
+      columnNames.map(_.get),
+      null, // orderBy
+      filterCondition.orNull,
+      updateBy.toArray,
+      replaceOnInsert)
   }
 }
 

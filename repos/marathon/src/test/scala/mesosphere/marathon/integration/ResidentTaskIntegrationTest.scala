@@ -35,8 +35,9 @@ class ResidentTaskIntegrationTest
   test("resident task can be deployed and write to persistent volume") { f =>
     Given("An app that writes into a persistent volume")
     val containerPath = "persistent-volume"
-    val app = f.residentApp(containerPath = containerPath,
-                            cmd = s"""echo "data" > $containerPath/data""")
+    val app = f.residentApp(
+      containerPath = containerPath,
+      cmd = s"""echo "data" > $containerPath/data""")
 
     When("A task is launched")
     f.createAsynchronously(app)
@@ -50,8 +51,9 @@ class ResidentTaskIntegrationTest
   test("persistent volume will be re-attached and keep state") { f =>
     Given("An app that writes into a persistent volume")
     val containerPath = "persistent-volume"
-    val app = f.residentApp(containerPath = containerPath,
-                            cmd = s"""echo "data" > $containerPath/data """)
+    val app = f.residentApp(
+      containerPath = containerPath,
+      cmd = s"""echo "data" > $containerPath/data """)
 
     When("a task is launched")
     f.createAsynchronously(app)
@@ -251,9 +253,10 @@ class ResidentTaskIntegrationTest
     val disk: Double = 1.0
     val persistentVolumeSize: Long = 2
 
-    val itMesosResources = ITResources("mem" -> mem,
-                                       "cpus" -> cpus,
-                                       "disk" -> (disk + persistentVolumeSize))
+    val itMesosResources = ITResources(
+      "mem" -> mem,
+      "cpus" -> cpus,
+      "disk" -> (disk + persistentVolumeSize))
 
     def residentApp(containerPath: String = "persistent-volume",
                     cmd: String = "sleep 1000",

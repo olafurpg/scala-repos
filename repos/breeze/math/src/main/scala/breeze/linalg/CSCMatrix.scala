@@ -106,32 +106,36 @@ class CSCMatrix[@spec(Double, Int, Float, Long) V: Zero](
         val newData = ArrayUtil.copyOf(data, newLength)
 
         // copy existing data into new arrays
-        System.arraycopy(_rowIndices,
-                         insertPos,
-                         newIndex,
-                         insertPos + 1,
-                         used - insertPos - 1)
-        System.arraycopy(data,
-                         insertPos,
-                         newData,
-                         insertPos + 1,
-                         used - insertPos - 1)
+        System.arraycopy(
+          _rowIndices,
+          insertPos,
+          newIndex,
+          insertPos + 1,
+          used - insertPos - 1)
+        System.arraycopy(
+          data,
+          insertPos,
+          newData,
+          insertPos + 1,
+          used - insertPos - 1)
 
         // update pointers
         _rowIndices = newIndex
         _data = newData
       } else if (used - insertPos > 1) {
         // need to make room for new element mid-array
-        System.arraycopy(_rowIndices,
-                         insertPos,
-                         _rowIndices,
-                         insertPos + 1,
-                         used - insertPos - 1)
-        System.arraycopy(data,
-                         insertPos,
-                         data,
-                         insertPos + 1,
-                         used - insertPos - 1)
+        System.arraycopy(
+          _rowIndices,
+          insertPos,
+          _rowIndices,
+          insertPos + 1,
+          used - insertPos - 1)
+        System.arraycopy(
+          data,
+          insertPos,
+          data,
+          insertPos + 1,
+          used - insertPos - 1)
       }
 
       // assign new value
@@ -215,12 +219,13 @@ class CSCMatrix[@spec(Double, Int, Float, Long) V: Zero](
   }
 
   def copy: CSCMatrix[V] = {
-    new CSCMatrix[V](ArrayUtil.copyOf(_data, activeSize),
-                     rows,
-                     cols,
-                     colPtrs.clone(),
-                     activeSize,
-                     _rowIndices.clone)
+    new CSCMatrix[V](
+      ArrayUtil.copyOf(_data, activeSize),
+      rows,
+      cols,
+      colPtrs.clone(),
+      activeSize,
+      _rowIndices.clone)
   }
 
   def flatten(view: View = View.Copy): SparseVector[V] = {
@@ -320,12 +325,13 @@ object CSCMatrix
       rows: Int,
       cols: Int,
       initialNonzero: Int) = {
-    new CSCMatrix[V](new Array(initialNonzero),
-                     rows,
-                     cols,
-                     new Array(cols + 1),
-                     0,
-                     new Array(initialNonzero))
+    new CSCMatrix[V](
+      new Array(initialNonzero),
+      rows,
+      cols,
+      new Array(cols + 1),
+      0,
+      new Array(initialNonzero))
   }
 
   def zeros[@spec(Double, Int, Float, Long) V: ClassTag: Zero](
@@ -417,12 +423,13 @@ object CSCMatrix
         var zeroSeen = false
         def ff(v: V) = { val r = fn(v); if (r == z) zeroSeen = true; r }
         val newData = from.data.map(ff)
-        val r = new CSCMatrix[R](newData,
-                                 from.rows,
-                                 from.cols,
-                                 from.colPtrs.clone(),
-                                 from.activeSize,
-                                 from.rowIndices.clone)
+        val r = new CSCMatrix[R](
+          newData,
+          from.rows,
+          from.cols,
+          from.colPtrs.clone(),
+          from.activeSize,
+          from.rowIndices.clone)
         if (zeroSeen) r.compact()
         r
       }

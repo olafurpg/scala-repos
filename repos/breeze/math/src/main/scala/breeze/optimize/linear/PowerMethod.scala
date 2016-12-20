@@ -38,8 +38,9 @@ class PowerMethod(maxIters: Int = 10, tolerance: Double = 1E-5)
 
   def reset(A: BDM, y: BDV, init: State): State = {
     import init._
-    require(eigenVector.length == y.length,
-            s"PowerMethod:reset mismatch in state dimension")
+    require(
+      eigenVector.length == y.length,
+      s"PowerMethod:reset mismatch in state dimension")
     normalize(eigenVector, y)
     QuadraticMinimizer.gemv(1.0, A, eigenVector, 0.0, ay)
     val lambda = nextEigen(eigenVector, ay)
@@ -92,8 +93,9 @@ object PowerMethod {
     new PowerMethod(maxIters, tolerance) {
       override def reset(A: BDM, y: BDV, init: State): State = {
         import init._
-        require(eigenVector.length == y.length,
-                s"InversePowerMethod:reset mismatch in state dimension")
+        require(
+          eigenVector.length == y.length,
+          s"InversePowerMethod:reset mismatch in state dimension")
         normalize(eigenVector, y)
         ay := eigenVector
         QuadraticMinimizer.dpotrs(A, ay)

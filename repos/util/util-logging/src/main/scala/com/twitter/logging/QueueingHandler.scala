@@ -154,7 +154,7 @@ class QueueingHandler(handler: Handler,
     */
   protected def onOverflow(record: javalog.LogRecord): Unit = {
     Console.err.println(
-      String.format("[%s] log queue overflow - record dropped",
-                    Time.now.toString))
+      String
+        .format("[%s] log queue overflow - record dropped", Time.now.toString))
   }
 }

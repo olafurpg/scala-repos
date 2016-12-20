@@ -226,13 +226,14 @@ object ImageUtils extends Logging {
           getImageDimensions(config.imagemagickIdentifyPath, localImageName)
         val fileExtension = getFileExtensionName(imageDetails)
         Some(
-          LocallyStoredImage(imageSrc,
-                             localImageName,
-                             linkhash,
-                             imageFile.length(),
-                             fileExtension,
-                             imageDetails.getHeight,
-                             imageDetails.getWidth))
+          LocallyStoredImage(
+            imageSrc,
+            localImageName,
+            linkhash,
+            imageFile.length(),
+            fileExtension,
+            imageDetails.getHeight,
+            imageDetails.getWidth))
       } catch {
         case e: Exception => {
           trace(e, "Unable to get image file dimensions & extension name!")
@@ -291,8 +292,9 @@ object ImageUtils extends Logging {
     URLHelper.tryToHttpGet(imageSrc) match {
       case Some(httpget) => {
         val localContext: HttpContext = new BasicHttpContext
-        localContext.setAttribute(ClientContext.COOKIE_STORE,
-                                  HtmlFetcher.emptyCookieStore)
+        localContext.setAttribute(
+          ClientContext.COOKIE_STORE,
+          HtmlFetcher.emptyCookieStore)
         val response = try {
           config.getHtmlFetcher.getHttpClient.execute(httpget, localContext)
         } catch {

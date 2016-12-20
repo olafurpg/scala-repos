@@ -73,8 +73,9 @@ trait PairOperators[K, V] extends Operators[(K, V)] {
   def partitionPredicates = filterPredicates
 
   def takeWhilePredicates =
-    zipPredicates(koperators.takeWhilePredicates,
-                  voperators.takeWhilePredicates)
+    zipPredicates(
+      koperators.takeWhilePredicates,
+      voperators.takeWhilePredicates)
 
   def dropWhilePredicates = takeWhilePredicates
 

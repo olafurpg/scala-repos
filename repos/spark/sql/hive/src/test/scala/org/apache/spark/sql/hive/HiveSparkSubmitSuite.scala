@@ -65,45 +65,47 @@ class HiveSparkSubmitSuite
     val jarsString =
       Seq(jar1, jar2, jar3, jar4).map(j => j.toString).mkString(",")
     val args =
-      Seq("--class",
-          SparkSubmitClassLoaderTest.getClass.getName.stripSuffix("$"),
-          "--name",
-          "SparkSubmitClassLoaderTest",
-          "--master",
-          "local-cluster[2,1,1024]",
-          "--conf",
-          "spark.ui.enabled=false",
-          "--conf",
-          "spark.master.rest.enabled=false",
-          "--driver-java-options",
-          "-Dderby.system.durability=test",
-          "--jars",
-          jarsString,
-          unusedJar.toString,
-          "SparkSubmitClassA",
-          "SparkSubmitClassB")
+      Seq(
+        "--class",
+        SparkSubmitClassLoaderTest.getClass.getName.stripSuffix("$"),
+        "--name",
+        "SparkSubmitClassLoaderTest",
+        "--master",
+        "local-cluster[2,1,1024]",
+        "--conf",
+        "spark.ui.enabled=false",
+        "--conf",
+        "spark.master.rest.enabled=false",
+        "--driver-java-options",
+        "-Dderby.system.durability=test",
+        "--jars",
+        jarsString,
+        unusedJar.toString,
+        "SparkSubmitClassA",
+        "SparkSubmitClassB")
     runSparkSubmit(args)
   }
 
   test("SPARK-8020: set sql conf in spark conf") {
     val unusedJar = TestUtils.createJarWithClasses(Seq.empty)
-    val args = Seq("--class",
-                   SparkSQLConfTest.getClass.getName.stripSuffix("$"),
-                   "--name",
-                   "SparkSQLConfTest",
-                   "--master",
-                   "local-cluster[2,1,1024]",
-                   "--conf",
-                   "spark.ui.enabled=false",
-                   "--conf",
-                   "spark.master.rest.enabled=false",
-                   "--conf",
-                   "spark.sql.hive.metastore.version=0.12",
-                   "--conf",
-                   "spark.sql.hive.metastore.jars=maven",
-                   "--driver-java-options",
-                   "-Dderby.system.durability=test",
-                   unusedJar.toString)
+    val args = Seq(
+      "--class",
+      SparkSQLConfTest.getClass.getName.stripSuffix("$"),
+      "--name",
+      "SparkSQLConfTest",
+      "--master",
+      "local-cluster[2,1,1024]",
+      "--conf",
+      "spark.ui.enabled=false",
+      "--conf",
+      "spark.master.rest.enabled=false",
+      "--conf",
+      "spark.sql.hive.metastore.version=0.12",
+      "--conf",
+      "spark.sql.hive.metastore.jars=maven",
+      "--driver-java-options",
+      "-Dderby.system.durability=test",
+      unusedJar.toString)
     runSparkSubmit(args)
   }
 
@@ -120,51 +122,54 @@ class HiveSparkSubmitSuite
     }
     val testJar =
       s"sql/hive/src/test/resources/regression-test-SPARK-8489/test-$version.jar"
-    val args = Seq("--conf",
-                   "spark.ui.enabled=false",
-                   "--conf",
-                   "spark.master.rest.enabled=false",
-                   "--driver-java-options",
-                   "-Dderby.system.durability=test",
-                   "--class",
-                   "Main",
-                   testJar)
+    val args = Seq(
+      "--conf",
+      "spark.ui.enabled=false",
+      "--conf",
+      "spark.master.rest.enabled=false",
+      "--driver-java-options",
+      "-Dderby.system.durability=test",
+      "--class",
+      "Main",
+      testJar)
     runSparkSubmit(args)
   }
 
   test("SPARK-9757 Persist Parquet relation with decimal column") {
     val unusedJar = TestUtils.createJarWithClasses(Seq.empty)
-    val args = Seq("--class",
-                   SPARK_9757.getClass.getName.stripSuffix("$"),
-                   "--name",
-                   "SparkSQLConfTest",
-                   "--master",
-                   "local-cluster[2,1,1024]",
-                   "--conf",
-                   "spark.ui.enabled=false",
-                   "--conf",
-                   "spark.master.rest.enabled=false",
-                   "--driver-java-options",
-                   "-Dderby.system.durability=test",
-                   unusedJar.toString)
+    val args = Seq(
+      "--class",
+      SPARK_9757.getClass.getName.stripSuffix("$"),
+      "--name",
+      "SparkSQLConfTest",
+      "--master",
+      "local-cluster[2,1,1024]",
+      "--conf",
+      "spark.ui.enabled=false",
+      "--conf",
+      "spark.master.rest.enabled=false",
+      "--driver-java-options",
+      "-Dderby.system.durability=test",
+      unusedJar.toString)
     runSparkSubmit(args)
   }
 
   test("SPARK-11009 fix wrong result of Window function in cluster mode") {
     val unusedJar = TestUtils.createJarWithClasses(Seq.empty)
-    val args = Seq("--class",
-                   SPARK_11009.getClass.getName.stripSuffix("$"),
-                   "--name",
-                   "SparkSQLConfTest",
-                   "--master",
-                   "local-cluster[2,1,1024]",
-                   "--conf",
-                   "spark.ui.enabled=false",
-                   "--conf",
-                   "spark.master.rest.enabled=false",
-                   "--driver-java-options",
-                   "-Dderby.system.durability=test",
-                   unusedJar.toString)
+    val args = Seq(
+      "--class",
+      SPARK_11009.getClass.getName.stripSuffix("$"),
+      "--name",
+      "SparkSQLConfTest",
+      "--master",
+      "local-cluster[2,1,1024]",
+      "--conf",
+      "spark.ui.enabled=false",
+      "--conf",
+      "spark.master.rest.enabled=false",
+      "--driver-java-options",
+      "-Dderby.system.durability=test",
+      unusedJar.toString)
     runSparkSubmit(args)
   }
 
@@ -221,9 +226,10 @@ class HiveSparkSubmitSuite
     } catch {
       case to: TestFailedDueToTimeoutException =>
         val historyLog = history.mkString("\n")
-        fail(s"Timeout of $commandLine" +
-               s" See the log4j logs for more detail." + s"\n$historyLog",
-             to)
+        fail(
+          s"Timeout of $commandLine" +
+            s" See the log4j logs for more detail." + s"\n$historyLog",
+          to)
       case t: Throwable => throw t
     } finally {
       // Ensure we still kill the process in case it timed out

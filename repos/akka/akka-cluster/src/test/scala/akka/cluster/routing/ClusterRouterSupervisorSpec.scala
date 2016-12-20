@@ -34,17 +34,18 @@ class ClusterRouterSupervisorSpec
     "use provided supervisor strategy" in {
       val router = system.actorOf(
         ClusterRouterPool(
-          RoundRobinPool(nrOfInstances = 1,
-                         supervisorStrategy =
-                           OneForOneStrategy(loggingEnabled = false) {
-                             case _ ⇒
-                               testActor ! "supervised"
-                               SupervisorStrategy.Stop
-                           }),
-          ClusterRouterPoolSettings(totalInstances = 1,
-                                    maxInstancesPerNode = 1,
-                                    allowLocalRoutees = true,
-                                    useRole = None))
+          RoundRobinPool(
+            nrOfInstances = 1,
+            supervisorStrategy = OneForOneStrategy(loggingEnabled = false) {
+              case _ ⇒
+                testActor ! "supervised"
+                SupervisorStrategy.Stop
+            }),
+          ClusterRouterPoolSettings(
+            totalInstances = 1,
+            maxInstancesPerNode = 1,
+            allowLocalRoutees = true,
+            useRole = None))
           .props(Props(classOf[KillableActor], testActor)),
         name = "therouter")
 

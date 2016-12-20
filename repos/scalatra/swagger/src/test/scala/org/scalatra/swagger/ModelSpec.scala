@@ -11,8 +11,9 @@ import org.specs2.mutable.Specification
 object ModelSpec {
 
   case class WithDescription(
-      @ApiModelProperty(description = "a description",
-                        allowableValues = "item1,item2") id: String)
+      @ApiModelProperty(
+        description = "a description",
+        allowableValues = "item1,item2") id: String)
   case class WithAllowableValues(
       @ApiModelProperty(allowableValues = "item1,item2") id: String)
   case class WithAllowableRangeValues(

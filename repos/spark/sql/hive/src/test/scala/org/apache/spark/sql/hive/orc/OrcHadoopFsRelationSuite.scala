@@ -63,8 +63,9 @@ class OrcHadoopFsRelationSuite extends HadoopFsRelationTest {
 
       checkQueries(
         hiveContext.read
-          .options(Map("path" -> file.getCanonicalPath,
-                       "dataSchema" -> dataSchemaWithPartition.json))
+          .options(Map(
+            "path" -> file.getCanonicalPath,
+            "dataSchema" -> dataSchemaWithPartition.json))
           .format(dataSourceName)
           .load())
     }

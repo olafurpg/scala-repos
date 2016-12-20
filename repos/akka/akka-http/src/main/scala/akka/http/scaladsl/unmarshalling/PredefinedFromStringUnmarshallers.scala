@@ -75,8 +75,9 @@ trait PredefinedFromStringUnmarshallers {
     case e: NumberFormatException ⇒
       throw if (value.isEmpty) Unmarshaller.NoContentException
       else
-        new IllegalArgumentException(s"'$value' is not a valid $target value",
-                                     e)
+        new IllegalArgumentException(
+          s"'$value' is not a valid $target value",
+          e)
   }
 }
 

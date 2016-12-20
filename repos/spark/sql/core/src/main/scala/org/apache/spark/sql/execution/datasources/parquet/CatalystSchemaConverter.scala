@@ -61,19 +61,22 @@ private[parquet] class CatalystSchemaConverter(
       SQLConf.PARQUET_WRITE_LEGACY_FORMAT.defaultValue.get) {
 
   def this(conf: SQLConf) =
-    this(assumeBinaryIsString = conf.isParquetBinaryAsString,
-         assumeInt96IsTimestamp = conf.isParquetINT96AsTimestamp,
-         writeLegacyParquetFormat = conf.writeLegacyParquetFormat)
+    this(
+      assumeBinaryIsString = conf.isParquetBinaryAsString,
+      assumeInt96IsTimestamp = conf.isParquetINT96AsTimestamp,
+      writeLegacyParquetFormat = conf.writeLegacyParquetFormat)
 
   def this(conf: Configuration) =
-    this(assumeBinaryIsString =
-           conf.get(SQLConf.PARQUET_BINARY_AS_STRING.key).toBoolean,
-         assumeInt96IsTimestamp =
-           conf.get(SQLConf.PARQUET_INT96_AS_TIMESTAMP.key).toBoolean,
-         writeLegacyParquetFormat = conf
-           .get(SQLConf.PARQUET_WRITE_LEGACY_FORMAT.key,
-                SQLConf.PARQUET_WRITE_LEGACY_FORMAT.defaultValue.get.toString)
-           .toBoolean)
+    this(
+      assumeBinaryIsString =
+        conf.get(SQLConf.PARQUET_BINARY_AS_STRING.key).toBoolean,
+      assumeInt96IsTimestamp =
+        conf.get(SQLConf.PARQUET_INT96_AS_TIMESTAMP.key).toBoolean,
+      writeLegacyParquetFormat = conf
+        .get(
+          SQLConf.PARQUET_WRITE_LEGACY_FORMAT.key,
+          SQLConf.PARQUET_WRITE_LEGACY_FORMAT.defaultValue.get.toString)
+        .toBoolean)
 
   /**
     * Converts Parquet [[MessageType]] `parquetSchema` to a Spark SQL [[StructType]].
@@ -255,9 +258,10 @@ private[parquet] class CatalystSchemaConverter(
 
         val valueType = keyValueType.getType(1)
         val valueOptional = valueType.isRepetition(OPTIONAL)
-        MapType(convertField(keyType),
-                convertField(valueType),
-                valueContainsNull = valueOptional)
+        MapType(
+          convertField(keyType),
+          convertField(valueType),
+          valueContainsNull = valueOptional)
 
       case _ =>
         throw new AnalysisException(s"Unrecognized Parquet type: $field")

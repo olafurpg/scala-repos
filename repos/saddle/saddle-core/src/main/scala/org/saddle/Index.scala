@@ -349,8 +349,9 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
     */
   def getIndexer(other: Index[T]): Option[Array[Int]] = {
     val ixer = this.join(other, index.RightJoin)
-    require(ixer.index.length == other.length,
-            "Could not reindex unambiguously")
+    require(
+      ixer.index.length == other.length,
+      "Could not reindex unambiguously")
     ixer.lTake
   }
 

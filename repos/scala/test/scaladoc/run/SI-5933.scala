@@ -40,7 +40,8 @@ object Test extends ScaladocModelTest {
       assert(s1 == s2, s1 + " == " + s2)
 
     assertEqual(test1.valueParams(0)(0).defaultValue.get.expression, "lx")
-    assertEqual(test2.valueParams(0)(0).defaultValue.get.expression,
-                "lx match { case 0 => 1; case 3 => 4 }")
+    assertEqual(
+      test2.valueParams(0)(0).defaultValue.get.expression,
+      "lx match { case 0 => 1; case 3 => 4 }")
   }
 }

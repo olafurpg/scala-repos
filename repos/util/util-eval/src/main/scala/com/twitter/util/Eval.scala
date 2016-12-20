@@ -117,10 +117,11 @@ class Eval(target: Option[File]) {
   protected lazy val compilerSettings: Settings = new EvalSettings(target)
 
   // Primary encapsulation around native Scala compiler
-  private[this] lazy val compiler = new StringCompiler(codeWrapperLineOffset,
-                                                       target,
-                                                       compilerSettings,
-                                                       compilerMessageHandler)
+  private[this] lazy val compiler = new StringCompiler(
+    codeWrapperLineOffset,
+    target,
+    compilerSettings,
+    compilerMessageHandler)
 
   /**
     * run preprocessors on our string, returning a String that is the processed source
@@ -183,8 +184,9 @@ class Eval(target: Option[File]) {
       val className = "Evaluator__%s_%s".format(cleanBaseName, sourceChecksum)
       applyProcessed(className, processed, false)
     } else {
-      apply(files.map { scala.io.Source.fromFile(_).mkString }.mkString("\n"),
-            true)
+      apply(
+        files.map { scala.io.Source.fromFile(_).mkString }.mkString("\n"),
+        true)
     }
   }
 

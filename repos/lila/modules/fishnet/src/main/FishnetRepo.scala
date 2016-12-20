@@ -36,8 +36,9 @@ private final class FishnetRepo(analysisColl: Coll, clientColl: Coll) {
     clientColl.remove(selectClient(key)) >> clientCache.remove(key)
   def enableClient(key: Client.Key, v: Boolean): Funit =
     clientColl
-      .update(selectClient(key),
-              BSONDocument("$set" -> BSONDocument("enabled" -> v)))
+      .update(
+        selectClient(key),
+        BSONDocument("$set" -> BSONDocument("enabled" -> v)))
       .void >> clientCache.remove(key)
   def allRecentClients =
     clientColl

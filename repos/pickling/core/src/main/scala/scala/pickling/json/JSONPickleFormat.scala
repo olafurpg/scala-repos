@@ -123,15 +123,17 @@ package json {
            pickleArray(picklee.asInstanceOf[Array[Long]], FastTypeTag.Long)),
       FastTypeTag.ArrayBoolean.key ->
         ((picklee: Any) =>
-           pickleArray(picklee.asInstanceOf[Array[Boolean]],
-                       FastTypeTag.Boolean)),
+           pickleArray(
+             picklee.asInstanceOf[Array[Boolean]],
+             FastTypeTag.Boolean)),
       FastTypeTag.ArrayFloat.key ->
         ((picklee: Any) =>
            pickleArray(picklee.asInstanceOf[Array[Float]], FastTypeTag.Float)),
       FastTypeTag.ArrayDouble.key ->
         ((picklee: Any) =>
-           pickleArray(picklee.asInstanceOf[Array[Double]],
-                       FastTypeTag.Double))
+           pickleArray(
+             picklee.asInstanceOf[Array[Double]],
+             FastTypeTag.Double))
     )
     override def beginEntry(picklee: Any, tag: FastTypeTag[_]): PBuilder =
       withHints { hints =>

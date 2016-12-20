@@ -109,8 +109,9 @@ class DelayedFetch(delayMs: Long,
               } else if (fetchOffset.messageOffset < endOffset.messageOffset) {
                 // we need take the partition fetch size as upper bound when accumulating the bytes
                 accumulatedSize +=
-                  math.min(endOffset.positionDiff(fetchOffset),
-                           fetchStatus.fetchInfo.fetchSize)
+                  math.min(
+                    endOffset.positionDiff(fetchOffset),
+                    fetchStatus.fetchInfo.fetchSize)
               }
             }
           }
@@ -150,9 +151,10 @@ class DelayedFetch(delayMs: Long,
 
     val fetchPartitionData = logReadResults.mapValues(
       result =>
-        FetchResponsePartitionData(result.errorCode,
-                                   result.hw,
-                                   result.info.messageSet))
+        FetchResponsePartitionData(
+          result.errorCode,
+          result.hw,
+          result.info.messageSet))
 
     responseCallback(fetchPartitionData)
   }

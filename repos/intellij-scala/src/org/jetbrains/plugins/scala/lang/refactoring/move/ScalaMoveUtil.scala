@@ -144,9 +144,10 @@ object ScalaMoveUtil {
         null,
         Array[Int](range.getStartOffset),
         Array[Int](range.getEndOffset))
-      clazz.putCopyableUserData(ASSOCIATIONS_KEY,
-                                if (associations.isEmpty) null
-                                else associations.get(0))
+      clazz.putCopyableUserData(
+        ASSOCIATIONS_KEY,
+        if (associations.isEmpty) null
+        else associations.get(0))
     }
     val alreadyMoved =
       getMoveDestination(aClass) == aClass.getContainingFile.getContainingDirectory
@@ -167,10 +168,11 @@ object ScalaMoveUtil {
         clazz.getCopyableUserData(ASSOCIATIONS_KEY)
       if (associations != null) {
         try {
-          PROCESSOR.restoreAssociations(associations,
-                                        clazz.getContainingFile,
-                                        clazz.getTextRange.getStartOffset,
-                                        clazz.getProject)
+          PROCESSOR.restoreAssociations(
+            associations,
+            clazz.getContainingFile,
+            clazz.getTextRange.getStartOffset,
+            clazz.getProject)
         } finally {
           clazz.putCopyableUserData(ASSOCIATIONS_KEY, null)
         }

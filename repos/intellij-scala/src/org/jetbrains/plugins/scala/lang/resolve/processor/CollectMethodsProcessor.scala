@@ -34,14 +34,15 @@ class CollectMethodsProcessor(place: PsiElement, name: String)
       element match {
         case m: PsiMethod =>
           addResult(
-            new ScalaResolveResult(m,
-                                   s,
-                                   getImports(state),
-                                   None,
-                                   implicitConversionClass,
-                                   implicitFunction = implFunction,
-                                   implicitType = implType,
-                                   isAccessible = accessible))
+            new ScalaResolveResult(
+              m,
+              s,
+              getImports(state),
+              None,
+              implicitConversionClass,
+              implicitFunction = implFunction,
+              implicitType = implType,
+              isAccessible = accessible))
         case _ =>
       }
     }

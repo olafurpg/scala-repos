@@ -39,9 +39,10 @@ class TestSet(s0: Set[Int], s1: Set[Int]) {
       checkSubSet("missing", s1, s0)
     }
     if (res0 != res1)
-      assert(false,
-             "DIFFERENCE , operation = " + explain(n, s0) + ", value =" +
-               (n >> 3) + ", result0 = " + res0 + ", result1 = " + res1)
+      assert(
+        false,
+        "DIFFERENCE , operation = " + explain(n, s0) + ", value =" +
+          (n >> 3) + ", result0 = " + res0 + ", result1 = " + res1)
   }
   Console.println("succeeded for " + Iterations + " iterations.")
 }
@@ -62,6 +63,7 @@ object Test extends App {
   t3954
 
   new TestSet(HashSet.empty, new LinkedHashSet)
-  new TestSet(new ImmutableSetAdaptor(collection.immutable.Set.empty[Int]),
-              new LinkedHashSet)
+  new TestSet(
+    new ImmutableSetAdaptor(collection.immutable.Set.empty[Int]),
+    new LinkedHashSet)
 }

@@ -26,12 +26,12 @@ class BadRequestException(url: String)
     extends LoggableException("Bad Request for URL: " + url)
 class NotAuthorizedException(url: String, statusCode: Int = 403)
     extends LoggableException(
-      "Not authorized (statusCode: %d) to access URL: %s".format(statusCode,
-                                                                 url))
+      "Not authorized (statusCode: %d) to access URL: %s"
+        .format(statusCode, url))
 class ServerErrorException(url: String, statusCode: Int = 500)
     extends LoggableException(
-      "Server Error! Status code returned: %d for URL: %s".format(statusCode,
-                                                                  url))
+      "Server Error! Status code returned: %d for URL: %s"
+        .format(statusCode, url))
 class UnhandledStatusCodeException(url: String, statusCode: Int)
     extends LoggableException(
       "Received HTTP statusCode: %d from URL: %s and did not know how to handle it!"

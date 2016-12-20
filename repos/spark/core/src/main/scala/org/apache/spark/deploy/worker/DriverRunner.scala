@@ -87,11 +87,12 @@ private[deploy] class DriverRunner(conf: SparkConf,
 
           // TODO: If we add ability to submit multiple jars they should also be added here
           val builder =
-            CommandUtils.buildProcessBuilder(driverDesc.command,
-                                             securityManager,
-                                             driverDesc.mem,
-                                             sparkHome.getAbsolutePath,
-                                             substituteVariables)
+            CommandUtils.buildProcessBuilder(
+              driverDesc.command,
+              securityManager,
+              driverDesc.mem,
+              sparkHome.getAbsolutePath,
+              substituteVariables)
           launchDriver(builder, driverDir, driverDesc.supervise)
         } catch {
           case e: Exception => finalException = Some(e)
@@ -152,13 +153,14 @@ private[deploy] class DriverRunner(conf: SparkConf,
     if (!localJarFile.exists()) {
       // May already exist if running multiple workers on one node
       logInfo(s"Copying user jar $jarPath to $destPath")
-      Utils.fetchFile(driverDesc.jarUrl,
-                      driverDir,
-                      conf,
-                      securityManager,
-                      hadoopConf,
-                      System.currentTimeMillis(),
-                      useCache = false)
+      Utils.fetchFile(
+        driverDesc.jarUrl,
+        driverDir,
+        conf,
+        securityManager,
+        hadoopConf,
+        System.currentTimeMillis(),
+        useCache = false)
     }
 
     if (!localJarFile.exists()) {

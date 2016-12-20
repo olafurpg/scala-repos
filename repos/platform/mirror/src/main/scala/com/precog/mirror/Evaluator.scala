@@ -141,9 +141,10 @@ trait EvaluatorModule
           val fromIdx = Set(fromRes map { case (ids, _) => ids }: _*)
           val toIdx = Set(toRes map { case (ids, _) => ids }: _*)
 
-          loop(env,
-               restrict + (from.provenance -> fromIdx) +
-                 (to.provenance -> toIdx))(in)
+          loop(
+            env,
+            restrict + (from.provenance -> fromIdx) +
+              (to.provenance -> toIdx))(in)
         }
 
         case TicVar(_, _) => sys.error("todo")
@@ -248,10 +249,11 @@ trait EvaluatorModule
         case MetaDescent(_, _, _) => sys.error("todo")
 
         case Deref(_, left, right) => {
-          handleBinary(loopForJoin(env, restrict)(left),
-                       left.provenance,
-                       loopForJoin(env, restrict)(right),
-                       right.provenance) {
+          handleBinary(
+            loopForJoin(env, restrict)(left),
+            left.provenance,
+            loopForJoin(env, restrict)(right),
+            right.provenance) {
             case (JArray(values), JNum(index)) =>
               values(index.toInt)
           }
@@ -292,10 +294,11 @@ trait EvaluatorModule
             }
 
             case Op2Binding(op2) =>
-              handleBinary(actualSets(0),
-                           actuals(0).provenance,
-                           actualSets(1),
-                           actuals(1).provenance)(op2.pf)
+              handleBinary(
+                actualSets(0),
+                actuals(0).provenance,
+                actualSets(1),
+                actuals(1).provenance)(op2.pf)
 
             case ReductionBinding(red) => {
               val values =
@@ -316,37 +319,40 @@ trait EvaluatorModule
         }
 
         case Cond(_, pred, left, right) => {
-          val packed = handleBinary(loopForJoin(env, restrict)(pred),
-                                    pred.provenance,
-                                    loopForJoin(env, restrict)(left),
-                                    left.provenance) {
+          val packed = handleBinary(
+            loopForJoin(env, restrict)(pred),
+            pred.provenance,
+            loopForJoin(env, restrict)(left),
+            left.provenance) {
             case (b: JBool, right) => JArray(b :: right :: Nil)
           }
 
-          handleBinary(packed,
-                       unifyProvenance(expr.relations)(pred.provenance,
-                                                       left.provenance).get,
-                       loopForJoin(env, restrict)(right),
-                       right.provenance) {
+          handleBinary(
+            packed,
+            unifyProvenance(expr.relations)(pred.provenance, left.provenance).get,
+            loopForJoin(env, restrict)(right),
+            right.provenance) {
             case (JArray(JBool(pred) :: left :: Nil), right) =>
               if (pred) left else right
           }
         }
 
         case Where(_, left, right) => {
-          handleBinary(loopForJoin(env, restrict)(left),
-                       left.provenance,
-                       loopForJoin(env, restrict)(right),
-                       right.provenance) {
+          handleBinary(
+            loopForJoin(env, restrict)(left),
+            left.provenance,
+            loopForJoin(env, restrict)(right),
+            right.provenance) {
             case (value, JTrue) => value
           }
         }
 
         case With(_, left, right) => {
-          handleBinary(loopForJoin(env, restrict)(left),
-                       left.provenance,
-                       loopForJoin(env, restrict)(right),
-                       right.provenance) {
+          handleBinary(
+            loopForJoin(env, restrict)(left),
+            left.provenance,
+            loopForJoin(env, restrict)(right),
+            right.provenance) {
             case (JObject(leftFields), JObject(rightFields)) =>
               JObject(leftFields ++ rightFields)
           }
@@ -382,127 +388,141 @@ trait EvaluatorModule
         }
 
         case Add(_, left, right) => {
-          handleBinary(loopForJoin(env, restrict)(left),
-                       left.provenance,
-                       loopForJoin(env, restrict)(right),
-                       right.provenance) {
+          handleBinary(
+            loopForJoin(env, restrict)(left),
+            left.provenance,
+            loopForJoin(env, restrict)(right),
+            right.provenance) {
             case (JNum(leftN), JNum(rightN)) => JNum(leftN + rightN)
           }
         }
 
         case Sub(_, left, right) => {
-          handleBinary(loopForJoin(env, restrict)(left),
-                       left.provenance,
-                       loopForJoin(env, restrict)(right),
-                       right.provenance) {
+          handleBinary(
+            loopForJoin(env, restrict)(left),
+            left.provenance,
+            loopForJoin(env, restrict)(right),
+            right.provenance) {
             case (JNum(leftN), JNum(rightN)) => JNum(leftN - rightN)
           }
         }
 
         case Mul(_, left, right) => {
-          handleBinary(loopForJoin(env, restrict)(left),
-                       left.provenance,
-                       loopForJoin(env, restrict)(right),
-                       right.provenance) {
+          handleBinary(
+            loopForJoin(env, restrict)(left),
+            left.provenance,
+            loopForJoin(env, restrict)(right),
+            right.provenance) {
             case (JNum(leftN), JNum(rightN)) => JNum(leftN * rightN)
           }
         }
 
         case Div(_, left, right) => {
-          handleBinary(loopForJoin(env, restrict)(left),
-                       left.provenance,
-                       loopForJoin(env, restrict)(right),
-                       right.provenance) {
+          handleBinary(
+            loopForJoin(env, restrict)(left),
+            left.provenance,
+            loopForJoin(env, restrict)(right),
+            right.provenance) {
             case (JNum(leftN), JNum(rightN)) => JNum(leftN / rightN)
           }
         }
 
         case Mod(_, left, right) => {
-          handleBinary(loopForJoin(env, restrict)(left),
-                       left.provenance,
-                       loopForJoin(env, restrict)(right),
-                       right.provenance) {
+          handleBinary(
+            loopForJoin(env, restrict)(left),
+            left.provenance,
+            loopForJoin(env, restrict)(right),
+            right.provenance) {
             case (JNum(leftN), JNum(rightN)) => JNum(leftN % rightN)
           }
         }
 
         case Pow(_, left, right) => {
-          handleBinary(loopForJoin(env, restrict)(left),
-                       left.provenance,
-                       loopForJoin(env, restrict)(right),
-                       right.provenance) {
+          handleBinary(
+            loopForJoin(env, restrict)(left),
+            left.provenance,
+            loopForJoin(env, restrict)(right),
+            right.provenance) {
             case (JNum(leftN), JNum(rightN)) => JNum(leftN pow rightN.toInt)
           }
         }
 
         case Lt(_, left, right) => {
-          handleBinary(loopForJoin(env, restrict)(left),
-                       left.provenance,
-                       loopForJoin(env, restrict)(right),
-                       right.provenance) {
+          handleBinary(
+            loopForJoin(env, restrict)(left),
+            left.provenance,
+            loopForJoin(env, restrict)(right),
+            right.provenance) {
             case (JNum(leftN), JNum(rightN)) => JBool(leftN < rightN)
           }
         }
 
         case LtEq(_, left, right) => {
-          handleBinary(loopForJoin(env, restrict)(left),
-                       left.provenance,
-                       loopForJoin(env, restrict)(right),
-                       right.provenance) {
+          handleBinary(
+            loopForJoin(env, restrict)(left),
+            left.provenance,
+            loopForJoin(env, restrict)(right),
+            right.provenance) {
             case (JNum(leftN), JNum(rightN)) => JBool(leftN <= rightN)
           }
         }
 
         case Gt(_, left, right) => {
-          handleBinary(loopForJoin(env, restrict)(left),
-                       left.provenance,
-                       loopForJoin(env, restrict)(right),
-                       right.provenance) {
+          handleBinary(
+            loopForJoin(env, restrict)(left),
+            left.provenance,
+            loopForJoin(env, restrict)(right),
+            right.provenance) {
             case (JNum(leftN), JNum(rightN)) => JBool(leftN > rightN)
           }
         }
 
         case GtEq(_, left, right) => {
-          handleBinary(loopForJoin(env, restrict)(left),
-                       left.provenance,
-                       loopForJoin(env, restrict)(right),
-                       right.provenance) {
+          handleBinary(
+            loopForJoin(env, restrict)(left),
+            left.provenance,
+            loopForJoin(env, restrict)(right),
+            right.provenance) {
             case (JNum(leftN), JNum(rightN)) => JBool(leftN >= rightN)
           }
         }
 
         case Eq(_, left, right) => {
-          handleBinary(loopForJoin(env, restrict)(left),
-                       left.provenance,
-                       loopForJoin(env, restrict)(right),
-                       right.provenance) {
+          handleBinary(
+            loopForJoin(env, restrict)(left),
+            left.provenance,
+            loopForJoin(env, restrict)(right),
+            right.provenance) {
             case (leftV, rightV) => JBool(leftV == rightV)
           }
         }
 
         case NotEq(_, left, right) => {
-          handleBinary(loopForJoin(env, restrict)(left),
-                       left.provenance,
-                       loopForJoin(env, restrict)(right),
-                       right.provenance) {
+          handleBinary(
+            loopForJoin(env, restrict)(left),
+            left.provenance,
+            loopForJoin(env, restrict)(right),
+            right.provenance) {
             case (leftV, rightV) => JBool(leftV != rightV)
           }
         }
 
         case And(_, left, right) => {
-          handleBinary(loopForJoin(env, restrict)(left),
-                       left.provenance,
-                       loopForJoin(env, restrict)(right),
-                       right.provenance) {
+          handleBinary(
+            loopForJoin(env, restrict)(left),
+            left.provenance,
+            loopForJoin(env, restrict)(right),
+            right.provenance) {
             case (JBool(leftB), JBool(rightB)) => JBool(leftB && rightB)
           }
         }
 
         case Or(_, left, right) => {
-          handleBinary(loopForJoin(env, restrict)(left),
-                       left.provenance,
-                       loopForJoin(env, restrict)(right),
-                       right.provenance) {
+          handleBinary(
+            loopForJoin(env, restrict)(left),
+            left.provenance,
+            loopForJoin(env, restrict)(right),
+            right.provenance) {
             case (JBool(leftB), JBool(rightB)) => JBool(leftB || rightB)
           }
         }

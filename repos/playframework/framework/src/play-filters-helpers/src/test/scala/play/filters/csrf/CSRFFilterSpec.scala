@@ -156,13 +156,14 @@ object CSRFFilterSpec extends CSRFCommonSpecs {
       def compareTokens(a: String, b: String) =
         crypto.compareSignedTokens(a, b) must beTrue
 
-      sharedTests(csrfCheckRequest,
-                  csrfAddToken,
-                  generate,
-                  addToken,
-                  getToken,
-                  compareTokens,
-                  UNAUTHORIZED)
+      sharedTests(
+        csrfCheckRequest,
+        csrfAddToken,
+        generate,
+        addToken,
+        getToken,
+        compareTokens,
+        UNAUTHORIZED)
     }
   }
 

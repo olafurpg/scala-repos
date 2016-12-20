@@ -78,9 +78,10 @@ private[akkahttp] class ModelConversion(
       override def queryString = request.uri.query().toMultiMap
       override val headers = convertRequestHeaders(request)
       private lazy val remoteConnection: ConnectionInfo = {
-        forwardedHeaderHandler.remoteConnection(remoteAddressArg.getAddress,
-                                                secureProtocol,
-                                                headers)
+        forwardedHeaderHandler.remoteConnection(
+          remoteAddressArg.getAddress,
+          secureProtocol,
+          headers)
       }
       override def remoteAddress = remoteConnection.address.getHostAddress
       override def secure = remoteConnection.secure
@@ -97,8 +98,9 @@ private[akkahttp] class ModelConversion(
       case HttpEntity.Strict(contentType, _) =>
         Seq((CONTENT_TYPE, contentType.value))
       case HttpEntity.Default(contentType, contentLength, _) =>
-        Seq((CONTENT_TYPE, contentType.value),
-            (CONTENT_LENGTH, contentLength.toString))
+        Seq(
+          (CONTENT_TYPE, contentType.value),
+          (CONTENT_LENGTH, contentLength.toString))
       case HttpEntity.Chunked(contentType, _) =>
         Seq((CONTENT_TYPE, contentType.value))
     }

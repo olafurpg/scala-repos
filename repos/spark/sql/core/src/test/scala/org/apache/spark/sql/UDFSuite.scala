@@ -55,8 +55,9 @@ class UDFSuite extends QueryTest with SharedSQLContext {
     val df =
       Seq((1, "Tearing down the walls that divide us")).toDF("id", "saying")
     df.registerTempTable("tmp_table")
-    checkAnswer(sql("select spark_partition_id() from tmp_table").toDF(),
-                Row(0))
+    checkAnswer(
+      sql("select spark_partition_id() from tmp_table").toDF(),
+      Row(0))
     sqlContext.dropTempTable("tmp_table")
   }
 
@@ -178,8 +179,9 @@ class UDFSuite extends QueryTest with SharedSQLContext {
   }
 
   test("struct UDF") {
-    sqlContext.udf.register("returnStruct",
-                            (f1: String, f2: String) => FunctionResult(f1, f2))
+    sqlContext.udf.register(
+      "returnStruct",
+      (f1: String, f2: String) => FunctionResult(f1, f2))
 
     val result = sql("SELECT returnStruct('test', 'test2') as ret")
       .select($"ret.f1")
@@ -203,50 +205,55 @@ class UDFSuite extends QueryTest with SharedSQLContext {
 
   test("udf in different types") {
     sqlContext.udf.register("testDataFunc", (n: Int, s: String) => { (n, s) })
-    sqlContext.udf.register("decimalDataFunc",
-                            (a: java.math.BigDecimal,
-                             b: java.math.BigDecimal) => { (a, b) })
+    sqlContext.udf.register(
+      "decimalDataFunc",
+      (a: java.math.BigDecimal, b: java.math.BigDecimal) => { (a, b) })
     sqlContext.udf.register("binaryDataFunc", (a: Array[Byte], b: Int) => {
       (a, b)
     })
-    sqlContext.udf.register("arrayDataFunc",
-                            (data: Seq[Int], nestedData: Seq[Seq[Int]]) => {
-                              (data, nestedData)
-                            })
+    sqlContext.udf.register(
+      "arrayDataFunc",
+      (data: Seq[Int], nestedData: Seq[Seq[Int]]) => {
+        (data, nestedData)
+      })
     sqlContext.udf
       .register("mapDataFunc", (data: scala.collection.Map[Int, String]) => {
         data
       })
-    sqlContext.udf.register("complexDataFunc",
-                            (m: Map[String, Int], a: Seq[Int], b: Boolean) => {
-                              (m, a, b)
-                            })
+    sqlContext.udf.register(
+      "complexDataFunc",
+      (m: Map[String, Int], a: Seq[Int], b: Boolean) => {
+        (m, a, b)
+      })
 
     checkAnswer(
       sql(
         "SELECT tmp.t.* FROM (SELECT testDataFunc(key, value) AS t from testData) tmp")
         .toDF(),
       testData)
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
            | SELECT tmp.t.* FROM
            | (SELECT decimalDataFunc(a, b) AS t FROM decimalData) tmp
           """.stripMargin).toDF(),
-                decimalData)
-    checkAnswer(sql("""
+      decimalData)
+    checkAnswer(
+      sql("""
            | SELECT tmp.t.* FROM
            | (SELECT binaryDataFunc(a, b) AS t FROM binaryData) tmp
           """.stripMargin).toDF(),
-                binaryData)
+      binaryData)
     checkAnswer(
       sql("""
            | SELECT tmp.t.* FROM
            | (SELECT arrayDataFunc(data, nestedData) AS t FROM arrayData) tmp
           """.stripMargin).toDF(),
       arrayData.toDF())
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
            | SELECT mapDataFunc(data) AS t FROM mapData
           """.stripMargin).toDF(),
-                mapData.toDF())
+      mapData.toDF())
     checkAnswer(
       sql("""
            | SELECT tmp.t.* FROM
@@ -265,8 +272,9 @@ class UDFSuite extends QueryTest with SharedSQLContext {
     // Without the fix, this will fail because we fail to cast data type of b to string
     // because myUDF does not know its input data type. With the fix, this query should not
     // fail.
-    checkAnswer(testData2.select(myUDF($"a", $"b").as("t")),
-                testData2.selectExpr("struct(a, b)"))
+    checkAnswer(
+      testData2.select(myUDF($"a", $"b").as("t")),
+      testData2.selectExpr("struct(a, b)"))
 
     checkAnswer(
       sql(

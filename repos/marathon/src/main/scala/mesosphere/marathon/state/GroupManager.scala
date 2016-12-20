@@ -130,11 +130,12 @@ class GroupManager @Singleton @Inject()(
       version: Timestamp = Timestamp.now(),
       force: Boolean = false,
       toKill: Iterable[Task] = Iterable.empty): Future[DeploymentPlan] =
-    upgrade(appId.parent,
-            _.updateApp(appId, fn, version),
-            version,
-            force,
-            Map(appId -> toKill))
+    upgrade(
+      appId.parent,
+      _.updateApp(appId, fn, version),
+      version,
+      force,
+      Map(appId -> toKill))
 
   private def upgrade(gid: PathId,
                       change: Group => Group,
@@ -213,8 +214,9 @@ class GroupManager @Singleton @Inject()(
           else {
             val storageUrls = app.storeUrls.map(paths).map(storage.item(_).url)
             val resolved =
-              app.copy(fetch = app.fetch ++ storageUrls.map(FetchUri.apply(_)),
-                       storeUrls = Seq.empty)
+              app.copy(
+                fetch = app.fetch ++ storageUrls.map(FetchUri.apply(_)),
+                storeUrls = Seq.empty)
             val appDownloads: Map[URL, String] = app.storeUrls
               .flatMap { url =>
                 downloads.remove(url).map { path =>
@@ -254,9 +256,10 @@ class GroupManager @Singleton @Inject()(
         portDefinitions: Seq[PortDefinition],
         servicePorts: Seq[Int]) = {
       portDefinitions
-        .zipAll(servicePorts,
-                AppDefinition.RandomPortDefinition,
-                AppDefinition.RandomPortValue)
+        .zipAll(
+          servicePorts,
+          AppDefinition.RandomPortDefinition,
+          AppDefinition.RandomPortValue)
         .map {
           case (portDefinition, servicePort) =>
             portDefinition.copy(port = servicePort)
@@ -298,9 +301,9 @@ class GroupManager @Singleton @Inject()(
       }
 
       app.copy(
-        portDefinitions =
-          mergeServicePortsAndPortDefinitions(app.portDefinitions,
-                                              servicePorts),
+        portDefinitions = mergeServicePortsAndPortDefinitions(
+          app.portDefinitions,
+          servicePorts),
         container = newContainer.orElse(app.container)
       )
     }
@@ -310,9 +313,9 @@ class GroupManager @Singleton @Inject()(
       case app: AppDefinition =>
         // Always set the ports to service ports, even if we do not have dynamic ports in our port mappings
         app.copy(
-          portDefinitions =
-            mergeServicePortsAndPortDefinitions(app.portDefinitions,
-                                                app.servicePorts)
+          portDefinitions = mergeServicePortsAndPortDefinitions(
+            app.portDefinitions,
+            app.servicePorts)
         )
     }
 

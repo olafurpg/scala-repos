@@ -28,9 +28,10 @@ final class ESClientHttp(endpoint: String,
 
   def search[Q: Writes](query: Q, from: From, size: Size) =
     monitor("search") {
-      HTTP(s"search/${index.name}/${from.value}/${size.value}",
-           query,
-           SearchResponse.apply)
+      HTTP(
+        s"search/${index.name}/${from.value}/${size.value}",
+        query,
+        SearchResponse.apply)
     }
 
   def count[Q: Writes](query: Q) = monitor("count") {
@@ -41,8 +42,9 @@ final class ESClientHttp(endpoint: String,
     writeable ?? HTTP(s"delete/id/${index.name}/${id.value}", Json.obj())
 
   def deleteByIds(ids: List[lila.search.Id]) =
-    writeable ?? HTTP(s"delete/ids/${index.name}",
-                      Json.obj("ids" -> ids.map(_.value)))
+    writeable ?? HTTP(
+      s"delete/ids/${index.name}",
+      Json.obj("ids" -> ids.map(_.value)))
 
   def putMapping =
     HTTP(s"mapping/${index.name}/${index.name}", Json.obj())
@@ -64,8 +66,9 @@ final class ESClientHttp(endpoint: String,
 
   private def monitor[A](op: String)(f: Fu[A]) =
     f.mon(_.search.client(op))
-      .addEffects(_ => lila.mon.search.failure(op)(),
-                  _ => lila.mon.search.success(op)())
+      .addEffects(
+        _ => lila.mon.search.failure(op)(),
+        _ => lila.mon.search.success(op)())
 }
 
 final class ESClientStub extends ESClient {

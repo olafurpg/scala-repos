@@ -78,10 +78,11 @@ private[round] final class Finisher(messenger: Messenger,
         game.perfType foreach { perfType =>
           timeline !
             (Propagate(
-              GameEnd(playerId = game fullIdOf color,
-                      opponent = game.player(!color).userId,
-                      win = game.winnerColor map (color ==),
-                      perf = perfType.key)) toUser userId)
+              GameEnd(
+                playerId = game fullIdOf color,
+                opponent = game.player(!color).userId,
+                win = game.winnerColor map (color ==),
+                perf = perfType.key)) toUser userId)
         }
       }
   }
@@ -90,9 +91,10 @@ private[round] final class Finisher(messenger: Messenger,
     (!finish.isVsSelf && !finish.game.aborted) ?? {
       (finish.white |@| finish.black).tupled ?? {
         case (white, black) =>
-          crosstableApi add finish.game zip perfsUpdater.save(finish.game,
-                                                              white,
-                                                              black)
+          crosstableApi add finish.game zip perfsUpdater.save(
+            finish.game,
+            white,
+            black)
       } zip (finish.white ?? incNbGames(finish.game)) zip
         (finish.black ?? incNbGames(finish.game)) void
     }
@@ -100,14 +102,15 @@ private[round] final class Finisher(messenger: Messenger,
   private def incNbGames(game: Game)(user: User): Funit = game.finished ?? {
     val totalTime = user.playTime.isDefined option game.moveTimes.sum / 10
     val tvTime = totalTime ifTrue game.metadata.tvAt.isDefined
-    UserRepo.incNbGames(user.id,
-                        game.rated,
-                        game.hasAi,
-                        result =
-                          if (game.winnerUserId exists (user.id ==)) 1
-                          else if (game.loserUserId exists (user.id ==)) -1
-                          else 0,
-                        totalTime = totalTime,
-                        tvTime = tvTime)
+    UserRepo.incNbGames(
+      user.id,
+      game.rated,
+      game.hasAi,
+      result =
+        if (game.winnerUserId exists (user.id ==)) 1
+        else if (game.loserUserId exists (user.id ==)) -1
+        else 0,
+      totalTime = totalTime,
+      tvTime = tvTime)
   }
 }

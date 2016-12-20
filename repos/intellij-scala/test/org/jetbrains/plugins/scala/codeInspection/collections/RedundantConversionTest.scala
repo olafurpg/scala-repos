@@ -21,9 +21,10 @@ class RedundantConversionTest extends OperationsOnCollectionInspectionTest {
   }
 
   def test_3(): Unit = {
-    doTest(s"Map(1 -> true).${START}toMap[Int, Boolean]$END",
-           "Map(1 -> true).toMap[Int, Boolean]",
-           "Map(1 -> true)")
+    doTest(
+      s"Map(1 -> true).${START}toMap[Int, Boolean]$END",
+      "Map(1 -> true).toMap[Int, Boolean]",
+      "Map(1 -> true)")
   }
 
   def test_4(): Unit = {

@@ -45,8 +45,9 @@ object Challenge extends LilaController {
       negotiate(
         html = fuccess {
           Ok(
-            mine.fold(html.challenge.mine.apply _,
-                      html.challenge.theirs.apply _)(c, json))
+            mine.fold(
+              html.challenge.mine.apply _,
+              html.challenge.theirs.apply _)(c, json))
         },
         api = _ => Ok(json).fuccess
       ) flatMap withChallengeAnonCookie(mine && c.challengerIsAnon, c, true)
@@ -71,10 +72,9 @@ object Challenge extends LilaController {
               Env.api.roundApi.player(pov, apiVersion) map { Ok(_) }
           ) flatMap withChallengeAnonCookie(ctx.isAnon, c, false)
         case None =>
-          negotiate(html =
-                      Redirect(routes.Round.watcher(c.id, "white")).fuccess,
-                    api =
-                      _ => notFoundJson("Someone else accepted the challenge"))
+          negotiate(
+            html = Redirect(routes.Round.watcher(c.id, "white")).fuccess,
+            api = _ => notFoundJson("Someone else accepted the challenge"))
       }
     }
   }
@@ -144,12 +144,13 @@ object Challenge extends LilaController {
           Env.pref.api getPref user zip Env.relation.api
             .fetchFollows(user.id, me.id) map {
             case (pref, follow) =>
-              lila.pref.Pref.Challenge.block(me,
-                                             user,
-                                             pref.challenge,
-                                             follow,
-                                             fromCheat = me.engine &&
-                                                 !user.engine)
+              lila.pref.Pref.Challenge.block(
+                me,
+                user,
+                pref.challenge,
+                follow,
+                fromCheat = me.engine &&
+                    !user.engine)
           }
       }
   }

@@ -78,16 +78,18 @@ class FileAppenderSuite
     val appender = new RollingFileAppender(
       testInputStream,
       testFile,
-      new TimeBasedRollingPolicy(rolloverIntervalMillis,
-                                 s"--HH-mm-ss-SSSS",
-                                 false),
+      new TimeBasedRollingPolicy(
+        rolloverIntervalMillis,
+        s"--HH-mm-ss-SSSS",
+        false),
       new SparkConf(),
       10)
 
-    testRolling(appender,
-                testOutputStream,
-                textToAppend,
-                rolloverIntervalMillis)
+    testRolling(
+      appender,
+      testOutputStream,
+      textToAppend,
+      rolloverIntervalMillis)
   }
 
   test("rolling file appender - size-based rolling") {
@@ -98,11 +100,12 @@ class FileAppenderSuite
     val textToAppend = (1 to 3).map(_.toString * 1000)
 
     val appender =
-      new RollingFileAppender(testInputStream,
-                              testFile,
-                              new SizeBasedRollingPolicy(rolloverSize, false),
-                              new SparkConf(),
-                              99)
+      new RollingFileAppender(
+        testInputStream,
+        testFile,
+        new SizeBasedRollingPolicy(rolloverSize, false),
+        new SparkConf(),
+        99)
 
     val files = testRolling(appender, testOutputStream, textToAppend, 0)
     files.foreach { file =>
@@ -118,11 +121,12 @@ class FileAppenderSuite
     val conf =
       new SparkConf().set(RollingFileAppender.RETAINED_FILES_PROPERTY, "10")
     val appender =
-      new RollingFileAppender(testInputStream,
-                              testFile,
-                              new SizeBasedRollingPolicy(1000, false),
-                              conf,
-                              10)
+      new RollingFileAppender(
+        testInputStream,
+        testFile,
+        new SizeBasedRollingPolicy(1000, false),
+        conf,
+        10)
 
     // send data to appender through the input stream, and wait for the data to be written
     val allGeneratedFiles = new HashSet[String]()
@@ -131,8 +135,9 @@ class FileAppenderSuite
       testOutputStream.write(items(i).getBytes(StandardCharsets.UTF_8))
       testOutputStream.flush()
       allGeneratedFiles ++= RollingFileAppender
-        .getSortedRolledOverFiles(testFile.getParentFile.toString,
-                                  testFile.getName)
+        .getSortedRolledOverFiles(
+          testFile.getParentFile.toString,
+          testFile.getName)
         .map(_.toString)
 
       Thread.sleep(10)
@@ -150,8 +155,9 @@ class FileAppenderSuite
     assert(rolledOverFiles.size > 2)
     val earliestRolledOverFile = rolledOverFiles.head
     val existingRolledOverFiles = RollingFileAppender
-      .getSortedRolledOverFiles(testFile.getParentFile.toString,
-                                testFile.getName)
+      .getSortedRolledOverFiles(
+        testFile.getParentFile.toString,
+        testFile.getName)
       .map(_.toString)
     logInfo(
       "Existing rolled over files:\n" +
@@ -217,8 +223,9 @@ class FileAppenderSuite
     testAppenderSelection[FileAppender, Any](Seq.empty)
 
     // test time based rolling strategy
-    testAppenderSelection[RollingFileAppender, Any](rollingStrategy("time"),
-                                                    msInDay)
+    testAppenderSelection[RollingFileAppender, Any](
+      rollingStrategy("time"),
+      msInDay)
     testAppenderSelection[RollingFileAppender, TimeBasedRollingPolicy](
       rollingStrategy("time") ++ rollingInterval("daily"),
       msInDay)

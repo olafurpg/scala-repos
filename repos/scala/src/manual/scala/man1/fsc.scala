@@ -107,30 +107,31 @@ object fsc extends Command {
     MBold(command) & " returns a zero exit status if it succeeds to " & "compile the specified input files. Non zero is returned in case " & "of failure.")
 
   val seeAlso =
-    Section("SEE ALSO",
-            Link(Bold("scala") & "(1)", "scala.html") & ", " & Link(
-              Bold("scalac") & "(1)",
-              "scalac.html") & ", " & Link(Bold("scaladoc") & "(1)",
-                                           "scaladoc.html") & ", " & Link(
-              Bold("scalap") & "(1)",
-              "scalap.html"))
+    Section(
+      "SEE ALSO",
+      Link(Bold("scala") & "(1)", "scala.html") & ", " & Link(
+        Bold("scalac") & "(1)",
+        "scalac.html") & ", " & Link(Bold("scaladoc") & "(1)", "scaladoc.html") & ", " & Link(
+        Bold("scalap") & "(1)",
+        "scalap.html"))
 
   def manpage = new Document {
     title = command
     date = "March 2012"
     author = "Lex Spoon"
     version = "0.5"
-    sections = List(name,
-                    synopsis,
-                    parameters,
-                    options,
-                    description,
-                    example,
-                    environment,
-                    exitStatus,
-                    authors,
-                    bugs,
-                    copyright,
-                    seeAlso)
+    sections = List(
+      name,
+      synopsis,
+      parameters,
+      options,
+      description,
+      example,
+      environment,
+      exitStatus,
+      authors,
+      bugs,
+      copyright,
+      seeAlso)
   }
 }

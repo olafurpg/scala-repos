@@ -260,10 +260,10 @@ object Serializers {
   }
 
   val serializers: Seq[LocalRegisteredSerializer] = List(
-    LocalRegisteredSerializer.fromSbtSerializer(forkConfigPickler,
-                                                forkConfigUnpickler),
-    LocalRegisteredSerializer.fromSbtSerializer(compileResultPickler,
-                                                compileResultUnpickler),
-    LocalRegisteredSerializer.fromSbtSerializer(playServerStartedPickler,
-                                                playServerStartedUnpickler))
+    LocalRegisteredSerializer
+      .fromSbtSerializer(forkConfigPickler, forkConfigUnpickler),
+    LocalRegisteredSerializer
+      .fromSbtSerializer(compileResultPickler, compileResultUnpickler),
+    LocalRegisteredSerializer
+      .fromSbtSerializer(playServerStartedPickler, playServerStartedUnpickler))
 }

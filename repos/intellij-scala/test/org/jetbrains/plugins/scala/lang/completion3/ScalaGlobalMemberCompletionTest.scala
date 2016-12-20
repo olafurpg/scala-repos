@@ -269,12 +269,13 @@ class Test {
       case sli: ScalaLookupItem =>
         sli.containingClass.name + "." + sli.getLookupString
     }
-    val expected = Set("D1.zeeGlobalDefInherited",
-                       "D1.zeeGlobalValInherited",
-                       "D1.zeeGlobalDef",
-                       "D1.zeeGlobalVal",
-                       "D2.zeeGlobalDefInherited",
-                       "D2.zeeGlobalValInherited")
+    val expected = Set(
+      "D1.zeeGlobalDefInherited",
+      "D1.zeeGlobalValInherited",
+      "D1.zeeGlobalDef",
+      "D1.zeeGlobalVal",
+      "D2.zeeGlobalDefInherited",
+      "D2.zeeGlobalValInherited")
     Assert.assertEquals(expected, lookups.toSet)
   }
 }

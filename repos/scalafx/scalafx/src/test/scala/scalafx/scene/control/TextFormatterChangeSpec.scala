@@ -48,8 +48,9 @@ import scalafx.testutil.{
   */
 @RunWith(classOf[JUnitRunner])
 class TextFormatterChangeSpec
-    extends SimpleSFXDelegateSpec[jfxsc.TextFormatter.Change,
-                                  TextFormatter.Change](
+    extends SimpleSFXDelegateSpec[
+      jfxsc.TextFormatter.Change,
+      TextFormatter.Change](
       classOf[jfxsc.TextFormatter.Change],
       classOf[TextFormatter.Change])
     with RunOnApplicationThread {

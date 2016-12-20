@@ -18,10 +18,11 @@ object ModifierType extends Enumeration {
   OVERRIDE, INNER, VOLATILE, TRANSIENT, NATIVE, THROW, SerialVersionUID,
   FINAL = Value
 
-  val accessModifiers = Seq(ModifierType.PUBLIC,
-                            ModifierType.PRIVATE,
-                            ModifierType.PROTECTED,
-                            ModifierType.PACKAGE_LOCAL)
+  val accessModifiers = Seq(
+    ModifierType.PUBLIC,
+    ModifierType.PRIVATE,
+    ModifierType.PROTECTED,
+    ModifierType.PACKAGE_LOCAL)
 
   override def toString(): String = {
     Value match {
@@ -48,10 +49,11 @@ case class ModifiersConstruction(annotations: Seq[IntermediateNode],
 
   def noModifiers = annotations.isEmpty && modifiers.isEmpty
 
-  val accessModifiers = Seq(ModifierType.PUBLIC,
-                            ModifierType.PRIVATE,
-                            ModifierType.PROTECTED,
-                            ModifierType.PACKAGE_LOCAL)
+  val accessModifiers = Seq(
+    ModifierType.PUBLIC,
+    ModifierType.PRIVATE,
+    ModifierType.PROTECTED,
+    ModifierType.PACKAGE_LOCAL)
 }
 
 case class ModifierWithExpression(mtype: ModifierType, value: IntermediateNode)

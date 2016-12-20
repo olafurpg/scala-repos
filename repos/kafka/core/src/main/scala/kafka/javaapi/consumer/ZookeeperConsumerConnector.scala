@@ -106,32 +106,36 @@ private[kafka] class ZookeeperConsumerConnector(
       topicCountMap: java.util.Map[String, java.lang.Integer])
     : java.util.Map[String,
                     java.util.List[KafkaStream[Array[Byte], Array[Byte]]]] =
-    createMessageStreams(topicCountMap,
-                         new DefaultDecoder(),
-                         new DefaultDecoder())
+    createMessageStreams(
+      topicCountMap,
+      new DefaultDecoder(),
+      new DefaultDecoder())
 
   def createMessageStreamsByFilter[K, V](topicFilter: TopicFilter,
                                          numStreams: Int,
                                          keyDecoder: Decoder[K],
                                          valueDecoder: Decoder[V]) = {
     import JavaConversions._
-    underlying.createMessageStreamsByFilter(topicFilter,
-                                            numStreams,
-                                            keyDecoder,
-                                            valueDecoder)
+    underlying.createMessageStreamsByFilter(
+      topicFilter,
+      numStreams,
+      keyDecoder,
+      valueDecoder)
   }
 
   def createMessageStreamsByFilter(topicFilter: TopicFilter, numStreams: Int) =
-    createMessageStreamsByFilter(topicFilter,
-                                 numStreams,
-                                 new DefaultDecoder(),
-                                 new DefaultDecoder())
+    createMessageStreamsByFilter(
+      topicFilter,
+      numStreams,
+      new DefaultDecoder(),
+      new DefaultDecoder())
 
   def createMessageStreamsByFilter(topicFilter: TopicFilter) =
-    createMessageStreamsByFilter(topicFilter,
-                                 1,
-                                 new DefaultDecoder(),
-                                 new DefaultDecoder())
+    createMessageStreamsByFilter(
+      topicFilter,
+      1,
+      new DefaultDecoder(),
+      new DefaultDecoder())
 
   def commitOffsets() {
     underlying.commitOffsets(true)

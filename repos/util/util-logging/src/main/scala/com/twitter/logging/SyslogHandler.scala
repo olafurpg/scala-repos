@@ -142,11 +142,12 @@ class SyslogFormatter(val hostname: String = NetUtil.getLocalHostName(),
                       truncateAt: Int = 0,
                       truncateStackTracesAt: Int =
                         Formatter.DefaultStackTraceSizeLimit)
-    extends Formatter(timezone,
-                      truncateAt,
-                      truncateStackTracesAt,
-                      useFullPackageNames = false,
-                      prefix = "") {
+    extends Formatter(
+      timezone,
+      truncateAt,
+      truncateStackTracesAt,
+      useFullPackageNames = false,
+      prefix = "") {
 
   override def dateFormat =
     if (useIsoDateFormat) {

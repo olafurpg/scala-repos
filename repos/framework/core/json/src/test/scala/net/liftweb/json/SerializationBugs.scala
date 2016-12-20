@@ -38,9 +38,10 @@ object SerializationBugs extends Specification {
 
     val g1 = Game(
       Map(
-        "a" -> Plan(Some(Action("f1", "s", Array(), None)),
-                    Some("A"),
-                    Some(Action("f2", "s2", Array(0, 1, 2), None)))))
+        "a" -> Plan(
+          Some(Action("f1", "s", Array(), None)),
+          Some("A"),
+          Some(Action("f2", "s2", Array(0, 1, 2), None)))))
     val ser = swrite(g1)
     val g2 = read[Game](ser)
     val plan = g2.buy("a")

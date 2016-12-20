@@ -125,8 +125,9 @@ private[spark] abstract class MapOutputTracker(conf: SparkConf)
     } catch {
       case e: Exception =>
         logError("Error communicating with MapOutputTracker", e)
-        throw new SparkException("Error communicating with MapOutputTracker",
-                                 e)
+        throw new SparkException(
+          "Error communicating with MapOutputTracker",
+          e)
     }
   }
 
@@ -579,9 +580,10 @@ private[spark] object MapOutputTracker extends Logging {
       if (status == null) {
         val errorMessage = s"Missing an output location for shuffle $shuffleId"
         logError(errorMessage)
-        throw new MetadataFetchFailedException(shuffleId,
-                                               startPartition,
-                                               errorMessage)
+        throw new MetadataFetchFailedException(
+          shuffleId,
+          startPartition,
+          errorMessage)
       } else {
         for (part <- startPartition until endPartition) {
           splitsByAddress.getOrElseUpdate(status.location, ArrayBuffer()) +=

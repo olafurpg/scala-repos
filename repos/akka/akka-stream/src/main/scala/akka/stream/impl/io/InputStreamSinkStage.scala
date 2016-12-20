@@ -131,8 +131,9 @@ private[akka] class InputStreamAdapter(
     require(a.length > 0, "array size must be >= 0")
     require(begin >= 0, "begin must be >= 0")
     require(length > 0, "length must be > 0")
-    require(begin + length <= a.length,
-            "begin + length must be smaller or equal to the array length")
+    require(
+      begin + length <= a.length,
+      "begin + length must be smaller or equal to the array length")
 
     executeIfNotClosed(() ⇒
       if (isStageAlive) {

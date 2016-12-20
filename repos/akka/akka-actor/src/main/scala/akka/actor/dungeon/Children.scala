@@ -42,26 +42,29 @@ private[akka] trait Children { this: ActorCell ⇒
   def actorOf(props: Props): ActorRef =
     makeChild(this, props, randomName(), async = false, systemService = false)
   def actorOf(props: Props, name: String): ActorRef =
-    makeChild(this,
-              props,
-              checkName(name),
-              async = false,
-              systemService = false)
+    makeChild(
+      this,
+      props,
+      checkName(name),
+      async = false,
+      systemService = false)
   private[akka] def attachChild(props: Props,
                                 systemService: Boolean): ActorRef =
-    makeChild(this,
-              props,
-              randomName(),
-              async = true,
-              systemService = systemService)
+    makeChild(
+      this,
+      props,
+      randomName(),
+      async = true,
+      systemService = systemService)
   private[akka] def attachChild(props: Props,
                                 name: String,
                                 systemService: Boolean): ActorRef =
-    makeChild(this,
-              props,
-              checkName(name),
-              async = true,
-              systemService = systemService)
+    makeChild(
+      this,
+      props,
+      checkName(name),
+      async = true,
+      systemService = systemService)
 
   @volatile private var _functionRefsDoNotCallMeDirectly =
     Map.empty[String, FunctionRef]
@@ -102,8 +105,9 @@ private[akka] trait Children { this: ActorCell ⇒
   }
 
   private[akka] def removeFunctionRef(ref: FunctionRef): Boolean = {
-    require(ref.path.parent eq self.path,
-            "trying to remove FunctionRef from wrong ActorCell")
+    require(
+      ref.path.parent eq self.path,
+      "trying to remove FunctionRef from wrong ActorCell")
     val name = ref.path.name
     @tailrec def rec(): Boolean = {
       val old = functionRefs
@@ -165,10 +169,11 @@ private[akka] trait Children { this: ActorCell ⇒
   @inline private final def swapChildrenRefs(
       oldChildren: ChildrenContainer,
       newChildren: ChildrenContainer): Boolean =
-    Unsafe.instance.compareAndSwapObject(this,
-                                         AbstractActorCell.childrenOffset,
-                                         oldChildren,
-                                         newChildren)
+    Unsafe.instance.compareAndSwapObject(
+      this,
+      AbstractActorCell.childrenOffset,
+      oldChildren,
+      newChildren)
 
   @tailrec final def reserveChild(name: String): Boolean = {
     val c = childrenRefs
@@ -205,9 +210,10 @@ private[akka] trait Children { this: ActorCell ⇒
   }
 
   final protected def setTerminated(): Unit =
-    Unsafe.instance.putObjectVolatile(this,
-                                      AbstractActorCell.childrenOffset,
-                                      TerminatedChildrenContainer)
+    Unsafe.instance.putObjectVolatile(
+      this,
+      AbstractActorCell.childrenOffset,
+      TerminatedChildrenContainer)
 
   /*
    * ActorCell-internal API
@@ -345,14 +351,15 @@ private[akka] trait Children { this: ActorCell ⇒
       val actor = try {
         val childPath =
           new ChildActorPath(cell.self.path, name, ActorCell.newUid())
-        cell.provider.actorOf(cell.systemImpl,
-                              props,
-                              cell.self,
-                              childPath,
-                              systemService = systemService,
-                              deploy = None,
-                              lookupDeploy = true,
-                              async = async)
+        cell.provider.actorOf(
+          cell.systemImpl,
+          props,
+          cell.self,
+          childPath,
+          systemService = systemService,
+          deploy = None,
+          lookupDeploy = true,
+          async = async)
       } catch {
         case e: InterruptedException ⇒
           unreserveChild(name)

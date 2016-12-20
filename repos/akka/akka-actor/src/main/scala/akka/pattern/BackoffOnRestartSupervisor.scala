@@ -28,9 +28,10 @@ private class BackoffOnRestartSupervisor(val childProps: Props,
   import context._
   import BackoffSupervisor._
   override val supervisorStrategy =
-    OneForOneStrategy(strategy.maxNrOfRetries,
-                      strategy.withinTimeRange,
-                      strategy.loggingEnabled) {
+    OneForOneStrategy(
+      strategy.maxNrOfRetries,
+      strategy.withinTimeRange,
+      strategy.loggingEnabled) {
       case ex ⇒
         val defaultDirective: Directive =
           super.supervisorStrategy.decider.applyOrElse(ex, (_: Any) ⇒ Escalate)

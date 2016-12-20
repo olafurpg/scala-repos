@@ -18,9 +18,10 @@ object hist extends UFunc {
                                  end: Double,
                                  bins: Double)
       extends Histogram[S] {
-    lazy val binEdges = DenseVector.rangeD(start,
-                                           end + ((end - start) / bins),
-                                           step = ((end - start) / bins))
+    lazy val binEdges = DenseVector.rangeD(
+      start,
+      end + ((end - start) / bins),
+      step = ((end - start) / bins))
   }
 
   @expand
@@ -116,10 +117,11 @@ object hist extends UFunc {
   @expand
   implicit def canTraverseValuesImplWeighted[T,
                                              U,
-                                             @expand.args(Int,
-                                                          Double,
-                                                          Float,
-                                                          Long) S](
+                                             @expand.args(
+                                               Int,
+                                               Double,
+                                               Float,
+                                               Long) S](
       implicit iter: CanZipAndTraverseValues[T, U, S, S])
     : Impl4[T, Int, (Double, Double), U, Histogram[S]] =
     new Impl4[T, Int, (Double, Double), U, Histogram[S]] {

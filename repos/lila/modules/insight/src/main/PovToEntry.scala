@@ -50,9 +50,10 @@ object PovToEntry {
           case (fen, an) =>
             for {
               boards <- chess.Replay
-                .boards(moveStrs = game.pgnMoves,
-                        initialFen = fen,
-                        variant = game.variant)
+                .boards(
+                  moveStrs = game.pgnMoves,
+                  initialFen = fen,
+                  variant = game.variant)
                 .toOption
                 .flatMap(_.toNel)
               movetimes <- game.moveTimes(pov.color).toNel
@@ -123,15 +124,16 @@ object PovToEntry {
               }
             case _ => none
           }
-        Move(phase = Phase.of(from.division, ply),
-             tenths = tenths,
-             role = role,
-             eval = prevInfo.flatMap(_.score).map(_.ceiled.centipawns),
-             mate = prevInfo.flatMap(_.mate),
-             cpl = cpDiffs lift i map (_ min 1000),
-             material = board.materialImbalance * from.pov.color.fold(1, -1),
-             opportunism = opportunism,
-             luck = luck)
+        Move(
+          phase = Phase.of(from.division, ply),
+          tenths = tenths,
+          role = role,
+          eval = prevInfo.flatMap(_.score).map(_.ceiled.centipawns),
+          mate = prevInfo.flatMap(_.mate),
+          cpl = cpDiffs lift i map (_ min 1000),
+          material = board.materialImbalance * from.pov.color.fold(1, -1),
+          opportunism = opportunism,
+          luck = luck)
     }
   }
 

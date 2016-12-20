@@ -19,8 +19,9 @@ import org.jetbrains.plugins.scala.lang.resolve.{
 }
 
 class VariablePatternShadowInspection
-    extends AbstractInspection("VariablePatternShadow",
-                               "Suspicious shadowing by a Variable Pattern") {
+    extends AbstractInspection(
+      "VariablePatternShadow",
+      "Suspicious shadowing by a Variable Pattern") {
 
   def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case refPat: ScReferencePattern => check(refPat, holder)
@@ -48,10 +49,11 @@ class VariablePatternShadowInspection
         case _ => false
       }
       if (results.exists(isAccessible)) {
-        holder.registerProblem(refPat.nameId,
-                               getDisplayName,
-                               new ConvertToStableIdentifierPatternFix(refPat),
-                               new RenameVariablePatternFix(refPat))
+        holder.registerProblem(
+          refPat.nameId,
+          getDisplayName,
+          new ConvertToStableIdentifierPatternFix(refPat),
+          new RenameVariablePatternFix(refPat))
       }
     }
   }

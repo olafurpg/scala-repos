@@ -170,9 +170,10 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     launcherRef ! RateLimiterActor.DelayUpdate(app, clock.now())
 
     Await
-      .result(launcherRef ? ActorOfferMatcher
-                .MatchOffer(clock.now() + 1.seconds, offer),
-              3.seconds)
+      .result(
+        launcherRef ? ActorOfferMatcher
+          .MatchOffer(clock.now() + 1.seconds, offer),
+        3.seconds)
       .asInstanceOf[MatchedTaskOps]
 
     val counts = Await
@@ -204,9 +205,10 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     launcherRef ! RateLimiterActor.DelayUpdate(app, clock.now())
 
     val matched = Await
-      .result(launcherRef ? ActorOfferMatcher
-                .MatchOffer(clock.now() + 1.seconds, offer),
-              3.seconds)
+      .result(
+        launcherRef ? ActorOfferMatcher
+          .MatchOffer(clock.now() + 1.seconds, offer),
+        3.seconds)
       .asInstanceOf[MatchedTaskOps]
 
     val testProbe = TestProbe()
@@ -236,9 +238,10 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     launcherRef ! RateLimiterActor.DelayUpdate(app, clock.now())
 
     val matchedTasks = Await
-      .result(launcherRef ? ActorOfferMatcher
-                .MatchOffer(clock.now() + 1.seconds, offer),
-              3.seconds)
+      .result(
+        launcherRef ? ActorOfferMatcher
+          .MatchOffer(clock.now() + 1.seconds, offer),
+        3.seconds)
       .asInstanceOf[MatchedTaskOps]
     matchedTasks.opsWithSource.foreach(_.reject("stuff"))
 
@@ -293,17 +296,19 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     launcherRef ! RateLimiterActor.DelayUpdate(app, clock.now())
 
     Await
-      .result(launcherRef ? ActorOfferMatcher
-                .MatchOffer(clock.now() + 1.seconds, offer),
-              3.seconds)
+      .result(
+        launcherRef ? ActorOfferMatcher
+          .MatchOffer(clock.now() + 1.seconds, offer),
+        3.seconds)
       .asInstanceOf[MatchedTaskOps]
 
     // just make sure that prior messages have been processed, will not launch further tasks
 
     Await
-      .result(launcherRef ? ActorOfferMatcher
-                .MatchOffer(clock.now() + 1.seconds, offer),
-              3.seconds)
+      .result(
+        launcherRef ? ActorOfferMatcher
+          .MatchOffer(clock.now() + 1.seconds, offer),
+        3.seconds)
       .asInstanceOf[MatchedTaskOps]
 
     assert(scheduleCalled)
@@ -327,9 +332,10 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     launcherRef ! RateLimiterActor.DelayUpdate(app, clock.now())
 
     val matchedTasks = Await
-      .result(launcherRef ? ActorOfferMatcher
-                .MatchOffer(clock.now() + 1.seconds, offer),
-              3.seconds)
+      .result(
+        launcherRef ? ActorOfferMatcher
+          .MatchOffer(clock.now() + 1.seconds, offer),
+        3.seconds)
       .asInstanceOf[MatchedTaskOps]
     matchedTasks.opsWithSource.foreach(_.accept())
 
@@ -407,8 +413,9 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
 
       val launcherRef =
         createLauncherRef(instances = 0, appToLaunch = appWithConstraints)
-      launcherRef ! RateLimiterActor.DelayUpdate(appWithConstraints,
-                                                 clock.now())
+      launcherRef ! RateLimiterActor.DelayUpdate(
+        appWithConstraints,
+        clock.now())
 
       And("that has succesfully started up")
       Await
@@ -417,8 +424,9 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
 
       When("we get a status update about a terminated task")
       Await
-        .result(launcherRef ? update.withTaskId(marathonTask.taskId).wrapped,
-                3.seconds)
+        .result(
+          launcherRef ? update.withTaskId(marathonTask.taskId).wrapped,
+          3.seconds)
         .asInstanceOf[QueuedTaskInfo]
 
       Then("reviveOffers has been called")
@@ -477,9 +485,10 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     MarathonTestHelper.makeOneCPUTask(taskId.idString).build()
   private[this] val marathonTask = MarathonTestHelper
     .mininimalTask(task.getTaskId.getValue)
-    .copy(appVersion = app.version,
-          status = Task.Status(app.version, None, None),
-          networking = Task.NoNetworking)
+    .copy(
+      appVersion = app.version,
+      status = Task.Status(app.version, None, None),
+      networking = Task.NoNetworking)
 
   private[this] implicit val timeout: Timeout = 3.seconds
   private[this] implicit var actorSystem: ActorSystem = _
@@ -494,14 +503,14 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
   private[this] def createLauncherRef(
       instances: Int,
       appToLaunch: AppDefinition = app): ActorRef = {
-    val props = AppTaskLauncherActor.props(launchQueueConfig,
-                                           offerMatcherManager,
-                                           clock,
-                                           taskOpFactory,
-                                           maybeOfferReviver =
-                                             Some(offerReviver),
-                                           taskTracker,
-                                           rateLimiterActor.ref) _
+    val props = AppTaskLauncherActor.props(
+      launchQueueConfig,
+      offerMatcherManager,
+      clock,
+      taskOpFactory,
+      maybeOfferReviver = Some(offerReviver),
+      taskTracker,
+      rateLimiterActor.ref) _
     actorSystem.actorOf(
       props(appToLaunch, instances),
       "launcher"

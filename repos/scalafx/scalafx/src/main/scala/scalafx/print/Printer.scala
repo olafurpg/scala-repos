@@ -58,8 +58,9 @@ object Printer {
     * Companion Object for [[scalafx.print.Printer.MarginType]].
     */
   object MarginType
-      extends SFXEnumDelegateCompanion[jfxp.Printer.MarginType,
-                                       Printer.MarginType] {
+      extends SFXEnumDelegateCompanion[
+        jfxp.Printer.MarginType,
+        Printer.MarginType] {
 
     /**
       * This requests a default 0.75 inch margin on all sides.

@@ -41,9 +41,10 @@ object MarkovChain {
           .map(me => (me.j.toInt, me.value / total))
           .sortBy(_._1)
 
-        new SparseVector(noOfStates,
-                         sortedTopN.map(_._1).toArray,
-                         sortedTopN.map(_._2).toArray)
+        new SparseVector(
+          noOfStates,
+          sortedTopN.map(_._1).toArray,
+          sortedTopN.map(_._2).toArray)
       }
 
     new MarkovChainModel(transitionVectors, topN)

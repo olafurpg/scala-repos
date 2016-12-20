@@ -176,15 +176,18 @@ private[spark] class MatrixUDT extends UserDefinedType[Matrix] {
         StructField("type", ByteType, nullable = false),
         StructField("numRows", IntegerType, nullable = false),
         StructField("numCols", IntegerType, nullable = false),
-        StructField("colPtrs",
-                    ArrayType(IntegerType, containsNull = false),
-                    nullable = true),
-        StructField("rowIndices",
-                    ArrayType(IntegerType, containsNull = false),
-                    nullable = true),
-        StructField("values",
-                    ArrayType(DoubleType, containsNull = false),
-                    nullable = true),
+        StructField(
+          "colPtrs",
+          ArrayType(IntegerType, containsNull = false),
+          nullable = true),
+        StructField(
+          "rowIndices",
+          ArrayType(IntegerType, containsNull = false),
+          nullable = true),
+        StructField(
+          "values",
+          ArrayType(DoubleType, containsNull = false),
+          nullable = true),
         StructField("isTransposed", BooleanType, nullable = false)
       ))
   }
@@ -231,12 +234,13 @@ private[spark] class MatrixUDT extends UserDefinedType[Matrix] {
           case 0 =>
             val colPtrs = row.getArray(3).toIntArray()
             val rowIndices = row.getArray(4).toIntArray()
-            new SparseMatrix(numRows,
-                             numCols,
-                             colPtrs,
-                             rowIndices,
-                             values,
-                             isTransposed)
+            new SparseMatrix(
+              numRows,
+              numCols,
+              colPtrs,
+              rowIndices,
+              values,
+              isTransposed)
           case 1 =>
             new DenseMatrix(numRows, numCols, values, isTransposed)
         }
@@ -427,11 +431,12 @@ class DenseMatrix @Since("1.3.0")(
       j += 1
       colPtrs(j) = nnz
     }
-    new SparseMatrix(numRows,
-                     numCols,
-                     colPtrs,
-                     rowIndices.result(),
-                     spVals.result())
+    new SparseMatrix(
+      numRows,
+      numCols,
+      colPtrs,
+      rowIndices.result(),
+      spVals.result())
   }
 
   @Since("2.0.0")
@@ -464,8 +469,9 @@ object DenseMatrix {
     */
   @Since("1.3.0")
   def zeros(numRows: Int, numCols: Int): DenseMatrix = {
-    require(numRows.toLong * numCols <= Int.MaxValue,
-            s"$numRows x $numCols dense matrix is too large to allocate")
+    require(
+      numRows.toLong * numCols <= Int.MaxValue,
+      s"$numRows x $numCols dense matrix is too large to allocate")
     new DenseMatrix(numRows, numCols, new Array[Double](numRows * numCols))
   }
 
@@ -477,8 +483,9 @@ object DenseMatrix {
     */
   @Since("1.3.0")
   def ones(numRows: Int, numCols: Int): DenseMatrix = {
-    require(numRows.toLong * numCols <= Int.MaxValue,
-            s"$numRows x $numCols dense matrix is too large to allocate")
+    require(
+      numRows.toLong * numCols <= Int.MaxValue,
+      s"$numRows x $numCols dense matrix is too large to allocate")
     new DenseMatrix(numRows, numCols, Array.fill(numRows * numCols)(1.0))
   }
 
@@ -507,11 +514,13 @@ object DenseMatrix {
     */
   @Since("1.3.0")
   def rand(numRows: Int, numCols: Int, rng: Random): DenseMatrix = {
-    require(numRows.toLong * numCols <= Int.MaxValue,
-            s"$numRows x $numCols dense matrix is too large to allocate")
-    new DenseMatrix(numRows,
-                    numCols,
-                    Array.fill(numRows * numCols)(rng.nextDouble()))
+    require(
+      numRows.toLong * numCols <= Int.MaxValue,
+      s"$numRows x $numCols dense matrix is too large to allocate")
+    new DenseMatrix(
+      numRows,
+      numCols,
+      Array.fill(numRows * numCols)(rng.nextDouble()))
   }
 
   /**
@@ -523,11 +532,13 @@ object DenseMatrix {
     */
   @Since("1.3.0")
   def randn(numRows: Int, numCols: Int, rng: Random): DenseMatrix = {
-    require(numRows.toLong * numCols <= Int.MaxValue,
-            s"$numRows x $numCols dense matrix is too large to allocate")
-    new DenseMatrix(numRows,
-                    numCols,
-                    Array.fill(numRows * numCols)(rng.nextGaussian()))
+    require(
+      numRows.toLong * numCols <= Int.MaxValue,
+      s"$numRows x $numCols dense matrix is too large to allocate")
+    new DenseMatrix(
+      numRows,
+      numCols,
+      Array.fill(numRows * numCols)(rng.nextGaussian()))
   }
 
   /**
@@ -673,12 +684,13 @@ class SparseMatrix @Since("1.3.0")(
   }
 
   private[spark] def map(f: Double => Double) =
-    new SparseMatrix(numRows,
-                     numCols,
-                     colPtrs,
-                     rowIndices,
-                     values.map(f),
-                     isTransposed)
+    new SparseMatrix(
+      numRows,
+      numCols,
+      colPtrs,
+      rowIndices,
+      values.map(f),
+      isTransposed)
 
   private[mllib] def update(f: Double => Double): SparseMatrix = {
     val len = values.length
@@ -692,12 +704,13 @@ class SparseMatrix @Since("1.3.0")(
 
   @Since("1.3.0")
   override def transpose: SparseMatrix =
-    new SparseMatrix(numCols,
-                     numRows,
-                     colPtrs,
-                     rowIndices,
-                     values,
-                     !isTransposed)
+    new SparseMatrix(
+      numCols,
+      numRows,
+      colPtrs,
+      rowIndices,
+      values,
+      !isTransposed)
 
   private[spark] override def foreachActive(
       f: (Int, Int, Double) => Unit): Unit = {
@@ -800,8 +813,9 @@ object SparseMatrix {
     if (sortedEntries.nonEmpty) {
       // Since the entries are sorted by column index, we only need to check the first and the last.
       for (col <- Seq(sortedEntries.head._2, sortedEntries.last._2)) {
-        require(col >= 0 && col < numCols,
-                s"Column index out of range [0, $numCols): $col.")
+        require(
+          col >= 0 && col < numCols,
+          s"Column index out of range [0, $numCols): $col.")
       }
     }
     val colPtrs = new Array[Int](numCols + 1)
@@ -821,8 +835,9 @@ object SparseMatrix {
             prevVal += v
           } else {
             if (prevVal != 0) {
-              require(prevRow >= 0 && prevRow < numRows,
-                      s"Row index out of range [0, $numRows): $prevRow.")
+              require(
+                prevRow >= 0 && prevRow < numRows,
+                s"Row index out of range [0, $numRows): $prevRow.")
               nnz += 1
               rowIndices += prevRow
               values += prevVal
@@ -836,11 +851,12 @@ object SparseMatrix {
           }
         }
     }
-    new SparseMatrix(numRows,
-                     numCols,
-                     colPtrs,
-                     rowIndices.result(),
-                     values.result())
+    new SparseMatrix(
+      numRows,
+      numCols,
+      colPtrs,
+      rowIndices.result(),
+      values.result())
   }
 
   /**
@@ -850,11 +866,12 @@ object SparseMatrix {
     */
   @Since("1.3.0")
   def speye(n: Int): SparseMatrix = {
-    new SparseMatrix(n,
-                     n,
-                     (0 to n).toArray,
-                     (0 until n).toArray,
-                     Array.fill(n)(1.0))
+    new SparseMatrix(
+      n,
+      n,
+      (0 to n).toArray,
+      (0 until n).toArray,
+      Array.fill(n)(1.0))
   }
 
   /**
@@ -877,19 +894,21 @@ object SparseMatrix {
       "The expected number of nonzeros cannot be greater than Int.MaxValue.")
     val nnz = math.ceil(expected).toInt
     if (density == 0.0) {
-      new SparseMatrix(numRows,
-                       numCols,
-                       new Array[Int](numCols + 1),
-                       Array[Int](),
-                       Array[Double]())
+      new SparseMatrix(
+        numRows,
+        numCols,
+        new Array[Int](numCols + 1),
+        Array[Int](),
+        Array[Double]())
     } else if (density == 1.0) {
       val colPtrs = Array.tabulate(numCols + 1)(j => j * numRows)
       val rowIndices = Array.tabulate(size.toInt)(idx => idx % numRows)
-      new SparseMatrix(numRows,
-                       numCols,
-                       colPtrs,
-                       rowIndices,
-                       new Array[Double](numRows * numCols))
+      new SparseMatrix(
+        numRows,
+        numCols,
+        colPtrs,
+        rowIndices,
+        new Array[Double](numRows * numCols))
     } else if (density < 0.34) {
       // draw-by-draw, expected number of iterations is less than 1.5 * nnz
       val entries = MHashSet[(Int, Int)]()
@@ -918,11 +937,12 @@ object SparseMatrix {
         colPtrs(j + 1) = numSelected
         j += 1
       }
-      new SparseMatrix(numRows,
-                       numCols,
-                       colPtrs,
-                       rowIndices,
-                       new Array[Double](nnz))
+      new SparseMatrix(
+        numRows,
+        numCols,
+        colPtrs,
+        rowIndices,
+        new Array[Double](nnz))
     }
   }
 
@@ -1154,9 +1174,10 @@ object Matrices {
     var hasSparse = false
     var numCols = 0
     matrices.foreach { mat =>
-      require(numRows == mat.numRows,
-              "The number of rows of the matrices in this sequence, " +
-                "don't match!")
+      require(
+        numRows == mat.numRows,
+        "The number of rows of the matrices in this sequence, " +
+          "don't match!")
       mat match {
         case sparse: SparseMatrix => hasSparse = true
         case dense: DenseMatrix => // empty on purpose
@@ -1216,9 +1237,10 @@ object Matrices {
     var hasSparse = false
     var numRows = 0
     matrices.foreach { mat =>
-      require(numCols == mat.numCols,
-              "The number of rows of the matrices in this sequence, " +
-                "don't match!")
+      require(
+        numCols == mat.numCols,
+        "The number of rows of the matrices in this sequence, " +
+          "don't match!")
       mat match {
         case sparse: SparseMatrix => hasSparse = true
         case dense: DenseMatrix => // empty on purpose

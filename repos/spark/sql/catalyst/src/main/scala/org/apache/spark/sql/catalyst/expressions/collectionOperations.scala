@@ -184,13 +184,14 @@ case class ArrayContains(left: Expression, right: Expression)
     var hasNull = false
     arr
       .asInstanceOf[ArrayData]
-      .foreach(right.dataType,
-               (i, v) =>
-                 if (v == null) {
-                   hasNull = true
-                 } else if (v == value) {
-                   return true
-               })
+      .foreach(
+        right.dataType,
+        (i, v) =>
+          if (v == null) {
+            hasNull = true
+          } else if (v == value) {
+            return true
+        })
     if (hasNull) {
       null
     } else {

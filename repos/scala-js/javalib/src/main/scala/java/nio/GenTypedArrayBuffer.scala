@@ -48,10 +48,11 @@ private[nio] final class GenTypedArrayBuffer[B <: Buffer](val self: B)
   def generic_slice()(
       implicit newTypedArrayBuffer: NewThisTypedArrayBuffer): BufferType = {
     val slicedTypedArray = _typedArray.subarray(position, limit)
-    newTypedArrayBuffer(slicedTypedArray,
-                        0,
-                        slicedTypedArray.length,
-                        isReadOnly)
+    newTypedArrayBuffer(
+      slicedTypedArray,
+      0,
+      slicedTypedArray.length,
+      isReadOnly)
   }
 
   @inline

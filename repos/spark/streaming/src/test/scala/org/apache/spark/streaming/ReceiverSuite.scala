@@ -157,8 +157,9 @@ class ReceiverSuite extends TestSuiteBase with Timeouts with Serializable {
     val recordedBlocks = blockGeneratorListener.arrayBuffers
     val recordedData = recordedBlocks.flatten
     assert(blockGeneratorListener.arrayBuffers.size > 0, "No blocks received")
-    assert(recordedData.toSet === generatedData.toSet,
-           "Received data not same")
+    assert(
+      recordedData.toSet === generatedData.toSet,
+      "Received data not same")
 
     // recordedData size should be close to the expected rate; use an error margin proportional to
     // the value, so that rate changes don't cause a brittle test
@@ -253,8 +254,9 @@ class ReceiverSuite extends TestSuiteBase with Timeouts with Serializable {
 
         // Run until sufficient WAL files have been generated and
         // the first WAL files has been deleted
-        eventually(timeout(20 seconds),
-                   interval(batchDuration.milliseconds millis)) {
+        eventually(
+          timeout(20 seconds),
+          interval(batchDuration.milliseconds millis)) {
           val (logFiles1, logFiles2) = getBothCurrentLogFiles()
           allLogFiles1 ++= logFiles1
           allLogFiles2 ++= logFiles2

@@ -57,10 +57,11 @@ case class CTree(path: CPath,
 
 object CTree {
   def empty(path: CPath) =
-    CTree(path,
-          MMap.empty[String, CTree],
-          ArrayBuffer.empty[CTree],
-          MMap.empty[CType, Int])
+    CTree(
+      path,
+      MMap.empty[String, CTree],
+      ArrayBuffer.empty[CTree],
+      MMap.empty[CType, Int])
 }
 
 object Segments {

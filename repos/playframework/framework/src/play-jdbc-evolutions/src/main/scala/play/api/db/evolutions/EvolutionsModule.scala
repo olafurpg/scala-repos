@@ -42,13 +42,14 @@ trait EvolutionsComponents {
     new EnvironmentEvolutionsReader(environment)
   lazy val evolutionsApi: EvolutionsApi = new DefaultEvolutionsApi(dbApi)
   lazy val applicationEvolutions: ApplicationEvolutions =
-    new ApplicationEvolutions(evolutionsConfig,
-                              evolutionsReader,
-                              evolutionsApi,
-                              dynamicEvolutions,
-                              dbApi,
-                              environment,
-                              webCommands)
+    new ApplicationEvolutions(
+      evolutionsConfig,
+      evolutionsReader,
+      evolutionsApi,
+      dynamicEvolutions,
+      dbApi,
+      environment,
+      webCommands)
 }
 
 @Singleton

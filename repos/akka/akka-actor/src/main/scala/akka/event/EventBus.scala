@@ -444,8 +444,9 @@ trait ManagedActorClassification { this: ActorEventBus with ActorClassifier ⇒
     */
   private[akka] def unregisterFromUnsubscriber(subscriber: ActorRef,
                                                seqNr: Int): Boolean = {
-    unsubscriber ! ActorClassificationUnsubscriber.Unregister(subscriber,
-                                                              seqNr)
+    unsubscriber ! ActorClassificationUnsubscriber.Unregister(
+      subscriber,
+      seqNr)
     true
   }
 }

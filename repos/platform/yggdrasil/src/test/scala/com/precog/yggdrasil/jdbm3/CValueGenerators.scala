@@ -59,14 +59,16 @@ trait CValueGenerators {
                     depth: Int = 0): Gen[CValueType[_]] = {
     if (depth >= maxDepth) genNonArrayCValueType
     else {
-      frequency(0 -> (genCValueType(maxDepth, depth + 1) map (CArrayType(_))),
-                6 -> genNonArrayCValueType)
+      frequency(
+        0 -> (genCValueType(maxDepth, depth + 1) map (CArrayType(_))),
+        6 -> genNonArrayCValueType)
     }
   }
 
   def genCType: Gen[CType] =
-    frequency(7 -> genCValueType(),
-              3 -> Gen.oneOf(CNull, CEmptyObject, CEmptyArray))
+    frequency(
+      7 -> genCValueType(),
+      3 -> Gen.oneOf(CNull, CEmptyObject, CEmptyArray))
 
   def genValueForCValueType[A](cType: CValueType[A]): Gen[CWrappedValue[A]] =
     cType match {
@@ -80,8 +82,9 @@ trait CValueGenerators {
           bigInt <- arbBigInt.arbitrary
         } yield
           CNum(
-            BigDecimal(new java.math.BigDecimal(bigInt.bigInteger, scale - 1),
-                       java.math.MathContext.UNLIMITED))
+            BigDecimal(
+              new java.math.BigDecimal(bigInt.bigInteger, scale - 1),
+              java.math.MathContext.UNLIMITED))
       case CDate =>
         choose[Long](0, Long.MaxValue) map (new DateTime(_)) map (CDate(_))
       case CArrayType(elemType) =>

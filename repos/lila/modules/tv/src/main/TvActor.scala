@@ -66,15 +66,18 @@ private[tv] final class TvActor(rendererActor: ActorSelection,
             (previousId.toList ::: otherIds.toList.flatten).distinct
           roundSocket ! TellIds(gameIds, {
             lila.hub.actorApi.tv.Select(
-              makeMessage("tvSelect",
-                          Json.obj("channel" -> channel.key,
-                                   "id" -> game.id,
-                                   "color" -> game.firstColor.name,
-                                   "player" -> user.map { u =>
-                                     Json.obj("name" -> u.name,
-                                              "title" -> u.title,
-                                              "rating" -> player.rating)
-                                   })))
+              makeMessage(
+                "tvSelect",
+                Json.obj(
+                  "channel" -> channel.key,
+                  "id" -> game.id,
+                  "color" -> game.firstColor.name,
+                  "player" -> user.map { u =>
+                    Json.obj(
+                      "name" -> u.name,
+                      "title" -> u.title,
+                      "rating" -> player.rating)
+                  })))
           })
         }
       if (channel == Tv.Channel.Best)
@@ -82,10 +85,12 @@ private[tv] final class TvActor(rendererActor: ActorSelection,
           case html: play.twirl.api.Html =>
             val event = lila.hub.actorApi.game.ChangeFeatured(
               game.id,
-              makeMessage("featured",
-                          Json.obj("html" -> html.toString,
-                                   "color" -> game.firstColor.name,
-                                   "id" -> game.id)))
+              makeMessage(
+                "featured",
+                Json.obj(
+                  "html" -> html.toString,
+                  "color" -> game.firstColor.name,
+                  "id" -> game.id)))
             context.system.lilaBus.publish(event, 'changeFeaturedGame)
         }
       GameRepo setTv game.id

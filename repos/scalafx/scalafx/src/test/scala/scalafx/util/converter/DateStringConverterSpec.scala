@@ -41,16 +41,18 @@ import scalafx.Includes._
   */
 @RunWith(classOf[JUnitRunner])
 class DateStringConverterSpec
-    extends AbstractStringConverterDelegateSpec[Date,
-                                                jfxuc.DateStringConverter,
-                                                Date,
-                                                DateStringConverter](
+    extends AbstractStringConverterDelegateSpec[
+      Date,
+      jfxuc.DateStringConverter,
+      Date,
+      DateStringConverter](
       classOf[jfxuc.DateStringConverter],
       classOf[DateStringConverter],
       classOf[Date]) {
 
-  val examples = List((dateFormat.parse("2012-04-01 00:00:00"), "01/04/2012"),
-                      (dateFormat.parse("2000-02-29 00:00:00"), "29/02/2000"))
+  val examples = List(
+    (dateFormat.parse("2012-04-01 00:00:00"), "01/04/2012"),
+    (dateFormat.parse("2000-02-29 00:00:00"), "29/02/2000"))
 
   override protected def getConverterForExample =
     new DateStringConverter("dd/MM/yyyy")

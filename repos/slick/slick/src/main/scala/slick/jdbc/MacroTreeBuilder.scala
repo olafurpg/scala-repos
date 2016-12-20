@@ -95,8 +95,9 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
       case n if (n <= 22) =>
         implicitTree(
           AppliedTypeTree(
-            Select(Select(Ident(termNames.ROOTPKG), TermName("scala")),
-                   TypeName("Tuple" + resultTypes.size)),
+            Select(
+              Select(Ident(termNames.ROOTPKG), TermName("scala")),
+              TypeName("Tuple" + resultTypes.size)),
             resultTypeTrees.toList
           ),
           GetResultTypeTree)
@@ -104,8 +105,9 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
         val rtypeTree = {
           val zero = TypeTree(
             typeOf[slick.collection.heterogeneous.syntax.HNil])
-          val :: = Select(Select(HeterogenousTree, TermName("syntax")),
-                          TypeName("$colon$colon"))
+          val :: = Select(
+            Select(HeterogenousTree, TermName("syntax")),
+            TypeName("$colon$colon"))
           resultTypeTrees.foldRight[TypTree](zero) { (typ, prev) =>
             AppliedTypeTree(::, List(typ, prev))
           }
@@ -121,30 +123,34 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
           List(
             Function(
               List(
-                ValDef(Modifiers(Flag.PARAM),
-                       TermName("p"),
-                       TypeTree(),
-                       EmptyTree)),
+                ValDef(
+                  Modifiers(Flag.PARAM),
+                  TermName("p"),
+                  TypeTree(),
+                  EmptyTree)),
               Block(
                 zipped
                   .map { tup =>
                     val (i: Int, typ: Tree) = tup
-                    ValDef(Modifiers(),
-                           TermName("gr" + i),
-                           TypeTree(),
-                           implicitTree(typ, GetResultTypeTree))
+                    ValDef(
+                      Modifiers(),
+                      TermName("gr" + i),
+                      TypeTree(),
+                      implicitTree(typ, GetResultTypeTree))
                   }
                   .toList,
                 zipped.foldRight[Tree](zero) { (tup, prev) =>
                   val (i: Int, typ: Tree) = tup
                   Block(
                     List(
-                      ValDef(Modifiers(),
-                             TermName("pv" + i),
-                             TypeTree(),
-                             Apply(<<, List(Ident(TermName("gr" + i)))))),
-                    Apply(Select(prev, TermName("$colon$colon")),
-                          List(Ident(TermName("pv" + i))))
+                      ValDef(
+                        Modifiers(),
+                        TermName("pv" + i),
+                        TypeTree(),
+                        Apply(<<, List(Ident(TermName("gr" + i)))))),
+                    Apply(
+                      Select(prev, TermName("$colon$colon")),
+                      List(Ident(TermName("pv" + i))))
                   )
                 }
               )
@@ -198,8 +204,9 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
               remaining += c.Expr[SetParameter[Unit]] {
                 Apply(
                   Select(
-                    implicitTree(TypeTree(param.actualType),
-                                 SetParameterTypeTree),
+                    implicitTree(
+                      TypeTree(param.actualType),
+                      SetParameterTypeTree),
                     TermName("applied")
                   ),
                   List(param.tree)
@@ -216,14 +223,16 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
             List(
               Function(
                 List(
-                  ValDef(Modifiers(Flag.PARAM),
-                         TermName("u"),
-                         TypeTree(),
-                         EmptyTree),
-                  ValDef(Modifiers(Flag.PARAM),
-                         TermName("pp"),
-                         TypeTree(),
-                         EmptyTree)
+                  ValDef(
+                    Modifiers(Flag.PARAM),
+                    TermName("u"),
+                    TypeTree(),
+                    EmptyTree),
+                  ValDef(
+                    Modifiers(Flag.PARAM),
+                    TermName("pp"),
+                    TypeTree(),
+                    EmptyTree)
                 ),
                 Block(
                   remaining.toList map

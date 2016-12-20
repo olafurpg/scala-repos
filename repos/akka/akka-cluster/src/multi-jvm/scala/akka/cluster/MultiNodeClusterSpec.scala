@@ -104,13 +104,14 @@ trait MultiNodeClusterSpec
 
   def muteLog(sys: ActorSystem = system): Unit = {
     if (!sys.log.isDebugEnabled) {
-      Seq(".*Metrics collection has started successfully.*",
-          ".*Metrics will be retreived from MBeans.*",
-          ".*Cluster Node.* - registered cluster JMX MBean.*",
-          ".*Cluster Node.* - is starting up.*",
-          ".*Shutting down cluster Node.*",
-          ".*Cluster node successfully shut down.*",
-          ".*Using a dedicated scheduler for cluster.*") foreach { s ⇒
+      Seq(
+        ".*Metrics collection has started successfully.*",
+        ".*Metrics will be retreived from MBeans.*",
+        ".*Cluster Node.* - registered cluster JMX MBean.*",
+        ".*Cluster Node.* - is starting up.*",
+        ".*Shutting down cluster Node.*",
+        ".*Cluster node successfully shut down.*",
+        ".*Using a dedicated scheduler for cluster.*") foreach { s ⇒
         sys.eventStream.publish(Mute(EventFilter.info(pattern = s)))
       }
 
@@ -290,9 +291,10 @@ trait MultiNodeClusterSpec
       val expectedLeader = roleOfLeader(nodesInCluster)
       val leader = clusterView.leader
       val isLeader = leader == Some(clusterView.selfAddress)
-      assert(isLeader == isNode(expectedLeader),
-             "expectedLeader [%s], got leader [%s], members [%s]"
-               .format(expectedLeader, leader, clusterView.members))
+      assert(
+        isLeader == isNode(expectedLeader),
+        "expectedLeader [%s], got leader [%s], members [%s]"
+          .format(expectedLeader, leader, clusterView.members))
       clusterView.status should
         (be(MemberStatus.Up) or be(MemberStatus.Leaving))
     }

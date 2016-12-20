@@ -39,8 +39,9 @@ private[play] final class SerializableResult(constructorResult: Result)
     cachedResult
   }
   override def readExternal(in: ObjectInput): Unit = {
-    assert(in.readByte() == SerializableResult.encodingVersion,
-           "Result was serialised from a different version of Play")
+    assert(
+      in.readByte() == SerializableResult.encodingVersion,
+      "Result was serialised from a different version of Play")
 
     val status = in.readInt()
 

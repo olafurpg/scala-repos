@@ -48,9 +48,10 @@ private[ui] abstract class BatchTableBase(tableId: String, batchInterval: Long) 
       .map { failureReason =>
         val failureReasonForUI =
           UIUtils.createOutputOperationFailureForUI(failureReason)
-        UIUtils.failureReasonCell(failureReasonForUI,
-                                  rowspan = 1,
-                                  includeFirstLineInExpandDetails = false)
+        UIUtils.failureReasonCell(
+          failureReasonForUI,
+          rowspan = 1,
+          includeFirstLineInExpandDetails = false)
       }
       .getOrElse(<td>-</td>)
   }

@@ -89,9 +89,10 @@ abstract class ChangeSignatureTestBase
         LightPlatformTestCase.getSourceRoot.createChildData(null, fileName)
       VfsUtil.saveText(vFile, text)
       val psiFile = LightPlatformTestCase.getPsiManager.findFile(vFile)
-      assertNotNull("Can't create PsiFile for '" + fileName +
-                      "'. Unknown file type most probably.",
-                    vFile)
+      assertNotNull(
+        "Can't create PsiFile for '" + fileName +
+          "'. Unknown file type most probably.",
+        vFile)
       assertTrue(psiFile.isPhysical)
       vFile.setCharset(CharsetToolkit.UTF8_CHARSET)
       PsiDocumentManager.getInstance(getProjectAdapter).commitAllDocuments()
@@ -125,13 +126,14 @@ abstract class ChangeSignatureTestBase
     val params =
       newParams.flatten.map(_.asInstanceOf[ParameterInfoImpl]).toArray
 
-    new ChangeSignatureProcessor(getProjectAdapter,
-                                 psiMethod, /*generateDelegate = */ false,
-                                 newVisibility,
-                                 newName,
-                                 retType,
-                                 params,
-                                 Array.empty)
+    new ChangeSignatureProcessor(
+      getProjectAdapter,
+      psiMethod, /*generateDelegate = */ false,
+      newVisibility,
+      newName,
+      retType,
+      params,
+      Array.empty)
   }
 
   protected def scalaProcessor(

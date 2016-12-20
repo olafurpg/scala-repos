@@ -41,7 +41,8 @@ final class Env(config: Config,
 object Env {
 
   lazy val current: Env =
-    "slack" boot new Env(system = lila.common.PlayApp.system,
-                         getLightUser = lila.user.Env.current.lightUser,
-                         config = lila.common.PlayApp loadConfig "slack")
+    "slack" boot new Env(
+      system = lila.common.PlayApp.system,
+      getLightUser = lila.user.Env.current.lightUser,
+      config = lila.common.PlayApp loadConfig "slack")
 }

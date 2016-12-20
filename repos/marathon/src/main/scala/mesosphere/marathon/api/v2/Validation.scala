@@ -41,10 +41,11 @@ object Validation {
         else
           Failure(
             Set(
-              GroupViolation(seq,
-                             "Seq contains elements, which are not valid.",
-                             None,
-                             violations.toSet)))
+              GroupViolation(
+                seq,
+                "Seq contains elements, which are not valid.",
+                None,
+                violations.toSet)))
       }
     }
   }

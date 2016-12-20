@@ -73,14 +73,16 @@ object PlaySettings {
         .find(_.getName.startsWith(playDocsName.value)),
       parallelExecution in Test := false,
       fork in Test := true,
-      testOptions in Test += Tests.Argument(TestFrameworks.Specs2,
-                                            "sequential",
-                                            "true",
-                                            "junitxml",
-                                            "console"),
+      testOptions in Test += Tests.Argument(
+        TestFrameworks.Specs2,
+        "sequential",
+        "true",
+        "junitxml",
+        "console"),
       testOptions in Test +=
-        Tests.Argument(TestFrameworks.JUnit,
-                       "--ignore-runners=org.specs2.runner.JUnitRunner"),
+        Tests.Argument(
+          TestFrameworks.JUnit,
+          "--ignore-runners=org.specs2.runner.JUnitRunner"),
       // Adds app directory's source files to continuous hot reloading
       watchSources <++=
         (sourceDirectory in Compile, sourceDirectory in Assets) map {
@@ -90,11 +92,12 @@ object PlaySettings {
       commands ++= {
         import PlayCommands._
         import PlayRun._
-        Seq(playStartCommand,
-            playRunProdCommand,
-            playTestProdCommand,
-            playStopProdCommand,
-            h2Command)
+        Seq(
+          playStartCommand,
+          playRunProdCommand,
+          playTestProdCommand,
+          playStopProdCommand,
+          h2Command)
       },
       // THE `in Compile` IS IMPORTANT!
       Keys.run in Compile <<= PlayRun.playDefaultRunTask,
@@ -157,11 +160,12 @@ object PlaySettings {
       scriptClasspathOrdering += {
         val (id, art) =
           (projectID.value, (artifact in (Assets, packageBin)).value)
-        val jarName = JavaAppPackaging.makeJarName(id.organization,
-                                                   id.name,
-                                                   id.revision,
-                                                   art.name,
-                                                   Some("assets"))
+        val jarName = JavaAppPackaging.makeJarName(
+          id.organization,
+          id.name,
+          id.revision,
+          art.name,
+          Some("assets"))
         playPackageAssets.value -> ("lib/" + jarName)
       },
       // Assets for testing
@@ -200,11 +204,12 @@ object PlaySettings {
                 val id = projectID.value
                 val art =
                   (artifact in Compile in playJarSansExternalized).value
-                val jarName = JavaAppPackaging.makeJarName(id.organization,
-                                                           id.name,
-                                                           id.revision,
-                                                           art.name,
-                                                           art.classifier)
+                val jarName = JavaAppPackaging.makeJarName(
+                  id.organization,
+                  id.name,
+                  id.revision,
+                  art.name,
+                  art.classifier)
                 jarSansExternalized -> ("lib/" + jarName)
               case other => other
             }
@@ -239,8 +244,9 @@ object PlaySettings {
     * Settings for creating a jar that excludes externalized resources
     */
   private def externalizedSettings: Seq[Setting[_]] =
-    Defaults.packageTaskSettings(playJarSansExternalized,
-                                 mappings in playJarSansExternalized) ++ Seq(
+    Defaults.packageTaskSettings(
+      playJarSansExternalized,
+      mappings in playJarSansExternalized) ++ Seq(
       playExternalizedResources := {
         val rdirs = unmanagedResourceDirectories.value
         (unmanagedResources.value --- rdirs) pair (relativeTo(rdirs) | flat)

@@ -69,12 +69,13 @@ class Accumulable[R, T] private (val id: Long,
                           name: Option[String],
                           internal: Boolean,
                           countFailedValues: Boolean) = {
-    this(Accumulators.newId(),
-         initialValue,
-         param,
-         name,
-         internal,
-         countFailedValues)
+    this(
+      Accumulators.newId(),
+      initialValue,
+      param,
+      name,
+      internal,
+      countFailedValues)
   }
 
   private[spark] def this(initialValue: R,
@@ -119,12 +120,13 @@ class Accumulable[R, T] private (val id: Long,
     * same mutable instance around.
     */
   private[spark] def copy(): Accumulable[R, T] = {
-    new Accumulable[R, T](id,
-                          initialValue,
-                          param,
-                          name,
-                          internal,
-                          countFailedValues)
+    new Accumulable[R, T](
+      id,
+      initialValue,
+      param,
+      name,
+      internal,
+      countFailedValues)
   }
 
   /**

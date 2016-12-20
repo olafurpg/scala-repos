@@ -80,8 +80,9 @@ class DeadLetterSupressionSpec extends AkkaSpec with ImplicitSender {
     allListener.expectMsg(
       200.millis,
       SuppressedDeadLetter(SuppressedMsg, testActor, system.deadLetters))
-    allListener.expectMsg(200.millis,
-                          DeadLetter(NormalMsg, testActor, system.deadLetters))
+    allListener.expectMsg(
+      200.millis,
+      DeadLetter(NormalMsg, testActor, system.deadLetters))
 
     Thread.sleep(200)
     deadListener.expectNoMsg(Duration.Zero)

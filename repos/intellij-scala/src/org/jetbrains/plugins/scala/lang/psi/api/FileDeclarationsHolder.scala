@@ -104,11 +104,12 @@ trait FileDeclarationsHolder
               place,
               classOf[ScPackaging]) == null) {
           if (defaultPackage != null &&
-              !ResolveUtils.packageProcessDeclarations(defaultPackage,
-                                                       processor,
-                                                       state,
-                                                       null,
-                                                       place))
+              !ResolveUtils.packageProcessDeclarations(
+                defaultPackage,
+                processor,
+                state,
+                null,
+                place))
             return false
         } else if (defaultPackage != null &&
                    !BaseProcessor.isImplicitProcessor(processor)) {
@@ -189,10 +190,11 @@ trait FileDeclarationsHolder
                   case tp: ScType =>
                     newState = state.put(BaseProcessor.FROM_TYPE_KEY, tp)
                 }
-                if (!clazz.processDeclarations(processor,
-                                               newState,
-                                               null,
-                                               place)) return false
+                if (!clazz.processDeclarations(
+                      processor,
+                      newState,
+                      null,
+                      place)) return false
               case _ =>
             }
           }
@@ -208,19 +210,21 @@ trait FileDeclarationsHolder
         ProgressManager.checkCanceled()
         val pack: PsiPackage =
           ScalaPsiManager.instance(getProject).getCachedPackage(implP).orNull
-        if (pack != null && !ResolveUtils.packageProcessDeclarations(pack,
-                                                                     processor,
-                                                                     state,
-                                                                     null,
-                                                                     place))
+        if (pack != null && !ResolveUtils.packageProcessDeclarations(
+              pack,
+              processor,
+              state,
+              null,
+              place))
           return false
       }
       true
     }
 
     if (checkWildcardImports) {
-      if (!checkObjects(implicitlyImportedObjects,
-                        PrecedenceTypes.WILDCARD_IMPORT))
+      if (!checkObjects(
+            implicitlyImportedObjects,
+            PrecedenceTypes.WILDCARD_IMPORT))
         return false
       if (!checkPackages(implicitlyImportedPackages)) return false
     }

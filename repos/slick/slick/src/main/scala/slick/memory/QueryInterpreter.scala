@@ -51,8 +51,9 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
             v.asInstanceOf[StructValue].getBySymbol(field)
         }
       case n: StructNode =>
-        new StructValue(n.children.toSeq.map(run),
-                        n.nodeType.asInstanceOf[StructType].symbolToIndex)
+        new StructValue(
+          n.children.toSeq.map(run),
+          n.nodeType.asInstanceOf[StructType].symbolToIndex)
       case ProductNode(ch) =>
         new ProductValue(ch.map(run).toSeq)
       case Pure(n, _) => Vector(run(n))
@@ -135,9 +136,11 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
               new ProductValue(Vector(l, r))
             }
           if (inner.headOption.isEmpty)
-            Vector(new ProductValue(
-              Vector(createNullRow(left.nodeType.asCollectionType.elementType),
-                     r)))
+            Vector(
+              new ProductValue(
+                Vector(
+                  createNullRow(left.nodeType.asCollectionType.elementType),
+                  r)))
           else inner
         }
         scope.remove(leftGen)
@@ -179,8 +182,9 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
           }
           .map { r =>
             new ProductValue(
-              Vector(createNullRow(left.nodeType.asCollectionType.elementType),
-                     r))
+              Vector(
+                createNullRow(left.nodeType.asCollectionType.elementType),
+                r))
           }
         scope.remove(leftGen)
         scope.remove(rightGen)
@@ -375,10 +379,11 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
             (t.elementType.asInstanceOf[ScalaBaseType[Any]].ordering, true)
           case t => (t.asInstanceOf[ScalaBaseType[Any]].ordering, false)
         }
-        reduceOptionIt[Any](it,
-                            opt,
-                            identity,
-                            (a, b) => if (ord.lt(b, a)) b else a)
+        reduceOptionIt[Any](
+          it,
+          opt,
+          identity,
+          (a, b) => if (ord.lt(b, a)) b else a)
       case Library.Max(ch) =>
         val coll = run(ch).asInstanceOf[Coll]
         val (it, itType) = unwrapSingleColumn(coll, ch.nodeType)
@@ -387,10 +392,11 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
             (t.elementType.asInstanceOf[ScalaBaseType[Any]].ordering, true)
           case t => (t.asInstanceOf[ScalaBaseType[Any]].ordering, false)
         }
-        reduceOptionIt[Any](it,
-                            opt,
-                            identity,
-                            (a, b) => if (ord.gt(b, a)) b else a)
+        reduceOptionIt[Any](
+          it,
+          opt,
+          identity,
+          (a, b) => if (ord.gt(b, a)) b else a)
       case Library.==(ch, LiteralNode(null)) =>
         val chV = run(ch)
         chV == null || chV.asInstanceOf[Option[_]].isEmpty
@@ -409,9 +415,10 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
             }
             logDebug("[chPlainV: " + chPlainV.mkString(", ") + "]")
             Some(
-              evalFunction(sym,
-                           chPlainV.toSeq,
-                           n.nodeType.asOptionType.elementType))
+              evalFunction(
+                sym,
+                chPlainV.toSeq,
+                n.nodeType.asOptionType.elementType))
           }
         } else evalFunction(sym, chV.toSeq, n.nodeType)
       //case Library.CountAll(ch) => run(ch).asInstanceOf[Coll].size
@@ -526,12 +533,14 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
         args(0)._2.asInstanceOf[String] * args(1)._2.asInstanceOf[Int]
       case Library.Substring if args.size == 3 =>
         args(0)._2.asInstanceOf[String]
-          .substring(args(1)._2.asInstanceOf[Int],
-                     args(2)._2.asInstanceOf[Int])
+          .substring(
+            args(1)._2.asInstanceOf[Int],
+            args(2)._2.asInstanceOf[Int])
       case Library.Replace =>
         args(0)._2.asInstanceOf[String]
-          .replace(args(1)._2.asInstanceOf[String],
-                   args(2)._2.asInstanceOf[String])
+          .replace(
+            args(1)._2.asInstanceOf[String],
+            args(2)._2.asInstanceOf[String])
       case Library.Reverse => args(0)._2.asInstanceOf[String].reverse
       case Library.IndexOf =>
         args(0)._2.asInstanceOf[String]
@@ -575,10 +584,11 @@ class QueryInterpreter(db: HeapBackend#Database, params: Any) extends Logging {
   def createNullRow(tpe: Type): Any = tpe match {
     case t: ScalaType[_] => if (t.nullable) None else null
     case StructType(el) =>
-      new StructValue(el.toSeq.map { case (_, tpe) => createNullRow(tpe) },
-                      el.toSeq.zipWithIndex.map {
-                        case ((sym, _), idx) => (sym, idx)
-                      }(collection.breakOut): Map[TermSymbol, Int])
+      new StructValue(
+        el.toSeq.map { case (_, tpe) => createNullRow(tpe) },
+        el.toSeq.zipWithIndex.map {
+          case ((sym, _), idx) => (sym, idx)
+        }(collection.breakOut): Map[TermSymbol, Int])
     case ProductType(el) =>
       new ProductValue(el.toSeq.map(tpe => createNullRow(tpe)))
   }

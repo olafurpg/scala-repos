@@ -89,8 +89,9 @@ class BisectingKMeans private (private var k: Int,
     */
   @Since("1.6.0")
   def setMaxIterations(maxIterations: Int): this.type = {
-    require(maxIterations > 0,
-            s"maxIterations must be positive but got $maxIterations.")
+    require(
+      maxIterations > 0,
+      s"maxIterations must be positive but got $maxIterations.")
     this.maxIterations = maxIterations
     this
   }
@@ -199,8 +200,9 @@ class BisectingKMeans private (private var k: Int,
           .flatMap {
             case (index, summary) =>
               val (left, right) = splitCenter(summary.center, random)
-              Iterator((leftChildIndex(index), left),
-                       (rightChildIndex(index), right))
+              Iterator(
+                (leftChildIndex(index), left),
+                (rightChildIndex(index), right))
           }
           .map(identity) // workaround for a Scala bug (SI-7005) that produces a not serializable map
         var newClusters: Map[Long, ClusterSummary] = null
@@ -254,15 +256,17 @@ private object BisectingKMeans extends Serializable {
 
   /** Returns the left child index of the given node index. */
   private def leftChildIndex(index: Long): Long = {
-    require(index <= MAX_DIVISIBLE_CLUSTER_INDEX,
-            s"Child index out of bound: 2 * $index.")
+    require(
+      index <= MAX_DIVISIBLE_CLUSTER_INDEX,
+      s"Child index out of bound: 2 * $index.")
     2 * index
   }
 
   /** Returns the right child index of the given node index. */
   private def rightChildIndex(index: Long): Long = {
-    require(index <= MAX_DIVISIBLE_CLUSTER_INDEX,
-            s"Child index out of bound: 2 * $index + 1.")
+    require(
+      index <= MAX_DIVISIBLE_CLUSTER_INDEX,
+      s"Child index out of bound: 2 * $index + 1.")
     2 * index + 1
   }
 
@@ -405,12 +409,13 @@ private object BisectingKMeans extends Serializable {
             .max)
         val left = buildSubTree(leftIndex)
         val right = buildSubTree(rightIndex)
-        new ClusteringTreeNode(index,
-                               size,
-                               center,
-                               cost,
-                               height,
-                               Array(left, right))
+        new ClusteringTreeNode(
+          index,
+          size,
+          center,
+          cost,
+          height,
+          Array(left, right))
       } else {
         val index = leafIndex
         leafIndex += 1
@@ -500,8 +505,9 @@ private[clustering] class ClusteringTreeNode private[clustering] (
     * Predicts the cluster index and the cost of the input point.
     */
   private def predict(pointWithNorm: VectorWithNorm): (Int, Double) = {
-    predict(pointWithNorm,
-            KMeans.fastSquaredDistance(centerWithNorm, pointWithNorm))
+    predict(
+      pointWithNorm,
+      KMeans.fastSquaredDistance(centerWithNorm, pointWithNorm))
   }
 
   /**

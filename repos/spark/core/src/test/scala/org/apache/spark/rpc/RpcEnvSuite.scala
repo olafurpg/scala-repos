@@ -760,9 +760,10 @@ abstract class RpcEnvSuite extends SparkFunSuite with BeforeAndAfterAll {
 
     // Construct RpcTimeout with prioritized list of properties
     val rt2 =
-      RpcTimeout(conf,
-                 Seq("spark.ask.invalid.timeout", testProp, secondaryProp),
-                 "1s")
+      RpcTimeout(
+        conf,
+        Seq("spark.ask.invalid.timeout", testProp, secondaryProp),
+        "1s")
     assert(testDurationSeconds === rt2.duration.toSeconds)
 
     // Construct RpcTimeout with default value,
@@ -872,12 +873,13 @@ abstract class RpcEnvSuite extends SparkFunSuite with BeforeAndAfterAll {
     val sm = new SecurityManager(conf)
     val hc = SparkHadoopUtil.get.conf
 
-    val files = Seq((file, fileUri),
-                    (fileWithSpecialChars, fileWithSpecialCharsUri),
-                    (empty, emptyUri),
-                    (jar, jarUri),
-                    (subFile1, dir1Uri + "/file1"),
-                    (subFile2, dir2Uri + "/file2"))
+    val files = Seq(
+      (file, fileUri),
+      (fileWithSpecialChars, fileWithSpecialCharsUri),
+      (empty, emptyUri),
+      (jar, jarUri),
+      (subFile1, dir1Uri + "/file1"),
+      (subFile2, dir2Uri + "/file2"))
     files.foreach {
       case (f, uri) =>
         val destFile = new File(destDir, f.getName())

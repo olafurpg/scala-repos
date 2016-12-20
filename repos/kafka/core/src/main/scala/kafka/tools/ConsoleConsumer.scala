@@ -61,10 +61,11 @@ object ConsoleConsumer extends Logging {
       if (conf.useNewConsumer) {
         val timeoutMs =
           if (conf.timeoutMs >= 0) conf.timeoutMs else Long.MaxValue
-        new NewShinyConsumer(Option(conf.topicArg),
-                             Option(conf.whitelistArg),
-                             getNewConsumerProps(conf),
-                             timeoutMs)
+        new NewShinyConsumer(
+          Option(conf.topicArg),
+          Option(conf.whitelistArg),
+          getNewConsumerProps(conf),
+          timeoutMs)
       } else {
         checkZk(conf)
         new OldConsumer(conf.filterSpec, getOldConsumerProps(conf))
@@ -73,10 +74,11 @@ object ConsoleConsumer extends Logging {
     addShutdownHook(consumer, conf)
 
     try {
-      process(conf.maxMessages,
-              conf.formatter,
-              consumer,
-              conf.skipMessageOnError)
+      process(
+        conf.maxMessages,
+        conf.formatter,
+        consumer,
+        conf.skipMessageOnError)
     } finally {
       consumer.cleanup()
       reportRecordCount()
@@ -92,17 +94,19 @@ object ConsoleConsumer extends Logging {
   }
 
   def checkZk(config: ConsumerConfig) {
-    if (!checkZkPathExists(config.options.valueOf(config.zkConnectOpt),
-                           "/brokers/ids")) {
+    if (!checkZkPathExists(
+          config.options.valueOf(config.zkConnectOpt),
+          "/brokers/ids")) {
       System.err.println("No brokers found in ZK.")
       System.exit(1)
     }
 
     if (!config.options.has(config.deleteConsumerOffsetsOpt) &&
         config.options.has(config.resetBeginningOpt) &&
-        checkZkPathExists(config.options.valueOf(config.zkConnectOpt),
-                          "/consumers/" + config.consumerProps.getProperty(
-                            "group.id") + "/offsets")) {
+        checkZkPathExists(
+          config.options.valueOf(config.zkConnectOpt),
+          "/consumers/" + config.consumerProps
+            .getProperty("group.id") + "/offsets")) {
       System.err.println(
         "Found previous offset information for this group " +
           config.consumerProps.getProperty("group.id") +
@@ -146,17 +150,19 @@ object ConsoleConsumer extends Logging {
       }
       messageCount += 1
       try {
-        formatter.writeTo(new ConsumerRecord(msg.topic,
-                                             msg.partition,
-                                             msg.offset,
-                                             msg.timestamp,
-                                             msg.timestampType,
-                                             0,
-                                             0,
-                                             0,
-                                             msg.key,
-                                             msg.value),
-                          System.out)
+        formatter.writeTo(
+          new ConsumerRecord(
+            msg.topic,
+            msg.partition,
+            msg.offset,
+            msg.timestamp,
+            msg.timestampType,
+            0,
+            0,
+            0,
+            msg.key,
+            msg.value),
+          System.out)
       } catch {
         case e: Throwable =>
           if (skipMessageOnError) {
@@ -187,8 +193,9 @@ object ConsoleConsumer extends Logging {
     val props = new Properties
 
     props.putAll(config.consumerProps)
-    props.put("auto.offset.reset",
-              if (config.fromBeginning) "smallest" else "largest")
+    props.put(
+      "auto.offset.reset",
+      if (config.fromBeginning) "smallest" else "largest")
     props.put("zookeeper.connect", config.zkConnectionStr)
 
     if (!config.options.has(config.deleteConsumerOffsetsOpt) &&
@@ -216,18 +223,21 @@ object ConsoleConsumer extends Logging {
     val props = new Properties
 
     props.putAll(config.consumerProps)
-    props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,
-              if (config.options.has(config.resetBeginningOpt)) "earliest"
-              else "latest")
+    props.put(
+      ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,
+      if (config.options.has(config.resetBeginningOpt)) "earliest"
+      else "latest")
     props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, config.bootstrapServer)
-    props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
-              if (config.keyDeserializer != null) config.keyDeserializer
-              else
-                "org.apache.kafka.common.serialization.ByteArrayDeserializer")
-    props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-              if (config.valueDeserializer != null) config.valueDeserializer
-              else
-                "org.apache.kafka.common.serialization.ByteArrayDeserializer")
+    props.put(
+      ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+      if (config.keyDeserializer != null) config.keyDeserializer
+      else
+        "org.apache.kafka.common.serialization.ByteArrayDeserializer")
+    props.put(
+      ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+      if (config.valueDeserializer != null) config.valueDeserializer
+      else
+        "org.apache.kafka.common.serialization.ByteArrayDeserializer")
 
     props
   }
@@ -271,8 +281,9 @@ object ConsoleConsumer extends Logging {
       .ofType(classOf[String])
       .defaultsTo(classOf[DefaultMessageFormatter].getName)
     val messageFormatterArgOpt = parser
-      .accepts("property",
-               "The properties to initialize the message formatter.")
+      .accepts(
+        "property",
+        "The properties to initialize the message formatter.")
       .withRequiredArg
       .describedAs("prop")
       .ofType(classOf[String])
@@ -305,9 +316,10 @@ object ConsoleConsumer extends Logging {
       "csv-reporter-enabled",
       "If set, the CSV metrics reporter will be enabled")
     val metricsDirectoryOpt = parser
-      .accepts("metrics-dir",
-               "If csv-reporter-enable is set, and this parameter is" +
-                 "set, the csv metrics will be outputed here")
+      .accepts(
+        "metrics-dir",
+        "If csv-reporter-enable is set, and this parameter is" +
+          "set, the csv metrics will be outputed here")
       .withRequiredArg
       .describedAs("metrics directory")
       .ofType(classOf[java.lang.String])
@@ -388,16 +400,18 @@ object ConsoleConsumer extends Logging {
       messageFormatterClass.newInstance().asInstanceOf[MessageFormatter]
     formatter.init(formatterArgs)
 
-    CommandLineUtils.checkRequiredArgs(parser,
-                                       options,
-                                       if (useNewConsumer) bootstrapServerOpt
-                                       else zkConnectOpt)
+    CommandLineUtils.checkRequiredArgs(
+      parser,
+      options,
+      if (useNewConsumer) bootstrapServerOpt
+      else zkConnectOpt)
 
     if (options.has(csvMetricsReporterEnabledOpt)) {
       val csvReporterProps = new Properties()
       csvReporterProps.put("kafka.metrics.polling.interval.secs", "5")
-      csvReporterProps.put("kafka.metrics.reporters",
-                           "kafka.metrics.KafkaCSVMetricsReporter")
+      csvReporterProps.put(
+        "kafka.metrics.reporters",
+        "kafka.metrics.KafkaCSVMetricsReporter")
       if (options.has(metricsDirectoryOpt))
         csvReporterProps
           .put("kafka.csv.metrics.dir", options.valueOf(metricsDirectoryOpt))
@@ -409,8 +423,9 @@ object ConsoleConsumer extends Logging {
 
     //Provide the consumer with a randomly assigned group id
     if (!consumerProps.containsKey(ConsumerConfig.GROUP_ID_CONFIG)) {
-      consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG,
-                        s"console-consumer-${new Random().nextInt(100000)}")
+      consumerProps.put(
+        ConsumerConfig.GROUP_ID_CONFIG,
+        s"console-consumer-${new Random().nextInt(100000)}")
       groupIdPassed = false
     }
 
@@ -537,14 +552,15 @@ class ChecksumMessageFormatter extends MessageFormatter {
     import consumerRecord._
     val chksum =
       if (timestampType != TimestampType.NO_TIMESTAMP_TYPE)
-        new Message(value,
-                    key,
-                    timestamp,
-                    timestampType,
-                    NoCompressionCodec,
-                    0,
-                    -1,
-                    Message.MagicValue_V1).checksum
+        new Message(
+          value,
+          key,
+          timestamp,
+          timestampType,
+          NoCompressionCodec,
+          0,
+          -1,
+          Message.MagicValue_V1).checksum
       else
         new Message(value, key, Message.NoTimestamp, Message.MagicValue_V0).checksum
     output.println(topicStr + "checksum:" + chksum)

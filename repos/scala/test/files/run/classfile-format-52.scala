@@ -29,12 +29,13 @@ object Test extends DirectTest {
     val methodType = "()Ljava/lang/String;"
 
     val cw = new ClassWriter(0)
-    cw.visit(52,
-             ACC_PUBLIC + ACC_ABSTRACT + ACC_INTERFACE,
-             interfaceName,
-             null,
-             "java/lang/Object",
-             null)
+    cw.visit(
+      52,
+      ACC_PUBLIC + ACC_ABSTRACT + ACC_INTERFACE,
+      interfaceName,
+      null,
+      "java/lang/Object",
+      null)
 
     def createMethod(flags: Int, name: String) {
       val method = cw.visitMethod(flags, name, methodType, null, null)

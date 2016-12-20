@@ -74,8 +74,9 @@ object ChoiceBoxListCell {
   /**
     * Added to satisfy Spec tests.
     */
-  @deprecated(message = "Use forListView[T](ObservableBuffer[T])",
-              since = "1.0")
+  @deprecated(
+    message = "Use forListView[T](ObservableBuffer[T])",
+    since = "1.0")
   def forListView[T](items: jfxc.ObservableList[T]) =
     jfxscc.ChoiceBoxListCell.forListView[T](items)
 
@@ -96,9 +97,9 @@ object ChoiceBoxListCell {
   /**
     * Added to satisfy Spec tests.
     */
-  @deprecated(message =
-                "Use forListView[T](StringConverter[T], ObservableBuffer[T])",
-              since = "1.0")
+  @deprecated(
+    message = "Use forListView[T](StringConverter[T], ObservableBuffer[T])",
+    since = "1.0")
   def forListView[T](converter: jfxu.StringConverter[T],
                      items: jfxc.ObservableList[T]) =
     jfxscc.ChoiceBoxListCell.forListView[T](converter, items)
@@ -119,8 +120,9 @@ object ChoiceBoxListCell {
   /**
     * Added to satisfy Spec tests.
     */
-  @deprecated(message = "Use forListView[T](StringConverter[T], T*)",
-              since = "1.0")
+  @deprecated(
+    message = "Use forListView[T](StringConverter[T], T*)",
+    since = "1.0")
   def forListView[T](converter: jfxu.StringConverter[T], items: T*) =
     jfxscc.ChoiceBoxListCell.forListView[T](converter, items: _*)
 

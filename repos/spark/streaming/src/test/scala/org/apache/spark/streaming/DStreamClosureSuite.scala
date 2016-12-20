@@ -178,21 +178,23 @@ class DStreamClosureSuite extends SparkFunSuite with BeforeAndAfterAll {
       ds.reduceByKeyAndWindow(reduceF, Seconds(1), Seconds(2), 5)
     }
     expectCorrectException {
-      ds.reduceByKeyAndWindow(reduceF,
-                              Seconds(1),
-                              Seconds(2),
-                              new HashPartitioner(5))
+      ds.reduceByKeyAndWindow(
+        reduceF,
+        Seconds(1),
+        Seconds(2),
+        new HashPartitioner(5))
     }
     expectCorrectException {
       ds.reduceByKeyAndWindow(reduceF, reduceF, Seconds(2))
     }
     expectCorrectException {
-      ds.reduceByKeyAndWindow(reduceF,
-                              reduceF,
-                              Seconds(2),
-                              Seconds(3),
-                              new HashPartitioner(5),
-                              filterF)
+      ds.reduceByKeyAndWindow(
+        reduceF,
+        reduceF,
+        Seconds(2),
+        Seconds(3),
+        new HashPartitioner(5),
+        filterF)
     }
   }
   private def testUpdateStateByKey(ds: DStream[(Int, Int)]): Unit = {

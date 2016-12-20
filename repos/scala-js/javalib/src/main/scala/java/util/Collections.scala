@@ -258,16 +258,18 @@ object Collections {
           val newCount = count + 1
           list(index) = value
           if (index != cycleStartIndex) {
-            rotateNext(cycleStartIndex,
-                       newCount,
-                       indexModulo(index + distance),
-                       nextValue)
+            rotateNext(
+              cycleStartIndex,
+              newCount,
+              indexModulo(index + distance),
+              nextValue)
           } else if (newCount < listSize) {
             val nextCycleStart = cycleStartIndex + 1
-            rotateNext(nextCycleStart,
-                       newCount,
-                       indexModulo(nextCycleStart + distance),
-                       list(nextCycleStart))
+            rotateNext(
+              nextCycleStart,
+              newCount,
+              indexModulo(nextCycleStart + distance),
+              list(nextCycleStart))
           }
         }
         rotateNext(0, 0, indexModulo(distance), list(0))
@@ -1025,8 +1027,9 @@ object Collections {
     override def listIterator(): ListIterator[E] = listIterator(0)
 
     override def listIterator(index: Int): ListIterator[E] =
-      new CheckedListIterator[E](this.inner.listIterator(index),
-                                 this.elemClazz)
+      new CheckedListIterator[E](
+        this.inner.listIterator(index),
+        this.elemClazz)
 
     override def subList(fromIndex: Int, toIndex: Int): List[E] =
       checkedList(super.subList(fromIndex, toIndex), this.elemClazz)

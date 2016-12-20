@@ -102,9 +102,10 @@ class ImportPanelConverterProvider
                   getElements.foreach(elem =>
                     settingsValue.addContent(elem.clone()))
                 }
-                JDOMUtil.writeDocument(new Document(root.clone()),
-                                       file,
-                                       SystemProperties.getLineSeparator)
+                JDOMUtil.writeDocument(
+                  new Document(root.clone()),
+                  file,
+                  SystemProperties.getLineSeparator)
             }
           case _ =>
         }

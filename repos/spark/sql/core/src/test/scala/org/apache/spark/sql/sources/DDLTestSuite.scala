@@ -28,9 +28,10 @@ class DDLScanSource extends RelationProvider {
   override def createRelation(
       sqlContext: SQLContext,
       parameters: Map[String, String]): BaseRelation = {
-    SimpleDDLScan(parameters("from").toInt,
-                  parameters("TO").toInt,
-                  parameters("Table"))(sqlContext)
+    SimpleDDLScan(
+      parameters("from").toInt,
+      parameters("TO").toInt,
+      parameters("Table"))(sqlContext)
   }
 }
 
@@ -42,12 +43,13 @@ case class SimpleDDLScan(from: Int, to: Int, table: String)(
   override def schema: StructType =
     StructType(
       Seq(
-        StructField("intType",
-                    IntegerType,
-                    nullable = false,
-                    new MetadataBuilder()
-                      .putString("comment", s"test comment $table")
-                      .build()),
+        StructField(
+          "intType",
+          IntegerType,
+          nullable = false,
+          new MetadataBuilder()
+            .putString("comment", s"test comment $table")
+            .build()),
         StructField("stringType", StringType, nullable = false),
         StructField("dateType", DateType, nullable = false),
         StructField("timestampType", TimestampType, nullable = false),
@@ -62,11 +64,11 @@ case class SimpleDDLScan(from: Int, to: Int, table: String)(
         StructField("floatType", FloatType, nullable = false),
         StructField("mapType", MapType(StringType, StringType)),
         StructField("arrayType", ArrayType(StringType)),
-        StructField("structType",
-                    StructType(
-                      StructField("f1", StringType) :: StructField(
-                        "f2",
-                        IntegerType) :: Nil))
+        StructField(
+          "structType",
+          StructType(StructField("f1", StringType) :: StructField(
+            "f2",
+            IntegerType) :: Nil))
       ))
 
   override def needConversion: Boolean = false
@@ -98,25 +100,26 @@ class DDLTestSuite extends DataSourceTest with SharedSQLContext {
       """.stripMargin)
   }
 
-  sqlTest("describe ddlPeople",
-          Seq(
-            Row("intType", "int", "test comment test1"),
-            Row("stringType", "string", ""),
-            Row("dateType", "date", ""),
-            Row("timestampType", "timestamp", ""),
-            Row("doubleType", "double", ""),
-            Row("bigintType", "bigint", ""),
-            Row("tinyintType", "tinyint", ""),
-            Row("decimalType", "decimal(10,0)", ""),
-            Row("fixedDecimalType", "decimal(5,1)", ""),
-            Row("binaryType", "binary", ""),
-            Row("booleanType", "boolean", ""),
-            Row("smallIntType", "smallint", ""),
-            Row("floatType", "float", ""),
-            Row("mapType", "map<string,string>", ""),
-            Row("arrayType", "array<string>", ""),
-            Row("structType", "struct<f1:string,f2:int>", "")
-          ))
+  sqlTest(
+    "describe ddlPeople",
+    Seq(
+      Row("intType", "int", "test comment test1"),
+      Row("stringType", "string", ""),
+      Row("dateType", "date", ""),
+      Row("timestampType", "timestamp", ""),
+      Row("doubleType", "double", ""),
+      Row("bigintType", "bigint", ""),
+      Row("tinyintType", "tinyint", ""),
+      Row("decimalType", "decimal(10,0)", ""),
+      Row("fixedDecimalType", "decimal(5,1)", ""),
+      Row("binaryType", "binary", ""),
+      Row("booleanType", "boolean", ""),
+      Row("smallIntType", "smallint", ""),
+      Row("floatType", "float", ""),
+      Row("mapType", "map<string,string>", ""),
+      Row("arrayType", "array<string>", ""),
+      Row("structType", "struct<f1:string,f2:int>", "")
+    ))
 
   test(
     "SPARK-7686 DescribeCommand should have correct physical plan output attributes") {

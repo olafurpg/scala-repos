@@ -44,8 +44,9 @@ class ScalaMethodImplementor extends MethodImplementor {
     } yield {
       val specifyType =
         ScalaApplicationSettings.getInstance().SPECIFY_RETURN_TYPE_EXPLICITLY
-      val body = ScalaGenerationInfo.defaultValue(member.scType,
-                                                  inClass.getContainingFile)
+      val body = ScalaGenerationInfo.defaultValue(
+        member.scType,
+        inClass.getContainingFile)
       val prototype = ScalaPsiElementFactory.createOverrideImplementMethod(
         member.sign,
         inClass.getManager,

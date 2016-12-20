@@ -120,8 +120,9 @@ class FutureSpec
           "Timedout")
         Await.result(timedOut fallbackTo empty, timeout.duration) should ===(
           "Timedout")
-        Await.result(failure fallbackTo failure fallbackTo timedOut,
-                     timeout.duration) should ===("Timedout")
+        Await.result(
+          failure fallbackTo failure fallbackTo timedOut,
+          timeout.duration) should ===("Timedout")
         intercept[RuntimeException] {
           Await.result(failure fallbackTo otherFailure, timeout.duration)
         }.getMessage should ===("br0ken")
@@ -500,30 +501,34 @@ class FutureSpec
         val timeout = 10000 millis
         val f = new IllegalStateException("test")
         intercept[IllegalStateException] {
-          Await.result(Promise
-                         .failed[String](f)
-                         .future zip Promise.successful("foo").future,
-                       timeout)
+          Await.result(
+            Promise
+              .failed[String](f)
+              .future zip Promise.successful("foo").future,
+            timeout)
         } should ===(f)
 
         intercept[IllegalStateException] {
-          Await.result(Promise
-                         .successful("foo")
-                         .future zip Promise.failed[String](f).future,
-                       timeout)
+          Await.result(
+            Promise
+              .successful("foo")
+              .future zip Promise.failed[String](f).future,
+            timeout)
         } should ===(f)
 
         intercept[IllegalStateException] {
-          Await.result(Promise
-                         .failed[String](f)
-                         .future zip Promise.failed[String](f).future,
-                       timeout)
+          Await.result(
+            Promise
+              .failed[String](f)
+              .future zip Promise.failed[String](f).future,
+            timeout)
         } should ===(f)
 
-        Await.result(Promise
-                       .successful("foo")
-                       .future zip Promise.successful("foo").future,
-                     timeout) should ===(("foo", "foo"))
+        Await.result(
+          Promise
+            .successful("foo")
+            .future zip Promise.successful("foo").future,
+          timeout) should ===(("foo", "foo"))
       }
 
       "fold by composing" in {
@@ -531,9 +536,10 @@ class FutureSpec
           (1 to 10).toList map { i ⇒
             Future(i)
           }
-        Await.result(futures.foldLeft(Future(0))((fr, fa) ⇒
-                       for (r ← fr; a ← fa) yield (r + a)),
-                     timeout.duration) should ===(55)
+        Await.result(
+          futures.foldLeft(Future(0))((fr, fa) ⇒
+            for (r ← fr; a ← fa) yield (r + a)),
+          timeout.duration) should ===(55)
       }
 
       "fold with an exception" in {
@@ -570,8 +576,9 @@ class FutureSpec
       }
 
       "return zero value if folding empty list" in {
-        Await.result(Future.fold(List[Future[Int]]())(0)(_ + _),
-                     timeout.duration) should ===(0)
+        Await.result(
+          Future.fold(List[Future[Int]]())(0)(_ + _),
+          timeout.duration) should ===(0)
       }
 
       "reduce results" in {
@@ -603,8 +610,9 @@ class FutureSpec
       "throw IllegalArgumentException on empty input to reduce" in {
         filterException[IllegalArgumentException] {
           intercept[java.util.NoSuchElementException] {
-            Await.result(Future.reduce(List[Future[Int]]())(_ + _),
-                         timeout.duration)
+            Await.result(
+              Future.reduce(List[Future[Int]]())(_ + _),
+              timeout.duration)
           }
         }
       }
@@ -639,8 +647,9 @@ class FutureSpec
         val list = (1 to 100).toList
         assert(
           Await
-            .result(Future.traverse(list)(x ⇒ Future(x * 2 - 1)),
-                    timeout.duration)
+            .result(
+              Future.traverse(list)(x ⇒ Future(x * 2 - 1)),
+              timeout.duration)
             .sum === 10000)
       }
 
@@ -844,8 +853,9 @@ class FutureSpec
     }
     "zip properly" in {
       f { (future, result) ⇒
-        Await.result(future zip Promise.successful("foo").future,
-                     timeout.duration) should ===((result, "foo"))
+        Await.result(
+          future zip Promise.successful("foo").future,
+          timeout.duration) should ===((result, "foo"))
         (intercept[RuntimeException] {
           Await.result(
             future zip Promise.failed(new RuntimeException("ohnoes")).future,
@@ -877,10 +887,11 @@ class FutureSpec
     "cast using mapTo" in {
       f(
         (future, result) ⇒
-          Await.result(future
-                         .mapTo[Boolean]
-                         .recover({ case _: ClassCastException ⇒ false }),
-                       timeout.duration) should ===(false))
+          Await.result(
+            future
+              .mapTo[Boolean]
+              .recover({ case _: ClassCastException ⇒ false }),
+            timeout.duration) should ===(false))
     }
   }
 
@@ -926,9 +937,10 @@ class FutureSpec
     "retain exception with flatMap" in {
       f((future, message) ⇒
         (intercept[java.lang.Exception] {
-          Await.result(future flatMap
-                         (_ ⇒ Promise.successful[Any]("foo").future),
-                       timeout.duration)
+          Await.result(
+            future flatMap
+              (_ ⇒ Promise.successful[Any]("foo").future),
+            timeout.duration)
         }).getMessage should ===(message))
     }
     "not perform action with foreach" is pending
@@ -936,8 +948,9 @@ class FutureSpec
     "zip properly" in {
       f { (future, message) ⇒
         (intercept[java.lang.Exception] {
-          Await.result(future zip Promise.successful("foo").future,
-                       timeout.duration)
+          Await.result(
+            future zip Promise.successful("foo").future,
+            timeout.duration)
         }).getMessage should ===(message)
       }
     }

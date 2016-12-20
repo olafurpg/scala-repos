@@ -103,10 +103,11 @@ class ComparingUnrelatedTypesInspection
           case _ =>
         }
       }
-    case MethodRepr(_,
-                    Some(baseExpr),
-                    Some(ResolvesTo(fun: ScFunction)),
-                    Seq(arg, _ *)) if mayNeedHighlighting(fun) =>
+    case MethodRepr(
+        _,
+        Some(baseExpr),
+        Some(ResolvesTo(fun: ScFunction)),
+        Seq(arg, _ *)) if mayNeedHighlighting(fun) =>
       for {
         ScParameterizedType(_, Seq(elemType)) <- baseExpr
           .getType()
@@ -117,9 +118,10 @@ class ComparingUnrelatedTypesInspection
           ScTypePresentation.different(elemType, argType)
         val message = InspectionBundle
           .message("comparing.unrelated.types.hint", elemTypeText, argTypeText)
-        holder.registerProblem(arg,
-                               message,
-                               ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
+        holder.registerProblem(
+          arg,
+          message,
+          ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
       }
     case IsInstanceOfCall(call) =>
       val qualType = call.referencedExpr match {
@@ -131,9 +133,10 @@ class ComparingUnrelatedTypesInspection
         t1 <- qualType
         t2 <- argType if cannotBeCompared(t1, t2)
       } {
-        holder.registerProblem(call,
-                               inspectionName,
-                               ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
+        holder.registerProblem(
+          call,
+          inspectionName,
+          ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
       }
   }
 

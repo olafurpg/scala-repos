@@ -40,9 +40,10 @@ class ReachingDefsCollectTest extends LightScalaTestCase {
       else file.getTextLength - 1)
     val range = ScalaPsiUtil.getElementsRange(start, end)
     val scope = PsiTreeUtil
-      .getParentOfType(PsiTreeUtil.findCommonParent(start, end),
-                       classOf[ScControlFlowOwner],
-                       false)
+      .getParentOfType(
+        PsiTreeUtil.findCommonParent(start, end),
+        classOf[ScControlFlowOwner],
+        false)
       .getParent
       .asInstanceOf[ScalaPsiElement]
 

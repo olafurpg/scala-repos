@@ -112,9 +112,10 @@ object SwaggerAuthSpec {
       "OK"
     }
 
-    get("/authenticated",
-        operation(
-          apiOperation[Unit]("authenticated").allows(allowsAuthenticated))) {
+    get(
+      "/authenticated",
+      operation(
+        apiOperation[Unit]("authenticated").allows(allowsAuthenticated))) {
       "OK"
     }
 
@@ -122,8 +123,9 @@ object SwaggerAuthSpec {
       "OK"
     }
 
-    get("/kate-and-tom",
-        operation(apiOperation[Unit]("getKateAndTom").allows(noJohn))) {
+    get(
+      "/kate-and-tom",
+      operation(apiOperation[Unit]("getKateAndTom").allows(noJohn))) {
       "OK"
     }
   }
@@ -150,8 +152,9 @@ object SwaggerAuthSpec {
       "OK"
     }
 
-    post("/blah",
-         operation(apiOperation[Unit]("createBlah").allows(isAllowed))) {
+    post(
+      "/blah",
+      operation(apiOperation[Unit]("createBlah").allows(isAllowed))) {
       "OK"
     }
   }

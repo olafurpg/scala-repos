@@ -185,13 +185,15 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     // Make sure the fields are strings:
     mapList[(String, AnyRef), CTuple](fieldDef) { outputList =>
       val asMap = outputList.toMap
-      assert(asMap.size == outputList.size,
-             "Repeated pivot key fields: " + outputList.toString)
+      assert(
+        asMap.size == outputList.size,
+        "Repeated pivot key fields: " + outputList.toString)
       val values = fieldDef._2.iterator.asScala
       // Look up this key:
         .map { fname =>
-          asMap.getOrElse(fname.asInstanceOf[String],
-                          defaultVal.asInstanceOf[AnyRef])
+          asMap.getOrElse(
+            fname.asInstanceOf[String],
+            defaultVal.asInstanceOf[AnyRef])
         }
       // Create the cascading tuple
       new CTuple(values.toSeq: _*)

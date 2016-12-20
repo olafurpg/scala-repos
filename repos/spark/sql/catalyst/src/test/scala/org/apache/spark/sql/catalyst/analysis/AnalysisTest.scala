@@ -38,13 +38,15 @@ trait AnalysisTest extends PlanTest {
     caseInsensitiveCatalog
       .registerTable(TableIdentifier("TaBlE"), TestRelations.testRelation)
 
-    new Analyzer(caseSensitiveCatalog,
-                 EmptyFunctionRegistry,
-                 caseSensitiveConf) {
+    new Analyzer(
+      caseSensitiveCatalog,
+      EmptyFunctionRegistry,
+      caseSensitiveConf) {
       override val extendedResolutionRules = EliminateSubqueryAliases :: Nil
-    } -> new Analyzer(caseInsensitiveCatalog,
-                      EmptyFunctionRegistry,
-                      caseInsensitiveConf) {
+    } -> new Analyzer(
+      caseInsensitiveCatalog,
+      EmptyFunctionRegistry,
+      caseInsensitiveConf) {
       override val extendedResolutionRules = EliminateSubqueryAliases :: Nil
     }
   }
@@ -69,14 +71,15 @@ trait AnalysisTest extends PlanTest {
     try analyzer.checkAnalysis(analysisAttempt)
     catch {
       case a: AnalysisException =>
-        fail(s"""
+        fail(
+          s"""
             |Failed to Analyze Plan
             |$inputPlan
             |
             |Partial Analysis
             |$analysisAttempt
           """.stripMargin,
-             a)
+          a)
     }
   }
 

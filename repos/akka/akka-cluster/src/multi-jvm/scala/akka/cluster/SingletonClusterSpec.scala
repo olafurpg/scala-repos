@@ -78,9 +78,10 @@ abstract class SingletonClusterSpec(
 
         markNodeAsUnavailable(secondAddress)
 
-        awaitMembersUp(numberOfMembers = 1,
-                       canNotBePartOfMemberRing = Set(secondAddress),
-                       30.seconds)
+        awaitMembersUp(
+          numberOfMembers = 1,
+          canNotBePartOfMemberRing = Set(secondAddress),
+          30.seconds)
         clusterView.isSingletonCluster should ===(true)
         awaitCond(clusterView.isLeader)
       }

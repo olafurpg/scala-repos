@@ -113,9 +113,10 @@ object EventSource {
     def apply[A](a: A)(implicit dataExtractor: EventDataExtractor[A],
                        nameExtractor: EventNameExtractor[A],
                        idExtractor: EventIdExtractor[A]): Event = {
-      Event(dataExtractor.eventData(a),
-            idExtractor.eventId(a),
-            nameExtractor.eventName(a))
+      Event(
+        dataExtractor.eventData(a),
+        idExtractor.eventId(a),
+        nameExtractor.eventName(a))
     }
 
     implicit def writeable(implicit codec: Codec): Writeable[Event] = {

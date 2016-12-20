@@ -108,6 +108,7 @@ private object DIContravariant extends Contravariant[λ[α => DummyImplicit]] {
 }
 
 object MapTest
-    extends XMapTest[SMap, λ[α => DummyImplicit]](std.map)(DIContravariant,
-                                                           implicitly,
-                                                           implicitly)
+    extends XMapTest[SMap, λ[α => DummyImplicit]](std.map)(
+      DIContravariant,
+      implicitly,
+      implicitly)

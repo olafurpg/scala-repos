@@ -149,9 +149,10 @@ class ScaloidCodeGenerator(cls: AndroidClass,
   }
 
   def classImplicitArgs =
-    concatArgs(cls.constructors.take(1).flatMap(_.implicitArgs),
-               customClassImplicitArgs,
-               isImplicit = true)
+    concatArgs(
+      cls.constructors.take(1).flatMap(_.implicitArgs),
+      customClassImplicitArgs,
+      isImplicit = true)
 
   private def constArgs(args: List[Argument]): String =
     args.map(a => s"${a.name}: ${genType(a.tpe)}").mkString(", ")

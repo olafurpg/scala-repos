@@ -80,8 +80,9 @@ class WeightedLeastSquaresSuite
        [1] 18.08  6.08 -0.60
      */
 
-    val expected = Seq(Vectors.dense(0.0, -3.727121, 3.009983),
-                       Vectors.dense(18.08, 6.08, -0.60))
+    val expected = Seq(
+      Vectors.dense(0.0, -3.727121, 3.009983),
+      Vectors.dense(18.08, 6.08, -0.60))
 
     var idx = 0
     for (fitIntercept <- Seq(false, true)) {
@@ -113,8 +114,9 @@ class WeightedLeastSquaresSuite
       [1] 17  0  0
      */
 
-    val expected = Seq(Vectors.dense(0.0, -9.221298, 3.394343),
-                       Vectors.dense(17.0, 0.0, 0.0))
+    val expected = Seq(
+      Vectors.dense(0.0, -9.221298, 3.394343),
+      Vectors.dense(17.0, 0.0, 0.0))
 
     var idx = 0
     for (fitIntercept <- Seq(false, true)) {
@@ -135,10 +137,11 @@ class WeightedLeastSquaresSuite
   test("WLS with regularization when label is constant") {
     // if regParam is non-zero and standardization is true, the problem is ill-defined and
     // an exception is thrown.
-    val wls = new WeightedLeastSquares(fitIntercept = false,
-                                       regParam = 0.1,
-                                       standardizeFeatures = true,
-                                       standardizeLabel = true)
+    val wls = new WeightedLeastSquares(
+      fitIntercept = false,
+      regParam = 0.1,
+      standardizeFeatures = true,
+      standardizeLabel = true)
     intercept[IllegalArgumentException] {
       wls.fit(instancesConstLabel)
     }
@@ -194,10 +197,11 @@ class WeightedLeastSquaresSuite
          regParam <- Seq(0.0, 0.1, 1.0);
          standardizeFeatures <- Seq(false, true)) {
       val wls =
-        new WeightedLeastSquares(fitIntercept,
-                                 regParam,
-                                 standardizeFeatures,
-                                 standardizeLabel = true).fit(instances)
+        new WeightedLeastSquares(
+          fitIntercept,
+          regParam,
+          standardizeFeatures,
+          standardizeLabel = true).fit(instances)
       val actual =
         Vectors.dense(wls.intercept, wls.coefficients(0), wls.coefficients(1))
       assert(actual ~== expected(idx) absTol 1e-4)

@@ -36,7 +36,8 @@ object CommonConnector {
       addrs: Seq[java.net.InetSocketAddress],
       sessionTimeout: Duration,
       connectTimeout: Duration)(implicit pool: FuturePool): CommonConnector = {
-    apply(new ZooKeeperClient(sessionTimeout.toIntAmount, addrs.asJava),
-          connectTimeout)(pool)
+    apply(
+      new ZooKeeperClient(sessionTimeout.toIntAmount, addrs.asJava),
+      connectTimeout)(pool)
   }
 }

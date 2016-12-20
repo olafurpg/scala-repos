@@ -26,8 +26,9 @@ class ScalaQualifiedClassNameMacro extends Macro {
   override def calculateResult(params: Array[Expression],
                                context: ExpressionContext): Result = {
     Option(
-      PsiTreeUtil.getParentOfType(context.getPsiElementAtStartOffset,
-                                  classOf[PsiClass]))
+      PsiTreeUtil.getParentOfType(
+        context.getPsiElementAtStartOffset,
+        classOf[PsiClass]))
       .map(_.getQualifiedName)
       .map(new TextResult(_))
       .orNull

@@ -44,11 +44,11 @@ trait IntegrationTestHarness extends KafkaServerTestHarness {
   val producers = Buffer[KafkaProducer[Array[Byte], Array[Byte]]]()
 
   override def generateConfigs() = {
-    val cfgs = TestUtils.createBrokerConfigs(serverCount,
-                                             zkConnect,
-                                             interBrokerSecurityProtocol =
-                                               Some(securityProtocol),
-                                             trustStoreFile = trustStoreFile)
+    val cfgs = TestUtils.createBrokerConfigs(
+      serverCount,
+      zkConnect,
+      interBrokerSecurityProtocol = Some(securityProtocol),
+      trustStoreFile = trustStoreFile)
     cfgs.foreach(_.putAll(serverConfig))
     cfgs.map(KafkaConfig.fromProps)
   }
@@ -76,16 +76,18 @@ trait IntegrationTestHarness extends KafkaServerTestHarness {
     consumerConfig.putAll(consumerSecurityProps)
     for (i <- 0 until producerCount)
       producers +=
-        TestUtils.createNewProducer(brokerList,
-                                    securityProtocol = this.securityProtocol,
-                                    trustStoreFile = this.trustStoreFile,
-                                    props = Some(producerConfig))
+        TestUtils.createNewProducer(
+          brokerList,
+          securityProtocol = this.securityProtocol,
+          trustStoreFile = this.trustStoreFile,
+          props = Some(producerConfig))
     for (i <- 0 until consumerCount) {
       consumers +=
-        TestUtils.createNewConsumer(brokerList,
-                                    securityProtocol = this.securityProtocol,
-                                    trustStoreFile = this.trustStoreFile,
-                                    props = Some(consumerConfig))
+        TestUtils.createNewConsumer(
+          brokerList,
+          securityProtocol = this.securityProtocol,
+          trustStoreFile = this.trustStoreFile,
+          props = Some(consumerConfig))
     }
 
     // create the consumer offset topic

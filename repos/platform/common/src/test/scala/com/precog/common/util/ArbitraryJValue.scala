@@ -26,9 +26,10 @@ import Arbitrary.arbitrary
 
 trait ArbitraryJValue {
   def genJValue: Gen[JValue] =
-    frequency((10, genSimple),
-              (1, wrap(choose(0, 5) flatMap genArray)),
-              (1, wrap(choose(0, 5) flatMap genObject)))
+    frequency(
+      (10, genSimple),
+      (1, wrap(choose(0, 5) flatMap genArray)),
+      (1, wrap(choose(0, 5) flatMap genObject)))
   def genJNum: Gen[JNum] = arbitrary[BigDecimal].map(JNum(_))
   def genJBool: Gen[JBool] = arbitrary[Boolean].map(JBool(_))
   def genJString: Gen[JString] = alphaStr.map(JString(_))

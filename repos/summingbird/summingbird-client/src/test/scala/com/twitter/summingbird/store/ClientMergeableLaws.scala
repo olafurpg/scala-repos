@@ -48,12 +48,12 @@ object ClientMergeableLaws extends Properties("ClientMergeable") {
       toMerge.forall {
         case (k, (v1, v2)) =>
           val tup = for {
-            prior <- machine.mergeable.readable.multiGetBatch(BatchID(1),
-                                                              Set(k))(k)
+            prior <- machine.mergeable.readable
+              .multiGetBatch(BatchID(1), Set(k))(k)
             mergePrior <- machine.mergeable.merge((k, BatchID(1)), v1)
             mergeAfter <- machine.mergeable.merge((k, BatchID(1)), v2)
-            last <- machine.mergeable.readable.multiGetBatch(BatchID(1),
-                                                             Set(k))(k)
+            last <- machine.mergeable.readable
+              .multiGetBatch(BatchID(1), Set(k))(k)
           } yield (prior, mergePrior, mergeAfter, last)
 
           Await.result(tup.map {

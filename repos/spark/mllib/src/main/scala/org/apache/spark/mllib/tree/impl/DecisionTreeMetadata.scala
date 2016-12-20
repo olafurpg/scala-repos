@@ -87,8 +87,9 @@ private[spark] class DecisionTreeMetadata(
     * For a continuous feature, number of bins is number of splits plus 1.
     */
   def setNumSplits(featureIndex: Int, numSplits: Int) {
-    require(isContinuous(featureIndex),
-            s"Only number of bin for a continuous feature can be set.")
+    require(
+      isContinuous(featureIndex),
+      s"Only number of bin for a continuous feature can be set.")
     numBins(featureIndex) = numSplits + 1
   }
 
@@ -201,20 +202,21 @@ private[spark] object DecisionTreeMetadata extends Logging {
       case "onethird" => (numFeatures / 3.0).ceil.toInt
     }
 
-    new DecisionTreeMetadata(numFeatures,
-                             numExamples,
-                             numClasses,
-                             numBins.max,
-                             strategy.categoricalFeaturesInfo,
-                             unorderedFeatures.toSet,
-                             numBins,
-                             strategy.impurity,
-                             strategy.quantileCalculationStrategy,
-                             strategy.maxDepth,
-                             strategy.minInstancesPerNode,
-                             strategy.minInfoGain,
-                             numTrees,
-                             numFeaturesPerNode)
+    new DecisionTreeMetadata(
+      numFeatures,
+      numExamples,
+      numClasses,
+      numBins.max,
+      strategy.categoricalFeaturesInfo,
+      unorderedFeatures.toSet,
+      numBins,
+      strategy.impurity,
+      strategy.quantileCalculationStrategy,
+      strategy.maxDepth,
+      strategy.minInstancesPerNode,
+      strategy.minInfoGain,
+      numTrees,
+      numFeaturesPerNode)
   }
 
   /**

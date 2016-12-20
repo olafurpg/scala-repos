@@ -52,9 +52,10 @@ class MigrationClientTest
     val loopback = InetAddress.getLoopbackAddress
 
     // start zookeeper server and create zookeeper client
-    zookeeperServer = new ZooKeeperServer(createTempDir(),
-                                          createTempDir(),
-                                          ZooKeeperServer.DEFAULT_TICK_TIME)
+    zookeeperServer = new ZooKeeperServer(
+      createTempDir(),
+      createTempDir(),
+      ZooKeeperServer.DEFAULT_TICK_TIME)
     connectionFactory = ServerCnxnFactory(loopback)
     connectionFactory.startup(zookeeperServer)
     zookeeperServerPort = zookeeperServer.getClientPort

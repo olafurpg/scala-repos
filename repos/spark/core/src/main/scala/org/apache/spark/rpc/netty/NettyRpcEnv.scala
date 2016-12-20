@@ -65,10 +65,11 @@ private[netty] class NettyRpcEnv(
       ): java.util.List[TransportClientBootstrap] = {
     if (securityManager.isAuthenticationEnabled()) {
       java.util.Arrays.asList(
-        new SaslClientBootstrap(transportConf,
-                                "",
-                                securityManager,
-                                securityManager.isSaslEncryptionEnabled()))
+        new SaslClientBootstrap(
+          transportConf,
+          "",
+          securityManager,
+          securityManager.isSaslEncryptionEnabled()))
     } else {
       java.util.Collections.emptyList[TransportClientBootstrap]
     }
@@ -127,8 +128,9 @@ private[netty] class NettyRpcEnv(
         java.util.Collections.emptyList()
       }
     server = transportContext.createServer(host, port, bootstraps)
-    dispatcher.registerRpcEndpoint(RpcEndpointVerifier.NAME,
-                                   new RpcEndpointVerifier(this, dispatcher))
+    dispatcher.registerRpcEndpoint(
+      RpcEndpointVerifier.NAME,
+      new RpcEndpointVerifier(this, dispatcher))
   }
 
   @Nullable
@@ -169,8 +171,9 @@ private[netty] class NettyRpcEnv(
     if (receiver.client != null) {
       message.sendWith(receiver.client)
     } else {
-      require(receiver.address != null,
-              "Cannot send message to client endpoint with no listen address.")
+      require(
+        receiver.address != null,
+        "Cannot send message to client endpoint with no listen address.")
       val targetOutbox = {
         val outbox = outboxes.get(receiver.address)
         if (outbox == null) {
@@ -340,8 +343,9 @@ private[netty] class NettyRpcEnv(
     val parsedUri = new URI(uri)
     require(parsedUri.getHost() != null, "Host name must be defined.")
     require(parsedUri.getPort() > 0, "Port must be defined.")
-    require(parsedUri.getPath() != null && parsedUri.getPath().nonEmpty,
-            "Path must be defined.")
+    require(
+      parsedUri.getPath() != null && parsedUri.getPath().nonEmpty,
+      "Path must be defined.")
 
     val pipe = Pipe.open()
     val source = new FileDownloadChannel(pipe.source())
@@ -468,10 +472,11 @@ private[rpc] class NettyRpcEnvFactory extends RpcEnvFactory with Logging {
     val javaSerializerInstance = new JavaSerializer(sparkConf)
       .newInstance()
       .asInstanceOf[JavaSerializerInstance]
-    val nettyEnv = new NettyRpcEnv(sparkConf,
-                                   javaSerializerInstance,
-                                   config.host,
-                                   config.securityManager)
+    val nettyEnv = new NettyRpcEnv(
+      sparkConf,
+      javaSerializerInstance,
+      config.host,
+      config.securityManager)
     if (!config.clientMode) {
       val startNettyRpcEnv: Int => (NettyRpcEnv, Int) = { actualPort =>
         nettyEnv.startServer(actualPort)
@@ -479,10 +484,11 @@ private[rpc] class NettyRpcEnvFactory extends RpcEnvFactory with Logging {
       }
       try {
         Utils
-          .startServiceOnPort(config.port,
-                              startNettyRpcEnv,
-                              sparkConf,
-                              config.name)
+          .startServiceOnPort(
+            config.port,
+            startNettyRpcEnv,
+            sparkConf,
+            config.name)
           ._1
       } catch {
         case NonFatal(e) =>
@@ -620,9 +626,10 @@ private[netty] class NettyRpcHandler(dispatcher: Dispatcher,
     val requestMessage = nettyEnv.deserialize[RequestMessage](client, message)
     if (requestMessage.senderAddress == null) {
       // Create a new message with the socket address of the client as the sender.
-      RequestMessage(clientAddr,
-                     requestMessage.receiver,
-                     requestMessage.content)
+      RequestMessage(
+        clientAddr,
+        requestMessage.receiver,
+        requestMessage.content)
     } else {
       // The remote RpcEnv listens to some port, we should also fire a RemoteProcessConnected for
       // the listening address

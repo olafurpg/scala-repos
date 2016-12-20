@@ -158,9 +158,11 @@ private[spark] object BinomialBounds {
     */
   def getUpperBound(delta: Double, n: Long, fraction: Double): Double = {
     val gamma = -math.log(delta) / n
-    math.min(1,
-             math.max(minSamplingRate,
-                      fraction + gamma +
-                        math.sqrt(gamma * gamma + 2 * gamma * fraction)))
+    math.min(
+      1,
+      math.max(
+        minSamplingRate,
+        fraction + gamma +
+          math.sqrt(gamma * gamma + 2 * gamma * fraction)))
   }
 }

@@ -82,8 +82,9 @@ class ContinuousQueryManagerSuite
           sqlContext.streams.get(q1.name)
         }
       }
-      assert(ex1.getMessage.contains(q1.name),
-             "error does not contain name of query to be fetched")
+      assert(
+        ex1.getMessage.contains(q1.name),
+        "error does not contain name of query to be fetched")
       assert(sqlContext.streams.get(q2.name).eq(q2))
 
       m2.addData(0) // q2 should terminate with error
@@ -156,78 +157,89 @@ class ContinuousQueryManagerSuite
       assert(sqlContext.streams.active.toSet === queries.toSet)
 
       // awaitAnyTermination should be blocking or non-blocking depending on timeout values
-      testAwaitAnyTermination(ExpectBlocked,
-                              awaitTimeout = 4 seconds,
-                              expectedReturnedValue = false,
-                              testBehaviorFor = 2 seconds)
+      testAwaitAnyTermination(
+        ExpectBlocked,
+        awaitTimeout = 4 seconds,
+        expectedReturnedValue = false,
+        testBehaviorFor = 2 seconds)
 
-      testAwaitAnyTermination(ExpectNotBlocked,
-                              awaitTimeout = 50 milliseconds,
-                              expectedReturnedValue = false,
-                              testBehaviorFor = 1 second)
+      testAwaitAnyTermination(
+        ExpectNotBlocked,
+        awaitTimeout = 50 milliseconds,
+        expectedReturnedValue = false,
+        testBehaviorFor = 1 second)
 
       // Stop a query asynchronously within timeout and awaitAnyTerm should be unblocked
       val q1 =
         stopRandomQueryAsync(stopAfter = 100 milliseconds, withError = false)
-      testAwaitAnyTermination(ExpectNotBlocked,
-                              awaitTimeout = 2 seconds,
-                              expectedReturnedValue = true,
-                              testBehaviorFor = 4 seconds)
+      testAwaitAnyTermination(
+        ExpectNotBlocked,
+        awaitTimeout = 2 seconds,
+        expectedReturnedValue = true,
+        testBehaviorFor = 4 seconds)
       require(!q1.isActive) // should be inactive by the time the prev awaitAnyTerm returned
 
       // All subsequent calls to awaitAnyTermination should be non-blocking even if timeout is high
-      testAwaitAnyTermination(ExpectNotBlocked,
-                              awaitTimeout = 4 seconds,
-                              expectedReturnedValue = true)
+      testAwaitAnyTermination(
+        ExpectNotBlocked,
+        awaitTimeout = 4 seconds,
+        expectedReturnedValue = true)
 
       // Resetting termination should make awaitAnyTermination() blocking again
       sqlContext.streams.resetTerminated()
-      testAwaitAnyTermination(ExpectBlocked,
-                              awaitTimeout = 4 seconds,
-                              expectedReturnedValue = false,
-                              testBehaviorFor = 1 second)
+      testAwaitAnyTermination(
+        ExpectBlocked,
+        awaitTimeout = 4 seconds,
+        expectedReturnedValue = false,
+        testBehaviorFor = 1 second)
 
       // Terminate a query asynchronously with exception within timeout, awaitAnyTermination should
       // throws the exception
       val q2 = stopRandomQueryAsync(100 milliseconds, withError = true)
-      testAwaitAnyTermination(ExpectException[SparkException],
-                              awaitTimeout = 1 seconds,
-                              testBehaviorFor = 2 seconds)
+      testAwaitAnyTermination(
+        ExpectException[SparkException],
+        awaitTimeout = 1 seconds,
+        testBehaviorFor = 2 seconds)
       require(!q2.isActive) // should be inactive by the time the prev awaitAnyTerm returned
 
       // All subsequent calls to awaitAnyTermination should throw the exception
-      testAwaitAnyTermination(ExpectException[SparkException],
-                              awaitTimeout = 2 seconds,
-                              testBehaviorFor = 4 seconds)
+      testAwaitAnyTermination(
+        ExpectException[SparkException],
+        awaitTimeout = 2 seconds,
+        testBehaviorFor = 4 seconds)
 
       // Terminate a query asynchronously outside the timeout, awaitAnyTerm should be blocked
       sqlContext.streams.resetTerminated()
       val q3 = stopRandomQueryAsync(2 seconds, withError = true)
-      testAwaitAnyTermination(ExpectNotBlocked,
-                              awaitTimeout = 100 milliseconds,
-                              expectedReturnedValue = false,
-                              testBehaviorFor = 4 seconds)
+      testAwaitAnyTermination(
+        ExpectNotBlocked,
+        awaitTimeout = 100 milliseconds,
+        expectedReturnedValue = false,
+        testBehaviorFor = 4 seconds)
 
       // After that query is stopped, awaitAnyTerm should throw exception
       eventually(Timeout(streamingTimeout)) { require(!q3.isActive) } // wait for query to stop
-      testAwaitAnyTermination(ExpectException[SparkException],
-                              awaitTimeout = 100 milliseconds,
-                              testBehaviorFor = 4 seconds)
+      testAwaitAnyTermination(
+        ExpectException[SparkException],
+        awaitTimeout = 100 milliseconds,
+        testBehaviorFor = 4 seconds)
 
       // Terminate multiple queries, one with failure and see whether awaitAnyTermination throws
       // the exception
       sqlContext.streams.resetTerminated()
 
       val q4 = stopRandomQueryAsync(10 milliseconds, withError = false)
-      testAwaitAnyTermination(ExpectNotBlocked,
-                              awaitTimeout = 2 seconds,
-                              expectedReturnedValue = true)
+      testAwaitAnyTermination(
+        ExpectNotBlocked,
+        awaitTimeout = 2 seconds,
+        expectedReturnedValue = true)
       require(!q4.isActive)
       val q5 = stopRandomQueryAsync(10 milliseconds, withError = true)
       eventually(Timeout(streamingTimeout)) { require(!q5.isActive) }
       // After q5 terminates with exception, awaitAnyTerm should start throwing exception
-      testAwaitAnyTermination(ExpectException[SparkException],
-                              awaitTimeout = 2 seconds)
+      testAwaitAnyTermination(
+        ExpectException[SparkException],
+        awaitTimeout = 2 seconds)
     }
   }
 
@@ -241,9 +253,10 @@ class ContinuousQueryManagerSuite
           try {
             val df = ds.toDF
             query = sqlContext.streams
-              .startQuery(StreamExecution.nextName,
-                          df,
-                          new MemorySink(df.schema))
+              .startQuery(
+                StreamExecution.nextName,
+                df,
+                new MemorySink(df.schema))
               .asInstanceOf[StreamExecution]
           } catch {
             case NonFatal(e) =>
@@ -273,8 +286,9 @@ class ContinuousQueryManagerSuite
       if (awaitTimeout != null && awaitTimeout.toMillis > 0) {
         val returnedValue =
           sqlContext.streams.awaitAnyTermination(awaitTimeout.toMillis)
-        assert(returnedValue === expectedReturnedValue,
-               "Returned value does not match expected")
+        assert(
+          returnedValue === expectedReturnedValue,
+          "Returned value does not match expected")
       } else {
         sqlContext.streams.awaitAnyTermination()
       }

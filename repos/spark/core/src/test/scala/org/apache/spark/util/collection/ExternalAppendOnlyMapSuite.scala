@@ -36,10 +36,11 @@ class ExternalAppendOnlyMapSuite extends SparkFunSuite with LocalSparkContext {
 
   private def createExternalMap[T] = {
     val context = MemoryTestingUtils.fakeTaskContext(sc.env)
-    new ExternalAppendOnlyMap[T, T, ArrayBuffer[T]](createCombiner[T],
-                                                    mergeValue[T],
-                                                    mergeCombiners[T],
-                                                    context = context)
+    new ExternalAppendOnlyMap[T, T, ArrayBuffer[T]](
+      createCombiner[T],
+      mergeValue[T],
+      mergeCombiners[T],
+      context = context)
   }
 
   private def createSparkConf(loadDefaults: Boolean,
@@ -82,9 +83,10 @@ class ExternalAppendOnlyMapSuite extends SparkFunSuite with LocalSparkContext {
     val it = map.iterator
     assert(it.hasNext)
     assert(
-      it.toSet === Set[(Int, ArrayBuffer[Int])]((1, ArrayBuffer[Int](10)),
-                                                (2, ArrayBuffer[Int](20)),
-                                                (3, ArrayBuffer[Int](30))))
+      it.toSet === Set[(Int, ArrayBuffer[Int])](
+        (1, ArrayBuffer[Int](10)),
+        (2, ArrayBuffer[Int](20)),
+        (3, ArrayBuffer[Int](30))))
     sc.stop()
   }
 
@@ -100,9 +102,10 @@ class ExternalAppendOnlyMapSuite extends SparkFunSuite with LocalSparkContext {
     val result =
       it.toSet[(Int, ArrayBuffer[Int])].map(kv => (kv._1, kv._2.toSet))
     assert(
-      result === Set[(Int, Set[Int])]((1, Set[Int](10, 100, 1000)),
-                                      (2, Set[Int](20, 200)),
-                                      (3, Set[Int](30))))
+      result === Set[(Int, Set[Int])](
+        (1, Set[Int](10, 100, 1000)),
+        (2, Set[Int](20, 200)),
+        (3, Set[Int](30))))
     sc.stop()
   }
 
@@ -189,8 +192,9 @@ class ExternalAppendOnlyMapSuite extends SparkFunSuite with LocalSparkContext {
     val result2 =
       rdd.groupByKey().collect().map(x => (x._1, x._2.toList)).toSet
     assert(
-      result2.toSet === Set[(Int, Seq[Int])]((0, List[Int](1, 1, 1, 1, 1)),
-                                             (1, List[Int](1, 1, 1, 1, 1))))
+      result2.toSet === Set[(Int, Seq[Int])](
+        (0, List[Int](1, 1, 1, 1, 1)),
+        (1, List[Int](1, 1, 1, 1, 1))))
     sc.stop()
   }
 
@@ -256,8 +260,9 @@ class ExternalAppendOnlyMapSuite extends SparkFunSuite with LocalSparkContext {
     val conf =
       createSparkConf(loadDefaults = true, codec) // Load defaults for Spark home
     conf.set("spark.shuffle.manager", "hash") // avoid using external sorter
-    conf.set("spark.shuffle.spill.numElementsForceSpillThreshold",
-             (size / 4).toString)
+    conf.set(
+      "spark.shuffle.spill.numElementsForceSpillThreshold",
+      (size / 4).toString)
     sc = new SparkContext("local-cluster[1,1,1024]", "test", conf)
 
     assertSpilled(sc, "reduceByKey") {
@@ -272,8 +277,9 @@ class ExternalAppendOnlyMapSuite extends SparkFunSuite with LocalSparkContext {
       result.foreach {
         case (k, v) =>
           val expected = k * 2 + 1
-          assert(v === expected,
-                 s"Value for $k was wrong: expected $expected, got $v")
+          assert(
+            v === expected,
+            s"Value for $k was wrong: expected $expected, got $v")
       }
     }
 
@@ -290,8 +296,9 @@ class ExternalAppendOnlyMapSuite extends SparkFunSuite with LocalSparkContext {
         case (i, seq) =>
           val actual = seq.toSet
           val expected = Set(i * 2, i * 2 + 1)
-          assert(actual === expected,
-                 s"Value for $i was wrong: expected $expected, got $actual")
+          assert(
+            actual === expected,
+            s"Value for $i was wrong: expected $expected, got $actual")
       }
     }
 
@@ -309,10 +316,12 @@ class ExternalAppendOnlyMapSuite extends SparkFunSuite with LocalSparkContext {
           val actual1 = seq1.toSet
           val actual2 = seq2.toSet
           val expected = Set(i * 2, i * 2 + 1)
-          assert(actual1 === expected,
-                 s"Value 1 for $i was wrong: expected $expected, got $actual1")
-          assert(actual2 === expected,
-                 s"Value 2 for $i was wrong: expected $expected, got $actual2")
+          assert(
+            actual1 === expected,
+            s"Value 1 for $i was wrong: expected $expected, got $actual1")
+          assert(
+            actual2 === expected,
+            s"Value 2 for $i was wrong: expected $expected, got $actual2")
       }
     }
 
@@ -322,8 +331,9 @@ class ExternalAppendOnlyMapSuite extends SparkFunSuite with LocalSparkContext {
   test("spilling with hash collisions") {
     val size = 1000
     val conf = createSparkConf(loadDefaults = true)
-    conf.set("spark.shuffle.spill.numElementsForceSpillThreshold",
-             (size / 2).toString)
+    conf.set(
+      "spark.shuffle.spill.numElementsForceSpillThreshold",
+      (size / 2).toString)
     sc = new SparkContext("local-cluster[1,1,1024]", "test", conf)
     val map = createExternalMap[String]
 
@@ -378,15 +388,16 @@ class ExternalAppendOnlyMapSuite extends SparkFunSuite with LocalSparkContext {
   test("spilling with many hash collisions") {
     val size = 1000
     val conf = createSparkConf(loadDefaults = true)
-    conf.set("spark.shuffle.spill.numElementsForceSpillThreshold",
-             (size / 2).toString)
+    conf.set(
+      "spark.shuffle.spill.numElementsForceSpillThreshold",
+      (size / 2).toString)
     sc = new SparkContext("local-cluster[1,1,1024]", "test", conf)
     val context = MemoryTestingUtils.fakeTaskContext(sc.env)
-    val map = new ExternalAppendOnlyMap[FixedHashObject, Int, Int](_ => 1,
-                                                                   _ + _,
-                                                                   _ + _,
-                                                                   context =
-                                                                     context)
+    val map = new ExternalAppendOnlyMap[FixedHashObject, Int, Int](
+      _ => 1,
+      _ + _,
+      _ + _,
+      context = context)
 
     // Insert 10 copies each of lots of objects whose hash codes are either 0 or 1. This causes
     // problems if the map fails to group together the objects with the same code (SPARK-2043).
@@ -411,8 +422,9 @@ class ExternalAppendOnlyMapSuite extends SparkFunSuite with LocalSparkContext {
   test("spilling with hash collisions using the Int.MaxValue key") {
     val size = 1000
     val conf = createSparkConf(loadDefaults = true)
-    conf.set("spark.shuffle.spill.numElementsForceSpillThreshold",
-             (size / 2).toString)
+    conf.set(
+      "spark.shuffle.spill.numElementsForceSpillThreshold",
+      (size / 2).toString)
     sc = new SparkContext("local-cluster[1,1,1024]", "test", conf)
     val map = createExternalMap[Int]
 
@@ -433,8 +445,9 @@ class ExternalAppendOnlyMapSuite extends SparkFunSuite with LocalSparkContext {
   test("spilling with null keys and values") {
     val size = 1000
     val conf = createSparkConf(loadDefaults = true)
-    conf.set("spark.shuffle.spill.numElementsForceSpillThreshold",
-             (size / 2).toString)
+    conf.set(
+      "spark.shuffle.spill.numElementsForceSpillThreshold",
+      (size / 2).toString)
     sc = new SparkContext("local-cluster[1,1,1024]", "test", conf)
     val map = createExternalMap[Int]
 
@@ -456,8 +469,9 @@ class ExternalAppendOnlyMapSuite extends SparkFunSuite with LocalSparkContext {
     val spillThreshold = 1000
     val conf = createSparkConf(loadDefaults = false)
       .set("spark.shuffle.manager", "hash") // make sure we're not also using ExternalSorter
-      .set("spark.shuffle.spill.numElementsForceSpillThreshold",
-           spillThreshold.toString)
+      .set(
+        "spark.shuffle.spill.numElementsForceSpillThreshold",
+        spillThreshold.toString)
     sc = new SparkContext("local", "test", conf)
     // No spilling
     AccumulatorSuite

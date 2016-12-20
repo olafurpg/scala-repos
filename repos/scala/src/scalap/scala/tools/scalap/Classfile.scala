@@ -41,11 +41,12 @@ class Classfile(in: ByteArrayReader) {
     var members: List[Member] = Nil
     var i = 0
     while (i < n) {
-      members = Member(field,
-                       in.nextChar.toInt,
-                       in.nextChar.toInt,
-                       in.nextChar.toInt,
-                       readAttribs) :: members
+      members = Member(
+          field,
+          in.nextChar.toInt,
+          in.nextChar.toInt,
+          in.nextChar.toInt,
+          readAttribs) :: members
       i = i + 1
     }
     members

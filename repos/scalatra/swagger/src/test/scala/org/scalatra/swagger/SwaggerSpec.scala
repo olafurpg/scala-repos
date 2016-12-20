@@ -34,12 +34,14 @@ class SwaggerSpec extends ScalatraSpec with JsonMatchers {
     OAuth(
       List("PUBLIC"),
       List(
-        ImplicitGrant(LoginEndpoint("http://localhost:8002/oauth/dialog"),
-                      "access_code"),
+        ImplicitGrant(
+          LoginEndpoint("http://localhost:8002/oauth/dialog"),
+          "access_code"),
         AuthorizationCodeGrant(
-          TokenRequestEndpoint("http://localhost:8002/oauth/requestToken",
-                               "client_id",
-                               "client_secret"),
+          TokenRequestEndpoint(
+            "http://localhost:8002/oauth/requestToken",
+            "client_id",
+            "client_secret"),
           TokenEndpoint("http://localhost:8002/oauth/token", "access_code"))
       )
     ))
@@ -123,9 +125,10 @@ class SwaggerSpec extends ScalatraSpec with JsonMatchers {
 
   def verifyApis(j: JValue) = {
     val JArray(apis) = j
-    val expectations = mutable.HashMap("/pet" -> "Operations about pets",
-                                       "/store" -> "Operations about store",
-                                       "/user" -> "Operations about user")
+    val expectations = mutable.HashMap(
+      "/pet" -> "Operations about pets",
+      "/store" -> "Operations about store",
+      "/user" -> "Operations about user")
     apis map { api =>
       val JString(path) = api \ "path"
       val desc = expectations(path)
@@ -173,12 +176,10 @@ class SwaggerSpec extends ScalatraSpec with JsonMatchers {
   def listPetOperations = {
     get("/api-docs/pet") {
       val bo = JsonParser.parseOpt(body)
-      bo must beSome[JValue] and verifyCommon(bo.get,
-                                              petOperationsJValue,
-                                              List("/pet/{petId}",
-                                                   "/pet/findByTags",
-                                                   "/pet/findByStatus",
-                                                   "/pet/")) and petOperations
+      bo must beSome[JValue] and verifyCommon(
+        bo.get,
+        petOperationsJValue,
+        List("/pet/{petId}", "/pet/findByTags", "/pet/findByStatus", "/pet/")) and petOperations
         .map(verifyOperation(bo.get, petOperationsJValue, _))
         .reduce(_ and _) and verifyPetModel(bo.get)
     }
@@ -228,21 +229,22 @@ class SwaggerSpec extends ScalatraSpec with JsonMatchers {
     val exp = findOperation(expected, name)
     (op must beSome[JValue])
       .setMessage("Couldn't find operation: " + name) and {
-      val m = verifyFields(op.get,
-                           exp.get,
-                           "method",
-                           "nickname",
-                           "type",
-                           "$ref",
-                           "items",
-                           "summary",
-                           "parameters",
-                           "notes",
-                           "responseMessages",
-                           "consumes",
-                           "produces",
-                           "protocols",
-                           "authorizations")
+      val m = verifyFields(
+        op.get,
+        exp.get,
+        "method",
+        "nickname",
+        "type",
+        "$ref",
+        "items",
+        "summary",
+        "parameters",
+        "notes",
+        "responseMessages",
+        "consumes",
+        "produces",
+        "protocols",
+        "authorizations")
       m setMessage (m.message + " of the operation " + name)
     }
   }
@@ -253,14 +255,15 @@ class SwaggerSpec extends ScalatraSpec with JsonMatchers {
     val actualPetProps = petProperties(actualPetJson)
     val expectedPetProps = petProperties(petOperationsJValue)
 
-    val m = verifyFields(actualPetProps,
-                         expectedPetProps,
-                         "category",
-                         "id",
-                         "name",
-                         "status",
-                         "tags",
-                         "urls")
+    val m = verifyFields(
+      actualPetProps,
+      expectedPetProps,
+      "category",
+      "id",
+      "name",
+      "status",
+      "tags",
+      "urls")
     m setMessage (m.message + " of the pet model")
   }
 
@@ -269,13 +272,14 @@ class SwaggerSpec extends ScalatraSpec with JsonMatchers {
     val actualOrderProps = petProperties(actualStoreJson)
     val expectedOrderProps = petProperties(storeOperationsJValue)
 
-    val m = verifyFields(actualOrderProps,
-                         expectedOrderProps,
-                         "id",
-                         "status",
-                         "petId",
-                         "quantity",
-                         "shipDate")
+    val m = verifyFields(
+      actualOrderProps,
+      expectedOrderProps,
+      "id",
+      "status",
+      "petId",
+      "quantity",
+      "shipDate")
     m setMessage (m.message + " of the order model")
   }
 
@@ -309,18 +313,19 @@ class SwaggerSpec extends ScalatraSpec with JsonMatchers {
           val JArray(ef) = exp \ fn
           val r =
             af map { v =>
-              val mm = verifyFields(v,
-                                    ef find (_ \ "name" == v \ "name") get,
-                                    "allowableValues",
-                                    "type",
-                                    "$ref",
-                                    "items",
-                                    "paramType",
-                                    "defaultValue",
-                                    "description",
-                                    "name",
-                                    "required",
-                                    "paramAccess")
+              val mm = verifyFields(
+                v,
+                ef find (_ \ "name" == v \ "name") get,
+                "allowableValues",
+                "type",
+                "$ref",
+                "items",
+                "paramType",
+                "defaultValue",
+                "description",
+                "name",
+                "required",
+                "paramAccess")
               mm setMessage
                 (mm.message + " in parameter " + (v \ "name").extractOrElse(
                   "N/A"))
@@ -564,72 +569,83 @@ object ApiResponseType {
 }
 
 class PetData {
-  var categories = List(Category(1, "Dogs"),
-                        Category(2, "Cats"),
-                        Category(3, "Rabbits"),
-                        Category(4, "Lions"))
+  var categories = List(
+    Category(1, "Dogs"),
+    Category(2, "Cats"),
+    Category(3, "Rabbits"),
+    Category(4, "Lions"))
 
   var pets = List(
-    Pet(1,
-        categories(1),
-        "Cat 1",
-        List("url1", "url2"),
-        List(Tag(1, "tag1"), Tag(2, "tag2")),
-        "available"),
-    Pet(2,
-        categories(1),
-        "Cat 1",
-        List("url1", "url2"),
-        List(Tag(1, "tag1"), Tag(2, "tag2")),
-        "available"),
-    Pet(3,
-        categories(1),
-        "Cat 1",
-        List("url1", "url2"),
-        List(Tag(1, "tag1"), Tag(2, "tag2")),
-        "available"),
-    Pet(4,
-        categories(0),
-        "Dog 1",
-        List("url1", "url2"),
-        List(Tag(1, "tag1"), Tag(2, "tag2")),
-        "available"),
-    Pet(5,
-        categories(0),
-        "Dog 1",
-        List("url1", "url2"),
-        List(Tag(1, "tag1"), Tag(2, "tag2")),
-        "available"),
-    Pet(6,
-        categories(0),
-        "Dog 1",
-        List("url1", "url2"),
-        List(Tag(1, "tag1"), Tag(2, "tag2")),
-        "available"),
-    Pet(7,
-        categories(3),
-        "Lion 1",
-        List("url1", "url2"),
-        List(Tag(1, "tag1"), Tag(2, "tag2")),
-        "available"),
-    Pet(8,
-        categories(3),
-        "Lion 1",
-        List("url1", "url2"),
-        List(Tag(1, "tag1"), Tag(2, "tag2")),
-        "available"),
-    Pet(9,
-        categories(3),
-        "Lion 1",
-        List("url1", "url2"),
-        List(Tag(1, "tag1"), Tag(2, "tag2")),
-        "available"),
-    Pet(10,
-        categories(2),
-        "Rabbit 1",
-        List("url1", "url2"),
-        List(Tag(1, "tag1"), Tag(2, "tag2")),
-        "available")
+    Pet(
+      1,
+      categories(1),
+      "Cat 1",
+      List("url1", "url2"),
+      List(Tag(1, "tag1"), Tag(2, "tag2")),
+      "available"),
+    Pet(
+      2,
+      categories(1),
+      "Cat 1",
+      List("url1", "url2"),
+      List(Tag(1, "tag1"), Tag(2, "tag2")),
+      "available"),
+    Pet(
+      3,
+      categories(1),
+      "Cat 1",
+      List("url1", "url2"),
+      List(Tag(1, "tag1"), Tag(2, "tag2")),
+      "available"),
+    Pet(
+      4,
+      categories(0),
+      "Dog 1",
+      List("url1", "url2"),
+      List(Tag(1, "tag1"), Tag(2, "tag2")),
+      "available"),
+    Pet(
+      5,
+      categories(0),
+      "Dog 1",
+      List("url1", "url2"),
+      List(Tag(1, "tag1"), Tag(2, "tag2")),
+      "available"),
+    Pet(
+      6,
+      categories(0),
+      "Dog 1",
+      List("url1", "url2"),
+      List(Tag(1, "tag1"), Tag(2, "tag2")),
+      "available"),
+    Pet(
+      7,
+      categories(3),
+      "Lion 1",
+      List("url1", "url2"),
+      List(Tag(1, "tag1"), Tag(2, "tag2")),
+      "available"),
+    Pet(
+      8,
+      categories(3),
+      "Lion 1",
+      List("url1", "url2"),
+      List(Tag(1, "tag1"), Tag(2, "tag2")),
+      "available"),
+    Pet(
+      9,
+      categories(3),
+      "Lion 1",
+      List("url1", "url2"),
+      List(Tag(1, "tag1"), Tag(2, "tag2")),
+      "available"),
+    Pet(
+      10,
+      categories(2),
+      "Rabbit 1",
+      List("url1", "url2"),
+      List(Tag(1, "tag1"), Tag(2, "tag2")),
+      "available")
   )
 
   def getPetbyId(id: Long): Option[Pet] = pets.find(_.id == id)

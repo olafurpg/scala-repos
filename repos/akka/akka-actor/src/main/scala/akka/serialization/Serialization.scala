@@ -209,9 +209,10 @@ class Serialization(val system: ExtendedActorSystem) extends Extension {
                   "'akka.actor.warn-about-java-serializer-usage'",
                 clazz.getName)
             }
-            log.debug("Using serializer[{}] for message [{}]",
-                      ser.getClass.getName,
-                      clazz.getName)
+            log.debug(
+              "Using serializer[{}] for message [{}]",
+              ser.getClass.getName,
+              clazz.getName)
             ser
           case some ⇒ some
         }

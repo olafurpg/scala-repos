@@ -46,12 +46,14 @@ class TableConstraintsTest {
     val ts = TableQuery[T]
 
     val foreignKeys = ts.baseTableRow.foreignKeys.map(_.name)
-    assertTrue("foreignKeys should be sorted by name",
-               foreignKeys == Seq("fk_bar", "fk_foo"))
+    assertTrue(
+      "foreignKeys should be sorted by name",
+      foreignKeys == Seq("fk_bar", "fk_foo"))
 
     val primaryKeys = ts.baseTableRow.primaryKeys.map(_.name)
-    assertTrue("primaryKeys should be sorted by name",
-               primaryKeys == Seq("pk1_t", "pk2_t"))
+    assertTrue(
+      "primaryKeys should be sorted by name",
+      primaryKeys == Seq("pk1_t", "pk2_t"))
 
     val indexes = ts.baseTableRow.indexes.map(_.name)
     assertTrue(

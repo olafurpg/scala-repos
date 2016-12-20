@@ -1126,8 +1126,9 @@ sealed abstract class MapInstances extends MapInstances0 {
         case Tip() =>
           F.zero
         case Bin(k, x, l, r) =>
-          F.append(bifoldMap(l)(f)(g),
-                   F.append(f(k), F.append(g(x), bifoldMap(r)(f)(g))))
+          F.append(
+            bifoldMap(l)(f)(g),
+            F.append(f(k), F.append(g(x), bifoldMap(r)(f)(g))))
       }
 
     def bifoldRight[A, B, C](fa: A ==>> B, z: => C)(f: (A, => C) => C)(

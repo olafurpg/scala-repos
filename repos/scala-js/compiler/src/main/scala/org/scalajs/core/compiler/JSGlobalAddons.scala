@@ -48,8 +48,9 @@ trait JSGlobalAddons extends JSDefinitions with Compat210Component {
     }
 
     private def assertValidForRegistration(sym: Symbol): Unit = {
-      assert(sym.isConstructor || sym.isClass,
-             "Can only register constructors or classes for export")
+      assert(
+        sym.isConstructor || sym.isClass,
+        "Can only register constructors or classes for export")
     }
 
     def clearRegisteredExports(): Unit =

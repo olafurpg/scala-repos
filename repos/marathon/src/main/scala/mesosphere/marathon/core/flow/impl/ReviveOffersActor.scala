@@ -22,11 +22,12 @@ private[flow] object ReviveOffersActor {
             offersWanted: Observable[Boolean],
             driverHolder: MarathonSchedulerDriverHolder): Props = {
     Props(
-      new ReviveOffersActor(clock,
-                            conf,
-                            marathonEventStream,
-                            offersWanted,
-                            driverHolder))
+      new ReviveOffersActor(
+        clock,
+        conf,
+        marathonEventStream,
+        offersWanted,
+        driverHolder))
   }
 
   private[impl] case object TimedCheck
@@ -97,9 +98,10 @@ private[impl] class ReviveOffersActor(
           conf.minReviveOffersInterval())
         nextReviveCancellableOpt = Some(schedulerCheck(untilNextRevive))
       } else if (log.isDebugEnabled) {
-        log.info("=> Next revive already scheduled at {} not yet due for {}",
-                 nextRevive,
-                 untilNextRevive)
+        log.info(
+          "=> Next revive already scheduled at {} not yet due for {}",
+          nextRevive,
+          untilNextRevive)
       }
     }
   }
@@ -118,8 +120,9 @@ private[impl] class ReviveOffersActor(
       initiateNewSeriesOfRevives()
 
     case OffersWanted(false) =>
-      log.info("Received offers NOT WANTED notification, canceling {} revives",
-               revivesNeeded)
+      log.info(
+        "Received offers NOT WANTED notification, canceling {} revives",
+        revivesNeeded)
       offersCurrentlyWanted = false
       revivesNeeded = 0
       nextReviveCancellableOpt.foreach(_.cancel())

@@ -57,10 +57,11 @@ class HistoryServer(conf: SparkConf,
                     provider: ApplicationHistoryProvider,
                     securityManager: SecurityManager,
                     port: Int)
-    extends WebUI(securityManager,
-                  securityManager.getSSLOptions("historyServer"),
-                  port,
-                  conf)
+    extends WebUI(
+      securityManager,
+      securityManager.getSSLOptions("historyServer"),
+      port,
+      conf)
     with Logging
     with UIRoot
     with ApplicationCacheOperations {
@@ -164,8 +165,9 @@ class HistoryServer(conf: SparkConf,
                              attemptId: Option[String],
                              ui: SparkUI,
                              completed: Boolean) {
-    assert(serverInfo.isDefined,
-           "HistoryServer must be bound before attaching SparkUIs")
+    assert(
+      serverInfo.isDefined,
+      "HistoryServer must be bound before attaching SparkUIs")
     ui.getHandlers.foreach(attachHandler)
     addFilters(ui.getHandlers, conf)
   }
@@ -174,8 +176,9 @@ class HistoryServer(conf: SparkConf,
   override def detachSparkUI(appId: String,
                              attemptId: Option[String],
                              ui: SparkUI): Unit = {
-    assert(serverInfo.isDefined,
-           "HistoryServer must be bound before detaching SparkUIs")
+    assert(
+      serverInfo.isDefined,
+      "HistoryServer must be bound before detaching SparkUIs")
     ui.getHandlers.foreach(detachHandler)
   }
 

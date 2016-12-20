@@ -444,16 +444,18 @@ trait PersistentFSMBase[S, D, E]
       // TODO Use context.watch(actor) and receive Terminated(actor) to clean up list
       listeners.add(actorRef)
       // send current state back as reference point
-      actorRef ! CurrentState(self,
-                              currentState.stateName,
-                              currentState.timeout)
+      actorRef ! CurrentState(
+        self,
+        currentState.stateName,
+        currentState.timeout)
     case Listen(actorRef) ⇒
       // TODO Use context.watch(actor) and receive Terminated(actor) to clean up list
       listeners.add(actorRef)
       // send current state back as reference point
-      actorRef ! CurrentState(self,
-                              currentState.stateName,
-                              currentState.timeout)
+      actorRef ! CurrentState(
+        self,
+        currentState.stateName,
+        currentState.timeout)
     case UnsubscribeTransitionCallBack(actorRef) ⇒
       listeners.remove(actorRef)
     case Deafen(actorRef) ⇒
@@ -510,10 +512,11 @@ trait PersistentFSMBase[S, D, E]
         this.nextState = nextState
         handleTransition(currentState.stateName, nextState.stateName)
         gossip(
-          Transition(self,
-                     currentState.stateName,
-                     nextState.stateName,
-                     nextState.timeout))
+          Transition(
+            self,
+            currentState.stateName,
+            nextState.stateName,
+            nextState.timeout))
         this.nextState = null
       }
       currentState = nextState

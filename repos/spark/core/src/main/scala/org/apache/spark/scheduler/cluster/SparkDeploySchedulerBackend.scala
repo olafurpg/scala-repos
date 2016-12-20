@@ -59,18 +59,19 @@ private[spark] class SparkDeploySchedulerBackend(scheduler: TaskSchedulerImpl,
       sc.conf.get("spark.driver.host"),
       sc.conf.get("spark.driver.port").toInt,
       CoarseGrainedSchedulerBackend.ENDPOINT_NAME).toString
-    val args = Seq("--driver-url",
-                   driverUrl,
-                   "--executor-id",
-                   "{{EXECUTOR_ID}}",
-                   "--hostname",
-                   "{{HOSTNAME}}",
-                   "--cores",
-                   "{{CORES}}",
-                   "--app-id",
-                   "{{APP_ID}}",
-                   "--worker-url",
-                   "{{WORKER_URL}}")
+    val args = Seq(
+      "--driver-url",
+      driverUrl,
+      "--executor-id",
+      "{{EXECUTOR_ID}}",
+      "--hostname",
+      "{{HOSTNAME}}",
+      "--cores",
+      "{{CORES}}",
+      "--app-id",
+      "{{APP_ID}}",
+      "--worker-url",
+      "{{WORKER_URL}}")
     val extraJavaOpts = sc.conf
       .getOption("spark.executor.extraJavaOptions")
       .map(Utils.splitCommandString)
@@ -115,15 +116,16 @@ private[spark] class SparkDeploySchedulerBackend(scheduler: TaskSchedulerImpl,
       } else {
         None
       }
-    val appDesc = new ApplicationDescription(sc.appName,
-                                             maxCores,
-                                             sc.executorMemory,
-                                             command,
-                                             appUIAddress,
-                                             sc.eventLogDir,
-                                             sc.eventLogCodec,
-                                             coresPerExecutor,
-                                             initialExecutorLimit)
+    val appDesc = new ApplicationDescription(
+      sc.appName,
+      maxCores,
+      sc.executorMemory,
+      command,
+      appUIAddress,
+      sc.eventLogDir,
+      sc.eventLogCodec,
+      coresPerExecutor,
+      initialExecutorLimit)
     client = new AppClient(sc.env.rpcEnv, masters, appDesc, this, conf)
     client.start()
     launcherBackend.setState(SparkAppHandle.State.SUBMITTED)

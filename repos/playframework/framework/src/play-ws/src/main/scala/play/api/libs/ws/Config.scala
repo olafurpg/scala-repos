@@ -50,16 +50,18 @@ class WSConfigParser @Inject()(configuration: Configuration,
 
     val compressionEnabled = config.get[Boolean]("compressionEnabled")
 
-    val sslConfig = new SSLConfigParser(config.get[PlayConfig]("ssl"),
-                                        environment.classLoader).parse()
+    val sslConfig = new SSLConfigParser(
+      config.get[PlayConfig]("ssl"),
+      environment.classLoader).parse()
 
-    WSClientConfig(connectionTimeout = connectionTimeout,
-                   idleTimeout = idleTimeout,
-                   requestTimeout = requestTimeout,
-                   followRedirects = followRedirects,
-                   useProxyProperties = useProxyProperties,
-                   userAgent = userAgent,
-                   compressionEnabled = compressionEnabled,
-                   ssl = sslConfig)
+    WSClientConfig(
+      connectionTimeout = connectionTimeout,
+      idleTimeout = idleTimeout,
+      requestTimeout = requestTimeout,
+      followRedirects = followRedirects,
+      useProxyProperties = useProxyProperties,
+      userAgent = userAgent,
+      compressionEnabled = compressionEnabled,
+      ssl = sslConfig)
   }
 }

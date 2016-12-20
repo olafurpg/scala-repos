@@ -90,13 +90,14 @@ object TestPurgatoryPerformance {
 
     val options = parser.parse(args: _*)
 
-    CommandLineUtils.checkRequiredArgs(parser,
-                                       options,
-                                       numRequestsOpt,
-                                       requestRateOpt,
-                                       requestDataSizeOpt,
-                                       pct75Opt,
-                                       pct50Opt)
+    CommandLineUtils.checkRequiredArgs(
+      parser,
+      options,
+      numRequestsOpt,
+      requestRateOpt,
+      requestDataSizeOpt,
+      pct75Opt,
+      pct50Opt)
 
     val numRequests = options.valueOf(numRequestsOpt).intValue
     val requestRate = options.valueOf(requestRateOpt).doubleValue
@@ -140,10 +141,11 @@ object TestPurgatoryPerformance {
 
           if (requestArrivalTime > now) Thread.sleep(requestArrivalTime - now)
 
-          val request = new FakeOperation(timeout,
-                                          requestDataSize,
-                                          latencyToComplete,
-                                          latch)
+          val request = new FakeOperation(
+            timeout,
+            requestDataSize,
+            latencyToComplete,
+            latch)
           if (latencyToComplete < timeout) queue.add(request)
           purgatory.tryCompleteElseWatch(request, keys)
         }
@@ -179,12 +181,13 @@ object TestPurgatoryPerformance {
     val gcTimes = gcMXBeans.map(_.getCollectionTime)
 
     println(
-      "%d\t%f\t%f\t%d\t%s\t%s".format(done - start,
-                                      targetRate,
-                                      actualRate,
-                                      cpuTime.getOrElse(-1L),
-                                      gcCounts.mkString(" "),
-                                      gcTimes.mkString(" ")))
+      "%d\t%f\t%f\t%d\t%s\t%s".format(
+        done - start,
+        targetRate,
+        actualRate,
+        cpuTime.getOrElse(-1L),
+        gcCounts.mkString(" "),
+        gcTimes.mkString(" ")))
 
     purgatory.shutdown()
   }
@@ -337,8 +340,9 @@ object TestPurgatoryPerformance {
 
     private class Scheduled(val operation: FakeOperation) extends Delayed {
       def getDelay(unit: TimeUnit): Long = {
-        unit.convert(max(operation.completesAt - SystemTime.milliseconds, 0),
-                     TimeUnit.MILLISECONDS)
+        unit.convert(
+          max(operation.completesAt - SystemTime.milliseconds, 0),
+          TimeUnit.MILLISECONDS)
       }
 
       def compareTo(d: Delayed): Int = {

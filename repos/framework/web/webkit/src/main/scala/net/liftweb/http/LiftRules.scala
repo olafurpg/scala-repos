@@ -401,10 +401,11 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
       case _ =>
         val ret = LiftSession(req)
         ret.fixSessionTime()
-        SessionMaster.addSession(ret,
-                                 req,
-                                 req.request.userAgent,
-                                 SessionMaster.getIpFromReq(req))
+        SessionMaster.addSession(
+          ret,
+          req,
+          req.request.userAgent,
+          SessionMaster.getIpFromReq(req))
         ret
     }
 
@@ -543,8 +544,9 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
       newUrl = new java.net.URL(
         url.toExternalForm.split("!")(0) + "!" + "/META-INF/MANIFEST.MF")
       str <- tryo(
-        new String(readWholeStream(newUrl.openConnection.getInputStream),
-                   "UTF-8"))
+        new String(
+          readWholeStream(newUrl.openConnection.getInputStream),
+          "UTF-8"))
       ma <- """Implementation-Version: (.*)""".r.findFirstMatchIn(str)
     } yield ma.group(1)
 
@@ -558,8 +560,9 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
       newUrl = new java.net.URL(
         url.toExternalForm.split("!")(0) + "!" + "/META-INF/MANIFEST.MF")
       str <- tryo(
-        new String(readWholeStream(newUrl.openConnection.getInputStream),
-                   "UTF-8"))
+        new String(
+          readWholeStream(newUrl.openConnection.getInputStream),
+          "UTF-8"))
       ma <- """Built-Time: (.*)""".r.findFirstMatchIn(str)
       asLong <- asLong(ma.group(1))
     } yield new Date(asLong)
@@ -1063,19 +1066,21 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
             DataAttributeProcessorAnswerFuture(
               LAFuture(
                 () =>
-                  new Elem("lift",
-                           snippetName,
-                           decodedMetaData,
-                           element.scope,
-                           false,
-                           element)))
+                  new Elem(
+                    "lift",
+                    snippetName,
+                    decodedMetaData,
+                    element.scope,
+                    false,
+                    element)))
           } else {
-            new Elem("lift",
-                     snippetName,
-                     decodedMetaData,
-                     element.scope,
-                     false,
-                     element)
+            new Elem(
+              "lift",
+              snippetName,
+              decodedMetaData,
+              element.scope,
+              false,
+              element)
           }
       }
   }
@@ -1588,12 +1593,13 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
                   code: Int) =
     convertResponse({
       val ret =
-        XhtmlResponse(ns,
-                      /*LiftRules.docType.vend(req)*/ S.htmlProperties.docType,
-                      headers,
-                      cookies,
-                      code,
-                      S.legacyIeCompatibilityMode)
+        XhtmlResponse(
+          ns,
+          /*LiftRules.docType.vend(req)*/ S.htmlProperties.docType,
+          headers,
+          cookies,
+          code,
+          S.legacyIeCompatibilityMode)
       ret._includeXmlVersion = !S.skipDocType
       ret
     }, headers, cookies, req)
@@ -1603,10 +1609,11 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     case _ =>
       val d = Helpers.nowAsInternetDate
 
-      List("Expires" -> d,
-           "Date" -> d,
-           "Cache-Control" -> "no-cache, private, no-store",
-           "Pragma" -> "no-cache")
+      List(
+        "Expires" -> d,
+        "Date" -> d,
+        "Cache-Control" -> "no-cache, private, no-store",
+        "Pragma" -> "no-cache")
   }
 
   /**
@@ -1681,9 +1688,10 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     */
   val exceptionHandler = RulesSeq[ExceptionHandlerPF].append {
     case (Props.RunModes.Development, r, e) =>
-      logger.error("Exception being returned to browser when processing " +
-                     r.uri.toString,
-                   e)
+      logger.error(
+        "Exception being returned to browser when processing " +
+          r.uri.toString,
+        e)
       XhtmlResponse(
         (<html> <body>Exception occured while processing {r.uri}<pre>{showException(e)}</pre> </body> </html>),
         S.htmlProperties.docType,
@@ -1693,9 +1701,10 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
         S.legacyIeCompatibilityMode)
 
     case (_, r, e) =>
-      logger.error("Exception being returned to browser when processing " +
-                     r.uri.toString,
-                   e)
+      logger.error(
+        "Exception being returned to browser when processing " +
+          r.uri.toString,
+        e)
       XhtmlResponse(
         (<html> <body>Something unexpected happened while serving the page at {r.uri}</body> </html>),
         S.htmlProperties.docType,
@@ -1785,8 +1794,9 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
           {
             css.map(
               str =>
-                CSSHelpers.fixCSS(new BufferedReader(new StringReader(str)),
-                                  prefix openOr (S.contextPath)) match {
+                CSSHelpers.fixCSS(
+                  new BufferedReader(new StringReader(str)),
+                  prefix openOr (S.contextPath)) match {
                   case (Full(c), _) => CSSResponse(c)
                   case (x, input) => {
                     logger.info(
@@ -2011,10 +2021,11 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
   var handleMimeFile: (String, String, String,
                        InputStream) => FileParamHolder =
     (fieldName, contentType, fileName, inputStream) =>
-      new InMemFileParamHolder(fieldName,
-                               contentType,
-                               fileName,
-                               Helpers.readWholeStream(inputStream))
+      new InMemFileParamHolder(
+        fieldName,
+        contentType,
+        fileName,
+        Helpers.readWholeStream(inputStream))
 
   private object _mimeHeaders
       extends TransientRequestVar[Box[Map[String, List[String]]]](Empty)
@@ -2345,9 +2356,10 @@ abstract class GenericValidator extends XHtmlValidator with Loggable {
       } catch {
         case e: org.xml.sax.SAXParseException =>
           List(
-            XHTMLValidationError(e.getMessage,
-                                 e.getLineNumber,
-                                 e.getColumnNumber))
+            XHTMLValidationError(
+              e.getMessage,
+              e.getLineNumber,
+              e.getColumnNumber))
       }) match {
       case Full(x) => x
       case Failure(msg, _, _) =>

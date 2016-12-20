@@ -110,16 +110,19 @@ class ParquetHiveCompatibilitySuite
   }
 
   test("SPARK-10177 timestamp") {
-    testParquetHiveCompatibility(Row(Timestamp.valueOf("2015-08-24 00:31:00")),
-                                 "TIMESTAMP")
+    testParquetHiveCompatibility(
+      Row(Timestamp.valueOf("2015-08-24 00:31:00")),
+      "TIMESTAMP")
   }
 
   test("array") {
     testParquetHiveCompatibility(
-      Row(Seq[Integer](1: Integer, null, 2: Integer, null),
-          Seq[String]("foo", null, "bar", null),
-          Seq[Seq[Integer]](Seq[Integer](1: Integer, null),
-                            Seq[Integer](2: Integer, null))),
+      Row(
+        Seq[Integer](1: Integer, null, 2: Integer, null),
+        Seq[String]("foo", null, "bar", null),
+        Seq[Seq[Integer]](
+          Seq[Integer](1: Integer, null),
+          Seq[Integer](2: Integer, null))),
       "ARRAY<INT>",
       "ARRAY<STRING>",
       "ARRAY<ARRAY<INT>>")
@@ -135,13 +138,15 @@ class ParquetHiveCompatibilitySuite
   ignore("map entries with null keys") {
     testParquetHiveCompatibility(
       Row(
-        Map[Integer, String](null.asInstanceOf[Integer] -> "bar",
-                             null.asInstanceOf[Integer] -> null)),
+        Map[Integer, String](
+          null.asInstanceOf[Integer] -> "bar",
+          null.asInstanceOf[Integer] -> null)),
       "MAP<INT, STRING>")
   }
 
   test("struct") {
-    testParquetHiveCompatibility(Row(Row(1, Seq("foo", "bar", null))),
-                                 "STRUCT<f0: INT, f1: ARRAY<STRING>>")
+    testParquetHiveCompatibility(
+      Row(Row(1, Seq("foo", "bar", null))),
+      "STRUCT<f0: INT, f1: ARRAY<STRING>>")
   }
 }

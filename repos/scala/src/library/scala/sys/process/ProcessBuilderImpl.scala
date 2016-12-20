@@ -35,8 +35,9 @@ private[process] trait ProcessBuilderImpl { self: ProcessBuilder.type =>
   private[process] class FileInput(file: File)
       extends IStreamBuilder(new FileInputStream(file), file.getAbsolutePath)
   private[process] class FileOutput(file: File, append: Boolean)
-      extends OStreamBuilder(new FileOutputStream(file, append),
-                             file.getAbsolutePath)
+      extends OStreamBuilder(
+        new FileOutputStream(file, append),
+        file.getAbsolutePath)
 
   private[process] class OStreamBuilder(
       stream: => OutputStream,
@@ -98,8 +99,9 @@ private[process] trait ProcessBuilderImpl { self: ProcessBuilder.type =>
     protected def toSink = this
 
     def #|(other: ProcessBuilder): ProcessBuilder = {
-      require(other.canPipeTo,
-              "Piping to multiple processes is not supported.")
+      require(
+        other.canPipeTo,
+        "Piping to multiple processes is not supported.")
       new PipedBuilder(this, other, false)
     }
     def #||(other: ProcessBuilder): ProcessBuilder = new OrBuilder(this, other)

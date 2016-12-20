@@ -78,8 +78,9 @@ abstract class AddInterfaces extends InfoTransform { self: Erasure =>
         // jvm doesn't throw a VerifyError. But we can't add the
         // body until now, because the typer knows that Any has no
         // constructor and won't accept a call to super.init.
-        assert((clazz isSubClass AnyValClass) || clazz.info.parents.isEmpty,
-               clazz)
+        assert(
+          (clazz isSubClass AnyValClass) || clazz.info.parents.isEmpty,
+          clazz)
         Block(List(Apply(gen.mkSuperInitCall, Nil)), expr)
 
       case Block(stats, expr) =>

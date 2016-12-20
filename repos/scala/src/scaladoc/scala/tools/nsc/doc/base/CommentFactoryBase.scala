@@ -257,23 +257,26 @@ trait CommentFactoryBase { this: MemberLookupBase =>
       case CodeBlockStartRegex(before, marker, after) :: ls
           if (!inCodeBlock) =>
         if (!before.trim.isEmpty && !after.trim.isEmpty)
-          parse0(docBody,
-                 tags,
-                 lastTagKey,
-                 before :: marker :: after :: ls,
-                 inCodeBlock = false)
+          parse0(
+            docBody,
+            tags,
+            lastTagKey,
+            before :: marker :: after :: ls,
+            inCodeBlock = false)
         else if (!before.trim.isEmpty)
-          parse0(docBody,
-                 tags,
-                 lastTagKey,
-                 before :: marker :: ls,
-                 inCodeBlock = false)
+          parse0(
+            docBody,
+            tags,
+            lastTagKey,
+            before :: marker :: ls,
+            inCodeBlock = false)
         else if (!after.trim.isEmpty)
-          parse0(docBody,
-                 tags,
-                 lastTagKey,
-                 marker :: after :: ls,
-                 inCodeBlock = true)
+          parse0(
+            docBody,
+            tags,
+            lastTagKey,
+            marker :: after :: ls,
+            inCodeBlock = true)
         else
           lastTagKey match {
             case Some(key) =>
@@ -281,38 +284,43 @@ trait CommentFactoryBase { this: MemberLookupBase =>
                 case Some(b :: bs) => (b + endOfLine + marker) :: bs
                 case None => oops("lastTagKey set when no tag exists for key")
               }
-              parse0(docBody,
-                     tags + (key -> value),
-                     lastTagKey,
-                     ls,
-                     inCodeBlock = true)
+              parse0(
+                docBody,
+                tags + (key -> value),
+                lastTagKey,
+                ls,
+                inCodeBlock = true)
             case None =>
-              parse0(docBody append endOfLine append marker,
-                     tags,
-                     lastTagKey,
-                     ls,
-                     inCodeBlock = true)
+              parse0(
+                docBody append endOfLine append marker,
+                tags,
+                lastTagKey,
+                ls,
+                inCodeBlock = true)
           }
 
       case CodeBlockEndRegex(before, marker, after) :: ls => {
         if (!before.trim.isEmpty && !after.trim.isEmpty)
-          parse0(docBody,
-                 tags,
-                 lastTagKey,
-                 before :: marker :: after :: ls,
-                 inCodeBlock = true)
+          parse0(
+            docBody,
+            tags,
+            lastTagKey,
+            before :: marker :: after :: ls,
+            inCodeBlock = true)
         if (!before.trim.isEmpty)
-          parse0(docBody,
-                 tags,
-                 lastTagKey,
-                 before :: marker :: ls,
-                 inCodeBlock = true)
+          parse0(
+            docBody,
+            tags,
+            lastTagKey,
+            before :: marker :: ls,
+            inCodeBlock = true)
         else if (!after.trim.isEmpty)
-          parse0(docBody,
-                 tags,
-                 lastTagKey,
-                 marker :: after :: ls,
-                 inCodeBlock = false)
+          parse0(
+            docBody,
+            tags,
+            lastTagKey,
+            marker :: after :: ls,
+            inCodeBlock = false)
         else
           lastTagKey match {
             case Some(key) =>
@@ -321,17 +329,19 @@ trait CommentFactoryBase { this: MemberLookupBase =>
                 case None =>
                   oops("lastTagKey set when no tag exists for key")
               }
-              parse0(docBody,
-                     tags + (key -> value),
-                     lastTagKey,
-                     ls,
-                     inCodeBlock = false)
+              parse0(
+                docBody,
+                tags + (key -> value),
+                lastTagKey,
+                ls,
+                inCodeBlock = false)
             case None =>
-              parse0(docBody append endOfLine append marker,
-                     tags,
-                     lastTagKey,
-                     ls,
-                     inCodeBlock = false)
+              parse0(
+                docBody append endOfLine append marker,
+                tags,
+                lastTagKey,
+                ls,
+                inCodeBlock = false)
           }
       }
 
@@ -389,10 +399,11 @@ trait CommentFactoryBase { this: MemberLookupBase =>
             case None => List.empty
           }
 
-        val stripTags = List(inheritDiagramTag,
-                             contentDiagramTag,
-                             SimpleTagKey("template"),
-                             SimpleTagKey("documentable"))
+        val stripTags = List(
+          inheritDiagramTag,
+          contentDiagramTag,
+          SimpleTagKey("template"),
+          SimpleTagKey("documentable"))
         val tagsWithoutDiagram =
           tags.filterNot(pair => stripTags.contains(pair._1))
 
@@ -492,11 +503,12 @@ trait CommentFactoryBase { this: MemberLookupBase =>
       }
     }
 
-    parse0(new StringBuilder(comment.size),
-           Map.empty,
-           None,
-           clean(comment),
-           inCodeBlock = false)
+    parse0(
+      new StringBuilder(comment.size),
+      Map.empty,
+      None,
+      clean(comment),
+      inCodeBlock = false)
   }
 
   /** Parses a string containing wiki syntax into a `Comment` object.
@@ -821,8 +833,9 @@ trait CommentFactoryBase { this: MemberLookupBase =>
     /** {{{ eol ::= { whitespace } '\n' }}} */
     def blockEnded(blockType: String): Unit = {
       if (char != endOfLine && char != endOfText) {
-        reportError(pos,
-                    "no additional content on same line after " + blockType)
+        reportError(
+          pos,
+          "no additional content on same line after " + blockType)
         jumpUntil(endOfLine)
       }
       while (char == endOfLine) nextChar()

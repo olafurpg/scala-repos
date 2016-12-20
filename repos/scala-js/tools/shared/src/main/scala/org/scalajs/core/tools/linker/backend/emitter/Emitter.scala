@@ -138,8 +138,9 @@ final class Emitter private (semantics: Semantics,
       val methodCache = classCache.getStaticCache(m.info.encodedName)
 
       addTree(
-        methodCache.getOrElseUpdate(m.version,
-                                    classEmitter.genMethod(className, m.tree)))
+        methodCache.getOrElseUpdate(
+          m.version,
+          classEmitter.genMethod(className, m.tree)))
     }
 
     if (linkedClass.hasInstances && kind.isAnyScalaJSDefinedClass) {
@@ -150,8 +151,9 @@ final class Emitter private (semantics: Semantics,
       val memberMethods = for (m <- linkedClass.memberMethods) yield {
         val methodCache = classCache.getMethodCache(m.info.encodedName)
 
-        methodCache.getOrElseUpdate(m.version,
-                                    classEmitter.genMethod(className, m.tree))
+        methodCache.getOrElseUpdate(
+          m.version,
+          classEmitter.genMethod(className, m.tree))
       }
 
       // Exported Members

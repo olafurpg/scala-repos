@@ -34,9 +34,10 @@ sealed trait Parsed[+T] {
 
 case class ParseError(failure: Parsed.Failure)
     extends Exception(
-      ParseError.msg0(failure.extra.input,
-                      failure.extra.traced.expected,
-                      failure.index)
+      ParseError.msg0(
+        failure.extra.input,
+        failure.extra.traced.expected,
+        failure.index)
     )
 
 object ParseError {
@@ -204,10 +205,11 @@ object Parsed {
       * the default error message isn't to your liking.
       */
     lazy val trace = {
-      Failure.formatStackTrace(stack,
-                               input,
-                               index,
-                               Failure.formatParser(expected0, input, index))
+      Failure.formatStackTrace(
+        stack,
+        input,
+        index,
+        Failure.formatParser(expected0, input, index))
     }
   }
   object TracedFailure {
@@ -219,12 +221,13 @@ object Parsed {
 
       val mutFailure = originalParser
         .parseRec(
-          new ParseCtx(input,
-                       0,
-                       index,
-                       originalParser,
-                       originalIndex,
-                       (_, _, _) => ()),
+          new ParseCtx(
+            input,
+            0,
+            index,
+            originalParser,
+            originalIndex,
+            (_, _, _) => ()),
           originalIndex
         )
         .asInstanceOf[Mutable.Failure]
@@ -315,11 +318,12 @@ object Mutable {
                      var cut: Boolean)
       extends Mutable[Nothing] {
     def toResult = {
-      val extra = new Parsed.Failure.Extra.Impl(input,
-                                                originalParser,
-                                                originalIndex,
-                                                lastParser,
-                                                index)
+      val extra = new Parsed.Failure.Extra.Impl(
+        input,
+        originalParser,
+        originalIndex,
+        lastParser,
+        index)
       Parsed.Failure(lastParser, index, extra)
     }
   }
@@ -343,8 +347,9 @@ class ParseCtx(val input: String,
                val originalIndex: Int,
                val instrument: (Parser[_], Int, () => Parsed[_]) => Unit) {
   require(logDepth >= -1, "logDepth can only be -1 (for no logs) or >= 0")
-  require(traceIndex >= -1,
-          "traceIndex can only be -1 (for no tracing) or an index 0")
+  require(
+    traceIndex >= -1,
+    "traceIndex can only be -1 (for no tracing) or an index 0")
   val failure = Mutable.Failure(
     input,
     mutable.Buffer(),

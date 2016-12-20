@@ -42,10 +42,11 @@ object STUsage extends App {
   def binSort[A: ClassTag](size: Int,
                            key: A => Int,
                            as: List[A]): ImmutableArray[List[A]] =
-    accumArray(size,
-               (vs: List[A], v: A) => v :: vs,
-               List(),
-               for { a <- as } yield (key(a), a))
+    accumArray(
+      size,
+      (vs: List[A], v: A) => v :: vs,
+      List(),
+      for { a <- as } yield (key(a), a))
 
   assert(
     binSort(12, (_: String).length, List("twenty four", "one", "")).toList.flatten === List(

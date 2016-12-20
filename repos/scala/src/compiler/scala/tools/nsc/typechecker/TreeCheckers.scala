@@ -220,8 +220,9 @@ abstract class TreeCheckers extends Analyzer {
     currentRun.currentUnit = unit
     body
     currentRun.advanceUnit()
-    assertFn(currentUnit == unit,
-             "currentUnit is " + currentUnit + ", but unit is " + unit)
+    assertFn(
+      currentUnit == unit,
+      "currentUnit is " + currentUnit + ", but unit is " + unit)
     currentRun.currentUnit = unit0
   }
   def check(unit: CompilationUnit) {
@@ -339,15 +340,17 @@ abstract class TreeCheckers extends Analyzer {
             }
           case ValDef(_, _, _, _) =>
             if (sym.hasGetter && !sym.isOuterField && !sym.isOuterAccessor) {
-              assertFn(sym.getterIn(sym.owner) != NoSymbol,
-                       ownerstr(sym) + " has getter but cannot be found. " +
-                         sym.ownerChain)
+              assertFn(
+                sym.getterIn(sym.owner) != NoSymbol,
+                ownerstr(sym) + " has getter but cannot be found. " +
+                  sym.ownerChain)
             }
           case Apply(fn, args) =>
             if (args exists (_ == EmptyTree))
-              errorFn(tree.pos,
-                      "Apply arguments to " + fn +
-                        " contains an empty tree: " + args)
+              errorFn(
+                tree.pos,
+                "Apply arguments to " + fn +
+                  " contains an empty tree: " + args)
 
           case Select(qual, name) =>
             checkSym(tree)

@@ -43,11 +43,12 @@ class DefaultRuntimePicklerGenerator(reflectionLock: ReentrantLock)
           val elemTag = FastTypeTag.mkRaw(elemClass, mirror)
           val elemPickler =
             currentRuntime.picklers.genPickler(classLoader, elemClass, elemTag)
-          mkRuntimeTravPickler[Array[AnyRef]](elemClass,
-                                              elemTag,
-                                              tag,
-                                              elemPickler,
-                                              null)
+          mkRuntimeTravPickler[Array[AnyRef]](
+            elemClass,
+            elemTag,
+            tag,
+            elemPickler,
+            null)
         } else {
           val runtime = new RuntimePickler(classLoader, clazz, tag)
           runtime.mkPickler
@@ -73,11 +74,12 @@ class DefaultRuntimePicklerGenerator(reflectionLock: ReentrantLock)
           val elemUnpickler = internal.currentRuntime.picklers
             .genUnpickler(mirror, elemTypeString)
           val tag = FastTypeTag(currentRuntime.currentMirror, tagKey)
-          mkRuntimeTravPickler[Array[AnyRef]](elemClass,
-                                              elemTag,
-                                              tag,
-                                              null,
-                                              elemUnpickler)
+          mkRuntimeTravPickler[Array[AnyRef]](
+            elemClass,
+            elemTag,
+            tag,
+            null,
+            elemUnpickler)
         } else {
           val runtime =
             if (share.isInstanceOf[refs.ShareNothing]) {
@@ -87,8 +89,9 @@ class DefaultRuntimePicklerGenerator(reflectionLock: ReentrantLock)
                 tagKey)
             } else {
               // debug(s"@@@ creating InterpretedUnpicklerRuntime for type $tagKey")
-              new InterpretedUnpicklerRuntime(currentRuntime.currentMirror,
-                                              tagKey)
+              new InterpretedUnpicklerRuntime(
+                currentRuntime.currentMirror,
+                tagKey)
             }
           runtime.genUnpickler
         }

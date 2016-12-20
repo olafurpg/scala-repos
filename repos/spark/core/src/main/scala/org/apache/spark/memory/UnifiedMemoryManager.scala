@@ -49,10 +49,11 @@ private[spark] class UnifiedMemoryManager private[memory] (
     val maxMemory: Long,
     storageRegionSize: Long,
     numCores: Int)
-    extends MemoryManager(conf,
-                          numCores,
-                          storageRegionSize,
-                          maxMemory - storageRegionSize) {
+    extends MemoryManager(
+      conf,
+      numCores,
+      storageRegionSize,
+      maxMemory - storageRegionSize) {
 
   // We always maintain this invariant:
   assert(
@@ -97,8 +98,9 @@ private[spark] class UnifiedMemoryManager private[memory] (
               // has grown to become larger than `storageRegionSize`, we can evict blocks and reclaim
               // the memory that storage has borrowed from execution.
               val memoryReclaimableFromStorage =
-                math.max(storageMemoryPool.memoryFree,
-                         storageMemoryPool.poolSize - storageRegionSize)
+                math.max(
+                  storageMemoryPool.memoryFree,
+                  storageMemoryPool.poolSize - storageRegionSize)
               if (memoryReclaimableFromStorage > 0) {
                 // Only reclaim as much space as is necessary and available:
                 val spaceReclaimed = storageMemoryPool.shrinkPoolToFreeSpace(
@@ -125,10 +127,11 @@ private[spark] class UnifiedMemoryManager private[memory] (
             maxMemory - math.min(storageMemoryUsed, storageRegionSize)
           }
 
-          onHeapExecutionMemoryPool.acquireMemory(numBytes,
-                                                  taskAttemptId,
-                                                  maybeGrowExecutionPool,
-                                                  computeMaxExecutionPoolSize)
+          onHeapExecutionMemoryPool.acquireMemory(
+            numBytes,
+            taskAttemptId,
+            maybeGrowExecutionPool,
+            computeMaxExecutionPoolSize)
 
         case MemoryMode.OFF_HEAP =>
           // For now, we only support on-heap caching of data, so we do not need to interact with
@@ -191,9 +194,10 @@ object UnifiedMemoryManager {
   private def getMaxMemory(conf: SparkConf): Long = {
     val systemMemory =
       conf.getLong("spark.testing.memory", Runtime.getRuntime.maxMemory)
-    val reservedMemory = conf.getLong("spark.testing.reservedMemory",
-                                      if (conf.contains("spark.testing")) 0
-                                      else RESERVED_SYSTEM_MEMORY_BYTES)
+    val reservedMemory = conf.getLong(
+      "spark.testing.reservedMemory",
+      if (conf.contains("spark.testing")) 0
+      else RESERVED_SYSTEM_MEMORY_BYTES)
     val minSystemMemory = reservedMemory * 1.5
     if (systemMemory < minSystemMemory) {
       throw new IllegalArgumentException(

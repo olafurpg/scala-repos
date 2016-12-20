@@ -76,11 +76,12 @@ trait IntegrationTest {
           .testStatus == status &&
         parentName.map(currentParentName == _).getOrElse(true)
       } || root.getChildren.toList.exists(
-        helper(_,
-               root.getValue
-                 .asInstanceOf[TreeElement]
-                 .getPresentation
-                 .getPresentableText))
+        helper(
+          _,
+          root.getValue
+            .asInstanceOf[TreeElement]
+            .getPresentation
+            .getPresentableText))
     }
 
     var res = false
@@ -102,9 +103,10 @@ trait IntegrationTest {
       testClass: String,
       testNames: String*): Boolean = {
     val config = configAndSettings.getConfiguration
-    checkConfig(testClass,
-                testNames,
-                config.asInstanceOf[AbstractTestRunConfiguration])
+    checkConfig(
+      testClass,
+      testNames,
+      config.asInstanceOf[AbstractTestRunConfiguration])
   }
 
   protected def checkPackageConfigAndSettings(
@@ -163,9 +165,10 @@ trait IntegrationTest {
         ((node: AbstractTestProxy) =>
            node.getName == names.head && (node.isLeaf || allowTail)) :: acc //last element must be leaf
       case _ =>
-        buildConditions(names.tail,
-                        ((node: AbstractTestProxy) =>
-                           node.getName == names.head && !node.isLeaf) :: acc)
+        buildConditions(
+          names.tail,
+          ((node: AbstractTestProxy) =>
+             node.getName == names.head && !node.isLeaf) :: acc)
     }
     getPathFromResultTree(root, buildConditions(names).reverse, allowTail)
   }
@@ -217,13 +220,14 @@ trait IntegrationTest {
 
     val runConfig = createTestFromLocation(lineNumber, offset, fileName)
 
-    runTestByConfig(runConfig,
-                    configurationCheck,
-                    testTreeCheck,
-                    expectedText,
-                    debug,
-                    duration,
-                    checkOutputs)
+    runTestByConfig(
+      runConfig,
+      configurationCheck,
+      testTreeCheck,
+      expectedText,
+      debug,
+      duration,
+      checkOutputs)
   }
 
   def runTestByConfig(
@@ -234,11 +238,12 @@ trait IntegrationTest {
       debug: Boolean = false,
       duration: Int = 3000,
       checkOutputs: Boolean = false) = {
-    val (res, testTreeRoot) = runTestFromConfig(configurationCheck,
-                                                runConfig,
-                                                checkOutputs,
-                                                duration,
-                                                debug)
+    val (res, testTreeRoot) = runTestFromConfig(
+      configurationCheck,
+      runConfig,
+      checkOutputs,
+      duration,
+      debug)
 
     val semaphore = new Semaphore
     semaphore.down()

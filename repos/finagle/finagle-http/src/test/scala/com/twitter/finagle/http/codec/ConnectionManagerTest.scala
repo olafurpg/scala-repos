@@ -92,9 +92,10 @@ class ConnectionManagerTest extends FunSuite with MockitoSugar {
   }
 
   test("not terminate regular http/1.1 connections") {
-    perform(makeRequest(Version.Http11),
-            makeResponse(Version.Http11, Fields.ContentLength -> "1"),
-            false)
+    perform(
+      makeRequest(Version.Http11),
+      makeResponse(Version.Http11, Fields.ContentLength -> "1"),
+      false)
   }
 
   // Note: by way of the codec, this reply is already taken care of.

@@ -17,11 +17,12 @@ class FlowIdleInjectSpec extends AkkaSpec {
 
     "not emit additional elements if upstream is fast enough" in Utils
       .assertAllStagesStopped {
-        Await.result(Source(1 to 10)
-                       .keepAlive(1.second, () ⇒ 0)
-                       .grouped(1000)
-                       .runWith(Sink.head),
-                     3.seconds) should ===(1 to 10)
+        Await.result(
+          Source(1 to 10)
+            .keepAlive(1.second, () ⇒ 0)
+            .grouped(1000)
+            .runWith(Sink.head),
+          3.seconds) should ===(1 to 10)
       }
 
     "emit elements periodically after silent periods" in Utils
@@ -30,12 +31,12 @@ class FlowIdleInjectSpec extends AkkaSpec {
           Source(1 to 5) ++ Source(6 to 10).initialDelay(2.second)
 
         val result =
-          Await.result(sourceWithIdleGap
-                         .keepAlive(0.6.seconds, () ⇒ 0)
-                         .grouped(1000)
-                         .runWith(Sink.head),
-                       3.seconds) should ===(
-            List(1, 2, 3, 4, 5, 0, 0, 0, 6, 7, 8, 9, 10))
+          Await.result(
+            sourceWithIdleGap
+              .keepAlive(0.6.seconds, () ⇒ 0)
+              .grouped(1000)
+              .runWith(Sink.head),
+            3.seconds) should ===(List(1, 2, 3, 4, 5, 0, 0, 0, 6, 7, 8, 9, 10))
       }
 
     "immediately pull upstream" in {

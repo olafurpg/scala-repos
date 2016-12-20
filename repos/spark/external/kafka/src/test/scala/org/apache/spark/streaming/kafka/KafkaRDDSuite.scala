@@ -60,8 +60,9 @@ class KafkaRDDSuite extends SparkFunSuite with BeforeAndAfterAll {
     kafkaTestUtils.sendMessages(topic, messages)
 
     val kafkaParams =
-      Map("metadata.broker.list" -> kafkaTestUtils.brokerAddress,
-          "group.id" -> s"test-consumer-${Random.nextInt}")
+      Map(
+        "metadata.broker.list" -> kafkaTestUtils.brokerAddress,
+        "group.id" -> s"test-consumer-${Random.nextInt}")
 
     val offsetRanges = Array(OffsetRange(topic, 0, 0, messages.size))
 
@@ -107,8 +108,9 @@ class KafkaRDDSuite extends SparkFunSuite with BeforeAndAfterAll {
     kafkaTestUtils.createTopic(topic)
 
     val kafkaParams =
-      Map("metadata.broker.list" -> kafkaTestUtils.brokerAddress,
-          "group.id" -> s"test-consumer-${Random.nextInt}")
+      Map(
+        "metadata.broker.list" -> kafkaTestUtils.brokerAddress,
+        "group.id" -> s"test-consumer-${Random.nextInt}")
 
     val kc = new KafkaCluster(kafkaParams)
 
@@ -124,8 +126,9 @@ class KafkaRDDSuite extends SparkFunSuite with BeforeAndAfterAll {
     val ranges = rdd.get.asInstanceOf[HasOffsetRanges].offsetRanges
     val rangeCount = ranges.map(o => o.untilOffset - o.fromOffset).sum
 
-    assert(rangeCount === sentCount,
-           "offset range didn't include all sent messages")
+    assert(
+      rangeCount === sentCount,
+      "offset range didn't include all sent messages")
     assert(rdd.get.count === sentCount, "didn't get all sent messages")
 
     val rangesMap = ranges
@@ -155,8 +158,9 @@ class KafkaRDDSuite extends SparkFunSuite with BeforeAndAfterAll {
     kafkaTestUtils.sendMessages(topic, Map("extra" -> 22))
 
     assert(rdd3.isDefined)
-    assert(rdd3.get.count === sentOnlyOne.values.sum,
-           "didn't get exactly one message")
+    assert(
+      rdd3.get.count === sentOnlyOne.values.sum,
+      "didn't get exactly one message")
   }
 
   // get an rdd from the committed consumer offsets until the latest leader offsets,
@@ -180,10 +184,11 @@ class KafkaRDDSuite extends SparkFunSuite with BeforeAndAfterAll {
             val offsetRanges = from
               .map {
                 case (tp: TopicAndPartition, fromOffset: Long) =>
-                  OffsetRange(tp.topic,
-                              tp.partition,
-                              fromOffset,
-                              until(tp).offset)
+                  OffsetRange(
+                    tp.topic,
+                    tp.partition,
+                    fromOffset,
+                    until(tp).offset)
               }
               .toArray
 

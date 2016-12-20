@@ -11,8 +11,9 @@ trait FunSuiteStaticStringTest extends ScalaTestTestCase {
   val funSuiteFileName = funSuiteClassName + ".scala"
 
   def addFunSuite(): Unit = {
-    addFileToProject(funSuiteFileName,
-                     """
+    addFileToProject(
+      funSuiteFileName,
+      """
         |import org.scalatest._
         |
         |class FunSuiteStringTest extends FunSuite {
@@ -34,26 +35,29 @@ trait FunSuiteStaticStringTest extends ScalaTestTestCase {
     addFunSuite()
 
     assert(
-      checkConfigAndSettings(createTestFromLocation(5, 10, funSuiteFileName),
-                             funSuiteClassName,
-                             "should work with sums"))
+      checkConfigAndSettings(
+        createTestFromLocation(5, 10, funSuiteFileName),
+        funSuiteClassName,
+        "should work with sums"))
   }
 
   def testFunSuiteVal() = {
     addFunSuite()
 
     assert(
-      checkConfigAndSettings(createTestFromLocation(8, 10, funSuiteFileName),
-                             funSuiteClassName,
-                             "consts"))
+      checkConfigAndSettings(
+        createTestFromLocation(8, 10, funSuiteFileName),
+        funSuiteClassName,
+        "consts"))
   }
 
   def testFunSuiteValSum() = {
     addFunSuite()
 
     assert(
-      checkConfigAndSettings(createTestFromLocation(11, 10, funSuiteFileName),
-                             funSuiteClassName,
-                             "should sum consts"))
+      checkConfigAndSettings(
+        createTestFromLocation(11, 10, funSuiteFileName),
+        funSuiteClassName,
+        "should sum consts"))
   }
 }

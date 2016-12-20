@@ -113,14 +113,15 @@ object MarathonBuild extends Build {
         "-Yno-adapted-args",
         "-Ywarn-numeric-widen"
       ),
-      javacOptions in Compile ++= Seq("-encoding",
-                                      "UTF-8",
-                                      "-source",
-                                      "1.8",
-                                      "-target",
-                                      "1.8",
-                                      "-Xlint:unchecked",
-                                      "-Xlint:deprecation"),
+      javacOptions in Compile ++= Seq(
+        "-encoding",
+        "UTF-8",
+        "-source",
+        "1.8",
+        "-target",
+        "1.8",
+        "-Xlint:unchecked",
+        "-Xlint:deprecation"),
       resolvers ++= Seq(
         "Mesosphere Public Repo" at "http://downloads.mesosphere.com/maven",
         "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/",

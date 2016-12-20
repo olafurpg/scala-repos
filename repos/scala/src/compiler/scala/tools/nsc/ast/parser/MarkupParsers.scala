@@ -129,8 +129,9 @@ trait MarkupParsers { self: Parsers =>
             try handle.parseAttribute(r2p(start, mid, curOffset), tmp)
             catch {
               case e: RuntimeException =>
-                errorAndResult("error parsing attribute value",
-                               parser.errorTermTree)
+                errorAndResult(
+                  "error parsing attribute value",
+                  parser.errorTermTree)
             }
 
           case '{' =>
@@ -166,9 +167,10 @@ trait MarkupParsers { self: Parsers =>
 
     def xUnparsed: Tree = {
       val start = curOffset
-      xTakeUntil(handle.unparsed,
-                 () => r2p(start, start, curOffset),
-                 "</xml:unparsed>")
+      xTakeUntil(
+        handle.unparsed,
+        () => r2p(start, start, curOffset),
+        "</xml:unparsed>")
     }
 
     /** Comment ::= '<!--' ((Char - '-') | ('-' (Char - '-')))* '-->'
@@ -308,11 +310,12 @@ trait MarkupParsers { self: Parsers =>
       if (ch == '/') {
         // empty element
         xToken("/>")
-        handle.element(r2p(start, start, curOffset),
-                       qname,
-                       attrMap,
-                       empty = true,
-                       new ListBuffer[Tree])
+        handle.element(
+          r2p(start, start, curOffset),
+          qname,
+          attrMap,
+          empty = true,
+          new ListBuffer[Tree])
       } else {
         // handle content
         xToken('>')

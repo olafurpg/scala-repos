@@ -42,9 +42,10 @@ class SimpleSSLContextBuilder(protocol: String,
 
     val sslContext = SSLContext.getInstance(protocol)
 
-    sslContext.init(nullIfEmpty(keyManagers.toArray),
-                    nullIfEmpty(trustManagers.toArray),
-                    secureRandom.orNull)
+    sslContext.init(
+      nullIfEmpty(keyManagers.toArray),
+      nullIfEmpty(trustManagers.toArray),
+      secureRandom.orNull)
     sslContext
   }
 }
@@ -103,10 +104,11 @@ class ConfigSSLContextBuilder(info: SSLConfig,
   protected val logger = org.slf4j.LoggerFactory.getLogger(getClass)
 
   def build: SSLContext = {
-    buildSSLContext(info.protocol,
-                    keyManagers,
-                    trustManagers,
-                    info.secureRandom)
+    buildSSLContext(
+      info.protocol,
+      keyManagers,
+      trustManagers,
+      info.secureRandom)
   }
 
   lazy val revocationLists = certificateRevocationList(info)
@@ -129,20 +131,22 @@ class ConfigSSLContextBuilder(info: SSLConfig,
   lazy val trustManagers: Seq[TrustManager] =
     if (info.trustManagerConfig.trustStoreConfigs.nonEmpty) {
       Seq(
-        buildCompositeTrustManager(info.trustManagerConfig,
-                                   info.checkRevocation.getOrElse(false),
-                                   revocationLists,
-                                   algorithmChecker))
+        buildCompositeTrustManager(
+          info.trustManagerConfig,
+          info.checkRevocation.getOrElse(false),
+          revocationLists,
+          algorithmChecker))
     } else Nil
 
   def buildSSLContext(protocol: String,
                       keyManagers: Seq[KeyManager],
                       trustManagers: Seq[TrustManager],
                       secureRandom: Option[SecureRandom]) = {
-    val builder = new SimpleSSLContextBuilder(protocol,
-                                              keyManagers,
-                                              trustManagers,
-                                              secureRandom)
+    val builder = new SimpleSSLContextBuilder(
+      protocol,
+      keyManagers,
+      trustManagers,
+      secureRandom)
     builder.build()
   }
 
@@ -160,10 +164,11 @@ class ConfigSSLContextBuilder(info: SSLConfig,
                                  algorithmChecker: AlgorithmChecker) = {
 
     val trustManagers = trustManagerInfo.trustStoreConfigs.map { tsc =>
-      buildTrustManager(tsc,
-                        revocationEnabled,
-                        revocationLists,
-                        algorithmChecker)
+      buildTrustManager(
+        tsc,
+        revocationEnabled,
+        revocationLists,
+        algorithmChecker)
     }
     new CompositeX509TrustManager(trustManagers, algorithmChecker)
   }
@@ -348,10 +353,11 @@ class ConfigSSLContextBuilder(info: SSLConfig,
     val trustStore = trustStoreBuilder(tsc).build()
     validateStore(trustStore, algorithmChecker)
 
-    val trustManagerParameters = buildTrustManagerParameters(trustStore,
-                                                             revocationEnabled,
-                                                             revocationLists,
-                                                             algorithmChecker)
+    val trustManagerParameters = buildTrustManagerParameters(
+      trustStore,
+      revocationEnabled,
+      revocationLists,
+      algorithmChecker)
 
     factory.init(trustManagerParameters)
     val trustManagers = factory.getTrustManagers

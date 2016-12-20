@@ -90,9 +90,10 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
 
   /** Messages explaining usage and options */
   def usageMsg =
-    createUsageMsg("where possible standard",
-                   shouldExplain = false,
-                   _.isStandard)
+    createUsageMsg(
+      "where possible standard",
+      shouldExplain = false,
+      _.isStandard)
   def xusageMsg =
     createUsageMsg("Possible advanced", shouldExplain = true, _.isAdvanced)
   def yusageMsg =

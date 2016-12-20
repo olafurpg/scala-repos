@@ -116,8 +116,9 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
   private val workerId = generateWorkerId()
   private val sparkHome =
     if (testing) {
-      assert(sys.props.contains("spark.test.home"),
-             "spark.test.home is not set!")
+      assert(
+        sys.props.contains("spark.test.home"),
+        "spark.test.home is not set!")
       new File(sys.props("spark.test.home"))
     } else {
       new File(sys.env.get("SPARK_HOME").getOrElse("."))
@@ -131,10 +132,12 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
   val appDirectories = new HashMap[String, Seq[String]]
   val finishedApps = new HashSet[String]
 
-  val retainedExecutors = conf.getInt("spark.worker.ui.retainedExecutors",
-                                      WorkerWebUI.DEFAULT_RETAINED_EXECUTORS)
-  val retainedDrivers = conf.getInt("spark.worker.ui.retainedDrivers",
-                                    WorkerWebUI.DEFAULT_RETAINED_DRIVERS)
+  val retainedExecutors = conf.getInt(
+    "spark.worker.ui.retainedExecutors",
+    WorkerWebUI.DEFAULT_RETAINED_EXECUTORS)
+  val retainedDrivers = conf.getInt(
+    "spark.worker.ui.retainedDrivers",
+    WorkerWebUI.DEFAULT_RETAINED_DRIVERS)
 
   // The shuffle service is not actually started unless configured.
   private val shuffleService = new ExternalShuffleService(conf, securityMgr)
@@ -288,14 +291,15 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
                   try {
                     logInfo("Connecting to master " + masterAddress + "...")
                     val masterEndpoint =
-                      rpcEnv.setupEndpointRef(masterAddress,
-                                              Master.ENDPOINT_NAME)
+                      rpcEnv
+                        .setupEndpointRef(masterAddress, Master.ENDPOINT_NAME)
                     registerWithMaster(masterEndpoint)
                   } catch {
                     case ie: InterruptedException => // Cancelled
                     case NonFatal(e) =>
-                      logWarning(s"Failed to connect to master $masterAddress",
-                                 e)
+                      logWarning(
+                        s"Failed to connect to master $masterAddress",
+                        e)
                   }
                 }
               }))
@@ -368,13 +372,14 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
   private def registerWithMaster(masterEndpoint: RpcEndpointRef): Unit = {
     masterEndpoint
       .ask[RegisterWorkerResponse](
-        RegisterWorker(workerId,
-                       host,
-                       port,
-                       self,
-                       cores,
-                       memory,
-                       workerWebUiUrl))
+        RegisterWorker(
+          workerId,
+          host,
+          port,
+          self,
+          cores,
+          memory,
+          workerWebUiUrl))
       .onComplete {
         // This is a very fast action so we can use "ThreadUtils.sameThread"
         case Success(msg) =>
@@ -382,8 +387,9 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
             handleRegisterResponse(msg)
           }
         case Failure(e) =>
-          logError(s"Cannot register with master: ${masterEndpoint.address}",
-                   e)
+          logError(
+            s"Cannot register with master: ${masterEndpoint.address}",
+            e)
           System.exit(1)
       }(ThreadUtils.sameThread)
   }
@@ -454,8 +460,8 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
             val appIdFromDir = dir.getName
             val isAppStillRunning = appIds.contains(appIdFromDir)
             dir.isDirectory && !isAppStillRunning &&
-            !Utils.doesDirectoryContainAnyNewFiles(dir,
-                                                   APP_DATA_RETENTION_SECONDS)
+            !Utils
+              .doesDirectoryContainAnyNewFiles(dir, APP_DATA_RETENTION_SECONDS)
           }
           .foreach { dir =>
             logInfo(s"Removing directory: ${dir.getPath}")
@@ -477,9 +483,10 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
       val execs = executors.values.map(e =>
         new ExecutorDescription(e.appId, e.execId, e.cores, e.state))
       masterRef.send(
-        WorkerSchedulerStateResponse(workerId,
-                                     execs.toList,
-                                     drivers.keys.toSeq))
+        WorkerSchedulerStateResponse(
+          workerId,
+          execs.toList,
+          drivers.keys.toSeq))
 
     case ReconnectWorker(masterUrl) =>
       logInfo(
@@ -551,20 +558,22 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
               executors -= appId + "/" + execId
             }
             sendToMaster(
-              ExecutorStateChanged(appId,
-                                   execId,
-                                   ExecutorState.FAILED,
-                                   Some(e.toString),
-                                   None))
+              ExecutorStateChanged(
+                appId,
+                execId,
+                ExecutorState.FAILED,
+                Some(e.toString),
+                None))
           }
         }
       }
 
-    case executorStateChanged @ ExecutorStateChanged(appId,
-                                                     execId,
-                                                     state,
-                                                     message,
-                                                     exitStatus) =>
+    case executorStateChanged @ ExecutorStateChanged(
+          appId,
+          execId,
+          state,
+          message,
+          exitStatus) =>
       handleExecutorStateChanged(executorStateChanged)
 
     case KillExecutor(masterUrl, appId, execId) =>
@@ -628,19 +637,20 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
       context: RpcCallContext): PartialFunction[Any, Unit] = {
     case RequestWorkerState =>
       context.reply(
-        WorkerStateResponse(host,
-                            port,
-                            workerId,
-                            executors.values.toList,
-                            finishedExecutors.values.toList,
-                            drivers.values.toList,
-                            finishedDrivers.values.toList,
-                            activeMasterUrl,
-                            cores,
-                            memory,
-                            coresUsed,
-                            memoryUsed,
-                            activeMasterWebUiUrl))
+        WorkerStateResponse(
+          host,
+          port,
+          workerId,
+          executors.values.toList,
+          finishedExecutors.values.toList,
+          drivers.values.toList,
+          finishedDrivers.values.toList,
+          activeMasterUrl,
+          cores,
+          memory,
+          coresUsed,
+          memoryUsed,
+          activeMasterWebUiUrl))
   }
 
   override def onDisconnected(remoteAddress: RpcAddress): Unit = {
@@ -788,14 +798,15 @@ private[deploy] object Worker extends Logging {
     Utils.initDaemon(log)
     val conf = new SparkConf
     val args = new WorkerArguments(argStrings, conf)
-    val rpcEnv = startRpcEnvAndEndpoint(args.host,
-                                        args.port,
-                                        args.webUiPort,
-                                        args.cores,
-                                        args.memory,
-                                        args.masters,
-                                        args.workDir,
-                                        conf = conf)
+    val rpcEnv = startRpcEnvAndEndpoint(
+      args.host,
+      args.port,
+      args.webUiPort,
+      args.cores,
+      args.memory,
+      args.masters,
+      args.workDir,
+      conf = conf)
     rpcEnv.awaitTermination()
   }
 
@@ -814,16 +825,18 @@ private[deploy] object Worker extends Logging {
     val securityMgr = new SecurityManager(conf)
     val rpcEnv = RpcEnv.create(systemName, host, port, conf, securityMgr)
     val masterAddresses = masterUrls.map(RpcAddress.fromSparkURL(_))
-    rpcEnv.setupEndpoint(ENDPOINT_NAME,
-                         new Worker(rpcEnv,
-                                    webUiPort,
-                                    cores,
-                                    memory,
-                                    masterAddresses,
-                                    ENDPOINT_NAME,
-                                    workDir,
-                                    conf,
-                                    securityMgr))
+    rpcEnv.setupEndpoint(
+      ENDPOINT_NAME,
+      new Worker(
+        rpcEnv,
+        webUiPort,
+        cores,
+        memory,
+        masterAddresses,
+        ENDPOINT_NAME,
+        workDir,
+        conf,
+        securityMgr))
     rpcEnv
   }
 

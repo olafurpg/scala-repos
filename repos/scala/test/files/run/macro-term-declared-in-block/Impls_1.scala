@@ -9,8 +9,9 @@ object Impls {
       List(Literal(Constant("prefix = " + prefix))))
     val body = Block(
       List(printPrefix),
-      Apply(Select(Ident(definitions.PredefModule), TermName("println")),
-            List(Literal(Constant("it works")))))
+      Apply(
+        Select(Ident(definitions.PredefModule), TermName("println")),
+        List(Literal(Constant("it works")))))
     c.Expr[Unit](body)
   }
 }

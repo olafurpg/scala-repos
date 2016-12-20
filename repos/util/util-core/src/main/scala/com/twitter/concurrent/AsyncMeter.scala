@@ -120,13 +120,15 @@ class AsyncMeter private[concurrent] (private[concurrent] val burstSize: Int,
                                       burstDuration: Duration,
                                       maxWaiters: Int)(implicit timer: Timer) {
 
-  require(burstSize > 0,
-          s"burst size of $burstSize, which is <= 0 doesn't make sense")
+  require(
+    burstSize > 0,
+    s"burst size of $burstSize, which is <= 0 doesn't make sense")
   require(
     burstDuration > Duration.Zero,
     s"burst duration of $burstDuration, which is <= 0 nanoseconds doesn't make sense")
-  require(maxWaiters > 0,
-          s"max waiters of $maxWaiters, which is <= 0 doesn't make sense")
+  require(
+    maxWaiters > 0,
+    s"max waiters of $maxWaiters, which is <= 0 doesn't make sense")
 
   private[this] val period = Period.fromBurstiness(burstSize, burstDuration)
 

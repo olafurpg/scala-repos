@@ -171,15 +171,17 @@ class EventServiceActor(val eventClient: LEvents,
             Map("plugins" -> Map(
               "inputblockers" -> pluginContext.inputBlockers.map {
                 case (n, p) =>
-                  n -> Map("name" -> p.pluginName,
-                           "description" -> p.pluginDescription,
-                           "class" -> p.getClass.getName)
+                  n -> Map(
+                    "name" -> p.pluginName,
+                    "description" -> p.pluginDescription,
+                    "class" -> p.getClass.getName)
               },
               "inputsniffers" -> pluginContext.inputSniffers.map {
                 case (n, p) =>
-                  n -> Map("name" -> p.pluginName,
-                           "description" -> p.pluginDescription,
-                           "class" -> p.getClass.getName)
+                  n -> Map(
+                    "name" -> p.pluginName,
+                    "description" -> p.pluginDescription,
+                    "class" -> p.getClass.getName)
               }
             ))
           }
@@ -198,9 +200,10 @@ class EventServiceActor(val eventClient: LEvents,
                   case EventServerPlugin.inputBlocker =>
                     pluginContext
                       .inputBlockers(pluginName)
-                      .handleREST(authData.appId,
-                                  authData.channelId,
-                                  pluginArgs)
+                      .handleREST(
+                        authData.appId,
+                        authData.channelId,
+                        pluginArgs)
                   case EventServerPlugin.inputSniffer =>
                     pluginsActorRef ? PluginsActor.HandleREST(
                       appId = authData.appId,
@@ -284,22 +287,26 @@ class EventServiceActor(val eventClient: LEvents,
                   if (events.isEmpty ||
                       authData.events.contains(event.event)) {
                     pluginContext.inputBlockers.values.foreach(
-                      _.process(EventInfo(appId = appId,
-                                          channelId = channelId,
-                                          event = event),
-                                pluginContext))
+                      _.process(
+                        EventInfo(
+                          appId = appId,
+                          channelId = channelId,
+                          event = event),
+                        pluginContext))
                     val data =
                       eventClient.futureInsert(event, appId, channelId).map {
                         id =>
-                          pluginsActorRef ! EventInfo(appId = appId,
-                                                      channelId = channelId,
-                                                      event = event)
+                          pluginsActorRef ! EventInfo(
+                            appId = appId,
+                            channelId = channelId,
+                            event = event)
                           val result =
                             (StatusCodes.Created, Map("eventId" -> s"${id}"))
                           if (config.stats) {
-                            statsActorRef ! Bookkeeping(appId,
-                                                        result._1,
-                                                        event)
+                            statsActorRef ! Bookkeeping(
+                              appId,
+                              result._1,
+                              event)
                           }
                           result
                       }
@@ -320,15 +327,16 @@ class EventServiceActor(val eventClient: LEvents,
             authenticate(withAccessKey) { authData =>
               val appId = authData.appId
               val channelId = authData.channelId
-              parameters('startTime.as[Option[String]],
-                         'untilTime.as[Option[String]],
-                         'entityType.as[Option[String]],
-                         'entityId.as[Option[String]],
-                         'event.as[Option[String]],
-                         'targetEntityType.as[Option[String]],
-                         'targetEntityId.as[Option[String]],
-                         'limit.as[Option[Int]],
-                         'reversed.as[Option[Boolean]]) {
+              parameters(
+                'startTime.as[Option[String]],
+                'untilTime.as[Option[String]],
+                'entityType.as[Option[String]],
+                'entityId.as[Option[String]],
+                'event.as[Option[String]],
+                'targetEntityType.as[Option[String]],
+                'targetEntityId.as[Option[String]],
+                'limit.as[Option[Int]],
+                'reversed.as[Option[Boolean]]) {
                 (startTimeStr, untilTimeStr, entityType, entityId,
                  eventName, // only support one event name
                  targetEntityType, targetEntityId, limit, reversed) =>
@@ -340,10 +348,11 @@ class EventServiceActor(val eventClient: LEvents,
                           s"et=${entityType} eid=${entityId} " +
                           s"li=${limit} rev=${reversed} ")
 
-                      require(!((reversed == Some(true)) &&
-                                (entityType.isEmpty || entityId.isEmpty)),
-                              "the parameter reversed can only be used with" +
-                                " both entityType and entityId specified.")
+                      require(
+                        !((reversed == Some(true)) &&
+                          (entityType.isEmpty || entityId.isEmpty)),
+                        "the parameter reversed can only be used with" +
+                          " both entityType and entityId specified.")
 
                       val parseTime = Future {
                         val startTime =
@@ -357,19 +366,19 @@ class EventServiceActor(val eventClient: LEvents,
                         .flatMap {
                           case (startTime, untilTime) =>
                             val data = eventClient
-                              .futureFind(appId = appId,
-                                          channelId = channelId,
-                                          startTime = startTime,
-                                          untilTime = untilTime,
-                                          entityType = entityType,
-                                          entityId = entityId,
-                                          eventNames = eventName.map(List(_)),
-                                          targetEntityType =
-                                            targetEntityType.map(Some(_)),
-                                          targetEntityId =
-                                            targetEntityId.map(Some(_)),
-                                          limit = limit.orElse(Some(20)),
-                                          reversed = reversed)
+                              .futureFind(
+                                appId = appId,
+                                channelId = channelId,
+                                startTime = startTime,
+                                untilTime = untilTime,
+                                entityType = entityType,
+                                entityId = entityId,
+                                eventNames = eventName.map(List(_)),
+                                targetEntityType =
+                                  targetEntityType.map(Some(_)),
+                                targetEntityId = targetEntityId.map(Some(_)),
+                                limit = limit.orElse(Some(20)),
+                                reversed = reversed)
                               .map { eventIter =>
                                 if (eventIter.hasNext) {
                                   (StatusCodes.OK, eventIter.toArray)
@@ -408,19 +417,23 @@ class EventServiceActor(val eventClient: LEvents,
                   if (allowedEvents.isEmpty ||
                       allowedEvents.contains(event.event)) {
                     pluginContext.inputBlockers.values.foreach(
-                      _.process(EventInfo(appId = appId,
-                                          channelId = channelId,
-                                          event = event),
-                                pluginContext))
+                      _.process(
+                        EventInfo(
+                          appId = appId,
+                          channelId = channelId,
+                          event = event),
+                        pluginContext))
                     val data = eventClient
                       .futureInsert(event, appId, channelId)
                       .map { id =>
-                        pluginsActorRef ! EventInfo(appId = appId,
-                                                    channelId = channelId,
-                                                    event = event)
+                        pluginsActorRef ! EventInfo(
+                          appId = appId,
+                          channelId = channelId,
+                          event = event)
                         val status = StatusCodes.Created
-                        val result = Map("status" -> status.intValue,
-                                         "eventId" -> s"${id}")
+                        val result = Map(
+                          "status" -> status.intValue,
+                          "eventId" -> s"${id}")
                         if (config.stats) {
                           statsActorRef ! Bookkeeping(appId, status, event)
                         }
@@ -428,8 +441,9 @@ class EventServiceActor(val eventClient: LEvents,
                       }
                       .recover {
                         case exception =>
-                          Map("status" -> StatusCodes.InternalServerError.intValue,
-                              "message" -> s"${exception.getMessage()}")
+                          Map(
+                            "status" -> StatusCodes.InternalServerError.intValue,
+                            "message" -> s"${exception.getMessage()}")
                       }
                     data
                   } else {
@@ -441,8 +455,9 @@ class EventServiceActor(val eventClient: LEvents,
                 }
                 case Failure(exception) => {
                   Future.successful(
-                    Map("status" -> StatusCodes.BadRequest.intValue,
-                        "message" -> s"${exception.getMessage()}"))
+                    Map(
+                      "status" -> StatusCodes.BadRequest.intValue,
+                      "message" -> s"${exception.getMessage()}"))
                 }
               }
 
@@ -503,14 +518,15 @@ class EventServiceActor(val eventClient: LEvents,
               respondWithMediaType(MediaTypes.`application/json`) {
                 entity(as[JObject]) { jObj =>
                   complete {
-                    Webhooks.postJson(appId = appId,
-                                      channelId = channelId,
-                                      web = web,
-                                      data = jObj,
-                                      eventClient = eventClient,
-                                      log = logger,
-                                      stats = config.stats,
-                                      statsActorRef = statsActorRef)
+                    Webhooks.postJson(
+                      appId = appId,
+                      channelId = channelId,
+                      web = web,
+                      data = jObj,
+                      eventClient = eventClient,
+                      log = logger,
+                      stats = config.stats,
+                      statsActorRef = statsActorRef)
                   }
                 }
               }
@@ -525,10 +541,11 @@ class EventServiceActor(val eventClient: LEvents,
               val channelId = authData.channelId
               respondWithMediaType(MediaTypes.`application/json`) {
                 complete {
-                  Webhooks.getJson(appId = appId,
-                                   channelId = channelId,
-                                   web = web,
-                                   log = logger)
+                  Webhooks.getJson(
+                    appId = appId,
+                    channelId = channelId,
+                    web = web,
+                    log = logger)
                 }
               }
             }
@@ -549,14 +566,15 @@ class EventServiceActor(val eventClient: LEvents,
                     // respond with JSON
                     import Json4sProtocol._
 
-                    Webhooks.postForm(appId = appId,
-                                      channelId = channelId,
-                                      web = web,
-                                      data = formData,
-                                      eventClient = eventClient,
-                                      log = logger,
-                                      stats = config.stats,
-                                      statsActorRef = statsActorRef)
+                    Webhooks.postForm(
+                      appId = appId,
+                      channelId = channelId,
+                      web = web,
+                      data = formData,
+                      eventClient = eventClient,
+                      log = logger,
+                      stats = config.stats,
+                      statsActorRef = statsActorRef)
                   }
                 }
               }
@@ -574,10 +592,11 @@ class EventServiceActor(val eventClient: LEvents,
                   // respond with JSON
                   import Json4sProtocol._
 
-                  Webhooks.getForm(appId = appId,
-                                   channelId = channelId,
-                                   web = web,
-                                   log = logger)
+                  Webhooks.getForm(
+                    appId = appId,
+                    channelId = channelId,
+                    web = web,
+                    log = logger)
                 }
               }
             }
@@ -598,12 +617,14 @@ class EventServerActor(val eventClient: LEvents,
                        val config: EventServerConfig)
     extends Actor
     with ActorLogging {
-  val child = context.actorOf(Props(classOf[EventServiceActor],
-                                    eventClient,
-                                    accessKeysClient,
-                                    channelsClient,
-                                    config),
-                              "EventServiceActor")
+  val child = context.actorOf(
+    Props(
+      classOf[EventServiceActor],
+      eventClient,
+      accessKeysClient,
+      channelsClient,
+      config),
+    "EventServiceActor")
   implicit val system = context.system
 
   def receive: Actor.Receive = {
@@ -630,11 +651,12 @@ object EventServer {
     val channelsClient = Storage.getMetaDataChannels()
 
     val serverActor = system.actorOf(
-      Props(classOf[EventServerActor],
-            eventClient,
-            accessKeysClient,
-            channelsClient,
-            config),
+      Props(
+        classOf[EventServerActor],
+        eventClient,
+        accessKeysClient,
+        channelsClient,
+        config),
       "EventServerActor"
     )
     if (config.stats) system.actorOf(Props[StatsActor], "StatsActor")

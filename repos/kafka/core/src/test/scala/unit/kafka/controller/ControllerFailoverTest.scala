@@ -107,13 +107,15 @@ class ControllerFailoverTest extends KafkaServerTestHarness with Logging {
           controller.kafkaController
             .sendUpdateMetadataRequest(Seq(0), Set(topicPartition))
           log.info(
-            "Queue state %d %d".format(channelManager.queueCapacity(0),
-                                       channelManager.queueSize(0)))
+            "Queue state %d %d".format(
+              channelManager.queueCapacity(0),
+              channelManager.queueSize(0)))
           controller.kafkaController
             .sendUpdateMetadataRequest(Seq(0), Set(topicPartition))
           log.info(
-            "Queue state %d %d".format(channelManager.queueCapacity(0),
-                                       channelManager.queueSize(0)))
+            "Queue state %d %d".format(
+              channelManager.queueCapacity(0),
+              channelManager.queueSize(0)))
         } catch {
           case e: Exception => {
             log.info("Thread interrupted")
@@ -140,8 +142,9 @@ class ControllerFailoverTest extends KafkaServerTestHarness with Logging {
           case Some(epoch) =>
             epoch
           case None =>
-            val msg = String.format("Missing element in epoch map %s",
-                                    epochMap.mkString(", "))
+            val msg = String.format(
+              "Missing element in epoch map %s",
+              epochMap.mkString(", "))
             throw new IllegalStateException(msg)
         }
 
@@ -171,10 +174,11 @@ class ControllerFailoverTest extends KafkaServerTestHarness with Logging {
 class MockChannelManager(private val controllerContext: ControllerContext,
                          config: KafkaConfig,
                          metrics: Metrics)
-    extends ControllerChannelManager(controllerContext,
-                                     config,
-                                     new SystemTime,
-                                     metrics) {
+    extends ControllerChannelManager(
+      controllerContext,
+      config,
+      new SystemTime,
+      metrics) {
 
   def stopSendThread(brokerId: Int) {
     val requestThread = brokerStateInfo(brokerId).requestSendThread

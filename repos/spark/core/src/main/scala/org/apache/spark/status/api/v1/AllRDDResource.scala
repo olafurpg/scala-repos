@@ -31,10 +31,11 @@ private[v1] class AllRDDResource(ui: SparkUI) {
     val storageStatusList = ui.storageListener.activeStorageStatusList
     val rddInfos = ui.storageListener.rddInfoList
     rddInfos.map { rddInfo =>
-      AllRDDResource.getRDDStorageInfo(rddInfo.id,
-                                       rddInfo,
-                                       storageStatusList,
-                                       includeDetails = false)
+      AllRDDResource.getRDDStorageInfo(
+        rddInfo.id,
+        rddInfo,
+        storageStatusList,
+        includeDetails = false)
     }
   }
 }

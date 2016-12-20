@@ -15,16 +15,17 @@ import org.scalatra.util.RicherString._
 
 object SwaggerSerializers {
   import org.scalatra.swagger.AllowableValues._
-  private val simpleTypes = Set("int32",
-                                "int64",
-                                "float",
-                                "double",
-                                "string",
-                                "byte",
-                                "boolean",
-                                "date",
-                                "date-time",
-                                "array")
+  private val simpleTypes = Set(
+    "int32",
+    "int64",
+    "float",
+    "double",
+    "string",
+    "byte",
+    "boolean",
+    "date",
+    "date-time",
+    "array")
   private def isSimpleType(name: String) = simpleTypes contains name
 
   private def str(jv: JValue): Option[String] =
@@ -41,14 +42,15 @@ object SwaggerSerializers {
 
   object SwaggerFormats {
     val serializers =
-      JodaTimeSerializers.all ++ Seq(new EnumNameSerializer(ParamType),
-                                     new HttpMethodSerializer,
-                                     new AllowableValuesSerializer,
-                                     new ModelPropertySerializer,
-                                     new ModelSerializer,
-                                     new ResponseMessageSerializer,
-                                     new ParameterSerializer,
-                                     new GrantTypeSerializer)
+      JodaTimeSerializers.all ++ Seq(
+        new EnumNameSerializer(ParamType),
+        new HttpMethodSerializer,
+        new AllowableValuesSerializer,
+        new ModelPropertySerializer,
+        new ModelSerializer,
+        new ResponseMessageSerializer,
+        new ParameterSerializer,
+        new GrantTypeSerializer)
   }
   trait SwaggerFormats extends DefaultFormats {
 
@@ -195,9 +197,10 @@ object SwaggerSerializers {
   private[swagger] val formats: SwaggerFormats = new SwaggerFormats {}
 
   val defaultFormats: SwaggerFormats =
-    formats ++ Seq(new OperationSerializer,
-                   new EndpointSerializer,
-                   new ApiSerializer)
+    formats ++ Seq(
+      new OperationSerializer,
+      new EndpointSerializer,
+      new ApiSerializer)
 
   class HttpMethodSerializer
       extends CustomSerializer[HttpMethod](implicit formats =>
@@ -296,18 +299,19 @@ object SwaggerSerializers {
       extends CustomSerializer[ModelProperty](implicit formats =>
         ({
           case json: JObject =>
-            ModelProperty(`type` = readDataType(json),
-                          position = (json \ "position").getAsOrElse(0),
-                          json \ "required" match {
-                            case JString(s) => s.toCheckboxBool
-                            case JBool(value) => value
-                            case _ => false
-                          },
-                          description = (json \ "description")
-                            .getAs[String]
-                            .flatMap(_.blankOption),
-                          allowableValues = json.extract[AllowableValues],
-                          items = None)
+            ModelProperty(
+              `type` = readDataType(json),
+              position = (json \ "position").getAsOrElse(0),
+              json \ "required" match {
+                case JString(s) => s.toCheckboxBool
+                case JBool(value) => value
+                case _ => false
+              },
+              description = (json \ "description")
+                .getAs[String]
+                .flatMap(_.blankOption),
+              allowableValues = json.extract[AllowableValues],
+              items = None)
         }, {
           case x: ModelProperty =>
             val json: JValue =
@@ -357,8 +361,9 @@ object SwaggerSerializers {
       extends CustomSerializer[ResponseMessage[_]](implicit formats =>
         ({
           case value: JObject =>
-            StringResponseMessage((value \ "code").as[Int],
-                                  (value \ "message").as[String])
+            StringResponseMessage(
+              (value \ "code").as[Int],
+              (value \ "message").as[String])
         }, {
           case StringResponseMessage(code, message) =>
             ("code" -> code) ~ ("message" -> message)
@@ -455,11 +460,12 @@ object SwaggerSerializers {
       extends CustomSerializer[Endpoint](implicit formats =>
         ({
           case value =>
-            Endpoint((value \ "path").extract[String],
-                     (value \ "description")
-                       .extractOpt[String]
-                       .flatMap(_.blankOption),
-                     (value \ "operations").extract[List[Operation]])
+            Endpoint(
+              (value \ "path").extract[String],
+              (value \ "description")
+                .extractOpt[String]
+                .flatMap(_.blankOption),
+              (value \ "operations").extract[List[Operation]])
         }, {
           case obj: Endpoint =>
             ("path" -> obj.path) ~ ("description" -> obj.description) ~
@@ -560,14 +566,16 @@ object SwaggerSerializers {
       extends CustomSerializer[AuthorizationType](implicit formats =>
         ({
           case value if value \ "type" == JString("apiKey") =>
-            ApiKey((value \ "keyname")
-                     .extractOpt[String]
-                     .flatMap(_.blankOption)
-                     .getOrElse("apiKey"),
-                   (value \ "passAs").extract[String])
+            ApiKey(
+              (value \ "keyname")
+                .extractOpt[String]
+                .flatMap(_.blankOption)
+                .getOrElse("apiKey"),
+              (value \ "passAs").extract[String])
           case value if value \ "type" == JString("oauth2") =>
-            OAuth((value \ "scopes").extract[List[String]],
-                  (value \ "grantTypes").extract[List[GrantType]])
+            OAuth(
+              (value \ "scopes").extract[List[String]],
+              (value \ "grantTypes").extract[List[GrantType]])
         }, {
           case obj @ OAuth(scopes, grantTypes) =>
             ("type" -> obj.`type`) ~ ("scopes" -> scopes) ~

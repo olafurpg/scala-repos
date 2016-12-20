@@ -37,9 +37,10 @@ class DottyLibraryPropertiesEditor(
 
       result match {
         case Failure(exc) =>
-          Messages.showErrorDialog(editorComponent.getProject,
-                                   exc.getMessage,
-                                   s"Error downloading Dotty $version")
+          Messages.showErrorDialog(
+            editorComponent.getProject,
+            exc.getMessage,
+            s"Error downloading Dotty $version")
         case _ =>
       }
     }

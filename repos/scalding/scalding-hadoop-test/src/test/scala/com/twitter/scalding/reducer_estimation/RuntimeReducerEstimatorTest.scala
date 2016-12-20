@@ -20,9 +20,10 @@ object HistoryService1 extends HistoryServiceWithData {
   def fetchHistory(info: FlowStrategyInfo,
                    maxHistory: Int): Try[Seq[FlowStepHistory]] =
     Success(
-      Seq(makeHistory(inputSize * 2, 0, List(10, 1000, 3000)),
-          makeHistory(inputSize / 2, 0, List(10, 200, 400)),
-          makeHistory(inputSize * 4, 0, List(10, 2400, 3000))))
+      Seq(
+        makeHistory(inputSize * 2, 0, List(10, 1000, 3000)),
+        makeHistory(inputSize / 2, 0, List(10, 200, 400)),
+        makeHistory(inputSize * 4, 0, List(10, 2400, 3000))))
 }
 
 class Estimator1 extends RuntimeReducerEstimator {

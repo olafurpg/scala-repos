@@ -309,8 +309,9 @@ class LiftMergeSpec extends Specification with XmlMatchers with Mockito {
         "/context-path/testform1" :: "testform3" :: "/context-path/testform2" :: "testform4" :: "/context-path/testform6" :: "/context-path/testform5" :: Nil
     }
 
-    "not rewrite script srcs anywhere" in new WithLiftContext(testRules,
-                                                              testSession) {
+    "not rewrite script srcs anywhere" in new WithLiftContext(
+      testRules,
+      testSession) {
       val result = URLRewriter.doWith((_: String) => "rewritten") {
         testSession.merge(
           <html>
@@ -341,8 +342,9 @@ class LiftMergeSpec extends Specification with XmlMatchers with Mockito {
         "testscript" :: "testscript2" :: "testscript3" :: Nil
     }
 
-    "not rewrite link hrefs anywhere" in new WithLiftContext(testRules,
-                                                             testSession) {
+    "not rewrite link hrefs anywhere" in new WithLiftContext(
+      testRules,
+      testSession) {
       val result = URLRewriter.doWith((_: String) => "rewritten") {
         testSession.merge(
           <html>
@@ -404,8 +406,9 @@ class LiftMergeSpec extends Specification with XmlMatchers with Mockito {
         "rewritten" :: "rewritten" :: "rewritten" :: Nil
     }
 
-    "rewrite form actions everywhere" in new WithLiftContext(testRules,
-                                                             testSession) {
+    "rewrite form actions everywhere" in new WithLiftContext(
+      testRules,
+      testSession) {
       val result = URLRewriter.doWith((_: String) => "rewritten") {
         testSession.merge(
           <html>

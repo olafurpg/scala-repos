@@ -95,36 +95,39 @@ class YarnAllocatorSuite
   }
 
   def createAllocator(maxExecutors: Int = 5): YarnAllocator = {
-    val args = Array("--executor-cores",
-                     "5",
-                     "--executor-memory",
-                     "2048",
-                     "--jar",
-                     "somejar.jar",
-                     "--class",
-                     "SomeClass")
+    val args = Array(
+      "--executor-cores",
+      "5",
+      "--executor-memory",
+      "2048",
+      "--jar",
+      "somejar.jar",
+      "--class",
+      "SomeClass")
     val sparkConfClone = sparkConf.clone()
     sparkConfClone.set("spark.executor.instances", maxExecutors.toString)
-    new YarnAllocator("not used",
-                      mock(classOf[RpcEndpointRef]),
-                      conf,
-                      sparkConfClone,
-                      rmClient,
-                      appAttemptId,
-                      new ApplicationMasterArguments(args),
-                      new SecurityManager(sparkConf))
+    new YarnAllocator(
+      "not used",
+      mock(classOf[RpcEndpointRef]),
+      conf,
+      sparkConfClone,
+      rmClient,
+      appAttemptId,
+      new ApplicationMasterArguments(args),
+      new SecurityManager(sparkConf))
   }
 
   def createContainer(host: String): Container = {
     val containerId = ContainerId.newInstance(appAttemptId, containerNum)
     containerNum += 1
     val nodeId = NodeId.newInstance(host, 1000)
-    Container.newInstance(containerId,
-                          nodeId,
-                          "",
-                          containerResource,
-                          RM_REQUEST_PRIORITY,
-                          null)
+    Container.newInstance(
+      containerId,
+      nodeId,
+      "",
+      containerResource,
+      RM_REQUEST_PRIORITY,
+      null)
   }
 
   test("single container allocated") {

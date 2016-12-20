@@ -54,9 +54,10 @@ object Test2 {
     val j1 = new java.lang.StringBuilder
     val s1 = new StringBuilder
     j1 append "###" append Array('0', '1', '2') append "xyz".subSequence(0, 3)
-    s1 append "###" appendAll Array('0', '1', '2') appendAll List('x',
-                                                                  'y',
-                                                                  'z')
+    s1 append "###" appendAll Array('0', '1', '2') appendAll List(
+      'x',
+      'y',
+      'z')
     println(
       "s1.toString equals j1.toString = " + (s1.toString equals j1.toString))
   }

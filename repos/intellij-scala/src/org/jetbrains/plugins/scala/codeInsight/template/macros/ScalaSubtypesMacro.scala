@@ -44,9 +44,10 @@ class ScalaSubtypesMacro extends Macro {
           case Some(x: ScTypeDefinition) =>
             import scala.collection.JavaConversions._
             ClassInheritorsSearch
-              .search(x,
-                      GlobalSearchScope.projectScope(context.getProject),
-                      true)
+              .search(
+                x,
+                GlobalSearchScope.projectScope(context.getProject),
+                true)
               .findAll()
               .filter(_.isInstanceOf[ScTypeDefinition])
               .map(

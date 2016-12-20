@@ -74,10 +74,11 @@ class GradientBoostedTrees @Since("1.2.0")(
         // Map labels to -1, +1 so binary classification can be treated as regression.
         val remappedInput =
           input.map(x => new LabeledPoint((x.label * 2) - 1, x.features))
-        GradientBoostedTrees.boost(remappedInput,
-                                   remappedInput,
-                                   boostingStrategy,
-                                   validate = false)
+        GradientBoostedTrees.boost(
+          remappedInput,
+          remappedInput,
+          boostingStrategy,
+          validate = false)
       case _ =>
         throw new IllegalArgumentException(
           s"$algo is not supported by the gradient boosting.")
@@ -118,10 +119,11 @@ class GradientBoostedTrees @Since("1.2.0")(
           input.map(x => new LabeledPoint((x.label * 2) - 1, x.features))
         val remappedValidationInput = validationInput.map(x =>
           new LabeledPoint((x.label * 2) - 1, x.features))
-        GradientBoostedTrees.boost(remappedInput,
-                                   remappedValidationInput,
-                                   boostingStrategy,
-                                   validate = true)
+        GradientBoostedTrees.boost(
+          remappedInput,
+          remappedValidationInput,
+          boostingStrategy,
+          validate = true)
       case _ =>
         throw new IllegalArgumentException(
           s"$algo is not supported by the gradient boosting.")
@@ -317,13 +319,15 @@ object GradientBoostedTrees extends Logging {
     if (persistedInput) input.unpersist()
 
     if (validate) {
-      new GradientBoostedTreesModel(boostingStrategy.treeStrategy.algo,
-                                    baseLearners.slice(0, bestM),
-                                    baseLearnerWeights.slice(0, bestM))
+      new GradientBoostedTreesModel(
+        boostingStrategy.treeStrategy.algo,
+        baseLearners.slice(0, bestM),
+        baseLearnerWeights.slice(0, bestM))
     } else {
-      new GradientBoostedTreesModel(boostingStrategy.treeStrategy.algo,
-                                    baseLearners,
-                                    baseLearnerWeights)
+      new GradientBoostedTreesModel(
+        boostingStrategy.treeStrategy.algo,
+        baseLearners,
+        baseLearnerWeights)
     }
   }
 }

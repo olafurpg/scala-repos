@@ -75,8 +75,9 @@ private[stats] class MetricsBucketedHistogram(
           MetricsBucketedHistogram.this.percentiles.length)
         var i = 0
         while (i < ps.length) {
-          ps(i) = new Percentile(MetricsBucketedHistogram.this.percentiles(i),
-                                 snap.quantiles(i))
+          ps(i) = new Percentile(
+            MetricsBucketedHistogram.this.percentiles(i),
+            snap.quantiles(i))
           i += 1
         }
         override def count(): Long = _count

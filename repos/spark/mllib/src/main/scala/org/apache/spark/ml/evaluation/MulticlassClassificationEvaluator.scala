@@ -54,16 +54,18 @@ class MulticlassClassificationEvaluator @Since("1.5.0")(
   @Since("1.5.0")
   val metricName: Param[String] = {
     val allowedParams = ParamValidators.inArray(
-      Array("f1",
-            "precision",
-            "recall",
-            "weightedPrecision",
-            "weightedRecall"))
-    new Param(this,
-              "metricName",
-              "metric name in evaluation " +
-                "(f1|precision|recall|weightedPrecision|weightedRecall)",
-              allowedParams)
+      Array(
+        "f1",
+        "precision",
+        "recall",
+        "weightedPrecision",
+        "weightedRecall"))
+    new Param(
+      this,
+      "metricName",
+      "metric name in evaluation " +
+        "(f1|precision|recall|weightedPrecision|weightedRecall)",
+      allowedParams)
   }
 
   /** @group getParam */

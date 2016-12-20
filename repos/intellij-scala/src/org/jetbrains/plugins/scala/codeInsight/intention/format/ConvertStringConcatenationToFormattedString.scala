@@ -9,7 +9,8 @@ import org.jetbrains.plugins.scala.format.{
   * Pavel Fatin
   */
 class ConvertStringConcatenationToFormattedString
-    extends AbstractFormatConversionIntention("Convert to formatted string",
-                                              StringConcatenationParser,
-                                              FormattedStringFormatter,
-                                              eager = true) {}
+    extends AbstractFormatConversionIntention(
+      "Convert to formatted string",
+      StringConcatenationParser,
+      FormattedStringFormatter,
+      eager = true) {}

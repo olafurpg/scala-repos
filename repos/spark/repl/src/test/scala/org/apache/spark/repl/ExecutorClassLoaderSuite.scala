@@ -68,8 +68,9 @@ class ExecutorClassLoaderSuite
     urls2 = List(tempDir2.toURI.toURL).toArray
     childClassNames.foreach(TestUtils.createCompiledClass(_, tempDir1, "1"))
     parentResourceNames.foreach { x =>
-      Files.write("resource".getBytes(StandardCharsets.UTF_8),
-                  new File(tempDir2, x))
+      Files.write(
+        "resource".getBytes(StandardCharsets.UTF_8),
+        new File(tempDir2, x))
     }
     parentClassNames.foreach(TestUtils.createCompiledClass(_, tempDir2, "2"))
   }
@@ -145,8 +146,9 @@ class ExecutorClassLoaderSuite
     val fileReader = Source
       .fromInputStream(resources.nextElement().openStream())
       .bufferedReader()
-    assert(fileReader.readLine().contains("resource"),
-           "File doesn't contain 'resource'")
+    assert(
+      fileReader.readLine().contains("resource"),
+      "File doesn't contain 'resource'")
   }
 
   test(
@@ -210,17 +212,18 @@ class ExecutorClassLoaderSuite
             invocation: InvocationOnMock): ReadableByteChannel = {
           val uri = new URI(invocation.getArguments()(0).asInstanceOf[String])
           val path =
-            Paths.get(tempDir1.getAbsolutePath(),
-                      uri.getPath().stripPrefix("/"))
+            Paths
+              .get(tempDir1.getAbsolutePath(), uri.getPath().stripPrefix("/"))
           FileChannel.open(path, StandardOpenOption.READ)
         }
       })
 
-    val classLoader = new ExecutorClassLoader(new SparkConf(),
-                                              env,
-                                              "spark://localhost:1234",
-                                              getClass().getClassLoader(),
-                                              false)
+    val classLoader = new ExecutorClassLoader(
+      new SparkConf(),
+      env,
+      "spark://localhost:1234",
+      getClass().getClassLoader(),
+      false)
 
     val fakeClass = classLoader.loadClass("ReplFakeClass2").newInstance()
     val fakeClassVersion = fakeClass.toString

@@ -428,9 +428,10 @@ class SparkJLineCompletion(val intp: SparkIMain)
         case ex: Throwable =>
           logWarning(
             "Error: complete(%s, %s) provoked".format(buf, cursor) + ex)
-          Candidates(cursor,
-                     if (isReplDebug) List("<error:" + ex + ">")
-                     else Nil)
+          Candidates(
+            cursor,
+            if (isReplDebug) List("<error:" + ex + ">")
+            else Nil)
       }
     }
   }

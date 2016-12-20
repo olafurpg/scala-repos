@@ -77,9 +77,10 @@ object ExtractSuperUtil {
       case td: ScTypeDefinition => td.qualifiedName
       case anon: ScNewTemplateDefinition =>
         val anonymous = "<anonymous>"
-        PsiTreeUtil.getParentOfType(anon,
-                                    classOf[ScTemplateDefinition],
-                                    classOf[ScFunctionDefinition]) match {
+        PsiTreeUtil.getParentOfType(
+          anon,
+          classOf[ScTemplateDefinition],
+          classOf[ScFunctionDefinition]) match {
           case td: ScTemplateDefinition => s"$anonymous in ${td.name}"
           case fun: ScFunctionDefinition => s"$anonymous in ${fun.name}"
           case _ => anonymous

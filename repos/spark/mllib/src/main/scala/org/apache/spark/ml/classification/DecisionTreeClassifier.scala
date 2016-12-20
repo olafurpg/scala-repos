@@ -55,9 +55,10 @@ import org.apache.spark.sql.DataFrame
 @Experimental
 final class DecisionTreeClassifier @Since("1.4.0")(
     @Since("1.4.0") override val uid: String)
-    extends ProbabilisticClassifier[Vector,
-                                    DecisionTreeClassifier,
-                                    DecisionTreeClassificationModel]
+    extends ProbabilisticClassifier[
+      Vector,
+      DecisionTreeClassifier,
+      DecisionTreeClassificationModel]
     with DecisionTreeClassifierParams
     with DefaultParamsWritable {
 
@@ -114,12 +115,13 @@ final class DecisionTreeClassifier @Since("1.4.0")(
       }
     val oldDataset: RDD[LabeledPoint] = extractLabeledPoints(dataset)
     val strategy = getOldStrategy(categoricalFeatures, numClasses)
-    val trees = RandomForest.run(oldDataset,
-                                 strategy,
-                                 numTrees = 1,
-                                 featureSubsetStrategy = "all",
-                                 seed = $(seed),
-                                 parentUID = Some(uid))
+    val trees = RandomForest.run(
+      oldDataset,
+      strategy,
+      numTrees = 1,
+      featureSubsetStrategy = "all",
+      seed = $(seed),
+      parentUID = Some(uid))
     trees.head.asInstanceOf[DecisionTreeClassificationModel]
   }
 
@@ -127,23 +129,25 @@ final class DecisionTreeClassifier @Since("1.4.0")(
   private[ml] def train(
       data: RDD[LabeledPoint],
       oldStrategy: OldStrategy): DecisionTreeClassificationModel = {
-    val trees = RandomForest.run(data,
-                                 oldStrategy,
-                                 numTrees = 1,
-                                 featureSubsetStrategy = "all",
-                                 seed = 0L,
-                                 parentUID = Some(uid))
+    val trees = RandomForest.run(
+      data,
+      oldStrategy,
+      numTrees = 1,
+      featureSubsetStrategy = "all",
+      seed = 0L,
+      parentUID = Some(uid))
     trees.head.asInstanceOf[DecisionTreeClassificationModel]
   }
 
   /** (private[ml]) Create a Strategy instance to use with the old API. */
   private[ml] def getOldStrategy(categoricalFeatures: Map[Int, Int],
                                  numClasses: Int): OldStrategy = {
-    super.getOldStrategy(categoricalFeatures,
-                         numClasses,
-                         OldAlgo.Classification,
-                         getOldImpurity,
-                         subsamplingRate = 1.0)
+    super.getOldStrategy(
+      categoricalFeatures,
+      numClasses,
+      OldAlgo.Classification,
+      getOldImpurity,
+      subsamplingRate = 1.0)
   }
 
   @Since("1.4.1")
@@ -178,8 +182,9 @@ final class DecisionTreeClassificationModel private[ml] (
     @Since("1.4.0") override val rootNode: Node,
     @Since("1.6.0") override val numFeatures: Int,
     @Since("1.5.0") override val numClasses: Int)
-    extends ProbabilisticClassificationModel[Vector,
-                                             DecisionTreeClassificationModel]
+    extends ProbabilisticClassificationModel[
+      Vector,
+      DecisionTreeClassificationModel]
     with DecisionTreeModel
     with DecisionTreeClassifierParams
     with MLWritable
@@ -219,11 +224,13 @@ final class DecisionTreeClassificationModel private[ml] (
 
   @Since("1.4.0")
   override def copy(extra: ParamMap): DecisionTreeClassificationModel = {
-    copyValues(new DecisionTreeClassificationModel(uid,
-                                                   rootNode,
-                                                   numFeatures,
-                                                   numClasses),
-               extra).setParent(parent)
+    copyValues(
+      new DecisionTreeClassificationModel(
+        uid,
+        rootNode,
+        numFeatures,
+        numClasses),
+      extra).setParent(parent)
   }
 
   @Since("1.4.0")
@@ -279,8 +286,9 @@ object DecisionTreeClassificationModel
       extends MLWriter {
 
     override protected def saveImpl(path: String): Unit = {
-      val extraMetadata: JObject = Map("numFeatures" -> instance.numFeatures,
-                                       "numClasses" -> instance.numClasses)
+      val extraMetadata: JObject = Map(
+        "numFeatures" -> instance.numFeatures,
+        "numClasses" -> instance.numClasses)
       DefaultParamsWriter.saveMetadata(instance, path, sc, Some(extraMetadata))
       val (nodeData, _) = NodeData.build(instance.rootNode, 0)
       val dataPath = new Path(path, "data").toString
@@ -300,10 +308,11 @@ object DecisionTreeClassificationModel
       val numFeatures = (metadata.metadata \ "numFeatures").extract[Int]
       val numClasses = (metadata.metadata \ "numClasses").extract[Int]
       val root = loadTreeNodes(path, metadata, sqlContext)
-      val model = new DecisionTreeClassificationModel(metadata.uid,
-                                                      root,
-                                                      numFeatures,
-                                                      numClasses)
+      val model = new DecisionTreeClassificationModel(
+        metadata.uid,
+        root,
+        numFeatures,
+        numClasses)
       DefaultParamsReader.getAndSetParams(model, metadata)
       model
     }

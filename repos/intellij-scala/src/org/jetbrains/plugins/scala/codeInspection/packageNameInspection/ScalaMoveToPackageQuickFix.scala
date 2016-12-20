@@ -44,10 +44,11 @@ class ScalaMoveToPackageQuickFix(myFile: ScalaFile, packQualName: String)
     }
     val error = RefactoringMessageUtil.checkCanCreateFile(directory, file.name)
     if (error != null) {
-      Messages.showMessageDialog(project,
-                                 error,
-                                 CommonBundle.getErrorTitle,
-                                 Messages.getErrorIcon)
+      Messages.showMessageDialog(
+        project,
+        error,
+        CommonBundle.getErrorTitle,
+        Messages.getErrorIcon)
       return
     }
     ScalaMoveUtil.saveMoveDestination(file, directory)

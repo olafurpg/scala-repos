@@ -36,15 +36,17 @@ final class ListClientIntegrationSuite extends RedisClientTest {
     }
   }
 
-  test("Correctly measure length of an actively changing list",
-       RedisTest,
-       ClientTest) {
+  test(
+    "Correctly measure length of an actively changing list",
+    RedisTest,
+    ClientTest) {
     withRedisClient { client =>
       val key = foo
 
       assert(Await.result(client.lLen(key)) == 0)
-      assert(Await.result(client.lPush(foo, List(bar))) == 1,
-             "Failed to insert list item.")
+      assert(
+        Await.result(client.lPush(foo, List(bar))) == 1,
+        "Failed to insert list item.")
       assert(Await.result(client.lLen(key)) == 1)
       assert(
         Await
@@ -54,9 +56,10 @@ final class ListClientIntegrationSuite extends RedisClientTest {
     }
   }
 
-  test("Correctly index elements of an actively changing list",
-       RedisTest,
-       ClientTest) {
+  test(
+    "Correctly index elements of an actively changing list",
+    RedisTest,
+    ClientTest) {
     withRedisClient { client =>
       val key = string2ChanBuf("lindex")
 
@@ -86,9 +89,10 @@ final class ListClientIntegrationSuite extends RedisClientTest {
     }
   }
 
-  test("Correctly insert before & after a pushed element",
-       RedisTest,
-       ClientTest) {
+  test(
+    "Correctly insert before & after a pushed element",
+    RedisTest,
+    ClientTest) {
     withRedisClient { client =>
       val key = string2ChanBuf("linsert")
       val PivotFailureMessage = "Pivot not found"
@@ -117,9 +121,10 @@ final class ListClientIntegrationSuite extends RedisClientTest {
     }
   }
 
-  test("Correctly Push -->> Remove -->> Pop elements in order",
-       RedisTest,
-       ClientTest) {
+  test(
+    "Correctly Push -->> Remove -->> Pop elements in order",
+    RedisTest,
+    ClientTest) {
     withRedisClient { client =>
       val key = string2ChanBuf("lremove")
 
@@ -133,9 +138,10 @@ final class ListClientIntegrationSuite extends RedisClientTest {
     }
   }
 
-  test("Correctly push members, set one, then pop them off in order",
-       RedisTest,
-       ClientTest) {
+  test(
+    "Correctly push members, set one, then pop them off in order",
+    RedisTest,
+    ClientTest) {
     withRedisClient { client =>
       val key = string2ChanBuf("lset")
 
@@ -159,9 +165,10 @@ final class ListClientIntegrationSuite extends RedisClientTest {
     }
   }
 
-  test("Correctly push members, examine the range, then pop them off",
-       RedisTest,
-       ClientTest) {
+  test(
+    "Correctly push members, examine the range, then pop them off",
+    RedisTest,
+    ClientTest) {
     withRedisClient { client =>
       val key = string2ChanBuf("lrange")
 
@@ -179,9 +186,10 @@ final class ListClientIntegrationSuite extends RedisClientTest {
     }
   }
 
-  test("Correctly push members, the poll members queue style (RPOP)",
-       RedisTest,
-       ClientTest) {
+  test(
+    "Correctly push members, the poll members queue style (RPOP)",
+    RedisTest,
+    ClientTest) {
     withRedisClient { client =>
       val key = string2ChanBuf("rpop")
 
@@ -198,9 +206,10 @@ final class ListClientIntegrationSuite extends RedisClientTest {
     }
   }
 
-  test("Correctly push then pop members from the HEAD (RPUSH RPOP)",
-       RedisTest,
-       ClientTest) {
+  test(
+    "Correctly push then pop members from the HEAD (RPUSH RPOP)",
+    RedisTest,
+    ClientTest) {
     withRedisClient { client =>
       val key = string2ChanBuf("rpush")
 
@@ -217,9 +226,10 @@ final class ListClientIntegrationSuite extends RedisClientTest {
     }
   }
 
-  test("Correctly push and trim members, then pop the two remaining",
-       RedisTest,
-       ClientTest) {
+  test(
+    "Correctly push and trim members, then pop the two remaining",
+    RedisTest,
+    ClientTest) {
     withRedisClient { client =>
       val key = string2ChanBuf("ltrim")
 

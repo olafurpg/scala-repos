@@ -200,11 +200,12 @@ class ComplexFutureAction[T](run: JobSubmitter => Future[T])
         // If the action hasn't been cancelled yet, submit the job. The check and the submitJob
         // command need to be in an atomic block.
         if (!isCancelled) {
-          val job = rdd.context.submitJob(rdd,
-                                          processPartition,
-                                          partitions,
-                                          resultHandler,
-                                          resultFunc)
+          val job = rdd.context.submitJob(
+            rdd,
+            processPartition,
+            partitions,
+            resultHandler,
+            resultFunc)
           subActions = job :: subActions
           job
         } else {

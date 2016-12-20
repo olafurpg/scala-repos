@@ -66,13 +66,14 @@ class ActorScheduler(scheduler: ActorRef, timeout: Timeout)
               sink: Path,
               timeoutMillis: Option[Long]): EitherT[Future, String, UUID] =
     EitherT {
-      (scheduler ? AddTask(repeat,
-                           apiKey,
-                           authorities,
-                           context,
-                           source,
-                           sink,
-                           timeoutMillis)).mapTo[String \/ UUID]
+      (scheduler ? AddTask(
+        repeat,
+        apiKey,
+        authorities,
+        context,
+        source,
+        sink,
+        timeoutMillis)).mapTo[String \/ UUID]
     }
 
   def deleteTask(id: UUID) = EitherT {

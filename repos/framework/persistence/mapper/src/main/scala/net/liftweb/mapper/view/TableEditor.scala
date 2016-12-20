@@ -97,8 +97,9 @@ trait ItemsList[T <: Mapper[T]] {
               aval.toLowerCase < bval.toLowerCase
             case (aval: Ordered[_], bval: Ordered[_]) =>
               aval.asInstanceOf[Ordered[Any]] < bval.asInstanceOf[Ordered[Any]]
-            case (aval: java.lang.Comparable[_],
-                  bval: java.lang.Comparable[_]) =>
+            case (
+                aval: java.lang.Comparable[_],
+                bval: java.lang.Comparable[_]) =>
               (aval.asInstanceOf[java.lang.Comparable[Any]] compareTo bval
                 .asInstanceOf[java.lang.Comparable[Any]]) < 0
             case (null, _) => sortNullFirst
@@ -293,19 +294,20 @@ trait ItemsListEditor[T <: Mapper[T]] {
       "^" #> customBind(item) andThen ".fields" #> eachField(item, {
         f: MappedField[_, T] =>
           ".form" #> <strike>{f.asHtml}</strike>
-      }) & ".removeBtn" #> SHtml.submit(?("Remove"),
-                                        () => onRemove(item),
-                                        noPrompt) & ".msg" #> Text(
-        ?("Deleted"))
+      }) & ".removeBtn" #> SHtml.submit(
+        ?("Remove"),
+        () => onRemove(item),
+        noPrompt) & ".msg" #> Text(?("Deleted"))
     }
 
     val bindRegularItems = items.items.map { item =>
       "^" #> customBind(item) andThen ".fields" #> eachField(item, {
         f: MappedField[_, T] =>
           ".form" #> f.toForm
-      }) & ".removeBtn" #> SHtml.submit(?("Remove"),
-                                        () => onRemove(item),
-                                        noPrompt) & ".msg" #> {
+      }) & ".removeBtn" #> SHtml.submit(
+        ?("Remove"),
+        () => onRemove(item),
+        noPrompt) & ".msg" #> {
         item.validate match {
           case Nil =>
             if (!item.saved_?) Text(?("New"))
@@ -325,9 +327,10 @@ trait ItemsListEditor[T <: Mapper[T]] {
         fieldFilter
       )
     } & ".table" #> {
-      ".title *" #> title & ".insertBtn" #> SHtml.submit(?("Insert"),
-                                                         onInsert _,
-                                                         noPrompt) & ".item" #>
+      ".title *" #> title & ".insertBtn" #> SHtml.submit(
+        ?("Insert"),
+        onInsert _,
+        noPrompt) & ".item" #>
         (bindRegularItems ++ bindRemovedItems) & ".saveBtn" #> SHtml
         .submit(?("Save"), onSubmit _, noPrompt)
     }

@@ -36,9 +36,10 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 22.02.2009
   */
 class ScalaPatternParameterInfoHandler
-    extends ParameterInfoHandlerWithTabActionSupport[ScPatternArgumentList,
-                                                     Any,
-                                                     ScPattern] {
+    extends ParameterInfoHandlerWithTabActionSupport[
+      ScPatternArgumentList,
+      Any,
+      ScPattern] {
   def getArgListStopSearchClasses: java.util.Set[_ <: Class[_]] = {
     java.util.Collections.singleton(classOf[PsiMethod]) //todo: ?
   }
@@ -162,13 +163,14 @@ class ScalaPatternParameterInfoHandler
         if (endOffset != -1) buffer.replace(endOffset, endOffset + 4, "")
 
         if (buffer.toString != "")
-          context.setupUIComponentPresentation(buffer.toString(),
-                                               startOffset,
-                                               endOffset,
-                                               false,
-                                               false,
-                                               false,
-                                               color)
+          context.setupUIComponentPresentation(
+            buffer.toString(),
+            startOffset,
+            endOffset,
+            false,
+            false,
+            false,
+            color)
         else context.setUIComponentEnabled(false)
       case _ =>
     }

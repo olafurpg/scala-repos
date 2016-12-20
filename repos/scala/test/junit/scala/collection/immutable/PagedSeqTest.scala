@@ -10,8 +10,9 @@ class PagedSeqTest {
   // should not NPE, and should equal the given Seq
   @Test
   def test_SI6615(): Unit = {
-    assertEquals(Seq('a'),
-                 PagedSeq.fromStrings(List.fill(5000)("a")).slice(4096, 4097))
+    assertEquals(
+      Seq('a'),
+      PagedSeq.fromStrings(List.fill(5000)("a")).slice(4096, 4097))
   }
 
   // should not NPE, and should be empty

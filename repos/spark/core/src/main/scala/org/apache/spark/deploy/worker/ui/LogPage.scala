@@ -183,8 +183,9 @@ private[ui] class LogPage(parent: WorkerWebUI)
       (logText, startIndex, endIndex, totalLength)
     } catch {
       case e: Exception =>
-        logError(s"Error getting $logType logs from directory $logDirectory",
-                 e)
+        logError(
+          s"Error getting $logType logs from directory $logDirectory",
+          e)
         ("Error getting logs due to exception: " + e.getMessage, 0, 0, 0)
     }
   }

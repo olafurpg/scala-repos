@@ -53,8 +53,9 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
       classOf[InternalClusterAction.Welcome] -> {
         case bytes ⇒
           val m = cm.Welcome.parseFrom(decompress(bytes))
-          InternalClusterAction.Welcome(uniqueAddressFromProto(m.getFrom),
-                                        gossipFromProto(m.getGossip))
+          InternalClusterAction.Welcome(
+            uniqueAddressFromProto(m.getFrom),
+            gossipFromProto(m.getGossip))
       },
       classOf[ClusterUserAction.Leave] ->
         (bytes ⇒ ClusterUserAction.Leave(addressFromBinary(bytes))),
@@ -203,15 +204,17 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
   }
 
   private def addressFromProto(address: cm.Address): Address =
-    Address(getProtocol(address),
-            getSystem(address),
-            address.getHostname,
-            address.getPort)
+    Address(
+      getProtocol(address),
+      getSystem(address),
+      address.getHostname,
+      address.getPort)
 
   private def uniqueAddressFromProto(
       uniqueAddress: cm.UniqueAddress): UniqueAddress =
-    UniqueAddress(addressFromProto(uniqueAddress.getAddress),
-                  uniqueAddress.getUid)
+    UniqueAddress(
+      addressFromProto(uniqueAddress.getAddress),
+      uniqueAddress.getUid)
 
   private val memberStatusToInt =
     scala.collection.immutable.HashMap[MemberStatus, Int](
@@ -383,10 +386,10 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
       : Reachability = {
       val recordBuilder = new immutable.VectorBuilder[Reachability.Record]
       val versionsBuilder =
-        new scala.collection.mutable.MapBuilder[UniqueAddress,
-                                                Long,
-                                                Map[UniqueAddress, Long]](
-          Map.empty)
+        new scala.collection.mutable.MapBuilder[
+          UniqueAddress,
+          Long,
+          Map[UniqueAddress, Long]](Map.empty)
       for (o ← observerReachability) {
         val observer = addressMapping(o.getAddressIndex)
         versionsBuilder += ((observer, o.getVersion))
@@ -420,9 +423,10 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
       gossip.getOverview.getSeenList.asScala.map(addressMapping(_))(breakOut)
     val overview = GossipOverview(seen, reachability)
 
-    Gossip(members,
-           overview,
-           vectorClockFromProto(gossip.getVersion, hashMapping))
+    Gossip(
+      members,
+      overview,
+      vectorClockFromProto(gossip.getVersion, hashMapping))
   }
 
   private def vectorClockFromProto(version: cm.VectorClock,
@@ -449,8 +453,9 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
   private def gossipStatusFromProto(status: cm.GossipStatus): GossipStatus =
     GossipStatus(
       uniqueAddressFromProto(status.getFrom),
-      vectorClockFromProto(status.getVersion,
-                           status.getAllHashesList.asScala.toVector))
+      vectorClockFromProto(
+        status.getVersion,
+        status.getAllHashesList.asScala.toVector))
 
   private def metricsGossipEnvelopeToProto(
       envelope: MetricsGossipEnvelope): cm.MetricsGossipEnvelope = {
@@ -570,9 +575,10 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
     }
 
     def metricFromProto(metric: cm.NodeMetrics.Metric): Metric =
-      Metric(metricNameMapping(metric.getNameIndex),
-             numberFromProto(metric.getNumber),
-             if (metric.hasEwma) ewmaFromProto(metric.getEwma) else None)
+      Metric(
+        metricNameMapping(metric.getNameIndex),
+        numberFromProto(metric.getNumber),
+        if (metric.hasEwma) ewmaFromProto(metric.getEwma) else None)
 
     def nodeMetricsFromProto(nodeMetrics: cm.NodeMetrics): NodeMetrics =
       NodeMetrics(
@@ -583,8 +589,9 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
     val nodeMetrics: Set[NodeMetrics] =
       mgossip.getNodeMetricsList.asScala.map(nodeMetricsFromProto)(breakOut)
 
-    MetricsGossipEnvelope(addressFromProto(envelope.getFrom),
-                          MetricsGossip(nodeMetrics),
-                          envelope.getReply)
+    MetricsGossipEnvelope(
+      addressFromProto(envelope.getFrom),
+      MetricsGossip(nodeMetrics),
+      envelope.getReply)
   }
 }

@@ -102,11 +102,12 @@ object ScalaMacroDebuggingUtil {
 
       val synFile = PsiFileFactory
         .getInstance(file.getManager.getProject)
-        .createFileFromText("expanded_" + file.getName,
-                            ScalaFileType.SCALA_FILE_TYPE,
-                            linesRed.toString(),
-                            file.getModificationStamp,
-                            true)
+        .createFileFromText(
+          "expanded_" + file.getName,
+          ScalaFileType.SCALA_FILE_TYPE,
+          linesRed.toString(),
+          file.getModificationStamp,
+          true)
         .asInstanceOf[ScalaFile]
 
       SOURCE_CACHE += (canonicalPath -> synFile)
@@ -178,11 +179,12 @@ object ScalaMacroDebuggingUtil {
     val sourceEditor =
       FileEditorManager.getInstance(project).getSelectedTextEditor
     val macroEditor = WorksheetEditorPrinter
-      .newMacrosheetUiFor(sourceEditor,
-                          PsiDocumentManager
-                            .getInstance(project)
-                            .getPsiFile(sourceEditor.getDocument)
-                            .getVirtualFile)
+      .newMacrosheetUiFor(
+        sourceEditor,
+        PsiDocumentManager
+          .getInstance(project)
+          .getPsiFile(sourceEditor.getDocument)
+          .getVirtualFile)
       .getViewerEditor
     val macrosheetFile = PsiDocumentManager
       .getInstance(project)

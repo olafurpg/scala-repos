@@ -40,11 +40,12 @@ private[streaming] class ShuffledDStream[K: ClassTag, V: ClassTag, C: ClassTag](
     parent.getOrCompute(validTime) match {
       case Some(rdd) =>
         Some(
-          rdd.combineByKey[C](createCombiner,
-                              mergeValue,
-                              mergeCombiner,
-                              partitioner,
-                              mapSideCombine))
+          rdd.combineByKey[C](
+            createCombiner,
+            mergeValue,
+            mergeCombiner,
+            partitioner,
+            mapSideCombine))
       case None => None
     }
   }

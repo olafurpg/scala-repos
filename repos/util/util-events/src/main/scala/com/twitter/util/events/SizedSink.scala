@@ -42,13 +42,14 @@ object SizedSink {
     def isDefined: Boolean = etype != null
 
     def toEvent: Event =
-      Event(etype,
-            Time.fromMilliseconds(whenMillis),
-            longVal,
-            objectVal,
-            doubleVal,
-            traceIdVal,
-            spanIdVal)
+      Event(
+        etype,
+        Time.fromMilliseconds(whenMillis),
+        longVal,
+        objectVal,
+        doubleVal,
+        traceIdVal,
+        spanIdVal)
   }
 }
 
@@ -79,8 +80,9 @@ class SizedSink private[events] (capacity: Int, milliTime: () => Long)
 
   // require capacity be a power of 2:
   // http://en.wikipedia.org/wiki/Power_of_two#Fast_algorithm_to_check_if_a_positive_number_is_a_power_of_two
-  require((capacity & (capacity - 1)) == 0,
-          s"capacity must be power of 2: $capacity")
+  require(
+    (capacity & (capacity - 1)) == 0,
+    s"capacity must be power of 2: $capacity")
 
   private[this] val pos = new AtomicLong(0)
 

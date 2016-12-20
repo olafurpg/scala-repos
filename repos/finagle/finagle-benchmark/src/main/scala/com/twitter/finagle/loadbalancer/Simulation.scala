@@ -192,9 +192,10 @@ private[finagle] object Simulation extends com.twitter.app.App {
       case "aperture" =>
         Balancers
           .aperture()
-          .newBalancer(activity,
-                       statsReceiver = stats.scope("aperture"),
-                       noBrokers)
+          .newBalancer(
+            activity,
+            statsReceiver = stats.scope("aperture"),
+            noBrokers)
     }
 
     val balancer = factory.toService

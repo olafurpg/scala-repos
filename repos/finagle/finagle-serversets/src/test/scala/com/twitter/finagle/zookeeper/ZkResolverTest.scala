@@ -115,10 +115,12 @@ class ZkResolverTest extends FunSuite with BeforeAndAfter {
       val serverSet = new ServerSetImpl(inst.zookeeperClient, "/foo/bar/baz")
       val port1 = RandomSocket.nextPort()
       val port2 = RandomSocket.nextPort()
-      val sockAddr = Address.Inet(new InetSocketAddress("127.0.0.1", port1),
-                                  Addr.Metadata.empty)
-      val blahAddr = Address.Inet(new InetSocketAddress("10.0.0.1", port2),
-                                  Addr.Metadata.empty)
+      val sockAddr = Address.Inet(
+        new InetSocketAddress("127.0.0.1", port1),
+        Addr.Metadata.empty)
+      val blahAddr = Address.Inet(
+        new InetSocketAddress("10.0.0.1", port2),
+        Addr.Metadata.empty)
 
       val status = serverSet.join(
         sockAddr.addr,

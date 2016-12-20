@@ -81,8 +81,9 @@ class IntegralDeltaSuite extends SparkFunSuite {
         buffer.getInt())
 
       if (input.nonEmpty) {
-        assertResult(Byte.MinValue,
-                     "The first byte should be an escaping mark")(buffer.get())
+        assertResult(
+          Byte.MinValue,
+          "The first byte should be an escaping mark")(buffer.get())
         assertResult(input.head, "The first value is wrong")(
           columnType.extract(buffer))
 

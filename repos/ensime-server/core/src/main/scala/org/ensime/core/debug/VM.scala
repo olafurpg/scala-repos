@@ -380,9 +380,10 @@ class VM(val mode: VmMode,
     } else {
       stackSlotForName(thread, name)
         .map({ slot =>
-          DebugStackSlot(DebugThreadId(thread.uniqueID),
-                         slot.frame,
-                         slot.offset)
+          DebugStackSlot(
+            DebugThreadId(thread.uniqueID),
+            slot.frame,
+            slot.offset)
         })
         .orElse(
           fieldByName(objRef, name).flatMap { f =>
@@ -432,10 +433,11 @@ class VM(val mode: VmMode,
         case Some(m) =>
           log.info("Invoking: " + m)
           Some(
-            obj.invokeMethod(thread,
-                             m,
-                             args,
-                             ObjectReference.INVOKE_SINGLE_THREADED))
+            obj.invokeMethod(
+              thread,
+              m,
+              args,
+              ObjectReference.INVOKE_SINGLE_THREADED))
         case other =>
           log.error("toString method not found: " + other)
           None
@@ -453,11 +455,12 @@ class VM(val mode: VmMode,
         Some(str.value)
       case Some(obj: ObjectReference) =>
         threadById(threadId) flatMap { thread =>
-          callMethod(thread,
-                     obj,
-                     "toString",
-                     "()Ljava/lang/String;",
-                     new java.util.Vector()) match {
+          callMethod(
+            thread,
+            obj,
+            "toString",
+            "()Ljava/lang/String;",
+            new java.util.Vector()) match {
             case Some(v: StringReference) =>
               Some(v.value)
             case Some(null) => Some("null")
@@ -532,10 +535,11 @@ class VM(val mode: VmMode,
       frame.visibleVariables.zipWithIndex
         .map {
           case (v, i) =>
-            DebugStackLocal(i,
-                            v.name,
-                            valueSummary(frame.getValue(v)),
-                            v.typeName())
+            DebugStackLocal(
+              i,
+              v.name,
+              valueSummary(frame.getValue(v)),
+              v.typeName())
         }
         .toList
     }, List.empty)
@@ -552,13 +556,14 @@ class VM(val mode: VmMode,
         )
       )
     val thisObjId = ignoreErr(remember(frame.thisObject()).uniqueID, -1L)
-    DebugStackFrame(index,
-                    locals,
-                    numArgs,
-                    className,
-                    methodName,
-                    pcLocation,
-                    DebugObjectId(thisObjId))
+    DebugStackFrame(
+      index,
+      locals,
+      numArgs,
+      className,
+      methodName,
+      pcLocation,
+      DebugObjectId(thisObjId))
   }
 
   def backtrace(thread: ThreadReference,
@@ -571,9 +576,10 @@ class VM(val mode: VmMode,
       frames += makeStackFrame(i, stackFrame)
       i += 1
     }
-    DebugBacktrace(frames.toList,
-                   DebugThreadId(thread.uniqueID()),
-                   thread.name())
+    DebugBacktrace(
+      frames.toList,
+      DebugThreadId(thread.uniqueID()),
+      thread.name())
   }
 
   private def mirrorFromString(tpe: Type, toMirror: String): Option[Value] = {

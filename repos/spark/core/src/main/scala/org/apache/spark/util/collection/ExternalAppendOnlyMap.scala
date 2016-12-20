@@ -76,12 +76,13 @@ class ExternalAppendOnlyMap[K, V, C](
            mergeCombiners: (C, C) => C,
            serializer: Serializer,
            blockManager: BlockManager) {
-    this(createCombiner,
-         mergeValue,
-         mergeCombiners,
-         serializer,
-         blockManager,
-         TaskContext.get())
+    this(
+      createCombiner,
+      mergeValue,
+      mergeCombiners,
+      serializer,
+      blockManager,
+      TaskContext.get())
   }
 
   override protected[this] def taskMemoryManager: TaskMemoryManager =
@@ -258,8 +259,9 @@ class ExternalAppendOnlyMap[K, V, C](
         "ExternalAppendOnlyMap.iterator is destructive and should only be called once.")
     }
     if (spilledMaps.isEmpty) {
-      CompletionIterator[(K, C), Iterator[(K, C)]](currentMap.iterator,
-                                                   freeCurrentMap())
+      CompletionIterator[(K, C), Iterator[(K, C)]](
+        currentMap.iterator,
+        freeCurrentMap())
     } else {
       new ExternalIterator()
     }
@@ -435,11 +437,12 @@ class ExternalAppendOnlyMap[K, V, C](
       extends Iterator[(K, C)] {
     private val batchOffsets =
       batchSizes.scanLeft(0L)(_ + _) // Size will be batchSize.length + 1
-    assert(file.length() == batchOffsets.last,
-           "File length is not equal to the last batch offset:\n" +
-             s"    file length = ${file.length}\n" +
-             s"    last batch offset = ${batchOffsets.last}\n" +
-             s"    all batch offsets = ${batchOffsets.mkString(",")}")
+    assert(
+      file.length() == batchOffsets.last,
+      "File length is not equal to the last batch offset:\n" +
+        s"    file length = ${file.length}\n" +
+        s"    last batch offset = ${batchOffsets.last}\n" +
+        s"    all batch offsets = ${batchOffsets.mkString(",")}")
 
     private var batchIndex = 0 // Which batch we're in
     private var fileStream: FileInputStream = null
@@ -471,9 +474,10 @@ class ExternalAppendOnlyMap[K, V, C](
 
         val end = batchOffsets(batchIndex)
 
-        assert(end >= start,
-               "start = " + start + ", end = " + end + ", batchOffsets = " +
-                 batchOffsets.mkString("[", ", ", "]"))
+        assert(
+          end >= start,
+          "start = " + start + ", end = " + end + ", batchOffsets = " +
+            batchOffsets.mkString("[", ", ", "]"))
 
         val bufferedStream = new BufferedInputStream(
           ByteStreams.limit(fileStream, end - start))

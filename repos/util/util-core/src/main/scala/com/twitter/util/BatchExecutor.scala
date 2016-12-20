@@ -62,9 +62,10 @@ private[util] class BatchExecutor[In, Out](
 
   def currentBufPercentile = sizePercentile match {
     case tooHigh if tooHigh > 1.0f =>
-      log.log(WARNING,
-              "value returned for sizePercentile (%f) was > 1.0f, using 1.0",
-              tooHigh)
+      log.log(
+        WARNING,
+        "value returned for sizePercentile (%f) was > 1.0f, using 1.0",
+        tooHigh)
       1.0f
 
     case tooLow if tooLow < 0.0f =>
@@ -130,10 +131,11 @@ private[util] class BatchExecutor[In, Out](
         executeBatch(prevBatch)
       } catch {
         case e: Throwable =>
-          log.log(WARNING,
-                  "unhandled exception caught in Future.batched: %s".format(
-                    e.toString),
-                  e)
+          log.log(
+            WARNING,
+            "unhandled exception caught in Future.batched: %s".format(
+              e.toString),
+            e)
       }
   }
 

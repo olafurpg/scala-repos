@@ -74,19 +74,20 @@ trait ReductionLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
     val ReductionNamespace = Vector()
 
     override def _libReduction =
-      super._libReduction ++ Set(Count,
-                                 Max,
-                                 Min,
-                                 MaxTime,
-                                 MinTime,
-                                 Sum,
-                                 Mean,
-                                 GeometricMean,
-                                 SumSq,
-                                 Variance,
-                                 StdDev,
-                                 Forall,
-                                 Exists)
+      super._libReduction ++ Set(
+        Count,
+        Max,
+        Min,
+        MaxTime,
+        MinTime,
+        Sum,
+        Mean,
+        GeometricMean,
+        SumSq,
+        Variance,
+        StdDev,
+        Forall,
+        Exists)
 
     val CountMonoid = implicitly[Monoid[Count.Result]]
     object Count extends Reduction(ReductionNamespace, "count") {

@@ -28,12 +28,13 @@ class ScalaMoveClassesOrPackagesProcessor(project: Project,
           td :: ScalaPsiUtil.getBaseCompanionModule(td).toList
         case e => List(e)
       } else elements
-} with MoveClassesOrPackagesProcessor(project,
-                                      expandedElements,
-                                      moveDestination,
-                                      searchInComments,
-                                      searchInNonJavaFiles,
-                                      moveCallback) {
+} with MoveClassesOrPackagesProcessor(
+  project,
+  expandedElements,
+  moveDestination,
+  searchInComments,
+  searchInNonJavaFiles,
+  moveCallback) {
   extensions.inWriteAction {
     expandedElements.foreach(
       c =>

@@ -138,48 +138,55 @@ object SBTConsole {
     val accountFinder = new StaticAccountFinder[Future]("", "")
     val rawAPIKeyFinder = new InMemoryAPIKeyManager[Future](Clock.System)
     val accessControl = new DirectAPIKeyFinder(rawAPIKeyFinder)
-    val permissionsFinder = new PermissionsFinder(accessControl,
-                                                  accountFinder,
-                                                  new org.joda.time.Instant())
+    val permissionsFinder = new PermissionsFinder(
+      accessControl,
+      accountFinder,
+      new org.joda.time.Instant())
 
     val rootAPIKey = rawAPIKeyFinder.rootAPIKey.copoint
-    val rootAccount = AccountDetails("root",
-                                     "nobody@precog.com",
-                                     new DateTime,
-                                     rootAPIKey,
-                                     Path.Root,
-                                     AccountPlan.Root)
+    val rootAccount = AccountDetails(
+      "root",
+      "nobody@precog.com",
+      new DateTime,
+      rootAPIKey,
+      Path.Root,
+      AccountPlan.Root)
     def evaluationContext =
-      EvaluationContext(rootAPIKey,
-                        rootAccount,
-                        Path.Root,
-                        Path.Root,
-                        new DateTime)
+      EvaluationContext(
+        rootAPIKey,
+        rootAccount,
+        Path.Root,
+        Path.Root,
+        new DateTime)
 
     val storageTimeout = yggConfig.storageTimeout
 
     val masterChef = actorSystem.actorOf(
       Props(
-        Chef(VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
-             VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
+        Chef(
+          VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
+          VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
 
-    val resourceBuilder = new ResourceBuilder(actorSystem,
-                                              yggConfig.clock,
-                                              masterChef,
-                                              yggConfig.cookThreshold,
-                                              yggConfig.storageTimeout)
+    val resourceBuilder = new ResourceBuilder(
+      actorSystem,
+      yggConfig.clock,
+      masterChef,
+      yggConfig.cookThreshold,
+      yggConfig.storageTimeout)
     val projectionsActor = actorSystem.actorOf(
       Props(
-        new PathRoutingActor(yggConfig.dataDir,
-                             yggConfig.storageTimeout.duration,
-                             yggConfig.quiescenceTimeout,
-                             100,
-                             yggConfig.clock)))
+        new PathRoutingActor(
+          yggConfig.dataDir,
+          yggConfig.storageTimeout.duration,
+          yggConfig.quiescenceTimeout,
+          100,
+          yggConfig.clock)))
 
     val jobManager = new InMemoryJobManager[Future]
-    val actorVFS = new ActorVFS(projectionsActor,
-                                yggConfig.storageTimeout,
-                                yggConfig.storageTimeout)
+    val actorVFS = new ActorVFS(
+      projectionsActor,
+      yggConfig.storageTimeout,
+      yggConfig.storageTimeout)
     val vfs =
       new SecureVFS(actorVFS, permissionsFinder, jobManager, Clock.System)
 

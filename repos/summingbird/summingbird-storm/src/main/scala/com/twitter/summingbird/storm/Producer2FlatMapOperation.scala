@@ -40,8 +40,9 @@ object Producer2FlatMapOperation {
           p match {
             case LeftJoinedProducer(_, wrapper) =>
               FlatMapOperation
-                .combine(acc.asInstanceOf[FlatMapOperation[Any, (Any, Any)]],
-                         wrapper.asInstanceOf[OnlineServiceFactory[Any, Any]])
+                .combine(
+                  acc.asInstanceOf[FlatMapOperation[Any, (Any, Any)]],
+                  wrapper.asInstanceOf[OnlineServiceFactory[Any, Any]])
                 .asInstanceOf[FlatMapOperation[Any, Any]]
             case OptionMappedProducer(_, op) =>
               acc.andThen(

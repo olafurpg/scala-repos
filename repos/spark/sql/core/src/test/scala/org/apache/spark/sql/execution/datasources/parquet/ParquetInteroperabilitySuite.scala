@@ -81,8 +81,9 @@ class ParquetInteroperabilitySuite
 
       logParquetSchema(protobufStylePath)
 
-      checkAnswer(sqlContext.read.parquet(dir.getCanonicalPath),
-                  Seq(Row(Seq(0, 1)), Row(Seq(2, 3))))
+      checkAnswer(
+        sqlContext.read.parquet(dir.getCanonicalPath),
+        Seq(Row(Seq(0, 1)), Row(Seq(2, 3))))
     }
   }
 }

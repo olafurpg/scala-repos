@@ -45,21 +45,23 @@ private[forum] final class TopicApi(
     TopicRepo
       .nextSlug(categ, data.name) zip detectLanguage(data.post.text) flatMap {
       case (slug, lang) =>
-        val topic = Topic.make(categId = categ.slug,
-                               slug = slug,
-                               name = data.name,
-                               troll = ctx.troll,
-                               featured = true)
-        val post = Post.make(topicId = topic.id,
-                             author = data.post.author,
-                             userId = ctx.me map (_.id),
-                             ip = ctx.isAnon option ctx.req.remoteAddress,
-                             troll = ctx.troll,
-                             hidden = topic.hidden,
-                             text = lila.security.Spam.replace(data.post.text),
-                             lang = lang map (_.language),
-                             number = 1,
-                             categId = categ.id)
+        val topic = Topic.make(
+          categId = categ.slug,
+          slug = slug,
+          name = data.name,
+          troll = ctx.troll,
+          featured = true)
+        val post = Post.make(
+          topicId = topic.id,
+          author = data.post.author,
+          userId = ctx.me map (_.id),
+          ip = ctx.isAnon option ctx.req.remoteAddress,
+          troll = ctx.troll,
+          hidden = topic.hidden,
+          text = lila.security.Spam.replace(data.post.text),
+          lang = lang map (_.language),
+          number = 1,
+          categId = categ.id)
         $insert(post) >> $insert(topic withPost post) >> $update(
           categ withTopic post) >>- (indexer ! InsertPost(post)) >> env.recent.invalidate >>- ctx.userId
           .?? { userId =>
@@ -71,8 +73,8 @@ private[forum] final class TopicApi(
           (ctx.userId ifFalse post.troll) ?? { userId =>
             timeline ! Propagate(
               ForumPost(userId, topic.id.some, topic.name, post.id)).|>(prop =>
-              post.isStaff.fold(prop toStaffFriendsOf userId,
-                                prop toFollowersOf userId))
+              post.isStaff
+                .fold(prop toStaffFriendsOf userId, prop toFollowersOf userId))
           }
           lila.mon.forum.post.create()
         } inject topic

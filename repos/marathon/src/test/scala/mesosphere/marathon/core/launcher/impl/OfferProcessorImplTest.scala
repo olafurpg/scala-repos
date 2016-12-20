@@ -291,9 +291,9 @@ class OfferProcessorImplTest
     Await.result(offerProcessor.processOffer(offer), 1.second)
 
     verify(offerMatcher).matchOffer(deadline, offer)
-    verify(taskLauncher).declineOffer(offerId,
-                                      refuseMilliseconds =
-                                        Some(conf.declineOfferDuration()))
+    verify(taskLauncher).declineOffer(
+      offerId,
+      refuseMilliseconds = Some(conf.declineOfferDuration()))
   }
 
   test("match crashed => decline") {

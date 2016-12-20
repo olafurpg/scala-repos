@@ -26,8 +26,9 @@ class RouteRegistry {
   def apply(method: HttpMethod): Seq[Route] =
     method match {
       case Head =>
-        _methodRoutes.getOrElse(Head,
-                                _methodRoutes.getOrElse(Get, Vector.empty))
+        _methodRoutes.getOrElse(
+          Head,
+          _methodRoutes.getOrElse(Get, Vector.empty))
       case m => _methodRoutes.getOrElse(m, Vector.empty)
     }
 

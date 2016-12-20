@@ -162,8 +162,9 @@ case class RichRequest(r: HttpServletRequest) extends AttributesMap {
     */
   def serverName: String = r.getServerName
 
-  @deprecated(message = "Use HttpServletRequest.serverName instead",
-              since = "2.0.0")
+  @deprecated(
+    message = "Use HttpServletRequest.serverName instead",
+    since = "2.0.0")
   def host: String = serverName
 
   /**
@@ -172,8 +173,9 @@ case class RichRequest(r: HttpServletRequest) extends AttributesMap {
     */
   def serverPort: Int = r.getServerPort
 
-  @deprecated(message = "Use HttpServletRequest.serverPort instead",
-              since = "2.0.0")
+  @deprecated(
+    message = "Use HttpServletRequest.serverPort instead",
+    since = "2.0.0")
   def port: String = Integer.toString(r.getServerPort)
 
   /**

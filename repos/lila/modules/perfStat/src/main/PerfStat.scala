@@ -63,9 +63,10 @@ case class PlayStreak(nb: Streaks, time: Streaks, lastDate: Option[DateTime]) {
   def agg(pov: Pov) = {
     val seconds = pov.game.durationSeconds
     val cont = seconds < 3 * 60 * 60 && isContinued(pov.game.createdAt)
-    copy(nb = nb(cont, pov)(1),
-         time = time(cont, pov)(seconds),
-         lastDate = pov.game.updatedAtOrCreatedAt.some)
+    copy(
+      nb = nb(cont, pov)(1),
+      time = time(cont, pov)(seconds),
+      lastDate = pov.game.updatedAtOrCreatedAt.some)
   }
   def checkCurrent =
     if (isContinued(DateTime.now)) this
@@ -116,34 +117,36 @@ case class Count(all: Int,
                  seconds: Int,
                  disconnects: Int) {
   def apply(pov: Pov) =
-    copy(all = all + 1,
-         rated = rated + pov.game.rated.fold(1, 0),
-         win = win + pov.win.contains(true).fold(1, 0),
-         loss = loss + pov.win.contains(false).fold(1, 0),
-         draw = draw + pov.win.isEmpty.fold(1, 0),
-         tour = tour + pov.game.isTournament.fold(1, 0),
-         berserk = berserk + pov.player.berserk.fold(1, 0),
-         opAvg = pov.opponent.stableRating.fold(opAvg)(opAvg.agg),
-         seconds = seconds +
-             (pov.game.durationSeconds match {
-             case s if s > 3 * 60 * 60 => 0
-             case s => s
-           }),
-         disconnects = disconnects + {
-           ~pov.loss && pov.game.status == chess.Status.Timeout
-         }.fold(1, 0))
+    copy(
+      all = all + 1,
+      rated = rated + pov.game.rated.fold(1, 0),
+      win = win + pov.win.contains(true).fold(1, 0),
+      loss = loss + pov.win.contains(false).fold(1, 0),
+      draw = draw + pov.win.isEmpty.fold(1, 0),
+      tour = tour + pov.game.isTournament.fold(1, 0),
+      berserk = berserk + pov.player.berserk.fold(1, 0),
+      opAvg = pov.opponent.stableRating.fold(opAvg)(opAvg.agg),
+      seconds = seconds +
+          (pov.game.durationSeconds match {
+          case s if s > 3 * 60 * 60 => 0
+          case s => s
+        }),
+      disconnects = disconnects + {
+        ~pov.loss && pov.game.status == chess.Status.Timeout
+      }.fold(1, 0))
 }
 object Count {
-  val init = Count(all = 0,
-                   rated = 0,
-                   win = 0,
-                   loss = 0,
-                   draw = 0,
-                   tour = 0,
-                   berserk = 0,
-                   opAvg = Avg(0, 0),
-                   seconds = 0,
-                   disconnects = 0)
+  val init = Count(
+    all = 0,
+    rated = 0,
+    win = 0,
+    loss = 0,
+    draw = 0,
+    tour = 0,
+    berserk = 0,
+    opAvg = Avg(0, 0),
+    seconds = 0,
+    disconnects = 0)
 }
 
 case class Avg(avg: Double, pop: Int) {

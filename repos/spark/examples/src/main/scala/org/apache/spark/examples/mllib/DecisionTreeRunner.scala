@@ -280,12 +280,13 @@ object DecisionTreeRunner {
     println(s"DecisionTreeRunner with parameters:\n$params")
 
     // Load training and test data and cache it.
-    val (training, test, numClasses) = loadDatasets(sc,
-                                                    params.input,
-                                                    params.dataFormat,
-                                                    params.testInput,
-                                                    params.algo,
-                                                    params.fracTest)
+    val (training, test, numClasses) = loadDatasets(
+      sc,
+      params.input,
+      params.dataFormat,
+      params.testInput,
+      params.algo,
+      params.fracTest)
 
     val impurityCalculator = params.impurity match {
       case Gini => impurity.Gini
@@ -295,16 +296,16 @@ object DecisionTreeRunner {
 
     params.checkpointDir.foreach(sc.setCheckpointDir)
 
-    val strategy = new Strategy(algo = params.algo,
-                                impurity = impurityCalculator,
-                                maxDepth = params.maxDepth,
-                                maxBins = params.maxBins,
-                                numClasses = numClasses,
-                                minInstancesPerNode =
-                                  params.minInstancesPerNode,
-                                minInfoGain = params.minInfoGain,
-                                useNodeIdCache = params.useNodeIdCache,
-                                checkpointInterval = params.checkpointInterval)
+    val strategy = new Strategy(
+      algo = params.algo,
+      impurity = impurityCalculator,
+      maxDepth = params.maxDepth,
+      maxBins = params.maxBins,
+      numClasses = numClasses,
+      minInstancesPerNode = params.minInstancesPerNode,
+      minInfoGain = params.minInfoGain,
+      useNodeIdCache = params.useNodeIdCache,
+      checkpointInterval = params.checkpointInterval)
     if (params.numTrees == 1) {
       val startTime = System.nanoTime()
       val model = DecisionTree.train(training, strategy)
@@ -333,11 +334,12 @@ object DecisionTreeRunner {
       val randomSeed = Utils.random.nextInt()
       if (params.algo == Classification) {
         val startTime = System.nanoTime()
-        val model = RandomForest.trainClassifier(training,
-                                                 strategy,
-                                                 params.numTrees,
-                                                 params.featureSubsetStrategy,
-                                                 randomSeed)
+        val model = RandomForest.trainClassifier(
+          training,
+          strategy,
+          params.numTrees,
+          params.featureSubsetStrategy,
+          randomSeed)
         val elapsedTime = (System.nanoTime() - startTime) / 1e9
         println(s"Training time: $elapsedTime seconds")
         if (model.totalNumNodes < 30) {
@@ -354,11 +356,12 @@ object DecisionTreeRunner {
       }
       if (params.algo == Regression) {
         val startTime = System.nanoTime()
-        val model = RandomForest.trainRegressor(training,
-                                                strategy,
-                                                params.numTrees,
-                                                params.featureSubsetStrategy,
-                                                randomSeed)
+        val model = RandomForest.trainRegressor(
+          training,
+          strategy,
+          params.numTrees,
+          params.featureSubsetStrategy,
+          randomSeed)
         val elapsedTime = (System.nanoTime() - startTime) / 1e9
         println(s"Training time: $elapsedTime seconds")
         if (model.totalNumNodes < 30) {

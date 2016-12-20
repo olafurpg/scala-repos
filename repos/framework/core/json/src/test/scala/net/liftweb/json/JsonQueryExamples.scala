@@ -32,11 +32,12 @@ object JsonQueryExamples extends Specification {
       ip
     }
 
-    ips mustEqual List("192.168.1.125",
-                       "192.168.1.126",
-                       "192.168.1.127",
-                       "192.168.2.125",
-                       "192.168.2.126")
+    ips mustEqual List(
+      "192.168.1.125",
+      "192.168.1.126",
+      "192.168.1.127",
+      "192.168.2.125",
+      "192.168.2.126")
   }
 
   "List of IPs converted to XML" in {

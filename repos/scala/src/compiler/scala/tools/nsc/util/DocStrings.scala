@@ -215,8 +215,9 @@ object DocStrings {
     val (beg, end) = section
     if (str.startsWith("@param", beg) || str.startsWith("@tparam", beg) ||
         str.startsWith("@throws", beg))
-      (skipWhitespace(str,
-                      skipIdent(str, skipWhitespace(str, skipTag(str, beg)))),
+      (skipWhitespace(
+         str,
+         skipIdent(str, skipWhitespace(str, skipTag(str, beg)))),
        end)
     else (skipWhitespace(str, skipTag(str, beg)), end)
   }

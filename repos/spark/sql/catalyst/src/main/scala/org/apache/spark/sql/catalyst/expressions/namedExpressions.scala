@@ -161,9 +161,10 @@ case class Alias(child: Expression, name: String)(
   }
 
   def newInstance(): NamedExpression =
-    Alias(child, name)(qualifiers = qualifiers,
-                       explicitMetadata = explicitMetadata,
-                       isGenerated = isGenerated)
+    Alias(child, name)(
+      qualifiers = qualifiers,
+      explicitMetadata = explicitMetadata,
+      isGenerated = isGenerated)
 
   override def toAttribute: Attribute = {
     if (resolved) {
@@ -267,9 +268,10 @@ case class AttributeReference(
     if (nullable == newNullability) {
       this
     } else {
-      AttributeReference(name, dataType, newNullability, metadata)(exprId,
-                                                                   qualifiers,
-                                                                   isGenerated)
+      AttributeReference(name, dataType, newNullability, metadata)(
+        exprId,
+        qualifiers,
+        isGenerated)
     }
   }
 
@@ -277,9 +279,10 @@ case class AttributeReference(
     if (name == newName) {
       this
     } else {
-      AttributeReference(newName, dataType, nullable, metadata)(exprId,
-                                                                qualifiers,
-                                                                isGenerated)
+      AttributeReference(newName, dataType, nullable, metadata)(
+        exprId,
+        qualifiers,
+        isGenerated)
     }
   }
 
@@ -290,9 +293,10 @@ case class AttributeReference(
     if (newQualifiers.toSet == qualifiers.toSet) {
       this
     } else {
-      AttributeReference(name, dataType, nullable, metadata)(exprId,
-                                                             newQualifiers,
-                                                             isGenerated)
+      AttributeReference(name, dataType, nullable, metadata)(
+        exprId,
+        newQualifiers,
+        isGenerated)
     }
   }
 
@@ -300,9 +304,10 @@ case class AttributeReference(
     if (exprId == newExprId) {
       this
     } else {
-      AttributeReference(name, dataType, nullable, metadata)(newExprId,
-                                                             qualifiers,
-                                                             isGenerated)
+      AttributeReference(name, dataType, nullable, metadata)(
+        newExprId,
+        qualifiers,
+        isGenerated)
     }
   }
 

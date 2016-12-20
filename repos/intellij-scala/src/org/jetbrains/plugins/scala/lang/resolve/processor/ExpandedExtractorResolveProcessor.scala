@@ -53,11 +53,12 @@ class ExpandedExtractorResolveProcessor(ref: ScReferenceElement,
                     if fun.name == "unapply" ||
                       (seq && fun.name == "unapplySeq") =>
                   buffer +=
-                    new ScalaResolveResult(fun,
-                                           parentSubst.followed(subst),
-                                           parentImports,
-                                           parentElement = Some(bind),
-                                           isAccessible = accessible)
+                    new ScalaResolveResult(
+                      fun,
+                      parentSubst.followed(subst),
+                      parentImports,
+                      parentElement = Some(bind),
+                      isAccessible = accessible)
                 case _ =>
               }
               true

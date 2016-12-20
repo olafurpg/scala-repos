@@ -73,11 +73,13 @@ object PathData {
       new Decomposer[DataType] with Extractor[DataType] {
         def decompose(t: DataType) = t match {
           case BLOB(contentType) =>
-            JObject("type" -> JString("blob"),
-                    "mimeType" -> JString(contentType.value))
+            JObject(
+              "type" -> JString("blob"),
+              "mimeType" -> JString(contentType.value))
           case NIHDB =>
-            JObject("type" -> JString("nihdb"),
-                    "mimeType" -> JString(FileContent.XQuirrelData.value))
+            JObject(
+              "type" -> JString("nihdb"),
+              "mimeType" -> JString(FileContent.XQuirrelData.value))
         }
 
         def validated(v: JValue) = {

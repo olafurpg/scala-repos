@@ -101,8 +101,9 @@ trait PrepJSExports { this: PrepJSInterop =>
 
   /** Checks and registers class exports on the symbol. */
   def registerClassExports(sym: Symbol): Unit = {
-    assert(!sym.isModuleClass && sym.hasAnnotation(ScalaJSDefinedAnnotation),
-           "Expected a Scala.js-defined JS class")
+    assert(
+      !sym.isModuleClass && sym.hasAnnotation(ScalaJSDefinedAnnotation),
+      "Expected a Scala.js-defined JS class")
     registerClassOrModuleExportsInternal(sym)
   }
 
@@ -144,10 +145,11 @@ trait PrepJSExports { this: PrepJSInterop =>
         for {
           exp <- named if !exp.ignoreInvalid
         } {
-          reporter.error(exp.pos,
-                         "You may not use @JSNamedExport on " +
-                           (if (isMod) "an object"
-                            else "a Scala.js-defined JS class"))
+          reporter.error(
+            exp.pos,
+            "You may not use @JSNamedExport on " +
+              (if (isMod) "an object"
+               else "a Scala.js-defined JS class"))
         }
 
         jsInterop.registerForExport(sym, normal)

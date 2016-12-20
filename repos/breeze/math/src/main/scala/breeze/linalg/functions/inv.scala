@@ -34,8 +34,9 @@ object inv extends UFunc {
           lwork /* workspace size */,
           info
         )
-        assert(info.`val` >= 0,
-               "Malformed argument %d (LAPACK)".format(-info.`val`))
+        assert(
+          info.`val` >= 0,
+          "Malformed argument %d (LAPACK)".format(-info.`val`))
 
         if (info.`val` > 0) throw new MatrixSingularException
 
@@ -64,8 +65,9 @@ object inv extends UFunc {
           lwork /* workspace size */,
           info
         )
-        assert(info.`val` >= 0,
-               "Malformed argument %d (LAPACK)".format(-info.`val`))
+        assert(
+          info.`val` >= 0,
+          "Malformed argument %d (LAPACK)".format(-info.`val`))
 
         if (info.`val` > 0) throw new MatrixSingularException
 

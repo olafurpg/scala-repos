@@ -101,10 +101,11 @@ private[mesos] trait MesosSchedulerUtils extends Logging {
       fwInfoBuilder.setRole(role)
     }
     if (credBuilder.hasPrincipal) {
-      new MesosSchedulerDriver(scheduler,
-                               fwInfoBuilder.build(),
-                               masterUrl,
-                               credBuilder.build())
+      new MesosSchedulerDriver(
+        scheduler,
+        fwInfoBuilder.build(),
+        masterUrl,
+        credBuilder.build())
     } else {
       new MesosSchedulerDriver(scheduler, fwInfoBuilder.build(), masterUrl)
     }
@@ -211,9 +212,10 @@ private[mesos] trait MesosSchedulerUtils extends Logging {
           requestedResources +=
             createResource(resourceName, usage, Some(r.getRole))
           remain -= usage
-          createResource(resourceName,
-                         r.getScalar.getValue - usage,
-                         Some(r.getRole))
+          createResource(
+            resourceName,
+            r.getScalar.getValue - usage,
+            Some(r.getRole))
         } else {
           r
         }
@@ -369,11 +371,13 @@ private[mesos] trait MesosSchedulerUtils extends Logging {
     *         (whichever is larger)
     */
   def executorMemory(sc: SparkContext): Int = {
-    sc.conf.getInt("spark.mesos.executor.memoryOverhead",
-                   math
-                     .max(MEMORY_OVERHEAD_FRACTION * sc.executorMemory,
-                          MEMORY_OVERHEAD_MINIMUM)
-                     .toInt) + sc.executorMemory
+    sc.conf.getInt(
+      "spark.mesos.executor.memoryOverhead",
+      math
+        .max(
+          MEMORY_OVERHEAD_FRACTION * sc.executorMemory,
+          MEMORY_OVERHEAD_MINIMUM)
+        .toInt) + sc.executorMemory
   }
 
   def setupUris(uris: String, builder: CommandInfo.Builder): Unit = {

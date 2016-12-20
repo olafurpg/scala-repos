@@ -109,9 +109,10 @@ class EdgeCaseRequestTest extends KafkaServerTestHarness {
     val plainSocket = connect()
     try {
       sendRequest(plainSocket, requestHeaderBytes(-1, 0))
-      assertEquals("The server should disconnect",
-                   -1,
-                   plainSocket.getInputStream.read())
+      assertEquals(
+        "The server should disconnect",
+        -1,
+        plainSocket.getInputStream.read())
     } finally {
       plainSocket.close()
     }
@@ -122,11 +123,12 @@ class EdgeCaseRequestTest extends KafkaServerTestHarness {
     val topic = "topic"
     val topicPartition = new TopicPartition(topic, 0)
     val correlationId = -1
-    TestUtils.createTopic(zkUtils,
-                          topic,
-                          numPartitions = 1,
-                          replicationFactor = 1,
-                          servers = servers)
+    TestUtils.createTopic(
+      zkUtils,
+      topic,
+      numPartitions = 1,
+      replicationFactor = 1,
+      servers = servers)
 
     val serializedBytes = {
       val headerBytes =
@@ -148,15 +150,18 @@ class EdgeCaseRequestTest extends KafkaServerTestHarness {
     val responseHeader = ResponseHeader.parse(responseBuffer)
     val produceResponse = ProduceResponse.parse(responseBuffer)
 
-    assertEquals("The response should parse completely",
-                 0,
-                 responseBuffer.remaining())
-    assertEquals("The correlationId should match request",
-                 correlationId,
-                 responseHeader.correlationId())
-    assertEquals("One partition response should be returned",
-                 1,
-                 produceResponse.responses().size())
+    assertEquals(
+      "The response should parse completely",
+      0,
+      responseBuffer.remaining())
+    assertEquals(
+      "The correlationId should match request",
+      correlationId,
+      responseHeader.correlationId())
+    assertEquals(
+      "One partition response should be returned",
+      1,
+      produceResponse.responses().size())
 
     val partitionResponse = produceResponse.responses().get(topicPartition)
     assertNotNull(partitionResponse)

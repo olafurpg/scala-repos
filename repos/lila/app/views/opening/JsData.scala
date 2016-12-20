@@ -29,11 +29,12 @@ object JsData extends lila.Steroids {
           "color" -> opening.color.name,
           "moves" -> JsArray(opening.qualityMoves.map {
             case QualityMove(move, quality) =>
-              Json.obj("uci" -> move.first,
-                       "san" -> move.line.headOption,
-                       "cp" -> move.cp,
-                       "line" -> move.line.mkString(" "),
-                       "quality" -> quality.name)
+              Json.obj(
+                "uci" -> move.first,
+                "san" -> move.line.headOption,
+                "cp" -> move.cp,
+                "line" -> move.line.mkString(" "),
+                "quality" -> quality.name)
           }),
           "url" -> s"$netBaseUrl${routes.Opening.show(opening.id)}",
           "identified" -> identified

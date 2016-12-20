@@ -17,28 +17,31 @@ class FlowInitialDelaySpec extends AkkaSpec {
   "Flow initialDelay" must {
 
     "work with zero delay" in Utils.assertAllStagesStopped {
-      Await.result(Source(1 to 10)
-                     .initialDelay(Duration.Zero)
-                     .grouped(100)
-                     .runWith(Sink.head),
-                   1.second) should ===(1 to 10)
+      Await.result(
+        Source(1 to 10)
+          .initialDelay(Duration.Zero)
+          .grouped(100)
+          .runWith(Sink.head),
+        1.second) should ===(1 to 10)
     }
 
     "delay elements by the specified time but not more" in Utils
       .assertAllStagesStopped {
         a[TimeoutException] shouldBe thrownBy {
-          Await.result(Source(1 to 10)
-                         .initialDelay(2.seconds)
-                         .initialTimeout(1.second)
-                         .runWith(Sink.ignore),
-                       2.seconds)
+          Await.result(
+            Source(1 to 10)
+              .initialDelay(2.seconds)
+              .initialTimeout(1.second)
+              .runWith(Sink.ignore),
+            2.seconds)
         }
 
-        Await.ready(Source(1 to 10)
-                      .initialDelay(1.seconds)
-                      .initialTimeout(2.second)
-                      .runWith(Sink.ignore),
-                    2.seconds)
+        Await.ready(
+          Source(1 to 10)
+            .initialDelay(1.seconds)
+            .initialTimeout(2.second)
+            .runWith(Sink.ignore),
+          2.seconds)
       }
 
     "properly ignore timer while backpressured" in Utils

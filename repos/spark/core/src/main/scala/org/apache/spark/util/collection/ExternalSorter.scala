@@ -250,11 +250,12 @@ private[spark] class ExternalSorter[K, V, C](
     def openWriter(): Unit = {
       assert(writer == null && spillMetrics == null)
       spillMetrics = new ShuffleWriteMetrics
-      writer = blockManager.getDiskWriter(blockId,
-                                          file,
-                                          serInstance,
-                                          fileBufferSize,
-                                          spillMetrics)
+      writer = blockManager.getDiskWriter(
+        blockId,
+        file,
+        serInstance,
+        fileBufferSize,
+        spillMetrics)
     }
     openWriter()
 
@@ -342,10 +343,11 @@ private[spark] class ExternalSorter[K, V, C](
       if (aggregator.isDefined) {
         // Perform partial aggregation across partitions
         (p,
-         mergeWithAggregation(iterators,
-                              aggregator.get.mergeCombiners,
-                              keyComparator,
-                              ordering.isDefined))
+         mergeWithAggregation(
+           iterators,
+           aggregator.get.mergeCombiners,
+           keyComparator,
+           ordering.isDefined))
       } else if (ordering.isDefined) {
         // No aggregator given, but we have an ordering (e.g. used by reduce tasks in sortByKey);
         // sort the elements without trying to merge them
@@ -514,9 +516,10 @@ private[spark] class ExternalSorter[K, V, C](
 
         val end = batchOffsets(batchId)
 
-        assert(end >= start,
-               "start = " + start + ", end = " + end + ", batchOffsets = " +
-                 batchOffsets.mkString("[", ", ", "]"))
+        assert(
+          end >= start,
+          "start = " + start + ", end = " + end + ", batchOffsets = " +
+            batchOffsets.mkString("[", ", ", "]"))
 
         val bufferedStream = new BufferedInputStream(
           ByteStreams.limit(fileStream, end - start))
@@ -645,8 +648,9 @@ private[spark] class ExternalSorter[K, V, C](
       }
     } else {
       // Merge spilled and in-memory data
-      merge(spills,
-            collection.partitionedDestructiveSortedIterator(comparator))
+      merge(
+        spills,
+        collection.partitionedDestructiveSortedIterator(comparator))
     }
   }
 
@@ -676,11 +680,12 @@ private[spark] class ExternalSorter[K, V, C](
       val it =
         collection.destructiveSortedWritablePartitionedIterator(comparator)
       while (it.hasNext) {
-        val writer = blockManager.getDiskWriter(blockId,
-                                                outputFile,
-                                                serInstance,
-                                                fileBufferSize,
-                                                writeMetrics)
+        val writer = blockManager.getDiskWriter(
+          blockId,
+          outputFile,
+          serInstance,
+          fileBufferSize,
+          writeMetrics)
         val partitionId = it.nextPartition()
         while (it.hasNext && it.nextPartition() == partitionId) {
           it.writeNext(writer)
@@ -693,11 +698,12 @@ private[spark] class ExternalSorter[K, V, C](
       // We must perform merge-sort; get an iterator by partition and write everything directly.
       for ((id, elements) <- this.partitionedIterator) {
         if (elements.hasNext) {
-          val writer = blockManager.getDiskWriter(blockId,
-                                                  outputFile,
-                                                  serInstance,
-                                                  fileBufferSize,
-                                                  writeMetrics)
+          val writer = blockManager.getDiskWriter(
+            blockId,
+            outputFile,
+            serInstance,
+            fileBufferSize,
+            writeMetrics)
           for (elem <- elements) {
             writer.write(elem._1, elem._2)
           }

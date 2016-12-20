@@ -43,13 +43,16 @@ class AdminClientTest extends IntegrationTestHarness with Logging {
   var client: AdminClient = null
 
   // configure the servers and clients
-  this.serverConfig.setProperty(KafkaConfig.ControlledShutdownEnableProp,
-                                "false") // speed up shutdown
-  this.serverConfig.setProperty(KafkaConfig.OffsetsTopicReplicationFactorProp,
-                                "3") // don't want to lose offset
+  this.serverConfig.setProperty(
+    KafkaConfig.ControlledShutdownEnableProp,
+    "false") // speed up shutdown
+  this.serverConfig.setProperty(
+    KafkaConfig.OffsetsTopicReplicationFactorProp,
+    "3") // don't want to lose offset
   this.serverConfig.setProperty(KafkaConfig.OffsetsTopicPartitionsProp, "1")
-  this.serverConfig.setProperty(KafkaConfig.GroupMinSessionTimeoutMsProp,
-                                "100") // set small enough session timeout
+  this.serverConfig.setProperty(
+    KafkaConfig.GroupMinSessionTimeoutMsProp,
+    "100") // set small enough session timeout
   this.producerConfig.setProperty(ProducerConfig.ACKS_CONFIG, "all")
   this.consumerConfig.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupId)
   this.consumerConfig.setProperty(ConsumerConfig.CLIENT_ID_CONFIG, clientId)
@@ -118,7 +121,8 @@ class AdminClientTest extends IntegrationTestHarness with Logging {
   @Test
   def testDescribeConsumerGroupForNonExistentGroup() {
     val nonExistentGroup = "non" + groupId
-    assertTrue("Expected empty ConsumerSummary list",
-               client.describeConsumerGroup(nonExistentGroup).isEmpty)
+    assertTrue(
+      "Expected empty ConsumerSummary list",
+      client.describeConsumerGroup(nonExistentGroup).isEmpty)
   }
 }

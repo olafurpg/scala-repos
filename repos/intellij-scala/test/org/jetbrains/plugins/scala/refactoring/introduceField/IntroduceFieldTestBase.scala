@@ -92,12 +92,13 @@ abstract class IntroduceFieldTestBase()
       val aClass = expr.parents.toList
         .filter(_.isInstanceOf[ScTemplateDefinition])(selectedClassNumber)
         .asInstanceOf[ScTemplateDefinition]
-      val ifc = new IntroduceFieldContext[ScExpression](getProjectAdapter,
-                                                        editor,
-                                                        scalaFile,
-                                                        expr,
-                                                        types,
-                                                        aClass)
+      val ifc = new IntroduceFieldContext[ScExpression](
+        getProjectAdapter,
+        editor,
+        scalaFile,
+        expr,
+        types,
+        aClass)
       val settings = new IntroduceFieldSettings[ScExpression](ifc)
       settings.replaceAll = replaceAll
       initInDecl.foreach(settings.initInDeclaration = _)
@@ -114,9 +115,10 @@ abstract class IntroduceFieldTestBase()
       res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim
     } catch {
       case e: Exception =>
-        assert(assertion = false,
-               message = e.getMessage + "\n" +
-                   e.getStackTrace.map(_.toString).mkString("  \n"))
+        assert(
+          assertion = false,
+          message = e.getMessage + "\n" +
+              e.getStackTrace.map(_.toString).mkString("  \n"))
     }
 
     val text = lastPsi.getText

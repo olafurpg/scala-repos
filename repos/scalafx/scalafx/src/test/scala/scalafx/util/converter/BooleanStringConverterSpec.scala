@@ -40,10 +40,11 @@ import scalafx.Includes._
   */
 @RunWith(classOf[JUnitRunner])
 class BooleanStringConverterSpec
-    extends AbstractStringConverterDelegateSpec[java.lang.Boolean,
-                                                jfxuc.BooleanStringConverter,
-                                                Boolean,
-                                                BooleanStringConverter](
+    extends AbstractStringConverterDelegateSpec[
+      java.lang.Boolean,
+      jfxuc.BooleanStringConverter,
+      Boolean,
+      BooleanStringConverter](
       classOf[jfxuc.BooleanStringConverter],
       classOf[BooleanStringConverter],
       classOf[Boolean]) {

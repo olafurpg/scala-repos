@@ -15,10 +15,11 @@ trait ComposeTests[F[_, _]] extends Laws {
                           ArbFBC: Arbitrary[F[B, C]],
                           ArbFCD: Arbitrary[F[C, D]],
                           EqFAD: Eq[F[A, D]]): RuleSet =
-    new DefaultRuleSet(name = "compose",
-                       parent = None,
-                       "compose associativity" -> forAll(
-                         laws.composeAssociativity[A, B, C, D] _))
+    new DefaultRuleSet(
+      name = "compose",
+      parent = None,
+      "compose associativity" -> forAll(
+        laws.composeAssociativity[A, B, C, D] _))
 }
 
 object ComposeTests {

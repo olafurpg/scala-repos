@@ -87,8 +87,9 @@ trait TypeComparers { self: SymbolTable =>
     ((tr1.sym eq tr2.sym) && !isDifferentType(tr1.pre, tr2.pre))
   private def isSameTypeConstructor(tp1: Type, tp2: Type): Boolean =
     (tp1.isInstanceOf[TypeRef] && tp2.isInstanceOf[TypeRef] &&
-      isSameTypeConstructor(tp1.asInstanceOf[TypeRef],
-                            tp2.asInstanceOf[TypeRef]))
+      isSameTypeConstructor(
+        tp1.asInstanceOf[TypeRef],
+        tp2.asInstanceOf[TypeRef]))
 
   /** Do `tp1` and `tp2` denote equivalent types? */
   def isSameType(tp1: Type, tp2: Type): Boolean =
@@ -394,8 +395,9 @@ trait TypeComparers { self: SymbolTable =>
   // the 'x' in the SuperType, then the types conform.
   private def isThisAndSuperSubtype(tp1: Type, tp2: Type): Boolean =
     (tp1, tp2) match {
-      case (SingleType(ThisType(lpre), v1),
-            SingleType(SuperType(ThisType(rpre), _), v2)) =>
+      case (
+          SingleType(ThisType(lpre), v1),
+          SingleType(SuperType(ThisType(rpre), _), v2)) =>
         (lpre eq rpre) && (v1.overrideChain contains v2)
       case _ => false
     }
@@ -646,8 +648,9 @@ trait TypeComparers { self: SymbolTable =>
     }
 
   def isNumericSubType(tp1: Type, tp2: Type) = (
-    isNumericSubClass(primitiveBaseClass(tp1.dealiasWiden),
-                      primitiveBaseClass(tp2.dealias))
+    isNumericSubClass(
+      primitiveBaseClass(tp1.dealiasWiden),
+      primitiveBaseClass(tp2.dealias))
   )
 
   /** If the given type has a primitive class among its base classes,

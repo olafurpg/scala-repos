@@ -34,10 +34,11 @@ case class ServiceLocation(protocol: String,
                            port: Int,
                            pathPrefix: Option[String]) {
   def toURI: URI =
-    URI(scheme = Some(protocol),
-        host = Some(host),
-        port = Some(port),
-        path = pathPrefix)
+    URI(
+      scheme = Some(protocol),
+      host = Some(host),
+      port = Some(port),
+      path = pathPrefix)
 }
 
 object ServiceLocation {

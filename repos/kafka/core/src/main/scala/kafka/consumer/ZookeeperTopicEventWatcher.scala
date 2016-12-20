@@ -90,8 +90,9 @@ class ZookeeperTopicEventWatcher(val zkUtils: ZkUtils,
         if (zkUtils != null) {
           info(
             "ZK expired: resubscribing topic event listener to topic registry")
-          zkUtils.zkClient.subscribeChildChanges(ZkUtils.BrokerTopicsPath,
-                                                 topicEventListener)
+          zkUtils.zkClient.subscribeChildChanges(
+            ZkUtils.BrokerTopicsPath,
+            topicEventListener)
         }
       }
     }

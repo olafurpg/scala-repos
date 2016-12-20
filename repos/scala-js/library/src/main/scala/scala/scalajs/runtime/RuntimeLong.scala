@@ -514,8 +514,9 @@ final class RuntimeLong(val lo: Int, val hi: Int)
       ask: Int): RuntimeLong | js.Tuple4[Int, Int, Int, Int] = {
 
     var shift =
-      inlineNumberOfLeadingZeros(blo, bhi) - inlineNumberOfLeadingZeros(alo,
-                                                                        ahi)
+      inlineNumberOfLeadingZeros(blo, bhi) - inlineNumberOfLeadingZeros(
+        alo,
+        ahi)
     val initialBShift = inline_<<(blo, bhi, shift)
     var bShiftLo = initialBShift._1
     var bShiftHi = initialBShift._2
@@ -558,10 +559,11 @@ final class RuntimeLong(val lo: Int, val hi: Int)
 
       if (ask != AskRemainder) {
         val rem_div_bDouble = remDouble / bDouble
-        val newQuot = inline_+(quotLo,
-                               quotHi,
-                               unsignedSafeDoubleLo(rem_div_bDouble),
-                               unsignedSafeDoubleHi(rem_div_bDouble))
+        val newQuot = inline_+(
+          quotLo,
+          quotHi,
+          unsignedSafeDoubleLo(rem_div_bDouble),
+          unsignedSafeDoubleHi(rem_div_bDouble))
         quotLo = newQuot._1
         quotHi = newQuot._2
       }

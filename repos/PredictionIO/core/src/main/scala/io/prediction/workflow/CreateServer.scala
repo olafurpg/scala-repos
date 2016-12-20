@@ -185,16 +185,19 @@ object CreateServer extends Logging {
           val engineFactoryName = engineInstance.engineFactory
           val upgrade = actorSystem.actorOf(
             Props(classOf[UpgradeActor], engineFactoryName))
-          actorSystem.scheduler.schedule(0.seconds,
-                                         1.days,
-                                         upgrade,
-                                         UpgradeCheck())
-          val master = actorSystem.actorOf(Props(classOf[MasterActor],
-                                                 sc,
-                                                 engineInstance,
-                                                 engineFactoryName,
-                                                 manifest),
-                                           "master")
+          actorSystem.scheduler.schedule(
+            0.seconds,
+            1.days,
+            upgrade,
+            UpgradeCheck())
+          val master = actorSystem.actorOf(
+            Props(
+              classOf[MasterActor],
+              sc,
+              engineInstance,
+              engineFactoryName,
+              manifest),
+            "master")
           implicit val timeout = Timeout(5.seconds)
           master ? StartServer()
           actorSystem.awaitTermination
@@ -231,10 +234,11 @@ object CreateServer extends Logging {
         engineInstance.engineFactory
       }
 
-    val sparkContext = WorkflowContext(batch = batch,
-                                       executorEnv = engineInstance.env,
-                                       mode = "Serving",
-                                       sparkEnv = engineInstance.sparkConf)
+    val sparkContext = WorkflowContext(
+      batch = batch,
+      executorEnv = engineInstance.env,
+      mode = "Serving",
+      sparkEnv = engineInstance.sparkConf)
 
     val models = engine.prepareDeploy(
       sparkContext,
@@ -251,23 +255,25 @@ object CreateServer extends Logging {
 
     val servingParamsWithName = engineParams.servingParams
 
-    val serving = Doer(engine.servingClassMap(servingParamsWithName._1),
-                       servingParamsWithName._2)
+    val serving = Doer(
+      engine.servingClassMap(servingParamsWithName._1),
+      servingParamsWithName._2)
 
     actorSystem.actorOf(
-      Props(classOf[ServerActor[Q, P]],
-            sc,
-            engineInstance,
-            engine,
-            engineLanguage,
-            manifest,
-            engineParams.dataSourceParams._2,
-            engineParams.preparatorParams._2,
-            algorithms,
-            engineParams.algorithmParamsList.map(_._2),
-            models,
-            serving,
-            engineParams.servingParams._2))
+      Props(
+        classOf[ServerActor[Q, P]],
+        sc,
+        engineInstance,
+        engine,
+        engineLanguage,
+        manifest,
+        engineParams.dataSourceParams._2,
+        engineParams.preparatorParams._2,
+        algorithms,
+        engineParams.algorithmParamsList.map(_._2),
+        models,
+        serving,
+        engineParams.servingParams._2))
   }
 }
 
@@ -335,11 +341,11 @@ class MasterActor(sc: ServerConfig,
     case x: BindServer =>
       currentServerActor map { actor =>
         val settings = ServerSettings(system)
-        IO(Http) ! Http.Bind(actor,
-                             interface = sc.ip,
-                             port = sc.port,
-                             settings =
-                               Some(settings.copy(sslEncryption = true)))
+        IO(Http) ! Http.Bind(
+          actor,
+          interface = sc.ip,
+          port = sc.port,
+          settings = Some(settings.copy(sslEncryption = true)))
       } getOrElse {
         log.error("Cannot bind a non-existing server backend.")
       }
@@ -364,11 +370,11 @@ class MasterActor(sc: ServerConfig,
         sprayHttpListener.map { l =>
           l ! Http.Unbind(5.seconds)
           val settings = ServerSettings(system)
-          IO(Http) ! Http.Bind(actor,
-                               interface = sc.ip,
-                               port = sc.port,
-                               settings =
-                                 Some(settings.copy(sslEncryption = true)))
+          IO(Http) ! Http.Bind(
+            actor,
+            interface = sc.ip,
+            port = sc.port,
+            settings = Some(settings.copy(sslEncryption = true)))
           currentServerActor.get ! Kill
           currentServerActor = Some(actor)
         } getOrElse {
@@ -412,12 +418,13 @@ class MasterActor(sc: ServerConfig,
 
     val deployableEngine = engine.asInstanceOf[Engine[_, _, _, _, _, _]]
 
-    CreateServer.createServerActorWithEngine(sc,
-                                             engineInstance,
-                                             // engine,
-                                             deployableEngine,
-                                             engineLanguage,
-                                             manifest)
+    CreateServer.createServerActorWithEngine(
+      sc,
+      engineInstance,
+      // engine,
+      deployableEngine,
+      engineLanguage,
+      manifest)
   }
 }
 
@@ -587,15 +594,15 @@ class ServerActor[Q, P](val args: ServerConfig,
                   }
                   val data =
                     Map(
-                        // "appId" -> dataSourceParams.asInstanceOf[ParamsWithAppId].appId,
-                        "event" -> "predict",
-                        "eventTime" -> queryTime.toString(),
-                        "entityType" -> "pio_pr", // prediction result
-                        "entityId" -> newPrId,
-                        "properties" -> Map(
-                          "engineInstanceId" -> engineInstance.id,
-                          "query" -> query,
-                          "prediction" -> prediction)) ++ queryPrId
+                      // "appId" -> dataSourceParams.asInstanceOf[ParamsWithAppId].appId,
+                      "event" -> "predict",
+                      "eventTime" -> queryTime.toString(),
+                      "entityType" -> "pio_pr", // prediction result
+                      "entityId" -> newPrId,
+                      "properties" -> Map(
+                        "engineInstanceId" -> engineInstance.id,
+                        "query" -> query,
+                        "prediction" -> prediction)) ++ queryPrId
                   // At this point args.accessKey should be Some(String).
                   val accessKey = args.accessKey.getOrElse("")
                   val f: Future[Int] = future {
@@ -653,10 +660,11 @@ class ServerActor[Q, P](val args: ServerConfig,
                 log.error(
                   s"Query '$queryString' is invalid. Reason: ${e.getMessage}")
                 args.logUrl map { url =>
-                  remoteLog(url,
-                            args.logPrefix.getOrElse(""),
-                            s"Query:\n$queryString\n\nStack Trace:\n" +
-                              s"${getStackTraceString(e)}\n\n")
+                  remoteLog(
+                    url,
+                    args.logPrefix.getOrElse(""),
+                    s"Query:\n$queryString\n\nStack Trace:\n" +
+                      s"${getStackTraceString(e)}\n\n")
                 }
                 complete(StatusCodes.BadRequest, e.getMessage)
               case e: Throwable =>
@@ -731,10 +739,9 @@ class ServerActor[Q, P](val args: ServerConfig,
             val pluginName = segments(1)
             pluginType match {
               case EngineServerPlugin.outputSniffer =>
-                pluginsActorRef ? PluginsActor.HandleREST(pluginName =
-                                                            pluginName,
-                                                          pluginArgs =
-                                                            pluginArgs) map {
+                pluginsActorRef ? PluginsActor.HandleREST(
+                  pluginName = pluginName,
+                  pluginArgs = pluginArgs) map {
                   _.asInstanceOf[String]
                 }
             }

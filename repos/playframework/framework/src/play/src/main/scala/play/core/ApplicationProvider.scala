@@ -21,8 +21,9 @@ trait SourceMapper {
     e.getStackTrace
       .find(element => sourceOf(element.getClassName).isDefined)
       .flatMap { interestingStackTrace =>
-        sourceOf(interestingStackTrace.getClassName,
-                 Option(interestingStackTrace.getLineNumber))
+        sourceOf(
+          interestingStackTrace.getClassName,
+          Option(interestingStackTrace.getLineNumber))
       }
   }
 }

@@ -70,12 +70,12 @@ class LibraryInjectorTest extends ModuleTestCase with ScalaVersion {
 
   override def setUpModule(): Unit = {
     super.setUpModule()
-    scalaLibraryLoader = new ScalaLibraryLoader(getProject,
-                                                getModule,
-                                                myProject.getBasePath,
-                                                isIncludeReflectLibrary = true,
-                                                javaSdk =
-                                                  Some(getTestProjectJdk))
+    scalaLibraryLoader = new ScalaLibraryLoader(
+      getProject,
+      getModule,
+      myProject.getBasePath,
+      isIncludeReflectLibrary = true,
+      javaSdk = Some(getTestProjectJdk))
 
     scalaLibraryLoader.loadScala(scalaSdkVersion)
     addLibrary(
@@ -131,12 +131,13 @@ class LibraryInjectorTest extends ModuleTestCase with ScalaVersion {
         |class Foo
       """.stripMargin
 
-    ZDir("META-INF",
-         Seq(
-           ZFile(LibraryInjectorLoader.INJECTOR_MANIFEST_NAME, manifest),
-           ZFile("Implementation.scala", implementationClass),
-           ZFile("Foo.scala", fooClass)
-         ))
+    ZDir(
+      "META-INF",
+      Seq(
+        ZFile(LibraryInjectorLoader.INJECTOR_MANIFEST_NAME, manifest),
+        ZFile("Implementation.scala", implementationClass),
+        ZFile("Foo.scala", fooClass)
+      ))
   }
 
   val testData = Map("Simple" -> simpleInjector)

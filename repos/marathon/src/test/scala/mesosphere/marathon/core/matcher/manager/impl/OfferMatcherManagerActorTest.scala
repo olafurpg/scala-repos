@@ -93,8 +93,9 @@ class OfferMatcherManagerActorTest
       import MarathonTestHelper._
       makeBasicOffer()
         .addResources(
-          reservedDisk(LocalVolumeId(appId, path, "uuid").idString,
-                       containerPath = path))
+          reservedDisk(
+            LocalVolumeId(appId, path, "uuid").idString,
+            containerPath = path))
         .build()
     }
   }

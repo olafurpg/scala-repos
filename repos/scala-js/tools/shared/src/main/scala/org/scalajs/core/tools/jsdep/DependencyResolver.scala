@@ -28,20 +28,22 @@ object DependencyResolver {
       manifest <- manifests
       dep <- manifest.libDeps
     } yield {
-      new FlatJSDependency(manifest.origin,
-                           resolvedJSLibs(dep.resourceName),
-                           dep.dependencies.map(resolvedJSLibs),
-                           dep.commonJSName,
-                           dep.minifiedResourceName.map(resolvedJSLibs))
+      new FlatJSDependency(
+        manifest.origin,
+        resolvedJSLibs(dep.resourceName),
+        dep.dependencies.map(resolvedJSLibs),
+        dep.commonJSName,
+        dep.minifiedResourceName.map(resolvedJSLibs))
     }
 
     val flatDeps = dependencyFilter(allFlatDeps)
     val includeList = createIncludeList(flatDeps)
 
     for (info <- includeList) yield {
-      new ResolvedJSDependency(availableLibs(info.relPath),
-                               info.relPathMinified.map(availableLibs),
-                               info)
+      new ResolvedJSDependency(
+        availableLibs(info.relPath),
+        info.relPathMinified.map(availableLibs),
+        info)
     }
   }
 

@@ -80,8 +80,9 @@ class ParametersAnnotatorTest extends SimpleTestCase {
     assertMatches(
       messages("def test(p1: String, p2 = \"default\") = p1 concat p2")) {
       //SCL-3799
-      case Error("p2 = \"default\"",
-                 "Missing type annotation for parameter: p2") :: Nil =>
+      case Error(
+            "p2 = \"default\"",
+            "Missing type annotation for parameter: p2") :: Nil =>
     }
   }
 

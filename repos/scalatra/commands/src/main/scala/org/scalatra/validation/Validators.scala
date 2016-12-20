@@ -28,9 +28,10 @@ object Validators {
         value: TResult): FieldValidation[TResult] = {
       if (isValid(value)) value.success
       else
-        ValidationError(messageFormat.format(fieldName.underscore.humanize),
-                        FieldName(fieldName),
-                        ValidationFail).failure[TResult]
+        ValidationError(
+          messageFormat.format(fieldName.underscore.humanize),
+          FieldName(fieldName),
+          ValidationFail).failure[TResult]
     }
   }
 
@@ -69,9 +70,10 @@ object Validators {
   def validEmail(
       fieldName: String,
       messageFormat: String = "%s must be a valid email."): Validator[String] =
-    new PredicateValidator[String](fieldName,
-                                   EmailValidator.getInstance.isValid(_),
-                                   messageFormat)
+    new PredicateValidator[String](
+      fieldName,
+      EmailValidator.getInstance.isValid(_),
+      messageFormat)
 
   /**
     * Must be a valid absolute URL, parseable by the Apache Commons URI class.
@@ -81,11 +83,12 @@ object Validators {
                        messageFormat: String =
                          "%s must be a valid absolute url.",
                        schemes: Seq[String] = Seq("http", "https")) =
-    buildUrlValidator(fieldName,
-                      absolute = true,
-                      allowLocalHost = allowLocalHost,
-                      messageFormat = messageFormat,
-                      schemes)
+    buildUrlValidator(
+      fieldName,
+      absolute = true,
+      allowLocalHost = allowLocalHost,
+      messageFormat = messageFormat,
+      schemes)
 
   /**
     * Must be a valid URL, parseable by the Apache Commons URI class.
@@ -94,11 +97,12 @@ object Validators {
                allowLocalHost: Boolean,
                messageFormat: String = "%s must be a valid url.",
                schemes: Seq[String] = Seq("http", "https")) =
-    buildUrlValidator(fieldName,
-                      absolute = false,
-                      allowLocalHost = allowLocalHost,
-                      messageFormat = messageFormat,
-                      schemes)
+    buildUrlValidator(
+      fieldName,
+      absolute = false,
+      allowLocalHost = allowLocalHost,
+      messageFormat = messageFormat,
+      schemes)
 
   /**
     * Must match the regex.
@@ -107,9 +111,10 @@ object Validators {
       fieldName: String,
       regex: Regex,
       messageFormat: String = "%s is invalid."): Validator[String] =
-    new PredicateValidator[String](fieldName,
-                                   regex.findFirstIn(_).isDefined,
-                                   messageFormat)
+    new PredicateValidator[String](
+      fieldName,
+      regex.findFirstIn(_).isDefined,
+      messageFormat)
 
   /**
     * The confirmation fieldName must have a true value.
@@ -132,9 +137,10 @@ object Validators {
       fieldName: String,
       min: T,
       messageFormat: String = "%%s must be greater than %s."): Validator[T] =
-    new PredicateValidator[T](fieldName,
-                              _ > min,
-                              messageFormat format min.toString)
+    new PredicateValidator[T](
+      fieldName,
+      _ > min,
+      messageFormat format min.toString)
 
   /**
     * Must be less than the max param.
@@ -143,9 +149,10 @@ object Validators {
                                 max: T,
                                 messageFormat: String =
                                   "%%s must be less than %s."): Validator[T] =
-    new PredicateValidator[T](fieldName,
-                              _ < max,
-                              messageFormat format max.toString)
+    new PredicateValidator[T](
+      fieldName,
+      _ < max,
+      messageFormat format max.toString)
 
   /**
     * Must be greater than or equal to the min param.
@@ -175,9 +182,10 @@ object Validators {
                 messageFormat: String =
                   "%%s must be at least %s characters long.")
     : Validator[String] =
-    new PredicateValidator[String](fieldName,
-                                   _.size >= min,
-                                   messageFormat.format(min))
+    new PredicateValidator[String](
+      fieldName,
+      _.size >= min,
+      messageFormat.format(min))
 
   /**
     * Must be included in the expected collection.

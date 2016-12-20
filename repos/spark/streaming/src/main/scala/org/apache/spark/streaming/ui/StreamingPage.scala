@@ -205,9 +205,10 @@ private[ui] class StreamingPage(parent: StreamingTab)
     val js =
       "var timeFormat = {};\n" + times
         .map { time =>
-          val formattedTime = UIUtils.formatBatchTime(time,
-                                                      listener.batchDuration,
-                                                      showYYYYMMSS = false)
+          val formattedTime = UIUtils.formatBatchTime(
+            time,
+            listener.batchDuration,
+            showYYYYMMSS = false)
           s"timeFormat[$time] = '$formattedTime';"
         }
         .mkString("\n")
@@ -412,13 +413,14 @@ private[ui] class StreamingPage(parent: StreamingTab)
       .sortBy(_._1)
       .map {
         case (streamId, eventRates) =>
-          generateInputDStreamRow(jsCollector,
-                                  streamId,
-                                  eventRates,
-                                  minX,
-                                  maxX,
-                                  minY,
-                                  maxYCalculated)
+          generateInputDStreamRow(
+            jsCollector,
+            streamId,
+            eventRates,
+            minX,
+            maxX,
+            minY,
+            maxYCalculated)
       }
       .foldLeft[Seq[Node]](Nil)(_ ++ _)
 
@@ -531,8 +533,9 @@ private[ui] class StreamingPage(parent: StreamingTab)
     val completedBatchesContent = {
       <h4 id="completed">
         Completed Batches (last {completedBatches.size} out of {listener.numTotalCompletedBatches})
-      </h4> ++ new CompletedBatchTable(completedBatches,
-                                       listener.batchDuration).toNodeSeq
+      </h4> ++ new CompletedBatchTable(
+        completedBatches,
+        listener.batchDuration).toNodeSeq
     }
 
     activeBatchesContent ++ completedBatchesContent

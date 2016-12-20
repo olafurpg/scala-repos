@@ -62,8 +62,9 @@ class CreateTableAsSelectSuite
         |SELECT a, b FROM jt
       """.stripMargin)
 
-    checkAnswer(sql("SELECT a, b FROM jsonTable"),
-                sql("SELECT a, b FROM jt").collect())
+    checkAnswer(
+      sql("SELECT a, b FROM jsonTable"),
+      sql("SELECT a, b FROM jt").collect())
 
     caseInsensitiveContext.dropTempTable("jsonTable")
   }
@@ -101,8 +102,9 @@ class CreateTableAsSelectSuite
         |SELECT a, b FROM jt
       """.stripMargin)
 
-    checkAnswer(sql("SELECT a, b FROM jsonTable"),
-                sql("SELECT a, b FROM jt").collect())
+    checkAnswer(
+      sql("SELECT a, b FROM jsonTable"),
+      sql("SELECT a, b FROM jt").collect())
 
     val message = intercept[AnalysisException] {
       sql(s"""
@@ -128,8 +130,9 @@ class CreateTableAsSelectSuite
         |) AS
         |SELECT a * 4 FROM jt
       """.stripMargin)
-    checkAnswer(sql("SELECT * FROM jsonTable"),
-                sql("SELECT a * 4 FROM jt").collect())
+    checkAnswer(
+      sql("SELECT * FROM jsonTable"),
+      sql("SELECT a * 4 FROM jt").collect())
 
     caseInsensitiveContext.dropTempTable("jsonTable")
     // Explicitly delete the data.
@@ -144,8 +147,9 @@ class CreateTableAsSelectSuite
         |SELECT b FROM jt
       """.stripMargin)
 
-    checkAnswer(sql("SELECT * FROM jsonTable"),
-                sql("SELECT b FROM jt").collect())
+    checkAnswer(
+      sql("SELECT * FROM jsonTable"),
+      sql("SELECT b FROM jt").collect())
 
     caseInsensitiveContext.dropTempTable("jsonTable")
   }
@@ -200,7 +204,8 @@ class CreateTableAsSelectSuite
         |SELECT a, b FROM jsonTable
       """.stripMargin)
     }.getMessage
-    assert(message.contains("Cannot overwrite table "),
-           "Writing to a table while querying it should not be allowed.")
+    assert(
+      message.contains("Cannot overwrite table "),
+      "Writing to a table while querying it should not be allowed.")
   }
 }

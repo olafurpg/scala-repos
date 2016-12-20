@@ -68,22 +68,25 @@ class PhiAccrualFailureDetector(
     * `heartbeat-interval`.
     */
   def this(config: Config, ev: EventStream) =
-    this(threshold = config.getDouble("threshold"),
-         maxSampleSize = config.getInt("max-sample-size"),
-         minStdDeviation = config.getMillisDuration("min-std-deviation"),
-         acceptableHeartbeatPause =
-           config.getMillisDuration("acceptable-heartbeat-pause"),
-         firstHeartbeatEstimate =
-           config.getMillisDuration("heartbeat-interval"))
+    this(
+      threshold = config.getDouble("threshold"),
+      maxSampleSize = config.getInt("max-sample-size"),
+      minStdDeviation = config.getMillisDuration("min-std-deviation"),
+      acceptableHeartbeatPause =
+        config.getMillisDuration("acceptable-heartbeat-pause"),
+      firstHeartbeatEstimate = config.getMillisDuration("heartbeat-interval"))
 
   require(threshold > 0.0, "failure-detector.threshold must be > 0")
   require(maxSampleSize > 0, "failure-detector.max-sample-size must be > 0")
-  require(minStdDeviation > Duration.Zero,
-          "failure-detector.min-std-deviation must be > 0")
-  require(acceptableHeartbeatPause >= Duration.Zero,
-          "failure-detector.acceptable-heartbeat-pause must be >= 0")
-  require(firstHeartbeatEstimate > Duration.Zero,
-          "failure-detector.heartbeat-interval must be > 0")
+  require(
+    minStdDeviation > Duration.Zero,
+    "failure-detector.min-std-deviation must be > 0")
+  require(
+    acceptableHeartbeatPause >= Duration.Zero,
+    "failure-detector.acceptable-heartbeat-pause must be >= 0")
+  require(
+    firstHeartbeatEstimate > Duration.Zero,
+    "failure-detector.heartbeat-interval must be > 0")
 
   // guess statistics for first heartbeat,
   // important so that connections with only one heartbeat becomes unavailable
@@ -200,10 +203,11 @@ private[akka] object HeartbeatHistory {
     * for empty HeartbeatHistory, i.e. throws ArithmeticException.
     */
   def apply(maxSampleSize: Int): HeartbeatHistory =
-    HeartbeatHistory(maxSampleSize = maxSampleSize,
-                     intervals = immutable.IndexedSeq.empty,
-                     intervalSum = 0L,
-                     squaredIntervalSum = 0L)
+    HeartbeatHistory(
+      maxSampleSize = maxSampleSize,
+      intervals = immutable.IndexedSeq.empty,
+      intervalSum = 0L,
+      squaredIntervalSum = 0L)
 }
 
 /**

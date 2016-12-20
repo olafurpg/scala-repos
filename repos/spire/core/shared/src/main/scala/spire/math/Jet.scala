@@ -269,8 +269,9 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
     // which holds because dv dv = du dv = 0.
     val br_inv: T = f.one / b.real
     val ar_div_br: T = real * br_inv
-    new Jet(ar_div_br,
-            br_inv *: (infinitesimal - (ar_div_br *: b.infinitesimal)))
+    new Jet(
+      ar_div_br,
+      br_inv *: (infinitesimal - (ar_div_br *: b.infinitesimal)))
   }
 
   def /~(b: Jet[T])(implicit c: ClassTag[T],
@@ -481,9 +482,10 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
                        t: Trig[T],
                        v: VectorSpace[Array[T], T]): Jet[T] = {
     val tmp = f.one / (a.real * a.real + real * real)
-    new Jet(spire.math.atan2(real, a.real),
-            ((tmp * (-real)) *: a.infinitesimal) +
-              ((tmp * a.real) *: infinitesimal))
+    new Jet(
+      spire.math.atan2(real, a.real),
+      ((tmp * (-real)) *: a.infinitesimal) +
+        ((tmp * a.real) *: infinitesimal))
   }
 
   /**

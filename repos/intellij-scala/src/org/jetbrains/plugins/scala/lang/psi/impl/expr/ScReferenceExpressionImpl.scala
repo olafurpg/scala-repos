@@ -181,10 +181,11 @@ class ScReferenceExpressionImpl(node: ASTNode)
       case res: ScalaResolveResult =>
         import org.jetbrains.plugins.scala.lang.psi.types.Nothing
         val qualifier = res.fromType.getOrElse(Nothing)
-        LookupElementManager.getLookupElement(res,
-                                              isInImport = isInImport,
-                                              qualifierType = qualifier,
-                                              isInStableCodeReference = false)
+        LookupElementManager.getLookupElement(
+          res,
+          isInImport = isInImport,
+          qualifierType = qualifier,
+          isInStableCodeReference = false)
       case r => Seq(r.getElement)
     }
   }
@@ -192,25 +193,27 @@ class ScReferenceExpressionImpl(node: ASTNode)
   def getSimpleVariants(
       implicits: Boolean,
       filterNotNamedVariants: Boolean): Array[ResolveResult] = {
-    doResolve(this,
-              new CompletionProcessor(getKinds(incomplete = true),
-                                      this,
-                                      implicits)).filter(r => {
-      if (filterNotNamedVariants) {
-        r match {
-          case res: ScalaResolveResult => res.isNamedParameter
-          case _ => false
-        }
-      } else true
-    })
+    doResolve(
+      this,
+      new CompletionProcessor(getKinds(incomplete = true), this, implicits))
+      .filter(r => {
+        if (filterNotNamedVariants) {
+          r match {
+            case res: ScalaResolveResult => res.isNamedParameter
+            case _ => false
+          }
+        } else true
+      })
   }
 
   def getSameNameVariants: Array[ResolveResult] =
-    doResolve(this,
-              new CompletionProcessor(getKinds(incomplete = true),
-                                      this,
-                                      true,
-                                      Some(refName)))
+    doResolve(
+      this,
+      new CompletionProcessor(
+        getKinds(incomplete = true),
+        this,
+        true,
+        Some(refName)))
 
   def getKinds(incomplete: Boolean, completion: Boolean = false) = {
     getContext match {
@@ -410,9 +413,10 @@ class ScReferenceExpressionImpl(node: ASTNode)
           if param.isRepeatedParameter =>
         val seqClass = ScalaPsiManager
           .instance(getProject)
-          .getCachedClass("scala.collection.Seq",
-                          getResolveScope,
-                          ScalaPsiManager.ClassCategory.TYPE)
+          .getCachedClass(
+            "scala.collection.Seq",
+            getResolveScope,
+            ScalaPsiManager.ClassCategory.TYPE)
         val result = param.getType(TypingContext.empty)
         val computeType = s.subst(result match {
           case Success(tp, _) => tp
@@ -472,8 +476,10 @@ class ScReferenceExpressionImpl(node: ASTNode)
       case Some(ScalaResolveResult(clazz: ScClass, s)) if clazz.isCase =>
         s.subst(
           clazz.constructor
-            .getOrElse(return Failure("Case Class hasn't primary constructor",
-                                      Some(this)))
+            .getOrElse(
+              return Failure(
+                "Case Class hasn't primary constructor",
+                Some(this)))
             .polymorphicType)
       case Some(ScalaResolveResult(clazz: ScTypeDefinition, s))
           if clazz.typeParameters.nonEmpty =>
@@ -491,9 +497,10 @@ class ScReferenceExpressionImpl(node: ASTNode)
             method.containingClass.getQualifiedName == "java.lang.Object") {
           val jlClass = ScalaPsiManager
             .instance(getProject)
-            .getCachedClass("java.lang.Class",
-                            getResolveScope,
-                            ScalaPsiManager.ClassCategory.TYPE)
+            .getCachedClass(
+              "java.lang.Class",
+              getResolveScope,
+              ScalaPsiManager.ClassCategory.TYPE)
           def convertQualifier(
               typeResult: TypeResult[ScType]): Option[ScType] = {
             if (jlClass != null) {
@@ -512,8 +519,9 @@ class ScReferenceExpressionImpl(node: ASTNode)
                       ScTypeUtil.removeTypeDesignator(tp).getOrElse(Any)
                   }
                   Some(ScExistentialType(
-                    ScParameterizedType(ScDesignatorType(jlClass),
-                                        Seq(ScTypeVariable("_$1"))),
+                    ScParameterizedType(
+                      ScDesignatorType(jlClass),
+                      Seq(ScTypeVariable("_$1"))),
                     List(
                       ScExistentialArgument("_$1", Nil, Nothing, actualType))))
                 case _ => None
@@ -559,18 +567,20 @@ class ScReferenceExpressionImpl(node: ASTNode)
                         typeParams ++ typeParams2 ++ unresolvedTypeParameters)),
                       Some(this))
                   case _ =>
-                    return Success(ScTypePolymorphicType(
-                                     inner,
-                                     typeParams ++ unresolvedTypeParameters),
-                                   Some(this))
+                    return Success(
+                      ScTypePolymorphicType(
+                        inner,
+                        typeParams ++ unresolvedTypeParameters),
+                      Some(this))
                 }
               case _ if unresolvedTypeParameters.nonEmpty =>
                 inner match {
                   case ScTypePolymorphicType(internal, typeParams) =>
-                    return Success(ScTypePolymorphicType(
-                                     internal,
-                                     unresolvedTypeParameters ++ typeParams),
-                                   Some(this))
+                    return Success(
+                      ScTypePolymorphicType(
+                        internal,
+                        unresolvedTypeParameters ++ typeParams),
+                      Some(this))
                   case _ =>
                     return Success(
                       ScTypePolymorphicType(inner, unresolvedTypeParameters),
@@ -592,18 +602,20 @@ class ScReferenceExpressionImpl(node: ASTNode)
                       typeParams ++ typeParams2 ++ unresolvedTypeParameters)),
                   Some(this))
               case _ =>
-                return Success(ScTypePolymorphicType(
-                                 inner,
-                                 typeParams ++ unresolvedTypeParameters),
-                               Some(this))
+                return Success(
+                  ScTypePolymorphicType(
+                    inner,
+                    typeParams ++ unresolvedTypeParameters),
+                  Some(this))
             }
           case _ if unresolvedTypeParameters.nonEmpty =>
             inner match {
               case ScTypePolymorphicType(internal, typeParams) =>
-                return Success(ScTypePolymorphicType(
-                                 internal,
-                                 unresolvedTypeParameters ++ typeParams),
-                               Some(this))
+                return Success(
+                  ScTypePolymorphicType(
+                    internal,
+                    unresolvedTypeParameters ++ typeParams),
+                  Some(this))
               case _ =>
                 return Success(
                   ScTypePolymorphicType(inner, unresolvedTypeParameters),

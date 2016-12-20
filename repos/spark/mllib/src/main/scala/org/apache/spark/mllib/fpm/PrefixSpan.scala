@@ -189,10 +189,11 @@ class PrefixSpan private (private var minSupport: Double,
       }
       .persist(StorageLevel.MEMORY_AND_DISK)
 
-    val results = genFreqPatterns(dataInternalRepr,
-                                  minCount,
-                                  maxPatternLength,
-                                  maxLocalProjDBSize)
+    val results = genFreqPatterns(
+      dataInternalRepr,
+      minCount,
+      maxPatternLength,
+      maxLocalProjDBSize)
 
     def toPublicRepr(pattern: Array[Int]): Array[Array[Item]] = {
       val sequenceBuilder = mutable.ArrayBuilder.make[Array[Item]]
@@ -412,8 +413,9 @@ object PrefixSpan extends Logging {
                              val partialStarts: Array[Int] = Array.empty)
       extends Serializable {
 
-    require(items.last == 0,
-            s"The last item in a postfix must be zero, but got ${items.last}.")
+    require(
+      items.last == 0,
+      s"The last item in a postfix must be zero, but got ${items.last}.")
     if (partialStarts.nonEmpty) {
       require(
         partialStarts.head >= start,
@@ -569,9 +571,10 @@ object PrefixSpan extends Logging {
       */
     def compressed: Postfix = {
       if (start > 0) {
-        new Postfix(items.slice(start, items.length),
-                    0,
-                    partialStarts.map(_ - start))
+        new Postfix(
+          items.slice(start, items.length),
+          0,
+          partialStarts.map(_ - start))
       } else {
         this
       }

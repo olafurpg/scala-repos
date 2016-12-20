@@ -23,16 +23,18 @@ package object rearranger {
   val SCALA_GETTERS_AND_SETTERS_UI =
     "Keep_scala-style_getters_and_setters_together"
   val SCALA_GETTERS_AND_SETTERS: ArrangementSettingsToken =
-    StdArrangementSettingsToken.token(SCALA_GETTERS_AND_SETTERS_ID,
-                                      SCALA_GETTERS_AND_SETTERS_UI,
-                                      StdArrangementTokenType.GROUPING)
+    StdArrangementSettingsToken.token(
+      SCALA_GETTERS_AND_SETTERS_ID,
+      SCALA_GETTERS_AND_SETTERS_UI,
+      StdArrangementTokenType.GROUPING)
   val JAVA_GETTERS_AND_SETTERS_ID = "SCALA_KEEP_JAVA_GETTERS_SETTERS_TOGETHER"
   val JAVA_GETTERS_AND_SETTERS_UI =
     "Keep_java-style_getters_and_setters_together"
   val JAVA_GETTERS_AND_SETTERS: ArrangementSettingsToken =
-    StdArrangementSettingsToken.token(JAVA_GETTERS_AND_SETTERS_ID,
-                                      JAVA_GETTERS_AND_SETTERS_UI,
-                                      StdArrangementTokenType.GROUPING)
+    StdArrangementSettingsToken.token(
+      JAVA_GETTERS_AND_SETTERS_ID,
+      JAVA_GETTERS_AND_SETTERS_UI,
+      StdArrangementTokenType.GROUPING)
   val SPLIT_INTO_UNARRANGEABLE_BLOCKS_BY_EXPRESSIONS_ID =
     "SCALA_SPLIT_BY_EXPRESSIONS"
   val SPLIT_INTO_UNARRANGEABLE_BLOCKS_BY_EXPRESSIONS_UI =
@@ -49,9 +51,10 @@ package object rearranger {
     SPLIT_INTO_UNARRANGEABLE_BLOCKS_BY_EXPRESSIONS.getId -> SPLIT_INTO_UNARRANGEABLE_BLOCKS_BY_EXPRESSIONS)
 
   //access modifiers
-  val scalaAccessModifiersByName = immutable.ListMap("public" -> PUBLIC,
-                                                     "protected" -> PROTECTED,
-                                                     "private" -> PRIVATE)
+  val scalaAccessModifiersByName = immutable.ListMap(
+    "public" -> PUBLIC,
+    "protected" -> PROTECTED,
+    "private" -> PRIVATE)
   val scalaAccessModifiersById = immutable.HashMap(
     PUBLIC.getId -> PUBLIC,
     PROTECTED.getId -> PROTECTED,
@@ -78,19 +81,21 @@ package object rearranger {
   val LAZY_UI = "lazy"
   val LAZY: ArrangementSettingsToken = StdArrangementSettingsToken
     .token(LAZY_ID, LAZY_UI, StdArrangementTokenType.MODIFIER)
-  val scalaOtherModifiersByName = immutable.ListMap(SEALED_UI -> SEALED,
-                                                    IMPLICIT_UI -> IMPLICIT,
-                                                    "abstract" -> ABSTRACT,
-                                                    CASE_UI -> CASE,
-                                                    "final" -> FINAL,
-                                                    OVERRIDE_UI -> OVERRIDE,
-                                                    LAZY_UI -> LAZY)
-  val scalaOtherModifiersById = immutable.HashMap(SEALED.getId -> SEALED,
-                                                  IMPLICIT.getId -> IMPLICIT,
-                                                  ABSTRACT.getId -> ABSTRACT,
-                                                  FINAL.getId -> FINAL,
-                                                  OVERRIDE.getId -> OVERRIDE,
-                                                  LAZY.getId -> LAZY)
+  val scalaOtherModifiersByName = immutable.ListMap(
+    SEALED_UI -> SEALED,
+    IMPLICIT_UI -> IMPLICIT,
+    "abstract" -> ABSTRACT,
+    CASE_UI -> CASE,
+    "final" -> FINAL,
+    OVERRIDE_UI -> OVERRIDE,
+    LAZY_UI -> LAZY)
+  val scalaOtherModifiersById = immutable.HashMap(
+    SEALED.getId -> SEALED,
+    IMPLICIT.getId -> IMPLICIT,
+    ABSTRACT.getId -> ABSTRACT,
+    FINAL.getId -> FINAL,
+    OVERRIDE.getId -> OVERRIDE,
+    LAZY.getId -> LAZY)
 
   //types
   val TYPE_ID = "SCALA_TYPE"
@@ -120,24 +125,26 @@ package object rearranger {
       .tokenById(UNSEPARABLE_RANGE_ID, StdArrangementTokenType.ENTRY_TYPE)
 
   //maps and sets of tokens
-  val scalaTypesValues = immutable.HashSet(TYPE,
-                                           FUNCTION,
-                                           CLASS,
-                                           VAL,
-                                           VAR,
-                                           TRAIT,
-                                           MACRO,
-                                           CONSTRUCTOR,
-                                           OBJECT)
-  val scalaTypesById = immutable.HashMap(TYPE.getId -> TYPE,
-                                         FUNCTION.getId -> FUNCTION,
-                                         CLASS.getId -> CLASS,
-                                         VAL.getId -> VAL,
-                                         VAR.getId -> VAR,
-                                         TRAIT.getId -> TRAIT,
-                                         MACRO.getId -> MACRO,
-                                         CONSTRUCTOR.getId -> CONSTRUCTOR,
-                                         OBJECT.getId -> OBJECT)
+  val scalaTypesValues = immutable.HashSet(
+    TYPE,
+    FUNCTION,
+    CLASS,
+    VAL,
+    VAR,
+    TRAIT,
+    MACRO,
+    CONSTRUCTOR,
+    OBJECT)
+  val scalaTypesById = immutable.HashMap(
+    TYPE.getId -> TYPE,
+    FUNCTION.getId -> FUNCTION,
+    CLASS.getId -> CLASS,
+    VAL.getId -> VAL,
+    VAR.getId -> VAR,
+    TRAIT.getId -> TRAIT,
+    MACRO.getId -> MACRO,
+    CONSTRUCTOR.getId -> CONSTRUCTOR,
+    OBJECT.getId -> OBJECT)
 
   val scalaAccessModifiersValues =
     scalaAccessModifiersByName.toSet.map((x: tokensType) => x._2)
@@ -148,8 +155,9 @@ package object rearranger {
 
   private type tokensType = (String, ArrangementSettingsToken)
 
-  val supportedOrders = immutable.HashSet(StdArrangementTokens.Order.BY_NAME,
-                                          StdArrangementTokens.Order.KEEP)
+  val supportedOrders = immutable.HashSet(
+    StdArrangementTokens.Order.BY_NAME,
+    StdArrangementTokens.Order.KEEP)
 
   val commonModifiers =
     scalaAccessModifiersValues + FINAL //TODO: determine if final is common

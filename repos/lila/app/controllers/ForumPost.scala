@@ -45,11 +45,12 @@ object ForumPost extends LilaController with ForumController {
                       ctx.userId ?? Env.timeline
                         .status(s"forum:${topic.id}") map { unsub =>
                         BadRequest(
-                          html.forum.topic.show(categ,
-                                                topic,
-                                                posts,
-                                                Some(err -> captcha),
-                                                unsub))
+                          html.forum.topic.show(
+                            categ,
+                            topic,
+                            posts,
+                            Some(err -> captcha),
+                            unsub))
                       }
                   },
                   data =>

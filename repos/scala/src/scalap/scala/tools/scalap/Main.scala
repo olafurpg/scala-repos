@@ -227,8 +227,9 @@ object Main extends Main {
             AggregateFlatClassPath(
               new FlatClassPathFactory(settings).classesInExpandedPath(cp))
           case ClassPathRepresentationType.Recursive =>
-            new JavaClassPath(DefaultJavaContext.classesInExpandedPath(cp),
-                              DefaultJavaContext)
+            new JavaClassPath(
+              DefaultJavaContext.classesInExpandedPath(cp),
+              DefaultJavaContext)
         }
       case _ =>
         settings.classpath.value = "." // include '.' in the default classpath SI-6669

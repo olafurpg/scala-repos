@@ -36,7 +36,8 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "socket" boot new Env(config = lila.common.PlayApp loadConfig "socket",
-                          system = lila.common.PlayApp.system,
-                          scheduler = lila.common.PlayApp.scheduler)
+    "socket" boot new Env(
+      config = lila.common.PlayApp loadConfig "socket",
+      system = lila.common.PlayApp.system,
+      scheduler = lila.common.PlayApp.scheduler)
 }

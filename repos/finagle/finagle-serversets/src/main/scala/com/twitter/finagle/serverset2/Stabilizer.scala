@@ -35,16 +35,18 @@ private[serverset2] object Stabilizer {
   // the notify() run each epoch can trigger some slow work.
   // nettyHwt required to get TimerStats
   private val nettyHwt = new netty.HashedWheelTimer(
-    new NamedPoolThreadFactory("finagle-serversets Stabilizer timer",
-                               true /*daemons*/ ),
+    new NamedPoolThreadFactory(
+      "finagle-serversets Stabilizer timer",
+      true /*daemons*/ ),
     HashedWheelTimer.TickDuration.inMilliseconds,
     TimeUnit.MILLISECONDS,
     HashedWheelTimer.TicksPerWheel)
   private val epochTimer = HashedWheelTimer(nettyHwt)
 
-  TimerStats.deviation(nettyHwt,
-                       10.milliseconds,
-                       FinagleStatsReceiver.scope("zk2").scope("timer"))
+  TimerStats.deviation(
+    nettyHwt,
+    10.milliseconds,
+    FinagleStatsReceiver.scope("zk2").scope("timer"))
 
   TimerStats.hashedWheelTimerInternals(
     nettyHwt,
@@ -134,9 +136,10 @@ private[serverset2] object Stabilizer {
                   addr)
 
               case Addr.Bound(bound, _) =>
-                State(limbo,
-                      Some(merge(active.getOrElse(Set.empty), bound)),
-                      addr)
+                State(
+                  limbo,
+                  Some(merge(active.getOrElse(Set.empty), bound)),
+                  addr)
 
               case Addr.Neg if (active == None && limbo == None) =>
                 State(limbo, Some(Set.empty), addr)

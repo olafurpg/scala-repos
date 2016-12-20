@@ -45,11 +45,12 @@ private[spark] class HashShuffleWriter[K, V](
   private val writeMetrics = metrics.registerShuffleWriteMetrics()
 
   private val blockManager = SparkEnv.get.blockManager
-  private val shuffle = shuffleBlockResolver.forMapTask(dep.shuffleId,
-                                                        mapId,
-                                                        numOutputSplits,
-                                                        dep.serializer,
-                                                        writeMetrics)
+  private val shuffle = shuffleBlockResolver.forMapTask(
+    dep.shuffleId,
+    mapId,
+    numOutputSplits,
+    dep.serializer,
+    writeMetrics)
 
   /** Write a bunch of records to this task's output */
   override def write(records: Iterator[Product2[K, V]]): Unit = {
@@ -61,8 +62,9 @@ private[spark] class HashShuffleWriter[K, V](
           records
         }
       } else {
-        require(!dep.mapSideCombine,
-                "Map-side combine without Aggregator specified!")
+        require(
+          !dep.mapSideCombine,
+          "Map-side combine without Aggregator specified!")
         records
       }
 

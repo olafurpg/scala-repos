@@ -202,8 +202,9 @@ object WorksheetUiConstructor {
 
   def createSplitter() = {
     val separator = new JSeparator(SwingConstants.VERTICAL)
-    val size = new Dimension(separator.getPreferredSize.width,
-                             separator.getMaximumSize.height)
+    val size = new Dimension(
+      separator.getPreferredSize.width,
+      separator.getMaximumSize.height)
     separator setMaximumSize size
 
     separator

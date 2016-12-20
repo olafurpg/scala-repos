@@ -145,11 +145,13 @@ package object util {
       PrettyAttribute(v.toString, t)
     case e: GetStructField =>
       val name = e.name.getOrElse(e.childSchema(e.ordinal).name)
-      PrettyAttribute(usePrettyExpression(e.child).sql + "." + name,
-                      e.dataType)
+      PrettyAttribute(
+        usePrettyExpression(e.child).sql + "." + name,
+        e.dataType)
     case e: GetArrayStructFields =>
-      PrettyAttribute(usePrettyExpression(e.child) + "." + e.field.name,
-                      e.dataType)
+      PrettyAttribute(
+        usePrettyExpression(e.child) + "." + e.field.name,
+        e.dataType)
   }
 
   def quoteIdentifier(name: String): String = {

@@ -13,13 +13,14 @@ object OccurrenceData {
   def apply(typeElement: ScTypeElement,
             usualOccurrence: Array[ScTypeElement],
             isReplaceAllUsual: Boolean): OccurrenceData = {
-    new OccurrenceData(typeElement,
-                       usualOccurrence,
-                       isReplaceAllUsual,
-                       Array[ScTypeElement](),
-                       false,
-                       Array[ScTypeElement](),
-                       false)
+    new OccurrenceData(
+      typeElement,
+      usualOccurrence,
+      isReplaceAllUsual,
+      Array[ScTypeElement](),
+      false,
+      Array[ScTypeElement](),
+      false)
   }
 
   def apply(typeElement: ScTypeElement,
@@ -29,21 +30,23 @@ object OccurrenceData {
             scopeItem: ScopeItem): OccurrenceData = {
     scopeItem match {
       case simpleScope: SimpleScopeItem =>
-        new OccurrenceData(typeElement,
-                           simpleScope.usualOccurrences,
-                           isReplaceAllUsual,
-                           simpleScope.occurrencesInCompanion,
-                           isReplaceOccurrenceIncompanionObject,
-                           simpleScope.occurrencesFromInheretors,
-                           isReplaceOccurrenceInInheritors)
+        new OccurrenceData(
+          typeElement,
+          simpleScope.usualOccurrences,
+          isReplaceAllUsual,
+          simpleScope.occurrencesInCompanion,
+          isReplaceOccurrenceIncompanionObject,
+          simpleScope.occurrencesFromInheretors,
+          isReplaceOccurrenceInInheritors)
       case packageScope: PackageScopeItem =>
-        new OccurrenceData(typeElement,
-                           packageScope.occurrences,
-                           isReplaceAllUsual,
-                           Array[ScTypeElement](),
-                           isReplaceOccurrenceIncompanionObject,
-                           Array[ScTypeElement](),
-                           isReplaceOccurrenceInInheritors)
+        new OccurrenceData(
+          typeElement,
+          packageScope.occurrences,
+          isReplaceAllUsual,
+          Array[ScTypeElement](),
+          isReplaceOccurrenceIncompanionObject,
+          Array[ScTypeElement](),
+          isReplaceOccurrenceInInheritors)
     }
   }
 }

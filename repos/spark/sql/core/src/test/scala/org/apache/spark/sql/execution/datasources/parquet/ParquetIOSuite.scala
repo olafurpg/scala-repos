@@ -111,15 +111,16 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
         |}
       """.stripMargin)
 
-    val expectedSparkTypes = Seq(ByteType,
-                                 ShortType,
-                                 DateType,
-                                 DecimalType(1, 0),
-                                 DecimalType(10, 0),
-                                 StringType,
-                                 StringType,
-                                 DecimalType(32, 0),
-                                 DecimalType(32, 0))
+    val expectedSparkTypes = Seq(
+      ByteType,
+      ShortType,
+      DateType,
+      DecimalType(1, 0),
+      DecimalType(10, 0),
+      StringType,
+      StringType,
+      DecimalType(32, 0),
+      DecimalType(32, 0))
 
     withTempPath { location =>
       val path = new Path(location.getCanonicalPath)
@@ -300,8 +301,9 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
   test("compression codec") {
     def compressionCodecFor(path: String, codecName: String): String = {
       val codecs = for {
-        footer <- readAllFootersWithoutSummaryFiles(new Path(path),
-                                                    hadoopConfiguration)
+        footer <- readAllFootersWithoutSummaryFiles(
+          new Path(path),
+          hadoopConfiguration)
         block <- footer.getParquetMetadata.getBlocks.asScala
         column <- block.getColumns.asScala
       } yield column.getCodec.name()
@@ -546,8 +548,9 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
     withTempPath { dir =>
       val clonedConf = new Configuration(hadoopConfiguration)
 
-      hadoopConfiguration.set(SQLConf.OUTPUT_COMMITTER_CLASS.key,
-                              classOf[ParquetOutputCommitter].getCanonicalName)
+      hadoopConfiguration.set(
+        SQLConf.OUTPUT_COMMITTER_CLASS.key,
+        classOf[ParquetOutputCommitter].getCanonicalName)
 
       hadoopConfiguration.set(
         "spark.sql.parquet.output.committer.class",
@@ -628,8 +631,9 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
 
         // By default, dictionary encoding is enabled from Parquet 1.2.0 but
         // it is enabled just in case.
-        hadoopConfiguration.setBoolean(ParquetOutputFormat.ENABLE_DICTIONARY,
-                                       true)
+        hadoopConfiguration.setBoolean(
+          ParquetOutputFormat.ENABLE_DICTIONARY,
+          true)
         val path = s"${dir.getCanonicalPath}/part-r-0.parquet"
         sqlContext
           .range(1 << 16)
@@ -681,11 +685,11 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
     ("true" :: "false" :: Nil).foreach { vectorized =>
       withSQLConf(SQLConf.PARQUET_VECTORIZED_READER_ENABLED.key -> vectorized) {
         checkAnswer(
-                    // Decimal column in this file is encoded using plain dictionary
-                    readResourceParquetFile("dec-in-i32.parquet"),
-                    sqlContext
-                      .range(1 << 4)
-                      .select('id % 10 cast DecimalType(5, 2) as 'i32_dec))
+          // Decimal column in this file is encoded using plain dictionary
+          readResourceParquetFile("dec-in-i32.parquet"),
+          sqlContext
+            .range(1 << 4)
+            .select('id % 10 cast DecimalType(5, 2) as 'i32_dec))
       }
     }
   }
@@ -694,11 +698,11 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
     ("true" :: "false" :: Nil).foreach { vectorized =>
       withSQLConf(SQLConf.PARQUET_VECTORIZED_READER_ENABLED.key -> vectorized) {
         checkAnswer(
-                    // Decimal column in this file is encoded using plain dictionary
-                    readResourceParquetFile("dec-in-i64.parquet"),
-                    sqlContext
-                      .range(1 << 4)
-                      .select('id % 10 cast DecimalType(10, 2) as 'i64_dec))
+          // Decimal column in this file is encoded using plain dictionary
+          readResourceParquetFile("dec-in-i64.parquet"),
+          sqlContext
+            .range(1 << 4)
+            .select('id % 10 cast DecimalType(10, 2) as 'i64_dec))
       }
     }
   }

@@ -100,10 +100,11 @@ private[streaming] class WriteAheadLogBackedBlockRDD[T: ClassTag](
     assertValid()
     Array.tabulate(_blockIds.length) { i =>
       val isValid = if (isBlockIdValid.length == 0) true else isBlockIdValid(i)
-      new WriteAheadLogBackedBlockRDDPartition(i,
-                                               _blockIds(i),
-                                               isValid,
-                                               walRecordHandles(i))
+      new WriteAheadLogBackedBlockRDDPartition(
+        i,
+        _blockIds(i),
+        isValid,
+        walRecordHandles(i))
     }
   }
 
@@ -163,9 +164,10 @@ private[streaming] class WriteAheadLogBackedBlockRDD[T: ClassTag](
         s"Read partition data of $this from write ahead log, record handle " +
           partition.walRecordHandle)
       if (storeInBlockManager) {
-        blockManager.putBytes(blockId,
-                              new ChunkedByteBuffer(dataRead.duplicate()),
-                              storageLevel)
+        blockManager.putBytes(
+          blockId,
+          new ChunkedByteBuffer(dataRead.duplicate()),
+          storageLevel)
         logDebug(
           s"Stored partition data of $this into block manager with level $storageLevel")
         dataRead.rewind()
@@ -198,10 +200,11 @@ private[streaming] class WriteAheadLogBackedBlockRDD[T: ClassTag](
       partition.walRecordHandle match {
         case fileSegment: FileBasedWriteAheadLogSegment =>
           try {
-            HdfsUtils.getFileSegmentLocations(fileSegment.path,
-                                              fileSegment.offset,
-                                              fileSegment.length,
-                                              hadoopConfig)
+            HdfsUtils.getFileSegmentLocations(
+              fileSegment.path,
+              fileSegment.offset,
+              fileSegment.length,
+              hadoopConfig)
           } catch {
             case NonFatal(e) =>
               logError("Error getting WAL file segment locations", e)

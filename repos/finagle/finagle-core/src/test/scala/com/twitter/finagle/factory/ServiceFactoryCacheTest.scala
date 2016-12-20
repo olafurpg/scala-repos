@@ -53,8 +53,9 @@ class ServiceFactoryCacheTest extends FunSuite with MockitoSugar {
     val newFactory: Int => ServiceFactory[String, String] = { i =>
       SF(i)
     }
-    val cache = new ServiceFactoryCache[Int, String, String](newFactory,
-                                                             maxCacheSize = 2)
+    val cache = new ServiceFactoryCache[Int, String, String](
+      newFactory,
+      maxCacheSize = 2)
 
     assert(factories.isEmpty)
 

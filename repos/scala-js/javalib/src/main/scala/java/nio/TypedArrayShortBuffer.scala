@@ -108,10 +108,11 @@ private[nio] object TypedArrayShortBuffer {
               initialPosition: Int,
               initialLimit: Int,
               readOnly: Boolean): TypedArrayShortBuffer = {
-      new TypedArrayShortBuffer(typedArray,
-                                initialPosition,
-                                initialLimit,
-                                readOnly)
+      new TypedArrayShortBuffer(
+        typedArray,
+        initialPosition,
+        initialLimit,
+        readOnly)
     }
 
     @inline

@@ -36,12 +36,12 @@ class ConsumerFetcherThread(
     sourceBroker: BrokerEndPoint,
     partitionMap: Map[TopicAndPartition, PartitionTopicInfo],
     val consumerFetcherManager: ConsumerFetcherManager)
-    extends AbstractFetcherThread(name = name,
-                                  clientId = config.clientId,
-                                  sourceBroker = sourceBroker,
-                                  fetchBackOffMs =
-                                    config.refreshLeaderBackoffMs,
-                                  isInterruptible = true) {
+    extends AbstractFetcherThread(
+      name = name,
+      clientId = config.clientId,
+      sourceBroker = sourceBroker,
+      fetchBackOffMs = config.refreshLeaderBackoffMs,
+      isInterruptible = true) {
 
   type REQ = FetchRequest
   type PD = PartitionData
@@ -83,10 +83,11 @@ class ConsumerFetcherThread(
     if (pti.getFetchOffset != fetchOffset)
       throw new RuntimeException(
         "Offset doesn't match for partition [%s,%d] pti offset: %d fetch offset: %d"
-          .format(topicAndPartition.topic,
-                  topicAndPartition.partition,
-                  pti.getFetchOffset,
-                  fetchOffset))
+          .format(
+            topicAndPartition.topic,
+            topicAndPartition.partition,
+            pti.getFetchOffset,
+            fetchOffset))
     pti.enqueue(
       partitionData.underlying.messages.asInstanceOf[ByteBufferMessageSet])
   }
@@ -120,10 +121,11 @@ class ConsumerFetcherThread(
     partitionMap.foreach {
       case ((topicAndPartition, partitionFetchState)) =>
         if (partitionFetchState.isActive)
-          fetchRequestBuilder.addFetch(topicAndPartition.topic,
-                                       topicAndPartition.partition,
-                                       partitionFetchState.offset,
-                                       fetchSize)
+          fetchRequestBuilder.addFetch(
+            topicAndPartition.topic,
+            topicAndPartition.partition,
+            partitionFetchState.offset,
+            fetchSize)
     }
 
     new FetchRequest(fetchRequestBuilder.build())

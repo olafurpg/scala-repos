@@ -45,9 +45,10 @@ object ScopeSuggester {
 
     def getParent(element: PsiElement, isScriptFile: Boolean): PsiElement = {
       if (isScriptFile)
-        PsiTreeUtil.getParentOfType(element,
-                                    classOf[ScTemplateBody],
-                                    classOf[ScalaFile])
+        PsiTreeUtil.getParentOfType(
+          element,
+          classOf[ScTemplateBody],
+          classOf[ScalaFile])
       else PsiTreeUtil.getParentOfType(element, classOf[ScTemplateBody])
     }
 
@@ -112,22 +113,24 @@ object ScopeSuggester {
 
       val occurrences =
         ScalaRefactoringUtil.getTypeElementOccurrences(currentElement, parent)
-      val validator = ScalaTypeValidator(conflictsReporter,
-                                         project,
-                                         currentElement,
-                                         parent,
-                                         occurrences.isEmpty)
+      val validator = ScalaTypeValidator(
+        conflictsReporter,
+        project,
+        currentElement,
+        parent,
+        occurrences.isEmpty)
 
       val possibleNames = NameSuggester
         .suggestNamesByType(currentElement.calcType)
         .map(validator.validateName(_, increaseNumber = true))
 
-      result += SimpleScopeItem(name,
-                                parent,
-                                occurrences,
-                                occInCompanionObj,
-                                validator,
-                                possibleNames.toArray)
+      result += SimpleScopeItem(
+        name,
+        parent,
+        occurrences,
+        occInCompanionObj,
+        validator,
+        possibleNames.toArray)
       parent = getParent(parent, isScriptFile)
     }
 
@@ -140,14 +143,15 @@ object ScopeSuggester {
         getAllAvailablePackages(scPackage.fullPackageName, currentElement)
       for ((resultPackage, resultDirectory) <- allPackages) {
         result +=
-          PackageScopeItem(resultPackage.getQualifiedName,
-                           resultDirectory,
-                           needDirectoryCreating = false,
-                           Array(
-                             NameSuggester
-                               .suggestNamesByType(currentElement.calcType)
-                               .apply(0)
-                               .capitalize))
+          PackageScopeItem(
+            resultPackage.getQualifiedName,
+            resultDirectory,
+            needDirectoryCreating = false,
+            Array(
+              NameSuggester
+                .suggestNamesByType(currentElement.calcType)
+                .apply(0)
+                .capitalize))
       }
     }
 
@@ -217,10 +221,11 @@ object ScopeSuggester {
 
           result += ((currentPackage, resultDirectory))
         }
-        getDirectoriesContainigFileAndPackage(currentPackage.getParentPackage,
-                                              module,
-                                              result,
-                                              dirContainingFile)
+        getDirectoriesContainigFileAndPackage(
+          currentPackage.getParentPackage,
+          module,
+          result,
+          dirContainingFile)
       } else {
         result
       }
@@ -235,10 +240,11 @@ object ScopeSuggester {
     val result: ArrayBuffer[(PsiPackage, PsiDirectory)] =
       new ArrayBuffer[(PsiPackage, PsiDirectory)]()
 
-    getDirectoriesContainigFileAndPackage(currentPackage,
-                                          module,
-                                          result,
-                                          directoriesContainingFile)
+    getDirectoriesContainigFileAndPackage(
+      currentPackage,
+      module,
+      result,
+      directoriesContainingFile)
 
     result.toArray
   }
@@ -306,8 +312,8 @@ object ScopeSuggester {
     val fileEncloser =
       if (packageObject.isDefined)
         PsiTreeUtil.getChildOfType(
-          PsiTreeUtil.getChildOfType(packageObject.get,
-                                     classOf[ScExtendsBlock]),
+          PsiTreeUtil
+            .getChildOfType(packageObject.get, classOf[ScExtendsBlock]),
           classOf[ScTemplateBody])
       else containinDirectory
 
@@ -328,11 +334,12 @@ object ScopeSuggester {
           case _ => PsiTreeUtil.findChildOfType(file, classOf[ScTemplateBody])
         }
         if (parent != null) {
-          allValidators += ScalaTypeValidator(conflictsReporter,
-                                              project,
-                                              typeElement,
-                                              parent,
-                                              occurrences.isEmpty)
+          allValidators += ScalaTypeValidator(
+            conflictsReporter,
+            project,
+            typeElement,
+            parent,
+            occurrences.isEmpty)
         }
       }
     }
@@ -351,11 +358,12 @@ object ScopeSuggester {
         val parent =
           PsiTreeUtil.findChildOfType(clazz, classOf[ScTemplateBody])
 
-        allValidators += ScalaTypeValidator(conflictsReporter,
-                                            project,
-                                            typeElement,
-                                            parent,
-                                            occurrences.isEmpty)
+        allValidators += ScalaTypeValidator(
+          conflictsReporter,
+          project,
+          typeElement,
+          parent,
+          occurrences.isEmpty)
       }
     } else {
       collectedFiles.foreach(handleOneFile)
@@ -363,22 +371,24 @@ object ScopeSuggester {
 
     val occurrences =
       allOcurrences.foldLeft(Array[ScTypeElement]())((a, b) => a ++ b)
-    val validator = ScalaCompositeTypeValidator(allValidators.toList,
-                                                conflictsReporter,
-                                                project,
-                                                typeElement,
-                                                occurrences.isEmpty,
-                                                containinDirectory,
-                                                containinDirectory)
+    val validator = ScalaCompositeTypeValidator(
+      allValidators.toList,
+      conflictsReporter,
+      project,
+      typeElement,
+      occurrences.isEmpty,
+      containinDirectory,
+      containinDirectory)
 
     val suggested = inputName
     val possibleNames = Array(
       validator.validateName(suggested, increaseNumber = true))
 
-    val result = PackageScopeItem(inPackage.getName,
-                                  fileEncloser,
-                                  needNewDir,
-                                  possibleNames.toArray)
+    val result = PackageScopeItem(
+      inPackage.getName,
+      fileEncloser,
+      needNewDir,
+      possibleNames.toArray)
 
     result.occurrences = occurrences
     result.validator = validator
@@ -418,10 +428,11 @@ case class SimpleScopeItem(name: String,
   def revalidate(newName: String): ScopeItem = {
     val revalidatedOccurrences = usualOccurrencesRanges.map {
       case (range, containigFile) =>
-        PsiTreeUtil.findElementOfClassAtRange(containigFile,
-                                              range.getStartOffset,
-                                              range.getEndOffset,
-                                              classOf[ScTypeElement])
+        PsiTreeUtil.findElementOfClassAtRange(
+          containigFile,
+          range.getStartOffset,
+          range.getEndOffset,
+          classOf[ScTypeElement])
     }
 
     val newNames =
@@ -433,10 +444,11 @@ case class SimpleScopeItem(name: String,
 
     val updatedFileEncloser = fileEncloserRange match {
       case (range, containingFile) =>
-        PsiTreeUtil.findElementOfClassAtRange(containingFile,
-                                              range.getStartOffset,
-                                              range.getEndOffset,
-                                              classOf[PsiElement])
+        PsiTreeUtil.findElementOfClassAtRange(
+          containingFile,
+          range.getStartOffset,
+          range.getEndOffset,
+          classOf[PsiElement])
     }
 
     val updatedValidator = new ScalaTypeValidator(
@@ -447,12 +459,13 @@ case class SimpleScopeItem(name: String,
       updatedFileEncloser,
       updatedFileEncloser)
 
-    new SimpleScopeItem(name,
-                        updatedFileEncloser,
-                        revalidatedOccurrences,
-                        occurrencesInCompanion,
-                        updatedValidator,
-                        newNames)
+    new SimpleScopeItem(
+      name,
+      updatedFileEncloser,
+      revalidatedOccurrences,
+      occurrencesInCompanion,
+      updatedValidator,
+      newNames)
   }
 
   def isTrait: Boolean = {

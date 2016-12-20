@@ -14,9 +14,10 @@ object HoconPsiElementFactory {
       offset: Int): T = {
     val element = PsiFileFactory
       .getInstance(manager.getProject)
-      .createFileFromText(Dummy + HoconFileType.DefaultExtension,
-                          HoconFileType,
-                          text)
+      .createFileFromText(
+        Dummy + HoconFileType.DefaultExtension,
+        HoconFileType,
+        text)
       .findElementAt(offset)
     Iterator.iterate(element)(_.getParent).collectFirst({ case t: T => t }).get
   }

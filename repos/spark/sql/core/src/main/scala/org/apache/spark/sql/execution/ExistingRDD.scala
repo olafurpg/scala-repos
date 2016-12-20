@@ -117,8 +117,8 @@ private[sql] case class PhysicalRDD(output: Seq[Attribute],
     extends LeafNode {
 
   private[sql] override lazy val metrics = Map(
-    "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
-                                                   "number of output rows"))
+    "numOutputRows" -> SQLMetrics
+      .createLongMetric(sparkContext, "number of output rows"))
 
   protected override def doExecute(): RDD[InternalRow] = {
     val numOutputRows = longMetric("numOutputRows")
@@ -155,8 +155,8 @@ private[sql] case class DataSourceScan(
   }
 
   private[sql] override lazy val metrics = Map(
-    "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
-                                                   "number of output rows"))
+    "numOutputRows" -> SQLMetrics
+      .createLongMetric(sparkContext, "number of output rows"))
 
   val outputUnsafeRows = relation match {
     case r: HadoopFsRelation if r.fileFormat.isInstanceOf[ParquetSource] =>
@@ -233,9 +233,10 @@ private[sql] case class DataSourceScan(
     val idx = ctx.freshName("batchIdx")
     val batch = ctx.freshName("batch")
     // PhysicalRDD always just has one input
-    ctx.addMutableState("scala.collection.Iterator",
-                        input,
-                        s"$input = inputs[0];")
+    ctx.addMutableState(
+      "scala.collection.Iterator",
+      input,
+      s"$input = inputs[0];")
     ctx.addMutableState(columnarBatchClz, batch, s"$batch = null;")
     ctx.addMutableState("int", idx, s"$idx = 0;")
 
@@ -254,8 +255,9 @@ private[sql] case class DataSourceScan(
     ctx.currentVars = null
     val columns1 = exprs.map(_.gen(ctx))
     val scanBatches = ctx.freshName("processBatches")
-    ctx.addNewFunction(scanBatches,
-                       s"""
+    ctx.addNewFunction(
+      scanBatches,
+      s"""
       | private void $scanBatches() throws java.io.IOException {
       |  while (true) {
       |     int numRows = $batch.numRows();
@@ -281,8 +283,9 @@ private[sql] case class DataSourceScan(
     val columns2 = exprs.map(_.gen(ctx))
     val inputRow = if (outputUnsafeRows) row else null
     val scanRows = ctx.freshName("processRows")
-    ctx.addNewFunction(scanRows,
-                       s"""
+    ctx.addNewFunction(
+      scanRows,
+      s"""
        | private void $scanRows(InternalRow $row) throws java.io.IOException {
        |   boolean firstRow = true;
        |   while (!shouldStop() && (firstRow || $input.hasNext())) {

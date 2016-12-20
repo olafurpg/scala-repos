@@ -467,10 +467,11 @@ class ScalaControlFlowBuilder(startInScope: ScalaPsiElement,
     paramOwner.accept(visitor)
 
     for (ref <- collectedRefs) {
-      val instr = new ReadWriteVariableInstruction(inc,
-                                                   ref,
-                                                   policy.usedVariable(ref),
-                                                   ScalaPsiUtil.isLValue(ref))
+      val instr = new ReadWriteVariableInstruction(
+        inc,
+        ref,
+        policy.usedVariable(ref),
+        ScalaPsiUtil.isLValue(ref))
       addNode(instr)
       checkPendingEdges(instr)
     }

@@ -148,8 +148,9 @@ class Persistence(val system: ExtendedActorSystem) extends Extension {
   // Lazy, so user is not forced to configure defaults when she is not using them.
   private lazy val defaultJournalPluginId = {
     val configPath = config.getString("journal.plugin")
-    require(!isEmpty(configPath),
-            "default journal plugin is not configured, see 'reference.conf'")
+    require(
+      !isEmpty(configPath),
+      "default journal plugin is not configured, see 'reference.conf'")
     configPath
   }
 
@@ -321,9 +322,10 @@ class Persistence(val system: ExtendedActorSystem) extends Extension {
         .findConstructor(pluginClass, List(pluginConfig)) // will throw if not found
       List(pluginConfig)
     } catch { case NonFatal(_) ⇒ Nil } // otherwise use empty constructor
-    val pluginActorProps = Props(Deploy(dispatcher = pluginDispatcherId),
-                                 pluginClass,
-                                 pluginActorArgs)
+    val pluginActorProps = Props(
+      Deploy(dispatcher = pluginDispatcherId),
+      pluginClass,
+      pluginActorArgs)
     system.systemActorOf(pluginActorProps, pluginActorName)
   }
 

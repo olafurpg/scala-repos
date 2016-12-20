@@ -49,9 +49,10 @@ class FlowLogSpec extends AkkaSpec("akka.loglevel = DEBUG") with ScriptedTest {
 
       "allow disabling element logging" in {
         val disableElementLogging =
-          Attributes.logLevels(onElement = LogLevels.Off,
-                               onFinish = Logging.DebugLevel,
-                               onFailure = Logging.DebugLevel)
+          Attributes.logLevels(
+            onElement = LogLevels.Off,
+            onFinish = Logging.DebugLevel,
+            onFailure = Logging.DebugLevel)
 
         val debugging = Flow[Int].log("my-debug")
         Source(1 to 2)
@@ -145,17 +146,19 @@ class FlowLogSpec extends AkkaSpec("akka.loglevel = DEBUG") with ScriptedTest {
       }
 
       "allow configuring log levels via Attributes" in {
-        val logAttrs = Attributes.logLevels(onElement = Logging.WarningLevel,
-                                            onFinish = Logging.InfoLevel,
-                                            onFailure = Logging.DebugLevel)
+        val logAttrs = Attributes.logLevels(
+          onElement = Logging.WarningLevel,
+          onFinish = Logging.InfoLevel,
+          onFailure = Logging.DebugLevel)
 
         Source
           .single(42)
           .log("flow-6")
           .withAttributes(
-            Attributes.logLevels(onElement = Logging.WarningLevel,
-                                 onFinish = Logging.InfoLevel,
-                                 onFailure = Logging.DebugLevel))
+            Attributes.logLevels(
+              onElement = Logging.WarningLevel,
+              onFinish = Logging.InfoLevel,
+              onFailure = Logging.DebugLevel))
           .runWith(Sink.ignore)
 
         logProbe.expectMsg(

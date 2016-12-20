@@ -165,9 +165,10 @@ object Template extends Logging {
             githubConnectErrorMessage(e)
             Map()
         })
-    FileUtils.writeStringToFile(new File(repoFilename),
-                                write(newReposCache),
-                                "ISO-8859-1")
+    FileUtils.writeStringToFile(
+      new File(repoFilename),
+      write(newReposCache),
+      "ISO-8859-1")
     newReposCache
   }
 
@@ -347,8 +348,9 @@ object Template extends Logging {
       if (ze.isDirectory) {
         new File(destFilename).mkdirs
       } else {
-        val os = new BufferedOutputStream(new FileOutputStream(destFilename),
-                                          bufferSize)
+        val os = new BufferedOutputStream(
+          new FileOutputStream(destFilename),
+          bufferSize)
         val data = Array.ofDim[Byte](bufferSize)
         var count = zis.read(data, 0, bufferSize)
         while (count != -1) {
@@ -402,8 +404,9 @@ object Template extends Logging {
         val fileContent = Source.fromFile(ftm).getLines()
         val processedLines =
           fileContent.map(_.replaceAllLiterally(pkgName, organization))
-        FileUtils.writeStringToFile(new File(ftm),
-                                    processedLines.mkString("\n"))
+        FileUtils.writeStringToFile(
+          new File(ftm),
+          processedLines.mkString("\n"))
       }
     } getOrElse {
       error(

@@ -103,9 +103,10 @@ class PathTest extends FunSuite with GeneratorDrivenPropertyChecks {
     object D extends DoubleParamMatcher("d")
 
     assert {
-      (Path("/test.json") :? ParamMap("i" -> "1",
-                                      "l" -> "2147483648",
-                                      "d" -> "1.3")) match {
+      (Path("/test.json") :? ParamMap(
+        "i" -> "1",
+        "l" -> "2147483648",
+        "d" -> "1.3")) match {
         case Root / "test.json" :? (I(i) :& L(l) :& D(d)) =>
           i == 1 && l == 2147483648L && d == 1.3D
         case _ => false

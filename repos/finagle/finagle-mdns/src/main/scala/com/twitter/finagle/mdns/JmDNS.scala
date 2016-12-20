@@ -65,12 +65,14 @@ private object JmDNSResolver {
           info =>
             val addresses = info.getInetAddresses
             val metadata =
-              MdnsAddrMetadata(info.getName,
-                               info.getApplication + "." + info.getProtocol,
-                               info.getDomain)
+              MdnsAddrMetadata(
+                info.getName,
+                info.getApplication + "." + info.getProtocol,
+                info.getDomain)
             val addr =
-              Address.Inet(new InetSocketAddress(addresses(0), info.getPort),
-                           MdnsAddrMetadata.toAddrMetadata(metadata))
+              Address.Inet(
+                new InetSocketAddress(addresses(0), info.getPort),
+                MdnsAddrMetadata.toAddrMetadata(metadata))
 
             synchronized {
               services.put(info.getName, addr)
@@ -109,12 +111,14 @@ private class JmDNSGroup(regType: String) extends Group[Address] {
         info =>
           val addresses = info.getInetAddresses
           val metadata =
-            MdnsAddrMetadata(info.getName,
-                             info.getApplication + "." + info.getProtocol,
-                             info.getDomain)
+            MdnsAddrMetadata(
+              info.getName,
+              info.getApplication + "." + info.getProtocol,
+              info.getDomain)
           val addr =
-            Address.Inet(new InetSocketAddress(addresses(0), info.getPort),
-                         MdnsAddrMetadata.toAddrMetadata(metadata))
+            Address.Inet(
+              new InetSocketAddress(addresses(0), info.getPort),
+              MdnsAddrMetadata.toAddrMetadata(metadata))
 
           synchronized {
             services.put(info.getName, addr)

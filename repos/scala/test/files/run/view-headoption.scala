@@ -1,15 +1,16 @@
 object Test {
   val failer = () => { println("fail"); None }
   val succeeder = () => { println("success"); Some(5) }
-  val fs = List(failer,
-                succeeder,
-                failer,
-                failer,
-                succeeder,
-                failer,
-                failer,
-                failer,
-                succeeder)
+  val fs = List(
+    failer,
+    succeeder,
+    failer,
+    failer,
+    succeeder,
+    failer,
+    failer,
+    failer,
+    succeeder)
 
   def f0 = fs.view flatMap (f => f())
   def f1 = f0.headOption

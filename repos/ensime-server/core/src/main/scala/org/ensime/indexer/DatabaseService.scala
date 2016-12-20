@@ -180,9 +180,9 @@ object DatabaseService {
       index("idx_fqn", fqn, unique = false) // fqns are unique by type and sig
     def uniq = index("idx_uniq", (fqn, descriptor, internal), unique = true)
     def filename =
-      foreignKey("filename_fk", file, fileChecks)(_.filename,
-                                                  onDelete =
-                                                    ForeignKeyAction.Cascade)
+      foreignKey("filename_fk", file, fileChecks)(
+        _.filename,
+        onDelete = ForeignKeyAction.Cascade)
   }
   private val fqnSymbols = TableQuery[FqnSymbols]
   private val fqnSymbolsCompiled = Compiled { TableQuery[FqnSymbols] }

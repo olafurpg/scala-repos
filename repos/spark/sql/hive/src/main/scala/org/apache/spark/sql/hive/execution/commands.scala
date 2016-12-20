@@ -153,19 +153,21 @@ private[hive] case class CreateMetastoreDataSource(
       }
 
     // Create the relation to validate the arguments before writing the metadata to the metastore.
-    DataSource(sqlContext = sqlContext,
-               userSpecifiedSchema = userSpecifiedSchema,
-               className = provider,
-               bucketSpec = None,
-               options = optionsWithPath).resolveRelation()
+    DataSource(
+      sqlContext = sqlContext,
+      userSpecifiedSchema = userSpecifiedSchema,
+      className = provider,
+      bucketSpec = None,
+      options = optionsWithPath).resolveRelation()
 
-    hiveContext.sessionState.catalog.createDataSourceTable(tableIdent,
-                                                           userSpecifiedSchema,
-                                                           Array.empty[String],
-                                                           bucketSpec = None,
-                                                           provider,
-                                                           optionsWithPath,
-                                                           isExternal)
+    hiveContext.sessionState.catalog.createDataSourceTable(
+      tableIdent,
+      userSpecifiedSchema,
+      Array.empty[String],
+      bucketSpec = None,
+      provider,
+      optionsWithPath,
+      isExternal)
 
     Seq.empty[Row]
   }
@@ -229,22 +231,22 @@ private[hive] case class CreateMetastoreDataSourceAsSelect(
           return Seq.empty[Row]
         case SaveMode.Append =>
           // Check if the specified data source match the data source of the existing table.
-          val dataSource = DataSource(sqlContext = sqlContext,
-                                      userSpecifiedSchema =
-                                        Some(query.schema.asNullable),
-                                      partitionColumns = partitionColumns,
-                                      bucketSpec = bucketSpec,
-                                      className = provider,
-                                      options = optionsWithPath)
+          val dataSource = DataSource(
+            sqlContext = sqlContext,
+            userSpecifiedSchema = Some(query.schema.asNullable),
+            partitionColumns = partitionColumns,
+            bucketSpec = bucketSpec,
+            className = provider,
+            options = optionsWithPath)
           // TODO: Check that options from the resolved relation match the relation that we are
           // inserting into (i.e. using the same compression).
 
           EliminateSubqueryAliases(
             sqlContext.sessionState.catalog.lookupRelation(tableIdent)) match {
-            case l @ LogicalRelation(_: InsertableRelation |
-                                     _: HadoopFsRelation,
-                                     _,
-                                     _) =>
+            case l @ LogicalRelation(
+                  _: InsertableRelation | _: HadoopFsRelation,
+                  _,
+                  _) =>
               existingSchema = Some(l.schema)
             case o =>
               throw new AnalysisException(
@@ -269,11 +271,12 @@ private[hive] case class CreateMetastoreDataSourceAsSelect(
     }
 
     // Create the relation based on the data of df.
-    val dataSource = DataSource(sqlContext,
-                                className = provider,
-                                partitionColumns = partitionColumns,
-                                bucketSpec = bucketSpec,
-                                options = optionsWithPath)
+    val dataSource = DataSource(
+      sqlContext,
+      className = provider,
+      partitionColumns = partitionColumns,
+      bucketSpec = bucketSpec,
+      options = optionsWithPath)
 
     val result = dataSource.write(mode, df)
 

@@ -109,9 +109,10 @@ trait Importers { to: SymbolTable =>
       }
       val my = their match {
         case their: from.MethodSymbol =>
-          linkReferenced(myowner.newMethod(myname.toTermName, mypos, myflags),
-                         their,
-                         importSymbol)
+          linkReferenced(
+            myowner.newMethod(myname.toTermName, mypos, myflags),
+            their,
+            importSymbol)
         case their: from.ModuleSymbol =>
           val ret = linkReferenced(
             myowner.newModuleSymbol(myname.toTermName, mypos, myflags),
@@ -120,16 +121,18 @@ trait Importers { to: SymbolTable =>
           ret.associatedFile = their.associatedFile
           ret
         case their: from.FreeTermSymbol =>
-          newFreeTermSymbol(myname.toTermName,
-                            their.value,
-                            their.flags,
-                            their.origin) setInfo importType(their.info)
+          newFreeTermSymbol(
+            myname.toTermName,
+            their.value,
+            their.flags,
+            their.origin) setInfo importType(their.info)
         case their: from.FreeTypeSymbol =>
           newFreeTypeSymbol(myname.toTypeName, their.flags, their.origin)
         case their: from.TermSymbol =>
-          linkReferenced(myowner.newValue(myname.toTermName, mypos, myflags),
-                         their,
-                         importSymbol)
+          linkReferenced(
+            myowner.newValue(myname.toTermName, mypos, myflags),
+            their,
+            importSymbol)
         case their: from.TypeSkolem =>
           val origin = their.unpackLocation match {
             case null => null
@@ -199,8 +202,9 @@ trait Importers { to: SymbolTable =>
               (if (myowner hasFlag Flags.LOCKED) NoSymbol
                else myowner.typeParams(their.paramPos))
             else if (isOverloaded)
-              myowner.newOverloaded(myowner.thisType,
-                                    their.alternatives map importSymbol)
+              myowner.newOverloaded(
+                myowner.thisType,
+                their.alternatives map importSymbol)
             else {
               def disambiguate(my: Symbol) = {
                 val result =
@@ -228,8 +232,9 @@ trait Importers { to: SymbolTable =>
           myexisting.orElse {
             val my = cachedRecreateSymbol(their)
             if (myscope != NoType) {
-              assert(myscope.decls.lookup(myname) == NoSymbol,
-                     myname + " " + myscope.decl(myname) + " " + myexisting)
+              assert(
+                myscope.decls.lookup(myname) == NoSymbol,
+                myname + " " + myscope.decl(myname) + " " + myexisting)
               myscope.decls enter my
             }
             my
@@ -286,9 +291,10 @@ trait Importers { to: SymbolTable =>
         decls foreach importSymbol // will enter itself into myclazz
         myclazzTpe
       case from.RefinedType(parents, decls) =>
-        RefinedType(parents map importType,
-                    importScope(decls),
-                    importSymbol(their.typeSymbol))
+        RefinedType(
+          parents map importType,
+          importScope(decls),
+          importSymbol(their.typeSymbol))
       case from.ExistentialType(tparams, result) =>
         newExistentialType(tparams map importSymbol, importType(result))
       case from.OverloadedType(pre, alts) =>
@@ -298,13 +304,15 @@ trait Importers { to: SymbolTable =>
       case from.AntiPolyType(pre, targs) =>
         AntiPolyType(importType(pre), targs map importType)
       case their: from.TypeVar =>
-        val myconstr = new TypeConstraint(their.constr.loBounds map importType,
-                                          their.constr.hiBounds map importType)
+        val myconstr = new TypeConstraint(
+          their.constr.loBounds map importType,
+          their.constr.hiBounds map importType)
         myconstr.inst = importType(their.constr.inst)
-        TypeVar(importType(their.origin),
-                myconstr,
-                their.typeArgs map importType,
-                their.params map importSymbol)
+        TypeVar(
+          importType(their.origin),
+          myconstr,
+          their.typeArgs map importType,
+          their.params map importSymbol)
       case from.AnnotatedType(annots, result) =>
         AnnotatedType(annots map importAnnotationInfo, importType(result))
       case from.ErrorType =>
@@ -353,47 +361,54 @@ trait Importers { to: SymbolTable =>
 
     def recreateTree(their: from.Tree): to.Tree = their match {
       case from.ClassDef(mods, name, tparams, impl) =>
-        new ClassDef(importModifiers(mods),
-                     importName(name).toTypeName,
-                     tparams map importTypeDef,
-                     importTemplate(impl))
+        new ClassDef(
+          importModifiers(mods),
+          importName(name).toTypeName,
+          tparams map importTypeDef,
+          importTemplate(impl))
       case from.PackageDef(pid, stats) =>
         new PackageDef(importRefTree(pid), stats map importTree)
       case from.ModuleDef(mods, name, impl) =>
-        new ModuleDef(importModifiers(mods),
-                      importName(name).toTermName,
-                      importTemplate(impl))
+        new ModuleDef(
+          importModifiers(mods),
+          importName(name).toTermName,
+          importTemplate(impl))
       case from.noSelfType =>
         noSelfType
       case from.pendingSuperCall =>
         pendingSuperCall
       case from.ValDef(mods, name, tpt, rhs) =>
-        new ValDef(importModifiers(mods),
-                   importName(name).toTermName,
-                   importTree(tpt),
-                   importTree(rhs))
+        new ValDef(
+          importModifiers(mods),
+          importName(name).toTermName,
+          importTree(tpt),
+          importTree(rhs))
       case from.DefDef(mods, name, tparams, vparamss, tpt, rhs) =>
-        new DefDef(importModifiers(mods),
-                   importName(name).toTermName,
-                   tparams map importTypeDef,
-                   mmap(vparamss)(importValDef),
-                   importTree(tpt),
-                   importTree(rhs))
+        new DefDef(
+          importModifiers(mods),
+          importName(name).toTermName,
+          tparams map importTypeDef,
+          mmap(vparamss)(importValDef),
+          importTree(tpt),
+          importTree(rhs))
       case from.TypeDef(mods, name, tparams, rhs) =>
-        new TypeDef(importModifiers(mods),
-                    importName(name).toTypeName,
-                    tparams map importTypeDef,
-                    importTree(rhs))
+        new TypeDef(
+          importModifiers(mods),
+          importName(name).toTypeName,
+          tparams map importTypeDef,
+          importTree(rhs))
       case from.LabelDef(name, params, rhs) =>
-        new LabelDef(importName(name).toTermName,
-                     params map importIdent,
-                     importTree(rhs))
+        new LabelDef(
+          importName(name).toTermName,
+          params map importIdent,
+          importTree(rhs))
       case from.Import(expr, selectors) =>
         new Import(importTree(expr), selectors map importImportSelector)
       case from.Template(parents, self, body) =>
-        new Template(parents map importTree,
-                     importValDef(self),
-                     body map importTree)
+        new Template(
+          parents map importTree,
+          importValDef(self),
+          body map importTree)
       case from.Block(stats, expr) =>
         new Block(stats map importTree, importTree(expr))
       case from.CaseDef(pat, guard, body) =>
@@ -421,9 +436,10 @@ trait Importers { to: SymbolTable =>
       case from.Return(expr) =>
         new Return(importTree(expr))
       case from.Try(block, catches, finalizer) =>
-        new Try(importTree(block),
-                catches map importCaseDef,
-                importTree(finalizer))
+        new Try(
+          importTree(block),
+          catches map importCaseDef,
+          importTree(finalizer))
       case from.Throw(expr) =>
         new Throw(importTree(expr))
       case from.New(tpt) =>
@@ -475,8 +491,9 @@ trait Importers { to: SymbolTable =>
       case from.TypeBoundsTree(lo, hi) =>
         new TypeBoundsTree(importTree(lo), importTree(hi))
       case from.ExistentialTypeTree(tpt, whereClauses) =>
-        new ExistentialTypeTree(importTree(tpt),
-                                whereClauses map importMemberDef)
+        new ExistentialTypeTree(
+          importTree(tpt),
+          whereClauses map importMemberDef)
       case from.EmptyTree =>
         EmptyTree
       case null =>
@@ -545,9 +562,10 @@ trait Importers { to: SymbolTable =>
       else newTermName(name.toString)
 
     def importModifiers(mods: from.Modifiers): Modifiers =
-      new Modifiers(mods.flags,
-                    importName(mods.privateWithin),
-                    mods.annotations map importTree)
+      new Modifiers(
+        mods.flags,
+        importName(mods.privateWithin),
+        mods.annotations map importTree)
 
     def importImportSelector(sel: from.ImportSelector): ImportSelector =
       new ImportSelector(

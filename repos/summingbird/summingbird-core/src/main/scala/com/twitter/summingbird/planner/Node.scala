@@ -130,8 +130,9 @@ case class Dag[P <: Platform[P]](
         else (src :: oldDestDependencies)
       val newDependenciesOfM = dependenciesOfM + (dest -> newDestDependencies)
 
-      copy(dependenciesOfM = newDependenciesOfM,
-           dependantsOfM = newDependantsOfM)
+      copy(
+        dependenciesOfM = newDependenciesOfM,
+        dependantsOfM = newDependantsOfM)
     }
   }
 
@@ -188,8 +189,9 @@ object Dag {
       registry: List[Node[P]],
       sanitizeName: String => String): Dag[P] = {
 
-    require(registry.collect { case n @ SourceNode(_) => n }.size > 0,
-            "Valid registries should have at least one source node")
+    require(
+      registry.collect { case n @ SourceNode(_) => n }.size > 0,
+      "Valid registries should have at least one source node")
 
     def buildProducerToNodeLookUp(
         stormNodeSet: List[Node[P]]): Map[Producer[P, _], Node[P]] = {
@@ -203,11 +205,12 @@ object Dag {
     }
     val producerToNode = buildProducerToNodeLookUp(registry)
     val dag = registry.foldLeft(
-      Dag(originalTail,
-          producerToPriorityNames,
-          tail,
-          producerToNode,
-          registry)) { (curDag, stormNode) =>
+      Dag(
+        originalTail,
+        producerToPriorityNames,
+        tail,
+        producerToNode,
+        registry)) { (curDag, stormNode) =>
       // Here we are building the Dag's connection topology.
       // We visit every producer and connect the Node's represented by its dependant and dependancies.
       // Producers which live in the same node will result in a NOP in connect.
@@ -240,8 +243,9 @@ object Dag {
       dag.dependenciesOf(dep).foldLeft((outerNodeToName, usedNames)) {
         case ((nodeToName, taken), n) =>
           val name =
-            tryGetName(nodeToName(dep) + "-" + n.shortName(sanitizeName),
-                       taken)
+            tryGetName(
+              nodeToName(dep) + "-" + n.shortName(sanitizeName),
+              taken)
           val useName = nodeToName.get(n) match {
             case None => name
             case Some(otherName) =>
@@ -264,10 +268,11 @@ object Dag {
         case ((nodeToName, usedNames), curTail) =>
           if (!nodeToName.contains(curTail)) {
             val tailN = tryGetName("Tail", usedNames)
-            genNames(curTail,
-                     dag,
-                     nodeToName + (curTail -> tailN),
-                     usedNames + tailN)
+            genNames(
+              curTail,
+              dag,
+              nodeToName + (curTail -> tailN),
+              usedNames + tailN)
           } else {
             (nodeToName, usedNames)
           }

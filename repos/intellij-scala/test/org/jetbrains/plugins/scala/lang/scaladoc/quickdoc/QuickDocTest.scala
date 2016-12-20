@@ -24,8 +24,9 @@ class QuickDocTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
       QuickDocTest.quickDocGenerator.generateDoc(docElement, docElement)
     Assert.assertEquals(
       assumedText,
-      generatedText.substring(generatedText.indexOf("&&") + 2,
-                              generatedText.lastIndexOf("&&")))
+      generatedText.substring(
+        generatedText.indexOf("&&") + 2,
+        generatedText.lastIndexOf("&&")))
   }
 
   private def generateSimpleByText(initialText: String, assumedText: String) {

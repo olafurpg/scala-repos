@@ -20,9 +20,10 @@ trait DateHelper { self: I18nHelper =>
   private val dateFormatters = mutable.Map[String, DateTimeFormatter]()
   private val periodFormatters = mutable.Map[String, PeriodFormatter]()
   private val periodType =
-    PeriodType forFields Array(DurationFieldType.days,
-                               DurationFieldType.hours,
-                               DurationFieldType.minutes)
+    PeriodType forFields Array(
+      DurationFieldType.days,
+      DurationFieldType.hours,
+      DurationFieldType.minutes)
 
   private val isoFormatter = ISODateTimeFormat.dateTime
 

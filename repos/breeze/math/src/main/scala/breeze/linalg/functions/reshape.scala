@@ -42,8 +42,9 @@ object reshape extends UFunc {
     : Impl3[DenseVector[T], Int, Int, DenseMatrix[T]] =
     new Impl3[DenseVector[T], Int, Int, DenseMatrix[T]] {
       def apply(v: DenseVector[T], rows: Int, cols: Int): DenseMatrix[T] = {
-        require(v.length == rows * cols,
-                "Vector length must equal rows * cols to reshape.")
+        require(
+          v.length == rows * cols,
+          "Vector length must equal rows * cols to reshape.")
         new DenseMatrix[T](rows, cols, v.toArray)
       }
     }
@@ -52,20 +53,22 @@ object reshape extends UFunc {
     : Impl3[DenseMatrix[T], Int, Int, DenseMatrix[T]] =
     new Impl3[DenseMatrix[T], Int, Int, DenseMatrix[T]] {
       def apply(dm: DenseMatrix[T], rows: Int, cols: Int): DenseMatrix[T] = {
-        require(dm.rows * dm.cols == rows * cols,
-                "Cannot reshape a (%d,%d) matrix to a (%d,%d) matrix!"
-                  .format(dm.rows, dm.cols, rows, cols))
+        require(
+          dm.rows * dm.cols == rows * cols,
+          "Cannot reshape a (%d,%d) matrix to a (%d,%d) matrix!"
+            .format(dm.rows, dm.cols, rows, cols))
         val nDM =
           new DenseMatrix[T](dm.rows, dm.cols, new Array[T](dm.activeSize))
         // in-place set method should be used to take advantage of blas.dcopy for T = Double
         // Unsure how blas.dcopy compares to System.arraycopy, which could also be used
         nDM := dm
-        new DenseMatrix(rows,
-                        cols,
-                        nDM.data,
-                        dm.offset,
-                        if (dm.isTranspose) cols else rows,
-                        dm.isTranspose)
+        new DenseMatrix(
+          rows,
+          cols,
+          nDM.data,
+          dm.offset,
+          if (dm.isTranspose) cols else rows,
+          dm.isTranspose)
       }
     }
 

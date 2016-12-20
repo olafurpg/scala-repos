@@ -34,36 +34,42 @@ object SwimmingRecord {
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8;"""
 
   val allRecords = List[SwimmingRecord](
-    SwimmingRecord("50 m freestyle",
-                   20.91F,
-                   "Cesar Cielo",
-                   "Brazil",
-                   Date.valueOf("2009-12-18")),
-    SwimmingRecord("100 m freestyle",
-                   46.91F,
-                   "Cesar Cielo",
-                   "Brazil",
-                   Date.valueOf("2009-08-02")),
-    SwimmingRecord("50 m backstroke",
-                   24.04F,
-                   "Liam Tancock",
-                   "Great Britain",
-                   Date.valueOf("2009-08-02")),
-    SwimmingRecord("100 m backstroke",
-                   51.94F,
-                   "Aaron Peirsol",
-                   "United States",
-                   Date.valueOf("2009-07-08")),
-    SwimmingRecord("50 m butterfly",
-                   22.43F,
-                   "Rafael Munoz",
-                   "Spain",
-                   Date.valueOf("2009-05-05")),
-    SwimmingRecord("100 m butterfly",
-                   49.82F,
-                   "Michael Phelps",
-                   "United States",
-                   Date.valueOf("2009-07-29"))
+    SwimmingRecord(
+      "50 m freestyle",
+      20.91F,
+      "Cesar Cielo",
+      "Brazil",
+      Date.valueOf("2009-12-18")),
+    SwimmingRecord(
+      "100 m freestyle",
+      46.91F,
+      "Cesar Cielo",
+      "Brazil",
+      Date.valueOf("2009-08-02")),
+    SwimmingRecord(
+      "50 m backstroke",
+      24.04F,
+      "Liam Tancock",
+      "Great Britain",
+      Date.valueOf("2009-08-02")),
+    SwimmingRecord(
+      "100 m backstroke",
+      51.94F,
+      "Aaron Peirsol",
+      "United States",
+      Date.valueOf("2009-07-08")),
+    SwimmingRecord(
+      "50 m butterfly",
+      22.43F,
+      "Rafael Munoz",
+      "Spain",
+      Date.valueOf("2009-05-05")),
+    SwimmingRecord(
+      "100 m butterfly",
+      49.82F,
+      "Michael Phelps",
+      "United States",
+      Date.valueOf("2009-07-29"))
   )
 }
 

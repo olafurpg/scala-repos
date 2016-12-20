@@ -59,8 +59,8 @@ object JsonFormatsSpec extends Specification with TypeHintExamples {
       override val parameterNameReader = TestReader
     }
     val json = parse("""{"name":"joe","age":35}""")
-    json.extract[NamesNotSameAsInJson] mustEqual NamesNotSameAsInJson("joe",
-                                                                      35)
+    json
+      .extract[NamesNotSameAsInJson] mustEqual NamesNotSameAsInJson("joe", 35)
   }
 }
 

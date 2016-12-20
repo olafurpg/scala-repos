@@ -321,8 +321,9 @@ object ValidationSpec extends Specification {
         List(Constraints.maxLength(10), Constraints.minLength(1))
       val values = Seq(Some(""), Some("12345678910"), Some("valid"))
       val expected = Invalid(
-        List(ValidationError("error.minLength", 1),
-             ValidationError("error.maxLength", 10)))
+        List(
+          ValidationError("error.minLength", 1),
+          ValidationError("error.maxLength", 10)))
 
       ParameterValidator(constraints, values: _*) must equalTo(expected)
     }

@@ -24,11 +24,12 @@ private[akka] object RemoteWatcher {
             heartbeatInterval: FiniteDuration,
             unreachableReaperInterval: FiniteDuration,
             heartbeatExpectedResponseAfter: FiniteDuration): Props =
-    Props(classOf[RemoteWatcher],
-          failureDetector,
-          heartbeatInterval,
-          unreachableReaperInterval,
-          heartbeatExpectedResponseAfter).withDeploy(Deploy.local)
+    Props(
+      classOf[RemoteWatcher],
+      failureDetector,
+      heartbeatInterval,
+      unreachableReaperInterval,
+      heartbeatExpectedResponseAfter).withDeploy(Deploy.local)
 
   final case class WatchRemote(watchee: InternalActorRef,
                                watcher: InternalActorRef)
@@ -127,10 +128,11 @@ private[akka] class RemoteWatcher(
 
   val heartbeatTask = scheduler
     .schedule(heartbeatInterval, heartbeatInterval, self, HeartbeatTick)
-  val failureDetectorReaperTask = scheduler.schedule(unreachableReaperInterval,
-                                                     unreachableReaperInterval,
-                                                     self,
-                                                     ReapUnreachableTick)
+  val failureDetectorReaperTask = scheduler.schedule(
+    unreachableReaperInterval,
+    unreachableReaperInterval,
+    self,
+    ReapUnreachableTick)
 
   override def postStop(): Unit = {
     super.postStop()
@@ -286,9 +288,10 @@ private[akka] class RemoteWatcher(
           log.debug("Sending first Heartbeat to [{}]", a)
           // schedule the expected first heartbeat for later, which will give the
           // other side a chance to reply, and also trigger some resends if needed
-          scheduler.scheduleOnce(heartbeatExpectedResponseAfter,
-                                 self,
-                                 ExpectedFirstHeartbeat(a))
+          scheduler.scheduleOnce(
+            heartbeatExpectedResponseAfter,
+            self,
+            ExpectedFirstHeartbeat(a))
         }
         context.actorSelection(RootActorPath(a) / self.path.elements) ! Heartbeat
       }

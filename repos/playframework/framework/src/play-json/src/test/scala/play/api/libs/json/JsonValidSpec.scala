@@ -151,11 +151,12 @@ object JsonValidSpec extends Specification {
 
     "invalidate JsArray of stream to List with wrong type conversion" in {
       JsArray(
-        Stream(JsNumber(1),
-               JsString("beta"),
-               JsString("delta"),
-               JsNumber(4),
-               JsString("five"))).validate[List[Int]] must equalTo(
+        Stream(
+          JsNumber(1),
+          JsString("beta"),
+          JsString("delta"),
+          JsNumber(4),
+          JsString("five"))).validate[List[Int]] must equalTo(
         JsError(
           Seq(
             JsPath(1) -> Seq(ValidationError("error.expected.jsnumber")),
@@ -683,8 +684,9 @@ object JsonValidSpec extends Specification {
         .obj("type" -> "coucou", "data" -> Json.obj())
         .validate(TupleReads) must beEqualTo(JsSuccess("coucou" -> Json.obj()))
       Json
-        .obj("type" -> "coucou",
-             "data" -> Json.obj("title" -> "blabla", "created" -> d))
+        .obj(
+          "type" -> "coucou",
+          "data" -> Json.obj("title" -> "blabla", "created" -> d))
         .validate(TupleReads) must beEqualTo(
         JsSuccess("coucou" -> Json.obj("title" -> "blabla", "created" -> d)))
       Json
@@ -703,9 +705,8 @@ object JsonValidSpec extends Specification {
       val js = Json.obj(
         "id" -> 123L,
         "name" -> "bob",
-        "friend" -> Json.obj("id" -> 124L,
-                             "name" -> "john",
-                             "friend" -> JsNull)
+        "friend" -> Json
+          .obj("id" -> 124L, "name" -> "john", "friend" -> JsNull)
       )
 
       js.validate[User] must beEqualTo(
@@ -750,8 +751,9 @@ object JsonValidSpec extends Specification {
 
       implicit lazy val UserFormats: Format[User] =
         ((__ \ 'id).format[Long] and (__ \ 'name).format[String] and
-          (__ \ 'friend).lazyFormatNullable(UserFormats))(User,
-                                                          unlift(User.unapply))
+          (__ \ 'friend).lazyFormatNullable(UserFormats))(
+          User,
+          unlift(User.unapply))
 
       val js = Json.obj(
         "id" -> 123L,
@@ -880,10 +882,11 @@ object JsonValidSpec extends Specification {
       val jserr = JsError(
         Seq(
           (__ \ 'field1 \ 'field11) -> Seq(
-            ValidationError(Seq("msg1.msg11", "msg1.msg12"),
-                            "arg11",
-                            123L,
-                            123.456F),
+            ValidationError(
+              Seq("msg1.msg11", "msg1.msg12"),
+              "arg11",
+              123L,
+              123.456F),
             ValidationError("msg2.msg21.msg22", 456, 123.456, true, 123)
           ),
           (__ \ 'field2 \ 'field21) -> Seq(
@@ -923,9 +926,8 @@ object JsonValidSpec extends Specification {
 
       val js = Json.obj(
         "field1" -> "alpha",
-        "field2" -> Json.obj("field21" -> 123,
-                             "field22" -> true,
-                             "field23" -> "blabla"),
+        "field2" -> Json
+          .obj("field21" -> 123, "field22" -> true, "field23" -> "blabla"),
         "field3" -> "beta"
       )
 
@@ -971,10 +973,11 @@ object JsonValidSpec extends Specification {
         .write[JsValue]).join
 
       joinWrites2.writes(JsString("toto")) must beEqualTo(
-        Json.obj("alpha" -> "toto",
-                 "beta" -> "toto",
-                 "gamma" -> "toto",
-                 "delta" -> "toto"))
+        Json.obj(
+          "alpha" -> "toto",
+          "beta" -> "toto",
+          "gamma" -> "toto",
+          "delta" -> "toto"))
     }
   }
 

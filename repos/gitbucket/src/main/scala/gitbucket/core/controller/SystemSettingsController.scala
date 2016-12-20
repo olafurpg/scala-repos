@@ -55,40 +55,30 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
         "fromName" -> trim(label("FROM Name", optional(text())))
       )(Smtp.apply)),
     "ldapAuthentication" -> trim(label("LDAP", boolean())),
-    "ldap" -> optionalIfNotChecked("ldapAuthentication",
-                                   mapping(
-                                     "host" -> trim(
-                                       label("LDAP host", text(required))),
-                                     "port" -> trim(
-                                       label("LDAP port", optional(number()))),
-                                     "bindDN" -> trim(
-                                       label("Bind DN", optional(text()))),
-                                     "bindPassword" -> trim(
-                                       label("Bind Password",
-                                             optional(text()))),
-                                     "baseDN" -> trim(
-                                       label("Base DN", text(required))),
-                                     "userNameAttribute" -> trim(
-                                       label("User name attribute",
-                                             text(required))),
-                                     "additionalFilterCondition" -> trim(
-                                       label("Additional filter condition",
-                                             optional(text()))),
-                                     "fullNameAttribute" -> trim(
-                                       label("Full name attribute",
-                                             optional(text()))),
-                                     "mailAttribute" -> trim(
-                                       label("Mail address attribute",
-                                             optional(text()))),
-                                     "tls" -> trim(label("Enable TLS",
-                                                         optional(boolean()))),
-                                     "ssl" -> trim(label("Enable SSL",
-                                                         optional(boolean()))),
-                                     "keystore" -> trim(
-                                       label("Keystore",
-                                             optional(text(
-                                               ))))
-                                   )(Ldap.apply))
+    "ldap" -> optionalIfNotChecked(
+      "ldapAuthentication",
+      mapping(
+        "host" -> trim(label("LDAP host", text(required))),
+        "port" -> trim(label("LDAP port", optional(number()))),
+        "bindDN" -> trim(label("Bind DN", optional(text()))),
+        "bindPassword" -> trim(label("Bind Password", optional(text()))),
+        "baseDN" -> trim(label("Base DN", text(required))),
+        "userNameAttribute" -> trim(
+          label("User name attribute", text(required))),
+        "additionalFilterCondition" -> trim(
+          label("Additional filter condition", optional(text()))),
+        "fullNameAttribute" -> trim(
+          label("Full name attribute", optional(text()))),
+        "mailAttribute" -> trim(
+          label("Mail address attribute", optional(text()))),
+        "tls" -> trim(label("Enable TLS", optional(boolean()))),
+        "ssl" -> trim(label("Enable SSL", optional(boolean()))),
+        "keystore" -> trim(
+          label(
+            "Keystore",
+            optional(text(
+              ))))
+      )(Ldap.apply))
   )(SystemSettings.apply).verifying { settings =>
     Vector(
       if (settings.ssh && settings.baseUrl.isEmpty) {
@@ -138,13 +128,15 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
 
   val newUserForm = mapping(
     "userName" -> trim(
-      label("Username",
-            text(required, maxlength(100), identifier, uniqueUserName))),
+      label(
+        "Username",
+        text(required, maxlength(100), identifier, uniqueUserName))),
     "password" -> trim(label("Password", text(required, maxlength(20)))),
     "fullName" -> trim(label("Full Name", text(required, maxlength(100)))),
     "mailAddress" -> trim(
-      label("Mail Address",
-            text(required, maxlength(100), uniqueMailAddress()))),
+      label(
+        "Mail Address",
+        text(required, maxlength(100), uniqueMailAddress()))),
     "isAdmin" -> trim(label("User Type", boolean())),
     "url" -> trim(label("URL", optional(text(maxlength(200))))),
     "fileId" -> trim(label("File ID", optional(text())))
@@ -156,8 +148,9 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
     "password" -> trim(label("Password", optional(text(maxlength(20))))),
     "fullName" -> trim(label("Full Name", text(required, maxlength(100)))),
     "mailAddress" -> trim(
-      label("Mail Address",
-            text(required, maxlength(100), uniqueMailAddress("userName")))),
+      label(
+        "Mail Address",
+        text(required, maxlength(100), uniqueMailAddress("userName")))),
     "isAdmin" -> trim(label("User Type", boolean())),
     "url" -> trim(label("URL", optional(text(maxlength(200))))),
     "fileId" -> trim(label("File ID", optional(text()))),
@@ -168,8 +161,9 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
 
   val newGroupForm = mapping(
     "groupName" -> trim(
-      label("Group name",
-            text(required, maxlength(100), identifier, uniqueUserName))),
+      label(
+        "Group name",
+        text(required, maxlength(100), identifier, uniqueUserName))),
     "url" -> trim(label("URL", optional(text(maxlength(200))))),
     "fileId" -> trim(label("File ID", optional(text()))),
     "members" -> trim(label("Members", text(required, members)))
@@ -227,12 +221,13 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
   })
 
   post("/admin/users/_newuser", newUserForm)(adminOnly { form =>
-    createAccount(form.userName,
-                  sha1(form.password),
-                  form.fullName,
-                  form.mailAddress,
-                  form.isAdmin,
-                  form.url)
+    createAccount(
+      form.userName,
+      sha1(form.password),
+      form.fullName,
+      form.mailAddress,
+      form.isAdmin,
+      form.url)
     updateImage(form.userName, form.fileId, false)
     redirect("/admin/users")
   })
@@ -259,13 +254,13 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
         }
 
         updateAccount(
-          account.copy(password =
-                         form.password.map(sha1).getOrElse(account.password),
-                       fullName = form.fullName,
-                       mailAddress = form.mailAddress,
-                       isAdmin = form.isAdmin,
-                       url = form.url,
-                       isRemoved = form.isRemoved))
+          account.copy(
+            password = form.password.map(sha1).getOrElse(account.password),
+            fullName = form.fullName,
+            mailAddress = form.mailAddress,
+            isAdmin = form.isAdmin,
+            url = form.url,
+            isRemoved = form.isRemoved))
 
         updateImage(userName, form.fileId, form.clearImage)
         redirect("/admin/users")
@@ -278,38 +273,41 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
 
   post("/admin/users/_newgroup", newGroupForm)(adminOnly { form =>
     createGroup(form.groupName, form.url)
-    updateGroupMembers(form.groupName,
-                       form.members
-                         .split(",")
-                         .map {
-                           _.split(":") match {
-                             case Array(userName, isManager) =>
-                               (userName, isManager.toBoolean)
-                           }
-                         }
-                         .toList)
+    updateGroupMembers(
+      form.groupName,
+      form.members
+        .split(",")
+        .map {
+          _.split(":") match {
+            case Array(userName, isManager) =>
+              (userName, isManager.toBoolean)
+          }
+        }
+        .toList)
     updateImage(form.groupName, form.fileId, false)
     redirect("/admin/users")
   })
 
   get("/admin/users/:groupName/_editgroup")(adminOnly {
     defining(params("groupName")) { groupName =>
-      html.usergroup(getAccountByUserName(groupName, true),
-                     getGroupMembers(groupName))
+      html.usergroup(
+        getAccountByUserName(groupName, true),
+        getGroupMembers(groupName))
     }
   })
 
   post("/admin/users/:groupName/_editgroup", editGroupForm)(adminOnly { form =>
-    defining(params("groupName"),
-             form.members
-               .split(",")
-               .map {
-                 _.split(":") match {
-                   case Array(userName, isManager) =>
-                     (userName, isManager.toBoolean)
-                 }
-               }
-               .toList) {
+    defining(
+      params("groupName"),
+      form.members
+        .split(",")
+        .map {
+          _.split(":") match {
+            case Array(userName, isManager) =>
+              (userName, isManager.toBoolean)
+          }
+        }
+        .toList) {
       case (groupName, members) =>
         getAccountByUserName(groupName, true).map {
           account =>

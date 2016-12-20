@@ -81,13 +81,14 @@ trait OverridingAnnotator {
       method.superSignaturesIncludingSelfType
     val signatures: Seq[Signature] = method.superSignatures
     checkStructural(method, signatures, isInSources)
-    checkOverrideMembers(method,
-                         method,
-                         signaturesWithSelfType,
-                         signatures,
-                         isConcrete,
-                         "Method",
-                         holder)
+    checkOverrideMembers(
+      method,
+      method,
+      signaturesWithSelfType,
+      signatures,
+      isConcrete,
+      "Method",
+      holder)
   }
 
   def checkOverrideVals(v: ScValue,
@@ -99,13 +100,14 @@ trait OverridingAnnotator {
       val valsSignatures: Seq[Signature] =
         ScalaPsiUtil.superValsSignatures(td, withSelfType = false)
       checkStructural(v, valsSignatures, isInSources)
-      checkOverrideMembers(td,
-                           v,
-                           valsSignaturesWithSelfType,
-                           valsSignatures,
-                           isConcrete,
-                           "Value",
-                           holder)
+      checkOverrideMembers(
+        td,
+        v,
+        valsSignaturesWithSelfType,
+        valsSignatures,
+        isConcrete,
+        "Value",
+        holder)
     })
   }
 
@@ -118,13 +120,14 @@ trait OverridingAnnotator {
       val valsSignatures: Seq[Signature] =
         ScalaPsiUtil.superValsSignatures(td, withSelfType = false)
       checkStructural(v, valsSignatures, isInSources)
-      checkOverrideMembers(td,
-                           v,
-                           valsSignaturesWithSelfType,
-                           valsSignatures,
-                           isConcrete,
-                           "Variable",
-                           holder)
+      checkOverrideMembers(
+        td,
+        v,
+        valsSignaturesWithSelfType,
+        valsSignatures,
+        isConcrete,
+        "Variable",
+        holder)
     })
   }
 
@@ -133,13 +136,14 @@ trait OverridingAnnotator {
     val supersWithSelfType =
       ScalaPsiUtil.superValsSignatures(v, withSelfType = true)
     val supers = ScalaPsiUtil.superValsSignatures(v, withSelfType = false)
-    checkOverrideMembers(v,
-                         v,
-                         supersWithSelfType,
-                         supers,
-                         isConcrete,
-                         "Parameter",
-                         holder)
+    checkOverrideMembers(
+      v,
+      v,
+      supersWithSelfType,
+      supers,
+      isConcrete,
+      "Parameter",
+      holder)
   }
 
   def checkOverrideTypes(tp: ScNamedElement with ScModifierListOwner,
@@ -155,13 +159,14 @@ trait OverridingAnnotator {
     val supers = ScalaPsiUtil
       .superTypeMembers(tp, withSelfType = false)
       .filter(_.isInstanceOf[ScTypeAlias])
-    checkOverrideMembers(tp,
-                         tp,
-                         supersWithSelfType,
-                         supers,
-                         isConcreteElement,
-                         "Type",
-                         holder)
+    checkOverrideMembers(
+      tp,
+      tp,
+      supersWithSelfType,
+      supers,
+      isConcreteElement,
+      "Type",
+      holder)
   }
   private def checkOverrideMembers[T <: ScNamedElement, Res](
       member: T,
@@ -188,9 +193,10 @@ trait OverridingAnnotator {
       if (isConcretes && !owner.hasModifierProperty("override")) {
         val annotation: Annotation = holder.createErrorAnnotation(
           member.nameId,
-          ScalaBundle.message("member.needs.override.modifier",
-                              memberType,
-                              member.name))
+          ScalaBundle.message(
+            "member.needs.override.modifier",
+            memberType,
+            member.name))
         annotation.setHighlightType(
           ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
 
@@ -209,24 +215,28 @@ trait OverridingAnnotator {
                 case p: ScClassParameter
                     if p.isVal || (p.isCaseClassVal && !p.isVar) =>
                   annotation.registerFix(
-                    new AddModifierWithValOrVarQuickFix(owner,
-                                                        "override",
-                                                        addVal = true))
+                    new AddModifierWithValOrVarQuickFix(
+                      owner,
+                      "override",
+                      addVal = true))
                 case _: ScClassParameter =>
                   annotation.registerFix(
-                    new AddModifierWithValOrVarQuickFix(owner,
-                                                        "override",
-                                                        addVal = false))
+                    new AddModifierWithValOrVarQuickFix(
+                      owner,
+                      "override",
+                      addVal = false))
                 case _: ScValue | _: ScFunction =>
                   annotation.registerFix(
-                    new AddModifierWithValOrVarQuickFix(owner,
-                                                        "override",
-                                                        addVal = true))
+                    new AddModifierWithValOrVarQuickFix(
+                      owner,
+                      "override",
+                      addVal = true))
                 case _: ScVariable =>
                   annotation.registerFix(
-                    new AddModifierWithValOrVarQuickFix(owner,
-                                                        "override",
-                                                        addVal = false))
+                    new AddModifierWithValOrVarQuickFix(
+                      owner,
+                      "override",
+                      addVal = false))
                 case _ =>
               }
             case _ =>

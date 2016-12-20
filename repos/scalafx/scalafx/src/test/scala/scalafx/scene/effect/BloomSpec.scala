@@ -41,8 +41,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class BloomSpec
-    extends SimpleSFXDelegateSpec[jfxse.Bloom, Bloom](classOf[jfxse.Bloom],
-                                                      classOf[Bloom])
+    extends SimpleSFXDelegateSpec[jfxse.Bloom, Bloom](
+      classOf[jfxse.Bloom],
+      classOf[Bloom])
     with InputDelegateSpec[Bloom] {
 
   val inputDelegate = getScalaClassInstance

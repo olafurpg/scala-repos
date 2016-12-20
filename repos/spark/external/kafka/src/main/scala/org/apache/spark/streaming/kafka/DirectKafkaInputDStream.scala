@@ -169,11 +169,12 @@ private[streaming] class DirectKafkaInputDStream[K: ClassTag,
 
   override def compute(validTime: Time): Option[KafkaRDD[K, V, U, T, R]] = {
     val untilOffsets = clamp(latestLeaderOffsets(maxRetries))
-    val rdd = KafkaRDD[K, V, U, T, R](context.sparkContext,
-                                      kafkaParams,
-                                      currentOffsets,
-                                      untilOffsets,
-                                      messageHandler)
+    val rdd = KafkaRDD[K, V, U, T, R](
+      context.sparkContext,
+      kafkaParams,
+      currentOffsets,
+      untilOffsets,
+      messageHandler)
 
     // Report the record number and metadata of this batch interval to InputInfoTracker.
     val offsetRanges = currentOffsets.map {
@@ -192,8 +193,9 @@ private[streaming] class DirectKafkaInputDStream[K: ClassTag,
       }
       .mkString("\n")
     // Copy offsetRanges to immutable.List to prevent from being modified by the user
-    val metadata = Map("offsets" -> offsetRanges.toList,
-                       StreamInputInfo.METADATA_KEY_DESCRIPTION -> description)
+    val metadata = Map(
+      "offsets" -> offsetRanges.toList,
+      StreamInputInfo.METADATA_KEY_DESCRIPTION -> description)
     val inputInfo = StreamInputInfo(id, rdd.count, metadata)
     ssc.scheduler.inputInfoTracker.reportInfo(validTime, inputInfo)
 
@@ -234,11 +236,12 @@ private[streaming] class DirectKafkaInputDStream[K: ClassTag,
           logInfo(
             s"Restoring KafkaRDD for time $t ${b.mkString("[", ", ", "]")}")
           generatedRDDs +=
-            t -> new KafkaRDD[K, V, U, T, R](context.sparkContext,
-                                             kafkaParams,
-                                             b.map(OffsetRange(_)),
-                                             leaders,
-                                             messageHandler)
+            t -> new KafkaRDD[K, V, U, T, R](
+              context.sparkContext,
+              kafkaParams,
+              b.map(OffsetRange(_)),
+              leaders,
+              messageHandler)
       }
     }
   }

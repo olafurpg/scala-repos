@@ -40,12 +40,14 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
 
   def testMultiInsns(insns: Traversable[AbstractInsnNode],
                      expected: Traversable[String]): Unit = {
-    assertTrue(s"Sizes don't match: ${insns.size} vs ${expected.size}",
-               insns.size == expected.size)
+    assertTrue(
+      s"Sizes don't match: ${insns.size} vs ${expected.size}",
+      insns.size == expected.size)
     for (insn <- insns) {
       val txt = prodToString(insn)
-      assertTrue(s"Instruction $txt not found in ${expected mkString ", "}",
-                 expected.exists(txt.contains))
+      assertTrue(
+        s"Instruction $txt not found in ${expected mkString ", "}",
+        expected.exists(txt.contains))
     }
   }
 
@@ -100,8 +102,9 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
     testSingleInsn(a.producersForValueAt(ifne, 1), "ParameterProducer")
 
     val ret = findInstr(m, "IRETURN").head
-    testMultiInsns(a.producersForValueAt(ret, 1),
-                   List("ParameterProducer", "ISTORE 1"))
+    testMultiInsns(
+      a.producersForValueAt(ret, 1),
+      List("ParameterProducer", "ISTORE 1"))
   }
 
   @Test
@@ -112,8 +115,9 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
 
     val List(ret) = findInstr(m, "IRETURN")
     testMultiInsns(a.producersForValueAt(ret, 2), List("ISTORE 2", "ISTORE 2"))
-    testMultiInsns(a.initialProducersForValueAt(ret, 2),
-                   List("BIPUSH 12", "ParameterProducer"))
+    testMultiInsns(
+      a.initialProducersForValueAt(ret, 2),
+      List("BIPUSH 12", "ParameterProducer"))
 
     val List(bipush) = findInstr(m, "BIPUSH 12")
     testSingleInsn(a.consumersOfOutputsFrom(bipush), "ISTORE 2")
@@ -152,11 +156,13 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
     val List(call) = findInstr(m, "INVOKEVIRTUAL")
     val List(ret) = findInstr(m, "IRETURN")
 
-    testSingleInsn(a.producersForValueAt(store, 2),
-                   "UninitializedLocalProducer(2)")
+    testSingleInsn(
+      a.producersForValueAt(store, 2),
+      "UninitializedLocalProducer(2)")
     testSingleInsn(a.producersForValueAt(call, 2), "ISTORE")
-    testMultiInsns(a.producersForValueAt(ret, 2),
-                   List("UninitializedLocalProducer", "ISTORE"))
+    testMultiInsns(
+      a.producersForValueAt(ret, 2),
+      List("UninitializedLocalProducer", "ISTORE"))
   }
 
   @Test
@@ -171,8 +177,9 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
     testSingleInsn(a.initialProducersForInputsOf(constr), "NEW")
 
     testSingleInsn(a.consumersOfOutputsFrom(newO), "DUP")
-    testMultiInsns(a.ultimateConsumersOfOutputsFrom(newO),
-                   List("INVOKESPECIAL", "ARETURN"))
+    testMultiInsns(
+      a.ultimateConsumersOfOutputsFrom(newO),
+      List("INVOKESPECIAL", "ARETURN"))
   }
 
   @Test
@@ -210,8 +217,9 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
     testMultiInsns(a.producersForInputsOf(swap), List("IADD", "DUP2"))
     testSingleInsn(a.consumersOfValueAt(swap.getNext, 4), "ISTORE")
     testSingleInsn(a.consumersOfValueAt(swap.getNext, 3), "IRETURN")
-    testSingleInsn(a.initialProducersForInputsOf(store),
-                   "ParameterProducer(1)")
+    testSingleInsn(
+      a.initialProducersForInputsOf(store),
+      "ParameterProducer(1)")
     testSingleInsn(a.initialProducersForInputsOf(ret), "IADD")
   }
 
@@ -290,12 +298,15 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
     assert(secondLoad.getOpcode == ILOAD)
 
     testSingleInsn(a.producersForValueAt(iadd, 2), "ILOAD")
-    testSingleInsn(a.initialProducersForValueAt(iadd, 2),
-                   "ParameterProducer(1)")
-    testMultiInsns(a.producersForInputsOf(firstLoad),
-                   List("ParameterProducer", "ISTORE"))
-    testMultiInsns(a.producersForInputsOf(secondLoad),
-                   List("ParameterProducer", "ISTORE"))
+    testSingleInsn(
+      a.initialProducersForValueAt(iadd, 2),
+      "ParameterProducer(1)")
+    testMultiInsns(
+      a.producersForInputsOf(firstLoad),
+      List("ParameterProducer", "ISTORE"))
+    testMultiInsns(
+      a.producersForInputsOf(secondLoad),
+      List("ParameterProducer", "ISTORE"))
 
     testSingleInsn(a.ultimateConsumersOfOutputsFrom(firstLoad), "IADD")
     testSingleInsn(a.ultimateConsumersOfOutputsFrom(secondLoad), "IADD")

@@ -47,8 +47,9 @@ class RetryPolicyTest extends FunSpec {
       // interrupted futures should never be retried.
       assert(
         weo(
-          Throw(Failure(new Exception,
-                        Failure.Interrupted | Failure.Restartable))) == false)
+          Throw(Failure(
+            new Exception,
+            Failure.Interrupted | Failure.Restartable))) == false)
       assert(weo(Throw(Failure(new Exception, Failure.Restartable))) == true)
       assert(weo(Throw(timeoutExc)) == false)
     }
@@ -68,9 +69,10 @@ class RetryPolicyTest extends FunSpec {
     it("RetryableWriteException matches retryable exception") {
       val retryable =
         Seq(Failure.rejected("test"), WriteException(new Exception))
-      val nonRetryable = Seq(Failure("test", Failure.Interrupted),
-                             new Exception,
-                             new ChannelClosedException)
+      val nonRetryable = Seq(
+        Failure("test", Failure.Interrupted),
+        new Exception,
+        new ChannelClosedException)
 
       retryable.foreach {
         case RetryPolicy.RetryableWriteException(_) =>
@@ -124,8 +126,9 @@ class RetryPolicyTest extends FunSpec {
 
     it("returns underlying result if filterEach accepts") {
       val actual =
-        getBackoffs(policy,
-                    Stream(IException(2), IException(2), IException(0)))
+        getBackoffs(
+          policy,
+          Stream(IException(2), IException(2), IException(0)))
       assert(actual == backoffs.take(2))
     }
   }
@@ -165,14 +168,16 @@ class RetryPolicyTest extends FunSpec {
     }
 
     it("mimicks first policy") {
-      val backoffs = getBackoffs(combinedPolicy,
-                                 Stream.fill(4)(WriteException(new Exception)))
+      val backoffs = getBackoffs(
+        combinedPolicy,
+        Stream.fill(4)(WriteException(new Exception)))
       assert(backoffs == Stream.fill(2)(writeExceptionBackoff))
     }
 
     it("mimicks second policy") {
-      val backoffs = getBackoffs(combinedPolicy,
-                                 Stream.fill(4)(new ChannelClosedException()))
+      val backoffs = getBackoffs(
+        combinedPolicy,
+        Stream.fill(4)(new ChannelClosedException()))
       assert(backoffs == Stream.fill(3)(channelClosedBackoff))
     }
 

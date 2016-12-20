@@ -40,8 +40,9 @@ class OfferMatcherReconcilerTest
     val taskId = Task.Id.forApp(appId)
     val localVolumeIdLaunched =
       LocalVolumeId(appId, "persistent-volume-launched", "uuidLaunched")
-    val offer = MarathonTestHelper.offerWithVolumes(taskId.idString,
-                                                    localVolumeIdLaunched)
+    val offer = MarathonTestHelper.offerWithVolumes(
+      taskId.idString,
+      localVolumeIdLaunched)
 
     And("no groups")
     f.groupRepository.rootGroupOrEmpty() returns Future.successful(Group.empty)
@@ -74,8 +75,9 @@ class OfferMatcherReconcilerTest
     val taskId = Task.Id.forApp(appId)
     val localVolumeIdLaunched =
       LocalVolumeId(appId, "persistent-volume-launched", "uuidLaunched")
-    val offer = MarathonTestHelper.offerWithVolumes(taskId.idString,
-                                                    localVolumeIdLaunched)
+    val offer = MarathonTestHelper.offerWithVolumes(
+      taskId.idString,
+      localVolumeIdLaunched)
 
     And("a bogus app")
     val app = AppDefinition(appId)
@@ -110,8 +112,9 @@ class OfferMatcherReconcilerTest
     val taskId = Task.Id.forApp(appId)
     val localVolumeIdLaunched =
       LocalVolumeId(appId, "persistent-volume-launched", "uuidLaunched")
-    val offer = MarathonTestHelper.offerWithVolumes(taskId.idString,
-                                                    localVolumeIdLaunched)
+    val offer = MarathonTestHelper.offerWithVolumes(
+      taskId.idString,
+      localVolumeIdLaunched)
 
     And("no groups")
     f.groupRepository.rootGroupOrEmpty() returns Future.successful(Group.empty)
@@ -147,8 +150,9 @@ class OfferMatcherReconcilerTest
     val taskId = Task.Id.forApp(appId)
     val localVolumeIdLaunched =
       LocalVolumeId(appId, "persistent-volume-launched", "uuidLaunched")
-    val offer = MarathonTestHelper.offerWithVolumes(taskId.idString,
-                                                    localVolumeIdLaunched)
+    val offer = MarathonTestHelper.offerWithVolumes(
+      taskId.idString,
+      localVolumeIdLaunched)
 
     And("a matching bogus app")
     val app = AppDefinition(appId)

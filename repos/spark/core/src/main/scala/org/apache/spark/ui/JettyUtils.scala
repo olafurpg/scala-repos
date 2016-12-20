@@ -59,15 +59,17 @@ private[spark] object JettyUtils extends Logging {
   // Conversions from various types of Responder's to appropriate servlet parameters
   implicit def jsonResponderToServlet(
       responder: Responder[JValue]): ServletParams[JValue] =
-    new ServletParams(responder,
-                      "text/json",
-                      (in: JValue) => pretty(render(in)))
+    new ServletParams(
+      responder,
+      "text/json",
+      (in: JValue) => pretty(render(in)))
 
   implicit def htmlResponderToServlet(
       responder: Responder[Seq[Node]]): ServletParams[Seq[Node]] =
-    new ServletParams(responder,
-                      "text/html",
-                      (in: Seq[Node]) => "<!DOCTYPE html>" + in.toString)
+    new ServletParams(
+      responder,
+      "text/html",
+      (in: Seq[Node]) => "<!DOCTYPE html>" + in.toString)
 
   implicit def textResponderToServlet(
       responder: Responder[String]): ServletParams[String] =
@@ -94,18 +96,21 @@ private[spark] object JettyUtils extends Logging {
               "%s;charset=utf-8".format(servletParams.contentType))
             response.setStatus(HttpServletResponse.SC_OK)
             val result = servletParams.responder(request)
-            response.setHeader("Cache-Control",
-                               "no-cache, no-store, must-revalidate")
+            response.setHeader(
+              "Cache-Control",
+              "no-cache, no-store, must-revalidate")
             response.setHeader("X-Frame-Options", xFrameOptionsValue)
             // scalastyle:off println
             response.getWriter.println(servletParams.extractFn(result))
             // scalastyle:on println
           } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED)
-            response.setHeader("Cache-Control",
-                               "no-cache, no-store, must-revalidate")
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-                               "User is not authorized to access this page.")
+            response.setHeader(
+              "Cache-Control",
+              "no-cache, no-store, must-revalidate")
+            response.sendError(
+              HttpServletResponse.SC_UNAUTHORIZED,
+              "User is not authorized to access this page.")
           }
         } catch {
           case e: IllegalArgumentException =>
@@ -131,9 +136,10 @@ private[spark] object JettyUtils extends Logging {
       securityMgr: SecurityManager,
       conf: SparkConf,
       basePath: String = ""): ServletContextHandler = {
-    createServletHandler(path,
-                         createServlet(servletParams, securityMgr, conf),
-                         basePath)
+    createServletHandler(
+      path,
+      createServlet(servletParams, securityMgr, conf),
+      basePath)
   }
 
   /** Create a context handler that responds to a request with the given path prefix */
@@ -182,8 +188,9 @@ private[spark] object JettyUtils extends Logging {
                             response: HttpServletResponse): Unit = {
         beforeRedirect(request)
         // Make sure we don't end up with "//" in the middle
-        val newUrl = new URL(new URL(request.getRequestURL.toString),
-                             prefixedDestPath).toString
+        val newUrl = new URL(
+          new URL(request.getRequestURL.toString),
+          prefixedDestPath).toString
         response.sendRedirect(newUrl)
       }
       // SPARK-5983 ensure TRACE is not supported
@@ -250,11 +257,12 @@ private[spark] object JettyUtils extends Logging {
                 holder.setInitParameter(k.substring(prefix.length()), v)
             }
 
-          val enumDispatcher = java.util.EnumSet.of(DispatcherType.ASYNC,
-                                                    DispatcherType.ERROR,
-                                                    DispatcherType.FORWARD,
-                                                    DispatcherType.INCLUDE,
-                                                    DispatcherType.REQUEST)
+          val enumDispatcher = java.util.EnumSet.of(
+            DispatcherType.ASYNC,
+            DispatcherType.ERROR,
+            DispatcherType.FORWARD,
+            DispatcherType.INCLUDE,
+            DispatcherType.REQUEST)
           handlers.foreach {
             case (handler) => handler.addFilter(holder, "/*", enumDispatcher)
           }
@@ -366,11 +374,12 @@ private[spark] object JettyUtils extends Logging {
         if (baseRequest.isSecure) {
           return
         }
-        val httpsURI = createRedirectURI(scheme,
-                                         baseRequest.getServerName,
-                                         securePort,
-                                         baseRequest.getRequestURI,
-                                         baseRequest.getQueryString)
+        val httpsURI = createRedirectURI(
+          scheme,
+          baseRequest.getServerName,
+          securePort,
+          baseRequest.getRequestURI,
+          baseRequest.getQueryString)
         response.setContentLength(0)
         response.encodeRedirectURL(httpsURI)
         response.sendRedirect(httpsURI)

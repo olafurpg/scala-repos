@@ -59,8 +59,9 @@ trait ScAnnotationsHolder extends ScalaPsiElement with PsiAnnotationOwner {
   def hasAnnotation(qualifiedName: String): Option[ScAnnotation] = {
     annotations.find(
       annot =>
-        acceptType(annot.typeElement.getType(TypingContext.empty).getOrAny,
-                   qualifiedName))
+        acceptType(
+          annot.typeElement.getType(TypingContext.empty).getOrAny,
+          qualifiedName))
   }
 
   def allMatchingAnnotations(qualifiedName: String): Seq[ScAnnotation] = {
@@ -79,8 +80,9 @@ trait ScAnnotationsHolder extends ScalaPsiElement with PsiAnnotationOwner {
       case _ =>
         tp.isAliasType match {
           case Some(AliasType(ta: ScTypeAliasDefinition, _, _)) =>
-            acceptType(ta.aliasedType(TypingContext.empty).getOrAny,
-                       qualifiedName)
+            acceptType(
+              ta.aliasedType(TypingContext.empty).getOrAny,
+              qualifiedName)
           case _ => false
         }
     }

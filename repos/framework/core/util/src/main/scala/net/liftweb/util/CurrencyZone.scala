@@ -119,9 +119,10 @@ abstract class CurrencyZone {
     def /(that: Currency): Currency =
       make(
         new BigDecimal(
-          this.amount.bigDecimal.divide(that.amount.bigDecimal,
-                                        scale,
-                                        java.math.BigDecimal.ROUND_HALF_UP)))
+          this.amount.bigDecimal.divide(
+            that.amount.bigDecimal,
+            scale,
+            java.math.BigDecimal.ROUND_HALF_UP)))
     def /(that: Int): Currency = this / make(that)
 
     def compare(that: Currency) = this.amount compare that.amount

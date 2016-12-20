@@ -102,14 +102,16 @@ class EvalTests extends CatsSuite {
 
   {
     implicit val A = ListWrapper.monoid[Int]
-    checkAll("Eval[ListWrapper[Int]]",
-             GroupLaws[Eval[ListWrapper[Int]]].monoid)
+    checkAll(
+      "Eval[ListWrapper[Int]]",
+      GroupLaws[Eval[ListWrapper[Int]]].monoid)
   }
 
   {
     implicit val A = ListWrapper.semigroup[Int]
-    checkAll("Eval[ListWrapper[Int]]",
-             GroupLaws[Eval[ListWrapper[Int]]].semigroup)
+    checkAll(
+      "Eval[ListWrapper[Int]]",
+      GroupLaws[Eval[ListWrapper[Int]]].semigroup)
   }
 
   {
@@ -119,8 +121,9 @@ class EvalTests extends CatsSuite {
 
   {
     implicit val A = ListWrapper.partialOrder[Int]
-    checkAll("Eval[ListWrapper[Int]]",
-             OrderLaws[Eval[ListWrapper[Int]]].partialOrder)
+    checkAll(
+      "Eval[ListWrapper[Int]]",
+      OrderLaws[Eval[ListWrapper[Int]]].partialOrder)
   }
 
   {

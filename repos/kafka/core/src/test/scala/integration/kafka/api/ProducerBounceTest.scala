@@ -48,9 +48,10 @@ class ProducerBounceTest extends KafkaServerTestHarness {
   // a small risk of hitting errors due to port conflicts. Hopefully this is infrequent enough to not cause problems.
   override def generateConfigs() = {
     FixedPortTestUtils
-      .createBrokerConfigs(numServers,
-                           zkConnect,
-                           enableControlledShutdown = false)
+      .createBrokerConfigs(
+        numServers,
+        zkConnect,
+        enableControlledShutdown = false)
       .map(KafkaConfig.fromProps(_, overridingProps))
   }
 
@@ -73,9 +74,10 @@ class ProducerBounceTest extends KafkaServerTestHarness {
       .createNewProducer(brokerList, acks = 0, bufferSize = producerBufferSize)
     producer2 = TestUtils
       .createNewProducer(brokerList, acks = 1, bufferSize = producerBufferSize)
-    producer3 = TestUtils.createNewProducer(brokerList,
-                                            acks = -1,
-                                            bufferSize = producerBufferSize)
+    producer3 = TestUtils.createNewProducer(
+      brokerList,
+      acks = -1,
+      bufferSize = producerBufferSize)
   }
 
   @After
@@ -96,8 +98,9 @@ class ProducerBounceTest extends KafkaServerTestHarness {
     val numPartitions = 3
     val leaders = TestUtils
       .createTopic(zkUtils, topic1, numPartitions, numServers, servers)
-    assertTrue("Leader of all partitions of the topic should exist",
-               leaders.values.forall(leader => leader.isDefined))
+    assertTrue(
+      "Leader of all partitions of the topic should exist",
+      leaders.values.forall(leader => leader.isDefined))
 
     val scheduler = new ProducerScheduler()
     scheduler.start
@@ -134,11 +137,12 @@ class ProducerBounceTest extends KafkaServerTestHarness {
     val fetchResponses = newLeaders.zipWithIndex.map {
       case (leader, partition) =>
         // Consumers must be instantiated after all the restarts since they use random ports each time they start up
-        val consumer = new SimpleConsumer("localhost",
-                                          servers(leader).boundPort(),
-                                          100,
-                                          1024 * 1024,
-                                          "")
+        val consumer = new SimpleConsumer(
+          "localhost",
+          servers(leader).boundPort(),
+          100,
+          1024 * 1024,
+          "")
         val response = consumer
           .fetch(
             new FetchRequestBuilder()
@@ -153,9 +157,10 @@ class ProducerBounceTest extends KafkaServerTestHarness {
     val uniqueMessages = messages.toSet
     val uniqueMessageSize = uniqueMessages.size
 
-    assertEquals("Should have fetched " + scheduler.sent + " unique messages",
-                 scheduler.sent,
-                 uniqueMessageSize)
+    assertEquals(
+      "Should have fetched " + scheduler.sent + " unique messages",
+      scheduler.sent,
+      uniqueMessageSize)
   }
 
   private class ProducerScheduler
@@ -164,18 +169,20 @@ class ProducerBounceTest extends KafkaServerTestHarness {
     var sent = 0
     var failed = false
 
-    val producer = TestUtils.createNewProducer(brokerList,
-                                               bufferSize = producerBufferSize,
-                                               retries = 10)
+    val producer = TestUtils.createNewProducer(
+      brokerList,
+      bufferSize = producerBufferSize,
+      retries = 10)
 
     override def doWork(): Unit = {
       val responses = for (i <- sent + 1 to sent + numRecords)
         yield
           producer.send(
-            new ProducerRecord[Array[Byte], Array[Byte]](topic1,
-                                                         null,
-                                                         null,
-                                                         i.toString.getBytes),
+            new ProducerRecord[Array[Byte], Array[Byte]](
+              topic1,
+              null,
+              null,
+              i.toString.getBytes),
             new ErrorLoggingCallback(topic1, null, null, true))
       val futures = responses.toList
 

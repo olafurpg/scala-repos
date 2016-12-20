@@ -128,9 +128,10 @@ private[regression] trait GeneralizedLinearRegressionBase
 @Since("2.0.0")
 class GeneralizedLinearRegression @Since("2.0.0")(
     @Since("2.0.0") override val uid: String)
-    extends Regressor[Vector,
-                      GeneralizedLinearRegression,
-                      GeneralizedLinearRegressionModel]
+    extends Regressor[
+      Vector,
+      GeneralizedLinearRegression,
+      GeneralizedLinearRegressionModel]
     with GeneralizedLinearRegressionBase
     with DefaultParamsWritable
     with Logging {
@@ -246,10 +247,11 @@ class GeneralizedLinearRegression @Since("2.0.0")(
 
     if (familyObj == Gaussian && linkObj == Identity) {
       // TODO: Make standardizeFeatures and standardizeLabel configurable.
-      val optimizer = new WeightedLeastSquares($(fitIntercept),
-                                               $(regParam),
-                                               standardizeFeatures = true,
-                                               standardizeLabel = true)
+      val optimizer = new WeightedLeastSquares(
+        $(fitIntercept),
+        $(regParam),
+        standardizeFeatures = true,
+        standardizeLabel = true)
       val wlsModel = optimizer.fit(instances)
       val model = copyValues(
         new GeneralizedLinearRegressionModel(
@@ -362,10 +364,11 @@ object GeneralizedLinearRegression
       }
       // TODO: Make standardizeFeatures and standardizeLabel configurable.
       val initialModel =
-        new WeightedLeastSquares(fitIntercept,
-                                 regParam,
-                                 standardizeFeatures = true,
-                                 standardizeLabel = true).fit(newInstances)
+        new WeightedLeastSquares(
+          fitIntercept,
+          regParam,
+          standardizeFeatures = true,
+          standardizeLabel = true).fit(newInstances)
       initialModel
     }
 
@@ -484,9 +487,10 @@ object GeneralizedLinearRegression
 
     override def initialize(y: Double, weight: Double): Double = {
       val mu = (weight * y + 0.5) / (weight + 1.0)
-      require(mu > 0.0 && mu < 1.0,
-              "The response variable of Binomial family" +
-                s"should be in range (0, 1), but got $mu")
+      require(
+        mu > 0.0 && mu < 1.0,
+        "The response variable of Binomial family" +
+          s"should be in range (0, 1), but got $mu")
       mu
     }
 
@@ -531,9 +535,10 @@ object GeneralizedLinearRegression
     val defaultLink: Link = Log
 
     override def initialize(y: Double, weight: Double): Double = {
-      require(y > 0.0,
-              "The response variable of Poisson family " +
-                s"should be positive, but got $y")
+      require(
+        y > 0.0,
+        "The response variable of Poisson family " +
+          s"should be positive, but got $y")
       y
     }
 
@@ -575,9 +580,10 @@ object GeneralizedLinearRegression
     val defaultLink: Link = Inverse
 
     override def initialize(y: Double, weight: Double): Double = {
-      require(y > 0.0,
-              "The response variable of Gamma family " +
-                s"should be positive, but got $y")
+      require(
+        y > 0.0,
+        "The response variable of Gamma family " +
+          s"should be positive, but got $y")
       y
     }
 
@@ -848,9 +854,10 @@ object GeneralizedLinearRegressionModel
       val intercept = data.getDouble(0)
       val coefficients = data.getAs[Vector](1)
 
-      val model = new GeneralizedLinearRegressionModel(metadata.uid,
-                                                       coefficients,
-                                                       intercept)
+      val model = new GeneralizedLinearRegressionModel(
+        metadata.uid,
+        coefficients,
+        intercept)
 
       DefaultParamsReader.getAndSetParams(model, metadata)
       model

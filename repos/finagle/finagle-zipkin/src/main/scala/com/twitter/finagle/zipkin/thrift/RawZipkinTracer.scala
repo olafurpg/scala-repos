@@ -42,8 +42,9 @@ object RawZipkinTracer {
       .daemon(true)
       .build()
 
-    new Scribe.FinagledClient(new TracelessFilter andThen transport,
-                              Protocols.binaryFactory())
+    new Scribe.FinagledClient(
+      new TracelessFilter andThen transport,
+      Protocols.binaryFactory())
   }
 
   // to make sure we only create one instance of the tracer per host and port
@@ -190,8 +191,9 @@ private[thrift] class RawZipkinTracer(
       try {
         span.toThrift.write(transport.protocol)
         entries.append(
-          LogEntry(category = TraceCategory,
-                   message = transport.toBase64Line()))
+          LogEntry(
+            category = TraceCategory,
+            message = transport.toBase64Line()))
       } catch {
         case NonFatal(e) => errorReceiver.counter(e.getClass.getName).incr()
       } finally {
@@ -271,44 +273,51 @@ private[thrift] class RawZipkinTracer(
       case tracing.Annotation.Rpcname(service: String, rpc: String) =>
         spanMap.update(record.traceId)(_.setServiceName(service).setName(rpc))
       case tracing.Annotation.BinaryAnnotation(key: String, value: Boolean) =>
-        binaryAnnotation(record,
-                         key,
-                         (if (value) TrueBB else FalseBB).duplicate(),
-                         thrift.AnnotationType.BOOL)
+        binaryAnnotation(
+          record,
+          key,
+          (if (value) TrueBB else FalseBB).duplicate(),
+          thrift.AnnotationType.BOOL)
       case tracing.Annotation
             .BinaryAnnotation(key: String, value: Array[Byte]) =>
-        binaryAnnotation(record,
-                         key,
-                         ByteBuffer.wrap(value),
-                         thrift.AnnotationType.BYTES)
+        binaryAnnotation(
+          record,
+          key,
+          ByteBuffer.wrap(value),
+          thrift.AnnotationType.BYTES)
       case tracing.Annotation
             .BinaryAnnotation(key: String, value: ByteBuffer) =>
         binaryAnnotation(record, key, value, thrift.AnnotationType.BYTES)
       case tracing.Annotation.BinaryAnnotation(key: String, value: Short) =>
-        binaryAnnotation(record,
-                         key,
-                         ByteBuffer.allocate(2).putShort(0, value),
-                         thrift.AnnotationType.I16)
+        binaryAnnotation(
+          record,
+          key,
+          ByteBuffer.allocate(2).putShort(0, value),
+          thrift.AnnotationType.I16)
       case tracing.Annotation.BinaryAnnotation(key: String, value: Int) =>
-        binaryAnnotation(record,
-                         key,
-                         ByteBuffer.allocate(4).putInt(0, value),
-                         thrift.AnnotationType.I32)
+        binaryAnnotation(
+          record,
+          key,
+          ByteBuffer.allocate(4).putInt(0, value),
+          thrift.AnnotationType.I32)
       case tracing.Annotation.BinaryAnnotation(key: String, value: Long) =>
-        binaryAnnotation(record,
-                         key,
-                         ByteBuffer.allocate(8).putLong(0, value),
-                         thrift.AnnotationType.I64)
+        binaryAnnotation(
+          record,
+          key,
+          ByteBuffer.allocate(8).putLong(0, value),
+          thrift.AnnotationType.I64)
       case tracing.Annotation.BinaryAnnotation(key: String, value: Double) =>
-        binaryAnnotation(record,
-                         key,
-                         ByteBuffer.allocate(8).putDouble(0, value),
-                         thrift.AnnotationType.DOUBLE)
+        binaryAnnotation(
+          record,
+          key,
+          ByteBuffer.allocate(8).putDouble(0, value),
+          thrift.AnnotationType.DOUBLE)
       case tracing.Annotation.BinaryAnnotation(key: String, value: String) =>
-        binaryAnnotation(record,
-                         key,
-                         ByteBuffer.wrap(value.getBytes),
-                         thrift.AnnotationType.STRING)
+        binaryAnnotation(
+          record,
+          key,
+          ByteBuffer.wrap(value.getBytes),
+          thrift.AnnotationType.STRING)
       case tracing.Annotation.BinaryAnnotation(key: String, value) =>
       // Throw error?
       case tracing.Annotation.LocalAddr(ia: InetSocketAddress) =>
@@ -317,18 +326,20 @@ private[thrift] class RawZipkinTracer(
         // use a binary annotation over a regular annotation to avoid a misleading timestamp
         spanMap.update(record.traceId) {
           _.addBinaryAnnotation(
-            BinaryAnnotation(thrift.Constants.CLIENT_ADDR,
-                             TrueBB.duplicate(),
-                             thrift.AnnotationType.BOOL,
-                             Endpoint.fromSocketAddress(ia)))
+            BinaryAnnotation(
+              thrift.Constants.CLIENT_ADDR,
+              TrueBB.duplicate(),
+              thrift.AnnotationType.BOOL,
+              Endpoint.fromSocketAddress(ia)))
         }
       case tracing.Annotation.ServerAddr(ia: InetSocketAddress) =>
         spanMap.update(record.traceId) {
           _.addBinaryAnnotation(
-            BinaryAnnotation(thrift.Constants.SERVER_ADDR,
-                             TrueBB.duplicate(),
-                             thrift.AnnotationType.BOOL,
-                             Endpoint.fromSocketAddress(ia)))
+            BinaryAnnotation(
+              thrift.Constants.SERVER_ADDR,
+              TrueBB.duplicate(),
+              thrift.AnnotationType.BOOL,
+              Endpoint.fromSocketAddress(ia)))
         }
     }
   }

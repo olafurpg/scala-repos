@@ -64,8 +64,9 @@ trait AbstractExamples extends Specification {
         case JField("name", _) => true
         case _ => false
       }
-    filtered mustEqual List(JField("name", JString("Joe")),
-                            JField("name", JString("Marilyn")))
+    filtered mustEqual List(
+      JField("name", JString("Joe")),
+      JField("name", JString("Marilyn")))
 
     val found =
       json findField {
@@ -94,13 +95,14 @@ trait AbstractExamples extends Specification {
         7,
         5,
         3)) and
-      (parse(lotto) \\ "winning-numbers" \ classOf[JInt] mustEqual List(2,
-                                                                        45,
-                                                                        34,
-                                                                        23,
-                                                                        7,
-                                                                        5,
-                                                                        3))
+      (parse(lotto) \\ "winning-numbers" \ classOf[JInt] mustEqual List(
+        2,
+        45,
+        34,
+        23,
+        7,
+        5,
+        3))
   }
 
   "Quoted example" in {

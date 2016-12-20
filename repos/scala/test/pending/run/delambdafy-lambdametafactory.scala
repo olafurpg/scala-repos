@@ -47,12 +47,13 @@ object Test {
     val invokedType =
       MethodType.methodType(classOf[Function1ish[_, _]], capturedParamTypes)
     val target = caller.findStatic(hostClass, accessorName, targetMethodType)
-    val site = LambdaMetafactory.metafactory(caller,
-                                             "apply",
-                                             invokedType,
-                                             methodType,
-                                             target,
-                                             instantiatedMethodType)
+    val site = LambdaMetafactory.metafactory(
+      caller,
+      "apply",
+      invokedType,
+      methodType,
+      target,
+      instantiatedMethodType)
     site.getTarget
       .invokeWithArguments(captured: _*)
       .asInstanceOf[Function1ish[A, B]]
@@ -62,22 +63,25 @@ object Test {
       lambdaFactory(classOf[C], classOf[String], classOf[String], "accessor$1")
         .apply("abc"))
     println(
-      lambdaFactory(classOf[C],
-                    classOf[String],
-                    classOf[String],
-                    "accessor$2",
-                    Array(classOf[String] -> "capture1")).apply("abc"))
+      lambdaFactory(
+        classOf[C],
+        classOf[String],
+        classOf[String],
+        "accessor$2",
+        Array(classOf[String] -> "capture1")).apply("abc"))
     println(
-      lambdaFactory(classOf[C],
-                    classOf[String],
-                    classOf[String],
-                    "accessor$3",
-                    Array(classOf[C] -> new C)).apply("abc"))
+      lambdaFactory(
+        classOf[C],
+        classOf[String],
+        classOf[String],
+        "accessor$3",
+        Array(classOf[C] -> new C)).apply("abc"))
     println(
-      lambdaFactory(Class.forName("T$class"),
-                    classOf[String],
-                    classOf[String],
-                    "accessor$4",
-                    Array(classOf[T] -> new T {})).apply("abc"))
+      lambdaFactory(
+        Class.forName("T$class"),
+        classOf[String],
+        classOf[String],
+        "accessor$4",
+        Array(classOf[T] -> new T {})).apply("abc"))
   }
 }

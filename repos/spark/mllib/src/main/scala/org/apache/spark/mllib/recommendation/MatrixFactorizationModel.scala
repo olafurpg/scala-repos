@@ -68,8 +68,9 @@ class MatrixFactorizationModel @Since("0.8.0")(
   /** Validates factors and warns users if there are performance concerns. */
   private def validateFeatures(name: String,
                                features: RDD[(Int, Array[Double])]): Unit = {
-    require(features.first()._2.length == rank,
-            s"$name feature dimension does not match the rank $rank.")
+    require(
+      features.first()._2.length == rank,
+      s"$name feature dimension does not match the rank $rank.")
     if (features.partitioner.isEmpty) {
       logWarning(
         s"$name factor does not have a partitioner. " +
@@ -140,9 +141,10 @@ class MatrixFactorizationModel @Since("0.8.0")(
       }
       users.join(productFeatures).map {
         case (product, ((user, uFeatures), pFeatures)) =>
-          Rating(user,
-                 product,
-                 blas.ddot(uFeatures.length, uFeatures, 1, pFeatures, 1))
+          Rating(
+            user,
+            product,
+            blas.ddot(uFeatures.length, uFeatures, 1, pFeatures, 1))
       }
     } else {
       val products = productFeatures.join(usersProducts.map(_.swap)).map {
@@ -150,9 +152,10 @@ class MatrixFactorizationModel @Since("0.8.0")(
       }
       products.join(userFeatures).map {
         case (user, ((product, pFeatures), uFeatures)) =>
-          Rating(user,
-                 product,
-                 blas.ddot(uFeatures.length, uFeatures, 1, pFeatures, 1))
+          Rating(
+            user,
+            product,
+            blas.ddot(uFeatures.length, uFeatures, 1, pFeatures, 1))
       }
     }
   }

@@ -56,9 +56,10 @@ case class EvaluatePython(udf: PythonUDF,
 
 object EvaluatePython {
   def apply(udf: PythonUDF, child: LogicalPlan): EvaluatePython =
-    new EvaluatePython(udf,
-                       child,
-                       AttributeReference("pythonUDF", udf.dataType)())
+    new EvaluatePython(
+      udf,
+      child,
+      AttributeReference("pythonUDF", udf.dataType)())
 
   def takeAndServe(df: DataFrame, n: Int): Int = {
     registerPicklers()
@@ -81,8 +82,9 @@ object EvaluatePython {
       val values = new Array[Any](row.numFields)
       var i = 0
       while (i < row.numFields) {
-        values(i) = toJava(row.get(i, struct.fields(i).dataType),
-                           struct.fields(i).dataType)
+        values(i) = toJava(
+          row.get(i, struct.fields(i).dataType),
+          struct.fields(i).dataType)
         i += 1
       }
       new GenericRowWithSchema(values, struct)

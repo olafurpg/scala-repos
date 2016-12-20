@@ -44,8 +44,9 @@ class ReflectSpec extends WordSpec with Matchers {
     "deal with multiple constructors" in {
       Reflect.findConstructor(classOf[MultipleOne], immutable.Seq(new A))
       Reflect.findConstructor(classOf[MultipleOne], immutable.Seq(new B))
-      Reflect.findConstructor(classOf[MultipleOne],
-                              immutable.Seq(new A, new B))
+      Reflect.findConstructor(
+        classOf[MultipleOne],
+        immutable.Seq(new A, new B))
     }
     "throw when multiple matching constructors" in {
       intercept[IllegalArgumentException] {

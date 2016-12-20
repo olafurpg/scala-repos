@@ -61,8 +61,9 @@ trait AuthenticationCombinators extends HttpRequestHandlerCombinators {
   def auth[A](accountManager: AccountManager[Future])(
       service: HttpService[A, Account => Future[HttpResponse[JValue]]])(
       implicit ctx: ExecutionContext) = {
-    new AuthenticationService[A, HttpResponse[JValue]](accountManager,
-                                                       service)({
+    new AuthenticationService[A, HttpResponse[JValue]](
+      accountManager,
+      service)({
       case NotProvided =>
         HttpResponse(
           Unauthorized,
@@ -143,12 +144,13 @@ trait AccountService
             val rootAPIKey = RootKey(config.detach("security"))
             val emailer = Emailer(config.detach("email"))
 
-            val handlers = new AccountServiceHandlers(accountManager,
-                                                      apiKeyFinder,
-                                                      clock,
-                                                      rootAccountId,
-                                                      rootAPIKey,
-                                                      emailer)
+            val handlers = new AccountServiceHandlers(
+              accountManager,
+              apiKeyFinder,
+              clock,
+              rootAccountId,
+              rootAPIKey,
+              emailer)
 
             State(handlers, stoppable)
           }

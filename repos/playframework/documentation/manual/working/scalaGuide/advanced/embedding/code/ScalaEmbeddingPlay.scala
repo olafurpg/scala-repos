@@ -81,10 +81,11 @@ object ScalaEmbeddingPlay extends Specification with WsTestClient {
         }
 
         override lazy val httpErrorHandler =
-          new DefaultHttpErrorHandler(environment,
-                                      configuration,
-                                      sourceMapper,
-                                      Some(router)) {
+          new DefaultHttpErrorHandler(
+            environment,
+            configuration,
+            sourceMapper,
+            Some(router)) {
 
             override protected def onNotFound(request: RequestHeader,
                                               message: String) = {

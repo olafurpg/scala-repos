@@ -183,46 +183,55 @@ object RandomDataGenerator {
         Some(
           () =>
             BigDecimal
-              .apply(rand.nextLong() % math.pow(10, precision).toLong,
-                     scale,
-                     new MathContext(precision))
+              .apply(
+                rand.nextLong() % math.pow(10, precision).toLong,
+                scale,
+                new MathContext(precision))
               .bigDecimal)
       case DoubleType =>
-        randomNumeric[Double](rand,
-                              r => longBitsToDouble(r.nextLong()),
-                              Seq(Double.MinValue,
-                                  Double.MinPositiveValue,
-                                  Double.MaxValue,
-                                  Double.PositiveInfinity,
-                                  Double.NegativeInfinity,
-                                  Double.NaN,
-                                  0.0))
+        randomNumeric[Double](
+          rand,
+          r => longBitsToDouble(r.nextLong()),
+          Seq(
+            Double.MinValue,
+            Double.MinPositiveValue,
+            Double.MaxValue,
+            Double.PositiveInfinity,
+            Double.NegativeInfinity,
+            Double.NaN,
+            0.0))
       case FloatType =>
-        randomNumeric[Float](rand,
-                             r => intBitsToFloat(r.nextInt()),
-                             Seq(Float.MinValue,
-                                 Float.MinPositiveValue,
-                                 Float.MaxValue,
-                                 Float.PositiveInfinity,
-                                 Float.NegativeInfinity,
-                                 Float.NaN,
-                                 0.0f))
+        randomNumeric[Float](
+          rand,
+          r => intBitsToFloat(r.nextInt()),
+          Seq(
+            Float.MinValue,
+            Float.MinPositiveValue,
+            Float.MaxValue,
+            Float.PositiveInfinity,
+            Float.NegativeInfinity,
+            Float.NaN,
+            0.0f))
       case ByteType =>
-        randomNumeric[Byte](rand,
-                            _.nextInt().toByte,
-                            Seq(Byte.MinValue, Byte.MaxValue, 0.toByte))
+        randomNumeric[Byte](
+          rand,
+          _.nextInt().toByte,
+          Seq(Byte.MinValue, Byte.MaxValue, 0.toByte))
       case IntegerType =>
-        randomNumeric[Int](rand,
-                           _.nextInt(),
-                           Seq(Int.MinValue, Int.MaxValue, 0))
+        randomNumeric[Int](
+          rand,
+          _.nextInt(),
+          Seq(Int.MinValue, Int.MaxValue, 0))
       case LongType =>
-        randomNumeric[Long](rand,
-                            _.nextLong(),
-                            Seq(Long.MinValue, Long.MaxValue, 0L))
+        randomNumeric[Long](
+          rand,
+          _.nextLong(),
+          Seq(Long.MinValue, Long.MaxValue, 0L))
       case ShortType =>
-        randomNumeric[Short](rand,
-                             _.nextInt().toShort,
-                             Seq(Short.MinValue, Short.MaxValue, 0.toShort))
+        randomNumeric[Short](
+          rand,
+          _.nextInt().toShort,
+          Seq(Short.MinValue, Short.MaxValue, 0.toShort))
       case NullType => Some(() => null)
       case ArrayType(elementType, containsNull) => {
         forType(elementType, nullable = containsNull, rand).map {
@@ -232,9 +241,10 @@ object RandomDataGenerator {
       }
       case MapType(keyType, valueType, valueContainsNull) => {
         for (keyGenerator <- forType(keyType, nullable = false, rand);
-             valueGenerator <- forType(valueType,
-                                       nullable = valueContainsNull,
-                                       rand)) yield { () =>
+             valueGenerator <- forType(
+               valueType,
+               nullable = valueContainsNull,
+               rand)) yield { () =>
           {
             val length = rand.nextInt(MAX_MAP_SIZE)
             val keys = scala.collection.mutable

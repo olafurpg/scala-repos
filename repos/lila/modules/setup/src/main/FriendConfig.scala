@@ -52,13 +52,14 @@ object FriendConfig extends BaseHumanConfig {
       color = Color(c) err "Invalid color " + c,
       fen = fen)
 
-  val default = FriendConfig(variant = variantDefault,
-                             timeMode = TimeMode.Unlimited,
-                             time = 5d,
-                             increment = 8,
-                             days = 2,
-                             mode = Mode.default,
-                             color = Color.default)
+  val default = FriendConfig(
+    variant = variantDefault,
+    timeMode = TimeMode.Unlimited,
+    time = 5d,
+    increment = 8,
+    days = 2,
+    mode = Mode.default,
+    color = Color.default)
 
   import reactivemongo.bson._
   import lila.db.BSON
@@ -67,22 +68,24 @@ object FriendConfig extends BaseHumanConfig {
     new BSON[FriendConfig] {
 
       def reads(r: BSON.Reader): FriendConfig =
-        FriendConfig(variant = chess.variant.Variant orDefault (r int "v"),
-                     timeMode = TimeMode orDefault (r int "tm"),
-                     time = r double "t",
-                     increment = r int "i",
-                     days = r int "d",
-                     mode = Mode orDefault (r int "m"),
-                     color = Color.White,
-                     fen = r strO "f" filter (_.nonEmpty))
+        FriendConfig(
+          variant = chess.variant.Variant orDefault (r int "v"),
+          timeMode = TimeMode orDefault (r int "tm"),
+          time = r double "t",
+          increment = r int "i",
+          days = r int "d",
+          mode = Mode orDefault (r int "m"),
+          color = Color.White,
+          fen = r strO "f" filter (_.nonEmpty))
 
       def writes(w: BSON.Writer, o: FriendConfig) =
-        BSONDocument("v" -> o.variant.id,
-                     "tm" -> o.timeMode.id,
-                     "t" -> o.time,
-                     "i" -> o.increment,
-                     "d" -> o.days,
-                     "m" -> o.mode.id,
-                     "f" -> o.fen)
+        BSONDocument(
+          "v" -> o.variant.id,
+          "tm" -> o.timeMode.id,
+          "t" -> o.time,
+          "i" -> o.increment,
+          "d" -> o.days,
+          "m" -> o.mode.id,
+          "f" -> o.fen)
     }
 }

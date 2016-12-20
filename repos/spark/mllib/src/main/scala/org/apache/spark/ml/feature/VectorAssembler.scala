@@ -115,8 +115,9 @@ class VectorAssembler(override val uid: String)
       }
     }
 
-    dataset.select(col("*"),
-                   assembleFunc(struct(args: _*)).as($(outputCol), metadata))
+    dataset.select(
+      col("*"),
+      assembleFunc(struct(args: _*)).as($(outputCol), metadata))
   }
 
   override def transformSchema(schema: StructType): StructType = {

@@ -33,10 +33,11 @@ object SonatypeSupport {
         username <- sys.env.get("SONATYPE_USERNAME")
         password <- sys.env.get("SONATYPE_PASSWORD")
       } yield
-        Credentials("Sonatype Nexus Repository Manager",
-                    "oss.sonatype.org",
-                    username,
-                    password)
+        Credentials(
+          "Sonatype Nexus Repository Manager",
+          "oss.sonatype.org",
+          username,
+          password)
     }.toSeq,
     pomExtra := (<scm>
         <url>git@github.com:${ ghUser }/${ ghRepo }.git</url>

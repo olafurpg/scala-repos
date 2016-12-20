@@ -381,15 +381,16 @@ class Settings(error: String => Unit,
 
     // included as names as here we don't have access to a Global with Definitions :(
     def valueClassList =
-      List("unit",
-           "boolean",
-           "byte",
-           "short",
-           "char",
-           "int",
-           "long",
-           "float",
-           "double")
+      List(
+        "unit",
+        "boolean",
+        "byte",
+        "short",
+        "char",
+        "int",
+        "long",
+        "float",
+        "double")
     def valueClassFilterPrefixes =
       List("scala.LowPriorityImplicits", "scala.Predef")
 

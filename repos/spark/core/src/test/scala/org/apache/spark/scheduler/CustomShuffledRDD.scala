@@ -106,10 +106,11 @@ class CustomShuffledRDD[K, V, C](var dependency: ShuffleDependency[K, V, C],
   override def compute(p: Partition, context: TaskContext): Iterator[(K, C)] = {
     val part = p.asInstanceOf[CustomShuffledRDDPartition]
     SparkEnv.get.shuffleManager
-      .getReader(dependency.shuffleHandle,
-                 part.startIndexInParent,
-                 part.endIndexInParent,
-                 context)
+      .getReader(
+        dependency.shuffleHandle,
+        part.startIndexInParent,
+        part.endIndexInParent,
+        context)
       .read()
       .asInstanceOf[Iterator[(K, C)]]
   }

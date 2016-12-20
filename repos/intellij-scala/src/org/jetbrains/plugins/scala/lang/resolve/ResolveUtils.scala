@@ -146,15 +146,16 @@ object ResolveUtils {
       case _ =>
         m.getParameterList.getParameters.map { param =>
           val scType = s.subst(param.exactParamType())
-          new Parameter("",
-                        None,
-                        scType,
-                        scType,
-                        false,
-                        param.isVarArgs,
-                        false,
-                        param.index,
-                        Some(param))
+          new Parameter(
+            "",
+            None,
+            scType,
+            scType,
+            false,
+            param.isVarArgs,
+            false,
+            param.index,
+            Some(param))
         }
     }, false)(m.getProject, scope)
   }
@@ -165,8 +166,9 @@ object ResolveUtils {
                           returnType: Option[ScType] = None): NonValueType = {
     if (m.getTypeParameters.isEmpty) javaMethodType(m, s, scope, returnType)
     else {
-      ScTypePolymorphicType(javaMethodType(m, s, scope, returnType),
-                            m.getTypeParameters.map(new TypeParameter(_)))
+      ScTypePolymorphicType(
+        javaMethodType(m, s, scope, returnType),
+        m.getTypeParameters.map(new TypeParameter(_)))
     }
   }
 
@@ -189,12 +191,13 @@ object ResolveUtils {
       case _ =>
     }
     if (place.getLanguage == JavaLanguage.INSTANCE) {
-      return JavaResolveUtil.isAccessible(memb,
-                                          memb.containingClass,
-                                          memb.getModifierList,
-                                          place,
-                                          null,
-                                          null)
+      return JavaResolveUtil.isAccessible(
+        memb,
+        memb.containingClass,
+        memb.getModifierList,
+        place,
+        null,
+        null)
     }
 
     import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil.getPlaceTd
@@ -323,11 +326,12 @@ object ResolveUtils {
                 if (bind == null) return true
                 def processPackage(packageName: String): Boolean = {
                   def context(place: PsiElement): PsiElement =
-                    ScalaPsiUtil.getContextOfType(place,
-                                                  true,
-                                                  classOf[ScPackaging],
-                                                  classOf[ScObject],
-                                                  classOf[ScalaFile])
+                    ScalaPsiUtil.getContextOfType(
+                      place,
+                      true,
+                      classOf[ScPackaging],
+                      classOf[ScObject],
+                      classOf[ScalaFile])
                   var placeEnclosing: PsiElement = context(place)
                   while (placeEnclosing != null &&
                          placeEnclosing
@@ -390,10 +394,11 @@ object ResolveUtils {
                       case _ => ""
                     }
                     val placeEnclosing: PsiElement =
-                      ScalaPsiUtil.getContextOfType(place,
-                                                    true,
-                                                    classOf[ScPackaging],
-                                                    classOf[ScalaFile])
+                      ScalaPsiUtil.getContextOfType(
+                        place,
+                        true,
+                        classOf[ScPackaging],
+                        classOf[ScalaFile])
                     if (placeEnclosing == null) return false //not Scala
                     val placePackageName = placeEnclosing match {
                       case file: ScalaFile => ""
@@ -412,11 +417,12 @@ object ResolveUtils {
                 if (bind == null) return true
                 def processPackage(packageName: String): Option[Boolean] = {
                   def context(place: PsiElement): PsiElement =
-                    ScalaPsiUtil.getContextOfType(place,
-                                                  true,
-                                                  classOf[ScPackaging],
-                                                  classOf[ScObject],
-                                                  classOf[ScalaFile])
+                    ScalaPsiUtil.getContextOfType(
+                      place,
+                      true,
+                      classOf[ScPackaging],
+                      classOf[ScObject],
+                      classOf[ScalaFile])
                   var placeEnclosing: PsiElement = context(place)
                   while (placeEnclosing != null &&
                          placeEnclosing
@@ -511,10 +517,11 @@ object ResolveUtils {
                     case packaging: ScPackaging => packaging.fullPackageName
                   }
                   val placeEnclosing: PsiElement =
-                    ScalaPsiUtil.getContextOfType(place,
-                                                  true,
-                                                  classOf[ScPackaging],
-                                                  classOf[ScalaFile])
+                    ScalaPsiUtil.getContextOfType(
+                      place,
+                      true,
+                      classOf[ScPackaging],
+                      classOf[ScalaFile])
                   if (placeEnclosing == null) return false //not Scala
                   val placePackageName = placeEnclosing match {
                     case file: ScalaFile => ""
@@ -635,8 +642,9 @@ object ResolveUtils {
       case b: BaseProcessor if b.isImplicitProcessor =>
         val objectsIterator = ScalaPsiManager
           .instance(pack.getProject)
-          .getPackageImplicitObjects(pack.getQualifiedName,
-                                     place.getResolveScope)
+          .getPackageImplicitObjects(
+            pack.getQualifiedName,
+            place.getResolveScope)
           .iterator
         while (objectsIterator.hasNext) {
           val obj = objectsIterator.next()

@@ -37,10 +37,12 @@ class Netty3TransporterTest extends FunSpec with MockitoSugar with Eventually {
           Transporter.ConnectTimeout(1.seconds) +
           LatencyCompensation.Compensation(12.millis) +
           Transporter.TLSHostname(Some("tls.host")) +
-          Transporter.HttpProxy(Some(new InetSocketAddress(0)),
-                                Some(Credentials("user", "pw"))) +
-          Transporter.SocksProxy(Some(new InetSocketAddress(0)),
-                                 Some(("user", "pw"))) +
+          Transporter.HttpProxy(
+            Some(new InetSocketAddress(0)),
+            Some(Credentials("user", "pw"))) +
+          Transporter.SocksProxy(
+            Some(new InetSocketAddress(0)),
+            Some(("user", "pw"))) +
           Transport.BufferSizes(Some(100), Some(200)) +
           Transport.TLSClientEngine.param.default +
           Transport.Liveness(1.seconds, 2.seconds, Some(true)) +
@@ -208,9 +210,10 @@ class Netty3TransporterTest extends FunSpec with MockitoSugar with Eventually {
       it("is not added if proxy address is given but address isLoopback") {
         val pipelineFactory = Channels.pipelineFactory(Channels.pipeline())
         val transporter =
-          new Netty3Transporter[Int, Int]("name",
-                                          pipelineFactory,
-                                          socksProxy = Some(loopbackSockAddr))
+          new Netty3Transporter[Int, Int](
+            "name",
+            pipelineFactory,
+            socksProxy = Some(loopbackSockAddr))
         val pipeline =
           transporter.newPipeline(loopbackSockAddr, NullStatsReceiver)
         assert(!hasSocksConnectHandler(pipeline))
@@ -219,9 +222,10 @@ class Netty3TransporterTest extends FunSpec with MockitoSugar with Eventually {
       it("is not added if proxy address is given but address isLinkLocal") {
         val pipelineFactory = Channels.pipelineFactory(Channels.pipeline())
         val transporter =
-          new Netty3Transporter[Int, Int]("name",
-                                          pipelineFactory,
-                                          socksProxy = Some(loopbackSockAddr))
+          new Netty3Transporter[Int, Int](
+            "name",
+            pipelineFactory,
+            socksProxy = Some(loopbackSockAddr))
         val pipeline =
           transporter.newPipeline(linkLocalSockAddr, NullStatsReceiver)
         assert(!hasSocksConnectHandler(pipeline))
@@ -230,9 +234,10 @@ class Netty3TransporterTest extends FunSpec with MockitoSugar with Eventually {
       it("is added if proxy address is given and addr is routable") {
         val pipelineFactory = Channels.pipelineFactory(Channels.pipeline())
         val transporter =
-          new Netty3Transporter[Int, Int]("name",
-                                          pipelineFactory,
-                                          socksProxy = Some(loopbackSockAddr))
+          new Netty3Transporter[Int, Int](
+            "name",
+            pipelineFactory,
+            socksProxy = Some(loopbackSockAddr))
         val pipeline =
           transporter.newPipeline(routableSockAddr, NullStatsReceiver)
         assert(hasSocksConnectHandler(pipeline))

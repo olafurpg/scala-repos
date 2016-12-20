@@ -49,8 +49,9 @@ case class Coalesce(children: Seq[Expression]) extends Expression {
       TypeCheckResult.TypeCheckFailure(
         "input to function coalesce cannot be empty")
     } else {
-      TypeUtils.checkForSameTypeInputExpr(children.map(_.dataType),
-                                          "function coalesce")
+      TypeUtils.checkForSameTypeInputExpr(
+        children.map(_.dataType),
+        "function coalesce")
     }
   }
 
@@ -140,8 +141,9 @@ case class NaNvl(left: Expression, right: Expression)
   override def dataType: DataType = left.dataType
 
   override def inputTypes: Seq[AbstractDataType] =
-    Seq(TypeCollection(DoubleType, FloatType),
-        TypeCollection(DoubleType, FloatType))
+    Seq(
+      TypeCollection(DoubleType, FloatType),
+      TypeCollection(DoubleType, FloatType))
 
   override def eval(input: InternalRow): Any = {
     val value = left.eval(input)

@@ -247,12 +247,13 @@ object ScalaAfterNewCompletionUtil {
           return null
         if (addedClasses.contains(clazz.qualifiedName)) return null
         addedClasses += clazz.qualifiedName
-        getLookupElementFromTypeAndClass(tp,
-                                         clazz,
-                                         subst,
-                                         renderer,
-                                         insertHandler,
-                                         renamesMap)
+        getLookupElementFromTypeAndClass(
+          tp,
+          clazz,
+          subst,
+          renderer,
+          insertHandler,
+          renamesMap)
       case _ => null
     }
   }
@@ -299,12 +300,13 @@ object ScalaAfterNewCompletionUtil {
               undef.getSubstitutor match {
                 case Some(undefSubst) =>
                   val lookupElement =
-                    convertTypeToLookupElement(undefSubst.subst(noUndefType),
-                                               place,
-                                               addedClasses,
-                                               renderer,
-                                               insertHandler,
-                                               renamesMap)
+                    convertTypeToLookupElement(
+                      undefSubst.subst(noUndefType),
+                      place,
+                      addedClasses,
+                      renderer,
+                      insertHandler,
+                      renamesMap)
                   if (lookupElement != null) {
                     for (undefine <- undefines) {
                       undefSubst.subst(undefine) match {

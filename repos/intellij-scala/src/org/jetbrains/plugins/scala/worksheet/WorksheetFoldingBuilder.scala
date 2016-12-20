@@ -55,8 +55,9 @@ class WorksheetFoldingBuilder extends FoldingBuilder {
     if (node.getElementType == ScalaTokenTypes.tLINE_COMMENT &&
         (node.getText.startsWith(WorksheetFoldingBuilder.FIRST_LINE_PREFIX) ||
         node.getText.startsWith(WorksheetFoldingBuilder.LINE_PREFIX))) {
-      val length = Math.max(WorksheetFoldingBuilder.FIRST_LINE_PREFIX.length,
-                            WorksheetFoldingBuilder.LINE_PREFIX.length)
+      val length = Math.max(
+        WorksheetFoldingBuilder.FIRST_LINE_PREFIX.length,
+        WorksheetFoldingBuilder.LINE_PREFIX.length)
       descriptors +=
         (new FoldingDescriptor(
           node,

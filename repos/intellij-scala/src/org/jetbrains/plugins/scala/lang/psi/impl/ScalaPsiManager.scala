@@ -75,10 +75,11 @@ class ScalaPsiManager(project: Project) extends ProjectComponent { self =>
     else getParameterlessSignaturesCached(tp, compoundTypeThisType)
   }
 
-  @CachedWithoutModificationCount(synchronized = false,
-                                  valueWrapper = ValueWrapper.SofterReference,
-                                  clearCacheOnChange,
-                                  clearCacheOnLowMemory)
+  @CachedWithoutModificationCount(
+    synchronized = false,
+    valueWrapper = ValueWrapper.SofterReference,
+    clearCacheOnChange,
+    clearCacheOnLowMemory)
   private def getParameterlessSignaturesCached(
       tp: ScCompoundType,
       compoundTypeThisType: Option[ScType]): PMap = {
@@ -92,10 +93,11 @@ class ScalaPsiManager(project: Project) extends ProjectComponent { self =>
     else getTypesCached(tp, compoundTypeThisType)
   }
 
-  @CachedWithoutModificationCount(synchronized = false,
-                                  ValueWrapper.SofterReference,
-                                  clearCacheOnChange,
-                                  clearCacheOnLowMemory)
+  @CachedWithoutModificationCount(
+    synchronized = false,
+    ValueWrapper.SofterReference,
+    clearCacheOnChange,
+    clearCacheOnLowMemory)
   private def getTypesCached(tp: ScCompoundType,
                              compoundTypeThisType: Option[ScType]): TMap = {
     TypeNodes.build(tp, compoundTypeThisType)
@@ -108,19 +110,21 @@ class ScalaPsiManager(project: Project) extends ProjectComponent { self =>
     getSignaturesCached(tp, compoundTypeThisType)
   }
 
-  @CachedWithoutModificationCount(synchronized = false,
-                                  ValueWrapper.SofterReference,
-                                  clearCacheOnChange,
-                                  clearCacheOnLowMemory)
+  @CachedWithoutModificationCount(
+    synchronized = false,
+    ValueWrapper.SofterReference,
+    clearCacheOnChange,
+    clearCacheOnLowMemory)
   private def getSignaturesCached(
       tp: ScCompoundType,
       compoundTypeThisType: Option[ScType]): SMap = {
     SignatureNodes.build(tp, compoundTypeThisType)
   }
 
-  @CachedWithoutModificationCount(synchronized = false,
-                                  ValueWrapper.SofterReference,
-                                  clearCacheOnOutOfBlockChange)
+  @CachedWithoutModificationCount(
+    synchronized = false,
+    ValueWrapper.SofterReference,
+    clearCacheOnOutOfBlockChange)
   def cachedDeepIsInheritor(clazz: PsiClass, base: PsiClass): Boolean =
     clazz.isInheritor(base, true)
 
@@ -130,9 +134,10 @@ class ScalaPsiManager(project: Project) extends ProjectComponent { self =>
     else getPackageImplicitObjectsCached(fqn, scope)
   }
 
-  @CachedWithoutModificationCount(synchronized = false,
-                                  ValueWrapper.SofterReference,
-                                  clearCacheOnOutOfBlockChange)
+  @CachedWithoutModificationCount(
+    synchronized = false,
+    ValueWrapper.SofterReference,
+    clearCacheOnOutOfBlockChange)
   private def getPackageImplicitObjectsCached(
       fqn: String,
       scope: GlobalSearchScope): Seq[ScObject] = {
@@ -141,16 +146,18 @@ class ScalaPsiManager(project: Project) extends ProjectComponent { self =>
       .getImplicitObjectsByPackage(fqn, scope)
   }
 
-  @CachedWithoutModificationCount(synchronized = false,
-                                  ValueWrapper.SofterReference,
-                                  clearCacheOnOutOfBlockChange)
+  @CachedWithoutModificationCount(
+    synchronized = false,
+    ValueWrapper.SofterReference,
+    clearCacheOnOutOfBlockChange)
   def getCachedPackage(fqn: String): Option[PsiPackage] = {
     Option(JavaPsiFacade.getInstance(project).findPackage(fqn))
   }
 
-  @CachedWithoutModificationCount(synchronized = false,
-                                  ValueWrapper.SofterReference,
-                                  clearCacheOnOutOfBlockChange)
+  @CachedWithoutModificationCount(
+    synchronized = false,
+    ValueWrapper.SofterReference,
+    clearCacheOnOutOfBlockChange)
   def getCachedClass(scope: GlobalSearchScope, fqn: String): Option[PsiClass] = {
     def getCachedFacadeClass(scope: GlobalSearchScope,
                              fqn: String): Option[PsiClass] = {
@@ -216,10 +223,11 @@ class ScalaPsiManager(project: Project) extends ProjectComponent { self =>
     else getClassesImpl(pack, scope)
   }
 
-  @CachedWithoutModificationCount(synchronized = false,
-                                  ValueWrapper.None,
-                                  clearCacheOnLowMemory,
-                                  clearCacheOnOutOfBlockChange)
+  @CachedWithoutModificationCount(
+    synchronized = false,
+    ValueWrapper.None,
+    clearCacheOnLowMemory,
+    clearCacheOnOutOfBlockChange)
   private def getClassesCached(pack: PsiPackage,
                                scope: GlobalSearchScope): Array[PsiClass] =
     getClassesImpl(pack, scope)
@@ -239,9 +247,10 @@ class ScalaPsiManager(project: Project) extends ProjectComponent { self =>
     classes ++ scalaClasses
   }
 
-  @CachedWithoutModificationCount(synchronized = false,
-                                  ValueWrapper.SofterReference,
-                                  clearCacheOnOutOfBlockChange)
+  @CachedWithoutModificationCount(
+    synchronized = false,
+    ValueWrapper.SofterReference,
+    clearCacheOnOutOfBlockChange)
   def getCachedClasses(scope: GlobalSearchScope,
                        fqn: String): Array[PsiClass] = {
     def getCachedFacadeClasses(scope: GlobalSearchScope,
@@ -264,8 +273,9 @@ class ScalaPsiManager(project: Project) extends ProjectComponent { self =>
       .getClassesByFQName(fqn, scope)
     ArrayUtil.mergeArrays(
       classes,
-      ArrayUtil.mergeArrays(fromScala.toArray,
-                            SyntheticClassProducer.getAllClasses(fqn, scope)))
+      ArrayUtil.mergeArrays(
+        fromScala.toArray,
+        SyntheticClassProducer.getAllClasses(fqn, scope)))
   }
 
   import java.util.{Set => JSet}
@@ -276,10 +286,11 @@ class ScalaPsiManager(project: Project) extends ProjectComponent { self =>
     getJavaPackageClassNamesCached(qualifier, scope)
   }
 
-  @CachedWithoutModificationCount(synchronized = false,
-                                  ValueWrapper.None,
-                                  clearCacheOnLowMemory,
-                                  clearCacheOnOutOfBlockChange)
+  @CachedWithoutModificationCount(
+    synchronized = false,
+    ValueWrapper.None,
+    clearCacheOnLowMemory,
+    clearCacheOnOutOfBlockChange)
   private def getJavaPackageClassNamesCached(
       packageFQN: String,
       scope: GlobalSearchScope): JSet[String] = {
@@ -310,10 +321,11 @@ class ScalaPsiManager(project: Project) extends ProjectComponent { self =>
     getScalaClassNamesCached(qualifier, scope)
   }
 
-  @CachedWithoutModificationCount(synchronized = false,
-                                  ValueWrapper.None,
-                                  clearCacheOnLowMemory,
-                                  clearCacheOnOutOfBlockChange)
+  @CachedWithoutModificationCount(
+    synchronized = false,
+    ValueWrapper.None,
+    clearCacheOnLowMemory,
+    clearCacheOnOutOfBlockChange)
   def getScalaClassNamesCached(
       packageFQN: String,
       scope: GlobalSearchScope): mutable.HashSet[String] = {
@@ -415,17 +427,19 @@ class ScalaPsiManager(project: Project) extends ProjectComponent { self =>
     }
   }
 
-  @CachedWithoutModificationCount(synchronized = false,
-                                  ValueWrapper.SofterReference,
-                                  clearCacheOnChange)
+  @CachedWithoutModificationCount(
+    synchronized = false,
+    ValueWrapper.SofterReference,
+    clearCacheOnChange)
   def psiTypeParameterUpperType(tp: PsiTypeParameter): ScType = {
     tp.getSuperTypes match {
       case array: Array[PsiClassType] if array.length == 1 =>
         ScType.create(array(0), project)
       case many =>
-        new ScCompoundType(many.map { ScType.create(_, project) },
-                           Map.empty,
-                           Map.empty)
+        new ScCompoundType(
+          many.map { ScType.create(_, project) },
+          Map.empty,
+          Map.empty)
     }
   }
 

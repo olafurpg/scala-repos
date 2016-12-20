@@ -114,11 +114,13 @@ class EventStreamSpec extends AkkaSpec(EventStreamSpec.config) {
         sys.eventStream.subscribe(testActor, classOf[AnyRef])
         val m = UnhandledMessage(42, sys.deadLetters, sys.deadLetters)
         sys.eventStream.publish(m)
-        expectMsgAllOf(m,
-                       Logging.Debug(sys.deadLetters.path.toString,
-                                     sys.deadLetters.getClass,
-                                     "unhandled message from " +
-                                       sys.deadLetters + ": 42"))
+        expectMsgAllOf(
+          m,
+          Logging.Debug(
+            sys.deadLetters.path.toString,
+            sys.deadLetters.getClass,
+            "unhandled message from " +
+              sys.deadLetters + ": 42"))
         sys.eventStream.unsubscribe(testActor)
       } finally {
         shutdown(sys)
@@ -291,8 +293,9 @@ class EventStreamSpec extends AkkaSpec(EventStreamSpec.config) {
     }
 
     "unsubscribe an actor on its termination" in {
-      val sys = ActorSystem("EventStreamSpecUnsubscribeOnTerminated",
-                            configUnhandledWithDebug)
+      val sys = ActorSystem(
+        "EventStreamSpecUnsubscribeOnTerminated",
+        configUnhandledWithDebug)
 
       try {
         val es = sys.eventStream
@@ -321,8 +324,9 @@ class EventStreamSpec extends AkkaSpec(EventStreamSpec.config) {
     }
 
     "unsubscribe the actor, when it subscribes already in terminated state" in {
-      val sys = ActorSystem("EventStreamSpecUnsubscribeTerminated",
-                            configUnhandledWithDebug)
+      val sys = ActorSystem(
+        "EventStreamSpecUnsubscribeTerminated",
+        configUnhandledWithDebug)
 
       try {
         val es = sys.eventStream
@@ -367,8 +371,9 @@ class EventStreamSpec extends AkkaSpec(EventStreamSpec.config) {
     }
 
     "unwatch an actor from unsubscriber when that actor unsubscribes from the stream" in {
-      val sys = ActorSystem("MustUnregisterDuringUnsubscribe",
-                            configUnhandledWithDebug)
+      val sys = ActorSystem(
+        "MustUnregisterDuringUnsubscribe",
+        configUnhandledWithDebug)
 
       try {
         val es = sys.eventStream
@@ -387,8 +392,9 @@ class EventStreamSpec extends AkkaSpec(EventStreamSpec.config) {
     }
 
     "unwatch an actor from unsubscriber when that actor unsubscribes from channels it subscribed" in {
-      val sys = ActorSystem("MustUnregisterWhenNoMoreChannelSubscriptions",
-                            configUnhandledWithDebug)
+      val sys = ActorSystem(
+        "MustUnregisterWhenNoMoreChannelSubscriptions",
+        configUnhandledWithDebug)
 
       try {
         val es = sys.eventStream
@@ -425,10 +431,11 @@ class EventStreamSpec extends AkkaSpec(EventStreamSpec.config) {
 
   private def verifyLevel(bus: LoggingBus, level: Logging.LogLevel) {
     import Logging._
-    val allmsg = Seq(Debug("", null, "debug"),
-                     Info("", null, "info"),
-                     Warning("", null, "warning"),
-                     Error("", null, "error"))
+    val allmsg = Seq(
+      Debug("", null, "debug"),
+      Info("", null, "info"),
+      Warning("", null, "warning"),
+      Error("", null, "error"))
     val msg = allmsg filter (_.level <= level)
     allmsg foreach bus.publish
     msg foreach (expectMsg(_))

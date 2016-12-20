@@ -84,8 +84,9 @@ class DefaultEventHandler[K, V](
       if (topicMetadataRefreshInterval >= 0 && SystemTime.milliseconds -
             lastTopicMetadataRefreshTime > topicMetadataRefreshInterval) {
         CoreUtils.swallowError(
-          brokerPartitionInfo.updateInfo(topicMetadataToRefresh.toSet,
-                                         correlationId.getAndIncrement))
+          brokerPartitionInfo.updateInfo(
+            topicMetadataToRefresh.toSet,
+            correlationId.getAndIncrement))
         sendPartitionPerTopicCache.clear()
         topicMetadataToRefresh.clear
         lastTopicMetadataRefreshTime = SystemTime.milliseconds
@@ -113,9 +114,10 @@ class DefaultEventHandler[K, V](
       val correlationIdEnd = correlationId.get()
       error(
         "Failed to send requests for topics %s with correlation ids in [%d,%d]"
-          .format(outstandingProduceRequests.map(_.topic).toSet.mkString(","),
-                  correlationIdStart,
-                  correlationIdEnd - 1))
+          .format(
+            outstandingProduceRequests.map(_.topic).toSet.mkString(","),
+            correlationIdStart,
+            correlationIdEnd - 1))
       throw new FailedToSendMessageException(
         "Failed to send messages after " + config.messageSendMaxRetries +
           " tries.",
@@ -167,18 +169,20 @@ class DefaultEventHandler[K, V](
             topic = e.topic,
             key = e.key,
             partKey = e.partKey,
-            message = new Message(key = keyEncoder.toBytes(e.key),
-                                  bytes = encoder.toBytes(e.message),
-                                  timestamp = time.milliseconds,
-                                  magicValue = Message.MagicValue_V1))
+            message = new Message(
+              key = keyEncoder.toBytes(e.key),
+              bytes = encoder.toBytes(e.message),
+              timestamp = time.milliseconds,
+              magicValue = Message.MagicValue_V1))
         else
           serializedMessages += new KeyedMessage[K, Message](
             topic = e.topic,
             key = e.key,
             partKey = e.partKey,
-            message = new Message(bytes = encoder.toBytes(e.message),
-                                  timestamp = time.milliseconds,
-                                  magicValue = Message.MagicValue_V1))
+            message = new Message(
+              bytes = encoder.toBytes(e.message),
+              timestamp = time.milliseconds,
+              magicValue = Message.MagicValue_V1))
       } catch {
         case t: Throwable =>
           producerStats.serializationErrorRate.mark()
@@ -199,15 +203,17 @@ class DefaultEventHandler[K, V](
                  collection.mutable.Map[TopicAndPartition,
                                         Seq[KeyedMessage[K, Message]]]]] = {
     val ret =
-      new HashMap[Int,
-                  collection.mutable.Map[TopicAndPartition,
-                                         Seq[KeyedMessage[K, Message]]]]
+      new HashMap[
+        Int,
+        collection.mutable.Map[TopicAndPartition,
+                               Seq[KeyedMessage[K, Message]]]]
     try {
       for (message <- messages) {
         val topicPartitionsList = getPartitionListForTopic(message)
-        val partitionIndex = getPartition(message.topic,
-                                          message.partitionKey,
-                                          topicPartitionsList)
+        val partitionIndex = getPartition(
+          message.topic,
+          message.partitionKey,
+          topicPartitionsList)
         val brokerPartition = topicPartitionsList(partitionIndex)
 
         // postpone the failure until the send operation, so that requests for other brokers are handled correctly
@@ -337,29 +343,32 @@ class DefaultEventHandler[K, V](
       messagesPerTopic.keys.toSeq
     } else if (messagesPerTopic.size > 0) {
       val currentCorrelationId = correlationId.getAndIncrement
-      val producerRequest = new ProducerRequest(currentCorrelationId,
-                                                config.clientId,
-                                                config.requestRequiredAcks,
-                                                config.requestTimeoutMs,
-                                                messagesPerTopic)
+      val producerRequest = new ProducerRequest(
+        currentCorrelationId,
+        config.clientId,
+        config.requestRequiredAcks,
+        config.requestTimeoutMs,
+        messagesPerTopic)
       var failedTopicPartitions = Seq.empty[TopicAndPartition]
       try {
         val syncProducer = producerPool.getProducer(brokerId)
         debug(
           "Producer sending messages with correlation id %d for topics %s to broker %d on %s:%d"
-            .format(currentCorrelationId,
-                    messagesPerTopic.keySet.mkString(","),
-                    brokerId,
-                    syncProducer.config.host,
-                    syncProducer.config.port))
+            .format(
+              currentCorrelationId,
+              messagesPerTopic.keySet.mkString(","),
+              brokerId,
+              syncProducer.config.host,
+              syncProducer.config.port))
         val response = syncProducer.send(producerRequest)
         debug(
           "Producer sent messages with correlation id %d for topics %s to broker %d on %s:%d"
-            .format(currentCorrelationId,
-                    messagesPerTopic.keySet.mkString(","),
-                    brokerId,
-                    syncProducer.config.host,
-                    syncProducer.config.port))
+            .format(
+              currentCorrelationId,
+              messagesPerTopic.keySet.mkString(","),
+              brokerId,
+              syncProducer.config.host,
+              syncProducer.config.port))
         if (response != null) {
           if (response.status.size != producerRequest.data.size)
             throw new KafkaException(
@@ -406,9 +415,10 @@ class DefaultEventHandler[K, V](
         case t: Throwable =>
           warn(
             "Failed to send producer request with correlation id %d to broker %d with data for partitions %s"
-              .format(currentCorrelationId,
-                      brokerId,
-                      messagesPerTopic.map(_._1).mkString(",")),
+              .format(
+                currentCorrelationId,
+                brokerId,
+                messagesPerTopic.map(_._1).mkString(",")),
             t)
           messagesPerTopic.keys.toSeq
       }
@@ -443,29 +453,35 @@ class DefaultEventHandler[K, V](
                 case 0 =>
                   debug(
                     "Sending %d messages with compression codec %d to %s"
-                      .format(messages.size,
-                              config.compressionCodec.codec,
-                              topicAndPartition))
-                  new ByteBufferMessageSet(config.compressionCodec,
-                                           rawMessages: _*)
+                      .format(
+                        messages.size,
+                        config.compressionCodec.codec,
+                        topicAndPartition))
+                  new ByteBufferMessageSet(
+                    config.compressionCodec,
+                    rawMessages: _*)
                 case _ =>
                   if (config.compressedTopics.contains(
                         topicAndPartition.topic)) {
                     debug(
                       "Sending %d messages with compression codec %d to %s"
-                        .format(messages.size,
-                                config.compressionCodec.codec,
-                                topicAndPartition))
-                    new ByteBufferMessageSet(config.compressionCodec,
-                                             rawMessages: _*)
+                        .format(
+                          messages.size,
+                          config.compressionCodec.codec,
+                          topicAndPartition))
+                    new ByteBufferMessageSet(
+                      config.compressionCodec,
+                      rawMessages: _*)
                   } else {
                     debug(
                       "Sending %d messages to %s with no compression as it is not in compressed.topics - %s"
-                        .format(messages.size,
-                                topicAndPartition,
-                                config.compressedTopics.toString))
-                    new ByteBufferMessageSet(NoCompressionCodec,
-                                             rawMessages: _*)
+                        .format(
+                          messages.size,
+                          topicAndPartition,
+                          config.compressedTopics.toString))
+                    new ByteBufferMessageSet(
+                      NoCompressionCodec,
+                      rawMessages: _*)
                   }
               }
           })

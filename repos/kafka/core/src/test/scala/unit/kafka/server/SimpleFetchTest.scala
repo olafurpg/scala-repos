@@ -116,14 +116,15 @@ class SimpleFetchTest {
     EasyMock.replay(logManager)
 
     // create the replica manager
-    replicaManager = new ReplicaManager(configs.head,
-                                        metrics,
-                                        time,
-                                        jTime,
-                                        zkUtils,
-                                        scheduler,
-                                        logManager,
-                                        new AtomicBoolean(false))
+    replicaManager = new ReplicaManager(
+      configs.head,
+      metrics,
+      time,
+      jTime,
+      zkUtils,
+      scheduler,
+      logManager,
+      new AtomicBoolean(false))
 
     // add the partition with two replicas, both in ISR
     val partition = replicaManager.getOrCreatePartition(topic, partitionId)
@@ -200,17 +201,19 @@ class SimpleFetchTest {
         .head
         .message)
 
-    assertEquals("Counts should increment after fetch",
-                 initialTopicCount + 2,
-                 BrokerTopicStats
-                   .getBrokerTopicStats(topic)
-                   .totalFetchRequestRate
-                   .count());
-    assertEquals("Counts should increment after fetch",
-                 initialAllTopicsCount + 2,
-                 BrokerTopicStats
-                   .getBrokerAllTopicsStats()
-                   .totalFetchRequestRate
-                   .count());
+    assertEquals(
+      "Counts should increment after fetch",
+      initialTopicCount + 2,
+      BrokerTopicStats
+        .getBrokerTopicStats(topic)
+        .totalFetchRequestRate
+        .count());
+    assertEquals(
+      "Counts should increment after fetch",
+      initialAllTopicsCount + 2,
+      BrokerTopicStats
+        .getBrokerAllTopicsStats()
+        .totalFetchRequestRate
+        .count());
   }
 }

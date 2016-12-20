@@ -75,10 +75,12 @@ class NNLS(val maxIters: Int = -1) extends SerializableLogging {
 
   def reset(ata: DenseMatrix[Double], atb: DenseVector[Double], state: State) = {
     import state._
-    require(ata.cols == ata.rows,
-            s"NNLS:iterations gram matrix must be symmetric")
-    require(ata.rows == state.x.length,
-            s"NNLS:iterations gram and linear dimension mismatch")
+    require(
+      ata.cols == ata.rows,
+      s"NNLS:iterations gram matrix must be symmetric")
+    require(
+      ata.rows == state.x.length,
+      s"NNLS:iterations gram and linear dimension mismatch")
     x := 0.0
     grad := 0.0
     dir := 0.0
@@ -152,16 +154,17 @@ class NNLS(val maxIters: Int = -1) extends SerializableLogging {
 
       // terminate?
       if (stop(step, ndir, nx)) {
-        return State(x,
-                     grad,
-                     dir,
-                     lastDir,
-                     res,
-                     tmp,
-                     nextNorm,
-                     nextWall,
-                     nextIter,
-                     true)
+        return State(
+          x,
+          grad,
+          dir,
+          lastDir,
+          res,
+          tmp,
+          nextNorm,
+          nextWall,
+          nextIter,
+          true)
       } else {
         // don't run through the walls
         cforRange(0 until n) { i =>

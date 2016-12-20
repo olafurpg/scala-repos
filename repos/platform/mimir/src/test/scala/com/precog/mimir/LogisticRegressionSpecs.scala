@@ -45,9 +45,10 @@ trait LogisticRegressionTestSupport[M[+ _]]
 
   def predictionInput(morph: Morphism2, modelData: String, model: String) = {
     val line = Line(0, 0, "")
-    dag.Morph2(morph,
-               dag.AbsoluteLoad(Const(CString(modelData))(line))(line),
-               dag.AbsoluteLoad(Const(CString(model))(line))(line))(line)
+    dag.Morph2(
+      morph,
+      dag.AbsoluteLoad(Const(CString(modelData))(line))(line),
+      dag.AbsoluteLoad(Const(CString(model))(line))(line))(line)
   }
 
   def sigmoid(z: Double): Double = 1 / (1 + math.exp(z))
@@ -110,15 +111,18 @@ trait LogisticRegressionSpecs[M[+ _]]
   def makeDAG(points: String) = {
     val line = Line(1, 1, "")
 
-    dag.Morph2(LogisticRegression,
-               dag.Join(DerefArray,
-                        Cross(Some(TableModule.CrossOrder.CrossLeft)),
-                        dag.AbsoluteLoad(Const(CString(points))(line))(line),
-                        dag.Const(CLong(1))(line))(line),
-               dag.Join(DerefArray,
-                        Cross(Some(TableModule.CrossOrder.CrossLeft)),
-                        dag.AbsoluteLoad(Const(CString(points))(line))(line),
-                        dag.Const(CLong(0))(line))(line))(line)
+    dag.Morph2(
+      LogisticRegression,
+      dag.Join(
+        DerefArray,
+        Cross(Some(TableModule.CrossOrder.CrossLeft)),
+        dag.AbsoluteLoad(Const(CString(points))(line))(line),
+        dag.Const(CLong(1))(line))(line),
+      dag.Join(
+        DerefArray,
+        Cross(Some(TableModule.CrossOrder.CrossLeft)),
+        dag.AbsoluteLoad(Const(CString(points))(line))(line),
+        dag.Const(CLong(0))(line))(line))(line)
   }
 
   def returnestimate(obj: Map[String, SValue]) = {
@@ -206,10 +210,11 @@ trait LogisticRegressionSpecs[M[+ _]]
 
     //runs the logistic regression function on 50 sets of data generated from the same distribution
     while (i < 50) {
-      val cpaths = Seq(CPath(CPathIndex(0), CPathField("foo")),
-                       CPath(CPathIndex(0), CPathField("bar")),
-                       CPath(CPathIndex(0), CPathField("baz")),
-                       CPath(CPathIndex(1))) sorted
+      val cpaths = Seq(
+        CPath(CPathIndex(0), CPathField("foo")),
+        CPath(CPathIndex(0), CPathField("bar")),
+        CPath(CPathIndex(0), CPathField("baz")),
+        CPath(CPathIndex(1))) sorted
 
       val samples = createLogisticSamplePoints(num, 100, actualThetas)
       val points = jvalues(samples, cpaths) map { _.renderCompact }
@@ -259,10 +264,11 @@ trait LogisticRegressionSpecs[M[+ _]]
                 returnestimate(obj)
             }
 
-            List(theta0.toDouble,
-                 theta1.toDouble,
-                 theta2.toDouble,
-                 theta3.toDouble)
+            List(
+              theta0.toDouble,
+              theta1.toDouble,
+              theta2.toDouble,
+              theta3.toDouble)
           }
         }
 
@@ -296,10 +302,11 @@ trait LogisticRegressionSpecs[M[+ _]]
       val cpaths = Seq(
         CPath(CPathIndex(0), CPathField("ack"), CPathIndex(0)),
         CPath(CPathIndex(0), CPathField("bak"), CPathField("bazoo")),
-        CPath(CPathIndex(0),
-              CPathField("bar"),
-              CPathField("baz"),
-              CPathIndex(0)),
+        CPath(
+          CPathIndex(0),
+          CPathField("bar"),
+          CPathField("baz"),
+          CPathIndex(0)),
         CPath(CPathIndex(0), CPathField("foo")),
         CPath(CPathIndex(1))) sorted
 
@@ -434,19 +441,19 @@ trait LogisticRegressionSpecs[M[+ _]]
             "model2" -> SObject(Map("fit" -> SDecimal(5.109089028037222E-12))),
             "model1" -> SObject(
               Map("fit" -> SDecimal(3.7751345441365816E-11)))))),
-        (SObject(
-          Map("model2" -> SObject(
-                Map("fit" -> SDecimal(1.0261879630648827E-10))),
-              "model1" -> SObject(
-                Map("fit" -> SDecimal(6.305116760146985E-16)))))),
+        (SObject(Map(
+          "model2" -> SObject(Map("fit" -> SDecimal(1.0261879630648827E-10))),
+          "model1" -> SObject(
+            Map("fit" -> SDecimal(6.305116760146985E-16)))))),
         (SObject(
           Map(
             "model2" -> SObject(Map("fit" -> SDecimal(2.543665647376276E-13))),
             "model1" -> SObject(
               Map("fit" -> SDecimal(1.1548224173015786E-17)))))),
         (SObject(
-          Map("model2" -> SObject(Map("fit" -> SDecimal(0.11920292202211755))),
-              "model1" -> SObject(Map("fit" -> SDecimal(0.5)))))),
+          Map(
+            "model2" -> SObject(Map("fit" -> SDecimal(0.11920292202211755))),
+            "model1" -> SObject(Map("fit" -> SDecimal(0.5)))))),
         (SObject(
           Map(
             "model2" -> SObject(Map("fit" -> SDecimal(0.9999998874648379))),

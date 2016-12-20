@@ -230,13 +230,14 @@ abstract class GuiceBuilder[Self] protected (environment: Environment,
                           disabled: Seq[Class[_]] = disabled,
                           binderOptions: Set[BinderOption] = binderOptions,
                           eagerly: Boolean = eagerly): Self =
-    newBuilder(environment,
-               configuration,
-               modules,
-               overrides,
-               disabled,
-               binderOptions,
-               eagerly)
+    newBuilder(
+      environment,
+      configuration,
+      modules,
+      overrides,
+      disabled,
+      binderOptions,
+      eagerly)
 
   /**
     * Create a new Self for this immutable builder.
@@ -287,13 +288,14 @@ final class GuiceInjectorBuilder(
                            disabled: Seq[Class[_]],
                            binderOptions: Set[BinderOption],
                            eagerly: Boolean): GuiceInjectorBuilder =
-    new GuiceInjectorBuilder(environment,
-                             configuration,
-                             modules,
-                             overrides,
-                             disabled,
-                             binderOptions,
-                             eagerly)
+    new GuiceInjectorBuilder(
+      environment,
+      configuration,
+      modules,
+      overrides,
+      disabled,
+      binderOptions,
+      eagerly)
 }
 
 /**

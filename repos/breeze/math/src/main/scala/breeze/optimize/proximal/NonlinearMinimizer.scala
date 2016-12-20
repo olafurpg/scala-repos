@@ -149,27 +149,29 @@ class NonlinearMinimizer(proximal: Proximal,
         val epsDual = scale + reltol * norm(s)
 
         if (residualNorm < epsPrimal && sNorm < epsDual || iter > admmIters) {
-          State(resultState,
-                u,
-                z,
-                xHat,
-                zOld,
-                residual,
-                s,
-                admmIters,
-                iter + 1,
-                true)
+          State(
+            resultState,
+            u,
+            z,
+            xHat,
+            zOld,
+            residual,
+            s,
+            admmIters,
+            iter + 1,
+            true)
         } else {
-          State(resultState,
-                u,
-                z,
-                xHat,
-                zOld,
-                residual,
-                s,
-                admmIters,
-                iter + 1,
-                false)
+          State(
+            resultState,
+            u,
+            z,
+            xHat,
+            zOld,
+            residual,
+            s,
+            admmIters,
+            iter + 1,
+            false)
         }
       }
       .takeUpToWhere { _.converged }
@@ -232,15 +234,17 @@ object NonlinearMinimizer {
       usePQN: Boolean = false): FirstOrderMinimizer[BDV, DiffFunction[BDV]] = {
     val projectionOp = Projection(proximal)
     if (usePQN)
-      new ProjectedQuasiNewton(projection = projectionOp.project,
-                               tolerance = 1e-6,
-                               maxIter = maxIter,
-                               m = m)
+      new ProjectedQuasiNewton(
+        projection = projectionOp.project,
+        tolerance = 1e-6,
+        maxIter = maxIter,
+        m = m)
     else
-      new SpectralProjectedGradient(projection = projectionOp.project,
-                                    tolerance = tolerance,
-                                    maxIter = maxIter,
-                                    bbMemory = m)
+      new SpectralProjectedGradient(
+        projection = projectionOp.project,
+        tolerance = tolerance,
+        maxIter = maxIter,
+        bbMemory = m)
   }
 
   /**

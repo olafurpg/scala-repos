@@ -46,11 +46,12 @@ private[prediction] class FakeEngine
 
 @Experimental
 private[prediction] class FakeRunner(f: (SparkContext => Unit))
-    extends BaseEvaluator[EmptyParams,
-                          EmptyParams,
-                          EmptyParams,
-                          EmptyParams,
-                          FakeEvalResult] {
+    extends BaseEvaluator[
+      EmptyParams,
+      EmptyParams,
+      EmptyParams,
+      EmptyParams,
+      FakeEvalResult] {
   @transient private lazy val logger = Logger[this.type]
   def evaluateBase(
       sc: SparkContext,

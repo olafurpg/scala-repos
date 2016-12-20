@@ -53,9 +53,10 @@ object StackServer {
     val stk =
       new StackBuilder[ServiceFactory[Req, Rep]](stack.nilStack[Req, Rep])
 
-    stk.push(Role.serverDestTracing,
-             ((next: ServiceFactory[Req, Rep]) =>
-                new ServerDestTracingProxy[Req, Rep](next)))
+    stk.push(
+      Role.serverDestTracing,
+      ((next: ServiceFactory[Req, Rep]) =>
+         new ServerDestTracingProxy[Req, Rep](next)))
     stk.push(TimeoutFilter.serverModule)
     // The DeadlineFilter is pushed after the stats filters so stats are
     // recorded for the request. If a server processing deadline is set in
@@ -72,9 +73,10 @@ object StackServer {
     stk.push(RequestSemaphoreFilter.module)
     stk.push(MaskCancelFilter.module)
     stk.push(ExceptionSourceFilter.module)
-    stk.push(Role.jvmTracing,
-             ((next: ServiceFactory[Req, Rep]) =>
-                newJvmFilter[Req, Rep]() andThen next))
+    stk.push(
+      Role.jvmTracing,
+      ((next: ServiceFactory[Req, Rep]) =>
+         newJvmFilter[Req, Rep]() andThen next))
     stk.push(ServerStatsFilter.module)
     stk.push(Role.protoTracing, identity[ServiceFactory[Req, Rep]](_))
     stk.push(ServerTracingFilter.module)
@@ -265,9 +267,8 @@ trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
             val d = server.newDispatcher(
               transport,
               Service.const(
-                Future.exception(
-                  Failure.rejected("Terminating session and ignoring request",
-                                   exc)))
+                Future.exception(Failure
+                  .rejected("Terminating session and ignoring request", exc)))
             )
             connections.add(d)
             transport.onClose ensure connections.remove(d)
@@ -277,9 +278,10 @@ trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
         }
       }
 
-      ServerRegistry.register(underlying.boundAddress.toString,
-                              server.stack,
-                              server.params)
+      ServerRegistry.register(
+        underlying.boundAddress.toString,
+        server.stack,
+        server.params)
 
       protected def closeServer(deadline: Time) = closeAwaitably {
         // Here be dragons

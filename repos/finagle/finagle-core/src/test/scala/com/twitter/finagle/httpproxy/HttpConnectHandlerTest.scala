@@ -83,10 +83,12 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
     val h = new HttpConnectHandlerHelper
     import h._
 
-    ch.handleUpstream(ctx,
-                      new UpstreamChannelStateEvent(channel,
-                                                    ChannelState.CONNECTED,
-                                                    remoteAddress))
+    ch.handleUpstream(
+      ctx,
+      new UpstreamChannelStateEvent(
+        channel,
+        ChannelState.CONNECTED,
+        remoteAddress))
     assert(!connectFuture.isDone)
     verify(ctx, times(0)).sendUpstream(any[ChannelEvent])
   }
@@ -96,10 +98,12 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
     val h = new HttpConnectHandlerHelper
     import h._
 
-    ch.handleUpstream(ctx,
-                      new UpstreamChannelStateEvent(channel,
-                                                    ChannelState.CONNECTED,
-                                                    remoteAddress))
+    ch.handleUpstream(
+      ctx,
+      new UpstreamChannelStateEvent(
+        channel,
+        ChannelState.CONNECTED,
+        remoteAddress))
     assert(!connectFuture.isDone)
     verify(ctx, times(0)).sendUpstream(any[ChannelEvent])
 
@@ -111,10 +115,12 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
     val h = new HttpConnectHandlerHelper
     import h._
 
-    ch.handleUpstream(ctx,
-                      new UpstreamChannelStateEvent(channel,
-                                                    ChannelState.CONNECTED,
-                                                    remoteAddress))
+    ch.handleUpstream(
+      ctx,
+      new UpstreamChannelStateEvent(
+        channel,
+        ChannelState.CONNECTED,
+        remoteAddress))
     assert(!connectFuture.isDone)
     verify(ctx, times(0)).sendUpstream(any[ChannelEvent])
 
@@ -158,17 +164,19 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
     import h._
 
     val handler =
-      HttpConnectHandler.addHandler(proxyAddress,
-                                    remoteAddress,
-                                    pipeline,
-                                    Some(Credentials("user", "pass")))
+      HttpConnectHandler.addHandler(
+        proxyAddress,
+        remoteAddress,
+        pipeline,
+        Some(Credentials("user", "pass")))
 
     handler.handleDownstream(ctx, connectRequested)
     handler.handleUpstream(
       ctx,
-      new UpstreamChannelStateEvent(channel,
-                                    ChannelState.CONNECTED,
-                                    remoteAddress))
+      new UpstreamChannelStateEvent(
+        channel,
+        ChannelState.CONNECTED,
+        remoteAddress))
     assert(!connectFuture.isDone)
     verify(ctx, times(0)).sendUpstream(any[ChannelEvent])
 

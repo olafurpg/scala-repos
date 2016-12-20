@@ -53,10 +53,11 @@ trait MethodIfaceBuilder[ServiceIface, MethodIface] {
 
 object ThriftMethodStats {
   def apply(stats: StatsReceiver): ThriftMethodStats =
-    ThriftMethodStats(stats.counter("requests"),
-                      stats.counter("success"),
-                      stats.counter("failures"),
-                      stats.scope("failures"))
+    ThriftMethodStats(
+      stats.counter("requests"),
+      stats.counter("success"),
+      stats.counter("failures"),
+      stats.scope("failures"))
 }
 
 case class ThriftMethodStats(requestsCounter: Counter,

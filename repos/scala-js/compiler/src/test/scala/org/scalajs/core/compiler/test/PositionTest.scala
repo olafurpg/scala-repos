@@ -21,9 +21,10 @@ class PositionTest extends JSASTTest {
     sourceAST(source) traverse {
       case lit: js.IntLiteral =>
         found = true
-        assertEquals("Scheme of virtual file URI should be `virtualfile'",
-                     "virtualfile",
-                     lit.pos.source.getScheme)
+        assertEquals(
+          "Scheme of virtual file URI should be `virtualfile'",
+          "virtualfile",
+          lit.pos.source.getScheme)
         assertEquals(
           "Scheme specific part of virtual file URI should be its path",
           name,

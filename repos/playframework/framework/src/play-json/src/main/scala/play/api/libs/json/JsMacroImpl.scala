@@ -13,21 +13,23 @@ import language.experimental.macros
 object JsMacroImpl {
 
   def formatImpl[A: c.WeakTypeTag](c: Context): c.Expr[OFormat[A]] =
-    macroImpl[A, OFormat, Format](c,
-                                  "format",
-                                  "inmap",
-                                  reads = true,
-                                  writes = true)
+    macroImpl[A, OFormat, Format](
+      c,
+      "format",
+      "inmap",
+      reads = true,
+      writes = true)
 
   def readsImpl[A: c.WeakTypeTag](c: Context): c.Expr[Reads[A]] =
     macroImpl[A, Reads, Reads](c, "read", "map", reads = true, writes = false)
 
   def writesImpl[A: c.WeakTypeTag](c: Context): c.Expr[OWrites[A]] =
-    macroImpl[A, OWrites, Writes](c,
-                                  "write",
-                                  "contramap",
-                                  reads = false,
-                                  writes = true)
+    macroImpl[A, OWrites, Writes](
+      c,
+      "write",
+      "contramap",
+      reads = false,
+      writes = true)
 
   /**
     * Generic implementation of the macro
@@ -154,8 +156,9 @@ object JsMacroImpl {
       case Some(apply) =>
         apply.paramLists.head //verify there is a single parameter group
       case None =>
-        c.abort(c.enclosingPosition,
-                "No apply function found matching unapply parameters")
+        c.abort(
+          c.enclosingPosition,
+          "No apply function found matching unapply parameters")
     }
 
     // Now we find all the implicits that we need

@@ -31,10 +31,11 @@ class AndroidFacetDataService
                               project: Project,
                               modelsProvider: IdeModifiableModelsProvider)
     : Importer[AndroidFacetData] =
-    new AndroidFacetDataService.Importer(toImport,
-                                         projectData,
-                                         project,
-                                         modelsProvider)
+    new AndroidFacetDataService.Importer(
+      toImport,
+      projectData,
+      project,
+      modelsProvider)
 }
 
 object AndroidFacetDataService {
@@ -42,10 +43,11 @@ object AndroidFacetDataService {
                          projectData: ProjectData,
                          project: Project,
                          modelsProvider: IdeModifiableModelsProvider)
-      extends AbstractImporter[AndroidFacetData](dataToImport,
-                                                 projectData,
-                                                 project,
-                                                 modelsProvider) {
+      extends AbstractImporter[AndroidFacetData](
+        dataToImport,
+        projectData,
+        project,
+        modelsProvider) {
 
     override def importData(): Unit =
       dataToImport.foreach { facetNode =>
@@ -64,10 +66,11 @@ object AndroidFacetDataService {
     private def createFacet(module: Module): AndroidFacet = {
       val model = getModifiableFacetModel(module)
       val facetType = new AndroidFacetType
-      val facet = facetType.createFacet(module,
-                                        "Android",
-                                        facetType.createDefaultConfiguration(),
-                                        null)
+      val facet = facetType.createFacet(
+        module,
+        "Android",
+        facetType.createDefaultConfiguration(),
+        null)
       model.addFacet(facet)
       facet
     }

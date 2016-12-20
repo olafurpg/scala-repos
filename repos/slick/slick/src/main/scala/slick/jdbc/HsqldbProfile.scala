@@ -109,24 +109,26 @@ trait HsqldbProfile extends JdbcProfile {
        * into joined views have already been mapped to unique identifiers at this point, so we can
        * safely rearrange views. */
       j match {
-        case Join(ls,
-                  rs,
-                  l,
-                  Join(ls2, rs2, l2, r2, JoinType.Inner, on2),
-                  JoinType.Inner,
-                  on) =>
+        case Join(
+            ls,
+            rs,
+            l,
+            Join(ls2, rs2, l2, r2, JoinType.Inner, on2),
+            JoinType.Inner,
+            on) =>
           val on3 = (on, on2) match {
             case (a, LiteralNode(true)) => a
             case (LiteralNode(true), b) => b
             case (a, b) => Apply(Library.And, ConstArray(a, b))(UnassignedType)
           }
           buildJoin(
-            Join(rs,
-                 rs2,
-                 Join(ls, ls2, l, l2, JoinType.Inner, LiteralNode(true)),
-                 r2,
-                 JoinType.Inner,
-                 on3))
+            Join(
+              rs,
+              rs2,
+              Join(ls, ls2, l, l2, JoinType.Inner, LiteralNode(true)),
+              r2,
+              JoinType.Inner,
+              on3))
         case j => super.buildJoin(j)
       }
     }

@@ -89,8 +89,9 @@ trait HashJoin { self: SparkPlan =>
             val rotated =
               if (e.dataType == IntegerType) {
                 // (e >>> 15) | (e << 17)
-                BitwiseOr(ShiftRightUnsigned(e, Literal(15)),
-                          ShiftLeft(e, Literal(17)))
+                BitwiseOr(
+                  ShiftRightUnsigned(e, Literal(15)),
+                  ShiftLeft(e, Literal(17)))
               } else {
                 e
               }
@@ -121,8 +122,9 @@ trait HashJoin { self: SparkPlan =>
 
   @transient private[this] lazy val boundCondition =
     if (condition.isDefined) {
-      newPredicate(condition.getOrElse(Literal(true)),
-                   left.output ++ right.output)
+      newPredicate(
+        condition.getOrElse(Literal(true)),
+        left.output ++ right.output)
     } else { (r: InternalRow) =>
       true
     }
@@ -172,11 +174,13 @@ trait HashJoin { self: SparkPlan =>
           // found some matches
           buildSide match {
             case BuildRight =>
-              joinRow(currentStreamedRow,
-                      currentHashMatches(currentMatchPosition))
+              joinRow(
+                currentStreamedRow,
+                currentHashMatches(currentMatchPosition))
             case BuildLeft =>
-              joinRow(currentHashMatches(currentMatchPosition),
-                      currentStreamedRow)
+              joinRow(
+                currentHashMatches(currentMatchPosition),
+                currentStreamedRow)
           }
           if (boundCondition(joinRow)) {
             return true

@@ -31,11 +31,12 @@ private[akka] final class FileSource(f: File,
     val settings = materializer.effectiveSettings(context.effectiveAttributes)
 
     val ioResultPromise = Promise[IOResult]()
-    val props = FilePublisher.props(f,
-                                    ioResultPromise,
-                                    chunkSize,
-                                    settings.initialInputBufferSize,
-                                    settings.maxInputBufferSize)
+    val props = FilePublisher.props(
+      f,
+      ioResultPromise,
+      chunkSize,
+      settings.initialInputBufferSize,
+      settings.maxInputBufferSize)
     val dispatcher =
       context.effectiveAttributes.get[Dispatcher](IODispatcher).dispatcher
 

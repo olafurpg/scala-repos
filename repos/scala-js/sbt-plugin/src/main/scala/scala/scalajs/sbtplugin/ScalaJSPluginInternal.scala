@@ -171,9 +171,10 @@ object ScalaJSPluginInternal {
           val realFiles = deps.get(scalaJSSourceFiles).get
           val resolvedDeps = deps.data
 
-          FileFunction.cached(s.cacheDirectory / cacheName,
-                              FilesInfo.lastModified,
-                              FilesInfo.exists) { _ =>
+          FileFunction.cached(
+            s.cacheDirectory / cacheName,
+            FilesInfo.lastModified,
+            FilesInfo.exists) { _ =>
             // We don't need the files
 
             IO.createDirectory(output.getParentFile)
@@ -218,14 +219,15 @@ object ScalaJSPluginInternal {
         .withPrettyPrint(opts.prettyPrintFullOptJS)
 
       val newLinker = { () =>
-        Linker(semantics,
-               outputMode,
-               withSourceMap,
-               opts.disableOptimizer,
-               opts.parallel,
-               opts.useClosureCompiler,
-               frontendConfig,
-               backendConfig)
+        Linker(
+          semantics,
+          outputMode,
+          withSourceMap,
+          opts.disableOptimizer,
+          opts.parallel,
+          opts.useClosureCompiler,
+          frontendConfig,
+          backendConfig)
       }
 
       new ClearableLinker(newLinker, opts.batchMode)
@@ -253,28 +255,27 @@ object ScalaJSPluginInternal {
       val output = (artifactPath in key).value
 
       Def.task {
-        FileFunction.cached(s.cacheDirectory,
-                            FilesInfo.lastModified,
-                            FilesInfo.exists) {
-          _ =>
-            // We don't need the files
+        FileFunction
+          .cached(s.cacheDirectory, FilesInfo.lastModified, FilesInfo.exists) {
+            _ =>
+              // We don't need the files
 
-            val stageName = stage match {
-              case Stage.FastOpt => "Fast"
-              case Stage.FullOpt => "Full"
-            }
+              val stageName = stage match {
+                case Stage.FastOpt => "Fast"
+                case Stage.FullOpt => "Full"
+              }
 
-            log.info(s"$stageName optimizing $output")
+              log.info(s"$stageName optimizing $output")
 
-            IO.createDirectory(output.getParentFile)
+              IO.createDirectory(output.getParentFile)
 
-            val linker = (scalaJSLinker in key).value
-            linker.link(ir, AtomicWritableFileVirtualJSFile(output), log)
+              val linker = (scalaJSLinker in key).value
+              linker.link(ir, AtomicWritableFileVirtualJSFile(output), log)
 
-            logIRCacheStats(log)
+              logIRCacheStats(log)
 
-            Set(output)
-        }(realFiles.toSet)
+              Set(output)
+          }(realFiles.toSet)
 
         Attributed.blank(output)
       } tag ((usesScalaJSLinkerTag in key).value)
@@ -403,15 +404,15 @@ object ScalaJSPluginInternal {
       scalaJSIR := {
         import IRFileCache.IRContainer
 
-        val rawIR = collectFromClasspath(fullClasspath.value,
-                                         "*.sjsir",
-                                         collectJar =
-                                           jar => IRContainer.Jar(jar) :: Nil,
-                                         collectFile = { (file, relPath) =>
-                                           IRContainer.File(
-                                             FileVirtualScalaJSIRFile
-                                               .relative(file, relPath))
-                                         })
+        val rawIR = collectFromClasspath(
+          fullClasspath.value,
+          "*.sjsir",
+          collectJar = jar => IRContainer.Jar(jar) :: Nil,
+          collectFile = { (file, relPath) =>
+            IRContainer.File(
+              FileVirtualScalaJSIRFile
+                .relative(file, relPath))
+          })
 
         val cache = scalaJSIRCache.value
         rawIR.map(cache.cached)
@@ -443,9 +444,10 @@ object ScalaJSPluginInternal {
             mainClass.value map {
               mainCl =>
                 val file = (artifactPath in packageScalaJSLauncher).value
-                IO.write(file,
-                         launcherContent(mainCl),
-                         Charset.forName("UTF-8"))
+                IO.write(
+                  file,
+                  launcherContent(mainCl),
+                  Charset.forName("UTF-8"))
 
                 // Attach the name of the main class used, (ab?)using the name key
                 Attributed(file)(AttributeMap.empty.put(name.key, mainCl))
@@ -458,16 +460,18 @@ object ScalaJSPluginInternal {
       artifactPath in packageJSDependencies :=
         ((crossTarget in packageJSDependencies).value /
           ((moduleName in packageJSDependencies).value + "-jsdeps.js")),
-      packageJSDependenciesSetting(packageJSDependencies,
-                                   "package-js-deps",
-                                   _.lib),
+      packageJSDependenciesSetting(
+        packageJSDependencies,
+        "package-js-deps",
+        _.lib),
       artifactPath in packageMinifiedJSDependencies :=
         ((crossTarget in packageMinifiedJSDependencies).value /
           ((moduleName in packageMinifiedJSDependencies).value +
             "-jsdeps.min.js")),
-      packageJSDependenciesSetting(packageMinifiedJSDependencies,
-                                   "package-min-js-deps",
-                                   dep => dep.minifiedLib.getOrElse(dep.lib)),
+      packageJSDependenciesSetting(
+        packageMinifiedJSDependencies,
+        "package-min-js-deps",
+        dep => dep.minifiedLib.getOrElse(dep.lib)),
       jsDependencyManifest := {
         val myModule = thisProject.value.id
         val config = configuration.value.name
@@ -490,10 +494,11 @@ object ScalaJSPluginInternal {
          */
         val compliantSemantics = scalaJSSemantics.value.compliants
 
-        val manifest = new JSDependencyManifest(new Origin(myModule, config),
-                                                jsDeps.toList,
-                                                requiresDOM,
-                                                compliantSemantics)
+        val manifest = new JSDependencyManifest(
+          new Origin(myModule, config),
+          jsDeps.toList,
+          requiresDOM,
+          compliantSemantics)
 
         // Write dependency file to class directory
         val targetDir = classDirectory.value
@@ -523,10 +528,11 @@ object ScalaJSPluginInternal {
               "are running a JVM REPL. JavaScript things won't work.")
         )),
       scalaJSNativeLibraries := {
-        collectFromClasspath(fullClasspath.value,
-                             "*.js",
-                             collectJar = _.jsFiles,
-                             collectFile = FileVirtualJSFile.relative)
+        collectFromClasspath(
+          fullClasspath.value,
+          "*.js",
+          collectJar = _.jsFiles,
+          collectFile = FileVirtualJSFile.relative)
       },
       jsDependencyManifests := {
         val filter = jsManifestFilter.value
@@ -573,9 +579,10 @@ object ScalaJSPluginInternal {
 
         // Actually resolve the dependencies
         val resolved =
-          DependencyResolver.resolveDependencies(attManifests.data,
-                                                 availableLibs,
-                                                 dependencyFilter)
+          DependencyResolver.resolveDependencies(
+            attManifests.data,
+            availableLibs,
+            dependencyFilter)
 
         Attributed
           .blank[Seq[ResolvedJSDependency]](resolved)
@@ -733,22 +740,24 @@ object ScalaJSPluginInternal {
 
       val launch = scalaJSLauncher.value
       val className = launch.get(name.key).getOrElse("<unknown class>")
-      jsRun(loadedJSEnv.value,
-            className,
-            launch.data,
-            streams.value.log,
-            scalaJSConsole.value)
+      jsRun(
+        loadedJSEnv.value,
+        className,
+        launch.data,
+        streams.value.log,
+        scalaJSConsole.value)
     },
     runMain := {
       // use assert to prevent warning about pure expr in stat pos
       assert(scalaJSEnsureUnforked.value)
 
       val mainClass = runMainParser.parsed
-      jsRun(loadedJSEnv.value,
-            mainClass,
-            memLauncher(mainClass),
-            streams.value.log,
-            scalaJSConsole.value)
+      jsRun(
+        loadedJSEnv.value,
+        mainClass,
+        memLauncher(mainClass),
+        streams.value.log,
+        scalaJSConsole.value)
     }
   )
 

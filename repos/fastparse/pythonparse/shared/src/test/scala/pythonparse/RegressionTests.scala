@@ -32,10 +32,11 @@ object RegressionTests extends TestSuite {
     'multi_line_function - TestUtils.check(
       Statements.file_input,
       Seq(
-        FunctionDef('session_config,
-                    arguments(Nil, None, None, Nil),
-                    Seq(Expr('a), Expr('b)),
-                    Nil)),
+        FunctionDef(
+          'session_config,
+          arguments(Nil, None, None, Nil),
+          Seq(Expr('a), Expr('b)),
+          Nil)),
       """def session_config():
         |    a
         |
@@ -178,15 +179,17 @@ object RegressionTests extends TestSuite {
     'chained_elifs - TestUtils.check(
       Statements.file_input,
       Seq(
-        While(Num(1),
+        While(
+          Num(1),
+          Seq(
+            If(
+              'a,
+              Seq(Expr('a)),
               Seq(
-                If('a,
-                   Seq(Expr('a)),
-                   Seq(
-                     If('b, Seq(Expr('b)), Seq(If('c, Seq(Expr('c)), Nil)))
-                   ))
-              ),
-              Nil)),
+                If('b, Seq(Expr('b)), Seq(If('c, Seq(Expr('c)), Nil)))
+              ))
+          ),
+          Nil)),
       """while 1:
         |    if a:
         |        a
@@ -211,10 +214,11 @@ object RegressionTests extends TestSuite {
     'comment_after_decorator - TestUtils.check(
       Statements.file_input,
       Seq(
-        ClassDef('GenericForeignKeyTests,
-                 Nil,
-                 Seq(Pass),
-                 Seq('override_settings))),
+        ClassDef(
+          'GenericForeignKeyTests,
+          Nil,
+          Seq(Pass),
+          Seq('override_settings))),
       """@override_settings # ForeignKey(unique=True)
         |class GenericForeignKeyTests:
         |    pass

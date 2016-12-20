@@ -145,8 +145,9 @@ trait SpecializedFactory[@spec(Boolean, Int, Long, Float, Double) T] {
       val r = arr(0).length
       if (r == 0) st.makeMat(0, 0, st.newArray(0))
       else {
-        require(arr.foldLeft(true)(_ && _.length == r),
-                "All vec inputs must have the same length")
+        require(
+          arr.foldLeft(true)(_ && _.length == r),
+          "All vec inputs must have the same length")
         altMatConstructor(r, c, arr)
       }
     }

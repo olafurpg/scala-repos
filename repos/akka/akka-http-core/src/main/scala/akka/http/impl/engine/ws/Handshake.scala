@@ -172,10 +172,11 @@ private[http] object Handshake {
       //version, protocol, extensions, origin
 
       val headers =
-        Seq(UpgradeHeader,
-            ConnectionUpgradeHeader,
-            key,
-            SecWebSocketVersionHeader) ++ protocol ++ extraHeaders
+        Seq(
+          UpgradeHeader,
+          ConnectionUpgradeHeader,
+          key,
+          SecWebSocketVersionHeader) ++ protocol ++ extraHeaders
 
       (HttpRequest(HttpMethods.GET, uri.toRelative, headers), key)
     }
@@ -272,12 +273,14 @@ private[http] object Handshake {
           })
 
       val expectations: Expectation =
-        check(_.status)(_ == StatusCodes.SwitchingProtocols,
-                        "unexpected status code: " + _) &&
+        check(_.status)(
+          _ == StatusCodes.SwitchingProtocols,
+          "unexpected status code: " + _) &&
           headerExists(UpgradeHeader, caseInsensitive = true) &&
           headerExists(ConnectionUpgradeHeader, caseInsensitive = true) &&
-          headerExists(`Sec-WebSocket-Accept`.forKey(key),
-                       showExactOther = false)
+          headerExists(
+            `Sec-WebSocket-Accept`.forKey(key),
+            showExactOther = false)
 
       expectations(response) match {
         case None ⇒

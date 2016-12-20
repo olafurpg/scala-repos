@@ -143,9 +143,10 @@ case class ConcatWs(children: Seq[Expression])
             if (!${eval.isNull}) {
               final int $size = ${eval.value}.numElements();
               for (int j = 0; j < $size; j ++) {
-                $array[$idxInVararg ++] = ${ctx.getValue(eval.value,
-                                                         StringType,
-                                                         "j")};
+                $array[$idxInVararg ++] = ${ctx.getValue(
+                   eval.value,
+                   StringType,
+                   "j")};
               }
             }
             """)
@@ -314,12 +315,14 @@ case class StringTranslate(srcExpr: Expression,
     val termDict = ctx.freshName("dict")
     val classNameDict = classOf[JMap[Character, Character]].getCanonicalName
 
-    ctx.addMutableState("UTF8String",
-                        termLastMatching,
-                        s"$termLastMatching = null;")
-    ctx.addMutableState("UTF8String",
-                        termLastReplace,
-                        s"$termLastReplace = null;")
+    ctx.addMutableState(
+      "UTF8String",
+      termLastMatching,
+      s"$termLastMatching = null;")
+    ctx.addMutableState(
+      "UTF8String",
+      termLastReplace,
+      s"$termLastReplace = null;")
     ctx.addMutableState(classNameDict, termDict, s"$termDict = null;")
 
     nullSafeCodeGen(ctx, ev, (src, matching, replace) => {
@@ -364,9 +367,10 @@ case class FindInSet(left: Expression, right: Expression)
     set.asInstanceOf[UTF8String].findInSet(word.asInstanceOf[UTF8String])
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx,
-                    ev,
-                    (word, set) => s"${ev.value} = $set.findInSet($word);")
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      (word, set) => s"${ev.value} = $set.findInSet($word);")
   }
 
   override def dataType: DataType = IntegerType
@@ -475,10 +479,10 @@ case class SubstringIndex(strExpr: Expression,
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    defineCodeGen(ctx,
-                  ev,
-                  (str, delim,
-                   count) => s"$str.subStringIndex($delim, $count)")
+    defineCodeGen(
+      ctx,
+      ev,
+      (str, delim, count) => s"$str.subStringIndex($delim, $count)")
   }
 }
 
@@ -778,9 +782,10 @@ case class Substring(str: Expression, pos: Expression, len: Expression)
           .asInstanceOf[UTF8String]
           .substringSQL(pos.asInstanceOf[Int], len.asInstanceOf[Int])
       case BinaryType =>
-        ByteArray.subStringSQL(string.asInstanceOf[Array[Byte]],
-                               pos.asInstanceOf[Int],
-                               len.asInstanceOf[Int])
+        ByteArray.subStringSQL(
+          string.asInstanceOf[Array[Byte]],
+          pos.asInstanceOf[Int],
+          len.asInstanceOf[Int])
     }
   }
 
@@ -964,9 +969,10 @@ case class Decode(bin: Expression, charset: Expression)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx,
-                    ev,
-                    (bytes, charset) => s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      (bytes, charset) => s"""
         try {
           ${ev.value} = UTF8String.fromString(new String($bytes, $charset.toString()));
         } catch (java.io.UnsupportedEncodingException e) {
@@ -996,9 +1002,10 @@ case class Encode(value: Expression, charset: Expression)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx,
-                    ev,
-                    (string, charset) => s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      (string, charset) => s"""
         try {
           ${ev.value} = $string.toString().getBytes($charset.toString());
         } catch (java.io.UnsupportedEncodingException e) {

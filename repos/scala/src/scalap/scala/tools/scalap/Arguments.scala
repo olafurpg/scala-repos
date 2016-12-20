@@ -105,8 +105,9 @@ object Arguments {
               if (args(i) startsWith prefix) {
                 val arg = args(i).substring(prefix.length()).trim()
                 i = i + 1
-                res.addBinding(prefix,
-                               parseBinding(arg, prefixedBindings(prefix)))
+                res.addBinding(
+                  prefix,
+                  parseBinding(arg, prefixedBindings(prefix)))
               }
             }
             if (i == j) {

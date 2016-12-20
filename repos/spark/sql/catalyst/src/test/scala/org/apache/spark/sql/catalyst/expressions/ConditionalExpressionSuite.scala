@@ -49,10 +49,12 @@ class ConditionalExpressionSuite
         val expectedConverted =
           if (expected == null) null else convert(expected)
 
-        checkEvaluation(If(Literal.create(predicate, BooleanType),
-                           Literal.create(trueValueConverted, dataType),
-                           Literal.create(falseValueConverted, dataType)),
-                        expectedConverted)
+        checkEvaluation(
+          If(
+            Literal.create(predicate, BooleanType),
+            Literal.create(trueValueConverted, dataType),
+            Literal.create(falseValueConverted, dataType)),
+          expectedConverted)
       }
     }
 
@@ -87,16 +89,18 @@ class ConditionalExpressionSuite
     checkEvaluation(CaseWhen(Seq((c1, c4)), c6), "c", row)
     checkEvaluation(CaseWhen(Seq((c2, c4)), c6), "c", row)
     checkEvaluation(CaseWhen(Seq((c3, c4)), c6), "a", row)
-    checkEvaluation(CaseWhen(Seq((Literal.create(null, BooleanType), c4)), c6),
-                    "c",
-                    row)
+    checkEvaluation(
+      CaseWhen(Seq((Literal.create(null, BooleanType), c4)), c6),
+      "c",
+      row)
     checkEvaluation(
       CaseWhen(Seq((Literal.create(false, BooleanType), c4)), c6),
       "c",
       row)
-    checkEvaluation(CaseWhen(Seq((Literal.create(true, BooleanType), c4)), c6),
-                    "a",
-                    row)
+    checkEvaluation(
+      CaseWhen(Seq((Literal.create(true, BooleanType), c4)), c6),
+      "a",
+      row)
 
     checkEvaluation(CaseWhen(Seq((c3, c4), (c2, c5)), c6), "a", row)
     checkEvaluation(CaseWhen(Seq((c2, c4), (c3, c5)), c6), "b", row)
@@ -144,9 +148,10 @@ class ConditionalExpressionSuite
     val literalString = Literal("a")
 
     checkEvaluation(CaseKeyWhen(c1, Seq(c2, c4, c5)), "b", row)
-    checkEvaluation(CaseKeyWhen(c1, Seq(c2, c4, literalNull, c5, c6)),
-                    "c",
-                    row)
+    checkEvaluation(
+      CaseKeyWhen(c1, Seq(c2, c4, literalNull, c5, c6)),
+      "c",
+      row)
     checkEvaluation(CaseKeyWhen(c2, Seq(literalInt, c4, c5)), "a", row)
     checkEvaluation(CaseKeyWhen(c2, Seq(c1, c4, c5)), "b", row)
     checkEvaluation(CaseKeyWhen(c4, Seq(literalString, c2, c3)), 1, row)
@@ -172,46 +177,60 @@ class ConditionalExpressionSuite
 
     val nullLiteral = Literal.create(null, IntegerType)
     checkEvaluation(Least(Seq(nullLiteral, nullLiteral)), null)
-    checkEvaluation(Least(Seq(Literal(null), Literal(null))),
-                    null,
-                    InternalRow.empty)
-    checkEvaluation(Least(Seq(Literal(-1.0), Literal(2.5))),
-                    -1.0,
-                    InternalRow.empty)
+    checkEvaluation(
+      Least(Seq(Literal(null), Literal(null))),
+      null,
+      InternalRow.empty)
+    checkEvaluation(
+      Least(Seq(Literal(-1.0), Literal(2.5))),
+      -1.0,
+      InternalRow.empty)
     checkEvaluation(Least(Seq(Literal(-1), Literal(2))), -1, InternalRow.empty)
-    checkEvaluation(Least(Seq(Literal((-1.0).toFloat), Literal(2.5.toFloat))),
-                    (-1.0).toFloat,
-                    InternalRow.empty)
-    checkEvaluation(Least(Seq(Literal(Long.MaxValue), Literal(Long.MinValue))),
-                    Long.MinValue,
-                    InternalRow.empty)
-    checkEvaluation(Least(Seq(Literal(1.toByte), Literal(2.toByte))),
-                    1.toByte,
-                    InternalRow.empty)
-    checkEvaluation(Least(Seq(Literal(1.toShort), Literal(2.toByte.toShort))),
-                    1.toShort,
-                    InternalRow.empty)
-    checkEvaluation(Least(Seq(Literal("abc"), Literal("aaaa"))),
-                    "aaaa",
-                    InternalRow.empty)
-    checkEvaluation(Least(Seq(Literal(true), Literal(false))),
-                    false,
-                    InternalRow.empty)
-    checkEvaluation(Least(
-                      Seq(Literal(BigDecimal("1234567890987654321123456")),
-                          Literal(BigDecimal("1234567890987654321123458")))),
-                    BigDecimal("1234567890987654321123456"),
-                    InternalRow.empty)
-    checkEvaluation(Least(
-                      Seq(Literal(Date.valueOf("2015-01-01")),
-                          Literal(Date.valueOf("2015-07-01")))),
-                    Date.valueOf("2015-01-01"),
-                    InternalRow.empty)
-    checkEvaluation(Least(
-                      Seq(Literal(Timestamp.valueOf("2015-07-01 08:00:00")),
-                          Literal(Timestamp.valueOf("2015-07-01 10:00:00")))),
-                    Timestamp.valueOf("2015-07-01 08:00:00"),
-                    InternalRow.empty)
+    checkEvaluation(
+      Least(Seq(Literal((-1.0).toFloat), Literal(2.5.toFloat))),
+      (-1.0).toFloat,
+      InternalRow.empty)
+    checkEvaluation(
+      Least(Seq(Literal(Long.MaxValue), Literal(Long.MinValue))),
+      Long.MinValue,
+      InternalRow.empty)
+    checkEvaluation(
+      Least(Seq(Literal(1.toByte), Literal(2.toByte))),
+      1.toByte,
+      InternalRow.empty)
+    checkEvaluation(
+      Least(Seq(Literal(1.toShort), Literal(2.toByte.toShort))),
+      1.toShort,
+      InternalRow.empty)
+    checkEvaluation(
+      Least(Seq(Literal("abc"), Literal("aaaa"))),
+      "aaaa",
+      InternalRow.empty)
+    checkEvaluation(
+      Least(Seq(Literal(true), Literal(false))),
+      false,
+      InternalRow.empty)
+    checkEvaluation(
+      Least(
+        Seq(
+          Literal(BigDecimal("1234567890987654321123456")),
+          Literal(BigDecimal("1234567890987654321123458")))),
+      BigDecimal("1234567890987654321123456"),
+      InternalRow.empty)
+    checkEvaluation(
+      Least(
+        Seq(
+          Literal(Date.valueOf("2015-01-01")),
+          Literal(Date.valueOf("2015-07-01")))),
+      Date.valueOf("2015-01-01"),
+      InternalRow.empty)
+    checkEvaluation(
+      Least(
+        Seq(
+          Literal(Timestamp.valueOf("2015-07-01 08:00:00")),
+          Literal(Timestamp.valueOf("2015-07-01 10:00:00")))),
+      Timestamp.valueOf("2015-07-01 08:00:00"),
+      InternalRow.empty)
 
     DataTypeTestUtils.ordered.foreach { dt =>
       checkConsistencyBetweenInterpretedAndCodegen(Least, dt, 2)
@@ -232,15 +251,18 @@ class ConditionalExpressionSuite
 
     val nullLiteral = Literal.create(null, IntegerType)
     checkEvaluation(Greatest(Seq(nullLiteral, nullLiteral)), null)
-    checkEvaluation(Greatest(Seq(Literal(null), Literal(null))),
-                    null,
-                    InternalRow.empty)
-    checkEvaluation(Greatest(Seq(Literal(-1.0), Literal(2.5))),
-                    2.5,
-                    InternalRow.empty)
-    checkEvaluation(Greatest(Seq(Literal(-1), Literal(2))),
-                    2,
-                    InternalRow.empty)
+    checkEvaluation(
+      Greatest(Seq(Literal(null), Literal(null))),
+      null,
+      InternalRow.empty)
+    checkEvaluation(
+      Greatest(Seq(Literal(-1.0), Literal(2.5))),
+      2.5,
+      InternalRow.empty)
+    checkEvaluation(
+      Greatest(Seq(Literal(-1), Literal(2))),
+      2,
+      InternalRow.empty)
     checkEvaluation(
       Greatest(Seq(Literal((-1.0).toFloat), Literal(2.5.toFloat))),
       2.5.toFloat,
@@ -249,34 +271,43 @@ class ConditionalExpressionSuite
       Greatest(Seq(Literal(Long.MaxValue), Literal(Long.MinValue))),
       Long.MaxValue,
       InternalRow.empty)
-    checkEvaluation(Greatest(Seq(Literal(1.toByte), Literal(2.toByte))),
-                    2.toByte,
-                    InternalRow.empty)
+    checkEvaluation(
+      Greatest(Seq(Literal(1.toByte), Literal(2.toByte))),
+      2.toByte,
+      InternalRow.empty)
     checkEvaluation(
       Greatest(Seq(Literal(1.toShort), Literal(2.toByte.toShort))),
       2.toShort,
       InternalRow.empty)
-    checkEvaluation(Greatest(Seq(Literal("abc"), Literal("aaaa"))),
-                    "abc",
-                    InternalRow.empty)
-    checkEvaluation(Greatest(Seq(Literal(true), Literal(false))),
-                    true,
-                    InternalRow.empty)
-    checkEvaluation(Greatest(
-                      Seq(Literal(BigDecimal("1234567890987654321123456")),
-                          Literal(BigDecimal("1234567890987654321123458")))),
-                    BigDecimal("1234567890987654321123458"),
-                    InternalRow.empty)
-    checkEvaluation(Greatest(
-                      Seq(Literal(Date.valueOf("2015-01-01")),
-                          Literal(Date.valueOf("2015-07-01")))),
-                    Date.valueOf("2015-07-01"),
-                    InternalRow.empty)
-    checkEvaluation(Greatest(
-                      Seq(Literal(Timestamp.valueOf("2015-07-01 08:00:00")),
-                          Literal(Timestamp.valueOf("2015-07-01 10:00:00")))),
-                    Timestamp.valueOf("2015-07-01 10:00:00"),
-                    InternalRow.empty)
+    checkEvaluation(
+      Greatest(Seq(Literal("abc"), Literal("aaaa"))),
+      "abc",
+      InternalRow.empty)
+    checkEvaluation(
+      Greatest(Seq(Literal(true), Literal(false))),
+      true,
+      InternalRow.empty)
+    checkEvaluation(
+      Greatest(
+        Seq(
+          Literal(BigDecimal("1234567890987654321123456")),
+          Literal(BigDecimal("1234567890987654321123458")))),
+      BigDecimal("1234567890987654321123458"),
+      InternalRow.empty)
+    checkEvaluation(
+      Greatest(
+        Seq(
+          Literal(Date.valueOf("2015-01-01")),
+          Literal(Date.valueOf("2015-07-01")))),
+      Date.valueOf("2015-07-01"),
+      InternalRow.empty)
+    checkEvaluation(
+      Greatest(
+        Seq(
+          Literal(Timestamp.valueOf("2015-07-01 08:00:00")),
+          Literal(Timestamp.valueOf("2015-07-01 10:00:00")))),
+      Timestamp.valueOf("2015-07-01 10:00:00"),
+      InternalRow.empty)
 
     DataTypeTestUtils.ordered.foreach { dt =>
       checkConsistencyBetweenInterpretedAndCodegen(Greatest, dt, 2)

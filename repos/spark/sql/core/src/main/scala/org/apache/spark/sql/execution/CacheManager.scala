@@ -92,11 +92,12 @@ private[sql] class CacheManager extends Logging {
       val sqlContext = query.sqlContext
       cachedData += CachedData(
         planToCache,
-        InMemoryRelation(sqlContext.conf.useCompression,
-                         sqlContext.conf.columnBatchSize,
-                         storageLevel,
-                         sqlContext.executePlan(planToCache).executedPlan,
-                         tableName))
+        InMemoryRelation(
+          sqlContext.conf.useCompression,
+          sqlContext.conf.columnBatchSize,
+          storageLevel,
+          sqlContext.executePlan(planToCache).executedPlan,
+          tableName))
     }
   }
 

@@ -75,7 +75,8 @@ class FlowModule(leadershipModule: LeadershipModule) {
         taskStatusObservables,
         offerMatcherManager
       )
-    leadershipModule.startWhenLeader(offerMatcherLaunchTokensProps,
-                                     "offerMatcherLaunchTokens")
+    leadershipModule.startWhenLeader(
+      offerMatcherLaunchTokensProps,
+      "offerMatcherLaunchTokens")
   }
 }

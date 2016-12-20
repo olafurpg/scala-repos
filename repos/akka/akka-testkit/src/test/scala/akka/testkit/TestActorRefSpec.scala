@@ -324,9 +324,10 @@ class TestActorRefSpec
 
     "allow creation of a TestActorRef with a specified supervisor and specified name with Props" in {
       val parent = TestActorRef[ReplyActor]
-      val ref = TestActorRef[WorkerActor](Props[WorkerActor],
-                                          parent,
-                                          "specificSupervisedPropsActor")
+      val ref = TestActorRef[WorkerActor](
+        Props[WorkerActor],
+        parent,
+        "specificSupervisedPropsActor")
       ref.underlyingActor.name should be("specificSupervisedPropsActor")
       ref.underlyingActor.supervisor should be(parent)
     }

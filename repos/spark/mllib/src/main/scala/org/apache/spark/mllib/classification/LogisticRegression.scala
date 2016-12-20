@@ -166,14 +166,15 @@ class LogisticRegressionModel @Since("1.3.0")(
 
   @Since("1.3.0")
   override def save(sc: SparkContext, path: String): Unit = {
-    GLMClassificationModel.SaveLoadV1_0.save(sc,
-                                             path,
-                                             this.getClass.getName,
-                                             numFeatures,
-                                             numClasses,
-                                             weights,
-                                             intercept,
-                                             threshold)
+    GLMClassificationModel.SaveLoadV1_0.save(
+      sc,
+      path,
+      this.getClass.getName,
+      numFeatures,
+      numClasses,
+      weights,
+      intercept,
+      threshold)
   }
 
   override protected def formatVersion: String = "1.0"
@@ -199,10 +200,11 @@ object LogisticRegressionModel extends Loader[LogisticRegressionModel] {
         val data =
           GLMClassificationModel.SaveLoadV1_0.loadData(sc, path, classNameV1_0)
         // numFeatures, numClasses, weights are checked in model initialization
-        val model = new LogisticRegressionModel(data.weights,
-                                                data.intercept,
-                                                numFeatures,
-                                                numClasses)
+        val model = new LogisticRegressionModel(
+          data.weights,
+          data.intercept,
+          numFeatures,
+          numClasses)
         data.threshold match {
           case Some(t) => model.setThreshold(t)
           case None => model.clearThreshold()
@@ -286,10 +288,11 @@ object LogisticRegressionWithSGD {
             stepSize: Double,
             miniBatchFraction: Double,
             initialWeights: Vector): LogisticRegressionModel = {
-    new LogisticRegressionWithSGD(stepSize,
-                                  numIterations,
-                                  0.0,
-                                  miniBatchFraction).run(input, initialWeights)
+    new LogisticRegressionWithSGD(
+      stepSize,
+      numIterations,
+      0.0,
+      miniBatchFraction).run(input, initialWeights)
   }
 
   /**
@@ -309,10 +312,11 @@ object LogisticRegressionWithSGD {
             numIterations: Int,
             stepSize: Double,
             miniBatchFraction: Double): LogisticRegressionModel = {
-    new LogisticRegressionWithSGD(stepSize,
-                                  numIterations,
-                                  0.0,
-                                  miniBatchFraction).run(input)
+    new LogisticRegressionWithSGD(
+      stepSize,
+      numIterations,
+      0.0,
+      miniBatchFraction).run(input)
   }
 
   /**
@@ -404,10 +408,11 @@ class LogisticRegressionWithLBFGS
     if (numOfLinearPredictor == 1) {
       new LogisticRegressionModel(weights, intercept)
     } else {
-      new LogisticRegressionModel(weights,
-                                  intercept,
-                                  numFeatures,
-                                  numOfLinearPredictor + 1)
+      new LogisticRegressionModel(
+        weights,
+        intercept,
+        numFeatures,
+        numOfLinearPredictor + 1)
     }
   }
 

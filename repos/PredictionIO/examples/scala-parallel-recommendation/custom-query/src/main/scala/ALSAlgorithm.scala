@@ -25,14 +25,16 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
   @transient lazy val logger = Logger[this.type]
 
   def train(data: PreparedData): ALSModel = {
-    require(!data.ratings.take(1).isEmpty,
-            s"viewEvents in PreparedData cannot be empty." +
-              " Please check if DataSource generates TrainingData" +
-              " and Preprator generates PreparedData correctly.")
-    require(!data.items.take(1).isEmpty,
-            s"items in PreparedData cannot be empty." +
-              " Please check if DataSource generates TrainingData" +
-              " and Preprator generates PreparedData correctly.")
+    require(
+      !data.ratings.take(1).isEmpty,
+      s"viewEvents in PreparedData cannot be empty." +
+        " Please check if DataSource generates TrainingData" +
+        " and Preprator generates PreparedData correctly.")
+    require(
+      !data.items.take(1).isEmpty,
+      s"items in PreparedData cannot be empty." +
+        " Please check if DataSource generates TrainingData" +
+        " and Preprator generates PreparedData correctly.")
     // create item's String ID to integer index BiMap
     val itemStringIntMap = BiMap.stringInt(data.items.keys)
     val userStringIntMap = BiMap.stringInt(data.ratings.map(_.user))
@@ -63,24 +65,27 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       .map { case ((u, i), v) => MLlibRating(u, i, v) }
 
     // MLLib ALS cannot handle empty training data.
-    require(!mllibRatings.take(1).isEmpty,
-            s"mllibRatings cannot be empty." +
-              " Please check if your events contain valid user and item ID.")
+    require(
+      !mllibRatings.take(1).isEmpty,
+      s"mllibRatings cannot be empty." +
+        " Please check if your events contain valid user and item ID.")
 
     // seed for MLlib ALS
     val seed = ap.seed.getOrElse(System.nanoTime)
 
-    val m = ALS.trainImplicit(ratings = mllibRatings,
-                              rank = ap.rank,
-                              iterations = ap.numIterations,
-                              lambda = ap.lambda,
-                              blocks = -1,
-                              alpha = 1.0,
-                              seed = seed)
+    val m = ALS.trainImplicit(
+      ratings = mllibRatings,
+      rank = ap.rank,
+      iterations = ap.numIterations,
+      lambda = ap.lambda,
+      blocks = -1,
+      alpha = 1.0,
+      seed = seed)
 
-    new ALSModel(productFeatures = m.productFeatures,
-                 itemStringIntMap = itemStringIntMap,
-                 items = items)
+    new ALSModel(
+      productFeatures = m.productFeatures,
+      itemStringIntMap = itemStringIntMap,
+      items = items)
   }
 
   def predict(model: ALSModel, query: Query): PredictedResult = {
@@ -108,9 +113,10 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
 
     val itemScores = topScores.map {
       case (i, s) ⇒
-        new ItemScore(item = model.itemIntStringMap(i),
-                      score = s,
-                      creationYear = model.items(i).creationYear)
+        new ItemScore(
+          item = model.itemIntStringMap(i),
+          score = s,
+          creationYear = model.items(i).creationYear)
     }
 
     new PredictedResult(itemScores)

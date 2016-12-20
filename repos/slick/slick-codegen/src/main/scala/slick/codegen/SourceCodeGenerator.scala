@@ -76,11 +76,12 @@ object SourceCodeGenerator {
       .get(null)
       .asInstanceOf[JdbcProfile]
     val dbFactory = profileInstance.api.Database
-    val db = dbFactory.forURL(url,
-                              driver = jdbcDriver,
-                              user = user.getOrElse(null),
-                              password = password.getOrElse(null),
-                              keepAliveConnection = true)
+    val db = dbFactory.forURL(
+      url,
+      driver = jdbcDriver,
+      user = user.getOrElse(null),
+      password = password.getOrElse(null),
+      keepAliveConnection = true)
     try {
       val m = Await.result(
         db.run(
@@ -121,23 +122,25 @@ object SourceCodeGenerator {
       case profile :: jdbcDriver :: url :: outputDir :: pkg :: Nil =>
         run(profile, jdbcDriver, url, outputDir, pkg, None, None, true)
       case profile :: jdbcDriver :: url :: outputDir :: pkg :: user :: password :: Nil =>
-        run(profile,
-            jdbcDriver,
-            url,
-            outputDir,
-            pkg,
-            Some(user),
-            Some(password),
-            true)
+        run(
+          profile,
+          jdbcDriver,
+          url,
+          outputDir,
+          pkg,
+          Some(user),
+          Some(password),
+          true)
       case profile :: jdbcDriver :: url :: outputDir :: pkg :: user :: password :: ignoreInvalidDefaults :: Nil =>
-        run(profile,
-            jdbcDriver,
-            url,
-            outputDir,
-            pkg,
-            Some(user),
-            Some(password),
-            ignoreInvalidDefaults.toBoolean)
+        run(
+          profile,
+          jdbcDriver,
+          url,
+          outputDir,
+          pkg,
+          Some(user),
+          Some(password),
+          ignoreInvalidDefaults.toBoolean)
       case _ => {
         println(
           """

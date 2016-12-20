@@ -107,125 +107,139 @@ class SQLQuerySuite
 
   test("SPARK-6851: Self-joined converted parquet tables") {
     val orders = Seq(
-      Order(1,
-            "Atlas",
-            "MTB",
-            234,
-            "2015-01-07",
-            "John D",
-            "Pacifica",
-            "CA",
-            20151),
-      Order(3,
-            "Swift",
-            "MTB",
-            285,
-            "2015-01-17",
-            "John S",
-            "Redwood City",
-            "CA",
-            20151),
-      Order(4,
-            "Atlas",
-            "Hybrid",
-            303,
-            "2015-01-23",
-            "Jones S",
-            "San Mateo",
-            "CA",
-            20151),
-      Order(7,
-            "Next",
-            "MTB",
-            356,
-            "2015-01-04",
-            "Jane D",
-            "Daly City",
-            "CA",
-            20151),
-      Order(10,
-            "Next",
-            "YFlikr",
-            187,
-            "2015-01-09",
-            "John D",
-            "Fremont",
-            "CA",
-            20151),
-      Order(11,
-            "Swift",
-            "YFlikr",
-            187,
-            "2015-01-23",
-            "John D",
-            "Hayward",
-            "CA",
-            20151),
-      Order(2,
-            "Next",
-            "Hybrid",
-            324,
-            "2015-02-03",
-            "Jane D",
-            "Daly City",
-            "CA",
-            20152),
-      Order(5,
-            "Next",
-            "Street",
-            187,
-            "2015-02-08",
-            "John D",
-            "Fremont",
-            "CA",
-            20152),
-      Order(6,
-            "Atlas",
-            "Street",
-            154,
-            "2015-02-09",
-            "John D",
-            "Pacifica",
-            "CA",
-            20152),
-      Order(8,
-            "Swift",
-            "Hybrid",
-            485,
-            "2015-02-19",
-            "John S",
-            "Redwood City",
-            "CA",
-            20152),
-      Order(9,
-            "Atlas",
-            "Split",
-            303,
-            "2015-02-28",
-            "Jones S",
-            "San Mateo",
-            "CA",
-            20152)
+      Order(
+        1,
+        "Atlas",
+        "MTB",
+        234,
+        "2015-01-07",
+        "John D",
+        "Pacifica",
+        "CA",
+        20151),
+      Order(
+        3,
+        "Swift",
+        "MTB",
+        285,
+        "2015-01-17",
+        "John S",
+        "Redwood City",
+        "CA",
+        20151),
+      Order(
+        4,
+        "Atlas",
+        "Hybrid",
+        303,
+        "2015-01-23",
+        "Jones S",
+        "San Mateo",
+        "CA",
+        20151),
+      Order(
+        7,
+        "Next",
+        "MTB",
+        356,
+        "2015-01-04",
+        "Jane D",
+        "Daly City",
+        "CA",
+        20151),
+      Order(
+        10,
+        "Next",
+        "YFlikr",
+        187,
+        "2015-01-09",
+        "John D",
+        "Fremont",
+        "CA",
+        20151),
+      Order(
+        11,
+        "Swift",
+        "YFlikr",
+        187,
+        "2015-01-23",
+        "John D",
+        "Hayward",
+        "CA",
+        20151),
+      Order(
+        2,
+        "Next",
+        "Hybrid",
+        324,
+        "2015-02-03",
+        "Jane D",
+        "Daly City",
+        "CA",
+        20152),
+      Order(
+        5,
+        "Next",
+        "Street",
+        187,
+        "2015-02-08",
+        "John D",
+        "Fremont",
+        "CA",
+        20152),
+      Order(
+        6,
+        "Atlas",
+        "Street",
+        154,
+        "2015-02-09",
+        "John D",
+        "Pacifica",
+        "CA",
+        20152),
+      Order(
+        8,
+        "Swift",
+        "Hybrid",
+        485,
+        "2015-02-19",
+        "John S",
+        "Redwood City",
+        "CA",
+        20152),
+      Order(
+        9,
+        "Atlas",
+        "Split",
+        303,
+        "2015-02-28",
+        "Jones S",
+        "San Mateo",
+        "CA",
+        20152)
     )
 
-    val orderUpdates = Seq(Order(1,
-                                 "Atlas",
-                                 "MTB",
-                                 434,
-                                 "2015-01-07",
-                                 "John D",
-                                 "Pacifica",
-                                 "CA",
-                                 20151),
-                           Order(11,
-                                 "Swift",
-                                 "YFlikr",
-                                 137,
-                                 "2015-01-23",
-                                 "John D",
-                                 "Hayward",
-                                 "CA",
-                                 20151))
+    val orderUpdates = Seq(
+      Order(
+        1,
+        "Atlas",
+        "MTB",
+        434,
+        "2015-01-07",
+        "John D",
+        "Pacifica",
+        "CA",
+        20151),
+      Order(
+        11,
+        "Swift",
+        "YFlikr",
+        137,
+        "2015-01-23",
+        "John D",
+        "Hayward",
+        "CA",
+        20151))
 
     orders.toDF.registerTempTable("orders1")
     orderUpdates.toDF.registerTempTable("orderupdates1")
@@ -260,7 +274,8 @@ class SQLQuerySuite
     sql(
       "INSERT INTO TABLE orderupdates PARTITION(state, month) SELECT * FROM orderupdates1")
 
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
           |select orders.state, orders.month
           |from orders
           |join (
@@ -270,7 +285,7 @@ class SQLQuerySuite
           |    on orderupdates.id = orders.id) ao
           |  on ao.state = orders.state and ao.month = orders.month
         """.stripMargin),
-                (1 to 6).map(_ => Row("CA", 20151)))
+      (1 to 6).map(_ => Row("CA", 20151)))
   }
 
   test("show functions") {
@@ -292,8 +307,9 @@ class SQLQuerySuite
     checkAnswer(sql("SHOW functions `a function doens't exist`"), Nil)
     checkAnswer(sql("SHOW functions `weekofyea.*`"), Row("weekofyear"))
     // this probably will failed if we add more function with `sha` prefixing.
-    checkAnswer(sql("SHOW functions `sha.*`"),
-                Row("sha") :: Row("sha1") :: Row("sha2") :: Nil)
+    checkAnswer(
+      sql("SHOW functions `sha.*`"),
+      Row("sha") :: Row("sha1") :: Row("sha2") :: Nil)
   }
 
   test("describe functions") {
@@ -317,15 +333,17 @@ class SQLQuerySuite
 
     checkExistence(sql("describe functioN Upper"), false, "Extended Usage")
 
-    checkExistence(sql("describe functioN abcadf"),
-                   true,
-                   "Function: abcadf not found.")
+    checkExistence(
+      sql("describe functioN abcadf"),
+      true,
+      "Function: abcadf not found.")
 
-    checkExistence(sql("describe functioN  `~`"),
-                   true,
-                   "Function: ~",
-                   "Class: org.apache.hadoop.hive.ql.udf.UDFOPBitNot",
-                   "Usage: ~ n - Bitwise not")
+    checkExistence(
+      sql("describe functioN  `~`"),
+      true,
+      "Function: ~",
+      "Class: org.apache.hadoop.hive.ql.udf.UDFOPBitNot",
+      "Usage: ~ n - Bitwise not")
   }
 
   test("SPARK-5371: union with null and sum") {
@@ -385,12 +403,13 @@ class SQLQuerySuite
         "SELECT `a`.`ints` FROM nestedArray LATERAL VIEW explode(a.b) `a` AS `ints`"),
       Row(1) :: Row(2) :: Row(3) :: Nil)
 
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
           |SELECT `weird``tab`.`weird``col`
           |FROM nestedArray
           |LATERAL VIEW explode(a.b) `weird``tab` AS `weird``col`
         """.stripMargin),
-                Row(1) :: Row(2) :: Row(3) :: Nil)
+      Row(1) :: Row(2) :: Row(3) :: Nil)
   }
 
   test(
@@ -514,13 +533,15 @@ class SQLQuerySuite
     checkAnswer(
       sql("SELECT k, value FROM ctas1 ORDER BY k, value"),
       sql("SELECT key, value FROM src ORDER BY key, value").collect().toSeq)
-    checkAnswer(sql("SELECT key, value FROM ctas2 ORDER BY key, value"),
-                sql("""
+    checkAnswer(
+      sql("SELECT key, value FROM ctas2 ORDER BY key, value"),
+      sql("""
           SELECT key, value
           FROM src
           ORDER BY key, value""").collect().toSeq)
-    checkAnswer(sql("SELECT key, value FROM ctas3 ORDER BY key, value"),
-                sql("""
+    checkAnswer(
+      sql("SELECT key, value FROM ctas3 ORDER BY key, value"),
+      sql("""
           SELECT key, value
           FROM src
           ORDER BY key, value""").collect().toSeq)
@@ -529,23 +550,25 @@ class SQLQuerySuite
           | SELECT key, value FROM src ORDER BY key, value""".stripMargin)
         .collect()
     }
-    checkAnswer(sql("SELECT key, value FROM ctas4 ORDER BY key, value"),
-                sql("SELECT key, value FROM ctas4 LIMIT 1").collect().toSeq)
+    checkAnswer(
+      sql("SELECT key, value FROM ctas4 ORDER BY key, value"),
+      sql("SELECT key, value FROM ctas4 LIMIT 1").collect().toSeq)
 
-    checkExistence(sql("DESC EXTENDED ctas2"),
-                   true,
-                   "name:key",
-                   "type:string",
-                   "name:value",
-                   "ctas2",
-                   "org.apache.hadoop.hive.ql.io.RCFileInputFormat",
-                   "org.apache.hadoop.hive.ql.io.RCFileOutputFormat",
-                   "org.apache.hadoop.hive.serde2.columnar.ColumnarSerDe",
-                   "serde_p1=p1",
-                   "serde_p2=p2",
-                   "tbl_p1=p11",
-                   "tbl_p2=p22",
-                   "MANAGED_TABLE")
+    checkExistence(
+      sql("DESC EXTENDED ctas2"),
+      true,
+      "name:key",
+      "type:string",
+      "name:value",
+      "ctas2",
+      "org.apache.hadoop.hive.ql.io.RCFileInputFormat",
+      "org.apache.hadoop.hive.ql.io.RCFileOutputFormat",
+      "org.apache.hadoop.hive.serde2.columnar.ColumnarSerDe",
+      "serde_p1=p1",
+      "serde_p2=p2",
+      "tbl_p1=p11",
+      "tbl_p2=p22",
+      "MANAGED_TABLE")
 
     sql("""CREATE TABLE ctas5
         | STORED AS parquet AS
@@ -569,10 +592,11 @@ class SQLQuerySuite
 
     // use the Hive SerDe for parquet tables
     withSQLConf(HiveContext.CONVERT_METASTORE_PARQUET.key -> "false") {
-      checkAnswer(sql("SELECT key, value FROM ctas5 ORDER BY key, value"),
-                  sql("SELECT key, value FROM src ORDER BY key, value")
-                    .collect()
-                    .toSeq)
+      checkAnswer(
+        sql("SELECT key, value FROM ctas5 ORDER BY key, value"),
+        sql("SELECT key, value FROM src ORDER BY key, value")
+          .collect()
+          .toSeq)
     }
   }
 
@@ -583,8 +607,9 @@ class SQLQuerySuite
 
     sql(
       "create table gen__tmp(a int, b string) as select key, value from mytable1")
-    checkAnswer(sql("SELECT a, b from gen__tmp"),
-                sql("select key, value from mytable1").collect())
+    checkAnswer(
+      sql("SELECT a, b from gen__tmp"),
+      sql("select key, value from mytable1").collect())
     sql("DROP TABLE gen__tmp")
 
     sql(
@@ -626,8 +651,9 @@ class SQLQuerySuite
   }
 
   test("ordering not in agg") {
-    checkAnswer(sql("SELECT key FROM src GROUP BY key, value ORDER BY value"),
-                sql("""
+    checkAnswer(
+      sql("SELECT key FROM src GROUP BY key, value ORDER BY value"),
+      sql("""
         SELECT key
         FROM (
           SELECT key, value
@@ -644,8 +670,9 @@ class SQLQuerySuite
     checkAnswer(sql("SELECT f1.f2.f3 FROM nested"), Row(1))
 
     sql("CREATE TABLE test_ctas_1234 AS SELECT * from nested")
-    checkAnswer(sql("SELECT * FROM test_ctas_1234"),
-                sql("SELECT * FROM nested").collect().toSeq)
+    checkAnswer(
+      sql("SELECT * FROM test_ctas_1234"),
+      sql("SELECT * FROM nested").collect().toSeq)
 
     intercept[AnalysisException] {
       sql("CREATE TABLE test_ctas_1234 AS SELECT * from notexists").collect()
@@ -654,8 +681,9 @@ class SQLQuerySuite
 
   test("test CTAS") {
     sql("CREATE TABLE test_ctas_123 AS SELECT key, value FROM src")
-    checkAnswer(sql("SELECT key, value FROM test_ctas_123 ORDER BY key"),
-                sql("SELECT key, value FROM src ORDER BY key").collect().toSeq)
+    checkAnswer(
+      sql("SELECT key, value FROM test_ctas_123 ORDER BY key"),
+      sql("SELECT key, value FROM src ORDER BY key").collect().toSeq)
   }
 
   test("SPARK-4825 save join to table") {
@@ -678,33 +706,39 @@ class SQLQuerySuite
   }
 
   test("SPARK-3708 Backticks aren't handled correctly is aliases") {
-    checkAnswer(sql("SELECT k FROM (SELECT `key` AS `k` FROM src) a"),
-                sql("SELECT `key` FROM src").collect().toSeq)
+    checkAnswer(
+      sql("SELECT k FROM (SELECT `key` AS `k` FROM src) a"),
+      sql("SELECT `key` FROM src").collect().toSeq)
   }
 
   test("SPARK-3834 Backticks not correctly handled in subquery aliases") {
-    checkAnswer(sql("SELECT a.key FROM (SELECT key FROM src) `a`"),
-                sql("SELECT `key` FROM src").collect().toSeq)
+    checkAnswer(
+      sql("SELECT a.key FROM (SELECT key FROM src) `a`"),
+      sql("SELECT `key` FROM src").collect().toSeq)
   }
 
   test("SPARK-3814 Support Bitwise & operator") {
-    checkAnswer(sql("SELECT case when 1&1=1 then 1 else 0 end FROM src"),
-                sql("SELECT 1 FROM src").collect().toSeq)
+    checkAnswer(
+      sql("SELECT case when 1&1=1 then 1 else 0 end FROM src"),
+      sql("SELECT 1 FROM src").collect().toSeq)
   }
 
   test("SPARK-3814 Support Bitwise | operator") {
-    checkAnswer(sql("SELECT case when 1|0=1 then 1 else 0 end FROM src"),
-                sql("SELECT 1 FROM src").collect().toSeq)
+    checkAnswer(
+      sql("SELECT case when 1|0=1 then 1 else 0 end FROM src"),
+      sql("SELECT 1 FROM src").collect().toSeq)
   }
 
   test("SPARK-3814 Support Bitwise ^ operator") {
-    checkAnswer(sql("SELECT case when 1^0=1 then 1 else 0 end FROM src"),
-                sql("SELECT 1 FROM src").collect().toSeq)
+    checkAnswer(
+      sql("SELECT case when 1^0=1 then 1 else 0 end FROM src"),
+      sql("SELECT 1 FROM src").collect().toSeq)
   }
 
   test("SPARK-3814 Support Bitwise ~ operator") {
-    checkAnswer(sql("SELECT case when ~1=-2 then 1 else 0 end FROM src"),
-                sql("SELECT 1 FROM src").collect().toSeq)
+    checkAnswer(
+      sql("SELECT case when ~1=-2 then 1 else 0 end FROM src"),
+      sql("SELECT 1 FROM src").collect().toSeq)
   }
 
   test(
@@ -727,33 +761,34 @@ class SQLQuerySuite
       .sample(withReplacement = false, fraction = 0.3)
       .registerTempTable("sampled")
     (1 to 10).foreach { i =>
-      checkAnswer(sql("SELECT * FROM sampled WHERE key % 2 = 1"),
-                  Seq.empty[Row])
+      checkAnswer(
+        sql("SELECT * FROM sampled WHERE key % 2 = 1"),
+        Seq.empty[Row])
     }
   }
 
   test("SPARK-4699 HiveContext should be case insensitive by default") {
-    checkAnswer(sql("SELECT KEY FROM Src ORDER BY value"),
-                sql("SELECT key FROM src ORDER BY value").collect().toSeq)
+    checkAnswer(
+      sql("SELECT KEY FROM Src ORDER BY value"),
+      sql("SELECT key FROM src ORDER BY value").collect().toSeq)
   }
 
   test(
     "SPARK-5284 Insert into Hive throws NPE when a inner complex type field has a null value") {
     val schema =
       StructType(
-        StructField("s",
-                    StructType(
-                      StructField("innerStruct",
-                                  StructType(StructField(
-                                    "s1",
-                                    StringType,
-                                    true) :: Nil)) :: StructField(
-                        "innerArray",
-                        ArrayType(IntegerType),
-                        true) :: StructField(
-                        "innerMap",
-                        MapType(StringType, IntegerType)) :: Nil),
-                    true) :: Nil)
+        StructField(
+          "s",
+          StructType(
+            StructField(
+              "innerStruct",
+              StructType(StructField("s1", StringType, true) :: Nil)) :: StructField(
+              "innerArray",
+              ArrayType(IntegerType),
+              true) :: StructField(
+              "innerMap",
+              MapType(StringType, IntegerType)) :: Nil),
+          true) :: Nil)
     val row = Row(Row(null, null, null))
 
     val rowRdd = sparkContext.parallelize(row :: Nil)
@@ -792,8 +827,9 @@ class SQLQuerySuite
     dropTempTable("data")
 
     read.json(rdd).registerTempTable("data")
-    checkAnswer(sql("SELECT year(c) + 1 FROM data GROUP BY year(c) + 1"),
-                Row(1971))
+    checkAnswer(
+      sql("SELECT year(c) + 1 FROM data GROUP BY year(c) + 1"),
+      Row(1971))
 
     dropTempTable("data")
   }
@@ -810,10 +846,12 @@ class SQLQuerySuite
     val rdd =
       sparkContext.makeRDD((1 to 2).map(i => s"""{"a":[$i, ${i + 1}]}"""))
     read.json(rdd).registerTempTable("data")
-    checkAnswer(sql("SELECT explode(map(1, 1)) FROM data LIMIT 1"),
-                Row(1, 1) :: Nil)
-    checkAnswer(sql("SELECT explode(map(1, 1)) as (k1, k2) FROM data LIMIT 1"),
-                Row(1, 1) :: Nil)
+    checkAnswer(
+      sql("SELECT explode(map(1, 1)) FROM data LIMIT 1"),
+      Row(1, 1) :: Nil)
+    checkAnswer(
+      sql("SELECT explode(map(1, 1)) as (k1, k2) FROM data LIMIT 1"),
+      Row(1, 1) :: Nil)
     intercept[AnalysisException] {
       sql("SELECT explode(map(1, 1)) as k1 FROM data LIMIT 1")
     }
@@ -827,8 +865,9 @@ class SQLQuerySuite
   test("TGF with non-TGF in projection") {
     val rdd = sparkContext.makeRDD("""{"a": "1", "b":"1"}""" :: Nil)
     read.json(rdd).registerTempTable("data")
-    checkAnswer(sql("SELECT explode(map(a, b)) as (k1, k2), a, b FROM data"),
-                Row("1", "1", "1", "1") :: Nil)
+    checkAnswer(
+      sql("SELECT explode(map(a, b)) as (k1, k2), a, b FROM data"),
+      Row("1", "1", "1", "1") :: Nil)
   }
 
   test(
@@ -1042,19 +1081,20 @@ class SQLQuerySuite
         (6, "c", 10, 51)
       ).map(i => Row(i._1, i._2, i._3, i._4)))
 
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
           |select month, area, product, sum(product)
           |over (partition by month % 2 order by 10 - product)
           |from windowData
         """.stripMargin),
-                Seq(
-                  (1, "a", 5, 21),
-                  (2, "a", 6, 24),
-                  (3, "b", 7, 16),
-                  (4, "b", 8, 18),
-                  (5, "c", 9, 9),
-                  (6, "c", 10, 10)
-                ).map(i => Row(i._1, i._2, i._3, i._4)))
+      Seq(
+        (1, "a", 5, 21),
+        (2, "a", 6, 24),
+        (3, "b", 7, 16),
+        (4, "b", 8, 18),
+        (5, "c", 9, 9),
+        (6, "c", 10, 10)
+      ).map(i => Row(i._1, i._2, i._3, i._4)))
   }
 
   test("window function: distinct should not be silently ignored") {
@@ -1109,9 +1149,10 @@ class SQLQuerySuite
     withTempTable("data") {
       sqlContext
         .range(1, 5)
-        .select(array($"id", $"id" + 1).as("a"),
-                $"id".as("b"),
-                (lit(10) - $"id").as("c"))
+        .select(
+          array($"id", $"id" + 1).as("a"),
+          $"id".as("b"),
+          (lit(10) - $"id").as("c"))
         .registerTempTable("data")
 
       // case 1: missing sort columns are resolvable if join is true
@@ -1121,8 +1162,9 @@ class SQLQuerySuite
         Row(1, 1) :: Row(2, 1) :: Nil)
 
       // case 2: missing sort columns are resolvable if join is false
-      checkAnswer(sql("SELECT explode(a) AS val FROM data order by val, c"),
-                  Seq(1, 2, 2, 3, 3, 4, 4, 5).map(i => Row(i)))
+      checkAnswer(
+        sql("SELECT explode(a) AS val FROM data order by val, c"),
+        Seq(1, 2, 2, 3, 3, 4, 4, 5).map(i => Row(i)))
 
       // case 3: missing sort columns are resolvable if join is true and outer is true
       checkAnswer(
@@ -1212,19 +1254,20 @@ class SQLQuerySuite
     )
     sparkContext.parallelize(data).toDF().registerTempTable("windowData")
 
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
           |select area, sum(product) over () as c from windowData
           |where product > 3 group by area, product
           |having avg(month) > 0 order by avg(month), product
         """.stripMargin),
-                Seq(
-                  ("a", 51),
-                  ("b", 51),
-                  ("b", 51),
-                  ("c", 51),
-                  ("c", 51),
-                  ("d", 51)
-                ).map(i => Row(i._1, i._2)))
+      Seq(
+        ("a", 51),
+        ("b", 51),
+        ("b", 51),
+        ("c", 51),
+        ("c", 51),
+        ("d", 51)
+      ).map(i => Row(i._1, i._2)))
   }
 
   test("window function: multiple window expressions in a single expression") {
@@ -1320,13 +1363,15 @@ class SQLQuerySuite
   }
 
   test("Cast STRING to BIGINT") {
-    checkAnswer(sql("SELECT CAST('775983671874188101' as BIGINT)"),
-                Row(775983671874188101L))
+    checkAnswer(
+      sql("SELECT CAST('775983671874188101' as BIGINT)"),
+      Row(775983671874188101L))
   }
 
   // `Math.exp(1.0)` has different result for different jdk version, so not use createQueryTest
   test("udf_java_method") {
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
         |SELECT java_method("java.lang.String", "valueOf", 1),
         |       java_method("java.lang.String", "isEmpty"),
         |       java_method("java.lang.Math", "max", 2, 3),
@@ -1336,13 +1381,14 @@ class SQLQuerySuite
         |       java_method("java.lang.Math", "floor", 1.9D)
         |FROM src tablesample (1 rows)
       """.stripMargin),
-                Row("1",
-                    "true",
-                    java.lang.Math.max(2, 3).toString,
-                    java.lang.Math.min(2, 3).toString,
-                    java.lang.Math.round(2.5).toString,
-                    java.lang.Math.exp(1.0).toString,
-                    java.lang.Math.floor(1.9).toString))
+      Row(
+        "1",
+        "true",
+        java.lang.Math.max(2, 3).toString,
+        java.lang.Math.min(2, 3).toString,
+        java.lang.Math.round(2.5).toString,
+        java.lang.Math.exp(1.0).toString,
+        java.lang.Math.floor(1.9).toString))
   }
 
   test("dynamic partition value test") {
@@ -1355,8 +1401,9 @@ class SQLQuerySuite
           |insert into table dynparttest1 partition(pdate)
           | select count(*), cast('2015-05-21' as date) as pdate from src
         """.stripMargin)
-      checkAnswer(sql("select * from dynparttest1"),
-                  Seq(Row(500, java.sql.Date.valueOf("2015-05-21"))))
+      checkAnswer(
+        sql("select * from dynparttest1"),
+        Seq(Row(500, java.sql.Date.valueOf("2015-05-21"))))
 
       // decimal
       sql("drop table if exists dynparttest2")
@@ -1366,8 +1413,9 @@ class SQLQuerySuite
           |insert into table dynparttest2 partition(pdec)
           | select count(*), cast('100.12' as decimal(5, 1)) as pdec from src
         """.stripMargin)
-      checkAnswer(sql("select * from dynparttest2"),
-                  Seq(Row(500, new java.math.BigDecimal("100.1"))))
+      checkAnswer(
+        sql("select * from dynparttest2"),
+        Seq(Row(500, new java.math.BigDecimal("100.1"))))
     } finally {
       sql("drop table if exists dynparttest1")
       sql("drop table if exists dynparttest2")
@@ -1421,11 +1469,12 @@ class SQLQuerySuite
           | CAST(CAST(CAST('1970-01-01 23:00:00' AS timestamp) AS date) AS timestamp)
           | FROM src LIMIT 1
         """.stripMargin),
-      Row(Date.valueOf("1969-12-31"),
-          String.valueOf("1969-12-31"),
-          Timestamp.valueOf("1969-12-31 16:00:00"),
-          String.valueOf("1969-12-31 16:00:00"),
-          Timestamp.valueOf("1970-01-01 00:00:00")))
+      Row(
+        Date.valueOf("1969-12-31"),
+        String.valueOf("1969-12-31"),
+        Timestamp.valueOf("1969-12-31 16:00:00"),
+        String.valueOf("1969-12-31 16:00:00"),
+        Timestamp.valueOf("1970-01-01 00:00:00")))
   }
 
   test("SPARK-8588 HiveTypeCoercion.inConversion fires too early") {
@@ -1455,23 +1504,30 @@ class SQLQuerySuite
   }
 
   test("Convert hive interval term into Literal of CalendarIntervalType") {
-    checkAnswer(sql("select interval '10-9' year to month"),
-                Row(CalendarInterval.fromString("interval 10 years 9 months")))
-    checkAnswer(sql("select interval '20 15:40:32.99899999' day to second"),
-                Row(
-                  CalendarInterval.fromString(
-                    "interval 2 weeks 6 days 15 hours 40 minutes " +
-                      "32 seconds 99 milliseconds 899 microseconds")))
-    checkAnswer(sql("select interval '30' year"),
-                Row(CalendarInterval.fromString("interval 30 years")))
-    checkAnswer(sql("select interval '25' month"),
-                Row(CalendarInterval.fromString("interval 25 months")))
-    checkAnswer(sql("select interval '-100' day"),
-                Row(CalendarInterval.fromString("interval -14 weeks -2 days")))
-    checkAnswer(sql("select interval '40' hour"),
-                Row(CalendarInterval.fromString("interval 1 days 16 hours")))
-    checkAnswer(sql("select interval '80' minute"),
-                Row(CalendarInterval.fromString("interval 1 hour 20 minutes")))
+    checkAnswer(
+      sql("select interval '10-9' year to month"),
+      Row(CalendarInterval.fromString("interval 10 years 9 months")))
+    checkAnswer(
+      sql("select interval '20 15:40:32.99899999' day to second"),
+      Row(
+        CalendarInterval.fromString(
+          "interval 2 weeks 6 days 15 hours 40 minutes " +
+            "32 seconds 99 milliseconds 899 microseconds")))
+    checkAnswer(
+      sql("select interval '30' year"),
+      Row(CalendarInterval.fromString("interval 30 years")))
+    checkAnswer(
+      sql("select interval '25' month"),
+      Row(CalendarInterval.fromString("interval 25 months")))
+    checkAnswer(
+      sql("select interval '-100' day"),
+      Row(CalendarInterval.fromString("interval -14 weeks -2 days")))
+    checkAnswer(
+      sql("select interval '40' hour"),
+      Row(CalendarInterval.fromString("interval 1 days 16 hours")))
+    checkAnswer(
+      sql("select interval '80' minute"),
+      Row(CalendarInterval.fromString("interval 1 hour 20 minutes")))
     checkAnswer(
       sql("select interval '299.889987299' second"),
       Row(
@@ -1574,21 +1630,23 @@ class SQLQuerySuite
           "CREATE TABLE test10741(c1 STRING, c2 INT) STORED AS PARQUET AS SELECT * FROM src")
       }
 
-      checkAnswer(sql("""
+      checkAnswer(
+        sql("""
           |SELECT c1, AVG(c2) AS c_avg
           |FROM test10741
           |GROUP BY c1
           |HAVING (AVG(c2) > 5) ORDER BY c1
         """.stripMargin),
-                  Row("a", 7.0) :: Row("b", 6.0) :: Nil)
+        Row("a", 7.0) :: Row("b", 6.0) :: Nil)
 
-      checkAnswer(sql("""
+      checkAnswer(
+        sql("""
           |SELECT c1, AVG(c2) AS c_avg
           |FROM test10741
           |GROUP BY c1
           |ORDER BY AVG(c2)
         """.stripMargin),
-                  Row("b", 6.0) :: Row("a", 7.0) :: Nil)
+        Row("b", 6.0) :: Row("a", 7.0) :: Nil)
     }
   }
 
@@ -1617,8 +1675,9 @@ class SQLQuerySuite
             |COMMENT 'blabla'
             |TBLPROPERTIES ('a' = 'b')
             |AS SELECT * FROM jt""".stripMargin)
-        checkAnswer(sql("SELECT c1, c2 FROM testView ORDER BY c1"),
-                    (1 to 9).map(i => Row(i, i)))
+        checkAnswer(
+          sql("SELECT c1, c2 FROM testView ORDER BY c1"),
+          (1 to 9).map(i => Row(i, i)))
         sql("DROP VIEW testView")
       }
     }
@@ -1635,8 +1694,9 @@ class SQLQuerySuite
         sql("CREATE VIEW IF NOT EXISTS testView AS SELECT * FROM jt2")
 
         // make sure our view doesn't change.
-        checkAnswer(sql("SELECT * FROM testView ORDER BY id"),
-                    (1 to 9).map(i => Row(i)))
+        checkAnswer(
+          sql("SELECT * FROM testView ORDER BY id"),
+          (1 to 9).map(i => Row(i)))
         sql("DROP VIEW testView")
       }
     }
@@ -1646,20 +1706,23 @@ class SQLQuerySuite
     val prefix =
       (if (enabled) "With" else "Without") + " canonical native view: "
     test(s"$prefix correctly handle CREATE OR REPLACE VIEW") {
-      withSQLConf(SQLConf.NATIVE_VIEW.key -> "true",
-                  SQLConf.CANONICAL_NATIVE_VIEW.key -> enabled.toString) {
+      withSQLConf(
+        SQLConf.NATIVE_VIEW.key -> "true",
+        SQLConf.CANONICAL_NATIVE_VIEW.key -> enabled.toString) {
         withTable("jt", "jt2") {
           sqlContext.range(1, 10).write.format("json").saveAsTable("jt")
           sql("CREATE OR REPLACE VIEW testView AS SELECT id FROM jt")
-          checkAnswer(sql("SELECT * FROM testView ORDER BY id"),
-                      (1 to 9).map(i => Row(i)))
+          checkAnswer(
+            sql("SELECT * FROM testView ORDER BY id"),
+            (1 to 9).map(i => Row(i)))
 
           val df = (1 until 10).map(i => i -> i).toDF("i", "j")
           df.write.format("json").saveAsTable("jt2")
           sql("CREATE OR REPLACE VIEW testView AS SELECT * FROM jt2")
           // make sure the view has been changed.
-          checkAnswer(sql("SELECT * FROM testView ORDER BY i"),
-                      (1 to 9).map(i => Row(i, i)))
+          checkAnswer(
+            sql("SELECT * FROM testView ORDER BY i"),
+            (1 to 9).map(i => Row(i, i)))
 
           sql("DROP VIEW testView")
 
@@ -1672,8 +1735,9 @@ class SQLQuerySuite
     }
 
     test(s"$prefix correctly handle ALTER VIEW") {
-      withSQLConf(SQLConf.NATIVE_VIEW.key -> "true",
-                  SQLConf.CANONICAL_NATIVE_VIEW.key -> enabled.toString) {
+      withSQLConf(
+        SQLConf.NATIVE_VIEW.key -> "true",
+        SQLConf.CANONICAL_NATIVE_VIEW.key -> enabled.toString) {
         withTable("jt", "jt2") {
           withView("testView") {
             sqlContext.range(1, 10).write.format("json").saveAsTable("jt")
@@ -1683,8 +1747,9 @@ class SQLQuerySuite
             df.write.format("json").saveAsTable("jt2")
             sql("ALTER VIEW testView AS SELECT * FROM jt2")
             // make sure the view has been changed.
-            checkAnswer(sql("SELECT * FROM testView ORDER BY i"),
-                        (1 to 9).map(i => Row(i, i)))
+            checkAnswer(
+              sql("SELECT * FROM testView ORDER BY i"),
+              (1 to 9).map(i => Row(i, i)))
           }
         }
       }
@@ -1692,14 +1757,16 @@ class SQLQuerySuite
 
     test(s"$prefix create hive view for json table") {
       // json table is not hive-compatible, make sure the new flag fix it.
-      withSQLConf(SQLConf.NATIVE_VIEW.key -> "true",
-                  SQLConf.CANONICAL_NATIVE_VIEW.key -> enabled.toString) {
+      withSQLConf(
+        SQLConf.NATIVE_VIEW.key -> "true",
+        SQLConf.CANONICAL_NATIVE_VIEW.key -> enabled.toString) {
         withTable("jt") {
           withView("testView") {
             sqlContext.range(1, 10).write.format("json").saveAsTable("jt")
             sql("CREATE VIEW testView AS SELECT id FROM jt")
-            checkAnswer(sql("SELECT * FROM testView ORDER BY id"),
-                        (1 to 9).map(i => Row(i)))
+            checkAnswer(
+              sql("SELECT * FROM testView ORDER BY id"),
+              (1 to 9).map(i => Row(i)))
           }
         }
       }
@@ -1707,8 +1774,9 @@ class SQLQuerySuite
 
     test(s"$prefix create hive view for partitioned parquet table") {
       // partitioned parquet table is not hive-compatible, make sure the new flag fix it.
-      withSQLConf(SQLConf.NATIVE_VIEW.key -> "true",
-                  SQLConf.CANONICAL_NATIVE_VIEW.key -> enabled.toString) {
+      withSQLConf(
+        SQLConf.NATIVE_VIEW.key -> "true",
+        SQLConf.CANONICAL_NATIVE_VIEW.key -> enabled.toString) {
         withTable("parTable") {
           withView("testView") {
             val df = Seq(1 -> "a").toDF("i", "j")
@@ -1722,8 +1790,9 @@ class SQLQuerySuite
   }
 
   test("CTE within view") {
-    withSQLConf(SQLConf.NATIVE_VIEW.key -> "true",
-                SQLConf.CANONICAL_NATIVE_VIEW.key -> "true") {
+    withSQLConf(
+      SQLConf.NATIVE_VIEW.key -> "true",
+      SQLConf.CANONICAL_NATIVE_VIEW.key -> "true") {
       withView("cte_view") {
         sql(
           "CREATE VIEW cte_view AS WITH w AS (SELECT 1 AS n) SELECT n FROM w")
@@ -1733,20 +1802,23 @@ class SQLQuerySuite
   }
 
   test("Using view after switching current database") {
-    withSQLConf(SQLConf.NATIVE_VIEW.key -> "true",
-                SQLConf.CANONICAL_NATIVE_VIEW.key -> "true") {
+    withSQLConf(
+      SQLConf.NATIVE_VIEW.key -> "true",
+      SQLConf.CANONICAL_NATIVE_VIEW.key -> "true") {
       withView("v") {
         sql("CREATE VIEW v AS SELECT * FROM src")
         withTempDatabase { db =>
           activateDatabase(db) {
             // Should look up table `src` in database `default`.
-            checkAnswer(sql("SELECT * FROM default.v"),
-                        sql("SELECT * FROM default.src"))
+            checkAnswer(
+              sql("SELECT * FROM default.v"),
+              sql("SELECT * FROM default.src"))
 
             // The new `src` table shouldn't be scanned.
             sql("CREATE TABLE src(key INT, value STRING)")
-            checkAnswer(sql("SELECT * FROM default.v"),
-                        sql("SELECT * FROM default.src"))
+            checkAnswer(
+              sql("SELECT * FROM default.v"),
+              sql("SELECT * FROM default.src"))
           }
         }
       }
@@ -1754,8 +1826,9 @@ class SQLQuerySuite
   }
 
   test("Using view after adding more columns") {
-    withSQLConf(SQLConf.NATIVE_VIEW.key -> "true",
-                SQLConf.CANONICAL_NATIVE_VIEW.key -> "true") {
+    withSQLConf(
+      SQLConf.NATIVE_VIEW.key -> "true",
+      SQLConf.CANONICAL_NATIVE_VIEW.key -> "true") {
       withTable("add_col") {
         sqlContext.range(10).write.saveAsTable("add_col")
         withView("v") {
@@ -1789,13 +1862,15 @@ class SQLQuerySuite
           .format("json")
           .saveAsTable("jt2")
         sql("CREATE VIEW testView AS SELECT * FROM jt1 JOIN jt2 ON id1 == id2")
-        checkAnswer(sql("SELECT * FROM testView ORDER BY id1"),
-                    (1 to 9).map(i => Row(i, i)))
+        checkAnswer(
+          sql("SELECT * FROM testView ORDER BY id1"),
+          (1 to 9).map(i => Row(i, i)))
 
         val df = (1 until 10).map(i => i -> i).toDF("id1", "newCol")
         df.write.format("json").mode(SaveMode.Overwrite).saveAsTable("jt1")
-        checkAnswer(sql("SELECT * FROM testView ORDER BY id1"),
-                    (1 to 9).map(i => Row(i, i)))
+        checkAnswer(
+          sql("SELECT * FROM testView ORDER BY id1"),
+          (1 to 9).map(i => Row(i, i)))
 
         sql("DROP VIEW testView")
       }
@@ -1950,38 +2025,40 @@ class SQLQuerySuite
         .mode(SaveMode.Append)
         .partitionBy("I")
         .saveAsTable("tbl11453")
-      checkAnswer(sqlContext.read
-                    .table("tbl11453")
-                    .select("i", "j")
-                    .orderBy("i"),
-                  Row("1", "10") :: Row("2", "20") :: Row("3", "30") :: Row(
-                    "4",
-                    "40") :: Nil)
+      checkAnswer(
+        sqlContext.read
+          .table("tbl11453")
+          .select("i", "j")
+          .orderBy("i"),
+        Row("1", "10") :: Row("2", "20") :: Row("3", "30") :: Row("4", "40") :: Nil)
     }
   }
 
   test("SPARK-11590: use native json_tuple in lateral view") {
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
         |SELECT a, b
         |FROM (SELECT '{"f1": "value1", "f2": 12}' json) test
         |LATERAL VIEW json_tuple(json, 'f1', 'f2') jt AS a, b
       """.stripMargin),
-                Row("value1", "12"))
+      Row("value1", "12"))
 
     // we should use `c0`, `c1`... as the name of fields if no alias is provided, to follow hive.
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
         |SELECT c0, c1
         |FROM (SELECT '{"f1": "value1", "f2": 12}' json) test
         |LATERAL VIEW json_tuple(json, 'f1', 'f2') jt
       """.stripMargin),
-                Row("value1", "12"))
+      Row("value1", "12"))
 
     // we can also use `json_tuple` in project list.
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
         |SELECT json_tuple(json, 'f1', 'f2')
         |FROM (SELECT '{"f1": "value1", "f2": 12}' json) test
       """.stripMargin),
-                Row("value1", "12"))
+      Row("value1", "12"))
 
     // we can also mix `json_tuple` with other project expressions.
     checkAnswer(
@@ -2011,8 +2088,9 @@ class SQLQuerySuite
             |WHERE col > 3
           """.stripMargin)
 
-        checkAnswer(sqlContext.table("dest1"),
-                    sql("SELECT id FROM source WHERE id > 3"))
+        checkAnswer(
+          sqlContext.table("dest1"),
+          sql("SELECT id FROM source WHERE id > 3"))
         checkAnswer(
           sqlContext.table("dest2"),
           sql(

@@ -38,13 +38,15 @@ import com.twitter.summingbird.batch.{BatchID, Timestamp}
 object SBChillRegistrar {
 
   def injectionRegistrar[T: Manifest: Codec]: InjectionRegistrar[T] =
-    InjectionRegistrar(manifest[T].runtimeClass.asInstanceOf[Class[T]],
-                       implicitly[Codec[T]])
+    InjectionRegistrar(
+      manifest[T].runtimeClass.asInstanceOf[Class[T]],
+      implicitly[Codec[T]])
 
   def injectionDefaultRegistrar[T: Manifest: Codec]
     : InjectionDefaultRegistrar[T] =
-    InjectionDefaultRegistrar(manifest[T].runtimeClass.asInstanceOf[Class[T]],
-                              implicitly[Codec[T]])
+    InjectionDefaultRegistrar(
+      manifest[T].runtimeClass.asInstanceOf[Class[T]],
+      implicitly[Codec[T]])
 
   def kryoRegClass(clazz: Class[_]*) = { k: Kryo =>
     clazz.filter(k.alreadyRegistered(_)).foreach(k.register(_))
@@ -59,8 +61,9 @@ object SBChillRegistrar {
 
     val defaults = List(
       new ReflectingRegistrar(classOf[BatchID], classOf[BatchIDSerializer]),
-      new ReflectingRegistrar(classOf[Timestamp],
-                              classOf[TimestampSerializer]))
+      new ReflectingRegistrar(
+        classOf[Timestamp],
+        classOf[TimestampSerializer]))
 
     ConfInst.setSerialized(
       kryoConfig,

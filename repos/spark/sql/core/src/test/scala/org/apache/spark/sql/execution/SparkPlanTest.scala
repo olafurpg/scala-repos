@@ -45,10 +45,11 @@ private[sql] abstract class SparkPlanTest extends SparkFunSuite {
                             planFunction: SparkPlan => SparkPlan,
                             expectedAnswer: Seq[Row],
                             sortAnswers: Boolean = true): Unit = {
-    doCheckAnswer(input :: Nil,
-                  (plans: Seq[SparkPlan]) => planFunction(plans.head),
-                  expectedAnswer,
-                  sortAnswers)
+    doCheckAnswer(
+      input :: Nil,
+      (plans: Seq[SparkPlan]) => planFunction(plans.head),
+      expectedAnswer,
+      sortAnswers)
   }
 
   /**
@@ -66,10 +67,11 @@ private[sql] abstract class SparkPlanTest extends SparkFunSuite {
                              planFunction: (SparkPlan, SparkPlan) => SparkPlan,
                              expectedAnswer: Seq[Row],
                              sortAnswers: Boolean = true): Unit = {
-    doCheckAnswer(left :: right :: Nil,
-                  (plans: Seq[SparkPlan]) => planFunction(plans(0), plans(1)),
-                  expectedAnswer,
-                  sortAnswers)
+    doCheckAnswer(
+      left :: right :: Nil,
+      (plans: Seq[SparkPlan]) => planFunction(plans(0), plans(1)),
+      expectedAnswer,
+      sortAnswers)
   }
 
   /**
@@ -85,11 +87,12 @@ private[sql] abstract class SparkPlanTest extends SparkFunSuite {
                               planFunction: Seq[SparkPlan] => SparkPlan,
                               expectedAnswer: Seq[Row],
                               sortAnswers: Boolean = true): Unit = {
-    SparkPlanTest.checkAnswer(input,
-                              planFunction,
-                              expectedAnswer,
-                              sortAnswers,
-                              sqlContext) match {
+    SparkPlanTest.checkAnswer(
+      input,
+      planFunction,
+      expectedAnswer,
+      sortAnswers,
+      sqlContext) match {
       case Some(errorMessage) => fail(errorMessage)
       case None =>
     }
@@ -112,11 +115,12 @@ private[sql] abstract class SparkPlanTest extends SparkFunSuite {
       planFunction: SparkPlan => SparkPlan,
       expectedPlanFunction: SparkPlan => SparkPlan,
       sortAnswers: Boolean = true): Unit = {
-    SparkPlanTest.checkAnswer(input,
-                              planFunction,
-                              expectedPlanFunction,
-                              sortAnswers,
-                              sqlContext) match {
+    SparkPlanTest.checkAnswer(
+      input,
+      planFunction,
+      expectedPlanFunction,
+      sortAnswers,
+      sqlContext) match {
       case Some(errorMessage) => fail(errorMessage)
       case None =>
     }

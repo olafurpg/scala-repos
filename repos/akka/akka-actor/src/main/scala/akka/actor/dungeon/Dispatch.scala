@@ -29,10 +29,11 @@ private[akka] trait Dispatch { this: ActorCell ⇒
 
   @tailrec final def swapMailbox(newMailbox: Mailbox): Mailbox = {
     val oldMailbox = mailbox
-    if (!Unsafe.instance.compareAndSwapObject(this,
-                                              AbstractActorCell.mailboxOffset,
-                                              oldMailbox,
-                                              newMailbox))
+    if (!Unsafe.instance.compareAndSwapObject(
+          this,
+          AbstractActorCell.mailboxOffset,
+          oldMailbox,
+          newMailbox))
       swapMailbox(newMailbox)
     else oldMailbox
   }
@@ -102,9 +103,10 @@ private[akka] trait Dispatch { this: ActorCell ⇒
     // ➡➡➡ NEVER SEND THE SAME SYSTEM MESSAGE OBJECT TO TWO ACTORS ⬅⬅⬅
     val createMessage = Create(
       Some(
-        ActorInitializationException(self,
-                                     "failure while creating ActorCell",
-                                     failure)))
+        ActorInitializationException(
+          self,
+          "failure while creating ActorCell",
+          failure)))
     mailbox.systemEnqueue(self, createMessage)
     this
   }
@@ -121,17 +123,19 @@ private[akka] trait Dispatch { this: ActorCell ⇒
   private def handleException: Catcher[Unit] = {
     case e: InterruptedException ⇒
       system.eventStream.publish(
-        Error(e,
-              self.path.toString,
-              clazz(actor),
-              "interrupted during message send"))
+        Error(
+          e,
+          self.path.toString,
+          clazz(actor),
+          "interrupted during message send"))
       Thread.currentThread.interrupt()
     case NonFatal(e) ⇒
       system.eventStream.publish(
-        Error(e,
-              self.path.toString,
-              clazz(actor),
-              "swallowing exception during message send"))
+        Error(
+          e,
+          self.path.toString,
+          clazz(actor),
+          "swallowing exception during message send"))
   }
 
   // ➡➡➡ NEVER SEND THE SAME SYSTEM MESSAGE OBJECT TO TWO ACTORS ⬅⬅⬅

@@ -104,10 +104,12 @@ abstract class TreeGen extends scala.reflect.internal.TreeGen with TreeDSL {
         1 to numParams map (_ => Bind(tpnme.WILDCARD, EmptyTree)) toList)
   }
   def mkBindForCase(patVar: Symbol, clazz: Symbol, targs: List[Type]): Tree = {
-    Bind(patVar,
-         Typed(Ident(nme.WILDCARD),
-               if (targs.isEmpty) mkAppliedTypeForCase(clazz)
-               else AppliedTypeTree(Ident(clazz), targs map TypeTree)))
+    Bind(
+      patVar,
+      Typed(
+        Ident(nme.WILDCARD),
+        if (targs.isEmpty) mkAppliedTypeForCase(clazz)
+        else AppliedTypeTree(Ident(clazz), targs map TypeTree)))
   }
 
   def wildcardStar(tree: Tree) =
@@ -152,13 +154,15 @@ abstract class TreeGen extends scala.reflect.internal.TreeGen with TreeDSL {
         phase)
     assert(!tree.tpe.isInstanceOf[MethodType], tree)
     assert(!pt.isInstanceOf[MethodType], tree)
-    assert(pt eq pt.normalize,
-           tree + " : " + debugString(pt) + " ~>" + debugString(pt.normalize))
+    assert(
+      pt eq pt.normalize,
+      tree + " : " + debugString(pt) + " ~>" + debugString(pt.normalize))
     atPos(tree.pos) {
-      mkAsInstanceOf(tree,
-                     pt,
-                     any = !phase.next.erasedTypes,
-                     wrapInApply = isAtPhaseAfter(currentRun.uncurryPhase))
+      mkAsInstanceOf(
+        tree,
+        pt,
+        any = !phase.next.erasedTypes,
+        wrapInApply = isAtPhaseAfter(currentRun.uncurryPhase))
     }
   }
 

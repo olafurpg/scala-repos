@@ -24,9 +24,10 @@ class RecipeGlobalRateLimit extends RecipeSpec {
                 tokenRefreshPeriod: FiniteDuration,
                 tokenRefreshAmount: Int): Props =
         Props(
-          new Limiter(maxAvailableTokens,
-                      tokenRefreshPeriod,
-                      tokenRefreshAmount))
+          new Limiter(
+            maxAvailableTokens,
+            tokenRefreshPeriod,
+            tokenRefreshAmount))
     }
 
     class Limiter(val maxAvailableTokens: Int,
@@ -40,10 +41,11 @@ class RecipeGlobalRateLimit extends RecipeSpec {
       private var waitQueue = immutable.Queue.empty[ActorRef]
       private var permitTokens = maxAvailableTokens
       private val replenishTimer =
-        system.scheduler.schedule(initialDelay = tokenRefreshPeriod,
-                                  interval = tokenRefreshPeriod,
-                                  receiver = self,
-                                  ReplenishTokens)
+        system.scheduler.schedule(
+          initialDelay = tokenRefreshPeriod,
+          interval = tokenRefreshPeriod,
+          receiver = self,
+          ReplenishTokens)
 
       override def receive: Receive = open
 

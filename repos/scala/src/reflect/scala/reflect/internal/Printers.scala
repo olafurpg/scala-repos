@@ -83,9 +83,10 @@ trait Printers extends api.Printers { self: SymbolTable =>
     protected def printTypesInfo(tree: Tree) =
       if (printTypes && tree.isTerm && tree.canHaveAttrs)
         comment {
-          print("{",
-                if (tree.tpe eq null) "<null>" else tree.tpe.toString,
-                "}")
+          print(
+            "{",
+            if (tree.tpe eq null) "<null>" else tree.tpe.toString,
+            "}")
         }
 
     def println() = {
@@ -500,8 +501,9 @@ trait Printers extends api.Printers { self: SymbolTable =>
             print(tree.tpe.toString)
           }
 
-        case an @ Annotated(Apply(Select(New(tpt), nme.CONSTRUCTOR), args),
-                            tree) =>
+        case an @ Annotated(
+              Apply(Select(New(tpt), nme.CONSTRUCTOR), args),
+              tree) =>
           def printAnnot() {
             print("@", tpt)
             if (args.nonEmpty) printRow(args, "(", ",", ")")
@@ -832,15 +834,16 @@ trait Printers extends api.Printers { self: SymbolTable =>
               print("class ", printedName(name))
               printTypeParams(tparams)
 
-              val build.SyntacticClassDef(_,
-                                          _,
-                                          _,
-                                          ctorMods,
-                                          vparamss,
-                                          earlyDefs,
-                                          parents,
-                                          selfType,
-                                          body) = cl
+              val build.SyntacticClassDef(
+                _,
+                _,
+                _,
+                ctorMods,
+                vparamss,
+                earlyDefs,
+                parents,
+                selfType,
+                body) = cl
 
               // constructor's modifier
               if (ctorMods.hasFlag(AccessFlags) ||
@@ -868,11 +871,12 @@ trait Printers extends api.Printers { self: SymbolTable =>
           // get trees without default classes and traits (when they are last)
           val printedParents = removeDefaultTypesFromList(clParents)()(
             if (mods.hasFlag(CASE)) defaultTraitsForCase else Nil)
-          print(if (mods.isDeferred)
-                  "<: "
-                else if (printedParents.nonEmpty) " extends "
-                else "",
-                impl)
+          print(
+            if (mods.isDeferred)
+              "<: "
+            else if (printedParents.nonEmpty) " extends "
+            else "",
+            impl)
 
         case pd @ PackageDef(packaged, stats) =>
           packaged match {
@@ -892,9 +896,10 @@ trait Printers extends api.Printers { self: SymbolTable =>
           printModifiers(tree, mods)
           val Template(parents, self, methods) = impl
           val parWithoutAnyRef = removeDefaultClassesFromList(parents)
-          print("object " + printedName(name),
-                if (parWithoutAnyRef.nonEmpty) " extends " else "",
-                impl)
+          print(
+            "object " + printedName(name),
+            if (parWithoutAnyRef.nonEmpty) " extends " else "",
+            impl)
 
         case vd @ ValDef(mods, name, tp, rhs) =>
           printValDef(vd, printedName(name)) {
@@ -1087,10 +1092,13 @@ trait Printers extends api.Printers { self: SymbolTable =>
         case Apply(fun, vargs) =>
           tree match {
             // processing methods ending on colons (x \: list)
-            case Apply(Block(l1 @ List(sVD: ValDef),
-                             a1 @ Apply(Select(_, methodName),
-                                        l2 @ List(Ident(iVDName)))),
-                       l3)
+            case Apply(
+                Block(
+                  l1 @ List(sVD: ValDef),
+                  a1 @ Apply(
+                    Select(_, methodName),
+                    l2 @ List(Ident(iVDName)))),
+                l3)
                 if sVD.mods.isSynthetic && treeInfo.isLeftAssoc(methodName) &&
                   sVD.name == iVDName =>
               val printBlock = Block(l1, Apply(a1, l3))
@@ -1202,11 +1210,12 @@ trait Printers extends api.Printers { self: SymbolTable =>
           printAnnot(ap)
 
         case SelectFromTypeTree(qualifier, selector) =>
-          print("(",
-                qualifier,
-                ")#",
-                blankForOperatorName(selector),
-                printedName(selector))
+          print(
+            "(",
+            qualifier,
+            ")#",
+            blankForOperatorName(selector),
+            printedName(selector))
 
         case tt: TypeTree =>
           if (!isEmptyTree(tt)) {
@@ -1395,9 +1404,10 @@ trait Printers extends api.Printers { self: SymbolTable =>
           if (printOwners) print("@", sym.owner.id)
           if (printKinds) print("#", sym.abbreviatedKindString)
           if (printMirrors)
-            print("%M",
-                  footnotes
-                    .put[scala.reflect.api.Mirror[_]](mirrorThatLoaded(sym)))
+            print(
+              "%M",
+              footnotes
+                .put[scala.reflect.api.Mirror[_]](mirrorThatLoaded(sym)))
         case tag: TypeTag[_] =>
           print("TypeTag(", tag.tpe, ")")
         case tag: WeakTypeTag[_] =>

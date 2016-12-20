@@ -86,10 +86,12 @@ object SexpData {
     if (kvs.isEmpty) SexpNil
     else {
       val mapped = kvs.toMap
-      require(mapped.size == kvs.size,
-              "duplicate keys not allowed: " + mapped.keys)
-      require(mapped.keys.forall(_.value.startsWith(":")),
-              "keys must start with ':' " + mapped.keys)
+      require(
+        mapped.size == kvs.size,
+        "duplicate keys not allowed: " + mapped.keys)
+      require(
+        mapped.keys.forall(_.value.startsWith(":")),
+        "keys must start with ':' " + mapped.keys)
       SexpList(
         kvs.flatMap { case (k, v) => k :: v :: Nil }(breakOut): List[Sexp])
     }

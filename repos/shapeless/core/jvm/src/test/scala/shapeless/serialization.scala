@@ -183,8 +183,9 @@ object SerializationTestDefns {
           icc.pack(
             icc
               .unpack(fa)
-              .fold(hd => Left(icc.fh.map(hd)(f)),
-                    tl => Right(icc.ft.map(tl)(f))))
+              .fold(
+                hd => Left(icc.fh.map(hd)(f)),
+                tl => Right(icc.ft.map(tl)(f))))
       }
 
     implicit def generic[F[_]](
@@ -961,8 +962,9 @@ class SerializationTests {
   @Test
   def testHMap {
     assertSerializable(
-      HMap[(Set ~?> Option)#λ](Set("foo") -> Option("bar"),
-                               Set(23) -> Option(13)))
+      HMap[(Set ~?> Option)#λ](
+        Set("foo") -> Option("bar"),
+        Set(23) -> Option(13)))
     assertSerializable(new (Set ~?> Option))
     assertSerializable(implicitly[(Set ~?> Option)#λ[Set[Int], Option[Int]]])
   }

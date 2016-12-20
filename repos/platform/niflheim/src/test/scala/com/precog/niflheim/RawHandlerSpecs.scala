@@ -96,19 +96,21 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
 
       val segs1 = h.snapshot(None).segments
       segs1 must contain(
-        ArraySegment(blockid,
-                     CPath(".a"),
-                     CNum,
-                     bitset(0, 1, 2),
-                     decs(123, 9999.0, 0)))
+        ArraySegment(
+          blockid,
+          CPath(".a"),
+          CNum,
+          bitset(0, 1, 2),
+          decs(123, 9999.0, 0)))
       segs1 must contain(
         BooleanSegment(blockid, CPath(".b"), bitset(0, 2), bitset(0), 3))
 
       val segs1R = h.snapshotRef(None).segments
       segs1R mustEqual segs1
 
-      h.write(17,
-              json("""
+      h.write(
+        17,
+        json("""
         999
         123.0
         "cat"
@@ -277,16 +279,18 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
       val bs = new BitSet()
       range.foreach(i => bs.set(i))
 
-      val sa = ArraySegment(blockid,
-                            cpa,
-                            CNum,
-                            bs.copy,
-                            range.map(i => BigDecimal(i * 2)).toArray)
-      val sb = ArraySegment(blockid,
-                            cpb,
-                            CNum,
-                            bs.copy,
-                            range.map(i => BigDecimal(i * 3)).toArray)
+      val sa = ArraySegment(
+        blockid,
+        cpa,
+        CNum,
+        bs.copy,
+        range.map(i => BigDecimal(i * 2)).toArray)
+      val sb = ArraySegment(
+        blockid,
+        cpb,
+        CNum,
+        bs.copy,
+        range.map(i => BigDecimal(i * 3)).toArray)
 
       h.snapshot(Some(Set(cpa))).segments must contain(sa)
       h.snapshot(Some(Set(cpb))).segments must contain(sb)
@@ -348,8 +352,9 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
       val a2REmpty = h.snapshotRef(Some(Set(ColumnRef(cpa, CNum)))).segments
       a2REmpty.toSet must_== Set()
 
-      h.write(17,
-              json("""{"a": "qux", "b": "xyz"} {"a": "baz", "b": "bla"}"""))
+      h.write(
+        17,
+        json("""{"a": "qux", "b": "xyz"} {"a": "baz", "b": "bla"}"""))
 
       val struct3 = h.structure
       struct1.toSet must_== Set()
@@ -363,16 +368,19 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
       snap1.toSet must_== Set()
       snap2.toSet must_== Set(
         ArraySegment(blockid, cpa, CString, bitset(0, 1), Array("foo", "bar")))
-      snap3.toSet must_== Set(ArraySegment(blockid,
-                                           cpa,
-                                           CString,
-                                           bitset(0, 1, 2, 3),
-                                           Array("foo", "bar", "qux", "baz")),
-                              ArraySegment(blockid,
-                                           cpb,
-                                           CString,
-                                           bitset(2, 3),
-                                           Array(null, null, "xyz", "bla")))
+      snap3.toSet must_== Set(
+        ArraySegment(
+          blockid,
+          cpa,
+          CString,
+          bitset(0, 1, 2, 3),
+          Array("foo", "bar", "qux", "baz")),
+        ArraySegment(
+          blockid,
+          cpb,
+          CString,
+          bitset(2, 3),
+          Array(null, null, "xyz", "bla")))
       snap3 mustEqual snap3R
 
       val a3 = h.snapshot(Some(Set(cpa))).segments
@@ -383,11 +391,12 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
       a2.toSet must_== Set(
         ArraySegment(blockid, cpa, CString, bitset(0, 1), Array("foo", "bar")))
       a3.toSet must_== Set(
-        ArraySegment(blockid,
-                     cpa,
-                     CString,
-                     bitset(0, 1, 2, 3),
-                     Array("foo", "bar", "qux", "baz")))
+        ArraySegment(
+          blockid,
+          cpa,
+          CString,
+          bitset(0, 1, 2, 3),
+          Array("foo", "bar", "qux", "baz")))
       a3 mustEqual a3R
 
       a3REmpty.toSet must_== Set()

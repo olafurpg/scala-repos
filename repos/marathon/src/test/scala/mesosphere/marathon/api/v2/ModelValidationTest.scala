@@ -30,12 +30,13 @@ class ModelValidationTest
 
   test(
     "A group can not be updated to have more than the configured number of apps") {
-    val group = Group("/".toPath,
-                      Set(
-                        createServicePortApp("/a".toPath, 0),
-                        createServicePortApp("/b".toPath, 0),
-                        createServicePortApp("/c".toPath, 0)
-                      ))
+    val group = Group(
+      "/".toPath,
+      Set(
+        createServicePortApp("/a".toPath, 0),
+        createServicePortApp("/b".toPath, 0),
+        createServicePortApp("/c".toPath, 0)
+      ))
 
     val failedResult = Group.validGroupWithConfig(Some(2)).apply(group)
     failedResult.isFailure should be(true)
@@ -111,13 +112,15 @@ class ModelValidationTest
   test(
     "Validators should not produce 'value' string at the end of description.") {
     val group =
-      Group("/test".toPath,
-            groups =
-              Set(Group("/test/group1".toPath,
-                        Set(AppDefinition("/test/group1/valid".toPath,
-                                          cmd = Some("foo")),
-                            AppDefinition("/test/group1/invalid".toPath))),
-                  Group("/test/group2".toPath)))
+      Group(
+        "/test".toPath,
+        groups = Set(
+          Group(
+            "/test/group1".toPath,
+            Set(
+              AppDefinition("/test/group1/valid".toPath, cmd = Some("foo")),
+              AppDefinition("/test/group1/invalid".toPath))),
+          Group("/test/group2".toPath)))
 
     validate(group) match {
       case Success => fail()

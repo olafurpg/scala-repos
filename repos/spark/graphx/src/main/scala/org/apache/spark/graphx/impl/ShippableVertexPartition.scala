@@ -39,10 +39,11 @@ private[graphx] object ShippableVertexPartition {
   /** Construct a `ShippableVertexPartition` from the given vertices without any routing table. */
   def apply[VD: ClassTag](
       iter: Iterator[(VertexId, VD)]): ShippableVertexPartition[VD] =
-    apply(iter,
-          RoutingTablePartition.empty,
-          null.asInstanceOf[VD],
-          (a, b) => a)
+    apply(
+      iter,
+      RoutingTablePartition.empty,
+      null.asInstanceOf[VD],
+      (a, b) => a)
 
   /**
     * Construct a `ShippableVertexPartition` from the given vertices with the specified routing
@@ -73,10 +74,11 @@ private[graphx] object ShippableVertexPartition {
       map.changeValue(vid, defaultVal, identity)
     }
 
-    new ShippableVertexPartition(map.keySet,
-                                 map._values,
-                                 map.keySet.getBitSet,
-                                 routingTable)
+    new ShippableVertexPartition(
+      map.keySet,
+      map._values,
+      map.keySet.getBitSet,
+      routingTable)
   }
 
   import scala.language.implicitConversions
@@ -171,24 +173,27 @@ private[graphx] class ShippableVertexPartitionOps[VD: ClassTag](
     extends VertexPartitionBaseOps[VD, ShippableVertexPartition](self) {
 
   def withIndex(index: VertexIdToIndexMap): ShippableVertexPartition[VD] = {
-    new ShippableVertexPartition(index,
-                                 self.values,
-                                 self.mask,
-                                 self.routingTable)
+    new ShippableVertexPartition(
+      index,
+      self.values,
+      self.mask,
+      self.routingTable)
   }
 
   def withValues[VD2: ClassTag](
       values: Array[VD2]): ShippableVertexPartition[VD2] = {
-    new ShippableVertexPartition(self.index,
-                                 values,
-                                 self.mask,
-                                 self.routingTable)
+    new ShippableVertexPartition(
+      self.index,
+      values,
+      self.mask,
+      self.routingTable)
   }
 
   def withMask(mask: BitSet): ShippableVertexPartition[VD] = {
-    new ShippableVertexPartition(self.index,
-                                 self.values,
-                                 mask,
-                                 self.routingTable)
+    new ShippableVertexPartition(
+      self.index,
+      self.values,
+      mask,
+      self.routingTable)
   }
 }

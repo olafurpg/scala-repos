@@ -45,8 +45,9 @@ private[spark] class ReliableCheckpointRDD[T: ClassTag](
     sc.broadcast(new SerializableConfiguration(hadoopConf))
 
   // Fail fast if checkpoint directory does not exist
-  require(fs.exists(cpath),
-          s"Checkpoint directory does not exist: $checkpointPath")
+  require(
+    fs.exists(cpath),
+    s"Checkpoint directory does not exist: $checkpointPath")
 
   /**
     * Return the path of the checkpoint directory this RDD reads data from.
@@ -55,8 +56,9 @@ private[spark] class ReliableCheckpointRDD[T: ClassTag](
 
   override val partitioner: Option[Partitioner] = {
     _partitioner.orElse {
-      ReliableCheckpointRDD.readCheckpointedPartitionerFile(context,
-                                                            checkpointPath)
+      ReliableCheckpointRDD.readCheckpointedPartitionerFile(
+        context,
+        checkpointPath)
     }
   }
 
@@ -90,8 +92,9 @@ private[spark] class ReliableCheckpointRDD[T: ClassTag](
     */
   protected override def getPreferredLocations(split: Partition): Seq[String] = {
     val status = fs.getFileStatus(
-      new Path(checkpointPath,
-               ReliableCheckpointRDD.checkpointFileName(split.index)))
+      new Path(
+        checkpointPath,
+        ReliableCheckpointRDD.checkpointFileName(split.index)))
     val locations = fs.getFileBlockLocations(status, 0, status.getLen)
     locations.headOption.toList.flatMap(_.getHosts).filter(_ != "localhost")
   }
@@ -100,8 +103,9 @@ private[spark] class ReliableCheckpointRDD[T: ClassTag](
     * Read the content of the checkpoint file associated with the given partition.
     */
   override def compute(split: Partition, context: TaskContext): Iterator[T] = {
-    val file = new Path(checkpointPath,
-                        ReliableCheckpointRDD.checkpointFileName(split.index))
+    val file = new Path(
+      checkpointPath,
+      ReliableCheckpointRDD.checkpointFileName(split.index))
     ReliableCheckpointRDD.readCheckpointFile(file, broadcastedConf, context)
   }
 }
@@ -141,19 +145,23 @@ private[spark] object ReliableCheckpointRDD extends Logging {
     val broadcastedConf =
       sc.broadcast(new SerializableConfiguration(sc.hadoopConfiguration))
     // TODO: This is expensive because it computes the RDD again unnecessarily (SPARK-8582)
-    sc.runJob(originalRDD,
-              writePartitionToCheckpointFile[T](checkpointDirPath.toString,
-                                                broadcastedConf) _)
+    sc.runJob(
+      originalRDD,
+      writePartitionToCheckpointFile[T](
+        checkpointDirPath.toString,
+        broadcastedConf) _)
 
     if (originalRDD.partitioner.nonEmpty) {
-      writePartitionerToCheckpointDir(sc,
-                                      originalRDD.partitioner.get,
-                                      checkpointDirPath)
+      writePartitionerToCheckpointDir(
+        sc,
+        originalRDD.partitioner.get,
+        checkpointDirPath)
     }
 
-    val newRDD = new ReliableCheckpointRDD[T](sc,
-                                              checkpointDirPath.toString,
-                                              originalRDD.partitioner)
+    val newRDD = new ReliableCheckpointRDD[T](
+      sc,
+      checkpointDirPath.toString,
+      originalRDD.partitioner)
     if (newRDD.partitions.length != originalRDD.partitions.length) {
       throw new SparkException(
         s"Checkpoint RDD $newRDD(${newRDD.partitions.length}) has different " +
@@ -190,11 +198,12 @@ private[spark] object ReliableCheckpointRDD extends Logging {
         fs.create(tempOutputPath, false, bufferSize)
       } else {
         // This is mainly for testing purpose
-        fs.create(tempOutputPath,
-                  false,
-                  bufferSize,
-                  fs.getDefaultReplication(fs.getWorkingDirectory),
-                  blockSize)
+        fs.create(
+          tempOutputPath,
+          false,
+          bufferSize,
+          fs.getDefaultReplication(fs.getWorkingDirectory),
+          blockSize)
       }
     val serializer = env.serializer.newInstance()
     val serializeStream = serializer.serializeStream(fileOutputStream)

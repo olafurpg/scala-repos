@@ -71,8 +71,9 @@ class EdgePartitionSuite extends SparkFunSuite {
       builder.add(e.srcId, e.dstId, e.attr)
     }
     val edgePartition = builder.toEdgePartition
-    val filtered = edgePartition.filter(et => et.srcId == 0,
-                                        (vid, attr) => vid == 0 || vid == 1)
+    val filtered = edgePartition.filter(
+      et => et.srcId == 0,
+      (vid, attr) => vid == 0 || vid == 1)
     assert(
       filtered
         .tripletIterator()
@@ -81,12 +82,13 @@ class EdgePartitionSuite extends SparkFunSuite {
   }
 
   test("groupEdges") {
-    val edges = List(Edge(0, 1, 1),
-                     Edge(1, 2, 2),
-                     Edge(2, 0, 4),
-                     Edge(0, 1, 8),
-                     Edge(1, 2, 16),
-                     Edge(2, 0, 32))
+    val edges = List(
+      Edge(0, 1, 1),
+      Edge(1, 2, 2),
+      Edge(2, 0, 4),
+      Edge(0, 1, 8),
+      Edge(1, 2, 16),
+      Edge(2, 0, 32))
     val groupedEdges = List(Edge(0, 1, 9), Edge(1, 2, 18), Edge(2, 0, 36))
     val builder = new EdgePartitionBuilder[Int, Nothing]
     for (e <- edges) {

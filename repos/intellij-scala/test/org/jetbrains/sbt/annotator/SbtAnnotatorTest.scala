@@ -101,8 +101,9 @@ class SbtAnnotatorTest extends AnnotatorTestBase with MockSbt {
     projectSettings.setModules(
       java.util.Collections.singleton(getModule.getModuleFilePath))
     SbtSystemSettings.getInstance(getProject).linkProject(projectSettings)
-    getModule.setOption(ExternalSystemConstants.ROOT_PROJECT_PATH_KEY,
-                        getProject.getBasePath)
+    getModule.setOption(
+      ExternalSystemConstants.ROOT_PROJECT_PATH_KEY,
+      getProject.getBasePath)
   }
 
   private def addTestFileToModuleSources(): Unit = {
@@ -121,25 +122,29 @@ class SbtAnnotatorTest extends AnnotatorTestBase with MockSbt {
 
 object Expectations {
   val sbt0137 = Seq(
-    Error("object Bar",
-          SbtBundle("sbt.annotation.sbtFileMustContainOnlyExpressions")),
+    Error(
+      "object Bar",
+      SbtBundle("sbt.annotation.sbtFileMustContainOnlyExpressions")),
     Error("null", SbtBundle("sbt.annotation.expectedExpressionType")),
     Error("???", SbtBundle("sbt.annotation.expectedExpressionType")),
     Error(
       "organization",
       SbtBundle("sbt.annotation.expressionMustConform", "SettingKey[String]")),
-    Error("\"some string\"",
-          SbtBundle("sbt.annotation.expressionMustConform", "String"))
+    Error(
+      "\"some string\"",
+      SbtBundle("sbt.annotation.expressionMustConform", "String"))
   )
 
   val sbt013 =
-    sbt0137 :+ Error("version := \"SNAPSHOT\"",
-                     SbtBundle("sbt.annotation.blankLineRequired", "0.13.1"))
+    sbt0137 :+ Error(
+      "version := \"SNAPSHOT\"",
+      SbtBundle("sbt.annotation.blankLineRequired", "0.13.1"))
 
   val sbt012 =
     sbt0137 ++ Seq(
-      Error("version := \"SNAPSHOT\"",
-            SbtBundle("sbt.annotation.blankLineRequired", "0.12.4")),
+      Error(
+        "version := \"SNAPSHOT\"",
+        SbtBundle("sbt.annotation.blankLineRequired", "0.12.4")),
       Error(
         "lazy val foo = project.in(file(\"foo\")).enablePlugins(sbt.plugins.JvmPlugin)",
         SbtBundle("sbt.annotation.sbtFileMustContainOnlyExpressions"))

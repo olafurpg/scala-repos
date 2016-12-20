@@ -60,9 +60,10 @@ abstract class TestResponse(_response: HttpResponse,
     */
   def entityAs[T](unmarshaller: Unmarshaller[T]): T =
     Unmarshal(response)
-      .to(unmarshaller.asInstanceOf[UnmarshallerImpl[T]].scalaUnmarshaller,
-          ec,
-          materializer)
+      .to(
+        unmarshaller.asInstanceOf[UnmarshallerImpl[T]].scalaUnmarshaller,
+        ec,
+        materializer)
       .awaitResult(awaitAtMost)
 
   /**
@@ -138,8 +139,9 @@ abstract class TestResponse(_response: HttpResponse,
     * Assert that a given header instance exists in the response.
     */
   def assertHeaderExists(expected: HttpHeader): TestResponse = {
-    assertTrue(response.headers.exists(_ == expected),
-               s"Header $expected was missing.")
+    assertTrue(
+      response.headers.exists(_ == expected),
+      s"Header $expected was missing.")
     this
   }
 
@@ -148,8 +150,9 @@ abstract class TestResponse(_response: HttpResponse,
     */
   def assertHeaderKindExists(name: String): TestResponse = {
     val lowercased = name.toRootLowerCase
-    assertTrue(response.headers.exists(_.is(lowercased)),
-               s"Expected `$name` header was missing.")
+    assertTrue(
+      response.headers.exists(_.is(lowercased)),
+      s"Expected `$name` header was missing.")
     this
   }
 

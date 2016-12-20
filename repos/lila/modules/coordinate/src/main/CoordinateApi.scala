@@ -17,12 +17,14 @@ final class CoordinateApi(scoreColl: Coll) {
         BSONDocument("_id" -> userId),
         BSONDocument(
           "$push" -> BSONDocument(
-            "white" -> BSONDocument("$each" ->
-                                      (white ?? List(BSONInteger(hits))),
-                                    "$slice" -> -20),
-            "black" -> BSONDocument("$each" ->
-                                      (!white ?? List(BSONInteger(hits))),
-                                    "$slice" -> -20)
+            "white" -> BSONDocument(
+              "$each" ->
+                (white ?? List(BSONInteger(hits))),
+              "$slice" -> -20),
+            "black" -> BSONDocument(
+              "$each" ->
+                (!white ?? List(BSONInteger(hits))),
+              "$slice" -> -20)
           )),
         upsert = true)
       .void

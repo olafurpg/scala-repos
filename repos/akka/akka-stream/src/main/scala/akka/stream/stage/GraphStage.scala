@@ -422,8 +422,9 @@ abstract class GraphStageLogic private[stream] (val inCount: Int,
       elem.asInstanceOf[T]
     } else {
       // Slow path
-      require(isAvailable(in),
-              s"Cannot get element from already empty input port ($in)")
+      require(
+        isAvailable(in),
+        s"Cannot get element from already empty input port ($in)")
       val failed = interpreter.connectionSlots(connection).asInstanceOf[Failed]
       val elem = failed.previousElem.asInstanceOf[T]
       interpreter.connectionSlots(connection) = Failed(failed.ex, Empty)
@@ -759,18 +760,22 @@ abstract class GraphStageLogic private[stream] (val inCount: Int,
       if (isAvailable(out)) {
         push(out, elems.next())
         if (elems.hasNext)
-          setOrAddEmitting(out,
-                           new EmittingIterator(out,
-                                                elems,
-                                                getNonEmittingHandler(out),
-                                                andThen))
+          setOrAddEmitting(
+            out,
+            new EmittingIterator(
+              out,
+              elems,
+              getNonEmittingHandler(out),
+              andThen))
         else andThen()
       } else {
-        setOrAddEmitting(out,
-                         new EmittingIterator(out,
-                                              elems,
-                                              getNonEmittingHandler(out),
-                                              andThen))
+        setOrAddEmitting(
+          out,
+          new EmittingIterator(
+            out,
+            elems,
+            getNonEmittingHandler(out),
+            andThen))
       }
     } else andThen()
 
@@ -961,9 +966,10 @@ abstract class GraphStageLogic private[stream] (val inCount: Int,
   final def getAsyncCallback[T](handler: T ⇒ Unit): AsyncCallback[T] = {
     new AsyncCallback[T] {
       override def invoke(event: T): Unit =
-        interpreter.onAsyncInput(GraphStageLogic.this,
-                                 event,
-                                 handler.asInstanceOf[Any ⇒ Unit])
+        interpreter.onAsyncInput(
+          GraphStageLogic.this,
+          event,
+          handler.asInstanceOf[Any ⇒ Unit])
     }
   }
 

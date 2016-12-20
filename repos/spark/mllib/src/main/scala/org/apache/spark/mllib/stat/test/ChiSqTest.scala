@@ -209,11 +209,12 @@ private[stat] object ChiSqTest extends Logging {
               "Chi-squared statistic undefined for input vectors due" +
                 " to 0.0 values in both observed and expected.")
           } else {
-            return new ChiSqTestResult(0.0,
-                                       size - 1,
-                                       Double.PositiveInfinity,
-                                       PEARSON.name,
-                                       NullHypothesis.goodnessOfFit.toString)
+            return new ChiSqTestResult(
+              0.0,
+              size - 1,
+              Double.PositiveInfinity,
+              PEARSON.name,
+              NullHypothesis.goodnessOfFit.toString)
           }
         }
         if (scale == 1.0) {
@@ -225,11 +226,12 @@ private[stat] object ChiSqTest extends Logging {
     val df = size - 1
     val pValue =
       1.0 - new ChiSquaredDistribution(df).cumulativeProbability(statistic)
-    new ChiSqTestResult(pValue,
-                        df,
-                        statistic,
-                        PEARSON.name,
-                        NullHypothesis.goodnessOfFit.toString)
+    new ChiSqTestResult(
+      pValue,
+      df,
+      statistic,
+      PEARSON.name,
+      NullHypothesis.goodnessOfFit.toString)
   }
 
   /*
@@ -287,19 +289,21 @@ private[stat] object ChiSqTest extends Logging {
     if (df == 0) {
       // 1 column or 1 row. Constant distribution is independent of anything.
       // pValue = 1.0 and statistic = 0.0 in this case.
-      new ChiSqTestResult(1.0,
-                          0,
-                          0.0,
-                          methodName,
-                          NullHypothesis.independence.toString)
+      new ChiSqTestResult(
+        1.0,
+        0,
+        0.0,
+        methodName,
+        NullHypothesis.independence.toString)
     } else {
       val pValue =
         1.0 - new ChiSquaredDistribution(df).cumulativeProbability(statistic)
-      new ChiSqTestResult(pValue,
-                          df,
-                          statistic,
-                          methodName,
-                          NullHypothesis.independence.toString)
+      new ChiSqTestResult(
+        pValue,
+        df,
+        statistic,
+        methodName,
+        NullHypothesis.independence.toString)
     }
   }
 }

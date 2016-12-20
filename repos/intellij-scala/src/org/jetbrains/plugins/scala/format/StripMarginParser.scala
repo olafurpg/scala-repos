@@ -23,8 +23,9 @@ object StripMarginParser extends StringParser {
 
   override def parse(element: PsiElement): Option[Seq[StringPart]] =
     Some(element) collect {
-      case Both(lit: ScInterpolatedStringLiteral,
-                WithStrippedMargin(_, marginChar)) =>
+      case Both(
+          lit: ScInterpolatedStringLiteral,
+          WithStrippedMargin(_, marginChar)) =>
         val parts = InterpolatedStringParser
           .parse(lit, checkStripMargin = false)
           .getOrElse(return None)
@@ -45,16 +46,17 @@ object WithStrippedMargin {
 
   def unapply(literal: ScLiteral): Option[(ScExpression, Char)] = {
     literal.getParent match {
-      case MethodRepr(refExpr: ScReferenceExpression,
-                      Some(lit: ScLiteral),
-                      Some(ref),
-                      Nil)
-          if lit.isMultiLineString && ref.refName == STRIP_MARGIN =>
+      case MethodRepr(
+          refExpr: ScReferenceExpression,
+          Some(lit: ScLiteral),
+          Some(ref),
+          Nil) if lit.isMultiLineString && ref.refName == STRIP_MARGIN =>
         Some(refExpr, '|')
-      case _ childOf(MethodRepr(mc: ScMethodCall,
-                                Some(lit: ScLiteral),
-                                Some(ref),
-                                List(argLit: ScLiteral)))
+      case _ childOf(MethodRepr(
+            mc: ScMethodCall,
+            Some(lit: ScLiteral),
+            Some(ref),
+            List(argLit: ScLiteral)))
           if lit.isMultiLineString && ref.refName == STRIP_MARGIN &&
             argLit.getFirstChild.getNode.getElementType == ScalaTokenTypes.tCHAR =>
         Some(mc, argLit.getValue.asInstanceOf[Char])

@@ -36,10 +36,11 @@ final class JsonView(getLightUser: String => Option[LightUser]) {
     Json.obj("name" -> u.username)
   }
   private implicit val glickoWriter: OWrites[Glicko] = OWrites { p =>
-    Json.obj("rating" -> truncate(p.rating),
-             "deviation" -> truncate(p.deviation),
-             "volatility" -> truncate(p.volatility),
-             "provisional" -> p.provisional)
+    Json.obj(
+      "rating" -> truncate(p.rating),
+      "deviation" -> truncate(p.deviation),
+      "volatility" -> truncate(p.volatility),
+      "provisional" -> p.provisional)
   }
   private implicit val perfWriter: OWrites[Perf] = OWrites { p =>
     Json.obj("glicko" -> p.glicko, "nb" -> p.nb, "progress" -> p.progress)
@@ -52,9 +53,10 @@ final class JsonView(getLightUser: String => Option[LightUser]) {
   }
   private implicit val userIdWriter: OWrites[UserId] = OWrites { u =>
     val light = getLightUser(u.value)
-    Json.obj("id" -> u.value,
-             "name" -> light.fold(u.value)(_.name),
-             "title" -> light.flatMap(_.title))
+    Json.obj(
+      "id" -> u.value,
+      "name" -> light.fold(u.value)(_.name),
+      "title" -> light.flatMap(_.title))
   }
   private implicit val ratingAtWrites = Json.writes[RatingAt]
   private implicit val resultWrites = Json.writes[Result]

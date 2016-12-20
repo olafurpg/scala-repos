@@ -19,14 +19,15 @@ final class Env(config: Config,
 
   lazy val storage = new PerfStatStorage(coll = db(CollectionPerfStat))
 
-  lazy val indexer = new PerfStatIndexer(storage = storage,
-                                         sequencer = system.actorOf(
-                                           Props(
-                                             classOf[lila.hub.Sequencer],
-                                             None,
-                                             None,
-                                             lila.log("perfStat")
-                                           )))
+  lazy val indexer = new PerfStatIndexer(
+    storage = storage,
+    sequencer = system.actorOf(
+      Props(
+        classOf[lila.hub.Sequencer],
+        None,
+        None,
+        lila.log("perfStat")
+      )))
 
   lazy val jsonView = new JsonView(lightUser)
 
@@ -46,8 +47,9 @@ final class Env(config: Config,
 object Env {
 
   lazy val current: Env =
-    "perfStat" boot new Env(config = lila.common.PlayApp loadConfig "perfStat",
-                            system = lila.common.PlayApp.system,
-                            lightUser = lila.user.Env.current.lightUser,
-                            db = lila.db.Env.current)
+    "perfStat" boot new Env(
+      config = lila.common.PlayApp loadConfig "perfStat",
+      system = lila.common.PlayApp.system,
+      lightUser = lila.user.Env.current.lightUser,
+      db = lila.db.Env.current)
 }

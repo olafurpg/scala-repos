@@ -81,13 +81,13 @@ object ServerResultUtilsSpec extends Specification with IterateeSpecification {
       }
     }
     "clear old flash value when different value sent" in {
-      flashCookieResult(Some("PLAY_FLASH" -> "\"a=b\"; Path=/"),
-                        Ok.flashing("c" -> "d")) must beSome {
-        cookies: Seq[Cookie] =>
-          cookies.length must_== 1
-          val cookie = cookies(0)
-          cookie.name must_== "PLAY_FLASH"
-          cookie.value must_== "c=d"
+      flashCookieResult(
+        Some("PLAY_FLASH" -> "\"a=b\"; Path=/"),
+        Ok.flashing("c" -> "d")) must beSome { cookies: Seq[Cookie] =>
+        cookies.length must_== 1
+        val cookie = cookies(0)
+        cookie.name must_== "PLAY_FLASH"
+        cookie.value must_== "c=d"
       }
     }
   }

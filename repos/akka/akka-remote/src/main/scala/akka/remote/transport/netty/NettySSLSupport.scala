@@ -177,9 +177,10 @@ private[akka] object NettySSLSupport {
         throw new GeneralSecurityException(
           """Failed to initialize client SSL because SSL context could not be found." +
               "Make sure your settings are correct: [trust-store: %s] [trust-store-password: %s] [protocol: %s]"""
-            .format(settings.SSLTrustStore,
-                    settings.SSLTrustStorePassword,
-                    settings.SSLProtocol))
+            .format(
+              settings.SSLTrustStore,
+              settings.SSLTrustStorePassword,
+              settings.SSLProtocol))
     }
   }
 
@@ -243,16 +244,18 @@ private[akka] object NettySSLSupport {
       settings.SSLKeyStorePassword,
       settings.SSLKeyPassword,
       settings.SSLProtocol) match {
-      case (Some(keyStore),
-            Some(storePassword),
-            Some(keyPassword),
-            Some(protocol)) ⇒
-        constructServerContext(settings,
-                               log,
-                               keyStore,
-                               storePassword,
-                               keyPassword,
-                               protocol)
+      case (
+          Some(keyStore),
+          Some(storePassword),
+          Some(keyPassword),
+          Some(protocol)) ⇒
+        constructServerContext(
+          settings,
+          log,
+          keyStore,
+          storePassword,
+          keyPassword,
+          protocol)
       case (keyStore, storePassword, keyPassword, protocol) ⇒
         throw new GeneralSecurityException(
           s"SSL key store settings went missing. [key-store: $keyStore] [key-store-password: $storePassword] [key-password: $keyPassword] [protocol: $protocol]")
@@ -267,9 +270,10 @@ private[akka] object NettySSLSupport {
         throw new GeneralSecurityException(
           """Failed to initialize server SSL because SSL context could not be found.
            Make sure your settings are correct: [key-store: %s] [key-store-password: %s] [protocol: %s]"""
-            .format(settings.SSLKeyStore,
-                    settings.SSLKeyStorePassword,
-                    settings.SSLProtocol))
+            .format(
+              settings.SSLKeyStore,
+              settings.SSLKeyStorePassword,
+              settings.SSLProtocol))
     }
   }
 }

@@ -38,8 +38,9 @@ class ReflectionTest {
   }
 
   @Test def should_append_$_to_class_name_of_objects(): Unit = {
-    assertEquals("org.scalajs.testsuite.compiler.ReflectionTest$TestObject$",
-                 TestObject.getClass.getName)
+    assertEquals(
+      "org.scalajs.testsuite.compiler.ReflectionTest$TestObject$",
+      TestObject.getClass.getName)
   }
 
   @Test def java_lang_Class_getName_renamed_through_semantics(): Unit = {
@@ -83,14 +84,16 @@ class ReflectionTest {
   }
 
   @Test def isInstance_for_raw_JS_traits_should_fail(): Unit = {
-    assertThrows(classOf[Exception],
-                 classOf[ReflectionTestRawJSTrait].isInstance(5))
+    assertThrows(
+      classOf[Exception],
+      classOf[ReflectionTestRawJSTrait].isInstance(5))
 
     val ct = classTag[ReflectionTestRawJSTrait]
     assertThrows(classOf[Exception], ct.unapply(new AnyRef))
 
-    assertThrows(classOf[Exception],
-                 implicitClassTagTest[ReflectionTestRawJSTrait](new AnyRef))
+    assertThrows(
+      classOf[Exception],
+      implicitClassTagTest[ReflectionTestRawJSTrait](new AnyRef))
   }
 
   @Test def getClass_for_normal_types(): Unit = {
@@ -129,8 +132,9 @@ class ReflectionTest {
   }
 
   @Test def getSuperclass_issue_1489(): Unit = {
-    assertEquals(classOf[SomeParentClass],
-                 classOf[SomeChildClass].getSuperclass)
+    assertEquals(
+      classOf[SomeParentClass],
+      classOf[SomeChildClass].getSuperclass)
     assertNull(classOf[AnyRef].getSuperclass)
     assertEquals(classOf[AnyRef], classOf[String].getSuperclass)
     assertEquals(classOf[Number], classOf[Integer].getSuperclass)

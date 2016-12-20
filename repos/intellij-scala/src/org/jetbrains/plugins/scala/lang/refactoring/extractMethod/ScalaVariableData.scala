@@ -18,10 +18,11 @@ class ScalaVariableData(val element: ScTypedDefinition,
     extends {
   private val parameter =
     new Parameter("", None, scType, false, false, false, -1)
-  private val fakeParam = new FakePsiParameter(element.getManager,
-                                               ScalaFileType.SCALA_LANGUAGE,
-                                               parameter,
-                                               element.name)
+  private val fakeParam = new FakePsiParameter(
+    element.getManager,
+    ScalaFileType.SCALA_LANGUAGE,
+    parameter,
+    element.name)
 } with VariableData(fakeParam, new FakePsiType(scType)) {
 
   passAsParameter = true

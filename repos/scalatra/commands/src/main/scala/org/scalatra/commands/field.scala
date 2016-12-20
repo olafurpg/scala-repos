@@ -127,18 +127,19 @@ class BasicFieldDescriptor[T](
            displayName: Option[String] = displayName,
            position: Int = position,
            requiredError: String = requiredError): FieldDescriptor[T] = {
-    new BasicFieldDescriptor(name,
-                             validator,
-                             transformations,
-                             isRequired,
-                             description,
-                             notes,
-                             defVal,
-                             valueSource,
-                             allowableValues,
-                             displayName,
-                             position,
-                             requiredError)(valueManifest)
+    new BasicFieldDescriptor(
+      name,
+      validator,
+      transformations,
+      isRequired,
+      description,
+      notes,
+      defVal,
+      valueSource,
+      allowableValues,
+      displayName,
+      position,
+      requiredError)(valueManifest)
   }
 
   def apply[S](original: Either[String, Option[S]])(

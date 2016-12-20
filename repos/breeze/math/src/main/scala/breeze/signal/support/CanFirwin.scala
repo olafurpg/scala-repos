@@ -67,13 +67,9 @@ object CanFirwin {
                 multiplier: Double,
                 optWindow: OptWindowFunction): FIRKernel1D[T] =
         new FIRKernel1D[T](
-          convert(firwinDoubleImpl(taps,
-                                   omegas,
-                                   nyquist,
-                                   zeroPass,
-                                   scale,
-                                   optWindow) * multiplier,
-                  T),
+          convert(
+            firwinDoubleImpl(taps, omegas, nyquist, zeroPass, scale, optWindow) * multiplier,
+            T),
           multiplier,
           "FIRKernel1D(firwin): " + taps + " taps, " + omegas + ", " +
             optWindow + ", zeroPass=" + zeroPass + ", nyquist=" + nyquist +
@@ -90,14 +86,16 @@ object CanFirwin {
                        optWindow: OptWindowFunction): DenseVector[Double] = {
     //various variable conditions which must be met
     require(omegas.length > 0, "At least one cutoff frequency must be given!")
-    require(min(omegas) >= 0,
-            "The cutoff frequencies must be bigger than zero!")
+    require(
+      min(omegas) >= 0,
+      "The cutoff frequencies must be bigger than zero!")
     require(
       max(omegas) <= nyquist,
       "The cutoff frequencies must be smaller than the nyquist frequency!")
     if (omegas.length > 1) {
-      require(min(diff(omegas)) > 0,
-              "The cutoff frequency must be monotonically increasing.")
+      require(
+        min(diff(omegas)) > 0,
+        "The cutoff frequency must be monotonically increasing.")
     }
 
     val nyquistPass = (zeroPass != isOdd(omegas.length))

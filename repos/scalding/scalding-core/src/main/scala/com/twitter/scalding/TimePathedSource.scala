@@ -27,10 +27,11 @@ object TimePathedSource {
     String.format(pattern, date.toCalendar(tz))
 
   def stepSize(pattern: String, tz: TimeZone): Option[Duration] =
-    List("%1$tH" -> Hours(1),
-         "%1$td" -> Days(1)(tz),
-         "%1$tm" -> Months(1)(tz),
-         "%1$tY" -> Years(1)(tz))
+    List(
+      "%1$tH" -> Hours(1),
+      "%1$td" -> Days(1)(tz),
+      "%1$tm" -> Months(1)(tz),
+      "%1$tY" -> Years(1)(tz))
       .find { unitDur: (String, Duration) =>
         pattern.contains(unitDur._1)
       }

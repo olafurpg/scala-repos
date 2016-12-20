@@ -91,22 +91,23 @@ private[mllib] object EigenValueDecomposition {
     var ipntr = new Array[Int](11)
 
     // call ARPACK's reverse communication, first iteration with ido = 0
-    arpack.dsaupd(ido,
-                  bmat,
-                  n,
-                  which,
-                  nev.`val`,
-                  tolW,
-                  resid,
-                  ncv,
-                  v,
-                  n,
-                  iparam,
-                  ipntr,
-                  workd,
-                  workl,
-                  workl.length,
-                  info)
+    arpack.dsaupd(
+      ido,
+      bmat,
+      n,
+      which,
+      nev.`val`,
+      tolW,
+      resid,
+      ncv,
+      v,
+      n,
+      iparam,
+      ipntr,
+      workd,
+      workl,
+      workl.length,
+      info)
 
     val w = BDV(workd)
 
@@ -124,22 +125,23 @@ private[mllib] object EigenValueDecomposition {
       val y = w.slice(outputOffset, outputOffset + n)
       y := mul(x)
       // call ARPACK's reverse communication
-      arpack.dsaupd(ido,
-                    bmat,
-                    n,
-                    which,
-                    nev.`val`,
-                    tolW,
-                    resid,
-                    ncv,
-                    v,
-                    n,
-                    iparam,
-                    ipntr,
-                    workd,
-                    workl,
-                    workl.length,
-                    info)
+      arpack.dsaupd(
+        ido,
+        bmat,
+        n,
+        which,
+        nev.`val`,
+        tolW,
+        resid,
+        ncv,
+        v,
+        n,
+        iparam,
+        ipntr,
+        workd,
+        workl,
+        workl.length,
+        info)
     }
 
     if (info.`val` != 0) {
@@ -166,28 +168,29 @@ private[mllib] object EigenValueDecomposition {
     val z = java.util.Arrays.copyOfRange(v, 0, nev.`val` * n)
 
     // call ARPACK's post-processing for eigenvectors
-    arpack.dseupd(true,
-                  "A",
-                  select,
-                  d,
-                  z,
-                  n,
-                  0.0,
-                  bmat,
-                  n,
-                  which,
-                  nev,
-                  tol,
-                  resid,
-                  ncv,
-                  v,
-                  n,
-                  iparam,
-                  ipntr,
-                  workd,
-                  workl,
-                  workl.length,
-                  info)
+    arpack.dseupd(
+      true,
+      "A",
+      select,
+      d,
+      z,
+      n,
+      0.0,
+      bmat,
+      n,
+      which,
+      nev,
+      tol,
+      resid,
+      ncv,
+      v,
+      n,
+      iparam,
+      ipntr,
+      workd,
+      workl,
+      workl.length,
+      info)
 
     // number of computed eigenvalues, might be smaller than k
     val computed = iparam(4)

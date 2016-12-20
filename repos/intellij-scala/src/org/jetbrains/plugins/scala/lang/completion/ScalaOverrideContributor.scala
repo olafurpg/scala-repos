@@ -32,10 +32,13 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
     extend(
       CompletionType.BASIC,
       PlatformPatterns.psiElement.and(
-        new FilterPattern(new AndFilter(
-          new NotFilter(new LeftNeighbour(new TextContainFilter("override"))),
-          new AndFilter(new NotFilter(new LeftNeighbour(new TextFilter("."))),
-                        filter)))),
+        new FilterPattern(
+          new AndFilter(
+            new NotFilter(
+              new LeftNeighbour(new TextContainFilter("override"))),
+            new AndFilter(
+              new NotFilter(new LeftNeighbour(new TextFilter("."))),
+              filter)))),
       new CompletionProvider[CompletionParameters] {
         def addCompletions(parameters: CompletionParameters,
                            context: ProcessingContext,
@@ -45,15 +48,16 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
       })
   }
 
-  extend(CompletionType.BASIC,
-         PlatformPatterns.psiElement(),
-         new CompletionProvider[CompletionParameters] {
-           def addCompletions(parameters: CompletionParameters,
-                              context: ProcessingContext,
-                              resultSet: CompletionResultSet) {
-             addCompletionsAfterOverride(resultSet, parameters)
-           }
-         })
+  extend(
+    CompletionType.BASIC,
+    PlatformPatterns.psiElement(),
+    new CompletionProvider[CompletionParameters] {
+      def addCompletions(parameters: CompletionParameters,
+                         context: ProcessingContext,
+                         resultSet: CompletionResultSet) {
+        addCompletionsAfterOverride(resultSet, parameters)
+      }
+    })
 
   class MyElementRenderer(member: ScalaNamedMember)
       extends LookupElementRenderer[LookupElementDecorator[LookupElement]] {
@@ -95,11 +99,11 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
       ScalaOIUtil.getMembersToOverride(clazz, withSelfType = true)
     if (classMembers.isEmpty) return
 
-    handleMembers(classMembers,
-                  clazz,
-                  (classMember,
-                   clazz) => createText(classMember, clazz, full = true),
-                  resultSet) { classMember =>
+    handleMembers(
+      classMembers,
+      clazz,
+      (classMember, clazz) => createText(classMember, clazz, full = true),
+      resultSet) { classMember =>
       new MyInsertHandler()
     }
   }
@@ -136,10 +140,11 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
       case _ => classMembers
     }
 
-    handleMembers(membersToRender,
-                  clazz,
-                  (classMember, clazz) => createText(classMember, clazz),
-                  resultSet) { classMember =>
+    handleMembers(
+      membersToRender,
+      clazz,
+      (classMember, clazz) => createText(classMember, clazz),
+      resultSet) { classMember =>
       new MyInsertHandler()
     }
   }
@@ -154,8 +159,9 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
 
         elementOption.foreach { element =>
           TypeAdjuster.markToAdjust(element)
-          ScalaGenerationInfo.positionCaret(context.getEditor,
-                                            element.asInstanceOf[PsiMember])
+          ScalaGenerationInfo.positionCaret(
+            context.getEditor,
+            element.asInstanceOf[PsiMember])
           context.commitDocument()
         }
       }
@@ -188,11 +194,11 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
               mBody)
         fun.getText
       case tm: ScAliasMember =>
-        ScalaPsiElementFactory.getOverrideImplementTypeSign(tm.getElement,
-                                                            tm.substitutor,
-                                                            "this.type",
-                                                            needsOverride =
-                                                              false)
+        ScalaPsiElementFactory.getOverrideImplementTypeSign(
+          tm.getElement,
+          tm.substitutor,
+          "this.type",
+          needsOverride = false)
       case value: ScValueMember =>
         ScalaPsiElementFactory.getOverrideImplementVariableSign(
           value.element,

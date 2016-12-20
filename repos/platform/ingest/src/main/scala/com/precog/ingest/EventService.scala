@@ -133,46 +133,51 @@ trait EventService
       stoppable: Stoppable): State = {
     import serviceConfig._
 
-    val ingestHandler = new IngestServiceHandler(permissionsFinder,
-                                                 jobManager,
-                                                 Clock.System,
-                                                 eventStore,
-                                                 ingestTimeout,
-                                                 ingestBatchSize,
-                                                 ingestMaxFields,
-                                                 ingestTmpDir,
-                                                 AccessMode.Append)
-    val dataHandler = new IngestServiceHandler(permissionsFinder,
-                                               jobManager,
-                                               Clock.System,
-                                               eventStore,
-                                               ingestTimeout,
-                                               ingestBatchSize,
-                                               ingestMaxFields,
-                                               ingestTmpDir,
-                                               AccessMode.Create)
-    val archiveHandler = new ArchiveServiceHandler[ByteChunk](apiKeyFinder,
-                                                              eventStore,
-                                                              Clock.System,
-                                                              deleteTimeout)
-    val createHandler = new FileStoreHandler(serviceLocation,
-                                             permissionsFinder,
-                                             jobManager,
-                                             Clock.System,
-                                             eventStore,
-                                             ingestTimeout)
+    val ingestHandler = new IngestServiceHandler(
+      permissionsFinder,
+      jobManager,
+      Clock.System,
+      eventStore,
+      ingestTimeout,
+      ingestBatchSize,
+      ingestMaxFields,
+      ingestTmpDir,
+      AccessMode.Append)
+    val dataHandler = new IngestServiceHandler(
+      permissionsFinder,
+      jobManager,
+      Clock.System,
+      eventStore,
+      ingestTimeout,
+      ingestBatchSize,
+      ingestMaxFields,
+      ingestTmpDir,
+      AccessMode.Create)
+    val archiveHandler = new ArchiveServiceHandler[ByteChunk](
+      apiKeyFinder,
+      eventStore,
+      Clock.System,
+      deleteTimeout)
+    val createHandler = new FileStoreHandler(
+      serviceLocation,
+      permissionsFinder,
+      jobManager,
+      Clock.System,
+      eventStore,
+      ingestTimeout)
     val shardClient = (new HttpClientXLightWeb)
       .protocol(shardLocation.protocol)
       .host(shardLocation.host)
       .port(shardLocation.port)
 
-    EventService.State(apiKeyFinder,
-                       ingestHandler,
-                       dataHandler,
-                       createHandler,
-                       archiveHandler,
-                       shardClient,
-                       stoppable)
+    EventService.State(
+      apiKeyFinder,
+      ingestHandler,
+      dataHandler,
+      createHandler,
+      archiveHandler,
+      shardClient,
+      stoppable)
   }
 
   def eventOptionsResponse = CORSHeaders.apply[JValue, Future](M)
@@ -180,32 +185,33 @@ trait EventService
   val eventService = this.service("ingest", "2.0") {
     requestLogging {
       help("/docs/api") {
-        healthMonitor("/health",
-                      defaultShutdownTimeout,
-                      List(blueeyes.health.metrics.eternity)) {
-          monitor => context =>
-            startup {
-              import context._
-              Future(configureEventService(config))
-            } -> request { (state: State) =>
-              import CORSHeaderHandler.allowOrigin
-              implicit val FR =
-                M.compose[({ type l[a] = Function2[APIKey, Path, a] })#l]
+        healthMonitor(
+          "/health",
+          defaultShutdownTimeout,
+          List(blueeyes.health.metrics.eternity)) { monitor => context =>
+          startup {
+            import context._
+            Future(configureEventService(config))
+          } -> request { (state: State) =>
+            import CORSHeaderHandler.allowOrigin
+            implicit val FR =
+              M.compose[({ type l[a] = Function2[APIKey, Path, a] })#l]
 
-              allowOrigin("*", executionContext) {
-                encode[ByteChunk,
-                       Future[HttpResponse[JValue]],
-                       Future[HttpResponse[ByteChunk]]] {
-                  produce(application / json) {
-                    //jsonp {
-                    fsService(state) ~ dataService(state)
-                    //}
-                  }
-                } ~ shardProxy(state.shardClient)
-              }
-            } -> stop { state =>
-              state.stop
+            allowOrigin("*", executionContext) {
+              encode[
+                ByteChunk,
+                Future[HttpResponse[JValue]],
+                Future[HttpResponse[ByteChunk]]] {
+                produce(application / json) {
+                  //jsonp {
+                  fsService(state) ~ dataService(state)
+                  //}
+                }
+              } ~ shardProxy(state.shardClient)
             }
+          } -> stop { state =>
+            state.stop
+          }
         }
       }
     }

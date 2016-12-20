@@ -36,45 +36,48 @@ class TypeAnnotationInspection extends AbstractInspection {
         if value.isSimple && !value.hasExplicitType =>
       val settings = ScalaCodeStyleSettings.getInstance(holder.getProject)
 
-      inspect(value.bindings.head,
-              kindOf(value) + " value",
-              value.declaredElements.headOption
-                .map(ScalaPsiUtil.superValsSignatures(_, withSelfType = true))
-                .exists(_.nonEmpty),
-              value.expr.exists(isSimple),
-              requirementForProperty(value, settings),
-              settings.OVERRIDING_PROPERTY_TYPE_ANNOTATION,
-              settings.SIMPLE_PROPERTY_TYPE_ANNOTATION,
-              holder)
+      inspect(
+        value.bindings.head,
+        kindOf(value) + " value",
+        value.declaredElements.headOption
+          .map(ScalaPsiUtil.superValsSignatures(_, withSelfType = true))
+          .exists(_.nonEmpty),
+        value.expr.exists(isSimple),
+        requirementForProperty(value, settings),
+        settings.OVERRIDING_PROPERTY_TYPE_ANNOTATION,
+        settings.SIMPLE_PROPERTY_TYPE_ANNOTATION,
+        holder)
 
     case variable: ScVariableDefinition
         if variable.isSimple && !variable.hasExplicitType =>
       val settings = ScalaCodeStyleSettings.getInstance(holder.getProject)
 
-      inspect(variable.bindings.head,
-              kindOf(variable) + " variable",
-              variable.declaredElements.headOption
-                .map(ScalaPsiUtil.superValsSignatures(_, withSelfType = true))
-                .exists(_.nonEmpty),
-              variable.expr.exists(isSimple),
-              requirementForProperty(variable, settings),
-              settings.OVERRIDING_PROPERTY_TYPE_ANNOTATION,
-              settings.SIMPLE_PROPERTY_TYPE_ANNOTATION,
-              holder)
+      inspect(
+        variable.bindings.head,
+        kindOf(variable) + " variable",
+        variable.declaredElements.headOption
+          .map(ScalaPsiUtil.superValsSignatures(_, withSelfType = true))
+          .exists(_.nonEmpty),
+        variable.expr.exists(isSimple),
+        requirementForProperty(variable, settings),
+        settings.OVERRIDING_PROPERTY_TYPE_ANNOTATION,
+        settings.SIMPLE_PROPERTY_TYPE_ANNOTATION,
+        holder)
 
     case method: ScFunctionDefinition
         if method.hasAssign && !method.hasExplicitType &&
           !method.isSecondaryConstructor =>
       val settings = ScalaCodeStyleSettings.getInstance(holder.getProject)
 
-      inspect(method.nameId,
-              kindOf(method) + " method",
-              method.superSignaturesIncludingSelfType.nonEmpty,
-              method.body.exists(isSimple),
-              requirementForMethod(method, settings),
-              settings.OVERRIDING_METHOD_TYPE_ANNOTATION,
-              settings.SIMPLE_METHOD_TYPE_ANNOTATION,
-              holder)
+      inspect(
+        method.nameId,
+        kindOf(method) + " method",
+        method.superSignaturesIncludingSelfType.nonEmpty,
+        method.body.exists(isSimple),
+        requirementForMethod(method, settings),
+        settings.OVERRIDING_METHOD_TYPE_ANNOTATION,
+        settings.SIMPLE_METHOD_TYPE_ANNOTATION,
+        holder)
   }
 
   private def isSimple(exp: ScExpression): Boolean = {

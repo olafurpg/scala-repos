@@ -165,9 +165,10 @@ sealed abstract class AggregateFunction
     * an [[AggregateExpression]].
     */
   def toAggregateExpression(isDistinct: Boolean): AggregateExpression = {
-    AggregateExpression(aggregateFunction = this,
-                        mode = Complete,
-                        isDistinct = isDistinct)
+    AggregateExpression(
+      aggregateFunction = this,
+      mode = Complete,
+      isDistinct = isDistinct)
   }
 
   def sql(isDistinct: Boolean): String = {

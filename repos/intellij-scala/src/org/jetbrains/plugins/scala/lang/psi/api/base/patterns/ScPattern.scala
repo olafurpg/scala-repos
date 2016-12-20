@@ -155,10 +155,11 @@ trait ScPattern extends ScalaPsiElement {
       }
 
       def rightWay: ScSubstitutor = {
-        val t = Conformance.conformsInner(tp,
-                                          substitutor.subst(funType),
-                                          Set.empty,
-                                          new ScUndefinedSubstitutor)
+        val t = Conformance.conformsInner(
+          tp,
+          substitutor.subst(funType),
+          Set.empty,
+          new ScUndefinedSubstitutor)
         if (t._1) {
           val undefSubst = t._2
           undefSubst.getSubstitutor match {
@@ -169,10 +170,11 @@ trait ScPattern extends ScalaPsiElement {
       }
 
       //todo: looks quite hacky to try another direction first, do you know better? see SCL-6543
-      val t = Conformance.conformsInner(substitutor.subst(funType),
-                                        tp,
-                                        Set.empty,
-                                        new ScUndefinedSubstitutor)
+      val t = Conformance.conformsInner(
+        substitutor.subst(funType),
+        tp,
+        Set.empty,
+        new ScUndefinedSubstitutor)
       if (t._1) {
         val undefSubst = t._2
         undefSubst.getSubstitutor match {
@@ -318,9 +320,9 @@ trait ScPattern extends ScalaPsiElement {
           case _ => None
         }
       case Some(
-          ScalaResolveResult(FakeCompanionClassOrCompanionClass(cl: ScClass),
-                             subst: ScSubstitutor))
-          if cl.isCase && cl.tooBigForUnapply =>
+          ScalaResolveResult(
+            FakeCompanionClassOrCompanionClass(cl: ScClass),
+            subst: ScSubstitutor)) if cl.isCase && cl.tooBigForUnapply =>
         val undefSubst = subst.followed(new ScSubstitutor(ScThisType(cl)))
         val params: Seq[ScParameter] = cl.parameters
         val types = params
@@ -352,10 +354,11 @@ trait ScPattern extends ScalaPsiElement {
       argList.getContext match {
         case constr: ScConstructorPattern =>
           val thisIndex: Int = constr.args.patterns.indexWhere(_ == this)
-          expectedTypeForExtractorArg(constr.ref,
-                                      thisIndex,
-                                      constr.expectedType,
-                                      argList.patterns.length)
+          expectedTypeForExtractorArg(
+            constr.ref,
+            thisIndex,
+            constr.expectedType,
+            argList.patterns.length)
         case _ => None
       }
     case composite: ScCompositePattern => composite.expectedType
@@ -383,10 +386,11 @@ trait ScPattern extends ScalaPsiElement {
                   case Some(pat) => pat.patterns.length
                   case _ => -1 //is it possible to get here?
                 }
-                return expectedTypeForExtractorArg(infix.reference,
-                                                   i + 1,
-                                                   infix.expectedType,
-                                                   patternLength)
+                return expectedTypeForExtractorArg(
+                  infix.reference,
+                  i + 1,
+                  infix.expectedType,
+                  patternLength)
               }
             case _ =>
           }
@@ -414,8 +418,9 @@ trait ScPattern extends ScalaPsiElement {
                   .instance(getProject)
                   .getCachedClass(getResolveScope, "scala.collection.Seq")
                 seqClass.map { seqClass =>
-                  ScParameterizedType(ScDesignatorType(seqClass),
-                                      Seq(ScDesignatorType(nodeClass)))
+                  ScParameterizedType(
+                    ScDesignatorType(seqClass),
+                    Seq(ScDesignatorType(nodeClass)))
                 }
               case _ => Some(ScDesignatorType(nodeClass))
             }

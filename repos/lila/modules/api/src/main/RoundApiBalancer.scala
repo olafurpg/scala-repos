@@ -51,21 +51,23 @@ private[api] final class RoundApiBalancer(system: ActorSystem,
                 s"inner player $pov"
               }
               .result
-            case Watcher(pov,
-                         apiVersion,
-                         tv,
-                         analysis,
-                         initialFenO,
-                         withMoveTimes,
-                         withOpening,
-                         ctx) =>
-              api.watcher(pov,
-                          apiVersion,
-                          tv,
-                          analysis,
-                          initialFenO,
-                          withMoveTimes,
-                          withOpening)(ctx)
+            case Watcher(
+                pov,
+                apiVersion,
+                tv,
+                analysis,
+                initialFenO,
+                withMoveTimes,
+                withOpening,
+                ctx) =>
+              api.watcher(
+                pov,
+                apiVersion,
+                tv,
+                analysis,
+                initialFenO,
+                withMoveTimes,
+                withOpening)(ctx)
             case UserAnalysis(pov, pref, initialFen, orientation, owner) =>
               api.userAnalysisJson(pov, pref, initialFen, orientation, owner)
           }
@@ -95,14 +97,15 @@ private[api] final class RoundApiBalancer(system: ActorSystem,
       initialFenO: Option[Option[String]] = None,
       withMoveTimes: Boolean = false,
       withOpening: Boolean = false)(implicit ctx: Context): Fu[JsObject] = {
-    router ? Watcher(pov,
-                     apiVersion,
-                     tv,
-                     analysis,
-                     initialFenO,
-                     withMoveTimes,
-                     withOpening,
-                     ctx) mapTo manifest[JsObject]
+    router ? Watcher(
+      pov,
+      apiVersion,
+      tv,
+      analysis,
+      initialFenO,
+      withMoveTimes,
+      withOpening,
+      ctx) mapTo manifest[JsObject]
   }.mon(_.round.api.watcher)
 
   def userAnalysisJson(pov: Pov,

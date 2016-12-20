@@ -11,8 +11,9 @@ trait FeatureSpecStaticStringTest extends ScalaTestTestCase {
   val featureSpecFileName = featureSpecClassName + ".scala"
 
   def addFeatureSpec() {
-    addFileToProject(featureSpecFileName,
-                     """
+    addFileToProject(
+      featureSpecFileName,
+      """
         |import org.scalatest._
         |
         |class FeatureSpecStringTest extends FeatureSpec {
@@ -42,17 +43,19 @@ trait FeatureSpecStaticStringTest extends ScalaTestTestCase {
     addFeatureSpec()
 
     assert(
-      checkConfigAndSettings(createTestFromLocation(6, 7, featureSpecFileName),
-                             featureSpecClassName,
-                             "Feature: Feature 1 Scenario: Scenario A"))
+      checkConfigAndSettings(
+        createTestFromLocation(6, 7, featureSpecFileName),
+        featureSpecClassName,
+        "Feature: Feature 1 Scenario: Scenario A"))
   }
 
   def testFeatureSpecValSumString() = {
     addFeatureSpec()
     assert(
-      checkConfigAndSettings(createTestFromLocation(8, 7, featureSpecFileName),
-                             featureSpecClassName,
-                             "Feature: Feature 1 Scenario: Scenario B"))
+      checkConfigAndSettings(
+        createTestFromLocation(8, 7, featureSpecFileName),
+        featureSpecClassName,
+        "Feature: Feature 1 Scenario: Scenario B"))
   }
 
   def testFeatureSpecValString() = {

@@ -44,10 +44,11 @@ trait Positions extends api.Positions { self: SymbolTable =>
       val ranged = trees filter (_.pos.isRange)
       if (ranged.isEmpty) if (focus) default.focus else default
       else
-        Position.range(default.source,
-                       (ranged map (_.pos.start)).min,
-                       default.point,
-                       (ranged map (_.pos.end)).max)
+        Position.range(
+          default.source,
+          (ranged map (_.pos.start)).min,
+          default.point,
+          (ranged map (_.pos.end)).max)
     }
   }
 

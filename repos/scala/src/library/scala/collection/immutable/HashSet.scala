@@ -293,11 +293,12 @@ object HashSet extends ImmutableSetFactory[HashSet] {
       if (hash == this.hash && key == this.key) this
       else {
         if (hash != this.hash) {
-          makeHashTrieSet(this.hash,
-                          this,
-                          hash,
-                          new HashSet1(key, hash),
-                          level)
+          makeHashTrieSet(
+            this.hash,
+            this,
+            hash,
+            new HashSet1(key, hash),
+            level)
         } else {
           // 32-bit hash collision (rare, but not impossible)
           new HashSetCollision1(hash, ListSet.empty + this.key + key)
@@ -939,11 +940,12 @@ object HashSet extends ImmutableSetFactory[HashSet] {
           if (bitmapNew != 0) {
             val elemsNew = new Array[HashSet[A]](elems.length - 1)
             Array.copy(elems, 0, elemsNew, 0, offset)
-            Array.copy(elems,
-                       offset + 1,
-                       elemsNew,
-                       offset,
-                       elems.length - offset - 1)
+            Array.copy(
+              elems,
+              offset + 1,
+              elemsNew,
+              offset,
+              elems.length - offset - 1)
             val sizeNew = size - sub.size
             // if we have only one child, which is not a HashTrieSet but a self-contained set like
             // HashSet1 or HashSetCollision1, return the child instead

@@ -116,9 +116,10 @@ trait ScClass extends ScTypeDefinition with ScParameterOwner {
                                  p.getDefaultExpression.fold("{}")(_.getText)
                              else if (p.isRepeatedParameter) "*"
                              else ""))
-                      .mkString(if (c.isImplicit) "(implicit " else "(",
-                                ", ",
-                                ")"))
+                      .mkString(
+                        if (c.isImplicit) "(implicit " else "(",
+                        ", ",
+                        ")"))
                 .mkString("")
           case None => ""
         }

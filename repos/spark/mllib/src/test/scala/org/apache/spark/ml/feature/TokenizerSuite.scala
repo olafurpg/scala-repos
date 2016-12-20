@@ -63,16 +63,18 @@ class RegexTokenizerSuite
       .setOutputCol("tokens")
     val dataset0 = sqlContext.createDataFrame(
       Seq(
-        TokenizerTestData("Test for tokenization.",
-                          Array("test", "for", "tokenization", ".")),
+        TokenizerTestData(
+          "Test for tokenization.",
+          Array("test", "for", "tokenization", ".")),
         TokenizerTestData("Te,st. punct", Array("te", ",", "st", ".", "punct"))
       ))
     testRegexTokenizer(tokenizer0, dataset0)
 
     val dataset1 = sqlContext.createDataFrame(
       Seq(
-        TokenizerTestData("Test for tokenization.",
-                          Array("test", "for", "tokenization")),
+        TokenizerTestData(
+          "Test for tokenization.",
+          Array("test", "for", "tokenization")),
         TokenizerTestData("Te,st. punct", Array("punct"))
       ))
     tokenizer0.setMinTokenLength(3)
@@ -82,8 +84,9 @@ class RegexTokenizerSuite
       new RegexTokenizer().setInputCol("rawText").setOutputCol("tokens")
     val dataset2 = sqlContext.createDataFrame(
       Seq(
-        TokenizerTestData("Test for tokenization.",
-                          Array("test", "for", "tokenization.")),
+        TokenizerTestData(
+          "Test for tokenization.",
+          Array("test", "for", "tokenization.")),
         TokenizerTestData("Te,st.  punct", Array("te,st.", "punct"))
       ))
     testRegexTokenizer(tokenizer2, dataset2)

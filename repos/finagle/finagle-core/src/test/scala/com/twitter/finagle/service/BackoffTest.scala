@@ -100,15 +100,16 @@ class BackoffTest extends FunSuite with GeneratorDrivenPropertyChecks {
 
       assert(5 == backoffs.head)
 
-      val ranges = Seq((5, 10),
-                       (10, 20),
-                       (20, 40),
-                       (40, 80),
-                       (80, 120),
-                       (80, 120),
-                       (80, 120),
-                       (80, 120),
-                       (80, 120))
+      val ranges = Seq(
+        (5, 10),
+        (10, 20),
+        (20, 40),
+        (40, 80),
+        (80, 120),
+        (80, 120),
+        (80, 120),
+        (80, 120),
+        (80, 120))
       backoffs.tail.zip(ranges).foreach {
         case (b, (min, max)) =>
           assert(b >= min)

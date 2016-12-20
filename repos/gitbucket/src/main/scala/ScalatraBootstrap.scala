@@ -19,23 +19,27 @@ class ScalatraBootstrap extends LifeCycle {
     context.addFilter("transactionFilter", new TransactionFilter)
     context
       .getFilterRegistration("transactionFilter")
-      .addMappingForUrlPatterns(EnumSet.allOf(classOf[DispatcherType]),
-                                true,
-                                "/*")
+      .addMappingForUrlPatterns(
+        EnumSet.allOf(classOf[DispatcherType]),
+        true,
+        "/*")
     context
       .addFilter("basicAuthenticationFilter", new BasicAuthenticationFilter)
     context
       .getFilterRegistration("basicAuthenticationFilter")
-      .addMappingForUrlPatterns(EnumSet.allOf(classOf[DispatcherType]),
-                                true,
-                                "/git/*")
-    context.addFilter("accessTokenAuthenticationFilter",
-                      new AccessTokenAuthenticationFilter)
+      .addMappingForUrlPatterns(
+        EnumSet.allOf(classOf[DispatcherType]),
+        true,
+        "/git/*")
+    context.addFilter(
+      "accessTokenAuthenticationFilter",
+      new AccessTokenAuthenticationFilter)
     context
       .getFilterRegistration("accessTokenAuthenticationFilter")
-      .addMappingForUrlPatterns(EnumSet.allOf(classOf[DispatcherType]),
-                                true,
-                                "/api/v3/*")
+      .addMappingForUrlPatterns(
+        EnumSet.allOf(classOf[DispatcherType]),
+        true,
+        "/api/v3/*")
     // Register controllers
     context.mount(new AnonymousAccessController, "/*")
 

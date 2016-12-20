@@ -27,10 +27,11 @@ class DoubleNegationInspection
     extends AbstractInspection("DoubleNegation", "Double negation") {
   def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case expr: ScExpression if DoubleNegationUtil.hasDoubleNegation(expr) =>
-      holder.registerProblem(expr,
-                             "Double negation",
-                             ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
-                             new DoubleNegationQuickFix(expr))
+      holder.registerProblem(
+        expr,
+        "Double negation",
+        ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+        new DoubleNegationQuickFix(expr))
     case _ =>
   }
 }

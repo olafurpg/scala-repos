@@ -27,9 +27,10 @@ trait BuildFileProvider {
     def toLightVirtualFile(origFile: VirtualFile) =
       vfsFileToCopy.getOrElseUpdate(
         origFile,
-        new LightVirtualFile(origFile,
-                             VfsUtilCore.loadText(origFile),
-                             LocalTimeCounter.currentTime))
+        new LightVirtualFile(
+          origFile,
+          VfsUtilCore.loadText(origFile),
+          LocalTimeCounter.currentTime))
 
     def toPsiFile(vFile: VirtualFile) =
       Option(PsiManager.getInstance(module.getProject).findFile(vFile))

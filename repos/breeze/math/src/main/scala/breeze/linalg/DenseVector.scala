@@ -112,14 +112,15 @@ class DenseVector[@spec(Double, Int, Float, Long) V](val data: Array[V],
 
   override def equals(p1: Any) = p1 match {
     case y: DenseVector[_] =>
-      y.length == length && ArrayUtil.nonstupidEquals(data,
-                                                      offset,
-                                                      stride,
-                                                      length,
-                                                      y.data,
-                                                      y.offset,
-                                                      y.stride,
-                                                      y.length)
+      y.length == length && ArrayUtil.nonstupidEquals(
+        data,
+        offset,
+        stride,
+        length,
+        y.data,
+        y.offset,
+        y.stride,
+        y.length)
     case _ => super.equals(p1)
   }
 
@@ -219,10 +220,11 @@ class DenseVector[@spec(Double, Int, Float, Long) V](val data: Array[V],
       throw new IllegalArgumentException(
         "End " + end +
           "is out of bounds for slice of DenseVector of length " + length)
-    new DenseVector(data,
-                    start * this.stride + offset,
-                    stride * this.stride,
-                    (end - start) / stride)
+    new DenseVector(
+      data,
+      start * this.stride + offset,
+      stride * this.stride,
+      (end - start) / stride)
   }
 
   // <editor-fold defaultstate="collapsed" desc=" Conversions (DenseMatrix, Array, Scala Vector) ">
@@ -319,10 +321,11 @@ object DenseVector
         new DenseVector(v, offset = offset, stride = stride, length = length)
           .asInstanceOf[DenseVector[V]]
       case _ =>
-        new DenseVector(data,
-                        offset = offset,
-                        stride = stride,
-                        length = length)
+        new DenseVector(
+          data,
+          offset = offset,
+          stride = stride,
+          length = length)
     }
   }
 
@@ -494,11 +497,12 @@ object DenseVector
           fn: CanTraverseKeyValuePairs.KeyValuePairsVisitor[Int, V]): Unit = {
         import from._
 
-        fn.visitArray((ind: Int) => (ind - offset) / stride,
-                      data,
-                      offset,
-                      length,
-                      stride)
+        fn.visitArray(
+          (ind: Int) => (ind - offset) / stride,
+          data,
+          offset,
+          length,
+          stride)
       }
     }
 
@@ -577,10 +581,11 @@ object DenseVector
 
         require(range.isEmpty || range.last < v.length)
         require(range.isEmpty || range.start >= 0)
-        DenseVector.create(v.data,
-                           offset = v.offset + v.stride * range.start,
-                           stride = v.stride * range.step,
-                           length = range.length)
+        DenseVector.create(
+          v.data,
+          offset = v.offset + v.stride * range.start,
+          stride = v.stride * range.step,
+          length = range.length)
       }
     }
   }
@@ -589,11 +594,12 @@ object DenseVector
                                                  DenseMatrix[Complex]] = {
     new CanTranspose[DenseVector[Complex], DenseMatrix[Complex]] {
       def apply(from: DenseVector[Complex]): DenseMatrix[Complex] = {
-        new DenseMatrix(data = from.data map { _.conjugate },
-                        offset = from.offset,
-                        cols = from.length,
-                        rows = 1,
-                        majorStride = from.stride)
+        new DenseMatrix(
+          data = from.data map { _.conjugate },
+          offset = from.offset,
+          cols = from.length,
+          rows = 1,
+          majorStride = from.stride)
       }
     }
   }
@@ -669,9 +675,10 @@ object DenseVector
   }
 
   implicit object canDaxpy
-      extends scaleAdd.InPlaceImpl3[DenseVector[Double],
-                                    Double,
-                                    DenseVector[Double]]
+      extends scaleAdd.InPlaceImpl3[
+        DenseVector[Double],
+        Double,
+        DenseVector[Double]]
       with Serializable {
     def apply(y: DenseVector[Double], a: Double, x: DenseVector[Double]) {
       require(x.length == y.length, s"Vectors must have same length")
@@ -724,9 +731,10 @@ object DenseVector
     .register(canSubD)
 
   implicit object canDotD
-      extends OpMulInner.Impl2[DenseVector[Double],
-                               DenseVector[Double],
-                               Double] {
+      extends OpMulInner.Impl2[
+        DenseVector[Double],
+        DenseVector[Double],
+        Double] {
     def apply(a: DenseVector[Double], b: DenseVector[Double]) = {
       require(a.length == b.length, s"Vectors must have same length")
       if (a.noOffsetOrStride && b.noOffsetOrStride &&

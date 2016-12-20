@@ -28,9 +28,10 @@ object EvaluatorSpecs extends Specification with EvaluatorModule {
   import Function.const
 
   "mirror evaluator" should {
-    implicit val fs = FS("/nums" -> Vector(JNum(1), JNum(2), JNum(3)),
-                         "/nums2" -> Vector(JNum(1), JNum(2), JNum(3)),
-                         "/nums3" -> Vector(JNum(1), JNum(2), JNum(3)))
+    implicit val fs = FS(
+      "/nums" -> Vector(JNum(1), JNum(2), JNum(3)),
+      "/nums2" -> Vector(JNum(1), JNum(2), JNum(3)),
+      "/nums3" -> Vector(JNum(1), JNum(2), JNum(3)))
 
     "evaluate basic literals" >> {
       "strings" >> {
@@ -231,15 +232,16 @@ object EvaluatorSpecs extends Specification with EvaluatorModule {
         |   n + n2
         | """.stripMargin
 
-      input must evalTo(JNum(2),
-                        JNum(3),
-                        JNum(4),
-                        JNum(3),
-                        JNum(4),
-                        JNum(5),
-                        JNum(4),
-                        JNum(5),
-                        JNum(6))
+      input must evalTo(
+        JNum(2),
+        JNum(3),
+        JNum(4),
+        JNum(3),
+        JNum(4),
+        JNum(5),
+        JNum(4),
+        JNum(5),
+        JNum(6))
     }
 
     "evaluate a join between related resultants" in {
@@ -252,15 +254,16 @@ object EvaluatorSpecs extends Specification with EvaluatorModule {
         |   (n + n2) * (n3 + n)
         | """.stripMargin
 
-      input must evalTo(JNum(4),
-                        JNum(9),
-                        JNum(16),
-                        JNum(9),
-                        JNum(16),
-                        JNum(25),
-                        JNum(16),
-                        JNum(25),
-                        JNum(36))
+      input must evalTo(
+        JNum(4),
+        JNum(9),
+        JNum(16),
+        JNum(9),
+        JNum(16),
+        JNum(25),
+        JNum(16),
+        JNum(25),
+        JNum(36))
     }
 
     "restrict cartesians by filtered relation" in {

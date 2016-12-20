@@ -62,12 +62,13 @@ class BackgroundSize(override val delegate: jfxsl.BackgroundSize)
            contain: Boolean,
            cover: Boolean) =
     this(
-      new jfxsl.BackgroundSize(width,
-                               height,
-                               widthAsPercentage,
-                               heightAsPercentage,
-                               contain,
-                               cover))
+      new jfxsl.BackgroundSize(
+        width,
+        height,
+        widthAsPercentage,
+        heightAsPercentage,
+        contain,
+        cover))
 
   /** The height of the area within the Region where the associated BackgroundImage should render. */
   def width: Double = delegate.getHeight

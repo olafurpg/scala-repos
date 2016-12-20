@@ -21,9 +21,10 @@ private[pickling] object IrSymbol {
           allmethods(tail, mthds, visitedClasses)
         case hd :: tail =>
           val newMthds = hd.methods
-          allmethods(tail ++ hd.parentClasses,
-                     newMthds ++ mthds,
-                     visitedClasses + hd.className)
+          allmethods(
+            tail ++ hd.parentClasses,
+            newMthds ++ mthds,
+            visitedClasses + hd.className)
         case Nil => mthds
       }
     // TODO - We should maybe warn if we see transient fields that cause us not to compile correctly, or maybe
@@ -40,9 +41,10 @@ private[pickling] object IrSymbol {
           allfields(tail, fields, visitedClasses)
         case hd :: tail =>
           val newFields = hd.fields
-          allfields(tail ++ hd.parentClasses,
-                    newFields ++ fields,
-                    visitedClasses + hd.className)
+          allfields(
+            tail ++ hd.parentClasses,
+            newFields ++ fields,
+            visitedClasses + hd.className)
         case Nil => fields
       }
     // TODO - We should maybe warn if we see transient fields that cause us not to compile correctly, or maybe

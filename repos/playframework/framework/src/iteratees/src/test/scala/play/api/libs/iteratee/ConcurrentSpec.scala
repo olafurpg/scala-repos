@@ -355,16 +355,16 @@ object ConcurrentSpec
     "redeem the iteratee with the result and the partial enumerator" in {
       val (a, remaining) =
         await(
-          Concurrent.runPartial(Enumerator("foo", "bar"),
-                                Iteratee.head[String]))
+          Concurrent
+            .runPartial(Enumerator("foo", "bar"), Iteratee.head[String]))
       a must beSome("foo")
       await(remaining |>>> Iteratee.getChunks[String]) must_== Seq("bar")
     }
     "work when there is no input left in the enumerator" in {
       val (a, remaining) =
         await(
-          Concurrent.runPartial(Enumerator("foo", "bar"),
-                                Iteratee.getChunks[String]))
+          Concurrent
+            .runPartial(Enumerator("foo", "bar"), Iteratee.getChunks[String]))
       a must_== Seq("foo", "bar")
       await(remaining |>>> Iteratee.getChunks[String]) must_== Nil
     }

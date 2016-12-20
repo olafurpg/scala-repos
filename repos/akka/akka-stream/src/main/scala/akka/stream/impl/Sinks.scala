@@ -301,8 +301,9 @@ private[akka] final class HeadOptionStage[T]
 }
 
 private[akka] final class SeqStage[T]
-    extends GraphStageWithMaterializedValue[SinkShape[T],
-                                            Future[immutable.Seq[T]]] {
+    extends GraphStageWithMaterializedValue[
+      SinkShape[T],
+      Future[immutable.Seq[T]]] {
   val in = Inlet[T]("seq.in")
 
   override def toString: String = "SeqStage"

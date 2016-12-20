@@ -44,9 +44,10 @@ object Doc {
                cache: File,
                compiler: AnalyzingCompiler,
                fileInputOptions: Seq[String]): Gen =
-    cached(cache,
-           fileInputOptions,
-           prepare(label + " Scala API documentation", compiler.doc))
+    cached(
+      cache,
+      fileInputOptions,
+      prepare(label + " Scala API documentation", compiler.doc))
   def javadoc(label: String,
               cache: File,
               doc: sbt.internal.inc.javac.JavaTools,
@@ -59,16 +60,18 @@ object Doc {
               log: Logger,
               reporter: Reporter,
               fileInputOptions: Seq[String]): Gen =
-    cached(cache,
-           fileInputOptions,
-           prepare(label + " Java API documentation",
-                   filterSources(javaSourcesOnly,
-                                 (sources: Seq[File], classpath: Seq[File],
-                                  outputDirectory: File, options: Seq[String],
-                                  maxErrors: Int, log: Logger) => {
-                                   // doc.doc
-                                   ???
-                                 })))
+    cached(
+      cache,
+      fileInputOptions,
+      prepare(
+        label + " Java API documentation",
+        filterSources(
+          javaSourcesOnly,
+          (sources: Seq[File], classpath: Seq[File], outputDirectory: File,
+           options: Seq[String], maxErrors: Int, log: Logger) => {
+            // doc.doc
+            ???
+          })))
 
   val javaSourcesOnly: File => Boolean = _.getName.endsWith(".java")
 
@@ -87,15 +90,16 @@ object Doc {
               outputDirectory: File,
               options: Seq[String],
               log: Logger) {
-      generate("Scala",
-               label,
-               compiler.doc,
-               sources,
-               classpath,
-               outputDirectory,
-               options,
-               maximumErrors,
-               log)
+      generate(
+        "Scala",
+        label,
+        compiler.doc,
+        sources,
+        classpath,
+        outputDirectory,
+        options,
+        maximumErrors,
+        log)
     }
   }
   private[sbt] final class Javadoc(maximumErrors: Int,
@@ -108,15 +112,16 @@ object Doc {
               options: Seq[String],
               log: Logger) {
       // javadoc doesn't handle *.scala properly, so we evict them from javadoc sources list.
-      generate("Java",
-               label,
-               doc.doc,
-               sources.filterNot(_.name.endsWith(".scala")),
-               classpath,
-               outputDirectory,
-               options,
-               maximumErrors,
-               log)
+      generate(
+        "Java",
+        label,
+        doc.doc,
+        sources.filterNot(_.name.endsWith(".scala")),
+        classpath,
+        outputDirectory,
+        options,
+        maximumErrors,
+        log)
     }
   }
 }

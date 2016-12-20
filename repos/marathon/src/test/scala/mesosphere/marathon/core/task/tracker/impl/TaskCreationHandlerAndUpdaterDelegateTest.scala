@@ -29,9 +29,10 @@ class TaskCreationHandlerAndUpdaterDelegateTest
 
     Then("an update operation is requested")
     f.taskTrackerProbe.expectMsg(
-      TaskTrackerActor.ForwardTaskOp(f.timeoutFromNow,
-                                     task.taskId,
-                                     TaskOpProcessor.Action.Update(task))
+      TaskTrackerActor.ForwardTaskOp(
+        f.timeoutFromNow,
+        task.taskId,
+        TaskOpProcessor.Action.Update(task))
     )
 
     When("the request is acknowledged")
@@ -50,9 +51,10 @@ class TaskCreationHandlerAndUpdaterDelegateTest
 
     Then("an update operation is requested")
     f.taskTrackerProbe.expectMsg(
-      TaskTrackerActor.ForwardTaskOp(f.timeoutFromNow,
-                                     task.taskId,
-                                     TaskOpProcessor.Action.Update(task))
+      TaskTrackerActor.ForwardTaskOp(
+        f.timeoutFromNow,
+        task.taskId,
+        TaskOpProcessor.Action.Update(task))
     )
 
     When("the response is an error")
@@ -75,9 +77,10 @@ class TaskCreationHandlerAndUpdaterDelegateTest
 
     Then("an expunge operation is requested")
     f.taskTrackerProbe.expectMsg(
-      TaskTrackerActor.ForwardTaskOp(f.timeoutFromNow,
-                                     task.taskId,
-                                     TaskOpProcessor.Action.Expunge)
+      TaskTrackerActor.ForwardTaskOp(
+        f.timeoutFromNow,
+        task.taskId,
+        TaskOpProcessor.Action.Expunge)
     )
 
     When("the request is acknowledged")
@@ -96,9 +99,10 @@ class TaskCreationHandlerAndUpdaterDelegateTest
 
     Then("an expunge operation is requested")
     f.taskTrackerProbe.expectMsg(
-      TaskTrackerActor.ForwardTaskOp(f.timeoutFromNow,
-                                     task.taskId,
-                                     TaskOpProcessor.Action.Expunge)
+      TaskTrackerActor.ForwardTaskOp(
+        f.timeoutFromNow,
+        task.taskId,
+        TaskOpProcessor.Action.Expunge)
     )
 
     When("the response is an error")

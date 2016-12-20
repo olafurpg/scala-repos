@@ -253,8 +253,9 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
 
           try {
             val ks = KeyStore.getInstance(KeyStore.getDefaultType)
-            ks.load(input,
-                    fileServerSSLOptions.trustStorePassword.get.toCharArray)
+            ks.load(
+              input,
+              fileServerSSLOptions.trustStorePassword.get.toCharArray)
 
             val tmf = TrustManagerFactory.getInstance(
               TrustManagerFactory.getDefaultAlgorithm)

@@ -22,10 +22,12 @@ class TraversableOnceTest {
         case u: UnsupportedOperationException => true
         case t: Throwable => false
       }
-    assert(hasException({ List[Int]().maxBy(_ * 3) }),
-           "maxBy: on empty list should throw UnsupportedOperationException.")
-    assert(hasException({ List[Int]().minBy(_ * 3) }),
-           "minBy: on empty list should throw UnsupportedOperationException.")
+    assert(
+      hasException({ List[Int]().maxBy(_ * 3) }),
+      "maxBy: on empty list should throw UnsupportedOperationException.")
+    assert(
+      hasException({ List[Int]().minBy(_ * 3) }),
+      "minBy: on empty list should throw UnsupportedOperationException.")
   }
 
   // Basic definition of minBy/maxBy.
@@ -33,12 +35,14 @@ class TraversableOnceTest {
   def testCorrectness() = {
     def f(x: Int) = -1 * x
     val max = list.maxBy(f)
-    assert(list.forall(f(_) <= f(max)),
-           "f(list.maxBy(f)) should ≥ f(x) where x is any element of list.")
+    assert(
+      list.forall(f(_) <= f(max)),
+      "f(list.maxBy(f)) should ≥ f(x) where x is any element of list.")
 
     val min = list.minBy(f)
-    assert(list.forall(f(_) >= f(min)),
-           "f(list.minBy(f)) should ≤ f(x) where x is any element of list.")
+    assert(
+      list.forall(f(_) >= f(min)),
+      "f(list.minBy(f)) should ≤ f(x) where x is any element of list.")
   }
 
   // Ensure that it always returns the first match if more than one element have the same largest/smallest f(x).

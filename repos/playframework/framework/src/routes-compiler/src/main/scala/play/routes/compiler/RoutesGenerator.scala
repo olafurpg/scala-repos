@@ -63,10 +63,11 @@ object StaticRoutesGenerator extends RoutesGenerator {
     val forwardsRoutesFiles =
       if (task.forwardsRouter) {
         Seq(
-          folder + ForwardsRoutesFile -> generateRouter(sourceInfo,
-                                                        namespace,
-                                                        task.additionalImports,
-                                                        rules))
+          folder + ForwardsRoutesFile -> generateRouter(
+            sourceInfo,
+            namespace,
+            task.additionalImports,
+            rules))
       } else {
         Nil
       }
@@ -219,10 +220,11 @@ object InjectedRoutesGenerator extends RoutesGenerator {
     val forwardsRoutesFiles =
       if (task.forwardsRouter) {
         Seq(
-          folder + ForwardsRoutesFile -> generateRouter(sourceInfo,
-                                                        namespace,
-                                                        task.additionalImports,
-                                                        rules))
+          folder + ForwardsRoutesFile -> generateRouter(
+            sourceInfo,
+            namespace,
+            task.additionalImports,
+            rules))
       } else {
         Nil
       }
@@ -268,9 +270,10 @@ object InjectedRoutesGenerator extends RoutesGenerator {
       .zipWithIndex
       .map {
         case ((router, includes), index) =>
-          router -> Dependency(router.replace('.', '_') + "_" + index,
-                               router,
-                               includes.head)
+          router -> Dependency(
+            router.replace('.', '_') + "_" + index,
+            router,
+            includes.head)
       }
       .toMap
 

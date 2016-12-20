@@ -47,10 +47,11 @@ trait XLightWebHttpClientModule[M[+ _]] extends HttpClientModule[M] {
     private def buildUrl(path: String): HttpClientError \/ URL =
       fromTryCatch(None) {
         val url0 = new URL(baseUrl)
-        new URL(url0.getProtocol,
-                url0.getHost,
-                url0.getPort,
-                url0.getPath + path)
+        new URL(
+          url0.getProtocol,
+          url0.getHost,
+          url0.getPort,
+          url0.getPath + path)
       }
 
     private def buildRequest(

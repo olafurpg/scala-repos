@@ -19,10 +19,12 @@ class CoyonedaTests extends CatsSuite {
         FA.eqv(a.run, b.run)
     }
 
-  checkAll("Coyoneda[Option, ?]",
-           FunctorTests[Coyoneda[Option, ?]].functor[Int, Int, Int])
-  checkAll("Functor[Coyoneda[Option, ?]]",
-           SerializableTests.serializable(Functor[Coyoneda[Option, ?]]))
+  checkAll(
+    "Coyoneda[Option, ?]",
+    FunctorTests[Coyoneda[Option, ?]].functor[Int, Int, Int])
+  checkAll(
+    "Functor[Coyoneda[Option, ?]]",
+    SerializableTests.serializable(Functor[Coyoneda[Option, ?]]))
 
   test("toYoneda and then toCoyoneda is identity") {
     forAll { (y: Coyoneda[Option, Int]) =>

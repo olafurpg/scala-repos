@@ -66,10 +66,11 @@ class ReplicatedMetrics(measureInterval: FiniteDuration,
   replicator ! Subscribe(UsedHeapKey, self)
   replicator ! Subscribe(MaxHeapKey, self)
 
-  cluster.subscribe(self,
-                    InitialStateAsEvents,
-                    classOf[MemberUp],
-                    classOf[MemberRemoved])
+  cluster.subscribe(
+    self,
+    InitialStateAsEvents,
+    classOf[MemberUp],
+    classOf[MemberRemoved])
 
   override def postStop(): Unit = {
     tickTask.cancel()

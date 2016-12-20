@@ -58,23 +58,25 @@ class UnionTest extends AsyncTest[RelationalTestDB] {
       _ <- mark("q2", q2.result).map(r =>
         r.toSet shouldBe Set((7, "Ben"), (8, "Greg"), (6, "Leonard")))
       _ <- mark("q3", q3.result).map(
-        _ shouldBe List((2, "Amy"),
-                        (7, "Ben"),
-                        (8, "Greg"),
-                        (6, "Leonard"),
-                        (3, "Steve")))
+        _ shouldBe List(
+          (2, "Amy"),
+          (7, "Ben"),
+          (8, "Greg"),
+          (6, "Leonard"),
+          (3, "Steve")))
       _ <- mark("q4b", q4b.result).map(r => r.toSet shouldBe Set(1, 2, 3))
       _ <- mark("q4c", q4c.result).map(r => r.toSet shouldBe Set(1, 2, 3))
       _ <- mark("q5", q5.result).map(
         r =>
-          r.toSet shouldBe Set((7, 7),
-                               (6, 6),
-                               (2, 0),
-                               (4, 4),
-                               (3, 0),
-                               (8, 8),
-                               (5, 5),
-                               (1, 0)))
+          r.toSet shouldBe Set(
+            (7, 7),
+            (6, 6),
+            (2, 0),
+            (4, 4),
+            (3, 0),
+            (8, 8),
+            (5, 5),
+            (1, 0)))
     } yield ()) andFinally (managers.schema ++ employees.schema).drop
   }
 
@@ -132,12 +134,13 @@ class UnionTest extends AsyncTest[RelationalTestDB] {
         r.toSet shouldBe Set((100L, 1L), (200L, 2L), (300L, 3L))),
       q3.result.map(
         r =>
-          r.toSet shouldBe Set((10L, 1L),
-                               (20L, 2L),
-                               (30L, 3L),
-                               (100L, 1L),
-                               (200L, 2L),
-                               (300L, 3L)))
+          r.toSet shouldBe Set(
+            (10L, 1L),
+            (20L, 2L),
+            (30L, 3L),
+            (100L, 1L),
+            (200L, 2L),
+            (300L, 3L)))
     )
   }
 

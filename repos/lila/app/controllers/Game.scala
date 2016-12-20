@@ -51,10 +51,11 @@ object Game extends LilaController {
             val date =
               (DateTimeFormat forPattern "yyyy-MM-dd") print new DateTime
             Ok.chunked(Env.api.pgnDump exportUserGames userId)
-              .withHeaders(CONTENT_TYPE -> ContentTypes.TEXT,
-                           CONTENT_DISPOSITION ->
-                             ("attachment; filename=" +
-                               s"lichess_${me.username}_$date.pgn"))
+              .withHeaders(
+                CONTENT_TYPE -> ContentTypes.TEXT,
+                CONTENT_DISPOSITION ->
+                  ("attachment; filename=" +
+                    s"lichess_${me.username}_$date.pgn"))
         })
     else notFound
   }

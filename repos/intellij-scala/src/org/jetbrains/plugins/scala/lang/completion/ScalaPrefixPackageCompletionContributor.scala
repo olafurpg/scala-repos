@@ -46,9 +46,10 @@ class ScalaPrefixPackageCompletionContributor
       def addCompletions(parameters: CompletionParameters,
                          context: ProcessingContext,
                          result: CompletionResultSet) {
-        if (!shouldRunClassNameCompletion(positionFromParameters(parameters),
-                                          parameters,
-                                          result.getPrefixMatcher)) {
+        if (!shouldRunClassNameCompletion(
+              positionFromParameters(parameters),
+              parameters,
+              result.getPrefixMatcher)) {
           ScalaPrefixPackageCompletionContributor.completePrefixPackageNames(
             positionFromParameters(parameters),
             parameters,

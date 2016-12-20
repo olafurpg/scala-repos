@@ -40,12 +40,13 @@ class MakeExplicitAction
     val file = PsiUtilBase.getPsiFileInEditor(editor, project)
     if (!file.isInstanceOf[ScalaFile]) return
 
-    IntentionUtils.showMakeExplicitPopup(project,
-                                         expression,
-                                         function,
-                                         editor,
-                                         secondPart,
-                                         getCurrentItemBounds _)
+    IntentionUtils.showMakeExplicitPopup(
+      project,
+      expression,
+      function,
+      editor,
+      secondPart,
+      getCurrentItemBounds _)
   }
 
   def getCurrentItemBounds: Rectangle = {

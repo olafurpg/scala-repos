@@ -73,12 +73,13 @@ class UnsafeFixedWidthAggregationMapSuite
       taskMemoryManager = new TaskMemoryManager(memoryManager, 0)
 
       TaskContext.setTaskContext(
-        new TaskContextImpl(stageId = 0,
-                            partitionId = 0,
-                            taskAttemptId = Random.nextInt(10000),
-                            attemptNumber = 0,
-                            taskMemoryManager = taskMemoryManager,
-                            metricsSystem = null))
+        new TaskContextImpl(
+          stageId = 0,
+          partitionId = 0,
+          taskAttemptId = Random.nextInt(10000),
+          attemptNumber = 0,
+          taskMemoryManager = taskMemoryManager,
+          metricsSystem = null))
 
       try {
         f

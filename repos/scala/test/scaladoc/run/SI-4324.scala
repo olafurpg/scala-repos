@@ -20,9 +20,10 @@ object Test extends ScaladocModelTest {
       case List(List(arg11, arg12), List(arg21, arg22), List(arg31, arg32)) =>
       //yeeey, do nothing
       case other =>
-        assert(false,
-               "Incorrect valueParams generated: " + other +
-                 " instead of (arg11, arg12)(arg21, arg22)(arg31, arg32)")
+        assert(
+          false,
+          "Incorrect valueParams generated: " + other +
+            " instead of (arg11, arg12)(arg21, arg22)(arg31, arg32)")
     }
   }
 }

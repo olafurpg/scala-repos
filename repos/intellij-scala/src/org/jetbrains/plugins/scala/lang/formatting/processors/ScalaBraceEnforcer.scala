@@ -113,9 +113,10 @@ class ScalaBraceEnforcer(settings: CodeStyleSettings)
         case Some(fin) =>
           fin.expression match {
             case Some(expr) =>
-              processExpression(expr,
-                                tryStmt,
-                                scalaSettings.FINALLY_BRACE_FORCE)
+              processExpression(
+                expr,
+                tryStmt,
+                scalaSettings.FINALLY_BRACE_FORCE)
             case _ =>
           }
         case _ =>
@@ -173,12 +174,14 @@ class ScalaBraceEnforcer(settings: CodeStyleSettings)
       val prev = expr.getPrevSibling
       if (ScalaPsiUtil.isLineTerminator(prev) ||
           prev.isInstanceOf[PsiWhiteSpace]) {
-        CodeEditUtil.removeChild(SourceTreeToPsiMap.psiElementToTree(parent),
-                                 SourceTreeToPsiMap.psiElementToTree(prev))
+        CodeEditUtil.removeChild(
+          SourceTreeToPsiMap.psiElementToTree(parent),
+          SourceTreeToPsiMap.psiElementToTree(prev))
       }
-      CodeEditUtil.replaceChild(SourceTreeToPsiMap.psiElementToTree(parent),
-                                SourceTreeToPsiMap.psiElementToTree(expr),
-                                SourceTreeToPsiMap.psiElementToTree(newExpr))
+      CodeEditUtil.replaceChild(
+        SourceTreeToPsiMap.psiElementToTree(parent),
+        SourceTreeToPsiMap.psiElementToTree(expr),
+        SourceTreeToPsiMap.psiElementToTree(newExpr))
       CodeStyleManager.getInstance(project).reformat(parent, true)
     } finally {
       updateResultRange(oldTextLength, parent.getTextLength)

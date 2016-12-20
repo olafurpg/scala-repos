@@ -39,14 +39,15 @@ class UnsavedFileTest
           expectMsg(VoidResponse)
           asyncHelper.expectMsg(FullTypeCheckCompleteEvent)
 
-          project ! SymbolDesignationsReq(Right(inMemory),
-                                          0,
-                                          50,
-                                          SourceSymbol.allSymbols)
+          project ! SymbolDesignationsReq(
+            Right(inMemory),
+            0,
+            50,
+            SourceSymbol.allSymbols)
           expectMsgPF() {
-            case SymbolDesignations(inMemory.file,
-                                    syms: List[SymbolDesignation])
-                if syms.nonEmpty =>
+            case SymbolDesignations(
+                inMemory.file,
+                syms: List[SymbolDesignation]) if syms.nonEmpty =>
           }
 
           project ! CompletionsReq(inMemory, 27, 0, false, false)
@@ -74,10 +75,11 @@ class UnsavedFileTest
           project ! TypecheckFileReq(unsaved)
           expectMsgPF() { case EnsimeServerError(e) => }
 
-          project ! SymbolDesignationsReq(Right(unsaved),
-                                          0,
-                                          0,
-                                          SourceSymbol.allSymbols)
+          project ! SymbolDesignationsReq(
+            Right(unsaved),
+            0,
+            0,
+            SourceSymbol.allSymbols)
           expectMsgPF() { case EnsimeServerError(e) => }
 
           project ! CompletionsReq(unsaved, 0, 0, false, false)

@@ -123,9 +123,10 @@ object Reflect {
         case e: VirtualMachineError => throw e
         case e: ThreadDeath => throw e
         case e: Throwable =>
-          throw new PlayException(s"Cannot load $key",
-                                  s"$key [$className] was not loaded.",
-                                  e)
+          throw new PlayException(
+            s"Cannot load $key",
+            s"$key [$className] was not loaded.",
+            e)
       }
     }
 
@@ -165,9 +166,10 @@ object Reflect {
       case e: ThreadDeath => throw e
       case e: Throwable =>
         val name = simpleName(implicitly[ClassTag[T]].runtimeClass)
-        throw new PlayException(s"Cannot load $name",
-                                s"$name [$fqcn] cannot be instantiated.",
-                                e)
+        throw new PlayException(
+          s"Cannot load $name",
+          s"$name [$fqcn] cannot be instantiated.",
+          e)
     }
   }
 

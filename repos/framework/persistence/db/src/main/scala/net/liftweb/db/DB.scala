@@ -337,10 +337,11 @@ trait DB extends Loggable {
     logger.trace("Acquiring " + name + " On thread " + Thread.currentThread)
     var ret = info.get(name) match {
       case None =>
-        ConnectionHolder(newConnection(name),
-                         calcBaseCount(name) + 1,
-                         Nil,
-                         false)
+        ConnectionHolder(
+          newConnection(name),
+          calcBaseCount(name) + 1,
+          Nil,
+          false)
       case Some(ConnectionHolder(conn, cnt, post, rb)) =>
         ConnectionHolder(conn, cnt + 1, post, rb)
     }
@@ -1230,9 +1231,10 @@ class StandardDBVendor(driverName: String,
     (dbUser, dbPassword) match {
       case (Full(user), Full(pwd)) =>
         tryo { t: Throwable =>
-          logger.error("Unable to get database connection. url=%s, user=%s"
-                         .format(dbUrl, user),
-                       t)
+          logger.error(
+            "Unable to get database connection. url=%s, user=%s"
+              .format(dbUrl, user),
+            t)
         }(DriverManager.getConnection(dbUrl, user, pwd))
       case _ =>
         tryo { t: Throwable =>
@@ -1295,8 +1297,8 @@ trait ProtoDBVendor extends ConnectionManager {
           ret.foreach(_.setAutoCommit(false))
           poolSize = poolSize + 1
           logger.debug(
-            "Created new pool entry. name=%s, poolSize=%d".format(name,
-                                                                  poolSize))
+            "Created new pool entry. name=%s, poolSize=%d"
+              .format(name, poolSize))
           ret
 
         case Nil =>

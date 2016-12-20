@@ -63,8 +63,9 @@ class RemoteRandomSpec
       runOn(fourth) {
         enterBarrier("start")
         val actor =
-          system.actorOf(RandomPool(nrOfInstances = 0).props(Props[SomeActor]),
-                         "service-hello")
+          system.actorOf(
+            RandomPool(nrOfInstances = 0).props(Props[SomeActor]),
+            "service-hello")
         actor.isInstanceOf[RoutedActorRef] should ===(true)
 
         val connectionCount = 3
@@ -79,9 +80,10 @@ class RemoteRandomSpec
           messages = connectionCount * iterationCount) {
           case ref: ActorRef ⇒ ref.path.address
         }).foldLeft(
-          Map(node(first).address -> 0,
-              node(second).address -> 0,
-              node(third).address -> 0)) {
+          Map(
+            node(first).address -> 0,
+            node(second).address -> 0,
+            node(third).address -> 0)) {
           case (replyMap, address) ⇒
             replyMap + (address -> (replyMap(address) + 1))
         }

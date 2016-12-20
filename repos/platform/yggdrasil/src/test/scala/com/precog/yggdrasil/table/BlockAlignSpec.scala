@@ -72,10 +72,11 @@ trait BlockAlignSpec[M[+ _]]
       }
 
     val finalResults = for {
-      results <- Table.align(fromJson(lstream),
-                             SourceKey.Single,
-                             fromJson(rstream),
-                             SourceKey.Single)
+      results <- Table.align(
+        fromJson(lstream),
+        SourceKey.Single,
+        fromJson(rstream),
+        SourceKey.Single)
       leftResult <- results._1.toJson
       rightResult <- results._2.toJson
       leftResult2 <- results._1.toJson
@@ -127,12 +128,14 @@ trait BlockAlignSpec[M[+ _]]
         }]
     """)
 
-    val sample = SampleData(elements.toStream,
-                            Some(
-                              (2,
-                               List((JPath(".q"), CNum),
-                                    (JPath(".hw"), CEmptyArray),
-                                    (JPath(".fr8y"), CNum)))))
+    val sample = SampleData(
+      elements.toStream,
+      Some(
+        (2,
+         List(
+           (JPath(".q"), CNum),
+           (JPath(".hw"), CEmptyArray),
+           (JPath(".fr8y"), CNum)))))
 
     testAlign(sample.sortBy(_ \ "key"))
   }
@@ -388,10 +391,11 @@ trait BlockAlignSpec[M[+ _]]
         [[5],{ "000000":2147483647 },2147483647]
       ]""")
 
-      test(fromJson(ljson.toStream),
-           lsortedOn,
-           fromJson(rjson.toStream),
-           rsortedOn)
+      test(
+        fromJson(ljson.toStream),
+        lsortedOn,
+        fromJson(rjson.toStream),
+        rsortedOn)
     }
 
     def test1 = {
@@ -412,14 +416,16 @@ trait BlockAlignSpec[M[+ _]]
         WrapObject(
           DerefObjectStatic(
             OuterObjectConcat(
-              WrapObject(DerefObjectStatic(DerefArrayStatic(Leaf(Source),
-                                                            CPathIndex(1)),
-                                           CPathField("000001")),
-                         "000000"),
-              WrapObject(DerefObjectStatic(DerefArrayStatic(Leaf(Source),
-                                                            CPathIndex(1)),
-                                           CPathField("000000")),
-                         "000001")
+              WrapObject(
+                DerefObjectStatic(
+                  DerefArrayStatic(Leaf(Source), CPathIndex(1)),
+                  CPathField("000001")),
+                "000000"),
+              WrapObject(
+                DerefObjectStatic(
+                  DerefArrayStatic(Leaf(Source), CPathIndex(1)),
+                  CPathField("000000")),
+                "000001")
             ),
             CPathField("000000")
           ),
@@ -436,10 +442,11 @@ trait BlockAlignSpec[M[+ _]]
 
       val rsortedOn = DerefArrayStatic(Leaf(Source), CPathIndex(1))
 
-      test(fromJson(ljson.toStream),
-           lsortedOn,
-           fromJson(rjson.toStream),
-           rsortedOn)
+      test(
+        fromJson(ljson.toStream),
+        lsortedOn,
+        fromJson(rjson.toStream),
+        rsortedOn)
     }
 
     def test2 = {
@@ -464,14 +471,16 @@ trait BlockAlignSpec[M[+ _]]
         WrapObject(
           DerefObjectStatic(
             OuterObjectConcat(
-              WrapObject(DerefObjectStatic(DerefArrayStatic(Leaf(Source),
-                                                            CPathIndex(1)),
-                                           CPathField("000000")),
-                         "000000"),
-              WrapObject(DerefObjectStatic(DerefArrayStatic(Leaf(Source),
-                                                            CPathIndex(1)),
-                                           CPathField("000001")),
-                         "000001")
+              WrapObject(
+                DerefObjectStatic(
+                  DerefArrayStatic(Leaf(Source), CPathIndex(1)),
+                  CPathField("000000")),
+                "000000"),
+              WrapObject(
+                DerefObjectStatic(
+                  DerefArrayStatic(Leaf(Source), CPathIndex(1)),
+                  CPathField("000001")),
+                "000001")
             ),
             CPathField("000000")
           ),

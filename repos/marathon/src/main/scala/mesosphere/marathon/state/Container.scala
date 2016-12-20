@@ -47,8 +47,9 @@ object Container {
                            labels: Map[String, String] =
                              Map.empty[String, String]) {
 
-      require(protocol == "tcp" || protocol == "udp",
-              "protocol can only be 'tcp' or 'udp'")
+      require(
+        protocol == "tcp" || protocol == "udp",
+        "protocol can only be 'tcp' or 'udp'")
     }
 
     object PortMapping {

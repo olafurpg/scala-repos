@@ -106,9 +106,10 @@ object ParameterDirectives extends ParameterDirectives {
           reject(MissingQueryParamRejection(paramName))
         case Failure(x) ⇒
           reject(
-            MalformedQueryParamRejection(paramName,
-                                         x.getMessage.nullAsEmpty,
-                                         Option(x.getCause)))
+            MalformedQueryParamRejection(
+              paramName,
+              x.getMessage.nullAsEmpty,
+              Option(x.getCause)))
       }
 
     //////////////////// "regular" parameter extraction //////////////////////
@@ -117,8 +118,9 @@ object ParameterDirectives extends ParameterDirectives {
       extractRequestContext flatMap { ctx ⇒
         import ctx.executionContext
         import ctx.materializer
-        handleParamResult(paramName,
-                          fsou(ctx.request.uri.query().get(paramName)))
+        handleParamResult(
+          paramName,
+          fsou(ctx.request.uri.query().get(paramName)))
       }
     implicit def forString(
         implicit fsu: FSU[String]): ParamDefAux[String, Directive1[String]] =

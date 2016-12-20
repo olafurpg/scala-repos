@@ -28,8 +28,9 @@ final class JSDependency(val resourceName: String,
 
   import JSDependency._
 
-  require(commonJSName.forall(isValidIdentifier),
-          "commonJSName must be a valid JavaScript identifier")
+  require(
+    commonJSName.forall(isValidIdentifier),
+    "commonJSName must be a valid JavaScript identifier")
 
   def dependsOn(names: String*): JSDependency =
     copy(dependencies = dependencies ++ names)
@@ -43,10 +44,11 @@ final class JSDependency(val resourceName: String,
                    commonJSName: Option[String] = this.commonJSName,
                    minifiedResourceName: Option[String] =
                      this.minifiedResourceName) = {
-    new JSDependency(resourceName,
-                     dependencies,
-                     commonJSName,
-                     minifiedResourceName)
+    new JSDependency(
+      resourceName,
+      dependencies,
+      commonJSName,
+      minifiedResourceName)
   }
 
   override def equals(that: Any): Boolean = that match {
@@ -89,8 +91,9 @@ object JSDependency {
     def serialize(x: JSDependency): JSON = {
       new JSONObjBuilder()
         .fld("resourceName", x.resourceName)
-        .opt("dependencies",
-             if (x.dependencies.nonEmpty) Some(x.dependencies) else None)
+        .opt(
+          "dependencies",
+          if (x.dependencies.nonEmpty) Some(x.dependencies) else None)
         .opt("commonJSName", x.commonJSName)
         .opt("minifiedResourceName", x.minifiedResourceName)
         .toJSON
@@ -101,10 +104,11 @@ object JSDependency {
       extends JSONDeserializer[JSDependency] {
     def deserialize(x: JSON): JSDependency = {
       val obj = new JSONObjExtractor(x)
-      new JSDependency(obj.fld[String]("resourceName"),
-                       obj.opt[List[String]]("dependencies").getOrElse(Nil),
-                       obj.opt[String]("commonJSName"),
-                       obj.opt[String]("minifiedResourceName"))
+      new JSDependency(
+        obj.fld[String]("resourceName"),
+        obj.opt[List[String]]("dependencies").getOrElse(Nil),
+        obj.opt[String]("commonJSName"),
+        obj.opt[String]("minifiedResourceName"))
     }
   }
 }

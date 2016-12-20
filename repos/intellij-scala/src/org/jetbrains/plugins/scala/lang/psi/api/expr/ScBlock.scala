@@ -74,27 +74,32 @@ trait ScBlock
           if (throwable == null)
             return Failure("Cannot find Throwable class", Some(this))
           return Success(
-            ScParameterizedType(ScDesignatorType(fun),
-                                Seq(ScDesignatorType(throwable), clausesType)),
+            ScParameterizedType(
+              ScDesignatorType(fun),
+              Seq(ScDesignatorType(throwable), clausesType)),
             Some(this))
         case _ =>
           val et =
             expectedType(fromUnderscore = false).getOrElse(
-              return Failure("Cannot infer type without expected type",
-                             Some(this)))
+              return Failure(
+                "Cannot infer type without expected type",
+                Some(this)))
           return et match {
             case f @ ScFunctionType(_, params) =>
-              Success(ScFunctionType(clausesType,
-                                     params.map(_.removeVarianceAbstracts(1)))(
-                        getProject,
-                        getResolveScope),
-                      Some(this))
+              Success(
+                ScFunctionType(
+                  clausesType,
+                  params.map(_.removeVarianceAbstracts(1)))(
+                  getProject,
+                  getResolveScope),
+                Some(this))
             case f @ ScPartialFunctionType(_, param) =>
-              Success(ScPartialFunctionType(clausesType,
-                                            param.removeVarianceAbstracts(1))(
-                        getProject,
-                        getResolveScope),
-                      Some(this))
+              Success(
+                ScPartialFunctionType(
+                  clausesType,
+                  param
+                    .removeVarianceAbstracts(1))(getProject, getResolveScope),
+                Some(this))
             case _ =>
               Failure(
                 "Cannot infer type without expected type of scala.FunctionN or scala.PartialFunction",
@@ -125,18 +130,21 @@ trait ScBlock
                 if typed.nameContext.isInstanceOf[ScCaseClause] &&
                   typed.nameContext.asInstanceOf[ScCaseClause].expr == Some(
                     this) =>
-              val t = existize(typed.getType(TypingContext.empty).getOrAny,
-                               visitedWithT)
-              m.put(typed.name,
-                    new ScExistentialArgument(typed.name, Nil, t, t))
+              val t = existize(
+                typed.getType(TypingContext.empty).getOrAny,
+                visitedWithT)
+              m.put(
+                typed.name,
+                new ScExistentialArgument(typed.name, Nil, t, t))
               new ScTypeVariable(typed.name)
             case ScDesignatorType(des)
                 if PsiTreeUtil.isContextAncestor(this, des, true) =>
               des match {
                 case obj: ScObject =>
                   val t = existize(leastClassType(obj), visitedWithT)
-                  m.put(obj.name,
-                        new ScExistentialArgument(obj.name, Nil, t, t))
+                  m.put(
+                    obj.name,
+                    new ScExistentialArgument(obj.name, Nil, t, t))
                   new ScTypeVariable(obj.name)
                 case clazz: ScTypeDefinition =>
                   val t = existize(leastClassType(clazz), visitedWithT)
@@ -145,14 +153,17 @@ trait ScBlock
                       ScalaPsiManager.typeVariable(tp)
                     }
                     .toList
-                  m.put(clazz.name,
-                        new ScExistentialArgument(clazz.name, vars, t, t))
+                  m.put(
+                    clazz.name,
+                    new ScExistentialArgument(clazz.name, vars, t, t))
                   new ScTypeVariable(clazz.name)
                 case typed: ScTypedDefinition =>
-                  val t = existize(typed.getType(TypingContext.empty).getOrAny,
-                                   visitedWithT)
-                  m.put(typed.name,
-                        new ScExistentialArgument(typed.name, Nil, t, t))
+                  val t = existize(
+                    typed.getType(TypingContext.empty).getOrAny,
+                    visitedWithT)
+                  m.put(
+                    typed.name,
+                    new ScExistentialArgument(typed.name, Nil, t, t))
                   new ScTypeVariable(typed.name)
                 case _ => t
               }
@@ -178,25 +189,26 @@ trait ScBlock
                       if (s.typeParams.length == 0) TypeParameter.EMPTY_ARRAY
                       else s.typeParams.map(updateTypeParam)
                     val rt: ScType = existize(tp, visitedWithT)
-                    (new Signature(s.name,
-                                   pTypes,
-                                   s.paramLength,
-                                   tParams,
-                                   ScSubstitutor.empty,
-                                   s.namedElement match {
-                                     case fun: ScFunction =>
-                                       ScFunction.getCompoundCopy(
-                                         pTypes.map(_.map(_()).toList),
-                                         tParams.toList,
-                                         rt,
-                                         fun)
-                                     case b: ScBindingPattern =>
-                                       ScBindingPattern.getCompoundCopy(rt, b)
-                                     case f: ScFieldId =>
-                                       ScFieldId.getCompoundCopy(rt, f)
-                                     case named => named
-                                   },
-                                   s.hasRepeatedParam),
+                    (new Signature(
+                       s.name,
+                       pTypes,
+                       s.paramLength,
+                       tParams,
+                       ScSubstitutor.empty,
+                       s.namedElement match {
+                         case fun: ScFunction =>
+                           ScFunction.getCompoundCopy(
+                             pTypes.map(_.map(_()).toList),
+                             tParams.toList,
+                             rt,
+                             fun)
+                         case b: ScBindingPattern =>
+                           ScBindingPattern.getCompoundCopy(rt, b)
+                         case f: ScFieldId =>
+                           ScFieldId.getCompoundCopy(rt, f)
+                         case named => named
+                       },
+                       s.hasRepeatedParam),
                      rt)
                 },
                 typesMap.map {
@@ -206,8 +218,9 @@ trait ScBlock
             case JavaArrayType(arg) =>
               JavaArrayType(existize(arg, visitedWithT))
             case ScParameterizedType(des, typeArgs) =>
-              ScParameterizedType(existize(des, visitedWithT),
-                                  typeArgs.map(existize(_, visitedWithT)))
+              ScParameterizedType(
+                existize(des, visitedWithT),
+                typeArgs.map(existize(_, visitedWithT)))
             case ex @ ScExistentialType(q, wildcards) =>
               new ScExistentialType(existize(q, visitedWithT), wildcards.map {
                 ex =>
@@ -240,10 +253,11 @@ trait ScBlock
 
     val superTypes = t.extendsBlock.superTypes
     if (superTypes.length > 1 || !holders.isEmpty || !aliases.isEmpty) {
-      ScCompoundType.fromPsi(superTypes,
-                             holders.toList,
-                             aliases.toList,
-                             ScSubstitutor.empty)
+      ScCompoundType.fromPsi(
+        superTypes,
+        holders.toList,
+        aliases.toList,
+        ScSubstitutor.empty)
     } else superTypes(0)
   }
 
@@ -270,8 +284,9 @@ trait ScBlock
 
   def addDefinition(decl: ScMember, before: PsiElement): Boolean = {
     getNode.addChild(decl.getNode, before.getNode)
-    getNode.addChild(ScalaPsiElementFactory.createNewLineNode(getManager),
-                     before.getNode)
+    getNode.addChild(
+      ScalaPsiElementFactory.createNewLineNode(getManager),
+      before.getNode)
     true
   }
 

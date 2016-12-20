@@ -290,8 +290,9 @@ private[http] class ByteArrayRendering(sizeHint: Int) extends Rendering {
     val oldSize = size
     val neededSize = oldSize.toLong + delta
     if (array.length < neededSize) {
-      require(neededSize < Int.MaxValue,
-              "Cannot create byte array greater than 2GB in size")
+      require(
+        neededSize < Int.MaxValue,
+        "Cannot create byte array greater than 2GB in size")
       val newLen = math
         .min(math.max(array.length.toLong << 1, neededSize), Int.MaxValue)
         .toInt

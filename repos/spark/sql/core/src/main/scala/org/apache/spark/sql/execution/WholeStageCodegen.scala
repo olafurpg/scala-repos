@@ -250,9 +250,10 @@ case class InputAdapter(child: SparkPlan)
   override def doProduce(ctx: CodegenContext): String = {
     val input = ctx.freshName("input")
     // Right now, InputAdapter is only used when there is one upstream.
-    ctx.addMutableState("scala.collection.Iterator",
-                        input,
-                        s"$input = inputs[0];")
+    ctx.addMutableState(
+      "scala.collection.Iterator",
+      input,
+      s"$input = inputs[0];")
 
     val exprs = output.zipWithIndex.map(x =>
       new BoundReference(x._2, x._1.dataType, true))
@@ -472,8 +473,9 @@ case class CollapseCodegenStages(conf: SQLConf) extends Rule[SparkPlan] {
   private def insertInputAdapter(plan: SparkPlan): SparkPlan = plan match {
     case j @ SortMergeJoin(_, _, _, _, left, right) if j.supportCodegen =>
       // The children of SortMergeJoin should do codegen separately.
-      j.copy(left = InputAdapter(insertWholeStageCodegen(left)),
-             right = InputAdapter(insertWholeStageCodegen(right)))
+      j.copy(
+        left = InputAdapter(insertWholeStageCodegen(left)),
+        right = InputAdapter(insertWholeStageCodegen(right)))
     case p if !supportCodegen(p) =>
       // collapse them recursively
       InputAdapter(insertWholeStageCodegen(p))

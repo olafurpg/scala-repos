@@ -58,8 +58,9 @@ abstract class ActorSystemActivator extends BundleActivator {
         event.getType match {
           case ServiceEvent.REGISTERED ⇒
             system.eventStream.publish(
-              serviceForReference[LogService](context,
-                                              event.getServiceReference))
+              serviceForReference[LogService](
+                context,
+                event.getServiceReference))
           case ServiceEvent.UNREGISTERING ⇒
             system.eventStream.publish(UnregisteringLogService)
         }

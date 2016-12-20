@@ -58,8 +58,9 @@ class AppUpdateTest extends MarathonSpec {
     shouldViolate(
       update.copy(
         portDefinitions = Some(
-          Seq(PortDefinition(port = 9000, name = Some("foo")),
-              PortDefinition(port = 9001, name = Some("foo"))))),
+          Seq(
+            PortDefinition(port = 9000, name = Some("foo")),
+            PortDefinition(port = 9001, name = Some("foo"))))),
       "/portDefinitions",
       "Port names must be unique."
     )
@@ -67,24 +68,29 @@ class AppUpdateTest extends MarathonSpec {
     shouldNotViolate(
       update.copy(
         portDefinitions = Some(
-          Seq(PortDefinition(port = 9000, name = Some("foo")),
-              PortDefinition(port = 9001, name = Some("bar"))))),
+          Seq(
+            PortDefinition(port = 9000, name = Some("foo")),
+            PortDefinition(port = 9001, name = Some("bar"))))),
       "/portDefinitions",
       "Port names must be unique."
     )
 
-    shouldViolate(update.copy(mem = Some(-3.0)),
-                  "/mem",
-                  "got -3.0, expected 0.0 or more")
-    shouldViolate(update.copy(cpus = Some(-3.0)),
-                  "/cpus",
-                  "got -3.0, expected 0.0 or more")
-    shouldViolate(update.copy(disk = Some(-3.0)),
-                  "/disk",
-                  "got -3.0, expected 0.0 or more")
-    shouldViolate(update.copy(instances = Some(-3)),
-                  "/instances",
-                  "got -3, expected 0 or more")
+    shouldViolate(
+      update.copy(mem = Some(-3.0)),
+      "/mem",
+      "got -3.0, expected 0.0 or more")
+    shouldViolate(
+      update.copy(cpus = Some(-3.0)),
+      "/cpus",
+      "got -3.0, expected 0.0 or more")
+    shouldViolate(
+      update.copy(disk = Some(-3.0)),
+      "/disk",
+      "got -3.0, expected 0.0 or more")
+    shouldViolate(
+      update.copy(instances = Some(-3)),
+      "/instances",
+      "got -3, expected 0 or more")
   }
 
   private[this] def fromJsonString(json: String): AppUpdate = {
@@ -225,8 +231,9 @@ class AppUpdateTest extends MarathonSpec {
   }
 
   test("acceptedResourceRoles of update is only applied when != None") {
-    val app = AppDefinition(id = PathId("withAcceptedRoles"),
-                            acceptedResourceRoles = Some(Set("a")))
+    val app = AppDefinition(
+      id = PathId("withAcceptedRoles"),
+      acceptedResourceRoles = Some(Set("a")))
 
     val unchanged = AppUpdate().apply(app).copy(versionInfo = app.versionInfo)
     assert(unchanged == app)
@@ -250,9 +257,10 @@ class AppUpdateTest extends MarathonSpec {
 
   test("AppUpdate with a version and other changes are not allowed") {
     val attempt = Try(
-      AppUpdate(id = Some(PathId("/test")),
-                cmd = Some("sleep 2"),
-                version = Some(Timestamp(2))))
+      AppUpdate(
+        id = Some(PathId("/test")),
+        cmd = Some("sleep 2"),
+        version = Some(Timestamp(2))))
     assert(
       attempt.failed.get.getMessage.contains(
         "The 'version' field may only be combined with the 'id' field."))
@@ -301,7 +309,8 @@ class AppUpdateTest extends MarathonSpec {
     import Formats._
     val result = Json.fromJson[AppUpdate](Json.parse(json))
     assert(
-      result == JsError(JsPath \ "ports",
-                        ValidationError("Ports must be unique.")))
+      result == JsError(
+        JsPath \ "ports",
+        ValidationError("Ports must be unique.")))
   }
 }

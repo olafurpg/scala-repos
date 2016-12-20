@@ -62,11 +62,13 @@ class ScalaGoToSuperActionHandler extends LanguageCodeInsightActionHandler {
       case (Seq(), Seq(c: NavigatablePsiElement)) if c.canNavigate =>
         c.navigate(true)
       case (superClassElems, Seq()) =>
-        popupChooser(superClassElems,
-                     ScalaBundle.message("goto.super.class.chooser.title"))
+        popupChooser(
+          superClassElems,
+          ScalaBundle.message("goto.super.class.chooser.title"))
       case (Seq(), superSigElems) =>
-        popupChooser(superSigElems,
-                     ScalaBundle.message("goto.super.member.chooser.title"))
+        popupChooser(
+          superSigElems,
+          ScalaBundle.message("goto.super.member.chooser.title"))
       case (superClassElems, superSigElems) =>
         popupChooser(
           superClassElems ++ superSigElems,
@@ -91,11 +93,12 @@ private object ScalaGoToSuperActionHandler {
 
     def templateSupers(template: ScTemplateDefinition): Array[PsiElement] = {
       def ignored =
-        Set("java.lang.Object",
-            "scala.ScalaObject",
-            "scala.Any",
-            "scala.AnyRef",
-            "scala.AnyVal")
+        Set(
+          "java.lang.Object",
+          "scala.ScalaObject",
+          "scala.Any",
+          "scala.AnyRef",
+          "scala.AnyVal")
       val supers = template.supers.filterNot((x: PsiClass) =>
         ignored.contains(x.qualifiedName))
       mutable.HashSet[PsiClass](supers: _*).toArray

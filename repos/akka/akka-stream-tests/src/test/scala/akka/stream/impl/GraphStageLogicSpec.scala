@@ -80,9 +80,10 @@ class GraphStageLogicSpec extends AkkaSpec with GraphInterpreterSpecKit {
 
         setHandler(out, new OutHandler {
           override def onPull(): Unit =
-            emitMultiple(out,
-                         Iterator.empty,
-                         () ⇒ emit(out, 42, () ⇒ completeStage()))
+            emitMultiple(
+              out,
+              Iterator.empty,
+              () ⇒ emit(out, 42, () ⇒ completeStage()))
         })
       }
   }

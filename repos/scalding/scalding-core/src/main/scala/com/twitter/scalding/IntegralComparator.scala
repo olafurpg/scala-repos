@@ -29,10 +29,11 @@ class IntegralComparator
     with Hasher[AnyRef]
     with Serializable {
 
-  val integralTypes: Set[Class[_]] = Set(classOf[java.lang.Long],
-                                         classOf[java.lang.Integer],
-                                         classOf[java.lang.Short],
-                                         classOf[java.lang.Byte])
+  val integralTypes: Set[Class[_]] = Set(
+    classOf[java.lang.Long],
+    classOf[java.lang.Integer],
+    classOf[java.lang.Short],
+    classOf[java.lang.Byte])
 
   def isIntegral(boxed: AnyRef) = integralTypes(boxed.getClass)
 

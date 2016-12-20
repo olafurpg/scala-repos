@@ -178,10 +178,11 @@ object Serialization {
     })
 
   def allLaws[T: Serialization]: Iterable[Law[T]] =
-    List(roundTripLaw,
-         serializationIsEquivalence,
-         hashCodeImpliesEquality,
-         reflexivity,
-         sizeLaw,
-         transitivity)
+    List(
+      roundTripLaw,
+      serializationIsEquivalence,
+      hashCodeImpliesEquality,
+      reflexivity,
+      sizeLaw,
+      transitivity)
 }

@@ -172,8 +172,9 @@ private[remote] object AkkaPduProtobufCodec extends AkkaPduCodec {
       .setOrigin(serializeAddress(info.origin))
       .setUid(info.uid)
     info.cookie foreach handshakeInfo.setCookie
-    constructControlMessagePdu(WireFormats.CommandType.ASSOCIATE,
-                               Some(handshakeInfo))
+    constructControlMessagePdu(
+      WireFormats.CommandType.ASSOCIATE,
+      Some(handshakeInfo))
   }
 
   private val DISASSOCIATE =
@@ -221,30 +222,32 @@ private[remote] object AkkaPduProtobufCodec extends AkkaPduCodec {
       if (ackAndEnvelope.hasAck) {
         import scala.collection.JavaConverters._
         Some(
-          Ack(SeqNo(ackAndEnvelope.getAck.getCumulativeAck),
-              ackAndEnvelope.getAck.getNacksList.asScala.map(SeqNo(_)).toSet))
+          Ack(
+            SeqNo(ackAndEnvelope.getAck.getCumulativeAck),
+            ackAndEnvelope.getAck.getNacksList.asScala.map(SeqNo(_)).toSet))
       } else None
 
     val messageOption =
       if (ackAndEnvelope.hasEnvelope) {
         val msgPdu = ackAndEnvelope.getEnvelope
         Some(
-          Message(recipient = provider.resolveActorRefWithLocalAddress(
-                    msgPdu.getRecipient.getPath,
-                    localAddress),
-                  recipientAddress =
-                    AddressFromURIString(msgPdu.getRecipient.getPath),
-                  serializedMessage = msgPdu.getMessage,
-                  senderOption =
-                    if (msgPdu.hasSender)
-                      Some(
-                        provider.resolveActorRefWithLocalAddress(
-                          msgPdu.getSender.getPath,
-                          localAddress))
-                    else None,
-                  seqOption =
-                    if (msgPdu.hasSeq) Some(SeqNo(msgPdu.getSeq))
-                    else None))
+          Message(
+            recipient = provider.resolveActorRefWithLocalAddress(
+              msgPdu.getRecipient.getPath,
+              localAddress),
+            recipientAddress =
+              AddressFromURIString(msgPdu.getRecipient.getPath),
+            serializedMessage = msgPdu.getMessage,
+            senderOption =
+              if (msgPdu.hasSender)
+                Some(
+                  provider.resolveActorRefWithLocalAddress(
+                    msgPdu.getSender.getPath,
+                    localAddress))
+              else None,
+            seqOption =
+              if (msgPdu.hasSeq) Some(SeqNo(msgPdu.getSeq))
+              else None))
       } else None
 
     (ackOption, messageOption)
@@ -276,10 +279,11 @@ private[remote] object AkkaPduProtobufCodec extends AkkaPduCodec {
   }
 
   private def decodeAddress(encodedAddress: AddressData): Address =
-    Address(encodedAddress.getProtocol,
-            encodedAddress.getSystem,
-            encodedAddress.getHostname,
-            encodedAddress.getPort)
+    Address(
+      encodedAddress.getProtocol,
+      encodedAddress.getSystem,
+      encodedAddress.getHostname,
+      encodedAddress.getPort)
 
   private def constructControlMessagePdu(
       code: WireFormats.CommandType,

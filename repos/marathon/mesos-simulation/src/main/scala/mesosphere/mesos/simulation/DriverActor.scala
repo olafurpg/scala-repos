@@ -162,11 +162,13 @@ class DriverActor(schedulerProps: Props) extends Actor {
 
       tasks.get(taskId.getValue) match {
         case Some(task) =>
-          scheduleStatusChange(toState = TaskState.TASK_KILLED,
-                               afterDuration = 2.seconds)(taskID = taskId)
+          scheduleStatusChange(
+            toState = TaskState.TASK_KILLED,
+            afterDuration = 2.seconds)(taskID = taskId)
         case None =>
-          scheduleStatusChange(toState = TaskState.TASK_LOST,
-                               afterDuration = 1.second)(taskID = taskId)
+          scheduleStatusChange(
+            toState = TaskState.TASK_LOST,
+            afterDuration = 1.second)(taskID = taskId)
       }
 
     case SuppressOffers => ()
@@ -203,20 +205,23 @@ class DriverActor(schedulerProps: Props) extends Actor {
     if (random.nextDouble() > 0.001) {
       log.debug(s"launch tasksToLaunch $offers, $tasksToLaunch")
       tasksToLaunch.map(_.getTaskId).foreach {
-        scheduleStatusChange(toState = TaskState.TASK_STAGING,
-                             afterDuration = 1.second,
-                             create = true)
+        scheduleStatusChange(
+          toState = TaskState.TASK_STAGING,
+          afterDuration = 1.second,
+          create = true)
       }
 
       if (random.nextDouble() > 0.001) {
         tasksToLaunch.map(_.getTaskId).foreach {
-          scheduleStatusChange(toState = TaskState.TASK_RUNNING,
-                               afterDuration = 5.seconds)
+          scheduleStatusChange(
+            toState = TaskState.TASK_RUNNING,
+            afterDuration = 5.seconds)
         }
       } else {
         tasksToLaunch.map(_.getTaskId).foreach {
-          scheduleStatusChange(toState = TaskState.TASK_FAILED,
-                               afterDuration = 5.seconds)
+          scheduleStatusChange(
+            toState = TaskState.TASK_FAILED,
+            afterDuration = 5.seconds)
         }
       }
     } else {

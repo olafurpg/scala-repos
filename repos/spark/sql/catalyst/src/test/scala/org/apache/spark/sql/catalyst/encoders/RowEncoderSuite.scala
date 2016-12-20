@@ -123,8 +123,9 @@ class RowEncoderSuite extends SparkFunSuite {
   encodeDecodeTest(
     new StructType()
       .add("structOfString", structOfString)
-      .add("structOfStructOfString",
-           new StructType().add("struct", structOfString))
+      .add(
+        "structOfStructOfString",
+        new StructType().add("struct", structOfString))
       .add("structOfArray", new StructType().add("array", arrayOfString))
       .add("structOfMap", new StructType().add("map", mapOfString))
       .add(
@@ -133,11 +134,12 @@ class RowEncoderSuite extends SparkFunSuite {
       .add("structOfUDT", structOfUDT))
 
   test(s"encode/decode: Product") {
-    val schema = new StructType().add("structAsProduct",
-                                      new StructType()
-                                        .add("int", IntegerType)
-                                        .add("string", StringType)
-                                        .add("double", DoubleType))
+    val schema = new StructType().add(
+      "structAsProduct",
+      new StructType()
+        .add("int", IntegerType)
+        .add("string", StringType)
+        .add("double", DoubleType))
 
     val encoder = RowEncoder(schema)
 
@@ -163,11 +165,12 @@ class RowEncoderSuite extends SparkFunSuite {
         }
       } catch {
         case e: Exception =>
-          fail(s"""
+          fail(
+            s"""
                |schema: ${schema.simpleString}
                |input: ${input}
              """.stripMargin,
-               e)
+            e)
       }
     }
   }

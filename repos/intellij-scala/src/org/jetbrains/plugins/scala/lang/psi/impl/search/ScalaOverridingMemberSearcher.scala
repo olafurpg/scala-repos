@@ -90,8 +90,9 @@ object ScalaOverridingMemberSearcher {
   def getOverridingMethods(method: ScNamedElement): Array[PsiNamedElement] = {
     val result = new ArrayBuffer[PsiNamedElement]
     inReadAction {
-      for (psiMethod <- ScalaOverridingMemberSearcher.search(method,
-                                                             deep = true)) {
+      for (psiMethod <- ScalaOverridingMemberSearcher.search(
+             method,
+             deep = true)) {
         result += psiMethod
       }
     }
@@ -161,8 +162,9 @@ object ScalaOverridingMemberSearcher {
               else TypeDefinitionMembers.getSignatures(inheritor)
             val signsIterator = signatures.forName(member.name)._1.iterator
             while (signsIterator.hasNext) {
-              val (t: Signature,
-                   node: TypeDefinitionMembers.SignatureNodes.Node) =
+              val (
+                t: Signature,
+                node: TypeDefinitionMembers.SignatureNodes.Node) =
                 signsIterator.next()
               if (PsiTreeUtil.getParentOfType(
                     t.namedElement,

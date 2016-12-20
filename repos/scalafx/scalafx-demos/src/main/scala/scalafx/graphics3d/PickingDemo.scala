@@ -112,9 +112,10 @@ object PickingDemo extends JFXApp {
         case Some(n) =>
           println("Picked node: '" + n.id() + "'")
           val p = pickResult.intersectedPoint
-          group.children += createMarker(x = p.x + n.translateX(),
-                                         y = p.y + n.translateY(),
-                                         z = p.z + n.translateZ())
+          group.children += createMarker(
+            x = p.x + n.translateX(),
+            y = p.y + n.translateY(),
+            z = p.z + n.translateZ())
         case None => println("Picked nothing.")
       }
     }

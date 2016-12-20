@@ -38,8 +38,9 @@ class ScalaDocInlinedTagInspection extends LocalInspectionTool {
 }
 
 class ScalaDocInlinedTagDeleteQuickFix(inlinedTag: ScDocInlinedTag)
-    extends AbstractFixOnPsiElement(ScalaBundle.message("delete.inlined.tag"),
-                                    inlinedTag) {
+    extends AbstractFixOnPsiElement(
+      ScalaBundle.message("delete.inlined.tag"),
+      inlinedTag) {
   override def getFamilyName: String = InspectionsUtil.SCALADOC
 
   def doApplyFix(project: Project) {
@@ -61,14 +62,14 @@ class ScalaDocInlinedTagReplaceQuickFix(inlinedTag: ScDocInlinedTag)
 
     if (tag.getValueElement == null) {
       tag.replace(
-        ScalaPsiElementFactory.createMonospaceSyntaxFromText("",
-                                                             tag.getManager))
+        ScalaPsiElementFactory
+          .createMonospaceSyntaxFromText("", tag.getManager))
     } else {
       val tagText = tag.getValueElement.getText
         .replace("`", MyScaladocParsing.escapeSequencesForWiki.get("`").get)
       tag.replace(
-        ScalaPsiElementFactory.createMonospaceSyntaxFromText(tagText,
-                                                             tag.getManager))
+        ScalaPsiElementFactory
+          .createMonospaceSyntaxFromText(tagText, tag.getManager))
     }
   }
 }

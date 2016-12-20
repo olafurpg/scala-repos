@@ -50,8 +50,9 @@ final class PlaybanApi(coll: Coll, isRematch: String => Boolean) {
   def currentBan(userId: String): Fu[Option[TempBan]] =
     coll
       .find(
-        BSONDocument("_id" -> userId,
-                     "b.0" -> BSONDocument("$exists" -> true)),
+        BSONDocument(
+          "_id" -> userId,
+          "b.0" -> BSONDocument("$exists" -> true)),
         BSONDocument("_id" -> false, "b" -> BSONDocument("$slice" -> -1))
       )
       .one[BSONDocument]
@@ -62,8 +63,9 @@ final class PlaybanApi(coll: Coll, isRematch: String => Boolean) {
   def bans(userId: String): Fu[List[TempBan]] =
     coll
       .find(
-        BSONDocument("_id" -> userId,
-                     "b.0" -> BSONDocument("$exists" -> true)),
+        BSONDocument(
+          "_id" -> userId,
+          "b.0" -> BSONDocument("$exists" -> true)),
         BSONDocument("_id" -> false, "b" -> true)
       )
       .one[BSONDocument]

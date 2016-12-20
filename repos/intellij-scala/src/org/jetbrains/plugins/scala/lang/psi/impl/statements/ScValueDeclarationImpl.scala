@@ -42,8 +42,9 @@ class ScValueDeclarationImpl private (stub: StubElement[ScValue],
 
   override def getType(ctx: TypingContext) = typeElement match {
     case None =>
-      Failure(ScalaBundle.message("no.type.element.found", getText),
-              Some(this))
+      Failure(
+        ScalaBundle.message("no.type.element.found", getText),
+        Some(this))
     case Some(te) => te.getType(ctx)
   }
 
@@ -58,8 +59,9 @@ class ScValueDeclarationImpl private (stub: StubElement[ScValue],
     val stub = getStub
     if (stub != null) {
       stub
-        .getChildrenByType(ScalaElementTypes.IDENTIFIER_LIST,
-                           JavaArrayFactoryUtil.ScIdListFactory)
+        .getChildrenByType(
+          ScalaElementTypes.IDENTIFIER_LIST,
+          JavaArrayFactoryUtil.ScIdListFactory)
         .apply(0)
     } else findChildByClass(classOf[ScIdList])
   }

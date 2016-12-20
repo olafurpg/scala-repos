@@ -474,9 +474,10 @@ object Stack {
     final val parameters: Seq[Stack.Param[_]] = Seq(implicitly[Param[P1]])
     def make(p1: P1, next: T): T
     def toStack(next: Stack[T]): Stack[T] =
-      Node(this,
-           (prms, next) => Leaf(this, make(prms[P1], next.make(prms))),
-           next)
+      Node(
+        this,
+        (prms, next) => Leaf(this, make(prms[P1], next.make(prms))),
+        next)
   }
 
   /** A module of 2 parameters. */
@@ -485,10 +486,10 @@ object Stack {
       Seq(implicitly[Param[P1]], implicitly[Param[P2]])
     def make(p1: P1, p2: P2, next: T): T
     def toStack(next: Stack[T]) =
-      Node(this,
-           (prms,
-            next) => Leaf(this, make(prms[P1], prms[P2], next.make(prms))),
-           next)
+      Node(
+        this,
+        (prms, next) => Leaf(this, make(prms[P1], prms[P2], next.make(prms))),
+        next)
   }
 
   /** A module of 3 parameters. */
@@ -498,26 +499,29 @@ object Stack {
       Seq(implicitly[Param[P1]], implicitly[Param[P2]], implicitly[Param[P3]])
     def make(p1: P1, p2: P2, p3: P3, next: T): T
     def toStack(next: Stack[T]): Stack[T] =
-      Node(this,
-           (prms, next) =>
-             Leaf(this, make(prms[P1], prms[P2], prms[P3], next.make(prms))),
-           next)
+      Node(
+        this,
+        (prms, next) =>
+          Leaf(this, make(prms[P1], prms[P2], prms[P3], next.make(prms))),
+        next)
   }
 
   /** A module of 4 parameters. */
   abstract class Module4[P1: Param, P2: Param, P3: Param, P4: Param, T]
       extends Stackable[T] {
-    final val parameters: Seq[Stack.Param[_]] = Seq(implicitly[Param[P1]],
-                                                    implicitly[Param[P2]],
-                                                    implicitly[Param[P3]],
-                                                    implicitly[Param[P4]])
+    final val parameters: Seq[Stack.Param[_]] = Seq(
+      implicitly[Param[P1]],
+      implicitly[Param[P2]],
+      implicitly[Param[P3]],
+      implicitly[Param[P4]])
     def make(p1: P1, p2: P2, p3: P3, p4: P4, next: T): T
     def toStack(next: Stack[T]): Stack[T] =
       Node(
         this,
         (prms, next) =>
-          Leaf(this,
-               make(prms[P1], prms[P2], prms[P3], prms[P4], next.make(prms))),
+          Leaf(
+            this,
+            make(prms[P1], prms[P2], prms[P3], prms[P4], next.make(prms))),
         next)
   }
 
@@ -525,48 +529,56 @@ object Stack {
   abstract class Module5[
       P1: Param, P2: Param, P3: Param, P4: Param, P5: Param, T]
       extends Stackable[T] {
-    final val parameters: Seq[Stack.Param[_]] = Seq(implicitly[Param[P1]],
-                                                    implicitly[Param[P2]],
-                                                    implicitly[Param[P3]],
-                                                    implicitly[Param[P4]],
-                                                    implicitly[Param[P5]])
+    final val parameters: Seq[Stack.Param[_]] = Seq(
+      implicitly[Param[P1]],
+      implicitly[Param[P2]],
+      implicitly[Param[P3]],
+      implicitly[Param[P4]],
+      implicitly[Param[P5]])
     def make(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, next: T): T
     def toStack(next: Stack[T]): Stack[T] =
-      Node(this,
-           (prms, next) =>
-             Leaf(this,
-                  make(prms[P1],
-                       prms[P2],
-                       prms[P3],
-                       prms[P4],
-                       prms[P5],
-                       next.make(prms))),
-           next)
+      Node(
+        this,
+        (prms, next) =>
+          Leaf(
+            this,
+            make(
+              prms[P1],
+              prms[P2],
+              prms[P3],
+              prms[P4],
+              prms[P5],
+              next.make(prms))),
+        next)
   }
 
   /** A module of 6 parameters. */
   abstract class Module6[
       P1: Param, P2: Param, P3: Param, P4: Param, P5: Param, P6: Param, T]
       extends Stackable[T] {
-    final val parameters: Seq[Stack.Param[_]] = Seq(implicitly[Param[P1]],
-                                                    implicitly[Param[P2]],
-                                                    implicitly[Param[P3]],
-                                                    implicitly[Param[P4]],
-                                                    implicitly[Param[P5]],
-                                                    implicitly[Param[P6]])
+    final val parameters: Seq[Stack.Param[_]] = Seq(
+      implicitly[Param[P1]],
+      implicitly[Param[P2]],
+      implicitly[Param[P3]],
+      implicitly[Param[P4]],
+      implicitly[Param[P5]],
+      implicitly[Param[P6]])
     def make(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, next: T): T
     def toStack(next: Stack[T]): Stack[T] =
-      Node(this,
-           (prms, next) =>
-             Leaf(this,
-                  make(prms[P1],
-                       prms[P2],
-                       prms[P3],
-                       prms[P4],
-                       prms[P5],
-                       prms[P6],
-                       next.make(prms))),
-           next)
+      Node(
+        this,
+        (prms, next) =>
+          Leaf(
+            this,
+            make(
+              prms[P1],
+              prms[P2],
+              prms[P3],
+              prms[P4],
+              prms[P5],
+              prms[P6],
+              next.make(prms))),
+        next)
   }
 }
 

@@ -140,9 +140,10 @@ class ClusterDomainEventPublisherSpec
 
     "publish role leader changed" in {
       val subscriber = TestProbe()
-      publisher ! Subscribe(subscriber.ref,
-                            InitialStateAsSnapshot,
-                            Set(classOf[RoleLeaderChanged]))
+      publisher ! Subscribe(
+        subscriber.ref,
+        InitialStateAsSnapshot,
+        Set(classOf[RoleLeaderChanged]))
       subscriber.expectMsgType[CurrentClusterState]
       publisher ! PublishChanges(Gossip(members = SortedSet(cJoining, dUp)))
       subscriber.expectMsg(RoleLeaderChanged("GRP", Some(dUp.address)))
@@ -152,9 +153,10 @@ class ClusterDomainEventPublisherSpec
 
     "send CurrentClusterState when subscribe" in {
       val subscriber = TestProbe()
-      publisher ! Subscribe(subscriber.ref,
-                            InitialStateAsSnapshot,
-                            Set(classOf[ClusterDomainEvent]))
+      publisher ! Subscribe(
+        subscriber.ref,
+        InitialStateAsSnapshot,
+        Set(classOf[ClusterDomainEvent]))
       subscriber.expectMsgType[CurrentClusterState]
       // but only to the new subscriber
       memberSubscriber.expectNoMsg(500 millis)
@@ -163,24 +165,26 @@ class ClusterDomainEventPublisherSpec
     "send events corresponding to current state when subscribe" in {
       val subscriber = TestProbe()
       publisher ! PublishChanges(g8)
-      publisher ! Subscribe(subscriber.ref,
-                            InitialStateAsEvents,
-                            Set(classOf[MemberEvent],
-                                classOf[ReachabilityEvent]))
+      publisher ! Subscribe(
+        subscriber.ref,
+        InitialStateAsEvents,
+        Set(classOf[MemberEvent], classOf[ReachabilityEvent]))
       subscriber.receiveN(4).toSet should be(
-        Set(MemberUp(aUp),
-            MemberUp(cUp),
-            MemberUp(dUp),
-            MemberExited(bExiting)))
+        Set(
+          MemberUp(aUp),
+          MemberUp(cUp),
+          MemberUp(dUp),
+          MemberExited(bExiting)))
       subscriber.expectMsg(UnreachableMember(dUp))
       subscriber.expectNoMsg(500 millis)
     }
 
     "support unsubscribe" in {
       val subscriber = TestProbe()
-      publisher ! Subscribe(subscriber.ref,
-                            InitialStateAsSnapshot,
-                            Set(classOf[MemberEvent]))
+      publisher ! Subscribe(
+        subscriber.ref,
+        InitialStateAsSnapshot,
+        Set(classOf[MemberEvent]))
       subscriber.expectMsgType[CurrentClusterState]
       publisher ! Unsubscribe(subscriber.ref, Some(classOf[MemberEvent]))
       publisher ! PublishChanges(g3)
@@ -192,9 +196,10 @@ class ClusterDomainEventPublisherSpec
 
     "publish SeenChanged" in {
       val subscriber = TestProbe()
-      publisher ! Subscribe(subscriber.ref,
-                            InitialStateAsSnapshot,
-                            Set(classOf[SeenChanged]))
+      publisher ! Subscribe(
+        subscriber.ref,
+        InitialStateAsSnapshot,
+        Set(classOf[SeenChanged]))
       subscriber.expectMsgType[CurrentClusterState]
       publisher ! PublishChanges(g2)
       subscriber.expectMsgType[SeenChanged]

@@ -193,18 +193,20 @@ private[serverset2] class ServiceDiscoverer(
   // protected for testing
   protected[this] val entriesOf: String => Activity[Seq[Entry]] = Memoize {
     path: String =>
-      entitiesOf(path,
-                 new ZkEntryCache(path, statsReceiver),
-                 zkEntriesReadStat,
-                 EndpointGlob)
+      entitiesOf(
+        path,
+        new ZkEntryCache(path, statsReceiver),
+        zkEntriesReadStat,
+        EndpointGlob)
   }
 
   private[this] val vectorsOf: String => Activity[Seq[Vector]] = Memoize {
     path: String =>
-      entitiesOf(path,
-                 new ZkVectorCache(path, statsReceiver),
-                 zkVectorsReadStat,
-                 VectorGlob)
+      entitiesOf(
+        path,
+        new ZkVectorCache(path, statsReceiver),
+        zkVectorsReadStat,
+        VectorGlob)
   }
 
   /**

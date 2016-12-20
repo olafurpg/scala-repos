@@ -25,9 +25,10 @@ abstract class StepOverTestBase extends ScalaDebuggerTestCase {
     Assert.assertTrue(
       s"File should start with definition of object $mainClassName",
       lines.head.startsWith(s"object $mainClassName"))
-    Assert.assertTrue("Method main should be defined on a second line",
-                      lines(1).trim.startsWith("def main") &&
-                        lines(2).trim.nonEmpty)
+    Assert.assertTrue(
+      "Method main should be defined on a second line",
+      lines(1).trim.startsWith("def main") &&
+        lines(2).trim.nonEmpty)
 
     def checkLine(expectedLineNumber: Int): Unit = {
       val actualLineNumber = currentLineNumber

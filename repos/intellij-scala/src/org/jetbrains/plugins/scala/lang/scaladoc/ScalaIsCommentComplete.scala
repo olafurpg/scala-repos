@@ -44,9 +44,10 @@ class ScalaIsCommentComplete extends CommentCompleteHandler {
     val commentPrefix: String =
       if (docComment) commenter.getDocumentationCommentPrefix
       else commenter.getBlockCommentPrefix
-    lexer.start(commentText,
-                if (commentPrefix eq null) 0 else commentPrefix.length,
-                commentText.length)
+    lexer.start(
+      commentText,
+      if (commentPrefix eq null) 0 else commentPrefix.length,
+      commentText.length)
     val fileTypeHandler: QuoteHandler =
       TypedHandler.getQuoteHandler(containingFile, editor)
     val javaLikeQuoteHandler: JavaLikeQuoteHandler = fileTypeHandler match {

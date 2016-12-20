@@ -185,8 +185,9 @@ trait MongoPlatformSpecs
   def includeIdField = false
 
   implicit val M: Monad[Future] with Comonad[Future] =
-    new blueeyes.bkka.UnsafeFutureComonad(asyncContext,
-                                          yggConfig.maxEvalDuration)
+    new blueeyes.bkka.UnsafeFutureComonad(
+      asyncContext,
+      yggConfig.maxEvalDuration)
 
   val report = new LoggingQueryLogger[Future, instructions.Line]
   with ExceptionQueryLogger[Future, instructions.Line]

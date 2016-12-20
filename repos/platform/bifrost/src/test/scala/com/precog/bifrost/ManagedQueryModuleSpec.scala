@@ -81,8 +81,9 @@ class ManagedQueryModuleSpec
   implicit val executionContext =
     ExecutionContext.defaultExecutionContext(actorSystem)
   implicit val M: Monad[Future] with Comonad[Future] =
-    new blueeyes.bkka.UnsafeFutureComonad(executionContext,
-                                          Duration(30, "seconds"))
+    new blueeyes.bkka.UnsafeFutureComonad(
+      executionContext,
+      Duration(30, "seconds"))
 
   val defaultTimeout = Duration(90, TimeUnit.SECONDS)
 
@@ -90,12 +91,13 @@ class ManagedQueryModuleSpec
   val apiKey = "O.o"
 
   var ticker: ActorRef = actorSystem.actorOf(Props(new Ticker(ticks)))
-  val account = AccountDetails("test",
-                               "test@test.test",
-                               clock.now(),
-                               apiKey,
-                               Path.Root,
-                               AccountPlan.Free)
+  val account = AccountDetails(
+    "test",
+    "test@test.test",
+    clock.now(),
+    apiKey,
+    Path.Root,
+    AccountPlan.Free)
 
   def dropStreamToFuture =
     implicitly[Hoist[StreamT]]
@@ -164,8 +166,9 @@ class ManagedQueryModuleSpec
   }
 
   step {
-    actorSystem.scheduler.schedule(Duration(0, "milliseconds"),
-                                   Duration(clock.duration, "milliseconds")) {
+    actorSystem.scheduler.schedule(
+      Duration(0, "milliseconds"),
+      Duration(clock.duration, "milliseconds")) {
       ticker ! Tick
     }
     startup.run.copoint
@@ -308,13 +311,15 @@ trait TestManagedQueryModule
               UserQuery(query, ctx.basePath, opts.sortOn, opts.sortOrder)
             val numTicks = query.toInt
 
-            EitherT.right[TestFuture,
-                          EvaluationError,
-                          StreamT[TestFuture, CharBuffer]] {
+            EitherT.right[
+              TestFuture,
+              EvaluationError,
+              StreamT[TestFuture, CharBuffer]] {
               WriterT {
-                createQueryJob(ctx.apiKey,
-                               Some(userQuery.serialize),
-                               opts.timeout) map { implicit M0 =>
+                createQueryJob(
+                  ctx.apiKey,
+                  Some(userQuery.serialize),
+                  opts.timeout) map { implicit M0 =>
                   val ticks = new AtomicInteger()
                   val result =
                     StreamT.unfoldM[JobQueryTF, CharBuffer, Int](0) {

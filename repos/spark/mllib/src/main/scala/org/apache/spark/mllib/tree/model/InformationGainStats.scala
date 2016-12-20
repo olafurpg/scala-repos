@@ -56,12 +56,13 @@ class InformationGainStats(val gain: Double,
   }
 
   override def hashCode: Int = {
-    com.google.common.base.Objects.hashCode(gain: java.lang.Double,
-                                            impurity: java.lang.Double,
-                                            leftImpurity: java.lang.Double,
-                                            rightImpurity: java.lang.Double,
-                                            leftPredict,
-                                            rightPredict)
+    com.google.common.base.Objects.hashCode(
+      gain: java.lang.Double,
+      impurity: java.lang.Double,
+      leftImpurity: java.lang.Double,
+      rightImpurity: java.lang.Double,
+      leftPredict,
+      rightPredict)
   }
 }
 
@@ -131,12 +132,13 @@ private[spark] object ImpurityStats {
     */
   def getInvalidImpurityStats(
       impurityCalculator: ImpurityCalculator): ImpurityStats = {
-    new ImpurityStats(Double.MinValue,
-                      impurityCalculator.calculate(),
-                      impurityCalculator,
-                      null,
-                      null,
-                      false)
+    new ImpurityStats(
+      Double.MinValue,
+      impurityCalculator.calculate(),
+      impurityCalculator,
+      null,
+      null,
+      false)
   }
 
   /**
@@ -145,10 +147,11 @@ private[spark] object ImpurityStats {
     */
   def getEmptyImpurityStats(
       impurityCalculator: ImpurityCalculator): ImpurityStats = {
-    new ImpurityStats(Double.NaN,
-                      impurityCalculator.calculate(),
-                      impurityCalculator,
-                      null,
-                      null)
+    new ImpurityStats(
+      Double.NaN,
+      impurityCalculator.calculate(),
+      impurityCalculator,
+      null,
+      null)
   }
 }

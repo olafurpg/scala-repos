@@ -324,8 +324,9 @@ case class Netty3Transporter[In, Out](
   def channelStatsHandler(statsReceiver: StatsReceiver): ChannelHandler =
     synchronized {
       if (!(statsHandlers containsKey statsReceiver)) {
-        statsHandlers.put(statsReceiver,
-                          new ChannelStatsHandler(statsReceiver))
+        statsHandlers.put(
+          statsReceiver,
+          new ChannelStatsHandler(statsReceiver))
       }
 
       statsHandlers.get(statsReceiver)
@@ -339,8 +340,9 @@ case class Netty3Transporter[In, Out](
 
     pipeline
       .addFirst("channelStatsHandler", channelStatsHandler(statsReceiver))
-    pipeline.addFirst("channelRequestStatsHandler",
-                      new ChannelRequestStatsHandler(statsReceiver))
+    pipeline.addFirst(
+      "channelRequestStatsHandler",
+      new ChannelRequestStatsHandler(statsReceiver))
 
     if (channelReaderTimeout.isFinite || channelWriterTimeout.isFinite) {
       val rms =
@@ -351,12 +353,14 @@ case class Netty3Transporter[In, Out](
         else 0L
 
       pipeline.addFirst("idleReactor", new IdleChannelHandler(statsReceiver))
-      pipeline.addFirst("idleDetector",
-                        new IdleStateHandler(DefaultTimer.netty,
-                                             rms,
-                                             wms,
-                                             0,
-                                             TimeUnit.MILLISECONDS))
+      pipeline.addFirst(
+        "idleDetector",
+        new IdleStateHandler(
+          DefaultTimer.netty,
+          rms,
+          wms,
+          0,
+          TimeUnit.MILLISECONDS))
     }
 
     for (Netty3TransporterTLSConfig(newEngine, verifyHost) <- tlsConfig) {

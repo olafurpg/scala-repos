@@ -111,11 +111,12 @@ object ScopeFilter {
     def inAggregates(ref: ProjectReference,
                      transitive: Boolean = true,
                      includeRoot: Boolean = true): ProjectFilter =
-      byDeps(ref,
-             transitive = transitive,
-             includeRoot = includeRoot,
-             aggregate = true,
-             classpath = false)
+      byDeps(
+        ref,
+        transitive = transitive,
+        includeRoot = includeRoot,
+        aggregate = true,
+        classpath = false)
 
     /**
       * Selects Scopes that have a project axis that is a dependency of `ref`, transitively if `transitive` is true.
@@ -124,11 +125,12 @@ object ScopeFilter {
     def inDependencies(ref: ProjectReference,
                        transitive: Boolean = true,
                        includeRoot: Boolean = true): ProjectFilter =
-      byDeps(ref,
-             transitive = transitive,
-             includeRoot = includeRoot,
-             aggregate = false,
-             classpath = true)
+      byDeps(
+        ref,
+        transitive = transitive,
+        includeRoot = includeRoot,
+        aggregate = false,
+        classpath = true)
 
     /** Selects Scopes that have a project axis with one of the provided values.*/
     def inProjects(projects: ProjectReference*): ProjectFilter =
@@ -195,9 +197,10 @@ object ScopeFilter {
                            classpath: Boolean): ProjectFilter =
     inResolvedProjects { data =>
       val resolvedRef = data.resolve(ref)
-      val direct = getDependencies(data.units,
-                                   classpath = classpath,
-                                   aggregate = aggregate)
+      val direct = getDependencies(
+        data.units,
+        classpath = classpath,
+        aggregate = aggregate)
       if (transitive) {
         val full = Dag.topologicalSort(resolvedRef)(direct)
         if (includeRoot) full else full dropRight 1

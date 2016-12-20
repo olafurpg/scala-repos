@@ -10,8 +10,9 @@ object MapPicklerHelper {
     tpe.typeargs match {
       case List(one, two) =>
         FastTypeTag
-          .apply(currentMirror,
-                 s"scala.Tuple2[${one.toString},${two.toString}]")
+          .apply(
+            currentMirror,
+            s"scala.Tuple2[${one.toString},${two.toString}]")
           .asInstanceOf[FastTypeTag[(T, U)]]
       // Note: This is what we do to handle
       case List() =>

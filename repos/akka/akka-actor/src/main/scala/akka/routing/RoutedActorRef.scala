@@ -28,12 +28,13 @@ private[akka] class RoutedActorRef(_system: ActorSystemImpl,
                                    _routeeProps: Props,
                                    _supervisor: InternalActorRef,
                                    _path: ActorPath)
-    extends RepointableActorRef(_system,
-                                _routerProps,
-                                _routerDispatcher,
-                                _routerMailbox,
-                                _supervisor,
-                                _path) {
+    extends RepointableActorRef(
+      _system,
+      _routerProps,
+      _routerDispatcher,
+      _routerMailbox,
+      _supervisor,
+      _path) {
 
   // verify that a BalancingDispatcher is not used with a Router
   if (_routerProps.routerConfig != NoRouter &&
@@ -46,20 +47,22 @@ private[akka] class RoutedActorRef(_system: ActorSystemImpl,
   override def newCell(old: UnstartedCell): Cell = {
     val cell = props.routerConfig match {
       case pool: Pool if pool.resizer.isDefined ⇒
-        new ResizablePoolCell(system,
-                              this,
-                              props,
-                              dispatcher,
-                              _routeeProps,
-                              supervisor,
-                              pool)
+        new ResizablePoolCell(
+          system,
+          this,
+          props,
+          dispatcher,
+          _routeeProps,
+          supervisor,
+          pool)
       case _ ⇒
-        new RoutedActorCell(system,
-                            this,
-                            props,
-                            dispatcher,
-                            _routeeProps,
-                            supervisor)
+        new RoutedActorCell(
+          system,
+          this,
+          props,
+          dispatcher,
+          _routeeProps,
+          supervisor)
     }
     cell.init(sendSupervise = false, mailboxType)
   }

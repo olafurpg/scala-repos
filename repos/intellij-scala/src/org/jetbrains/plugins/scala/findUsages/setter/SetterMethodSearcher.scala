@@ -77,11 +77,12 @@ class SetterMethodSearcher
       }
     }
     val helper: PsiSearchHelper = PsiSearchHelper.SERVICE.getInstance(project)
-    helper.processElementsWithWord(processor,
-                                   scope,
-                                   name.stripSuffix(suffixScala),
-                                   UsageSearchContext.IN_CODE,
-                                   true)
+    helper.processElementsWithWord(
+      processor,
+      scope,
+      name.stripSuffix(suffixScala),
+      UsageSearchContext.IN_CODE,
+      true)
   }
 
   private def processSimpleUsages(element: PsiElement,
@@ -110,10 +111,11 @@ class SetterMethodSearcher
       }
     }
     val helper: PsiSearchHelper = PsiSearchHelper.SERVICE.getInstance(project)
-    helper.processElementsWithWord(processor,
-                                   scope,
-                                   name,
-                                   UsageSearchContext.IN_CODE,
-                                   true)
+    helper.processElementsWithWord(
+      processor,
+      scope,
+      name,
+      UsageSearchContext.IN_CODE,
+      true)
   }
 }

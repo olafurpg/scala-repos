@@ -164,8 +164,9 @@ class MacroExpandAction extends AnAction {
           applyExpansions(xs)
         } catch {
           case exc: UnresolvedExpansion if !triedResolving =>
-            applyExpansions(tryResolveExpansionPlace(x.expansion) :: xs,
-                            triedResolving = true)
+            applyExpansions(
+              tryResolveExpansionPlace(x.expansion) :: xs,
+              triedResolving = true)
           case exc: UnresolvedExpansion if triedResolving =>
             LOG.warn(
               s"unable to expand ${x.expansion.place}, cannot resolve place, skipping")
@@ -192,17 +193,21 @@ class MacroExpandAction extends AnAction {
             val children = block.getChildren
             block.children
               .find(_.isInstanceOf[ScalaPsiElement])
-              .foreach(p =>
-                p.putCopyableUserData(MacroExpandAction.EXPANDED_KEY,
-                                      holder.getText))
-            holder.getParent.addRangeAfter(children.tail.head,
-                                           children.dropRight(1).last,
-                                           holder)
+              .foreach(
+                p =>
+                  p.putCopyableUserData(
+                    MacroExpandAction.EXPANDED_KEY,
+                    holder.getText))
+            holder.getParent.addRangeAfter(
+              children.tail.head,
+              children.dropRight(1).last,
+              holder)
             holder.delete()
           case Some(psi: PsiElement) => // defns/method bodies/etc...
             val result = holder.replace(psi)
-            result.putCopyableUserData(MacroExpandAction.EXPANDED_KEY,
-                                       holder.getText)
+            result.putCopyableUserData(
+              MacroExpandAction.EXPANDED_KEY,
+              holder.getText)
           case None => LOG.warn(s"Failed to parse expansion: $body")
         }
       case other =>

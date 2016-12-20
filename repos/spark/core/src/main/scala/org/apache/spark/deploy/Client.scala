@@ -95,20 +95,20 @@ private class ClientEndpoint(override val rpcEnv: RpcEnv,
         val sparkJavaOpts = Utils.sparkJavaOpts(conf)
         val javaOpts = sparkJavaOpts ++ extraJavaOpts
         val command =
-          new Command(mainClass,
-                      Seq("{{WORKER_URL}}",
-                          "{{USER_JAR}}",
-                          driverArgs.mainClass) ++ driverArgs.driverOptions,
-                      sys.env,
-                      classPathEntries,
-                      libraryPathEntries,
-                      javaOpts)
+          new Command(
+            mainClass,
+            Seq("{{WORKER_URL}}", "{{USER_JAR}}", driverArgs.mainClass) ++ driverArgs.driverOptions,
+            sys.env,
+            classPathEntries,
+            libraryPathEntries,
+            javaOpts)
 
-        val driverDescription = new DriverDescription(driverArgs.jarUrl,
-                                                      driverArgs.memory,
-                                                      driverArgs.cores,
-                                                      driverArgs.supervise,
-                                                      command)
+        val driverDescription = new DriverDescription(
+          driverArgs.jarUrl,
+          driverArgs.memory,
+          driverArgs.cores,
+          driverArgs.supervise,
+          command)
         ayncSendToMasterAndForwardReply[SubmitDriverResponse](
           RequestSubmitDriver(driverDescription))
 
@@ -246,11 +246,12 @@ object Client {
     conf.set("spark.rpc.askTimeout", "10")
     Logger.getRootLogger.setLevel(driverArgs.logLevel)
 
-    val rpcEnv = RpcEnv.create("driverClient",
-                               Utils.localHostName(),
-                               0,
-                               conf,
-                               new SecurityManager(conf))
+    val rpcEnv = RpcEnv.create(
+      "driverClient",
+      Utils.localHostName(),
+      0,
+      conf,
+      new SecurityManager(conf))
 
     val masterEndpoints = driverArgs.masters
       .map(RpcAddress.fromSparkURL)

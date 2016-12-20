@@ -188,9 +188,10 @@ private[stat] object KolmogorovSmirnovTest extends Logging {
       case "norm" => {
         if (params.nonEmpty) {
           // parameters are passed, then can only be 2
-          require(params.length == 2,
-                  "Normal distribution requires mean and standard " +
-                    "deviation as parameters")
+          require(
+            params.length == 2,
+            "Normal distribution requires mean and standard " +
+              "deviation as parameters")
           new NormalDistribution(params(0), params(1))
         } else {
           // if no parameters passed in initializes to standard normal
@@ -212,8 +213,9 @@ private[stat] object KolmogorovSmirnovTest extends Logging {
   private def evalOneSampleP(ksStat: Double,
                              n: Long): KolmogorovSmirnovTestResult = {
     val pval = 1 - new CommonMathKolmogorovSmirnovTest().cdf(ksStat, n.toInt)
-    new KolmogorovSmirnovTestResult(pval,
-                                    ksStat,
-                                    NullHypothesis.OneSampleTwoSided.toString)
+    new KolmogorovSmirnovTestResult(
+      pval,
+      ksStat,
+      NullHypothesis.OneSampleTwoSided.toString)
   }
 }

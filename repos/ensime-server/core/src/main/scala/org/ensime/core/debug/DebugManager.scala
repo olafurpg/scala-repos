@@ -196,10 +196,11 @@ class DebugManager(
       disconnectDebugVM()
     case e: StepEvent =>
       (for (pos <- sourceMap.locToPos(e.location())) yield {
-        broadcaster ! DebugStepEvent(DebugThreadId(e.thread().uniqueID()),
-                                     e.thread().name,
-                                     pos.file,
-                                     pos.line)
+        broadcaster ! DebugStepEvent(
+          DebugThreadId(e.thread().uniqueID()),
+          e.thread().name,
+          pos.file,
+          pos.line)
       }) getOrElse {
         val loc = e.location()
         log.warning(
@@ -207,10 +208,11 @@ class DebugManager(
       }
     case e: BreakpointEvent =>
       (for (pos <- sourceMap.locToPos(e.location())) yield {
-        broadcaster ! DebugBreakEvent(DebugThreadId(e.thread().uniqueID()),
-                                      e.thread().name,
-                                      pos.file,
-                                      pos.line)
+        broadcaster ! DebugBreakEvent(
+          DebugThreadId(e.thread().uniqueID()),
+          e.thread().name,
+          pos.file,
+          pos.line)
       }) getOrElse {
         val loc = e.location()
         log.warning(
@@ -275,11 +277,12 @@ class DebugManager(
   def handleDebugAttachReq(hostname: String, port: String): RpcResponse = {
     disposeCurrentVM()
     try {
-      val vm = new VM(VmAttach(hostname, port),
-                      vmOptions(),
-                      self,
-                      broadcaster,
-                      sourceMap)
+      val vm = new VM(
+        VmAttach(hostname, port),
+        vmOptions(),
+        self,
+        broadcaster,
+        sourceMap)
       maybeVM = Some(vm)
       vm.start()
       DebugVmSuccess()

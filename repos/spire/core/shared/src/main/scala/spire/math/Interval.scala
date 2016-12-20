@@ -233,8 +233,9 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     lhs intersect rhs
 
   def intersect(rhs: Interval[A]): Interval[A] =
-    Interval.fromBounds(maxLower(lhs.lowerBound, rhs.lowerBound, true),
-                        minUpper(lhs.upperBound, rhs.upperBound, true))
+    Interval.fromBounds(
+      maxLower(lhs.lowerBound, rhs.lowerBound, true),
+      minUpper(lhs.upperBound, rhs.upperBound, true))
 
   def unary_~(): List[Interval[A]] =
     this match {
@@ -277,8 +278,9 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     lhs union rhs
 
   def union(rhs: Interval[A]): Interval[A] =
-    Interval.fromBounds(minLower(lhs.lowerBound, rhs.lowerBound, false),
-                        maxUpper(lhs.upperBound, rhs.upperBound, false))
+    Interval.fromBounds(
+      minLower(lhs.lowerBound, rhs.lowerBound, false),
+      maxUpper(lhs.upperBound, rhs.upperBound, false))
 
   override def toString(): String = this match {
     case All() =>
@@ -317,13 +319,15 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 
   // for all a in A, and all b in B, (A vmin B) is the interval that contains all (a min b)
   def vmin(rhs: Interval[A])(implicit m: AdditiveMonoid[A]): Interval[A] =
-    Interval.fromBounds(minLower(lhs.lowerBound, rhs.lowerBound, true),
-                        minUpper(lhs.upperBound, rhs.upperBound, true))
+    Interval.fromBounds(
+      minLower(lhs.lowerBound, rhs.lowerBound, true),
+      minUpper(lhs.upperBound, rhs.upperBound, true))
 
   // for all a in A, and all b in B, (A vmax B) is the interval that contains all (a max b)
   def vmax(rhs: Interval[A])(implicit m: AdditiveMonoid[A]): Interval[A] =
-    Interval.fromBounds(maxLower(lhs.lowerBound, rhs.lowerBound, true),
-                        maxUpper(lhs.upperBound, rhs.upperBound, true))
+    Interval.fromBounds(
+      maxLower(lhs.lowerBound, rhs.lowerBound, true),
+      maxUpper(lhs.upperBound, rhs.upperBound, true))
 
   def combine(rhs: Interval[A])(f: (A, A) => A): Interval[A] = {
     val lb = lhs.lowerBound.combine(rhs.lowerBound)(f)

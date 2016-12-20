@@ -108,11 +108,13 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
     */
   final def classBTypeFromSymbol(classSym: Symbol): ClassBType = {
     assert(classSym != NoSymbol, "Cannot create ClassBType from NoSymbol")
-    assert(classSym.isClass,
-           s"Cannot create ClassBType from non-class symbol $classSym")
+    assert(
+      classSym.isClass,
+      s"Cannot create ClassBType from non-class symbol $classSym")
     assertClassNotArrayNotPrimitive(classSym)
-    assert(!primitiveTypeToBType.contains(classSym) || isCompilingPrimitive,
-           s"Cannot create ClassBType for primitive class symbol $classSym")
+    assert(
+      !primitiveTypeToBType.contains(classSym) || isCompilingPrimitive,
+      s"Cannot create ClassBType for primitive class symbol $classSym")
     if (classSym == NothingClass) srNothingRef
     else if (classSym == NullClass) srNullRef
     else {
@@ -137,9 +139,10 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
     */
   final def methodBTypeFromSymbol(methodSymbol: Symbol): MethodBType = {
     assert(methodSymbol.isMethod, s"not a method-symbol: $methodSymbol")
-    methodBTypeFromMethodType(methodSymbol.info,
-                              methodSymbol.isClassConstructor ||
-                                methodSymbol.isConstructor)
+    methodBTypeFromMethodType(
+      methodSymbol.info,
+      methodSymbol.isClassConstructor ||
+        methodSymbol.isConstructor)
   }
 
   /**
@@ -172,10 +175,11 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
       if (sym.owner.isModuleClass) sym.owner.linkedClassOfClass else sym.owner
     val descriptor =
       methodBTypeFromMethodType(sym.info, isConstructor = false).descriptor
-    new asm.Handle(asm.Opcodes.H_INVOKESTATIC,
-                   classBTypeFromSymbol(owner).internalName,
-                   sym.name.encoded,
-                   descriptor)
+    new asm.Handle(
+      asm.Opcodes.H_INVOKESTATIC,
+      classBTypeFromSymbol(owner).internalName,
+      sym.name.encoded,
+      descriptor)
   }
 
   /**
@@ -352,8 +356,9 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
       *   https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.1-200-E.1
       */
     def javaClassfileFlags(classSym: Symbol): Int = {
-      assert(classSym.isJava,
-             s"Expected Java class symbol, got ${classSym.fullName}")
+      assert(
+        classSym.isJava,
+        s"Expected Java class symbol, got ${classSym.fullName}")
       import asm.Opcodes._
       def enumFlags = ACC_ENUM | {
         // Java enums have the `ACC_ABSTRACT` flag if they have a deferred method.
@@ -527,18 +532,20 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
     val inlineInfo = buildInlineInfo(classSym, classBType.internalName)
 
     classBType.info = Right(
-      ClassInfo(superClass,
-                interfaces,
-                flags,
-                nestedClasses,
-                nestedInfo,
-                inlineInfo))
+      ClassInfo(
+        superClass,
+        interfaces,
+        flags,
+        nestedClasses,
+        nestedInfo,
+        inlineInfo))
     classBType
   }
 
   private def buildNestedInfo(innerClassSym: Symbol): Option[NestedInfo] = {
-    assert(innerClassSym.isClass,
-           s"Cannot build NestedInfo for non-class symbol $innerClassSym")
+    assert(
+      innerClassSym.isClass,
+      s"Cannot build NestedInfo for non-class symbol $innerClassSym")
 
     val isTopLevel = innerClassSym.rawowner.isPackageClass
     // impl classes are considered top-level, see comment in BTypes
@@ -620,9 +627,10 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
   private def buildInlineInfo(classSym: Symbol,
                               internalName: InternalName): InlineInfo = {
     def buildFromSymbol =
-      buildInlineInfoFromClassSymbol(classSym,
-                                     classBTypeFromSymbol(_).internalName,
-                                     methodBTypeFromSymbol(_).descriptor)
+      buildInlineInfoFromClassSymbol(
+        classSym,
+        classBTypeFromSymbol(_).internalName,
+        methodBTypeFromSymbol(_).descriptor)
 
     // phase travel required, see implementation of `compiles`. for nested classes, it checks if the
     // enclosingTopLevelClass is being compiled. after flatten, all classes are considered top-level,
@@ -653,8 +661,9 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
     * ClassBType (its info.nestedClasses will hold the InnerClass entries, see comment in BTypes).
     */
   def mirrorClassClassBType(moduleClassSym: Symbol): ClassBType = {
-    assert(isTopLevelModuleClass(moduleClassSym),
-           s"not a top-level module class: $moduleClassSym")
+    assert(
+      isTopLevelModuleClass(moduleClassSym),
+      s"not a top-level module class: $moduleClassSym")
     val internalName = moduleClassSym.javaBinaryName.dropModule.toString
     classBTypeFromInternalName.getOrElse(internalName, {
       val c = ClassBType(internalName)
@@ -678,12 +687,13 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
     classBTypeFromInternalName.getOrElse(internalName, {
       val c = ClassBType(internalName)
       c.info = Right(
-        ClassInfo(superClass = Some(sbScalaBeanInfoRef),
-                  interfaces = Nil,
-                  flags = javaFlags(mainClass),
-                  nestedClasses = Nil,
-                  nestedInfo = None,
-                  inlineInfo = EmptyInlineInfo))
+        ClassInfo(
+          superClass = Some(sbScalaBeanInfoRef),
+          interfaces = Nil,
+          flags = javaFlags(mainClass),
+          nestedClasses = Nil,
+          nestedInfo = None,
+          inlineInfo = EmptyInlineInfo))
       c
     })
   }

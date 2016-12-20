@@ -42,9 +42,10 @@ object ExternalCompile {
 
         // Compile
 
-        val cachedCompile = FileFunction.cached(cacheDir / "compile",
-                                                FilesInfo.lastModified,
-                                                FilesInfo.exists) {
+        val cachedCompile = FileFunction.cached(
+          cacheDir / "compile",
+          FilesInfo.lastModified,
+          FilesInfo.exists) {
           dependencies =>
             logger.info(
               "Compiling %d Scala sources to %s..." format
@@ -73,11 +74,12 @@ object ExternalCompile {
 
             def doCompile(sourcesArgs: List[String]): Unit = {
               val run = (runner in compile).value
-              run.run("scala.tools.nsc.Main",
-                      compilerCp,
-                      "-cp" :: cpStr :: "-d" :: classesDirectory
-                        .getAbsolutePath() :: options ++: sourcesArgs,
-                      patchedLogger) foreach sys.error
+              run.run(
+                "scala.tools.nsc.Main",
+                compilerCp,
+                "-cp" :: cpStr :: "-d" :: classesDirectory
+                  .getAbsolutePath() :: options ++: sourcesArgs,
+                patchedLogger) foreach sys.error
             }
 
             /* Crude way of overcoming the Windows limitation on command line

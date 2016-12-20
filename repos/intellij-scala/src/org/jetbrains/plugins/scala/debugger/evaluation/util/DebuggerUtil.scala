@@ -202,8 +202,9 @@ object DebuggerUtil {
       case _ => Seq.empty
     }
     val subst = typeParams.foldLeft(ScSubstitutor.empty) { (subst, tp) =>
-      subst.bindT((tp.name, ScalaPsiUtil.getPsiElementId(tp)),
-                  tp.upperBound.getOrAny)
+      subst.bindT(
+        (tp.name, ScalaPsiUtil.getPsiElementId(tp)),
+        tp.upperBound.getOrAny)
     }
     val localParameters = function match {
       case fun: ScFunctionDefinition if fun.isLocal =>
@@ -232,8 +233,9 @@ object DebuggerUtil {
       parameters.map(parameterForJVMSignature(_, subst)).mkString("(", "", ")")
     val resultType = function match {
       case fun: ScFunction if !fun.isConstructor =>
-        getJVMStringForType(subst.subst(fun.returnType.getOrAny),
-                            isParam = false)
+        getJVMStringForType(
+          subst.subst(fun.returnType.getOrAny),
+          isParam = false)
       case _: ScFunction | _: ScPrimaryConstructor => "V"
     }
     JVMNameUtil.getJVMRawText(paramTypes + resultType)
@@ -363,16 +365,16 @@ object DebuggerUtil {
         case Some(refType) => refType.name
         case _ =>
           throw EvaluationException(
-            DebuggerBundle.message("error.class.not.loaded",
-                                   getDisplayName(process)))
+            DebuggerBundle
+              .message("error.class.not.loaded", getDisplayName(process)))
       }
     }
 
     def getDisplayName(debugProcess: DebugProcessImpl): String = {
       ApplicationManager.getApplication.runReadAction(new Computable[String] {
         def compute: String = {
-          JVMNameUtil.getSourcePositionClassDisplayName(debugProcess,
-                                                        sourcePosition)
+          JVMNameUtil
+            .getSourcePositionClassDisplayName(debugProcess, sourcePosition)
         }
       })
     }
@@ -387,8 +389,9 @@ object DebuggerUtil {
           refType.methodsByName("<init>").get(0).signature()
         case None =>
           throw EvaluationException(
-            DebuggerBundle.message("error.class.not.loaded",
-                                   inReadAction(clazz.qualifiedName)))
+            DebuggerBundle.message(
+              "error.class.not.loaded",
+              inReadAction(clazz.qualifiedName)))
       }
     }
 

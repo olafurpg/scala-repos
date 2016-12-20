@@ -195,9 +195,10 @@ with AbstractTestConfigurationProducer {
       PsiTreeUtil.getParentOfType(element, classOf[ScTypeDefinition], false)
     if (containingObject == null) return fail
     while (!containingObject.isInstanceOf[ScObject] &&
-           PsiTreeUtil.getParentOfType(containingObject,
-                                       classOf[ScTypeDefinition],
-                                       true) != null) {
+           PsiTreeUtil.getParentOfType(
+             containingObject,
+             classOf[ScTypeDefinition],
+             true) != null) {
       containingObject = PsiTreeUtil
         .getParentOfType(containingObject, classOf[ScTypeDefinition], true)
     }

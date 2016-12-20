@@ -395,9 +395,10 @@ private[twitter] object Message {
     def typ = Types.BAD_Tdiscarded
     lazy val buf = ChannelBuffers.wrappedBuffer(
       ChannelBuffers.wrappedBuffer(
-        Array[Byte]((which >> 16 & 0xff).toByte,
-                    (which >> 8 & 0xff).toByte,
-                    (which & 0xff).toByte)),
+        Array[Byte](
+          (which >> 16 & 0xff).toByte,
+          (which >> 8 & 0xff).toByte,
+          (which & 0xff).toByte)),
       encodeString(why))
   }
 
@@ -508,11 +509,12 @@ private[twitter] object Message {
     val id = trace3 match {
       case Some((spanId, parentId, traceId)) =>
         Some(
-          TraceId(Some(traceId),
-                  Some(parentId),
-                  spanId,
-                  None,
-                  Flags(traceFlags)))
+          TraceId(
+            Some(traceId),
+            Some(parentId),
+            spanId,
+            None,
+            Flags(traceFlags)))
       case None => None
     }
 

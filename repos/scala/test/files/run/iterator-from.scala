@@ -13,68 +13,77 @@ object Test extends App {
 
   def testSet[A <% Ordered[A]](set: SortedSet[A], list: List[A]) {
     val distinctSorted = list.distinct.sorted
-    assertEquals("Set size wasn't the same as list sze",
-                 set.size,
-                 distinctSorted.size)
+    assertEquals(
+      "Set size wasn't the same as list sze",
+      set.size,
+      distinctSorted.size)
 
     for (key <- distinctSorted) {
       val clazz = set.getClass
       val iteratorFrom = (set iteratorFrom key).toList
-      check(clazz,
-            list,
-            s"set iteratorFrom $key",
-            s"(set from $key).iterator",
-            iteratorFrom,
-            (set from key).iterator.toList)
-      check(clazz,
-            list,
-            s"set.iteratorFrom $key",
-            s"distinctSorted dropWhile (_ < $key)",
-            iteratorFrom,
-            distinctSorted dropWhile (_ < key))
-      check(clazz,
-            list,
-            s"set iteratorFrom $key",
-            s"set keysIterator from $key",
-            iteratorFrom,
-            (set keysIteratorFrom key).toList)
+      check(
+        clazz,
+        list,
+        s"set iteratorFrom $key",
+        s"(set from $key).iterator",
+        iteratorFrom,
+        (set from key).iterator.toList)
+      check(
+        clazz,
+        list,
+        s"set.iteratorFrom $key",
+        s"distinctSorted dropWhile (_ < $key)",
+        iteratorFrom,
+        distinctSorted dropWhile (_ < key))
+      check(
+        clazz,
+        list,
+        s"set iteratorFrom $key",
+        s"set keysIterator from $key",
+        iteratorFrom,
+        (set keysIteratorFrom key).toList)
     }
   }
 
   def testMap[A <% Ordered[A], B](map: SortedMap[A, B], list: List[(A, B)]) {
     val distinctSorted = distinctByKey(list).sortBy(_._1)
-    assertEquals("Map size wasn't the same as list sze",
-                 map.size,
-                 distinctSorted.size)
+    assertEquals(
+      "Map size wasn't the same as list sze",
+      map.size,
+      distinctSorted.size)
 
     for (keyValue <- distinctSorted) {
       val key = keyValue._1
       val clazz = map.getClass
       val iteratorFrom = (map iteratorFrom key).toList
-      check(clazz,
-            list,
-            s"map iteratorFrom $key",
-            s"(map from $key).iterator",
-            iteratorFrom,
-            (map from key).iterator.toList)
-      check(clazz,
-            list,
-            s"map iteratorFrom $key",
-            s"distinctSorted dropWhile (_._1 < $key)",
-            iteratorFrom,
-            distinctSorted dropWhile (_._1 < key))
-      check(clazz,
-            list,
-            s"map iteratorFrom $key map (_._1)",
-            s"map keysIteratorFrom $key",
-            iteratorFrom map (_._1),
-            (map keysIteratorFrom key).toList)
-      check(clazz,
-            list,
-            s"map iteratorFrom $key map (_._2)",
-            s"map valuesIteratorFrom $key",
-            iteratorFrom map (_._2),
-            (map valuesIteratorFrom key).toList)
+      check(
+        clazz,
+        list,
+        s"map iteratorFrom $key",
+        s"(map from $key).iterator",
+        iteratorFrom,
+        (map from key).iterator.toList)
+      check(
+        clazz,
+        list,
+        s"map iteratorFrom $key",
+        s"distinctSorted dropWhile (_._1 < $key)",
+        iteratorFrom,
+        distinctSorted dropWhile (_._1 < key))
+      check(
+        clazz,
+        list,
+        s"map iteratorFrom $key map (_._1)",
+        s"map keysIteratorFrom $key",
+        iteratorFrom map (_._1),
+        (map keysIteratorFrom key).toList)
+      check(
+        clazz,
+        list,
+        s"map iteratorFrom $key map (_._2)",
+        s"map valuesIteratorFrom $key",
+        iteratorFrom map (_._2),
+        (map valuesIteratorFrom key).toList)
     }
   }
 

@@ -18,9 +18,10 @@ class EmptyParenMethodOverridenAsParameterlessInspection
         // f.superMethod returns None for some reason
         case Some(method: ScFunction)
             if !method.isInCompiledFile && method.isEmptyParen =>
-          holder.registerProblem(f.nameId,
-                                 getDisplayName,
-                                 new AddEmptyParentheses(f))
+          holder.registerProblem(
+            f.nameId,
+            getDisplayName,
+            new AddEmptyParentheses(f))
         case _ =>
       }
   }

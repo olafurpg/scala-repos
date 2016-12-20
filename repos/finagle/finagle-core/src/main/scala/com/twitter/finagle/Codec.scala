@@ -82,8 +82,9 @@ trait Codec[Req, Rep] {
       transport: Transport[Any, Any],
       service: Service[Req, Rep]
   ): Closable =
-    new SerialServerDispatcher[Req, Rep](Transport.cast[Rep, Req](transport),
-                                         service)
+    new SerialServerDispatcher[Req, Rep](
+      Transport.cast[Rep, Req](transport),
+      service)
 
   /**
     * Is this Codec OK for failfast? This is a temporary hack to

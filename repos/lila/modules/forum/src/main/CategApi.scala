@@ -28,22 +28,24 @@ private[forum] final class CategApi(env: Env) {
 
   def makeTeam(slug: String, name: String): Funit =
     CategRepo.nextPosition flatMap { position =>
-      val categ = Categ(id = teamSlug(slug),
-                        name = name,
-                        desc = "Forum of the team " + name,
-                        pos = position,
-                        team = slug.some,
-                        nbTopics = 0,
-                        nbPosts = 0,
-                        lastPostId = "",
-                        nbTopicsTroll = 0,
-                        nbPostsTroll = 0,
-                        lastPostIdTroll = "")
-      val topic = Topic.make(categId = categ.slug,
-                             slug = slug + "-forum",
-                             name = name + " forum",
-                             troll = false,
-                             featured = true)
+      val categ = Categ(
+        id = teamSlug(slug),
+        name = name,
+        desc = "Forum of the team " + name,
+        pos = position,
+        team = slug.some,
+        nbTopics = 0,
+        nbPosts = 0,
+        lastPostId = "",
+        nbTopicsTroll = 0,
+        nbPostsTroll = 0,
+        lastPostIdTroll = "")
+      val topic = Topic.make(
+        categId = categ.slug,
+        slug = slug + "-forum",
+        name = name + " forum",
+        troll = false,
+        featured = true)
       val post = Post.make(
         topicId = topic.id,
         author = none,

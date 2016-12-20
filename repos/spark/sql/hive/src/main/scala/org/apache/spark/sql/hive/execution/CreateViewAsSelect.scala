@@ -95,10 +95,11 @@ private[hive] case class CreateViewAsSelect(tableDesc: CatalogTable,
       } else {
         childSchema.zip(tableDesc.schema).map {
           case (a, col) =>
-            CatalogColumn(col.name,
-                          HiveMetastoreTypes.toMetastoreType(a.dataType),
-                          nullable = true,
-                          col.comment)
+            CatalogColumn(
+              col.name,
+              HiveMetastoreTypes.toMetastoreType(a.dataType),
+              nullable = true,
+              col.comment)
         }
       }
     }

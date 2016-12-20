@@ -37,13 +37,15 @@ object FontPosture
     extends SFXEnumDelegateCompanion[jfxst.FontPosture, FontPosture] {
 
   val Regular = new FontPosture(jfxst.FontPosture.REGULAR)
-  @deprecated("Use Regular; REGULAR will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Regular; REGULAR will be removed in a future release",
+    "8.0.60-R10")
   val REGULAR = Regular
 
   val Italic = new FontPosture(jfxst.FontPosture.ITALIC)
-  @deprecated("Use Italic; ITALIC will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Italic; ITALIC will be removed in a future release",
+    "8.0.60-R10")
   val ITALIC = Italic
 
   protected override def unsortedValues: Array[FontPosture] =

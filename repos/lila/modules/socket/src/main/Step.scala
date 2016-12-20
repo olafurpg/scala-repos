@@ -81,10 +81,11 @@ object Step {
       }) _ compose add("drops", drops.map { drops =>
       JsString(drops.map(_.key).mkString)
     }) _ compose add("crazy", crazyData))(
-      Json.obj("ply" -> ply,
-               "uci" -> move.map(_.uciString),
-               "san" -> move.map(_.san),
-               "fen" -> fen))
+      Json.obj(
+        "ply" -> ply,
+        "uci" -> move.map(_.uciString),
+        "san" -> move.map(_.san),
+        "fen" -> fen))
   }
 
   private def add[A](k: String, v: A, cond: Boolean)(o: JsObject)(

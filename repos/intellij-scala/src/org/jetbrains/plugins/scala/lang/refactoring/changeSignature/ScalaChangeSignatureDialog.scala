@@ -62,15 +62,13 @@ class ScalaChangeSignatureDialog(val project: Project,
                                  val method: ScalaMethodDescriptor)
     extends {
   private var defaultValuesUsagePanel: DefaultValuesUsagePanel = null
-} with ChangeSignatureDialogBase[ScalaParameterInfo,
-                                 ScFunction,
-                                 String,
-                                 ScalaMethodDescriptor,
-                                 ScalaParameterTableModelItem,
-                                 ScalaParameterTableModel](project,
-                                                           method,
-                                                           false,
-                                                           method.fun) {
+} with ChangeSignatureDialogBase[
+  ScalaParameterInfo,
+  ScFunction,
+  String,
+  ScalaMethodDescriptor,
+  ScalaParameterTableModelItem,
+  ScalaParameterTableModel](project, method, false, method.fun) {
   override def getFileType: LanguageFileType = ScalaFileType.SCALA_FILE_TYPE
 
   override def createCallerChooser(title: String,
@@ -80,12 +78,13 @@ class ScalaChangeSignatureDialog(val project: Project,
 
   override def createRefactoringProcessor(): BaseRefactoringProcessor = {
     val parameters = splittedItems.map(_.map(_.parameter))
-    val changeInfo = new ScalaChangeInfo(getVisibility,
-                                         method.fun,
-                                         getMethodName,
-                                         returnType,
-                                         parameters,
-                                         isAddDefaultArgs)
+    val changeInfo = new ScalaChangeInfo(
+      getVisibility,
+      method.fun,
+      getMethodName,
+      returnType,
+      parameters,
+      isAddDefaultArgs)
 
     new ScalaChangeSignatureProcessor(project, changeInfo)
   }
@@ -212,10 +211,11 @@ class ScalaChangeSignatureDialog(val project: Project,
     def nameAndType(item: ScalaParameterTableModelItem) = {
       if (item.parameter.name == "") ""
       else
-        ScalaExtractMethodUtils.typedName(item.parameter.name,
-                                          item.typeText,
-                                          project,
-                                          byName = false)
+        ScalaExtractMethodUtils.typedName(
+          item.parameter.name,
+          item.typeText,
+          project,
+          byName = false)
     }
 
     def itemText(item: ScalaParameterTableModelItem) =
@@ -247,8 +247,9 @@ class ScalaChangeSignatureDialog(val project: Project,
         problems += RefactoringBundle.message("changeSignature.no.return.type")
       else if (returnTypeText.isEmpty)
         problems +=
-          RefactoringBundle.message("changeSignature.wrong.return.type",
-                                    myReturnTypeCodeFragment.getText)
+          RefactoringBundle.message(
+            "changeSignature.wrong.return.type",
+            myReturnTypeCodeFragment.getText)
     }
 
     val paramNames = paramItems.map(_.parameter.name)
@@ -400,9 +401,10 @@ class ScalaChangeSignatureDialog(val project: Project,
   }
 
   protected def createRemoveClauseButton() = {
-    val removeClauseButton = new AnActionButton("Remove parameter clause",
-                                                null,
-                                                Icons.REMOVE_CLAUSE) {
+    val removeClauseButton = new AnActionButton(
+      "Remove parameter clause",
+      null,
+      Icons.REMOVE_CLAUSE) {
       override def actionPerformed(e: AnActionEvent): Unit = {
         val table = parametersTable
         val editedColumn = editingColumn(table)
@@ -537,11 +539,12 @@ class ScalaChangeSignatureDialog(val project: Project,
                 byName /*already in type text*/ = false)
           val defText = defaultText(item)
           val text = s"$nameAndType $defText"
-          val comp = JBListTable.createEditorTextFieldPresentation(project,
-                                                                   getFileType,
-                                                                   " " + text,
-                                                                   selected,
-                                                                   focused)
+          val comp = JBListTable.createEditorTextFieldPresentation(
+            project,
+            getFileType,
+            " " + text,
+            selected,
+            focused)
 
           if (item.parameter.isIntroducedParameter) {
             val fields = UIUtil

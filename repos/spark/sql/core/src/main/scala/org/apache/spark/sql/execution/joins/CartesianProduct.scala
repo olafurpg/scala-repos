@@ -66,9 +66,10 @@ private[spark] class UnsafeCartesianRDD(left: RDD[UnsafeRow],
         }
         override def next(): UnsafeRow = {
           iter.loadNext()
-          unsafeRow.pointTo(iter.getBaseObject,
-                            iter.getBaseOffset,
-                            iter.getRecordLength)
+          unsafeRow.pointTo(
+            iter.getBaseObject,
+            iter.getBaseOffset,
+            iter.getRecordLength)
           unsafeRow
         }
       }
@@ -76,10 +77,9 @@ private[spark] class UnsafeCartesianRDD(left: RDD[UnsafeRow],
 
     val resultIter = for (x <- rdd1.iterator(partition.s1, context);
                           y <- createIter()) yield (x, y)
-    CompletionIterator[(UnsafeRow, UnsafeRow),
-                       Iterator[(UnsafeRow, UnsafeRow)]](
-      resultIter,
-      sorter.cleanupResources)
+    CompletionIterator[
+      (UnsafeRow, UnsafeRow),
+      Iterator[(UnsafeRow, UnsafeRow)]](resultIter, sorter.cleanupResources)
   }
 }
 
@@ -88,8 +88,8 @@ case class CartesianProduct(left: SparkPlan, right: SparkPlan)
   override def output: Seq[Attribute] = left.output ++ right.output
 
   override private[sql] lazy val metrics = Map(
-    "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
-                                                   "number of output rows"))
+    "numOutputRows" -> SQLMetrics
+      .createLongMetric(sparkContext, "number of output rows"))
 
   protected override def doExecute(): RDD[InternalRow] = {
     val numOutputRows = longMetric("numOutputRows")

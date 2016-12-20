@@ -318,11 +318,12 @@ final class AskableActorRef(val actorRef: ActorRef) extends AnyVal {
         Future.failed[Any](new IllegalArgumentException(
           s"""Timeout length must not be negative, question not sent to [$actorRef]. Sender[$sender] sent the message of type "${message.getClass.getName}"."""))
       else {
-        val a = PromiseActorRef(ref.provider,
-                                timeout,
-                                targetName = actorRef,
-                                message.getClass.getName,
-                                sender)
+        val a = PromiseActorRef(
+          ref.provider,
+          timeout,
+          targetName = actorRef,
+          message.getClass.getName,
+          sender)
         actorRef.tell(message, a)
         a.result.future
       }
@@ -365,11 +366,12 @@ final class ExplicitlyAskableActorRef(val actorRef: ActorRef) extends AnyVal {
           Future.failed[Any](new IllegalArgumentException(
             s"""Timeout length must not be negative, question not sent to [$actorRef]. Sender[$sender] sent the message of type "${message.getClass.getName}"."""))
         } else {
-          val a = PromiseActorRef(ref.provider,
-                                  timeout,
-                                  targetName = actorRef,
-                                  "unknown",
-                                  sender)
+          val a = PromiseActorRef(
+            ref.provider,
+            timeout,
+            targetName = actorRef,
+            "unknown",
+            sender)
           val message = messageFactory(a)
           a.messageClassName = message.getClass.getName
           actorRef.tell(message, a)
@@ -444,11 +446,12 @@ final class AskableActorSelection(val actorSel: ActorSelection)
           Future.failed[Any](new IllegalArgumentException(
             s"""Timeout length must not be negative, question not sent to [$actorSel]. Sender[$sender] sent the message of type "${message.getClass.getName}"."""))
         else {
-          val a = PromiseActorRef(ref.provider,
-                                  timeout,
-                                  targetName = actorSel,
-                                  message.getClass.getName,
-                                  sender)
+          val a = PromiseActorRef(
+            ref.provider,
+            timeout,
+            targetName = actorSel,
+            message.getClass.getName,
+            sender)
           actorSel.tell(message, a)
           a.result.future
         }
@@ -487,11 +490,12 @@ final class ExplicitlyAskableActorSelection(val actorSel: ActorSelection)
           Future.failed[Any](new IllegalArgumentException(
             s"""Timeout length must not be negative, question not sent to [$actorSel]. Sender[$sender] sent the message of type "${message.getClass.getName}"."""))
         } else {
-          val a = PromiseActorRef(ref.provider,
-                                  timeout,
-                                  targetName = actorSel,
-                                  "unknown",
-                                  sender)
+          val a = PromiseActorRef(
+            ref.provider,
+            timeout,
+            targetName = actorSel,
+            "unknown",
+            sender)
           val message = messageFactory(a)
           a.messageClassName = message.getClass.getName
           actorSel.tell(message, a)
@@ -647,9 +651,10 @@ private[akka] final class PromiseActorRef private (
           if (!addWatcher(watcher))
             // ➡➡➡ NEVER SEND THE SAME SYSTEM MESSAGE OBJECT TO TWO ACTORS ⬅⬅⬅
             watcher.sendSystemMessage(
-              DeathWatchNotification(watchee,
-                                     existenceConfirmed = true,
-                                     addressTerminated = false))
+              DeathWatchNotification(
+                watchee,
+                existenceConfirmed = true,
+                addressTerminated = false))
         } else
           System.err.println(
             "BUG: illegal Watch(%s,%s) for %s".format(watchee, watcher, this))
@@ -679,9 +684,10 @@ private[akka] final class PromiseActorRef private (
           watcher
             .asInstanceOf[InternalActorRef]
             .sendSystemMessage(
-              DeathWatchNotification(this,
-                                     existenceConfirmed = true,
-                                     addressTerminated = false))
+              DeathWatchNotification(
+                this,
+                existenceConfirmed = true,
+                addressTerminated = false))
         }
       }
     }

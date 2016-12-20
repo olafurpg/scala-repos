@@ -46,11 +46,12 @@ object OffsetFetchRequest extends Logging {
         TopicAndPartition(topic, partitionId)
       })
     })
-    OffsetFetchRequest(consumerGroupId,
-                       pairs,
-                       versionId,
-                       correlationId,
-                       clientId)
+    OffsetFetchRequest(
+      consumerGroupId,
+      pairs,
+      versionId,
+      correlationId,
+      clientId)
   }
 }
 
@@ -106,8 +107,9 @@ case class OffsetFetchRequest(
            ))
       }
       .toMap
-    val errorResponse = OffsetFetchResponse(requestInfo = responseMap,
-                                            correlationId = correlationId)
+    val errorResponse = OffsetFetchResponse(
+      requestInfo = responseMap,
+      correlationId = correlationId)
     requestChannel.sendResponse(
       new Response(
         request,

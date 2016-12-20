@@ -229,9 +229,10 @@ class WindowOperationsSuite extends TestSuiteBase {
 
   testReduceByKeyAndWindowWithInverse("big test", bigInput, bigReduceInvOutput)
 
-  testReduceByKeyAndWindowWithFilteredInverse("big test",
-                                              bigInput,
-                                              bigReduceOutput)
+  testReduceByKeyAndWindowWithFilteredInverse(
+    "big test",
+    bigInput,
+    bigReduceOutput)
 
   test("groupByKeyAndWindow") {
     val input = bigInput
@@ -305,9 +306,10 @@ class WindowOperationsSuite extends TestSuiteBase {
       val numBatches =
         expectedOutput.size * (slideDuration / batchDuration).toInt
       val operation = (s: DStream[(String, Int)]) => {
-        s.reduceByKeyAndWindow((x: Int, y: Int) => x + y,
-                               windowDuration,
-                               slideDuration)
+        s.reduceByKeyAndWindow(
+          (x: Int, y: Int) => x + y,
+          windowDuration,
+          slideDuration)
       }
       testOperation(input, operation, expectedOutput, numBatches, true)
     }
@@ -346,11 +348,12 @@ class WindowOperationsSuite extends TestSuiteBase {
         expectedOutput.size * (slideDuration / batchDuration).toInt
       val filterFunc = (p: (String, Int)) => p._2 != 0
       val operation = (s: DStream[(String, Int)]) => {
-        s.reduceByKeyAndWindow(_ + _,
-                                _ - _,
-                                windowDuration,
-                                slideDuration,
-                                filterFunc = filterFunc)
+        s.reduceByKeyAndWindow(
+            _ + _,
+            _ - _,
+            windowDuration,
+            slideDuration,
+            filterFunc = filterFunc)
           .persist()
           .checkpoint(Seconds(100)) // Large value to avoid effect of RDD checkpointing
       }

@@ -88,8 +88,9 @@ trait BaselineComparisons {
       results match {
         case Tree.Node((RunQuery(query), stats), _) =>
           Tree.leaf(
-            RunQuery(query) -> PerfDelta(baseline get ((path, Some(query))),
-                                         stats))
+            RunQuery(query) -> PerfDelta(
+              baseline get ((path, Some(query))),
+              stats))
 
         case Tree.Node((Group(name), stats), kids) =>
           val newPath = path :+ name
@@ -137,12 +138,13 @@ trait BaselineComparisons {
                     (jpath collect { case JString(p) => p },
                      (obj \? "query") collect { case JString(query) => query })
                   val n = count.toInt
-                  path -> Statistics(0,
-                                     List(min.toDouble),
-                                     List(max.toDouble),
-                                     mean.toDouble,
-                                     (n - 1) * variance.toDouble,
-                                     n)
+                  path -> Statistics(
+                    0,
+                    List(min.toDouble),
+                    List(max.toDouble),
+                    mean.toDouble,
+                    (n - 1) * variance.toDouble,
+                    n)
                 }) map (acc + _) getOrElse {
                   // TODO: Replace these errors with something more useful.
                   sys.error("Error parsing: %s" format obj.toString)
@@ -163,12 +165,13 @@ trait BaselineComparisons {
   def createBaseline(result: Tree[(PerfTest, Option[Statistics])]): JValue = {
 
     def statsJson(stats: Statistics): List[JField] =
-      List(JField("mean", JNum(stats.mean)),
-           JField("variance", JNum(stats.variance)),
-           JField("stdDev", JNum(stats.stdDev)),
-           JField("min", JNum(stats.min)),
-           JField("max", JNum(stats.max)),
-           JField("count", JNum(stats.count)))
+      List(
+        JField("mean", JNum(stats.mean)),
+        JField("variance", JNum(stats.variance)),
+        JField("stdDev", JNum(stats.stdDev)),
+        JField("min", JNum(stats.min)),
+        JField("max", JNum(stats.max)),
+        JField("count", JNum(stats.count)))
 
     def values(path: List[JString],
                test: Tree[(PerfTest, Option[Statistics])]): List[JValue] = {

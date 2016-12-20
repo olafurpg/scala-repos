@@ -43,10 +43,11 @@ case class CollectLimit(limit: Int, child: SparkPlan) extends UnaryNode {
     child.output.size)
   protected override def doExecute(): RDD[InternalRow] = {
     val shuffled = new ShuffledRowRDD(
-      ShuffleExchange.prepareShuffleDependency(child.execute(),
-                                               child.output,
-                                               SinglePartition,
-                                               serializer))
+      ShuffleExchange.prepareShuffleDependency(
+        child.execute(),
+        child.output,
+        SinglePartition,
+        serializer))
     shuffled.mapPartitionsInternal(_.take(limit))
   }
 }
@@ -78,8 +79,9 @@ trait BaseLimit extends UnaryNode with CodegenSupport {
     val stopEarly = ctx.freshName("stopEarly")
     ctx.addMutableState("boolean", stopEarly, s"$stopEarly = false;")
 
-    ctx.addNewFunction("shouldStop",
-                       s"""
+    ctx.addNewFunction(
+      "shouldStop",
+      s"""
       @Override
       protected boolean shouldStop() {
         return !currentRows.isEmpty() || $stopEarly;
@@ -153,10 +155,11 @@ case class TakeOrderedAndProject(limit: Int,
       }
     }
     val shuffled = new ShuffledRowRDD(
-      ShuffleExchange.prepareShuffleDependency(localTopK,
-                                               child.output,
-                                               SinglePartition,
-                                               serializer))
+      ShuffleExchange.prepareShuffleDependency(
+        localTopK,
+        child.output,
+        SinglePartition,
+        serializer))
     shuffled.mapPartitions { iter =>
       val topK = org.apache.spark.util.collection.Utils
         .takeOrdered(iter.map(_.copy()), limit)(ord)

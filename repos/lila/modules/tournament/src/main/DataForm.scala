@@ -61,8 +61,9 @@ final class DataForm {
         "private" -> optional(text.verifying("on" == _))
       )(TournamentSetup.apply)(TournamentSetup.unapply)
         .verifying("Invalid clock", _.validClock)
-        .verifying("Increase tournament duration, or decrease game clock",
-                   _.validTiming)) fill TournamentSetup(
+        .verifying(
+          "Increase tournament duration, or decrease game clock",
+          _.validTiming)) fill TournamentSetup(
       clockTime = clockTimeDefault,
       clockIncrement = clockIncrementDefault,
       minutes = minuteDefault,
@@ -77,15 +78,16 @@ object DataForm {
 
   import chess.variant._
 
-  val validVariants = List(Standard,
-                           Chess960,
-                           KingOfTheHill,
-                           ThreeCheck,
-                           Antichess,
-                           Atomic,
-                           Horde,
-                           RacingKings,
-                           Crazyhouse)
+  val validVariants = List(
+    Standard,
+    Chess960,
+    KingOfTheHill,
+    ThreeCheck,
+    Antichess,
+    Atomic,
+    Horde,
+    RacingKings,
+    Crazyhouse)
 
   val validVariantIds = validVariants.map(_.id).toSet
 }

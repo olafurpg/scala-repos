@@ -40,17 +40,19 @@ import scalafx.Includes._
   */
 @RunWith(classOf[JUnitRunner])
 class ShortStringConverterSpec
-    extends AbstractStringConverterDelegateSpec[java.lang.Short,
-                                                jfxuc.ShortStringConverter,
-                                                Short,
-                                                ShortStringConverter](
+    extends AbstractStringConverterDelegateSpec[
+      java.lang.Short,
+      jfxuc.ShortStringConverter,
+      Short,
+      ShortStringConverter](
       classOf[jfxuc.ShortStringConverter],
       classOf[ShortStringConverter],
       classOf[Short]) {
 
-  val examples = List((0.toShort, "0"),
-                      (123.toShort, "123"),
-                      (-123.toShort, "-123"),
-                      (Short.MaxValue, Short.MaxValue.toString),
-                      (Short.MinValue, Short.MinValue.toString))
+  val examples = List(
+    (0.toShort, "0"),
+    (123.toShort, "123"),
+    (-123.toShort, "-123"),
+    (Short.MaxValue, Short.MaxValue.toString),
+    (Short.MinValue, Short.MinValue.toString))
 }

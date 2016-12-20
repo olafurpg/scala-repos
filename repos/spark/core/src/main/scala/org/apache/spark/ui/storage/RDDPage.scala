@@ -36,8 +36,9 @@ private[ui] class RDDPage(parent: StorageTab) extends WebUIPage("rdd") {
 
   def render(request: HttpServletRequest): Seq[Node] = {
     val parameterId = request.getParameter("id")
-    require(parameterId != null && parameterId.nonEmpty,
-            "Missing id parameter")
+    require(
+      parameterId != null && parameterId.nonEmpty,
+      "Missing id parameter")
 
     val parameterBlockPage = request.getParameter("block.page")
     val parameterBlockSortColumn = request.getParameter("block.sort")
@@ -153,9 +154,10 @@ private[ui] class RDDPage(parent: StorageTab) extends WebUIPage("rdd") {
         {blockTableHTML ++ jsForScrollingDownToBlockTable}
       </div>;
 
-    UIUtils.headerSparkPage("RDD Storage Info for " + rddStorageInfo.name,
-                            content,
-                            parent)
+    UIUtils.headerSparkPage(
+      "RDD Storage Info for " + rddStorageInfo.name,
+      content,
+      parent)
   }
 
   /** Header fields for the worker table */
@@ -196,11 +198,12 @@ private[ui] class BlockDataSource(rddPartitions: Seq[RDDPartitionInfo],
   }
 
   private def blockRow(rddPartition: RDDPartitionInfo): BlockTableRowData = {
-    BlockTableRowData(rddPartition.blockName,
-                      rddPartition.storageLevel,
-                      rddPartition.memoryUsed,
-                      rddPartition.diskUsed,
-                      rddPartition.executors.mkString(" "))
+    BlockTableRowData(
+      rddPartition.blockName,
+      rddPartition.storageLevel,
+      rddPartition.memoryUsed,
+      rddPartition.diskUsed,
+      rddPartition.executors.mkString(" "))
   }
 
   /**
@@ -284,11 +287,12 @@ private[ui] class BlockPagedTable(basePath: String,
   }
 
   override def headers: Seq[Node] = {
-    val blockHeaders = Seq("Block Name",
-                           "Storage Level",
-                           "Size in Memory",
-                           "Size on Disk",
-                           "Executors")
+    val blockHeaders = Seq(
+      "Block Name",
+      "Storage Level",
+      "Size in Memory",
+      "Size on Disk",
+      "Executors")
 
     if (!blockHeaders.contains(sortColumn)) {
       throw new IllegalArgumentException(s"Unknown column: $sortColumn")

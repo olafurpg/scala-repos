@@ -54,8 +54,9 @@ object Inspect {
       case Uses =>
         Project.showUses(Project.usedBy(structure, true, sk.key))
       case Definitions =>
-        Project.showDefinitions(sk.key,
-                                Project.definitions(structure, true, sk.key))
+        Project.showDefinitions(
+          sk.key,
+          Project.definitions(structure, true, sk.key))
     }
   }
 }

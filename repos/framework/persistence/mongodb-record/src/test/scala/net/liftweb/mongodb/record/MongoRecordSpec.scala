@@ -249,8 +249,9 @@ class MongoRecordSpec extends Specification with MongoTestKit {
       .mandatoryStringListField(List("abc", "def", "ghi"))
       .mandatoryIntListField(List(4, 5, 6))
       .mandatoryMongoJsonObjectListField(
-        List(TypeTestJsonObject(1, "jsonobj1", Map("x" -> "1")),
-             TypeTestJsonObject(2, "jsonobj2", Map("x" -> "2"))))
+        List(
+          TypeTestJsonObject(1, "jsonobj1", Map("x" -> "1")),
+          TypeTestJsonObject(2, "jsonobj2", Map("x" -> "2"))))
       .mongoCaseClassListField(
         List(MongoCaseClassTestObject(1, "str", MyTestEnum.TWO)))
       .mandatoryMongoRefListField(Nil)
@@ -872,8 +873,9 @@ class MongoRecordSpec extends Specification with MongoTestKit {
       ltr.mandatoryIntListField.dirty_? must_== true
 
       ltr.mandatoryMongoJsonObjectListField(
-        List(TypeTestJsonObject(1, "jsonobj1", Map("x" -> "1")),
-             TypeTestJsonObject(2, "jsonobj2", Map("x" -> "2"))))
+        List(
+          TypeTestJsonObject(1, "jsonobj1", Map("x" -> "1")),
+          TypeTestJsonObject(2, "jsonobj2", Map("x" -> "2"))))
       ltr.mandatoryMongoJsonObjectListField.dirty_? must_== true
 
       ltr.mongoCaseClassListField(

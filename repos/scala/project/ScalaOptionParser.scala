@@ -20,8 +20,9 @@ object ScalaOptionParser {
     def MultiStringSetting(name: String): Parser[String] =
       concat(
         concat(token(name ~ ":")) ~ repsep(
-          token(StringBasicNotStartingWithDash,
-                TokenCompletions.displayOnly("<value>")),
+          token(
+            StringBasicNotStartingWithDash,
+            TokenCompletions.displayOnly("<value>")),
           token(",")).map(_.mkString))
     def IntSetting(name: String): Parser[String] =
       concat(
@@ -62,11 +63,13 @@ object ScalaOptionParser {
     }
     val Property: Parser[String] = {
       val PropName = concat(
-        token("-D" ~ oneOrMore(NotSpaceClass & not('=', "not =")).string,
-              TokenCompletions.displayOnly("-D<property name>")))
+        token(
+          "-D" ~ oneOrMore(NotSpaceClass & not('=', "not =")).string,
+          TokenCompletions.displayOnly("-D<property name>")))
       val EqualsValue = concat(
-        "=" ~ token(OptNotSpace,
-                    TokenCompletions.displayOnly("<property value>")))
+        "=" ~ token(
+          OptNotSpace,
+          TokenCompletions.displayOnly("<property value>")))
       concat(PropName ~ EqualsValue.?.map(_.getOrElse("")))
     }
 
@@ -111,8 +114,9 @@ object ScalaOptionParser {
     val P = entryPoint match {
       case "scala" =>
         val runnable =
-          token(StringBasicNotStartingWithDash,
-                TokenCompletions.displayOnly("<script|class|object|jar>"))
+          token(
+            StringBasicNotStartingWithDash,
+            TokenCompletions.displayOnly("<script|class|object|jar>"))
             .filter(!_.startsWith("-"), x => x)
         val runnableAndArgs = concat(
           runnable ~ Opt(
@@ -226,75 +230,81 @@ object ScalaOptionParser {
       "-version"
     )
   private def stringSettingNames =
-    List("-Xgenerate-phase-graph",
-         "-Xmain-class",
-         "-Xpluginsdir",
-         "-Xshow-class",
-         "-Xshow-object",
-         "-Xsource-reader",
-         "-Ydump-classes",
-         "-Ygen-asmp",
-         "-Ypresentation-log",
-         "-Ypresentation-replay",
-         "-Yrepl-outdir",
-         "-d",
-         "-dependencyfile",
-         "-encoding",
-         "-Xscript")
+    List(
+      "-Xgenerate-phase-graph",
+      "-Xmain-class",
+      "-Xpluginsdir",
+      "-Xshow-class",
+      "-Xshow-object",
+      "-Xsource-reader",
+      "-Ydump-classes",
+      "-Ygen-asmp",
+      "-Ypresentation-log",
+      "-Ypresentation-replay",
+      "-Yrepl-outdir",
+      "-d",
+      "-dependencyfile",
+      "-encoding",
+      "-Xscript")
   private def pathSettingNames =
-    List("-bootclasspath",
-         "-classpath",
-         "-extdirs",
-         "-javabootclasspath",
-         "-javaextdirs",
-         "-sourcepath",
-         "-toolcp")
-  private val phases = List("all",
-                            "parser",
-                            "namer",
-                            "packageobjects",
-                            "typer",
-                            "patmat",
-                            "superaccessors",
-                            "extmethods",
-                            "pickler",
-                            "refchecks",
-                            "uncurry",
-                            "tailcalls",
-                            "specialize",
-                            "explicitouter",
-                            "erasure",
-                            "posterasure",
-                            "lazyvals",
-                            "lambdalift",
-                            "constructors",
-                            "flatten",
-                            "mixin",
-                            "cleanup",
-                            "delambdafy",
-                            "icode",
-                            "jvm",
-                            "terminal")
-  private val phaseSettings = List("-Xprint-icode",
-                                   "-Ystop-after",
-                                   "-Yskip",
-                                   "-Yshow",
-                                   "-Ystop-before",
-                                   "-Ybrowse",
-                                   "-Ylog",
-                                   "-Ycheck",
-                                   "-Xprint")
+    List(
+      "-bootclasspath",
+      "-classpath",
+      "-extdirs",
+      "-javabootclasspath",
+      "-javaextdirs",
+      "-sourcepath",
+      "-toolcp")
+  private val phases = List(
+    "all",
+    "parser",
+    "namer",
+    "packageobjects",
+    "typer",
+    "patmat",
+    "superaccessors",
+    "extmethods",
+    "pickler",
+    "refchecks",
+    "uncurry",
+    "tailcalls",
+    "specialize",
+    "explicitouter",
+    "erasure",
+    "posterasure",
+    "lazyvals",
+    "lambdalift",
+    "constructors",
+    "flatten",
+    "mixin",
+    "cleanup",
+    "delambdafy",
+    "icode",
+    "jvm",
+    "terminal")
+  private val phaseSettings = List(
+    "-Xprint-icode",
+    "-Ystop-after",
+    "-Yskip",
+    "-Yshow",
+    "-Ystop-before",
+    "-Ybrowse",
+    "-Ylog",
+    "-Ycheck",
+    "-Xprint")
   private def multiStringSettingNames =
-    List("-Xmacro-settings",
-         "-Xplugin",
-         "-Xplugin-disable",
-         "-Xplugin-require")
+    List(
+      "-Xmacro-settings",
+      "-Xplugin",
+      "-Xplugin-disable",
+      "-Xplugin-require")
   private def intSettingNames =
-    List("-Xmax-classfile-name",
-         "-Xelide-below",
-         "-Ypatmat-exhaust-depth",
-         "-Ypresentation-delay",
-         "-Yrecursion")
+    List(
+      "-Xmax-classfile-name",
+      "-Xelide-below",
+      "-Ypatmat-exhaust-depth",
+      "-Ypresentation-delay",
+      "-Yrecursion")
   private def choiceSettingNames =
     Map[String, List[String]](
       "-YclasspathImpl" -> List("flat", "recursive"),
@@ -304,51 +314,55 @@ object ScalaOptionParser {
       "-g" -> List("line", "none", "notailcails", "source", "vars"),
       "-target" -> List("jvm-1.5", "jvm-1.6", "jvm-1.7", "jvm-1.8"))
   private def multiChoiceSettingNames = Map[String, List[String]](
-    "-Xlint" -> List("adapted-args",
-                     "nullary-unit",
-                     "inaccessible",
-                     "nullary-override",
-                     "infer-any",
-                     "missing-interpolator",
-                     "doc-detached",
-                     "private-shadow",
-                     "type-parameter-shadow",
-                     "poly-implicit-overload",
-                     "option-implicit",
-                     "delayedinit-select",
-                     "by-name-right-associative",
-                     "package-object-classes",
-                     "unsound-match",
-                     "stars-align"),
-    "-language" -> List("help",
-                        "_",
-                        "dynamics",
-                        "postfixOps",
-                        "reflectiveCalls",
-                        "implicitConversions",
-                        "higherKinds",
-                        "existentials",
-                        "experimental.macros"),
-    "-Yopt" -> List("l:none",
-                    "l:default",
-                    "l:method",
-                    "l:project",
-                    "l:classpath",
-                    "unreachable-code",
-                    "simplify-jumps",
-                    "empty-line-numbers",
-                    "empty-labels",
-                    "compact-locals",
-                    "nullness-tracking",
-                    "closure-elimination",
-                    "inline-project",
-                    "inline-global"),
-    "-Ystatistics" -> List("parser",
-                           "typer",
-                           "patmat",
-                           "erasure",
-                           "cleanup",
-                           "jvm")
+    "-Xlint" -> List(
+      "adapted-args",
+      "nullary-unit",
+      "inaccessible",
+      "nullary-override",
+      "infer-any",
+      "missing-interpolator",
+      "doc-detached",
+      "private-shadow",
+      "type-parameter-shadow",
+      "poly-implicit-overload",
+      "option-implicit",
+      "delayedinit-select",
+      "by-name-right-associative",
+      "package-object-classes",
+      "unsound-match",
+      "stars-align"),
+    "-language" -> List(
+      "help",
+      "_",
+      "dynamics",
+      "postfixOps",
+      "reflectiveCalls",
+      "implicitConversions",
+      "higherKinds",
+      "existentials",
+      "experimental.macros"),
+    "-Yopt" -> List(
+      "l:none",
+      "l:default",
+      "l:method",
+      "l:project",
+      "l:classpath",
+      "unreachable-code",
+      "simplify-jumps",
+      "empty-line-numbers",
+      "empty-labels",
+      "compact-locals",
+      "nullness-tracking",
+      "closure-elimination",
+      "inline-project",
+      "inline-global"),
+    "-Ystatistics" -> List(
+      "parser",
+      "typer",
+      "patmat",
+      "erasure",
+      "cleanup",
+      "jvm")
   )
   private def scalaVersionSettings = List("-Xmigration", "-Xsource")
 
@@ -358,34 +372,37 @@ object ScalaOptionParser {
   private def scalaBooleanSettingNames = List("-nc", "-save")
 
   private def scalaDocBooleanSettingNames =
-    List("-Yuse-stupid-types",
-         "-implicits",
-         "-implicits-debug",
-         "-implicits-show-all",
-         "-implicits-sound-shadowing",
-         "-implicits-hide",
-         "-author",
-         "-diagrams",
-         "-diagrams-debug",
-         "-raw-output",
-         "-no-prefixes",
-         "-no-link-warnings",
-         "-expand-all-types",
-         "-groups")
+    List(
+      "-Yuse-stupid-types",
+      "-implicits",
+      "-implicits-debug",
+      "-implicits-show-all",
+      "-implicits-sound-shadowing",
+      "-implicits-hide",
+      "-author",
+      "-diagrams",
+      "-diagrams-debug",
+      "-raw-output",
+      "-no-prefixes",
+      "-no-link-warnings",
+      "-expand-all-types",
+      "-groups")
   private def scalaDocIntSettingNames =
-    List("-diagrams-max-classes",
-         "-diagrams-max-implicits",
-         "-diagrams-dot-timeout",
-         "-diagrams-dot-restart")
+    List(
+      "-diagrams-max-classes",
+      "-diagrams-max-implicits",
+      "-diagrams-dot-timeout",
+      "-diagrams-dot-restart")
   private def scalaDocChoiceSettingNames = Map("-doc-format" -> List("html"))
   private def scaladocStringSettingNames =
-    List("-doc-title",
-         "-doc-version",
-         "-doc-footer",
-         "-doc-no-compile",
-         "-doc-source-url",
-         "-doc-generator",
-         "-skip-packages")
+    List(
+      "-doc-title",
+      "-doc-version",
+      "-doc-footer",
+      "-doc-no-compile",
+      "-doc-source-url",
+      "-doc-generator",
+      "-skip-packages")
   private def scaladocPathSettingNames =
     List("-doc-root-content", "-diagrams-dot-path")
   private def scaladocMultiStringSettingNames = List("-doc-external-doc")

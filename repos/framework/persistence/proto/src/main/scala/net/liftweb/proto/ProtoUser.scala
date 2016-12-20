@@ -363,10 +363,11 @@ trait ProtoUser {
   def loginMenuLoc: Box[Menu] =
     Full(
       Menu(
-        Loc("Login" + menuNameSuffix,
-            loginPath,
-            S.?("login"),
-            loginMenuLocParams ::: globalUserLocParams)))
+        Loc(
+          "Login" + menuNameSuffix,
+          loginPath,
+          S.?("login"),
+          loginMenuLocParams ::: globalUserLocParams)))
 
   /**
     * If you want to include a LocParam (e.g. LocGroup) on all the
@@ -394,10 +395,11 @@ trait ProtoUser {
   def logoutMenuLoc: Box[Menu] =
     Full(
       Menu(
-        Loc("Logout" + menuNameSuffix,
-            logoutPath,
-            S.?("logout"),
-            logoutMenuLocParams ::: globalUserLocParams)))
+        Loc(
+          "Logout" + menuNameSuffix,
+          logoutPath,
+          S.?("logout"),
+          logoutMenuLocParams ::: globalUserLocParams)))
 
   /**
     * The LocParams for the menu item for logout.
@@ -412,10 +414,11 @@ trait ProtoUser {
   def createUserMenuLoc: Box[Menu] =
     Full(
       Menu(
-        Loc("CreateUser" + menuNameSuffix,
-            signUpPath,
-            S.?("sign.up"),
-            createUserMenuLocParams ::: globalUserLocParams)))
+        Loc(
+          "CreateUser" + menuNameSuffix,
+          signUpPath,
+          S.?("sign.up"),
+          createUserMenuLocParams ::: globalUserLocParams)))
 
   /**
     * The LocParams for the menu item for creating the user/sign up.
@@ -443,8 +446,9 @@ trait ProtoUser {
     * Overwrite in order to add custom LocParams. Attention: Not calling super will change the default behavior!
     */
   protected def lostPasswordMenuLocParams: List[LocParam[Unit]] =
-    Template(() => wrapIt(lostPassword)) :: If(notLoggedIn_? _,
-                                               S.?("logout.first")) :: Nil
+    Template(() => wrapIt(lostPassword)) :: If(
+      notLoggedIn_? _,
+      S.?("logout.first")) :: Nil
 
   /**
     * The menu item for resetting the password (make this "Empty" to disable)
@@ -473,10 +477,11 @@ trait ProtoUser {
   def editUserMenuLoc: Box[Menu] =
     Full(
       Menu(
-        Loc("EditUser" + menuNameSuffix,
-            editPath,
-            S.?("edit.user"),
-            editUserMenuLocParams ::: globalUserLocParams)))
+        Loc(
+          "EditUser" + menuNameSuffix,
+          editPath,
+          S.?("edit.user"),
+          editUserMenuLocParams ::: globalUserLocParams)))
 
   /**
     * The LocParams for the menu item for editing the user.
@@ -491,10 +496,11 @@ trait ProtoUser {
   def changePasswordMenuLoc: Box[Menu] =
     Full(
       Menu(
-        Loc("ChangePassword" + menuNameSuffix,
-            changePasswordPath,
-            S.?("change.password"),
-            changePasswordMenuLocParams ::: globalUserLocParams)))
+        Loc(
+          "ChangePassword" + menuNameSuffix,
+          changePasswordPath,
+          S.?("change.password"),
+          changePasswordMenuLocParams ::: globalUserLocParams)))
 
   /**
     * The LocParams for the menu item for changing password.
@@ -509,10 +515,11 @@ trait ProtoUser {
   def validateUserMenuLoc: Box[Menu] =
     Full(
       Menu(
-        Loc("ValidateUser" + menuNameSuffix,
-            (validateUserPath, true),
-            S.?("validate.user"),
-            validateUserMenuLocParams ::: globalUserLocParams)))
+        Loc(
+          "ValidateUser" + menuNameSuffix,
+          (validateUserPath, true),
+          S.?("validate.user"),
+          validateUserMenuLocParams ::: globalUserLocParams)))
 
   /**
     * The LocParams for the menu item for validating a user.
@@ -564,14 +571,15 @@ trait ProtoUser {
       case UnderUnapply(menu) => List(menu.rebuild(_ ::: sitemap))
     }(SiteMap.addMenusAtEndMutator(sitemap))
 
-  lazy val sitemap: List[Menu] = List(loginMenuLoc,
-                                      createUserMenuLoc,
-                                      lostPasswordMenuLoc,
-                                      resetPasswordMenuLoc,
-                                      editUserMenuLoc,
-                                      changePasswordMenuLoc,
-                                      validateUserMenuLoc,
-                                      logoutMenuLoc).flatten(a => a)
+  lazy val sitemap: List[Menu] = List(
+    loginMenuLoc,
+    createUserMenuLoc,
+    lostPasswordMenuLoc,
+    resetPasswordMenuLoc,
+    editUserMenuLoc,
+    changePasswordMenuLoc,
+    validateUserMenuLoc,
+    logoutMenuLoc).flatten(a => a)
 
   def skipEmailValidation = false
 
@@ -721,11 +729,11 @@ trait ProtoUser {
 
     val msgXml = signupMailBody(user, resetLink)
 
-    Mailer.sendMail(From(emailFrom),
-                    Subject(signupMailSubject),
-                    (To(user.getEmail) :: generateValidationEmailBodies(
-                      user,
-                      resetLink) ::: (bccEmail.toList.map(BCC(_)))): _*)
+    Mailer.sendMail(
+      From(emailFrom),
+      Subject(signupMailSubject),
+      (To(user.getEmail) :: generateValidationEmailBodies(user, resetLink) ::: (bccEmail.toList
+        .map(BCC(_)))): _*)
   }
 
   /**

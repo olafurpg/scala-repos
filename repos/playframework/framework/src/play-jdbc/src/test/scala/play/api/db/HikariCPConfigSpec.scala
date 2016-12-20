@@ -182,11 +182,12 @@ class HikariCPConfigSpec extends Specification {
 }
 
 trait Configs extends Scope {
-  val dbConfig = DatabaseConfig(Some("org.h2.Driver"),
-                                Some("jdbc:h2:mem:"),
-                                None,
-                                None,
-                                None)
+  val dbConfig = DatabaseConfig(
+    Some("org.h2.Driver"),
+    Some("jdbc:h2:mem:"),
+    None,
+    None,
+    None)
   val reference =
     PlayConfig(Configuration.reference).get[PlayConfig]("play.db.prototype")
   def from(props: (String, String)*) =

@@ -104,9 +104,10 @@ object BatcherLaws extends Properties("Batcher") {
   property("UTC 1D obeys laws") = batcherLaws(CalendarBatcher.ofDaysUtc(1))
 
   property("Combined obeys laws") = batcherLaws(
-    new CombinedBatcher(Batcher.ofHours(1),
-                        ExclusiveUpper(Timestamp.now),
-                        Batcher.ofMinutes(10)))
+    new CombinedBatcher(
+      Batcher.ofHours(1),
+      ExclusiveUpper(Timestamp.now),
+      Batcher.ofMinutes(10)))
 
   val millisPerHour = 1000 * 60 * 60
 

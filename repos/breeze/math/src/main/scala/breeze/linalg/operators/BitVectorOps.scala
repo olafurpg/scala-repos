@@ -53,9 +53,10 @@ trait BitVectorOps {
             s"Lengths don't match: ${a.length} ${b.length}")
         val result = a.data.clone().asInstanceOf[util.BitSet]
         op(result, b.data)
-        new BitVector(result,
-                      a.length max b.length,
-                      a.enforceLength && b.enforceLength)
+        new BitVector(
+          result,
+          a.length max b.length,
+          a.enforceLength && b.enforceLength)
       }
     }
 

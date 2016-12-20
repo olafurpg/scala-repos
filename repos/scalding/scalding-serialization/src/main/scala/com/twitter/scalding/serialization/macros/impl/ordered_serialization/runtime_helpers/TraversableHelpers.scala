@@ -139,24 +139,26 @@ object TraversableHelpers {
              * We can safely recurse because startA does not hold pivot, so we won't
              * do the same algorithm
              */
-            compare(startA,
-                    extend(startA, endA),
-                    a,
-                    startB,
-                    extend(startB, endB),
-                    b)
+            compare(
+              startA,
+              extend(startA, endA),
+              a,
+              startB,
+              extend(startB, endB),
+              b)
           } else {
             /*
              * We know that startB does not have the pivot, because if it did, bsublen == 0
              * and both are equal, which is not true in this branch.
              * we can reverse the recursion to ensure we get a different pivot
              */
-            -compare(startB,
-                     extend(startB, endB),
-                     b,
-                     startA,
-                     extend(startA, endA),
-                     a)
+            -compare(
+              startB,
+              extend(startB, endB),
+              b,
+              startA,
+              extend(startA, endA),
+              a)
           }
         } else {
           // the prefixes are the same size

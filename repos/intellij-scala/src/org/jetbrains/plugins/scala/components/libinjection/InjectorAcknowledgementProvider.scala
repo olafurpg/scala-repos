@@ -47,10 +47,11 @@ class UIAcknowledgementProvider(
       }
     }
     GROUP
-      .createNotification("IDEA Extensions",
-                          message,
-                          NotificationType.INFORMATION,
-                          listener)
+      .createNotification(
+        "IDEA Extensions",
+        message,
+        NotificationType.INFORMATION,
+        listener)
       .notify(project)
   }
 

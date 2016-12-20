@@ -74,9 +74,10 @@ private[round] object History {
   val size = 30
 
   def apply(coll: Coll)(gameId: String, withPersistence: Boolean): History =
-    new History(load = serverStarting ?? load(coll, gameId, withPersistence),
-                persist = persist(coll, gameId) _,
-                withPersistence = withPersistence)
+    new History(
+      load = serverStarting ?? load(coll, gameId, withPersistence),
+      persist = persist(coll, gameId) _,
+      withPersistence = withPersistence)
 
   private def serverStarting = !lila.common.PlayApp.startedSinceMinutes(5)
 
@@ -95,8 +96,9 @@ private[round] object History {
     if (vevs.nonEmpty)
       coll.uncheckedUpdate(
         BSONDocument("_id" -> gameId),
-        BSONDocument("$set" -> BSONDocument("e" -> vevs.reverse),
-                     "$setOnInsert" -> BSONDocument("d" -> DateTime.now)),
+        BSONDocument(
+          "$set" -> BSONDocument("e" -> vevs.reverse),
+          "$setOnInsert" -> BSONDocument("d" -> DateTime.now)),
         upsert = true)
   }
 }

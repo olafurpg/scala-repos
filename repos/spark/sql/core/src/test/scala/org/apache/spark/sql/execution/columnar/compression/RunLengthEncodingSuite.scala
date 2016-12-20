@@ -41,9 +41,10 @@ class RunLengthEncodingSuite extends SparkFunSuite {
       // Tests encoder
       // -------------
 
-      val builder = TestCompressibleColumnBuilder(columnStats,
-                                                  columnType,
-                                                  RunLengthEncoding)
+      val builder = TestCompressibleColumnBuilder(
+        columnStats,
+        columnType,
+        RunLengthEncoding)
       val (values, rows) =
         makeUniqueValuesAndSingleValueRows(columnType, uniqueValueCount)
       val inputSeq = inputRuns.flatMap {

@@ -70,12 +70,13 @@ class OneHotEncoderSuite
       .collect()
       .toSet
     // a -> 0, b -> 2, c -> 1
-    val expected = Set((0, 1.0, 0.0, 0.0),
-                       (1, 0.0, 0.0, 1.0),
-                       (2, 0.0, 1.0, 0.0),
-                       (3, 1.0, 0.0, 0.0),
-                       (4, 1.0, 0.0, 0.0),
-                       (5, 0.0, 1.0, 0.0))
+    val expected = Set(
+      (0, 1.0, 0.0, 0.0),
+      (1, 0.0, 0.0, 1.0),
+      (2, 0.0, 1.0, 0.0),
+      (3, 1.0, 0.0, 0.0),
+      (4, 1.0, 0.0, 0.0),
+      (5, 0.0, 1.0, 0.0))
     assert(output === expected)
   }
 
@@ -95,12 +96,13 @@ class OneHotEncoderSuite
       .collect()
       .toSet
     // a -> 0, b -> 2, c -> 1
-    val expected = Set((0, 1.0, 0.0),
-                       (1, 0.0, 0.0),
-                       (2, 0.0, 1.0),
-                       (3, 1.0, 0.0),
-                       (4, 1.0, 0.0),
-                       (5, 0.0, 1.0))
+    val expected = Set(
+      (0, 1.0, 0.0),
+      (1, 0.0, 0.0),
+      (2, 0.0, 1.0),
+      (3, 1.0, 0.0),
+      (4, 1.0, 0.0),
+      (5, 0.0, 1.0))
     assert(output === expected)
   }
 
@@ -159,12 +161,13 @@ class OneHotEncoderSuite
       .withColumn("intLabel", df("labelIndex").cast(IntegerType))
       .withColumn("floatLabel", df("labelIndex").cast(FloatType))
       .withColumn("decimalLabel", df("labelIndex").cast(DecimalType(10, 0)))
-    val cols = Array("labelIndex",
-                     "shortLabel",
-                     "longLabel",
-                     "intLabel",
-                     "floatLabel",
-                     "decimalLabel")
+    val cols = Array(
+      "labelIndex",
+      "shortLabel",
+      "longLabel",
+      "intLabel",
+      "floatLabel",
+      "decimalLabel")
     for (col <- cols) {
       val encoder = new OneHotEncoder()
         .setInputCol(col)
@@ -182,12 +185,13 @@ class OneHotEncoderSuite
         .collect()
         .toSet
       // a -> 0, b -> 2, c -> 1
-      val expected = Set((0, 1.0, 0.0, 0.0),
-                         (1, 0.0, 0.0, 1.0),
-                         (2, 0.0, 1.0, 0.0),
-                         (3, 1.0, 0.0, 0.0),
-                         (4, 1.0, 0.0, 0.0),
-                         (5, 0.0, 1.0, 0.0))
+      val expected = Set(
+        (0, 1.0, 0.0, 0.0),
+        (1, 0.0, 0.0, 1.0),
+        (2, 0.0, 1.0, 0.0),
+        (3, 1.0, 0.0, 0.0),
+        (4, 1.0, 0.0, 0.0),
+        (5, 0.0, 1.0, 0.0))
       assert(output === expected)
     }
   }

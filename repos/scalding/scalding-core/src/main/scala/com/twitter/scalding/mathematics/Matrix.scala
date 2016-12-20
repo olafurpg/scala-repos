@@ -268,11 +268,12 @@ object Matrix {
     val newPipe = diag.pipe.map(diag.idxSym -> colSym) { (x: RowT) =>
       x
     }
-    new Matrix[RowT, RowT, ValT](diag.idxSym,
-                                 colSym,
-                                 diag.valSym,
-                                 newPipe,
-                                 diag.sizeHint)
+    new Matrix[RowT, RowT, ValT](
+      diag.idxSym,
+      colSym,
+      diag.valSym,
+      newPipe,
+      diag.sizeHint)
   }
 }
 
@@ -329,11 +330,12 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
       //This annoying Tuple1 wrapping ensures we can handle ValT that may itself be a Tuple.
       mon.nonZeroOption(fn(imp._1)).map { Tuple1(_) }
     }
-    new Matrix[RowT, ColT, ValU](this.rowSym,
-                                 this.colSym,
-                                 this.valSym,
-                                 newPipe,
-                                 sizeHint)
+    new Matrix[RowT, ColT, ValU](
+      this.rowSym,
+      this.colSym,
+      this.valSym,
+      newPipe,
+      sizeHint)
   }
 
   /**
@@ -355,11 +357,12 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
       //This annoying Tuple1 wrapping ensures we can handle ValT that may itself be a Tuple.
       fn(imp._1)
     }
-    new Matrix[RowT, ColT, ValT](this.rowSym,
-                                 this.colSym,
-                                 this.valSym,
-                                 newPipe,
-                                 sizeHint)
+    new Matrix[RowT, ColT, ValT](
+      this.rowSym,
+      this.colSym,
+      this.valSym,
+      newPipe,
+      sizeHint)
   }
 
   // Binarize values, all x != 0 become 1
@@ -440,11 +443,12 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
           _.sortBy(valSym).reverse.take(k)
         }
         .project(rowSym, colSym, valSym)
-      new Matrix[RowT, ColT, ValT](rowSym,
-                                   colSym,
-                                   valSym,
-                                   newPipe,
-                                   FiniteHint(-1L, k))
+      new Matrix[RowT, ColT, ValT](
+        rowSym,
+        colSym,
+        valSym,
+        newPipe,
+        FiniteHint(-1L, k))
     }
   }
 
@@ -464,11 +468,12 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
             (row, imp._1, imp._2)
           }
       }
-    new Matrix[RowT, ColT, ValT](rowSym,
-                                 topSym,
-                                 valSym,
-                                 newPipe,
-                                 FiniteHint(-1L, k))
+    new Matrix[RowT, ColT, ValT](
+      rowSym,
+      topSym,
+      valSym,
+      newPipe,
+      FiniteHint(-1L, k))
   }
 
   protected lazy val rowL0Norm = {
@@ -545,11 +550,12 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
         List((row, 1, size), (row, 2, avg), (row, 3, stdev))
       }
     val newHint = sizeHint.setCols(3L)
-    new Matrix[RowT, Int, Double](rowSym,
-                                  newColSym,
-                                  newValSym,
-                                  newPipe,
-                                  newHint)
+    new Matrix[RowT, Int, Double](
+      rowSym,
+      newColSym,
+      newValSym,
+      newPipe,
+      newHint)
   }
 
   def rowColValSymbols: Fields = (rowSym, colSym, valSym)
@@ -685,11 +691,12 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
   }
 
   def transpose: Matrix[ColT, RowT, ValT] = {
-    new Matrix[ColT, RowT, ValT](colSym,
-                                 rowSym,
-                                 valSym,
-                                 inPipe,
-                                 sizeHint.transpose)
+    new Matrix[ColT, RowT, ValT](
+      colSym,
+      rowSym,
+      valSym,
+      inPipe,
+      sizeHint.transpose)
   }
 
   // This should only be called by def diagonal, which verifies that RowT == ColT
@@ -699,10 +706,11 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
         (input._1 == input._2)
       }
       .project(rowSym, valSym)
-    new DiagonalMatrix[RowT, ValT](rowSym,
-                                   valSym,
-                                   diagPipe,
-                                   SizeHint.asDiagonal(sizeHint))
+    new DiagonalMatrix[RowT, ValT](
+      rowSym,
+      valSym,
+      diagPipe,
+      SizeHint.asDiagonal(sizeHint))
   }
   // This method will only work if the row type and column type are the same
   // the type constraint below means there is evidence that RowT and ColT are
@@ -758,11 +766,12 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
           Tuple1(leftRight)
       }
       .project(rowColValSymbols)
-    new Matrix[RowT, ColT, (ValT, ValU)](rowSym,
-                                         colSym,
-                                         valSym,
-                                         newPipe,
-                                         sizeHint)
+    new Matrix[RowT, ColT, (ValT, ValU)](
+      rowSym,
+      colSym,
+      valSym,
+      newPipe,
+      sizeHint)
   }
 
   // Similar to zip, but combine the scalar on the right with all non-zeros in this matrix:
@@ -773,11 +782,12 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
         Tuple1((left._1, that.value))
       }
       .project(rowColValSymbols)
-    new Matrix[RowT, ColT, (ValT, ValU)](rowSym,
-                                         colSym,
-                                         valSym,
-                                         newPipe,
-                                         sizeHint)
+    new Matrix[RowT, ColT, (ValT, ValU)](
+      rowSym,
+      colSym,
+      valSym,
+      newPipe,
+      sizeHint)
   }
 
   // Override the size hint
@@ -797,18 +807,20 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
     // TODO optimize the number of reducers
     val zipped = cleanUpZipJoin(getField(newRFields, 1), pairMonoid) {
       pipe
-        .joinWithSmaller(rowSym -> getField(newRFields, 0),
-                         newRPipe,
-                         new OuterJoin)
+        .joinWithSmaller(
+          rowSym -> getField(newRFields, 0),
+          newRPipe,
+          new OuterJoin)
         .thenDo { p: RichPipe =>
           cleanUpIndexZipJoin(rowSym.append(getField(newRFields, 0)), p)
         }
     }
-    new Matrix[RowT, ColT, (ValT, ValU)](rowSym,
-                                         colSym,
-                                         valSym,
-                                         zipped,
-                                         sizeHint + that.sizeH)
+    new Matrix[RowT, ColT, (ValT, ValU)](
+      rowSym,
+      colSym,
+      valSym,
+      zipped,
+      sizeHint + that.sizeH)
   }
   // Zip the given row with all the rows of the matrix
   def zip[ValU](that: RowVector[ColT, ValU])(
@@ -822,18 +834,20 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
     // TODO optimize the number of reducers
     val zipped = cleanUpZipJoin(getField(newRFields, 1), pairMonoid) {
       pipe
-        .joinWithSmaller(colSym -> getField(newRFields, 0),
-                         newRPipe,
-                         new OuterJoin)
+        .joinWithSmaller(
+          colSym -> getField(newRFields, 0),
+          newRPipe,
+          new OuterJoin)
         .thenDo { p: RichPipe =>
           cleanUpIndexZipJoin(colSym.append(getField(newRFields, 0)), p)
         }
     }
-    new Matrix[RowT, ColT, (ValT, ValU)](rowSym,
-                                         colSym,
-                                         valSym,
-                                         zipped,
-                                         sizeHint + that.sizeH)
+    new Matrix[RowT, ColT, (ValT, ValU)](
+      rowSym,
+      colSym,
+      valSym,
+      zipped,
+      sizeHint + that.sizeH)
   }
 
   // This creates the matrix with pairs for the entries
@@ -860,11 +874,12 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
           cleanUpIndexZipJoin(colSym.append(getField(newRFields, 1)), p)
         }
     }
-    new Matrix[RowT, ColT, (ValT, ValU)](rowSym,
-                                         colSym,
-                                         valSym,
-                                         zipped,
-                                         sizeHint + that.sizeHint)
+    new Matrix[RowT, ColT, (ValT, ValU)](
+      rowSym,
+      colSym,
+      valSym,
+      zipped,
+      sizeHint + that.sizeHint)
   }
 
   def toBlockMatrix[G](
@@ -892,10 +907,11 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
     val filtered = joined.filter(filterV) { x: ValU =>
       null == x
     }
-    new Matrix[RowT, ColT, ValT](rowSym,
-                                 colSym,
-                                 valSym,
-                                 filtered.project(rowSym, colSym, valSym))
+    new Matrix[RowT, ColT, ValT](
+      rowSym,
+      colSym,
+      valSym,
+      filtered.project(rowSym, colSym, valSym))
   }
 
   /**
@@ -911,10 +927,11 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
       (rowSym, colSym) -> (keepR, keepC),
       that.pipe.rename(
         (that.rowSym, that.colSym, that.valSym) -> (keepR, keepC, keepV)))
-    new Matrix[RowT, ColT, ValT](rowSym,
-                                 colSym,
-                                 valSym,
-                                 joined.project(rowSym, colSym, valSym))
+    new Matrix[RowT, ColT, ValT](
+      rowSym,
+      colSym,
+      valSym,
+      joined.project(rowSym, colSym, valSym))
   }
 
   /**
@@ -925,10 +942,11 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
     val joined = pipe.joinWithSmaller(
       rowSym -> index,
       that.pipe.rename(that.rowS -> index).project(index))
-    new Matrix[RowT, ColT, ValT](rowSym,
-                                 colSym,
-                                 valSym,
-                                 joined.project(rowSym, colSym, valSym))
+    new Matrix[RowT, ColT, ValT](
+      rowSym,
+      colSym,
+      valSym,
+      joined.project(rowSym, colSym, valSym))
   }
 
   /**
@@ -939,10 +957,11 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
     val joined = pipe.joinWithSmaller(
       colSym -> index,
       that.pipe.rename(that.colS -> index).project(index))
-    new Matrix[RowT, ColT, ValT](rowSym,
-                                 colSym,
-                                 valSym,
-                                 joined.project(rowSym, colSym, valSym))
+    new Matrix[RowT, ColT, ValT](
+      rowSym,
+      colSym,
+      valSym,
+      joined.project(rowSym, colSym, valSym))
   }
 
   /**
@@ -955,14 +974,15 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
       rowSym -> index,
       that.pipe.rename(that.rowS -> index).project(index),
       joiner = new LeftJoin)
-    new Matrix[RowT, ColT, ValT](rowSym,
-                                 colSym,
-                                 valSym,
-                                 joined
-                                   .filter(index) { x: RowT =>
-                                     null == x
-                                   }
-                                   .project(rowSym, colSym, valSym))
+    new Matrix[RowT, ColT, ValT](
+      rowSym,
+      colSym,
+      valSym,
+      joined
+        .filter(index) { x: RowT =>
+          null == x
+        }
+        .project(rowSym, colSym, valSym))
   }
 
   /**
@@ -975,14 +995,15 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
       colSym -> index,
       that.pipe.rename(that.colS -> index).project(index),
       joiner = new LeftJoin)
-    new Matrix[RowT, ColT, ValT](rowSym,
-                                 colSym,
-                                 valSym,
-                                 joined
-                                   .filter(index) { x: ColT =>
-                                     null == x
-                                   }
-                                   .project(rowSym, colSym, valSym))
+    new Matrix[RowT, ColT, ValT](
+      rowSym,
+      colSym,
+      valSym,
+      joined
+        .filter(index) { x: ColT =>
+          null == x
+        }
+        .project(rowSym, colSym, valSym))
   }
 
   /**
@@ -1188,10 +1209,11 @@ class RowVector[ColT, ValT](val colS: Symbol,
           _.sortBy(ordValS).reverse.take(k)
         }
         .project(colS, valS)
-      new RowVector[ColT, ValT](colS,
-                                valS,
-                                newPipe,
-                                sizeH.setCols(k).setRows(1L))
+      new RowVector[ColT, ValT](
+        colS,
+        valS,
+        newPipe,
+        sizeH.setCols(k).setRows(1L))
     }
   }
 
@@ -1206,10 +1228,11 @@ class RowVector[ColT, ValT](val colS: Symbol,
       .flatMap('top_vals -> (topSym, valS)) { imp: List[(ColT, ValT)] =>
         imp
       }
-    new RowVector[ColT, ValT](topSym,
-                              valS,
-                              newPipe,
-                              sizeH.setCols(k).setRows(1L))
+    new RowVector[ColT, ValT](
+      topSym,
+      valS,
+      newPipe,
+      sizeH.setCols(k).setRows(1L))
   }
 
   def toMatrix[RowT](rowId: RowT): Matrix[RowT, ColT, ValT] = {
@@ -1220,19 +1243,21 @@ class RowVector[ColT, ValT](val colS: Symbol,
         rowId
       }
       .project(rowSym, colS, valS)
-    new Matrix[RowT, ColT, ValT](rowSym,
-                                 colS,
-                                 valS,
-                                 newPipe,
-                                 sizeH.setRows(1L))
+    new Matrix[RowT, ColT, ValT](
+      rowSym,
+      colS,
+      valS,
+      newPipe,
+      sizeH.setRows(1L))
   }
 
   // Override the size hint
   def withColsHint(cols: Long): RowVector[ColT, ValT] = {
-    new RowVector[ColT, ValT](colS,
-                              valS,
-                              pipe,
-                              sizeH.setRows(1L).setCols(cols))
+    new RowVector[ColT, ValT](
+      colS,
+      valS,
+      pipe,
+      sizeH.setRows(1L).setCols(cols))
   }
 
   /**
@@ -1331,10 +1356,11 @@ class ColVector[RowT, ValT](val rowS: Symbol,
           _.sortBy(valS).reverse.take(k)
         }
         .project(rowS, valS)
-      new ColVector[RowT, ValT](rowS,
-                                valS,
-                                newPipe,
-                                sizeH.setCols(1L).setRows(k))
+      new ColVector[RowT, ValT](
+        rowS,
+        valS,
+        newPipe,
+        sizeH.setCols(1L).setRows(k))
     }
   }
 
@@ -1349,10 +1375,11 @@ class ColVector[RowT, ValT](val rowS: Symbol,
       .flatMap('top_vals -> (topSym, valS)) { imp: List[(RowT, ValT)] =>
         imp
       }
-    new ColVector[RowT, ValT](topSym,
-                              valS,
-                              newPipe,
-                              sizeH.setCols(1L).setRows(k))
+    new ColVector[RowT, ValT](
+      topSym,
+      valS,
+      newPipe,
+      sizeH.setCols(1L).setRows(k))
   }
 
   def toMatrix[ColT](colIdx: ColT): Matrix[RowT, ColT, ValT] = {
@@ -1363,19 +1390,21 @@ class ColVector[RowT, ValT](val rowS: Symbol,
         colIdx
       }
       .project(rowS, colSym, valS)
-    new Matrix[RowT, ColT, ValT](rowS,
-                                 colSym,
-                                 valS,
-                                 newPipe,
-                                 sizeH.setCols(1L))
+    new Matrix[RowT, ColT, ValT](
+      rowS,
+      colSym,
+      valS,
+      newPipe,
+      sizeH.setCols(1L))
   }
 
   // Override the size hint
   def withRowsHint(rows: Long): ColVector[RowT, ValT] = {
-    new ColVector[RowT, ValT](rowS,
-                              valS,
-                              pipe,
-                              sizeH.setRows(rows).setCols(1L))
+    new ColVector[RowT, ValT](
+      rowS,
+      valS,
+      pipe,
+      sizeH.setRows(rows).setCols(1L))
   }
 
   /**

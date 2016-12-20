@@ -95,8 +95,9 @@ private[netty4] class SimpleChannelSnooper(val name: String)
   override def write(ctx: ChannelHandlerContext,
                      msg: Object,
                      promise: ChannelPromise): Unit = {
-    printOutbound(ctx.channel,
-                  s"WRITE ${msg.toString} to ${ctx.channel.remoteAddress}")
+    printOutbound(
+      ctx.channel,
+      s"WRITE ${msg.toString} to ${ctx.channel.remoteAddress}")
     super.write(ctx, msg, promise)
   }
 
@@ -189,8 +190,9 @@ private[netty4] class SimpleChannelSnooper(val name: String)
   }
 
   override def channelRead(ctx: ChannelHandlerContext, msg: Object): Unit = {
-    printInbound(ctx.channel,
-                 s"READ ${msg.toString} from ${ctx.channel.remoteAddress}")
+    printInbound(
+      ctx.channel,
+      s"READ ${msg.toString} from ${ctx.channel.remoteAddress}")
     super.channelRead(ctx, msg)
   }
 }

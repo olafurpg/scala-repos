@@ -59,11 +59,13 @@ private[streaming] object WriteAheadLogUtils extends Logging {
 
   def getRollingIntervalSecs(conf: SparkConf, isDriver: Boolean): Int = {
     if (isDriver) {
-      conf.getInt(DRIVER_WAL_ROLLING_INTERVAL_CONF_KEY,
-                  DEFAULT_ROLLING_INTERVAL_SECS)
+      conf.getInt(
+        DRIVER_WAL_ROLLING_INTERVAL_CONF_KEY,
+        DEFAULT_ROLLING_INTERVAL_SECS)
     } else {
-      conf.getInt(RECEIVER_WAL_ROLLING_INTERVAL_CONF_KEY,
-                  DEFAULT_ROLLING_INTERVAL_SECS)
+      conf.getInt(
+        RECEIVER_WAL_ROLLING_INTERVAL_CONF_KEY,
+        DEFAULT_ROLLING_INTERVAL_SECS)
     }
   }
 
@@ -90,11 +92,13 @@ private[streaming] object WriteAheadLogUtils extends Logging {
 
   def shouldCloseFileAfterWrite(conf: SparkConf, isDriver: Boolean): Boolean = {
     if (isDriver) {
-      conf.getBoolean(DRIVER_WAL_CLOSE_AFTER_WRITE_CONF_KEY,
-                      defaultValue = false)
+      conf.getBoolean(
+        DRIVER_WAL_CLOSE_AFTER_WRITE_CONF_KEY,
+        defaultValue = false)
     } else {
-      conf.getBoolean(RECEIVER_WAL_CLOSE_AFTER_WRITE_CONF_KEY,
-                      defaultValue = false)
+      conf.getBoolean(
+        RECEIVER_WAL_CLOSE_AFTER_WRITE_CONF_KEY,
+        defaultValue = false)
     }
   }
 
@@ -145,10 +149,11 @@ private[streaming] object WriteAheadLogUtils extends Logging {
     val wal = classNameOption
       .map { className =>
         try {
-          instantiateClass(Utils
-                             .classForName(className)
-                             .asInstanceOf[Class[_ <: WriteAheadLog]],
-                           sparkConf)
+          instantiateClass(
+            Utils
+              .classForName(className)
+              .asInstanceOf[Class[_ <: WriteAheadLog]],
+            sparkConf)
         } catch {
           case NonFatal(e) =>
             throw new SparkException(

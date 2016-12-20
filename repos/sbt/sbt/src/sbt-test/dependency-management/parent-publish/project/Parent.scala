@@ -10,7 +10,8 @@ object ParentTest extends Build {
     Project("Extra-reporters", file("reporters"), delegates = parent :: Nil) aggregate
       (jfreechart) dependsOn (jfreechart)
   lazy val jfreechart: Project =
-    Project("JFreeChart-reporters",
-            file("jfreechart") /*, delegates = reporters :: Nil*/ ) dependsOn
+    Project(
+      "JFreeChart-reporters",
+      file("jfreechart") /*, delegates = reporters :: Nil*/ ) dependsOn
       (core)
 }

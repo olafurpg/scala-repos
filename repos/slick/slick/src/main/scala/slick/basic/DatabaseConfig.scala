@@ -99,8 +99,9 @@ object DatabaseConfig {
       else classLoader.loadClass(n).newInstance()
     } catch {
       case NonFatal(ex) =>
-        throw new SlickException(s"""Error getting instance of profile "$n"""",
-                                 ex)
+        throw new SlickException(
+          s"""Error getting instance of profile "$n"""",
+          ex)
     }
     val pClass = implicitly[ClassTag[P]].runtimeClass
     if (!pClass.isInstance(untypedP))
@@ -172,9 +173,10 @@ object StaticDatabaseConfigMacros {
       ann
         .map(
           a =>
-            c.typecheck(a.tree,
-                        pt = weakTypeOf[StaticDatabaseConfig],
-                        silent = true))
+            c.typecheck(
+              a.tree,
+              pt = weakTypeOf[StaticDatabaseConfig],
+              silent = true))
         .collectFirst {
           case Apply(Select(_, _), List(Literal(Constant(uri: String)))) => uri
         }
@@ -185,8 +187,9 @@ object StaticDatabaseConfigMacros {
     val uriOpt =
       scopes.map(s => findUri(s.annotations)).find(_.isDefined).flatten
     uriOpt.getOrElse(
-      c.abort(c.enclosingPosition,
-              "No @StaticDatabaseConfig annotation found in enclosing scope"))
+      c.abort(
+        c.enclosingPosition,
+        "No @StaticDatabaseConfig annotation found in enclosing scope"))
   }
 
   def getImpl[P <: BasicProfile: c.WeakTypeTag](c: Context)(

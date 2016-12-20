@@ -44,8 +44,9 @@ class SbtResolverIndex private (val kind: SbtResolver.Kind.Value,
         artifact.getGroupId
       gaMap.getOrElseUpdate(artifact.getGroupId, mutable.Set.empty) +=
         artifact.getArtifactId
-      gavMap.getOrElseUpdate(SbtResolverUtils.joinGroupArtifact(artifact),
-                             mutable.Set.empty) +=
+      gavMap.getOrElseUpdate(
+        SbtResolverUtils.joinGroupArtifact(artifact),
+        mutable.Set.empty) +=
         artifact.getVersion
     }
 
@@ -121,9 +122,10 @@ class SbtResolverIndex private (val kind: SbtResolver.Kind.Value,
   }
 
   private def createPersistentMap(file: File) =
-    new PersistentHashMap[String, Set[String]](file,
-                                               new EnumeratorStringDescriptor,
-                                               new SetDescriptor) {
+    new PersistentHashMap[String, Set[String]](
+      file,
+      new EnumeratorStringDescriptor,
+      new SetDescriptor) {
       def getOrEmpty(key: String): Set[String] =
         try {
           Option(get(key)).getOrElse(Set.empty)

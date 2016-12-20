@@ -71,10 +71,11 @@ abstract class AbstractList[E] protected ()
           override def listIterator(index: Int): ListIterator[E] = {
             checkIndexOnBounds(index)
             // Iterator that accesses the original list directly
-            new RandomAccessListIterator(self,
-                                         fromIndex + index,
-                                         fromIndex,
-                                         selfView.toIndex) {
+            new RandomAccessListIterator(
+              self,
+              fromIndex + index,
+              fromIndex,
+              selfView.toIndex) {
               override protected def onSizeChanged(delta: Int): Unit =
                 changeViewSize(delta)
             }
@@ -85,9 +86,10 @@ abstract class AbstractList[E] protected ()
           override def listIterator(index: Int): ListIterator[E] = {
             checkIndexOnBounds(index)
             // Iterator that accesses the original list using it's iterator
-            new BackedUpListIterator(list.listIterator(fromIndex + index),
-                                     fromIndex,
-                                     selfView.toIndex - fromIndex) {
+            new BackedUpListIterator(
+              list.listIterator(fromIndex + index),
+              fromIndex,
+              selfView.toIndex - fromIndex) {
               override protected def onSizeChanged(delta: Int): Unit =
                 changeViewSize(delta)
             }

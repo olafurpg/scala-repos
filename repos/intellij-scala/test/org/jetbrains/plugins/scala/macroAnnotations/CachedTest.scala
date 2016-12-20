@@ -97,9 +97,10 @@ class CachedTest extends CachedTestBase {
 
   def testModificationTrackers(): Unit = {
     object Foo extends Managed {
-      @Cached(synchronized = false,
-              modificationCount = ModCount.getModificationCount,
-              this)
+      @Cached(
+        synchronized = false,
+        modificationCount = ModCount.getModificationCount,
+        this)
       def currentTime: Long = System.currentTimeMillis()
 
       def getProject = myFixture.getProject

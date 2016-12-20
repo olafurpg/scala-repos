@@ -29,9 +29,11 @@ class PerfTestRunnerSpec extends Specification {
     "run in order, with disjoint timespans" in {
       import Id._
 
-      val t = Tree.node(RunSequential,
-                        Stream(Tree.leaf[PerfTest](RunQuery(".")),
-                               Tree.leaf[PerfTest](RunQuery("."))))
+      val t = Tree.node(
+        RunSequential,
+        Stream(
+          Tree.leaf[PerfTest](RunQuery(".")),
+          Tree.leaf[PerfTest](RunQuery("."))))
       val r = new MockPerfTestRunner[Id](50)
 
       import r.timer._

@@ -115,9 +115,10 @@ class StorageUnit(val bytes: Long) extends Ordered[StorageUnit] {
     if (prefixIndex < 0) {
       "%d B".format(bytes)
     } else {
-      "%.1f %ciB".formatLocal(Locale.ENGLISH,
-                              display * bytes.signum,
-                              prefix.charAt(prefixIndex))
+      "%.1f %ciB".formatLocal(
+        Locale.ENGLISH,
+        display * bytes.signum,
+        prefix.charAt(prefixIndex))
     }
   }
 }

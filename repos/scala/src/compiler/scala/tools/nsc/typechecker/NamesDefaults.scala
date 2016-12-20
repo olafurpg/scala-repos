@@ -315,9 +315,10 @@ trait NamesDefaults { self: Analyzer =>
                             arg.tpe
                           }).widen // have to widen or types inferred from literal defaults will be singletons
             val s =
-              context.owner.newValue(unit.freshTermName(nme.NAMEDARG_PREFIX),
-                                     arg.pos,
-                                     newFlags = ARTIFACT) setInfo {
+              context.owner.newValue(
+                unit.freshTermName(nme.NAMEDARG_PREFIX),
+                arg.pos,
+                newFlags = ARTIFACT) setInfo {
                 val tp = if (byName) functionType(Nil, argTpe) else argTpe
                 uncheckedBounds(tp)
               }
@@ -360,11 +361,12 @@ trait NamesDefaults { self: Analyzer =>
             val Block(stats, funOnly) = transformedFun
 
             // type the application without names; put the arguments in definition-site order
-            val typedApp = doTypedApply(tree,
-                                        funOnly,
-                                        reorderArgs(namelessArgs, argPos),
-                                        mode,
-                                        pt)
+            val typedApp = doTypedApply(
+              tree,
+              funOnly,
+              reorderArgs(namelessArgs, argPos),
+              mode,
+              pt)
             typedApp match {
               case Apply(expr, typedArgs)
                   if (typedApp :: typedArgs).exists(_.isErrorTyped) =>
@@ -374,14 +376,16 @@ trait NamesDefaults { self: Analyzer =>
                 // ValDef's in the block), change the arguments to these local values.
 
                 // typedArgs: definition-site order
-                val formals = formalTypes(expr.tpe.paramTypes,
-                                          typedArgs.length,
-                                          removeByName = false,
-                                          removeRepeated = false)
+                val formals = formalTypes(
+                  expr.tpe.paramTypes,
+                  typedArgs.length,
+                  removeByName = false,
+                  removeRepeated = false)
                 // valDefs: call-site order
-                val valDefs = argValDefs(reorderArgsInv(typedArgs, argPos),
-                                         reorderArgsInv(formals, argPos),
-                                         blockTyper)
+                val valDefs = argValDefs(
+                  reorderArgsInv(typedArgs, argPos),
+                  reorderArgsInv(formals, argPos),
+                  blockTyper)
                 // refArgs: definition-site order again
                 val refArgs =
                   map3(reorderArgs(valDefs, argPos), formals, typedArgs)(
@@ -661,10 +665,11 @@ trait NamesDefaults { self: Analyzer =>
                 case AssignOrNamedArg(Ident(oName), _) if oName != name =>
                   oName
               }
-            DoubleParamNamesDefaultError(arg,
-                                         name,
-                                         existingArgIndex + 1,
-                                         otherName)
+            DoubleParamNamesDefaultError(
+              arg,
+              name,
+              existingArgIndex + 1,
+              otherName)
           case paramPos
               if isAmbiguousAssignment(typer, params(paramPos), arg) =>
             AmbiguousReferenceInNamesDefaultError(arg, name)

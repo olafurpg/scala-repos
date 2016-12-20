@@ -10,17 +10,21 @@ object Test extends App {
   System.setOut(new java.io.PrintStream(output))
   val toolBox = currentMirror.mkToolBox(options = "-Yreify-copypaste")
   val reify = Select(
-    Select(Select(Select(Ident(ScalaPackage), TermName("reflect")),
-                  TermName("runtime")),
-           TermName("universe")),
+    Select(
+      Select(
+        Select(Ident(ScalaPackage), TermName("reflect")),
+        TermName("runtime")),
+      TermName("universe")),
     TermName("reify"))
   val reifee = Block(
     List(
-      ValDef(Modifiers(LAZY),
-             TermName("x"),
-             TypeTree(),
-             Apply(Ident(ListModule),
-                   List(Literal(Constant(1)), Literal(Constant(2)))))),
+      ValDef(
+        Modifiers(LAZY),
+        TermName("x"),
+        TypeTree(),
+        Apply(
+          Ident(ListModule),
+          List(Literal(Constant(1)), Literal(Constant(2)))))),
     Ident(TermName("x")))
   toolBox.eval(Apply(reify, List(reifee)))
   val Block(

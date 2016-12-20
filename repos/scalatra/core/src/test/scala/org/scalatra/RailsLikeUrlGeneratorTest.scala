@@ -68,9 +68,10 @@ class RailsLikeUrlGeneratorTest extends FunSuite with Matchers {
   }
 
   test("multiple glob segments") {
-    url("src/*files/dir/*morefiles/foo.txt",
-        "files" -> "a/b",
-        "morefiles" -> "c/d") should equal("src/a/b/dir/c/d/foo.txt")
+    url(
+      "src/*files/dir/*morefiles/foo.txt",
+      "files" -> "a/b",
+      "morefiles" -> "c/d") should equal("src/a/b/dir/c/d/foo.txt")
   }
 
   test("escaped glob segment") {

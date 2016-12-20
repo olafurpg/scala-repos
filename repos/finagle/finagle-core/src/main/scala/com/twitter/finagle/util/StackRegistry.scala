@@ -115,12 +115,13 @@ trait StackRegistry {
       case Module(paramName, _, reflected) =>
         reflected.foreach {
           case (field, value) =>
-            val key = Seq(registryName,
-                          entry.protocolLibrary,
-                          entry.name,
-                          entry.addr,
-                          paramName,
-                          field)
+            val key = Seq(
+              registryName,
+              entry.protocolLibrary,
+              entry.name,
+              entry.addr,
+              paramName,
+              field)
             if (gRegistry.put(key, value).isEmpty) numEntries.incrementAndGet()
         }
     }
@@ -133,12 +134,13 @@ trait StackRegistry {
       case Module(paramName, _, reflected) =>
         reflected.foreach {
           case (field, value) =>
-            val key = Seq(registryName,
-                          entry.protocolLibrary,
-                          name,
-                          entry.addr,
-                          paramName,
-                          field)
+            val key = Seq(
+              registryName,
+              entry.protocolLibrary,
+              name,
+              entry.addr,
+              paramName,
+              field)
             if (gRegistry.remove(key).isDefined) numEntries.decrementAndGet()
         }
     }

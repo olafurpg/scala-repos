@@ -407,8 +407,9 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
         }
       } catch {
         case e: java.lang.IllegalArgumentException =>
-          throw new TreeNodeException(this,
-                                      s"""
+          throw new TreeNodeException(
+            this,
+            s"""
              |Failed to copy node.
              |Is otherCopyArgs specified correctly for $nodeName.
              |Exception message: ${e.getMessage}
@@ -553,9 +554,10 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
 
     if (innerChildren.nonEmpty) {
       innerChildren.init.foreach(
-        _.generateTreeString(depth + 2,
-                             lastChildren :+ false :+ false,
-                             builder))
+        _.generateTreeString(
+          depth + 2,
+          lastChildren :+ false :+ false,
+          builder))
       innerChildren.last
         .generateTreeString(depth + 2, lastChildren :+ false :+ true, builder)
     }
@@ -607,9 +609,10 @@ abstract class TreeNode[BaseType <: TreeNode[BaseType]] extends Product {
   protected def jsonFields: List[JField] = {
     val fieldNames = getConstructorParameterNames(getClass)
     val fieldValues = productIterator.toSeq ++ otherCopyArgs
-    assert(fieldNames.length == fieldValues.length,
-           s"${getClass.getSimpleName} fields: " + fieldNames.mkString(", ") +
-             s", values: " + fieldValues.map(_.toString).mkString(", "))
+    assert(
+      fieldNames.length == fieldValues.length,
+      s"${getClass.getSimpleName} fields: " + fieldNames.mkString(", ") +
+        s", values: " + fieldValues.map(_.toString).mkString(", "))
 
     fieldNames
       .zip(fieldValues)
@@ -730,13 +733,14 @@ object TreeNode {
             maybeCtor.get.newInstance(parameters: _*).asInstanceOf[TreeNode[_]]
           } catch {
             case e: java.lang.IllegalArgumentException =>
-              throw new RuntimeException(s"""
+              throw new RuntimeException(
+                s"""
                   |Failed to construct tree node: ${cls.getName}
                   |ctor: ${maybeCtor.get}
                   |types: ${parameters.map(_.getClass).mkString(", ")}
                   |args: ${parameters.mkString(", ")}
                 """.stripMargin,
-                                         e)
+                e)
           }
         }
       }
@@ -786,11 +790,12 @@ object TreeNode {
           val JBool(useOffHeap) = value \ "useOffHeap"
           val JBool(deserialized) = value \ "deserialized"
           val JInt(replication) = value \ "replication"
-          StorageLevel(useDisk,
-                       useMemory,
-                       useOffHeap,
-                       deserialized,
-                       replication.toInt)
+          StorageLevel(
+            useDisk,
+            useMemory,
+            useOffHeap,
+            deserialized,
+            replication.toInt)
         case t if t <:< localTypeOf[TreeNode[_]] =>
           value match {
             case JInt(i) => children(i.toInt)

@@ -18,10 +18,11 @@ final class BoostingApi(modApi: ModApi,
   private implicit val boostingRecordBSONHandler =
     Macros.handler[BoostingRecord]
 
-  private val variants = Set[variant.Variant](variant.Standard,
-                                              variant.Chess960,
-                                              variant.KingOfTheHill,
-                                              variant.ThreeCheck)
+  private val variants = Set[variant.Variant](
+    variant.Standard,
+    variant.Chess960,
+    variant.KingOfTheHill,
+    variant.ThreeCheck)
 
   def getBoostingRecord(id: String): Fu[Option[BoostingRecord]] =
     collBoosting.find(BSONDocument("_id" -> id)).one[BoostingRecord]
@@ -65,9 +66,10 @@ final class BoostingApi(modApi: ModApi,
             case Some(record) =>
               val newRecord =
                 BoostingRecord(_id = id, games = record.games + 1)
-              createBoostRecord(newRecord) >> determineBoosting(newRecord,
-                                                                result.winner,
-                                                                result.loser)
+              createBoostRecord(newRecord) >> determineBoosting(
+                newRecord,
+                result.winner,
+                result.loser)
             case none =>
               createBoostRecord(BoostingRecord(_id = id, games = 1))
           }

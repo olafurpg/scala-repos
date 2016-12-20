@@ -89,10 +89,11 @@ abstract class ClusterShardingGetStateSpec
   }
 
   def startProxy(): ActorRef = {
-    ClusterSharding(system).startProxy(typeName = shardTypeName,
-                                       role = Some("shard"),
-                                       extractEntityId = extractEntityId,
-                                       extractShardId = extractShardId)
+    ClusterSharding(system).startProxy(
+      typeName = shardTypeName,
+      role = Some("shard"),
+      extractEntityId = extractEntityId,
+      extractShardId = extractShardId)
   }
 
   def join(from: RoleName): Unit = {

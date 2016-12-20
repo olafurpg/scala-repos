@@ -65,8 +65,9 @@ class FileUploadDirectivesExamplesSpec extends RoutingSpec {
     val multipartForm = Multipart.FormData(
       Multipart.FormData.BodyPart.Strict(
         "csv",
-        HttpEntity(ContentTypes.`text/plain(UTF-8)`,
-                   "2,3,5\n7,11,13,17,23\n29,31,37\n"),
+        HttpEntity(
+          ContentTypes.`text/plain(UTF-8)`,
+          "2,3,5\n7,11,13,17,23\n29,31,37\n"),
         Map("filename" -> "primes.csv")))
 
     Post("/", multipartForm) ~> route ~> check {

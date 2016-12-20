@@ -112,9 +112,10 @@ case class FilesystemIngestFailureLog(
   def logFailed(offset: Long,
                 message: EventMessage,
                 lastKnownGood: YggCheckpoint): IngestFailureLog = {
-    copy(failureLog = failureLog +
-             (message -> LogRecord(offset, message, lastKnownGood)),
-         restoreFrom = lastKnownGood min restoreFrom)
+    copy(
+      failureLog = failureLog +
+          (message -> LogRecord(offset, message, lastKnownGood)),
+      restoreFrom = lastKnownGood min restoreFrom)
   }
 
   def checkFailed(message: EventMessage): Boolean =
@@ -360,10 +361,11 @@ abstract class KafkaShardIngestActor(
                   // using that handler reference as the sender to which the ingest system will reply
                   val batchHandler = context.actorOf(
                     Props(
-                      new BatchHandler(self,
-                                       requestor,
-                                       checkpoint,
-                                       ingestTimeout)))
+                      new BatchHandler(
+                        self,
+                        requestor,
+                        checkpoint,
+                        ingestTimeout)))
                   batchHandler.tell(ProjectionUpdatesExpected(messages.size))
                   requestor.tell(IngestData(messages), batchHandler)
                 } else {
@@ -442,9 +444,10 @@ abstract class KafkaShardIngestActor(
 
         case (offset, store: StoreFileMessage) :: tail =>
           val EventId(pid, sid) = store.eventId
-          buildBatch(tail,
-                     batch :+ (offset, store),
-                     checkpoint.update(offset, pid, sid))
+          buildBatch(
+            tail,
+            batch :+ (offset, store),
+            checkpoint.update(offset, pid, sid))
 
         case (offset, ArchiveMessage(_, _, _, eventId, _)) :: tail
             if batch.nonEmpty =>
@@ -509,71 +512,70 @@ abstract class KafkaShardIngestActor(
                               Future[(Vector[(Long, EventMessage)],
                                       YggCheckpoint)]] =
         eventMessages
-          .sequence[({ type λ[α] = Validation[Error, α] })#λ,
-                    (Long, EventMessage.EventMessageExtraction)] map {
-          messageSet =>
-            val apiKeys: List[(APIKey, Path)] = msTime({ t =>
-              logger.debug(
-                "Collected api keys from %d messages in %d ms"
-                  .format(messageSet.size, t))
-            }) {
-              messageSet collect {
-                case (_, \/-(IngestMessage(apiKey, path, _, _, _, _, _))) =>
-                  (apiKey, path)
-                case (_, -\/((apiKey, path, _))) => (apiKey, path)
-              }
+          .sequence[
+            ({ type λ[α] = Validation[Error, α] })#λ,
+            (Long, EventMessage.EventMessageExtraction)] map { messageSet =>
+          val apiKeys: List[(APIKey, Path)] = msTime({ t =>
+            logger.debug(
+              "Collected api keys from %d messages in %d ms"
+                .format(messageSet.size, t))
+          }) {
+            messageSet collect {
+              case (_, \/-(IngestMessage(apiKey, path, _, _, _, _, _))) =>
+                (apiKey, path)
+              case (_, -\/((apiKey, path, _))) => (apiKey, path)
+            }
+          }
+
+          val authoritiesStartTime = System.currentTimeMillis
+
+          val distinctKeys = apiKeys.distinct
+
+          val authorityCacheFutures =
+            distinctKeys map {
+              case k @ (apiKey, path) =>
+                // infer write authorities without a timestamp here, because we'll only use this for legacy events
+                //val inferStart = System.currentTimeMillis
+                permissionsFinder
+                  .inferWriteAuthorities(apiKey, path, None) map { inferred =>
+                  //logger.trace("Write authorities inferred on %s in %d ms".format(k, System.currentTimeMillis - inferStart))
+                  k -> inferred
+                }
             }
 
-            val authoritiesStartTime = System.currentTimeMillis
+          authorityCacheFutures.sequence map { cached =>
+            logger.debug(
+              "Computed authorities from %d apiKeys in %d ms".format(
+                distinctKeys.size,
+                System.currentTimeMillis - authoritiesStartTime))
+            val authorityCache =
+              cached.foldLeft(Map.empty[(APIKey, Path), Authorities]) {
+                case (acc, (k, Some(a))) => acc + (k -> a)
+                case (acc, (_, None)) => acc
+              }
 
-            val distinctKeys = apiKeys.distinct
+            val updatedMessages: List[(Long, EventMessage)] =
+              messageSet.flatMap {
+                case (offset, \/-(message)) =>
+                  Some((offset, message))
 
-            val authorityCacheFutures =
-              distinctKeys map {
-                case k @ (apiKey, path) =>
-                  // infer write authorities without a timestamp here, because we'll only use this for legacy events
-                  //val inferStart = System.currentTimeMillis
-                  permissionsFinder
-                    .inferWriteAuthorities(apiKey, path, None) map {
-                    inferred =>
-                      //logger.trace("Write authorities inferred on %s in %d ms".format(k, System.currentTimeMillis - inferStart))
-                      k -> inferred
+                case (offset, -\/((apiKey, path, genMessage))) =>
+                  authorityCache.get((apiKey, path)) map { authorities =>
+                    Some((offset, genMessage(authorities)))
+                  } getOrElse {
+                    logger.warn(
+                      "Discarding event at offset %d with apiKey %s for path %s because we could not determine the account"
+                        .format(offset, apiKey, path))
+                    None
                   }
               }
 
-            authorityCacheFutures.sequence map { cached =>
-              logger.debug(
-                "Computed authorities from %d apiKeys in %d ms".format(
-                  distinctKeys.size,
-                  System.currentTimeMillis - authoritiesStartTime))
-              val authorityCache =
-                cached.foldLeft(Map.empty[(APIKey, Path), Authorities]) {
-                  case (acc, (k, Some(a))) => acc + (k -> a)
-                  case (acc, (_, None)) => acc
-                }
-
-              val updatedMessages: List[(Long, EventMessage)] =
-                messageSet.flatMap {
-                  case (offset, \/-(message)) =>
-                    Some((offset, message))
-
-                  case (offset, -\/((apiKey, path, genMessage))) =>
-                    authorityCache.get((apiKey, path)) map { authorities =>
-                      Some((offset, genMessage(authorities)))
-                    } getOrElse {
-                      logger.warn(
-                        "Discarding event at offset %d with apiKey %s for path %s because we could not determine the account"
-                          .format(offset, apiKey, path))
-                      None
-                    }
-                }
-
-              msTime({ t =>
-                logger.debug("Batch built in %d ms".format(t))
-              }) {
-                buildBatch(updatedMessages, Vector.empty, fromCheckpoint)
-              }
+            msTime({ t =>
+              logger.debug("Batch built in %d ms".format(t))
+            }) {
+              buildBatch(updatedMessages, Vector.empty, fromCheckpoint)
             }
+          }
         }
 
       batched.sequence[Future, (Vector[(Long, EventMessage)], YggCheckpoint)]
@@ -584,9 +586,9 @@ abstract class KafkaShardIngestActor(
 
   protected def status: JValue =
     JObject(
-      JField("Ingest",
-             JObject(
-               JField("lastCheckpoint", lastCheckpoint.serialize) :: Nil)) :: Nil)
+      JField(
+        "Ingest",
+        JObject(JField("lastCheckpoint", lastCheckpoint.serialize) :: Nil)) :: Nil)
 
   override def postStop() = {
     consumer.close

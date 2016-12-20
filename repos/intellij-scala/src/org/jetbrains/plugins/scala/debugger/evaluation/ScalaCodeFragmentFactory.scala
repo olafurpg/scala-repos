@@ -72,8 +72,9 @@ class ScalaCodeFragmentFactory extends CodeFragmentFactory {
       }
       null
     }
-    fragment.putCopyableUserData(ScalaRuntimeTypeEvaluator.KEY,
-                                 evaluateType: (ScExpression) => ScType)
+    fragment.putCopyableUserData(
+      ScalaRuntimeTypeEvaluator.KEY,
+      evaluateType: (ScExpression) => ScType)
     fragment
   }
 
@@ -83,8 +84,9 @@ class ScalaCodeFragmentFactory extends CodeFragmentFactory {
     val fragment = new ScalaCodeFragment(project, item.getText)
     fragment.setContext(context, null)
     fragment.addImportsFromString(item.getImports)
-    fragment.putUserData(DebuggerExpressionComboBox.KEY,
-                         "DebuggerComboBoxEditor.IS_DEBUGGER_EDITOR")
+    fragment.putUserData(
+      DebuggerExpressionComboBox.KEY,
+      "DebuggerComboBoxEditor.IS_DEBUGGER_EDITOR")
     fragment
   }
 

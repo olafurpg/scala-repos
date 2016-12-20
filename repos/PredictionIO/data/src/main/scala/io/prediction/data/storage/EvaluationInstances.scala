@@ -100,8 +100,9 @@ class EvaluationInstanceSerializer
                     i.copy(endTime = Utils.stringToDateTime(endTime))
                   case JField("evaluationClass", JString(evaluationClass)) =>
                     i.copy(evaluationClass = evaluationClass)
-                  case JField("engineParamsGeneratorClass",
-                              JString(engineParamsGeneratorClass)) =>
+                  case JField(
+                      "engineParamsGeneratorClass",
+                      JString(engineParamsGeneratorClass)) =>
                     i.copy(
                       engineParamsGeneratorClass = engineParamsGeneratorClass)
                   case JField("batch", JString(batch)) =>
@@ -114,11 +115,13 @@ class EvaluationInstanceSerializer
                         Extraction.extract[Map[String, String]](sparkConf))
                   case JField("evaluatorResults", JString(evaluatorResults)) =>
                     i.copy(evaluatorResults = evaluatorResults)
-                  case JField("evaluatorResultsHTML",
-                              JString(evaluatorResultsHTML)) =>
+                  case JField(
+                      "evaluatorResultsHTML",
+                      JString(evaluatorResultsHTML)) =>
                     i.copy(evaluatorResultsHTML = evaluatorResultsHTML)
-                  case JField("evaluatorResultsJSON",
-                              JString(evaluatorResultsJSON)) =>
+                  case JField(
+                      "evaluatorResultsJSON",
+                      JString(evaluatorResultsJSON)) =>
                     i.copy(evaluatorResultsJSON = evaluatorResultsJSON)
                   case _ => i
                 }

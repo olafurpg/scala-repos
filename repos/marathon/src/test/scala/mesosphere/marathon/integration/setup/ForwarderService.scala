@@ -95,9 +95,10 @@ object ForwarderService {
     ProcessKeeper.startJavaProcess(
       s"forwarder_${conf.httpPort()}",
       heapInMegs = 128,
-      arguments = List(ForwarderService.className,
-                       "forwarder",
-                       forwardToPort.toString) ++ args,
+      arguments = List(
+          ForwarderService.className,
+          "forwarder",
+          forwardToPort.toString) ++ args,
       upWhen = _.contains("ServerConnector@"))
   }
 
@@ -115,18 +116,20 @@ object ForwarderService {
   def createHelloApp(args: String*): Service = {
     val conf = createConf(args: _*)
     log.info(s"Start hello app at ${conf.httpPort()}")
-    startImpl(conf,
-              new LeaderInfoModule(elected = true, leaderHostPort = None))
+    startImpl(
+      conf,
+      new LeaderInfoModule(elected = true, leaderHostPort = None))
   }
 
   def createForwarder(forwardToPort: Int, args: String*): Service = {
     val conf = createConf(args: _*)
     log.info(
       s"Start forwarder on port  ${conf.httpPort()}, forwarding to $forwardToPort")
-    startImpl(conf,
-              new LeaderInfoModule(elected = false,
-                                   leaderHostPort =
-                                     Some(s"localhost:$forwardToPort")))
+    startImpl(
+      conf,
+      new LeaderInfoModule(
+        elected = false,
+        leaderHostPort = Some(s"localhost:$forwardToPort")))
   }
 
   private[this] def createConf(args: String*): ForwarderConf = {
@@ -142,12 +145,13 @@ object ForwarderService {
     val injector = Guice.createInjector(
       new MetricsModule,
       new HttpModule(conf),
-      new ForwarderAppModule(myHostPort =
-                               if (conf.disableHttp())
-                                 s"localhost:${conf.httpsPort()}"
-                               else s"localhost:${conf.httpPort()}",
-                             conf,
-                             conf),
+      new ForwarderAppModule(
+        myHostPort =
+          if (conf.disableHttp())
+            s"localhost:${conf.httpsPort()}"
+          else s"localhost:${conf.httpPort()}",
+        conf,
+        conf),
       leaderModule
     )
     val http = injector.getInstance(classOf[HttpService])

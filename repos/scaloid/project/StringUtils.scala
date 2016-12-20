@@ -13,22 +13,23 @@ object StringUtils {
 
   def dotToSlash(s: String) = s.replace(".", "/")
 
-  private val reservedKeywordsNotInJava = Set("def",
-                                              "extends",
-                                              "implicit",
-                                              "import",
-                                              "match",
-                                              "lazy",
-                                              "object",
-                                              "package",
-                                              "requires",
-                                              "sealed",
-                                              "trait",
-                                              "type",
-                                              "val",
-                                              "var",
-                                              "with",
-                                              "yield")
+  private val reservedKeywordsNotInJava = Set(
+    "def",
+    "extends",
+    "implicit",
+    "import",
+    "match",
+    "lazy",
+    "object",
+    "package",
+    "requires",
+    "sealed",
+    "trait",
+    "type",
+    "val",
+    "var",
+    "with",
+    "yield")
   def safeIdent(s: String) =
     if (s.matches("^[0-9].*") || reservedKeywordsNotInJava(s)) "`" + s + "`"
     else s

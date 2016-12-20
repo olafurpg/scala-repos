@@ -76,8 +76,9 @@ class SparkPlanner(val sparkContext: SparkContext,
       filterCondition.map(Filter(_, scan)).getOrElse(scan)
     } else {
       val scan = scanBuilder((projectSet ++ filterSet).toSeq)
-      Project(projectList,
-              filterCondition.map(Filter(_, scan)).getOrElse(scan))
+      Project(
+        projectList,
+        filterCondition.map(Filter(_, scan)).getOrElse(scan))
     }
   }
 }

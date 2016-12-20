@@ -41,8 +41,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class StopSpec
-    extends SimpleSFXDelegateSpec[jfxsp.Stop, Stop](classOf[jfxsp.Stop],
-                                                    classOf[Stop]) {
+    extends SimpleSFXDelegateSpec[jfxsp.Stop, Stop](
+      classOf[jfxsp.Stop],
+      classOf[Stop]) {
 
   override protected def getJavaClassInstance = new jfxsp.Stop(0, 0)
 }

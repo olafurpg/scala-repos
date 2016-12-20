@@ -43,8 +43,8 @@ class TasksResourceTest
     val task2 = MarathonTestHelper.runningTask(taskId2)
 
     config.zkTimeoutDuration returns 5.seconds
-    taskTracker.tasksByAppSync returns TaskTracker.TasksByApp.forTasks(task1,
-                                                                       task2)
+    taskTracker.tasksByAppSync returns TaskTracker.TasksByApp
+      .forTasks(task1, task2)
     taskKiller.kill(any, any)(any) returns Future.successful(
       Iterable.empty[Task])
     groupManager.app(app1) returns Future.successful(Some(AppDefinition(app1)))
@@ -76,18 +76,19 @@ class TasksResourceTest
     val taskId2 = Task.Id.forApp(app2).idString
     val body = s"""{"ids": ["$taskId1", "$taskId2"]}"""
     val bodyBytes = body.toCharArray.map(_.toByte)
-    val deploymentPlan = new DeploymentPlan("plan",
-                                            Group.empty,
-                                            Group.empty,
-                                            Seq.empty[DeploymentStep],
-                                            Timestamp.zero)
+    val deploymentPlan = new DeploymentPlan(
+      "plan",
+      Group.empty,
+      Group.empty,
+      Seq.empty[DeploymentStep],
+      Timestamp.zero)
 
     val task1 = MarathonTestHelper.runningTask(taskId1)
     val task2 = MarathonTestHelper.stagedTask(taskId2)
 
     config.zkTimeoutDuration returns 5.seconds
-    taskTracker.tasksByAppSync returns TaskTracker.TasksByApp.forTasks(task1,
-                                                                       task2)
+    taskTracker.tasksByAppSync returns TaskTracker.TasksByApp
+      .forTasks(task1, task2)
     taskKiller.killAndScale(any, any)(any) returns Future.successful(
       deploymentPlan)
     groupManager.app(app1) returns Future.successful(Some(AppDefinition(app1)))
@@ -183,12 +184,13 @@ class TasksResourceTest
     val taskId3 = Task.Id.forApp(appId).idString
     val body = s"""{"ids": ["$taskId1", "$taskId2", "$taskId3"]}""".getBytes
 
-    taskKiller = new TaskKiller(taskTracker,
-                                groupManager,
-                                service,
-                                config,
-                                auth.auth,
-                                auth.auth)
+    taskKiller = new TaskKiller(
+      taskTracker,
+      groupManager,
+      service,
+      config,
+      auth.auth,
+      auth.auth)
     taskResource = new TasksResource(
       service,
       taskTracker,
@@ -221,10 +223,11 @@ class TasksResourceTest
 
     When("we ask to kill those two tasks")
     val ex = intercept[BadRequestException] {
-      taskResource.killTasks(scale = false,
-                             force = false,
-                             body = bodyBytes,
-                             auth.request)
+      taskResource.killTasks(
+        scale = false,
+        force = false,
+        body = bodyBytes,
+        auth.request)
     }
 
     Then("An exception should be thrown that points to the invalid taskId")

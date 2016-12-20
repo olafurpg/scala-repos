@@ -282,8 +282,9 @@ class InMemoryCatalog extends ExternalCatalog {
                                 specs: Seq[TablePartitionSpec],
                                 newSpecs: Seq[TablePartitionSpec]): Unit =
     synchronized {
-      require(specs.size == newSpecs.size,
-              "number of old and new partition specs differ")
+      require(
+        specs.size == newSpecs.size,
+        "number of old and new partition specs differ")
       specs.zip(newSpecs).foreach {
         case (oldSpec, newSpec) =>
           val newPart = getPartition(db, table, oldSpec).copy(spec = newSpec)

@@ -98,14 +98,15 @@ trait LzoTypedTextDelimited[T]
     with LocalTapSource {
   override def hdfsScheme =
     HadoopSchemeInstance(
-      new LzoTextDelimited(typeDescriptor.fields,
-                           false,
-                           false,
-                           separator.str,
-                           strict,
-                           null /* quote */,
-                           typeDescriptor.fields.getTypesClasses,
-                           safe).asInstanceOf[Scheme[_, _, _, _, _]])
+      new LzoTextDelimited(
+        typeDescriptor.fields,
+        false,
+        false,
+        separator.str,
+        strict,
+        null /* quote */,
+        typeDescriptor.fields.getTypesClasses,
+        safe).asInstanceOf[Scheme[_, _, _, _, _]])
 }
 
 class TimePathLzoTypedText[T](sep: TypedSep, path: String)(

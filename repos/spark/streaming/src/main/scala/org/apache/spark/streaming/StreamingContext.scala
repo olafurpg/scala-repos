@@ -116,9 +116,10 @@ class StreamingContext private[streaming] (
     *                   HDFS compatible filesystems
     */
   def this(path: String, hadoopConf: Configuration) =
-    this(null,
-         CheckpointReader.read(path, new SparkConf(), hadoopConf).get,
-         null)
+    this(
+      null,
+      CheckpointReader.read(path, new SparkConf(), hadoopConf).get,
+      null)
 
   /**
     * Recreate a StreamingContext from a checkpoint file.
@@ -132,11 +133,12 @@ class StreamingContext private[streaming] (
     * @param sparkContext Existing SparkContext
     */
   def this(path: String, sparkContext: SparkContext) = {
-    this(sparkContext,
-         CheckpointReader
-           .read(path, sparkContext.conf, sparkContext.hadoopConfiguration)
-           .get,
-         null)
+    this(
+      sparkContext,
+      CheckpointReader
+        .read(path, sparkContext.conf, sparkContext.hadoopConfiguration)
+        .get,
+      null)
   }
 
   if (_sc == null && _cp == null) {
@@ -175,8 +177,9 @@ class StreamingContext private[streaming] (
       _cp.graph.restoreCheckpointData()
       _cp.graph
     } else {
-      require(_batchDur != null,
-              "Batch duration for StreamingContext cannot be null")
+      require(
+        _batchDur != null,
+        "Batch duration for StreamingContext cannot be null")
       val newGraph = new DStreamGraph()
       newGraph.setBatchDuration(_batchDur)
       newGraph
@@ -317,10 +320,11 @@ class StreamingContext private[streaming] (
       port: Int,
       storageLevel: StorageLevel = StorageLevel.MEMORY_AND_DISK_SER_2
   ): ReceiverInputDStream[String] = withNamedScope("socket text stream") {
-    socketStream[String](hostname,
-                         port,
-                         SocketReceiver.bytesToLines,
-                         storageLevel)
+    socketStream[String](
+      hostname,
+      port,
+      SocketReceiver.bytesToLines,
+      storageLevel)
   }
 
   /**
@@ -422,11 +426,12 @@ class StreamingContext private[streaming] (
     filter: Path => Boolean,
     newFilesOnly: Boolean,
     conf: Configuration): InputDStream[(K, V)] = {
-    new FileInputDStream[K, V, F](this,
-                                  directory,
-                                  filter,
-                                  newFilesOnly,
-                                  Option(conf))
+    new FileInputDStream[K, V, F](
+      this,
+      directory,
+      filter,
+      newFilesOnly,
+      Option(conf))
   }
 
   /**
@@ -460,8 +465,9 @@ class StreamingContext private[streaming] (
                           recordLength: Int): DStream[Array[Byte]] =
     withNamedScope("binary records stream") {
       val conf = _sc.hadoopConfiguration
-      conf.setInt(FixedLengthBinaryInputFormat.RECORD_LENGTH_PROPERTY,
-                  recordLength)
+      conf.setInt(
+        FixedLengthBinaryInputFormat.RECORD_LENGTH_PROPERTY,
+        recordLength)
       val br =
         fileStream[LongWritable, BytesWritable, FixedLengthBinaryInputFormat](
           directory,
@@ -889,12 +895,13 @@ object StreamingContext extends Logging {
       jars: Seq[String],
       environment: Map[String, String]
   ): SparkContext = {
-    val conf = SparkContext.updatedConf(new SparkConf(),
-                                        master,
-                                        appName,
-                                        sparkHome,
-                                        jars,
-                                        environment)
+    val conf = SparkContext.updatedConf(
+      new SparkConf(),
+      master,
+      appName,
+      sparkHome,
+      jars,
+      environment)
     new SparkContext(conf)
   }
 

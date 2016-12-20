@@ -285,8 +285,9 @@ case class PackageInfo(
     // n.b. members should be sorted by name for consistency
     members: Seq[EntityInfo]
 ) extends EntityInfo {
-  require(members == members.sortBy(_.name),
-          "members should be sorted by name")
+  require(
+    members == members.sortBy(_.name),
+    "members should be sorted by name")
 }
 
 sealed trait SymbolSearchResult extends RpcResponse {

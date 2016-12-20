@@ -42,9 +42,9 @@ class ServerGenerateBrokerIdTest extends ZooKeeperTestHarness {
 
   @Test
   def testAutoGenerateBrokerId() {
-    var server1 = new KafkaServer(config1,
-                                  threadNamePrefix =
-                                    Option(this.getClass.getName))
+    var server1 = new KafkaServer(
+      config1,
+      threadNamePrefix = Option(this.getClass.getName))
     server1.startup()
     server1.shutdown()
     assertTrue(verifyBrokerMetadata(config1.logDirs, 1001))
@@ -60,12 +60,12 @@ class ServerGenerateBrokerIdTest extends ZooKeeperTestHarness {
   @Test
   def testUserConfigAndGeneratedBrokerId() {
     // start the server with broker.id as part of config
-    val server1 = new KafkaServer(config1,
-                                  threadNamePrefix =
-                                    Option(this.getClass.getName))
-    val server2 = new KafkaServer(config2,
-                                  threadNamePrefix =
-                                    Option(this.getClass.getName))
+    val server1 = new KafkaServer(
+      config1,
+      threadNamePrefix = Option(this.getClass.getName))
+    val server2 = new KafkaServer(
+      config2,
+      threadNamePrefix = Option(this.getClass.getName))
     val props3 = TestUtils.createBrokerConfig(-1, zkConnect)
     val config3 = KafkaConfig.fromProps(props3)
     val server3 = new KafkaServer(config3)
@@ -112,9 +112,9 @@ class ServerGenerateBrokerIdTest extends ZooKeeperTestHarness {
         TestUtils.tempDir().getAbsolutePath
     props1.setProperty("log.dir", logDirs)
     config1 = KafkaConfig.fromProps(props1)
-    var server1 = new KafkaServer(config1,
-                                  threadNamePrefix =
-                                    Option(this.getClass.getName))
+    var server1 = new KafkaServer(
+      config1,
+      threadNamePrefix = Option(this.getClass.getName))
     server1.startup()
     server1.shutdown()
     assertTrue(verifyBrokerMetadata(config1.logDirs, 1001))
@@ -123,8 +123,9 @@ class ServerGenerateBrokerIdTest extends ZooKeeperTestHarness {
       props1.getProperty("log.dir") + "," + TestUtils.tempDir().getAbsolutePath
     props1.setProperty("log.dir", newLogDirs)
     config1 = KafkaConfig.fromProps(props1)
-    server1 = new KafkaServer(config1,
-                              threadNamePrefix = Option(this.getClass.getName))
+    server1 = new KafkaServer(
+      config1,
+      threadNamePrefix = Option(this.getClass.getName))
     server1.startup()
     server1.shutdown()
     assertTrue(verifyBrokerMetadata(config1.logDirs, 1001))

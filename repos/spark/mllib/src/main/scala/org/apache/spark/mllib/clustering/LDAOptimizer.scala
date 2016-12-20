@@ -194,12 +194,13 @@ final class EMLDAOptimizer extends LDAOptimizer {
         // E-STEP: Compute gamma_{wjk} (smoothed topic distributions), scaled by token count
         // N_{wj}.
         val scaledTopicDistribution: TopicCounts =
-          computePTopic(edgeContext.srcAttr,
-                        edgeContext.dstAttr,
-                        N_k,
-                        W,
-                        eta,
-                        alpha) *= N_wj
+          computePTopic(
+            edgeContext.srcAttr,
+            edgeContext.dstAttr,
+            N_k,
+            W,
+            eta,
+            alpha) *= N_wj
         edgeContext.sendToDst((false, scaledTopicDistribution))
         edgeContext.sendToSrc((false, scaledTopicDistribution))
       }
@@ -350,8 +351,9 @@ final class OnlineLDAOptimizer extends LDAOptimizer {
     */
   @Since("1.4.0")
   def setKappa(kappa: Double): this.type = {
-    require(kappa >= 0,
-            s"Online LDA kappa must be nonnegative, but was set to $kappa")
+    require(
+      kappa >= 0,
+      s"Online LDA kappa must be nonnegative, but was set to $kappa")
     this.kappa = kappa
     this
   }
@@ -438,13 +440,15 @@ final class OnlineLDAOptimizer extends LDAOptimizer {
       if (lda.getAsymmetricDocConcentration(0) == -1)
         Vectors.dense(Array.fill(k)(1.0 / k))
       else {
-        require(lda.getAsymmetricDocConcentration(0) >= 0,
-                s"all entries in alpha must be >=0, got: $alpha")
+        require(
+          lda.getAsymmetricDocConcentration(0) >= 0,
+          s"all entries in alpha must be >=0, got: $alpha")
         Vectors.dense(Array.fill(k)(lda.getAsymmetricDocConcentration(0)))
       }
     } else {
-      require(lda.getAsymmetricDocConcentration.size == k,
-              s"alpha must have length k, got: $alpha")
+      require(
+        lda.getAsymmetricDocConcentration.size == k,
+        s"alpha must have length k, got: $alpha")
       lda.getAsymmetricDocConcentration.foreachActive {
         case (_, x) =>
           require(x >= 0, s"all entries in alpha must be >= 0, got: $alpha")
@@ -465,9 +469,10 @@ final class OnlineLDAOptimizer extends LDAOptimizer {
   }
 
   override private[clustering] def next(): OnlineLDAOptimizer = {
-    val batch = docs.sample(withReplacement = sampleWithReplacement,
-                            miniBatchFraction,
-                            randomGenerator.nextLong())
+    val batch = docs.sample(
+      withReplacement = sampleWithReplacement,
+      miniBatchFraction,
+      randomGenerator.nextLong())
     if (batch.isEmpty()) return this
     submitMiniBatch(batch)
   }
@@ -500,11 +505,12 @@ final class OnlineLDAOptimizer extends LDAOptimizer {
               case v: SparseVector => v.indices.toList
             }
             val (gammad, sstats) =
-              OnlineLDAOptimizer.variationalTopicInference(termCounts,
-                                                           expElogbetaBc.value,
-                                                           alpha,
-                                                           gammaShape,
-                                                           k)
+              OnlineLDAOptimizer.variationalTopicInference(
+                termCounts,
+                expElogbetaBc.value,
+                alpha,
+                gammaShape,
+                k)
             stat(::, ids) := stat(::, ids).toDenseMatrix + sstats
             gammaPart = gammad :: gammaPart
         }
@@ -581,10 +587,11 @@ final class OnlineLDAOptimizer extends LDAOptimizer {
 
   override private[clustering] def getLDAModel(
       iterationTimes: Array[Double]): LDAModel = {
-    new LocalLDAModel(Matrices.fromBreeze(lambda).transpose,
-                      alpha,
-                      eta,
-                      gammaShape)
+    new LocalLDAModel(
+      Matrices.fromBreeze(lambda).transpose,
+      alpha,
+      eta,
+      gammaShape)
   }
 }
 

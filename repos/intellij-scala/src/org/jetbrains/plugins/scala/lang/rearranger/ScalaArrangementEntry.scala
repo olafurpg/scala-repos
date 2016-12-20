@@ -17,10 +17,11 @@ class ScalaArrangementEntry(parent: ArrangementEntry,
                             entryType: ArrangementSettingsToken,
                             name: String,
                             canBeMatched: Boolean)
-    extends DefaultArrangementEntry(parent,
-                                    startOffset,
-                                    endOffset,
-                                    canBeMatched)
+    extends DefaultArrangementEntry(
+      parent,
+      startOffset,
+      endOffset,
+      canBeMatched)
     with TypeAwareArrangementEntry
     with NameAwareArrangementEntry
     with ModifierAwareArrangementEntry {
@@ -32,12 +33,13 @@ class ScalaArrangementEntry(parent: ArrangementEntry,
            entryType: ArrangementSettingsToken,
            name: String,
            canBeMatched: Boolean) =
-    this(parent,
-         range.getStartOffset,
-         range.getEndOffset,
-         entryType,
-         name,
-         canBeMatched)
+    this(
+      parent,
+      range.getStartOffset,
+      range.getEndOffset,
+      entryType,
+      name,
+      canBeMatched)
 
   override def getName: String = name
 

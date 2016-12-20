@@ -27,18 +27,20 @@ object Export extends LilaController {
                 (Env.analyse.analyser get game.id)
             } yield
               Env.analyse
-                .annotator(pgn,
-                           analysis,
-                           game.opening,
-                           game.winnerColor,
-                           game.status,
-                           game.clock)
+                .annotator(
+                  pgn,
+                  analysis,
+                  game.opening,
+                  game.winnerColor,
+                  game.status,
+                  game.clock)
                 .toString
         }) map { content =>
-          Ok(content).withHeaders(CONTENT_TYPE -> ContentTypes.TEXT,
-                                  CONTENT_DISPOSITION ->
-                                    ("attachment; filename=" +
-                                      (Env.api.pgnDump filename game)))
+          Ok(content).withHeaders(
+            CONTENT_TYPE -> ContentTypes.TEXT,
+            CONTENT_DISPOSITION ->
+              ("attachment; filename=" +
+                (Env.api.pgnDump filename game)))
         }
       }
     }
@@ -48,8 +50,9 @@ object Export extends LilaController {
     OnlyHumans {
       OptionResult(GameRepo game id) { game =>
         Ok.chunked(Enumerator.outputStream(env.pdfExport(game.id)))
-          .withHeaders(CONTENT_TYPE -> "application/pdf",
-                       CACHE_CONTROL -> "max-age=7200")
+          .withHeaders(
+            CONTENT_TYPE -> "application/pdf",
+            CACHE_CONTROL -> "max-age=7200")
       }
     }
   }
@@ -58,8 +61,9 @@ object Export extends LilaController {
     OnlyHumansAndFacebook {
       OptionResult(GameRepo game id) { game =>
         Ok.chunked(Enumerator.outputStream(env.pngExport(game)))
-          .withHeaders(CONTENT_TYPE -> "image/png",
-                       CACHE_CONTROL -> "max-age=7200")
+          .withHeaders(
+            CONTENT_TYPE -> "image/png",
+            CACHE_CONTROL -> "max-age=7200")
       }
     }
   }
@@ -68,8 +72,9 @@ object Export extends LilaController {
     OnlyHumansAndFacebook {
       OptionResult(Env.puzzle.api.puzzle find id) { puzzle =>
         Ok.chunked(Enumerator.outputStream(Env.puzzle.pngExport(puzzle)))
-          .withHeaders(CONTENT_TYPE -> "image/png",
-                       CACHE_CONTROL -> "max-age=7200")
+          .withHeaders(
+            CONTENT_TYPE -> "image/png",
+            CACHE_CONTROL -> "max-age=7200")
       }
     }
   }

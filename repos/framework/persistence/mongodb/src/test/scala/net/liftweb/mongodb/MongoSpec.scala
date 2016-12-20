@@ -60,10 +60,10 @@ class MongoSpec extends Specification {
 
     "Define DB with MongoClient instance" in {
       val opts = MongoClientOptions.builder.connectionsPerHost(12).build
-      passDefinitionTests(TestMongoIdentifier,
-                          new MongoClient(new ServerAddress("localhost"),
-                                          opts),
-                          "test_default_b")
+      passDefinitionTests(
+        TestMongoIdentifier,
+        new MongoClient(new ServerAddress("localhost"), opts),
+        "test_default_b")
     }
 
     /* Requires a server other than localhost with auth setup.

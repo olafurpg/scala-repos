@@ -71,8 +71,9 @@ final case class DateTime private (
     * `yyyy-mm-ddThh:mm:ss`
     */
   def renderIsoDateTimeString[R <: Rendering](r: R): r.type =
-    put_##(put_##(put_##(renderIsoDate(r) ~~ 'T', hour) ~~ ':', minute) ~~ ':',
-           second)
+    put_##(
+      put_##(put_##(renderIsoDate(r) ~~ 'T', hour) ~~ ':', minute) ~~ ':',
+      second)
 
   /**
     * `yyyy-mm-ddThh:mm:ss`
@@ -83,8 +84,9 @@ final case class DateTime private (
     * `yyyy-mm-dd hh:mm:ss`
     */
   def renderIsoLikeDateTimeString[R <: Rendering](r: R): r.type =
-    put_##(put_##(put_##(renderIsoDate(r) ~~ ' ', hour) ~~ ':', minute) ~~ ':',
-           second)
+    put_##(
+      put_##(put_##(renderIsoDate(r) ~~ ' ', hour) ~~ ':', minute) ~~ ':',
+      second)
 
   /**
     * `yyyy-mm-dd hh:mm:ss`
@@ -126,18 +128,19 @@ final case class DateTime private (
 object DateTime {
   private[this] val WEEKDAYS =
     Array("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
-  private[this] val MONTHS = Array("Jan",
-                                   "Feb",
-                                   "Mar",
-                                   "Apr",
-                                   "May",
-                                   "Jun",
-                                   "Jul",
-                                   "Aug",
-                                   "Sep",
-                                   "Oct",
-                                   "Nov",
-                                   "Dec")
+  private[this] val MONTHS = Array(
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec")
 
   /**
     * Returns the three-letter string for the weekday with the given index. Sunday is zero.
@@ -187,15 +190,16 @@ object DateTime {
       (dn - 1) * 86400L + hour * 3600L + minute * 60L +
         second // seconds since Jan 1, 1970, 00:00:00
 
-    new DateTime(year,
-                 month,
-                 day,
-                 hour,
-                 minute,
-                 second,
-                 weekday = d % 7,
-                 clicks = c * 1000,
-                 isLeapYear = isLeap)
+    new DateTime(
+      year,
+      month,
+      day,
+      hour,
+      minute,
+      second,
+      weekday = d % 7,
+      clicks = c * 1000,
+      isLeapYear = isLeap)
   }
 
   /**
@@ -204,10 +208,11 @@ object DateTime {
     * Note that this implementation discards milliseconds (i.e. rounds down to full seconds).
     */
   def apply(clicks: Long): DateTime = {
-    require(DateTime.MinValue.clicks <= clicks &&
-              clicks <= DateTime.MaxValue.clicks,
-            "DateTime value must be >= " + DateTime.MinValue + " and <= " +
-              DateTime.MaxValue)
+    require(
+      DateTime.MinValue.clicks <= clicks &&
+        clicks <= DateTime.MaxValue.clicks,
+      "DateTime value must be >= " + DateTime.MinValue + " and <= " +
+        DateTime.MaxValue)
 
     // based on a fast RFC1123 implementation (C) 2000 by Tim Kientzle <kientzle@acm.org>
     val c = clicks - clicks % 1000
@@ -256,15 +261,16 @@ object DateTime {
     m %= 60
     val w = (dn + 1) % 7 // day of week, 0==Sun
 
-    new DateTime(year = y,
-                 month = mon + 1,
-                 day = d,
-                 hour = h,
-                 minute = m,
-                 second = s.toInt,
-                 weekday = w,
-                 clicks = c,
-                 isLeapYear = isLeap)
+    new DateTime(
+      year = y,
+      month = mon + 1,
+      day = d,
+      hour = h,
+      minute = m,
+      second = s.toInt,
+      weekday = w,
+      clicks = c,
+      isLeapYear = isLeap)
   }
 
   private def isLeapYear(year: Int): Boolean =

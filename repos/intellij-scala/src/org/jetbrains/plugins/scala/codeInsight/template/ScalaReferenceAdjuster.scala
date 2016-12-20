@@ -28,13 +28,14 @@ class ScalaReferenceAdjuster extends ReferenceAdjuster {
                        incompleteCode: Boolean,
                        useFqInJavadoc: Boolean,
                        useFqInCode: Boolean): ASTNode = {
-    processRange(element,
-                 element.getTextRange.getStartOffset,
-                 element.getTextRange.getEndOffset,
-                 addImports,
-                 incompleteCode,
-                 useFqInJavadoc,
-                 useFqInCode)
+    processRange(
+      element,
+      element.getTextRange.getStartOffset,
+      element.getTextRange.getEndOffset,
+      addImports,
+      incompleteCode,
+      useFqInJavadoc,
+      useFqInCode)
     element
   }
 
@@ -43,13 +44,14 @@ class ScalaReferenceAdjuster extends ReferenceAdjuster {
                             endOffset: Int,
                             useFqInJavadoc: Boolean,
                             useFqInCode: Boolean): Unit = {
-    processRange(element,
-                 startOffset,
-                 endOffset,
-                 addImports = true,
-                 incompleteCode = false,
-                 useFqInJavadoc = useFqInJavadoc,
-                 useFqInCode = useFqInCode)
+    processRange(
+      element,
+      startOffset,
+      endOffset,
+      addImports = true,
+      incompleteCode = false,
+      useFqInJavadoc = useFqInJavadoc,
+      useFqInCode = useFqInCode)
   }
 
   def processRange(element: ASTNode,
@@ -80,11 +82,12 @@ class ScalaReferenceAdjuster extends ReferenceAdjuster {
                             endOffset: Int,
                             project: Project): Unit = {
     val settings = CodeStyleSettingsManager.getSettings(project)
-    processRange(element,
-                 startOffset,
-                 endOffset,
-                 settings.USE_FQ_CLASS_NAMES_IN_JAVADOC,
-                 settings.USE_FQ_CLASS_NAMES)
+    processRange(
+      element,
+      startOffset,
+      endOffset,
+      settings.USE_FQ_CLASS_NAMES_IN_JAVADOC,
+      settings.USE_FQ_CLASS_NAMES)
   }
 
   override def process(element: ASTNode,
@@ -92,10 +95,11 @@ class ScalaReferenceAdjuster extends ReferenceAdjuster {
                        incompleteCode: Boolean,
                        project: Project): ASTNode = {
     val settings = CodeStyleSettingsManager.getSettings(project)
-    process(element,
-            addImports,
-            incompleteCode,
-            settings.USE_FQ_CLASS_NAMES_IN_JAVADOC,
-            settings.USE_FQ_CLASS_NAMES)
+    process(
+      element,
+      addImports,
+      incompleteCode,
+      settings.USE_FQ_CLASS_NAMES_IN_JAVADOC,
+      settings.USE_FQ_CLASS_NAMES)
   }
 }

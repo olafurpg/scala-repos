@@ -21,9 +21,10 @@ class JavaMutatorMethodOverridenAsParameterlessInspection
         // f.superMethod returns None for some reason
         case Some(_: ScalaPsiElement) => // do nothing
         case Some(method) if method.isMutator =>
-          holder.registerProblem(f.nameId,
-                                 getDisplayName,
-                                 new AddEmptyParentheses(f))
+          holder.registerProblem(
+            f.nameId,
+            getDisplayName,
+            new AddEmptyParentheses(f))
         case _ =>
       }
   }

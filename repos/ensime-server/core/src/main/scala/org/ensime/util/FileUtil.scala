@@ -100,10 +100,11 @@ object FileUtils {
           case (file, fileChanges) =>
             readFile(file, cs) match {
               case Right(contents) =>
-                FileEditHelper.diffFromTextEdits(fileChanges,
-                                                 contents,
-                                                 file,
-                                                 file)
+                FileEditHelper.diffFromTextEdits(
+                  fileChanges,
+                  contents,
+                  file,
+                  file)
               case Left(e) => throw e
             }
         }

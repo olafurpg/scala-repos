@@ -25,8 +25,9 @@ class SbtReplaceProjectWithProjectInInspection extends AbstractInspection {
     case defn: ScPatternDefinition
         if defn.getContainingFile.getFileType.getName == Sbt.Name =>
       (defn.expr, defn.bindings) match {
-        case (Some(call: ScMethodCall),
-              Seq(projectNamePattern: ScReferencePattern)) =>
+        case (
+            Some(call: ScMethodCall),
+            Seq(projectNamePattern: ScReferencePattern)) =>
           findPlaceToFix(call, projectNamePattern.getText).foreach { place =>
             holder.registerProblem(
               place,
@@ -56,8 +57,9 @@ class SbtReplaceProjectWithProjectInInspection extends AbstractInspection {
 }
 
 class SbtReplaceProjectWithProjectInQuickFix(call: ScMethodCall)
-    extends AbstractFixOnPsiElement(SbtBundle("sbt.inspection.projectIn.name"),
-                                    call) {
+    extends AbstractFixOnPsiElement(
+      SbtBundle("sbt.inspection.projectIn.name"),
+      call) {
 
   def doApplyFix(project: Project) = {
     val place = getElement

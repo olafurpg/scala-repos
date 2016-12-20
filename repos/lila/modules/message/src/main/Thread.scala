@@ -67,18 +67,19 @@ object Thread {
            text: String,
            creatorId: String,
            invitedId: String): Thread =
-    Thread(id = Random nextStringUppercase idSize,
-           name = name,
-           createdAt = DateTime.now,
-           updatedAt = DateTime.now,
-           posts = List(
-             Post.make(
-               text = text,
-               isByCreator = true
-             )),
-           creatorId = creatorId,
-           invitedId = invitedId,
-           visibleByUserIds = List(creatorId, invitedId))
+    Thread(
+      id = Random nextStringUppercase idSize,
+      name = name,
+      createdAt = DateTime.now,
+      updatedAt = DateTime.now,
+      posts = List(
+        Post.make(
+          text = text,
+          isByCreator = true
+        )),
+      creatorId = creatorId,
+      invitedId = invitedId,
+      visibleByUserIds = List(creatorId, invitedId))
 
   import lila.db.JsTube
   import JsTube.Helpers._

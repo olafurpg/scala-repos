@@ -106,10 +106,11 @@ class StatsFilter[Req, Rep](statsReceiver: StatsReceiver,
       exceptionStatsHandler: ExceptionStatsHandler,
       timeUnit: TimeUnit
   ) =
-    this(statsReceiver,
-         ResponseClassifier.Default,
-         exceptionStatsHandler,
-         timeUnit)
+    this(
+      statsReceiver,
+      ResponseClassifier.Default,
+      exceptionStatsHandler,
+      timeUnit)
 
   def this(statsReceiver: StatsReceiver,
            exceptionStatsHandler: ExceptionStatsHandler) =

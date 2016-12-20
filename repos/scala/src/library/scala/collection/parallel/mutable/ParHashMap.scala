@@ -37,10 +37,11 @@ class ParHashMap[K, V] private[collection] (
     contents: HashTable.Contents[K, DefaultEntry[K, V]])
     extends ParMap[K, V]
     with GenericParMapTemplate[K, V, ParHashMap]
-    with ParMapLike[K,
-                    V,
-                    ParHashMap[K, V],
-                    scala.collection.mutable.HashMap[K, V]]
+    with ParMapLike[
+      K,
+      V,
+      ParHashMap[K, V],
+      scala.collection.mutable.HashMap[K, V]]
     with ParHashTable[K, DefaultEntry[K, V]]
     with Serializable { self =>
   initWithContents(contents)
@@ -59,10 +60,11 @@ class ParHashMap[K, V] private[collection] (
     new scala.collection.mutable.HashMap[K, V](hashTableContents)
 
   def splitter =
-    new ParHashMapIterator(1,
-                           table.length,
-                           size,
-                           table(0).asInstanceOf[DefaultEntry[K, V]])
+    new ParHashMapIterator(
+      1,
+      table.length,
+      size,
+      table(0).asInstanceOf[DefaultEntry[K, V]])
 
   override def size = tableSize
 
@@ -102,10 +104,11 @@ class ParHashMap[K, V] private[collection] (
                            untilIdx: Int,
                            totalSize: Int,
                            e: DefaultEntry[K, V])
-      extends EntryIterator[(K, V), ParHashMapIterator](start,
-                                                        untilIdx,
-                                                        totalSize,
-                                                        e) {
+      extends EntryIterator[(K, V), ParHashMapIterator](
+        start,
+        untilIdx,
+        totalSize,
+        e) {
     def entry2item(entry: DefaultEntry[K, V]) = (entry.key, entry.value)
 
     def newIterator(idxFrom: Int,
@@ -184,11 +187,11 @@ object ParHashMap extends ParMapFactory[ParHashMap] {
 
 private[mutable] abstract class ParHashMapCombiner[K, V](
     private val tableLoadFactor: Int)
-    extends scala.collection.parallel.BucketCombiner[(K, V),
-                                                     ParHashMap[K, V],
-                                                     DefaultEntry[K, V],
-                                                     ParHashMapCombiner[K, V]](
-      ParHashMapCombiner.numblocks)
+    extends scala.collection.parallel.BucketCombiner[
+      (K, V),
+      ParHashMap[K, V],
+      DefaultEntry[K, V],
+      ParHashMapCombiner[K, V]](ParHashMapCombiner.numblocks)
     with scala.collection.mutable.HashTable.HashUtils[K] {
   private val nonmasklen = ParHashMapCombiner.nonmasklength
   private val seedvalue = 27
@@ -324,8 +327,9 @@ private[mutable] abstract class ParHashMapCombiner[K, V](
     }
     def split = {
       val fp = howmany / 2
-      List(new FillBlocks(buckets, table, offset, fp),
-           new FillBlocks(buckets, table, offset + fp, howmany - fp))
+      List(
+        new FillBlocks(buckets, table, offset, fp),
+        new FillBlocks(buckets, table, offset + fp, howmany - fp))
     }
     override def merge(that: FillBlocks) {
       this.result += that.result

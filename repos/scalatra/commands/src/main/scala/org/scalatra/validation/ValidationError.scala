@@ -121,10 +121,11 @@ class ValidationErrorSerializer(includeCode: Boolean = true,
       ({
         case jo @ JObject(JField("message", _) :: _) ⇒
           implicit val fmts = formats
-          new ValidationError((jo \ "message").extractOrElse(""),
-                              (jo \ "field").extractOpt[String] map FieldName,
-                              (jo \ "code").extractOpt[ErrorCode],
-                              (jo \ "args").children)
+          new ValidationError(
+            (jo \ "message").extractOrElse(""),
+            (jo \ "field").extractOpt[String] map FieldName,
+            (jo \ "code").extractOpt[ErrorCode],
+            (jo \ "args").children)
       }, {
         case ValidationError(message, fieldName, code, args) ⇒
           implicit val fmts = formats

@@ -59,8 +59,9 @@ object PrinterJob {
     * Companion Object for [[scalafx.print.PrinterJob.JobStatus]].
     */
   object JobStatus
-      extends SFXEnumDelegateCompanion[jfxp.PrinterJob.JobStatus,
-                                       PrinterJob.JobStatus] {
+      extends SFXEnumDelegateCompanion[
+        jfxp.PrinterJob.JobStatus,
+        PrinterJob.JobStatus] {
 
     /**
       * The job has been cancelled by the application.
@@ -117,8 +118,9 @@ object PrinterJob {
   /**
     * Added just to satisfy Spec tests.
     */
-  @deprecated(message = "Use createPrinterJob(Printer): PrinterJob instead",
-              since = "8.0")
+  @deprecated(
+    message = "Use createPrinterJob(Printer): PrinterJob instead",
+    since = "8.0")
   def createPrinterJob(printer: jfxp.Printer): jfxp.PrinterJob =
     jfxp.PrinterJob.createPrinterJob(printer)
 }

@@ -209,6 +209,7 @@ abstract class CoderSpec
     input.via(Coder.decoderFlow).join.awaitResult(3.seconds)
 
   def decodeFromIterator(iterator: () ⇒ Iterator[ByteString]): ByteString =
-    Await.result(Source.fromIterator(iterator).via(Coder.decoderFlow).join,
-                 3.seconds)
+    Await.result(
+      Source.fromIterator(iterator).via(Coder.decoderFlow).join,
+      3.seconds)
 }

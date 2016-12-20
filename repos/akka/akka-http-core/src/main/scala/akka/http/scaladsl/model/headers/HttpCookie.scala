@@ -150,26 +150,28 @@ object HttpCookie {
                secure: Boolean = false,
                httpOnly: Boolean = false,
                extension: Option[String] = None): HttpCookie =
-    HttpCookie(pair.name,
-               pair.value,
-               expires,
-               maxAge,
-               domain,
-               path,
-               secure,
-               httpOnly,
-               extension)
+    HttpCookie(
+      pair.name,
+      pair.value,
+      expires,
+      maxAge,
+      domain,
+      path,
+      secure,
+      httpOnly,
+      extension)
 
   import akka.http.impl.model.parser.CharacterClasses._
 
   private[http] def nameChars = tchar
   // http://tools.ietf.org/html/rfc6265#section-4.1.1
   // ; US-ASCII characters excluding CTLs, whitespace DQUOTE, comma, semicolon, and backslash
-  private[http] val valueChars = CharPredicate('\u0021',
-                                               '\u0023' to '\u002B',
-                                               '\u002D' to '\u003A',
-                                               '\u003C' to '\u005B',
-                                               '\u005D' to '\u007E')
+  private[http] val valueChars = CharPredicate(
+    '\u0021',
+    '\u0023' to '\u002B',
+    '\u002D' to '\u003A',
+    '\u003C' to '\u005B',
+    '\u005D' to '\u007E')
   private[http] val rawValueChars = CharacterClasses.`cookie-octet-raw`
   private[http] val domainChars = ALPHANUM ++ ".-"
   private[http] val pathOrExtChars = VCHAR ++ ' ' -- ';'

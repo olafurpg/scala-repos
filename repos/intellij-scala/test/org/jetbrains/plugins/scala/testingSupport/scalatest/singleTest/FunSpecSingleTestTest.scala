@@ -17,13 +17,15 @@ trait FunSpecSingleTestTest extends FunSpecGenerator {
       5,
       9,
       funSpecFileName,
-      checkConfigAndSettings(_,
-                             funSpecClassName,
-                             "FunSpecTest should launch single test"),
+      checkConfigAndSettings(
+        _,
+        funSpecClassName,
+        "FunSpecTest should launch single test"),
       root =>
         checkResultTreeHasExactNamedPath(root, funSpecTestPath: _*) &&
-          checkResultTreeDoesNotHaveNodes(root,
-                                          "should not launch other tests"),
+          checkResultTreeDoesNotHaveNodes(
+            root,
+            "should not launch other tests"),
       debug = true)
   }
 }

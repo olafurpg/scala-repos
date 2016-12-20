@@ -214,12 +214,14 @@ abstract class Parser(initialValueStackSize: Int = 16,
         }
         if (trace eq null) done
         else
-          phase4_collectRuleTraces(reportedErrorIndex,
-                                   principalErrorIndex,
-                                   reportQuiet)(
-            new CollectingRuleTraces(reportedErrorIndex,
-                                     reportQuiet,
-                                     phase3.traceNr + 1),
+          phase4_collectRuleTraces(
+            reportedErrorIndex,
+            principalErrorIndex,
+            reportQuiet)(
+            new CollectingRuleTraces(
+              reportedErrorIndex,
+              reportQuiet,
+              phase3.traceNr + 1),
             traces += trace)
       } else done
     }
@@ -230,18 +232,20 @@ abstract class Parser(initialValueStackSize: Int = 16,
         val principalErrorIndex = phase1_establishPrincipalErrorIndex()
         val p2 = phase2_establishReportedErrorIndex(principalErrorIndex)
         val reportQuiet = phase3_determineReportQuiet(principalErrorIndex)
-        val parseError = phase4_collectRuleTraces(p2.reportedErrorIndex,
-                                                  principalErrorIndex,
-                                                  reportQuiet)()
+        val parseError = phase4_collectRuleTraces(
+          p2.reportedErrorIndex,
+          principalErrorIndex,
+          reportQuiet)()
         scheme.parseError(parseError)
       }
     } catch {
       case e: Parser.Fail ⇒
         val pos = Position(cursor, input)
         scheme.parseError(
-          ParseError(pos,
-                     pos,
-                     RuleTrace(Nil, RuleTrace.Fail(e.expected)) :: Nil))
+          ParseError(
+            pos,
+            pos,
+            RuleTrace(Nil, RuleTrace.Fail(e.expected)) :: Nil))
       case NonFatal(e) ⇒
         scheme.failure(e)
     } finally {
@@ -434,8 +438,9 @@ abstract class Parser(initialValueStackSize: Int = 16,
         catch {
           case Parser.StartTracingException ⇒
             import RuleTrace._
-            __bubbleUp(NonTerminal(StringMatch(string), -ix) :: Nil,
-                       CharMatch(string charAt ix))
+            __bubbleUp(
+              NonTerminal(StringMatch(string), -ix) :: Nil,
+              CharMatch(string charAt ix))
         }
       } else true
 
@@ -466,8 +471,9 @@ abstract class Parser(initialValueStackSize: Int = 16,
         catch {
           case Parser.StartTracingException ⇒
             import RuleTrace._
-            __bubbleUp(NonTerminal(IgnoreCaseString(string), -ix) :: Nil,
-                       IgnoreCaseChar(string charAt ix))
+            __bubbleUp(
+              NonTerminal(IgnoreCaseString(string), -ix) :: Nil,
+              IgnoreCaseChar(string charAt ix))
         }
       } else true
 

@@ -90,21 +90,23 @@ abstract class AbstractTable[T](val tableTag: Tag,
     val fv = Library.==.typed[Boolean](
       unpackp.toNode(targetColumns(aliased.value)),
       unpackp.toNode(sourceColumns))
-    val fk = ForeignKey(name,
-                        toNode,
-                        q.shaped.asInstanceOf[ShapedValue[TT, _]],
-                        targetTable,
-                        unpackp,
-                        sourceColumns,
-                        targetColumns,
-                        onUpdate,
-                        onDelete)
-    new ForeignKeyQuery[TT, U](Filter.ifRefutable(generator, q.toNode, fv),
-                               q.shaped,
-                               IndexedSeq(fk),
-                               q,
-                               generator,
-                               aliased.value)
+    val fk = ForeignKey(
+      name,
+      toNode,
+      q.shaped.asInstanceOf[ShapedValue[TT, _]],
+      targetTable,
+      unpackp,
+      sourceColumns,
+      targetColumns,
+      onUpdate,
+      onDelete)
+    new ForeignKeyQuery[TT, U](
+      Filter.ifRefutable(generator, q.toNode, fv),
+      q.shaped,
+      IndexedSeq(fk),
+      q,
+      generator,
+      aliased.value)
   }
 
   /** Define the primary key for this table.
@@ -114,8 +116,9 @@ abstract class AbstractTable[T](val tableTag: Tag,
     * with Slick). */
   def primaryKey[T](name: String, sourceColumns: T)(
       implicit shape: Shape[_ <: FlatShapeLevel, T, _, _]): PrimaryKey =
-    PrimaryKey(name,
-               ForeignKey.linearizeFieldRefs(shape.toNode(sourceColumns)))
+    PrimaryKey(
+      name,
+      ForeignKey.linearizeFieldRefs(shape.toNode(sourceColumns)))
 
   def tableConstraints: Iterator[Constraint] =
     for {
@@ -140,10 +143,11 @@ abstract class AbstractTable[T](val tableTag: Tag,
   /** Define an index or a unique constraint. */
   def index[T](name: String, on: T, unique: Boolean = false)(
       implicit shape: Shape[_ <: FlatShapeLevel, T, _, _]) =
-    new Index(name,
-              this,
-              ForeignKey.linearizeFieldRefs(shape.toNode(on)),
-              unique)
+    new Index(
+      name,
+      this,
+      ForeignKey.linearizeFieldRefs(shape.toNode(on)),
+      unique)
 
   def indexes: Iterable[Index] =
     (for {

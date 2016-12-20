@@ -54,15 +54,16 @@ trait ToResponse { self: BaseGetPoster =>
         case (server, responseCode) =>
           val respHeaders = slurpApacheHeaders(getter.getResponseHeaders)
 
-          new HttpResponse(baseUrl,
-                           responseCode,
-                           getter.getStatusText,
-                           respHeaders,
-                           for {
-                             st <- Box !! getter.getResponseBodyAsStream
-                             bytes <- tryo(readWholeStream(st))
-                           } yield bytes,
-                           httpClient)
+          new HttpResponse(
+            baseUrl,
+            responseCode,
+            getter.getStatusText,
+            respHeaders,
+            for {
+              st <- Box !! getter.getResponseBodyAsStream
+              bytes <- tryo(readWholeStream(st))
+            } yield bytes,
+            httpClient)
       }
     } catch {
       case e: IOException => new CompleteFailure(baseUrl + fullUrl, Full(e))
@@ -88,15 +89,16 @@ trait ToBoxTheResponse { self: BaseGetPoster =>
           val respHeaders = slurpApacheHeaders(getter.getResponseHeaders)
 
           Full(
-            new TheResponse(baseUrl,
-                            responseCode,
-                            getter.getStatusText,
-                            respHeaders,
-                            for {
-                              st <- Box !! getter.getResponseBodyAsStream
-                              bytes <- tryo(readWholeStream(st))
-                            } yield bytes,
-                            httpClient))
+            new TheResponse(
+              baseUrl,
+              responseCode,
+              getter.getStatusText,
+              respHeaders,
+              for {
+                st <- Box !! getter.getResponseBodyAsStream
+                bytes <- tryo(readWholeStream(st))
+              } yield bytes,
+              httpClient))
       }
     } catch {
       case e: IOException => Failure(baseUrl + fullUrl, Full(e), Empty)

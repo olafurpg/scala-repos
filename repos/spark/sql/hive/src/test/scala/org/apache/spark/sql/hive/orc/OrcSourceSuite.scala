@@ -76,11 +76,13 @@ abstract class OrcSuite
   test("create temporary orc table") {
     checkAnswer(sql("SELECT COUNT(*) FROM normal_orc_source"), Row(10))
 
-    checkAnswer(sql("SELECT * FROM normal_orc_source"),
-                (1 to 10).map(i => Row(i, s"part-$i")))
+    checkAnswer(
+      sql("SELECT * FROM normal_orc_source"),
+      (1 to 10).map(i => Row(i, s"part-$i")))
 
-    checkAnswer(sql("SELECT * FROM normal_orc_source where intField > 5"),
-                (6 to 10).map(i => Row(i, s"part-$i")))
+    checkAnswer(
+      sql("SELECT * FROM normal_orc_source where intField > 5"),
+      (6 to 10).map(i => Row(i, s"part-$i")))
 
     checkAnswer(
       sql(
@@ -91,11 +93,13 @@ abstract class OrcSuite
   test("create temporary orc table as") {
     checkAnswer(sql("SELECT COUNT(*) FROM normal_orc_as_source"), Row(10))
 
-    checkAnswer(sql("SELECT * FROM normal_orc_source"),
-                (1 to 10).map(i => Row(i, s"part-$i")))
+    checkAnswer(
+      sql("SELECT * FROM normal_orc_source"),
+      (1 to 10).map(i => Row(i, s"part-$i")))
 
-    checkAnswer(sql("SELECT * FROM normal_orc_source WHERE intField > 5"),
-                (6 to 10).map(i => Row(i, s"part-$i")))
+    checkAnswer(
+      sql("SELECT * FROM normal_orc_source WHERE intField > 5"),
+      (6 to 10).map(i => Row(i, s"part-$i")))
 
     checkAnswer(
       sql(
@@ -107,11 +111,11 @@ abstract class OrcSuite
     sql(
       "INSERT INTO TABLE normal_orc_source SELECT * FROM orc_temp_table WHERE intField > 5")
 
-    checkAnswer(sql("SELECT * FROM normal_orc_source"),
-                (1 to 5).map(i => Row(i, s"part-$i")) ++ (6 to 10).flatMap {
-                  i =>
-                    Seq.fill(2)(Row(i, s"part-$i"))
-                })
+    checkAnswer(
+      sql("SELECT * FROM normal_orc_source"),
+      (1 to 5).map(i => Row(i, s"part-$i")) ++ (6 to 10).flatMap { i =>
+        Seq.fill(2)(Row(i, s"part-$i"))
+      })
   }
 
   test("overwrite insert") {
@@ -119,8 +123,9 @@ abstract class OrcSuite
         |SELECT * FROM orc_temp_table WHERE intField > 5
       """.stripMargin)
 
-    checkAnswer(sql("SELECT * FROM normal_orc_as_source"),
-                (6 to 10).map(i => Row(i, s"part-$i")))
+    checkAnswer(
+      sql("SELECT * FROM normal_orc_as_source"),
+      (6 to 10).map(i => Row(i, s"part-$i")))
   }
 
   test("write null values") {
@@ -144,8 +149,9 @@ abstract class OrcSuite
 
     df.write.format("orc").saveAsTable("orcNullValues")
 
-    checkAnswer(sql("SELECT * FROM orcNullValues"),
-                Row.fromSeq(Seq.fill(11)(null)))
+    checkAnswer(
+      sql("SELECT * FROM orcNullValues"),
+      Row.fromSeq(Seq.fill(11)(null)))
 
     sql("DROP TABLE IF EXISTS orcNullValues")
   }

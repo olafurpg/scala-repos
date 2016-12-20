@@ -21,8 +21,9 @@ final case class PickleOps[T](picklee: T) {
 final case class UnpickleOps(val thePickle: Pickle) {
   def unpickle[T](implicit unpickler: Unpickler[T], format: PickleFormat): T =
     // TODO - Ideally we get a compiler error if pickle type doesn't match.
-    functions.unpickle(thePickle.asInstanceOf[format.PickleType])(unpickler,
-                                                                  format)
+    functions.unpickle(thePickle.asInstanceOf[format.PickleType])(
+      unpickler,
+      format)
 }
 
 trait Ops {

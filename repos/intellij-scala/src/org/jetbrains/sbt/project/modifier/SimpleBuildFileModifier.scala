@@ -22,10 +22,10 @@ class SimpleBuildFileModifier(
     val libDependencies: Seq[String],
     val resolvers: Seq[String],
     val scalacOptions: Seq[String],
-    val buildFileProviders: List[BuildFileProvider] = List(
-          SimpleModuleBuildFileProvider, ProjectRootBuildFileProvider),
-    val buildFileLocationProviders: List[BuildFileModificationLocationProvider] = List(
-          EndOfFileLocationProvider))
+    val buildFileProviders: List[BuildFileProvider] =
+      List(SimpleModuleBuildFileProvider, ProjectRootBuildFileProvider),
+    val buildFileLocationProviders: List[BuildFileModificationLocationProvider] =
+      List(EndOfFileLocationProvider))
     extends BuildFileModifier {
 
   /**
@@ -37,9 +37,8 @@ class SimpleBuildFileModifier(
       fileToWorkingCopy: mutable.Map[VirtualFile, LightVirtualFile])
     : Option[List[VirtualFile]] = {
     val empty: Option[List[VirtualFile]] = Some(List())
-    requiredElementTypes.foldLeft(empty)(
-        (acc, nextType) =>
-          acc match {
+    requiredElementTypes.foldLeft(empty)((acc, nextType) =>
+      acc match {
         case Some(accList) =>
           addElements(module, nextType, fileToWorkingCopy).map(_ :: accList)
         case _ => None
@@ -55,28 +54,30 @@ class SimpleBuildFileModifier(
     //TODO: rewrite this?
     buildFileProviders
       .map(fileProvider =>
-            fileProvider.findBuildFile(module, elementType, fileToWorkingCopy))
+        fileProvider.findBuildFile(module, elementType, fileToWorkingCopy))
       .toStream
       .map(
-          _.map(buildFileEntry =>
-                locationProvidersStream
-                  .map(locationProvider =>
-                        buildPsiElement(
-                            module.getProject,
-                            Option(if (buildFileEntry.isModuleLocal)
-                                  null else module.getName),
-                            elementType).map(
-                            SimpleBuildFileModifier.addElementsToBuildFile(
-                                module,
-                                locationProvider,
-                                elementType,
-                                buildFileEntry.file,
-                                SimpleBuildFileModifier.newLine(
-                                    module.getProject),
-                                _)
-                      ))
-                  .find(_.isDefined)
-                  .flatten))
+        _.map(
+          buildFileEntry =>
+            locationProvidersStream
+              .map(
+                locationProvider =>
+                  buildPsiElement(
+                    module.getProject,
+                    Option(if (buildFileEntry.isModuleLocal)
+                      null
+                    else module.getName),
+                    elementType).map(
+                    SimpleBuildFileModifier.addElementsToBuildFile(
+                      module,
+                      locationProvider,
+                      elementType,
+                      buildFileEntry.file,
+                      SimpleBuildFileModifier.newLine(module.getProject),
+                      _)
+                ))
+              .find(_.isDefined)
+              .flatten))
       .map(opt => opt.flatten.flatten)
       .find(_.isDefined)
       .flatten
@@ -89,15 +90,19 @@ class SimpleBuildFileModifier(
     elementType match {
       case BuildFileElementType.libraryDependencyElementId =>
         SimpleBuildFileModifier.buildLibraryDependenciesPsi(
-            project, inName, libDependencies)
+          project,
+          inName,
+          libDependencies)
       case BuildFileElementType.resolverElementId =>
         SimpleBuildFileModifier.buildResolversPsi(project, inName, resolvers)
       case BuildFileElementType.`scalacOptionsElementId` =>
         SimpleBuildFileModifier.buildScalacOptionsPsi(
-            project, Some("Test"), scalacOptions)
+          project,
+          Some("Test"),
+          scalacOptions)
       case _ =>
         throw new IllegalArgumentException(
-            "Unsupported build file element type: " + elementType)
+          "Unsupported build file element type: " + elementType)
     }
   }
 
@@ -110,7 +115,7 @@ class SimpleBuildFileModifier(
         scalacOptions.nonEmpty
       case elementType =>
         throw new IllegalArgumentException(
-            "Unsupported build file element type: " + elementType)
+          "Unsupported build file element type: " + elementType)
     }
   }
 }
@@ -122,8 +127,8 @@ object SimpleBuildFileModifier {
 
   def createSeqString(normalIndent: String, seq: Seq[String]): String =
     "Seq(\n" +
-    seq.tail.fold(normalIndent + seq.head)(_ + ",\n" + normalIndent + _) +
-    "\n)"
+      seq.tail.fold(normalIndent + seq.head)(_ + ",\n" + normalIndent + _) +
+      "\n)"
 
   def createSeqPsiExpr(project: IJProject,
                        inName: Option[String],
@@ -132,11 +137,10 @@ object SimpleBuildFileModifier {
     if (seq.isEmpty) None
     else
       Some(
-          ScalaPsiElementFactory.createExpressionFromText(
-              prefix + inName.map(" in " + _).getOrElse("") + " ++= " +
-              createSeqString(FormatterUtil.getNormalIndentString(project),
-                              seq),
-              PsiManager.getInstance(project)))
+        ScalaPsiElementFactory.createExpressionFromText(
+          prefix + inName.map(" in " + _).getOrElse("") + " ++= " +
+            createSeqString(FormatterUtil.getNormalIndentString(project), seq),
+          PsiManager.getInstance(project)))
 
   def buildLibraryDependenciesPsi(
       project: IJProject,
@@ -155,9 +159,9 @@ object SimpleBuildFileModifier {
     createSeqPsiExpr(project, inName, "scalacOptions", options)
 
   val supportedElementTypes: List[BuildFileElementType] = List(
-      BuildFileElementType.libraryDependencyElementId,
-      BuildFileElementType.resolverElementId,
-      BuildFileElementType.scalacOptionsElementId)
+    BuildFileElementType.libraryDependencyElementId,
+    BuildFileElementType.resolverElementId,
+    BuildFileElementType.scalacOptionsElementId)
 
   def addElementsToBuildFile(
       module: IJModule,
@@ -172,11 +176,11 @@ object SimpleBuildFileModifier {
         if (children.isEmpty) {
           for (psiElement <- psiElements) parent.add(psiElement)
         } else if (index == 0) {
-          for (psiElement <- psiElements) parent.addBefore(
-              psiElement, children(0))
+          for (psiElement <- psiElements)
+            parent.addBefore(psiElement, children(0))
         } else {
-          for (psiElement <- psiElements.reverse) parent.addAfter(
-              psiElement, children(index - 1))
+          for (psiElement <- psiElements.reverse)
+            parent.addAfter(psiElement, children(index - 1))
         }
         val psiFile = parent.getContainingFile
         val res = psiFile.getVirtualFile
@@ -196,7 +200,11 @@ object SimpleBuildFileModifier {
       buildFile: PsiFile,
       psiElement: PsiElement) = {
     addElementsToBuildFile(
-        module, locationProvider, elementType, buildFile, psiElement)
+      module,
+      locationProvider,
+      elementType,
+      buildFile,
+      psiElement)
   }
 
   def removeElementFromBuildFile(
@@ -206,7 +214,10 @@ object SimpleBuildFileModifier {
       elementType: BuildFileElementType,
       elementCondition: PsiElement => Boolean) = {
     locationProvider.getModifyOrRemoveElement(
-        module, elementType, elementCondition, buildFile) match {
+      module,
+      elementType,
+      elementCondition,
+      buildFile) match {
       case Some(element) =>
         val res = element.getContainingFile
         element.delete()
@@ -223,7 +234,10 @@ object SimpleBuildFileModifier {
       elementCondition: PsiElement => Boolean,
       modifyFunction: PsiElement => PsiElement) = {
     locationProvider.getModifyOrRemoveElement(
-        module, elementType, elementCondition, buildFile) match {
+      module,
+      elementType,
+      elementCondition,
+      buildFile) match {
       case Some(element) =>
         val res = element.getContainingFile
         element.replace(modifyFunction(element))

@@ -118,10 +118,11 @@ private[ui] object RDDOperationGraph extends Logging {
       // TODO: differentiate between the intention to cache an RDD and whether it's actually cached
       val node = nodes.getOrElseUpdate(
         rdd.id,
-        RDDOperationNode(rdd.id,
-                         rdd.name,
-                         rdd.storageLevel != StorageLevel.NONE,
-                         rdd.callSite))
+        RDDOperationNode(
+          rdd.id,
+          rdd.name,
+          rdd.storageLevel != StorageLevel.NONE,
+          rdd.callSite))
 
       if (rdd.scope.isEmpty) {
         // This RDD has no encompassing scope, so we put it directly in the root cluster
@@ -138,9 +139,9 @@ private[ui] object RDDOperationGraph extends Logging {
         val rddClusters = rddScopes.map { scope =>
           val clusterId = scope.id
           val clusterName = scope.name.replaceAll("\\n", "\\\\n")
-          clusters.getOrElseUpdate(clusterId,
-                                   new RDDOperationCluster(clusterId,
-                                                           clusterName))
+          clusters.getOrElseUpdate(
+            clusterId,
+            new RDDOperationCluster(clusterId, clusterName))
         }
         // Build the cluster hierarchy for this RDD
         rddClusters.sliding(2).foreach { pc =>

@@ -53,10 +53,11 @@ trait OutputHelpers {
                   pkg: String,
                   container: String = "Tables",
                   fileName: String = "Tables.scala") {
-    writeStringToFile(packageCode(profile, pkg, container, parentType),
-                      folder,
-                      pkg,
-                      fileName)
+    writeStringToFile(
+      packageCode(profile, pkg, container, parentType),
+      folder,
+      pkg,
+      fileName)
   }
 
   /**

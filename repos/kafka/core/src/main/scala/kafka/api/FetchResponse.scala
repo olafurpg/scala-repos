@@ -36,9 +36,10 @@ object FetchResponsePartitionData {
     val messageSetBuffer = buffer.slice()
     messageSetBuffer.limit(messageSetSize)
     buffer.position(buffer.position + messageSetSize)
-    new FetchResponsePartitionData(error,
-                                   hw,
-                                   new ByteBufferMessageSet(messageSetBuffer))
+    new FetchResponsePartitionData(
+      error,
+      hw,
+      new ByteBufferMessageSet(messageSetBuffer))
   }
 
   val headerSize =
@@ -254,8 +255,8 @@ case class FetchResponse(
       case Some(partitionData) => partitionData
       case _ =>
         throw new IllegalArgumentException(
-          "No partition %s in fetch response %s".format(topicAndPartition,
-                                                        this.toString))
+          "No partition %s in fetch response %s"
+            .format(topicAndPartition, this.toString))
     }
   }
 

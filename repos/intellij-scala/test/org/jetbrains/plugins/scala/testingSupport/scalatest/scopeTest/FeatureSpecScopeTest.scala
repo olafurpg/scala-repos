@@ -18,16 +18,19 @@ trait FeatureSpecScopeTest extends FeatureSpecGenerator {
 
   def testFeatureSpecScope() {
     addFeatureSpec()
-    val testNames = Seq("Feature: Feature 1 Scenario: Scenario A",
-                        "Feature: Feature 1 Scenario: Scenario B")
-    val aPath = List("[root]",
-                     "FeatureSpecTest",
-                     "Feature: Feature 1",
-                     "Scenario: Scenario A")
-    val bPath = List("[root]",
-                     "FeatureSpecTest",
-                     "Feature: Feature 1",
-                     "Scenario: Scenario B")
+    val testNames = Seq(
+      "Feature: Feature 1 Scenario: Scenario A",
+      "Feature: Feature 1 Scenario: Scenario B")
+    val aPath = List(
+      "[root]",
+      "FeatureSpecTest",
+      "Feature: Feature 1",
+      "Scenario: Scenario A")
+    val bPath = List(
+      "[root]",
+      "FeatureSpecTest",
+      "Feature: Feature 1",
+      "Scenario: Scenario B")
 
     runTestByLocation(
       3,

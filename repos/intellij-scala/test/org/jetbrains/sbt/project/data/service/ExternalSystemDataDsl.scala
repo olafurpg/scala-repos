@@ -70,9 +70,10 @@ object ExternalSystemDataDsl {
   class project {
 
     def build: ProjectNode = {
-      val node = new ProjectNode(attributes.getOrFail(name),
-                                 attributes.getOrFail(ideDirectoryPath),
-                                 attributes.getOrFail(linkedProjectPath))
+      val node = new ProjectNode(
+        attributes.getOrFail(name),
+        attributes.getOrFail(ideDirectoryPath),
+        attributes.getOrFail(linkedProjectPath))
 
       val moduleToNode = {
         val allModules = attributes.get(modules).getOrElse(Seq.empty)
@@ -112,9 +113,10 @@ object ExternalSystemDataDsl {
           module.getLibraryDependencies.foreach { dependency =>
             libraryToNode.get(dependency).foreach { libraryNode =>
               moduleNode.add(
-                new LibraryDependencyNode(moduleNode,
-                                          libraryNode,
-                                          LibraryLevel.PROJECT))
+                new LibraryDependencyNode(
+                  moduleNode,
+                  libraryNode,
+                  LibraryLevel.PROJECT))
             }
           }
       }
@@ -134,11 +136,12 @@ object ExternalSystemDataDsl {
     val typeId: String
 
     def build: ModuleNode = {
-      val node = new ModuleNode(typeId,
-                                attributes.getOrFail(name),
-                                attributes.getOrFail(name),
-                                attributes.getOrFail(moduleFileDirectoryPath),
-                                attributes.getOrFail(externalConfigPath))
+      val node = new ModuleNode(
+        typeId,
+        attributes.getOrFail(name),
+        attributes.getOrFail(name),
+        attributes.getOrFail(moduleFileDirectoryPath),
+        attributes.getOrFail(externalConfigPath))
       attributes.get(libraries).foreach { libs =>
         libs.map(_.build).foreach { libNode =>
           node.add(libNode)

@@ -63,15 +63,16 @@ object LogQuery {
     def extractKey(line: String): (String, String, String) = {
       apacheLogRegex.findFirstIn(line) match {
         case Some(
-            apacheLogRegex(ip,
-                           _,
-                           user,
-                           dateTime,
-                           query,
-                           status,
-                           bytes,
-                           referer,
-                           ua)) =>
+            apacheLogRegex(
+              ip,
+              _,
+              user,
+              dateTime,
+              query,
+              status,
+              bytes,
+              referer,
+              ua)) =>
           if (user != "\"-\"") (ip, user, query)
           else (null, null, null)
         case _ => (null, null, null)
@@ -81,15 +82,16 @@ object LogQuery {
     def extractStats(line: String): Stats = {
       apacheLogRegex.findFirstIn(line) match {
         case Some(
-            apacheLogRegex(ip,
-                           _,
-                           user,
-                           dateTime,
-                           query,
-                           status,
-                           bytes,
-                           referer,
-                           ua)) =>
+            apacheLogRegex(
+              ip,
+              _,
+              user,
+              dateTime,
+              query,
+              status,
+              bytes,
+              referer,
+              ua)) =>
           new Stats(1, bytes.toInt)
         case _ => new Stats(1, 0)
       }

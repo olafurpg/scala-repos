@@ -46,8 +46,8 @@ private[akka] class Mailboxes(val settings: ActorSystem.Settings,
       envelope.message match {
         case _: DeadLetter ⇒ // actor subscribing to DeadLetter, drop it
         case msg ⇒
-          deadLetters.tell(DeadLetter(msg, envelope.sender, receiver),
-                           envelope.sender)
+          deadLetters
+            .tell(DeadLetter(msg, envelope.sender, receiver), envelope.sender)
       }
     def dequeue() = null
     def hasMessages = false
@@ -239,8 +239,9 @@ private[akka] class Mailboxes(val settings: ActorSystem.Settings,
                 throw new ConfigurationException(
                   s"The setting mailbox-type, defined in [$id] is empty")
               case fqcn ⇒
-                val args = List(classOf[ActorSystem.Settings] -> settings,
-                                classOf[Config] -> conf)
+                val args = List(
+                  classOf[ActorSystem.Settings] -> settings,
+                  classOf[Config] -> conf)
                 dynamicAccess
                   .createInstanceFor[MailboxType](fqcn, args)
                   .recover({

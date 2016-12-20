@@ -54,8 +54,9 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
 
   test("get ports from multiple ranges, requirePorts") {
     val app =
-      AppDefinition(portDefinitions = PortDefinitions(80, 81, 82, 83, 100),
-                    requirePorts = true)
+      AppDefinition(
+        portDefinitions = PortDefinitions(80, 81, 82, 83, 100),
+        requirePorts = true)
     val portsResource = RangesResource(
       Resource.PORTS,
       Seq(protos.Range(80, 83), protos.Range(100, 100))
@@ -76,8 +77,9 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
 
   // #2865 Multiple explicit ports are mixed up in task json
   test("get ports with requirePorts preserves the ports order") {
-    val app = AppDefinition(portDefinitions = PortDefinitions(100, 80),
-                            requirePorts = true)
+    val app = AppDefinition(
+      portDefinitions = PortDefinitions(100, 80),
+      requirePorts = true)
     val offer =
       MarathonTestHelper.makeBasicOffer(beginPort = 70, endPort = 200).build
     val matcher = new PortsMatcher(app, offer, ResourceSelector.wildcard)
@@ -161,8 +163,9 @@ class PortsMatcherTest extends MarathonSpec with Matchers {
   }
 
   test("fail if required ports are not available") {
-    val app = AppDefinition(portDefinitions = PortDefinitions(80, 81, 82),
-                            requirePorts = true)
+    val app = AppDefinition(
+      portDefinitions = PortDefinitions(80, 81, 82),
+      requirePorts = true)
     val offer = MarathonTestHelper
       .makeBasicOffer(beginPort = 31000, endPort = 32000)
       .build

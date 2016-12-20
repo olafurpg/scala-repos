@@ -43,20 +43,22 @@ case class LInsert(key: ChannelBuffer,
   val command = Commands.LINSERT
   override def toChannelBuffer =
     RedisCodec.toUnifiedFormat(
-      Seq(CommandBytes.LINSERT,
-          key,
-          StringToChannelBuffer(relativePosition),
-          pivot,
-          value))
+      Seq(
+        CommandBytes.LINSERT,
+        key,
+        StringToChannelBuffer(relativePosition),
+        pivot,
+        value))
 }
 
 object LInsert {
   def apply(args: Seq[Array[Byte]]): LInsert = {
     val list = trimList(args, 4, Commands.LINSERT)
-    LInsert(ChannelBuffers.wrappedBuffer(list(0)),
-            BytesToString(list(1)),
-            ChannelBuffers.wrappedBuffer(list(2)),
-            ChannelBuffers.wrappedBuffer(list(3)))
+    LInsert(
+      ChannelBuffers.wrappedBuffer(list(0)),
+      BytesToString(list(1)),
+      ChannelBuffers.wrappedBuffer(list(2)),
+      ChannelBuffers.wrappedBuffer(list(3)))
   }
 }
 
@@ -82,8 +84,9 @@ case class LPush(key: ChannelBuffer, values: Seq[ChannelBuffer])
 object LPush {
   def apply(args: List[Array[Byte]]): LPush = args match {
     case head :: tail =>
-      LPush(ChannelBuffers.wrappedBuffer(head),
-            tail map ChannelBuffers.wrappedBuffer)
+      LPush(
+        ChannelBuffers.wrappedBuffer(head),
+        tail map ChannelBuffers.wrappedBuffer)
     case _ => throw ClientError("Invalid use of LPush")
   }
 }
@@ -105,9 +108,10 @@ object LRem {
     val count = RequireClientProtocol.safe {
       NumberFormat.toInt(BytesToString(list(1)))
     }
-    LRem(ChannelBuffers.wrappedBuffer(list(0)),
-         count,
-         ChannelBuffers.wrappedBuffer(list(2)))
+    LRem(
+      ChannelBuffers.wrappedBuffer(list(0)),
+      count,
+      ChannelBuffers.wrappedBuffer(list(2)))
   }
 }
 
@@ -116,10 +120,11 @@ case class LSet(key: ChannelBuffer, index: Long, value: ChannelBuffer)
     with StrictValueCommand {
   val command = Commands.LSET
   override def toChannelBuffer = {
-    val commandArgs = List(CommandBytes.LSET,
-                           key,
-                           StringToChannelBuffer(index.toString),
-                           value)
+    val commandArgs = List(
+      CommandBytes.LSET,
+      key,
+      StringToChannelBuffer(index.toString),
+      value)
     RedisCodec.toUnifiedFormat(commandArgs)
   }
 }
@@ -130,9 +135,10 @@ object LSet {
     val index = RequireClientProtocol.safe {
       NumberFormat.toInt(BytesToString(list(1)))
     }
-    LSet(ChannelBuffers.wrappedBuffer(list(0)),
-         index,
-         ChannelBuffers.wrappedBuffer(list(2)))
+    LSet(
+      ChannelBuffers.wrappedBuffer(list(0)),
+      index,
+      ChannelBuffers.wrappedBuffer(list(2)))
   }
 }
 
@@ -145,8 +151,9 @@ object LRange {
   def apply(args: Seq[Array[Byte]]): LRange = {
     val list = trimList(args, 3, Commands.LRANGE)
     val (start, end) = RequireClientProtocol.safe {
-      Tuple2(NumberFormat.toInt(BytesToString(list(1))),
-             NumberFormat.toInt(BytesToString(list(2))))
+      Tuple2(
+        NumberFormat.toInt(BytesToString(list(1))),
+        NumberFormat.toInt(BytesToString(list(2))))
     }
     LRange(ChannelBuffers.wrappedBuffer(list(0)), start, end)
   }
@@ -174,8 +181,9 @@ case class RPush(key: ChannelBuffer, values: List[ChannelBuffer])
 object RPush {
   def apply(args: List[Array[Byte]]): RPush = args match {
     case head :: tail =>
-      RPush(ChannelBuffers.wrappedBuffer(head),
-            tail map ChannelBuffers.wrappedBuffer)
+      RPush(
+        ChannelBuffers.wrappedBuffer(head),
+        tail map ChannelBuffers.wrappedBuffer)
     case _ => throw ClientError("Invalid use of RPush")
   }
 }
@@ -189,8 +197,9 @@ object LTrim {
   def apply(args: Seq[Array[Byte]]): LTrim = {
     val list = trimList(args, 3, Commands.LTRIM)
     val (start, end) = RequireClientProtocol.safe {
-      Tuple2(NumberFormat.toInt(BytesToString(list(1))),
-             NumberFormat.toInt(BytesToString(list(2))))
+      Tuple2(
+        NumberFormat.toInt(BytesToString(list(1))),
+        NumberFormat.toInt(BytesToString(list(2))))
     }
     LTrim(ChannelBuffers.wrappedBuffer(list(0)), start, end)
   }
@@ -203,9 +212,10 @@ trait ListRangeCommand extends StrictKeyCommand {
 
   override def toChannelBuffer = {
     RedisCodec.toUnifiedFormat(
-      Seq(StringToChannelBuffer(command),
-          key,
-          StringToChannelBuffer(start.toString),
-          StringToChannelBuffer(end.toString)))
+      Seq(
+        StringToChannelBuffer(command),
+        key,
+        StringToChannelBuffer(start.toString),
+        StringToChannelBuffer(end.toString)))
   }
 }

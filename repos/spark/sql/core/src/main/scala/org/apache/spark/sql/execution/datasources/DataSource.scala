@@ -165,9 +165,10 @@ case class DataSource(sqlContext: SQLContext,
           new HDFSFileCatalog(sqlContext, options, globbedPaths, None)
         val dataSchema = userSpecifiedSchema
           .orElse {
-            format.inferSchema(sqlContext,
-                               caseInsensitiveOptions,
-                               fileCatalog.allFiles())
+            format.inferSchema(
+              sqlContext,
+              caseInsensitiveOptions,
+              fileCatalog.allFiles())
           }
           .getOrElse {
             throw new AnalysisException(
@@ -186,12 +187,13 @@ case class DataSource(sqlContext: SQLContext,
                 options = options.filterKeys(_ != "path")).resolveRelation()))
         }
 
-        new FileStreamSource(sqlContext,
-                             metadataPath,
-                             path,
-                             Some(dataSchema),
-                             className,
-                             dataFrameBuilder)
+        new FileStreamSource(
+          sqlContext,
+          metadataPath,
+          path,
+          Some(dataSchema),
+          className,
+          dataFrameBuilder)
       case _ =>
         throw new UnsupportedOperationException(
           s"Data source $className does not support streamed reading")
@@ -252,15 +254,17 @@ case class DataSource(sqlContext: SQLContext,
           })
         }
 
-        val fileCatalog: FileCatalog = new HDFSFileCatalog(sqlContext,
-                                                           options,
-                                                           globbedPaths,
-                                                           partitionSchema)
+        val fileCatalog: FileCatalog = new HDFSFileCatalog(
+          sqlContext,
+          options,
+          globbedPaths,
+          partitionSchema)
         val dataSchema = userSpecifiedSchema
           .orElse {
-            format.inferSchema(sqlContext,
-                               caseInsensitiveOptions,
-                               fileCatalog.allFiles())
+            format.inferSchema(
+              sqlContext,
+              caseInsensitiveOptions,
+              fileCatalog.allFiles())
           }
           .getOrElse {
             throw new AnalysisException(
@@ -268,14 +272,14 @@ case class DataSource(sqlContext: SQLContext,
                 "It must be specified manually")
           }
 
-        HadoopFsRelation(sqlContext,
-                         fileCatalog,
-                         partitionSchema =
-                           fileCatalog.partitionSpec().partitionColumns,
-                         dataSchema = dataSchema.asNullable,
-                         bucketSpec = bucketSpec,
-                         format,
-                         options)
+        HadoopFsRelation(
+          sqlContext,
+          fileCatalog,
+          partitionSchema = fileCatalog.partitionSpec().partitionColumns,
+          dataSchema = dataSchema.asNullable,
+          bucketSpec = bucketSpec,
+          format,
+          options)
 
       case _ =>
         throw new AnalysisException(
@@ -313,9 +317,10 @@ case class DataSource(sqlContext: SQLContext,
         }
 
         val caseSensitive = sqlContext.conf.caseSensitiveAnalysis
-        PartitioningUtils.validatePartitionColumnDataTypes(data.schema,
-                                                           partitionColumns,
-                                                           caseSensitive)
+        PartitioningUtils.validatePartitionColumnDataTypes(
+          data.schema,
+          partitionColumns,
+          caseSensitive)
 
         val equality =
           if (sqlContext.conf.caseSensitiveAnalysis) {

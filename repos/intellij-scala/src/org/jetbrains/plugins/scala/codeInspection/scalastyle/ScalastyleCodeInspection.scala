@@ -112,24 +112,26 @@ class ScalastyleCodeInspection extends LocalInspectionTool {
           }
 
         result.flatMap {
-          case StyleError(_,
-                          _,
-                          key,
-                          level,
-                          args,
-                          Some(line),
-                          column,
-                          customMessage) =>
+          case StyleError(
+              _,
+              _,
+              key,
+              level,
+              args,
+              Some(line),
+              column,
+              customMessage) =>
             findPsiElement(line, column)
               .filter(e => e.isPhysical && !e.getTextRange.isEmpty)
               .map { e =>
                 val message = Messages.format(key, args, customMessage)
-                manager.createProblemDescriptor(e,
-                                                message,
-                                                Array.empty[LocalQuickFix],
-                                                levelToProblemType(level),
-                                                true,
-                                                false)
+                manager.createProblemDescriptor(
+                  e,
+                  message,
+                  Array.empty[LocalQuickFix],
+                  levelToProblemType(level),
+                  true,
+                  false)
               }
 
           case _ => None

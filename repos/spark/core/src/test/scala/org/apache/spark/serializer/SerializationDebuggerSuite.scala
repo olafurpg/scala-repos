@@ -162,25 +162,29 @@ class SerializationDebuggerSuite
       }
     }
 
-    findAndAssert(false,
-                  new SerializableClassWithWriteReplace(
-                    new ExternalizableClass(
-                      new SerializableSubclass(
-                        new SerializableArray(
-                          Array(new SerializableClass1,
-                                new SerializableClass2(new NotSerializable))
-                        )
-                      ))))
+    findAndAssert(
+      false,
+      new SerializableClassWithWriteReplace(
+        new ExternalizableClass(
+          new SerializableSubclass(
+            new SerializableArray(
+              Array(
+                new SerializableClass1,
+                new SerializableClass2(new NotSerializable))
+            )
+          ))))
 
-    findAndAssert(true,
-                  new SerializableClassWithWriteReplace(
-                    new ExternalizableClass(
-                      new SerializableSubclass(
-                        new SerializableArray(
-                          Array(new SerializableClass1,
-                                new SerializableClass2(new SerializableClass1))
-                        )
-                      ))))
+    findAndAssert(
+      true,
+      new SerializableClassWithWriteReplace(
+        new ExternalizableClass(
+          new SerializableSubclass(
+            new SerializableArray(
+              Array(
+                new SerializableClass1,
+                new SerializableClass2(new SerializableClass1))
+            )
+          ))))
   }
 
   test("improveException") {

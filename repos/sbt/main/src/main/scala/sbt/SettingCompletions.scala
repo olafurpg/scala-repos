@@ -50,10 +50,11 @@ private[sbt] object SettingCompletions {
       .keys
     val projectScope = Load.projectScope(currentRef)
     def resolve(s: Setting[_]): Seq[Setting[_]] =
-      Load.transformSettings(projectScope,
-                             currentRef.build,
-                             rootProject,
-                             s :: Nil)
+      Load.transformSettings(
+        projectScope,
+        currentRef.build,
+        rootProject,
+        s :: Nil)
     def rescope[T](setting: Setting[T]): Seq[Setting[_]] = {
       val akey = setting.key.key
       val global = ScopedKey(Global, akey)
@@ -75,16 +76,18 @@ private[sbt] object SettingCompletions {
               settings: Seq[Def.Setting[_]],
               arg: String): SetResult = {
     import extracted._
-    val append = Load.transformSettings(Load.projectScope(currentRef),
-                                        currentRef.build,
-                                        rootProject,
-                                        settings)
+    val append = Load.transformSettings(
+      Load.projectScope(currentRef),
+      currentRef.build,
+      rootProject,
+      settings)
     val newSession =
       session.appendSettings(append map (a => (a, arg.split('\n').toList)))
     val struct = extracted.structure
-    val r = relation(newSession.mergeSettings, true)(structure.delegates,
-                                                     structure.scopeLocal,
-                                                     implicitly)
+    val r = relation(newSession.mergeSettings, true)(
+      structure.delegates,
+      structure.scopeLocal,
+      implicitly)
     setResult(newSession, r, append)
   }
 
@@ -148,15 +151,17 @@ private[sbt] object SettingCompletions {
     } toMap;
     def inputScopedKey(
         pred: AttributeKey[_] => Boolean): Parser[ScopedKey[_]] =
-      scopedKeyParser(keyMap.filter { case (_, k) => pred(k) },
-                      settings,
-                      context)
+      scopedKeyParser(
+        keyMap.filter { case (_, k) => pred(k) },
+        settings,
+        context)
     val full = for {
       defineKey <- scopedKeyParser(keyMap, settings, context)
       a <- assign(defineKey)
-      deps <- valueParser(defineKey,
-                          a,
-                          inputScopedKey(keyFilter(defineKey.key)))
+      deps <- valueParser(
+        defineKey,
+        a,
+        inputScopedKey(keyFilter(defineKey.key)))
     } yield
       () // parser is currently only for completion and the parsed data structures are not used
 
@@ -245,8 +250,9 @@ private[sbt] object SettingCompletions {
         completeScope(seen, level, definedChoices, fullChoices)(description).toSet
       }
       Act.optionalAxis(
-        inParser ~> token(Space) ~> token(scalaID(fullChoices, label),
-                                          completions),
+        inParser ~> token(Space) ~> token(
+          scalaID(fullChoices, label),
+          completions),
         This)
     }
     val configurations: Map[String, Configuration] =
@@ -256,10 +262,11 @@ private[sbt] object SettingCompletions {
       c => configScalaID(c.name),
       ck => configurations.get(ck.name).map(_.description),
       "configuration")
-    val taskParser = axisParser[AttributeKey[_]](_.task,
-                                                 k => keyScalaID(k.label),
-                                                 _.description,
-                                                 "task")
+    val taskParser = axisParser[AttributeKey[_]](
+      _.task,
+      k => keyScalaID(k.label),
+      _.description,
+      "task")
     val nonGlobal =
       (configParser ~ taskParser) map {
         case (c, t) => Scope(This, c, t, Global)
@@ -361,8 +368,9 @@ private[sbt] object SettingCompletions {
       val padded = CommandUtil.aligned("", "   ", withDescriptions)
       (padded, in).zipped.map {
         case (line, (id, key)) =>
-          Completion.tokenDisplay(append = appendString(id),
-                                  display = line + "\n")
+          Completion.tokenDisplay(
+            append = appendString(id),
+            display = line + "\n")
       }
     } else
       in map {

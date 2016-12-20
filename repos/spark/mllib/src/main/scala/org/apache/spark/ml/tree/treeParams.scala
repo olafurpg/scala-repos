@@ -127,13 +127,14 @@ private[ml] trait DecisionTreeParams
       " algorithm will cache node IDs for each instance. Caching can speed up training of deeper" +
       " trees.")
 
-  setDefault(maxDepth -> 5,
-             maxBins -> 32,
-             minInstancesPerNode -> 1,
-             minInfoGain -> 0.0,
-             maxMemoryInMB -> 256,
-             cacheNodeIds -> false,
-             checkpointInterval -> 10)
+  setDefault(
+    maxDepth -> 5,
+    maxBins -> 32,
+    minInstancesPerNode -> 1,
+    minInfoGain -> 0.0,
+    maxMemoryInMB -> 256,
+    cacheNodeIds -> false,
+    checkpointInterval -> 10)
 
   /** @group setParam */
   def setMaxDepth(value: Int): this.type = set(maxDepth, value)
@@ -361,11 +362,12 @@ private[ml] trait TreeEnsembleParams extends DecisionTreeParams {
                                  numClasses: Int,
                                  oldAlgo: OldAlgo.Algo,
                                  oldImpurity: OldImpurity): OldStrategy = {
-    super.getOldStrategy(categoricalFeatures,
-                         numClasses,
-                         oldAlgo,
-                         oldImpurity,
-                         getSubsamplingRate)
+    super.getOldStrategy(
+      categoricalFeatures,
+      numClasses,
+      oldAlgo,
+      oldImpurity,
+      getSubsamplingRate)
   }
 }
 
@@ -481,22 +483,25 @@ private[ml] trait GBTParams
   def setStepSize(value: Double): this.type = set(stepSize, value)
 
   override def validateParams(): Unit = {
-    require(ParamValidators.inRange(0,
-                                    1,
-                                    lowerInclusive = false,
-                                    upperInclusive = true)(getStepSize),
-            "GBT parameter stepSize should be in interval (0, 1], " +
-              s"but it given invalid value $getStepSize.")
+    require(
+      ParamValidators.inRange(
+        0,
+        1,
+        lowerInclusive = false,
+        upperInclusive = true)(getStepSize),
+      "GBT parameter stepSize should be in interval (0, 1], " +
+        s"but it given invalid value $getStepSize.")
   }
 
   /** (private[ml]) Create a BoostingStrategy instance to use with the old API. */
   private[ml] def getOldBoostingStrategy(
       categoricalFeatures: Map[Int, Int],
       oldAlgo: OldAlgo.Algo): OldBoostingStrategy = {
-    val strategy = super.getOldStrategy(categoricalFeatures,
-                                        numClasses = 2,
-                                        oldAlgo,
-                                        OldVariance)
+    val strategy = super.getOldStrategy(
+      categoricalFeatures,
+      numClasses = 2,
+      oldAlgo,
+      OldVariance)
     // NOTE: The old API does not support "seed" so we ignore it.
     new OldBoostingStrategy(strategy, getOldLossType, getMaxIter, getStepSize)
   }

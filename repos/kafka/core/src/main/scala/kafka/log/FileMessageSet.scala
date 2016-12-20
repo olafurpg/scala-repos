@@ -83,15 +83,17 @@ class FileMessageSet private[kafka] (@volatile var file: File,
            fileAlreadyExists: Boolean,
            initFileSize: Int,
            preallocate: Boolean) =
-    this(file,
-         channel = FileMessageSet.openChannel(file,
-                                              mutable = true,
-                                              fileAlreadyExists,
-                                              initFileSize,
-                                              preallocate),
-         start = 0,
-         end = (if (!fileAlreadyExists && preallocate) 0 else Int.MaxValue),
-         isSlice = false)
+    this(
+      file,
+      channel = FileMessageSet.openChannel(
+        file,
+        mutable = true,
+        fileAlreadyExists,
+        initFileSize,
+        preallocate),
+      start = 0,
+      end = (if (!fileAlreadyExists && preallocate) 0 else Int.MaxValue),
+      isSlice = false)
 
   /**
     * Create a file message set with mutable option
@@ -121,11 +123,11 @@ class FileMessageSet private[kafka] (@volatile var file: File,
     if (position < 0)
       throw new IllegalArgumentException("Invalid position: " + position)
     if (size < 0) throw new IllegalArgumentException("Invalid size: " + size)
-    new FileMessageSet(file,
-                       channel,
-                       start = this.start + position,
-                       end =
-                         math.min(this.start + position + size, sizeInBytes()))
+    new FileMessageSet(
+      file,
+      channel,
+      start = this.start + position,
+      end = math.min(this.start + position + size, sizeInBytes()))
   }
 
   /**
@@ -240,11 +242,12 @@ class FileMessageSet private[kafka] (@volatile var file: File,
     }
 
     // We use the offset seq to assign offsets so the offset of the messages does not change.
-    new ByteBufferMessageSet(compressionCodec = this.headOption
-                               .map(_.message.compressionCodec)
-                               .getOrElse(NoCompressionCodec),
-                             offsetSeq = offsets,
-                             newMessages: _*)
+    new ByteBufferMessageSet(
+      compressionCodec = this.headOption
+        .map(_.message.compressionCodec)
+        .getOrElse(NoCompressionCodec),
+      offsetSeq = offsets,
+      newMessages: _*)
   }
 
   /**

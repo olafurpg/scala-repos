@@ -27,12 +27,13 @@ package scala
   */
 trait Function2[@specialized(scala.Int, scala.Long, scala.Double) -T1,
                 @specialized(scala.Int, scala.Long, scala.Double) -T2,
-                @specialized(scala.Unit,
-                             scala.Boolean,
-                             scala.Int,
-                             scala.Float,
-                             scala.Long,
-                             scala.Double) +R]
+                @specialized(
+                  scala.Unit,
+                  scala.Boolean,
+                  scala.Int,
+                  scala.Float,
+                  scala.Long,
+                  scala.Double) +R]
     extends AnyRef { self =>
 
   /** Apply the body of this function to the arguments.

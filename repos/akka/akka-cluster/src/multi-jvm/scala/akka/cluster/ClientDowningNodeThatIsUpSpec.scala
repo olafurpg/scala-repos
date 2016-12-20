@@ -65,8 +65,9 @@ abstract class ClientDowningNodeThatIsUpSpec(
 
         markNodeAsUnavailable(thirdAddress)
 
-        awaitMembersUp(numberOfMembers = 3,
-                       canNotBePartOfMemberRing = Set(thirdAddress))
+        awaitMembersUp(
+          numberOfMembers = 3,
+          canNotBePartOfMemberRing = Set(thirdAddress))
         clusterView.members.exists(_.address == thirdAddress) should ===(false)
       }
 
@@ -77,8 +78,9 @@ abstract class ClientDowningNodeThatIsUpSpec(
       runOn(second, fourth) {
         enterBarrier("down-third-node")
 
-        awaitMembersUp(numberOfMembers = 3,
-                       canNotBePartOfMemberRing = Set(thirdAddress))
+        awaitMembersUp(
+          numberOfMembers = 3,
+          canNotBePartOfMemberRing = Set(thirdAddress))
       }
 
       enterBarrier("await-completion")

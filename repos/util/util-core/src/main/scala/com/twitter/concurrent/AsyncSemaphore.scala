@@ -47,10 +47,12 @@ class AsyncSemaphore protected (initialPermits: Int, maxWaiters: Option[Int]) {
   def this(initialPermits: Int, maxWaiters: Int) =
     this(initialPermits, Some(maxWaiters))
 
-  require(maxWaiters.getOrElse(0) >= 0,
-          s"maxWaiters must be non-negative: $maxWaiters")
-  require(initialPermits > 0,
-          s"initialPermits must be positive: $initialPermits")
+  require(
+    maxWaiters.getOrElse(0) >= 0,
+    s"maxWaiters must be non-negative: $maxWaiters")
+  require(
+    initialPermits > 0,
+    s"initialPermits must be positive: $initialPermits")
 
   // access to `closed`, `waitq`, and `availablePermits` is synchronized
   // by locking on `self`

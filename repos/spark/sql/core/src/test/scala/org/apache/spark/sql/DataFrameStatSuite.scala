@@ -57,12 +57,13 @@ class DataFrameStatSuite extends QueryTest with SharedSQLContext {
       val splits = data.randomSplit(Array[Double](1, 2, 3), seed)
       assert(splits.length == 3, "wrong number of splits")
 
-      assert(splits
-               .reduce((a, b) => a.unionAll(b))
-               .sort("id")
-               .collect()
-               .toList == data.collect().toList,
-             "incomplete or wrong split")
+      assert(
+        splits
+          .reduce((a, b) => a.unionAll(b))
+          .sort("id")
+          .collect()
+          .toList == data.collect().toList,
+        "incomplete or wrong split")
 
       val s = splits.map(_.count())
       assert(math.abs(s(0) - 100) < 50) // std =  9.13
@@ -259,8 +260,9 @@ class DataFrameStatSuite extends QueryTest with SharedSQLContext {
   test("sampleBy") {
     val df = sqlContext.range(0, 100).select((col("id") % 3).as("key"))
     val sampled = df.stat.sampleBy("key", Map(0 -> 0.1, 1 -> 0.2), 0L)
-    checkAnswer(sampled.groupBy("key").count().orderBy("key"),
-                Seq(Row(0, 6), Row(1, 11)))
+    checkAnswer(
+      sampled.groupBy("key").count().orderBy("key"),
+      Seq(Row(0, 6), Row(1, 11)))
   }
 
   // This test case only verifies that `DataFrame.countMinSketch()` methods do return
@@ -355,10 +357,11 @@ class DataFrameStatPerfSuite
     logDebug(s"T1 = $t1")
     logDebug("*** Just quantiles ***")
     val t2 = seconds {
-      StatFunctions.multipleApproxQuantiles(df,
-                                            Seq("col1"),
-                                            Seq(0.1, 0.25, 0.5, 0.75, 0.9),
-                                            0.01)
+      StatFunctions.multipleApproxQuantiles(
+        df,
+        Seq("col1"),
+        Seq(0.1, 0.25, 0.5, 0.75, 0.9),
+        0.01)
     }
     logDebug(s"T1 = $t1, T2 = $t2")
   }

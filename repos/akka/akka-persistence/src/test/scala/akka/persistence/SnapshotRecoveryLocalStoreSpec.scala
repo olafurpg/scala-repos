@@ -47,9 +47,10 @@ class SnapshotRecoveryLocalStoreSpec
     super.beforeEach()
 
     val persistentActor1 = system.actorOf(
-      Props(classOf[SaveSnapshotTestPersistentActor],
-            persistenceId,
-            testActor))
+      Props(
+        classOf[SaveSnapshotTestPersistentActor],
+        persistenceId,
+        testActor))
     val persistentActor2 = system.actorOf(
       Props(classOf[SaveSnapshotTestPersistentActor], extendedName, testActor))
     persistentActor1 ! TakeSnapshot
@@ -62,13 +63,15 @@ class SnapshotRecoveryLocalStoreSpec
 
       val recoveringActor =
         system.actorOf(
-          Props(classOf[LoadSnapshotTestPersistentActor],
-                persistenceId,
-                testActor))
+          Props(
+            classOf[LoadSnapshotTestPersistentActor],
+            persistenceId,
+            testActor))
 
       expectMsgPF() {
-        case SnapshotOffer(SnapshotMetadata(`persistenceId`, seqNo, timestamp),
-                           state) ⇒
+        case SnapshotOffer(
+            SnapshotMetadata(`persistenceId`, seqNo, timestamp),
+            state) ⇒
       }
       expectMsg(RecoveryCompleted)
     }

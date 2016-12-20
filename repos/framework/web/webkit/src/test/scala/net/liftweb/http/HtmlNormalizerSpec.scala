@@ -89,16 +89,17 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
           false
         )
 
-      List("testJs1",
-           "testJs2",
-           "testJs3",
-           "testJs4",
-           "testJs5",
-           "testJs6",
-           "testJs7",
-           "testJs8",
-           "testJs9",
-           "testJs10").foreach(js.toJsCmd must contain(_))
+      List(
+        "testJs1",
+        "testJs2",
+        "testJs3",
+        "testJs4",
+        "testJs5",
+        "testJs6",
+        "testJs7",
+        "testJs8",
+        "testJs9",
+        "testJs10").foreach(js.toJsCmd must contain(_))
 
       html.toString must beLike {
         case eventAttributeMatcher(eventAttribute) =>

@@ -124,9 +124,10 @@ object Build extends sbt.Build {
         url("https://github.com/scala-js/scala-js/blob/master/LICENSE")),
       scmInfo :=
         Some(
-          ScmInfo(url("https://github.com/scala-js/scala-js"),
-                  "scm:git:git@github.com:scala-js/scala-js.git",
-                  Some("scm:git:git@github.com:scala-js/scala-js.git"))),
+          ScmInfo(
+            url("https://github.com/scala-js/scala-js"),
+            "scm:git:git@github.com:scala-js/scala-js.git",
+            Some("scm:git:git@github.com:scala-js/scala-js.git"))),
       shouldPartest := {
         val testListDir =
           ((resourceDirectory in (partestSuite, Test)).value / "scala" / "tools" / "partest" / "scalajs" / scalaVersion.value)
@@ -204,9 +205,10 @@ object Build extends sbt.Build {
             m.group(1) + "?" + frag.replace('.', '/') + ".html"
         }
 
-        FileFunction.cached(streams.value.cacheDirectory,
-                            FilesInfo.lastModified,
-                            FilesInfo.exists) {
+        FileFunction.cached(
+          streams.value.cacheDirectory,
+          FilesInfo.lastModified,
+          FilesInfo.exists) {
           files =>
             for {
               file <- files if file != additionalStylesFile
@@ -302,9 +304,10 @@ object Build extends sbt.Build {
           val snapshotsOrReleases =
             if (scalaJSIsSnapshotVersion) "snapshots" else "releases"
           Some(
-            Resolver.sftp(s"scala-js-$snapshotsOrReleases",
-                          "repo.scala-js.org",
-                          s"/home/scalajsrepo/www/repo/$snapshotsOrReleases")(
+            Resolver.sftp(
+              s"scala-js-$snapshotsOrReleases",
+              "repo.scala-js.org",
+              s"/home/scalajsrepo/www/repo/$snapshotsOrReleases")(
               Resolver.ivyStylePatterns) as (user, pass))
         case _ =>
           None
@@ -753,18 +756,20 @@ object Build extends sbt.Build {
 
         val report = updateClassifiers.value
         val scalaLibSourcesJar = report
-          .select(configuration = Set("compile"),
-                  module = moduleFilter(name = "scala-library"),
-                  artifact = artifactFilter(`type` = "src"))
+          .select(
+            configuration = Set("compile"),
+            module = moduleFilter(name = "scala-library"),
+            artifact = artifactFilter(`type` = "src"))
           .headOption
           .getOrElse {
             sys.error(
               s"Could not fetch scala-library sources for version $ver")
           }
 
-        FileFunction.cached(cacheDir / s"fetchScalaSource-$ver",
-                            FilesInfo.lastModified,
-                            FilesInfo.exists) { dependencies =>
+        FileFunction.cached(
+          cacheDir / s"fetchScalaSource-$ver",
+          FilesInfo.lastModified,
+          FilesInfo.exists) { dependencies =>
           s.log.info(s"Unpacking Scala library sources to $trgDir...")
 
           if (trgDir.exists) IO.delete(trgDir)
@@ -1141,8 +1146,9 @@ object Build extends sbt.Build {
 
       List(sharedTestDir / "scala") ++ includeIf(
         sharedTestDir / "require-jdk7",
-        javaVersion.value >= 7) ++ includeIf(sharedTestDir / "require-jdk8",
-                                             javaVersion.value >= 8)
+        javaVersion.value >= 7) ++ includeIf(
+        sharedTestDir / "require-jdk8",
+        javaVersion.value >= 8)
     },
     sources in Test ++= {
       /* Can't add require-sam as unmanagedSourceDirectories because of the use
@@ -1216,8 +1222,9 @@ object Build extends sbt.Build {
           .mkString("; ")
         IO.write(
           outFile,
-          replaced.replace("@Test def workTest(): Unit = sys.error(\"stubs\")",
-                           unitTests))
+          replaced.replace(
+            "@Test def workTest(): Unit = sys.error(\"stubs\")",
+            unitTests))
         Seq(outFile)
       },
         scalacOptions in Test ++= {

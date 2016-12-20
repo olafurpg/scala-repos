@@ -6,8 +6,9 @@ package org.jetbrains.plugins.scala.testingSupport.specs2
   */
 abstract class Specs2DuplicateConfigTest extends Specs2TestCase {
   def testDuplicateConfig(): Unit = {
-    addFileToProject("DuplicateConfigTest.scala",
-                     """
+    addFileToProject(
+      "DuplicateConfigTest.scala",
+      """
         |import org.specs2.mutable.Specification
         |
         |class DuplicateTest extends Specification {
@@ -23,11 +24,13 @@ abstract class Specs2DuplicateConfigTest extends Specs2TestCase {
         |}
       """.stripMargin)
 
-    runDuplicateConfigTest(5,
-                           10,
-                           "DuplicateConfigTest.scala",
-                           checkConfigAndSettings(_,
-                                                  "DuplicateConfigTest",
-                                                  "create only one config"))
+    runDuplicateConfigTest(
+      5,
+      10,
+      "DuplicateConfigTest.scala",
+      checkConfigAndSettings(
+        _,
+        "DuplicateConfigTest",
+        "create only one config"))
   }
 }

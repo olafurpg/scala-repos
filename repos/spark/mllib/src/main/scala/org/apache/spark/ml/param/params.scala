@@ -211,10 +211,11 @@ object ParamValidators {
 
   /** Version of [[inRange()]] which uses inclusive be default: [lowerBound, upperBound] */
   def inRange[T](lowerBound: Double, upperBound: Double): T => Boolean = {
-    inRange[T](lowerBound,
-               upperBound,
-               lowerInclusive = true,
-               upperInclusive = true)
+    inRange[T](
+      lowerBound,
+      upperBound,
+      lowerInclusive = true,
+      upperInclusive = true)
   }
 
   /** Check for value in an allowed set of values. */
@@ -813,8 +814,9 @@ trait Params extends Identifiable with Serializable {
 
   /** Validates that the input param belongs to this instance. */
   private def shouldOwn(param: Param[_]): Unit = {
-    require(param.parent == uid && hasParam(param.name),
-            s"Param $param does not belong to $this.")
+    require(
+      param.parent == uid && hasParam(param.name),
+      s"Param $param does not belong to $this.")
   }
 
   /**

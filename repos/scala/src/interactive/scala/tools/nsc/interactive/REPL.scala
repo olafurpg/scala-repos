@@ -23,8 +23,9 @@ object REPL {
   var reporter: ConsoleReporter = _
 
   private def replError(msg: String) {
-    reporter.error( /*new Position */ FakePos("scalac"),
-                   msg + "\n  scalac -help  gives more information")
+    reporter.error(
+      /*new Position */ FakePos("scalac"),
+      msg + "\n  scalac -help  gives more information")
   }
 
   def process(args: Array[String]) {
@@ -102,9 +103,10 @@ object REPL {
     }
 
     def doStructure(file: String) {
-      comp.askParsedEntered(toSourceFile(file),
-                            keepLoaded = false,
-                            structureResult)
+      comp.askParsedEntered(
+        toSourceFile(file),
+        keepLoaded = false,
+        structureResult)
       show(structureResult)
     }
 

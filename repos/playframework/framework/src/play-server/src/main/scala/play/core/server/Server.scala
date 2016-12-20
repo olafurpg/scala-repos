@@ -172,9 +172,10 @@ private[play] object JavaServerHelper {
       def router = r
     }.application
     Play.start(application)
-    val serverConfig = ServerConfig(mode = mode,
-                                    port = httpPort.map(_.intValue),
-                                    sslPort = sslPort.map(_.intValue))
+    val serverConfig = ServerConfig(
+      mode = mode,
+      port = httpPort.map(_.intValue),
+      sslPort = sslPort.map(_.intValue))
     implicitly[ServerProvider].createServer(serverConfig, application)
   }
 }

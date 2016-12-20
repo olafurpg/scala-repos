@@ -78,8 +78,9 @@ object Partitioner {
   * produce an unexpected or incorrect result.
   */
 class HashPartitioner(partitions: Int) extends Partitioner {
-  require(partitions >= 0,
-          s"Number of partitions ($partitions) cannot be negative.")
+  require(
+    partitions >= 0,
+    s"Number of partitions ($partitions) cannot be negative.")
 
   def numPartitions: Int = partitions
 
@@ -113,8 +114,9 @@ class RangePartitioner[K: Ordering: ClassTag, V](
     extends Partitioner {
 
   // We allow partitions = 0, which happens when sorting an empty RDD under the default settings.
-  require(partitions >= 0,
-          s"Number of partitions cannot be negative but found $partitions.")
+  require(
+    partitions >= 0,
+    s"Number of partitions cannot be negative but found $partitions.")
 
   private var ordering = implicitly[Ordering[K]]
 
@@ -275,9 +277,10 @@ private[spark] object RangePartitioner {
       .mapPartitionsWithIndex { (idx, iter) =>
         val seed = byteswap32(idx ^ (shift << 16))
         val (sample, n) =
-          SamplingUtils.reservoirSampleAndCount(iter,
-                                                sampleSizePerPartition,
-                                                seed)
+          SamplingUtils.reservoirSampleAndCount(
+            iter,
+            sampleSizePerPartition,
+            seed)
         Iterator((idx, n, sample))
       }
       .collect()

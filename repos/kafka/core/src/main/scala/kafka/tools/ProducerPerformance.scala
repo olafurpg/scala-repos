@@ -65,12 +65,13 @@ object ProducerPerformance extends Logging {
 
     for (i <- 0 until config.numThreads) {
       executor.execute(
-        new ProducerThread(i,
-                           config,
-                           totalBytesSent,
-                           totalMessagesSent,
-                           allDone,
-                           rand))
+        new ProducerThread(
+          i,
+          config,
+          totalBytesSent,
+          totalMessagesSent,
+          allDone,
+          rand))
     }
 
     allDone.await()
@@ -105,8 +106,9 @@ object ProducerPerformance extends Logging {
       .describedAs("config file")
       .ofType(classOf[String])
     val topicsOpt = parser
-      .accepts("topics",
-               "REQUIRED: The comma separated list of topics to produce to")
+      .accepts(
+        "topics",
+        "REQUIRED: The comma separated list of topics to produce to")
       .withRequiredArg
       .describedAs("topic1,topic2..")
       .ofType(classOf[String])
@@ -121,14 +123,16 @@ object ProducerPerformance extends Logging {
       .ofType(classOf[java.lang.Integer])
       .defaultsTo(3)
     val producerRetryBackOffMsOpt = parser
-      .accepts("producer-retry-backoff-ms",
-               "The producer retry backoff time in milliseconds")
+      .accepts(
+        "producer-retry-backoff-ms",
+        "The producer retry backoff time in milliseconds")
       .withRequiredArg()
       .ofType(classOf[java.lang.Integer])
       .defaultsTo(100)
     val producerRequestRequiredAcksOpt = parser
-      .accepts("request-num-acks",
-               "Number of acks required for producer request " + "to complete")
+      .accepts(
+        "request-num-acks",
+        "Number of acks required for producer request " + "to complete")
       .withRequiredArg()
       .ofType(classOf[java.lang.Integer])
       .defaultsTo(-1)
@@ -164,9 +168,10 @@ object ProducerPerformance extends Logging {
       "csv-reporter-enabled",
       "If set, the CSV metrics reporter will be enabled")
     val metricsDirectoryOpt = parser
-      .accepts("metrics-dir",
-               "If csv-reporter-enable is set, and this parameter is" +
-                 "set, the csv metrics will be outputted here")
+      .accepts(
+        "metrics-dir",
+        "If csv-reporter-enable is set, and this parameter is" +
+          "set, the csv metrics will be outputted here")
       .withRequiredArg
       .describedAs("metrics directory")
       .ofType(classOf[java.lang.String])
@@ -174,11 +179,12 @@ object ProducerPerformance extends Logging {
       parser.accepts("new-producer", "Use the new producer implementation.")
 
     val options = parser.parse(args: _*)
-    CommandLineUtils.checkRequiredArgs(parser,
-                                       options,
-                                       topicsOpt,
-                                       brokerListOpt,
-                                       numMessagesOpt)
+    CommandLineUtils.checkRequiredArgs(
+      parser,
+      options,
+      topicsOpt,
+      brokerListOpt,
+      numMessagesOpt)
 
     val topicsStr = options.valueOf(topicsOpt)
     val topics = topicsStr.split(",")
@@ -218,8 +224,9 @@ object ProducerPerformance extends Logging {
     if (csvMetricsReporterEnabled) {
       val props = new Properties()
       props.put("kafka.metrics.polling.interval.secs", "1")
-      props.put("kafka.metrics.reporters",
-                "kafka.metrics.KafkaCSVMetricsReporter")
+      props.put(
+        "kafka.metrics.reporters",
+        "kafka.metrics.KafkaCSVMetricsReporter")
       if (options.has(metricsDirectoryOpt))
         props
           .put("kafka.csv.metrics.dir", options.valueOf(metricsDirectoryOpt))
@@ -251,18 +258,24 @@ object ProducerPerformance extends Logging {
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.brokerList)
         props.put(ProducerConfig.SEND_BUFFER_CONFIG, (64 * 1024).toString)
         props.put(ProducerConfig.CLIENT_ID_CONFIG, "producer-performance")
-        props.put(ProducerConfig.ACKS_CONFIG,
-                  config.producerRequestRequiredAcks.toString)
-        props.put(ProducerConfig.RETRIES_CONFIG,
-                  config.producerNumRetries.toString)
-        props.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG,
-                  config.producerRetryBackoffMs.toString)
-        props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG,
-                  config.compressionCodec.name)
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-                  "org.apache.kafka.common.serialization.ByteArraySerializer")
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-                  "org.apache.kafka.common.serialization.ByteArraySerializer")
+        props.put(
+          ProducerConfig.ACKS_CONFIG,
+          config.producerRequestRequiredAcks.toString)
+        props.put(
+          ProducerConfig.RETRIES_CONFIG,
+          config.producerNumRetries.toString)
+        props.put(
+          ProducerConfig.RETRY_BACKOFF_MS_CONFIG,
+          config.producerRetryBackoffMs.toString)
+        props.put(
+          ProducerConfig.COMPRESSION_TYPE_CONFIG,
+          config.compressionCodec.name)
+        props.put(
+          ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+          "org.apache.kafka.common.serialization.ByteArraySerializer")
+        props.put(
+          ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+          "org.apache.kafka.common.serialization.ByteArraySerializer")
         new NewShinyProducer(props)
       } else {
         props.putAll(config.producerProps)
@@ -275,8 +288,9 @@ object ProducerPerformance extends Logging {
           props.put("queue.enqueue.timeout.ms", "-1")
         }
         props.put("client.id", "producer-performance")
-        props.put("request.required.acks",
-                  config.producerRequestRequiredAcks.toString)
+        props.put(
+          "request.required.acks",
+          config.producerRequestRequiredAcks.toString)
         props
           .put("request.timeout.ms", config.producerRequestTimeoutMs.toString)
         props

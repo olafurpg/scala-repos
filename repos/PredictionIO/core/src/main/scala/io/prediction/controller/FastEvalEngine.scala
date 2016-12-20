@@ -72,10 +72,11 @@ object FastEvalEngineWorkflow {
                            algorithmParamsList: Seq[(String, Params)],
                            servingParams: (String, Params)) {
     def this(ep: EngineParams) =
-      this(ep.dataSourceParams,
-           ep.preparatorParams,
-           ep.algorithmParamsList,
-           ep.servingParams)
+      this(
+        ep.dataSourceParams,
+        ep.preparatorParams,
+        ep.algorithmParamsList,
+        ep.servingParams)
   }
 
   def getDataSourceResult[TD, EI, PD, Q, P, A](
@@ -115,8 +116,9 @@ object FastEvalEngineWorkflow {
         prefix.preparatorParams._2)
 
       val result =
-        getDataSourceResult(workflow = workflow,
-                            prefix = new DataSourcePrefix(prefix)).mapValues {
+        getDataSourceResult(
+          workflow = workflow,
+          prefix = new DataSourcePrefix(prefix)).mapValues {
           case (td, _, _) => preparator.prepareBase(workflow.sc, td)
         }
 
@@ -197,8 +199,9 @@ object FastEvalEngineWorkflow {
           val unionAlgoPredicts: RDD[(QX, Seq[P])] =
             workflow.sc.union(algoPredicts).groupByKey.mapValues { ps =>
               {
-                assert(ps.size == algoCount,
-                       "Must have same length as algoCount")
+                assert(
+                  ps.size == algoCount,
+                  "Must have same length as algoCount")
                 // TODO. Check size == algoCount
                 ps.toSeq.sortBy(_._1).map(_._2)
               }
@@ -232,9 +235,9 @@ object FastEvalEngineWorkflow {
         workflow.engine.servingClassMap(prefix.servingParams._1),
         prefix.servingParams._2)
 
-      val algoPredictsMap = getAlgorithmsResult(workflow = workflow,
-                                                prefix =
-                                                  new AlgorithmsPrefix(prefix))
+      val algoPredictsMap = getAlgorithmsResult(
+        workflow = workflow,
+        prefix = new AlgorithmsPrefix(prefix))
 
       val dataSourceResult = getDataSourceResult(
         workflow = workflow,
@@ -320,10 +323,11 @@ class FastEvalEngine[TD, EI, PD, Q, P, A](
     preparatorClassMap: Map[String, Class[_ <: BasePreparator[TD, PD]]],
     algorithmClassMap: Map[String, Class[_ <: BaseAlgorithm[PD, _, Q, P]]],
     servingClassMap: Map[String, Class[_ <: BaseServing[Q, P]]])
-    extends Engine[TD, EI, PD, Q, P, A](dataSourceClassMap,
-                                        preparatorClassMap,
-                                        algorithmClassMap,
-                                        servingClassMap) {
+    extends Engine[TD, EI, PD, Q, P, A](
+      dataSourceClassMap,
+      preparatorClassMap,
+      algorithmClassMap,
+      servingClassMap) {
   @transient override lazy val logger = Logger[this.type]
 
   override def eval(sc: SparkContext,

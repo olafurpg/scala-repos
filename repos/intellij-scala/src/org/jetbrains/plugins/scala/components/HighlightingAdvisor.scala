@@ -108,9 +108,10 @@ class HighlightingAdvisor(project: Project)
 
   private def notifyIfNeeded() {
     if (settings.SUGGEST_TYPE_AWARE_HIGHLIGHTING && !enabled && applicable) {
-      notify("Configure type-aware highlighting for the project",
-             AdviceMessage,
-             NotificationType.WARNING)
+      notify(
+        "Configure type-aware highlighting for the project",
+        AdviceMessage,
+        NotificationType.WARNING)
     }
   }
 

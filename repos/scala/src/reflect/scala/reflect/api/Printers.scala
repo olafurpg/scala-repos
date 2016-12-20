@@ -224,14 +224,15 @@ trait Printers { self: Universe =>
            printKinds: BooleanFlag = None,
            printMirrors: BooleanFlag = None,
            printPositions: BooleanFlag = None): String =
-    render(any,
-           newTreePrinter(_),
-           printTypes,
-           printIds,
-           printOwners,
-           printKinds,
-           printMirrors,
-           printPositions)
+    render(
+      any,
+      newTreePrinter(_),
+      printTypes,
+      printIds,
+      printOwners,
+      printKinds,
+      printMirrors,
+      printPositions)
 
   /** Hook to define what `show(...)` means.
     * @group Printers
@@ -256,14 +257,15 @@ trait Printers { self: Universe =>
                printOwners: BooleanFlag = None,
                printPositions: BooleanFlag = None,
                printRootPkg: Boolean = false) =
-    render(tree,
-           newCodePrinter(_, tree, printRootPkg),
-           printTypes,
-           printIds,
-           printOwners,
-           printKinds = None,
-           printMirrors = None,
-           printPositions)
+    render(
+      tree,
+      newCodePrinter(_, tree, printRootPkg),
+      printTypes,
+      printIds,
+      printOwners,
+      printKinds = None,
+      printMirrors = None,
+      printPositions)
 
   /**
     * Hook to define what `showCode(...)` means.
@@ -285,14 +287,15 @@ trait Printers { self: Universe =>
               printKinds: BooleanFlag = None,
               printMirrors: BooleanFlag = None,
               printPositions: BooleanFlag = None): String =
-    render(any,
-           newRawTreePrinter,
-           printTypes,
-           printIds,
-           printOwners,
-           printKinds,
-           printMirrors,
-           printPositions)
+    render(
+      any,
+      newRawTreePrinter,
+      printTypes,
+      printIds,
+      printOwners,
+      printKinds,
+      printMirrors,
+      printPositions)
 
   /** Hook to define what `showRaw(...)` means.
     * @group Printers

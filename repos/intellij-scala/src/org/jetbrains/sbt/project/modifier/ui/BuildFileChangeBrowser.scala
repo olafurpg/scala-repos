@@ -22,15 +22,16 @@ class BuildFileChangeBrowser(
     val canExcludeChanges: Boolean,
     val fileChangesMap: mutable.Map[VirtualFile,
                                     (BuildFileModifiedStatus, Long)])
-    extends ChangesBrowser(project,
-                           null,
-                           changes,
-                           null,
-                           canExcludeChanges,
-                           true,
-                           null,
-                           ChangesBrowser.MyUseCase.LOCAL_CHANGES,
-                           null) {
+    extends ChangesBrowser(
+      project,
+      null,
+      changes,
+      null,
+      canExcludeChanges,
+      true,
+      null,
+      ChangesBrowser.MyUseCase.LOCAL_CHANGES,
+      null) {
 
   override def afterDiffRefresh() {
     val updatedChanges = new java.util.ArrayList[Change]
@@ -51,12 +52,14 @@ class BuildFileChangeBrowser(
                 if (newModificationStamp != modificationStamp) {
                   val newStatus =
                     modifiedStatus.changeAfterManualModification()
-                  fileChangesMap.put(changeSwapped.getVirtualFile,
-                                     (newStatus, newModificationStamp))
+                  fileChangesMap.put(
+                    changeSwapped.getVirtualFile,
+                    (newStatus, newModificationStamp))
                   BuildFileChange.swap(
-                    new BuildFileChange(changeSwapped.getBeforeRevision,
-                                        changeSwapped.getAfterRevision,
-                                        newStatus))
+                    new BuildFileChange(
+                      changeSwapped.getBeforeRevision,
+                      changeSwapped.getAfterRevision,
+                      newStatus))
                 } else myChange
               case _ => myChange
             }
@@ -74,9 +77,10 @@ class BuildFileChangeBrowser(
     val changesArraySwapped: Array[Change] = for (change <- changesArray)
       yield BuildFileChange.swap(change.asInstanceOf[BuildFileChange])
 
-    ShowDiffAction.showDiffForChange(changesArraySwapped,
-                                     indexInSelection,
-                                     myProject,
-                                     context)
+    ShowDiffAction.showDiffForChange(
+      changesArraySwapped,
+      indexInSelection,
+      myProject,
+      context)
   }
 }

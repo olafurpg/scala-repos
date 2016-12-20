@@ -119,10 +119,11 @@ class ScalaInvalidPropertyKeyInspection extends LocalInspectionTool {
       if (UnresolvedPropertyVisitor.isComputablePropertyExpression(expression))
         return
       val resourceBundleName: Ref[String] = new Ref[String]
-      if (!ScalaI18nUtil.isValidPropertyReference(myManager.getProject,
-                                                  expression,
-                                                  key,
-                                                  resourceBundleName)) {
+      if (!ScalaI18nUtil.isValidPropertyReference(
+            myManager.getProject,
+            expression,
+            key,
+            resourceBundleName)) {
         UnresolvedPropertyVisitor.appendPropertyKeyNotFoundProblem(
           resourceBundleName.get,
           key,
@@ -163,9 +164,10 @@ class ScalaInvalidPropertyKeyInspection extends LocalInspectionTool {
             val annotationParams = new mutable.HashMap[String, AnyRef]
             annotationParams
               .put(AnnotationUtil.PROPERTY_KEY_RESOURCE_BUNDLE_PARAMETER, null)
-            if (!ScalaI18nUtil.mustBePropertyKey(myManager.getProject,
-                                                 expression,
-                                                 annotationParams)) return
+            if (!ScalaI18nUtil.mustBePropertyKey(
+                  myManager.getProject,
+                  expression,
+                  annotationParams)) return
             val paramsCount: java.lang.Integer =
               ScalaI18nUtil.getPropertyValueParamsMaxCount(expression)
             if (paramsCount == -1) return

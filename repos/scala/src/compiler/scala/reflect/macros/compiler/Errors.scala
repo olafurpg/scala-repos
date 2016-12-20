@@ -119,8 +119,9 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
         }
         (rtpe, atpe) match {
           case _ if rtpe eq atpe => success()
-          case (TypeRef(_, RepeatedParamClass, rtpe :: Nil),
-                TypeRef(_, RepeatedParamClass, atpe :: Nil)) =>
+          case (
+              TypeRef(_, RepeatedParamClass, rtpe :: Nil),
+              TypeRef(_, RepeatedParamClass, atpe :: Nil)) =>
             check(rtpe, atpe)
           case (ExprClassOf(_), TreeType()) if rtpe.prefix =:= atpe.prefix =>
             success()
@@ -190,11 +191,12 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
     def MacroImplTargMismatchError(atargs: List[Type],
                                    atparams: List[Symbol]) =
       compatibilityError(
-        NotWithinBoundsErrorMessage("",
-                                    atargs,
-                                    atparams,
-                                    macroDebugVerbose ||
-                                      settings.explaintypes.value))
+        NotWithinBoundsErrorMessage(
+          "",
+          atargs,
+          atparams,
+          macroDebugVerbose ||
+            settings.explaintypes.value))
 
     def MacroImplTparamInstantiationError(atparams: List[Symbol],
                                           e: NoInstance) = {

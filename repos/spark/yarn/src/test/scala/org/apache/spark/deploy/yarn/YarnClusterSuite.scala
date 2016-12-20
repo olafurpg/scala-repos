@@ -145,9 +145,10 @@ class YarnClusterSuite extends BaseYarnClusterSuite {
 
   private def testBasicYarnApp(clientMode: Boolean): Unit = {
     val result = File.createTempFile("result", null, tempDir)
-    val finalState = runSpark(clientMode,
-                              mainClassName(YarnClusterDriver.getClass),
-                              appArgs = Seq(result.getAbsolutePath()))
+    val finalState = runSpark(
+      clientMode,
+      mainClassName(YarnClusterDriver.getClass),
+      appArgs = Seq(result.getAbsolutePath()))
     checkResult(finalState, result)
   }
 
@@ -161,10 +162,11 @@ class YarnClusterSuite extends BaseYarnClusterSuite {
     val sparkHome = sys.props("spark.test.home")
     val pythonPath =
       Seq(s"$sparkHome/python/lib/py4j-0.9.2-src.zip", s"$sparkHome/python")
-    val extraEnv = Map("PYSPARK_ARCHIVES_PATH" -> pythonPath
-                         .map("local:" + _)
-                         .mkString(File.pathSeparator),
-                       "PYTHONPATH" -> pythonPath.mkString(File.pathSeparator))
+    val extraEnv = Map(
+      "PYSPARK_ARCHIVES_PATH" -> pythonPath
+        .map("local:" + _)
+        .mkString(File.pathSeparator),
+      "PYTHONPATH" -> pythonPath.mkString(File.pathSeparator))
 
     val moduleDir =
       if (clientMode) {
@@ -185,11 +187,12 @@ class YarnClusterSuite extends BaseYarnClusterSuite {
       Seq(pyModule.getAbsolutePath(), mod2Archive.getPath()).mkString(",")
     val result = File.createTempFile("result", null, tempDir)
 
-    val finalState = runSpark(clientMode,
-                              primaryPyFile.getAbsolutePath(),
-                              sparkArgs = Seq("--py-files" -> pyFiles),
-                              appArgs = Seq(result.getAbsolutePath()),
-                              extraEnv = extraEnv)
+    val finalState = runSpark(
+      clientMode,
+      primaryPyFile.getAbsolutePath(),
+      sparkArgs = Seq("--py-files" -> pyFiles),
+      appArgs = Seq(result.getAbsolutePath()),
+      extraEnv = extraEnv)
     checkResult(finalState, result)
   }
 
@@ -208,8 +211,9 @@ class YarnClusterSuite extends BaseYarnClusterSuite {
         Seq(driverResult.getAbsolutePath(), executorResult.getAbsolutePath()),
       extraClassPath = Seq(originalJar.getPath()),
       extraJars = Seq("local:" + userJar.getPath()),
-      extraConf = Map("spark.driver.userClassPathFirst" -> "true",
-                      "spark.executor.userClassPathFirst" -> "true"))
+      extraConf = Map(
+        "spark.driver.userClassPathFirst" -> "true",
+        "spark.executor.userClassPathFirst" -> "true"))
     checkResult(finalState, driverResult, "OVERRIDDEN")
     checkResult(finalState, executorResult, "OVERRIDDEN")
   }

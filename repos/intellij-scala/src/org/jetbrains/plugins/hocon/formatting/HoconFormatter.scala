@@ -62,11 +62,12 @@ class HoconFormatter(settings: CodeStyleSettings) {
 
     def dependentLFSpacing(shouldBeSpace: Boolean) = {
       val spaces = if (shouldBeSpace) 1 else 0
-      Spacing.createDependentLFSpacing(spaces,
-                                       spaces,
-                                       parent.getTextRange,
-                                       keepLineBreaks,
-                                       maxBlankLines)
+      Spacing.createDependentLFSpacing(
+        spaces,
+        spaces,
+        parent.getTextRange,
+        keepLineBreaks,
+        maxBlankLines)
     }
 
     def normalSpacing(shouldBeSpace: Boolean) = {
@@ -78,10 +79,11 @@ class HoconFormatter(settings: CodeStyleSettings) {
       Spacing.createSpacing(0, 0, 1, keepLineBreaks, maxBlankLines)
 
     val isLineBreakBetween = parent.getText
-      .subSequence(leftChild.getTextRange.getEndOffset -
-                     parent.getTextRange.getStartOffset,
-                   rightChild.getTextRange.getStartOffset -
-                     parent.getTextRange.getStartOffset)
+      .subSequence(
+        leftChild.getTextRange.getEndOffset -
+          parent.getTextRange.getStartOffset,
+        rightChild.getTextRange.getStartOffset -
+          parent.getTextRange.getStartOffset)
       .charIterator
       .contains('\n')
 
@@ -95,8 +97,9 @@ class HoconFormatter(settings: CodeStyleSettings) {
             dependentLFSpacing(commonSettings.SPACE_WITHIN_BRACES)
           else normalSpacing(commonSettings.SPACE_WITHIN_BRACES)
 
-        case (Include | KeyedField.extractor(),
-              Include | KeyedField.extractor()) =>
+        case (
+            Include | KeyedField.extractor(),
+            Include | KeyedField.extractor()) =>
           lineBreakEnsuringSpacing
 
         case (Include | KeyedField.extractor(), Comma) =>
@@ -257,7 +260,8 @@ class HoconFormatter(settings: CodeStyleSettings) {
 
   def getIndent(parent: ASTNode, child: ASTNode) =
     (parent.getElementType, child.getElementType) match {
-      case (Object,
+      case (
+            Object,
             Include | KeyedField.extractor() | Comma | Comment.extractor()) |
           (Array, Value.extractor() | Comma | Comment.extractor()) =>
         Indent.getNormalIndent

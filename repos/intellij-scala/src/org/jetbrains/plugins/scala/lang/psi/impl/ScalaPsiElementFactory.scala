@@ -293,10 +293,11 @@ object ScalaPsiElementFactory {
       clauseText: String,
       manager: PsiManager,
       context: PsiElement): ScParameterClause = {
-    createElementWithContext(clauseText,
-                             context,
-                             contextLastChild(context),
-                             ImplicitParamClause.parse(_)) match {
+    createElementWithContext(
+      clauseText,
+      context,
+      contextLastChild(context),
+      ImplicitParamClause.parse(_)) match {
       case clause: ScParameterClause => clause
       case _ => null
     }
@@ -306,10 +307,11 @@ object ScalaPsiElementFactory {
       clauseText: String,
       manager: PsiManager,
       context: PsiElement): ScParameterClause = {
-    createElementWithContext(clauseText,
-                             context,
-                             contextLastChild(context),
-                             ImplicitClassParamClause.parse(_)) match {
+    createElementWithContext(
+      clauseText,
+      context,
+      contextLastChild(context),
+      ImplicitClassParamClause.parse(_)) match {
       case clause: ScParameterClause => clause
       case _ => null
     }
@@ -318,10 +320,11 @@ object ScalaPsiElementFactory {
   def createEmptyClassParamClauseWithContext(
       manager: PsiManager,
       context: PsiElement): ScParameterClause = {
-    createElementWithContext("()",
-                             context,
-                             contextLastChild(context),
-                             ClassParamClause.parse(_)) match {
+    createElementWithContext(
+      "()",
+      context,
+      contextLastChild(context),
+      ClassParamClause.parse(_)) match {
       case clause: ScParameterClause => clause
       case _ => null
     }
@@ -329,10 +332,11 @@ object ScalaPsiElementFactory {
 
   def createClassParamClausesWithContext(text: String,
                                          context: PsiElement): ScParameters = {
-    createElementWithContext(text,
-                             context,
-                             contextLastChild(context),
-                             ClassParamClauses.parse(_)) match {
+    createElementWithContext(
+      text,
+      context,
+      contextLastChild(context),
+      ClassParamClauses.parse(_)) match {
       case parameters: ScParameters => parameters
       case _ => null
     }
@@ -519,9 +523,10 @@ object ScalaPsiElementFactory {
   def createBlockExpressionWithoutBracesFromText(
       text: String,
       manager: PsiManager): ScBlockImpl = {
-    createElement(text,
-                  manager,
-                  Block.parse(_, hasBrace = false, needNode = true)) match {
+    createElement(
+      text,
+      manager,
+      Block.parse(_, hasBrace = false, needNode = true)) match {
       case b: ScBlockImpl => b
       case _ => null
     }
@@ -749,12 +754,13 @@ object ScalaPsiElementFactory {
                         manager: PsiManager,
                         isPresentableText: Boolean = false): ScMember = {
     val expr = createExpressionFromText(exprText, manager)
-    createDeclaration(typez,
-                      name,
-                      isVariable,
-                      expr,
-                      manager,
-                      isPresentableText)
+    createDeclaration(
+      typez,
+      name,
+      isVariable,
+      expr,
+      manager,
+      isPresentableText)
   }
 
   def createDeclaration(name: String,
@@ -966,10 +972,11 @@ object ScalaPsiElementFactory {
       manager: PsiManager,
       needsOverrideModifier: Boolean): ScTypeAlias = {
     val text =
-      "class a {" + getOverrideImplementTypeSign(alias,
-                                                 substitutor,
-                                                 "this.type",
-                                                 needsOverrideModifier) + "}"
+      "class a {" + getOverrideImplementTypeSign(
+        alias,
+        substitutor,
+        "this.type",
+        needsOverrideModifier) + "}"
     val dummyFile = PsiFileFactory
       .getInstance(manager.getProject)
       .createFileFromText(
@@ -989,12 +996,13 @@ object ScalaPsiElementFactory {
                                       isVal: Boolean,
                                       needsInferType: Boolean): ScMember = {
     val text =
-      "class a {" + getOverrideImplementVariableSign(variable,
-                                                     substitutor,
-                                                     "_",
-                                                     needsOverrideModifier,
-                                                     isVal,
-                                                     needsInferType) + "}"
+      "class a {" + getOverrideImplementVariableSign(
+        variable,
+        substitutor,
+        "_",
+        needsOverrideModifier,
+        isVal,
+        needsInferType) + "}"
     val dummyFile = PsiFileFactory
       .getInstance(manager.getProject)
       .createFileFromText(
@@ -1413,11 +1421,12 @@ object ScalaPsiElementFactory {
     val holder: FileElement =
       DummyHolderFactory.createHolder(manager, context).getTreeElement
     val builder: ScalaPsiBuilderImpl = new ScalaPsiBuilderImpl(
-      PsiBuilderFactory.getInstance.createBuilder(manager.getProject,
-                                                  holder,
-                                                  new ScalaLexer,
-                                                  ScalaFileType.SCALA_LANGUAGE,
-                                                  text.trim))
+      PsiBuilderFactory.getInstance.createBuilder(
+        manager.getProject,
+        holder,
+        new ScalaLexer,
+        ScalaFileType.SCALA_LANGUAGE,
+        text.trim))
     val marker = builder.mark()
     parse(builder)
     while (!builder.eof()) {
@@ -1439,11 +1448,12 @@ object ScalaPsiElementFactory {
       .createHolder(context.getManager, context)
       .getTreeElement
     val builder: ScalaPsiBuilderImpl = new ScalaPsiBuilderImpl(
-      PsiBuilderFactory.getInstance.createBuilder(context.getProject,
-                                                  holder,
-                                                  new ScalaLexer,
-                                                  ScalaFileType.SCALA_LANGUAGE,
-                                                  text.trim))
+      PsiBuilderFactory.getInstance.createBuilder(
+        context.getProject,
+        holder,
+        new ScalaLexer,
+        ScalaFileType.SCALA_LANGUAGE,
+        text.trim))
     val marker = builder.mark()
     parse(builder)
     while (!builder.eof()) {
@@ -1674,9 +1684,10 @@ object ScalaPsiElementFactory {
   }
 
   def createDocHeaderElement(length: Int, manager: PsiManager): PsiElement =
-    createScalaFile("/**=header" + StringUtils.repeat("=", length) +
-                      "*/\n class a {}",
-                    manager)
+    createScalaFile(
+      "/**=header" + StringUtils.repeat("=", length) +
+        "*/\n class a {}",
+      manager)
       .typeDefinitions(0)
       .docComment
       .get

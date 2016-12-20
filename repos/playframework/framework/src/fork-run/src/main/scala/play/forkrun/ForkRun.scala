@@ -85,9 +85,10 @@ object ForkRun {
 
     val watchService = config.watchService match {
       case ForkConfig.DefaultWatchService =>
-        FileWatchService.defaultWatchService(config.targetDirectory,
-                                             config.pollInterval,
-                                             log)
+        FileWatchService.defaultWatchService(
+          config.targetDirectory,
+          config.pollInterval,
+          log)
       case ForkConfig.JDK7WatchService => FileWatchService.jdk7(log)
       case ForkConfig.JNotifyWatchService =>
         FileWatchService.jnotify(config.targetDirectory)
@@ -134,10 +135,11 @@ object ForkRun {
   def sendStart(sbt: ActorRef,
                 config: ForkConfig,
                 args: Seq[String]): InetSocketAddress => Unit = { address =>
-    val url = serverUrl(args,
-                        config.defaultHttpPort,
-                        config.defaultHttpAddress,
-                        address)
+    val url = serverUrl(
+      args,
+      config.defaultHttpPort,
+      config.defaultHttpAddress,
+      address)
     sbt ! SbtClient.Execute(s"${config.notifyKey} $url")
   }
 

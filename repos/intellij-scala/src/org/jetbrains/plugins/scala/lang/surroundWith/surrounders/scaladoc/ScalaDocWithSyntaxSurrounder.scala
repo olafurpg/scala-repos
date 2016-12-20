@@ -45,8 +45,9 @@ trait ScalaDocWithSyntaxSurrounder extends Surrounder {
 
     elements.foreach(_.delete())
 
-    new TextRange(endOffset + 2 * getSyntaxTag.length,
-                  endOffset + 2 * getSyntaxTag.length)
+    new TextRange(
+      endOffset + 2 * getSyntaxTag.length,
+      endOffset + 2 * getSyntaxTag.length)
   }
 
   def getSyntaxTag: String

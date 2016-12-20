@@ -194,8 +194,9 @@ class Dispatchers(val settings: ActorSystem.Settings,
       case "PinnedDispatcher" ⇒
         new PinnedDispatcherConfigurator(cfg, prerequisites)
       case fqn ⇒
-        val args = List(classOf[Config] -> cfg,
-                        classOf[DispatcherPrerequisites] -> prerequisites)
+        val args = List(
+          classOf[Config] -> cfg,
+          classOf[DispatcherPrerequisites] -> prerequisites)
         prerequisites.dynamicAccess
           .createInstanceFor[MessageDispatcherConfigurator](fqn, args)
           .recover({
@@ -327,9 +328,10 @@ class PinnedDispatcherConfigurator(config: Config,
     * Creates new dispatcher for each invocation.
     */
   override def dispatcher(): MessageDispatcher =
-    new PinnedDispatcher(this,
-                         null,
-                         config.getString("id"),
-                         config.getMillisDuration("shutdown-timeout"),
-                         threadPoolConfig)
+    new PinnedDispatcher(
+      this,
+      null,
+      config.getString("id"),
+      config.getMillisDuration("shutdown-timeout"),
+      threadPoolConfig)
 }

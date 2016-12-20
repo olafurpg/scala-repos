@@ -135,8 +135,9 @@ object Multipart {
   private def streamed(boundary: String, nioCharset: Charset, chunkSize: Int)
     : PushPullStage[MultipartFormData.Part[Source[ByteString, _]],
                     Source[ByteString, Any]] =
-    new PushPullStage[MultipartFormData.Part[Source[ByteString, _]],
-                      Source[ByteString, Any]] {
+    new PushPullStage[
+      MultipartFormData.Part[Source[ByteString, _]],
+      Source[ByteString, Any]] {
       var firstBoundaryRendered = false
 
       override def onPush(
@@ -158,9 +159,10 @@ object Multipart {
             case _ => throw new UnsupportedOperationException()
           }
 
-        renderBoundary(f,
-                       boundary,
-                       suppressInitialCrLf = !firstBoundaryRendered)
+        renderBoundary(
+          f,
+          boundary,
+          suppressInitialCrLf = !firstBoundaryRendered)
         firstBoundaryRendered = true
 
         val (key, filename, contentType) = bodyPart match {

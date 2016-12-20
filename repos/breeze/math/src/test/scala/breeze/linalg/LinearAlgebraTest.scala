@@ -46,10 +46,11 @@ class LinearAlgebraTest
     val a = DenseMatrix((1, 2), (3, 4))
     val b = DenseMatrix((0, 5), (6, 7))
     assert(
-      kron(a, b) === DenseMatrix((0, 5, 0, 10),
-                                 (6, 7, 12, 14),
-                                 (0, 15, 0, 20),
-                                 (18, 21, 24, 28)))
+      kron(a, b) === DenseMatrix(
+        (0, 5, 0, 10),
+        (6, 7, 12, 14),
+        (0, 15, 0, 20),
+        (18, 21, 24, 28)))
   }
 
   test("ranks") {
@@ -57,11 +58,12 @@ class LinearAlgebraTest
     assert(ranks(DenseVector(3, -1, 2)).toList === List(3.0, 1.0, 2.0))
     assert(ranks(DenseVector(1, 2, 3, 3)).toList === List(1.0, 2.0, 3.5, 3.5))
     assert(
-      ranks(DenseVector(1, 2, 3, 3, 3)).toList === List(1.0,
-                                                        2.0,
-                                                        4.0,
-                                                        4.0,
-                                                        4.0))
+      ranks(DenseVector(1, 2, 3, 3, 3)).toList === List(
+        1.0,
+        2.0,
+        4.0,
+        4.0,
+        4.0))
   }
 
   test("cholesky") {
@@ -96,14 +98,16 @@ class LinearAlgebraTest
 
   test("LUfactorization") {
     val (m, _) = LU(
-      DenseMatrix((29, 42, -4, 50, 1),
-                  (20, -31, 32, 21, 2),
-                  (-47, -20, 24, -22, 3),
-                  (3, 17, -45, 23, 4)))
-    val aux = DenseMatrix((-47.0000, -20.0000, 24.0000, -22.0000, 3.0000),
-                          (-0.4255, -39.5106, 42.2127, 11.6382, 3.2765),
-                          (-0.6170, -0.7506, 42.4964, 45.1620, 5.3107),
-                          (-0.0638, -0.3979, -0.6275, 54.5694, 8.8282))
+      DenseMatrix(
+        (29, 42, -4, 50, 1),
+        (20, -31, 32, 21, 2),
+        (-47, -20, 24, -22, 3),
+        (3, 17, -45, 23, 4)))
+    val aux = DenseMatrix(
+      (-47.0000, -20.0000, 24.0000, -22.0000, 3.0000),
+      (-0.4255, -39.5106, 42.2127, 11.6382, 3.2765),
+      (-0.6170, -0.7506, 42.4964, 45.1620, 5.3107),
+      (-0.0638, -0.3979, -0.6275, 54.5694, 8.8282))
     matricesNearlyEqual(m, aux, 1E-4)
   }
 
@@ -154,10 +158,11 @@ class LinearAlgebraTest
   }
 
   test("inv") {
-    val X = DenseMatrix((29.0, 42.0, -4.0, 50.0),
-                        (20.0, -31.0, 32.0, 21.0),
-                        (-47.0, -20.0, 24.0, -22.0),
-                        (3.0, 17.0, -45.0, 23.0))
+    val X = DenseMatrix(
+      (29.0, 42.0, -4.0, 50.0),
+      (20.0, -31.0, 32.0, 21.0),
+      (-47.0, -20.0, 24.0, -22.0),
+      (3.0, 17.0, -45.0, 23.0))
     val I = DenseMatrix.eye[Double](4)
     matricesNearlyEqual(inv(X) * X, I)
   }
@@ -192,9 +197,10 @@ class LinearAlgebraTest
       } yield DenseVector(els(0), els(1), els(2))
     }
     check { (a: DenseVector[Double], b: DenseVector[Double]) =>
-      val r = DenseVector(a(1) * b(2) - a(2) * b(1),
-                          a(2) * b(0) - a(0) * b(2),
-                          a(0) * b(1) - a(1) * b(0))
+      val r = DenseVector(
+        a(1) * b(2) - a(2) * b(1),
+        a(2) * b(0) - a(0) * b(2),
+        a(0) * b(1) - a(1) * b(0))
       cross(a, b) == r
       cross(b, a) == r * -1.0
     }
@@ -232,9 +238,10 @@ class LinearAlgebraTest
   }
 
   test("qr A[m, n], m < n") {
-    val A = DenseMatrix((1.0, 1.0, 1.0, 1.0),
-                        (4.0, 2.0, 1.0, 1.0),
-                        (16.0, 4.0, 1.0, 1.0))
+    val A = DenseMatrix(
+      (1.0, 1.0, 1.0, 1.0),
+      (4.0, 2.0, 1.0, 1.0),
+      (16.0, 4.0, 1.0, 1.0))
     val QR(_Q, _R) = qr(A)
 
     assert((_Q.rows, _Q.cols) == (A.rows, A.rows))
@@ -250,10 +257,11 @@ class LinearAlgebraTest
   }
 
   test("qr A[m, n], m > n") {
-    val A = DenseMatrix((1.0, 1.0, 1.0),
-                        (4.0, 2.0, 1.0),
-                        (16.0, 4.0, 1.0),
-                        (32.0, 8.0, 1.0))
+    val A = DenseMatrix(
+      (1.0, 1.0, 1.0),
+      (4.0, 2.0, 1.0),
+      (16.0, 4.0, 1.0),
+      (32.0, 8.0, 1.0))
     val QR(_Q, _R) = qr(A)
 
     assert((_Q.rows, _Q.cols) == (A.rows, A.rows))
@@ -277,9 +285,10 @@ class LinearAlgebraTest
   }
 
   test("qr float A[m, n], m < n") {
-    val A = DenseMatrix((1.0f, 1.0f, 1.0f, 1.0f),
-                        (4.0f, 2.0f, 1.0f, 1.0f),
-                        (16.0f, 4.0f, 1.0f, 1.0f))
+    val A = DenseMatrix(
+      (1.0f, 1.0f, 1.0f, 1.0f),
+      (4.0f, 2.0f, 1.0f, 1.0f),
+      (16.0f, 4.0f, 1.0f, 1.0f))
     val QR(_Q, _R) = qr(A)
 
     assert((_Q.rows, _Q.cols) == (A.rows, A.rows))
@@ -295,10 +304,11 @@ class LinearAlgebraTest
   }
 
   test("qr float A[m, n], m > n") {
-    val A = DenseMatrix((1.0f, 1.0f, 1.0f),
-                        (4.0f, 2.0f, 1.0f),
-                        (16.0f, 4.0f, 1.0f),
-                        (32.0f, 8.0f, 1.0f))
+    val A = DenseMatrix(
+      (1.0f, 1.0f, 1.0f),
+      (4.0f, 2.0f, 1.0f),
+      (16.0f, 4.0f, 1.0f),
+      (32.0f, 8.0f, 1.0f))
     val QR(_Q, _R) = qr(A)
 
     assert((_Q.rows, _Q.cols) == (A.rows, A.rows))
@@ -330,9 +340,10 @@ class LinearAlgebraTest
   }
 
   test("qr reduced A[m, n], m < n") {
-    val A = DenseMatrix((1.0, 1.0, 1.0, 1.0),
-                        (4.0, 2.0, 1.0, 1.0),
-                        (16.0, 4.0, 1.0, 1.0))
+    val A = DenseMatrix(
+      (1.0, 1.0, 1.0, 1.0),
+      (4.0, 2.0, 1.0, 1.0),
+      (16.0, 4.0, 1.0, 1.0))
     val QR(_Q, _R) = qr.reduced(A)
 
     assert((_Q.rows, _Q.cols) == (A.rows, min(A.rows, A.cols)))
@@ -364,10 +375,11 @@ class LinearAlgebraTest
   }
 
   test("qr reduced A[m, n], m > n") {
-    val A = DenseMatrix((1.0, 1.0, 1.0),
-                        (4.0, 2.0, 1.0),
-                        (16.0, 4.0, 1.0),
-                        (32.0, 8.0, 1.0))
+    val A = DenseMatrix(
+      (1.0, 1.0, 1.0),
+      (4.0, 2.0, 1.0),
+      (16.0, 4.0, 1.0),
+      (32.0, 8.0, 1.0))
     val QR(_Q, _R) = qr.reduced(A)
 
     assert((_Q.rows, _Q.cols) == (A.rows, min(A.rows, A.cols)))
@@ -391,9 +403,10 @@ class LinearAlgebraTest
   }
 
   test("qr float reduced A[m, n], m < n") {
-    val A = DenseMatrix((1.0f, 1.0f, 1.0f, 1.0f),
-                        (4.0f, 2.0f, 1.0f, 1.0f),
-                        (16.0f, 4.0f, 1.0f, 1.0f))
+    val A = DenseMatrix(
+      (1.0f, 1.0f, 1.0f, 1.0f),
+      (4.0f, 2.0f, 1.0f, 1.0f),
+      (16.0f, 4.0f, 1.0f, 1.0f))
     val QR(_Q, _R) = qr.reduced(A)
 
     assert((_Q.rows, _Q.cols) == (A.rows, min(A.rows, A.cols)))
@@ -426,10 +439,11 @@ class LinearAlgebraTest
   }
 
   test("qr float reduced A[m, n], m > n") {
-    val A = DenseMatrix((1.0f, 1.0f, 1.0f),
-                        (4.0f, 2.0f, 1.0f),
-                        (16.0f, 4.0f, 1.0f),
-                        (32.0f, 8.0f, 1.0f))
+    val A = DenseMatrix(
+      (1.0f, 1.0f, 1.0f),
+      (4.0f, 2.0f, 1.0f),
+      (16.0f, 4.0f, 1.0f),
+      (32.0f, 8.0f, 1.0f))
     val QR(_Q, _R) = qr.reduced(A)
 
     assert((_Q.rows, _Q.cols) == (A.rows, min(A.rows, A.cols)))
@@ -741,18 +755,20 @@ class LinearAlgebraTest
   }
 
   test("csc svd") {
-    val m1 = DenseMatrix((2.0, 4.0, 0.0, 1.0, 2.0),
-                         (1.0, 0.0, 2.0, 1.0, 0.0),
-                         (1.0, 3.0, 2.0, 1.0, 9.0),
-                         (0.0, 0.0, 2.0, 0.0, 5.0),
-                         (0.0, 1.5, 0.0, 0.0, 5.0),
-                         (1.5, 0.0, 2.0, 0.0, 5.0))
-    val m2 = CSCMatrix((2.0, 4.0, 0.0, 1.0, 2.0),
-                       (1.0, 0.0, 2.0, 1.0, 0.0),
-                       (1.0, 3.0, 2.0, 1.0, 9.0),
-                       (0.0, 0.0, 2.0, 0.0, 5.0),
-                       (0.0, 1.5, 0.0, 0.0, 5.0),
-                       (1.5, 0.0, 2.0, 0.0, 5.0))
+    val m1 = DenseMatrix(
+      (2.0, 4.0, 0.0, 1.0, 2.0),
+      (1.0, 0.0, 2.0, 1.0, 0.0),
+      (1.0, 3.0, 2.0, 1.0, 9.0),
+      (0.0, 0.0, 2.0, 0.0, 5.0),
+      (0.0, 1.5, 0.0, 0.0, 5.0),
+      (1.5, 0.0, 2.0, 0.0, 5.0))
+    val m2 = CSCMatrix(
+      (2.0, 4.0, 0.0, 1.0, 2.0),
+      (1.0, 0.0, 2.0, 1.0, 0.0),
+      (1.0, 3.0, 2.0, 1.0, 9.0),
+      (0.0, 0.0, 2.0, 0.0, 5.0),
+      (0.0, 1.5, 0.0, 0.0, 5.0),
+      (1.5, 0.0, 2.0, 0.0, 5.0))
 
     def checkCols(m1: DenseMatrix[Double], m2: DenseMatrix[Double]) = {
       for (i <- 0 until m1.cols) {
@@ -780,10 +796,9 @@ class LinearAlgebraTest
   test("small pow test") {
     val X = DenseMatrix((.7, .2), (.3, .8))
     assert(mpow(X, 1) === X)
-    assert(max(
-             abs(mpow(X, .5) - DenseMatrix((.82426, 0.11716),
-                                           (.17574, 0.88284)))) < 1E-5,
-           mpow(X, .5))
+    assert(
+      max(abs(mpow(X, .5) - DenseMatrix((.82426, 0.11716), (.17574, 0.88284)))) < 1E-5,
+      mpow(X, .5))
   }
 
   test("diff test") {
@@ -896,50 +911,55 @@ class LinearAlgebraTest
   test("pca") {
 
     // The data
-    val smithData = DenseMatrix((2.5, 2.4),
-                                (0.5, 0.7),
-                                (2.2, 2.9),
-                                (1.9, 2.2),
-                                (3.1, 3.0),
-                                (2.3, 2.7),
-                                (2.0, 1.6),
-                                (1.0, 1.1),
-                                (1.5, 1.6),
-                                (1.1, 0.9))
+    val smithData = DenseMatrix(
+      (2.5, 2.4),
+      (0.5, 0.7),
+      (2.2, 2.9),
+      (1.9, 2.2),
+      (3.1, 3.0),
+      (2.3, 2.7),
+      (2.0, 1.6),
+      (1.0, 1.1),
+      (1.5, 1.6),
+      (1.1, 0.9))
 
     // The correct answers bundled up.
     object smithTruth {
 
       val centeredData =
-        DenseMatrix((0.69, 0.4900000000000002),
-                    (-1.31, -1.2099999999999997),
-                    (0.3900000000000001, 0.9900000000000002),
-                    (0.08999999999999986, 0.2900000000000005),
-                    (1.29, 1.0900000000000003),
-                    (0.48999999999999977, 0.7900000000000005),
-                    (0.18999999999999995, -0.3099999999999996),
-                    (-0.81, -0.8099999999999996),
-                    (-0.31000000000000005, -0.3099999999999996),
-                    (-0.71, -1.0099999999999998))
+        DenseMatrix(
+          (0.69, 0.4900000000000002),
+          (-1.31, -1.2099999999999997),
+          (0.3900000000000001, 0.9900000000000002),
+          (0.08999999999999986, 0.2900000000000005),
+          (1.29, 1.0900000000000003),
+          (0.48999999999999977, 0.7900000000000005),
+          (0.18999999999999995, -0.3099999999999996),
+          (-0.81, -0.8099999999999996),
+          (-0.31000000000000005, -0.3099999999999996),
+          (-0.71, -1.0099999999999998))
 
-      val covmat = DenseMatrix((0.6165555555555556, 0.6154444444444445),
-                               (0.6154444444444445, 0.7165555555555555))
+      val covmat = DenseMatrix(
+        (0.6165555555555556, 0.6154444444444445),
+        (0.6154444444444445, 0.7165555555555555))
 
       val eigenvalues = DenseVector(1.2840277121727839, 0.04908339893832735)
 
-      val eigenvectors = DenseMatrix((-0.6778733985280118, -0.735178655544408),
-                                     (-0.735178655544408, 0.6778733985280118))
+      val eigenvectors = DenseMatrix(
+        (-0.6778733985280118, -0.735178655544408),
+        (-0.735178655544408, 0.6778733985280118))
 
-      val scores = DenseMatrix((-0.8279701862010882, -0.17511530704691552),
-                               (1.7775803252804288, 0.14285722654428046),
-                               (-0.9921974944148888, 0.3843749888804126),
-                               (-0.27421041597539964, 0.13041720657412714),
-                               (-1.6758014186445402, -0.2094984612567533),
-                               (-0.9129491031588082, 0.17528244362036988),
-                               (0.099109437498444, -0.34982469809712086),
-                               (1.1445721637986597, 0.04641725818328124),
-                               (0.43804613676244986, 0.017764629675083132),
-                               (1.2238205550547403, -0.16267528707676204))
+      val scores = DenseMatrix(
+        (-0.8279701862010882, -0.17511530704691552),
+        (1.7775803252804288, 0.14285722654428046),
+        (-0.9921974944148888, 0.3843749888804126),
+        (-0.27421041597539964, 0.13041720657412714),
+        (-1.6758014186445402, -0.2094984612567533),
+        (-0.9129491031588082, 0.17528244362036988),
+        (0.099109437498444, -0.34982469809712086),
+        (1.1445721637986597, 0.04641725818328124),
+        (0.43804613676244986, 0.017764629675083132),
+        (1.2238205550547403, -0.16267528707676204))
     }
 
     val pca = princomp(smithData)
@@ -990,16 +1010,21 @@ class LinearAlgebraTest
 //    println( rangeInclN1.start + " " + rangeInclN1.end + " " + rangeInclN1.step)
 //    val rangeInclN1r = rangeInclN1.getRangeWithoutNegativeIndexes( xInt.length )
 //    println( rangeInclN1r.start + " " + rangeInclN1r.end + " " + rangeInclN1r.step)
-    assert(xInt(rangeInclN1) == DenseVector(3, 4, 5),
-           "range inclusive, negative end")
-    assert(xInt(rangeInclN2) == DenseVector(3, 4, 5),
-           "range inclusive, negative start")
-    assert(xInt(rangeInclN3) == DenseVector(5, 4, 3),
-           "range inclusive, negative start/step")
-    assert(xInt(rangeInclN4) == DenseVector(5, 4, 3),
-           "range inclusive, negative end/step")
-    assert(xInt(rangeInclN5) == DenseVector(5, 4, 3),
-           "range inclusive, negative start/end/step")
+    assert(
+      xInt(rangeInclN1) == DenseVector(3, 4, 5),
+      "range inclusive, negative end")
+    assert(
+      xInt(rangeInclN2) == DenseVector(3, 4, 5),
+      "range inclusive, negative start")
+    assert(
+      xInt(rangeInclN3) == DenseVector(5, 4, 3),
+      "range inclusive, negative start/step")
+    assert(
+      xInt(rangeInclN4) == DenseVector(5, 4, 3),
+      "range inclusive, negative end/step")
+    assert(
+      xInt(rangeInclN5) == DenseVector(5, 4, 3),
+      "range inclusive, negative start/end/step")
 
     assert(xInt(rangeExcl) == DenseVector(0, 1, 2, 3, 4), "range exclusive")
     intercept[IllegalArgumentException] { xInt(rangeExclN1) }

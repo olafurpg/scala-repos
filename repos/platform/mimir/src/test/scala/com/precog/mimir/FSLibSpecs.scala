@@ -80,17 +80,19 @@ trait FSLibSpecs[M[+ _]]
 
   val testAPIKey = "testAPIKey"
   def testAccount =
-    AccountDetails("00001",
-                   "test@email.com",
-                   new DateTime,
-                   "testAPIKey",
-                   Path.Root,
-                   AccountPlan.Free)
-  val defaultEvaluationContext = EvaluationContext(testAPIKey,
-                                                   testAccount,
-                                                   Path.Root,
-                                                   Path.Root,
-                                                   new DateTime)
+    AccountDetails(
+      "00001",
+      "test@email.com",
+      new DateTime,
+      "testAPIKey",
+      Path.Root,
+      AccountPlan.Free)
+  val defaultEvaluationContext = EvaluationContext(
+    testAPIKey,
+    testAccount,
+    Path.Root,
+    Path.Root,
+    new DateTime)
   val defaultMorphContext =
     MorphContext(defaultEvaluationContext, new MorphLogger {
       def info(msg: String): M[Unit] = M.point(())
@@ -143,9 +145,10 @@ trait FSLibSpecs[M[+ _]]
 
     "expand multiple globbed segments" in {
       val table = pathTable("/foo/*/baz/*")
-      val expected: List[JValue] = List(JString("/foo/bar1/baz/quux1/"),
-                                        JString("/foo/bar2/baz/quux1/"),
-                                        JString("/foo/bar2/baz/quux2/"))
+      val expected: List[JValue] = List(
+        JString("/foo/bar1/baz/quux1/"),
+        JString("/foo/bar2/baz/quux1/"),
+        JString("/foo/bar2/baz/quux2/"))
       runExpansion(table) must_== expected
     }
   }

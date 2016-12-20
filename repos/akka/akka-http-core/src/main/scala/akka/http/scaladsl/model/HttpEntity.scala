@@ -206,8 +206,9 @@ object HttpEntity {
             string: String): HttpEntity.Strict =
     if (string.isEmpty) empty(contentType)
     else
-      apply(contentType,
-            ByteString(string.getBytes(contentType.charset.nioCharset)))
+      apply(
+        contentType,
+        ByteString(string.getBytes(contentType.charset.nioCharset)))
   def apply(contentType: ContentType, bytes: Array[Byte]): HttpEntity.Strict =
     if (bytes.length == 0) empty(contentType)
     else apply(contentType, ByteString(bytes))
@@ -236,10 +237,11 @@ object HttpEntity {
             chunkSize: Int = -1): UniversalEntity = {
     val fileLength = file.length
     if (fileLength > 0)
-      HttpEntity.Default(contentType,
-                         fileLength,
-                         if (chunkSize > 0) FileIO.fromFile(file, chunkSize)
-                         else FileIO.fromFile(file))
+      HttpEntity.Default(
+        contentType,
+        fileLength,
+        if (chunkSize > 0) FileIO.fromFile(file, chunkSize)
+        else FileIO.fromFile(file))
     else empty(contentType)
   }
 
@@ -277,9 +279,10 @@ object HttpEntity {
     override def transformDataBytes(
         newContentLength: Long,
         transformer: Flow[ByteString, ByteString, Any]): UniversalEntity =
-      HttpEntity.Default(contentType,
-                         newContentLength,
-                         Source.single(data) via transformer)
+      HttpEntity.Default(
+        contentType,
+        newContentLength,
+        Source.single(data) via transformer)
 
     override def withContentType(contentType: ContentType): HttpEntity.Strict =
       if (contentType == this.contentType) this

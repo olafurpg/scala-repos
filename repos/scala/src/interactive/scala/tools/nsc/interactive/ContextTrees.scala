@@ -147,10 +147,10 @@ trait ContextTrees { self: Global =>
               } else if (cpos includes oldpos) {
                 val start = contexts.indexWhere(cpos includes _.pos)
                 val last = contexts.lastIndexWhere(cpos includes _.pos)
-                contexts(start) =
-                  new ContextTree(cpos,
-                                  context,
-                                  contexts.slice(start, last + 1))
+                contexts(start) = new ContextTree(
+                  cpos,
+                  context,
+                  contexts.slice(start, last + 1))
                 contexts.remove(start + 1, last - start)
                 true
               } else false

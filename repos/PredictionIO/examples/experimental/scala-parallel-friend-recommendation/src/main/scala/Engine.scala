@@ -19,11 +19,13 @@ case class ProductScore(
 
 object PSimRankEngineFactory extends IEngineFactory {
   def apply() = {
-    Engine(Map("default" -> classOf[DataSource],
-               "node" -> classOf[NodeSamplingDataSource],
-               "forest" -> classOf[ForestFireSamplingDataSource]),
-           classOf[IdentityPreparator],
-           Map("simrank" -> classOf[SimRankAlgorithm]),
-           classOf[Serving])
+    Engine(
+      Map(
+        "default" -> classOf[DataSource],
+        "node" -> classOf[NodeSamplingDataSource],
+        "forest" -> classOf[ForestFireSamplingDataSource]),
+      classOf[IdentityPreparator],
+      Map("simrank" -> classOf[SimRankAlgorithm]),
+      classOf[Serving])
   }
 }

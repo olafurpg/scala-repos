@@ -9,27 +9,33 @@ import cats.laws.discipline.eq._
 class ProdTests extends CatsSuite {
   implicit val iso =
     CartesianTests.Isomorphisms.invariant[Prod[Option, List, ?]]
-  checkAll("Prod[Option, List, Int]",
-           CartesianTests[Lambda[X => Prod[Option, List, X]]]
-             .cartesian[Int, Int, Int])
-  checkAll("Cartesian[Prod[Option, List, Int]]",
-           SerializableTests.serializable(
-             Cartesian[Lambda[X => Prod[Option, List, X]]]))
+  checkAll(
+    "Prod[Option, List, Int]",
+    CartesianTests[Lambda[X => Prod[Option, List, X]]]
+      .cartesian[Int, Int, Int])
+  checkAll(
+    "Cartesian[Prod[Option, List, Int]]",
+    SerializableTests.serializable(
+      Cartesian[Lambda[X => Prod[Option, List, X]]]))
 
-  checkAll("Prod[Option, List, Int]",
-           AlternativeTests[Lambda[X => Prod[Option, List, X]]]
-             .alternative[Int, Int, Int])
-  checkAll("Alternative[Prod[Option, List, Int]]",
-           SerializableTests.serializable(
-             Alternative[Lambda[X => Prod[Option, List, X]]]))
+  checkAll(
+    "Prod[Option, List, Int]",
+    AlternativeTests[Lambda[X => Prod[Option, List, X]]]
+      .alternative[Int, Int, Int])
+  checkAll(
+    "Alternative[Prod[Option, List, Int]]",
+    SerializableTests.serializable(
+      Alternative[Lambda[X => Prod[Option, List, X]]]))
 
   {
     implicit val monoidK = ListWrapper.monoidK
-    checkAll("Prod[ListWrapper, ListWrapper, ?]",
-             MonoidKTests[Prod[ListWrapper, ListWrapper, ?]].monoidK[Int])
-    checkAll("MonoidK[Prod[ListWrapper, ListWrapper, ?]]",
-             SerializableTests.serializable(
-               MonoidK[Prod[ListWrapper, ListWrapper, ?]]))
+    checkAll(
+      "Prod[ListWrapper, ListWrapper, ?]",
+      MonoidKTests[Prod[ListWrapper, ListWrapper, ?]].monoidK[Int])
+    checkAll(
+      "MonoidK[Prod[ListWrapper, ListWrapper, ?]]",
+      SerializableTests.serializable(
+        MonoidK[Prod[ListWrapper, ListWrapper, ?]]))
   }
 
   {
@@ -37,9 +43,10 @@ class ProdTests extends CatsSuite {
     checkAll(
       "Prod[ListWrapper, ListWrapper, ?]",
       SemigroupKTests[Prod[ListWrapper, ListWrapper, ?]].semigroupK[Int])
-    checkAll("SemigroupK[Prod[ListWrapper, ListWrapper, ?]]",
-             SerializableTests.serializable(
-               SemigroupK[Prod[ListWrapper, ListWrapper, ?]]))
+    checkAll(
+      "SemigroupK[Prod[ListWrapper, ListWrapper, ?]]",
+      SerializableTests.serializable(
+        SemigroupK[Prod[ListWrapper, ListWrapper, ?]]))
   }
 
   {
@@ -59,8 +66,9 @@ class ProdTests extends CatsSuite {
     checkAll(
       "Prod[ListWrapper, ListWrapper, ?]",
       FunctorTests[Prod[ListWrapper, ListWrapper, ?]].functor[Int, Int, Int])
-    checkAll("Functor[Prod[ListWrapper, ListWrapper, ?]]",
-             SerializableTests.serializable(
-               Functor[Prod[ListWrapper, ListWrapper, ?]]))
+    checkAll(
+      "Functor[Prod[ListWrapper, ListWrapper, ?]]",
+      SerializableTests.serializable(
+        Functor[Prod[ListWrapper, ListWrapper, ?]]))
   }
 }

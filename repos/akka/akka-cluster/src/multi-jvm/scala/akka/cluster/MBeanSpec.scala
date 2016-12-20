@@ -48,13 +48,14 @@ abstract class MBeanSpec
     "expose attributes" taggedAs LongRunningTest in {
       val info = mbeanServer.getMBeanInfo(mbeanName)
       info.getAttributes.map(_.getName).toSet should ===(
-        Set("ClusterStatus",
-            "Members",
-            "Unreachable",
-            "MemberStatus",
-            "Leader",
-            "Singleton",
-            "Available"))
+        Set(
+          "ClusterStatus",
+          "Members",
+          "Unreachable",
+          "MemberStatus",
+          "Leader",
+          "Singleton",
+          "Available"))
       enterBarrier("after-1")
     }
 
@@ -101,10 +102,11 @@ abstract class MBeanSpec
 
     "support join" taggedAs LongRunningTest in {
       runOn(second, third, fourth) {
-        mbeanServer.invoke(mbeanName,
-                           "join",
-                           Array(address(first).toString),
-                           Array("java.lang.String"))
+        mbeanServer.invoke(
+          mbeanName,
+          "join",
+          Array(address(first).toString),
+          Array("java.lang.String"))
       }
       enterBarrier("joined")
 
@@ -215,10 +217,11 @@ abstract class MBeanSpec
       // fourth unreachable in previous step
 
       runOn(second) {
-        mbeanServer.invoke(mbeanName,
-                           "down",
-                           Array(fourthAddress.toString),
-                           Array("java.lang.String"))
+        mbeanServer.invoke(
+          mbeanName,
+          "down",
+          Array(fourthAddress.toString),
+          Array("java.lang.String"))
       }
       enterBarrier("fourth-down")
 
@@ -234,10 +237,11 @@ abstract class MBeanSpec
 
     "support leave" taggedAs LongRunningTest in within(20 seconds) {
       runOn(second) {
-        mbeanServer.invoke(mbeanName,
-                           "leave",
-                           Array(address(third).toString),
-                           Array("java.lang.String"))
+        mbeanServer.invoke(
+          mbeanName,
+          "leave",
+          Array(address(third).toString),
+          Array("java.lang.String"))
       }
       enterBarrier("third-left")
       runOn(first, second) {

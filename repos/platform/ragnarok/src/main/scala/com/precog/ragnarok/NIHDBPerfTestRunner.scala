@@ -101,15 +101,17 @@ final class NIHDBPerfTestRunner[T](val timer: Timer[T],
   val accountFinder = new StaticAccountFinder[Future]("", "")
   val apiKeyManager = new InMemoryAPIKeyManager[Future](yggConfig.clock)
   val accessControl = new DirectAPIKeyFinder(apiKeyManager)
-  val permissionsFinder = new PermissionsFinder(accessControl,
-                                                accountFinder,
-                                                new org.joda.time.Instant())
+  val permissionsFinder = new PermissionsFinder(
+    accessControl,
+    accountFinder,
+    new org.joda.time.Instant())
 
   val storageTimeout = Timeout(testTimeout)
 
   private def makeChef =
-    Chef(VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
-         VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))
+    Chef(
+      VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
+      VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))
 
   val chefs = (1 to 4).map { _ =>
     actorSystem.actorOf(Props(makeChef))
@@ -118,22 +120,25 @@ final class NIHDBPerfTestRunner[T](val timer: Timer[T],
     actorSystem.actorOf(Props[Chef].withRouter(RoundRobinRouter(chefs)))
 
   val jobManager = new InMemoryJobManager[Future]
-  val resourceBuilder = new ResourceBuilder(actorSystem,
-                                            yggConfig.clock,
-                                            masterChef,
-                                            yggConfig.cookThreshold,
-                                            yggConfig.storageTimeout)
+  val resourceBuilder = new ResourceBuilder(
+    actorSystem,
+    yggConfig.clock,
+    masterChef,
+    yggConfig.cookThreshold,
+    yggConfig.storageTimeout)
   val projectionsActor = actorSystem.actorOf(
     Props(
-      new PathRoutingActor(yggConfig.dataDir,
-                           yggConfig.storageTimeout.duration,
-                           yggConfig.quiescenceTimeout,
-                           1000,
-                           yggConfig.clock)))
+      new PathRoutingActor(
+        yggConfig.dataDir,
+        yggConfig.storageTimeout.duration,
+        yggConfig.quiescenceTimeout,
+        1000,
+        yggConfig.clock)))
 
-  val actorVFS = new ActorVFS(projectionsActor,
-                              yggConfig.storageTimeout,
-                              yggConfig.storageTimeout)
+  val actorVFS = new ActorVFS(
+    projectionsActor,
+    yggConfig.storageTimeout,
+    yggConfig.storageTimeout)
   val vfs =
     new SecureVFS(actorVFS, permissionsFinder, jobManager, yggConfig.clock)
 

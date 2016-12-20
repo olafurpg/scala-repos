@@ -21,12 +21,13 @@ class MarathonStartupIntegrationTest
     val failingProcess = ProcessKeeper.startMarathon(
       cwd,
       env,
-      List("--http_port",
-           config.marathonBasePort.toString,
-           "--zk",
-           config.zk,
-           "--master",
-           config.master),
+      List(
+        "--http_port",
+        config.marathonBasePort.toString,
+        "--zk",
+        config.zk,
+        "--master",
+        config.master),
       startupLine = "Failed to start all services.",
       processName = "marathonFail"
     )

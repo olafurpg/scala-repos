@@ -56,15 +56,17 @@ private[sql] object SparkPlanInfo {
     }
     val metrics = plan.metrics.toSeq.map {
       case (key, metric) =>
-        new SQLMetricInfo(metric.name.getOrElse(key),
-                          metric.id,
-                          Utils.getFormattedClassName(metric.param))
+        new SQLMetricInfo(
+          metric.name.getOrElse(key),
+          metric.id,
+          Utils.getFormattedClassName(metric.param))
     }
 
-    new SparkPlanInfo(plan.nodeName,
-                      plan.simpleString,
-                      children.map(fromSparkPlan),
-                      plan.metadata,
-                      metrics)
+    new SparkPlanInfo(
+      plan.nodeName,
+      plan.simpleString,
+      children.map(fromSparkPlan),
+      plan.metadata,
+      metrics)
   }
 }

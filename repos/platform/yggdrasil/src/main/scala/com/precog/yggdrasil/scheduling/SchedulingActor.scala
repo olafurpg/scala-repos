@@ -150,8 +150,9 @@ trait SchedulingActorModule extends SecureVFSModule[Future, Slice] {
       }
 
       scheduleQueue.headOption foreach { head =>
-        val delay = Duration(new JodaDuration(new DateTime, head._1).getMillis,
-                             TimeUnit.MILLISECONDS)
+        val delay = Duration(
+          new JodaDuration(new DateTime, head._1).getMillis,
+          TimeUnit.MILLISECONDS)
 
         scheduledAwake =
           Some(context.system.scheduler.scheduleOnce(delay, self, WakeForRun))
@@ -236,10 +237,11 @@ trait SchedulingActorModule extends SecureVFSModule[Future, Slice] {
               logger.error(
                 "An error was encountered processing a scheduled query execution: " +
                   failure)
-              ourself ! TaskComplete(task.id,
-                                     clock.now(),
-                                     0,
-                                     Some(failure.toString)): PrecogUnit
+              ourself ! TaskComplete(
+                task.id,
+                clock.now(),
+                0,
+                Some(failure.toString)): PrecogUnit
           },
           storedQueryResult => {
             consumeStream(0, storedQueryResult.data) map { totalSize =>
@@ -268,35 +270,38 @@ trait SchedulingActorModule extends SecureVFSModule[Future, Slice] {
           identity[Future[PrecogUnit]]
         } onFailure {
           case t: Throwable =>
-            logger.error("Scheduled query execution failed by thrown error.",
-                         t)
-            ourself ! TaskComplete(task.id,
-                                   clock.now(),
-                                   0,
-                                   Option(t.getMessage) orElse Some(
-                                     t.getClass.toString)): PrecogUnit
+            logger.error(
+              "Scheduled query execution failed by thrown error.",
+              t)
+            ourself ! TaskComplete(
+              task.id,
+              clock.now(),
+              0,
+              Option(t.getMessage) orElse Some(t.getClass.toString)): PrecogUnit
         }
       }
     }
 
     def receive = {
-      case AddTask(repeat,
-                   apiKey,
-                   authorities,
-                   context,
-                   source,
-                   sink,
-                   timeout) =>
+      case AddTask(
+          repeat,
+          apiKey,
+          authorities,
+          context,
+          source,
+          sink,
+          timeout) =>
         val ourself = self
         val taskId = UUID.randomUUID()
-        val newTask = ScheduledTask(taskId,
-                                    repeat,
-                                    apiKey,
-                                    authorities,
-                                    context,
-                                    source,
-                                    sink,
-                                    timeout)
+        val newTask = ScheduledTask(
+          taskId,
+          repeat,
+          apiKey,
+          authorities,
+          context,
+          source,
+          sink,
+          timeout)
         val addResult: EitherT[Future, String, PrecogUnit] = repeat match {
           case None =>
             EitherT.right(executeTask(newTask))
@@ -355,9 +360,10 @@ trait SchedulingActorModule extends SecureVFSModule[Future, Slice] {
               case None =>
                 logger.info(
                   "Scheduled task %s completed with %d records in %d millis"
-                    .format(id,
-                            total,
-                            (new JodaDuration(startAt, endedAt)).getMillis))
+                    .format(
+                      id,
+                      total,
+                      (new JodaDuration(startAt, endedAt)).getMillis))
 
               case Some(error) =>
                 logger.warn(

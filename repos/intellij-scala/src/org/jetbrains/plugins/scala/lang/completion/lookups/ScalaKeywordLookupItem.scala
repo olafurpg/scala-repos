@@ -95,8 +95,9 @@ object ScalaKeywordLookupItem {
             if (file == null) return
             CodeStyleManager
               .getInstance(context.getProject)
-              .adjustLineIndent(file,
-                                new TextRange(context.getStartOffset, offset))
+              .adjustLineIndent(
+                file,
+                new TextRange(context.getStartOffset, offset))
           }
       }
     }

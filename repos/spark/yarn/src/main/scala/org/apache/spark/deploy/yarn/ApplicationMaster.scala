@@ -151,8 +151,9 @@ private[spark] class ApplicationMaster(args: ApplicationMasterArguments,
 
         // Set this internal configuration if it is running on cluster mode, this
         // configuration will be checked in SparkContext to avoid misuse of yarn cluster mode.
-        System.setProperty("spark.yarn.app.id",
-                           appAttemptId.getApplicationId().toString())
+        System.setProperty(
+          "spark.yarn.app.id",
+          appAttemptId.getApplicationId().toString())
       }
 
       logInfo("ApplicationAttemptId: " + appAttemptId)
@@ -172,9 +173,10 @@ private[spark] class ApplicationMaster(args: ApplicationMasterArguments,
           // If user application is exited ahead of time by calling System.exit(N), here mark
           // this application as failed with EXIT_EARLY. For a good shutdown, user shouldn't call
           // System.exit(0) to terminate the application.
-          finish(finalStatus,
-                 ApplicationMaster.EXIT_EARLY,
-                 "Shutdown hook called before final status was reported.")
+          finish(
+            finalStatus,
+            ApplicationMaster.EXIT_EARLY,
+            "Shutdown hook called before final status was reported.")
         }
 
         if (!unregistered) {
@@ -211,9 +213,10 @@ private[spark] class ApplicationMaster(args: ApplicationMasterArguments,
       case e: Exception =>
         // catch everything else if not specifically handled
         logError("Uncaught exception: ", e)
-        finish(FinalApplicationStatus.FAILED,
-               ApplicationMaster.EXIT_UNCAUGHT_EXCEPTION,
-               "Uncaught exception: " + e)
+        finish(
+          FinalApplicationStatus.FAILED,
+          ApplicationMaster.EXIT_UNCAUGHT_EXCEPTION,
+          "Uncaught exception: " + e)
     }
     exitCode
   }
@@ -314,13 +317,14 @@ private[spark] class ApplicationMaster(args: ApplicationMasterArguments,
       _sparkConf.get("spark.driver.host"),
       _sparkConf.get("spark.driver.port").toInt,
       CoarseGrainedSchedulerBackend.ENDPOINT_NAME).toString
-    allocator = client.register(driverUrl,
-                                driverRef,
-                                yarnConf,
-                                _sparkConf,
-                                uiAddress,
-                                historyAddress,
-                                securityMgr)
+    allocator = client.register(
+      driverUrl,
+      driverRef,
+      yarnConf,
+      _sparkConf,
+      uiAddress,
+      historyAddress,
+      securityMgr)
 
     allocator.allocateResources()
     reporterThread = launchReporterThread()
@@ -356,36 +360,41 @@ private[spark] class ApplicationMaster(args: ApplicationMasterArguments,
 
     // If there is no SparkContext at this point, just fail the app.
     if (sc == null) {
-      finish(FinalApplicationStatus.FAILED,
-             ApplicationMaster.EXIT_SC_NOT_INITED,
-             "Timed out waiting for SparkContext.")
+      finish(
+        FinalApplicationStatus.FAILED,
+        ApplicationMaster.EXIT_SC_NOT_INITED,
+        "Timed out waiting for SparkContext.")
     } else {
       rpcEnv = sc.env.rpcEnv
-      val driverRef = runAMEndpoint(sc.getConf.get("spark.driver.host"),
-                                    sc.getConf.get("spark.driver.port"),
-                                    isClusterMode = true)
-      registerAM(rpcEnv,
-                 driverRef,
-                 sc.ui.map(_.appUIAddress).getOrElse(""),
-                 securityMgr)
+      val driverRef = runAMEndpoint(
+        sc.getConf.get("spark.driver.host"),
+        sc.getConf.get("spark.driver.port"),
+        isClusterMode = true)
+      registerAM(
+        rpcEnv,
+        driverRef,
+        sc.ui.map(_.appUIAddress).getOrElse(""),
+        securityMgr)
       userClassThread.join()
     }
   }
 
   private def runExecutorLauncher(securityMgr: SecurityManager): Unit = {
     val port = sparkConf.getInt("spark.yarn.am.port", 0)
-    rpcEnv = RpcEnv.create("sparkYarnAM",
-                           Utils.localHostName,
-                           port,
-                           sparkConf,
-                           securityMgr,
-                           clientMode = true)
+    rpcEnv = RpcEnv.create(
+      "sparkYarnAM",
+      Utils.localHostName,
+      port,
+      sparkConf,
+      securityMgr,
+      clientMode = true)
     val driverRef = waitForSparkDriver()
     addAmIpFilter()
-    registerAM(rpcEnv,
-               driverRef,
-               sparkConf.get("spark.driver.appUIAddress", ""),
-               securityMgr)
+    registerAM(
+      rpcEnv,
+      driverRef,
+      sparkConf.get("spark.driver.appUIAddress", ""),
+      securityMgr)
 
     // In client mode the actor will stop the reporter thread.
     reporterThread.join()
@@ -420,15 +429,17 @@ private[spark] class ApplicationMaster(args: ApplicationMasterArguments,
                     .getClass()
                     .getName()) {
                 logError("Exception from Reporter thread.", e)
-                finish(FinalApplicationStatus.FAILED,
-                       ApplicationMaster.EXIT_REPORTER_FAILURE,
-                       e.getMessage)
+                finish(
+                  FinalApplicationStatus.FAILED,
+                  ApplicationMaster.EXIT_REPORTER_FAILURE,
+                  e.getMessage)
               } else if (!NonFatal(e) ||
                          failureCount >= reporterMaxFailures) {
-                finish(FinalApplicationStatus.FAILED,
-                       ApplicationMaster.EXIT_REPORTER_FAILURE,
-                       "Exception was thrown " +
-                         s"$failureCount time(s) from Reporter thread.")
+                finish(
+                  FinalApplicationStatus.FAILED,
+                  ApplicationMaster.EXIT_REPORTER_FAILURE,
+                  "Exception was thrown " +
+                    s"$failureCount time(s) from Reporter thread.")
               } else {
                 logWarning(
                   s"Reporter thread fails $failureCount time(s) in a row.",
@@ -606,8 +617,9 @@ private[spark] class ApplicationMaster(args: ApplicationMasterArguments,
       override def run() {
         try {
           mainMethod.invoke(null, userArgs.toArray)
-          finish(FinalApplicationStatus.SUCCEEDED,
-                 ApplicationMaster.EXIT_SUCCESS)
+          finish(
+            FinalApplicationStatus.SUCCEEDED,
+            ApplicationMaster.EXIT_SUCCESS)
           logDebug("Done running users class")
         } catch {
           case e: InvocationTargetException =>
@@ -620,9 +632,10 @@ private[spark] class ApplicationMaster(args: ApplicationMasterArguments,
                 finish(FinalApplicationStatus.FAILED, exitCode, msg)
               case cause: Throwable =>
                 logError("User class threw exception: " + cause, cause)
-                finish(FinalApplicationStatus.FAILED,
-                       ApplicationMaster.EXIT_EXCEPTION_USER_CLASS,
-                       "User class threw exception: " + cause)
+                finish(
+                  FinalApplicationStatus.FAILED,
+                  ApplicationMaster.EXIT_EXCEPTION_USER_CLASS,
+                  "User class threw exception: " + cause)
             }
         }
       }
@@ -659,9 +672,10 @@ private[spark] class ApplicationMaster(args: ApplicationMasterArguments,
 
     override def receiveAndReply(
         context: RpcCallContext): PartialFunction[Any, Unit] = {
-      case RequestExecutors(requestedTotal,
-                            localityAwareTasks,
-                            hostToLocalTaskCount) =>
+      case RequestExecutors(
+          requestedTotal,
+          localityAwareTasks,
+          hostToLocalTaskCount) =>
         Option(allocator) match {
           case Some(a) =>
             if (a.requestTotalExecutorsWithPreferredLocalities(
@@ -706,8 +720,9 @@ private[spark] class ApplicationMaster(args: ApplicationMasterArguments,
       if (!isClusterMode) {
         logInfo(
           s"Driver terminated or disconnected! Shutting down. $remoteAddress")
-        finish(FinalApplicationStatus.SUCCEEDED,
-               ApplicationMaster.EXIT_SUCCESS)
+        finish(
+          FinalApplicationStatus.SUCCEEDED,
+          ApplicationMaster.EXIT_SUCCESS)
       }
     }
   }

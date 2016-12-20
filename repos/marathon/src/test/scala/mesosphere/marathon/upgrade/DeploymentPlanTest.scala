@@ -100,13 +100,15 @@ class DeploymentPlanTest
   }
 
   test("start from running group") {
-    val apps = Set(AppDefinition("/app".toPath, Some("sleep 10")),
-                   AppDefinition("/app2".toPath, Some("cmd2")),
-                   AppDefinition("/app3".toPath, Some("cmd3")))
+    val apps = Set(
+      AppDefinition("/app".toPath, Some("sleep 10")),
+      AppDefinition("/app2".toPath, Some("cmd2")),
+      AppDefinition("/app3".toPath, Some("cmd3")))
     val update =
-      Set(AppDefinition("/app".toPath, Some("sleep 30")),
-          AppDefinition("/app2".toPath, Some("cmd2"), instances = 10),
-          AppDefinition("/app4".toPath, Some("cmd4")))
+      Set(
+        AppDefinition("/app".toPath, Some("sleep 30")),
+        AppDefinition("/app2".toPath, Some("cmd2"), instances = 10),
+        AppDefinition("/app4".toPath, Some("cmd4")))
 
     val from = Group("/group".toPath, apps)
     val to = Group("/group".toPath, update)
@@ -128,9 +130,10 @@ class DeploymentPlanTest
       AppDefinition("/app2".toPath, Some("cmd2"), versionInfo = versionInfo)
     val app3: AppDefinition =
       AppDefinition("/app3".toPath, Some("cmd3"), versionInfo = versionInfo)
-    val unchanged: AppDefinition = AppDefinition("/unchanged".toPath,
-                                                 Some("unchanged"),
-                                                 versionInfo = versionInfo)
+    val unchanged: AppDefinition = AppDefinition(
+      "/unchanged".toPath,
+      Some("unchanged"),
+      versionInfo = versionInfo)
 
     val apps = Set(app, app2, app3, unchanged)
 
@@ -161,11 +164,12 @@ class DeploymentPlanTest
 
     val versionInfo = AppDefinition.VersionInfo.forNewConfig(Timestamp(10))
     val mongo: (AppDefinition, AppDefinition) =
-      AppDefinition(mongoId,
-                    Some("mng1"),
-                    instances = 4,
-                    upgradeStrategy = strategy,
-                    versionInfo = versionInfo) -> AppDefinition(
+      AppDefinition(
+        mongoId,
+        Some("mng1"),
+        instances = 4,
+        upgradeStrategy = strategy,
+        versionInfo = versionInfo) -> AppDefinition(
         mongoId,
         Some("mng2"),
         instances = 8,
@@ -173,11 +177,12 @@ class DeploymentPlanTest
         versionInfo = versionInfo)
 
     val service: (AppDefinition, AppDefinition) =
-      AppDefinition(serviceId,
-                    Some("srv1"),
-                    instances = 4,
-                    upgradeStrategy = strategy,
-                    versionInfo = versionInfo) -> AppDefinition(
+      AppDefinition(
+        serviceId,
+        Some("srv1"),
+        instances = 4,
+        upgradeStrategy = strategy,
+        versionInfo = versionInfo) -> AppDefinition(
         serviceId,
         Some("srv2"),
         dependencies = Set(mongoId),
@@ -194,11 +199,12 @@ class DeploymentPlanTest
       )
     )
 
-    val to = Group("/test".toPath,
-                   groups = Set(
-                     Group("/test/database".toPath, Set(mongo._2)),
-                     Group("/test/service".toPath, Set(service._2))
-                   ))
+    val to = Group(
+      "/test".toPath,
+      groups = Set(
+        Group("/test/database".toPath, Set(mongo._2)),
+        Group("/test/service".toPath, Set(service._2))
+      ))
 
     When("the deployment plan is computed")
     val plan = DeploymentPlan(from, to)
@@ -252,11 +258,12 @@ class DeploymentPlanTest
     val versionInfo = AppDefinition.VersionInfo.forNewConfig(Timestamp(10))
 
     val mongo =
-      AppDefinition(mongoId,
-                    Some("mng1"),
-                    instances = 4,
-                    upgradeStrategy = strategy,
-                    versionInfo = versionInfo) -> AppDefinition(
+      AppDefinition(
+        mongoId,
+        Some("mng1"),
+        instances = 4,
+        upgradeStrategy = strategy,
+        versionInfo = versionInfo) -> AppDefinition(
         mongoId,
         Some("mng2"),
         instances = 8,
@@ -264,11 +271,12 @@ class DeploymentPlanTest
         versionInfo = versionInfo)
 
     val service =
-      AppDefinition(serviceId,
-                    Some("srv1"),
-                    instances = 4,
-                    upgradeStrategy = strategy,
-                    versionInfo = versionInfo) -> AppDefinition(
+      AppDefinition(
+        serviceId,
+        Some("srv1"),
+        instances = 4,
+        upgradeStrategy = strategy,
+        versionInfo = versionInfo) -> AppDefinition(
         serviceId,
         Some("srv2"),
         instances = 10,
@@ -276,17 +284,19 @@ class DeploymentPlanTest
         versionInfo = versionInfo)
 
     val from: Group =
-      Group("/test".toPath,
-            groups = Set(
-              Group("/test/database".toPath, Set(mongo._1)),
-              Group("/test/service".toPath, Set(service._1))
-            ))
+      Group(
+        "/test".toPath,
+        groups = Set(
+          Group("/test/database".toPath, Set(mongo._1)),
+          Group("/test/service".toPath, Set(service._1))
+        ))
 
-    val to: Group = Group("/test".toPath,
-                          groups = Set(
-                            Group("/test/database".toPath, Set(mongo._2)),
-                            Group("/test/service".toPath, Set(service._2))
-                          ))
+    val to: Group = Group(
+      "/test".toPath,
+      groups = Set(
+        Group("/test/database".toPath, Set(mongo._2)),
+        Group("/test/service".toPath, Set(service._2))
+      ))
 
     When("the deployment plan is computed")
     val plan = DeploymentPlan(from, to)
@@ -308,11 +318,12 @@ class DeploymentPlanTest
     val versionInfo = AppDefinition.VersionInfo.forNewConfig(Timestamp(10))
 
     val mongo =
-      AppDefinition(mongoId,
-                    Some("mng1"),
-                    instances = 4,
-                    upgradeStrategy = strategy,
-                    versionInfo = versionInfo) -> AppDefinition(
+      AppDefinition(
+        mongoId,
+        Some("mng1"),
+        instances = 4,
+        upgradeStrategy = strategy,
+        versionInfo = versionInfo) -> AppDefinition(
         mongoId,
         Some("mng2"),
         instances = 8,
@@ -320,11 +331,12 @@ class DeploymentPlanTest
         versionInfo = versionInfo)
 
     val service =
-      AppDefinition(serviceId,
-                    Some("srv1"),
-                    instances = 4,
-                    upgradeStrategy = strategy,
-                    versionInfo = versionInfo) -> AppDefinition(
+      AppDefinition(
+        serviceId,
+        Some("srv1"),
+        instances = 4,
+        upgradeStrategy = strategy,
+        versionInfo = versionInfo) -> AppDefinition(
         serviceId,
         Some("srv2"),
         dependencies = Set(mongoId),
@@ -333,37 +345,42 @@ class DeploymentPlanTest
         versionInfo = versionInfo)
 
     val independent =
-      AppDefinition(appId,
-                    Some("app1"),
-                    instances = 1,
-                    upgradeStrategy = strategy) -> AppDefinition(
+      AppDefinition(
+        appId,
+        Some("app1"),
+        instances = 1,
+        upgradeStrategy = strategy) -> AppDefinition(
         appId,
         Some("app2"),
         instances = 3,
         upgradeStrategy = strategy)
 
-    val toStop = AppDefinition("/test/service/toStop".toPath,
-                               instances = 1,
-                               dependencies = Set(mongoId))
-    val toStart = AppDefinition("/test/service/toStart".toPath,
-                                instances = 2,
-                                dependencies = Set(serviceId))
+    val toStop = AppDefinition(
+      "/test/service/toStop".toPath,
+      instances = 1,
+      dependencies = Set(mongoId))
+    val toStart = AppDefinition(
+      "/test/service/toStart".toPath,
+      instances = 2,
+      dependencies = Set(serviceId))
 
     val from: Group =
-      Group("/test".toPath,
-            groups = Set(
-              Group("/test/database".toPath, Set(mongo._1)),
-              Group("/test/service".toPath, Set(service._1, toStop)),
-              Group("/test/independent".toPath, Set(independent._1))
-            ))
+      Group(
+        "/test".toPath,
+        groups = Set(
+          Group("/test/database".toPath, Set(mongo._1)),
+          Group("/test/service".toPath, Set(service._1, toStop)),
+          Group("/test/independent".toPath, Set(independent._1))
+        ))
 
     val to: Group =
-      Group("/test".toPath,
-            groups = Set(
-              Group("/test/database".toPath, Set(mongo._2)),
-              Group("/test/service".toPath, Set(service._2, toStart)),
-              Group("/test/independent".toPath, Set(independent._2))
-            ))
+      Group(
+        "/test".toPath,
+        groups = Set(
+          Group("/test/database".toPath, Set(mongo._2)),
+          Group("/test/service".toPath, Set(service._2, toStart)),
+          Group("/test/independent".toPath, Set(independent._2))
+        ))
 
     When("the deployment plan is computed")
     val plan = DeploymentPlan(from, to)
@@ -387,15 +404,17 @@ class DeploymentPlanTest
     Given("application updates with only the removal of an app")
     val strategy = UpgradeStrategy(0.75)
     val app =
-      AppDefinition("/test/independent/app".toPath,
-                    Some("app2"),
-                    instances = 3,
-                    upgradeStrategy = strategy) -> None
+      AppDefinition(
+        "/test/independent/app".toPath,
+        Some("app2"),
+        instances = 3,
+        upgradeStrategy = strategy) -> None
     val from: Group =
-      Group("/test".toPath,
-            groups = Set(
-              Group("/test/independent".toPath, Set(app._1))
-            ))
+      Group(
+        "/test".toPath,
+        groups = Set(
+          Group("/test/independent".toPath, Set(app._1))
+        ))
     val to: Group = Group("/test".toPath)
 
     When("the deployment plan is computed")
@@ -410,9 +429,10 @@ class DeploymentPlanTest
   test("Should create non-empty deployment plan when only args have changed") {
     val versionInfo: FullVersionInfo =
       AppDefinition.VersionInfo.forNewConfig(Timestamp(10))
-    val app = AppDefinition(id = "/test".toPath,
-                            cmd = Some("sleep 5"),
-                            versionInfo = versionInfo)
+    val app = AppDefinition(
+      id = "/test".toPath,
+      cmd = Some("sleep 5"),
+      versionInfo = versionInfo)
     val appNew = app.copy(args = Some(Seq("foo")))
 
     val from = Group("/".toPath, apps = Set(app))
@@ -459,9 +479,9 @@ class DeploymentPlanTest
     Given("a group with one app")
     val aId = "/test/some/a".toPath
     val oldApp =
-      AppDefinition(aId,
-                    versionInfo =
-                      AppDefinition.VersionInfo.forNewConfig(Timestamp(10)))
+      AppDefinition(
+        aId,
+        versionInfo = AppDefinition.VersionInfo.forNewConfig(Timestamp(10)))
 
     When("A deployment plan is generated")
     val originalGroup = Group(
@@ -482,11 +502,12 @@ class DeploymentPlanTest
     )
 
     val taskToKill = MarathonTestHelper.stagedTaskForApp(aId)
-    val plan = DeploymentPlan(original = originalGroup,
-                              target = targetGroup,
-                              resolveArtifacts = Seq.empty,
-                              version = Timestamp.now(),
-                              toKill = Map(aId -> Set(taskToKill)))
+    val plan = DeploymentPlan(
+      original = originalGroup,
+      target = targetGroup,
+      resolveArtifacts = Seq.empty,
+      version = Timestamp.now(),
+      toKill = Map(aId -> Set(taskToKill)))
 
     Then("DeploymentSteps should include ScaleApplication w/ tasksToKill")
     plan.steps should not be empty
@@ -498,9 +519,10 @@ class DeploymentPlanTest
 
   test("Deployment plan allows valid updates for resident tasks") {
     Given("All options are supplied and we have a valid group change")
-    AllConf.SuppliedOptionNames = Set("mesos_authentication_principal",
-                                      "mesos_role",
-                                      "mesos_authentication_secret_file")
+    AllConf.SuppliedOptionNames = Set(
+      "mesos_authentication_principal",
+      "mesos_role",
+      "mesos_authentication_secret_file")
     val f = new Fixture()
 
     When("We create a scale deployment")
@@ -515,9 +537,10 @@ class DeploymentPlanTest
   test(
     "Deployment plan validation fails for invalid changes in resident tasks") {
     Given("All options are supplied and we have a valid group change")
-    AllConf.SuppliedOptionNames = Set("mesos_authentication_principal",
-                                      "mesos_role",
-                                      "mesos_authentication_secret_file")
+    AllConf.SuppliedOptionNames = Set(
+      "mesos_authentication_principal",
+      "mesos_role",
+      "mesos_authentication_secret_file")
     val f = new Fixture()
 
     When("We update the upgrade strategy to the default strategy")

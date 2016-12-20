@@ -302,11 +302,12 @@ object CSRF {
     def bindingsFromConfiguration(
         environment: Environment,
         configuration: Configuration): Seq[Binding[_]] = {
-      Reflect.bindingsFromConfiguration[ErrorHandler,
-                                        CSRFErrorHandler,
-                                        JavaCSRFErrorHandlerAdapter,
-                                        JavaCSRFErrorHandlerDelegate,
-                                        CSRFHttpErrorHandler](
+      Reflect.bindingsFromConfiguration[
+        ErrorHandler,
+        CSRFErrorHandler,
+        JavaCSRFErrorHandlerAdapter,
+        JavaCSRFErrorHandlerDelegate,
+        CSRFHttpErrorHandler](
         environment,
         PlayConfig(configuration),
         "play.filters.csrf.errorHandler",
@@ -342,8 +343,9 @@ trait CSRFComponents {
     new CSRF.TokenProviderProvider(csrfConfig, csrfTokenSigner).get
   lazy val csrfErrorHandler: CSRF.ErrorHandler = new CSRFHttpErrorHandler(
     httpErrorHandler)
-  lazy val csrfFilter: CSRFFilter = new CSRFFilter(csrfConfig,
-                                                   csrfTokenSigner,
-                                                   csrfTokenProvider,
-                                                   csrfErrorHandler)
+  lazy val csrfFilter: CSRFFilter = new CSRFFilter(
+    csrfConfig,
+    csrfTokenSigner,
+    csrfTokenProvider,
+    csrfErrorHandler)
 }

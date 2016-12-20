@@ -68,10 +68,11 @@ class TypeCheckCanBeMatchInspection
         if typeCheckIsUsedEnough(ifStmt, call)
       } {
         val fix = new TypeCheckCanBeMatchQuickFix(call, ifStmt)
-        holder.registerProblem(call,
-                               inspectionName,
-                               ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
-                               fix)
+        holder.registerProblem(
+          call,
+          inspectionName,
+          ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+          fix)
       }
   }
 
@@ -89,9 +90,10 @@ class TypeCheckCanBeMatchInspection
 
 class TypeCheckCanBeMatchQuickFix(isInstOfUnderFix: ScGenericCall,
                                   ifStmt: ScIfStmt)
-    extends AbstractFixOnTwoPsiElements(inspectionName,
-                                        isInstOfUnderFix,
-                                        ifStmt) {
+    extends AbstractFixOnTwoPsiElements(
+      inspectionName,
+      isInstOfUnderFix,
+      ifStmt) {
   def doApplyFix(project: Project) {
     val isInstOf = getFirstElement
     val ifSt = getSecondElement
@@ -143,9 +145,10 @@ object TypeCheckToMatchUtil {
 
     //method for finding and saving named type cast
     def checkAndStoreNameAndDef(asInstOfCall: ScGenericCall): Boolean = {
-      ScalaPsiUtil.getContextOfType(asInstOfCall,
-                                    strict = true,
-                                    classOf[ScPatternDefinition]) match {
+      ScalaPsiUtil.getContextOfType(
+        asInstOfCall,
+        strict = true,
+        classOf[ScPatternDefinition]) match {
         case patternDef: ScPatternDefinition =>
           val bindings = patternDef.bindings
           //pattern consist of one assignment of asInstanceOf call
@@ -187,21 +190,23 @@ object TypeCheckToMatchUtil {
       if (asInstOfInBody.count(checkAndStoreNameAndDef) == 0) {
         //no usage of asInstanceOf
         if (asInstOfEverywhere.isEmpty) {
-          buildCaseClauseText("_ : " + typeName,
-                              guardCond,
-                              ifStmt.thenBranch,
-                              ifStmt.getProject)
+          buildCaseClauseText(
+            "_ : " + typeName,
+            guardCond,
+            ifStmt.thenBranch,
+            ifStmt.getProject)
         }
         //no named usage
         else {
           val suggestedNames: Array[String] = NameSuggester.suggestNames(
             asInstOfEverywhere.head,
-            new ScalaVariableValidator(null,
-                                       ifStmt.getProject,
-                                       ifStmt,
-                                       false,
-                                       ifStmt.getParent,
-                                       ifStmt.getParent))
+            new ScalaVariableValidator(
+              null,
+              ifStmt.getProject,
+              ifStmt,
+              false,
+              ifStmt.getParent,
+              ifStmt.getParent))
           val name = suggestedNames(0)
           asInstOfEverywhere.foreach { c =>
             val newExpr = ScalaPsiElementFactory
@@ -212,10 +217,11 @@ object TypeCheckToMatchUtil {
           }
 
           renameData += ((caseClauseIndex, suggestedNames.toSeq))
-          buildCaseClauseText(s"$name : $typeName",
-                              guardCond,
-                              ifStmt.thenBranch,
-                              ifStmt.getProject)
+          buildCaseClauseText(
+            s"$name : $typeName",
+            guardCond,
+            ifStmt.thenBranch,
+            ifStmt.getProject)
         }
       }
       //have named usage, use this name in case clause pattern definition
@@ -232,10 +238,11 @@ object TypeCheckToMatchUtil {
           asInstOfEverywhere.foreach(
             _.replaceExpression(newExpr, removeParenthesis = true))
         }
-        buildCaseClauseText(s"$name : $typeName",
-                            guardCond,
-                            ifStmt.thenBranch,
-                            ifStmt.getProject)
+        buildCaseClauseText(
+          s"$name : $typeName",
+          guardCond,
+          ifStmt.thenBranch,
+          ifStmt.getProject)
       }
     }
   }
@@ -305,10 +312,11 @@ object TypeCheckToMatchUtil {
     val renameData = new RenameData()
     for {
       index <- ifStmts.indices
-      text <- buildCaseClauseText(ifStmts(index),
-                                  isInstOf(index),
-                                  index,
-                                  renameData)
+      text <- buildCaseClauseText(
+        ifStmts(index),
+        isInstOf(index),
+        index,
+        renameData)
     } {
       builder.append(text)
     }

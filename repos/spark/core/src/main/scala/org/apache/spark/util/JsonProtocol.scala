@@ -597,12 +597,13 @@ private[spark] object JsonProtocol {
     val taskEndReason = taskEndReasonFromJson(json \ "Task End Reason")
     val taskInfo = taskInfoFromJson(json \ "Task Info")
     val taskMetrics = taskMetricsFromJson(json \ "Task Metrics")
-    SparkListenerTaskEnd(stageId,
-                         stageAttemptId,
-                         taskType,
-                         taskEndReason,
-                         taskInfo,
-                         taskMetrics)
+    SparkListenerTaskEnd(
+      stageId,
+      stageAttemptId,
+      taskType,
+      taskEndReason,
+      taskInfo,
+      taskMetrics)
   }
 
   def jobStartFromJson(json: JValue): SparkListenerJobStart = {
@@ -672,12 +673,13 @@ private[spark] object JsonProtocol {
     val appAttemptId =
       Utils.jsonOption(json \ "App Attempt ID").map(_.extract[String])
     val driverLogs = Utils.jsonOption(json \ "Driver Logs").map(mapFromJson)
-    SparkListenerApplicationStart(appName,
-                                  appId,
-                                  time,
-                                  sparkUser,
-                                  appAttemptId,
-                                  driverLogs)
+    SparkListenerApplicationStart(
+      appName,
+      appId,
+      time,
+      sparkUser,
+      appAttemptId,
+      driverLogs)
   }
 
   def applicationEndFromJson(json: JValue): SparkListenerApplicationEnd = {
@@ -748,13 +750,14 @@ private[spark] object JsonProtocol {
         case None => Seq[AccumulableInfo]()
       }
 
-    val stageInfo = new StageInfo(stageId,
-                                  attemptId,
-                                  stageName,
-                                  numTasks,
-                                  rddInfos,
-                                  parentIds,
-                                  details)
+    val stageInfo = new StageInfo(
+      stageId,
+      attemptId,
+      stageName,
+      numTasks,
+      rddInfos,
+      parentIds,
+      details)
     stageInfo.submissionTime = submissionTime
     stageInfo.completionTime = completionTime
     stageInfo.failureReason = failureReason
@@ -783,14 +786,15 @@ private[spark] object JsonProtocol {
       case None => Seq[AccumulableInfo]()
     }
 
-    val taskInfo = new TaskInfo(taskId,
-                                index,
-                                attempt,
-                                launchTime,
-                                executorId,
-                                host,
-                                taskLocality,
-                                speculative)
+    val taskInfo = new TaskInfo(
+      taskId,
+      index,
+      attempt,
+      launchTime,
+      executorId,
+      host,
+      taskLocality,
+      speculative)
     taskInfo.gettingResultTime = gettingResultTime
     taskInfo.finishTime = finishTime
     taskInfo.failed = failed
@@ -811,13 +815,14 @@ private[spark] object JsonProtocol {
     val countFailedValues =
       (json \ "Count Failed Values").extractOpt[Boolean].getOrElse(false)
     val metadata = (json \ "Metadata").extractOpt[String]
-    new AccumulableInfo(id,
-                        name,
-                        update,
-                        value,
-                        internal,
-                        countFailedValues,
-                        metadata)
+    new AccumulableInfo(
+      id,
+      name,
+      update,
+      value,
+      internal,
+      countFailedValues,
+      metadata)
   }
 
   /**
@@ -953,11 +958,12 @@ private[spark] object JsonProtocol {
         val mapId = (json \ "Map ID").extract[Int]
         val reduceId = (json \ "Reduce ID").extract[Int]
         val message = Utils.jsonOption(json \ "Message").map(_.extract[String])
-        new FetchFailed(blockManagerAddress,
-                        shuffleId,
-                        mapId,
-                        reduceId,
-                        message.getOrElse("Unknown reason"))
+        new FetchFailed(
+          blockManagerAddress,
+          shuffleId,
+          mapId,
+          reduceId,
+          message.getOrElse("Unknown reason"))
       case `exceptionFailure` =>
         val className = (json \ "Class Name").extract[String]
         val description = (json \ "Description").extract[String]
@@ -970,12 +976,13 @@ private[spark] object JsonProtocol {
           .map(_.extract[List[JValue]].map(accumulableInfoFromJson))
           .getOrElse(
             taskMetricsFromJson(json \ "Metrics").accumulatorUpdates())
-        ExceptionFailure(className,
-                         description,
-                         stackTrace,
-                         fullStackTrace,
-                         None,
-                         accumUpdates)
+        ExceptionFailure(
+          className,
+          description,
+          stackTrace,
+          fullStackTrace,
+          None,
+          accumUpdates)
       case `taskResultLost` => TaskResultLost
       case `taskKilled` => TaskKilled
       case `taskCommitDenied` =>
@@ -1000,9 +1007,10 @@ private[spark] object JsonProtocol {
           Utils.jsonOption(json \ "Executor ID").map(_.extract[String])
         val reason =
           Utils.jsonOption(json \ "Loss Reason").map(_.extract[String])
-        ExecutorLostFailure(executorId.getOrElse("Unknown"),
-                            exitCausedByApp.getOrElse(true),
-                            reason)
+        ExecutorLostFailure(
+          executorId.getOrElse("Unknown"),
+          exitCausedByApp.getOrElse(true),
+          reason)
       case `unknownReason` => UnknownReason
     }
   }
@@ -1052,13 +1060,14 @@ private[spark] object JsonProtocol {
     val memSize = (json \ "Memory Size").extract[Long]
     val diskSize = (json \ "Disk Size").extract[Long]
 
-    val rddInfo = new RDDInfo(rddId,
-                              name,
-                              numPartitions,
-                              storageLevel,
-                              parentIds,
-                              callsite,
-                              scope)
+    val rddInfo = new RDDInfo(
+      rddId,
+      name,
+      numPartitions,
+      storageLevel,
+      parentIds,
+      callsite,
+      scope)
     rddInfo.numCachedPartitions = numCachedPartitions
     rddInfo.memSize = memSize
     rddInfo.diskSize = diskSize

@@ -62,8 +62,9 @@ case class AppDefinition(
 
   import mesosphere.mesos.protos.Implicits._
 
-  require(ipAddress.isEmpty || portDefinitions.isEmpty,
-          "IP address and ports are not allowed at the same time")
+  require(
+    ipAddress.isEmpty || portDefinitions.isEmpty,
+    "IP address and ports are not allowed at the same time")
 
   lazy val portNumbers: Seq[Int] = portDefinitions.map(_.port)
 

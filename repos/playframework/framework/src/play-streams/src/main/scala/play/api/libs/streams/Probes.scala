@@ -118,9 +118,10 @@ object Probes {
         override def onDownstreamFinish(ctx: Context[T]) =
           log("onDownstreamFinish")(super.onDownstreamFinish(ctx))
         override def onUpstreamFailure(cause: Throwable, ctx: Context[T]) =
-          log("onUpstreamFailure",
-              s"${cause.getClass}: ${cause.getMessage}",
-              cause.printStackTrace())(super.onUpstreamFailure(cause, ctx))
+          log(
+            "onUpstreamFailure",
+            s"${cause.getClass}: ${cause.getMessage}",
+            cause.printStackTrace())(super.onUpstreamFailure(cause, ctx))
         override def postStop() = log("postStop")(super.postStop())
         override def decide(t: Throwable) = log("decide")(super.decide(t))
         override def restart() = log("restart")(super.restart())

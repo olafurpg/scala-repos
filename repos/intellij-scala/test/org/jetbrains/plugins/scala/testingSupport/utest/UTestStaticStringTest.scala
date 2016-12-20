@@ -21,8 +21,9 @@ trait UTestStaticStringTest extends UTestTestCase {
   }
 
   protected def addTest(): Unit = {
-    addFileToProject(staticStringTestFileName,
-                     """
+    addFileToProject(
+      staticStringTestFileName,
+      """
         |import utest._
         |import utest.framework.TestSuite
         |

@@ -311,12 +311,13 @@ object H5Store {
       ab.sizeHint(gcount)
 
       for (i <- Range(0, gcount)) {
-        ab += H5.H5Lget_name_by_idx(fileid,
-                                    node,
-                                    HDF5Constants.H5_INDEX_NAME,
-                                    HDF5Constants.H5_ITER_INC,
-                                    i,
-                                    HDF5Constants.H5P_DEFAULT)
+        ab += H5.H5Lget_name_by_idx(
+          fileid,
+          node,
+          HDF5Constants.H5_INDEX_NAME,
+          HDF5Constants.H5_ITER_INC,
+          i,
+          HDF5Constants.H5P_DEFAULT)
       }
 
       ab.result()
@@ -343,10 +344,11 @@ object H5Store {
     * @param path Path of file
     */
   def createFile(path: String): Int = withMonitor {
-    val fid = H5.H5Fcreate(path,
-                           HDF5Constants.H5F_ACC_EXCL,
-                           HDF5Constants.H5P_DEFAULT,
-                           HDF5Constants.H5P_DEFAULT)
+    val fid = H5.H5Fcreate(
+      path,
+      HDF5Constants.H5F_ACC_EXCL,
+      HDF5Constants.H5P_DEFAULT,
+      HDF5Constants.H5P_DEFAULT)
     assertException(fid >= 0, "Could not create file " + path)
     writePytablesHeader(fid)
     // H5Reg.save(fid, H5F) <-- don't want fid automatically released on error
@@ -417,19 +419,22 @@ object H5Store {
 
     // link creation property list
     val lcpl_id = H5.H5Pcreate(HDF5Constants.H5P_LINK_CREATE)
-    assertException(lcpl_id >= 0,
-                    "Could not create property list in createNode")
+    assertException(
+      lcpl_id >= 0,
+      "Could not create property list in createNode")
 
     H5Reg.save(lcpl_id, H5P)
 
-    assertException(H5.H5Pset_create_intermediate_group(lcpl_id, true) >= 0,
-                    "Failed to set property for creating intermediate groups")
+    assertException(
+      H5.H5Pset_create_intermediate_group(lcpl_id, true) >= 0,
+      "Failed to set property for creating intermediate groups")
 
-    val gid = H5.H5Gcreate(parent_id,
-                           path,
-                           lcpl_id,
-                           HDF5Constants.H5P_DEFAULT,
-                           HDF5Constants.H5P_DEFAULT)
+    val gid = H5.H5Gcreate(
+      parent_id,
+      path,
+      lcpl_id,
+      HDF5Constants.H5P_DEFAULT,
+      HDF5Constants.H5P_DEFAULT)
     assertException(gid >= 0, "Failed to great group %s" format path)
 
     H5Reg.close(lcpl_id, H5P)
@@ -460,18 +465,20 @@ object H5Store {
 
     // open new scalar space for string constant
     val spaceToUse = H5.H5Screate(HDF5Constants.H5S_SCALAR)
-    assertException(spaceToUse >= 0,
-                    "No space to write the attribute: " + attr)
+    assertException(
+      spaceToUse >= 0,
+      "No space to write the attribute: " + attr)
 
     H5Reg.save(spaceToUse, H5S)
 
     val attribute_id = try {
-      H5.H5Acreate(node_id,
-                   attr,
-                   tcsz,
-                   spaceToUse,
-                   HDF5Constants.H5P_DEFAULT,
-                   HDF5Constants.H5P_DEFAULT)
+      H5.H5Acreate(
+        node_id,
+        attr,
+        tcsz,
+        spaceToUse,
+        HDF5Constants.H5P_DEFAULT,
+        HDF5Constants.H5P_DEFAULT)
     } catch {
       case e: HDF5LibraryException =>
         H5.H5Aopen(node_id, attr, HDF5Constants.H5P_DEFAULT)
@@ -549,18 +556,20 @@ object H5Store {
   private def writeAttrLong(node_id: Int, attr: String, datum: Long) {
     // open new scalar space for long constant
     val spaceToUse = H5.H5Screate(HDF5Constants.H5S_SCALAR)
-    assertException(spaceToUse >= 0,
-                    "No space to write the attribute: " + attr)
+    assertException(
+      spaceToUse >= 0,
+      "No space to write the attribute: " + attr)
 
     H5Reg.save(spaceToUse, H5S)
 
     val attribute_id = try {
-      H5.H5Acreate(node_id,
-                   attr,
-                   HDF5Constants.H5T_NATIVE_LONG,
-                   spaceToUse,
-                   HDF5Constants.H5P_DEFAULT,
-                   HDF5Constants.H5P_DEFAULT)
+      H5.H5Acreate(
+        node_id,
+        attr,
+        HDF5Constants.H5T_NATIVE_LONG,
+        spaceToUse,
+        HDF5Constants.H5P_DEFAULT,
+        HDF5Constants.H5P_DEFAULT)
     } catch {
       case e: HDF5LibraryException =>
         H5.H5Aopen(node_id, attr, HDF5Constants.H5P_DEFAULT)
@@ -579,18 +588,20 @@ object H5Store {
   private def writeAttrBool(node_id: Int, attr: String, datum: Boolean) {
     // open new scalar space for long constant
     val spaceToUse = H5.H5Screate(HDF5Constants.H5S_SCALAR)
-    assertException(spaceToUse >= 0,
-                    "No space to write the attribute: " + attr)
+    assertException(
+      spaceToUse >= 0,
+      "No space to write the attribute: " + attr)
 
     H5Reg.save(spaceToUse, H5S)
 
     val attribute_id = try {
-      H5.H5Acreate(node_id,
-                   attr,
-                   HDF5Constants.H5T_STD_B8LE,
-                   spaceToUse,
-                   HDF5Constants.H5P_DEFAULT,
-                   HDF5Constants.H5P_DEFAULT)
+      H5.H5Acreate(
+        node_id,
+        attr,
+        HDF5Constants.H5T_STD_B8LE,
+        spaceToUse,
+        HDF5Constants.H5P_DEFAULT,
+        HDF5Constants.H5P_DEFAULT)
     } catch {
       case e: HDF5LibraryException =>
         H5.H5Aopen(node_id, attr, HDF5Constants.H5P_DEFAULT)
@@ -619,9 +630,10 @@ object H5Store {
 
     // make sure it's a long attribute
     val datatype = H5.H5Aget_type(attrid)
-    assertException(datatype >= 0 &&
-                      H5.H5Tget_class(datatype) == HDF5Constants.H5T_INTEGER,
-                    "Attribute is not a long attribute. ")
+    assertException(
+      datatype >= 0 &&
+        H5.H5Tget_class(datatype) == HDF5Constants.H5T_INTEGER,
+      "Attribute is not a long attribute. ")
 
     H5Reg.save(datatype, H5A)
 
@@ -679,8 +691,9 @@ object H5Store {
                                   dim2: Int,
                                   data: Array[T],
                                   withAttr: List[(String, String)] = Nil) {
-    assertException(data.length == dim1 * dim2,
-                    "Data dimensions do not correspond to data length!")
+    assertException(
+      data.length == dim1 * dim2,
+      "Data dimensions do not correspond to data length!")
 
     // create space for array
     val space_id =
@@ -761,23 +774,25 @@ object H5Store {
     assertException(cparms >= 0, "Failure during params for dataset creation")
     H5Reg.save(cparms, H5P)
 
-    val dataset_id = H5.H5Dcreate(node_id,
-                                  name,
-                                  datatype_id,
-                                  space_id,
-                                  HDF5Constants.H5P_DEFAULT,
-                                  cparms,
-                                  HDF5Constants.H5P_DEFAULT)
+    val dataset_id = H5.H5Dcreate(
+      node_id,
+      name,
+      datatype_id,
+      space_id,
+      HDF5Constants.H5P_DEFAULT,
+      cparms,
+      HDF5Constants.H5P_DEFAULT)
     assertException(dataset_id >= 0, "Failure during dataset creation")
     H5Reg.save(dataset_id, H5D)
 
     // write buffer data
-    H5.H5Dwrite(dataset_id,
-                datatype_id,
-                HDF5Constants.H5S_ALL,
-                HDF5Constants.H5S_ALL,
-                HDF5Constants.H5P_DEFAULT,
-                databuf)
+    H5.H5Dwrite(
+      dataset_id,
+      datatype_id,
+      HDF5Constants.H5S_ALL,
+      HDF5Constants.H5S_ALL,
+      HDF5Constants.H5P_DEFAULT,
+      databuf)
 
     // close temp resources
     H5Reg.close(datatype_id, H5T)
@@ -791,8 +806,9 @@ object H5Store {
   private def readArray[X: ST](grpid: Int, dsname: String): Array[X] = {
     // get dataset id
     val dsetid = H5.H5Dopen(grpid, dsname, HDF5Constants.H5P_DEFAULT)
-    assertException(dsetid >= 0,
-                    "Dataset: " + dsname + " does not exist for this group")
+    assertException(
+      dsetid >= 0,
+      "Dataset: " + dsname + " does not exist for this group")
 
     H5Reg.save(dsetid, H5D)
 
@@ -808,15 +824,17 @@ object H5Store {
   private def read2DArray[T: ST](node_id: Int, dsname: String): Array2D[T] = {
     // get dataset id
     val dsetid = H5.H5Dopen(node_id, dsname, HDF5Constants.H5P_DEFAULT)
-    assertException(dsetid >= 0,
-                    "Dataset: " + dsname + " does not exist for this group")
+    assertException(
+      dsetid >= 0,
+      "Dataset: " + dsname + " does not exist for this group")
 
     H5Reg.save(dsetid, H5D)
 
     // get space
     val dspaceid = H5.H5Dget_space(dsetid)
-    assertException(dspaceid != 0,
-                    "Dataspace does not exist for dataset = " + dsetid)
+    assertException(
+      dspaceid != 0,
+      "Dataspace does not exist for dataset = " + dsetid)
 
     H5Reg.save(dspaceid, H5S)
 
@@ -841,49 +859,56 @@ object H5Store {
     val read_type = stag.runtimeClass match {
       // doubles
       case c if c == dc => {
-        assertException(H5.H5Tget_class(datatype) == HDF5Constants.H5T_FLOAT,
-                        "Not a valid Double")
+        assertException(
+          H5.H5Tget_class(datatype) == HDF5Constants.H5T_FLOAT,
+          "Not a valid Double")
         HDF5Constants.H5T_NATIVE_DOUBLE
       }
       // floats
       case c if c == fc => {
-        assertException(H5.H5Tget_class(datatype) == HDF5Constants.H5T_FLOAT,
-                        "Not a valid float")
+        assertException(
+          H5.H5Tget_class(datatype) == HDF5Constants.H5T_FLOAT,
+          "Not a valid float")
         HDF5Constants.H5T_NATIVE_FLOAT
       }
       // ints
       case c if c == ic => {
-        assertException(H5.H5Tget_class(datatype) == HDF5Constants.H5T_INTEGER,
-                        "Not a valid Integer")
+        assertException(
+          H5.H5Tget_class(datatype) == HDF5Constants.H5T_INTEGER,
+          "Not a valid Integer")
         HDF5Constants.H5T_NATIVE_INT32
       }
       // longs
       case c if c == lc => {
-        assertException(H5.H5Tget_class(datatype) == HDF5Constants.H5T_INTEGER,
-                        "Not a valid Long")
+        assertException(
+          H5.H5Tget_class(datatype) == HDF5Constants.H5T_INTEGER,
+          "Not a valid Long")
         HDF5Constants.H5T_NATIVE_INT64
       }
       // strings
       case c if c == sc => {
-        assertException(H5.H5Tget_class(datatype) == HDF5Constants.H5T_STRING,
-                        "Not a valid String")
+        assertException(
+          H5.H5Tget_class(datatype) == HDF5Constants.H5T_STRING,
+          "Not a valid String")
         datatype
       }
       // datetimes
       case c if c == tc => {
-        assertException(H5.H5Tget_class(datatype) == HDF5Constants.H5T_INTEGER,
-                        "Not a valid DateTime")
+        assertException(
+          H5.H5Tget_class(datatype) == HDF5Constants.H5T_INTEGER,
+          "Not a valid DateTime")
         HDF5Constants.H5T_NATIVE_INT64
       }
     }
 
     if (result.length > 0) {
-      H5.H5Dread(dsetid,
-                 read_type,
-                 HDF5Constants.H5S_ALL,
-                 HDF5Constants.H5S_ALL,
-                 HDF5Constants.H5P_DEFAULT,
-                 result)
+      H5.H5Dread(
+        dsetid,
+        read_type,
+        HDF5Constants.H5S_ALL,
+        HDF5Constants.H5S_ALL,
+        HDF5Constants.H5P_DEFAULT,
+        result)
     }
 
     H5Reg.close(datatype, H5T)
@@ -897,8 +922,9 @@ object H5Store {
   private def readArray[X: ST](grpid: Int, dsetid: Int): Array[X] = {
     // get space
     val dspaceid = H5.H5Dget_space(dsetid)
-    assertException(dspaceid != 0,
-                    "Dataspace does not exist for dataset = " + dsetid)
+    assertException(
+      dspaceid != 0,
+      "Dataspace does not exist for dataset = " + dsetid)
 
     H5Reg.save(dspaceid, H5S)
 
@@ -922,32 +948,37 @@ object H5Store {
     val read_type = stag.runtimeClass match {
       // doubles
       case c if c == dc => {
-        assertException(H5.H5Tget_class(datatype) == HDF5Constants.H5T_FLOAT,
-                        "Not a valid Double")
+        assertException(
+          H5.H5Tget_class(datatype) == HDF5Constants.H5T_FLOAT,
+          "Not a valid Double")
         HDF5Constants.H5T_NATIVE_DOUBLE
       }
       // floats
       case c if c == fc => {
-        assertException(H5.H5Tget_class(datatype) == HDF5Constants.H5T_FLOAT,
-                        "Not a valid Float")
+        assertException(
+          H5.H5Tget_class(datatype) == HDF5Constants.H5T_FLOAT,
+          "Not a valid Float")
         HDF5Constants.H5T_NATIVE_FLOAT
       }
       // ints
       case c if c == ic => {
-        assertException(H5.H5Tget_class(datatype) == HDF5Constants.H5T_INTEGER,
-                        "Not a valid Integer")
+        assertException(
+          H5.H5Tget_class(datatype) == HDF5Constants.H5T_INTEGER,
+          "Not a valid Integer")
         HDF5Constants.H5T_NATIVE_INT32
       }
       // longs
       case c if c == lc => {
-        assertException(H5.H5Tget_class(datatype) == HDF5Constants.H5T_INTEGER,
-                        "Not a valid Long")
+        assertException(
+          H5.H5Tget_class(datatype) == HDF5Constants.H5T_INTEGER,
+          "Not a valid Long")
         HDF5Constants.H5T_NATIVE_INT64
       }
       // strings
       case c if c == sc => {
-        assertException(H5.H5Tget_class(datatype) == HDF5Constants.H5T_STRING,
-                        "Not a valid String")
+        assertException(
+          H5.H5Tget_class(datatype) == HDF5Constants.H5T_STRING,
+          "Not a valid String")
 
         // get string record size
         val sdim = H5.H5Tget_size(datatype)
@@ -961,12 +992,13 @@ object H5Store {
         val byteBuff = Array.ofDim[Byte](arrlen * sdim)
         val result = Array.ofDim[X](arrlen)
 
-        H5.H5Dread(dsetid,
-                   memtype_id,
-                   HDF5Constants.H5S_ALL,
-                   HDF5Constants.H5S_ALL,
-                   HDF5Constants.H5P_DEFAULT,
-                   byteBuff)
+        H5.H5Dread(
+          dsetid,
+          memtype_id,
+          HDF5Constants.H5S_ALL,
+          HDF5Constants.H5S_ALL,
+          HDF5Constants.H5P_DEFAULT,
+          byteBuff)
 
         // copy from raw bytes to strings
         var j = 0
@@ -996,12 +1028,13 @@ object H5Store {
     // construct new array
     val result = Array.ofDim[X](arrlen)
 
-    H5.H5Dread(dsetid,
-               read_type,
-               HDF5Constants.H5S_ALL,
-               HDF5Constants.H5S_ALL,
-               HDF5Constants.H5P_DEFAULT,
-               result)
+    H5.H5Dread(
+      dsetid,
+      read_type,
+      HDF5Constants.H5S_ALL,
+      HDF5Constants.H5S_ALL,
+      HDF5Constants.H5P_DEFAULT,
+      result)
 
     H5Reg.close(datatype, H5T)
     H5Reg.close(dspaceid, H5S)
@@ -1042,10 +1075,11 @@ object H5Store {
   }
 
   private def getPandasSeriesAttribs = {
-    List(("CLASS", "ARRAY"),
-         ("FLAVOR", "numpy"),
-         ("TITLE", ""),
-         ("VERSION", "2.3"))
+    List(
+      ("CLASS", "ARRAY"),
+      ("FLAVOR", "numpy"),
+      ("TITLE", ""),
+      ("VERSION", "2.3"))
   }
 
   private def getPandasIndexAttribs[X: ST](index: Index[X]) = {
@@ -1059,9 +1093,10 @@ object H5Store {
         case c if c == fc => List(("kind", "float"))
         case c if c == sc => List(("kind", "string"))
         case c if c == tc =>
-          List(("index_class", "datetime"),
-               ("kind", "datetime64"),
-               ("freq", "N."))
+          List(
+            ("index_class", "datetime"),
+            ("kind", "datetime64"),
+            ("freq", "N."))
         case _ =>
           throw new IllegalArgumentException("Index type not recognized")
       }
@@ -1080,8 +1115,9 @@ object H5Store {
         createFile(file) -> true
       }
 
-    assertException(fileid >= 0,
-                    "File ID : " + fileid + " does not belong to a valid file")
+    assertException(
+      fileid >= 0,
+      "File ID : " + fileid + " does not belong to a valid file")
 
     try {
       if (writeHeader) writePytablesHeader(fileid)
@@ -1095,16 +1131,18 @@ object H5Store {
                                               group: String,
                                               index: Index[X],
                                               values: Array[T]): Int = {
-    assertException(fileid >= 0,
-                    "File ID : " + fileid + " does not belong to a valid file")
+    assertException(
+      fileid >= 0,
+      "File ID : " + fileid + " does not belong to a valid file")
 
     val nodeid = createNode(fileid, group)
     writeSeriesPandasHeader(nodeid)
 
-    write1DArray(nodeid,
-                 "index",
-                 index.toVec.contents,
-                 getPandasIndexAttribs(index))
+    write1DArray(
+      nodeid,
+      "index",
+      index.toVec.contents,
+      getPandasIndexAttribs(index))
     write1DArray(nodeid, "values", values, getPandasSeriesAttribs)
 
     closeNode(nodeid)
@@ -1116,8 +1154,9 @@ object H5Store {
       group: String): Series[X, T] = {
 
     val fileid = openFile(file)
-    assertException(fileid >= 0,
-                    "File ID : " + fileid + " does not belong to a valid file")
+    assertException(
+      fileid >= 0,
+      "File ID : " + fileid + " does not belong to a valid file")
 
     try {
       readPandasSeries[X, T](fileid, group)
@@ -1152,22 +1191,26 @@ object H5Store {
     // type-check the index
     readAttrText(idxid, "kind") match {
       case "integer" =>
-        assertException(ixtype.runtimeClass == classOf[Long] ||
-                          ixtype.runtimeClass == classOf[Int],
-                        "Index is not a long/int")
+        assertException(
+          ixtype.runtimeClass == classOf[Long] ||
+            ixtype.runtimeClass == classOf[Int],
+          "Index is not a long/int")
 
       case "string" =>
-        assertException(ixtype.runtimeClass == classOf[String],
-                        "Index is not a string")
+        assertException(
+          ixtype.runtimeClass == classOf[String],
+          "Index is not a string")
 
       case "float" =>
-        assertException(ixtype.runtimeClass == classOf[Double] ||
-                          ixtype.runtimeClass == classOf[Float],
-                        "Index is not a float")
+        assertException(
+          ixtype.runtimeClass == classOf[Double] ||
+            ixtype.runtimeClass == classOf[Float],
+          "Index is not a float")
 
       case "datetime64" =>
-        assertException(ixtype.runtimeClass == classOf[DateTime],
-                        "Index is not a datetime64")
+        assertException(
+          ixtype.runtimeClass == classOf[DateTime],
+          "Index is not a datetime64")
 
       case _ @t =>
         throw new IllegalArgumentException(
@@ -1202,8 +1245,9 @@ object H5Store {
         createFile(file) -> true
       }
 
-    assertException(fileid >= 0,
-                    "File ID : " + fileid + " does not belong to a valid file")
+    assertException(
+      fileid >= 0,
+      "File ID : " + fileid + " does not belong to a valid file")
 
     try {
       if (writeHeader) {
@@ -1240,79 +1284,93 @@ object H5Store {
     writeFramePandasHeader(nodeid)
 
     // axis 0 is column names
-    write1DArray(nodeid,
-                 "axis0",
-                 frame.colIx.toVec.contents,
-                 getPandasIndexAttribs(frame.colIx))
+    write1DArray(
+      nodeid,
+      "axis0",
+      frame.colIx.toVec.contents,
+      getPandasIndexAttribs(frame.colIx))
 
     // axis 1 is row names
-    write1DArray(nodeid,
-                 "axis1",
-                 frame.rowIx.toVec.contents,
-                 getPandasIndexAttribs(frame.rowIx))
+    write1DArray(
+      nodeid,
+      "axis1",
+      frame.rowIx.toVec.contents,
+      getPandasIndexAttribs(frame.rowIx))
 
-    write1DArray(nodeid,
-                 "block0_items",
-                 dfDouble.colIx.toVec.contents,
-                 getPandasIndexAttribs(dfDouble.colIx))
-    write1DArray(nodeid,
-                 "block1_items",
-                 dfInt.colIx.toVec.contents,
-                 getPandasIndexAttribs(dfInt.colIx))
-    write1DArray(nodeid,
-                 "block2_items",
-                 dfLong.colIx.toVec.contents,
-                 getPandasIndexAttribs(dfLong.colIx))
-    write1DArray(nodeid,
-                 "block3_items",
-                 dfString.colIx.toVec.contents,
-                 getPandasIndexAttribs(dfString.colIx))
-    write1DArray(nodeid,
-                 "block4_items",
-                 dfFloat.colIx.toVec.contents,
-                 getPandasIndexAttribs(dfFloat.colIx))
-    write1DArray(nodeid,
-                 "block5_items",
-                 dfDates.colIx.toVec.contents,
-                 getPandasIndexAttribs(dfDates.colIx))
+    write1DArray(
+      nodeid,
+      "block0_items",
+      dfDouble.colIx.toVec.contents,
+      getPandasIndexAttribs(dfDouble.colIx))
+    write1DArray(
+      nodeid,
+      "block1_items",
+      dfInt.colIx.toVec.contents,
+      getPandasIndexAttribs(dfInt.colIx))
+    write1DArray(
+      nodeid,
+      "block2_items",
+      dfLong.colIx.toVec.contents,
+      getPandasIndexAttribs(dfLong.colIx))
+    write1DArray(
+      nodeid,
+      "block3_items",
+      dfString.colIx.toVec.contents,
+      getPandasIndexAttribs(dfString.colIx))
+    write1DArray(
+      nodeid,
+      "block4_items",
+      dfFloat.colIx.toVec.contents,
+      getPandasIndexAttribs(dfFloat.colIx))
+    write1DArray(
+      nodeid,
+      "block5_items",
+      dfDates.colIx.toVec.contents,
+      getPandasIndexAttribs(dfDates.colIx))
 
     // the data itself is stored in a transposed format (col-major order)
-    write2DArray(nodeid,
-                 "block0_values",
-                 valDouble.numRows,
-                 valDouble.numCols,
-                 valDouble.contents,
-                 getPandasSeriesAttribs)
-    write2DArray(nodeid,
-                 "block1_values",
-                 valInt.numRows,
-                 valInt.numCols,
-                 valInt.contents,
-                 getPandasSeriesAttribs)
-    write2DArray(nodeid,
-                 "block2_values",
-                 valLong.numRows,
-                 valLong.numCols,
-                 valLong.contents,
-                 getPandasSeriesAttribs)
-    write2DArray(nodeid,
-                 "block3_values",
-                 valString.numRows,
-                 valString.numCols,
-                 valString.contents,
-                 getPandasSeriesAttribs)
-    write2DArray(nodeid,
-                 "block4_values",
-                 valFloat.numRows,
-                 valFloat.numCols,
-                 valFloat.contents,
-                 getPandasSeriesAttribs)
-    write2DArray(nodeid,
-                 "block5_values",
-                 valDates.numRows,
-                 valDates.numCols,
-                 valDates.contents,
-                 ("value_type", "datetime64") :: getPandasSeriesAttribs)
+    write2DArray(
+      nodeid,
+      "block0_values",
+      valDouble.numRows,
+      valDouble.numCols,
+      valDouble.contents,
+      getPandasSeriesAttribs)
+    write2DArray(
+      nodeid,
+      "block1_values",
+      valInt.numRows,
+      valInt.numCols,
+      valInt.contents,
+      getPandasSeriesAttribs)
+    write2DArray(
+      nodeid,
+      "block2_values",
+      valLong.numRows,
+      valLong.numCols,
+      valLong.contents,
+      getPandasSeriesAttribs)
+    write2DArray(
+      nodeid,
+      "block3_values",
+      valString.numRows,
+      valString.numCols,
+      valString.contents,
+      getPandasSeriesAttribs)
+    write2DArray(
+      nodeid,
+      "block4_values",
+      valFloat.numRows,
+      valFloat.numCols,
+      valFloat.contents,
+      getPandasSeriesAttribs)
+    write2DArray(
+      nodeid,
+      "block5_values",
+      valDates.numRows,
+      valDates.numCols,
+      valDates.contents,
+      ("value_type", "datetime64") :: getPandasSeriesAttribs)
 
     closeNode(nodeid)
     H5.H5Fflush(fileid, HDF5Constants.H5F_SCOPE_GLOBAL)
@@ -1323,8 +1381,9 @@ object H5Store {
       name: String): Frame[RX, CX, T] = {
 
     val fileid = openFile(file)
-    assertException(fileid >= 0,
-                    "File ID : " + fileid + " does not belong to a valid file")
+    assertException(
+      fileid >= 0,
+      "File ID : " + fileid + " does not belong to a valid file")
 
     try {
       readPandasFrame[RX, CX, T](fileid, name)
@@ -1368,22 +1427,26 @@ object H5Store {
     // type-check the indices
     readAttrText(rowidx, "kind") match {
       case "integer" =>
-        assertException(rxtype.runtimeClass == classOf[Long] ||
-                          rxtype.runtimeClass == classOf[Int],
-                        "Row index is not a long/int")
+        assertException(
+          rxtype.runtimeClass == classOf[Long] ||
+            rxtype.runtimeClass == classOf[Int],
+          "Row index is not a long/int")
 
       case "string" =>
-        assertException(rxtype.runtimeClass == classOf[String],
-                        "Row index is not a string")
+        assertException(
+          rxtype.runtimeClass == classOf[String],
+          "Row index is not a string")
 
       case "float" =>
-        assertException(rxtype.runtimeClass == classOf[Double] ||
-                          rxtype.runtimeClass == classOf[Float],
-                        "Row index is not a float")
+        assertException(
+          rxtype.runtimeClass == classOf[Double] ||
+            rxtype.runtimeClass == classOf[Float],
+          "Row index is not a float")
 
       case "datetime64" =>
-        assertException(rxtype.runtimeClass == classOf[DateTime],
-                        "Row index is not a datetime64")
+        assertException(
+          rxtype.runtimeClass == classOf[DateTime],
+          "Row index is not a datetime64")
 
       case _ @t =>
         throw new IllegalArgumentException(
@@ -1416,22 +1479,26 @@ object H5Store {
     // type-check the indices
     readAttrText(colidx, "kind") match {
       case "integer" =>
-        assertException(cxtype.runtimeClass == classOf[Long] ||
-                          cxtype.runtimeClass == classOf[Int],
-                        "Col index is not a long/int")
+        assertException(
+          cxtype.runtimeClass == classOf[Long] ||
+            cxtype.runtimeClass == classOf[Int],
+          "Col index is not a long/int")
 
       case "string" =>
-        assertException(cxtype.runtimeClass == classOf[String],
-                        "Col index is not a string")
+        assertException(
+          cxtype.runtimeClass == classOf[String],
+          "Col index is not a string")
 
       case "float" =>
-        assertException(cxtype.runtimeClass == classOf[Double] ||
-                          cxtype.runtimeClass == classOf[Float],
-                        "Col index is not a float")
+        assertException(
+          cxtype.runtimeClass == classOf[Double] ||
+            cxtype.runtimeClass == classOf[Float],
+          "Col index is not a float")
 
       case "datetime64" =>
-        assertException(cxtype.runtimeClass == classOf[DateTime],
-                        "Col index is not a joda datetime64")
+        assertException(
+          cxtype.runtimeClass == classOf[DateTime],
+          "Col index is not a joda datetime64")
 
       case _ @t =>
         throw new IllegalArgumentException(

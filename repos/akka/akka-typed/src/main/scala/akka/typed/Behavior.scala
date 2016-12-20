@@ -268,8 +268,9 @@ object Behavior {
   private[akka] object stoppedBehavior extends Behavior[Nothing] {
     override def management(ctx: ActorContext[Nothing],
                             msg: Signal): Behavior[Nothing] = {
-      assert(msg == PostStop,
-             s"stoppedBehavior received $msg (only PostStop is expected)")
+      assert(
+        msg == PostStop,
+        s"stoppedBehavior received $msg (only PostStop is expected)")
       this
     }
     override def message(ctx: ActorContext[Nothing],

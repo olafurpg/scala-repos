@@ -130,8 +130,9 @@ object LoggerSpec {
       val cmim = "Current Message in MDC"
       val perMessage = currentMessage match {
         case `cmim` ⇒
-          Map[String, Any]("currentMsg" -> cmim,
-                           "currentMsgLength" -> cmim.length)
+          Map[String, Any](
+            "currentMsg" -> cmim,
+            "currentMsgLength" -> cmim.length)
         case _ ⇒ Map()
       }
       always ++ perMessage

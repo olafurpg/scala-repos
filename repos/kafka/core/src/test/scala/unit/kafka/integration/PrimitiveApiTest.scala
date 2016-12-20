@@ -82,18 +82,20 @@ class PrimitiveApiTest
     producer.send(new KeyedMessage[String, String](topic, "test-message"))
 
     val replica = servers.head.replicaManager.getReplica(topic, 0).get
-    assertTrue("HighWatermark should equal logEndOffset with just 1 replica",
-               replica.logEndOffset.messageOffset > 0 &&
-                 replica.logEndOffset.equals(replica.highWatermark))
+    assertTrue(
+      "HighWatermark should equal logEndOffset with just 1 replica",
+      replica.logEndOffset.messageOffset > 0 &&
+        replica.logEndOffset.equals(replica.highWatermark))
 
     val request = new FetchRequestBuilder()
       .clientId("test-client")
       .addFetch(topic, 0, 0, 10000)
       .build()
     val fetched = consumer.fetch(request)
-    assertEquals("Returned correlationId doesn't match that in request.",
-                 0,
-                 fetched.correlationId)
+    assertEquals(
+      "Returned correlationId doesn't match that in request.",
+      0,
+      fetched.correlationId)
 
     val messageSet = fetched.messageSet(topic, 0)
     assertTrue(messageSet.iterator.hasNext)
@@ -153,9 +155,10 @@ class PrimitiveApiTest
       val response = consumer.fetch(request)
       for ((topic, partition) <- topics) {
         val fetched = response.messageSet(topic, partition)
-        assertEquals(messages(topic),
-                     fetched.map(messageAndOffset =>
-                       TestUtils.readString(messageAndOffset.message.payload)))
+        assertEquals(
+          messages(topic),
+          fetched.map(messageAndOffset =>
+            TestUtils.readString(messageAndOffset.message.payload)))
       }
     }
 
@@ -224,9 +227,10 @@ class PrimitiveApiTest
     val response = consumer.fetch(request)
     for ((topic, partition) <- topics) {
       val fetched = response.messageSet(topic, partition)
-      assertEquals(messages(topic),
-                   fetched.map(messageAndOffset =>
-                     TestUtils.readString(messageAndOffset.message.payload)))
+      assertEquals(
+        messages(topic),
+        fetched.map(messageAndOffset =>
+          TestUtils.readString(messageAndOffset.message.payload)))
     }
   }
 
@@ -238,11 +242,12 @@ class PrimitiveApiTest
   @Test
   def testConsumerEmptyTopic() {
     val newTopic = "new-topic"
-    TestUtils.createTopic(zkUtils,
-                          newTopic,
-                          numPartitions = 1,
-                          replicationFactor = 1,
-                          servers = servers)
+    TestUtils.createTopic(
+      zkUtils,
+      newTopic,
+      numPartitions = 1,
+      replicationFactor = 1,
+      servers = servers)
 
     val fetchResponse = consumer.fetch(
       new FetchRequestBuilder().addFetch(newTopic, 0, 0, 10000).build())
@@ -337,9 +342,10 @@ class PrimitiveApiTest
     val response = consumer.fetch(request)
     for ((topic, partition) <- topics) {
       val fetched = response.messageSet(topic, partition)
-      assertEquals(messages(topic),
-                   fetched.map(messageAndOffset =>
-                     TestUtils.readString(messageAndOffset.message.payload)))
+      assertEquals(
+        messages(topic),
+        fetched.map(messageAndOffset =>
+          TestUtils.readString(messageAndOffset.message.payload)))
     }
   }
 }

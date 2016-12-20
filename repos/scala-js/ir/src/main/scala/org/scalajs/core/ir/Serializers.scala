@@ -618,10 +618,11 @@ object Serializers {
         case TagVarDef =>
           VarDef(readIdent(), readType(), readBoolean(), readTree())
         case TagParamDef =>
-          ParamDef(readIdent(),
-                   readType(),
-                   readBoolean(),
-                   rest = if (useHacks060) false else readBoolean())
+          ParamDef(
+            readIdent(),
+            readType(),
+            readBoolean(),
+            rest = if (useHacks060) false else readBoolean())
 
         case TagSkip => Skip()
         case TagBlock => Block(readTrees())
@@ -648,10 +649,11 @@ object Serializers {
         case TagApply =>
           Apply(readTree(), readIdent(), readTrees())(readType())
         case TagApplyStatically =>
-          val result1 = ApplyStatically(readTree(),
-                                        readClassType(),
-                                        readIdent(),
-                                        readTrees())(readType())
+          val result1 = ApplyStatically(
+            readTree(),
+            readClassType(),
+            readIdent(),
+            readTrees())(readType())
           if (useHacks065 && result1.tpe != NoType &&
               isConstructorName(result1.method.name)) result1.copy()(NoType)
           else result1
@@ -682,10 +684,11 @@ object Serializers {
         case TagJSSuperBracketSelect =>
           JSSuperBracketSelect(readClassType(), readTree(), readTree())
         case TagJSSuperBracketCall =>
-          JSSuperBracketCall(readClassType(),
-                             readTree(),
-                             readTree(),
-                             readTrees())
+          JSSuperBracketCall(
+            readClassType(),
+            readTree(),
+            readTree(),
+            readTrees())
         case TagJSSuperConstructorCall => JSSuperConstructorCall(readTrees())
         case TagLoadJSConstructor => LoadJSConstructor(readClassType())
         case TagLoadJSModule => LoadJSModule(readClassType())
@@ -754,9 +757,10 @@ object Serializers {
           /* TODO Merge this into TagFieldDef and use readPropertyName()
            * when we can break binary compatibility.
            */
-          FieldDef(readTree().asInstanceOf[StringLiteral],
-                   readType(),
-                   readBoolean())
+          FieldDef(
+            readTree().asInstanceOf[StringLiteral],
+            readType(),
+            readBoolean())
 
         case TagMethodDef =>
           val optHash = readOptHash()
@@ -764,11 +768,12 @@ object Serializers {
           val len = readInt()
           assert(len >= 0)
           val result1 =
-            MethodDef(readBoolean(),
-                      readPropertyName(),
-                      readParamDefs(),
-                      readType(),
-                      readTree())(new OptimizerHints(readInt()), optHash)
+            MethodDef(
+              readBoolean(),
+              readPropertyName(),
+              readParamDefs(),
+              readType(),
+              readTree())(new OptimizerHints(readInt()), optHash)
           val result2 =
             if (foundArguments) {
               foundArguments = false
@@ -785,10 +790,11 @@ object Serializers {
             result2
           }
         case TagPropertyDef =>
-          PropertyDef(readPropertyName(),
-                      readTree(),
-                      readTree().asInstanceOf[ParamDef],
-                      readTree())
+          PropertyDef(
+            readPropertyName(),
+            readTree(),
+            readTree().asInstanceOf[ParamDef],
+            readTree())
         case TagConstructorExportDef =>
           val result =
             ConstructorExportDef(readString(), readParamDefs(), readTree())
@@ -806,8 +812,9 @@ object Serializers {
       }
       if (UseDebugMagic) {
         val magic = readInt()
-        assert(magic == DebugMagic,
-               s"Bad magic after reading a ${result.getClass}!")
+        assert(
+          magic == DebugMagic,
+          s"Bad magic after reading a ${result.getClass}!")
       }
       result
     }
@@ -857,11 +864,12 @@ object Serializers {
             val originalName = readString()
             val tpe = readType()
             val mutable = input.readBoolean()
-            RecordType.Field(name,
-                             if (originalName.isEmpty) None
-                             else Some(originalName),
-                             tpe,
-                             mutable)
+            RecordType.Field(
+              name,
+              if (originalName.isEmpty) None
+              else Some(originalName),
+              tpe,
+              mutable)
           })
       }
     }
@@ -897,28 +905,32 @@ object Serializers {
               val column = readInt()
               Position(file, line, column)
             } else {
-              assert(lastPosition != NoPosition,
-                     "Position format error: first position must be full")
+              assert(
+                lastPosition != NoPosition,
+                "Position format error: first position must be full")
               if ((first & Format1Mask) == Format1MaskValue) {
                 val columnDiff = first >> Format1Shift
-                Position(lastPosition.source,
-                         lastPosition.line,
-                         lastPosition.column + columnDiff)
+                Position(
+                  lastPosition.source,
+                  lastPosition.line,
+                  lastPosition.column + columnDiff)
               } else if ((first & Format2Mask) == Format2MaskValue) {
                 val lineDiff = first >> Format2Shift
                 val column = readByte() & 0xff // unsigned
-                Position(lastPosition.source,
-                         lastPosition.line + lineDiff,
-                         column)
+                Position(
+                  lastPosition.source,
+                  lastPosition.line + lineDiff,
+                  column)
               } else {
                 assert(
                   (first & Format3Mask) == Format3MaskValue,
                   s"Position format error: first byte $first does not match any format")
                 val lineDiff = readShort()
                 val column = readByte() & 0xff // unsigned
-                Position(lastPosition.source,
-                         lastPosition.line + lineDiff,
-                         column)
+                Position(
+                  lastPosition.source,
+                  lastPosition.line + lineDiff,
+                  column)
               }
             }
           lastPosition = result
@@ -927,8 +939,9 @@ object Serializers {
 
       if (UseDebugMagic) {
         val magic = readInt()
-        assert(magic == PosDebugMagic,
-               s"Bad magic after reading position with first byte $first")
+        assert(
+          magic == PosDebugMagic,
+          s"Bad magic after reading position with first byte $first")
       }
 
       result
@@ -962,11 +975,12 @@ object Serializers {
        */
       val MethodDef(static, name, args, resultType, body) = tree
       setupParamToIndex(args)
-      MethodDef(static,
-                name,
-                List(argumentsParamDef(tree.pos)),
-                resultType,
-                transform(body, isStat = resultType == NoType))(
+      MethodDef(
+        static,
+        name,
+        List(argumentsParamDef(tree.pos)),
+        resultType,
+        transform(body, isStat = resultType == NoType))(
         tree.optimizerHints,
         None)(tree.pos)
     }
@@ -975,9 +989,10 @@ object Serializers {
         tree: ConstructorExportDef): ConstructorExportDef = {
       val ConstructorExportDef(name, args, body) = tree
       setupParamToIndex(args)
-      ConstructorExportDef(name,
-                           List(argumentsParamDef(tree.pos)),
-                           transformStat(body))(tree.pos)
+      ConstructorExportDef(
+        name,
+        List(argumentsParamDef(tree.pos)),
+        transformStat(body))(tree.pos)
     }
 
     private def setupParamToIndex(params: List[ParamDef]): Unit =

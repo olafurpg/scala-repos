@@ -225,8 +225,9 @@ class DataFrameReaderWriterSuite
     def activeStreamNames: Set[String] = {
       val streams = sqlContext.streams.active
       val names = streams.map(_.name).toSet
-      assert(streams.length === names.size,
-             s"names of active queries are not unique: $names")
+      assert(
+        streams.length === names.size,
+        s"names of active queries are not unique: $names")
       names
     }
 

@@ -44,10 +44,11 @@ private[sird] object QueryStringParameterMacros {
         val paramName = parts.head match {
           case paramEquals(param) => param
           case _ =>
-            c.abort(c.enclosingPosition.withPoint(startOfString),
-                    "Invalid start of string for query string extractor '" +
-                      parts.head + "', extractor string must have format " +
-                      name + "\"param=$extracted\"")
+            c.abort(
+              c.enclosingPosition.withPoint(startOfString),
+              "Invalid start of string for query string extractor '" +
+                parts.head + "', extractor string must have format " +
+                name + "\"param=$extracted\"")
         }
 
         if (parts.length == 1) {

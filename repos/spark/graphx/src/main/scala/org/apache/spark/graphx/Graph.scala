@@ -525,11 +525,12 @@ object Graph {
       edgeStorageLevel: StorageLevel = StorageLevel.MEMORY_ONLY,
       vertexStorageLevel: StorageLevel = StorageLevel.MEMORY_ONLY)
     : Graph[VD, ED] = {
-    GraphImpl(vertices,
-              edges,
-              defaultVertexAttr,
-              edgeStorageLevel,
-              vertexStorageLevel)
+    GraphImpl(
+      vertices,
+      edges,
+      defaultVertexAttr,
+      edgeStorageLevel,
+      vertexStorageLevel)
   }
 
   /**

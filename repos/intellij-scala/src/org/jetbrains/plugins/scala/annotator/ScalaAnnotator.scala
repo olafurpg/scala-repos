@@ -137,9 +137,10 @@ class ScalaAnnotator
 
         if (isAdvancedHighlightingEnabled(element)) {
           expr.getTypeExt(TypingContext.empty) match {
-            case ExpressionTypeResult(Success(t, _),
-                                      _,
-                                      Some(implicitFunction)) =>
+            case ExpressionTypeResult(
+                Success(t, _),
+                _,
+                Some(implicitFunction)) =>
               highlightImplicitView(expr, implicitFunction, t, expr, holder)
             case _ =>
           }
@@ -267,9 +268,10 @@ class ScalaAnnotator
       }
 
       override def visitVariableDeclaration(varr: ScVariableDeclaration) {
-        checkAbstractMemberPrivateModifier(varr,
-                                           varr.declaredElements.map(_.nameId),
-                                           holder)
+        checkAbstractMemberPrivateModifier(
+          varr,
+          varr.declaredElements.map(_.nameId),
+          holder)
         super.visitVariableDeclaration(varr)
       }
 
@@ -409,11 +411,12 @@ class ScalaAnnotator
           checkOverrideTypes(alias, holder)
         }
         if (!compoundType(alias))
-          checkBoundsVariance(alias,
-                              holder,
-                              alias.nameId,
-                              alias,
-                              checkTypeDeclaredSameBracket = false)
+          checkBoundsVariance(
+            alias,
+            holder,
+            alias.nameId,
+            alias,
+            checkTypeDeclaredSameBracket = false)
         super.visitTypeAlias(alias)
       }
 
@@ -425,30 +428,34 @@ class ScalaAnnotator
         }
         varr.typeElement match {
           case Some(typ) =>
-            checkBoundsVariance(varr,
-                                holder,
-                                typ,
-                                varr,
-                                checkTypeDeclaredSameBracket = false)
+            checkBoundsVariance(
+              varr,
+              holder,
+              typ,
+              varr,
+              checkTypeDeclaredSameBracket = false)
           case _ =>
         }
         if (!childHasAnnotation(varr.typeElement, "uncheckedVariance")) {
-          checkValueAndVariableVariance(varr,
-                                        ScTypeParam.Covariant,
-                                        varr.declaredElements,
-                                        holder)
-          checkValueAndVariableVariance(varr,
-                                        ScTypeParam.Contravariant,
-                                        varr.declaredElements,
-                                        holder)
+          checkValueAndVariableVariance(
+            varr,
+            ScTypeParam.Covariant,
+            varr.declaredElements,
+            holder)
+          checkValueAndVariableVariance(
+            varr,
+            ScTypeParam.Contravariant,
+            varr.declaredElements,
+            holder)
         }
         super.visitVariable(varr)
       }
 
       override def visitValueDeclaration(v: ScValueDeclaration) {
-        checkAbstractMemberPrivateModifier(v,
-                                           v.declaredElements.map(_.nameId),
-                                           holder)
+        checkAbstractMemberPrivateModifier(
+          v,
+          v.declaredElements.map(_.nameId),
+          holder)
         super.visitValueDeclaration(v)
       }
 
@@ -460,18 +467,20 @@ class ScalaAnnotator
         }
         v.typeElement match {
           case Some(typ) =>
-            checkBoundsVariance(v,
-                                holder,
-                                typ,
-                                v,
-                                checkTypeDeclaredSameBracket = false)
+            checkBoundsVariance(
+              v,
+              holder,
+              typ,
+              v,
+              checkTypeDeclaredSameBracket = false)
           case _ =>
         }
         if (!childHasAnnotation(v.typeElement, "uncheckedVariance")) {
-          checkValueAndVariableVariance(v,
-                                        ScTypeParam.Covariant,
-                                        v.declaredElements,
-                                        holder)
+          checkValueAndVariableVariance(
+            v,
+            ScTypeParam.Covariant,
+            v.declaredElements,
+            holder)
         }
         super.visitValue(v)
       }
@@ -495,21 +504,23 @@ class ScalaAnnotator
 
     element match {
       case templateDefinition: ScTemplateDefinition =>
-        checkBoundsVariance(templateDefinition,
-                            holder,
-                            templateDefinition.nameId,
-                            templateDefinition.nameId,
-                            ScTypeParam.Covariant)
-        val tdParts = Seq(AbstractInstantiation,
-                          FinalClassInheritance,
-                          IllegalInheritance,
-                          ObjectCreationImpossible,
-                          MultipleInheritance,
-                          NeedsToBeAbstract,
-                          NeedsToBeMixin,
-                          NeedsToBeTrait,
-                          SealedClassInheritance,
-                          UndefinedMember)
+        checkBoundsVariance(
+          templateDefinition,
+          holder,
+          templateDefinition.nameId,
+          templateDefinition.nameId,
+          ScTypeParam.Covariant)
+        val tdParts = Seq(
+          AbstractInstantiation,
+          FinalClassInheritance,
+          IllegalInheritance,
+          ObjectCreationImpossible,
+          MultipleInheritance,
+          NeedsToBeAbstract,
+          NeedsToBeMixin,
+          NeedsToBeTrait,
+          SealedClassInheritance,
+          UndefinedMember)
         tdParts.foreach(_.annotate(templateDefinition, holder, typeAware))
         templateDefinition match {
           case cls: ScClass =>
@@ -595,9 +606,10 @@ class ScalaAnnotator
           processor.processType(tp, expr)
           val candidates = processor.candidates
           if (candidates.length != 1) {
-            val error = ScalaBundle.message("method.is.not.member",
-                                            memberName,
-                                            ScType.presentableText(tp))
+            val error = ScalaBundle.message(
+              "method.is.not.member",
+              memberName,
+              ScType.presentableText(tp))
             val annotation = holder.createErrorAnnotation(expr, error)
             annotation.setHighlightType(ProblemHighlightType.GENERIC_ERROR)
           } else if (checkReturnTypeIsBoolean) {
@@ -635,8 +647,9 @@ class ScalaAnnotator
                     if (!conformance) {
                       if (typeAware) {
                         val (retTypeText, expectedTypeText) =
-                          ScTypePresentation.different(returnType.getOrNothing,
-                                                       expectedType.get)
+                          ScTypePresentation.different(
+                            returnType.getOrNothing,
+                            expectedType.get)
                         val error = ScalaBundle.message(
                           "expr.type.does.not.conform.expected.type",
                           retTypeText,
@@ -728,8 +741,9 @@ class ScalaAnnotator
     toCheck match {
       case boundOwner: ScTypeBoundsOwner =>
         checkAndHighlightBounds(boundOwner.upperTypeElement, varianceOfUpper)
-        checkAndHighlightBounds(boundOwner.lowerTypeElement,
-                                varianceOfUpper * -1)
+        checkAndHighlightBounds(
+          boundOwner.lowerTypeElement,
+          varianceOfUpper * -1)
       case _ =>
     }
     toCheck match {
@@ -737,12 +751,13 @@ class ScalaAnnotator
         val inParameterized =
           if (paramOwner.isInstanceOf[ScTemplateDefinition]) false else true
         for (param <- paramOwner.typeParameters) {
-          checkBoundsVariance(param,
-                              holder,
-                              param.nameId,
-                              checkParentOf,
-                              varianceOfUpper * -1,
-                              insideParameterized = inParameterized)
+          checkBoundsVariance(
+            param,
+            holder,
+            param.nameId,
+            checkParentOf,
+            varianceOfUpper * -1,
+            insideParameterized = inParameterized)
         }
       case _ =>
     }
@@ -752,13 +767,14 @@ class ScalaAnnotator
       boundOption match {
         case Some(bound)
             if !childHasAnnotation(Some(bound), "uncheckedVariance") =>
-          checkVariance(bound.calcType,
-                        expectedVariance,
-                        toHighlight,
-                        checkParentOf,
-                        holder,
-                        checkTypeDeclaredSameBracket,
-                        insideParameterized)
+          checkVariance(
+            bound.calcType,
+            expectedVariance,
+            toHighlight,
+            checkParentOf,
+            holder,
+            checkTypeDeclaredSameBracket,
+            insideParameterized)
         case _ =>
       }
     }
@@ -875,11 +891,12 @@ class ScalaAnnotator
             case Some(fun) =>
               val pref = e.getParent.asInstanceOf[ScPrefixExpr]
               val expr = pref.operand
-              highlightImplicitMethod(expr,
-                                      resolveResult,
-                                      refElement,
-                                      fun,
-                                      holder)
+              highlightImplicitMethod(
+                expr,
+                resolveResult,
+                refElement,
+                fun,
+                holder)
             case _ =>
           }
         case e: ScReferenceExpression
@@ -889,11 +906,12 @@ class ScalaAnnotator
             case Some(fun) =>
               val inf = e.getParent.asInstanceOf[ScInfixExpr]
               val expr = if (inf.isLeftAssoc) inf.rOp else inf.lOp
-              highlightImplicitMethod(expr,
-                                      resolveResult,
-                                      refElement,
-                                      fun,
-                                      holder)
+              highlightImplicitMethod(
+                expr,
+                resolveResult,
+                refElement,
+                fun,
+                holder)
             case _ =>
           }
         case _ =>
@@ -936,8 +954,9 @@ class ScalaAnnotator
           if (addCreateApplyOrUnapplyFix(
                 messageKey,
                 td => new CreateApplyQuickFix(td, mc))) return
-        case Both(p: ScPattern,
-                  (_: ScConstructorPattern | _: ScInfixPattern)) =>
+        case Both(
+            p: ScPattern,
+            (_: ScConstructorPattern | _: ScInfixPattern)) =>
           val messageKey = "cannot.resolve.unapply.method"
           if (addCreateApplyOrUnapplyFix(
                 messageKey,
@@ -1104,11 +1123,12 @@ class ScalaAnnotator
           }
         }
 
-        annotateReference(expr
-                            .asInstanceOf[ScMethodCall]
-                            .getEffectiveInvokedExpr
-                            .asInstanceOf[ScReferenceElement],
-                          fakeAnnotator)
+        annotateReference(
+          expr
+            .asInstanceOf[ScMethodCall]
+            .getEffectiveInvokedExpr
+            .asInstanceOf[ScReferenceElement],
+          fakeAnnotator)
       case _ => annotateBadPrefix("cannot.resolve.in.StringContext")
     }
   }
@@ -1125,8 +1145,9 @@ class ScalaAnnotator
                                   result: ScalaResolveResult) {
     ImportTracker
       .getInstance(element.getProject)
-      .registerUsedImports(element.getContainingFile.asInstanceOf[ScalaFile],
-                           result.importsUsed)
+      .registerUsedImports(
+        element.getContainingFile.asInstanceOf[ScalaFile],
+        result.importsUsed)
   }
 
   private def checkMethodCallImplicitConversion(call: ScMethodCall,
@@ -1134,8 +1155,9 @@ class ScalaAnnotator
     val importUsed = call.getImportsUsed
     ImportTracker
       .getInstance(call.getProject)
-      .registerUsedImports(call.getContainingFile.asInstanceOf[ScalaFile],
-                           importUsed)
+      .registerUsedImports(
+        call.getContainingFile.asInstanceOf[ScalaFile],
+        importUsed)
   }
 
   private def checkExpressionType(expr: ScExpression,
@@ -1148,8 +1170,9 @@ class ScalaAnnotator
           fromUnderscore = fromUnderscore)
       ImportTracker
         .getInstance(expr.getProject)
-        .registerUsedImports(expr.getContainingFile.asInstanceOf[ScalaFile],
-                             importUsed)
+        .registerUsedImports(
+          expr.getContainingFile.asInstanceOf[ScalaFile],
+          importUsed)
 
       expr match {
         case m: ScMatchStmt =>
@@ -1234,9 +1257,10 @@ class ScalaAnnotator
                     holder.createErrorAnnotation(markedPsi, error)
                   annotation.setHighlightType(
                     ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
-                  if (WrapInOptionQuickFix.isAvailable(expr,
-                                                       expectedType,
-                                                       exprType)) {
+                  if (WrapInOptionQuickFix.isAvailable(
+                        expr,
+                        expectedType,
+                        exprType)) {
                     val wrapInOptionFix =
                       new WrapInOptionQuickFix(expr, expectedType, exprType)
                     annotation.registerFix(wrapInOptionFix)
@@ -1337,9 +1361,10 @@ class ScalaAnnotator
             val ExpressionTypeResult(_, importUsed, _) = ret.expr match {
               case Some(e: ScExpression) => e.getTypeAfterImplicitConversion()
               case None =>
-                ExpressionTypeResult(Success(psi.types.Unit, None),
-                                     Set.empty,
-                                     None)
+                ExpressionTypeResult(
+                  Success(psi.types.Unit, None),
+                  Set.empty,
+                  None)
             }
             ImportTracker
               .getInstance(ret.getProject)
@@ -1355,8 +1380,9 @@ class ScalaAnnotator
                                     holder: AnnotationHolder) {
     ImportTracker
       .getInstance(f.getProject)
-      .registerUsedImports(f.getContainingFile.asInstanceOf[ScalaFile],
-                           ScalaPsiUtil.getExprImports(f))
+      .registerUsedImports(
+        f.getContainingFile.asInstanceOf[ScalaFile],
+        ScalaPsiUtil.getExprImports(f))
   }
 
   private def checkImportExpr(impExpr: ScImportExpr,
@@ -1533,9 +1559,10 @@ class ScalaAnnotator
                 case _ =>
                   def findVariance: Int = {
                     if (!checkIfTypeIsInSameBrackets) return i
-                    if (PsiTreeUtil.isAncestor(scTypeParam.getParent,
-                                               toHighlight,
-                                               false))
+                    if (PsiTreeUtil.isAncestor(
+                          scTypeParam.getParent,
+                          toHighlight,
+                          false))
                       //we do not highlight element if it was declared inside parameterized type.
                       if (!scTypeParam.getParent.getParent
                             .isInstanceOf[ScTemplateDefinition])
@@ -1545,9 +1572,10 @@ class ScalaAnnotator
                       return i * -1
                     i
                   }
-                  highlightVarianceError(scTypeParam.variance,
-                                         findVariance,
-                                         paramType.name)
+                  highlightVarianceError(
+                    scTypeParam.variance,
+                    findVariance,
+                    paramType.name)
               }
             case _ =>
           }

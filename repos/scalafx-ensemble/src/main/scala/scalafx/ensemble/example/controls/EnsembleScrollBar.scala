@@ -47,9 +47,10 @@ class EnsembleScrollBar extends EnsembleExample {
   private val yBarHeight = 393
   private val circleRadius = 90
 
-  val bg = Rectangle(xBarWidth + yBarWidth,
-                     xBarHeight + yBarHeight,
-                     Color.rgb(90, 90, 90))
+  val bg = Rectangle(
+    xBarWidth + yBarWidth,
+    xBarHeight + yBarHeight,
+    Color.rgb(90, 90, 90))
   val box = new Rectangle {
     width = 100
     height = 100

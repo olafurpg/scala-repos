@@ -29,11 +29,13 @@ class SchemaSpec extends Specification {
   "cpath" should {
     "return the correct sequence of CPath" in {
       val jtype = JObjectFixedT(
-        Map("foo" -> JNumberT,
-            "bar" -> JArrayFixedT(
-              Map(0 -> JBooleanT,
-                  1 -> JObjectFixedT(Map("baz" -> JArrayHomogeneousT(JNullT))),
-                  2 -> JTextT))))
+        Map(
+          "foo" -> JNumberT,
+          "bar" -> JArrayFixedT(
+            Map(
+              0 -> JBooleanT,
+              1 -> JObjectFixedT(Map("baz" -> JArrayHomogeneousT(JNullT))),
+              2 -> JTextT))))
 
       val result = Schema.cpath(jtype)
       val expected = Seq(

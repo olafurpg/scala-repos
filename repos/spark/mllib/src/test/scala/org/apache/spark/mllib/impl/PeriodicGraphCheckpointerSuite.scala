@@ -92,10 +92,11 @@ private object PeriodicGraphCheckpointerSuite {
 
   case class GraphToCheck(graph: Graph[Double, Double], gIndex: Int)
 
-  val edges = Seq(Edge[Double](0, 1, 0),
-                  Edge[Double](1, 2, 0),
-                  Edge[Double](2, 3, 0),
-                  Edge[Double](3, 4, 0))
+  val edges = Seq(
+    Edge[Double](0, 1, 0),
+    Edge[Double](1, 2, 0),
+    Edge[Double](2, 3, 0),
+    Edge[Double](3, 4, 0))
 
   def createGraph(sc: SparkContext): Graph[Double, Double] = {
     Graph.fromEdges[Double, Double](sc.parallelize(edges), 0)
@@ -146,8 +147,9 @@ private object PeriodicGraphCheckpointerSuite {
     //       is fixed (though it can then be simplified and not look for the files).
     val fs = FileSystem.get(graph.vertices.sparkContext.hadoopConfiguration)
     graph.getCheckpointFiles.foreach { checkpointFile =>
-      assert(!fs.exists(new Path(checkpointFile)),
-             "Graph checkpoint file should have been removed")
+      assert(
+        !fs.exists(new Path(checkpointFile)),
+        "Graph checkpoint file should have been removed")
     }
   }
 
@@ -167,17 +169,20 @@ private object PeriodicGraphCheckpointerSuite {
         if (iteration - 2 * checkpointInterval < gIndex &&
             gIndex <= iteration) {
           assert(graph.isCheckpointed, "Graph should be checkpointed")
-          assert(graph.getCheckpointFiles.length == 2,
-                 "Graph should have 2 checkpoint files")
+          assert(
+            graph.getCheckpointFiles.length == 2,
+            "Graph should have 2 checkpoint files")
         } else {
           confirmCheckpointRemoved(graph)
         }
       } else {
         // Graph should never be checkpointed
-        assert(!graph.isCheckpointed,
-               "Graph should never have been checkpointed")
-        assert(graph.getCheckpointFiles.isEmpty,
-               "Graph should not have any checkpoint files")
+        assert(
+          !graph.isCheckpointed,
+          "Graph should never have been checkpointed")
+        assert(
+          graph.getCheckpointFiles.isEmpty,
+          "Graph should not have any checkpoint files")
       }
     } catch {
       case e: AssertionError =>

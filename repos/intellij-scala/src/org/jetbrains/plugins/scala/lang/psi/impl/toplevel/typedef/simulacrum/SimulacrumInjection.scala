@@ -159,11 +159,12 @@ class SimulacrumInjection extends SyntheticMembersInjector {
                           def clauseText(p: ScParameterClause): String = {
                             p.parameters
                               .map(paramText)
-                              .mkString("(" +
-                                          (if (p.isImplicit) "implicit "
-                                           else ""),
-                                        ", ",
-                                        ")")
+                              .mkString(
+                                "(" +
+                                  (if (p.isImplicit) "implicit "
+                                   else ""),
+                                ", ",
+                                ")")
                           }
                           val typeParamClasue =
                             f.typeParametersClause.map(_.getText).getOrElse("")
@@ -206,8 +207,9 @@ class SimulacrumInjection extends SyntheticMembersInjector {
                       case Success(ScParameterizedType(classType, Seq(tp)), _)
                           if isProperTpt(tp).isDefined =>
                         def fromType: Seq[String] = {
-                          ScType.extractClass(classType,
-                                              Some(clazz.getProject)) match {
+                          ScType.extractClass(
+                            classType,
+                            Some(clazz.getProject)) match {
                             case Some(cl: ScTypeDefinition) =>
                               Seq(
                                 s" with ${cl.qualifiedName}.AllOps[$tpName$additionalWithComma]")

@@ -31,12 +31,13 @@ class MemorySpaceTest extends FunSuite with MockitoSugar {
     when(rSnooper.handleBytes()).thenReturn(2.megabytes)
     val rnd = mock[GenerationalRandom]
     when(rnd.apply()).thenReturn(107.megabytes.inBytes.toInt)
-    val space = new MemorySpace(nfo,
-                                minDiscount,
-                                maxDiscount,
-                                rSnooper,
-                                NullLogsReceiver,
-                                rnd)
+    val space = new MemorySpace(
+      nfo,
+      minDiscount,
+      maxDiscount,
+      rSnooper,
+      NullLogsReceiver,
+      rnd)
     assert(space.discount() == 7.megabytes)
     verify(rnd).apply()
     verify(rSnooper).handleBytes()
@@ -49,12 +50,13 @@ class MemorySpaceTest extends FunSuite with MockitoSugar {
     val rSnooper = mock[RequestSnooper]
     when(rSnooper.handleBytes()).thenReturn(9.megabytes)
     val rnd = mock[GenerationalRandom]
-    val space = new MemorySpace(nfo,
-                                minDiscount,
-                                maxDiscount,
-                                rSnooper,
-                                NullLogsReceiver,
-                                rnd)
+    val space = new MemorySpace(
+      nfo,
+      minDiscount,
+      maxDiscount,
+      rSnooper,
+      NullLogsReceiver,
+      rnd)
     assert(space.discount() == 8.megabytes)
   }
 }

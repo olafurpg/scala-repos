@@ -18,17 +18,18 @@ class HttpMuxerTest extends FunSuite {
     }
   }
 
-  val (fooBarPrefix,
-       fooBarExact,
-       fooBooBaz,
-       exactMatch,
-       specialCase,
-       percentEncode) = ("fooBarPrefix",
-                         "fooBarExact",
-                         "fooBooBaz",
-                         "exactMatch",
-                         "specialCase",
-                         "percentEncode")
+  val (
+    fooBarPrefix,
+    fooBarExact,
+    fooBooBaz,
+    exactMatch,
+    specialCase,
+    percentEncode) = ("fooBarPrefix",
+                      "fooBarExact",
+                      "fooBooBaz",
+                      "exactMatch",
+                      "specialCase",
+                      "percentEncode")
 
   val muxService = new HttpMuxer()
     .withHandler("foo/bar/", new DummyService(fooBarPrefix)) // prefix match

@@ -18,11 +18,12 @@ class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
                            prefix: String,
                            graphite: GraphiteClient,
                            verbose: Boolean = false)
-    extends ScheduledReporter(registry.asInstanceOf[MetricRegistry],
-                              "akka-graphite-reporter",
-                              MetricFilter.ALL,
-                              TimeUnit.SECONDS,
-                              TimeUnit.NANOSECONDS) {
+    extends ScheduledReporter(
+      registry.asInstanceOf[MetricRegistry],
+      "akka-graphite-reporter",
+      MetricFilter.ALL,
+      TimeUnit.SECONDS,
+      TimeUnit.NANOSECONDS) {
 
   // todo get rid of ScheduledReporter (would mean removing codahale metrics)?
 
@@ -48,9 +49,10 @@ class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
     val metricsCount =
       List(gauges, counters, histograms, meters, timers).map(_.size).sum +
         List(knownOpsInTimespanCounters, hdrHistograms).map(_.size).sum
-    sendWithBanner("== AkkaGraphiteReporter @ " + dateTime + " == (" +
-                     metricsCount + " metrics)",
-                   '=')
+    sendWithBanner(
+      "== AkkaGraphiteReporter @ " + dateTime + " == (" +
+        metricsCount + " metrics)",
+      '=')
 
     try {
       // graphite takes timestamps in seconds
@@ -64,9 +66,10 @@ class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
       sendMetrics(now, meters.asScala, sendMetered)
       sendMetrics(now, timers.asScala, sendTimer)
 
-      sendMetrics(now,
-                  knownOpsInTimespanCounters,
-                  sendKnownOpsInTimespanCounter)
+      sendMetrics(
+        now,
+        knownOpsInTimespanCounters,
+        sendKnownOpsInTimespanCounter)
       sendMetrics(now, hdrHistograms, sendHdrHistogram)
       sendMetrics(now, averagingGauges, sendAveragingGauge)
     } catch {

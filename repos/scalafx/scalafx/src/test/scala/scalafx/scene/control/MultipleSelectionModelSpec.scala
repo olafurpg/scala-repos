@@ -41,8 +41,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class MultipleSelectionModelSpec[T]
-    extends SimpleSFXDelegateSpec[jfxsc.MultipleSelectionModel[T],
-                                  MultipleSelectionModel[T]](
+    extends SimpleSFXDelegateSpec[
+      jfxsc.MultipleSelectionModel[T],
+      MultipleSelectionModel[T]](
       classOf[jfxsc.MultipleSelectionModel[T]],
       classOf[MultipleSelectionModel[T]]) {
 

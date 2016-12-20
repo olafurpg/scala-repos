@@ -12,8 +12,9 @@ object ExecuteSpec extends Properties("Execute") {
   val iGen = Arbitrary.arbInt.arbitrary
   property("evaluates simple task") = forAll(iGen, MaxWorkersGen) {
     (i: Int, workers: Int) =>
-      ("Workers: " + workers) |: checkResult(tryRun(task(i), false, workers),
-                                             i)
+      ("Workers: " + workers) |: checkResult(
+        tryRun(task(i), false, workers),
+        i)
   }
   // no direct dependencies currently
   /*property("evaluates simple static graph") = forAll(iGen, MaxWorkersGen) { (i: Int, workers: Int) =>

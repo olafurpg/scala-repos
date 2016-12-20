@@ -14,13 +14,14 @@ object Test extends DirectTest {
       List(sys.props("partest.lib"), testOutput.path) mkString sys.props(
         "path.separator")
     compileString(
-      newCompiler("-cp",
-                  classpath,
-                  "-d",
-                  testOutput.path,
-                  "-Yopt:l:classpath",
-                  "-Yopt-inline-heuristics:everything",
-                  "-Yopt-warnings:_"))(code)
+      newCompiler(
+        "-cp",
+        classpath,
+        "-d",
+        testOutput.path,
+        "-Yopt:l:classpath",
+        "-Yopt-inline-heuristics:everything",
+        "-Yopt-warnings:_"))(code)
   }
 
   def show(): Unit = {

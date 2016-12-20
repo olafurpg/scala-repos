@@ -29,8 +29,8 @@ object MultipleInheritance extends AnnotatorPart[ScTemplateDefinition] {
           entries.map(_._1).foreach { refElement =>
             holder.createErrorAnnotation(
               refElement,
-              "%s %s inherited multiple times".format(kindOf(psiClass),
-                                                      psiClass.name))
+              "%s %s inherited multiple times"
+                .format(kindOf(psiClass), psiClass.name))
           }
         case _ =>
       }

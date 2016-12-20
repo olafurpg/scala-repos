@@ -401,23 +401,26 @@ trait SliceTransforms[M[+ _]]
 
                   val columns: Map[ColumnRef, Column] = {
                     val (leftObjectBits, leftEmptyBits) =
-                      buildFilters(sl.columns,
-                                   sl.size,
-                                   filterObjects,
-                                   filterEmptyObjects)
+                      buildFilters(
+                        sl.columns,
+                        sl.size,
+                        filterObjects,
+                        filterEmptyObjects)
                     val (rightObjectBits, rightEmptyBits) =
-                      buildFilters(sr.columns,
-                                   sr.size,
-                                   filterObjects,
-                                   filterEmptyObjects)
+                      buildFilters(
+                        sr.columns,
+                        sr.size,
+                        filterObjects,
+                        filterEmptyObjects)
 
                     val (leftFields, rightFields) =
                       buildFields(sl.columns, sr.columns)
 
-                    val emptyBits = buildOuterBits(leftEmptyBits,
-                                                   rightEmptyBits,
-                                                   leftObjectBits,
-                                                   rightObjectBits)
+                    val emptyBits = buildOuterBits(
+                      leftEmptyBits,
+                      rightEmptyBits,
+                      leftObjectBits,
+                      rightObjectBits)
 
                     val emptyObjects = buildEmptyObjects(emptyBits)
                     val nonemptyObjects =
@@ -477,24 +480,27 @@ trait SliceTransforms[M[+ _]]
                       sl.columns ++ sr.columns
                     } else {
                       val (leftObjectBits, leftEmptyBits) =
-                        buildFilters(sl.columns,
-                                     sl.size,
-                                     filterObjects,
-                                     filterEmptyObjects)
+                        buildFilters(
+                          sl.columns,
+                          sl.size,
+                          filterObjects,
+                          filterEmptyObjects)
                       val (rightObjectBits, rightEmptyBits) =
-                        buildFilters(sr.columns,
-                                     sr.size,
-                                     filterObjects,
-                                     filterEmptyObjects)
+                        buildFilters(
+                          sr.columns,
+                          sr.size,
+                          filterObjects,
+                          filterEmptyObjects)
 
                       val (leftFields, rightFields) =
                         buildFields(sl.columns, sr.columns)
 
                       val (emptyBits, nonemptyBits) =
-                        buildInnerBits(leftEmptyBits,
-                                       rightEmptyBits,
-                                       leftObjectBits,
-                                       rightObjectBits)
+                        buildInnerBits(
+                          leftEmptyBits,
+                          rightEmptyBits,
+                          leftObjectBits,
+                          rightObjectBits)
 
                       val emptyObjects = buildEmptyObjects(emptyBits)
                       val nonemptyObjects =
@@ -526,20 +532,23 @@ trait SliceTransforms[M[+ _]]
 
                   val columns: Map[ColumnRef, Column] = {
                     val (leftArrayBits, leftEmptyBits) =
-                      buildFilters(sl.columns,
-                                   sl.size,
-                                   filterArrays,
-                                   filterEmptyArrays)
+                      buildFilters(
+                        sl.columns,
+                        sl.size,
+                        filterArrays,
+                        filterEmptyArrays)
                     val (rightArrayBits, rightEmptyBits) =
-                      buildFilters(sr.columns,
-                                   sr.size,
-                                   filterArrays,
-                                   filterEmptyArrays)
+                      buildFilters(
+                        sr.columns,
+                        sr.size,
+                        filterArrays,
+                        filterEmptyArrays)
 
-                    val emptyBits = buildOuterBits(leftEmptyBits,
-                                                   rightEmptyBits,
-                                                   leftArrayBits,
-                                                   rightArrayBits)
+                    val emptyBits = buildOuterBits(
+                      leftEmptyBits,
+                      rightEmptyBits,
+                      leftArrayBits,
+                      rightArrayBits)
 
                     val emptyArrays = buildEmptyArrays(emptyBits)
                     val nonemptyArrays =
@@ -567,21 +576,24 @@ trait SliceTransforms[M[+ _]]
                       Map.empty[ColumnRef, Column]
                     } else {
                       val (leftArrayBits, leftEmptyBits) =
-                        buildFilters(sl.columns,
-                                     sl.size,
-                                     filterArrays,
-                                     filterEmptyArrays)
+                        buildFilters(
+                          sl.columns,
+                          sl.size,
+                          filterArrays,
+                          filterEmptyArrays)
                       val (rightArrayBits, rightEmptyBits) =
-                        buildFilters(sr.columns,
-                                     sr.size,
-                                     filterArrays,
-                                     filterEmptyArrays)
+                        buildFilters(
+                          sr.columns,
+                          sr.size,
+                          filterArrays,
+                          filterEmptyArrays)
 
                       val (emptyBits, nonemptyBits) =
-                        buildInnerBits(leftEmptyBits,
-                                       rightEmptyBits,
-                                       leftArrayBits,
-                                       rightArrayBits)
+                        buildInnerBits(
+                          leftEmptyBits,
+                          rightEmptyBits,
+                          leftArrayBits,
+                          rightArrayBits)
 
                       val emptyArrays = buildEmptyArrays(emptyBits)
                       val nonemptyArrays =
@@ -851,9 +863,10 @@ trait SliceTransforms[M[+ _]]
       // Since they're done in parallel, we just need to make sure combine works.
 
       (this, t, t2) match {
-        case (sta: SliceTransform1S[_],
-              stb: SliceTransform1S[_],
-              stc: SliceTransform1S[_]) =>
+        case (
+            sta: SliceTransform1S[_],
+            stb: SliceTransform1S[_],
+            stc: SliceTransform1S[_]) =>
           SliceTransform1S((sta.initial, stb.initial, stc.initial), {
             case ((a0, b0, c0), s0) =>
               val (a, sa) = sta.f0(a0, s0)
@@ -993,11 +1006,13 @@ trait SliceTransforms[M[+ _]]
             case ((a, b, c), d) => (a, ((b, c), d), ())
           })
 
-        case (SliceTransform1SMS(sta, stb, stc),
-              SliceTransform1SMS(std, ste, stf)) =>
-          val st = SliceTransform1SMS(sta,
-                                      stb andThen stc andThen std andThen ste,
-                                      stf)
+        case (
+            SliceTransform1SMS(sta, stb, stc),
+            SliceTransform1SMS(std, ste, stf)) =>
+          val st = SliceTransform1SMS(
+            sta,
+            stb andThen stc andThen std andThen ste,
+            stf)
           st.mapState({
             case (a, (((b, c), d), e), f) => ((a, b, c), (d, e, f))
           }, { case ((a, b, c), (d, e, f)) => (a, (((b, c), d), e), f) })
@@ -1053,9 +1068,10 @@ trait SliceTransforms[M[+ _]]
         apply(s) map {
           case ((a, b, c), slice) =>
             val transM0 = SliceTransform1M(b, transM.f)
-            (SliceTransform1SMS[A, B, C](before.copy(initial = a),
-                                         transM0,
-                                         after.copy(initial = c)),
+            (SliceTransform1SMS[A, B, C](
+               before.copy(initial = a),
+               transM0,
+               after.copy(initial = c)),
              slice)
         }
     }
@@ -1145,9 +1161,10 @@ trait SliceTransforms[M[+ _]]
       // Since they're done in parallel, we just need to make sure combine works.
 
       (this, t, t2) match {
-        case (sta: SliceTransform2S[_],
-              stb: SliceTransform2S[_],
-              stc: SliceTransform2S[_]) =>
+        case (
+            sta: SliceTransform2S[_],
+            stb: SliceTransform2S[_],
+            stc: SliceTransform2S[_]) =>
           SliceTransform2S((sta.initial, stb.initial, stc.initial), {
             case ((a0, b0, c0), sl0, sr0) =>
               val (a, sa) = sta.f0(a0, sl0, sr0)

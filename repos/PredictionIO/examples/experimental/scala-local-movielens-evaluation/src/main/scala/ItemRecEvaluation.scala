@@ -27,17 +27,18 @@ object ItemRecEvaluation1 {
       actions = Set("rate"),
       attributeNames = CommonParams.DataSourceAttributeNames,
       slidingEval = Some(
-        new EventsSlidingEvalParams(firstTrainingUntilTime =
-                                      new DateTime(1998, 2, 1, 0, 0),
-                                    evalDuration = Duration.standardDays(7),
-                                    evalCount = 12)),
+        new EventsSlidingEvalParams(
+          firstTrainingUntilTime = new DateTime(1998, 2, 1, 0, 0),
+          evalDuration = Duration.standardDays(7),
+          evalCount = 12)),
       //evalCount = 3)),
       evalParams = Some(new EvalParams(queryN = 10))
     )
 
-    val pp = new PreparatorParams(actions = Map("rate" -> None),
-                                  seenActions = Set("rate"),
-                                  conflict = "latest")
+    val pp = new PreparatorParams(
+      actions = Map("rate" -> None),
+      seenActions = Set("rate"),
+      conflict = "latest")
 
     val ncMahoutAlgoParams = new NCItemBasedAlgorithmParams(
       booleanData = true,
@@ -55,8 +56,9 @@ object ItemRecEvaluation1 {
       algorithmParamsList = Seq(("ncMahoutItemBased", ncMahoutAlgoParams)))
 
     val evaluatorParams = new ItemRecEvaluatorParams(
-      ratingParams = new BinaryRatingParams(actionsMap = Map("rate" -> None),
-                                            goodThreshold = 3),
+      ratingParams = new BinaryRatingParams(
+        actionsMap = Map("rate" -> None),
+        goodThreshold = 3),
       measureType = MeasureType.PrecisionAtK,
       measureK = 10
     )

@@ -56,12 +56,14 @@ trait JdbcBackend extends RelationalBackend {
       * sequencing is preserved even though processing may happen on a different thread. */
     final def stream[T](a: StreamingDBIO[_, T],
                         bufferNext: Boolean): DatabasePublisher[T] =
-      createPublisher(a,
-                      s =>
-                        new JdbcStreamingActionContext(s,
-                                                       false,
-                                                       DatabaseDef.this,
-                                                       bufferNext))
+      createPublisher(
+        a,
+        s =>
+          new JdbcStreamingActionContext(
+            s,
+            false,
+            DatabaseDef.this,
+            bufferNext))
 
     override protected[this] def createDatabaseActionContext[T](
         _useSameThread: Boolean): Context =
@@ -103,8 +105,9 @@ trait JdbcBackend extends RelationalBackend {
     def forDataSource(ds: DataSource,
                       executor: AsyncExecutor = AsyncExecutor.default(),
                       keepAliveConnection: Boolean = false): DatabaseDef =
-      forSource(new DataSourceJdbcDataSource(ds, keepAliveConnection),
-                executor)
+      forSource(
+        new DataSourceJdbcDataSource(ds, keepAliveConnection),
+        executor)
 
     /** Create a Database based on the JNDI name of a DataSource. */
     def forName(name: String, executor: AsyncExecutor = null) =
@@ -129,14 +132,16 @@ trait JdbcBackend extends RelationalBackend {
                keepAliveConnection: Boolean = false,
                classLoader: ClassLoader = ClassLoaderUtil.defaultClassLoader)
       : DatabaseDef =
-      forDataSource(new DriverDataSource(url,
-                                         user,
-                                         password,
-                                         prop,
-                                         driver,
-                                         classLoader = classLoader),
-                    executor,
-                    keepAliveConnection)
+      forDataSource(
+        new DriverDataSource(
+          url,
+          user,
+          password,
+          prop,
+          driver,
+          classLoader = classLoader),
+        executor,
+        keepAliveConnection)
 
     /** Create a Database that uses the DriverManager to open new connections. */
     def forURL(url: String, prop: Map[String, String]): Database = {
@@ -317,9 +322,10 @@ trait JdbcBackend extends RelationalBackend {
       val usedConfig = if (path.isEmpty) config else config.getConfig(path)
       val source =
         JdbcDataSource.forConfig(usedConfig, driver, path, classLoader)
-      val executor = AsyncExecutor(path,
-                                   usedConfig.getIntOr("numThreads", 20),
-                                   usedConfig.getIntOr("queueSize", 1000))
+      val executor = AsyncExecutor(
+        path,
+        usedConfig.getIntOr("numThreads", 20),
+        usedConfig.getIntOr("queueSize", 1000))
       forSource(source, executor)
     }
   }
@@ -373,9 +379,10 @@ trait JdbcBackend extends RelationalBackend {
                                        new Array[String](0))
       : PreparedStatement = {
       if (JdbcBackend.statementLogger.isDebugEnabled)
-        JdbcBackend.logStatement("Preparing insert statement (returning: " +
-                                   columnNames.mkString(",") + ")",
-                                 sql)
+        JdbcBackend.logStatement(
+          "Preparing insert statement (returning: " +
+            columnNames.mkString(",") + ")",
+          sql)
       val s = loggingPreparedStatement(
         decorateStatement(conn.prepareStatement(sql, columnNames)))
       if (fetchSize != 0) s.setFetchSize(fetchSize)
@@ -427,10 +434,11 @@ trait JdbcBackend extends RelationalBackend {
           ResultSetConcurrency.ReadOnly,
         defaultHoldability: ResultSetHoldability = ResultSetHoldability.Default)(
         f: (PreparedStatement => T)): T = {
-      val st = prepareStatement(sql,
-                                defaultType,
-                                defaultConcurrency,
-                                defaultHoldability)
+      val st = prepareStatement(
+        sql,
+        defaultType,
+        defaultConcurrency,
+        defaultHoldability)
       try f(st)
       finally st.close()
     }
@@ -610,11 +618,12 @@ trait JdbcBackend extends RelationalBackend {
       if (statementParameters eq null) super.session
       else {
         val p = statementParameters.head
-        super.session.internalForParameters(p.rsType,
-                                            p.rsConcurrency,
-                                            p.rsHoldability,
-                                            p.statementInit,
-                                            p.fetchSize)
+        super.session.internalForParameters(
+          p.rsType,
+          p.rsConcurrency,
+          p.rsHoldability,
+          p.statementInit,
+          p.fetchSize)
       }
 
     /** The current JDBC Connection */

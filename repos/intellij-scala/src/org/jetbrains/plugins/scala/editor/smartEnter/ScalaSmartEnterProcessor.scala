@@ -29,13 +29,14 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScPatternDefinition
 object ScalaSmartEnterProcessor {
   private val LOG = Logger.getInstance(getClass)
 
-  val myFixers = Seq(new ScalaMethodCallFixer,
-                     new ScalaIfConditionFixer,
-                     new ScalaForStatementFixer,
-                     new ScalaWhileConditionFixer,
-                     new ScalaMissingWhileBodyFixer,
-                     new ScalaMissingIfBranchesFixer,
-                     new ScalaMissingForBodyFixer)
+  val myFixers = Seq(
+    new ScalaMethodCallFixer,
+    new ScalaIfConditionFixer,
+    new ScalaForStatementFixer,
+    new ScalaWhileConditionFixer,
+    new ScalaMissingWhileBodyFixer,
+    new ScalaMissingIfBranchesFixer,
+    new ScalaMissingForBodyFixer)
   val myEnterProcessors = Seq.empty[EnterProcessor] //Can plug in later
 }
 
@@ -120,10 +121,11 @@ class ScalaSmartEnterProcessor extends SmartEnterProcessor {
     reformat(atCaret)
     commit(editor)
 
-    atCaret = CodeInsightUtil.findElementInRange(psiFile,
-                                                 rangeMarker.getStartOffset,
-                                                 rangeMarker.getEndOffset,
-                                                 atCaret.getClass)
+    atCaret = CodeInsightUtil.findElementInRange(
+      psiFile,
+      rangeMarker.getStartOffset,
+      rangeMarker.getEndOffset,
+      atCaret.getClass)
 
     for (processor <- ScalaSmartEnterProcessor.myEnterProcessors) {
       if (atCaret != null &&
@@ -199,9 +201,10 @@ class ScalaSmartEnterProcessor extends SmartEnterProcessor {
     PsiDocumentManager.getInstance(project).hasUncommitedDocuments
 
   protected def plainEnter(editor: Editor) {
-    getEnterHandler.execute(editor,
-                            editor.getCaretModel.getCurrentCaret,
-                            editor.asInstanceOf[EditorEx].getDataContext)
+    getEnterHandler.execute(
+      editor,
+      editor.getCaretModel.getCurrentCaret,
+      editor.asInstanceOf[EditorEx].getDataContext)
   }
 
   protected def getEnterHandler =

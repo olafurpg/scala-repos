@@ -35,12 +35,14 @@ trait MilestonesControllerBase extends ControllerBase {
   )(MilestoneForm.apply)
 
   get("/:owner/:repository/issues/milestones")(referrersOnly { repository =>
-    html.list(params.getOrElse("state", "open"),
-              getMilestonesWithIssueCount(repository.owner, repository.name),
-              repository,
-              hasWritePermission(repository.owner,
-                                 repository.name,
-                                 context.loginAccount))
+    html.list(
+      params.getOrElse("state", "open"),
+      getMilestonesWithIssueCount(repository.owner, repository.name),
+      repository,
+      hasWritePermission(
+        repository.owner,
+        repository.name,
+        context.loginAccount))
   })
 
   get("/:owner/:repository/issues/milestones/new")(collaboratorsOnly {
@@ -49,32 +51,36 @@ trait MilestonesControllerBase extends ControllerBase {
 
   post("/:owner/:repository/issues/milestones/new", milestoneForm)(
     collaboratorsOnly { (form, repository) =>
-      createMilestone(repository.owner,
-                      repository.name,
-                      form.title,
-                      form.description,
-                      form.dueDate)
+      createMilestone(
+        repository.owner,
+        repository.name,
+        form.title,
+        form.description,
+        form.dueDate)
       redirect(s"/${repository.owner}/${repository.name}/issues/milestones")
     })
 
   get("/:owner/:repository/issues/milestones/:milestoneId/edit")(
     collaboratorsOnly { repository =>
       params("milestoneId").toIntOpt.map { milestoneId =>
-        html.edit(getMilestone(repository.owner, repository.name, milestoneId),
-                  repository)
+        html.edit(
+          getMilestone(repository.owner, repository.name, milestoneId),
+          repository)
       } getOrElse NotFound
     })
 
-  post("/:owner/:repository/issues/milestones/:milestoneId/edit",
-       milestoneForm)(collaboratorsOnly { (form, repository) =>
+  post(
+    "/:owner/:repository/issues/milestones/:milestoneId/edit",
+    milestoneForm)(collaboratorsOnly { (form, repository) =>
     params("milestoneId").toIntOpt.flatMap {
       milestoneId =>
         getMilestone(repository.owner, repository.name, milestoneId).map {
           milestone =>
             updateMilestone(
-              milestone.copy(title = form.title,
-                             description = form.description,
-                             dueDate = form.dueDate))
+              milestone.copy(
+                title = form.title,
+                description = form.description,
+                dueDate = form.dueDate))
             redirect(
               s"/${repository.owner}/${repository.name}/issues/milestones")
         }
@@ -110,9 +116,10 @@ trait MilestonesControllerBase extends ControllerBase {
       params("milestoneId").toIntOpt.flatMap { milestoneId =>
         getMilestone(repository.owner, repository.name, milestoneId).map {
           milestone =>
-            deleteMilestone(repository.owner,
-                            repository.name,
-                            milestone.milestoneId)
+            deleteMilestone(
+              repository.owner,
+              repository.name,
+              milestone.milestoneId)
             redirect(
               s"/${repository.owner}/${repository.name}/issues/milestones")
         }

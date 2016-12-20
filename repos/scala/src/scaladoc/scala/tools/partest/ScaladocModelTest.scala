@@ -111,8 +111,9 @@ abstract class ScaladocModelTest extends DirectTest {
           .collect({ case c: DocTemplateEntity with Class => c })
 
       def _classMbr(name: String): MemberTemplateEntity =
-        getTheFirst(_classesMbr(name),
-                    tpl.qualifiedName + ".classMember(" + name + ")")
+        getTheFirst(
+          _classesMbr(name),
+          tpl.qualifiedName + ".classMember(" + name + ")")
       def _classesMbr(name: String): List[MemberTemplateEntity] =
         tpl.templates
           .filter(_.name == name)
@@ -126,32 +127,36 @@ abstract class ScaladocModelTest extends DirectTest {
           .collect({ case t: DocTemplateEntity with Trait => t })
 
       def _traitMbr(name: String): MemberTemplateEntity =
-        getTheFirst(_traitsMbr(name),
-                    tpl.qualifiedName + ".traitMember(" + name + ")")
+        getTheFirst(
+          _traitsMbr(name),
+          tpl.qualifiedName + ".traitMember(" + name + ")")
       def _traitsMbr(name: String): List[MemberTemplateEntity] =
         tpl.templates
           .filter(_.name == name)
           .collect({ case t: MemberTemplateEntity if t.isTrait => t })
 
       def _object(name: String): DocTemplateEntity =
-        getTheFirst(_objects(name),
-                    tpl.qualifiedName + ".object(" + name + ")")
+        getTheFirst(
+          _objects(name),
+          tpl.qualifiedName + ".object(" + name + ")")
       def _objects(name: String): List[DocTemplateEntity] =
         tpl.templates
           .filter(_.name == name)
           .collect({ case o: DocTemplateEntity with Object => o })
 
       def _objectMbr(name: String): MemberTemplateEntity =
-        getTheFirst(_objectsMbr(name),
-                    tpl.qualifiedName + ".objectMember(" + name + ")")
+        getTheFirst(
+          _objectsMbr(name),
+          tpl.qualifiedName + ".objectMember(" + name + ")")
       def _objectsMbr(name: String): List[MemberTemplateEntity] =
         tpl.templates
           .filter(_.name == name)
           .collect({ case o: MemberTemplateEntity if o.isObject => o })
 
       def _method(name: String): Def =
-        getTheFirst(_methods(name),
-                    tpl.qualifiedName + ".method(" + name + ")")
+        getTheFirst(
+          _methods(name),
+          tpl.qualifiedName + ".method(" + name + ")")
       def _methods(name: String): List[Def] =
         tpl.methods.filter(_.name == name)
 
@@ -160,20 +165,23 @@ abstract class ScaladocModelTest extends DirectTest {
       def _values(name: String): List[Val] = tpl.values.filter(_.name == name)
 
       def _conversion(name: String): ImplicitConversion =
-        getTheFirst(_conversions(name),
-                    tpl.qualifiedName + ".conversion(" + name + ")")
+        getTheFirst(
+          _conversions(name),
+          tpl.qualifiedName + ".conversion(" + name + ")")
       def _conversions(name: String): List[ImplicitConversion] =
         tpl.conversions.filter(_.conversionQualifiedName == name)
 
       def _absType(name: String): MemberEntity =
-        getTheFirst(_absTypes(name),
-                    tpl.qualifiedName + ".abstractType(" + name + ")")
+        getTheFirst(
+          _absTypes(name),
+          tpl.qualifiedName + ".abstractType(" + name + ")")
       def _absTypes(name: String): List[MemberEntity] =
         tpl.members.filter(mbr => mbr.name == name && mbr.isAbstractType)
 
       def _absTypeTpl(name: String): DocTemplateEntity =
-        getTheFirst(_absTypeTpls(name),
-                    tpl.qualifiedName + ".abstractType(" + name + ")")
+        getTheFirst(
+          _absTypeTpls(name),
+          tpl.qualifiedName + ".abstractType(" + name + ")")
       def _absTypeTpls(name: String): List[DocTemplateEntity] =
         tpl.members.collect({
           case dtpl: DocTemplateEntity with AbstractType
@@ -182,14 +190,16 @@ abstract class ScaladocModelTest extends DirectTest {
         })
 
       def _aliasType(name: String): MemberEntity =
-        getTheFirst(_aliasTypes(name),
-                    tpl.qualifiedName + ".aliasType(" + name + ")")
+        getTheFirst(
+          _aliasTypes(name),
+          tpl.qualifiedName + ".aliasType(" + name + ")")
       def _aliasTypes(name: String): List[MemberEntity] =
         tpl.members.filter(mbr => mbr.name == name && mbr.isAliasType)
 
       def _aliasTypeTpl(name: String): DocTemplateEntity =
-        getTheFirst(_aliasTypeTpls(name),
-                    tpl.qualifiedName + ".aliasType(" + name + ")")
+        getTheFirst(
+          _aliasTypeTpls(name),
+          tpl.qualifiedName + ".aliasType(" + name + ")")
       def _aliasTypeTpls(name: String): List[DocTemplateEntity] =
         tpl.members.collect({
           case dtpl: DocTemplateEntity with AliasType if dtpl.name == name =>
@@ -206,8 +216,9 @@ abstract class ScaladocModelTest extends DirectTest {
     }
     implicit class PackageAccess(pack: Package) extends TemplateAccess(pack) {
       def _package(name: String): Package =
-        getTheFirst(_packages(name),
-                    pack.qualifiedName + ".package(" + name + ")")
+        getTheFirst(
+          _packages(name),
+          pack.qualifiedName + ".package(" + name + ")")
       def _packages(name: String): List[Package] =
         pack.packages.filter(_.name == name)
     }
@@ -269,12 +280,14 @@ abstract class ScaladocModelTest extends DirectTest {
                     nodes: Int,
                     edges: Int) = {
       assert(diag.isDefined, doc.qualifiedName + " diagram missing")
-      assert(diag.get.nodes.length == nodes,
-             doc.qualifiedName + "'s diagram: node count " +
-               diag.get.nodes.length + " == " + nodes)
-      assert(diag.get.edges.map(_._2.length).sum == edges,
-             doc.qualifiedName + "'s diagram: edge count " +
-               diag.get.edges.length + " == " + edges)
+      assert(
+        diag.get.nodes.length == nodes,
+        doc.qualifiedName + "'s diagram: node count " +
+          diag.get.nodes.length + " == " + nodes)
+      assert(
+        diag.get.edges.map(_._2.length).sum == edges,
+        doc.qualifiedName + "'s diagram: edge count " +
+          diag.get.edges.length + " == " + edges)
     }
   }
 }

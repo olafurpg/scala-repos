@@ -70,10 +70,12 @@ case class Spdy(_version: SpdyVersion = SpdyVersion.SPDY_3_1,
 
           val pipeline = Channels.pipeline()
           pipeline.addLast("spdyFrameCodec", spdyFrameCodec)
-          pipeline.addLast("spdySessionHandler",
-                           new SpdySessionHandler(_version, false))
-          pipeline.addLast("spdyHttpCodec",
-                           new SpdyHttpCodec(_version, maxResponseSizeInBytes))
+          pipeline.addLast(
+            "spdySessionHandler",
+            new SpdySessionHandler(_version, false))
+          pipeline.addLast(
+            "spdyHttpCodec",
+            new SpdyHttpCodec(_version, maxResponseSizeInBytes))
           pipeline
         }
       }
@@ -106,10 +108,12 @@ case class Spdy(_version: SpdyVersion = SpdyVersion.SPDY_3_1,
 
           val pipeline = Channels.pipeline()
           pipeline.addLast("spdyFrameCodec", spdyFrameCodec)
-          pipeline.addLast("spdySessionHandler",
-                           new SpdySessionHandler(_version, true))
-          pipeline.addLast("spdyHttpCodec",
-                           new SpdyHttpCodec(_version, maxRequestSizeInBytes))
+          pipeline.addLast(
+            "spdySessionHandler",
+            new SpdySessionHandler(_version, true))
+          pipeline.addLast(
+            "spdyHttpCodec",
+            new SpdyHttpCodec(_version, maxRequestSizeInBytes))
           pipeline
         }
       }

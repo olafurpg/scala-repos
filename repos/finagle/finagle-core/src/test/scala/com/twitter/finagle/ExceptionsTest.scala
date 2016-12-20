@@ -124,11 +124,12 @@ class ExceptionsTest extends FunSuite with MockitoSugar {
     val upstreamId = "upstream"
 
     exc.setRemoteInfo(
-      RemoteInfo.Available(Some(upstreamAddr),
-                           Some(ClientId(upstreamId)),
-                           Some(downstreamAddr),
-                           Some(ClientId(downstreamId)),
-                           traceId))
+      RemoteInfo.Available(
+        Some(upstreamAddr),
+        Some(ClientId(upstreamId)),
+        Some(downstreamAddr),
+        Some(ClientId(downstreamId)),
+        traceId))
     assert(exc
       .getMessage() == "foo. Remote Info: Upstream Address: /2.3.4.5:100, Upstream Client Id: upstream, " +
       "Downstream Address: /1.2.3.4:100, Downstream Client Id: downstream, " +

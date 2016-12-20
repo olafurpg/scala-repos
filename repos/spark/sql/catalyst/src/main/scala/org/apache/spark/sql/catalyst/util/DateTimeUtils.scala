@@ -367,12 +367,13 @@ object DateTimeUtils {
       c.set(Calendar.MINUTE, segments(4))
       c.set(Calendar.SECOND, segments(5))
     } else {
-      c.set(segments(0),
-            segments(1) - 1,
-            segments(2),
-            segments(3),
-            segments(4),
-            segments(5))
+      c.set(
+        segments(0),
+        segments(1) - 1,
+        segments(2),
+        segments(3),
+        segments(4),
+        segments(5))
     }
 
     Some(c.getTimeInMillis * 1000 + segments(6))

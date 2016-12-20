@@ -47,10 +47,11 @@ trait GracefulStopSupport {
                    timeout: FiniteDuration,
                    stopMessage: Any = PoisonPill): Future[Boolean] = {
     val internalTarget = target.asInstanceOf[InternalActorRef]
-    val ref = PromiseActorRef(internalTarget.provider,
-                              Timeout(timeout),
-                              target,
-                              stopMessage.getClass.getName)
+    val ref = PromiseActorRef(
+      internalTarget.provider,
+      Timeout(timeout),
+      target,
+      stopMessage.getClass.getName)
     internalTarget.sendSystemMessage(Watch(internalTarget, ref))
     target.tell(stopMessage, Actor.noSender)
     ref.result.future.transform({

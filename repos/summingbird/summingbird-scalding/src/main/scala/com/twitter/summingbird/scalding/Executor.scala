@@ -97,9 +97,10 @@ object Executor {
     val toRun = scaldPlatform.plan(config.graph)
 
     try {
-      scaldPlatform.run(config.getWaitingState(hadoopConf, startDate, batches),
-                        Hdfs(true, hadoopConf),
-                        toRun)
+      scaldPlatform.run(
+        config.getWaitingState(hadoopConf, startDate, batches),
+        Hdfs(true, hadoopConf),
+        toRun)
     } catch {
       case f @ FlowPlanException(errs) =>
         /* This is generally due to data not being ready, don't give a failed error code */

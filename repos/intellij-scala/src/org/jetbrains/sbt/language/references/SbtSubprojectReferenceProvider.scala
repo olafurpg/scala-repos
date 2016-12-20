@@ -43,9 +43,10 @@ class SbtSubprojectReferenceProvider extends PsiReferenceProvider {
   private def findBuildFile(subprojectPath: String,
                             project: Project): Option[PsiFile] = {
     FilenameIndex
-      .getFilesByName(project,
-                      "build.sbt",
-                      GlobalSearchScope.allScope(project))
+      .getFilesByName(
+        project,
+        "build.sbt",
+        GlobalSearchScope.allScope(project))
       .find { file =>
         val relativeToProjectPath =
           project.getBasePath + File.separator + subprojectPath
@@ -156,6 +157,7 @@ private class SbtSubprojectReference[T <: PsiElement](val element: T,
                                                       val sbtFile: PsiFile)
     extends PsiReferenceBase.Immediate[T](
       element,
-      TextRange.create(element.getStartOffsetInParent,
-                       element.getStartOffsetInParent + element.getTextLength),
+      TextRange.create(
+        element.getStartOffsetInParent,
+        element.getStartOffsetInParent + element.getTextLength),
       sbtFile)

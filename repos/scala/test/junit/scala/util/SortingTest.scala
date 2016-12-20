@@ -71,22 +71,28 @@ class SortingTest {
     assertTrue("Quicksort should be in order", isSorted(qxs))
     assertTrue("Quicksort should be in reverse order", isAntisorted(pxs))
     assertTrue("Stable sort should be sorted and stable", isStable(sxs))
-    assertTrue("Stable sort should be reverse sorted but stable",
-               isAntistable(rxs))
-    assertTrue("Stable sorting by proxy should produce sorted stable list",
-               isStable(sys.map(i => xs(i))))
-    assertTrue("Quicksort should produce canonical ordering",
-               (qxs zip zs).forall {
-                 case (a, b) => a.i == b.i
-               })
-    assertTrue("Reverse quicksort should produce canonical ordering",
-               (pxs.reverse zip zs).forall { case (a, b) => a.i == b.i })
-    assertTrue("Stable sort should produce exact ordering",
-               (sxs zip zs).forall {
-                 case (a, b) => a == b
-               })
-    assertTrue("Reverse stable sort should produce canonical ordering",
-               (rxs.reverse zip zs).forall { case (a, b) => a.i == b.i })
+    assertTrue(
+      "Stable sort should be reverse sorted but stable",
+      isAntistable(rxs))
+    assertTrue(
+      "Stable sorting by proxy should produce sorted stable list",
+      isStable(sys.map(i => xs(i))))
+    assertTrue(
+      "Quicksort should produce canonical ordering",
+      (qxs zip zs).forall {
+        case (a, b) => a.i == b.i
+      })
+    assertTrue(
+      "Reverse quicksort should produce canonical ordering",
+      (pxs.reverse zip zs).forall { case (a, b) => a.i == b.i })
+    assertTrue(
+      "Stable sort should produce exact ordering",
+      (sxs zip zs).forall {
+        case (a, b) => a == b
+      })
+    assertTrue(
+      "Reverse stable sort should produce canonical ordering",
+      (rxs.reverse zip zs).forall { case (a, b) => a.i == b.i })
     assertTrue(
       "Proxy sort and direct sort should produce exactly the same thing",
       (sxs zip sys.map(i => xs(i))).forall { case (a, b) => a == b })
@@ -99,10 +105,12 @@ class SortingTest {
       i <- 0 until math.min(
         100,
         math
-          .max(math.min(math.floor(math.pow(v, size) / 2),
-                        math.ceil(workLimit /
-                          (math.log(math.max(2, size)) / math.log(2) * size))),
-               1)
+          .max(
+            math.min(
+              math.floor(math.pow(v, size) / 2),
+              math.ceil(workLimit /
+                (math.log(math.max(2, size)) / math.log(2) * size))),
+            1)
           .toInt)
     } runOneTest(size, v)
 
@@ -111,17 +119,21 @@ class SortingTest {
       val bfwd = Sorting.stableSort(b.clone: Seq[Boolean])
       val bbkw = Sorting
         .stableSort(b.clone: Seq[Boolean], (x: Boolean, y: Boolean) => x && !y)
-      assertTrue("All falses should be first",
-                 bfwd.dropWhile(_ == false).forall(_ == true))
-      assertTrue("All falses should be last when sorted backwards",
-                 bbkw.dropWhile(_ == true).forall(_ == false))
-      assertTrue("Sorting booleans should preserve the number of trues",
-                 b.count(_ == true) == bfwd.count(_ == true))
+      assertTrue(
+        "All falses should be first",
+        bfwd.dropWhile(_ == false).forall(_ == true))
+      assertTrue(
+        "All falses should be last when sorted backwards",
+        bbkw.dropWhile(_ == true).forall(_ == false))
+      assertTrue(
+        "Sorting booleans should preserve the number of trues",
+        b.count(_ == true) == bfwd.count(_ == true))
       assertTrue(
         "Backwards sorting booleans should preserve the number of trues",
         b.count(_ == true) == bbkw.count(_ == true))
-      assertTrue("Sorting should not change the sizes of arrays",
-                 b.length == bfwd.length && b.length == bbkw.length)
+      assertTrue(
+        "Sorting should not change the sizes of arrays",
+        b.length == bfwd.length && b.length == bbkw.length)
     }
   }
 }

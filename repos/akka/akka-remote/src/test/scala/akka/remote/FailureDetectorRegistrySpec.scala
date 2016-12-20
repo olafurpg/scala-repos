@@ -24,12 +24,12 @@ class FailureDetectorRegistrySpec extends AkkaSpec("akka.loglevel = INFO") {
                               Duration.Zero,
                             firstHeartbeatEstimate: FiniteDuration = 1.second,
                             clock: Clock = FailureDetector.defaultClock) =
-    new PhiAccrualFailureDetector(threshold,
-                                  maxSampleSize,
-                                  minStdDeviation,
-                                  acceptableLostDuration,
-                                  firstHeartbeatEstimate =
-                                    firstHeartbeatEstimate)(clock = clock)
+    new PhiAccrualFailureDetector(
+      threshold,
+      maxSampleSize,
+      minStdDeviation,
+      acceptableLostDuration,
+      firstHeartbeatEstimate = firstHeartbeatEstimate)(clock = clock)
 
   def createFailureDetectorRegistry(
       threshold: Double = 8.0,
@@ -41,12 +41,13 @@ class FailureDetectorRegistrySpec extends AkkaSpec("akka.loglevel = INFO") {
     : FailureDetectorRegistry[String] = {
     new DefaultFailureDetectorRegistry[String](
       () ⇒
-        createFailureDetector(threshold,
-                              maxSampleSize,
-                              minStdDeviation,
-                              acceptableLostDuration,
-                              firstHeartbeatEstimate,
-                              clock))
+        createFailureDetector(
+          threshold,
+          maxSampleSize,
+          minStdDeviation,
+          acceptableLostDuration,
+          firstHeartbeatEstimate,
+          clock))
   }
 
   "mark node as available after a series of successful heartbeats" in {
@@ -63,9 +64,9 @@ class FailureDetectorRegistrySpec extends AkkaSpec("akka.loglevel = INFO") {
 
   "mark node as dead if heartbeat are missed" in {
     val timeInterval = List[Long](0, 1000, 100, 100, 4000, 3000)
-    val fd = createFailureDetectorRegistry(threshold = 3,
-                                           clock =
-                                             fakeTimeGenerator(timeInterval))
+    val fd = createFailureDetectorRegistry(
+      threshold = 3,
+      clock = fakeTimeGenerator(timeInterval))
 
     fd.heartbeat("resource1") //0
     fd.heartbeat("resource1") //1000
@@ -79,8 +80,9 @@ class FailureDetectorRegistrySpec extends AkkaSpec("akka.loglevel = INFO") {
   "accept some configured missing heartbeats" in {
     val timeInterval = List[Long](0, 1000, 1000, 1000, 4000, 1000, 1000)
     val fd =
-      createFailureDetectorRegistry(acceptableLostDuration = 3.seconds,
-                                    clock = fakeTimeGenerator(timeInterval))
+      createFailureDetectorRegistry(
+        acceptableLostDuration = 3.seconds,
+        clock = fakeTimeGenerator(timeInterval))
 
     fd.heartbeat("resource1")
     fd.heartbeat("resource1")
@@ -95,8 +97,9 @@ class FailureDetectorRegistrySpec extends AkkaSpec("akka.loglevel = INFO") {
     val timeInterval =
       List[Long](0, 1000, 1000, 1000, 1000, 1000, 500, 500, 5000)
     val fd =
-      createFailureDetectorRegistry(acceptableLostDuration = 3.seconds,
-                                    clock = fakeTimeGenerator(timeInterval))
+      createFailureDetectorRegistry(
+        acceptableLostDuration = 3.seconds,
+        clock = fakeTimeGenerator(timeInterval))
 
     fd.heartbeat("resource1")
     fd.heartbeat("resource1")

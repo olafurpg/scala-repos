@@ -324,15 +324,17 @@ object Gzip {
         for {
           headerBytes <- take(10, "Not enough bytes for gzip file", crc)
           header <- done(
-            Header(littleEndianToShort(headerBytes),
-                   headerBytes(2),
-                   headerBytes(3)))
+            Header(
+              littleEndianToShort(headerBytes),
+              headerBytes(2),
+              headerBytes(3)))
           _ <- if (header.magic != GzipMagic.asInstanceOf[Short])
-            Error("Not a gzip file, found header" + headerBytes
-                    .take(2)
-                    .map(b => "%02X".format(b))
-                    .mkString("(", ", ", ")"),
-                  Input.El(headerBytes))
+            Error(
+              "Not a gzip file, found header" + headerBytes
+                .take(2)
+                .map(b => "%02X".format(b))
+                .mkString("(", ", ", ")"),
+              Input.El(headerBytes))
           else done()
           _ <- if (header.compressionMethod != Deflater.DEFLATED)
             Error("Unsupported compression method", Input.El(headerBytes))
@@ -342,14 +344,16 @@ object Gzip {
             drop(efLength, "Not enough bytes for extra field", crc)
           else done()
           _ <- if (header.hasFilename)
-            dropWhileIncluding(_ != 0x00,
-                               "EOF found in middle of file name",
-                               crc)
+            dropWhileIncluding(
+              _ != 0x00,
+              "EOF found in middle of file name",
+              crc)
           else done()
           _ <- if (header.hasComment)
-            dropWhileIncluding(_ != 0x00,
-                               "EOF found in middle of comment",
-                               crc)
+            dropWhileIncluding(
+              _ != 0x00,
+              "EOF found in middle of comment",
+              crc)
           else done()
           headerCrc <- if (header.hasCrc) readShort(new CRC32) else done(0)
           _ <- if (header.hasCrc && (crc.getValue & 0xffff) != headerCrc)
@@ -366,9 +370,10 @@ object Gzip {
         for {
           crc <- readInt("Premature EOF before gzip CRC", dummy)
           _ <- if (crc != state.crc.getValue.asInstanceOf[Int])
-            Error("CRC failed, was %X, expected %X"
-                    .format(state.crc.getValue.asInstanceOf[Int], crc),
-                  Input.El(intToLittleEndian(crc)))
+            Error(
+              "CRC failed, was %X, expected %X"
+                .format(state.crc.getValue.asInstanceOf[Int], crc),
+              Input.El(intToLittleEndian(crc)))
           else done()
           length <- readInt("Premature EOF before gzip total length", dummy)
           _ <- if (length != state.inflater.getTotalOut)

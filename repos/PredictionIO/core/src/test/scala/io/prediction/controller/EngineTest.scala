@@ -20,21 +20,24 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
   @transient lazy val logger = Logger[this.type]
 
   test("Engine.train") {
-    val engine = new Engine(classOf[PDataSource2],
-                            classOf[PPreparator1],
-                            Map("" -> classOf[PAlgo2]),
-                            classOf[LServing1])
+    val engine = new Engine(
+      classOf[PDataSource2],
+      classOf[PPreparator1],
+      Map("" -> classOf[PAlgo2]),
+      classOf[LServing1])
 
     val engineParams =
-      EngineParams(dataSourceParams = PDataSource2.Params(0),
-                   preparatorParams = PPreparator1.Params(1),
-                   algorithmParamsList = Seq(("", PAlgo2.Params(2))),
-                   servingParams = LServing1.Params(3))
+      EngineParams(
+        dataSourceParams = PDataSource2.Params(0),
+        preparatorParams = PPreparator1.Params(1),
+        algorithmParamsList = Seq(("", PAlgo2.Params(2))),
+        servingParams = LServing1.Params(3))
 
-    val models = engine.train(sc,
-                              engineParams,
-                              engineInstanceId = "",
-                              params = WorkflowParams())
+    val models = engine.train(
+      sc,
+      engineParams,
+      engineInstanceId = "",
+      params = WorkflowParams())
 
     val pd = ProcessedData(1, TrainingData(0))
 
@@ -44,31 +47,34 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
   }
 
   test("Engine.train persisting PAlgo.Model") {
-    val engine = new Engine(classOf[PDataSource2],
-                            classOf[PPreparator1],
-                            Map(
-                              "PAlgo2" -> classOf[PAlgo2],
-                              "PAlgo3" -> classOf[PAlgo3]
-                            ),
-                            classOf[LServing1])
+    val engine = new Engine(
+      classOf[PDataSource2],
+      classOf[PPreparator1],
+      Map(
+        "PAlgo2" -> classOf[PAlgo2],
+        "PAlgo3" -> classOf[PAlgo3]
+      ),
+      classOf[LServing1])
 
-    val engineParams = EngineParams(dataSourceParams = PDataSource2.Params(0),
-                                    preparatorParams = PPreparator1.Params(1),
-                                    algorithmParamsList = Seq(
-                                      ("PAlgo2", PAlgo2.Params(2)),
-                                      ("PAlgo3", PAlgo3.Params(21)),
-                                      ("PAlgo3", PAlgo3.Params(22))
-                                    ),
-                                    servingParams = LServing1.Params(3))
+    val engineParams = EngineParams(
+      dataSourceParams = PDataSource2.Params(0),
+      preparatorParams = PPreparator1.Params(1),
+      algorithmParamsList = Seq(
+        ("PAlgo2", PAlgo2.Params(2)),
+        ("PAlgo3", PAlgo3.Params(21)),
+        ("PAlgo3", PAlgo3.Params(22))
+      ),
+      servingParams = LServing1.Params(3))
 
     val pd = ProcessedData(1, TrainingData(0))
     val model21 = PAlgo3.Model(21, pd)
     val model22 = PAlgo3.Model(22, pd)
 
-    val models = engine.train(sc,
-                              engineParams,
-                              engineInstanceId = "",
-                              params = WorkflowParams())
+    val models = engine.train(
+      sc,
+      engineParams,
+      engineInstanceId = "",
+      params = WorkflowParams())
 
     val pModel21 = PersistentModelManifest(model21.getClass.getName)
     val pModel22 = PersistentModelManifest(model22.getClass.getName)
@@ -77,22 +83,25 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
   }
 
   test("Engine.train persisting LAlgo.Model") {
-    val engine = Engine(classOf[LDataSource1],
-                        classOf[LPreparator1],
-                        Map(
-                          "LAlgo1" -> classOf[LAlgo1],
-                          "LAlgo2" -> classOf[LAlgo2],
-                          "LAlgo3" -> classOf[LAlgo3]
-                        ),
-                        classOf[LServing1])
+    val engine = Engine(
+      classOf[LDataSource1],
+      classOf[LPreparator1],
+      Map(
+        "LAlgo1" -> classOf[LAlgo1],
+        "LAlgo2" -> classOf[LAlgo2],
+        "LAlgo3" -> classOf[LAlgo3]
+      ),
+      classOf[LServing1])
 
     val engineParams =
-      EngineParams(dataSourceParams = LDataSource1.Params(0),
-                   preparatorParams = LPreparator1.Params(1),
-                   algorithmParamsList = Seq(("LAlgo2", LAlgo2.Params(20)),
-                                             ("LAlgo2", LAlgo2.Params(21)),
-                                             ("LAlgo3", LAlgo3.Params(22))),
-                   servingParams = LServing1.Params(3))
+      EngineParams(
+        dataSourceParams = LDataSource1.Params(0),
+        preparatorParams = LPreparator1.Params(1),
+        algorithmParamsList = Seq(
+          ("LAlgo2", LAlgo2.Params(20)),
+          ("LAlgo2", LAlgo2.Params(21)),
+          ("LAlgo3", LAlgo3.Params(22))),
+        servingParams = LServing1.Params(3))
 
     val pd = ProcessedData(1, TrainingData(0))
     val model20 = LAlgo2.Model(20, pd)
@@ -100,10 +109,11 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
     val model22 = LAlgo3.Model(22, pd)
 
     //val models = engine.train(sc, engineParams, WorkflowParams())
-    val models = engine.train(sc,
-                              engineParams,
-                              engineInstanceId = "",
-                              params = WorkflowParams())
+    val models = engine.train(
+      sc,
+      engineParams,
+      engineInstanceId = "",
+      params = WorkflowParams())
 
     val pModel20 = PersistentModelManifest(model20.getClass.getName)
     val pModel21 = PersistentModelManifest(model21.getClass.getName)
@@ -112,27 +122,29 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
   }
 
   test("Engine.train persisting P&NAlgo.Model") {
-    val engine = new Engine(classOf[PDataSource2],
-                            classOf[PPreparator1],
-                            Map(
-                              "PAlgo2" -> classOf[PAlgo2],
-                              "PAlgo3" -> classOf[PAlgo3],
-                              "NAlgo2" -> classOf[NAlgo2],
-                              "NAlgo3" -> classOf[NAlgo3]
-                            ),
-                            classOf[LServing1])
+    val engine = new Engine(
+      classOf[PDataSource2],
+      classOf[PPreparator1],
+      Map(
+        "PAlgo2" -> classOf[PAlgo2],
+        "PAlgo3" -> classOf[PAlgo3],
+        "NAlgo2" -> classOf[NAlgo2],
+        "NAlgo3" -> classOf[NAlgo3]
+      ),
+      classOf[LServing1])
 
-    val engineParams = EngineParams(dataSourceParams = PDataSource2.Params(0),
-                                    preparatorParams = PPreparator1.Params(1),
-                                    algorithmParamsList = Seq(
-                                      ("PAlgo2", PAlgo2.Params(20)),
-                                      ("PAlgo3", PAlgo3.Params(21)),
-                                      ("PAlgo3", PAlgo3.Params(22)),
-                                      ("NAlgo2", NAlgo2.Params(23)),
-                                      ("NAlgo3", NAlgo3.Params(24)),
-                                      ("NAlgo3", NAlgo3.Params(25))
-                                    ),
-                                    servingParams = LServing1.Params(3))
+    val engineParams = EngineParams(
+      dataSourceParams = PDataSource2.Params(0),
+      preparatorParams = PPreparator1.Params(1),
+      algorithmParamsList = Seq(
+        ("PAlgo2", PAlgo2.Params(20)),
+        ("PAlgo3", PAlgo3.Params(21)),
+        ("PAlgo3", PAlgo3.Params(22)),
+        ("NAlgo2", NAlgo2.Params(23)),
+        ("NAlgo3", NAlgo3.Params(24)),
+        ("NAlgo3", NAlgo3.Params(25))
+      ),
+      servingParams = LServing1.Params(3))
 
     val pd = ProcessedData(1, TrainingData(0))
     val model21 = PAlgo3.Model(21, pd)
@@ -142,38 +154,41 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
     val model25 = NAlgo3.Model(25, pd)
 
     //val models = engine.train(sc, engineParams, WorkflowParams())
-    val models = engine.train(sc,
-                              engineParams,
-                              engineInstanceId = "",
-                              params = WorkflowParams())
+    val models = engine.train(
+      sc,
+      engineParams,
+      engineInstanceId = "",
+      params = WorkflowParams())
 
     val pModel21 = PersistentModelManifest(model21.getClass.getName)
     val pModel22 = PersistentModelManifest(model22.getClass.getName)
     val pModel23 = PersistentModelManifest(model23.getClass.getName)
 
-    models should contain theSameElementsAs Seq(Unit,
-                                                pModel21,
-                                                pModel22,
-                                                pModel23,
-                                                model24,
-                                                model25)
+    models should contain theSameElementsAs Seq(
+      Unit,
+      pModel21,
+      pModel22,
+      pModel23,
+      model24,
+      model25)
   }
 
   test("Engine.eval") {
-    val engine = new Engine(classOf[PDataSource2],
-                            classOf[PPreparator1],
-                            Map("" -> classOf[PAlgo2]),
-                            classOf[LServing1])
+    val engine = new Engine(
+      classOf[PDataSource2],
+      classOf[PPreparator1],
+      Map("" -> classOf[PAlgo2]),
+      classOf[LServing1])
 
     val qn = 10
     val en = 3
 
     val engineParams =
-      EngineParams(dataSourceParams =
-                     PDataSource2.Params(id = 0, en = en, qn = qn),
-                   preparatorParams = PPreparator1.Params(1),
-                   algorithmParamsList = Seq(("", PAlgo2.Params(2))),
-                   servingParams = LServing1.Params(3))
+      EngineParams(
+        dataSourceParams = PDataSource2.Params(id = 0, en = en, qn = qn),
+        preparatorParams = PPreparator1.Params(1),
+        algorithmParamsList = Seq(("", PAlgo2.Params(2))),
+        servingParams = LServing1.Params(3))
 
     val algoCount = engineParams.algorithmParamsList.size
     val pd = ProcessedData(1, TrainingData(0))
@@ -217,27 +232,29 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
   }
 
   test("Engine.prepareDeploy PAlgo") {
-    val engine = new Engine(classOf[PDataSource2],
-                            classOf[PPreparator1],
-                            Map(
-                              "PAlgo2" -> classOf[PAlgo2],
-                              "PAlgo3" -> classOf[PAlgo3],
-                              "NAlgo2" -> classOf[NAlgo2],
-                              "NAlgo3" -> classOf[NAlgo3]
-                            ),
-                            classOf[LServing1])
+    val engine = new Engine(
+      classOf[PDataSource2],
+      classOf[PPreparator1],
+      Map(
+        "PAlgo2" -> classOf[PAlgo2],
+        "PAlgo3" -> classOf[PAlgo3],
+        "NAlgo2" -> classOf[NAlgo2],
+        "NAlgo3" -> classOf[NAlgo3]
+      ),
+      classOf[LServing1])
 
-    val engineParams = EngineParams(dataSourceParams = PDataSource2.Params(0),
-                                    preparatorParams = PPreparator1.Params(1),
-                                    algorithmParamsList = Seq(
-                                      ("PAlgo2", PAlgo2.Params(20)),
-                                      ("PAlgo3", PAlgo3.Params(21)),
-                                      ("PAlgo3", PAlgo3.Params(22)),
-                                      ("NAlgo2", NAlgo2.Params(23)),
-                                      ("NAlgo3", NAlgo3.Params(24)),
-                                      ("NAlgo3", NAlgo3.Params(25))
-                                    ),
-                                    servingParams = LServing1.Params(3))
+    val engineParams = EngineParams(
+      dataSourceParams = PDataSource2.Params(0),
+      preparatorParams = PPreparator1.Params(1),
+      algorithmParamsList = Seq(
+        ("PAlgo2", PAlgo2.Params(20)),
+        ("PAlgo3", PAlgo3.Params(21)),
+        ("PAlgo3", PAlgo3.Params(22)),
+        ("NAlgo2", NAlgo2.Params(23)),
+        ("NAlgo3", NAlgo3.Params(24)),
+        ("NAlgo3", NAlgo3.Params(25))
+      ),
+      servingParams = LServing1.Params(3))
 
     val pd = ProcessedData(1, TrainingData(0))
     val model20 = PAlgo2.Model(20, pd)
@@ -266,12 +283,13 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
       params = WorkflowParams()
     )
 
-    deployableModels should contain theSameElementsAs Seq(model20,
-                                                          model21,
-                                                          model22,
-                                                          model23,
-                                                          model24,
-                                                          model25)
+    deployableModels should contain theSameElementsAs Seq(
+      model20,
+      model21,
+      model22,
+      model23,
+      model24,
+      model25)
   }
 }
 
@@ -290,9 +308,10 @@ class EngineTrainSuite extends FunSuite with SharedSparkContext {
 
     val pd = ProcessedData(1, TrainingData(0))
 
-    models should contain theSameElementsAs Seq(PAlgo0.Model(2, pd),
-                                                PAlgo1.Model(3, pd),
-                                                PAlgo0.Model(4, pd))
+    models should contain theSameElementsAs Seq(
+      PAlgo0.Model(2, pd),
+      PAlgo1.Model(3, pd),
+      PAlgo0.Model(4, pd))
   }
 
   test("Local DS/P/Algos") {
@@ -328,9 +347,10 @@ class EngineTrainSuite extends FunSuite with SharedSparkContext {
 
     val pd = ProcessedData(1, TrainingData(0))
 
-    models should contain theSameElementsAs Seq(NAlgo0.Model(2, pd),
-                                                NAlgo1.Model(3, pd),
-                                                NAlgo0.Model(4, pd))
+    models should contain theSameElementsAs Seq(
+      NAlgo0.Model(2, pd),
+      NAlgo1.Model(3, pd),
+      NAlgo0.Model(4, pd))
   }
 
   test("Parallel DS/P/Algos Stop-After-Read") {
@@ -382,9 +402,10 @@ class EngineTrainSuite extends FunSuite with SharedSparkContext {
 
     val pd = ProcessedData(1, TrainingData(0, error = true))
 
-    models should contain theSameElementsAs Seq(PAlgo0.Model(2, pd),
-                                                PAlgo1.Model(3, pd),
-                                                PAlgo0.Model(4, pd))
+    models should contain theSameElementsAs Seq(
+      PAlgo0.Model(2, pd),
+      PAlgo1.Model(3, pd),
+      PAlgo0.Model(4, pd))
   }
 }
 
@@ -398,11 +419,12 @@ class EngineEvalSuite extends FunSuite with Inside with SharedSparkContext {
     val qn = 5
 
     val evalDataSet: Seq[(EvalInfo, RDD[(Query, Prediction, Actual)])] =
-      Engine.eval(sc,
-                  new PDataSource1(id = 1, en = en, qn = qn),
-                  new PPreparator0(id = 2),
-                  Seq(new PAlgo0(id = 3)),
-                  new LServing0(id = 10))
+      Engine.eval(
+        sc,
+        new PDataSource1(id = 1, en = en, qn = qn),
+        new PPreparator0(id = 2),
+        Seq(new PAlgo0(id = 3)),
+        new LServing0(id = 10))
 
     val pd = ProcessedData(2, TrainingData(1))
     val model0 = PAlgo0.Model(3, pd)

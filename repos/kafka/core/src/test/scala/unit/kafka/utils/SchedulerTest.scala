@@ -42,12 +42,14 @@ class SchedulerTest {
   def testMockSchedulerNonPeriodicTask() {
     mockTime.scheduler.schedule("test1", counter1.getAndIncrement, delay = 1)
     mockTime.scheduler.schedule("test2", counter2.getAndIncrement, delay = 100)
-    assertEquals("Counter1 should not be incremented prior to task running.",
-                 0,
-                 counter1.get)
-    assertEquals("Counter2 should not be incremented prior to task running.",
-                 0,
-                 counter2.get)
+    assertEquals(
+      "Counter1 should not be incremented prior to task running.",
+      0,
+      counter1.get)
+    assertEquals(
+      "Counter2 should not be incremented prior to task running.",
+      0,
+      counter2.get)
     mockTime.sleep(1)
     assertEquals("Counter1 should be incremented", 1, counter1.get)
     assertEquals("Counter2 should not be incremented", 0, counter2.get)
@@ -65,12 +67,14 @@ class SchedulerTest {
       .schedule("test1", counter1.getAndIncrement, delay = 1, period = 1)
     mockTime.scheduler
       .schedule("test2", counter2.getAndIncrement, delay = 100, period = 100)
-    assertEquals("Counter1 should not be incremented prior to task running.",
-                 0,
-                 counter1.get)
-    assertEquals("Counter2 should not be incremented prior to task running.",
-                 0,
-                 counter2.get)
+    assertEquals(
+      "Counter1 should not be incremented prior to task running.",
+      0,
+      counter1.get)
+    assertEquals(
+      "Counter2 should not be incremented prior to task running.",
+      0,
+      counter2.get)
     mockTime.sleep(1)
     assertEquals("Counter1 should be incremented", 1, counter1.get)
     assertEquals("Counter2 should not be incremented", 0, counter2.get)

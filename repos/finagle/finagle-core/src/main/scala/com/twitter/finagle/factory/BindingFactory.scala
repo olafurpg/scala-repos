@@ -362,10 +362,11 @@ object BindingFactory {
       extends Stack.Module[ServiceFactory[Req, Rep]] {
     val role = BindingFactory.role
     val description = "Bind destination names to endpoints"
-    val parameters = Seq(implicitly[Stack.Param[BaseDtab]],
-                         implicitly[Stack.Param[Dest]],
-                         implicitly[Stack.Param[Label]],
-                         implicitly[Stack.Param[Stats]])
+    val parameters = Seq(
+      implicitly[Stack.Param[BaseDtab]],
+      implicitly[Stack.Param[Dest]],
+      implicitly[Stack.Param[Label]],
+      implicitly[Stack.Param[Stats]])
 
     /**
       * A request filter that is aware of the bound residual path.
@@ -396,10 +397,11 @@ object BindingFactory {
 
         case Name.Path(path) =>
           val BaseDtab(baseDtab) = params[BaseDtab]
-          new BindingFactory(path,
-                             newStack(path.show, _),
-                             baseDtab,
-                             stats.scope("namer"))
+          new BindingFactory(
+            path,
+            newStack(path.show, _),
+            baseDtab,
+            stats.scope("namer"))
       }
 
       Stack.Leaf(role, factory)

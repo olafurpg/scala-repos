@@ -101,11 +101,12 @@ object KafkaEventServer
             .format(errors.list.mkString("; ")))
       }
 
-    buildServiceState(serviceConfig,
-                      apiKeyFinder,
-                      permissionsFinder,
-                      eventStore,
-                      jobManager,
-                      stoppable)
+    buildServiceState(
+      serviceConfig,
+      apiKeyFinder,
+      permissionsFinder,
+      eventStore,
+      jobManager,
+      stoppable)
   }
 }

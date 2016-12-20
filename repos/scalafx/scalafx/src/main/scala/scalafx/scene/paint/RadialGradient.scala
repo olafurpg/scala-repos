@@ -53,14 +53,15 @@ object RadialGradient {
     val stopsList = new java.util.ArrayList[jfxsp.Stop](stops.length)
     for (stop <- stops) stopsList.add(stop)
     new RadialGradient(
-      new jfxsp.RadialGradient(focusAngle,
-                               focusDistance,
-                               centerX,
-                               centerY,
-                               radius,
-                               proportional,
-                               cycleMethod,
-                               stopsList))
+      new jfxsp.RadialGradient(
+        focusAngle,
+        focusDistance,
+        centerX,
+        centerY,
+        radius,
+        proportional,
+        cycleMethod,
+        stopsList))
   }
 
   /* This should work but it looks like it calls the constructor that
@@ -79,14 +80,15 @@ object RadialGradient {
     val stopsList = new java.util.ArrayList[jfxsp.Stop](stops.length)
     for (stop <- stops) stopsList.add(stop)
     new RadialGradient(
-      new jfxsp.RadialGradient(focusAngle,
-                               focusDistance,
-                               centerX,
-                               centerY,
-                               radius,
-                               proportional,
-                               cycleMethod,
-                               stopsList))
+      new jfxsp.RadialGradient(
+        focusAngle,
+        focusDistance,
+        centerX,
+        centerY,
+        radius,
+        proportional,
+        cycleMethod,
+        stopsList))
   }
 }
 
@@ -103,14 +105,15 @@ class RadialGradient(override val delegate: jfxsp.RadialGradient)
            cycleMethod: jfxsp.CycleMethod,
            stops: Seq[jfxsp.Stop]) =
     this(
-      new jfxsp.RadialGradient(focusAngle,
-                               focusDistance,
-                               centerX,
-                               centerY,
-                               radius,
-                               proportional,
-                               cycleMethod,
-                               stops))
+      new jfxsp.RadialGradient(
+        focusAngle,
+        focusDistance,
+        centerX,
+        centerY,
+        radius,
+        proportional,
+        cycleMethod,
+        stops))
 
   /**
     * Defines the X coordinate of the center point of the circle defining the gradient.

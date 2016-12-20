@@ -46,11 +46,12 @@ object Scaladoc extends AutoPlugin {
 
   def scaladocOptions(ver: String, base: File): List[String] = {
     val urlString = GitHub.url(ver) + "/€{FILE_PATH}.scala"
-    val opts = List("-implicits",
-                    "-doc-source-url",
-                    urlString,
-                    "-sourcepath",
-                    base.getAbsolutePath)
+    val opts = List(
+      "-implicits",
+      "-doc-source-url",
+      urlString,
+      "-sourcepath",
+      base.getAbsolutePath)
     CliOptions.scaladocDiagramsEnabled.ifTrue("-diagrams").toList ::: opts
   }
 
@@ -150,12 +151,13 @@ object UnidocRoot extends AutoPlugin {
       .ifTrue(scalaJavaUnidocSettings)
       .getOrElse(scalaUnidocSettings) ++ settings(
       Seq(AkkaBuild.samples),
-      Seq(AkkaBuild.remoteTests,
-          AkkaBuild.benchJmh,
-          AkkaBuild.parsing,
-          AkkaBuild.protobuf,
-          AkkaBuild.osgiDiningHakkersSampleMavenTest,
-          AkkaBuild.akkaScalaNightly))
+      Seq(
+        AkkaBuild.remoteTests,
+        AkkaBuild.benchJmh,
+        AkkaBuild.parsing,
+        AkkaBuild.protobuf,
+        AkkaBuild.osgiDiningHakkersSampleMavenTest,
+        AkkaBuild.akkaScalaNightly))
 }
 
 /**

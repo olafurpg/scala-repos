@@ -322,8 +322,9 @@ object TestGraphs {
       .mapValues {
         _.map(_._2).toList
           .sortBy(identity)
-          .scanLeft(Option.empty[(Long, JoinedU)],
-                    Option.empty[(Long, U, Option[JoinedU])]) {
+          .scanLeft(
+            Option.empty[(Long, JoinedU)],
+            Option.empty[(Long, U, Option[JoinedU])]) {
             case ((None, result), (time, Left(u))) => {
               // The was no value previously
               (None, Some((time, u, None)))

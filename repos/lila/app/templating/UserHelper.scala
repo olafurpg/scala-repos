@@ -27,18 +27,19 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
     s"""<span $title class="$klass">$span</span>"""
   }
 
-  val topBarSortedPerfTypes: List[PerfType] = List(PerfType.Bullet,
-                                                   PerfType.Chess960,
-                                                   PerfType.Blitz,
-                                                   PerfType.KingOfTheHill,
-                                                   PerfType.Classical,
-                                                   PerfType.ThreeCheck,
-                                                   PerfType.Correspondence,
-                                                   PerfType.Antichess,
-                                                   PerfType.Atomic,
-                                                   PerfType.Horde,
-                                                   PerfType.RacingKings,
-                                                   PerfType.Crazyhouse)
+  val topBarSortedPerfTypes: List[PerfType] = List(
+    PerfType.Bullet,
+    PerfType.Chess960,
+    PerfType.Blitz,
+    PerfType.KingOfTheHill,
+    PerfType.Classical,
+    PerfType.ThreeCheck,
+    PerfType.Correspondence,
+    PerfType.Antichess,
+    PerfType.Atomic,
+    PerfType.Horde,
+    PerfType.RacingKings,
+    PerfType.Crazyhouse)
 
   private def best4Of(u: User, perfTypes: List[PerfType]) =
     perfTypes.sortBy { pt =>
@@ -46,20 +47,23 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
     } take 4
 
   def miniViewSortedPerfTypes(u: User): List[PerfType] =
-    best4Of(u,
-            List(PerfType.Bullet,
-                 PerfType.Blitz,
-                 PerfType.Classical,
-                 PerfType.Correspondence)) ::: best4Of(
+    best4Of(
       u,
-      List(PerfType.Crazyhouse,
-           PerfType.Chess960,
-           PerfType.KingOfTheHill,
-           PerfType.ThreeCheck,
-           PerfType.Antichess,
-           PerfType.Atomic,
-           PerfType.Horde,
-           PerfType.RacingKings))
+      List(
+        PerfType.Bullet,
+        PerfType.Blitz,
+        PerfType.Classical,
+        PerfType.Correspondence)) ::: best4Of(
+      u,
+      List(
+        PerfType.Crazyhouse,
+        PerfType.Chess960,
+        PerfType.KingOfTheHill,
+        PerfType.ThreeCheck,
+        PerfType.Antichess,
+        PerfType.Atomic,
+        PerfType.Horde,
+        PerfType.RacingKings))
 
   def showPerfRating(rating: Int,
                      name: String,
@@ -77,12 +81,13 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
 
   def showPerfRating(perfType: PerfType, perf: Perf, klass: String)(
       implicit ctx: Context): Html =
-    showPerfRating(perf.intRating,
-                   perfType.name,
-                   perf.nb,
-                   perf.provisional,
-                   perfType.iconChar,
-                   klass)
+    showPerfRating(
+      perf.intRating,
+      perfType.name,
+      perf.nb,
+      perf.provisional,
+      perfType.iconChar,
+      klass)
 
   def showPerfRating(
       u: User,
@@ -125,14 +130,15 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
                  truncate: Option[Int] = None,
                  params: String = ""): Html = Html {
     userIdOption.flatMap(lightUser).fold(User.anonymous) { user =>
-      userIdNameLink(userId = user.id,
-                     username = user.name,
-                     title = user.title,
-                     cssClass = cssClass,
-                     withOnline = withOnline,
-                     withTitle = withTitle,
-                     truncate = truncate,
-                     params = params)
+      userIdNameLink(
+        userId = user.id,
+        username = user.name,
+        title = user.title,
+        cssClass = cssClass,
+        withOnline = withOnline,
+        withTitle = withTitle,
+        truncate = truncate,
+        params = params)
     }
   }
 
@@ -142,14 +148,15 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
                     withTitle: Boolean = true,
                     truncate: Option[Int] = None,
                     params: String = ""): Html = Html {
-    userIdNameLink(userId = user.id,
-                   username = user.name,
-                   title = user.title,
-                   cssClass = cssClass,
-                   withOnline = withOnline,
-                   withTitle = withTitle,
-                   truncate = truncate,
-                   params = params)
+    userIdNameLink(
+      userId = user.id,
+      username = user.name,
+      title = user.title,
+      cssClass = cssClass,
+      withOnline = withOnline,
+      withTitle = withTitle,
+      truncate = truncate,
+      params = params)
   }
 
   def userIdLink(userId: String, cssClass: Option[String]): Html =
@@ -170,12 +177,13 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
                    withTitle: Boolean = true,
                    truncate: Option[Int] = None): Html = Html {
     usernameOption.fold(User.anonymous) { username =>
-      userIdNameLink(username.toLowerCase,
-                     username,
-                     cssClass,
-                     withOnline,
-                     withTitle,
-                     truncate)
+      userIdNameLink(
+        username.toLowerCase,
+        username,
+        cssClass,
+        withOnline,
+        withTitle,
+        truncate)
     }
   }
 

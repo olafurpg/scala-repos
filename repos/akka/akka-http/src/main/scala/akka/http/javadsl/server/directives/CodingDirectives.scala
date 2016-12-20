@@ -24,8 +24,9 @@ abstract class CodingDirectives extends CacheConditionDirectives {
   @varargs
   def encodeResponse(innerRoute: Route, moreInnerRoutes: Route*): Route =
     RouteStructure.EncodeResponse(
-      CodingDirectives._DefaultCodersToEncodeResponse)(innerRoute,
-                                                       moreInnerRoutes.toList)
+      CodingDirectives._DefaultCodersToEncodeResponse)(
+      innerRoute,
+      moreInnerRoutes.toList)
 
   /**
     * A directive that Wraps its inner routes with encoding support.
@@ -46,8 +47,9 @@ abstract class CodingDirectives extends CacheConditionDirectives {
   def decodeRequestWith(decoder: Coder,
                         innerRoute: Route,
                         moreInnerRoutes: Route*): Route =
-    RouteStructure.DecodeRequest(decoder :: Nil)(innerRoute,
-                                                 moreInnerRoutes.toList)
+    RouteStructure.DecodeRequest(decoder :: Nil)(
+      innerRoute,
+      moreInnerRoutes.toList)
 
   /**
     * Decodes the incoming request if it is encoded with one of the given
@@ -66,8 +68,9 @@ abstract class CodingDirectives extends CacheConditionDirectives {
   @varargs
   def decodeRequest(innerRoute: Route, moreInnerRoutes: Route*): Route =
     RouteStructure.DecodeRequest(
-      CodingDirectives._DefaultCodersToDecodeRequest)(innerRoute,
-                                                      moreInnerRoutes.toList)
+      CodingDirectives._DefaultCodersToDecodeRequest)(
+      innerRoute,
+      moreInnerRoutes.toList)
 }
 
 /**

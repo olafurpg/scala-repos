@@ -51,8 +51,9 @@ class HDFSMetadataLog[T: ClassTag](sqlContext: SQLContext, path: String)
     if (metadataPath.toUri.getScheme == null) {
       FileContext.getFileContext(sqlContext.sparkContext.hadoopConfiguration)
     } else {
-      FileContext.getFileContext(metadataPath.toUri,
-                                 sqlContext.sparkContext.hadoopConfiguration)
+      FileContext.getFileContext(
+        metadataPath.toUri,
+        sqlContext.sparkContext.hadoopConfiguration)
     }
 
   if (!fc.util().exists(metadataPath)) {

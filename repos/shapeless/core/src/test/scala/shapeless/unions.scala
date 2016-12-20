@@ -253,8 +253,9 @@ class UnionTests {
 
       assertTypedEquals(Coproduct[USF]("first".narrow -> Option(2)), f1)
       assertTypedEquals(Coproduct[USF]("second".narrow -> Option(true)), f2)
-      assertTypedEquals(Coproduct[USF]("third".narrow -> Option.empty[String]),
-                        f3)
+      assertTypedEquals(
+        Coproduct[USF]("third".narrow -> Option.empty[String]),
+        f3)
     }
   }
 

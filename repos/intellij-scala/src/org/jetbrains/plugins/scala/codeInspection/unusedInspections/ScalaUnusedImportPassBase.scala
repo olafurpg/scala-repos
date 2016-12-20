@@ -88,13 +88,14 @@ trait ScalaUnusedImportPassBase { self: TextEditorHighlightingPass =>
     }
 
   protected def highlightAll(highlights: util.Collection[HighlightInfo]) {
-    UpdateHighlightersUtil.setHighlightersToEditor(file.getProject,
-                                                   document,
-                                                   0,
-                                                   file.getTextLength,
-                                                   highlights,
-                                                   getColorsScheme,
-                                                   getId)
+    UpdateHighlightersUtil.setHighlightersToEditor(
+      file.getProject,
+      document,
+      0,
+      file.getTextLength,
+      highlights,
+      getColorsScheme,
+      getId)
   }
 
   protected def getFixes: List[IntentionAction]

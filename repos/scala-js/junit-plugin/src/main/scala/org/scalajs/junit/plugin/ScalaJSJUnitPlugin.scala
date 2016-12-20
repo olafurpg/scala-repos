@@ -215,22 +215,25 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
             mod =>
               jUnitAnnotatedMethods(mod.symbol.asClass)
           }
-          mkInvokeJUnitMethodOnModuleDef(annotatedMethods,
-                                         bootSym,
-                                         modDefOption.map(_.symbol))
+          mkInvokeJUnitMethodOnModuleDef(
+            annotatedMethods,
+            bootSym,
+            modDefOption.map(_.symbol))
         }
         val invokeJUnitMethodOnInstanceDef = {
           val annotatedMethods = jUnitAnnotatedMethods(clazz.symbol.asClass)
-          mkInvokeJUnitMethodOnInstanceDef(annotatedMethods,
-                                           bootSym,
-                                           clazz.symbol)
+          mkInvokeJUnitMethodOnInstanceDef(
+            annotatedMethods,
+            bootSym,
+            clazz.symbol)
         }
 
         val bootBody = {
-          List(getJUnitMetadataDef,
-               newInstanceDef,
-               invokeJUnitMethodDef,
-               invokeJUnitMethodOnInstanceDef)
+          List(
+            getJUnitMetadataDef,
+            newInstanceDef,
+            invokeJUnitMethodDef,
+            invokeJUnitMethodOnInstanceDef)
         }
         val bootParents = List(
           TypeTree(definitions.ObjectTpe),
@@ -351,8 +354,9 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
         val invokeJUnitMethodSym = classSym.newMethod(newTermName("invoke"))
 
         val paramSyms = {
-          val params = List(("instance", definitions.ObjectTpe),
-                            ("methodName", definitions.StringTpe))
+          val params = List(
+            ("instance", definitions.ObjectTpe),
+            ("methodName", definitions.StringTpe))
           mkParamSymbols(invokeJUnitMethodSym, params)
         }
 
@@ -389,14 +393,16 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
             case ann
                 if ann.atp.typeSymbol == TestClass &&
                   ann.original.isInstanceOf[Block] =>
-              reporter.error(ann.pos,
-                             "@Test(timeout = ...) is not " +
-                               "supported in Scala.js JUnit Framework")
+              reporter.error(
+                ann.pos,
+                "@Test(timeout = ...) is not " +
+                  "supported in Scala.js JUnit Framework")
 
             case ann if ann.atp.typeSymbol == FixMethodOrderClass =>
-              reporter.error(ann.pos,
-                             "@FixMethodOrder(...) is not supported " +
-                               "in Scala.js JUnit Framework")
+              reporter.error(
+                ann.pos,
+                "@FixMethodOrder(...) is not supported " +
+                  "in Scala.js JUnit Framework")
 
             case _ => // all is well
           }
@@ -431,14 +437,15 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
           mkList(testMethods.map(defaultMethodMetadata(tpe)))
 
         val getJUnitMethodRhs = {
-          mkNewInstance(TypeTree(jUnitClassMetadataType),
-                        List(
-                          mkList(liftAnnotations(clSym)),
-                          gen.mkNil,
-                          mkMethodList(jUnitMethodMetadataTypeTree)(methods),
-                          modMethods.fold(gen.mkNil)(
-                            mkMethodList(jUnitMethodMetadataTypeTree))
-                        ))
+          mkNewInstance(
+            TypeTree(jUnitClassMetadataType),
+            List(
+              mkList(liftAnnotations(clSym)),
+              gen.mkNil,
+              mkMethodList(jUnitMethodMetadataTypeTree)(methods),
+              modMethods.fold(gen.mkNil)(
+                mkMethodList(jUnitMethodMetadataTypeTree))
+            ))
         }
 
         val getJUnitMetadataSym = clSym.newMethod(newTermName("metadata"))
@@ -501,10 +508,11 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
           (methodSymbol, acc) =>
             val mName = Literal(Constant(methodSymbol.name.toString))
             val paramIdent = gen.mkAttributedIdent(idParamSym)
-            val cond = gen.mkMethodCall(paramIdent,
-                                        definitions.Object_equals,
-                                        Nil,
-                                        List(mName))
+            val cond = gen.mkMethodCall(
+              paramIdent,
+              definitions.Object_equals,
+              Nil,
+              List(mName))
             val call = genCall(methodSymbol)
             If(cond, call, acc)
         }
@@ -513,10 +521,11 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
 
       private def mkMethodNotFound(paramSym: Symbol) = {
         val paramIdent = gen.mkAttributedIdent(paramSym)
-        val msg = gen.mkMethodCall(paramIdent,
-                                   definitions.String_+,
-                                   Nil,
-                                   List(Literal(Constant(" not found"))))
+        val msg = gen.mkMethodCall(
+          paramIdent,
+          definitions.String_+,
+          Nil,
+          List(Literal(Constant(" not found"))))
         val exception = mkNewInstance[NoSuchMethodException](List(msg))
         Throw(exception)
       }

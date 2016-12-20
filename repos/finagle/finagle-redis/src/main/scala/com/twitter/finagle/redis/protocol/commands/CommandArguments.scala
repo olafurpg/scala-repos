@@ -29,18 +29,21 @@ case class Limit(offset: Long, count: Long) extends CommandArgument {
   def toChannelBuffer =
     ChannelBuffers.wrappedBuffer(toChannelBuffers.toArray: _*)
   def toChannelBuffers =
-    Seq(Limit.LIMIT_CB,
-        StringToChannelBuffer(offset.toString),
-        StringToChannelBuffer(count.toString))
+    Seq(
+      Limit.LIMIT_CB,
+      StringToChannelBuffer(offset.toString),
+      StringToChannelBuffer(count.toString))
 }
 object Limit {
   val LIMIT = "LIMIT"
   val LIMIT_CB = StringToChannelBuffer(LIMIT)
   def apply(args: Seq[String]) = {
-    RequireClientProtocol(args != null && args.length == 3,
-                          "LIMIT requires two arguments")
-    RequireClientProtocol(args.head == LIMIT,
-                          "LIMIT must start with LIMIT clause")
+    RequireClientProtocol(
+      args != null && args.length == 3,
+      "LIMIT requires two arguments")
+    RequireClientProtocol(
+      args.head == LIMIT,
+      "LIMIT must start with LIMIT clause")
     RequireClientProtocol.safe {
       val offset = NumberFormat.toLong(args(1))
       val count = NumberFormat.toLong(args(2))
@@ -76,12 +79,14 @@ object Weights {
 
   def apply(args: Seq[String]): Option[Weights] = {
     val argLength = args.length
-    RequireClientProtocol(args != null && argLength > 0,
-                          "WEIGHTS can not be specified with an empty list")
+    RequireClientProtocol(
+      args != null && argLength > 0,
+      "WEIGHTS can not be specified with an empty list")
     args.head.toUpperCase match {
       case WEIGHTS =>
-        RequireClientProtocol(argLength > 1,
-                              "WEIGHTS requires additional arguments")
+        RequireClientProtocol(
+          argLength > 1,
+          "WEIGHTS requires additional arguments")
         val weights: Array[Double] = RequireClientProtocol.safe {
           args.tail.map { item =>
             NumberFormat.toDouble(item)
@@ -113,12 +118,14 @@ object Aggregate {
 
   def apply(args: Seq[String]): Option[Aggregate] = {
     val argLength = args.length
-    RequireClientProtocol(args != null && argLength > 0,
-                          "AGGREGATE can not be specified with empty list")
+    RequireClientProtocol(
+      args != null && argLength > 0,
+      "AGGREGATE can not be specified with empty list")
     args.head.toUpperCase match {
       case AGGREGATE =>
-        RequireClientProtocol(argLength == 2,
-                              "AGGREGATE requires a type (MIN, MAX, SUM)")
+        RequireClientProtocol(
+          argLength == 2,
+          "AGGREGATE requires a type (MIN, MAX, SUM)")
         args(1).toUpperCase match {
           case Aggregate.Sum.name => Some(Aggregate.Sum)
           case Aggregate.Max.name => Some(Aggregate.Max)
@@ -137,8 +144,9 @@ object Count {
   val COUNT_CB = StringToChannelBuffer(COUNT)
 
   def apply(args: Seq[String]): Option[JLong] = {
-    RequireClientProtocol(args != null && !args.isEmpty,
-                          "COUNT can not be specified with empty list")
+    RequireClientProtocol(
+      args != null && !args.isEmpty,
+      "COUNT can not be specified with empty list")
     args.head.toUpperCase match {
       case COUNT =>
         RequireClientProtocol(args.length == 2, "COUNT requires two arguments")
@@ -153,8 +161,9 @@ object Pattern {
   val PATTERN_CB = StringToChannelBuffer(PATTERN)
 
   def apply(args: Seq[String]): Option[String] = {
-    RequireClientProtocol(args != null && !args.isEmpty,
-                          "AGGREGATE can not be specified with empty list")
+    RequireClientProtocol(
+      args != null && !args.isEmpty,
+      "AGGREGATE can not be specified with empty list")
     args.head.toUpperCase match {
       case PATTERN => Some(args(1))
       case _ => None

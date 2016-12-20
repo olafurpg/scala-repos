@@ -259,11 +259,12 @@ private[parquet] class CatalystWriteSupport
           // fixed-length byte array.
           val signByte = if (bytes.head < 0) -1: Byte else 0: Byte
           util.Arrays.fill(decimalBuffer, 0, numBytes - bytes.length, signByte)
-          System.arraycopy(bytes,
-                           0,
-                           decimalBuffer,
-                           numBytes - bytes.length,
-                           bytes.length)
+          System.arraycopy(
+            bytes,
+            0,
+            decimalBuffer,
+            numBytes - bytes.length,
+            bytes.length)
           decimalBuffer
         }
 
@@ -343,8 +344,9 @@ private[parquet] class CatalystWriteSupport
         //                                           ^~~~~~~  elementFieldName
         //     }
         //   }
-        threeLevelArrayWriter(repeatedGroupName = "list",
-                              elementFieldName = "element")
+        threeLevelArrayWriter(
+          repeatedGroupName = "list",
+          elementFieldName = "element")
 
       case (legacyMode @ true, nullableElements @ true) =>
         // Legacy mode, with nullable elements:
@@ -356,8 +358,9 @@ private[parquet] class CatalystWriteSupport
         //                               ^~~~~ elementFieldName
         //     }
         //   }
-        threeLevelArrayWriter(repeatedGroupName = "bag",
-                              elementFieldName = "array")
+        threeLevelArrayWriter(
+          repeatedGroupName = "bag",
+          elementFieldName = "array")
 
       case (legacyMode @ true, nullableElements @ false) =>
         // Legacy mode, with non-nullable elements:

@@ -171,12 +171,13 @@ class FileHandlerTest extends WordSpec with TempFolder {
     // verify that at the proper time, the log file rolls and resets.
     "roll logs into new files" in {
       withTempFolder {
-        val handler = new FileHandler(folderName + "/test.log",
-                                      Policy.Hourly,
-                                      true,
-                                      -1,
-                                      BareFormatter,
-                                      None)
+        val handler = new FileHandler(
+          folderName + "/test.log",
+          Policy.Hourly,
+          true,
+          -1,
+          BareFormatter,
+          None)
         Time.withCurrentTimeFrozen { time =>
           handler.publish(record1)
           val date = new Date(Time.now.inMilliseconds)

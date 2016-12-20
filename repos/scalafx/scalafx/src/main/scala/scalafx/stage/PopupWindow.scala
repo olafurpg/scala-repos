@@ -48,8 +48,9 @@ object PopupWindow {
     * Wraps [[http://download.java.net/jdk8/jfxdocs/javafx/stage/PopupWindow.AnchorLocation.html AnchorLocation]]
     */
   object AnchorLocation
-      extends SFXEnumDelegateCompanion[jfxs.PopupWindow.AnchorLocation,
-                                       AnchorLocation] {
+      extends SFXEnumDelegateCompanion[
+        jfxs.PopupWindow.AnchorLocation,
+        AnchorLocation] {
 
     /** Represents bottom left content corner. */
     val ContentBottomLeft = new AnchorLocation(
@@ -116,14 +117,15 @@ object PopupWindow {
     val WINDOW_TOP_RIGHT = WindowTopRight
 
     protected override def unsortedValues: Array[AnchorLocation] =
-      Array(ContentBottomLeft,
-            ContentBottomRight,
-            ContentTopLeft,
-            ContentTopRight,
-            WindowBottomLeft,
-            WindowBottomRight,
-            WindowTopLeft,
-            WindowTopRight)
+      Array(
+        ContentBottomLeft,
+        ContentBottomRight,
+        ContentTopLeft,
+        ContentTopRight,
+        WindowBottomLeft,
+        WindowBottomRight,
+        WindowTopLeft,
+        WindowTopRight)
   }
 
   /** Anchor location constants for popup anchor point selection.

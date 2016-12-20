@@ -80,8 +80,9 @@ class SymbolTableForUnitTesting extends SymbolTable {
 
     def rootLoader: LazyType = settings.YclasspathImpl.value match {
       case ClassPathRepresentationType.Flat =>
-        new loaders.PackageLoaderUsingFlatClassPath(FlatClassPath.RootPackage,
-                                                    flatClassPath)
+        new loaders.PackageLoaderUsingFlatClassPath(
+          FlatClassPath.RootPackage,
+          flatClassPath)
       case ClassPathRepresentationType.Recursive =>
         new loaders.PackageLoader(classPath)
     }

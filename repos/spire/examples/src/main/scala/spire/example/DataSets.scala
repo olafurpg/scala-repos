@@ -115,29 +115,32 @@ object DataSet {
     Ignored("Species"))
 
   def Iris =
-    fromResource[Vector, Rational, String]("Iris",
-                                           "/datasets/iris.data",
-                                           ',',
-                                           IrisVars,
-                                           (4, identity))(CoordinateSpace.seq)
+    fromResource[Vector, Rational, String](
+      "Iris",
+      "/datasets/iris.data",
+      ',',
+      IrisVars,
+      (4, identity))(CoordinateSpace.seq)
 
-  private val YeastVars = List[Variable[Double]](Ignored("Protein"),
-                                                 Continuous("mcg", _.toDouble),
-                                                 Continuous("gvh", _.toDouble),
-                                                 Continuous("alm", _.toDouble),
-                                                 Continuous("mit", _.toDouble),
-                                                 Continuous("erl", _.toDouble),
-                                                 Continuous("pox", _.toDouble),
-                                                 Continuous("vac", _.toDouble),
-                                                 Continuous("nuc", _.toDouble),
-                                                 Ignored("Location"))
+  private val YeastVars = List[Variable[Double]](
+    Ignored("Protein"),
+    Continuous("mcg", _.toDouble),
+    Continuous("gvh", _.toDouble),
+    Continuous("alm", _.toDouble),
+    Continuous("mit", _.toDouble),
+    Continuous("erl", _.toDouble),
+    Continuous("pox", _.toDouble),
+    Continuous("vac", _.toDouble),
+    Continuous("nuc", _.toDouble),
+    Ignored("Location"))
 
   def Yeast =
-    fromResource[Array, Double, String]("Yeast",
-                                        "/datasets/yeast.data",
-                                        ',',
-                                        YeastVars,
-                                        (9, identity))(CoordinateSpace.array)
+    fromResource[Array, Double, String](
+      "Yeast",
+      "/datasets/yeast.data",
+      ',',
+      YeastVars,
+      (9, identity))(CoordinateSpace.array)
 
   private val MpgVars = List[Variable[Double]](
     Ignored("MPG"),
@@ -151,11 +154,12 @@ object DataSet {
     Ignored("Model Name"))
 
   def MPG =
-    fromResource[Array, Double, Double]("MPG",
-                                        "/datasets/auto-mpg.data",
-                                        ',',
-                                        MpgVars,
-                                        (0, _.toDouble))(CoordinateSpace.array)
+    fromResource[Array, Double, Double](
+      "MPG",
+      "/datasets/auto-mpg.data",
+      ',',
+      MpgVars,
+      (0, _.toDouble))(CoordinateSpace.array)
 }
 
 sealed trait Variable[+F]

@@ -296,10 +296,11 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     }
 
     // top types
-    lazy val AnyClass = enterNewClass(ScalaPackageClass,
-                                      tpnme.Any,
-                                      Nil,
-                                      ABSTRACT) markAllCompleted
+    lazy val AnyClass = enterNewClass(
+      ScalaPackageClass,
+      tpnme.Any,
+      Nil,
+      ABSTRACT) markAllCompleted
     lazy val AnyRefClass =
       newAlias(ScalaPackageClass, tpnme.AnyRef, ObjectTpe) markAllCompleted
     lazy val ObjectClass = getRequiredClass(sn.Object.toString)
@@ -322,10 +323,11 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
 
     lazy val AnyValClass: ClassSymbol =
       (ScalaPackageClass.info member tpnme.AnyVal orElse {
-        val anyval = enterNewClass(ScalaPackageClass,
-                                   tpnme.AnyVal,
-                                   AnyTpe :: Nil,
-                                   ABSTRACT)
+        val anyval = enterNewClass(
+          ScalaPackageClass,
+          tpnme.AnyVal,
+          AnyTpe :: Nil,
+          ABSTRACT)
         val av_constr = anyval.newClassConstructor(NoPosition)
         anyval.info.decls enter av_constr
         anyval markAllCompleted
@@ -732,10 +734,11 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
 
     val MaxTupleArity, MaxProductArity, MaxFunctionArity = 22
 
-    lazy val ProductClass = new VarArityClass("Product",
-                                              MaxProductArity,
-                                              countFrom = 1,
-                                              init = Some(UnitClass))
+    lazy val ProductClass = new VarArityClass(
+      "Product",
+      MaxProductArity,
+      countFrom = 1,
+      init = Some(UnitClass))
     lazy val TupleClass =
       new VarArityClass("Tuple", MaxTupleArity, countFrom = 1)
     lazy val FunctionClass = new VarArityClass("Function", MaxFunctionArity)
@@ -1307,21 +1310,24 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     lazy val Object_ne =
       enterNewMethod(ObjectClass, nme.ne, AnyRefTpe :: Nil, BooleanTpe, FINAL)
     lazy val Object_isInstanceOf =
-      newT1NoParamsMethod(ObjectClass,
-                          nme.isInstanceOf_Ob,
-                          FINAL | SYNTHETIC | ARTIFACT)(_ => BooleanTpe)
+      newT1NoParamsMethod(
+        ObjectClass,
+        nme.isInstanceOf_Ob,
+        FINAL | SYNTHETIC | ARTIFACT)(_ => BooleanTpe)
     lazy val Object_asInstanceOf =
-      newT1NoParamsMethod(ObjectClass,
-                          nme.asInstanceOf_Ob,
-                          FINAL | SYNTHETIC | ARTIFACT)(_.typeConstructor)
+      newT1NoParamsMethod(
+        ObjectClass,
+        nme.asInstanceOf_Ob,
+        FINAL | SYNTHETIC | ARTIFACT)(_.typeConstructor)
     lazy val Object_synchronized =
       newPolyMethod(1, ObjectClass, nme.synchronized_, FINAL)(tps =>
         (Some(List(tps.head.typeConstructor)), tps.head.typeConstructor))
-    lazy val String_+ = enterNewMethod(StringClass,
-                                       nme.raw.PLUS,
-                                       AnyTpe :: Nil,
-                                       StringTpe,
-                                       FINAL)
+    lazy val String_+ = enterNewMethod(
+      StringClass,
+      nme.raw.PLUS,
+      AnyTpe :: Nil,
+      StringTpe,
+      FINAL)
 
     def Object_getClass = getMemberMethod(ObjectClass, nme.getClass_)
     def Object_clone = getMemberMethod(ObjectClass, nme.clone_)
@@ -1559,9 +1565,10 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
       *  know the method in question is uniquely declared in the given owner.
       */
     def getDecl(owner: Symbol, name: Name): Symbol = {
-      getDeclIfDefined(owner, name) orElse fatalMissingSymbol(owner,
-                                                              name,
-                                                              "decl")
+      getDeclIfDefined(owner, name) orElse fatalMissingSymbol(
+        owner,
+        name,
+        "decl")
     }
     def getDeclIfDefined(owner: Symbol, name: Name): Symbol =
       owner.info.nonPrivateDecl(name)
@@ -1775,8 +1782,9 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
 
       private def valueCompanionMember(className: Name,
                                        methodName: TermName): TermSymbol =
-        getMemberMethod(valueClassCompanion(className.toTermName).moduleClass,
-                        methodName)
+        getMemberMethod(
+          valueClassCompanion(className.toTermName).moduleClass,
+          methodName)
 
       lazy val boxMethod = classesMap(x => valueCompanionMember(x, nme.box))
       lazy val unboxMethod = classesMap(
@@ -1896,16 +1904,18 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
 
       def isPolymorphicSignature(sym: Symbol) = PolySigMethods(sym)
       private lazy val PolySigMethods: Set[Symbol] =
-        Set[Symbol](MethodHandle.info.decl(sn.Invoke),
-                    MethodHandle.info.decl(sn.InvokeExact)).filter(_.exists)
+        Set[Symbol](
+          MethodHandle.info.decl(sn.Invoke),
+          MethodHandle.info.decl(sn.InvokeExact)).filter(_.exists)
 
       lazy val Scala_Java8_CompatPackage =
         rootMirror.getPackageIfDefined("scala.runtime.java8")
       lazy val Scala_Java8_CompatPackage_JFunction =
         (0 to MaxFunctionArity).toArray map
           (i =>
-             getMemberIfDefined(Scala_Java8_CompatPackage.moduleClass,
-                                TypeName("JFunction" + i)))
+             getMemberIfDefined(
+               Scala_Java8_CompatPackage.moduleClass,
+               TypeName("JFunction" + i)))
     }
   }
 }

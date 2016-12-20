@@ -266,8 +266,9 @@ final class ORSet[A] private[akka] (
     val newVvector = vvector + node
     val newDot = VersionVector(node, newVvector.versionAt(node))
     assignAncestor(
-      new ORSet(elementsMap = elementsMap.updated(element, newDot),
-                vvector = newVvector))
+      new ORSet(
+        elementsMap = elementsMap.updated(element, newDot),
+        vvector = newVvector))
   }
 
   /**
@@ -324,16 +325,18 @@ final class ORSet[A] private[akka] (
       val entries00 = ORSet.mergeCommonKeys(commonKeys, this, that)
       val thisUniqueKeys =
         this.elementsMap.keysIterator.filterNot(that.elementsMap.contains)
-      val entries0 = ORSet.mergeDisjointKeys(thisUniqueKeys,
-                                             this.elementsMap,
-                                             that.vvector,
-                                             entries00)
+      val entries0 = ORSet.mergeDisjointKeys(
+        thisUniqueKeys,
+        this.elementsMap,
+        that.vvector,
+        entries00)
       val thatUniqueKeys =
         that.elementsMap.keysIterator.filterNot(this.elementsMap.contains)
-      val entries = ORSet.mergeDisjointKeys(thatUniqueKeys,
-                                            that.elementsMap,
-                                            this.vvector,
-                                            entries0)
+      val entries = ORSet.mergeDisjointKeys(
+        thatUniqueKeys,
+        that.elementsMap,
+        this.vvector,
+        entries0)
       val mergedVvector = this.vvector.merge(that.vvector)
 
       clearAncestor()

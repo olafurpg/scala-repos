@@ -1585,9 +1585,10 @@ trait Types
               case _ => mapOver(tp)
             }
           }
-          val bts = copyRefinedType(tpe.asInstanceOf[RefinedType],
-                                    tpe.parents map varToParam,
-                                    varToParam mapOver tpe.decls).baseTypeSeq
+          val bts = copyRefinedType(
+            tpe.asInstanceOf[RefinedType],
+            tpe.parents map varToParam,
+            varToParam mapOver tpe.decls).baseTypeSeq
           tpe.baseTypeSeqCache = bts lateMap paramToVar
         } else {
           if (Statistics.canEnable)
@@ -1737,10 +1738,11 @@ trait Types
       if (decls.isEmpty && hasLength(flattened, 1)) {
         flattened.head
       } else if (flattened != parents) {
-        refinedType(flattened,
-                    if (typeSymbol eq NoSymbol) NoSymbol else typeSymbol.owner,
-                    decls,
-                    NoPosition)
+        refinedType(
+          flattened,
+          if (typeSymbol eq NoSymbol) NoSymbol else typeSymbol.owner,
+          decls,
+          NoPosition)
       } else if (isHigherKinded) {
         etaExpand
       } else super.normalize
@@ -2664,9 +2666,10 @@ trait Types
 
     override def cloneInfo(owner: Symbol) = {
       val vparams = cloneSymbolsAtOwner(params, owner)
-      copyMethodType(this,
-                     vparams,
-                     resultType.substSym(params, vparams).cloneInfo(owner))
+      copyMethodType(
+        this,
+        vparams,
+        resultType.substSym(params, vparams).cloneInfo(owner))
     }
 
     override def atOwner(owner: Symbol) =
@@ -2751,8 +2754,9 @@ trait Types
       *  wrap lo&hi in polytypes to bind variables
       */
     override def bounds: TypeBounds =
-      TypeBounds(typeFun(typeParams, resultType.bounds.lo),
-                 typeFun(typeParams, resultType.bounds.hi))
+      TypeBounds(
+        typeFun(typeParams, resultType.bounds.lo),
+        typeFun(typeParams, resultType.bounds.hi))
 
     override def isHigherKinded = !typeParams.isEmpty
 
@@ -2760,8 +2764,9 @@ trait Types
 
     override def cloneInfo(owner: Symbol) = {
       val tparams = cloneSymbolsAtOwner(typeParams, owner)
-      PolyType(tparams,
-               resultType.substSym(typeParams, tparams).cloneInfo(owner))
+      PolyType(
+        tparams,
+        resultType.substSym(typeParams, tparams).cloneInfo(owner))
     }
 
     override def atOwner(owner: Symbol) =
@@ -2794,8 +2799,9 @@ trait Types
 
     override def isTrivial = false
     override def bounds =
-      TypeBounds(maybeRewrap(underlying.bounds.lo),
-                 maybeRewrap(underlying.bounds.hi))
+      TypeBounds(
+        maybeRewrap(underlying.bounds.lo),
+        maybeRewrap(underlying.bounds.hi))
     override def parents = underlying.parents map maybeRewrap
     override def boundSyms = quantified.toSet
     override def prefix = maybeRewrap(underlying.prefix)
@@ -2813,8 +2819,9 @@ trait Types
       val underlying1 = underlying.instantiateTypeParams(formals, actuals)
       if ((quantified1 eq quantified) && (underlying1 eq underlying)) this
       else
-        existentialAbstraction(quantified1,
-                               underlying1.substSym(quantified, quantified1))
+        existentialAbstraction(
+          quantified1,
+          underlying1.substSym(quantified, quantified1))
     }
     override def baseType(clazz: Symbol) =
       maybeRewrap(underlying.baseType(clazz))
@@ -2871,11 +2878,12 @@ trait Types
           if (!canSharpen) quant.info
           else tparam.info.substSym(tpars, quantified)
 
-        owner.newExistentialSkolem(quant.name.toTypeName,
-                                   skolemInfo,
-                                   quant.flags,
-                                   quant.pos,
-                                   origin)
+        owner.newExistentialSkolem(
+          quant.name.toTypeName,
+          skolemInfo,
+          quant.flags,
+          quant.pos,
+          origin)
       }
 
       val canSharpenBounds =
@@ -2960,11 +2968,12 @@ trait Types
         underlying
           .instantiateTypeParams(quantified, tvars) // fuse subst quantified -> quantifiedFresh -> tvars
       op(underlying1) && {
-        solve(tvars,
-              quantifiedFresh,
-              quantifiedFresh map (_ => Invariant),
-              upper = false,
-              depth) &&
+        solve(
+          tvars,
+          quantifiedFresh,
+          quantifiedFresh map (_ => Invariant),
+          upper = false,
+          depth) &&
         isWithinBounds(NoPrefix, NoSymbol, quantifiedFresh, tvars map (_.inst))
       }
     }
@@ -3112,11 +3121,12 @@ trait Types
       trace("create", "In " + tv.originLocation)(tv)
     }
     private def createTypeVar(tparam: Symbol, untouchable: Boolean): TypeVar =
-      createTypeVar(tparam.tpeHK,
-                    deriveConstraint(tparam),
-                    Nil,
-                    tparam.typeParams,
-                    untouchable)
+      createTypeVar(
+        tparam.tpeHK,
+        deriveConstraint(tparam),
+        Nil,
+        tparam.typeParams,
+        untouchable)
   }
 
   /** Precondition: params.nonEmpty.  (args.nonEmpty enforced structurally.)
@@ -3223,9 +3233,10 @@ trait Types
        else if (newArgs.size == params.size) {
          val tv = TypeVar(origin, constr, newArgs, params)
          tv.linkSuspended(this)
-         TypeVar.trace("applyArgs",
-                       "In " + originLocation + ", apply args " +
-                         newArgs.mkString(", ") + " to " + originName)(tv)
+         TypeVar.trace(
+           "applyArgs",
+           "In " + originLocation + ", apply args " +
+             newArgs.mkString(", ") + " to " + originName)(tv)
        } else TypeVar(typeSymbol).setInst(ErrorType))
     // newArgs.length may differ from args.length (could've been empty before)
     //
@@ -3462,8 +3473,9 @@ trait Types
       * (`T` corresponds to @param sym)
       */
     def registerTypeSelection(sym: Symbol, tp: Type): Boolean = {
-      registerBound(HasTypeMember(sym.name.toTypeName, tp),
-                    isLowerBound = false)
+      registerBound(
+        HasTypeMember(sym.name.toTypeName, tp),
+        isLowerBound = false)
     }
 
     private def isSkolemAboveLevel(tp: Type) = tp.typeSymbol match {
@@ -3495,9 +3507,10 @@ trait Types
       (if (!isHigherKinded) this
        else
          logResult("Normalizing HK $this")(
-           typeFun(params,
-                   applyArgs(params map
-                     (_.typeConstructor)))))
+           typeFun(
+             params,
+             applyArgs(params map
+               (_.typeConstructor)))))
     override def typeSymbol = origin.typeSymbol
 
     private def tparamsOfSym(sym: Symbol) = sym.info match {
@@ -3594,9 +3607,10 @@ trait Types
                                        actuals: List[Type]) = {
       val annotations1 = annotations.map(
         info =>
-          AnnotationInfo(info.atp.instantiateTypeParams(formals, actuals),
-                         info.args,
-                         info.assocs).setPos(info.pos))
+          AnnotationInfo(
+            info.atp.instantiateTypeParams(formals, actuals),
+            info.args,
+            info.assocs).setPos(info.pos))
       val underlying1 = underlying.instantiateTypeParams(formals, actuals)
       if ((annotations1 eq annotations) && (underlying1 eq underlying)) this
       else AnnotatedType(annotations1, underlying1)
@@ -3927,9 +3941,10 @@ trait Types
     def apply(tparams: List[Symbol], tpe: Type): Type = {
       tpe match {
         case MethodType(_, _) =>
-          assert(tparams forall (_.isInvariant),
-                 "Trying to create a method with variant type parameters: " +
-                   ((tparams, tpe)))
+          assert(
+            tparams forall (_.isInvariant),
+            "Trying to create a method with variant type parameters: " +
+              ((tparams, tpe)))
         case _ =>
       }
       if (tparams.nonEmpty) typeFun(tparams, tpe)
@@ -4029,10 +4044,11 @@ trait Types
     }
   }
   class ClassUnwrapper(existential: Boolean)
-      extends TypeUnwrapper(poly = true,
-                            existential,
-                            annotated = true,
-                            nullary = false) {
+      extends TypeUnwrapper(
+        poly = true,
+        existential,
+        annotated = true,
+        nullary = false) {
     override def apply(tp: Type) =
       super.apply(tp.normalize) // normalize is required here
   }
@@ -4182,8 +4198,9 @@ trait Types
       } else loop(tp.prefix) memberType tp.typeSymbol
 
     val result = loop(sym.tpeHK)
-    assert(sym.isTerm || result.typeSymbol == sym,
-           s"($result).typeSymbol = ${result.typeSymbol}; expected ${sym}")
+    assert(
+      sym.isTerm || result.typeSymbol == sym,
+      s"($result).typeSymbol = ${result.typeSymbol}; expected ${sym}")
     result
   }
 
@@ -4492,8 +4509,9 @@ trait Types
                                          depth: Depth): Boolean =
     (symHi.isAliasType || symHi.isTerm || symHi.isAbstractType) && {
       // only now that we know symHi is a viable candidate ^^^^^^^, do the expensive checks: ----V
-      require((symLo ne NoSymbol) && (symHi ne NoSymbol),
-              ((preLo, symLo, preHi, symHi, depth)))
+      require(
+        (symLo ne NoSymbol) && (symHi ne NoSymbol),
+        ((preLo, symLo, preHi, symHi, depth)))
 
       val tpHi = preHi.memberInfo(symHi).substThis(preHi.typeSymbol, preLo)
 
@@ -4810,8 +4828,9 @@ trait Types
               }
               if (args contains NoType) NoType
               else
-                existentialAbstraction(capturedParams.toList,
-                                       typeRef(pre, sym, args))
+                existentialAbstraction(
+                  capturedParams.toList,
+                  typeRef(pre, sym, args))
           }
       } catch {
         case ex: MalformedType => NoType
@@ -4968,14 +4987,15 @@ trait Types
       case _ =>
     }
 
-  val shorthands = Set("scala.collection.immutable.List",
-                       "scala.collection.immutable.Nil",
-                       "scala.collection.Seq",
-                       "scala.collection.Traversable",
-                       "scala.collection.Iterable",
-                       "scala.collection.mutable.StringBuilder",
-                       "scala.collection.IndexedSeq",
-                       "scala.collection.Iterator")
+  val shorthands = Set(
+    "scala.collection.immutable.List",
+    "scala.collection.immutable.Nil",
+    "scala.collection.Seq",
+    "scala.collection.Traversable",
+    "scala.collection.Iterable",
+    "scala.collection.mutable.StringBuilder",
+    "scala.collection.IndexedSeq",
+    "scala.collection.Iterator")
 
 // ----- Hoisted closures and convenience methods, for compile time reductions -------
 

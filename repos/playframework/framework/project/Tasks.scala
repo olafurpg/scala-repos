@@ -60,12 +60,13 @@ object Commands {
     }
 
     val newStructure =
-      Load.reapply(filtered ++ Seq(
-                     publishArtifact in GlobalScope in packageDoc := toggle,
-                     publishArtifact in GlobalScope in packageSrc := toggle,
-                     publishArtifact in GlobalScope := true
-                   ),
-                   structure)
+      Load.reapply(
+        filtered ++ Seq(
+          publishArtifact in GlobalScope in packageDoc := toggle,
+          publishArtifact in GlobalScope in packageSrc := toggle,
+          publishArtifact in GlobalScope := true
+        ),
+        structure)
     Project
       .setProject(session, newStructure, state.put(quickPublishToggle, toggle))
   }

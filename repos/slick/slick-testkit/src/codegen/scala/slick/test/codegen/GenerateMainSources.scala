@@ -28,14 +28,16 @@ object GenerateMainSources extends TestCodeGenerator {
 
   lazy val configurations = Seq(
     new Config("CG1", StandardTestDBs.H2Mem, "H2Mem", Seq("/dbs/h2.sql")),
-    new Config("CG2",
-               StandardTestDBs.HsqldbMem,
-               "HsqldbMem",
-               Seq("/dbs/hsqldb.sql")),
-    new Config("CG3",
-               StandardTestDBs.SQLiteMem,
-               "SQLiteMem",
-               Seq("/dbs/sqlite.sql")),
+    new Config(
+      "CG2",
+      StandardTestDBs.HsqldbMem,
+      "HsqldbMem",
+      Seq("/dbs/hsqldb.sql")),
+    new Config(
+      "CG3",
+      StandardTestDBs.SQLiteMem,
+      "SQLiteMem",
+      Seq("/dbs/sqlite.sql")),
     new Config("CG7", StandardTestDBs.H2Mem, "H2Mem", Seq("/dbs/h2.sql")) {
       override def generator =
         tdb.profile
@@ -61,10 +63,11 @@ object GenerateMainSources extends TestCodeGenerator {
             }
           })
     },
-    new Config("CG8",
-               StandardTestDBs.H2Mem,
-               "H2Mem",
-               Seq("/dbs/h2-simple.sql")) {
+    new Config(
+      "CG8",
+      StandardTestDBs.H2Mem,
+      "H2Mem",
+      Seq("/dbs/h2-simple.sql")) {
       override def generator =
         tdb.profile
           .createModel(ignoreInvalidDefaults = false)
@@ -103,10 +106,11 @@ val  SimpleA = CustomTyping.SimpleA
             }
           })
     },
-    new UUIDConfig("CG10",
-                   StandardTestDBs.H2Mem,
-                   "H2Mem",
-                   Seq("/dbs/uuid.sql")),
+    new UUIDConfig(
+      "CG10",
+      StandardTestDBs.H2Mem,
+      "H2Mem",
+      Seq("/dbs/uuid.sql")),
     new Config("Postgres1", StandardTestDBs.Postgres, "Postgres", Nil) {
       import tdb.profile.api._
       class A(tag: Tag) extends Table[(Int, Array[Byte], Blob)](tag, "a") {
@@ -131,15 +135,17 @@ val  SimpleA = CustomTyping.SimpleA
           |  ).transactionally
         """.stripMargin
     },
-    new UUIDConfig("Postgres2",
-                   StandardTestDBs.Postgres,
-                   "Postgres",
-                   Seq("/dbs/uuid.sql")),
+    new UUIDConfig(
+      "Postgres2",
+      StandardTestDBs.Postgres,
+      "Postgres",
+      Seq("/dbs/uuid.sql")),
     new Config("EmptyDB", StandardTestDBs.H2Mem, "H2Mem", Nil),
-    new Config("Oracle1",
-               StandardTestDBs.Oracle,
-               "Oracle",
-               Seq("/dbs/oracle1.sql")) {
+    new Config(
+      "Oracle1",
+      StandardTestDBs.Oracle,
+      "Oracle",
+      Seq("/dbs/oracle1.sql")) {
       override def useSingleLineStatements = true
       override def testCode = "DBIO.successful(())"
     }

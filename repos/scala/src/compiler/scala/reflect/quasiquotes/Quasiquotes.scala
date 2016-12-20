@@ -19,9 +19,11 @@ abstract class Quasiquotes
     c.macroApplication match {
       case Apply(
           build.SyntacticTypeApplied(
-            Select(Select(Apply(Select(universe0, _), List(Apply(_, parts0))),
-                          interpolator0),
-                   method0),
+            Select(
+              Select(
+                Apply(Select(universe0, _), List(Apply(_, parts0))),
+                interpolator0),
+              method0),
             _),
           args0) =>
         debug(
@@ -29,8 +31,9 @@ abstract class Quasiquotes
         val parts1 = parts0.map {
           case lit @ Literal(Constant(s: String)) => s -> lit.pos
           case part =>
-            c.abort(part.pos,
-                    "Quasiquotes can only be used with literal strings")
+            c.abort(
+              part.pos,
+              "Quasiquotes can only be used with literal strings")
         }
         val reify0 = method0 match {
           case nme.apply => new ApplyReifier().reifyFillingHoles(_)

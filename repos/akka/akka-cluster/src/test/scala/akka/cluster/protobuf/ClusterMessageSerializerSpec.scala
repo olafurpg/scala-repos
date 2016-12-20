@@ -75,8 +75,9 @@ class ClusterMessageSerializerSpec
         .unreachable(a1.uniqueAddress, e1.uniqueAddress)
         .unreachable(b1.uniqueAddress, e1.uniqueAddress)
       val g3 =
-        g2.copy(members = SortedSet(a1, b1, c1, d1, e1),
-                overview = g2.overview.copy(reachability = reachability3))
+        g2.copy(
+          members = SortedSet(a1, b1, c1, d1, e1),
+          overview = g2.overview.copy(reachability = reachability3))
       checkSerialization(GossipEnvelope(a1.uniqueAddress, uniqueAddress2, g1))
       checkSerialization(GossipEnvelope(a1.uniqueAddress, uniqueAddress2, g2))
       checkSerialization(GossipEnvelope(a1.uniqueAddress, uniqueAddress2, g3))
@@ -88,16 +89,18 @@ class ClusterMessageSerializerSpec
       checkSerialization(InternalClusterAction.Welcome(uniqueAddress, g2))
 
       val mg = MetricsGossip(
-        Set(NodeMetrics(a1.address, 4711, Set(Metric("foo", 1.2, None))),
-            NodeMetrics(
-              b1.address,
-              4712,
-              Set(Metric("foo", 2.1, Some(EWMA(value = 100.0, alpha = 0.18))),
-                  Metric("bar1", Double.MinPositiveValue, None),
-                  Metric("bar2", Float.MaxValue, None),
-                  Metric("bar3", Int.MaxValue, None),
-                  Metric("bar4", Long.MaxValue, None),
-                  Metric("bar5", BigInt(Long.MaxValue), None)))))
+        Set(
+          NodeMetrics(a1.address, 4711, Set(Metric("foo", 1.2, None))),
+          NodeMetrics(
+            b1.address,
+            4712,
+            Set(
+              Metric("foo", 2.1, Some(EWMA(value = 100.0, alpha = 0.18))),
+              Metric("bar1", Double.MinPositiveValue, None),
+              Metric("bar2", Float.MaxValue, None),
+              Metric("bar3", Int.MaxValue, None),
+              Metric("bar4", Long.MaxValue, None),
+              Metric("bar5", BigInt(Long.MaxValue), None)))))
       checkSerialization(MetricsGossipEnvelope(a1.address, mg, true))
     }
   }

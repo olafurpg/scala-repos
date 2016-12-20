@@ -60,8 +60,8 @@ private[round] final class Drawer(messenger: Messenger,
       } inject List(Event.ReloadOwner)
     case Pov(g, color) if pov.opponent.isOfferingDraw =>
       GameRepo save {
-        messenger.system(g,
-                         color.fold(_.whiteDeclinesDraw, _.blackDeclinesDraw))
+        messenger
+          .system(g, color.fold(_.whiteDeclinesDraw, _.blackDeclinesDraw))
         Progress(g) map { g =>
           g.updatePlayer(!color, _.removeDrawOffer)
         }
@@ -71,8 +71,9 @@ private[round] final class Drawer(messenger: Messenger,
 
   def claim(pov: Pov): Fu[Events] =
     (pov.game.playable &&
-      pov.game.toChessHistory.threefoldRepetition) ?? finisher.other(pov.game,
-                                                                     _.Draw)
+      pov.game.toChessHistory.threefoldRepetition) ?? finisher.other(
+      pov.game,
+      _.Draw)
 
   def force(game: Game): Fu[Events] = finisher.other(game, _.Draw, None, None)
 }

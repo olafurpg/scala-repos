@@ -28,6 +28,7 @@ class UnapplyTests extends CatsSuite {
       List(Option((1, 3)), Option((1, 4)), Option((2, 3)), Option((2, 4))))
   }
 
-  checkAll("Unapply[Functor, Option[String]]",
-           SerializableTests.serializable(Unapply[Functor, Option[String]]))
+  checkAll(
+    "Unapply[Functor, Option[String]]",
+    SerializableTests.serializable(Unapply[Functor, Option[String]]))
 }

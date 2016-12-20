@@ -187,20 +187,22 @@ class ApplicationCacheSuite
             completed: Boolean,
             started: Long,
             ended: Long): SparkUI = {
-    val info = new ApplicationInfo(name,
-                                   name,
-                                   Some(1),
-                                   Some(1),
-                                   Some(1),
-                                   Some(64),
-                                   Seq(
-                                     new AttemptInfo(attemptId,
-                                                     new Date(started),
-                                                     new Date(ended),
-                                                     new Date(ended),
-                                                     ended - started,
-                                                     "user",
-                                                     completed)))
+    val info = new ApplicationInfo(
+      name,
+      name,
+      Some(1),
+      Some(1),
+      Some(1),
+      Some(64),
+      Seq(
+        new AttemptInfo(
+          attemptId,
+          new Date(started),
+          new Date(ended),
+          new Date(ended),
+          ended - started,
+          "user",
+          completed)))
     val ui = mock[SparkUI]
     when(ui.getApplicationInfoList).thenReturn(List(info).iterator)
     when(ui.getAppName).thenReturn(name)
@@ -247,8 +249,9 @@ class ApplicationCacheSuite
     assert(1 === operations.attachCount, "attachCount")
 
     // and in the map of attached
-    assert(operations.getAttached(app1, None).isDefined,
-           s"attached entry '1' from $cache")
+    assert(
+      operations.getAttached(app1, None).isDefined,
+      s"attached entry '1' from $cache")
 
     // go forward in time
     clock.setTime(10)
@@ -280,9 +283,10 @@ class ApplicationCacheSuite
   test("Test that if an attempt ID is is set, it must be used in lookups") {
     val operations = new StubCacheOperations()
     val clock = new ManualClock(1)
-    implicit val cache = new ApplicationCache(operations,
-                                              retainedApplications = 10,
-                                              clock = clock)
+    implicit val cache = new ApplicationCache(
+      operations,
+      retainedApplications = 10,
+      clock = clock)
     val appId = "app1"
     val attemptId = Some("_01")
     operations.putAppUI(appId, attemptId, false, clock.getTimeMillis(), 0, 0)
@@ -312,8 +316,9 @@ class ApplicationCacheSuite
     assert(!firstEntry.completed, s"entry is complete: $firstEntry")
     assertMetric("lookupCount", metrics.lookupCount, 1)
 
-    assert(0 === operations.updateProbeCount,
-           "expected no update probe on that first get")
+    assert(
+      0 === operations.updateProbeCount,
+      "expected no update probe on that first get")
 
     val checkTime = window * 2
     clock.setTime(checkTime)
@@ -338,8 +343,9 @@ class ApplicationCacheSuite
     assertMetric("updateProbeCount", metrics.updateProbeCount, 2)
     // the update was triggered
     assertMetric("updateTriggeredCount", metrics.updateTriggeredCount, 1)
-    assert(updatedApp === entry5.ui,
-           s"UI {$updatedApp} did not match entry {$entry5} in $cache")
+    assert(
+      updatedApp === entry5.ui,
+      s"UI {$updatedApp} did not match entry {$entry5} in $cache")
 
     // at which point, the refreshes stop
     clock.setTime(window * 20)
@@ -382,8 +388,9 @@ class ApplicationCacheSuite
     val errorText =
       s"Expected get($appId, $attemptId) -> $expected, but got $actual from $cache"
     assert(expected.ui === actual.ui, errorText + " SparkUI reference")
-    assert(expected.completed === actual.completed,
-           errorText + " -completed flag")
+    assert(
+      expected.completed === actual.completed,
+      errorText + " -completed flag")
     assert(expected.probeTime === actual.probeTime, errorText + " -timestamp")
   }
 
@@ -413,9 +420,10 @@ class ApplicationCacheSuite
     val size = 5
     // only two entries are retained, so we expect evictions to occur on lookups
     implicit val cache: ApplicationCache =
-      new TestApplicationCache(operations,
-                               retainedApplications = size,
-                               clock = clock)
+      new TestApplicationCache(
+        operations,
+        retainedApplications = size,
+        clock = clock)
 
     val attempt1 = Some("01")
 
@@ -460,9 +468,10 @@ class ApplicationCacheSuite
     def expectLoadAndEvictionCounts(expectedLoad: Int,
                                     expectedEvictionCount: Int): Unit = {
       assertMetric("loadCount", metrics.loadCount, expectedLoad)
-      assertMetric("evictionCount",
-                   metrics.evictionCount,
-                   expectedEvictionCount)
+      assertMetric(
+        "evictionCount",
+        metrics.evictionCount,
+        expectedEvictionCount)
     }
 
     // first entry

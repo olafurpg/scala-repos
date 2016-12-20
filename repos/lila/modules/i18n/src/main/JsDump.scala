@@ -71,8 +71,9 @@ private[i18n] final class JsDump(path: String, pool: I18nPool, keys: I18nKeys) {
   private def dumpFromDefault(messages: List[I18nKey], lang: Lang): String =
     messages
       .map { key =>
-        """"%s":"%s"""".format(escape(key.to(pool.default)()),
-                               escape(key.to(lang)()))
+        """"%s":"%s"""".format(
+          escape(key.to(pool.default)()),
+          escape(key.to(lang)()))
       }
       .mkString("{", ",", "}")
 

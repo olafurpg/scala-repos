@@ -32,12 +32,13 @@ class PythonMLLibAPISuite extends SparkFunSuite {
   SerDe.initialize()
 
   test("pickle vector") {
-    val vectors = Seq(Vectors.dense(Array.empty[Double]),
-                      Vectors.dense(0.0),
-                      Vectors.dense(0.0, -2.0),
-                      Vectors.sparse(0, Array.empty[Int], Array.empty[Double]),
-                      Vectors.sparse(1, Array.empty[Int], Array.empty[Double]),
-                      Vectors.sparse(2, Array(1), Array(-2.0)))
+    val vectors = Seq(
+      Vectors.dense(Array.empty[Double]),
+      Vectors.dense(0.0),
+      Vectors.dense(0.0, -2.0),
+      Vectors.sparse(0, Array.empty[Int], Array.empty[Double]),
+      Vectors.sparse(1, Array.empty[Int], Array.empty[Double]),
+      Vectors.sparse(2, Array(1), Array(-2.0)))
     vectors.foreach { v =>
       val u = SerDe.loads(SerDe.dumps(v))
       assert(u.getClass === v.getClass)
@@ -51,10 +52,12 @@ class PythonMLLibAPISuite extends SparkFunSuite {
         LabeledPoint(0.0, Vectors.dense(Array.empty[Double])),
         LabeledPoint(1.0, Vectors.dense(0.0)),
         LabeledPoint(-0.5, Vectors.dense(0.0, -2.0)),
-        LabeledPoint(0.0,
-                     Vectors.sparse(0, Array.empty[Int], Array.empty[Double])),
-        LabeledPoint(1.0,
-                     Vectors.sparse(1, Array.empty[Int], Array.empty[Double])),
+        LabeledPoint(
+          0.0,
+          Vectors.sparse(0, Array.empty[Int], Array.empty[Double])),
+        LabeledPoint(
+          1.0,
+          Vectors.sparse(1, Array.empty[Int], Array.empty[Double])),
         LabeledPoint(-0.5, Vectors.sparse(2, Array(1), Array(-2.0))))
     points.foreach { p =>
       val q = SerDe.loads(SerDe.dumps(p)).asInstanceOf[LabeledPoint]
@@ -65,12 +68,13 @@ class PythonMLLibAPISuite extends SparkFunSuite {
   }
 
   test("pickle double") {
-    for (x <- List(123.0,
-                   -10.0,
-                   0.0,
-                   Double.MaxValue,
-                   Double.MinValue,
-                   Double.NaN)) {
+    for (x <- List(
+           123.0,
+           -10.0,
+           0.0,
+           Double.MaxValue,
+           Double.MinValue,
+           Double.NaN)) {
       val deser =
         SerDe.loads(SerDe.dumps(x.asInstanceOf[AnyRef])).asInstanceOf[Double]
       // We use `equals` here for comparison because we cannot use `==` for NaN
@@ -90,20 +94,22 @@ class PythonMLLibAPISuite extends SparkFunSuite {
     val ne = SerDe.loads(SerDe.dumps(emptyMatrix)).asInstanceOf[DenseMatrix]
     assert(emptyMatrix == ne)
 
-    val sm = new SparseMatrix(3,
-                              2,
-                              Array(0, 1, 3),
-                              Array(1, 0, 2),
-                              Array(0.9, 1.2, 3.4))
+    val sm = new SparseMatrix(
+      3,
+      2,
+      Array(0, 1, 3),
+      Array(1, 0, 2),
+      Array(0.9, 1.2, 3.4))
     val nsm = SerDe.loads(SerDe.dumps(sm)).asInstanceOf[SparseMatrix]
     assert(sm.toArray === nsm.toArray)
 
-    val smt = new SparseMatrix(3,
-                               3,
-                               Array(0, 2, 3, 5),
-                               Array(0, 2, 1, 0, 2),
-                               Array(0.9, 1.2, 3.4, 5.7, 8.9),
-                               isTransposed = true)
+    val smt = new SparseMatrix(
+      3,
+      3,
+      Array(0, 2, 3, 5),
+      Array(0, 2, 1, 0, 2),
+      Array(0.9, 1.2, 3.4, 5.7, 8.9),
+      isTransposed = true)
     val nsmt = SerDe.loads(SerDe.dumps(smt)).asInstanceOf[SparseMatrix]
     assert(smt.toArray === nsmt.toArray)
   }

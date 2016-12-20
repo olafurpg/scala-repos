@@ -22,7 +22,8 @@ object Macros {
       xs.map(_.tree).toList map {
         case Apply(
             TypeApply(
-            Select(Apply(_, List(Literal(Constant(name: String)))), _), _),
+              Select(Apply(_, List(Literal(Constant(name: String)))), _),
+              _),
             List(value)) =>
           name -> value
       }
@@ -30,63 +31,76 @@ object Macros {
     val fields =
       kvps map {
         case (k, v) =>
-          DefDef(Modifiers(MACRO,
-                           typeNames.EMPTY,
-                           List(Apply(Select(New(Ident(TypeName("body"))),
-                                             termNames.CONSTRUCTOR),
-                                      List(v)))),
-                 TermName(k),
-                 Nil,
-                 Nil,
-                 Ident(TypeName("Any")),
-                 Select(Ident(TermName("Macros")), TermName("selFieldImpl")))
+          DefDef(
+            Modifiers(
+              MACRO,
+              typeNames.EMPTY,
+              List(
+                Apply(
+                  Select(New(Ident(TypeName("body"))), termNames.CONSTRUCTOR),
+                  List(v)))),
+            TermName(k),
+            Nil,
+            Nil,
+            Ident(TypeName("Any")),
+            Select(Ident(TermName("Macros")), TermName("selFieldImpl")))
       }
     // q"import scala.language.experimental.macros; class Workaround { ..$fields }; new Workaround{}"
     c.Expr[Any](
-        Block(
+      Block(
+        List(
+          Import(
+            Select(
+              Select(Ident(TermName("scala")), TermName("language")),
+              TermName("experimental")),
             List(
-                Import(
-                    Select(Select(Ident(TermName("scala")),
-                                  TermName("language")),
-                           TermName("experimental")),
-                    List(ImportSelector(
-                            TermName("macros"), 51, TermName("macros"), 51))),
-                ClassDef(
-                    NoMods,
-                    TypeName("Workaround"),
-                    Nil,
-                    Template(
-                        List(Select(Ident(TermName("scala")),
-                                    TypeName("AnyRef"))),
-                        noSelfType,
-                        DefDef(NoMods,
-                               termNames.CONSTRUCTOR,
-                               Nil,
-                               List(Nil),
-                               TypeTree(),
-                               Block(List(Apply(Select(Super(This(typeNames.EMPTY), typeNames.EMPTY), termNames.CONSTRUCTOR),
-                                                List())),
-                                     Literal(Constant(())))) +: fields)),
-                ClassDef(
-                    Modifiers(FINAL),
-                    TypeName("$anon"),
-                    Nil,
-                    Template(
-                        List(Ident(TypeName("Workaround"))),
-                        noSelfType,
-                        List(DefDef(
-                                NoMods,
-                                termNames.CONSTRUCTOR,
-                                Nil,
-                                List(Nil),
-                                TypeTree(),
-                                Block(List(Apply(Select(Super(This(typeNames.EMPTY),
-                                                              typeNames.EMPTY),
-                                                        termNames.CONSTRUCTOR),
-                                                 List())),
-                                      Literal(Constant(())))))))),
-            Apply(Select(New(Ident(TypeName("$anon"))), termNames.CONSTRUCTOR),
-                  List())))
+              ImportSelector(TermName("macros"), 51, TermName("macros"), 51))),
+          ClassDef(
+            NoMods,
+            TypeName("Workaround"),
+            Nil,
+            Template(
+              List(Select(Ident(TermName("scala")), TypeName("AnyRef"))),
+              noSelfType,
+              DefDef(
+                NoMods,
+                termNames.CONSTRUCTOR,
+                Nil,
+                List(Nil),
+                TypeTree(),
+                Block(
+                  List(
+                    Apply(
+                      Select(
+                        Super(This(typeNames.EMPTY), typeNames.EMPTY),
+                        termNames.CONSTRUCTOR),
+                      List())),
+                  Literal(Constant(())))) +: fields)),
+          ClassDef(
+            Modifiers(FINAL),
+            TypeName("$anon"),
+            Nil,
+            Template(
+              List(Ident(TypeName("Workaround"))),
+              noSelfType,
+              List(
+                DefDef(
+                  NoMods,
+                  termNames.CONSTRUCTOR,
+                  Nil,
+                  List(Nil),
+                  TypeTree(),
+                  Block(
+                    List(
+                      Apply(
+                        Select(
+                          Super(This(typeNames.EMPTY), typeNames.EMPTY),
+                          termNames.CONSTRUCTOR),
+                        List())),
+                    Literal(Constant(())))))))),
+        Apply(
+          Select(New(Ident(TypeName("$anon"))), termNames.CONSTRUCTOR),
+          List())))
   }
 }
 

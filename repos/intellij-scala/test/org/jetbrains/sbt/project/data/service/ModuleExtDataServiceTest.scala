@@ -90,10 +90,12 @@ class ModuleExtDataServiceTest
       .instanceIn(getProject)
       .getSettingsForModule(module)
 
-    assertEquals(compilerConfiguration.debuggingInfoLevel,
-                 DebuggingInfoLevel.Source)
-    UsefulTestCase.assertContainsElements(compilerConfiguration.plugins.asJava,
-                                          "test-plugin.jar")
+    assertEquals(
+      compilerConfiguration.debuggingInfoLevel,
+      DebuggingInfoLevel.Source)
+    UsefulTestCase.assertContainsElements(
+      compilerConfiguration.plugins.asJava,
+      "test-plugin.jar")
     UsefulTestCase.assertContainsElements(
       compilerConfiguration.additionalCompilerOptions.asJava,
       "-XmyCoolAdditionalOption")
@@ -120,11 +122,12 @@ class ModuleExtDataServiceTest
       name := getProject.getName
       ideDirectoryPath := getProject.getBasePath
       linkedProjectPath := getProject.getBasePath
-      arbitraryNodes += new ModuleExtNode(Some(Version("2.11.5")),
-                                          Seq.empty,
-                                          Seq.empty,
-                                          None,
-                                          Seq.empty)
+      arbitraryNodes += new ModuleExtNode(
+        Some(Version("2.11.5")),
+        Seq.empty,
+        Seq.empty,
+        None,
+        Seq.empty)
     }.build.toDataNode
 
     importProjectData(testProject)
@@ -152,9 +155,10 @@ class ModuleExtDataServiceTest
   def testValidJdkByHome(): Unit = {
     val jdk =
       ProjectJdkTable.getInstance().findJdk(IdeaTestUtil.getMockJdk18.getName)
-    doTestSdk(Some(JdkByHome(new File(jdk.getHomePath))),
-              jdk,
-              LanguageLevel.JDK_1_8)
+    doTestSdk(
+      Some(JdkByHome(new File(jdk.getHomePath))),
+      jdk,
+      LanguageLevel.JDK_1_8)
   }
 
   def testJavacOptions(): Unit = {
@@ -169,8 +173,9 @@ class ModuleExtDataServiceTest
     importProjectData(generateJavaProject(None, options))
 
     val compilerConfiguration = CompilerConfiguration.getInstance(getProject)
-    assertEquals("1.8",
-                 compilerConfiguration.getBytecodeTargetLevel(getModule))
+    assertEquals(
+      "1.8",
+      compilerConfiguration.getBytecodeTargetLevel(getModule))
   }
 
   def testScalaSdkForEvictedVersion(): Unit = {
@@ -183,11 +188,12 @@ class ModuleExtDataServiceTest
       name := getProject.getName
       ideDirectoryPath := getProject.getBasePath
       linkedProjectPath := getProject.getBasePath
-      arbitraryNodes += new SbtProjectNode(Seq.empty,
-                                           None,
-                                           Seq.empty,
-                                           "",
-                                           getProject.getBasePath)
+      arbitraryNodes += new SbtProjectNode(
+        Seq.empty,
+        None,
+        Seq.empty,
+        "",
+        getProject.getBasePath)
 
       val evictedScalaLibrary = new library {
         name := s"org.scala-lang:scala-library:$evictedVersion"
@@ -202,11 +208,12 @@ class ModuleExtDataServiceTest
         moduleFileDirectoryPath := getProject.getBasePath + "/module1"
         externalConfigPath := getProject.getBasePath + "/module1"
         libraryDependencies += newScalaLibrary
-        arbitraryNodes += new ModuleExtNode(Some(Version(evictedVersion)),
-                                            Seq.empty,
-                                            Seq.empty,
-                                            None,
-                                            Seq.empty)
+        arbitraryNodes += new ModuleExtNode(
+          Some(Version(evictedVersion)),
+          Seq.empty,
+          Seq.empty,
+          None,
+          Seq.empty)
       }
     }.build.toDataNode
 
@@ -224,11 +231,12 @@ class ModuleExtDataServiceTest
       scalaVersion: String,
       scalaLibraryVersion: Option[String],
       scalacOptions: Seq[String]): DataNode[ProjectData] =
-    generateProject(Some(scalaVersion),
-                    scalaLibraryVersion,
-                    scalacOptions,
-                    None,
-                    Seq.empty)
+    generateProject(
+      Some(scalaVersion),
+      scalaLibraryVersion,
+      scalacOptions,
+      None,
+      Seq.empty)
 
   private def generateJavaProject(
       jdk: Option[Sdk],
@@ -245,11 +253,12 @@ class ModuleExtDataServiceTest
       name := getProject.getName
       ideDirectoryPath := getProject.getBasePath
       linkedProjectPath := getProject.getBasePath
-      arbitraryNodes += new SbtProjectNode(Seq.empty,
-                                           None,
-                                           Seq.empty,
-                                           "",
-                                           getProject.getBasePath)
+      arbitraryNodes += new SbtProjectNode(
+        Seq.empty,
+        None,
+        Seq.empty,
+        "",
+        getProject.getBasePath)
 
       val scalaLibrary = scalaLibraryVersion.map { version =>
         new library { name := "org.scala-lang:scala-library:" + version }
@@ -261,11 +270,12 @@ class ModuleExtDataServiceTest
         moduleFileDirectoryPath := getProject.getBasePath + "/module1"
         externalConfigPath := getProject.getBasePath + "/module1"
         scalaLibrary.foreach(libraryDependencies += _)
-        arbitraryNodes += new ModuleExtNode(scalaVersion.map(Version(_)),
-                                            Seq.empty,
-                                            scalacOptions,
-                                            jdk,
-                                            javacOptions)
+        arbitraryNodes += new ModuleExtNode(
+          scalaVersion.map(Version(_)),
+          Seq.empty,
+          scalacOptions,
+          jdk,
+          javacOptions)
       }
     }.build.toDataNode
 

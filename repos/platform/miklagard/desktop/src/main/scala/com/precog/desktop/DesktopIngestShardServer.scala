@@ -183,10 +183,11 @@ object DesktopIngestShardServer
     val rootAPIKey = config[String]("security.masterAccount.apiKey")
     val accountFinder =
       new StaticAccountFinder("desktop", rootAPIKey, Some("/"))
-    val platform = platformFactory(config.detach("queryExecutor"),
-                                   apiKeyFinder,
-                                   accountFinder,
-                                   jobManager)
+    val platform = platformFactory(
+      config.detach("queryExecutor"),
+      apiKeyFinder,
+      accountFinder,
+      jobManager)
 
     val stoppable = Stoppable.fromFuture {
       platform.shutdown
@@ -236,8 +237,9 @@ object DesktopIngestShardServer
     defaultProps.setProperty("log.cleanup.interval.mins", "1")
     defaultProps.setProperty("zk.connectiontimeout.ms", "1000000")
 
-    defaultProps.setProperty("zk.connect",
-                             "localhost:" + config[String]("zookeeper.port"))
+    defaultProps.setProperty(
+      "zk.connect",
+      "localhost:" + config[String]("zookeeper.port"))
 
     val centralProps = defaultProps.clone.asInstanceOf[Properties]
     centralProps.putAll(config.detach("kafka").data.asJava)

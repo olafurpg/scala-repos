@@ -16,8 +16,9 @@ class ScalaMethodReturnTypeMacro extends Macro {
   override def calculateResult(params: Array[Expression],
                                context: ExpressionContext): Result = {
     Option(
-      PsiTreeUtil.getParentOfType(context.getPsiElementAtStartOffset,
-                                  classOf[ScFunction]))
+      PsiTreeUtil.getParentOfType(
+        context.getPsiElementAtStartOffset,
+        classOf[ScFunction]))
       .map(_.getType(TypingContext.empty).getOrAny match {
         case ScFunctionType(rt, _) => rt
         case t => t

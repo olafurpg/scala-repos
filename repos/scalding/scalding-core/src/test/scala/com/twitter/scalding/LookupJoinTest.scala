@@ -44,8 +44,9 @@ class LookupJoinerJob(args: Args) extends Job(args) {
   val in0 = TypedTsv[(Int, Int, Int)]("input0")
   val in1 = TypedTsv[(Int, Int, Int)]("input1")
 
-  LookupJoin(TypedPipe.from(in0).map { case (t, k, v) => (t, (k, v)) },
-             TypedPipe.from(in1).map { case (t, k, v) => (t, (k, v)) })
+  LookupJoin(
+    TypedPipe.from(in0).map { case (t, k, v) => (t, (k, v)) },
+    TypedPipe.from(in1).map { case (t, k, v) => (t, (k, v)) })
     .map {
       case (t, (k, (v, opt))) =>
         (t.toString, k.toString, v.toString, opt.toString)
@@ -53,8 +54,9 @@ class LookupJoinerJob(args: Args) extends Job(args) {
     .write(TypedTsv[(String, String, String, String)]("output"))
 
   LookupJoin
-    .rightSumming(TypedPipe.from(in0).map { case (t, k, v) => (t, (k, v)) },
-                  TypedPipe.from(in1).map { case (t, k, v) => (t, (k, v)) })
+    .rightSumming(
+      TypedPipe.from(in0).map { case (t, k, v) => (t, (k, v)) },
+      TypedPipe.from(in1).map { case (t, k, v) => (t, (k, v)) })
     .map {
       case (t, (k, (v, opt))) =>
         (t.toString, k.toString, v.toString, opt.toString)

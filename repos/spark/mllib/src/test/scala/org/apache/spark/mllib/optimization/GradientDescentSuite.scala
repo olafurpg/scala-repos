@@ -96,14 +96,15 @@ class GradientDescentSuite
       Vectors.dense(initialWeights.toArray :+ 1.0)
 
     val (_, loss) =
-      GradientDescent.runMiniBatchSGD(dataRDD,
-                                      gradient,
-                                      updater,
-                                      stepSize,
-                                      numIterations,
-                                      regParam,
-                                      miniBatchFrac,
-                                      initialWeightsWithIntercept)
+      GradientDescent.runMiniBatchSGD(
+        dataRDD,
+        gradient,
+        updater,
+        stepSize,
+        numIterations,
+        regParam,
+        miniBatchFrac,
+        initialWeightsWithIntercept)
 
     assert(loss.last - loss.head < 0, "loss isn't decreasing.")
 
@@ -131,25 +132,27 @@ class GradientDescentSuite
 
     val regParam0 = 0
     val (newWeights0, loss0) =
-      GradientDescent.runMiniBatchSGD(dataRDD,
-                                      gradient,
-                                      updater,
-                                      1,
-                                      1,
-                                      regParam0,
-                                      1.0,
-                                      initialWeightsWithIntercept)
+      GradientDescent.runMiniBatchSGD(
+        dataRDD,
+        gradient,
+        updater,
+        1,
+        1,
+        regParam0,
+        1.0,
+        initialWeightsWithIntercept)
 
     val regParam1 = 1
     val (newWeights1, loss1) =
-      GradientDescent.runMiniBatchSGD(dataRDD,
-                                      gradient,
-                                      updater,
-                                      1,
-                                      1,
-                                      regParam1,
-                                      1.0,
-                                      initialWeightsWithIntercept)
+      GradientDescent.runMiniBatchSGD(
+        dataRDD,
+        gradient,
+        updater,
+        1,
+        1,
+        regParam1,
+        1.0,
+        initialWeightsWithIntercept)
 
     assert(
       loss1(0) ~=
@@ -158,11 +161,11 @@ class GradientDescentSuite
             math.pow(initialWeightsWithIntercept(1), 2)) / 2) absTol 1E-5,
       """For non-zero weights, the regVal should be \frac{1}{2}\sum_i w_i^2.""")
 
-    assert((newWeights1(0) ~= (newWeights0(0) - initialWeightsWithIntercept(0)) absTol 1E-5) &&
-             (newWeights1(1) ~= (newWeights0(1) - initialWeightsWithIntercept(
-               1)) absTol 1E-5),
-           "The different between newWeights with/without regularization " +
-             "should be initialWeightsWithIntercept.")
+    assert(
+      (newWeights1(0) ~= (newWeights0(0) - initialWeightsWithIntercept(0)) absTol 1E-5) &&
+        (newWeights1(1) ~= (newWeights0(1) - initialWeightsWithIntercept(1)) absTol 1E-5),
+      "The different between newWeights with/without regularization " +
+        "should be initialWeightsWithIntercept.")
   }
 
   test("iteration should end with convergence tolerance") {
@@ -193,18 +196,20 @@ class GradientDescentSuite
       Vectors.dense(initialWeights.toArray :+ 1.0)
 
     val (_, loss) =
-      GradientDescent.runMiniBatchSGD(dataRDD,
-                                      gradient,
-                                      updater,
-                                      stepSize,
-                                      numIterations,
-                                      regParam,
-                                      miniBatchFrac,
-                                      initialWeightsWithIntercept,
-                                      convergenceTolerance)
+      GradientDescent.runMiniBatchSGD(
+        dataRDD,
+        gradient,
+        updater,
+        stepSize,
+        numIterations,
+        regParam,
+        miniBatchFrac,
+        initialWeightsWithIntercept,
+        convergenceTolerance)
 
-    assert(loss.length < numIterations,
-           "convergenceTolerance failed to stop optimization early")
+    assert(
+      loss.length < numIterations,
+      "convergenceTolerance failed to stop optimization early")
   }
 }
 
@@ -225,13 +230,14 @@ class GradientDescentClusterSuite
     // If we serialize data directly in the task closure, the size of the serialized task would be
     // greater than 1MB and hence Spark would throw an error.
     val (weights, loss) =
-      GradientDescent.runMiniBatchSGD(points,
-                                      new LogisticGradient,
-                                      new SquaredL2Updater,
-                                      0.1,
-                                      2,
-                                      1.0,
-                                      1.0,
-                                      Vectors.dense(new Array[Double](n)))
+      GradientDescent.runMiniBatchSGD(
+        points,
+        new LogisticGradient,
+        new SquaredL2Updater,
+        0.1,
+        2,
+        1.0,
+        1.0,
+        Vectors.dense(new Array[Double](n)))
   }
 }

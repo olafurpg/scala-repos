@@ -217,9 +217,10 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
   override def initialParticipants = roles.size
 
   val storageLocations =
-    List("akka.persistence.journal.leveldb.dir",
-         "akka.persistence.journal.leveldb-shared.store.dir",
-         "akka.persistence.snapshot-store.local.dir").map(s ⇒
+    List(
+      "akka.persistence.journal.leveldb.dir",
+      "akka.persistence.journal.leveldb-shared.store.dir",
+      "akka.persistence.snapshot-store.local.dir").map(s ⇒
       new File(system.settings.config.getString(s)))
 
   override protected def atStartup() {
@@ -245,11 +246,12 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
   }
 
   def createCoordinator(): Unit = {
-    val replicator = system.actorOf(Replicator.props(
-                                      ReplicatorSettings(system)
-                                        .withGossipInterval(1.second)
-                                        .withMaxDeltaElements(10)),
-                                    "replicator")
+    val replicator = system.actorOf(
+      Replicator.props(
+        ReplicatorSettings(system)
+          .withGossipInterval(1.second)
+          .withMaxDeltaElements(10)),
+      "replicator")
 
     def coordinatorProps(typeName: String,
                          rebalanceEnabled: Boolean,
@@ -275,28 +277,31 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
           .props(typeName, settings, allocationStrategy, replicator)
     }
 
-    List("counter",
-         "rebalancingCounter",
-         "RememberCounterEntities",
-         "AnotherRememberCounter",
-         "RememberCounter",
-         "RebalancingRememberCounter",
-         "AutoMigrateRememberRegionTest").foreach { typeName ⇒
+    List(
+      "counter",
+      "rebalancingCounter",
+      "RememberCounterEntities",
+      "AnotherRememberCounter",
+      "RememberCounter",
+      "RebalancingRememberCounter",
+      "AutoMigrateRememberRegionTest").foreach { typeName ⇒
       val rebalanceEnabled = typeName.toLowerCase.startsWith("rebalancing")
       val rememberEnabled = typeName.toLowerCase.contains("remember")
       val singletonProps = BackoffSupervisor
-        .props(childProps =
-                 coordinatorProps(typeName, rebalanceEnabled, rememberEnabled),
-               childName = "coordinator",
-               minBackoff = 5.seconds,
-               maxBackoff = 5.seconds,
-               randomFactor = 0.1)
+        .props(
+          childProps =
+            coordinatorProps(typeName, rebalanceEnabled, rememberEnabled),
+          childName = "coordinator",
+          minBackoff = 5.seconds,
+          maxBackoff = 5.seconds,
+          randomFactor = 0.1)
         .withDeploy(Deploy.local)
-      system.actorOf(ClusterSingletonManager.props(
-                       singletonProps,
-                       terminationMessage = PoisonPill,
-                       settings = ClusterSingletonManagerSettings(system)),
-                     name = typeName + "Coordinator")
+      system.actorOf(
+        ClusterSingletonManager.props(
+          singletonProps,
+          terminationMessage = PoisonPill,
+          settings = ClusterSingletonManagerSettings(system)),
+        name = typeName + "Coordinator")
     }
   }
 
@@ -312,14 +317,15 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
     val settings =
       ClusterShardingSettings(cfg).withRememberEntities(rememberEntities)
     system.actorOf(
-      ShardRegion.props(typeName = typeName,
-                        entityProps = qualifiedCounterProps(typeName),
-                        settings = settings,
-                        coordinatorPath = "/user/" +
-                            typeName + "Coordinator/singleton/coordinator",
-                        extractEntityId = extractEntityId,
-                        extractShardId = extractShardId,
-                        handOffStopMessage = PoisonPill),
+      ShardRegion.props(
+        typeName = typeName,
+        entityProps = qualifiedCounterProps(typeName),
+        settings = settings,
+        coordinatorPath = "/user/" +
+            typeName + "Coordinator/singleton/coordinator",
+        extractEntityId = extractEntityId,
+        extractShardId = extractShardId,
+        handOffStopMessage = PoisonPill),
       name = typeName + "Region")
   }
 
@@ -452,14 +458,15 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
             system.settings.config.getConfig("akka.cluster.sharding"))
         val settings = ClusterShardingSettings(cfg)
         val proxy =
-          system.actorOf(ShardRegion.proxyProps(
-                           typeName = "counter",
-                           settings,
-                           coordinatorPath =
-                             "/user/counterCoordinator/singleton/coordinator",
-                           extractEntityId = extractEntityId,
-                           extractShardId = extractShardId),
-                         name = "regionProxy")
+          system.actorOf(
+            ShardRegion.proxyProps(
+              typeName = "counter",
+              settings,
+              coordinatorPath =
+                "/user/counterCoordinator/singleton/coordinator",
+              extractEntityId = extractEntityId,
+              extractShardId = extractShardId),
+            name = "regionProxy")
 
         proxy ! Get(1)
         expectMsg(2)
@@ -621,25 +628,27 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
     runOn(third, fourth, fifth, sixth) {
       //#counter-start
       val counterRegion: ActorRef =
-        ClusterSharding(system).start(typeName = "Counter",
-                                      entityProps = Props[Counter],
-                                      settings =
-                                        ClusterShardingSettings(system),
-                                      extractEntityId = extractEntityId,
-                                      extractShardId = extractShardId)
+        ClusterSharding(system).start(
+          typeName = "Counter",
+          entityProps = Props[Counter],
+          settings = ClusterShardingSettings(system),
+          extractEntityId = extractEntityId,
+          extractShardId = extractShardId)
       //#counter-start
-      ClusterSharding(system).start(typeName = "AnotherCounter",
-                                    entityProps = Props[AnotherCounter],
-                                    settings = ClusterShardingSettings(system),
-                                    extractEntityId = extractEntityId,
-                                    extractShardId = extractShardId)
+      ClusterSharding(system).start(
+        typeName = "AnotherCounter",
+        entityProps = Props[AnotherCounter],
+        settings = ClusterShardingSettings(system),
+        extractEntityId = extractEntityId,
+        extractShardId = extractShardId)
 
       //#counter-supervisor-start
-      ClusterSharding(system).start(typeName = "SupervisedCounter",
-                                    entityProps = Props[CounterSupervisor],
-                                    settings = ClusterShardingSettings(system),
-                                    extractEntityId = extractEntityId,
-                                    extractShardId = extractShardId)
+      ClusterSharding(system).start(
+        typeName = "SupervisedCounter",
+        entityProps = Props[CounterSupervisor],
+        settings = ClusterShardingSettings(system),
+        extractEntityId = extractEntityId,
+        extractShardId = extractShardId)
       //#counter-supervisor-start
     }
     enterBarrier("extension-started")
@@ -681,12 +690,12 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
   "easy API for starting" in within(50.seconds) {
     runOn(first) {
       val counterRegionViaStart: ActorRef =
-        ClusterSharding(system).start(typeName = "ApiTest",
-                                      entityProps = Props[Counter],
-                                      settings =
-                                        ClusterShardingSettings(system),
-                                      extractEntityId = extractEntityId,
-                                      extractShardId = extractShardId)
+        ClusterSharding(system).start(
+          typeName = "ApiTest",
+          entityProps = Props[Counter],
+          settings = ClusterShardingSettings(system),
+          extractEntityId = extractEntityId,
+          extractShardId = extractShardId)
 
       val counterRegionViaGet: ActorRef =
         ClusterSharding(system).shardRegion("ApiTest")
@@ -721,9 +730,10 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
         val probe = TestProbe()
         awaitAssert({
           shard.tell(Identify(1), probe.ref)
-          probe.expectMsg(1 second,
-                          "Shard was still around",
-                          ActorIdentity(1, None))
+          probe.expectMsg(
+            1 second,
+            "Shard was still around",
+            ActorIdentity(1, None))
         }, 5 seconds, 500 millis)
 
         //Get the path to where the shard now resides
@@ -795,9 +805,10 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
         awaitAssert({
           //Check counter 1 is dead
           counter1.tell(Identify(1), probe1.ref)
-          probe1.expectMsg(1 second,
-                           "Entity 1 was still around",
-                           ActorIdentity(1, None))
+          probe1.expectMsg(
+            1 second,
+            "Entity 1 was still around",
+            ActorIdentity(1, None))
         }, 5 second, 500 millis)
 
         //Stop the shard cleanly
@@ -807,9 +818,10 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
         val probe2 = TestProbe()
         awaitAssert({
           shard.tell(Identify(2), probe2.ref)
-          probe2.expectMsg(1 second,
-                           "Shard was still around",
-                           ActorIdentity(2, None))
+          probe2.expectMsg(
+            1 second,
+            "Shard was still around",
+            ActorIdentity(2, None))
         }, 5 seconds, 500 millis)
       }
 

@@ -151,8 +151,9 @@ trait OptimizationPackageLowPriority {
 
       val params: OptParams =
         options.foldLeft(OptParams())((a, b) => b apply a)
-      require(!params.useL1,
-              "Sorry, we can't use L1 with immutable objects right now...")
+      require(
+        !params.useL1,
+        "Sorry, we can't use L1 with immutable objects right now...")
       val lbfgs: LBFGS[Wrapper] = new LBFGS[Wrapper](
         tolerance = params.tolerance,
         maxIter = params.maxIterations)

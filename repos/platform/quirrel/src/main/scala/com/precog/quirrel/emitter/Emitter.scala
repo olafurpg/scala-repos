@@ -95,8 +95,9 @@ trait Emitter
         val before = e.bytecode.take(idx)
         val after = e.bytecode.drop(idx)
 
-        (e.copy(bytecode = before ++ is ++ after,
-                marks = e.marks.transform((k, v) => v.insert(idx, is.length))),
+        (e.copy(
+           bytecode = before ++ is ++ after,
+           marks = e.marks.transform((k, v) => v.insert(idx, is.length))),
          ())
       }
 
@@ -210,8 +211,9 @@ trait Emitter
           if (finalStackSize == 1) Vector()
           else (1 until finalStackSize) map Swap
 
-        (insertInstrAtMulti((pullUp :+ Dup) ++ pushDown ++ saveSwaps,
-                            insertIdx) >> insertInstrAtMulti(
+        (insertInstrAtMulti(
+          (pullUp :+ Dup) ++ pushDown ++ saveSwaps,
+          insertIdx) >> insertInstrAtMulti(
           restoreSwaps,
           e.bytecode.length + pullUp.length + 1 + pushDown.length +
             saveSwaps.length))(e)
@@ -270,11 +272,12 @@ trait Emitter
                 right: Expr,
                 op: BinaryOperation,
                 dispatches: Set[ast.Dispatch]): EmitterState = {
-      emitMapState(emitExpr(left, dispatches),
-                   left.provenance,
-                   emitExpr(right, dispatches),
-                   right.provenance,
-                   op)
+      emitMapState(
+        emitExpr(left, dispatches),
+        left.provenance,
+        emitExpr(right, dispatches),
+        right.provenance,
+        op)
     }
 
     def emitUnary(expr: Expr,
@@ -296,10 +299,11 @@ trait Emitter
     def emitFilter(left: Expr,
                    right: Expr,
                    dispatches: Set[ast.Dispatch]): EmitterState = {
-      emitFilterState(emitExpr(left, dispatches),
-                      left.provenance,
-                      emitExpr(right, dispatches),
-                      right.provenance)
+      emitFilterState(
+        emitExpr(left, dispatches),
+        left.provenance,
+        emitExpr(right, dispatches),
+        right.provenance)
     }
 
     def emitWhere(where: ast.Where,
@@ -700,18 +704,20 @@ trait Emitter
           }
 
           case ast.Descent(_, child, property) =>
-            emitMapState(emitExpr(child, dispatches),
-                         child.provenance,
-                         emitInstr(PushString(property)),
-                         ValueProvenance,
-                         DerefObject)
+            emitMapState(
+              emitExpr(child, dispatches),
+              child.provenance,
+              emitInstr(PushString(property)),
+              ValueProvenance,
+              DerefObject)
 
           case ast.MetaDescent(_, child, property) =>
-            emitMapState(emitExpr(child, dispatches),
-                         child.provenance,
-                         emitInstr(PushString(property)),
-                         ValueProvenance,
-                         DerefMetadata)
+            emitMapState(
+              emitExpr(child, dispatches),
+              child.provenance,
+              emitInstr(PushString(property)),
+              ValueProvenance,
+              DerefMetadata)
 
           case ast.Deref(_, left, right) =>
             emitMap(left, right, DerefArray, dispatches)
@@ -755,10 +761,11 @@ trait Emitter
                 emitUnary(actuals(0), BuiltInFunction1Op(op), dispatches)
 
               case Op2Binding(op) =>
-                emitMap(actuals(0),
-                        actuals(1),
-                        BuiltInFunction2Op(op),
-                        dispatches)
+                emitMap(
+                  actuals(0),
+                  actuals(1),
+                  BuiltInFunction2Op(op),
+                  dispatches)
 
               case LetBinding(let @ ast.Let(_, id, params, left, right)) =>
                 if (params.length > 0) {

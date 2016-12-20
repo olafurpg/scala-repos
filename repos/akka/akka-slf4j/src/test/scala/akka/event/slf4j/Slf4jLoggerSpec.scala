@@ -99,9 +99,9 @@ class Slf4jLoggerSpec
     }
 
     "put custom MDC values when specified" in {
-      producer ! StringWithMDC("Message with custom MDC values",
-                               Map("ticketNumber" -> 3671,
-                                   "ticketDesc" -> "Custom MDC Values"))
+      producer ! StringWithMDC(
+        "Message with custom MDC values",
+        Map("ticketNumber" -> 3671, "ticketDesc" -> "Custom MDC Values"))
 
       awaitCond(outputString.contains("----"), 5 seconds)
       val s = outputString
@@ -114,9 +114,9 @@ class Slf4jLoggerSpec
     }
 
     "Support null values in custom MDC" in {
-      producer ! StringWithMDC("Message with null custom MDC values",
-                               Map("ticketNumber" -> 3671,
-                                   "ticketDesc" -> null))
+      producer ! StringWithMDC(
+        "Message with null custom MDC values",
+        Map("ticketNumber" -> 3671, "ticketDesc" -> null))
 
       awaitCond(outputString.contains("----"), 5 seconds)
       val s = outputString
@@ -140,8 +140,9 @@ class Slf4jLoggerSpec
     }
 
     "not include system info in akkaSource when creating Logging with system.eventStream" in {
-      val log = Logging(system.eventStream,
-                        "akka.event.slf4j.Slf4jLoggerSpec.MyLogSource")
+      val log = Logging(
+        system.eventStream,
+        "akka.event.slf4j.Slf4jLoggerSpec.MyLogSource")
       log.info("test")
       awaitCond(outputString.contains("----"), 5 seconds)
       val s = outputString

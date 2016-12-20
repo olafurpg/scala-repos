@@ -111,8 +111,8 @@ class ControllerChannelManager(controllerContext: ControllerContext,
   private def addNewBroker(broker: Broker) {
     val messageQueue = new LinkedBlockingQueue[QueueItem]
     debug(
-      "Controller %d trying to connect to broker %d".format(config.brokerId,
-                                                            broker.id))
+      "Controller %d trying to connect to broker %d"
+        .format(config.brokerId, broker.id))
     val brokerEndPoint =
       broker.getBrokerEndPoint(config.interBrokerSecurityProtocol)
     val brokerNode =
@@ -126,10 +126,11 @@ class ControllerChannelManager(controllerContext: ControllerContext,
         "controller-channel",
         Map("broker-id" -> broker.id.toString).asJava,
         false,
-        ChannelBuilders.create(config.interBrokerSecurityProtocol,
-                               Mode.CLIENT,
-                               LoginType.SERVER,
-                               config.values)
+        ChannelBuilders.create(
+          config.interBrokerSecurityProtocol,
+          Mode.CLIENT,
+          LoginType.SERVER,
+          config.values)
       )
       new NetworkClient(
         selector,
@@ -152,20 +153,23 @@ class ControllerChannelManager(controllerContext: ControllerContext,
           .format(name, config.brokerId, broker.id)
     }
 
-    val requestThread = new RequestSendThread(config.brokerId,
-                                              controllerContext,
-                                              messageQueue,
-                                              networkClient,
-                                              brokerNode,
-                                              config,
-                                              time,
-                                              threadName)
+    val requestThread = new RequestSendThread(
+      config.brokerId,
+      controllerContext,
+      messageQueue,
+      networkClient,
+      brokerNode,
+      config,
+      time,
+      threadName)
     requestThread.setDaemon(false)
-    brokerStateInfo.put(broker.id,
-                        new ControllerBrokerStateInfo(networkClient,
-                                                      brokerNode,
-                                                      messageQueue,
-                                                      requestThread))
+    brokerStateInfo.put(
+      broker.id,
+      new ControllerBrokerStateInfo(
+        networkClient,
+        brokerNode,
+        messageQueue,
+        requestThread))
   }
 
   private def removeExistingBroker(brokerState: ControllerBrokerStateInfo) {
@@ -226,9 +230,10 @@ class RequestSendThread(val controllerId: Int,
               val requestHeader =
                 apiVersion.fold(networkClient.nextRequestHeader(apiKey))(
                   networkClient.nextRequestHeader(apiKey, _))
-              val send = new RequestSend(brokerNode.idString,
-                                         requestHeader,
-                                         request.toStruct)
+              val send = new RequestSend(
+                brokerNode.idString,
+                requestHeader,
+                request.toStruct)
               val clientRequest =
                 new ClientRequest(time.milliseconds(), true, send, null)
               clientResponse = networkClient
@@ -244,10 +249,11 @@ class RequestSendThread(val controllerId: Int,
               // if the send was not successful, reconnect to broker and resend the message
               warn(
                 ("Controller %d epoch %d fails to send request %s to broker %s. " +
-                  "Reconnecting to broker.").format(controllerId,
-                                                    controllerContext.epoch,
-                                                    request.toString,
-                                                    brokerNode.toString()),
+                  "Reconnecting to broker.").format(
+                  controllerId,
+                  controllerContext.epoch,
+                  request.toString,
+                  brokerNode.toString()),
                 e)
               networkClient.close(brokerNode.idString)
               isSendSuccessful = false
@@ -269,10 +275,11 @@ class RequestSendThread(val controllerId: Int,
             }
           stateChangeLogger.trace(
             "Controller %d epoch %d received response %s for a request sent to broker %s"
-              .format(controllerId,
-                      controllerContext.epoch,
-                      response.toString,
-                      brokerNode.toString))
+              .format(
+                controllerId,
+                controllerContext.epoch,
+                response.toString,
+                brokerNode.toString))
 
           if (callback != null) {
             callback(response)
@@ -281,9 +288,10 @@ class RequestSendThread(val controllerId: Int,
       }
     } catch {
       case e: Throwable =>
-        error("Controller %d fails to send a request to broker %s"
-                .format(controllerId, brokerNode.toString()),
-              e)
+        error(
+          "Controller %d fails to send a request to broker %s"
+            .format(controllerId, brokerNode.toString()),
+          e)
         // If there is any socket error (eg, socket timeout), the connection is no longer usable and needs to be recreated.
         networkClient.close(brokerNode.idString)
     }
@@ -309,9 +317,10 @@ class RequestSendThread(val controllerId: Int,
       }
     } catch {
       case e: Throwable =>
-        warn("Controller %d's connection to broker %s was unsuccessful"
-               .format(controllerId, brokerNode.toString()),
-             e)
+        warn(
+          "Controller %d's connection to broker %s was unsuccessful"
+            .format(controllerId, brokerNode.toString()),
+          e)
         networkClient.close(brokerNode.idString)
         false
     }
@@ -384,8 +393,8 @@ class ControllerBrokerRequestBatch(controller: KafkaController)
                                       callback: (AbstractRequestResponse,
                                                  Int) => Unit = null) {
     brokerIds.filter(b => b >= 0).foreach { brokerId =>
-      stopReplicaRequestMap.getOrElseUpdate(brokerId,
-                                            Seq.empty[StopReplicaRequestInfo])
+      stopReplicaRequestMap
+        .getOrElseUpdate(brokerId, Seq.empty[StopReplicaRequestInfo])
       val v = stopReplicaRequestMap(brokerId)
       if (callback != null)
         stopReplicaRequestMap(brokerId) = v :+ StopReplicaRequestInfo(
@@ -493,9 +502,10 @@ class ControllerBrokerRequestBatch(controller: KafkaController)
             .map { b =>
               val brokerEndPoint = b.getBrokerEndPoint(
                 controller.config.interBrokerSecurityProtocol)
-              new BrokerEndPoint(brokerEndPoint.id,
-                                 brokerEndPoint.host,
-                                 brokerEndPoint.port)
+              new BrokerEndPoint(
+                brokerEndPoint.id,
+                brokerEndPoint.host,
+                brokerEndPoint.port)
             }
           val partitionStates = partitionStateInfos.map {
             case (topicPartition, partitionStateInfo) =>
@@ -511,15 +521,17 @@ class ControllerBrokerRequestBatch(controller: KafkaController)
               topicPartition -> partitionState
           }
           val leaderAndIsrRequest =
-            new LeaderAndIsrRequest(controllerId,
-                                    controllerEpoch,
-                                    partitionStates.asJava,
-                                    leaders.asJava)
-          controller.sendRequest(broker,
-                                 ApiKeys.LEADER_AND_ISR,
-                                 None,
-                                 leaderAndIsrRequest,
-                                 null)
+            new LeaderAndIsrRequest(
+              controllerId,
+              controllerEpoch,
+              partitionStates.asJava,
+              leaders.asJava)
+          controller.sendRequest(
+            broker,
+            ApiKeys.LEADER_AND_ISR,
+            None,
+            leaderAndIsrRequest,
+            null)
       }
       leaderAndIsrRequestMap.clear()
       updateMetadataRequestMap.foreach {
@@ -561,14 +573,16 @@ class ControllerBrokerRequestBatch(controller: KafkaController)
                 controllerContext.liveOrShuttingDownBrokers.map { broker =>
                   val brokerEndPoint =
                     broker.getBrokerEndPoint(SecurityProtocol.PLAINTEXT)
-                  new BrokerEndPoint(brokerEndPoint.id,
-                                     brokerEndPoint.host,
-                                     brokerEndPoint.port)
+                  new BrokerEndPoint(
+                    brokerEndPoint.id,
+                    brokerEndPoint.host,
+                    brokerEndPoint.port)
                 }
-              new UpdateMetadataRequest(controllerId,
-                                        controllerEpoch,
-                                        liveBrokers.asJava,
-                                        partitionStates.asJava)
+              new UpdateMetadataRequest(
+                controllerId,
+                controllerEpoch,
+                liveBrokers.asJava,
+                partitionStates.asJava)
             } else {
               val liveBrokers =
                 controllerContext.liveOrShuttingDownBrokers.map { broker =>
@@ -578,22 +592,25 @@ class ControllerBrokerRequestBatch(controller: KafkaController)
                         endPoint.host,
                         endPoint.port)
                   }
-                  new UpdateMetadataRequest.Broker(broker.id,
-                                                   endPoints.asJava,
-                                                   broker.rack.orNull)
+                  new UpdateMetadataRequest.Broker(
+                    broker.id,
+                    endPoints.asJava,
+                    broker.rack.orNull)
                 }
-              new UpdateMetadataRequest(version,
-                                        controllerId,
-                                        controllerEpoch,
-                                        partitionStates.asJava,
-                                        liveBrokers.asJava)
+              new UpdateMetadataRequest(
+                version,
+                controllerId,
+                controllerEpoch,
+                partitionStates.asJava,
+                liveBrokers.asJava)
             }
 
-          controller.sendRequest(broker,
-                                 ApiKeys.UPDATE_METADATA_KEY,
-                                 Some(version),
-                                 updateMetadataRequest,
-                                 null)
+          controller.sendRequest(
+            broker,
+            ApiKeys.UPDATE_METADATA_KEY,
+            Some(version),
+            updateMetadataRequest,
+            null)
       }
       updateMetadataRequestMap.clear()
       stopReplicaRequestMap.foreach {
@@ -610,18 +627,17 @@ class ControllerBrokerRequestBatch(controller: KafkaController)
               .format(broker, stopReplicaWithoutDelete.mkString(",")))
           replicaInfoList.foreach { r =>
             val stopReplicaRequest =
-              new StopReplicaRequest(controllerId,
-                                     controllerEpoch,
-                                     r.deletePartition,
-                                     Set(
-                                       new TopicPartition(
-                                         r.replica.topic,
-                                         r.replica.partition)).asJava)
-            controller.sendRequest(broker,
-                                   ApiKeys.STOP_REPLICA,
-                                   None,
-                                   stopReplicaRequest,
-                                   r.callback)
+              new StopReplicaRequest(
+                controllerId,
+                controllerEpoch,
+                r.deletePartition,
+                Set(new TopicPartition(r.replica.topic, r.replica.partition)).asJava)
+            controller.sendRequest(
+              broker,
+              ApiKeys.STOP_REPLICA,
+              None,
+              stopReplicaRequest,
+              r.callback)
           }
       }
       stopReplicaRequestMap.clear()
@@ -689,9 +705,10 @@ object Callbacks {
     }
 
     def build: Callbacks = {
-      new Callbacks(leaderAndIsrResponseCbk,
-                    updateMetadataResponseCbk,
-                    stopReplicaResponseCbk)
+      new Callbacks(
+        leaderAndIsrResponseCbk,
+        updateMetadataResponseCbk,
+        stopReplicaResponseCbk)
     }
   }
 }

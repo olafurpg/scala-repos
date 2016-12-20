@@ -180,30 +180,33 @@ object Runner extends Logging {
 
     val sparkSubmitKryo =
       if (ca.common.sparkKryo) {
-        Seq("--conf",
-            "spark.serializer=org.apache.spark.serializer.KryoSerializer")
+        Seq(
+          "--conf",
+          "spark.serializer=org.apache.spark.serializer.KryoSerializer")
       } else {
         Nil
       }
 
     val verbose = if (ca.common.verbose) Seq("--verbose") else Nil
 
-    val sparkSubmit = Seq(sparkSubmitCommand,
-                          ca.common.sparkPassThrough,
-                          Seq("--class", className),
-                          sparkSubmitJars,
-                          sparkSubmitFiles,
-                          sparkSubmitExtraClasspaths,
-                          sparkSubmitKryo,
-                          Seq(mainJar),
-                          detectFilePaths(fs, ca.common.scratchUri, classArgs),
-                          Seq("--env", pioEnvVars),
-                          verbose).flatten.filter(_ != "")
+    val sparkSubmit = Seq(
+      sparkSubmitCommand,
+      ca.common.sparkPassThrough,
+      Seq("--class", className),
+      sparkSubmitJars,
+      sparkSubmitFiles,
+      sparkSubmitExtraClasspaths,
+      sparkSubmitKryo,
+      Seq(mainJar),
+      detectFilePaths(fs, ca.common.scratchUri, classArgs),
+      Seq("--env", pioEnvVars),
+      verbose).flatten.filter(_ != "")
     info(s"Submission command: ${sparkSubmit.mkString(" ")}")
-    val proc = Process(sparkSubmit,
-                       None,
-                       "CLASSPATH" -> "",
-                       "SPARK_YARN_USER_ENV" -> pioEnvVars).run()
+    val proc = Process(
+      sparkSubmit,
+      None,
+      "CLASSPATH" -> "",
+      "SPARK_YARN_USER_ENV" -> pioEnvVars).run()
     Runtime.getRuntime.addShutdownHook(new Thread(new Runnable {
       def run(): Unit = {
         cleanup(fs, ca.common.scratchUri)

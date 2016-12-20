@@ -125,18 +125,19 @@ trait ClassManifestDeprecatedApis[T] extends OptManifest[T] {
   @deprecated("Use wrap.wrap.wrap.newArray instead", "2.10.0")
   def newArray4(len: Int): Array[Array[Array[Array[T]]]] =
     java.lang.reflect.Array
-      .newInstance(arrayClass[Array[Array[T]]](
-                     arrayClass[Array[T]](arrayClass[T](runtimeClass))),
-                   len)
+      .newInstance(
+        arrayClass[Array[Array[T]]](
+          arrayClass[Array[T]](arrayClass[T](runtimeClass))),
+        len)
       .asInstanceOf[Array[Array[Array[Array[T]]]]]
 
   @deprecated("Use wrap.wrap.wrap.wrap.newArray instead", "2.10.0")
   def newArray5(len: Int): Array[Array[Array[Array[Array[T]]]]] =
     java.lang.reflect.Array
-      .newInstance(arrayClass[Array[Array[Array[T]]]](
-                     arrayClass[Array[Array[T]]](
-                       arrayClass[Array[T]](arrayClass[T](runtimeClass)))),
-                   len)
+      .newInstance(
+        arrayClass[Array[Array[Array[T]]]](arrayClass[Array[Array[T]]](
+          arrayClass[Array[T]](arrayClass[T](runtimeClass)))),
+        len)
       .asInstanceOf[Array[Array[Array[Array[Array[T]]]]]]
 
   @deprecated("Create WrappedArray directly instead", "2.10.0")

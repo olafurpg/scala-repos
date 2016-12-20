@@ -45,10 +45,11 @@ object ReplicationUtils extends Logging {
       zkUtils.leaderAndIsrZkData(newLeaderAndIsr, controllerEpoch)
     // use the epoch of the controller that made the leadership decision, instead of the current controller epoch
     val updatePersistentPath: (Boolean, Int) =
-      zkUtils.conditionalUpdatePersistentPath(path,
-                                              newLeaderData,
-                                              zkVersion,
-                                              Some(checkLeaderAndIsrZkData))
+      zkUtils.conditionalUpdatePersistentPath(
+        path,
+        newLeaderData,
+        zkVersion,
+        Some(checkLeaderAndIsrZkData))
     updatePersistentPath
   }
 
@@ -127,7 +128,8 @@ object ReplicationUtils extends Logging {
       .map(tp => Map("topic" -> tp.topic, "partition" -> tp.partition))
       .toArray
     Json.encode(
-      Map("version" -> IsrChangeNotificationListener.version,
-          "partitions" -> partitions))
+      Map(
+        "version" -> IsrChangeNotificationListener.version,
+        "partitions" -> partitions))
   }
 }

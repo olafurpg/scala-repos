@@ -50,14 +50,16 @@ class BooleanSimplificationSuite extends PlanTest with PredicateHelper {
 
   test("a && a => a") {
     checkCondition(Literal(1) < 'a && Literal(1) < 'a, Literal(1) < 'a)
-    checkCondition(Literal(1) < 'a && Literal(1) < 'a && Literal(1) < 'a,
-                   Literal(1) < 'a)
+    checkCondition(
+      Literal(1) < 'a && Literal(1) < 'a && Literal(1) < 'a,
+      Literal(1) < 'a)
   }
 
   test("a || a => a") {
     checkCondition(Literal(1) < 'a || Literal(1) < 'a, Literal(1) < 'a)
-    checkCondition(Literal(1) < 'a || Literal(1) < 'a || Literal(1) < 'a,
-                   Literal(1) < 'a)
+    checkCondition(
+      Literal(1) < 'a || Literal(1) < 'a || Literal(1) < 'a,
+      Literal(1) < 'a)
   }
 
   test(
@@ -87,12 +89,14 @@ class BooleanSimplificationSuite extends PlanTest with PredicateHelper {
 
     checkCondition('a < 2 && ('a < 2 || 'a > 3 || 'b > 5), 'a < 2)
 
-    checkCondition(('a < 2 || 'b > 3) && ('a < 2 || 'c > 5),
-                   'a < 2 || ('b > 3 && 'c > 5))
+    checkCondition(
+      ('a < 2 || 'b > 3) && ('a < 2 || 'c > 5),
+      'a < 2 || ('b > 3 && 'c > 5))
 
-    checkCondition(('a === 'b || 'b > 3) && ('a === 'b || 'a > 3) &&
-                     ('a === 'b || 'a < 5),
-                   'a === 'b || 'b > 3 && 'a > 3 && 'a < 5)
+    checkCondition(
+      ('a === 'b || 'b > 3) && ('a === 'b || 'a > 3) &&
+        ('a === 'b || 'a < 5),
+      'a === 'b || 'b > 3 && 'a > 3 && 'a < 5)
   }
 
   test("a && (!a || b)") {

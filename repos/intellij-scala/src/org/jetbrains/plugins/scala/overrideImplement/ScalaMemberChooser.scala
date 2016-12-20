@@ -30,12 +30,13 @@ class ScalaMemberChooser[T <: ClassMember: scala.reflect.ClassTag](
   private val checkboxes =
     Array[JComponent](specifyRetTypeChb, addOverrideModifierChb)
   private val sortedElements = ScalaMemberChooser.sorted(elements, targetClass)
-} with MemberChooser[T](sortedElements.toArray[T],
-                        allowEmptySelection,
-                        allowMultiSelection,
-                        targetClass.getProject,
-                        null,
-                        checkboxes) {
+} with MemberChooser[T](
+  sortedElements.toArray[T],
+  allowEmptySelection,
+  allowMultiSelection,
+  targetClass.getProject,
+  null,
+  checkboxes) {
 
   specifyRetTypeChb.setSelected(
     ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY)

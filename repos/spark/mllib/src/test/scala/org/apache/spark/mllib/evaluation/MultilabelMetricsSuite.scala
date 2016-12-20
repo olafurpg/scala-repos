@@ -45,14 +45,16 @@ class MultilabelMetricsSuite extends SparkFunSuite with MLlibTestSparkContext {
      *
      */
     val scoreAndLabels: RDD[(Array[Double], Array[Double])] =
-      sc.parallelize(Seq((Array(0.0, 1.0), Array(0.0, 2.0)),
-                         (Array(0.0, 2.0), Array(0.0, 1.0)),
-                         (Array(), Array(0.0)),
-                         (Array(2.0), Array(2.0)),
-                         (Array(2.0, 0.0), Array(2.0, 0.0)),
-                         (Array(0.0, 1.0, 2.0), Array(0.0, 1.0)),
-                         (Array(1.0), Array(1.0, 2.0))),
-                     2)
+      sc.parallelize(
+        Seq(
+          (Array(0.0, 1.0), Array(0.0, 2.0)),
+          (Array(0.0, 2.0), Array(0.0, 1.0)),
+          (Array(), Array(0.0)),
+          (Array(2.0), Array(2.0)),
+          (Array(2.0, 0.0), Array(2.0, 0.0)),
+          (Array(0.0, 1.0, 2.0), Array(0.0, 1.0)),
+          (Array(1.0), Array(1.0, 2.0))),
+        2)
     val metrics = new MultilabelMetrics(scoreAndLabels)
     val delta = 0.00001
     val precision0 = 4.0 / (4 + 0)

@@ -136,8 +136,9 @@ class ExecutorClassLoader(conf: SparkConf,
         new URL(classUri + "/" + urlEncode(pathInDirectory))
       }
     val connection: HttpURLConnection = Utils
-      .setupSecureURLConnection(url.openConnection(),
-                                SparkEnv.get.securityManager)
+      .setupSecureURLConnection(
+        url.openConnection(),
+        SparkEnv.get.securityManager)
       .asInstanceOf[HttpURLConnection]
     // Set the connection timeouts (for testing purposes)
     if (httpUrlConnectionTimeoutMillis != -1) {
@@ -256,11 +257,12 @@ class ConstructorCleaner(className: String, cv: ClassVisitor)
       // field in the class to point to it, but do nothing otherwise.
       mv.visitCode()
       mv.visitVarInsn(ALOAD, 0) // load this
-      mv.visitMethodInsn(INVOKESPECIAL,
-                         "java/lang/Object",
-                         "<init>",
-                         "()V",
-                         false)
+      mv.visitMethodInsn(
+        INVOKESPECIAL,
+        "java/lang/Object",
+        "<init>",
+        "()V",
+        false)
       mv.visitVarInsn(ALOAD, 0) // load this
       // val classType = className.replace('.', '/')
       // mv.visitFieldInsn(PUTSTATIC, classType, "MODULE$", "L" + classType + ";")

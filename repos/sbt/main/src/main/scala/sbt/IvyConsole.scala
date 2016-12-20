@@ -42,10 +42,11 @@ object IvyConsole {
       logLevel in Global := Level.Warn,
       showSuccess in Global := false
     )
-    val append = Load.transformSettings(Load.projectScope(currentRef),
-                                        currentRef.build,
-                                        rootProject,
-                                        depSettings)
+    val append = Load.transformSettings(
+      Load.projectScope(currentRef),
+      currentRef.build,
+      rootProject,
+      depSettings)
 
     val newStructure = Load.reapply(session.original ++ append, structure)
     val newState = state.copy(remainingCommands = "console-quick" :: Nil)

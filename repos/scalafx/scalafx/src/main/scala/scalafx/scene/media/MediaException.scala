@@ -126,20 +126,22 @@ object MediaException {
       * Indicates an error has occurred for an unknown reason.
       */
     val Unknown = new Type(jfxsm.MediaException.Type.UNKNOWN)
-    @deprecated("Use Unknown; UNKNOWN will be removed in a future release",
-                "8.0.60-R10")
+    @deprecated(
+      "Use Unknown; UNKNOWN will be removed in a future release",
+      "8.0.60-R10")
     val UNKNOWN = Unknown
 
     protected override def unsortedValues: Array[Type] =
-      Array(MediaCorrupted,
-            MediaInaccessible,
-            MediaUnavailable,
-            MediaUnspecified,
-            MediaUnsupported,
-            OperationUnsupported,
-            PlaybackError,
-            PlaybackHalted,
-            Unknown)
+      Array(
+        MediaCorrupted,
+        MediaInaccessible,
+        MediaUnavailable,
+        MediaUnspecified,
+        MediaUnsupported,
+        OperationUnsupported,
+        PlaybackError,
+        PlaybackHalted,
+        Unknown)
   }
 
   /**

@@ -90,8 +90,9 @@ class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase {
       |}
       """.stripMargin('|').replaceAll("\r", "").trim()
 
-    completeLookupItem(activeLookup.find(le => le.getLookupString == "if").get,
-                       ' ')
+    completeLookupItem(
+      activeLookup.find(le => le.getLookupString == "if").get,
+      ' ')
     checkResultByText(resultText)
   }
 
@@ -158,8 +159,9 @@ class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase {
       |}
       """.stripMargin('|').replaceAll("\r", "").trim()
 
-    completeLookupItem(activeLookup.find(le => le.getLookupString == "if").get,
-                       '(')
+    completeLookupItem(
+      activeLookup.find(le => le.getLookupString == "if").get,
+      '(')
     checkResultByText(resultText)
   }
 

@@ -88,8 +88,10 @@ trait PredictionLibModule[M[+ _]]
 
                       val res = Model
                         .filteredRange(scannerPrelims.includedModel, range)
-                        .foldLeft(Intervals(new Array[Double](range.end),
-                                            new Array[Double](range.end))) {
+                        .foldLeft(
+                          Intervals(
+                            new Array[Double](range.end),
+                            new Array[Double](range.end))) {
                           case (Intervals(arrConf, arrPred), i) =>
                             val includedDoubles =
                               1.0 +:
@@ -131,16 +133,18 @@ trait PredictionLibModule[M[+ _]]
                         arraySum(resultArray, res.prediction map { -_ })
 
                       def makeCPath(field: String, index: Int) = {
-                        CPath(TableModule.paths.Value,
-                              CPathField(model.name),
-                              CPathField(field),
-                              CPathIndex(index))
+                        CPath(
+                          TableModule.paths.Value,
+                          CPathField(model.name),
+                          CPathField(field),
+                          CPathIndex(index))
                       }
 
                       // the correct model name gets added to the CPath here
-                      val pathFit = CPath(TableModule.paths.Value,
-                                          CPathField(model.name),
-                                          CPathField(fitStr))
+                      val pathFit = CPath(
+                        TableModule.paths.Value,
+                        CPathField(model.name),
+                        CPathField(fitStr))
                       val pathConfidenceLower = makeCPath(confIntvStr, 0)
                       val pathConfidenceUpper = makeCPath(confIntvStr, 1)
                       val pathPredictionLower = makeCPath(predIntvStr, 0)
@@ -219,9 +223,10 @@ trait PredictionLibModule[M[+ _]]
                         Model.makePrelims(model, cols, range, trans)
 
                       // the correct model name gets added to the CPath here
-                      val pathFit = CPath(TableModule.paths.Value,
-                                          CPathField(model.name),
-                                          CPathField(fitStr))
+                      val pathFit = CPath(
+                        TableModule.paths.Value,
+                        CPathField(model.name),
+                        CPathField(fitStr))
 
                       Map(
                         ColumnRef(pathFit, CDouble) -> ArrayDoubleColumn(

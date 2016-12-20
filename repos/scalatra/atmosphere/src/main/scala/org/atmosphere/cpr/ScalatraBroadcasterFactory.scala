@@ -48,9 +48,10 @@ class ScalatraBroadcasterFactory(var cfg: AtmosphereConfig,
 
       if (b.getBroadcasterConfig == null) {
         b.setBroadcasterConfig(
-          new BroadcasterConfig(cfg.framework().broadcasterFilters,
-                                cfg,
-                                id.toString).init())
+          new BroadcasterConfig(
+            cfg.framework().broadcasterFilters,
+            cfg,
+            id.toString).init())
       }
 
       b.setBroadcasterLifeCyclePolicy(BroadcasterLifeCyclePolicy.NEVER)

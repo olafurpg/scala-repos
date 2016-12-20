@@ -120,9 +120,10 @@ trait ApplicationAnnotator {
                         val (expectedText, actualText) =
                           ScTypePresentation.different(expectedType, t)
                         val message =
-                          ScalaBundle.message("type.mismatch.expected.actual",
-                                              expectedText,
-                                              actualText)
+                          ScalaBundle.message(
+                            "type.mismatch.expected.actual",
+                            expectedText,
+                            actualText)
                         val annotation =
                           holder.createErrorAnnotation(expression, message)
                         annotation.registerFix(ReportHighlightingErrorQuickFix)
@@ -164,16 +165,18 @@ trait ApplicationAnnotator {
                     }
                   case WrongTypeParameterInferred => //todo: ?
                   case ExpectedTypeMismatch => //will be reported later
-                  case ElementApplicabilityProblem(element,
-                                                   actual,
-                                                   expected) =>
+                  case ElementApplicabilityProblem(
+                      element,
+                      actual,
+                      expected) =>
                     val (actualType, expectedType) =
                       ScTypePresentation.different(actual, expected)
                     holder.createErrorAnnotation(
                       element,
-                      ScalaBundle.message("type.mismatch.found.required",
-                                          actualType,
-                                          expectedType))
+                      ScalaBundle.message(
+                        "type.mismatch.found.required",
+                        actualType,
+                        expectedType))
                   case a =>
                     holder.createErrorAnnotation(
                       call.argsElement,
@@ -259,8 +262,9 @@ trait ApplicationAnnotator {
     problems.foreach {
       case DoesNotTakeParameters() =>
         val annotation =
-          holder.createErrorAnnotation(call.argsElement,
-                                       "Application does not take parameters")
+          holder.createErrorAnnotation(
+            call.argsElement,
+            "Application does not take parameters")
         (call, call.getInvokedExpr) match {
           case (c: ScMethodCall, InstanceOfClass(td: ScTypeDefinition)) =>
             annotation.registerFix(new CreateApplyQuickFix(td, c))
@@ -282,17 +286,21 @@ trait ApplicationAnnotator {
       case UnresolvedParameter(_) =>
       // don't show function inapplicability, unresolved
       case MalformedDefinition() =>
-        holder.createErrorAnnotation(call.getInvokedExpr,
-                                     "Application has malformed definition")
+        holder.createErrorAnnotation(
+          call.getInvokedExpr,
+          "Application has malformed definition")
       case ExpansionForNonRepeatedParameter(expression) =>
-        holder.createErrorAnnotation(expression,
-                                     "Expansion for non-repeated parameter")
+        holder.createErrorAnnotation(
+          expression,
+          "Expansion for non-repeated parameter")
       case PositionalAfterNamedArgument(argument) =>
-        holder.createErrorAnnotation(argument,
-                                     "Positional after named argument")
+        holder.createErrorAnnotation(
+          argument,
+          "Positional after named argument")
       case ParameterSpecifiedMultipleTimes(assignment) =>
-        holder.createErrorAnnotation(assignment.getLExpression,
-                                     "Parameter specified multiple times")
+        holder.createErrorAnnotation(
+          assignment.getLExpression,
+          "Parameter specified multiple times")
       case ExpectedTypeMismatch => // it will be reported later
       case DefaultTypeParameterMismatch(_, _) => //it will be reported later
       case _ =>

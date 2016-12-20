@@ -37,15 +37,17 @@ class UntypedProducerTest
   "An UntypedProducer producing a message to a sync Camel route" must {
 
     "produce a message and receive a normal response" in {
-      val producer = system.actorOf(Props[SampleUntypedReplyingProducer],
-                                    name = "sample-untyped-replying-producer")
+      val producer = system.actorOf(
+        Props[SampleUntypedReplyingProducer],
+        name = "sample-untyped-replying-producer")
 
       val message =
         CamelMessage("test", Map(CamelMessage.MessageExchangeId -> "123"))
       val future = producer.ask(message)(timeout)
 
-      val expected = CamelMessage("received test",
-                                  Map(CamelMessage.MessageExchangeId -> "123"))
+      val expected = CamelMessage(
+        "received test",
+        Map(CamelMessage.MessageExchangeId -> "123"))
       Await.result(future, timeout) match {
         case result: CamelMessage ⇒ result should ===(expected)
         case unexpected ⇒
@@ -55,8 +57,9 @@ class UntypedProducerTest
 
     "produce a message and receive a failure response" in {
       val producer =
-        system.actorOf(Props[SampleUntypedReplyingProducer],
-                       name = "sample-untyped-replying-producer-failure")
+        system.actorOf(
+          Props[SampleUntypedReplyingProducer],
+          name = "sample-untyped-replying-producer-failure")
 
       val message =
         CamelMessage("fail", Map(CamelMessage.MessageExchangeId -> "123"))
@@ -78,8 +81,9 @@ class UntypedProducerTest
 
     "produce a message and send a normal response to direct:forward-test-1" in {
       val producer =
-        system.actorOf(Props[SampleUntypedForwardingProducer],
-                       name = "sample-untyped-forwarding-producer")
+        system.actorOf(
+          Props[SampleUntypedForwardingProducer],
+          name = "sample-untyped-forwarding-producer")
 
       mockEndpoint.expectedBodiesReceived("received test")
       producer.tell(CamelMessage("test", Map[String, Any]()), producer)

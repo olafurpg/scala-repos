@@ -56,14 +56,16 @@ private[pickling] trait SourceGenerator extends Macro with FastTypeTagMacros {
             val result = reflectivelyGet(newTermName("picklee"), x)(fm => fm)
             val rTerm = c.fresh(newTermName("result"))
             val logic = q"""val $rTerm = { ..$result }
-                            ${putField(q"$rTerm.asInstanceOf[$tpe]",
-                                       staticallyElided,
-                                       tpe)}"""
+                            ${putField(
+              q"$rTerm.asInstanceOf[$tpe]",
+              staticallyElided,
+              tpe)}"""
             if (x.isScala) allowNonExistentField(logic) else logic
           } else
-            putField(q"picklee.${newTermName(x.fieldName)}",
-                     staticallyElided,
-                     tpe)
+            putField(
+              q"picklee.${newTermName(x.fieldName)}",
+              staticallyElided,
+              tpe)
         case _: IrConstructor =>
           // This is a logic erorr
           sys.error(
@@ -75,9 +77,10 @@ private[pickling] trait SourceGenerator extends Macro with FastTypeTagMacros {
             tpe.isEffectivelyFinal || tpe.isEffectivelyPrimitive
           }
           if (y.isPublic)
-            putField(q"picklee.${newTermName(y.methodName)}",
-                     staticallyElided,
-                     tpe)
+            putField(
+              q"picklee.${newTermName(y.methodName)}",
+              staticallyElided,
+              tpe)
           else {
             val result = reflectivelyGet(newTermName("picklee"), y)(fm =>
               putField(
@@ -94,9 +97,10 @@ private[pickling] trait SourceGenerator extends Macro with FastTypeTagMacros {
       val clazzName = newTermName("clazz")
       val compileTimeDispatch: List[CaseDef] = (x.subClasses map { subtpe =>
         val tpe = subtpe.tpe[c.universe.type](c.universe)
-        CaseDef(Bind(clazzName, Ident(nme.WILDCARD)),
-                q"clazz == classOf[$tpe]",
-                createPickler(tpe, q"builder"))
+        CaseDef(
+          Bind(clazzName, Ident(nme.WILDCARD)),
+          q"clazz == classOf[$tpe]",
+          createPickler(tpe, q"builder"))
       })(collection.breakOut)
 
       val failDispatch = {
@@ -109,9 +113,10 @@ private[pickling] trait SourceGenerator extends Macro with FastTypeTagMacros {
             q"""throw _root_.scala.pickling.PicklingException("Class " + clazz + " not recognized by pickler, looking for one of: " + $dispatcheeNames)"""
         CaseDef(Bind(otherTermName, Ident(nme.WILDCARD)), throwUnknownTag)
       }
-      val runtimeDispatch = CaseDef(Ident(nme.WILDCARD),
-                                    EmptyTree,
-                                    createRuntimePickler(q"builder"))
+      val runtimeDispatch = CaseDef(
+        Ident(nme.WILDCARD),
+        EmptyTree,
+        createRuntimePickler(q"builder"))
       // TODO - Figure out if we can handle runtime dispatch...
       val unknownDispatch =
         if (x.lookupRuntime) List(runtimeDispatch)
@@ -161,9 +166,10 @@ private[pickling] trait SourceGenerator extends Macro with FastTypeTagMacros {
         case x: PickleEntry => genPickleEntry(x)
         case x: SubclassDispatch => genSubclassDispatch(x)
         case x: PickleExternalizable =>
-          genExternalizablePickle(newTermName("picklee"),
-                                  newTermName("builder"),
-                                  x)
+          genExternalizablePickle(
+            newTermName("picklee"),
+            newTermName("builder"),
+            x)
       }
     genPickleOp(picklerAst)
   }

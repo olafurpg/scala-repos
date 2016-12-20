@@ -32,12 +32,13 @@ trait RequestBodyHandlingSpec
     def withServer[T](action: EssentialAction)(block: Port => T) = {
       val port = testServerPort
       running(
-        TestServer(port,
-                   GuiceApplicationBuilder()
-                     .routes {
-                       case _ => action
-                     }
-                     .build())) {
+        TestServer(
+          port,
+          GuiceApplicationBuilder()
+            .routes {
+              case _ => action
+            }
+            .build())) {
         block(port)
       }
     }
@@ -48,11 +49,12 @@ trait RequestBodyHandlingSpec
       val body = new String(Random.alphanumeric.take(50 * 1024).toArray)
       val responses =
         BasicHttpClient.makeRequests(port, trickleFeed = Some(100L))(
-          BasicRequest("POST",
-                       "/",
-                       "HTTP/1.1",
-                       Map("Content-Length" -> body.length.toString),
-                       body),
+          BasicRequest(
+            "POST",
+            "/",
+            "HTTP/1.1",
+            Map("Content-Length" -> body.length.toString),
+            body),
           // Second request ensures that Play switches back to its normal handler
           BasicRequest("GET", "/", "HTTP/1.1", Map(), "")
         )
@@ -71,11 +73,12 @@ trait RequestBodyHandlingSpec
       // Trickle feed is important, otherwise it won't switch to ignoring the body.
       val responses =
         BasicHttpClient.makeRequests(port, trickleFeed = Some(100L))(
-          BasicRequest("POST",
-                       "/",
-                       "HTTP/1.1",
-                       Map("Content-Length" -> body.length.toString),
-                       body),
+          BasicRequest(
+            "POST",
+            "/",
+            "HTTP/1.1",
+            Map("Content-Length" -> body.length.toString),
+            body),
           // Second request ensures that Play switches back to its normal handler
           BasicRequest("GET", "/", "HTTP/1.1", Map(), "")
         )

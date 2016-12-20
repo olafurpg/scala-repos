@@ -98,11 +98,12 @@ private[persistence] trait LeveldbRecovery extends AsyncRecovery {
       replayCallback: ReplayedTaggedMessage ⇒ Unit): Future[Unit] = {
     val tagNid = tagNumericId(tag)
     Future(
-      replayTaggedMessages(tag,
-                           tagNid,
-                           fromSequenceNr: Long,
-                           toSequenceNr,
-                           max: Long)(replayCallback))(replayDispatcher)
+      replayTaggedMessages(
+        tag,
+        tagNid,
+        fromSequenceNr: Long,
+        toSequenceNr,
+        max: Long)(replayCallback))(replayDispatcher)
   }
 
   def replayTaggedMessages(

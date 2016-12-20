@@ -152,11 +152,12 @@ private[math] object Division {
       // Step D4: multiply normB by guessDigit and subtract the production
       // from normA.
       if (guessDigit != 0) {
-        val borrow = Division.multiplyAndSubtract(normA,
-                                                  j - normBLength,
-                                                  normB,
-                                                  normBLength,
-                                                  guessDigit)
+        val borrow = Division.multiplyAndSubtract(
+          normA,
+          j - normBLength,
+          normB,
+          normBLength,
+          guessDigit)
         // Step D5: check the borrow
         if (borrow != 0) {
           // Step D6: compensating addition
@@ -974,10 +975,11 @@ private[math] object Division {
       var innnerCarry: Long = 0
       val m = Multiplication.unsignedMultAddAdd(res(i), n2, 0, 0).toInt
       for (j <- 0 until modulusLen) {
-        innnerCarry = unsignedMultAddAdd(m,
-                                         modulusDigits(j),
-                                         res(i + j),
-                                         innnerCarry.toInt)
+        innnerCarry = unsignedMultAddAdd(
+          m,
+          modulusDigits(j),
+          res(i + j),
+          innnerCarry.toInt)
         res(i + j) = innnerCarry.toInt
         innnerCarry >>>= 32
       }

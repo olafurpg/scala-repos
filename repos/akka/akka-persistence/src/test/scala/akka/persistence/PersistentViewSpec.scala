@@ -281,11 +281,12 @@ abstract class PersistentViewSpec(config: Config)
       persistentActor ! "c"
       persistentActorProbe.expectMsg("c-3")
       view = system.actorOf(
-        Props(classOf[TestPersistentView],
-              name,
-              viewProbe.ref,
-              5.seconds,
-              Some("b")))
+        Props(
+          classOf[TestPersistentView],
+          name,
+          viewProbe.ref,
+          5.seconds,
+          Some("b")))
       viewProbe.expectMsg("replicated-a-1")
       viewProbe.expectMsg("replicated-a-1")
       viewProbe.expectMsg("replicated-b-2")

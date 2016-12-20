@@ -109,14 +109,15 @@ private[sql] case class JDBCRelation(
                          filters: Array[Filter]): RDD[Row] = {
     // Rely on a type erasure hack to pass RDD[InternalRow] back as RDD[Row]
     JDBCRDD
-      .scanTable(sqlContext.sparkContext,
-                 schema,
-                 url,
-                 properties,
-                 table,
-                 requiredColumns,
-                 filters,
-                 parts)
+      .scanTable(
+        sqlContext.sparkContext,
+        schema,
+        url,
+        properties,
+        table,
+        requiredColumns,
+        filters,
+        parts)
       .asInstanceOf[RDD[Row]]
   }
 

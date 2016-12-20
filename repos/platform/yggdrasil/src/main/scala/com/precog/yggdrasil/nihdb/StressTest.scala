@@ -74,12 +74,13 @@ class StressTest {
 
   def newNihdb(workDir: File, threshold: Int = 1000): NIHDB =
     NIHDB
-      .create(chef,
-              authorities,
-              workDir,
-              threshold,
-              Duration(60, "seconds"),
-              txLogScheduler)(actorSystem)
+      .create(
+        chef,
+        authorities,
+        workDir,
+        threshold,
+        Duration(60, "seconds"),
+        txLogScheduler)(actorSystem)
       .unsafePerformIO
       .valueOr { e =>
         throw new Exception(e.message)

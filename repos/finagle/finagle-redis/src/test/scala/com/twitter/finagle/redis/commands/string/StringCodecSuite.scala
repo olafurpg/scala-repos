@@ -10,8 +10,9 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 final class StringCodecSuite extends RedisRequestTest {
 
-  test("Throw a ClientError if APPEND is called with no key or value",
-       CodecTest) {
+  test(
+    "Throw a ClientError if APPEND is called with no key or value",
+    CodecTest) {
     intercept[ClientError] {
       codec(wrap("APPEND\r\n"))
     }
@@ -38,8 +39,9 @@ final class StringCodecSuite extends RedisRequestTest {
         BitCount(StringToChannelBuffer("foo"))))
   }
 
-  test("Throw a ClientError if BITCOUNT is called with start but no end",
-       CodecTest) {
+  test(
+    "Throw a ClientError if BITCOUNT is called with start but no end",
+    CodecTest) {
     intercept[ClientError] {
       codec(wrap("BITCOUNT foo 0\r\n"))
     }
@@ -60,9 +62,10 @@ final class StringCodecSuite extends RedisRequestTest {
   test("Correctly encode BITOP AND") {
     assert(
       codec(wrap("BITOP AND baz foo bar\r\n")) == List(
-        BitOp(BitOp.And,
-              StringToChannelBuffer("baz"),
-              Seq(StringToChannelBuffer("foo"), StringToChannelBuffer("bar")))
+        BitOp(
+          BitOp.And,
+          StringToChannelBuffer("baz"),
+          Seq(StringToChannelBuffer("foo"), StringToChannelBuffer("bar")))
       ))
   }
 
@@ -75,9 +78,10 @@ final class StringCodecSuite extends RedisRequestTest {
   test("Correctly encode BITOP NOT") {
     assert(
       codec(wrap("BITOP NOT foo bar\r\n")) == List(
-        BitOp(BitOp.Not,
-              StringToChannelBuffer("foo"),
-              Seq(StringToChannelBuffer("bar")))))
+        BitOp(
+          BitOp.Not,
+          StringToChannelBuffer("foo"),
+          Seq(StringToChannelBuffer("bar")))))
   }
 
   test("Correctly encode DECR with an integer key") {
@@ -242,9 +246,10 @@ final class StringCodecSuite extends RedisRequestTest {
   test("Correctly encode PSETEX") {
     assert(
       codec(wrap("PSETEX foo 1000 bar\r\n")) == List(
-        PSetEx(StringToChannelBuffer("foo"),
-               1000L,
-               StringToChannelBuffer("bar"))))
+        PSetEx(
+          StringToChannelBuffer("foo"),
+          1000L,
+          StringToChannelBuffer("bar"))))
   }
 
   test("Correctly encode SET") {
@@ -413,8 +418,9 @@ final class StringCodecSuite extends RedisRequestTest {
     assert(codec(wrap("*2\r\n")) == Nil)
   }
 
-  test("Correctly encode command string size in unified GET requests",
-       CodecTest) {
+  test(
+    "Correctly encode command string size in unified GET requests",
+    CodecTest) {
     assert(codec(wrap("$3\r\n")) == Nil)
   }
 
@@ -435,8 +441,9 @@ final class StringCodecSuite extends RedisRequestTest {
     assert(codec(wrap("*3\r\n")) == Nil)
   }
 
-  test("Correctly encode command string size in unified MGET requests",
-       CodecTest) {
+  test(
+    "Correctly encode command string size in unified MGET requests",
+    CodecTest) {
     assert(codec(wrap("$4\r\n")) == Nil)
   }
 
@@ -466,8 +473,9 @@ final class StringCodecSuite extends RedisRequestTest {
     assert(codec(wrap("*5\r\n")) == Nil)
   }
 
-  test("Correctly encode command string size in unified MSET requests",
-       CodecTest) {
+  test(
+    "Correctly encode command string size in unified MSET requests",
+    CodecTest) {
     assert(codec(wrap("$4\r\n")) == Nil)
   }
 

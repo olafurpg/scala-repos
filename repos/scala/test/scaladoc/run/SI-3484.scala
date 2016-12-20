@@ -44,8 +44,9 @@ object Test extends ScaladocModelTest {
 
     // check correct expansion of the use case signature
     val map = rootPackage._class("Collection")._method("map")
-    assert(map.resultType.name == "Collection[B]",
-           map.resultType.name + " == Traversable[B]")
+    assert(
+      map.resultType.name == "Collection[B]",
+      map.resultType.name + " == Traversable[B]")
 
     val foo = rootPackage._class("SR704")._method("foo")
     assert(

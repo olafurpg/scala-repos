@@ -72,43 +72,48 @@ final class Env(config: Config,
     }
   }
 
-  val pgnDump = new PgnDump(dumper = gamePgnDump,
-                            simulName = getSimulName,
-                            tournamentName = getTournamentName)
+  val pgnDump = new PgnDump(
+    dumper = gamePgnDump,
+    simulName = getSimulName,
+    tournamentName = getTournamentName)
 
-  val userApi = new UserApi(jsonView = userEnv.jsonView,
-                            makeUrl = makeUrl,
-                            relationApi = relationApi,
-                            bookmarkApi = bookmarkApi,
-                            crosstableApi = crosstableApi,
-                            prefApi = prefApi)
+  val userApi = new UserApi(
+    jsonView = userEnv.jsonView,
+    makeUrl = makeUrl,
+    relationApi = relationApi,
+    bookmarkApi = bookmarkApi,
+    crosstableApi = crosstableApi,
+    prefApi = prefApi)
 
   val analysisApi = new AnalysisApi
 
-  val gameApi = new GameApi(netBaseUrl = Net.BaseUrl,
-                            apiToken = apiToken,
-                            pgnDump = pgnDump,
-                            analysisApi = analysisApi)
+  val gameApi = new GameApi(
+    netBaseUrl = Net.BaseUrl,
+    apiToken = apiToken,
+    pgnDump = pgnDump,
+    analysisApi = analysisApi)
 
   val userGameApi = new UserGameApi(bookmarkApi = bookmarkApi)
 
   val roundApi = new RoundApiBalancer(
-    api = new RoundApi(jsonView = roundJsonView,
-                       noteApi = noteApi,
-                       forecastApi = forecastApi,
-                       analysisApi = analysisApi,
-                       bookmarkApi = bookmarkApi,
-                       getTourAndRanks = getTourAndRanks,
-                       getSimul = getSimul,
-                       lightUser = userEnv.lightUser),
+    api = new RoundApi(
+      jsonView = roundJsonView,
+      noteApi = noteApi,
+      forecastApi = forecastApi,
+      analysisApi = analysisApi,
+      bookmarkApi = bookmarkApi,
+      getTourAndRanks = getTourAndRanks,
+      getSimul = getSimul,
+      lightUser = userEnv.lightUser),
     system = system,
     nbActors = math.max(1, Runtime.getRuntime.availableProcessors - 1))
 
-  val lobbyApi = new LobbyApi(lobby = lobbyEnv.lobby,
-                              lobbyVersion = () => lobbyEnv.history.version,
-                              getFilter = setupEnv.filter,
-                              lightUser = userEnv.lightUser,
-                              seekApi = lobbyEnv.seekApi)
+  val lobbyApi = new LobbyApi(
+    lobby = lobbyEnv.lobby,
+    lobbyVersion = () => lobbyEnv.history.version,
+    getFilter = setupEnv.filter,
+    lightUser = userEnv.lightUser,
+    seekApi = lobbyEnv.seekApi)
 
   private def makeUrl(path: String): String = s"${Net.BaseUrl}/$path"
 

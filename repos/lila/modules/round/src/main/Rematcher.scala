@@ -134,9 +134,10 @@ private[round] final class Rematcher(messenger: Messenger,
   private def redirectEvents(game: Game): Events = {
     val whiteId = game fullIdOf White
     val blackId = game fullIdOf Black
-    List(Event.RedirectOwner(White, blackId, AnonCookie.json(game, Black)),
-         Event.RedirectOwner(Black, whiteId, AnonCookie.json(game, White)),
-         // tell spectators to reload
-         Event.Reload)
+    List(
+      Event.RedirectOwner(White, blackId, AnonCookie.json(game, Black)),
+      Event.RedirectOwner(Black, whiteId, AnonCookie.json(game, White)),
+      // tell spectators to reload
+      Event.Reload)
   }
 }

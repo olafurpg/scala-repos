@@ -57,9 +57,10 @@ class ConstantFoldingSuite extends PlanTest {
     */
   test("Constant folding test: expressions only have literals") {
     val originalQuery = testRelation
-      .select(Literal(2) + Literal(3) + Literal(4) as Symbol("2+3+4"),
-              Literal(2) * Literal(3) + Literal(4) as Symbol("2*3+4"),
-              Literal(2) * (Literal(3) + Literal(4)) as Symbol("2*(3+4)"))
+      .select(
+        Literal(2) + Literal(3) + Literal(4) as Symbol("2+3+4"),
+        Literal(2) * Literal(3) + Literal(4) as Symbol("2*3+4"),
+        Literal(2) * (Literal(3) + Literal(4)) as Symbol("2*(3+4)"))
       .where(Literal(1) === Literal(1) && Literal(2) > Literal(3) ||
         Literal(3) > Literal(2))
       .groupBy(
@@ -69,9 +70,10 @@ class ConstantFoldingSuite extends PlanTest {
     val optimized = Optimize.execute(originalQuery.analyze)
 
     val correctAnswer = testRelation
-      .select(Literal(9) as Symbol("2+3+4"),
-              Literal(10) as Symbol("2*3+4"),
-              Literal(14) as Symbol("2*(3+4)"))
+      .select(
+        Literal(9) as Symbol("2+3+4"),
+        Literal(10) as Symbol("2*3+4"),
+        Literal(14) as Symbol("2*(3+4)"))
       .where(Literal(true))
       .groupBy(Literal(3.0))(Literal(3.0) as Symbol("9/3"))
       .analyze
@@ -83,18 +85,20 @@ class ConstantFoldingSuite extends PlanTest {
     "Constant folding test: expressions have attribute references and literals in " +
       "arithmetic operations") {
     val originalQuery =
-      testRelation.select(Literal(2) + Literal(3) + 'a as Symbol("c1"),
-                          'a + Literal(2) + Literal(3) as Symbol("c2"),
-                          Literal(2) * 'a + Literal(4) as Symbol("c3"),
-                          'a * (Literal(3) + Literal(4)) as Symbol("c4"))
+      testRelation.select(
+        Literal(2) + Literal(3) + 'a as Symbol("c1"),
+        'a + Literal(2) + Literal(3) as Symbol("c2"),
+        Literal(2) * 'a + Literal(4) as Symbol("c3"),
+        'a * (Literal(3) + Literal(4)) as Symbol("c4"))
 
     val optimized = Optimize.execute(originalQuery.analyze)
 
     val correctAnswer = testRelation
-      .select(Literal(5) + 'a as Symbol("c1"),
-              'a + Literal(2) + Literal(3) as Symbol("c2"),
-              Literal(2) * 'a + Literal(4) as Symbol("c3"),
-              'a * Literal(7) as Symbol("c4"))
+      .select(
+        Literal(5) + 'a as Symbol("c1"),
+        'a + Literal(2) + Literal(3) as Symbol("c2"),
+        Literal(2) * 'a + Literal(4) as Symbol("c3"),
+        'a * Literal(7) as Symbol("c4"))
       .analyze
 
     comparePlans(optimized, correctAnswer)
@@ -138,8 +142,9 @@ class ConstantFoldingSuite extends PlanTest {
 
   test("Constant folding test: expressions have nonfoldable functions") {
     val originalQuery =
-      testRelation.select(Rand(5L) + Literal(1) as Symbol("c1"),
-                          sum('a) as Symbol("c2"))
+      testRelation.select(
+        Rand(5L) + Literal(1) as Symbol("c1"),
+        sum('a) as Symbol("c2"))
 
     val optimized = Optimize.execute(originalQuery.analyze)
 
@@ -156,11 +161,13 @@ class ConstantFoldingSuite extends PlanTest {
         IsNull(Literal(null)) as 'c1,
         IsNotNull(Literal(null)) as 'c2,
         UnresolvedExtractValue(Literal.create(null, ArrayType(IntegerType)), 1) as 'c3,
-        UnresolvedExtractValue(Literal.create(Seq(1), ArrayType(IntegerType)),
-                               Literal.create(null, IntegerType)) as 'c4,
         UnresolvedExtractValue(
-          Literal.create(null,
-                         StructType(Seq(StructField("a", IntegerType, true)))),
+          Literal.create(Seq(1), ArrayType(IntegerType)),
+          Literal.create(null, IntegerType)) as 'c4,
+        UnresolvedExtractValue(
+          Literal.create(
+            null,
+            StructType(Seq(StructField("a", IntegerType, true)))),
           "a") as 'c5,
         UnaryMinus(Literal.create(null, IntegerType)) as 'c6,
         Cast(Literal(null), IntegerType) as 'c7,

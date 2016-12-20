@@ -70,63 +70,72 @@ object RowEncoder {
         Invoke(obj, "serialize", udt.sqlType, inputObject :: Nil)
 
       case TimestampType =>
-        StaticInvoke(DateTimeUtils.getClass,
-                     TimestampType,
-                     "fromJavaTimestamp",
-                     inputObject :: Nil)
+        StaticInvoke(
+          DateTimeUtils.getClass,
+          TimestampType,
+          "fromJavaTimestamp",
+          inputObject :: Nil)
 
       case DateType =>
-        StaticInvoke(DateTimeUtils.getClass,
-                     DateType,
-                     "fromJavaDate",
-                     inputObject :: Nil)
+        StaticInvoke(
+          DateTimeUtils.getClass,
+          DateType,
+          "fromJavaDate",
+          inputObject :: Nil)
 
       case _: DecimalType =>
-        StaticInvoke(Decimal.getClass,
-                     DecimalType.SYSTEM_DEFAULT,
-                     "apply",
-                     inputObject :: Nil)
+        StaticInvoke(
+          Decimal.getClass,
+          DecimalType.SYSTEM_DEFAULT,
+          "apply",
+          inputObject :: Nil)
 
       case StringType =>
-        StaticInvoke(classOf[UTF8String],
-                     StringType,
-                     "fromString",
-                     inputObject :: Nil)
+        StaticInvoke(
+          classOf[UTF8String],
+          StringType,
+          "fromString",
+          inputObject :: Nil)
 
       case t @ ArrayType(et, _) =>
         et match {
           case BooleanType | ByteType | ShortType | IntegerType | LongType |
               FloatType | DoubleType =>
-            NewInstance(classOf[GenericArrayData],
-                        inputObject :: Nil,
-                        dataType = t)
+            NewInstance(
+              classOf[GenericArrayData],
+              inputObject :: Nil,
+              dataType = t)
           case _ =>
-            MapObjects(extractorsFor(_, et),
-                       inputObject,
-                       externalDataTypeFor(et))
+            MapObjects(
+              extractorsFor(_, et),
+              inputObject,
+              externalDataTypeFor(et))
         }
 
       case t @ MapType(kt, vt, valueNullable) =>
         val keys = Invoke(
-          Invoke(inputObject,
-                 "keysIterator",
-                 ObjectType(classOf[scala.collection.Iterator[_]])),
+          Invoke(
+            inputObject,
+            "keysIterator",
+            ObjectType(classOf[scala.collection.Iterator[_]])),
           "toSeq",
           ObjectType(classOf[scala.collection.Seq[_]]))
         val convertedKeys = extractorsFor(keys, ArrayType(kt, false))
 
         val values = Invoke(
-          Invoke(inputObject,
-                 "valuesIterator",
-                 ObjectType(classOf[scala.collection.Iterator[_]])),
+          Invoke(
+            inputObject,
+            "valuesIterator",
+            ObjectType(classOf[scala.collection.Iterator[_]])),
           "toSeq",
           ObjectType(classOf[scala.collection.Seq[_]]))
         val convertedValues =
           extractorsFor(values, ArrayType(vt, valueNullable))
 
-        NewInstance(classOf[ArrayBasedMapData],
-                    convertedKeys :: convertedValues :: Nil,
-                    dataType = t)
+        NewInstance(
+          classOf[ArrayBasedMapData],
+          convertedKeys :: convertedValues :: Nil,
+          dataType = t)
 
       case StructType(fields) =>
         val convertedFields = fields.zipWithIndex.map {
@@ -137,17 +146,21 @@ object RowEncoder {
               } else {
                 "get"
               }
-            If(Invoke(inputObject, "isNullAt", BooleanType, Literal(i) :: Nil),
-               Literal.create(null, f.dataType),
-               extractorsFor(Invoke(inputObject,
-                                    method,
-                                    externalDataTypeFor(f.dataType),
-                                    Literal(i) :: Nil),
-                             f.dataType))
+            If(
+              Invoke(inputObject, "isNullAt", BooleanType, Literal(i) :: Nil),
+              Literal.create(null, f.dataType),
+              extractorsFor(
+                Invoke(
+                  inputObject,
+                  method,
+                  externalDataTypeFor(f.dataType),
+                  Literal(i) :: Nil),
+                f.dataType))
         }
-        If(IsNull(inputObject),
-           Literal.create(null, inputType),
-           CreateStruct(convertedFields))
+        If(
+          IsNull(inputObject),
+          Literal.create(null, inputType),
+          CreateStruct(convertedFields))
     }
 
   private def externalDataTypeFor(dt: DataType): DataType = dt match {
@@ -197,33 +210,38 @@ object RowEncoder {
         Invoke(obj, "deserialize", ObjectType(udt.userClass), input :: Nil)
 
       case TimestampType =>
-        StaticInvoke(DateTimeUtils.getClass,
-                     ObjectType(classOf[java.sql.Timestamp]),
-                     "toJavaTimestamp",
-                     input :: Nil)
+        StaticInvoke(
+          DateTimeUtils.getClass,
+          ObjectType(classOf[java.sql.Timestamp]),
+          "toJavaTimestamp",
+          input :: Nil)
 
       case DateType =>
-        StaticInvoke(DateTimeUtils.getClass,
-                     ObjectType(classOf[java.sql.Date]),
-                     "toJavaDate",
-                     input :: Nil)
+        StaticInvoke(
+          DateTimeUtils.getClass,
+          ObjectType(classOf[java.sql.Date]),
+          "toJavaDate",
+          input :: Nil)
 
       case _: DecimalType =>
-        Invoke(input,
-               "toJavaBigDecimal",
-               ObjectType(classOf[java.math.BigDecimal]))
+        Invoke(
+          input,
+          "toJavaBigDecimal",
+          ObjectType(classOf[java.math.BigDecimal]))
 
       case StringType =>
         Invoke(input, "toString", ObjectType(classOf[String]))
 
       case ArrayType(et, nullable) =>
-        val arrayData = Invoke(MapObjects(constructorFor(_), input, et),
-                               "array",
-                               ObjectType(classOf[Array[_]]))
-        StaticInvoke(scala.collection.mutable.WrappedArray.getClass,
-                     ObjectType(classOf[Seq[_]]),
-                     "make",
-                     arrayData :: Nil)
+        val arrayData = Invoke(
+          MapObjects(constructorFor(_), input, et),
+          "array",
+          ObjectType(classOf[Array[_]]))
+        StaticInvoke(
+          scala.collection.mutable.WrappedArray.getClass,
+          ObjectType(classOf[Seq[_]]),
+          "make",
+          arrayData :: Nil)
 
       case MapType(kt, vt, valueNullable) =>
         val keyArrayType = ArrayType(kt, false)
@@ -233,20 +251,23 @@ object RowEncoder {
         val valueData = constructorFor(
           Invoke(input, "valueArray", valueArrayType))
 
-        StaticInvoke(ArrayBasedMapData.getClass,
-                     ObjectType(classOf[Map[_, _]]),
-                     "toScalaMap",
-                     keyData :: valueData :: Nil)
+        StaticInvoke(
+          ArrayBasedMapData.getClass,
+          ObjectType(classOf[Map[_, _]]),
+          "toScalaMap",
+          keyData :: valueData :: Nil)
 
       case schema @ StructType(fields) =>
         val convertedFields = fields.zipWithIndex.map {
           case (f, i) =>
-            If(Invoke(input, "isNullAt", BooleanType, Literal(i) :: Nil),
-               Literal.create(null, externalDataTypeFor(f.dataType)),
-               constructorFor(GetStructField(input, i)))
+            If(
+              Invoke(input, "isNullAt", BooleanType, Literal(i) :: Nil),
+              Literal.create(null, externalDataTypeFor(f.dataType)),
+              constructorFor(GetStructField(input, i)))
         }
-        If(IsNull(input),
-           Literal.create(null, externalDataTypeFor(input.dataType)),
-           CreateExternalRow(convertedFields, schema))
+        If(
+          IsNull(input),
+          Literal.create(null, externalDataTypeFor(input.dataType)),
+          CreateExternalRow(convertedFields, schema))
     }
 }

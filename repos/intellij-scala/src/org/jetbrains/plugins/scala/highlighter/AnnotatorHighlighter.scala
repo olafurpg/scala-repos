@@ -59,13 +59,14 @@ object AnnotatorHighlighter {
   private val SCALA_COLLECTION_GENERIC_BASE =
     "_root_.scala.collection.generic."
   private val SCALA_PREDEFINED_OBJECTS = Set("scala", "scala.Predef")
-  private val SCALA_PREDEF_IMMUTABLE_BASES = Set("_root_.scala.PredefMap",
-                                                 "_root_.scala.PredefSet",
-                                                 "scalaList",
-                                                 "scalaNil",
-                                                 "scalaStream",
-                                                 "scalaVector",
-                                                 "scalaSeq")
+  private val SCALA_PREDEF_IMMUTABLE_BASES = Set(
+    "_root_.scala.PredefMap",
+    "_root_.scala.PredefSet",
+    "scalaList",
+    "scalaNil",
+    "scalaStream",
+    "scalaVector",
+    "scalaSeq")
 
   private def getParentStub(
       el: StubBasedPsiElement[_ <: StubElement[_ <: PsiElement]])
@@ -112,9 +113,10 @@ object AnnotatorHighlighter {
         qn.exists(textName => {
           val cachedClass = ScalaPsiManager
             .instance(refElement.getProject)
-            .getCachedClass(textName,
-                            refElement.getResolveScope,
-                            ClassCategory.TYPE)
+            .getCachedClass(
+              textName,
+              refElement.getResolveScope,
+              ClassCategory.TYPE)
           if (cachedClass == null) false
           else tp.conforms(ScType.designator(cachedClass))
         })
@@ -135,14 +137,17 @@ object AnnotatorHighlighter {
 
       if (text.startsWith(SCALA_COLLECTION_IMMUTABLE_BASE) ||
           SCALA_PREDEF_IMMUTABLE_BASES.contains(text)) {
-        simpleAnnotate(ScalaBundle.message("scala.immutable.collection"),
-                       DefaultHighlighter.IMMUTABLE_COLLECTION)
+        simpleAnnotate(
+          ScalaBundle.message("scala.immutable.collection"),
+          DefaultHighlighter.IMMUTABLE_COLLECTION)
       } else if (text.startsWith(SCALA_COLLECTION_MUTABLE_BASE)) {
-        simpleAnnotate(ScalaBundle.message("scala.mutable.collection"),
-                       DefaultHighlighter.MUTABLE_COLLECTION)
+        simpleAnnotate(
+          ScalaBundle.message("scala.mutable.collection"),
+          DefaultHighlighter.MUTABLE_COLLECTION)
       } else if (conformsByNames(resolvedType, JAVA_COLLECTIONS_BASES)) {
-        simpleAnnotate(ScalaBundle.message("java.collection"),
-                       DefaultHighlighter.JAVA_COLLECTION)
+        simpleAnnotate(
+          ScalaBundle.message("java.collection"),
+          DefaultHighlighter.JAVA_COLLECTION)
       } else if (resolvedType.canonicalText.startsWith(
                    SCALA_COLLECTION_GENERIC_BASE) &&
                  refElement.isInstanceOf[ScReferenceExpression]) {

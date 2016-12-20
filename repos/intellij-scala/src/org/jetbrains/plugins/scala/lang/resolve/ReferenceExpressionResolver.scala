@@ -37,9 +37,10 @@ class ReferenceExpressionResolver(shapesOnly: Boolean)
     e.getContext match {
       case generic: ScGenericCall => getContextInfo(ref, generic)
       case call: ScMethodCall if !call.isUpdateCall =>
-        ContextInfo(Some(call.argumentExpressions),
-                    () => call.expectedType(),
-                    isUnderscore = false)
+        ContextInfo(
+          Some(call.argumentExpressions),
+          () => call.expectedType(),
+          isUnderscore = false)
       case call: ScMethodCall =>
         val args =
           call.argumentExpressions ++ call.getContext
@@ -121,16 +122,17 @@ class ReferenceExpressionResolver(shapesOnly: Boolean)
 
     def nonAssignResolve: Array[ResolveResult] = {
       def processor(smartProcessor: Boolean): MethodResolveProcessor =
-        new MethodResolveProcessor(reference,
-                                   name,
-                                   info.arguments.toList,
-                                   getTypeArgs(reference),
-                                   prevInfoTypeParams,
-                                   kinds(reference, reference, incomplete),
-                                   expectedOption,
-                                   info.isUnderscore,
-                                   shapesOnly,
-                                   enableTupling = true) {
+        new MethodResolveProcessor(
+          reference,
+          name,
+          info.arguments.toList,
+          getTypeArgs(reference),
+          prevInfoTypeParams,
+          kinds(reference, reference, incomplete),
+          expectedOption,
+          info.isUnderscore,
+          shapesOnly,
+          enableTupling = true) {
           override def candidatesS: Set[ScalaResolveResult] = {
             if (!smartProcessor) super.candidatesS
             else {

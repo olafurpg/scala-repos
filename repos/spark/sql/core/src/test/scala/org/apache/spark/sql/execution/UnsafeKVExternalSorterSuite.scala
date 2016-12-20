@@ -39,12 +39,14 @@ class UnsafeKVExternalSorterSuite extends SparkFunSuite with SharedSQLContext {
   private val valueTypes = Seq(IntegerType, FloatType, DoubleType, StringType)
 
   testKVSorter(new StructType, new StructType, spill = true)
-  testKVSorter(new StructType().add("c1", IntegerType),
-               new StructType,
-               spill = true)
-  testKVSorter(new StructType,
-               new StructType().add("c1", IntegerType),
-               spill = true)
+  testKVSorter(
+    new StructType().add("c1", IntegerType),
+    new StructType,
+    spill = true)
+  testKVSorter(
+    new StructType,
+    new StructType().add("c1", IntegerType),
+    spill = true)
 
   private val rand = new Random(42)
   for (i <- 0 until 6) {
@@ -133,17 +135,19 @@ class UnsafeKVExternalSorterSuite extends SparkFunSuite with SharedSQLContext {
       new SparkConf().set("spark.memory.offHeap.enabled", "false"))
     val taskMemMgr = new TaskMemoryManager(memoryManager, 0)
     TaskContext.setTaskContext(
-      new TaskContextImpl(stageId = 0,
-                          partitionId = 0,
-                          taskAttemptId = 98456,
-                          attemptNumber = 0,
-                          taskMemoryManager = taskMemMgr,
-                          metricsSystem = null))
+      new TaskContextImpl(
+        stageId = 0,
+        partitionId = 0,
+        taskAttemptId = 98456,
+        attemptNumber = 0,
+        taskMemoryManager = taskMemMgr,
+        metricsSystem = null))
 
-    val sorter = new UnsafeKVExternalSorter(keySchema,
-                                            valueSchema,
-                                            SparkEnv.get.blockManager,
-                                            pageSize)
+    val sorter = new UnsafeKVExternalSorter(
+      keySchema,
+      valueSchema,
+      SparkEnv.get.blockManager,
+      pageSize)
 
     // Insert the keys and values into the sorter
     inputData.foreach {
@@ -183,8 +187,9 @@ class UnsafeKVExternalSorterSuite extends SparkFunSuite with SharedSQLContext {
     out.zipWithIndex.foreach {
       case ((k, v), i) =>
         if (prevK != null) {
-          assert(keyOrdering.compare(prevK, k) <= 0,
-                 s"""
+          assert(
+            keyOrdering.compare(prevK, k) <= 0,
+            s"""
              |key is not in sorted order:
              |previous key: $prevK
              |current key : $k

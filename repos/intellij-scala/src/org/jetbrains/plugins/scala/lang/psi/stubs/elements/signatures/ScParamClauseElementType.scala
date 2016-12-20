@@ -32,9 +32,10 @@ class ScParamClauseElementType
   def deserializeImpl(dataStream: StubInputStream,
                       parentStub: Any): ScParamClauseStub = {
     val implic = dataStream.readBoolean
-    new ScParamClauseStubImpl(parentStub.asInstanceOf[StubElement[PsiElement]],
-                              this,
-                              implic)
+    new ScParamClauseStubImpl(
+      parentStub.asInstanceOf[StubElement[PsiElement]],
+      this,
+      implic)
   }
 
   def createStubImpl[ParentPsi <: PsiElement](

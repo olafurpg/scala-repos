@@ -82,10 +82,11 @@ private[streaming] class BlockManagerBasedBlockHandler(
     val putSucceeded: Boolean = block match {
       case ArrayBufferBlock(arrayBuffer) =>
         numRecords = Some(arrayBuffer.size.toLong)
-        blockManager.putIterator(blockId,
-                                 arrayBuffer.iterator,
-                                 storageLevel,
-                                 tellMaster = true)
+        blockManager.putIterator(
+          blockId,
+          arrayBuffer.iterator,
+          storageLevel,
+          tellMaster = true)
       case IteratorBlock(iterator) =>
         val countIterator = new CountingIterator(iterator)
         val putResult = blockManager
@@ -93,10 +94,11 @@ private[streaming] class BlockManagerBasedBlockHandler(
         numRecords = countIterator.count
         putResult
       case ByteBufferBlock(byteBuffer) =>
-        blockManager.putBytes(blockId,
-                              new ChunkedByteBuffer(byteBuffer.duplicate()),
-                              storageLevel,
-                              tellMaster = true)
+        blockManager.putBytes(
+          blockId,
+          new ChunkedByteBuffer(byteBuffer.duplicate()),
+          storageLevel,
+          tellMaster = true)
       case o =>
         throw new SparkException(
           s"Could not store $blockId to block manager, unexpected block type ${o.getClass.getName}")
@@ -155,11 +157,12 @@ private[streaming] class WriteAheadLogBasedBlockHandler(
           s"write ahead log is enabled, change to replication 1")
     }
 
-    StorageLevel(storageLevel.useDisk,
-                 storageLevel.useMemory,
-                 storageLevel.useOffHeap,
-                 false,
-                 1)
+    StorageLevel(
+      storageLevel.useDisk,
+      storageLevel.useMemory,
+      storageLevel.useOffHeap,
+      false,
+      1)
   }
 
   if (storageLevel != effectiveStorageLevel) {
@@ -208,10 +211,11 @@ private[streaming] class WriteAheadLogBasedBlockHandler(
 
     // Store the block in block manager
     val storeInBlockManagerFuture = Future {
-      val putSucceeded = blockManager.putBytes(blockId,
-                                               serializedBlock,
-                                               effectiveStorageLevel,
-                                               tellMaster = true)
+      val putSucceeded = blockManager.putBytes(
+        blockId,
+        serializedBlock,
+        effectiveStorageLevel,
+        tellMaster = true)
       if (!putSucceeded) {
         throw new SparkException(
           s"Could not store $blockId to block manager with storage level $storageLevel")

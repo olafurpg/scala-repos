@@ -68,11 +68,12 @@ private[mesos] class MesosClusterDispatcher(
 
   private val server =
     new MesosRestServer(args.host, args.port, conf, scheduler)
-  private val webUi = new MesosClusterUI(new SecurityManager(conf),
-                                         args.webUiPort,
-                                         conf,
-                                         publicAddress,
-                                         scheduler)
+  private val webUi = new MesosClusterUI(
+    new SecurityManager(conf),
+    args.webUiPort,
+    conf,
+    publicAddress,
+    scheduler)
 
   private val shutdownLatch = new CountDownLatch(1)
 

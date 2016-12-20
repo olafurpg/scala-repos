@@ -92,8 +92,9 @@ class ThrowExceptionStrategyPersistentActorBoundedStashingSpec
     "throws stash overflow exception" in {
       val persistentActor =
         namedPersistentActor[StashOverflowStrategyFromConfigPersistentActor]
-      awaitAssert(SteppingInmemJournal.getRef("persistence-bounded-stash"),
-                  3.seconds)
+      awaitAssert(
+        SteppingInmemJournal.getRef("persistence-bounded-stash"),
+        3.seconds)
       val journal = SteppingInmemJournal.getRef("persistence-bounded-stash")
 
       // initial read highest
@@ -121,8 +122,9 @@ class DiscardStrategyPersistentActorBoundedStashingSpec
     "discard to deadletter" in {
       val persistentActor =
         namedPersistentActor[StashOverflowStrategyFromConfigPersistentActor]
-      awaitAssert(SteppingInmemJournal.getRef("persistence-bounded-stash"),
-                  3.seconds)
+      awaitAssert(
+        SteppingInmemJournal.getRef("persistence-bounded-stash"),
+        3.seconds)
       val journal = SteppingInmemJournal.getRef("persistence-bounded-stash")
 
       //initial read highest
@@ -153,8 +155,9 @@ class ReplyToStrategyPersistentActorBoundedStashingSpec
     "reply to request with custom message" in {
       val persistentActor =
         namedPersistentActor[StashOverflowStrategyFromConfigPersistentActor]
-      awaitAssert(SteppingInmemJournal.getRef("persistence-bounded-stash"),
-                  3.seconds)
+      awaitAssert(
+        SteppingInmemJournal.getRef("persistence-bounded-stash"),
+        3.seconds)
       val journal = SteppingInmemJournal.getRef("persistence-bounded-stash")
 
       //initial read highest

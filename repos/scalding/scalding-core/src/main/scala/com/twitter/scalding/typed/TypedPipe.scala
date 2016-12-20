@@ -405,9 +405,10 @@ trait TypedPipe[+T] extends Serializable {
     val self = this
     TypedPipeFactory({ (fd, m) =>
       val pipe =
-        self.toPipe[T](new Fields(java.lang.Integer.valueOf(0)))(fd,
-                                                                 m,
-                                                                 singleSetter)
+        self.toPipe[T](new Fields(java.lang.Integer.valueOf(0)))(
+          fd,
+          m,
+          singleSetter)
       TypedPipe.fromSingleField[T](onPipe(pipe))(fd, m)
     })
   }
@@ -490,8 +491,9 @@ trait TypedPipe[+T] extends Serializable {
     * Does not require a reduce step.
     */
   def sample(fraction: Double, seed: Long): TypedPipe[T] = {
-    require(0.0 <= fraction && fraction <= 1.0,
-            s"got $fraction which is an invalid fraction")
+    require(
+      0.0 <= fraction && fraction <= 1.0,
+      s"got $fraction which is an invalid fraction")
 
     // Make sure to fix the seed, otherwise restarts cause subtle errors
     lazy val rand = new Random(seed)
@@ -518,8 +520,9 @@ trait TypedPipe[+T] extends Serializable {
     val selfKV = raiseTo[(K, V)]
     TypedPipeFactory({ (fd, mode) =>
       val pipe = selfKV.toPipe(fields)(fd, mode, tup2Setter)
-      val msr = new MapsideReduce(sg, 'key, 'value, None)(singleConverter[V],
-                                                          singleSetter[V])
+      val msr = new MapsideReduce(sg, 'key, 'value, None)(
+        singleConverter[V],
+        singleSetter[V])
       TypedPipe.from[(K, V)](pipe.eachTo(fields -> fields) { _ =>
         msr
       }, fields)(fd, mode, tuple2Converter)
@@ -953,8 +956,9 @@ final case class IterablePipe[T](iterable: Iterable[T]) extends TypedPipe[T] {
 
   private[this] def toSourcePipe =
     TypedPipe.from(
-      IterableSource[T](iterable, new Fields("0"))(singleSetter,
-                                                   singleConverter))
+      IterableSource[T](iterable, new Fields("0"))(
+        singleSetter,
+        singleConverter))
 
   override def toIterableExecution: Execution[Iterable[T]] =
     Execution.from(iterable)
@@ -1096,18 +1100,20 @@ class TypedPipeInst[T] private[scalding] (@transient inpipe: Pipe,
   }
 
   override def filter(f: T => Boolean): TypedPipe[T] =
-    new TypedPipeInst[T](inpipe,
-                         fields,
-                         localFlowDef,
-                         mode,
-                         flatMapFn.filter(f))
+    new TypedPipeInst[T](
+      inpipe,
+      fields,
+      localFlowDef,
+      mode,
+      flatMapFn.filter(f))
 
   override def flatMap[U](f: T => TraversableOnce[U]): TypedPipe[U] =
-    new TypedPipeInst[U](inpipe,
-                         fields,
-                         localFlowDef,
-                         mode,
-                         flatMapFn.flatMap(f))
+    new TypedPipeInst[U](
+      inpipe,
+      fields,
+      localFlowDef,
+      mode,
+      flatMapFn.flatMap(f))
 
   override def map[U](f: T => U): TypedPipe[U] =
     new TypedPipeInst[U](inpipe, fields, localFlowDef, mode, flatMapFn.map(f))
@@ -1140,12 +1146,13 @@ class TypedPipeInst[T] private[scalding] (@transient inpipe: Pipe,
       checkMode(mode)
 
       val msr =
-        new TypedMapsideReduce[K, V](flatMapFn.asInstanceOf[FlatMapFn[(K, V)]],
-                                     sg,
-                                     fields,
-                                     'key,
-                                     'value,
-                                     None)(tup2Setter)
+        new TypedMapsideReduce[K, V](
+          flatMapFn.asInstanceOf[FlatMapFn[(K, V)]],
+          sg,
+          fields,
+          'key,
+          'value,
+          None)(tup2Setter)
       TypedPipe.from[(K, V)](inpipe.eachTo(fields -> destFields) { _ =>
         msr
       }, destFields)(fd, mode, tuple2Converter)
@@ -1253,8 +1260,9 @@ final case class MergedTypedPipe[T](left: TypedPipe[T], right: TypedPipe[T])
   override def hashCogroup[K, V, W, R](smaller: HashJoinable[K, W])(
       joiner: (K, V, Iterable[W]) => Iterator[R])(
       implicit ev: TypedPipe[T] <:< TypedPipe[(K, V)]): TypedPipe[(K, R)] =
-    MergedTypedPipe(left.hashCogroup(smaller)(joiner),
-                    right.hashCogroup(smaller)(joiner))
+    MergedTypedPipe(
+      left.hashCogroup(smaller)(joiner),
+      right.hashCogroup(smaller)(joiner))
 }
 
 case class WithOnComplete[T](typedPipe: TypedPipe[T], fn: () => Unit)

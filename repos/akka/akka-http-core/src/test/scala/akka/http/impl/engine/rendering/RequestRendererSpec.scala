@@ -69,11 +69,13 @@ class RequestRendererSpec
       }
 
       "POST request, a few headers (incl. a custom Host header) and no body" in new TestSetup() {
-        HttpRequest(POST,
-                    "/abc/xyz",
-                    List(RawHeader("X-Fancy", "naa"),
-                         Link(Uri("http://akka.io"), LinkParams.first),
-                         Host("spray.io", 9999))) should renderTo {
+        HttpRequest(
+          POST,
+          "/abc/xyz",
+          List(
+            RawHeader("X-Fancy", "naa"),
+            Link(Uri("http://akka.io"), LinkParams.first),
+            Host("spray.io", 9999))) should renderTo {
           """POST /abc/xyz HTTP/1.1
             |X-Fancy: naa
             |Link: <http://akka.io>; rel=first
@@ -86,11 +88,13 @@ class RequestRendererSpec
       }
 
       "PUT request, a few headers and a body" in new TestSetup() {
-        HttpRequest(PUT,
-                    "/abc/xyz",
-                    List(RawHeader("X-Fancy", "naa"),
-                         RawHeader("Cache-Control", "public"),
-                         Host("spray.io")))
+        HttpRequest(
+          PUT,
+          "/abc/xyz",
+          List(
+            RawHeader("X-Fancy", "naa"),
+            RawHeader("Cache-Control", "public"),
+            Host("spray.io")))
           .withEntity("The content please!") should renderTo {
           """PUT /abc/xyz HTTP/1.1
             |X-Fancy: naa
@@ -108,11 +112,13 @@ class RequestRendererSpec
         HttpRequest(
           PUT,
           "/abc/xyz",
-          List(RawHeader("X-Fancy", "naa"),
-               RawHeader("Cache-Control", "public"),
-               Host("spray.io")),
-          HttpEntity(ContentTypes.NoContentType,
-                     ByteString("The content please!"))) should renderTo {
+          List(
+            RawHeader("X-Fancy", "naa"),
+            RawHeader("Cache-Control", "public"),
+            Host("spray.io")),
+          HttpEntity(
+            ContentTypes.NoContentType,
+            ByteString("The content please!"))) should renderTo {
           """PUT /abc/xyz HTTP/1.1
             |X-Fancy: naa
             |Cache-Control: public
@@ -156,10 +162,10 @@ class RequestRendererSpec
 
       "PUT request with empty chunk stream and custom Content-Type" in new TestSetup() {
         pending // Disabled until #15981 is fixed
-        HttpRequest(PUT,
-                    "/abc/xyz",
-                    entity = Chunked(ContentTypes.`text/plain(UTF-8)`,
-                                     source())) should renderTo {
+        HttpRequest(
+          PUT,
+          "/abc/xyz",
+          entity = Chunked(ContentTypes.`text/plain(UTF-8)`, source())) should renderTo {
           """PUT /abc/xyz HTTP/1.1
             |Host: test.com:8080
             |User-Agent: akka-http/1.0.0
@@ -194,14 +200,15 @@ class RequestRendererSpec
       }
 
       "POST request with chunked body and explicit LastChunk" in new TestSetup() {
-        val chunks = List(ChunkStreamPart("XXXX"),
-                          ChunkStreamPart("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
-                          LastChunk)
+        val chunks = List(
+          ChunkStreamPart("XXXX"),
+          ChunkStreamPart("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
+          LastChunk)
 
-        HttpRequest(POST,
-                    "/abc/xyz",
-                    entity = Chunked(ContentTypes.`text/plain(UTF-8)`,
-                                     Source(chunks))) should renderTo {
+        HttpRequest(
+          POST,
+          "/abc/xyz",
+          entity = Chunked(ContentTypes.`text/plain(UTF-8)`, Source(chunks))) should renderTo {
           """POST /abc/xyz HTTP/1.1
             |Host: test.com:8080
             |User-Agent: akka-http/1.0.0
@@ -219,15 +226,16 @@ class RequestRendererSpec
       }
 
       "POST request with chunked body and extra LastChunks at the end (which should be ignored)" in new TestSetup() {
-        val chunks = List(ChunkStreamPart("XXXX"),
-                          ChunkStreamPart("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
-                          LastChunk,
-                          LastChunk)
+        val chunks = List(
+          ChunkStreamPart("XXXX"),
+          ChunkStreamPart("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
+          LastChunk,
+          LastChunk)
 
-        HttpRequest(POST,
-                    "/abc/xyz",
-                    entity = Chunked(ContentTypes.`text/plain(UTF-8)`,
-                                     Source(chunks))) should renderTo {
+        HttpRequest(
+          POST,
+          "/abc/xyz",
+          entity = Chunked(ContentTypes.`text/plain(UTF-8)`, Source(chunks))) should renderTo {
           """POST /abc/xyz HTTP/1.1
             |Host: test.com:8080
             |User-Agent: akka-http/1.0.0
@@ -350,9 +358,10 @@ class RequestRendererSpec
                     `User-Agent`("akka-http/1.0.0")),
                   serverAddress: InetSocketAddress =
                     new InetSocketAddress("test.com", 8080))
-      extends HttpRequestRendererFactory(userAgent,
-                                         requestHeaderSizeHint = 64,
-                                         NoLogging) {
+      extends HttpRequestRendererFactory(
+        userAgent,
+        requestHeaderSizeHint = 64,
+        NoLogging) {
 
     def renderTo(expected: String): Matcher[HttpRequest] =
       equal(expected.stripMarginWithNewline("\r\n")).matcher[String] compose {

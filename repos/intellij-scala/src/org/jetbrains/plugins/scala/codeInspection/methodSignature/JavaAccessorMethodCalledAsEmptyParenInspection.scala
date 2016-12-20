@@ -33,9 +33,10 @@ class JavaAccessorMethodCalledAsEmptyParenInspection
                   case (m: PsiMethod)
                       if m.isAccessor && !isOverloadedMethod(e) &&
                         hasSameType(call, e) =>
-                    holder.registerProblem(e.nameId,
-                                           getDisplayName,
-                                           new RemoveCallParentheses(call))
+                    holder.registerProblem(
+                      e.nameId,
+                      getDisplayName,
+                      new RemoveCallParentheses(call))
                   case _ =>
                 }
               }

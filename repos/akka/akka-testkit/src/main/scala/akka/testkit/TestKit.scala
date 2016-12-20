@@ -383,9 +383,10 @@ trait TestKitBase {
                                     hint: Option[String] = None): T = {
     val o = receiveOne(max)
     val hintOrEmptyString = hint.map(": " + _).getOrElse("")
-    assert(o ne null,
-           s"timeout ($max) during expectMsg while waiting for $obj" +
-             hintOrEmptyString)
+    assert(
+      o ne null,
+      s"timeout ($max) during expectMsg while waiting for $obj" +
+        hintOrEmptyString)
     assert(obj == o, s"expected $obj, found $o" + hintOrEmptyString)
     o.asInstanceOf[T]
   }
@@ -436,10 +437,12 @@ trait TestKitBase {
     @tailrec
     def recv: Any = {
       val o = receiveOne(end - now)
-      assert(o ne null,
-             s"timeout (${_max}) during fishForMessage, hint: $hint")
-      assert(f.isDefinedAt(o),
-             s"fishForMessage($hint) found unexpected message $o")
+      assert(
+        o ne null,
+        s"timeout (${_max}) during fishForMessage, hint: $hint")
+      assert(
+        f.isDefinedAt(o),
+        s"fishForMessage($hint) found unexpected message $o")
       if (f(o)) o else recv
     }
     recv
@@ -449,8 +452,9 @@ trait TestKitBase {
     * Same as `expectMsgType[T](remainingOrDefault)`, but correctly treating the timeFactor.
     */
   def expectMsgType[T](implicit t: ClassTag[T]): T =
-    expectMsgClass_internal(remainingOrDefault,
-                            t.runtimeClass.asInstanceOf[Class[T]])
+    expectMsgClass_internal(
+      remainingOrDefault,
+      t.runtimeClass.asInstanceOf[Class[T]])
 
   /**
     * Receive one message from the test actor and assert that it conforms to the
@@ -529,9 +533,10 @@ trait TestKitBase {
   private def expectMsgAnyClassOf_internal[C](max: FiniteDuration,
                                               obj: Class[_ <: C]*): C = {
     val o = receiveOne(max)
-    assert(o ne null,
-           s"timeout ($max) during expectMsgAnyClassOf waiting for ${obj
-             .mkString("(", ", ", ")")}")
+    assert(
+      o ne null,
+      s"timeout ($max) during expectMsgAnyClassOf waiting for ${obj
+        .mkString("(", ", ", ")")}")
     assert(obj exists (c ⇒ BoxedType(c) isInstance o), s"found unexpected $o")
     o.asInstanceOf[C]
   }
@@ -562,12 +567,13 @@ trait TestKitBase {
                                         unexpected: Seq[Any],
                                         missingMessage: String,
                                         unexpectedMessage: String): Unit = {
-    assert(missing.isEmpty && unexpected.isEmpty,
-           (if (missing.isEmpty)
-              ""
-            else missing.mkString(missingMessage + " [", ", ", "] ")) +
-             (if (unexpected.isEmpty) ""
-              else unexpected.mkString(unexpectedMessage + " [", ", ", "]")))
+    assert(
+      missing.isEmpty && unexpected.isEmpty,
+      (if (missing.isEmpty)
+         ""
+       else missing.mkString(missingMessage + " [", ", ", "] ")) +
+        (if (unexpected.isEmpty) ""
+         else unexpected.mkString(unexpectedMessage + " [", ", ", "]")))
   }
 
   private def expectMsgAllOf_internal[T](max: FiniteDuration,
@@ -575,10 +581,11 @@ trait TestKitBase {
     val recv = receiveN_internal(obj.size, max)
     val missing = obj filterNot (x ⇒ recv exists (x == _))
     val unexpected = recv filterNot (x ⇒ obj exists (x == _))
-    checkMissingAndUnexpected(missing,
-                              unexpected,
-                              "not found",
-                              "found unexpected")
+    checkMissingAndUnexpected(
+      missing,
+      unexpected,
+      "not found",
+      "found unexpected")
     recv.asInstanceOf[immutable.Seq[T]]
   }
 
@@ -607,10 +614,11 @@ trait TestKitBase {
     val missing = obj filterNot (x ⇒ recv exists (_.getClass eq BoxedType(x)))
     val unexpected =
       recv filterNot (x ⇒ obj exists (c ⇒ BoxedType(c) eq x.getClass))
-    checkMissingAndUnexpected(missing,
-                              unexpected,
-                              "not found",
-                              "found non-matching object(s)")
+    checkMissingAndUnexpected(
+      missing,
+      unexpected,
+      "not found",
+      "found non-matching object(s)")
     recv.asInstanceOf[immutable.Seq[T]]
   }
 
@@ -642,10 +650,11 @@ trait TestKitBase {
     val missing = obj filterNot (x ⇒ recv exists (BoxedType(x) isInstance _))
     val unexpected =
       recv filterNot (x ⇒ obj exists (c ⇒ BoxedType(c) isInstance x))
-    checkMissingAndUnexpected(missing,
-                              unexpected,
-                              "not found",
-                              "found non-matching object(s)")
+    checkMissingAndUnexpected(
+      missing,
+      unexpected,
+      "not found",
+      "found non-matching object(s)")
     recv.asInstanceOf[immutable.Seq[T]]
   }
 
@@ -734,8 +743,9 @@ trait TestKitBase {
     for { x ← 1 to n } yield {
       val timeout = stop - now
       val o = receiveOne(timeout)
-      assert(o ne null,
-             s"timeout ($max) while expecting $n messages (got ${x - 1})")
+      assert(
+        o ne null,
+        s"timeout ($max) while expecting $n messages (got ${x - 1})")
       o
     }
   }

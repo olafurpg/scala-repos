@@ -117,10 +117,11 @@ class StateMapSuite extends SparkFunSuite {
     assert(map.get(4) === Some(4000)) // item removed + updated in this map
 
     assert(
-      map.getAll().toSet === Set((1, 1000, 100),
-                                 (2, 2000, 200),
-                                 (3, 3000, 300),
-                                 (4, 4000, 400)))
+      map.getAll().toSet === Set(
+        (1, 1000, 100),
+        (2, 2000, 200),
+        (3, 3000, 300),
+        (4, 4000, 400)))
     assert(parentMap.getAll().toSet === Set((2, 200, 2)))
 
     map.remove(2) // remove item present in parent map, so that its not visible in child map
@@ -282,10 +283,11 @@ class StateMapSuite extends SparkFunSuite {
         }
 
         // Test whether the current state map after all key updates is correct
-        assertMap(stateMap,
-                  refMap,
-                  time,
-                  "State map does not match reference map")
+        assertMap(
+          stateMap,
+          refMap,
+          time,
+          "State map does not match reference map")
 
         // Test whether the previous map before copy has not changed
         if (prevSetStateMap != null && prevSetRefMap != null) {
@@ -303,15 +305,17 @@ class StateMapSuite extends SparkFunSuite {
       stateMap = stateMap.copy()
 
       // Assert that the copied map has the same data
-      assertMap(stateMap,
-                prevSetRefMap,
-                time,
-                "State map does not match reference map after copying")
+      assertMap(
+        stateMap,
+        prevSetRefMap,
+        time,
+        "State map does not match reference map after copying")
     }
-    assertMap(stateMap,
-              refMap.toMap,
-              time,
-              "Final state map does not match reference map")
+    assertMap(
+      stateMap,
+      refMap.toMap,
+      time,
+      "Final state map does not match reference map")
   }
 
   private def testSerialization[T: ClassTag](

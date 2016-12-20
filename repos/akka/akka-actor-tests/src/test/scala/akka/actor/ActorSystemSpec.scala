@@ -179,14 +179,15 @@ class ActorSystemSpec
     }
 
     "reject invalid names" in {
-      for (n ← Seq("-hallowelt",
-                   "_hallowelt",
-                   "hallo*welt",
-                   "hallo@welt",
-                   "hallo#welt",
-                   "hallo$welt",
-                   "hallo%welt",
-                   "hallo/welt")) intercept[IllegalArgumentException] {
+      for (n ← Seq(
+             "-hallowelt",
+             "_hallowelt",
+             "hallo*welt",
+             "hallo@welt",
+             "hallo#welt",
+             "hallo$welt",
+             "hallo%welt",
+             "hallo/welt")) intercept[IllegalArgumentException] {
         ActorSystem(n)
       }
     }
@@ -215,10 +216,11 @@ class ActorSystemSpec
     }
 
     "log dead letters" in {
-      val sys = ActorSystem("LogDeadLetters",
-                            ConfigFactory
-                              .parseString("akka.loglevel=INFO")
-                              .withFallback(AkkaSpec.testConf))
+      val sys = ActorSystem(
+        "LogDeadLetters",
+        ConfigFactory
+          .parseString("akka.loglevel=INFO")
+          .withFallback(AkkaSpec.testConf))
       try {
         val a = sys.actorOf(Props[ActorSystemSpec.Terminater])
         watch(a)
@@ -401,8 +403,9 @@ class ActorSystemSpec
     "work with a passed in ExecutionContext" in {
       val ecProbe = TestProbe()
       val ec =
-        new ActorSystemSpec.TestExecutionContext(ecProbe.ref,
-                                                 ExecutionContexts.global())
+        new ActorSystemSpec.TestExecutionContext(
+          ecProbe.ref,
+          ExecutionContexts.global())
 
       val system2 =
         ActorSystem(name = "default", defaultExecutionContext = Some(ec))
@@ -428,14 +431,16 @@ class ActorSystemSpec
     "not use passed in ExecutionContext if executor is configured" in {
       val ecProbe = TestProbe()
       val ec =
-        new ActorSystemSpec.TestExecutionContext(ecProbe.ref,
-                                                 ExecutionContexts.global())
+        new ActorSystemSpec.TestExecutionContext(
+          ecProbe.ref,
+          ExecutionContexts.global())
 
       val config = ConfigFactory.parseString(
         "akka.actor.default-dispatcher.executor = \"fork-join-executor\"")
-      val system2 = ActorSystem(name = "default",
-                                config = Some(config),
-                                defaultExecutionContext = Some(ec))
+      val system2 = ActorSystem(
+        name = "default",
+        config = Some(config),
+        defaultExecutionContext = Some(ec))
 
       try {
         val ref = system2.actorOf(Props(new Actor {
@@ -456,11 +461,12 @@ class ActorSystemSpec
     }
 
     "not allow top-level actor creation with custom guardian" in {
-      val sys = new ActorSystemImpl("custom",
-                                    ConfigFactory.defaultReference(),
-                                    getClass.getClassLoader,
-                                    None,
-                                    Some(Props.empty))
+      val sys = new ActorSystemImpl(
+        "custom",
+        ConfigFactory.defaultReference(),
+        getClass.getClassLoader,
+        None,
+        Some(Props.empty))
       sys.start()
       try {
         intercept[UnsupportedOperationException] {

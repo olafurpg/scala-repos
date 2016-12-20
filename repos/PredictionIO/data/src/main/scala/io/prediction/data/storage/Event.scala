@@ -111,21 +111,28 @@ object EventValidation {
     require(!e.event.isEmpty, "event must not be empty.")
     require(!e.entityType.isEmpty, "entityType must not be empty string.")
     require(!e.entityId.isEmpty, "entityId must not be empty string.")
-    require(e.targetEntityType.map(!_.isEmpty).getOrElse(true),
-            "targetEntityType must not be empty string")
-    require(e.targetEntityId.map(!_.isEmpty).getOrElse(true),
-            "targetEntityId must not be empty string.")
-    require(!((e.targetEntityType != None) && (e.targetEntityId == None)),
-            "targetEntityType and targetEntityId must be specified together.")
-    require(!((e.targetEntityType == None) && (e.targetEntityId != None)),
-            "targetEntityType and targetEntityId must be specified together.")
-    require(!((e.event == "$unset") && e.properties.isEmpty),
-            "properties cannot be empty for $unset event")
-    require(!isReservedPrefix(e.event) || isSpecialEvents(e.event),
-            s"${e.event} is not a supported reserved event name.")
-    require(!isSpecialEvents(e.event) ||
-              ((e.targetEntityType == None) && (e.targetEntityId == None)),
-            s"Reserved event ${e.event} cannot have targetEntity")
+    require(
+      e.targetEntityType.map(!_.isEmpty).getOrElse(true),
+      "targetEntityType must not be empty string")
+    require(
+      e.targetEntityId.map(!_.isEmpty).getOrElse(true),
+      "targetEntityId must not be empty string.")
+    require(
+      !((e.targetEntityType != None) && (e.targetEntityId == None)),
+      "targetEntityType and targetEntityId must be specified together.")
+    require(
+      !((e.targetEntityType == None) && (e.targetEntityId != None)),
+      "targetEntityType and targetEntityId must be specified together.")
+    require(
+      !((e.event == "$unset") && e.properties.isEmpty),
+      "properties cannot be empty for $unset event")
+    require(
+      !isReservedPrefix(e.event) || isSpecialEvents(e.event),
+      s"${e.event} is not a supported reserved event name.")
+    require(
+      !isSpecialEvents(e.event) ||
+        ((e.targetEntityType == None) && (e.targetEntityId == None)),
+      s"Reserved event ${e.event} cannot have targetEntity")
     require(
       !isReservedPrefix(e.entityType) || isBuiltinEntityTypes(e.entityType),
       s"The entityType ${e.entityType} is not allowed. " +
@@ -160,9 +167,10 @@ object EventValidation {
     */
   def validateProperties(e: Event): Unit = {
     e.properties.keySet.foreach { k =>
-      require(!isReservedPrefix(k) || builtinProperties.contains(k),
-              s"The property ${k} is not allowed. " +
-                s"'pio_' is a reserved name prefix.")
+      require(
+        !isReservedPrefix(k) || builtinProperties.contains(k),
+        s"The property ${k} is not allowed. " +
+          s"'pio_' is a reserved name prefix.")
     }
   }
 }

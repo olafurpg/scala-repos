@@ -55,10 +55,11 @@ final class RedisScalatraBroadcaster(
         val selectedResources = _resources.asScala filter clientFilter
         val selectedSet = selectedResources.toSet.asJava
         push(
-          new Deliver(newMsg,
-                      selectedSet,
-                      new BroadcasterFuture[Any](newMsg),
-                      embeddedMsg))
+          new Deliver(
+            newMsg,
+            selectedSet,
+            new BroadcasterFuture[Any](newMsg),
+            embeddedMsg))
       }
     } catch {
       case t: Throwable =>

@@ -49,11 +49,13 @@ private[hive] object SparkSQLEnv extends Logging {
       sparkConf
         .setAppName(
           maybeAppName.getOrElse(s"SparkSQL::${Utils.localHostName()}"))
-        .set("spark.serializer",
-             maybeSerializer.getOrElse(
-               "org.apache.spark.serializer.KryoSerializer"))
-        .set("spark.kryo.referenceTracking",
-             maybeKryoReferenceTracking.getOrElse("false"))
+        .set(
+          "spark.serializer",
+          maybeSerializer.getOrElse(
+            "org.apache.spark.serializer.KryoSerializer"))
+        .set(
+          "spark.kryo.referenceTracking",
+          maybeKryoReferenceTracking.getOrElse("false"))
 
       sparkContext = new SparkContext(sparkConf)
       sparkContext.addSparkListener(new StatsReportListener())

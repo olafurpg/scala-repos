@@ -29,9 +29,10 @@ object Bridge {
   ): ((Address, StatsReceiver) => ServiceFactory[Req, Rep]) = {
     case (Address.Inet(ia, _), sr) =>
       ServiceFactory(() => transporter(ia, sr) map newDispatcher)
-    case (com.twitter.finagle.exp.Address
-            .ServiceFactory(sf: ServiceFactory[Req, Rep], _),
-          _) =>
+    case (
+        com.twitter.finagle.exp.Address
+          .ServiceFactory(sf: ServiceFactory[Req, Rep], _),
+        _) =>
       sf
     case (Address.Failed(e), _) => new FailingFactory(e)
   }

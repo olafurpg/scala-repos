@@ -20,8 +20,9 @@ package scala
   *  @param  _6   Element 6 of this Tuple7
   *  @param  _7   Element 7 of this Tuple7
   */
-@deprecatedInheritance("Tuples will be made final in a future version.",
-                       "2.11.0")
+@deprecatedInheritance(
+  "Tuples will be made final in a future version.",
+  "2.11.0")
 case class Tuple7[+T1, +T2, +T3, +T4, +T5, +T6, +T7](_1: T1,
                                                      _2: T2,
                                                      _3: T3,

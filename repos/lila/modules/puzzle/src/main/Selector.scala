@@ -45,12 +45,13 @@ private[puzzle] final class Selector(puzzleColl: Coll,
         val rating = user.perfs.puzzle.intRating min 2300 max 900
         val step = toleranceStepFor(rating)
         api.attempt.playedIds(user, maxAttempts) flatMap { ids =>
-          tryRange(rating,
-                   step,
-                   step,
-                   difficultyDecay(difficulty),
-                   ids,
-                   isMate)
+          tryRange(
+            rating,
+            step,
+            step,
+            difficultyDecay(difficulty),
+            ids,
+            isMate)
         }
     }
   }.mon(_.puzzle.selector.time)

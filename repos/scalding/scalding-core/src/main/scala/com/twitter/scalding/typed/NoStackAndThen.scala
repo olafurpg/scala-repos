@@ -44,9 +44,10 @@ sealed trait NoStackAndThen[-A, +B] extends java.io.Serializable {
       case NoStackWrap(fn) => andThen(fn)
       case NoStackMore(head, tail) =>
         // casts needed for the tailrec, they can't cause runtime errors
-        push(this,
-             head.asInstanceOf[NoStackAndThen[Any, Any]],
-             EmptyStack(tail))
+        push(
+          this,
+          head.asInstanceOf[NoStackAndThen[Any, Any]],
+          EmptyStack(tail))
     }
   }
 }

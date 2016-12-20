@@ -37,10 +37,11 @@ object FormattedStringParser extends StringParser {
         (literal, args)
 
       // "%d" format 1, "%d" format (1)
-      case ScInfixExpr(literal: ScLiteral,
-                       PsiReferenceEx.resolve(
-                         (f: ScFunction) && ContainingClass(owner: ScTrait)),
-                       arg)
+      case ScInfixExpr(
+          literal: ScLiteral,
+          PsiReferenceEx.resolve(
+            (f: ScFunction) && ContainingClass(owner: ScTrait)),
+          arg)
           if literal.isString && isFormatMethod(owner.qualifiedName, f.name) =>
         val args = arg match {
           case tuple: ScTuple => tuple.exprs
@@ -59,10 +60,11 @@ object FormattedStringParser extends StringParser {
         (literal, Seq(arg))
 
       // 1 formatted "%d"
-      case ScInfixExpr(arg: ScExpression,
-                       PsiReferenceEx.resolve(
-                         (f: ScFunction) && ContainingClass(owner: ScClass)),
-                       literal: ScLiteral)
+      case ScInfixExpr(
+          arg: ScExpression,
+          PsiReferenceEx.resolve(
+            (f: ScFunction) && ContainingClass(owner: ScClass)),
+          literal: ScLiteral)
           if literal.isString &&
             isFormattedMethod(owner.qualifiedName, f.name) =>
         (literal, Seq(arg))
@@ -116,14 +118,15 @@ object FormattedStringParser extends StringParser {
           }
         } else {
           if (it.toString().equals("%n"))
-            Injection(ScalaPsiElementFactory.createExpressionFromText(
-                        "\"\\n\"",
-                        literal.getManager),
-                      None)
+            Injection(
+              ScalaPsiElementFactory
+                .createExpressionFromText("\"\\n\"", literal.getManager),
+              None)
           else if (it.toString == "%%")
-            Injection(ScalaPsiElementFactory
-                        .createExpressionFromText("\"%\"", literal.getManager),
-                      None)
+            Injection(
+              ScalaPsiElementFactory
+                .createExpressionFromText("\"%\"", literal.getManager),
+              None)
           else if (remainingArguments.hasNext)
             Injection(remainingArguments.next(), Some(specifier))
           else UnboundSpecifier(specifier)

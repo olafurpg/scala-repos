@@ -42,8 +42,9 @@ class HealthCheckActorTest
     when(appRepository.app(appId, appVersion))
       .thenReturn(Future.successful(Some(app)))
 
-    val task = MarathonTestHelper.stagedTask("test_task.9876543",
-                                             appVersion = appVersion)
+    val task = MarathonTestHelper.stagedTask(
+      "test_task.9876543",
+      appVersion = appVersion)
 
     when(tracker.appTasksSync(appId)).thenReturn(Set(task))
 
@@ -51,12 +52,13 @@ class HealthCheckActorTest
       new MarathonSchedulerDriverHolder
     val actor = TestActorRef[HealthCheckActor](
       Props(
-        new HealthCheckActor(app,
-                             holder,
-                             mock[MarathonScheduler],
-                             HealthCheck(),
-                             tracker,
-                             system.eventStream) {
+        new HealthCheckActor(
+          app,
+          holder,
+          mock[MarathonScheduler],
+          HealthCheck(),
+          tracker,
+          system.eventStream) {
           override val workerProps = Props {
             latch.countDown()
             new TestActors.EchoActor
@@ -86,19 +88,21 @@ class HealthCheckActorTest
     when(appRepository.app(appId, appVersion))
       .thenReturn(Future.successful(Some(app)))
 
-    val task = MarathonTestHelper.runningTask("test_task.9876543",
-                                              appVersion = appVersion)
+    val task = MarathonTestHelper.runningTask(
+      "test_task.9876543",
+      appVersion = appVersion)
 
     val healthCheck: HealthCheck = HealthCheck(maxConsecutiveFailures = 3)
 
     val actor = TestActorRef[HealthCheckActor](
       Props(
-        new HealthCheckActor(app,
-                             holder,
-                             scheduler,
-                             healthCheck,
-                             tracker,
-                             system.eventStream)
+        new HealthCheckActor(
+          app,
+          holder,
+          scheduler,
+          healthCheck,
+          tracker,
+          system.eventStream)
       )
     )
 

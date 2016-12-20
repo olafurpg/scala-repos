@@ -58,9 +58,10 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
 
     protected[this] def compile(compiler: QueryCompiler): Artifacts = {
       val compiled = compiler.run(source).tree
-      val ResultSetMapping(_,
-                           CompiledStatement(sql, ibr: InsertBuilderResult, _),
-                           CompiledMapping(conv, _)) = compiled
+      val ResultSetMapping(
+        _,
+        CompiledStatement(sql, ibr: InsertBuilderResult, _),
+        CompiledMapping(conv, _)) = compiled
       new Artifacts(
         compiled,
         conv.asInstanceOf[ResultConverter[JdbcResultConverterDomain, Any]],
@@ -90,9 +91,10 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
       if (!capabilities.contains(JdbcCapabilities.returnInsertKey))
         throw new SlickException(
           "This DBMS does not allow returning columns from INSERT statements")
-      val ResultSetMapping(_,
-                           CompiledStatement(_, ibr: InsertBuilderResult, _),
-                           CompiledMapping(rconv, _)) =
+      val ResultSetMapping(
+        _,
+        CompiledStatement(_, ibr: InsertBuilderResult, _),
+        CompiledMapping(rconv, _)) =
         forceInsertCompiler.run(node).tree
       if (ibr.table.baseIdentity != standardInsert.table.baseIdentity)
         throw new SlickException(
@@ -268,9 +270,10 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
             b"\nfrom "
             b.sep(from, ", ") {
               case (sym, n) =>
-                buildFrom(n,
-                          if (Some(sym) == currentUniqueFrom) None
-                          else Some(sym))
+                buildFrom(
+                  n,
+                  if (Some(sym) == currentUniqueFrom) None
+                  else Some(sym))
             }
         }
       }
@@ -408,14 +411,17 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
             }
             b"\)"
           case RewriteBooleans.ToFakeBoolean(ch) =>
-            expr(IfThenElse(
-                   ConstArray(ch,
-                              LiteralNode(1).infer(),
-                              LiteralNode(0).infer())),
-                 skipParens)
+            expr(
+              IfThenElse(
+                ConstArray(
+                  ch,
+                  LiteralNode(1).infer(),
+                  LiteralNode(0).infer())),
+              skipParens)
           case RewriteBooleans.ToRealBoolean(ch) =>
-            expr(Library.==.typed[Boolean](ch, LiteralNode(true).infer()),
-                 skipParens)
+            expr(
+              Library.==.typed[Boolean](ch, LiteralNode(true).infer()),
+              skipParens)
           case Library.Exists(c: Comprehension) =>
             /* If tuples are not supported, selecting multiple individial columns
              * in exists(select ...) is probably not supported, either, so we rewrite
@@ -452,8 +458,9 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
           case Library.EndsWith(n, LiteralNode(s: String)) =>
             b"\($n like ${valueToSQLLiteral("%" + likeEncode(s), ScalaBaseType.stringType)} escape '^'\)"
           case Library.Trim(n) =>
-            expr(Library.LTrim.typed[String](Library.RTrim.typed[String](n)),
-                 skipParens)
+            expr(
+              Library.LTrim.typed[String](Library.RTrim.typed[String](n)),
+              skipParens)
           case Library.Substring(n, start, end) =>
             b"\({fn substring($n, ${QueryParameter
               .constOp[Int]("+")(_ + _)(start, LiteralNode(1).infer())}, ${QueryParameter
@@ -545,16 +552,17 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
 
     def buildUpdate: SQLBuilder.Result = {
       val (gen, from, where, select) = tree match {
-        case Comprehension(sym,
-                           from: TableNode,
-                           Pure(select, _),
-                           where,
-                           None,
-                           _,
-                           None,
-                           None,
-                           None,
-                           None) =>
+        case Comprehension(
+            sym,
+            from: TableNode,
+            Pure(select, _),
+            where,
+            None,
+            _,
+            None,
+            None,
+            None,
+            None) =>
           select match {
             case f @ Select(Ref(struct), _) if struct == sym =>
               (sym, from, where, ConstArray(f.field))
@@ -582,8 +590,9 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
       b.sep(select, ", ")(field => b += symbolName(field) += " = ?")
       if (!where.isEmpty) {
         b" where "
-        expr(where.reduceLeft((a, b) => Library.And.typed[Boolean](a, b)),
-             true)
+        expr(
+          where.reduceLeft((a, b) => Library.And.typed[Boolean](a, b)),
+          true)
       }
       b.build
     }
@@ -592,16 +601,17 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
       def fail(msg: String) =
         throw new SlickException("Invalid query for DELETE statement: " + msg)
       val (gen, from, where) = tree match {
-        case Comprehension(sym,
-                           from,
-                           Pure(select, _),
-                           where,
-                           _,
-                           _,
-                           None,
-                           distinct,
-                           fetch,
-                           offset) =>
+        case Comprehension(
+            sym,
+            from,
+            Pure(select, _),
+            where,
+            _,
+            _,
+            None,
+            distinct,
+            fetch,
+            offset) =>
           if (fetch.isDefined || offset.isDefined || distinct.isDefined)
             fail(".take, .drop and .distinct are not supported for deleting")
           from match {
@@ -619,8 +629,9 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
       b"delete from $qtn"
       if (!where.isEmpty) {
         b" where "
-        expr(where.reduceLeft((a, b) => Library.And.typed[Boolean](a, b)),
-             true)
+        expr(
+          where.reduceLeft((a, b) => Library.And.typed[Boolean](a, b)),
+          true)
       }
       b.build
     }
@@ -628,10 +639,11 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
 
   /** Builder for INSERT statements. */
   class InsertBuilder(val ins: Insert) {
-    protected val Insert(_,
-                         table: TableNode,
-                         ProductNode(rawColumns),
-                         allFields) = ins
+    protected val Insert(
+      _,
+      table: TableNode,
+      ProductNode(rawColumns),
+      allFields) = ins
     protected val syms: ConstArray[FieldSymbol] = rawColumns.map {
       case Select(_, fs: FieldSymbol) => fs
     }
@@ -670,9 +682,10 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
       lazy val reordering: ConstArray[IndexedSeq[Int]] =
         syms.map(fs => newIndices(fs).map(_._2 + 1))
       n.replace({
-        case InsertColumn(ConstArray(Select(ref, ElementSymbol(idx))),
-                          fs,
-                          tpe) =>
+        case InsertColumn(
+            ConstArray(Select(ref, ElementSymbol(idx))),
+            fs,
+            tpe) =>
           val newPaths =
             reordering(idx - 1).map(i => Select(ref, ElementSymbol(i)))
           InsertColumn(ConstArray.from(newPaths), fs, tpe) :@ tpe
@@ -809,13 +822,15 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
 
     protected def addForeignKey(fk: ForeignKey, sb: StringBuilder) {
       sb append "constraint " append quoteIdentifier(fk.name) append " foreign key("
-      addForeignKeyColumnList(fk.linearizedSourceColumns,
-                              sb,
-                              tableNode.tableName)
+      addForeignKeyColumnList(
+        fk.linearizedSourceColumns,
+        sb,
+        tableNode.tableName)
       sb append ") references " append quoteTableName(fk.targetTable) append "("
-      addForeignKeyColumnList(fk.linearizedTargetColumnsForOriginalTargetTable,
-                              sb,
-                              fk.targetTable.tableName)
+      addForeignKeyColumnList(
+        fk.linearizedTargetColumnsForOriginalTargetTable,
+        sb,
+        fk.targetTable.tableName)
       sb append ") on update " append fk.onUpdate.action
       sb append " on delete " append fk.onDelete.action
     }

@@ -574,10 +574,11 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
             val combined = prefix + "val " + varName + " =\n" + l2
 
             repldbg(
-              List("    line" -> line,
-                   " content" -> content,
-                   "     was" -> l2,
-                   "combined" -> combined) map {
+              List(
+                "    line" -> line,
+                " content" -> content,
+                "     was" -> l2,
+                "combined" -> combined) map {
                 case (label, s) => label + ": '" + s + "'"
               } mkString "\n")
             combined
@@ -969,15 +970,17 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     /** Code to import bound names from previous lines - accessPath is code to
       * append to objectName to access anything bound by request.
       */
-    lazy val ComputedImports(headerPreamble,
-                             importsPreamble,
-                             importsTrailer,
-                             accessPath) =
+    lazy val ComputedImports(
+      headerPreamble,
+      importsPreamble,
+      importsTrailer,
+      accessPath) =
       exitingTyper(
-        importsCode(referencedNames.toSet,
-                    ObjectSourceCode,
-                    definesClass,
-                    generousImports))
+        importsCode(
+          referencedNames.toSet,
+          ObjectSourceCode,
+          definesClass,
+          generousImports))
 
     /** the line of code to compute */
     def toCompute = line
@@ -995,8 +998,9 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
         if (!isReplPower) Nil // power mode only for now
         else {
           val escapedLine = Constant(originalLine).escapedStringValue
-          List(s"""def $$line = $escapedLine """,
-               """def $trees = _root_.scala.Nil""")
+          List(
+            s"""def $$line = $escapedLine """,
+            """def $trees = _root_.scala.Nil""")
         }
       }
       def preamble = s"""

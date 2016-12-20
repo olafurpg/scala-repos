@@ -271,8 +271,8 @@ object PlayBuild extends Build {
         // The pair with errorIfNone being false both creates the mappings, and filters non twirl outputs out of
         // managed sources
         val twirlCompiledSources =
-          (managedSources in Compile).value.pair(relativeTo(twirlTarget),
-                                                 errorIfNone = false)
+          (managedSources in Compile).value
+            .pair(relativeTo(twirlTarget), errorIfNone = false)
 
         twirlSources ++ twirlCompiledSources
       },
@@ -301,8 +301,9 @@ object PlayBuild extends Build {
       .dependsOn(PlayServerProject)
 
   lazy val PlayAkkaHttpServerProject =
-    PlayCrossBuiltProject("Play-Akka-Http-Server-Experimental",
-                          "play-akka-http-server")
+    PlayCrossBuiltProject(
+      "Play-Akka-Http-Server-Experimental",
+      "play-akka-http-server")
       .settings(libraryDependencies ++= akkaHttp)
       // Include scripted tests here as well as in the SBT Plugin, because we
       // don't want the SBT Plugin to have a dependency on an experimental module.
@@ -416,17 +417,18 @@ object PlayBuild extends Build {
 
   lazy val SbtForkRunPluginProject =
     PlaySbtPluginProject("SBT-Fork-Run-Plugin", "sbt-fork-run-plugin")
-      .settings(libraryDependencies ++= sbtForkRunPluginDependencies(
-                  sbtVersion.value,
-                  scalaVersion.value),
-                // This only publishes the sbt plugin projects on each scripted run.
-                // The runtests script does a full publish before running tests.
-                // When developing the sbt plugins, run a publishLocal in the root project first.
-                scriptedDependencies := {
-                  val () = publishLocal.value
-                  val () = (publishLocal in SbtPluginProject).value
-                  val () = (publishLocal in SbtRoutesCompilerProject).value
-                })
+      .settings(
+        libraryDependencies ++= sbtForkRunPluginDependencies(
+          sbtVersion.value,
+          scalaVersion.value),
+        // This only publishes the sbt plugin projects on each scripted run.
+        // The runtests script does a full publish before running tests.
+        // When developing the sbt plugins, run a publishLocal in the root project first.
+        scriptedDependencies := {
+          val () = publishLocal.value
+          val () = (publishLocal in SbtPluginProject).value
+          val () = (publishLocal in SbtRoutesCompilerProject).value
+        })
       .dependsOn(SbtForkRunProtocolProject, SbtPluginProject)
 
   lazy val PlayLogback = PlayCrossBuiltProject("Play-Logback", "play-logback")
@@ -450,8 +452,9 @@ object PlayBuild extends Build {
     .dependsOn(PlayProject)
     .dependsOn(PlaySpecs2Project % "test")
 
-  lazy val PlayWsJavaProject = PlayCrossBuiltProject("Play-Java-WS",
-                                                     "play-java-ws")
+  lazy val PlayWsJavaProject = PlayCrossBuiltProject(
+    "Play-Java-WS",
+    "play-java-ws")
     .settings(
       libraryDependencies ++= playWsDeps,
       parallelExecution in Test := false
@@ -464,10 +467,11 @@ object PlayBuild extends Build {
       .settings(
         parallelExecution in Test := false
       )
-      .dependsOn(PlayProject,
-                 PlayJavaProject,
-                 PlaySpecs2Project % "test",
-                 PlayWsProject % "test")
+      .dependsOn(
+        PlayProject,
+        PlayJavaProject,
+        PlaySpecs2Project % "test",
+        PlayWsProject % "test")
 
   // This project is just for testing Play, not really a public artifact
   lazy val PlayIntegrationTestProject =
@@ -476,11 +480,12 @@ object PlayBuild extends Build {
         parallelExecution in Test := false,
         previousArtifacts := Set.empty
       )
-      .dependsOn(PlayProject % "test->test",
-                 PlayLogback % "test->test",
-                 PlayWsProject,
-                 PlayWsJavaProject,
-                 PlaySpecs2Project)
+      .dependsOn(
+        PlayProject % "test->test",
+        PlayLogback % "test->test",
+        PlayWsProject,
+        PlayWsJavaProject,
+        PlaySpecs2Project)
       .dependsOn(PlayFiltersHelpersProject)
       .dependsOn(PlayJavaProject)
       .dependsOn(PlayAkkaHttpServerProject)

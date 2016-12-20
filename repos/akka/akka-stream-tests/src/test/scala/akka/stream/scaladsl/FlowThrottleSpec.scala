@@ -137,10 +137,11 @@ class FlowThrottleSpec extends AkkaSpec {
     "throw exception when exceeding throughtput in enforced mode" in Utils
       .assertAllStagesStopped {
         an[RateExceededException] shouldBe thrownBy {
-          Await.result(Source(1 to 5)
-                         .throttle(1, 200.millis, 5, Enforcing)
-                         .runWith(Sink.ignore),
-                       2.seconds)
+          Await.result(
+            Source(1 to 5)
+              .throttle(1, 200.millis, 5, Enforcing)
+              .runWith(Sink.ignore),
+            2.seconds)
         }
       }
 
@@ -265,10 +266,11 @@ class FlowThrottleSpec extends AkkaSpec {
     "throw exception when exceeding throughtput in enforced mode" in Utils
       .assertAllStagesStopped {
         an[RateExceededException] shouldBe thrownBy {
-          Await.result(Source(1 to 5)
-                         .throttle(2, 200.millis, 0, identity, Enforcing)
-                         .runWith(Sink.ignore),
-                       2.seconds)
+          Await.result(
+            Source(1 to 5)
+              .throttle(2, 200.millis, 0, identity, Enforcing)
+              .runWith(Sink.ignore),
+            2.seconds)
         }
       }
 

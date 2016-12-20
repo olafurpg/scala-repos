@@ -41,8 +41,9 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
   */
 @RunWith(classOf[JUnitRunner])
 class ToggleSpec
-    extends SimpleSFXDelegateSpec[jfxsc.Toggle, Toggle](classOf[jfxsc.Toggle],
-                                                        classOf[Toggle])
+    extends SimpleSFXDelegateSpec[jfxsc.Toggle, Toggle](
+      classOf[jfxsc.Toggle],
+      classOf[Toggle])
     with RunOnApplicationThread {
 
   override def getScalaClassInstance = new ToggleButton

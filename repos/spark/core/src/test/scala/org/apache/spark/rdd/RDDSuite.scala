@@ -53,18 +53,20 @@ class RDDSuite extends SparkFunSuite with SharedSparkContext {
         .toList === List(1, 1, 2, 1, 2, 3, 1, 2, 3, 4))
     assert(nums.union(nums).collect().toList === List(1, 2, 3, 4, 1, 2, 3, 4))
     assert(
-      nums.glom().map(_.toList).collect().toList === List(List(1, 2),
-                                                          List(3, 4)))
+      nums.glom().map(_.toList).collect().toList === List(
+        List(1, 2),
+        List(3, 4)))
     assert(
       nums
         .collect({ case i if i >= 3 => i.toString })
         .collect()
         .toList === List("3", "4"))
     assert(
-      nums.keyBy(_.toString).collect().toList === List(("1", 1),
-                                                       ("2", 2),
-                                                       ("3", 3),
-                                                       ("4", 4)))
+      nums.keyBy(_.toString).collect().toList === List(
+        ("1", 1),
+        ("2", 2),
+        ("3", 3),
+        ("4", 4)))
     assert(!nums.isEmpty())
     assert(nums.max() === 4)
     assert(nums.min() === 1)
@@ -142,9 +144,9 @@ class RDDSuite extends SparkFunSuite with SharedSparkContext {
       sc.parallelize(Seq(1 -> true)).partitionBy(new HashPartitioner(1))
     val rddWithNoPartitioner = sc.parallelize(Seq(2 -> true))
     intercept[IllegalArgumentException] {
-      new PartitionerAwareUnionRDD(sc,
-                                   Seq(rddWithNoPartitioner,
-                                       rddWithPartitioner))
+      new PartitionerAwareUnionRDD(
+        sc,
+        Seq(rddWithNoPartitioner, rddWithPartitioner))
     }
   }
 
@@ -160,10 +162,9 @@ class RDDSuite extends SparkFunSuite with SharedSparkContext {
     val nums2 = makeRDDWithPartitioner(5 to 8)
     assert(nums1.partitioner == nums2.partitioner)
     assert(
-      new PartitionerAwareUnionRDD(sc, Seq(nums1)).collect().toSet === Set(1,
-                                                                           2,
-                                                                           3,
-                                                                           4))
+      new PartitionerAwareUnionRDD(sc, Seq(nums1))
+        .collect()
+        .toSet === Set(1, 2, 3, 4))
 
     val union = new PartitionerAwareUnionRDD(sc, Seq(nums1, nums2))
     assert(union.collect().toSet === Set(1, 2, 3, 4, 5, 6, 7, 8))
@@ -397,8 +398,9 @@ class RDDSuite extends SparkFunSuite with SharedSparkContext {
     val coal3 = data3.coalesce(3)
     val list3 = coal3.partitions.flatMap(
       _.asInstanceOf[CoalescedRDDPartition].preferredLocation)
-    assert(list3.sorted === Array("a", "b", "c"),
-           "Locality preferences are dropped")
+    assert(
+      list3.sorted === Array("a", "b", "c"),
+      "Locality preferences are dropped")
 
     // RDD with locality preferences spread (non-randomly) over 6 machines, m0 through m5
     val data = sc.makeRDD((1 to 9).map(i =>
@@ -406,12 +408,14 @@ class RDDSuite extends SparkFunSuite with SharedSparkContext {
         "m" + (j % 6)
       })))
     val coalesced1 = data.coalesce(3)
-    assert(coalesced1.collect().toList.sorted === (1 to 9).toList,
-           "Data got *lost* in coalescing")
+    assert(
+      coalesced1.collect().toList.sorted === (1 to 9).toList,
+      "Data got *lost* in coalescing")
 
     val splits = coalesced1.glom().collect().map(_.toList).toList
-    assert(splits.length === 3,
-           "Supposed to coalesce to 3 but got " + splits.length)
+    assert(
+      splits.length === 3,
+      "Supposed to coalesce to 3 but got " + splits.length)
 
     assert(splits.forall(_.length >= 1) === true, "Some partitions were empty")
 
@@ -422,12 +426,13 @@ class RDDSuite extends SparkFunSuite with SharedSparkContext {
     val sortedList = listOfLists.sortWith { (x, y) =>
       !x.isEmpty && (y.isEmpty || (x(0) < y(0)))
     }
-    assert(sortedList === (1 to 9)
-             .map { x =>
-               List(x)
-             }
-             .toList,
-           "Tried coalescing 9 partitions to 20 but didn't get 9 back")
+    assert(
+      sortedList === (1 to 9)
+        .map { x =>
+          List(x)
+        }
+        .toList,
+      "Tried coalescing 9 partitions to 20 but didn't get 9 back")
   }
 
   test("coalesced RDDs with locality, large scale (10K partitions)") {
@@ -460,8 +465,9 @@ class RDDSuite extends SparkFunSuite with SharedSparkContext {
       val maxImbalance = coalesced2.partitions
         .map(part => part.asInstanceOf[CoalescedRDDPartition].parents.size)
         .foldLeft(0)((dev, curr) => math.max(math.abs(100 - curr), dev))
-      assert(maxImbalance <= 20,
-             "Expected 100 +/- 20 per partition, but got " + maxImbalance)
+      assert(
+        maxImbalance <= 20,
+        "Expected 100 +/- 20 per partition, but got " + maxImbalance)
 
       val data3 =
         sc.makeRDD(blocks)
@@ -470,9 +476,10 @@ class RDDSuite extends SparkFunSuite with SharedSparkContext {
       val minLocality2 = coalesced3.partitions
         .map(part => part.asInstanceOf[CoalescedRDDPartition].localFraction)
         .foldLeft(1.0)((perc, loc) => math.min(perc, loc))
-      assert(minLocality2 >= 0.90,
-             "Expected 90% locality for derived RDD but got " +
-               (minLocality2 * 100.0).toInt + "%")
+      assert(
+        minLocality2 >= 0.90,
+        "Expected 90% locality for derived RDD but got " +
+          (minLocality2 * 100.0).toInt + "%")
     }
   }
 
@@ -656,31 +663,35 @@ class RDDSuite extends SparkFunSuite with SharedSparkContext {
     {
       val sample = data.takeSample(withReplacement = true, num = 20)
       assert(sample.size === 20) // Got exactly 100 elements
-      assert(sample.toSet.size <= 20,
-             "sampling with replacement returned all distinct elements")
+      assert(
+        sample.toSet.size <= 20,
+        "sampling with replacement returned all distinct elements")
       assert(sample.forall(x => 1 <= x && x <= n), s"elements not in [1, $n]")
     }
     {
       val sample = data.takeSample(withReplacement = true, num = n)
       assert(sample.size === n) // Got exactly 100 elements
       // Chance of getting all distinct elements is astronomically low, so test we got < 100
-      assert(sample.toSet.size < n,
-             "sampling with replacement returned all distinct elements")
+      assert(
+        sample.toSet.size < n,
+        "sampling with replacement returned all distinct elements")
       assert(sample.forall(x => 1 <= x && x <= n), s"elements not in [1, $n]")
     }
     for (seed <- 1 to 5) {
       val sample = data.takeSample(withReplacement = true, n, seed)
       assert(sample.size === n) // Got exactly 100 elements
       // Chance of getting all distinct elements is astronomically low, so test we got < 100
-      assert(sample.toSet.size < n,
-             "sampling with replacement returned all distinct elements")
+      assert(
+        sample.toSet.size < n,
+        "sampling with replacement returned all distinct elements")
     }
     for (seed <- 1 to 5) {
       val sample = data.takeSample(withReplacement = true, 2 * n, seed)
       assert(sample.size === 2 * n) // Got exactly 200 elements
       // Chance of getting all distinct elements is still quite low, so test we got < 100
-      assert(sample.toSet.size < n,
-             "sampling with replacement returned all distinct elements")
+      assert(
+        sample.toSet.size < n,
+        "sampling with replacement returned all distinct elements")
     }
   }
 
@@ -743,21 +754,24 @@ class RDDSuite extends SparkFunSuite with SharedSparkContext {
 
   test("sortByKey with explicit ordering") {
     val data = sc.parallelize(
-      Seq("Bob|Smith|50",
-          "Jane|Smith|40",
-          "Thomas|Williams|30",
-          "Karen|Williams|60"))
+      Seq(
+        "Bob|Smith|50",
+        "Jane|Smith|40",
+        "Thomas|Williams|30",
+        "Karen|Williams|60"))
 
-    val ageOrdered = Array("Thomas|Williams|30",
-                           "Jane|Smith|40",
-                           "Bob|Smith|50",
-                           "Karen|Williams|60")
+    val ageOrdered = Array(
+      "Thomas|Williams|30",
+      "Jane|Smith|40",
+      "Bob|Smith|50",
+      "Karen|Williams|60")
 
     // last name, then first name
-    val nameOrdered = Array("Bob|Smith|50",
-                            "Jane|Smith|40",
-                            "Karen|Williams|60",
-                            "Thomas|Williams|30")
+    val nameOrdered = Array(
+      "Bob|Smith|50",
+      "Jane|Smith|40",
+      "Karen|Williams|60",
+      "Thomas|Williams|30")
 
     val parse = (s: String) => {
       val split = s.split("\\|")

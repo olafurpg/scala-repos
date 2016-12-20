@@ -45,15 +45,17 @@ object TabPane {
     if (v != null) v.delegate else null
 
   object TabClosingPolicy
-      extends SFXEnumDelegateCompanion[jfxsc.TabPane.TabClosingPolicy,
-                                       TabClosingPolicy] {
+      extends SFXEnumDelegateCompanion[
+        jfxsc.TabPane.TabClosingPolicy,
+        TabClosingPolicy] {
 
     /**
       * All tabs will have the option to be closed.
       */
     val AllTabs = new TabClosingPolicy(jfxsc.TabPane.TabClosingPolicy.ALL_TABS)
-    @deprecated("Use AllTabs; ALL_TABS will be removed in a future release",
-                "8.0.60-R10")
+    @deprecated(
+      "Use AllTabs; ALL_TABS will be removed in a future release",
+      "8.0.60-R10")
     val ALL_TABS = AllTabs
 
     /**

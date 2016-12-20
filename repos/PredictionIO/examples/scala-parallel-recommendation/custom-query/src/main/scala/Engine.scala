@@ -14,8 +14,9 @@ case class ItemScore(item: String, score: Double, creationYear: Option[Int])
 
 object RecommendationEngine extends IEngineFactory {
   def apply() =
-    new Engine(classOf[DataSource],
-               classOf[Preparator],
-               Map("als" → classOf[ALSAlgorithm]),
-               classOf[Serving])
+    new Engine(
+      classOf[DataSource],
+      classOf[Preparator],
+      Map("als" → classOf[ALSAlgorithm]),
+      classOf[Serving])
 }

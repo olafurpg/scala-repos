@@ -103,8 +103,9 @@ object ScalaIndentProcessor extends ScalaTokenTypes {
     if (node.getElementType == ScalaTokenTypes.tLBRACE &&
         Option(node.getTreeParent)
           .map(_.getElementType)
-          .exists(Set[IElementType](ScalaElementTypes.TRY_BLOCK,
-                                    ScalaElementTypes.PACKAGING).contains)) {
+          .exists(Set[IElementType](
+            ScalaElementTypes.TRY_BLOCK,
+            ScalaElementTypes.PACKAGING).contains)) {
       return if (child.getElementType == ScalaTokenTypes.tLBRACE ||
                  child.getElementType == ScalaTokenTypes.tRBRACE)
         Indent.getNoneIndent

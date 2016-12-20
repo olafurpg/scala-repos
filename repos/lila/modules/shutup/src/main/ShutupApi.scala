@@ -67,10 +67,11 @@ final class ShutupApi(coll: Coll,
                   "$slice" -> -textType.rotation)
               ) ++ pushPublicLine
             coll
-              .findAndUpdate(selector = BSONDocument("_id" -> userId),
-                             update = BSONDocument("$push" -> push),
-                             fetchNewObject = true,
-                             upsert = true)
+              .findAndUpdate(
+                selector = BSONDocument("_id" -> userId),
+                update = BSONDocument("$push" -> push),
+                fetchNewObject = true,
+                upsert = true)
               .map(_.value) map2 UserRecordBSONHandler.read flatMap {
               case None => fufail(s"can't find user record for $userId")
               case Some(userRecord) => legiferate(userRecord)
@@ -86,11 +87,12 @@ final class ShutupApi(coll: Coll,
         .update(
           BSONDocument("_id" -> userRecord.userId),
           BSONDocument(
-            "$unset" -> BSONDocument(TextType.PublicForumMessage.key -> true,
-                                     TextType.TeamForumMessage.key -> true,
-                                     TextType.PrivateMessage.key -> true,
-                                     TextType.PrivateChat.key -> true,
-                                     TextType.PublicChat.key -> true))
+            "$unset" -> BSONDocument(
+              TextType.PublicForumMessage.key -> true,
+              TextType.TeamForumMessage.key -> true,
+              TextType.PrivateMessage.key -> true,
+              TextType.PrivateChat.key -> true,
+              TextType.PublicChat.key -> true))
         )
         .void
     }

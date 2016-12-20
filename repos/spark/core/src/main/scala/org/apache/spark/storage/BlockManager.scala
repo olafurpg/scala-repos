@@ -123,10 +123,11 @@ private[spark] class BlockManager(executorId: String,
     if (externalShuffleServiceEnabled) {
       val transConf =
         SparkTransportConf.fromSparkConf(conf, "shuffle", numUsableCores)
-      new ExternalShuffleClient(transConf,
-                                securityManager,
-                                securityManager.isAuthenticationEnabled(),
-                                securityManager.isSaslEncryptionEnabled())
+      new ExternalShuffleClient(
+        transConf,
+        securityManager,
+        securityManager.isAuthenticationEnabled(),
+        securityManager.isSaslEncryptionEnabled())
     } else {
       blockTransferService
     }
@@ -180,15 +181,17 @@ private[spark] class BlockManager(executorId: String,
     blockTransferService.init(this)
     shuffleClient.init(appId)
 
-    blockManagerId = BlockManagerId(executorId,
-                                    blockTransferService.hostName,
-                                    blockTransferService.port)
+    blockManagerId = BlockManagerId(
+      executorId,
+      blockTransferService.hostName,
+      blockTransferService.port)
 
     shuffleServerId = if (externalShuffleServiceEnabled) {
       logInfo(s"external shuffle service port = $externalShuffleServicePort")
-      BlockManagerId(executorId,
-                     blockTransferService.hostName,
-                     externalShuffleServicePort)
+      BlockManagerId(
+        executorId,
+        blockTransferService.hostName,
+        externalShuffleServicePort)
     } else {
       blockManagerId
     }
@@ -216,10 +219,11 @@ private[spark] class BlockManager(executorId: String,
         // Synchronous and will throw an exception if we cannot connect.
         shuffleClient
           .asInstanceOf[ExternalShuffleClient]
-          .registerWithShuffleServer(shuffleServerId.host,
-                                     shuffleServerId.port,
-                                     shuffleServerId.executorId,
-                                     shuffleConfig)
+          .registerWithShuffleServer(
+            shuffleServerId.host,
+            shuffleServerId.port,
+            shuffleServerId.executorId,
+            shuffleConfig)
         return
       } catch {
         case e: Exception if i < MAX_ATTEMPTS =>
@@ -382,11 +386,12 @@ private[spark] class BlockManager(executorId: String,
       val storageLevel = status.storageLevel
       val inMemSize = Math.max(status.memSize, droppedMemorySize)
       val onDiskSize = status.diskSize
-      master.updateBlockInfo(blockManagerId,
-                             blockId,
-                             storageLevel,
-                             inMemSize,
-                             onDiskSize)
+      master.updateBlockInfo(
+        blockManagerId,
+        blockId,
+        storageLevel,
+        inMemSize,
+        onDiskSize)
     } else {
       true
     }
@@ -464,8 +469,9 @@ private[spark] class BlockManager(executorId: String,
                 maybeCacheDiskBytesInMemory(info, blockId, level, diskBytes))
             }
           }
-          val ci = CompletionIterator[Any, Iterator[Any]](iterToReturn,
-                                                          releaseLock(blockId))
+          val ci = CompletionIterator[Any, Iterator[Any]](
+            iterToReturn,
+            releaseLock(blockId))
           Some(new BlockResult(ci, DataReadMethod.Disk, info.size))
         } else {
           releaseLock(blockId)
@@ -531,10 +537,11 @@ private[spark] class BlockManager(executorId: String,
       if (level.useMemory && memoryStore.contains(blockId)) {
         memoryStore.getBytes(blockId).get
       } else if (level.useDisk && diskStore.contains(blockId)) {
-        maybeCacheDiskBytesInMemory(info,
-                                    blockId,
-                                    level,
-                                    diskStore.getBytes(blockId))
+        maybeCacheDiskBytesInMemory(
+          info,
+          blockId,
+          level,
+          diskStore.getBytes(blockId))
       } else {
         releaseLock(blockId)
         throw new SparkException(
@@ -550,9 +557,10 @@ private[spark] class BlockManager(executorId: String,
     */
   def getRemoteValues(blockId: BlockId): Option[BlockResult] = {
     getRemoteBytes(blockId).map { data =>
-      new BlockResult(dataDeserialize(blockId, data),
-                      DataReadMethod.Network,
-                      data.size)
+      new BlockResult(
+        dataDeserialize(blockId, data),
+        DataReadMethod.Network,
+        data.size)
     }
   }
 
@@ -601,9 +609,10 @@ private[spark] class BlockManager(executorId: String,
               e)
           }
 
-          logWarning(s"Failed to fetch remote block $blockId " +
-                       s"from $loc (failed attempt $runningFailureCount)",
-                     e)
+          logWarning(
+            s"Failed to fetch remote block $blockId " +
+              s"from $loc (failed attempt $runningFailureCount)",
+            e)
 
           // If there is a large number of executors then locations list can contain a
           // large number of stale entries causing a large number of retries that may
@@ -750,13 +759,14 @@ private[spark] class BlockManager(executorId: String,
     val compressStream: OutputStream => OutputStream =
       wrapForCompression(blockId, _)
     val syncWrites = conf.getBoolean("spark.shuffle.sync", false)
-    new DiskBlockObjectWriter(file,
-                              serializerInstance,
-                              bufferSize,
-                              compressStream,
-                              syncWrites,
-                              writeMetrics,
-                              blockId)
+    new DiskBlockObjectWriter(
+      file,
+      serializerInstance,
+      bufferSize,
+      compressStream,
+      syncWrites,
+      writeMetrics,
+      blockId)
   }
 
   /**

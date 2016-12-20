@@ -280,9 +280,10 @@ object PowerIterationClustering extends Logging {
     }, mergeMsg = _ + _, TripletFields.EdgeOnly)
     Graph(vD, graph.edges).mapTriplets(
       e => e.attr / math.max(e.srcAttr, MLUtils.EPSILON),
-      new TripletFields( /* useSrc */ true,
-                        /* useDst */ false,
-                        /* useEdge */ true))
+      new TripletFields(
+        /* useSrc */ true,
+        /* useDst */ false,
+        /* useEdge */ true))
   }
 
   /**
@@ -308,9 +309,10 @@ object PowerIterationClustering extends Logging {
     }, mergeMsg = _ + _, TripletFields.EdgeOnly)
     Graph(vD, gA.edges).mapTriplets(
       e => e.attr / math.max(e.srcAttr, MLUtils.EPSILON),
-      new TripletFields( /* useSrc */ true,
-                        /* useDst */ false,
-                        /* useEdge */ true))
+      new TripletFields(
+        /* useSrc */ true,
+        /* useDst */ false,
+        /* useEdge */ true))
   }
 
   /**
@@ -372,9 +374,10 @@ object PowerIterationClustering extends Logging {
         .aggregateMessages[Double](
           sendMsg = ctx => ctx.sendToSrc(ctx.attr * ctx.dstAttr),
           mergeMsg = _ + _,
-          new TripletFields( /* useSrc */ false,
-                            /* useDst */ true,
-                            /* useEdge */ true))
+          new TripletFields(
+            /* useSrc */ false,
+            /* useDst */ true,
+            /* useEdge */ true))
         .cache()
       // normalize v
       val norm = v.values.map(math.abs).sum()

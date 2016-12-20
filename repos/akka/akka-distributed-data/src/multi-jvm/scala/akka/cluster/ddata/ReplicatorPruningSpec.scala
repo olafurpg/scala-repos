@@ -78,9 +78,10 @@ class ReplicatorPruningSpec
 
       // we need the UniqueAddress
       val memberProbe = TestProbe()
-      cluster.subscribe(memberProbe.ref,
-                        initialStateMode = InitialStateAsEvents,
-                        classOf[MemberUp])
+      cluster.subscribe(
+        memberProbe.ref,
+        initialStateMode = InitialStateAsEvents,
+        classOf[MemberUp])
       val thirdUniqueAddress = {
         val member = memberProbe
           .fishForMessage(3.seconds) {

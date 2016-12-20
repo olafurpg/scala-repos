@@ -36,8 +36,9 @@ class OptimizedBytecodeTest extends ClearAfterClass {
         |}
       """.stripMargin
     val List(c) = compileClasses(compiler)(code)
-    assertSameCode(getSingleMethod(c, "t"),
-                   List(Label(0), Jump(GOTO, Label(0))))
+    assertSameCode(
+      getSingleMethod(c, "t"),
+      List(Label(0), Jump(GOTO, Label(0))))
   }
 
   @Test
@@ -58,10 +59,12 @@ class OptimizedBytecodeTest extends ClearAfterClass {
     assertSameSummary(
       getSingleMethod(c, "t"),
       List(LDC, ASTORE, ALOAD /*0*/, ALOAD /*1*/, "C$$$anonfun$1", IRETURN))
-    assertSameSummary(getSingleMethod(c, "C$$$anonfun$1"),
-                      List(LDC, "C$$$anonfun$2", IRETURN))
-    assertSameSummary(getSingleMethod(c, "C$$$anonfun$2"),
-                      List(-1 /*A*/, GOTO /*A*/ ))
+    assertSameSummary(
+      getSingleMethod(c, "C$$$anonfun$1"),
+      List(LDC, "C$$$anonfun$2", IRETURN))
+    assertSameSummary(
+      getSingleMethod(c, "C$$$anonfun$2"),
+      List(-1 /*A*/, GOTO /*A*/ ))
   }
 
   @Test
@@ -84,8 +87,9 @@ class OptimizedBytecodeTest extends ClearAfterClass {
     val List(c, t, tMod) = compileClasses(compiler)(
       code,
       allowMessage = _.msg.contains("not be exhaustive"))
-    assertSameSummary(getSingleMethod(c, "t"),
-                      List(GETSTATIC, "$qmark$qmark$qmark", ATHROW))
+    assertSameSummary(
+      getSingleMethod(c, "t"),
+      List(GETSTATIC, "$qmark$qmark$qmark", ATHROW))
   }
 
   @Test
@@ -132,9 +136,9 @@ class OptimizedBytecodeTest extends ClearAfterClass {
         |object Warmup { def filter[A](p: Any => Boolean): Any = filter[Any](p) }
       """.stripMargin
     val c2 = "class C { def t = warmup.Warmup.filter[Any](x => false) }"
-    val List(c, _, _) = compileClassesSeparately(List(c1, c2),
-                                                 extraArgs =
-                                                   OptimizedBytecodeTest.args)
+    val List(c, _, _) = compileClassesSeparately(
+      List(c1, c2),
+      extraArgs = OptimizedBytecodeTest.args)
     assertInvoke(getSingleMethod(c, "t"), "warmup/Warmup$", "filter")
   }
 
@@ -231,16 +235,18 @@ class OptimizedBytecodeTest extends ClearAfterClass {
         |}
       """.stripMargin
     val List(c) = compileClasses(compiler)(code)
-    assertSameSummary(getSingleMethod(c, "t"),
-                      List(ALOAD /*1*/,
-                           INSTANCEOF /*Some*/,
-                           IFNE /*A*/,
-                           ALOAD /*0*/,
-                           "getInt",
-                           POP,
-                           -1 /*A*/,
-                           BIPUSH,
-                           IRETURN))
+    assertSameSummary(
+      getSingleMethod(c, "t"),
+      List(
+        ALOAD /*1*/,
+        INSTANCEOF /*Some*/,
+        IFNE /*A*/,
+        ALOAD /*0*/,
+        "getInt",
+        POP,
+        -1 /*A*/,
+        BIPUSH,
+        IRETURN))
   }
 
   @Test
@@ -255,24 +261,26 @@ class OptimizedBytecodeTest extends ClearAfterClass {
         |}
       """.stripMargin
     val List(c) = compileClasses(compiler)(code)
-    assertSameSummary(getSingleMethod(c, "t"),
-                      List(-1 /*A*/,
-                           ILOAD /*1*/,
-                           TABLESWITCH,
-                           -1,
-                           ALOAD,
-                           "pr",
-                           RETURN,
-                           -1,
-                           ALOAD,
-                           "pr",
-                           RETURN,
-                           -1,
-                           ILOAD,
-                           ICONST_2,
-                           ISUB,
-                           ISTORE,
-                           GOTO /*A*/ ))
+    assertSameSummary(
+      getSingleMethod(c, "t"),
+      List(
+        -1 /*A*/,
+        ILOAD /*1*/,
+        TABLESWITCH,
+        -1,
+        ALOAD,
+        "pr",
+        RETURN,
+        -1,
+        ALOAD,
+        "pr",
+        RETURN,
+        -1,
+        ILOAD,
+        ICONST_2,
+        ISUB,
+        ISTORE,
+        GOTO /*A*/ ))
   }
 
   @Test
@@ -290,25 +298,27 @@ class OptimizedBytecodeTest extends ClearAfterClass {
         |}
       """.stripMargin
 
-    val cls = compileClassesSeparately(List(c1, c2),
-                                       extraArgs = OptimizedBytecodeTest.args)
+    val cls = compileClassesSeparately(
+      List(c1, c2),
+      extraArgs = OptimizedBytecodeTest.args)
     val c = cls.find(_.name == "C").get
     assertSameSummary(
       getSingleMethod(c, "t"),
-      List(GETSTATIC,
-           IFNONNULL,
-           ACONST_NULL,
-           ATHROW, // module load and null checks not yet eliminated
-           -1,
-           ICONST_1,
-           GETSTATIC,
-           IFNONNULL,
-           ACONST_NULL,
-           ATHROW,
-           -1,
-           ICONST_2,
-           IADD,
-           IRETURN))
+      List(
+        GETSTATIC,
+        IFNONNULL,
+        ACONST_NULL,
+        ATHROW, // module load and null checks not yet eliminated
+        -1,
+        ICONST_1,
+        GETSTATIC,
+        IFNONNULL,
+        ACONST_NULL,
+        ATHROW,
+        -1,
+        ICONST_2,
+        IADD,
+        IRETURN))
   }
 
   @Test

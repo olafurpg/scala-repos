@@ -25,23 +25,25 @@ trait Expect100ContinueSpec
     def withServer[T](action: EssentialAction)(block: Port => T) = {
       val port = testServerPort
       running(
-        TestServer(port,
-                   GuiceApplicationBuilder()
-                     .routes {
-                       case _ => action
-                     }
-                     .build())) {
+        TestServer(
+          port,
+          GuiceApplicationBuilder()
+            .routes {
+              case _ => action
+            }
+            .build())) {
         block(port)
       }
     }
 
     "honour 100 continue" in withServer(Action(req => Results.Ok)) { port =>
       val responses = BasicHttpClient.makeRequests(port)(
-        BasicRequest("POST",
-                     "/",
-                     "HTTP/1.1",
-                     Map("Expect" -> "100-continue", "Content-Length" -> "10"),
-                     "abcdefghij")
+        BasicRequest(
+          "POST",
+          "/",
+          "HTTP/1.1",
+          Map("Expect" -> "100-continue", "Content-Length" -> "10"),
+          "abcdefghij")
       )
       responses.length must_== 2
       responses(0).status must_== 100
@@ -52,12 +54,12 @@ trait Expect100ContinueSpec
       EssentialAction(_ => Accumulator.done(Results.Ok))
     ) { port =>
       val responses = BasicHttpClient.makeRequests(port)(
-        BasicRequest("POST",
-                     "/",
-                     "HTTP/1.1",
-                     Map("Expect" -> "100-continue",
-                         "Content-Length" -> "100000"),
-                     "foo")
+        BasicRequest(
+          "POST",
+          "/",
+          "HTTP/1.1",
+          Map("Expect" -> "100-continue", "Content-Length" -> "100000"),
+          "foo")
       )
       responses.length must_== 1
       responses(0).status must_== 200
@@ -74,12 +76,12 @@ trait Expect100ContinueSpec
       EssentialAction(_ => Accumulator.done(Results.Ok))
     ) { port =>
       val responses = BasicHttpClient.makeRequests(port, checkClosed = true)(
-        BasicRequest("POST",
-                     "/",
-                     "HTTP/1.1",
-                     Map("Expect" -> "100-continue",
-                         "Content-Length" -> "100000"),
-                     "foo")
+        BasicRequest(
+          "POST",
+          "/",
+          "HTTP/1.1",
+          Map("Expect" -> "100-continue", "Content-Length" -> "100000"),
+          "foo")
       )
       responses.length must_== 1
       responses(0).status must_== 200
@@ -89,11 +91,12 @@ trait Expect100ContinueSpec
       Action(req => Results.Ok)
     ) { port =>
       val responses = BasicHttpClient.makeRequests(port)(
-        BasicRequest("POST",
-                     "/",
-                     "HTTP/1.1",
-                     Map("Expect" -> "100-continue", "Content-Length" -> "10"),
-                     "abcdefghij"),
+        BasicRequest(
+          "POST",
+          "/",
+          "HTTP/1.1",
+          Map("Expect" -> "100-continue", "Content-Length" -> "10"),
+          "abcdefghij"),
         BasicRequest("GET", "/", "HTTP/1.1", Map(), "")
       )
       responses.length must_== 3

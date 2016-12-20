@@ -185,9 +185,10 @@ object ZKData {
       val content =
         if (proto.getCompressed) uncompress(proto.getValue.toByteArray)
         else proto.getValue.toByteArray
-      new ZKData(proto.getName,
-                 UUIDUtil.uuid(proto.getUuid.toByteArray),
-                 content)
+      new ZKData(
+        proto.getName,
+        UUIDUtil.uuid(proto.getUuid.toByteArray),
+        content)
     } catch {
       case ex: InvalidProtocolBufferException =>
         throw new StoreCommandFailedException(

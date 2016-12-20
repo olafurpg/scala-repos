@@ -128,12 +128,13 @@ object MongoAPIKeyManager extends Logging {
       None
     )
 
-    val rootAPIKeyRecord = APIKeyRecord(rootAPIKeyId,
-                                        Some("root-apiKey"),
-                                        Some("The root API key"),
-                                        rootAPIKeyId,
-                                        Set(rootGrantId),
-                                        true)
+    val rootAPIKeyRecord = APIKeyRecord(
+      rootAPIKeyId,
+      Some("root-apiKey"),
+      Some("The root API key"),
+      rootAPIKeyId,
+      Set(rootGrantId),
+      true)
 
     for {
       _ <- db(
@@ -191,12 +192,13 @@ class MongoAPIKeyManager(
                    description: Option[String],
                    issuerKey: APIKey,
                    grants: Set[GrantId]): Future[APIKeyRecord] = {
-    val apiKey = APIKeyRecord(APIKeyManager.newAPIKey(),
-                              name,
-                              description,
-                              issuerKey,
-                              grants,
-                              false)
+    val apiKey = APIKeyRecord(
+      APIKeyManager.newAPIKey(),
+      name,
+      description,
+      issuerKey,
+      grants,
+      false)
     database(
       insert(apiKey.serialize.asInstanceOf[JObject])
         .into(settings.apiKeys)) map { _ =>
@@ -210,14 +212,15 @@ class MongoAPIKeyManager(
                   parentIds: Set[GrantId],
                   perms: Set[Permission],
                   expiration: Option[DateTime]): Future[Grant] = {
-    val ng = Grant(APIKeyManager.newGrantId(),
-                   name,
-                   description,
-                   issuerKey,
-                   parentIds,
-                   perms,
-                   clock.instant(),
-                   expiration)
+    val ng = Grant(
+      APIKeyManager.newGrantId(),
+      name,
+      description,
+      issuerKey,
+      parentIds,
+      perms,
+      clock.instant(),
+      expiration)
     logger.debug("Adding grant: " + ng)
     database(insert(ng.serialize.asInstanceOf[JObject]).into(settings.grants)) map {
       _ =>

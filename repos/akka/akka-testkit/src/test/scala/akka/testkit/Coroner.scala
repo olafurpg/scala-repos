@@ -121,8 +121,9 @@ object Coroner {
         watchedHandle.finished()
       }
     }
-    new Thread(new Runnable { def run = triggerReportIfOverdue(duration) },
-               "Coroner").start()
+    new Thread(
+      new Runnable { def run = triggerReportIfOverdue(duration) },
+      "Coroner").start()
     watchedHandle.waitForStart()
     watchedHandle
   }
@@ -149,8 +150,9 @@ object Coroner {
                  .getNonHeapMemoryUsage()}""".stripMargin('#'))
 
     def dumpAllThreads: Seq[ThreadInfo] = {
-      threadMx.dumpAllThreads(threadMx.isObjectMonitorUsageSupported,
-                              threadMx.isSynchronizerUsageSupported)
+      threadMx.dumpAllThreads(
+        threadMx.isObjectMonitorUsageSupported,
+        threadMx.isSynchronizerUsageSupported)
     }
 
     def findDeadlockedThreads: (Seq[ThreadInfo], String) = {
@@ -266,11 +268,12 @@ trait WatchedByCoroner { self: TestKit ⇒
   @volatile private var coronerWatch: Coroner.WatchHandle = _
 
   final def startCoroner() {
-    coronerWatch = Coroner.watch(expectedTestDuration.dilated,
-                                 getClass.getName,
-                                 System.err,
-                                 startAndStopDuration.dilated,
-                                 displayThreadCounts)
+    coronerWatch = Coroner.watch(
+      expectedTestDuration.dilated,
+      getClass.getName,
+      System.err,
+      startAndStopDuration.dilated,
+      displayThreadCounts)
   }
 
   final def stopCoroner() {

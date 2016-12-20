@@ -185,11 +185,12 @@ class ALSSuite
          uncompressed.ratings(i))
       }
       .toSet
-    val expected = Set((1, 0, 0, 1.0f),
-                       (0, 0, 1, 2.0f),
-                       (2, 0, 4, 3.0f),
-                       (3, 1, 2, 4.0f),
-                       (0, 1, 5, 5.0f))
+    val expected = Set(
+      (1, 0, 0, 1.0f),
+      (0, 0, 1, 2.0f),
+      (2, 0, 4, 3.0f),
+      (3, 1, 2, 4.0f),
+      (0, 1, 5, 5.0f))
     assert(records === expected)
 
     val compressed = uncompressed.compress()
@@ -409,107 +410,121 @@ class ALSSuite
   test("exact rank-1 matrix") {
     val (training, test) =
       genExplicitTestData(numUsers = 20, numItems = 40, rank = 1)
-    testALS(training,
-            test,
-            maxIter = 1,
-            rank = 1,
-            regParam = 1e-5,
-            targetRMSE = 0.001)
-    testALS(training,
-            test,
-            maxIter = 1,
-            rank = 2,
-            regParam = 1e-5,
-            targetRMSE = 0.001)
+    testALS(
+      training,
+      test,
+      maxIter = 1,
+      rank = 1,
+      regParam = 1e-5,
+      targetRMSE = 0.001)
+    testALS(
+      training,
+      test,
+      maxIter = 1,
+      rank = 2,
+      regParam = 1e-5,
+      targetRMSE = 0.001)
   }
 
   test("approximate rank-1 matrix") {
-    val (training, test) = genExplicitTestData(numUsers = 20,
-                                               numItems = 40,
-                                               rank = 1,
-                                               noiseStd = 0.01)
-    testALS(training,
-            test,
-            maxIter = 2,
-            rank = 1,
-            regParam = 0.01,
-            targetRMSE = 0.02)
-    testALS(training,
-            test,
-            maxIter = 2,
-            rank = 2,
-            regParam = 0.01,
-            targetRMSE = 0.02)
+    val (training, test) = genExplicitTestData(
+      numUsers = 20,
+      numItems = 40,
+      rank = 1,
+      noiseStd = 0.01)
+    testALS(
+      training,
+      test,
+      maxIter = 2,
+      rank = 1,
+      regParam = 0.01,
+      targetRMSE = 0.02)
+    testALS(
+      training,
+      test,
+      maxIter = 2,
+      rank = 2,
+      regParam = 0.01,
+      targetRMSE = 0.02)
   }
 
   test("approximate rank-2 matrix") {
-    val (training, test) = genExplicitTestData(numUsers = 20,
-                                               numItems = 40,
-                                               rank = 2,
-                                               noiseStd = 0.01)
-    testALS(training,
-            test,
-            maxIter = 4,
-            rank = 2,
-            regParam = 0.01,
-            targetRMSE = 0.03)
-    testALS(training,
-            test,
-            maxIter = 4,
-            rank = 3,
-            regParam = 0.01,
-            targetRMSE = 0.03)
+    val (training, test) = genExplicitTestData(
+      numUsers = 20,
+      numItems = 40,
+      rank = 2,
+      noiseStd = 0.01)
+    testALS(
+      training,
+      test,
+      maxIter = 4,
+      rank = 2,
+      regParam = 0.01,
+      targetRMSE = 0.03)
+    testALS(
+      training,
+      test,
+      maxIter = 4,
+      rank = 3,
+      regParam = 0.01,
+      targetRMSE = 0.03)
   }
 
   test("different block settings") {
-    val (training, test) = genExplicitTestData(numUsers = 20,
-                                               numItems = 40,
-                                               rank = 2,
-                                               noiseStd = 0.01)
+    val (training, test) = genExplicitTestData(
+      numUsers = 20,
+      numItems = 40,
+      rank = 2,
+      noiseStd = 0.01)
     for ((numUserBlocks, numItemBlocks) <- Seq((1, 1), (1, 2), (2, 1), (2, 2))) {
-      testALS(training,
-              test,
-              maxIter = 4,
-              rank = 3,
-              regParam = 0.01,
-              targetRMSE = 0.03,
-              numUserBlocks = numUserBlocks,
-              numItemBlocks = numItemBlocks)
+      testALS(
+        training,
+        test,
+        maxIter = 4,
+        rank = 3,
+        regParam = 0.01,
+        targetRMSE = 0.03,
+        numUserBlocks = numUserBlocks,
+        numItemBlocks = numItemBlocks)
     }
   }
 
   test("more blocks than ratings") {
     val (training, test) =
       genExplicitTestData(numUsers = 4, numItems = 4, rank = 1)
-    testALS(training,
-            test,
-            maxIter = 2,
-            rank = 1,
-            regParam = 1e-4,
-            targetRMSE = 0.002,
-            numItemBlocks = 5,
-            numUserBlocks = 5)
+    testALS(
+      training,
+      test,
+      maxIter = 2,
+      rank = 1,
+      regParam = 1e-4,
+      targetRMSE = 0.002,
+      numItemBlocks = 5,
+      numUserBlocks = 5)
   }
 
   test("implicit feedback") {
-    val (training, test) = genImplicitTestData(numUsers = 20,
-                                               numItems = 40,
-                                               rank = 2,
-                                               noiseStd = 0.01)
-    testALS(training,
-            test,
-            maxIter = 4,
-            rank = 2,
-            regParam = 0.01,
-            implicitPrefs = true,
-            targetRMSE = 0.3)
+    val (training, test) = genImplicitTestData(
+      numUsers = 20,
+      numItems = 40,
+      rank = 2,
+      noiseStd = 0.01)
+    testALS(
+      training,
+      test,
+      maxIter = 4,
+      rank = 2,
+      regParam = 0.01,
+      implicitPrefs = true,
+      targetRMSE = 0.3)
   }
 
   test("using generic ID types") {
-    val (ratings, _) = genImplicitTestData(numUsers = 20,
-                                           numItems = 40,
-                                           rank = 2,
-                                           noiseStd = 0.01)
+    val (ratings, _) = genImplicitTestData(
+      numUsers = 20,
+      numItems = 40,
+      rank = 2,
+      noiseStd = 0.01)
 
     val longRatings =
       ratings.map(r => Rating(r.user.toLong, r.item.toLong, r.rating))
@@ -525,10 +540,11 @@ class ALSSuite
   }
 
   test("nonnegative constraint") {
-    val (ratings, _) = genImplicitTestData(numUsers = 20,
-                                           numItems = 40,
-                                           rank = 2,
-                                           noiseStd = 0.01)
+    val (ratings, _) = genImplicitTestData(
+      numUsers = 20,
+      numItems = 40,
+      rank = 2,
+      noiseStd = 0.01)
     val (userFactors, itemFactors) =
       ALS.train(ratings, rank = 2, maxIter = 4, nonnegative = true, seed = 0)
     def isNonnegative(factors: RDD[(Int, Array[Float])]): Boolean = {
@@ -552,19 +568,22 @@ class ALSSuite
   }
 
   test("partitioner in returned factors") {
-    val (ratings, _) = genImplicitTestData(numUsers = 20,
-                                           numItems = 40,
-                                           rank = 2,
-                                           noiseStd = 0.01)
-    val (userFactors, itemFactors) = ALS.train(ratings,
-                                               rank = 2,
-                                               maxIter = 4,
-                                               numUserBlocks = 3,
-                                               numItemBlocks = 4,
-                                               seed = 0)
+    val (ratings, _) = genImplicitTestData(
+      numUsers = 20,
+      numItems = 40,
+      rank = 2,
+      noiseStd = 0.01)
+    val (userFactors, itemFactors) = ALS.train(
+      ratings,
+      rank = 2,
+      maxIter = 4,
+      numUserBlocks = 3,
+      numItemBlocks = 4,
+      seed = 0)
     for ((tpe, factors) <- Seq(("User", userFactors), ("Item", itemFactors))) {
-      assert(userFactors.partitioner.isDefined,
-             s"$tpe factors should have partitioner.")
+      assert(
+        userFactors.partitioner.isDefined,
+        s"$tpe factors should have partitioner.")
       val part = userFactors.partitioner.get
       userFactors
         .mapPartitionsWithIndex { (idx, items) =>
@@ -584,19 +603,21 @@ class ALSSuite
   test("als with large number of iterations") {
     val (ratings, _) =
       genExplicitTestData(numUsers = 4, numItems = 4, rank = 1)
-    ALS.train(ratings,
-              rank = 1,
-              maxIter = 50,
-              numUserBlocks = 2,
-              numItemBlocks = 2,
-              seed = 0)
-    ALS.train(ratings,
-              rank = 1,
-              maxIter = 50,
-              numUserBlocks = 2,
-              numItemBlocks = 2,
-              implicitPrefs = true,
-              seed = 0)
+    ALS.train(
+      ratings,
+      rank = 1,
+      maxIter = 50,
+      numUserBlocks = 2,
+      numItemBlocks = 2,
+      seed = 0)
+    ALS.train(
+      ratings,
+      rank = 1,
+      maxIter = 50,
+      numUserBlocks = 2,
+      numItemBlocks = 2,
+      implicitPrefs = true,
+      seed = 0)
   }
 
   test("read/write") {

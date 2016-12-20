@@ -71,10 +71,11 @@ class ORMultiMapSpec extends WordSpec with Matchers {
 
       // merge both ways
 
-      val expectedMerged = Map("a" -> Set("A2"),
-                               "b" -> Set("B1"),
-                               "c" -> Set("C2"),
-                               "d" -> Set("D1", "D2"))
+      val expectedMerged = Map(
+        "a" -> Set("A2"),
+        "b" -> Set("B1"),
+        "c" -> Set("C2"),
+        "d" -> Set("D1", "D2"))
 
       val merged1 = m1 merge m2
       merged1.entries should be(expectedMerged)

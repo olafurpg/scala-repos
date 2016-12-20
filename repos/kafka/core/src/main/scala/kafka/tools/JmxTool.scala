@@ -51,17 +51,19 @@ object JmxTool extends Logging {
       .describedAs("name")
       .ofType(classOf[String])
     val reportingIntervalOpt = parser
-      .accepts("reporting-interval",
-               "Interval in MS with which to poll jmx stats.")
+      .accepts(
+        "reporting-interval",
+        "Interval in MS with which to poll jmx stats.")
       .withRequiredArg
       .describedAs("ms")
       .ofType(classOf[java.lang.Integer])
       .defaultsTo(2000)
     val helpOpt = parser.accepts("help", "Print usage information.")
     val dateFormatOpt = parser
-      .accepts("date-format",
-               "The date format to use for formatting the time field. " +
-                 "See java.text.SimpleDateFormat for options.")
+      .accepts(
+        "date-format",
+        "The date format to use for formatting the time field. " +
+          "See java.text.SimpleDateFormat for options.")
       .withRequiredArg
       .describedAs("format")
       .ofType(classOf[String])
@@ -151,8 +153,9 @@ object JmxTool extends Logging {
     var attributes = new mutable.HashMap[String, Any]()
     for (name <- names) {
       val mbean = mbsc.getMBeanInfo(name)
-      for (attrObj <- mbsc.getAttributes(name,
-                                         mbean.getAttributes.map(_.getName))) {
+      for (attrObj <- mbsc.getAttributes(
+             name,
+             mbean.getAttributes.map(_.getName))) {
         val attr = attrObj.asInstanceOf[Attribute]
         attributesWhitelist match {
           case Some(allowedAttributes) =>

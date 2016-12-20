@@ -32,8 +32,9 @@ private[spark] class PartitionedPairBuffer[K, V](initialCapacity: Int = 64)
     with SizeTracker {
   import PartitionedPairBuffer._
 
-  require(initialCapacity <= MAXIMUM_CAPACITY,
-          s"Can't make capacity bigger than ${MAXIMUM_CAPACITY} elements")
+  require(
+    initialCapacity <= MAXIMUM_CAPACITY,
+    s"Can't make capacity bigger than ${MAXIMUM_CAPACITY} elements")
   require(initialCapacity >= 1, "Invalid initial capacity")
 
   // Basic growable array data structure. We use a single array of AnyRef to hold both the keys

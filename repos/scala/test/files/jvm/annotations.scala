@@ -73,8 +73,9 @@ object Test4 {
     value = "http://scala-lang.org",
     mails = Array("scala@lists.epfl.ch", "scala-lounge@lists.epfl.ch"))
   class Foo1
-  @SourceAnnotation(value = "http://bloodsuckers.com",
-                    mails = Array("you@bloodsuckers.com"))
+  @SourceAnnotation(
+    value = "http://bloodsuckers.com",
+    mails = Array("you@bloodsuckers.com"))
   class Foo2
   @SourceAnnotation("http://bloodsuckers.com")
   class Foo3

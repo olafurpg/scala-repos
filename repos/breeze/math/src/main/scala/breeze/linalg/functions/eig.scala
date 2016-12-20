@@ -42,20 +42,21 @@ object eig extends UFunc {
       val worksize = Array.ofDim[Double](1)
       val info = new intW(0)
 
-      lapack.dgeev("N",
-                   "V",
-                   n,
-                   Array.empty[Double],
-                   scala.math.max(1, n),
-                   Array.empty[Double],
-                   Array.empty[Double],
-                   Array.empty[Double],
-                   scala.math.max(1, n),
-                   Array.empty[Double],
-                   scala.math.max(1, n),
-                   worksize,
-                   -1,
-                   info)
+      lapack.dgeev(
+        "N",
+        "V",
+        n,
+        Array.empty[Double],
+        scala.math.max(1, n),
+        Array.empty[Double],
+        Array.empty[Double],
+        Array.empty[Double],
+        scala.math.max(1, n),
+        Array.empty[Double],
+        scala.math.max(1, n),
+        worksize,
+        -1,
+        info)
 
       // Allocate the workspace
       val lwork: Int =
@@ -68,20 +69,21 @@ object eig extends UFunc {
 
       val A = DenseMatrix.zeros[Double](n, n)
       A := m
-      lapack.dgeev("N",
-                   "V",
-                   n,
-                   A.data,
-                   scala.math.max(1, n),
-                   Wr.data,
-                   Wi.data,
-                   Array.empty[Double],
-                   scala.math.max(1, n),
-                   Vr.data,
-                   scala.math.max(1, n),
-                   work,
-                   work.length,
-                   info)
+      lapack.dgeev(
+        "N",
+        "V",
+        n,
+        A.data,
+        scala.math.max(1, n),
+        Wr.data,
+        Wi.data,
+        Array.empty[Double],
+        scala.math.max(1, n),
+        Vr.data,
+        scala.math.max(1, n),
+        work,
+        work.length,
+        info)
 
       if (info.`val` > 0)
         throw new NotConvergedException(NotConvergedException.Iterations)

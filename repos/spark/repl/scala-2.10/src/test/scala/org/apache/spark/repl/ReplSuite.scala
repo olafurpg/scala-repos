@@ -65,14 +65,16 @@ class ReplSuite extends SparkFunSuite {
 
   def assertContains(message: String, output: String) {
     val isContain = output.contains(message)
-    assert(isContain,
-           "Interpreter output did not contain '" + message + "':\n" + output)
+    assert(
+      isContain,
+      "Interpreter output did not contain '" + message + "':\n" + output)
   }
 
   def assertDoesNotContain(message: String, output: String) {
     val isContain = output.contains(message)
-    assert(!isContain,
-           "Interpreter output contained '" + message + "':\n" + output)
+    assert(
+      !isContain,
+      "Interpreter output contained '" + message + "':\n" + output)
   }
 
   test("propagation of local properties") {
@@ -106,8 +108,9 @@ class ReplSuite extends SparkFunSuite {
 
   test("simple foreach with accumulator") {
     val output =
-      runInterpreter("local",
-                     """
+      runInterpreter(
+        "local",
+        """
         |val accum = sc.accumulator(0)
         |sc.parallelize(1 to 10).foreach(x => accum += x)
         |accum.value
@@ -201,15 +204,16 @@ class ReplSuite extends SparkFunSuite {
     out.write("Goodbye\n")
     out.close()
     val output =
-      runInterpreter("local",
-                     """
+      runInterpreter(
+        "local",
+        """
         |var file = sc.textFile("%s").cache()
         |file.count()
         |file.count()
         |file.count()
       """.stripMargin.format(
-                       StringEscapeUtils.escapeJava(
-                         tempDir.getAbsolutePath + File.separator + "input")))
+          StringEscapeUtils.escapeJava(
+            tempDir.getAbsolutePath + File.separator + "input")))
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
     assertContains("res0: Long = 3", output)
@@ -255,8 +259,9 @@ class ReplSuite extends SparkFunSuite {
   }
 
   test("SPARK-2452 compound statements.") {
-    val output = runInterpreter("local",
-                                """
+    val output = runInterpreter(
+      "local",
+      """
         |val x = 4 ; def f() = x
         |f()
       """.stripMargin)
@@ -283,8 +288,9 @@ class ReplSuite extends SparkFunSuite {
 
   test("SPARK-8461 SQL with codegen") {
     val output =
-      runInterpreter("local",
-                     """
+      runInterpreter(
+        "local",
+        """
       |val sqlContext = new org.apache.spark.sql.SQLContext(sc)
       |sqlContext.setConf("spark.sql.codegen", "true")
       |sqlContext.range(0, 100).filter('id > 50).count()
@@ -394,8 +400,9 @@ class ReplSuite extends SparkFunSuite {
 
   test("collecting objects of class defined in repl - shuffling") {
     val output =
-      runInterpreter("local-cluster[1,1,1024]",
-                     """
+      runInterpreter(
+        "local-cluster[1,1,1024]",
+        """
         |case class Foo(i: Int)
         |val list = List((1, Foo(1)), (1, Foo(2)))
         |val ret = sc.parallelize(list).groupByKey().collect()

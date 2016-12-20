@@ -131,13 +131,15 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
           resKind = tpeTK(larg).maxType(tpeTK(rarg))
           if (scalaPrimitives.isShiftOp(code) ||
               scalaPrimitives.isBitwiseOp(code)) {
-            assert(resKind.isIntegralType || (resKind == BOOL),
-                   s"$resKind incompatible with arithmetic modulo operation.")
+            assert(
+              resKind.isIntegralType || (resKind == BOOL),
+              s"$resKind incompatible with arithmetic modulo operation.")
           }
 
           genLoad(larg, resKind)
-          genLoad(rarg, // check .NET size of shift arguments!
-                  if (scalaPrimitives.isShiftOp(code)) INT else resKind)
+          genLoad(
+            rarg, // check .NET size of shift arguments!
+            if (scalaPrimitives.isShiftOp(code)) INT else resKind)
 
           (code: @switch) match {
             case ADD => bc add resKind
@@ -173,8 +175,9 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
 
       if (scalaPrimitives.isArrayGet(code)) {
         // load argument on stack
-        assert(args.length == 1,
-               s"Too many arguments for array get operation: $tree");
+        assert(
+          args.length == 1,
+          s"Too many arguments for array get operation: $tree");
         genLoad(args.head, INT)
         generatedType = k.asArrayBType.componentType
         bc.aload(elementType)
@@ -336,10 +339,11 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
           genLoadArguments(
             dynamicArgs,
             qual.symbol.info.params.map(param => typeToBType(param.info)))
-          mnode.visitInvokeDynamicInsn(qual.symbol.name.encoded,
-                                       descriptor.descriptor,
-                                       boostrapDescriptor,
-                                       bootstrapArgs: _*)
+          mnode.visitInvokeDynamicInsn(
+            qual.symbol.name.encoded,
+            descriptor.descriptor,
+            boostrapDescriptor,
+            bootstrapArgs: _*)
 
         case ApplyDynamic(qual, args) =>
           sys.error("No invokedynamic support yet.")
@@ -609,8 +613,9 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
             else if (l.isPrimitive) {
               bc drop l
               if (cast) {
-                mnode.visitTypeInsn(asm.Opcodes.NEW,
-                                    jlClassCastExceptionRef.internalName)
+                mnode.visitTypeInsn(
+                  asm.Opcodes.NEW,
+                  jlClassCastExceptionRef.internalName)
                 bc dup ObjectRef
                 emit(asm.Opcodes.ATHROW)
               } else {
@@ -654,12 +659,14 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
         // instance (on JVM, <init> methods return VOID).
         case Apply(fun @ Select(New(tpt), nme.CONSTRUCTOR), args) =>
           val ctor = fun.symbol
-          assert(ctor.isClassConstructor,
-                 s"'new' call to non-constructor: ${ctor.name}")
+          assert(
+            ctor.isClassConstructor,
+            s"'new' call to non-constructor: ${ctor.name}")
 
           generatedType = tpeTK(tpt)
-          assert(generatedType.isRef,
-                 s"Non reference type cannot be instantiated: $generatedType")
+          assert(
+            generatedType.isRef,
+            s"Non reference type cannot be instantiated: $generatedType")
 
           generatedType match {
             case arr @ ArrayBType(componentType) =>
@@ -690,8 +697,9 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
               }
 
             case rt: ClassBType =>
-              assert(classBTypeFromSymbol(ctor.owner) == rt,
-                     s"Symbol ${ctor.owner.fullName} is different from $rt")
+              assert(
+                classBTypeFromSymbol(ctor.owner) == rt,
+                s"Symbol ${ctor.owner.fullName} is different from $rt")
               mnode.visitTypeInsn(asm.Opcodes.NEW, rt.internalName)
               bc dup generatedType
               genLoadArguments(args, paramTKs(app))
@@ -705,9 +713,10 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
           val attachment =
             app.attachments.get[delambdafy.LambdaMetaFactoryCapable].get
           genLoadArguments(args, paramTKs(app))
-          genInvokeDynamicLambda(attachment.target,
-                                 attachment.arity,
-                                 attachment.functionalInterface)
+          genInvokeDynamicLambda(
+            attachment.target,
+            attachment.arity,
+            attachment.functionalInterface)
           generatedType = methodBTypeFromSymbol(fun.symbol).returnType
 
         case Apply(fun @ _, List(expr))
@@ -716,10 +725,11 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
           genLoad(expr, nativeKind)
           val MethodNameAndType(mname, methodType) =
             srBoxesRuntimeBoxToMethods(nativeKind)
-          bc.invokestatic(srBoxesRunTimeRef.internalName,
-                          mname,
-                          methodType.descriptor,
-                          app.pos)
+          bc.invokestatic(
+            srBoxesRunTimeRef.internalName,
+            mname,
+            methodType.descriptor,
+            app.pos)
           generatedType = boxResultType(fun.symbol) // was typeToBType(fun.symbol.tpe.resultType)
 
         case Apply(fun @ _, List(expr))
@@ -730,10 +740,11 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
           generatedType = boxType
           val MethodNameAndType(mname, methodType) =
             srBoxesRuntimeUnboxToMethods(boxType)
-          bc.invokestatic(srBoxesRunTimeRef.internalName,
-                          mname,
-                          methodType.descriptor,
-                          app.pos)
+          bc.invokestatic(
+            srBoxesRunTimeRef.internalName,
+            mname,
+            methodType.descriptor,
+            app.pos)
 
         case app @ Apply(fun, args) =>
           val sym = fun.symbol
@@ -790,10 +801,11 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
                 // descriptor (instead of a class internal name):
                 //   invokevirtual  #2; //Method "[I".clone:()Ljava/lang/Object
                 val target: String = targetTypeKind.asRefBType.classOrArrayType
-                bc.invokevirtual(target,
-                                 "clone",
-                                 "()Ljava/lang/Object;",
-                                 app.pos)
+                bc.invokevirtual(
+                  target,
+                  "clone",
+                  "()Ljava/lang/Object;",
+                  app.pos)
               } else {
                 genCallMethod(sym, invokeStyle, app.pos, hostClass)
                 // Check if the Apply tree has an InlineAnnotatedAttachment, added by the typer
@@ -880,8 +892,9 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
             flatKeys ::= value.intValue
             targets ::= switchBlockPoint
           case Ident(nme.WILDCARD) =>
-            assert(default == null,
-                   s"multiple default targets in a Match node, at ${tree.pos}")
+            assert(
+              default == null,
+              s"multiple default targets in a Match node, at ${tree.pos}")
             default = switchBlockPoint
           case Alternative(alts) =>
             alts foreach {
@@ -896,10 +909,11 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
             abort(s"Invalid pattern in Match node: $tree at: ${tree.pos}")
         }
       }
-      bc.emitSWITCH(mkArrayReverse(flatKeys),
-                    mkArray(targets.reverse),
-                    default,
-                    MIN_SWITCH_DENSITY)
+      bc.emitSWITCH(
+        mkArrayReverse(flatKeys),
+        mkArray(targets.reverse),
+        default,
+        MIN_SWITCH_DENSITY)
 
       // emit switch-blocks.
       val postMatch = new asm.Label
@@ -1021,8 +1035,9 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
 
       val aps = {
         val params: List[Symbol] = lblDef.params.map(_.symbol)
-        assert(args.length == params.length,
-               s"Wrong number of arguments in call to label at: $gotoPos")
+        assert(
+          args.length == params.length,
+          s"Wrong number of arguments in call to label at: $gotoPos")
 
         def isTrivial(kv: (Tree, Symbol)) = kv match {
           case (This(_), p) if p.name == nme.THIS => true
@@ -1385,19 +1400,21 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
                   tpeTK(lhs).isClass) {
                 // rewrite `==` to null tests and `equals`. not needed for arrays (`equals` is reference equality).
                 if (code == EQ)
-                  genEqEqPrimitive(lhs,
-                                   rhs,
-                                   success,
-                                   failure,
-                                   targetIfNoJump,
-                                   tree.pos)
+                  genEqEqPrimitive(
+                    lhs,
+                    rhs,
+                    success,
+                    failure,
+                    targetIfNoJump,
+                    tree.pos)
                 else
-                  genEqEqPrimitive(lhs,
-                                   rhs,
-                                   failure,
-                                   success,
-                                   targetIfNoJump,
-                                   tree.pos)
+                  genEqEqPrimitive(
+                    lhs,
+                    rhs,
+                    failure,
+                    success,
+                    targetIfNoJump,
+                    tree.pos)
               } else if (scalaPrimitives.isComparisonOp(code)) {
                 genComparisonOp(lhs, rhs, code)
               } else loadAndTestBoolean()
@@ -1473,20 +1490,22 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
           genLoad(r, ObjectRef)
           locals.store(eqEqTempLocal)
           bc dup ObjectRef
-          genCZJUMP(lNull,
-                    lNonNull,
-                    TestOp.EQ,
-                    ObjectRef,
-                    targetIfNoJump = lNull)
+          genCZJUMP(
+            lNull,
+            lNonNull,
+            TestOp.EQ,
+            ObjectRef,
+            targetIfNoJump = lNull)
 
           markProgramPoint(lNull)
           bc drop ObjectRef
           locals.load(eqEqTempLocal)
-          genCZJUMP(success,
-                    failure,
-                    TestOp.EQ,
-                    ObjectRef,
-                    targetIfNoJump = lNonNull)
+          genCZJUMP(
+            success,
+            failure,
+            TestOp.EQ,
+            ObjectRef,
+            targetIfNoJump = lNonNull)
 
           markProgramPoint(lNonNull)
           locals.load(eqEqTempLocal)

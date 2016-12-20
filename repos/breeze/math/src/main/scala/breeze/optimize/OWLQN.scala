@@ -87,9 +87,9 @@ class OWLQN[K, T](maxIter: Int, m: Int, l1reg: K => Double, tolerance: Double)(
         adjv -> (adjgrad dot dir)
       }
     }
-    val search = new BacktrackingLineSearch(state.value,
-                                            shrinkStep =
-                                              if (iter < 1) 0.1 else 0.5)
+    val search = new BacktrackingLineSearch(
+      state.value,
+      shrinkStep = if (iter < 1) 0.1 else 0.5)
     val alpha =
       search.minimize(ff, if (iter < 1) .5 / norm(state.grad) else 1.0)
 

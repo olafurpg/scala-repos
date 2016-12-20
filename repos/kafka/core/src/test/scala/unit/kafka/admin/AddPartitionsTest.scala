@@ -53,22 +53,26 @@ class AddPartitionsTest extends ZooKeeperTestHarness {
       new Broker(s.config.brokerId, s.config.hostName, s.boundPort()))
 
     // create topics first
-    createTopic(zkUtils,
-                topic1,
-                partitionReplicaAssignment = Map(0 -> Seq(0, 1)),
-                servers = servers)
-    createTopic(zkUtils,
-                topic2,
-                partitionReplicaAssignment = Map(0 -> Seq(1, 2)),
-                servers = servers)
-    createTopic(zkUtils,
-                topic3,
-                partitionReplicaAssignment = Map(0 -> Seq(2, 3, 0, 1)),
-                servers = servers)
-    createTopic(zkUtils,
-                topic4,
-                partitionReplicaAssignment = Map(0 -> Seq(0, 3)),
-                servers = servers)
+    createTopic(
+      zkUtils,
+      topic1,
+      partitionReplicaAssignment = Map(0 -> Seq(0, 1)),
+      servers = servers)
+    createTopic(
+      zkUtils,
+      topic2,
+      partitionReplicaAssignment = Map(0 -> Seq(1, 2)),
+      servers = servers)
+    createTopic(
+      zkUtils,
+      topic3,
+      partitionReplicaAssignment = Map(0 -> Seq(2, 3, 0, 1)),
+      servers = servers)
+    createTopic(
+      zkUtils,
+      topic4,
+      partitionReplicaAssignment = Map(0 -> Seq(0, 3)),
+      servers = servers)
   }
 
   @After
@@ -233,12 +237,14 @@ class AddPartitionsTest extends ZooKeeperTestHarness {
     val partition = partitionOpt.get
 
     assertTrue("Partition leader should exist", partition.leader.isDefined)
-    assertEquals("Partition leader id should match",
-                 expectedLeaderId,
-                 partition.leader.get.id)
+    assertEquals(
+      "Partition leader id should match",
+      expectedLeaderId,
+      partition.leader.get.id)
 
-    assertEquals("Replica set should match",
-                 expectedReplicas,
-                 partition.replicas.map(_.id).toSet)
+    assertEquals(
+      "Replica set should match",
+      expectedReplicas,
+      partition.replicas.map(_.id).toSet)
   }
 }

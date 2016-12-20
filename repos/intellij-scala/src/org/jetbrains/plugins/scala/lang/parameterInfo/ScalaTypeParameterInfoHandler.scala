@@ -37,9 +37,10 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 22.02.2009
   */
 class ScalaTypeParameterInfoHandler
-    extends ParameterInfoHandlerWithTabActionSupport[ScTypeArgs,
-                                                     Any,
-                                                     ScTypeElement] {
+    extends ParameterInfoHandlerWithTabActionSupport[
+      ScTypeArgs,
+      Any,
+      ScTypeElement] {
   def getArgListStopSearchClasses: java.util.Set[_ <: Class[_]] = {
     java.util.Collections.singleton(classOf[PsiMethod]) //todo: ?
   }
@@ -114,13 +115,14 @@ class ScalaTypeParameterInfoHandler
         if (endOffset != -1) buffer.replace(endOffset, endOffset + 4, "")
 
         if (buffer.toString != "")
-          context.setupUIComponentPresentation(buffer.toString,
-                                               startOffset,
-                                               endOffset,
-                                               false,
-                                               false,
-                                               false,
-                                               color)
+          context.setupUIComponentPresentation(
+            buffer.toString,
+            startOffset,
+            endOffset,
+            false,
+            false,
+            false,
+            color)
         else context.setUIComponentEnabled(false)
       case _ =>
     }
@@ -246,8 +248,9 @@ class ScalaTypeParameterInfoHandler
                   val bind = resRef.bind()
                   bind match {
                     case Some(
-                        r @ ScalaResolveResult(method: PsiMethod,
-                                               substitutor)) =>
+                        r @ ScalaResolveResult(
+                          method: PsiMethod,
+                          substitutor)) =>
                       res += Tuple2(r.getElement, substitutor)
                     case _ =>
                   }
@@ -260,16 +263,19 @@ class ScalaTypeParameterInfoHandler
                     case Some(ref) =>
                       ref.bind() match {
                         case Some(
-                            r @ ScalaResolveResult(method: PsiMethod,
-                                                   substitutor)) =>
+                            r @ ScalaResolveResult(
+                              method: PsiMethod,
+                              substitutor)) =>
                           res += Tuple2(r.getActualElement, substitutor)
                         case Some(
-                            ScalaResolveResult(element: PsiClass,
-                                               substitutor)) =>
+                            ScalaResolveResult(
+                              element: PsiClass,
+                              substitutor)) =>
                           res += Tuple2(element, substitutor)
                         case Some(
-                            ScalaResolveResult(element: ScTypeParametersOwner,
-                                               substitutor)) =>
+                            ScalaResolveResult(
+                              element: ScTypeParametersOwner,
+                              substitutor)) =>
                           res += Tuple2(element, substitutor)
                         case _ =>
                       }

@@ -43,10 +43,11 @@ class ApplyUnapplyForBindingSearcher
     element match {
       case _ if inReadAction(!element.isValid) => true
       case binding: ScBindingPattern =>
-        val processor = createProcessor(consumer,
-                                        binding,
-                                        checkApply = true,
-                                        checkUnapply = true)
+        val processor = createProcessor(
+          consumer,
+          binding,
+          checkApply = true,
+          checkUnapply = true)
         processBinding(processor, scope, binding, queryParameters.getProject)
       case inAnonClassWithBinding((binding, checkApply, checkUnapply)) =>
         val processor =
@@ -88,11 +89,12 @@ class ApplyUnapplyForBindingSearcher
     val helper: PsiSearchHelper = PsiSearchHelper.SERVICE.getInstance(project)
     try {
       val name = inReadAction(binding.name)
-      helper.processElementsWithWord(processor,
-                                     scope,
-                                     name,
-                                     UsageSearchContext.IN_CODE,
-                                     true)
+      helper.processElementsWithWord(
+        processor,
+        scope,
+        name,
+        UsageSearchContext.IN_CODE,
+        true)
     } catch {
       case ignore: IndexNotReadyException => true
     }

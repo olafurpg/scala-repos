@@ -71,10 +71,11 @@ abstract class FormatInterpolator {
     // create a tmp val and add it to the ids passed to format
     def defval(value: Tree, tpe: Type): Unit = {
       val freshName = TermName(c.freshName("arg$"))
-      evals += ValDef(Modifiers(),
-                      freshName,
-                      TypeTree(tpe) setPos value.pos.focus,
-                      value) setPos value.pos
+      evals += ValDef(
+        Modifiers(),
+        freshName,
+        TypeTree(tpe) setPos value.pos.focus,
+        value) setPos value.pos
       ids += Ident(freshName)
     }
     // Append the nth part to the string builder, possibly prepending an omitted %s first.
@@ -204,14 +205,17 @@ abstract class FormatInterpolator {
       val scalaPackage = Select(Ident(nme.ROOTPKG), TermName("scala"))
       val newStringOps = Select(
         New(
-          Select(Select(Select(scalaPackage, TermName("collection")),
-                        TermName("immutable")),
-                 TypeName("StringOps"))),
+          Select(
+            Select(
+              Select(scalaPackage, TermName("collection")),
+              TermName("immutable")),
+            TypeName("StringOps"))),
         termNames.CONSTRUCTOR
       )
       val expr = Apply(
-        Select(Apply(newStringOps, List(Literal(Constant(format)))),
-               TermName("format")),
+        Select(
+          Apply(newStringOps, List(Literal(Constant(format)))),
+          TermName("format")),
         ids.toList
       )
       val p = c.macroApplication.pos
@@ -296,8 +300,9 @@ abstract class FormatInterpolator {
     }
     def goodIndex = {
       if (index.nonEmpty && hasFlag('<'))
-        c.warning(groupPos(Index),
-                  "Argument index ignored if '<' flag is present")
+        c.warning(
+          groupPos(Index),
+          "Argument index ignored if '<' flag is present")
       val okRange = index map (i => i > 0 && i <= argc) getOrElse true
       okRange || hasFlag('<') || falsely {
         errorAt(Index, "Argument index out of range")
@@ -403,18 +408,20 @@ abstract class FormatInterpolator {
         case 'o' | 'x' | 'X' if hasAnyFlag(maybeOK) && !isBigInt =>
           maybeOK filter hasFlag foreach
             (badf =>
-               badFlag(badf,
-                       s"only use '$badf' for BigInt conversions to o, x, X"))
+               badFlag(
+                 badf,
+                 s"only use '$badf' for BigInt conversions to o, x, X"))
           true
       }
       if (bad_+) None
       else
-        pickAcceptable(arg,
-                       IntTpe,
-                       LongTpe,
-                       ByteTpe,
-                       ShortTpe,
-                       tagOfBigInt.tpe)
+        pickAcceptable(
+          arg,
+          IntTpe,
+          LongTpe,
+          ByteTpe,
+          ShortTpe,
+          tagOfBigInt.tpe)
     }
   }
   class FloatingPointXn(val m: Match, val pos: Position, val argc: Int)
@@ -441,9 +448,10 @@ abstract class FormatInterpolator {
         errorAt(CC, "Date/time conversion must have two characters")
       })
     def goodCC = ("HIklMSLNpzZsQBbhAaCYyjmdeRTrDFc" contains cc) || falsely {
-      errorAtOffset(CC,
-                    1,
-                    s"'$cc' doesn't seem to be a date or time conversion")
+      errorAtOffset(
+        CC,
+        1,
+        s"'$cc' doesn't seem to be a date or time conversion")
     }
     override def verify =
       super.verify && hasCC && goodCC && noPrecision &&

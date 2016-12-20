@@ -72,11 +72,12 @@ object ExpressionEncoder {
         new StructType().add("value", dt, nullable)
     }
 
-    new ExpressionEncoder[T](schema,
-                             flat,
-                             toRowExpression.flatten,
-                             fromRowExpression,
-                             ClassTag[T](cls))
+    new ExpressionEncoder[T](
+      schema,
+      flat,
+      toRowExpression.flatten,
+      fromRowExpression,
+      ClassTag[T](cls))
   }
 
   // TODO: improve error message for java bean encoder.
@@ -87,11 +88,12 @@ object ExpressionEncoder {
     val toRowExpression = JavaTypeInference.extractorsFor(beanClass)
     val fromRowExpression = JavaTypeInference.constructorFor(beanClass)
 
-    new ExpressionEncoder[T](schema.asInstanceOf[StructType],
-                             flat = false,
-                             toRowExpression.flatten,
-                             fromRowExpression,
-                             ClassTag[T](beanClass))
+    new ExpressionEncoder[T](
+      schema.asInstanceOf[StructType],
+      flat = false,
+      toRowExpression.flatten,
+      fromRowExpression,
+      ClassTag[T](beanClass))
   }
 
   /**
@@ -126,9 +128,10 @@ object ExpressionEncoder {
         case (expr, index) =>
           expr.transformUp {
             case BoundReference(0, t, _) =>
-              Invoke(BoundReference(0, ObjectType(cls), nullable = true),
-                     s"_${index + 1}",
-                     t)
+              Invoke(
+                BoundReference(0, ObjectType(cls), nullable = true),
+                s"_${index + 1}",
+                t)
           }
       }
 
@@ -150,16 +153,18 @@ object ExpressionEncoder {
         }
     }
 
-    val fromRowExpression = NewInstance(cls,
-                                        fromRowExpressions,
-                                        ObjectType(cls),
-                                        propagateNull = false)
+    val fromRowExpression = NewInstance(
+      cls,
+      fromRowExpressions,
+      ObjectType(cls),
+      propagateNull = false)
 
-    new ExpressionEncoder[Any](schema,
-                               flat = false,
-                               toRowExpressions,
-                               fromRowExpression,
-                               ClassTag(cls))
+    new ExpressionEncoder[Any](
+      schema,
+      flat = false,
+      toRowExpressions,
+      fromRowExpression,
+      ClassTag(cls))
   }
 
   def tuple[T1, T2](e1: ExpressionEncoder[T1],

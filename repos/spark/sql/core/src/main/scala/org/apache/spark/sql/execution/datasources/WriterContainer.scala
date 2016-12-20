@@ -124,9 +124,10 @@ private[sql] abstract class BaseWriterContainer(
   }
 
   def executorSideSetup(taskContext: TaskContext): Unit = {
-    setupIDs(taskContext.stageId(),
-             taskContext.partitionId(),
-             taskContext.attemptNumber())
+    setupIDs(
+      taskContext.stageId(),
+      taskContext.partitionId(),
+      taskContext.attemptNumber())
     setupConf()
     taskAttemptContext =
       new TaskAttemptContextImpl(serializableConf.value, taskAttemptId)
@@ -210,8 +211,9 @@ private[sql] abstract class BaseWriterContainer(
             // The specified output committer is a FileOutputCommitter.
             // So, we will use the FileOutputCommitter-specified constructor.
             val ctor =
-              clazz.getDeclaredConstructor(classOf[Path],
-                                           classOf[TaskAttemptContext])
+              clazz.getDeclaredConstructor(
+                classOf[Path],
+                classOf[TaskAttemptContext])
             ctor.newInstance(new Path(outputPath), context)
           } else {
             // The specified output committer is just a OutputCommitter.
@@ -246,10 +248,11 @@ private[sql] abstract class BaseWriterContainer(
   }
 
   def commitTask(): Unit = {
-    SparkHadoopMapRedUtil.commitTask(outputCommitter,
-                                     taskAttemptContext,
-                                     jobId.getId,
-                                     taskId.getId)
+    SparkHadoopMapRedUtil.commitTask(
+      outputCommitter,
+      taskAttemptContext,
+      jobId.getId,
+      taskId.getId)
   }
 
   def abortTask(): Unit = {
@@ -370,10 +373,11 @@ private[sql] class DynamicPartitionWriterContainer(
   private def partitionStringExpression: Seq[Expression] = {
     partitionColumns.zipWithIndex.flatMap {
       case (c, i) =>
-        val escaped = ScalaUDF(PartitioningUtils.escapePathName _,
-                               StringType,
-                               Seq(Cast(c, StringType)),
-                               Seq(StringType))
+        val escaped = ScalaUDF(
+          PartitioningUtils.escapePathName _,
+          StringType,
+          Seq(Cast(c, StringType)),
+          Seq(StringType))
         val str = If(IsNull(c), Literal(defaultPartitionName), escaped)
         val partitionName = Literal(c.name + "=") :: str :: Nil
         if (i == 0) partitionName else Literal(Path.SEPARATOR) :: partitionName
@@ -397,8 +401,9 @@ private[sql] class DynamicPartitionWriterContainer(
     val path =
       if (partitionColumns.nonEmpty) {
         val partitionPath = getPartitionString(key).getString(0)
-        configuration.set("spark.sql.sources.output.path",
-                          new Path(outputPath, partitionPath).toString)
+        configuration.set(
+          "spark.sql.sources.output.path",
+          new Path(outputPath, partitionPath).toString)
         new Path(getWorkPath, partitionPath).toString
       } else {
         configuration.set("spark.sql.sources.output.path", outputPath)

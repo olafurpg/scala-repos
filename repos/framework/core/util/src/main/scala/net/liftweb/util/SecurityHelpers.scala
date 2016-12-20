@@ -235,15 +235,18 @@ trait SecurityHelpers { self: StringHelpers with IoHelpers =>
     )
 
     parserFactory.setNamespaceAware(false)
-    parserFactory.setFeature(Constants.SAX_FEATURE_PREFIX +
-                               Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE,
-                             false)
-    parserFactory.setFeature(Constants.SAX_FEATURE_PREFIX +
-                               Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE,
-                             false)
-    parserFactory.setFeature(Constants.XERCES_FEATURE_PREFIX +
-                               Constants.DISALLOW_DOCTYPE_DECL_FEATURE,
-                             true)
+    parserFactory.setFeature(
+      Constants.SAX_FEATURE_PREFIX +
+        Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE,
+      false)
+    parserFactory.setFeature(
+      Constants.SAX_FEATURE_PREFIX +
+        Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE,
+      false)
+    parserFactory.setFeature(
+      Constants.XERCES_FEATURE_PREFIX +
+        Constants.DISALLOW_DOCTYPE_DECL_FEATURE,
+      true)
     parserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
 
     val saxParser = parserFactory.newSAXParser();

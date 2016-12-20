@@ -18,9 +18,10 @@ class NonPublicSeparateTest extends FunSuite {
   //implicit val pu = PicklerUnpickler.generate[Hobby]
   //implicit val pu2 = PicklerUnpickler.generate[Person]
   test("main") {
-    val person = new Person("Eugene",
-                            25,
-                            new Hobby("hacking", "mostly Scala", "loving it"))
+    val person = new Person(
+      "Eugene",
+      25,
+      new Hobby("hacking", "mostly Scala", "loving it"))
     val anyPickle = (person: Any).pickle
     assert(
       anyPickle.toString === """

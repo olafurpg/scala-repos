@@ -49,8 +49,9 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
     val model = new StreamingKMeans()
       .setK(1)
       .setDecayFactor(1.0)
-      .setInitialCenters(Array(Vectors.dense(0.0, 0.0, 0.0, 0.0, 0.0)),
-                         Array(0.0))
+      .setInitialCenters(
+        Array(Vectors.dense(0.0, 0.0, 0.0, 0.0, 0.0)),
+        Array(0.0))
 
     // generate random data for k-means
     val (input, centers) =
@@ -87,9 +88,11 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
     val kMeans = new StreamingKMeans()
       .setK(2)
       .setHalfLife(2, "batches")
-      .setInitialCenters(Array(Vectors.dense(-0.1, 0.1, -0.2, -0.3, -0.1),
-                               Vectors.dense(0.1, -0.2, 0.0, 0.2, 0.1)),
-                         Array(5.0, 5.0))
+      .setInitialCenters(
+        Array(
+          Vectors.dense(-0.1, 0.1, -0.2, -0.3, -0.1),
+          Vectors.dense(0.1, -0.2, 0.0, 0.2, 0.1)),
+        Array(5.0, 5.0))
 
     // generate random data for k-means
     val (input, centers) =
@@ -127,17 +130,19 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
     val kMeans = new StreamingKMeans()
       .setK(2)
       .setHalfLife(0.5, "points")
-      .setInitialCenters(Array(Vectors.dense(0.0), Vectors.dense(1000.0)),
-                         Array(1.0, 1.0))
+      .setInitialCenters(
+        Array(Vectors.dense(0.0), Vectors.dense(1000.0)),
+        Array(1.0, 1.0))
 
     // new data are all around the first cluster 0.0
-    val (input, _) = StreamingKMeansDataGenerator(numPoints,
-                                                  numBatches,
-                                                  k,
-                                                  d,
-                                                  r,
-                                                  42,
-                                                  Array(Vectors.dense(0.0)))
+    val (input, _) = StreamingKMeansDataGenerator(
+      numPoints,
+      numBatches,
+      k,
+      d,
+      r,
+      42,
+      Array(Vectors.dense(0.0)))
 
     // setup and run the model training
     ssc = setupStreams(input, (inputDStream: DStream[Vector]) => {
@@ -152,8 +157,9 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
     val c0 = model.clusterCenters(0)(0)
     val c1 = model.clusterCenters(1)(0)
 
-    assert(c0 * c1 < 0.0,
-           "should have one positive center and one negative center")
+    assert(
+      c0 * c1 < 0.0,
+      "should have one positive center and one negative center")
     // 0.8 is the mean of half-normal distribution
     assert(math.abs(c0) ~== 0.8 absTol 0.6)
     assert(math.abs(c1) ~== 0.8 absTol 0.6)

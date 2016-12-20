@@ -32,9 +32,10 @@ class PerfConfig(args: Array[String]) {
     .ofType(classOf[java.lang.Integer])
     .defaultsTo(5000)
   val dateFormatOpt = parser
-    .accepts("date-format",
-             "The date format to use for formatting the time field. " +
-               "See java.text.SimpleDateFormat for options.")
+    .accepts(
+      "date-format",
+      "The date format to use for formatting the time field. " +
+        "See java.text.SimpleDateFormat for options.")
     .withRequiredArg
     .describedAs("date format")
     .ofType(classOf[String])

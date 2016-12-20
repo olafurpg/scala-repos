@@ -67,16 +67,18 @@ object Http
 
   object param {
     case class MaxRequestSize(size: StorageUnit) {
-      require(size < 2.gigabytes,
-              s"MaxRequestSize should be less than 2 Gb, but was $size")
+      require(
+        size < 2.gigabytes,
+        s"MaxRequestSize should be less than 2 Gb, but was $size")
     }
     implicit object MaxRequestSize extends Stack.Param[MaxRequestSize] {
       val default = MaxRequestSize(5.megabytes)
     }
 
     case class MaxResponseSize(size: StorageUnit) {
-      require(size < 2.gigabytes,
-              s"MaxResponseSize should be less than 2 Gb, but was $size")
+      require(
+        size < 2.gigabytes,
+        s"MaxResponseSize should be less than 2 Gb, but was $size")
     }
     implicit object MaxResponseSize extends Stack.Param[MaxResponseSize] {
       val default = MaxResponseSize(5.megabytes)
@@ -110,9 +112,10 @@ object Http
   // Only record payload sizes when streaming is disabled.
   private[this] val nonChunkedPayloadSize: Stackable[
     ServiceFactory[Request, Response]] =
-    new Stack.Module2[param.Streaming,
-                      Stats,
-                      ServiceFactory[Request, Response]] {
+    new Stack.Module2[
+      param.Streaming,
+      Stats,
+      ServiceFactory[Request, Response]] {
       override def role: Stack.Role = PayloadSizeFilter.Role
       override def description: String = PayloadSizeFilter.Description
 
@@ -132,8 +135,9 @@ object Http
 
   object Client {
     val stack: Stack[ServiceFactory[Request, Response]] = StackClient.newStack
-      .replace(TraceInitializerFilter.role,
-               new HttpClientTraceInitializer[Request, Response])
+      .replace(
+        TraceInitializerFilter.role,
+        new HttpClientTraceInitializer[Request, Response])
       .prepend(http.TlsFilter.module)
       .prepend(nonChunkedPayloadSize)
   }
@@ -250,8 +254,9 @@ object Http
 
   object Server {
     val stack: Stack[ServiceFactory[Request, Response]] = StackServer.newStack
-      .replace(TraceInitializerFilter.role,
-               new HttpServerTraceInitializer[Request, Response])
+      .replace(
+        TraceInitializerFilter.role,
+        new HttpServerTraceInitializer[Request, Response])
       .replace(StackServer.Role.preparer, HttpNackFilter.module)
       .prepend(nonChunkedPayloadSize)
   }
@@ -283,9 +288,10 @@ object Http
 
       val endpoint = dtab.andThen(context).andThen(service)
 
-      new HttpServerDispatcher(new HttpTransport(transport),
-                               endpoint,
-                               stats.scope("dispatch"))
+      new HttpServerDispatcher(
+        new HttpTransport(transport),
+        endpoint,
+        stats.scope("dispatch"))
     }
 
     protected def copy1(

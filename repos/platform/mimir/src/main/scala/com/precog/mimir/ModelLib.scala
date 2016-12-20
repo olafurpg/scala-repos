@@ -60,8 +60,9 @@ trait ModelLibModule[M[+ _]] {
                   modelSet: ModelSet): Map[ColumnRef, Column] = {
           val keyCols =
             cols filter {
-              case (ColumnRef(CPath(paths.Key, CPathIndex(_), _ @_ *), _),
-                    _) =>
+              case (
+                  ColumnRef(CPath(paths.Key, CPathIndex(_), _ @_ *), _),
+                  _) =>
                 true
               case _ => false
             }
@@ -204,11 +205,12 @@ trait ModelLibModule[M[+ _]] {
               }
           }
 
-          ScannerPrelims(includedModel,
-                         definedModel,
-                         cpaths,
-                         includedCols,
-                         resultArray)
+          ScannerPrelims(
+            includedModel,
+            definedModel,
+            cpaths,
+            includedCols,
+            resultArray)
         }
       }
     }
@@ -268,8 +270,9 @@ trait ModelLibModule[M[+ _]] {
 
           val modelNames: Set[String] = schema.columnRefs
             .collect {
-              case ColumnRef(CPath(paths.Value, CPathField(modelName), _ @_ *),
-                             _) =>
+              case ColumnRef(
+                  CPath(paths.Value, CPathField(modelName), _ @_ *),
+                  _) =>
                 modelName
             }
             .toSet
@@ -278,11 +281,12 @@ trait ModelLibModule[M[+ _]] {
             .map { modelName =>
               (modelName,
                Set(
-                 CPath(paths.Value,
-                       CPathField(modelName),
-                       CPathField(`coefficients`),
-                       CPathIndex(1),
-                       CPathField(`estimate`))))
+                 CPath(
+                   paths.Value,
+                   CPathField(modelName),
+                   CPathField(`coefficients`),
+                   CPathIndex(1),
+                   CPathField(`estimate`))))
             }
             .toMap
 
@@ -290,10 +294,11 @@ trait ModelLibModule[M[+ _]] {
             .map { modelName =>
               (modelName,
                Set(
-                 CPath(paths.Value,
-                       CPathField(modelName),
-                       CPathField(`residualStandardError`),
-                       CPathField(`estimate`))))
+                 CPath(
+                   paths.Value,
+                   CPathField(modelName),
+                   CPathField(`residualStandardError`),
+                   CPathField(`estimate`))))
             }
             .toMap
 
@@ -301,21 +306,24 @@ trait ModelLibModule[M[+ _]] {
             .map { modelName =>
               (modelName,
                Set(
-                 CPath(paths.Value,
-                       CPathField(modelName),
-                       CPathField(`residualStandardError`),
-                       CPathField(`degreesOfFreedom`))))
+                 CPath(
+                   paths.Value,
+                   CPathField(modelName),
+                   CPathField(`residualStandardError`),
+                   CPathField(`degreesOfFreedom`))))
             }
             .toMap
 
           val covarPaths =
             schema.columnRefs
               .collect {
-                case ColumnRef(path @ CPath(paths.Value,
-                                            CPathField(modelName),
-                                            CPathField(`varianceCovariance`),
-                                            _ @_ *),
-                               _) =>
+                case ColumnRef(
+                    path @ CPath(
+                      paths.Value,
+                      CPathField(modelName),
+                      CPathField(`varianceCovariance`),
+                      _ @_ *),
+                    _) =>
                   (modelName, path)
               }
               .groupBy(_._1) map {
@@ -326,12 +334,14 @@ trait ModelLibModule[M[+ _]] {
           val featuresPaths =
             schema.columnRefs
               .collect {
-                case ColumnRef(path @ CPath(paths.Value,
-                                            CPathField(modelName),
-                                            CPathField(`coefficients`),
-                                            CPathIndex(0),
-                                            rest @ _ *),
-                               _)
+                case ColumnRef(
+                    path @ CPath(
+                      paths.Value,
+                      CPathField(modelName),
+                      CPathField(`coefficients`),
+                      CPathIndex(0),
+                      rest @ _ *),
+                    _)
                     if rest.length > 0 && rest.last == CPathField(
                       `estimate`) =>
                   (modelName, path)
@@ -354,11 +364,12 @@ trait ModelLibModule[M[+ _]] {
           val joined0 = commonKeys map {
             case field =>
               (field,
-               List(interceptCols(field),
-                    stdErrCols(field),
-                    dofCols(field),
-                    covarCols(field),
-                    featuresCols(field)))
+               List(
+                 interceptCols(field),
+                 stdErrCols(field),
+                 dofCols(field),
+                 covarCols(field),
+                 featuresCols(field)))
           } toMap
 
           val rowModels: Int => Set[Model] = (i: Int) => {
@@ -374,12 +385,14 @@ trait ModelLibModule[M[+ _]] {
 
             joined
               .collect {
-                case (field,
-                      cols @ List(constant,
-                                  resStdErr,
-                                  degs,
-                                  varCovar,
-                                  values)) =>
+                case (
+                    field,
+                    cols @ List(
+                      constant,
+                      resStdErr,
+                      degs,
+                      varCovar,
+                      values)) =>
                   val cnst =
                     constant
                       .map {
@@ -412,23 +425,27 @@ trait ModelLibModule[M[+ _]] {
 
                   val fts =
                     values map {
-                      case (CPath(paths.Value,
-                                  CPathField(_),
-                                  CPathField(`coefficients`),
-                                  CPathIndex(0),
-                                  rest @ _ *),
-                            col) =>
+                      case (
+                          CPath(
+                            paths.Value,
+                            CPathField(_),
+                            CPathField(`coefficients`),
+                            CPathIndex(0),
+                            rest @ _ *),
+                          col) =>
                         val paths0 = paths.Value +: rest.take(rest.length - 1)
                         (CPath(paths0: _*), col.apply(i))
                     }
 
                   val vc: Map[CPath, Double] =
                     varCovar map {
-                      case (CPath(paths.Value,
-                                  CPathField(_),
-                                  CPathField(`varianceCovariance`),
-                                  rest @ _ *),
-                            col) =>
+                      case (
+                          CPath(
+                            paths.Value,
+                            CPathField(_),
+                            CPathField(`varianceCovariance`),
+                            rest @ _ *),
+                          col) =>
                         (CPath(rest: _*), col.apply(i))
                     }
                   val size = fts.size + 1
@@ -469,8 +486,9 @@ trait ModelLibModule[M[+ _]] {
 
           val modelNames: Set[String] = schema.columnRefs
             .collect {
-              case ColumnRef(CPath(paths.Value, CPathField(modelName), _ @_ *),
-                             _) =>
+              case ColumnRef(
+                  CPath(paths.Value, CPathField(modelName), _ @_ *),
+                  _) =>
                 modelName
             }
             .toSet
@@ -479,23 +497,26 @@ trait ModelLibModule[M[+ _]] {
             .map { modelName =>
               (modelName,
                Set(
-                 CPath(paths.Value,
-                       CPathField(modelName),
-                       CPathField(`coefficients`),
-                       CPathIndex(1),
-                       CPathField(`estimate`))))
+                 CPath(
+                   paths.Value,
+                   CPathField(modelName),
+                   CPathField(`coefficients`),
+                   CPathIndex(1),
+                   CPathField(`estimate`))))
             }
             .toMap
 
           val featuresPaths =
             schema.columnRefs
               .collect {
-                case ColumnRef(path @ CPath(paths.Value,
-                                            CPathField(modelName),
-                                            CPathField(`coefficients`),
-                                            CPathIndex(0),
-                                            rest @ _ *),
-                               _)
+                case ColumnRef(
+                    path @ CPath(
+                      paths.Value,
+                      CPathField(modelName),
+                      CPathField(`coefficients`),
+                      CPathIndex(0),
+                      rest @ _ *),
+                    _)
                     if rest.length > 0 && rest.last == CPathField(
                       `estimate`) =>
                   (modelName, path)
@@ -542,12 +563,14 @@ trait ModelLibModule[M[+ _]] {
 
                   val fts =
                     values collect {
-                      case (CPath(paths.Value,
-                                  CPathField(_),
-                                  CPathField(`coefficients`),
-                                  CPathIndex(0),
-                                  rest @ _ *),
-                            col) if col.isDefinedAt(i) =>
+                      case (
+                          CPath(
+                            paths.Value,
+                            CPathField(_),
+                            CPathField(`coefficients`),
+                            CPathIndex(0),
+                            rest @ _ *),
+                          col) if col.isDefinedAt(i) =>
                         val paths0 = paths.Value +: rest.take(rest.length - 1)
                         (CPath(paths0: _*), col.apply(i))
                     }

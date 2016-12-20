@@ -73,9 +73,10 @@ object Watched {
 
     val (triggered, newWatchState, newState) = try {
       val (triggered, newWatchState) =
-        SourceModificationWatch.watch(sourcesFinder,
-                                      watched.pollInterval,
-                                      watchState)(shouldTerminate)
+        SourceModificationWatch.watch(
+          sourcesFinder,
+          watched.pollInterval,
+          watchState)(shouldTerminate)
       (triggered, newWatchState, s)
     } catch {
       case e: Exception =>
@@ -98,6 +99,7 @@ object Watched {
   val ContinuousState = AttributeKey[WatchState](
     "watch state",
     "Internal: tracks state for continuous execution.")
-  val Configuration = AttributeKey[Watched]("watched-configuration",
-                                            "Configures continuous execution.")
+  val Configuration = AttributeKey[Watched](
+    "watched-configuration",
+    "Configures continuous execution.")
 }

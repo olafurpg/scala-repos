@@ -172,12 +172,14 @@ private[http] object HttpServerBluePrint {
 
             val entity =
               createEntity(entityCreator) withSizeLimit settings.parserSettings.maxContentLength
-            push(out,
-                 HttpRequest(effectiveMethod,
-                             uri,
-                             effectiveHeaders,
-                             entity,
-                             protocol))
+            push(
+              out,
+              HttpRequest(
+                effectiveMethod,
+                uri,
+                effectiveHeaders,
+                entity,
+                protocol))
           case other ⇒
             throw new IllegalStateException(
               s"unexpected element of type ${other.getClass}")
@@ -267,27 +269,29 @@ private[http] object HttpServerBluePrint {
       rawRequestUriHeader,
       HttpHeaderParser(parserSettings) { info ⇒
         if (parserSettings.illegalHeaderWarnings)
-          logParsingError(info withSummaryPrepended "Illegal request header",
-                          log,
-                          parserSettings.errorLoggingVerbosity)
+          logParsingError(
+            info withSummaryPrepended "Illegal request header",
+            log,
+            parserSettings.errorLoggingVerbosity)
       })
 
     def establishAbsoluteUri(requestOutput: RequestOutput): RequestOutput =
       requestOutput match {
         case start: RequestStart ⇒
           try {
-            val effectiveUri = HttpRequest.effectiveUri(start.uri,
-                                                        start.headers,
-                                                        securedConnection =
-                                                          false,
-                                                        defaultHostHeader)
+            val effectiveUri = HttpRequest.effectiveUri(
+              start.uri,
+              start.headers,
+              securedConnection = false,
+              defaultHostHeader)
             start.copy(uri = effectiveUri)
           } catch {
             case e: IllegalUriException ⇒
               MessageStartError(
                 StatusCodes.BadRequest,
-                ErrorInfo("Request is missing required `Host` header",
-                          e.getMessage))
+                ErrorInfo(
+                  "Request is missing required `Host` header",
+                  e.getMessage))
           }
         case x ⇒ x
       }
@@ -347,16 +351,18 @@ private[http] object HttpServerBluePrint {
             val (entity, requestEnd) =
               HttpEntity.captureTermination(request.entity)
             val access =
-              new TimeoutAccessImpl(request,
-                                    initialTimeout,
-                                    requestEnd,
-                                    getAsyncCallback(emitTimeoutResponse),
-                                    interpreter.materializer)
+              new TimeoutAccessImpl(
+                request,
+                initialTimeout,
+                requestEnd,
+                getAsyncCallback(emitTimeoutResponse),
+                interpreter.materializer)
             openTimeouts = openTimeouts.enqueue(access)
-            push(requestOut,
-                 request.copy(
-                   headers = request.headers :+ `Timeout-Access`(access),
-                   entity = entity))
+            push(
+              requestOut,
+              request.copy(
+                headers = request.headers :+ `Timeout-Access`(access),
+                entity = entity))
           }
           override def onUpstreamFinish() = complete(requestOut)
           override def onUpstreamFailure(ex: Throwable) = fail(requestOut, ex)
@@ -405,10 +411,11 @@ private[http] object HttpServerBluePrint {
     set {
       requestEnd.fast.map(
         _ ⇒
-          new TimeoutSetup(Deadline.now,
-                           schedule(initialTimeout, this),
-                           initialTimeout,
-                           this))
+          new TimeoutSetup(
+            Deadline.now,
+            schedule(initialTimeout, this),
+            initialTimeout,
+            this))
     }
 
     override def apply(request: HttpRequest) =
@@ -440,10 +447,11 @@ private[http] object HttpServerBluePrint {
               schedule(old.timeoutBase + x - Deadline.now, newHandler)
             case _ ⇒ null // don't schedule a new timeout
           }
-          new TimeoutSetup(old.timeoutBase,
-                           newScheduling,
-                           newTimeout,
-                           newHandler)
+          new TimeoutSetup(
+            old.timeoutBase,
+            newScheduling,
+            newTimeout,
+            newHandler)
         } else
           old // too late, the previously set timeout cannot be cancelled anymore
       }
@@ -479,10 +487,11 @@ private[http] object HttpServerBluePrint {
 
     override def initialAttributes = Attributes.name("ControllerStage")
 
-    val shape = new BidiShape(requestParsingIn,
-                              requestPrepOut,
-                              httpResponseIn,
-                              responseCtxOut)
+    val shape = new BidiShape(
+      requestParsingIn,
+      requestPrepOut,
+      httpResponseIn,
+      responseCtxOut)
 
     def createLogic(effectiveAttributes: Attributes) =
       new GraphStageLogic(shape) {
@@ -541,12 +550,14 @@ private[http] object HttpServerBluePrint {
                 oneHundredContinueResponsePending ||
                 isClosed(requestParsingIn) && openRequests.isEmpty ||
                 isEarlyResponse
-            emit(responseCtxOut,
-                 ResponseRenderingContext(response,
-                                          requestStart.method,
-                                          requestStart.protocol,
-                                          close),
-                 pullHttpResponseIn)
+            emit(
+              responseCtxOut,
+              ResponseRenderingContext(
+                response,
+                requestStart.method,
+                requestStart.protocol,
+                close),
+              pullHttpResponseIn)
             if (close) complete(responseCtxOut)
           }
           override def onUpstreamFinish() =
@@ -557,8 +568,9 @@ private[http] object HttpServerBluePrint {
             ex match {
               case EntityStreamException(errorInfo) ⇒
                 // the application has forwarded a request entity stream error to the response stream
-                finishWithIllegalRequestError(StatusCodes.BadRequest,
-                                              errorInfo)
+                finishWithIllegalRequestError(
+                  StatusCodes.BadRequest,
+                  errorInfo)
 
               case EntityStreamSizeException(limit, contentLength) ⇒
                 val summary = contentLength match {
@@ -607,9 +619,10 @@ private[http] object HttpServerBluePrint {
         }
 
         def emitErrorResponse(response: HttpResponse): Unit =
-          emit(responseCtxOut,
-               ResponseRenderingContext(response, closeRequested = true),
-               () ⇒ complete(responseCtxOut))
+          emit(
+            responseCtxOut,
+            ResponseRenderingContext(response, closeRequested = true),
+            () ⇒ complete(responseCtxOut))
 
         /**
           * The `Expect: 100-continue` header has a special status in HTTP.
@@ -646,8 +659,9 @@ private[http] object HttpServerBluePrint {
           */
         val emit100ContinueResponse = getAsyncCallback[Unit] { _ ⇒
           oneHundredContinueResponsePending = false
-          emit(responseCtxOut,
-               ResponseRenderingContext(HttpResponse(StatusCodes.Continue)))
+          emit(
+            responseCtxOut,
+            ResponseRenderingContext(HttpResponse(StatusCodes.Continue)))
           if (pullSuppressed) {
             pullSuppressed = false
             pull(requestParsingIn)
@@ -778,9 +792,10 @@ private[http] object HttpServerBluePrint {
             case Left(frameHandler) ⇒ frameHandler
             case Right(messageHandler) ⇒
               WebSocket
-                .stack(serverSide = true,
-                       maskingRandomFactory = settings.websocketRandomFactory,
-                       log = log)
+                .stack(
+                  serverSide = true,
+                  maskingRandomFactory = settings.websocketRandomFactory,
+                  log = log)
                 .join(messageHandler)
           }
 

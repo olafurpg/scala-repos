@@ -73,8 +73,9 @@ abstract class TypeInferenceTestBase
       "Not specified end marker in test case. Use /*end*/ in scala file for this.")
 
     val addOne =
-      if (PsiTreeUtil.getParentOfType(scalaFile.findElementAt(startOffset),
-                                      classOf[ScExpression]) != null) 0
+      if (PsiTreeUtil.getParentOfType(
+            scalaFile.findElementAt(startOffset),
+            classOf[ScExpression]) != null) 0
       else 1 //for xml tests
     val expr: ScExpression = PsiTreeUtil.findElementOfClassAtRange(
       scalaFile,
@@ -121,17 +122,19 @@ abstract class TypeInferenceTestBase
               ScType.presentableText(actualExpectedType)
             assertEquals(expectedExpectedTypeText, actualExpectedTypeText)
           case SimplifiedPattern(expectedText) =>
-            assertEquals(expectedText,
-                         ScTypePresentation.withoutAliases(ttypez))
+            assertEquals(
+              expectedText,
+              ScTypePresentation.withoutAliases(ttypez))
           case _ => assertEquals(output, res)
         }
       case Failure(msg, elem) =>
-        assert(assertion = false,
-               msg + " :: " +
-                 (elem match {
-                   case Some(x) => x.getText
-                   case None => "empty element"
-                 }))
+        assert(
+          assertion = false,
+          msg + " :: " +
+            (elem match {
+              case Some(x) => x.getText
+              case None => "empty element"
+            }))
     }
   }
 }

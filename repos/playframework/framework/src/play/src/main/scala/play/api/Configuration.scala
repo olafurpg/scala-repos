@@ -115,10 +115,11 @@ object Configuration {
     */
   def load(environment: Environment,
            devSettings: Map[String, AnyRef]): Configuration = {
-    load(environment.classLoader,
-         System.getProperties,
-         devSettings,
-         allowMissingApplicationConf = environment.mode == Mode.Test)
+    load(
+      environment.classLoader,
+      System.getProperties,
+      devSettings,
+      allowMissingApplicationConf = environment.mode == Mode.Test)
   }
 
   /**
@@ -234,10 +235,11 @@ case class Configuration(underlying: Config) {
         case Some(values) if values.contains(value) => value
         case Some(values) if values.isEmpty => value
         case Some(values) =>
-          throw reportError(path,
-                            "Incorrect value, one of " +
-                              (values.reduceLeft(_ + ", " + _)) +
-                              " was expected.")
+          throw reportError(
+            path,
+            "Incorrect value, one of " +
+              (values.reduceLeft(_ + ", " + _)) +
+              " was expected.")
         case None => value
       }
     }
@@ -869,11 +871,12 @@ case class Configuration(underlying: Config) {
   def reportError(path: String,
                   message: String,
                   e: Option[Throwable] = None): PlayException = {
-    Configuration.configError(if (underlying.hasPath(path))
-                                underlying.getValue(path).origin
-                              else underlying.root.origin,
-                              message,
-                              e)
+    Configuration.configError(
+      if (underlying.hasPath(path))
+        underlying.getValue(path).origin
+      else underlying.root.origin,
+      message,
+      e)
   }
 
   /**
@@ -1096,11 +1099,12 @@ private[play] class PlayConfig(val underlying: Config) {
   def reportError(path: String,
                   message: String,
                   e: Option[Throwable] = None): PlayException = {
-    Configuration.configError(if (underlying.hasPath(path))
-                                underlying.getValue(path).origin
-                              else underlying.root.origin,
-                              message,
-                              e)
+    Configuration.configError(
+      if (underlying.hasPath(path))
+        underlying.getValue(path).origin
+      else underlying.root.origin,
+      message,
+      e)
   }
 
   /**
@@ -1159,8 +1163,9 @@ private[play] object ConfigLoader {
     config =>
       path =>
         if (!config.getIsNull(path))
-          FiniteDuration(config.getDuration(path, TimeUnit.MILLISECONDS),
-                         TimeUnit.MILLISECONDS)
+          FiniteDuration(
+            config.getDuration(path, TimeUnit.MILLISECONDS),
+            TimeUnit.MILLISECONDS)
         else Duration.Inf)
 
   implicit val finiteDurationLoader: ConfigLoader[FiniteDuration] =

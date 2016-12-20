@@ -157,8 +157,9 @@ trait HadoopMode extends Mode {
       case None => asMap
     }
 
-    val flowConnectorClass = jobConf.get(Mode.CascadingFlowConnectorClassKey,
-                                         Mode.DefaultHadoopFlowConnector)
+    val flowConnectorClass = jobConf.get(
+      Mode.CascadingFlowConnectorClassKey,
+      Mode.DefaultHadoopFlowConnector)
 
     try {
       val clazz = Class.forName(flowConnectorClass)

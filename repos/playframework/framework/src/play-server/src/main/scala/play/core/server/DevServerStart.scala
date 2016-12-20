@@ -45,11 +45,12 @@ object DevServerStart {
                       buildDocHandler: BuildDocHandler,
                       httpPort: Int,
                       httpAddress: String): ServerWithStop = {
-    mainDev(buildLink,
-            buildDocHandler,
-            Some(httpPort),
-            Option(System.getProperty("https.port")).map(Integer.parseInt(_)),
-            httpAddress)
+    mainDev(
+      buildLink,
+      buildDocHandler,
+      Some(httpPort),
+      Option(System.getProperty("https.port")).map(Integer.parseInt(_)),
+      httpAddress)
   }
 
   private def mainDev(buildLink: BuildLink,
@@ -161,8 +162,9 @@ object DevServerStart {
                                       .orNull)).flatMap {
                                   case Array(file: java.io.File, null) =>
                                     Some((file, None))
-                                  case Array(file: java.io.File,
-                                             line: java.lang.Integer) =>
+                                  case Array(
+                                      file: java.io.File,
+                                      line: java.lang.Integer) =>
                                     Some((file, Some(line)))
                                   case _ => None
                                 }
@@ -235,11 +237,11 @@ object DevServerStart {
           address = httpAddress,
           mode = Mode.Dev,
           properties = process.properties,
-          configuration =
-            Configuration.load(classLoader,
-                               System.getProperties,
-                               dirAndDevSettings,
-                               allowMissingApplicationConf = true)
+          configuration = Configuration.load(
+            classLoader,
+            System.getProperties,
+            dirAndDevSettings,
+            allowMissingApplicationConf = true)
         )
 
         // We *must* use a different Akka configuration in dev mode, since loading two actor systems from the same

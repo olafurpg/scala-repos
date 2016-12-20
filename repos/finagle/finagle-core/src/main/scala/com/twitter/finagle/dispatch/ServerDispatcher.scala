@@ -49,16 +49,16 @@ abstract class GenSerialServerDispatcher[Req, Rep, In, Out](
         val eos = new Promise[Unit]
         val save = Local.save()
         try {
-          Contexts.local.let(RemoteInfo.Upstream.AddressCtx,
-                             trans.remoteAddress) {
-            trans.peerCertificate match {
-              case None => p.become(dispatch(req, eos))
-              case Some(cert) =>
-                Contexts.local.let(Transport.peerCertCtx, cert) {
-                  p.become(dispatch(req, eos))
-                }
+          Contexts.local
+            .let(RemoteInfo.Upstream.AddressCtx, trans.remoteAddress) {
+              trans.peerCertificate match {
+                case None => p.become(dispatch(req, eos))
+                case Some(cert) =>
+                  Contexts.local.let(Transport.peerCertCtx, cert) {
+                    p.become(dispatch(req, eos))
+                  }
+              }
             }
-          }
         } finally Local.restore(save)
         p map { res =>
           (res, eos)

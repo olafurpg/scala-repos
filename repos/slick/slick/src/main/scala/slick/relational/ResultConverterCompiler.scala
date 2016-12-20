@@ -98,7 +98,8 @@ final case class CompiledMapping(
   def rebuild = copy()
   override def getDumpInfo = {
     val di = super.getDumpInfo
-    di.copy(mainInfo = "",
-            children = di.children ++ Vector(("converter", converter)))
+    di.copy(
+      mainInfo = "",
+      children = di.children ++ Vector(("converter", converter)))
   }
 }

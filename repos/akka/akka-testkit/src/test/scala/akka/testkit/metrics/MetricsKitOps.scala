@@ -31,8 +31,9 @@ private[akka] trait MetricsKitOps extends MetricKeyDSL { this: MetricsKit ⇒
     * Do not use for short running pieces of code.
     */
   def timedWithKnownOps[T](key: MetricKey, ops: Long)(run: ⇒ T): T = {
-    val c = getOrRegister(key.toString,
-                          new KnownOpsInTimespanTimer(expectedOps = ops))
+    val c = getOrRegister(
+      key.toString,
+      new KnownOpsInTimespanTimer(expectedOps = ops))
     try run
     finally c.stop()
   }
@@ -48,10 +49,12 @@ private[akka] trait MetricsKitOps extends MetricKeyDSL { this: MetricsKit ⇒
                    highestTrackableValue: Long,
                    numberOfSignificantValueDigits: Int,
                    unitString: String = ""): HdrHistogram =
-    getOrRegister((key / "hdr-histogram").toString,
-                  new HdrHistogram(highestTrackableValue,
-                                   numberOfSignificantValueDigits,
-                                   unitString))
+    getOrRegister(
+      (key / "hdr-histogram").toString,
+      new HdrHistogram(
+        highestTrackableValue,
+        numberOfSignificantValueDigits,
+        unitString))
 
   /**
     * Use when measuring for 9x'th percentiles as well as min / max / mean values.

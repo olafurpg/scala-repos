@@ -68,8 +68,9 @@ class BoneConnectionPool @Inject()(environment: Environment)
         case "REPEATABLE_READ" => Connection.TRANSACTION_REPEATABLE_READ
         case "SERIALIZABLE" => Connection.TRANSACTION_SERIALIZABLE
         case unknown =>
-          throw config.reportError("bonecp.isolation",
-                                   s"Unknown isolation level [$unknown]")
+          throw config.reportError(
+            "bonecp.isolation",
+            s"Unknown isolation level [$unknown]")
       }
     val catalog = config
       .getDeprecated[Option[String]]("bonecp.defaultCatalog", "defaultCatalog")
@@ -117,30 +118,36 @@ class BoneConnectionPool @Inject()(environment: Environment)
 
     // Pool configuration
     datasource.setCloseOpenStatements(
-      config.getDeprecated[Boolean]("bonecp.closeOpenStatements",
-                                    "closeOpenStatements"))
+      config.getDeprecated[Boolean](
+        "bonecp.closeOpenStatements",
+        "closeOpenStatements"))
     datasource.setPartitionCount(
       config.getDeprecated[Int]("bonecp.partitionCount", "partitionCount"))
     datasource.setMaxConnectionsPerPartition(
-      config.getDeprecated[Int]("bonecp.maxConnectionsPerPartition",
-                                "maxConnectionsPerPartition"))
+      config.getDeprecated[Int](
+        "bonecp.maxConnectionsPerPartition",
+        "maxConnectionsPerPartition"))
     datasource.setMinConnectionsPerPartition(
-      config.getDeprecated[Int]("bonecp.minConnectionsPerPartition",
-                                "minConnectionsPerPartition"))
+      config.getDeprecated[Int](
+        "bonecp.minConnectionsPerPartition",
+        "minConnectionsPerPartition"))
     datasource.setAcquireIncrement(
       config.getDeprecated[Int]("bonecp.acquireIncrement", "acquireIncrement"))
     datasource.setAcquireRetryAttempts(
-      config.getDeprecated[Int]("bonecp.acquireRetryAttempts",
-                                "acquireRetryAttempts"))
+      config.getDeprecated[Int](
+        "bonecp.acquireRetryAttempts",
+        "acquireRetryAttempts"))
     datasource.setAcquireRetryDelayInMs(
       config
-        .getDeprecated[FiniteDuration]("bonecp.acquireRetryDelay",
-                                       "acquireRetryDelay")
+        .getDeprecated[FiniteDuration](
+          "bonecp.acquireRetryDelay",
+          "acquireRetryDelay")
         .toMillis)
     datasource.setConnectionTimeoutInMs(
       config
-        .getDeprecated[FiniteDuration]("bonecp.connectionTimeout",
-                                       "connectionTimeout")
+        .getDeprecated[FiniteDuration](
+          "bonecp.connectionTimeout",
+          "connectionTimeout")
         .toMillis)
     datasource.setIdleMaxAgeInSeconds(
       config
@@ -148,33 +155,38 @@ class BoneConnectionPool @Inject()(environment: Environment)
         .toSeconds)
     datasource.setMaxConnectionAgeInSeconds(
       config
-        .getDeprecated[FiniteDuration]("bonecp.maxConnectionAge",
-                                       "maxConnectionAge")
+        .getDeprecated[FiniteDuration](
+          "bonecp.maxConnectionAge",
+          "maxConnectionAge")
         .toSeconds)
     datasource.setDisableJMX(
       config.getDeprecated[Boolean]("bonecp.disableJMX", "disableJMX"))
-    datasource.setStatisticsEnabled(
-      config.getDeprecated[Boolean]("bonecp.statisticsEnabled",
-                                    "statisticsEnabled"))
+    datasource.setStatisticsEnabled(config
+      .getDeprecated[Boolean]("bonecp.statisticsEnabled", "statisticsEnabled"))
     datasource.setIdleConnectionTestPeriodInSeconds(
       config
-        .getDeprecated[FiniteDuration]("bonecp.idleConnectionTestPeriod",
-                                       "idleConnectionTestPeriod")
+        .getDeprecated[FiniteDuration](
+          "bonecp.idleConnectionTestPeriod",
+          "idleConnectionTestPeriod")
         .toSeconds)
     datasource.setDisableConnectionTracking(
-      config.getDeprecated[Boolean]("bonecp.disableConnectionTracking",
-                                    "disableConnectionTracking"))
+      config.getDeprecated[Boolean](
+        "bonecp.disableConnectionTracking",
+        "disableConnectionTracking"))
     datasource.setQueryExecuteTimeLimitInMs(
       config
-        .getDeprecated[FiniteDuration]("bonecp.queryExecuteTimeLimit",
-                                       "queryExecuteTimeLimit")
+        .getDeprecated[FiniteDuration](
+          "bonecp.queryExecuteTimeLimit",
+          "queryExecuteTimeLimit")
         .toMillis)
     datasource.setResetConnectionOnClose(
-      config.getDeprecated[Boolean]("bonecp.resetConnectionOnClose",
-                                    "resetConnectionOnClose"))
+      config.getDeprecated[Boolean](
+        "bonecp.resetConnectionOnClose",
+        "resetConnectionOnClose"))
     datasource.setDetectUnresolvedTransactions(
-      config.getDeprecated[Boolean]("bonecp.detectUnresolvedTransactions",
-                                    "detectUnresolvedTransactions"))
+      config.getDeprecated[Boolean](
+        "bonecp.detectUnresolvedTransactions",
+        "detectUnresolvedTransactions"))
     datasource.setLogStatementsEnabled(
       config.getDeprecated[Boolean]("bonecp.logStatements", "logStatements"))
 
@@ -182,8 +194,9 @@ class BoneConnectionPool @Inject()(environment: Environment)
       .getDeprecated[Option[String]]("bonecp.initSQL", "initSQL")
       .foreach(datasource.setInitSQL)
     config
-      .getDeprecated[Option[String]]("bonecp.connectionTestStatement",
-                                     "connectionTestStatement")
+      .getDeprecated[Option[String]](
+        "bonecp.connectionTestStatement",
+        "connectionTestStatement")
       .foreach(datasource.setConnectionTestStatement)
 
     // Bind in JNDI

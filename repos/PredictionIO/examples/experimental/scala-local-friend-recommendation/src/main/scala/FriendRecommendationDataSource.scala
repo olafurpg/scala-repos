@@ -6,10 +6,11 @@ import scala.collection.immutable.HashMap
 
 class FriendRecommendationDataSource(
     val dsp: FriendRecommendationDataSourceParams
-) extends LDataSource[FriendRecommendationTrainingData,
-                        EmptyEvaluationInfo,
-                        FriendRecommendationQuery,
-                        EmptyActualResult] {
+) extends LDataSource[
+      FriendRecommendationTrainingData,
+      EmptyEvaluationInfo,
+      FriendRecommendationQuery,
+      EmptyActualResult] {
 
   override def readTraining(): FriendRecommendationTrainingData = {
     val (itemIdMap, itemKeyword) = readItem(dsp.itemFilePath)
@@ -21,12 +22,13 @@ class FriendRecommendationDataSource(
     // val trainingRecord = readTrainingRecord(dsp.trainingRecordFilePath,
     //   userIdMap, itemIdMap)
     val trainingRecord = null
-    new FriendRecommendationTrainingData(userIdMap,
-                                         itemIdMap,
-                                         userKeyword,
-                                         itemKeyword,
-                                         adjArray,
-                                         trainingRecord)
+    new FriendRecommendationTrainingData(
+      userIdMap,
+      itemIdMap,
+      userKeyword,
+      itemKeyword,
+      adjArray,
+      trainingRecord)
   }
 
   def readItem(

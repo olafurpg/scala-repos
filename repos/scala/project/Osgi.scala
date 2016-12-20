@@ -41,11 +41,12 @@ object Osgi {
     },
     bundle <<= Def.task {
       val res = (products in Compile in packageBin).value
-      bundleTask(headers.value.toMap,
-                 (products in Compile in packageBin).value,
-                 (artifactPath in (Compile, packageBin)).value,
-                 res,
-                 streams.value)
+      bundleTask(
+        headers.value.toMap,
+        (products in Compile in packageBin).value,
+        (artifactPath in (Compile, packageBin)).value,
+        res,
+        streams.value)
     },
     packagedArtifact in (Compile, packageBin) <<=
       (artifact in (Compile, packageBin), bundle).identityMap,

@@ -157,8 +157,9 @@ class BigDecimalTest {
       case xs =>
         for ((a, i) <- xs; (b, j) <- xs) {
           assert(a == b, s"$a != $b (#$i != #$j) but should be the same")
-          assert(a.## == b.##,
-                 s"Hash code mismatch in equal BigDecimals: #$i != #$j")
+          assert(
+            a.## == b.##,
+            s"Hash code mismatch in equal BigDecimals: #$i != #$j")
         }
     }
     val List(xs, ys) = sameRounding.map(_.zipWithIndex)
@@ -209,12 +210,14 @@ class BigDecimalTest {
       val bd = BigDecimal(bi)
       val bd2 = BigDecimal.decimal(d)
       assert(!bi.isValidLong || bi == l, s"Should be invalid or equal: $bi $l")
-      assert(!bi.isValidDouble || bi == d,
-             s"Should be invalid or equal: $bi $d")
+      assert(
+        !bi.isValidDouble || bi == d,
+        s"Should be invalid or equal: $bi $d")
       assert(bd == bi, s"Should be equal $bi $bd")
       assert(bd.## == bi.##, s"Hash codes for $bi, $bd should be equal")
-      assert(bd == bd2 || bd2 != BigDecimal.exact(d) || !bi.isValidDouble,
-             s"$bd != $bd2 should only be when inexact or invalid")
+      assert(
+        bd == bd2 || bd2 != BigDecimal.exact(d) || !bi.isValidDouble,
+        s"$bd != $bd2 should only be when inexact or invalid")
       assert(d == bd2 && bd2 == d, s"$d != $bd2 but they should equal")
     }
     val different = List(
@@ -226,8 +229,9 @@ class BigDecimalTest {
       BigDecimal.decimal((0.1f).toDouble)
     )
     for (a <- different; b <- different if (a ne b))
-      assert(a != b,
-             "BigDecimal representations of Double mistakenly conflated")
+      assert(
+        a != b,
+        "BigDecimal representations of Double mistakenly conflated")
   }
 
   // Make sure hash code agrees with decimal representation of Double

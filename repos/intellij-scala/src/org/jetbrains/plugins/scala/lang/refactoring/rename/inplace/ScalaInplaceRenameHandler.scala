@@ -118,9 +118,10 @@ trait ScalaInplaceRenameHandler {
     }
 
     val atCaret = PsiUtilBase.getElementAtCaret(editor)
-    val selected = ScalaPsiUtil.getParentOfType(atCaret,
-                                                classOf[ScReferenceElement],
-                                                classOf[ScNamedElement])
+    val selected = ScalaPsiUtil.getParentOfType(
+      atCaret,
+      classOf[ScReferenceElement],
+      classOf[ScNamedElement])
     val nameId = selected match {
       case ref: ScReferenceElement => ref.nameId
       case named: ScNamedElement => named.nameId

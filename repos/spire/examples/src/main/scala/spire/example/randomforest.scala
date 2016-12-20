@@ -19,11 +19,13 @@ object RandomForestExample extends App {
   testClassification(DataSet.Iris, RandomForestOptions())
 
   // The Yeast data set uses `Array[Double]`.
-  testClassification(DataSet.Yeast,
-                     RandomForestOptions(numAxesSample = Some(2),
-                                         numPointsSample = Some(200),
-                                         numTrees = Some(200),
-                                         minSplitSize = Some(3)))
+  testClassification(
+    DataSet.Yeast,
+    RandomForestOptions(
+      numAxesSample = Some(2),
+      numPointsSample = Some(200),
+      numTrees = Some(200),
+      minSplitSize = Some(3)))
 
   // The MPG data set uses `Array[Double]`.
   testRegression[Array[Double], Double](
@@ -127,10 +129,12 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
   protected def randomForest(data: Array[V],
                              outputs: Array[K],
                              opts: FixedOptions): Forest = {
-    require(opts.numAxesSample <= V.dimensions,
-            "Cannot sample more dimension than exist in V.")
-    require(data.length == outputs.length,
-            "Number of dependent and independent variables must match.")
+    require(
+      opts.numAxesSample <= V.dimensions,
+      "Cannot sample more dimension than exist in V.")
+    require(
+      data.length == outputs.length,
+      "Number of dependent and independent variables must match.")
 
     // Selects a set of `m` predictors to use as coordiante indices. The
     // sampling is done using a variant of Knuth's shuffle.
@@ -263,11 +267,12 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
   private def fixOptions(size: Int,
                          options: RandomForestOptions): FixedOptions = {
     val defaults = defaultOptions(size)
-    FixedOptions(options.numAxesSample getOrElse defaults.numAxesSample,
-                 options.numPointsSample getOrElse defaults.numPointsSample,
-                 options.numTrees getOrElse defaults.numTrees,
-                 options.minSplitSize getOrElse defaults.minSplitSize,
-                 options.parallel)
+    FixedOptions(
+      options.numAxesSample getOrElse defaults.numAxesSample,
+      options.numPointsSample getOrElse defaults.numPointsSample,
+      options.numTrees getOrElse defaults.numTrees,
+      options.minSplitSize getOrElse defaults.minSplitSize,
+      options.parallel)
   }
 
   def apply(data: Array[V], out: Array[K], options: RandomForestOptions) = {

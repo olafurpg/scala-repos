@@ -18,17 +18,19 @@ class VectorTest extends FunSuite {
 
   test("scan") {
     assert(
-      dvTest.scanLeft(0)((p1: Int, p2: Int) => p1 + p2) == DenseVector(0,
-                                                                       1,
-                                                                       3,
-                                                                       6,
-                                                                       10))
+      dvTest.scanLeft(0)((p1: Int, p2: Int) => p1 + p2) == DenseVector(
+        0,
+        1,
+        3,
+        6,
+        10))
     assert(
-      dvTest.scanRight(0)((p1: Int, p2: Int) => p1 + p2) == DenseVector(10,
-                                                                        9,
-                                                                        7,
-                                                                        4,
-                                                                        0))
+      dvTest.scanRight(0)((p1: Int, p2: Int) => p1 + p2) == DenseVector(
+        10,
+        9,
+        7,
+        4,
+        0))
   }
 
   test("fold") {

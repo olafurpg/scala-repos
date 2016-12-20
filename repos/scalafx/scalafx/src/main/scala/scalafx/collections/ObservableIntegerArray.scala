@@ -32,9 +32,10 @@ import javafx.{collections => jfxc}
   * Companion Object for [[scalafx.collections.ObservableIntegerArray]].
   */
 object ObservableIntegerArray
-    extends ObservableArrayCompanionBase[Int,
-                                         ObservableIntegerArray,
-                                         jfxc.ObservableIntegerArray] {
+    extends ObservableArrayCompanionBase[
+      Int,
+      ObservableIntegerArray,
+      jfxc.ObservableIntegerArray] {
 
   /**
     * @inheritdoc
@@ -72,9 +73,10 @@ object ObservableIntegerArray
 class ObservableIntegerArray(
     delegate: jfxc.ObservableIntegerArray =
       jfxc.FXCollections.observableIntegerArray())
-    extends ObservableArray[Int,
-                            ObservableIntegerArray,
-                            jfxc.ObservableIntegerArray](delegate) {
+    extends ObservableArray[
+      Int,
+      ObservableIntegerArray,
+      jfxc.ObservableIntegerArray](delegate) {
 
   /**
     * Create $OIA with specified capacity.

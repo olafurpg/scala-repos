@@ -105,8 +105,9 @@ class RoutingSpec
 
     "use configured nr-of-instances when FromConfig" in {
       val router =
-        system.actorOf(FromConfig.props(routeeProps = Props[TestActor]),
-                       "router1")
+        system.actorOf(
+          FromConfig.props(routeeProps = Props[TestActor]),
+          "router1")
       router ! GetRoutees
       expectMsgType[Routees].routees.size should ===(3)
       watch(router)
@@ -115,9 +116,10 @@ class RoutingSpec
     }
 
     "use configured nr-of-instances when router is specified" in {
-      val router = system.actorOf(RoundRobinPool(nrOfInstances = 2)
-                                    .props(routeeProps = Props[TestActor]),
-                                  "router2")
+      val router = system.actorOf(
+        RoundRobinPool(nrOfInstances = 2)
+          .props(routeeProps = Props[TestActor]),
+        "router2")
       router ! GetRoutees
       expectMsgType[Routees].routees.size should ===(3)
       system.stop(router)
@@ -133,10 +135,10 @@ class RoutingSpec
           3
         }
       }
-      val router = system.actorOf(RoundRobinPool(nrOfInstances = 0,
-                                                 resizer = Some(resizer))
-                                    .props(routeeProps = Props[TestActor]),
-                                  "router3")
+      val router = system.actorOf(
+        RoundRobinPool(nrOfInstances = 0, resizer = Some(resizer))
+          .props(routeeProps = Props[TestActor]),
+        "router3")
       Await.ready(latch, remainingOrDefault)
       router ! GetRoutees
       expectMsgType[Routees].routees.size should ===(3)
@@ -176,10 +178,11 @@ class RoutingSpec
       val escalator = OneForOneStrategy() {
         case e ⇒ testActor ! e; SupervisorStrategy.Escalate
       }
-      val router = system.actorOf(FromConfig
-                                    .withSupervisorStrategy(escalator)
-                                    .props(routeeProps = Props[TestActor]),
-                                  "router1")
+      val router = system.actorOf(
+        FromConfig
+          .withSupervisorStrategy(escalator)
+          .props(routeeProps = Props[TestActor]),
+        "router1")
       router ! GetRoutees
       EventFilter[ActorKilledException](occurrences = 1) intercept {
         expectMsgType[Routees].routees.head.send(Kill, testActor)
@@ -245,8 +248,9 @@ class RoutingSpec
   "router FromConfig" must {
     "throw suitable exception when not configured" in {
       val e = intercept[ConfigurationException] {
-        system.actorOf(FromConfig.props(routeeProps = Props[TestActor]),
-                       "routerNotDefined")
+        system.actorOf(
+          FromConfig.props(routeeProps = Props[TestActor]),
+          "routerNotDefined")
       }
       e.getMessage should include("routerNotDefined")
     }

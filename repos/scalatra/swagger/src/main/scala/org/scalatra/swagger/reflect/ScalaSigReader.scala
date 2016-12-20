@@ -136,8 +136,9 @@ private[reflect] object ScalaSigReader {
       }
     }
     toClass(
-      findPrimitive(s.children(argIdx).asInstanceOf[SymbolInfoSymbol].infoType,
-                    0))
+      findPrimitive(
+        s.children(argIdx).asInstanceOf[SymbolInfoSymbol].infoType,
+        0))
   }
 
   private def findArgTypeForField(s: MethodSymbol, typeArgIdx: Int): Class[_] = {

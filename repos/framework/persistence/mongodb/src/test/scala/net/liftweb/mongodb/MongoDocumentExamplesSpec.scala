@@ -325,12 +325,13 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
 
     // create a new Person UUID.randomUUID.toString
     val p =
-      Person(UUID.randomUUID,
-             "joe",
-             27,
-             Address("Bulevard", "Helsinki"),
-             List(Child("Mary", 5, Some(cal.getTime)), Child("Mazy", 3, None)),
-             date("2004-09-04T18:06:22.000Z"))
+      Person(
+        UUID.randomUUID,
+        "joe",
+        27,
+        Address("Bulevard", "Helsinki"),
+        List(Child("Mary", 5, Some(cal.getTime)), Child("Mazy", 3, None)),
+        date("2004-09-04T18:06:22.000Z"))
 
     // save it
     p.save
@@ -581,16 +582,17 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
 
     def date(s: String) = Primitive.formats.dateFormat.parse(s).get
 
-    val p = Primitive(ObjectId.get,
-                      2147483647,
-                      2147483648L,
-                      1797693,
-                      3.4028235F,
-                      1000,
-                      0,
-                      true,
-                      512,
-                      date("2004-09-04T18:06:22.000Z"))
+    val p = Primitive(
+      ObjectId.get,
+      2147483647,
+      2147483648L,
+      1797693,
+      3.4028235F,
+      1000,
+      0,
+      true,
+      512,
+      date("2004-09-04T18:06:22.000Z"))
 
     // save it
     p.save
@@ -674,8 +676,9 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
 
     checkMongoIsRunning
 
-    val pdoc1 = PatternDoc(ObjectId.get,
-                           Pattern.compile("^Mo", Pattern.CASE_INSENSITIVE))
+    val pdoc1 = PatternDoc(
+      ObjectId.get,
+      Pattern.compile("^Mo", Pattern.CASE_INSENSITIVE))
     pdoc1.save
 
     PatternDoc.find(pdoc1._id) must beLike {

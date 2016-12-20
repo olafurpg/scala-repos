@@ -22,12 +22,13 @@ object Page {
   def make(name: String, body: String): Option[Page] = name match {
     case NameRegex(lang, numberStr, title) =>
       parseIntOption(numberStr) map { number =>
-        Page(id = name,
-             number = number,
-             slug = slugify(title),
-             lang = lang,
-             title = title.replace("-", " "),
-             body = body)
+        Page(
+          id = name,
+          number = number,
+          slug = slugify(title),
+          lang = lang,
+          title = title.replace("-", " "),
+          body = body)
       }
     case _ => none
   }

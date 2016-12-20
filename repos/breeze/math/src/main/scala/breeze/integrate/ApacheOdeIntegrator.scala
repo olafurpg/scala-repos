@@ -33,11 +33,12 @@ trait ApacheOdeIntegrator extends OdeIntegrator {
     finalStates(0) = y0
     for (i <- 1 until t.length) {
       val result: Array[Double] = new Array(y0.length)
-      inner.integrate(equations,
-                      t(i - 1),
-                      finalStates(i - 1).toArray,
-                      t(i),
-                      result)
+      inner.integrate(
+        equations,
+        t(i - 1),
+        finalStates(i - 1).toArray,
+        t(i),
+        result)
       finalStates(i) = DenseVector(result)
     }
 

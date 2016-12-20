@@ -44,11 +44,12 @@ class LaunchQueueModule(config: LaunchQueueConfig,
     new LaunchQueueDelegate(config, launchQueueActorRef, rateLimiterActor)
 
   private[this] def appActorProps(app: AppDefinition, count: Int): Props =
-    AppTaskLauncherActor.props(config,
-                               subOfferMatcherManager,
-                               clock,
-                               taskOpFactory,
-                               maybeOfferReviver,
-                               taskTracker,
-                               rateLimiterActor)(app, count)
+    AppTaskLauncherActor.props(
+      config,
+      subOfferMatcherManager,
+      clock,
+      taskOpFactory,
+      maybeOfferReviver,
+      taskTracker,
+      rateLimiterActor)(app, count)
 }

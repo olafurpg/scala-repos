@@ -24,9 +24,10 @@ class IndexGrouper[Y: ST: ORD](ix: Index[Y], sorted: Boolean = true) {
   private lazy val uniq: Array[Y] = {
     val arr = ix.uniques.toArray
     if (sorted && !ix.isMonotonic)
-      array.take(arr,
-                 array.argsort(arr),
-                 sys.error("Logic error in sorting group index"))
+      array.take(
+        arr,
+        array.argsort(arr),
+        sys.error("Logic error in sorting group index"))
     else arr
   }
 

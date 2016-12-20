@@ -9,8 +9,9 @@ trait ScalaTestPackageTest extends ScalaTestTestCase {
   protected val secondPackageName = "secondPackage"
 
   protected def addFiles(): Unit = {
-    addFileToProject(packageName + "/Test1.scala",
-                     """
+    addFileToProject(
+      packageName + "/Test1.scala",
+      """
         |package myPackage
         |
         |import org.scalatest._
@@ -22,8 +23,9 @@ trait ScalaTestPackageTest extends ScalaTestTestCase {
         |}
       """.stripMargin.trim())
 
-    addFileToProject(packageName + "/Test2.scala",
-                     """
+    addFileToProject(
+      packageName + "/Test2.scala",
+      """
         |package myPackage
         |
         |import org.scalatest._
@@ -35,8 +37,9 @@ trait ScalaTestPackageTest extends ScalaTestTestCase {
         |}
       """.stripMargin.trim())
 
-    addFileToProject(secondPackageName + "/Test1.scala",
-                     """
+    addFileToProject(
+      secondPackageName + "/Test1.scala",
+      """
         |package secondPackage
         |
         |import org.scalatest._
@@ -67,9 +70,10 @@ trait ScalaTestPackageTest extends ScalaTestTestCase {
       root =>
         checkResultTreeHasExactNamedPath(root, "[root]", "Test1", "Test1") &&
           checkResultTreeHasExactNamedPath(root, "[root]", "Test2", "Test2") &&
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           "Test1",
-                                           "SecondTest"))
+          checkResultTreeHasExactNamedPath(
+            root,
+            "[root]",
+            "Test1",
+            "SecondTest"))
   }
 }

@@ -562,8 +562,9 @@ private[internal] trait TypeMaps { self: SymbolTable =>
     private def correspondingTypeArgument(lhs: Type, rhs: Type): Type = {
       val TypeRef(_, lhsSym, lhsArgs) = lhs
       val TypeRef(_, rhsSym, rhsArgs) = rhs
-      require(lhsSym.owner == rhsSym,
-              s"$lhsSym is not a type parameter of $rhsSym")
+      require(
+        lhsSym.owner == rhsSym,
+        s"$lhsSym is not a type parameter of $rhsSym")
 
       // Find the type parameter position; we'll use the corresponding argument.
       // Why are we checking by name rather than by equality? Because for
@@ -723,8 +724,9 @@ private[internal] trait TypeMaps { self: SymbolTable =>
   abstract class SubstMap[T](from: List[Symbol], to: List[T]) extends TypeMap {
     // OPT this check was 2-3% of some profiles, demoted to -Xdev
     if (isDeveloper)
-      assert(sameLength(from, to),
-             "Unsound substitution from " + from + " to " + to)
+      assert(
+        sameLength(from, to),
+        "Unsound substitution from " + from + " to " + to)
 
     /** Are `sym` and `sym1` the same? Can be tuned by subclasses. */
     protected def matches(sym: Symbol, sym1: Symbol): Boolean = sym eq sym1
@@ -1153,11 +1155,12 @@ private[internal] trait TypeMaps { self: SymbolTable =>
           val msg =
             "Cannot adapt module class; sym = %s, sourceModule = %s, sourceModule.moduleClass = %s => sourceModule1 = %s, sourceModule1.moduleClass = %s"
           debuglog(
-            msg.format(sym,
-                       sym.sourceModule,
-                       sym.sourceModule.moduleClass,
-                       sourceModule1,
-                       sourceModule1.moduleClass))
+            msg.format(
+              sym,
+              sym.sourceModule,
+              sym.sourceModule.moduleClass,
+              sourceModule1,
+              sourceModule1.moduleClass))
           sym
         }
       } else {
@@ -1266,10 +1269,11 @@ private[internal] trait TypeMaps { self: SymbolTable =>
         val parents1 = parents mapConserve (this)
         if (parents1 eq parents) tp
         else
-          refinedType(parents1,
-                      tp.typeSymbol.owner,
-                      decls,
-                      tp.typeSymbol.owner.pos)
+          refinedType(
+            parents1,
+            tp.typeSymbol.owner,
+            decls,
+            tp.typeSymbol.owner.pos)
       case SuperType(_, _) => mapOver(tp)
       case TypeBounds(_, _) => mapOver(tp)
       case TypeVar(_, _) => mapOver(tp)

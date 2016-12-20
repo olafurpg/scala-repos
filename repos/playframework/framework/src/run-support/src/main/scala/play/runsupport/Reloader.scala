@@ -177,8 +177,9 @@ object Reloader {
       filterArgs(args, defaultHttpPort, defaultHttpAddress, devSettings)
     val systemProperties = extractSystemProperties(javaOptions)
 
-    require(httpPort.isDefined || httpsPort.isDefined,
-            "You have to specify https.port when http.port is disabled")
+    require(
+      httpPort.isDefined || httpsPort.isDefined,
+      "You have to specify https.port when http.port is disabled")
 
     // Set Java properties
     (properties ++ systemProperties).foreach {
@@ -250,14 +251,15 @@ object Reloader {
       delegatingLoader)
     lazy val assetsLoader = assetsClassLoader(applicationLoader)
 
-    lazy val reloader = new Reloader(reloadCompile,
-                                     reloaderClassLoader,
-                                     assetsLoader,
-                                     projectPath,
-                                     devSettings,
-                                     monitoredFiles,
-                                     fileWatchService,
-                                     runSbtTask)
+    lazy val reloader = new Reloader(
+      reloadCompile,
+      reloaderClassLoader,
+      assetsLoader,
+      projectPath,
+      devSettings,
+      monitoredFiles,
+      fileWatchService,
+      runSbtTask)
 
     try {
       // Now we're about to start, let's call the hooks:
@@ -288,30 +290,34 @@ object Reloader {
       val server = {
         val mainClass = applicationLoader.loadClass(mainClassName)
         if (httpPort.isDefined) {
-          val mainDev = mainClass.getMethod("mainDevHttpMode",
-                                            classOf[BuildLink],
-                                            classOf[BuildDocHandler],
-                                            classOf[Int],
-                                            classOf[String])
+          val mainDev = mainClass.getMethod(
+            "mainDevHttpMode",
+            classOf[BuildLink],
+            classOf[BuildDocHandler],
+            classOf[Int],
+            classOf[String])
           mainDev
-            .invoke(null,
-                    reloader,
-                    buildDocHandler,
-                    httpPort.get: java.lang.Integer,
-                    httpAddress)
+            .invoke(
+              null,
+              reloader,
+              buildDocHandler,
+              httpPort.get: java.lang.Integer,
+              httpAddress)
             .asInstanceOf[play.core.server.ServerWithStop]
         } else {
-          val mainDev = mainClass.getMethod("mainDevOnlyHttpsMode",
-                                            classOf[BuildLink],
-                                            classOf[BuildDocHandler],
-                                            classOf[Int],
-                                            classOf[String])
+          val mainDev = mainClass.getMethod(
+            "mainDevOnlyHttpsMode",
+            classOf[BuildLink],
+            classOf[BuildDocHandler],
+            classOf[Int],
+            classOf[String])
           mainDev
-            .invoke(null,
-                    reloader,
-                    buildDocHandler,
-                    httpsPort.get: java.lang.Integer,
-                    httpAddress)
+            .invoke(
+              null,
+              reloader,
+              buildDocHandler,
+              httpsPort.get: java.lang.Integer,
+              httpAddress)
             .asInstanceOf[play.core.server.ServerWithStop]
         }
       }
@@ -431,9 +437,10 @@ class Reloader(reloadCompile: () => CompileResult,
               // they won't trigger a reload.
               // Use the SBT watch service, passing true as the termination to force it to break after one check
               val (_, newState) =
-                SourceModificationWatch.watch(PathFinder.strict(classpath).***,
-                                              0,
-                                              watchState)(true)
+                SourceModificationWatch.watch(
+                  PathFinder.strict(classpath).***,
+                  0,
+                  watchState)(true)
               // SBT has a quiet wait period, if that's set to true, sources were modified
               val triggered = newState.awaitingQuietPeriod
               watchState = newState

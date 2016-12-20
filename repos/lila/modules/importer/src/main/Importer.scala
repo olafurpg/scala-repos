@@ -52,10 +52,11 @@ final class Importer(roundMap: ActorRef,
             game.pgnImport.flatMap(_.user).isDefined ?? GameRepo
               .setImportCreatedAt(game)
           } >> {
-            GameRepo.finish(id = game.id,
-                            winnerColor = game.winnerColor,
-                            winnerId = None,
-                            status = game.status)
+            GameRepo.finish(
+              id = game.id,
+              winnerColor = game.winnerColor,
+              winnerId = None,
+              status = game.status)
           } inject game
       }
     }

@@ -132,8 +132,9 @@ object AutoUpdate {
         conn.select("SELECT USER_NAME, REPOSITORY_NAME FROM REPOSITORY") {
           rs =>
             defining(
-              Directory.getAttachedDir(rs.getString("USER_NAME"),
-                                       rs.getString("REPOSITORY_NAME"))) {
+              Directory.getAttachedDir(
+                rs.getString("USER_NAME"),
+                rs.getString("REPOSITORY_NAME"))) {
               dir =>
                 if (dir.exists && dir.isDirectory) {
                   dir.listFiles.foreach {
@@ -147,9 +148,10 @@ object AutoUpdate {
                           .toString
                         if (mimeType.startsWith("image/")) {
                           file.renameTo(
-                            new File(file.getParent,
-                                     file.getName + "." +
-                                       mimeType.split("/")(1)))
+                            new File(
+                              file.getParent,
+                              file.getName + "." +
+                                mimeType.split("/")(1)))
                         }
                       }
                   }
@@ -176,15 +178,15 @@ object AutoUpdate {
           rs =>
             using(
               Git.open(
-                getWikiRepositoryDir(rs.getString("USER_NAME"),
-                                     rs.getString("REPOSITORY_NAME")))) {
-              git =>
-                defining(git.getRepository.getConfig) { config =>
-                  if (!config.getBoolean("http", "receivepack", false)) {
-                    config.setBoolean("http", null, "receivepack", true)
-                    config.save
-                  }
+                getWikiRepositoryDir(
+                  rs.getString("USER_NAME"),
+                  rs.getString("REPOSITORY_NAME")))) { git =>
+              defining(git.getRepository.getConfig) { config =>
+                if (!config.getBoolean("http", "receivepack", false)) {
+                  config.setBoolean("http", null, "receivepack", true)
+                  config.save
                 }
+              }
             }
         }
       }

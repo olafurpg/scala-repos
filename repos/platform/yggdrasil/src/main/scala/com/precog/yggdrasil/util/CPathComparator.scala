@@ -142,10 +142,11 @@ object CPathComparator {
       case (CNum, CDouble) =>
         new ArrayCPathComparator[BigDecimal, Double](lPath, lCol, rPath, rCol)
       case (CNum, CNum) =>
-        new ArrayCPathComparator[BigDecimal, BigDecimal](lPath,
-                                                         lCol,
-                                                         rPath,
-                                                         rCol)
+        new ArrayCPathComparator[BigDecimal, BigDecimal](
+          lPath,
+          lCol,
+          rPath,
+          rCol)
       case (CBoolean, CBoolean) =>
         new ArrayCPathComparator[Boolean, Boolean](lPath, lCol, rPath, rCol)
       case (CString, CString) =>
@@ -200,9 +201,10 @@ object CPathComparator {
       case (CNum, rCol: DoubleColumn) =>
         new HalfArrayCPathComparator[BigDecimal, Double](lPath, lCol, rCol(_))
       case (CNum, rCol: NumColumn) =>
-        new HalfArrayCPathComparator[BigDecimal, BigDecimal](lPath,
-                                                             lCol,
-                                                             rCol(_))
+        new HalfArrayCPathComparator[BigDecimal, BigDecimal](
+          lPath,
+          lCol,
+          rCol(_))
       case (CBoolean, rCol: BoolColumn) =>
         new HalfArrayCPathComparator[Boolean, Boolean](lPath, lCol, rCol(_))
       case (CString, rCol: StrColumn) =>
@@ -247,12 +249,14 @@ private[yggdrasil] trait ArrayCPathComparatorSupport {
   * A non-boxing CPathComparator where the left-side is a homogeneous array and
   * the right side is not.
   */
-private[yggdrasil] final class HalfArrayCPathComparator[@spec(Boolean,
-                                                              Long,
-                                                              Double) A,
-                                                        @spec(Boolean,
-                                                              Long,
-                                                              Double) B](
+private[yggdrasil] final class HalfArrayCPathComparator[@spec(
+                                                          Boolean,
+                                                          Long,
+                                                          Double) A,
+                                                        @spec(
+                                                          Boolean,
+                                                          Long,
+                                                          Double) B](
     lPath: CPath,
     lCol: HomogeneousArrayColumn[_],
     rCol: Int => B)(implicit ma: Manifest[A], ho: HetOrder[A, B])
@@ -283,12 +287,14 @@ private[yggdrasil] final class HalfArrayCPathComparator[@spec(Boolean,
 /**
   * A non-boxing CPathComparator for homogeneous arrays.
   */
-private[yggdrasil] final class ArrayCPathComparator[@spec(Boolean,
-                                                          Long,
-                                                          Double) A,
-                                                    @spec(Boolean,
-                                                          Long,
-                                                          Double) B](
+private[yggdrasil] final class ArrayCPathComparator[@spec(
+                                                      Boolean,
+                                                      Long,
+                                                      Double) A,
+                                                    @spec(
+                                                      Boolean,
+                                                      Long,
+                                                      Double) B](
     lPath: CPath,
     lCol: HomogeneousArrayColumn[_],
     rPath: CPath,

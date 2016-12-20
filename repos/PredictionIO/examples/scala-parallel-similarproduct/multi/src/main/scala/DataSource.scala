@@ -16,10 +16,11 @@ import grizzled.slf4j.Logger
 case class DataSourceParams(appId: Int) extends Params
 
 class DataSource(val dsp: DataSourceParams)
-    extends PDataSource[TrainingData,
-                        EmptyEvaluationInfo,
-                        Query,
-                        EmptyActualResult] {
+    extends PDataSource[
+      TrainingData,
+      EmptyEvaluationInfo,
+      Query,
+      EmptyActualResult] {
 
   @transient lazy val logger = Logger[this.type]
 
@@ -71,19 +72,21 @@ class DataSource(val dsp: DataSourceParams)
 
     // get all "user" "view" "item" events
     val viewEventsRDD: RDD[ViewEvent] = eventsDb
-      .find(appId = dsp.appId,
-            entityType = Some("user"),
-            eventNames = Some(List("view")),
-            // targetEntityType is optional field of an event.
-            targetEntityType = Some(Some("item")))(sc)
+      .find(
+        appId = dsp.appId,
+        entityType = Some("user"),
+        eventNames = Some(List("view")),
+        // targetEntityType is optional field of an event.
+        targetEntityType = Some(Some("item")))(sc)
       // eventsDb.find() returns RDD[Event]
       .map { event =>
         val viewEvent = try {
           event.event match {
             case "view" =>
-              ViewEvent(user = event.entityId,
-                        item = event.targetEntityId.get,
-                        t = event.eventTime.getMillis)
+              ViewEvent(
+                user = event.entityId,
+                item = event.targetEntityId.get,
+                t = event.eventTime.getMillis)
             case _ =>
               throw new Exception(s"Unexpected event ${event} is read.")
           }
@@ -101,20 +104,22 @@ class DataSource(val dsp: DataSourceParams)
     // ADDED
     // get all "user" "like" and "dislike" "item" events
     val likeEventsRDD: RDD[LikeEvent] = eventsDb
-      .find(appId = dsp.appId,
-            entityType = Some("user"),
-            eventNames = Some(List("like", "dislike")),
-            // targetEntityType is optional field of an event.
-            targetEntityType = Some(Some("item")))(sc)
+      .find(
+        appId = dsp.appId,
+        entityType = Some("user"),
+        eventNames = Some(List("like", "dislike")),
+        // targetEntityType is optional field of an event.
+        targetEntityType = Some(Some("item")))(sc)
       // eventsDb.find() returns RDD[Event]
       .map { event =>
         val likeEvent = try {
           event.event match {
             case "like" | "dislike" =>
-              LikeEvent(user = event.entityId,
-                        item = event.targetEntityId.get,
-                        t = event.eventTime.getMillis,
-                        like = (event.event == "like"))
+              LikeEvent(
+                user = event.entityId,
+                item = event.targetEntityId.get,
+                t = event.eventTime.getMillis,
+                like = (event.event == "like"))
             case _ =>
               throw new Exception(s"Unexpected event ${event} is read.")
           }

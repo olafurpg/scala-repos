@@ -30,9 +30,10 @@ object DemoMain {
   }
   @JSExport
   def whitespaceMath(container: html.Div) = {
-    helper(container,
-           fastparse.WhiteSpaceMathTests.expr,
-           "  (  (  1+1  * 2   ) +( 3* 4  *5  )  )/3")
+    helper(
+      container,
+      fastparse.WhiteSpaceMathTests.expr,
+      "  (  (  1+1  * 2   ) +( 3* 4  *5  )  )/3")
   }
   @JSExport
   def indentation(container: html.Div) = {
@@ -53,9 +54,10 @@ object DemoMain {
   }
   @JSExport
   def json(container: html.Div) = {
-    helper(container,
-           fastparse.JsonTests.jsonExpr,
-           """{
+    helper(
+      container,
+      fastparse.JsonTests.jsonExpr,
+      """{
         |  "firstName": "John",
         |  "lastName": "Smith",
         |  "age": 25,

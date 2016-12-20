@@ -113,10 +113,11 @@ trait ProducerSupport extends Actor with CamelSupport {
       case msg @ (_: FailureResult | _: MessageResult) ⇒
         context.parent forward msg
       case msg ⇒
-        produce(endpoint,
-                processor,
-                msg,
-                if (oneway) ExchangePattern.InOnly else ExchangePattern.InOut)
+        produce(
+          endpoint,
+          processor,
+          msg,
+          if (oneway) ExchangePattern.InOnly else ExchangePattern.InOut)
     }
 
     /**
@@ -149,13 +150,13 @@ trait ProducerSupport extends Actor with CamelSupport {
       processor.process(xchg.exchange, new AsyncCallback {
         // Ignoring doneSync, sending back async uniformly.
         def done(doneSync: Boolean): Unit =
-          producer.tell(if (xchg.exchange.isFailed)
-                          xchg.toFailureResult(cmsg.headers(headersToCopy))
-                        else
-                          MessageResult(
-                            xchg.toResponseMessage(
-                              cmsg.headers(headersToCopy))),
-                        originalSender)
+          producer.tell(
+            if (xchg.exchange.isFailed)
+              xchg.toFailureResult(cmsg.headers(headersToCopy))
+            else
+              MessageResult(
+                xchg.toResponseMessage(cmsg.headers(headersToCopy))),
+            originalSender)
       })
     }
   }

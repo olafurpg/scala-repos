@@ -34,10 +34,11 @@ abstract class ApacheAdaptiveStepIntegrator(relTol: DenseVector[Double] = null,
   if (!aTol.isEmpty && !rTol.isEmpty)
     inner.setStepSizeControl(inner.getMinStep, inner.getMaxStep, aTol, rTol)
   else
-    inner.setStepSizeControl(inner.getMinStep,
-                             inner.getMaxStep,
-                             ApacheAdaptiveStepIntegrator.defaultAbsTol,
-                             ApacheAdaptiveStepIntegrator.defaultRelTol)
+    inner.setStepSizeControl(
+      inner.getMinStep,
+      inner.getMaxStep,
+      ApacheAdaptiveStepIntegrator.defaultAbsTol,
+      ApacheAdaptiveStepIntegrator.defaultRelTol)
 }
 
 object ApacheAdaptiveStepIntegrator {

@@ -98,17 +98,19 @@ private[spark] class FairSchedulableBuilder(val rootPool: Pool,
 
   private def buildDefaultPool() {
     if (rootPool.getSchedulableByName(DEFAULT_POOL_NAME) == null) {
-      val pool = new Pool(DEFAULT_POOL_NAME,
-                          DEFAULT_SCHEDULING_MODE,
-                          DEFAULT_MINIMUM_SHARE,
-                          DEFAULT_WEIGHT)
+      val pool = new Pool(
+        DEFAULT_POOL_NAME,
+        DEFAULT_SCHEDULING_MODE,
+        DEFAULT_MINIMUM_SHARE,
+        DEFAULT_WEIGHT)
       rootPool.addSchedulable(pool)
       logInfo(
         "Created default pool %s, schedulingMode: %s, minShare: %d, weight: %d"
-          .format(DEFAULT_POOL_NAME,
-                  DEFAULT_SCHEDULING_MODE,
-                  DEFAULT_MINIMUM_SHARE,
-                  DEFAULT_WEIGHT))
+          .format(
+            DEFAULT_POOL_NAME,
+            DEFAULT_SCHEDULING_MODE,
+            DEFAULT_MINIMUM_SHARE,
+            DEFAULT_WEIGHT))
     }
   }
 
@@ -161,17 +163,19 @@ private[spark] class FairSchedulableBuilder(val rootPool: Pool,
       if (parentPool == null) {
         // we will create a new pool that user has configured in app
         // instead of being defined in xml file
-        parentPool = new Pool(poolName,
-                              DEFAULT_SCHEDULING_MODE,
-                              DEFAULT_MINIMUM_SHARE,
-                              DEFAULT_WEIGHT)
+        parentPool = new Pool(
+          poolName,
+          DEFAULT_SCHEDULING_MODE,
+          DEFAULT_MINIMUM_SHARE,
+          DEFAULT_WEIGHT)
         rootPool.addSchedulable(parentPool)
         logInfo(
           "Created pool %s, schedulingMode: %s, minShare: %d, weight: %d"
-            .format(poolName,
-                    DEFAULT_SCHEDULING_MODE,
-                    DEFAULT_MINIMUM_SHARE,
-                    DEFAULT_WEIGHT))
+            .format(
+              poolName,
+              DEFAULT_SCHEDULING_MODE,
+              DEFAULT_MINIMUM_SHARE,
+              DEFAULT_WEIGHT))
       }
     }
     parentPool.addSchedulable(manager)

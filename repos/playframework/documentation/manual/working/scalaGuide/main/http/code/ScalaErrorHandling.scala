@@ -38,8 +38,8 @@ object ScalaErrorHandling extends PlaySpecification with WsTestClient {
       )
       def errorContent(mode: Mode.Mode) =
         contentAsString(
-          errorHandler(mode).onServerError(FakeRequest(),
-                                           new RuntimeException("foo")))
+          errorHandler(mode)
+            .onServerError(FakeRequest(), new RuntimeException("foo")))
 
       errorContent(Mode.Prod) must startWith("A server error occurred: ")
       errorContent(Mode.Dev) must not startWith ("A server error occurred: ")

@@ -21,10 +21,11 @@ object Item {
 }
 
 class DataSource(val dsp: DataSourceParams)
-    extends PDataSource[TrainingData,
-                        EmptyEvaluationInfo,
-                        Query,
-                        EmptyActualResult] {
+    extends PDataSource[
+      TrainingData,
+      EmptyEvaluationInfo,
+      Query,
+      EmptyActualResult] {
 
   @transient lazy val logger = Logger[this.type]
   private lazy val EntityType = "movie"
@@ -46,11 +47,12 @@ class DataSource(val dsp: DataSourceParams)
 
     // get all user rate events
     val rateEventsRDD: RDD[Event] =
-      eventsDb.find(appId = dsp.appId,
-                    entityType = Some("user"),
-                    eventNames = Some(List("rate")), // read "rate"
-                    // targetEntityType is optional field of an event.
-                    targetEntityType = Some(Some(EntityType)))(sc)
+      eventsDb.find(
+        appId = dsp.appId,
+        entityType = Some("user"),
+        eventNames = Some(List("rate")), // read "rate"
+        // targetEntityType is optional field of an event.
+        targetEntityType = Some(Some(EntityType)))(sc)
 
     // collect ratings
     val ratingsRDD = rateEventsRDD

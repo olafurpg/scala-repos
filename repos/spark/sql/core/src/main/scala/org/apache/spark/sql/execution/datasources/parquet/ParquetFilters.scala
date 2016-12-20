@@ -223,8 +223,9 @@ private[sql] object ParquetFilters {
           SetInFilter(v.asInstanceOf[Set[java.lang.Integer]]))
     case LongType =>
       (n: String, v: Set[Any]) =>
-        FilterApi.userDefined(longColumn(n),
-                              SetInFilter(v.asInstanceOf[Set[java.lang.Long]]))
+        FilterApi.userDefined(
+          longColumn(n),
+          SetInFilter(v.asInstanceOf[Set[java.lang.Long]]))
     case FloatType =>
       (n: String, v: Set[Any]) =>
         FilterApi.userDefined(
@@ -370,8 +371,9 @@ private[sql] object ParquetFilters {
   private lazy val relaxParquetValidTypeMap: Unit = {
     val constructor = Class
       .forName(classOf[ValidTypeMap].getCanonicalName + "$FullTypeDescriptor")
-      .getDeclaredConstructor(classOf[PrimitiveTypeName],
-                              classOf[OriginalType])
+      .getDeclaredConstructor(
+        classOf[PrimitiveTypeName],
+        classOf[OriginalType])
 
     constructor.setAccessible(true)
     val enumTypeDescriptor = constructor

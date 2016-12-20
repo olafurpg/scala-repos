@@ -490,8 +490,9 @@ with ContextTrees with RichCompilationUnits with Picklers {
                     units.size))
                 debugLog(
                   "Cleanup up responses (%d loadedType pending, %d parsedEntered pending)"
-                    .format(waitLoadedTypeResponses.size,
-                            getParsedEnteredResponses.size))
+                    .format(
+                      waitLoadedTypeResponses.size,
+                      getParsedEnteredResponses.size))
                 checkNoResponsesOutstanding()
 
                 log.flush()
@@ -1100,10 +1101,11 @@ with ContextTrees with RichCompilationUnits with Picklers {
               context.isAccessible(s.getter, pre, superAccess = false),
               viaImport)
           else
-            new ScopeMember(s,
-                            st,
-                            context.isAccessible(s, pre, superAccess = false),
-                            viaImport)
+            new ScopeMember(
+              s,
+              st,
+              context.isAccessible(s, pre, superAccess = false),
+              viaImport)
         member.prefix = pre
         member
       }
@@ -1179,9 +1181,10 @@ with ContextTrees with RichCompilationUnits with Picklers {
         val result = new TypeMember(
           s,
           st,
-          context.isAccessible(if (s.hasGetter) s.getterIn(s.owner) else s,
-                               pre,
-                               superAccess && !implicitlyAdded),
+          context.isAccessible(
+            if (s.hasGetter) s.getterIn(s.owner) else s,
+            pre,
+            superAccess && !implicitlyAdded),
           inherited,
           viaView)
         result.prefix = pre
@@ -1216,11 +1219,11 @@ with ContextTrees with RichCompilationUnits with Picklers {
       val applicableViews: List[SearchResult] =
         if (ownerTpe.isErroneous) List()
         else
-          new ImplicitSearch(tree,
-                             functionType(List(ownerTpe), AnyTpe),
-                             isView = true,
-                             context0 = context.makeImplicit(
-                               reportAmbiguousErrors = false)).allImplicits
+          new ImplicitSearch(
+            tree,
+            functionType(List(ownerTpe), AnyTpe),
+            isView = true,
+            context0 = context.makeImplicit(reportAmbiguousErrors = false)).allImplicits
       for (view <- applicableViews) {
         val vtree = viewApply(view)
         val vpre = stabilizedType(vtree)
@@ -1309,10 +1312,11 @@ with ContextTrees with RichCompilationUnits with Picklers {
                     init =>
                       enteredAlternatives.exists(
                         entered =>
-                          lenientMatch(entered.stripPrefix(init),
-                                       tail,
-                                       matchCount +
-                                         (if (init.isEmpty) 0 else 1))))
+                          lenientMatch(
+                            entered.stripPrefix(init),
+                            tail,
+                            matchCount +
+                              (if (init.isEmpty) 0 else 1))))
             }
           }
           val containsAllEnteredChars = {
@@ -1486,16 +1490,17 @@ with ContextTrees with RichCompilationUnits with Picklers {
   // Otherwise thread safety property of parseTree method would be violated.
   protected def forceSymbolsUsedByParser(): Unit = {
     val symbols =
-      Set(UnitClass,
-          BooleanClass,
-          ByteClass,
-          ShortClass,
-          IntClass,
-          LongClass,
-          FloatClass,
-          DoubleClass,
-          NilModule,
-          ListClass) ++ TupleClass.seq
+      Set(
+        UnitClass,
+        BooleanClass,
+        ByteClass,
+        ShortClass,
+        IntClass,
+        LongClass,
+        FloatClass,
+        DoubleClass,
+        NilModule,
+        ListClass) ++ TupleClass.seq
     symbols.foreach(_.initialize)
   }
 

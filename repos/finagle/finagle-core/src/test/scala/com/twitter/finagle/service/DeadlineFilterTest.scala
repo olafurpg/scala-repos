@@ -357,9 +357,10 @@ class DeadlineFilterTest extends FunSuite with MockitoSugar {
         assert(
           statsReceiver.counters
             .get(
-              List("admission_control",
-                   "deadline",
-                   "exceeded_beyond_tolerance")) == None)
+              List(
+                "admission_control",
+                "deadline",
+                "exceeded_beyond_tolerance")) == None)
         assert(
           statsReceiver.counters.get(
             List("admission_control", "deadline", "rejected")) == Some(1))

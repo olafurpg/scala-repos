@@ -148,19 +148,20 @@ class DoubleRDDSuite extends SparkFunSuite with SharedSparkContext {
   test("WorksMixedRangeWithUnevenBucketsAndNaN") {
     // Make sure that it works with two unequally spaced buckets and elements in each
     val rdd = sc.parallelize(
-      Seq(-0.01,
-          0.0,
-          1,
-          2,
-          3,
-          5,
-          6,
-          11.01,
-          12.0,
-          199.0,
-          200.0,
-          200.1,
-          Double.NaN))
+      Seq(
+        -0.01,
+        0.0,
+        1,
+        2,
+        3,
+        5,
+        6,
+        11.01,
+        12.0,
+        199.0,
+        200.0,
+        200.1,
+        Double.NaN))
     val buckets = Array(0.0, 5.0, 11.0, 12.0, 200.0)
     val histogramResults = rdd.histogram(buckets)
     val expectedHistogramResults = Array(4, 2, 1, 3)
@@ -170,19 +171,20 @@ class DoubleRDDSuite extends SparkFunSuite with SharedSparkContext {
   test("WorksMixedRangeWithUnevenBucketsAndNaNAndNaNRange") {
     // Make sure that it works with two unequally spaced buckets and elements in each
     val rdd = sc.parallelize(
-      Seq(-0.01,
-          0.0,
-          1,
-          2,
-          3,
-          5,
-          6,
-          11.01,
-          12.0,
-          199.0,
-          200.0,
-          200.1,
-          Double.NaN))
+      Seq(
+        -0.01,
+        0.0,
+        1,
+        2,
+        3,
+        5,
+        6,
+        11.01,
+        12.0,
+        199.0,
+        200.0,
+        200.1,
+        Double.NaN))
     val buckets = Array(0.0, 5.0, 11.0, 12.0, 200.0, Double.NaN)
     val histogramResults = rdd.histogram(buckets)
     val expectedHistogramResults = Array(4, 2, 1, 2, 3)
@@ -192,21 +194,22 @@ class DoubleRDDSuite extends SparkFunSuite with SharedSparkContext {
   test("WorksMixedRangeWithUnevenBucketsAndNaNAndNaNRangeAndInfinity") {
     // Make sure that it works with two unequally spaced buckets and elements in each
     val rdd = sc.parallelize(
-      Seq(-0.01,
-          0.0,
-          1,
-          2,
-          3,
-          5,
-          6,
-          11.01,
-          12.0,
-          199.0,
-          200.0,
-          200.1,
-          1.0 / 0.0,
-          -1.0 / 0.0,
-          Double.NaN))
+      Seq(
+        -0.01,
+        0.0,
+        1,
+        2,
+        3,
+        5,
+        6,
+        11.01,
+        12.0,
+        199.0,
+        200.0,
+        200.1,
+        1.0 / 0.0,
+        -1.0 / 0.0,
+        Double.NaN))
     val buckets = Array(0.0, 5.0, 11.0, 12.0, 200.0, Double.NaN)
     val histogramResults = rdd.histogram(buckets)
     val expectedHistogramResults = Array(4, 2, 1, 2, 4)

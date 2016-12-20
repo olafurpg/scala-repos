@@ -161,8 +161,9 @@ private[akka] trait Pump {
       "Pump has been not initialized with a phase")
 
   final def initialPhase(waitForUpstream: Int, andThen: TransferPhase): Unit = {
-    require(waitForUpstream >= 1,
-            s"waitForUpstream must be >= 1 (was $waitForUpstream)")
+    require(
+      waitForUpstream >= 1,
+      s"waitForUpstream must be >= 1 (was $waitForUpstream)")
     if (transferState != NotInitialized)
       throw new IllegalStateException(
         s"initialPhase expected NotInitialized, but was [$transferState]")
@@ -170,8 +171,9 @@ private[akka] trait Pump {
   }
 
   final def waitForUpstreams(waitForUpstream: Int): Unit = {
-    require(waitForUpstream >= 1,
-            s"waitForUpstream must be >= 1 (was $waitForUpstream)")
+    require(
+      waitForUpstream >= 1,
+      s"waitForUpstream must be >= 1 (was $waitForUpstream)")
     transferState = WaitingForUpstreamSubscription(
       waitForUpstream,
       TransferPhase(transferState)(currentAction))

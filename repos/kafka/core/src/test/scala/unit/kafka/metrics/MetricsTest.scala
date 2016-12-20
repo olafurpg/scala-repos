@@ -58,11 +58,12 @@ class MetricsTest extends KafkaServerTestHarness with Logging {
     "0.10.0.0")
   def testMetricsLeak() {
     // create topic topic1 with 1 partition on broker 0
-    createTopic(zkUtils,
-                topic,
-                numPartitions = 1,
-                replicationFactor = 1,
-                servers = servers)
+    createTopic(
+      zkUtils,
+      topic,
+      numPartitions = 1,
+      replicationFactor = 1,
+      servers = servers)
     // force creation not client's specific metrics.
     createAndShutdownStep("group0", "consumer0", "producer0")
 
@@ -73,11 +74,13 @@ class MetricsTest extends KafkaServerTestHarness with Logging {
       Metrics.defaultRegistry().allMetrics().keySet().size
 
     for (i <- 0 to 5) {
-      createAndShutdownStep("group" + i % 3,
-                            "consumer" + i % 2,
-                            "producer" + i % 2)
-      assertEquals(countOfStaticMetrics,
-                   Metrics.defaultRegistry().allMetrics().keySet().size)
+      createAndShutdownStep(
+        "group" + i % 3,
+        "consumer" + i % 2,
+        "producer" + i % 2)
+      assertEquals(
+        countOfStaticMetrics,
+        Metrics.defaultRegistry().allMetrics().keySet().size)
     }
   }
 
@@ -87,8 +90,9 @@ class MetricsTest extends KafkaServerTestHarness with Logging {
     AdminUtils.createTopic(zkUtils, topic, 1, 1)
     AdminUtils.deleteTopic(zkUtils, topic)
     TestUtils.verifyTopicDeletion(zkUtils, topic, 1, servers)
-    assertFalse("Topic metrics exists after deleteTopic",
-                checkTopicMetricsExists(topic))
+    assertFalse(
+      "Topic metrics exists after deleteTopic",
+      checkTopicMetricsExists(topic))
   }
 
   @deprecated(

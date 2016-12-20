@@ -112,27 +112,30 @@ class FileStreamSourceSuite
 
   test("FileStreamSource schema: no path") {
     val e = intercept[IllegalArgumentException] {
-      createFileStreamSourceAndGetSchema(format = None,
-                                         path = None,
-                                         schema = None)
+      createFileStreamSourceAndGetSchema(
+        format = None,
+        path = None,
+        schema = None)
     }
     assert("'path' is not specified" === e.getMessage)
   }
 
   test("FileStreamSource schema: path doesn't exist") {
     intercept[AnalysisException] {
-      createFileStreamSourceAndGetSchema(format = None,
-                                         path = Some("/a/b/c"),
-                                         schema = None)
+      createFileStreamSourceAndGetSchema(
+        format = None,
+        path = Some("/a/b/c"),
+        schema = None)
     }
   }
 
   test("FileStreamSource schema: text, no existing files, no schema") {
     withTempDir { src =>
       val schema =
-        createFileStreamSourceAndGetSchema(format = Some("text"),
-                                           path = Some(src.getCanonicalPath),
-                                           schema = None)
+        createFileStreamSourceAndGetSchema(
+          format = Some("text"),
+          path = Some(src.getCanonicalPath),
+          schema = None)
       assert(schema === new StructType().add("value", StringType))
     }
   }
@@ -141,9 +144,10 @@ class FileStreamSourceSuite
     withTempDir { src =>
       stringToFile(new File(src, "1"), "a\nb\nc")
       val schema =
-        createFileStreamSourceAndGetSchema(format = Some("text"),
-                                           path = Some(src.getCanonicalPath),
-                                           schema = None)
+        createFileStreamSourceAndGetSchema(
+          format = Some("text"),
+          path = Some(src.getCanonicalPath),
+          schema = None)
       assert(schema === new StructType().add("value", StringType))
     }
   }
@@ -153,9 +157,10 @@ class FileStreamSourceSuite
       stringToFile(new File(src, "1"), "a\nb\nc")
       val userSchema = new StructType().add("userColumn", StringType)
       val schema =
-        createFileStreamSourceAndGetSchema(format = Some("text"),
-                                           path = Some(src.getCanonicalPath),
-                                           schema = Some(userSchema))
+        createFileStreamSourceAndGetSchema(
+          format = Some("text"),
+          path = Some(src.getCanonicalPath),
+          schema = Some(userSchema))
       assert(schema === userSchema)
     }
   }
@@ -182,9 +187,10 @@ class FileStreamSourceSuite
         .write
         .parquet(new File(src, "1").getCanonicalPath)
       val schema =
-        createFileStreamSourceAndGetSchema(format = Some("parquet"),
-                                           path = Some(src.getCanonicalPath),
-                                           schema = None)
+        createFileStreamSourceAndGetSchema(
+          format = Some("parquet"),
+          path = Some(src.getCanonicalPath),
+          schema = None)
       assert(schema === new StructType().add("value", StringType))
     }
   }
@@ -199,9 +205,10 @@ class FileStreamSourceSuite
         .parquet(new File(src, "1").getCanonicalPath)
       val userSchema = new StructType().add("userColumn", StringType)
       val schema =
-        createFileStreamSourceAndGetSchema(format = Some("parquet"),
-                                           path = Some(src.getCanonicalPath),
-                                           schema = Some(userSchema))
+        createFileStreamSourceAndGetSchema(
+          format = Some("parquet"),
+          path = Some(src.getCanonicalPath),
+          schema = Some(userSchema))
       assert(schema === userSchema)
     }
   }
@@ -209,9 +216,10 @@ class FileStreamSourceSuite
   test("FileStreamSource schema: json, no existing files, no schema") {
     withTempDir { src =>
       val e = intercept[AnalysisException] {
-        createFileStreamSourceAndGetSchema(format = Some("json"),
-                                           path = Some(src.getCanonicalPath),
-                                           schema = None)
+        createFileStreamSourceAndGetSchema(
+          format = Some("json"),
+          path = Some(src.getCanonicalPath),
+          schema = None)
       }
       assert(
         "Unable to infer schema.  It must be specified manually.;" === e.getMessage)
@@ -222,9 +230,10 @@ class FileStreamSourceSuite
     withTempDir { src =>
       stringToFile(new File(src, "1"), "{'c': '1'}\n{'c': '2'}\n{'c': '3'}")
       val schema =
-        createFileStreamSourceAndGetSchema(format = Some("json"),
-                                           path = Some(src.getCanonicalPath),
-                                           schema = None)
+        createFileStreamSourceAndGetSchema(
+          format = Some("json"),
+          path = Some(src.getCanonicalPath),
+          schema = None)
       assert(schema === new StructType().add("c", StringType))
     }
   }
@@ -234,9 +243,10 @@ class FileStreamSourceSuite
       stringToFile(new File(src, "1"), "{'c': '1'}\n{'c': '2'}\n{'c', '3'}")
       val userSchema = new StructType().add("userColumn", StringType)
       val schema =
-        createFileStreamSourceAndGetSchema(format = Some("json"),
-                                           path = Some(src.getCanonicalPath),
-                                           schema = Some(userSchema))
+        createFileStreamSourceAndGetSchema(
+          format = Some("json"),
+          path = Some(src.getCanonicalPath),
+          schema = Some(userSchema))
       assert(schema === userSchema)
     }
   }
@@ -303,8 +313,9 @@ class FileStreamSourceSuite
     val tmp = Utils.createTempDir("streaming.tmp")
 
     // Add a file so that we can infer its schema
-    stringToFile(new File(src, "existing"),
-                 "{'c': 'drop1'}\n{'c': 'keep2'}\n{'c': 'keep3'}")
+    stringToFile(
+      new File(src, "existing"),
+      "{'c': 'drop1'}\n{'c': 'keep2'}\n{'c': 'keep3'}")
 
     val textSource = createFileStreamSource("json", src.getCanonicalPath)
 
@@ -312,10 +323,11 @@ class FileStreamSourceSuite
     val filtered = textSource.toDF().filter($"c" contains "keep")
 
     testStream(filtered)(
-      AddTextFileData(textSource,
-                      "{'c': 'drop4'}\n{'c': 'keep5'}\n{'c': 'keep6'}",
-                      src,
-                      tmp),
+      AddTextFileData(
+        textSource,
+        "{'c': 'drop4'}\n{'c': 'keep5'}\n{'c': 'keep6'}",
+        src,
+        tmp),
       CheckAnswer("keep2", "keep3", "keep5", "keep6")
     )
 
@@ -327,9 +339,10 @@ class FileStreamSourceSuite
     val src = Utils.createTempDir("streaming.src")
     val tmp = Utils.createTempDir("streaming.tmp")
 
-    val fileSource = createFileStreamSource("parquet",
-                                            src.getCanonicalPath,
-                                            Some(valueSchema))
+    val fileSource = createFileStreamSource(
+      "parquet",
+      src.getCanonicalPath,
+      Some(valueSchema))
     val filtered = fileSource.toDF().filter($"value" contains "keep")
 
     testStream(filtered)(
@@ -397,8 +410,9 @@ class FileStreamSourceSuite
     assertBatch(textSource2.getNextBatch(None), textSource.getNextBatch(None))
     for (f <- 0L to textSource.currentOffset.offset) {
       val offset = LongOffset(f)
-      assertBatch(textSource2.getNextBatch(Some(offset)),
-                  textSource.getNextBatch(Some(offset)))
+      assertBatch(
+        textSource2.getNextBatch(Some(offset)),
+        textSource.getNextBatch(Some(offset)))
     }
 
     Utils.deleteRecursively(src)

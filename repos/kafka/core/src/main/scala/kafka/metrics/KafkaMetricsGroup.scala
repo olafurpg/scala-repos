@@ -121,89 +121,108 @@ object KafkaMetricsGroup extends KafkaMetricsGroup with Logging {
   private val consumerMetricNameList: immutable.List[MetricName] =
     immutable.List[MetricName](
       // kafka.consumer.ZookeeperConsumerConnector
-      new MetricName("kafka.consumer",
-                     "ZookeeperConsumerConnector",
-                     "FetchQueueSize"),
-      new MetricName("kafka.consumer",
-                     "ZookeeperConsumerConnector",
-                     "KafkaCommitsPerSec"),
-      new MetricName("kafka.consumer",
-                     "ZookeeperConsumerConnector",
-                     "ZooKeeperCommitsPerSec"),
-      new MetricName("kafka.consumer",
-                     "ZookeeperConsumerConnector",
-                     "RebalanceRateAndTime"),
-      new MetricName("kafka.consumer",
-                     "ZookeeperConsumerConnector",
-                     "OwnedPartitionsCount"),
+      new MetricName(
+        "kafka.consumer",
+        "ZookeeperConsumerConnector",
+        "FetchQueueSize"),
+      new MetricName(
+        "kafka.consumer",
+        "ZookeeperConsumerConnector",
+        "KafkaCommitsPerSec"),
+      new MetricName(
+        "kafka.consumer",
+        "ZookeeperConsumerConnector",
+        "ZooKeeperCommitsPerSec"),
+      new MetricName(
+        "kafka.consumer",
+        "ZookeeperConsumerConnector",
+        "RebalanceRateAndTime"),
+      new MetricName(
+        "kafka.consumer",
+        "ZookeeperConsumerConnector",
+        "OwnedPartitionsCount"),
       // kafka.consumer.ConsumerFetcherManager
       new MetricName("kafka.consumer", "ConsumerFetcherManager", "MaxLag"),
-      new MetricName("kafka.consumer",
-                     "ConsumerFetcherManager",
-                     "MinFetchRate"),
+      new MetricName(
+        "kafka.consumer",
+        "ConsumerFetcherManager",
+        "MinFetchRate"),
       // kafka.server.AbstractFetcherThread <-- kafka.consumer.ConsumerFetcherThread
       new MetricName("kafka.server", "FetcherLagMetrics", "ConsumerLag"),
       // kafka.consumer.ConsumerTopicStats <-- kafka.consumer.{ConsumerIterator, PartitionTopicInfo}
-      new MetricName("kafka.consumer",
-                     "ConsumerTopicMetrics",
-                     "MessagesPerSec"),
+      new MetricName(
+        "kafka.consumer",
+        "ConsumerTopicMetrics",
+        "MessagesPerSec"),
       // kafka.consumer.ConsumerTopicStats
       new MetricName("kafka.consumer", "ConsumerTopicMetrics", "BytesPerSec"),
       // kafka.server.AbstractFetcherThread <-- kafka.consumer.ConsumerFetcherThread
       new MetricName("kafka.server", "FetcherStats", "BytesPerSec"),
       new MetricName("kafka.server", "FetcherStats", "RequestsPerSec"),
       // kafka.consumer.FetchRequestAndResponseStats <-- kafka.consumer.SimpleConsumer
-      new MetricName("kafka.consumer",
-                     "FetchRequestAndResponseMetrics",
-                     "FetchResponseSize"),
-      new MetricName("kafka.consumer",
-                     "FetchRequestAndResponseMetrics",
-                     "FetchRequestRateAndTimeMs"),
-      new MetricName("kafka.consumer",
-                     "FetchRequestAndResponseMetrics",
-                     "FetchRequestThrottleRateAndTimeMs"),
+      new MetricName(
+        "kafka.consumer",
+        "FetchRequestAndResponseMetrics",
+        "FetchResponseSize"),
+      new MetricName(
+        "kafka.consumer",
+        "FetchRequestAndResponseMetrics",
+        "FetchRequestRateAndTimeMs"),
+      new MetricName(
+        "kafka.consumer",
+        "FetchRequestAndResponseMetrics",
+        "FetchRequestThrottleRateAndTimeMs"),
       /**
         * ProducerRequestStats <-- SyncProducer
         * metric for SyncProducer in fetchTopicMetaData() needs to be removed when consumer is closed.
         */
-      new MetricName("kafka.producer",
-                     "ProducerRequestMetrics",
-                     "ProducerRequestRateAndTimeMs"),
-      new MetricName("kafka.producer",
-                     "ProducerRequestMetrics",
-                     "ProducerRequestSize")
+      new MetricName(
+        "kafka.producer",
+        "ProducerRequestMetrics",
+        "ProducerRequestRateAndTimeMs"),
+      new MetricName(
+        "kafka.producer",
+        "ProducerRequestMetrics",
+        "ProducerRequestSize")
     )
 
   private val producerMetricNameList: immutable.List[MetricName] = immutable
     .List[MetricName](
       // kafka.producer.ProducerStats <-- DefaultEventHandler <-- Producer
-      new MetricName("kafka.producer",
-                     "ProducerStats",
-                     "SerializationErrorsPerSec"),
+      new MetricName(
+        "kafka.producer",
+        "ProducerStats",
+        "SerializationErrorsPerSec"),
       new MetricName("kafka.producer", "ProducerStats", "ResendsPerSec"),
       new MetricName("kafka.producer", "ProducerStats", "FailedSendsPerSec"),
       // kafka.producer.ProducerSendThread
-      new MetricName("kafka.producer.async",
-                     "ProducerSendThread",
-                     "ProducerQueueSize"),
+      new MetricName(
+        "kafka.producer.async",
+        "ProducerSendThread",
+        "ProducerQueueSize"),
       // kafka.producer.ProducerTopicStats <-- kafka.producer.{Producer, async.DefaultEventHandler}
-      new MetricName("kafka.producer",
-                     "ProducerTopicMetrics",
-                     "MessagesPerSec"),
-      new MetricName("kafka.producer",
-                     "ProducerTopicMetrics",
-                     "DroppedMessagesPerSec"),
+      new MetricName(
+        "kafka.producer",
+        "ProducerTopicMetrics",
+        "MessagesPerSec"),
+      new MetricName(
+        "kafka.producer",
+        "ProducerTopicMetrics",
+        "DroppedMessagesPerSec"),
       new MetricName("kafka.producer", "ProducerTopicMetrics", "BytesPerSec"),
       // kafka.producer.ProducerRequestStats <-- SyncProducer
-      new MetricName("kafka.producer",
-                     "ProducerRequestMetrics",
-                     "ProducerRequestRateAndTimeMs"),
-      new MetricName("kafka.producer",
-                     "ProducerRequestMetrics",
-                     "ProducerRequestSize"),
-      new MetricName("kafka.producer",
-                     "ProducerRequestMetrics",
-                     "ProducerRequestThrottleRateAndTimeMs")
+      new MetricName(
+        "kafka.producer",
+        "ProducerRequestMetrics",
+        "ProducerRequestRateAndTimeMs"),
+      new MetricName(
+        "kafka.producer",
+        "ProducerRequestMetrics",
+        "ProducerRequestSize"),
+      new MetricName(
+        "kafka.producer",
+        "ProducerRequestMetrics",
+        "ProducerRequestThrottleRateAndTimeMs")
     )
 
   private def toMBeanName(

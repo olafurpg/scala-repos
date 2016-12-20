@@ -141,11 +141,12 @@ class ZkClientTest extends WordSpec with MockitoSugar {
           meq(null))) thenAnswer answer[AsyncCallback.Children2Callback](2) {
         cbValue =>
           children onSuccess { znode =>
-            cbValue.processResult(0,
-                                  path,
-                                  null,
-                                  znode.children.map { _.name }.toList.asJava,
-                                  znode.stat)
+            cbValue.processResult(
+              0,
+              path,
+              null,
+              znode.children.map { _.name }.toList.asJava,
+              znode.stat)
           } onFailure {
             case ke: KeeperException =>
               cbValue.processResult(ke.code.intValue, path, null, null, null)
@@ -164,11 +165,12 @@ class ZkClientTest extends WordSpec with MockitoSugar {
         case (watcher: Watcher, cbValue: AsyncCallback.Children2Callback) =>
           children onSuccess {
             case ZNode.Children(znode, stat, children) =>
-              cbValue.processResult(0,
-                                    path,
-                                    null,
-                                    children.map { _.name }.toList.asJava,
-                                    stat)
+              cbValue.processResult(
+                0,
+                path,
+                null,
+                children.map { _.name }.toList.asJava,
+                stat)
           } onFailure {
             case ke: KeeperException =>
               cbValue.processResult(ke.code.intValue, path, null, null, null)
@@ -480,9 +482,10 @@ class ZkClientTest extends WordSpec with MockitoSugar {
           assert(
             Await
               .result(
-                zkClient(path).create(data,
-                                      child = Some(""),
-                                      mode = CreateMode.EPHEMERAL_SEQUENTIAL))
+                zkClient(path).create(
+                  data,
+                  child = Some(""),
+                  mode = CreateMode.EPHEMERAL_SEQUENTIAL))
               .path == path + "/0000")
         }
       }
@@ -694,10 +697,11 @@ class ZkClientTest extends WordSpec with MockitoSugar {
       "monitor" in {
         val znode = zkClient("/characters")
         val results =
-          List(Seq("Angel", "Buffy", "Giles", "Willow", "Xander"),
-               Seq("Angel", "Buffy", "Giles", "Spike", "Willow", "Xander"),
-               Seq("Buffy", "Giles", "Willow", "Xander"),
-               Seq("Angel", "Spike")) map {
+          List(
+            Seq("Angel", "Buffy", "Giles", "Willow", "Xander"),
+            Seq("Angel", "Buffy", "Giles", "Spike", "Willow", "Xander"),
+            Seq("Buffy", "Giles", "Willow", "Xander"),
+            Seq("Angel", "Spike")) map {
             ZNode.Children(znode, new Stat, _)
           }
         results foreach { r =>
@@ -848,9 +852,10 @@ class ZkClientTest extends WordSpec with MockitoSugar {
         .map { z =>
           val prior: Set[ZNode] =
             expectedByPath.get(z.path).map { _.added }.getOrElse(Set.empty)
-          z.path -> ZNode.TreeUpdate(z,
-                                     z.children.toSet -- prior,
-                                     prior -- z.children.toSet)
+          z.path -> ZNode.TreeUpdate(
+            z,
+            z.children.toSet -- prior,
+            prior -- z.children.toSet)
         }
         .toMap
 

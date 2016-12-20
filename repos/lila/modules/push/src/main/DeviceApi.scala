@@ -34,14 +34,15 @@ private final class DeviceApi(coll: Coll) {
   def register(user: User, platform: String, deviceId: String) = {
     lila.mon.push.register.in(platform)()
     coll
-      .update(BSONDocument("_id" -> deviceId),
-              Device(
-                _id = deviceId,
-                platform = platform,
-                userId = user.id,
-                seenAt = DateTime.now
-              ),
-              upsert = true)
+      .update(
+        BSONDocument("_id" -> deviceId),
+        Device(
+          _id = deviceId,
+          platform = platform,
+          userId = user.id,
+          seenAt = DateTime.now
+        ),
+        upsert = true)
       .void
   }
 

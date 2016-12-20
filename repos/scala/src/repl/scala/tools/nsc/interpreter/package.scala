@@ -141,8 +141,9 @@ package object interpreter extends ReplConfig with ReplStrings {
     }
 
     def kindCommandInternal(expr: String, verbose: Boolean): Unit = {
-      val catcher = catching(classOf[MissingRequirementError],
-                             classOf[ScalaReflectionException])
+      val catcher = catching(
+        classOf[MissingRequirementError],
+        classOf[ScalaReflectionException])
       def typeFromTypeString: Option[ClassSymbol] = catcher opt {
         exprTyper.typeOfTypeString(expr).typeSymbol.asClass
       }

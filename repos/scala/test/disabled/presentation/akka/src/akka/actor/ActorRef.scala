@@ -900,21 +900,23 @@ class LocalActorRef private[akka] (private[this] val actorFactory: () => Actor,
       message: Any,
       senderOption: Option[ActorRef]): Unit =
     if (isClientManaged_?) {
-      Actor.remote.send[Any](message,
-                             senderOption,
-                             None,
-                             homeAddress.get,
-                             timeout,
-                             true,
-                             this,
-                             None,
-                             ActorType.ScalaActor,
-                             None)
+      Actor.remote.send[Any](
+        message,
+        senderOption,
+        None,
+        homeAddress.get,
+        timeout,
+        true,
+        this,
+        None,
+        ActorType.ScalaActor,
+        None)
     } else
-      dispatcher dispatchMessage new MessageInvocation(this,
-                                                       message,
-                                                       senderOption,
-                                                       None)
+      dispatcher dispatchMessage new MessageInvocation(
+        this,
+        message,
+        senderOption,
+        None)
 
   protected[akka] def postMessageToMailboxAndCreateFutureResultWithTimeout[T](
       message: Any,
@@ -922,16 +924,17 @@ class LocalActorRef private[akka] (private[this] val actorFactory: () => Actor,
       senderOption: Option[ActorRef],
       senderFuture: Option[CompletableFuture[T]]): CompletableFuture[T] = {
     if (isClientManaged_?) {
-      val future = Actor.remote.send[T](message,
-                                        senderOption,
-                                        senderFuture,
-                                        homeAddress.get,
-                                        timeout,
-                                        false,
-                                        this,
-                                        None,
-                                        ActorType.ScalaActor,
-                                        None)
+      val future = Actor.remote.send[T](
+        message,
+        senderOption,
+        senderFuture,
+        homeAddress.get,
+        timeout,
+        false,
+        this,
+        None,
+        ActorType.ScalaActor,
+        None)
       if (future.isDefined) future.get
       else
         throw new IllegalActorStateException(
@@ -1060,10 +1063,11 @@ class LocalActorRef private[akka] (private[this] val actorFactory: () => Actor,
       _supervisor.foreach { sup =>
         // can supervisor handle the notification?
         val notification =
-          MaximumNumberOfRestartsWithinTimeRangeReached(this,
-                                                        maxNrOfRetries,
-                                                        withinTimeRange,
-                                                        reason)
+          MaximumNumberOfRestartsWithinTimeRangeReached(
+            this,
+            maxNrOfRetries,
+            withinTimeRange,
+            reason)
         if (sup.isDefinedAt(notification))
           notifySupervisorWithMessage(notification)
       }
@@ -1244,10 +1248,11 @@ class LocalActorRef private[akka] (private[this] val actorFactory: () => Actor,
     if (receiveTimeout.isDefined && dispatcher.mailboxSize(this) <= 0) {
       //Only reschedule if desired and there are currently no more messages to be processed
       _futureTimeout = Some(
-        Scheduler.scheduleOnce(this,
-                               ReceiveTimeout,
-                               receiveTimeout.get,
-                               TimeUnit.MILLISECONDS))
+        Scheduler.scheduleOnce(
+          this,
+          ReceiveTimeout,
+          receiveTimeout.get,
+          TimeUnit.MILLISECONDS))
     }
   }
 
@@ -1299,32 +1304,34 @@ private[akka] case class RemoteActorRef private[akka] (
 
   def postMessageToMailbox(message: Any,
                            senderOption: Option[ActorRef]): Unit =
-    Actor.remote.send[Any](message,
-                           senderOption,
-                           None,
-                           homeAddress.get,
-                           timeout,
-                           true,
-                           this,
-                           None,
-                           actorType,
-                           loader)
+    Actor.remote.send[Any](
+      message,
+      senderOption,
+      None,
+      homeAddress.get,
+      timeout,
+      true,
+      this,
+      None,
+      actorType,
+      loader)
 
   def postMessageToMailboxAndCreateFutureResultWithTimeout[T](
       message: Any,
       timeout: Long,
       senderOption: Option[ActorRef],
       senderFuture: Option[CompletableFuture[T]]): CompletableFuture[T] = {
-    val future = Actor.remote.send[T](message,
-                                      senderOption,
-                                      senderFuture,
-                                      homeAddress.get,
-                                      timeout,
-                                      false,
-                                      this,
-                                      None,
-                                      actorType,
-                                      loader)
+    val future = Actor.remote.send[T](
+      message,
+      senderOption,
+      senderFuture,
+      homeAddress.get,
+      timeout,
+      false,
+      this,
+      None,
+      actorType,
+      loader)
     if (future.isDefined) future.get
     else
       throw new IllegalActorStateException(
@@ -1542,10 +1549,11 @@ trait ScalaActorRef extends ActorRefShared { ref: ActorRef =>
   def !!![T](message: Any, timeout: Long = this.timeout)(
       implicit sender: Option[ActorRef] = None): Future[T] = {
     if (isRunning)
-      postMessageToMailboxAndCreateFutureResultWithTimeout[T](message,
-                                                              timeout,
-                                                              sender,
-                                                              None)
+      postMessageToMailboxAndCreateFutureResultWithTimeout[T](
+        message,
+        timeout,
+        sender,
+        None)
     else
       throw new ActorInitializationException(
         "Actor has not been started, you need to invoke 'actor.start()' before using it")
@@ -1614,10 +1622,11 @@ trait ScalaActorRef extends ActorRefShared { ref: ActorRef =>
                                         port: Int,
                                         timeout: Long): ActorRef = {
     ensureRemotingEnabled
-    spawnRemote(classTag[T].erasure.asInstanceOf[Class[_ <: Actor]],
-                hostname,
-                port,
-                timeout)
+    spawnRemote(
+      classTag[T].erasure.asInstanceOf[Class[_ <: Actor]],
+      hostname,
+      port,
+      timeout)
   }
 
   /**
@@ -1633,9 +1642,10 @@ trait ScalaActorRef extends ActorRefShared { ref: ActorRef =>
                                             port: Int,
                                             timeout: Long): ActorRef = {
     ensureRemotingEnabled
-    spawnLinkRemote(classTag[T].erasure.asInstanceOf[Class[_ <: Actor]],
-                    hostname,
-                    port,
-                    timeout)
+    spawnLinkRemote(
+      classTag[T].erasure.asInstanceOf[Class[_ <: Actor]],
+      hostname,
+      port,
+      timeout)
   }
 }

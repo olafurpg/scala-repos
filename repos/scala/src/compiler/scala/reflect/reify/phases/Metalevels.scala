@@ -134,13 +134,14 @@ trait Metalevels { self: Reifier =>
         withinSplice {
           super.transform(
             TreeSplice(
-              ReifiedTree(universe,
-                          mirror,
-                          symtab1,
-                          rtree,
-                          tpe,
-                          rtpe,
-                          concrete)))
+              ReifiedTree(
+                universe,
+                mirror,
+                symtab1,
+                rtree,
+                tpe,
+                rtpe,
+                concrete)))
         }
       case TreeSplice(splicee) =>
         if (reifyDebug) println("entering splice: " + splicee)

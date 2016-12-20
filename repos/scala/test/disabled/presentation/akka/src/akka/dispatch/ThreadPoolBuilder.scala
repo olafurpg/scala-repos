@@ -71,22 +71,24 @@ case class ThreadPoolConfig(
       threadFactory: ThreadFactory): ExecutorService = {
     flowHandler match {
       case Left(rejectHandler) =>
-        val service = new ThreadPoolExecutor(corePoolSize,
-                                             maxPoolSize,
-                                             threadTimeout.length,
-                                             threadTimeout.unit,
-                                             queueFactory(),
-                                             threadFactory,
-                                             rejectHandler)
+        val service = new ThreadPoolExecutor(
+          corePoolSize,
+          maxPoolSize,
+          threadTimeout.length,
+          threadTimeout.unit,
+          queueFactory(),
+          threadFactory,
+          rejectHandler)
         service.allowCoreThreadTimeOut(allowCorePoolTimeout)
         service
       case Right(bounds) =>
-        val service = new ThreadPoolExecutor(corePoolSize,
-                                             maxPoolSize,
-                                             threadTimeout.length,
-                                             threadTimeout.unit,
-                                             queueFactory(),
-                                             threadFactory)
+        val service = new ThreadPoolExecutor(
+          corePoolSize,
+          maxPoolSize,
+          threadTimeout.length,
+          threadTimeout.unit,
+          queueFactory(),
+          threadFactory)
         service.allowCoreThreadTimeOut(allowCorePoolTimeout)
         new BoundedExecutorDecorator(service, bounds)
     }
@@ -119,14 +121,14 @@ case class ThreadPoolConfigDispatcherBuilder(
   def withNewBoundedThreadPoolWithLinkedBlockingQueueWithUnboundedCapacity(
       bounds: Int): ThreadPoolConfigDispatcherBuilder =
     this.copy(
-      config = config.copy(flowHandler = flowHandler(bounds),
-                           queueFactory = linkedBlockingQueue()))
+      config = config.copy(
+        flowHandler = flowHandler(bounds),
+        queueFactory = linkedBlockingQueue()))
 
   def withNewThreadPoolWithCustomBlockingQueue(
       newQueueFactory: QueueFactory): ThreadPoolConfigDispatcherBuilder =
-    this.copy(
-      config = config.copy(flowHandler = defaultFlowHandler,
-                           queueFactory = newQueueFactory))
+    this.copy(config = config
+      .copy(flowHandler = defaultFlowHandler, queueFactory = newQueueFactory))
 
   def withNewThreadPoolWithCustomBlockingQueue(
       queue: BlockingQueue[Runnable]): ThreadPoolConfigDispatcherBuilder =
@@ -134,27 +136,31 @@ case class ThreadPoolConfigDispatcherBuilder(
 
   def withNewThreadPoolWithLinkedBlockingQueueWithUnboundedCapacity: ThreadPoolConfigDispatcherBuilder =
     this.copy(
-      config = config.copy(queueFactory = linkedBlockingQueue(),
-                           flowHandler = defaultFlowHandler))
+      config = config.copy(
+        queueFactory = linkedBlockingQueue(),
+        flowHandler = defaultFlowHandler))
 
   def withNewThreadPoolWithLinkedBlockingQueueWithCapacity(
       capacity: Int): ThreadPoolConfigDispatcherBuilder =
     this.copy(
-      config = config.copy(queueFactory = linkedBlockingQueue(capacity),
-                           flowHandler = defaultFlowHandler))
+      config = config.copy(
+        queueFactory = linkedBlockingQueue(capacity),
+        flowHandler = defaultFlowHandler))
 
   def withNewThreadPoolWithSynchronousQueueWithFairness(
       fair: Boolean): ThreadPoolConfigDispatcherBuilder =
     this.copy(
-      config = config.copy(queueFactory = synchronousQueue(fair),
-                           flowHandler = defaultFlowHandler))
+      config = config.copy(
+        queueFactory = synchronousQueue(fair),
+        flowHandler = defaultFlowHandler))
 
   def withNewThreadPoolWithArrayBlockingQueueWithCapacityAndFairness(
       capacity: Int,
       fair: Boolean): ThreadPoolConfigDispatcherBuilder =
     this.copy(
-      config = config.copy(queueFactory = arrayBlockingQueue(capacity, fair),
-                           flowHandler = defaultFlowHandler))
+      config = config.copy(
+        queueFactory = arrayBlockingQueue(capacity, fair),
+        flowHandler = defaultFlowHandler))
 
   def setCorePoolSize(size: Int): ThreadPoolConfigDispatcherBuilder =
     this.copy(config = config.copy(corePoolSize = size))
@@ -222,8 +228,9 @@ object MonitorableThread {
   * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
 class MonitorableThread(runnable: Runnable, name: String)
-    extends Thread(runnable,
-                   name + "-" + MonitorableThread.created.incrementAndGet) {
+    extends Thread(
+      runnable,
+      name + "-" + MonitorableThread.created.incrementAndGet) {
 
   setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
     def uncaughtException(thread: Thread, cause: Throwable) = {}

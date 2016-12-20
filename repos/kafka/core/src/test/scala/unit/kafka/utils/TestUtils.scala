@@ -174,18 +174,19 @@ object TestUtils extends Logging {
       enableSaslSsl: Boolean = false,
       rackInfo: Map[Int, String] = Map()): Seq[Properties] = {
     (0 until numConfigs).map { node =>
-      createBrokerConfig(node,
-                         zkConnect,
-                         enableControlledShutdown,
-                         enableDeleteTopic,
-                         RandomPort,
-                         interBrokerSecurityProtocol,
-                         trustStoreFile,
-                         enablePlaintext = enablePlaintext,
-                         enableSsl = enableSsl,
-                         enableSaslPlaintext = enableSaslPlaintext,
-                         enableSaslSsl = enableSaslSsl,
-                         rack = rackInfo.get(node))
+      createBrokerConfig(
+        node,
+        zkConnect,
+        enableControlledShutdown,
+        enableDeleteTopic,
+        RandomPort,
+        interBrokerSecurityProtocol,
+        trustStoreFile,
+        enablePlaintext = enablePlaintext,
+        enableSsl = enableSsl,
+        enableSaslPlaintext = enableSaslPlaintext,
+        enableSaslSsl = enableSaslSsl,
+        rack = rackInfo.get(node))
     }
   }
 
@@ -279,11 +280,12 @@ object TestUtils extends Logging {
                   topicConfig: Properties = new Properties)
     : scala.collection.immutable.Map[Int, Option[Int]] = {
     // create topic
-    AdminUtils.createTopic(zkUtils,
-                           topic,
-                           numPartitions,
-                           replicationFactor,
-                           topicConfig)
+    AdminUtils.createTopic(
+      zkUtils,
+      topic,
+      numPartitions,
+      replicationFactor,
+      topicConfig)
     // wait until the update metadata request for new topic reaches all servers
     (0 until numPartitions)
       .map {
@@ -383,13 +385,15 @@ object TestUtils extends Logging {
     * Check that the buffer content from buffer.position() to buffer.limit() is equal
     */
   def checkEquals(b1: ByteBuffer, b2: ByteBuffer) {
-    assertEquals("Buffers should have equal length",
-                 b1.limit - b1.position,
-                 b2.limit - b2.position)
+    assertEquals(
+      "Buffers should have equal length",
+      b1.limit - b1.position,
+      b2.limit - b2.position)
     for (i <- 0 until b1.limit - b1.position)
-      assertEquals("byte " + i + " byte not equal.",
-                   b1.get(b1.position + i),
-                   b2.get(b1.position + i))
+      assertEquals(
+        "byte " + i + " byte not equal.",
+        b1.get(b1.position + i),
+        b2.get(b1.position + i))
   }
 
   /**
@@ -410,9 +414,10 @@ object TestUtils extends Logging {
         expected.next
         length1 += 1
       }
-      assertFalse("Iterators have uneven length-- first has more: " + length1 +
-                    " > " + length,
-                  true);
+      assertFalse(
+        "Iterators have uneven length-- first has more: " + length1 +
+          " > " + length,
+        true);
     }
 
     // check if the actual iterator was longer
@@ -422,9 +427,10 @@ object TestUtils extends Logging {
         actual.next
         length2 += 1
       }
-      assertFalse("Iterators have uneven length-- second has more: " +
-                    length2 + " > " + length,
-                  true);
+      assertFalse(
+        "Iterators have uneven length-- second has more: " +
+          length2 + " > " + length,
+        true);
     }
   }
 
@@ -520,10 +526,11 @@ object TestUtils extends Logging {
     val props = new Properties
     if (usesSslTransportLayer(securityProtocol))
       props.putAll(
-        sslConfigs(mode,
-                   securityProtocol == SecurityProtocol.SSL,
-                   trustStoreFile,
-                   certAlias))
+        sslConfigs(
+          mode,
+          securityProtocol == SecurityProtocol.SSL,
+          trustStoreFile,
+          certAlias))
     props
       .put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, securityProtocol.name)
     props
@@ -614,8 +621,9 @@ object TestUtils extends Logging {
     val consumerProps = props.getOrElse(new Properties())
     consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList)
     consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, autoOffsetReset)
-    consumerProps.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG,
-                      partitionFetchSize.toString)
+    consumerProps.put(
+      ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG,
+      partitionFetchSize.toString)
 
     val defaultProps = Map(
       ConsumerConfig.RETRY_BACKOFF_MS_CONFIG -> "100",
@@ -674,10 +682,11 @@ object TestUtils extends Logging {
   def updateConsumerOffset(config: ConsumerConfig,
                            path: String,
                            offset: Long) = {
-    val zkUtils = ZkUtils(config.zkConnect,
-                          config.zkSessionTimeoutMs,
-                          config.zkConnectionTimeoutMs,
-                          false)
+    val zkUtils = ZkUtils(
+      config.zkConnect,
+      config.zkSessionTimeoutMs,
+      config.zkConnectionTimeoutMs,
+      false)
     zkUtils.updatePersistentPath(path, offset.toString)
   }
 
@@ -697,19 +706,21 @@ object TestUtils extends Logging {
                         zkUtils: ZkUtils): Seq[Broker] = {
     val brokers = brokerMetadatas.map { b =>
       val protocol = SecurityProtocol.PLAINTEXT
-      Broker(b.id,
-             Map(protocol -> EndPoint("localhost", 6667, protocol)).toMap,
-             b.rack)
+      Broker(
+        b.id,
+        Map(protocol -> EndPoint("localhost", 6667, protocol)).toMap,
+        b.rack)
     }
     brokers.foreach(
       b =>
-        zkUtils.registerBrokerInZk(b.id,
-                                   "localhost",
-                                   6667,
-                                   b.endPoints,
-                                   jmxPort = -1,
-                                   rack = b.rack,
-                                   ApiVersion.latestVersion))
+        zkUtils.registerBrokerInZk(
+          b.id,
+          "localhost",
+          6667,
+          b.endPoints,
+          jmxPort = -1,
+          rack = b.rack,
+          ApiVersion.latestVersion))
     brokers
   }
 
@@ -739,13 +750,14 @@ object TestUtils extends Logging {
                      timeout: Int,
                      correlationId: Int = 0,
                      clientId: String): ProducerRequest = {
-    produceRequestWithAcks(Seq(topic),
-                           Seq(partition),
-                           message,
-                           acks,
-                           timeout,
-                           correlationId,
-                           clientId)
+    produceRequestWithAcks(
+      Seq(topic),
+      Seq(partition),
+      message,
+      acks,
+      timeout,
+      correlationId,
+      clientId)
   }
 
   @deprecated(
@@ -761,11 +773,12 @@ object TestUtils extends Logging {
     val data = topics.flatMap(topic =>
       partitions.map(partition =>
         (TopicAndPartition(topic, partition), message)))
-    new ProducerRequest(correlationId,
-                        clientId,
-                        acks.toShort,
-                        timeout,
-                        collection.mutable.Map(data: _*))
+    new ProducerRequest(
+      correlationId,
+      clientId,
+      acks.toShort,
+      timeout,
+      collection.mutable.Map(data: _*))
   }
 
   def makeLeaderForPartition(
@@ -794,9 +807,10 @@ object TestUtils extends Logging {
             zkUtils.leaderAndIsrZkData(newLeaderAndIsr, controllerEpoch))
         } catch {
           case oe: Throwable =>
-            error("Error while electing leader for partition [%s,%d]"
-                    .format(topic, partition),
-                  oe)
+            error(
+              "Error while electing leader for partition [%s,%d]"
+                .format(topic, partition),
+              oe)
         }
       }
     }
@@ -816,8 +830,9 @@ object TestUtils extends Logging {
       timeoutMs: Long = 5000L,
       oldLeaderOpt: Option[Int] = None,
       newLeaderOpt: Option[Int] = None): Option[Int] = {
-    require(!(oldLeaderOpt.isDefined && newLeaderOpt.isDefined),
-            "Can't define both the old and the new leader")
+    require(
+      !(oldLeaderOpt.isDefined && newLeaderOpt.isDefined),
+      "Can't define both the old and the new leader")
     val startTime = System.currentTimeMillis()
     var isLeaderElectedOrChanged = false
 
@@ -1047,14 +1062,15 @@ object TestUtils extends Logging {
   }
 
   def verifyNonDaemonThreadsStatus(threadNamePrefix: String) {
-    assertEquals(0,
-                 Thread.getAllStackTraces
-                   .keySet()
-                   .toArray
-                   .map(_.asInstanceOf[Thread])
-                   .count(t =>
-                     !t.isDaemon && t.isAlive &&
-                       t.getName.startsWith(threadNamePrefix)))
+    assertEquals(
+      0,
+      Thread.getAllStackTraces
+        .keySet()
+        .toArray
+        .map(_.asInstanceOf[Thread])
+        .count(t =>
+          !t.isDaemon && t.isAlive &&
+            t.getName.startsWith(threadNamePrefix)))
   }
 
   /**
@@ -1065,17 +1081,18 @@ object TestUtils extends Logging {
                        cleanerConfig: CleanerConfig = CleanerConfig(
                          enableCleaner = false),
                        time: MockTime = new MockTime()): LogManager = {
-    new LogManager(logDirs = logDirs,
-                   topicConfigs = Map(),
-                   defaultConfig = defaultConfig,
-                   cleanerConfig = cleanerConfig,
-                   ioThreads = 4,
-                   flushCheckMs = 1000L,
-                   flushCheckpointMs = 10000L,
-                   retentionCheckMs = 1000L,
-                   scheduler = time.scheduler,
-                   time = time,
-                   brokerState = new BrokerState())
+    new LogManager(
+      logDirs = logDirs,
+      topicConfigs = Map(),
+      defaultConfig = defaultConfig,
+      cleanerConfig = cleanerConfig,
+      ioThreads = 4,
+      flushCheckMs = 1000L,
+      flushCheckpointMs = 10000L,
+      retentionCheckMs = 1000L,
+      scheduler = time.scheduler,
+      time = time,
+      brokerState = new BrokerState())
   }
 
   @deprecated(
@@ -1232,10 +1249,11 @@ object TestUtils extends Logging {
                 .getPartition(tp.topic, tp.partition) == None)),
       "Replica manager's should have deleted all of this topic's partitions")
     // ensure that logs from all replicas are deleted if delete topic is marked successful in zookeeper
-    assertTrue("Replica logs not deleted after delete topic is complete",
-               servers.forall(server =>
-                 topicAndPartitions.forall(tp =>
-                   server.getLogManager().getLog(tp).isEmpty)))
+    assertTrue(
+      "Replica logs not deleted after delete topic is complete",
+      servers.forall(server =>
+        topicAndPartitions.forall(tp =>
+          server.getLogManager().getLog(tp).isEmpty)))
     // ensure that topic is removed from all cleaner offsets
     TestUtils.waitUntilTrue(
       () =>
@@ -1348,8 +1366,9 @@ object TestUtils extends Logging {
     } finally {
       threadPool.shutdownNow()
     }
-    assertTrue(s"$message failed with exception(s) $exceptions",
-               exceptions.isEmpty)
+    assertTrue(
+      s"$message failed with exception(s) $exceptions",
+      exceptions.isEmpty)
   }
 }
 

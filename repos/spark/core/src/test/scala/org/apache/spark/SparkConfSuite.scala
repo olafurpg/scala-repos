@@ -159,8 +159,9 @@ class SparkConfSuite
     val executor = Executors.newSingleThreadScheduledExecutor()
     val sf = executor.scheduleAtFixedRate(new Runnable {
       override def run(): Unit =
-        System.setProperty("spark.5425." + Random.nextInt(),
-                           Random.nextInt().toString)
+        System.setProperty(
+          "spark.5425." + Random.nextInt(),
+          Random.nextInt().toString)
     }, 0, 1, TimeUnit.MILLISECONDS)
 
     try {

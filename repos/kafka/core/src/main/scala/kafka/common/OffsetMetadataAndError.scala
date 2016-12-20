@@ -21,10 +21,11 @@ import org.apache.kafka.common.protocol.Errors
 case class OffsetMetadata(offset: Long,
                           metadata: String = OffsetMetadata.NoMetadata) {
   override def toString =
-    "OffsetMetadata[%d,%s]".format(offset,
-                                   if (metadata != null && metadata.length > 0)
-                                     metadata
-                                   else "NO_METADATA")
+    "OffsetMetadata[%d,%s]".format(
+      offset,
+      if (metadata != null && metadata.length > 0)
+        metadata
+      else "NO_METADATA")
 }
 
 object OffsetMetadata {
@@ -56,9 +57,10 @@ object OffsetAndMetadata {
             metadata: String,
             commitTimestamp: Long,
             expireTimestamp: Long) =
-    new OffsetAndMetadata(OffsetMetadata(offset, metadata),
-                          commitTimestamp,
-                          expireTimestamp)
+    new OffsetAndMetadata(
+      OffsetMetadata(offset, metadata),
+      commitTimestamp,
+      expireTimestamp)
 
   def apply(offset: Long, metadata: String, timestamp: Long) =
     new OffsetAndMetadata(OffsetMetadata(offset, metadata), timestamp)
@@ -80,8 +82,9 @@ case class OffsetMetadataAndError(offsetMetadata: OffsetMetadata,
 }
 
 object OffsetMetadataAndError {
-  val NoOffset = OffsetMetadataAndError(OffsetMetadata.InvalidOffsetMetadata,
-                                        Errors.NONE.code)
+  val NoOffset = OffsetMetadataAndError(
+    OffsetMetadata.InvalidOffsetMetadata,
+    Errors.NONE.code)
   val GroupLoading = OffsetMetadataAndError(
     OffsetMetadata.InvalidOffsetMetadata,
     Errors.GROUP_LOAD_IN_PROGRESS.code)

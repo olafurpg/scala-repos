@@ -24,15 +24,17 @@ trait TimeLikeSpec[T <: TimeLike[T]]
   import ops._
 
   "Top, Bottom, Undefined, Nanoseconds(_), Finite(_)" should {
-    val easyVs = Seq(Zero,
-                     Top,
-                     Bottom,
-                     Undefined,
-                     fromNanoseconds(1),
-                     fromNanoseconds(-1))
+    val easyVs = Seq(
+      Zero,
+      Top,
+      Bottom,
+      Undefined,
+      fromNanoseconds(1),
+      fromNanoseconds(-1))
     val vs =
-      easyVs ++ Seq(fromNanoseconds(Long.MaxValue - 1),
-                    fromNanoseconds(Long.MinValue + 1))
+      easyVs ++ Seq(
+        fromNanoseconds(Long.MaxValue - 1),
+        fromNanoseconds(Long.MinValue + 1))
 
     "behave like boxed doubles" in {
       assert((Top compare Undefined) < 0)

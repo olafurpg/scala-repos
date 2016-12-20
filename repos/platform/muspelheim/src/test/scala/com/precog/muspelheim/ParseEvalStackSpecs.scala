@@ -114,18 +114,20 @@ trait TestStackLike[M[+ _]]
     val idSource = new FreshAtomicIdSource
   }
 
-  private val dummyAccount = AccountDetails("dummyAccount",
-                                            "nobody@precog.com",
-                                            new DateTime,
-                                            "dummyAPIKey",
-                                            Path.Root,
-                                            AccountPlan.Free)
+  private val dummyAccount = AccountDetails(
+    "dummyAccount",
+    "nobody@precog.com",
+    new DateTime,
+    "dummyAPIKey",
+    Path.Root,
+    AccountPlan.Free)
   private def dummyEvaluationContext =
-    EvaluationContext("dummyAPIKey",
-                      dummyAccount,
-                      Path.Root,
-                      Path.Root,
-                      new DateTime)
+    EvaluationContext(
+      "dummyAPIKey",
+      dummyAccount,
+      Path.Root,
+      Path.Root,
+      new DateTime)
 
   def eval(str: String, debug: Boolean = false): Set[SValue] =
     evalE(str, debug) map { _._2 }

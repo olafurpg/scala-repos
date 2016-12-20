@@ -50,8 +50,9 @@ class HiveTableScanSuite extends HiveComparisonTest {
   // In unit test, kv1.txt is a small file and will be loaded as table src
   // Since the small file will be considered as a single split, we assume
   // Hive / SparkSQL HQL has the same output even for SORT BY
-  createQueryTest("file_split_for_small_table",
-                  """
+  createQueryTest(
+    "file_split_for_small_table",
+    """
       |SELECT key, value FROM src SORT BY key, value
     """.stripMargin)
 
@@ -93,8 +94,9 @@ class HiveTableScanSuite extends HiveComparisonTest {
     sql("create table spark_4959 (col1 string)")
     sql("""insert into table spark_4959 select "hi" from src limit 1""")
     table("spark_4959")
-      .select('col1.as("CaseSensitiveColName"),
-              'col1.as("CaseSensitiveColName2"))
+      .select(
+        'col1.as("CaseSensitiveColName"),
+        'col1.as("CaseSensitiveColName2"))
       .registerTempTable("spark_4959_2")
 
     assert(

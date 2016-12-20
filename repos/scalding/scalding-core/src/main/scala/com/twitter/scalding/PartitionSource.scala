@@ -66,9 +66,10 @@ abstract class PartitionSource(val openWritesThreshold: Option[Int] = None)
             getHPartitionTap(hfsTap)
           }
           case hdfsTest @ HadoopTest(_, _) => {
-            val hfsTap = createHfsTap(hdfsScheme,
-                                      hdfsTest.getWritePathFor(this),
-                                      sinkMode)
+            val hfsTap = createHfsTap(
+              hdfsScheme,
+              hdfsTest.getWritePathFor(this),
+              sinkMode)
             getHPartitionTap(hfsTap)
           }
           case _ => TestTapFactory(this, hdfsScheme).createTap(readOrWrite)
@@ -121,11 +122,12 @@ object PartitionedTsv {
             writeHeader: Boolean = false,
             tsvFields: Fields = Fields.ALL,
             sinkMode: SinkMode = SinkMode.REPLACE) =
-    new PartitionedTsv(basePath,
-                       new DelimitedPartition(pathFields, delimiter),
-                       writeHeader,
-                       tsvFields,
-                       sinkMode)
+    new PartitionedTsv(
+      basePath,
+      new DelimitedPartition(pathFields, delimiter),
+      writeHeader,
+      tsvFields,
+      sinkMode)
 }
 
 /**
@@ -165,10 +167,11 @@ object PartitionedSequenceFile {
             pathFields: Fields = Fields.ALL,
             sequenceFields: Fields = Fields.ALL,
             sinkMode: SinkMode = SinkMode.REPLACE) =
-    new PartitionedSequenceFile(basePath,
-                                new DelimitedPartition(pathFields, delimiter),
-                                sequenceFields,
-                                sinkMode)
+    new PartitionedSequenceFile(
+      basePath,
+      new DelimitedPartition(pathFields, delimiter),
+      sequenceFields,
+      sinkMode)
 }
 
 /**

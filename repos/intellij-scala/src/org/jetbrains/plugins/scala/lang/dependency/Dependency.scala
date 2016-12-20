@@ -75,17 +75,19 @@ object Dependency {
                             fromType: Option[ScType]): Option[Dependency] = {
     def withEntity(entity: String) =
       Some(
-        new Dependency(DependencyKind.Reference,
-                       reference,
-                       target,
-                       Path(entity)))
+        new Dependency(
+          DependencyKind.Reference,
+          reference,
+          target,
+          Path(entity)))
 
     def withMember(entity: String, member: String) =
       Some(
-        new Dependency(DependencyKind.Reference,
-                       reference,
-                       target,
-                       Path(entity, Some(member))))
+        new Dependency(
+          DependencyKind.Reference,
+          reference,
+          target,
+          Path(entity, Some(member))))
 
     reference match {
       case Parent(_: ScConstructorPattern) =>

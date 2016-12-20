@@ -614,10 +614,11 @@ object JqJsCmds {
   case class FadeOut(id: String, duration: TimeSpan, fadeTime: TimeSpan)
       extends JsCmd {
     def toJsCmd =
-      (After(duration,
-             JqJE.JqId(id) ~>
-               (new JsRaw("fadeOut(" + fadeTime.millis + ")")
-               with JsMember))).toJsCmd
+      (After(
+        duration,
+        JqJE.JqId(id) ~>
+          (new JsRaw("fadeOut(" + fadeTime.millis + ")")
+          with JsMember))).toJsCmd
   }
 
   /**
@@ -640,10 +641,11 @@ object JqJsCmds {
   case class FadeIn(id: String, duration: TimeSpan, fadeTime: TimeSpan)
       extends JsCmd {
     def toJsCmd =
-      (After(duration,
-             JqJE.JqId(id) ~>
-               (new JsRaw("fadeIn(" + fadeTime.millis + ")")
-               with JsMember))).toJsCmd
+      (After(
+        duration,
+        JqJE.JqId(id) ~>
+          (new JsRaw("fadeIn(" + fadeTime.millis + ")")
+          with JsMember))).toJsCmd
   }
 
   /**

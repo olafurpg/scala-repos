@@ -55,12 +55,13 @@ private[spark] class PipedRDD[T: ClassTag](
            printPipeContext: (String => Unit) => Unit = null,
            printRDDElement: (T, String => Unit) => Unit = null,
            separateWorkingDir: Boolean = false) =
-    this(prev,
-         PipedRDD.tokenize(command),
-         envVars,
-         printPipeContext,
-         printRDDElement,
-         separateWorkingDir)
+    this(
+      prev,
+      PipedRDD.tokenize(command),
+      envVars,
+      printPipeContext,
+      printRDDElement,
+      separateWorkingDir)
 
   override def getPartitions: Array[Partition] = firstParent[T].partitions
 
@@ -120,9 +121,10 @@ private[spark] class PipedRDD[T: ClassTag](
         workInTaskDirectory = true
       } catch {
         case e: Exception =>
-          logError("Unable to setup task working directory: " + e.getMessage +
-                     " (" + taskDirectory + ")",
-                   e)
+          logError(
+            "Unable to setup task working directory: " + e.getMessage +
+              " (" + taskDirectory + ")",
+            e)
       }
     }
 

@@ -17,11 +17,12 @@ private[setup] case object ApiConfig extends Config {
   val days = 2
 
   def game =
-    Game.make(game = makeGame,
-              whitePlayer = Player.white,
-              blackPlayer = Player.black,
-              mode = mode,
-              variant = variant,
-              source = Source.Api,
-              pgnImport = None)
+    Game.make(
+      game = makeGame,
+      whitePlayer = Player.white,
+      blackPlayer = Player.black,
+      mode = mode,
+      variant = variant,
+      source = Source.Api,
+      pgnImport = None)
 }

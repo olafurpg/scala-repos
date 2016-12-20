@@ -41,8 +41,9 @@ class Tokenizer(override val uid: String)
   }
 
   override protected def validateInputType(inputType: DataType): Unit = {
-    require(inputType == StringType,
-            s"Input type must be string type but got $inputType.")
+    require(
+      inputType == StringType,
+      s"Input type must be string type but got $inputType.")
   }
 
   override protected def outputDataType: DataType =
@@ -77,10 +78,11 @@ class RegexTokenizer(override val uid: String)
     * Default: 1, to avoid returning empty strings
     * @group param
     */
-  val minTokenLength: IntParam = new IntParam(this,
-                                              "minTokenLength",
-                                              "minimum token length (>= 0)",
-                                              ParamValidators.gtEq(0))
+  val minTokenLength: IntParam = new IntParam(
+    this,
+    "minTokenLength",
+    "minimum token length (>= 0)",
+    ParamValidators.gtEq(0))
 
   /** @group setParam */
   def setMinTokenLength(value: Int): this.type = set(minTokenLength, value)
@@ -132,10 +134,11 @@ class RegexTokenizer(override val uid: String)
   /** @group getParam */
   def getToLowercase: Boolean = $(toLowercase)
 
-  setDefault(minTokenLength -> 1,
-             gaps -> true,
-             pattern -> "\\s+",
-             toLowercase -> true)
+  setDefault(
+    minTokenLength -> 1,
+    gaps -> true,
+    pattern -> "\\s+",
+    toLowercase -> true)
 
   override protected def createTransformFunc: String => Seq[String] = {
     originStr =>
@@ -148,8 +151,9 @@ class RegexTokenizer(override val uid: String)
   }
 
   override protected def validateInputType(inputType: DataType): Unit = {
-    require(inputType == StringType,
-            s"Input type must be string type but got $inputType.")
+    require(
+      inputType == StringType,
+      s"Input type must be string type but got $inputType.")
   }
 
   override protected def outputDataType: DataType =

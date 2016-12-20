@@ -45,8 +45,9 @@ object Literal {
     case d: BigDecimal =>
       Literal(Decimal(d), DecimalType(Math.max(d.precision, d.scale), d.scale))
     case d: java.math.BigDecimal =>
-      Literal(Decimal(d),
-              DecimalType(Math.max(d.precision, d.scale), d.scale()))
+      Literal(
+        Decimal(d),
+        DecimalType(Math.max(d.precision, d.scale), d.scale()))
     case d: Decimal =>
       Literal(d, DecimalType(Math.max(d.precision, d.scale), d.scale))
     case t: Timestamp =>

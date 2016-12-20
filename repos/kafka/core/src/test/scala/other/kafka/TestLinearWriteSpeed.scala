@@ -50,8 +50,9 @@ object TestLinearWriteSpeed {
       .describedAs("num_bytes")
       .ofType(classOf[java.lang.Integer])
     val messageSizeOpt = parser
-      .accepts("message-size",
-               "REQUIRED: The size of each message in the message set.")
+      .accepts(
+        "message-size",
+        "REQUIRED: The size of each message in the message set.")
       .withRequiredArg
       .describedAs("num_bytes")
       .ofType(classOf[java.lang.Integer])
@@ -137,10 +138,11 @@ object TestLinearWriteSpeed {
           .put(LogConfig.SegmentBytesProp, segmentSize: java.lang.Integer)
         logProperties
           .put(LogConfig.FlushMessagesProp, flushInterval: java.lang.Long)
-        writables(i) = new LogWritable(new File(dir, "kafka-test-" + i),
-                                       new LogConfig(logProperties),
-                                       scheduler,
-                                       messageSet)
+        writables(i) = new LogWritable(
+          new File(dir, "kafka-test-" + i),
+          new LogConfig(logProperties),
+          scheduler,
+          messageSet)
       } else {
         System.err.println(
           "Must specify what to write to with one of --log, --channel, or --mmap")
@@ -171,10 +173,11 @@ object TestLinearWriteSpeed {
         val ellapsedSecs = (start - lastReport) / (1000.0 * 1000.0 * 1000.0)
         val mb = written / (1024.0 * 1024.0)
         println(
-          "%10.3f\t%10.3f\t%10.3f".format(mb / ellapsedSecs,
-                                          totalLatency / count.toDouble /
-                                            (1000.0 * 1000.0),
-                                          maxLatency / (1000.0 * 1000.0)))
+          "%10.3f\t%10.3f\t%10.3f".format(
+            mb / ellapsedSecs,
+            totalLatency / count.toDouble /
+              (1000.0 * 1000.0),
+            maxLatency / (1000.0 * 1000.0)))
         lastReport = start
         written = 0
         maxLatency = 0L

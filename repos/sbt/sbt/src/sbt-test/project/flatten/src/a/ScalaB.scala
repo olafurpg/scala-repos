@@ -10,6 +10,7 @@ object ScalaC {
     resource("/a/main-resource-a")
   }
   def resource(s: String) =
-    assert(getClass.getResource(s) != null,
-           "Could not find resource '" + s + "'")
+    assert(
+      getClass.getResource(s) != null,
+      "Could not find resource '" + s + "'")
 }

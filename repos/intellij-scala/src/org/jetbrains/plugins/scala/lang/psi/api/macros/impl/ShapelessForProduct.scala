@@ -44,9 +44,10 @@ object ShapelessForProduct extends ScalaMacroTypeable {
                           context: MacroContext): Option[ScType] = {
     if (!context.expectedType.isDefined) return None
     val manager = ScalaPsiManager.instance(context.place.getProject)
-    val clazz = manager.getCachedClass("shapeless.Generic",
-                                       context.place.getResolveScope,
-                                       ClassCategory.TYPE)
+    val clazz = manager.getCachedClass(
+      "shapeless.Generic",
+      context.place.getResolveScope,
+      ClassCategory.TYPE)
     clazz match {
       case c: ScTypeDefinition =>
         val tpt = c.typeParameters
@@ -71,14 +72,16 @@ object ShapelessForProduct extends ScalaMacroTypeable {
               context.place.getResolveScope,
               ClassCategory.TYPE)
             if (coloncolon == null) return None
-            val hnil = manager.getCachedClass("shapeless.HNil",
-                                              context.place.getResolveScope,
-                                              ClassCategory.TYPE)
+            val hnil = manager.getCachedClass(
+              "shapeless.HNil",
+              context.place.getResolveScope,
+              ClassCategory.TYPE)
             if (hnil == null) return None
             val repr = parts.foldRight(ScDesignatorType(hnil): ScType) {
               case (part, resultType) =>
-                ScParameterizedType(ScDesignatorType(coloncolon),
-                                    Seq(part, resultType))
+                ScParameterizedType(
+                  ScDesignatorType(coloncolon),
+                  Seq(part, resultType))
             }
             ScalaPsiUtil.getCompanionModule(c) match {
               case Some(obj: ScObject) =>
@@ -89,9 +92,10 @@ object ShapelessForProduct extends ScalaMacroTypeable {
                 if (!elem.isDefined) return None
                 Some(
                   ScParameterizedType(
-                    ScProjectionType(ScDesignatorType(obj),
-                                     elem.get.asInstanceOf[PsiNamedElement],
-                                     superReference = false),
+                    ScProjectionType(
+                      ScDesignatorType(obj),
+                      elem.get.asInstanceOf[PsiNamedElement],
+                      superReference = false),
                     Seq(productLikeType, repr)))
               case _ => None
             }

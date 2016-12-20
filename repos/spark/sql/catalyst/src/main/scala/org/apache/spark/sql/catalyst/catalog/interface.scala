@@ -235,11 +235,12 @@ case class CatalogTable(name: TableIdentifier,
                      serdeProperties: Map[String, String] =
                        storage.serdeProperties): CatalogTable = {
     copy(
-      storage = CatalogStorageFormat(locationUri,
-                                     inputFormat,
-                                     outputFormat,
-                                     serde,
-                                     serdeProperties))
+      storage = CatalogStorageFormat(
+        locationUri,
+        inputFormat,
+        outputFormat,
+        serde,
+        serdeProperties))
   }
 }
 

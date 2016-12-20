@@ -6,10 +6,11 @@ import scala.math
 import scala.io.Source
 
 class KeywordSimilarityAlgorithm(val ap: FriendRecommendationAlgoParams)
-    extends LAlgorithm[FriendRecommendationTrainingData,
-                       KeywordSimilarityModel,
-                       FriendRecommendationQuery,
-                       FriendRecommendationPrediction] {
+    extends LAlgorithm[
+      FriendRecommendationTrainingData,
+      KeywordSimilarityModel,
+      FriendRecommendationQuery,
+      FriendRecommendationPrediction] {
 
   override def train(
       td: FriendRecommendationTrainingData): KeywordSimilarityModel = {
@@ -30,12 +31,13 @@ class KeywordSimilarityAlgorithm(val ap: FriendRecommendationAlgoParams)
       }
     }
      */
-    new KeywordSimilarityModel(td.userIdMap,
-                               td.itemIdMap,
-                               td.userKeyword,
-                               td.itemKeyword,
-                               keywordSimWeight,
-                               keywordSimThreshold)
+    new KeywordSimilarityModel(
+      td.userIdMap,
+      td.itemIdMap,
+      td.userKeyword,
+      td.itemKeyword,
+      keywordSimWeight,
+      keywordSimThreshold)
   }
 
   def findKeywordSimilarity(keywordMap1: HashMap[Int, Double],

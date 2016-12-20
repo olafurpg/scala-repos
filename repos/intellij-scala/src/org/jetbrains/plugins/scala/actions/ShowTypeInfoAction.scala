@@ -54,11 +54,12 @@ class ShowTypeInfoAction extends AnAction(ScalaBundle.message("type.info")) {
 
       def hintForExpression: Option[String] = {
         val exprWithTypes: Option[(ScExpression, Array[ScType])] =
-          ScalaRefactoringUtil.getExpression(file.getProject,
-                                             editor,
-                                             file,
-                                             getSelectionStart,
-                                             getSelectionEnd)
+          ScalaRefactoringUtil.getExpression(
+            file.getProject,
+            editor,
+            file,
+            getSelectionStart,
+            getSelectionEnd)
 
         exprWithTypes.map {
           case (expr @ ExpressionType(tpe), _) =>

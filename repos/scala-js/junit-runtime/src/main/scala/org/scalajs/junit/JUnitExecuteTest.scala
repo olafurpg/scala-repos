@@ -94,16 +94,18 @@ final class JUnitExecuteTest(taskDef: TaskDef,
       val testMethodFailed = {
         try {
           classMetadata.invoke(testClassInstance, method.name)
-          executedWithoutExceptions(method.name,
-                                    testAnnotation,
-                                    timeInSeconds())
+          executedWithoutExceptions(
+            method.name,
+            testAnnotation,
+            timeInSeconds())
           false
         } catch {
           case ex: Throwable =>
-            executedWithExceptions(method.name,
-                                   testAnnotation,
-                                   timeInSeconds(),
-                                   ex)
+            executedWithExceptions(
+              method.name,
+              testAnnotation,
+              timeInSeconds(),
+              ex)
             true
         }
       }
@@ -121,9 +123,10 @@ final class JUnitExecuteTest(taskDef: TaskDef,
           }
         } catch {
           case ex: Throwable =>
-            logFormattedError(method.name,
-                              "failed: on @AfterClass method",
-                              Some(ex))
+            logFormattedError(
+              method.name,
+              "failed: on @AfterClass method",
+              Some(ex))
             val selector =
               new NestedTestSelector(fullyQualifiedName, method.name)
             eventHandler.handle(

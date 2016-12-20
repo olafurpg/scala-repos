@@ -67,17 +67,19 @@ class HBPEvents(client: HBClient,
     checkTableExists(appId, channelId)
 
     val conf = HBaseConfiguration.create()
-    conf.set(TableInputFormat.INPUT_TABLE,
-             HBEventsUtil.tableName(namespace, appId, channelId))
+    conf.set(
+      TableInputFormat.INPUT_TABLE,
+      HBEventsUtil.tableName(namespace, appId, channelId))
 
-    val scan = HBEventsUtil.createScan(startTime = startTime,
-                                       untilTime = untilTime,
-                                       entityType = entityType,
-                                       entityId = entityId,
-                                       eventNames = eventNames,
-                                       targetEntityType = targetEntityType,
-                                       targetEntityId = targetEntityId,
-                                       reversed = None)
+    val scan = HBEventsUtil.createScan(
+      startTime = startTime,
+      untilTime = untilTime,
+      entityType = entityType,
+      entityId = entityId,
+      eventNames = eventNames,
+      targetEntityType = targetEntityType,
+      targetEntityId = targetEntityId,
+      reversed = None)
     scan.setCaching(500) // TODO
     scan.setCacheBlocks(false) // TODO
 
@@ -85,10 +87,11 @@ class HBPEvents(client: HBClient,
 
     // HBase is not accessed until this rdd is actually used.
     val rdd = sc
-      .newAPIHadoopRDD(conf,
-                       classOf[TableInputFormat],
-                       classOf[ImmutableBytesWritable],
-                       classOf[Result])
+      .newAPIHadoopRDD(
+        conf,
+        classOf[TableInputFormat],
+        classOf[ImmutableBytesWritable],
+        classOf[Result])
       .map {
         case (key, row) => HBEventsUtil.resultToEvent(row, appId)
       }
@@ -102,11 +105,13 @@ class HBPEvents(client: HBClient,
     checkTableExists(appId, channelId)
 
     val conf = HBaseConfiguration.create()
-    conf.set(TableOutputFormat.OUTPUT_TABLE,
-             HBEventsUtil.tableName(namespace, appId, channelId))
-    conf.setClass("mapreduce.outputformat.class",
-                  classOf[TableOutputFormat[Object]],
-                  classOf[OutputFormat[Object, Writable]])
+    conf.set(
+      TableOutputFormat.OUTPUT_TABLE,
+      HBEventsUtil.tableName(namespace, appId, channelId))
+    conf.setClass(
+      "mapreduce.outputformat.class",
+      classOf[TableOutputFormat[Object]],
+      classOf[OutputFormat[Object, Writable]])
 
     events
       .map { event =>

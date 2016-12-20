@@ -27,22 +27,23 @@ object BinaryFormat {
 
     private type MT = Int // tenths of seconds
     private val size = 16
-    private val encodeList: List[(MT, Int)] = List(1,
-                                                   5,
-                                                   10,
-                                                   15,
-                                                   20,
-                                                   30,
-                                                   40,
-                                                   50,
-                                                   60,
-                                                   80,
-                                                   100,
-                                                   150,
-                                                   200,
-                                                   300,
-                                                   400,
-                                                   600).zipWithIndex
+    private val encodeList: List[(MT, Int)] = List(
+      1,
+      5,
+      10,
+      15,
+      20,
+      30,
+      40,
+      50,
+      60,
+      80,
+      100,
+      150,
+      200,
+      300,
+      400,
+      600).zipWithIndex
     private val encodeMap: Map[MT, Int] = encodeList.toMap
     private val decodeList: List[(Int, MT)] = encodeList.map(x => x._2 -> x._1)
     private val decodeMap: Map[Int, MT] = decodeList.toMap
@@ -112,13 +113,14 @@ object BinaryFormat {
           // compatibility with 5 bytes timers
           // #TODO remove me! But fix the DB first!
           case Array(b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, _) =>
-            PausedClock(color = color,
-                        limit = readClockLimit(b1),
-                        increment = b2,
-                        whiteTime = readSignedInt24(b3, b4, b5).toFloat / 100,
-                        blackTime = readSignedInt24(b6, b7, b8).toFloat / 100,
-                        whiteBerserk = whiteBerserk,
-                        blackBerserk = blackBerserk)
+            PausedClock(
+              color = color,
+              limit = readClockLimit(b1),
+              increment = b2,
+              whiteTime = readSignedInt24(b3, b4, b5).toFloat / 100,
+              blackTime = readSignedInt24(b6, b7, b8).toFloat / 100,
+              whiteBerserk = whiteBerserk,
+              blackBerserk = blackBerserk)
           case x =>
             sys error s"BinaryFormat.clock.read invalid bytes: ${ba.showBytes}"
       }

@@ -166,10 +166,11 @@ class AppsResource @Inject()(clock: Clock,
       withValid(Json.parse(body).as[AppUpdate].copy(id = Some(appId))) {
         appUpdate =>
           val plan = result(
-            groupManager.updateApp(appId,
-                                   updateOrCreate(appId, _, appUpdate, now),
-                                   now,
-                                   force))
+            groupManager.updateApp(
+              appId,
+              updateOrCreate(appId, _, appUpdate, now),
+              now,
+              force))
 
           val response = plan.original
             .app(appId)
@@ -195,9 +196,10 @@ class AppsResource @Inject()(clock: Clock,
             (group, update) =>
               update.id match {
                 case Some(id) =>
-                  group.updateApp(id,
-                                  updateOrCreate(id, _, update, version),
-                                  version)
+                  group.updateApp(
+                    id,
+                    updateOrCreate(id, _, update, version),
+                    version)
                 case None => group
               }
           }
@@ -218,9 +220,10 @@ class AppsResource @Inject()(clock: Clock,
       val appId = id.toRootPath
 
       def deleteAppFromGroup(group: Group) = {
-        checkAuthorization(DeleteApp,
-                           group.app(appId),
-                           UnknownAppException(appId))
+        checkAuthorization(
+          DeleteApp,
+          group.app(appId),
+          UnknownAppException(appId))
         group.removeApplication(appId)
       }
 
@@ -233,11 +236,12 @@ class AppsResource @Inject()(clock: Clock,
 
   @Path("{appId:.+}/versions")
   def appVersionsResource(): AppVersionsResource =
-    new AppVersionsResource(service,
-                            groupManager,
-                            authenticator,
-                            authorizer,
-                            config)
+    new AppVersionsResource(
+      service,
+      groupManager,
+      authenticator,
+      authorizer,
+      config)
 
   @POST
   @Path("{id:.+}/restart")
@@ -256,10 +260,11 @@ class AppsResource @Inject()(clock: Clock,
 
       val newVersion = clock.now()
       val restartDeployment = result(
-        groupManager.updateApp(id.toRootPath,
-                               markForRestartingOrThrow,
-                               newVersion,
-                               force)
+        groupManager.updateApp(
+          id.toRootPath,
+          markForRestartingOrThrow,
+          newVersion,
+          force)
       )
 
       deploymentResult(restartDeployment)

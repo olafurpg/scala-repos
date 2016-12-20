@@ -97,16 +97,17 @@ class ScTraitImpl private (stub: StubElement[ScTemplateDefinition],
     val res = new ArrayBuffer[PsiMethod]()
     res ++= getConstructors
     TypeDefinitionMembers.SignatureNodes.forAllSignatureNodes(this) { node =>
-      this.processPsiMethodsForNode(node,
-                                    isStatic = false,
-                                    isInterface = true)(res += _)
+      this.processPsiMethodsForNode(
+        node,
+        isStatic = false,
+        isInterface = true)(res += _)
     }
 
     for (synthetic <- syntheticMethodsNoOverride) {
       this.processPsiMethodsForNode(
-        new SignatureNodes.Node(new PhysicalSignature(synthetic,
-                                                      ScSubstitutor.empty),
-                                ScSubstitutor.empty),
+        new SignatureNodes.Node(
+          new PhysicalSignature(synthetic, ScSubstitutor.empty),
+          ScSubstitutor.empty),
         isStatic = false,
         isInterface = isInterface)(res += _)
     }

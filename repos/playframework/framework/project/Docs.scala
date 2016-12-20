@@ -67,8 +67,9 @@ object Docs {
 
           // The play version is added so that resource paths are versioned
           val webjarMappings =
-            webjars.*** pair rebase(webjars,
-                                    "play/docs/content/webjars/" + playVersion)
+            webjars.*** pair rebase(
+              webjars,
+              "play/docs/content/webjars/" + playVersion)
 
           // Gather all the conf files into the project
           val referenceConfMappings = confs.map {
@@ -110,8 +111,9 @@ object Docs {
   def apiDocsTask = Def.task {
 
     val targetDir =
-      new File(target.value,
-               "scala-" + CrossVersion.binaryScalaVersion(scalaVersion.value))
+      new File(
+        target.value,
+        "scala-" + CrossVersion.binaryScalaVersion(scalaVersion.value))
     val apiTarget = new File(targetDir, "apidocs")
 
     if ((publishArtifact in packageDoc).value) {
@@ -160,12 +162,13 @@ object Docs {
       // Since there is absolutely no documentation on what the arguments here should be aside from their types, here
       // are the parameter names of the method that does eventually get called:
       // (sources, classpath, outputDirectory, options, maxErrors, log)
-      scaladoc(apiDocsScalaSources.value,
-               classpath,
-               apiTarget / "scala",
-               options,
-               10,
-               streams.value.log)
+      scaladoc(
+        apiDocsScalaSources.value,
+        classpath,
+        apiTarget / "scala",
+        options,
+        10,
+        streams.value.log)
 
       val javadocOptions = Seq(
         "-windowtitle",
@@ -184,12 +187,13 @@ object Docs {
         if (useCache) Doc.javadoc(label, javaCache, compilers.javac)
         else DocNoCache.javadoc(label, compilers)
       }
-      javadoc(apiDocsJavaSources.value,
-              classpath,
-              apiTarget / "java",
-              javadocOptions,
-              10,
-              streams.value.log)
+      javadoc(
+        apiDocsJavaSources.value,
+        classpath,
+        apiTarget / "java",
+        javadocOptions,
+        10,
+        streams.value.log)
     }
 
     apiTarget

@@ -48,17 +48,20 @@ object JavaWSSpec extends Specification with Results with Status {
   "The Java WS class" should {
     "call WS correctly" in new WithServer(app = fakeApplication, port = 3333) {
       val result =
-        MockJavaActionHelper.call(app.injector.instanceOf[JavaWS.Controller1],
-                                  fakeRequest())
+        MockJavaActionHelper.call(
+          app.injector.instanceOf[JavaWS.Controller1],
+          fakeRequest())
 
       result.status() must equalTo(OK)
     }
 
-    "compose WS calls successfully" in new WithServer(app = fakeApplication,
-                                                      port = 3333) {
+    "compose WS calls successfully" in new WithServer(
+      app = fakeApplication,
+      port = 3333) {
       val result =
-        MockJavaActionHelper.call(app.injector.instanceOf[JavaWS.Controller2],
-                                  fakeRequest())
+        MockJavaActionHelper.call(
+          app.injector.instanceOf[JavaWS.Controller2],
+          fakeRequest())
 
       result.status() must equalTo(OK)
       contentAsString(result) must beEqualTo("Number of comments: 10")

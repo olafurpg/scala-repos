@@ -127,11 +127,12 @@ package object typedarray {
     array2typedArrayImpl(array, new Float64Array(array.length))
 
   @inline private def array2typedArrayImpl[ // scalastyle:ignore
-                                           @specialized(Byte,
-                                                        Short,
-                                                        Int,
-                                                        Float,
-                                                        Double) T,
+                                           @specialized(
+                                             Byte,
+                                             Short,
+                                             Int,
+                                             Float,
+                                             Double) T,
                                            Repr <: TypedArray[T, Repr]](
       array: scala.Array[T],
       dest: Repr): Repr = {
@@ -174,11 +175,12 @@ package object typedarray {
     typedArray2arrayImpl(array, new scala.Array(array.length))
 
   @inline private def typedArray2arrayImpl[ // scalastyle:ignore
-                                           @specialized(Byte,
-                                                        Short,
-                                                        Int,
-                                                        Float,
-                                                        Double) T,
+                                           @specialized(
+                                             Byte,
+                                             Short,
+                                             Int,
+                                             Float,
+                                             Double) T,
                                            Repr <: TypedArray[T, Repr]](
       array: Repr,
       dest: scala.Array[T]): scala.Array[T] = {

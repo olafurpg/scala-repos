@@ -37,9 +37,10 @@ private[camel] class DefaultCamel(val system: ExtendedActorSystem)
     ctx.setName(system.name)
     ctx.setStreamCaching(settings.StreamingCache)
     ctx.addComponent("akka", new ActorComponent(this, system))
-    ctx.getTypeConverterRegistry.addTypeConverter(classOf[FiniteDuration],
-                                                  classOf[String],
-                                                  DurationTypeConverter)
+    ctx.getTypeConverterRegistry.addTypeConverter(
+      classOf[FiniteDuration],
+      classOf[String],
+      DurationTypeConverter)
     ctx
   }
 
@@ -57,9 +58,10 @@ private[camel] class DefaultCamel(val system: ExtendedActorSystem)
     context.start()
     try template.start()
     catch { case NonFatal(e) ⇒ context.stop(); throw e }
-    log.debug("Started CamelContext[{}] for ActorSystem[{}]",
-              context.getName,
-              system.name)
+    log.debug(
+      "Started CamelContext[{}] for ActorSystem[{}]",
+      context.getName,
+      system.name)
     this
   }
 
@@ -81,9 +83,10 @@ private[camel] class DefaultCamel(val system: ExtendedActorSystem)
             e)
       }
     }
-    log.debug("Stopped CamelContext[{}] for ActorSystem[{}]",
-              context.getName,
-              system.name)
+    log.debug(
+      "Stopped CamelContext[{}] for ActorSystem[{}]",
+      context.getName,
+      system.name)
   }
 
   /**

@@ -75,18 +75,19 @@ object Region {
                    halignment: jfxg.HPos,
                    valignment: jfxg.VPos,
                    isSnapToPixel: Boolean) {
-    jfxsl.Region.layoutInArea(child,
-                              areaX,
-                              areaY,
-                              areaWidth,
-                              areaHeight,
-                              areaBaselineOffset,
-                              margin,
-                              fillWidth,
-                              fillHeight,
-                              halignment,
-                              valignment,
-                              isSnapToPixel)
+    jfxsl.Region.layoutInArea(
+      child,
+      areaX,
+      areaY,
+      areaWidth,
+      areaHeight,
+      areaBaselineOffset,
+      margin,
+      fillWidth,
+      fillHeight,
+      halignment,
+      valignment,
+      isSnapToPixel)
   }
 
   /** Utility method which positions the child within an area of this region defined by areaX, areaY,
@@ -101,16 +102,17 @@ object Region {
                      halignment: jfxg.HPos,
                      valignment: jfxg.VPos,
                      isSnapToPixel: Boolean) {
-    jfxsl.Region.positionInArea(child,
-                                areaX,
-                                areaY,
-                                areaWidth,
-                                areaHeight,
-                                areaBaselineOffset,
-                                margin,
-                                halignment,
-                                valignment,
-                                isSnapToPixel)
+    jfxsl.Region.positionInArea(
+      child,
+      areaX,
+      areaY,
+      areaWidth,
+      areaHeight,
+      areaBaselineOffset,
+      margin,
+      halignment,
+      valignment,
+      isSnapToPixel)
   }
 }
 

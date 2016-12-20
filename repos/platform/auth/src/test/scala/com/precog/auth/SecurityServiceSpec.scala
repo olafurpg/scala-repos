@@ -124,17 +124,19 @@ class SecurityServiceSpec
     authService.get("/apikeys/" + queryKey + "/grants/")
 
   def addAPIKeyGrant(authAPIKey: String, updateKey: String, grantId: GrantId) =
-    addAPIKeyGrantRaw(authAPIKey,
-                      updateKey,
-                      JObject("grantId" -> JString(grantId)))
+    addAPIKeyGrantRaw(
+      authAPIKey,
+      updateKey,
+      JObject("grantId" -> JString(grantId)))
 
   def addAPIKeyGrantRaw(authAPIKey: String,
                         updateKey: String,
                         grantId: JValue) =
     authService
       .query("apiKey", authAPIKey)
-      .post("/apikeys/" + updateKey + "/grants/")(grantId)(identity[JValue],
-                                                           tc)
+      .post("/apikeys/" + updateKey + "/grants/")(grantId)(
+        identity[JValue],
+        tc)
 
   def createAPIKeyGrant(authAPIKey: String, request: v1.NewGrantRequest) =
     createAPIKeyGrantRaw(authAPIKey, request.serialize)
@@ -178,19 +180,21 @@ class SecurityServiceSpec
       (g1.expirationDate == g2.expirationDate)
 
   def mkNewGrantRequest(grant: Grant) = grant match {
-    case Grant(_,
-               name,
-               description,
-               _,
-               parentIds,
-               permissions,
-               _,
-               expirationDate) =>
-      v1.NewGrantRequest(name,
-                         description,
-                         parentIds,
-                         permissions,
-                         expirationDate)
+    case Grant(
+        _,
+        name,
+        description,
+        _,
+        parentIds,
+        permissions,
+        _,
+        expirationDate) =>
+      v1.NewGrantRequest(
+        name,
+        description,
+        parentIds,
+        permissions,
+        expirationDate)
   }
 
   def standardGrant(accountId: AccountId) =
@@ -229,12 +233,13 @@ class SecurityServiceSpec
   val user4Grant =
     Await.result(apiKeyManager.findGrant(user4.grants.head), to).get
   val user4DerivedGrant = Await.result(
-    apiKeyManager.createGrant(None,
-                              None,
-                              user4.apiKey,
-                              Set(user4Grant.grantId),
-                              standardPermissions("user4"),
-                              None),
+    apiKeyManager.createGrant(
+      None,
+      None,
+      user4.apiKey,
+      Set(user4Grant.grantId),
+      standardPermissions("user4"),
+      None),
     to)
 
   val user5 = Await.result(
@@ -247,12 +252,13 @@ class SecurityServiceSpec
     to)
 
   val expiredGrant = Await.result(
-    apiKeyManager.createGrant(None,
-                              None,
-                              user1.apiKey,
-                              Set(user1Grant.grantId),
-                              standardPermissions("user1"),
-                              Some(new DateTime().minusYears(1000))),
+    apiKeyManager.createGrant(
+      None,
+      None,
+      user1.apiKey,
+      Set(user1Grant.grantId),
+      standardPermissions("user1"),
+      Some(new DateTime().minusYears(1000))),
     to)
   val expired = Await.result(
     apiKeyManager
@@ -370,9 +376,10 @@ class SecurityServiceSpec
     }
 
     "create non-root API key with defaults" in {
-      val request = v1.NewAPIKeyRequest(Some("non-root-1"),
-                                        None,
-                                        Set(standardGrant("non-root-1")))
+      val request = v1.NewAPIKeyRequest(
+        Some("non-root-1"),
+        None,
+        Set(standardGrant("non-root-1")))
       createAPIKey(rootAPIKey, request) must awaited(to) {
         beLike {
           case HttpResponse(HttpStatus(OK, _), _, Some(jid), _) =>
@@ -383,9 +390,10 @@ class SecurityServiceSpec
     }
 
     "create derived non-root API key" in {
-      val request = v1.NewAPIKeyRequest(Some("non-root-2"),
-                                        None,
-                                        Set(mkNewGrantRequest(user1Grant)))
+      val request = v1.NewAPIKeyRequest(
+        Some("non-root-2"),
+        None,
+        Set(mkNewGrantRequest(user1Grant)))
       val result = for {
         HttpResponse(HttpStatus(OK, _), _, Some(jid), _) <- createAPIKey(
           user1.apiKey,
@@ -408,25 +416,28 @@ class SecurityServiceSpec
       val request = JObject(List(JField("create", JString("invalid"))))
       createAPIKeyRaw(rootAPIKey, request) must awaited(to) {
         beLike {
-          case HttpResponse(HttpStatus(BadRequest, msg),
-                            _,
-                            Some(JObject(elems)),
-                            _) if elems.contains("error") =>
+          case HttpResponse(
+              HttpStatus(BadRequest, msg),
+              _,
+              Some(JObject(elems)),
+              _) if elems.contains("error") =>
             msg must startWith("Invalid new API key request body")
         }
       }
     }
 
     "don't create if API key is expired" in {
-      val request = v1.NewAPIKeyRequest(Some("expired-2"),
-                                        None,
-                                        Set(mkNewGrantRequest(expiredGrant)))
+      val request = v1.NewAPIKeyRequest(
+        Some("expired-2"),
+        None,
+        Set(mkNewGrantRequest(expiredGrant)))
       createAPIKey(expired.apiKey, request) must awaited(to) {
         beLike {
-          case HttpResponse(HttpStatus(BadRequest, _),
-                            _,
-                            Some(JObject(elems)),
-                            _) if elems.contains("error") =>
+          case HttpResponse(
+              HttpStatus(BadRequest, _),
+              _,
+              Some(JObject(elems)),
+              _) if elems.contains("error") =>
             elems("error") must beLike {
               case JString(
                   "Unable to create API key with expired permission") =>
@@ -437,15 +448,17 @@ class SecurityServiceSpec
     }
 
     "don't create if API key cannot grant permissions" in {
-      val request = v1.NewAPIKeyRequest(Some("unauthorized"),
-                                        None,
-                                        Set(mkNewGrantRequest(user1Grant)))
+      val request = v1.NewAPIKeyRequest(
+        Some("unauthorized"),
+        None,
+        Set(mkNewGrantRequest(user1Grant)))
       createAPIKey(user2.apiKey, request) must awaited(to) {
         beLike {
-          case HttpResponse(HttpStatus(BadRequest, _),
-                            _,
-                            Some(JObject(elems)),
-                            _) if elems.contains("error") =>
+          case HttpResponse(
+              HttpStatus(BadRequest, _),
+              _,
+              Some(JObject(elems)),
+              _) if elems.contains("error") =>
             elems("error") must beLike {
               case JString(msg) =>
                 msg must startWith(
@@ -533,10 +546,11 @@ class SecurityServiceSpec
             ReadPermission(Path("/user2/secret"), WrittenByAccount("user2"))),
           None)) must awaited(to) {
         beLike {
-          case HttpResponse(HttpStatus(BadRequest, _),
-                            _,
-                            Some(JObject(elems)),
-                            _) if elems.contains("error") =>
+          case HttpResponse(
+              HttpStatus(BadRequest, _),
+              _,
+              Some(JObject(elems)),
+              _) if elems.contains("error") =>
             elems("error") must beLike {
               case JString(msg) =>
                 msg must startWith(
@@ -589,12 +603,15 @@ class SecurityServiceSpec
         HttpResponse(HttpStatus(OK, _), _, Some(jid), _) <- addGrantChild(
           user1.apiKey,
           user1Grant.grantId,
-          v1.NewGrantRequest(None,
-                             None,
-                             Set.empty[GrantId],
-                             Set(ReadPermission(Path("/user1/secret"),
-                                                WrittenByAccount("user1"))),
-                             None))
+          v1.NewGrantRequest(
+            None,
+            None,
+            Set.empty[GrantId],
+            Set(
+              ReadPermission(
+                Path("/user1/secret"),
+                WrittenByAccount("user1"))),
+            None))
         details = jid.deserialize[v1.GrantDetails]
         HttpResponse(HttpStatus(OK, _), _, Some(jgs), _) <- getGrantChildren(
           user1.apiKey,
@@ -630,16 +647,19 @@ class SecurityServiceSpec
       val permsM = for {
         HttpResponse(HttpStatus(OK, _), _, Some(jid), _) <- createAPIKeyGrant(
           user1.apiKey,
-          v1.NewGrantRequest(None,
-                             None,
-                             Set.empty,
-                             Set(
-                               ReadPermission(Path("/user1/public"),
-                                              WrittenByAccount("user1"))),
-                             None))
-        _ <- addAPIKeyGrant(user1.apiKey,
-                            user4.apiKey,
-                            jid.deserialize[v1.GrantDetails].grantId)
+          v1.NewGrantRequest(
+            None,
+            None,
+            Set.empty,
+            Set(
+              ReadPermission(
+                Path("/user1/public"),
+                WrittenByAccount("user1"))),
+            None))
+        _ <- addAPIKeyGrant(
+          user1.apiKey,
+          user4.apiKey,
+          jid.deserialize[v1.GrantDetails].grantId)
         HttpResponse(HttpStatus(OK, _), _, Some(jperms), _) <- getPermissions(
           user4.apiKey,
           Path("/user1/public"))

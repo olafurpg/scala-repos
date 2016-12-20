@@ -136,15 +136,15 @@ class RichPipe(val pipe: Pipe)
       val newPipe = new Each(
         pipe,
         f,
-        new SideEffectMapFunction(bf,
-                                  fn,
-                                  new Function1[C, Unit]
-                                  with java.io.Serializable {
-                                    def apply(c: C) { c.release() }
-                                  },
-                                  Fields.NONE,
-                                  conv,
-                                  set))
+        new SideEffectMapFunction(
+          bf,
+          fn,
+          new Function1[C, Unit] with java.io.Serializable {
+            def apply(c: C) { c.release() }
+          },
+          Fields.NONE,
+          conv,
+          set))
       NullSource.writeFrom(newPipe)(flowDef, mode)
       newPipe
     }
@@ -157,15 +157,15 @@ class RichPipe(val pipe: Pipe)
         set: TupleSetter[T]) = {
       conv.assertArityMatches(fs._1)
       set.assertArityMatches(fs._2)
-      val mf = new SideEffectMapFunction(bf,
-                                         fn,
-                                         new Function1[C, Unit]
-                                         with java.io.Serializable {
-                                           def apply(c: C) { c.release() }
-                                         },
-                                         fs._2,
-                                         conv,
-                                         set)
+      val mf = new SideEffectMapFunction(
+        bf,
+        fn,
+        new Function1[C, Unit] with java.io.Serializable {
+          def apply(c: C) { c.release() }
+        },
+        fs._2,
+        conv,
+        set)
       new Each(pipe, fs._1, mf, defaultMode(fs._1, fs._2))
     }
 
@@ -177,15 +177,15 @@ class RichPipe(val pipe: Pipe)
         set: TupleSetter[T]) = {
       conv.assertArityMatches(fs._1)
       set.assertArityMatches(fs._2)
-      val mf = new SideEffectFlatMapFunction(bf,
-                                             fn,
-                                             new Function1[C, Unit]
-                                             with java.io.Serializable {
-                                               def apply(c: C) { c.release() }
-                                             },
-                                             fs._2,
-                                             conv,
-                                             set)
+      val mf = new SideEffectFlatMapFunction(
+        bf,
+        fn,
+        new Function1[C, Unit] with java.io.Serializable {
+          def apply(c: C) { c.release() }
+        },
+        fs._2,
+        conv,
+        set)
       new Each(pipe, fs._1, mf, defaultMode(fs._1, fs._2))
     }
   }
@@ -244,8 +244,9 @@ class RichPipe(val pipe: Pipe)
     if (this.pipe == that) {
       // Cascading fails on self merge:
       // solution by Jack Guo
-      new Merge(assignName(this.pipe),
-                assignName(new Each(that, new Identity)))
+      new Merge(
+        assignName(this.pipe),
+        assignName(new Each(that, new Identity)))
     } else {
       new Merge(assignName(this.pipe), assignName(that))
     }
@@ -390,8 +391,9 @@ class RichPipe(val pipe: Pipe)
     val (fromFields, toFields) = fields
     val in_arity = fromFields.size
     val out_arity = toFields.size
-    assert(in_arity == out_arity,
-           "Number of field names must match for rename")
+    assert(
+      in_arity == out_arity,
+      "Number of field names must match for rename")
     new Each(pipe, fromFields, new Identity(toFields), Fields.SWAP)
   }
 
@@ -614,8 +616,9 @@ class RichPipe(val pipe: Pipe)
     * etc...
     */
   def unpivot(fieldDef: (Fields, Fields)): Pipe = {
-    assert(fieldDef._2.size == 2,
-           "Must specify exactly two Field names for the results")
+    assert(
+      fieldDef._2.size == 2,
+      "Must specify exactly two Field names for the results")
     // toKeyValueList comes from TupleConversions
     pipe
       .flatMap(fieldDef) { te: TupleEntry =>

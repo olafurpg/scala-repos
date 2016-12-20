@@ -68,10 +68,11 @@ class RandomForestClassifierSuite
       .setNumTrees(1)
       .setFeatureSubsetStrategy("auto")
       .setSeed(123)
-    compareAPIs(orderedLabeledPoints50_1000,
-                newRF,
-                categoricalFeatures,
-                numClasses)
+    compareAPIs(
+      orderedLabeledPoints50_1000,
+      newRF,
+      categoricalFeatures,
+      numClasses)
   }
 
   test("params") {
@@ -79,10 +80,11 @@ class RandomForestClassifierSuite
     val model = new RandomForestClassificationModel(
       "rfc",
       Array(
-        new DecisionTreeClassificationModel("dtc",
-                                            new LeafNode(0.0, 0.0, null),
-                                            1,
-                                            2)),
+        new DecisionTreeClassificationModel(
+          "dtc",
+          new LeafNode(0.0, 0.0, null),
+          1,
+          2)),
       2,
       2)
     ParamsSuite.checkParams(model)
@@ -160,9 +162,10 @@ class RandomForestClassifierSuite
 
     val predictions = model
       .transform(df)
-      .select(rf.getPredictionCol,
-              rf.getRawPredictionCol,
-              rf.getProbabilityCol)
+      .select(
+        rf.getPredictionCol,
+        rf.getRawPredictionCol,
+        rf.getProbabilityCol)
       .collect()
 
     predictions.foreach {
@@ -171,8 +174,9 @@ class RandomForestClassifierSuite
           pred === rawPred.argmax,
           s"Expected prediction $pred but calculated ${rawPred.argmax} from rawPrediction.")
         val sum = rawPred.toArray.sum
-        assert(Vectors.dense(rawPred.toArray.map(_ / sum)) === probPred,
-               "probability prediction mismatch")
+        assert(
+          Vectors.dense(rawPred.toArray.map(_ / sum)) === probPred,
+          "probability prediction mismatch")
         assert(probPred.toArray.sum ~== 1.0 relTol 1E-5)
     }
   }
@@ -241,15 +245,17 @@ private object RandomForestClassifierSuite extends SparkFunSuite {
                   categoricalFeatures: Map[Int, Int],
                   numClasses: Int): Unit = {
     val numFeatures = data.first().features.size
-    val oldStrategy = rf.getOldStrategy(categoricalFeatures,
-                                        numClasses,
-                                        OldAlgo.Classification,
-                                        rf.getOldImpurity)
-    val oldModel = OldRandomForest.trainClassifier(data,
-                                                   oldStrategy,
-                                                   rf.getNumTrees,
-                                                   rf.getFeatureSubsetStrategy,
-                                                   rf.getSeed.toInt)
+    val oldStrategy = rf.getOldStrategy(
+      categoricalFeatures,
+      numClasses,
+      OldAlgo.Classification,
+      rf.getOldImpurity)
+    val oldModel = OldRandomForest.trainClassifier(
+      data,
+      oldStrategy,
+      rf.getNumTrees,
+      rf.getFeatureSubsetStrategy,
+      rf.getSeed.toInt)
     val newData: DataFrame =
       TreeTests.setMetadata(data, categoricalFeatures, numClasses)
     val newModel = rf.fit(newData)

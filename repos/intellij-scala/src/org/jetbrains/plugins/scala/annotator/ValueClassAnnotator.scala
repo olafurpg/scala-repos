@@ -38,9 +38,10 @@ trait ValueClassAnnotator {
     annotateValueClassConstructor(valueClass, holder)
     annotateValueClassTypeParameters(valueClass.typeParametersClause, holder)
     annotateInnerMembers(valueClass, holder: AnnotationHolder)
-    annotateContainingClass(valueClass,
-                            holder,
-                            Option(valueClass.containingClass))
+    annotateContainingClass(
+      valueClass,
+      holder,
+      Option(valueClass.containingClass))
   }
 
   @tailrec
@@ -50,9 +51,10 @@ trait ValueClassAnnotator {
       containingClass: Option[ScTemplateDefinition]): Unit = {
     containingClass match {
       case Some(obj: ScObject) =>
-        annotateContainingClass(valueClass,
-                                holder,
-                                Option(obj.containingClass)) //keep going
+        annotateContainingClass(
+          valueClass,
+          holder,
+          Option(obj.containingClass)) //keep going
       case Some(_) =>
         //value class is inside a trait or a class, need to highlight it
         holder.createErrorAnnotation(

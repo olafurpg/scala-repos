@@ -74,9 +74,10 @@ trait SchemasSpec[M[+ _]]
       JObjectFixedT(Map("a" -> JArrayFixedT(Map.empty), "b" -> JTextT)),
       JObjectFixedT(Map("a" -> JNullT, "b" -> JTextT)),
       JObjectFixedT(
-        Map("a" -> JArrayFixedT(Map(0 -> JNumberT, 1 -> JNumberT)),
-            "b" -> JArrayFixedT(
-              Map(0 -> JTextT, 1 -> JObjectFixedT(Map.empty)))))
+        Map(
+          "a" -> JArrayFixedT(Map(0 -> JNumberT, 1 -> JNumberT)),
+          "b" -> JArrayFixedT(
+            Map(0 -> JTextT, 1 -> JObjectFixedT(Map.empty)))))
     )
     val data = Stream.tabulate(30) {
       case i if i % 3 == 0 => JParser.parseUnsafe("""{ "a": [], "b": "2" }""")

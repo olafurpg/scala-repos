@@ -79,27 +79,33 @@ class PrunedScanSuite extends DataSourceTest with SharedSQLContext {
       """.stripMargin)
   }
 
-  sqlTest("SELECT * FROM oneToTenPruned",
-          (1 to 10).map(i => Row(i, i * 2)).toSeq)
+  sqlTest(
+    "SELECT * FROM oneToTenPruned",
+    (1 to 10).map(i => Row(i, i * 2)).toSeq)
 
-  sqlTest("SELECT a, b FROM oneToTenPruned",
-          (1 to 10).map(i => Row(i, i * 2)).toSeq)
+  sqlTest(
+    "SELECT a, b FROM oneToTenPruned",
+    (1 to 10).map(i => Row(i, i * 2)).toSeq)
 
-  sqlTest("SELECT b, a FROM oneToTenPruned",
-          (1 to 10).map(i => Row(i * 2, i)).toSeq)
+  sqlTest(
+    "SELECT b, a FROM oneToTenPruned",
+    (1 to 10).map(i => Row(i * 2, i)).toSeq)
 
   sqlTest("SELECT a FROM oneToTenPruned", (1 to 10).map(i => Row(i)).toSeq)
 
-  sqlTest("SELECT a, a FROM oneToTenPruned",
-          (1 to 10).map(i => Row(i, i)).toSeq)
+  sqlTest(
+    "SELECT a, a FROM oneToTenPruned",
+    (1 to 10).map(i => Row(i, i)).toSeq)
 
   sqlTest("SELECT b FROM oneToTenPruned", (1 to 10).map(i => Row(i * 2)).toSeq)
 
-  sqlTest("SELECT a * 2 FROM oneToTenPruned",
-          (1 to 10).map(i => Row(i * 2)).toSeq)
+  sqlTest(
+    "SELECT a * 2 FROM oneToTenPruned",
+    (1 to 10).map(i => Row(i * 2)).toSeq)
 
-  sqlTest("SELECT A AS b FROM oneToTenPruned",
-          (1 to 10).map(i => Row(i)).toSeq)
+  sqlTest(
+    "SELECT A AS b FROM oneToTenPruned",
+    (1 to 10).map(i => Row(i)).toSeq)
 
   sqlTest(
     "SELECT x.b, y.a FROM oneToTenPruned x JOIN oneToTenPruned y ON x.a = y.b",

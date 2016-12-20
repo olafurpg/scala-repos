@@ -124,7 +124,8 @@ private object LibraryReference {
   }
 
   def apply(element: Element): LibraryReference = {
-    LibraryReference(Level.fromTitle(element.getAttributeValue("level")),
-                     element.getAttributeValue("name"))
+    LibraryReference(
+      Level.fromTitle(element.getAttributeValue("level")),
+      element.getAttributeValue("name"))
   }
 }

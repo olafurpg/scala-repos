@@ -60,16 +60,17 @@ class ScSelfInvocationImpl(node: ASTNode)
       case Some(arguments) => arguments.exprs.map(new Expression(_))
       case None => Seq.empty
     }
-    val proc = new MethodResolveProcessor(this,
-                                          "this",
-                                          List(expressions),
-                                          Seq.empty,
-                                          Seq.empty /*todo: ? */,
-                                          StdKinds.methodsOnly,
-                                          constructorResolve = true,
-                                          isShapeResolve = shapeResolve,
-                                          enableTupling = true,
-                                          selfConstructorResolve = true)
+    val proc = new MethodResolveProcessor(
+      this,
+      "this",
+      List(expressions),
+      Seq.empty,
+      Seq.empty /*todo: ? */,
+      StdKinds.methodsOnly,
+      constructorResolve = true,
+      isShapeResolve = shapeResolve,
+      enableTupling = true,
+      selfConstructorResolve = true)
     for (constr <- clazz.secondaryConstructors.filter(_ != method)
          if constr != method) {
       proc.execute(constr, ResolveState.initial)

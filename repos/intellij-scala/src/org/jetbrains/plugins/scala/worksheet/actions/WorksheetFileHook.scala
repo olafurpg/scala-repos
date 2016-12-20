@@ -49,8 +49,9 @@ class WorksheetFileHook(private val project: Project)
   override def projectOpened() {
     project.getMessageBus
       .connect(project)
-      .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER,
-                 WorksheetEditorListener)
+      .subscribe(
+        FileEditorManagerListener.FILE_EDITOR_MANAGER,
+        WorksheetEditorListener)
     project.getMessageBus
       .connect(project)
       .subscribe(DumbService.DUMB_MODE, new DumbModeListener {

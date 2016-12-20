@@ -864,20 +864,23 @@ private trait Tuple5Cozip[A1, A2, A3, A4] extends Cozip[(A1, A2, A3, A4, ?)] {
 private trait Tuple6Cozip[A1, A2, A3, A4, A5]
     extends Cozip[(A1, A2, A3, A4, A5, ?)] {
   override def cozip[A, B](x: (A1, A2, A3, A4, A5, A \/ B)) =
-    x._6.bimap((x._1, x._2, x._3, x._4, x._5, _),
-               (x._1, x._2, x._3, x._4, x._5, _))
+    x._6.bimap(
+      (x._1, x._2, x._3, x._4, x._5, _),
+      (x._1, x._2, x._3, x._4, x._5, _))
 }
 private trait Tuple7Cozip[A1, A2, A3, A4, A5, A6]
     extends Cozip[(A1, A2, A3, A4, A5, A6, ?)] {
   override def cozip[A, B](x: (A1, A2, A3, A4, A5, A6, A \/ B)) =
-    x._7.bimap((x._1, x._2, x._3, x._4, x._5, x._6, _),
-               (x._1, x._2, x._3, x._4, x._5, x._6, _))
+    x._7.bimap(
+      (x._1, x._2, x._3, x._4, x._5, x._6, _),
+      (x._1, x._2, x._3, x._4, x._5, x._6, _))
 }
 private trait Tuple8Cozip[A1, A2, A3, A4, A5, A6, A7]
     extends Cozip[(A1, A2, A3, A4, A5, A6, A7, ?)] {
   override def cozip[A, B](x: (A1, A2, A3, A4, A5, A6, A7, A \/ B)) =
-    x._8.bimap((x._1, x._2, x._3, x._4, x._5, x._6, x._7, _),
-               (x._1, x._2, x._3, x._4, x._5, x._6, x._7, _))
+    x._8.bimap(
+      (x._1, x._2, x._3, x._4, x._5, x._6, x._7, _),
+      (x._1, x._2, x._3, x._4, x._5, x._6, x._7, _))
 }
 
 private trait Tuple1Equal[A1] extends Equal[Tuple1[A1]] {
@@ -922,8 +925,9 @@ private trait Tuple5Equal[A1, A2, A3, A4, A5]
   implicit def _5: Equal[A5]
   override def equal(f1: (A1, A2, A3, A4, A5), f2: (A1, A2, A3, A4, A5)) =
     _1.equal(f1._1, f2._1) && _2.equal(f1._2, f2._2) &&
-      _3.equal(f1._3, f2._3) && _4.equal(f1._4, f2._4) && _5.equal(f1._5,
-                                                                   f2._5)
+      _3.equal(f1._3, f2._3) && _4.equal(f1._4, f2._4) && _5.equal(
+      f1._5,
+      f2._5)
   override val equalIsNatural: Boolean =
     _1.equalIsNatural && _2.equalIsNatural && _3.equalIsNatural &&
       _4.equalIsNatural && _5.equalIsNatural
@@ -958,8 +962,9 @@ private trait Tuple7Equal[A1, A2, A3, A4, A5, A6, A7]
                      f2: (A1, A2, A3, A4, A5, A6, A7)) =
     _1.equal(f1._1, f2._1) && _2.equal(f1._2, f2._2) &&
       _3.equal(f1._3, f2._3) && _4.equal(f1._4, f2._4) &&
-      _5.equal(f1._5, f2._5) && _6.equal(f1._6, f2._6) && _7.equal(f1._7,
-                                                                   f2._7)
+      _5.equal(f1._5, f2._5) && _6.equal(f1._6, f2._6) && _7.equal(
+      f1._7,
+      f2._7)
   override val equalIsNatural: Boolean =
     _1.equalIsNatural && _2.equalIsNatural && _3.equalIsNatural &&
       _4.equalIsNatural && _5.equalIsNatural && _6.equalIsNatural &&
@@ -1010,15 +1015,16 @@ private trait Tuple4Show[A1, A2, A3, A4] extends Show[(A1, A2, A3, A4)] {
   implicit def _3: Show[A3]
   implicit def _4: Show[A4]
   override def show(f: (A1, A2, A3, A4)) =
-    Cord("(",
-         _1.show(f._1),
-         ",",
-         _2.show(f._2),
-         ",",
-         _3.show(f._3),
-         ",",
-         _4.show(f._4),
-         ")")
+    Cord(
+      "(",
+      _1.show(f._1),
+      ",",
+      _2.show(f._2),
+      ",",
+      _3.show(f._3),
+      ",",
+      _4.show(f._4),
+      ")")
 }
 private trait Tuple5Show[A1, A2, A3, A4, A5]
     extends Show[(A1, A2, A3, A4, A5)] {
@@ -1028,17 +1034,18 @@ private trait Tuple5Show[A1, A2, A3, A4, A5]
   implicit def _4: Show[A4]
   implicit def _5: Show[A5]
   override def show(f: (A1, A2, A3, A4, A5)) =
-    Cord("(",
-         _1.show(f._1),
-         ",",
-         _2.show(f._2),
-         ",",
-         _3.show(f._3),
-         ",",
-         _4.show(f._4),
-         ",",
-         _5.show(f._5),
-         ")")
+    Cord(
+      "(",
+      _1.show(f._1),
+      ",",
+      _2.show(f._2),
+      ",",
+      _3.show(f._3),
+      ",",
+      _4.show(f._4),
+      ",",
+      _5.show(f._5),
+      ")")
 }
 private trait Tuple6Show[A1, A2, A3, A4, A5, A6]
     extends Show[(A1, A2, A3, A4, A5, A6)] {
@@ -1049,19 +1056,20 @@ private trait Tuple6Show[A1, A2, A3, A4, A5, A6]
   implicit def _5: Show[A5]
   implicit def _6: Show[A6]
   override def show(f: (A1, A2, A3, A4, A5, A6)) =
-    Cord("(",
-         _1.show(f._1),
-         ",",
-         _2.show(f._2),
-         ",",
-         _3.show(f._3),
-         ",",
-         _4.show(f._4),
-         ",",
-         _5.show(f._5),
-         ",",
-         _6.show(f._6),
-         ")")
+    Cord(
+      "(",
+      _1.show(f._1),
+      ",",
+      _2.show(f._2),
+      ",",
+      _3.show(f._3),
+      ",",
+      _4.show(f._4),
+      ",",
+      _5.show(f._5),
+      ",",
+      _6.show(f._6),
+      ")")
 }
 private trait Tuple7Show[A1, A2, A3, A4, A5, A6, A7]
     extends Show[(A1, A2, A3, A4, A5, A6, A7)] {
@@ -1073,21 +1081,22 @@ private trait Tuple7Show[A1, A2, A3, A4, A5, A6, A7]
   implicit def _6: Show[A6]
   implicit def _7: Show[A7]
   override def show(f: (A1, A2, A3, A4, A5, A6, A7)) =
-    Cord("(",
-         _1.show(f._1),
-         ",",
-         _2.show(f._2),
-         ",",
-         _3.show(f._3),
-         ",",
-         _4.show(f._4),
-         ",",
-         _5.show(f._5),
-         ",",
-         _6.show(f._6),
-         ",",
-         _7.show(f._7),
-         ")")
+    Cord(
+      "(",
+      _1.show(f._1),
+      ",",
+      _2.show(f._2),
+      ",",
+      _3.show(f._3),
+      ",",
+      _4.show(f._4),
+      ",",
+      _5.show(f._5),
+      ",",
+      _6.show(f._6),
+      ",",
+      _7.show(f._7),
+      ")")
 }
 private trait Tuple8Show[A1, A2, A3, A4, A5, A6, A7, A8]
     extends Show[(A1, A2, A3, A4, A5, A6, A7, A8)] {
@@ -1100,23 +1109,24 @@ private trait Tuple8Show[A1, A2, A3, A4, A5, A6, A7, A8]
   implicit def _7: Show[A7]
   implicit def _8: Show[A8]
   override def show(f: (A1, A2, A3, A4, A5, A6, A7, A8)) =
-    Cord("(",
-         _1.show(f._1),
-         ",",
-         _2.show(f._2),
-         ",",
-         _3.show(f._3),
-         ",",
-         _4.show(f._4),
-         ",",
-         _5.show(f._5),
-         ",",
-         _6.show(f._6),
-         ",",
-         _7.show(f._7),
-         ",",
-         _8.show(f._8),
-         ")")
+    Cord(
+      "(",
+      _1.show(f._1),
+      ",",
+      _2.show(f._2),
+      ",",
+      _3.show(f._3),
+      ",",
+      _4.show(f._4),
+      ",",
+      _5.show(f._5),
+      ",",
+      _6.show(f._6),
+      ",",
+      _7.show(f._7),
+      ",",
+      _8.show(f._8),
+      ")")
 }
 
 private trait Tuple1Order[A1] extends Order[Tuple1[A1]] with Tuple1Equal[A1] {

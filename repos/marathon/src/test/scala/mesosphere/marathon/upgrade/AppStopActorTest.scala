@@ -51,8 +51,9 @@ class AppStopActorTest
   test("Stop App") {
     val app = AppDefinition(id = PathId("app"), instances = 2)
     val promise = Promise[Unit]()
-    val tasks = Set(MarathonTestHelper.runningTask("task_a"),
-                    MarathonTestHelper.runningTask("task_b"))
+    val tasks = Set(
+      MarathonTestHelper.runningTask("task_a"),
+      MarathonTestHelper.runningTask("task_b"))
 
     when(taskTracker.appTasksLaunchedSync(app.id)).thenReturn(tasks)
 
@@ -153,8 +154,9 @@ class AppStopActorTest
   test("Failed") {
     val app = AppDefinition(id = PathId("app"), instances = 2)
     val promise = Promise[Unit]()
-    val tasks = Set(MarathonTestHelper.runningTask("task_a"),
-                    MarathonTestHelper.runningTask("task_b"))
+    val tasks = Set(
+      MarathonTestHelper.runningTask("task_a"),
+      MarathonTestHelper.runningTask("task_b"))
 
     when(taskTracker.appTasksLaunchedSync(app.id)).thenReturn(tasks)
 
@@ -183,8 +185,9 @@ class AppStopActorTest
   test("Task synchronization") {
     val app = AppDefinition(id = PathId("app"), instances = 2)
     val promise = Promise[Unit]()
-    val tasks = Set(MarathonTestHelper.runningTask("task_a"),
-                    MarathonTestHelper.runningTask("task_b"))
+    val tasks = Set(
+      MarathonTestHelper.runningTask("task_a"),
+      MarathonTestHelper.runningTask("task_b"))
 
     when(taskTracker.appTasksLaunchedSync(app.id))
       .thenReturn(tasks)

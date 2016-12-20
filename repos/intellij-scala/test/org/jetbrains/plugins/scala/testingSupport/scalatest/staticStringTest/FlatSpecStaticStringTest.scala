@@ -39,37 +39,41 @@ trait FlatSpecStaticStringTest extends ScalaTestTestCase {
     addFlatSpec()
 
     assert(
-      checkConfigAndSettings(createTestFromLocation(6, 7, flatSpecFileName),
-                             flatSpecClassName,
-                             "Static strings should accept sums"))
+      checkConfigAndSettings(
+        createTestFromLocation(6, 7, flatSpecFileName),
+        flatSpecClassName,
+        "Static strings should accept sums"))
   }
 
   def testFlatSpecVal() = {
     addFlatSpec()
 
     assert(
-      checkConfigAndSettings(createTestFromLocation(9, 7, flatSpecFileName),
-                             flatSpecClassName,
-                             "Static strings should work with consts"))
+      checkConfigAndSettings(
+        createTestFromLocation(9, 7, flatSpecFileName),
+        flatSpecClassName,
+        "Static strings should work with consts"))
   }
 
   def testFlatSpecValSum() = {
     addFlatSpec()
 
     assert(
-      checkConfigAndSettings(createTestFromLocation(12, 7, flatSpecFileName),
-                             flatSpecClassName,
-                             "Static strings should work with sums of consts"))
+      checkConfigAndSettings(
+        createTestFromLocation(12, 7, flatSpecFileName),
+        flatSpecClassName,
+        "Static strings should work with sums of consts"))
   }
 
   def testFlatSpecNonConst() = {
     addFlatSpec()
 
     assert(
-      checkConfigAndSettings(createTestFromLocation(15, 7, flatSpecFileName),
-                             flatSpecClassName,
-                             "Static strings should accept sums",
-                             "Static strings should work with consts",
-                             "Static strings should work with sums of consts"))
+      checkConfigAndSettings(
+        createTestFromLocation(15, 7, flatSpecFileName),
+        flatSpecClassName,
+        "Static strings should accept sums",
+        "Static strings should work with consts",
+        "Static strings should work with sums of consts"))
   }
 }

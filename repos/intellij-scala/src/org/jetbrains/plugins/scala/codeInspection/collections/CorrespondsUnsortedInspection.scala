@@ -17,15 +17,17 @@ class CorrespondsUnsortedInspection extends OperationOnCollectionInspection {
       holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case Both(expr: ScExpression, (left `.sameElements` (right)))
         if isUnsorted(left) || isUnsorted(right) =>
-      holder.registerProblem(refNameId(expr).getOrElse(expr),
-                             InspectionBundle.message("sameElements.unsorted"),
-                             highlightType)
+      holder.registerProblem(
+        refNameId(expr).getOrElse(expr),
+        InspectionBundle.message("sameElements.unsorted"),
+        highlightType)
     case Both(expr: ScExpression, (left `.corresponds` (right, _)))
         if isIterator(left) && isUnsorted(right) =>
       //corresponds signature imply that check is needed for iterators only
-      holder.registerProblem(refNameId(expr).getOrElse(expr),
-                             InspectionBundle.message("corresponds.unsorted"),
-                             highlightType)
+      holder.registerProblem(
+        refNameId(expr).getOrElse(expr),
+        InspectionBundle.message("corresponds.unsorted"),
+        highlightType)
   }
 
   private def isUnsorted(expr: ScExpression): Boolean =

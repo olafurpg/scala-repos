@@ -82,8 +82,9 @@ object Udp extends ExtensionId[UdpExt] with ExtensionIdProvider {
                         target: InetSocketAddress,
                         ack: Event)
       extends Command {
-    require(ack != null,
-            "ack must be non-null. Use NoAck if you don't want acks.")
+    require(
+      ack != null,
+      "ack must be non-null. Use NoAck if you don't want acks.")
 
     def wantsAck: Boolean = !ack.isInstanceOf[NoAck]
   }

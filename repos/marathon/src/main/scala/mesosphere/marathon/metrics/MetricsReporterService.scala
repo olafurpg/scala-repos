@@ -122,21 +122,22 @@ class MetricsReporterService @Inject()(config: MetricsReporterConf,
       .get("expansions")
       .map(_.split(",").toSeq)
       .getOrElse(
-        Seq("count",
-            "meanRate",
-            "1MinuteRate",
-            "5MinuteRate",
-            "15MinuteRate",
-            "min",
-            "mean",
-            "max",
-            "stddev",
-            "median",
-            "p75",
-            "p95",
-            "p98",
-            "p99",
-            "p999"))
+        Seq(
+          "count",
+          "meanRate",
+          "1MinuteRate",
+          "5MinuteRate",
+          "15MinuteRate",
+          "min",
+          "mean",
+          "max",
+          "stddev",
+          "median",
+          "p75",
+          "p95",
+          "p98",
+          "p99",
+          "p999"))
 
     val interval = params.get("interval").map(_.toLong).getOrElse(10L)
     val prefix = params.getOrElse("prefix", "marathon_test")

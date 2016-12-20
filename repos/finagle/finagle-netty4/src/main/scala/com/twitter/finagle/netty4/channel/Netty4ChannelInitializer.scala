@@ -85,8 +85,9 @@ private[netty4] class Netty4ChannelInitializer(
 
     if (readTimeout.isFinite) {
       val (timeoutValue, timeoutUnit) = readTimeout.inTimeUnit
-      pipeline.addLast("readTimeout",
-                       new ReadTimeoutHandler(timeoutValue, timeoutUnit))
+      pipeline.addLast(
+        "readTimeout",
+        new ReadTimeoutHandler(timeoutValue, timeoutUnit))
     }
 
     tlsConfig.foreach(initChannelTls(_, ch))
@@ -120,11 +121,12 @@ private[netty4] class ServerBridge[In, Out](
 }
 
 private[netty4] object ChannelExceptionHandler {
-  private val FinestIOExceptionMessages = Set("Connection reset by peer",
-                                              "Broken pipe",
-                                              "Connection timed out",
-                                              "No route to host",
-                                              "")
+  private val FinestIOExceptionMessages = Set(
+    "Connection reset by peer",
+    "Broken pipe",
+    "Connection timed out",
+    "No route to host",
+    "")
 }
 
 /**

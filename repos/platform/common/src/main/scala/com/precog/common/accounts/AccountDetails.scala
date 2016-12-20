@@ -51,14 +51,15 @@ case class AccountDetails(accountId: AccountId,
 object AccountDetails {
   def from(account: Account): AccountDetails = {
     import account._
-    AccountDetails(accountId,
-                   email,
-                   accountCreationDate,
-                   apiKey,
-                   rootPath,
-                   plan,
-                   lastPasswordChangeTime,
-                   profile)
+    AccountDetails(
+      accountId,
+      email,
+      accountCreationDate,
+      apiKey,
+      rootPath,
+      plan,
+      lastPasswordChangeTime,
+      profile)
   }
 
   implicit val accountDetailsIso =

@@ -83,9 +83,10 @@ object CassandraCQLTest {
     val configuration = job.getConfiguration
     ConfigHelper.setInputInitialAddress(job.getConfiguration(), cHost)
     ConfigHelper.setInputRpcPort(job.getConfiguration(), cPort)
-    ConfigHelper.setInputColumnFamily(job.getConfiguration(),
-                                      KeySpace,
-                                      InputColumnFamily)
+    ConfigHelper.setInputColumnFamily(
+      job.getConfiguration(),
+      KeySpace,
+      InputColumnFamily)
     ConfigHelper
       .setInputPartitioner(job.getConfiguration(), "Murmur3Partitioner")
     CqlConfigHelper.setInputCQLPageRowSize(job.getConfiguration(), "3")
@@ -97,18 +98,20 @@ object CassandraCQLTest {
     CqlConfigHelper.setOutputCql(job.getConfiguration(), query)
 
     job.setOutputFormatClass(classOf[CqlOutputFormat])
-    ConfigHelper.setOutputColumnFamily(job.getConfiguration(),
-                                       KeySpace,
-                                       OutputColumnFamily)
+    ConfigHelper.setOutputColumnFamily(
+      job.getConfiguration(),
+      KeySpace,
+      OutputColumnFamily)
     ConfigHelper.setOutputInitialAddress(job.getConfiguration(), cHost)
     ConfigHelper.setOutputRpcPort(job.getConfiguration(), cPort)
     ConfigHelper
       .setOutputPartitioner(job.getConfiguration(), "Murmur3Partitioner")
 
-    val casRdd = sc.newAPIHadoopRDD(job.getConfiguration(),
-                                    classOf[CqlPagingInputFormat],
-                                    classOf[java.util.Map[String, ByteBuffer]],
-                                    classOf[java.util.Map[String, ByteBuffer]])
+    val casRdd = sc.newAPIHadoopRDD(
+      job.getConfiguration(),
+      classOf[CqlPagingInputFormat],
+      classOf[java.util.Map[String, ByteBuffer]],
+      classOf[java.util.Map[String, ByteBuffer]])
 
     println("Count: " + casRdd.count)
     val productSaleRDD = casRdd.map {

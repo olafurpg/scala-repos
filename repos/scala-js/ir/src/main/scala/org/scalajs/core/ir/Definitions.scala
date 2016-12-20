@@ -37,14 +37,15 @@ object Definitions {
   val ComparableClass = "jl_Comparable"
   val NumberClass = "jl_Number"
 
-  val HijackedBoxedClasses = Set(BoxedUnitClass,
-                                 BoxedBooleanClass,
-                                 BoxedByteClass,
-                                 BoxedShortClass,
-                                 BoxedIntegerClass,
-                                 BoxedLongClass,
-                                 BoxedFloatClass,
-                                 BoxedDoubleClass)
+  val HijackedBoxedClasses = Set(
+    BoxedUnitClass,
+    BoxedBooleanClass,
+    BoxedByteClass,
+    BoxedShortClass,
+    BoxedIntegerClass,
+    BoxedLongClass,
+    BoxedFloatClass,
+    BoxedDoubleClass)
   val HijackedClasses = HijackedBoxedClasses + StringClass
 
   val AncestorsOfStringClass =
@@ -96,8 +97,9 @@ object Definitions {
         case (prefix, decompressed) if encoded.startsWith(prefix) =>
           decompressed + encoded.substring(prefix.length)
       } getOrElse {
-        assert(!encoded.isEmpty && encoded.charAt(0) == 'L',
-               s"Cannot decode invalid encoded name '$encodedName'")
+        assert(
+          !encoded.isEmpty && encoded.charAt(0) == 'L',
+          s"Cannot decode invalid encoded name '$encodedName'")
         encoded.substring(1)
       }
     })

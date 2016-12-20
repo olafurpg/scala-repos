@@ -73,8 +73,9 @@ class UserDefinedTypeSuite
   import testImplicits._
 
   private lazy val pointsRDD =
-    Seq(MyLabeledPoint(1.0, new MyDenseVector(Array(0.1, 1.0))),
-        MyLabeledPoint(0.0, new MyDenseVector(Array(0.2, 2.0)))).toDF()
+    Seq(
+      MyLabeledPoint(1.0, new MyDenseVector(Array(0.1, 1.0))),
+      MyLabeledPoint(0.0, new MyDenseVector(Array(0.2, 2.0)))).toDF()
 
   test("register user type: MyDenseVector for MyLabeledPoint") {
     val labels: RDD[Double] =
@@ -97,17 +98,20 @@ class UserDefinedTypeSuite
       "testType",
       (d: MyDenseVector) => d.isInstanceOf[MyDenseVector])
     pointsRDD.registerTempTable("points")
-    checkAnswer(sql("SELECT testType(features) from points"),
-                Seq(Row(true), Row(true)))
+    checkAnswer(
+      sql("SELECT testType(features) from points"),
+      Seq(Row(true), Row(true)))
   }
 
   testStandardAndLegacyModes("UDTs with Parquet") {
     withTempPath { dir =>
       val path = dir.getCanonicalPath
       pointsRDD.write.parquet(path)
-      checkAnswer(sqlContext.read.parquet(path),
-                  Seq(Row(1.0, new MyDenseVector(Array(0.1, 1.0))),
-                      Row(0.0, new MyDenseVector(Array(0.2, 2.0)))))
+      checkAnswer(
+        sqlContext.read.parquet(path),
+        Seq(
+          Row(1.0, new MyDenseVector(Array(0.1, 1.0))),
+          Row(0.0, new MyDenseVector(Array(0.2, 2.0)))))
     }
   }
 
@@ -115,9 +119,11 @@ class UserDefinedTypeSuite
     withTempPath { dir =>
       val path = dir.getCanonicalPath
       pointsRDD.repartition(1).write.parquet(path)
-      checkAnswer(sqlContext.read.parquet(path),
-                  Seq(Row(1.0, new MyDenseVector(Array(0.1, 1.0))),
-                      Row(0.0, new MyDenseVector(Array(0.2, 2.0)))))
+      checkAnswer(
+        sqlContext.read.parquet(path),
+        Seq(
+          Row(1.0, new MyDenseVector(Array(0.1, 1.0))),
+          Row(0.0, new MyDenseVector(Array(0.2, 2.0)))))
     }
   }
 

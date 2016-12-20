@@ -39,11 +39,12 @@ class PerfTestUtil(rootDir: File, runs: Int = 30) {
 
   def withRunner[A](config: RunConfig)(f: NIHDBPerfTestRunner[Long] => A): A = {
     val result = try {
-      val runner = new NIHDBPerfTestRunner(SimpleTimer,
-                                           optimize = config.optimize,
-                                           apiKey = "dummyAPIKey",
-                                           _rootDir = config.rootDir,
-                                           testTimeout = timeout)
+      val runner = new NIHDBPerfTestRunner(
+        SimpleTimer,
+        optimize = config.optimize,
+        apiKey = "dummyAPIKey",
+        _rootDir = config.rootDir,
+        testTimeout = timeout)
 
       runner.startup()
       try {

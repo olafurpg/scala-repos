@@ -180,11 +180,12 @@ class PBatchView(val appId: Int,
   @transient lazy val eventsDb = Storage.getPEvents()
 
   @transient lazy val _events: RDD[Event] =
-    eventsDb.getByAppIdAndTimeAndEntity(appId = appId,
-                                        startTime = startTime,
-                                        untilTime = untilTime,
-                                        entityType = None,
-                                        entityId = None)(sc)
+    eventsDb.getByAppIdAndTimeAndEntity(
+      appId = appId,
+      startTime = startTime,
+      untilTime = untilTime,
+      entityType = None,
+      entityId = None)(sc)
 
   // TODO: change to use EventSeq?
   @transient lazy val events: RDD[Event] = _events

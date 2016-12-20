@@ -182,11 +182,12 @@ private[spark] class AppClient(rpcEnv: RpcEnv,
         markDead("Master removed our application: %s".format(message))
         stop()
 
-      case ExecutorAdded(id: Int,
-                         workerId: String,
-                         hostPort: String,
-                         cores: Int,
-                         memory: Int) =>
+      case ExecutorAdded(
+          id: Int,
+          workerId: String,
+          hostPort: String,
+          cores: Int,
+          memory: Int) =>
         val fullId = appId + "/" + id
         logInfo(
           "Executor added: %s on %s (%s) with %d cores"

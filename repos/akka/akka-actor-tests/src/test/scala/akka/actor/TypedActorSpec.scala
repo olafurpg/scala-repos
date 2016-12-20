@@ -390,9 +390,10 @@ class TypedActorSpec
           }
         }))
         val t =
-          Await.result((boss ? TypedProps[Bar](classOf[Foo], classOf[Bar])
-                         .withTimeout(2 seconds)).mapTo[Foo],
-                       timeout.duration)
+          Await.result(
+            (boss ? TypedProps[Bar](classOf[Foo], classOf[Bar])
+              .withTimeout(2 seconds)).mapTo[Foo],
+            timeout.duration)
 
         t.incr()
         t.failingPigdog()
@@ -477,8 +478,9 @@ class TypedActorSpec
       import java.io._
       JavaSerializer.currentSystem.withValue(
         system.asInstanceOf[ExtendedActorSystem]) {
-        val m = TypedActor.MethodCall(classOf[Foo].getDeclaredMethod("pigdog"),
-                                      Array[AnyRef]())
+        val m = TypedActor.MethodCall(
+          classOf[Foo].getDeclaredMethod("pigdog"),
+          Array[AnyRef]())
         val baos = new ByteArrayOutputStream(8192 * 4)
         val out = new ObjectOutputStream(baos)
 
@@ -557,8 +559,9 @@ class TypedActorSpec
       val ta = TypedActor(system)
       val t: LifeCycles =
         ta.typedActorOf(
-          TypedProps[LifeCyclesImpl](classOf[LifeCycles],
-                                     new LifeCyclesImpl(latch)))
+          TypedProps[LifeCyclesImpl](
+            classOf[LifeCycles],
+            new LifeCyclesImpl(latch)))
       EventFilter[IllegalStateException]("Crash!", occurrences = 1) intercept {
         t.crash()
       }

@@ -27,12 +27,14 @@ class RemoteConsistentHashingRouterSpec
         system.actorSelection("akka.tcp://Sys@server2:2552/user/a/b"))
       val s3 = ActorSelectionRoutee(
         system.actorSelection("akka.tcp://Sys@server3:2552/user/a/b"))
-      val nodes1 = List(ConsistentRoutee(s1, a1),
-                        ConsistentRoutee(s2, a1),
-                        ConsistentRoutee(s3, a1))
-      val nodes2 = List(ConsistentRoutee(s1, a2),
-                        ConsistentRoutee(s2, a2),
-                        ConsistentRoutee(s3, a2))
+      val nodes1 = List(
+        ConsistentRoutee(s1, a1),
+        ConsistentRoutee(s2, a1),
+        ConsistentRoutee(s3, a1))
+      val nodes2 = List(
+        ConsistentRoutee(s1, a2),
+        ConsistentRoutee(s2, a2),
+        ConsistentRoutee(s3, a2))
       val consistentHash1 = ConsistentHash(nodes1, 10)
       val consistentHash2 = ConsistentHash(nodes2, 10)
       val keys = List("A", "B", "C", "D", "E", "F", "G")

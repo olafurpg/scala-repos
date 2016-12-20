@@ -175,11 +175,12 @@ private class ReqRepFilter
         val contexts = Contexts.broadcast.marshal().map {
           case (k, v) => (BufChannelBuffer(k), BufChannelBuffer(v))
         }
-        Message.Tdispatch(tag,
-                          contexts.toSeq,
-                          req.destination,
-                          Dtab.local,
-                          BufChannelBuffer(req.body))
+        Message.Tdispatch(
+          tag,
+          contexts.toSeq,
+          req.destination,
+          Dtab.local,
+          BufChannelBuffer(req.body))
       }
     }
 

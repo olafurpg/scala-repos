@@ -18,14 +18,15 @@ abstract class AkkaPublisherVerification[T](val env: TestEnvironment,
     with ActorSystemLifecycle {
 
   def this(printlnDebug: Boolean) =
-    this(new TestEnvironment(Timeouts.defaultTimeoutMillis, printlnDebug),
-         Timeouts.publisherShutdownTimeoutMillis)
+    this(
+      new TestEnvironment(Timeouts.defaultTimeoutMillis, printlnDebug),
+      Timeouts.publisherShutdownTimeoutMillis)
 
   def this() = this(false)
 
   implicit lazy val materializer = ActorMaterializer(
-    ActorMaterializerSettings(system).withInputBuffer(initialSize = 512,
-                                                      maxSize = 512))(system)
+    ActorMaterializerSettings(system)
+      .withInputBuffer(initialSize = 512, maxSize = 512))(system)
 
   override def createFailedPublisher(): Publisher[T] =
     TestPublisher.error(

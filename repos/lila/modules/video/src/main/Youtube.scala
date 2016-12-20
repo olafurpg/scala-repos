@@ -26,14 +26,15 @@ private[video] final class Youtube(url: String,
         api.video
           .setMetadata(
             entry.id,
-            Metadata(views = ~parseIntOption(entry.statistics.viewCount),
-                     likes = ~parseIntOption(entry.statistics.likeCount) -
-                         ~parseIntOption(entry.statistics.dislikeCount),
-                     description = entry.snippet.description,
-                     duration = Some(entry.contentDetails.seconds),
-                     publishedAt = entry.snippet.publishedAt.flatMap { at =>
-                       scala.util.Try { new DateTime(at) }.toOption
-                     }))
+            Metadata(
+              views = ~parseIntOption(entry.statistics.viewCount),
+              likes = ~parseIntOption(entry.statistics.likeCount) -
+                  ~parseIntOption(entry.statistics.dislikeCount),
+              description = entry.snippet.description,
+              duration = Some(entry.contentDetails.seconds),
+              publishedAt = entry.snippet.publishedAt.flatMap { at =>
+                scala.util.Try { new DateTime(at) }.toOption
+              }))
           .recover {
             case e: Exception => logger.warn("update all youtube", e)
           }

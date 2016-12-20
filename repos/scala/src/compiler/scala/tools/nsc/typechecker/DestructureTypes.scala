@@ -53,9 +53,11 @@ trait DestructureTypes {
       val (names, args) = ann.assocs.toIndexedSeq.unzip
       if (names.isEmpty) wrapEmpty
       else
-        node("assocs",
-             nodeList(names.indices.toList,
-                      (i: Int) => atom(names(i).toString, args(i))))
+        node(
+          "assocs",
+          nodeList(
+            names.indices.toList,
+            (i: Int) => atom(names(i).toString, args(i))))
     }
     private def typeTypeName(tp: Type) = tp match {
       case mt @ MethodType(_, _) if mt.isImplicit => "ImplicitMethodType"
@@ -194,9 +196,10 @@ trait DestructureTypes {
         product(tp, parentList(parents), scope(decls), wrapAtom(clazz))
       case ConstantType(const) => product(tp, constant("value", const))
       case OverloadedType(pre, alts) =>
-        product(tp,
-                prefix(pre),
-                node("alts", typeList(alts map pre.memberType)))
+        product(
+          tp,
+          prefix(pre),
+          node("alts", typeList(alts map pre.memberType)))
       case RefinedType(parents, decls) =>
         product(tp, parentList(parents), scope(decls))
       case SingleType(pre, sym) => product(tp, prefix(pre), wrapAtom(sym))

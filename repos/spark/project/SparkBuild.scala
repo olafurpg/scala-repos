@@ -75,25 +75,29 @@ object BuildCommons {
       "sketch"
     ).map(ProjectRef(buildLocation, _)) ++ sqlProjects ++ streamingProjects
 
-  val optionallyEnabledProjects @ Seq(yarn,
-                                      java8Tests,
-                                      sparkGangliaLgpl,
-                                      streamingKinesisAsl,
-                                      dockerIntegrationTests) =
-    Seq("yarn",
-        "java8-tests",
-        "ganglia-lgpl",
-        "streaming-kinesis-asl",
-        "docker-integration-tests").map(ProjectRef(buildLocation, _))
+  val optionallyEnabledProjects @ Seq(
+    yarn,
+    java8Tests,
+    sparkGangliaLgpl,
+    streamingKinesisAsl,
+    dockerIntegrationTests) =
+    Seq(
+      "yarn",
+      "java8-tests",
+      "ganglia-lgpl",
+      "streaming-kinesis-asl",
+      "docker-integration-tests").map(ProjectRef(buildLocation, _))
 
-  val assemblyProjects @ Seq(assembly,
-                             networkYarn,
-                             streamingKafkaAssembly,
-                             streamingKinesisAslAssembly) =
-    Seq("assembly",
-        "network-yarn",
-        "streaming-kafka-assembly",
-        "streaming-kinesis-asl-assembly").map(ProjectRef(buildLocation, _))
+  val assemblyProjects @ Seq(
+    assembly,
+    networkYarn,
+    streamingKafkaAssembly,
+    streamingKinesisAslAssembly) =
+    Seq(
+      "assembly",
+      "network-yarn",
+      "streaming-kafka-assembly",
+      "streaming-kinesis-asl-assembly").map(ProjectRef(buildLocation, _))
 
   val copyJarsProjects @ Seq(examples) =
     Seq("examples").map(ProjectRef(buildLocation, _))
@@ -214,9 +218,9 @@ object SparkBuild extends PomBuild {
       resolvers := Seq(
         DefaultMavenRepository,
         Resolver.mavenLocal,
-        Resolver.file("local",
-                      file(Path.userHome.absolutePath + "/.ivy2/local"))(
-          Resolver.ivyStylePatterns)
+        Resolver
+          .file("local", file(Path.userHome.absolutePath + "/.ivy2/local"))(
+            Resolver.ivyStylePatterns)
       ),
       externalResolvers := resolvers.value,
       otherResolvers <<= SbtPomKeys.mvnLocalRepository(dotM2 =>
@@ -397,16 +401,18 @@ object SparkBuild extends PomBuild {
         val scalaRun = (runner in run).value
         val classpath = (fullClasspath in Runtime).value
         val args =
-          Seq("--packages",
-              packages,
-              "--class",
-              className,
-              (Keys.`package` in Compile in "core").value.getCanonicalPath) ++ otherArgs
+          Seq(
+            "--packages",
+            packages,
+            "--class",
+            className,
+            (Keys.`package` in Compile in "core").value.getCanonicalPath) ++ otherArgs
         println(args)
-        scalaRun.run("org.apache.spark.deploy.SparkSubmit",
-                     classpath.map(_.data),
-                     args,
-                     streams.value.log)
+        scalaRun.run(
+          "org.apache.spark.deploy.SparkSubmit",
+          classpath.map(_.data),
+          args,
+          streams.value.log)
       },
       javaOptions in Compile += "-Dspark.master=local",
       sparkSql := {
@@ -708,9 +714,10 @@ object PySparkAssembly {
     if (source.isDirectory()) {
       output.putNextEntry(new ZipEntry(parent + source.getName()))
       for (file <- source.listFiles()) {
-        addFilesToZipStream(parent + source.getName() + File.separator,
-                            file,
-                            output)
+        addFilesToZipStream(
+          parent + source.getName() + File.separator,
+          file,
+          output)
       }
     } else {
       val in = new FileInputStream(source)
@@ -773,19 +780,21 @@ object Unidoc {
     scalaJavaUnidocSettings ++ Seq(
       publish := {},
       unidocProjectFilter in (ScalaUnidoc, unidoc) :=
-        inAnyProject -- inProjects(OldDeps.project,
-                                   repl,
-                                   examples,
-                                   tools,
-                                   yarn,
-                                   testTags),
+        inAnyProject -- inProjects(
+          OldDeps.project,
+          repl,
+          examples,
+          tools,
+          yarn,
+          testTags),
       unidocProjectFilter in (JavaUnidoc, unidoc) :=
-        inAnyProject -- inProjects(OldDeps.project,
-                                   repl,
-                                   examples,
-                                   tools,
-                                   yarn,
-                                   testTags),
+        inAnyProject -- inProjects(
+          OldDeps.project,
+          repl,
+          examples,
+          tools,
+          yarn,
+          testTags),
       // Skip actual catalyst, but include the subproject.
       // Catalyst is not public API and contains quasiquotes which break scaladoc.
       unidocAllSources in (ScalaUnidoc, unidoc) := {
@@ -921,15 +930,16 @@ object TestSettings {
     // Setting SPARK_DIST_CLASSPATH is a simple way to make sure any child processes
     // launched by the tests have access to the correct test-time classpath.
     envVars in Test ++=
-      Map("SPARK_DIST_CLASSPATH" -> (fullClasspath in Test).value.files
-            .map(_.getAbsolutePath)
-            .mkString(":")
-            .stripSuffix(":"),
-          "SPARK_PREPEND_CLASSES" -> "1",
-          "SPARK_TESTING" -> "1",
-          "JAVA_HOME" -> sys.env
-            .get("JAVA_HOME")
-            .getOrElse(sys.props("java.home"))),
+      Map(
+        "SPARK_DIST_CLASSPATH" -> (fullClasspath in Test).value.files
+          .map(_.getAbsolutePath)
+          .mkString(":")
+          .stripSuffix(":"),
+        "SPARK_PREPEND_CLASSES" -> "1",
+        "SPARK_TESTING" -> "1",
+        "JAVA_HOME" -> sys.env
+          .get("JAVA_HOME")
+          .getOrElse(sys.props("java.home"))),
     javaOptions in Test += s"-Djava.io.tmpdir=$testTempDir",
     javaOptions in Test += "-Dspark.test.home=" + sparkHome,
     javaOptions in Test += "-Dspark.testing=1",
@@ -951,26 +961,28 @@ object TestSettings {
         .toSeq,
     javaOptions += "-Xmx3g",
     // Exclude tags defined in a system property
-    testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest,
-                                          sys.props
-                                            .get("test.exclude.tags")
-                                            .map { tags =>
-                                              tags
-                                                .split(",")
-                                                .flatMap { tag =>
-                                                  Seq("-l", tag)
-                                                }
-                                                .toSeq
-                                            }
-                                            .getOrElse(Nil): _*),
+    testOptions in Test += Tests.Argument(
+      TestFrameworks.ScalaTest,
+      sys.props
+        .get("test.exclude.tags")
+        .map { tags =>
+          tags
+            .split(",")
+            .flatMap { tag =>
+              Seq("-l", tag)
+            }
+            .toSeq
+        }
+        .getOrElse(Nil): _*),
     testOptions in Test +=
-      Tests.Argument(TestFrameworks.JUnit,
-                     sys.props
-                       .get("test.exclude.tags")
-                       .map { tags =>
-                         Seq("--exclude-categories=" + tags)
-                       }
-                       .getOrElse(Nil): _*),
+      Tests.Argument(
+        TestFrameworks.JUnit,
+        sys.props
+          .get("test.exclude.tags")
+          .map { tags =>
+            Seq("--exclude-categories=" + tags)
+          }
+          .getOrElse(Nil): _*),
     // Show full stack trace and duration in test cases.
     testOptions in Test += Tests.Argument("-oDF"),
     testOptions in Test += Tests.Argument(TestFrameworks.JUnit, "-v", "-a"),

@@ -101,9 +101,10 @@ class InterpreterSupervisionSpec
 
     "emit failure when op throws in middle of the chain" in new OneBoundedSetup[
       Int](
-      Seq(Map((x: Int) ⇒ x + 1, stoppingDecider),
-          Map((x: Int) ⇒ if (x == 0) throw TE else x + 10, stoppingDecider),
-          Map((x: Int) ⇒ x + 100, stoppingDecider))) {
+      Seq(
+        Map((x: Int) ⇒ x + 1, stoppingDecider),
+        Map((x: Int) ⇒ if (x == 0) throw TE else x + 10, stoppingDecider),
+        Map((x: Int) ⇒ x + 100, stoppingDecider))) {
 
       downstream.requestOne()
       lastEvents() should be(Set(RequestOne))
@@ -143,9 +144,10 @@ class InterpreterSupervisionSpec
 
     "resume when Map throws in middle of the chain" in new OneBoundedSetup[
       Int](
-      Seq(Map((x: Int) ⇒ x + 1, resumingDecider),
-          Map((x: Int) ⇒ if (x == 0) throw TE else x + 10, resumingDecider),
-          Map((x: Int) ⇒ x + 100, resumingDecider))) {
+      Seq(
+        Map((x: Int) ⇒ x + 1, resumingDecider),
+        Map((x: Int) ⇒ if (x == 0) throw TE else x + 10, resumingDecider),
+        Map((x: Int) ⇒ x + 100, resumingDecider))) {
 
       downstream.requestOne()
       lastEvents() should be(Set(RequestOne))
@@ -162,9 +164,10 @@ class InterpreterSupervisionSpec
     }
 
     "resume when Map throws before Grouped" in new OneBoundedSetup[Int](
-      Seq(Map((x: Int) ⇒ x + 1, resumingDecider),
-          Map((x: Int) ⇒ if (x <= 0) throw TE else x + 10, resumingDecider),
-          Grouped(3))) {
+      Seq(
+        Map((x: Int) ⇒ x + 1, resumingDecider),
+        Map((x: Int) ⇒ if (x <= 0) throw TE else x + 10, resumingDecider),
+        Grouped(3))) {
 
       downstream.requestOne()
       lastEvents() should be(Set(RequestOne))
@@ -183,9 +186,10 @@ class InterpreterSupervisionSpec
 
     "complete after resume when Map throws before Grouped" in new OneBoundedSetup[
       Int](
-      Seq(Map((x: Int) ⇒ x + 1, resumingDecider),
-          Map((x: Int) ⇒ if (x <= 0) throw TE else x + 10, resumingDecider),
-          Grouped(1000))) {
+      Seq(
+        Map((x: Int) ⇒ x + 1, resumingDecider),
+        Map((x: Int) ⇒ if (x <= 0) throw TE else x + 10, resumingDecider),
+        Grouped(1000))) {
 
       downstream.requestOne()
       lastEvents() should be(Set(RequestOne))
@@ -211,9 +215,10 @@ class InterpreterSupervisionSpec
       }
 
       new OneBoundedSetup[Int](
-        Seq(Map((x: Int) ⇒ x + 1, restartingDecider),
-            stage,
-            Map((x: Int) ⇒ x + 100, restartingDecider))) {
+        Seq(
+          Map((x: Int) ⇒ x + 1, restartingDecider),
+          stage,
+          Map((x: Int) ⇒ x + 100, restartingDecider))) {
 
         downstream.requestOne()
         lastEvents() should be(Set(RequestOne))
@@ -240,9 +245,10 @@ class InterpreterSupervisionSpec
       }
 
       new OneBoundedSetup[Int](
-        Seq(Map((x: Int) ⇒ x + 1, restartingDecider),
-            stage,
-            Map((x: Int) ⇒ x + 100, restartingDecider))) {
+        Seq(
+          Map((x: Int) ⇒ x + 1, restartingDecider),
+          stage,
+          Map((x: Int) ⇒ x + 100, restartingDecider))) {
 
         downstream.requestOne()
         lastEvents() should be(Set(RequestOne))
@@ -272,9 +278,10 @@ class InterpreterSupervisionSpec
       }
 
       new OneBoundedSetup[Int](
-        Seq(Map((x: Int) ⇒ x + 1, restartingDecider),
-            stage,
-            Map((x: Int) ⇒ x + 100, restartingDecider))) {
+        Seq(
+          Map((x: Int) ⇒ x + 1, restartingDecider),
+          stage,
+          Map((x: Int) ⇒ x + 100, restartingDecider))) {
 
         downstream.requestOne()
         lastEvents() should be(Set(RequestOne))
@@ -330,9 +337,10 @@ class InterpreterSupervisionSpec
 
     "resume when Scan throws" in new OneBoundedSetup[Int](
       Seq(
-        Scan(1,
-             (acc: Int, x: Int) ⇒ if (x == 10) throw TE else acc + x,
-             resumingDecider))) {
+        Scan(
+          1,
+          (acc: Int, x: Int) ⇒ if (x == 10) throw TE else acc + x,
+          resumingDecider))) {
       downstream.requestOne()
       lastEvents() should be(Set(OnNext(1)))
       downstream.requestOne()
@@ -351,9 +359,10 @@ class InterpreterSupervisionSpec
 
     "restart when Scan throws" in new OneBoundedSetup[Int](
       Seq(
-        Scan(1,
-             (acc: Int, x: Int) ⇒ if (x == 10) throw TE else acc + x,
-             restartingDecider))) {
+        Scan(
+          1,
+          (acc: Int, x: Int) ⇒ if (x == 10) throw TE else acc + x,
+          restartingDecider))) {
       downstream.requestOne()
       lastEvents() should be(Set(OnNext(1)))
       downstream.requestOne()

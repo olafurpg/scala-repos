@@ -117,11 +117,12 @@ trait ClassfileIndexer { this: SLF4JLogging =>
 
             case name =>
               val descriptor = DescriptorParser.parse(desc)
-              val method = RawMethod(MemberName(clazz.name, name),
-                                     Access(access),
-                                     descriptor,
-                                     Option(signature),
-                                     firstLine)
+              val method = RawMethod(
+                MemberName(clazz.name, name),
+                Access(access),
+                descriptor,
+                Option(signature),
+                firstLine)
               clazz = clazz.copy(methods = clazz.methods :+ method)
           }
         }

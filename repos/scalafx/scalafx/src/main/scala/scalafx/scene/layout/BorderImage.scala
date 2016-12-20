@@ -58,13 +58,14 @@ class BorderImage(override val delegate: jfxsl.BorderImage)
            repeatX: BorderRepeat,
            repeatY: BorderRepeat) =
     this(
-      new jfxsl.BorderImage(image,
-                            widths,
-                            insets,
-                            slices,
-                            filled,
-                            repeatX,
-                            repeatY))
+      new jfxsl.BorderImage(
+        image,
+        widths,
+        insets,
+        slices,
+        filled,
+        repeatX,
+        repeatY))
 
   /**
     * The image to be used.

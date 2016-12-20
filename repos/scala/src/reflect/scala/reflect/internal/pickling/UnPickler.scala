@@ -404,9 +404,10 @@ abstract class UnPickler {
         val sym = readSymbolRef() match {
           case stub: StubSymbol if !stub.isClass =>
             // SI-8502 This allows us to create a stub for a unpickled reference to `missingPackage.Foo`.
-            stub.owner.newStubSymbol(stub.name.toTypeName,
-                                     stub.missingMessage,
-                                     isPackage = true)
+            stub.owner.newStubSymbol(
+              stub.name.toTypeName,
+              stub.missingMessage,
+              isPackage = true)
           case sym => sym
         }
         ThisType(sym)
@@ -430,8 +431,9 @@ abstract class UnPickler {
         case METHODtpe => MethodTypeRef(readTypeRef(), readSymbols())
         case POLYtpe => PolyOrNullaryType(readTypeRef(), readSymbols())
         case EXISTENTIALtpe =>
-          ExistentialType(underlying = readTypeRef(),
-                          quantified = readSymbols())
+          ExistentialType(
+            underlying = readTypeRef(),
+            quantified = readSymbols())
         case ANNOTATEDtpe =>
           AnnotatedType(underlying = readTypeRef(), annotations = readAnnots())
       }
@@ -594,12 +596,13 @@ abstract class UnPickler {
           ClassDef(modsRef, typeNameRef, rep(tparamRef), implRef)
         case COMPOUNDTYPEtree => CompoundTypeTree(implRef)
         case DEFDEFtree =>
-          DefDef(modsRef,
-                 termNameRef,
-                 rep(tparamRef),
-                 rep(rep(vparamRef)),
-                 ref,
-                 ref)
+          DefDef(
+            modsRef,
+            termNameRef,
+            rep(tparamRef),
+            rep(rep(vparamRef)),
+            ref,
+            ref)
         case EXISTENTIALTYPEtree => ExistentialTypeTree(ref, all(memberRef))
         case FUNCTIONtree => Function(rep(vparamRef), ref)
         case IMPORTtree => Import(ref, selectorsRef)
@@ -766,9 +769,10 @@ abstract class UnPickler {
               tp match {
                 case ClassInfoType(superClass :: traits, decls, typeSymbol)
                     if superClass.typeSymbol.isTrait =>
-                  ClassInfoType(definitions.ObjectTpe :: superClass :: traits,
-                                decls,
-                                typeSymbol)
+                  ClassInfoType(
+                    definitions.ObjectTpe :: superClass :: traits,
+                    decls,
+                    typeSymbol)
                 case _ => tp
               } else tp
 

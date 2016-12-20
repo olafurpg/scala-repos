@@ -93,11 +93,12 @@ trait DAGTransform extends DAG {
 
         case graph @ Cond(pred, left, leftJoin, right, rightJoin) =>
           f(
-            Cond(transformAux(pred),
-                 transformAux(left),
-                 leftJoin,
-                 transformAux(right),
-                 rightJoin)(graph.loc))
+            Cond(
+              transformAux(pred),
+              transformAux(left),
+              leftJoin,
+              transformAux(right),
+              rightJoin)(graph.loc))
 
         case graph @ Observe(data, samples) =>
           f(Observe(transformAux(data), transformAux(samples))(graph.loc))

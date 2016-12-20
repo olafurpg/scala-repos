@@ -35,8 +35,9 @@ class Decoder(storageCommands: collection.Set[ChannelBuffer])
         }
       case AwaitingData(tokens, bytesNeeded) =>
         decodeData(bytesNeeded, buffer) { data =>
-          TokensWithData(tokens.map { ChannelBufferBuf.Owned(_) },
-                         ChannelBufferBuf.Owned(data))
+          TokensWithData(
+            tokens.map { ChannelBufferBuf.Owned(_) },
+            ChannelBufferBuf.Owned(data))
         }
     }
   }

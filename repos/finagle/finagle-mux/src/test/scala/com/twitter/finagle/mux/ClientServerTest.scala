@@ -84,11 +84,12 @@ private[mux] class ClientServerTest(canDispatch: Boolean)
         }
     }
 
-    val server = new ServerDispatcher(serverTransport,
-                                      filter andThen Processor andThen service,
-                                      Lessor.nil,
-                                      tracer,
-                                      NullStatsReceiver)
+    val server = new ServerDispatcher(
+      serverTransport,
+      filter andThen Processor andThen service,
+      Lessor.nil,
+      tracer,
+      NullStatsReceiver)
   }
 
   // Push a tracer for the client.
@@ -270,8 +271,9 @@ private[mux] class ClientServerTest(canDispatch: Boolean)
   }
 
   test("failure detection") {
-    val config = FailureDetector.ThresholdConfig(minPeriod = 10.milliseconds,
-                                                 closeTimeout = Duration.Top)
+    val config = FailureDetector.ThresholdConfig(
+      minPeriod = 10.milliseconds,
+      closeTimeout = Duration.Top)
 
     val ctx = new Ctx(config)
     import ctx._

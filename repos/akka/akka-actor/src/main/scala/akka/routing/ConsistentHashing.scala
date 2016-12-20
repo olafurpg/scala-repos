@@ -152,9 +152,10 @@ final case class ConsistentHashingRoutingLogic(
     * @param system the actor system hosting this router
     */
   def this(system: ActorSystem) =
-    this(system,
-         virtualNodesFactor = 0,
-         hashMapping = ConsistentHashingRouter.emptyConsistentHashMapping)
+    this(
+      system,
+      virtualNodesFactor = 0,
+      hashMapping = ConsistentHashingRouter.emptyConsistentHashMapping)
 
   private val selfAddress =
     system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
@@ -198,8 +199,9 @@ final case class ConsistentHashingRoutingLogic(
           val consistentHash =
             if (routees == oldRoutees) oldConsistentHash
             else
-              ConsistentHash(routees.map(ConsistentRoutee(_, selfAddress)),
-                             vnodes) // re-hash
+              ConsistentHash(
+                routees.map(ConsistentRoutee(_, selfAddress)),
+                vnodes) // re-hash
           // ignore, don't update, in case of CAS failure
           consistentHashRef
             .compareAndSet(oldConsistentHashTuple, (routees, consistentHash))
@@ -297,9 +299,10 @@ final case class ConsistentHashingPool(
     with PoolOverrideUnsetConfig[ConsistentHashingPool] {
 
   def this(config: Config) =
-    this(nrOfInstances = config.getInt("nr-of-instances"),
-         resizer = Resizer.fromConfig(config),
-         usePoolDispatcher = config.hasPath("pool-dispatcher"))
+    this(
+      nrOfInstances = config.getInt("nr-of-instances"),
+      resizer = Resizer.fromConfig(config),
+      usePoolDispatcher = config.hasPath("pool-dispatcher"))
 
   /**
     * Java API

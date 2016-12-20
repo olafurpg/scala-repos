@@ -197,10 +197,11 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
         else pckg.getDirectories()(0)
       }
     ScalaDirectoryService
-      .createClassFromTemplate(dir,
-                               name,
-                               "Scala Trait",
-                               askToDefineVariables = false)
+      .createClassFromTemplate(
+        dir,
+        name,
+        "Scala Trait",
+        askToDefineVariables = false)
       .asInstanceOf[ScTrait]
   }
 

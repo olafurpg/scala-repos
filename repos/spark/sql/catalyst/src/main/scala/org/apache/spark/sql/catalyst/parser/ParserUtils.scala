@@ -159,18 +159,21 @@ object ParserUtils {
 
   def nodeToStructField(node: ASTNode): StructField = node match {
     case Token("TOK_TABCOL", Token(fieldName, Nil) :: dataType :: Nil) =>
-      StructField(cleanIdentifier(fieldName),
-                  nodeToDataType(dataType),
-                  nullable = true)
-    case Token("TOK_TABCOL",
-               Token(fieldName, Nil) :: dataType :: comment :: Nil) =>
+      StructField(
+        cleanIdentifier(fieldName),
+        nodeToDataType(dataType),
+        nullable = true)
+    case Token(
+        "TOK_TABCOL",
+        Token(fieldName, Nil) :: dataType :: comment :: Nil) =>
       val meta = new MetadataBuilder()
         .putString("comment", unquoteString(comment.text))
         .build()
-      StructField(cleanIdentifier(fieldName),
-                  nodeToDataType(dataType),
-                  nullable = true,
-                  meta)
+      StructField(
+        cleanIdentifier(fieldName),
+        nodeToDataType(dataType),
+        nullable = true,
+        meta)
     case _ =>
       noParseRule("StructField", node)
   }

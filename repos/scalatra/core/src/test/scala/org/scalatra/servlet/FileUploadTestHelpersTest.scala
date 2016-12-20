@@ -20,10 +20,12 @@ class FileUploadTestHelpersTestServlet
 
     fileParams.foreach(fileParam => {
       response.setHeader("File-" + fileParam._1 + "-Name", fileParam._2.name)
-      response.setHeader("File-" + fileParam._1 + "-Size",
-                         fileParam._2.size.toString)
-      response.setHeader("File-" + fileParam._1 + "-SHA",
-                         DigestUtils.shaHex(fileParam._2.get()))
+      response.setHeader(
+        "File-" + fileParam._1 + "-Size",
+        fileParam._2.size.toString)
+      response.setHeader(
+        "File-" + fileParam._1 + "-SHA",
+        DigestUtils.shaHex(fileParam._2.get()))
     })
   }
 
@@ -133,10 +135,11 @@ class FileUploadTestHelpersTest extends ScalatraFunSuite {
   }
 
   test("post with empty files and params map works") {
-    post("/no-files-or-params",
-         Map[String, String](),
-         Map[String, File](),
-         Map[String, String]()) {
+    post(
+      "/no-files-or-params",
+      Map[String, String](),
+      Map[String, File](),
+      Map[String, String]()) {
       assert(status === 200)
       assert(body === "/no-files-or-params")
     }

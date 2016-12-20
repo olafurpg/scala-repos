@@ -31,24 +31,24 @@ import org.jetbrains.plugins.scala.settings.ScalaProjectSettings
   * @author Pavel Fatin
   */
 class ScalaAotCompletionContributor extends ScalaCompletionContributor {
-  extend(CompletionType.BASIC,
-         PlatformPatterns
-           .psiElement(ScalaTokenTypes.tIDENTIFIER)
-           .withParent(classOf[ScParameter]),
-         new CompletionProvider[CompletionParameters] {
+  extend(
+    CompletionType.BASIC,
+    PlatformPatterns
+      .psiElement(ScalaTokenTypes.tIDENTIFIER)
+      .withParent(classOf[ScParameter]),
+    new CompletionProvider[CompletionParameters] {
 
-           def addCompletions(parameters: CompletionParameters,
-                              context: ProcessingContext,
-                              result: CompletionResultSet) {
-             addCompletions0(parameters, result, typed = true) {
-               (text, element) =>
-                 val parameter = createParameterFrom(text, element)
-                 val context = element.getContext.getContext
-                 parameter.setContext(context, context.getLastChild)
-                 typeIdentifierIn(parameter)
-             }
-           }
-         })
+      def addCompletions(parameters: CompletionParameters,
+                         context: ProcessingContext,
+                         result: CompletionResultSet) {
+        addCompletions0(parameters, result, typed = true) { (text, element) =>
+          val parameter = createParameterFrom(text, element)
+          val context = element.getContext.getContext
+          parameter.setContext(context, context.getLastChild)
+          typeIdentifierIn(parameter)
+        }
+      }
+    })
 
   extend(
     CompletionType.BASIC,
@@ -97,9 +97,10 @@ class ScalaAotCompletionContributor extends ScalaCompletionContributor {
       identifier.getTextRange.getStartOffset + prefix.length)
     val result0 = result.withPrefixMatcher(
       result.getPrefixMatcher.cloneWithPrefix(capitalize(prefix)))
-    result0.runRemainingContributors(parameters0,
-                                     new MyConsumer(prefix, typed, result0),
-                                     true)
+    result0.runRemainingContributors(
+      parameters0,
+      new MyConsumer(prefix, typed, result0),
+      true)
   }
 
   private def isSuitableIdentifier(s: String) =
@@ -213,15 +214,17 @@ private object MyInsertHandler {
   private def contextWith(context: InsertionContext,
                           range: TextRange): InsertionContext = {
     val map = new OffsetMap(context.getDocument)
-    map.addOffset(CompletionInitializationContext.START_OFFSET,
-                  range.getStartOffset)
+    map.addOffset(
+      CompletionInitializationContext.START_OFFSET,
+      range.getStartOffset)
     map.addOffset(InsertionContext.TAIL_OFFSET, range.getEndOffset)
 
-    new InsertionContext(map,
-                         context.getCompletionChar,
-                         context.getElements,
-                         context.getFile,
-                         context.getEditor,
-                         context.shouldAddCompletionChar)
+    new InsertionContext(
+      map,
+      context.getCompletionChar,
+      context.getElements,
+      context.getFile,
+      context.getEditor,
+      context.shouldAddCompletionChar)
   }
 }

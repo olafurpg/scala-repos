@@ -169,9 +169,10 @@ object Pref {
     val FRIENDS = 1
     val EVERYBODY = 2
 
-    val choices = Seq(NOBODY -> "With nobody",
-                      FRIENDS -> "With friends",
-                      EVERYBODY -> "With everybody")
+    val choices = Seq(
+      NOBODY -> "With nobody",
+      FRIENDS -> "With friends",
+      EVERYBODY -> "With everybody")
   }
 
   object Blindfold {
@@ -186,9 +187,10 @@ object Pref {
     val TIME = 2
     val ALWAYS = 3
 
-    val choices = Seq(NEVER -> "Never",
-                      ALWAYS -> "Always",
-                      TIME -> "When time remaining < 30 seconds")
+    val choices = Seq(
+      NEVER -> "Never",
+      ALWAYS -> "Always",
+      TIME -> "When time remaining < 30 seconds")
   }
 
   object Takeback {
@@ -196,9 +198,10 @@ object Pref {
     val CASUAL = 2
     val ALWAYS = 3
 
-    val choices = Seq(NEVER -> "Never",
-                      ALWAYS -> "Always",
-                      CASUAL -> "In casual games only")
+    val choices = Seq(
+      NEVER -> "Never",
+      ALWAYS -> "Always",
+      CASUAL -> "In casual games only")
   }
 
   object Animation {
@@ -216,9 +219,10 @@ object Pref {
     val INSIDE = 1
     val OUTSIDE = 2
 
-    val choices = Seq(NONE -> "No",
-                      INSIDE -> "Inside the board",
-                      OUTSIDE -> "Outside the board")
+    val choices = Seq(
+      NONE -> "No",
+      INSIDE -> "Inside the board",
+      OUTSIDE -> "Outside the board")
   }
 
   object Replay {
@@ -235,9 +239,10 @@ object Pref {
     val LOWTIME = 1
     val ALWAYS = 2
 
-    val choices = Seq(NEVER -> "Never",
-                      LOWTIME -> "When time remaining < 10 seconds",
-                      ALWAYS -> "Always")
+    val choices = Seq(
+      NEVER -> "Never",
+      LOWTIME -> "When time remaining < 10 seconds",
+      ALWAYS -> "Always")
   }
 
   object Challenge {
@@ -248,10 +253,11 @@ object Pref {
 
     private val ratingThreshold = 500
 
-    val choices = Seq(NEVER -> "Never",
-                      RATING -> s"If rating is ± $ratingThreshold",
-                      FRIEND -> "Only friends",
-                      ALWAYS -> "Always")
+    val choices = Seq(
+      NEVER -> "Never",
+      RATING -> s"If rating is ± $ratingThreshold",
+      FRIEND -> "Only friends",
+      ALWAYS -> "Always")
 
     def block(from: User,
               to: User,

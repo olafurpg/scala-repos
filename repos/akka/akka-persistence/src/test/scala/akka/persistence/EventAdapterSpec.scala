@@ -114,9 +114,10 @@ class EventAdapterSpec(journalName: String,
   import EventAdapterSpec._
 
   def this(journalName: String) {
-    this("inmem",
-         PersistenceSpec.config("inmem", "InmemPersistentTaggingSpec"),
-         ConfigFactory.parseString(s"""
+    this(
+      "inmem",
+      PersistenceSpec.config("inmem", "InmemPersistentTaggingSpec"),
+      ConfigFactory.parseString(s"""
          |akka.persistence.journal {
          |
          |  common-event-adapters {
@@ -164,10 +165,12 @@ class EventAdapterSpec(journalName: String,
   }
 
   def persister(name: String, journalId: String = journalName) =
-    system.actorOf(Props(classOf[PersistAllIncomingActor],
-                         name,
-                         "akka.persistence.journal." + journalId),
-                   name)
+    system.actorOf(
+      Props(
+        classOf[PersistAllIncomingActor],
+        name,
+        "akka.persistence.journal." + journalId),
+      name)
 
   def toJournal(in: Any, journalId: String = journalName) =
     Persistence(system)

@@ -60,8 +60,9 @@ object EndToEndLatency {
       if (sslPropsFile.equals("")) new Properties()
       else Utils.loadProps(sslPropsFile)
     consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList)
-    consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG,
-                      "test-group-" + System.currentTimeMillis())
+    consumerProps.put(
+      ConsumerConfig.GROUP_ID_CONFIG,
+      "test-group-" + System.currentTimeMillis())
     consumerProps.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false")
     consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
     consumerProps.put(

@@ -126,8 +126,9 @@ trait RedisClientServerIntegrationTest
       case MBulkReply(msgs) =>
         contains match {
           case true =>
-            assert(expects.isEmpty == false,
-                   "Test did no supply a list of expected replies.")
+            assert(
+              expects.isEmpty == false,
+              "Test did no supply a list of expected replies.")
             val newMsgs = ReplyFormat.toString(msgs)
             expects.foreach({ msg =>
               val doesMBulkReplyContainMessage = newMsgs.contains(msg)

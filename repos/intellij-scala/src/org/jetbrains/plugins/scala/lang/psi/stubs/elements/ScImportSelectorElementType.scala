@@ -40,11 +40,12 @@ class ScImportSelectorElementType[Func <: ScImportSelector]
     val refText = psi.reference.getText
     val importedName = psi.importedName
     val aliasImport = psi.isAliasedImport
-    new ScImportSelectorStubImpl(parentStub,
-                                 this,
-                                 refText,
-                                 importedName,
-                                 aliasImport)
+    new ScImportSelectorStubImpl(
+      parentStub,
+      this,
+      refText,
+      importedName,
+      aliasImport)
   }
 
   def deserializeImpl(dataStream: StubInputStream,

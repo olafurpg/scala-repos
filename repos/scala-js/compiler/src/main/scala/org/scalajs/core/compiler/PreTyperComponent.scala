@@ -79,20 +79,22 @@ abstract class PreTyperComponent
       case tree: ClassDef if needsAnnotations(tree) =>
         val newBody = tree.impl.body.map {
           case vdef: ValDef if needsAnnotations(vdef) =>
-            treeCopy.ValDef(vdef,
-                            withWasPublic(vdef.mods),
-                            vdef.name,
-                            vdef.tpt,
-                            transform(vdef.rhs))
+            treeCopy.ValDef(
+              vdef,
+              withWasPublic(vdef.mods),
+              vdef.name,
+              vdef.tpt,
+              transform(vdef.rhs))
 
           case ddef: DefDef if needsAnnotations(ddef) =>
-            treeCopy.DefDef(ddef,
-                            withWasPublic(ddef.mods),
-                            ddef.name,
-                            ddef.tparams,
-                            ddef.vparamss,
-                            ddef.tpt,
-                            transform(ddef.rhs))
+            treeCopy.DefDef(
+              ddef,
+              withWasPublic(ddef.mods),
+              ddef.name,
+              ddef.tparams,
+              ddef.vparamss,
+              ddef.tpt,
+              transform(ddef.rhs))
 
           case member => transform(member)
         }

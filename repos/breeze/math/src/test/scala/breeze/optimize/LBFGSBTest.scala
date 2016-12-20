@@ -27,8 +27,9 @@ class LBFGSBTest extends OptimizeTestBase {
   val EPS = 1E-4;
 
   test("L-BFGS-B should solve with bound constraint") {
-    val solver = new LBFGSB(DenseVector[Double](-100, -100),
-                            DenseVector[Double](1200, 100))
+    val solver = new LBFGSB(
+      DenseVector[Double](-100, -100),
+      DenseVector[Double](1200, 100))
     val nearX0 = DenseVector[Double](-1.2, 1.0)
 
     val f = new DiffFunction[DenseVector[Double]] {

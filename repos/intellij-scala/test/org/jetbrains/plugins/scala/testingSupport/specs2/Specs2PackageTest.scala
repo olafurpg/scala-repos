@@ -9,8 +9,9 @@ abstract class Specs2PackageTest extends Specs2TestCase {
   protected val secondPackageName = "otherPackage"
 
   protected def addPackageTest(): Unit = {
-    addFileToProject(packageName + "/Test1.scala",
-                     """
+    addFileToProject(
+      packageName + "/Test1.scala",
+      """
         |package testPackage
         |
         |import org.specs2.mutable.Specification
@@ -30,8 +31,9 @@ abstract class Specs2PackageTest extends Specs2TestCase {
         |}
       """.stripMargin.trim())
 
-    addFileToProject(packageName + "/Test2.scala",
-                     """
+    addFileToProject(
+      packageName + "/Test2.scala",
+      """
         |package testPackage
         |
         |import org.specs2.mutable.Specification
@@ -51,8 +53,9 @@ abstract class Specs2PackageTest extends Specs2TestCase {
         |}
       """.stripMargin.trim())
 
-    addFileToProject(secondPackageName + "/Test1.scala",
-                     """
+    addFileToProject(
+      secondPackageName + "/Test1.scala",
+      """
         |package otherPackage
         |
         |import org.specs2.mutable.Specification
@@ -67,30 +70,35 @@ abstract class Specs2PackageTest extends Specs2TestCase {
 
   def testPackageTestRun(): Unit = {
     addPackageTest()
-    runTestByConfig(createTestFromPackage(packageName),
-                    checkPackageConfigAndSettings(_, packageName),
-                    root =>
-                      checkResultTreeHasExactNamedPath(root,
-                                                       "[root]",
-                                                       "Test1",
-                                                       "One should",
-                                                       "run") &&
-                        checkResultTreeHasExactNamedPath(root,
-                                                         "[root]",
-                                                         "Test1",
-                                                         "Two should",
-                                                         "run") &&
-                        checkResultTreeHasExactNamedPath(root,
-                                                         "[root]",
-                                                         "Test2",
-                                                         "One should",
-                                                         "run") &&
-                        checkResultTreeHasExactNamedPath(root,
-                                                         "[root]",
-                                                         "Test2",
-                                                         "Two should",
-                                                         "run") &&
-                        checkResultTreeDoesNotHaveNodes(root, "Three should"))
+    runTestByConfig(
+      createTestFromPackage(packageName),
+      checkPackageConfigAndSettings(_, packageName),
+      root =>
+        checkResultTreeHasExactNamedPath(
+          root,
+          "[root]",
+          "Test1",
+          "One should",
+          "run") &&
+          checkResultTreeHasExactNamedPath(
+            root,
+            "[root]",
+            "Test1",
+            "Two should",
+            "run") &&
+          checkResultTreeHasExactNamedPath(
+            root,
+            "[root]",
+            "Test2",
+            "One should",
+            "run") &&
+          checkResultTreeHasExactNamedPath(
+            root,
+            "[root]",
+            "Test2",
+            "Two should",
+            "run") &&
+          checkResultTreeDoesNotHaveNodes(root, "Three should"))
   }
 
   def testModuleTestRun(): Unit = {
@@ -99,30 +107,35 @@ abstract class Specs2PackageTest extends Specs2TestCase {
       createTestFromModule(testClassName),
       checkPackageConfigAndSettings(_, generatedName = "ScalaTests in 'src'"),
       root =>
-        checkResultTreeHasExactNamedPath(root,
-                                         "[root]",
-                                         "Test1",
-                                         "One should",
-                                         "run") &&
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           "Test1",
-                                           "Two should",
-                                           "run") &&
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           "Test2",
-                                           "One should",
-                                           "run") &&
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           "Test2",
-                                           "Two should",
-                                           "run") &&
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           "Test2",
-                                           "Three should",
-                                           "run"))
+        checkResultTreeHasExactNamedPath(
+          root,
+          "[root]",
+          "Test1",
+          "One should",
+          "run") &&
+          checkResultTreeHasExactNamedPath(
+            root,
+            "[root]",
+            "Test1",
+            "Two should",
+            "run") &&
+          checkResultTreeHasExactNamedPath(
+            root,
+            "[root]",
+            "Test2",
+            "One should",
+            "run") &&
+          checkResultTreeHasExactNamedPath(
+            root,
+            "[root]",
+            "Test2",
+            "Two should",
+            "run") &&
+          checkResultTreeHasExactNamedPath(
+            root,
+            "[root]",
+            "Test2",
+            "Three should",
+            "run"))
   }
 }

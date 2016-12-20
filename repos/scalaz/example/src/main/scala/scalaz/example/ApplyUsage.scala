@@ -90,15 +90,16 @@ object ApplyUsage extends App {
   // the applicative builder created by |@| also has a "tupled" method
   // which will tuple the arguments
   assert(
-    (List(1, 2, 3) |@| List("a", "b", "c")).tupled === List(1 -> "a",
-                                                            1 -> "b",
-                                                            1 -> "c",
-                                                            2 -> "a",
-                                                            2 -> "b",
-                                                            2 -> "c",
-                                                            3 -> "a",
-                                                            3 -> "b",
-                                                            3 -> "c"))
+    (List(1, 2, 3) |@| List("a", "b", "c")).tupled === List(
+      1 -> "a",
+      1 -> "b",
+      1 -> "c",
+      2 -> "a",
+      2 -> "b",
+      2 -> "c",
+      3 -> "a",
+      3 -> "b",
+      3 -> "c"))
 
   // there are ^, ^^, ^^^, etc methods which correspond respectively
   // to apply2, apply, apply4, etc.
@@ -150,17 +151,19 @@ object ApplyUsage extends App {
   val applyVLO = Apply[Vector] compose Apply[List] compose Apply[Option]
 
   val deepResult =
-    applyVLO.apply2(Vector(List(1.some, none[Int]), List(2.some, 3.some)),
-                    Vector(List("a".some, "b".some, "c".some)))(_.toString + _)
+    applyVLO.apply2(
+      Vector(List(1.some, none[Int]), List(2.some, 3.some)),
+      Vector(List("a".some, "b".some, "c".some)))(_.toString + _)
 
   val expectedDeep = Vector(
     List(Some("1a"), Some("1b"), Some("1c"), None, None, None),
-    List(Some("2a"),
-         Some("2b"),
-         Some("2c"),
-         Some("3a"),
-         Some("3b"),
-         Some("3c")))
+    List(
+      Some("2a"),
+      Some("2b"),
+      Some("2c"),
+      Some("3a"),
+      Some("3b"),
+      Some("3c")))
 
   assert(deepResult === expectedDeep)
 }

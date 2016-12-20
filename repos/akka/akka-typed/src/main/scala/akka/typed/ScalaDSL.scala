@@ -58,8 +58,9 @@ object ScalaDSL {
       } else Stopped
 
     override def management(ctx: ActorContext[U], msg: Signal): Behavior[U] =
-      postProcess(ctx,
-                  behavior.management(ctx.asInstanceOf[ActorContext[T]], msg))
+      postProcess(
+        ctx,
+        behavior.management(ctx.asInstanceOf[ActorContext[T]], msg))
 
     override def message(ctx: ActorContext[U], msg: U): Behavior[U] =
       if (matcher.isDefinedAt(msg))

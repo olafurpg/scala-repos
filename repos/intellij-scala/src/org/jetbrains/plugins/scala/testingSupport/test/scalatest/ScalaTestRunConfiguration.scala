@@ -68,8 +68,9 @@ object ScalaTestRunConfiguration extends SuiteValidityChecker {
               val firstParam = params(0)
               val psiManager = ScalaPsiManager.instance(project)
               val mapPsiClass = psiManager
-                .getCachedClass(ProjectScope.getAllScope(project),
-                                "scala.collection.immutable.Map")
+                .getCachedClass(
+                  ProjectScope.getAllScope(project),
+                  "scala.collection.immutable.Map")
                 .orNull
               val mapClass = ScType.designator(mapPsiClass)
               val paramClass = ScType.create(firstParam.getType, project)

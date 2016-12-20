@@ -67,31 +67,35 @@ class MetadataCacheTest {
 
     val brokers = (0 to 2)
       .map { brokerId =>
-        new Broker(brokerId,
-                   securityProtocolToEndPoint(brokerId).asJava,
-                   "rack1")
+        new Broker(
+          brokerId,
+          securityProtocolToEndPoint(brokerId).asJava,
+          "rack1")
       }
       .toSet
 
     val partitionStates = Map(
-      new TopicPartition(topic, 0) -> new PartitionState(controllerEpoch,
-                                                         0,
-                                                         0,
-                                                         asList(0),
-                                                         zkVersion,
-                                                         asSet(0)),
-      new TopicPartition(topic, 1) -> new PartitionState(controllerEpoch,
-                                                         1,
-                                                         1,
-                                                         asList(1),
-                                                         zkVersion,
-                                                         asSet(1)),
-      new TopicPartition(topic, 2) -> new PartitionState(controllerEpoch,
-                                                         2,
-                                                         2,
-                                                         asList(2),
-                                                         zkVersion,
-                                                         asSet(2)))
+      new TopicPartition(topic, 0) -> new PartitionState(
+        controllerEpoch,
+        0,
+        0,
+        asList(0),
+        zkVersion,
+        asSet(0)),
+      new TopicPartition(topic, 1) -> new PartitionState(
+        controllerEpoch,
+        1,
+        1,
+        asList(1),
+        zkVersion,
+        asSet(1)),
+      new TopicPartition(topic, 2) -> new PartitionState(
+        controllerEpoch,
+        2,
+        2,
+        asList(2),
+        zkVersion,
+        asSet(2)))
 
     val updateMetadataRequest = new UpdateMetadataRequest(
       controllerId,
@@ -100,8 +104,9 @@ class MetadataCacheTest {
       brokers.asJava)
     cache.updateCache(15, updateMetadataRequest)
 
-    for (securityProtocol <- Seq(SecurityProtocol.PLAINTEXT,
-                                 SecurityProtocol.SSL)) {
+    for (securityProtocol <- Seq(
+           SecurityProtocol.PLAINTEXT,
+           SecurityProtocol.SSL)) {
       val topicMetadatas = cache.getTopicMetadata(Set(topic), securityProtocol)
       assertEquals(1, topicMetadatas.size)
 
@@ -148,12 +153,13 @@ class MetadataCacheTest {
     val leader = 1
     val leaderEpoch = 1
     val partitionStates = Map(
-      new TopicPartition(topic, 0) -> new PartitionState(controllerEpoch,
-                                                         leader,
-                                                         leaderEpoch,
-                                                         asList(0),
-                                                         zkVersion,
-                                                         asSet(0)))
+      new TopicPartition(topic, 0) -> new PartitionState(
+        controllerEpoch,
+        leader,
+        leaderEpoch,
+        asList(0),
+        zkVersion,
+        asSet(0)))
 
     val updateMetadataRequest = new UpdateMetadataRequest(
       controllerId,
@@ -203,12 +209,13 @@ class MetadataCacheTest {
     val isr = asList[Integer](0)
 
     val partitionStates = Map(
-      new TopicPartition(topic, 0) -> new PartitionState(controllerEpoch,
-                                                         leader,
-                                                         leaderEpoch,
-                                                         isr,
-                                                         zkVersion,
-                                                         replicas))
+      new TopicPartition(topic, 0) -> new PartitionState(
+        controllerEpoch,
+        leader,
+        leaderEpoch,
+        isr,
+        zkVersion,
+        replicas))
 
     val updateMetadataRequest = new UpdateMetadataRequest(
       controllerId,
@@ -257,12 +264,13 @@ class MetadataCacheTest {
     val isr = asList[Integer](0, 1)
 
     val partitionStates = Map(
-      new TopicPartition(topic, 0) -> new PartitionState(controllerEpoch,
-                                                         leader,
-                                                         leaderEpoch,
-                                                         isr,
-                                                         zkVersion,
-                                                         replicas))
+      new TopicPartition(topic, 0) -> new PartitionState(
+        controllerEpoch,
+        leader,
+        leaderEpoch,
+        isr,
+        zkVersion,
+        replicas))
 
     val updateMetadataRequest = new UpdateMetadataRequest(
       controllerId,
@@ -304,12 +312,13 @@ class MetadataCacheTest {
     val replicas = asSet[Integer](0)
     val isr = asList[Integer](0, 1)
     val partitionStates = Map(
-      new TopicPartition(topic, 0) -> new PartitionState(controllerEpoch,
-                                                         leader,
-                                                         leaderEpoch,
-                                                         isr,
-                                                         3,
-                                                         replicas))
+      new TopicPartition(topic, 0) -> new PartitionState(
+        controllerEpoch,
+        leader,
+        leaderEpoch,
+        isr,
+        3,
+        replicas))
     val updateMetadataRequest = new UpdateMetadataRequest(
       2,
       controllerEpoch,
@@ -344,12 +353,13 @@ class MetadataCacheTest {
       val replicas = asSet[Integer](0)
       val isr = asList[Integer](0, 1)
       val partitionStates = Map(
-        new TopicPartition(topic, 0) -> new PartitionState(controllerEpoch,
-                                                           leader,
-                                                           leaderEpoch,
-                                                           isr,
-                                                           3,
-                                                           replicas))
+        new TopicPartition(topic, 0) -> new PartitionState(
+          controllerEpoch,
+          leader,
+          leaderEpoch,
+          isr,
+          3,
+          replicas))
       val updateMetadataRequest = new UpdateMetadataRequest(
         2,
         controllerEpoch,

@@ -20,9 +20,10 @@ private[io] class AtomicFileOutputStream private (
   def this(baseFile: File) = {
     this(baseFile, {
       // Create a temporary file we actually write to
-      val tmpFile = File.createTempFile(".tmp-" + baseFile.getName,
-                                        ".tmp",
-                                        baseFile.getParentFile)
+      val tmpFile = File.createTempFile(
+        ".tmp-" + baseFile.getName,
+        ".tmp",
+        baseFile.getParentFile)
       tmpFile.deleteOnExit()
       tmpFile
     })
@@ -44,8 +45,9 @@ private[io] class AtomicFileOutputStream private (
     if (!tmpFile.renameTo(baseFile)) {
       // Renaming failed. Fallback to copy
       try {
-        IO.copyTo(FileVirtualBinaryFile(tmpFile),
-                  WritableFileVirtualBinaryFile(baseFile))
+        IO.copyTo(
+          FileVirtualBinaryFile(tmpFile),
+          WritableFileVirtualBinaryFile(baseFile))
       } finally {
         tmpFile.delete()
       }

@@ -274,8 +274,9 @@ object Eval extends EvalInstances {
           case c: Compute[_] =>
             c.start() match {
               case cc: Compute[_] =>
-                loop(cc.start().asInstanceOf[L],
-                     cc.run.asInstanceOf[C] :: c.run.asInstanceOf[C] :: fs)
+                loop(
+                  cc.start().asInstanceOf[L],
+                  cc.run.asInstanceOf[C] :: c.run.asInstanceOf[C] :: fs)
               case xx =>
                 loop(c.run(xx.value).asInstanceOf[L], fs)
             }

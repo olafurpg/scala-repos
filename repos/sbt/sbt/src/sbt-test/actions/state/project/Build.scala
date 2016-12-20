@@ -33,12 +33,14 @@ object MyBuild extends Build {
         (key, updateDemo, state) map {
           case ((curExpected, prevExpected), value, s) =>
             val prev = s get sample
-            assert(value == curExpected,
-                   "Expected current value to be " + curExpected + ", got " +
-                     value)
-            assert(prev == prevExpected,
-                   "Expected previous value to be " + prevExpected + ", got " +
-                     prev)
+            assert(
+              value == curExpected,
+              "Expected current value to be " + curExpected + ", got " +
+                value)
+            assert(
+              prev == prevExpected,
+              "Expected previous value to be " + prevExpected + ", got " +
+                prev)
         }
     }
 

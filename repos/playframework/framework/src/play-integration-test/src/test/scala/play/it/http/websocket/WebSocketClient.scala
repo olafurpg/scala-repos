@@ -119,11 +119,12 @@ object WebSocketClient {
       val normalized = url.normalize()
       val tgt =
         if (normalized.getPath == null || normalized.getPath.trim().isEmpty) {
-          new URI(normalized.getScheme,
-                  normalized.getAuthority,
-                  "/",
-                  normalized.getQuery,
-                  normalized.getFragment)
+          new URI(
+            normalized.getScheme,
+            normalized.getAuthority,
+            "/",
+            normalized.getQuery,
+            normalized.getFragment)
         } else normalized
 
       val disconnected = Promise[Unit]()
@@ -171,10 +172,11 @@ object WebSocketClient {
           val publisher =
             new HandlerPublisher(ctx.executor, classOf[WebSocketFrame])
           val subscriber = new HandlerSubscriber[WebSocketFrame](ctx.executor)
-          ctx.pipeline.addAfter(ctx.executor,
-                                ctx.name,
-                                "websocket-subscriber",
-                                subscriber)
+          ctx.pipeline.addAfter(
+            ctx.executor,
+            ctx.name,
+            "websocket-subscriber",
+            subscriber)
           ctx.pipeline
             .addAfter(ctx.executor, ctx.name, "websocket-publisher", publisher)
 
@@ -216,22 +218,26 @@ object WebSocketClient {
         case SimpleMessage(TextMessage(data), finalFragment) =>
           new TextWebSocketFrame(finalFragment, 0, data)
         case SimpleMessage(BinaryMessage(data), finalFragment) =>
-          new BinaryWebSocketFrame(finalFragment,
-                                   0,
-                                   Unpooled.wrappedBuffer(data.asByteBuffer))
+          new BinaryWebSocketFrame(
+            finalFragment,
+            0,
+            Unpooled.wrappedBuffer(data.asByteBuffer))
         case SimpleMessage(PingMessage(data), finalFragment) =>
-          new PingWebSocketFrame(finalFragment,
-                                 0,
-                                 Unpooled.wrappedBuffer(data.asByteBuffer))
+          new PingWebSocketFrame(
+            finalFragment,
+            0,
+            Unpooled.wrappedBuffer(data.asByteBuffer))
         case SimpleMessage(PongMessage(data), finalFragment) =>
-          new PongWebSocketFrame(finalFragment,
-                                 0,
-                                 Unpooled.wrappedBuffer(data.asByteBuffer))
+          new PongWebSocketFrame(
+            finalFragment,
+            0,
+            Unpooled.wrappedBuffer(data.asByteBuffer))
         case SimpleMessage(CloseMessage(statusCode, reason), finalFragment) =>
-          new CloseWebSocketFrame(finalFragment,
-                                  0,
-                                  statusCode.getOrElse(CloseCodes.NoStatus),
-                                  reason)
+          new CloseWebSocketFrame(
+            finalFragment,
+            0,
+            statusCode.getOrElse(CloseCodes.NoStatus),
+            reason)
         case ContinuationMessage(data, finalFragment) =>
           new ContinuationWebSocketFrame(
             finalFragment,
@@ -244,21 +250,25 @@ object WebSocketClient {
           case text: TextWebSocketFrame =>
             SimpleMessage(TextMessage(text.text()), text.isFinalFragment)
           case binary: BinaryWebSocketFrame =>
-            SimpleMessage(BinaryMessage(toByteString(binary)),
-                          binary.isFinalFragment)
+            SimpleMessage(
+              BinaryMessage(toByteString(binary)),
+              binary.isFinalFragment)
           case ping: PingWebSocketFrame =>
-            SimpleMessage(PingMessage(toByteString(ping)),
-                          ping.isFinalFragment)
+            SimpleMessage(
+              PingMessage(toByteString(ping)),
+              ping.isFinalFragment)
           case pong: PongWebSocketFrame =>
-            SimpleMessage(PongMessage(toByteString(pong)),
-                          pong.isFinalFragment)
+            SimpleMessage(
+              PongMessage(toByteString(pong)),
+              pong.isFinalFragment)
           case close: CloseWebSocketFrame =>
             SimpleMessage(
               CloseMessage(Some(close.statusCode()), close.reasonText()),
               close.isFinalFragment)
           case continuation: ContinuationWebSocketFrame =>
-            ContinuationMessage(toByteString(continuation),
-                                continuation.isFinalFragment)
+            ContinuationMessage(
+              toByteString(continuation),
+              continuation.isFinalFragment)
         }
         ReferenceCountUtil.release(frame)
         message

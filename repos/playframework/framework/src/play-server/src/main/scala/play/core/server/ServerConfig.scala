@@ -50,10 +50,11 @@ object ServerConfig {
       address = address,
       mode = mode,
       properties = properties,
-      configuration = Configuration.load(classLoader,
-                                         properties,
-                                         rootDirConfig(rootDir),
-                                         mode == Mode.Test)
+      configuration = Configuration.load(
+        classLoader,
+        properties,
+        rootDirConfig(rootDir),
+        mode == Mode.Test)
     )
   }
 

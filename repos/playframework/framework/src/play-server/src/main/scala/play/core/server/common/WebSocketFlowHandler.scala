@@ -103,8 +103,9 @@ object WebSocketFlowHandler {
                 case MessageType.Continuation
                     if currentPartialMessage == null =>
                   serverInitiatedClose(
-                    CloseMessage(CloseCodes.ProtocolError,
-                                 "Unexpected continuation frame"))
+                    CloseMessage(
+                      CloseCodes.ProtocolError,
+                      "Unexpected continuation frame"))
                   null
                 case MessageType.Continuation
                     if currentPartialMessage.data.size +
@@ -114,15 +115,16 @@ object WebSocketFlowHandler {
                   null
                 case MessageType.Continuation if read.isFinal =>
                   val message =
-                    toMessage(currentPartialMessage.messageType,
-                              currentPartialMessage.data ++ read.data)
+                    toMessage(
+                      currentPartialMessage.messageType,
+                      currentPartialMessage.data ++ read.data)
                   currentPartialMessage = null
                   message
                 case MessageType.Continuation =>
-                  currentPartialMessage =
-                    RawMessage(currentPartialMessage.messageType,
-                               currentPartialMessage.data ++ read.data,
-                               false)
+                  currentPartialMessage = RawMessage(
+                    currentPartialMessage.messageType,
+                    currentPartialMessage.data ++ read.data,
+                    false)
                   null
                 case _ if currentPartialMessage != null =>
                   serverInitiatedClose(
@@ -317,8 +319,9 @@ object WebSocketFlowHandler {
 
   def parseCloseMessage(data: ByteString): CloseMessage = {
     def invalid(reason: String) =
-      CloseMessage(Some(CloseCodes.ProtocolError),
-                   s"Peer sent illegal close frame ($reason).")
+      CloseMessage(
+        Some(CloseCodes.ProtocolError),
+        s"Peer sent illegal close frame ($reason).")
 
     if (data.length >= 2) {
       val code = ((data(0) & 0xff) << 8) | (data(1) & 0xff)

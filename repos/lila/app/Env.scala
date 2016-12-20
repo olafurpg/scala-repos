@@ -46,13 +46,14 @@ final class Env(config: Config,
 
   system.actorOf(Props(new actor.Renderer), name = RendererName)
 
-  system.actorOf(Props(
-                   new actor.Router(
-                     baseUrl = Env.api.Net.BaseUrl,
-                     protocol = Env.api.Net.Protocol,
-                     domain = Env.api.Net.Domain
-                   )),
-                 name = RouterName)
+  system.actorOf(
+    Props(
+      new actor.Router(
+        baseUrl = Env.api.Net.BaseUrl,
+        protocol = Env.api.Net.Protocol,
+        domain = Env.api.Net.Domain
+      )),
+    name = RouterName)
 
   lila.log.boot.info("Preloading modules")
   List(
@@ -99,11 +100,12 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "app" boot new Env(config = lila.common.PlayApp.loadConfig,
-                       scheduler = lila.common.PlayApp.scheduler,
-                       system = lila.common.PlayApp.system,
-                       appPath = lila.common.PlayApp withApp
-                           (_.path.getCanonicalPath))
+    "app" boot new Env(
+      config = lila.common.PlayApp.loadConfig,
+      scheduler = lila.common.PlayApp.scheduler,
+      system = lila.common.PlayApp.system,
+      appPath = lila.common.PlayApp withApp
+          (_.path.getCanonicalPath))
 
   def api = lila.api.Env.current
   def db = lila.db.Env.current

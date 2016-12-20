@@ -48,17 +48,19 @@ class RemoteServerConnector(module: Module,
                             worksheet: File,
                             output: File,
                             worksheetClassName: String)
-    extends RemoteServerConnectorBase(module: Module,
-                                      worksheet: File,
-                                      output: File) {
+    extends RemoteServerConnectorBase(
+      module: Module,
+      worksheet: File,
+      output: File) {
 
   val runType = WorksheetCompiler.getRunType(module.getProject)
 
   override val worksheetArgs: Array[String] =
     if (runType != OutOfProcessServer)
-      Array(worksheetClassName,
-            runnersJar.getAbsolutePath,
-            output.getAbsolutePath) ++ outputDirs
+      Array(
+        worksheetClassName,
+        runnersJar.getAbsolutePath,
+        output.getAbsolutePath) ++ outputDirs
     else Array.empty[String]
 
   def compileAndRun(callback: Runnable,
@@ -192,13 +194,14 @@ object RemoteServerConnector {
       }
 
       consumer.message(
-        new CompilerMessageImpl(project,
-                                category,
-                                finalText,
-                                worksheet,
-                                line1 getOrElse -1,
-                                column1 getOrElse -1,
-                                null)
+        new CompilerMessageImpl(
+          project,
+          category,
+          finalText,
+          worksheet,
+          line1 getOrElse -1,
+          column1 getOrElse -1,
+          null)
       )
     }
 

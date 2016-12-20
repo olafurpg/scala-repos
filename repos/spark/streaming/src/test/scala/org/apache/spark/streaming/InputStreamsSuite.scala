@@ -56,9 +56,10 @@ class InputStreamsSuite extends TestSuiteBase with BeforeAndAfter {
         val input = Seq(1, 2, 3, 4, 5)
         // Use "batchCount" to make sure we check the result after all batches finish
         val batchCounter = new BatchCounter(ssc)
-        val networkStream = ssc.socketTextStream("localhost",
-                                                 testServer.port,
-                                                 StorageLevel.MEMORY_AND_DISK)
+        val networkStream = ssc.socketTextStream(
+          "localhost",
+          testServer.port,
+          StorageLevel.MEMORY_AND_DISK)
         val outputQueue = new ConcurrentLinkedQueue[Seq[String]]
         val outputStream = new TestOutputStream(networkStream, outputQueue)
         outputStream.register()
@@ -118,9 +119,10 @@ class InputStreamsSuite extends TestSuiteBase with BeforeAndAfter {
         ssc.addStreamingListener(ssc.progressListener)
 
         val batchCounter = new BatchCounter(ssc)
-        val networkStream = ssc.socketTextStream("localhost",
-                                                 testServer.port,
-                                                 StorageLevel.MEMORY_AND_DISK)
+        val networkStream = ssc.socketTextStream(
+          "localhost",
+          testServer.port,
+          StorageLevel.MEMORY_AND_DISK)
         val outputQueue = new ConcurrentLinkedQueue[Seq[String]]
         val outputStream = new TestOutputStream(networkStream, outputQueue)
         outputStream.register()
@@ -400,10 +402,10 @@ class InputStreamsSuite extends TestSuiteBase with BeforeAndAfter {
         clock.setTime(existingFile.lastModified + batchDuration.milliseconds)
         val batchCounter = new BatchCounter(ssc)
         val fileStream = ssc
-          .fileStream[LongWritable, Text, TextInputFormat](testDir.toString,
-                                                           (x: Path) => true,
-                                                           newFilesOnly =
-                                                             newFilesOnly)
+          .fileStream[LongWritable, Text, TextInputFormat](
+            testDir.toString,
+            (x: Path) => true,
+            newFilesOnly = newFilesOnly)
           .map(_._2.toString)
         val outputQueue = new ConcurrentLinkedQueue[Seq[String]]
         val outputStream = new TestOutputStream(fileStream, outputQueue)
@@ -473,8 +475,9 @@ class TestServer(portToBind: Int = 0) extends Logging {
             try {
               clientSocket.setTcpNoDelay(true)
               val outputStream = new BufferedWriter(
-                new OutputStreamWriter(clientSocket.getOutputStream,
-                                       StandardCharsets.UTF_8))
+                new OutputStreamWriter(
+                  clientSocket.getOutputStream,
+                  StandardCharsets.UTF_8))
 
               while (clientSocket.isConnected) {
                 val msg = queue.poll(100, TimeUnit.MILLISECONDS)

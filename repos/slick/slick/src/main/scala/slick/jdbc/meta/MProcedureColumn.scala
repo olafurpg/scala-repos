@@ -28,29 +28,31 @@ object MProcedureColumn {
   def getProcedureColumns(procedurePattern: MQName,
                           columnNamePattern: String = "%") =
     ResultSetAction[MProcedureColumn](
-      _.metaData.getProcedureColumns(procedurePattern.catalog_?,
-                                     procedurePattern.schema_?,
-                                     procedurePattern.name,
-                                     columnNamePattern)) { r =>
-      MProcedureColumn(MQName.from(r),
-                       r.<<,
-                       r.<<,
-                       r.<<,
-                       r.<<,
-                       r.<<,
-                       r.<<,
-                       r.<<,
-                       r.<<,
-                       r.nextShort match {
-                         case DatabaseMetaData.procedureNoNulls => Some(false)
-                         case DatabaseMetaData.procedureNullable => Some(true)
-                         case _ => None
-                       },
-                       r.<<,
-                       r.<<?,
-                       r.skip.skip.<<?,
-                       r.<<?,
-                       DatabaseMeta.yesNoOpt(r),
-                       r.<<?)
+      _.metaData.getProcedureColumns(
+        procedurePattern.catalog_?,
+        procedurePattern.schema_?,
+        procedurePattern.name,
+        columnNamePattern)) { r =>
+      MProcedureColumn(
+        MQName.from(r),
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.<<,
+        r.nextShort match {
+          case DatabaseMetaData.procedureNoNulls => Some(false)
+          case DatabaseMetaData.procedureNullable => Some(true)
+          case _ => None
+        },
+        r.<<,
+        r.<<?,
+        r.skip.skip.<<?,
+        r.<<?,
+        DatabaseMeta.yesNoOpt(r),
+        r.<<?)
     }
 }

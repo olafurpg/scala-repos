@@ -165,9 +165,10 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
       case e: Throwable =>
         LOG.warn(
           s"Failed to load injector cache, continuing with empty(${e.getMessage})")
-        InjectorPersistentCache(ScalaPluginVersionVerifier.getPluginVersion
-                                  .getOrElse(Version.Snapshot),
-                                new util.HashMap())
+        InjectorPersistentCache(
+          ScalaPluginVersionVerifier.getPluginVersion
+            .getOrElse(Version.Snapshot),
+          new util.HashMap())
     } finally {
       if (stream != null) stream.close()
     }
@@ -191,8 +192,9 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
       cache: InjectorPersistentCache): InjectorPersistentCache = {
     if (ScalaPluginVersionVerifier.getPluginVersion.exists(
           _ != cache.pluginVersion))
-      InjectorPersistentCache(ScalaPluginVersionVerifier.getPluginVersion.get,
-                              new util.HashMap())
+      InjectorPersistentCache(
+        ScalaPluginVersionVerifier.getPluginVersion.get,
+        new util.HashMap())
     else cache
   }
 
@@ -445,8 +447,9 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
             for (injectorDescriptor <- injectors) {
               try {
                 compileInjectorFromLibrary(
-                  extractInjectorSources(new File(manifest.jarPath),
-                                         injectorDescriptor),
+                  extractInjectorSources(
+                    new File(manifest.jarPath),
+                    injectorDescriptor),
                   getInjectorCacheDir(manifest)(injectorDescriptor),
                   module
                 )
@@ -470,10 +473,11 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
             if (numFailed == 0) NotificationType.INFORMATION
             else NotificationType.ERROR
           GROUP
-            .createNotification("IDEA Extensions",
-                                msg,
-                                notificationDisplayType,
-                                null)
+            .createNotification(
+              "IDEA Extensions",
+              msg,
+              notificationDisplayType,
+              null)
             .notify(project)
           LOG.trace(msg)
         }, indicator)
@@ -495,8 +499,9 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
     val jarName = new File(jarManifest.jarPath).getName
     val pluginVersion =
       ScalaPluginVersionVerifier.getPluginVersion.get.toString
-    val libraryDir = new File(myInjectorCacheDir,
-                              (jarName + pluginVersion).replaceAll("\\.", "_"))
+    val libraryDir = new File(
+      myInjectorCacheDir,
+      (jarName + pluginVersion).replaceAll("\\.", "_"))
     val injectorDir =
       new File(libraryDir, injectorDescriptor.impl.hashCode.abs.toString)
     injectorDir.mkdirs()

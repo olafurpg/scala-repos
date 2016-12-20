@@ -149,9 +149,10 @@ object ContravariantCoyonedaUsage extends App {
   // result’s ordering.  That’s what happens here:
 
   val byOrdListSorts: List[List[Vector[String]]] = for {
-    (ord, i) <- List((caseInsensitivelyOrd, 0),
-                     (dateOrd, 1),
-                     (numerically2, 2))
+    (ord, i) <- List(
+      (caseInsensitivelyOrd, 0),
+      (dateOrd, 1),
+      (numerically2, 2))
   } yield unstructuredData.sortBy(v => v(i))(ord.toScalaOrdering)
 
   // We can no longer use `schwartzian', though, because there is no

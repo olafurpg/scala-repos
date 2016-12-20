@@ -165,9 +165,9 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
 
     for (synthetic <- syntheticMethodsNoOverride) {
       this.processPsiMethodsForNode(
-        new SignatureNodes.Node(new PhysicalSignature(synthetic,
-                                                      ScSubstitutor.empty),
-                                ScSubstitutor.empty),
+        new SignatureNodes.Node(
+          new PhysicalSignature(synthetic, ScSubstitutor.empty),
+          ScSubstitutor.empty),
         isStatic = false,
         isInterface = isInterface)(res += _, names += _)
     }
@@ -197,16 +197,17 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
           }
         }
         TypeDefinitionMembers.SignatureNodes.forAllSignatureNodes(o) { node =>
-          this.processPsiMethodsForNode(node,
-                                        isStatic = true,
-                                        isInterface = false)(add)
+          this.processPsiMethodsForNode(
+            node,
+            isStatic = true,
+            isInterface = false)(add)
         }
 
         for (synthetic <- o.syntheticMethodsNoOverride) {
           this.processPsiMethodsForNode(
-            new SignatureNodes.Node(new PhysicalSignature(synthetic,
-                                                          ScSubstitutor.empty),
-                                    ScSubstitutor.empty),
+            new SignatureNodes.Node(
+              new PhysicalSignature(synthetic, ScSubstitutor.empty),
+              ScSubstitutor.empty),
             isStatic = true,
             isInterface = false)(res += _, names += _)
         }
@@ -220,9 +221,10 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
     buffer ++= functions
       .filter(_.isConstructor)
       .flatMap(
-        _.getFunctionWrappers(isStatic = false,
-                              isInterface = false,
-                              Some(this)))
+        _.getFunctionWrappers(
+          isStatic = false,
+          isInterface = false,
+          Some(this)))
     constructor match {
       case Some(x) => buffer ++= x.getFunctionWrappers
       case _ =>
@@ -361,9 +363,10 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
                 ScType.toPsi(tp, getProject, getResolveScope).getCanonicalText
               val text = s"public final $psiTypeText ${param.name};"
               val elem =
-                new LightField(getManager,
-                               factory.createFieldFromText(text, this),
-                               this)
+                new LightField(
+                  getManager,
+                  factory.createFieldFromText(text, this),
+                  this)
               elem.setNavigationElement(param)
               Option(elem)
             case _ => None

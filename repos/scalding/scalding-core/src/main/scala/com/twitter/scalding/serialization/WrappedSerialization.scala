@@ -112,12 +112,13 @@ object WrappedSerialization {
 
   def rawSetBinary(bufs: Iterable[ClassSerialization[_]],
                    fn: (String, String) => Unit) = {
-    fn(confKey,
-       bufs
-         .map {
-           case (cls, buf) => s"${cls.getName}:${serialize(buf)}"
-         }
-         .mkString(","))
+    fn(
+      confKey,
+      bufs
+        .map {
+          case (cls, buf) => s"${cls.getName}:${serialize(buf)}"
+        }
+        .mkString(","))
   }
   def setBinary(conf: Configuration,
                 bufs: Iterable[ClassSerialization[_]]): Unit =

@@ -52,8 +52,8 @@ case class TungstenAggregate(
       .flatMap(_.aggregateFunction.inputAggBufferAttributes)
 
   override private[sql] lazy val metrics = Map(
-    "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
-                                                   "number of output rows"),
+    "numOutputRows" -> SQLMetrics
+      .createLongMetric(sparkContext, "number of output rows"),
     "dataSize" -> SQLMetrics.createSizeMetric(sparkContext, "data size"),
     "spillSize" -> SQLMetrics.createSizeMetric(sparkContext, "spill size"))
 
@@ -77,8 +77,9 @@ case class TungstenAggregate(
   // This is for testing. We force TungstenAggregationIterator to fall back to sort-based
   // aggregation once it has processed a given number of input rows.
   private val testFallbackStartsAt: Option[Int] = {
-    sqlContext.getConf("spark.sql.TungstenAggregate.testFallbackStartsAt",
-                       null) match {
+    sqlContext.getConf(
+      "spark.sql.TungstenAggregate.testFallbackStartsAt",
+      null) match {
       case null | "" => None
       case fallbackStartsAt => Some(fallbackStartsAt.toInt)
     }
@@ -104,9 +105,10 @@ case class TungstenAggregate(
             initialInputBufferOffset,
             resultExpressions,
             (expressions, inputSchema) =>
-              newMutableProjection(expressions,
-                                   inputSchema,
-                                   subexpressionEliminationEnabled),
+              newMutableProjection(
+                expressions,
+                inputSchema,
+                subexpressionEliminationEnabled),
             child.output,
             iter,
             testFallbackStartsAt,
@@ -212,8 +214,9 @@ case class TungstenAggregate(
       }
 
     val doAgg = ctx.freshName("doAggregateWithoutKey")
-    ctx.addNewFunction(doAgg,
-                       s"""
+    ctx.addNewFunction(
+      doAgg,
+      s"""
          | private void $doAgg() throws java.io.IOException {
          |   // initialize aggregation buffer
          |   $initBufVar
@@ -440,9 +443,10 @@ case class TungstenAggregate(
     } else if (modes.contains(Partial) || modes.contains(PartialMerge)) {
       // This should be the last operator in a stage, we should output UnsafeRow directly
       val joinerTerm = ctx.freshName("unsafeRowJoiner")
-      ctx.addMutableState(classOf[UnsafeRowJoiner].getName,
-                          joinerTerm,
-                          s"$joinerTerm = $plan.createUnsafeJoiner();")
+      ctx.addMutableState(
+        classOf[UnsafeRowJoiner].getName,
+        joinerTerm,
+        s"$joinerTerm = $plan.createUnsafeJoiner();")
       val resultRow = ctx.freshName("resultRow")
       s"""
        UnsafeRow $resultRow = $joinerTerm.join($keyTerm, $bufferTerm);
@@ -467,22 +471,25 @@ case class TungstenAggregate(
     val thisPlan = ctx.addReferenceObj("plan", this)
     hashMapTerm = ctx.freshName("hashMap")
     val hashMapClassName = classOf[UnsafeFixedWidthAggregationMap].getName
-    ctx.addMutableState(hashMapClassName,
-                        hashMapTerm,
-                        s"$hashMapTerm = $thisPlan.createHashMap();")
+    ctx.addMutableState(
+      hashMapClassName,
+      hashMapTerm,
+      s"$hashMapTerm = $thisPlan.createHashMap();")
     sorterTerm = ctx.freshName("sorter")
     ctx
       .addMutableState(classOf[UnsafeKVExternalSorter].getName, sorterTerm, "")
 
     // Create a name for iterator from HashMap
     val iterTerm = ctx.freshName("mapIter")
-    ctx.addMutableState(classOf[KVIterator[UnsafeRow, UnsafeRow]].getName,
-                        iterTerm,
-                        "")
+    ctx.addMutableState(
+      classOf[KVIterator[UnsafeRow, UnsafeRow]].getName,
+      iterTerm,
+      "")
 
     val doAgg = ctx.freshName("doAggregateWithKeys")
-    ctx.addNewFunction(doAgg,
-                       s"""
+    ctx.addNewFunction(
+      doAgg,
+      s"""
         private void $doAgg() throws java.io.IOException {
           ${child.asInstanceOf[CodegenSupport].produce(ctx, this)}
 

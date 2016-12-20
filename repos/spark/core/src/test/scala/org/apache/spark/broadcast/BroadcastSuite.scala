@@ -69,9 +69,10 @@ class BroadcastSuite extends SparkFunSuite with LocalSparkContext {
     val conf = new SparkConf
     conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
     conf.set("spark.broadcast.compress", "true")
-    sc = new SparkContext("local-cluster[%d, 1, 1024]".format(numSlaves),
-                          "test",
-                          conf)
+    sc = new SparkContext(
+      "local-cluster[%d, 1, 1024]".format(numSlaves),
+      "test",
+      conf)
     val list = List[Int](1, 2, 3, 4)
     val broadcast = sc.broadcast(list)
     val results =
@@ -111,8 +112,9 @@ class BroadcastSuite extends SparkFunSuite with LocalSparkContext {
   }
 
   test("Unpersisting TorrentBroadcast on executors only in local mode") {
-    testUnpersistTorrentBroadcast(distributed = false,
-                                  removeFromDriver = false)
+    testUnpersistTorrentBroadcast(
+      distributed = false,
+      removeFromDriver = false)
   }
 
   test("Unpersisting TorrentBroadcast on executors and driver in local mode") {
@@ -197,12 +199,13 @@ class BroadcastSuite extends SparkFunSuite with LocalSparkContext {
       assert(statuses.size === expectedNumBlocks)
     }
 
-    testUnpersistBroadcast(distributed,
-                           numSlaves,
-                           afterCreation,
-                           afterUsingBroadcast,
-                           afterUnpersist,
-                           removeFromDriver)
+    testUnpersistBroadcast(
+      distributed,
+      numSlaves,
+      afterCreation,
+      afterUsingBroadcast,
+      afterUnpersist,
+      removeFromDriver)
   }
 
   /**

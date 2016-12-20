@@ -32,16 +32,17 @@ object SnippetSpec extends Specification with XmlMatchers {
 
   def makeReq =
     Full(
-      new Req(Req.NilPath,
-              "",
-              GetRequest,
-              Empty,
-              null,
-              System.nanoTime,
-              System.nanoTime,
-              false,
-              () => ParamCalcInfo(Nil, Map.empty, Nil, Empty),
-              Map()))
+      new Req(
+        Req.NilPath,
+        "",
+        GetRequest,
+        Empty,
+        null,
+        System.nanoTime,
+        System.nanoTime,
+        false,
+        () => ParamCalcInfo(Nil, Map.empty, Nil, Empty),
+        Map()))
 
   "Templates" should {
     "Correctly process lift:content_id" in {
@@ -413,9 +414,10 @@ object SnippetSpec extends Specification with XmlMatchers {
       S.initIfUninitted(new LiftSession("", "", Empty)) {
         S.withAttrs(new UnprefixedAttribute("a", "a", Null)) {
           S.withAttrs(
-            new UnprefixedAttribute("b",
-                                    "b",
-                                    new UnprefixedAttribute("c", "c", Null))) {
+            new UnprefixedAttribute(
+              "b",
+              "b",
+              new UnprefixedAttribute("c", "c", Null))) {
             S.withAttrs(new UnprefixedAttribute("d", "d", Null)) {
               S.attr("a") must_== Full("a")
               S.attr("b") must_== Full("b")
@@ -444,9 +446,10 @@ object SnippetSpec extends Specification with XmlMatchers {
       S.initIfUninitted(new LiftSession("", "", Empty)) {
         S.withAttrs(new UnprefixedAttribute("a", "a", Null)) {
           S.withAttrs(
-            new UnprefixedAttribute("b",
-                                    "b",
-                                    new UnprefixedAttribute("c", "c", Null))) {
+            new UnprefixedAttribute(
+              "b",
+              "b",
+              new UnprefixedAttribute("c", "c", Null))) {
             S.withAttrs(new UnprefixedAttribute("d", "d", Null)) {
               S.currentAttr("a") must_== Empty
               S.currentAttr("b") must_== Empty

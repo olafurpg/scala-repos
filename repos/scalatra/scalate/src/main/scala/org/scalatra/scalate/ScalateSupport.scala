@@ -100,9 +100,9 @@ trait ScalateSupport extends org.scalatra.servlet.ServletBase {
       case _ =>
         // Don't know how to convert your Config to something that
         // ServletTemplateEngine can accept, so fall back to a TemplateEngine
-        ScalateSupport.scalateTemplateEngine(ctxKey,
-                                             new TemplateEngine
-                                             with ScalatraTemplateEngine)
+        ScalateSupport.scalateTemplateEngine(
+          ctxKey,
+          new TemplateEngine with ScalatraTemplateEngine)
     }
   }
 
@@ -121,10 +121,11 @@ trait ScalateSupport extends org.scalatra.servlet.ServletBase {
 
     ScalateSupport.setLayoutStrategy(this)
     templateDirectories = defaultTemplatePath
-    bindings ::= Binding("context",
-                         "_root_." + classOf[ScalatraRenderContext].getName,
-                         importMembers = true,
-                         isImplicit = true)
+    bindings ::= Binding(
+      "context",
+      "_root_." + classOf[ScalatraRenderContext].getName,
+      importMembers = true,
+      isImplicit = true)
     importStatements ::= "import org.scalatra.servlet.ServletApiImplicits._"
   }
 
@@ -148,8 +149,9 @@ trait ScalateSupport extends org.scalatra.servlet.ServletBase {
     * search is performed, and the layout strategy is circumvented.  Clients
     * are urged to consider layoutTemplate instead.
     */
-  @deprecated("not idiomatic Scalate; consider layoutTemplate instead",
-              "2.0.0")
+  @deprecated(
+    "not idiomatic Scalate; consider layoutTemplate instead",
+    "2.0.0")
   def renderTemplate(path: String, attributes: (String, Any)*)(
       implicit request: HttpServletRequest,
       response: HttpServletResponse) =

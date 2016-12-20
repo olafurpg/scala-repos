@@ -18,15 +18,17 @@ class ScalaOverrideImplementTest
               expectedText: String,
               isImplement: Boolean,
               needsInferType: Boolean = true) {
-    configureFromFileTextAdapter("dummy.scala",
-                                 fileText.replace("\r", "").stripMargin.trim)
+    configureFromFileTextAdapter(
+      "dummy.scala",
+      fileText.replace("\r", "").stripMargin.trim)
     ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY =
       needsInferType
-    ScalaOIUtil.invokeOverrideImplement(getProjectAdapter,
-                                        getEditorAdapter,
-                                        getFileAdapter,
-                                        isImplement,
-                                        methodName)
+    ScalaOIUtil.invokeOverrideImplement(
+      getProjectAdapter,
+      getEditorAdapter,
+      getFileAdapter,
+      isImplement,
+      methodName)
     checkResultByText(expectedText.replace("\r", "").stripMargin.trim)
   }
 

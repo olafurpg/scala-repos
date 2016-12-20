@@ -114,8 +114,9 @@ object CookiesSpec extends Specification {
       val originalRequest = FakeRequest()
         .withCookies(Cookie("foo", "fooValue1"), Cookie("bar", "barValue2"))
       val requestWithMoreCookies =
-        originalRequest.withCookies(Cookie("foo", "fooValue2"),
-                                    Cookie("baz", "bazValue"))
+        originalRequest.withCookies(
+          Cookie("foo", "fooValue2"),
+          Cookie("baz", "bazValue"))
       val cookies = requestWithMoreCookies.cookies
       cookies.toSet must_== Set(
         Cookie("foo", "fooValue2"),

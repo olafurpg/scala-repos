@@ -60,10 +60,11 @@ object Hitbox {
         streamer <- StreamerList.findHitbox(streamers)(s.media_user_name)
         if s.media_is_live == "1"
       } yield
-        StreamOnAir(streamer = streamer,
-                    name = s.media_status,
-                    url = s.channel.channel_link,
-                    streamId = s.media_name)
+        StreamOnAir(
+          streamer = streamer,
+          name = s.media_status,
+          url = s.channel.channel_link,
+          streamId = s.media_name)
     }
   }
   object Reads {
@@ -85,10 +86,11 @@ object Youtube {
         streamer <- StreamerList.findYoutube(streamers)(item.snippet.channelId)
         if item.snippet.liveBroadcastContent == "live"
       } yield
-        StreamOnAir(streamer = streamer,
-                    name = item.snippet.title,
-                    url = item.id.videoId,
-                    streamId = item.snippet.channelId)
+        StreamOnAir(
+          streamer = streamer,
+          name = item.snippet.title,
+          url = item.id.videoId,
+          streamId = item.snippet.channelId)
     }
   }
   object Reads {

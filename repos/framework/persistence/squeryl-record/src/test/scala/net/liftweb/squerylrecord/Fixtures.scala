@@ -203,8 +203,9 @@ object MySchema extends Schema {
 
   on(employees)(
     e =>
-      declare(e.companyId defineAs (indexed("idx_employee_companyId")),
-              e.email defineAs indexed("idx_employee_email")))
+      declare(
+        e.companyId defineAs (indexed("idx_employee_companyId")),
+        e.email defineAs indexed("idx_employee_email")))
 
   /**
     * Drops an old schema if exists and then creates

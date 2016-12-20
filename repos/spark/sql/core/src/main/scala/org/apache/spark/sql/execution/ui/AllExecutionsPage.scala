@@ -38,29 +38,32 @@ private[ui] class AllExecutionsPage(parent: SQLTab)
     val content = listener.synchronized {
       val _content = mutable.ListBuffer[Node]()
       if (listener.getRunningExecutions.nonEmpty) {
-        _content ++= new RunningExecutionTable(parent,
-                                               "Running Queries",
-                                               currentTime,
-                                               listener.getRunningExecutions
-                                                 .sortBy(_.submissionTime)
-                                                 .reverse).toNodeSeq
+        _content ++= new RunningExecutionTable(
+          parent,
+          "Running Queries",
+          currentTime,
+          listener.getRunningExecutions
+            .sortBy(_.submissionTime)
+            .reverse).toNodeSeq
       }
       if (listener.getCompletedExecutions.nonEmpty) {
         _content ++=
-          new CompletedExecutionTable(parent,
-                                      "Completed Queries",
-                                      currentTime,
-                                      listener.getCompletedExecutions
-                                        .sortBy(_.submissionTime)
-                                        .reverse).toNodeSeq
+          new CompletedExecutionTable(
+            parent,
+            "Completed Queries",
+            currentTime,
+            listener.getCompletedExecutions
+              .sortBy(_.submissionTime)
+              .reverse).toNodeSeq
       }
       if (listener.getFailedExecutions.nonEmpty) {
-        _content ++= new FailedExecutionTable(parent,
-                                              "Failed Queries",
-                                              currentTime,
-                                              listener.getFailedExecutions
-                                                .sortBy(_.submissionTime)
-                                                .reverse).toNodeSeq
+        _content ++= new FailedExecutionTable(
+          parent,
+          "Failed Queries",
+          currentTime,
+          listener.getFailedExecutions
+            .sortBy(_.submissionTime)
+            .reverse).toNodeSeq
       }
       _content
     }
@@ -193,20 +196,22 @@ private[ui] class RunningExecutionTable(
     tableName: String,
     currentTime: Long,
     executionUIDatas: Seq[SQLExecutionUIData])
-    extends ExecutionTable(parent,
-                           "running-execution-table",
-                           tableName,
-                           currentTime,
-                           executionUIDatas,
-                           showRunningJobs = true,
-                           showSucceededJobs = true,
-                           showFailedJobs = true) {
+    extends ExecutionTable(
+      parent,
+      "running-execution-table",
+      tableName,
+      currentTime,
+      executionUIDatas,
+      showRunningJobs = true,
+      showSucceededJobs = true,
+      showFailedJobs = true) {
 
   override protected def header: Seq[String] =
-    baseHeader ++ Seq("Running Jobs",
-                      "Succeeded Jobs",
-                      "Failed Jobs",
-                      "Detail")
+    baseHeader ++ Seq(
+      "Running Jobs",
+      "Succeeded Jobs",
+      "Failed Jobs",
+      "Detail")
 }
 
 private[ui] class CompletedExecutionTable(
@@ -214,14 +219,15 @@ private[ui] class CompletedExecutionTable(
     tableName: String,
     currentTime: Long,
     executionUIDatas: Seq[SQLExecutionUIData])
-    extends ExecutionTable(parent,
-                           "completed-execution-table",
-                           tableName,
-                           currentTime,
-                           executionUIDatas,
-                           showRunningJobs = false,
-                           showSucceededJobs = true,
-                           showFailedJobs = false) {
+    extends ExecutionTable(
+      parent,
+      "completed-execution-table",
+      tableName,
+      currentTime,
+      executionUIDatas,
+      showRunningJobs = false,
+      showSucceededJobs = true,
+      showFailedJobs = false) {
 
   override protected def header: Seq[String] =
     baseHeader ++ Seq("Jobs", "Detail")
@@ -232,14 +238,15 @@ private[ui] class FailedExecutionTable(
     tableName: String,
     currentTime: Long,
     executionUIDatas: Seq[SQLExecutionUIData])
-    extends ExecutionTable(parent,
-                           "failed-execution-table",
-                           tableName,
-                           currentTime,
-                           executionUIDatas,
-                           showRunningJobs = false,
-                           showSucceededJobs = true,
-                           showFailedJobs = true) {
+    extends ExecutionTable(
+      parent,
+      "failed-execution-table",
+      tableName,
+      currentTime,
+      executionUIDatas,
+      showRunningJobs = false,
+      showSucceededJobs = true,
+      showFailedJobs = true) {
 
   override protected def header: Seq[String] =
     baseHeader ++ Seq("Succeeded Jobs", "Failed Jobs", "Detail")

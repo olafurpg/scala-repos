@@ -62,10 +62,11 @@ class TimerTest {
   @Test
   def testAlreadyExpiredTask(): Unit = {
     val startTime = System.currentTimeMillis()
-    val timer = new Timer(taskExecutor = executor,
-                          tickMs = 1,
-                          wheelSize = 3,
-                          startMs = startTime)
+    val timer = new Timer(
+      taskExecutor = executor,
+      tickMs = 1,
+      wheelSize = 3,
+      startMs = startTime)
     val output = new ArrayBuffer[Int]()
 
     val latches = (-5 until 0).map { i =>
@@ -75,23 +76,26 @@ class TimerTest {
     }
 
     latches.take(5).foreach { latch =>
-      assertEquals("already expired tasks should run immediately",
-                   true,
-                   latch.await(3, TimeUnit.SECONDS))
+      assertEquals(
+        "already expired tasks should run immediately",
+        true,
+        latch.await(3, TimeUnit.SECONDS))
     }
 
-    assertEquals("output of already expired tasks",
-                 Set(-5, -4, -3, -2, -1),
-                 output.toSet)
+    assertEquals(
+      "output of already expired tasks",
+      Set(-5, -4, -3, -2, -1),
+      output.toSet)
   }
 
   @Test
   def testTaskExpiration(): Unit = {
     val startTime = System.currentTimeMillis()
-    val timer = new Timer(taskExecutor = executor,
-                          tickMs = 1,
-                          wheelSize = 3,
-                          startMs = startTime)
+    val timer = new Timer(
+      taskExecutor = executor,
+      tickMs = 1,
+      wheelSize = 3,
+      startMs = startTime)
     val output = new ArrayBuffer[Int]()
 
     val tasks = new ArrayBuffer[TestTask]()

@@ -30,10 +30,11 @@ class JarTargetTest
           eventually(interval(1 second)) {
             project ! PublicSymbolSearchReq(List("Foo"), 5)
             atLeast(1, expectMsgType[SymbolSearchResults].syms) should matchPattern {
-              case TypeSearchResult("baz.Foo$",
-                                    "Foo$",
-                                    DeclaredAs.Class,
-                                    Some(_)) =>
+              case TypeSearchResult(
+                  "baz.Foo$",
+                  "Foo$",
+                  DeclaredAs.Class,
+                  Some(_)) =>
             }
           }
         }
@@ -92,10 +93,11 @@ class MissingJarTargetTest
           eventually(interval(1 second)) {
             project ! PublicSymbolSearchReq(List("Foo"), 5)
             atLeast(1, expectMsgType[SymbolSearchResults].syms) should matchPattern {
-              case TypeSearchResult("baz.Foo$",
-                                    "Foo$",
-                                    DeclaredAs.Class,
-                                    Some(_)) =>
+              case TypeSearchResult(
+                  "baz.Foo$",
+                  "Foo$",
+                  DeclaredAs.Class,
+                  Some(_)) =>
             }
           }
         }

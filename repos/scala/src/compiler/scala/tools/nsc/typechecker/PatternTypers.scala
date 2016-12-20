@@ -384,12 +384,13 @@ trait PatternTypers { self: Analyzer =>
       // and re-typechecks of the target of the unapply call in PATTERNmode,
       // this breaks down when the classTagExtractor (which defines the unapply member) is not a simple reference to an object,
       // but an arbitrary tree as is the case here
-      val res = doTypedUnapply(app,
-                               classTagExtractor,
-                               classTagExtractor,
-                               args,
-                               PATTERNmode,
-                               pt)
+      val res = doTypedUnapply(
+        app,
+        classTagExtractor,
+        classTagExtractor,
+        args,
+        PATTERNmode,
+        pt)
 
       log(sm"""
         |wrapClassTagUnapply {

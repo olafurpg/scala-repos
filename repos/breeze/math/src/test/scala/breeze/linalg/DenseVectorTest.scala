@@ -148,9 +148,10 @@ class DenseVectorTest extends FunSuite with Checkers {
     // assert result is a dense matrix
     val m: DenseMatrix[Double] = a * b.t
     assert(
-      m === DenseMatrix((6.0, -4.0, 8.0),
-                        (12.0, -8.0, 16.0),
-                        (18.0, -12.0, 24.0)))
+      m === DenseMatrix(
+        (6.0, -4.0, 8.0),
+        (12.0, -8.0, 16.0),
+        (18.0, -12.0, 24.0)))
   }
 
   test("Range") {
@@ -158,28 +159,30 @@ class DenseVectorTest extends FunSuite with Checkers {
       DenseVector.range(0, 10) == DenseVector(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
     assert(
       norm(
-        DenseVector.rangeD(0, 1, 0.1) - DenseVector(0.0,
-                                                    0.1,
-                                                    0.2,
-                                                    0.3,
-                                                    0.4,
-                                                    0.5,
-                                                    0.6,
-                                                    0.7,
-                                                    0.8,
-                                                    0.9)) < 1e-10)
+        DenseVector.rangeD(0, 1, 0.1) - DenseVector(
+          0.0,
+          0.1,
+          0.2,
+          0.3,
+          0.4,
+          0.5,
+          0.6,
+          0.7,
+          0.8,
+          0.9)) < 1e-10)
     assert(
       norm(
-        DenseVector.rangeF(0f, 1f, 0.1f) - DenseVector(0.0f,
-                                                       0.1f,
-                                                       0.2f,
-                                                       0.3f,
-                                                       0.4f,
-                                                       0.5f,
-                                                       0.6f,
-                                                       0.7f,
-                                                       0.8f,
-                                                       0.9f)) < 1e-6)
+        DenseVector.rangeF(0f, 1f, 0.1f) - DenseVector(
+          0.0f,
+          0.1f,
+          0.2f,
+          0.3f,
+          0.4f,
+          0.5f,
+          0.6f,
+          0.7f,
+          0.8f,
+          0.9f)) < 1e-6)
   }
 
   test("Slice") {
@@ -444,9 +447,10 @@ class DenseVectorTest extends FunSuite with Checkers {
     assert(util.Arrays.equals(a(0 until 3 by 2).toArray, Array(1, 3)))
     assert(util.Arrays.equals(a(1 until 3 by 1).toArray, Array(2, 3)))
 
-    val b = DenseVector(1d * breeze.math.i,
-                        0d * breeze.math.i,
-                        2d * breeze.math.i).toArray
+    val b = DenseVector(
+      1d * breeze.math.i,
+      0d * breeze.math.i,
+      2d * breeze.math.i).toArray
     //assert( util.Arrays.equals( b.toArray, Array(1d*breeze.math.i, 0d, 2d)) )
     assert(b(0) == Complex(0, 1))
     assert(b(1) == Complex(0, 0))

@@ -68,9 +68,10 @@ trait MemoryQueryingProfile extends BasicProfile {
     }
 
     def transformSimpleGrouping(n: Node) = n match {
-      case Bind(gen,
-                g: GroupBy,
-                p @ Pure((_: ProductNode | _: StructNode), _)) =>
+      case Bind(
+          gen,
+          g: GroupBy,
+          p @ Pure((_: ProductNode | _: StructNode), _)) =>
         val p2 = transformCountAll(gen, p)
         if (p2 eq p) n else Bind(gen, g, p2).infer(typeChildren = true)
       case Library.SilentCast(n :@ tpe1) :@ tpe2 if tpe1 == tpe2 => n
@@ -115,8 +116,9 @@ trait MemoryQueryingProfile extends BasicProfile {
 
     def createColumnConverter(n: Node, idx: Int, column: Option[FieldSymbol])
       : ResultConverter[MemoryResultConverterDomain, _] =
-      new QueryResultConverter(idx,
-                               typeInfoFor(n.nodeType.structural).nullable)
+      new QueryResultConverter(
+        idx,
+        typeInfoFor(n.nodeType.structural).nullable)
 
     class QueryResultConverter(ridx: Int, nullable: Boolean)
         extends ResultConverter[MemoryResultConverterDomain, Any] {

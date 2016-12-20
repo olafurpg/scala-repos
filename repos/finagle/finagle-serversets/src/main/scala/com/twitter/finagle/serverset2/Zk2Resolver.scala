@@ -68,11 +68,12 @@ class Zk2Resolver(statsReceiver: StatsReceiver,
   import Zk2Resolver._
 
   def this() =
-    this(DefaultStatsReceiver.scope("zk2"),
-         40.seconds,
-         5.seconds,
-         5.minutes,
-         DefaultTimer.twitter)
+    this(
+      DefaultStatsReceiver.scope("zk2"),
+      40.seconds,
+      5.seconds,
+      5.minutes,
+      DefaultTimer.twitter)
 
   def this(statsReceiver: StatsReceiver) =
     this(statsReceiver, 40.seconds, 5.seconds, 5.minutes, DefaultTimer.twitter)
@@ -96,15 +97,17 @@ class Zk2Resolver(statsReceiver: StatsReceiver,
       val varZkSession = ZkSession.retrying(
         retryStream,
         () =>
-          ZkSession(retryStream,
-                    hosts,
-                    sessionTimeout = sessionTimeout,
-                    statsReceiver)
+          ZkSession(
+            retryStream,
+            hosts,
+            sessionTimeout = sessionTimeout,
+            statsReceiver)
       )
-      new ServiceDiscoverer(varZkSession,
-                            statsReceiver.scope(statsOf(hosts)),
-                            unhealthyEpoch,
-                            timer)
+      new ServiceDiscoverer(
+        varZkSession,
+        statsReceiver.scope(statsOf(hosts)),
+        unhealthyEpoch,
+        timer)
     }
 
   private[this] val gauges = Seq(
@@ -126,8 +129,9 @@ class Zk2Resolver(statsReceiver: StatsReceiver,
   }
 
   private[this] val serverSetOf =
-    Memoize[(ServiceDiscoverer, String),
-            Var[Activity.State[Seq[(Entry, Double)]]]] {
+    Memoize[
+      (ServiceDiscoverer, String),
+      Var[Activity.State[Seq[(Entry, Double)]]]] {
       case (discoverer, path) => discoverer(path).run
     }
 
@@ -162,13 +166,15 @@ class Zk2Resolver(statsReceiver: StatsReceiver,
             val endpoint = endpointOption.getOrElse(null)
             val subseq =
               eps collect {
-                case (Endpoint(names,
-                               host,
-                               port,
-                               shard,
-                               Endpoint.Status.Alive,
-                               _),
-                      weight) if names.contains(endpoint) && host != null =>
+                case (
+                    Endpoint(
+                      names,
+                      host,
+                      port,
+                      shard,
+                      Endpoint.Status.Alive,
+                      _),
+                    weight) if names.contains(endpoint) && host != null =>
                   val metadata =
                     ZkMetadata.toAddrMetadata(ZkMetadata(Some(shard)))
                   (host,
@@ -177,8 +183,9 @@ class Zk2Resolver(statsReceiver: StatsReceiver,
               }
 
             if (chatty()) {
-              eprintf("Received new serverset vector: %s\n",
-                      subseq mkString ",")
+              eprintf(
+                "Received new serverset vector: %s\n",
+                subseq mkString ",")
             }
 
             if (subseq.isEmpty) Var.value(Addr.Neg)
@@ -213,10 +220,11 @@ class Zk2Resolver(statsReceiver: StatsReceiver,
               val (clientHealth, state) = tuple
 
               if (chatty()) {
-                eprintf("New state for %s!%s: %s\n",
-                        path,
-                        endpointOption getOrElse "default",
-                        state)
+                eprintf(
+                  "New state for %s!%s: %s\n",
+                  path,
+                  endpointOption getOrElse "default",
+                  state)
               }
 
               synchronized {

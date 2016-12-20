@@ -133,17 +133,19 @@ class VectorBuilder[@spec(Double, Int, Float, Long) E](
   }
 
   def copy: VectorBuilder[E] = {
-    new VectorBuilder[E](ArrayUtil.copyOf(index, index.length),
-                         ArrayUtil.copyOf(data, index.length),
-                         activeSize,
-                         size)
+    new VectorBuilder[E](
+      ArrayUtil.copyOf(index, index.length),
+      ArrayUtil.copyOf(data, index.length),
+      activeSize,
+      size)
   }
 
   def zerosLike: VectorBuilder[E] = {
-    new VectorBuilder[E](new Array[Int](0),
-                         ArrayUtil.newArrayLike(data, 0),
-                         0,
-                         size)
+    new VectorBuilder[E](
+      new Array[Int](0),
+      ArrayUtil.newArrayLike(data, 0),
+      0,
+      size)
   }
 
   def reserve(nnz: Int) {
@@ -235,8 +237,9 @@ class VectorBuilder[@spec(Double, Int, Float, Long) E](
 
     if (ord.length > 0) out += 1
 
-    require(ord.length == 0 || length > outIndex.last,
-            "Index out of bounds in constructing sparse vector.")
+    require(
+      ord.length == 0 || length > outIndex.last,
+      "Index out of bounds in constructing sparse vector.")
     new SparseVector(outIndex, outValues, out, length)
   }
 
@@ -281,8 +284,9 @@ class VectorBuilder[@spec(Double, Int, Float, Long) E](
     */
   def use(index: Array[Int], data: Array[E], activeSize: Int) {
     require(activeSize >= 0, "activeSize must be non-negative")
-    require(data.length >= activeSize,
-            "activeSize must be no greater than array length...")
+    require(
+      data.length >= activeSize,
+      "activeSize must be no greater than array length...")
     _data = data
     _index = index
     used = activeSize
@@ -326,10 +330,11 @@ object VectorBuilder extends VectorBuilderOps {
     new VectorBuilder(size, initialNonzero)
   def apply[@spec(Double, Int, Float, Long) V: Semiring: Zero](
       values: Array[V]) =
-    new VectorBuilder(Array.range(0, values.length),
-                      values,
-                      values.length,
-                      values.length)
+    new VectorBuilder(
+      Array.range(0, values.length),
+      values,
+      values.length,
+      values.length)
 
   def apply[V: ClassTag: Semiring: Zero](values: V*): VectorBuilder[V] =
     apply(values.toArray)

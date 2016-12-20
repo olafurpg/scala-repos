@@ -86,9 +86,10 @@ class ActivityTest extends FunSuite {
 
     wits(0).notify(Return(100))
     assert(
-      ref.get == Seq(Return(Seq.range(0, 10)),
-                     Throw(exc),
-                     Return(100 +: Seq.range(1, 10))))
+      ref.get == Seq(
+        Return(Seq.range(0, 10)),
+        Throw(exc),
+        Return(100 +: Seq.range(1, 10))))
   }
 
   test("Activity.future: produce an initially-pending Activity") {
@@ -160,20 +161,22 @@ class ActivityTest extends FunSuite {
 
     w.notify(Return(3))
     assert(
-      ref.get == Seq(Return(1),
-                     Throw(exc1),
-                     Return(2),
-                     Throw(exc2),
-                     Return(3)))
+      ref.get == Seq(
+        Return(1),
+        Throw(exc1),
+        Return(2),
+        Throw(exc2),
+        Return(3)))
 
     w.notify(Return(333))
     assert(
-      ref.get == Seq(Return(1),
-                     Throw(exc1),
-                     Return(2),
-                     Throw(exc2),
-                     Return(3),
-                     Throw(exc3)))
+      ref.get == Seq(
+        Return(1),
+        Throw(exc1),
+        Return(2),
+        Throw(exc2),
+        Return(3),
+        Throw(exc3)))
   }
 
   test("Activity.sample") {
@@ -205,16 +208,18 @@ class ActivityTest extends FunSuite {
     assert(ref.get == Seq(Activity.Pending, Activity.Pending))
     bw.notify(Return("ok"))
     assert(
-      ref.get == Seq(Activity.Pending,
-                     Activity.Pending,
-                     Activity.Ok((1, "ok"))))
+      ref.get == Seq(
+        Activity.Pending,
+        Activity.Pending,
+        Activity.Ok((1, "ok"))))
 
     val exc = new Exception
     aw.notify(Throw(exc))
     assert(
-      ref.get == Seq(Activity.Pending,
-                     Activity.Pending,
-                     Activity.Ok((1, "ok")),
-                     Activity.Failed(exc)))
+      ref.get == Seq(
+        Activity.Pending,
+        Activity.Pending,
+        Activity.Ok((1, "ok")),
+        Activity.Failed(exc)))
   }
 }

@@ -87,9 +87,10 @@ class ScProjectionType private (
         case ta: ScTypeAlias if ta.typeParameters.length == 0 =>
           val subst: ScSubstitutor = actualSubst
           Some(
-            AliasType(ta,
-                      ta.lowerBound.map(subst.subst),
-                      ta.upperBound.map(subst.subst)))
+            AliasType(
+              ta,
+              ta.lowerBound.map(subst.subst),
+              ta.upperBound.map(subst.subst)))
         case ta: ScTypeAlias => //higher kind case
           ta match {
             case ta: ScTypeAliasDefinition =>
@@ -102,16 +103,18 @@ class ScProjectionType private (
                       if (taArgs.length == typeArgs.length && taArgs
                             .zip(typeArgs)
                             .forall {
-                              case (tParam: ScTypeParam,
-                                    ScTypeParameterType(_, _, _, _, param))
+                              case (
+                                  tParam: ScTypeParam,
+                                  ScTypeParameterType(_, _, _, _, param))
                                   if tParam == param =>
                                 true
                               case _ => false
                             })
                         return Some(
-                          AliasType(ta,
-                                    Success(des, Some(element)),
-                                    Success(des, Some(element))))
+                          AliasType(
+                            ta,
+                            Success(des, Some(element)),
+                            Success(des, Some(element))))
                     case _ =>
                   }
                 case _ =>
@@ -125,19 +128,21 @@ class ScProjectionType private (
               (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
             ta.typeParameters.map(tp => {
               val name = tp.name + "$$"
-              args += new ScExistentialArgument(name,
-                                                Nil,
-                                                types.Nothing,
-                                                types.Any)
+              args += new ScExistentialArgument(
+                name,
+                Nil,
+                types.Nothing,
+                types.Any)
               ScTypeVariable(name)
             }))
           val s = actualSubst.followed(genericSubst)
           Some(
-            AliasType(ta,
-                      ta.lowerBound.map(scType =>
-                        ScExistentialType(s.subst(scType), args.toList)),
-                      ta.upperBound.map(scType =>
-                        ScExistentialType(s.subst(scType), args.toList))))
+            AliasType(
+              ta,
+              ta.lowerBound.map(scType =>
+                ScExistentialType(s.subst(scType), args.toList)),
+              ta.upperBound.map(scType =>
+                ScExistentialType(s.subst(scType), args.toList))))
         case _ => None
       }
     } else None
@@ -167,9 +172,10 @@ class ScProjectionType private (
     update(this) match {
       case (true, res) => res
       case _ =>
-        ScProjectionType(projected.recursiveUpdate(update, visited + this),
-                         element,
-                         superReference)
+        ScProjectionType(
+          projected.recursiveUpdate(update, visited + this),
+          element,
+          superReference)
     }
   }
 
@@ -187,9 +193,10 @@ class ScProjectionType private (
     }
   }
 
-  @CachedMappedWithRecursionGuard(element,
-                                  None,
-                                  ModCount.getBlockModificationCount)
+  @CachedMappedWithRecursionGuard(
+    element,
+    None,
+    ModCount.getBlockModificationCount)
   private def actualImpl(
       projected: ScType,
       superReference: Boolean): Option[(PsiNamedElement, ScSubstitutor)] = {
@@ -255,8 +262,9 @@ class ScProjectionType private (
         if (candidates.length == 1 &&
             candidates(0).element.isInstanceOf[PsiNamedElement]) {
           //todo: superMemberSubstitutor? However I don't know working example for this case
-          Some(candidates(0).element,
-               emptySubst followed candidates(0).substitutor)
+          Some(
+            candidates(0).element,
+            emptySubst followed candidates(0).substitutor)
         } else None
       case d: ScTypeDefinition => processType(d.name)
       case d: PsiClass => processType(d.getName)
@@ -488,16 +496,18 @@ case class ScDesignatorType(element: PsiNamedElement) extends ValueType {
                     if (taArgs.length == typeArgs.length && taArgs
                           .zip(typeArgs)
                           .forall {
-                            case (tParam: ScTypeParam,
-                                  ScTypeParameterType(_, _, _, _, param))
+                            case (
+                                tParam: ScTypeParam,
+                                ScTypeParameterType(_, _, _, _, param))
                                 if tParam == param =>
                               true
                             case _ => false
                           })
                       return Some(
-                        AliasType(ta,
-                                  Success(des, Some(element)),
-                                  Success(des, Some(element))))
+                        AliasType(
+                          ta,
+                          Success(des, Some(element)),
+                          Success(des, Some(element))))
                   case _ =>
                 }
               case _ =>
@@ -511,10 +521,11 @@ case class ScDesignatorType(element: PsiNamedElement) extends ValueType {
             (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
           ta.typeParameters.map(tp => {
             val name = tp.name + "$$"
-            args += new ScExistentialArgument(name,
-                                              Nil,
-                                              types.Nothing,
-                                              types.Any)
+            args += new ScExistentialArgument(
+              name,
+              Nil,
+              types.Nothing,
+              types.Any)
             ScTypeVariable(name)
           }))
         Some(

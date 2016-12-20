@@ -148,9 +148,9 @@ object CABRunLengthEncoder {
     for {
       state <- get
       config <- ask
-      _ <- state.lastToken.cata(none = point(()), // nothing to emit
-                                some =
-                                  writeOutput(_, state.length, config.minRun))
+      _ <- state.lastToken.cata(
+        none = point(()), // nothing to emit
+        some = writeOutput(_, state.length, config.minRun))
     } yield ()
 
   /**

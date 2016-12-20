@@ -363,8 +363,8 @@ class RelationalGroupedDataset protected[sql] (
         new RelationalGroupedDataset(
           df,
           groupingExprs,
-          RelationalGroupedDataset.PivotType(df.resolve(pivotColumn),
-                                             values.map(Literal.apply)))
+          RelationalGroupedDataset
+            .PivotType(df.resolve(pivotColumn), values.map(Literal.apply)))
       case _: RelationalGroupedDataset.PivotType =>
         throw new UnsupportedOperationException(
           "repeated pivots are not supported")

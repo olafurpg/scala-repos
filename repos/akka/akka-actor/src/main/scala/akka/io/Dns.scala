@@ -92,10 +92,11 @@ class DnsExt(system: ExtendedActorSystem) extends IO.Extension {
   val cache: Dns = provider.cache
 
   val manager: ActorRef = {
-    system.systemActorOf(props = Props(classOf[SimpleDnsManager], this)
-                           .withDeploy(Deploy.local)
-                           .withDispatcher(Settings.Dispatcher),
-                         name = "IO-DNS")
+    system.systemActorOf(
+      props = Props(classOf[SimpleDnsManager], this)
+        .withDeploy(Deploy.local)
+        .withDispatcher(Settings.Dispatcher),
+      name = "IO-DNS")
   }
 
   def getResolver: ActorRef = manager

@@ -44,9 +44,10 @@ class ScalaDocCompletionContributor extends ScalaCompletionContributor {
               case _: ScClass =>
                 MyScaladocParsing.allTags - MyScaladocParsing.RETURN_TAG
               case _: ScTypeAlias | _: ScTrait =>
-                MyScaladocParsing.allTags -- Set(MyScaladocParsing.RETURN_TAG,
-                                                 MyScaladocParsing.THROWS_TAG,
-                                                 MyScaladocParsing.PARAM_TAG)
+                MyScaladocParsing.allTags -- Set(
+                  MyScaladocParsing.RETURN_TAG,
+                  MyScaladocParsing.THROWS_TAG,
+                  MyScaladocParsing.PARAM_TAG)
               case _ =>
                 MyScaladocParsing.allTags -- MyScaladocParsing.tagsWithParameters -
                   MyScaladocParsing.RETURN_TAG

@@ -99,9 +99,10 @@ class NamerTest extends FunSuite with AssertionsForJUnit {
     // Ok(Bound) & Ok(Bound)
     namer("/test/1").notify(Return(NameTree.read("/$/inet/0/1")))
     namer("/test/2").notify(Return(NameTree.read("/$/inet/0/2")))
-    assertEval(res,
-               boundWithWeight(1.0, Address(1)),
-               boundWithWeight(1.0, Address(2)))
+    assertEval(
+      res,
+      boundWithWeight(1.0, Address(1)),
+      boundWithWeight(1.0, Address(2)))
 
     // Ok(Bound) & Ok(Neg)
     namer("/test/2").notify(Return(NameTree.Neg))

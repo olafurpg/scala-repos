@@ -33,8 +33,9 @@ class AddStripMarginToMLStringIntention extends PsiElementBaseIntentionAction {
     val suffix = if (marginChar == "|") "" else "(\'" + marginChar + "\')"
 
     extensions.inWriteAction {
-      editor.getDocument.insertString(element.getTextRange.getEndOffset,
-                                      ".stripMargin" + suffix)
+      editor.getDocument.insertString(
+        element.getTextRange.getEndOffset,
+        ".stripMargin" + suffix)
     }
   }
 

@@ -24,13 +24,15 @@ class MarathonStore[S <: MarathonState[_, S]](
   private[this] lazy val lockManager = LockManager.create()
   protected[this] def metricsPrefix = MetricPrefixes.SERVICE
   protected[this] val bytesRead: Histogram = metrics.histogram(
-    metrics.name(metricsPrefix,
-                 getClass,
-                 s"${ct.runtimeClass.getSimpleName}.read-data-size"))
+    metrics.name(
+      metricsPrefix,
+      getClass,
+      s"${ct.runtimeClass.getSimpleName}.read-data-size"))
   protected[this] val bytesWritten: Histogram = metrics.histogram(
-    metrics.name(metricsPrefix,
-                 getClass,
-                 s"${ct.runtimeClass.getSimpleName}.write-data-size"))
+    metrics.name(
+      metricsPrefix,
+      getClass,
+      s"${ct.runtimeClass.getSimpleName}.write-data-size"))
 
   def fetch(key: String): Future[Option[S]] = {
     log.debug(s"Fetch $prefix$key")

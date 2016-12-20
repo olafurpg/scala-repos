@@ -85,8 +85,9 @@ trait JSEncoding extends SubComponent { self: GenJSCode =>
   }
 
   def encodeFieldSym(sym: Symbol)(implicit pos: Position): js.Ident = {
-    require(sym.owner.isClass && sym.isTerm && !sym.isMethod && !sym.isModule,
-            "encodeFieldSym called with non-field symbol: " + sym)
+    require(
+      sym.owner.isClass && sym.isTerm && !sym.isMethod && !sym.isModule,
+      "encodeFieldSym called with non-field symbol: " + sym)
 
     val name0 = encodeMemberNameInternal(sym)
     val name =
@@ -110,8 +111,9 @@ trait JSEncoding extends SubComponent { self: GenJSCode =>
   def encodeMethodSym(sym: Symbol, reflProxy: Boolean = false)(
       implicit pos: Position): js.Ident = {
     val (encodedName, paramsString) = encodeMethodNameInternal(sym, reflProxy)
-    js.Ident(encodedName + paramsString,
-             Some(sym.unexpandedName.decoded + paramsString))
+    js.Ident(
+      encodedName + paramsString,
+      Some(sym.unexpandedName.decoded + paramsString))
   }
 
   def encodeMethodName(sym: Symbol, reflProxy: Boolean = false): String = {
@@ -126,15 +128,17 @@ trait JSEncoding extends SubComponent { self: GenJSCode =>
     */
   def encodeRTStringMethodSym(sym: Symbol)(
       implicit pos: Position): (Symbol, js.Ident) = {
-    require(sym.isMethod,
-            "encodeMethodSym called with non-method symbol: " + sym)
+    require(
+      sym.isMethod,
+      "encodeMethodSym called with non-method symbol: " + sym)
     require(sym.owner == definitions.StringClass)
     require(!sym.isClassConstructor && !sym.isPrivate)
 
     val (encodedName, paramsString) =
       encodeMethodNameInternal(sym, inRTClass = true)
-    val methodIdent = js.Ident(encodedName + paramsString,
-                               Some(sym.unexpandedName.decoded + paramsString))
+    val methodIdent = js.Ident(
+      encodedName + paramsString,
+      Some(sym.unexpandedName.decoded + paramsString))
 
     (jsDefinitions.RuntimeStringModuleClass, methodIdent)
   }
@@ -143,8 +147,9 @@ trait JSEncoding extends SubComponent { self: GenJSCode =>
       sym: Symbol,
       reflProxy: Boolean = false,
       inRTClass: Boolean = false): (String, String) = {
-    require(sym.isMethod,
-            "encodeMethodSym called with non-method symbol: " + sym)
+    require(
+      sym.isMethod,
+      "encodeMethodSym called with non-method symbol: " + sym)
 
     def name = encodeMemberNameInternal(sym)
 
@@ -166,11 +171,13 @@ trait JSEncoding extends SubComponent { self: GenJSCode =>
   }
 
   def encodeStaticMemberSym(sym: Symbol)(implicit pos: Position): js.Ident = {
-    require(sym.isStaticMember,
-            "encodeStaticMemberSym called with non-static symbol: " + sym)
-    js.Ident(mangleJSName(encodeMemberNameInternal(sym)) + makeParamsString(
-               List(internalName(sym.tpe))),
-             Some(sym.unexpandedName.decoded))
+    require(
+      sym.isStaticMember,
+      "encodeStaticMemberSym called with non-static symbol: " + sym)
+    js.Ident(
+      mangleJSName(encodeMemberNameInternal(sym)) + makeParamsString(
+        List(internalName(sym.tpe))),
+      Some(sym.unexpandedName.decoded))
   }
 
   def encodeLocalSym(sym: Symbol)(implicit pos: Position): js.Ident = {
@@ -194,8 +201,9 @@ trait JSEncoding extends SubComponent { self: GenJSCode =>
     if (sym == definitions.ObjectClass) jstpe.AnyType
     else if (isRawJSType(sym.toTypeConstructor)) jstpe.AnyType
     else {
-      assert(sym != definitions.ArrayClass,
-             "encodeClassType() cannot be called with ArrayClass")
+      assert(
+        sym != definitions.ArrayClass,
+        "encodeClassType() cannot be called with ArrayClass")
       jstpe.ClassType(encodeClassFullName(sym))
     }
   }

@@ -118,8 +118,9 @@ case class ArrayType(elementType: DataType, containsNull: Boolean)
           } else if (isNullRight) {
             return 1
           } else {
-            val comp = elementOrdering.compare(leftArray.get(i, elementType),
-                                               rightArray.get(i, elementType))
+            val comp = elementOrdering.compare(
+              leftArray.get(i, elementType),
+              rightArray.get(i, elementType))
             if (comp != 0) {
               return comp
             }

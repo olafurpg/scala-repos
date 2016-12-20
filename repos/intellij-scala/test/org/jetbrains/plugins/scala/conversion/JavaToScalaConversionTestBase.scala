@@ -57,9 +57,10 @@ abstract class JavaToScalaConversionTestBase
     var res = JavaToScala.convertPsisToText(buf.toArray)
     val newFile = PsiFileFactory
       .getInstance(getProjectAdapter)
-      .createFileFromText("dummyForJavaToScala.scala",
-                          ScalaFileType.SCALA_LANGUAGE,
-                          res)
+      .createFileFromText(
+        "dummyForJavaToScala.scala",
+        ScalaFileType.SCALA_LANGUAGE,
+        res)
     res = inWriteAction {
       CodeStyleManager.getInstance(getProjectAdapter).reformat(newFile).getText
     }

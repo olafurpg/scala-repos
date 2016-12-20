@@ -35,11 +35,12 @@ trait LinkerPlatformExtensions { this: Linker.type =>
       else Some(IncOptimizer.factory)
     }
 
-    val frontend = new LinkerFrontend(semantics,
-                                      outputMode.esLevel,
-                                      withSourceMap,
-                                      frontendConfig,
-                                      optOptimizerFactory)
+    val frontend = new LinkerFrontend(
+      semantics,
+      outputMode.esLevel,
+      withSourceMap,
+      frontendConfig,
+      optOptimizerFactory)
 
     val backend = {
       if (useClosureCompiler) {
@@ -48,10 +49,11 @@ trait LinkerPlatformExtensions { this: Linker.type =>
           s"Cannot use output mode $outputMode with the Closure Compiler")
         new ClosureLinkerBackend(semantics, withSourceMap, backendConfig)
       } else {
-        new BasicLinkerBackend(semantics,
-                               outputMode,
-                               withSourceMap,
-                               backendConfig)
+        new BasicLinkerBackend(
+          semantics,
+          outputMode,
+          withSourceMap,
+          backendConfig)
       }
     }
 

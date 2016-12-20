@@ -62,10 +62,11 @@ object DottySdkDescriptor extends SdkDescriptorCompanion {
                                              libraryFiles: Seq[File],
                                              sourceFiles: Seq[File],
                                              docFiles: Seq[File]) = {
-    DottySdkDescriptor(None,
-                       compilerFiles,
-                       libraryFiles,
-                       sourceFiles,
-                       docFiles)
+    DottySdkDescriptor(
+      None,
+      compilerFiles,
+      libraryFiles,
+      sourceFiles,
+      docFiles)
   }
 }

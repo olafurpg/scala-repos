@@ -131,9 +131,10 @@ class FilePollingActivitySource private[exp] (
         if (file.exists()) {
           pool {
             val reader =
-              new InputStreamReader(new FileInputStream(file),
-                                    InputStreamReader.DefaultMaxBufferSize,
-                                    pool)
+              new InputStreamReader(
+                new FileInputStream(file),
+                InputStreamReader.DefaultMaxBufferSize,
+                pool)
             Reader.readAll(reader) respond {
               case Return(buf) =>
                 value() = Activity.Ok(buf)
@@ -184,9 +185,10 @@ class ClassLoaderActivitySource private[exp] (classLoader: ClassLoader,
             case null => p.setValue(Activity.Failed(NotFound))
             case stream =>
               val reader =
-                new InputStreamReader(stream,
-                                      InputStreamReader.DefaultMaxBufferSize,
-                                      pool)
+                new InputStreamReader(
+                  stream,
+                  InputStreamReader.DefaultMaxBufferSize,
+                  pool)
               Reader.readAll(reader) respond {
                 case Return(buf) =>
                   p.setValue(Activity.Ok(buf))

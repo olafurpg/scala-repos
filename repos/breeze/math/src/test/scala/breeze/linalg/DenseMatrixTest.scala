@@ -310,15 +310,17 @@ class DenseMatrixTest
     // should be dense
     val y: DenseMatrix[Double] = a.t * a
     assert(
-      y === DenseMatrix((17.0, 22.0, 27.0),
-                        (22.0, 29.0, 36.0),
-                        (27.0, 36.0, 45.0)))
+      y === DenseMatrix(
+        (17.0, 22.0, 27.0),
+        (22.0, 29.0, 36.0),
+        (27.0, 36.0, 45.0)))
 
     val z: DenseMatrix[Double] = b * (b + 1.0)
     assert(
-      z === DenseMatrix((164.0, 5.0, 107.0),
-                        (-5.0, 10.0, -27.0),
-                        (161.0, -7.0, 138.0)))
+      z === DenseMatrix(
+        (164.0, 5.0, 107.0),
+        (-5.0, 10.0, -27.0),
+        (161.0, -7.0, 138.0)))
   }
 
   test("Multiply Int") {
@@ -345,17 +347,19 @@ class DenseMatrixTest
 
   test("Multiply Boolean") {
     val a = DenseMatrix((true, true, true), (true, true, true))
-    val b = DenseMatrix((true, false, true),
-                        (true, false, true),
-                        (true, false, true))
+    val b = DenseMatrix(
+      (true, false, true),
+      (true, false, true),
+      (true, false, true))
     assert(a * b === DenseMatrix((true, false, true), (true, false, true)))
   }
 
   test("Multiply Float") {
     val a = DenseMatrix((1.0f, 2.0f, 3.0f), (4.0f, 5.0f, 6.0f))
-    val b = DenseMatrix((7.0f, -2.0f, 8.0f),
-                        (-3.0f, -3.0f, 1.0f),
-                        (12.0f, 0.0f, 5.0f))
+    val b = DenseMatrix(
+      (7.0f, -2.0f, 8.0f),
+      (-3.0f, -3.0f, 1.0f),
+      (12.0f, 0.0f, 5.0f))
     val c = DenseVector(6.0f, 2.0f, 3.0f)
     val cs = SparseVector(6.0f, 2.0f, 3.0f)
     assert(
@@ -374,24 +378,28 @@ class DenseMatrixTest
     // should be dense
     val y = a.t * a
     assert(
-      y === DenseMatrix((17.0f, 22.0f, 27.0f),
-                        (22.0f, 29.0f, 36.0f),
-                        (27.0f, 36.0f, 45.0f)))
+      y === DenseMatrix(
+        (17.0f, 22.0f, 27.0f),
+        (22.0f, 29.0f, 36.0f),
+        (27.0f, 36.0f, 45.0f)))
 
     val z: DenseMatrix[Float] = b * (b + 1.0f)
     assert(
-      z === DenseMatrix((164.0f, 5.0f, 107.0f),
-                        (-5.0f, 10.0f, -27.0f),
-                        (161.0f, -7.0f, 138.0f)))
+      z === DenseMatrix(
+        (164.0f, 5.0f, 107.0f),
+        (-5.0f, 10.0f, -27.0f),
+        (161.0f, -7.0f, 138.0f)))
   }
 
   test("Multiply Complex") {
 
-    val a = DenseMatrix((Complex(1, 1), Complex(2, 2), Complex(3, 3)),
-                        (Complex(4, 4), Complex(5, 5), Complex(6, 6)))
-    val b = DenseMatrix((Complex(7, 7), Complex(-2, -2), Complex(8, 8)),
-                        (Complex(-3, -3), Complex(-3, -3), Complex(1, 1)),
-                        (Complex(12, 12), Complex(0, 0), Complex(5, 5)))
+    val a = DenseMatrix(
+      (Complex(1, 1), Complex(2, 2), Complex(3, 3)),
+      (Complex(4, 4), Complex(5, 5), Complex(6, 6)))
+    val b = DenseMatrix(
+      (Complex(7, 7), Complex(-2, -2), Complex(8, 8)),
+      (Complex(-3, -3), Complex(-3, -3), Complex(1, 1)),
+      (Complex(12, 12), Complex(0, 0), Complex(5, 5)))
     val c = DenseVector(Complex(6, 0), Complex(2, 0), Complex(3, 0))
     val cs = SparseVector(Complex(6, 0), Complex(2, 0), Complex(3, 0))
     val value: DenseMatrix[Complex] = a * b
@@ -400,17 +408,20 @@ class DenseMatrixTest
         (Complex(0, 74), Complex(0, -16), Complex(0, 50)),
         (Complex(0, 170), Complex(0, -46), Complex(0, 134))))
     assert(
-      b * c === DenseVector(Complex(62, 62),
-                            Complex(-21, -21),
-                            Complex(87, 87)))
+      b * c === DenseVector(
+        Complex(62, 62),
+        Complex(-21, -21),
+        Complex(87, 87)))
     assert(
-      b * cs === DenseVector(Complex(62, 62),
-                             Complex(-21, -21),
-                             Complex(87, 87)))
+      b * cs === DenseVector(
+        Complex(62, 62),
+        Complex(-21, -21),
+        Complex(87, 87)))
     assert(
-      b.t * c === DenseVector(Complex(72, -72),
-                              Complex(-18, 18),
-                              Complex(65, -65)))
+      b.t * c === DenseVector(
+        Complex(72, -72),
+        Complex(-18, 18),
+        Complex(65, -65)))
   }
 
   test("Multiply BigDecimal") {
@@ -496,46 +507,57 @@ class DenseMatrixTest
     val r2: DenseVector[Double] =
       DenseMatrix((1.0, 3.0, 4.0), (2.0, 0.0, 6.0)) \ DenseVector(1.0, 3.0)
     assert(
-      norm(r2 - DenseVector(0.1813186813186811,
-                            -0.3131868131868131,
-                            0.43956043956043944),
-           inf) < 1E-5)
+      norm(
+        r2 - DenseVector(
+          0.1813186813186811,
+          -0.3131868131868131,
+          0.43956043956043944),
+        inf) < 1E-5)
 
     // wide matrix solve
     val r3: DenseMatrix[Double] =
-      DenseMatrix((1.0, 3.0, 4.0), (2.0, 0.0, 6.0)) \ DenseMatrix((1.0, 2.0),
-                                                                  (3.0, 4.0))
-    matricesNearlyEqual(r3,
-                        DenseMatrix((0.1813186813186811, 0.2197802197802196),
-                                    (-0.3131868131868131, -0.1978021978021977),
-                                    (0.43956043956043944, 0.5934065934065933)))
+      DenseMatrix((1.0, 3.0, 4.0), (2.0, 0.0, 6.0)) \ DenseMatrix(
+        (1.0, 2.0),
+        (3.0, 4.0))
+    matricesNearlyEqual(
+      r3,
+      DenseMatrix(
+        (0.1813186813186811, 0.2197802197802196),
+        (-0.3131868131868131, -0.1978021978021977),
+        (0.43956043956043944, 0.5934065934065933)))
 
     // tall matrix solve
     val r4: DenseMatrix[Double] =
-      DenseMatrix((1.0, 3.0), (2.0, 0.0), (4.0, 6.0)) \ DenseMatrix((1.0, 4.0),
-                                                                    (2.0, 5.0),
-                                                                    (3.0, 6.0))
-    assert(max(abs(
-      r4 - DenseMatrix((0.9166666666666667, 1.9166666666666672),
-                       (-0.08333333333333352, -0.08333333333333436)))) < 1E-5)
+      DenseMatrix((1.0, 3.0), (2.0, 0.0), (4.0, 6.0)) \ DenseMatrix(
+        (1.0, 4.0),
+        (2.0, 5.0),
+        (3.0, 6.0))
+    assert(
+      max(
+        abs(r4 - DenseMatrix(
+          (0.9166666666666667, 1.9166666666666672),
+          (-0.08333333333333352, -0.08333333333333436)))) < 1E-5)
   }
 
   test("Solve Float") {
     // square solve
     val r1: DenseMatrix[Float] =
-      DenseMatrix((1.0f, 3.0f), (2.0f, 0.0f)) \ DenseMatrix((1.0f, 2.0f),
-                                                            (3.0f, 4.0f))
+      DenseMatrix((1.0f, 3.0f), (2.0f, 0.0f)) \ DenseMatrix(
+        (1.0f, 2.0f),
+        (3.0f, 4.0f))
     assert(r1 === DenseMatrix((1.5f, 2.0f), (-1.0f / 6, 0.0f)))
 
     // matrix-vector solve
     val r2: DenseVector[Float] =
-      DenseMatrix((1.0f, 3.0f, 4.0f), (2.0f, 0.0f, 6.0f)) \ DenseVector(1.0f,
-                                                                        3.0f)
+      DenseMatrix((1.0f, 3.0f, 4.0f), (2.0f, 0.0f, 6.0f)) \ DenseVector(
+        1.0f,
+        3.0f)
     assert(
       norm(
-        r2 - DenseVector(0.1813186813186811f,
-                         -0.3131868131868131f,
-                         0.43956043956043944f)) < 1E-5)
+        r2 - DenseVector(
+          0.1813186813186811f,
+          -0.3131868131868131f,
+          0.43956043956043944f)) < 1E-5)
 
     // wide matrix solve
     val r3: DenseMatrix[Float] =
@@ -543,10 +565,12 @@ class DenseMatrixTest
         (1.0f, 2.0f),
         (3.0f, 4.0f))
     assert(
-      max(abs(
-        r3 - DenseMatrix((0.1813186813186811f, 0.2197802197802196f),
-                         (-0.3131868131868131f, -0.1978021978021977f),
-                         (0.43956043956043944f, 0.5934065934065933f)))) < 1E-5)
+      max(
+        abs(
+          r3 - DenseMatrix(
+            (0.1813186813186811f, 0.2197802197802196f),
+            (-0.3131868131868131f, -0.1978021978021977f),
+            (0.43956043956043944f, 0.5934065934065933f)))) < 1E-5)
 
     // tall matrix solve
     val r4: DenseMatrix[Float] =
@@ -600,16 +624,19 @@ class DenseMatrixTest
   test("normalize rows and columns") {
     val A = DenseMatrix((1.0, 3.0), (2.0, 4.0))
     assert(
-      normalize(A, Axis._0, 1) === DenseMatrix((1.0 / 3.0, 3.0 / 7.0),
-                                               (2.0 / 3.0, 4.0 / 7.0)))
+      normalize(A, Axis._0, 1) === DenseMatrix(
+        (1.0 / 3.0, 3.0 / 7.0),
+        (2.0 / 3.0, 4.0 / 7.0)))
     assert(
-      normalize(A, Axis._1, 1) === DenseMatrix((1.0 / 4.0, 3.0 / 4.0),
-                                               (2.0 / 6.0, 4.0 / 6.0)))
+      normalize(A, Axis._1, 1) === DenseMatrix(
+        (1.0 / 4.0, 3.0 / 4.0),
+        (2.0 / 6.0, 4.0 / 6.0)))
     // handle odd sized matrices (test for a bug.)
     val dm = DenseMatrix.tabulate(2, 5)((i, j) => i * j * 1.0 + 1)
     dm := normalize(dm, Axis._1, 2)
-    assert(abs(sum(dm(0, ::).t.map(x => x * x)) - 1.0) < 1E-4,
-           dm.toString + " not normalized!")
+    assert(
+      abs(sum(dm(0, ::).t.map(x => x * x)) - 1.0) < 1E-4,
+      dm.toString + " not normalized!")
   }
 
   test("Generic Dense ops") {
@@ -710,8 +737,8 @@ class DenseMatrixTest
 
     assert((dm(::, 0 until 0) * dm(0 until 0, ::)) === dm)
     assert(
-      (dm(0 until 0, ::) * dm(::, 0 until 0)) === DenseMatrix.zeros[Double](0,
-                                                                            0))
+      (dm(0 until 0, ::) * dm(::, 0 until 0)) === DenseMatrix
+        .zeros[Double](0, 0))
 //    assert( (dm(::, 2 until 0 by -1) * dm(2 until 0 by -1, ::)) === dm)
   }
 
@@ -723,118 +750,121 @@ class DenseMatrixTest
   }
 
   test("#221") {
-    val data = Array(1,
-                     2,
-                     3,
-                     4,
-                     5,
-                     6,
-                     7,
-                     8,
-                     9,
-                     10,
-                     1,
-                     2,
-                     3,
-                     4,
-                     5,
-                     6,
-                     7,
-                     8,
-                     9,
-                     10,
-                     1,
-                     2,
-                     3,
-                     4,
-                     5,
-                     6,
-                     7,
-                     8,
-                     9,
-                     10,
-                     1,
-                     2,
-                     3,
-                     4,
-                     5,
-                     6,
-                     7,
-                     8,
-                     9,
-                     10,
-                     1,
-                     2,
-                     3,
-                     4,
-                     5,
-                     6,
-                     7,
-                     8,
-                     9,
-                     10,
-                     1,
-                     2,
-                     3,
-                     4,
-                     5,
-                     6,
-                     7,
-                     8,
-                     9,
-                     10,
-                     1,
-                     2,
-                     3,
-                     4,
-                     5,
-                     6,
-                     7,
-                     8,
-                     9,
-                     10,
-                     1,
-                     2,
-                     3,
-                     4,
-                     5,
-                     6,
-                     7,
-                     8,
-                     9,
-                     10,
-                     1,
-                     2,
-                     3,
-                     4,
-                     5,
-                     6,
-                     7,
-                     8,
-                     9,
-                     10,
-                     1,
-                     2,
-                     3,
-                     4,
-                     5,
-                     6,
-                     7,
-                     8,
-                     9,
-                     10)
+    val data = Array(
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10)
     val mat = new DenseMatrix(rows = 10, data, offset = 0).t
     val area = mat(3 until 6, 2 until 7)
     assert(
       area === DenseMatrix((3, 4, 5, 6, 7), (3, 4, 5, 6, 7), (3, 4, 5, 6, 7)))
 
-    assert(area.t === DenseMatrix((3, 4, 5, 6, 7),
-                                  (3, 4, 5, 6, 7),
-                                  (3, 4, 5, 6, 7)).t)
+    assert(area.t === DenseMatrix(
+      (3, 4, 5, 6, 7),
+      (3, 4, 5, 6, 7),
+      (3, 4, 5, 6, 7)).t)
 
     val sl2t = area.t(0 until area.cols, 1 until area.rows)
-    assert(sl2t.offset === area.offset + area.majorStride,
-           sl2t.data(area.offset + area.majorStride) + " " + area.offset)
+    assert(
+      sl2t.offset === area.offset + area.majorStride,
+      sl2t.data(area.offset + area.majorStride) + " " + area.offset)
     assert(sl2t.t === DenseMatrix((3, 4, 5, 6, 7), (3, 4, 5, 6, 7)))
 
     val sl2 = area(1 until area.rows, 0 until area.cols)
@@ -843,9 +873,10 @@ class DenseMatrixTest
 
   test("DenseMatrix construction with list of lists") {
     val dm = DenseMatrix(
-      List(List(1, 2, 3, 0, 0, 0, 0, 0, 0),
-           List(0, 0, 0, 1, 2, 3, 0, 0, 0),
-           List(0, 0, 0, 0, 0, 0, 1, 2, 3)): _*)
+      List(
+        List(1, 2, 3, 0, 0, 0, 0, 0, 0),
+        List(0, 0, 0, 1, 2, 3, 0, 0, 0),
+        List(0, 0, 0, 0, 0, 0, 1, 2, 3)): _*)
   }
 
   test("#265: slices of :: and IndexedSeq") {

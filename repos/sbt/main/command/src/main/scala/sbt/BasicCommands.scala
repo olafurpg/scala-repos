@@ -28,26 +28,27 @@ import scala.util.control.NonFatal
 
 object BasicCommands {
   lazy val allBasicCommands =
-    Seq(nop,
-        ignore,
-        help,
-        completionsCommand,
-        multi,
-        ifLast,
-        append,
-        setOnFailure,
-        clearOnFailure,
-        stashOnFailure,
-        popOnFailure,
-        reboot,
-        call,
-        early,
-        exit,
-        continuous,
-        history,
-        shell,
-        read,
-        alias) ++ compatCommands
+    Seq(
+      nop,
+      ignore,
+      help,
+      completionsCommand,
+      multi,
+      ifLast,
+      append,
+      setOnFailure,
+      clearOnFailure,
+      stashOnFailure,
+      popOnFailure,
+      reboot,
+      call,
+      early,
+      exit,
+      continuous,
+      history,
+      shell,
+      read,
+      alias) ++ compatCommands
 
   def nop = Command.custom(s => success(() => s))
   def ignore = Command.command(FailureWall)(idFun)
@@ -219,9 +220,10 @@ object BasicCommands {
   def continuous =
     Command(ContinuousExecutePrefix, continuousBriefHelp, continuousDetail)(
       otherCommandParser) { (s, arg) =>
-      withAttribute(s,
-                    Watched.Configuration,
-                    "Continuous execution not configured.") { w =>
+      withAttribute(
+        s,
+        Watched.Configuration,
+        "Continuous execution not configured.") { w =>
         val repeat =
           ContinuousExecutePrefix +
             (if (arg.startsWith(" ")) arg else " " + arg)
@@ -254,8 +256,9 @@ object BasicCommands {
     line match {
       case Some(line) =>
         val newState = s
-          .copy(onFailure = Some(Shell),
-                remainingCommands = line +: Shell +: s.remainingCommands)
+          .copy(
+            onFailure = Some(Shell),
+            remainingCommands = line +: Shell +: s.remainingCommands)
           .setInteractive(true)
         if (line.trim.isEmpty) newState else newState.clearGlobalLog
       case None => s.setInteractive(false)

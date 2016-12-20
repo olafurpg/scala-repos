@@ -113,10 +113,11 @@ case class RichServletContext(sc: ServletContext) extends AttributesMap {
     }
 
     if (classOf[HttpServlet].isAssignableFrom(handlerClass)) {
-      mountServlet(handlerClass.asInstanceOf[Class[HttpServlet]],
-                   pathMap,
-                   name,
-                   loadOnStartup)
+      mountServlet(
+        handlerClass.asInstanceOf[Class[HttpServlet]],
+        pathMap,
+        name,
+        loadOnStartup)
     } else if (classOf[Filter].isAssignableFrom(handlerClass)) {
       mountFilter(handlerClass.asInstanceOf[Class[Filter]], pathMap, name)
     } else {

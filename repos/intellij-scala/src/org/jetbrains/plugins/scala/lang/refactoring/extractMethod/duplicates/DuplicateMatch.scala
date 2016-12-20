@@ -88,24 +88,29 @@ class DuplicateMatch(pattern: DuplicatePattern,
         val paramValue = parameterValues.getOrElseUpdate(p, expr)
         PsiEquivalenceUtil.areElementsEquivalent(paramValue, expr) &&
         typesEquiv(ref, expr)
-      case Both((ref1: ScReferenceExpression, ref2: ScReferenceExpression),
-                (ResolvesTo(td1: ScTypedDefinition),
-                 ResolvesTo(td2: ScTypedDefinition)))
+      case Both(
+          (ref1: ScReferenceExpression, ref2: ScReferenceExpression),
+          (
+            ResolvesTo(td1: ScTypedDefinition),
+            ResolvesTo(td2: ScTypedDefinition)))
           if pattern.definitions.contains(td1) =>
         definitionCorrespondence.get(td1) == Some(td2) &&
           typesEquiv(ref1, ref2)
-      case Both((ref1: ScReferenceElement, ref2: ScReferenceElement),
-                (ResolvesTo(res1), ResolvesTo(res2))) if res1 != res2 =>
+      case Both(
+          (ref1: ScReferenceElement, ref2: ScReferenceElement),
+          (ResolvesTo(res1), ResolvesTo(res2))) if res1 != res2 =>
         (res1, res2) match {
           case (sf1: ScSyntheticFunction, sf2: ScSyntheticFunction) =>
             sf1.isStringPlusMethod && sf2.isStringPlusMethod
           case _ => false
         }
-      case (intd1: ScInterpolatedStringLiteral,
-            intd2: ScInterpolatedStringLiteral) =>
+      case (
+          intd1: ScInterpolatedStringLiteral,
+          intd2: ScInterpolatedStringLiteral) =>
         checkChildren(intd1, intd2)
-      case (ElementType(ScalaTokenTypes.tINTERPOLATED_STRING),
-            ElementType(ScalaTokenTypes.tINTERPOLATED_STRING)) =>
+      case (
+          ElementType(ScalaTokenTypes.tINTERPOLATED_STRING),
+          ElementType(ScalaTokenTypes.tINTERPOLATED_STRING)) =>
         subPattern.getText == candidate.getText
       case (lit1: ScLiteral, lit2: ScLiteral) => lit1.getValue == lit2.getValue
       case _ => checkChildren(subPattern, candidate)

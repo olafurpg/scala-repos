@@ -29,8 +29,9 @@ object HandshakeInit extends Decoder[HandshakeInit] {
     // the rest of the fields are optional and protocol version specific
     val capLow = if (br.readable(2)) br.readUnsignedShort() else 0
 
-    require(protocol == 10 && (capLow & Capability.Protocol41) != 0,
-            "unsupported protocol version")
+    require(
+      protocol == 10 && (capLow & Capability.Protocol41) != 0,
+      "unsupported protocol version")
 
     val charset = br.readUnsignedByte()
     val status = br.readShort()

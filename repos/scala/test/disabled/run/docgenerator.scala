@@ -21,8 +21,9 @@ object Test {
   private def test1(tmpDir: File) {
     def testOptions(inFile: File, outDirName: String, opts: String*) {
       val outDir = createDir(tmpDir, outDirName)
-      val args = Array.concat(Array("-d", outDir.getPath, inFile.getPath),
-                              opts.toArray: Array[String])
+      val args = Array.concat(
+        Array("-d", outDir.getPath, inFile.getPath),
+        opts.toArray: Array[String])
       if (MainDoc.main0(args)) {
         for (name <- List("all-classes.html", "index.html")) {
           val outFile = new File(outDir, name)

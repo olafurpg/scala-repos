@@ -341,9 +341,10 @@ object Thrift
         if (framed) thrift.ThriftServerFramedPipelineFactory
         else thrift.ThriftServerBufferedPipelineFactory(protocolFactory)
 
-      Netty3Listener(pipeline,
-                     if (params.contains[Label]) params
-                     else params + Label("thrift"))
+      Netty3Listener(
+        pipeline,
+        if (params.contains[Label]) params
+        else params + Label("thrift"))
     }
 
     protected def newDispatcher(

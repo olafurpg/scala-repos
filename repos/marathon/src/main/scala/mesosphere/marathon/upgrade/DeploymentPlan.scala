@@ -162,11 +162,12 @@ object DeploymentPlan {
   private val log = LoggerFactory.getLogger(getClass)
 
   def empty: DeploymentPlan =
-    DeploymentPlan(UUID.randomUUID().toString,
-                   Group.empty,
-                   Group.empty,
-                   Nil,
-                   Timestamp.now())
+    DeploymentPlan(
+      UUID.randomUUID().toString,
+      Group.empty,
+      Group.empty,
+      Nil,
+      Timestamp.now())
 
   def fromProto(message: Protos.DeploymentPlanDefinition): DeploymentPlan =
     empty.mergeFromProto(message)
@@ -250,9 +251,10 @@ object DeploymentPlan {
               // Scale-only change.
               case Some(oldApp) if oldApp.isOnlyScaleChange(newApp) =>
                 Some(
-                  ScaleApplication(newApp,
-                                   newApp.instances,
-                                   toKill.get(newApp.id)))
+                  ScaleApplication(
+                    newApp,
+                    newApp.instances,
+                    toKill.get(newApp.id)))
 
               // Update or restart an existing app.
               case Some(oldApp) if oldApp.needsRestart(newApp) =>

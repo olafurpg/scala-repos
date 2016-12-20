@@ -69,8 +69,9 @@ trait PropertyComparator extends AbstractComparator {
 
   def comparePropertiesInProxy(javafxClass: Class[_],
                                scalafxPropertyProxy: Class[_]) {
-    assertProperties(getProperties(javafxClass),
-                     scalafxPropertyProxy,
-                     "Properties in Proxy")
+    assertProperties(
+      getProperties(javafxClass),
+      scalafxPropertyProxy,
+      "Properties in Proxy")
   }
 }

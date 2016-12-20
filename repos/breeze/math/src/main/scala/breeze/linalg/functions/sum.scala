@@ -97,8 +97,9 @@ trait VectorizedReduceUFunc extends UFunc {
       implicit helper: VectorizeHelper[T])
     : Impl[BroadcastedColumns[DenseMatrix[T], DenseVector[T]],
            Transpose[DenseVector[T]]] = {
-    new Impl[BroadcastedColumns[DenseMatrix[T], DenseVector[T]],
-             Transpose[DenseVector[T]]] {
+    new Impl[
+      BroadcastedColumns[DenseMatrix[T], DenseVector[T]],
+      Transpose[DenseVector[T]]] {
       override def apply(v: BroadcastedColumns[DenseMatrix[T], DenseVector[T]])
         : Transpose[DenseVector[T]] = {
         val mat = v.underlying

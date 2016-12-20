@@ -242,11 +242,12 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
     val nowStr = rec.meta.formats.dateFormat.format(now)
     val now2 = Calendar.getInstance()
     now2.add(Calendar.DATE, 1)
-    passBasicTests(now,
-                   now2.getTime,
-                   rec.mandatoryDateField,
-                   Full(rec.legacyOptionalDateField),
-                   false)
+    passBasicTests(
+      now,
+      now2.getTime,
+      rec.mandatoryDateField,
+      Full(rec.legacyOptionalDateField),
+      false)
     passConversionTests(
       now,
       rec.mandatoryDateField,
@@ -264,10 +265,11 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
     val json =
       ("intField" -> 1) ~ ("stringField" -> "jsonobj1") ~
         ("mapField" -> (("x" -> "a")))
-    passBasicTests(ttjo,
-                   ttjo2,
-                   rec.mandatoryJsonObjectField,
-                   Full(rec.legacyOptionalJsonObjectField))
+    passBasicTests(
+      ttjo,
+      ttjo2,
+      rec.mandatoryJsonObjectField,
+      Full(rec.legacyOptionalJsonObjectField))
     passConversionTests(
       ttjo,
       rec.mandatoryJsonObjectField,
@@ -285,11 +287,12 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
       val rec = MongoFieldTypeTestRecord.createRecord
       val oid = ObjectId.get
       val oid2 = ObjectId.get
-      passBasicTests(oid,
-                     oid2,
-                     rec.mandatoryObjectIdField,
-                     Full(rec.legacyOptionalObjectIdField),
-                     false)
+      passBasicTests(
+        oid,
+        oid2,
+        rec.mandatoryObjectIdField,
+        Full(rec.legacyOptionalObjectIdField),
+        false)
       passConversionTests(
         oid,
         rec.mandatoryObjectIdField,
@@ -308,18 +311,20 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
     val rec = PatternFieldTestRecord.createRecord
     val ptrn = Pattern.compile("^Mo", Pattern.CASE_INSENSITIVE)
     val ptrn2 = Pattern.compile("^MON", Pattern.CASE_INSENSITIVE)
-    passBasicTests(ptrn,
-                   ptrn2,
-                   rec.mandatoryPatternField,
-                   Full(rec.legacyOptionalPatternField),
-                   false)
+    passBasicTests(
+      ptrn,
+      ptrn2,
+      rec.mandatoryPatternField,
+      Full(rec.legacyOptionalPatternField),
+      false)
     passConversionTests(
       ptrn,
       rec.mandatoryPatternField,
       JsObj(("$regex", Str(ptrn.toString)), ("$flags", Num(2))),
       JObject(
-        List(JField("$regex", JString(ptrn.toString)),
-             JField("$flags", JInt(2)))),
+        List(
+          JField("$regex", JString(ptrn.toString)),
+          JField("$flags", JInt(2)))),
       Empty,
       false
     )
@@ -329,11 +334,12 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
     val rec = MongoFieldTypeTestRecord.createRecord
     val uuid = UUID.randomUUID
     val uuid2 = UUID.randomUUID
-    passBasicTests(uuid,
-                   uuid2,
-                   rec.mandatoryUUIDField,
-                   Full(rec.legacyOptionalUUIDField),
-                   false)
+    passBasicTests(
+      uuid,
+      uuid2,
+      rec.mandatoryUUIDField,
+      Full(rec.legacyOptionalUUIDField),
+      false)
     passConversionTests(
       uuid,
       rec.mandatoryUUIDField,
@@ -528,10 +534,12 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
   "MongoJsonObjectListField" should {
     "function correctly" in {
       val rec = ListTestRecord.createRecord
-      val lst = List(TypeTestJsonObject(1, "jsonobj1", Map("x" -> "1")),
-                     TypeTestJsonObject(2, "jsonobj2", Map("x" -> "2")))
-      val lst2 = List(TypeTestJsonObject(3, "jsonobj3", Map("x" -> "3")),
-                      TypeTestJsonObject(4, "jsonobj4", Map("x" -> "4")))
+      val lst = List(
+        TypeTestJsonObject(1, "jsonobj1", Map("x" -> "1")),
+        TypeTestJsonObject(2, "jsonobj2", Map("x" -> "2")))
+      val lst2 = List(
+        TypeTestJsonObject(3, "jsonobj3", Map("x" -> "3")),
+        TypeTestJsonObject(4, "jsonobj4", Map("x" -> "4")))
       val json = List(
         ("intField" -> 1) ~ ("stringField" -> "jsonobj1") ~
           ("mapField" -> (("x" -> "1"))),
@@ -624,11 +632,12 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
         def toJsCmd = compactRender(srJson)
       }
 
-      passBasicTests(subRec,
-                     subRec2,
-                     rec.mandatoryBsonRecordField,
-                     Full(rec.legacyOptionalBsonRecordField),
-                     false)
+      passBasicTests(
+        subRec,
+        subRec2,
+        rec.mandatoryBsonRecordField,
+        Full(rec.legacyOptionalBsonRecordField),
+        false)
       passConversionTests(
         subRec,
         rec.mandatoryBsonRecordField,
@@ -643,10 +652,12 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
     "function correctly" in {
       val rec = SubRecordTestRecord.createRecord
       val subSubRec = SubSubRecord.createRecord.name("subsub")
-      val lst = List(SubRecord.createRecord.name("subrec1").subsub(subSubRec),
-                     SubRecord.createRecord.name("subrec2").subsub(subSubRec))
-      val lst2 = List(SubRecord.createRecord.name("subrec3"),
-                      SubRecord.createRecord.name("subrec4"))
+      val lst = List(
+        SubRecord.createRecord.name("subrec1").subsub(subSubRec),
+        SubRecord.createRecord.name("subrec2").subsub(subSubRec))
+      val lst2 = List(
+        SubRecord.createRecord.name("subrec3"),
+        SubRecord.createRecord.name("subrec4"))
       val sr1Json =
         ("name" -> "subrec1") ~ ("subsub" -> ("name" -> "subsub")) ~
           ("subsublist" -> JArray(Nil)) ~
@@ -676,10 +687,11 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
         def toJsCmd = compactRender(sr2Json)
       }
 
-      passBasicTests(lst,
-                     lst2,
-                     rec.mandatoryBsonRecordListField,
-                     Full(rec.legacyOptionalBsonRecordListField))
+      passBasicTests(
+        lst,
+        lst2,
+        rec.mandatoryBsonRecordListField,
+        Full(rec.legacyOptionalBsonRecordListField))
       passConversionTests(
         lst,
         rec.mandatoryBsonRecordListField,

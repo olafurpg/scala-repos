@@ -38,8 +38,9 @@ class JavaStreamingListenerWrapperSuite extends SparkFunSuite {
         executorId = "1"
       ))
     listenerWrapper.onReceiverStarted(receiverStarted)
-    assertReceiverInfo(listener.receiverStarted.receiverInfo,
-                       receiverStarted.receiverInfo)
+    assertReceiverInfo(
+      listener.receiverStarted.receiverInfo,
+      receiverStarted.receiverInfo)
 
     val receiverStopped = StreamingListenerReceiverStopped(
       ReceiverInfo(
@@ -50,8 +51,9 @@ class JavaStreamingListenerWrapperSuite extends SparkFunSuite {
         executorId = "1"
       ))
     listenerWrapper.onReceiverStopped(receiverStopped)
-    assertReceiverInfo(listener.receiverStopped.receiverInfo,
-                       receiverStopped.receiverInfo)
+    assertReceiverInfo(
+      listener.receiverStopped.receiverInfo,
+      receiverStopped.receiverInfo)
 
     val receiverError = StreamingListenerReceiverError(
       ReceiverInfo(
@@ -65,8 +67,9 @@ class JavaStreamingListenerWrapperSuite extends SparkFunSuite {
         lastErrorTime = System.currentTimeMillis()
       ))
     listenerWrapper.onReceiverError(receiverError)
-    assertReceiverInfo(listener.receiverError.receiverInfo,
-                       receiverError.receiverInfo)
+    assertReceiverInfo(
+      listener.receiverError.receiverInfo,
+      receiverError.receiverInfo)
 
     val batchSubmitted = StreamingListenerBatchSubmitted(
       BatchInfo(
@@ -85,25 +88,28 @@ class JavaStreamingListenerWrapperSuite extends SparkFunSuite {
         submissionTime = 1001L,
         None,
         None,
-        outputOperationInfos =
-          Map(0 -> OutputOperationInfo(batchTime = Time(1000L),
-                                       id = 0,
-                                       name = "op1",
-                                       description = "operation1",
-                                       startTime = None,
-                                       endTime = None,
-                                       failureReason = None),
-              1 -> OutputOperationInfo(batchTime = Time(1000L),
-                                       id = 1,
-                                       name = "op2",
-                                       description = "operation2",
-                                       startTime = None,
-                                       endTime = None,
-                                       failureReason = None))
+        outputOperationInfos = Map(
+          0 -> OutputOperationInfo(
+            batchTime = Time(1000L),
+            id = 0,
+            name = "op1",
+            description = "operation1",
+            startTime = None,
+            endTime = None,
+            failureReason = None),
+          1 -> OutputOperationInfo(
+            batchTime = Time(1000L),
+            id = 1,
+            name = "op2",
+            description = "operation2",
+            startTime = None,
+            endTime = None,
+            failureReason = None))
       ))
     listenerWrapper.onBatchSubmitted(batchSubmitted)
-    assertBatchInfo(listener.batchSubmitted.batchInfo,
-                    batchSubmitted.batchInfo)
+    assertBatchInfo(
+      listener.batchSubmitted.batchInfo,
+      batchSubmitted.batchInfo)
 
     val batchStarted = StreamingListenerBatchStarted(
       BatchInfo(
@@ -122,21 +128,23 @@ class JavaStreamingListenerWrapperSuite extends SparkFunSuite {
         submissionTime = 1001L,
         Some(1002L),
         None,
-        outputOperationInfos =
-          Map(0 -> OutputOperationInfo(batchTime = Time(1000L),
-                                       id = 0,
-                                       name = "op1",
-                                       description = "operation1",
-                                       startTime = Some(1003L),
-                                       endTime = None,
-                                       failureReason = None),
-              1 -> OutputOperationInfo(batchTime = Time(1000L),
-                                       id = 1,
-                                       name = "op2",
-                                       description = "operation2",
-                                       startTime = Some(1005L),
-                                       endTime = None,
-                                       failureReason = None))
+        outputOperationInfos = Map(
+          0 -> OutputOperationInfo(
+            batchTime = Time(1000L),
+            id = 0,
+            name = "op1",
+            description = "operation1",
+            startTime = Some(1003L),
+            endTime = None,
+            failureReason = None),
+          1 -> OutputOperationInfo(
+            batchTime = Time(1000L),
+            id = 1,
+            name = "op2",
+            description = "operation2",
+            startTime = Some(1005L),
+            endTime = None,
+            failureReason = None))
       ))
     listenerWrapper.onBatchStarted(batchStarted)
     assertBatchInfo(listener.batchStarted.batchInfo, batchStarted.batchInfo)
@@ -158,25 +166,28 @@ class JavaStreamingListenerWrapperSuite extends SparkFunSuite {
         submissionTime = 1001L,
         Some(1002L),
         Some(1010L),
-        outputOperationInfos =
-          Map(0 -> OutputOperationInfo(batchTime = Time(1000L),
-                                       id = 0,
-                                       name = "op1",
-                                       description = "operation1",
-                                       startTime = Some(1003L),
-                                       endTime = Some(1004L),
-                                       failureReason = None),
-              1 -> OutputOperationInfo(batchTime = Time(1000L),
-                                       id = 1,
-                                       name = "op2",
-                                       description = "operation2",
-                                       startTime = Some(1005L),
-                                       endTime = Some(1010L),
-                                       failureReason = None))
+        outputOperationInfos = Map(
+          0 -> OutputOperationInfo(
+            batchTime = Time(1000L),
+            id = 0,
+            name = "op1",
+            description = "operation1",
+            startTime = Some(1003L),
+            endTime = Some(1004L),
+            failureReason = None),
+          1 -> OutputOperationInfo(
+            batchTime = Time(1000L),
+            id = 1,
+            name = "op2",
+            description = "operation2",
+            startTime = Some(1005L),
+            endTime = Some(1010L),
+            failureReason = None))
       ))
     listenerWrapper.onBatchCompleted(batchCompleted)
-    assertBatchInfo(listener.batchCompleted.batchInfo,
-                    batchCompleted.batchInfo)
+    assertBatchInfo(
+      listener.batchCompleted.batchInfo,
+      batchCompleted.batchInfo)
 
     val outputOperationStarted = StreamingListenerOutputOperationStarted(
       OutputOperationInfo(
@@ -228,8 +239,9 @@ class JavaStreamingListenerWrapperSuite extends SparkFunSuite {
       javaBatchInfo.streamIdToInputInfo.size === batchInfo.streamIdToInputInfo.size)
     batchInfo.streamIdToInputInfo.foreach {
       case (streamId, streamInputInfo) =>
-        assertStreamingInfo(javaBatchInfo.streamIdToInputInfo.get(streamId),
-                            streamInputInfo)
+        assertStreamingInfo(
+          javaBatchInfo.streamIdToInputInfo.get(streamId),
+          streamInputInfo)
     }
     assert(javaBatchInfo.submissionTime === batchInfo.submissionTime)
     assert(

@@ -81,8 +81,9 @@ object Acl {
   }
 
   def toJsonCompatibleMap(acls: Set[Acl]): Map[String, Any] = {
-    Map(Acl.VersionKey -> Acl.CurrentVersion,
-        Acl.AclsKey -> acls.map(acl => acl.toMap).toList)
+    Map(
+      Acl.VersionKey -> Acl.CurrentVersion,
+      Acl.AclsKey -> acls.map(acl => acl.toMap).toList)
   }
 }
 
@@ -106,10 +107,11 @@ case class Acl(principal: KafkaPrincipal,
     * @return Map representation of the Acl.
     */
   def toMap(): Map[String, Any] = {
-    Map(Acl.PrincipalKey -> principal.toString,
-        Acl.PermissionTypeKey -> permissionType.name,
-        Acl.OperationKey -> operation.name,
-        Acl.HostsKey -> host)
+    Map(
+      Acl.PrincipalKey -> principal.toString,
+      Acl.PermissionTypeKey -> permissionType.name,
+      Acl.OperationKey -> operation.name,
+      Acl.HostsKey -> host)
   }
 
   override def toString: String = {

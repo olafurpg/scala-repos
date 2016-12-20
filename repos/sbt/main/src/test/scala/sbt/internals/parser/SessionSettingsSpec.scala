@@ -42,8 +42,9 @@ abstract class AbstractSessionSettingsSpec(folder: String)
       foreach(expectedResultAndMap(file)) {
         case (expectedResultList, commands) =>
           val resultList =
-            SbtRefactorings.applySessionSettings((file, originalLines),
-                                                 commands)
+            SbtRefactorings.applySessionSettings(
+              (file, originalLines),
+              commands)
           val expected = SbtParser(file, expectedResultList)
           val result = SbtParser(file, resultList._2)
           result.settings must_== expected.settings

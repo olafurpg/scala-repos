@@ -118,8 +118,9 @@ class ParArray[T] private[mutable] (val arrayseq: ArraySeq[T])
       val left = remaining
       if (left >= 2) {
         val splitpoint = left / 2
-        val sq = Seq(new ParArrayIterator(i, i + splitpoint, arr),
-                     new ParArrayIterator(i + splitpoint, until, arr))
+        val sq = Seq(
+          new ParArrayIterator(i, i + splitpoint, arr),
+          new ParArrayIterator(i + splitpoint, until, arr))
         i = until
         sq
       } else {
@@ -640,13 +641,14 @@ class ParArray[T] private[mutable] (val arrayseq: ArraySeq[T])
                                              op: (U, U) => U,
                                              destarr: Array[A],
                                              from: Int) {
-      scanToArray_quick[U](array,
-                           destarr.asInstanceOf[Array[Any]],
-                           op,
-                           z,
-                           i,
-                           until,
-                           from)
+      scanToArray_quick[U](
+        array,
+        destarr.asInstanceOf[Array[Any]],
+        op,
+        z,
+        i,
+        until,
+        from)
       i = until
     }
 
@@ -772,8 +774,9 @@ class ParArray[T] private[mutable] (val arrayseq: ArraySeq[T])
     }
     def split = {
       val fp = howmany / 2
-      List(new Map(f, targetarr, offset, fp),
-           new Map(f, targetarr, offset + fp, howmany - fp))
+      List(
+        new Map(f, targetarr, offset, fp),
+        new Map(f, targetarr, offset + fp, howmany - fp))
     }
     def shouldSplitFurther =
       howmany > scala.collection.parallel
@@ -816,8 +819,9 @@ object ParArray extends ParFactory[ParArray] {
     case arr: Array[AnyRef] => new ParArray[T](new ExposedArraySeq[T](arr, sz))
     case _ =>
       new ParArray[T](
-        new ExposedArraySeq[T](scala.runtime.ScalaRunTime.toObjectArray(arr),
-                               sz))
+        new ExposedArraySeq[T](
+          scala.runtime.ScalaRunTime.toObjectArray(arr),
+          sz))
   }
 
   def createFromCopy[T <: AnyRef: ClassTag](arr: Array[T]): ParArray[T] = {

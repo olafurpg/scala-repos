@@ -24,8 +24,9 @@ class LeastSquaresTest extends WordSpec with Matchers {
         b.update(i, 2 * i + 5 + math.random * 0.01)
       })
       val result = leastSquares(a, b)
-      assert(norm(result.coefficients - DenseVector(2.0, 5.0)) < 1e-2,
-             "norm is too large")
+      assert(
+        norm(result.coefficients - DenseVector(2.0, 5.0)) < 1e-2,
+        "norm is too large")
       assert(result.rSquared < 1e-2, "rsquared too large")
     }
     "handle transpose" in {

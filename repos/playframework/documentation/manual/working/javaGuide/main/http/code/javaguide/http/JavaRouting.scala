@@ -44,8 +44,9 @@ object JavaRouting extends Specification {
     }
     "support default values for parameters" in {
       contentOf(FakeRequest("GET", "/clients"), classOf[defaultvalue.Routes]) must_== "clients page 1"
-      contentOf(FakeRequest("GET", "/clients?page=2"),
-                classOf[defaultvalue.Routes]) must_== "clients page 2"
+      contentOf(
+        FakeRequest("GET", "/clients?page=2"),
+        classOf[defaultvalue.Routes]) must_== "clients page 2"
     }
     "support optional values for parameters" in {
       contentOf(FakeRequest("GET", "/api/list-all")) must_== "version null"

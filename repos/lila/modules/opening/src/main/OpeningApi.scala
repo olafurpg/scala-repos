@@ -80,8 +80,9 @@ private[opening] final class OpeningApi(openingColl: Coll,
         Group(BSONBoolean(true))("ids" -> Push(Attempt.BSONFields.openingId))
 
       col
-        .aggregate(Match(BSONDocument(Attempt.BSONFields.userId -> user.id)),
-                   List(Limit(max), playedIdsGroup))
+        .aggregate(
+          Match(BSONDocument(Attempt.BSONFields.userId -> user.id)),
+          List(Limit(max), playedIdsGroup))
         .map(
           _.documents.headOption
             .flatMap(_.getAs[BSONArray]("ids"))

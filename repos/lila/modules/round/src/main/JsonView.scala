@@ -155,9 +155,10 @@ final class JsonView(chatApi: lila.chat.ChatApi,
           .obj(
             "game" -> {
               gameJson(game, initialFen) ++ Json
-                .obj("moveTimes" -> withMoveTimes.option(game.moveTimes),
-                     "opening" -> game.opening,
-                     "importedBy" -> game.pgnImport.flatMap(_.user))
+                .obj(
+                  "moveTimes" -> withMoveTimes.option(game.moveTimes),
+                  "opening" -> game.opening,
+                  "importedBy" -> game.pgnImport.flatMap(_.user))
                 .noNull
             },
             "clock" -> game.clock.map(clockJson),
@@ -235,18 +236,19 @@ final class JsonView(chatApi: lila.chat.ChatApi,
         import pov._
         val fen = Forsyth >> game.toChess
         Json.obj(
-          "game" -> Json.obj("id" -> gameId,
-                             "variant" -> game.variant,
-                             "opening" -> game.opening,
-                             "initialFen" -> {
-                               if (pov.game.pgnMoves.isEmpty) fen
-                               else
-                                 (initialFen | chess.format.Forsyth.initial)
-                             },
-                             "fen" -> fen,
-                             "turns" -> game.turns,
-                             "player" -> game.turnColor.name,
-                             "status" -> game.status),
+          "game" -> Json.obj(
+            "id" -> gameId,
+            "variant" -> game.variant,
+            "opening" -> game.opening,
+            "initialFen" -> {
+              if (pov.game.pgnMoves.isEmpty) fen
+              else
+                (initialFen | chess.format.Forsyth.initial)
+            },
+            "fen" -> fen,
+            "turns" -> game.turns,
+            "player" -> game.turnColor.name,
+            "status" -> game.status),
           "player" -> Json.obj(
             "id" -> owner.option(pov.playerId),
             "color" -> color.name
@@ -353,8 +355,9 @@ final class JsonView(chatApi: lila.chat.ChatApi,
     animationFactor(pref) * baseAnimationDuration.toMillis * pov.game.finished
       .fold(
         1,
-        math.max(0,
-                 math.min(1.2, ((pov.game.estimateTotalTime - 60) / 60) * 0.2))
+        math.max(
+          0,
+          math.min(1.2, ((pov.game.estimateTotalTime - 60) / 60) * 0.2))
       )
   }
 }
@@ -362,10 +365,11 @@ final class JsonView(chatApi: lila.chat.ChatApi,
 object JsonView {
 
   implicit val variantWriter: OWrites[chess.variant.Variant] = OWrites { v =>
-    Json.obj("key" -> v.key,
-             "name" -> v.name,
-             "short" -> v.shortName,
-             "title" -> v.title)
+    Json.obj(
+      "key" -> v.key,
+      "name" -> v.name,
+      "short" -> v.shortName,
+      "title" -> v.title)
   }
 
   implicit val statusWriter: OWrites[chess.Status] = OWrites { s =>
@@ -373,21 +377,23 @@ object JsonView {
   }
 
   implicit val clockWriter: OWrites[Clock] = OWrites { c =>
-    Json.obj("running" -> c.isRunning,
-             "initial" -> c.limit,
-             "increment" -> c.increment,
-             "white" -> truncateAt(c.remainingTime(Color.White), 2),
-             "black" -> truncateAt(c.remainingTime(Color.Black), 2),
-             "emerg" -> c.emergTime)
+    Json.obj(
+      "running" -> c.isRunning,
+      "initial" -> c.limit,
+      "increment" -> c.increment,
+      "white" -> truncateAt(c.remainingTime(Color.White), 2),
+      "black" -> truncateAt(c.remainingTime(Color.Black), 2),
+      "emerg" -> c.emergTime)
   }
 
   implicit val correspondenceWriter: OWrites[CorrespondenceClock] = OWrites {
     c =>
-      Json.obj("daysPerTurn" -> c.daysPerTurn,
-               "increment" -> c.increment,
-               "white" -> c.whiteTime,
-               "black" -> c.blackTime,
-               "emerg" -> c.emerg)
+      Json.obj(
+        "daysPerTurn" -> c.daysPerTurn,
+        "increment" -> c.increment,
+        "white" -> c.whiteTime,
+        "black" -> c.blackTime,
+        "emerg" -> c.emerg)
   }
 
   implicit val openingWriter: OWrites[chess.opening.FullOpening.AtPly] =

@@ -147,16 +147,17 @@ object Balancers {
         sr: StatsReceiver,
         exc: NoBrokersAvailableException
     ): ServiceFactory[Req, Rep] = {
-      new ApertureLoadBandBalancer(endpoints,
-                                   smoothWin,
-                                   lowLoad,
-                                   highLoad,
-                                   minAperture,
-                                   maxEffort,
-                                   rng,
-                                   timer,
-                                   sr,
-                                   exc) {
+      new ApertureLoadBandBalancer(
+        endpoints,
+        smoothWin,
+        lowLoad,
+        highLoad,
+        minAperture,
+        maxEffort,
+        rng,
+        timer,
+        sr,
+        exc) {
         private[this] val gauge = sr.addGauge("aperture")(1)
         override def close(when: Time): Future[Unit] = {
           gauge.remove()

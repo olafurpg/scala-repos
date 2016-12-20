@@ -92,8 +92,9 @@ trait MatchCodeGen extends Interface {
       def drop(tgt: Tree)(n: Int): Tree = {
         def callDirect = fn(tgt, nme.drop, LIT(n))
         def callRuntime =
-          Apply(REF(currentRun.runDefinitions.traversableDropMethod),
-                tgt :: LIT(n) :: Nil)
+          Apply(
+            REF(currentRun.runDefinitions.traversableDropMethod),
+            tgt :: LIT(n) :: Nil)
         def needsRuntime =
           (tgt.tpe ne null) && (typeOfMemberNamedDrop(tgt.tpe) == NoType)
 
@@ -109,10 +110,11 @@ trait MatchCodeGen extends Interface {
         if (b.info <:< tp) REF(b)
         else gen.mkCastPreservingAnnotations(REF(b), tp)
       def _isInstanceOf(b: Symbol, tp: Type): Tree =
-        gen.mkIsInstanceOf(REF(b),
-                           tp.withoutAnnotations,
-                           any = true,
-                           wrapInApply = false)
+        gen.mkIsInstanceOf(
+          REF(b),
+          tp.withoutAnnotations,
+          any = true,
+          wrapInApply = false)
 
       def mkZero(tp: Type): Tree = gen.mkConstantZero(tp) match {
         case Constant(null) =>
@@ -174,10 +176,11 @@ trait MatchCodeGen extends Interface {
         flatMap(guard(cond, res), nextBinder, next)
       //  __match.guard(`guardTree`, ()).flatMap((_: P[Unit]) => `next`)
       def flatMapGuard(guardTree: Tree, next: Tree): Tree =
-        flatMapCond(guardTree,
-                    CODE.UNIT,
-                    freshSym(guardTree.pos, pureType(UnitTpe)),
-                    next)
+        flatMapCond(
+          guardTree,
+          CODE.UNIT,
+          freshSym(guardTree.pos, pureType(UnitTpe)),
+          next)
     }
   }
 
@@ -209,8 +212,9 @@ trait MatchCodeGen extends Interface {
             NoPosition,
             newFlags = SYNTHETIC) setInfo restpe.withoutAnnotations
         val matchEnd =
-          newSynthCaseLabel("matchEnd") setInfo MethodType(List(matchRes),
-                                                           restpe)
+          newSynthCaseLabel("matchEnd") setInfo MethodType(
+            List(matchRes),
+            restpe)
 
         def newCaseSym =
           newSynthCaseLabel("case") setInfo MethodType(Nil, restpe)
@@ -222,9 +226,10 @@ trait MatchCodeGen extends Interface {
             val nextCase = newCaseSym
             _currCase = nextCase
 
-            LabelDef(currCase,
-                     Nil,
-                     mkCase(new OptimizedCasegen(matchEnd, nextCase)))
+            LabelDef(
+              currCase,
+              Nil,
+              mkCase(new OptimizedCasegen(matchEnd, nextCase)))
           }
         // must compute catchAll after caseLabels (side-effects nextCase)
         // catchAll.isEmpty iff no synthetic default case needed (the (last) user-defined case is a default)
@@ -310,12 +315,13 @@ trait MatchCodeGen extends Interface {
                               res: Tree,
                               nextBinder: Symbol,
                               next: Tree): Tree =
-          ifThenElseZero(cond,
-                         BLOCK(
-                           condSym === mkTRUE,
-                           nextBinder === res,
-                           next
-                         ))
+          ifThenElseZero(
+            cond,
+            BLOCK(
+              condSym === mkTRUE,
+              nextBinder === res,
+              next
+            ))
       }
     }
   }

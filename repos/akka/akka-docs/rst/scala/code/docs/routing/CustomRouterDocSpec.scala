@@ -83,8 +83,9 @@ final case class RedundancyGroup(routeePaths: immutable.Iterable[String],
     extends Group {
 
   def this(config: Config) =
-    this(routeePaths = immutableSeq(config.getStringList("routees.paths")),
-         nbrCopies = config.getInt("nbr-copies"))
+    this(
+      routeePaths = immutableSeq(config.getStringList("routees.paths")),
+      nbrCopies = config.getInt("nbr-copies"))
 
   override def paths(system: ActorSystem): immutable.Iterable[String] =
     routeePaths
@@ -129,8 +130,9 @@ class CustomRouterDocSpec
 
     val paths = for (n <- 1 to 10) yield ("/user/s" + n)
     val redundancy1: ActorRef =
-      system.actorOf(RedundancyGroup(paths, nbrCopies = 3).props(),
-                     name = "redundancy1")
+      system.actorOf(
+        RedundancyGroup(paths, nbrCopies = 3).props(),
+        name = "redundancy1")
     redundancy1 ! "important"
     //#usage-1
 

@@ -191,10 +191,11 @@ object Tests {
           .toList
           .distinct
     val uniqueTests = distinctBy(tests)(_.name)
-    new ProcessedOptions(uniqueTests,
-                         setup.toList,
-                         cleanup.toList,
-                         testListeners.toList)
+    new ProcessedOptions(
+      uniqueTests,
+      setup.toList,
+      cleanup.toList,
+      testListeners.toList)
   }
 
   private[this] def distinctBy[T, K](in: Seq[T])(f: T => K): Seq[T] = {
@@ -209,15 +210,16 @@ object Tests {
             config: Execution,
             log: Logger): Task[Output] = {
     val o = processOptions(config, discovered, log)
-    testTask(testLoader,
-             frameworks,
-             runners,
-             o.tests,
-             o.setup,
-             o.cleanup,
-             log,
-             o.testListeners,
-             config)
+    testTask(
+      testLoader,
+      frameworks,
+      runners,
+      o.tests,
+      o.setup,
+      o.cleanup,
+      log,
+      o.testListeners,
+      config)
   }
 
   def testTask(loader: ClassLoader,
@@ -266,10 +268,11 @@ object Tests {
         (testFunDef.fullyQualifiedName,
          TestFramework.createTestFunction(
            loader,
-           new TaskDef(testFunDef.fullyQualifiedName + "-" + idx,
-                       testFunDef.fingerprint,
-                       testFunDef.explicitlySpecified,
-                       testFunDef.selectors),
+           new TaskDef(
+             testFunDef.fullyQualifiedName + "-" + idx,
+             testFunDef.fingerprint,
+             testFunDef.explicitlySpecified,
+             testFunDef.selectors),
            testFun.runner,
            nt))
     }
@@ -330,8 +333,9 @@ object Tests {
           val (result, nestedTasks) = testFun.apply()
           val nestedRunnables =
             createNestedRunnables(loader, testFun, nestedTasks)
-          processRunnable(nestedRunnables.toList ::: rst,
-                          (hd._1, result) :: acc)
+          processRunnable(
+            nestedRunnables.toList ::: rst,
+            (hd._1, result) :: acc)
         case Nil => acc
       }
 
@@ -372,9 +376,10 @@ object Tests {
   def discover(frameworks: Seq[Framework],
                analysis: CompileAnalysis,
                log: Logger): (Seq[TestDefinition], Set[String]) =
-    discover(frameworks flatMap TestFramework.getFingerprints,
-             allDefs(analysis),
-             log)
+    discover(
+      frameworks flatMap TestFramework.getFingerprints,
+      allDefs(analysis),
+      log)
 
   def allDefs(analysis: CompileAnalysis) = analysis match {
     case analysis: Analysis =>
@@ -403,19 +408,21 @@ object Tests {
       in collect { case (name, IsModule, print) if names(name) => print }
 
     def toFingerprints(d: Discovered): Seq[Fingerprint] =
-      defined(subclasses, d.baseClasses, d.isModule) ++ defined(annotations,
-                                                                d.annotations,
-                                                                d.isModule)
+      defined(subclasses, d.baseClasses, d.isModule) ++ defined(
+        annotations,
+        d.annotations,
+        d.isModule)
 
     val discovered =
       Discovery(firsts(subclasses), firsts(annotations))(definitions)
     // TODO: To pass in correct explicitlySpecified and selectors
     val tests = for ((df, di) <- discovered; fingerprint <- toFingerprints(di))
       yield
-        new TestDefinition(df.name,
-                           fingerprint,
-                           false,
-                           Array(new SuiteSelector))
+        new TestDefinition(
+          df.name,
+          fingerprint,
+          false,
+          Array(new SuiteSelector))
     val mains = discovered collect { case (df, di) if di.hasMain => df.name }
     (tests, mains.toSet)
   }

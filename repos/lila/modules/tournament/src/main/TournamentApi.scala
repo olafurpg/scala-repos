@@ -106,8 +106,9 @@ private[tournament] final class TournamentApi(
         .sortBy(_.bestRank)
         .headOption ?? { bestCandidate =>
         def switch =
-          TournamentRepo.setFeaturedGameId(tour.id,
-                                           bestCandidate.pairing.gameId)
+          TournamentRepo.setFeaturedGameId(
+            tour.id,
+            bestCandidate.pairing.gameId)
         curOption.filter(_.pairing.playing) match {
           case Some(current) if bestCandidate.bestRank < current.bestRank =>
             switch
@@ -400,11 +401,12 @@ private[tournament] final class TournamentApi(
     private val debouncer = system.actorOf(Props(new Debouncer(10 seconds, {
       (_: Debouncer.Nothing) =>
         fetchVisibleTournaments foreach { vis =>
-          site ! SendToFlag("tournament",
-                            Json.obj(
-                              "t" -> "reload",
-                              "d" -> scheduleJsonView(vis)
-                            ))
+          site ! SendToFlag(
+            "tournament",
+            Json.obj(
+              "t" -> "reload",
+              "d" -> scheduleJsonView(vis)
+            ))
         }
         TournamentRepo.promotable foreach { tours =>
           renderer ? TournamentTable(tours) map {

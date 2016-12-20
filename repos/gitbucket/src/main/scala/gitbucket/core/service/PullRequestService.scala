@@ -86,15 +86,16 @@ trait PullRequestService { self: IssuesService =>
                         requestBranch: String,
                         commitIdFrom: String,
                         commitIdTo: String)(implicit s: Session): Unit =
-    PullRequests insert PullRequest(originUserName,
-                                    originRepositoryName,
-                                    issueId,
-                                    originBranch,
-                                    requestUserName,
-                                    requestRepositoryName,
-                                    requestBranch,
-                                    commitIdFrom,
-                                    commitIdTo)
+    PullRequests insert PullRequest(
+      originUserName,
+      originRepositoryName,
+      issueId,
+      originBranch,
+      requestUserName,
+      requestRepositoryName,
+      requestBranch,
+      commitIdFrom,
+      commitIdTo)
 
   def getPullRequestsByRequest(
       userName: String,
@@ -155,18 +156,20 @@ trait PullRequestService { self: IssuesService =>
               .exists
               .run) {
           val (commitIdTo, commitIdFrom) =
-            JGitUtil.updatePullRequest(pullreq.userName,
-                                       pullreq.repositoryName,
-                                       pullreq.branch,
-                                       pullreq.issueId,
-                                       pullreq.requestUserName,
-                                       pullreq.requestRepositoryName,
-                                       pullreq.requestBranch)
-          updateCommitId(pullreq.userName,
-                         pullreq.repositoryName,
-                         pullreq.issueId,
-                         commitIdTo,
-                         commitIdFrom)
+            JGitUtil.updatePullRequest(
+              pullreq.userName,
+              pullreq.repositoryName,
+              pullreq.branch,
+              pullreq.issueId,
+              pullreq.requestUserName,
+              pullreq.requestRepositoryName,
+              pullreq.requestBranch)
+          updateCommitId(
+            pullreq.userName,
+            pullreq.repositoryName,
+            pullreq.issueId,
+            commitIdTo,
+            commitIdFrom)
         }
     }
 

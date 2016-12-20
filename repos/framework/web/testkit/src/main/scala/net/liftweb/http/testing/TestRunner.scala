@@ -141,8 +141,9 @@ class TestRunner(clearDB: Box[() => Any],
                     ex match {
                       case null => base
                       case _ =>
-                        combineStack(ex.getCause,
-                                     ex.getStackTrace.toList ::: base)
+                        combineStack(
+                          ex.getCause,
+                          ex.getStackTrace.toList ::: base)
                     }
                   val trace = combineStack(e, Nil)
                     .takeWhile(

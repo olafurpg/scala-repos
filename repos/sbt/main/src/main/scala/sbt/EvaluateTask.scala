@@ -135,19 +135,21 @@ final object EvaluateTaskConfig {
     AdaptedTaskConfig
   }
 
-  @deprecated("Use the alternative that specifies minForcegcInterval",
-              "0.13.9")
+  @deprecated(
+    "Use the alternative that specifies minForcegcInterval",
+    "0.13.9")
   def apply(restrictions: Seq[Tags.Rule],
             checkCycles: Boolean,
             progressReporter: ExecuteProgress[Task],
             cancelStrategy: TaskCancellationStrategy,
             forceGarbageCollection: Boolean): EvaluateTaskConfig =
-    apply(restrictions,
-          checkCycles,
-          progressReporter,
-          cancelStrategy,
-          forceGarbageCollection,
-          GCUtil.defaultMinForcegcInterval)
+    apply(
+      restrictions,
+      checkCycles,
+      progressReporter,
+      cancelStrategy,
+      forceGarbageCollection,
+      GCUtil.defaultMinForcegcInterval)
 
   /** Raw constructor for EvaluateTaskConfig. */
   def apply(restrictions: Seq[Tags.Rule],
@@ -190,13 +192,15 @@ object PluginData {
             definitionClasspath: Seq[Attributed[File]],
             resolvers: Option[Seq[Resolver]],
             report: Option[UpdateReport]): PluginData =
-    PluginData(dependencyClasspath,
-               definitionClasspath,
-               resolvers,
-               report,
-               Nil)
-  @deprecated("Use the alternative that specifies the specific classpaths.",
-              "0.13.0")
+    PluginData(
+      dependencyClasspath,
+      definitionClasspath,
+      resolvers,
+      report,
+      Nil)
+  @deprecated(
+    "Use the alternative that specifies the specific classpaths.",
+    "0.13.0")
   def apply(classpath: Seq[Attributed[File]],
             resolvers: Option[Seq[Resolver]],
             report: Option[UpdateReport]): PluginData =
@@ -222,18 +226,20 @@ object EvaluateTask {
 
   @deprecated("Use extractedTaskConfig.", "0.13.0")
   def defaultConfig(extracted: Extracted, structure: BuildStructure) =
-    EvaluateConfig(false,
-                   restrictions(extracted, structure),
-                   progress = defaultProgress)
+    EvaluateConfig(
+      false,
+      restrictions(extracted, structure),
+      progress = defaultProgress)
 
   @deprecated("Use other extractedTaskConfig", "0.13.2")
   def extractedConfig(extracted: Extracted,
                       structure: BuildStructure): EvaluateConfig = {
     val workers = restrictions(extracted, structure)
     val canCancel = cancelable(extracted, structure)
-    EvaluateConfig(cancelable = canCancel,
-                   restrictions = workers,
-                   progress = defaultProgress)
+    EvaluateConfig(
+      cancelable = canCancel,
+      restrictions = workers,
+      progress = defaultProgress)
   }
   @deprecated("Use other extractedTaskConfig", "0.13.5")
   def extractedConfig(extracted: Extracted,
@@ -242,9 +248,10 @@ object EvaluateTask {
     val workers = restrictions(extracted, structure)
     val canCancel = cancelable(extracted, structure)
     val progress = executeProgress(extracted, structure, state)
-    EvaluateConfig(cancelable = canCancel,
-                   restrictions = workers,
-                   progress = progress)
+    EvaluateConfig(
+      cancelable = canCancel,
+      restrictions = workers,
+      progress = progress)
   }
   def extractedTaskConfig(extracted: Extracted,
                           structure: BuildStructure,
@@ -268,10 +275,11 @@ object EvaluateTask {
   }
   def restrictions(extracted: Extracted,
                    structure: BuildStructure): Seq[Tags.Rule] =
-    getSetting(Keys.concurrentRestrictions,
-               defaultRestrictions(extracted, structure),
-               extracted,
-               structure)
+    getSetting(
+      Keys.concurrentRestrictions,
+      defaultRestrictions(extracted, structure),
+      extracted,
+      structure)
   def maxWorkers(extracted: Extracted, structure: BuildStructure): Int =
     if (getSetting(Keys.parallelExecution, true, extracted, structure))
       SystemProcessors
@@ -299,17 +307,19 @@ object EvaluateTask {
   // TODO - Should this pull from Global or from the project itself?
   private[sbt] def forcegc(extracted: Extracted,
                            structure: BuildStructure): Boolean =
-    getSetting(Keys.forcegc in Global,
-               GCUtil.defaultForceGarbageCollection,
-               extracted,
-               structure)
+    getSetting(
+      Keys.forcegc in Global,
+      GCUtil.defaultForceGarbageCollection,
+      extracted,
+      structure)
   // TODO - Should this pull from Global or from the project itself?
   private[sbt] def minForcegcInterval(extracted: Extracted,
                                       structure: BuildStructure): Duration =
-    getSetting(Keys.minForcegcInterval in Global,
-               GCUtil.defaultMinForcegcInterval,
-               extracted,
-               structure)
+    getSetting(
+      Keys.minForcegcInterval in Global,
+      GCUtil.defaultMinForcegcInterval,
+      extracted,
+      structure)
 
   def getSetting[T](key: SettingKey[T],
                     default: T,
@@ -325,15 +335,17 @@ object EvaluateTask {
 
   def evalPluginDef(log: Logger)(pluginDef: BuildStructure,
                                  state: State): PluginData = {
-    val root = ProjectRef(pluginDef.root,
-                          Load.getRootProject(pluginDef.units)(pluginDef.root))
+    val root = ProjectRef(
+      pluginDef.root,
+      Load.getRootProject(pluginDef.units)(pluginDef.root))
     val pluginKey = pluginData
     val config = extractedTaskConfig(Project.extract(state), pluginDef, state)
-    val evaluated = apply(pluginDef,
-                          ScopedKey(pluginKey.scope, pluginKey.key),
-                          state,
-                          root,
-                          config)
+    val evaluated = apply(
+      pluginDef,
+      ScopedKey(pluginKey.scope, pluginKey.key),
+      state,
+      root,
+      config)
     val (newS, result) =
       evaluated getOrElse sys.error(
         "Plugin data does not exist for plugin definition at " +
@@ -351,11 +363,12 @@ object EvaluateTask {
                       ref: ProjectRef,
                       checkCycles: Boolean = false,
                       maxWorkers: Int = SystemProcessors): Option[Result[T]] =
-    apply(structure,
-          taskKey,
-          state,
-          ref,
-          EvaluateConfig(false, defaultRestrictions(maxWorkers), checkCycles))
+    apply(
+      structure,
+      taskKey,
+      state,
+      ref,
+      EvaluateConfig(false, defaultRestrictions(maxWorkers), checkCycles))
       .map(_._2)
 
   /**
@@ -367,11 +380,12 @@ object EvaluateTask {
                taskKey: ScopedKey[Task[T]],
                state: State,
                ref: ProjectRef): Option[(State, Result[T])] =
-    apply[T](structure,
-             taskKey,
-             state,
-             ref,
-             extractedTaskConfig(Project.extract(state), structure, state))
+    apply[T](
+      structure,
+      taskKey,
+      state,
+      ref,
+      extractedTaskConfig(Project.extract(state), structure, state))
 
   /**
     * Evaluates `taskKey` and returns the new State and the result of the task wrapped in Some.
@@ -489,8 +503,9 @@ object EvaluateTask {
     val log = state.log
     log.debug(
       s"Running task... Cancel: ${config.cancelStrategy}, check cycles: ${config.checkCycles}, forcegc: ${config.forceGarbageCollection}")
-    val tags = tagged[Task[_]](_.info get tagsKey getOrElse Map.empty,
-                               Tags.predicate(config.restrictions))
+    val tags = tagged[Task[_]](
+      _.info get tagsKey getOrElse Map.empty,
+      Tags.predicate(config.restrictions))
     val (service, shutdownThreads) =
       completionService[Task[_], Completed](tags, (s: String) => log.warn(s))
 
@@ -510,9 +525,10 @@ object EvaluateTask {
     }
     def run() = {
       val x =
-        new Execute[Task](Execute.config(config.checkCycles, overwriteNode),
-                          triggers,
-                          config.progressReporter)(taskToNode)
+        new Execute[Task](
+          Execute.config(config.checkCycles, overwriteNode),
+          triggers,
+          config.progressReporter)(taskToNode)
       val (newState, result) = try {
         val results = x.runKeep(root)(service)
         storeValuesForPrevious(results, state, streams)

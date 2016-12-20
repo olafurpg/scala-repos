@@ -135,9 +135,9 @@ class FlowJoinSpec
 
     "allow for concat cycle" in assertAllStagesStopped {
       val flow =
-        Flow.fromGraph(GraphDSL.create(TestSource.probe[String](system),
-                                       Sink.head[String])(Keep.both) {
-          implicit b ⇒ (source, sink) ⇒
+        Flow.fromGraph(
+          GraphDSL.create(TestSource.probe[String](system), Sink.head[String])(
+            Keep.both) { implicit b ⇒ (source, sink) ⇒
             import GraphDSL.Implicits._
             val concat = b.add(Concat[String](2))
             val broadcast = b.add(Broadcast[String](2, eagerCancel = true))
@@ -146,7 +146,7 @@ class FlowJoinSpec
             broadcast.out(0) ~> sink
 
             FlowShape(concat.in(1), broadcast.out(1))
-        })
+          })
 
       val (probe, result) = flow.join(Flow[String]).run()
       probe.sendNext("lonely traveler")

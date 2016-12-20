@@ -18,10 +18,11 @@ private[team] object Member {
   def makeId(team: String, user: String) = user + "@" + team
 
   def make(team: String, user: String): Member =
-    new Member(id = makeId(team, user),
-               user = user,
-               team = team,
-               date = DateTime.now)
+    new Member(
+      id = makeId(team, user),
+      user = user,
+      team = team,
+      date = DateTime.now)
 
   import lila.db.JsTube, JsTube.Helpers._
   import play.api.libs.json._

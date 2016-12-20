@@ -57,20 +57,24 @@ class BlockGeneratorSuite extends SparkFunSuite with BeforeAndAfter {
 
     // Verify that creating the generator does not start it
     blockGenerator = new BlockGenerator(listener, 0, conf, clock)
-    assert(blockGenerator.isActive() === false,
-           "block generator active before start()")
-    assert(blockGenerator.isStopped() === false,
-           "block generator stopped before start()")
+    assert(
+      blockGenerator.isActive() === false,
+      "block generator active before start()")
+    assert(
+      blockGenerator.isStopped() === false,
+      "block generator stopped before start()")
     assert(listener.onAddDataCalled === false)
     assert(listener.onGenerateBlockCalled === false)
     assert(listener.onPushBlockCalled === false)
 
     // Verify start marks the generator active, but does not call the callbacks
     blockGenerator.start()
-    assert(blockGenerator.isActive() === true,
-           "block generator active after start()")
-    assert(blockGenerator.isStopped() === false,
-           "block generator stopped after start()")
+    assert(
+      blockGenerator.isActive() === true,
+      "block generator active after start()")
+    assert(
+      blockGenerator.isStopped() === false,
+      "block generator stopped after start()")
     withClue("callbacks called before adding data") {
       assert(listener.onAddDataCalled === false)
       assert(listener.onGenerateBlockCalled === false)
@@ -209,8 +213,9 @@ class BlockGeneratorSuite extends SparkFunSuite with BeforeAndAfter {
       assert(thread.isAlive === false)
     }
     assert(blockGenerator.isStopped() === true) // generator has finally been completely stopped
-    assert(listener.pushedData.asScala.toSeq === data,
-           "All data not pushed by stop()")
+    assert(
+      listener.pushedData.asScala.toSeq === data,
+      "All data not pushed by stop()")
   }
 
   test("block push errors are reported") {

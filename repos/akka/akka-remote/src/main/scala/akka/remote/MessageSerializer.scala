@@ -22,11 +22,12 @@ private[akka] object MessageSerializer {
   def deserialize(system: ExtendedActorSystem,
                   messageProtocol: SerializedMessage): AnyRef = {
     SerializationExtension(system)
-      .deserialize(messageProtocol.getMessage.toByteArray,
-                   messageProtocol.getSerializerId,
-                   if (messageProtocol.hasMessageManifest)
-                     messageProtocol.getMessageManifest.toStringUtf8
-                   else "")
+      .deserialize(
+        messageProtocol.getMessage.toByteArray,
+        messageProtocol.getSerializerId,
+        if (messageProtocol.hasMessageManifest)
+          messageProtocol.getMessageManifest.toStringUtf8
+        else "")
       .get
   }
 

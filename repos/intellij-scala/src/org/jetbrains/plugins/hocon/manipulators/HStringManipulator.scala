@@ -55,11 +55,13 @@ class HStringManipulator extends AbstractElementManipulator[HString] {
     case UnquotedString =>
       new TextRange(0, element.getTextLength)
     case QuotedString =>
-      new TextRange(1,
-                    element.getTextLength - (if (element.isClosed) 1 else 0))
+      new TextRange(
+        1,
+        element.getTextLength - (if (element.isClosed) 1 else 0))
     case MultilineString =>
-      new TextRange(3,
-                    element.getTextLength - (if (element.isClosed) 3 else 0))
+      new TextRange(
+        3,
+        element.getTextLength - (if (element.isClosed) 3 else 0))
     case _ =>
       super.getRangeInElement(element)
   }

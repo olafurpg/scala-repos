@@ -206,27 +206,31 @@ class VersionedBatchedStoreTest extends WordSpec {
       // Now check that the inMemory == matches the hadoop job we ran
 
       assert(
-        TestUtil.compareMaps(original,
-                             inMemoryA,
-                             testStoreAReader(lastExpectedWriteBatch),
-                             "StoreA") == true)
+        TestUtil.compareMaps(
+          original,
+          inMemoryA,
+          testStoreAReader(lastExpectedWriteBatch),
+          "StoreA") == true)
       assert(
-        TestUtil.compareMaps(original,
-                             inMemoryB,
-                             testStoreBReader(lastExpectedWriteBatch),
-                             "StoreB") == true)
+        TestUtil.compareMaps(
+          original,
+          inMemoryB,
+          testStoreBReader(lastExpectedWriteBatch),
+          "StoreB") == true)
       assert(
-        TestUtil.compareMaps(original,
-                             inMemoryA,
-                             testStoreCReader(lastExpectedWriteBatch),
-                             "StoreC") == true)
+        TestUtil.compareMaps(
+          original,
+          inMemoryA,
+          testStoreCReader(lastExpectedWriteBatch),
+          "StoreC") == true)
 
       // Now for total sanity just compare store's A and C's output. it should be identical
       assert(
-        TestUtil.compareMaps(original,
-                             testStoreAReader(lastExpectedWriteBatch),
-                             testStoreCReader(lastExpectedWriteBatch),
-                             "StoreC vs StoreA") == true)
+        TestUtil.compareMaps(
+          original,
+          testStoreAReader(lastExpectedWriteBatch),
+          testStoreCReader(lastExpectedWriteBatch),
+          "StoreC vs StoreA") == true)
     }
   }
 }

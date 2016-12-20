@@ -107,10 +107,11 @@ object Dependencies {
   val mvnWagonFile = "org.apache.maven.wagon" % "wagon-file" % mvnWagonVersion
    */
   def aetherLibs =
-    Seq(guava,
-        javaxInject,
-        sisuPlexus,
-        aetherImpl,
-        aetherConnectorBasic,
-        mvnAether)
+    Seq(
+      guava,
+      javaxInject,
+      sisuPlexus,
+      aetherImpl,
+      aetherConnectorBasic,
+      mvnAether)
 }

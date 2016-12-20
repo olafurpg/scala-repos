@@ -473,8 +473,9 @@ abstract class Macro extends RichTypes { self =>
       c.inferImplicitValue(ourPt, silent = true) match {
         case success if success != EmptyTree =>
           debug(s"no, because there's $success")
-          c.abort(c.enclosingPosition,
-                  "stepping aside: there are other candidates")
+          c.abort(
+            c.enclosingPosition,
+            "stepping aside: there are other candidates")
         // c.diverge()
         case _ =>
           debug("yes, there are no obstacles. entering " + ourPt)

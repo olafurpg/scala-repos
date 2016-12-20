@@ -20,8 +20,16 @@ package org.apache.spark.mllib.clustering
 import scala.util.Random
 
 import org.apache.spark.SparkFunSuite
-import org.apache.spark.mllib.linalg.{DenseVector, SparseVector, Vector, Vectors}
-import org.apache.spark.mllib.util.{LocalClusterSparkContext, MLlibTestSparkContext}
+import org.apache.spark.mllib.linalg.{
+  DenseVector,
+  SparseVector,
+  Vector,
+  Vectors
+}
+import org.apache.spark.mllib.util.{
+  LocalClusterSparkContext,
+  MLlibTestSparkContext
+}
 import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.util.Utils
 
@@ -31,11 +39,11 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
 
   test("single cluster") {
     val data = sc.parallelize(
-        Array(
-            Vectors.dense(1.0, 2.0, 6.0),
-            Vectors.dense(1.0, 3.0, 0.0),
-            Vectors.dense(1.0, 4.0, 6.0)
-        ))
+      Array(
+        Vectors.dense(1.0, 2.0, 6.0),
+        Vectors.dense(1.0, 3.0, 0.0),
+        Vectors.dense(1.0, 4.0, 6.0)
+      ))
 
     val center = Vectors.dense(1.0, 3.0, 4.0)
 
@@ -58,22 +66,29 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(model.clusterCenters.head ~== center absTol 1E-5)
 
     model = KMeans.train(
-        data, k = 1, maxIterations = 1, runs = 1, initializationMode = RANDOM)
+      data,
+      k = 1,
+      maxIterations = 1,
+      runs = 1,
+      initializationMode = RANDOM)
     assert(model.clusterCenters.head ~== center absTol 1E-5)
 
-    model = KMeans.train(data,
-                         k = 1,
-                         maxIterations = 1,
-                         runs = 1,
-                         initializationMode = K_MEANS_PARALLEL)
+    model = KMeans.train(
+      data,
+      k = 1,
+      maxIterations = 1,
+      runs = 1,
+      initializationMode = K_MEANS_PARALLEL)
     assert(model.clusterCenters.head ~== center absTol 1E-5)
   }
 
   test("no distinct points") {
-    val data = sc.parallelize(Array(Vectors.dense(1.0, 2.0, 3.0),
-                                    Vectors.dense(1.0, 2.0, 3.0),
-                                    Vectors.dense(1.0, 2.0, 3.0)),
-                              2)
+    val data = sc.parallelize(
+      Array(
+        Vectors.dense(1.0, 2.0, 3.0),
+        Vectors.dense(1.0, 2.0, 3.0),
+        Vectors.dense(1.0, 2.0, 3.0)),
+      2)
     val center = Vectors.dense(1.0, 2.0, 3.0)
 
     // Make sure code runs.
@@ -83,8 +98,8 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
 
   test("more clusters than points") {
     val data = sc.parallelize(
-        Array(Vectors.dense(1.0, 2.0, 3.0), Vectors.dense(1.0, 3.0, 4.0)),
-        2)
+      Array(Vectors.dense(1.0, 2.0, 3.0), Vectors.dense(1.0, 3.0, 4.0)),
+      2)
 
     // Make sure code runs.
     var model = KMeans.train(data, k = 3, maxIterations = 1)
@@ -98,20 +113,22 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     for (initMode <- Seq(RANDOM, K_MEANS_PARALLEL)) {
       // Create three deterministic models and compare cluster means
-      val model1 = KMeans.train(rdd,
-                                k = 10,
-                                maxIterations = 2,
-                                runs = 1,
-                                initializationMode = initMode,
-                                seed = 42)
+      val model1 = KMeans.train(
+        rdd,
+        k = 10,
+        maxIterations = 2,
+        runs = 1,
+        initializationMode = initMode,
+        seed = 42)
       val centers1 = model1.clusterCenters
 
-      val model2 = KMeans.train(rdd,
-                                k = 10,
-                                maxIterations = 2,
-                                runs = 1,
-                                initializationMode = initMode,
-                                seed = 42)
+      val model2 = KMeans.train(
+        rdd,
+        k = 10,
+        maxIterations = 2,
+        runs = 1,
+        initializationMode = initMode,
+        seed = 42)
       val centers2 = model2.clusterCenters
 
       centers1.zip(centers2).foreach {
@@ -123,9 +140,9 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
 
   test("single cluster with big dataset") {
     val smallData = Array(
-        Vectors.dense(1.0, 2.0, 6.0),
-        Vectors.dense(1.0, 3.0, 0.0),
-        Vectors.dense(1.0, 4.0, 6.0)
+      Vectors.dense(1.0, 2.0, 6.0),
+      Vectors.dense(1.0, 3.0, 0.0),
+      Vectors.dense(1.0, 4.0, 6.0)
     )
     val data = sc.parallelize((1 to 100).flatMap(_ => smallData), 4)
 
@@ -151,14 +168,19 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(model.clusterCenters.head ~== center absTol 1E-5)
 
     model = KMeans.train(
-        data, k = 1, maxIterations = 1, runs = 1, initializationMode = RANDOM)
+      data,
+      k = 1,
+      maxIterations = 1,
+      runs = 1,
+      initializationMode = RANDOM)
     assert(model.clusterCenters.head ~== center absTol 1E-5)
 
-    model = KMeans.train(data,
-                         k = 1,
-                         maxIterations = 1,
-                         runs = 1,
-                         initializationMode = K_MEANS_PARALLEL)
+    model = KMeans.train(
+      data,
+      k = 1,
+      maxIterations = 1,
+      runs = 1,
+      initializationMode = K_MEANS_PARALLEL)
     assert(model.clusterCenters.head ~== center absTol 1E-5)
   }
 
@@ -168,12 +190,12 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
     val data = sc.parallelize((1 to 100).flatMap { i =>
       val x = i / 1000.0
       Array(
-          Vectors.sparse(n, Seq((0, 1.0 + x), (1, 2.0), (2, 6.0))),
-          Vectors.sparse(n, Seq((0, 1.0 - x), (1, 2.0), (2, 6.0))),
-          Vectors.sparse(n, Seq((0, 1.0), (1, 3.0 + x))),
-          Vectors.sparse(n, Seq((0, 1.0), (1, 3.0 - x))),
-          Vectors.sparse(n, Seq((0, 1.0), (1, 4.0), (2, 6.0 + x))),
-          Vectors.sparse(n, Seq((0, 1.0), (1, 4.0), (2, 6.0 - x)))
+        Vectors.sparse(n, Seq((0, 1.0 + x), (1, 2.0), (2, 6.0))),
+        Vectors.sparse(n, Seq((0, 1.0 - x), (1, 2.0), (2, 6.0))),
+        Vectors.sparse(n, Seq((0, 1.0), (1, 3.0 + x))),
+        Vectors.sparse(n, Seq((0, 1.0), (1, 3.0 - x))),
+        Vectors.sparse(n, Seq((0, 1.0), (1, 4.0), (2, 6.0 + x))),
+        Vectors.sparse(n, Seq((0, 1.0), (1, 4.0), (2, 6.0 - x)))
       )
     }, 4)
 
@@ -200,14 +222,19 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(model.clusterCenters.head ~== center absTol 1E-5)
 
     model = KMeans.train(
-        data, k = 1, maxIterations = 1, runs = 1, initializationMode = RANDOM)
+      data,
+      k = 1,
+      maxIterations = 1,
+      runs = 1,
+      initializationMode = RANDOM)
     assert(model.clusterCenters.head ~== center absTol 1E-5)
 
-    model = KMeans.train(data,
-                         k = 1,
-                         maxIterations = 1,
-                         runs = 1,
-                         initializationMode = K_MEANS_PARALLEL)
+    model = KMeans.train(
+      data,
+      k = 1,
+      maxIterations = 1,
+      runs = 1,
+      initializationMode = K_MEANS_PARALLEL)
     assert(model.clusterCenters.head ~== center absTol 1E-5)
 
     data.unpersist()
@@ -228,11 +255,11 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
     }
 
     val points = Seq(
-        Vectors.dense(1.0, 2.0, 6.0),
-        Vectors.dense(1.0, 3.0, 0.0),
-        Vectors.dense(1.0, 4.0, 6.0),
-        Vectors.dense(1.0, 0.0, 1.0),
-        Vectors.dense(1.0, 1.0, 1.0)
+      Vectors.dense(1.0, 2.0, 6.0),
+      Vectors.dense(1.0, 3.0, 0.0),
+      Vectors.dense(1.0, 4.0, 6.0),
+      Vectors.dense(1.0, 0.0, 1.0),
+      Vectors.dense(1.0, 1.0, 1.0)
     )
     val rdd = sc.parallelize(points)
 
@@ -243,36 +270,36 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
     var model = KMeans.train(rdd, k = 5, maxIterations = 1)
 
     assert(
-        model.clusterCenters
-          .sortBy(VectorWithCompare(_))
-          .zip(points.sortBy(VectorWithCompare(_)))
-          .forall(x => x._1 ~== (x._2) absTol 1E-5))
+      model.clusterCenters
+        .sortBy(VectorWithCompare(_))
+        .zip(points.sortBy(VectorWithCompare(_)))
+        .forall(x => x._1 ~== (x._2) absTol 1E-5))
 
     // Iterations of Lloyd's should not change the answer either
     model = KMeans.train(rdd, k = 5, maxIterations = 10)
     assert(
-        model.clusterCenters
-          .sortBy(VectorWithCompare(_))
-          .zip(points.sortBy(VectorWithCompare(_)))
-          .forall(x => x._1 ~== (x._2) absTol 1E-5))
+      model.clusterCenters
+        .sortBy(VectorWithCompare(_))
+        .zip(points.sortBy(VectorWithCompare(_)))
+        .forall(x => x._1 ~== (x._2) absTol 1E-5))
 
     // Neither should more runs
     model = KMeans.train(rdd, k = 5, maxIterations = 10, runs = 5)
     assert(
-        model.clusterCenters
-          .sortBy(VectorWithCompare(_))
-          .zip(points.sortBy(VectorWithCompare(_)))
-          .forall(x => x._1 ~== (x._2) absTol 1E-5))
+      model.clusterCenters
+        .sortBy(VectorWithCompare(_))
+        .zip(points.sortBy(VectorWithCompare(_)))
+        .forall(x => x._1 ~== (x._2) absTol 1E-5))
   }
 
   test("two clusters") {
     val points = Seq(
-        Vectors.dense(0.0, 0.0),
-        Vectors.dense(0.0, 0.1),
-        Vectors.dense(0.1, 0.0),
-        Vectors.dense(9.0, 0.0),
-        Vectors.dense(9.0, 0.2),
-        Vectors.dense(9.2, 0.0)
+      Vectors.dense(0.0, 0.0),
+      Vectors.dense(0.0, 0.1),
+      Vectors.dense(0.1, 0.0),
+      Vectors.dense(9.0, 0.0),
+      Vectors.dense(9.0, 0.2),
+      Vectors.dense(9.2, 0.0)
     )
     val rdd = sc.parallelize(points, 3)
 
@@ -311,10 +338,10 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
 
   test("Initialize using given cluster centers") {
     val points = Seq(
-        Vectors.dense(0.0, 0.0),
-        Vectors.dense(1.0, 0.0),
-        Vectors.dense(0.0, 1.0),
-        Vectors.dense(1.0, 1.0)
+      Vectors.dense(0.0, 0.0),
+      Vectors.dense(1.0, 0.0),
+      Vectors.dense(0.0, 1.0),
+      Vectors.dense(1.0, 1.0)
     )
     val rdd = sc.parallelize(points, 3)
     // creating an initial model
@@ -351,7 +378,7 @@ object KMeansSuite extends SparkFunSuite {
         assert(ca === cb)
       case _ =>
         throw new AssertionError(
-            "checkEqual failed since the two clusters were not identical.\n")
+          "checkEqual failed since the two clusters were not identical.\n")
     }
   }
 }

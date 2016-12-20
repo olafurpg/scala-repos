@@ -64,9 +64,10 @@ class CircuitBreaker(potentiallyFailingService: ActorRef)
   import SimpleService._
 
   val serviceCircuitBreaker = context.actorOf(
-    CircuitBreakerPropsBuilder(maxFailures = 3,
-                               callTimeout = 2.seconds,
-                               resetTimeout = 30.seconds)
+    CircuitBreakerPropsBuilder(
+      maxFailures = 3,
+      callTimeout = 2.seconds,
+      resetTimeout = 30.seconds)
       .copy(failureDetector = {
         _ match {
           case Response(Left(_)) ⇒ true
@@ -108,9 +109,10 @@ class CircuitBreakerAsk(potentiallyFailingService: ActorRef)
   implicit val askTimeout: Timeout = 2.seconds
 
   val serviceCircuitBreaker = context.actorOf(
-    CircuitBreakerPropsBuilder(maxFailures = 3,
-                               callTimeout = askTimeout,
-                               resetTimeout = 30.seconds)
+    CircuitBreakerPropsBuilder(
+      maxFailures = 3,
+      callTimeout = askTimeout,
+      resetTimeout = 30.seconds)
       .copy(failureDetector = {
         _ match {
           case Response(Left(_)) ⇒ true

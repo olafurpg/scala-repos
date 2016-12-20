@@ -138,8 +138,9 @@ class ALSSuite extends SparkFunSuite with MLlibTestSparkContext {
 
   test("pseudorandomness") {
     val ratings =
-      sc.parallelize(ALSSuite.generateRatings(10, 20, 5, 0.5, false, false)._1,
-                     2)
+      sc.parallelize(
+        ALSSuite.generateRatings(10, 20, 5, 0.5, false, false)._1,
+        2)
     val model11 = ALS.train(ratings, 5, 1, 1.0, 2, 1)
     val model12 = ALS.train(ratings, 5, 1, 1.0, 2, 1)
     val u11 = model11.userFeatures.values.flatMap(_.toList).collect().toList
@@ -152,8 +153,9 @@ class ALSSuite extends SparkFunSuite with MLlibTestSparkContext {
 
   test("Storage Level for RDDs in model") {
     val ratings =
-      sc.parallelize(ALSSuite.generateRatings(10, 20, 5, 0.5, false, false)._1,
-                     2)
+      sc.parallelize(
+        ALSSuite.generateRatings(10, 20, 5, 0.5, false, false)._1,
+        2)
     var storageLevel = StorageLevel.MEMORY_ONLY
     var model = new ALS()
       .setRank(5)
@@ -283,14 +285,15 @@ class ALSSuite extends SparkFunSuite with MLlibTestSparkContext {
         if (math.abs(prediction - correct) > matchThreshold) {
           fail(
             ("Model failed to predict (%d, %d): %f vs %f\ncorr: %s\npred: %s\nU: %s\n P: %s")
-              .format(u,
-                      p,
-                      correct,
-                      prediction,
-                      trueRatings,
-                      predictedRatings,
-                      predictedU,
-                      predictedP))
+              .format(
+                u,
+                p,
+                correct,
+                prediction,
+                trueRatings,
+                predictedRatings,
+                predictedU,
+                predictedP))
         }
       }
     } else {

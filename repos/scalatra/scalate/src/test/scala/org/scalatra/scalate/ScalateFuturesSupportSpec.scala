@@ -110,9 +110,10 @@ class ScalateFuturesSupportServlet(exec: ExecutorService)
     new AsyncResult {
       val is = Future {
         println("Rendering reverse routing template")
-        layoutTemplate("/urlGenerationWithParams.jade",
-                       ("a" -> params("a")),
-                       ("b" -> params("b")))
+        layoutTemplate(
+          "/urlGenerationWithParams.jade",
+          ("a" -> params("a")),
+          ("b" -> params("b")))
       }
     }
   }

@@ -56,16 +56,17 @@ abstract class ScFunctionElementType[Func <: ScFunction](debugName: String)
       }
     }
     val isImplicit = psi.hasModifierProperty("implicit")
-    new ScFunctionStubImpl[ParentPsi](parentStub,
-                                      this,
-                                      psi.name,
-                                      psi.isInstanceOf[ScFunctionDeclaration],
-                                      psi.annotationNames.toArray,
-                                      returnTypeText,
-                                      bodyText,
-                                      assign,
-                                      isImplicit,
-                                      psi.containingClass == null)
+    new ScFunctionStubImpl[ParentPsi](
+      parentStub,
+      this,
+      psi.name,
+      psi.isInstanceOf[ScFunctionDeclaration],
+      psi.annotationNames.toArray,
+      returnTypeText,
+      bodyText,
+      assign,
+      isImplicit,
+      psi.containingClass == null)
   }
 
   def serialize(stub: ScFunctionStub, dataStream: StubOutputStream) {
@@ -98,16 +99,17 @@ abstract class ScFunctionElementType[Func <: ScFunction](debugName: String)
     val assign = dataStream.readBoolean
     val isImplicit = dataStream.readBoolean()
     val isLocal = dataStream.readBoolean()
-    new ScFunctionStubImpl(parent,
-                           this,
-                           name,
-                           isDecl,
-                           annotations,
-                           returnTypeText,
-                           bodyText,
-                           assign,
-                           isImplicit,
-                           isLocal)
+    new ScFunctionStubImpl(
+      parent,
+      this,
+      name,
+      isDecl,
+      annotations,
+      returnTypeText,
+      bodyText,
+      assign,
+      isImplicit,
+      isLocal)
   }
 
   def indexStub(stub: ScFunctionStub, sink: IndexSink) {

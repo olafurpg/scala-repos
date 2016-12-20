@@ -137,8 +137,9 @@ class TheMacros(val c: whitebox.Context) {
     // Bail for primitives because the resulting trees with type set to Unit
     // will crash the compiler
     if (tpe.typeSymbol.asClass.isPrimitive)
-      c.abort(c.enclosingPosition,
-              s"Primitive type $tpe may not be used in this context")
+      c.abort(
+        c.enclosingPosition,
+        s"Primitive type $tpe may not be used in this context")
 
     val inferred = c.inferImplicitValue(tpe, silent = true)
     if (inferred.isEmpty)

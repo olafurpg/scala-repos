@@ -92,10 +92,10 @@ trait Evaluation extends Deployment {
   def engineMetric_=[EI, Q, P, A](
       engineMetric: (BaseEngine[EI, Q, P, A], Metric[EI, Q, P, A, _])) {
     engineEvaluator = (engineMetric._1,
-                       MetricEvaluator(metric = engineMetric._2,
-                                       otherMetrics =
-                                         Seq[Metric[EI, Q, P, A, _]](),
-                                       outputPath = "best.json"))
+                       MetricEvaluator(
+                         metric = engineMetric._2,
+                         otherMetrics = Seq[Metric[EI, Q, P, A, _]](),
+                         outputPath = "best.json"))
   }
 
   private[prediction] def engineMetrics: (BaseEngine[_, _, _, _],

@@ -35,9 +35,10 @@ class NullnessAnalyzerTest extends ClearAfterClass {
 
   def newNullnessAnalyzer(methodNode: MethodNode,
                           classInternalName: InternalName = "C") =
-    new AsmAnalyzer(methodNode,
-                    classInternalName,
-                    new NullnessAnalyzer(noOptCompiler.genBCode.bTypes))
+    new AsmAnalyzer(
+      methodNode,
+      classInternalName,
+      new NullnessAnalyzer(noOptCompiler.genBCode.bTypes))
 
   def testNullness(analyzer: AsmAnalyzer[NullnessValue],
                    method: MethodNode,
@@ -46,8 +47,9 @@ class NullnessAnalyzerTest extends ClearAfterClass {
                    nullness: NullnessValue): Unit = {
     for (i <- findInstr(method, query)) {
       val r = analyzer.frameAt(i).getValue(index)
-      assertTrue(s"Expected: $nullness, found: $r. At instr ${textify(i)}",
-                 nullness == r)
+      assertTrue(
+        s"Expected: $nullness, found: $r. At instr ${textify(i)}",
+        nullness == r)
     }
   }
 

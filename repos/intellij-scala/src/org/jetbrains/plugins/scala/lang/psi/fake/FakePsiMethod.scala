@@ -40,11 +40,12 @@ class FakePsiMethod(
   val language = navElement.getLanguage
 } with LightElement(manager, language) with PsiMethod {
   def this(value: ScTypedDefinition, hasModifier: String => Boolean) = {
-    this(value,
-         value.name,
-         Array.empty,
-         value.getType(TypingContext.empty).getOrAny,
-         hasModifier)
+    this(
+      value,
+      value.name,
+      Array.empty,
+      value.getType(TypingContext.empty).getOrAny,
+      hasModifier)
   }
   override def toString: String = name + "()"
 
@@ -126,9 +127,10 @@ class FakePsiMethod(
   def isConstructor: Boolean = false
 
   def getThrowsList: PsiReferenceList =
-    new FakePsiReferenceList(manager,
-                             language,
-                             PsiReferenceList.Role.THROWS_LIST)
+    new FakePsiReferenceList(
+      manager,
+      language,
+      PsiReferenceList.Role.THROWS_LIST)
 
   def isVarArgs: Boolean = false
 
@@ -161,9 +163,10 @@ class FakePsiTypeElement(manager: PsiManager, language: Language, tp: ScType)
   def getInnermostComponentReferenceElement: PsiJavaCodeReferenceElement = null
 
   def getType: PsiType =
-    ScType.toPsi(tp,
-                 manager.getProject,
-                 GlobalSearchScope.allScope(manager.getProject))
+    ScType.toPsi(
+      tp,
+      manager.getProject,
+      GlobalSearchScope.allScope(manager.getProject))
 
   def addAnnotation(qualifiedName: String): PsiAnnotation = null
 
@@ -204,9 +207,10 @@ class FakePsiParameter(manager: PsiManager,
   def getInitializer: PsiExpression = null
 
   def getType: PsiType =
-    ScType.toPsi(parameter.paramType,
-                 manager.getProject,
-                 GlobalSearchScope.allScope(manager.getProject))
+    ScType.toPsi(
+      parameter.paramType,
+      manager.getProject,
+      GlobalSearchScope.allScope(manager.getProject))
 
   def isVarArgs: Boolean = false
 

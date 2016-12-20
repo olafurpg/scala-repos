@@ -250,8 +250,9 @@ final class GBTRegressionModel private[ml] (
 
   @Since("1.4.0")
   override def copy(extra: ParamMap): GBTRegressionModel = {
-    copyValues(new GBTRegressionModel(uid, _trees, _treeWeights, numFeatures),
-               extra).setParent(parent)
+    copyValues(
+      new GBTRegressionModel(uid, _trees, _treeWeights, numFeatures),
+      extra).setParent(parent)
   }
 
   @Since("1.4.0")
@@ -282,9 +283,10 @@ private[ml] object GBTRegressionModel {
     }
     val uid =
       if (parent != null) parent.uid else Identifiable.randomUID("gbtr")
-    new GBTRegressionModel(parent.uid,
-                           newTrees,
-                           oldModel.treeWeights,
-                           numFeatures)
+    new GBTRegressionModel(
+      parent.uid,
+      newTrees,
+      oldModel.treeWeights,
+      numFeatures)
   }
 }

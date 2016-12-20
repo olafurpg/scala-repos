@@ -14,10 +14,11 @@ import java.nio._
 import java.nio.charset._
 
 private[niocharset] object UTF_8
-    extends Charset("UTF-8",
-                    Array( // scalastyle:ignore
-                          "UTF8",
-                          "unicode-1-1-utf-8")) {
+    extends Charset(
+      "UTF-8",
+      Array( // scalastyle:ignore
+        "UTF8",
+        "unicode-1-1-utf-8")) {
 
   import java.lang.Character._
 
@@ -404,8 +405,9 @@ private[niocharset] object UTF_8
           // Here, we need to encode the code point as a surrogate pair.
           // http://en.wikipedia.org/wiki/UTF-16
           val offsetCodePoint = codePoint - 0x10000
-          DecodedMultiByte(((offsetCodePoint >> 10) | 0xd800).toChar,
-                           ((offsetCodePoint & 0x3ff) | 0xdc00).toChar)
+          DecodedMultiByte(
+            ((offsetCodePoint >> 10) | 0xd800).toChar,
+            ((offsetCodePoint & 0x3ff) | 0xdc00).toChar)
         }
       }
     }

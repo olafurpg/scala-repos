@@ -146,11 +146,12 @@ private[spark] class Executor(executorId: String,
                  attemptNumber: Int,
                  taskName: String,
                  serializedTask: ByteBuffer): Unit = {
-    val tr = new TaskRunner(context,
-                            taskId = taskId,
-                            attemptNumber = attemptNumber,
-                            taskName,
-                            serializedTask)
+    val tr = new TaskRunner(
+      context,
+      taskId = taskId,
+      attemptNumber = attemptNumber,
+      taskName,
+      serializedTask)
     runningTasks.put(taskId, tr)
     threadPool.execute(tr)
   }
@@ -242,9 +243,10 @@ private[spark] class Executor(executorId: String,
         taskStart = System.currentTimeMillis()
         var threwException = true
         val value = try {
-          val res = task.run(taskAttemptId = taskId,
-                             attemptNumber = attemptNumber,
-                             metricsSystem = env.metricsSystem)
+          val res = task.run(
+            taskAttemptId = taskId,
+            attemptNumber = attemptNumber,
+            metricsSystem = env.metricsSystem)
           threwException = false
           res
         } finally {
@@ -315,8 +317,9 @@ private[spark] class Executor(executorId: String,
                 s"(${Utils.bytesToString(resultSize)} > ${Utils.bytesToString(maxResultSize)}), " +
                 s"dropping it.")
             ser.serialize(
-              new IndirectTaskResult[Any](TaskResultBlockId(taskId),
-                                          resultSize))
+              new IndirectTaskResult[Any](
+                TaskResultBlockId(taskId),
+                resultSize))
           } else if (resultSize > maxDirectResultSize) {
             val blockId = TaskResultBlockId(taskId)
             env.blockManager.putBytes(
@@ -375,9 +378,10 @@ private[spark] class Executor(executorId: String,
               case _: NotSerializableException =>
                 // t is not serializable so just send the stacktrace
                 ser.serialize(
-                  new ExceptionFailure(t,
-                                       accumulatorUpdates,
-                                       preserveCause = false))
+                  new ExceptionFailure(
+                    t,
+                    accumulatorUpdates,
+                    preserveCause = false))
             }
           }
           execBackend
@@ -433,11 +437,12 @@ private[spark] class Executor(executorId: String,
         val klass = Utils
           .classForName("org.apache.spark.repl.ExecutorClassLoader")
           .asInstanceOf[Class[_ <: ClassLoader]]
-        val constructor = klass.getConstructor(classOf[SparkConf],
-                                               classOf[SparkEnv],
-                                               classOf[String],
-                                               classOf[ClassLoader],
-                                               classOf[Boolean])
+        val constructor = klass.getConstructor(
+          classOf[SparkConf],
+          classOf[SparkEnv],
+          classOf[String],
+          classOf[ClassLoader],
+          classOf[Boolean])
         constructor
           .newInstance(conf, env, classUri, parent, _userClassPathFirst)
       } catch {
@@ -465,13 +470,14 @@ private[spark] class Executor(executorId: String,
            if currentFiles.getOrElse(name, -1L) < timestamp) {
         logInfo("Fetching " + name + " with timestamp " + timestamp)
         // Fetch file with useCache mode, close cache for local mode.
-        Utils.fetchFile(name,
-                        new File(SparkFiles.getRootDirectory()),
-                        conf,
-                        env.securityManager,
-                        hadoopConf,
-                        timestamp,
-                        useCache = !isLocal)
+        Utils.fetchFile(
+          name,
+          new File(SparkFiles.getRootDirectory()),
+          conf,
+          env.securityManager,
+          hadoopConf,
+          timestamp,
+          useCache = !isLocal)
         currentFiles(name) = timestamp
       }
       for ((name, timestamp) <- newJars) {
@@ -483,13 +489,14 @@ private[spark] class Executor(executorId: String,
         if (currentTimeStamp < timestamp) {
           logInfo("Fetching " + name + " with timestamp " + timestamp)
           // Fetch file with useCache mode, close cache for local mode.
-          Utils.fetchFile(name,
-                          new File(SparkFiles.getRootDirectory()),
-                          conf,
-                          env.securityManager,
-                          hadoopConf,
-                          timestamp,
-                          useCache = !isLocal)
+          Utils.fetchFile(
+            name,
+            new File(SparkFiles.getRootDirectory()),
+            conf,
+            env.securityManager,
+            hadoopConf,
+            timestamp,
+            useCache = !isLocal)
           currentJars(name) = timestamp
           // Add it to our class loader
           val url =
@@ -519,9 +526,10 @@ private[spark] class Executor(executorId: String,
       }
     }
 
-    val message = Heartbeat(executorId,
-                            accumUpdates.toArray,
-                            env.blockManager.blockManagerId)
+    val message = Heartbeat(
+      executorId,
+      accumUpdates.toArray,
+      env.blockManager.blockManagerId)
     try {
       val response = heartbeatReceiverRef.askWithRetry[HeartbeatResponse](
         message,
@@ -558,9 +566,10 @@ private[spark] class Executor(executorId: String,
     val heartbeatTask = new Runnable() {
       override def run(): Unit = Utils.logUncaughtExceptions(reportHeartBeat())
     }
-    heartbeater.scheduleAtFixedRate(heartbeatTask,
-                                    initialDelay,
-                                    intervalMs,
-                                    TimeUnit.MILLISECONDS)
+    heartbeater.scheduleAtFixedRate(
+      heartbeatTask,
+      initialDelay,
+      intervalMs,
+      TimeUnit.MILLISECONDS)
   }
 }

@@ -40,18 +40,18 @@ class ContainerTest extends MarathonSpec with Matchers {
           network = Some(mesos.ContainerInfo.DockerInfo.Network.BRIDGE),
           portMappings = Some(
             Seq(
-              Container.Docker.PortMapping(containerPort = 8080,
-                                           hostPort = 32001,
-                                           servicePort = 9000,
-                                           protocol =
-                                             Container.Docker.PortMapping.TCP,
-                                           name = Some("http"),
-                                           labels = Map("foo" -> "bar")),
-              Container.Docker.PortMapping(containerPort = 8081,
-                                           hostPort = 32002,
-                                           servicePort = 9001,
-                                           protocol =
-                                             Container.Docker.PortMapping.UDP)
+              Container.Docker.PortMapping(
+                containerPort = 8080,
+                hostPort = 32001,
+                servicePort = 9000,
+                protocol = Container.Docker.PortMapping.TCP,
+                name = Some("http"),
+                labels = Map("foo" -> "bar")),
+              Container.Docker.PortMapping(
+                containerPort = 8081,
+                hostPort = 32002,
+                servicePort = 9001,
+                protocol = Container.Docker.PortMapping.UDP)
             ))
         )
       )
@@ -368,8 +368,9 @@ class ContainerTest extends MarathonSpec with Matchers {
   test("""ToJson should correctly handle container type MESOS""") {
     val f = new Fixture
     val appDefinition =
-      AppDefinition(id = PathId("test"),
-                    container = Some(f.mesosContainerWithPersistentVolume))
+      AppDefinition(
+        id = PathId("test"),
+        container = Some(f.mesosContainerWithPersistentVolume))
     val json = Json.toJson(appDefinition)
     (json \ "container" \ "type").asOpt[String] should be(Some("MESOS"))
   }

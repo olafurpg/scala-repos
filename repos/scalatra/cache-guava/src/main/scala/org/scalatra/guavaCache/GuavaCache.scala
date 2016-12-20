@@ -24,8 +24,9 @@ object GuavaCache extends Cache {
   override def put[V](key: String, value: V, ttl: Option[Duration]): V = {
     cache.put(
       key,
-      new Entry(value.asInstanceOf[Object],
-                ttl.map(t => DateTime.now.plusMillis(t.toMillis.toInt))))
+      new Entry(
+        value.asInstanceOf[Object],
+        ttl.map(t => DateTime.now.plusMillis(t.toMillis.toInt))))
     value
   }
 

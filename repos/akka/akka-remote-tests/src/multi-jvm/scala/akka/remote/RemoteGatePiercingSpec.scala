@@ -87,8 +87,9 @@ abstract class RemoteGatePiercingSpec
           .intercept {
             Await.result(
               RARP(system).provider.transport.managementCommand(
-                ForceDisassociateExplicitly(node(second).address,
-                                            AssociationHandle.Unknown)),
+                ForceDisassociateExplicitly(
+                  node(second).address,
+                  AssociationHandle.Unknown)),
               3.seconds)
           }
 

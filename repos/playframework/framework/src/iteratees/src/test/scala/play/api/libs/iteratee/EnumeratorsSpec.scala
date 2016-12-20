@@ -75,8 +75,9 @@ object EnumeratorsSpec
           else Future.successful(None)
         }(unfoldEC)
         val result =
-          Await.result((e1 interleave e2) |>>> Iteratee.getChunks[Int],
-                       Duration.Inf)
+          Await.result(
+            (e1 interleave e2) |>>> Iteratee.getChunks[Int],
+            Duration.Inf)
         result must_== Seq(1, 2, 3, 4, 5)
       }
     }

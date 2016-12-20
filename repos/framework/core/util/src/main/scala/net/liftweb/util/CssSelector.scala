@@ -97,12 +97,13 @@ final case class SurroundKids() extends SubNode with WithKids {
     val res: NodeSeq = newNs.flatMap {
       case e: Elem if !changed =>
         changed = true
-        new Elem(e.prefix,
-                 e.label,
-                 e.attributes,
-                 e.scope,
-                 e.minimizeEmpty,
-                 e.child ++ original: _*)
+        new Elem(
+          e.prefix,
+          e.label,
+          e.attributes,
+          e.scope,
+          e.minimizeEmpty,
+          e.child ++ original: _*)
       case x => x
     }
 

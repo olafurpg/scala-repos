@@ -123,8 +123,9 @@ class NettyBlockTransferSecuritySuite
     val result = fetchBlock(exec0, exec1, "1", blockId) match {
       case Success(buf) =>
         val actualString = CharStreams.toString(
-          new InputStreamReader(buf.createInputStream(),
-                                StandardCharsets.UTF_8))
+          new InputStreamReader(
+            buf.createInputStream(),
+            StandardCharsets.UTF_8))
         actualString should equal(blockString)
         buf.release()
         Success(())

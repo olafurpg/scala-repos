@@ -44,9 +44,10 @@ class OfferOperationFactoryTest
 
     When("We create a reserve operation")
     val error = intercept[WrongConfigurationException] {
-      factory.reserve(f.frameworkId,
-                      Task.Id.forApp(PathId("/test")),
-                      Seq(Mesos.Resource.getDefaultInstance))
+      factory.reserve(
+        f.frameworkId,
+        Task.Id.forApp(PathId("/test")),
+        Seq(Mesos.Resource.getDefaultInstance))
     }
 
     Then("A meaningful exception is thrown")
@@ -61,9 +62,10 @@ class OfferOperationFactoryTest
 
     When("We create a reserve operation")
     val error = intercept[WrongConfigurationException] {
-      factory.reserve(f.frameworkId,
-                      Task.Id.forApp(PathId("/test")),
-                      Seq(Mesos.Resource.getDefaultInstance))
+      factory.reserve(
+        f.frameworkId,
+        Task.Id.forApp(PathId("/test")),
+        Seq(Mesos.Resource.getDefaultInstance))
     }
 
     Then("A meaningful exception is thrown")
@@ -80,9 +82,10 @@ class OfferOperationFactoryTest
     val task = MarathonTestHelper.makeOneCPUTask("123")
 
     When("We create a reserve operation")
-    val operation = factory.reserve(f.frameworkId,
-                                    Task.Id(task.getTaskId),
-                                    task.getResourcesList.asScala)
+    val operation = factory.reserve(
+      f.frameworkId,
+      Task.Id(task.getTaskId),
+      task.getResourcesList.asScala)
 
     Then("The operation is as expected")
     operation.getType shouldEqual Mesos.Offer.Operation.Type.RESERVE
@@ -140,9 +143,10 @@ class OfferOperationFactoryTest
 
     def localVolume(containerPath: String): Task.LocalVolume = {
       val appId = PathId("/my-app")
-      val pv = PersistentVolume(containerPath = containerPath,
-                                persistent = PersistentVolumeInfo(size = 10),
-                                mode = Mesos.Volume.Mode.RW)
+      val pv = PersistentVolume(
+        containerPath = containerPath,
+        persistent = PersistentVolumeInfo(size = 10),
+        mode = Mesos.Volume.Mode.RW)
       Task.LocalVolume(Task.LocalVolumeId(appId, pv), pv)
     }
   }

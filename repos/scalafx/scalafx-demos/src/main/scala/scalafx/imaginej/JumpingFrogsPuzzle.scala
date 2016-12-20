@@ -332,8 +332,9 @@ class View(position: FrogShape => Int, val frogShapes: List[FrogShape]) {
             frogShape.centerY -> (frogShapeCenterY - length * STONE_STEP / 2)
           },
           at(length * TIME s) {
-            frogShape.centerX -> next(frogShapeCenterX,
-                                      length * STONE_STEP / 2)
+            frogShape.centerX -> next(
+              frogShapeCenterX,
+              length * STONE_STEP / 2)
           },
           at(2 * length * TIME s) {
             frogShape.centerY -> frogShapeCenterY
@@ -393,8 +394,9 @@ class Control {
 object theModel extends Model(theModelValues.optionalFrogMap)
 
 object theView
-    extends View(theModel.position compose (_.getFrog),
-                 theViewValues.frogShapes) {
+    extends View(
+      theModel.position compose (_.getFrog),
+      theViewValues.frogShapes) {
   theControl.update(theModel, this)
 }
 

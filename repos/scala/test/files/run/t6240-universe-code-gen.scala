@@ -53,12 +53,15 @@ object Test extends App {
         |
         |${forceCode("this", JavaUniverseTpe)}
         |${forceCode("definitions", DefinitionsModule.info)}
-        |${forceCode("refChecks",
-                     typeOf[scala.reflect.internal.transform.RefChecks])}
-        |${forceCode("uncurry",
-                     typeOf[scala.reflect.internal.transform.UnCurry])}
-        |${forceCode("erasure",
-                     typeOf[scala.reflect.internal.transform.Erasure])}
+        |${forceCode(
+         "refChecks",
+         typeOf[scala.reflect.internal.transform.RefChecks])}
+        |${forceCode(
+         "uncurry",
+         typeOf[scala.reflect.internal.transform.UnCurry])}
+        |${forceCode(
+         "erasure",
+         typeOf[scala.reflect.internal.transform.Erasure])}
         |  }
         |}""".stripMargin
 

@@ -101,8 +101,9 @@ final case class WatermarkRequestStrategy(highWatermark: Int,
                                           lowWatermark: Int)
     extends RequestStrategy {
   require(lowWatermark >= 0, "lowWatermark must be >= 0")
-  require(highWatermark >= lowWatermark,
-          "highWatermark must be >= lowWatermark")
+  require(
+    highWatermark >= lowWatermark,
+    "highWatermark must be >= lowWatermark")
 
   /**
     * Create [[WatermarkRequestStrategy]] with `lowWatermark` as half of
@@ -238,8 +239,9 @@ trait ActorSubscriber extends Actor {
   protected[akka] override def aroundPreRestart(reason: Throwable,
                                                 message: Option[Any]): Unit = {
     // some state must survive restart
-    state.set(self,
-              ActorSubscriberState.State(subscription, requested, _canceled))
+    state.set(
+      self,
+      ActorSubscriberState.State(subscription, requested, _canceled))
     super.aroundPreRestart(reason, message)
   }
 

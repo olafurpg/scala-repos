@@ -51,8 +51,9 @@ object Package {
   def mergeAttributes(a1: Attributes, a2: Attributes) = a1 ++= a2
   // merges `mergeManifest` into `manifest` (mutating `manifest` in the process)
   def mergeManifests(manifest: Manifest, mergeManifest: Manifest): Unit = {
-    mergeAttributes(manifest.getMainAttributes,
-                    mergeManifest.getMainAttributes)
+    mergeAttributes(
+      manifest.getMainAttributes,
+      mergeManifest.getMainAttributes)
     val entryMap = mapAsScalaMap(manifest.getEntries)
     for ((key, value) <- mergeManifest.getEntries) {
       entryMap.get(key) match {
@@ -115,10 +116,11 @@ object Package {
                                 org: String,
                                 orgName: String): PackageOption = {
     import Attributes.Name._
-    val attribKeys = Seq(IMPLEMENTATION_TITLE,
-                         IMPLEMENTATION_VERSION,
-                         IMPLEMENTATION_VENDOR,
-                         IMPLEMENTATION_VENDOR_ID)
+    val attribKeys = Seq(
+      IMPLEMENTATION_TITLE,
+      IMPLEMENTATION_VERSION,
+      IMPLEMENTATION_VENDOR,
+      IMPLEMENTATION_VENDOR_ID)
     val attribVals = Seq(name, version, orgName, org)
     ManifestAttributes((attribKeys zip attribVals) ++ {
       homepage map (h => (IMPLEMENTATION_URL, h.toString))

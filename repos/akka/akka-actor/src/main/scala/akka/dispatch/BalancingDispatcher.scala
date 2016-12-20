@@ -37,12 +37,13 @@ class BalancingDispatcher(
     _executorServiceFactoryProvider: ExecutorServiceFactoryProvider,
     _shutdownTimeout: FiniteDuration,
     attemptTeamWork: Boolean)
-    extends Dispatcher(_configurator,
-                       _id,
-                       throughput,
-                       throughputDeadlineTime,
-                       _executorServiceFactoryProvider,
-                       _shutdownTimeout) {
+    extends Dispatcher(
+      _configurator,
+      _id,
+      throughput,
+      throughputDeadlineTime,
+      _executorServiceFactoryProvider,
+      _shutdownTimeout) {
 
   /**
     * INTERNAL API

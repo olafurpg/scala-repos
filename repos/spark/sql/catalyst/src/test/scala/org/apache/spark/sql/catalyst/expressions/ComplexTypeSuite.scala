@@ -88,8 +88,9 @@ class ComplexTypeSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(getStructField(nullStruct, "a"), null)
 
     val nestedStruct =
-      Literal.create(create_row(create_row(1)),
-                     StructType(StructField("a", typeS) :: Nil))
+      Literal.create(
+        create_row(create_row(1)),
+        StructType(StructField("a", typeS) :: Nil))
     checkEvaluation(getStructField(nestedStruct, "a"), create_row(1))
 
     val typeS_fieldNotNullable =
@@ -115,11 +116,12 @@ class ComplexTypeSuite extends SparkFunSuite with ExpressionEvalHelper {
       expr.dataType match {
         case ArrayType(StructType(fields), containsNull) =>
           val field = fields.find(_.name == fieldName).get
-          GetArrayStructFields(expr,
-                               field,
-                               fields.indexOf(field),
-                               fields.length,
-                               containsNull)
+          GetArrayStructFields(
+            expr,
+            field,
+            fields.indexOf(field),
+            fields.length,
+            containsNull)
       }
     }
 
@@ -144,8 +146,9 @@ class ComplexTypeSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(CreateArray(intWithNull), intSeq :+ null, EmptyRow)
     checkEvaluation(CreateArray(longWithNull), longSeq :+ null, EmptyRow)
     checkEvaluation(CreateArray(strWithNull), strSeq :+ null, EmptyRow)
-    checkEvaluation(CreateArray(Literal.create(null, IntegerType) :: Nil),
-                    null :: Nil)
+    checkEvaluation(
+      CreateArray(Literal.create(null, IntegerType) :: Nil),
+      null :: Nil)
   }
 
   test("CreateStruct") {
@@ -153,22 +156,26 @@ class ComplexTypeSuite extends SparkFunSuite with ExpressionEvalHelper {
     val c1 = 'a.int.at(0)
     val c3 = 'c.int.at(2)
     checkEvaluation(CreateStruct(Seq(c1, c3)), create_row(1, 3), row)
-    checkEvaluation(CreateStruct(Literal.create(null, LongType) :: Nil),
-                    create_row(null))
+    checkEvaluation(
+      CreateStruct(Literal.create(null, LongType) :: Nil),
+      create_row(null))
   }
 
   test("CreateNamedStruct") {
     val row = create_row(1, 2, 3)
     val c1 = 'a.int.at(0)
     val c3 = 'c.int.at(2)
-    checkEvaluation(CreateNamedStruct(Seq("a", c1, "b", c3)),
-                    create_row(1, 3),
-                    row)
-    checkEvaluation(CreateNamedStruct(Seq("a", c1, "b", "y")),
-                    create_row(1, UTF8String.fromString("y")),
-                    row)
-    checkEvaluation(CreateNamedStruct(Seq("a", "x", "b", 2.0)),
-                    create_row(UTF8String.fromString("x"), 2.0))
+    checkEvaluation(
+      CreateNamedStruct(Seq("a", c1, "b", c3)),
+      create_row(1, 3),
+      row)
+    checkEvaluation(
+      CreateNamedStruct(Seq("a", c1, "b", "y")),
+      create_row(1, UTF8String.fromString("y")),
+      row)
+    checkEvaluation(
+      CreateNamedStruct(Seq("a", "x", "b", 2.0)),
+      create_row(UTF8String.fromString("x"), 2.0))
     checkEvaluation(
       CreateNamedStruct(Seq("a", Literal.create(null, IntegerType))),
       create_row(null))
@@ -183,12 +190,14 @@ class ComplexTypeSuite extends SparkFunSuite with ExpressionEvalHelper {
       quickResolve('c.map(MapType(StringType, StringType)).at(0).getItem("a")),
       "b",
       create_row(Map("a" -> "b")))
-    checkEvaluation(quickResolve('c.array(StringType).at(0).getItem(1)),
-                    "b",
-                    create_row(Seq("a", "b")))
-    checkEvaluation(quickResolve('c.struct('a.int).at(0).getField("a")),
-                    1,
-                    create_row(create_row(1)))
+    checkEvaluation(
+      quickResolve('c.array(StringType).at(0).getItem(1)),
+      "b",
+      create_row(Seq("a", "b")))
+    checkEvaluation(
+      quickResolve('c.struct('a.int).at(0).getField("a")),
+      1,
+      create_row(create_row(1)))
   }
 
   test("error message of ExtractValue") {
@@ -199,16 +208,18 @@ class ComplexTypeSuite extends SparkFunSuite with ExpressionEvalHelper {
                           fieldDataType: DataType,
                           errorMesage: String): Unit = {
       val e = intercept[org.apache.spark.sql.AnalysisException] {
-        ExtractValue(Literal.create(null, childDataType),
-                     Literal.create(null, fieldDataType),
-                     _ == _)
+        ExtractValue(
+          Literal.create(null, childDataType),
+          Literal.create(null, fieldDataType),
+          _ == _)
       }
       assert(e.getMessage().contains(errorMesage))
     }
 
-    checkErrorMessage(structType,
-                      IntegerType,
-                      "Field name should be String Literal")
+    checkErrorMessage(
+      structType,
+      IntegerType,
+      "Field name should be String Literal")
     checkErrorMessage(otherType, StringType, "Can't extract value from")
   }
 }

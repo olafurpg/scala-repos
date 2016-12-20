@@ -60,8 +60,9 @@ class InputStreamTest extends CommonStreamsTests {
 
     // Read 50 bytes, should wrap (next: 161)
     assertEquals(50, stream.read(buf))
-    assertArrayEquals(((111 to 127) ++ (-128 to -96)).toArray.map(_.toByte),
-                      buf)
+    assertArrayEquals(
+      ((111 to 127) ++ (-128 to -96)).toArray.map(_.toByte),
+      buf)
 
     // Read 45 bytes, should read 40 (next: EOF)
     assertEquals(40, stream.read(buf, 5, 45))

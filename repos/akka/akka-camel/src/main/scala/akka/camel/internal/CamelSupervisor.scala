@@ -123,10 +123,11 @@ private[camel] class Registry(activationTracker: ActorRef)
       cause match {
         case _: ActorActivationException | _: ActorDeActivationException ⇒
           try context.system.eventStream.publish {
-            Logging.Error(cause.getCause,
-                          child.path.toString,
-                          getClass,
-                          cause.getMessage)
+            Logging.Error(
+              cause.getCause,
+              child.path.toString,
+              getClass,
+              cause.getMessage)
           } catch { case NonFatal(_) ⇒ }
         case _ ⇒ super.logFailure(context, child, cause, decision)
       }
@@ -234,10 +235,11 @@ private[camel] class ConsumerRegistrar(activationTracker: ActorRef)
       try {
         // if this throws, the supervisor stops the consumer and de-registers it on termination
         camelContext.addRoutes(
-          new ConsumerActorRouteBuilder(endpointUri,
-                                        consumer,
-                                        consumerConfig,
-                                        camel.settings))
+          new ConsumerActorRouteBuilder(
+            endpointUri,
+            consumer,
+            consumerConfig,
+            camel.settings))
         activationTracker ! EndpointActivated(consumer)
       } catch {
         case NonFatal(e) ⇒ throw new ActorActivationException(consumer, e)

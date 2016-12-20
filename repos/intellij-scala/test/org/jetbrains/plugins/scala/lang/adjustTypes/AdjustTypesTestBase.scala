@@ -52,10 +52,11 @@ abstract class AdjustTypesTestBase
 
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
-    val element = PsiTreeUtil.findElementOfClassAtRange(scalaFile,
-                                                        startOffset,
-                                                        endOffset,
-                                                        classOf[PsiElement])
+    val element = PsiTreeUtil.findElementOfClassAtRange(
+      scalaFile,
+      startOffset,
+      endOffset,
+      classOf[PsiElement])
 
     var res: String = null
     val lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)
@@ -71,8 +72,9 @@ abstract class AdjustTypesTestBase
     } catch {
       case e: Exception =>
         println(e)
-        assert(assertion = false,
-               message = e.getMessage + "\n" + e.getStackTrace)
+        assert(
+          assertion = false,
+          message = e.getMessage + "\n" + e.getStackTrace)
     }
 
     val text = lastPsi.getText

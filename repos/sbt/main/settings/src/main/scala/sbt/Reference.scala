@@ -118,7 +118,8 @@ object Reference {
   @deprecated("Explicitly wrap the File in a call to RootProject.", "0.13.0")
   implicit def fileToRef(f: File): ProjectReference = RootProject(f)
 
-  @deprecated("Explicitly wrap the String in a call to LocalProject.",
-              "0.13.0")
+  @deprecated(
+    "Explicitly wrap the String in a call to LocalProject.",
+    "0.13.0")
   implicit def stringToReference(s: String): ProjectReference = LocalProject(s)
 }

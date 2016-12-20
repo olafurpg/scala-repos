@@ -58,9 +58,10 @@ class ScLiteralImpl(node: ASTNode)
       case ScalaTokenTypes.tSYMBOL =>
         val sym = ScalaPsiManager
           .instance(getProject)
-          .getCachedClass("scala.Symbol",
-                          getResolveScope,
-                          ScalaPsiManager.ClassCategory.TYPE)
+          .getCachedClass(
+            "scala.Symbol",
+            getResolveScope,
+            ScalaPsiManager.ClassCategory.TYPE)
         if (sym != null) ScType.designator(sym) else Nothing
       case ScalaTokenTypes.tSTRING | ScalaTokenTypes.tWRONG_STRING |
           ScalaTokenTypes.tMULTILINE_STRING =>
@@ -205,8 +206,9 @@ class ScLiteralImpl(node: ASTNode)
           intrp.reference.fold("")(_.refName)
         case _ => ""
       }
-      new TextRange(range.getStartOffset + prefix.length + quote.length,
-                    range.getEndOffset - quote.length)
+      new TextRange(
+        range.getStartOffset + prefix.length + quote.length,
+        range.getEndOffset - quote.length)
     } else if (isChar) {
       new TextRange(range.getStartOffset + 1, range.getEndOffset - 1)
     } else if (isSymbol) {
@@ -234,9 +236,10 @@ class ScLiteralImpl(node: ASTNode)
     */
   def setTypeWithoutImplicits(tp: Option[ScType]) {
     if (getFirstChild.getNode.getElementType != ScalaTokenTypes.kNULL)
-      assert(assertion = false,
-             message = "Only null literals accepted, type: " +
-                 getFirstChild.getNode.getElementType)
+      assert(
+        assertion = false,
+        message = "Only null literals accepted, type: " +
+            getFirstChild.getNode.getElementType)
     typeWithoutImplicits = tp
   }
 

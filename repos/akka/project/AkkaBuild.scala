@@ -42,8 +42,9 @@ object AkkaBuild extends Build {
   lazy val rootSettings =
     parentSettings ++ Release.settings ++ SphinxDoc.akkaSettings ++ Dist.settings ++ s3Settings ++ UnidocRoot.akkaSettings ++ Protobuf.settings ++ Seq(
       parallelExecution in GlobalScope := System
-        .getProperty("akka.parallelExecution",
-                     parallelExecutionByDefault.toString)
+        .getProperty(
+          "akka.parallelExecution",
+          parallelExecutionByDefault.toString)
         .toBoolean,
       Dist.distExclude := Seq(actorTests.id, docs.id, samples.id, osgi.id),
       S3.host in S3.upload := "downloads.typesafe.com.s3.amazonaws.com",
@@ -60,44 +61,45 @@ object AkkaBuild extends Build {
   lazy val root = Project(
     id = "akka",
     base = file("."),
-    aggregate = Seq(actor,
-                    testkit,
-                    actorTests,
-                    remote,
-                    remoteTests,
-                    camel,
-                    cluster,
-                    clusterMetrics,
-                    clusterTools,
-                    clusterSharding,
-                    distributedData,
-                    slf4j,
-                    agent,
-                    persistence,
-                    persistenceQuery,
-                    persistenceTck,
-                    persistenceShared,
-                    kernel,
-                    osgi,
-                    docs,
-                    contrib,
-                    samples,
-                    multiNodeTestkit,
-                    benchJmh,
-                    typed,
-                    protobuf,
-                    stream,
-                    streamTestkit,
-                    streamTests,
-                    streamTestsTck,
-                    parsing,
-                    httpCore,
-                    http,
-                    httpSprayJson,
-                    httpXml,
-                    httpJackson,
-                    httpTests,
-                    httpTestkit)
+    aggregate = Seq(
+      actor,
+      testkit,
+      actorTests,
+      remote,
+      remoteTests,
+      camel,
+      cluster,
+      clusterMetrics,
+      clusterTools,
+      clusterSharding,
+      distributedData,
+      slf4j,
+      agent,
+      persistence,
+      persistenceQuery,
+      persistenceTck,
+      persistenceShared,
+      kernel,
+      osgi,
+      docs,
+      contrib,
+      samples,
+      multiNodeTestkit,
+      benchJmh,
+      typed,
+      protobuf,
+      stream,
+      streamTestkit,
+      streamTests,
+      streamTestsTck,
+      parsing,
+      httpCore,
+      http,
+      httpSprayJson,
+      httpXml,
+      httpJackson,
+      httpTests,
+      httpTestkit)
   ).settings(rootSettings: _*)
 
   lazy val akkaScalaNightly = Project(
@@ -105,41 +107,42 @@ object AkkaBuild extends Build {
     base = file("akka-scala-nightly"),
     // remove dependencies that we have to build ourselves (Scala STM)
     // samples don't work with dbuild right now
-    aggregate = Seq(actor,
-                    testkit,
-                    actorTests,
-                    remote,
-                    remoteTests,
-                    camel,
-                    cluster,
-                    clusterMetrics,
-                    clusterTools,
-                    clusterSharding,
-                    distributedData,
-                    slf4j,
-                    persistence,
-                    persistenceQuery,
-                    persistenceTck,
-                    persistenceShared,
-                    kernel,
-                    osgi,
-                    contrib,
-                    multiNodeTestkit,
-                    benchJmh,
-                    typed,
-                    protobuf,
-                    stream,
-                    streamTestkit,
-                    streamTests,
-                    streamTestsTck,
-                    parsing,
-                    httpCore,
-                    http,
-                    httpSprayJson,
-                    httpXml,
-                    httpJackson,
-                    httpTests,
-                    httpTestkit)
+    aggregate = Seq(
+      actor,
+      testkit,
+      actorTests,
+      remote,
+      remoteTests,
+      camel,
+      cluster,
+      clusterMetrics,
+      clusterTools,
+      clusterSharding,
+      distributedData,
+      slf4j,
+      persistence,
+      persistenceQuery,
+      persistenceTck,
+      persistenceShared,
+      kernel,
+      osgi,
+      contrib,
+      multiNodeTestkit,
+      benchJmh,
+      typed,
+      protobuf,
+      stream,
+      streamTestkit,
+      streamTests,
+      streamTestsTck,
+      parsing,
+      httpCore,
+      http,
+      httpSprayJson,
+      httpXml,
+      httpJackson,
+      httpTests,
+      httpTestkit)
   ).disablePlugins(ValidatePullRequest, MimaPlugin)
 
   lazy val actor = Project(
@@ -216,9 +219,9 @@ object AkkaBuild extends Build {
     Project(
       id = "akka-cluster-metrics",
       base = file("akka-cluster-metrics"),
-      dependencies =
-        Seq(cluster % "compile->compile;test->test;multi-jvm->multi-jvm",
-            slf4j % "test->compile")
+      dependencies = Seq(
+        cluster % "compile->compile;test->test;multi-jvm->multi-jvm",
+        slf4j % "test->compile")
     ) configs (MultiJvm)
 
   lazy val clusterTools =
@@ -237,11 +240,11 @@ object AkkaBuild extends Build {
       //      If I only use "provided" here it works, but then we can't run tests.
       //      Scope "test" is alright in the pom.xml, but would have been nicer with
       //      provided.
-      dependencies =
-        Seq(cluster % "compile->compile;test->test;multi-jvm->multi-jvm",
-            persistence % "compile;test->provided",
-            distributedData % "provided;test",
-            clusterTools)
+      dependencies = Seq(
+        cluster % "compile->compile;test->test;multi-jvm->multi-jvm",
+        persistence % "compile;test->provided",
+        distributedData % "provided;test",
+        clusterTools)
     ) configs (MultiJvm)
 
   lazy val distributedData =
@@ -273,26 +276,29 @@ object AkkaBuild extends Build {
   lazy val persistenceQuery = Project(
     id = "akka-persistence-query-experimental",
     base = file("akka-persistence-query"),
-    dependencies = Seq(stream,
-                       persistence % "compile;provided->provided;test->test",
-                       testkit % "compile;test->test",
-                       streamTestkit % "compile;test->test")
+    dependencies = Seq(
+      stream,
+      persistence % "compile;provided->provided;test->test",
+      testkit % "compile;test->test",
+      streamTestkit % "compile;test->test")
   )
 
   lazy val persistenceTck = Project(
     id = "akka-persistence-tck",
     base = file("akka-persistence-tck"),
-    dependencies = Seq(persistence % "compile;provided->provided;test->test",
-                       testkit % "compile;test->test")
+    dependencies = Seq(
+      persistence % "compile;provided->provided;test->test",
+      testkit % "compile;test->test")
   )
 
   lazy val persistenceShared = Project(
     id = "akka-persistence-shared",
     base = file("akka-persistence-shared"),
-    dependencies = Seq(persistence % "test->test",
-                       testkit % "test->test",
-                       remote % "test",
-                       protobuf)
+    dependencies = Seq(
+      persistence % "test->test",
+      testkit % "test->test",
+      remote % "test",
+      protobuf)
   )
 
   lazy val httpCore = Project(
@@ -316,11 +322,12 @@ object AkkaBuild extends Build {
   lazy val httpTests = Project(
     id = "akka-http-tests",
     base = file("akka-http-tests"),
-    dependencies = Seq(httpTestkit % "test",
-                       testkit % "test->test",
-                       httpSprayJson,
-                       httpXml,
-                       httpJackson)
+    dependencies = Seq(
+      httpTestkit % "test",
+      testkit % "test->test",
+      httpSprayJson,
+      httpXml,
+      httpJackson)
   )
 
   lazy val httpMarshallersScala = Project(
@@ -433,11 +440,12 @@ object AkkaBuild extends Build {
     Project(
       id = "akka-contrib",
       base = file("akka-contrib"),
-      dependencies = Seq(remote,
-                         remoteTests % "test->test",
-                         cluster,
-                         clusterTools,
-                         persistence % "compile;test->provided")
+      dependencies = Seq(
+        remote,
+        remoteTests % "test->test",
+        cluster,
+        clusterTools,
+        persistence % "compile;test->provided")
     ) configs (MultiJvm)
 
   lazy val samplesSettings = parentSettings ++ ActivatorDist.settings
@@ -449,24 +457,25 @@ object AkkaBuild extends Build {
     aggregate =
       if (!Sample.CliOptions.aggregateSamples) Nil
       else
-        Seq(sampleCamelJava,
-            sampleCamelScala,
-            sampleClusterJava,
-            sampleClusterScala,
-            sampleFsmScala,
-            sampleFsmJavaLambda,
-            sampleMainJava,
-            sampleMainScala,
-            sampleMainJavaLambda,
-            sampleMultiNodeScala,
-            samplePersistenceJava,
-            samplePersistenceScala,
-            samplePersistenceJavaLambda,
-            sampleRemoteJava,
-            sampleRemoteScala,
-            sampleSupervisionJavaLambda,
-            sampleDistributedDataScala,
-            sampleDistributedDataJava)
+        Seq(
+          sampleCamelJava,
+          sampleCamelScala,
+          sampleClusterJava,
+          sampleClusterScala,
+          sampleFsmScala,
+          sampleFsmJavaLambda,
+          sampleMainJava,
+          sampleMainScala,
+          sampleMainJavaLambda,
+          sampleMultiNodeScala,
+          samplePersistenceJava,
+          samplePersistenceScala,
+          samplePersistenceJavaLambda,
+          sampleRemoteJava,
+          sampleRemoteScala,
+          sampleSupervisionJavaLambda,
+          sampleDistributedDataScala,
+          sampleDistributedDataJava)
   ).settings(samplesSettings: _*).disablePlugins(MimaPlugin)
 
   lazy val sampleCamelJava = Sample.project("akka-sample-camel-java")
@@ -523,17 +532,19 @@ object AkkaBuild extends Build {
         {
           def executeMvnCommands(failureMessage: String, commands: String*) = {
             if ({
-              List("sh",
-                   "-c",
-                   commands.mkString(
-                     "cd akka-samples/akka-sample-osgi-dining-hakkers; mvn ",
-                     " ",
-                     "")) !
+              List(
+                "sh",
+                "-c",
+                commands.mkString(
+                  "cd akka-samples/akka-sample-osgi-dining-hakkers; mvn ",
+                  " ",
+                  "")) !
             } != 0) throw new Exception(failureMessage)
           }
-          executeMvnCommands("Osgi sample Dining hakkers test failed",
-                             "clean",
-                             "install")
+          executeMvnCommands(
+            "Osgi sample Dining hakkers test failed",
+            "clean",
+            "install")
         }
       }
     )
@@ -615,26 +626,28 @@ object AkkaBuild extends Build {
   lazy val defaultSettings =
     resolverSettings ++ TestExtras.Filter.settings ++ Protobuf.settings ++ Seq(
       // compile options
-      scalacOptions in Compile ++= Seq("-encoding",
-                                       "UTF-8",
-                                       "-target:jvm-1.8",
-                                       "-feature",
-                                       "-unchecked",
-                                       "-Xlog-reflective-calls",
-                                       "-Xlint"),
+      scalacOptions in Compile ++= Seq(
+        "-encoding",
+        "UTF-8",
+        "-target:jvm-1.8",
+        "-feature",
+        "-unchecked",
+        "-Xlog-reflective-calls",
+        "-Xlint"),
       scalacOptions in Compile ++=
         (if (allWarnings) Seq("-deprecation") else Nil),
       scalacOptions in Test := (scalacOptions in Test).value.filterNot(opt =>
         opt == "-Xlog-reflective-calls" || opt.contains("genjavadoc")),
       // -XDignore.symbol.file suppresses sun.misc.Unsafe warnings
-      javacOptions in compile ++= Seq("-encoding",
-                                      "UTF-8",
-                                      "-source",
-                                      "1.8",
-                                      "-target",
-                                      "1.8",
-                                      "-Xlint:unchecked",
-                                      "-XDignore.symbol.file"),
+      javacOptions in compile ++= Seq(
+        "-encoding",
+        "UTF-8",
+        "-source",
+        "1.8",
+        "-target",
+        "1.8",
+        "-Xlint:unchecked",
+        "-XDignore.symbol.file"),
       javacOptions in compile ++=
         (if (allWarnings) Seq("-Xlint:deprecation") else Nil),
       javacOptions in doc ++= Seq(),
@@ -664,8 +677,9 @@ object AkkaBuild extends Build {
         */
 
       parallelExecution in Test := System
-        .getProperty("akka.parallelExecution",
-                     parallelExecutionByDefault.toString)
+        .getProperty(
+          "akka.parallelExecution",
+          parallelExecutionByDefault.toString)
         .toBoolean,
       logBuffered in Test :=
         System.getProperty("akka.logBufferedTests", "false").toBoolean,

@@ -192,29 +192,33 @@ object EventHandler extends ListenerManagement {
     def receive = {
       case event @ Error(cause, instance, message) =>
         println(
-          error.format(formattedTimestamp,
-                       event.thread.getName,
-                       instance.getClass.getSimpleName,
-                       message,
-                       stackTraceFor(cause)))
+          error.format(
+            formattedTimestamp,
+            event.thread.getName,
+            instance.getClass.getSimpleName,
+            message,
+            stackTraceFor(cause)))
       case event @ Warning(instance, message) =>
         println(
-          warning.format(formattedTimestamp,
-                         event.thread.getName,
-                         instance.getClass.getSimpleName,
-                         message))
+          warning.format(
+            formattedTimestamp,
+            event.thread.getName,
+            instance.getClass.getSimpleName,
+            message))
       case event @ Info(instance, message) =>
         println(
-          info.format(formattedTimestamp,
-                      event.thread.getName,
-                      instance.getClass.getSimpleName,
-                      message))
+          info.format(
+            formattedTimestamp,
+            event.thread.getName,
+            instance.getClass.getSimpleName,
+            message))
       case event @ Debug(instance, message) =>
         println(
-          debug.format(formattedTimestamp,
-                       event.thread.getName,
-                       instance.getClass.getSimpleName,
-                       message))
+          debug.format(
+            formattedTimestamp,
+            event.thread.getName,
+            instance.getClass.getSimpleName,
+            message))
       case event =>
         println(generic.format(formattedTimestamp, event.toString))
     }

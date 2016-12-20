@@ -145,9 +145,10 @@ class MarathonSchedulerServiceTest
       .thenReturn(Future.successful(()))
     schedulerService.onElected(mock[ExceptionalCommand[Group.JoinException]])
 
-    verify(mockTimer).schedule(any[TimerTask](),
-                               mockEq(ReconciliationDelay),
-                               mockEq(ReconciliationInterval))
+    verify(mockTimer).schedule(
+      any[TimerTask](),
+      mockEq(ReconciliationDelay),
+      mockEq(ReconciliationInterval))
   }
 
   test("Cancel timer when defeated") {
@@ -179,8 +180,9 @@ class MarathonSchedulerServiceTest
     schedulerService.onDefeated()
 
     verify(mockTimer).cancel()
-    assert(schedulerService.timer != mockTimer,
-           "Timer should be replaced after leadership defeat")
+    assert(
+      schedulerService.timer != mockTimer,
+      "Timer should be replaced after leadership defeat")
   }
 
   test("Re-enable timer when re-elected") {
@@ -220,9 +222,10 @@ class MarathonSchedulerServiceTest
 
     verify(mockTimer, times(2))
       .schedule(any(), mockEq(ScaleAppsDelay), mockEq(ScaleAppsInterval))
-    verify(mockTimer, times(2)).schedule(any[TimerTask](),
-                                         mockEq(ReconciliationDelay),
-                                         mockEq(ReconciliationInterval))
+    verify(mockTimer, times(2)).schedule(
+      any[TimerTask](),
+      mockEq(ReconciliationDelay),
+      mockEq(ReconciliationInterval))
     verify(mockTimer).cancel()
   }
 
@@ -231,10 +234,11 @@ class MarathonSchedulerServiceTest
     val mockTimer = mock[Timer]
 
     val metrics = new Metrics(new MetricRegistry)
-    val store = new MarathonStore[FrameworkId](new InMemoryStore,
-                                               metrics,
-                                               () => new FrameworkId(""),
-                                               "frameworkId:")
+    val store = new MarathonStore[FrameworkId](
+      new InMemoryStore,
+      metrics,
+      () => new FrameworkId(""),
+      "frameworkId:")
     frameworkIdUtil = new FrameworkIdUtil(store, Duration.Inf)
 
     val schedulerService = new MarathonSchedulerService(

@@ -38,9 +38,10 @@ abstract class SimpleTestCase extends UsefulTestCase {
   def parseText(@Language("Scala") s: String): ScalaFile = {
     PsiFileFactory
       .getInstance(fixture.getProject)
-      .createFileFromText("foo" + ScalaFileType.DEFAULT_EXTENSION,
-                          ScalaFileType.SCALA_FILE_TYPE,
-                          s)
+      .createFileFromText(
+        "foo" + ScalaFileType.DEFAULT_EXTENSION,
+        ScalaFileType.SCALA_FILE_TYPE,
+        s)
       .asInstanceOf[ScalaFile]
   }
 

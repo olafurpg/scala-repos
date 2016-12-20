@@ -48,13 +48,14 @@ object BuildUtil {
     val configs =
       (_: ResolvedProject).configurations.map(c => ConfigKey(c.name))
     val aggregates = aggregationRelation(units)
-    new BuildUtil(keyIndex,
-                  data,
-                  root,
-                  Load getRootProject units,
-                  getp,
-                  configs,
-                  aggregates)
+    new BuildUtil(
+      keyIndex,
+      data,
+      root,
+      Load getRootProject units,
+      getp,
+      configs,
+      aggregates)
   }
 
   def dependencies(units: Map[URI, LoadedBuildUnit]): BuildDependencies = {

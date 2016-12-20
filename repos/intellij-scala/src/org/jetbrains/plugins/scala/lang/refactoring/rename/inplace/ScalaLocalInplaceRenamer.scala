@@ -30,21 +30,23 @@ class ScalaLocalInplaceRenamer(elementToRename: PsiNamedElement,
                                project: Project,
                                initialName: String,
                                oldName: String)
-    extends VariableInplaceRenamer(elementToRename,
-                                   editor,
-                                   project,
-                                   initialName,
-                                   oldName) {
+    extends VariableInplaceRenamer(
+      elementToRename,
+      editor,
+      project,
+      initialName,
+      oldName) {
 
   private val elementRange =
     editor.getDocument.createRangeMarker(elementToRename.getTextRange)
 
   def this(@NotNull elementToRename: PsiNamedElement, editor: Editor) =
-    this(elementToRename,
-         editor,
-         elementToRename.getProject,
-         ScalaNamesUtil.scalaName(elementToRename),
-         ScalaNamesUtil.scalaName(elementToRename))
+    this(
+      elementToRename,
+      editor,
+      elementToRename.getProject,
+      ScalaNamesUtil.scalaName(elementToRename),
+      ScalaNamesUtil.scalaName(elementToRename))
 
   override def collectAdditionalElementsToRename(
       stringUsages: util.List[Pair[PsiElement, TextRange]]): Unit = {

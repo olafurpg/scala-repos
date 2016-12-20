@@ -25,8 +25,9 @@ case class KeyStoreConfig(storeType: String = KeyStore.getDefaultType,
                           data: Option[String] = None,
                           password: Option[String] = None) {
 
-  assert(filePath.isDefined ^ data.isDefined,
-         "Either key store path or data must be defined, but not both.")
+  assert(
+    filePath.isDefined ^ data.isDefined,
+    "Either key store path or data must be defined, but not both.")
 }
 
 /**
@@ -42,8 +43,9 @@ case class TrustStoreConfig(storeType: String = KeyStore.getDefaultType,
                             filePath: Option[String],
                             data: Option[String]) {
 
-  assert(filePath.isDefined ^ data.isDefined,
-         "Either trust store path or data must be defined, but not both.")
+  assert(
+    filePath.isDefined ^ data.isDefined,
+    "Either trust store path or data must be defined, but not both.")
 }
 
 /**
@@ -229,19 +231,20 @@ class SSLConfigParser(c: PlayConfig, classLoader: ClassLoader) {
 
     val trustManagers = parseTrustManager(c.get[PlayConfig]("trustManager"))
 
-    SSLConfig(default = default,
-              protocol = protocol,
-              checkRevocation = checkRevocation,
-              revocationLists = revocationLists,
-              enabledCipherSuites = ciphers,
-              enabledProtocols = protocols,
-              keyManagerConfig = keyManagers,
-              disabledSignatureAlgorithms = disabledSignatureAlgorithms,
-              disabledKeyAlgorithms = disabledKeyAlgorithms,
-              trustManagerConfig = trustManagers,
-              secureRandom = None,
-              debug = debug,
-              loose = looseOptions)
+    SSLConfig(
+      default = default,
+      protocol = protocol,
+      checkRevocation = checkRevocation,
+      revocationLists = revocationLists,
+      enabledCipherSuites = ciphers,
+      enabledProtocols = protocols,
+      keyManagerConfig = keyManagers,
+      disabledSignatureAlgorithms = disabledSignatureAlgorithms,
+      disabledKeyAlgorithms = disabledKeyAlgorithms,
+      trustManagerConfig = trustManagers,
+      secureRandom = None,
+      debug = debug,
+      loose = looseOptions)
   }
 
   /**
@@ -301,18 +304,19 @@ class SSLConfigParser(c: PlayConfig, classLoader: ClassLoader) {
       val pluggability = config.get[Boolean]("pluggability")
       val ssl = config.get[Boolean]("ssl")
 
-      SSLDebugConfig(ssl = ssl,
-                     record = record,
-                     handshake = handshake,
-                     keygen = keygen,
-                     session = session,
-                     defaultctx = defaultctx,
-                     sslctx = sslctx,
-                     sessioncache = sessioncache,
-                     keymanager = keymanager,
-                     trustmanager = trustmanager,
-                     pluggability = pluggability,
-                     certpath = certpath)
+      SSLDebugConfig(
+        ssl = ssl,
+        record = record,
+        handshake = handshake,
+        keygen = keygen,
+        session = session,
+        defaultctx = defaultctx,
+        sslctx = sslctx,
+        sessioncache = sessioncache,
+        keymanager = keymanager,
+        trustmanager = trustmanager,
+        pluggability = pluggability,
+        certpath = certpath)
     }
   }
 
@@ -326,10 +330,11 @@ class SSLConfigParser(c: PlayConfig, classLoader: ClassLoader) {
     val data = config.get[Option[String]]("data")
     val password = config.get[Option[String]]("password")
 
-    KeyStoreConfig(filePath = path,
-                   storeType = storeType,
-                   data = data,
-                   password = password)
+    KeyStoreConfig(
+      filePath = path,
+      storeType = storeType,
+      data = data,
+      password = password)
   }
 
   /**

@@ -72,11 +72,11 @@ object ScalaMarkerType {
             assert(optionClazz.isDefined)
             val clazz = optionClazz.get
             if (!GutterUtil.isOverrides(element, signatures))
-              ScalaBundle.message("implements.method.from.super",
-                                  clazz.qualifiedName)
+              ScalaBundle
+                .message("implements.method.from.super", clazz.qualifiedName)
             else
-              ScalaBundle.message("overrides.method.from.super",
-                                  clazz.qualifiedName)
+              ScalaBundle
+                .message("overrides.method.from.super", clazz.qualifiedName)
           case _: ScValue | _: ScVariable =>
             val signatures = new ArrayBuffer[Signature]
             val bindings = elem match {
@@ -95,15 +95,16 @@ object ScalaMarkerType {
             assert(optionClazz.isDefined)
             val clazz = optionClazz.get
             if (!GutterUtil.isOverrides(element, signatures))
-              ScalaBundle.message("implements.val.from.super",
-                                  clazz.qualifiedName)
+              ScalaBundle
+                .message("implements.val.from.super", clazz.qualifiedName)
             else
-              ScalaBundle.message("overrides.val.from.super",
-                                  clazz.qualifiedName)
+              ScalaBundle
+                .message("overrides.val.from.super", clazz.qualifiedName)
           case x @ (_: ScTypeDefinition | _: ScTypeAlias) =>
             val superMembers =
-              ScalaPsiUtil.superTypeMembers(x.asInstanceOf[PsiNamedElement],
-                                            withSelfType = true)
+              ScalaPsiUtil.superTypeMembers(
+                x.asInstanceOf[PsiNamedElement],
+                withSelfType = true)
             assert(superMembers.nonEmpty)
             val optionClazz = superMembers.head
             ScalaBundle.message("overrides.type.from.super", optionClazz.name)
@@ -167,8 +168,9 @@ object ScalaMarkerType {
             }
           case x @ (_: ScTypeDefinition | _: ScTypeAlias) =>
             val elems =
-              ScalaPsiUtil.superTypeMembers(x.asInstanceOf[PsiNamedElement],
-                                            withSelfType = true)
+              ScalaPsiUtil.superTypeMembers(
+                x.asInstanceOf[PsiNamedElement],
+                withSelfType = true)
 
             elems.toSeq match {
               case Seq() =>
@@ -225,16 +227,19 @@ object ScalaMarkerType {
         if (overrides.isEmpty) return
         val title =
           if (GutterUtil.isAbstract(element))
-            ScalaBundle.message("navigation.title.implementation.member",
-                                members(0).name,
-                                "" + overrides.length)
+            ScalaBundle.message(
+              "navigation.title.implementation.member",
+              members(0).name,
+              "" + overrides.length)
           else
-            ScalaBundle.message("navigation.title.overrider.member",
-                                members(0).name,
-                                "" + overrides.length)
+            ScalaBundle.message(
+              "navigation.title.overrider.member",
+              members(0).name,
+              "" + overrides.length)
         val renderer = new ScCellRenderer
-        util.Arrays.sort(overrides.map(_.asInstanceOf[PsiElement]).toArray,
-                         renderer.getComparator)
+        util.Arrays.sort(
+          overrides.map(_.asInstanceOf[PsiElement]).toArray,
+          renderer.getComparator)
         PsiElementListNavigator.openTargets(
           mouseEvent,
           overrides.map(_.asInstanceOf[NavigatablePsiElement]).toArray,
@@ -274,13 +279,15 @@ object ScalaMarkerType {
         if (inheritors.isEmpty) return
         val title = clazz match {
           case _: ScTrait =>
-            ScalaBundle.message("goto.implementation.chooser.title",
-                                clazz.name,
-                                "" + inheritors.length)
+            ScalaBundle.message(
+              "goto.implementation.chooser.title",
+              clazz.name,
+              "" + inheritors.length)
           case _ =>
-            ScalaBundle.message("navigation.title.subclass",
-                                clazz.name,
-                                "" + inheritors.length)
+            ScalaBundle.message(
+              "navigation.title.subclass",
+              clazz.name,
+              "" + inheritors.length)
         }
         val renderer = new PsiClassListCellRenderer
         util.Arrays.sort(inheritors, renderer.getComparator)

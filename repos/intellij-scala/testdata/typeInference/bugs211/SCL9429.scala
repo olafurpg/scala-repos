@@ -26,29 +26,30 @@ object SCL9429 {
 
   def foo(i: Any) {
     i match {
-      case UnneccessarillyGiantCaseClass23(protection,
-                                           friends,
-                                           autoEnableGps,
-                                           lockOnLost,
-                                           sirenOnLost,
-                                           blockSettingsOnLost,
-                                           blockUsbDebuggingOnLost,
-                                           forceMobileDataOnLost,
-                                           lowBatteryNotification,
-                                           lockText,
-                                           passwordCheckFailure,
-                                           pin,
-                                           smsSendingAllowed,
-                                           sendLocationOnLost,
-                                           recordAudioOnLost,
-                                           takePictureOnLost,
-                                           sendPersonalDataOnLost,
-                                           lostOnSimChange,
-                                           lostOnBluetoothDisconnect,
-                                           locationOnLowBattery,
-                                           personalDataOnLowBattery,
-                                           ccConfigOnLost,
-                                           sendSimChangeBySms) =>
+      case UnneccessarillyGiantCaseClass23(
+          protection,
+          friends,
+          autoEnableGps,
+          lockOnLost,
+          sirenOnLost,
+          blockSettingsOnLost,
+          blockUsbDebuggingOnLost,
+          forceMobileDataOnLost,
+          lowBatteryNotification,
+          lockText,
+          passwordCheckFailure,
+          pin,
+          smsSendingAllowed,
+          sendLocationOnLost,
+          recordAudioOnLost,
+          takePictureOnLost,
+          sendPersonalDataOnLost,
+          lostOnSimChange,
+          lostOnBluetoothDisconnect,
+          locationOnLowBattery,
+          personalDataOnLowBattery,
+          ccConfigOnLost,
+          sendSimChangeBySms) =>
         val s = /*start*/ sendSimChangeBySms /*end*/
       case _ =>
     }

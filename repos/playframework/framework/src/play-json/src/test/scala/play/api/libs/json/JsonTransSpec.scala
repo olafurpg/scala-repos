@@ -23,10 +23,11 @@ object JsonTransSpec extends Specification {
         "field31" -> "beta",
         "field32" -> 345
       ),
-      "field4" -> Json.arr("alpha",
-                           2,
-                           true,
-                           Json.obj("field41" -> "toto", "field42" -> "tata"))
+      "field4" -> Json.arr(
+        "alpha",
+        2,
+        true,
+        Json.obj("field41" -> "toto", "field42" -> "tata"))
     )
 
     "pick a value at a path" in {
@@ -69,11 +70,11 @@ object JsonTransSpec extends Specification {
             "field32" -> 345,
             "field33" -> false
           ),
-          "field4" -> Json.arr("alpha",
-                               2,
-                               true,
-                               Json.obj("field41" -> "toto",
-                                        "field42" -> "tata"))
+          "field4" -> Json.arr(
+            "alpha",
+            2,
+            true,
+            Json.obj("field41" -> "toto", "field42" -> "tata"))
         )
       )
     }
@@ -130,11 +131,11 @@ object JsonTransSpec extends Specification {
         Json.obj(
           "field1" -> "alpha",
           "field2" -> 123L,
-          "field4" -> Json.arr("alpha",
-                               2,
-                               true,
-                               Json.obj("field41" -> "toto",
-                                        "field42" -> "tata"))
+          "field4" -> Json.arr(
+            "alpha",
+            2,
+            true,
+            Json.obj("field41" -> "toto", "field42" -> "tata"))
         )
       )
     }

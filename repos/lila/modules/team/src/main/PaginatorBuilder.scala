@@ -12,10 +12,12 @@ private[team] final class PaginatorBuilder(maxPerPage: Int,
                                            maxUserPerPage: Int) {
 
   def popularTeams(page: Int): Fu[Paginator[Team]] =
-    Paginator(adapter = new Adapter[Team](selector = TeamRepo.enabledQuery,
-                                          sort = Seq(TeamRepo.sortPopular)),
-              page,
-              maxPerPage)
+    Paginator(
+      adapter = new Adapter[Team](
+        selector = TeamRepo.enabledQuery,
+        sort = Seq(TeamRepo.sortPopular)),
+      page,
+      maxPerPage)
 
   def teamMembers(team: Team, page: Int): Fu[Paginator[MemberWithUser]] =
     Paginator(adapter = new TeamAdapter(team), page, maxUserPerPage)

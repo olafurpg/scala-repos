@@ -76,21 +76,24 @@ class UTF8Test extends BaseCharsetTest(Charset.forName("UTF-8")) {
     testDecode(bb"bf")(Malformed(1))
     testDecode(bb"80 80")(Malformed(1), Malformed(1))
     testDecode(bb"80 80 80")(Malformed(1), Malformed(1), Malformed(1))
-    testDecode(bb"80 80 80 80")(Malformed(1),
-                                Malformed(1),
-                                Malformed(1),
-                                Malformed(1))
-    testDecode(bb"80 80 80 80 80")(Malformed(1),
-                                   Malformed(1),
-                                   Malformed(1),
-                                   Malformed(1),
-                                   Malformed(1))
-    testDecode(bb"41 80 80 42 80 43")(cb"A",
-                                      Malformed(1),
-                                      Malformed(1),
-                                      cb"B",
-                                      Malformed(1),
-                                      cb"C")
+    testDecode(bb"80 80 80 80")(
+      Malformed(1),
+      Malformed(1),
+      Malformed(1),
+      Malformed(1))
+    testDecode(bb"80 80 80 80 80")(
+      Malformed(1),
+      Malformed(1),
+      Malformed(1),
+      Malformed(1),
+      Malformed(1))
+    testDecode(bb"41 80 80 42 80 43")(
+      cb"A",
+      Malformed(1),
+      Malformed(1),
+      cb"B",
+      Malformed(1),
+      cb"C")
 
     // Lonely start characters, separated by spaces
     if (!executingInJVM) {
@@ -120,23 +123,26 @@ class UTF8Test extends BaseCharsetTest(Charset.forName("UTF-8")) {
     // Impossible bytes
     testDecode(bb"fe")(Malformed(1))
     testDecode(bb"ff")(Malformed(1))
-    testDecode(bb"fe fe ff ff")(Malformed(1),
-                                Malformed(1),
-                                Malformed(1),
-                                Malformed(1))
+    testDecode(bb"fe fe ff ff")(
+      Malformed(1),
+      Malformed(1),
+      Malformed(1),
+      Malformed(1))
     // Old 5-byte and 6-byte starts
     if (!executingInJVM) {
-      testDecode(bb"f8 80 80 80 af")(Malformed(1),
-                                     Malformed(1),
-                                     Malformed(1),
-                                     Malformed(1),
-                                     Malformed(1))
-      testDecode(bb"fc 80 80 80 80 af")(Malformed(1),
-                                        Malformed(1),
-                                        Malformed(1),
-                                        Malformed(1),
-                                        Malformed(1),
-                                        Malformed(1))
+      testDecode(bb"f8 80 80 80 af")(
+        Malformed(1),
+        Malformed(1),
+        Malformed(1),
+        Malformed(1),
+        Malformed(1))
+      testDecode(bb"fc 80 80 80 80 af")(
+        Malformed(1),
+        Malformed(1),
+        Malformed(1),
+        Malformed(1),
+        Malformed(1),
+        Malformed(1))
 
       // Overlong sequences (encoded with more bytes than necessary)
       // Overlong '/'

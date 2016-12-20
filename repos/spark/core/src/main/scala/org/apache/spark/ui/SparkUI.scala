@@ -55,12 +55,13 @@ private[spark] class SparkUI private (
     var appName: String,
     val basePath: String,
     val startTime: Long)
-    extends WebUI(securityManager,
-                  securityManager.getSSLOptions("ui"),
-                  SparkUI.getUIPort(conf),
-                  conf,
-                  basePath,
-                  "SparkUI")
+    extends WebUI(
+      securityManager,
+      securityManager.getSSLOptions("ui"),
+      SparkUI.getUIPort(conf),
+      conf,
+      basePath,
+      "SparkUI")
     with Logging
     with UIRoot {
 
@@ -83,10 +84,11 @@ private[spark] class SparkUI private (
     attachHandler(ApiRootResource.getServletHandler(this))
     // This should be POST only, but, the YARN AM proxy won't proxy POSTs
     attachHandler(
-      createRedirectHandler("/stages/stage/kill",
-                            "/stages/",
-                            stagesTab.handleKillRequest,
-                            httpMethods = Set("GET", "POST")))
+      createRedirectHandler(
+        "/stages/stage/kill",
+        "/stages/",
+        stagesTab.handleKillRequest,
+        httpMethods = Set("GET", "POST")))
   }
   initialize()
 
@@ -160,13 +162,14 @@ private[spark] object SparkUI {
                    securityManager: SecurityManager,
                    appName: String,
                    startTime: Long): SparkUI = {
-    create(Some(sc),
-           conf,
-           listenerBus,
-           securityManager,
-           appName,
-           jobProgressListener = Some(jobProgressListener),
-           startTime = startTime)
+    create(
+      Some(sc),
+      conf,
+      listenerBus,
+      securityManager,
+      appName,
+      jobProgressListener = Some(jobProgressListener),
+      startTime = startTime)
   }
 
   def createHistoryUI(conf: SparkConf,
@@ -175,17 +178,19 @@ private[spark] object SparkUI {
                       appName: String,
                       basePath: String,
                       startTime: Long): SparkUI = {
-    val sparkUI = create(None,
-                         conf,
-                         listenerBus,
-                         securityManager,
-                         appName,
-                         basePath,
-                         startTime = startTime)
+    val sparkUI = create(
+      None,
+      conf,
+      listenerBus,
+      securityManager,
+      appName,
+      basePath,
+      startTime = startTime)
 
     val listenerFactories = ServiceLoader
-      .load(classOf[SparkHistoryListenerFactory],
-            Utils.getContextOrSparkClassLoader)
+      .load(
+        classOf[SparkHistoryListenerFactory],
+        Utils.getContextOrSparkClassLoader)
       .asScala
     listenerFactories.foreach { listenerFactory =>
       val listeners = listenerFactory.createListeners(conf, sparkUI)
@@ -229,17 +234,18 @@ private[spark] object SparkUI {
     listenerBus.addListener(storageListener)
     listenerBus.addListener(operationGraphListener)
 
-    new SparkUI(sc,
-                conf,
-                securityManager,
-                environmentListener,
-                storageStatusListener,
-                executorsListener,
-                _jobProgressListener,
-                storageListener,
-                operationGraphListener,
-                appName,
-                basePath,
-                startTime)
+    new SparkUI(
+      sc,
+      conf,
+      securityManager,
+      environmentListener,
+      storageStatusListener,
+      executorsListener,
+      _jobProgressListener,
+      storageListener,
+      operationGraphListener,
+      appName,
+      basePath,
+      startTime)
   }
 }

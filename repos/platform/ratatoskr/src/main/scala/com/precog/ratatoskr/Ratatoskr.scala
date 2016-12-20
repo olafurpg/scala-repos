@@ -166,14 +166,15 @@ object KafkaTools extends Command {
   def run(args: Array[String]) {
     val config = new Config
     val parser = new OptionParser("yggutils kafka") {
-      opt("r",
-          "range",
-          "<start:stop>",
-          "show message range, e.g.: 5:10 :100 10:", { s: String =>
-            val range = MessageRange.parse(s)
-            config.range =
-              range.getOrElse(sys.error("Invalid range specification: " + s))
-          })
+      opt(
+        "r",
+        "range",
+        "<start:stop>",
+        "show message range, e.g.: 5:10 :100 10:", { s: String =>
+          val range = MessageRange.parse(s)
+          config.range =
+            range.getOrElse(sys.error("Invalid range specification: " + s))
+        })
       intOpt(
         "i",
         "trackInterval",
@@ -199,13 +200,14 @@ object KafkaTools extends Command {
         "For the usage report, reset size for a given account when archive messages are encountered", {
           config.cumulative = false
         })
-      opt("k",
-          "lookupDatabase",
-          "accounts database name",
-          "Use this database for email lookups in usage reports", {
-            (s: String) =>
-              config.lookupDatabase = Some(s)
-          })
+      opt(
+        "k",
+        "lookupDatabase",
+        "accounts database name",
+        "Use this database for email lookups in usage reports", {
+          (s: String) =>
+            config.lookupDatabase = Some(s)
+        })
       opt(
         "v2",
         "centralToLocal",
@@ -413,9 +415,10 @@ object KafkaTools extends Command {
       if (path.length > 0) {
         val size = data.map(_.value.renderCompact.length).sum
 
-        ReportState(state.index + 1,
-                    state.pathSize +
-                      (path -> (state.pathSize.getOrElse(path, 0L) + size)))
+        ReportState(
+          state.index + 1,
+          state.pathSize +
+            (path -> (state.pathSize.getOrElse(path, 0L) + size)))
       } else {
         state.inc
       }
@@ -500,9 +503,10 @@ object KafkaTools extends Command {
             }).foreach { timestamp =>
               //println(index + " => " + timestamp)
               println(
-                "%d,%d,%s".format(timestamp,
-                                  accountTotals.sum,
-                                  accountTotals.mkString(",")))
+                "%d,%d,%s".format(
+                  timestamp,
+                  accountTotals.sum,
+                  accountTotals.mkString(",")))
             }
         }
       } else {
@@ -514,17 +518,19 @@ object KafkaTools extends Command {
             }).foreach { timestamp =>
               //println(index + " => " + timestamp)
               println(
-                JObject("index" -> JNum(timestamp),
-                        "account" -> JString("total"),
-                        "size" -> JNum(byAccount.map(_._2).sum)).renderCompact)
+                JObject(
+                  "index" -> JNum(timestamp),
+                  "account" -> JString("total"),
+                  "size" -> JNum(byAccount.map(_._2).sum)).renderCompact)
               trackedAccounts.foreach { account =>
                 if (byAccount.contains(account)) {
                   println(
-                    JObject("index" -> JNum(timestamp),
-                            "account" -> JString(
-                              accountLookup.getOrElse(account, account)),
-                            "size" -> JNum(byAccount
-                              .getOrElse(account, 0L))).renderCompact)
+                    JObject(
+                      "index" -> JNum(timestamp),
+                      "account" -> JString(
+                        accountLookup.getOrElse(account, account)),
+                      "size" -> JNum(byAccount
+                        .getOrElse(account, 0L))).renderCompact)
                 }
               }
             }
@@ -635,8 +641,8 @@ object KafkaTools extends Command {
 
         case other =>
           println(
-            "Message %d: %s was not an ingest request.".format(i + 1,
-                                                               other.toString))
+            "Message %d: %s was not an ingest request."
+              .format(i + 1, other.toString))
       }
     }
   }
@@ -656,8 +662,8 @@ object KafkaTools extends Command {
       parsed.valueOr {
         case other =>
           println(
-            "Message %d: %s was not an ingest request.".format(i + 1,
-                                                               other.toString))
+            "Message %d: %s was not an ingest request."
+              .format(i + 1, other.toString))
       }
     }
   }
@@ -681,11 +687,12 @@ object ZookeeperTools extends Command {
       opt("a", "agents", "Show ingest agent state with prefix", { s: String =>
         config.showAgents = Some(s)
       })
-      opt("uc",
-          "update_checkpoints",
-          "Update agent state. Format = path:json", { s: String =>
-            config.updateCheckpoint = Some(s)
-          })
+      opt(
+        "uc",
+        "update_checkpoints",
+        "Update agent state. Format = path:json", { s: String =>
+          config.updateCheckpoint = Some(s)
+        })
       opt("ua", "update_agents", "Update agent state. Format = path:json", {
         s: String =>
           config.updateAgent = Some(s)
@@ -955,24 +962,27 @@ object ImportTools extends Command with Logging {
       opt("t", "token", "<api key>", "authorizing API key", { s: String =>
         config.apiKey = s
       })
-      opt("o",
-          "owner",
-          "<account id>",
-          "Owner account ID to insert data under", { s: String =>
-            config.accountId = s
-          })
-      opt("s",
-          "storage",
-          "<storage root>",
-          "directory containing data files", { s: String =>
-            config.storageRoot = new File(s)
-          })
-      opt("a",
-          "archive",
-          "<archive root>",
-          "directory containing archived data files", { s: String =>
-            config.archiveRoot = new File(s)
-          })
+      opt(
+        "o",
+        "owner",
+        "<account id>",
+        "Owner account ID to insert data under", { s: String =>
+          config.accountId = s
+        })
+      opt(
+        "s",
+        "storage",
+        "<storage root>",
+        "directory containing data files", { s: String =>
+          config.storageRoot = new File(s)
+        })
+      opt(
+        "a",
+        "archive",
+        "<archive root>",
+        "directory containing archived data files", { s: String =>
+          config.archiveRoot = new File(s)
+        })
       arglist("<json input> ...", "json input file mappings {db}={input}", {
         s: String =>
           val parts = s.split("=")
@@ -1014,15 +1024,18 @@ object ImportTools extends Command with Logging {
 
     val chefs = (1 to 8).map { _ =>
       actorSystem.actorOf(
-        Props(Chef(VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
-                   VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
+        Props(
+          Chef(
+            VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
+            VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
     }
     val masterChef =
       actorSystem.actorOf(Props[Chef].withRouter(RoundRobinRouter(chefs)))
 
-    val accountFinder = new StaticAccountFinder[Future](config.accountId,
-                                                        config.apiKey,
-                                                        Some("/"))
+    val accountFinder = new StaticAccountFinder[Future](
+      config.accountId,
+      config.apiKey,
+      Some("/"))
 
     logger.info("Starting APIKeyFinder")
     //// ****** WARNING ****** ////
@@ -1040,20 +1053,22 @@ object ImportTools extends Command with Logging {
       val jobManager = new InMemoryJobManager[Future]
       val permissionsFinder =
         new PermissionsFinder(apiKeyFinder, accountFinder, new Instant(0L))
-      val resourceBuilder = new ResourceBuilder(actorSystem,
-                                                yggConfig.clock,
-                                                masterChef,
-                                                yggConfig.cookThreshold,
-                                                yggConfig.storageTimeout)
+      val resourceBuilder = new ResourceBuilder(
+        actorSystem,
+        yggConfig.clock,
+        masterChef,
+        yggConfig.cookThreshold,
+        yggConfig.storageTimeout)
 
       logger.info("Starting Projections Actor")
       val projectionsActor = actorSystem.actorOf(
         Props(
-          new PathRoutingActor(yggConfig.dataDir,
-                               yggConfig.storageTimeout.duration,
-                               yggConfig.quiescenceTimeout,
-                               100,
-                               yggConfig.clock)))
+          new PathRoutingActor(
+            yggConfig.dataDir,
+            yggConfig.storageTimeout.duration,
+            yggConfig.quiescenceTimeout,
+            100,
+            yggConfig.clock)))
 
       logger.info("Shard module complete")
     }
@@ -1068,11 +1083,12 @@ object ImportTools extends Command with Logging {
       for {
         rootKey <- apiKeyManager.rootAPIKey
         rootGrantId <- apiKeyManager.rootGrantId
-        _ <- apiKeyManager.populateAPIKey(None,
-                                          None,
-                                          rootKey,
-                                          key,
-                                          Set(rootGrantId)) onComplete {
+        _ <- apiKeyManager.populateAPIKey(
+          None,
+          None,
+          rootKey,
+          key,
+          Set(rootGrantId)) onComplete {
           case Left(error) =>
             logger.error(
               "Could not add grant " + rootGrantId + " to apiKey " + key,
@@ -1118,13 +1134,14 @@ object ImportTools extends Command with Logging {
             val update = IngestData(
               Seq(
                 (offset,
-                 IngestMessage(apiKey,
-                               path,
-                               authorities,
-                               records,
-                               None,
-                               yggConfig.clock.instant,
-                               StreamRef.Append)))
+                 IngestMessage(
+                   apiKey,
+                   path,
+                   authorities,
+                   records,
+                   None,
+                   yggConfig.clock.instant,
+                   StreamRef.Append)))
             )
 
             (vfsModule.projectionsActor ? update) flatMap { _ =>
@@ -1195,10 +1212,11 @@ object CSVTools extends Command {
 
   def process(config: Config) {
     CSVToJSONConverter
-      .convert(config.input,
-               config.delimeter,
-               config.teaseTimestamps,
-               config.verbose)
+      .convert(
+        config.input,
+        config.delimeter,
+        config.teaseTimestamps,
+        config.verbose)
       .foreach {
         case jval => println(jval.renderCompact)
       }
@@ -1297,9 +1315,10 @@ object APIKeyTools extends Command with AkkaDefaults with Logging {
       }
 
     rootKey map { k =>
-      (new MongoAPIKeyManager(mongo,
-                              database,
-                              config.mongoSettings.copy(rootKeyId = k.apiKey)),
+      (new MongoAPIKeyManager(
+         mongo,
+         database,
+         config.mongoSettings.copy(rootKeyId = k.apiKey)),
        dbStop)
     }
   }

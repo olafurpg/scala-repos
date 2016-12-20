@@ -65,8 +65,9 @@ final class DList[A] private[scalaz] (f: IList[A] => Trampoline[IList[A]]) {
     foldr(DList[B]())((x, y) => f(x) ++ y)
 
   def zip[B](bs: => DList[B]): DList[(A, B)] =
-    uncons(DList(),
-           (h, t) => bs.uncons(DList(), (h2, t2) => (h → h2) +: (t zip t2)))
+    uncons(
+      DList(),
+      (h, t) => bs.uncons(DList(), (h2, t2) => (h → h2) +: (t zip t2)))
 }
 
 object DList extends DListInstances {

@@ -322,9 +322,10 @@ object AclCommand {
       .ofType(classOf[String])
 
     val topicOpt = parser
-      .accepts("topic",
-               "topic to which ACLs should be added or removed. " +
-                 "A value of * indicates ACL should apply to all topics.")
+      .accepts(
+        "topic",
+        "topic to which ACLs should be added or removed. " +
+          "A value of * indicates ACL should apply to all topics.")
       .withRequiredArg
       .describedAs("topic")
       .ofType(classOf[String])
@@ -421,15 +422,17 @@ object AclCommand {
           parser,
           "Command must include exactly one action: --list, --add, --remove. ")
 
-      CommandLineUtils.checkInvalidArgs(parser,
-                                        options,
-                                        listOpt,
-                                        Set(producerOpt,
-                                            consumerOpt,
-                                            allowHostsOpt,
-                                            allowPrincipalsOpt,
-                                            denyHostssOpt,
-                                            denyPrincipalsOpt))
+      CommandLineUtils.checkInvalidArgs(
+        parser,
+        options,
+        listOpt,
+        Set(
+          producerOpt,
+          consumerOpt,
+          allowHostsOpt,
+          allowPrincipalsOpt,
+          denyHostssOpt,
+          denyPrincipalsOpt))
 
       //when --producer or --consumer is specified , user should not specify operations as they are inferred and we also disallow --deny-principals and --deny-hosts.
       CommandLineUtils.checkInvalidArgs(

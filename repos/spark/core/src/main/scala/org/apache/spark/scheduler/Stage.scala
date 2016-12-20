@@ -126,10 +126,11 @@ private[scheduler] abstract class Stage(val id: Int,
   def makeNewStageAttempt(numPartitionsToCompute: Int,
                           taskLocalityPreferences: Seq[Seq[TaskLocation]] =
                             Seq.empty): Unit = {
-    _latestInfo = StageInfo.fromStage(this,
-                                      nextAttemptId,
-                                      Some(numPartitionsToCompute),
-                                      taskLocalityPreferences)
+    _latestInfo = StageInfo.fromStage(
+      this,
+      nextAttemptId,
+      Some(numPartitionsToCompute),
+      taskLocalityPreferences)
     nextAttemptId += 1
   }
 

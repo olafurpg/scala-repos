@@ -40,13 +40,14 @@ object SdkUtils {
 
   def defaultJavaLanguageLevelIn(
       jdk: projectRoots.Sdk): Option[LanguageLevel] = {
-    val JavaLanguageLevels = Map("1.3" -> LanguageLevel.JDK_1_3,
-                                 "1.4" -> LanguageLevel.JDK_1_4,
-                                 "1.5" -> LanguageLevel.JDK_1_5,
-                                 "1.6" -> LanguageLevel.JDK_1_6,
-                                 "1.7" -> LanguageLevel.JDK_1_7,
-                                 "1.8" -> LanguageLevel.JDK_1_8,
-                                 "1.9" -> LanguageLevel.JDK_1_9)
+    val JavaLanguageLevels = Map(
+      "1.3" -> LanguageLevel.JDK_1_3,
+      "1.4" -> LanguageLevel.JDK_1_4,
+      "1.5" -> LanguageLevel.JDK_1_5,
+      "1.6" -> LanguageLevel.JDK_1_6,
+      "1.7" -> LanguageLevel.JDK_1_7,
+      "1.8" -> LanguageLevel.JDK_1_8,
+      "1.9" -> LanguageLevel.JDK_1_9)
     val jdkVersion = Option(jdk.getVersionString).getOrElse(jdk.getName)
 
     JavaLanguageLevels.collectFirst {

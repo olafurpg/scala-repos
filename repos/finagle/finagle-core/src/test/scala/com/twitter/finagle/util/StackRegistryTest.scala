@@ -122,9 +122,10 @@ class StackRegistryTest extends FunSuite {
     reg.register("addr2", stk, Stack.Params.empty + param.Label(name))
     assert(reg.registeredDuplicates.size == 1)
 
-    reg.register("addr3",
-                 stk,
-                 Stack.Params.empty + param.Label("somethingelse"))
+    reg.register(
+      "addr3",
+      stk,
+      Stack.Params.empty + param.Label("somethingelse"))
     assert(reg.registeredDuplicates.size == 1)
   }
 }

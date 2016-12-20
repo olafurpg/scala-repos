@@ -373,8 +373,9 @@ object CPathTraversal {
           case (p :: ps, q :: qs) if p == q =>
             loop(ps, qs, p :: is, rss)
 
-          case (CPathPoint(n @ CPathIndex(i)) :: ps,
-                CPathRange(ns, j, k) :: qs) if i >= j && i <= k.getOrElse(i) =>
+          case (
+              CPathPoint(n @ CPathIndex(i)) :: ps,
+              CPathRange(ns, j, k) :: qs) if i >= j && i <= k.getOrElse(i) =>
             val rss0 =
               if (j < i) {
                 ((CPathRange(ns, j, Some(i - 1)) :: is) reverse_::: qs) :: rss
@@ -387,8 +388,9 @@ object CPathTraversal {
 
             loop(ps, qs, CPathRange(ns + n, i, Some(i)) :: is, rss1)
 
-          case (CPathRange(ns, j, k) :: ps,
-                CPathPoint(n @ CPathIndex(i)) :: qs)
+          case (
+              CPathRange(ns, j, k) :: ps,
+              CPathPoint(n @ CPathIndex(i)) :: qs)
               if i >= j && i <= k.getOrElse(i) =>
             val rss0 =
               if (j < i) {
@@ -425,9 +427,10 @@ object CPathTraversal {
             loop(
               ps,
               qs,
-              CPathRange(ns1 ++ ns2,
-                         math.max(l1, l2),
-                         ^(r1, r2)(math.min(_, _)) orElse r1 orElse r2) :: is,
+              CPathRange(
+                ns1 ++ ns2,
+                math.max(l1, l2),
+                ^(r1, r2)(math.min(_, _)) orElse r1 orElse r2) :: is,
               rss1)
 
           case (ps, qs) =>

@@ -101,9 +101,10 @@ private[streaming] class DStreamCheckpointData[T: ClassTag](
                 "Deleted checkpoint file '" + file + "' for time " + time)
             } catch {
               case e: Exception =>
-                logWarning("Error deleting old checkpoint file '" + file +
-                             "' for time " + time,
-                           e)
+                logWarning(
+                  "Error deleting old checkpoint file '" + file +
+                    "' for time " + time,
+                  e)
                 fileSystem = null
             }
         }

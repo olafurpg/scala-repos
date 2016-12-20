@@ -90,18 +90,19 @@ class HypothesisTestSuite extends SparkFunSuite with MLlibTestSparkContext {
   }
 
   test("chi squared pearson matrix independence") {
-    val data = Array(40.0,
-                     24.0,
-                     29.0,
-                     56.0,
-                     32.0,
-                     42.0,
-                     31.0,
-                     10.0,
-                     0.0,
-                     30.0,
-                     15.0,
-                     12.0)
+    val data = Array(
+      40.0,
+      24.0,
+      29.0,
+      56.0,
+      32.0,
+      42.0,
+      31.0,
+      10.0,
+      0.0,
+      30.0,
+      15.0,
+      12.0)
     // [[40.0, 56.0, 31.0, 30.0],
     //  [24.0, 32.0, 10.0, 15.0],
     //  [29.0, 42.0, 0.0,  12.0]]
@@ -136,12 +137,13 @@ class HypothesisTestSuite extends SparkFunSuite with MLlibTestSparkContext {
     // labels: 1.0 (2 / 6), 0.0 (4 / 6)
     // feature1: 0.5 (1 / 6), 1.5 (2 / 6), 3.5 (3 / 6)
     // feature2: 10.0 (1 / 6), 20.0 (1 / 6), 30.0 (2 / 6), 40.0 (2 / 6)
-    val data = Seq(LabeledPoint(0.0, Vectors.dense(0.5, 10.0)),
-                   LabeledPoint(0.0, Vectors.dense(1.5, 20.0)),
-                   LabeledPoint(1.0, Vectors.dense(1.5, 30.0)),
-                   LabeledPoint(0.0, Vectors.dense(3.5, 30.0)),
-                   LabeledPoint(0.0, Vectors.dense(3.5, 40.0)),
-                   LabeledPoint(1.0, Vectors.dense(3.5, 40.0)))
+    val data = Seq(
+      LabeledPoint(0.0, Vectors.dense(0.5, 10.0)),
+      LabeledPoint(0.0, Vectors.dense(1.5, 20.0)),
+      LabeledPoint(1.0, Vectors.dense(1.5, 30.0)),
+      LabeledPoint(0.0, Vectors.dense(3.5, 30.0)),
+      LabeledPoint(0.0, Vectors.dense(3.5, 40.0)),
+      LabeledPoint(1.0, Vectors.dense(3.5, 40.0)))
     for (numParts <- List(2, 4, 6, 8)) {
       val chi = Statistics.chiSqTest(sc.parallelize(data, numParts))
       val feature1 = chi(0)
@@ -163,8 +165,9 @@ class HypothesisTestSuite extends SparkFunSuite with MLlibTestSparkContext {
     // Test that the right number of results is returned
     val numCols = 1001
     val sparseData =
-      Array(new LabeledPoint(0.0, Vectors.sparse(numCols, Seq((100, 2.0)))),
-            new LabeledPoint(0.1, Vectors.sparse(numCols, Seq((200, 1.0)))))
+      Array(
+        new LabeledPoint(0.0, Vectors.sparse(numCols, Seq((100, 2.0)))),
+        new LabeledPoint(0.1, Vectors.sparse(numCols, Seq((200, 1.0)))))
     val chi = Statistics.chiSqTest(sc.parallelize(sparseData))
     assert(chi.size === numCols)
     assert(chi(1000) != null) // SPARK-3087
@@ -237,8 +240,9 @@ class HypothesisTestSuite extends SparkFunSuite with MLlibTestSparkContext {
     // Where X != Y
     val result3 = Statistics.kolmogorovSmirnovTest(sampledExp, expCDF)
     val referenceStat3 =
-      ksTest.kolmogorovSmirnovStatistic(new ExponentialDistribution(0.2),
-                                        sampledExp.collect())
+      ksTest.kolmogorovSmirnovStatistic(
+        new ExponentialDistribution(0.2),
+        sampledExp.collect())
     val referencePVal3 =
       1 - ksTest.cdf(referenceStat3, sampledNorm.count().toInt)
     // verify vs apache math commons ks test

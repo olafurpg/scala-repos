@@ -159,9 +159,10 @@ class PerformanceSpec
 
   def stressMixedPersistentActor(failAt: Option[Long]): Unit = {
     val persistentActor = namedPersistentActor[MixedTestPersistentActor]
-    stressPersistentActor(persistentActor,
-                          failAt,
-                          "persistent events & commands")
+    stressPersistentActor(
+      persistentActor,
+      failAt,
+      "persistent events & commands")
   }
 
   def stressStashingPersistentActor(): Unit = {

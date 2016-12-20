@@ -179,12 +179,14 @@ final class CookedReader(baseDir: File,
                   segmentFormat.reader.readSegment(channel).toValidationNel
                 }
               }
-              .sequence[({ type λ[α] = ValidationNel[IOException, α] })#λ,
-                        Segment]
+              .sequence[
+                ({ type λ[α] = ValidationNel[IOException, α] })#λ,
+                Segment]
             v map (path -> _)
           }
-          .sequence[({ type λ[α] = ValidationNel[IOException, α] })#λ,
-                    (ColumnRef, List[Segment])]
+          .sequence[
+            ({ type λ[α] = ValidationNel[IOException, α] })#λ,
+            (ColumnRef, List[Segment])]
     }
   }
 }

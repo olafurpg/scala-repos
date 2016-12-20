@@ -75,8 +75,9 @@ private[orc] object OrcFilters extends Logging {
       // Combines all convertible filters using `And` to produce a single conjunction
       conjunction <- convertibleFilters.reduceOption(And)
       // Then tries to build a single ORC `SearchArgument` for the conjunction predicate
-      builder <- buildSearchArgument(conjunction,
-                                     SearchArgumentFactory.newBuilder())
+      builder <- buildSearchArgument(
+        conjunction,
+        SearchArgumentFactory.newBuilder())
     } yield builder.build()
   }
 

@@ -53,11 +53,12 @@ object MediaRangeSpec extends Specification {
       MediaRange.parse("""foo/bar, foo2/bar2; p="v,/\"\\vv"; p2=v2""") must_==
         Seq(
           new MediaRange("foo", "bar", Nil, None, Nil),
-          new MediaRange("foo2",
-                         "bar2",
-                         Seq("p" -> Some("""v,/"\vv"""), "p2" -> Some("v2")),
-                         None,
-                         Nil)
+          new MediaRange(
+            "foo2",
+            "bar2",
+            Seq("p" -> Some("""v,/"\vv"""), "p2" -> Some("v2")),
+            None,
+            Nil)
         )
     }
     "allow valueless parameters" in {
@@ -107,11 +108,12 @@ object MediaRangeSpec extends Specification {
     "order by parameters" in {
       MediaRange.parse("foo/bar, foo/bar;p1=v1;p2=v2, foo/bar;p1=v1") must contain(
         exactly(
-          new MediaRange("foo",
-                         "bar",
-                         Seq("p1" -> Some("v1"), "p2" -> Some("v2")),
-                         None,
-                         Nil),
+          new MediaRange(
+            "foo",
+            "bar",
+            Seq("p1" -> Some("v1"), "p2" -> Some("v2")),
+            None,
+            Nil),
           new MediaRange("foo", "bar", Seq("p1" -> Some("v1")), None, Nil),
           new MediaRange("foo", "bar", Nil, None, Nil)
         ).inOrder)
@@ -131,11 +133,10 @@ object MediaRangeSpec extends Specification {
     }
     "be able to be convert back to a string" in {
       new MediaType("foo", "bar", Nil).toString must_== "foo/bar"
-      new MediaType("foo",
-                    "bar",
-                    Seq("p1" -> Some("v1"),
-                        "p2" -> Some(""" v\"v"""),
-                        "p3" -> None)).toString must_== """foo/bar; p1=v1; p2=" v\\\"v"; p3"""
+      new MediaType(
+        "foo",
+        "bar",
+        Seq("p1" -> Some("v1"), "p2" -> Some(""" v\"v"""), "p3" -> None)).toString must_== """foo/bar; p1=v1; p2=" v\\\"v"; p3"""
       new MediaRange("foo", "bar", Nil, None, Nil).toString must_== "foo/bar"
       new MediaRange("foo", "bar", Nil, Some(0.25f), Nil).toString must_== "foo/bar; q=0.25"
       new MediaRange(

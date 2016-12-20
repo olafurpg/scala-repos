@@ -50,11 +50,12 @@ class CommonsStatsReceiver extends StatsReceiverWithCumulativeGauges {
         if (!stats.contains(name)) {
           val stat = new Stat {
             val percentile =
-              new Percentile[java.lang.Float](variableName(name),
-                                              100.0f,
-                                              50,
-                                              95,
-                                              99)
+              new Percentile[java.lang.Float](
+                variableName(name),
+                100.0f,
+                50,
+                95,
+                99)
             def add(value: Float): Unit = percentile.record(value)
           }
 

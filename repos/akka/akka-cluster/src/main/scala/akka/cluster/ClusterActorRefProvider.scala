@@ -37,10 +37,11 @@ private[akka] class ClusterActorRefProvider(_systemName: String,
                                             _settings: ActorSystem.Settings,
                                             _eventStream: EventStream,
                                             _dynamicAccess: DynamicAccess)
-    extends RemoteActorRefProvider(_systemName,
-                                   _settings,
-                                   _eventStream,
-                                   _dynamicAccess) {
+    extends RemoteActorRefProvider(
+      _systemName,
+      _settings,
+      _eventStream,
+      _dynamicAccess) {
 
   override def init(system: ActorSystemImpl): Unit = {
     super.init(system)
@@ -57,12 +58,11 @@ private[akka] class ClusterActorRefProvider(_systemName: String,
     import remoteSettings._
     val failureDetector = createRemoteWatcherFailureDetector(system)
     system.systemActorOf(
-      ClusterRemoteWatcher.props(failureDetector,
-                                 heartbeatInterval = WatchHeartBeatInterval,
-                                 unreachableReaperInterval =
-                                   WatchUnreachableReaperInterval,
-                                 heartbeatExpectedResponseAfter =
-                                   WatchHeartbeatExpectedResponseAfter),
+      ClusterRemoteWatcher.props(
+        failureDetector,
+        heartbeatInterval = WatchHeartBeatInterval,
+        unreachableReaperInterval = WatchUnreachableReaperInterval,
+        heartbeatExpectedResponseAfter = WatchHeartbeatExpectedResponseAfter),
       "remote-watcher")
   }
 

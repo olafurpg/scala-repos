@@ -376,8 +376,9 @@ class ScalaSigPrinter(stream: PrintStream, printPrivates: Boolean) {
             case _ => {
               val path =
                 StringUtil.cutSubstring(symbol.path)(".package") //remove package object reference
-              StringUtil.trimStart(processName(path) + typeArgString(typeArgs),
-                                   "<empty>.")
+              StringUtil.trimStart(
+                processName(path) + typeArgString(typeArgs),
+                "<empty>.")
             }
           })
       case TypeBoundsType(lower, upper) => {
@@ -442,24 +443,25 @@ class ScalaSigPrinter(stream: PrintStream, printPrivates: Boolean) {
     if (params.isEmpty) ""
     else params.map(toString).mkString("[", ", ", "]")
 
-  val _syms = Map("\\$bar" -> "|",
-                  "\\$tilde" -> "~",
-                  "\\$bang" -> "!",
-                  "\\$up" -> "^",
-                  "\\$plus" -> "+",
-                  "\\$minus" -> "-",
-                  "\\$eq" -> "=",
-                  "\\$less" -> "<",
-                  "\\$times" -> "*",
-                  "\\$div" -> "/",
-                  "\\$bslash" -> "\\\\",
-                  "\\$greater" -> ">",
-                  "\\$qmark" -> "?",
-                  "\\$percent" -> "%",
-                  "\\$amp" -> "&",
-                  "\\$colon" -> ":",
-                  "\\$u2192" -> "→",
-                  "\\$hash" -> "#")
+  val _syms = Map(
+    "\\$bar" -> "|",
+    "\\$tilde" -> "~",
+    "\\$bang" -> "!",
+    "\\$up" -> "^",
+    "\\$plus" -> "+",
+    "\\$minus" -> "-",
+    "\\$eq" -> "=",
+    "\\$less" -> "<",
+    "\\$times" -> "*",
+    "\\$div" -> "/",
+    "\\$bslash" -> "\\\\",
+    "\\$greater" -> ">",
+    "\\$qmark" -> "?",
+    "\\$percent" -> "%",
+    "\\$amp" -> "&",
+    "\\$colon" -> ":",
+    "\\$u2192" -> "→",
+    "\\$hash" -> "#")
   val pattern = Pattern.compile(
     _syms.keys.foldLeft("")((x, y) => if (x == "") y else x + "|" + y))
   val placeholderPattern = "_\\$(\\d)+"

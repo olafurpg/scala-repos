@@ -22,11 +22,12 @@ private[setup] case class UserConfig(id: String,
 private[setup] object UserConfig {
 
   def default(id: String): UserConfig =
-    UserConfig(id = id,
-               ai = AiConfig.default,
-               friend = FriendConfig.default,
-               hook = HookConfig.default,
-               filter = FilterConfig.default)
+    UserConfig(
+      id = id,
+      ai = AiConfig.default,
+      friend = FriendConfig.default,
+      hook = HookConfig.default,
+      filter = FilterConfig.default)
 
   import lila.db.{BsTube, BSON}
   import reactivemongo.bson._
@@ -46,11 +47,12 @@ private[setup] object UserConfig {
         filter = r.getO[FilterConfig]("filter") | FilterConfig.default)
 
     def writes(w: BSON.Writer, o: UserConfig) =
-      BSONDocument("_id" -> o.id,
-                   "ai" -> o.ai,
-                   "friend" -> o.friend,
-                   "hook" -> o.hook,
-                   "filter" -> o.filter)
+      BSONDocument(
+        "_id" -> o.id,
+        "ai" -> o.ai,
+        "friend" -> o.friend,
+        "hook" -> o.hook,
+        "filter" -> o.filter)
   }
 
   private[setup] val tube = BsTube(userConfigBSONHandler)

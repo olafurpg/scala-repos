@@ -29,9 +29,10 @@ class SinatraLikeUrlGeneratorTest extends FunSuite with Matchers {
   }
 
   test("Named of path containing a dot get replaced anyway") {
-    url("/dot-outside-named-param/:file.:ext",
-        "file" -> "TroutLauncher",
-        "ext" -> "scala") should equal(
+    url(
+      "/dot-outside-named-param/:file.:ext",
+      "file" -> "TroutLauncher",
+      "ext" -> "scala") should equal(
       "/dot-outside-named-param/TroutLauncher.scala")
   }
 
@@ -76,9 +77,10 @@ class SinatraLikeUrlGeneratorTest extends FunSuite with Matchers {
   }
 
   test("Mix named and splat") {
-    url("/mix-named-and-splat-params/:foo/*",
-        Map("foo" -> "deep"),
-        Seq("purple")) should equal("/mix-named-and-splat-params/deep/purple")
+    url(
+      "/mix-named-and-splat-params/:foo/*",
+      Map("foo" -> "deep"),
+      Seq("purple")) should equal("/mix-named-and-splat-params/deep/purple")
   }
 
   test("Unexpected splat parameters trigger an exception") {

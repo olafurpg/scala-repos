@@ -118,8 +118,9 @@ object FixCertpathDebugLogging {
       AccessController.doPrivileged(action)
     } catch {
       case NonFatal(e) =>
-        throw new IllegalStateException("CertificateDebug configuration error",
-                                        e)
+        throw new IllegalStateException(
+          "CertificateDebug configuration error",
+          e)
     }
   }
 }

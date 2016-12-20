@@ -643,8 +643,9 @@ abstract class Stream[+A]
       asThat(
         if (this.isEmpty || that.isEmpty) Stream.Empty
         else
-          cons((this.head, that.head),
-               asStream[(A1, B)](this.tail zip that.tail))
+          cons(
+            (this.head, that.head),
+            asStream[(A1, B)](this.tail zip that.tail))
       )
     else super.zip(that)(bf)
 

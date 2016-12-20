@@ -12,10 +12,11 @@ object argmax extends UFunc {
   @expand
   implicit def reduce[T, I, @expand.args(Int, Double, Float, Long) S](
       implicit iter: CanTraverseKeyValuePairs[T, I, S],
-      @expand.sequence[S](Int.MinValue,
-                          Double.NegativeInfinity,
-                          Float.NegativeInfinity,
-                          Long.MinValue) init: S): Impl[T, I] =
+      @expand.sequence[S](
+        Int.MinValue,
+        Double.NegativeInfinity,
+        Float.NegativeInfinity,
+        Long.MinValue) init: S): Impl[T, I] =
     new Impl[T, I] {
       def apply(v: T): I = {
         class SumVisitor extends KeyValuePairsVisitor[I, S] {
@@ -76,10 +77,11 @@ object argmin extends UFunc {
   @expand
   implicit def reduce[T, I, @expand.args(Int, Double, Float, Long) S](
       implicit iter: CanTraverseKeyValuePairs[T, I, S],
-      @expand.sequence[S](Int.MaxValue,
-                          Double.PositiveInfinity,
-                          Float.PositiveInfinity,
-                          Long.MaxValue) init: S): Impl[T, I] =
+      @expand.sequence[S](
+        Int.MaxValue,
+        Double.PositiveInfinity,
+        Float.PositiveInfinity,
+        Long.MaxValue) init: S): Impl[T, I] =
     new Impl[T, I] {
       def apply(v: T): I = {
         class SumVisitor extends KeyValuePairsVisitor[I, S] {

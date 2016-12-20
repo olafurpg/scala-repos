@@ -583,8 +583,9 @@ object ProvenanceCheckingSpecs
     "accept union on different loads" in {
       val tree = compileSingle("//foo union //bar")
       tree.provenance must beLike {
-        case CoproductProvenance(StaticProvenance("/foo"),
-                                 StaticProvenance("/bar")) =>
+        case CoproductProvenance(
+            StaticProvenance("/foo"),
+            StaticProvenance("/bar")) =>
           ok
       }
       tree.errors must beEmpty
@@ -593,8 +594,9 @@ object ProvenanceCheckingSpecs
     "accept union on different relative loads" in {
       val tree = compileSingle("./foo union ./bar")
       tree.provenance must beLike {
-        case CoproductProvenance(StaticProvenance("foo"),
-                                 StaticProvenance("bar")) =>
+        case CoproductProvenance(
+            StaticProvenance("foo"),
+            StaticProvenance("bar")) =>
           ok
       }
       tree.errors must beEmpty
@@ -603,8 +605,9 @@ object ProvenanceCheckingSpecs
     "accept union on static and dynamic provenances" in {
       val tree = compileSingle("//foo union new 1")
       tree.provenance must beLike {
-        case CoproductProvenance(StaticProvenance("/foo"),
-                                 DynamicProvenance(_)) =>
+        case CoproductProvenance(
+            StaticProvenance("/foo"),
+            DynamicProvenance(_)) =>
           ok
       }
       tree.errors must beEmpty
@@ -680,11 +683,13 @@ object ProvenanceCheckingSpecs
       val tree =
         compileSingle("(//foo union //bar) difference (//bar union //baz)")
       tree.provenance must beLike {
-        case CoproductProvenance(StaticProvenance("/foo"),
-                                 StaticProvenance("/bar")) =>
+        case CoproductProvenance(
+            StaticProvenance("/foo"),
+            StaticProvenance("/bar")) =>
           ok
-        case CoproductProvenance(StaticProvenance("/bar"),
-                                 StaticProvenance("/foo")) =>
+        case CoproductProvenance(
+            StaticProvenance("/bar"),
+            StaticProvenance("/foo")) =>
           ok
       }
       tree.errors must beEmpty
@@ -710,8 +715,9 @@ object ProvenanceCheckingSpecs
       val tree = compileSingle(
         "(//foo union (new //bar)) difference ((new //baz) union //qux)")
       tree.provenance must beLike {
-        case CoproductProvenance(StaticProvenance("/foo"),
-                                 DynamicProvenance(_)) =>
+        case CoproductProvenance(
+            StaticProvenance("/foo"),
+            DynamicProvenance(_)) =>
           ok
       }
       tree.errors must beEmpty
@@ -722,22 +728,26 @@ object ProvenanceCheckingSpecs
         compileSingle("back := //foo ~ //bar //foo + //bar back")
 
       tree.resultProvenance must beLike {
-        case ProductProvenance(StaticProvenance("/foo"),
-                               StaticProvenance("/bar")) =>
+        case ProductProvenance(
+            StaticProvenance("/foo"),
+            StaticProvenance("/bar")) =>
           ok
-        case ProductProvenance(StaticProvenance("/bar"),
-                               StaticProvenance("/foo")) =>
+        case ProductProvenance(
+            StaticProvenance("/bar"),
+            StaticProvenance("/foo")) =>
           ok
       }
 
       tree.resultProvenance.isParametric mustEqual false
 
       tree.provenance must beLike {
-        case ProductProvenance(StaticProvenance("/foo"),
-                               StaticProvenance("/bar")) =>
+        case ProductProvenance(
+            StaticProvenance("/foo"),
+            StaticProvenance("/bar")) =>
           ok
-        case ProductProvenance(StaticProvenance("/bar"),
-                               StaticProvenance("/foo")) =>
+        case ProductProvenance(
+            StaticProvenance("/bar"),
+            StaticProvenance("/foo")) =>
           ok
       }
 
@@ -759,11 +769,13 @@ object ProvenanceCheckingSpecs
       val tree = compileSingle(input)
 
       tree.provenance must beLike {
-        case CoproductProvenance(ProductProvenance(StaticProvenance("/foo"),
-                                                   StaticProvenance("/bar")),
-                                 ProductProvenance(StaticProvenance("/bar"),
-                                                   StaticProvenance(
-                                                     "/baz"))) =>
+        case CoproductProvenance(
+            ProductProvenance(
+              StaticProvenance("/foo"),
+              StaticProvenance("/bar")),
+            ProductProvenance(
+              StaticProvenance("/bar"),
+              StaticProvenance("/baz"))) =>
           ok
       }
 
@@ -820,8 +832,9 @@ object ProvenanceCheckingSpecs
 
       val tree = compileSingle(input)
 
-      tree.provenance mustEqual ProductProvenance(StaticProvenance("/foo"),
-                                                  StaticProvenance("/baz"))
+      tree.provenance mustEqual ProductProvenance(
+        StaticProvenance("/foo"),
+        StaticProvenance("/baz"))
       tree.errors must beEmpty
     }
 
@@ -844,8 +857,9 @@ object ProvenanceCheckingSpecs
 
       val tree = compileSingle(input)
 
-      tree.provenance mustEqual ProductProvenance(StaticProvenance("/foo"),
-                                                  StaticProvenance("/baz"))
+      tree.provenance mustEqual ProductProvenance(
+        StaticProvenance("/foo"),
+        StaticProvenance("/baz"))
       tree.errors must beEmpty
     }
 
@@ -901,8 +915,9 @@ object ProvenanceCheckingSpecs
 
       // in this case we are "removing" all of `bar` from `fb`
       // but the provenance alone does not tell us this
-      tree.provenance mustEqual CoproductProvenance(StaticProvenance("/foo"),
-                                                    StaticProvenance("/bar"))
+      tree.provenance mustEqual CoproductProvenance(
+        StaticProvenance("/foo"),
+        StaticProvenance("/bar"))
       tree.errors must beEmpty
     }
 
@@ -933,8 +948,9 @@ object ProvenanceCheckingSpecs
 
       val tree = compileSingle(input)
       tree.provenance must beLike {
-        case CoproductProvenance(StaticProvenance("/foo"),
-                                 StaticProvenance("/bar")) =>
+        case CoproductProvenance(
+            StaticProvenance("/foo"),
+            StaticProvenance("/bar")) =>
           ok
       }
       tree.errors must beEmpty
@@ -1041,11 +1057,13 @@ object ProvenanceCheckingSpecs
       val tree = compileSingle(input)
 
       tree.provenance must beLike {
-        case CoproductProvenance(ProductProvenance(StaticProvenance("/foo"),
-                                                   StaticProvenance("/bar")),
-                                 ProductProvenance(StaticProvenance("/bar"),
-                                                   StaticProvenance(
-                                                     "/baz"))) =>
+        case CoproductProvenance(
+            ProductProvenance(
+              StaticProvenance("/foo"),
+              StaticProvenance("/bar")),
+            ProductProvenance(
+              StaticProvenance("/bar"),
+              StaticProvenance("/baz"))) =>
           ok
       }
 
@@ -1173,8 +1191,9 @@ object ProvenanceCheckingSpecs
 
       tree.provenance mustEqual NullProvenance
       // both errors are propogated through here because we're handling parametric provenances
-      tree.errors mustEqual Set(IntersectProvenanceDifferentLength,
-                                IntersectWithNoCommonalities)
+      tree.errors mustEqual Set(
+        IntersectProvenanceDifferentLength,
+        IntersectWithNoCommonalities)
     }
 
     "reject difference through a function on product provenances" in {
@@ -1193,8 +1212,9 @@ object ProvenanceCheckingSpecs
 
       tree.provenance mustEqual NullProvenance
       // both errors are propogated through here because we're handling parametric provenances
-      tree.errors mustEqual Set(DifferenceProvenanceDifferentLength,
-                                DifferenceWithNoCommonalities)
+      tree.errors mustEqual Set(
+        DifferenceProvenanceDifferentLength,
+        DifferenceWithNoCommonalities)
     }
 
     "reject addition on different loads" in {

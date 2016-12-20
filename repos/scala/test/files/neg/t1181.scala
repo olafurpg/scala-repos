@@ -10,9 +10,10 @@ class CompilerTest(val valueList: List[Symbol]) {
       case (Nil, Nil) =>
         map
         _ =>
-          buildMap(map.updated(keyList.head, valueList.head),
-                   keyList.tail,
-                   valueList.tail)
+          buildMap(
+            map.updated(keyList.head, valueList.head),
+            keyList.tail,
+            valueList.tail)
     }
   }
 }

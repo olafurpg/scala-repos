@@ -45,10 +45,11 @@ object ConfigCommand {
 
     opts.checkArgs()
 
-    val zkUtils = ZkUtils(opts.options.valueOf(opts.zkConnectOpt),
-                          30000,
-                          30000,
-                          JaasUtils.isZkSecurityEnabled())
+    val zkUtils = ZkUtils(
+      opts.options.valueOf(opts.zkConnectOpt),
+      30000,
+      30000,
+      JaasUtils.isZkSecurityEnabled())
 
     try {
       if (opts.options.has(opts.alterOpt)) alterConfig(zkUtils, opts)
@@ -187,13 +188,14 @@ object ConfigCommand {
     val helpOpt = parser.accepts("help", "Print usage information.")
     val options = parser.parse(args: _*)
 
-    val allOpts: Set[OptionSpec[_]] = Set(alterOpt,
-                                          describeOpt,
-                                          entityType,
-                                          entityName,
-                                          addConfig,
-                                          deleteConfig,
-                                          helpOpt)
+    val allOpts: Set[OptionSpec[_]] = Set(
+      alterOpt,
+      describeOpt,
+      entityType,
+      entityName,
+      addConfig,
+      deleteConfig,
+      helpOpt)
 
     def checkArgs() {
       // should have exactly one action
@@ -208,10 +210,11 @@ object ConfigCommand {
         .checkRequiredArgs(parser, options, zkConnectOpt, entityType)
       CommandLineUtils
         .checkInvalidArgs(parser, options, alterOpt, Set(describeOpt))
-      CommandLineUtils.checkInvalidArgs(parser,
-                                        options,
-                                        describeOpt,
-                                        Set(alterOpt, addConfig, deleteConfig))
+      CommandLineUtils.checkInvalidArgs(
+        parser,
+        options,
+        describeOpt,
+        Set(alterOpt, addConfig, deleteConfig))
       if (options.has(alterOpt)) {
         if (!options.has(entityName))
           throw new IllegalArgumentException(
@@ -227,8 +230,8 @@ object ConfigCommand {
       if (!entityTypeVal.equals(ConfigType.Topic) &&
           !entityTypeVal.equals(ConfigType.Client)) {
         throw new IllegalArgumentException(
-          "--entity-type must be '%s' or '%s'".format(ConfigType.Topic,
-                                                      ConfigType.Client))
+          "--entity-type must be '%s' or '%s'"
+            .format(ConfigType.Topic, ConfigType.Client))
       }
     }
   }

@@ -52,10 +52,11 @@ class DefaultSource extends RelationProvider with DataSourceRegister {
       if (partitionColumn == null) {
         null
       } else {
-        JDBCPartitioningInfo(partitionColumn,
-                             lowerBound.toLong,
-                             upperBound.toLong,
-                             numPartitions.toInt)
+        JDBCPartitioningInfo(
+          partitionColumn,
+          lowerBound.toLong,
+          upperBound.toLong,
+          numPartitions.toInt)
       }
     val parts = JDBCRelation.columnPartition(partitionInfo)
     val properties =

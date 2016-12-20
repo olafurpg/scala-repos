@@ -91,8 +91,9 @@ class ScalacFork extends ScalaMatchingTask with ScalacShared with TaskArgs {
   override def execute() {
     def plural(x: Int) = if (x > 1) "s" else ""
 
-    log("Executing ant task scalacfork, origin: %s".format(originOfThis),
-        Project.MSG_VERBOSE)
+    log(
+      "Executing ant task scalacfork, origin: %s".format(originOfThis),
+      Project.MSG_VERBOSE)
 
     val compilerPath =
       this.compilerPath getOrElse sys.error(
@@ -127,9 +128,10 @@ class ScalacFork extends ScalaMatchingTask with ScalacShared with TaskArgs {
 
     if (includedFiles.nonEmpty)
       log(
-        "Compiling %d file%s to %s".format(includedFiles.length,
-                                           plural(includedFiles.length),
-                                           destinationDir))
+        "Compiling %d file%s to %s".format(
+          includedFiles.length,
+          plural(includedFiles.length),
+          destinationDir))
 
     argfile foreach (x => log("Using argfile file: @" + x))
 

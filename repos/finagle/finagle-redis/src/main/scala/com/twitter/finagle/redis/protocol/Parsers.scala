@@ -32,9 +32,10 @@ trait UnifiedProtocolCodec {
           case ARG_SIZE_MARKER =>
             val size = NumberFormat.toInt(line.drop(1))
             if (size < 1) {
-              decodeRequestLines(i - 1,
-                                 lines.+:(RedisCodec.NIL_VALUE_BA.array),
-                                 doneFn)
+              decodeRequestLines(
+                i - 1,
+                lines.+:(RedisCodec.NIL_VALUE_BA.array),
+                doneFn)
             } else {
               readBytes(size) { byteArray =>
                 readBytes(2) { eol =>

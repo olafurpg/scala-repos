@@ -232,8 +232,8 @@ object CoreUtils extends Logging {
   def replaceSuffix(s: String, oldSuffix: String, newSuffix: String): String = {
     if (!s.endsWith(oldSuffix))
       throw new IllegalArgumentException(
-        "Expected string to end with '%s' but string is '%s'".format(oldSuffix,
-                                                                     s))
+        "Expected string to end with '%s' but string is '%s'"
+          .format(oldSuffix, s))
     s.substring(0, s.length - oldSuffix.length) + newSuffix
   }
 

@@ -20,8 +20,9 @@ class BigDecimalConvertTest {
     assertEquals(1.toByte, BigDecimal.ONE.byteValue())
     assertEquals(BigDecimal.valueOf(255).byteValue(), -1.toByte)
     assertEquals(BigDecimal.ONE.byteValueExact(), 1.toByte)
-    expectThrows(classOf[ArithmeticException],
-                 BigDecimal.valueOf(255).byteValueExact())
+    expectThrows(
+      classOf[ArithmeticException],
+      BigDecimal.valueOf(255).byteValueExact())
   }
 
   @Test def testDoubleValueNeg(): Unit = {

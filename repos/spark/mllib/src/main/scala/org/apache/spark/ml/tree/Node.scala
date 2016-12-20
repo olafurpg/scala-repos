@@ -93,9 +93,10 @@ private[ml] object Node {
     if (oldNode.isLeaf) {
       // TODO: Once the implementation has been moved to this API, then include sufficient
       //       statistics here.
-      new LeafNode(prediction = oldNode.predict.predict,
-                   impurity = oldNode.impurity,
-                   impurityStats = null)
+      new LeafNode(
+        prediction = oldNode.predict.predict,
+        impurity = oldNode.impurity,
+        impurityStats = null)
     } else {
       val gain =
         if (oldNode.stats.nonEmpty) {
@@ -208,9 +209,10 @@ final class InternalNode private[ml] (
   }
 
   override private[ml] def toOld(id: Int): OldNode = {
-    assert(id.toLong * 2 < Int.MaxValue,
-           "Decision Tree could not be converted from new to old API" +
-             " since the old API does not support deep trees.")
+    assert(
+      id.toLong * 2 < Int.MaxValue,
+      "Decision Tree could not be converted from new to old API" +
+        " since the old API does not support deep trees.")
     new OldNode(
       id,
       new OldPredict(prediction, prob = impurityStats.prob(prediction)),
@@ -230,9 +232,11 @@ final class InternalNode private[ml] (
   }
 
   override private[ml] def maxSplitFeatureIndex(): Int = {
-    math.max(split.featureIndex,
-             math.max(leftChild.maxSplitFeatureIndex(),
-                      rightChild.maxSplitFeatureIndex()))
+    math.max(
+      split.featureIndex,
+      math.max(
+        leftChild.maxSplitFeatureIndex(),
+        rightChild.maxSplitFeatureIndex()))
   }
 }
 
@@ -297,23 +301,26 @@ private[tree] class LearningNode(var id: Int,
       assert(
         rightChild.nonEmpty && split.nonEmpty && stats != null,
         "Unknown error during Decision Tree learning.  Could not convert LearningNode to Node.")
-      new InternalNode(stats.impurityCalculator.predict,
-                       stats.impurity,
-                       stats.gain,
-                       leftChild.get.toNode,
-                       rightChild.get.toNode,
-                       split.get,
-                       stats.impurityCalculator)
+      new InternalNode(
+        stats.impurityCalculator.predict,
+        stats.impurity,
+        stats.gain,
+        leftChild.get.toNode,
+        rightChild.get.toNode,
+        split.get,
+        stats.impurityCalculator)
     } else {
       if (stats.valid) {
-        new LeafNode(stats.impurityCalculator.predict,
-                     stats.impurity,
-                     stats.impurityCalculator)
+        new LeafNode(
+          stats.impurityCalculator.predict,
+          stats.impurity,
+          stats.impurityCalculator)
       } else {
         // Here we want to keep same behavior with the old mllib.DecisionTreeModel
-        new LeafNode(stats.impurityCalculator.predict,
-                     -1.0,
-                     stats.impurityCalculator)
+        new LeafNode(
+          stats.impurityCalculator.predict,
+          -1.0,
+          stats.impurityCalculator)
       }
     }
   }

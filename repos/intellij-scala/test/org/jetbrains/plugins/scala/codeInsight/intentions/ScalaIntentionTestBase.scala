@@ -25,9 +25,10 @@ abstract class ScalaIntentionTestBase
     intentionByFamilyName(text, familyName) match {
       case Some(action) =>
         startCommand(getProject, "Test Intention") {
-          action.invoke(myFixture.getProject,
-                        myFixture.getEditor,
-                        myFixture.getFile)
+          action.invoke(
+            myFixture.getProject,
+            myFixture.getEditor,
+            myFixture.getFile)
         }
       case None => Assert.fail("Intention is not found")
     }
@@ -39,14 +40,16 @@ abstract class ScalaIntentionTestBase
 
   def checkIntentionIsNotAvailable(text: String,
                                    familyName: String = this.familyName) {
-    assert(intentionByFamilyName(text, familyName).isEmpty,
-           "Intention is found")
+    assert(
+      intentionByFamilyName(text, familyName).isEmpty,
+      "Intention is found")
   }
 
   def checkIntentionIsAvailable(text: String,
                                 familyName: String = this.familyName) {
-    assert(intentionByFamilyName(text, familyName).isDefined,
-           "Intention is not found")
+    assert(
+      intentionByFamilyName(text, familyName).isDefined,
+      "Intention is not found")
   }
 
   def intentionByFamilyName(text: String,

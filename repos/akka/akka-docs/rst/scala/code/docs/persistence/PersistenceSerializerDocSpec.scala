@@ -28,8 +28,9 @@ class PersistenceSerializerDocSpec extends WordSpec {
       //#custom-serializer-config
     """
 
-  val system = ActorSystem("PersistenceSerializerDocSpec",
-                           ConfigFactory.parseString(customSerializerConfig))
+  val system = ActorSystem(
+    "PersistenceSerializerDocSpec",
+    ConfigFactory.parseString(customSerializerConfig))
   try {
     SerializationExtension(system)
   } finally {

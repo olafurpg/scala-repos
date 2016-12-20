@@ -24,11 +24,13 @@ trait MatchWarnings { self: PatternMatching =>
     private def matchingSymbolInScope(pat: Tree): Symbol = {
       def declarationOfName(tpe: Type, name: Name): Symbol = tpe match {
         case PolyType(tparams, restpe) =>
-          tparams find (_.name == name) getOrElse declarationOfName(restpe,
-                                                                    name)
+          tparams find (_.name == name) getOrElse declarationOfName(
+            restpe,
+            name)
         case MethodType(params, restpe) =>
-          params find (_.name == name) getOrElse declarationOfName(restpe,
-                                                                   name)
+          params find (_.name == name) getOrElse declarationOfName(
+            restpe,
+            name)
         case ClassInfoType(_, _, clazz) => clazz.rawInfo member name
         case _ => NoSymbol
       }

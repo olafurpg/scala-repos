@@ -72,9 +72,10 @@ private abstract class BaseRRDD[T: ClassTag, U: ClassTag](
     // the socket used to send out the input of task
     serverSocket.setSoTimeout(10000)
     val inSocket = serverSocket.accept()
-    startStdinThread(inSocket.getOutputStream(),
-                     parentIterator,
-                     partition.index)
+    startStdinThread(
+      inSocket.getOutputStream(),
+      parentIterator,
+      partition.index)
 
     // the socket used to receive the output of task
     val outSocket = serverSocket.accept()
@@ -227,8 +228,9 @@ private abstract class BaseRRDD[T: ClassTag, U: ClassTag](
       }
     } catch {
       case eof: EOFException =>
-        throw new SparkException("R worker exited unexpectedly (cranshed)",
-                                 eof)
+        throw new SparkException(
+          "R worker exited unexpectedly (cranshed)",
+          eof)
     }
   }
 }
@@ -406,9 +408,10 @@ private[r] object RRDD {
     */
   private def startStdoutThread(proc: Process): BufferedStreamThread = {
     val BUFFER_SIZE = 100
-    val thread = new BufferedStreamThread(proc.getInputStream,
-                                          "stdout reader for R",
-                                          BUFFER_SIZE)
+    val thread = new BufferedStreamThread(
+      proc.getInputStream,
+      "stdout reader for R",
+      BUFFER_SIZE)
     thread.setDaemon(true)
     thread.start()
     thread

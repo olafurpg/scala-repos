@@ -73,25 +73,28 @@ private class PoolInterfaceActor(
 
     val connectionFlow = connectionContext match {
       case httpsContext: HttpsConnectionContext ⇒
-        Http().outgoingConnectionHttps(host,
-                                       port,
-                                       httpsContext,
-                                       None,
-                                       settings.connectionSettings,
-                                       setup.log)
+        Http().outgoingConnectionHttps(
+          host,
+          port,
+          httpsContext,
+          None,
+          settings.connectionSettings,
+          setup.log)
       case _ ⇒
-        Http().outgoingConnection(host,
-                                  port,
-                                  None,
-                                  settings.connectionSettings,
-                                  setup.log)
+        Http().outgoingConnection(
+          host,
+          port,
+          None,
+          settings.connectionSettings,
+          setup.log)
     }
 
     val poolFlow =
-      PoolFlow(Flow[HttpRequest].viaMat(connectionFlow)(Keep.right),
-               new InetSocketAddress(host, port),
-               settings,
-               setup.log).named("PoolFlow")
+      PoolFlow(
+        Flow[HttpRequest].viaMat(connectionFlow)(Keep.right),
+        new InetSocketAddress(host, port),
+        settings,
+        setup.log).named("PoolFlow")
 
     Source
       .fromPublisher(ActorPublisher(self))
@@ -121,17 +124,19 @@ private class PoolInterfaceActor(
       activateIdleTimeoutIfNecessary()
 
     case OnComplete ⇒ // the pool shut down
-      log.debug("Host connection pool to {}:{} has completed orderly shutdown",
-                hcps.host,
-                hcps.port)
+      log.debug(
+        "Host connection pool to {}:{} has completed orderly shutdown",
+        hcps.host,
+        hcps.port)
       shutdownCompletedPromise.success(Done)
       self ! PoisonPill // give potentially queued requests another chance to be forwarded back to the gateway
 
     case OnError(e) ⇒ // the pool shut down
-      log.debug("Host connection pool to {}:{} has shut down with error {}",
-                hcps.host,
-                hcps.port,
-                e)
+      log.debug(
+        "Host connection pool to {}:{} has shut down with error {}",
+        hcps.host,
+        hcps.port,
+        e)
       shutdownCompletedPromise.failure(e)
       self ! PoisonPill // give potentially queued requests another chance to be forwarded back to the gateway
 
@@ -161,9 +166,10 @@ private class PoolInterfaceActor(
       responsePromise.completeWith(gateway(request))
 
     case Shutdown ⇒ // signal coming in from gateway
-      log.debug("Shutting down host connection pool to {}:{}",
-                hcps.host,
-                hcps.port)
+      log.debug(
+        "Shutting down host connection pool to {}:{}",
+        hcps.host,
+        hcps.port)
       onComplete()
       while (!inputBuffer.isEmpty) {
         val PoolRequest(request, responsePromise) = inputBuffer.dequeue()

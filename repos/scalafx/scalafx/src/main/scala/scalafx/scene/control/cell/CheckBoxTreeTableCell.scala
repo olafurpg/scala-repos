@@ -208,9 +208,10 @@ class CheckBoxTreeTableCell[S, T](
       new jfxscc.CheckBoxTreeTableCell[S, T])
     extends TreeTableCell[S, T](delegate)
     with ConvertableCell[jfxscc.CheckBoxTreeTableCell[S, T], T, T]
-    with StateSelectableCell[jfxscc.CheckBoxTreeTableCell[S, T],
-                             T,
-                             java.lang.Integer]
+    with StateSelectableCell[
+      jfxscc.CheckBoxTreeTableCell[S, T],
+      T,
+      java.lang.Integer]
     with UpdatableCell[jfxscc.CheckBoxTreeTableCell[S, T], T]
     with SFXDelegate[jfxscc.CheckBoxTreeTableCell[S, T]] {
 

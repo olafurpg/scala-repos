@@ -52,9 +52,10 @@ class DateTimeUtilsSuite extends SparkFunSuite {
     assert(ns === 0)
     assert(fromJulianDay(d, ns) == 0L)
 
-    Seq(Timestamp.valueOf("2015-06-11 10:10:10.100"),
-        Timestamp.valueOf("2015-06-11 20:10:10.100"),
-        Timestamp.valueOf("1900-06-11 20:10:10.100")).foreach { t =>
+    Seq(
+      Timestamp.valueOf("2015-06-11 10:10:10.100"),
+      Timestamp.valueOf("2015-06-11 20:10:10.100"),
+      Timestamp.valueOf("1900-06-11 20:10:10.100")).foreach { t =>
       val (d, ns) = toJulianDay(fromJavaTimestamp(t))
       assert(ns > 0)
       val t1 = toJavaTimestamp(fromJulianDay(d, ns))
@@ -392,10 +393,11 @@ class DateTimeUtilsSuite extends SparkFunSuite {
   }
 
   test("hours / minutes / seconds") {
-    Seq(Timestamp.valueOf("2015-06-11 10:12:35.789"),
-        Timestamp.valueOf("2015-06-11 20:13:40.789"),
-        Timestamp.valueOf("1900-06-11 12:14:50.789"),
-        Timestamp.valueOf("1700-02-28 12:14:50.123456")).foreach { t =>
+    Seq(
+      Timestamp.valueOf("2015-06-11 10:12:35.789"),
+      Timestamp.valueOf("2015-06-11 20:13:40.789"),
+      Timestamp.valueOf("1900-06-11 12:14:50.789"),
+      Timestamp.valueOf("1700-02-28 12:14:50.123456")).foreach { t =>
       val us = fromJavaTimestamp(t)
       assert(toJavaTimestamp(us) === t)
     }
@@ -469,44 +471,52 @@ class DateTimeUtilsSuite extends SparkFunSuite {
     c1.set(1997, 1, 28, 10, 30, 0)
     val c2 = Calendar.getInstance()
     c2.set(1996, 9, 30, 0, 0, 0)
-    assert(monthsBetween(c1.getTimeInMillis * 1000L,
-                         c2.getTimeInMillis * 1000L) === 3.94959677)
+    assert(monthsBetween(
+      c1.getTimeInMillis * 1000L,
+      c2.getTimeInMillis * 1000L) === 3.94959677)
     c2.set(2000, 1, 28, 0, 0, 0)
-    assert(monthsBetween(c1.getTimeInMillis * 1000L,
-                         c2.getTimeInMillis * 1000L) === -36)
+    assert(monthsBetween(
+      c1.getTimeInMillis * 1000L,
+      c2.getTimeInMillis * 1000L) === -36)
     c2.set(2000, 1, 29, 0, 0, 0)
-    assert(monthsBetween(c1.getTimeInMillis * 1000L,
-                         c2.getTimeInMillis * 1000L) === -36)
+    assert(monthsBetween(
+      c1.getTimeInMillis * 1000L,
+      c2.getTimeInMillis * 1000L) === -36)
     c2.set(1996, 2, 31, 0, 0, 0)
-    assert(monthsBetween(c1.getTimeInMillis * 1000L,
-                         c2.getTimeInMillis * 1000L) === 11)
+    assert(monthsBetween(
+      c1.getTimeInMillis * 1000L,
+      c2.getTimeInMillis * 1000L) === 11)
   }
 
   test("from UTC timestamp") {
     def test(utc: String, tz: String, expected: String): Unit = {
       assert(
-        toJavaTimestamp(fromUTCTime(fromJavaTimestamp(Timestamp.valueOf(utc)),
-                                    tz)).toString === expected)
+        toJavaTimestamp(fromUTCTime(
+          fromJavaTimestamp(Timestamp.valueOf(utc)),
+          tz)).toString === expected)
     }
     test("2011-12-25 09:00:00.123456", "UTC", "2011-12-25 09:00:00.123456")
     test("2011-12-25 09:00:00.123456", "JST", "2011-12-25 18:00:00.123456")
     test("2011-12-25 09:00:00.123456", "PST", "2011-12-25 01:00:00.123456")
-    test("2011-12-25 09:00:00.123456",
-         "Asia/Shanghai",
-         "2011-12-25 17:00:00.123456")
+    test(
+      "2011-12-25 09:00:00.123456",
+      "Asia/Shanghai",
+      "2011-12-25 17:00:00.123456")
   }
 
   test("to UTC timestamp") {
     def test(utc: String, tz: String, expected: String): Unit = {
       assert(
-        toJavaTimestamp(toUTCTime(fromJavaTimestamp(Timestamp.valueOf(utc)),
-                                  tz)).toString === expected)
+        toJavaTimestamp(toUTCTime(
+          fromJavaTimestamp(Timestamp.valueOf(utc)),
+          tz)).toString === expected)
     }
     test("2011-12-25 09:00:00.123456", "UTC", "2011-12-25 09:00:00.123456")
     test("2011-12-25 18:00:00.123456", "JST", "2011-12-25 09:00:00.123456")
     test("2011-12-25 01:00:00.123456", "PST", "2011-12-25 09:00:00.123456")
-    test("2011-12-25 17:00:00.123456",
-         "Asia/Shanghai",
-         "2011-12-25 09:00:00.123456")
+    test(
+      "2011-12-25 17:00:00.123456",
+      "Asia/Shanghai",
+      "2011-12-25 09:00:00.123456")
   }
 }

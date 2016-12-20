@@ -222,8 +222,9 @@ class GroupsResourceTest
     "Creation of a group with same path as an existing app should be prohibited (fixes #3385)") {
     Given("A real group manager with one app")
     useRealGroupManager()
-    val group = Group("/group".toRootPath,
-                      apps = Set(AppDefinition("/group/app".toRootPath)))
+    val group = Group(
+      "/group".toRootPath,
+      apps = Set(AppDefinition("/group/app".toRootPath)))
     groupRepository.group(GroupRepository.zkRootName) returns Future
       .successful(Some(group))
     groupRepository.rootGroup returns Future.successful(Some(group))

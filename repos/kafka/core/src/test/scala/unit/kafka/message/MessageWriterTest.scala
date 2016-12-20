@@ -36,11 +36,12 @@ class MessageWriterTest extends JUnitSuite {
                                   bytes: Array[Byte],
                                   codec: CompressionCodec): Message = {
     val writer = new MessageWriter(100)
-    writer.write(key = key,
-                 codec = codec,
-                 timestamp = Message.NoTimestamp,
-                 timestampType = TimestampType.CREATE_TIME,
-                 magicValue = Message.MagicValue_V1) { output =>
+    writer.write(
+      key = key,
+      codec = codec,
+      timestamp = Message.NoTimestamp,
+      timestampType = TimestampType.CREATE_TIME,
+      magicValue = Message.MagicValue_V1) { output =>
       val out =
         if (codec == NoCompressionCodec) output
         else CompressionFactory(codec, output)
@@ -111,10 +112,11 @@ class MessageWriterTest extends JUnitSuite {
   def testWithNoCompressionAttribute(): Unit = {
     val bytes = mkRandomArray(4096)
     val actual = mkMessageWithWriter(bytes = bytes, codec = NoCompressionCodec)
-    val expected = new Message(bytes,
-                               Message.NoTimestamp,
-                               NoCompressionCodec,
-                               Message.MagicValue_V1)
+    val expected = new Message(
+      bytes,
+      Message.NoTimestamp,
+      NoCompressionCodec,
+      Message.MagicValue_V1)
     assertEquals(expected.buffer, actual.buffer)
   }
 
@@ -123,10 +125,11 @@ class MessageWriterTest extends JUnitSuite {
     val bytes = mkRandomArray(4096)
     val actual =
       mkMessageWithWriter(bytes = bytes, codec = SnappyCompressionCodec)
-    val expected = new Message(compress(bytes, SnappyCompressionCodec),
-                               Message.NoTimestamp,
-                               SnappyCompressionCodec,
-                               Message.MagicValue_V1)
+    val expected = new Message(
+      compress(bytes, SnappyCompressionCodec),
+      Message.NoTimestamp,
+      SnappyCompressionCodec,
+      Message.MagicValue_V1)
 
     assertEquals(
       decompress(toArray(expected.payload), SnappyCompressionCodec).toSeq,
@@ -140,11 +143,12 @@ class MessageWriterTest extends JUnitSuite {
     val bytes = mkRandomArray(4096)
     val actual =
       mkMessageWithWriter(bytes = bytes, key = key, codec = NoCompressionCodec)
-    val expected = new Message(bytes = bytes,
-                               key = key,
-                               timestamp = Message.NoTimestamp,
-                               codec = NoCompressionCodec,
-                               magicValue = Message.MagicValue_V1)
+    val expected = new Message(
+      bytes = bytes,
+      key = key,
+      timestamp = Message.NoTimestamp,
+      codec = NoCompressionCodec,
+      magicValue = Message.MagicValue_V1)
 
     assertEquals(expected.buffer, actual.buffer)
   }

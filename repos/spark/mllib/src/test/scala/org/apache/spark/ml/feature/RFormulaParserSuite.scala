@@ -92,9 +92,10 @@ class RFormulaParserSuite extends SparkFunSuite {
     checkParse("y ~ ._a:._x", "y", Seq("._a:._x"))
     checkParse("y ~ foo:bar", "y", Seq("foo:bar"))
     checkParse("y ~ a : b : c", "y", Seq("a:b:c"))
-    checkParse("y ~ q + a:b:c + b:c + c:d + z",
-               "y",
-               Seq("q", "a:b:c", "b:c", "c:d", "z"))
+    checkParse(
+      "y ~ q + a:b:c + b:c + c:d + z",
+      "y",
+      Seq("q", "a:b:c", "b:c", "c:d", "z"))
   }
 
   test("parse basic interactions with dot") {
@@ -116,24 +117,26 @@ class RFormulaParserSuite extends SparkFunSuite {
       .add("Petal.Length", "double", true)
       .add("Petal.Width", "double", true)
       .add("Species", "string", true)
-    checkParse("y ~ .:.",
-               "y",
-               Seq("Sepal.Length",
-                   "Sepal.Width",
-                   "Petal.Length",
-                   "Petal.Width",
-                   "Species",
-                   "Sepal.Length:Sepal.Width",
-                   "Sepal.Length:Petal.Length",
-                   "Sepal.Length:Petal.Width",
-                   "Sepal.Length:Species",
-                   "Sepal.Width:Petal.Length",
-                   "Sepal.Width:Petal.Width",
-                   "Sepal.Width:Species",
-                   "Petal.Length:Petal.Width",
-                   "Petal.Length:Species",
-                   "Petal.Width:Species"),
-               schema)
+    checkParse(
+      "y ~ .:.",
+      "y",
+      Seq(
+        "Sepal.Length",
+        "Sepal.Width",
+        "Petal.Length",
+        "Petal.Width",
+        "Species",
+        "Sepal.Length:Sepal.Width",
+        "Sepal.Length:Petal.Length",
+        "Sepal.Length:Petal.Width",
+        "Sepal.Length:Species",
+        "Sepal.Width:Petal.Length",
+        "Sepal.Width:Petal.Width",
+        "Sepal.Width:Species",
+        "Petal.Length:Petal.Width",
+        "Petal.Length:Species",
+        "Petal.Width:Species"),
+      schema)
   }
 
   // Test data generated in R with terms.formula(y ~ .:. - Species:., data = iris)
@@ -145,18 +148,20 @@ class RFormulaParserSuite extends SparkFunSuite {
       .add("Petal.Width", "double", true)
       .add("Species", "string", true)
     checkParse("y ~ .:. - .:.", "y", Nil, schema)
-    checkParse("y ~ .:. - Species:.",
-               "y",
-               Seq("Sepal.Length",
-                   "Sepal.Width",
-                   "Petal.Length",
-                   "Petal.Width",
-                   "Sepal.Length:Sepal.Width",
-                   "Sepal.Length:Petal.Length",
-                   "Sepal.Length:Petal.Width",
-                   "Sepal.Width:Petal.Length",
-                   "Sepal.Width:Petal.Width",
-                   "Petal.Length:Petal.Width"),
-               schema)
+    checkParse(
+      "y ~ .:. - Species:.",
+      "y",
+      Seq(
+        "Sepal.Length",
+        "Sepal.Width",
+        "Petal.Length",
+        "Petal.Width",
+        "Sepal.Length:Sepal.Width",
+        "Sepal.Length:Petal.Length",
+        "Sepal.Length:Petal.Width",
+        "Sepal.Width:Petal.Length",
+        "Sepal.Width:Petal.Width",
+        "Petal.Length:Petal.Width"),
+      schema)
   }
 }

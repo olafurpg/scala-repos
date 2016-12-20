@@ -35,10 +35,11 @@ case class LeaderAndIsr(var leader: Int,
                         var isr: List[Int],
                         var zkVersion: Int) {
   def this(leader: Int, isr: List[Int]) =
-    this(leader,
-         LeaderAndIsr.initialLeaderEpoch,
-         isr,
-         LeaderAndIsr.initialZKVersion)
+    this(
+      leader,
+      LeaderAndIsr.initialLeaderEpoch,
+      isr,
+      LeaderAndIsr.initialZKVersion)
 
   override def toString(): String = {
     Json.encode(

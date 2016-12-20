@@ -20,16 +20,18 @@ class MigrationTo0_11Test
     lazy val metrics = new Metrics(new MetricRegistry)
     lazy val store = new InMemoryStore()
 
-    lazy val groupStore = new MarathonStore[Group](store,
-                                                   metrics,
-                                                   () => Group.empty,
-                                                   prefix = "group:")
+    lazy val groupStore = new MarathonStore[Group](
+      store,
+      metrics,
+      () => Group.empty,
+      prefix = "group:")
     lazy val groupRepo =
       new GroupRepository(groupStore, maxVersions = None, metrics)
-    lazy val appStore = new MarathonStore[AppDefinition](store,
-                                                         metrics,
-                                                         () => AppDefinition(),
-                                                         prefix = "app:")
+    lazy val appStore = new MarathonStore[AppDefinition](
+      store,
+      metrics,
+      () => AppDefinition(),
+      prefix = "app:")
     lazy val appRepo = new AppRepository(appStore, maxVersions = None, metrics)
 
     lazy val migration =
@@ -110,21 +112,24 @@ class MigrationTo0_11Test
       "one app with multiple versions in appRepo and the newest version in groupRepo")
     val f = new Fixture
 
-    val appV1 = AppDefinition(PathId("/test"),
-                              cmd = Some("sleep 1"),
-                              instances = 0,
-                              versionInfo = onlyVersion(1))
-    val appV2Upgrade = AppDefinition(PathId("/test"),
-                                     cmd = Some("sleep 2"),
-                                     instances = 0,
-                                     versionInfo = onlyVersion(2))
+    val appV1 = AppDefinition(
+      PathId("/test"),
+      cmd = Some("sleep 1"),
+      instances = 0,
+      versionInfo = onlyVersion(1))
+    val appV2Upgrade = AppDefinition(
+      PathId("/test"),
+      cmd = Some("sleep 2"),
+      instances = 0,
+      versionInfo = onlyVersion(2))
     f.appRepo.store(appV1).futureValue
     f.appRepo.store(appV2Upgrade).futureValue
 
-    val appV3Scaling = AppDefinition(PathId("/test"),
-                                     cmd = Some("sleep 2"),
-                                     instances = 1,
-                                     versionInfo = onlyVersion(3))
+    val appV3Scaling = AppDefinition(
+      PathId("/test"),
+      cmd = Some("sleep 2"),
+      instances = 1,
+      versionInfo = onlyVersion(3))
     val groupWithApp = emptyGroup.copy(
       apps = Set(appV3Scaling),
       version = Timestamp(3)
@@ -171,18 +176,21 @@ class MigrationTo0_11Test
       "one app with multiple versions in appRepo and the newest version in groupRepo")
     val f = new Fixture
 
-    val appV1 = AppDefinition(PathId("/test"),
-                              cmd = Some("sleep 1"),
-                              instances = 0,
-                              versionInfo = onlyVersion(1))
-    val appV2Upgrade = AppDefinition(PathId("/test"),
-                                     cmd = Some("sleep 2"),
-                                     instances = 0,
-                                     versionInfo = onlyVersion(2))
-    val appV3Scaling = AppDefinition(PathId("/test"),
-                                     cmd = Some("sleep 2"),
-                                     instances = 1,
-                                     versionInfo = onlyVersion(3))
+    val appV1 = AppDefinition(
+      PathId("/test"),
+      cmd = Some("sleep 1"),
+      instances = 0,
+      versionInfo = onlyVersion(1))
+    val appV2Upgrade = AppDefinition(
+      PathId("/test"),
+      cmd = Some("sleep 2"),
+      instances = 0,
+      versionInfo = onlyVersion(2))
+    val appV3Scaling = AppDefinition(
+      PathId("/test"),
+      cmd = Some("sleep 2"),
+      instances = 1,
+      versionInfo = onlyVersion(3))
 
     f.appRepo.store(appV1).futureValue
     f.appRepo.store(appV2Upgrade).futureValue

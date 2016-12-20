@@ -141,9 +141,10 @@ class AdminClient(val time: Time,
 
   def describeGroup(groupId: String): GroupSummary = {
     val coordinator = findCoordinator(groupId)
-    val responseBody = send(coordinator,
-                            ApiKeys.DESCRIBE_GROUPS,
-                            new DescribeGroupsRequest(List(groupId).asJava))
+    val responseBody = send(
+      coordinator,
+      ApiKeys.DESCRIBE_GROUPS,
+      new DescribeGroupsRequest(List(groupId).asJava))
     val response = new DescribeGroupsResponse(responseBody)
     val metadata = response.groups().get(groupId)
     if (metadata == null)
@@ -156,17 +157,19 @@ class AdminClient(val time: Time,
       .map { member =>
         val metadata = Utils.readBytes(member.memberMetadata())
         val assignment = Utils.readBytes(member.memberAssignment())
-        MemberSummary(member.memberId(),
-                      member.clientId(),
-                      member.clientHost(),
-                      metadata,
-                      assignment)
+        MemberSummary(
+          member.memberId(),
+          member.clientId(),
+          member.clientHost(),
+          metadata,
+          assignment)
       }
       .toList
-    GroupSummary(metadata.state(),
-                 metadata.protocolType(),
-                 metadata.protocol(),
-                 members)
+    GroupSummary(
+      metadata.state(),
+      metadata.protocolType(),
+      metadata.protocol(),
+      members)
   }
 
   case class ConsumerSummary(memberId: String,
@@ -186,10 +189,11 @@ class AdminClient(val time: Time,
       group.members.map { member =>
         val assignment = ConsumerProtocol.deserializeAssignment(
           ByteBuffer.wrap(member.assignment))
-        new ConsumerSummary(member.memberId,
-                            member.clientId,
-                            member.clientHost,
-                            assignment.partitions().asScala.toList)
+        new ConsumerSummary(
+          member.memberId,
+          member.clientId,
+          member.clientHost,
+          assignment.partitions().asScala.toList)
       }
     } else {
       List.empty
@@ -212,15 +216,17 @@ object AdminClient {
   val AdminClientIdSequence = new AtomicInteger(1)
   val AdminConfigDef = {
     val config = new ConfigDef()
-      .define(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG,
-              Type.LIST,
-              Importance.HIGH,
-              CommonClientConfigs.BOOSTRAP_SERVERS_DOC)
-      .define(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG,
-              ConfigDef.Type.STRING,
-              CommonClientConfigs.DEFAULT_SECURITY_PROTOCOL,
-              ConfigDef.Importance.MEDIUM,
-              CommonClientConfigs.SECURITY_PROTOCOL_DOC)
+      .define(
+        CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG,
+        Type.LIST,
+        Importance.HIGH,
+        CommonClientConfigs.BOOSTRAP_SERVERS_DOC)
+      .define(
+        CommonClientConfigs.SECURITY_PROTOCOL_CONFIG,
+        ConfigDef.Type.STRING,
+        CommonClientConfigs.DEFAULT_SECURITY_PROTOCOL,
+        ConfigDef.Importance.MEDIUM,
+        CommonClientConfigs.SECURITY_PROTOCOL_DOC)
       .withClientSslSupport()
       .withClientSaslSupport()
     config
@@ -251,11 +257,12 @@ object AdminClient {
     val bootstrapCluster = Cluster.bootstrap(brokerAddresses)
     metadata.update(bootstrapCluster, 0)
 
-    val selector = new Selector(DefaultConnectionMaxIdleMs,
-                                metrics,
-                                time,
-                                "admin",
-                                channelBuilder)
+    val selector = new Selector(
+      DefaultConnectionMaxIdleMs,
+      metrics,
+      time,
+      "admin",
+      channelBuilder)
 
     val networkClient = new NetworkClient(
       selector,
@@ -268,14 +275,16 @@ object AdminClient {
       DefaultRequestTimeoutMs,
       time)
 
-    val highLevelClient = new ConsumerNetworkClient(networkClient,
-                                                    metadata,
-                                                    time,
-                                                    DefaultRetryBackoffMs)
+    val highLevelClient = new ConsumerNetworkClient(
+      networkClient,
+      metadata,
+      time,
+      DefaultRetryBackoffMs)
 
-    new AdminClient(time,
-                    DefaultRequestTimeoutMs,
-                    highLevelClient,
-                    bootstrapCluster.nodes().asScala.toList)
+    new AdminClient(
+      time,
+      DefaultRequestTimeoutMs,
+      highLevelClient,
+      bootstrapCluster.nodes().asScala.toList)
   }
 }

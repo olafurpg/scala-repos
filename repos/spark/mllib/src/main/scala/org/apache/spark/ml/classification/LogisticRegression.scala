@@ -178,9 +178,10 @@ private[classification] trait LogisticRegressionParams
 @Experimental
 class LogisticRegression @Since("1.2.0")(
     @Since("1.4.0") override val uid: String)
-    extends ProbabilisticClassifier[Vector,
-                                    LogisticRegression,
-                                    LogisticRegressionModel]
+    extends ProbabilisticClassifier[
+      Vector,
+      LogisticRegression,
+      LogisticRegressionModel]
     with LogisticRegressionParams
     with DefaultParamsWritable
     with Logging {
@@ -313,8 +314,9 @@ class LogisticRegression @Since("1.2.0")(
          c2: (MultivariateOnlineSummarizer, MultiClassSummarizer)) =>
           (c1._1.merge(c2._1), c1._2.merge(c2._2))
 
-      instances.treeAggregate(new MultivariateOnlineSummarizer,
-                              new MultiClassSummarizer)(seqOp, combOp)
+      instances.treeAggregate(
+        new MultivariateOnlineSummarizer,
+        new MultiClassSummarizer)(seqOp, combOp)
     }
 
     val histogram = labelSummarizer.histogram
@@ -368,13 +370,14 @@ class LogisticRegression @Since("1.2.0")(
         val regParamL1 = $(elasticNetParam) * $(regParam)
         val regParamL2 = (1.0 - $(elasticNetParam)) * $(regParam)
 
-        val costFun = new LogisticCostFun(instances,
-                                          numClasses,
-                                          $(fitIntercept),
-                                          $(standardization),
-                                          featuresStd,
-                                          featuresMean,
-                                          regParamL2)
+        val costFun = new LogisticCostFun(
+          instances,
+          numClasses,
+          $(fitIntercept),
+          $(standardization),
+          featuresStd,
+          featuresMean,
+          regParamL2)
 
         val optimizer =
           if ($(elasticNetParam) == 0.0 || $(regParam) == 0.0) {
@@ -401,10 +404,11 @@ class LogisticRegression @Since("1.2.0")(
                   }
                 }
               }
-            new BreezeOWLQN[Int, BDV[Double]]($(maxIter),
-                                              10,
-                                              regParamL1Fun,
-                                              $(tol))
+            new BreezeOWLQN[Int, BDV[Double]](
+              $(maxIter),
+              10,
+              regParamL1Fun,
+              $(tol))
           }
 
         val initialCoefficientsWithIntercept =
@@ -615,10 +619,11 @@ class LogisticRegressionModel private[spark] (
   // TODO: decide on a good name before exposing to public API
   private[classification] def evaluate(
       dataset: DataFrame): LogisticRegressionSummary = {
-    new BinaryLogisticRegressionSummary(this.transform(dataset),
-                                        $(probabilityCol),
-                                        $(labelCol),
-                                        $(featuresCol))
+    new BinaryLogisticRegressionSummary(
+      this.transform(dataset),
+      $(probabilityCol),
+      $(labelCol),
+      $(featuresCol))
   }
 
   /**
@@ -719,10 +724,11 @@ object LogisticRegressionModel extends MLReadable[LogisticRegressionModel] {
       // Save metadata and Params
       DefaultParamsWriter.saveMetadata(instance, path, sc)
       // Save model data: numClasses, numFeatures, intercept, coefficients
-      val data = Data(instance.numClasses,
-                      instance.numFeatures,
-                      instance.intercept,
-                      instance.coefficients)
+      val data = Data(
+        instance.numClasses,
+        instance.numFeatures,
+        instance.intercept,
+        instance.coefficients)
       val dataPath = new Path(path, "data").toString
       sqlContext
         .createDataFrame(Seq(data))
@@ -894,10 +900,11 @@ class BinaryLogisticRegressionTrainingSummary private[classification] (
     @Since("1.5.0") labelCol: String,
     @Since("1.6.0") featuresCol: String,
     @Since("1.5.0") val objectiveHistory: Array[Double])
-    extends BinaryLogisticRegressionSummary(predictions,
-                                            probabilityCol,
-                                            labelCol,
-                                            featuresCol)
+    extends BinaryLogisticRegressionSummary(
+      predictions,
+      probabilityCol,
+      labelCol,
+      featuresCol)
     with LogisticRegressionTrainingSummary {}
 
 /**
@@ -1053,9 +1060,10 @@ private class LogisticAggregator(coefficients: Vector,
   def add(instance: Instance): this.type = {
     instance match {
       case Instance(label, weight, features) =>
-        require(dim == features.size,
-                s"Dimensions mismatch when adding new instance." +
-                  s" Expecting $dim but got ${features.size}.")
+        require(
+          dim == features.size,
+          s"Dimensions mismatch when adding new instance." +
+            s" Expecting $dim but got ${features.size}.")
         require(weight >= 0.0, s"instance weight, $weight has to be >= 0.0")
 
         if (weight == 0.0) return this
@@ -1117,9 +1125,10 @@ private class LogisticAggregator(coefficients: Vector,
     * @return This LogisticAggregator object.
     */
   def merge(other: LogisticAggregator): this.type = {
-    require(dim == other.dim,
-            s"Dimensions mismatch when merging with another " +
-              s"LeastSquaresAggregator. Expecting $dim but got ${other.dim}.")
+    require(
+      dim == other.dim,
+      s"Dimensions mismatch when merging with another " +
+        s"LeastSquaresAggregator. Expecting $dim but got ${other.dim}.")
 
     if (other.weightSum != 0.0) {
       weightSum += other.weightSum
@@ -1138,16 +1147,18 @@ private class LogisticAggregator(coefficients: Vector,
   }
 
   def loss: Double = {
-    require(weightSum > 0.0,
-            s"The effective number of instances should be " +
-              s"greater than 0.0, but $weightSum.")
+    require(
+      weightSum > 0.0,
+      s"The effective number of instances should be " +
+        s"greater than 0.0, but $weightSum.")
     lossSum / weightSum
   }
 
   def gradient: Vector = {
-    require(weightSum > 0.0,
-            s"The effective number of instances should be " +
-              s"greater than 0.0, but $weightSum.")
+    require(
+      weightSum > 0.0,
+      s"The effective number of instances should be " +
+        s"greater than 0.0, but $weightSum.")
     val result = Vectors.dense(gradientSumArray.clone())
     scal(1.0 / weightSum, result)
     result
@@ -1180,11 +1191,12 @@ private class LogisticCostFun(instances: RDD[Instance],
         c1.merge(c2)
 
       instances.treeAggregate(
-        new LogisticAggregator(coeffs,
-                               numClasses,
-                               fitIntercept,
-                               featuresStd,
-                               featuresMean)
+        new LogisticAggregator(
+          coeffs,
+          numClasses,
+          fitIntercept,
+          featuresStd,
+          featuresMean)
       )(seqOp, combOp)
     }
 

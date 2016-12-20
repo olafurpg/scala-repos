@@ -120,9 +120,10 @@ private[spark] case class SSLOptions(
       }
 
       val supported = enabledAlgorithms & providerAlgorithms
-      require(supported.nonEmpty || sys.env.contains("SPARK_TESTING"),
-              "SSLContext does not support any of the enabled algorithms: " +
-                enabledAlgorithms.mkString(","))
+      require(
+        supported.nonEmpty || sys.env.contains("SPARK_TESTING"),
+        "SSLContext does not support any of the enabled algorithms: " +
+          enabledAlgorithms.mkString(","))
       supported
     }
 
@@ -187,9 +188,9 @@ private[spark] object SSLOptions extends Logging {
       .getOption(s"$ns.keyStoreType")
       .orElse(defaults.flatMap(_.keyStoreType))
 
-    val needClientAuth = conf.getBoolean(s"$ns.needClientAuth",
-                                         defaultValue =
-                                           defaults.exists(_.needClientAuth))
+    val needClientAuth = conf.getBoolean(
+      s"$ns.needClientAuth",
+      defaultValue = defaults.exists(_.needClientAuth))
 
     val trustStore = conf
       .getOption(s"$ns.trustStore")
@@ -213,16 +214,17 @@ private[spark] object SSLOptions extends Logging {
       .orElse(defaults.map(_.enabledAlgorithms))
       .getOrElse(Set.empty)
 
-    new SSLOptions(enabled,
-                   keyStore,
-                   keyStorePassword,
-                   keyPassword,
-                   keyStoreType,
-                   needClientAuth,
-                   trustStore,
-                   trustStorePassword,
-                   trustStoreType,
-                   protocol,
-                   enabledAlgorithms)
+    new SSLOptions(
+      enabled,
+      keyStore,
+      keyStorePassword,
+      keyPassword,
+      keyStoreType,
+      needClientAuth,
+      trustStore,
+      trustStorePassword,
+      trustStoreType,
+      protocol,
+      enabledAlgorithms)
   }
 }

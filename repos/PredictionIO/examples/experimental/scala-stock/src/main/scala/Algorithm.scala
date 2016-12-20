@@ -35,10 +35,11 @@ abstract class StockStrategy[M: ClassTag]
     val activeTickers =
       dataView.activeFrame().rowAt(0).filter(identity).index.toVec.contents
 
-    val query = Query(idx = queryDate.idx,
-                      dataView = dataView,
-                      tickers = activeTickers,
-                      mktTicker = rawData.mktTicker)
+    val query = Query(
+      idx = queryDate.idx,
+      dataView = dataView,
+      tickers = activeTickers,
+      mktTicker = rawData.mktTicker)
 
     val prediction: Prediction = onClose(model, query)
 

@@ -173,10 +173,11 @@ object Failure {
             logLevel: Level = Level.WARNING): Failure =
     if (cause == null) new Failure("unknown", None, flags, logLevel = logLevel)
     else if (cause.getMessage == null)
-      new Failure(cause.getClass.getName,
-                  Some(cause),
-                  flags,
-                  logLevel = logLevel)
+      new Failure(
+        cause.getClass.getName,
+        Some(cause),
+        flags,
+        logLevel = logLevel)
     else new Failure(cause.getMessage, Some(cause), flags, logLevel = logLevel)
 
   /**
@@ -274,10 +275,11 @@ object Failure {
     * Create a new [[Restartable]] failure with the given message and cause.
     */
   def rejected(why: String, cause: Throwable): Failure =
-    new Failure(why,
-                Option(cause),
-                Failure.Restartable,
-                logLevel = Level.DEBUG)
+    new Failure(
+      why,
+      Option(cause),
+      Failure.Restartable,
+      logLevel = Level.DEBUG)
 
   /**
     * A default [[Restartable]] failure.

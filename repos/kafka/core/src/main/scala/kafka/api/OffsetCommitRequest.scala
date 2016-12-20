@@ -82,14 +82,15 @@ object OffsetCommitRequest extends Logging {
       })
     })
 
-    OffsetCommitRequest(groupId,
-                        immutable.Map(pairs: _*),
-                        versionId,
-                        correlationId,
-                        clientId,
-                        groupGenerationId,
-                        memberId,
-                        retentionMs)
+    OffsetCommitRequest(
+      groupId,
+      immutable.Map(pairs: _*),
+      versionId,
+      correlationId,
+      clientId,
+      groupGenerationId,
+      memberId,
+      retentionMs)
   }
 }
 

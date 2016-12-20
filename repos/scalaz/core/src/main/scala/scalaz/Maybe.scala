@@ -197,8 +197,9 @@ sealed abstract class MaybeInstances {
       def A = implicitly
 
       def order(fa1: Maybe[A], fa2: Maybe[A]) =
-        fa1.cata(a1 => fa2.cata(a2 => Order[A].order(a1, a2), GT),
-                 fa2.cata(_ => LT, EQ))
+        fa1.cata(
+          a1 => fa2.cata(a2 => Order[A].order(a1, a2), GT),
+          fa2.cata(_ => LT, EQ))
     }
 
   implicit def maybeShow[A](implicit A: Show[A]): Show[Maybe[A]] =
@@ -207,8 +208,9 @@ sealed abstract class MaybeInstances {
   implicit def maybeMonoid[A](implicit A: Semigroup[A]): Monoid[Maybe[A]] =
     new Monoid[Maybe[A]] {
       def append(fa1: Maybe[A], fa2: => Maybe[A]) =
-        fa1.cata(a1 => fa2.cata(a2 => just(A.append(a1, a2)), fa1),
-                 fa2.cata(_ => fa2, empty))
+        fa1.cata(
+          a1 => fa2.cata(a2 => just(A.append(a1, a2)), fa1),
+          fa2.cata(_ => fa2, empty))
 
       def zero = empty
     }
@@ -362,6 +364,7 @@ private sealed trait MaybeEqual[A] extends Equal[Maybe[A]] {
   implicit def A: Equal[A]
 
   override final def equal(fa1: Maybe[A], fa2: Maybe[A]) =
-    fa1.cata(a1 => fa2.cata(a2 => A.equal(a1, a2), false),
-             fa2.cata(_ => false, true))
+    fa1.cata(
+      a1 => fa2.cata(a2 => A.equal(a1, a2), false),
+      fa2.cata(_ => false, true))
 }

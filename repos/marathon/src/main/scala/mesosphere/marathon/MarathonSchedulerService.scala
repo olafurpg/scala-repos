@@ -250,8 +250,9 @@ class MarathonSchedulerService @Inject()(
           }
         case Failure(t) =>
           log.error("Exception while running driver", t)
-          abdicateAfterFailure(() => executeAbdicationCommand(),
-                               runAbdicationCommand = true)
+          abdicateAfterFailure(
+            () => executeAbdicationCommand(),
+            runAbdicationCommand = true)
       }
     }
 
@@ -271,8 +272,9 @@ class MarathonSchedulerService @Inject()(
 
     log.info(
       s"Call onDefeated leadership callbacks on ${leadershipCallbacks.mkString(", ")}")
-    Await.result(Future.sequence(leadershipCallbacks.map(_.onDefeated)),
-                 zkTimeout)
+    Await.result(
+      Future.sequence(leadershipCallbacks.map(_.onDefeated)),
+      zkTimeout)
     log.info(s"Finished onDefeated leadership callbacks")
 
     // Our leadership has been defeated and thus we call the defeatLeadership() method.
@@ -291,13 +293,15 @@ class MarathonSchedulerService @Inject()(
       //run all leadership callbacks
       log.info(s"""Call onElected leadership callbacks on ${leadershipCallbacks
         .mkString(", ")}""")
-      Await.result(Future.sequence(leadershipCallbacks.map(_.onElected)),
-                   config.onElectedPrepareTimeout().millis)
+      Await.result(
+        Future.sequence(leadershipCallbacks.map(_.onElected)),
+        config.onElectedPrepareTimeout().millis)
       log.info(s"Finished onElected leadership callbacks")
 
       //start all leadership coordination actors
-      Await.result(leadershipCoordinator.prepareForStart(),
-                   config.maxActorStartupTime().milliseconds)
+      Await.result(
+        leadershipCoordinator.prepareForStart(),
+        config.maxActorStartupTime().milliseconds)
 
       //create new driver
       driver = Some(driverFactory.createDriver())
@@ -316,8 +320,9 @@ class MarathonSchedulerService @Inject()(
     } catch {
       case NonFatal(e) => // catch Scala and Java exceptions
         log.error("Failed to take over leadership", e)
-        abdicateAfterFailure(() => abdicateCmd.execute(),
-                             runAbdicationCommand = !driverHandlesAbdication)
+        abdicateAfterFailure(
+          () => abdicateCmd.execute(),
+          runAbdicationCommand = !driverHandlesAbdication)
     }
   }
   //End Leader interface

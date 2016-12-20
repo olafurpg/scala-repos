@@ -404,8 +404,8 @@ class MergedClassPath[T](override val entries: IndexedSeq[ClassPath[T]],
 
   def show() {
     println(
-      "ClassPath %s has %d entries and results in:\n".format(name,
-                                                             entries.size))
+      "ClassPath %s has %d entries and results in:\n"
+        .format(name, entries.size))
     asClassPathString split ':' foreach (x => println("  " + x))
   }
 

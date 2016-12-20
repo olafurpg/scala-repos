@@ -78,11 +78,12 @@ abstract class MappedLocale[T <: Mapper[T]](owner: T)
 
   override def _toForm: Box[Elem] =
     Full(
-      SHtml.select(Locale.getAvailableLocales.toList
-                     .sortWith(_.getDisplayName < _.getDisplayName)
-                     .map(lo => (lo.toString, lo.getDisplayName)),
-                   Full(this.get),
-                   set) % ("id" -> fieldId))
+      SHtml.select(
+        Locale.getAvailableLocales.toList
+          .sortWith(_.getDisplayName < _.getDisplayName)
+          .map(lo => (lo.toString, lo.getDisplayName)),
+        Full(this.get),
+        set) % ("id" -> fieldId))
 }
 
 abstract class MappedTimeZone[T <: Mapper[T]](owner: T)
@@ -138,19 +139,22 @@ abstract class MappedPostalCode[T <: Mapper[T]](owner: T,
 
   override def validations = country.get match {
     case Countries.USA =>
-      valRegex(REPat.compile("[0-9]{5}(\\-[0-9]{4})?"),
-               S.?("invalid.zip.code")) _ :: super.validations
+      valRegex(
+        REPat.compile("[0-9]{5}(\\-[0-9]{4})?"),
+        S.?("invalid.zip.code")) _ :: super.validations
 
     case Countries.Sweden =>
-      valRegex(REPat.compile("[0-9]{3}[ ]?[0-9]{2}"),
-               S.?("invalid.postal.code")) _ :: super.validations
+      valRegex(
+        REPat.compile("[0-9]{3}[ ]?[0-9]{2}"),
+        S.?("invalid.postal.code")) _ :: super.validations
 
     case Countries.Australia =>
       valRegex(REPat.compile("(0?|[1-9])[0-9]{3}"), S.?("invalid.postal.code")) _ :: super.validations
 
     case Countries.Canada =>
-      valRegex(REPat.compile("[A-Z][0-9][A-Z][ ][0-9][A-Z][0-9]"),
-               S.?("invalid.postal.code")) _ :: super.validations
+      valRegex(
+        REPat.compile("[A-Z][0-9][A-Z][ ][0-9][A-Z][0-9]"),
+        S.?("invalid.postal.code")) _ :: super.validations
 
     case Countries.Germany =>
       valRegex(REPat.compile("[0-9]{5}"), S.?("invalid.postal.code")) _ :: super.validations

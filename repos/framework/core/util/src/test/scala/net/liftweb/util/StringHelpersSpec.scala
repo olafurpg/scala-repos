@@ -353,8 +353,10 @@ trait StringGen {
   val camelCasedStrings = for {
     length <- choose(0, 4)
     firstLetter <- alphaNumChar.map(_.toUpper)
-    string <- listOfN(length,
-                      frequency((3, alphaNumChar.map(_.toLower)),
-                                (1, alphaNumChar.map(_.toUpper))))
+    string <- listOfN(
+      length,
+      frequency(
+        (3, alphaNumChar.map(_.toLower)),
+        (1, alphaNumChar.map(_.toUpper))))
   } yield (firstLetter :: string).mkString
 }

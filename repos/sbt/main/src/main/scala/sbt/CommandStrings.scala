@@ -35,9 +35,10 @@ object CommandStrings {
   def actHelp = showHelp ++ multiTaskHelp
 
   def multiTaskHelp =
-    Help(MultiTaskCommand,
-         (multiTaskSyntax, multiTaskBrief),
-         multiTaskDetailed)
+    Help(
+      MultiTaskCommand,
+      (multiTaskSyntax, multiTaskBrief),
+      multiTaskDetailed)
   def multiTaskDetailed =
     s"""$multiTaskSyntax
 

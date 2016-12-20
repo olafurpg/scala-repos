@@ -90,12 +90,13 @@ class IntroduceExplicitParameterIntention
 
       val names = NameSuggester.suggestNames(
         u,
-        new ScalaVariableValidator(null,
-                                   project,
-                                   u,
-                                   false,
-                                   expr.getContext,
-                                   expr.getContext) {
+        new ScalaVariableValidator(
+          null,
+          project,
+          u,
+          false,
+          expr.getContext,
+          expr.getContext) {
           override def validateName(name: String,
                                     increaseNumber: Boolean): String = {
             var res = super.validateName(name, increaseNumber)
@@ -168,8 +169,9 @@ class IntroduceExplicitParameterIntention
 
       val file = PsiDocumentManager.getInstance(project).getPsiFile(document)
       val parent =
-        PsiTreeUtil.findCommonParent(file.findElementAt(parentStartOffset),
-                                     file.findElementAt(parentEndOffset - 1))
+        PsiTreeUtil.findCommonParent(
+          file.findElementAt(parentStartOffset),
+          file.findElementAt(parentEndOffset - 1))
 
       val builder: TemplateBuilderImpl = TemplateBuilderFactory
         .getInstance()
@@ -182,23 +184,26 @@ class IntroduceExplicitParameterIntention
       parent match {
         case f: ScFunctionExpr =>
           for (parameter <- f.parameters) {
-            val lookupExpr = new MyLookupExpression(parameter.name,
-                                                    null,
-                                                    parameter,
-                                                    f,
-                                                    false,
-                                                    null)
-            builder.replaceElement(parameter.nameId,
-                                   parameter.name,
-                                   lookupExpr,
-                                   true)
+            val lookupExpr = new MyLookupExpression(
+              parameter.name,
+              null,
+              parameter,
+              f,
+              false,
+              null)
+            builder.replaceElement(
+              parameter.nameId,
+              parameter.name,
+              lookupExpr,
+              true)
 
             val dependantParam =
               file.findElementAt(offsets(parameter.name) + diff)
-            builder.replaceElement(dependantParam,
-                                   parameter.name + "_1",
-                                   parameter.name,
-                                   false)
+            builder.replaceElement(
+              dependantParam,
+              parameter.name + "_1",
+              parameter.name,
+              false)
 
             params.put(index, parameter.name)
             depends.put(index, parameter.name + "_1")
@@ -247,13 +252,14 @@ class IntroduceExplicitParameterIntention
               highlightManager: HighlightManager) {
             for ((range, attributes) <- ranges) {
               import scala.collection.JavaConversions._
-              highlightManager.addOccurrenceHighlight(editor,
-                                                      range.getStartOffset,
-                                                      range.getEndOffset,
-                                                      attributes,
-                                                      0,
-                                                      highlighters,
-                                                      null)
+              highlightManager.addOccurrenceHighlight(
+                editor,
+                range.getStartOffset,
+                range.getEndOffset,
+                attributes,
+                0,
+                highlighters,
+                null)
             }
             for (highlighter <- highlighters) {
               highlighter.setGreedyToLeft(true)
@@ -283,10 +289,11 @@ class IntroduceExplicitParameterIntention
                 rangesToHighlight.put(segmentOffset, attributes)
               i += 1
             }
-            addHighlights(rangesToHighlight,
-                          editor,
-                          myHighlighters,
-                          HighlightManager.getInstance(project))
+            addHighlights(
+              rangesToHighlight,
+              editor,
+              myHighlighters,
+              HighlightManager.getInstance(project))
           }
 
           private def clearHighlighters() {

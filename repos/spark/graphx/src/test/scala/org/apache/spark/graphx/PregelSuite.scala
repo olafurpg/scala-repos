@@ -40,8 +40,9 @@ class PregelSuite extends SparkFunSuite with LocalSparkContext {
       val n = 5
       val chain = Graph
         .fromEdgeTuples(
-          sc.parallelize((1 until n).map(x => (x: VertexId, x + 1: VertexId)),
-                         3),
+          sc.parallelize(
+            (1 until n).map(x => (x: VertexId, x + 1: VertexId)),
+            3),
           0)
         .cache()
       assert(
@@ -57,12 +58,13 @@ class PregelSuite extends SparkFunSuite with LocalSparkContext {
         chainWithSeed.vertices.collect.toSet === Set((1: VertexId, 1)) ++
           (2 to n).map(x => (x: VertexId, 0)).toSet)
       val result =
-        Pregel(chainWithSeed, 0)((vid, attr, msg) => math.max(msg, attr),
-                                 et =>
-                                   if (et.dstAttr != et.srcAttr)
-                                     Iterator((et.dstId, et.srcAttr))
-                                   else Iterator.empty,
-                                 (a: Int, b: Int) => math.max(a, b))
+        Pregel(chainWithSeed, 0)(
+          (vid, attr, msg) => math.max(msg, attr),
+          et =>
+            if (et.dstAttr != et.srcAttr)
+              Iterator((et.dstId, et.srcAttr))
+            else Iterator.empty,
+          (a: Int, b: Int) => math.max(a, b))
       assert(
         result.vertices.collect.toSet === chain.vertices
           .mapValues { (vid, attr) =>

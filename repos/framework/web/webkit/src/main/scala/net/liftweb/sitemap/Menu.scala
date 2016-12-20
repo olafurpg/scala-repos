@@ -106,41 +106,43 @@ object Menu extends MenuSingleton {
       * The method to add a path element to the URL representing this menu item
       */
     def /(pathElement: LocPath): ParamMenuable[T] with WithSlash =
-      new ParamMenuable[T](name,
-                           linkText,
-                           parser,
-                           encoder,
-                           pathElement :: Nil,
-                           false,
-                           Nil,
-                           Nil) with WithSlash
+      new ParamMenuable[T](
+        name,
+        linkText,
+        parser,
+        encoder,
+        pathElement :: Nil,
+        false,
+        Nil,
+        Nil) with WithSlash
 
     /**
       * The Java way of building menus.  Put the path String here,
       * for example "/foo/bar" or "/foo/ * /bar"
       */
     def path(pathElement: String): ParamMenuable[T] =
-      new ParamMenuable[T](name,
-                           linkText,
-                           parser,
-                           encoder,
-                           pathElement
-                             .charSplit('/')
-                             .drop(if (pathElement.startsWith("/")) 1
-                             else 0)
-                             .map(_.trim)
-                             .filter(_ != "**")
-                             .map {
-                               case "*" => *
-                               case "" => NormalLocPath("index")
-                               case str => NormalLocPath(str)
-                             } match {
-                             case Nil => List(NormalLocPath("index"))
-                             case xs => xs
-                           },
-                           pathElement.endsWith("**"),
-                           Nil,
-                           Nil)
+      new ParamMenuable[T](
+        name,
+        linkText,
+        parser,
+        encoder,
+        pathElement
+          .charSplit('/')
+          .drop(if (pathElement.startsWith("/")) 1
+          else 0)
+          .map(_.trim)
+          .filter(_ != "**")
+          .map {
+            case "*" => *
+            case "" => NormalLocPath("index")
+            case str => NormalLocPath(str)
+          } match {
+          case Nil => List(NormalLocPath("index"))
+          case xs => xs
+        },
+        pathElement.endsWith("**"),
+        Nil,
+        Nil)
   }
 
   class ParamMenuable[T](val name: String,
@@ -156,24 +158,26 @@ object Menu extends MenuSingleton {
     type BuiltType = ParamMenuable[T]
 
     def buildOne(newPath: List[LocPath], newHead: Boolean): BuiltType =
-      new ParamMenuable[T](name,
-                           linkText,
-                           parser,
-                           encoder,
-                           newPath,
-                           newHead,
-                           params,
-                           submenus)
+      new ParamMenuable[T](
+        name,
+        linkText,
+        parser,
+        encoder,
+        newPath,
+        newHead,
+        params,
+        submenus)
     def buildSlashOne(newPath: List[LocPath],
                       newHead: Boolean): BuiltType with WithSlash =
-      new ParamMenuable[T](name,
-                           linkText,
-                           parser,
-                           encoder,
-                           newPath,
-                           newHead,
-                           params,
-                           submenus) with WithSlash
+      new ParamMenuable[T](
+        name,
+        linkText,
+        parser,
+        encoder,
+        newPath,
+        newHead,
+        params,
+        submenus) with WithSlash
 
     /**
       * Append a LocParam to the Menu item
@@ -184,14 +188,15 @@ object Menu extends MenuSingleton {
       * Append a LocParam to the Menu item
       */
     def >>(param: Loc.LocParam[T]): ParamMenuable[T] =
-      new ParamMenuable[T](name,
-                           linkText,
-                           parser,
-                           encoder,
-                           path,
-                           headMatch,
-                           params ::: List(param),
-                           submenus)
+      new ParamMenuable[T](
+        name,
+        linkText,
+        parser,
+        encoder,
+        path,
+        headMatch,
+        params ::: List(param),
+        submenus)
 
     /**
       * Define the submenus of this menu item
@@ -203,14 +208,15 @@ object Menu extends MenuSingleton {
       * Define the submenus of this menu item
       */
     def submenus(subs: List[ConvertableToMenu]): ParamMenuable[T] =
-      new ParamMenuable[T](name,
-                           linkText,
-                           parser,
-                           encoder,
-                           path,
-                           headMatch,
-                           params,
-                           submenus ::: subs)
+      new ParamMenuable[T](
+        name,
+        linkText,
+        parser,
+        encoder,
+        path,
+        headMatch,
+        params,
+        submenus ::: subs)
 
     // FIXME... do the right thing so that in development mode
     // the menu and loc are recalculated when the menu is reloaded
@@ -247,9 +253,10 @@ object Menu extends MenuSingleton {
 
       def listToFrom(in: List[String]): Box[String] = in.headOption
 
-      val link = new ParamLocLink[T](ParamMenuable.this.path,
-                                     ParamMenuable.this.headMatch,
-                                     t => List(encoder(t)))
+      val link = new ParamLocLink[T](
+        ParamMenuable.this.path,
+        ParamMenuable.this.headMatch,
+        t => List(encoder(t)))
     }
   }
 
@@ -283,24 +290,26 @@ object Menu extends MenuSingleton {
       * The method to add a path element to the URL representing this menu item
       */
     def /(pathElement: LocPath): ParamsMenuable[T] with WithSlash =
-      new ParamsMenuable[T](name,
-                            linkText,
-                            parser,
-                            encoder,
-                            pathElement :: Nil,
-                            false,
-                            Nil,
-                            Nil) with WithSlash
+      new ParamsMenuable[T](
+        name,
+        linkText,
+        parser,
+        encoder,
+        pathElement :: Nil,
+        false,
+        Nil,
+        Nil) with WithSlash
 
     def path(pathElement: String): ParamsMenuable[T] with WithSlash =
-      new ParamsMenuable[T](name,
-                            linkText,
-                            parser,
-                            encoder,
-                            pathElement :: Nil,
-                            false,
-                            Nil,
-                            Nil) with WithSlash
+      new ParamsMenuable[T](
+        name,
+        linkText,
+        parser,
+        encoder,
+        pathElement :: Nil,
+        false,
+        Nil,
+        Nil) with WithSlash
   }
 
   class ParamsMenuable[T](val name: String,
@@ -316,24 +325,26 @@ object Menu extends MenuSingleton {
     type BuiltType = ParamsMenuable[T]
 
     def buildOne(newPath: List[LocPath], newHead: Boolean): BuiltType =
-      new ParamsMenuable[T](name,
-                            linkText,
-                            parser,
-                            encoder,
-                            newPath,
-                            newHead,
-                            params,
-                            submenus)
+      new ParamsMenuable[T](
+        name,
+        linkText,
+        parser,
+        encoder,
+        newPath,
+        newHead,
+        params,
+        submenus)
     def buildSlashOne(newPath: List[LocPath],
                       newHead: Boolean): BuiltType with WithSlash =
-      new ParamsMenuable[T](name,
-                            linkText,
-                            parser,
-                            encoder,
-                            newPath,
-                            newHead,
-                            params,
-                            submenus) with WithSlash
+      new ParamsMenuable[T](
+        name,
+        linkText,
+        parser,
+        encoder,
+        newPath,
+        newHead,
+        params,
+        submenus) with WithSlash
 
     /**
       * Append a LocParam to the Menu item
@@ -344,14 +355,15 @@ object Menu extends MenuSingleton {
       * Append a LocParam to the Menu item
       */
     def >>(param: Loc.LocParam[T]): ParamsMenuable[T] =
-      new ParamsMenuable[T](name,
-                            linkText,
-                            parser,
-                            encoder,
-                            path,
-                            headMatch,
-                            params ::: List(param),
-                            submenus)
+      new ParamsMenuable[T](
+        name,
+        linkText,
+        parser,
+        encoder,
+        path,
+        headMatch,
+        params ::: List(param),
+        submenus)
 
     /**
       * Define the submenus of this menu item
@@ -363,14 +375,15 @@ object Menu extends MenuSingleton {
       * Define the submenus of this menu item
       */
     def submenus(subs: List[ConvertableToMenu]): ParamsMenuable[T] =
-      new ParamsMenuable[T](name,
-                            linkText,
-                            parser,
-                            encoder,
-                            path,
-                            headMatch,
-                            params,
-                            submenus ::: subs)
+      new ParamsMenuable[T](
+        name,
+        linkText,
+        parser,
+        encoder,
+        path,
+        headMatch,
+        params,
+        submenus ::: subs)
 
     // FIXME... do the right thing so that in development mode
     // the menu and loc are recalculated when the menu is reloaded
@@ -401,9 +414,10 @@ object Menu extends MenuSingleton {
         */
       def text = ParamsMenuable.this.linkText
 
-      val link = new ParamLocLink[T](ParamsMenuable.this.path,
-                                     ParamsMenuable.this.headMatch,
-                                     encoder)
+      val link = new ParamLocLink[T](
+        ParamsMenuable.this.path,
+        ParamsMenuable.this.headMatch,
+        encoder)
 
       def locPath: List[LocPath] = ParamsMenuable.this.path
 
@@ -606,12 +620,13 @@ object Menu extends MenuSingleton {
       * Append a LocParam to the Menu item
       */
     def >>(param: Loc.LocParam[Unit]): Menuable =
-      new Menuable(name,
-                   linkText,
-                   path,
-                   headMatch,
-                   params ::: List(param),
-                   submenus)
+      new Menuable(
+        name,
+        linkText,
+        path,
+        headMatch,
+        params ::: List(param),
+        submenus)
 
     /**
       * Define the submenus of this menu item
@@ -640,10 +655,11 @@ object Menu extends MenuSingleton {
       */
     implicit def toMenu(able: Menuable): Menu =
       Menu(
-        Loc(able.name,
-            new ParamLocLink[Unit](able.path, able.headMatch, ignore => Nil),
-            able.linkText,
-            able.params),
+        Loc(
+          able.name,
+          new ParamLocLink[Unit](able.path, able.headMatch, ignore => Nil),
+          able.linkText,
+          able.params),
         able.submenus: _*)
   }
 }
@@ -753,9 +769,10 @@ case class Menu(loc: Loc[_], private val convertableKids: ConvertableToMenu*)
     val kids: List[MenuItem] = _parent.toList.flatMap(
       _.kids.toList.flatMap(
         m =>
-          m.loc.buildItem(if (m == this) populate else Nil,
-                          m == actual,
-                          m == pathAt)))
+          m.loc.buildItem(
+            if (m == this) populate else Nil,
+            m == actual,
+            m == pathAt)))
 
     _parent.toList.flatMap(p => p.buildUpperLines(p, actual, kids))
   }

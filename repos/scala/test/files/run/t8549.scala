@@ -80,8 +80,9 @@ object Test extends App {
         patch(f, lineNumberOfLiteralString, prevResult, result)
       case None =>
         checkRoundTrip(instance)(f)
-        assert(f(deserialize(prevResult).asInstanceOf[T]) == f(instance),
-               s"$instance != f(deserialize(prevResult))")
+        assert(
+          f(deserialize(prevResult).asInstanceOf[T]) == f(instance),
+          s"$instance != f(deserialize(prevResult))")
         assert(
           prevResult == result,
           s"instance = $instance : ${instance.getClass}\n serialization unstable: ${prevResult}\n   found: ${result}")

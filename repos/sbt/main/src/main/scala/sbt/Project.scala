@@ -123,16 +123,17 @@ sealed trait Project extends ProjectDefinition[ProjectReference] {
            settings: => Seq[Setting[_]] = settings,
            configurations: Seq[Configuration] = configurations,
            auto: AddSettings = auto): Project =
-    unresolved(id,
-               base,
-               aggregate = aggregate,
-               dependencies = dependencies,
-               delegates = delegates,
-               settings,
-               configurations,
-               auto,
-               plugins,
-               autoPlugins)
+    unresolved(
+      id,
+      base,
+      aggregate = aggregate,
+      dependencies = dependencies,
+      delegates = delegates,
+      settings,
+      configurations,
+      auto,
+      plugins,
+      autoPlugins)
 
   def resolve(resolveRef: ProjectReference => ProjectRef): ResolvedProject = {
     def resolveRefs(prs: Seq[ProjectReference]) = prs map resolveRef
@@ -140,16 +141,17 @@ sealed trait Project extends ProjectDefinition[ProjectReference] {
       ds map resolveDep
     def resolveDep(d: ClasspathDep[ProjectReference]) =
       ResolvedClasspathDependency(resolveRef(d.project), d.configuration)
-    resolved(id,
-             base,
-             aggregate = resolveRefs(aggregate),
-             dependencies = resolveDeps(dependencies),
-             delegates = resolveRefs(delegates),
-             settings,
-             configurations,
-             auto,
-             plugins,
-             autoPlugins)
+    resolved(
+      id,
+      base,
+      aggregate = resolveRefs(aggregate),
+      dependencies = resolveDeps(dependencies),
+      delegates = resolveRefs(delegates),
+      settings,
+      configurations,
+      auto,
+      plugins,
+      autoPlugins)
   }
   def resolveBuild(resolveRef: ProjectReference => ProjectReference): Project = {
     def resolveRefs(prs: Seq[ProjectReference]) = prs map resolveRef
@@ -157,16 +159,17 @@ sealed trait Project extends ProjectDefinition[ProjectReference] {
       ds map resolveDep
     def resolveDep(d: ClasspathDep[ProjectReference]) =
       ClasspathDependency(resolveRef(d.project), d.configuration)
-    unresolved(id,
-               base,
-               aggregate = resolveRefs(aggregate),
-               dependencies = resolveDeps(dependencies),
-               delegates = resolveRefs(delegates),
-               settings,
-               configurations,
-               auto,
-               plugins,
-               autoPlugins)
+    unresolved(
+      id,
+      base,
+      aggregate = resolveRefs(aggregate),
+      dependencies = resolveDeps(dependencies),
+      delegates = resolveRefs(delegates),
+      settings,
+      configurations,
+      auto,
+      plugins,
+      autoPlugins)
   }
 
   /**
@@ -237,8 +240,9 @@ sealed trait Project extends ProjectDefinition[ProjectReference] {
     */
   def setSbtFiles(files: File*): Project =
     copy(
-      auto = AddSettings.append(AddSettings.clearSbtFiles(auto),
-                                AddSettings.sbtFiles(files: _*)))
+      auto = AddSettings.append(
+        AddSettings.clearSbtFiles(auto),
+        AddSettings.sbtFiles(files: _*)))
 
   /**
     * Sets the [[AutoPlugin]]s of this project.
@@ -250,36 +254,38 @@ sealed trait Project extends ProjectDefinition[ProjectReference] {
   /** Disable the given plugins on this project. */
   def disablePlugins(ps: AutoPlugin*): Project =
     setPlugins(
-      Plugins.and(plugins,
-                  Plugins.And(ps.map(p => Plugins.Exclude(p)).toList)))
+      Plugins
+        .and(plugins, Plugins.And(ps.map(p => Plugins.Exclude(p)).toList)))
 
   private[this] def setPlugins(ns: Plugins): Project = {
     // TODO: for 0.14.0, use copy when it has the additional `plugins` parameter
-    unresolved(id,
-               base,
-               aggregate = aggregate,
-               dependencies = dependencies,
-               delegates = delegates,
-               settings,
-               configurations,
-               auto,
-               ns,
-               autoPlugins)
+    unresolved(
+      id,
+      base,
+      aggregate = aggregate,
+      dependencies = dependencies,
+      delegates = delegates,
+      settings,
+      configurations,
+      auto,
+      ns,
+      autoPlugins)
   }
 
   /** Definitively set the [[AutoPlugin]]s for this project. */
   private[sbt] def setAutoPlugins(autos: Seq[AutoPlugin]): Project = {
     // TODO: for 0.14.0, use copy when it has the additional `autoPlugins` parameter
-    unresolved(id,
-               base,
-               aggregate = aggregate,
-               dependencies = dependencies,
-               delegates = delegates,
-               settings,
-               configurations,
-               auto,
-               plugins,
-               autos)
+    unresolved(
+      id,
+      base,
+      aggregate = aggregate,
+      dependencies = dependencies,
+      delegates = delegates,
+      settings,
+      configurations,
+      auto,
+      plugins,
+      autos)
   }
 }
 sealed trait ResolvedProject extends ProjectDefinition[ProjectRef] {
@@ -323,9 +329,10 @@ object Project extends ProjectExtra {
   def showContextKey(session: SessionSettings,
                      structure: BuildStructure,
                      keyNameColor: Option[String] = None): Show[ScopedKey[_]] =
-    Def.showRelativeKey(session.current,
-                        structure.allProjects.size > 1,
-                        keyNameColor)
+    Def.showRelativeKey(
+      session.current,
+      structure.allProjects.size > 1,
+      keyNameColor)
 
   def showLoadingKey(loaded: LoadedBuild,
                      keyNameColor: Option[String] = None): Show[ScopedKey[_]] =
@@ -364,16 +371,17 @@ object Project extends ProjectExtra {
             settings: => Seq[Def.Setting[_]] = Nil,
             configurations: Seq[Configuration] = Nil,
             auto: AddSettings = AddSettings.allDefaults): Project =
-    unresolved(id,
-               base,
-               aggregate,
-               dependencies,
-               delegates,
-               settings,
-               configurations,
-               auto,
-               Plugins.empty,
-               Nil) // Note: JvmModule/IvyModule auto included...
+    unresolved(
+      id,
+      base,
+      aggregate,
+      dependencies,
+      delegates,
+      settings,
+      configurations,
+      auto,
+      Plugins.empty,
+      Nil) // Note: JvmModule/IvyModule auto included...
 
   /** This is a variation of def apply that mixes in GeneratedRootProject. */
   private[sbt] def mkGeneratedRoot(
@@ -382,17 +390,17 @@ object Project extends ProjectExtra {
       aggregate: => Seq[ProjectReference]): Project = {
     validProjectID(id).foreach(errMsg =>
       sys.error("Invalid project ID: " + errMsg))
-    new ProjectDef[ProjectReference](id,
-                                     base,
-                                     aggregate,
-                                     Nil,
-                                     Nil,
-                                     Nil,
-                                     Nil,
-                                     AddSettings.allDefaults,
-                                     Plugins.empty,
-                                     Nil) with Project
-    with GeneratedRootProject
+    new ProjectDef[ProjectReference](
+      id,
+      base,
+      aggregate,
+      Nil,
+      Nil,
+      Nil,
+      Nil,
+      AddSettings.allDefaults,
+      Plugins.empty,
+      Nil) with Project with GeneratedRootProject
   }
 
   /** Returns None if `id` is a valid Project ID or Some containing the parser error message if it is not.*/
@@ -428,16 +436,17 @@ object Project extends ProjectExtra {
                settings: Seq[Def.Setting[_]],
                configurations: Seq[Configuration],
                auto: AddSettings): ResolvedProject =
-    resolved(id,
-             base,
-             aggregate,
-             dependencies,
-             delegates,
-             settings,
-             configurations,
-             auto,
-             Plugins.empty,
-             Nil)
+    resolved(
+      id,
+      base,
+      aggregate,
+      dependencies,
+      delegates,
+      settings,
+      configurations,
+      auto,
+      Plugins.empty,
+      Nil)
 
   private def resolved(id: String,
                        base: File,
@@ -449,16 +458,17 @@ object Project extends ProjectExtra {
                        auto: AddSettings,
                        plugins: Plugins,
                        autoPlugins: Seq[AutoPlugin]): ResolvedProject =
-    new ProjectDef[ProjectRef](id,
-                               base,
-                               aggregate,
-                               dependencies,
-                               delegates,
-                               settings,
-                               configurations,
-                               auto,
-                               plugins,
-                               autoPlugins) with ResolvedProject
+    new ProjectDef[ProjectRef](
+      id,
+      base,
+      aggregate,
+      dependencies,
+      delegates,
+      settings,
+      configurations,
+      auto,
+      plugins,
+      autoPlugins) with ResolvedProject
 
   private def unresolved(id: String,
                          base: File,
@@ -472,16 +482,17 @@ object Project extends ProjectExtra {
                          autoPlugins: Seq[AutoPlugin]): Project = {
     validProjectID(id).foreach(errMsg =>
       sys.error("Invalid project ID: " + errMsg))
-    new ProjectDef[ProjectReference](id,
-                                     base,
-                                     aggregate,
-                                     dependencies,
-                                     delegates,
-                                     settings,
-                                     configurations,
-                                     auto,
-                                     plugins,
-                                     autoPlugins) with Project
+    new ProjectDef[ProjectReference](
+      id,
+      base,
+      aggregate,
+      dependencies,
+      delegates,
+      settings,
+      configurations,
+      auto,
+      plugins,
+      autoPlugins) with Project
   }
 
   @deprecated(
@@ -570,12 +581,14 @@ object Project extends ProjectExtra {
     val commandDefs =
       allCommands.distinct.flatten[Command].map(_ tag (projectCommand, true))
     val newDefinedCommands =
-      commandDefs ++ BasicCommands.removeTagged(s.definedCommands,
-                                                projectCommand)
+      commandDefs ++ BasicCommands.removeTagged(
+        s.definedCommands,
+        projectCommand)
     val newAttrs = setCond(Watched.Configuration, watched, s.attributes)
       .put(historyPath.key, history)
-    s.copy(attributes = setCond(shellPrompt.key, prompt, newAttrs),
-           definedCommands = newDefinedCommands)
+    s.copy(
+      attributes = setCond(shellPrompt.key, prompt, newAttrs),
+      definedCommands = newDefinedCommands)
   }
   def setCond[T](key: AttributeKey[T],
                  vopt: Option[T],
@@ -677,9 +690,10 @@ object Project extends ProjectExtra {
     val definingScoped = definingScope match {
       case Some(sc) => ScopedKey(sc, key); case None => scoped
     }
-    val comp = Def.compiled(structure.settings, actual)(structure.delegates,
-                                                        structure.scopeLocal,
-                                                        display)
+    val comp = Def.compiled(structure.settings, actual)(
+      structure.delegates,
+      structure.scopeLocal,
+      display)
     val definedAt =
       comp get definingScoped map { c =>
         Def.definedAtString(c.settings).capitalize
@@ -733,10 +747,11 @@ object Project extends ProjectExtra {
 
     data + "\n" + description + providedBy + definedAt +
       printDepScopes("Dependencies", "derived from", depends, derivedDepends) +
-      printDepScopes("Reverse dependencies",
-                     "derives",
-                     reverse,
-                     derivedReverse) +
+      printDepScopes(
+        "Reverse dependencies",
+        "derives",
+        reverse,
+        derivedReverse) +
       printScopes("Delegates", delegates(structure, scope, key)) + printScopes(
       "Related",
       related,
@@ -765,9 +780,10 @@ object Project extends ProjectExtra {
   def relation(structure: BuildStructure, actual: Boolean)(
       implicit display: Show[ScopedKey[_]])
     : Relation[ScopedKey[_], ScopedKey[_]] =
-    relation(structure.settings, actual)(structure.delegates,
-                                         structure.scopeLocal,
-                                         display)
+    relation(structure.settings, actual)(
+      structure.delegates,
+      structure.scopeLocal,
+      display)
 
   private[sbt] def relation(settings: Seq[Def.Setting[_]], actual: Boolean)(
       implicit delegates: Scope => Seq[Scope],
@@ -875,11 +891,13 @@ object Project extends ProjectExtra {
       state: State,
       checkCycles: Boolean = false,
       maxWorkers: Int = EvaluateTask.SystemProcessors): Option[Result[T]] =
-    runTask(taskKey,
-            state,
-            EvaluateConfig(true,
-                           EvaluateTask.defaultRestrictions(maxWorkers),
-                           checkCycles)).map(_._2)
+    runTask(
+      taskKey,
+      state,
+      EvaluateConfig(
+        true,
+        EvaluateTask.defaultRestrictions(maxWorkers),
+        checkCycles)).map(_._2)
 
   def runTask[T](taskKey: ScopedKey[Task[T]],
                  state: State,
@@ -896,21 +914,23 @@ object Project extends ProjectExtra {
                  state: State,
                  config: EvaluateConfig): Option[(State, Result[T])] = {
     val extracted = Project.extract(state)
-    EvaluateTask(extracted.structure,
-                 taskKey,
-                 state,
-                 extracted.currentRef,
-                 config)
+    EvaluateTask(
+      extracted.structure,
+      taskKey,
+      state,
+      extracted.currentRef,
+      config)
   }
   def runTask[T](taskKey: ScopedKey[Task[T]],
                  state: State,
                  config: EvaluateTaskConfig): Option[(State, Result[T])] = {
     val extracted = Project.extract(state)
-    EvaluateTask(extracted.structure,
-                 taskKey,
-                 state,
-                 extracted.currentRef,
-                 config)
+    EvaluateTask(
+      extracted.structure,
+      taskKey,
+      state,
+      extracted.currentRef,
+      config)
   }
 
   implicit def projectToRef(p: Project): ProjectReference = LocalProject(p.id)
@@ -923,18 +943,21 @@ object Project extends ProjectExtra {
     def storeAs(key: TaskKey[S])(
         implicit f: sbinary.Format[S]): Def.Initialize[Task[S]] =
       (Keys.resolvedScoped, i) { (scoped, task) =>
-        tx(task,
-           (state, value) =>
-             persistAndSet(resolveContext(key, scoped.scope, state),
-                           state,
-                           value)(f))
+        tx(
+          task,
+          (state, value) =>
+            persistAndSet(
+              resolveContext(key, scoped.scope, state),
+              state,
+              value)(f))
       }
     def keepAs(key: TaskKey[S]): Def.Initialize[Task[S]] =
       (i, Keys.resolvedScoped)(
         (t, scoped) =>
-          tx(t,
-             (state, value) =>
-               set(resolveContext(key, scoped.scope, state), state, value)))
+          tx(
+            t,
+            (state, value) =>
+              set(resolveContext(key, scoped.scope, state), state, value)))
   }
 
   import scala.reflect._

@@ -143,10 +143,12 @@ private[prediction] case class EventOp(
       // NotSerializableException issue. Use map(identity) to work around this.
       // see https://issues.scala-lang.org/browse/SI-7005
       combinedFields.map { f =>
-        require(firstUpdated.isDefined,
-                "Unexpected Error: firstUpdated cannot be None.")
-        require(lastUpdated.isDefined,
-                "Unexpected Error: lastUpdated cannot be None.")
+        require(
+          firstUpdated.isDefined,
+          "Unexpected Error: firstUpdated cannot be None.")
+        require(
+          lastUpdated.isDefined,
+          "Unexpected Error: lastUpdated cannot be None.")
         PropertyMap(
           fields = f.mapValues(_.d).map(identity),
           firstUpdated = firstUpdated.get,

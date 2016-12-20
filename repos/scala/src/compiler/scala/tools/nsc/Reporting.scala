@@ -65,10 +65,11 @@ trait Reporting extends scala.reflect.internal.Reporting {
       "inliner",
       () => !settings.YoptWarningsSummaryOnly,
       settings.YoptWarnings)
-    private val _allConditionalWarnings = List(_deprecationWarnings,
-                                               _uncheckedWarnings,
-                                               _featureWarnings,
-                                               _inlinerWarnings)
+    private val _allConditionalWarnings = List(
+      _deprecationWarnings,
+      _uncheckedWarnings,
+      _featureWarnings,
+      _inlinerWarnings)
 
     // TODO: remove in favor of the overload that takes a Symbol, give that argument a default (NoSymbol)
     def deprecationWarning(pos: Position, msg: String): Unit =
@@ -95,9 +96,10 @@ trait Reporting extends scala.reflect.internal.Reporting {
         case Some(msg) => ": " + msg
         case _ => ""
       }
-      deprecationWarning(pos,
-                         sym,
-                         s"$sym${sym.locationString} is deprecated$suffix")
+      deprecationWarning(
+        pos,
+        sym,
+        s"$sym${sym.locationString} is deprecated$suffix")
     }
 
     private[this] var reportedFeature = Set[Symbol]()
@@ -138,8 +140,9 @@ trait Reporting extends scala.reflect.internal.Reporting {
       // todo: migrationWarnings
 
       if (settings.fatalWarnings && reporter.hasWarnings)
-        reporter.error(NoPosition,
-                       "No warnings can be incurred under -Xfatal-warnings.")
+        reporter.error(
+          NoPosition,
+          "No warnings can be incurred under -Xfatal-warnings.")
     }
   }
 }

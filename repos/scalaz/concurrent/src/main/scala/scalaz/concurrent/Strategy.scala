@@ -41,8 +41,9 @@ trait Strategys extends StrategysLow {
     * where N is equal to the number of available processors.
     */
   val DefaultExecutorService: ExecutorService = {
-    Executors.newFixedThreadPool(Runtime.getRuntime.availableProcessors,
-                                 DefaultDaemonThreadFactory)
+    Executors.newFixedThreadPool(
+      Runtime.getRuntime.availableProcessors,
+      DefaultDaemonThreadFactory)
   }
 
   /**

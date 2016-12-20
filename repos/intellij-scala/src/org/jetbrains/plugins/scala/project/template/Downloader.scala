@@ -58,12 +58,13 @@ trait Downloader {
       jarWith[this.type].getParentFile.getParentFile / "launcher" / "sbt-launch.jar"
 
     if (launcher.exists()) {
-      Seq("java",
-          "-Djline.terminal=jline.UnsupportedTerminal",
-          "-Dsbt.log.noformat=true",
-          "-jar",
-          launcher.getAbsolutePath,
-          "< " + file.getAbsolutePath)
+      Seq(
+        "java",
+        "-Djline.terminal=jline.UnsupportedTerminal",
+        "-Dsbt.log.noformat=true",
+        "-jar",
+        launcher.getAbsolutePath,
+        "< " + file.getAbsolutePath)
     } else {
       throw new FileNotFoundException(launcher.getPath)
     }

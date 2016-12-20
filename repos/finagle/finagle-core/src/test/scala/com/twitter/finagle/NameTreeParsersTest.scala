@@ -60,8 +60,9 @@ class NameTreeParsersTest extends FunSuite with AssertionsForJUnit {
     assert(
       NameTreeParsers.parseNameTree(
         "1 * /foo & 2 * /bar | .5 * /bar & .5 * /baz") == NameTree.Alt(
-        NameTree.Union(NameTree.Weighted(1D, NameTree.Leaf(Path.Utf8("foo"))),
-                       NameTree.Weighted(2D, NameTree.Leaf(Path.Utf8("bar")))),
+        NameTree.Union(
+          NameTree.Weighted(1D, NameTree.Leaf(Path.Utf8("foo"))),
+          NameTree.Weighted(2D, NameTree.Leaf(Path.Utf8("bar")))),
         NameTree.Union(
           NameTree.Weighted(0.5D, NameTree.Leaf(Path.Utf8("bar"))),
           NameTree.Weighted(0.5D, NameTree.Leaf(Path.Utf8("baz"))))))
@@ -83,8 +84,8 @@ class NameTreeParsersTest extends FunSuite with AssertionsForJUnit {
     assert(
       NameTreeParsers.parseDentry("/=>!") == Dentry(Path.empty, NameTree.Fail))
     assert(
-      NameTreeParsers.parseDentry("/ => !") == Dentry(Path.empty,
-                                                      NameTree.Fail))
+      NameTreeParsers
+        .parseDentry("/ => !") == Dentry(Path.empty, NameTree.Fail))
 
     intercept[IllegalArgumentException] { NameTreeParsers.parseDentry("/&!") }
   }
@@ -99,7 +100,8 @@ class NameTreeParsersTest extends FunSuite with AssertionsForJUnit {
         IndexedSeq(Dentry(Path.empty, NameTree.Fail))))
     assert(
       NameTreeParsers.parseDtab("/=>!;/foo=>/bar") == Dtab(
-        IndexedSeq(Dentry(Path.empty, NameTree.Fail),
-                   Dentry(Path.Utf8("foo"), NameTree.Leaf(Path.Utf8("bar"))))))
+        IndexedSeq(
+          Dentry(Path.empty, NameTree.Fail),
+          Dentry(Path.Utf8("foo"), NameTree.Leaf(Path.Utf8("bar"))))))
   }
 }

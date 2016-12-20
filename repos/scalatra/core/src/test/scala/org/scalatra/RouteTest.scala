@@ -84,8 +84,9 @@ class RouteTestServlet extends ScalatraServlet {
     "regex: false"
   }
 
-  get("""/reg(ular)?-ex(pression)?""".r,
-      params.getOrElse("condition", "false") == "true") {
+  get(
+    """/reg(ular)?-ex(pression)?""".r,
+    params.getOrElse("condition", "false") == "true") {
     "regex: true"
   }
 

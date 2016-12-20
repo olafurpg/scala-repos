@@ -75,10 +75,11 @@ class Slf4jLogger
             Logger(logClass, logSource).error(
               if (message != null) message.toString else null)
           case _ ⇒
-            Logger(logClass, logSource).error(if (message != null)
-                                                message.toString
-                                              else cause.getLocalizedMessage,
-                                              cause)
+            Logger(logClass, logSource).error(
+              if (message != null)
+                message.toString
+              else cause.getLocalizedMessage,
+              cause)
         }
       }
 

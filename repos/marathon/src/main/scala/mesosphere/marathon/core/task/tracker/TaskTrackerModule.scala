@@ -29,9 +29,10 @@ class TaskTrackerModule(clock: Clock,
       new TaskTrackerDelegate(None, config, taskTrackerRef))
   private[this] def taskOpProcessor(
       taskTrackerRef: ActorRef): TaskOpProcessor =
-    new TaskOpProcessorImpl(taskTrackerRef,
-                            taskRepository,
-                            statusUpdateResolver(taskTrackerRef))
+    new TaskOpProcessorImpl(
+      taskTrackerRef,
+      taskRepository,
+      statusUpdateResolver(taskTrackerRef))
   private[this] lazy val taskUpdaterActorMetrics =
     new TaskUpdateActor.ActorMetrics(metrics)
   private[this] def taskUpdaterActorProps(taskTrackerRef: ActorRef) =
@@ -49,7 +50,8 @@ class TaskTrackerModule(clock: Clock,
       taskTrackerActorName
     )
   private[this] lazy val taskTrackerCreatorAndUpdater =
-    new TaskCreationHandlerAndUpdaterDelegate(clock,
-                                              config,
-                                              taskTrackerActorRef)
+    new TaskCreationHandlerAndUpdaterDelegate(
+      clock,
+      config,
+      taskTrackerActorRef)
 }

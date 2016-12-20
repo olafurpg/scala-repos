@@ -108,11 +108,13 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
     lg(3.0, 4.0) should be(0.4212028764812177 +- 1E-8)
     lg(3.0, 1.0) should be(-1.828821079471455 +- 1E-8)
     assert(
-      lg(3.0, DenseVector(4.0, 1.0)) === DenseVector(lg(3.0, 4.0),
-                                                     lg(3.0, 1.0)))
+      lg(3.0, DenseVector(4.0, 1.0)) === DenseVector(
+        lg(3.0, 4.0),
+        lg(3.0, 1.0)))
     assert(
-      lg(DenseVector(3.0, 3.0), 4.0) === DenseVector(lg(3.0, 4.0),
-                                                     lg(3.0, 4.0)))
+      lg(DenseVector(3.0, 3.0), 4.0) === DenseVector(
+        lg(3.0, 4.0),
+        lg(3.0, 4.0)))
     assert(
       lg(DenseVector(3.0, 3.0), DenseVector(4.0, 1.0)) === DenseVector(
         lg(3.0, 4.0),
@@ -163,10 +165,12 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
   test("isOdd/isEven") {
     assert(isOdd(1), "1 should be odd!")
     assert(isEven(0.0), "0.0 should be even!")
-    assert(isEven(DenseVector(2.0f, 1.5f, -3.0f)) == DenseVector(true,
-                                                                 false,
-                                                                 false),
-           "an array of floats")
+    assert(
+      isEven(DenseVector(2.0f, 1.5f, -3.0f)) == DenseVector(
+        true,
+        false,
+        false),
+      "an array of floats")
   }
 
   test("sinc") {
@@ -178,10 +182,11 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
     val testDV = DenseVector(-10d, -7d, -4d, -1d)
     assert(
       norm(
-        sinc(testDV) - DenseVector(-0.05440211108893698,
-                                   0.09385522838839844,
-                                   -0.18920062382698205,
-                                   0.8414709848078965)) < testThreshold)
+        sinc(testDV) - DenseVector(
+          -0.05440211108893698,
+          0.09385522838839844,
+          -0.18920062382698205,
+          0.8414709848078965)) < testThreshold)
   }
 
   test("sincpi") {
@@ -193,10 +198,11 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
     val testDV = DenseVector(-3d, -2.5, -2d, -1.5)
     assert(
       norm(
-        sincpi(testDV) - DenseVector(3.898171832519376E-17,
-                                     0.127323954473516,
-                                     -3.898171832519376E-17,
-                                     -0.212206590789194)) < testThreshold)
+        sincpi(testDV) - DenseVector(
+          3.898171832519376E-17,
+          0.127323954473516,
+          -3.898171832519376E-17,
+          -0.212206590789194)) < testThreshold)
   }
 
   test("nextPower") {

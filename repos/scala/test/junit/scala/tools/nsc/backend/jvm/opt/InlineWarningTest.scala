@@ -93,10 +93,11 @@ class InlineWarningTest extends ClearAfterClass {
         |Note that the following parent classes could not be found on the classpath: T$class""".stripMargin
 
     var c = 0
-    compileSeparately(List(codeA, codeB),
-                      extraArgs = InlineWarningTest.args,
-                      afterEach = removeImpl,
-                      allowMessage = i => { c += 1; i.msg contains warn })
+    compileSeparately(
+      List(codeA, codeB),
+      extraArgs = InlineWarningTest.args,
+      afterEach = removeImpl,
+      allowMessage = i => { c += 1; i.msg contains warn })
     assert(c == 1, c)
 
     // only summary here
@@ -162,12 +163,13 @@ class InlineWarningTest extends ClearAfterClass {
     c = 0
     compileClasses(
       newCompiler(extraArgs = InlineWarningTest.argsNoWarn +
-          " -Yopt-warnings:no-inline-mixed"))(scalaCode,
-                                              List((javaCode, "A.java")),
-                                              allowMessage = i => {
-                                                c += 1;
-                                                warns.exists(i.msg contains _)
-                                              })
+          " -Yopt-warnings:no-inline-mixed"))(
+      scalaCode,
+      List((javaCode, "A.java")),
+      allowMessage = i => {
+        c += 1;
+        warns.exists(i.msg contains _)
+      })
     assert(c == 2, c)
   }
 

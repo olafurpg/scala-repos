@@ -32,8 +32,9 @@ class PrepareRequestsSpec extends AkkaSpec {
         case EntityChunk(chunk) ⇒ chunk
         case EntityStreamError(info) ⇒ throw EntityStreamException(info)
       }
-      HttpEntity.Chunked(ContentTypes.`application/octet-stream`,
-                         HttpEntity.limitableChunkSource(chunks))
+      HttpEntity.Chunked(
+        ContentTypes.`application/octet-stream`,
+        HttpEntity.limitableChunkSource(chunks))
     },
     expect100Continue = true,
     closeRequested = false)
@@ -49,8 +50,8 @@ class PrepareRequestsSpec extends AkkaSpec {
     HttpProtocols.`HTTP/1.1`,
     List(),
     StrictEntityCreator(
-      HttpEntity.Strict(ContentTypes.`application/octet-stream`,
-                        ByteString("body"))),
+      HttpEntity
+        .Strict(ContentTypes.`application/octet-stream`, ByteString("body"))),
     true,
     false)
 

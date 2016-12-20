@@ -28,7 +28,8 @@ class ComplexCheck
   def complex2(name: String)(f: (C, C) => Unit) =
     property(name) {
       forAll { (rx: Int, ix: Int, ry: Int, iy: Int) =>
-        f(Complex(BigDecimal(rx), BigDecimal(ix)),
+        f(
+          Complex(BigDecimal(rx), BigDecimal(ix)),
           Complex(BigDecimal(ry), BigDecimal(iy)))
       }
     }

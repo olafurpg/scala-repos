@@ -91,12 +91,13 @@ case class TreePrinter(name: String = "",
 object TreePrinter {
   def default = new TreePrinter
 
-  private[TreePrinter] val (childPrefix1,
-                            childPrefix2,
-                            lastChildPrefix1,
-                            lastChildPrefix2,
-                            multi1,
-                            multi2) =
+  private[TreePrinter] val (
+    childPrefix1,
+    childPrefix2,
+    lastChildPrefix1,
+    lastChildPrefix2,
+    multi1,
+    multi2) =
     if (GlobalConfig.unicodeDump)
       ("\u2523 ", "\u2503 ", "\u2517 ", "  ", "\u250f ", "\u2507 ")
     else ("  ", "  ", "  ", "  ", ": ", ": ")

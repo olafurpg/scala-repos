@@ -60,9 +60,10 @@ class AggregateTest extends AsyncTest[RelationalTestDB] {
         } yield (k, v.length, v.map(_.a).sum, v.map(_.b).sum)).sortBy(_._1)
         db.run(mark("q", q.result)).map {
           rt: Seq[(Int, Int, Option[Int], Option[Int])] =>
-            rt shouldBe Vector((1, 3, Some(3), Some(6)),
-                               (2, 3, Some(6), Some(8)),
-                               (3, 2, Some(6), Some(10)))
+            rt shouldBe Vector(
+              (1, 3, Some(3), Some(6)),
+              (2, 3, Some(6), Some(8)),
+              (3, 2, Some(6), Some(10)))
         }
       }
       .flatMap { _ =>
@@ -77,9 +78,10 @@ class AggregateTest extends AsyncTest[RelationalTestDB] {
         }
         db.run(mark("q2", q2.result)).map {
           r2t: Seq[(Int, Int, Option[Int], Option[Int])] =>
-            r2t.toSet shouldBe Set((1, 3, Some(3), Some(6)),
-                                   (2, 3, Some(6), Some(8)),
-                                   (3, 2, Some(6), Some(10)))
+            r2t.toSet shouldBe Set(
+              (1, 3, Some(3), Some(6)),
+              (2, 3, Some(6), Some(8)),
+              (3, 2, Some(6), Some(10)))
         }
       }
       .flatMap { _ =>
@@ -139,10 +141,11 @@ class AggregateTest extends AsyncTest[RelationalTestDB] {
           .to[Set]
         db.run(mark("q6", q6.result))
           .map(
-            _ shouldBe Set((1, 3, 3, 3, 3, 3),
-                           (2, 3, 3, 3, 3, 3),
-                           (3, 2, 2, 2, 2, 2),
-                           (4, 1, 1, 1, 1, 0)))
+            _ shouldBe Set(
+              (1, 3, 3, 3, 3, 3),
+              (2, 3, 3, 3, 3, 3),
+              (3, 2, 2, 2, 2, 2),
+              (4, 1, 1, 1, 1, 0)))
       }
       .flatMap { _ =>
         val q7 = ts
@@ -157,9 +160,11 @@ class AggregateTest extends AsyncTest[RelationalTestDB] {
           }
           .to[Set]
         db.run(mark("q7", q7.result))
-          .map(_ shouldBe Set((1, Some(6), Some(1), Some(3), Some(2)),
-                              (2, Some(8), Some(1), Some(5), Some(2)),
-                              (3, Some(10), Some(1), Some(9), Some(5))))
+          .map(
+            _ shouldBe Set(
+              (1, Some(6), Some(1), Some(3), Some(2)),
+              (2, Some(8), Some(1), Some(5), Some(2)),
+              (3, Some(10), Some(1), Some(9), Some(5))))
       }
       .flatMap { _ =>
         val q8 = us.map(_ => "test").groupBy(x => x).map(_._2.max)
@@ -177,10 +182,11 @@ class AggregateTest extends AsyncTest[RelationalTestDB] {
             .map(_._2.max)
         db.run(for {
           _ <- mark("q8a", q8a.result).map(
-            _.toSet shouldBe Set(Some("1test"),
-                                 Some("2test"),
-                                 Some("3test"),
-                                 Some("4test")))
+            _.toSet shouldBe Set(
+              Some("1test"),
+              Some("2test"),
+              Some("3test"),
+              Some("4test")))
           _ <- mark("q8d", q8d.result).map(_ shouldBe Seq(Some("test")))
           _ <- mark("q8", q8.result).map(_ shouldBe Seq(Some("test")))
           _ <- mark("q8b", q8b.result).map(_ shouldBe Seq(("x", Some("x"))))
@@ -298,9 +304,10 @@ class AggregateTest extends AsyncTest[RelationalTestDB] {
         }
         .to[Set]
       _ <- q1.result.map(
-        _ shouldBe Set(("baz", "quux", Some(4)),
-                       ("foo", "quux", Some(3)),
-                       ("foo", "bar", Some(3))))
+        _ shouldBe Set(
+          ("baz", "quux", Some(4)),
+          ("foo", "quux", Some(3)),
+          ("foo", "bar", Some(3))))
       q2 = Tabs
         .groupBy(t => ((t.col1, t.col2), t.col3))
         .map {
@@ -308,9 +315,10 @@ class AggregateTest extends AsyncTest[RelationalTestDB] {
         }
         .to[Set]
       _ <- q2.result.map(
-        _ shouldBe Set(("baz", "quux", Some(4)),
-                       ("foo", "quux", Some(3)),
-                       ("foo", "bar", Some(3))))
+        _ shouldBe Set(
+          ("baz", "quux", Some(4)),
+          ("foo", "quux", Some(3)),
+          ("foo", "bar", Some(3))))
       q3 = Tabs
         .groupBy(_.col1)
         .map {

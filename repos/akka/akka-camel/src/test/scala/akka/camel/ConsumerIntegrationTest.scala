@@ -31,15 +31,17 @@ class ConsumerIntegrationTest
 
     "Consumer must throw FailedToCreateRouteException, while awaiting activation, if endpoint is invalid" in {
       filterEvents(
-        EventFilter[FailedToCreateRouteException](pattern =
-                                                    "failed to activate.*",
-                                                  occurrences = 1)) {
+        EventFilter[FailedToCreateRouteException](
+          pattern = "failed to activate.*",
+          occurrences = 1)) {
         val actorRef =
-          system.actorOf(Props(new TestActor(uri = "some invalid uri")),
-                         "invalidActor")
+          system.actorOf(
+            Props(new TestActor(uri = "some invalid uri")),
+            "invalidActor")
         intercept[FailedToCreateRouteException] {
-          Await.result(camel.activationFutureFor(actorRef),
-                       defaultTimeoutDuration)
+          Await.result(
+            camel.activationFutureFor(actorRef),
+            defaultTimeoutDuration)
         }
       }
     }
@@ -104,8 +106,9 @@ class ConsumerIntegrationTest
       camel.routeCount should be > (0)
 
       system.stop(consumer)
-      Await.result(camel.deactivationFutureFor(consumer),
-                   defaultTimeoutDuration)
+      Await.result(
+        camel.deactivationFutureFor(consumer),
+        defaultTimeoutDuration)
 
       camel.routeCount should ===(0)
     }
@@ -119,8 +122,9 @@ class ConsumerIntegrationTest
       camel.routes.get(0).getEndpoint.getEndpointUri should ===(
         "direct://test")
       system.stop(consumer)
-      Await.result(camel.deactivationFutureFor(consumer),
-                   defaultTimeoutDuration)
+      Await.result(
+        camel.deactivationFutureFor(consumer),
+        defaultTimeoutDuration)
       camel.routeCount should ===(0)
       stop(consumer)
     }

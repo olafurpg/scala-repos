@@ -16,14 +16,18 @@ object AkkaProvider
   AccessController.doPrivileged(new PrivilegedAction[this.type] {
     def run = {
       //SecureRandom
-      put("SecureRandom.AES128CounterSecureRNG",
-          classOf[AES128CounterSecureRNG].getName)
-      put("SecureRandom.AES256CounterSecureRNG",
-          classOf[AES256CounterSecureRNG].getName)
-      put("SecureRandom.AES128CounterInetRNG",
-          classOf[AES128CounterInetRNG].getName)
-      put("SecureRandom.AES256CounterInetRNG",
-          classOf[AES256CounterInetRNG].getName)
+      put(
+        "SecureRandom.AES128CounterSecureRNG",
+        classOf[AES128CounterSecureRNG].getName)
+      put(
+        "SecureRandom.AES256CounterSecureRNG",
+        classOf[AES256CounterSecureRNG].getName)
+      put(
+        "SecureRandom.AES128CounterInetRNG",
+        classOf[AES128CounterInetRNG].getName)
+      put(
+        "SecureRandom.AES256CounterInetRNG",
+        classOf[AES256CounterInetRNG].getName)
 
       //Implementation type: software or hardware
       put("SecureRandom.AES128CounterSecureRNG ImplementedIn", "Software")

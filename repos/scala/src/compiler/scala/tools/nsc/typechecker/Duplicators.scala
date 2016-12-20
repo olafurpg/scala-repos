@@ -34,8 +34,9 @@ abstract class Duplicators extends Analyzer {
       newClassOwner = newThis
     } else resetClassOwners()
 
-    envSubstitution = new SubstSkolemsTypeMap(env.keysIterator.toList,
-                                              env.valuesIterator.toList)
+    envSubstitution = new SubstSkolemsTypeMap(
+      env.keysIterator.toList,
+      env.valuesIterator.toList)
     debuglog("retyped with env: " + env)
 
     newBodyDuplicator(context).typed(tree)
@@ -272,9 +273,10 @@ abstract class Duplicators extends Analyzer {
           val rhs1 =
             (new TreeSubstituter(params map (_.symbol), params1) transform rhs) // TODO: duplicate?
 
-          super.typed(treeCopy.LabelDef(tree, name, params1, rhs1.clearType()),
-                      mode,
-                      pt)
+          super.typed(
+            treeCopy.LabelDef(tree, name, params1, rhs1.clearType()),
+            mode,
+            pt)
 
         case Bind(name, _) =>
           // log("bind: " + tree)

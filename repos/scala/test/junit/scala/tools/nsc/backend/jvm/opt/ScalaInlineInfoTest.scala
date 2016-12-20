@@ -132,12 +132,14 @@ class ScalaInlineInfoTest extends ClearAfterClass {
       """.stripMargin
     val cs = compileClasses(compiler)(code)
     val sams = cs.map(c => (c.name, inlineInfo(c).sam))
-    assertEquals(sams,
-                 List(("C", Some("g(I)I")),
-                      ("D", None),
-                      ("E", Some("h(Ljava/lang/String;)I")),
-                      ("F", None),
-                      ("T", Some("h(Ljava/lang/String;)I")),
-                      ("U", None)))
+    assertEquals(
+      sams,
+      List(
+        ("C", Some("g(I)I")),
+        ("D", None),
+        ("E", Some("h(Ljava/lang/String;)I")),
+        ("F", None),
+        ("T", Some("h(Ljava/lang/String;)I")),
+        ("U", None)))
   }
 }

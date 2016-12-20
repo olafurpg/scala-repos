@@ -52,12 +52,14 @@ class AdminServiceActor(val commandClient: CommandClient)
     case MalformedRequestContentRejection(msg, _) :: _ =>
       complete(StatusCodes.BadRequest, Map("message" -> msg))
     case MissingQueryParamRejection(msg) :: _ =>
-      complete(StatusCodes.NotFound,
-               Map("message" -> s"missing required query parameter ${msg}."))
+      complete(
+        StatusCodes.NotFound,
+        Map("message" -> s"missing required query parameter ${msg}."))
     case AuthenticationFailedRejection(cause, challengeHeaders) :: _ =>
-      complete(StatusCodes.Unauthorized,
-               challengeHeaders,
-               Map("message" -> s"Invalid accessKey."))
+      complete(
+        StatusCodes.Unauthorized,
+        challengeHeaders,
+        Map("message" -> s"Invalid accessKey."))
   }
 
   val jsonPath = """(.+)\.json$""".r
@@ -103,8 +105,9 @@ class AdminServiceActor(val commandClient: CommandClient)
 
 class AdminServerActor(val commandClient: CommandClient) extends Actor {
   val log = Logging(context.system, this)
-  val child = context.actorOf(Props(classOf[AdminServiceActor], commandClient),
-                              "AdminServiceActor")
+  val child = context.actorOf(
+    Props(classOf[AdminServiceActor], commandClient),
+    "AdminServiceActor")
 
   implicit val system = context.system
 

@@ -195,9 +195,10 @@ class Formatter(val timezone: Option[String] = None,
 
   override def format(record: javalog.LogRecord): String = {
     val name = formatName(record)
-    val prefix = formatPrefix(record.getLevel,
-                              dateFormat.format(new Date(record.getMillis)),
-                              name)
+    val prefix = formatPrefix(
+      record.getLevel,
+      dateFormat.format(new Date(record.getMillis)),
+      name)
     formatMessageLines(record)
       .mkString(prefix, lineTerminator + prefix, lineTerminator)
   }

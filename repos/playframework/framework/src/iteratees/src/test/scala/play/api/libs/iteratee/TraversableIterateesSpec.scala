@@ -16,7 +16,8 @@ object TraversableIterateesSpec
       mustExecute(1) { splitEC =>
         val e = Traversable.splitOnceAt[String, Char] { c =>
           c != 'e'
-        }(implicitly[String => scala.collection.TraversableLike[Char, String]],
+        }(
+          implicitly[String => scala.collection.TraversableLike[Char, String]],
           splitEC)
         mustTransformTo("hello", "there")("h")(e)
       }

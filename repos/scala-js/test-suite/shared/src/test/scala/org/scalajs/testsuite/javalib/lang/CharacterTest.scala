@@ -58,8 +58,9 @@ class CharacterTest {
     assertTrue(
       Character.toChars(0x10FFFF) sameElements Array('\uDBFF', '\uDFFF'))
 
-    expectThrows(classOf[IllegalArgumentException],
-                 Character.toChars(Integer.MAX_VALUE))
+    expectThrows(
+      classOf[IllegalArgumentException],
+      Character.toChars(Integer.MAX_VALUE))
   }
 
   @Test def isDigit(): Unit = {

@@ -68,12 +68,13 @@ class TaskContextSuite
     val func = (c: TaskContext, i: Iterator[String]) => i.next()
     val taskBinary = sc.broadcast(
       JavaUtils.bufferToArray(closureSerializer.serialize((rdd, func))))
-    val task = new ResultTask[String, String](0,
-                                              0,
-                                              taskBinary,
-                                              rdd.partitions(0),
-                                              Seq.empty,
-                                              0)
+    val task = new ResultTask[String, String](
+      0,
+      0,
+      taskBinary,
+      rdd.partitions(0),
+      Seq.empty,
+      0)
     intercept[RuntimeException] {
       task.run(0, 0, null)
     }
@@ -95,12 +96,13 @@ class TaskContextSuite
     val func = (c: TaskContext, i: Iterator[String]) => i.next()
     val taskBinary = sc.broadcast(
       JavaUtils.bufferToArray(closureSerializer.serialize((rdd, func))))
-    val task = new ResultTask[String, String](0,
-                                              0,
-                                              taskBinary,
-                                              rdd.partitions(0),
-                                              Seq.empty,
-                                              0)
+    val task = new ResultTask[String, String](
+      0,
+      0,
+      taskBinary,
+      rdd.partitions(0),
+      Seq.empty,
+      0)
     intercept[RuntimeException] {
       task.run(0, 0, null)
     }
@@ -174,16 +176,18 @@ class TaskContextSuite
     sc = new SparkContext("local[1,4]", "test")
     val param = AccumulatorParam.LongAccumulatorParam
     // Create 2 accumulators, one that counts failed values and another that doesn't
-    val acc1 = new Accumulator(0L,
-                               param,
-                               Some("x"),
-                               internal = false,
-                               countFailedValues = true)
-    val acc2 = new Accumulator(0L,
-                               param,
-                               Some("y"),
-                               internal = false,
-                               countFailedValues = false)
+    val acc1 = new Accumulator(
+      0L,
+      param,
+      Some("x"),
+      internal = false,
+      countFailedValues = true)
+    val acc2 = new Accumulator(
+      0L,
+      param,
+      Some("y"),
+      internal = false,
+      countFailedValues = false)
     // Fail first 3 attempts of every task. This means each task should be run 4 times.
     sc.parallelize(1 to 10, 10)
       .map { i =>
@@ -206,16 +210,18 @@ class TaskContextSuite
     "failed tasks collect only accumulators whose values count during failures") {
     sc = new SparkContext("local", "test")
     val param = AccumulatorParam.LongAccumulatorParam
-    val acc1 = new Accumulator(0L,
-                               param,
-                               Some("x"),
-                               internal = false,
-                               countFailedValues = true)
-    val acc2 = new Accumulator(0L,
-                               param,
-                               Some("y"),
-                               internal = false,
-                               countFailedValues = false)
+    val acc1 = new Accumulator(
+      0L,
+      param,
+      Some("x"),
+      internal = false,
+      countFailedValues = true)
+    val acc2 = new Accumulator(
+      0L,
+      param,
+      Some("y"),
+      internal = false,
+      countFailedValues = false)
     val initialAccums = InternalAccumulator.createAll()
     // Create a dummy task. We won't end up running this; we just want to collect
     // accumulator updates from it.

@@ -73,13 +73,14 @@ private[http] object FrameEventParser extends ByteStringParser[FrameEvent] {
           else None
 
         def isFlagSet(mask: Int): Boolean = (flags & mask) != 0
-        val header = FrameHeader(Opcode.forCode(op.toByte),
-                                 mask,
-                                 length,
-                                 fin = isFlagSet(FIN_MASK),
-                                 rsv1 = isFlagSet(RSV1_MASK),
-                                 rsv2 = isFlagSet(RSV2_MASK),
-                                 rsv3 = isFlagSet(RSV3_MASK))
+        val header = FrameHeader(
+          Opcode.forCode(op.toByte),
+          mask,
+          length,
+          fin = isFlagSet(FIN_MASK),
+          rsv1 = isFlagSet(RSV1_MASK),
+          rsv2 = isFlagSet(RSV2_MASK),
+          rsv3 = isFlagSet(RSV3_MASK))
 
         val takeNow = (header.length min reader.remainingSize).toInt
         val thisFrameData = reader.take(takeNow)
@@ -89,9 +90,10 @@ private[http] object FrameEventParser extends ByteStringParser[FrameEvent] {
           if (noMoreData) ReadFrameHeader
           else new ReadData(length - thisFrameData.length)
 
-        ParseResult(Some(FrameStart(header, thisFrameData.compact)),
-                    nextState,
-                    true)
+        ParseResult(
+          Some(FrameStart(header, thisFrameData.compact)),
+          nextState,
+          true)
       }
     }
 
@@ -101,9 +103,10 @@ private[http] object FrameEventParser extends ByteStringParser[FrameEvent] {
       override def parse(reader: ByteReader): ParseResult[FrameEvent] =
         if (reader.remainingSize < remaining) {
           remaining -= reader.remainingSize
-          ParseResult(Some(FrameData(reader.takeAll(), lastPart = false)),
-                      this,
-                      true)
+          ParseResult(
+            Some(FrameData(reader.takeAll(), lastPart = false)),
+            this,
+            true)
         } else {
           ParseResult(
             Some(FrameData(reader.take(remaining.toInt), lastPart = true)),

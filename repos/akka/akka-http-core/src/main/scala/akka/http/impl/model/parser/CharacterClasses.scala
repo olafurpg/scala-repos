@@ -59,11 +59,12 @@ private[http] object CharacterClasses {
   val `token68-start` = ALPHA ++ DIGIT ++ "-._~+/"
 
   // https://tools.ietf.org/html/rfc6265#section-4.1.1
-  val `cookie-octet-rfc-6265` = CharPredicate('\u0021',
-                                              '\u0023' to '\u002b',
-                                              '\u002d' to '\u003a',
-                                              '\u003c' to '\u005b',
-                                              '\u005d' to '\u007e')
+  val `cookie-octet-rfc-6265` = CharPredicate(
+    '\u0021',
+    '\u0023' to '\u002b',
+    '\u002d' to '\u003a',
+    '\u003c' to '\u005b',
+    '\u005d' to '\u007e')
   val `cookie-separator` = CharPredicate(akka.parboiled2.EOI, ';')
   val `cookie-octet-raw` =
     CharPredicate('\u0020' to '\u007e') ++ CharPredicate((x: Char) ⇒
@@ -75,16 +76,18 @@ private[http] object CharacterClasses {
   val `reg-rel-type-octet` = LOWER_ALPHA ++ DIGIT ++ '.' ++ '-'
 
   // helpers
-  val `qdtext-base` = CharPredicate(HTAB,
-                                    SP,
-                                    '\u0021',
-                                    '\u0023' to '\u005B',
-                                    '\u005D' to '\u007E')
-  val `ctext-base` = CharPredicate(HTAB,
-                                   SP,
-                                   '\u0021' to '\u0027',
-                                   '\u002A' to '\u005B',
-                                   '\u005D' to '\u007E')
+  val `qdtext-base` = CharPredicate(
+    HTAB,
+    SP,
+    '\u0021',
+    '\u0023' to '\u005B',
+    '\u005D' to '\u007E')
+  val `ctext-base` = CharPredicate(
+    HTAB,
+    SP,
+    '\u0021' to '\u0027',
+    '\u002A' to '\u005B',
+    '\u005D' to '\u007E')
   val `quotable-base` = CharPredicate(HTAB, SP, VCHAR)
   val `etagc-base` = VCHAR -- '"'
   val DIGIT04 = CharPredicate('0' to '4')

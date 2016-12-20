@@ -145,9 +145,10 @@ class ScalatraTest extends ScalatraFunSuite {
 
   test("GET /print_referrer should return Referer") {
     val referer = "Referer" // Misspelling intentional; it's the standard
-    get("/print_referrer",
-        Map.empty[String, String],
-        Map(referer -> "somewhere")) {
+    get(
+      "/print_referrer",
+      Map.empty[String, String],
+      Map(referer -> "somewhere")) {
       body should equal("somewhere")
     }
   }

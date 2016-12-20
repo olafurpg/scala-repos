@@ -29,8 +29,9 @@ trait ConstructorAnnotator {
 
     resolved match {
       case List() =>
-        holder.createErrorAnnotation(constructor.typeElement,
-                                     "Cannot resolve constructor")
+        holder.createErrorAnnotation(
+          constructor.typeElement,
+          "Cannot resolve constructor")
       case List(r: ScalaResolveResult) =>
         val missed = for (MissedValueParameter(p) <- r.problems)
           yield p.name + ": " + p.paramType.presentableText
@@ -42,8 +43,9 @@ trait ConstructorAnnotator {
 
         r.problems.foreach {
           case ExcessArgument(argument) =>
-            holder.createErrorAnnotation(argument,
-                                         "Too many arguments for constructor")
+            holder.createErrorAnnotation(
+              argument,
+              "Too many arguments for constructor")
           case TypeMismatch(expression, expectedType) =>
             if (expression != null)
               for (t <- expression.getType(TypingContext.empty)) {
@@ -51,9 +53,10 @@ trait ConstructorAnnotator {
                 val (expectedText, actualText) =
                   ScTypePresentation.different(expectedType, t)
                 val message =
-                  ScalaBundle.message("type.mismatch.expected.actual",
-                                      expectedText,
-                                      actualText)
+                  ScalaBundle.message(
+                    "type.mismatch.expected.actual",
+                    expectedText,
+                    actualText)
                 val annotation =
                   holder.createErrorAnnotation(expression, message)
                 annotation.registerFix(ReportHighlightingErrorQuickFix)
@@ -72,11 +75,13 @@ trait ConstructorAnnotator {
               expression,
               "Expansion for non-repeated parameter")
           case PositionalAfterNamedArgument(argument) =>
-            holder.createErrorAnnotation(argument,
-                                         "Positional after named argument")
+            holder.createErrorAnnotation(
+              argument,
+              "Positional after named argument")
           case ParameterSpecifiedMultipleTimes(assignment) =>
-            holder.createErrorAnnotation(assignment.getLExpression,
-                                         "Parameter specified multiple times")
+            holder.createErrorAnnotation(
+              assignment.getLExpression,
+              "Parameter specified multiple times")
           case WrongTypeParameterInferred => //todo: ?
           case ExpectedTypeMismatch => //will be reported later
           case DefaultTypeParameterMismatch(expected, actual) =>
@@ -95,8 +100,9 @@ trait ConstructorAnnotator {
               "Not applicable." /* TODO + signatureOf(f)*/ )
         }
       case results =>
-        holder.createErrorAnnotation(constructor.typeElement,
-                                     "Cannot resolve constructor")
+        holder.createErrorAnnotation(
+          constructor.typeElement,
+          "Cannot resolve constructor")
     }
   }
 

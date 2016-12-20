@@ -91,9 +91,10 @@ class AddBracesIntention extends PsiElementBaseIntentionAction {
         val replacement = ScalaPsiElementFactory.createExpressionFromText(
           "{\n%s}".format(expr.getText),
           expr.getManager)
-        CodeEditUtil.replaceChild(expr.getParent.getNode,
-                                  expr.getNode,
-                                  replacement.getNode)
+        CodeEditUtil.replaceChild(
+          expr.getParent.getNode,
+          expr.getNode,
+          replacement.getNode)
       }
     }
   }

@@ -20,11 +20,12 @@ object MBestRowIdentifierColumn {
                            scope: Scope,
                            nullable: Boolean = false) =
     ResultSetAction[MBestRowIdentifierColumn](
-      _.metaData.getBestRowIdentifier(table.catalog_?,
-                                      table.schema_?,
-                                      table.name,
-                                      scope.value,
-                                      nullable)) { r =>
+      _.metaData.getBestRowIdentifier(
+        table.catalog_?,
+        table.schema_?,
+        table.name,
+        scope.value,
+        nullable)) { r =>
       MBestRowIdentifierColumn(
         Scope(r.<<),
         r.<<,

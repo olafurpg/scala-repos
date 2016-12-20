@@ -69,17 +69,18 @@ class JavaCompiler(
     }
 
     compiler
-      .getTask(null,
-               fileManager,
-               listener,
-               List(
-                 "-cp",
-                 cp,
-                 "-Xlint:" + lint,
-                 "-proc:none"
-               ).asJava,
-               null,
-               files)
+      .getTask(
+        null,
+        fileManager,
+        listener,
+        List(
+          "-cp",
+          cp,
+          "-Xlint:" + lint,
+          "-proc:none"
+        ).asJava,
+        null,
+        files)
       .asInstanceOf[JavacTask]
   }
 
@@ -116,12 +117,13 @@ class JavaCompiler(
       case (info: CompilationInfo, path: TreePath) =>
         def withName(name: String): Option[SymbolInfo] = {
           val tpeMirror = Option(info.getTrees().getTypeMirror(path))
-          val nullTpe = new BasicTypeInfo("NA",
-                                          DeclaredAs.Nil,
-                                          "NA",
-                                          List.empty,
-                                          List.empty,
-                                          None)
+          val nullTpe = new BasicTypeInfo(
+            "NA",
+            DeclaredAs.Nil,
+            "NA",
+            List.empty,
+            List.empty,
+            None)
           Some(
             SymbolInfo(
               fqn(info, path).map(_.toFqnString).getOrElse(name),
@@ -181,12 +183,13 @@ class JavaCompiler(
   }
 
   private def typeMirrorToTypeInfo(tm: TypeMirror): TypeInfo = {
-    BasicTypeInfo(tm.toString,
-                  DeclaredAs.Class,
-                  tm.toString,
-                  List(),
-                  List(),
-                  Some(EmptySourcePosition()))
+    BasicTypeInfo(
+      tm.toString,
+      DeclaredAs.Class,
+      tm.toString,
+      List(),
+      List(),
+      Some(EmptySourcePosition()))
   }
 
   private def getTypeMirror(info: CompilationInfo,

@@ -78,8 +78,9 @@ private[saddle] object JoinHelper {
       i += 1
     }
 
-    JoinResult(applyUnsorter(lUnsorter, lLabels),
-               applyUnsorter(rUnsorter, rLabels))
+    JoinResult(
+      applyUnsorter(lUnsorter, lLabels),
+      applyUnsorter(rUnsorter, rLabels))
   }
 
   // Calculates mapping of factor label to count seen in labels array

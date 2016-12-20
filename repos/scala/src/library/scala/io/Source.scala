@@ -178,9 +178,10 @@ object Source {
     fromInputStream(is)(Codec(enc))
 
   def fromInputStream(is: InputStream)(implicit codec: Codec): BufferedSource =
-    createBufferedSource(is,
-                         reset = () => fromInputStream(is)(codec),
-                         close = () => is.close())(codec)
+    createBufferedSource(
+      is,
+      reset = () => fromInputStream(is)(codec),
+      close = () => is.close())(codec)
 
   /** Reads data from a classpath resource, using either a context classloader (default) or a passed one.
     *

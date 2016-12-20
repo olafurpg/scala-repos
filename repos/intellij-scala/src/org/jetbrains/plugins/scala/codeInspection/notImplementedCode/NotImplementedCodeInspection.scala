@@ -17,10 +17,11 @@ import org.jetbrains.plugins.scala.extensions._
 class NotImplementedCodeInspection extends AbstractInspection {
   def actionFor(holder: ProblemsHolder) = {
     case reference @ ReferenceTarget(Member("???", "scala.Predef")) =>
-      holder.registerProblem(reference,
-                             "Not implemented",
-                             ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
-                             new ImplementQuickFix(reference))
+      holder.registerProblem(
+        reference,
+        "Not implemented",
+        ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+        new ImplementQuickFix(reference))
   }
 
   private class ImplementQuickFix(e: PsiElement)

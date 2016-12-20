@@ -39,17 +39,19 @@ object TypeCheckerWithExplicitTypes_MonadTransformers {
       for {
         t <- typeCheck(tst)
         _ <- liftK(
-          compare(t,
-                  boolT,
-                  boolT,
-                  "if required bool in test position, but got: " + t))
+          compare(
+            t,
+            boolT,
+            boolT,
+            "if required bool in test position, but got: " + t))
         lt <- typeCheck(texp)
         rt <- typeCheck(fexp)
         res <- liftK(
-          compare(lt,
-                  rt,
-                  lt,
-                  "if branches not the same type, got: " + (lt, rt)))
+          compare(
+            lt,
+            rt,
+            lt,
+            "if branches not the same type, got: " + (lt, rt)))
       } yield res
     case Fun(arg, argType, body) =>
       for {
@@ -63,11 +65,12 @@ object TypeCheckerWithExplicitTypes_MonadTransformers {
         operandType <- typeCheck(operand)
         res <- liftK(operatorType match {
           case TyLam(argType, resultType) =>
-            compare(argType,
-                    operandType,
-                    resultType,
-                    "function expected arg of type: " + argType +
-                      ", but got: " + operandType)
+            compare(
+              argType,
+              operandType,
+              resultType,
+              "function expected arg of type: " + argType +
+                ", but got: " + operandType)
           case _ =>
             typeError(
               "function application expected function, but got: " +

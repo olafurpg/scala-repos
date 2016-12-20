@@ -135,10 +135,11 @@ private[yarn] class AMDelegationTokenRenewer(sparkConf: SparkConf,
       val thresholdTime =
         System.currentTimeMillis() - (daysToKeepFiles days).toMillis
       hadoopUtil
-        .listFilesSorted(remoteFs,
-                         credentialsPath.getParent,
-                         credentialsPath.getName,
-                         SparkHadoopUtil.SPARK_YARN_CREDS_TEMP_EXTENSION)
+        .listFilesSorted(
+          remoteFs,
+          credentialsPath.getParent,
+          credentialsPath.getName,
+          SparkHadoopUtil.SPARK_YARN_CREDS_TEMP_EXTENSION)
         .dropRight(numFilesToKeep)
         .takeWhile(_.getModificationTime < thresholdTime)
         .foreach(x => remoteFs.delete(x.getPath, true))
@@ -197,10 +198,11 @@ private[yarn] class AMDelegationTokenRenewer(sparkConf: SparkConf,
     // and update the lastCredentialsFileSuffix.
     if (lastCredentialsFileSuffix == 0) {
       hadoopUtil
-        .listFilesSorted(remoteFs,
-                         credentialsPath.getParent,
-                         credentialsPath.getName,
-                         SparkHadoopUtil.SPARK_YARN_CREDS_TEMP_EXTENSION)
+        .listFilesSorted(
+          remoteFs,
+          credentialsPath.getParent,
+          credentialsPath.getName,
+          SparkHadoopUtil.SPARK_YARN_CREDS_TEMP_EXTENSION)
         .lastOption
         .foreach { status =>
           lastCredentialsFileSuffix =

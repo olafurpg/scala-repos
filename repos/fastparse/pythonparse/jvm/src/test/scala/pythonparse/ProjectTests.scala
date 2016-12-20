@@ -40,9 +40,10 @@ object ProjectTests extends TestSuite {
       .result(Future.sequence(pythonFiles.map { p =>
         Future {
           print("-")
-          (Seq("python",
-               "pythonparse/jvm/src/test/resources/pythonparse/parse.py",
-               p).!,
+          (Seq(
+             "python",
+             "pythonparse/jvm/src/test/resources/pythonparse/parse.py",
+             p).!,
            p)
         }
       }), Duration.Inf)

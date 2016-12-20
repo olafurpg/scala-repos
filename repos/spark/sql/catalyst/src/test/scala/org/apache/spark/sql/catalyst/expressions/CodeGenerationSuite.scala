@@ -91,25 +91,28 @@ class CodeGenerationSuite extends SparkFunSuite with ExpressionEvalHelper {
       Array(
         StructField("a", StringType, true),
         StructField("b", IntegerType, true),
-        StructField("c",
-                    new StructType(
-                      Array(
-                        StructField("aa", StringType, true),
-                        StructField("bb", IntegerType, true)
-                      )),
-                    true),
-        StructField("d",
-                    new StructType(
-                      Array(
-                        StructField("a",
-                                    new StructType(
-                                      Array(
-                                        StructField("b", StringType, true),
-                                        StructField("", IntegerType, true)
-                                      )),
-                                    true)
-                      )),
-                    true)
+        StructField(
+          "c",
+          new StructType(
+            Array(
+              StructField("aa", StringType, true),
+              StructField("bb", IntegerType, true)
+            )),
+          true),
+        StructField(
+          "d",
+          new StructType(
+            Array(
+              StructField(
+                "a",
+                new StructType(
+                  Array(
+                    StructField("b", StringType, true),
+                    StructField("", IntegerType, true)
+                  )),
+                true)
+            )),
+          true)
       ))
     val row = Row("a", 1, Row("b", 2), Row(Row("c", 3)))
     val lit = Literal.create(row, schema)
@@ -142,18 +145,22 @@ class CodeGenerationSuite extends SparkFunSuite with ExpressionEvalHelper {
   test("*/ in the data") {
     // When */ appears in a comment block (i.e. in /**/), code gen will break.
     // So, in Expression and CodegenFallback, we escape */ to \*\/.
-    checkEvaluation(EqualTo(BoundReference(0, StringType, false),
-                            Literal.create("*/", StringType)),
-                    true,
-                    InternalRow(UTF8String.fromString("*/")))
+    checkEvaluation(
+      EqualTo(
+        BoundReference(0, StringType, false),
+        Literal.create("*/", StringType)),
+      true,
+      InternalRow(UTF8String.fromString("*/")))
   }
 
   test("\\u in the data") {
     // When \ u appears in a comment block (i.e. in /**/), code gen will break.
     // So, in Expression and CodegenFallback, we escape \ u to \\u.
-    checkEvaluation(EqualTo(BoundReference(0, StringType, false),
-                            Literal.create("\\u", StringType)),
-                    true,
-                    InternalRow(UTF8String.fromString("\\u")))
+    checkEvaluation(
+      EqualTo(
+        BoundReference(0, StringType, false),
+        Literal.create("\\u", StringType)),
+      true,
+      InternalRow(UTF8String.fromString("\\u")))
   }
 }

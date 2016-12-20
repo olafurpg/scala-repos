@@ -265,10 +265,11 @@ private[akka] class UnstartedCell(val systemImpl: ActorSystemImpl,
           cell.sendMessage(msg)
         } else if (!queue.offer(msg)) {
           system.eventStream.publish(
-            Warning(self.path.toString,
-                    getClass,
-                    "dropping message of type " + msg.message.getClass +
-                      " due to enqueue failure"))
+            Warning(
+              self.path.toString,
+              getClass,
+              "dropping message of type " + msg.message.getClass +
+                " due to enqueue failure"))
           system.deadLetters
             .tell(DeadLetter(msg.message, msg.sender, self), msg.sender)
         } else if (Mailbox.debug)
@@ -276,10 +277,11 @@ private[akka] class UnstartedCell(val systemImpl: ActorSystemImpl,
       } finally lock.unlock()
     } else {
       system.eventStream.publish(
-        Warning(self.path.toString,
-                getClass,
-                "dropping message of type" + msg.message.getClass +
-                  " due to lock timeout"))
+        Warning(
+          self.path.toString,
+          getClass,
+          "dropping message of type" + msg.message.getClass +
+            " due to lock timeout"))
       system.deadLetters
         .tell(DeadLetter(msg.message, msg.sender, self), msg.sender)
     }

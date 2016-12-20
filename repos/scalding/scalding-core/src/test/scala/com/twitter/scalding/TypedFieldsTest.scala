@@ -36,8 +36,9 @@ class TypedFieldsTest extends WordSpec with Matchers {
       JobTest(new TypedFieldsJob(_))
         .arg("input", "inputFile")
         .arg("output", "outputFile")
-        .source(TextLine("inputFile"),
-                List("0" -> "5,foo", "1" -> "6,bar", "2" -> "9,foo"))
+        .source(
+          TextLine("inputFile"),
+          List("0" -> "5,foo", "1" -> "6,bar", "2" -> "9,foo"))
         .sink[(Opaque, Int)](Tsv("outputFile")) { outputBuffer =>
           val outMap = outputBuffer
             .map {
@@ -57,8 +58,9 @@ class TypedFieldsTest extends WordSpec with Matchers {
     JobTest(new UntypedFieldsJob(_))
       .arg("input", "inputFile")
       .arg("output", "outputFile")
-      .source(TextLine("inputFile"),
-              List("0" -> "5,foo", "1" -> "6,bar", "2" -> "9,foo"))
+      .source(
+        TextLine("inputFile"),
+        List("0" -> "5,foo", "1" -> "6,bar", "2" -> "9,foo"))
       .sink[(Opaque, Int)](Tsv("outputFile")) { _ =>
         }
       .run

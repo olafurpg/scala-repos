@@ -80,10 +80,11 @@ class ConvolveTest extends FunSuite {
         11.0,
         14.0,
         5.0))
-    assert(correlate(data,
-                     kernelEven,
-                     2 to -1 by 2,
-                     overhang = OptOverhang.Full) == DenseVector(11.0, 5.0))
+    assert(correlate(
+      data,
+      kernelEven,
+      2 to -1 by 2,
+      overhang = OptOverhang.Full) == DenseVector(11.0, 5.0))
   }
   //MatLab: conv(2 : 5, 1 : 2)
   //Mathematica: ListConvolve[{1, 2}, {2, 3, 4, 5}]
@@ -95,7 +96,8 @@ class ConvolveTest extends FunSuite {
     assert(convolve(data, kernelEven) == DenseVector(7L, 10L, 13L))
     assert(correlate(data, kernelEven) == DenseVector(8L, 11L, 14L))
     assert(
-      correlate(data, kernelEven, range = (0 to 2 by 2)) == DenseVector(8L,
-                                                                        14L))
+      correlate(data, kernelEven, range = (0 to 2 by 2)) == DenseVector(
+        8L,
+        14L))
   }
 }

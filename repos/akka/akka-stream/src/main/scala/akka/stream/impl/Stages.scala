@@ -129,8 +129,9 @@ private[stream] object Stages {
    */
   case class SymbolicGraphStage[-In, +Out, Ext](
       symbolicStage: SymbolicStage[In, Out])
-      extends PushPullGraphStage[In, Out, Ext](symbolicStage.create,
-                                               symbolicStage.attributes) {}
+      extends PushPullGraphStage[In, Out, Ext](
+        symbolicStage.create,
+        symbolicStage.attributes) {}
 
   sealed trait SymbolicStage[-In, +Out] {
     def attributes: Attributes

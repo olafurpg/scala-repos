@@ -57,10 +57,12 @@ class ListTablesSuite
     Seq(tables(), sql("SHOW TABLes")).foreach {
       case allTables =>
         // We are using default DB.
-        checkAnswer(allTables.filter("tableName = 'listtablessuitetable'"),
-                    Row("listtablessuitetable", true))
-        checkAnswer(allTables.filter("tableName = 'hivelisttablessuitetable'"),
-                    Row("hivelisttablessuitetable", false))
+        checkAnswer(
+          allTables.filter("tableName = 'listtablessuitetable'"),
+          Row("listtablessuitetable", true))
+        checkAnswer(
+          allTables.filter("tableName = 'hivelisttablessuitetable'"),
+          Row("hivelisttablessuitetable", false))
         assert(
           allTables
             .filter("tableName = 'hiveindblisttablessuitetable'")
@@ -72,8 +74,9 @@ class ListTablesSuite
     Seq(tables("listtablessuiteDb"), sql("SHOW TABLes in listTablesSuitedb"))
       .foreach {
         case allTables =>
-          checkAnswer(allTables.filter("tableName = 'listtablessuitetable'"),
-                      Row("listtablessuitetable", true))
+          checkAnswer(
+            allTables.filter("tableName = 'listtablessuitetable'"),
+            Row("listtablessuitetable", true))
           assert(
             allTables
               .filter("tableName = 'hivelisttablessuitetable'")

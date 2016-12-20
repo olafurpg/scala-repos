@@ -24,8 +24,9 @@ class JavaApiTestCaseSpecs extends FreeSpec with MustMatchers {
       "wrong method" in {
         JavaApiTestCases.handleRequest(
           model.HttpRequest(model.HttpMethods.HEAD)) must be(
-          model.HttpResponse(model.StatusCodes.MethodNotAllowed,
-                             entity = "Unsupported method"))
+          model.HttpResponse(
+            model.StatusCodes.MethodNotAllowed,
+            entity = "Unsupported method"))
       }
       "missing path" in {
         JavaApiTestCases.handleRequest(model.HttpRequest(uri = "/blubber")) must be(

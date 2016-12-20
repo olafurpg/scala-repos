@@ -179,9 +179,10 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
       if (sym.isDeprecated)
         Some((sym.deprecationMessage, sym.deprecationVersion) match {
           case (Some(msg), Some(ver)) =>
-            parseWiki("''(Since version " + ver + ")'' " + msg,
-                      NoPosition,
-                      inTpl)
+            parseWiki(
+              "''(Since version " + ver + ")'' " + msg,
+              NoPosition,
+              inTpl)
           case (Some(msg), None) => parseWiki(msg, NoPosition, inTpl)
           case (None, Some(ver)) =>
             parseWiki("''(Since version " + ver + ")''", NoPosition, inTpl)
@@ -192,14 +193,16 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
       if (sym.hasMigrationAnnotation)
         Some((sym.migrationMessage, sym.migrationVersion) match {
           case (Some(msg), Some(ver)) =>
-            parseWiki("''(Changed in version " + ver + ")'' " + msg,
-                      NoPosition,
-                      inTpl)
+            parseWiki(
+              "''(Changed in version " + ver + ")'' " + msg,
+              NoPosition,
+              inTpl)
           case (Some(msg), None) => parseWiki(msg, NoPosition, inTpl)
           case (None, Some(ver)) =>
-            parseWiki("''(Changed in version " + ver + ")''",
-                      NoPosition,
-                      inTpl)
+            parseWiki(
+              "''(Changed in version " + ver + ")''",
+              NoPosition,
+              inTpl)
           case (None, None) => Body(Nil)
         })
       else None
@@ -283,8 +286,9 @@ class ModelFactory(val global: Global, val settings: doc.Settings) {
       with HigherKindedImpl
       with NoDocTemplate {
     assert(modelFinished, this)
-    assert(!(noDocTemplatesCache isDefinedAt sym),
-           (sym, noDocTemplatesCache(sym)))
+    assert(
+      !(noDocTemplatesCache isDefinedAt sym),
+      (sym, noDocTemplatesCache(sym)))
     noDocTemplatesCache += (sym -> this)
     def isDocTemplate = false
   }

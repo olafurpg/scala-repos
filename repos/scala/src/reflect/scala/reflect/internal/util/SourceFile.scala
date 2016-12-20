@@ -97,9 +97,10 @@ object ScriptSourceFile {
 
   def apply(underlying: BatchSourceFile) = {
     val headerLen = headerLength(underlying.content)
-    new ScriptSourceFile(underlying,
-                         underlying.content drop headerLen,
-                         headerLen)
+    new ScriptSourceFile(
+      underlying,
+      underlying.content drop headerLen,
+      headerLen)
   }
 }
 

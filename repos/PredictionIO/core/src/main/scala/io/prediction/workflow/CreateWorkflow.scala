@@ -156,9 +156,10 @@ object CreateWorkflow extends Logging {
         WorkflowUtils.getEngineParamsGenerator(epg, getClass.getClassLoader)._2
       } catch {
         case e @ (_: ClassNotFoundException | _: NoSuchMethodException) =>
-          error(s"Unable to obtain engine parameters generator $epg. " +
-                  "Aborting workflow.",
-                e)
+          error(
+            s"Unable to obtain engine parameters generator $epg. " +
+              "Aborting workflow.",
+            e)
           sys.exit(1)
       }
     }
@@ -241,28 +242,25 @@ object CreateWorkflow extends Logging {
         batch = wfc.batch,
         env = pioEnvVars,
         sparkConf = workflowParams.sparkEnv,
-        dataSourceParams =
-          JsonExtractor.paramToJson(wfc.jsonExtractor,
-                                    engineParams.dataSourceParams),
-        preparatorParams =
-          JsonExtractor.paramToJson(wfc.jsonExtractor,
-                                    engineParams.preparatorParams),
-        algorithmsParams =
-          JsonExtractor.paramsToJson(wfc.jsonExtractor,
-                                     engineParams.algorithmParamsList),
-        servingParams = JsonExtractor.paramToJson(wfc.jsonExtractor,
-                                                  engineParams.servingParams)
+        dataSourceParams = JsonExtractor
+          .paramToJson(wfc.jsonExtractor, engineParams.dataSourceParams),
+        preparatorParams = JsonExtractor
+          .paramToJson(wfc.jsonExtractor, engineParams.preparatorParams),
+        algorithmsParams = JsonExtractor
+          .paramsToJson(wfc.jsonExtractor, engineParams.algorithmParamsList),
+        servingParams = JsonExtractor
+          .paramToJson(wfc.jsonExtractor, engineParams.servingParams)
       )
 
       val engineInstanceId =
         Storage.getMetaDataEngineInstances.insert(engineInstance)
 
-      CoreWorkflow.runTrain(env = pioEnvVars,
-                            params = workflowParams,
-                            engine = trainableEngine,
-                            engineParams = engineParams,
-                            engineInstance =
-                              engineInstance.copy(id = engineInstanceId))
+      CoreWorkflow.runTrain(
+        env = pioEnvVars,
+        params = workflowParams,
+        engine = trainableEngine,
+        engineParams = engineParams,
+        engineInstance = engineInstance.copy(id = engineInstanceId))
     } else {
       val workflowParams = WorkflowParams(
         verbose = wfc.verbosity,
@@ -277,10 +275,11 @@ object CreateWorkflow extends Logging {
         env = pioEnvVars,
         sparkConf = workflowParams.sparkEnv
       )
-      Workflow.runEvaluation(evaluation = evaluation.get,
-                             engineParamsGenerator = engineParamsGenerator.get,
-                             evaluationInstance = evaluationInstance,
-                             params = workflowParams)
+      Workflow.runEvaluation(
+        evaluation = evaluation.get,
+        engineParamsGenerator = engineParamsGenerator.get,
+        evaluationInstance = evaluationInstance,
+        params = workflowParams)
     }
   }
 }

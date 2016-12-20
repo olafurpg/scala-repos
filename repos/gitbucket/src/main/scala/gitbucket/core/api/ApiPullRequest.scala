@@ -40,12 +40,14 @@ object ApiPullRequest {
     number = issue.issueId,
     updated_at = issue.updatedDate,
     created_at = issue.registeredDate,
-    head = Commit(sha = pullRequest.commitIdTo,
-                  ref = pullRequest.requestBranch,
-                  repo = headRepo)(issue.userName),
-    base = Commit(sha = pullRequest.commitIdFrom,
-                  ref = pullRequest.branch,
-                  repo = baseRepo)(issue.userName),
+    head = Commit(
+      sha = pullRequest.commitIdTo,
+      ref = pullRequest.requestBranch,
+      repo = headRepo)(issue.userName),
+    base = Commit(
+      sha = pullRequest.commitIdFrom,
+      ref = pullRequest.branch,
+      repo = baseRepo)(issue.userName),
     mergeable = None, // TODO: need check mergeable.
     title = issue.title,
     body = issue.content.getOrElse(""),

@@ -45,10 +45,11 @@ object ActivatorDownloadUtil {
             try {
               val contentLength: Int = request.getConnection.getContentLength
               substituteContentLength(progress, originalText, contentLength)
-              NetUtils.copyStreamContent(progress,
-                                         request.getInputStream,
-                                         output,
-                                         contentLength)
+              NetUtils.copyStreamContent(
+                progress,
+                request.getInputStream,
+                output,
+                contentLength)
             } catch {
               case e: IOException =>
                 throw new IOException(

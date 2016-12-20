@@ -300,9 +300,10 @@ class ActorProducerTest
 
           "no Ack is sent within timeout" must {
             "set failure on exchange" in {
-              producer = given(outCapable = false,
-                               replyTimeout = 10 millis,
-                               autoAck = false)
+              producer = given(
+                outCapable = false,
+                replyTimeout = 10 millis,
+                autoAck = false)
 
               producer.processExchangeAdapter(exchange, asyncCallback)
               asyncCallback.awaitCalled(100 millis)

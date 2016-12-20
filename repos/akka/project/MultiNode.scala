@@ -78,9 +78,10 @@ object MultiNode extends AutoPlugin {
             if (testResults.overall.id < multiNodeResults.overall.id)
               multiNodeResults.overall
             else testResults.overall
-          Tests.Output(overall,
-                       testResults.events ++ multiNodeResults.events,
-                       testResults.summaries ++ multiNodeResults.summaries)
+          Tests.Output(
+            overall,
+            testResults.events ++ multiNodeResults.events,
+            testResults.summaries ++ multiNodeResults.summaries)
       })
 }
 
@@ -102,16 +103,18 @@ object MultiNodeScalaTest extends AutoPlugin {
       Seq("-C", "org.scalatest.extra.QuietReporter") ++
         (if (excludeTestTags.value.isEmpty) Seq.empty
          else
-           Seq("-l",
-               if (MultiNode.CliOptions.multiNode.get)
-                 excludeTestTags.value.mkString("\"", " ", "\"")
-               else excludeTestTags.value.mkString(" "))) ++
+           Seq(
+             "-l",
+             if (MultiNode.CliOptions.multiNode.get)
+               excludeTestTags.value.mkString("\"", " ", "\"")
+             else excludeTestTags.value.mkString(" "))) ++
         (if (onlyTestTags.value.isEmpty) Seq.empty
          else
-           Seq("-n",
-               if (MultiNode.CliOptions.multiNode.get)
-                 onlyTestTags.value.mkString("\"", " ", "\"")
-               else onlyTestTags.value.mkString(" ")))
+           Seq(
+             "-n",
+             if (MultiNode.CliOptions.multiNode.get)
+               onlyTestTags.value.mkString("\"", " ", "\"")
+             else onlyTestTags.value.mkString(" ")))
     }
   )
 }

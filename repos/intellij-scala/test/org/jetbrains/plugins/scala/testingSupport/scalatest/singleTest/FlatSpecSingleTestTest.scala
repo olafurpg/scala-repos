@@ -7,10 +7,11 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.generators.FlatSpecG
   * @since 20.01.2015.
   */
 trait FlatSpecSingleTestTest extends FlatSpecGenerator {
-  val flatSpecTestPath = List("[root]",
-                              "FlatSpecTest",
-                              "A FlatSpecTest",
-                              "should be able to run single test")
+  val flatSpecTestPath = List(
+    "[root]",
+    "FlatSpecTest",
+    "A FlatSpecTest",
+    "should be able to run single test")
 
   def testFlatSpec() {
     addFlatSpec()

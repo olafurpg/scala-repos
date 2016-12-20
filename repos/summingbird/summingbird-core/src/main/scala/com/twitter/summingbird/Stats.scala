@@ -108,9 +108,10 @@ object JobCounters {
     Option(registeredCountersForJob.get(jobID)).map(_.toList)
 
   def registerCounter(jobID: JobId, group: Group, name: Name): Unit = {
-    val set = getOrElseUpdate(registeredCountersForJob,
-                              jobID,
-                              ParHashSet[(Group, Name)]())
+    val set = getOrElseUpdate(
+      registeredCountersForJob,
+      jobID,
+      ParHashSet[(Group, Name)]())
     set += ((group, name))
   }
 }

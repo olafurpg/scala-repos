@@ -33,9 +33,10 @@ trait DenseMatrixMultiplyStuff
     : OpMulMatrix.Impl2[Transpose[DenseVector[T]],
                         DenseMatrix[T],
                         Transpose[DenseVector[T]]] =
-    new OpMulMatrix.Impl2[Transpose[DenseVector[T]],
-                          DenseMatrix[T],
-                          Transpose[DenseVector[T]]] {
+    new OpMulMatrix.Impl2[
+      Transpose[DenseVector[T]],
+      DenseMatrix[T],
+      Transpose[DenseVector[T]]] {
       override def apply(v: Transpose[DenseVector[T]],
                          v2: DenseMatrix[T]): Transpose[DenseVector[T]] = {
         (v.inner.asDenseMatrix * v2) apply (0, ::)
@@ -60,9 +61,10 @@ trait DenseMatrixMultiplyStuff
     if (a.isTranspose) "T" else "N"
 
   implicit object implOpMulMatrix_DMD_DMD_eq_DMD
-      extends OpMulMatrix.Impl2[DenseMatrix[Double],
-                                DenseMatrix[Double],
-                                DenseMatrix[Double]] {
+      extends OpMulMatrix.Impl2[
+        DenseMatrix[Double],
+        DenseMatrix[Double],
+        DenseMatrix[Double]] {
 
     def apply(_a: DenseMatrix[Double],
               _b: DenseMatrix[Double]): DenseMatrix[Double] = {
@@ -76,30 +78,33 @@ trait DenseMatrixMultiplyStuff
 
       // if we have a weird stride...
       val a: DenseMatrix[Double] =
-        if (_a.majorStride < math.max(if (_a.isTranspose) _a.cols else _a.rows,
-                                      1)) _a.copy
+        if (_a.majorStride < math.max(
+              if (_a.isTranspose) _a.cols else _a.rows,
+              1)) _a.copy
         else _a
       val b: DenseMatrix[Double] =
-        if (_b.majorStride < math.max(if (_b.isTranspose) _b.cols else _b.rows,
-                                      1)) _b.copy
+        if (_b.majorStride < math.max(
+              if (_b.isTranspose) _b.cols else _b.rows,
+              1)) _b.copy
         else _b
 
-      blas.dgemm(transposeString(a),
-                 transposeString(b),
-                 rv.rows,
-                 rv.cols,
-                 a.cols,
-                 1.0,
-                 a.data,
-                 a.offset,
-                 a.majorStride,
-                 b.data,
-                 b.offset,
-                 b.majorStride,
-                 0.0,
-                 rv.data,
-                 0,
-                 rv.rows)
+      blas.dgemm(
+        transposeString(a),
+        transposeString(b),
+        rv.rows,
+        rv.cols,
+        a.cols,
+        1.0,
+        a.data,
+        a.offset,
+        a.majorStride,
+        b.data,
+        b.offset,
+        b.majorStride,
+        0.0,
+        rv.data,
+        0,
+        rv.rows)
       rv
     }
     implicitly[BinaryRegistry[Matrix[Double],
@@ -113,9 +118,10 @@ trait DenseMatrixMultiplyStuff
   }
 
   implicit object implOpMulMatrix_DMD_DVD_eq_DVD
-      extends OpMulMatrix.Impl2[DenseMatrix[Double],
-                                DenseVector[Double],
-                                DenseVector[Double]] {
+      extends OpMulMatrix.Impl2[
+        DenseMatrix[Double],
+        DenseVector[Double],
+        DenseVector[Double]] {
     def apply(a: DenseMatrix[Double],
               b: DenseVector[Double]): DenseVector[Double] = {
 
@@ -127,20 +133,21 @@ trait DenseMatrixMultiplyStuff
 
       val rv = DenseVector.zeros[Double](a.rows)
 
-      blas.dgemv(transposeString(a),
-                 if (a.isTranspose) a.cols else a.rows,
-                 if (a.isTranspose) a.rows else a.cols,
-                 1.0,
-                 a.data,
-                 a.offset,
-                 a.majorStride,
-                 b.data,
-                 b.offset,
-                 b.stride,
-                 0.0,
-                 rv.data,
-                 rv.offset,
-                 rv.stride)
+      blas.dgemv(
+        transposeString(a),
+        if (a.isTranspose) a.cols else a.rows,
+        if (a.isTranspose) a.rows else a.cols,
+        1.0,
+        a.data,
+        a.offset,
+        a.majorStride,
+        b.data,
+        b.offset,
+        b.stride,
+        0.0,
+        rv.data,
+        rv.offset,
+        rv.stride)
       rv
     }
   }
@@ -149,9 +156,10 @@ trait DenseMatrixMultiplyStuff
     DenseVector[Double],
     DenseMatrix[Double],
     DenseMatrix[Double]] = {
-    new OpMulMatrix.Impl2[DenseVector[Double],
-                          DenseMatrix[Double],
-                          DenseMatrix[Double]] {
+    new OpMulMatrix.Impl2[
+      DenseVector[Double],
+      DenseMatrix[Double],
+      DenseMatrix[Double]] {
       def apply(a: DenseVector[Double],
                 b: DenseMatrix[Double]): DenseMatrix[Double] = {
         require(b.rows == 1)
@@ -163,22 +171,23 @@ trait DenseMatrixMultiplyStuff
         //          a.data
         //        }
         val rv = DenseMatrix.zeros[Double](a.length, b.cols)
-        blas.dgemm("T",
-                   transposeString(b),
-                   rv.rows,
-                   rv.cols,
-                   1,
-                   1.0,
-                   a.data,
-                   a.offset,
-                   a.stride,
-                   b.data,
-                   b.offset,
-                   b.majorStride,
-                   0.0,
-                   rv.data,
-                   0,
-                   rv.rows)
+        blas.dgemm(
+          "T",
+          transposeString(b),
+          rv.rows,
+          rv.cols,
+          1,
+          1.0,
+          a.data,
+          a.offset,
+          a.stride,
+          b.data,
+          b.offset,
+          b.majorStride,
+          0.0,
+          rv.data,
+          0,
+          rv.rows)
         rv
       }
     }
@@ -189,9 +198,10 @@ trait DenseMatrixMultiplyStuff
   // <editor-fold defaultstate="collapsed" desc=" // <editor-fold defaultstate="collapsed" desc=" OpSolveMatrixBy implementations ">
 
   implicit object implOpSolveMatrixBy_DMD_DMD_eq_DMD
-      extends OpSolveMatrixBy.Impl2[DenseMatrix[Double],
-                                    DenseMatrix[Double],
-                                    DenseMatrix[Double]] {
+      extends OpSolveMatrixBy.Impl2[
+        DenseMatrix[Double],
+        DenseMatrix[Double],
+        DenseMatrix[Double]] {
 
     override def apply(A: DenseMatrix[Double],
                        V: DenseMatrix[Double]): DenseMatrix[Double] = {
@@ -223,17 +233,18 @@ trait DenseMatrixMultiplyStuff
 
       val info: Int = {
         val info = new intW(0)
-        lapack.dgesv(A.rows,
-                     X.cols,
-                     newA.data,
-                     newA.offset,
-                     newA.majorStride,
-                     piv,
-                     0,
-                     X.data,
-                     X.offset,
-                     X.majorStride,
-                     info)
+        lapack.dgesv(
+          A.rows,
+          X.cols,
+          newA.data,
+          newA.offset,
+          newA.majorStride,
+          piv,
+          0,
+          X.data,
+          X.offset,
+          X.majorStride,
+          info)
         info.`val`
       }
 
@@ -267,25 +278,27 @@ trait DenseMatrixMultiplyStuff
       // query optimal workspace
       val queryWork = new Array[Double](1)
       val queryInfo = new intW(0)
-      lapack.dgels(if (!transpose) "N" else "T",
-                   A.rows,
-                   A.cols,
-                   nrhs,
-                   newData,
-                   A.majorStride,
-                   Xtmp.data,
-                   math.max(1, math.max(A.rows, A.cols)),
-                   queryWork,
-                   -1,
-                   queryInfo)
+      lapack.dgels(
+        if (!transpose) "N" else "T",
+        A.rows,
+        A.cols,
+        nrhs,
+        newData,
+        A.majorStride,
+        Xtmp.data,
+        math.max(1, math.max(A.rows, A.cols)),
+        queryWork,
+        -1,
+        queryInfo)
 
       // allocate workspace
       val work: Array[Double] = {
         val lwork = {
           if (queryInfo.`val` != 0)
-            math.max(1,
-                     math.min(A.rows, A.cols) +
-                       math.max(math.min(A.rows, A.cols), nrhs))
+            math.max(
+              1,
+              math.min(A.rows, A.cols) +
+                math.max(math.min(A.rows, A.cols), nrhs))
           else math.max(queryWork(0).toInt, 1)
         }
         new Array[Double](lwork)
@@ -293,17 +306,18 @@ trait DenseMatrixMultiplyStuff
 
       // compute factorization
       val info = new intW(0)
-      lapack.dgels(if (!transpose) "N" else "T",
-                   A.rows,
-                   A.cols,
-                   nrhs,
-                   newData,
-                   A.majorStride,
-                   Xtmp.data,
-                   math.max(1, math.max(A.rows, A.cols)),
-                   work,
-                   work.length,
-                   info)
+      lapack.dgels(
+        if (!transpose) "N" else "T",
+        A.rows,
+        A.cols,
+        nrhs,
+        newData,
+        A.majorStride,
+        Xtmp.data,
+        math.max(1, math.max(A.rows, A.cols)),
+        work,
+        work.length,
+        info)
 
       if (info.`val` < 0) throw new IllegalArgumentException
 
@@ -316,18 +330,20 @@ trait DenseMatrixMultiplyStuff
   }
 
   implicit object implOpSolveMatrixBy_DMD_DVD_eq_DVD
-      extends OpSolveMatrixBy.Impl2[DenseMatrix[Double],
-                                    DenseVector[Double],
-                                    DenseVector[Double]] {
+      extends OpSolveMatrixBy.Impl2[
+        DenseMatrix[Double],
+        DenseVector[Double],
+        DenseVector[Double]] {
     override def apply(a: DenseMatrix[Double],
                        b: DenseVector[Double]): DenseVector[Double] = {
       val rv: DenseMatrix[Double] =
-        a \ new DenseMatrix[Double](b.size,
-                                    1,
-                                    b.data,
-                                    b.offset,
-                                    b.stride,
-                                    true)
+        a \ new DenseMatrix[Double](
+          b.size,
+          1,
+          b.data,
+          b.offset,
+          b.stride,
+          true)
       new DenseVector[Double](rv.data)
     }
   }
@@ -343,9 +359,10 @@ trait DenseMatrixFloatMultiplyStuff
   // <editor-fold defaultstate="collapsed" desc=" OpMulMatrix implementations ">
 
   implicit object implOpMulMatrix_DMF_DMF_eq_DMF
-      extends OpMulMatrix.Impl2[DenseMatrix[Float],
-                                DenseMatrix[Float],
-                                DenseMatrix[Float]] {
+      extends OpMulMatrix.Impl2[
+        DenseMatrix[Float],
+        DenseMatrix[Float],
+        DenseMatrix[Float]] {
 
     def apply(_a: DenseMatrix[Float],
               _b: DenseMatrix[Float]): DenseMatrix[Float] = {
@@ -357,30 +374,33 @@ trait DenseMatrixFloatMultiplyStuff
 
       // if we have a weird stride...
       val a: DenseMatrix[Float] =
-        if (_a.majorStride < math.max(if (_a.isTranspose) _a.cols else _a.rows,
-                                      1)) _a.copy
+        if (_a.majorStride < math.max(
+              if (_a.isTranspose) _a.cols else _a.rows,
+              1)) _a.copy
         else _a
       val b: DenseMatrix[Float] =
-        if (_b.majorStride < math.max(if (_b.isTranspose) _b.cols else _b.rows,
-                                      1)) _b.copy
+        if (_b.majorStride < math.max(
+              if (_b.isTranspose) _b.cols else _b.rows,
+              1)) _b.copy
         else _b
 
-      blas.sgemm(transposeString(a),
-                 transposeString(b),
-                 rv.rows,
-                 rv.cols,
-                 a.cols,
-                 1.0f,
-                 a.data,
-                 a.offset,
-                 a.majorStride,
-                 b.data,
-                 b.offset,
-                 b.majorStride,
-                 0.0f,
-                 rv.data,
-                 0,
-                 rv.rows)
+      blas.sgemm(
+        transposeString(a),
+        transposeString(b),
+        rv.rows,
+        rv.cols,
+        a.cols,
+        1.0f,
+        a.data,
+        a.offset,
+        a.majorStride,
+        b.data,
+        b.offset,
+        b.majorStride,
+        0.0f,
+        rv.data,
+        0,
+        rv.rows)
       rv
     }
     implicitly[BinaryRegistry[Matrix[Float],
@@ -398,28 +418,30 @@ trait DenseMatrixFloatMultiplyStuff
   }
 
   implicit object implOpMulMatrix_DMF_DVF_eq_DVF
-      extends OpMulMatrix.Impl2[DenseMatrix[Float],
-                                DenseVector[Float],
-                                DenseVector[Float]] {
+      extends OpMulMatrix.Impl2[
+        DenseMatrix[Float],
+        DenseVector[Float],
+        DenseVector[Float]] {
     def apply(a: DenseMatrix[Float],
               b: DenseVector[Float]): DenseVector[Float] = {
 
       require(a.cols == b.length, "Dimension mismatch!")
       val rv = DenseVector.zeros[Float](a.rows)
-      blas.sgemv(transposeString(a),
-                 if (a.isTranspose) a.cols else a.rows,
-                 if (a.isTranspose) a.rows else a.cols,
-                 1.0f,
-                 a.data,
-                 a.offset,
-                 a.majorStride,
-                 b.data,
-                 b.offset,
-                 b.stride,
-                 0.0f,
-                 rv.data,
-                 rv.offset,
-                 rv.stride)
+      blas.sgemv(
+        transposeString(a),
+        if (a.isTranspose) a.cols else a.rows,
+        if (a.isTranspose) a.rows else a.cols,
+        1.0f,
+        a.data,
+        a.offset,
+        a.majorStride,
+        b.data,
+        b.offset,
+        b.stride,
+        0.0f,
+        rv.data,
+        rv.offset,
+        rv.stride)
       rv
     }
   }
@@ -428,9 +450,10 @@ trait DenseMatrixFloatMultiplyStuff
     DenseVector[Float],
     DenseMatrix[Float],
     DenseMatrix[Float]] = {
-    new OpMulMatrix.Impl2[DenseVector[Float],
-                          DenseMatrix[Float],
-                          DenseMatrix[Float]] {
+    new OpMulMatrix.Impl2[
+      DenseVector[Float],
+      DenseMatrix[Float],
+      DenseMatrix[Float]] {
       def apply(a: DenseVector[Float],
                 b: DenseMatrix[Float]): DenseMatrix[Float] = {
         require(b.rows == 1)
@@ -442,22 +465,23 @@ trait DenseMatrixFloatMultiplyStuff
         //          a.data
         //        }
         val rv: DenseMatrix[Float] = DenseMatrix.zeros[Float](a.length, b.cols)
-        blas.sgemm("T",
-                   transposeString(b),
-                   rv.rows,
-                   rv.cols,
-                   1,
-                   1.0f,
-                   a.data,
-                   a.offset,
-                   a.stride,
-                   b.data,
-                   b.offset,
-                   b.majorStride,
-                   0.0f,
-                   rv.data,
-                   0,
-                   rv.rows)
+        blas.sgemm(
+          "T",
+          transposeString(b),
+          rv.rows,
+          rv.cols,
+          1,
+          1.0f,
+          a.data,
+          a.offset,
+          a.stride,
+          b.data,
+          b.offset,
+          b.majorStride,
+          0.0f,
+          rv.data,
+          0,
+          rv.rows)
         rv
       }
     }
@@ -468,9 +492,10 @@ trait DenseMatrixFloatMultiplyStuff
   // <editor-fold defaultstate="collapsed" desc=" // <editor-fold defaultstate="collapsed" desc=" OpSolveMatrixBy implementations ">
 
   implicit object implOpSolveMatrixBy_DMF_DMF_eq_DMF
-      extends OpSolveMatrixBy.Impl2[DenseMatrix[Float],
-                                    DenseMatrix[Float],
-                                    DenseMatrix[Float]] {
+      extends OpSolveMatrixBy.Impl2[
+        DenseMatrix[Float],
+        DenseMatrix[Float],
+        DenseMatrix[Float]] {
 
     override def apply(A: DenseMatrix[Float], V: DenseMatrix[Float]) = {
       require(A.rows == V.rows, "Non-conformant matrix sizes")
@@ -503,14 +528,15 @@ trait DenseMatrixFloatMultiplyStuff
 
       val info: Int = {
         val info = new intW(0)
-        lapack.sgesv(A.rows,
-                     X.cols,
-                     newA.data,
-                     newA.majorStride,
-                     piv,
-                     X.data,
-                     X.majorStride,
-                     info)
+        lapack.sgesv(
+          A.rows,
+          X.cols,
+          newA.data,
+          newA.majorStride,
+          piv,
+          X.data,
+          X.majorStride,
+          info)
         info.`val`
       }
 
@@ -545,25 +571,27 @@ trait DenseMatrixFloatMultiplyStuff
       // query optimal workspace
       val queryWork = new Array[Float](1)
       val queryInfo = new intW(0)
-      lapack.sgels(if (!transpose) "N" else "T",
-                   A.rows,
-                   A.cols,
-                   nrhs,
-                   newData,
-                   A.majorStride,
-                   Xtmp.data,
-                   math.max(1, math.max(A.rows, A.cols)),
-                   queryWork,
-                   -1,
-                   queryInfo)
+      lapack.sgels(
+        if (!transpose) "N" else "T",
+        A.rows,
+        A.cols,
+        nrhs,
+        newData,
+        A.majorStride,
+        Xtmp.data,
+        math.max(1, math.max(A.rows, A.cols)),
+        queryWork,
+        -1,
+        queryInfo)
 
       // allocate workspace
       val work: Array[Float] = {
         val lwork: Int = {
           if (queryInfo.`val` != 0)
-            math.max(1,
-                     math.min(A.rows, A.cols) +
-                       math.max(math.min(A.rows, A.cols), nrhs))
+            math.max(
+              1,
+              math.min(A.rows, A.cols) +
+                math.max(math.min(A.rows, A.cols), nrhs))
           else math.max(queryWork(0).toInt, 1)
         }
         new Array[Float](lwork)
@@ -571,17 +599,18 @@ trait DenseMatrixFloatMultiplyStuff
 
       // compute factorization
       val info = new intW(0)
-      lapack.sgels(if (!transpose) "N" else "T",
-                   A.rows,
-                   A.cols,
-                   nrhs,
-                   newData,
-                   A.majorStride,
-                   Xtmp.data,
-                   math.max(1, math.max(A.rows, A.cols)),
-                   work,
-                   work.length,
-                   info)
+      lapack.sgels(
+        if (!transpose) "N" else "T",
+        A.rows,
+        A.cols,
+        nrhs,
+        newData,
+        A.majorStride,
+        Xtmp.data,
+        math.max(1, math.max(A.rows, A.cols)),
+        work,
+        work.length,
+        info)
 
       if (info.`val` < 0) throw new IllegalArgumentException
 
@@ -594,9 +623,10 @@ trait DenseMatrixFloatMultiplyStuff
   }
 
   implicit object implOpSolveMatrixBy_DMF_DVF_eq_DVF
-      extends OpSolveMatrixBy.Impl2[DenseMatrix[Float],
-                                    DenseVector[Float],
-                                    DenseVector[Float]] {
+      extends OpSolveMatrixBy.Impl2[
+        DenseMatrix[Float],
+        DenseVector[Float],
+        DenseVector[Float]] {
 
     override def apply(a: DenseMatrix[Float],
                        b: DenseVector[Float]): DenseVector[Float] = {
@@ -618,13 +648,14 @@ trait DenseMatrixOps { this: DenseMatrix.type =>
   @expand
   @expand.valify
   implicit def dm_dm_UpdateOp[@expand.args(Int, Double, Float, Long) T,
-                              @expand.args(OpAdd,
-                                           OpSub,
-                                           OpMulScalar,
-                                           OpDiv,
-                                           OpSet,
-                                           OpMod,
-                                           OpPow) Op <: OpType](
+                              @expand.args(
+                                OpAdd,
+                                OpSub,
+                                OpMulScalar,
+                                OpDiv,
+                                OpSet,
+                                OpMod,
+                                OpPow) Op <: OpType](
       implicit @expand.sequence[Op](
         { _ + _ }, { _ - _ }, { _ * _ }, { _ / _ }, { (a, b) =>
           b
@@ -647,8 +678,9 @@ trait DenseMatrixOps { this: DenseMatrix.type =>
           // if a and b are both nicely and identically shaped, add them as though they were vectors
         } else if (a.isTranspose == b.isTranspose && a.isContiguous &&
                    b.isContiguous) {
-          vecOp(new DenseVector(a.data, a.offset, 1, a.size),
-                new DenseVector(b.data, b.offset, 1, b.size))
+          vecOp(
+            new DenseVector(a.data, a.offset, 1, a.size),
+            new DenseVector(b.data, b.offset, 1, b.size))
         } else {
           slowPath(a, b)
         }
@@ -679,12 +711,13 @@ trait DenseMatrixOps { this: DenseMatrix.type =>
   }
 
   @expand
-  implicit def dm_dm_UpdateOp[@expand.args(OpAdd,
-                                           OpSub,
-                                           OpMulScalar,
-                                           OpDiv,
-                                           OpMod,
-                                           OpPow) Op <: OpType,
+  implicit def dm_dm_UpdateOp[@expand.args(
+                                OpAdd,
+                                OpSub,
+                                OpMulScalar,
+                                OpDiv,
+                                OpMod,
+                                OpPow) Op <: OpType,
                               T: Field: Zero: ClassTag](
       implicit @expand.sequence[Op](
         { f.+(_, _) }, { f.-(_, _) }, { f.*(_, _) }, {
@@ -726,14 +759,15 @@ trait DenseMatrixOps { this: DenseMatrix.type =>
   @expand
   @expand.valify
   implicit def dm_s_UpdateOp[@expand.args(Int, Double, Float, Long) T,
-                             @expand.args(OpAdd,
-                                          OpSub,
-                                          OpMulScalar,
-                                          OpMulMatrix,
-                                          OpDiv,
-                                          OpSet,
-                                          OpMod,
-                                          OpPow) Op <: OpType](
+                             @expand.args(
+                               OpAdd,
+                               OpSub,
+                               OpMulScalar,
+                               OpMulMatrix,
+                               OpDiv,
+                               OpSet,
+                               OpMod,
+                               OpPow) Op <: OpType](
       implicit @expand.sequence[Op](
         { _ + _ }, { _ - _ }, { _ * _ }, { _ * _ }, {
           _ / _
@@ -775,13 +809,14 @@ trait DenseMatrixOps { this: DenseMatrix.type =>
     }
 
   @expand
-  implicit def opUpdate_DM_S[@expand.args(OpAdd,
-                                          OpSub,
-                                          OpMulScalar,
-                                          OpMulMatrix,
-                                          OpDiv,
-                                          OpMod,
-                                          OpPow) Op <: OpType,
+  implicit def opUpdate_DM_S[@expand.args(
+                               OpAdd,
+                               OpSub,
+                               OpMulScalar,
+                               OpMulMatrix,
+                               OpDiv,
+                               OpMod,
+                               OpPow) Op <: OpType,
                              T: Field: Zero: ClassTag](
       implicit @expand.sequence[Op](
         { f.+(_, _) }, { f.-(_, _) }, { f.*(_, _) }, {
@@ -815,13 +850,14 @@ trait DenseMatrixOps { this: DenseMatrix.type =>
   @expand
   @expand.valify
   implicit def op_DM_S[@expand.args(Int, Long, Float, Double) T,
-                       @expand.args(OpAdd,
-                                    OpSub,
-                                    OpMulScalar,
-                                    OpMulMatrix,
-                                    OpMod,
-                                    OpDiv,
-                                    OpPow) Op]
+                       @expand.args(
+                         OpAdd,
+                         OpSub,
+                         OpMulScalar,
+                         OpMulMatrix,
+                         OpMod,
+                         OpDiv,
+                         OpPow) Op]
     : Op.Impl2[DenseMatrix[T], T, DenseMatrix[T]] = {
     val uop = implicitly[Op.InPlaceImpl2[DenseMatrix[T], T]]
     new Op.Impl2[DenseMatrix[T], T, DenseMatrix[T]] {
@@ -836,13 +872,14 @@ trait DenseMatrixOps { this: DenseMatrix.type =>
   }
 
   @expand
-  implicit def op_DM_S[@expand.args(OpAdd,
-                                    OpSub,
-                                    OpMulScalar,
-                                    OpMulMatrix,
-                                    OpDiv,
-                                    OpMod,
-                                    OpPow) Op <: OpType,
+  implicit def op_DM_S[@expand.args(
+                         OpAdd,
+                         OpSub,
+                         OpMulScalar,
+                         OpMulMatrix,
+                         OpDiv,
+                         OpMod,
+                         OpPow) Op <: OpType,
                        T: Field: Zero: ClassTag]:
 //  (implicit @expand.sequence[Op]({f.+(_,_)}, {f.-(_,_)}, {f.*(_,_)}, {f.*(_,_)}, {f./(_,_)}, {f.%(_,_)},{f.pow(_,_)}) op: Op.Impl2[T,T,T]):
   Op.Impl2[DenseMatrix[T], T, DenseMatrix[T]] = {
@@ -865,18 +902,18 @@ trait DenseMatrixOps { this: DenseMatrix.type =>
   @expand
   @expand.valify
   implicit def s_dm_op[@expand.args(Int, Double, Float, Long) T,
-                       @expand.args(OpAdd,
-                                    OpSub,
-                                    OpMulScalar,
-                                    OpMulMatrix,
-                                    OpDiv,
-                                    OpMod,
-                                    OpPow) Op <: OpType](
-      implicit @expand.sequence[Op]({
-        _ + _
-      }, { _ - _ }, { _ * _ }, { _ * _ }, {
-        _ / _
-      }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+                       @expand.args(
+                         OpAdd,
+                         OpSub,
+                         OpMulScalar,
+                         OpMulMatrix,
+                         OpDiv,
+                         OpMod,
+                         OpPow) Op <: OpType](implicit @expand.sequence[Op]({
+    _ + _
+  }, { _ - _ }, { _ * _ }, { _ * _ }, {
+    _ / _
+  }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
     : Op.Impl2[T, DenseMatrix[T], DenseMatrix[T]] =
     new Op.Impl2[T, DenseMatrix[T], DenseMatrix[T]] {
       def apply(b: T, a: DenseMatrix[T]): DenseMatrix[T] = {
@@ -910,12 +947,13 @@ trait DenseMatrixOps { this: DenseMatrix.type =>
   @expand
   @expand.valify
   implicit def op_DM_DM[@expand.args(Int, Long, Float, Double) T,
-                        @expand.args(OpAdd,
-                                     OpSub,
-                                     OpMulScalar,
-                                     OpMod,
-                                     OpDiv,
-                                     OpPow) Op]
+                        @expand.args(
+                          OpAdd,
+                          OpSub,
+                          OpMulScalar,
+                          OpMod,
+                          OpDiv,
+                          OpPow) Op]
     : Op.Impl2[DenseMatrix[T], DenseMatrix[T], DenseMatrix[T]] = {
     val uop = implicitly[Op.InPlaceImpl2[DenseMatrix[T], DenseMatrix[T]]]
     new Op.Impl2[DenseMatrix[T], DenseMatrix[T], DenseMatrix[T]] {
@@ -969,10 +1007,11 @@ trait DenseMatrixMultOps extends DenseMatrixOps with DenseMatrixOpsLowPrio {
                      Vector[T],
                      OpMulMatrix.type,
                      DenseVector[T]] =
-    new BinaryRegistry[DenseMatrix[T],
-                       Vector[T],
-                       OpMulMatrix.type,
-                       DenseVector[T]] {
+    new BinaryRegistry[
+      DenseMatrix[T],
+      Vector[T],
+      OpMulMatrix.type,
+      DenseVector[T]] {
       override def bindingMissing(a: DenseMatrix[T],
                                   b: Vector[T]): DenseVector[T] = {
 
@@ -1005,10 +1044,11 @@ trait DenseMatrixMultOps extends DenseMatrixOps with DenseMatrixOpsLowPrio {
                      Matrix[T],
                      OpMulMatrix.type,
                      DenseMatrix[T]] =
-    new BinaryRegistry[DenseMatrix[T],
-                       Matrix[T],
-                       OpMulMatrix.type,
-                       DenseMatrix[T]] {
+    new BinaryRegistry[
+      DenseMatrix[T],
+      Matrix[T],
+      OpMulMatrix.type,
+      DenseMatrix[T]] {
       override def bindingMissing(a: DenseMatrix[T],
                                   b: Matrix[T]): DenseMatrix[T] = {
         // Martin Senne:
@@ -1293,10 +1333,11 @@ trait LowPriorityDenseMatrix extends LowPriorityDenseMatrix1 {
                                        Vector[T],
                                        OpMulMatrix.type,
                                        DenseVector[T]] =
-    new BinaryRegistry[DenseMatrix[T],
-                       Vector[T],
-                       OpMulMatrix.type,
-                       DenseVector[T]] {
+    new BinaryRegistry[
+      DenseMatrix[T],
+      Vector[T],
+      OpMulMatrix.type,
+      DenseVector[T]] {
       override def bindingMissing(a: DenseMatrix[T],
                                   b: Vector[T]): DenseVector[T] = {
 
@@ -1332,11 +1373,12 @@ trait LowPriorityDenseMatrix1 {
                       DenseVector[V],
                       R,
                       Transpose[DenseVector[R]]] =
-    new CanCollapseAxis[DenseMatrix[V],
-                        Axis._0.type,
-                        DenseVector[V],
-                        R,
-                        Transpose[DenseVector[R]]] {
+    new CanCollapseAxis[
+      DenseMatrix[V],
+      Axis._0.type,
+      DenseVector[V],
+      R,
+      Transpose[DenseVector[R]]] {
       def apply(from: DenseMatrix[V], axis: Axis._0.type)(
           f: (DenseVector[V]) => R): Transpose[DenseVector[R]] = {
         val result = DenseVector.zeros[R](from.cols)
@@ -1354,11 +1396,12 @@ trait LowPriorityDenseMatrix1 {
     * @return
     */
   implicit def canCollapseCols[V, R: ClassTag: Zero] =
-    new CanCollapseAxis[DenseMatrix[V],
-                        Axis._1.type,
-                        DenseVector[V],
-                        R,
-                        DenseVector[R]] {
+    new CanCollapseAxis[
+      DenseMatrix[V],
+      Axis._1.type,
+      DenseVector[V],
+      R,
+      DenseVector[R]] {
       def apply(from: DenseMatrix[V], axis: Axis._1.type)(
           f: (DenseVector[V]) => R): DenseVector[R] = {
         val result = DenseVector.zeros[R](from.rows)

@@ -91,13 +91,15 @@ trait Parser extends RegexParsers with Filters with AST {
     } | namespacedId ^# { (loc, id) =>
       Dispatch(loc, id, Vector())
     } | ticId ^# TicVar | pathLiteral ^# { (loc, str) =>
-      Dispatch(loc,
-               LoadId,
-               Vector(Dispatch(loc, ExpandGlobId, Vector(StrLit(loc, str)))))
+      Dispatch(
+        loc,
+        LoadId,
+        Vector(Dispatch(loc, ExpandGlobId, Vector(StrLit(loc, str)))))
     } | relPathLiteral ^# { (loc, str) =>
-      Dispatch(loc,
-               RelLoadId,
-               Vector(Dispatch(loc, ExpandGlobId, Vector(StrLit(loc, str)))))
+      Dispatch(
+        loc,
+        RelLoadId,
+        Vector(Dispatch(loc, ExpandGlobId, Vector(StrLit(loc, str)))))
     } | strLiteral ^# StrLit | numLiteral ^# NumLit | boolLiteral ^# BoolLit | undefinedLiteral ^# {
       (loc, _) =>
         UndefinedLit(loc)
@@ -250,23 +252,24 @@ trait Parser extends RegexParsers with Filters with AST {
   override val whitespace = """([;\s]+|--.*|\(-([^\-]|-+[^)\-])*-+\))+""".r
   override val skipWhitespace = true
 
-  private val precedence = prec((Descent, MetaDescent),
-                                Deref,
-                                Comp,
-                                Neg,
-                                Pow,
-                                (Mul, Div, Mod),
-                                (Add, Sub),
-                                (Lt, LtEq, Gt, GtEq),
-                                (Eq, NotEq),
-                                (And, Or),
-                                (Union, Intersect, Difference),
-                                Cond,
-                                With,
-                                New,
-                                Where,
-                                Observe,
-                                (Relate, Let, Solve, Import, Assert))
+  private val precedence = prec(
+    (Descent, MetaDescent),
+    Deref,
+    Comp,
+    Neg,
+    Pow,
+    (Mul, Div, Mod),
+    (Add, Sub),
+    (Lt, LtEq, Gt, GtEq),
+    (Eq, NotEq),
+    (And, Or),
+    (Union, Intersect, Difference),
+    Cond,
+    With,
+    New,
+    Where,
+    Observe,
+    (Relate, Let, Solve, Import, Assert))
 
   private def arrayDefDeref = new com.codecommit.gll.ast.Filter[Node] {
     def apply(n: Node): Boolean = n match {
@@ -352,15 +355,16 @@ trait Parser extends RegexParsers with Filters with AST {
     private val ExpectedPattern = "expected %s"
     private val SyntaxPattern = "syntax error"
 
-    private lazy val Parsers = Map(expr -> "expression",
-                                   property -> "property",
-                                   pathLiteral -> "path",
-                                   id -> "identifier",
-                                   regex(ticId) -> "tic-variable",
-                                   strLiteral -> "string",
-                                   regex(numLiteral) -> "number",
-                                   boolLiteral -> "boolean",
-                                   op -> "operator")
+    private lazy val Parsers = Map(
+      expr -> "expression",
+      property -> "property",
+      pathLiteral -> "path",
+      id -> "identifier",
+      regex(ticId) -> "tic-variable",
+      strLiteral -> "string",
+      regex(numLiteral) -> "number",
+      boolLiteral -> "boolean",
+      op -> "operator")
 
     private def reduceFailures(failures: Set[Failure]) = {
       val expectedPowerSet =

@@ -20,8 +20,9 @@ class RetriesTest extends FunSuite {
   }
 
   private[this] def newRetryPolicy(retries: Int) =
-    RetryPolicy.tries(retries + 1, // 1 request and `retries` retries
-                      retryFn)
+    RetryPolicy.tries(
+      retries + 1, // 1 request and `retries` retries
+      retryFn)
 
   private[this] val requeableEx =
     Failure.wrap(new RuntimeException("yep"), Failure.Restartable)
@@ -236,10 +237,11 @@ class RetriesTest extends FunSuite {
     val backReqs = new AtomicInteger()
     val retryPercent = 0.2 // 20% retries
     def mkBudget() =
-      RetryBudget(60.seconds,
-                  0, // keep minimum out of this to simplify
-                  retryPercent,
-                  Stopwatch.timeMillis)
+      RetryBudget(
+        60.seconds,
+        0, // keep minimum out of this to simplify
+        retryPercent,
+        Stopwatch.timeMillis)
 
     val svc = endToEndToEndSvc(stats, backReqs, mkBudget)
 

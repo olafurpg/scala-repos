@@ -29,10 +29,11 @@ object InlinerTest extends ClearAfterClass.Clearable {
 
   // allows inspecting the caches after a compilation run
   def notPerRun: List[Clearable] =
-    List(compiler.genBCode.bTypes.classBTypeFromInternalName,
-         compiler.genBCode.bTypes.byteCodeRepository.compilingClasses,
-         compiler.genBCode.bTypes.byteCodeRepository.parsedClasses,
-         compiler.genBCode.bTypes.callGraph.callsites)
+    List(
+      compiler.genBCode.bTypes.classBTypeFromInternalName,
+      compiler.genBCode.bTypes.byteCodeRepository.compilingClasses,
+      compiler.genBCode.bTypes.byteCodeRepository.parsedClasses,
+      compiler.genBCode.bTypes.callGraph.callsites)
   notPerRun foreach compiler.perRunCaches.unrecordCache
 
   def clear(): Unit = { compiler = null; inlineOnlyCompiler = null }
@@ -62,17 +63,20 @@ class InlinerTest extends ClearAfterClass {
   }
 
   def checkCallsite(callsite: callGraph.Callsite, callee: MethodNode) = {
-    assert(callsite.callsiteMethod.instructions
-             .contains(callsite.callsiteInstruction),
-           instructionsFromMethod(callsite.callsiteMethod))
+    assert(
+      callsite.callsiteMethod.instructions
+        .contains(callsite.callsiteInstruction),
+      instructionsFromMethod(callsite.callsiteMethod))
 
     val callsiteClassNode =
       byteCodeRepository.classNode(callsite.callsiteClass.internalName).get
-    assert(callsiteClassNode.methods.contains(callsite.callsiteMethod),
-           callsiteClassNode.methods.asScala.map(_.name).toList)
+    assert(
+      callsiteClassNode.methods.contains(callsite.callsiteMethod),
+      callsiteClassNode.methods.asScala.map(_.name).toList)
 
-    assert(callsite.callee.get.callee == callee,
-           callsite.callee.get.callee.name)
+    assert(
+      callsite.callee.get.callee == callee,
+      callsite.callee.get.callee.name)
   }
 
   def getCallsite(method: MethodNode, calleeName: String) =
@@ -114,18 +118,20 @@ class InlinerTest extends ClearAfterClass {
     val g = inlineTest(code)
 
     val gConv = convertMethod(g)
-    assertSameCode(gConv,
-                   List(VarOp(ALOAD, 0),
-                        VarOp(ASTORE, 1), // store this
-                        Op(ICONST_1),
-                        VarOp(ISTORE, 2),
-                        Jump(GOTO, Label(10)), // store return value
-                        Label(10),
-                        VarOp(ILOAD, 2), // load return value
-                        VarOp(ALOAD, 0),
-                        Invoke(INVOKEVIRTUAL, "C", "f", "()I", false),
-                        Op(IADD),
-                        Op(IRETURN)))
+    assertSameCode(
+      gConv,
+      List(
+        VarOp(ALOAD, 0),
+        VarOp(ASTORE, 1), // store this
+        Op(ICONST_1),
+        VarOp(ISTORE, 2),
+        Jump(GOTO, Label(10)), // store return value
+        Label(10),
+        VarOp(ILOAD, 2), // load return value
+        VarOp(ALOAD, 0),
+        Invoke(INVOKEVIRTUAL, "C", "f", "()I", false),
+        Op(IADD),
+        Op(IRETURN)))
 
     // line numbers are kept, so there's a line 2 (from the inlined f)
     assert(gConv.instructions exists {
@@ -133,10 +139,12 @@ class InlinerTest extends ClearAfterClass {
       case _ => false
     }, gConv.instructions.filter(_.isInstanceOf[LineNumber]))
 
-    assert(gConv.localVars.map(_.name).sorted == List("f_this", "this"),
-           gConv.localVars)
-    assert(g.maxStack == 2 && g.maxLocals == 3,
-           s"${g.maxLocals} - ${g.maxStack}")
+    assert(
+      gConv.localVars.map(_.name).sorted == List("f_this", "this"),
+      gConv.localVars)
+    assert(
+      g.maxStack == 2 && g.maxLocals == 3,
+      s"${g.maxLocals} - ${g.maxStack}")
   }
 
   @Test
@@ -156,11 +164,12 @@ class InlinerTest extends ClearAfterClass {
 
     val invokeQQQ = List(
       Field(GETSTATIC, "scala/Predef$", "MODULE$", "Lscala/Predef$;"),
-      Invoke(INVOKEVIRTUAL,
-             "scala/Predef$",
-             "$qmark$qmark$qmark",
-             "()Lscala/runtime/Nothing$;",
-             false))
+      Invoke(
+        INVOKEVIRTUAL,
+        "scala/Predef$",
+        "$qmark$qmark$qmark",
+        "()Lscala/runtime/Nothing$;",
+        false))
 
     val gBeforeLocalOpt =
       VarOp(ALOAD, 0) :: VarOp(ASTORE, 1) :: invokeQQQ ::: List(
@@ -213,9 +222,10 @@ class InlinerTest extends ClearAfterClass {
         |}
       """.stripMargin
     val r = canInlineTest(code)
-    assert(r.nonEmpty &&
-             r.get.isInstanceOf[MethodWithHandlerCalledOnNonEmptyStack],
-           r)
+    assert(
+      r.nonEmpty &&
+        r.get.isInstanceOf[MethodWithHandlerCalledOnNonEmptyStack],
+      r)
   }
 
   @Test
@@ -429,21 +439,25 @@ class InlinerTest extends ClearAfterClass {
       c.methods.asScala.filter(_.name.length == 2).toList
 
     // stack height at callsite of f1 is 1, so max of g1 after inlining is max of f1 + 1
-    assert(g1.maxStack == 7 && f1.maxStack == 6,
-           s"${g1.maxStack} - ${f1.maxStack}")
+    assert(
+      g1.maxStack == 7 && f1.maxStack == 6,
+      s"${g1.maxStack} - ${f1.maxStack}")
 
     // locals in f1: this, x, a
     // locals in g1 after inlining: this, this-of-f1, x, a, return value
-    assert(g1.maxLocals == 5 && f1.maxLocals == 3,
-           s"${g1.maxLocals} - ${f1.maxLocals}")
+    assert(
+      g1.maxLocals == 5 && f1.maxLocals == 3,
+      s"${g1.maxLocals} - ${f1.maxLocals}")
 
     // like maxStack in g1 / f1
-    assert(g2.maxStack == 5 && f2.maxStack == 4,
-           s"${g2.maxStack} - ${f2.maxStack}")
+    assert(
+      g2.maxStack == 5 && f2.maxStack == 4,
+      s"${g2.maxStack} - ${f2.maxStack}")
 
     // like maxLocals for g1 / f1, but no return value
-    assert(g2.maxLocals == 4 && f2.maxLocals == 3,
-           s"${g2.maxLocals} - ${f2.maxLocals}")
+    assert(
+      g2.maxLocals == 4 && f2.maxLocals == 3,
+      s"${g2.maxLocals} - ${f2.maxLocals}")
   }
 
   @Test
@@ -1361,53 +1375,66 @@ class InlinerTest extends ClearAfterClass {
       """.stripMargin
     val List(c, _, _) = compile(code)
 
-    assertSameSummary(getSingleMethod(c, "t1"),
-                      List(BIPUSH, "C$$$anonfun$1", IRETURN))
-    assertSameSummary(getSingleMethod(c, "t1a"),
-                      List(LCONST_1, "C$$$anonfun$2", IRETURN))
-    assertSameSummary(getSingleMethod(c, "t2"),
-                      List(ICONST_1, ICONST_2, "C$$$anonfun$3", IRETURN))
+    assertSameSummary(
+      getSingleMethod(c, "t1"),
+      List(BIPUSH, "C$$$anonfun$1", IRETURN))
+    assertSameSummary(
+      getSingleMethod(c, "t1a"),
+      List(LCONST_1, "C$$$anonfun$2", IRETURN))
+    assertSameSummary(
+      getSingleMethod(c, "t2"),
+      List(ICONST_1, ICONST_2, "C$$$anonfun$3", IRETURN))
 
     // val a = new ValKl(n); new ValKl(anonfun(a.x)).x
     // value class instantiation-extraction should be optimized by boxing elim
-    assertSameSummary(getSingleMethod(c, "t3"),
-                      List(NEW,
-                           DUP,
-                           ICONST_1,
-                           "<init>",
-                           ASTORE,
-                           NEW,
-                           DUP,
-                           ALOAD,
-                           "x",
-                           "C$$$anonfun$4",
-                           "<init>",
-                           "x",
-                           IRETURN))
+    assertSameSummary(
+      getSingleMethod(c, "t3"),
+      List(
+        NEW,
+        DUP,
+        ICONST_1,
+        "<init>",
+        ASTORE,
+        NEW,
+        DUP,
+        ALOAD,
+        "x",
+        "C$$$anonfun$4",
+        "<init>",
+        "x",
+        IRETURN))
 
-    assertSameSummary(getSingleMethod(c, "t4"),
-                      List(BIPUSH, "C$$$anonfun$5", "boxToInteger", ARETURN))
-    assertSameSummary(getSingleMethod(c, "t4a"),
-                      List(ICONST_1, LDC, "C$$$anonfun$6", LRETURN))
+    assertSameSummary(
+      getSingleMethod(c, "t4"),
+      List(BIPUSH, "C$$$anonfun$5", "boxToInteger", ARETURN))
+    assertSameSummary(
+      getSingleMethod(c, "t4a"),
+      List(ICONST_1, LDC, "C$$$anonfun$6", LRETURN))
     assertSameSummary(
       getSingleMethod(c, "t5"),
       List(BIPUSH, ICONST_3, "C$$$anonfun$7", "boxToInteger", ARETURN))
-    assertSameSummary(getSingleMethod(c, "t5a"),
-                      List(BIPUSH, BIPUSH, I2B, "C$$$anonfun$8", IRETURN))
-    assertSameSummary(getSingleMethod(c, "t6"),
-                      List(BIPUSH, "C$$$anonfun$9", RETURN))
-    assertSameSummary(getSingleMethod(c, "t7"),
-                      List(ICONST_1, "C$$$anonfun$10", RETURN))
-    assertSameSummary(getSingleMethod(c, "t8"),
-                      List(ICONST_1, LDC, "C$$$anonfun$11", LRETURN))
-    assertSameSummary(getSingleMethod(c, "t9"),
-                      List(ICONST_1, "boxToInteger", "C$$$anonfun$12", RETURN))
+    assertSameSummary(
+      getSingleMethod(c, "t5a"),
+      List(BIPUSH, BIPUSH, I2B, "C$$$anonfun$8", IRETURN))
+    assertSameSummary(
+      getSingleMethod(c, "t6"),
+      List(BIPUSH, "C$$$anonfun$9", RETURN))
+    assertSameSummary(
+      getSingleMethod(c, "t7"),
+      List(ICONST_1, "C$$$anonfun$10", RETURN))
+    assertSameSummary(
+      getSingleMethod(c, "t8"),
+      List(ICONST_1, LDC, "C$$$anonfun$11", LRETURN))
+    assertSameSummary(
+      getSingleMethod(c, "t9"),
+      List(ICONST_1, "boxToInteger", "C$$$anonfun$12", RETURN))
 
     // t9a inlines Range.foreach, which is quite a bit of code, so just testing the core
     assertInvoke(getSingleMethod(c, "t9a"), "C", "C$$$anonfun$13")
-    assertInvoke(getSingleMethod(c, "t9a"),
-                 "scala/runtime/BoxesRunTime",
-                 "boxToInteger")
+    assertInvoke(
+      getSingleMethod(c, "t9a"),
+      "scala/runtime/BoxesRunTime",
+      "boxToInteger")
 
     assertSameSummary(
       getSingleMethod(c, "t10"),
@@ -1438,8 +1465,9 @@ class InlinerTest extends ClearAfterClass {
         |}
       """.stripMargin
     val List(c) = compile(code)
-    assertSameCode(getSingleMethod(c, "t1"),
-                   List(Op(ICONST_0), Op(ICONST_1), Op(IADD), Op(IRETURN)))
+    assertSameCode(
+      getSingleMethod(c, "t1"),
+      List(Op(ICONST_0), Op(ICONST_1), Op(IADD), Op(IRETURN)))
     assertEquals(getSingleMethod(c, "t2").instructions collect {
       case i: Invoke => i.owner + "." + i.name
     }, List("scala/runtime/IntRef.create", "C.C$$$anonfun$1"))
@@ -1481,12 +1509,15 @@ class InlinerTest extends ClearAfterClass {
         |}
       """.stripMargin
     val List(c) = compile(code)
-    assertSameCode(getSingleMethod(c, "t1"),
-                   List(Op(ICONST_3), Op(ICONST_4), Op(IADD), Op(IRETURN)))
-    assertSameCode(getSingleMethod(c, "t2"),
-                   List(Op(ICONST_1), Op(ICONST_2), Op(IADD), Op(IRETURN)))
-    assertSameCode(getSingleMethod(c, "t3"),
-                   List(Op(ICONST_1), Op(ICONST_3), Op(ISUB), Op(IRETURN)))
+    assertSameCode(
+      getSingleMethod(c, "t1"),
+      List(Op(ICONST_3), Op(ICONST_4), Op(IADD), Op(IRETURN)))
+    assertSameCode(
+      getSingleMethod(c, "t2"),
+      List(Op(ICONST_1), Op(ICONST_2), Op(IADD), Op(IRETURN)))
+    assertSameCode(
+      getSingleMethod(c, "t3"),
+      List(Op(ICONST_1), Op(ICONST_3), Op(ISUB), Op(IRETURN)))
     assertNoInvoke(getSingleMethod(c, "t4"))
     assertNoInvoke(getSingleMethod(c, "t5"))
   }
@@ -1517,12 +1548,15 @@ class InlinerTest extends ClearAfterClass {
     def casts(m: String) = getSingleMethod(c, m).instructions collect {
       case TypeOp(CHECKCAST, tp) => tp
     }
-    assertSameCode(getSingleMethod(c, "t1"),
-                   List(VarOp(ALOAD, 1), Op(ARETURN)))
-    assertSameCode(getSingleMethod(c, "t2"),
-                   List(VarOp(ALOAD, 1), Op(ARETURN)))
-    assertSameCode(getSingleMethod(c, "t3"),
-                   List(VarOp(ALOAD, 1), TypeOp(CHECKCAST, "C"), Op(ARETURN)))
+    assertSameCode(
+      getSingleMethod(c, "t1"),
+      List(VarOp(ALOAD, 1), Op(ARETURN)))
+    assertSameCode(
+      getSingleMethod(c, "t2"),
+      List(VarOp(ALOAD, 1), Op(ARETURN)))
+    assertSameCode(
+      getSingleMethod(c, "t3"),
+      List(VarOp(ALOAD, 1), TypeOp(CHECKCAST, "C"), Op(ARETURN)))
     assertEquals(casts("t4"), List("C"))
     assertEquals(casts("t5"), Nil)
     assertEquals(casts("t6"), Nil)
@@ -1547,19 +1581,21 @@ class InlinerTest extends ClearAfterClass {
 
     val cls = compile(code)
     val test = cls.find(_.name == "Test$").get
-    assertSameSummary(getSingleMethod(test, "f"),
-                      List(GETSTATIC,
-                           "mkFoo",
-                           BIPUSH,
-                           ISTORE,
-                           IFNONNULL,
-                           ACONST_NULL,
-                           ATHROW,
-                           -1 /*label*/,
-                           ILOAD,
-                           ICONST_1,
-                           IADD,
-                           IRETURN))
+    assertSameSummary(
+      getSingleMethod(test, "f"),
+      List(
+        GETSTATIC,
+        "mkFoo",
+        BIPUSH,
+        ISTORE,
+        IFNONNULL,
+        ACONST_NULL,
+        ATHROW,
+        -1 /*label*/,
+        ILOAD,
+        ICONST_1,
+        IADD,
+        IRETURN))
   }
 
   @Test // a test taken from the test suite for the 2.11 inliner
@@ -1574,15 +1610,17 @@ class InlinerTest extends ClearAfterClass {
     val List(c) = compile(code)
 
     // box-unbox will clean it up
-    assertSameSummary(getSingleMethod(c, "t"),
-                      List(ALOAD,
-                           "C$$$anonfun$1",
-                           IFEQ /*A*/,
-                           "C$$$anonfun$2",
-                           IRETURN,
-                           -1 /*A*/,
-                           "C$$$anonfun$3",
-                           IRETURN))
+    assertSameSummary(
+      getSingleMethod(c, "t"),
+      List(
+        ALOAD,
+        "C$$$anonfun$1",
+        IFEQ /*A*/,
+        "C$$$anonfun$2",
+        IRETURN,
+        -1 /*A*/,
+        "C$$$anonfun$3",
+        IRETURN))
   }
 
   @Test

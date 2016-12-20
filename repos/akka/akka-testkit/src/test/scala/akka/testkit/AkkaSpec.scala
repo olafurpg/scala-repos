@@ -68,8 +68,9 @@ abstract class AkkaSpec(_system: ActorSystem)
 
   def this(config: Config) =
     this(
-      ActorSystem(AkkaSpec.getCallerName(getClass),
-                  ConfigFactory.load(config.withFallback(AkkaSpec.testConf))))
+      ActorSystem(
+        AkkaSpec.getCallerName(getClass),
+        ConfigFactory.load(config.withFallback(AkkaSpec.testConf))))
 
   def this(s: String) = this(ConfigFactory.parseString(s))
 

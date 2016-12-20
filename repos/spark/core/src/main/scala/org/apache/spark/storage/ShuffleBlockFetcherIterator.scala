@@ -193,11 +193,12 @@ private[spark] final class ShuffleBlockFetcherIterator(
                 buf.retain()
                 remainingBlocks -= blockId
                 results.put(
-                  new SuccessFetchResult(BlockId(blockId),
-                                         address,
-                                         sizeMap(blockId),
-                                         buf,
-                                         remainingBlocks.isEmpty))
+                  new SuccessFetchResult(
+                    BlockId(blockId),
+                    address,
+                    sizeMap(blockId),
+                    buf,
+                    remainingBlocks.isEmpty))
                 logDebug("remainingBlocks: " + remainingBlocks)
               }
             }
@@ -286,11 +287,12 @@ private[spark] final class ShuffleBlockFetcherIterator(
         shuffleMetrics.incLocalBytesRead(buf.size)
         buf.retain()
         results.put(
-          new SuccessFetchResult(blockId,
-                                 blockManager.blockManagerId,
-                                 0,
-                                 buf,
-                                 false))
+          new SuccessFetchResult(
+            blockId,
+            blockManager.blockManagerId,
+            0,
+            buf,
+            false))
       } catch {
         case e: Exception =>
           // If we see an exception, stop immediately.
@@ -394,15 +396,17 @@ private[spark] final class ShuffleBlockFetcherIterator(
                                         e: Throwable) = {
     blockId match {
       case ShuffleBlockId(shufId, mapId, reduceId) =>
-        throw new FetchFailedException(address,
-                                       shufId.toInt,
-                                       mapId.toInt,
-                                       reduceId,
-                                       e)
+        throw new FetchFailedException(
+          address,
+          shufId.toInt,
+          mapId.toInt,
+          reduceId,
+          e)
       case _ =>
-        throw new SparkException("Failed to get block " + blockId +
-                                   ", which is not a shuffle block",
-                                 e)
+        throw new SparkException(
+          "Failed to get block " + blockId +
+            ", which is not a shuffle block",
+          e)
     }
   }
 }

@@ -110,10 +110,11 @@ object BackendReporting {
           else ""
         }
 
-      case MethodNotFound(name,
-                          descriptor,
-                          ownerInternalName,
-                          missingClasses) =>
+      case MethodNotFound(
+          name,
+          descriptor,
+          ownerInternalName,
+          missingClasses) =>
         val (javaDef, others) = missingClasses.partition(_.definedInJavaSource)
         s"The method $name$descriptor could not be found in the class $ownerInternalName or any of its parents." +
           (if (others.isEmpty) ""
@@ -273,21 +274,23 @@ object BackendReporting {
         s"The callee $calleeMethodSig contains the instruction ${AsmUtils.textify(instruction)}" +
           s"\nthat would cause an IllegalAccessError when inlined into class $callsiteClass."
 
-      case IllegalAccessCheckFailed(_,
-                                    _,
-                                    _,
-                                    callsiteClass,
-                                    instruction,
-                                    cause) =>
+      case IllegalAccessCheckFailed(
+          _,
+          _,
+          _,
+          callsiteClass,
+          instruction,
+          cause) =>
         s"Failed to check if $calleeMethodSig can be safely inlined to $callsiteClass without causing an IllegalAccessError. Checking instruction ${AsmUtils
           .textify(instruction)} failed:\n" + cause
 
-      case MethodWithHandlerCalledOnNonEmptyStack(_,
-                                                  _,
-                                                  _,
-                                                  callsiteClass,
-                                                  callsiteName,
-                                                  callsiteDesc) =>
+      case MethodWithHandlerCalledOnNonEmptyStack(
+          _,
+          _,
+          _,
+          callsiteClass,
+          callsiteName,
+          callsiteDesc) =>
         s"""The operand stack at the callsite in ${BackendReporting
              .methodSignature(callsiteClass, callsiteName, callsiteDesc)} contains more values than the
            |arguments expected by the callee $calleeMethodSig. These values would be discarded
@@ -296,23 +299,25 @@ object BackendReporting {
       case SynchronizedMethod(_, _, _) =>
         s"Method $calleeMethodSig cannot be inlined because it is synchronized."
 
-      case StrictfpMismatch(_,
-                            _,
-                            _,
-                            callsiteClass,
-                            callsiteName,
-                            callsiteDesc) =>
+      case StrictfpMismatch(
+          _,
+          _,
+          _,
+          callsiteClass,
+          callsiteName,
+          callsiteDesc) =>
         s"""The callsite method ${BackendReporting
              .methodSignature(callsiteClass, callsiteName, callsiteDesc)}
            |does not have the same strictfp mode as the callee $calleeMethodSig.
          """.stripMargin
 
-      case ResultingMethodTooLarge(_,
-                                   _,
-                                   _,
-                                   callsiteClass,
-                                   callsiteName,
-                                   callsiteDesc) =>
+      case ResultingMethodTooLarge(
+          _,
+          _,
+          _,
+          callsiteClass,
+          callsiteName,
+          callsiteDesc) =>
         s"""The size of the callsite method ${BackendReporting
              .methodSignature(callsiteClass, callsiteName, callsiteDesc)}
            |would exceed the JVM method size limit after inlining $calleeMethodSig.

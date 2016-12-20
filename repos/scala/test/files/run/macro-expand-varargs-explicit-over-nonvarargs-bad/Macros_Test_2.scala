@@ -9,9 +9,11 @@ object Test extends App {
   val tree = Apply(
     Select(Ident(TermName("Macros")), TermName("foo")),
     List(
-      Typed(Apply(Ident(definitions.ListModule),
-                  List(Literal(Constant(1)), Literal(Constant(2)))),
-            Ident(typeNames.WILDCARD_STAR))))
+      Typed(
+        Apply(
+          Ident(definitions.ListModule),
+          List(Literal(Constant(1)), Literal(Constant(2)))),
+        Ident(typeNames.WILDCARD_STAR))))
   try cm.mkToolBox().eval(tree)
   catch {
     case ex: Throwable => println(ex.getMessage)

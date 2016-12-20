@@ -42,8 +42,9 @@ class GeneratedProjectionSuite extends SparkFunSuite {
     val joinedSchema = StructType(schema1 ++ schema2)
     val nested = new JoinedRow(InternalRow(joined, joined), joined)
     val nestedSchema =
-      StructType(Seq(StructField("", joinedSchema),
-                     StructField("", joinedSchema)) ++ joinedSchema)
+      StructType(Seq(
+        StructField("", joinedSchema),
+        StructField("", joinedSchema)) ++ joinedSchema)
 
     // test generated UnsafeProjection
     val unsafeProj = UnsafeProjection.create(nestedSchema)
@@ -87,9 +88,10 @@ class GeneratedProjectionSuite extends SparkFunSuite {
 
   test("generated unsafe projection with array of binary") {
     val row =
-      InternalRow(Array[Byte](1, 2),
-                  new GenericArrayData(
-                    Array(Array[Byte](1, 2), null, Array[Byte](3, 4))))
+      InternalRow(
+        Array[Byte](1, 2),
+        new GenericArrayData(
+          Array(Array[Byte](1, 2), null, Array[Byte](3, 4))))
     val fields = (BinaryType :: ArrayType(BinaryType) :: Nil).toArray[DataType]
 
     val unsafeProj = UnsafeProjection.create(fields)
@@ -110,24 +112,26 @@ class GeneratedProjectionSuite extends SparkFunSuite {
   }
 
   test("padding bytes should be zeroed out") {
-    val types = Seq(BooleanType,
-                    ByteType,
-                    ShortType,
-                    IntegerType,
-                    FloatType,
-                    BinaryType,
-                    StringType)
+    val types = Seq(
+      BooleanType,
+      ByteType,
+      ShortType,
+      IntegerType,
+      FloatType,
+      BinaryType,
+      StringType)
     val struct = StructType(types.map(StructField("", _, true)))
     val fields = Array[DataType](StringType, struct)
     val unsafeProj = UnsafeProjection.create(fields)
 
-    val innerRow = InternalRow(false,
-                               1.toByte,
-                               2.toShort,
-                               3,
-                               4.0f,
-                               "".getBytes(StandardCharsets.UTF_8),
-                               UTF8String.fromString(""))
+    val innerRow = InternalRow(
+      false,
+      1.toByte,
+      2.toShort,
+      3,
+      4.0f,
+      "".getBytes(StandardCharsets.UTF_8),
+      UTF8String.fromString(""))
     val row1 = InternalRow(UTF8String.fromString(""), innerRow)
     val unsafe1 = unsafeProj(row1).copy()
     // create a Row with long String before the inner struct

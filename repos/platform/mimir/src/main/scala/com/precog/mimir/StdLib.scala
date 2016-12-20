@@ -164,8 +164,9 @@ trait TableLibModule[M[+ _]] extends TableModule[M] with TransSpecModule {
           left: TransSpec[A],
           right: TransSpec[A]): TransSpec[A] = {
         trans.MapWith(
-          trans.InnerArrayConcat(trans.WrapArray(trans.Map1(left, prepare)),
-                                 trans.WrapArray(trans.Map1(right, prepare))),
+          trans.InnerArrayConcat(
+            trans.WrapArray(trans.Map1(left, prepare)),
+            trans.WrapArray(trans.Map1(right, prepare))),
           mapper)
       }
 
@@ -284,16 +285,18 @@ trait ColumnarTableLibModule[M[+ _]]
                 val right = acc.extract(r._2)
 
                 left.cross(right)(
-                  OuterArrayConcat(WrapArray(Leaf(SourceLeft)),
-                                   Leaf(SourceRight)))
+                  OuterArrayConcat(
+                    WrapArray(Leaf(SourceLeft)),
+                    Leaf(SourceRight)))
               }
 
               // TODO: Can't translate this into a CValue. Evaluator
               // won't inline the results. See call to inlineNodeValue
               def extractValue(res: Result) = None
 
-              val tpe = UnaryOperationType(JUnionT(x.tpe.arg, acc.tpe.arg),
-                                           JArrayUnfixedT)
+              val tpe = UnaryOperationType(
+                JUnionT(x.tpe.arg, acc.tpe.arg),
+                JArrayUnfixedT)
             }
 
             rec(xs, impl)

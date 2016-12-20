@@ -12,23 +12,28 @@ object Serbench extends Benchmark {
     "test",
     new Date,
     Some(Language("Scala", 2.75)),
-    List(Team("QA", List(Employee("John Doe", 5), Employee("Mike", 3))),
-         Team("Impl",
-              List(Employee("Mark", 4),
-                   Employee("Mary", 5),
-                   Employee("Nick Noob", 1)))))
+    List(
+      Team("QA", List(Employee("John Doe", 5), Employee("Mike", 3))),
+      Team(
+        "Impl",
+        List(
+          Employee("Mark", 4),
+          Employee("Mary", 5),
+          Employee("Nick Noob", 1)))))
 
   val jvalueProject = {
     ("name" -> "test") ~ ("startDate" -> new Date().getTime) ~
       ("lang" -> (("name" -> "Scala") ~ ("version" -> 2.75))) ~
       ("teams" -> List(
         ("role" -> "QA") ~
-          ("members" -> List(("name" -> "John Doe") ~ ("experience" -> 5),
-                             ("name" -> "Mike") ~ ("experience" -> 3))),
+          ("members" -> List(
+            ("name" -> "John Doe") ~ ("experience" -> 5),
+            ("name" -> "Mike") ~ ("experience" -> 3))),
         ("role" -> "Impl") ~
-          ("members" -> List(("name" -> "Mark") ~ ("experience" -> 4),
-                             ("name" -> "Mary") ~ ("experience" -> 5),
-                             ("name" -> "Nick Noob") ~ ("experience" -> 1)))
+          ("members" -> List(
+            ("name" -> "Mark") ~ ("experience" -> 4),
+            ("name" -> "Mary") ~ ("experience" -> 5),
+            ("name" -> "Nick Noob") ~ ("experience" -> 1)))
       ))
   }
 

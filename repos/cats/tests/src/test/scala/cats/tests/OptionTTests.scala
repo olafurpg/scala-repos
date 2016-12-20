@@ -124,10 +124,12 @@ class OptionTTests extends CatsSuite {
 
   implicit val iso = CartesianTests.Isomorphisms.invariant[OptionT[List, ?]]
 
-  checkAll("OptionT[List, Int]",
-           CartesianTests[OptionT[List, ?]].cartesian[Int, Int, Int])
-  checkAll("Cartesian[OptionT[List, ?]]",
-           SerializableTests.serializable(Cartesian[OptionT[List, ?]]))
+  checkAll(
+    "OptionT[List, Int]",
+    CartesianTests[OptionT[List, ?]].cartesian[Int, Int, Int])
+  checkAll(
+    "Cartesian[OptionT[List, ?]]",
+    SerializableTests.serializable(Cartesian[OptionT[List, ?]]))
 
   test("liftF") {
     forAll { (xs: List[Int]) =>
@@ -160,14 +162,17 @@ class OptionTTests extends CatsSuite {
     }
   }
 
-  checkAll("Monad[OptionT[List, Int]]",
-           MonadTests[OptionT[List, ?]].monad[Int, Int, Int])
-  checkAll("Monad[OptionT[List, ?]]",
-           SerializableTests.serializable(Monad[OptionT[List, ?]]))
+  checkAll(
+    "Monad[OptionT[List, Int]]",
+    MonadTests[OptionT[List, ?]].monad[Int, Int, Int])
+  checkAll(
+    "Monad[OptionT[List, ?]]",
+    SerializableTests.serializable(Monad[OptionT[List, ?]]))
 
   {
     implicit val F = ListWrapper.functor
-    checkAll("Functor[OptionT[ListWrapper, ?]]",
-             FunctorTests[OptionT[ListWrapper, ?]].functor[Int, Int, Int])
+    checkAll(
+      "Functor[OptionT[ListWrapper, ?]]",
+      FunctorTests[OptionT[ListWrapper, ?]].functor[Int, Int, Int])
   }
 }

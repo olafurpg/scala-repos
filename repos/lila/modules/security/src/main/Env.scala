@@ -70,8 +70,9 @@ final class Env(config: Config,
 
   lazy val recaptcha: Recaptcha =
     if (RecaptchaEnabled)
-      new RecaptchaGoogle(privateKey = RecaptchaPrivateKey,
-                          endpoint = RecaptchaEndpoint)
+      new RecaptchaGoogle(
+        privateKey = RecaptchaPrivateKey,
+        endpoint = RecaptchaEndpoint)
     else RecaptchaSkip
 
   lazy val forms =
@@ -87,11 +88,12 @@ final class Env(config: Config,
 
   lazy val emailConfirm: EmailConfirm =
     if (EmailConfirmEnabled)
-      new EmailConfirmMailGun(apiUrl = EmailConfirmMailgunApiUrl,
-                              apiKey = EmailConfirmMailgunApiKey,
-                              sender = EmailConfirmMailgunSender,
-                              baseUrl = EmailConfirmMailgunBaseUrl,
-                              secret = EmailConfirmSecret)
+      new EmailConfirmMailGun(
+        apiUrl = EmailConfirmMailgunApiUrl,
+        apiKey = EmailConfirmMailgunApiKey,
+        sender = EmailConfirmMailgunSender,
+        baseUrl = EmailConfirmMailgunBaseUrl,
+        secret = EmailConfirmSecret)
     else EmailConfirmSkip
 
   lazy val passwordReset = new PasswordReset(
@@ -128,10 +130,11 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "security" boot new Env(config = lila.common.PlayApp loadConfig "security",
-                            db = lila.db.Env.current,
-                            system = lila.common.PlayApp.system,
-                            scheduler = lila.common.PlayApp.scheduler,
-                            captcher = lila.hub.Env.current.actor.captcher,
-                            messenger = lila.hub.Env.current.actor.messenger)
+    "security" boot new Env(
+      config = lila.common.PlayApp loadConfig "security",
+      db = lila.db.Env.current,
+      system = lila.common.PlayApp.system,
+      scheduler = lila.common.PlayApp.scheduler,
+      captcher = lila.hub.Env.current.actor.captcher,
+      messenger = lila.hub.Env.current.actor.messenger)
 }

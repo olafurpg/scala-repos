@@ -82,9 +82,10 @@ final class OneVsRestModel private[ml] (
 
   @Since("1.4.0")
   override def transformSchema(schema: StructType): StructType = {
-    validateAndTransformSchema(schema,
-                               fitting = false,
-                               getClassifier.featuresDataType)
+    validateAndTransformSchema(
+      schema,
+      fitting = false,
+      getClassifier.featuresDataType)
   }
 
   @Since("1.4.0")
@@ -197,9 +198,10 @@ final class OneVsRest @Since("1.4.0")(@Since("1.4.0") override val uid: String)
 
   @Since("1.4.0")
   override def transformSchema(schema: StructType): StructType = {
-    validateAndTransformSchema(schema,
-                               fitting = true,
-                               getClassifier.featuresDataType)
+    validateAndTransformSchema(
+      schema,
+      fitting = true,
+      getClassifier.featuresDataType)
   }
 
   @Since("1.4.0")

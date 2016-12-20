@@ -15,8 +15,9 @@ class ScalaMethodNameMacro extends Macro {
   override def calculateResult(params: Array[Expression],
                                context: ExpressionContext): Result =
     Option(
-      PsiTreeUtil.getParentOfType(context.getPsiElementAtStartOffset,
-                                  classOf[ScFunction]))
+      PsiTreeUtil.getParentOfType(
+        context.getPsiElementAtStartOffset,
+        classOf[ScFunction]))
       .map(scFun => new TextResult(scFun.getName))
       .orNull
 

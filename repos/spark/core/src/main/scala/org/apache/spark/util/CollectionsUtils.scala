@@ -31,8 +31,9 @@ private[spark] object CollectionsUtils {
             .binarySearch(l.asInstanceOf[Array[Float]], x.asInstanceOf[Float])
       case ClassTag.Double =>
         (l, x) =>
-          util.Arrays.binarySearch(l.asInstanceOf[Array[Double]],
-                                   x.asInstanceOf[Double])
+          util.Arrays.binarySearch(
+            l.asInstanceOf[Array[Double]],
+            x.asInstanceOf[Double])
       case ClassTag.Byte =>
         (l, x) =>
           util.Arrays

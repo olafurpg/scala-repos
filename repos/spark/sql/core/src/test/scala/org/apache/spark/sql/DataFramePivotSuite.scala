@@ -50,11 +50,12 @@ class DataFramePivotSuite extends QueryTest with SharedSQLContext {
         .groupBy($"year")
         .pivot("course", Seq("dotNET", "Java"))
         .agg(sum($"earnings"), avg($"earnings")),
-      Row(2012, 15000.0, 7500.0, 20000.0, 20000.0) :: Row(2013,
-                                                          48000.0,
-                                                          48000.0,
-                                                          30000.0,
-                                                          30000.0) :: Nil
+      Row(2012, 15000.0, 7500.0, 20000.0, 20000.0) :: Row(
+        2013,
+        48000.0,
+        48000.0,
+        30000.0,
+        30000.0) :: Nil
     )
   }
 

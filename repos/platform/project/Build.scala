@@ -171,21 +171,22 @@ object PlatformBuild extends Build {
   lazy val platform = Project(id = "platform", base = file("."))
     .settings(
       ScctPlugin.mergeReportSettings ++ ScctPlugin.instrumentSettings: _*)
-    .aggregate(quirrel,
-               mirror,
-               yggdrasil,
-               bytecode,
-               mimir,
-               ingest,
-               bifrost,
-               auth,
-               accounts,
-               surtr,
-               util,
-               common,
-               ragnarok,
-               dvergr,
-               ratatoskr) //, mongo, jdbc, desktop)
+    .aggregate(
+      quirrel,
+      mirror,
+      yggdrasil,
+      bytecode,
+      mimir,
+      ingest,
+      bifrost,
+      auth,
+      accounts,
+      surtr,
+      util,
+      common,
+      ragnarok,
+      dvergr,
+      ratatoskr) //, mongo, jdbc, desktop)
 
   lazy val util =
     Project(id = "util", base = file("util"))
@@ -212,17 +213,19 @@ object PlatformBuild extends Build {
 
   lazy val niflheim = Project(id = "niflheim", base = file("niflheim"))
     .settings(commonAssemblySettings: _*)
-    .dependsOn(common % "compile->compile;test->test",
-               util,
-               logging % "test->test")
+    .dependsOn(
+      common % "compile->compile;test->test",
+      util,
+      logging % "test->test")
 
   lazy val yggdrasil = Project(id = "yggdrasil", base = file("yggdrasil"))
     .settings(commonAssemblySettings: _*)
-    .dependsOn(common % "compile->compile;test->test",
-               bytecode,
-               util,
-               niflheim,
-               logging % "test->test")
+    .dependsOn(
+      common % "compile->compile;test->test",
+      bytecode,
+      util,
+      niflheim,
+      logging % "test->test")
 
   lazy val yggdrasilProf =
     Project(id = "yggdrasilProf", base = file("yggdrasilProf"))
@@ -231,8 +234,9 @@ object PlatformBuild extends Build {
           profileTask,
           Test,
           "com.precog.yggdrasil.test.Run")): _*)
-      .dependsOn(yggdrasil % "compile->compile;compile->test",
-                 logging % "test->test")
+      .dependsOn(
+        yggdrasil % "compile->compile;compile->test",
+        logging % "test->test")
 
   lazy val mongo = Project(id = "mongo", base = file("mongo"))
     .settings(commonAssemblySettings: _*)
@@ -248,11 +252,12 @@ object PlatformBuild extends Build {
 
   lazy val mimir = Project(id = "mimir", base = file("mimir"))
     .settings(commonNexusSettings: _*)
-    .dependsOn(util % "compile->compile;test->test",
-               common,
-               bytecode % "compile->compile;test->test",
-               yggdrasil % "compile->compile;test->test",
-               logging % "test->test")
+    .dependsOn(
+      util % "compile->compile;test->test",
+      common,
+      bytecode % "compile->compile;test->test",
+      yggdrasil % "compile->compile;test->test",
+      logging % "test->test")
 
   /// Testing ///
 
@@ -270,33 +275,36 @@ object PlatformBuild extends Build {
 
   lazy val ragnarok = Project(id = "ragnarok", base = file("ragnarok"))
     .settings(commonAssemblySettings: _*)
-    .dependsOn(quirrel,
-               mimir,
-               yggdrasil,
-               ingest,
-               muspelheim % "compile->compile;test->test",
-               logging % "test->test")
+    .dependsOn(
+      quirrel,
+      mimir,
+      yggdrasil,
+      ingest,
+      muspelheim % "compile->compile;test->test",
+      logging % "test->test")
 
   lazy val gjallerhorn =
     Project(id = "gjallerhorn", base = file("gjallerhorn"))
       .settings(commonAssemblySettings: _*)
-      .dependsOn(quirrel,
-                 mimir,
-                 yggdrasil % "compile->test",
-                 ingest,
-                 muspelheim % "compile->compile;test->test",
-                 logging % "test->test")
+      .dependsOn(
+        quirrel,
+        mimir,
+        yggdrasil % "compile->test",
+        ingest,
+        muspelheim % "compile->compile;test->test",
+        logging % "test->test")
 
   lazy val performance =
     Project(id = "performance", base = file("performance"))
       .settings(commonNexusSettings: _*)
-      .dependsOn(ingest,
-                 common % "compile->compile;test->test",
-                 quirrel,
-                 mimir,
-                 yggdrasil,
-                 bifrost,
-                 logging % "test->test")
+      .dependsOn(
+        ingest,
+        common % "compile->compile;test->test",
+        quirrel,
+        mimir,
+        yggdrasil,
+        bifrost,
+        logging % "test->test")
 
   lazy val jprofiler = Project(id = "jprofiler", base = file("jprofiler"))
     .settings(jprofilerSettings ++ commonNexusSettings ++ Seq(
@@ -316,21 +324,24 @@ object PlatformBuild extends Build {
 
   lazy val ingest = Project(id = "ingest", base = file("ingest"))
     .settings(commonAssemblySettings: _*)
-    .dependsOn(common % "compile->compile;test->test",
-               yggdrasil,
-               logging % "test->test")
+    .dependsOn(
+      common % "compile->compile;test->test",
+      yggdrasil,
+      logging % "test->test")
 
   lazy val dvergr = Project(id = "dvergr", base = file("dvergr"))
     .settings(commonAssemblySettings: _*)
-    .dependsOn(common % "compile->compile;test->test",
-               util,
-               logging % "test->test")
+    .dependsOn(
+      common % "compile->compile;test->test",
+      util,
+      logging % "test->test")
 
   lazy val bifrost = Project(id = "bifrost", base = file("bifrost"))
     .settings(commonAssemblySettings: _*)
-    .dependsOn(common % "compile->compile;test->test",
-               muspelheim,
-               surtr % "test->test")
+    .dependsOn(
+      common % "compile->compile;test->test",
+      muspelheim,
+      surtr % "test->test")
 
   /// Tooling ///
 

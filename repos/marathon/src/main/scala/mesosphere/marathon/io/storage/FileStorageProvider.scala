@@ -55,9 +55,10 @@ case class FileStorageItem(file: File,
   */
 class FileStorageProvider(val url: String, val basePath: File)
     extends StorageProvider {
-  require(basePath.exists(),
-          "Base path does not exist: %s. Configuration error?".format(
-            basePath.getAbsolutePath))
+  require(
+    basePath.exists(),
+    "Base path does not exist: %s. Configuration error?".format(
+      basePath.getAbsolutePath))
 
   def item(path: String): FileStorageItem = {
     val file: File = new File(basePath, path)

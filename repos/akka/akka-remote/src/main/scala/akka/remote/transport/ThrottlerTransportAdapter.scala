@@ -128,9 +128,9 @@ object ThrottlerTransportAdapter {
       if (isAvailable(nanoTimeOfSend, tokens))
         (this.copy(
            nanoTimeOfLastSend = nanoTimeOfSend,
-           availableTokens =
-             min(availableTokens - tokens + tokensGenerated(nanoTimeOfSend),
-                 capacity)),
+           availableTokens = min(
+             availableTokens - tokens + tokensGenerated(nanoTimeOfSend),
+             capacity)),
          true)
       else (this, false)
     }
@@ -354,10 +354,11 @@ private[transport] class ThrottlerManager(wrappedTransport: Transport)
     if (target.isTerminated) Future successful SetThrottleAck
     else {
       val internalTarget = target.asInstanceOf[InternalActorRef]
-      val ref = PromiseActorRef(internalTarget.provider,
-                                timeout,
-                                target,
-                                mode.getClass.getName)
+      val ref = PromiseActorRef(
+        internalTarget.provider,
+        timeout,
+        target,
+        mode.getClass.getName)
       internalTarget.sendSystemMessage(Watch(internalTarget, ref))
       target.tell(mode, ref)
       ref.result.future.transform({
@@ -375,16 +376,19 @@ private[transport] class ThrottlerManager(wrappedTransport: Transport)
                          listener: AssociationEventListener,
                          inbound: Boolean): ThrottlerHandle = {
     val managerRef = self
-    ThrottlerHandle(originalHandle,
-                    context.actorOf(RARP(context.system)
-                                      .configureDispatcher(
-                                        Props(classOf[ThrottledAssociation],
-                                              managerRef,
-                                              listener,
-                                              originalHandle,
-                                              inbound))
-                                      .withDeploy(Deploy.local),
-                                    "throttler" + nextId()))
+    ThrottlerHandle(
+      originalHandle,
+      context.actorOf(
+        RARP(context.system)
+          .configureDispatcher(
+            Props(
+              classOf[ThrottledAssociation],
+              managerRef,
+              listener,
+              originalHandle,
+              inbound))
+          .withDeploy(Deploy.local),
+        "throttler" + nextId()))
   }
 }
 
@@ -434,8 +438,9 @@ private[transport] class ThrottledAssociation(
     val originalHandle: AssociationHandle,
     val inbound: Boolean)
     extends Actor
-    with LoggingFSM[ThrottledAssociation.ThrottlerState,
-                    ThrottledAssociation.ThrottlerData]
+    with LoggingFSM[
+      ThrottledAssociation.ThrottlerState,
+      ThrottledAssociation.ThrottlerData]
     with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
   import ThrottledAssociation._
   import context.dispatcher
@@ -517,8 +522,8 @@ private[transport] class ThrottledAssociation(
       cancelTimer(DequeueTimerName)
       if (throttledMessages.nonEmpty)
         scheduleDequeue(
-          inboundThrottleMode.timeToAvailable(System.nanoTime(),
-                                              throttledMessages.head.length))
+          inboundThrottleMode
+            .timeToAvailable(System.nanoTime(), throttledMessages.head.length))
       sender() ! SetThrottleAck
       stay()
     case Event(InboundPayload(p), _) ⇒
@@ -534,9 +539,8 @@ private[transport] class ThrottledAssociation(
           .tryConsumeTokens(System.nanoTime(), payload.length)
           ._1
         if (throttledMessages.nonEmpty)
-          scheduleDequeue(
-            inboundThrottleMode.timeToAvailable(System.nanoTime(),
-                                                throttledMessages.head.length))
+          scheduleDequeue(inboundThrottleMode
+            .timeToAvailable(System.nanoTime(), throttledMessages.head.length))
       }
       stay()
   }

@@ -27,8 +27,9 @@ class ConvertToInfixIntention extends PsiElementBaseIntentionAction {
   def isAvailable(project: Project, editor: Editor, element: PsiElement) = {
     element match {
       case Parent(
-          Both(ref: ScStableCodeReferenceElement,
-               Parent(Parent(param: ScParameterizedTypeElement))))
+          Both(
+            ref: ScStableCodeReferenceElement,
+            Parent(Parent(param: ScParameterizedTypeElement))))
           if param.typeArgList.typeArgs.size == 2 &&
             !ref.refName.forall(_.isLetterOrDigit) =>
         true
@@ -57,9 +58,10 @@ class ConvertToInfixIntention extends PsiElementBaseIntentionAction {
         paramTypeElement.replace(newTypeElement)
       } catch {
         case npe: NullPointerException =>
-          throw new RuntimeException("Unable to replace: %s with %s"
-                                       .format(paramTypeElement, newTypeText),
-                                     npe)
+          throw new RuntimeException(
+            "Unable to replace: %s with %s"
+              .format(paramTypeElement, newTypeText),
+            npe)
       }
       UndoUtil.markPsiFileForUndo(replaced.getContainingFile)
     }

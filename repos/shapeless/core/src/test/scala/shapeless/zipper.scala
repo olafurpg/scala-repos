@@ -167,15 +167,18 @@ class ZipperTests {
 
     val updatedName = z.put("Fred Bloggs").reify
     typed[Person](updatedName)
-    assertEquals(Person("Fred Bloggs",
-                        37,
-                        Address("Southover Street", "Brighton", "BN2 9UA")),
-                 updatedName)
+    assertEquals(
+      Person(
+        "Fred Bloggs",
+        37,
+        Address("Southover Street", "Brighton", "BN2 9UA")),
+      updatedName)
 
     val updatedCity = z.right.right.down.right.put("London")
     typed[Address](updatedCity.reify)
-    assertEquals(Address("Southover Street", "London", "BN2 9UA"),
-                 updatedCity.reify)
+    assertEquals(
+      Address("Southover Street", "London", "BN2 9UA"),
+      updatedCity.reify)
 
     typed[Person](updatedCity.up.reify)
     assertEquals(
@@ -189,10 +192,12 @@ class ZipperTests {
 
     val agedPerson = z.right.modify(_ + 1).reify
     typed[Person](agedPerson)
-    assertEquals(Person("Joe Grey",
-                        38,
-                        Address("Southover Street", "Brighton", "BN2 9UA")),
-                 agedPerson)
+    assertEquals(
+      Person(
+        "Joe Grey",
+        38,
+        Address("Southover Street", "Brighton", "BN2 9UA")),
+      agedPerson)
 
     val reifiedAddress = z.right.right.down.reify
     typed[Address](reifiedAddress)

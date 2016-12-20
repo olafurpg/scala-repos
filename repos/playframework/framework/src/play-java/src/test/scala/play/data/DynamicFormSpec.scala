@@ -79,16 +79,16 @@ object DynamicFormSpec extends Specification {
     }
 
     "allow access to the property when filled" in {
-      val form = new DynamicForm(jMessagesApi,
-                                 new Formatters(jMessagesApi),
-                                 validator).fill(Map("foo" -> "bar"))
+      val form =
+        new DynamicForm(jMessagesApi, new Formatters(jMessagesApi), validator)
+          .fill(Map("foo" -> "bar"))
       form.get("foo") must_== "bar"
     }
 
     "allow access to the equivalent of the raw data when filled" in {
-      val form = new DynamicForm(jMessagesApi,
-                                 new Formatters(jMessagesApi),
-                                 validator).fill(Map("foo" -> "bar"))
+      val form =
+        new DynamicForm(jMessagesApi, new Formatters(jMessagesApi), validator)
+          .fill(Map("foo" -> "bar"))
       form("foo").value() must_== "bar"
     }
   }

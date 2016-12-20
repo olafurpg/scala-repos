@@ -43,8 +43,9 @@ private[finagle] class LatencyHistogram(clipDuration: Long,
                                         now: () => Long) {
 
   require(clipDuration.toInt > 0)
-  require(error >= 0.0 && error <= 1.0,
-          s"error must be between [0.0, 1.0], was $error")
+  require(
+    error >= 0.0 && error <= 1.0,
+    s"error must be between [0.0, 1.0], was $error")
 
   /** size of each "bucket" */
   private[this] val width: Int =

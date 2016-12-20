@@ -138,11 +138,12 @@ class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
       val facade = JavaPsiFacade.getInstance(getProject)
       val pack =
         facade.findPackage(qual) //do not wrap into ScPackage to avoid SOE
-      if (pack != null && !ResolveUtils.packageProcessDeclarations(pack,
-                                                                   processor,
-                                                                   newState,
-                                                                   lastParent,
-                                                                   place))
+      if (pack != null && !ResolveUtils.packageProcessDeclarations(
+            pack,
+            processor,
+            newState,
+            lastParent,
+            place))
         return false
     }
     true
@@ -264,16 +265,17 @@ class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
         case t: ScTypedDefinition if t.isAbstractMember => true
         case _ => false
       }
-      this.processPsiMethodsForNode(node,
-                                    isStatic = false,
-                                    isInterface = isInterface)(res += _)
+      this.processPsiMethodsForNode(
+        node,
+        isStatic = false,
+        isInterface = isInterface)(res += _)
     }
 
     for (synthetic <- syntheticMethodsNoOverride) {
       this.processPsiMethodsForNode(
-        new SignatureNodes.Node(new PhysicalSignature(synthetic,
-                                                      ScSubstitutor.empty),
-                                ScSubstitutor.empty),
+        new SignatureNodes.Node(
+          new PhysicalSignature(synthetic, ScSubstitutor.empty),
+          ScSubstitutor.empty),
         isStatic = false,
         isInterface = isInterface)(res += _)
     }
@@ -306,8 +308,9 @@ class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
   private val hardParameterlessSignatures: mutable.WeakHashMap[
     Project,
     TypeDefinitionMembers.ParameterlessNodes.Map] =
-    new mutable.WeakHashMap[Project,
-                            TypeDefinitionMembers.ParameterlessNodes.Map]
+    new mutable.WeakHashMap[
+      Project,
+      TypeDefinitionMembers.ParameterlessNodes.Map]
   def getHardParameterlessSignatures: TypeDefinitionMembers.ParameterlessNodes.Map = {
     hardParameterlessSignatures.getOrElseUpdate(
       getProject,

@@ -86,11 +86,12 @@ abstract class IntroduceParameterTestBase
       ScalaUtils.runWriteActionDoNotRequestConfirmation(new Runnable {
         def run() {
           editor.getSelectionModel.setSelection(startOffset, endOffset)
-          ScalaRefactoringUtil.afterExpressionChoosing(project,
-                                                       editor,
-                                                       scalaFile,
-                                                       null,
-                                                       "Introduce Variable") {
+          ScalaRefactoringUtil.afterExpressionChoosing(
+            project,
+            editor,
+            scalaFile,
+            null,
+            "Introduce Variable") {
             ScalaRefactoringUtil.trimSpacesAndComments(editor, scalaFile)
             PsiDocumentManager.getInstance(project).commitAllDocuments()
             val handler = new ScalaIntroduceParameterHandler()
@@ -109,35 +110,39 @@ abstract class IntroduceParameterTestBase
                  StdType.ANY)
               else {
                 val fun =
-                  PsiTreeUtil.getContextOfType(elems.head,
-                                               true,
-                                               classOf[ScFunctionDefinition])
+                  PsiTreeUtil.getContextOfType(
+                    elems.head,
+                    true,
+                    classOf[ScFunctionDefinition])
                 (fun, fun.returnType.getOrAny)
               }
             val collectedData =
               handler.collectData(exprWithTypes, elems, methodLike, editor)
-            assert(collectedData.isDefined,
-                   "Could not collect data for introduce parameter")
+            assert(
+              collectedData.isDefined,
+              "Could not collect data for introduce parameter")
             val data = collectedData.get
               .copy(paramName = paramName, replaceAll = replaceAllOccurrences)
 
             val paramInfo =
-              new ScalaParameterInfo(data.paramName,
-                                     -1,
-                                     data.tp,
-                                     project,
-                                     false,
-                                     false,
-                                     data.defaultArg,
-                                     isIntroducedParameter = true)
+              new ScalaParameterInfo(
+                data.paramName,
+                -1,
+                data.tp,
+                project,
+                false,
+                false,
+                data.defaultArg,
+                isIntroducedParameter = true)
             val descriptor: ScalaMethodDescriptor =
               handler.createMethodDescriptor(data.methodToSearchFor, paramInfo)
-            val changeInfo = new ScalaChangeInfo(descriptor.getVisibility,
-                                                 data.methodToSearchFor,
-                                                 descriptor.getName,
-                                                 returnType,
-                                                 descriptor.parameters,
-                                                 isDefaultParam)
+            val changeInfo = new ScalaChangeInfo(
+              descriptor.getVisibility,
+              data.methodToSearchFor,
+              descriptor.getName,
+              returnType,
+              descriptor.parameters,
+              isDefaultParam)
 
             changeInfo.introducedParameterData = Some(data)
             new ScalaChangeSignatureProcessor(project, changeInfo).run()
@@ -147,8 +152,9 @@ abstract class IntroduceParameterTestBase
       res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim
     } catch {
       case e: Exception =>
-        assert(assertion = false,
-               message = e.getMessage + "\n" + e.getStackTrace)
+        assert(
+          assertion = false,
+          message = e.getMessage + "\n" + e.getStackTrace)
     }
 
     val text = lastPsi.getText

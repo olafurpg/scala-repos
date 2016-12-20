@@ -161,9 +161,10 @@ sealed abstract class IList[A] extends Product with Serializable {
 
   def groupBy1[K](f: A => K)(implicit ev: Order[K]): K ==>> OneAnd[IList, A] =
     foldLeft(==>>.empty[K, OneAnd[IList, A]]) { (m, a) =>
-      m.alter(f(a),
-              _.map(oa => OneAnd(a, oa.head :: oa.tail)) orElse Some(
-                OneAnd(a, empty)))
+      m.alter(
+        f(a),
+        _.map(oa => OneAnd(a, oa.head :: oa.tail)) orElse Some(
+          OneAnd(a, empty)))
     }
 
   def headOption: Option[A] =
@@ -423,8 +424,9 @@ sealed abstract class IList[A] extends Product with Serializable {
   }
 
   def toEphemeralStream: EphemeralStream[A] =
-    uncons(EphemeralStream(),
-           (h, t) => EphemeralStream.cons(h, t.toEphemeralStream))
+    uncons(
+      EphemeralStream(),
+      (h, t) => EphemeralStream.cons(h, t.toEphemeralStream))
 
   def toList: List[A] =
     foldRight(Nil: List[A])(_ :: _)

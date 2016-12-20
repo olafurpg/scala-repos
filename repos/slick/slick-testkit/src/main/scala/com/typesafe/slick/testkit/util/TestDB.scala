@@ -50,12 +50,13 @@ object TestDB {
     /** Supports all tested transaction isolation levels */
     val transactionIsolation = new Capability("test.transactionIsolation")
 
-    val all = Set(plainSql,
-                  jdbcMeta,
-                  jdbcMetaGetClientInfoProperties,
-                  jdbcMetaGetFunctions,
-                  jdbcMetaGetIndexInfo,
-                  transactionIsolation)
+    val all = Set(
+      plainSql,
+      jdbcMeta,
+      jdbcMetaGetClientInfoProperties,
+      jdbcMetaGetFunctions,
+      jdbcMetaGetIndexInfo,
+      transactionIsolation)
   }
 
   /** Copy a file, expanding it if the source name ends with .gz */

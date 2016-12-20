@@ -26,10 +26,11 @@ final object Aggregation {
   final case class KeyValue[+T](key: ScopedKey[_], value: T)
 
   def defaultShow(state: State, showTasks: Boolean): ShowConfig =
-    ShowConfig(settingValues = true,
-               taskValues = showTasks,
-               s => state.log.info(s),
-               success = true)
+    ShowConfig(
+      settingValues = true,
+      taskValues = showTasks,
+      s => state.log.info(s),
+      success = true)
   def printSettings(xs: Seq[KeyValue[_]], print: String => Unit)(
       implicit display: Show[ScopedKey[_]]) =
     xs match {
@@ -54,8 +55,9 @@ final object Aggregation {
       runTasks(s, structure, ts, DummyTaskMap(Nil), show)
     }
 
-  @deprecated("Use `timedRun` and `showRun` directly or use `runTasks`.",
-              "0.13.0")
+  @deprecated(
+    "Use `timedRun` and `showRun` directly or use `runTasks`.",
+    "0.13.0")
   def runTasksWithResult[T](
       s: State,
       structure: BuildStructure,
@@ -207,10 +209,11 @@ final object Aggregation {
         val base =
           if (tasks.isEmpty) success(() => s)
           else
-            applyTasks(s,
-                       structure,
-                       maps(tasks)(x => success(castToAny(x))),
-                       show)
+            applyTasks(
+              s,
+              structure,
+              maps(tasks)(x => success(castToAny(x))),
+              show)
         base.map { res => () =>
           val newState = res()
           if (show.settingValues && settings.nonEmpty)

@@ -84,12 +84,14 @@ class Performance(
         0.0
       }
 
-    benchmark(test,
-              BenchmarkResults(0,
-                               repeatsRequired(),
-                               overhead,
-                               Vector.empty[Long],
-                               Vector.empty[T]))
+    benchmark(
+      test,
+      BenchmarkResults(
+        0,
+        repeatsRequired(),
+        overhead,
+        Vector.empty[Long],
+        Vector.empty[T]))
   }
 
   def time[T](repeat: Int, f: => T): (Long, T) = {
@@ -126,11 +128,12 @@ case class BenchmarkResults[T](testRuns: Int,
                                timings: Vector[Long],
                                results: Vector[T] = Vector.empty[T]) {
   def add(timing: Long, result: T): BenchmarkResults[T] =
-    BenchmarkResults(testRuns + 1,
-                     repCount,
-                     baseline,
-                     timings :+ timing,
-                     results :+ result)
+    BenchmarkResults(
+      testRuns + 1,
+      repCount,
+      baseline,
+      timings :+ timing,
+      results :+ result)
 
   private val reportTemplate =
     """

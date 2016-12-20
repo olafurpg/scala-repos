@@ -46,8 +46,9 @@ object Protocols {
           case NonFatal(t) =>
             Logger
               .get()
-              .info("%s unable to initialize sun.misc.Unsafe",
-                    getClass.getName)
+              .info(
+                "%s unable to initialize sun.misc.Unsafe",
+                getClass.getName)
             null
         }
     }
@@ -77,11 +78,12 @@ object Protocols {
         statsReceiver.counter("larger_than_threadlocal_out_buffer")
       new TProtocolFactory {
         override def getProtocol(trans: TTransport): TProtocol = {
-          val proto = new TFinagleBinaryProtocol(trans,
-                                                 fastEncodeFailed,
-                                                 largerThanTlOutBuffer,
-                                                 strictRead,
-                                                 strictWrite)
+          val proto = new TFinagleBinaryProtocol(
+            trans,
+            fastEncodeFailed,
+            largerThanTlOutBuffer,
+            strictRead,
+            strictWrite)
           if (readLength != 0) {
             proto.setReadLength(readLength)
           }

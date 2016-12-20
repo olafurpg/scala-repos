@@ -97,8 +97,8 @@ case class ScalaFieldEvaluator(objectEvaluator: Evaluator,
         }
         if (field == null || !field.isStatic) {
           throw EvaluationException(
-            DebuggerBundle.message("evaluation.error.no.static.field",
-                                   fieldName))
+            DebuggerBundle
+              .message("evaluation.error.no.static.field", fieldName))
         }
         myEvaluatedField = field
         myEvaluatedQualifier = refType
@@ -108,8 +108,8 @@ case class ScalaFieldEvaluator(objectEvaluator: Evaluator,
         if (!(refType.isInstanceOf[ClassType] ||
               refType.isInstanceOf[ArrayType])) {
           throw EvaluationException(
-            DebuggerBundle.message("evaluation.error.class.or.array.expected",
-                                   fieldName))
+            DebuggerBundle
+              .message("evaluation.error.class.or.array.expected", fieldName))
         }
         objRef match {
           case arrayRef: ArrayReference if "length" == fieldName =>
@@ -125,8 +125,8 @@ case class ScalaFieldEvaluator(objectEvaluator: Evaluator,
         }
         if (field == null) {
           throw EvaluationException(
-            DebuggerBundle.message("evaluation.error.no.instance.field",
-                                   fieldName))
+            DebuggerBundle
+              .message("evaluation.error.no.instance.field", fieldName))
         }
         myEvaluatedQualifier = if (field.isStatic) refType else objRef
         myEvaluatedField = field
@@ -134,8 +134,8 @@ case class ScalaFieldEvaluator(objectEvaluator: Evaluator,
       case null => throw EvaluationException(new NullPointerException)
       case _ =>
         throw EvaluationException(
-          DebuggerBundle.message("evaluation.error.evaluating.field",
-                                 fieldName))
+          DebuggerBundle
+            .message("evaluation.error.evaluating.field", fieldName))
     }
   }
 

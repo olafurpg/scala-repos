@@ -25,9 +25,10 @@ object Setup extends LilaController with TheftPrevention {
   def aiForm = Open { implicit ctx =>
     if (HTTPRequest isXhr ctx.req) {
       env.forms aiFilled get("fen") map { form =>
-        html.setup.ai(form,
-                      Env.fishnet.aiPerfApi.intRatings,
-                      form("fen").value flatMap ValidFen(getBool("strict")))
+        html.setup.ai(
+          form,
+          Env.fishnet.aiPerfApi.intRatings,
+          form("fen").value flatMap ValidFen(getBool("strict")))
       }
     } else
       fuccess {
@@ -126,15 +127,17 @@ object Setup extends LilaController with TheftPrevention {
           .bindFromRequest
           .fold(
             err =>
-              negotiate(html = BadRequest(errorsAsJson(err).toString).fuccess,
-                        api = _ => BadRequest(errorsAsJson(err)).fuccess),
+              negotiate(
+                html = BadRequest(errorsAsJson(err).toString).fuccess,
+                api = _ => BadRequest(errorsAsJson(err)).fuccess),
             config =>
               (ctx.userId ?? Env.relation.api.fetchBlocking) flatMap {
                 blocking =>
-                  env.processor.hook(config,
-                                     uid,
-                                     HTTPRequest sid req,
-                                     blocking) map hookResponse recover {
+                  env.processor.hook(
+                    config,
+                    uid,
+                    HTTPRequest sid req,
+                    blocking) map hookResponse recover {
                     case e: IllegalArgumentException =>
                       BadRequest(jsonError(e.getMessage)) as JSON
                   }
@@ -153,10 +156,11 @@ object Setup extends LilaController with TheftPrevention {
           } flatMap { config =>
             (ctx.userId ?? Env.relation.api.fetchBlocking) flatMap {
               blocking =>
-                env.processor.hook(config,
-                                   uid,
-                                   HTTPRequest sid ctx.req,
-                                   blocking) map hookResponse recover {
+                env.processor.hook(
+                  config,
+                  uid,
+                  HTTPRequest sid ctx.req,
+                  blocking) map hookResponse recover {
                   case e: IllegalArgumentException =>
                     BadRequest(jsonError(e.getMessage)) as JSON
                 }
@@ -224,9 +228,10 @@ object Setup extends LilaController with TheftPrevention {
     val redir = Redirect(routes.Round.watcher(pov.game.id, "white"))
     if (ctx.isAuth) redir
     else
-      redir withCookies LilaCookie.cookie(AnonCookie.name,
-                                          pov.playerId,
-                                          maxAge = AnonCookie.maxAge.some,
-                                          httpOnly = false.some)
+      redir withCookies LilaCookie.cookie(
+        AnonCookie.name,
+        pov.playerId,
+        maxAge = AnonCookie.maxAge.some,
+        httpOnly = false.some)
   }
 }

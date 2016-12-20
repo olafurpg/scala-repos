@@ -81,13 +81,14 @@ class XmlRenameHandler extends RenameHandler {
 
       HighlightManager
         .getInstance(editor.getProject)
-        .addOccurrenceHighlight(editor,
-                                matchedRange.getStartOffset,
-                                matchedRange.getEndOffset,
-                                attributes,
-                                0,
-                                rangeHighlighters,
-                                null)
+        .addOccurrenceHighlight(
+          editor,
+          matchedRange.getStartOffset,
+          matchedRange.getEndOffset,
+          attributes,
+          0,
+          rangeHighlighters,
+          null)
 
       rangeHighlighters.foreach { a =>
         a.setGreedyToLeft(true)
@@ -148,10 +149,11 @@ class XmlRenameHandler extends RenameHandler {
             calculateQuickResult(context)
         },
         true)
-      builder.replaceElement(element.getMatchedTag.getTagNameElement,
-                             "second",
-                             "first",
-                             false)
+      builder.replaceElement(
+        element.getMatchedTag.getTagNameElement,
+        "second",
+        "first",
+        false)
 
       builder.buildInlineTemplate()
     }

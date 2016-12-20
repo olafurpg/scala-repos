@@ -120,8 +120,8 @@ trait FileUploadSupport extends ServletBase with HasMultipartConfig {
                   params.fileParams +
                     ((
                        item.getFieldName,
-                       item +: params.fileParams.getOrElse(item.getFieldName,
-                                                           List[FileItem]())
+                       item +: params.fileParams
+                         .getOrElse(item.getFieldName, List[FileItem]())
                      )),
                   params.formParams)
               } else {
@@ -140,8 +140,9 @@ trait FileUploadSupport extends ServletBase with HasMultipartConfig {
       if (isMultipartRequest(req)) req.getParts.asScala else Seq.empty[Part]
     } catch {
       case e: Exception if isSizeConstraintException(e) =>
-        throw new SizeConstraintExceededException("Too large request or file",
-                                                  e)
+        throw new SizeConstraintExceededException(
+          "Too large request or file",
+          e)
     }
   }
 

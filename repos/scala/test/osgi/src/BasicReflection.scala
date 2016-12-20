@@ -57,8 +57,9 @@ class BasicReflectionTest extends ScalaOsgiHelper {
       "Unable to reflect field name!",
       "value f1",
       im.reflectField(typeOf[C].member(TermName("f1")).asTerm).symbol.toString)
-    assertEquals("Unable to reflect value!",
-                 2,
-                 im.reflectField(typeOf[C].member(TermName("f1")).asTerm).get)
+    assertEquals(
+      "Unable to reflect value!",
+      2,
+      im.reflectField(typeOf[C].member(TermName("f1")).asTerm).get)
   }
 }

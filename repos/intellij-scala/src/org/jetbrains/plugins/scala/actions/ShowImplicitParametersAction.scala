@@ -185,8 +185,9 @@ class ShowImplicitParametersAction
       }
       val expressions = getExpressions
       def chooseExpression(expr: PsiElement) {
-        editor.getSelectionModel.setSelection(expr.getTextRange.getStartOffset,
-                                              expr.getTextRange.getEndOffset)
+        editor.getSelectionModel.setSelection(
+          expr.getTextRange.getStartOffset,
+          expr.getTextRange.getEndOffset)
         forExpr(expr)
       }
       if (expressions.length == 0) {
@@ -330,9 +331,10 @@ class ImplicitParametersTreeStructure(project: Project,
 
   class ImplicitParametersNode(value: ScalaResolveResult,
                                implicitResult: Option[ImplicitResult] = None)
-      extends AbstractPsiBasedNode[ScalaResolveResult](project,
-                                                       value,
-                                                       ViewSettings.DEFAULT) {
+      extends AbstractPsiBasedNode[ScalaResolveResult](
+        project,
+        value,
+        ViewSettings.DEFAULT) {
     override def extractPsiFromValue(): PsiNamedElement = value.getElement
 
     override def getChildrenImpl: util.Collection[AbstractTreeNode[_]] = {

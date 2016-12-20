@@ -73,15 +73,17 @@ class RDDOperationScopeSuite extends SparkFunSuite with BeforeAndAfter {
     RDDOperationScope
       .withScope(sc, "scope1", allowNesting = false, ignoreParent = false) {
         rdd1 = new MyCoolRDD(sc)
-        RDDOperationScope.withScope(sc,
-                                    "scope2",
-                                    allowNesting = false,
-                                    ignoreParent = false) {
+        RDDOperationScope.withScope(
+          sc,
+          "scope2",
+          allowNesting = false,
+          ignoreParent = false) {
           rdd2 = new MyCoolRDD(sc)
-          RDDOperationScope.withScope(sc,
-                                      "scope3",
-                                      allowNesting = false,
-                                      ignoreParent = false) {
+          RDDOperationScope.withScope(
+            sc,
+            "scope3",
+            allowNesting = false,
+            ignoreParent = false) {
             rdd3 = new MyCoolRDD(sc)
           }
         }
@@ -105,15 +107,17 @@ class RDDOperationScopeSuite extends SparkFunSuite with BeforeAndAfter {
       .withScope(sc, "scope1", allowNesting = true, ignoreParent = false) {
         rdd1 = new MyCoolRDD(sc)
         // stop nesting here
-        RDDOperationScope.withScope(sc,
-                                    "scope2",
-                                    allowNesting = false,
-                                    ignoreParent = false) {
+        RDDOperationScope.withScope(
+          sc,
+          "scope2",
+          allowNesting = false,
+          ignoreParent = false) {
           rdd2 = new MyCoolRDD(sc)
-          RDDOperationScope.withScope(sc,
-                                      "scope3",
-                                      allowNesting = false,
-                                      ignoreParent = false) {
+          RDDOperationScope.withScope(
+            sc,
+            "scope3",
+            allowNesting = false,
+            ignoreParent = false) {
             rdd3 = new MyCoolRDD(sc)
           }
         }
@@ -135,15 +139,17 @@ class RDDOperationScopeSuite extends SparkFunSuite with BeforeAndAfter {
     RDDOperationScope
       .withScope(sc, "scope1", allowNesting = true, ignoreParent = false) {
         rdd1 = new MyCoolRDD(sc)
-        RDDOperationScope.withScope(sc,
-                                    "scope2",
-                                    allowNesting = true,
-                                    ignoreParent = false) {
+        RDDOperationScope.withScope(
+          sc,
+          "scope2",
+          allowNesting = true,
+          ignoreParent = false) {
           rdd2 = new MyCoolRDD(sc)
-          RDDOperationScope.withScope(sc,
-                                      "scope3",
-                                      allowNesting = true,
-                                      ignoreParent = false) {
+          RDDOperationScope.withScope(
+            sc,
+            "scope3",
+            allowNesting = true,
+            ignoreParent = false) {
             rdd3 = new MyCoolRDD(sc)
           }
         }

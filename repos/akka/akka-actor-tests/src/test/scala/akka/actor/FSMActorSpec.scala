@@ -263,9 +263,10 @@ class FSMActorSpec
       import scala.collection.JavaConverters._
       val config = ConfigFactory
         .parseMap(
-          Map("akka.loglevel" -> "DEBUG",
-              "akka.actor.serialize-messages" -> "off",
-              "akka.actor.debug.fsm" -> true).asJava)
+          Map(
+            "akka.loglevel" -> "DEBUG",
+            "akka.actor.serialize-messages" -> "off",
+            "akka.actor.debug.fsm" -> true).asJava)
         .withFallback(system.settings.config)
       val fsmEventSystem = ActorSystem("fsmEvent", config)
       try {
@@ -298,11 +299,13 @@ class FSMActorSpec
             }
             expectMsg(
               1 second,
-              Logging.Debug(name,
-                            fsmClass,
-                            "setting timer 't'/1500 milliseconds: Shutdown"))
-            expectMsg(1 second,
-                      Logging.Debug(name, fsmClass, "transition 1 -> 2"))
+              Logging.Debug(
+                name,
+                fsmClass,
+                "setting timer 't'/1500 milliseconds: Shutdown"))
+            expectMsg(
+              1 second,
+              Logging.Debug(name, fsmClass, "transition 1 -> 2"))
             fsm ! "stop"
             expectMsgPF(1 second, hint = "processing Event(stop,null)") {
               case Logging.Debug(`name`, `fsmClass`, s: String)
@@ -337,16 +340,20 @@ class FSMActorSpec
       expectMsg(1 second, IndexedSeq(LogEntry(1, 0, "log")))
       fsmref ! "count"
       fsmref ! "log"
-      expectMsg(1 second,
-                IndexedSeq(LogEntry(1, 0, "log"),
-                           LogEntry(1, 0, "count"),
-                           LogEntry(1, 1, "log")))
+      expectMsg(
+        1 second,
+        IndexedSeq(
+          LogEntry(1, 0, "log"),
+          LogEntry(1, 0, "count"),
+          LogEntry(1, 1, "log")))
       fsmref ! "count"
       fsmref ! "log"
-      expectMsg(1 second,
-                IndexedSeq(LogEntry(1, 1, "log"),
-                           LogEntry(1, 1, "count"),
-                           LogEntry(1, 2, "log")))
+      expectMsg(
+        1 second,
+        IndexedSeq(
+          LogEntry(1, 1, "log"),
+          LogEntry(1, 1, "count"),
+          LogEntry(1, 2, "log")))
     }
 
     "allow transforming of state results" in {

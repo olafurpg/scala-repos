@@ -120,21 +120,24 @@ object TestResultLogger {
         results.summaries.headOption.forall(_.summaryText.isEmpty)
 
     val printStandard = TestResultLogger((log, results, _) => {
-      val (skippedCount,
-           errorsCount,
-           passedCount,
-           failuresCount,
-           ignoredCount,
-           canceledCount,
-           pendingCount) = results.events.foldLeft((0, 0, 0, 0, 0, 0, 0)) {
-        case ((skippedAcc,
-               errorAcc,
-               passedAcc,
-               failureAcc,
-               ignoredAcc,
-               canceledAcc,
-               pendingAcc),
-              (name, testEvent)) =>
+      val (
+        skippedCount,
+        errorsCount,
+        passedCount,
+        failuresCount,
+        ignoredCount,
+        canceledCount,
+        pendingCount) = results.events.foldLeft((0, 0, 0, 0, 0, 0, 0)) {
+        case (
+            (
+              skippedAcc,
+              errorAcc,
+              passedAcc,
+              failureAcc,
+              ignoredAcc,
+              canceledAcc,
+              pendingAcc),
+            (name, testEvent)) =>
           (skippedAcc + testEvent.skippedCount,
            errorAcc + testEvent.errorCount,
            passedAcc + testEvent.passedCount,
@@ -148,10 +151,11 @@ object TestResultLogger {
       val base =
         s"Total $totalCount, Failed $failuresCount, Errors $errorsCount, Passed $passedCount"
 
-      val otherCounts = Seq("Skipped" -> skippedCount,
-                            "Ignored" -> ignoredCount,
-                            "Canceled" -> canceledCount,
-                            "Pending" -> pendingCount)
+      val otherCounts = Seq(
+        "Skipped" -> skippedCount,
+        "Ignored" -> ignoredCount,
+        "Canceled" -> canceledCount,
+        "Pending" -> pendingCount)
       val extra = otherCounts.filter(_._2 > 0).map {
         case (label, count) => s", $label $count"
       }

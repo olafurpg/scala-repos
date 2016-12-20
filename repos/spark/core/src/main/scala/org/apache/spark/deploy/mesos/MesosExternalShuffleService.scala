@@ -47,10 +47,11 @@ private[mesos] class MesosExternalShuffleBlockHandler(
 
   ThreadUtils
     .newDaemonSingleThreadScheduledExecutor("shuffle-cleaner-watcher")
-    .scheduleAtFixedRate(new CleanerThread(),
-                         0,
-                         cleanerIntervalS,
-                         TimeUnit.SECONDS)
+    .scheduleAtFixedRate(
+      new CleanerThread(),
+      0,
+      cleanerIntervalS,
+      TimeUnit.SECONDS)
 
   // Stores a map of app id to app state (timeout value and last heartbeat)
   private val connectedApps = new ConcurrentHashMap[String, AppState]()
@@ -140,8 +141,9 @@ private[mesos] class MesosExternalShuffleService(
 private[spark] object MesosExternalShuffleService extends Logging {
 
   def main(args: Array[String]): Unit = {
-    ExternalShuffleService.main(args,
-                                (conf: SparkConf, sm: SecurityManager) =>
-                                  new MesosExternalShuffleService(conf, sm))
+    ExternalShuffleService.main(
+      args,
+      (conf: SparkConf,
+       sm: SecurityManager) => new MesosExternalShuffleService(conf, sm))
   }
 }

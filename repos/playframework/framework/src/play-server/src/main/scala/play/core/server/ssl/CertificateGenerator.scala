@@ -37,12 +37,13 @@ object CertificateGenerator {
     val keyGen = KeyPairGenerator.getInstance("RSA")
     keyGen.initialize(keySize, new SecureRandom())
     val pair = keyGen.generateKeyPair()
-    generateCertificate(dn,
-                        pair,
-                        from.toDate,
-                        to.toDate,
-                        "SHA256withRSA",
-                        AlgorithmId.sha256WithRSAEncryption_oid)
+    generateCertificate(
+      dn,
+      pair,
+      from.toDate,
+      to.toDate,
+      "SHA256withRSA",
+      AlgorithmId.sha256WithRSAEncryption_oid)
   }
 
   def generateRSAWithSHA1(keySize: Int = 2048,
@@ -57,12 +58,13 @@ object CertificateGenerator {
     val keyGen = KeyPairGenerator.getInstance("RSA")
     keyGen.initialize(keySize, new SecureRandom())
     val pair = keyGen.generateKeyPair()
-    generateCertificate(dn,
-                        pair,
-                        from.toDate,
-                        to.toDate,
-                        "SHA1withRSA",
-                        AlgorithmId.sha256WithRSAEncryption_oid)
+    generateCertificate(
+      dn,
+      pair,
+      from.toDate,
+      to.toDate,
+      "SHA1withRSA",
+      AlgorithmId.sha256WithRSAEncryption_oid)
   }
 
   def toPEM(certificate: X509Certificate) = {
@@ -89,12 +91,13 @@ object CertificateGenerator {
     val keyGen = KeyPairGenerator.getInstance("RSA")
     keyGen.initialize(keySize, new SecureRandom())
     val pair = keyGen.generateKeyPair()
-    generateCertificate(dn,
-                        pair,
-                        from.toDate,
-                        to.toDate,
-                        "MD5WithRSA",
-                        AlgorithmId.md5WithRSAEncryption_oid)
+    generateCertificate(
+      dn,
+      pair,
+      from.toDate,
+      to.toDate,
+      "MD5WithRSA",
+      AlgorithmId.md5WithRSAEncryption_oid)
   }
 
   private[play] def generateCertificate(
@@ -117,10 +120,12 @@ object CertificateGenerator {
 
     info.set(X509CertInfo.VALIDITY, interval)
     info.set(X509CertInfo.SERIAL_NUMBER, new CertificateSerialNumber(sn))
-    info.set(X509CertInfo.SUBJECT,
-             if (justName) owner else new CertificateSubjectName(owner))
-    info.set(X509CertInfo.ISSUER,
-             if (justName) owner else new CertificateIssuerName(owner))
+    info.set(
+      X509CertInfo.SUBJECT,
+      if (justName) owner else new CertificateSubjectName(owner))
+    info.set(
+      X509CertInfo.ISSUER,
+      if (justName) owner else new CertificateIssuerName(owner))
     info.set(X509CertInfo.KEY, new CertificateX509Key(pair.getPublic))
     info
       .set(X509CertInfo.VERSION, new CertificateVersion(CertificateVersion.V3))

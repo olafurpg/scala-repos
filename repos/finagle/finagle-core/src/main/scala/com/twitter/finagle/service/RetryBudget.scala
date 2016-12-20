@@ -137,12 +137,15 @@ object RetryBudget {
       percentCanRetry: Double,
       nowMillis: () => Long = Stopwatch.systemMillis
   ): RetryBudget = {
-    require(ttl.inSeconds >= 1 && ttl.inSeconds <= 60,
-            s"ttl must be [1 second, 60 seconds]: $ttl")
-    require(minRetriesPerSec >= 0,
-            s"minRetriesPerSec must be non-negative: $minRetriesPerSec")
-    require(percentCanRetry >= 0.0,
-            s"percentCanRetry must be non-negative: $percentCanRetry")
+    require(
+      ttl.inSeconds >= 1 && ttl.inSeconds <= 60,
+      s"ttl must be [1 second, 60 seconds]: $ttl")
+    require(
+      minRetriesPerSec >= 0,
+      s"minRetriesPerSec must be non-negative: $minRetriesPerSec")
+    require(
+      percentCanRetry >= 0.0,
+      s"percentCanRetry must be non-negative: $percentCanRetry")
     require(
       percentCanRetry <= TokenRetryBudget.ScaleFactor,
       s"percentCanRetry must not be greater than ${TokenRetryBudget.ScaleFactor}: $percentCanRetry")

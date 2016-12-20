@@ -81,8 +81,9 @@ class HyperLogLogPlusPlusSuite extends SparkFunSuite {
         val estimate = hll.eval(buffer).asInstanceOf[Long].toDouble
         val cardinality = c(n)
         val error = math.abs((estimate / cardinality.toDouble) - 1.0d)
-        assert(error < hll.trueRsd * 3.0d,
-               "Error should be within 3 std. errors.")
+        assert(
+          error < hll.trueRsd * 3.0d,
+          "Error should be within 3 std. errors.")
     }
   }
 
@@ -109,10 +110,11 @@ class HyperLogLogPlusPlusSuite extends SparkFunSuite {
       seen.clear()
       cardinality
     }
-    testCardinalityEstimates(Seq(0.05, 0.01),
-                             Seq(100, 10000, 500000),
-                             update,
-                             eval)
+    testCardinalityEstimates(
+      Seq(0.05, 0.01),
+      Seq(100, 10000, 500000),
+      update,
+      eval)
   }
 
   // Test merging

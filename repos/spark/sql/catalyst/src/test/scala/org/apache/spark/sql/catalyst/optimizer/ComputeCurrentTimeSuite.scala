@@ -61,8 +61,9 @@ class ComputeCurrentTimeSuite extends PlanTest {
 
   test("analyzer should replace current_date with literals") {
     val in =
-      Project(Seq(Alias(CurrentDate(), "a")(), Alias(CurrentDate(), "b")()),
-              LocalRelation())
+      Project(
+        Seq(Alias(CurrentDate(), "a")(), Alias(CurrentDate(), "b")()),
+        LocalRelation())
 
     val min = DateTimeUtils.millisToDays(System.currentTimeMillis())
     val plan = Optimize.execute(in.analyze).asInstanceOf[Project]

@@ -34,9 +34,11 @@ object Test extends ScaladocModelTest {
     val a = p._class("A")
     val c = p._class("C")
 
-    assert(a.constructors.isEmpty,
-           s"there should be no constructors, found: ${a.constructors}")
-    assert(c.constructors.isEmpty,
-           s"there should be no constructors, found: ${c.constructors}")
+    assert(
+      a.constructors.isEmpty,
+      s"there should be no constructors, found: ${a.constructors}")
+    assert(
+      c.constructors.isEmpty,
+      s"there should be no constructors, found: ${c.constructors}")
   }
 }

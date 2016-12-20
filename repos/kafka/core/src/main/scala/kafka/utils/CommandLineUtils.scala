@@ -47,9 +47,10 @@ object CommandLineUtils extends Logging {
     if (options.has(usedOption)) {
       for (arg <- invalidOptions) {
         if (options.has(arg))
-          printUsageAndDie(parser,
-                           "Option \"" + usedOption +
-                             "\" can't be used with option\"" + arg + "\"")
+          printUsageAndDie(
+            parser,
+            "Option \"" + usedOption +
+              "\" can't be used with option\"" + arg + "\"")
       }
     }
   }

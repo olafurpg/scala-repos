@@ -61,10 +61,11 @@ class PartitionAssignorTest extends Logging {
       val scenario = Scenario("g1", topicPartitionCounts, subscriptions)
       val zkUtils = PartitionAssignorTest.setupZkClientMock(scenario)
       EasyMock.replay(zkUtils.zkClient)
-      PartitionAssignorTest.assignAndVerify(scenario,
-                                            assignor,
-                                            zkUtils,
-                                            verifyAssignmentIsUniform = true)
+      PartitionAssignorTest.assignAndVerify(
+        scenario,
+        assignor,
+        zkUtils,
+        verifyAssignmentIsUniform = true)
     })
   }
 
@@ -127,10 +128,11 @@ private object PartitionAssignorTest extends Logging {
       extends SubscriptionInfo {
     def registrationString =
       Json.encode(
-        Map("version" -> 1,
-            "subscription" -> streamCounts,
-            "pattern" -> "static",
-            "timestamp" -> 1234.toString))
+        Map(
+          "version" -> 1,
+          "subscription" -> streamCounts,
+          "pattern" -> "static",
+          "timestamp" -> 1234.toString))
 
     override def toString = {
       "Stream counts: " + streamCounts
@@ -143,14 +145,16 @@ private object PartitionAssignorTest extends Logging {
       extends SubscriptionInfo {
     def registrationString =
       Json.encode(
-        Map("version" -> 1,
-            "subscription" -> Map(regex -> streamCount),
-            "pattern" -> (if (isWhitelist) "white_list" else "black_list")))
+        Map(
+          "version" -> 1,
+          "subscription" -> Map(regex -> streamCount),
+          "pattern" -> (if (isWhitelist) "white_list" else "black_list")))
 
     override def toString = {
-      "\"%s\":%d (%s)".format(regex,
-                              streamCount,
-                              if (isWhitelist) "whitelist" else "blacklist")
+      "\"%s\":%d (%s)".format(
+        regex,
+        streamCount,
+        if (isWhitelist) "whitelist" else "blacklist")
     }
   }
 
@@ -182,9 +186,9 @@ private object PartitionAssignorTest extends Logging {
       case (consumerId, subscriptionInfo) =>
         EasyMock
           .expect(
-            zkClient.readData("/consumers/%s/ids/%s".format(scenario.group,
-                                                            consumerId),
-                              new Stat()))
+            zkClient.readData(
+              "/consumers/%s/ids/%s".format(scenario.group, consumerId),
+              new Stat()))
           .andReturn(subscriptionInfo.registrationString)
         EasyMock.expectLastCall().anyTimes()
     }
@@ -215,10 +219,11 @@ private object PartitionAssignorTest extends Logging {
                               verifyAssignmentIsUniform: Boolean = false) {
     val assignments = scenario.subscriptions.map {
       case (consumer, subscription) =>
-        val ctx = new AssignmentContext("g1",
-                                        consumer,
-                                        excludeInternalTopics = true,
-                                        zkUtils)
+        val ctx = new AssignmentContext(
+          "g1",
+          consumer,
+          excludeInternalTopics = true,
+          zkUtils)
         assignor.assign(ctx).get(consumer)
     }
 
@@ -229,9 +234,10 @@ private object PartitionAssignorTest extends Logging {
       assignment.foreach {
         case (topicPartition, owner) =>
           val previousOwnerOpt = globalAssignment.put(topicPartition, owner)
-          assertTrue("Scenario %s: %s is assigned to two owners."
-                       .format(scenario, topicPartition),
-                     previousOwnerOpt.isEmpty)
+          assertTrue(
+            "Scenario %s: %s is assigned to two owners."
+              .format(scenario, topicPartition),
+            previousOwnerOpt.isEmpty)
       }
     })
 

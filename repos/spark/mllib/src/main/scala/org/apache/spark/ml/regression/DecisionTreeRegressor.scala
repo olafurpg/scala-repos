@@ -51,9 +51,10 @@ import org.apache.spark.sql.functions._
 @Experimental
 final class DecisionTreeRegressor @Since("1.4.0")(
     @Since("1.4.0") override val uid: String)
-    extends Predictor[Vector,
-                      DecisionTreeRegressor,
-                      DecisionTreeRegressionModel]
+    extends Predictor[
+      Vector,
+      DecisionTreeRegressor,
+      DecisionTreeRegressionModel]
     with DecisionTreeRegressorParams
     with DefaultParamsWritable {
 
@@ -101,12 +102,13 @@ final class DecisionTreeRegressor @Since("1.4.0")(
       MetadataUtils.getCategoricalFeatures(dataset.schema($(featuresCol)))
     val oldDataset: RDD[LabeledPoint] = extractLabeledPoints(dataset)
     val strategy = getOldStrategy(categoricalFeatures)
-    val trees = RandomForest.run(oldDataset,
-                                 strategy,
-                                 numTrees = 1,
-                                 featureSubsetStrategy = "all",
-                                 seed = $(seed),
-                                 parentUID = Some(uid))
+    val trees = RandomForest.run(
+      oldDataset,
+      strategy,
+      numTrees = 1,
+      featureSubsetStrategy = "all",
+      seed = $(seed),
+      parentUID = Some(uid))
     trees.head.asInstanceOf[DecisionTreeRegressionModel]
   }
 
@@ -114,23 +116,25 @@ final class DecisionTreeRegressor @Since("1.4.0")(
   private[ml] def train(
       data: RDD[LabeledPoint],
       oldStrategy: OldStrategy): DecisionTreeRegressionModel = {
-    val trees = RandomForest.run(data,
-                                 oldStrategy,
-                                 numTrees = 1,
-                                 featureSubsetStrategy = "all",
-                                 seed = 0L,
-                                 parentUID = Some(uid))
+    val trees = RandomForest.run(
+      data,
+      oldStrategy,
+      numTrees = 1,
+      featureSubsetStrategy = "all",
+      seed = 0L,
+      parentUID = Some(uid))
     trees.head.asInstanceOf[DecisionTreeRegressionModel]
   }
 
   /** (private[ml]) Create a Strategy instance to use with the old API. */
   private[ml] def getOldStrategy(
       categoricalFeatures: Map[Int, Int]): OldStrategy = {
-    super.getOldStrategy(categoricalFeatures,
-                         numClasses = 0,
-                         OldAlgo.Regression,
-                         getOldImpurity,
-                         subsamplingRate = 1.0)
+    super.getOldStrategy(
+      categoricalFeatures,
+      numClasses = 0,
+      OldAlgo.Regression,
+      getOldImpurity,
+      subsamplingRate = 1.0)
   }
 
   @Since("1.4.0")
@@ -218,8 +222,9 @@ final class DecisionTreeRegressionModel private[ml] (
 
   @Since("1.4.0")
   override def copy(extra: ParamMap): DecisionTreeRegressionModel = {
-    copyValues(new DecisionTreeRegressionModel(uid, rootNode, numFeatures),
-               extra).setParent(parent)
+    copyValues(
+      new DecisionTreeRegressionModel(uid, rootNode, numFeatures),
+      extra).setParent(parent)
   }
 
   @Since("1.4.0")

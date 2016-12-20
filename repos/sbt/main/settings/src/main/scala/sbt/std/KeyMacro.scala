@@ -55,8 +55,9 @@ private[sbt] object KeyMacro {
             if mods.hasFlag(Flag.LAZY) =>
           processName(name)
         case _ =>
-          c.error(c.enclosingPosition,
-                  invalidEnclosingTree(methodName.decoded))
+          c.error(
+            c.enclosingPosition,
+            invalidEnclosingTree(methodName.decoded))
           "<error>"
       }
     }

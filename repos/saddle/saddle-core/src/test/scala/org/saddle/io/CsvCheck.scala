@@ -37,9 +37,10 @@ class CsvCheck extends Specification with ScalaCheck {
 
     val frame = CsvParser.parse()(src).withColIndex(0).resetRowIndex
     val expect =
-      Frame(Vec("1", "4", "5", "7"),
-            Vec("25", "55", "9", "8"),
-            Vec("36", "6", "38", "9")).setColIndex(Index("a", "b,c,d", "e"))
+      Frame(
+        Vec("1", "4", "5", "7"),
+        Vec("25", "55", "9", "8"),
+        Vec("36", "6", "38", "9")).setColIndex(Index("a", "b,c,d", "e"))
 
     frame must_== expect
   }

@@ -66,9 +66,10 @@ private[akka] class FileSubscriber(f: File,
       }
 
     case ActorSubscriberMessage.OnError(ex) ⇒
-      log.error(ex,
-                "Tearing down FileSink({}) due to upstream error",
-                f.getAbsolutePath)
+      log.error(
+        ex,
+        "Tearing down FileSink({}) due to upstream error",
+        f.getAbsolutePath)
       closeAndComplete(IOResult(bytesWritten, Failure(ex)))
       context.stop(self)
 

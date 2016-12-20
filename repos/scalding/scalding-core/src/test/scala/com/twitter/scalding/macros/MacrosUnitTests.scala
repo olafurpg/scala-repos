@@ -247,17 +247,19 @@ class MacrosUnitTests extends WordSpec with Matchers {
     "round trip class -> tupleentry -> class" in {
       shouldRoundTrip(SampleClassA(100, "onehundred"))
       shouldRoundTrip(
-        SampleClassB(SampleClassA(100, "onehundred"),
-                     SampleClassA(-1, "zero"),
-                     "what"))
+        SampleClassB(
+          SampleClassA(100, "onehundred"),
+          SampleClassA(-1, "zero"),
+          "what"))
       val a = SampleClassA(73, "hrmA1")
       val b = SampleClassB(a, a, "hrmB1")
       val c =
-        SampleClassC(a,
-                     b,
-                     SampleClassA(123980, "heyA2"),
-                     SampleClassB(a, SampleClassA(-1, "zeroA3"), "zooB2"),
-                     b)
+        SampleClassC(
+          a,
+          b,
+          SampleClassA(123980, "heyA2"),
+          SampleClassB(a, SampleClassA(-1, "zeroA3"), "zooB2"),
+          b)
       shouldRoundTrip(b)
       shouldRoundTrip(c)
       shouldRoundTrip(SampleClassD(Some(c)))
@@ -273,14 +275,16 @@ class MacrosUnitTests extends WordSpec with Matchers {
     "Case Class should form expected tuple" in {
       val input = SampleClassC(
         SampleClassA(1, "asdf"),
-        SampleClassB(SampleClassA(2, "bcdf"),
-                     SampleClassA(5, "jkfs"),
-                     "wetew"),
+        SampleClassB(
+          SampleClassA(2, "bcdf"),
+          SampleClassA(5, "jkfs"),
+          "wetew"),
         SampleClassA(9, "xcmv"),
         SampleClassB(SampleClassA(23, "ck"), SampleClassA(13, "dafk"), "xcv"),
-        SampleClassB(SampleClassA(34, "were"),
-                     SampleClassA(654, "power"),
-                     "adsfmx"))
+        SampleClassB(
+          SampleClassA(34, "were"),
+          SampleClassA(654, "power"),
+          "adsfmx"))
       val setter = implicitly[TupleSetter[SampleClassC]]
       val tup = setter(input)
       assert(tup.size == 19)
@@ -340,11 +344,12 @@ class MacrosUnitTests extends WordSpec with Matchers {
       val fields = Macros.toFields[SampleClassB]
       assert(fields.size === 5)
       assert(
-        fields.getTypes === Array[java.lang.reflect.Type](classOf[Int],
-                                                          classOf[String],
-                                                          classOf[Int],
-                                                          classOf[String],
-                                                          classOf[String]))
+        fields.getTypes === Array[java.lang.reflect.Type](
+          classOf[Int],
+          classOf[String],
+          classOf[Int],
+          classOf[String],
+          classOf[String]))
       val names = List("a1.x", "a1.y", "a2.x", "a2.y", "y")
       names.zipWithIndex.foreach {
         case (name, indx) =>
@@ -372,11 +377,12 @@ class MacrosUnitTests extends WordSpec with Matchers {
       val fields = Macros.toIndexedFields[SampleClassB]
       assert(fields.size === 5)
       assert(
-        fields.getTypes === Array[java.lang.reflect.Type](classOf[Int],
-                                                          classOf[String],
-                                                          classOf[Int],
-                                                          classOf[String],
-                                                          classOf[String]))
+        fields.getTypes === Array[java.lang.reflect.Type](
+          classOf[Int],
+          classOf[String],
+          classOf[Int],
+          classOf[String],
+          classOf[String]))
       val names = (0 until fields.size)
       names.zipWithIndex.foreach {
         case (name, indx) =>

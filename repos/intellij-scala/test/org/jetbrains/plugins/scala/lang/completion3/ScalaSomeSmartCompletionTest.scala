@@ -53,8 +53,9 @@ class TUI {
 }
 """.replaceAll("\r", "").trim()
 
-    completeLookupItem(activeLookup.find(le => le.getLookupString == "z").get,
-                       ',')
+    completeLookupItem(
+      activeLookup.find(le => le.getLookupString == "z").get,
+      ',')
     checkResultByText(resultText)
   }
 

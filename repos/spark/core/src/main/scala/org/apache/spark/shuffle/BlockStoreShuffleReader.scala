@@ -47,9 +47,10 @@ private[spark] class BlockStoreShuffleReader[K, C](
         context,
         blockManager.shuffleClient,
         blockManager,
-        mapOutputTracker.getMapSizesByExecutorId(handle.shuffleId,
-                                                 startPartition,
-                                                 endPartition),
+        mapOutputTracker.getMapSizesByExecutorId(
+          handle.shuffleId,
+          startPartition,
+          endPartition),
         // Note: we use getSizeAsMb when no suffix is provided for backwards compatibility
         SparkEnv.get.conf
           .getSizeAsMb("spark.reducer.maxSizeInFlight", "48m") * 1024 * 1024,
@@ -102,8 +103,9 @@ private[spark] class BlockStoreShuffleReader[K, C](
           dep.aggregator.get.combineValuesByKey(keyValuesIterator, context)
         }
       } else {
-        require(!dep.mapSideCombine,
-                "Map-side combine without Aggregator specified!")
+        require(
+          !dep.mapSideCombine,
+          "Map-side combine without Aggregator specified!")
         interruptibleIter.asInstanceOf[Iterator[Product2[K, C]]]
       }
 
@@ -112,9 +114,10 @@ private[spark] class BlockStoreShuffleReader[K, C](
       case Some(keyOrd: Ordering[K]) =>
         // Create an ExternalSorter to sort the data. Note that if spark.shuffle.spill is disabled,
         // the ExternalSorter won't spill to disk.
-        val sorter = new ExternalSorter[K, C, C](context,
-                                                 ordering = Some(keyOrd),
-                                                 serializer = dep.serializer)
+        val sorter = new ExternalSorter[K, C, C](
+          context,
+          ordering = Some(keyOrd),
+          serializer = dep.serializer)
         sorter.insertAll(aggregatedIter)
         context.taskMetrics().incMemoryBytesSpilled(sorter.memoryBytesSpilled)
         context.taskMetrics().incDiskBytesSpilled(sorter.diskBytesSpilled)

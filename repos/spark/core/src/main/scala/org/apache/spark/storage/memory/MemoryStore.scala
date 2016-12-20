@@ -103,8 +103,9 @@ private[spark] class MemoryStore(conf: SparkConf,
   def putBytes(blockId: BlockId,
                size: Long,
                _bytes: () => ChunkedByteBuffer): Boolean = {
-    require(!contains(blockId),
-            s"Block $blockId is already present in the MemoryStore")
+    require(
+      !contains(blockId),
+      s"Block $blockId is already present in the MemoryStore")
     if (memoryManager.acquireStorageMemory(blockId, size)) {
       // We acquired enough memory for the block, so go ahead and put it
       val bytes = _bytes()
@@ -115,9 +116,10 @@ private[spark] class MemoryStore(conf: SparkConf,
       }
       logInfo(
         "Block %s stored as bytes in memory (estimated size %s, free %s)"
-          .format(blockId,
-                  Utils.bytesToString(size),
-                  Utils.bytesToString(blocksMemoryUsed)))
+          .format(
+            blockId,
+            Utils.bytesToString(size),
+            Utils.bytesToString(blocksMemoryUsed)))
       true
     } else {
       false
@@ -145,8 +147,9 @@ private[spark] class MemoryStore(conf: SparkConf,
       values: Iterator[Any],
       level: StorageLevel): Either[PartiallyUnrolledIterator, Long] = {
 
-    require(!contains(blockId),
-            s"Block $blockId is already present in the MemoryStore")
+    require(
+      !contains(blockId),
+      s"Block $blockId is already present in the MemoryStore")
 
     // Number of elements unrolled so far
     var elementsUnrolled = 0
@@ -203,8 +206,9 @@ private[spark] class MemoryStore(conf: SparkConf,
       vector = null
       val entry =
         if (level.deserialized) {
-          new DeserializedMemoryEntry(arrayValues,
-                                      SizeEstimator.estimate(arrayValues))
+          new DeserializedMemoryEntry(
+            arrayValues,
+            SizeEstimator.estimate(arrayValues))
         } else {
           val bytes = blockManager.dataSerialize(blockId, arrayValues.iterator)
           new SerializedMemoryEntry(bytes, bytes.size)
@@ -215,8 +219,9 @@ private[spark] class MemoryStore(conf: SparkConf,
         memoryManager.synchronized {
           releaseUnrollMemoryForThisTask(amount)
           val success = memoryManager.acquireStorageMemory(blockId, amount)
-          assert(success,
-                 "transferring unroll memory to storage memory failed")
+          assert(
+            success,
+            "transferring unroll memory to storage memory failed")
         }
       }
       // Acquire storage memory if necessary to store this block in memory.
@@ -245,29 +250,32 @@ private[spark] class MemoryStore(conf: SparkConf,
         val bytesOrValues = if (level.deserialized) "values" else "bytes"
         logInfo(
           "Block %s stored as %s in memory (estimated size %s, free %s)"
-            .format(blockId,
-                    bytesOrValues,
-                    Utils.bytesToString(size),
-                    Utils.bytesToString(blocksMemoryUsed)))
+            .format(
+              blockId,
+              bytesOrValues,
+              Utils.bytesToString(size),
+              Utils.bytesToString(blocksMemoryUsed)))
         Right(size)
       } else {
         assert(
           currentUnrollMemoryForThisTask >= currentUnrollMemoryForThisTask,
           "released too much unroll memory")
         Left(
-          new PartiallyUnrolledIterator(this,
-                                        unrollMemoryUsedByThisBlock,
-                                        unrolled = arrayValues.toIterator,
-                                        rest = Iterator.empty))
+          new PartiallyUnrolledIterator(
+            this,
+            unrollMemoryUsedByThisBlock,
+            unrolled = arrayValues.toIterator,
+            rest = Iterator.empty))
       }
     } else {
       // We ran out of space while unrolling the values for this block
       logUnrollFailureMessage(blockId, vector.estimateSize())
       Left(
-        new PartiallyUnrolledIterator(this,
-                                      unrollMemoryUsedByThisBlock,
-                                      unrolled = vector.iterator,
-                                      rest = values))
+        new PartiallyUnrolledIterator(
+          this,
+          unrollMemoryUsedByThisBlock,
+          unrolled = vector.iterator,
+          rest = values))
     }
   }
 

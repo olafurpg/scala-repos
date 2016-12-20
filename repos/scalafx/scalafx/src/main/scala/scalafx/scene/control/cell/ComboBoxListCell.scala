@@ -97,9 +97,9 @@ object ComboBoxListCell {
   /**
     * $FLVINITDEPREC
     */
-  @deprecated(message =
-                "Use forListView[T](StringConverter[T], ObservableBuffer[T])",
-              since = "1.0")
+  @deprecated(
+    message = "Use forListView[T](StringConverter[T], ObservableBuffer[T])",
+    since = "1.0")
   def forListView[T](converter: jfxu.StringConverter[T],
                      items: jfxc.ObservableList[T]) =
     jfxscc.ComboBoxListCell.forListView(converter, items)
@@ -119,8 +119,9 @@ object ComboBoxListCell {
   /**
     * $FLVINITDEPREC
     */
-  @deprecated(message = "Use forListView[T](StringConverter[T], T*)",
-              since = "1.0")
+  @deprecated(
+    message = "Use forListView[T](StringConverter[T], T*)",
+    since = "1.0")
   def forListView[T](converter: jfxu.StringConverter[T], items: T*) =
     jfxscc.ComboBoxListCell.forListView[T](converter, items: _*)
 

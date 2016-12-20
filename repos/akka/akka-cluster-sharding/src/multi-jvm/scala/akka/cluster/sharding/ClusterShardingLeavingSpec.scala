@@ -121,9 +121,10 @@ abstract class ClusterShardingLeavingSpec(
   override def initialParticipants = roles.size
 
   val storageLocations =
-    List("akka.persistence.journal.leveldb.dir",
-         "akka.persistence.journal.leveldb-shared.store.dir",
-         "akka.persistence.snapshot-store.local.dir").map(s ⇒
+    List(
+      "akka.persistence.journal.leveldb.dir",
+      "akka.persistence.journal.leveldb-shared.store.dir",
+      "akka.persistence.snapshot-store.local.dir").map(s ⇒
       new File(system.settings.config.getString(s)))
 
   override protected def atStartup() {
@@ -157,11 +158,12 @@ abstract class ClusterShardingLeavingSpec(
   }
 
   def startSharding(): Unit = {
-    ClusterSharding(system).start(typeName = "Entity",
-                                  entityProps = Props[Entity],
-                                  settings = ClusterShardingSettings(system),
-                                  extractEntityId = extractEntityId,
-                                  extractShardId = extractShardId)
+    ClusterSharding(system).start(
+      typeName = "Entity",
+      entityProps = Props[Entity],
+      settings = ClusterShardingSettings(system),
+      extractEntityId = extractEntityId,
+      extractShardId = extractShardId)
   }
 
   lazy val region = ClusterSharding(system).shardRegion("Entity")

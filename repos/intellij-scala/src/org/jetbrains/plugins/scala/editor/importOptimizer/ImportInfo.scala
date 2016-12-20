@@ -74,16 +74,17 @@ case class ImportInfo(prefixQualifier: String,
   def merge(second: ImportInfo): ImportInfo = {
     val relative = this.relative.orElse(second.relative)
     val rootUsed = relative.isEmpty && (this.rootUsed || second.rootUsed)
-    new ImportInfo(this.prefixQualifier,
-                   relative,
-                   this.allNames ++ second.allNames,
-                   this.singleNames ++ second.singleNames,
-                   this.renames ++ second.renames,
-                   this.hiddenNames ++ second.hiddenNames,
-                   this.hasWildcard || second.hasWildcard,
-                   rootUsed,
-                   this.isStableImport && second.isStableImport,
-                   this.allNamesForWildcard)
+    new ImportInfo(
+      this.prefixQualifier,
+      relative,
+      this.allNames ++ second.allNames,
+      this.singleNames ++ second.singleNames,
+      this.renames ++ second.renames,
+      this.hiddenNames ++ second.hiddenNames,
+      this.hasWildcard || second.hasWildcard,
+      rootUsed,
+      this.isStableImport && second.isStableImport,
+      this.allNamesForWildcard)
   }
 
   def isSimpleWildcard =
@@ -96,11 +97,12 @@ case class ImportInfo(prefixQualifier: String,
   }
 
   private def template: ImportInfo =
-    copy(singleNames = Set.empty,
-         renames = Map.empty,
-         hiddenNames = Set.empty,
-         allNames = allNamesForWildcard,
-         hasWildcard = false)
+    copy(
+      singleNames = Set.empty,
+      renames = Map.empty,
+      hiddenNames = Set.empty,
+      allNames = allNamesForWildcard,
+      hasWildcard = false)
 
   def toWildcardInfo: ImportInfo = template.copy(hasWildcard = true)
 
@@ -150,14 +152,16 @@ object ImportInfo {
     def collectAllNamesForWildcard(): Unit = {
       val refText = imp.qualifier.getText + ".someIdentifier"
       val reference = ScalaPsiElementFactory
-        .createReferenceFromText(refText,
-                                 imp.qualifier.getContext,
-                                 imp.qualifier)
+        .createReferenceFromText(
+          refText,
+          imp.qualifier.getContext,
+          imp.qualifier)
         .asInstanceOf[ScStableCodeReferenceElementImpl]
-      val processor = new CompletionProcessor(StdKinds.stableImportSelector,
-                                              reference,
-                                              collectImplicits = true,
-                                              includePrefixImports = false)
+      val processor = new CompletionProcessor(
+        StdKinds.stableImportSelector,
+        reference,
+        collectImplicits = true,
+        includePrefixImports = false)
 
       reference.doResolve(reference, processor).foreach {
         case rr: ScalaResolveResult if shouldAddName(rr) =>
@@ -335,17 +339,18 @@ object ImportInfo {
     }
 
     Some(
-      new ImportInfo(prefixQualifier,
-                     relativeQualifier,
-                     allNames.toSet,
-                     singleNames.toSet,
-                     renames.toMap,
-                     hiddenNames.toSet,
-                     hasWildcard,
-                     rootUsed,
-                     isStableImport,
-                     namesForWildcard.toSet,
-                     hasNonUsedImplicits))
+      new ImportInfo(
+        prefixQualifier,
+        relativeQualifier,
+        allNames.toSet,
+        singleNames.toSet,
+        renames.toMap,
+        hiddenNames.toSet,
+        hasWildcard,
+        rootUsed,
+        isStableImport,
+        namesForWildcard.toSet,
+        hasNonUsedImplicits))
   }
 
   def merge(infos: Seq[ImportInfo]): Option[ImportInfo] =

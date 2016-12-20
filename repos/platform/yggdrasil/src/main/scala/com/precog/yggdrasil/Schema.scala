@@ -104,8 +104,9 @@ object Schema {
           case (field, tpe) =>
             val refs0 =
               refs collect {
-                case ColumnRef(CPath(CPathField(`field`), rest @ _ *),
-                               ctype) =>
+                case ColumnRef(
+                    CPath(CPathField(`field`), rest @ _ *),
+                    ctype) =>
                   ColumnRef(CPath(rest: _*), ctype)
               }
             buildPath(CPathField(field) :: nodes, refs0, tpe)
@@ -376,9 +377,10 @@ object Schema {
   def requiredBy(jtpe: JType, path: CPath, ctpe: CType): Boolean =
     includes(jtpe, path, ctpe) ||
       ((jtpe, path, ctpe) match {
-        case (JArrayFixedT(elements),
-              CPath(CPathArray, tail @ _ *),
-              CArrayType(elemType)) =>
+        case (
+            JArrayFixedT(elements),
+            CPath(CPathArray, tail @ _ *),
+            CArrayType(elemType)) =>
           elements.values exists (requiredBy(_, CPath(tail: _*), elemType))
         case _ => false
       })
@@ -407,8 +409,9 @@ object Schema {
           if fields.isEmpty =>
         true
 
-      case (JObjectFixedT(fields),
-            (CPath(CPathField(head), tail @ _ *), ctpe)) => {
+      case (
+          JObjectFixedT(fields),
+          (CPath(CPathField(head), tail @ _ *), ctpe)) => {
         fields
           .get(head)
           .map(includes(_, CPath(tail: _*), ctpe))
@@ -421,22 +424,25 @@ object Schema {
       case (JArrayFixedT(elements), (CPath.Identity, CEmptyArray))
           if elements.isEmpty =>
         true
-      case (JArrayFixedT(elements),
-            (CPath(CPathIndex(i), tail @ _ *), ctpe)) =>
+      case (
+          JArrayFixedT(elements),
+          (CPath(CPathIndex(i), tail @ _ *), ctpe)) =>
         elements
           .get(i)
           .map(includes(_, CPath(tail: _*), ctpe))
           .getOrElse(false)
-      case (JArrayHomogeneousT(jElemType),
-            (CPath(CPathArray, _ *), CArrayType(cElemType))) =>
+      case (
+          JArrayHomogeneousT(jElemType),
+          (CPath(CPathArray, _ *), CArrayType(cElemType))) =>
         fromCValueType(cElemType) == Some(jElemType)
 
       // TODO This is a bit contentious, as this situation will need to be dealt
       // with at a higher level if we let parts of a heterogeneous array fall
       // through, posing as a homogeneous array. Especially since, eg, someone
       // should be expecting that if a[1] exists, therefore a[0] exists.
-      case (JArrayHomogeneousT(jElemType),
-            (CPath(CPathIndex(i), tail @ _ *), ctpe)) =>
+      case (
+          JArrayHomogeneousT(jElemType),
+          (CPath(CPathIndex(i), tail @ _ *), ctpe)) =>
         ctypes(jElemType) contains ctpe
 
       case (JUnionT(ljtpe, rjtpe), (path, ctpe)) =>

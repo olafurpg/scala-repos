@@ -390,8 +390,9 @@ class AsyncStreamTest extends FunSuite with GeneratorDrivenPropertyChecks {
   test("buffer() has the same properties as take() and drop()") {
     // We need items to be non-empty, because AsyncStream.empty ++
     // <something> forces the future to be created.
-    val gen = Gen.zip(Gen.nonEmptyListOf(Arbitrary.arbitrary[Char]),
-                      Arbitrary.arbitrary[Int])
+    val gen = Gen.zip(
+      Gen.nonEmptyListOf(Arbitrary.arbitrary[Char]),
+      Arbitrary.arbitrary[Int])
 
     forAll(gen) {
       case (items, n) =>

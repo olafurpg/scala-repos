@@ -104,11 +104,12 @@ trait WithPlay { self: PackageObject =>
   }
 
   implicit def LilaFuMonoid[A: Monoid]: Monoid[Fu[A]] =
-    Monoid.instance((x, y) =>
-                      x zip y map {
-                        case (a, b) => a ⊹ b
-                    },
-                    fuccess(∅[A]))
+    Monoid.instance(
+      (x, y) =>
+        x zip y map {
+          case (a, b) => a ⊹ b
+      },
+      fuccess(∅[A]))
 
   implicit def LilaFuZero[A: Zero]: Zero[Fu[A]] =
     Zero.instance(fuccess(zero[A]))

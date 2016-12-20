@@ -122,14 +122,15 @@ class Node @Since("1.2.0")(
       } else {
         Some(rightNode.get.deepCopy())
       }
-    new Node(id,
-             predict,
-             impurity,
-             isLeaf,
-             split,
-             leftNodeCopy,
-             rightNodeCopy,
-             stats)
+    new Node(
+      id,
+      predict,
+      impurity,
+      isLeaf,
+      split,
+      leftNodeCopy,
+      rightNodeCopy,
+      stats)
   }
 
   /**
@@ -203,14 +204,15 @@ private[spark] object Node {
     * Return a node with the given node id (but nothing else set).
     */
   def emptyNode(nodeIndex: Int): Node =
-    new Node(nodeIndex,
-             new Predict(Double.MinValue),
-             -1.0,
-             false,
-             None,
-             None,
-             None,
-             None)
+    new Node(
+      nodeIndex,
+      new Predict(Double.MinValue),
+      -1.0,
+      false,
+      None,
+      None,
+      None,
+      None)
 
   /**
     * Construct a node with nodeIndex, predict, impurity and isLeaf parameters.

@@ -25,9 +25,10 @@ final class KeyClientServerIntegrationSuite
     }
   }
 
-  test("DELETE should throw ClientError when given null list",
-       ClientServerTest,
-       RedisTest) {
+  test(
+    "DELETE should throw ClientError when given null list",
+    ClientServerTest,
+    RedisTest) {
     withRedisClient { client =>
       intercept[ClientError] {
         Await.result(client(Del(null: List[ChannelBuffer])))
@@ -35,9 +36,10 @@ final class KeyClientServerIntegrationSuite
     }
   }
 
-  test("DELETE should throw ClientError when given an empty List",
-       ClientServerTest,
-       RedisTest) {
+  test(
+    "DELETE should throw ClientError when given an empty List",
+    ClientServerTest,
+    RedisTest) {
     withRedisClient { client =>
       intercept[ClientError] {
         Await.result(client(Del(List[ChannelBuffer]())))
@@ -56,9 +58,10 @@ final class KeyClientServerIntegrationSuite
     }
   }
 
-  test("EXISTS should return an IntegerReply of 0 for a non-existent key",
-       ClientServerTest,
-       RedisTest) {
+  test(
+    "EXISTS should return an IntegerReply of 0 for a non-existent key",
+    ClientServerTest,
+    RedisTest) {
     withRedisClient { client =>
       assert(
         Await
@@ -67,18 +70,20 @@ final class KeyClientServerIntegrationSuite
     }
   }
 
-  test("EXISTS should return and IntegerReply of 1 for an existing key",
-       ClientServerTest,
-       RedisTest) {
+  test(
+    "EXISTS should return and IntegerReply of 1 for an existing key",
+    ClientServerTest,
+    RedisTest) {
     withRedisClient { client =>
       assert(Await.result(client(Set(foo, bar))) == OKStatusReply)
       assert(Await.result(client(Exists(foo))) == IntegerReply(1))
     }
   }
 
-  test("EXISTS should throw ClientError when given a null ChannelBuffer",
-       ClientServerTest,
-       RedisTest) {
+  test(
+    "EXISTS should throw ClientError when given a null ChannelBuffer",
+    ClientServerTest,
+    RedisTest) {
     withRedisClient { client =>
       intercept[ClientError] {
         Await.result(client(Exists(null: ChannelBuffer)))
@@ -105,9 +110,10 @@ final class KeyClientServerIntegrationSuite
     }
   }
 
-  test("EXPIRE should throw ClientError when given a null key",
-       ClientServerTest,
-       RedisTest) {
+  test(
+    "EXPIRE should throw ClientError when given a null key",
+    ClientServerTest,
+    RedisTest) {
     withRedisClient { client =>
       intercept[ClientError] {
         Await.result(client(Expire(null: ChannelBuffer, 30)))
@@ -138,9 +144,10 @@ final class KeyClientServerIntegrationSuite
     }
   }
 
-  test("EXPIREAT should throw ClientError when given a null key",
-       ClientServerTest,
-       RedisTest) {
+  test(
+    "EXPIREAT should throw ClientError when given a null key",
+    ClientServerTest,
+    RedisTest) {
     withRedisClient { client =>
       intercept[ClientError] {
         Await.result(
@@ -159,9 +166,10 @@ final class KeyClientServerIntegrationSuite
     }
   }
 
-  test("MOVE should throw ClientError when given an empty or null key",
-       ClientServerTest,
-       RedisTest) {
+  test(
+    "MOVE should throw ClientError when given an empty or null key",
+    ClientServerTest,
+    RedisTest) {
     withRedisClient { client =>
       val toDBDoesNotMatter = string2ChanBuf("71")
       val blankKey = string2ChanBuf("")
@@ -175,9 +183,10 @@ final class KeyClientServerIntegrationSuite
     }
   }
 
-  test("MOVE should throw ClientError when given an empty or null toDatabase",
-       ClientServerTest,
-       RedisTest) {
+  test(
+    "MOVE should throw ClientError when given an empty or null toDatabase",
+    ClientServerTest,
+    RedisTest) {
     withRedisClient { client =>
       val blankToDb = string2ChanBuf("")
       intercept[ClientError] {
@@ -190,9 +199,10 @@ final class KeyClientServerIntegrationSuite
     }
   }
 
-  test("MOVE should return an Integer Reply of 1 to verify a key was moved",
-       ClientServerTest,
-       RedisTest) {
+  test(
+    "MOVE should return an Integer Reply of 1 to verify a key was moved",
+    ClientServerTest,
+    RedisTest) {
     withRedisClient { client =>
       val fromDb = 14
       val toDb = 15
@@ -217,9 +227,10 @@ final class KeyClientServerIntegrationSuite
     }
   }
 
-  test("PERSIST should return an IntegerReply of 0 when no key is found",
-       ClientServerTest,
-       RedisTest) {
+  test(
+    "PERSIST should return an IntegerReply of 0 when no key is found",
+    ClientServerTest,
+    RedisTest) {
     withRedisClient { client =>
       assert(Await
         .result(client(Persist(string2ChanBuf("nosuchKey")))) == IntegerReply(
@@ -243,8 +254,9 @@ final class KeyClientServerIntegrationSuite
     RedisTest) {
     withRedisClient { client =>
       assert(Await.result(client(Set(baz, bar))) == OKStatusReply)
-      assert(Await.result(client(Expire(baz, 30))) == IntegerReply(1),
-             "FATAL could not expire existing key")
+      assert(
+        Await.result(client(Expire(baz, 30))) == IntegerReply(1),
+        "FATAL could not expire existing key")
 
       assert(Await.result(client(Persist(baz))) == IntegerReply(1))
     }
@@ -317,9 +329,10 @@ final class KeyClientServerIntegrationSuite
     }
   }
 
-  test("RENAMENX should an IntegerReply of 1 to verify a key was renamed",
-       ClientServerTest,
-       RedisTest) {
+  test(
+    "RENAMENX should an IntegerReply of 1 to verify a key was renamed",
+    ClientServerTest,
+    RedisTest) {
     withRedisClient { client =>
       val rename1 = string2ChanBuf("rename1")
       val rename2 = string2ChanBuf("rename2")
@@ -346,17 +359,19 @@ final class KeyClientServerIntegrationSuite
     }
   }
 
-  test("RANDOMKEY should return an EmptyBulkReply",
-       ClientServerTest,
-       RedisTest) {
+  test(
+    "RANDOMKEY should return an EmptyBulkReply",
+    ClientServerTest,
+    RedisTest) {
     withRedisClient { client =>
       assert(Await.result(client(Randomkey())).isInstanceOf[EmptyBulkReply])
     }
   }
 
-  test("TTL should throw a ClientError when given an empty key",
-       ClientServerTest,
-       RedisTest) {
+  test(
+    "TTL should throw a ClientError when given an empty key",
+    ClientServerTest,
+    RedisTest) {
     withRedisClient { client =>
       val emptyKey = string2ChanBuf("")
 

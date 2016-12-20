@@ -194,11 +194,12 @@ object ActorModelSpec {
     } catch {
       case e: Throwable ⇒
         system.eventStream.publish(
-          Error(e,
-                dispatcher.toString,
-                dispatcher.getClass,
-                "actual: stops=" + dispatcher.stops.get +
-                  " required: stops=" + stops))
+          Error(
+            e,
+            dispatcher.toString,
+            dispatcher.getClass,
+            "actual: stops=" + dispatcher.stops.get +
+              " required: stops=" + stops))
         throw e
     }
   }
@@ -227,13 +228,14 @@ object ActorModelSpec {
       msgsReceived: Long = 0,
       msgsProcessed: Long = 0,
       restarts: Long = 0)(implicit system: ActorSystem) {
-    assertRef(actorRef, dispatcher)(suspensions,
-                                    resumes,
-                                    registers,
-                                    unregisters,
-                                    msgsReceived,
-                                    msgsProcessed,
-                                    restarts)
+    assertRef(actorRef, dispatcher)(
+      suspensions,
+      resumes,
+      registers,
+      unregisters,
+      msgsReceived,
+      msgsProcessed,
+      restarts)
   }
 
   def assertRef(actorRef: ActorRef, dispatcher: MessageDispatcher = null)(
@@ -245,13 +247,14 @@ object ActorModelSpec {
       msgsProcessed: Long = statsFor(actorRef, dispatcher).msgsProcessed.get(),
       restarts: Long = statsFor(actorRef, dispatcher).restarts.get())(
       implicit system: ActorSystem) {
-    val stats = statsFor(actorRef,
-                         Option(dispatcher).getOrElse(
-                           actorRef
-                             .asInstanceOf[ActorRefWithCell]
-                             .underlying
-                             .asInstanceOf[ActorCell]
-                             .dispatcher))
+    val stats = statsFor(
+      actorRef,
+      Option(dispatcher).getOrElse(
+        actorRef
+          .asInstanceOf[ActorRefWithCell]
+          .underlying
+          .asInstanceOf[ActorCell]
+          .dispatcher))
     val deadline = System.currentTimeMillis + 1000
     try {
       await(deadline)(stats.suspensions.get() == suspensions)
@@ -264,13 +267,14 @@ object ActorModelSpec {
     } catch {
       case e: Throwable ⇒
         system.eventStream.publish(
-          Error(e,
-                Option(dispatcher).toString,
-                (Option(dispatcher) getOrElse this).getClass,
-                "actual: " + stats + ", required: InterceptorStats(susp=" +
-                  suspensions + ",res=" + resumes + ",reg=" + registers +
-                  ",unreg=" + unregisters + ",recv=" + msgsReceived +
-                  ",proc=" + msgsProcessed + ",restart=" + restarts))
+          Error(
+            e,
+            Option(dispatcher).toString,
+            (Option(dispatcher) getOrElse this).getClass,
+            "actual: " + stats + ", required: InterceptorStats(susp=" +
+              suspensions + ",res=" + resumes + ",reg=" + registers +
+              ",unreg=" + unregisters + ",recv=" + msgsReceived +
+              ",proc=" + msgsProcessed + ",restart=" + restarts))
         throw e
     }
   }
@@ -316,13 +320,14 @@ abstract class ActorModelSpec(config: String)
       assertDispatcher(dispatcher)(stops = 0)
       system.stop(a)
       assertDispatcher(dispatcher)(stops = 1)
-      assertRef(a, dispatcher)(suspensions = 0,
-                               resumes = 0,
-                               registers = 1,
-                               unregisters = 1,
-                               msgsReceived = 0,
-                               msgsProcessed = 0,
-                               restarts = 0)
+      assertRef(a, dispatcher)(
+        suspensions = 0,
+        resumes = 0,
+        registers = 1,
+        unregisters = 1,
+        msgsReceived = 0,
+        msgsProcessed = 0,
+        restarts = 0)
 
       val futures = for (i ← 1 to 10)
         yield
@@ -347,28 +352,33 @@ abstract class ActorModelSpec(config: String)
       awaitStarted(a)
 
       a ! CountDown(start)
-      assertCountDown(start,
-                      3.seconds.dilated.toMillis,
-                      "Should process first message within 3 seconds")
-      assertRefDefaultZero(a)(registers = 1,
-                              msgsReceived = 1,
-                              msgsProcessed = 1)
+      assertCountDown(
+        start,
+        3.seconds.dilated.toMillis,
+        "Should process first message within 3 seconds")
+      assertRefDefaultZero(a)(
+        registers = 1,
+        msgsReceived = 1,
+        msgsProcessed = 1)
 
       a ! Wait(1000)
       a ! CountDown(oneAtATime)
       // in case of serialization violation, restart would happen instead of count down
-      assertCountDown(oneAtATime,
-                      (1.5 seconds).dilated.toMillis,
-                      "Processed message when allowed")
-      assertRefDefaultZero(a)(registers = 1,
-                              msgsReceived = 3,
-                              msgsProcessed = 3)
+      assertCountDown(
+        oneAtATime,
+        (1.5 seconds).dilated.toMillis,
+        "Processed message when allowed")
+      assertRefDefaultZero(a)(
+        registers = 1,
+        msgsReceived = 3,
+        msgsProcessed = 3)
 
       system.stop(a)
-      assertRefDefaultZero(a)(registers = 1,
-                              unregisters = 1,
-                              msgsReceived = 3,
-                              msgsProcessed = 3)
+      assertRefDefaultZero(a)(
+        registers = 1,
+        unregisters = 1,
+        msgsReceived = 3,
+        msgsProcessed = 3)
     }
 
     "handle queueing from multiple threads" in {
@@ -383,12 +393,14 @@ abstract class ActorModelSpec(config: String)
           }
         }
       }
-      assertCountDown(counter,
-                      3.seconds.dilated.toMillis,
-                      "Should process 200 messages")
-      assertRefDefaultZero(a)(registers = 1,
-                              msgsReceived = 200,
-                              msgsProcessed = 200)
+      assertCountDown(
+        counter,
+        3.seconds.dilated.toMillis,
+        "Should process 200 messages")
+      assertRefDefaultZero(a)(
+        registers = 1,
+        msgsReceived = 200,
+        msgsProcessed = 200)
 
       system.stop(a)
     }
@@ -412,28 +424,32 @@ abstract class ActorModelSpec(config: String)
       val done = new CountDownLatch(1)
       a.suspend
       a ! CountDown(done)
-      assertNoCountDown(done,
-                        1000,
-                        "Should not process messages while suspended")
+      assertNoCountDown(
+        done,
+        1000,
+        "Should not process messages while suspended")
       assertRefDefaultZero(a)(registers = 1, msgsReceived = 1, suspensions = 1)
 
       a.resume(causedByFailure = null)
-      assertCountDown(done,
-                      3.seconds.dilated.toMillis,
-                      "Should resume processing of messages when resumed")
-      assertRefDefaultZero(a)(registers = 1,
-                              msgsReceived = 1,
-                              msgsProcessed = 1,
-                              suspensions = 1,
-                              resumes = 1)
+      assertCountDown(
+        done,
+        3.seconds.dilated.toMillis,
+        "Should resume processing of messages when resumed")
+      assertRefDefaultZero(a)(
+        registers = 1,
+        msgsReceived = 1,
+        msgsProcessed = 1,
+        suspensions = 1,
+        resumes = 1)
 
       system.stop(a)
-      assertRefDefaultZero(a)(registers = 1,
-                              unregisters = 1,
-                              msgsReceived = 1,
-                              msgsProcessed = 1,
-                              suspensions = 1,
-                              resumes = 1)
+      assertRefDefaultZero(a)(
+        registers = 1,
+        unregisters = 1,
+        msgsReceived = 1,
+        msgsProcessed = 1,
+        suspensions = 1,
+        resumes = 1)
     }
 
     "handle waves of actors" in {
@@ -465,9 +481,10 @@ abstract class ActorModelSpec(config: String)
           }).start()
           boss ! "run"
           try {
-            assertCountDown(cachedMessage.latch,
-                            waitTime,
-                            "Counting down from " + num)
+            assertCountDown(
+              cachedMessage.latch,
+              waitTime,
+              "Counting down from " + num)
           } catch {
             case e: Throwable ⇒
               dispatcher match {
@@ -514,9 +531,10 @@ abstract class ActorModelSpec(config: String)
     }
 
     "continue to process messages when a thread gets interrupted and throws an exception" in {
-      filterEvents(EventFilter[InterruptedException](),
-                   EventFilter[ActorInterruptedException](),
-                   EventFilter[akka.event.Logging.LoggerException]()) {
+      filterEvents(
+        EventFilter[InterruptedException](),
+        EventFilter[ActorInterruptedException](),
+        EventFilter[akka.event.Logging.LoggerException]()) {
         implicit val dispatcher = interceptedDispatcher()
         val a = newTestActor(dispatcher.id)
         val f1 = a ? Reply("foo")
@@ -572,8 +590,9 @@ abstract class ActorModelSpec(config: String)
     }
 
     "continue to process messages when exception is thrown" in {
-      filterEvents(EventFilter[IndexOutOfBoundsException](),
-                   EventFilter[RemoteException]()) {
+      filterEvents(
+        EventFilter[IndexOutOfBoundsException](),
+        EventFilter[RemoteException]()) {
         implicit val dispatcher = interceptedDispatcher()
         val a = newTestActor(dispatcher.id)
         val f1 = a ? Reply("foo")
@@ -666,14 +685,16 @@ class DispatcherModelSpec extends ActorModelSpec(DispatcherModelSpec.config) {
       val a, b = newTestActor(dispatcher.id)
 
       a ! Meet(aStart, aStop)
-      assertCountDown(aStart,
-                      3.seconds.dilated.toMillis,
-                      "Should process first message within 3 seconds")
+      assertCountDown(
+        aStart,
+        3.seconds.dilated.toMillis,
+        "Should process first message within 3 seconds")
 
       b ! CountDown(bParallel)
-      assertCountDown(bParallel,
-                      3.seconds.dilated.toMillis,
-                      "Should process other actors in parallel")
+      assertCountDown(
+        bParallel,
+        3.seconds.dilated.toMillis,
+        "Should process other actors in parallel")
 
       aStop.countDown()
 
@@ -682,14 +703,16 @@ class DispatcherModelSpec extends ActorModelSpec(DispatcherModelSpec.config) {
 
       while (!a.isTerminated && !b.isTerminated) {} //Busy wait for termination
 
-      assertRefDefaultZero(a)(registers = 1,
-                              unregisters = 1,
-                              msgsReceived = 1,
-                              msgsProcessed = 1)
-      assertRefDefaultZero(b)(registers = 1,
-                              unregisters = 1,
-                              msgsReceived = 1,
-                              msgsProcessed = 1)
+      assertRefDefaultZero(a)(
+        registers = 1,
+        unregisters = 1,
+        msgsReceived = 1,
+        msgsProcessed = 1)
+      assertRefDefaultZero(b)(
+        registers = 1,
+        unregisters = 1,
+        msgsReceived = 1,
+        msgsProcessed = 1)
     }
   }
 }
@@ -760,14 +783,16 @@ class BalancingDispatcherModelSpec
       val a, b = newTestActor(dispatcher.id)
 
       a ! Meet(aStart, aStop)
-      assertCountDown(aStart,
-                      3.seconds.dilated.toMillis,
-                      "Should process first message within 3 seconds")
+      assertCountDown(
+        aStart,
+        3.seconds.dilated.toMillis,
+        "Should process first message within 3 seconds")
 
       b ! CountDown(bParallel)
-      assertCountDown(bParallel,
-                      3.seconds.dilated.toMillis,
-                      "Should process other actors in parallel")
+      assertCountDown(
+        bParallel,
+        3.seconds.dilated.toMillis,
+        "Should process other actors in parallel")
 
       aStop.countDown()
 
@@ -776,14 +801,16 @@ class BalancingDispatcherModelSpec
 
       while (!a.isTerminated && !b.isTerminated) {} //Busy wait for termination
 
-      assertRefDefaultZero(a)(registers = 1,
-                              unregisters = 1,
-                              msgsReceived = 1,
-                              msgsProcessed = 1)
-      assertRefDefaultZero(b)(registers = 1,
-                              unregisters = 1,
-                              msgsReceived = 1,
-                              msgsProcessed = 1)
+      assertRefDefaultZero(a)(
+        registers = 1,
+        unregisters = 1,
+        msgsReceived = 1,
+        msgsProcessed = 1)
+      assertRefDefaultZero(b)(
+        registers = 1,
+        unregisters = 1,
+        msgsReceived = 1,
+        msgsProcessed = 1)
     }
   }
 }

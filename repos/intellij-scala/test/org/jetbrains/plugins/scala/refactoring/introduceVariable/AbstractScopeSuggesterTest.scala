@@ -57,14 +57,16 @@ abstract class AbstractScopeSuggesterTest
     var element = CommonDataKeys.PSI_ELEMENT.getData(
       DataManager.getInstance().getDataContextFromFocus.getResult)
     if (element == null) {
-      element = PsiTreeUtil.findElementOfClassAtRange(scalaFile,
-                                                      startOffset,
-                                                      endOffset,
-                                                      classOf[PsiElement])
+      element = PsiTreeUtil.findElementOfClassAtRange(
+        scalaFile,
+        startOffset,
+        endOffset,
+        classOf[PsiElement])
     }
 
-    assert(element.isInstanceOf[ScTypeElement],
-           "Selected element should be ScTypeElement")
+    assert(
+      element.isInstanceOf[ScTypeElement],
+      "Selected element should be ScTypeElement")
 
     val scopes: Array[ScopeItem] = ScopeSuggester.suggestScopes(
       new EmptyConflictsReporter {},
@@ -72,7 +74,8 @@ abstract class AbstractScopeSuggesterTest
       editor,
       element.getContainingFile,
       element.asInstanceOf[ScTypeElement])
-    Assert.assertEquals(scopes.map(_.getName).sorted.mkString(", "),
-                        suggestedScopesNames.sorted.mkString(", "))
+    Assert.assertEquals(
+      scopes.map(_.getName).sorted.mkString(", "),
+      suggestedScopesNames.sorted.mkString(", "))
   }
 }

@@ -53,23 +53,25 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
         } mkString " "
       val textScore = BSONDocument(
         "score" -> BSONDocument("$meta" -> "textScore"))
-      Paginator(adapter = new BSONAdapter[Video](
-                    collection = videoColl,
-                    selector = BSONDocument(
-                      "$text" -> BSONDocument("$search" -> q)
-                    ),
-                    projection = textScore,
-                    sort = textScore
-                  ) mapFutureList videoViews(user),
-                currentPage = page,
-                maxPerPage = maxPerPage)
+      Paginator(
+        adapter = new BSONAdapter[Video](
+            collection = videoColl,
+            selector = BSONDocument(
+              "$text" -> BSONDocument("$search" -> q)
+            ),
+            projection = textScore,
+            sort = textScore
+          ) mapFutureList videoViews(user),
+        currentPage = page,
+        maxPerPage = maxPerPage)
     }
 
     def save(video: Video): Funit =
       videoColl
-        .update(BSONDocument("_id" -> video.id),
-                BSONDocument("$set" -> video),
-                upsert = true)
+        .update(
+          BSONDocument("_id" -> video.id),
+          BSONDocument("$set" -> video),
+          upsert = true)
         .void
 
     def removeNotIn(ids: List[Video.ID]) =
@@ -92,44 +94,47 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
       videoColl.distinct("_id", none) map lila.db.BSON.asStrings
 
     def popular(user: Option[User], page: Int): Fu[Paginator[VideoView]] =
-      Paginator(adapter = new BSONAdapter[Video](
-                    collection = videoColl,
-                    selector = BSONDocument(),
-                    projection = BSONDocument(),
-                    sort = BSONDocument("metadata.likes" -> -1)
-                  ) mapFutureList videoViews(user),
-                currentPage = page,
-                maxPerPage = maxPerPage)
+      Paginator(
+        adapter = new BSONAdapter[Video](
+            collection = videoColl,
+            selector = BSONDocument(),
+            projection = BSONDocument(),
+            sort = BSONDocument("metadata.likes" -> -1)
+          ) mapFutureList videoViews(user),
+        currentPage = page,
+        maxPerPage = maxPerPage)
 
     def byTags(user: Option[User],
                tags: List[Tag],
                page: Int): Fu[Paginator[VideoView]] =
       if (tags.isEmpty) popular(user, page)
       else
-        Paginator(adapter = new BSONAdapter[Video](
-                      collection = videoColl,
-                      selector = BSONDocument(
-                        "tags" -> BSONDocument("$all" -> tags)
-                      ),
-                      projection = BSONDocument(),
-                      sort = BSONDocument("metadata.likes" -> -1)
-                    ) mapFutureList videoViews(user),
-                  currentPage = page,
-                  maxPerPage = maxPerPage)
+        Paginator(
+          adapter = new BSONAdapter[Video](
+              collection = videoColl,
+              selector = BSONDocument(
+                "tags" -> BSONDocument("$all" -> tags)
+              ),
+              projection = BSONDocument(),
+              sort = BSONDocument("metadata.likes" -> -1)
+            ) mapFutureList videoViews(user),
+          currentPage = page,
+          maxPerPage = maxPerPage)
 
     def byAuthor(user: Option[User],
                  author: String,
                  page: Int): Fu[Paginator[VideoView]] =
-      Paginator(adapter = new BSONAdapter[Video](
-                    collection = videoColl,
-                    selector = BSONDocument(
-                      "author" -> author
-                    ),
-                    projection = BSONDocument(),
-                    sort = BSONDocument("metadata.likes" -> -1)
-                  ) mapFutureList videoViews(user),
-                currentPage = page,
-                maxPerPage = maxPerPage)
+      Paginator(
+        adapter = new BSONAdapter[Video](
+            collection = videoColl,
+            selector = BSONDocument(
+              "author" -> author
+            ),
+            projection = BSONDocument(),
+            sort = BSONDocument("metadata.likes" -> -1)
+          ) mapFutureList videoViews(user),
+        currentPage = page,
+        maxPerPage = maxPerPage)
 
     def similar(user: Option[User],
                 video: Video,
@@ -180,12 +185,13 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
         ).some) map (0 !=)
 
     def seenVideoIds(user: User, videos: Seq[Video]): Fu[Set[Video.ID]] =
-      viewColl.distinct(View.BSONFields.videoId,
-                        BSONDocument(
-                          "_id" -> BSONDocument("$in" -> videos.map { v =>
-                            View.makeId(v.id, user.id)
-                          })
-                        ).some) map lila.db.BSON.asStringSet
+      viewColl.distinct(
+        View.BSONFields.videoId,
+        BSONDocument(
+          "_id" -> BSONDocument("$in" -> videos.map { v =>
+            View.makeId(v.id, user.id)
+          })
+        ).some) map lila.db.BSON.asStringSet
   }
 
   object tag {
@@ -220,9 +226,10 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
               .aggregate(
                 Match(
                   BSONDocument("tags" -> BSONDocument("$all" -> filterTags))),
-                List(Project(BSONDocument("tags" -> BSONBoolean(true))),
-                     Unwind("tags"),
-                     GroupField("tags")("nb" -> SumValue(1))))
+                List(
+                  Project(BSONDocument("tags" -> BSONBoolean(true))),
+                  Unwind("tags"),
+                  GroupField("tags")("nb" -> SumValue(1))))
               .map(_.documents.flatMap(_.asOpt[TagNb]))
 
         allPopular zip allPaths map {
@@ -248,10 +255,12 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
 
     private val popularCache = AsyncCache.single[List[TagNb]](
       f = videoColl
-        .aggregate(Project(BSONDocument("tags" -> BSONBoolean(true))),
-                   List(Unwind("tags"),
-                        GroupField("tags")("nb" -> SumValue(1)),
-                        Sort(Descending("nb"))))
+        .aggregate(
+          Project(BSONDocument("tags" -> BSONBoolean(true))),
+          List(
+            Unwind("tags"),
+            GroupField("tags")("nb" -> SumValue(1)),
+            Sort(Descending("nb"))))
         .map(_.documents.flatMap(_.asOpt[TagNb])),
       timeToLive = 1.day)
   }

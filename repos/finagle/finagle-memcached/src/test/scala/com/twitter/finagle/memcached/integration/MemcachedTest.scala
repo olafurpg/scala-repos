@@ -210,12 +210,13 @@ class MemcachedTest extends FunSuite with BeforeAndAfter {
     val partitionedClient = client.asInstanceOf[PartitionedClient]
 
     // set values
-    Await.result(Future.collect(
-                   (0 to 20).map { i =>
-                     client.set(s"foo$i", Buf.Utf8(s"bar$i"))
-                   }
-                 ),
-                 TimeOut)
+    Await.result(
+      Future.collect(
+        (0 to 20).map { i =>
+          client.set(s"foo$i", Buf.Utf8(s"bar$i"))
+        }
+      ),
+      TimeOut)
 
     // shutdown one memcache host
     server2.foreach(_.stop())
@@ -281,8 +282,9 @@ class MemcachedTest extends FunSuite with BeforeAndAfter {
     }
 
     val cacheServer =
-      Memcached.serve(new InetSocketAddress(InetAddress.getLoopbackAddress, 0),
-                      new MockedMemcacheServer)
+      Memcached.serve(
+        new InetSocketAddress(InetAddress.getLoopbackAddress, 0),
+        new MockedMemcacheServer)
 
     val timer = new MockTimer
     val statsReceiver = new InMemoryStatsReceiver

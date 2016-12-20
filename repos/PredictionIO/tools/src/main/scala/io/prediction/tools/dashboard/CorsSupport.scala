@@ -38,8 +38,8 @@ trait CORSSupport { this: HttpService =>
                                       |Accept-Language,
                                       |Host,
                                       |Referer,
-                                      |User-Agent""".stripMargin.replace("\n",
-                                                                         " ")),
+                                      |User-Agent""".stripMargin
+        .replace("\n", " ")),
     `Access-Control-Max-Age`(1728000)
   )
 

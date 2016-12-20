@@ -349,12 +349,13 @@ class AppTasksResourceTest
   }
 
   private[this] def useRealTaskKiller(): Unit = {
-    taskKiller = new TaskKiller(taskTracker,
-                                groupManager,
-                                service,
-                                config,
-                                auth.auth,
-                                auth.auth)
+    taskKiller = new TaskKiller(
+      taskTracker,
+      groupManager,
+      service,
+      config,
+      auth.auth,
+      auth.auth)
     appsTaskResource = new AppTasksResource(
       service,
       taskTracker,

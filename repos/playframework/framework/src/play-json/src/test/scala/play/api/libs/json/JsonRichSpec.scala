@@ -15,9 +15,8 @@ object JsonRichSpec extends Specification {
   "JSON" should {
     "create json with rich syntax" in {
       val js = Json.obj(
-        "key1" -> Json.obj("key11" -> "value11",
-                           "key12" -> 123L,
-                           "key13" -> JsNull),
+        "key1" -> Json
+          .obj("key11" -> "value11", "key12" -> 123L, "key13" -> JsNull),
         "key2" -> 123,
         "key3" -> true,
         "key4" -> Json.arr(

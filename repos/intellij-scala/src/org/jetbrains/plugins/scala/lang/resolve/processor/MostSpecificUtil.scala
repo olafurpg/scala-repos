@@ -45,15 +45,17 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
       applicable.map(r =>
         r.innerResolveResult match {
           case Some(rr) if expandInnerResult =>
-            new InnerScalaResolveResult(rr.element,
-                                        rr.implicitConversionClass,
-                                        r,
-                                        r.substitutor)
+            new InnerScalaResolveResult(
+              rr.element,
+              rr.implicitConversionClass,
+              r,
+              r.substitutor)
           case _ =>
-            new InnerScalaResolveResult(r.element,
-                                        r.implicitConversionClass,
-                                        r,
-                                        r.substitutor)
+            new InnerScalaResolveResult(
+              r.element,
+              r.implicitConversionClass,
+              r,
+              r.substitutor)
       }),
       noImplicit = false).map(_.repr)
   }
@@ -65,17 +67,19 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
       case (r, subst) =>
         r.innerResolveResult match {
           case Some(rr) =>
-            new InnerScalaResolveResult(rr.element,
-                                        rr.implicitConversionClass,
-                                        r,
-                                        subst,
-                                        implicitCase = true)
+            new InnerScalaResolveResult(
+              rr.element,
+              rr.implicitConversionClass,
+              r,
+              subst,
+              implicitCase = true)
           case None =>
-            new InnerScalaResolveResult(r.element,
-                                        r.implicitConversionClass,
-                                        r,
-                                        subst,
-                                        implicitCase = true)
+            new InnerScalaResolveResult(
+              r.element,
+              r.implicitConversionClass,
+              r,
+              subst,
+              implicitCase = true)
         }
     }, noImplicit = true).map(_.repr)
   }
@@ -88,17 +92,19 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
         r: ScalaResolveResult): InnerScalaResolveResult[ScalaResolveResult] = {
       r.innerResolveResult match {
         case Some(rr) =>
-          new InnerScalaResolveResult(rr.element,
-                                      rr.implicitConversionClass,
-                                      r,
-                                      ScSubstitutor.empty,
-                                      implicitCase = true)
+          new InnerScalaResolveResult(
+            rr.element,
+            rr.implicitConversionClass,
+            r,
+            ScSubstitutor.empty,
+            implicitCase = true)
         case None =>
-          new InnerScalaResolveResult(r.element,
-                                      r.implicitConversionClass,
-                                      r,
-                                      ScSubstitutor.empty,
-                                      implicitCase = true)
+          new InnerScalaResolveResult(
+            r.element,
+            r.implicitConversionClass,
+            r,
+            ScSubstitutor.empty,
+            implicitCase = true)
       }
     }
     val (next, r) =
@@ -122,12 +128,13 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
           checkCallByName(f.effectiveParameterClauses)
         case _ =>
       }
-      new InnerScalaResolveResult(r.element,
-                                  None,
-                                  r,
-                                  r.implicitDependentSubst followed r.subst,
-                                  callByName,
-                                  implicitCase = true)
+      new InnerScalaResolveResult(
+        r.element,
+        None,
+        r,
+        r.implicitDependentSubst followed r.subst,
+        callByName,
+        implicitCase = true)
     }), noImplicit = true).map(_.repr)
   }
 
@@ -156,8 +163,9 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
             existential: Boolean): Either[Seq[Parameter], ScType] = {
           tp match {
             case ScMethodType(_, params, _) => Left(params)
-            case ScTypePolymorphicType(ScMethodType(_, params, _),
-                                       typeParams) =>
+            case ScTypePolymorphicType(
+                ScMethodType(_, params, _),
+                typeParams) =>
               if (!existential) {
                 val s: ScSubstitutor =
                   typeParams.foldLeft(ScSubstitutor.empty) {
@@ -178,10 +186,11 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
                   }
                 val arguments = typeParams.toList.map(
                   tp =>
-                    new ScExistentialArgument(tp.name,
-                                              List.empty /* todo? */,
-                                              s.subst(tp.lowerType()),
-                                              s.subst(tp.upperType())))
+                    new ScExistentialArgument(
+                      tp.name,
+                      List.empty /* todo? */,
+                      s.subst(tp.lowerType()),
+                      s.subst(tp.upperType())))
                 Left(
                   params.map(p =>
                     p.copy(paramType =
@@ -208,10 +217,11 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
                   }
                 val arguments = typeParams.toList.map(
                   tp =>
-                    new ScExistentialArgument(tp.name,
-                                              List.empty /* todo? */,
-                                              s.subst(tp.lowerType()),
-                                              s.subst(tp.upperType())))
+                    new ScExistentialArgument(
+                      tp.name,
+                      List.empty /* todo? */,
+                      s.subst(tp.lowerType()),
+                      s.subst(tp.upperType())))
                 Right(ScExistentialType(s.subst(internal), arguments))
               }
             case _ => Right(tp)
@@ -236,8 +246,9 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
                 case p: Parameter if p.isRepeated =>
                   val seq = ScalaPsiManager
                     .instance(r1.element.getProject)
-                    .getCachedClass(r1.element.getResolveScope,
-                                    "scala.collection.Seq")
+                    .getCachedClass(
+                      r1.element.getResolveScope,
+                      "scala.collection.Seq")
                     .orNull
                   if (seq != null) {
                     val newParamType = p.paramType match {
@@ -246,32 +257,36 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
                           ScParameterizedType(ScDesignatorType(seq), Seq(q)),
                           wilds)
                       case paramType =>
-                        ScParameterizedType(ScDesignatorType(seq),
-                                            Seq(paramType))
+                        ScParameterizedType(
+                          ScDesignatorType(seq),
+                          Seq(paramType))
                     }
-                    Parameter(p.name,
-                              p.deprecatedName,
-                              newParamType,
-                              p.expectedType,
-                              p.isDefault,
-                              isRepeated = false,
-                              isByName = p.isByName)
+                    Parameter(
+                      p.name,
+                      p.deprecatedName,
+                      newParamType,
+                      p.expectedType,
+                      p.isDefault,
+                      isRepeated = false,
+                      isByName = p.isByName)
                   } else p
                 case p => p
               }
             val i: Int =
               if (params1.length > 0) 0.max(length - params1.length) else 0
-            val default: Expression = new Expression(if (params1.length > 0)
-                                                       params1.last.paramType
-                                                     else types.Nothing,
-                                                     elem)
+            val default: Expression = new Expression(
+              if (params1.length > 0)
+                params1.last.paramType
+              else types.Nothing,
+              elem)
             val exprs: Seq[Expression] =
               params1.map(p => new Expression(p.paramType, elem)) ++ Seq.fill(
                 i)(default)
-            Compatibility.checkConformance(checkNames = false,
-                                           params2,
-                                           exprs,
-                                           checkImplicits)
+            Compatibility.checkConformance(
+              checkNames = false,
+              params2,
+              exprs,
+              checkImplicits)
           case (Right(type1), Right(type2)) =>
             Conformance.conformsInner(
               type2,
@@ -453,8 +468,9 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
       case f: ScFunction if f.isConstructor =>
         f.containingClass match {
           case td: ScTypeDefinition if td.hasTypeParameters =>
-            ScTypePolymorphicType(f.methodType,
-                                  td.typeParameters.map(new TypeParameter(_)))
+            ScTypePolymorphicType(
+              f.methodType,
+              td.typeParameters.map(new TypeParameter(_)))
           case _ => f.polymorphicType()
         }
       case f: ScFunction => f.polymorphicType()
@@ -485,8 +501,9 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
 
     res match {
       case ScMethodType(retType, _, true) if implicitCase => retType
-      case ScTypePolymorphicType(ScMethodType(retType, _, true),
-                                 typeParameters) if implicitCase =>
+      case ScTypePolymorphicType(
+          ScMethodType(retType, _, true),
+          typeParameters) if implicitCase =>
         ScTypePolymorphicType(retType, typeParameters)
       case tp => tp
     }

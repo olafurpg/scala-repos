@@ -56,11 +56,12 @@ object AddSettings {
   def seq(autos: AddSettings*): AddSettings = new Sequence(autos)
 
   /** The default inclusion of settings. */
-  val allDefaults: AddSettings = seq(autoPlugins,
-                                     buildScalaFiles,
-                                     userSettings,
-                                     nonAutoPlugins,
-                                     defaultSbtFiles)
+  val allDefaults: AddSettings = seq(
+    autoPlugins,
+    buildScalaFiles,
+    userSettings,
+    nonAutoPlugins,
+    defaultSbtFiles)
 
   /** Combines two automatic setting configurations. */
   def append(a: AddSettings, b: AddSettings): AddSettings = (a, b) match {

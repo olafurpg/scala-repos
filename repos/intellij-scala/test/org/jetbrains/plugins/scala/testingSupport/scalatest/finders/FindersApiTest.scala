@@ -49,10 +49,11 @@ trait FindersApiTest
     //on 'feature' word
     checkSelection(3, 7, fileName, Set(scenarioA, scenarioB))
     //on feature name
-    checkSelection(14,
-                   15,
-                   fileName,
-                   Set("Feature: Feature 2 Scenario: Scenario C"))
+    checkSelection(
+      14,
+      15,
+      fileName,
+      Set("Feature: Feature 2 Scenario: Scenario C"))
     //inside scenario
     checkSelection(5, 8, fileName, Set(scenarioA))
   }

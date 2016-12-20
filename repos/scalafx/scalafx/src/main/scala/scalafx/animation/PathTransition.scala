@@ -63,15 +63,17 @@ object PathTransition extends AnimationStatics {
     * Companion Object for $OT, where its values are defined.
     */
   object OrientationType
-      extends SFXEnumDelegateCompanion[jfxa.PathTransition.OrientationType,
-                                       OrientationType] {
+      extends SFXEnumDelegateCompanion[
+        jfxa.PathTransition.OrientationType,
+        OrientationType] {
 
     /**
       * The targeted node's rotation matrix stays unchanged along the geometric path.
       */
     val None = new OrientationType(jfxa.PathTransition.OrientationType.NONE)
-    @deprecated("Use None; NONE will be removed in a future release",
-                "8.0.60-R10")
+    @deprecated(
+      "Use None; NONE will be removed in a future release",
+      "8.0.60-R10")
     val NONE = None
 
     /**

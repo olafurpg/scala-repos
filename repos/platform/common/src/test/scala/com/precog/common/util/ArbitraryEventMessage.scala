@@ -76,13 +76,14 @@ trait ArbitraryEventMessage extends ArbitraryJValue {
       jobId <- oneOf(identifier.map(Option.apply), None)
       streamRef <- genStreamRef
     } yield
-      Ingest(apiKey,
-             path,
-             Some(Authorities(ownerAccountId)),
-             content,
-             jobId,
-             new Instant(),
-             streamRef)
+      Ingest(
+        apiKey,
+        path,
+        Some(Authorities(ownerAccountId)),
+        content,
+        jobId,
+        new Instant(),
+        streamRef)
 
   def genRandomArchive: Gen[Archive] =
     for {
@@ -101,13 +102,14 @@ trait ArbitraryEventMessage extends ArbitraryJValue {
       //TODO: Replace with IngestMessage.fromIngest when it's usable
       val data =
         (eventIds zip ingest.data) map { Function.tupled(IngestRecord.apply) }
-      IngestMessage(ingest.apiKey,
-                    ingest.path,
-                    ingest.writeAs.get,
-                    data,
-                    ingest.jobId,
-                    new Instant(),
-                    streamRef)
+      IngestMessage(
+        ingest.apiKey,
+        ingest.path,
+        ingest.writeAs.get,
+        data,
+        ingest.jobId,
+        new Instant(),
+        streamRef)
     }
 
   def genRandomArchiveMessage: Gen[ArchiveMessage] =
@@ -115,11 +117,12 @@ trait ArbitraryEventMessage extends ArbitraryJValue {
       eventId <- genEventId
       archive <- genRandomArchive
     } yield
-      ArchiveMessage(archive.apiKey,
-                     archive.path,
-                     archive.jobId,
-                     eventId,
-                     archive.timestamp)
+      ArchiveMessage(
+        archive.apiKey,
+        archive.path,
+        archive.jobId,
+        eventId,
+        archive.timestamp)
 
   def genRandomEventMessage: Gen[EventMessage] =
     frequency(
@@ -155,8 +158,9 @@ trait RealisticEventMessage extends ArbitraryEventMessage {
     if (depth == 0) {
       List(parent)
     } else {
-      parent :: containerOfN[List, String](choose(2, 4).sample.get,
-                                           resize(10, alphaStr))
+      parent :: containerOfN[List, String](
+        choose(2, 4).sample.get,
+        resize(10, alphaStr))
         .map(_.filter(_.length > 1).flatMap(child =>
           buildChildPaths(child :: parent, depth - 1)))
         .sample
@@ -187,13 +191,14 @@ trait RealisticEventMessage extends ArbitraryEventMessage {
         Vector(l: _*))
       streamRef <- genStreamRef
     } yield
-      Ingest(ingestAPIKey,
-             Path(path),
-             Some(ingestOwnerAccountId),
-             ingestData,
-             None,
-             new Instant(),
-             streamRef)
+      Ingest(
+        ingestAPIKey,
+        Path(path),
+        Some(ingestOwnerAccountId),
+        ingestData,
+        None,
+        new Instant(),
+        streamRef)
 
   def genIngestMessage: Gen[IngestMessage] =
     for {
@@ -206,12 +211,13 @@ trait RealisticEventMessage extends ArbitraryEventMessage {
             EventId(producerId, eventIds(producerId).getAndIncrement),
             jv)
         }
-      IngestMessage(ingest.apiKey,
-                    ingest.path,
-                    ingest.writeAs.get,
-                    records,
-                    ingest.jobId,
-                    ingest.timestamp,
-                    ingest.streamRef)
+      IngestMessage(
+        ingest.apiKey,
+        ingest.path,
+        ingest.writeAs.get,
+        records,
+        ingest.jobId,
+        ingest.timestamp,
+        ingest.streamRef)
     }
 }

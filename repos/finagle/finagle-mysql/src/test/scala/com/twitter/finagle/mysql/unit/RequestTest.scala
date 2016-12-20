@@ -27,26 +27,27 @@ class SimpleCommandRequestTest extends FunSuite {
 class HandshakeResponseTest extends FunSuite {
   val username = Some("username")
   val password = Some("password")
-  val salt = Array[Byte](70,
-                         38,
-                         43,
-                         66,
-                         74,
-                         48,
-                         79,
-                         126,
-                         76,
-                         66,
-                         70,
-                         118,
-                         67,
-                         40,
-                         63,
-                         68,
-                         120,
-                         80,
-                         103,
-                         54)
+  val salt = Array[Byte](
+    70,
+    38,
+    43,
+    66,
+    74,
+    48,
+    79,
+    126,
+    76,
+    66,
+    70,
+    118,
+    67,
+    40,
+    63,
+    68,
+    120,
+    80,
+    103,
+    54)
   val req = HandshakeResponse(
     username,
     password,
@@ -225,10 +226,11 @@ class ExecuteRequestTest extends FunSuite {
       new TimestampValue(TimeZone.getDefault(), TimeZone.getDefault())
 
     test("java.sql.Timestamp") {
-      val raw = RawValue(Type.Timestamp,
-                         Charset.Binary,
-                         true,
-                         br.readLengthCodedBytes())
+      val raw = RawValue(
+        Type.Timestamp,
+        Charset.Binary,
+        true,
+        br.readLengthCodedBytes())
       val timestampValueLocal(ts) = raw
       assert(ts == timestamp)
     }
@@ -241,10 +243,11 @@ class ExecuteRequestTest extends FunSuite {
     }
 
     test("java.util.Date") {
-      val raw = RawValue(Type.DateTime,
-                         Charset.Binary,
-                         true,
-                         br.readLengthCodedBytes())
+      val raw = RawValue(
+        Type.DateTime,
+        Charset.Binary,
+        true,
+        br.readLengthCodedBytes())
       val timestampValueLocal(dt) = raw
       assert(dt.getTime == timestamp.getTime)
     }

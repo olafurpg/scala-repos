@@ -64,10 +64,11 @@ class HDFSStateLaws extends WordSpec {
         }
         case _ => fail("requested interval should be an interseciton")
       }
-      shouldCheckpointInterval(batcher,
-                               nextState,
-                               nextPrepareState.requested,
-                               path)
+      shouldCheckpointInterval(
+        batcher,
+        nextState,
+        nextPrepareState.requested,
+        path)
     }
   }
 
@@ -83,23 +84,27 @@ class HDFSStateLaws extends WordSpec {
         batcher.earliestTimeOf(batcher.batchOf(startDate.get))
       // Not aligned with batch size
       val partialIncompleteInterval: Interval[Timestamp] =
-        leftClosedRightOpenInterval(startBatchTime,
-                                    RichDate("2012-12-26T10:40").value)
+        leftClosedRightOpenInterval(
+          startBatchTime,
+          RichDate("2012-12-26T10:40").value)
       shouldNotAcceptInterval(waitingState, partialIncompleteInterval)
 
       //artificially create a 1 millis hole
       val intervalWithHoles: Interval[Timestamp] =
-        leftClosedRightOpenInterval(startBatchTime.incrementMillis(1),
-                                    RichDate("2012-12-26T11:30").value)
+        leftClosedRightOpenInterval(
+          startBatchTime.incrementMillis(1),
+          RichDate("2012-12-26T11:30").value)
       shouldNotAcceptInterval(waitingState, intervalWithHoles)
 
       val partialCompleteInterval: Interval[Timestamp] =
-        leftClosedRightOpenInterval(startBatchTime,
-                                    RichDate("2012-12-26T11:30").value)
-      shouldCheckpointInterval(batcher,
-                               waitingState,
-                               partialCompleteInterval,
-                               path)
+        leftClosedRightOpenInterval(
+          startBatchTime,
+          RichDate("2012-12-26T11:30").value)
+      shouldCheckpointInterval(
+        batcher,
+        waitingState,
+        partialCompleteInterval,
+        path)
     }
   }
 
@@ -135,8 +140,9 @@ class HDFSStateLaws extends WordSpec {
     interval match {
       case intersection @ Intersection(low, high) => {
         BatchID
-          .range(batcher.batchOf(low.least.get),
-                 batcher.batchOf(high.greatest.get))
+          .range(
+            batcher.batchOf(low.least.get),
+            batcher.batchOf(high.greatest.get))
           .foreach { t =>
             val totPath =
               (path + "/" + batcher.earliestTimeOf(t).milliSinceEpoch +

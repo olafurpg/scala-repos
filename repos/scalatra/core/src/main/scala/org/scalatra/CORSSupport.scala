@@ -33,14 +33,15 @@ object CorsSupport {
     "MULTIPART/FORM-DATA",
     "TEXT/PLAIN")
 
-  val CorsHeaders: Seq[String] = List(OriginHeader,
-                                      AccessControlAllowCredentialsHeader,
-                                      AccessControlAllowHeadersHeader,
-                                      AccessControlAllowMethodsHeader,
-                                      AccessControlAllowOriginHeader,
-                                      AccessControlMaxAgeHeader,
-                                      AccessControlRequestHeadersHeader,
-                                      AccessControlRequestMethodHeader)
+  val CorsHeaders: Seq[String] = List(
+    OriginHeader,
+    AccessControlAllowCredentialsHeader,
+    AccessControlAllowHeadersHeader,
+    AccessControlAllowMethodsHeader,
+    AccessControlAllowOriginHeader,
+    AccessControlMaxAgeHeader,
+    AccessControlRequestHeadersHeader,
+    AccessControlRequestMethodHeader)
 
   case class CORSConfig(allowedOrigins: Seq[String],
                         allowedMethods: Seq[String],
@@ -62,22 +63,23 @@ object CorsSupport {
 
   private val DefaultMethods: String = "GET,POST,PUT,DELETE,HEAD,OPTIONS,PATCH"
 
-  private val DefaultHeaders: String = Seq("Cookie",
-                                           "Host",
-                                           "X-Forwarded-For",
-                                           "Accept-Charset",
-                                           "If-Modified-Since",
-                                           "Accept-Language",
-                                           "X-Forwarded-Port",
-                                           "Connection",
-                                           "X-Forwarded-Proto",
-                                           "User-Agent",
-                                           "Referer",
-                                           "Accept-Encoding",
-                                           "X-Requested-With",
-                                           "Authorization",
-                                           "Accept",
-                                           "Content-Type").mkString(",")
+  private val DefaultHeaders: String = Seq(
+    "Cookie",
+    "Host",
+    "X-Forwarded-For",
+    "Accept-Charset",
+    "If-Modified-Since",
+    "Accept-Language",
+    "X-Forwarded-Port",
+    "Connection",
+    "X-Forwarded-Proto",
+    "User-Agent",
+    "Referer",
+    "Accept-Encoding",
+    "X-Requested-With",
+    "Authorization",
+    "Accept",
+    "Content-Type").mkString(",")
 }
 trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
 
@@ -118,9 +120,10 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
     import corsCfg._
     if (enabled) {
       logger debug "Enabled CORS Support with:\nallowedOrigins:\n\t%s\nallowedMethods:\n\t%s\nallowedHeaders:\n\t%s"
-        .format(allowedOrigins mkString ", ",
-                allowedMethods mkString ", ",
-                allowedHeaders mkString ", ")
+        .format(
+          allowedOrigins mkString ", ",
+          allowedMethods mkString ", ",
+          allowedHeaders mkString ", ")
     } else {
       logger debug "Cors support is disabled"
     }
@@ -156,8 +159,9 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
     response.headers(AccessControlAllowOriginHeader) = hdr
     if (corsConfig.allowCredentials)
       response.headers(AccessControlAllowCredentialsHeader) = "true"
-    response.setHeader(AccessControlAllowHeadersHeader,
-                       request.getHeader(AccessControlRequestHeadersHeader))
+    response.setHeader(
+      AccessControlAllowHeadersHeader,
+      request.getHeader(AccessControlRequestHeadersHeader))
   }
 
   private[this] def corsConfig: CORSConfig = {

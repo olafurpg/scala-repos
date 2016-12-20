@@ -45,15 +45,17 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       "Accept: */*, text/*; foo=bar, custom/custom; bar=\"b>az\"" =!= Accept(
         `*/*`,
         MediaRange.custom("text", Map("foo" -> "bar")),
-        MediaType.customBinary("custom",
-                               "custom",
-                               MediaType.Compressible,
-                               params = Map("bar" -> "b>az")))
+        MediaType.customBinary(
+          "custom",
+          "custom",
+          MediaType.Compressible,
+          params = Map("bar" -> "b>az")))
       "Accept: application/*+xml; version=2" =!= Accept(
-        MediaType.customBinary("application",
-                               "*+xml",
-                               MediaType.Compressible,
-                               params = Map("version" -> "2")))
+        MediaType.customBinary(
+          "application",
+          "*+xml",
+          MediaType.Compressible,
+          params = Map("version" -> "2")))
     }
 
     "Accept-Charset" in {
@@ -157,9 +159,9 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       "Accept-Language: de-CH-1901, *;q=0.0" =!= `Accept-Language`(
         Language("de", "CH", "1901"),
         LanguageRange.`*` withQValue 0f)
-      "Accept-Language: es-419, es" =!= `Accept-Language`(Language("es",
-                                                                   "419"),
-                                                          Language("es"))
+      "Accept-Language: es-419, es" =!= `Accept-Language`(
+        Language("es", "419"),
+        Language("es"))
     }
 
     "Age" in {
@@ -183,8 +185,9 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
         GenericHttpCredentials("Fancy", Map("yes" -> "n:o", "nonce" -> "42")))
         .renderedTo("""Fancy yes="n:o",nonce=42""")
       """Authorization: Fancy yes=no,nonce="4\\2"""" =!= Authorization(
-        GenericHttpCredentials("Fancy",
-                               Map("yes" -> "no", "nonce" -> """4\2""")))
+        GenericHttpCredentials(
+          "Fancy",
+          Map("yes" -> "no", "nonce" -> """4\2""")))
       "Authorization: Basic Qm9iOg==" =!= Authorization(
         BasicHttpCredentials("Bob", ""))
       """Authorization: Digest name=Bob""" =!= Authorization(
@@ -200,8 +203,9 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
     }
 
     "Cache-Control" in {
-      "Cache-Control: no-cache, max-age=0" =!= `Cache-Control`(`no-cache`,
-                                                               `max-age`(0))
+      "Cache-Control: no-cache, max-age=0" =!= `Cache-Control`(
+        `no-cache`,
+        `max-age`(0))
       "Cache-Control: private=\"Some-Field\"" =!= `Cache-Control`(
         `private`("Some-Field"))
       "Cache-Control: private, community=\"<UCI>\"" =!= `Cache-Control`(
@@ -270,10 +274,11 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
         `multipart/mixed` withBoundary "ABC/123" withCharset `UTF-8`)
         .renderedTo("""multipart/mixed; boundary="ABC/123"; charset=UTF-8""")
       "Content-Type: application/*" =!= `Content-Type`(
-        MediaType.customBinary("application",
-                               "*",
-                               MediaType.Compressible,
-                               allowArbitrarySubtypes = true))
+        MediaType.customBinary(
+          "application",
+          "*",
+          MediaType.Compressible,
+          allowArbitrarySubtypes = true))
     }
 
     "Content-Range" in {
@@ -333,19 +338,22 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
         List(HttpCookiePair("z" -> "0"), HttpCookiePair.raw("a" -> "1,b=2")))
         .withCookieParsingMode(CookieParsingMode.Raw)
       """Cookie: a=1;b="test"""" =!= Cookie(
-        List(HttpCookiePair("a" -> "1"),
-             HttpCookiePair.raw("b" -> "\"test\"")))
+        List(
+          HttpCookiePair("a" -> "1"),
+          HttpCookiePair.raw("b" -> "\"test\"")))
         .renderedTo("a=1; b=\"test\"")
         .withCookieParsingMode(CookieParsingMode.Raw)
       "Cookie: a=1; b=f\"d\"c\"; c=xyz" =!= Cookie(
-        List(HttpCookiePair("a" -> "1"),
-             HttpCookiePair.raw("b" -> "f\"d\"c\""),
-             HttpCookiePair("c" -> "xyz")))
+        List(
+          HttpCookiePair("a" -> "1"),
+          HttpCookiePair.raw("b" -> "f\"d\"c\""),
+          HttpCookiePair("c" -> "xyz")))
         .withCookieParsingMode(CookieParsingMode.Raw)
       "Cookie: a=1; b=ä; c=d" =!= Cookie(
-        List(HttpCookiePair("a" -> "1"),
-             HttpCookiePair.raw("b" -> "ä"),
-             HttpCookiePair("c" -> "d")))
+        List(
+          HttpCookiePair("a" -> "1"),
+          HttpCookiePair.raw("b" -> "ä"),
+          HttpCookiePair("c" -> "d")))
         .withCookieParsingMode(CookieParsingMode.Raw)
     }
 
@@ -450,8 +458,9 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
 
     "Link" in {
       "Link: </?page=2>; rel=next" =!= Link(Uri("/?page=2"), LinkParams.next)
-      "Link: <https://spray.io>; rel=next" =!= Link(Uri("https://spray.io"),
-                                                    LinkParams.next)
+      "Link: <https://spray.io>; rel=next" =!= Link(
+        Uri("https://spray.io"),
+        LinkParams.next)
       """Link: </>; rel=prev, </page/2>; rel="next"""" =!= Link(
         LinkValue(Uri("/"), LinkParams.prev),
         LinkValue(Uri("/page/2"), LinkParams.next))
@@ -460,8 +469,9 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       """Link: </>; rel="x.y-z http://spray.io"""" =!= Link(
         Uri("/"),
         LinkParams.rel("x.y-z http://spray.io"))
-      """Link: </>; title="My Title"""" =!= Link(Uri("/"),
-                                                 LinkParams.title("My Title"))
+      """Link: </>; title="My Title"""" =!= Link(
+        Uri("/"),
+        LinkParams.title("My Title"))
       """Link: </>; rel=next; title="My Title"""" =!= Link(
         Uri("/"),
         LinkParams.next,
@@ -509,8 +519,9 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
 
     "Proxy-Authorization" in {
       """Proxy-Authorization: Fancy yes=no,nonce="4\\2"""" =!= `Proxy-Authorization`(
-        GenericHttpCredentials("Fancy",
-                               Map("yes" -> "no", "nonce" -> """4\2""")))
+        GenericHttpCredentials(
+          "Fancy",
+          Map("yes" -> "no", "nonce" -> """4\2""")))
     }
 
     "Referer" in {
@@ -549,9 +560,10 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       "Range: bytes=0-1" =!= Range(ByteRange(0, 1))
       "Range: bytes=0-" =!= Range(ByteRange.fromOffset(0))
       "Range: bytes=-1" =!= Range(ByteRange.suffix(1))
-      "Range: bytes=0-1, 2-3, -99" =!= Range(ByteRange(0, 1),
-                                             ByteRange(2, 3),
-                                             ByteRange.suffix(99))
+      "Range: bytes=0-1, 2-3, -99" =!= Range(
+        ByteRange(0, 1),
+        ByteRange(2, 3),
+        ByteRange.suffix(99))
     }
 
     "Sec-WebSocket-Accept" in {
@@ -564,26 +576,34 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       "Sec-WebSocket-Extensions: abc, def" =!= `Sec-WebSocket-Extensions`(
         Vector(WebSocketExtension("abc"), WebSocketExtension("def")))
       "Sec-WebSocket-Extensions: abc; param=2; use_y, def" =!= `Sec-WebSocket-Extensions`(
-        Vector(WebSocketExtension("abc", Map("param" -> "2", "use_y" -> "")),
-               WebSocketExtension("def")))
+        Vector(
+          WebSocketExtension("abc", Map("param" -> "2", "use_y" -> "")),
+          WebSocketExtension("def")))
       "Sec-WebSocket-Extensions: abc; param=\",xyz\", def" =!= `Sec-WebSocket-Extensions`(
-        Vector(WebSocketExtension("abc", Map("param" -> ",xyz")),
-               WebSocketExtension("def")))
+        Vector(
+          WebSocketExtension("abc", Map("param" -> ",xyz")),
+          WebSocketExtension("def")))
 
       // real examples from https://tools.ietf.org/html/draft-ietf-hybi-permessage-compression-19
       "Sec-WebSocket-Extensions: permessage-deflate" =!= `Sec-WebSocket-Extensions`(
         Vector(WebSocketExtension("permessage-deflate")))
       "Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits; server_max_window_bits=10" =!= `Sec-WebSocket-Extensions`(
         Vector(
-          WebSocketExtension("permessage-deflate",
-                             Map("client_max_window_bits" -> "",
-                                 "server_max_window_bits" -> "10"))))
+          WebSocketExtension(
+            "permessage-deflate",
+            Map(
+              "client_max_window_bits" -> "",
+              "server_max_window_bits" -> "10"))))
       "Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits; server_max_window_bits=10, permessage-deflate; client_max_window_bits" =!= `Sec-WebSocket-Extensions`(
-        Vector(WebSocketExtension("permessage-deflate",
-                                  Map("client_max_window_bits" -> "",
-                                      "server_max_window_bits" -> "10")),
-               WebSocketExtension("permessage-deflate",
-                                  Map("client_max_window_bits" -> ""))))
+        Vector(
+          WebSocketExtension(
+            "permessage-deflate",
+            Map(
+              "client_max_window_bits" -> "",
+              "server_max_window_bits" -> "10")),
+          WebSocketExtension(
+            "permessage-deflate",
+            Map("client_max_window_bits" -> ""))))
     }
     "Sec-WebSocket-Key" in {
       "Sec-WebSocket-Key: c2Zxb3JpbmgyMzA5dGpoMDIzOWdlcm5vZ2luCg==" =!= `Sec-WebSocket-Key`(
@@ -609,113 +629,131 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
         HttpCookie("SID", "31d4d96e407aad42"))
         .renderedTo("SID=31d4d96e407aad42")
       "Set-Cookie: SID=31d4d96e407aad42; Domain=example.com; Path=/" =!= `Set-Cookie`(
-        HttpCookie("SID",
-                   "31d4d96e407aad42",
-                   path = Some("/"),
-                   domain = Some("example.com")))
+        HttpCookie(
+          "SID",
+          "31d4d96e407aad42",
+          path = Some("/"),
+          domain = Some("example.com")))
       "Set-Cookie: lang=en-US; Expires=Wed, 09 Jun 2021 10:18:14 GMT; Path=/hello" =!= `Set-Cookie`(
-        HttpCookie("lang",
-                   "en-US",
-                   expires = Some(DateTime(2021, 6, 9, 10, 18, 14)),
-                   path = Some("/hello")))
+        HttpCookie(
+          "lang",
+          "en-US",
+          expires = Some(DateTime(2021, 6, 9, 10, 18, 14)),
+          path = Some("/hello")))
       "Set-Cookie: name=123; Max-Age=12345; Secure" =!= `Set-Cookie`(
         HttpCookie("name", "123", maxAge = Some(12345), secure = true))
       "Set-Cookie: name=123; HttpOnly; fancyPants" =!= `Set-Cookie`(
-        HttpCookie("name",
-                   "123",
-                   httpOnly = true,
-                   extension = Some("fancyPants")))
+        HttpCookie(
+          "name",
+          "123",
+          httpOnly = true,
+          extension = Some("fancyPants")))
       "Set-Cookie: foo=bar; domain=example.com; Path=/this is a path with blanks; extension with blanks" =!= `Set-Cookie`(
-        HttpCookie("foo",
-                   "bar",
-                   domain = Some("example.com"),
-                   path = Some("/this is a path with blanks"),
-                   extension = Some("extension with blanks"))).renderedTo(
+        HttpCookie(
+          "foo",
+          "bar",
+          domain = Some("example.com"),
+          path = Some("/this is a path with blanks"),
+          extension = Some("extension with blanks"))).renderedTo(
         "foo=bar; Domain=example.com; Path=/this is a path with blanks; extension with blanks")
 
       // test all weekdays
       "Set-Cookie: lang=; Expires=Sun, 07 Dec 2014 00:42:55 GMT; Max-Age=12345" =!= `Set-Cookie`(
-        HttpCookie("lang",
-                   "",
-                   expires = Some(DateTime(2014, 12, 7, 0, 42, 55)),
-                   maxAge = Some(12345)))
+        HttpCookie(
+          "lang",
+          "",
+          expires = Some(DateTime(2014, 12, 7, 0, 42, 55)),
+          maxAge = Some(12345)))
       "Set-Cookie: lang=; Expires=Sunday, 07 Dec 2014 00:42:55 GMT; Max-Age=12345" =!= `Set-Cookie`(
-        HttpCookie("lang",
-                   "",
-                   expires = Some(DateTime(2014, 12, 7, 0, 42, 55)),
-                   maxAge = Some(12345))).renderedTo(
+        HttpCookie(
+          "lang",
+          "",
+          expires = Some(DateTime(2014, 12, 7, 0, 42, 55)),
+          maxAge = Some(12345))).renderedTo(
         "lang=; Expires=Sun, 07 Dec 2014 00:42:55 GMT; Max-Age=12345")
 
       "Set-Cookie: lang=; Expires=Mon, 08 Dec 2014 00:42:55 GMT; Max-Age=12345" =!= `Set-Cookie`(
-        HttpCookie("lang",
-                   "",
-                   expires = Some(DateTime(2014, 12, 8, 0, 42, 55)),
-                   maxAge = Some(12345)))
+        HttpCookie(
+          "lang",
+          "",
+          expires = Some(DateTime(2014, 12, 8, 0, 42, 55)),
+          maxAge = Some(12345)))
       "Set-Cookie: lang=; Expires=Monday, 08 Dec 2014 00:42:55 GMT; Max-Age=12345" =!= `Set-Cookie`(
-        HttpCookie("lang",
-                   "",
-                   expires = Some(DateTime(2014, 12, 8, 0, 42, 55)),
-                   maxAge = Some(12345))).renderedTo(
+        HttpCookie(
+          "lang",
+          "",
+          expires = Some(DateTime(2014, 12, 8, 0, 42, 55)),
+          maxAge = Some(12345))).renderedTo(
         "lang=; Expires=Mon, 08 Dec 2014 00:42:55 GMT; Max-Age=12345")
 
       "Set-Cookie: lang=; Expires=Tue, 09 Dec 2014 00:42:55 GMT; Max-Age=12345" =!= `Set-Cookie`(
-        HttpCookie("lang",
-                   "",
-                   expires = Some(DateTime(2014, 12, 9, 0, 42, 55)),
-                   maxAge = Some(12345)))
+        HttpCookie(
+          "lang",
+          "",
+          expires = Some(DateTime(2014, 12, 9, 0, 42, 55)),
+          maxAge = Some(12345)))
       "Set-Cookie: lang=; Expires=Tuesday, 09 Dec 2014 00:42:55 GMT; Max-Age=12345" =!= `Set-Cookie`(
-        HttpCookie("lang",
-                   "",
-                   expires = Some(DateTime(2014, 12, 9, 0, 42, 55)),
-                   maxAge = Some(12345))).renderedTo(
+        HttpCookie(
+          "lang",
+          "",
+          expires = Some(DateTime(2014, 12, 9, 0, 42, 55)),
+          maxAge = Some(12345))).renderedTo(
         "lang=; Expires=Tue, 09 Dec 2014 00:42:55 GMT; Max-Age=12345")
 
       "Set-Cookie: lang=; Expires=Wed, 10 Dec 2014 00:42:55 GMT; Max-Age=12345" =!= `Set-Cookie`(
-        HttpCookie("lang",
-                   "",
-                   expires = Some(DateTime(2014, 12, 10, 0, 42, 55)),
-                   maxAge = Some(12345)))
+        HttpCookie(
+          "lang",
+          "",
+          expires = Some(DateTime(2014, 12, 10, 0, 42, 55)),
+          maxAge = Some(12345)))
       "Set-Cookie: lang=; Expires=Wednesday, 10 Dec 2014 00:42:55 GMT; Max-Age=12345" =!= `Set-Cookie`(
-        HttpCookie("lang",
-                   "",
-                   expires = Some(DateTime(2014, 12, 10, 0, 42, 55)),
-                   maxAge = Some(12345))).renderedTo(
+        HttpCookie(
+          "lang",
+          "",
+          expires = Some(DateTime(2014, 12, 10, 0, 42, 55)),
+          maxAge = Some(12345))).renderedTo(
         "lang=; Expires=Wed, 10 Dec 2014 00:42:55 GMT; Max-Age=12345")
 
       "Set-Cookie: lang=; Expires=Thu, 11 Dec 2014 00:42:55 GMT; Max-Age=12345" =!= `Set-Cookie`(
-        HttpCookie("lang",
-                   "",
-                   expires = Some(DateTime(2014, 12, 11, 0, 42, 55)),
-                   maxAge = Some(12345)))
+        HttpCookie(
+          "lang",
+          "",
+          expires = Some(DateTime(2014, 12, 11, 0, 42, 55)),
+          maxAge = Some(12345)))
       "Set-Cookie: lang=; Expires=Thursday, 11 Dec 2014 00:42:55 GMT; Max-Age=12345" =!= `Set-Cookie`(
-        HttpCookie("lang",
-                   "",
-                   expires = Some(DateTime(2014, 12, 11, 0, 42, 55)),
-                   maxAge = Some(12345))).renderedTo(
+        HttpCookie(
+          "lang",
+          "",
+          expires = Some(DateTime(2014, 12, 11, 0, 42, 55)),
+          maxAge = Some(12345))).renderedTo(
         "lang=; Expires=Thu, 11 Dec 2014 00:42:55 GMT; Max-Age=12345")
 
       "Set-Cookie: lang=; Expires=Fri, 12 Dec 2014 00:42:55 GMT; Max-Age=12345" =!= `Set-Cookie`(
-        HttpCookie("lang",
-                   "",
-                   expires = Some(DateTime(2014, 12, 12, 0, 42, 55)),
-                   maxAge = Some(12345)))
+        HttpCookie(
+          "lang",
+          "",
+          expires = Some(DateTime(2014, 12, 12, 0, 42, 55)),
+          maxAge = Some(12345)))
       "Set-Cookie: lang=; Expires=Friday, 12 Dec 2014 00:42:55 GMT; Max-Age=12345" =!= `Set-Cookie`(
-        HttpCookie("lang",
-                   "",
-                   expires = Some(DateTime(2014, 12, 12, 0, 42, 55)),
-                   maxAge = Some(12345))).renderedTo(
+        HttpCookie(
+          "lang",
+          "",
+          expires = Some(DateTime(2014, 12, 12, 0, 42, 55)),
+          maxAge = Some(12345))).renderedTo(
         "lang=; Expires=Fri, 12 Dec 2014 00:42:55 GMT; Max-Age=12345")
 
       "Set-Cookie: lang=; Expires=Sat, 13 Dec 2014 00:42:55 GMT; Max-Age=12345" =!= `Set-Cookie`(
-        HttpCookie("lang",
-                   "",
-                   expires = Some(DateTime(2014, 12, 13, 0, 42, 55)),
-                   maxAge = Some(12345)))
+        HttpCookie(
+          "lang",
+          "",
+          expires = Some(DateTime(2014, 12, 13, 0, 42, 55)),
+          maxAge = Some(12345)))
       "Set-Cookie: lang=; Expires=Saturday, 13 Dec 2014 00:42:55 GMT; Max-Age=12345" =!= `Set-Cookie`(
-        HttpCookie("lang",
-                   "",
-                   expires = Some(DateTime(2014, 12, 13, 0, 42, 55)),
-                   maxAge = Some(12345))).renderedTo(
+        HttpCookie(
+          "lang",
+          "",
+          expires = Some(DateTime(2014, 12, 13, 0, 42, 55)),
+          maxAge = Some(12345))).renderedTo(
         "lang=; Expires=Sat, 13 Dec 2014 00:42:55 GMT; Max-Age=12345")
 
       "Set-Cookie: lang=; Expires=Mon, 13 Dec 2014 00:42:55 GMT; Max-Age=12345" =!= ErrorInfo(
@@ -728,17 +766,19 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
 
       // extra examples from play
       "Set-Cookie: PLAY_FLASH=\"success=found\"; Path=/; HTTPOnly" =!= `Set-Cookie`(
-        HttpCookie("PLAY_FLASH",
-                   "success=found",
-                   path = Some("/"),
-                   httpOnly = true))
+        HttpCookie(
+          "PLAY_FLASH",
+          "success=found",
+          path = Some("/"),
+          httpOnly = true))
         .renderedTo("PLAY_FLASH=success=found; Path=/; HttpOnly")
       "Set-Cookie: PLAY_FLASH=; Expires=Sun, 07 Dec 2014 22:48:47 GMT; Path=/; HTTPOnly" =!= `Set-Cookie`(
-        HttpCookie("PLAY_FLASH",
-                   "",
-                   expires = Some(DateTime(2014, 12, 7, 22, 48, 47)),
-                   path = Some("/"),
-                   httpOnly = true)).renderedTo(
+        HttpCookie(
+          "PLAY_FLASH",
+          "",
+          expires = Some(DateTime(2014, 12, 7, 22, 48, 47)),
+          path = Some("/"),
+          httpOnly = true)).renderedTo(
         "PLAY_FLASH=; Expires=Sun, 07 Dec 2014 22:48:47 GMT; Path=/; HttpOnly")
     }
 
@@ -774,11 +814,13 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
                            nonce=dcd98b7102dd2f0e8b11d0f600bfb0c093,
                            opaque=5ccc069c403ebaf9f0171e9517f40e41"""
         .stripMarginWithNewline("\r\n") =!= `WWW-Authenticate`(
-        HttpChallenge("Digest",
-                      "testrealm@host.com",
-                      Map("qop" -> "auth,auth-int",
-                          "nonce" -> "dcd98b7102dd2f0e8b11d0f600bfb0c093",
-                          "opaque" -> "5ccc069c403ebaf9f0171e9517f40e41")))
+        HttpChallenge(
+          "Digest",
+          "testrealm@host.com",
+          Map(
+            "qop" -> "auth,auth-int",
+            "nonce" -> "dcd98b7102dd2f0e8b11d0f600bfb0c093",
+            "opaque" -> "5ccc069c403ebaf9f0171e9517f40e41")))
         .renderedTo(
           "Digest realm=\"testrealm@host.com\",qop=\"auth,auth-int\",nonce=dcd98b7102dd2f0e8b11d0f600bfb0c093,opaque=5ccc069c403ebaf9f0171e9517f40e41")
       "WWW-Authenticate: Basic realm=\"WallyWorld\",attr=\"val>ue\", Fancy realm=\"yeah\"" =!= `WWW-Authenticate`(
@@ -871,8 +913,9 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
     }
 
     "RawHeader" in {
-      "X-Space-Ranger: no, this rock!" =!= RawHeader("X-Space-Ranger",
-                                                     "no, this rock!")
+      "X-Space-Ranger: no, this rock!" =!= RawHeader(
+        "X-Space-Ranger",
+        "no, this rock!")
     }
   }
 
@@ -892,8 +935,9 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
     }
     "allow UTF8 characters in RawHeaders" in {
       parse("Flood-Resistant-Hammerdrill", "árvíztűrő ütvefúrógép") shouldEqual ParsingResult
-        .Ok(RawHeader("Flood-Resistant-Hammerdrill", "árvíztűrő ütvefúrógép"),
-            Nil)
+        .Ok(
+          RawHeader("Flood-Resistant-Hammerdrill", "árvíztűrő ütvefúrógép"),
+          Nil)
     }
     "compress value whitespace into single spaces and trim" in {
       parse("Foo", " b  a \tr\t") shouldEqual ParsingResult
@@ -907,10 +951,11 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
     "parse with custom uri parsing mode" in {
       val targetUri =
         Uri("http://example.org/?abc=def=ghi", Uri.ParsingMode.Relaxed)
-      HeaderParser.parseFull("location",
-                             "http://example.org/?abc=def=ghi",
-                             HeaderParser.Settings(uriParsingMode =
-                               Uri.ParsingMode.Relaxed)) shouldEqual Right(
+      HeaderParser.parseFull(
+        "location",
+        "http://example.org/?abc=def=ghi",
+        HeaderParser
+          .Settings(uriParsingMode = Uri.ParsingMode.Relaxed)) shouldEqual Right(
         Location(targetUri))
     }
   }

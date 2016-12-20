@@ -129,12 +129,13 @@ object Workflow {
       evaluator: BaseEvaluator[EI, Q, P, A, R],
       env: Map[String, String] = WorkflowUtils.pioEnvVars,
       params: WorkflowParams = WorkflowParams()) {
-    CoreWorkflow.runEvaluation(evaluation = evaluation,
-                               engine = engine,
-                               engineParamsList = engineParamsList,
-                               evaluationInstance = evaluationInstance,
-                               evaluator = evaluator,
-                               env = env,
-                               params = params)
+    CoreWorkflow.runEvaluation(
+      evaluation = evaluation,
+      engine = engine,
+      engineParamsList = engineParamsList,
+      evaluationInstance = evaluationInstance,
+      evaluator = evaluator,
+      env = env,
+      params = params)
   }
 }

@@ -32,10 +32,11 @@ object DeleteZKPath {
 
     val config = new ConsumerConfig(Utils.loadProps(args(0)))
     val zkPath = args(1)
-    val zkUtils = ZkUtils(config.zkConnect,
-                          config.zkSessionTimeoutMs,
-                          config.zkConnectionTimeoutMs,
-                          false)
+    val zkUtils = ZkUtils(
+      config.zkConnect,
+      config.zkSessionTimeoutMs,
+      config.zkConnectionTimeoutMs,
+      false)
 
     try {
       zkUtils.deletePathRecursive(zkPath);

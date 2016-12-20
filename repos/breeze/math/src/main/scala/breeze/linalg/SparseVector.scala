@@ -110,10 +110,11 @@ class SparseVector[@spec(Double, Int, Float, Long) V](
   }
 
   def copy: SparseVector[V] = {
-    new SparseVector[V](ArrayUtil.copyOf(index, index.length),
-                        ArrayUtil.copyOf(data, index.length),
-                        activeSize,
-                        size)
+    new SparseVector[V](
+      ArrayUtil.copyOf(index, index.length),
+      ArrayUtil.copyOf(data, index.length),
+      activeSize,
+      size)
   }
 
   def reserve(nnz: Int): Unit = {
@@ -132,11 +133,13 @@ class SparseVector[@spec(Double, Int, Float, Long) V](
     * @param activeSize number of active elements. The first activeSize will be used.
     */
   def use(index: Array[Int], data: Array[V], activeSize: Int): Unit = {
-    require(activeSize <= size,
-            "Can't have more elements in the array than length!")
+    require(
+      activeSize <= size,
+      "Can't have more elements in the array than length!")
     require(activeSize >= 0, "activeSize must be non-negative")
-    require(data.length >= activeSize,
-            "activeSize must be no greater than array length...")
+    require(
+      data.length >= activeSize,
+      "activeSize must be no greater than array length...")
     array.use(index, data, activeSize)
   }
 
@@ -173,12 +176,13 @@ class SparseVector[@spec(Double, Int, Float, Long) V](
       val nIndex = Array.tabulate[Int](length + 1)((cp: Int) =>
         if (ii < used && cp == index(ii)) { ii += 1; ii - 1 } else ii)
       assert(ii == used)
-      new CSCMatrix[V](data,
-                       1,
-                       length,
-                       nIndex,
-                       activeSize,
-                       Array.fill[Int](data.length)(0))
+      new CSCMatrix[V](
+        data,
+        1,
+        length,
+        nIndex,
+        activeSize,
+        Array.fill[Int](data.length)(0))
     }
   }
 
@@ -186,12 +190,13 @@ class SparseVector[@spec(Double, Int, Float, Long) V](
     // zero SV
     if (index.length == 0) CSCMatrix.zeros[V](length, 1)
     else {
-      new CSCMatrix[V](data.clone(),
-                       length,
-                       1,
-                       Array(0, used),
-                       activeSize,
-                       index)
+      new CSCMatrix[V](
+        data.clone(),
+        length,
+        1,
+        Array(0, used),
+        activeSize,
+        index)
     }
   }
 }
@@ -205,10 +210,11 @@ object SparseVector
   def zeros[@spec(Double, Int, Float, Long) V: ClassTag: Zero](size: Int) =
     new SparseVector(Array.empty, Array.empty[V], 0, size)
   def apply[@spec(Double, Int, Float, Long) V: Zero](values: Array[V]) =
-    new SparseVector(Array.range(0, values.length),
-                     values,
-                     values.length,
-                     values.length)
+    new SparseVector(
+      Array.range(0, values.length),
+      values,
+      values.length,
+      values.length)
 
   def apply[V: ClassTag: Zero](values: V*): SparseVector[V] =
     apply(values.toArray)
@@ -250,11 +256,12 @@ object SparseVector
       colPtrs(vec) = off
       System
         .arraycopy(vectors(vec).data, 0, data, off, vectors(vec).activeSize)
-      System.arraycopy(vectors(vec).index,
-                       0,
-                       rowIndices,
-                       off,
-                       vectors(vec).activeSize)
+      System.arraycopy(
+        vectors(vec).index,
+        0,
+        rowIndices,
+        off,
+        vectors(vec).activeSize)
       off += vectors(vec).activeSize
       vec += 1
     }
@@ -299,10 +306,11 @@ object SparseVector
           out(i) = fn(from.data(i))
           i += 1
         }
-        new SparseVector(from.index.take(from.activeSize),
-                         out,
-                         from.activeSize,
-                         from.length)
+        new SparseVector(
+          from.index.take(from.activeSize),
+          out,
+          from.activeSize,
+          from.length)
       }
     }
   }
@@ -335,9 +343,10 @@ object SparseVector
 
         fn.visitArray(index, data, 0, activeSize, 1)
         if (activeSize != size) {
-          fn.zeros(size - activeSize,
-                   Iterator.range(0, size).filterNot(index contains _),
-                   from.default)
+          fn.zeros(
+            size - activeSize,
+            Iterator.range(0, size).filterNot(index contains _),
+            from.default)
         }
       }
     }
@@ -413,10 +422,11 @@ object SparseVector
           out(i) = fn(from.index(i), from.data(i))
           i += 1
         }
-        new SparseVector(from.index.take(from.used),
-                         out,
-                         from.used,
-                         from.length)
+        new SparseVector(
+          from.index.take(from.used),
+          out,
+          from.used,
+          from.length)
       }
     }
   }

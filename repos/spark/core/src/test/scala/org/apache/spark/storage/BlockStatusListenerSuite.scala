@@ -31,11 +31,12 @@ class BlockStatusListenerSuite extends SparkFunSuite {
       SparkListenerBlockManagerAdded(0, blockManagerId, 0))
     listener.onBlockUpdated(
       SparkListenerBlockUpdated(
-        BlockUpdatedInfo(blockManagerId,
-                         StreamBlockId(0, 100),
-                         StorageLevel.MEMORY_AND_DISK,
-                         memSize = 100,
-                         diskSize = 100)))
+        BlockUpdatedInfo(
+          blockManagerId,
+          StreamBlockId(0, 100),
+          StorageLevel.MEMORY_AND_DISK,
+          memSize = 100,
+          diskSize = 100)))
     // The new block status should be added to the listener
     val expectedBlock = BlockUIData(
       StreamBlockId(0, 100),
@@ -57,11 +58,12 @@ class BlockStatusListenerSuite extends SparkFunSuite {
     // Add a new replication of the same block id from the second manager
     listener.onBlockUpdated(
       SparkListenerBlockUpdated(
-        BlockUpdatedInfo(blockManagerId2,
-                         StreamBlockId(0, 100),
-                         StorageLevel.MEMORY_AND_DISK,
-                         memSize = 100,
-                         diskSize = 100)))
+        BlockUpdatedInfo(
+          blockManagerId2,
+          StreamBlockId(0, 100),
+          StorageLevel.MEMORY_AND_DISK,
+          memSize = 100,
+          diskSize = 100)))
     val expectedBlock2 = BlockUIData(
       StreamBlockId(0, 100),
       "localhost:10001",
@@ -100,11 +102,12 @@ class BlockStatusListenerSuite extends SparkFunSuite {
       SparkListenerBlockManagerRemoved(0, blockManagerId2))
     listener.onBlockUpdated(
       SparkListenerBlockUpdated(
-        BlockUpdatedInfo(blockManagerId2,
-                         StreamBlockId(0, 100),
-                         StorageLevel.MEMORY_AND_DISK,
-                         memSize = 100,
-                         diskSize = 100)))
+        BlockUpdatedInfo(
+          blockManagerId2,
+          StreamBlockId(0, 100),
+          StorageLevel.MEMORY_AND_DISK,
+          memSize = 100,
+          diskSize = 100)))
     // The second block manager is removed so we should not see the new block
     val expectedExecutorStreamBlockStatus4 = Seq(
       ExecutorStreamBlockStatus("0", "localhost:10000", Seq(expectedBlock))

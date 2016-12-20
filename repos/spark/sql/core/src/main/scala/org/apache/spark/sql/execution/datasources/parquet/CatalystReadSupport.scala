@@ -173,10 +173,11 @@ private[parquet] object CatalystReadSupport {
         parquetList.isRepetition(Repetition.REPEATED)) {
       clipParquetType(parquetList, elementType)
     } else {
-      assert(parquetList.getOriginalType == OriginalType.LIST,
-             "Invalid Parquet schema. " +
-               "Original type of annotated Parquet lists must be LIST: " +
-               parquetList.toString)
+      assert(
+        parquetList.getOriginalType == OriginalType.LIST,
+        "Invalid Parquet schema. " +
+          "Original type of annotated Parquet lists must be LIST: " +
+          parquetList.toString)
 
       assert(
         parquetList.getFieldCount == 1 &&

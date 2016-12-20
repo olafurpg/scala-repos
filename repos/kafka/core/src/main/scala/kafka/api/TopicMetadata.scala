@@ -87,9 +87,10 @@ case class TopicMetadata(topic: String,
             case error: Errors =>
               topicMetadataInfo.append(
                 "\nMetadata for partition [%s,%d] is not available due to %s"
-                  .format(topic,
-                          partitionMetadata.partitionId,
-                          error.exceptionName))
+                  .format(
+                    topic,
+                    partitionMetadata.partitionId,
+                    error.exceptionName))
           }
         }
       case error: Errors =>

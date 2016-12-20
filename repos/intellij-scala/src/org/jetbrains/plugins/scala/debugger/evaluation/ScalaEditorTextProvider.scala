@@ -55,10 +55,11 @@ class ScalaEditorTextProvider extends EditorTextProvider {
         Some(expr)
       else None
 
-    PsiTreeUtil.getParentOfType(element,
-                                classOf[ScExpression],
-                                classOf[ScParameter],
-                                classOf[ScBindingPattern]) match {
+    PsiTreeUtil.getParentOfType(
+      element,
+      classOf[ScExpression],
+      classOf[ScParameter],
+      classOf[ScBindingPattern]) match {
       case (ref: ScReferenceExpression) childOf (mc: ScMethodCall) =>
         allowed(mc)
       case (ref: ScReferenceExpression) childOf (inf: ScInfixExpr)

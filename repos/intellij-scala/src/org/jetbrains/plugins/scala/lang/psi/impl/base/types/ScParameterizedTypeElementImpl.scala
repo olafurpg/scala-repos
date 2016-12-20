@@ -215,13 +215,15 @@ class ScParameterizedTypeElementImpl(node: ASTNode)
             if (ref.isConstructorReference) {
               ref.resolveNoConstructor match {
                 case Array(
-                    ScalaResolveResult(to: ScTypeParametersOwner,
-                                       subst: ScSubstitutor))
+                    ScalaResolveResult(
+                      to: ScTypeParametersOwner,
+                      subst: ScSubstitutor))
                     if to.isInstanceOf[PsiNamedElement] =>
                   return tr //all things were done in ScSimpleTypeElementImpl.innerType
                 case Array(
-                    ScalaResolveResult(to: PsiTypeParameterListOwner,
-                                       subst: ScSubstitutor))
+                    ScalaResolveResult(
+                      to: PsiTypeParameterListOwner,
+                      subst: ScSubstitutor))
                     if to.isInstanceOf[PsiNamedElement] =>
                   return tr //all things were done in ScSimpleTypeElementImpl.innerType
                 case _ =>
@@ -289,10 +291,12 @@ class ScParameterizedTypeElementImpl(node: ASTNode)
                             val upperBound = text.indexOf("<:")
                             //we have to call processor execute so both `+A` and A resolve: Lambda[`+A` => (A, A)]
                             processor.execute(tp, state)
-                            processor.execute(new ScSyntheticClass(getManager,
-                                                                   s"`$text`",
-                                                                   Any),
-                                              state)
+                            processor.execute(
+                              new ScSyntheticClass(
+                                getManager,
+                                s"`$text`",
+                                Any),
+                              state)
                             if (lowerBound < 0 && upperBound > 0) {
                               processor.execute(
                                 new ScSyntheticClass(
@@ -311,9 +315,10 @@ class ScParameterizedTypeElementImpl(node: ASTNode)
                               val actualText = text
                                 .substring(0, math.min(lowerBound, upperBound))
                               processor.execute(
-                                new ScSyntheticClass(getManager,
-                                                     actualText,
-                                                     Any),
+                                new ScSyntheticClass(
+                                  getManager,
+                                  actualText,
+                                  Any),
                                 state)
                             }
                           }

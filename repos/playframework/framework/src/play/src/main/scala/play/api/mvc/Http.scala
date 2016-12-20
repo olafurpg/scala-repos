@@ -214,27 +214,28 @@ package play.api.mvc {
              secure: => Boolean = this.secure,
              clientCertificateChain: Option[Seq[X509Certificate]] =
                this.clientCertificateChain): RequestHeader = {
-      val (_id,
-           _tags,
-           _uri,
-           _path,
-           _method,
-           _version,
-           _queryString,
-           _headers,
-           _remoteAddress,
-           _secure,
-           _clientCertificateChain) = (id,
-                                       tags,
-                                       uri,
-                                       path,
-                                       method,
-                                       version,
-                                       queryString,
-                                       headers,
-                                       () => remoteAddress,
-                                       () => secure,
-                                       clientCertificateChain)
+      val (
+        _id,
+        _tags,
+        _uri,
+        _path,
+        _method,
+        _version,
+        _queryString,
+        _headers,
+        _remoteAddress,
+        _secure,
+        _clientCertificateChain) = (id,
+                                    tags,
+                                    uri,
+                                    path,
+                                    method,
+                                    version,
+                                    queryString,
+                                    headers,
+                                    () => remoteAddress,
+                                    () => secure,
+                                    clientCertificateChain)
       new RequestHeader {
         override val id = _id
         override val tags = _tags
@@ -603,8 +604,8 @@ package play.api.mvc {
           .split("&")
           .map(_.split("=", 2))
           .map(p =>
-            URLDecoder.decode(p(0), "UTF-8") -> URLDecoder.decode(p(1),
-                                                                  "UTF-8"))
+            URLDecoder.decode(p(0), "UTF-8") -> URLDecoder
+              .decode(p(1), "UTF-8"))
           .toMap
       }
 

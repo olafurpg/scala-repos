@@ -36,32 +36,36 @@ class ScalaXmlUnmatchedTagInspection extends LocalInspectionTool {
 
         val endTag = s.getClosingTag
         def register(fixes: LocalQuickFix*) {
-          holder.registerProblem(s,
-                                 ScalaBundle.message("xml.no.closing.tag"),
-                                 fixes: _*)
+          holder.registerProblem(
+            s,
+            ScalaBundle.message("xml.no.closing.tag"),
+            fixes: _*)
         }
 
         if (endTag == null) {
           register(new DeleteUnmatchedTagQuickFix(s))
         } else if (endTag.getTagName != s.getTagName) {
-          register(new DeleteUnmatchedTagQuickFix(s),
-                   new RenameClosingTagQuickFix(s))
+          register(
+            new DeleteUnmatchedTagQuickFix(s),
+            new RenameClosingTagQuickFix(s))
         }
       }
 
       override def visitXmlEndTag(s: ScXmlEndTag) {
         val startTag = s.getOpeningTag
         def register(fixes: LocalQuickFix*) {
-          holder.registerProblem(s,
-                                 ScalaBundle.message("xml.no.opening.tag"),
-                                 fixes: _*)
+          holder.registerProblem(
+            s,
+            ScalaBundle.message("xml.no.opening.tag"),
+            fixes: _*)
         }
 
         if (startTag == null) {
           register(new DeleteUnmatchedTagQuickFix(s))
         } else if (startTag.getTagName != s.getTagName) {
-          register(new DeleteUnmatchedTagQuickFix(s),
-                   new RenameOpeningTagQuickFix(s))
+          register(
+            new DeleteUnmatchedTagQuickFix(s),
+            new RenameOpeningTagQuickFix(s))
         }
       }
     }

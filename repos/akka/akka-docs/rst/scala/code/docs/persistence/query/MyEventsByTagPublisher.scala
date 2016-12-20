@@ -85,10 +85,11 @@ class MyEventsByTagPublisher(tag: String,
           case (id, bytes) ⇒
             val p =
               serialization.deserialize(bytes, classOf[PersistentRepr]).get
-            EventEnvelope(offset = id,
-                          p.persistenceId,
-                          p.sequenceNr,
-                          p.payload)
+            EventEnvelope(
+              offset = id,
+              p.persistenceId,
+              p.sequenceNr,
+              p.payload)
         }
       } catch {
         case e: Exception ⇒

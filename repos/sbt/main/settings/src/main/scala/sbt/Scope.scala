@@ -21,9 +21,10 @@ final case class Scope(project: ScopeAxis[Reference],
   def in(project: Reference, task: AttributeKey[_]): Scope =
     copy(project = Select(project), task = Select(task))
   def in(project: Reference, config: ConfigKey, task: AttributeKey[_]): Scope =
-    copy(project = Select(project),
-         config = Select(config),
-         task = Select(task))
+    copy(
+      project = Select(project),
+      config = Select(config),
+      task = Select(task))
   def in(project: Reference): Scope = copy(project = Select(project))
   def in(config: ConfigKey): Scope = copy(config = Select(config))
   def in(task: AttributeKey[_]): Scope = copy(task = Select(task))
@@ -42,10 +43,11 @@ object Scope {
 
   def replaceThis(thisScope: Scope): Scope => Scope =
     (scope: Scope) =>
-      Scope(subThis(thisScope.project, scope.project),
-            subThis(thisScope.config, scope.config),
-            subThis(thisScope.task, scope.task),
-            subThis(thisScope.extra, scope.extra))
+      Scope(
+        subThis(thisScope.project, scope.project),
+        subThis(thisScope.config, scope.config),
+        subThis(thisScope.task, scope.task),
+        subThis(thisScope.extra, scope.extra))
 
   def subThis[T](sub: ScopeAxis[T], into: ScopeAxis[T]): ScopeAxis[T] =
     if (into == This) sub else into
@@ -140,11 +142,12 @@ object Scope {
     val taskPrefix = task.foldStrict(_.label + "::", "", ".::")
     val extras = extra.foldStrict(_.entries.map(_.toString).toList, Nil, Nil)
     val postfix = if (extras.isEmpty) "" else extras.mkString("(", ", ", ")")
-    mask.concatShow(projectPrefix(project, showProject),
-                    configPrefix,
-                    taskPrefix,
-                    sep,
-                    postfix)
+    mask.concatShow(
+      projectPrefix(project, showProject),
+      configPrefix,
+      taskPrefix,
+      sep,
+      postfix)
   }
 
   def equal(a: Scope, b: Scope, mask: ScopeMask): Boolean =
@@ -161,15 +164,16 @@ object Scope {
   def parseScopedKey(command: String): (Scope, String) = {
     val ScopedKeyRegex2 =
       """([{](.*?)[}])?((\w*)\/)?(([\w\*]+)\:)?(([\w\-]+)\:\:)?([\w\-]+)""".r
-    val ScopedKeyRegex2(_,
-                        uriOrNull,
-                        _,
-                        projectIdOrNull,
-                        _,
-                        configOrNull,
-                        _,
-                        inTaskOrNull,
-                        key) =
+    val ScopedKeyRegex2(
+      _,
+      uriOrNull,
+      _,
+      projectIdOrNull,
+      _,
+      configOrNull,
+      _,
+      inTaskOrNull,
+      key) =
       command
     val uriOpt = Option(uriOrNull) map { new URI(_) }
     val projectIdOpt = Option(projectIdOrNull)
@@ -283,8 +287,9 @@ object Scope {
     val pDelegates = refs map {
       case (ref, project) =>
         (ref,
-         delegateIndex(ref, configurations(project))(projectInherit,
-                                                     configInherit))
+         delegateIndex(ref, configurations(project))(
+           projectInherit,
+           configInherit))
     } toMap;
     new DelegateIndex0(pDelegates)
   }

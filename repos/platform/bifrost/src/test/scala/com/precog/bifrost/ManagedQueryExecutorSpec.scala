@@ -65,18 +65,20 @@ class ManagedQueryExecutorSpec extends TestManagedPlatform with Specification {
   implicit val executionContext =
     ExecutionContext.defaultExecutionContext(actorSystem)
   implicit val M: Monad[Future] with Comonad[Future] =
-    new blueeyes.bkka.UnsafeFutureComonad(executionContext,
-                                          Duration(15, "seconds"))
+    new blueeyes.bkka.UnsafeFutureComonad(
+      executionContext,
+      Duration(15, "seconds"))
   val defaultTimeout = Duration(90, TimeUnit.SECONDS)
 
   val jobManager: JobManager[Future] = new InMemoryJobManager[Future]
   val apiKey = "O.o"
-  val account = AccountDetails("test",
-                               "test@test.test",
-                               clock.now(),
-                               apiKey,
-                               Path.Root,
-                               AccountPlan.Free)
+  val account = AccountDetails(
+    "test",
+    "test@test.test",
+    clock.now(),
+    apiKey,
+    Path.Root,
+    AccountPlan.Free)
   val ticker = actorSystem.actorOf(Props(new Ticker(ticks)))
 
   def execute(numTicks: Int,
@@ -89,11 +91,12 @@ class ManagedQueryExecutorSpec extends TestManagedPlatform with Specification {
       executor <- asyncExecutorFor(apiKey) leftMap {
         EvaluationError.invalidState
       }
-      ctx = EvaluationContext(apiKey,
-                              account,
-                              Path("/\\\\/\\///\\/"),
-                              Path.Root,
-                              clock.now())
+      ctx = EvaluationContext(
+        apiKey,
+        account,
+        Path("/\\\\/\\///\\/"),
+        Path.Root,
+        clock.now())
       result <- executor
         .execute(numTicks.toString, ctx, QueryOptions(timeout = timeout))
     } yield result
@@ -135,8 +138,9 @@ class ManagedQueryExecutorSpec extends TestManagedPlatform with Specification {
   }
 
   step {
-    actorSystem.scheduler.schedule(Duration(0, "milliseconds"),
-                                   Duration(clock.duration, "milliseconds")) {
+    actorSystem.scheduler.schedule(
+      Duration(0, "milliseconds"),
+      Duration(clock.duration, "milliseconds")) {
       ticker ! Tick
     }
 

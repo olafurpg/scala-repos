@@ -68,13 +68,14 @@ class MarathonHealthCheckManagerTest
     taskCreationHandler = taskTrackerModule.taskCreationHandler
     taskUpdater = taskTrackerModule.taskUpdater
 
-    appRepository =
-      new AppRepository(new MarathonStore[AppDefinition](new InMemoryStore,
-                                                         metrics,
-                                                         () => AppDefinition(),
-                                                         "app:"),
-                        None,
-                        metrics)
+    appRepository = new AppRepository(
+      new MarathonStore[AppDefinition](
+        new InMemoryStore,
+        metrics,
+        () => AppDefinition(),
+        "app:"),
+      None,
+      metrics)
 
     eventStream = new EventStream()
 
@@ -165,8 +166,9 @@ class MarathonHealthCheckManagerTest
     EventFilter
       .info(start = "Received health result for app", occurrences = 1)
       .intercept {
-        hcManager.update(taskStatus.toBuilder.setHealthy(false).build,
-                         app.version)
+        hcManager.update(
+          taskStatus.toBuilder.setHealthy(false).build,
+          app.version)
       }
 
     val Seq(health2) = hcManager.status(appId, taskId).futureValue
@@ -177,8 +179,9 @@ class MarathonHealthCheckManagerTest
     EventFilter
       .info(start = "Received health result for app", occurrences = 1)
       .intercept {
-        hcManager.update(taskStatus.toBuilder.setHealthy(true).build,
-                         app.version)
+        hcManager.update(
+          taskStatus.toBuilder.setHealthy(true).build,
+          app.version)
       }
 
     val Seq(health3) = hcManager.status(appId, taskId).futureValue
@@ -255,8 +258,9 @@ class MarathonHealthCheckManagerTest
     val healthChecks = List(0, 1, 2).map { i =>
       (0 until i)
         .map { j =>
-          HealthCheck(protocol = Protocol.COMMAND,
-                      gracePeriod = (i * 3 + j).seconds)
+          HealthCheck(
+            protocol = Protocol.COMMAND,
+            gracePeriod = (i * 3 + j).seconds)
         }
         .toSet
     }
@@ -327,8 +331,9 @@ class MarathonHealthCheckManagerTest
       hcManager.reconcileWith(appId).futureValue
     }
     assert(
-      captured3.map(_.eventType) == Vector("add_health_check_event",
-                                           "add_health_check_event"))
+      captured3.map(_.eventType) == Vector(
+        "add_health_check_event",
+        "add_health_check_event"))
     assert(hcManager.list(appId) == healthChecks(1) ++ healthChecks(2))
 
     // reconcileWith stops health checks which are not current and which are without tasks

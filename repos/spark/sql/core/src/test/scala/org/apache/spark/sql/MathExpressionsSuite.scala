@@ -38,10 +38,11 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
   private lazy val nnDoubleData =
     (1 to 10).map(i => DoubleData(i * 0.1, i * -0.1)).toDF()
 
-  private lazy val nullDoubles = Seq(NullDoubles(1.0),
-                                     NullDoubles(2.0),
-                                     NullDoubles(3.0),
-                                     NullDoubles(null)).toDF()
+  private lazy val nullDoubles = Seq(
+    NullDoubles(1.0),
+    NullDoubles(2.0),
+    NullDoubles(3.0),
+    NullDoubles(null)).toDF()
 
   private def testOneToOneMathFunction[
       @specialized(Int, Long, Float, Double) T,
@@ -183,8 +184,9 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
 
   test("ceil and ceiling") {
     testOneToOneMathFunction(ceil, (d: Double) => math.ceil(d).toLong)
-    checkAnswer(sql("SELECT ceiling(0), ceiling(1), ceiling(1.5)"),
-                Row(0L, 1L, 2L))
+    checkAnswer(
+      sql("SELECT ceiling(0), ceiling(1), ceiling(1.5)"),
+      Row(0L, 1L, 2L))
   }
 
   test("conv") {
@@ -195,8 +197,9 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
     checkAnswer(df.selectExpr("conv(num, fromBase, toBase)"), Row("101001101"))
     checkAnswer(df.selectExpr("""conv("100", 2, 10)"""), Row("4"))
     checkAnswer(df.selectExpr("""conv("-10", 16, -10)"""), Row("-16"))
-    checkAnswer(df.selectExpr("""conv("9223372036854775807", 36, -16)"""),
-                Row("-1")) // for overflow
+    checkAnswer(
+      df.selectExpr("""conv("9223372036854775807", 36, -16)"""),
+      Row("-1")) // for overflow
   }
 
   test("floor") {
@@ -232,13 +235,14 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
         s"SELECT round($pi, -3), round($pi, -2), round($pi, -1), " +
           s"round($pi, 0), round($pi, 1), round($pi, 2), round($pi, 3)"),
       Seq(
-        Row(BigDecimal("0E3"),
-            BigDecimal("0E2"),
-            BigDecimal("0E1"),
-            BigDecimal(3),
-            BigDecimal("3.1"),
-            BigDecimal("3.14"),
-            BigDecimal("3.142")))
+        Row(
+          BigDecimal("0E3"),
+          BigDecimal("0E2"),
+          BigDecimal("0E1"),
+          BigDecimal(3),
+          BigDecimal("3.1"),
+          BigDecimal("3.14"),
+          BigDecimal("3.142")))
     )
   }
 
@@ -275,18 +279,21 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
     checkAnswer(data.selectExpr("hex(b)"), Seq(Row("FFFFFFFFFFFFFFE4")))
     checkAnswer(data.selectExpr("hex(c)"), Seq(Row("177828FED4")))
     checkAnswer(data.selectExpr("hex(d)"), Seq(Row("68656C6C6F")))
-    checkAnswer(data.selectExpr("hex(cast(d as binary))"),
-                Seq(Row("68656C6C6F")))
+    checkAnswer(
+      data.selectExpr("hex(cast(d as binary))"),
+      Seq(Row("68656C6C6F")))
   }
 
   test("unhex") {
     val data = Seq(("1C", "737472696E67")).toDF("a", "b")
     checkAnswer(data.select(unhex('a)), Row(Array[Byte](28.toByte)))
-    checkAnswer(data.select(unhex('b)),
-                Row("string".getBytes(StandardCharsets.UTF_8)))
+    checkAnswer(
+      data.select(unhex('b)),
+      Row("string".getBytes(StandardCharsets.UTF_8)))
     checkAnswer(data.selectExpr("unhex(a)"), Row(Array[Byte](28.toByte)))
-    checkAnswer(data.selectExpr("unhex(b)"),
-                Row("string".getBytes(StandardCharsets.UTF_8)))
+    checkAnswer(
+      data.selectExpr("unhex(b)"),
+      Row("string".getBytes(StandardCharsets.UTF_8)))
     checkAnswer(data.selectExpr("""unhex("##")"""), Row(null))
     checkAnswer(data.selectExpr("""unhex("G123")"""), Row(null))
   }
@@ -300,8 +307,9 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
   }
 
   test("log / ln") {
-    testOneToOneNonNegativeMathFunction(org.apache.spark.sql.functions.log,
-                                        math.log)
+    testOneToOneNonNegativeMathFunction(
+      org.apache.spark.sql.functions.log,
+      math.log)
     checkAnswer(
       sql("SELECT ln(0), ln(1), ln(1.5)"),
       Seq((1, 2))
@@ -322,81 +330,98 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
     val df = Seq[(Long, Integer, Short, Byte, Integer, Integer)](
       (21, 21, 21, 21, 21, null)).toDF("a", "b", "c", "d", "e", "f")
 
-    checkAnswer(df.select(shiftLeft('a, 1),
-                          shiftLeft('b, 1),
-                          shiftLeft('c, 1),
-                          shiftLeft('d, 1),
-                          shiftLeft('f, 1)),
-                Row(42.toLong, 42, 42.toShort, 42.toByte, null))
+    checkAnswer(
+      df.select(
+        shiftLeft('a, 1),
+        shiftLeft('b, 1),
+        shiftLeft('c, 1),
+        shiftLeft('d, 1),
+        shiftLeft('f, 1)),
+      Row(42.toLong, 42, 42.toShort, 42.toByte, null))
 
-    checkAnswer(df.selectExpr("shiftLeft(a, 1)",
-                              "shiftLeft(b, 1)",
-                              "shiftLeft(b, 1)",
-                              "shiftLeft(d, 1)",
-                              "shiftLeft(f, 1)"),
-                Row(42.toLong, 42, 42.toShort, 42.toByte, null))
+    checkAnswer(
+      df.selectExpr(
+        "shiftLeft(a, 1)",
+        "shiftLeft(b, 1)",
+        "shiftLeft(b, 1)",
+        "shiftLeft(d, 1)",
+        "shiftLeft(f, 1)"),
+      Row(42.toLong, 42, 42.toShort, 42.toByte, null))
   }
 
   test("shift right") {
     val df = Seq[(Long, Integer, Short, Byte, Integer, Integer)](
       (42, 42, 42, 42, 42, null)).toDF("a", "b", "c", "d", "e", "f")
 
-    checkAnswer(df.select(shiftRight('a, 1),
-                          shiftRight('b, 1),
-                          shiftRight('c, 1),
-                          shiftRight('d, 1),
-                          shiftRight('f, 1)),
-                Row(21.toLong, 21, 21.toShort, 21.toByte, null))
+    checkAnswer(
+      df.select(
+        shiftRight('a, 1),
+        shiftRight('b, 1),
+        shiftRight('c, 1),
+        shiftRight('d, 1),
+        shiftRight('f, 1)),
+      Row(21.toLong, 21, 21.toShort, 21.toByte, null))
 
-    checkAnswer(df.selectExpr("shiftRight(a, 1)",
-                              "shiftRight(b, 1)",
-                              "shiftRight(c, 1)",
-                              "shiftRight(d, 1)",
-                              "shiftRight(f, 1)"),
-                Row(21.toLong, 21, 21.toShort, 21.toByte, null))
+    checkAnswer(
+      df.selectExpr(
+        "shiftRight(a, 1)",
+        "shiftRight(b, 1)",
+        "shiftRight(c, 1)",
+        "shiftRight(d, 1)",
+        "shiftRight(f, 1)"),
+      Row(21.toLong, 21, 21.toShort, 21.toByte, null))
   }
 
   test("shift right unsigned") {
     val df = Seq[(Long, Integer, Short, Byte, Integer, Integer)](
       (-42, 42, 42, 42, 42, null)).toDF("a", "b", "c", "d", "e", "f")
 
-    checkAnswer(df.select(shiftRightUnsigned('a, 1),
-                          shiftRightUnsigned('b, 1),
-                          shiftRightUnsigned('c, 1),
-                          shiftRightUnsigned('d, 1),
-                          shiftRightUnsigned('f, 1)),
-                Row(9223372036854775787L, 21, 21.toShort, 21.toByte, null))
+    checkAnswer(
+      df.select(
+        shiftRightUnsigned('a, 1),
+        shiftRightUnsigned('b, 1),
+        shiftRightUnsigned('c, 1),
+        shiftRightUnsigned('d, 1),
+        shiftRightUnsigned('f, 1)),
+      Row(9223372036854775787L, 21, 21.toShort, 21.toByte, null))
 
-    checkAnswer(df.selectExpr("shiftRightUnsigned(a, 1)",
-                              "shiftRightUnsigned(b, 1)",
-                              "shiftRightUnsigned(c, 1)",
-                              "shiftRightUnsigned(d, 1)",
-                              "shiftRightUnsigned(f, 1)"),
-                Row(9223372036854775787L, 21, 21.toShort, 21.toByte, null))
+    checkAnswer(
+      df.selectExpr(
+        "shiftRightUnsigned(a, 1)",
+        "shiftRightUnsigned(b, 1)",
+        "shiftRightUnsigned(c, 1)",
+        "shiftRightUnsigned(d, 1)",
+        "shiftRightUnsigned(f, 1)"),
+      Row(9223372036854775787L, 21, 21.toShort, 21.toByte, null))
   }
 
   test("binary log") {
     val df = Seq[(Integer, Integer)]((123, null)).toDF("a", "b")
-    checkAnswer(df.select(org.apache.spark.sql.functions.log("a"),
-                          org.apache.spark.sql.functions.log(2.0, "a"),
-                          org.apache.spark.sql.functions.log("b")),
-                Row(math.log(123), math.log(123) / math.log(2), null))
+    checkAnswer(
+      df.select(
+        org.apache.spark.sql.functions.log("a"),
+        org.apache.spark.sql.functions.log(2.0, "a"),
+        org.apache.spark.sql.functions.log("b")),
+      Row(math.log(123), math.log(123) / math.log(2), null))
 
-    checkAnswer(df.selectExpr("log(a)", "log(2.0, a)", "log(b)"),
-                Row(math.log(123), math.log(123) / math.log(2), null))
+    checkAnswer(
+      df.selectExpr("log(a)", "log(2.0, a)", "log(b)"),
+      Row(math.log(123), math.log(123) / math.log(2), null))
   }
 
   test("abs") {
-    val input = Seq[(java.lang.Double, java.lang.Double)]((null, null),
-                                                          (0.0, 0.0),
-                                                          (1.5, 1.5),
-                                                          (-2.5, 2.5))
+    val input = Seq[(java.lang.Double, java.lang.Double)](
+      (null, null),
+      (0.0, 0.0),
+      (1.5, 1.5),
+      (-2.5, 2.5))
     checkAnswer(
       input.toDF("key", "value").select(abs($"key").alias("a")).sort("a"),
       input.map(pair => Row(pair._2)))
 
-    checkAnswer(input.toDF("key", "value").selectExpr("abs(key) a").sort("a"),
-                input.map(pair => Row(pair._2)))
+    checkAnswer(
+      input.toDF("key", "value").selectExpr("abs(key) a").sort("a"),
+      input.map(pair => Row(pair._2)))
 
     checkAnswer(
       sql(
@@ -406,9 +431,10 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
 
     checkAnswer(
       sql("select abs(0.0), abs(-3.14159265), abs(3.14159265)"),
-      Row(BigDecimal("0.0"),
-          BigDecimal("3.14159265"),
-          BigDecimal("3.14159265"))
+      Row(
+        BigDecimal("0.0"),
+        BigDecimal("3.14159265"),
+        BigDecimal("3.14159265"))
     )
   }
 
@@ -424,13 +450,15 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
     checkAnswer(df.select(sqrt("a"), sqrt("b")), Row(1.0, 2.0))
 
     checkAnswer(sql("SELECT SQRT(4.0), SQRT(null)"), Row(2.0, null))
-    checkAnswer(df.selectExpr("sqrt(a)", "sqrt(b)", "sqrt(null)"),
-                Row(1.0, 2.0, null))
+    checkAnswer(
+      df.selectExpr("sqrt(a)", "sqrt(b)", "sqrt(null)"),
+      Row(1.0, 2.0, null))
   }
 
   test("negative") {
-    checkAnswer(sql("SELECT negative(1), negative(0), negative(-1)"),
-                Row(-1, 0, 1))
+    checkAnswer(
+      sql("SELECT negative(1), negative(0), negative(-1)"),
+      Row(-1, 0, 1))
   }
 
   test("positive") {

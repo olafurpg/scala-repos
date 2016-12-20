@@ -15,8 +15,9 @@ class FreeTests extends CatsSuite {
   implicit val iso = CartesianTests.Isomorphisms.invariant[Free[Option, ?]]
 
   checkAll("Free[Option, ?]", MonadTests[Free[Option, ?]].monad[Int, Int, Int])
-  checkAll("Monad[Free[Option, ?]]",
-           SerializableTests.serializable(Monad[Free[Option, ?]]))
+  checkAll(
+    "Monad[Free[Option, ?]]",
+    SerializableTests.serializable(Monad[Free[Option, ?]]))
 
   test("mapSuspension id") {
     forAll { x: Free[List, Int] =>
@@ -86,8 +87,9 @@ sealed trait FreeTestsInstances {
   private def freeGen[F[_], A](maxDepth: Int)(
       implicit F: Arbitrary[F[A]],
       A: Arbitrary[A]): Gen[Free[F, A]] = {
-    val noGosub = Gen.oneOf(A.arbitrary.map(Free.pure[F, A]),
-                            F.arbitrary.map(Free.liftF[F, A]))
+    val noGosub = Gen.oneOf(
+      A.arbitrary.map(Free.pure[F, A]),
+      F.arbitrary.map(Free.liftF[F, A]))
 
     val nextDepth = Gen.chooseNum(1, maxDepth - 1)
 

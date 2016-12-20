@@ -41,8 +41,9 @@ object EventType {
     * It is also the only event type which has its super event type set to null.
     */
   val Root = new EventType(jfxe.EventType.ROOT)
-  @deprecated("Use Root; ROOT will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Root; ROOT will be removed in a future release",
+    "8.0.60-R10")
   val ROOT = Root
 }
 

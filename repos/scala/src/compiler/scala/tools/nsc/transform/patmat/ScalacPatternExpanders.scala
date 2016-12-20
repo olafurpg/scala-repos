@@ -153,15 +153,17 @@ trait ScalacPatternExpanders {
 
       val extractor = sel.symbol.name match {
         case nme.unapply =>
-          unapplyMethodTypes(context,
-                             firstParamType(fn.tpe),
-                             sel.tpe,
-                             isSeq = false)
+          unapplyMethodTypes(
+            context,
+            firstParamType(fn.tpe),
+            sel.tpe,
+            isSeq = false)
         case nme.unapplySeq =>
-          unapplyMethodTypes(context,
-                             firstParamType(fn.tpe),
-                             sel.tpe,
-                             isSeq = true)
+          unapplyMethodTypes(
+            context,
+            firstParamType(fn.tpe),
+            sel.tpe,
+            isSeq = true)
         case _ => applyMethodTypes(fn.tpe)
       }
 

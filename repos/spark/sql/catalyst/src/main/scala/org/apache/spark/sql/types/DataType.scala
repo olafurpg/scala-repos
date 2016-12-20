@@ -102,19 +102,20 @@ object DataType {
   def fromJson(json: String): DataType = parseDataType(parse(json))
 
   private val nonDecimalNameToType = {
-    Seq(NullType,
-        DateType,
-        TimestampType,
-        BinaryType,
-        IntegerType,
-        BooleanType,
-        LongType,
-        DoubleType,
-        FloatType,
-        ShortType,
-        ByteType,
-        StringType,
-        CalendarIntervalType).map(t => t.typeName -> t).toMap
+    Seq(
+      NullType,
+      DateType,
+      TimestampType,
+      BinaryType,
+      IntegerType,
+      BooleanType,
+      LongType,
+      DoubleType,
+      FloatType,
+      ShortType,
+      ByteType,
+      StringType,
+      CalendarIntervalType).map(t => t.typeName -> t).toMap
   }
 
   /** Given the string representation of a type, return its DataType */
@@ -141,52 +142,60 @@ object DataType {
     case JString(name) =>
       nameToType(name)
 
-    case JSortedObject(("containsNull", JBool(n)),
-                       ("elementType", t: JValue),
-                       ("type", JString("array"))) =>
+    case JSortedObject(
+        ("containsNull", JBool(n)),
+        ("elementType", t: JValue),
+        ("type", JString("array"))) =>
       ArrayType(parseDataType(t), n)
 
-    case JSortedObject(("keyType", k: JValue),
-                       ("type", JString("map")),
-                       ("valueContainsNull", JBool(n)),
-                       ("valueType", v: JValue)) =>
+    case JSortedObject(
+        ("keyType", k: JValue),
+        ("type", JString("map")),
+        ("valueContainsNull", JBool(n)),
+        ("valueType", v: JValue)) =>
       MapType(parseDataType(k), parseDataType(v), n)
 
-    case JSortedObject(("fields", JArray(fields)),
-                       ("type", JString("struct"))) =>
+    case JSortedObject(
+        ("fields", JArray(fields)),
+        ("type", JString("struct"))) =>
       StructType(fields.map(parseStructField))
 
     // Scala/Java UDT
-    case JSortedObject(("class", JString(udtClass)),
-                       ("pyClass", _),
-                       ("sqlType", _),
-                       ("type", JString("udt"))) =>
+    case JSortedObject(
+        ("class", JString(udtClass)),
+        ("pyClass", _),
+        ("sqlType", _),
+        ("type", JString("udt"))) =>
       Utils
         .classForName(udtClass)
         .newInstance()
         .asInstanceOf[UserDefinedType[_]]
 
     // Python UDT
-    case JSortedObject(("pyClass", JString(pyClass)),
-                       ("serializedClass", JString(serialized)),
-                       ("sqlType", v: JValue),
-                       ("type", JString("udt"))) =>
+    case JSortedObject(
+        ("pyClass", JString(pyClass)),
+        ("serializedClass", JString(serialized)),
+        ("sqlType", v: JValue),
+        ("type", JString("udt"))) =>
       new PythonUserDefinedType(parseDataType(v), pyClass, serialized)
   }
 
   private def parseStructField(json: JValue): StructField = json match {
-    case JSortedObject(("metadata", metadata: JObject),
-                       ("name", JString(name)),
-                       ("nullable", JBool(nullable)),
-                       ("type", dataType: JValue)) =>
-      StructField(name,
-                  parseDataType(dataType),
-                  nullable,
-                  Metadata.fromJObject(metadata))
+    case JSortedObject(
+        ("metadata", metadata: JObject),
+        ("name", JString(name)),
+        ("nullable", JBool(nullable)),
+        ("type", dataType: JValue)) =>
+      StructField(
+        name,
+        parseDataType(dataType),
+        nullable,
+        Metadata.fromJObject(metadata))
     // Support reading schema when 'metadata' is missing.
-    case JSortedObject(("name", JString(name)),
-                       ("nullable", JBool(nullable)),
-                       ("type", dataType: JValue)) =>
+    case JSortedObject(
+        ("name", JString(name)),
+        ("nullable", JBool(nullable)),
+        ("type", dataType: JValue)) =>
       StructField(name, parseDataType(dataType), nullable)
   }
 
@@ -212,16 +221,18 @@ object DataType {
     (left, right) match {
       case (ArrayType(leftElementType, _), ArrayType(rightElementType, _)) =>
         equalsIgnoreNullability(leftElementType, rightElementType)
-      case (MapType(leftKeyType, leftValueType, _),
-            MapType(rightKeyType, rightValueType, _)) =>
+      case (
+          MapType(leftKeyType, leftValueType, _),
+          MapType(rightKeyType, rightValueType, _)) =>
         equalsIgnoreNullability(leftKeyType, rightKeyType) &&
           equalsIgnoreNullability(leftValueType, rightValueType)
       case (StructType(leftFields), StructType(rightFields)) =>
         leftFields.length == rightFields.length &&
           leftFields.zip(rightFields).forall {
             case (l, r) =>
-              l.name == r.name && equalsIgnoreNullability(l.dataType,
-                                                          r.dataType)
+              l.name == r.name && equalsIgnoreNullability(
+                l.dataType,
+                r.dataType)
           }
       case (l, r) => l == r
     }
@@ -258,8 +269,9 @@ object DataType {
             case (fromField, toField) =>
               fromField.name == toField.name &&
                 (toField.nullable || !fromField.nullable) &&
-                equalsIgnoreCompatibleNullability(fromField.dataType,
-                                                  toField.dataType)
+                equalsIgnoreCompatibleNullability(
+                  fromField.dataType,
+                  toField.dataType)
           }
 
       case (fromDataType, toDataType) => fromDataType == toDataType

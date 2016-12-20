@@ -63,12 +63,12 @@ class ReplicaFetcherThread(name: String,
                            replicaMgr: ReplicaManager,
                            metrics: Metrics,
                            time: Time)
-    extends AbstractFetcherThread(name = name,
-                                  clientId = name,
-                                  sourceBroker = sourceBroker,
-                                  fetchBackOffMs =
-                                    brokerConfig.replicaFetchBackoffMs,
-                                  isInterruptible = false) {
+    extends AbstractFetcherThread(
+      name = name,
+      clientId = name,
+      sourceBroker = sourceBroker,
+      fetchBackOffMs = brokerConfig.replicaFetchBackoffMs,
+      isInterruptible = false) {
 
   type REQ = FetchRequest
   type PD = PartitionData
@@ -98,13 +98,15 @@ class ReplicaFetcherThread(name: String,
       metrics,
       time,
       "replica-fetcher",
-      Map("broker-id" -> sourceBroker.id.toString,
-          "fetcher-id" -> fetcherId.toString).asJava,
+      Map(
+        "broker-id" -> sourceBroker.id.toString,
+        "fetcher-id" -> fetcherId.toString).asJava,
       false,
-      ChannelBuilders.create(brokerConfig.interBrokerSecurityProtocol,
-                             Mode.CLIENT,
-                             LoginType.SERVER,
-                             brokerConfig.values)
+      ChannelBuilders.create(
+        brokerConfig.interBrokerSecurityProtocol,
+        Mode.CLIENT,
+        LoginType.SERVER,
+        brokerConfig.values)
     )
     new NetworkClient(
       selector,
@@ -141,19 +143,21 @@ class ReplicaFetcherThread(name: String,
       if (logger.isTraceEnabled)
         trace(
           "Follower %d has replica log end offset %d for partition %s. Received %d messages and leader hw %d"
-            .format(replica.brokerId,
-                    replica.logEndOffset.messageOffset,
-                    topicAndPartition,
-                    messageSet.sizeInBytes,
-                    partitionData.highWatermark))
+            .format(
+              replica.brokerId,
+              replica.logEndOffset.messageOffset,
+              topicAndPartition,
+              messageSet.sizeInBytes,
+              partitionData.highWatermark))
       replica.log.get.append(messageSet, assignOffsets = false)
       if (logger.isTraceEnabled)
         trace(
           "Follower %d has replica log end offset %d after appending %d bytes of messages for partition %s"
-            .format(replica.brokerId,
-                    replica.logEndOffset.messageOffset,
-                    messageSet.sizeInBytes,
-                    topicAndPartition))
+            .format(
+              replica.brokerId,
+              replica.logEndOffset.messageOffset,
+              messageSet.sizeInBytes,
+              topicAndPartition))
       val followerHighWatermark =
         replica.logEndOffset.messageOffset.min(partitionData.highWatermark)
       // for the follower replica, we do not need to keep
@@ -163,10 +167,11 @@ class ReplicaFetcherThread(name: String,
       if (logger.isTraceEnabled)
         trace(
           "Follower %d set replica high watermark for partition [%s,%d] to %s"
-            .format(replica.brokerId,
-                    topic,
-                    partitionId,
-                    followerHighWatermark))
+            .format(
+              replica.brokerId,
+              topic,
+              partitionId,
+              followerHighWatermark))
     } catch {
       case e: KafkaStorageException =>
         fatal("Disk error while replicating data.", e)
@@ -211,30 +216,34 @@ class ReplicaFetcherThread(name: String,
       // This situation could only happen if the unclean election configuration for a topic changes while a replica is down. Otherwise,
       // we should never encounter this situation since a non-ISR leader cannot be elected if disallowed by the broker configuration.
       if (!LogConfig
-            .fromProps(brokerConfig.originals,
-                       AdminUtils.fetchEntityConfig(replicaMgr.zkUtils,
-                                                    ConfigType.Topic,
-                                                    topicAndPartition.topic))
+            .fromProps(
+              brokerConfig.originals,
+              AdminUtils.fetchEntityConfig(
+                replicaMgr.zkUtils,
+                ConfigType.Topic,
+                topicAndPartition.topic))
             .uncleanLeaderElectionEnable) {
         // Log a fatal error and shutdown the broker to ensure that data loss does not unexpectedly occur.
         fatal(
           "Halting because log truncation is not allowed for topic %s,".format(
             topicAndPartition.topic) +
             " Current leader %d's latest offset %d is less than replica %d's latest offset %d"
-              .format(sourceBroker.id,
-                      leaderEndOffset,
-                      brokerConfig.brokerId,
-                      replica.logEndOffset.messageOffset))
+              .format(
+                sourceBroker.id,
+                leaderEndOffset,
+                brokerConfig.brokerId,
+                replica.logEndOffset.messageOffset))
         Runtime.getRuntime.halt(1)
       }
 
       warn(
         "Replica %d for partition %s reset its fetch offset from %d to current leader %d's latest offset %d"
-          .format(brokerConfig.brokerId,
-                  topicAndPartition,
-                  replica.logEndOffset.messageOffset,
-                  sourceBroker.id,
-                  leaderEndOffset))
+          .format(
+            brokerConfig.brokerId,
+            topicAndPartition,
+            replica.logEndOffset.messageOffset,
+            sourceBroker.id,
+            leaderEndOffset))
       replicaMgr.logManager.truncateTo(
         Map(topicAndPartition -> leaderEndOffset))
       leaderEndOffset
@@ -268,11 +277,12 @@ class ReplicaFetcherThread(name: String,
         brokerConfig.brokerId)
       warn(
         "Replica %d for partition %s reset its fetch offset from %d to current leader %d's start offset %d"
-          .format(brokerConfig.brokerId,
-                  topicAndPartition,
-                  replica.logEndOffset.messageOffset,
-                  sourceBroker.id,
-                  leaderStartOffset))
+          .format(
+            brokerConfig.brokerId,
+            topicAndPartition,
+            replica.logEndOffset.messageOffset,
+            sourceBroker.id,
+            leaderStartOffset))
       val offsetToFetch =
         Math.max(leaderStartOffset, replica.logEndOffset.messageOffset)
       // Only truncate log when current leader's log start offset is greater than follower's log end offset.
@@ -290,9 +300,10 @@ class ReplicaFetcherThread(name: String,
 
   protected def fetch(
       fetchRequest: FetchRequest): Map[TopicAndPartition, PartitionData] = {
-    val clientResponse = sendRequest(ApiKeys.FETCH,
-                                     Some(fetchRequestVersion),
-                                     fetchRequest.underlying)
+    val clientResponse = sendRequest(
+      ApiKeys.FETCH,
+      Some(fetchRequestVersion),
+      fetchRequest.underlying)
     new FetchResponse(clientResponse.responseBody).responseData.asScala.map {
       case (key, value) =>
         TopicAndPartition(key.topic, key.partition) -> new PartitionData(value)
@@ -334,8 +345,9 @@ class ReplicaFetcherThread(name: String,
     val topicPartition =
       new TopicPartition(topicAndPartition.topic, topicAndPartition.partition)
     val partitions = Map(
-      topicPartition -> new ListOffsetRequest.PartitionData(earliestOrLatest,
-                                                            1)
+      topicPartition -> new ListOffsetRequest.PartitionData(
+        earliestOrLatest,
+        1)
     )
     val request = new ListOffsetRequest(consumerId, partitions.asJava)
     val clientResponse = sendRequest(ApiKeys.LIST_OFFSETS, None, request)
@@ -357,8 +369,9 @@ class ReplicaFetcherThread(name: String,
       case ((TopicAndPartition(topic, partition), partitionFetchState)) =>
         if (partitionFetchState.isActive)
           requestMap(new TopicPartition(topic, partition)) =
-            new JFetchRequest.PartitionData(partitionFetchState.offset,
-                                            fetchSize)
+            new JFetchRequest.PartitionData(
+              partitionFetchState.offset,
+              fetchSize)
     }
 
     new FetchRequest(
@@ -374,8 +387,9 @@ object ReplicaFetcherThread {
     def offset(topicAndPartition: TopicAndPartition): Long =
       underlying.fetchData
         .asScala(
-          new TopicPartition(topicAndPartition.topic,
-                             topicAndPartition.partition))
+          new TopicPartition(
+            topicAndPartition.topic,
+            topicAndPartition.partition))
         .offset
   }
 

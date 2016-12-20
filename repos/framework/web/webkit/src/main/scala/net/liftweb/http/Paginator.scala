@@ -69,9 +69,10 @@ trait Paginator[T] extends Loggable {
     */
   def zoomedPages =
     (List(curPage - 1020, curPage - 120, curPage - 20) ++
-      (curPage - 10 to curPage + 10) ++ List(curPage + 20,
-                                             curPage + 120,
-                                             curPage + 1020)) filter { n =>
+      (curPage - 10 to curPage + 10) ++ List(
+      curPage + 20,
+      curPage + 120,
+      curPage + 1020)) filter { n =>
       n >= 0 && n < numPages
     }
 }
@@ -183,9 +184,10 @@ trait PaginatorSnippet[T] extends Paginator[T] {
     if (count == 0) Text(S.?("paginator.norecords"))
     else
       Text(
-        S.?("paginator.displayingrecords",
-            Array(recordsFrom, recordsTo, count)
-              .map(_.asInstanceOf[AnyRef]): _*))
+        S.?(
+          "paginator.displayingrecords",
+          Array(recordsFrom, recordsTo, count)
+            .map(_.asInstanceOf[AnyRef]): _*))
 
   /**
     * The template prefix for general navigation components

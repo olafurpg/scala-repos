@@ -228,8 +228,9 @@ abstract class BaseYarnClusterSuite
     // SPARK-4267: make sure java options are propagated correctly.
     props
       .setProperty("spark.driver.extraJavaOptions", "-Dfoo=\"one two three\"")
-    props.setProperty("spark.executor.extraJavaOptions",
-                      "-Dfoo=\"one two three\"")
+    props.setProperty(
+      "spark.executor.extraJavaOptions",
+      "-Dfoo=\"one two three\"")
 
     yarnCluster.getConfig().asScala.foreach { e =>
       props.setProperty("spark.hadoop." + e.getKey(), e.getValue())
@@ -243,8 +244,9 @@ abstract class BaseYarnClusterSuite
     extraConf.foreach { case (k, v) => props.setProperty(k, v) }
 
     val propsFile = File.createTempFile("spark", ".properties", tempDir)
-    val writer = new OutputStreamWriter(new FileOutputStream(propsFile),
-                                        StandardCharsets.UTF_8)
+    val writer = new OutputStreamWriter(
+      new FileOutputStream(propsFile),
+      StandardCharsets.UTF_8)
     props.store(writer, "Spark properties.")
     writer.close()
     propsFile.getAbsolutePath()

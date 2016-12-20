@@ -269,10 +269,11 @@ private[internal] trait GlbLubs { self: SymbolTable =>
      else if (tps forall isNumericValueType)
        numericLub(tps)
      else if (tps exists typeHasAnnotations)
-       annotationsLub(lub(
-                        tps map
-                          (_.withoutAnnotations)),
-                      tps)
+       annotationsLub(
+         lub(
+           tps map
+             (_.withoutAnnotations)),
+         tps)
      else lub(tps))
 
   def numericLub(ts: List[Type]) =
@@ -332,8 +333,9 @@ private[internal] trait GlbLubs { self: SymbolTable =>
       case ts @ NullaryMethodType(_) :: rest =>
         NullaryMethodType(lub0(matchingRestypes(ts, Nil)))
       case ts @ TypeBounds(_, _) :: rest =>
-        TypeBounds(glb(ts map (_.bounds.lo), depth),
-                   lub(ts map (_.bounds.hi), depth))
+        TypeBounds(
+          glb(ts map (_.bounds.lo), depth),
+          lub(ts map (_.bounds.hi), depth))
       case ts @ AnnotatedType(annots, tpe) :: rest =>
         annotationsLub(lub0(ts map (_.withoutAnnotations)), ts)
       case ts =>
@@ -389,8 +391,9 @@ private[internal] trait GlbLubs { self: SymbolTable =>
                   .setInfoOwnerAdjusted(symtypes.head)
               else {
                 def lubBounds(bnds: List[TypeBounds]): TypeBounds =
-                  TypeBounds(glb(bnds map (_.lo), depth.decr),
-                             lub(bnds map (_.hi), depth.decr))
+                  TypeBounds(
+                    glb(bnds map (_.lo), depth.decr),
+                    lub(bnds map (_.hi), depth.decr))
                 lubRefined.typeSymbol
                   .newAbstractType(proto.name.toTypeName, proto.pos)
                   .setInfoOwnerAdjusted(lubBounds(symtypes map (_.bounds)))
@@ -509,8 +512,9 @@ private[internal] trait GlbLubs { self: SymbolTable =>
       case ts @ NullaryMethodType(_) :: rest =>
         NullaryMethodType(glbNorm(matchingRestypes(ts, Nil), depth))
       case ts @ TypeBounds(_, _) :: rest =>
-        TypeBounds(lub(ts map (_.bounds.lo), depth),
-                   glb(ts map (_.bounds.hi), depth))
+        TypeBounds(
+          lub(ts map (_.bounds.lo), depth),
+          glb(ts map (_.bounds.hi), depth))
       case ts =>
         glbResults get ((depth, ts)) match {
           case Some(glbType) =>

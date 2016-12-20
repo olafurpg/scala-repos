@@ -32,9 +32,11 @@ private[stream] object Timers {
   private def idleTimeoutCheckInterval(
       timeout: FiniteDuration): FiniteDuration = {
     import scala.concurrent.duration._
-    FiniteDuration(math.min(math.max(timeout.toNanos / 8, 100.millis.toNanos),
-                            timeout.toNanos / 2),
-                   TimeUnit.NANOSECONDS)
+    FiniteDuration(
+      math.min(
+        math.max(timeout.toNanos / 8, 100.millis.toNanos),
+        timeout.toNanos / 2),
+      TimeUnit.NANOSECONDS)
   }
 
   final class Initial[T](timeout: FiniteDuration)
@@ -118,8 +120,9 @@ private[stream] object Timers {
                 s"No elements passed in the last $timeout."))
 
         override def preStart(): Unit =
-          schedulePeriodically("IdleTimeoutCheckTimer",
-                               interval = idleTimeoutCheckInterval(timeout))
+          schedulePeriodically(
+            "IdleTimeoutCheckTimer",
+            interval = idleTimeoutCheckInterval(timeout))
       }
 
     override def toString = "IdleTimeout"
@@ -177,8 +180,9 @@ private[stream] object Timers {
                 s"No elements passed in the last $timeout."))
 
         override def preStart(): Unit =
-          schedulePeriodically("IdleTimeoutCheckTimer",
-                               idleTimeoutCheckInterval(timeout))
+          schedulePeriodically(
+            "IdleTimeoutCheckTimer",
+            idleTimeoutCheckInterval(timeout))
       }
   }
 

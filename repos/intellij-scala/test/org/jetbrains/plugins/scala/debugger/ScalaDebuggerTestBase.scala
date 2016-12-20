@@ -82,8 +82,9 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
   }
 
   override def getIprFile: File = {
-    val file = new File(testDataBasePath,
-                        testClassName + ProjectFileType.DOT_DEFAULT_EXTENSION)
+    val file = new File(
+      testDataBasePath,
+      testClassName + ProjectFileType.DOT_DEFAULT_EXTENSION)
     FileUtil.createIfDoesntExist(file)
     file
   }
@@ -142,8 +143,9 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
   }
 
   protected def addFileToProject(fileText: String) {
-    Assert.assertTrue(s"File should start with `object $mainClassName`",
-                      fileText.startsWith(s"object $mainClassName"))
+    Assert.assertTrue(
+      s"File should start with `object $mainClassName`",
+      fileText.startsWith(s"object $mainClassName"))
     addFileToProject(mainFileName, fileText)
   }
 

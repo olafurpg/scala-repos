@@ -28,16 +28,17 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
   val Applicable = "applicable" // default: true
   val Accessible = "accessible" // default: true
 
-  val Parameters = List(Resolved,
-                        Name,
-                        File,
-                        Line,
-                        Offset,
-                        Length,
-                        Type,
-                        Path,
-                        Applicable,
-                        Accessible)
+  val Parameters = List(
+    Resolved,
+    Name,
+    File,
+    Line,
+    Offset,
+    Length,
+    Type,
+    Path,
+    Applicable,
+    Accessible)
 
   var options: List[Parameters] = List()
   var references: List[PsiReference] = List()
@@ -75,8 +76,9 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
     options = options.reverse
     references = references.reverse
 
-    Assert.assertFalse("At least one expectation must be specified",
-                       references.isEmpty)
+    Assert.assertFalse(
+      "At least one expectation must be specified",
+      references.isEmpty)
     Assert.assertEquals("Options number", references.size, options.size)
 
     null
@@ -84,9 +86,10 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
 
   def assertKnown(parameters: Parameters) {
     for ((key, value) <- parameters) {
-      Assert.assertTrue("Unknown parameter: " + key +
-                          "\nAllowed: " + Parameters.mkString(", "),
-                        Parameters.contains(key))
+      Assert.assertTrue(
+        "Unknown parameter: " + key +
+          "\nAllowed: " + Parameters.mkString(", "),
+        Parameters.contains(key))
     }
   }
 
@@ -117,12 +120,14 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
                 case Some(r: ScReferenceElement) =>
                   doEachTest(r, it._2)
                 case _ =>
-                  assert(assertion = false,
-                         message = "Multihost references are not supported")
+                  assert(
+                    assertion = false,
+                    message = "Multihost references are not supported")
               }
             } else {
-              assert(assertion = false,
-                     message = "Multihost references are not supported")
+              assert(
+                assertion = false,
+                message = "Multihost references are not supported")
             }
         }
       })
@@ -153,27 +158,32 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
         .assertNotNull(message(referenceName + " must BE resolved!"), target)
 
       if (options.contains(Accessible) && options(Accessible) == "false") {
-        Assert.assertFalse(message(referenceName + " must NOT be accessible!"),
-                           accessible)
+        Assert.assertFalse(
+          message(referenceName + " must NOT be accessible!"),
+          accessible)
       } else {
-        Assert.assertTrue(message(referenceName + " must BE accessible!"),
-                          accessible)
+        Assert.assertTrue(
+          message(referenceName + " must BE accessible!"),
+          accessible)
       }
 
       if (options.contains(Applicable) && options(Applicable) == "false") {
-        Assert.assertFalse(message(referenceName + " must NOT be applicable!"),
-                           applicable)
+        Assert.assertFalse(
+          message(referenceName + " must NOT be applicable!"),
+          applicable)
       } else {
-        Assert.assertTrue(message(
-                            referenceName + " must BE applicable! " +
-                              result.get.problems.mkString("(", ",", ")")),
-                          applicable)
+        Assert.assertTrue(
+          message(
+            referenceName + " must BE applicable! " +
+              result.get.problems.mkString("(", ",", ")")),
+          applicable)
       }
 
       if (options.contains(Path)) {
-        assertEquals(Path,
-                     options(Path),
-                     target.asInstanceOf[ScTypeDefinition].qualifiedName)
+        assertEquals(
+          Path,
+          options(Path),
+          target.asInstanceOf[ScTypeDefinition].qualifiedName)
       }
 
       if (options.contains(File) || options.contains(Offset) ||
@@ -209,8 +219,9 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
         val text =
           Type + " - expected: " + expectedClass.getSimpleName + ", actual: " +
             targetClass.getSimpleName
-        Assert.assertTrue(message(text),
-                          expectedClass.isAssignableFrom(targetClass))
+        Assert.assertTrue(
+          message(text),
+          expectedClass.isAssignableFrom(targetClass))
       }
     }
   }

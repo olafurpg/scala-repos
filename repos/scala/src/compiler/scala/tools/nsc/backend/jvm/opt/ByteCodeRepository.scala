@@ -203,16 +203,18 @@ class ByteCodeRepository[BT <: BTypes](
     // In a MethodInsnNode, the `owner` field may be an array descriptor, for example when invoking `clone`. We don't have a method node to return in this case.
     if (ownerInternalNameOrArrayDescriptor.charAt(0) == '[')
       Left(
-        MethodNotFound(name,
-                       descriptor,
-                       ownerInternalNameOrArrayDescriptor,
-                       Nil))
+        MethodNotFound(
+          name,
+          descriptor,
+          ownerInternalNameOrArrayDescriptor,
+          Nil))
     else
       methodNodeImpl(ownerInternalNameOrArrayDescriptor).left.map(
-        MethodNotFound(name,
-                       descriptor,
-                       ownerInternalNameOrArrayDescriptor,
-                       _))
+        MethodNotFound(
+          name,
+          descriptor,
+          ownerInternalNameOrArrayDescriptor,
+          _))
   }
 
   private def parseClass(
@@ -227,9 +229,10 @@ class ByteCodeRepository[BT <: BTypes](
       // Attribute.
       // We don't need frames when inlining, but we want to keep the local variable table, so we
       // don't use SKIP_DEBUG.
-      classReader.accept(classNode,
-                         Array[Attribute](InlineInfoAttributePrototype),
-                         asm.ClassReader.SKIP_FRAMES)
+      classReader.accept(
+        classNode,
+        Array[Attribute](InlineInfoAttributePrototype),
+        asm.ClassReader.SKIP_FRAMES)
       // SKIP_FRAMES leaves line number nodes. Remove them because they are not correct after
       // inlining.
       // TODO: we need to remove them also for classes that are not parsed from classfiles, why not simplify and do it once when inlining?

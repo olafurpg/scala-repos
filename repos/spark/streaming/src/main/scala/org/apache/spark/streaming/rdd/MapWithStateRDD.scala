@@ -217,11 +217,12 @@ private[streaming] object MapWithStateRDD {
     val noOpFunc = (time: Time, key: K, value: Option[V], state: State[S]) =>
       None
 
-    new MapWithStateRDD[K, V, S, E](stateRDD,
-                                    emptyDataRDD,
-                                    noOpFunc,
-                                    updateTime,
-                                    None)
+    new MapWithStateRDD[K, V, S, E](
+      stateRDD,
+      emptyDataRDD,
+      noOpFunc,
+      updateTime,
+      None)
   }
 
   def createFromRDD[K: ClassTag, V: ClassTag, S: ClassTag, E: ClassTag](
@@ -249,10 +250,11 @@ private[streaming] object MapWithStateRDD {
     val noOpFunc = (time: Time, key: K, value: Option[V], state: State[S]) =>
       None
 
-    new MapWithStateRDD[K, V, S, E](stateRDD,
-                                    emptyDataRDD,
-                                    noOpFunc,
-                                    updateTime,
-                                    None)
+    new MapWithStateRDD[K, V, S, E](
+      stateRDD,
+      emptyDataRDD,
+      noOpFunc,
+      updateTime,
+      None)
   }
 }

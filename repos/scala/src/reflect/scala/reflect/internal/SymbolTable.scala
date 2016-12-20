@@ -68,8 +68,9 @@ abstract class SymbolTable
   def isPastTyper = false
   protected def isDeveloper: Boolean = settings.debug
 
-  @deprecated("Use devWarning if this is really a warning; otherwise use log",
-              "2.11.0")
+  @deprecated(
+    "Use devWarning if this is really a warning; otherwise use log",
+    "2.11.0")
   def debugwarn(msg: => String): Unit = devWarning(msg)
 
   /** Override with final implementation for inlining. */

@@ -137,11 +137,12 @@ private[round] final class Socket(gameId: String,
     case GetSocketStatus =>
       playerGet(White, _.isGone) zip playerGet(Black, _.isGone) map {
         case (whiteIsGone, blackIsGone) =>
-          SocketStatus(version = history.getVersion,
-                       whiteOnGame = ownerOf(White).isDefined,
-                       whiteIsGone = whiteIsGone,
-                       blackOnGame = ownerOf(Black).isDefined,
-                       blackIsGone = blackIsGone)
+          SocketStatus(
+            version = history.getVersion,
+            whiteOnGame = ownerOf(White).isDefined,
+            whiteIsGone = whiteIsGone,
+            blackOnGame = ownerOf(Black).isDefined,
+            blackIsGone = blackIsGone)
       } pipeTo sender
 
     case Join(uid, user, color, playerId, ip, userTv) =>
@@ -192,9 +193,10 @@ private[round] final class Socket(gameId: String,
 
     case NotifyCrowd =>
       delayedCrowdNotification = false
-      val event = Event.Crowd(white = ownerOf(White).isDefined,
-                              black = ownerOf(Black).isDefined,
-                              watchers = showSpectators(lightUser)(watchers))
+      val event = Event.Crowd(
+        white = ownerOf(White).isDefined,
+        black = ownerOf(Black).isDefined,
+        watchers = showSpectators(lightUser)(watchers))
       notifyAll(event.typ, event.data)
   }
 

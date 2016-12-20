@@ -29,12 +29,13 @@ private[nio] object GenHeapBuffer {
     val initialLimit = initialPosition + initialLength
     if (initialPosition < 0 || initialLength < 0 || initialLimit > capacity)
       throw new IndexOutOfBoundsException
-    newHeapBuffer(capacity,
-                  array,
-                  arrayOffset,
-                  initialPosition,
-                  initialLimit,
-                  isReadOnly)
+    newHeapBuffer(
+      capacity,
+      array,
+      arrayOffset,
+      initialPosition,
+      initialLimit,
+      isReadOnly)
   }
 }
 
@@ -47,23 +48,25 @@ private[nio] final class GenHeapBuffer[B <: Buffer](val self: B)
   @inline
   def generic_slice()(implicit newHeapBuffer: NewThisHeapBuffer): BufferType = {
     val newCapacity = remaining
-    newHeapBuffer(newCapacity,
-                  _array,
-                  _arrayOffset + position,
-                  0,
-                  newCapacity,
-                  isReadOnly)
+    newHeapBuffer(
+      newCapacity,
+      _array,
+      _arrayOffset + position,
+      0,
+      newCapacity,
+      isReadOnly)
   }
 
   @inline
   def generic_duplicate()(
       implicit newHeapBuffer: NewThisHeapBuffer): BufferType = {
-    val result = newHeapBuffer(capacity,
-                               _array,
-                               _arrayOffset,
-                               position,
-                               limit,
-                               isReadOnly)
+    val result = newHeapBuffer(
+      capacity,
+      _array,
+      _arrayOffset,
+      position,
+      limit,
+      isReadOnly)
     result._mark = _mark
     result
   }

@@ -62,8 +62,9 @@ object Mod extends LilaController {
       lila.user.DataForm.title.bindFromRequest.fold(
         err => fuccess(redirect(username, mod = true)),
         title =>
-          modApi.setTitle(me.id, username, title) inject redirect(username,
-                                                                  mod = false)
+          modApi.setTitle(me.id, username, title) inject redirect(
+            username,
+            mod = false)
       )
     else fuccess(authorizationFailed(ctx.req))
   }
@@ -136,11 +137,12 @@ object Mod extends LilaController {
             fuccess((ratio * 100).toInt)
         }
       }
-      .addEffects(fail = _ => lila.mon.security.proxy.request.failure(),
-                  succ = percent => {
-                    lila.mon.security.proxy.percent(percent max 0)
-                    lila.mon.security.proxy.request.success()
-                  })
+      .addEffects(
+        fail = _ => lila.mon.security.proxy.request.failure(),
+        succ = percent => {
+          lila.mon.security.proxy.percent(percent max 0)
+          lila.mon.security.proxy.request.success()
+        })
   }, maxCapacity = 1024)
 
   def ipIntel(ip: String) = Secure(_.IpBan) { ctx => me =>

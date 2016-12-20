@@ -10,10 +10,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
   */
 class FilterEmptyCheckInspection extends OperationOnCollectionInspection {
   override def possibleSimplificationTypes: Array[SimplificationType] =
-    Array(FilterIsEmptyCheck,
-          FilterNonEmptyCheck,
-          FilterNotIsEmptyCheck,
-          FilterNotNonEmptyCheck)
+    Array(
+      FilterIsEmptyCheck,
+      FilterNonEmptyCheck,
+      FilterNotIsEmptyCheck,
+      FilterNotNonEmptyCheck)
 }
 
 object FilterIsEmptyCheck extends SimplificationType {

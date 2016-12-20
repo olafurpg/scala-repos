@@ -24,8 +24,9 @@ case class FromLocalArgEvaluator(delegate: Evaluator) extends Evaluator {
         evaluateNotFromField(inner, context).map(
           ScalaBoxingEvaluator.box(_, context))
       case _: ScalaFieldEvaluator => None
-      case ScalaDuplexEvaluator(first: ScalaFieldEvaluator,
-                                second: ScalaFieldEvaluator) =>
+      case ScalaDuplexEvaluator(
+          first: ScalaFieldEvaluator,
+          second: ScalaFieldEvaluator) =>
         None
       case ScalaDuplexEvaluator(first: ScalaFieldEvaluator, second)
           if Try(first.evaluate(context)).isFailure =>

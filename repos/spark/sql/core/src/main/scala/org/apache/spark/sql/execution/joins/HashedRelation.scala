@@ -169,9 +169,10 @@ private[execution] object HashedRelation {
             sizeEstimate: Int = 64): HashedRelation = {
 
     if (keyGenerator.isInstanceOf[UnsafeProjection]) {
-      return UnsafeHashedRelation(input,
-                                  keyGenerator.asInstanceOf[UnsafeProjection],
-                                  sizeEstimate)
+      return UnsafeHashedRelation(
+        input,
+        keyGenerator.asInstanceOf[UnsafeProjection],
+        sizeEstimate)
     }
 
     // TODO: Use Spark's HashMap implementation.
@@ -279,11 +280,12 @@ private[joins] final class UnsafeHashedRelation(
       // Used in Broadcast join
       val map = binaryMap // avoid the compiler error
       val loc = new map.Location // this could be allocated in stack
-      binaryMap.safeLookup(unsafeKey.getBaseObject,
-                           unsafeKey.getBaseOffset,
-                           unsafeKey.getSizeInBytes,
-                           loc,
-                           unsafeKey.hashCode())
+      binaryMap.safeLookup(
+        unsafeKey.getBaseObject,
+        unsafeKey.getBaseOffset,
+        unsafeKey.getSizeInBytes,
+        loc,
+        unsafeKey.hashCode())
       if (loc.isDefined) {
         val buffer = CompactBuffer[UnsafeRow]()
 
@@ -321,11 +323,12 @@ private[joins] final class UnsafeHashedRelation(
           if (buffer.length < length) {
             buffer = new Array[Byte](length)
           }
-          Platform.copyMemory(base,
-                              offset,
-                              buffer,
-                              Platform.BYTE_ARRAY_OFFSET,
-                              length)
+          Platform.copyMemory(
+            base,
+            offset,
+            buffer,
+            Platform.BYTE_ARRAY_OFFSET,
+            length)
           out.write(buffer, 0, length)
         }
 
@@ -400,10 +403,10 @@ private[joins] final class UnsafeHashedRelation(
     // TODO(josh): We won't need this dummy memory manager after future refactorings; revisit
     // during code review
 
-    binaryMap =
-      new BytesToBytesMap(taskMemoryManager,
-                          (nKeys * 1.5 + 1).toInt, // reduce hash collision
-                          pageSizeBytes)
+    binaryMap = new BytesToBytesMap(
+      taskMemoryManager,
+      (nKeys * 1.5 + 1).toInt, // reduce hash collision
+      pageSizeBytes)
 
     var i = 0
     var keyBuffer = new Array[Byte](1024)
@@ -424,12 +427,13 @@ private[joins] final class UnsafeHashedRelation(
       val loc =
         binaryMap.lookup(keyBuffer, Platform.BYTE_ARRAY_OFFSET, keySize)
       assert(!loc.isDefined, "Duplicated key found!")
-      val putSuceeded = loc.putNewKey(keyBuffer,
-                                      Platform.BYTE_ARRAY_OFFSET,
-                                      keySize,
-                                      valuesBuffer,
-                                      Platform.BYTE_ARRAY_OFFSET,
-                                      valuesSize)
+      val putSuceeded = loc.putNewKey(
+        keyBuffer,
+        Platform.BYTE_ARRAY_OFFSET,
+        keySize,
+        valuesBuffer,
+        Platform.BYTE_ARRAY_OFFSET,
+        valuesSize)
       if (!putSuceeded) {
         throw new IOException(
           "Could not allocate memory to grow BytesToBytesMap")

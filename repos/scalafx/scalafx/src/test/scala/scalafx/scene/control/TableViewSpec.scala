@@ -78,12 +78,13 @@ class TableViewSpec[S]
 
   it should "not alter the delegate state during implicit conversion - Issue 154" in {
     val rocky = "Rocky"
-    val characters = ObservableBuffer[String]("Peggy",
-                                              "Sue",
-                                              "555-6798",
-                                              rocky,
-                                              "Raccoon",
-                                              "555-6798")
+    val characters = ObservableBuffer[String](
+      "Peggy",
+      "Sue",
+      "555-6798",
+      rocky,
+      "Raccoon",
+      "555-6798")
 
     val tableView = new TableView[String](characters) {
       columns += new TableColumn[String, String]("Name")

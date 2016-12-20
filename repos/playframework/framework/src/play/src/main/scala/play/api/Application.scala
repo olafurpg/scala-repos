@@ -93,8 +93,9 @@ trait Application {
   /**
     * The router used by this application.
     */
-  @deprecated("Either use HttpRequestHandler, or have the router injected",
-              "2.4.0")
+  @deprecated(
+    "Either use HttpRequestHandler, or have the router injected",
+    "2.4.0")
   def routes: Router = {
     // Use a cached value because the injector might be slow
     if (cachedRoutes != null) cachedRoutes
@@ -268,10 +269,11 @@ trait BuiltInComponents {
   lazy val httpConfiguration: HttpConfiguration =
     HttpConfiguration.fromConfiguration(configuration)
   lazy val httpRequestHandler: HttpRequestHandler =
-    new DefaultHttpRequestHandler(router,
-                                  httpErrorHandler,
-                                  httpConfiguration,
-                                  httpFilters: _*)
+    new DefaultHttpRequestHandler(
+      router,
+      httpErrorHandler,
+      httpConfiguration,
+      httpFilters: _*)
   lazy val httpErrorHandler: HttpErrorHandler = new DefaultHttpErrorHandler(
     environment,
     configuration,

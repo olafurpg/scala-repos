@@ -127,14 +127,15 @@ class ArgTest extends WordSpec {
 
     "correctly parse numeric args" in {
       val map = Args(
-        Array("--anInt",
-              "-1",
-              "--aLong",
-              "21474836470",
-              "--aDecimal",
-              "3.141592654",
-              "--aString",
-              "foo"))
+        Array(
+          "--anInt",
+          "-1",
+          "--aLong",
+          "21474836470",
+          "--aDecimal",
+          "3.141592654",
+          "--aString",
+          "foo"))
       assert(map.int("anInt") == "-1".toInt)
       assert(map.int("anInt", 2) == "-1".toInt)
       assert(map.int("nothing", 2) == 2)

@@ -190,10 +190,11 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
     ScalaValueClassesNoUnit.map(primitive => {
       val boxed = boxedClass(primitive)
       val method =
-        methodNameAndType(boxed,
-                          newTermName("valueOf"),
-                          static = true,
-                          filterOverload = singleParamOfClass(primitive))
+        methodNameAndType(
+          boxed,
+          newTermName("valueOf"),
+          static = true,
+          filterOverload = singleParamOfClass(primitive))
       (classBTypeFromSymbol(boxed).internalName, method)
     })(collection.breakOut)
   }
@@ -248,9 +249,10 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
     ScalaValueClassesNoUnit.map(primitive => {
       val boxed = boxedClass(primitive)
       (classBTypeFromSymbol(boxed).internalName,
-       methodNameAndType(boxed,
-                         nme.CONSTRUCTOR,
-                         filterOverload = singleParamOfClass(primitive)))
+       methodNameAndType(
+         boxed,
+         nme.CONSTRUCTOR,
+         filterOverload = singleParamOfClass(primitive)))
     })(collection.breakOut)
   }
 
@@ -351,10 +353,11 @@ class CoreBTypes[BTFS <: BTypesFromSymbols[_ <: Global]](val bTypes: BTFS) {
     coreBTypes.jliLambdaMetafactoryRef.internalName,
     sn.AltMetafactory.toString,
     MethodBType(
-      List(coreBTypes.jliMethodHandlesLookupRef,
-           coreBTypes.StringRef,
-           coreBTypes.jliMethodTypeRef,
-           ArrayBType(ObjectRef)),
+      List(
+        coreBTypes.jliMethodHandlesLookupRef,
+        coreBTypes.StringRef,
+        coreBTypes.jliMethodTypeRef,
+        ArrayBType(ObjectRef)),
       coreBTypes.jliCallSiteRef
     ).descriptor)
 

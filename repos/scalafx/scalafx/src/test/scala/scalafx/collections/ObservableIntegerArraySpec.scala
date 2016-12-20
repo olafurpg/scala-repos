@@ -42,8 +42,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class ObservableIntegerArraySpec
-    extends SimpleSFXDelegateSpec[jfxc.ObservableIntegerArray,
-                                  ObservableIntegerArray](
+    extends SimpleSFXDelegateSpec[
+      jfxc.ObservableIntegerArray,
+      ObservableIntegerArray](
       classOf[jfxc.ObservableIntegerArray],
       classOf[ObservableIntegerArray]
     ) {
@@ -328,8 +329,9 @@ class ObservableIntegerArraySpec
     testEmpty(ObservableIntegerArray.iterate(0, -1)(_ + 1))
     testEmpty(ObservableIntegerArray.iterate(0, 0)(_ + 1))
     testNonEmpty(ObservableIntegerArray.iterate(0, 1)(_ + 1), Array(0))
-    testNonEmpty(ObservableIntegerArray.iterate(0, 5)(_ + 1),
-                 Array(0, 1, 2, 3, 4))
+    testNonEmpty(
+      ObservableIntegerArray.iterate(0, 5)(_ + 1),
+      Array(0, 1, 2, 3, 4))
   }
   it should "return valid initialized array from companion's range(start, end)" in {
     testIllegalArgumentExceptionThrown(ObservableIntegerArray.range(1, 2, 0))

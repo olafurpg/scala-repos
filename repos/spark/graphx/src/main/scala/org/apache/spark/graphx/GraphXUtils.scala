@@ -32,18 +32,19 @@ object GraphXUtils {
     */
   def registerKryoClasses(conf: SparkConf) {
     conf.registerKryoClasses(
-      Array(classOf[Edge[Object]],
-            classOf[(VertexId, Object)],
-            classOf[EdgePartition[Object, Object]],
-            classOf[BitSet],
-            classOf[VertexIdToIndexMap],
-            classOf[VertexAttributeBlock[Object]],
-            classOf[PartitionStrategy],
-            classOf[BoundedPriorityQueue[Object]],
-            classOf[EdgeDirection],
-            classOf[GraphXPrimitiveKeyOpenHashMap[VertexId, Int]],
-            classOf[OpenHashSet[Int]],
-            classOf[OpenHashSet[Long]]))
+      Array(
+        classOf[Edge[Object]],
+        classOf[(VertexId, Object)],
+        classOf[EdgePartition[Object, Object]],
+        classOf[BitSet],
+        classOf[VertexIdToIndexMap],
+        classOf[VertexAttributeBlock[Object]],
+        classOf[PartitionStrategy],
+        classOf[BoundedPriorityQueue[Object]],
+        classOf[EdgeDirection],
+        classOf[GraphXPrimitiveKeyOpenHashMap[VertexId, Int]],
+        classOf[OpenHashSet[Int]],
+        classOf[OpenHashSet[Long]]))
   }
 
   /**
@@ -69,9 +70,10 @@ object GraphXUtils {
         }
       }
     }
-    g.aggregateMessagesWithActiveSet(sendMsg,
-                                     reduceFunc,
-                                     TripletFields.All,
-                                     activeSetOpt)
+    g.aggregateMessagesWithActiveSet(
+      sendMsg,
+      reduceFunc,
+      TripletFields.All,
+      activeSetOpt)
   }
 }

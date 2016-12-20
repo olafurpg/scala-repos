@@ -172,9 +172,10 @@ class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
     val jp = new JavaParameters
     val jdk: Sdk = PathUtilEx.getAnyJdk(project)
     assert(jdk != null, "JDK IS NULL")
-    jp.configureByProject(project,
-                          JavaParameters.JDK_AND_CLASSES_AND_TESTS,
-                          jdk)
+    jp.configureByProject(
+      project,
+      JavaParameters.JDK_AND_CLASSES_AND_TESTS,
+      jdk)
     jp.setWorkingDirectory(project.getBaseDir.getPath)
 
     val scalaModule = project.anyScalaModule.getOrElse {
@@ -216,8 +217,9 @@ class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
         target: OrderEnumerator,
         classesCollector: collection.mutable.HashSet[String],
         sourcesCollector: collection.mutable.HashSet[String]) {
-      Set(classesCollector -> target.classes(),
-          sourcesCollector -> target.sources()).foreach { entry =>
+      Set(
+        classesCollector -> target.classes(),
+        sourcesCollector -> target.sources()).foreach { entry =>
         entry._1 ++= entry._2.withoutSelfModuleOutput().getRoots.map {
           virtualFile =>
             virtualFile.getPath.replaceAll(
@@ -234,14 +236,16 @@ class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
 
       if (modulesNeeded.nonEmpty) {
         for (module <- modulesNeeded) {
-          collectCPSources(OrderEnumerator.orderEntries(module),
-                           allEntries,
-                           allSourceEntries)
+          collectCPSources(
+            OrderEnumerator.orderEntries(module),
+            allEntries,
+            allSourceEntries)
         }
       } else {
-        collectCPSources(OrderEnumerator.orderEntries(project),
-                         allEntries,
-                         allSourceEntries)
+        collectCPSources(
+          OrderEnumerator.orderEntries(project),
+          allEntries,
+          allSourceEntries)
       }
       allEntries.foreach(a => classpathWithFacet.append(a))
       allSourceEntries.foreach(a => sourcepathWithFacet.append(a))

@@ -179,12 +179,13 @@ class CSVIngestProcessing(apiKey: APIKey,
               // boundary was hit on the previous read and so it was not discovered that we didn't
               // need to continue until now. This could be cleaner via a more CPS'ed style, but meh.
               // This empty record is just stored to send the terminated streamRef.
-              ingestStore.store(apiKey,
-                                path,
-                                authorities,
-                                Nil,
-                                jobId,
-                                streamRef.terminate) flatMap { _ =>
+              ingestStore.store(
+                apiKey,
+                path,
+                authorities,
+                Nil,
+                jobId,
+                streamRef.terminate) flatMap { _ =>
                 M.point(BatchResult(total, ingested, errors))
               }
             } else {
@@ -197,25 +198,28 @@ class CSVIngestProcessing(apiKey: APIKey,
                   }
                 }
 
-              ingestStore.store(apiKey,
-                                path,
-                                authorities,
-                                jvals,
-                                jobId,
-                                if (done)
-                                  streamRef.terminate
-                                else streamRef) flatMap { _ =>
+              ingestStore.store(
+                apiKey,
+                path,
+                authorities,
+                jvals,
+                jobId,
+                if (done)
+                  streamRef.terminate
+                else streamRef) flatMap { _ =>
                 if (done)
                   M.point(
-                    BatchResult(total + batch.length,
-                                ingested + batch.length,
-                                errors))
+                    BatchResult(
+                      total + batch.length,
+                      ingested + batch.length,
+                      errors))
                 else
-                  readBatches(paths,
-                              reader,
-                              total + batch.length,
-                              ingested + batch.length,
-                              errors)
+                  readBatches(
+                    paths,
+                    reader,
+                    total + batch.length,
+                    ingested + batch.length,
+                    errors)
               }
             }
         }

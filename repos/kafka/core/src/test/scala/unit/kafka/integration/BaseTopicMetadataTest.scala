@@ -43,20 +43,21 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
   @Before
   override def setUp() {
     super.setUp()
-    val props = createBrokerConfigs(numConfigs,
-                                    zkConnect,
-                                    interBrokerSecurityProtocol =
-                                      Some(securityProtocol),
-                                    trustStoreFile = trustStoreFile)
+    val props = createBrokerConfigs(
+      numConfigs,
+      zkConnect,
+      interBrokerSecurityProtocol = Some(securityProtocol),
+      trustStoreFile = trustStoreFile)
     val configs: Seq[KafkaConfig] = props.map(KafkaConfig.fromProps)
     adHocConfigs = configs.takeRight(configs.size - 1) // Started and stopped by individual test cases
     server1 = TestUtils.createServer(configs.head)
     brokerEndPoints = Seq(
       // We are using the Scala clients and they don't support SSL. Once we move to the Java ones, we should use
       // `securityProtocol` instead of PLAINTEXT below
-      new BrokerEndPoint(server1.config.brokerId,
-                         server1.config.hostName,
-                         server1.boundPort(SecurityProtocol.PLAINTEXT))
+      new BrokerEndPoint(
+        server1.config.brokerId,
+        server1.config.hostName,
+        server1.boundPort(SecurityProtocol.PLAINTEXT))
     )
   }
 
@@ -70,33 +71,39 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
   def testBasicTopicMetadata {
     // create topic
     val topic = "test"
-    createTopic(zkUtils,
-                topic,
-                numPartitions = 1,
-                replicationFactor = 1,
-                servers = Seq(server1))
+    createTopic(
+      zkUtils,
+      topic,
+      numPartitions = 1,
+      replicationFactor = 1,
+      servers = Seq(server1))
 
     val topicsMetadata = ClientUtils
-      .fetchTopicMetadata(Set(topic),
-                          brokerEndPoints,
-                          "TopicMetadataTest-testBasicTopicMetadata",
-                          2000,
-                          0)
+      .fetchTopicMetadata(
+        Set(topic),
+        brokerEndPoints,
+        "TopicMetadataTest-testBasicTopicMetadata",
+        2000,
+        0)
       .topicsMetadata
     assertEquals(Errors.NONE.code, topicsMetadata.head.errorCode)
-    assertEquals(Errors.NONE.code,
-                 topicsMetadata.head.partitionsMetadata.head.errorCode)
+    assertEquals(
+      Errors.NONE.code,
+      topicsMetadata.head.partitionsMetadata.head.errorCode)
     assertEquals("Expecting metadata only for 1 topic", 1, topicsMetadata.size)
-    assertEquals("Expecting metadata for the test topic",
-                 "test",
-                 topicsMetadata.head.topic)
+    assertEquals(
+      "Expecting metadata for the test topic",
+      "test",
+      topicsMetadata.head.topic)
     val partitionMetadata = topicsMetadata.head.partitionsMetadata
-    assertEquals("Expecting metadata for 1 partition",
-                 1,
-                 partitionMetadata.size)
-    assertEquals("Expecting partition id to be 0",
-                 0,
-                 partitionMetadata.head.partitionId)
+    assertEquals(
+      "Expecting metadata for 1 partition",
+      1,
+      partitionMetadata.size)
+    assertEquals(
+      "Expecting partition id to be 0",
+      0,
+      partitionMetadata.head.partitionId)
     assertEquals(1, partitionMetadata.head.replicas.size)
   }
 
@@ -105,46 +112,55 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
     // create topic
     val topic1 = "testGetAllTopicMetadata1"
     val topic2 = "testGetAllTopicMetadata2"
-    createTopic(zkUtils,
-                topic1,
-                numPartitions = 1,
-                replicationFactor = 1,
-                servers = Seq(server1))
-    createTopic(zkUtils,
-                topic2,
-                numPartitions = 1,
-                replicationFactor = 1,
-                servers = Seq(server1))
+    createTopic(
+      zkUtils,
+      topic1,
+      numPartitions = 1,
+      replicationFactor = 1,
+      servers = Seq(server1))
+    createTopic(
+      zkUtils,
+      topic2,
+      numPartitions = 1,
+      replicationFactor = 1,
+      servers = Seq(server1))
 
     // issue metadata request with empty list of topics
     val topicsMetadata = ClientUtils
-      .fetchTopicMetadata(Set.empty,
-                          brokerEndPoints,
-                          "TopicMetadataTest-testGetAllTopicMetadata",
-                          2000,
-                          0)
+      .fetchTopicMetadata(
+        Set.empty,
+        brokerEndPoints,
+        "TopicMetadataTest-testGetAllTopicMetadata",
+        2000,
+        0)
       .topicsMetadata
     assertEquals(Errors.NONE.code, topicsMetadata.head.errorCode)
     assertEquals(2, topicsMetadata.size)
-    assertEquals(Errors.NONE.code,
-                 topicsMetadata.head.partitionsMetadata.head.errorCode)
-    assertEquals(Errors.NONE.code,
-                 topicsMetadata.last.partitionsMetadata.head.errorCode)
+    assertEquals(
+      Errors.NONE.code,
+      topicsMetadata.head.partitionsMetadata.head.errorCode)
+    assertEquals(
+      Errors.NONE.code,
+      topicsMetadata.last.partitionsMetadata.head.errorCode)
     val partitionMetadataTopic1 = topicsMetadata.head.partitionsMetadata
     val partitionMetadataTopic2 = topicsMetadata.last.partitionsMetadata
-    assertEquals("Expecting metadata for 1 partition",
-                 1,
-                 partitionMetadataTopic1.size)
-    assertEquals("Expecting partition id to be 0",
-                 0,
-                 partitionMetadataTopic1.head.partitionId)
+    assertEquals(
+      "Expecting metadata for 1 partition",
+      1,
+      partitionMetadataTopic1.size)
+    assertEquals(
+      "Expecting partition id to be 0",
+      0,
+      partitionMetadataTopic1.head.partitionId)
     assertEquals(1, partitionMetadataTopic1.head.replicas.size)
-    assertEquals("Expecting metadata for 1 partition",
-                 1,
-                 partitionMetadataTopic2.size)
-    assertEquals("Expecting partition id to be 0",
-                 0,
-                 partitionMetadataTopic2.head.partitionId)
+    assertEquals(
+      "Expecting metadata for 1 partition",
+      1,
+      partitionMetadataTopic2.size)
+    assertEquals(
+      "Expecting partition id to be 0",
+      0,
+      partitionMetadataTopic2.head.partitionId)
     assertEquals(1, partitionMetadataTopic2.head.replicas.size)
   }
 
@@ -153,18 +169,21 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
     // auto create topic
     val topic = "testAutoCreateTopic"
     var topicsMetadata = ClientUtils
-      .fetchTopicMetadata(Set(topic),
-                          brokerEndPoints,
-                          "TopicMetadataTest-testAutoCreateTopic",
-                          2000,
-                          0)
+      .fetchTopicMetadata(
+        Set(topic),
+        brokerEndPoints,
+        "TopicMetadataTest-testAutoCreateTopic",
+        2000,
+        0)
       .topicsMetadata
-    assertEquals(Errors.LEADER_NOT_AVAILABLE.code,
-                 topicsMetadata.head.errorCode)
+    assertEquals(
+      Errors.LEADER_NOT_AVAILABLE.code,
+      topicsMetadata.head.errorCode)
     assertEquals("Expecting metadata only for 1 topic", 1, topicsMetadata.size)
-    assertEquals("Expecting metadata for the test topic",
-                 topic,
-                 topicsMetadata.head.topic)
+    assertEquals(
+      "Expecting metadata for the test topic",
+      topic,
+      topicsMetadata.head.topic)
     assertEquals(0, topicsMetadata.head.partitionsMetadata.size)
 
     // wait for leader to be elected
@@ -173,22 +192,26 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
 
     // retry the metadata for the auto created topic
     topicsMetadata = ClientUtils
-      .fetchTopicMetadata(Set(topic),
-                          brokerEndPoints,
-                          "TopicMetadataTest-testBasicTopicMetadata",
-                          2000,
-                          0)
+      .fetchTopicMetadata(
+        Set(topic),
+        brokerEndPoints,
+        "TopicMetadataTest-testBasicTopicMetadata",
+        2000,
+        0)
       .topicsMetadata
     assertEquals(Errors.NONE.code, topicsMetadata.head.errorCode)
-    assertEquals(Errors.NONE.code,
-                 topicsMetadata.head.partitionsMetadata.head.errorCode)
+    assertEquals(
+      Errors.NONE.code,
+      topicsMetadata.head.partitionsMetadata.head.errorCode)
     val partitionMetadata = topicsMetadata.head.partitionsMetadata
-    assertEquals("Expecting metadata for 1 partition",
-                 1,
-                 partitionMetadata.size)
-    assertEquals("Expecting partition id to be 0",
-                 0,
-                 partitionMetadata.head.partitionId)
+    assertEquals(
+      "Expecting metadata for 1 partition",
+      1,
+      partitionMetadata.size)
+    assertEquals(
+      "Expecting partition id to be 0",
+      0,
+      partitionMetadata.head.partitionId)
     assertEquals(1, partitionMetadata.head.replicas.size)
     assertTrue(partitionMetadata.head.leader.isDefined)
   }
@@ -199,24 +222,29 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
     val topic1 = "testAutoCreate_Topic"
     val topic2 = "testAutoCreate.Topic"
     var topicsMetadata = ClientUtils
-      .fetchTopicMetadata(Set(topic1, topic2),
-                          brokerEndPoints,
-                          "TopicMetadataTest-testAutoCreateTopic",
-                          2000,
-                          0)
+      .fetchTopicMetadata(
+        Set(topic1, topic2),
+        brokerEndPoints,
+        "TopicMetadataTest-testAutoCreateTopic",
+        2000,
+        0)
       .topicsMetadata
     assertEquals("Expecting metadata for 2 topics", 2, topicsMetadata.size)
-    assertEquals("Expecting metadata for topic1",
-                 topic1,
-                 topicsMetadata.head.topic)
-    assertEquals(Errors.LEADER_NOT_AVAILABLE.code,
-                 topicsMetadata.head.errorCode)
-    assertEquals("Expecting metadata for topic2",
-                 topic2,
-                 topicsMetadata(1).topic)
-    assertEquals("Expecting InvalidTopicCode for topic2 metadata",
-                 Errors.INVALID_TOPIC_EXCEPTION.code,
-                 topicsMetadata(1).errorCode)
+    assertEquals(
+      "Expecting metadata for topic1",
+      topic1,
+      topicsMetadata.head.topic)
+    assertEquals(
+      Errors.LEADER_NOT_AVAILABLE.code,
+      topicsMetadata.head.errorCode)
+    assertEquals(
+      "Expecting metadata for topic2",
+      topic2,
+      topicsMetadata(1).topic)
+    assertEquals(
+      "Expecting InvalidTopicCode for topic2 metadata",
+      Errors.INVALID_TOPIC_EXCEPTION.code,
+      topicsMetadata(1).errorCode)
 
     // wait for leader to be elected
     TestUtils.waitUntilLeaderIsElectedOrChanged(zkUtils, topic1, 0)
@@ -224,22 +252,26 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
 
     // retry the metadata for the first auto created topic
     topicsMetadata = ClientUtils
-      .fetchTopicMetadata(Set(topic1),
-                          brokerEndPoints,
-                          "TopicMetadataTest-testBasicTopicMetadata",
-                          2000,
-                          0)
+      .fetchTopicMetadata(
+        Set(topic1),
+        brokerEndPoints,
+        "TopicMetadataTest-testBasicTopicMetadata",
+        2000,
+        0)
       .topicsMetadata
     assertEquals(Errors.NONE.code, topicsMetadata.head.errorCode)
-    assertEquals(Errors.NONE.code,
-                 topicsMetadata.head.partitionsMetadata.head.errorCode)
+    assertEquals(
+      Errors.NONE.code,
+      topicsMetadata.head.partitionsMetadata.head.errorCode)
     var partitionMetadata = topicsMetadata.head.partitionsMetadata
-    assertEquals("Expecting metadata for 1 partition",
-                 1,
-                 partitionMetadata.size)
-    assertEquals("Expecting partition id to be 0",
-                 0,
-                 partitionMetadata.head.partitionId)
+    assertEquals(
+      "Expecting metadata for 1 partition",
+      1,
+      partitionMetadata.size)
+    assertEquals(
+      "Expecting partition id to be 0",
+      0,
+      partitionMetadata.head.partitionId)
     assertEquals(1, partitionMetadata.head.replicas.size)
     assertTrue(partitionMetadata.head.leader.isDefined)
   }
@@ -249,10 +281,11 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
       servers.filter(x => x.brokerState.currentState != NotRunning.state)
     val expectedIsr: Seq[BrokerEndPoint] = activeBrokers.map(
       x =>
-        new BrokerEndPoint(x.config.brokerId,
-                           if (x.config.hostName.nonEmpty) x.config.hostName
-                           else "localhost",
-                           x.boundPort())
+        new BrokerEndPoint(
+          x.config.brokerId,
+          if (x.config.hostName.nonEmpty) x.config.hostName
+          else "localhost",
+          x.boundPort())
     )
 
     // Assert that topic metadata at new brokers is updated correctly
@@ -263,11 +296,12 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
         metadata = ClientUtils.fetchTopicMetadata(
           Set.empty,
           Seq(
-            new BrokerEndPoint(x.config.brokerId,
-                               if (x.config.hostName.nonEmpty)
-                                 x.config.hostName
-                               else "localhost",
-                               x.boundPort())),
+            new BrokerEndPoint(
+              x.config.brokerId,
+              if (x.config.hostName.nonEmpty)
+                x.config.hostName
+              else "localhost",
+              x.boundPort())),
           "TopicMetadataTest-testBasicTopicMetadata",
           2000,
           0)

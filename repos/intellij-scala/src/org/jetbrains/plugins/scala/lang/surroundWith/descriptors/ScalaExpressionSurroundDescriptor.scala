@@ -76,35 +76,41 @@ class ScalaExpressionSurroundDescriptor extends SurroundDescriptor {
     val element2: PsiElement = file.findElementAt(endOffset - 1);
     (element1, element2) match {
       case (_: PsiWhiteSpace, _) => {
-        return findExpressionInRange(file,
-                                     element1.getTextRange.getEndOffset,
-                                     endOffset)
+        return findExpressionInRange(
+          file,
+          element1.getTextRange.getEndOffset,
+          endOffset)
       }
       case (_, _: PsiWhiteSpace) => {
-        return findExpressionInRange(file,
-                                     startOffset,
-                                     element2.getTextRange.getStartOffset)
+        return findExpressionInRange(
+          file,
+          startOffset,
+          element2.getTextRange.getStartOffset)
       }
       case (null, _) | (_, null) => return null
       case _ => {
         if (element2.getNode.getElementType == ScalaTokenTypes.tSEMICOLON)
           return findExpressionInRange(file, startOffset, endOffset - 1)
         if (ScalaPsiUtil.isLineTerminator(element1))
-          return findExpressionInRange(file,
-                                       element1.getTextRange.getEndOffset,
-                                       endOffset)
+          return findExpressionInRange(
+            file,
+            element1.getTextRange.getEndOffset,
+            endOffset)
         if (ScalaPsiUtil.isLineTerminator(element2))
-          return findExpressionInRange(file,
-                                       startOffset,
-                                       element2.getTextRange.getStartOffset)
+          return findExpressionInRange(
+            file,
+            startOffset,
+            element2.getTextRange.getStartOffset)
         if (ScalaTokenTypes.COMMENTS_TOKEN_SET contains element1.getNode.getElementType)
-          return findExpressionInRange(file,
-                                       element1.getTextRange.getEndOffset,
-                                       endOffset)
+          return findExpressionInRange(
+            file,
+            element1.getTextRange.getEndOffset,
+            endOffset)
         if (ScalaTokenTypes.COMMENTS_TOKEN_SET contains element2.getNode.getElementType)
-          return findExpressionInRange(file,
-                                       startOffset,
-                                       element2.getTextRange.getStartOffset)
+          return findExpressionInRange(
+            file,
+            startOffset,
+            element2.getTextRange.getStartOffset)
       }
     }
 

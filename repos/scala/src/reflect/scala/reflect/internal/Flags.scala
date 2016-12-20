@@ -331,8 +331,9 @@ class Flags extends ModifierFlags {
 
   // A precaution against future additions to FlagsNotPickled turning out
   // to be overloaded flags thus not-pickling more than intended.
-  assert((OverloadedFlagsMask & FlagsNotPickled) == 0,
-         flagsToString(OverloadedFlagsMask & FlagsNotPickled))
+  assert(
+    (OverloadedFlagsMask & FlagsNotPickled) == 0,
+    flagsToString(OverloadedFlagsMask & FlagsNotPickled))
 
   /** These flags are pickled */
   final val PickledFlags =

@@ -31,9 +31,10 @@ object ExistsEquals extends SimplificationType {
 
   def canBeReplacedWithContains(qual: ScExpression, arg: ScExpression) = {
     val exprText = s"(${qual.getText}).contains(${arg.getText})"
-    ScalaPsiElementFactory.createExpressionWithContextFromText(exprText,
-                                                               qual.getContext,
-                                                               qual) match {
+    ScalaPsiElementFactory.createExpressionWithContextFromText(
+      exprText,
+      qual.getContext,
+      qual) match {
       case ScMethodCall(ref: ScReferenceExpression, Seq(a)) =>
         ref.resolve() != null && a
           .expectedType(fromUnderscore = false)

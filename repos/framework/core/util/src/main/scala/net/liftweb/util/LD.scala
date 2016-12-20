@@ -91,9 +91,10 @@ object LD {
       word match {
         case Nil => dist
         case c :: cs =>
-          matrix(cs,
-                 pos + 1,
-                 column(x1, dist, pos, pos + 1, c, new ListBuffer))
+          matrix(
+            cs,
+            pos + 1,
+            column(x1, dist, pos, pos + 1, c, new ListBuffer))
       }
 
     matrix(y1, 0, (1 to x.length).toList) match {

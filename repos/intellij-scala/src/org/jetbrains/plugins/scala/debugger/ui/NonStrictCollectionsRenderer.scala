@@ -291,8 +291,9 @@ object NonStrictCollectionsRenderer {
         JavaPsiFacade
           .getInstance(project)
           .getElementFactory
-          .createExpressionFromText(name,
-                                    PositionUtil getContextElement context)
+          .createExpressionFromText(
+            name,
+            PositionUtil getContextElement context)
       } catch {
         case e: IncorrectOperationException => null
       }

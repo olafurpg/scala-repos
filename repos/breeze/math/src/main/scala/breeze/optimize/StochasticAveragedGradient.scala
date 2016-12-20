@@ -25,11 +25,12 @@ class StochasticAveragedGradient[T](maxIter: Int = -1,
 
   protected def initialHistory(f: BatchDiffFunction[T], init: T): History = {
     val zero = zeroLike(init)
-    History(initialStepSize,
-            f.fullRange,
-            zeroLike(init),
-            IndexedSeq.fill(f.fullRange.length)(zero),
-            0)
+    History(
+      initialStepSize,
+      f.fullRange,
+      zeroLike(init),
+      IndexedSeq.fill(f.fullRange.length)(zero),
+      0)
   }
 
   protected def chooseDescentDirection(state: State,
@@ -82,11 +83,12 @@ class StochasticAveragedGradient[T](maxIter: Int = -1,
         stepSize
       }
     d += newGrad
-    History(newStepSize,
-            range,
-            d,
-            previousGradients.updated(nextPos, newGrad),
-            if (oldState.iter < previousGradients.length - 1) oldState.iter + 1
-            else Rand.choose(range).draw())
+    History(
+      newStepSize,
+      range,
+      d,
+      previousGradients.updated(nextPos, newGrad),
+      if (oldState.iter < previousGradients.length - 1) oldState.iter + 1
+      else Rand.choose(range).draw())
   }
 }

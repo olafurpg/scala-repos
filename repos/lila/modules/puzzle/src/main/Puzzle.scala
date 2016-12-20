@@ -50,19 +50,20 @@ object Puzzle {
            history: List[String],
            fen: String,
            lines: Lines)(id: PuzzleId) =
-    new Puzzle(id = id,
-               gameId = gameId,
-               history = history,
-               fen = fen,
-               lines = lines,
-               depth = Line minDepth lines,
-               color = Color(history.size % 2 == 0),
-               date = DateTime.now,
-               perf = Perf.default,
-               vote = Vote(0, 0, 0),
-               attempts = 0,
-               wins = 0,
-               time = 0)
+    new Puzzle(
+      id = id,
+      gameId = gameId,
+      history = history,
+      fen = fen,
+      lines = lines,
+      depth = Line minDepth lines,
+      color = Color(history.size % 2 == 0),
+      date = DateTime.now,
+      perf = Perf.default,
+      vote = Vote(0, 0, 0),
+      attempts = 0,
+      wins = 0,
+      time = 0)
 
   import reactivemongo.bson._
   import lila.db.BSON
@@ -118,33 +119,35 @@ object Puzzle {
     import Vote.voteBSONHandler
 
     def reads(r: BSON.Reader): Puzzle =
-      Puzzle(id = r int id,
-             gameId = r strO gameId,
-             history = r str history split ' ' toList,
-             fen = r str fen,
-             lines = r.get[Lines](lines),
-             depth = r int depth,
-             color = Color(r bool white),
-             date = r date date,
-             perf = r.get[Perf](perf),
-             vote = r.get[Vote](vote),
-             attempts = r int attempts,
-             wins = r int wins,
-             time = r int time)
+      Puzzle(
+        id = r int id,
+        gameId = r strO gameId,
+        history = r str history split ' ' toList,
+        fen = r str fen,
+        lines = r.get[Lines](lines),
+        depth = r int depth,
+        color = Color(r bool white),
+        date = r date date,
+        perf = r.get[Perf](perf),
+        vote = r.get[Vote](vote),
+        attempts = r int attempts,
+        wins = r int wins,
+        time = r int time)
 
     def writes(w: BSON.Writer, o: Puzzle) =
-      BSONDocument(id -> o.id,
-                   gameId -> o.gameId,
-                   history -> o.history.mkString(" "),
-                   fen -> o.fen,
-                   lines -> o.lines,
-                   depth -> o.depth,
-                   white -> o.color.white,
-                   date -> o.date,
-                   perf -> o.perf,
-                   vote -> o.vote,
-                   attempts -> o.attempts,
-                   wins -> o.wins,
-                   time -> o.time)
+      BSONDocument(
+        id -> o.id,
+        gameId -> o.gameId,
+        history -> o.history.mkString(" "),
+        fen -> o.fen,
+        lines -> o.lines,
+        depth -> o.depth,
+        white -> o.color.white,
+        date -> o.date,
+        perf -> o.perf,
+        vote -> o.vote,
+        attempts -> o.attempts,
+        wins -> o.wins,
+        time -> o.time)
   }
 }

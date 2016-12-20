@@ -128,8 +128,9 @@ object Traversable {
               def continue[A](k: K[M, A]) = Cont(step(k))
             } &> k(Input.El(prefix))
           case (prefix, suffix) =>
-            Done(if (prefix.isEmpty) Cont(k) else k(Input.El(prefix)),
-                 Input.El(suffix.drop(1)))
+            Done(
+              if (prefix.isEmpty) Cont(k) else k(Input.El(prefix)),
+              Input.El(suffix.drop(1)))
         }(dec))
 
       case Input.Empty =>

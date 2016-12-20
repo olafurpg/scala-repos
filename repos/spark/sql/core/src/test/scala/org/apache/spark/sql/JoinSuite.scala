@@ -158,23 +158,25 @@ class JoinSuite extends QueryTest with SharedSQLContext {
   }
 
   test("inner join where, one match per row") {
-    checkAnswer(upperCaseData.join(lowerCaseData).where('n === 'N),
-                Seq(
-                  Row(1, "A", 1, "a"),
-                  Row(2, "B", 2, "b"),
-                  Row(3, "C", 3, "c"),
-                  Row(4, "D", 4, "d")
-                ))
+    checkAnswer(
+      upperCaseData.join(lowerCaseData).where('n === 'N),
+      Seq(
+        Row(1, "A", 1, "a"),
+        Row(2, "B", 2, "b"),
+        Row(3, "C", 3, "c"),
+        Row(4, "D", 4, "d")
+      ))
   }
 
   test("inner join ON, one match per row") {
-    checkAnswer(upperCaseData.join(lowerCaseData, $"n" === $"N"),
-                Seq(
-                  Row(1, "A", 1, "a"),
-                  Row(2, "B", 2, "b"),
-                  Row(3, "C", 3, "c"),
-                  Row(4, "D", 4, "d")
-                ))
+    checkAnswer(
+      upperCaseData.join(lowerCaseData, $"n" === $"N"),
+      Seq(
+        Row(1, "A", 1, "a"),
+        Row(2, "B", 2, "b"),
+        Row(3, "C", 3, "c"),
+        Row(4, "D", 4, "d")
+      ))
   }
 
   test("inner join, where, multiple matches") {
@@ -198,20 +200,22 @@ class JoinSuite extends QueryTest with SharedSQLContext {
     val bigDataX = bigData.as("x")
     val bigDataY = bigData.as("y")
 
-    checkAnswer(bigDataX.join(bigDataY).where($"x.key" === $"y.key"),
-                testData.rdd
-                  .flatMap(row => Seq.fill(16)(Row.merge(row, row)))
-                  .collect()
-                  .toSeq)
+    checkAnswer(
+      bigDataX.join(bigDataY).where($"x.key" === $"y.key"),
+      testData.rdd
+        .flatMap(row => Seq.fill(16)(Row.merge(row, row)))
+        .collect()
+        .toSeq)
   }
 
   test("cartisian product join") {
-    checkAnswer(testData3.join(testData3),
-                Row(1, null, 1, null) :: Row(1, null, 2, 2) :: Row(
-                  2,
-                  2,
-                  1,
-                  null) :: Row(2, 2, 2, 2) :: Nil)
+    checkAnswer(
+      testData3.join(testData3),
+      Row(1, null, 1, null) :: Row(1, null, 2, 2) :: Row(2, 2, 1, null) :: Row(
+        2,
+        2,
+        2,
+        2) :: Nil)
   }
 
   test("left outer join") {
@@ -223,31 +227,21 @@ class JoinSuite extends QueryTest with SharedSQLContext {
         4,
         "d") :: Row(5, "E", null, null) :: Row(6, "F", null, null) :: Nil)
 
-    checkAnswer(upperCaseData.join(lowerCaseData,
-                                   $"n" === $"N" && $"n" > 1,
-                                   "left"),
-                Row(1, "A", null, null) :: Row(2, "B", 2, "b") :: Row(
-                  3,
-                  "C",
-                  3,
-                  "c") :: Row(4, "D", 4, "d") :: Row(5, "E", null, null) :: Row(
-                  6,
-                  "F",
-                  null,
-                  null) :: Nil)
+    checkAnswer(
+      upperCaseData.join(lowerCaseData, $"n" === $"N" && $"n" > 1, "left"),
+      Row(1, "A", null, null) :: Row(2, "B", 2, "b") :: Row(3, "C", 3, "c") :: Row(
+        4,
+        "D",
+        4,
+        "d") :: Row(5, "E", null, null) :: Row(6, "F", null, null) :: Nil)
 
-    checkAnswer(upperCaseData.join(lowerCaseData,
-                                   $"n" === $"N" && $"N" > 1,
-                                   "left"),
-                Row(1, "A", null, null) :: Row(2, "B", 2, "b") :: Row(
-                  3,
-                  "C",
-                  3,
-                  "c") :: Row(4, "D", 4, "d") :: Row(5, "E", null, null) :: Row(
-                  6,
-                  "F",
-                  null,
-                  null) :: Nil)
+    checkAnswer(
+      upperCaseData.join(lowerCaseData, $"n" === $"N" && $"N" > 1, "left"),
+      Row(1, "A", null, null) :: Row(2, "B", 2, "b") :: Row(3, "C", 3, "c") :: Row(
+        4,
+        "D",
+        4,
+        "d") :: Row(5, "E", null, null) :: Row(6, "F", null, null) :: Nil)
 
     checkAnswer(
       upperCaseData.join(lowerCaseData, $"n" === $"N" && $"l" > $"L", "left"),
@@ -286,30 +280,20 @@ class JoinSuite extends QueryTest with SharedSQLContext {
         "d",
         4,
         "D") :: Row(null, null, 5, "E") :: Row(null, null, 6, "F") :: Nil)
-    checkAnswer(lowerCaseData.join(upperCaseData,
-                                   $"n" === $"N" && $"n" > 1,
-                                   "right"),
-                Row(null, null, 1, "A") :: Row(2, "b", 2, "B") :: Row(
-                  3,
-                  "c",
-                  3,
-                  "C") :: Row(4, "d", 4, "D") :: Row(null, null, 5, "E") :: Row(
-                  null,
-                  null,
-                  6,
-                  "F") :: Nil)
-    checkAnswer(lowerCaseData.join(upperCaseData,
-                                   $"n" === $"N" && $"N" > 1,
-                                   "right"),
-                Row(null, null, 1, "A") :: Row(2, "b", 2, "B") :: Row(
-                  3,
-                  "c",
-                  3,
-                  "C") :: Row(4, "d", 4, "D") :: Row(null, null, 5, "E") :: Row(
-                  null,
-                  null,
-                  6,
-                  "F") :: Nil)
+    checkAnswer(
+      lowerCaseData.join(upperCaseData, $"n" === $"N" && $"n" > 1, "right"),
+      Row(null, null, 1, "A") :: Row(2, "b", 2, "B") :: Row(3, "c", 3, "C") :: Row(
+        4,
+        "d",
+        4,
+        "D") :: Row(null, null, 5, "E") :: Row(null, null, 6, "F") :: Nil)
+    checkAnswer(
+      lowerCaseData.join(upperCaseData, $"n" === $"N" && $"N" > 1, "right"),
+      Row(null, null, 1, "A") :: Row(2, "b", 2, "B") :: Row(3, "c", 3, "C") :: Row(
+        4,
+        "d",
+        4,
+        "D") :: Row(null, null, 5, "E") :: Row(null, null, 6, "F") :: Nil)
     checkAnswer(
       lowerCaseData.join(upperCaseData, $"n" === $"N" && $"l" > $"L", "right"),
       Row(1, "a", 1, "A") :: Row(2, "b", 2, "B") :: Row(3, "c", 3, "C") :: Row(
@@ -346,21 +330,17 @@ class JoinSuite extends QueryTest with SharedSQLContext {
     val left = UnresolvedRelation(TableIdentifier("left"), None)
     val right = UnresolvedRelation(TableIdentifier("right"), None)
 
-    checkAnswer(left.join(right, $"left.N" === $"right.N", "full"),
-                Row(1, "A", null, null) :: Row(2, "B", null, null) :: Row(
-                  3,
-                  "C",
-                  3,
-                  "C") :: Row(4, "D", 4, "D") :: Row(null, null, 5, "E") :: Row(
-                  null,
-                  null,
-                  6,
-                  "F") :: Nil)
+    checkAnswer(
+      left.join(right, $"left.N" === $"right.N", "full"),
+      Row(1, "A", null, null) :: Row(2, "B", null, null) :: Row(3, "C", 3, "C") :: Row(
+        4,
+        "D",
+        4,
+        "D") :: Row(null, null, 5, "E") :: Row(null, null, 6, "F") :: Nil)
 
     checkAnswer(
-      left.join(right,
-                ($"left.N" === $"right.N") && ($"left.N" =!= 3),
-                "full"),
+      left
+        .join(right, ($"left.N" === $"right.N") && ($"left.N" =!= 3), "full"),
       Row(1, "A", null, null) :: Row(2, "B", null, null) :: Row(
         3,
         "C",
@@ -372,9 +352,8 @@ class JoinSuite extends QueryTest with SharedSQLContext {
         "E") :: Row(null, null, 6, "F") :: Nil)
 
     checkAnswer(
-      left.join(right,
-                ($"left.N" === $"right.N") && ($"right.N" =!= 3),
-                "full"),
+      left
+        .join(right, ($"left.N" === $"right.N") && ($"right.N" =!= 3), "full"),
       Row(1, "A", null, null) :: Row(2, "B", null, null) :: Row(
         3,
         "C",
@@ -499,29 +478,32 @@ class JoinSuite extends QueryTest with SharedSQLContext {
          classOf[BroadcastNestedLoopJoin])
       ).foreach { case (query, joinClass) => assertJoin(query, joinClass) }
 
-      checkAnswer(sql("""
+      checkAnswer(
+        sql("""
             SELECT x.value, y.a, y.b FROM testData x JOIN testData2 y WHERE x.key = 2
           """.stripMargin),
-                  Row("2", 1, 1) :: Row("2", 1, 2) :: Row("2", 2, 1) :: Row(
-                    "2",
-                    2,
-                    2) :: Row("2", 3, 1) :: Row("2", 3, 2) :: Nil)
+        Row("2", 1, 1) :: Row("2", 1, 2) :: Row("2", 2, 1) :: Row("2", 2, 2) :: Row(
+          "2",
+          3,
+          1) :: Row("2", 3, 2) :: Nil)
 
-      checkAnswer(sql("""
+      checkAnswer(
+        sql("""
             SELECT x.value, y.a, y.b FROM testData x JOIN testData2 y WHERE x.key < y.a
           """.stripMargin),
-                  Row("1", 2, 1) :: Row("1", 2, 2) :: Row("1", 3, 1) :: Row(
-                    "1",
-                    3,
-                    2) :: Row("2", 3, 1) :: Row("2", 3, 2) :: Nil)
+        Row("1", 2, 1) :: Row("1", 2, 2) :: Row("1", 3, 1) :: Row("1", 3, 2) :: Row(
+          "2",
+          3,
+          1) :: Row("2", 3, 2) :: Nil)
 
-      checkAnswer(sql("""
+      checkAnswer(
+        sql("""
             SELECT x.value, y.a, y.b FROM testData x JOIN testData2 y ON x.key < y.a
           """.stripMargin),
-                  Row("1", 2, 1) :: Row("1", 2, 2) :: Row("1", 3, 1) :: Row(
-                    "1",
-                    3,
-                    2) :: Row("2", 3, 1) :: Row("2", 3, 2) :: Nil)
+        Row("1", 2, 1) :: Row("1", 2, 2) :: Row("1", 3, 1) :: Row("1", 3, 2) :: Row(
+          "2",
+          3,
+          1) :: Row("2", 3, 2) :: Nil)
     }
 
     sql("UNCACHE TABLE testData")

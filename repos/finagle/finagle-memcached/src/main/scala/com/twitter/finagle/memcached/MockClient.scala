@@ -33,9 +33,10 @@ class MockClient(val map: mutable.Map[String, Buf]) extends Client {
         map.get(key) match {
           case Some(v: Buf) =>
             hits +=
-              (key -> Value(Buf.Utf8(key),
-                            v,
-                            Some(Interpreter.generateCasUnique(v))))
+              (key -> Value(
+                Buf.Utf8(key),
+                v,
+                Some(Interpreter.generateCasUnique(v))))
           case _ =>
             misses += key
         }

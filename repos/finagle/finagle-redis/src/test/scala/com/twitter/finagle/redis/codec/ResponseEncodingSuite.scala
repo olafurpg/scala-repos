@@ -32,8 +32,9 @@ final class ResponseEncodingSuite extends RedisResponseTest {
   }
 
   test("Correctly encode multi bulk replies", CodecTest) {
-    val messages = List(BulkReply(StringToChannelBuffer("foo")),
-                        BulkReply(StringToChannelBuffer("bar")))
+    val messages = List(
+      BulkReply(StringToChannelBuffer("foo")),
+      BulkReply(StringToChannelBuffer("bar")))
     assert(
       codec.send(MBulkReply(messages)) == List(
         "*2\r\n$3\r\nfoo\r\n$3\r\nbar\r\n"))

@@ -15,8 +15,9 @@ package object interpolation {
   }
 
   trait UnivariateInterpolator[T]
-      extends VariableUFunc[UnivariateInterpolatorImpl.type,
-                            UnivariateInterpolator[T]] {
+      extends VariableUFunc[
+        UnivariateInterpolatorImpl.type,
+        UnivariateInterpolator[T]] {
     def apply(x: T): T
   }
 

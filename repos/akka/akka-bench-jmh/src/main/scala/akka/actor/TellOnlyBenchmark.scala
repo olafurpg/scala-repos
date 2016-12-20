@@ -25,8 +25,9 @@ class TellOnlyBenchmark {
 
   @Setup(Level.Trial)
   def setup(): Unit = {
-    system = ActorSystem("TellOnlyBenchmark",
-                         ConfigFactory.parseString(s"""| akka {
+    system = ActorSystem(
+      "TellOnlyBenchmark",
+      ConfigFactory.parseString(s"""| akka {
           |   log-dead-letters = off
           |   actor {
           |     default-dispatcher {
@@ -129,12 +130,13 @@ object TellOnlyBenchmark {
       _throughputDeadlineTime: Duration,
       _executorServiceFactoryProvider: ExecutorServiceFactoryProvider,
       _shutdownTimeout: FiniteDuration)
-      extends Dispatcher(_configurator,
-                         _id,
-                         _throughput,
-                         _throughputDeadlineTime,
-                         _executorServiceFactoryProvider,
-                         _shutdownTimeout) {
+      extends Dispatcher(
+        _configurator,
+        _id,
+        _throughput,
+        _throughputDeadlineTime,
+        _executorServiceFactoryProvider,
+        _shutdownTimeout) {
 
     override protected[akka] def dispatch(receiver: ActorCell,
                                           invocation: Envelope): Unit = {

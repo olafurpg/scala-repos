@@ -158,9 +158,10 @@ class DatabaseEvolutions(database: Database, schema: String = "") {
           case true => {
             Some(
               (rs,
-               Evolution(rs.getInt(1),
-                         Option(rs.getString(3)) getOrElse "",
-                         Option(rs.getString(4)) getOrElse "")))
+               Evolution(
+                 rs.getInt(1),
+                 Option(rs.getString(3)) getOrElse "",
+                 Option(rs.getString(4)) getOrElse "")))
           }
         }
       }
@@ -257,11 +258,12 @@ class DatabaseEvolutions(database: Database, schema: String = "") {
                  lastScript.evolution.sql_up
                else lastScript.evolution.sql_down)
 
-          throw InconsistentDatabase(database.name,
-                                     humanScript,
-                                     message,
-                                     lastScript.evolution.revision,
-                                     autocommit)
+          throw InconsistentDatabase(
+            database.name,
+            humanScript,
+            message,
+            lastScript.evolution.revision,
+            autocommit)
         } else {
           updateLastProblem(message, applying)
         }
@@ -320,11 +322,12 @@ class DatabaseEvolutions(database: Database, schema: String = "") {
             (if (state == "applying_up") "Ups" else "Downs") + " - " + hash +
             "\n\n" + script
 
-        throw InconsistentDatabase(database.name,
-                                   humanScript,
-                                   error,
-                                   revision,
-                                   autocommit)
+        throw InconsistentDatabase(
+          database.name,
+          humanScript,
+          error,
+          revision,
+          autocommit)
       }
     } catch {
       case e: InconsistentDatabase => throw e
@@ -514,9 +517,10 @@ abstract class ResourceEvolutionsReader extends EvolutionsReader {
             .groupBy(i => i._1)
             .mapValues { _.map(_._2).mkString("\n").trim }
 
-          Evolution(revision,
-                    parsed.getOrElse(UPS, ""),
-                    parsed.getOrElse(DOWNS, ""))
+          Evolution(
+            revision,
+            parsed.getOrElse(UPS, ""),
+            parsed.getOrElse(DOWNS, ""))
         }
       }
   }

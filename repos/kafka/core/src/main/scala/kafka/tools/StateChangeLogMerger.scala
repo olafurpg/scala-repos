@@ -65,8 +65,9 @@ object StateChangeLogMerger extends Logging {
       .describedAs("file1,file2,...")
       .ofType(classOf[String])
     val regexOpt = parser
-      .accepts("logs-regex",
-               "Regex to match the state change log files to be merged")
+      .accepts(
+        "logs-regex",
+        "Regex to match the state change log files to be merged")
       .withRequiredArg
       .describedAs("for example: /tmp/state-change.log*")
       .ofType(classOf[String])
@@ -91,8 +92,9 @@ object StateChangeLogMerger extends Logging {
       .ofType(classOf[String])
       .defaultsTo("0000-00-00 00:00:00,000")
     val endTimeOpt = parser
-      .accepts("end-time",
-               "The latest timestamp of state change log entries to be merged")
+      .accepts(
+        "end-time",
+        "The latest timestamp of state change log entries to be merged")
       .withRequiredArg
       .describedAs("end timestamp in the format " + dateFormat)
       .ofType(classOf[String])

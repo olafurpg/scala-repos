@@ -402,8 +402,9 @@ object ScalaCompletionUtil {
         if (owner.containingFile.contains(parameters.getOriginalFile)) {
           owner
             .getMirrorPositionForCompletion(
-              getDummyIdentifier(parameters.getOffset,
-                                 parameters.getOriginalFile),
+              getDummyIdentifier(
+                parameters.getOffset,
+                parameters.getOriginalFile),
               parameters.getOffset - owner.getTextRange.getStartOffset)
             .getOrElse(parameters.getPosition)
         } else parameters.getPosition

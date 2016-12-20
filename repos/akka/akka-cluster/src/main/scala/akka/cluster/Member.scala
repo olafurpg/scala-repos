@@ -52,8 +52,9 @@ class Member private[cluster] (
     val oldStatus = this.status
     if (status == oldStatus) this
     else {
-      require(allowedTransitions(oldStatus)(status),
-              s"Invalid member status transition [ ${this} -> ${status}]")
+      require(
+        allowedTransitions(oldStatus)(status),
+        s"Invalid member status transition [ ${this} -> ${status}]")
       new Member(uniqueAddress, upNumber, status, roles)
     }
   }
@@ -245,13 +246,14 @@ object MemberStatus {
     * INTERNAL API
     */
   private[cluster] val allowedTransitions: Map[MemberStatus, Set[MemberStatus]] =
-    Map(Joining -> Set(WeaklyUp, Up, Down, Removed),
-        WeaklyUp -> Set(Up, Down, Removed),
-        Up -> Set(Leaving, Down, Removed),
-        Leaving -> Set(Exiting, Down, Removed),
-        Down -> Set(Removed),
-        Exiting -> Set(Removed, Down),
-        Removed -> Set.empty[MemberStatus])
+    Map(
+      Joining -> Set(WeaklyUp, Up, Down, Removed),
+      WeaklyUp -> Set(Up, Down, Removed),
+      Up -> Set(Leaving, Down, Removed),
+      Leaving -> Set(Exiting, Down, Removed),
+      Down -> Set(Removed),
+      Exiting -> Set(Removed, Down),
+      Removed -> Set.empty[MemberStatus])
 }
 
 /**

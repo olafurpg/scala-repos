@@ -114,8 +114,9 @@ private[yarn] class YarnAllocator(driverUrl: String,
   protected val memoryOverhead: Int = sparkConf
     .get(EXECUTOR_MEMORY_OVERHEAD)
     .getOrElse(
-      math.max((MEMORY_OVERHEAD_FACTOR * executorMemory).toInt,
-               MEMORY_OVERHEAD_MIN))
+      math.max(
+        (MEMORY_OVERHEAD_FACTOR * executorMemory).toInt,
+        MEMORY_OVERHEAD_MIN))
     .toInt
   // Number of cores per executor.
   protected val executorCores = args.executorCores
@@ -138,12 +139,13 @@ private[yarn] class YarnAllocator(driverUrl: String,
   private val nodeLabelConstructor = labelExpression.flatMap { expr =>
     try {
       Some(
-        classOf[ContainerRequest].getConstructor(classOf[Resource],
-                                                 classOf[Array[String]],
-                                                 classOf[Array[String]],
-                                                 classOf[Priority],
-                                                 classOf[Boolean],
-                                                 classOf[String]))
+        classOf[ContainerRequest].getConstructor(
+          classOf[Resource],
+          classOf[Array[String]],
+          classOf[Array[String]],
+          classOf[Priority],
+          classOf[Boolean],
+          classOf[String]))
     } catch {
       case e: NoSuchMethodException => {
         logWarning(
@@ -247,9 +249,10 @@ private[yarn] class YarnAllocator(driverUrl: String,
     if (allocatedContainers.size > 0) {
       logDebug(
         "Allocated containers: %d. Current executor count: %d. Cluster resources: %s."
-          .format(allocatedContainers.size,
-                  numExecutorsRunning,
-                  allocateResponse.getAvailableResources))
+          .format(
+            allocatedContainers.size,
+            numExecutorsRunning,
+            allocateResponse.getAvailableResources))
 
       handleAllocatedContainers(allocatedContainers.asScala)
     }
@@ -287,8 +290,9 @@ private[yarn] class YarnAllocator(driverUrl: String,
       // requests, since required locality preference has been changed, recalculating using
       // container placement strategy.
       val (localRequests, staleRequests, anyHostRequests) =
-        splitPendingAllocationsByLocality(hostToLocalTaskCounts,
-                                          pendingAllocate)
+        splitPendingAllocationsByLocality(
+          hostToLocalTaskCounts,
+          pendingAllocate)
 
       // cancel "stale" requests for locations that are no longer needed
       staleRequests.foreach { stale =>
@@ -377,12 +381,13 @@ private[yarn] class YarnAllocator(driverUrl: String,
       racks: Array[String]): ContainerRequest = {
     nodeLabelConstructor
       .map { constructor =>
-        constructor.newInstance(resource,
-                                nodes,
-                                racks,
-                                RM_REQUEST_PRIORITY,
-                                true: java.lang.Boolean,
-                                labelExpression.orNull)
+        constructor.newInstance(
+          resource,
+          nodes,
+          racks,
+          RM_REQUEST_PRIORITY,
+          true: java.lang.Boolean,
+          labelExpression.orNull)
       }
       .getOrElse(
         new ContainerRequest(resource, nodes, racks, RM_REQUEST_PRIORITY))
@@ -402,10 +407,11 @@ private[yarn] class YarnAllocator(driverUrl: String,
     // Match incoming requests by host
     val remainingAfterHostMatches = new ArrayBuffer[Container]
     for (allocatedContainer <- allocatedContainers) {
-      matchContainerToRequest(allocatedContainer,
-                              allocatedContainer.getNodeId.getHost,
-                              containersToUse,
-                              remainingAfterHostMatches)
+      matchContainerToRequest(
+        allocatedContainer,
+        allocatedContainer.getNodeId.getHost,
+        containersToUse,
+        remainingAfterHostMatches)
     }
 
     // Match remaining by rack
@@ -414,19 +420,21 @@ private[yarn] class YarnAllocator(driverUrl: String,
       val rack = RackResolver
         .resolve(conf, allocatedContainer.getNodeId.getHost)
         .getNetworkLocation
-      matchContainerToRequest(allocatedContainer,
-                              rack,
-                              containersToUse,
-                              remainingAfterRackMatches)
+      matchContainerToRequest(
+        allocatedContainer,
+        rack,
+        containersToUse,
+        remainingAfterRackMatches)
     }
 
     // Assign remaining that are neither node-local nor rack-local
     val remainingAfterOffRackMatches = new ArrayBuffer[Container]
     for (allocatedContainer <- remainingAfterRackMatches) {
-      matchContainerToRequest(allocatedContainer,
-                              ANY_HOST,
-                              containersToUse,
-                              remainingAfterOffRackMatches)
+      matchContainerToRequest(
+        allocatedContainer,
+        ANY_HOST,
+        containersToUse,
+        remainingAfterOffRackMatches)
     }
 
     if (!remainingAfterOffRackMatches.isEmpty) {
@@ -498,8 +506,8 @@ private[yarn] class YarnAllocator(driverUrl: String,
       assert(container.getResource.getMemory >= resource.getMemory)
 
       logInfo(
-        "Launching container %s for on host %s".format(containerId,
-                                                       executorHostname))
+        "Launching container %s for on host %s"
+          .format(containerId, executorHostname))
       executorIdToContainer(executorId) = container
       containerIdToExecutorId(container.getId) = executorId
 
@@ -565,12 +573,14 @@ private[yarn] class YarnAllocator(driverUrl: String,
             // Should probably still count memory exceeded exit codes towards task failures
             case VMEM_EXCEEDED_EXIT_CODE =>
               (true,
-               memLimitExceededLogMessage(completedContainer.getDiagnostics,
-                                          VMEM_EXCEEDED_PATTERN))
+               memLimitExceededLogMessage(
+                 completedContainer.getDiagnostics,
+                 VMEM_EXCEEDED_PATTERN))
             case PMEM_EXCEEDED_EXIT_CODE =>
               (true,
-               memLimitExceededLogMessage(completedContainer.getDiagnostics,
-                                          PMEM_EXCEEDED_PATTERN))
+               memLimitExceededLogMessage(
+                 completedContainer.getDiagnostics,
+                 PMEM_EXCEEDED_PATTERN))
             case _ =>
               numExecutorsFailed += 1
               (true,

@@ -49,15 +49,16 @@ trait ArbitraryTreesAndNames {
   def genModifiers = for (flagset <- genFlagSet) yield Modifiers(flagset)
 
   def genConstant =
-    for (value <- oneOf(arbitrary[Byte],
-                        arbitrary[Short],
-                        arbitrary[Char],
-                        arbitrary[Int],
-                        arbitrary[Long],
-                        arbitrary[Float],
-                        arbitrary[Double],
-                        arbitrary[Boolean],
-                        arbitrary[String])) yield Constant(value)
+    for (value <- oneOf(
+           arbitrary[Byte],
+           arbitrary[Short],
+           arbitrary[Char],
+           arbitrary[Int],
+           arbitrary[Long],
+           arbitrary[Float],
+           arbitrary[Double],
+           arbitrary[Boolean],
+           arbitrary[String])) yield Constant(value)
 
   def genAnnotated(size: Int, argGen: Int => Gen[Tree]) =
     for (annot <- genTree(size - 1); arg <- argGen(size - 1))
@@ -112,8 +113,9 @@ trait ArbitraryTreesAndNames {
 
   def genExistentialTypeTree(size: Int) =
     for (tpt <- genTree(size - 1);
-         where <- smallList(size,
-                            oneOf(genValDef(size - 1), genTypeDef(size - 1))))
+         where <- smallList(
+           size,
+           oneOf(genValDef(size - 1), genTypeDef(size - 1))))
       yield ExistentialTypeTree(tpt, where)
 
   def genFunction(size: Int) =
@@ -239,58 +241,61 @@ trait ArbitraryTreesAndNames {
     if (size <= 1)
       oneOf(EmptyTree: Gen[Tree], genTreeIsTerm(size), genTreeIsType(size))
     else
-      oneOf(genTree(1),
-            // these trees are neither terms nor types
-            genPackageDef(size - 1),
-            genModuleDef(size - 1),
-            genCaseDef(size - 1),
-            genDefDef(size - 1),
-            genTypeDef(size - 1),
-            genTemplate(size - 1),
-            genClassDef(size - 1),
-            genValDef(size - 1),
-            genImport(size - 1))
+      oneOf(
+        genTree(1),
+        // these trees are neither terms nor types
+        genPackageDef(size - 1),
+        genModuleDef(size - 1),
+        genCaseDef(size - 1),
+        genDefDef(size - 1),
+        genTypeDef(size - 1),
+        genTemplate(size - 1),
+        genClassDef(size - 1),
+        genValDef(size - 1),
+        genImport(size - 1))
 
   def genTreeIsTerm(size: Int): Gen[Tree] =
     if (size <= 1) oneOf(genLiteral, genIdent(genTermName))
     else
-      oneOf(genTreeIsTerm(1),
-            genBind(size - 1, genTermName),
-            genAnnotated(size - 1, genTreeIsTerm),
-            genSelect(size - 1, genTermName),
-            genAlternative(size - 1),
-            genApply(size - 1),
-            genAssign(size - 1),
-            genAssignOrNamedArg(size - 1),
-            genBlock(size - 1),
-            genFunction(size - 1),
-            genIf(size - 1),
-            genLabelDef(size - 1),
-            genMatch(size - 1),
-            genNew(size - 1),
-            genReturn(size - 1),
-            genStar(size - 1),
-            genSuper(size - 1),
-            genThis(size - 1),
-            genThrow(size - 1),
-            genTry(size - 1),
-            genTypeApply(size - 1),
-            genTyped(size - 1),
-            genUnApply(size - 1))
+      oneOf(
+        genTreeIsTerm(1),
+        genBind(size - 1, genTermName),
+        genAnnotated(size - 1, genTreeIsTerm),
+        genSelect(size - 1, genTermName),
+        genAlternative(size - 1),
+        genApply(size - 1),
+        genAssign(size - 1),
+        genAssignOrNamedArg(size - 1),
+        genBlock(size - 1),
+        genFunction(size - 1),
+        genIf(size - 1),
+        genLabelDef(size - 1),
+        genMatch(size - 1),
+        genNew(size - 1),
+        genReturn(size - 1),
+        genStar(size - 1),
+        genSuper(size - 1),
+        genThis(size - 1),
+        genThrow(size - 1),
+        genTry(size - 1),
+        genTypeApply(size - 1),
+        genTyped(size - 1),
+        genUnApply(size - 1))
 
   def genTreeIsType(size: Int): Gen[Tree] =
     if (size <= 1) genIdent(genTypeName)
     else
-      oneOf(genTreeIsType(1),
-            genAnnotated(size - 1, genTreeIsType),
-            genBind(size - 1, genTypeName),
-            genSelect(size - 1, genTypeName),
-            genSingletonTypeTree(size - 1),
-            genSelectFromTypeTree(size - 1),
-            genExistentialTypeTree(size - 1),
-            genCompoundTypeTree(size - 1),
-            genAppliedTypeTree(size - 1),
-            genTypeBoundsTree(size - 1))
+      oneOf(
+        genTreeIsType(1),
+        genAnnotated(size - 1, genTreeIsType),
+        genBind(size - 1, genTypeName),
+        genSelect(size - 1, genTypeName),
+        genSingletonTypeTree(size - 1),
+        genSelectFromTypeTree(size - 1),
+        genExistentialTypeTree(size - 1),
+        genCompoundTypeTree(size - 1),
+        genAppliedTypeTree(size - 1),
+        genTypeBoundsTree(size - 1))
 
   /*  These are marker types that allow to write tests that
    *  depend specifically on Trees that are terms or types.

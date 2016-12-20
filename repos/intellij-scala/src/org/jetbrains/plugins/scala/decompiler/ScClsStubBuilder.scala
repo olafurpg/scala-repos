@@ -74,9 +74,10 @@ class ScClsStubBuilder extends ClsStubBuilder {
   override def buildFileStub(content: FileContent): PsiFileStub[ScalaFile] = {
     if (isInnerClass(content.getFile)) null
     else
-      buildFileStub(content.getFile,
-                    content.getContent,
-                    ProjectManager.getInstance().getDefaultProject)
+      buildFileStub(
+        content.getFile,
+        content.getContent,
+        ProjectManager.getInstance().getDefaultProject)
   }
 
   private def buildFileStub(vFile: VirtualFile,

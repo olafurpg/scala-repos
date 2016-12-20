@@ -71,7 +71,8 @@ object Deadline
     val deadline = ByteArrays.get64be(bytes, 8)
 
     Return(
-      Deadline(Time.fromNanoseconds(timestamp),
-               Time.fromNanoseconds(deadline)))
+      Deadline(
+        Time.fromNanoseconds(timestamp),
+        Time.fromNanoseconds(deadline)))
   }
 }

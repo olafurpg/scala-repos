@@ -32,9 +32,10 @@ object UidClashTest {
   }
 
   def createCollidingRef(system: ActorSystem): ActorRef =
-    new EvilCollidingActorRef(system.asInstanceOf[ActorSystemImpl].provider,
-                              oldActor.path,
-                              system.eventStream)
+    new EvilCollidingActorRef(
+      system.asInstanceOf[ActorSystemImpl].provider,
+      oldActor.path,
+      system.eventStream)
 
   case object PleaseRestart
   case object PingMyself

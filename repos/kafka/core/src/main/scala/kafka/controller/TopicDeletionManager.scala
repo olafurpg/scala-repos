@@ -374,11 +374,11 @@ class TopicDeletionManager(controller: KafkaController,
         val replicasForDeletionRetry =
           aliveReplicasForTopic -- successfullyDeletedReplicas
         // move dead replicas directly to failed state
-        replicaStateMachine.handleStateChanges(deadReplicasForTopic,
-                                               ReplicaDeletionIneligible)
+        replicaStateMachine
+          .handleStateChanges(deadReplicasForTopic, ReplicaDeletionIneligible)
         // send stop replica to all followers that are not in the OfflineReplica state so they stop sending fetch requests to the leader
-        replicaStateMachine.handleStateChanges(replicasForDeletionRetry,
-                                               OfflineReplica)
+        replicaStateMachine
+          .handleStateChanges(replicasForDeletionRetry, OfflineReplica)
         debug(
           "Deletion started for replicas %s".format(
             replicasForDeletionRetry.mkString(",")))
@@ -483,9 +483,10 @@ class TopicDeletionManager(controller: KafkaController,
                 TopicAndPartition(r.topic, r.partition))
               info(
                 "Deletion for replicas %s for partition %s of topic %s in progress"
-                  .format(replicaIds.mkString(","),
-                          partitions.mkString(","),
-                          topic))
+                  .format(
+                    replicaIds.mkString(","),
+                    partitions.mkString(","),
+                    topic))
             } else {
               // if you come here, then no replica is in TopicDeletionStarted and all replicas are not in
               // TopicDeletionSuccessful. That means, that either given topic haven't initiated deletion

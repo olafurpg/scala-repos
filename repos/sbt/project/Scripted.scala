@@ -101,12 +101,13 @@ object Scripted {
         def get(x: Int): sbt.File = ???
         def size(): Int = 0
       }
-      bridge.run(sourcePath,
-                 true,
-                 args.toArray,
-                 launcher,
-                 launcherVmOptions,
-                 callback)
+      bridge.run(
+        sourcePath,
+        true,
+        args.toArray,
+        launcher,
+        launcherVmOptions,
+        callback)
     } catch {
       case ite: java.lang.reflect.InvocationTargetException =>
         throw ite.getCause

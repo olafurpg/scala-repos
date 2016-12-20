@@ -221,11 +221,13 @@ object CanConvolve extends SerializableLogging {
       def apply(data: DenseVector[T],
                 kernel: DenseVector[T],
                 range: Range): DenseVector[T] = {
-        require(data.length * kernel.length != 0,
-                "data and kernel must be non-empty DenseVectors")
-        require(data.length >= kernel.length,
-                "kernel (" + kernel.length + ") cannot be longer than data(" +
-                  data.length + ") to be convolved/correlated!")
+        require(
+          data.length * kernel.length != 0,
+          "data and kernel must be non-empty DenseVectors")
+        require(
+          data.length >= kernel.length,
+          "kernel (" + kernel.length + ") cannot be longer than data(" +
+            data.length + ") to be convolved/correlated!")
         require(
           range.start >= 0 &&
             range.last <= (data.length - kernel.length + 1),
@@ -259,16 +261,19 @@ object CanConvolve extends SerializableLogging {
     DenseVector[Int],
     DenseVector[Int],
     DenseVector[Int]] =
-    new CanCorrelateNoOverhang[DenseVector[Int],
-                               DenseVector[Int],
-                               DenseVector[Int]] {
+    new CanCorrelateNoOverhang[
+      DenseVector[Int],
+      DenseVector[Int],
+      DenseVector[Int]] {
       def apply(data: DenseVector[Int],
                 kernel: DenseVector[Int],
                 range: Range): DenseVector[Int] = {
-        require(data.length * kernel.length != 0,
-                "data and kernel must be non-empty DenseVectors")
-        require(data.length >= kernel.length,
-                "kernel cannot be longer than data to be convolved/corelated!")
+        require(
+          data.length * kernel.length != 0,
+          "data and kernel must be non-empty DenseVectors")
+        require(
+          data.length >= kernel.length,
+          "kernel cannot be longer than data to be convolved/corelated!")
         require(
           range.start >= 0 &&
             range.last <= (data.length - kernel.length + 1),

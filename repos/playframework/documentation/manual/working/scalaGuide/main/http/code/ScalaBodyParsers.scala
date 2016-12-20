@@ -165,8 +165,9 @@ package scalaguide.http.scalabodyparsers {
         }
         //#csv
 
-        testAction(Action(csv)(req => Ok(req.body(1)(2))),
-                   FakeRequest("POST", "/").withTextBody("1,2\n3,4,foo\n5,6"))
+        testAction(
+          Action(csv)(req => Ok(req.body(1)(2))),
+          FakeRequest("POST", "/").withTextBody("1,2\n3,4,foo\n5,6"))
       }
     }
 

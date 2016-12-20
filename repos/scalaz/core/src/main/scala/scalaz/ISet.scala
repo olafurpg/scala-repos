@@ -201,9 +201,10 @@ sealed abstract class ISet[A] {
           t1.insertR(x)
         case (Bin(x, l, r), _) =>
           val bmi = some(x)
-          join(x,
-               hedgeUnion(blo, bmi, l, t2.trim(blo, bmi)),
-               hedgeUnion(bmi, bhi, r, t2.trim(bmi, bhi)))
+          join(
+            x,
+            hedgeUnion(blo, bmi, l, t2.trim(blo, bmi)),
+            hedgeUnion(bmi, bhi, r, t2.trim(bmi, bhi)))
       }
 
     (this, other) match {
@@ -595,30 +596,32 @@ sealed abstract class ISet[A] {
     }
 
   final def filterGt(a: Option[A])(implicit o: Order[A]): ISet[A] =
-    cata(a)(s =>
-              this match {
-                case Tip() => ISet.empty
-                case Bin(x, l, r) =>
-                  o.order(s, x) match {
-                    case LT => join(x, l.filterGt(a), r)
-                    case EQ => r
-                    case GT => r.filterGt(a)
-                  }
-            },
-            this)
+    cata(a)(
+      s =>
+        this match {
+          case Tip() => ISet.empty
+          case Bin(x, l, r) =>
+            o.order(s, x) match {
+              case LT => join(x, l.filterGt(a), r)
+              case EQ => r
+              case GT => r.filterGt(a)
+            }
+      },
+      this)
 
   final def filterLt(a: Option[A])(implicit o: Order[A]): ISet[A] =
-    cata(a)(s =>
-              this match {
-                case Tip() => ISet.empty
-                case Bin(x, l, r) =>
-                  o.order(x, s) match {
-                    case LT => join(x, l, r.filterLt(a))
-                    case EQ => l
-                    case GT => l.filterLt(a)
-                  }
-            },
-            this)
+    cata(a)(
+      s =>
+        this match {
+          case Tip() => ISet.empty
+          case Bin(x, l, r) =>
+            o.order(x, s) match {
+              case LT => join(x, l, r.filterLt(a))
+              case EQ => l
+              case GT => l.filterLt(a)
+            }
+      },
+      this)
 
   override final def equals(other: Any): Boolean =
     other match {

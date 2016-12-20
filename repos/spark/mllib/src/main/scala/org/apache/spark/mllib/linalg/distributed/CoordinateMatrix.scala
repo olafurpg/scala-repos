@@ -73,9 +73,10 @@ class CoordinateMatrix @Since("1.0.0")(
   /** Transposes this CoordinateMatrix. */
   @Since("1.3.0")
   def transpose(): CoordinateMatrix = {
-    new CoordinateMatrix(entries.map(x => MatrixEntry(x.j, x.i, x.value)),
-                         numCols(),
-                         numRows())
+    new CoordinateMatrix(
+      entries.map(x => MatrixEntry(x.j, x.i, x.value)),
+      numCols(),
+      numRows())
   }
 
   /** Converts to IndexedRowMatrix. The number of columns must be within the integer range. */

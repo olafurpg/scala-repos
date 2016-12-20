@@ -11,8 +11,9 @@ object Test {
     val uniques = hashCodes.distinct
     val collisionRate = (totalCodes - uniques.size) * 1000 / totalCodes
 
-    assert(collisionRate < 5,
-           "Collision rate too high: %d / 1000".format(collisionRate))
+    assert(
+      collisionRate < 5,
+      "Collision rate too high: %d / 1000".format(collisionRate))
     // println("collisionRate = %d / 1000".format(collisionRate))
   }
 }

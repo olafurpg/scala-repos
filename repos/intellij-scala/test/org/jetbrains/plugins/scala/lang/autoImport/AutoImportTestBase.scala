@@ -81,13 +81,15 @@ abstract class AutoImportTestBase
         }
       }, getProjectAdapter, "Test")
       res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim //getImportStatements.map(_.getText()).mkString("\n")
-      assert(refPointer.getElement.resolve != null,
-             "reference is unresolved after import action")
+      assert(
+        refPointer.getElement.resolve != null,
+        "reference is unresolved after import action")
     } catch {
       case e: Exception =>
         println(e)
-        assert(assertion = false,
-               message = e.getMessage + "\n" + e.getStackTrace)
+        assert(
+          assertion = false,
+          message = e.getMessage + "\n" + e.getStackTrace)
     }
 
     val text = lastPsi.getText

@@ -88,12 +88,13 @@ case class JsonLine(p: String,
   * was added to get mima to not report binary errors
   */
 object JsonLine
-    extends scala.runtime.AbstractFunction5[String,
-                                            Fields,
-                                            SinkMode,
-                                            Boolean,
-                                            Boolean,
-                                            JsonLine]
+    extends scala.runtime.AbstractFunction5[
+      String,
+      Fields,
+      SinkMode,
+      Boolean,
+      Boolean,
+      JsonLine]
     with Serializable
     with scala.Serializable {
 

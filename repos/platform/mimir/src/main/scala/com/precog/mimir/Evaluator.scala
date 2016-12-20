@@ -138,12 +138,13 @@ trait EvaluatorModule[M[+ _]]
                          ctx: EvaluationContext): DepGraph => DepGraph = {
       // rewrites are written in `andThen` order
       // we reverse above because our semigroup uses `compose`
-      composeOptimizations(optimize,
-                           List(
-                             inlineStatics(_, ctx),
-                             optimizeJoins(_, ctx),
-                             rewriteConditionals(_)
-                           ))
+      composeOptimizations(
+        optimize,
+        List(
+          inlineStatics(_, ctx),
+          optimizeJoins(_, ctx),
+          rewriteConditionals(_)
+        ))
     }
 
     def fullRewriteDAG(optimize: Boolean,
@@ -187,11 +188,12 @@ trait EvaluatorModule[M[+ _]]
               leftRes <- leftSpec
               rightRes <- rightSpec
             } yield
-              GroupingAlignment(keySpec,
-                                keySpec,
-                                leftRes,
-                                rightRes,
-                                GroupingSpec.Union)
+              GroupingAlignment(
+                keySpec,
+                keySpec,
+                leftRes,
+                rightRes,
+                GroupingSpec.Union)
           }
 
         case IntersectBucketSpec(left, right) =>
@@ -206,11 +208,12 @@ trait EvaluatorModule[M[+ _]]
               leftRes <- leftSpec
               rightRes <- rightSpec
             } yield
-              GroupingAlignment(keySpec,
-                                keySpec,
-                                leftRes,
-                                rightRes,
-                                GroupingSpec.Intersection)
+              GroupingAlignment(
+                keySpec,
+                keySpec,
+                leftRes,
+                rightRes,
+                GroupingSpec.Intersection)
           }
 
         case dag.Group(id, target, forest) =>
@@ -224,19 +227,21 @@ trait EvaluatorModule[M[+ _]]
                   liftToValues(pendingTarget.trans)
                 }
                 _ <- monadState.gets(identity)
-                subSpec <- resolveLowLevelGroup(resultTargetTable,
-                                                reducedTarget,
-                                                forest,
-                                                splits)
+                subSpec <- resolveLowLevelGroup(
+                  resultTargetTable,
+                  reducedTarget,
+                  forest,
+                  splits)
               } yield {
                 // TODO FIXME if the target has forcing points, targetTrans is insufficient
                 val Some(trans) = mkTransSpec(target, reducedTarget, ctx)
                 N.point(
-                  GroupingSource(resultTargetTable,
-                                 SourceKey.Single,
-                                 Some(liftToValues(trans)),
-                                 id,
-                                 subSpec))
+                  GroupingSource(
+                    resultTargetTable,
+                    SourceKey.Single,
+                    Some(liftToValues(trans)),
+                    id,
+                    subSpec))
               }
 
             case None =>
@@ -256,26 +261,30 @@ trait EvaluatorModule[M[+ _]]
         : StateT[N, EvaluatorState, GroupKeySpec] = forest match {
         case UnionBucketSpec(left, right) =>
           for {
-            leftRes <- resolveLowLevelGroup(commonTable,
-                                            commonGraph,
-                                            left,
-                                            splits)
-            rightRes <- resolveLowLevelGroup(commonTable,
-                                             commonGraph,
-                                             right,
-                                             splits)
+            leftRes <- resolveLowLevelGroup(
+              commonTable,
+              commonGraph,
+              left,
+              splits)
+            rightRes <- resolveLowLevelGroup(
+              commonTable,
+              commonGraph,
+              right,
+              splits)
           } yield GroupKeySpecOr(leftRes, rightRes)
 
         case IntersectBucketSpec(left, right) =>
           for {
-            leftRes <- resolveLowLevelGroup(commonTable,
-                                            commonGraph,
-                                            left,
-                                            splits)
-            rightRes <- resolveLowLevelGroup(commonTable,
-                                             commonGraph,
-                                             right,
-                                             splits)
+            leftRes <- resolveLowLevelGroup(
+              commonTable,
+              commonGraph,
+              left,
+              splits)
+            rightRes <- resolveLowLevelGroup(
+              commonTable,
+              commonGraph,
+              right,
+              splits)
           } yield GroupKeySpecAnd(leftRes, rightRes)
 
         case UnfixedSolution(id, solution) =>
@@ -298,8 +307,9 @@ trait EvaluatorModule[M[+ _]]
               case Leaf(_) => DerefObjectStatic(Leaf(Source), paths.Value)
             }
           } yield
-            GroupKeySpecSource(CPathField("extra" + extraId),
-                               trans.Filter(liftedTrans, liftedTrans))
+            GroupKeySpecSource(
+              CPathField("extra" + extraId),
+              trans.Filter(liftedTrans, liftedTrans))
 
         case dag.Group(_, _, _) =>
           sys.error("assertion error")
@@ -340,10 +350,11 @@ trait EvaluatorModule[M[+ _]]
               val liftedAssumption =
                 assumedResult map {
                   case (table, sort) =>
-                    monadState point PendingTable(table,
-                                                  graph,
-                                                  TransSpec1.Id,
-                                                  sort)
+                    monadState point PendingTable(
+                      table,
+                      graph,
+                      TransSpec1.Id,
+                      sort)
                 }
 
               liftedAssumption getOrElse memoizedResult
@@ -383,9 +394,10 @@ trait EvaluatorModule[M[+ _]]
               val lTable = ptLeft.table.transform(liftToValues(ptLeft.trans))
               val rTable = ptRight.table.transform(liftToValues(ptRight.trans))
               val crossSpec = buildWrappedCrossSpec(spec)
-              val resultM = Table.cross(lTable.compact(valueSpec),
-                                        rTable.compact(valueSpec),
-                                        hint)(crossSpec)
+              val resultM = Table.cross(
+                lTable.compact(valueSpec),
+                rTable.compact(valueSpec),
+                hint)(crossSpec)
 
               transState liftM mn(resultM map {
                 case (joinOrder, table) =>
@@ -469,8 +481,9 @@ trait EvaluatorModule[M[+ _]]
             } else {
               val components = for (i <- ids)
                 yield
-                  trans.WrapArray(DerefArrayStatic(SourceKey.Single,
-                                                   CPathIndex(i))): TransSpec1
+                  trans.WrapArray(DerefArrayStatic(
+                    SourceKey.Single,
+                    CPathIndex(i))): TransSpec1
               components reduceLeft { trans.InnerArrayConcat(_, _) }
             }
           }
@@ -526,9 +539,10 @@ trait EvaluatorModule[M[+ _]]
                   if (lSorted) LeftOrder
                   else if (rSorted) RightOrder
                   else KeyOrder)
-                Table.join(leftResult, rightResult, hint)(leftKeySpec,
-                                                          rightKeySpec,
-                                                          joinSpec)
+                Table.join(leftResult, rightResult, hint)(
+                  leftKeySpec,
+                  rightKeySpec,
+                  joinSpec)
             }
 
             resultM map {
@@ -556,12 +570,13 @@ trait EvaluatorModule[M[+ _]]
         type TSM[+T] = StateT[N, EvaluatorState, T]
         def evalTransSpecable(
             to: DepGraph): StateT[N, EvaluatorState, PendingTable] = {
-          mkTransSpecWithState[TSM, PendingTable](to,
-                                                  None,
-                                                  ctx,
-                                                  get0,
-                                                  set0,
-                                                  init0)
+          mkTransSpecWithState[TSM, PendingTable](
+            to,
+            None,
+            ctx,
+            get0,
+            set0,
+            init0)
         }
 
         def evalNotTransSpecable(
@@ -602,16 +617,18 @@ trait EvaluatorModule[M[+ _]]
                 PendingTable(result, graph, TransSpec1.Id, sort)
               }
 
-            case Join(op,
-                      joinSort @ (IdentitySort | ValueSort(_)),
-                      left,
-                      right) =>
+            case Join(
+                op,
+                joinSort @ (IdentitySort | ValueSort(_)),
+                left,
+                right) =>
               join(graph, left, right, joinSort)(
                 transFromBinOp(op, MorphContext(ctx, graph)))
 
-            case dag.Filter(joinSort @ (IdentitySort | ValueSort(_)),
-                            target,
-                            boolean) =>
+            case dag.Filter(
+                joinSort @ (IdentitySort | ValueSort(_)),
+                target,
+                boolean) =>
               join(graph, target, boolean, joinSort)(trans.Filter(_, _))
 
             case s: SplitParam =>
@@ -649,16 +666,18 @@ trait EvaluatorModule[M[+ _]]
               }
 
               val spec = buildConstantWrapSpec(Leaf(Source))
-              monadState point PendingTable(table.transform(spec),
-                                            graph,
-                                            TransSpec1.Id,
-                                            IdentityOrder.empty)
+              monadState point PendingTable(
+                table.transform(spec),
+                graph,
+                TransSpec1.Id,
+                IdentityOrder.empty)
 
             case Undefined() =>
-              monadState point PendingTable(Table.empty,
-                                            graph,
-                                            TransSpec1.Id,
-                                            IdentityOrder.empty)
+              monadState point PendingTable(
+                Table.empty,
+                graph,
+                TransSpec1.Id,
+                IdentityOrder.empty)
 
             // TODO technically, we can do this without forcing by pre-lifting PendingTable#trans
             case dag.New(parent) =>
@@ -672,10 +691,11 @@ trait EvaluatorModule[M[+ _]]
                   .transform(liftToValues(pendingTable.trans))
                   .transform(idSpec)
               } yield
-                PendingTable(tableM2,
-                             graph,
-                             TransSpec1.Id,
-                             IdentityOrder(graph))
+                PendingTable(
+                  tableM2,
+                  graph,
+                  TransSpec1.Id,
+                  IdentityOrder(graph))
 
             // TODO abstract over absolute/relative load
             case dag.AbsoluteLoad(parent, jtpe) =>
@@ -741,14 +761,16 @@ trait EvaluatorModule[M[+ _]]
               for {
                 pendingTable <- prepareEval(parent, splits)
                 back <- transState liftM mn(
-                  mor(pendingTable.table.transform(
-                        liftToValues(pendingTable.trans)),
-                      MorphContext(ctx, graph)))
+                  mor(
+                    pendingTable.table.transform(
+                      liftToValues(pendingTable.trans)),
+                    MorphContext(ctx, graph)))
               } yield {
-                PendingTable(back,
-                             graph,
-                             TransSpec1.Id,
-                             findMorphOrder(mor.idPolicy, pendingTable.sort))
+                PendingTable(
+                  back,
+                  graph,
+                  TransSpec1.Id,
+                  findMorphOrder(mor.idPolicy, pendingTable.sort))
               }
 
             // TODO: There are many thigns wrong. Morph2 needs to get join info from compiler, which
@@ -757,8 +779,9 @@ trait EvaluatorModule[M[+ _]]
             case dag.Morph2(mor, left, right) =>
               val spec: (TransSpec2, TransSpec2) => TransSpec2 = {
                 (srcLeft, srcRight) =>
-                  trans.InnerArrayConcat(trans.WrapArray(srcLeft),
-                                         trans.WrapArray(srcRight))
+                  trans.InnerArrayConcat(
+                    trans.WrapArray(srcLeft),
+                    trans.WrapArray(srcRight))
               }
 
               val joined: StateT[N,
@@ -774,11 +797,11 @@ trait EvaluatorModule[M[+ _]]
 
                   case MorphismAlignment.Match(morph1)
                       if areJoinable(left, right) =>
-                    ((transState liftM mn(morph1)) |@| join(graph,
-                                                            left,
-                                                            right,
-                                                            IdentitySort)(
-                      spec)).tupled
+                    ((transState liftM mn(morph1)) |@| join(
+                      graph,
+                      left,
+                      right,
+                      IdentitySort)(spec)).tupled
 
                   // TODO: Remove and see if things break. Also,
                   case MorphismAlignment.Match(morph1) =>
@@ -819,10 +842,11 @@ trait EvaluatorModule[M[+ _]]
                         transState liftM mn(f(leftTable, rightTable) map {
                           case (table, morph1) =>
                             (morph1,
-                             PendingTable(table,
-                                          graph,
-                                          TransSpec1.Id,
-                                          sort(idPolicy)))
+                             PendingTable(
+                               table,
+                               graph,
+                               TransSpec1.Id,
+                               sort(idPolicy)))
                         })
                     }
                 }
@@ -832,10 +856,11 @@ trait EvaluatorModule[M[+ _]]
                   transState liftM mn(
                     morph1(joinedTable, MorphContext(ctx, graph))) map {
                     table =>
-                      PendingTable(table,
-                                   graph,
-                                   TransSpec1.Id,
-                                   findMorphOrder(mor.idPolicy, sort))
+                      PendingTable(
+                        table,
+                        graph,
+                        TransSpec1.Id,
+                        findMorphOrder(mor.idPolicy, sort))
                   }
               }
 
@@ -853,10 +878,11 @@ trait EvaluatorModule[M[+ _]]
                 distinct = table.distinct(valueSpec)
                 result = distinct.transform(idSpec)
               } yield {
-                PendingTable(result,
-                             graph,
-                             TransSpec1.Id,
-                             IdentityOrder(graph))
+                PendingTable(
+                  result,
+                  graph,
+                  TransSpec1.Id,
+                  IdentityOrder(graph))
               }
 
             /**
@@ -916,10 +942,11 @@ trait EvaluatorModule[M[+ _]]
                   )
                 }
               } yield {
-                PendingTable(wrapped,
-                             graph,
-                             TransSpec1.Id,
-                             IdentityOrder(graph))
+                PendingTable(
+                  wrapped,
+                  graph,
+                  TransSpec1.Id,
+                  IdentityOrder(graph))
               }
 
             case r @ dag.Reduce(red, parent) =>
@@ -927,15 +954,17 @@ trait EvaluatorModule[M[+ _]]
                 pendingTable <- prepareEval(parent, splits)
                 liftedTrans = liftToValues(pendingTable.trans)
                 result <- transState liftM mn(
-                  red(pendingTable.table.transform(
-                        DerefObjectStatic(liftedTrans, paths.Value)),
-                      MorphContext(ctx, graph)))
+                  red(
+                    pendingTable.table.transform(
+                      DerefObjectStatic(liftedTrans, paths.Value)),
+                    MorphContext(ctx, graph)))
                 wrapped = result transform buildConstantWrapSpec(Leaf(Source))
               } yield
-                PendingTable(wrapped,
-                             graph,
-                             TransSpec1.Id,
-                             IdentityOrder(graph))
+                PendingTable(
+                  wrapped,
+                  graph,
+                  TransSpec1.Id,
+                  IdentityOrder(graph))
 
             case s @ dag.Split(spec, child, id) =>
               val idSpec = makeTableTrans(
@@ -1009,8 +1038,9 @@ trait EvaluatorModule[M[+ _]]
             case IUI(union, left, right) =>
               // TODO: Get rid of ValueSorts.
               for {
-                pair <- zip(prepareEval(left, splits),
-                            prepareEval(right, splits))
+                pair <- zip(
+                  prepareEval(left, splits),
+                  prepareEval(right, splits))
                 (leftPending, rightPending) = pair
 
                 keyValueSpec = TransSpec1.PruneToKeyValue
@@ -1040,17 +1070,19 @@ trait EvaluatorModule[M[+ _]]
                     TransSpec2.LeftId)
                 }
               } yield {
-                PendingTable(result,
-                             graph,
-                             TransSpec1.Id,
-                             IdentityOrder(graph))
+                PendingTable(
+                  result,
+                  graph,
+                  TransSpec1.Id,
+                  IdentityOrder(graph))
               }
 
             // TODO unify with IUI
             case Diff(left, right) =>
               for {
-                pair <- zip(prepareEval(left, splits),
-                            prepareEval(right, splits))
+                pair <- zip(
+                  prepareEval(left, splits),
+                  prepareEval(right, splits))
                 (leftPending, rightPending) = pair
 
                 leftTable = leftPending.table.transform(
@@ -1075,10 +1107,11 @@ trait EvaluatorModule[M[+ _]]
                     TransSpec1.DeleteKeyValue,
                     TransSpec2.DeleteKeyValueLeft)
               } yield {
-                PendingTable(result,
-                             graph,
-                             TransSpec1.Id,
-                             IdentityOrder(graph))
+                PendingTable(
+                  result,
+                  graph,
+                  TransSpec1.Id,
+                  IdentityOrder(graph))
               }
 
             case j @ Join(op, Cross(hint), left, right) =>
@@ -1110,11 +1143,11 @@ trait EvaluatorModule[M[+ _]]
                         CPathField("sort-" + id0)
                       }
                     val spec = InnerObjectConcat(
-                      InnerObjectConcat(ObjectDelete(
-                                          Leaf(Source),
-                                          Set(CPathField("sort-" + id),
-                                              paths.Value) ++ oldSortFields),
-                                        wrappedSort),
+                      InnerObjectConcat(
+                        ObjectDelete(
+                          Leaf(Source),
+                          Set(CPathField("sort-" + id), paths.Value) ++ oldSortFields),
+                        wrappedSort),
                       wrappedValue)
 
                     table.transform(spec)
@@ -1201,8 +1234,9 @@ trait EvaluatorModule[M[+ _]]
 
       val resultTable: N[Table] = resultState.eval(EvaluatorState())
       resultTable map {
-        _ paged maxSliceSize compact DerefObjectStatic(Leaf(Source),
-                                                       paths.Value)
+        _ paged maxSliceSize compact DerefObjectStatic(
+          Leaf(Source),
+          paths.Value)
       }
     }
 

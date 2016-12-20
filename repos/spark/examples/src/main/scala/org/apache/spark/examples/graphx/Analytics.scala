@@ -91,11 +91,12 @@ object Analytics extends Logging {
         val sc = new SparkContext(conf.setAppName("PageRank(" + fname + ")"))
 
         val unpartitionedGraph = GraphLoader
-          .edgeListFile(sc,
-                        fname,
-                        numEdgePartitions = numEPart,
-                        edgeStorageLevel = edgeStorageLevel,
-                        vertexStorageLevel = vertexStorageLevel)
+          .edgeListFile(
+            sc,
+            fname,
+            numEdgePartitions = numEPart,
+            edgeStorageLevel = edgeStorageLevel,
+            vertexStorageLevel = vertexStorageLevel)
           .cache()
         val graph =
           partitionStrategy.foldLeft(unpartitionedGraph)(_.partitionBy(_))
@@ -130,11 +131,12 @@ object Analytics extends Logging {
         val sc = new SparkContext(
           conf.setAppName("ConnectedComponents(" + fname + ")"))
         val unpartitionedGraph = GraphLoader
-          .edgeListFile(sc,
-                        fname,
-                        numEdgePartitions = numEPart,
-                        edgeStorageLevel = edgeStorageLevel,
-                        vertexStorageLevel = vertexStorageLevel)
+          .edgeListFile(
+            sc,
+            fname,
+            numEdgePartitions = numEPart,
+            edgeStorageLevel = edgeStorageLevel,
+            vertexStorageLevel = vertexStorageLevel)
           .cache()
         val graph =
           partitionStrategy.foldLeft(unpartitionedGraph)(_.partitionBy(_))
@@ -158,12 +160,13 @@ object Analytics extends Logging {
         val sc = new SparkContext(
           conf.setAppName("TriangleCount(" + fname + ")"))
         val graph = GraphLoader
-          .edgeListFile(sc,
-                        fname,
-                        canonicalOrientation = true,
-                        numEdgePartitions = numEPart,
-                        edgeStorageLevel = edgeStorageLevel,
-                        vertexStorageLevel = vertexStorageLevel)
+          .edgeListFile(
+            sc,
+            fname,
+            canonicalOrientation = true,
+            numEdgePartitions = numEPart,
+            edgeStorageLevel = edgeStorageLevel,
+            vertexStorageLevel = vertexStorageLevel)
           // TriangleCount requires the graph to be partitioned
           .partitionBy(partitionStrategy.getOrElse(RandomVertexCut))
           .cache()

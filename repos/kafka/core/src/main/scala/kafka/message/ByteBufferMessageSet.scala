@@ -53,33 +53,35 @@ object ByteBufferMessageSet {
       }
       var offset = -1L
       val messageWriter = new MessageWriter(
-        math.min(math.max(MessageSet.messageSetSize(messages) / 2, 1024),
-                 1 << 16))
-      messageWriter.write(codec = compressionCodec,
-                          timestamp = magicAndTimestamp.timestamp,
-                          timestampType = timestampType,
-                          magicValue = magicAndTimestamp.magic) {
-        outputStream =>
-          val output = new DataOutputStream(
-            CompressionFactory(compressionCodec, outputStream))
-          try {
-            for (message <- messages) {
-              offset = offsetAssigner.nextAbsoluteOffset()
-              if (message.magic != magicAndTimestamp.magic)
-                throw new IllegalArgumentException(
-                  "Messages in the message set must have same magic value")
-              // Use inner offset if magic value is greater than 0
-              if (magicAndTimestamp.magic > Message.MagicValue_V0)
-                output.writeLong(offsetAssigner.toInnerOffset(offset))
-              else output.writeLong(offset)
-              output.writeInt(message.size)
-              output.write(message.buffer.array,
-                           message.buffer.arrayOffset,
-                           message.buffer.limit)
-            }
-          } finally {
-            output.close()
+        math.min(
+          math.max(MessageSet.messageSetSize(messages) / 2, 1024),
+          1 << 16))
+      messageWriter.write(
+        codec = compressionCodec,
+        timestamp = magicAndTimestamp.timestamp,
+        timestampType = timestampType,
+        magicValue = magicAndTimestamp.magic) { outputStream =>
+        val output = new DataOutputStream(
+          CompressionFactory(compressionCodec, outputStream))
+        try {
+          for (message <- messages) {
+            offset = offsetAssigner.nextAbsoluteOffset()
+            if (message.magic != magicAndTimestamp.magic)
+              throw new IllegalArgumentException(
+                "Messages in the message set must have same magic value")
+            // Use inner offset if magic value is greater than 0
+            if (magicAndTimestamp.magic > Message.MagicValue_V0)
+              output.writeLong(offsetAssigner.toInnerOffset(offset))
+            else output.writeLong(offset)
+            output.writeInt(message.size)
+            output.write(
+              message.buffer.array,
+              message.buffer.arrayOffset,
+              message.buffer.limit)
           }
+        } finally {
+          output.close()
+        }
       }
       val buffer =
         ByteBuffer.allocate(messageWriter.size + MessageSet.LogOverhead)
@@ -142,9 +144,10 @@ object ByteBufferMessageSet {
         val buffer = ByteBuffer.wrap(bufferArray)
 
         // Override the timestamp if necessary
-        val newMessage = new Message(buffer,
-                                     wrapperMessageTimestampOpt,
-                                     wrapperMessageTimestampTypeOpt)
+        val newMessage = new Message(
+          buffer,
+          wrapperMessageTimestampOpt,
+          wrapperMessageTimestampTypeOpt)
 
         // Inner message and wrapper message must have same magic value
         if (newMessage.magic != wrapperMessage.magic)
@@ -285,32 +288,35 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
                           timestampType: TimestampType,
                           messages: Message*) {
     this(
-      ByteBufferMessageSet.create(OffsetAssigner(offsetCounter, messages.size),
-                                  compressionCodec,
-                                  wrapperMessageTimestamp,
-                                  timestampType,
-                                  messages: _*))
+      ByteBufferMessageSet.create(
+        OffsetAssigner(offsetCounter, messages.size),
+        compressionCodec,
+        wrapperMessageTimestamp,
+        timestampType,
+        messages: _*))
   }
 
   def this(compressionCodec: CompressionCodec,
            offsetCounter: LongRef,
            messages: Message*) {
-    this(compressionCodec,
-         offsetCounter,
-         None,
-         TimestampType.CREATE_TIME,
-         messages: _*)
+    this(
+      compressionCodec,
+      offsetCounter,
+      None,
+      TimestampType.CREATE_TIME,
+      messages: _*)
   }
 
   def this(compressionCodec: CompressionCodec,
            offsetSeq: Seq[Long],
            messages: Message*) {
     this(
-      ByteBufferMessageSet.create(new OffsetAssigner(offsetSeq),
-                                  compressionCodec,
-                                  None,
-                                  TimestampType.CREATE_TIME,
-                                  messages: _*))
+      ByteBufferMessageSet.create(
+        new OffsetAssigner(offsetSeq),
+        compressionCodec,
+        None,
+        TimestampType.CREATE_TIME,
+        messages: _*))
   }
 
   def this(compressionCodec: CompressionCodec, messages: Message*) {
@@ -443,12 +449,13 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
       // check the magic value
       if (!isMagicValueInAllWrapperMessages(messageFormatVersion)) {
         // Message format conversion
-        (convertNonCompressedMessages(offsetCounter,
-                                      compactedTopic,
-                                      now,
-                                      messageTimestampType,
-                                      messageTimestampDiffMaxMs,
-                                      messageFormatVersion),
+        (convertNonCompressedMessages(
+           offsetCounter,
+           compactedTopic,
+           now,
+           messageTimestampType,
+           messageTimestampDiffMaxMs,
+           messageFormatVersion),
          true)
       } else {
         // Do in-place validation, offset assignment and maybe set timestamp
@@ -484,10 +491,11 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
             messageFormatVersion > Message.MagicValue_V0) {
           // No in place assignment situation 3
           // Validate the timestamp
-          validateTimestamp(message,
-                            now,
-                            messageTimestampType,
-                            messageTimestampDiffMaxMs)
+          validateTimestamp(
+            message,
+            now,
+            messageTimestampType,
+            messageTimestampDiffMaxMs)
           // Check if we need to overwrite offset
           if (messageAndOffset.offset != expectedInnerOffset.getAndIncrement())
             inPlaceAssignment = false
@@ -519,12 +527,12 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
             Some(now)
         }
 
-        (new ByteBufferMessageSet(compressionCodec = targetCodec,
-                                  offsetCounter = offsetCounter,
-                                  wrapperMessageTimestamp =
-                                    wrapperMessageTimestamp,
-                                  timestampType = messageTimestampType,
-                                  messages = validatedMessages: _*),
+        (new ByteBufferMessageSet(
+           compressionCodec = targetCodec,
+           offsetCounter = offsetCounter,
+           wrapperMessageTimestamp = wrapperMessageTimestamp,
+           timestampType = messageTimestampType,
+           messages = validatedMessages: _*),
          true)
       } else {
         // Do not do re-compression but simply update the offset, timestamp and attributes field of the wrapper message.
@@ -544,17 +552,19 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
         else if (messageTimestampType == TimestampType.LOG_APPEND_TIME) {
           // Set timestamp type and timestamp
           buffer.putLong(timestampOffset, now)
-          buffer.put(attributeOffset,
-                     messageTimestampType.updateAttributes(attributes))
+          buffer.put(
+            attributeOffset,
+            messageTimestampType.updateAttributes(attributes))
         }
 
         if (crcUpdateNeeded) {
           // need to recompute the crc value
           buffer.position(MessageSet.LogOverhead)
           val wrapperMessage = new Message(buffer.slice())
-          Utils.writeUnsignedInt(buffer,
-                                 MessageSet.LogOverhead + Message.CrcOffset,
-                                 wrapperMessage.computeChecksum)
+          Utils.writeUnsignedInt(
+            buffer,
+            MessageSet.LogOverhead + Message.CrcOffset,
+            wrapperMessage.computeChecksum)
         }
         buffer.rewind()
         (this, false)
@@ -584,10 +594,11 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
     this.internalIterator(isShallow = true).foreach {
       case MessageAndOffset(message, _) =>
         validateMessageKey(message, compactedTopic)
-        validateTimestamp(message,
-                          now,
-                          timestampType,
-                          messageTimestampDiffMaxMs)
+        validateTimestamp(
+          message,
+          now,
+          timestampType,
+          messageTimestampDiffMaxMs)
         newBuffer.position(newMessagePosition)
         newBuffer.putLong(offsetCounter.getAndIncrement())
         val newMessageSize =
@@ -628,9 +639,10 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
           message.buffer.put(
             Message.AttributesOffset,
             timestampType.updateAttributes(message.attributes))
-          Utils.writeUnsignedInt(message.buffer,
-                                 Message.CrcOffset,
-                                 message.computeChecksum)
+          Utils.writeUnsignedInt(
+            message.buffer,
+            Message.CrcOffset,
+            message.computeChecksum)
         }
       }
       messagePosition += MessageSet.LogOverhead + messageSize

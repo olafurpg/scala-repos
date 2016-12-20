@@ -83,19 +83,21 @@ private[sql] class DefaultSource extends FileFormat with DataSourceRegister {
     }
 
     compressionCodec.foreach { codecName =>
-      job.getConfiguration.set(OrcTableProperties.COMPRESSION.getPropName,
-                               OrcRelation.shortOrcCompressionCodecNames
-                                 .getOrElse(codecName, CompressionKind.NONE)
-                                 .name())
+      job.getConfiguration.set(
+        OrcTableProperties.COMPRESSION.getPropName,
+        OrcRelation.shortOrcCompressionCodecNames
+          .getOrElse(codecName, CompressionKind.NONE)
+          .name())
     }
 
     job.getConfiguration match {
       case conf: JobConf =>
         conf.setOutputFormat(classOf[OrcOutputFormat])
       case conf =>
-        conf.setClass("mapred.output.format.class",
-                      classOf[OrcOutputFormat],
-                      classOf[MapRedOutputFormat[_, _]])
+        conf.setClass(
+          "mapred.output.format.class",
+          classOf[OrcOutputFormat],
+          classOf[MapRedOutputFormat[_, _]])
     }
 
     new OutputWriterFactory {
@@ -132,12 +134,13 @@ private[orc] class OrcOutputWriter(path: String,
   private val serializer = {
     val table = new Properties()
     table.setProperty("columns", dataSchema.fieldNames.mkString(","))
-    table.setProperty("columns.types",
-                      dataSchema
-                        .map { f =>
-                          HiveMetastoreTypes.toMetastoreType(f.dataType)
-                        }
-                        .mkString(":"))
+    table.setProperty(
+      "columns.types",
+      dataSchema
+        .map { f =>
+          HiveMetastoreTypes.toMetastoreType(f.dataType)
+        }
+        .mkString(":"))
 
     val serde = new OrcSerde
     val configuration = context.getConfiguration
@@ -198,11 +201,13 @@ private[orc] class OrcOutputWriter(path: String,
     var i = 0
     while (i < fieldRefs.size) {
 
-      oi.setStructFieldData(struct,
-                            fieldRefs.get(i),
-                            wrap(row.get(i, dataSchema(i).dataType),
-                                 fieldRefs.get(i).getFieldObjectInspector,
-                                 dataSchema(i).dataType))
+      oi.setStructFieldData(
+        struct,
+        fieldRefs.get(i),
+        wrap(
+          row.get(i, dataSchema(i).dataType),
+          fieldRefs.get(i).getFieldObjectInspector,
+          dataSchema(i).dataType))
       i += 1
     }
   }
@@ -212,8 +217,9 @@ private[orc] class OrcOutputWriter(path: String,
   override protected[sql] def writeInternal(row: InternalRow): Unit = {
     wrapOrcStruct(cachedOrcStruct, structOI, row)
 
-    recordWriter.write(NullWritable.get(),
-                       serializer.serialize(cachedOrcStruct, structOI))
+    recordWriter.write(
+      NullWritable.get(),
+      serializer.serialize(cachedOrcStruct, structOI))
   }
 
   override def close(): Unit = {
@@ -327,10 +333,11 @@ private[orc] case class OrcTableScan(@transient sqlContext: SQLContext,
     rdd.mapPartitionsWithInputSplit {
       case (split: OrcSplit, iterator) =>
         val writableIterator = iterator.map(_._2)
-        fillObject(split.getPath.toString,
-                   wrappedConf.value,
-                   writableIterator,
-                   attributes)
+        fillObject(
+          split.getPath.toString,
+          wrappedConf.value,
+          writableIterator,
+          attributes)
     }
   }
 }

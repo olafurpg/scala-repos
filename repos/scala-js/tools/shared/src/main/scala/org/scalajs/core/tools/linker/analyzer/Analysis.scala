@@ -250,8 +250,9 @@ object Analysis {
       def loopTrace(optFrom: Option[From], verb: String = "called"): Unit = {
         optFrom match {
           case None =>
-            log(level,
-                s"$verb from ... er ... nowhere!? (this is a bug in dce)")
+            log(
+              level,
+              s"$verb from ... er ... nowhere!? (this is a bug in dce)")
           case Some(from) =>
             from match {
               case FromMethod(methodInfo) =>
@@ -280,9 +281,10 @@ object Analysis {
 
             // recurse with Debug log level not to overwhelm the user
             if (onlyOnce(Level.Debug, classInfo)) {
-              logCallStackImpl(Level.Debug,
-                               classInfo.instantiatedFrom.headOption,
-                               verb = "instantiated")
+              logCallStackImpl(
+                Level.Debug,
+                classInfo.instantiatedFrom.headOption,
+                verb = "instantiated")
             }
           }
         }

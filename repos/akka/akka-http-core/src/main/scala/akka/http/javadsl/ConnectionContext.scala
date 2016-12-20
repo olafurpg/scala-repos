@@ -22,9 +22,9 @@ object ConnectionContext {
             enabledProtocols: Optional[JCollection[String]],
             clientAuth: Optional[TLSClientAuth],
             sslParameters: Optional[SSLParameters]) =
-    scaladsl.ConnectionContext.https(sslContext,
-                                     sslParameters =
-                                       OptionConverters.toScala(sslParameters))
+    scaladsl.ConnectionContext.https(
+      sslContext,
+      sslParameters = OptionConverters.toScala(sslParameters))
   //#https-context-creation
 
   /** Used to serve HTTP traffic. */

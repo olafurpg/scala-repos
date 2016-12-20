@@ -43,24 +43,27 @@ case class DescribeCommand(table: TableIdentifier, isExtended: Boolean)
 
   override val output: Seq[Attribute] = Seq(
     // Column names are based on Hive.
-    AttributeReference("col_name",
-                       StringType,
-                       nullable = false,
-                       new MetadataBuilder()
-                         .putString("comment", "name of the column")
-                         .build())(),
-    AttributeReference("data_type",
-                       StringType,
-                       nullable = false,
-                       new MetadataBuilder()
-                         .putString("comment", "data type of the column")
-                         .build())(),
-    AttributeReference("comment",
-                       StringType,
-                       nullable = true,
-                       new MetadataBuilder()
-                         .putString("comment", "comment of the column")
-                         .build())()
+    AttributeReference(
+      "col_name",
+      StringType,
+      nullable = false,
+      new MetadataBuilder()
+        .putString("comment", "name of the column")
+        .build())(),
+    AttributeReference(
+      "data_type",
+      StringType,
+      nullable = false,
+      new MetadataBuilder()
+        .putString("comment", "data type of the column")
+        .build())(),
+    AttributeReference(
+      "comment",
+      StringType,
+      nullable = true,
+      new MetadataBuilder()
+        .putString("comment", "comment of the column")
+        .build())()
   )
 }
 
@@ -109,15 +112,17 @@ case class CreateTempTableUsing(tableIdent: TableIdentifier,
     extends RunnableCommand {
 
   def run(sqlContext: SQLContext): Seq[Row] = {
-    val dataSource = DataSource(sqlContext,
-                                userSpecifiedSchema = userSpecifiedSchema,
-                                className = provider,
-                                options = options)
+    val dataSource = DataSource(
+      sqlContext,
+      userSpecifiedSchema = userSpecifiedSchema,
+      className = provider,
+      options = options)
     sqlContext.sessionState.catalog.registerTable(
       tableIdent,
       Dataset
-        .newDataFrame(sqlContext,
-                      LogicalRelation(dataSource.resolveRelation()))
+        .newDataFrame(
+          sqlContext,
+          LogicalRelation(dataSource.resolveRelation()))
         .logicalPlan)
 
     Seq.empty[Row]
@@ -134,11 +139,12 @@ case class CreateTempTableUsingAsSelect(tableIdent: TableIdentifier,
 
   override def run(sqlContext: SQLContext): Seq[Row] = {
     val df = Dataset.newDataFrame(sqlContext, query)
-    val dataSource = DataSource(sqlContext,
-                                className = provider,
-                                partitionColumns = partitionColumns,
-                                bucketSpec = None,
-                                options = options)
+    val dataSource = DataSource(
+      sqlContext,
+      className = provider,
+      partitionColumns = partitionColumns,
+      bucketSpec = None,
+      options = options)
     val result = dataSource.write(mode, df)
     sqlContext.sessionState.catalog.registerTable(
       tableIdent,

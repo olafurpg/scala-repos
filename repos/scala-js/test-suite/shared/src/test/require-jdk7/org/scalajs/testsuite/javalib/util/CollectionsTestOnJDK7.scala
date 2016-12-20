@@ -34,8 +34,9 @@ class CollectionsTestOnJDK7 {
       expectThrows(classOf[NoSuchElementException], freshIter.next())
       expectThrows(classOf[NoSuchElementException], freshIter.previous())
       expectThrows(classOf[IllegalStateException], freshIter.remove())
-      expectThrows(classOf[UnsupportedOperationException],
-                   freshIter.add(toElem(0)))
+      expectThrows(
+        classOf[UnsupportedOperationException],
+        freshIter.add(toElem(0)))
       expectThrows(classOf[IllegalStateException], freshIter.set(toElem(0)))
     }
 

@@ -73,9 +73,10 @@ class GraphOps[VD: ClassTag, ED: ClassTag](graph: Graph[VD, ED])
       graph.aggregateMessages(_.sendToSrc(1), _ + _, TripletFields.None)
     } else {
       // EdgeDirection.Either
-      graph.aggregateMessages(ctx => { ctx.sendToSrc(1); ctx.sendToDst(1) },
-                              _ + _,
-                              TripletFields.None)
+      graph.aggregateMessages(
+        ctx => { ctx.sendToSrc(1); ctx.sendToDst(1) },
+        _ + _,
+        TripletFields.None)
     }
   }
 
@@ -380,9 +381,10 @@ class GraphOps[VD: ClassTag, ED: ClassTag](graph: Graph[VD, ED])
       vprog: (VertexId, VD, A) => VD,
       sendMsg: EdgeTriplet[VD, ED] => Iterator[(VertexId, A)],
       mergeMsg: (A, A) => A): Graph[VD, ED] = {
-    Pregel(graph, initialMsg, maxIterations, activeDirection)(vprog,
-                                                              sendMsg,
-                                                              mergeMsg)
+    Pregel(graph, initialMsg, maxIterations, activeDirection)(
+      vprog,
+      sendMsg,
+      mergeMsg)
   }
 
   /**

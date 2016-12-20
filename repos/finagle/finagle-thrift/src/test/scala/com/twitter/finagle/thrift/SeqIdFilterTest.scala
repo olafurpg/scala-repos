@@ -53,9 +53,10 @@ class SeqIdFilterTest
       verify(service).apply(req.capture)
       p.setValue(
         mkmsg(
-          new TMessage("proc",
-                       TMessageType.REPLY,
-                       getmsg(req.getValue.message).seqid)))
+          new TMessage(
+            "proc",
+            TMessageType.REPLY,
+            getmsg(req.getValue.message).seqid)))
 
       f.poll match {
         case Some(Return(buf)) => assert(getmsg(buf).seqid == seqId)

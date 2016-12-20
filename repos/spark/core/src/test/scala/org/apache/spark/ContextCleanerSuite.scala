@@ -506,9 +506,10 @@ class CleanerTester(sc: SparkContext,
   def assertCleanup()(implicit waitTimeout: PatienceConfiguration.Timeout) {
     try {
       eventually(waitTimeout, interval(100 millis)) {
-        assert(isAllCleanedUp,
-               "The following resources were not cleaned up:\n" +
-                 uncleanedResourcesToString)
+        assert(
+          isAllCleanedUp,
+          "The following resources were not cleaned up:\n" +
+            uncleanedResourcesToString)
       }
       postCleanupValidate()
     } finally {
@@ -519,9 +520,10 @@ class CleanerTester(sc: SparkContext,
 
   /** Verify that RDDs, shuffles, etc. occupy resources */
   private def preCleanupValidate() {
-    assert(rddIds.nonEmpty || shuffleIds.nonEmpty ||
-             broadcastIds.nonEmpty || checkpointIds.nonEmpty,
-           "Nothing to cleanup")
+    assert(
+      rddIds.nonEmpty || shuffleIds.nonEmpty ||
+        broadcastIds.nonEmpty || checkpointIds.nonEmpty,
+      "Nothing to cleanup")
 
     // Verify the RDDs have been persisted and blocks are present
     rddIds.foreach { rddId =>

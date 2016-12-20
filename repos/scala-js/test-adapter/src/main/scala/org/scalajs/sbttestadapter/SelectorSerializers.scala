@@ -51,8 +51,9 @@ private[testadapter] object SelectorSerializers {
         case "NestedSuiteSelector" =>
           new NestedSuiteSelector(obj.fld[String]("suiteId"))
         case "NestedTestSelector" =>
-          new NestedTestSelector(obj.fld[String]("suiteId"),
-                                 obj.fld[String]("testName"))
+          new NestedTestSelector(
+            obj.fld[String]("suiteId"),
+            obj.fld[String]("testName"))
         case "TestWildcardSelector" =>
           new TestWildcardSelector(obj.fld[String]("testWildcard"))
         case tpe =>

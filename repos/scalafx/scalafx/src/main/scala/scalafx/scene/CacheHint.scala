@@ -35,23 +35,27 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 object CacheHint extends SFXEnumDelegateCompanion[jfxs.CacheHint, CacheHint] {
 
   val Default = new CacheHint(jfxs.CacheHint.DEFAULT)
-  @deprecated("Use Default; DEFAULT will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Default; DEFAULT will be removed in a future release",
+    "8.0.60-R10")
   val DEFAULT = Default
 
   val Quality = new CacheHint(jfxs.CacheHint.QUALITY)
-  @deprecated("Use Quality; QUALITY will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Quality; QUALITY will be removed in a future release",
+    "8.0.60-R10")
   val QUALITY = Quality
 
   val Rotate = new CacheHint(jfxs.CacheHint.ROTATE)
-  @deprecated("Use Rotate; ROTATE will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Rotate; ROTATE will be removed in a future release",
+    "8.0.60-R10")
   val ROTATE = Rotate
 
   val Scale = new CacheHint(jfxs.CacheHint.SCALE)
-  @deprecated("Use Scale; SCALE will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Scale; SCALE will be removed in a future release",
+    "8.0.60-R10")
   val SCALE = Scale
 
   val ScaleAndRotate = new CacheHint(jfxs.CacheHint.SCALE_AND_ROTATE)
@@ -61,8 +65,9 @@ object CacheHint extends SFXEnumDelegateCompanion[jfxs.CacheHint, CacheHint] {
   val SCALE_AND_ROTATE = ScaleAndRotate
 
   val Speed = new CacheHint(jfxs.CacheHint.SPEED)
-  @deprecated("Use Speed; SPEED will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Speed; SPEED will be removed in a future release",
+    "8.0.60-R10")
   val SPEED = Speed
 
   protected override def unsortedValues: Array[CacheHint] = Array(

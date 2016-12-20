@@ -390,10 +390,11 @@ class WatermarkPoolTest extends FunSpec with MockitoSugar {
       val lowWatermark = 5
       val highWatermark = 10
       val maxWaiters = 3
-      val pool = new WatermarkPool(factory,
-                                   lowWatermark,
-                                   highWatermark,
-                                   maxWaiters = maxWaiters)
+      val pool = new WatermarkPool(
+        factory,
+        lowWatermark,
+        highWatermark,
+        maxWaiters = maxWaiters)
 
       val services =
         0 until highWatermark map { _ =>

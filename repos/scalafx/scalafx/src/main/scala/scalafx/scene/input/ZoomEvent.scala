@@ -48,8 +48,9 @@ object ZoomEvent {
     * This event occurs when user performs a zooming gesture such as dragging two fingers apart.
     */
   val Zoom: EventType[jfxsi.ZoomEvent] = jfxsi.ZoomEvent.ZOOM
-  @deprecated("Use Zoom; ZOOM will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Zoom; ZOOM will be removed in a future release",
+    "8.0.60-R10")
   val ZOOM = Zoom
 
   /**

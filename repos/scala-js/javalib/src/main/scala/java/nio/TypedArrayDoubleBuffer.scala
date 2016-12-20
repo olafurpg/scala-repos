@@ -112,10 +112,11 @@ private[nio] object TypedArrayDoubleBuffer {
               initialPosition: Int,
               initialLimit: Int,
               readOnly: Boolean): TypedArrayDoubleBuffer = {
-      new TypedArrayDoubleBuffer(typedArray,
-                                 initialPosition,
-                                 initialLimit,
-                                 readOnly)
+      new TypedArrayDoubleBuffer(
+        typedArray,
+        initialPosition,
+        initialLimit,
+        readOnly)
     }
 
     @inline

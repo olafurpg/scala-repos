@@ -48,11 +48,12 @@ object SimpleConsumerPerformance {
           "time, fetch.size, data.consumed.in.MB, MB.sec, data.consumed.in.nMsg, nMsg.sec")
     }
 
-    val consumer = new SimpleConsumer(config.url.getHost,
-                                      config.url.getPort,
-                                      30 * 1000,
-                                      2 * config.fetchSize,
-                                      config.clientId)
+    val consumer = new SimpleConsumer(
+      config.url.getHost,
+      config.url.getPort,
+      30 * 1000,
+      2 * config.fetchSize,
+      config.clientId)
 
     // reset to latest or smallest offset
     val topicAndPartition = TopicAndPartition(config.topic, config.partition)
@@ -165,8 +166,9 @@ object SimpleConsumerPerformance {
       .ofType(classOf[java.lang.Integer])
       .defaultsTo(0)
     val fetchSizeOpt = parser
-      .accepts("fetch-size",
-               "REQUIRED: The fetch size to use for consumption.")
+      .accepts(
+        "fetch-size",
+        "REQUIRED: The fetch size to use for consumption.")
       .withRequiredArg
       .describedAs("bytes")
       .ofType(classOf[java.lang.Integer])

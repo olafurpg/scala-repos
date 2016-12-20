@@ -28,8 +28,9 @@ class ScalaCompilerConfigurable(project: Project,
 
   def reset() {
     form.setIncrementalityType(configuration.incrementalityType)
-    profiles.initProfiles(configuration.defaultProfile,
-                          configuration.customProfiles.asJava)
+    profiles.initProfiles(
+      configuration.defaultProfile,
+      configuration.customProfiles.asJava)
   }
 
   def apply() {

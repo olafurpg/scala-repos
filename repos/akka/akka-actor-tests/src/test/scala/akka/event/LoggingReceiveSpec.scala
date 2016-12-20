@@ -83,11 +83,13 @@ class LoggingReceiveSpec extends WordSpec with BeforeAndAfterAll {
             })
         }))
         a ! "hallo"
-        expectMsg(1 second,
-                  Logging.Debug("funky",
-                                classOf[DummyClassForStringSources],
-                                "received unhandled message hallo from " +
-                                  system.deadLetters))
+        expectMsg(
+          1 second,
+          Logging.Debug(
+            "funky",
+            classOf[DummyClassForStringSources],
+            "received unhandled message hallo from " +
+              system.deadLetters))
         expectMsgType[UnhandledMessage](1 second)
       }
     }
@@ -115,9 +117,10 @@ class LoggingReceiveSpec extends WordSpec with BeforeAndAfterAll {
         actor ! "buh"
         within(1 second) {
           expectMsg(
-            Logging.Debug(actor.path.toString,
-                          actor.underlyingActor.getClass,
-                          "received handled message buh from " + self))
+            Logging.Debug(
+              actor.path.toString,
+              actor.underlyingActor.getClass,
+              "received handled message buh from " + self))
           expectMsg("x")
         }
 
@@ -144,9 +147,10 @@ class LoggingReceiveSpec extends WordSpec with BeforeAndAfterAll {
         actor ! "buh"
         within(1 second) {
           expectMsg(
-            Logging.Debug(actor.path.toString,
-                          actor.underlyingActor.getClass,
-                          "received handled message buh from " + self))
+            Logging.Debug(
+              actor.path.toString,
+              actor.underlyingActor.getClass,
+              "received handled message buh from " + self))
           expectMsg("x")
         }
       }
@@ -271,9 +275,10 @@ class LoggingReceiveSpec extends WordSpec with BeforeAndAfterAll {
           }
 
           system.stop(supervisor)
-          expectMsgAllOf(Logging.Debug(aname, aclass, "stopped"),
-                         Logging.Debug(sname, sclass, "stopping"),
-                         Logging.Debug(sname, sclass, "stopped"))
+          expectMsgAllOf(
+            Logging.Debug(aname, aclass, "stopped"),
+            Logging.Debug(sname, sclass, "stopping"),
+            Logging.Debug(sname, sclass, "stopped"))
         }
       }
     }

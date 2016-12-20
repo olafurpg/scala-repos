@@ -216,10 +216,11 @@ class ErrorFormatter(showExpected: Boolean = true,
     import error._
     traces
       .map(formatTrace(_, position.index))
-      .mkString(traces.size + " rule" + (if (traces.size != 1) "s" else "") +
-                  " mismatched at error location:\n  ",
-                "\n  ",
-                "\n")
+      .mkString(
+        traces.size + " rule" + (if (traces.size != 1) "s" else "") +
+          " mismatched at error location:\n  ",
+        "\n  ",
+        "\n")
   }
 
   /**

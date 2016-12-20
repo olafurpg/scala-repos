@@ -112,9 +112,10 @@ class AkkaProtocolStressTest
     "guarantee at-most-once delivery and message ordering despite packet loss" taggedAs TimingTest in {
       system.eventStream.publish(TestEvent.Mute(DeadLettersFilter[Any]))
       systemB.eventStream.publish(TestEvent.Mute(DeadLettersFilter[Any]))
-      Await.result(RARP(system).provider.transport
-                     .managementCommand(One(addressB, Drop(0.1, 0.1))),
-                   3.seconds.dilated)
+      Await.result(
+        RARP(system).provider.transport
+          .managementCommand(One(addressB, Drop(0.1, 0.1))),
+        3.seconds.dilated)
 
       val tester =
         system.actorOf(Props(classOf[SequenceVerifier], here, self)) ! "start"
@@ -130,8 +131,9 @@ class AkkaProtocolStressTest
   override def beforeTermination() {
     system.eventStream.publish(
       TestEvent.Mute(
-        EventFilter.warning(source = "akka://AkkaProtocolStressTest/user/$a",
-                            start = "received dead letter"),
+        EventFilter.warning(
+          source = "akka://AkkaProtocolStressTest/user/$a",
+          start = "received dead letter"),
         EventFilter.warning(
           pattern = "received dead letter.*(InboundPayload|Disassociate)")))
     systemB.eventStream.publish(

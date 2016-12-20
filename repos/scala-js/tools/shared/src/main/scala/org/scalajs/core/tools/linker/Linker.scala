@@ -27,12 +27,15 @@ import org.scalajs.core.tools.linker.backend.{
 final class Linker(frontend: LinkerFrontend, backend: LinkerBackend)
     extends GenLinker {
 
-  require(!backend.withSourceMap || frontend.withSourceMap,
-          "Frontend must have source maps enabled if backend has them enabled")
-  require(frontend.semantics == backend.semantics,
-          "Frontend and backend must agree on semantics")
-  require(frontend.esLevel == backend.esLevel,
-          "Frontend and backend must agree on ESLevel")
+  require(
+    !backend.withSourceMap || frontend.withSourceMap,
+    "Frontend must have source maps enabled if backend has them enabled")
+  require(
+    frontend.semantics == backend.semantics,
+    "Frontend and backend must agree on semantics")
+  require(
+    frontend.esLevel == backend.esLevel,
+    "Frontend and backend must agree on ESLevel")
 
   val semantics: Semantics = frontend.semantics
   val esLevel: ESLevel = backend.esLevel

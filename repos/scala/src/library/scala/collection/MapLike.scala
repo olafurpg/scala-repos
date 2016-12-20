@@ -194,16 +194,18 @@ trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
     *
     *  @return the keys of this map as an iterable.
     */
-  @migration("`keys` returns `Iterable[A]` rather than `Iterator[A]`.",
-             "2.8.0")
+  @migration(
+    "`keys` returns `Iterable[A]` rather than `Iterator[A]`.",
+    "2.8.0")
   def keys: Iterable[A] = keySet
 
   /** Collects all values of this map in an iterable collection.
     *
     *  @return the values of this map as an iterable.
     */
-  @migration("`values` returns `Iterable[B]` rather than `Iterator[B]`.",
-             "2.8.0")
+  @migration(
+    "`values` returns `Iterable[B]` rather than `Iterator[B]`.",
+    "2.8.0")
   def values: Iterable[B] = new DefaultValuesIterable
 
   /** The implementation class of the iterable returned by `values`.

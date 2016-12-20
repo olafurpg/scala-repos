@@ -36,8 +36,9 @@ object ConnectHttp {
   def toHost(uriHost: Uri): ConnectHttp = {
     val s = uriHost.scheme.toLowerCase(Locale.ROOT)
     if (s == "https")
-      new ConnectHttpsImpl(uriHost.host.address,
-                           effectivePort(s, uriHost.port))
+      new ConnectHttpsImpl(
+        uriHost.host.address,
+        effectivePort(s, uriHost.port))
     else
       new ConnectHttpImpl(uriHost.host.address, effectivePort(s, uriHost.port))
   }
@@ -60,8 +61,9 @@ object ConnectHttp {
   @throws(classOf[IllegalArgumentException])
   def toHostHttps(uriHost: Uri): ConnectWithHttps = {
     val s = uriHost.scheme.toLowerCase(Locale.ROOT)
-    require(s == "" || s == "https",
-            "toHostHttps used with non https scheme! Was: " + uriHost)
+    require(
+      s == "" || s == "https",
+      "toHostHttps used with non https scheme! Was: " + uriHost)
     val httpsHost = uriHost.scheme("https") // for effective port calculation
     new ConnectHttpsImpl(httpsHost.host.address, effectivePort(uriHost))
   }

@@ -273,17 +273,19 @@ class SyntheticClasses(project: Project)
       new ScSyntheticFunction(manager, "!=", Boolean, Seq(Seq(Any))))
     any.addMethod(new ScSyntheticFunction(manager, "##", Int, Seq.empty))
     any.addMethod(
-      new ScSyntheticFunction(manager,
-                              "isInstanceOf",
-                              Boolean,
-                              Seq.empty,
-                              Seq(ScalaUtils.typeParameter)))
+      new ScSyntheticFunction(
+        manager,
+        "isInstanceOf",
+        Boolean,
+        Seq.empty,
+        Seq(ScalaUtils.typeParameter)))
     any.addMethod(
-      new ScSyntheticFunction(manager,
-                              "asInstanceOf",
-                              Any,
-                              Seq.empty,
-                              Seq(ScalaUtils.typeParameter)) {
+      new ScSyntheticFunction(
+        manager,
+        "asInstanceOf",
+        Any,
+        Seq.empty,
+        Seq(ScalaUtils.typeParameter)) {
         override val retType = ScalaPsiManager.typeVariable(typeParams(0))
       })
 
@@ -293,20 +295,22 @@ class SyntheticClasses(project: Project)
     anyRef.addMethod(
       new ScSyntheticFunction(manager, "ne", Boolean, Seq(Seq(AnyRef))))
     anyRef.addMethod(
-      new ScSyntheticFunction(manager,
-                              "synchronized",
-                              Any,
-                              Seq.empty,
-                              Seq(ScalaUtils.typeParameter)) {
+      new ScSyntheticFunction(
+        manager,
+        "synchronized",
+        Any,
+        Seq.empty,
+        Seq(ScalaUtils.typeParameter)) {
         override val paramClauses: Seq[Seq[Parameter]] = Seq(
           Seq(
-            new Parameter("",
-                          None,
-                          ScalaPsiManager.typeVariable(typeParams(0)),
-                          false,
-                          false,
-                          false,
-                          0)))
+            new Parameter(
+              "",
+              None,
+              ScalaPsiManager.typeVariable(typeParams(0)),
+              false,
+              false,
+              false,
+              0)))
         override val retType: ScType =
           ScalaPsiManager.typeVariable(typeParams(0))
       })
@@ -338,16 +342,18 @@ class SyntheticClasses(project: Project)
           new ScSyntheticFunction(manager, op, Boolean, Seq(Seq(nc1.t))))
       for (nc1 <- numeric; op <- numeric_arith_ops)
         nc.addMethod(
-          new ScSyntheticFunction(manager,
-                                  op,
-                                  op_type(nc, nc1),
-                                  Seq(Seq(nc1.t))))
+          new ScSyntheticFunction(
+            manager,
+            op,
+            op_type(nc, nc1),
+            Seq(Seq(nc1.t))))
       for (nc1 <- numeric)
         nc.addMethod(
-          new ScSyntheticFunction(manager,
-                                  "to" + nc1.className,
-                                  nc1.t,
-                                  Seq.empty))
+          new ScSyntheticFunction(
+            manager,
+            "to" + nc1.className,
+            nc1.t,
+            Seq.empty))
       for (un_op <- numeric_arith_unary_ops)
         nc.addMethod(
           new ScSyntheticFunction(manager, "unary_" + un_op, nc.t match {
@@ -359,10 +365,11 @@ class SyntheticClasses(project: Project)
     for (ic <- integer) {
       for (ic1 <- integer; op <- bitwise_bin_ops)
         ic.addMethod(
-          new ScSyntheticFunction(manager,
-                                  op,
-                                  op_type(ic, ic1),
-                                  Seq(Seq(ic1.t))))
+          new ScSyntheticFunction(
+            manager,
+            op,
+            op_type(ic, ic1),
+            Seq(Seq(ic1.t))))
       ic.addMethod(
         new ScSyntheticFunction(manager, "unary_~", ic.t, Seq.empty))
 
@@ -381,8 +388,9 @@ class SyntheticClasses(project: Project)
     try {
       val stringClass = ScalaPsiManager
         .instance(project)
-        .getCachedClass(GlobalSearchScope.allScope(project),
-                        "java.lang.String")
+        .getCachedClass(
+          GlobalSearchScope.allScope(project),
+          "java.lang.String")
       stringClass.map { stringClass =>
         scriptSyntheticValues += new ScSyntheticValue(
           manager,

@@ -61,10 +61,11 @@ class EndToEndTest
     val serverTrans = new QueueTransport[Message, Message](q1, q0)
 
     val server = ServerDispatcher.newRequestResponse(serverTrans, svc)
-    val session = new ClientSession(clientTrans,
-                                    FailureDetector.NullConfig,
-                                    "test",
-                                    NullStatsReceiver)
+    val session = new ClientSession(
+      clientTrans,
+      FailureDetector.NullConfig,
+      "test",
+      NullStatsReceiver)
     val client = ClientDispatcher.newRequestResponse(session)
 
     val f = client(Request(Path.empty, Buf.Empty))
@@ -176,8 +177,9 @@ class EndToEndTest
 
     val a, b = Mux.serve("localhost:*", service)
     val client = Mux.newService(
-      Name.bound(Address(a.boundAddress.asInstanceOf[InetSocketAddress]),
-                 Address(b.boundAddress.asInstanceOf[InetSocketAddress])),
+      Name.bound(
+        Address(a.boundAddress.asInstanceOf[InetSocketAddress]),
+        Address(b.boundAddress.asInstanceOf[InetSocketAddress])),
       "client")
 
     assert(n.get == 0)

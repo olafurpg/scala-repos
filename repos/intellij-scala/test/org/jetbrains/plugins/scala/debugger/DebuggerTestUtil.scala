@@ -100,8 +100,9 @@ object DebuggerTestUtil {
     val priorityPaths = Seq(
       currentJava(),
       Option(
-        sys.env.getOrElse(s"JDK_1${versionMajor}_x64",
-                          sys.env.getOrElse(s"JDK_1$versionMajor", null)))
+        sys.env.getOrElse(
+          s"JDK_1${versionMajor}_x64",
+          sys.env.getOrElse(s"JDK_1$versionMajor", null)))
         .map(_ + "/jre") // teamcity style
     )
     if (priorityPaths.exists(_.isDefined)) {

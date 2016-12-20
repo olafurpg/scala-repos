@@ -784,16 +784,17 @@ abstract class PersistentActorSpec(config: Config)
       persistentActor ! Cmd("e")
       persistentActor ! GetState
       expectMsg(
-        List("a-1",
-             "a-2",
-             "b-0",
-             "c-30",
-             "c-31",
-             "c-32",
-             "d-0",
-             "e-30",
-             "e-31",
-             "e-32"))
+        List(
+          "a-1",
+          "a-2",
+          "b-0",
+          "c-30",
+          "c-31",
+          "c-32",
+          "d-0",
+          "e-30",
+          "e-31",
+          "e-32"))
     }
     "allow behavior changes in command handler (as last action)" in {
       val persistentActor =
@@ -804,16 +805,17 @@ abstract class PersistentActorSpec(config: Config)
       persistentActor ! Cmd("e")
       persistentActor ! GetState
       expectMsg(
-        List("a-1",
-             "a-2",
-             "b-0",
-             "c-30",
-             "c-31",
-             "c-32",
-             "d-0",
-             "e-30",
-             "e-31",
-             "e-32"))
+        List(
+          "a-1",
+          "a-2",
+          "b-0",
+          "c-30",
+          "c-31",
+          "c-32",
+          "d-0",
+          "e-30",
+          "e-31",
+          "e-32"))
     }
     "support snapshotting" in {
       val persistentActor1 = system.actorOf(
@@ -1073,9 +1075,10 @@ abstract class PersistentActorSpec(config: Config)
       expectMsg(List("a-1", "a-2", "b-41", "b-42", "c-41", "c-42"))
 
       val persistentActor2 = system.actorOf(
-        Props(classOf[HandleRecoveryFinishedEventPersistentActor],
-              name,
-              testActor))
+        Props(
+          classOf[HandleRecoveryFinishedEventPersistentActor],
+          name,
+          testActor))
       expectMsg("offered")
       expectMsg(RecoveryCompleted)
       expectMsg("I am the stashed")
@@ -1175,10 +1178,11 @@ abstract class PersistentActorSpec(config: Config)
       val nestedPersistAsyncs = 6
 
       val persistentActor = system.actorOf(
-        Props(classOf[DeeplyNestedPersistAsyncs],
-              name,
-              nestedPersistAsyncs,
-              testActor))
+        Props(
+          classOf[DeeplyNestedPersistAsyncs],
+          name,
+          nestedPersistAsyncs,
+          testActor))
 
       persistentActor ! "a"
       expectMsg("a")

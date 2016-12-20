@@ -45,18 +45,22 @@ object BubbleChartDemo extends JFXApp {
         title = "Bubble Chart"
         legendSide = Side.Right
         data = ObservableBuffer(
-          xyrSeries("Series 1",
-                    Seq((30, 40, 10),
-                        (60, 20, 13),
-                        (10, 90, 7),
-                        (100, 40, 10),
-                        (50, 23, 5))),
-          xyrSeries("Series 2",
-                    Seq((13, 100, 7),
-                        (20, 80, 13),
-                        (100, 60, 10),
-                        (30, 40, 6),
-                        (50, 20, 12)))
+          xyrSeries(
+            "Series 1",
+            Seq(
+              (30, 40, 10),
+              (60, 20, 13),
+              (10, 90, 7),
+              (100, 40, 10),
+              (50, 23, 5))),
+          xyrSeries(
+            "Series 2",
+            Seq(
+              (13, 100, 7),
+              (20, 80, 13),
+              (100, 60, 10),
+              (30, 40, 6),
+              (50, 20, 12)))
         )
       }
     }

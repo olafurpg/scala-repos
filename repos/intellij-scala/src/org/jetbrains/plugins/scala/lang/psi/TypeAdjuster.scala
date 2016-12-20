@@ -152,9 +152,10 @@ object TypeAdjuster extends ApplicationAdapter {
                 .copy(origTypeElem = info.origTypeElem))
           } else
             Some(
-              CompoundInfo(info.origTypeElem,
-                           newTypeEl,
-                           subTypeElems.map(ReplacementInfo.initial)))
+              CompoundInfo(
+                info.origTypeElem,
+                newTypeEl,
+                subTypeElems.map(ReplacementInfo.initial)))
         } else None
       }
     }
@@ -269,8 +270,9 @@ object TypeAdjuster extends ApplicationAdapter {
 
   private def replaceAndAddImports(rInfos: Seq[ReplacementInfo],
                                    addImports: Boolean): Unit = {
-    assert(rInfos.forall(_.origTypeElem.isValid),
-           "Psi shouldn't be modified before this stage!")
+    assert(
+      rInfos.forall(_.origTypeElem.isValid),
+      "Psi shouldn't be modified before this stage!")
 
     val replacementsWithSameResolve =
       rInfos.filter(_.checkReplacementResolve).toSet
@@ -369,9 +371,10 @@ object TypeAdjuster extends ApplicationAdapter {
         case s: ScSimpleTypeElement if s.singleton => s"$newText.type"
         case _ => newText
       }
-      val withoutImport = copy(replacement = replacementText,
-                               resolve = Some(target),
-                               pathsToImport = Seq.empty)
+      val withoutImport = copy(
+        replacement = replacementText,
+        resolve = Some(target),
+        pathsToImport = Seq.empty)
 
       if (withoutImport.checkReplacementResolve) withoutImport
       else withoutImport.copy(pathsToImport = pathToImport.toSeq)

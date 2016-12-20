@@ -31,13 +31,14 @@ trait JavaHelpers {
   def cookiesToScalaCookies(
       cookies: java.lang.Iterable[play.mvc.Http.Cookie]): Seq[Cookie] = {
     cookies.asScala.toSeq map { c =>
-      Cookie(c.name,
-             c.value,
-             if (c.maxAge == null) None else Some(c.maxAge),
-             c.path,
-             Option(c.domain),
-             c.secure,
-             c.httpOnly)
+      Cookie(
+        c.name,
+        c.value,
+        if (c.maxAge == null) None else Some(c.maxAge),
+        c.path,
+        Option(c.domain),
+        c.secure,
+        c.httpOnly)
     }
   }
 
@@ -48,13 +49,14 @@ trait JavaHelpers {
       }
 
       private def makeJavaCookie(cookie: Cookie): JCookie = {
-        new JCookie(cookie.name,
-                    cookie.value,
-                    cookie.maxAge.map(i => new Integer(i)).orNull,
-                    cookie.path,
-                    cookie.domain.orNull,
-                    cookie.secure,
-                    cookie.httpOnly)
+        new JCookie(
+          cookie.name,
+          cookie.value,
+          cookie.maxAge.map(i => new Integer(i)).orNull,
+          cookie.path,
+          cookie.domain.orNull,
+          cookie.secure,
+          cookie.httpOnly)
       }
 
       def iterator: java.util.Iterator[JCookie] = {
@@ -110,12 +112,13 @@ trait JavaHelpers {
     * @param req
     */
   def createJavaContext(req: Request[RequestBody]): JContext = {
-    new JContext(req.id,
-                 req,
-                 new JRequestImpl(req),
-                 req.session.data.asJava,
-                 req.flash.data.asJava,
-                 req.tags.mapValues(_.asInstanceOf[AnyRef]).asJava)
+    new JContext(
+      req.id,
+      req,
+      new JRequestImpl(req),
+      req.session.data.asJava,
+      req.flash.data.asJava,
+      req.tags.mapValues(_.asInstanceOf[AnyRef]).asJava)
   }
 
   /**

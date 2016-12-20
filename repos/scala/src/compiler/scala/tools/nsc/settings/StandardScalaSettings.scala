@@ -23,25 +23,30 @@ trait StandardScalaSettings { self: AbsScalaSettings =>
     Defaults.scalaBootClassPath)
   val classpath: PathSetting // is mutated directly in various places (thus inspiring this very effort)
   val d: OutputSetting // depends on mutable OutputDirs class
-  val extdirs = PathSetting("-extdirs",
-                            "Override location of installed extensions.",
-                            Defaults.scalaExtDirs)
-  val javabootclasspath = PathSetting("-javabootclasspath",
-                                      "Override java boot classpath.",
-                                      Defaults.javaBootClassPath)
-  val javaextdirs = PathSetting("-javaextdirs",
-                                "Override java extdirs classpath.",
-                                Defaults.javaExtDirs)
-  val sourcepath = PathSetting("-sourcepath",
-                               "Specify location(s) of source files.",
-                               "") // Defaults.scalaSourcePath
+  val extdirs = PathSetting(
+    "-extdirs",
+    "Override location of installed extensions.",
+    Defaults.scalaExtDirs)
+  val javabootclasspath = PathSetting(
+    "-javabootclasspath",
+    "Override java boot classpath.",
+    Defaults.javaBootClassPath)
+  val javaextdirs = PathSetting(
+    "-javaextdirs",
+    "Override java extdirs classpath.",
+    Defaults.javaExtDirs)
+  val sourcepath = PathSetting(
+    "-sourcepath",
+    "Specify location(s) of source files.",
+    "") // Defaults.scalaSourcePath
 
   /** Other settings.
     */
-  val dependencyfile = StringSetting("-dependencyfile",
-                                     "file",
-                                     "Set dependency tracking file.",
-                                     ".scala_dependencies")
+  val dependencyfile = StringSetting(
+    "-dependencyfile",
+    "file",
+    "Set dependency tracking file.",
+    ".scala_dependencies")
   val deprecation = BooleanSetting(
     "-deprecation",
     "Emit warning and location for usages of deprecated APIs.")
@@ -55,11 +60,12 @@ trait StandardScalaSettings { self: AbsScalaSettings =>
   val feature = BooleanSetting(
     "-feature",
     "Emit warning and location for usages of features that should be imported explicitly.")
-  val g = ChoiceSetting("-g",
-                        "level",
-                        "Set level of generated debugging info.",
-                        List("none", "source", "line", "vars", "notailcalls"),
-                        "vars")
+  val g = ChoiceSetting(
+    "-g",
+    "level",
+    "Set level of generated debugging info.",
+    List("none", "source", "line", "vars", "notailcalls"),
+    "vars")
   val help = BooleanSetting("-help", "Print a synopsis of standard options")
   val nowarn = BooleanSetting("-nowarn", "Generate no warnings.")
   val optimise: BooleanSetting // depends on post hook which mutates other settings

@@ -106,10 +106,12 @@ class ScalatraFilterTest extends ScalatraFunSuite {
   override def skipDefaultServlet = true
   addServlet(classOf[ScalatraFilterTestPathMappedServlet], "/path-mapped/*")
   addServlet(classOf[ScalatraFilterTestExtensionMappedServlet], "*.do")
-  addServlet(classOf[ScalatraFilterTestExactMatchServlet],
-             "/exact-match/filtered")
-  addServlet(classOf[ScalatraFilterTestExactMatchServlet],
-             "/exact-match/unfiltered")
+  addServlet(
+    classOf[ScalatraFilterTestExactMatchServlet],
+    "/exact-match/filtered")
+  addServlet(
+    classOf[ScalatraFilterTestExactMatchServlet],
+    "/exact-match/unfiltered")
   addServlet(classOf[ScalatraFilterTestDefaultServlet], "/")
 
   test("should filter matching request to path-mapped servlet") {

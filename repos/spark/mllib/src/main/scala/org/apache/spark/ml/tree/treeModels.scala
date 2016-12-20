@@ -134,14 +134,16 @@ private[ml] object DecisionTreeModelReadWrite {
 
     def getSplit: Split = {
       if (numCategories != -1) {
-        new CategoricalSplit(featureIndex,
-                             leftCategoriesOrThreshold,
-                             numCategories)
+        new CategoricalSplit(
+          featureIndex,
+          leftCategoriesOrThreshold,
+          numCategories)
       } else {
-        assert(leftCategoriesOrThreshold.length == 1,
-               s"DecisionTree split data expected" +
-                 s" 1 threshold for ContinuousSplit, but found thresholds: " +
-                 leftCategoriesOrThreshold.mkString(", "))
+        assert(
+          leftCategoriesOrThreshold.length == 1,
+          s"DecisionTree split data expected" +
+            s" 1 threshold for ContinuousSplit, but found thresholds: " +
+            leftCategoriesOrThreshold.mkString(", "))
         new ContinuousSplit(featureIndex, leftCategoriesOrThreshold(0))
       }
     }
@@ -189,25 +191,27 @@ private[ml] object DecisionTreeModelReadWrite {
       case n: InternalNode =>
         val (leftNodeData, leftIdx) = build(n.leftChild, id + 1)
         val (rightNodeData, rightIdx) = build(n.rightChild, leftIdx + 1)
-        val thisNodeData = NodeData(id,
-                                    n.prediction,
-                                    n.impurity,
-                                    n.impurityStats.stats,
-                                    n.gain,
-                                    leftNodeData.head.id,
-                                    rightNodeData.head.id,
-                                    SplitData(n.split))
+        val thisNodeData = NodeData(
+          id,
+          n.prediction,
+          n.impurity,
+          n.impurityStats.stats,
+          n.gain,
+          leftNodeData.head.id,
+          rightNodeData.head.id,
+          SplitData(n.split))
         (thisNodeData +: (leftNodeData ++ rightNodeData), rightIdx)
       case _: LeafNode =>
         (Seq(
-           NodeData(id,
-                    node.prediction,
-                    node.impurity,
-                    node.impurityStats.stats,
-                    -1.0,
-                    -1,
-                    -1,
-                    SplitData(-1, Array.empty[Double], -1))),
+           NodeData(
+             id,
+             node.prediction,
+             node.impurity,
+             node.impurityStats.stats,
+             -1.0,
+             -1,
+             -1,
+             SplitData(-1, Array.empty[Double], -1))),
          id)
     }
   }
@@ -230,12 +234,14 @@ private[ml] object DecisionTreeModelReadWrite {
     // Load all nodes, sorted by ID.
     val nodes: Array[NodeData] = data.collect().sortBy(_.id)
     // Sanity checks; could remove
-    assert(nodes.head.id == 0,
-           s"Decision Tree load failed.  Expected smallest node ID to be 0," +
-             s" but found ${nodes.head.id}")
-    assert(nodes.last.id == nodes.length - 1,
-           s"Decision Tree load failed.  Expected largest" +
-             s" node ID to be ${nodes.length - 1}, but found ${nodes.last.id}")
+    assert(
+      nodes.head.id == 0,
+      s"Decision Tree load failed.  Expected smallest node ID to be 0," +
+        s" but found ${nodes.head.id}")
+    assert(
+      nodes.last.id == nodes.length - 1,
+      s"Decision Tree load failed.  Expected largest" +
+        s" node ID to be ${nodes.length - 1}, but found ${nodes.last.id}")
     // We fill `finalNodes` in reverse order.  Since node IDs are assigned via a pre-order
     // traversal, this guarantees that child nodes will be built before parent nodes.
     val finalNodes = new Array[Node](nodes.length)
@@ -247,13 +253,14 @@ private[ml] object DecisionTreeModelReadWrite {
           if (n.leftChild != -1) {
             val leftChild = finalNodes(n.leftChild)
             val rightChild = finalNodes(n.rightChild)
-            new InternalNode(n.prediction,
-                             n.impurity,
-                             n.gain,
-                             leftChild,
-                             rightChild,
-                             n.split.getSplit,
-                             impurityStats)
+            new InternalNode(
+              n.prediction,
+              n.impurity,
+              n.gain,
+              leftChild,
+              rightChild,
+              n.split.getSplit,
+              impurityStats)
           } else {
             new LeafNode(n.prediction, n.impurity, impurityStats)
           }

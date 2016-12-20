@@ -47,10 +47,11 @@ private[feature] trait CountVectorizerParams
     * Default: 2^18^
     * @group param
     */
-  val vocabSize: IntParam = new IntParam(this,
-                                         "vocabSize",
-                                         "max size of the vocabulary",
-                                         ParamValidators.gt(0))
+  val vocabSize: IntParam = new IntParam(
+    this,
+    "vocabSize",
+    "max size of the vocabulary",
+    ParamValidators.gt(0))
 
   /** @group getParam */
   def getVocabSize: Int = $(vocabSize)
@@ -189,8 +190,9 @@ class CountVectorizer(override val uid: String)
       tmpSortedWC.map(_._1)
     }
 
-    require(vocab.length > 0,
-            "The vocabulary size should be > 0. Lower minDF as necessary.")
+    require(
+      vocab.length > 0,
+      "The vocabulary size should be > 0. Lower minDF as necessary.")
     copyValues(new CountVectorizerModel(uid, vocab).setParent(this))
   }
 

@@ -167,12 +167,13 @@ final class FishnetApi(
                                     skill: String): Fu[Client] =
     Client.Skill.byKey(skill).fold(fufail[Client](s"Invalid skill $skill")) {
       sk =>
-        val client = Client(_id = Client.makeKey,
-                            userId = userId,
-                            skill = sk,
-                            instance = None,
-                            enabled = true,
-                            createdAt = DateTime.now)
+        val client = Client(
+          _id = Client.makeKey,
+          userId = userId,
+          skill = sk,
+          instance = None,
+          enabled = true,
+          createdAt = DateTime.now)
         repo addClient client inject client
     }
 

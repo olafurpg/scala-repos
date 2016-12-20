@@ -300,9 +300,10 @@ trait AtLeastOnceDeliveryLike extends Eventsourced {
           send(deliveryId, delivery, now)
 
           if (delivery.attempt == warnAfterNumberOfUnconfirmedAttempts)
-            warnings :+= UnconfirmedDelivery(deliveryId,
-                                             delivery.destination,
-                                             delivery.message)
+            warnings :+= UnconfirmedDelivery(
+              deliveryId,
+              delivery.destination,
+              delivery.message)
       }
 
     if (warnings.nonEmpty) self ! UnconfirmedWarning(warnings)

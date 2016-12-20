@@ -264,8 +264,9 @@ object ByteString {
     def apply(bs1: ByteStrings, bs2: ByteStrings): ByteString =
       compare(bs1, bs2) match {
         case 3 ⇒
-          new ByteStrings(bs1.bytestrings ++ bs2.bytestrings,
-                          bs1.length + bs2.length)
+          new ByteStrings(
+            bs1.bytestrings ++ bs2.bytestrings,
+            bs1.length + bs2.length)
         case 2 ⇒ bs2
         case 1 ⇒ bs1
         case 0 ⇒ ByteString.empty

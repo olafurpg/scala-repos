@@ -46,9 +46,10 @@ trait AssignmentAnnotator {
                         val (expectedText, actualText) =
                           ScTypePresentation.different(lType, rType)
                         val message =
-                          ScalaBundle.message("type.mismatch.expected.actual",
-                                              expectedText,
-                                              actualText)
+                          ScalaBundle.message(
+                            "type.mismatch.expected.actual",
+                            expectedText,
+                            actualText)
                         val annotation =
                           holder.createErrorAnnotation(expression, message)
                         annotation.registerFix(ReportHighlightingErrorQuickFix)

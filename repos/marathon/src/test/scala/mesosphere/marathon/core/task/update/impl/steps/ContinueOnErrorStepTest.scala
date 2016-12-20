@@ -61,12 +61,13 @@ class ContinueOnErrorStepTest
 
   test("A failing step should log the error but proceed") {
     def processUpdate(step: TaskStatusUpdateStep): Future[_] = {
-      step.processUpdate(timestamp,
-                         task = dummyTask,
-                         mesosStatus = TaskStatus
-                           .newBuilder()
-                           .setTaskId(TaskID.newBuilder().setValue("task"))
-                           .buildPartial())
+      step.processUpdate(
+        timestamp,
+        task = dummyTask,
+        mesosStatus = TaskStatus
+          .newBuilder()
+          .setTaskId(TaskID.newBuilder().setValue("task"))
+          .buildPartial())
     }
 
     Given("a nested step that is always successful")

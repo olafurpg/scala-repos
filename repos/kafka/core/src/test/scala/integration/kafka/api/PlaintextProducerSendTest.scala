@@ -55,9 +55,10 @@ class PlaintextProducerSendTest extends BaseProducerSendTest {
       brokerList: String): KafkaProducer[Array[Byte], Array[Byte]] = {
     val producerProps = new Properties()
     producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList)
-    return new KafkaProducer[Array[Byte], Array[Byte]](producerProps,
-                                                       new ByteArraySerializer,
-                                                       new ByteArraySerializer)
+    return new KafkaProducer[Array[Byte], Array[Byte]](
+      producerProps,
+      new ByteArraySerializer,
+      new ByteArraySerializer)
   }
 
   @Test
@@ -81,10 +82,12 @@ class PlaintextProducerSendTest extends BaseProducerSendTest {
       brokerList: String): KafkaProducer[Array[Byte], Array[Byte]] = {
     val producerProps = new Properties()
     producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList)
-    producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-                      "org.apache.kafka.common.serialization.StringSerializer")
-    producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-                      "org.apache.kafka.common.serialization.StringSerializer")
+    producerProps.put(
+      ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+      "org.apache.kafka.common.serialization.StringSerializer")
+    producerProps.put(
+      ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+      "org.apache.kafka.common.serialization.StringSerializer")
     return new KafkaProducer[Array[Byte], Array[Byte]](producerProps)
   }
 }

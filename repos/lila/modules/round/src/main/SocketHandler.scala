@@ -139,12 +139,13 @@ private[round] final class SocketHandler(roundMap: ActorRef,
                    user: Option[User],
                    ip: String,
                    userTv: Option[String]): Fu[JsSocketHandler] = {
-    val join = Join(uid = uid,
-                    user = user,
-                    color = pov.color,
-                    playerId = playerId,
-                    ip = ip,
-                    userTv = userTv)
+    val join = Join(
+      uid = uid,
+      user = user,
+      color = pov.color,
+      playerId = playerId,
+      ip = ip,
+      userTv = userTv)
     socketHub ? Get(pov.gameId) mapTo manifest[ActorRef] flatMap { socket =>
       Handler(hub, socket, uid, join, user map (_.id)) {
         case Connected(enum, member) =>

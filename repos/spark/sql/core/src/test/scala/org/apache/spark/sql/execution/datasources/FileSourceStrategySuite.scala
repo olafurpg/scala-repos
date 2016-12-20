@@ -49,16 +49,17 @@ class FileSourceStrategySuite
 
   test("unpartitioned table, single partition") {
     val table = createTable(
-      files = Seq("file1" -> 1,
-                  "file2" -> 1,
-                  "file3" -> 1,
-                  "file4" -> 1,
-                  "file5" -> 1,
-                  "file6" -> 1,
-                  "file7" -> 1,
-                  "file8" -> 1,
-                  "file9" -> 1,
-                  "file10" -> 1))
+      files = Seq(
+        "file1" -> 1,
+        "file2" -> 1,
+        "file3" -> 1,
+        "file4" -> 1,
+        "file5" -> 1,
+        "file6" -> 1,
+        "file7" -> 1,
+        "file8" -> 1,
+        "file9" -> 1,
+        "file10" -> 1))
 
     checkScan(table.select('c1)) { partitions =>
       // 10 one byte files should fit in a single partition with 10 files.
@@ -134,10 +135,12 @@ class FileSourceStrategySuite
     checkScan(table.where("p1 = 1 AND c1 = 1 AND (p1 + c1) = 1")) {
       partitions =>
         assert(partitions.size == 1, "when checking partitions")
-        assert(partitions.head.files.size == 1,
-               "when checking files in partition 1")
-        assert(partitions.head.files.head.partitionValues.getInt(0) == 1,
-               "when checking partition values")
+        assert(
+          partitions.head.files.size == 1,
+          "when checking files in partition 1")
+        assert(
+          partitions.head.files.head.partitionValues.getInt(0) == 1,
+          "when checking partition values")
     }
     // Only the filters that do not contain the partition column should be pushed down
     checkDataFilters(Set(IsNotNull("c1"), EqualTo("c1", 1)))
@@ -157,14 +160,16 @@ class FileSourceStrategySuite
   }
 
   test("bucketed table") {
-    val table = createTable(files = Seq("p1=1/file1_0000" -> 1,
-                                        "p1=1/file2_0000" -> 1,
-                                        "p1=1/file3_0002" -> 1,
-                                        "p1=2/file4_0002" -> 1,
-                                        "p1=2/file5_0000" -> 1,
-                                        "p1=2/file6_0000" -> 1,
-                                        "p1=2/file7_0000" -> 1),
-                            buckets = 3)
+    val table = createTable(
+      files = Seq(
+        "p1=1/file1_0000" -> 1,
+        "p1=1/file2_0000" -> 1,
+        "p1=1/file3_0002" -> 1,
+        "p1=2/file4_0002" -> 1,
+        "p1=2/file5_0000" -> 1,
+        "p1=2/file6_0000" -> 1,
+        "p1=2/file7_0000" -> 1),
+      buckets = 3)
 
     // No partition pruning
     checkScan(table) { partitions =>

@@ -21,23 +21,26 @@ class FlatClassPathResolverTest {
 
   val tempDir = new TemporaryFolder()
 
-  private val packagesToTest = List(FlatClassPath.RootPackage,
-                                    "scala",
-                                    "scala.reflect",
-                                    "scala.reflect.io")
-  private val classFilesToFind = List("scala.tools.util.FlatClassPathResolver",
-                                      "scala.reflect.io.AbstractFile",
-                                      "scala.collection.immutable.List",
-                                      "scala.Option",
-                                      "scala.collection.immutable.Vector",
-                                      "scala.util.hashing.MurmurHash3",
-                                      "java.lang.Object",
-                                      "java.util.Date")
+  private val packagesToTest = List(
+    FlatClassPath.RootPackage,
+    "scala",
+    "scala.reflect",
+    "scala.reflect.io")
+  private val classFilesToFind = List(
+    "scala.tools.util.FlatClassPathResolver",
+    "scala.reflect.io.AbstractFile",
+    "scala.collection.immutable.List",
+    "scala.Option",
+    "scala.collection.immutable.Vector",
+    "scala.util.hashing.MurmurHash3",
+    "java.lang.Object",
+    "java.util.Date")
 
   private val classesToFind =
-    classFilesToFind ++ List("TestSourceInRootPackage",
-                             "scala.reflect.io.TestScalaSource",
-                             "scala.reflect.io.TestJavaSource")
+    classFilesToFind ++ List(
+      "TestSourceInRootPackage",
+      "scala.reflect.io.TestScalaSource",
+      "scala.reflect.io.TestJavaSource")
 
   private val settings = new Settings
 
@@ -177,8 +180,9 @@ class FlatClassPathResolverTest {
   def testFindClassFile: Unit = {
     val classPath = createFlatClassPath(settings)
     classFilesToFind foreach { className =>
-      assertTrue(s"File for $className should be found",
-                 classPath.findClassFile(className).isDefined)
+      assertTrue(
+        s"File for $className should be found",
+        classPath.findClassFile(className).isDefined)
     }
   }
 
@@ -186,8 +190,9 @@ class FlatClassPathResolverTest {
   def testFindClass: Unit = {
     val classPath = createFlatClassPath(settings)
     classesToFind foreach { className =>
-      assertTrue(s"File for $className should be found",
-                 classPath.findClass(className).isDefined)
+      assertTrue(
+        s"File for $className should be found",
+        classPath.findClass(className).isDefined)
     }
   }
 }

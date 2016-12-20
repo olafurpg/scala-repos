@@ -215,12 +215,12 @@ final class DataFrameWriter private[sql] (df: DataFrame) {
     */
   def save(): Unit = {
     assertNotBucketed()
-    val dataSource = DataSource(df.sqlContext,
-                                className = source,
-                                partitionColumns =
-                                  partitioningColumns.getOrElse(Nil),
-                                bucketSpec = getBucketSpec,
-                                options = extraOptions.toMap)
+    val dataSource = DataSource(
+      df.sqlContext,
+      className = source,
+      partitionColumns = partitioningColumns.getOrElse(Nil),
+      bucketSpec = getBucketSpec,
+      options = extraOptions.toMap)
 
     dataSource.write(mode, df)
   }
@@ -255,11 +255,11 @@ final class DataFrameWriter private[sql] (df: DataFrame) {
     * @since 2.0.0
     */
   def startStream(): ContinuousQuery = {
-    val dataSource = DataSource(df.sqlContext,
-                                className = source,
-                                options = extraOptions.toMap,
-                                partitionColumns =
-                                  normalizedParCols.getOrElse(Nil))
+    val dataSource = DataSource(
+      df.sqlContext,
+      className = source,
+      options = extraOptions.toMap,
+      partitionColumns = normalizedParCols.getOrElse(Nil))
 
     df.sqlContext.sessionState.continuousQueryManager.startQuery(
       extraOptions.getOrElse("queryName", StreamExecution.nextName),
@@ -327,15 +327,17 @@ final class DataFrameWriter private[sql] (df: DataFrame) {
 
   private def getBucketSpec: Option[BucketSpec] = {
     if (sortColumnNames.isDefined) {
-      require(numBuckets.isDefined,
-              "sortBy must be used together with bucketBy")
+      require(
+        numBuckets.isDefined,
+        "sortBy must be used together with bucketBy")
     }
 
     for {
       n <- numBuckets
     } yield {
-      require(n > 0 && n < 100000,
-              "Bucket number must be greater than 0 and less than 100000.")
+      require(
+        n > 0 && n < 100000,
+        "Bucket number must be greater than 0 and less than 100000.")
 
       // partitionBy columns cannot be used in bucketBy
       if (normalizedParCols.nonEmpty && normalizedBucketColNames.get.toSet
@@ -346,9 +348,10 @@ final class DataFrameWriter private[sql] (df: DataFrame) {
             s"partitionBy columns '${partitioningColumns.get.mkString(", ")}'")
       }
 
-      BucketSpec(n,
-                 normalizedBucketColNames.get,
-                 normalizedSortColNames.getOrElse(Nil))
+      BucketSpec(
+        n,
+        normalizedBucketColNames.get,
+        normalizedSortColNames.getOrElse(Nil))
     }
   }
 

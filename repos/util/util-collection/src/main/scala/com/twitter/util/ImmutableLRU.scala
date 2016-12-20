@@ -11,10 +11,11 @@ object ImmutableLRU {
     * Build an immutable LRU key/value store that cannot grow larger than `maxSize`
     */
   def apply[K, V](maxSize: Int): ImmutableLRU[K, V] = {
-    new ImmutableLRU(maxSize,
-                     0,
-                     Map.empty[K, (Long, V)],
-                     SortedMap.empty[Long, K])
+    new ImmutableLRU(
+      maxSize,
+      0,
+      Map.empty[K, (Long, V)],
+      SortedMap.empty[Long, K])
   }
 }
 

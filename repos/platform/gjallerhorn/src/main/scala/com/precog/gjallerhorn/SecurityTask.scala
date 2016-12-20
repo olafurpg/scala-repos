@@ -124,10 +124,11 @@ class SecurityTask(settings: Settings)
       val g =
         createGrant(apiKey, ("read", subPath, accountId :: Nil) :: Nil).jvalue
 
-      val p = JObject("schemaVersion" -> JString("1.0"),
-                      "path" -> JString(rootPath + "qux/"),
-                      "accessType" -> JString("read"),
-                      "ownerAccountIds" -> JArray(JString(accountId) :: Nil))
+      val p = JObject(
+        "schemaVersion" -> JString("1.0"),
+        "path" -> JString(rootPath + "qux/"),
+        "accessType" -> JString("read"),
+        "ownerAccountIds" -> JArray(JString(accountId) :: Nil))
 
       val grantId = (g \ "grantId").deserialize[String]
       (g \ "permissions") must_== JArray(p :: Nil)
@@ -207,9 +208,10 @@ class SecurityTask(settings: Settings)
 
       val p2 = p + text(4) + "/"
       val child =
-        createChildGrant(apiKey2,
-                         grantId,
-                         ("read", p2, accountId1 :: Nil) :: Nil).jvalue
+        createChildGrant(
+          apiKey2,
+          grantId,
+          ("read", p2, accountId1 :: Nil) :: Nil).jvalue
       val childId = (child \ "grantId").deserialize[String]
 
       describeGrant(apiKey1, childId).jvalue must_== child
@@ -225,9 +227,10 @@ class SecurityTask(settings: Settings)
       val grantId = (g \ "grantId").deserialize[String]
 
       val p2 = p + text(4) + "/"
-      createChildGrant(apiKey2,
-                       grantId,
-                       ("read", p2, accountId1 :: Nil) :: Nil) must beLike {
+      createChildGrant(
+        apiKey2,
+        grantId,
+        ("read", p2, accountId1 :: Nil) :: Nil) must beLike {
         case ApiFailure(
             400,
             "{\"error\":\"Requestor lacks permissions to create grant.\"}") =>
@@ -246,9 +249,10 @@ class SecurityTask(settings: Settings)
       addToGrant(apiKey2, apiKey1, grantId).complete()
 
       val p2 = p + text(4) + "/"
-      createChildGrant(apiKey2,
-                       grantId,
-                       ("read", p2, accountId2 :: Nil) :: Nil) must beLike {
+      createChildGrant(
+        apiKey2,
+        grantId,
+        ("read", p2, accountId2 :: Nil) :: Nil) must beLike {
         case ApiFailure(
             400,
             "{\"error\":\"Requestor lacks permissions to create grant.\"}") =>

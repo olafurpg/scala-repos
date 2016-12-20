@@ -46,19 +46,22 @@ trait TypeInferencer extends DAG {
                            spec: BucketSpec): Map[DepGraph, Set[JType]] =
         spec match {
           case UnionBucketSpec(left, right) =>
-            collectSpecTypes(collectSpecTypes(typing, splits, left),
-                             splits,
-                             right)
+            collectSpecTypes(
+              collectSpecTypes(typing, splits, left),
+              splits,
+              right)
 
           case IntersectBucketSpec(left, right) =>
-            collectSpecTypes(collectSpecTypes(typing, splits, left),
-                             splits,
-                             right)
+            collectSpecTypes(
+              collectSpecTypes(typing, splits, left),
+              splits,
+              right)
 
           case Group(id, target, child) =>
-            collectSpecTypes(inner(None, typing, splits, target),
-                             splits,
-                             child)
+            collectSpecTypes(
+              inner(None, typing, splits, target),
+              splits,
+              child)
 
           case UnfixedSolution(id, target) =>
             inner(Some(universe), typing, splits, target)
@@ -110,10 +113,11 @@ trait TypeInferencer extends DAG {
             inner(Some(m.tpe.arg), typing, splits, parent)
 
           case Morph2(m, left, right) =>
-            inner(Some(m.tpe.arg1),
-                  inner(Some(m.tpe.arg0), typing, splits, left),
-                  splits,
-                  right)
+            inner(
+              Some(m.tpe.arg1),
+              inner(Some(m.tpe.arg0), typing, splits, left),
+              splits,
+              right)
 
           case Join(DerefObject, Cross(_), left, right @ ConstString(str)) =>
             inner(jtpe map { jtpe0 =>
@@ -144,17 +148,19 @@ trait TypeInferencer extends DAG {
                 case _ => Some(JArrayUnfixedT)
               }
 
-            inner(Some(JNumberT),
-                  inner(jtpe2, typing, splits, left),
-                  splits,
-                  right)
+            inner(
+              Some(JNumberT),
+              inner(jtpe2, typing, splits, left),
+              splits,
+              right)
           }
 
           case Join(op: BinaryOperation, _, left, right) =>
-            inner(Some(op.tpe.arg1),
-                  inner(Some(op.tpe.arg0), typing, splits, left),
-                  splits,
-                  right)
+            inner(
+              Some(op.tpe.arg1),
+              inner(Some(op.tpe.arg0), typing, splits, left),
+              splits,
+              right)
 
           case Assert(pred, child) =>
             inner(jtpe, inner(jtpe, typing, splits, pred), splits, child)
@@ -172,10 +178,11 @@ trait TypeInferencer extends DAG {
             inner(jtpe, inner(jtpe, typing, splits, left), splits, right)
 
           case Filter(_, target, boolean) =>
-            inner(Some(JBooleanT),
-                  inner(jtpe, typing, splits, target),
-                  splits,
-                  boolean)
+            inner(
+              Some(JBooleanT),
+              inner(jtpe, typing, splits, target),
+              splits,
+              boolean)
 
           case AddSortKey(parent, _, _, _) =>
             inner(jtpe, typing, splits, parent)
@@ -185,10 +192,11 @@ trait TypeInferencer extends DAG {
           case Distinct(parent) => inner(jtpe, typing, splits, parent)
 
           case s @ Split(spec, child, id) =>
-            inner(jtpe,
-                  collectSpecTypes(typing, splits, spec),
-                  splits + (id -> s),
-                  child)
+            inner(
+              jtpe,
+              collectSpecTypes(typing, splits, spec),
+              splits + (id -> s),
+              child)
 
           // not using extractors due to bug
           case s: SplitGroup => {

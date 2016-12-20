@@ -23,10 +23,12 @@ class FlagsTest {
     })(body)
 
   def testTimedFlag(flag: Long, test: Symbol => Boolean, enabling: Boolean) = {
-    assertEquals(withFlagMask(InitialFlags)(test(sym.setFlag(flag))),
-                 !enabling)
-    assertEquals(withFlagMask(InitialFlags | flag)(test(sym.setFlag(flag))),
-                 enabling)
+    assertEquals(
+      withFlagMask(InitialFlags)(test(sym.setFlag(flag))),
+      !enabling)
+    assertEquals(
+      withFlagMask(InitialFlags | flag)(test(sym.setFlag(flag))),
+      enabling)
   }
 
   def testLate(flag: Long, test: Symbol => Boolean) =
@@ -47,12 +49,14 @@ class FlagsTest {
     assertFalse(
       withFlagMask(AllFlags)(sym.setFlag(PRIVATE | notPRIVATE).isPrivate))
 
-    assertEquals(withFlagMask(InitialFlags)(
-                   sym.setFlag(PRIVATE | notPRIVATE).flags & PRIVATE),
-                 PRIVATE)
-    assertEquals(withFlagMask(AllFlags)(
-                   sym.setFlag(PRIVATE | notPRIVATE).flags & PRIVATE),
-                 0)
+    assertEquals(
+      withFlagMask(InitialFlags)(
+        sym.setFlag(PRIVATE | notPRIVATE).flags & PRIVATE),
+      PRIVATE)
+    assertEquals(
+      withFlagMask(AllFlags)(
+        sym.setFlag(PRIVATE | notPRIVATE).flags & PRIVATE),
+      0)
   }
 
   @Test
@@ -98,13 +102,16 @@ class FlagsTest {
     val lateFlags = lateable << LateShift
     val allButLateable = AllFlags & ~lateable
 
-    assertEquals(withFlagMask(AllFlags)(sym.setFlag(AllFlags).flags),
-                 allButNegatable)
-    assertEquals(withFlagMask(AllFlags)(sym.setFlag(allButLateable).flags),
-                 allButNegatable)
+    assertEquals(
+      withFlagMask(AllFlags)(sym.setFlag(AllFlags).flags),
+      allButNegatable)
+    assertEquals(
+      withFlagMask(AllFlags)(sym.setFlag(allButLateable).flags),
+      allButNegatable)
 
-    assertEquals(withFlagMask(AllFlags)(sym.setFlag(lateFlags).flags),
-                 lateFlags | lateable)
+    assertEquals(
+      withFlagMask(AllFlags)(sym.setFlag(lateFlags).flags),
+      lateFlags | lateable)
   }
 
   @Test

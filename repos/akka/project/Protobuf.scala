@@ -11,8 +11,9 @@ import com.typesafe.sbt.preprocess.Preprocess._
 import java.io.File
 
 object Protobuf {
-  val paths = SettingKey[Seq[File]]("protobuf-paths",
-                                    "The paths that contain *.proto files.")
+  val paths = SettingKey[Seq[File]](
+    "protobuf-paths",
+    "The paths that contain *.proto files.")
   val outputPaths = SettingKey[Seq[File]](
     "protobuf-output-paths",
     "The paths where to save the generated *.java files.")
@@ -27,10 +28,12 @@ object Protobuf {
     "Compile the protobuf sources and do all processing.")
 
   lazy val settings: Seq[Setting[_]] = Seq(
-    paths := Seq((sourceDirectory in Compile).value,
-                 (sourceDirectory in Test).value).map(_ / "protobuf"),
-    outputPaths := Seq((sourceDirectory in Compile).value,
-                       (sourceDirectory in Test).value).map(_ / "java"),
+    paths := Seq(
+      (sourceDirectory in Compile).value,
+      (sourceDirectory in Test).value).map(_ / "protobuf"),
+    outputPaths := Seq(
+      (sourceDirectory in Compile).value,
+      (sourceDirectory in Test).value).map(_ / "java"),
     protoc := "protoc",
     protocVersion := "2.5.0",
     generate := {
@@ -122,8 +125,9 @@ object Protobuf {
 
         val exitCode = callProtoc(
           protoc,
-          Seq("-I" + srcDir.absolutePath,
-              "--java_out=%s" format targetDir.absolutePath) ++ protoFiles.map(
+          Seq(
+            "-I" + srcDir.absolutePath,
+            "--java_out=%s" format targetDir.absolutePath) ++ protoFiles.map(
             _.absolutePath),
           log, { (p, l) =>
             p ! l

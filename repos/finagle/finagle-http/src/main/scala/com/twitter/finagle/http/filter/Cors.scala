@@ -118,8 +118,9 @@ object Cors {
       */
     protected[this] def addExposedHeaders(response: Response): Response = {
       if (policy.exposedHeaders.nonEmpty) {
-        response.headers.add("Access-Control-Expose-Headers",
-                             policy.exposedHeaders.mkString(", "))
+        response.headers.add(
+          "Access-Control-Expose-Headers",
+          policy.exposedHeaders.mkString(", "))
       }
       response
     }

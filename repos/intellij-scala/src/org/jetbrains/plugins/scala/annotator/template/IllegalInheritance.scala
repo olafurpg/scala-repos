@@ -30,9 +30,9 @@ object IllegalInheritance extends AnnotatorPart[ScTemplateDefinition] {
           case (refElement, Some((SelfType(Some(aType)), subst))) =>
             val anotherType = subst.subst(aType)
             if (!ownType.conforms(anotherType))
-              holder.createErrorAnnotation(refElement,
-                                           Message(ownType.presentableText,
-                                                   aType.presentableText))
+              holder.createErrorAnnotation(
+                refElement,
+                Message(ownType.presentableText, aType.presentableText))
           case _ =>
         }
       }

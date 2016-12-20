@@ -144,8 +144,9 @@ object ScalaRenameUtil {
             }
             val (usagesEncoded, usagesPlain) =
               usagez.partition(needEncodedName)
-            Seq(UsagesWithName(encodedName, usagesEncoded),
-                UsagesWithName(name, usagesPlain))
+            Seq(
+              UsagesWithName(encodedName, usagesEncoded),
+              UsagesWithName(name, usagesPlain))
           }
         }
     }
@@ -158,8 +159,9 @@ object ScalaRenameUtil {
             !u.getReference.isInstanceOf[ResolvableReferenceElement]
           }
           val (usagesWithDS, usagesPlain) = usagez.partition(needDollarSign)
-          Seq(UsagesWithName(name + "$", usagesWithDS),
-              UsagesWithName(name, usagesPlain))
+          Seq(
+            UsagesWithName(name + "$", usagesWithDS),
+            UsagesWithName(name, usagesPlain))
         }
     }
 
@@ -193,10 +195,11 @@ object ScalaRenameUtil {
       case _ =>
     }
     //to guarantee correct name of namedElement itself
-    RenameUtil.doRenameGenericNamedElement(namedElement,
-                                           newName,
-                                           Array.empty[UsageInfo],
-                                           listener)
+    RenameUtil.doRenameGenericNamedElement(
+      namedElement,
+      newName,
+      Array.empty[UsageInfo],
+      listener)
   }
 
   def setterSuffix(name: String) = {

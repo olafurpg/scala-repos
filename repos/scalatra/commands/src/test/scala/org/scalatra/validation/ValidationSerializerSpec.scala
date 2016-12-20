@@ -13,9 +13,10 @@ class ValidationSerializerSpec extends Specification {
 
   "A validation error serializer" should {
     "serialize a validation error" in {
-      val err = ValidationError("the error message",
-                                FieldName("a_field"),
-                                org.scalatra.validation.NotFound)
+      val err = ValidationError(
+        "the error message",
+        FieldName("a_field"),
+        org.scalatra.validation.NotFound)
       Extraction.decompose(err) must_== JObject(
         JField("message", JString("the error message")) :: "field" -> JString(
           "a_field") :: "code" -> JString("NotFound") :: Nil)

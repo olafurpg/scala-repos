@@ -376,13 +376,14 @@ abstract class ShuffleSuite
     val writer1 = manager.getWriter[Int, Int](
       shuffleHandle,
       0,
-      new TaskContextImpl(0,
-                          0,
-                          0L,
-                          0,
-                          taskMemoryManager,
-                          metricsSystem,
-                          InternalAccumulator.create(sc)))
+      new TaskContextImpl(
+        0,
+        0,
+        0L,
+        0,
+        taskMemoryManager,
+        metricsSystem,
+        InternalAccumulator.create(sc)))
     val data1 = (1 to 10).map { x =>
       x -> x
     }
@@ -393,13 +394,14 @@ abstract class ShuffleSuite
     val writer2 = manager.getWriter[Int, Int](
       shuffleHandle,
       0,
-      new TaskContextImpl(0,
-                          0,
-                          1L,
-                          0,
-                          taskMemoryManager,
-                          metricsSystem,
-                          InternalAccumulator.create(sc)))
+      new TaskContextImpl(
+        0,
+        0,
+        1L,
+        0,
+        taskMemoryManager,
+        metricsSystem,
+        InternalAccumulator.create(sc)))
     val data2 = (11 to 20).map { x =>
       x -> x
     }
@@ -412,10 +414,11 @@ abstract class ShuffleSuite
       val files = writer.write(iter)
       writer.stop(true)
     }
-    val interleaver = new InterleaveIterators(data1,
-                                              writeAndClose(writer1),
-                                              data2,
-                                              writeAndClose(writer2))
+    val interleaver = new InterleaveIterators(
+      data1,
+      writeAndClose(writer1),
+      data2,
+      writeAndClose(writer2))
     val (mapOutput1, mapOutput2) = interleaver.run()
 
     // check that we can read the map output and it has the right data
@@ -435,13 +438,14 @@ abstract class ShuffleSuite
       shuffleHandle,
       0,
       1,
-      new TaskContextImpl(1,
-                          0,
-                          2L,
-                          0,
-                          taskMemoryManager,
-                          metricsSystem,
-                          InternalAccumulator.create(sc)))
+      new TaskContextImpl(
+        1,
+        0,
+        2L,
+        0,
+        taskMemoryManager,
+        metricsSystem,
+        InternalAccumulator.create(sc)))
     val readData = reader.read().toIndexedSeq
     assert(readData === data1.toIndexedSeq || readData === data2.toIndexedSeq)
 
@@ -532,9 +536,10 @@ object ShuffleSuite {
     job
 
     sc.listenerBus.waitUntilEmpty(500)
-    AggregatedShuffleMetrics(recordsWritten,
-                             recordsRead,
-                             bytesWritten,
-                             bytesRead)
+    AggregatedShuffleMetrics(
+      recordsWritten,
+      recordsRead,
+      bytesWritten,
+      bytesRead)
   }
 }

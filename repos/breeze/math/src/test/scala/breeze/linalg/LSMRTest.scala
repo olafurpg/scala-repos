@@ -110,9 +110,10 @@ class LSMRTest extends FunSuite {
     case object A {
 
       implicit object mulADV
-          extends OpMulMatrix.Impl2[A.type,
-                                    DenseVector[Double],
-                                    DenseVector[Double]] {
+          extends OpMulMatrix.Impl2[
+            A.type,
+            DenseVector[Double],
+            DenseVector[Double]] {
         override def apply(v: A.type,
                            v2: DenseVector[Double]): DenseVector[Double] = {
           assert(v2.length == n)
@@ -131,9 +132,10 @@ class LSMRTest extends FunSuite {
       }
 
       implicit object mulATDV
-          extends OpMulMatrix.Impl2[Transpose[A.type],
-                                    DenseVector[Double],
-                                    DenseVector[Double]] {
+          extends OpMulMatrix.Impl2[
+            Transpose[A.type],
+            DenseVector[Double],
+            DenseVector[Double]] {
         override def apply(v: Transpose[A.type],
                            v2: DenseVector[Double]): DenseVector[Double] = {
           assert(v2.length == m)

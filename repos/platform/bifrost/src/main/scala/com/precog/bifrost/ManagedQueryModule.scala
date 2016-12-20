@@ -123,11 +123,12 @@ trait ManagedQueryModule extends YggConfigComponent with Logging {
       implicit asyncContext: ExecutionContext): Future[JobQueryTFMonad] = {
     val start = System.currentTimeMillis
     val futureJob = jobManager
-      .createJob(apiKey,
-                 "Quirrel Query",
-                 "bifrost-query",
-                 data,
-                 Some(yggConfig.clock.now()))
+      .createJob(
+        apiKey,
+        "Quirrel Query",
+        "bifrost-query",
+        data,
+        Some(yggConfig.clock.now()))
       .onComplete { _ =>
         logger.debug(
           "Job created in %d ms".format(System.currentTimeMillis - start))
@@ -167,12 +168,12 @@ trait ManagedQueryModule extends YggConfigComponent with Logging {
       f.run recover {
         case ex =>
           M.jobId map { jobId =>
-            jobManager.addMessage(jobId,
-                                  JobManager.channels.ServerError,
-                                  JString("Internal server error."))
-            jobManager.abort(jobId,
-                             "Internal server error.",
-                             yggConfig.clock.now())
+            jobManager.addMessage(
+              jobId,
+              JobManager.channels.ServerError,
+              JString("Internal server error."))
+            jobManager
+              .abort(jobId, "Internal server error.", yggConfig.clock.now())
           }
           throw ex
       } map {
@@ -267,10 +268,10 @@ trait ManagedQueryModule extends YggConfigComponent with Logging {
     def start(): Unit = lock.synchronized {
       if (poller.isEmpty) {
         poller = Some(
-          jobActorSystem.scheduler.schedule(yggConfig.jobPollFrequency,
-                                            yggConfig.jobPollFrequency) {
-            poll()
-          })
+          jobActorSystem.scheduler
+            .schedule(yggConfig.jobPollFrequency, yggConfig.jobPollFrequency) {
+              poll()
+            })
       }
     }
 

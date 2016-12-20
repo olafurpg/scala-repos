@@ -307,9 +307,10 @@ trait MySQLProfile extends JdbcProfile { profile =>
             "() returns " +
             sqlType + " begin " + "select max(id) into @v from " +
             quoteIdentifier(seq.name + "_seq") + "; return @v; end"),
-        Iterable("drop function " + quoteIdentifier(seq.name + "_currval"),
-                 "drop function " + quoteIdentifier(seq.name + "_nextval"),
-                 "drop table " + quoteIdentifier(seq.name + "_seq"))
+        Iterable(
+          "drop function " + quoteIdentifier(seq.name + "_currval"),
+          "drop function " + quoteIdentifier(seq.name + "_nextval"),
+          "drop table " + quoteIdentifier(seq.name + "_seq"))
       )
     }
   }

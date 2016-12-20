@@ -78,8 +78,9 @@ class NewRemoteActorSpec
     "be locally instantiated on a remote node (with null parameter) and be able to communicate through its RemoteActorRef" in {
 
       runOn(master) {
-        val actor = system.actorOf(Props(classOf[SomeActorWithParam], null),
-                                   "service-hello-null")
+        val actor = system.actorOf(
+          Props(classOf[SomeActorWithParam], null),
+          "service-hello-null")
         actor.isInstanceOf[RemoteActorRef] should ===(true)
         actor.path.address should ===(node(slave).address)
 

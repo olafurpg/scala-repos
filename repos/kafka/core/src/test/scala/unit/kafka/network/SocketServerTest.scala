@@ -261,13 +261,15 @@ class SocketServerTest extends JUnitSuite {
     overrideServer.startup()
     try {
       val sslContext = SSLContext.getInstance("TLSv1.2")
-      sslContext.init(null,
-                      Array(TestUtils.trustAllCerts),
-                      new java.security.SecureRandom())
+      sslContext.init(
+        null,
+        Array(TestUtils.trustAllCerts),
+        new java.security.SecureRandom())
       val socketFactory = sslContext.getSocketFactory
       val sslSocket = socketFactory
-        .createSocket("localhost",
-                      overrideServer.boundPort(SecurityProtocol.SSL))
+        .createSocket(
+          "localhost",
+          overrideServer.boundPort(SecurityProtocol.SSL))
         .asInstanceOf[SSLSocket]
       sslSocket.setNeedClientAuth(false)
 
@@ -305,8 +307,9 @@ class SocketServerTest extends JUnitSuite {
     val socket = connect()
     val bytes = new Array[Byte](40)
     sendRequest(socket, bytes, Some(0))
-    assertEquals(KafkaPrincipal.ANONYMOUS,
-                 server.requestChannel.receiveRequest().session.principal)
+    assertEquals(
+      KafkaPrincipal.ANONYMOUS,
+      server.requestChannel.receiveRequest().session.principal)
     socket.close()
   }
 }

@@ -51,9 +51,10 @@ class FailureDetectorTest extends FunSuite {
 
   test("request null gets null") {
     assert(
-      NullFailureDetector == FailureDetector(FailureDetector.NullConfig,
-                                             ping,
-                                             statsReceiver))
+      NullFailureDetector == FailureDetector(
+        FailureDetector.NullConfig,
+        ping,
+        statsReceiver))
   }
 
   test("explicit threshold used") {

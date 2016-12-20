@@ -29,15 +29,17 @@ class JavaMutatorMethodAccessedAsParameterlessInspection
             case gen: ScGenericCall =>
               ScalaPsiUtil.findCall(gen) match {
                 case None =>
-                  holder.registerProblem(e.nameId,
-                                         getDisplayName,
-                                         new AddCallParentheses(gen))
+                  holder.registerProblem(
+                    e.nameId,
+                    getDisplayName,
+                    new AddCallParentheses(gen))
                 case Some(mc) =>
               }
             case _ =>
-              holder.registerProblem(e.nameId,
-                                     getDisplayName,
-                                     new AddCallParentheses(e))
+              holder.registerProblem(
+                e.nameId,
+                getDisplayName,
+                new AddCallParentheses(e))
           }
         case _ =>
       }

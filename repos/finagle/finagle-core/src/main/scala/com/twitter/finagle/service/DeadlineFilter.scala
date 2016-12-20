@@ -52,9 +52,10 @@ object DeadlineFilter {
     * [[com.twitter.finagle.service.DeadlineFilter]].
     */
   def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
-    new Stack.Module2[param.Stats,
-                      DeadlineFilter.Param,
-                      ServiceFactory[Req, Rep]] {
+    new Stack.Module2[
+      param.Stats,
+      DeadlineFilter.Param,
+      ServiceFactory[Req, Rep]] {
       val role = DeadlineFilter.role
       val description = "Reject requests when their deadline has passed"
 
@@ -107,8 +108,9 @@ private[finagle] class DeadlineFilter[Req, Rep](tolerance: Duration,
     extends SimpleFilter[Req, Rep] {
 
   require(tolerance >= Duration.Zero, "tolerance must be greater than zero")
-  require(rejectPeriod.inSeconds >= 1 && rejectPeriod.inSeconds <= 60,
-          s"rejectPeriod must be [1 second, 60 seconds]: $rejectPeriod")
+  require(
+    rejectPeriod.inSeconds >= 1 && rejectPeriod.inSeconds <= 60,
+    s"rejectPeriod must be [1 second, 60 seconds]: $rejectPeriod")
   require(
     maxRejectPercentage <= 1.0,
     s"maxRejectPercentage must be between 0.0 and 1.0: $maxRejectPercentage")

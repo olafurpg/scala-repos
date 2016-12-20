@@ -124,12 +124,13 @@ object LinearRegressionExample {
 
     // Load training and test data and cache it.
     val (training: DataFrame, test: DataFrame) =
-      DecisionTreeExample.loadDatasets(sc,
-                                       params.input,
-                                       params.dataFormat,
-                                       params.testInput,
-                                       "regression",
-                                       params.fracTest)
+      DecisionTreeExample.loadDatasets(
+        sc,
+        params.input,
+        params.dataFormat,
+        params.testInput,
+        "regression",
+        params.fracTest)
 
     val lir = new LinearRegression()
       .setFeaturesCol("features")

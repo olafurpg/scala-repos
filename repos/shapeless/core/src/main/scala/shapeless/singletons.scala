@@ -311,8 +311,9 @@ class SingletonTypeMacros(val c: whitebox.Context)
       case SingletonSymbolType(c) => mkSingletonSymbol(c)
 
       case _ =>
-        c.abort(c.enclosingPosition,
-                s"Type argument $tpe is not a singleton type")
+        c.abort(
+          c.enclosingPosition,
+          s"Type argument $tpe is not a singleton type")
     }
 
   def materializeImpl[T: WeakTypeTag]: Tree = {
@@ -352,8 +353,9 @@ class SingletonTypeMacros(val c: whitebox.Context)
   def inferInstance(tci: Type): Tree = {
     val i = c.inferImplicitValue(tci)
     if (i == EmptyTree)
-      c.abort(c.enclosingPosition,
-              s"Unable to resolve implicit value of type $tci")
+      c.abort(
+        c.enclosingPosition,
+        s"Unable to resolve implicit value of type $tci")
     i
   }
 
@@ -428,8 +430,9 @@ class SingletonTypeMacros(val c: whitebox.Context)
           if s1 == s2 =>
         mkSingletonSymbol(s1)
       case _ =>
-        c.abort(c.enclosingPosition,
-                s"Expression $t is not an appropriate Symbol literal")
+        c.abort(
+          c.enclosingPosition,
+          s"Expression $t is not an appropriate Symbol literal")
     }
   }
 

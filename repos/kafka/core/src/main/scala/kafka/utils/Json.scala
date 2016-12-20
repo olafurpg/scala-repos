@@ -39,8 +39,9 @@ object Json extends Logging {
         JSON.parseFull(input)
       } catch {
         case t: Throwable =>
-          throw new KafkaException("Can't parse json string: %s".format(input),
-                                   t)
+          throw new KafkaException(
+            "Can't parse json string: %s".format(input),
+            t)
       }
     }
   }

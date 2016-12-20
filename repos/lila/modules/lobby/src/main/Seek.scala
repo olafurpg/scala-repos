@@ -50,14 +50,16 @@ case class Seek(_id: String,
     "id" -> _id,
     "username" -> user.username,
     "rating" -> rating,
-    "variant" -> Json.obj("key" -> realVariant.key,
-                          "short" -> realVariant.shortName,
-                          "name" -> realVariant.name),
+    "variant" -> Json.obj(
+      "key" -> realVariant.key,
+      "short" -> realVariant.shortName,
+      "name" -> realVariant.name),
     "mode" -> realMode.id,
     "days" -> daysPerTurn,
     "color" -> chess.Color(color).??(_.name),
-    "perf" -> Json.obj("icon" -> perfType.map(_.iconChar.toString),
-                       "name" -> perfType.map(_.name))
+    "perf" -> Json.obj(
+      "icon" -> perfType.map(_.iconChar.toString),
+      "name" -> perfType.map(_.name))
   )
 
   lazy val perfType =
@@ -75,24 +77,26 @@ object Seek {
            user: User,
            ratingRange: RatingRange,
            blocking: Set[String]): Seek =
-    new Seek(_id = Random nextStringUppercase idSize,
-             variant = variant.id,
-             daysPerTurn = daysPerTurn,
-             mode = mode.id,
-             color = color,
-             user = LobbyUser.make(user, blocking),
-             ratingRange = ratingRange.toString,
-             createdAt = DateTime.now)
+    new Seek(
+      _id = Random nextStringUppercase idSize,
+      variant = variant.id,
+      daysPerTurn = daysPerTurn,
+      mode = mode.id,
+      color = color,
+      user = LobbyUser.make(user, blocking),
+      ratingRange = ratingRange.toString,
+      createdAt = DateTime.now)
 
   def renew(seek: Seek) =
-    new Seek(_id = Random nextStringUppercase idSize,
-             variant = seek.variant,
-             daysPerTurn = seek.daysPerTurn,
-             mode = seek.mode,
-             color = seek.color,
-             user = seek.user,
-             ratingRange = seek.ratingRange,
-             createdAt = DateTime.now)
+    new Seek(
+      _id = Random nextStringUppercase idSize,
+      variant = seek.variant,
+      daysPerTurn = seek.daysPerTurn,
+      mode = seek.mode,
+      color = seek.color,
+      user = seek.user,
+      ratingRange = seek.ratingRange,
+      createdAt = DateTime.now)
 
   import reactivemongo.bson.Macros
   import lila.db.BSON.MapValue.MapHandler

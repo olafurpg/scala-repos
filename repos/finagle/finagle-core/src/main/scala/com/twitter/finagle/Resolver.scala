@@ -289,11 +289,12 @@ private[finagle] abstract class BaseResolver(f: () => Seq[Resolver]) {
     val rs = f()
     val log = Logger.getLogger(getClass.getName)
     val resolvers =
-      Seq(inetResolver,
-          fixedInetResolver,
-          NegResolver,
-          NilResolver,
-          FailResolver) ++ rs
+      Seq(
+        inetResolver,
+        fixedInetResolver,
+        NegResolver,
+        NilResolver,
+        FailResolver) ++ rs
 
     val dups =
       resolvers.groupBy(_.scheme).filter { case (_, rs) => rs.size > 1 }

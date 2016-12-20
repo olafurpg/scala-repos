@@ -137,10 +137,11 @@ class Engine[TD, EI, PD, Q, P, A](
         algorithmClassMap,
       servingClassMap: Map[String, Class[_ <: BaseServing[Q, P]]] =
         servingClassMap): Engine[TD, EI, PD, Q, P, A] = {
-    new Engine(dataSourceClassMap,
-               preparatorClassMap,
-               algorithmClassMap,
-               servingClassMap)
+    new Engine(
+      dataSourceClassMap,
+      preparatorClassMap,
+      algorithmClassMap,
+      servingClassMap)
   }
 
   /** Training this engine would return a list of models.
@@ -161,8 +162,9 @@ class Engine[TD, EI, PD, Q, P, A](
     val preparator = Doer(preparatorClassMap(preparatorName), preparatorParams)
 
     val algoParamsList = engineParams.algorithmParamsList
-    require(algoParamsList.size > 0,
-            "EngineParams.algorithmParamsList must have at least 1 element.")
+    require(
+      algoParamsList.size > 0,
+      "EngineParams.algorithmParamsList must have at least 1 element.")
 
     val algorithms = algoParamsList.map {
       case (algoName, algoParams) =>
@@ -181,9 +183,10 @@ class Engine[TD, EI, PD, Q, P, A](
         }
       }
 
-    makeSerializableModels(sc,
-                           engineInstanceId = engineInstanceId,
-                           algoTuples = algoTuples)
+    makeSerializableModels(
+      sc,
+      engineInstanceId = engineInstanceId,
+      algoTuples = algoTuples)
   }
 
   /** Algorithm models can be persisted before deploy. However, it is also
@@ -315,8 +318,9 @@ class Engine[TD, EI, PD, Q, P, A](
     val preparator = Doer(preparatorClassMap(preparatorName), preparatorParams)
 
     val algoParamsList = engineParams.algorithmParamsList
-    require(algoParamsList.size > 0,
-            "EngineParams.algorithmParamsList must have at least 1 element.")
+    require(
+      algoParamsList.size > 0,
+      "EngineParams.algorithmParamsList must have at least 1 element.")
 
     val algorithms = algoParamsList.map {
       case (algoName, algoParams) => {
@@ -356,20 +360,22 @@ class Engine[TD, EI, PD, Q, P, A](
     // Extract EngineParams
     logger.info(s"Extracting datasource params...")
     val dataSourceParams: (String, Params) =
-      WorkflowUtils.getParamsFromJsonByFieldAndClass(variantJson,
-                                                     "datasource",
-                                                     dataSourceClassMap,
-                                                     engineLanguage,
-                                                     jsonExtractor)
+      WorkflowUtils.getParamsFromJsonByFieldAndClass(
+        variantJson,
+        "datasource",
+        dataSourceClassMap,
+        engineLanguage,
+        jsonExtractor)
     logger.info(s"Datasource params: $dataSourceParams")
 
     logger.info(s"Extracting preparator params...")
     val preparatorParams: (String, Params) =
-      WorkflowUtils.getParamsFromJsonByFieldAndClass(variantJson,
-                                                     "preparator",
-                                                     preparatorClassMap,
-                                                     engineLanguage,
-                                                     jsonExtractor)
+      WorkflowUtils.getParamsFromJsonByFieldAndClass(
+        variantJson,
+        "preparator",
+        preparatorClassMap,
+        engineLanguage,
+        jsonExtractor)
     logger.info(s"Preparator params: $preparatorParams")
 
     val algorithmsParams: Seq[(String, Params)] =
@@ -385,10 +391,11 @@ class Engine[TD, EI, PD, Q, P, A](
                 algorithmParamsJValue.extract[CreateWorkflow.AlgorithmParams]
               (
                 eap.name,
-                WorkflowUtils.extractParams(engineLanguage,
-                                            compact(render(eap.params)),
-                                            algorithmClassMap(eap.name),
-                                            jsonExtractor)
+                WorkflowUtils.extractParams(
+                  engineLanguage,
+                  compact(render(eap.params)),
+                  algorithmClassMap(eap.name),
+                  jsonExtractor)
               )
             }
           case _ => Nil
@@ -397,17 +404,19 @@ class Engine[TD, EI, PD, Q, P, A](
 
     logger.info(s"Extracting serving params...")
     val servingParams: (String, Params) =
-      WorkflowUtils.getParamsFromJsonByFieldAndClass(variantJson,
-                                                     "serving",
-                                                     servingClassMap,
-                                                     engineLanguage,
-                                                     jsonExtractor)
+      WorkflowUtils.getParamsFromJsonByFieldAndClass(
+        variantJson,
+        "serving",
+        servingClassMap,
+        engineLanguage,
+        jsonExtractor)
     logger.info(s"Serving params: $servingParams")
 
-    new EngineParams(dataSourceParams = dataSourceParams,
-                     preparatorParams = preparatorParams,
-                     algorithmParamsList = algorithmsParams,
-                     servingParams = servingParams)
+    new EngineParams(
+      dataSourceParams = dataSourceParams,
+      preparatorParams = preparatorParams,
+      algorithmParamsList = algorithmsParams,
+      servingParams = servingParams)
   }
 
   private[prediction] def engineInstanceToEngineParams(
@@ -455,10 +464,11 @@ class Engine[TD, EI, PD, Q, P, A](
       read[Seq[(String, JValue)]](engineInstance.algorithmsParams).map {
         case (algoName, params) =>
           val extractedParams =
-            WorkflowUtils.extractParams(engineLanguage,
-                                        compact(render(params)),
-                                        algorithmClassMap(algoName),
-                                        jsonExtractor)
+            WorkflowUtils.extractParams(
+              engineLanguage,
+              compact(render(params)),
+              algorithmClassMap(algoName),
+              jsonExtractor)
           (algoName, extractedParams)
       }
 
@@ -478,10 +488,11 @@ class Engine[TD, EI, PD, Q, P, A](
       (name, extractedParams)
     }
 
-    new EngineParams(dataSourceParams = dataSourceParamsWithName,
-                     preparatorParams = preparatorParamsWithName,
-                     algorithmParamsList = algorithmsParamsWithNames,
-                     servingParams = servingParamsWithName)
+    new EngineParams(
+      dataSourceParams = dataSourceParamsWithName,
+      preparatorParams = preparatorParamsWithName,
+      algorithmParamsList = algorithmsParamsWithNames,
+      servingParams = servingParamsWithName)
   }
 }
 
@@ -798,8 +809,9 @@ object Engine {
           val unionAlgoPredicts: RDD[(QX, Seq[P])] =
             sc.union(algoPredicts).groupByKey().mapValues { ps =>
               {
-                assert(ps.size == algoCount,
-                       "Must have same length as algoCount")
+                assert(
+                  ps.size == algoCount,
+                  "Must have same length as algoCount")
                 // TODO. Check size == algoCount
                 ps.toSeq.sortBy(_._1).map(_._2)
               }

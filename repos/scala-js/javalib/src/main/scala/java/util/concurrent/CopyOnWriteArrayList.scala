@@ -253,10 +253,11 @@ class CopyOnWriteArrayList[E <: AnyRef] private (
 
     override def listIterator(index: Int): ListIterator[E] = {
       checkIndexOnBounds(index)
-      new CopyOnWriteArrayListIterator[E](innerSnapshot(),
-                                          fromIndex + index,
-                                          fromIndex,
-                                          toIndex) {
+      new CopyOnWriteArrayListIterator[E](
+        innerSnapshot(),
+        fromIndex + index,
+        fromIndex,
+        toIndex) {
         override protected def onSizeChanged(delta: Int): Unit =
           changeSize(delta)
       }
@@ -266,8 +267,9 @@ class CopyOnWriteArrayList[E <: AnyRef] private (
       if (fromIndex < 0 || fromIndex > toIndex || toIndex > size)
         throw new IndexOutOfBoundsException
 
-      new CopyOnWriteArrayListView(viewSelf.fromIndex + fromIndex,
-                                   viewSelf.fromIndex + toIndex) {
+      new CopyOnWriteArrayListView(
+        viewSelf.fromIndex + fromIndex,
+        viewSelf.fromIndex + toIndex) {
         override protected def changeSize(delta: Int): Unit = {
           super.changeSize(delta)
           viewSelf.changeSize(delta)

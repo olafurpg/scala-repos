@@ -29,12 +29,13 @@ object DefaultClient {
       sr: StatsReceiver,
       responseClassifier: ResponseClassifier
   ): ServiceFactoryWrapper =
-    FailureAccrualFactory.wrapper(sr,
-                                  FailureAccrualFactory.defaultPolicy(),
-                                  "DefaultClient",
-                                  DefaultLogger,
-                                  Address.failing,
-                                  responseClassifier)(DefaultTimer.twitter)
+    FailureAccrualFactory.wrapper(
+      sr,
+      FailureAccrualFactory.defaultPolicy(),
+      "DefaultClient",
+      DefaultLogger,
+      Address.failing,
+      responseClassifier)(DefaultTimer.twitter)
 
   /** marker trait for uninitialized failure accrual */
   private[finagle] trait UninitializedFailureAccrual
@@ -150,9 +151,10 @@ case class DefaultClient[Req, Rep](
     protected def newDispatcher(transport: Transport[In, Out]) = throw unimpl
 
     override protected val endpointer: Stackable[ServiceFactory[Req, Rep]] =
-      new Stack.Module2[Transporter.EndpointAddr,
-                        param.Stats,
-                        ServiceFactory[Req, Rep]] {
+      new Stack.Module2[
+        Transporter.EndpointAddr,
+        param.Stats,
+        ServiceFactory[Req, Rep]] {
         val role = com.twitter.finagle.stack.Endpoint
         val description = "Send requests over the wire"
         def make(_addr: Transporter.EndpointAddr,

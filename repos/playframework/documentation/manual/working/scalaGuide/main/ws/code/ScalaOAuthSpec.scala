@@ -41,11 +41,13 @@ object ScalaOAuthSpec extends PlaySpecification {
   //#flow
   val KEY = ConsumerKey("xxxxx", "xxxxx")
 
-  val oauth = OAuth(ServiceInfo("https://api.twitter.com/oauth/request_token",
-                                "https://api.twitter.com/oauth/access_token",
-                                "https://api.twitter.com/oauth/authorize",
-                                KEY),
-                    true)
+  val oauth = OAuth(
+    ServiceInfo(
+      "https://api.twitter.com/oauth/request_token",
+      "https://api.twitter.com/oauth/access_token",
+      "https://api.twitter.com/oauth/authorize",
+      KEY),
+    true)
 
   def sessionTokenPair(implicit request: RequestHeader): Option[RequestToken] = {
     for {

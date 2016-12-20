@@ -95,10 +95,11 @@ trait KMediansCoreSetClustering {
       val (centers2, weights2) = c2
       val epsilon0 = epsilon / (c * ((level + 1) ** 2))
 
-      CoreSet.fromWeightedPoints(centers1 ++ centers2,
-                                 weights1 ++ weights2,
-                                 k,
-                                 epsilon0)
+      CoreSet.fromWeightedPoints(
+        centers1 ++ centers2,
+        weights1 ++ weights2,
+        k,
+        epsilon0)
     }
 
     private def insertCoreSet(coreset: CoreSet, level: Int): CoreSetTree = {
@@ -455,9 +456,10 @@ trait KMediansCoreSetClustering {
         val j =
           math.max(0, math.ceil((math.log(minx) - logRadiusGLB) / log2).toInt)
 
-        require(j < sideLengths.length,
-                "Point (%d) found outside of grid (%d). What to do..." format
-                  (j, sideLengths.length))
+        require(
+          j < sideLengths.length,
+          "Point (%d) found outside of grid (%d). What to do..." format
+            (j, sideLengths.length))
 
         val sideLength = sideLengths(j)
         val scaledPoint = {
@@ -749,11 +751,9 @@ trait ClusteringLibModule[M[+ _]]
                       .reduce(reducerFeatures(k))
 
                     StreamT(coreSetTree map { tree =>
-                      StreamT.Yield(extract(tree,
-                                            k,
-                                            jtype,
-                                            defaultNumber.getAndIncrement),
-                                    StreamT.empty[M, Table])
+                      StreamT.Yield(
+                        extract(tree, k, jtype, defaultNumber.getAndIncrement),
+                        StreamT.empty[M, Table])
                     })
                 }
 

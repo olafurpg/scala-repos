@@ -77,13 +77,14 @@ object KafkaRelayAgent extends Logging {
     val consumer =
       new SimpleConsumer(consumerHost, consumerPort, 5000, 64 * 1024)
 
-    val relayAgent = new KafkaRelayAgent(permissionsFinder,
-                                         eventIdSeq,
-                                         consumer,
-                                         localTopic,
-                                         producer,
-                                         centralTopic,
-                                         maxMessageSize)
+    val relayAgent = new KafkaRelayAgent(
+      permissionsFinder,
+      eventIdSeq,
+      consumer,
+      localTopic,
+      producer,
+      centralTopic,
+      maxMessageSize)
     val stoppable = Stoppable.fromFuture(relayAgent.stop map { _ =>
       consumer.close; producer.close
     })
@@ -153,8 +154,8 @@ final class KafkaRelayAgent(
           if (messages.size > 0) {
             val o: Long = messages.last.offset
             logger.debug(
-              "Kafka consumer batch size: %d offset: %d)".format(messages.size,
-                                                                 o))
+              "Kafka consumer batch size: %d offset: %d)"
+                .format(messages.size, o))
             (o, 0L)
           } else {
             (offset, waitCount + 1)
@@ -214,8 +215,9 @@ final class KafkaRelayAgent(
         }
       }
 
-    outgoing.sequence[({ type λ[α] = Validation[Error, α] })#λ,
-                      Future[Authorized]] map { messageFutures =>
+    outgoing.sequence[
+      ({ type λ[α] = Validation[Error, α] })#λ,
+      Future[Authorized]] map { messageFutures =>
       Future.sequence(messageFutures) map { messages: List[Authorized] =>
         val identified: List[Message] = messages.flatMap {
           case Authorized(
@@ -246,13 +248,14 @@ final class KafkaRelayAgent(
               data map { IngestRecord(eventIdSeq.next(offset), _) }
             encodeIngestMessages(
               List(
-                IngestMessage(apiKey,
-                              path,
-                              authorities,
-                              ingestRecords,
-                              jobId,
-                              timestamp,
-                              storeMode)))
+                IngestMessage(
+                  apiKey,
+                  path,
+                  authorities,
+                  ingestRecords,
+                  jobId,
+                  timestamp,
+                  storeMode)))
 
           case Authorized(event: Ingest, _, None) =>
             // cannot relay event without a resolved owner account ID; fail loudly.
@@ -261,16 +264,18 @@ final class KafkaRelayAgent(
               "Unable to establish owner account ID for ingest of event " +
                 event)
 
-          case Authorized(archive @ Archive(apiKey, path, jobId, timestamp),
-                          offset,
-                          _) =>
+          case Authorized(
+              archive @ Archive(apiKey, path, jobId, timestamp),
+              offset,
+              _) =>
             List(
               centralCodec.toMessage(
-                ArchiveMessage(apiKey,
-                               path,
-                               jobId,
-                               eventIdSeq.next(offset),
-                               timestamp)))
+                ArchiveMessage(
+                  apiKey,
+                  path,
+                  jobId,
+                  eventIdSeq.next(offset),
+                  timestamp)))
 
           case Authorized(
               StoreFile(apiKey, path, _, jobId, content, timestamp, stream),
@@ -278,14 +283,15 @@ final class KafkaRelayAgent(
               Some(authorities)) =>
             List(
               centralCodec.toMessage(
-                StoreFileMessage(apiKey,
-                                 path,
-                                 authorities,
-                                 Some(jobId),
-                                 eventIdSeq.next(offset),
-                                 content,
-                                 timestamp,
-                                 stream)))
+                StoreFileMessage(
+                  apiKey,
+                  path,
+                  authorities,
+                  Some(jobId),
+                  eventIdSeq.next(offset),
+                  content,
+                  timestamp,
+                  stream)))
 
           case Authorized(s: StoreFile, _, None) =>
             sys.error(

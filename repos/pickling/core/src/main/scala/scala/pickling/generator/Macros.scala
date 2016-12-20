@@ -24,20 +24,22 @@ private[pickling] trait PicklingMacros
     if (isStaticOnly) {
       // TODO - should we consider externalizable "safe" or "static only" since we know it's externalizable at compile time?
       PicklingAlgorithm.aggregate(
-        Seq(new CaseClassPickling(allowReflection = false,
-                                  careAboutSubclasses =
-                                    handleCaseClassSubclasses),
-            AdtPickling,
-            ScalaSingleton))
+        Seq(
+          new CaseClassPickling(
+            allowReflection = false,
+            careAboutSubclasses = handleCaseClassSubclasses),
+          AdtPickling,
+          ScalaSingleton))
     } else {
       PicklingAlgorithm.aggregate(
-        Seq(new CaseClassPickling(allowReflection = true,
-                                  careAboutSubclasses =
-                                    handleCaseClassSubclasses),
-            AdtPickling,
-            ScalaSingleton,
-            new ExternalizablePickling,
-            WillRobinsonPickling))
+        Seq(
+          new CaseClassPickling(
+            allowReflection = true,
+            careAboutSubclasses = handleCaseClassSubclasses),
+          AdtPickling,
+          ScalaSingleton,
+          new ExternalizablePickling,
+          WillRobinsonPickling))
     }
 
   object logger extends AlgorithmLogger {
@@ -53,19 +55,23 @@ private[pickling] trait PicklingMacros
     import definitions._
     tpe.normalize match {
       case NothingTpe =>
-        c.abort(c.enclosingPosition,
-                "cannot generate pickling logic for type Nothing")
+        c.abort(
+          c.enclosingPosition,
+          "cannot generate pickling logic for type Nothing")
       case RefinedType(parents, decls) =>
-        c.abort(c.enclosingPosition,
-                "cannot generate pickling logic for refined type")
+        c.abort(
+          c.enclosingPosition,
+          "cannot generate pickling logic for refined type")
       case _ if tpe.isEffectivelyPrimitive || tpe.typeSymbol == StringClass =>
-        c.abort(c.enclosingPosition,
-                s"cannot generate pickling logic for primitive type: $tpe")
+        c.abort(
+          c.enclosingPosition,
+          s"cannot generate pickling logic for primitive type: $tpe")
       case tpe1 if tpe1.typeSymbol.isClass =>
         () // This case is fine.
       case _ =>
-        c.abort(c.enclosingPosition,
-                s"cannot generate pickling logic for non-class type $tpe")
+        c.abort(
+          c.enclosingPosition,
+          s"cannot generate pickling logic for non-class type $tpe")
     }
   }
 
@@ -101,8 +107,9 @@ private[pickling] trait PicklingMacros
         }
       tree2 match {
         case None =>
-          c.error(c.enclosingPosition,
-                  s"Failed to generate unpickler for $tpe")
+          c.error(
+            c.enclosingPosition,
+            s"Failed to generate unpickler for $tpe")
           ???
         case Some(tree) =>
           //System.err.println(s" --=== $tpe ===--\n$tree\n --=== / $tpe ===--")
@@ -119,8 +126,9 @@ private[pickling] trait PicklingMacros
       val tree2 = impl map generatePicklerUnpicklerClass[T]
       tree2 match {
         case None =>
-          c.error(c.enclosingPosition,
-                  s"Failed to generate pickler/unpickler for $tpe")
+          c.error(
+            c.enclosingPosition,
+            s"Failed to generate pickler/unpickler for $tpe")
           ???
         case Some(tree) =>
           //System.err.println(s" --=== $tpe ===--\n$tree\n --=== / $tpe ===--")

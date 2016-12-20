@@ -62,8 +62,9 @@ object GetOffsetShell {
       .ofType(classOf[java.lang.Integer])
       .defaultsTo(1)
     val maxWaitMsOpt = parser
-      .accepts("max-wait-ms",
-               "The max amount of time each fetch request waits.")
+      .accepts(
+        "max-wait-ms",
+        "The max amount of time each fetch request waits.")
       .withRequiredArg
       .describedAs("ms")
       .ofType(classOf[java.lang.Integer])
@@ -90,10 +91,11 @@ object GetOffsetShell {
     val maxWaitMs = options.valueOf(maxWaitMsOpt).intValue()
 
     val topicsMetadata = ClientUtils
-      .fetchTopicMetadata(Set(topic),
-                          metadataTargetBrokers,
-                          clientId,
-                          maxWaitMs)
+      .fetchTopicMetadata(
+        Set(topic),
+        metadataTargetBrokers,
+        clientId,
+        maxWaitMs)
       .topicsMetadata
     if (topicsMetadata.size != 1 || !topicsMetadata(0).topic.equals(topic)) {
       System.err.println(
@@ -115,15 +117,18 @@ object GetOffsetShell {
         case Some(metadata) =>
           metadata.leader match {
             case Some(leader) =>
-              val consumer = new SimpleConsumer(leader.host,
-                                                leader.port,
-                                                10000,
-                                                100000,
-                                                clientId)
+              val consumer = new SimpleConsumer(
+                leader.host,
+                leader.port,
+                10000,
+                100000,
+                clientId)
               val topicAndPartition = TopicAndPartition(topic, partitionId)
               val request = OffsetRequest(
-                Map(topicAndPartition -> PartitionOffsetRequestInfo(time,
-                                                                    nOffsets)))
+                Map(
+                  topicAndPartition -> PartitionOffsetRequestInfo(
+                    time,
+                    nOffsets)))
               val offsets = consumer
                 .getOffsetsBefore(request)
                 .partitionErrorAndOffsets(topicAndPartition)

@@ -466,15 +466,17 @@ trait TypeDiagnostics { self: Analyzer =>
   trait TyperDiagnostics { self: Typer =>
 
     def permanentlyHiddenWarning(pos: Position, hidden: Name, defn: Symbol) =
-      context.warning(pos,
-                      "imported `%s' is permanently hidden by definition of %s"
-                        .format(hidden, defn.fullLocationString))
+      context.warning(
+        pos,
+        "imported `%s' is permanently hidden by definition of %s"
+          .format(hidden, defn.fullLocationString))
 
     object checkUnused {
-      val ignoreNames: Set[TermName] = Set(TermName("readResolve"),
-                                           TermName("readObject"),
-                                           TermName("writeObject"),
-                                           TermName("writeReplace"))
+      val ignoreNames: Set[TermName] = Set(
+        TermName("readResolve"),
+        TermName("readObject"),
+        TermName("writeObject"),
+        TermName("writeReplace"))
 
       class UnusedPrivates extends Traverser {
         val defnTrees = ListBuffer[MemberDef]()
@@ -584,8 +586,9 @@ trait TypeDiagnostics { self: Analyzer =>
         p.unusedTypes foreach { t =>
           val sym = t.symbol
           val why = if (sym.isPrivate) "private" else "local"
-          reporter.warning(t.pos,
-                           s"$why ${sym.fullLocationString} is never used")
+          reporter.warning(
+            t.pos,
+            s"$why ${sym.fullLocationString} is never used")
         }
       }
     }

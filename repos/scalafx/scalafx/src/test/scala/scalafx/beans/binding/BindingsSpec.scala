@@ -201,9 +201,10 @@ class BindingsSpec extends FlatSpec with BeforeAndAfterEach {
       val width: DoubleProperty = delegate.widthProperty
     }
 
-    val dp1 = new ObjectProperty[DoubleHolderJFX](this,
-                                                  "level 2 property",
-                                                  new DoubleHolderJFX())
+    val dp1 = new ObjectProperty[DoubleHolderJFX](
+      this,
+      "level 2 property",
+      new DoubleHolderJFX())
     val prop2 = new DoubleProperty(this, "prop2", 0.0)
     prop2() should equal(0.0)
 

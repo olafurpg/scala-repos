@@ -41,13 +41,15 @@ sealed abstract class Ior[+A, +B] extends Product with Serializable {
   final def onlyBoth: Option[(A, B)] =
     fold(_ => None, _ => None, (a, b) => Some((a, b)))
   final def pad: (Option[A], Option[B]) =
-    fold(a => (Some(a), None),
-         b => (None, Some(b)),
-         (a, b) => (Some(a), Some(b)))
+    fold(
+      a => (Some(a), None),
+      b => (None, Some(b)),
+      (a, b) => (Some(a), Some(b)))
   final def unwrap: (A Xor B) Xor (A, B) =
-    fold(a => Xor.left(Xor.left(a)),
-         b => Xor.left(Xor.right(b)),
-         (a, b) => Xor.right((a, b)))
+    fold(
+      a => Xor.left(Xor.left(a)),
+      b => Xor.left(Xor.right(b)),
+      (a, b) => Xor.right((a, b)))
 
   final def toXor: A Xor B = fold(Xor.left, Xor.right, (_, b) => Xor.right(b))
   final def toEither: Either[A, B] =
@@ -57,9 +59,10 @@ sealed abstract class Ior[+A, +B] extends Product with Serializable {
 
   final def to[F[_], BB >: B](implicit monoidKF: MonoidK[F],
                               applicativeF: Applicative[F]): F[BB] =
-    fold(_ => monoidKF.empty,
-         applicativeF.pure,
-         (_, b) => applicativeF.pure(b))
+    fold(
+      _ => monoidKF.empty,
+      applicativeF.pure,
+      (_, b) => applicativeF.pure(b))
 
   final def swap: B Ior A = fold(Ior.right, Ior.left, (a, b) => Ior.both(b, a))
 
@@ -70,9 +73,10 @@ sealed abstract class Ior[+A, +B] extends Product with Serializable {
     fold(f, identity, (a, b) => BB.combine(f(a), b))
 
   final def bimap[C, D](fa: A => C, fb: B => D): C Ior D =
-    fold(a => Ior.left(fa(a)),
-         b => Ior.right(fb(b)),
-         (a, b) => Ior.both(fa(a), fb(b)))
+    fold(
+      a => Ior.left(fa(a)),
+      b => Ior.right(fb(b)),
+      (a, b) => Ior.both(fa(a), fb(b)))
 
   final def map[D](f: B => D): A Ior D = bimap(identity, f)
   final def leftMap[C](f: A => C): C Ior B = bimap(f, identity)
@@ -142,9 +146,10 @@ sealed abstract class Ior[+A, +B] extends Product with Serializable {
       a => that.fold(a2 => AA.eqv(a, a2), b2 => false, (a2, b2) => false),
       b => that.fold(a2 => false, b2 => BB.eqv(b, b2), (a2, b2) => false),
       (a, b) =>
-        that.fold(a2 => false,
-                  b2 => false,
-                  (a2, b2) => AA.eqv(a, a2) && BB.eqv(b, b2))
+        that.fold(
+          a2 => false,
+          b2 => false,
+          (a2, b2) => AA.eqv(a, a2) && BB.eqv(b, b2))
     )
 
   final def show[AA >: A, BB >: B](implicit AA: Show[AA],

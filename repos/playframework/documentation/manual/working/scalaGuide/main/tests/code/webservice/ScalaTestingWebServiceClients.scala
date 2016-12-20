@@ -55,8 +55,9 @@ package test {
           implicit val materializer = Play.current.materializer
           WsTestClient.withClient { client =>
             val result =
-              Await.result(new GitHubClient(client, "").repositories(),
-                           10.seconds)
+              Await.result(
+                new GitHubClient(client, "").repositories(),
+                10.seconds)
             result must_== Seq("octocat/Hello-World")
           }
         }

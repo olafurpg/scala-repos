@@ -71,9 +71,10 @@ object PlayerRepo {
 
   def unWithdraw(tourId: String) =
     coll
-      .update(selectTour(tourId) ++ selectWithdraw,
-              BSONDocument("$unset" -> BSONDocument("w" -> true)),
-              multi = true)
+      .update(
+        selectTour(tourId) ++ selectWithdraw,
+        BSONDocument("$unset" -> BSONDocument("w" -> true)),
+        multi = true)
       .void
 
   def find(tourId: String, userId: String): Fu[Option[Player]] =
@@ -99,16 +100,18 @@ object PlayerRepo {
   def join(tourId: String, user: User, perfLens: Perfs => Perf) =
     find(tourId, user.id) flatMap {
       case Some(p) if p.withdraw =>
-        coll.update(selectId(p._id),
-                    BSONDocument("$unset" -> BSONDocument("w" -> true)))
+        coll.update(
+          selectId(p._id),
+          BSONDocument("$unset" -> BSONDocument("w" -> true)))
       case Some(p) => funit
       case None => coll.insert(Player.make(tourId, user, perfLens))
     } void
 
   def withdraw(tourId: String, userId: String) =
     coll
-      .update(selectTourUser(tourId, userId),
-              BSONDocument("$set" -> BSONDocument("w" -> true)))
+      .update(
+        selectTourUser(tourId, userId),
+        BSONDocument("$set" -> BSONDocument("w" -> true)))
       .void
 
   def withPoints(tourId: String): Fu[List[Player]] =
@@ -142,9 +145,9 @@ object PlayerRepo {
 
   // freaking expensive (marathons)
   private[tournament] def computeRanking(tourId: String): Fu[Ranking] =
-    coll.aggregate(Match(selectTour(tourId)),
-                   List(Sort(Descending("m")),
-                        Group(BSONNull)("uids" -> Push("uid")))) map {
+    coll.aggregate(
+      Match(selectTour(tourId)),
+      List(Sort(Descending("m")), Group(BSONNull)("uids" -> Push("uid")))) map {
       _.documents.headOption.fold(Map.empty: Ranking) {
         _ get "uids" match {
           case Some(BSONArray(uids)) =>
@@ -187,8 +190,9 @@ object PlayerRepo {
 
   def setPerformance(player: Player, performance: Int) =
     coll
-      .update(selectId(player.id),
-              BSONDocument("$set" -> BSONDocument("e" -> performance)))
+      .update(
+        selectId(player.id),
+        BSONDocument("$set" -> BSONDocument("e" -> performance)))
       .void
 
   private def rankPlayers(players: List[Player],

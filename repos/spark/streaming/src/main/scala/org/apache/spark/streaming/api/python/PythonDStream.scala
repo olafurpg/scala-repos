@@ -79,8 +79,9 @@ private[python] class TransformFunction(
   def apply(rdd: Option[RDD[_]],
             rdd2: Option[RDD[_]],
             time: Time): Option[RDD[Array[Byte]]] = {
-    val rdds = List(rdd.map(JavaRDD.fromRDD(_)).orNull,
-                    rdd2.map(JavaRDD.fromRDD(_)).orNull).asJava
+    val rdds = List(
+      rdd.map(JavaRDD.fromRDD(_)).orNull,
+      rdd2.map(JavaRDD.fromRDD(_)).orNull).asJava
     Option(callPythonTransformFunction(time.milliseconds, rdds)).map(_.rdd)
   }
 

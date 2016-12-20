@@ -148,8 +148,9 @@ class ReplaceDoWhileWithWhileIntention extends PsiElementBaseIntentionAction {
                 elementType != ScalaTokenTypes.tRBRACE)
               parent.addBefore(elem, newExpression)
           }
-          parent.addBefore(ScalaPsiElementFactory.createNewLine(manager),
-                           newExpression)
+          parent.addBefore(
+            ScalaPsiElementFactory.createNewLine(manager),
+            newExpression)
 
           PsiDocumentManager
             .getInstance(project)
@@ -165,10 +166,11 @@ class ReplaceDoWhileWithWhileIntention extends PsiElementBaseIntentionAction {
       StdKinds.refExprLastRef,
       firstChild,
       collectImplicits = true)
-    element.processDeclarations(processor,
-                                ResolveState.initial(),
-                                firstChild,
-                                firstChild)
+    element.processDeclarations(
+      processor,
+      ResolveState.initial(),
+      firstChild,
+      firstChild)
     val candidates: Set[ScalaResolveResult] = processor.candidatesS
 
     candidates.map(_.name)

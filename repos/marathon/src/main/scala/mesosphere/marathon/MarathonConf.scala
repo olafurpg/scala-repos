@@ -28,10 +28,11 @@ trait MarathonConf
 
   //scalastyle:off magic.number
 
-  lazy val mesosMaster = opt[String]("master",
-                                     descr = "The URL of the Mesos master",
-                                     required = true,
-                                     noshort = true)
+  lazy val mesosMaster = opt[String](
+    "master",
+    descr = "The URL of the Mesos master",
+    required = true,
+    noshort = true)
 
   lazy val mesosLeaderUiUrl = opt[String](
     "mesos_leader_ui_url",
@@ -153,8 +154,9 @@ trait MarathonConf
     val parsed = parseDefaultAcceptedResourceRoles(str)
 
     // throw exceptions for better error messages
-    require(parsed.nonEmpty,
-            "--default_accepted_resource_roles must not be empty")
+    require(
+      parsed.nonEmpty,
+      "--default_accepted_resource_roles must not be empty")
     require(
       parsed.forall(expectedResourceRoles),
       "--default_accepted_resource_roles contains roles for which we will not receive offers: " +
@@ -209,10 +211,10 @@ trait MarathonConf
         "will be removed in a later release.",
     default = None)
 
-  lazy val mesosUser = opt[String]("mesos_user",
-                                   descr = "Mesos user for this framework.",
-                                   default = new SystemProperties().get(
-                                     "user.name")) // Current logged in user
+  lazy val mesosUser = opt[String](
+    "mesos_user",
+    descr = "Mesos user for this framework.",
+    default = new SystemProperties().get("user.name")) // Current logged in user
 
   lazy val frameworkName = opt[String](
     "framework_name",

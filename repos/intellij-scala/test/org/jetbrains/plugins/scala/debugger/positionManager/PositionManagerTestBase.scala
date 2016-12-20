@@ -45,9 +45,10 @@ abstract class PositionManagerTestBase extends ScalaDebuggerTestCase {
 
   protected def checkLocationsOfLine(expectedLocations: Set[Loc]*): Unit = {
     val sourcePositions = sourcePositionsInFile(mainFileName)
-    Assert.assertEquals("Wrong number of expected locations sets: ",
-                        sourcePositions.size,
-                        expectedLocations.size)
+    Assert.assertEquals(
+      "Wrong number of expected locations sets: ",
+      sourcePositions.size,
+      expectedLocations.size)
 
     runDebugger() {
       waitForBreakpoint()
@@ -78,9 +79,10 @@ abstract class PositionManagerTestBase extends ScalaDebuggerTestCase {
   }
 
   private def toSimpleLocation(location: Location) =
-    Loc(location.declaringType().name(),
-        location.method().name(),
-        location.lineNumber())
+    Loc(
+      location.declaringType().name(),
+      location.method().name(),
+      location.lineNumber())
 
   protected def setupFile(fileName: String, fileText: String): Unit = {
     val breakpointLine = fileText.lines.indexWhere(_.contains(bp))

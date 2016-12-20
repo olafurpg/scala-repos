@@ -55,13 +55,14 @@ object LinearGradient {
             proportional: Boolean,
             cycleMethod: CycleMethod,
             stops: List[Stop]) =
-    new LinearGradient(startX,
-                       startY,
-                       endX,
-                       endY,
-                       proportional,
-                       cycleMethod,
-                       stops.map(_.delegate))
+    new LinearGradient(
+      startX,
+      startY,
+      endX,
+      endY,
+      proportional,
+      cycleMethod,
+      stops.map(_.delegate))
 
   /**
     * Creates a new instance of LinearGradient.
@@ -81,13 +82,14 @@ object LinearGradient {
             proportional: Boolean,
             cycleMethod: CycleMethod,
             stops: Stop*) =
-    new LinearGradient(startX,
-                       startY,
-                       endX,
-                       endY,
-                       proportional,
-                       cycleMethod,
-                       stops.map(_.delegate))
+    new LinearGradient(
+      startX,
+      startY,
+      endX,
+      endY,
+      proportional,
+      cycleMethod,
+      stops.map(_.delegate))
 
   /**
     * Creates a linear gradient value from a string representation.
@@ -128,13 +130,14 @@ class LinearGradient(override val delegate: jfxsp.LinearGradient)
            cycleMethod: CycleMethod = CycleMethod.NoCycle,
            stops: Seq[jfxsp.Stop] = Nil) =
     this(
-      new jfxsp.LinearGradient(startX,
-                               startY,
-                               endX,
-                               endY,
-                               proportional,
-                               cycleMethod,
-                               stops))
+      new jfxsp.LinearGradient(
+        startX,
+        startY,
+        endX,
+        endY,
+        proportional,
+        cycleMethod,
+        stops))
 
   /**
     * Defines which of the following cycle method is applied to the

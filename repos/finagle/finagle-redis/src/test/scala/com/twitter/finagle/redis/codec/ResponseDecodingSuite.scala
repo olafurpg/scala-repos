@@ -44,8 +44,9 @@ final class ResponseDecodingSuite extends RedisResponseTest {
 
   test("Correctly decode BAD error reply with message") {
     assert(
-      codec(wrap("-BAD\r\n-Bad Thing\r\n")) == List(ErrorReply("BAD"),
-                                                    ErrorReply("Bad Thing")))
+      codec(wrap("-BAD\r\n-Bad Thing\r\n")) == List(
+        ErrorReply("BAD"),
+        ErrorReply("Bad Thing")))
   }
 
   test("Throw ServerError when decoding BLANK error reply") {

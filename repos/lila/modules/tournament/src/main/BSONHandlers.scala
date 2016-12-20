@@ -97,29 +97,31 @@ object BSONHandlers {
 
   implicit val playerBSONHandler = new BSON[Player] {
     def reads(r: BSON.Reader) =
-      Player(_id = r str "_id",
-             tourId = r str "tid",
-             userId = r str "uid",
-             rating = r int "r",
-             provisional = r boolD "pr",
-             withdraw = r boolD "w",
-             score = r intD "s",
-             ratingDiff = r intD "p",
-             magicScore = r int "m",
-             fire = r boolD "f",
-             performance = r intO "e")
+      Player(
+        _id = r str "_id",
+        tourId = r str "tid",
+        userId = r str "uid",
+        rating = r int "r",
+        provisional = r boolD "pr",
+        withdraw = r boolD "w",
+        score = r intD "s",
+        ratingDiff = r intD "p",
+        magicScore = r int "m",
+        fire = r boolD "f",
+        performance = r intO "e")
     def writes(w: BSON.Writer, o: Player) =
-      BSONDocument("_id" -> o._id,
-                   "tid" -> o.tourId,
-                   "uid" -> o.userId,
-                   "r" -> o.rating,
-                   "pr" -> w.boolO(o.provisional),
-                   "w" -> w.boolO(o.withdraw),
-                   "s" -> w.intO(o.score),
-                   "p" -> w.intO(o.ratingDiff),
-                   "m" -> o.magicScore,
-                   "f" -> w.boolO(o.fire),
-                   "e" -> o.performance)
+      BSONDocument(
+        "_id" -> o._id,
+        "tid" -> o.tourId,
+        "uid" -> o.userId,
+        "r" -> o.rating,
+        "pr" -> w.boolO(o.provisional),
+        "w" -> w.boolO(o.withdraw),
+        "s" -> w.intO(o.score),
+        "p" -> w.intO(o.ratingDiff),
+        "m" -> o.magicScore,
+        "f" -> w.boolO(o.fire),
+        "e" -> o.performance)
   }
 
   implicit val pairingHandler = new BSON[Pairing] {
@@ -127,25 +129,27 @@ object BSONHandlers {
       val users = r strsD "u"
       val user1 = users.headOption err "tournament pairing first user"
       val user2 = users lift 1 err "tournament pairing second user"
-      Pairing(id = r str "_id",
-              tourId = r str "tid",
-              status = chess.Status(r int "s") err "tournament pairing status",
-              user1 = user1,
-              user2 = user2,
-              winner = r boolO "w" map (_.fold(user1, user2)),
-              turns = r intO "t",
-              berserk1 = r intD "b1",
-              berserk2 = r intD "b2")
+      Pairing(
+        id = r str "_id",
+        tourId = r str "tid",
+        status = chess.Status(r int "s") err "tournament pairing status",
+        user1 = user1,
+        user2 = user2,
+        winner = r boolO "w" map (_.fold(user1, user2)),
+        turns = r intO "t",
+        berserk1 = r intD "b1",
+        berserk2 = r intD "b2")
     }
     def writes(w: BSON.Writer, o: Pairing) =
-      BSONDocument("_id" -> o.id,
-                   "tid" -> o.tourId,
-                   "s" -> o.status.id,
-                   "u" -> BSONArray(o.user1, o.user2),
-                   "w" -> o.winner.map(o.user1 ==),
-                   "t" -> o.turns,
-                   "b1" -> w.intO(o.berserk1),
-                   "b2" -> w.intO(o.berserk2))
+      BSONDocument(
+        "_id" -> o.id,
+        "tid" -> o.tourId,
+        "s" -> o.status.id,
+        "u" -> BSONArray(o.user1, o.user2),
+        "w" -> o.winner.map(o.user1 ==),
+        "t" -> o.turns,
+        "b1" -> w.intO(o.berserk1),
+        "b2" -> w.intO(o.berserk2))
   }
 
   implicit val leaderboardEntryHandler = new BSON[LeaderboardApi.Entry] {
@@ -164,17 +168,18 @@ object BSONHandlers {
         date = r date "d")
 
     def writes(w: BSON.Writer, o: LeaderboardApi.Entry) =
-      BSONDocument("_id" -> o.id,
-                   "u" -> o.userId,
-                   "t" -> o.tourId,
-                   "g" -> o.nbGames,
-                   "s" -> o.score,
-                   "r" -> o.rank,
-                   "w" -> o.rankRatio,
-                   "f" -> o.freq.map(_.id),
-                   "p" -> o.speed.map(_.id),
-                   "v" -> o.perf.id,
-                   "d" -> w.date(o.date))
+      BSONDocument(
+        "_id" -> o.id,
+        "u" -> o.userId,
+        "t" -> o.tourId,
+        "g" -> o.nbGames,
+        "s" -> o.score,
+        "r" -> o.rank,
+        "w" -> o.rankRatio,
+        "f" -> o.freq.map(_.id),
+        "p" -> o.speed.map(_.id),
+        "v" -> o.perf.id,
+        "d" -> w.date(o.date))
   }
 
   import LeaderboardApi.ChartData.AggregationResult

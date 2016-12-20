@@ -223,9 +223,10 @@ private object FaultToleranceTest extends App with Logging {
     // Counter-hack: Because of a hack in SparkEnv#create() that changes this
     // property, we need to reset it.
     System.setProperty("spark.driver.port", "0")
-    sc = new SparkContext(getMasterUrls(masters),
-                          "fault-tolerance",
-                          containerSparkHome)
+    sc = new SparkContext(
+      getMasterUrls(masters),
+      "fault-tolerance",
+      containerSparkHome)
   }
 
   private def getMasterUrls(masters: Seq[TestMasterInfo]): String = {

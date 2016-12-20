@@ -145,12 +145,13 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
   def updateAccordingToExpectedType(
       nonValueType: TypeResult[ScType],
       check: Boolean = false): TypeResult[ScType] = {
-    InferUtil.updateAccordingToExpectedType(nonValueType,
-                                            fromImplicitParameters = false,
-                                            filterTypeParams = false,
-                                            expectedType = expectedType(),
-                                            expr = this,
-                                            check = check)
+    InferUtil.updateAccordingToExpectedType(
+      nonValueType,
+      fromImplicitParameters = false,
+      filterTypeParams = false,
+      expectedType = expectedType(),
+      expr = this,
+      check = check)
   }
 
   /**
@@ -192,11 +193,12 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
                          parameters: Seq[Parameter]) = {
       tuplizyCase(psiExprs) { t =>
         val result =
-          Compatibility.checkConformanceExt(checkNames = true,
-                                            parameters = parameters,
-                                            exprs = t,
-                                            checkWithImplicits = true,
-                                            isShapesResolve = false)
+          Compatibility.checkConformanceExt(
+            checkNames = true,
+            parameters = parameters,
+            exprs = t,
+            checkWithImplicits = true,
+            isShapesResolve = false)
         (retType, result.problems, result.matchedArgs, result.matchedTypes)
       }
     }
@@ -206,12 +208,12 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
                                       typeParams: Seq[TypeParameter],
                                       parameters: Seq[Parameter]) = {
       tuplizyCase(psiExprs) { t =>
-        InferUtil.localTypeInferenceWithApplicabilityExt(retType,
-                                                         parameters,
-                                                         t,
-                                                         typeParams,
-                                                         safeCheck =
-                                                           withExpectedType)
+        InferUtil.localTypeInferenceWithApplicabilityExt(
+          retType,
+          parameters,
+          t,
+          typeParams,
+          safeCheck = withExpectedType)
       }
     }
 
@@ -234,10 +236,11 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
       }
       if (c._2.nonEmpty) {
         ScalaPsiUtil
-          .tuplizy(exprs,
-                   getResolveScope,
-                   getManager,
-                   ScalaPsiUtil.firstLeaf(this))
+          .tuplizy(
+            exprs,
+            getResolveScope,
+            getManager,
+            ScalaPsiUtil.firstLeaf(this))
           .map { e =>
             val cd = fun(e)
             if (cd._2.nonEmpty) tail
@@ -262,9 +265,10 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
       val functionClass = Option(
         ScalaPsiManager
           .instance(getProject)
-          .getCachedClass(functionName,
-                          getResolveScope,
-                          ScalaPsiManager.ClassCategory.TYPE)).flatMap {
+          .getCachedClass(
+            functionName,
+            getResolveScope,
+            ScalaPsiManager.ClassCategory.TYPE)).flatMap {
         case t: ScTrait => Option(t)
         case _ => None
       }
@@ -272,15 +276,16 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
         functionClass.flatMap(_.functions.find(_.name == "apply"))
       params.mapWithIndex {
         case (tp, i) =>
-          new Parameter("v" + (i + 1),
-                        None,
-                        tp,
-                        tp,
-                        false,
-                        false,
-                        false,
-                        i,
-                        applyFunction.map(_.parameters.apply(i)))
+          new Parameter(
+            "v" + (i + 1),
+            None,
+            tp,
+            tp,
+            false,
+            false,
+            false,
+            i,
+            applyFunction.map(_.parameters.apply(i)))
       }
     }
 
@@ -288,17 +293,20 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
       tpe match {
         case ScMethodType(retType, params, _) =>
           Some(checkConformance(retType, args, params))
-        case ScTypePolymorphicType(ScMethodType(retType, params, _),
-                                   typeParams) =>
+        case ScTypePolymorphicType(
+            ScMethodType(retType, params, _),
+            typeParams) =>
           Some(
             checkConformanceWithInference(retType, args, typeParams, params))
-        case ScTypePolymorphicType(ScFunctionType(retType, params),
-                                   typeParams) =>
+        case ScTypePolymorphicType(
+            ScFunctionType(retType, params),
+            typeParams) =>
           Some(
-            checkConformanceWithInference(retType,
-                                          args,
-                                          typeParams,
-                                          functionParams(params)))
+            checkConformanceWithInference(
+              retType,
+              args,
+              typeParams,
+              functionParams(params)))
         case any if ScalaPsiUtil.isSAMEnabled(this) =>
           ScalaPsiUtil.toSAMType(any, getResolveScope) match {
             case Some(ScFunctionType(retType: ScType, params: Seq[ScType])) =>
@@ -337,9 +345,10 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
                 case t => t
               }
               val (res, imports) =
-                super.getTypeAfterImplicitConversion(checkImplicits,
-                                                     isShape,
-                                                     expectedOption)
+                super.getTypeAfterImplicitConversion(
+                  checkImplicits,
+                  isShape,
+                  expectedOption)
               val str = ScalaPsiManager
                 .instance(getProject)
                 .getCachedClass(getResolveScope, "java.lang.String")
@@ -347,8 +356,9 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
                 str.map(ScType.designator(_)).getOrElse(types.Any)
               (res.map(
                  tp =>
-                   ScTupleType(Seq(stringType, tp))(getProject,
-                                                    getResolveScope)),
+                   ScTupleType(Seq(stringType, tp))(
+                     getProject,
+                     getResolveScope)),
                imports)
             }
           }
@@ -371,10 +381,11 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
     var res: ScType =
       checkApplication(invokedType, args(isNamedDynamic = isApplyDynamicNamed))
         .getOrElse {
-          var (processedType,
-               importsUsed,
-               implicitFunction,
-               applyOrUpdateResult) =
+          var (
+            processedType,
+            importsUsed,
+            implicitFunction,
+            applyOrUpdateResult) =
             ScalaPsiUtil
               .processTypeForUpdateOrApply(invokedType, this, isShape = false)
               .getOrElse {
@@ -406,11 +417,12 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
     //Implicit parameters
     val checkImplicitParameters = withEtaExpansion(this)
     if (checkImplicitParameters) {
-      val tuple = InferUtil.updateTypeWithImplicitParameters(res,
-                                                             this,
-                                                             None,
-                                                             useExpectedType,
-                                                             fullInfo = false)
+      val tuple = InferUtil.updateTypeWithImplicitParameters(
+        res,
+        this,
+        None,
+        useExpectedType,
+        fullInfo = false)
       res = tuple._1
       implicitParameters = tuple._2
     }
@@ -420,8 +432,9 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
 
   def setApplicabilityProblemsVar(seq: Seq[ApplicabilityProblem]) {
     val modCount: Long = getManager.getModificationTracker.getModificationCount
-    putUserData(MethodInvocation.APPLICABILITY_PROBLEMS_VAR_KEY,
-                (modCount, seq))
+    putUserData(
+      MethodInvocation.APPLICABILITY_PROBLEMS_VAR_KEY,
+      (modCount, seq))
   }
 
   private def setMatchedParametersVar(seq: Seq[(Parameter, ScExpression)]) {

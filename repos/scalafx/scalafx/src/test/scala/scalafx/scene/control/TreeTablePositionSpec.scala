@@ -39,13 +39,15 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class TreeTablePositionSpec[S, T]
-    extends SimpleSFXDelegateSpec[jfxsc.TreeTablePosition[S, T],
-                                  TreeTablePosition[S, T]](
+    extends SimpleSFXDelegateSpec[
+      jfxsc.TreeTablePosition[S, T],
+      TreeTablePosition[S, T]](
       classOf[jfxsc.TreeTablePosition[S, T]],
       classOf[TreeTablePosition[S, T]]) {
 
   override def getJavaClassInstance =
-    new jfxsc.TreeTablePosition(new jfxsc.TreeTableView(),
-                                0,
-                                new jfxsc.TreeTableColumn())
+    new jfxsc.TreeTablePosition(
+      new jfxsc.TreeTableView(),
+      0,
+      new jfxsc.TreeTableColumn())
 }

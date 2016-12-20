@@ -177,11 +177,12 @@ private[streaming] class InternalMapWithStateDStream[K: ClassTag,
       (validTime - interval).milliseconds
     }
     Some(
-      new MapWithStateRDD(prevStateRDD,
-                          partitionedDataRDD,
-                          mappingFunction,
-                          validTime,
-                          timeoutThresholdTime))
+      new MapWithStateRDD(
+        prevStateRDD,
+        partitionedDataRDD,
+        mappingFunction,
+        validTime,
+        timeoutThresholdTime))
   }
 }
 

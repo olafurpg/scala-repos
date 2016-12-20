@@ -103,25 +103,28 @@ class WriteAheadLogBackedBlockRDDSuite
   }
 
   test("Test isBlockValid skips block fetching from BlockManager") {
-    testRDD(numPartitions = 5,
-            numPartitionsInBM = 5,
-            numPartitionsInWAL = 0,
-            testIsBlockValid = true)
+    testRDD(
+      numPartitions = 5,
+      numPartitionsInBM = 5,
+      numPartitionsInWAL = 0,
+      testIsBlockValid = true)
   }
 
   test("Test whether RDD is valid after removing blocks from block manager") {
-    testRDD(numPartitions = 5,
-            numPartitionsInBM = 5,
-            numPartitionsInWAL = 5,
-            testBlockRemove = true)
+    testRDD(
+      numPartitions = 5,
+      numPartitionsInBM = 5,
+      numPartitionsInWAL = 5,
+      testBlockRemove = true)
   }
 
   test(
     "Test storing of blocks recovered from write ahead log back into block manager") {
-    testRDD(numPartitions = 5,
-            numPartitionsInBM = 0,
-            numPartitionsInWAL = 5,
-            testStoreInBM = true)
+    testRDD(
+      numPartitions = 5,
+      numPartitionsInBM = 0,
+      numPartitionsInWAL = 5,
+      testStoreInBM = true)
   }
 
   /**
@@ -161,10 +164,12 @@ class WriteAheadLogBackedBlockRDDSuite
       testBlockRemove: Boolean = false,
       testStoreInBM: Boolean = false
   ) {
-    require(numPartitionsInBM <= numPartitions,
-            "Can't put more partitions in BlockManager than that in RDD")
-    require(numPartitionsInWAL <= numPartitions,
-            "Can't put more partitions in write ahead log than that in RDD")
+    require(
+      numPartitionsInBM <= numPartitions,
+      "Can't put more partitions in BlockManager than that in RDD")
+    require(
+      numPartitionsInWAL <= numPartitions,
+      "Can't put more partitions in write ahead log than that in RDD")
     val data = Seq.fill(numPartitions, 10)(scala.util.Random.nextString(50))
 
     // Put the necessary blocks in the block manager
@@ -209,11 +214,11 @@ class WriteAheadLogBackedBlockRDDSuite
     )
 
     // Create the RDD and verify whether the returned data is correct
-    val rdd = new WriteAheadLogBackedBlockRDD[String](sparkContext,
-                                                      blockIds.toArray,
-                                                      recordHandles.toArray,
-                                                      storeInBlockManager =
-                                                        false)
+    val rdd = new WriteAheadLogBackedBlockRDD[String](
+      sparkContext,
+      blockIds.toArray,
+      recordHandles.toArray,
+      storeInBlockManager = false)
     assert(rdd.collect() === data.flatten)
 
     // Verify that the block fetching is skipped when isBlockValid is set to false.
@@ -221,8 +226,9 @@ class WriteAheadLogBackedBlockRDDSuite
     // Using that RDD will throw exception, as it skips block fetching even if the blocks are in
     // in BlockManager.
     if (testIsBlockValid) {
-      require(numPartitionsInBM === numPartitions,
-              "All partitions must be in BlockManager")
+      require(
+        numPartitionsInBM === numPartitions,
+        "All partitions must be in BlockManager")
       require(numPartitionsInWAL === 0, "No partitions must be in WAL")
       val rdd2 = new WriteAheadLogBackedBlockRDD[String](
         sparkContext,
@@ -237,10 +243,12 @@ class WriteAheadLogBackedBlockRDDSuite
     // Verify that the RDD is not invalid after the blocks are removed and can still read data
     // from write ahead log
     if (testBlockRemove) {
-      require(numPartitions === numPartitionsInWAL,
-              "All partitions must be in WAL for this test")
-      require(numPartitionsInBM > 0,
-              "Some partitions must be in BlockManager for this test")
+      require(
+        numPartitions === numPartitionsInWAL,
+        "All partitions must be in WAL for this test")
+      require(
+        numPartitionsInBM > 0,
+        "Some partitions must be in BlockManager for this test")
       rdd.removeBlocks()
       assert(rdd.collect() === data.flatten)
     }

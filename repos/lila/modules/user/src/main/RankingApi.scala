@@ -33,16 +33,18 @@ final class RankingApi(coll: lila.db.Types.Coll,
 
   def save(userId: User.ID, perfType: PerfType, perf: Perf): Funit =
     (perf.nb >= 2) ?? coll
-      .update(BSONDocument(
-                "_id" -> s"$userId:${perfType.id}"
-              ),
-              BSONDocument("user" -> userId,
-                           "perf" -> perfType.id,
-                           "rating" -> perf.intRating,
-                           "prog" -> perf.progress,
-                           "stable" -> perf.established,
-                           "expiresAt" -> DateTime.now.plusDays(7)),
-              upsert = true)
+      .update(
+        BSONDocument(
+          "_id" -> s"$userId:${perfType.id}"
+        ),
+        BSONDocument(
+          "user" -> userId,
+          "perf" -> perfType.id,
+          "rating" -> perf.intRating,
+          "prog" -> perf.progress,
+          "stable" -> perf.established,
+          "expiresAt" -> DateTime.now.plusDays(7)),
+        upsert = true)
       .void
 
   def remove(userId: User.ID): Funit = UserRepo byId userId flatMap {
@@ -71,10 +73,11 @@ final class RankingApi(coll: lila.db.Types.Coll,
         .collect[List](nb) map {
         _.flatMap { r =>
           lightUser(r.user).map { light =>
-            User.LightPerf(user = light,
-                           perfKey = perfKey,
-                           rating = r.rating,
-                           progress = ~r.prog)
+            User.LightPerf(
+              user = light,
+              perfKey = perfKey,
+              rating = r.rating,
+              progress = ~r.prog)
           }
         }
       }
@@ -90,9 +93,9 @@ final class RankingApi(coll: lila.db.Types.Coll,
           cache(perf.id) map { _ get userId map (perf.key -> _) }
       } map (_.flatten.toMap)
 
-    private val cache = AsyncCache[Perf.ID, Map[User.ID, Rank]](f = compute,
-                                                                timeToLive =
-                                                                  15 minutes)
+    private val cache = AsyncCache[Perf.ID, Map[User.ID, Rank]](
+      f = compute,
+      timeToLive = 15 minutes)
 
     private def compute(perfId: Perf.ID): Fu[Map[User.ID, Rank]] = {
       val enumerator = coll

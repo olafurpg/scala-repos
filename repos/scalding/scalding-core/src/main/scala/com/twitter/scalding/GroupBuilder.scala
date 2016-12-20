@@ -206,12 +206,13 @@ class GroupBuilder(val groupFields: Fields)
     endSetter.assertArityMatches(toFields)
     // Update projectFields
     projectFields = projectFields.map { Fields.merge(_, fromFields) }
-    val ag = new MRMAggregator[T, X, U](mapfn,
-                                        redfn,
-                                        mapfn2,
-                                        toFields,
-                                        startConv,
-                                        endSetter)
+    val ag = new MRMAggregator[T, X, U](
+      mapfn,
+      redfn,
+      mapfn2,
+      toFields,
+      startConv,
+      endSetter)
     val ev = (pipe => new Every(pipe, fromFields, ag)): Pipe => Every
     assert(
       middleSetter.arity > 0,
@@ -220,16 +221,17 @@ class GroupBuilder(val groupFields: Fields)
     val middleFields = strFields(ScalaRange(0, middleSetter.arity).map { i =>
       getNextMiddlefield
     })
-    val mrmBy = new MRMBy[T, X, U](fromFields,
-                                   middleFields,
-                                   toFields,
-                                   mapfn,
-                                   redfn,
-                                   mapfn2,
-                                   startConv,
-                                   middleSetter,
-                                   middleConv,
-                                   endSetter)
+    val mrmBy = new MRMBy[T, X, U](
+      fromFields,
+      middleFields,
+      toFields,
+      mapfn,
+      redfn,
+      mapfn2,
+      startConv,
+      middleSetter,
+      middleConv,
+      endSetter)
     tryAggregateBy(mrmBy, ev)
     this
   }
@@ -260,11 +262,12 @@ class GroupBuilder(val groupFields: Fields)
     //Check arity
     conv.assertArityMatches(inFields)
     setter.assertArityMatches(outFields)
-    val b = new BufferOp[Unit, T, X]((),
-                                     (u: Unit, it: Iterator[T]) => mapfn(it),
-                                     outFields,
-                                     conv,
-                                     setter)
+    val b = new BufferOp[Unit, T, X](
+      (),
+      (u: Unit, it: Iterator[T]) => mapfn(it),
+      outFields,
+      conv,
+      setter)
     every(
       pipe => new Every(pipe, inFields, b, defaultMode(inFields, outFields)))
   }

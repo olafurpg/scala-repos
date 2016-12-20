@@ -52,8 +52,9 @@ class HoconMultiModuleIncludeResolutionTest
 
         def subpath(name: String) = new File(dir, name).getPath
         def libMapping(lib: String) =
-          Map(OrderRootType.CLASSES -> lib,
-              OrderRootType.SOURCES -> (lib + "src"))
+          Map(
+            OrderRootType.CLASSES -> lib,
+            OrderRootType.SOURCES -> (lib + "src"))
             .mapValues(s => Array(subpath(s)))
             .asJava
 
@@ -74,10 +75,12 @@ class HoconMultiModuleIncludeResolutionTest
       modules.values.foreach { mod =>
         val model = ModuleRootManager.getInstance(mod).getModifiableModel
         val contentEntry = model.getContentEntries.head
-        contentEntry.addSourceFolder(contentEntry.getFile.findChild("src"),
-                                     JavaSourceRootType.SOURCE)
-        contentEntry.addSourceFolder(contentEntry.getFile.findChild("testsrc"),
-                                     JavaSourceRootType.TEST_SOURCE)
+        contentEntry.addSourceFolder(
+          contentEntry.getFile.findChild("src"),
+          JavaSourceRootType.SOURCE)
+        contentEntry.addSourceFolder(
+          contentEntry.getFile.findChild("testsrc"),
+          JavaSourceRootType.TEST_SOURCE)
         model.getOrderEntries.foreach {
           case loe: LibraryOrderEntry
               if loe.getLibraryName.endsWith("testlib") =>

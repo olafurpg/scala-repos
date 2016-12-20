@@ -54,8 +54,9 @@ class PythonBroadcastSuite
       assertBroadcastIsValid(broadcast)
       val conf = new SparkConf().set("spark.kryo.registrationRequired", "true")
       val deserializedBroadcast =
-        Utils.clone[PythonBroadcast](broadcast,
-                                     new KryoSerializer(conf).newInstance())
+        Utils.clone[PythonBroadcast](
+          broadcast,
+          new KryoSerializer(conf).newInstance())
       assertBroadcastIsValid(deserializedBroadcast)
     } finally {
       Utils.deleteRecursively(tempDir)

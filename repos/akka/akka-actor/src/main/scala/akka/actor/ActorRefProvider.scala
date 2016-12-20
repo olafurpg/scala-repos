@@ -500,12 +500,13 @@ private[akka] class LocalActorRefProvider private[akka] (
            settings: ActorSystem.Settings,
            eventStream: EventStream,
            dynamicAccess: DynamicAccess) =
-    this(_systemName,
-         settings,
-         eventStream,
-         dynamicAccess,
-         new Deployer(settings, dynamicAccess),
-         None)
+    this(
+      _systemName,
+      settings,
+      eventStream,
+      dynamicAccess,
+      new Deployer(settings, dynamicAccess),
+      None)
 
   override val rootPath: ActorPath = RootActorPath(
     Address("akka", _systemName))
@@ -554,8 +555,9 @@ private[akka] class LocalActorRefProvider private[akka] (
         terminationPromise.tryCompleteWith(causeOfTermination.future) // Signal termination downstream, idempotent
       }
 
-      @deprecated("Use context.watch(actor) and receive Terminated(actor)",
-                  "2.2")
+      @deprecated(
+        "Use context.watch(actor) and receive Terminated(actor)",
+        "2.2")
       override private[akka] def isTerminated: Boolean = !isWalking
 
       override def !(message: Any)(
@@ -679,9 +681,10 @@ private[akka] class LocalActorRefProvider private[akka] (
     cell.reserveChild("system")
     val ref = new LocalActorRef(
       system,
-      Props(classOf[LocalActorRefProvider.SystemGuardian],
-            systemGuardianStrategy,
-            guardian),
+      Props(
+        classOf[LocalActorRefProvider.SystemGuardian],
+        systemGuardianStrategy,
+        guardian),
       defaultDispatcher,
       defaultMailbox,
       rootGuardian,
@@ -723,8 +726,9 @@ private[akka] class LocalActorRefProvider private[akka] (
     path match {
       case RelativeActorPath(elems) ⇒
         if (elems.isEmpty) {
-          log.debug("look-up of empty path string [{}] fails (per definition)",
-                    path)
+          log.debug(
+            "look-up of empty path string [{}] fails (per definition)",
+            path)
           deadLetters
         } else if (elems.head.isEmpty) actorFor(rootGuardian, elems.tail)
         else actorFor(ref, elems)
@@ -787,11 +791,13 @@ private[akka] class LocalActorRefProvider private[akka] (
     } else
       ref.getChild(pathElements.iterator) match {
         case Nobody ⇒
-          log.debug("resolve of path sequence [/{}] failed",
-                    pathElements.mkString("/"))
-          new EmptyLocalActorRef(system.provider,
-                                 ref.path / pathElements,
-                                 eventStream)
+          log.debug(
+            "resolve of path sequence [/{}] failed",
+            pathElements.mkString("/"))
+          new EmptyLocalActorRef(
+            system.provider,
+            ref.path / pathElements,
+            eventStream)
         case x ⇒ x
       }
 
@@ -837,19 +843,21 @@ private[akka] class LocalActorRefProvider private[akka] (
             .getMailboxType(props2, dispatcher.configurator.config)
 
           if (async)
-            new RepointableActorRef(system,
-                                    props2,
-                                    dispatcher,
-                                    mailboxType,
-                                    supervisor,
-                                    path).initialize(async)
+            new RepointableActorRef(
+              system,
+              props2,
+              dispatcher,
+              mailboxType,
+              supervisor,
+              path).initialize(async)
           else
-            new LocalActorRef(system,
-                              props2,
-                              dispatcher,
-                              mailboxType,
-                              supervisor,
-                              path)
+            new LocalActorRef(
+              system,
+              props2,
+              dispatcher,
+              mailboxType,
+              supervisor,
+              path)
         } catch {
           case NonFatal(e) ⇒
             throw new ConfigurationException(
@@ -890,13 +898,14 @@ private[akka] class LocalActorRefProvider private[akka] (
           val routeeMailbox = system.mailboxes
             .getMailboxType(routeeProps, routeeDispatcher.configurator.config)
 
-          new RoutedActorRef(system,
-                             routerProps,
-                             routerDispatcher,
-                             routerMailbox,
-                             routeeProps,
-                             supervisor,
-                             path).initialize(async)
+          new RoutedActorRef(
+            system,
+            routerProps,
+            routerDispatcher,
+            routerMailbox,
+            routeeProps,
+            supervisor,
+            path).initialize(async)
         } catch {
           case NonFatal(e) ⇒
             throw new ConfigurationException(

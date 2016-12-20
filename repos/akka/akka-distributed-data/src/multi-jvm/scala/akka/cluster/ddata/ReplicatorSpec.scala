@@ -43,11 +43,12 @@ class ReplicatorSpec
   override def initialParticipants = roles.size
 
   implicit val cluster = Cluster(system)
-  val replicator = system.actorOf(Replicator.props(
-                                    ReplicatorSettings(system)
-                                      .withGossipInterval(1.second)
-                                      .withMaxDeltaElements(10)),
-                                  "replicator")
+  val replicator = system.actorOf(
+    Replicator.props(
+      ReplicatorSettings(system)
+        .withGossipInterval(1.second)
+        .withMaxDeltaElements(10)),
+    "replicator")
   val timeout = 2.seconds.dilated
   val writeTwo = WriteTo(2, timeout)
   val writeMajority = WriteMajority(timeout)

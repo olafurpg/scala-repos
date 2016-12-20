@@ -158,9 +158,10 @@ class TcpConnectionSpec extends AkkaSpec("""
 
         selector.send(connectionActor, ChannelConnectable)
         userHandler.expectMsg(
-          Connected(serverAddress,
-                    clientSideChannel.socket.getLocalSocketAddress
-                      .asInstanceOf[InetSocketAddress]))
+          Connected(
+            serverAddress,
+            clientSideChannel.socket.getLocalSocketAddress
+              .asInstanceOf[InetSocketAddress]))
 
         userHandler.send(connectionActor, Register(userHandler.ref))
         userHandler
@@ -262,8 +263,9 @@ class TcpConnectionSpec extends AkkaSpec("""
         val size = math.min(testFile.length(), 100000000).toInt
 
         val writer = TestProbe()
-        writer.send(connectionActor,
-                    WriteFile(testFile.getAbsolutePath, 0, size, Ack))
+        writer.send(
+          connectionActor,
+          WriteFile(testFile.getAbsolutePath, 0, size, Ack))
         pullFromServerSide(size, 1000000)
         writer.expectMsg(Ack)
       }
@@ -676,8 +678,9 @@ class TcpConnectionSpec extends AkkaSpec("""
 
     "report failed connection attempt when timing out" in new UnacceptedConnectionTest() {
       override lazy val connectionActor =
-        createConnectionActor(serverAddress = UnboundAddress,
-                              timeout = Option(100.millis))
+        createConnectionActor(
+          serverAddress = UnboundAddress,
+          timeout = Option(100.millis))
       run {
         connectionActor.toString should not be ("")
         userHandler.expectMsg(
@@ -693,9 +696,10 @@ class TcpConnectionSpec extends AkkaSpec("""
 
         selector.send(connectionActor, ChannelConnectable)
         userHandler.expectMsg(
-          Connected(serverAddress,
-                    clientSideChannel.socket.getLocalSocketAddress
-                      .asInstanceOf[InetSocketAddress]))
+          Connected(
+            serverAddress,
+            clientSideChannel.socket.getLocalSocketAddress
+              .asInstanceOf[InetSocketAddress]))
 
         watch(connectionActor)
         expectTerminated(connectionActor)
@@ -719,8 +723,9 @@ class TcpConnectionSpec extends AkkaSpec("""
         watch(connectionActor)
         EventFilter[DeathPactException](occurrences = 1) intercept {
           system.stop(connectionHandler.ref)
-          val deaths = Set(expectMsgType[Terminated].actor,
-                           expectMsgType[Terminated].actor)
+          val deaths = Set(
+            expectMsgType[Terminated].actor,
+            expectMsgType[Terminated].actor)
           deaths should ===(Set(connectionHandler.ref, connectionActor))
         }
       }
@@ -934,10 +939,11 @@ class TcpConnectionSpec extends AkkaSpec("""
         options: immutable.Seq[SocketOption] = Nil,
         timeout: Option[FiniteDuration] = None,
         pullMode: Boolean = false): TestActorRef[TcpOutgoingConnection] = {
-      val ref = createConnectionActorWithoutRegistration(serverAddress,
-                                                         options,
-                                                         timeout,
-                                                         pullMode)
+      val ref = createConnectionActorWithoutRegistration(
+        serverAddress,
+        options,
+        timeout,
+        pullMode)
       ref ! newChannelRegistration
       ref
     }
@@ -954,13 +960,15 @@ class TcpConnectionSpec extends AkkaSpec("""
         timeout: Option[FiniteDuration] = None,
         pullMode: Boolean = false): TestActorRef[TcpOutgoingConnection] =
       TestActorRef(
-        new TcpOutgoingConnection(Tcp(system),
-                                  this,
-                                  userHandler.ref,
-                                  Connect(serverAddress,
-                                          options = options,
-                                          timeout = timeout,
-                                          pullMode = pullMode)) {
+        new TcpOutgoingConnection(
+          Tcp(system),
+          this,
+          userHandler.ref,
+          Connect(
+            serverAddress,
+            options = options,
+            timeout = timeout,
+            pullMode = pullMode)) {
           override def postRestart(reason: Throwable): Unit =
             context.stop(self) // ensure we never restart
         })
@@ -1021,14 +1029,17 @@ class TcpConnectionSpec extends AkkaSpec("""
         interestCallReceiver.expectMsg(OP_CONNECT)
         selector.send(connectionActor, ChannelConnectable)
         userHandler.expectMsg(
-          Connected(serverAddress,
-                    clientSideChannel.socket.getLocalSocketAddress
-                      .asInstanceOf[InetSocketAddress]))
+          Connected(
+            serverAddress,
+            clientSideChannel.socket.getLocalSocketAddress
+              .asInstanceOf[InetSocketAddress]))
 
-        userHandler.send(connectionActor,
-                         Register(connectionHandler.ref,
-                                  keepOpenOnPeerClosed,
-                                  useResumeWriting))
+        userHandler.send(
+          connectionActor,
+          Register(
+            connectionHandler.ref,
+            keepOpenOnPeerClosed,
+            useResumeWriting))
         ignoreWindowsWorkaroundForTicket15766()
         if (!pullMode) interestCallReceiver.expectMsg(OP_READ)
 
@@ -1143,17 +1154,19 @@ class TcpConnectionSpec extends AkkaSpec("""
                    duration: Duration): BeMatcher[SelectionKey] =
       new BeMatcher[SelectionKey] {
         def apply(key: SelectionKey) =
-          MatchResult(checkFor(key, interest, duration.toMillis.toInt),
-                      "%s key was not selected for %s after %s" format
-                        (key.attachment(), interestsDesc(interest), duration),
-                      "%s key was selected for %s after %s" format
-                        (key.attachment(), interestsDesc(interest), duration))
+          MatchResult(
+            checkFor(key, interest, duration.toMillis.toInt),
+            "%s key was not selected for %s after %s" format
+              (key.attachment(), interestsDesc(interest), duration),
+            "%s key was selected for %s after %s" format
+              (key.attachment(), interestsDesc(interest), duration))
       }
 
-    val interestsNames = Seq(OP_ACCEPT -> "accepting",
-                             OP_CONNECT -> "connecting",
-                             OP_READ -> "reading",
-                             OP_WRITE -> "writing")
+    val interestsNames = Seq(
+      OP_ACCEPT -> "accepting",
+      OP_CONNECT -> "connecting",
+      OP_READ -> "reading",
+      OP_WRITE -> "writing")
     def interestsDesc(interests: Int): String =
       interestsNames
         .filter(i ⇒ (i._1 & interests) != 0)

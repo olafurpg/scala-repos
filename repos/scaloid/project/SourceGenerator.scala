@@ -34,8 +34,9 @@ object SourceGenerator {
           val templateDir = srcDir / "st"
           val relativePath = Path.relativeTo(templateDir)
           val scalaTemplates =
-            recursiveListFiles(templateDir,
-                               (s: String) => s.endsWith(".scala"))
+            recursiveListFiles(
+              templateDir,
+              (s: String) => s.endsWith(".scala"))
 
           scalaTemplates.map { (file: File) =>
             val outFile = srcDir / "scala" / relativePath(file).get

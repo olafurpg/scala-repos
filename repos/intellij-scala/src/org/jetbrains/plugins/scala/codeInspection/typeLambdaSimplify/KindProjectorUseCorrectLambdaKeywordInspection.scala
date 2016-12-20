@@ -40,26 +40,31 @@ class KindProjectorUseCorrectLambdaKeywordInspection
             case "Lambda" if useGreekLambda =>
               val changeKeywordFix =
                 new KindProjectorUseCorrectLambdaKeywordQuickFix(simple, "λ")
-              holder.registerProblem(simple,
-                                     "Kind Projector: Replace Lambda with λ",
-                                     changeKeywordFix)
+              holder.registerProblem(
+                simple,
+                "Kind Projector: Replace Lambda with λ",
+                changeKeywordFix)
               val changeSettingsFix =
                 new ChangeLambdaCodeStyleSetting(!useGreekLambda)
-              holder.registerProblem(simple,
-                                     codeStyleSettingUseWordLambda,
-                                     changeSettingsFix)
+              holder.registerProblem(
+                simple,
+                codeStyleSettingUseWordLambda,
+                changeSettingsFix)
             case "λ" if !useGreekLambda =>
               val changeKeywordFix =
-                new KindProjectorUseCorrectLambdaKeywordQuickFix(simple,
-                                                                 "Lambda")
-              holder.registerProblem(simple,
-                                     "Kind Projector: Replace λ with Lambda",
-                                     changeKeywordFix)
+                new KindProjectorUseCorrectLambdaKeywordQuickFix(
+                  simple,
+                  "Lambda")
+              holder.registerProblem(
+                simple,
+                "Kind Projector: Replace λ with Lambda",
+                changeKeywordFix)
               val changeSettingsFix =
                 new ChangeLambdaCodeStyleSetting(!useGreekLambda)
-              holder.registerProblem(simple,
-                                     codeStyleSettingUseGreekLambda,
-                                     changeSettingsFix)
+              holder.registerProblem(
+                simple,
+                codeStyleSettingUseGreekLambda,
+                changeSettingsFix)
             case _ =>
           }
         case _ =>

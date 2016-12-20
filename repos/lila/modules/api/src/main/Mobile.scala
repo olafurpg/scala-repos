@@ -19,9 +19,10 @@ object Mobile {
     def oldVersions: List[Old] = List(
       // old version 0 is just an example, so the list is never empty :)
       // nobody ever used version 0.
-      Old(version = 0,
-          deprecatedAt = new DateTime("2014-08-01"),
-          unsupportedAt = new DateTime("2014-12-01"))
+      Old(
+        version = 0,
+        deprecatedAt = new DateTime("2014-08-01"),
+        unsupportedAt = new DateTime("2014-12-01"))
     )
 
     private val PathPattern = """^.+/socket/v(\d+)$""".r

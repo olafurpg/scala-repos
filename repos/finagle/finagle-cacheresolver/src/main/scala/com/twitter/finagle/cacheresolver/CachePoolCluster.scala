@@ -130,9 +130,10 @@ object CacheNodeGroup {
       zkClient: ZooKeeperClient,
       statsReceiver: StatsReceiver = NullStatsReceiver
   ) =
-    new ZookeeperCacheNodeGroup(zkPath = path,
-                                zkClient = zkClient,
-                                statsReceiver = statsReceiver)
+    new ZookeeperCacheNodeGroup(
+      zkPath = path,
+      zkClient = zkClient,
+      statsReceiver = statsReceiver)
 
   private[finagle] def fromVarAddr(va: Var[Addr],
                                    useOnlyResolvedAddress: Boolean = false) =
@@ -204,9 +205,8 @@ object CachePoolCluster {
       zkClient: ZooKeeperClient
   ) =
     new ZookeeperServerSetCluster(
-      ServerSets.create(zkClient,
-                        ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
-                        zkPath)
+      ServerSets
+        .create(zkClient, ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL, zkPath)
     ) map {
       case addr: InetSocketAddress =>
         CacheNode(addr.getHostName, addr.getPort, 1)
@@ -323,9 +323,10 @@ class ZookeeperCachePoolCluster private[cacheresolver] (
 
   private[this] val zkServerSetCluster =
     new ZookeeperServerSetCluster(
-      ServerSets.create(zkClient,
-                        ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
-                        zkPath)) map {
+      ServerSets.create(
+        zkClient,
+        ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
+        zkPath)) map {
       case addr: InetSocketAddress =>
         CacheNode(addr.getHostName, addr.getPort, 1)
     }
@@ -377,10 +378,12 @@ class ZookeeperCachePoolCluster private[cacheresolver] (
       // should be always exactly matching existing memberships, controlled by cache-team operator.
       // It will only block for 10 seconds after which it should trigger alerting metrics and schedule
       // another try
-      val newSet = Await.result(waitForClusterComplete(snapshotSeq.toSet,
-                                                       expectedClusterSize,
-                                                       snapshotChanges),
-                                CachePoolWaitCompleteTimeout)
+      val newSet = Await.result(
+        waitForClusterComplete(
+          snapshotSeq.toSet,
+          expectedClusterSize,
+          snapshotChanges),
+        CachePoolWaitCompleteTimeout)
 
       updatePool(newSet)
     }

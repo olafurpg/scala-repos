@@ -238,11 +238,12 @@ class CompilerState private (val compiler: QueryCompiler,
 
   /** Return a new `CompilerState` with the given mapping of phase to phase state */
   def +[S, P <: Phase { type State = S }](t: (P, S)) =
-    new CompilerState(compiler,
-                      symbolNamer,
-                      tree,
-                      state + (t._1.name -> t._2),
-                      wellTyped)
+    new CompilerState(
+      compiler,
+      symbolNamer,
+      tree,
+      state + (t._1.name -> t._2),
+      wellTyped)
 
   /** Return a new `CompilerState` which encapsulates the specified AST */
   def withNode(tree: Node) =

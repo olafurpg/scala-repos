@@ -68,9 +68,10 @@ final case class Extracted(
     import EvaluateTask._
 
     val scopedKey = Scoped.scopedSetting(
-      Scope.resolveScope(Load.projectScope(currentRef),
-                         currentRef.build,
-                         structure.rootProject)(key.scope),
+      Scope.resolveScope(
+        Load.projectScope(currentRef),
+        currentRef.build,
+        structure.rootProject)(key.scope),
       key.key)
     val rkey = resolve(scopedKey.scopedKey)
     val inputTask = get(Scoped.scopedSetting(rkey.scope, rkey.key))
@@ -97,11 +98,12 @@ final case class Extracted(
     val rkey = resolve(key.scopedKey)
     val keys = Aggregation.aggregate(rkey, ScopeMask(), structure.extra)
     val tasks = Act.keyValues(structure)(keys)
-    Aggregation.runTasks(state,
-                         structure,
-                         tasks,
-                         DummyTaskMap(Nil),
-                         show = Aggregation.defaultShow(state, false))(showKey)
+    Aggregation.runTasks(
+      state,
+      structure,
+      tasks,
+      DummyTaskMap(Nil),
+      show = Aggregation.defaultShow(state, false))(showKey)
   }
 
   private[this] def resolve[T](key: ScopedKey[T]): ScopedKey[T] =
@@ -120,10 +122,11 @@ final case class Extracted(
       display(ScopedKey(scope, key)) + " is undefined.")
 
   def append(settings: Seq[Setting[_]], state: State): State = {
-    val appendSettings = Load.transformSettings(Load.projectScope(currentRef),
-                                                currentRef.build,
-                                                rootProject,
-                                                settings)
+    val appendSettings = Load.transformSettings(
+      Load.projectScope(currentRef),
+      currentRef.build,
+      rootProject,
+      settings)
     val newStructure =
       Load.reapply(session.original ++ appendSettings, structure)
     Project.setProject(session, newStructure, state)

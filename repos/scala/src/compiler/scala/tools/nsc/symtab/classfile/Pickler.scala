@@ -196,10 +196,11 @@ abstract class Pickler extends SubComponent {
                 val parents =
                   (if (sym.isTrait) List(definitions.ObjectTpe) else Nil) ::: List(
                     sym.tpe)
-                globals + sym.newClassWithInfo(tpnme.LOCAL_CHILD,
-                                               parents,
-                                               EmptyScope,
-                                               pos = sym.pos)
+                globals + sym.newClassWithInfo(
+                  tpnme.LOCAL_CHILD,
+                  parents,
+                  EmptyScope,
+                  pos = sym.pos)
               }
 
             putChildren(sym, children.toList sortBy (_.sealedSortName))

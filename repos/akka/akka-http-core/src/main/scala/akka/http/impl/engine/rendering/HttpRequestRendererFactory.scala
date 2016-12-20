@@ -61,86 +61,96 @@ private[http] class HttpRequestRendererFactory(
                 log,
                 x,
                 "explicit `Content-Length` header is not allowed. Use the appropriate HttpEntity subtype.")
-              renderHeaders(tail,
-                            hostHeaderSeen,
-                            userAgentSeen,
-                            transferEncodingSeen)
+              renderHeaders(
+                tail,
+                hostHeaderSeen,
+                userAgentSeen,
+                transferEncodingSeen)
 
             case x: `Content-Type` ⇒
               suppressionWarning(
                 log,
                 x,
                 "explicit `Content-Type` header is not allowed. Set `HttpRequest.entity.contentType` instead.")
-              renderHeaders(tail,
-                            hostHeaderSeen,
-                            userAgentSeen,
-                            transferEncodingSeen)
+              renderHeaders(
+                tail,
+                hostHeaderSeen,
+                userAgentSeen,
+                transferEncodingSeen)
 
             case x: `Transfer-Encoding` ⇒
               x.withChunkedPeeled match {
                 case None ⇒
                   suppressionWarning(log, head)
-                  renderHeaders(tail,
-                                hostHeaderSeen,
-                                userAgentSeen,
-                                transferEncodingSeen)
+                  renderHeaders(
+                    tail,
+                    hostHeaderSeen,
+                    userAgentSeen,
+                    transferEncodingSeen)
                 case Some(te) ⇒
                   // if the user applied some custom transfer-encoding we need to keep the header
                   render(
                     if (entity.isChunked && !entity.isKnownEmpty)
                       te.withChunked
                     else te)
-                  renderHeaders(tail,
-                                hostHeaderSeen,
-                                userAgentSeen,
-                                transferEncodingSeen = true)
+                  renderHeaders(
+                    tail,
+                    hostHeaderSeen,
+                    userAgentSeen,
+                    transferEncodingSeen = true)
               }
 
             case x: `Host` ⇒
               render(x)
-              renderHeaders(tail,
-                            hostHeaderSeen = true,
-                            userAgentSeen,
-                            transferEncodingSeen)
+              renderHeaders(
+                tail,
+                hostHeaderSeen = true,
+                userAgentSeen,
+                transferEncodingSeen)
 
             case x: `User-Agent` ⇒
               render(x)
-              renderHeaders(tail,
-                            hostHeaderSeen,
-                            userAgentSeen = true,
-                            transferEncodingSeen)
+              renderHeaders(
+                tail,
+                hostHeaderSeen,
+                userAgentSeen = true,
+                transferEncodingSeen)
 
             case x: `Raw-Request-URI` ⇒ // we never render this header
-              renderHeaders(tail,
-                            hostHeaderSeen,
-                            userAgentSeen,
-                            transferEncodingSeen)
+              renderHeaders(
+                tail,
+                hostHeaderSeen,
+                userAgentSeen,
+                transferEncodingSeen)
 
             case x: CustomHeader ⇒
               if (x.renderInRequests) render(x)
-              renderHeaders(tail,
-                            hostHeaderSeen,
-                            userAgentSeen,
-                            transferEncodingSeen)
+              renderHeaders(
+                tail,
+                hostHeaderSeen,
+                userAgentSeen,
+                transferEncodingSeen)
 
             case x: RawHeader
                 if (x is "content-type") || (x is "content-length") ||
                   (x is "transfer-encoding") || (x is "host") ||
                   (x is "user-agent") ⇒
               suppressionWarning(log, x, "illegal RawHeader")
-              renderHeaders(tail,
-                            hostHeaderSeen,
-                            userAgentSeen,
-                            transferEncodingSeen)
+              renderHeaders(
+                tail,
+                hostHeaderSeen,
+                userAgentSeen,
+                transferEncodingSeen)
 
             case x ⇒
               if (x.renderInRequests) render(x)
               else
                 log.warning("HTTP header '{}' is not allowed in requests", x)
-              renderHeaders(tail,
-                            hostHeaderSeen,
-                            userAgentSeen,
-                            transferEncodingSeen)
+              renderHeaders(
+                tail,
+                hostHeaderSeen,
+                userAgentSeen,
+                transferEncodingSeen)
           }
 
         case Nil ⇒
@@ -215,9 +225,10 @@ private[http] object HttpRequestRendererFactory {
   def renderStrict(ctx: RequestRenderingContext,
                    settings: ClientConnectionSettings,
                    log: LoggingAdapter): ByteString =
-    new HttpRequestRendererFactory(settings.userAgentHeader,
-                                   settings.requestHeaderSizeHint,
-                                   log).renderStrict(ctx)
+    new HttpRequestRendererFactory(
+      settings.userAgentHeader,
+      settings.requestHeaderSizeHint,
+      log).renderStrict(ctx)
 
   sealed trait RequestRenderingOutput {
     def byteStream: Source[ByteString, Any]

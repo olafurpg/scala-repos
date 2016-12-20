@@ -10,14 +10,15 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
 
   // configuration //
 
-  val scalaIgnore = Set("equals",
-                        "hashCode",
-                        "notify",
-                        "notifyAll",
-                        "wait",
-                        "toString",
-                        "getClass",
-                        "shape")
+  val scalaIgnore = Set(
+    "equals",
+    "hashCode",
+    "notify",
+    "notifyAll",
+    "wait",
+    "toString",
+    "getClass",
+    "shape")
 
   val javaIgnore = Set("adapt") // the scaladsl -> javadsl bridge
 
@@ -78,32 +79,38 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
     TestCase("Source", scaladsl.Source.getClass, javadsl.Source.getClass),
     TestCase("Flow", scaladsl.Flow.getClass, javadsl.Flow.getClass),
     TestCase("Sink", scaladsl.Sink.getClass, javadsl.Sink.getClass),
-    TestCase("BidiFlow",
-             scaladsl.BidiFlow.getClass,
-             javadsl.BidiFlow.getClass),
-    TestCase("GraphDSL",
-             scaladsl.GraphDSL.getClass,
-             javadsl.GraphDSL.getClass,
-             classOf[javadsl.GraphCreate]),
-    TestCase("ZipWith",
-             Some(scaladsl.ZipWith.getClass),
-             None,
-             Some(javadsl.ZipWith.getClass)),
+    TestCase(
+      "BidiFlow",
+      scaladsl.BidiFlow.getClass,
+      javadsl.BidiFlow.getClass),
+    TestCase(
+      "GraphDSL",
+      scaladsl.GraphDSL.getClass,
+      javadsl.GraphDSL.getClass,
+      classOf[javadsl.GraphCreate]),
+    TestCase(
+      "ZipWith",
+      Some(scaladsl.ZipWith.getClass),
+      None,
+      Some(javadsl.ZipWith.getClass)),
     TestCase("Merge", scaladsl.Merge.getClass, javadsl.Merge.getClass),
-    TestCase("MergePreferred",
-             scaladsl.MergePreferred.getClass,
-             javadsl.MergePreferred.getClass),
-    TestCase("Broadcast",
-             scaladsl.Broadcast.getClass,
-             javadsl.Broadcast.getClass),
+    TestCase(
+      "MergePreferred",
+      scaladsl.MergePreferred.getClass,
+      javadsl.MergePreferred.getClass),
+    TestCase(
+      "Broadcast",
+      scaladsl.Broadcast.getClass,
+      javadsl.Broadcast.getClass),
     TestCase("Balance", scaladsl.Balance.getClass, javadsl.Balance.getClass),
     TestCase("Zip", scaladsl.Zip.getClass, javadsl.Zip.getClass),
     TestCase("UnZip", scaladsl.Unzip.getClass, javadsl.Unzip.getClass),
     TestCase("Concat", scaladsl.Concat.getClass, javadsl.Concat.getClass),
     TestCase("FileIO", scaladsl.FileIO.getClass, javadsl.FileIO.getClass),
-    TestCase("StreamConverters",
-             scaladsl.StreamConverters.getClass,
-             javadsl.StreamConverters.getClass)
+    TestCase(
+      "StreamConverters",
+      scaladsl.StreamConverters.getClass,
+      javadsl.StreamConverters.getClass)
   )
 
   "Java DSL" must provide {
@@ -137,10 +144,11 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
       .toList
 
   private def toMethod(m: java.lang.reflect.Method): Method =
-    Method(m.getName,
-           List(m.getParameterTypes: _*),
-           m.getReturnType,
-           m.getDeclaringClass)
+    Method(
+      m.getName,
+      List(m.getParameterTypes: _*),
+      m.getReturnType,
+      m.getDeclaringClass)
 
   private case class Ignore(cls: Class[_] ⇒ Boolean,
                             name: String ⇒ Boolean,
@@ -150,35 +158,42 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
   private def ignore(m: Method): Boolean = {
     val ignores = Seq(
       // private scaladsl method
-      Ignore(_ == akka.stream.scaladsl.Source.getClass,
-             _ == "apply",
-             _ == 1,
-             _ == List(classOf[akka.stream.impl.SourceModule[_, _]])),
+      Ignore(
+        _ == akka.stream.scaladsl.Source.getClass,
+        _ == "apply",
+        _ == 1,
+        _ == List(classOf[akka.stream.impl.SourceModule[_, _]])),
       // corresponding matches on java side would need to have Function23
-      Ignore(_ == akka.stream.scaladsl.Source.getClass,
-             _ == "apply",
-             _ == 24,
-             _ ⇒ true),
-      Ignore(_ == akka.stream.scaladsl.Flow.getClass,
-             _ == "apply",
-             _ == 24,
-             _ ⇒ true),
-      Ignore(_ == akka.stream.scaladsl.Sink.getClass,
-             _ == "apply",
-             _ == 24,
-             _ ⇒ true),
-      Ignore(_ == akka.stream.scaladsl.BidiFlow.getClass,
-             _ == "apply",
-             _ == 24,
-             _ ⇒ true),
-      Ignore(_ == akka.stream.scaladsl.GraphDSL.getClass,
-             _ == "runnable",
-             _ == 24,
-             _ ⇒ true),
-      Ignore(_ == akka.stream.scaladsl.GraphDSL.getClass,
-             _ == "create",
-             _ == 24,
-             _ ⇒ true),
+      Ignore(
+        _ == akka.stream.scaladsl.Source.getClass,
+        _ == "apply",
+        _ == 24,
+        _ ⇒ true),
+      Ignore(
+        _ == akka.stream.scaladsl.Flow.getClass,
+        _ == "apply",
+        _ == 24,
+        _ ⇒ true),
+      Ignore(
+        _ == akka.stream.scaladsl.Sink.getClass,
+        _ == "apply",
+        _ == 24,
+        _ ⇒ true),
+      Ignore(
+        _ == akka.stream.scaladsl.BidiFlow.getClass,
+        _ == "apply",
+        _ == 24,
+        _ ⇒ true),
+      Ignore(
+        _ == akka.stream.scaladsl.GraphDSL.getClass,
+        _ == "runnable",
+        _ == 24,
+        _ ⇒ true),
+      Ignore(
+        _ == akka.stream.scaladsl.GraphDSL.getClass,
+        _ == "create",
+        _ == 24,
+        _ ⇒ true),
       // all generated methods like scaladsl.Sink$.akka$stream$scaladsl$Sink$$newOnCompleteStage$1
       Ignore(_ ⇒ true, _.contains("$"), _ ⇒ true, _ ⇒ true)
     )
@@ -207,9 +222,10 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
     */
   private val curryLikeJava: PartialFunction[Method, Method] = {
     case m if m.parameterTypes.size > 1 ⇒
-      m.copy(name = m.name.filter(Character.isLetter),
-             parameterTypes = m.parameterTypes
-                 .dropRight(1) :+ classOf[akka.japi.function.Function[_, _]])
+      m.copy(
+        name = m.name.filter(Character.isLetter),
+        parameterTypes = m.parameterTypes
+            .dropRight(1) :+ classOf[akka.japi.function.Function[_, _]])
     case m ⇒ m
   }
 
@@ -288,10 +304,11 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
         if (typeMatch(s.parameterTypes, j.parameterTypes))
           if (returnTypeMatch(s.returnType, j.returnType)) Match(s, j)
           else
-            MatchFailure(s,
-                         j,
-                         "Return types don't match! " + s.returnType + ", " +
-                           j.returnType)
+            MatchFailure(
+              s,
+              j,
+              "Return types don't match! " + s.returnType + ", " +
+                j.returnType)
         else MatchFailure(s, j, "Types of parameters don't match!")
       else MatchFailure(s, j, "Same name, but different number of parameters!")
     } else {

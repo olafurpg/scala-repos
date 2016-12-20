@@ -40,13 +40,14 @@ private[sql] abstract class SQLMetric[R <: SQLMetricValue[T], T](
   // Provide special identifier as metadata so we can tell that this is a `SQLMetric` later
   override def toInfo(update: Option[Any],
                       value: Option[Any]): AccumulableInfo = {
-    new AccumulableInfo(id,
-                        Some(name),
-                        update,
-                        value,
-                        isInternal,
-                        countFailedValues,
-                        Some(SQLMetrics.ACCUM_IDENTIFIER))
+    new AccumulableInfo(
+      id,
+      Some(name),
+      update,
+      value,
+      isInternal,
+      countFailedValues,
+      Some(SQLMetrics.ACCUM_IDENTIFIER))
   }
 
   def reset(): Unit = {
@@ -153,10 +154,11 @@ private object StaticsLongSQLMetricParam
             Seq.fill(4)(0L)
           } else {
             val sorted = validValues.sorted
-            Seq(sorted.sum,
-                sorted(0),
-                sorted(validValues.length / 2),
-                sorted(validValues.length - 1))
+            Seq(
+              sorted.sum,
+              sorted(0),
+              sorted(validValues.length / 2),
+              sorted(validValues.length - 1))
           }
         metric.map(Utils.bytesToString)
       }
@@ -190,9 +192,10 @@ private[sql] object SQLMetrics {
     // The final result of this metric in physical operator UI may looks like:
     // data size total (min, med, max):
     // 100GB (100MB, 1GB, 10GB)
-    createLongMetric(sc,
-                     s"$name total (min, med, max)",
-                     StaticsLongSQLMetricParam)
+    createLongMetric(
+      sc,
+      s"$name total (min, med, max)",
+      StaticsLongSQLMetricParam)
   }
 
   def getMetricParam(

@@ -97,8 +97,9 @@ trait SerializationSupport {
       .setUid(uniqueAddress.uid)
 
   def uniqueAddressFromProto(uniqueAddress: dm.UniqueAddress): UniqueAddress =
-    UniqueAddress(addressFromProto(uniqueAddress.getAddress),
-                  uniqueAddress.getUid)
+    UniqueAddress(
+      addressFromProto(uniqueAddress.getAddress),
+      uniqueAddress.getUid)
 
   def resolveActorRef(path: String): ActorRef =
     system.provider.resolveActorRef(path)
@@ -143,9 +144,10 @@ trait SerializationSupport {
       if (other.hasMessageManifest) other.getMessageManifest.toStringUtf8
       else ""
     serialization
-      .deserialize(other.getEnclosedMessage.toByteArray,
-                   other.getSerializerId,
-                   manifest)
+      .deserialize(
+        other.getEnclosedMessage.toByteArray,
+        other.getSerializerId,
+        manifest)
       .get
   }
 }

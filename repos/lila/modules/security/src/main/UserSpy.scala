@@ -54,14 +54,15 @@ object UserSpy {
       sharingIp ← exploreSimilar("ip")(user)
       sharingFingerprint ← exploreSimilar("fp")(user)
     } yield
-      UserSpy(ips = ips zip blockedIps zip locations map {
-                case ((ip, blocked), location) => IPData(ip, blocked, location)
-              },
-              uas = infos.map(_.ua).distinct,
-              usersSharingIp = (sharingIp +
-                user).toList.sortBy(-_.createdAt.getMillis),
-              usersSharingFingerprint = (sharingFingerprint +
-                user).toList.sortBy(-_.createdAt.getMillis))
+      UserSpy(
+        ips = ips zip blockedIps zip locations map {
+          case ((ip, blocked), location) => IPData(ip, blocked, location)
+        },
+        uas = infos.map(_.ua).distinct,
+        usersSharingIp = (sharingIp +
+          user).toList.sortBy(-_.createdAt.getMillis),
+        usersSharingFingerprint = (sharingFingerprint +
+          user).toList.sortBy(-_.createdAt.getMillis))
 
   private def exploreSimilar(field: String)(user: User): Fu[Set[User]] =
     nextValues(field)(user) flatMap { nValues =>
@@ -82,13 +83,13 @@ object UserSpy {
   private def nextUsers(field: String)(values: Set[Value],
                                        user: User): Fu[Set[User]] =
     values.nonEmpty ?? {
-      storeColl.distinct("user",
-                         BSONDocument(
-                           field -> BSONDocument("$in" -> values),
-                           "user" -> BSONDocument("$ne" -> user.id)
-                         ).some) map lila.db.BSON.asStrings flatMap {
-        userIds =>
-          userIds.nonEmpty ?? (UserRepo byIds userIds) map (_.toSet)
+      storeColl.distinct(
+        "user",
+        BSONDocument(
+          field -> BSONDocument("$in" -> values),
+          "user" -> BSONDocument("$ne" -> user.id)
+        ).some) map lila.db.BSON.asStrings flatMap { userIds =>
+        userIds.nonEmpty ?? (UserRepo byIds userIds) map (_.toSet)
       }
     }
 }

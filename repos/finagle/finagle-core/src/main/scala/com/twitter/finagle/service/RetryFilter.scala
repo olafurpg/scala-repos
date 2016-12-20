@@ -128,9 +128,10 @@ object RetryFilter {
   )(
       implicit timer: Timer
   ): RetryFilter[Req, Rep] =
-    new RetryFilter[Req, Rep](RetryPolicy.backoff(backoffs)(shouldRetry),
-                              timer,
-                              statsReceiver)
+    new RetryFilter[Req, Rep](
+      RetryPolicy.backoff(backoffs)(shouldRetry),
+      timer,
+      statsReceiver)
 }
 
 /**

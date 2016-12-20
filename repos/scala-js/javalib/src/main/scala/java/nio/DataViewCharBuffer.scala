@@ -35,11 +35,12 @@ private[nio] final class DataViewCharBuffer private (
   def subSequence(start: Int, end: Int): CharBuffer = {
     if (start < 0 || end < start || end > remaining)
       throw new IndexOutOfBoundsException
-    new DataViewCharBuffer(_dataView,
-                           position + start,
-                           position + end,
-                           isReadOnly,
-                           isBigEndian)
+    new DataViewCharBuffer(
+      _dataView,
+      position + start,
+      position + end,
+      isReadOnly,
+      isBigEndian)
   }
 
   @noinline
@@ -116,11 +117,12 @@ private[nio] object DataViewCharBuffer {
               initialLimit: Int,
               readOnly: Boolean,
               isBigEndian: Boolean): CharBuffer = {
-      new DataViewCharBuffer(dataView,
-                             initialPosition,
-                             initialLimit,
-                             readOnly,
-                             isBigEndian)
+      new DataViewCharBuffer(
+        dataView,
+        initialPosition,
+        initialLimit,
+        readOnly,
+        isBigEndian)
     }
   }
 

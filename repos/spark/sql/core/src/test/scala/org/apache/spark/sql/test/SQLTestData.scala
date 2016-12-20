@@ -248,13 +248,15 @@ private[sql] trait SQLTestData { self =>
 
   protected lazy val complexData: DataFrame = {
     val df = sqlContext.sparkContext
-      .parallelize(ComplexData(Map("1" -> 1),
-                               TestData(1, "1"),
-                               Seq(1, 1, 1),
-                               true) :: ComplexData(Map("2" -> 2),
-                                                    TestData(2, "2"),
-                                                    Seq(2, 2, 2),
-                                                    false) :: Nil)
+      .parallelize(ComplexData(
+        Map("1" -> 1),
+        TestData(1, "1"),
+        Seq(1, 1, 1),
+        true) :: ComplexData(
+        Map("2" -> 2),
+        TestData(2, "2"),
+        Seq(2, 2, 2),
+        false) :: Nil)
       .toDF()
     df.registerTempTable("complexData")
     df
@@ -280,8 +282,9 @@ private[sql] trait SQLTestData { self =>
     * Initialize all test data such that all temp tables are properly registered.
     */
   def loadTestData(): Unit = {
-    assert(sqlContext != null,
-           "attempted to initialize test data before SQLContext.")
+    assert(
+      sqlContext != null,
+      "attempted to initialize test data before SQLContext.")
     emptyTestData
     testData
     testData2

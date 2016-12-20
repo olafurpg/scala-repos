@@ -42,11 +42,12 @@ object CSVRelation extends Logging {
     // If header is set, make sure firstLine is materialized before sending to executors.
     file.mapPartitionsWithIndex({
       case (split, iter) =>
-        new BulkCsvReader(if (params.headerFlag)
-                            iter.filterNot(_ == firstLine)
-                          else iter,
-                          params,
-                          headers = header)
+        new BulkCsvReader(
+          if (params.headerFlag)
+            iter.filterNot(_ == firstLine)
+          else iter,
+          params,
+          headers = header)
     }, true)
   }
 
@@ -106,10 +107,11 @@ object CSVRelation extends Logging {
             // It anyway needs to try to parse since it decides if this row is malformed
             // or not after trying to cast in `DROPMALFORMED` mode even if the casted
             // value is not stored in the row.
-            val value = CSVTypeCast.castTo(indexSafeTokens(index),
-                                           field.dataType,
-                                           field.nullable,
-                                           params.nullValue)
+            val value = CSVTypeCast.castTo(
+              indexSafeTokens(index),
+              field.dataType,
+              field.nullable,
+              params.nullValue)
             if (subIndex < requiredSize) {
               row(subIndex) = value
             }

@@ -29,10 +29,11 @@ object TimeoutFilter {
     * for use in clients.
     */
   def clientModule[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
-    new Stack.Module3[TimeoutFilter.Param,
-                      param.Timer,
-                      LatencyCompensation.Compensation,
-                      ServiceFactory[Req, Rep]] {
+    new Stack.Module3[
+      TimeoutFilter.Param,
+      param.Timer,
+      LatencyCompensation.Compensation,
+      ServiceFactory[Req, Rep]] {
       val role = TimeoutFilter.role
       val description =
         "Apply a timeout-derived deadline to requests; adjust existing deadlines."
@@ -61,9 +62,10 @@ object TimeoutFilter {
     * for use in servers.
     */
   def serverModule[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
-    new Stack.Module2[TimeoutFilter.Param,
-                      param.Timer,
-                      ServiceFactory[Req, Rep]] {
+    new Stack.Module2[
+      TimeoutFilter.Param,
+      param.Timer,
+      ServiceFactory[Req, Rep]] {
       val role = TimeoutFilter.role
       val description =
         "Apply a timeout-derived deadline to requests; adjust existing deadlines."

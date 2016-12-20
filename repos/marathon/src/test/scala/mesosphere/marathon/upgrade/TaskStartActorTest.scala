@@ -52,9 +52,10 @@ class TaskStartActorTest
     metrics = new Metrics(new MetricRegistry)
     val leadershipModule = AlwaysElectedLeadershipModule.forActorSystem(system)
     val taskTrackerModule =
-      MarathonTestHelper.createTaskTrackerModule(leadershipModule,
-                                                 store = new InMemoryStore,
-                                                 metrics = metrics)
+      MarathonTestHelper.createTaskTrackerModule(
+        leadershipModule,
+        store = new InMemoryStore,
+        metrics = metrics)
 
     taskCreationHandler = taskTrackerModule.taskCreationHandler
     taskTracker = spy(taskTrackerModule.taskTracker)
@@ -70,15 +71,16 @@ class TaskStartActorTest
 
       when(launchQueue.get(app.id)).thenReturn(counts)
       val ref = TestActorRef(
-        Props(classOf[TaskStartActor],
-              driver,
-              scheduler,
-              launchQueue,
-              taskTracker,
-              system.eventStream,
-              app,
-              app.instances,
-              promise))
+        Props(
+          classOf[TaskStartActor],
+          driver,
+          scheduler,
+          launchQueue,
+          taskTracker,
+          system.eventStream,
+          app,
+          app.instances,
+          promise))
 
       watch(ref)
 
@@ -86,15 +88,16 @@ class TaskStartActorTest
 
       for (i <- 0 until app.instances)
         system.eventStream.publish(
-          MesosStatusUpdateEvent("",
-                                 Task.Id(s"task-$i"),
-                                 "TASK_RUNNING",
-                                 "",
-                                 app.id,
-                                 "",
-                                 Nil,
-                                 Nil,
-                                 app.version.toString))
+          MesosStatusUpdateEvent(
+            "",
+            Task.Id(s"task-$i"),
+            "TASK_RUNNING",
+            "",
+            app.id,
+            "",
+            Nil,
+            Nil,
+            app.version.toString))
 
       Await.result(promise.future, 3.seconds) should be(())
 
@@ -132,15 +135,16 @@ class TaskStartActorTest
 
       for (i <- 0 until (app.instances - 1))
         system.eventStream.publish(
-          MesosStatusUpdateEvent("",
-                                 Task.Id(s"task-$i"),
-                                 "TASK_RUNNING",
-                                 "",
-                                 app.id,
-                                 "",
-                                 Nil,
-                                 Nil,
-                                 app.version.toString))
+          MesosStatusUpdateEvent(
+            "",
+            Task.Id(s"task-$i"),
+            "TASK_RUNNING",
+            "",
+            app.id,
+            "",
+            Nil,
+            Nil,
+            app.version.toString))
 
       Await.result(promise.future, 3.seconds) should be(())
 
@@ -158,15 +162,16 @@ class TaskStartActorTest
     taskCreationHandler.created(task).futureValue
 
     val ref = TestActorRef(
-      Props(classOf[TaskStartActor],
-            driver,
-            scheduler,
-            launchQueue,
-            taskTracker,
-            system.eventStream,
-            app,
-            app.instances,
-            promise))
+      Props(
+        classOf[TaskStartActor],
+        driver,
+        scheduler,
+        launchQueue,
+        taskTracker,
+        system.eventStream,
+        app,
+        app.instances,
+        promise))
 
     watch(ref)
 
@@ -174,15 +179,16 @@ class TaskStartActorTest
 
     for (i <- 0 until (app.instances - 1))
       system.eventStream.publish(
-        MesosStatusUpdateEvent("",
-                               Task.Id(s"task-$i"),
-                               "TASK_RUNNING",
-                               "",
-                               app.id,
-                               "",
-                               Nil,
-                               Nil,
-                               app.version.toString))
+        MesosStatusUpdateEvent(
+          "",
+          Task.Id(s"task-$i"),
+          "TASK_RUNNING",
+          "",
+          app.id,
+          "",
+          Nil,
+          Nil,
+          app.version.toString))
 
     Await.result(promise.future, 3.seconds) should be(())
 
@@ -195,15 +201,16 @@ class TaskStartActorTest
     when(launchQueue.get(app.id)).thenReturn(None)
 
     val ref = TestActorRef(
-      Props(classOf[TaskStartActor],
-            driver,
-            scheduler,
-            launchQueue,
-            taskTracker,
-            system.eventStream,
-            app,
-            app.instances,
-            promise))
+      Props(
+        classOf[TaskStartActor],
+        driver,
+        scheduler,
+        launchQueue,
+        taskTracker,
+        system.eventStream,
+        app,
+        app.instances,
+        promise))
 
     watch(ref)
 
@@ -222,15 +229,16 @@ class TaskStartActorTest
     when(launchQueue.get(app.id)).thenReturn(None)
 
     val ref = TestActorRef(
-      Props(classOf[TaskStartActor],
-            driver,
-            scheduler,
-            launchQueue,
-            taskTracker,
-            system.eventStream,
-            app,
-            app.instances,
-            promise))
+      Props(
+        classOf[TaskStartActor],
+        driver,
+        scheduler,
+        launchQueue,
+        taskTracker,
+        system.eventStream,
+        app,
+        app.instances,
+        promise))
 
     watch(ref)
 
@@ -238,10 +246,11 @@ class TaskStartActorTest
 
     for (i <- 0 until app.instances)
       system.eventStream.publish(
-        HealthStatusChanged(app.id,
-                            Task.Id(s"task_$i"),
-                            app.version,
-                            alive = true))
+        HealthStatusChanged(
+          app.id,
+          Task.Id(s"task_$i"),
+          app.version,
+          alive = true))
 
     Await.result(promise.future, 3.seconds) should be(())
 
@@ -258,15 +267,16 @@ class TaskStartActorTest
     when(launchQueue.get(app.id)).thenReturn(None)
 
     val ref = TestActorRef(
-      Props(classOf[TaskStartActor],
-            driver,
-            scheduler,
-            launchQueue,
-            taskTracker,
-            system.eventStream,
-            app,
-            app.instances,
-            promise))
+      Props(
+        classOf[TaskStartActor],
+        driver,
+        scheduler,
+        launchQueue,
+        taskTracker,
+        system.eventStream,
+        app,
+        app.instances,
+        promise))
 
     watch(ref)
 
@@ -281,15 +291,16 @@ class TaskStartActorTest
     when(launchQueue.get(app.id)).thenReturn(None)
 
     val ref = system.actorOf(
-      Props(classOf[TaskStartActor],
-            driver,
-            scheduler,
-            launchQueue,
-            taskTracker,
-            system.eventStream,
-            app,
-            app.instances,
-            promise))
+      Props(
+        classOf[TaskStartActor],
+        driver,
+        scheduler,
+        launchQueue,
+        taskTracker,
+        system.eventStream,
+        app,
+        app.instances,
+        promise))
 
     watch(ref)
 
@@ -308,44 +319,47 @@ class TaskStartActorTest
 
     when(launchQueue.get(app.id)).thenReturn(None)
     val ref = TestActorRef(
-      Props(classOf[TaskStartActor],
-            driver,
-            scheduler,
-            launchQueue,
-            taskTracker,
-            system.eventStream,
-            app,
-            app.instances,
-            promise))
+      Props(
+        classOf[TaskStartActor],
+        driver,
+        scheduler,
+        launchQueue,
+        taskTracker,
+        system.eventStream,
+        app,
+        app.instances,
+        promise))
 
     watch(ref)
 
     verify(launchQueue, Mockito.timeout(3000)).add(app, app.instances)
 
     system.eventStream.publish(
-      MesosStatusUpdateEvent("",
-                             Task.Id.forApp(app.id),
-                             "TASK_FAILED",
-                             "",
-                             app.id,
-                             "",
-                             Nil,
-                             Nil,
-                             app.version.toString))
+      MesosStatusUpdateEvent(
+        "",
+        Task.Id.forApp(app.id),
+        "TASK_FAILED",
+        "",
+        app.id,
+        "",
+        Nil,
+        Nil,
+        app.version.toString))
 
     verify(launchQueue, Mockito.timeout(3000)).add(app, 1)
 
     for (i <- 0 until app.instances)
       system.eventStream.publish(
-        MesosStatusUpdateEvent("",
-                               Task.Id.forApp(app.id),
-                               "TASK_RUNNING",
-                               "",
-                               app.id,
-                               "",
-                               Nil,
-                               Nil,
-                               app.version.toString))
+        MesosStatusUpdateEvent(
+          "",
+          Task.Id.forApp(app.id),
+          "TASK_RUNNING",
+          "",
+          app.id,
+          "",
+          Nil,
+          Nil,
+          app.version.toString))
 
     Await.result(promise.future, 3.seconds) should be(())
 
@@ -364,15 +378,16 @@ class TaskStartActorTest
     taskCreationHandler.created(outdatedTask).futureValue
 
     val ref = TestActorRef(
-      Props(classOf[TaskStartActor],
-            driver,
-            scheduler,
-            launchQueue,
-            taskTracker,
-            system.eventStream,
-            app,
-            app.instances,
-            promise))
+      Props(
+        classOf[TaskStartActor],
+        driver,
+        scheduler,
+        launchQueue,
+        taskTracker,
+        system.eventStream,
+        app,
+        app.instances,
+        promise))
 
     watch(ref)
 
@@ -417,15 +432,16 @@ class TaskStartActorTest
     when(taskTracker.countLaunchedAppTasksSync(app.id)).thenReturn(4)
     List(0, 1, 2, 3) foreach { i =>
       system.eventStream.publish(
-        MesosStatusUpdateEvent("",
-                               Task.Id(s"task-$i"),
-                               "TASK_RUNNING",
-                               "",
-                               app.id,
-                               "",
-                               Nil,
-                               Nil,
-                               app.version.toString))
+        MesosStatusUpdateEvent(
+          "",
+          Task.Id(s"task-$i"),
+          "TASK_RUNNING",
+          "",
+          app.id,
+          "",
+          Nil,
+          Nil,
+          app.version.toString))
     }
 
     // it finished early

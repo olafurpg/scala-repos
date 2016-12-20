@@ -12,27 +12,28 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
   import io.prediction.controller.Engine0._
 
   test("Single Evaluation") {
-    val engine = new FastEvalEngine(Map("" -> classOf[PDataSource2]),
-                                    Map("" -> classOf[PPreparator1]),
-                                    Map(
-                                      "PAlgo2" -> classOf[PAlgo2],
-                                      "PAlgo3" -> classOf[PAlgo3]
-                                    ),
-                                    Map("" -> classOf[LServing1]))
+    val engine = new FastEvalEngine(
+      Map("" -> classOf[PDataSource2]),
+      Map("" -> classOf[PPreparator1]),
+      Map(
+        "PAlgo2" -> classOf[PAlgo2],
+        "PAlgo3" -> classOf[PAlgo3]
+      ),
+      Map("" -> classOf[LServing1]))
 
     val qn = 10
     val en = 3
 
     val engineParams =
-      EngineParams(dataSourceParams =
-                     PDataSource2.Params(id = 0, en = en, qn = qn),
-                   preparatorParams = PPreparator1.Params(1),
-                   algorithmParamsList = Seq(
-                     ("PAlgo2", PAlgo2.Params(20)),
-                     ("PAlgo2", PAlgo2.Params(21)),
-                     ("PAlgo3", PAlgo3.Params(22))
-                   ),
-                   servingParams = LServing1.Params(3))
+      EngineParams(
+        dataSourceParams = PDataSource2.Params(id = 0, en = en, qn = qn),
+        preparatorParams = PPreparator1.Params(1),
+        algorithmParamsList = Seq(
+          ("PAlgo2", PAlgo2.Params(20)),
+          ("PAlgo2", PAlgo2.Params(21)),
+          ("PAlgo3", PAlgo3.Params(22))
+        ),
+        servingParams = LServing1.Params(3))
 
     val algoCount = engineParams.algorithmParamsList.size
     val pd = ProcessedData(1, TrainingData(0))
@@ -81,20 +82,21 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
   }
 
   test("Batch Evaluation") {
-    val engine = new FastEvalEngine(Map("" -> classOf[PDataSource2]),
-                                    Map("" -> classOf[PPreparator1]),
-                                    Map("" -> classOf[PAlgo2]),
-                                    Map("" -> classOf[LServing1]))
+    val engine = new FastEvalEngine(
+      Map("" -> classOf[PDataSource2]),
+      Map("" -> classOf[PPreparator1]),
+      Map("" -> classOf[PAlgo2]),
+      Map("" -> classOf[LServing1]))
 
     val qn = 10
     val en = 3
 
     val baseEngineParams =
-      EngineParams(dataSourceParams =
-                     PDataSource2.Params(id = 0, en = en, qn = qn),
-                   preparatorParams = PPreparator1.Params(1),
-                   algorithmParamsList = Seq(("", PAlgo2.Params(2))),
-                   servingParams = LServing1.Params(3))
+      EngineParams(
+        dataSourceParams = PDataSource2.Params(id = 0, en = en, qn = qn),
+        preparatorParams = PPreparator1.Params(1),
+        algorithmParamsList = Seq(("", PAlgo2.Params(2))),
+        servingParams = LServing1.Params(3))
 
     val ep0 = baseEngineParams
     val ep1 =
@@ -137,20 +139,21 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
   test("Not cached when isEqual not implemented") {
     // PDataSource3.Params is a class not case class. Need to implement the
     // isEqual function for hashing.
-    val engine = new FastEvalEngine(Map("" -> classOf[PDataSource4]),
-                                    Map("" -> classOf[PPreparator1]),
-                                    Map("" -> classOf[PAlgo2]),
-                                    Map("" -> classOf[LServing1]))
+    val engine = new FastEvalEngine(
+      Map("" -> classOf[PDataSource4]),
+      Map("" -> classOf[PPreparator1]),
+      Map("" -> classOf[PAlgo2]),
+      Map("" -> classOf[LServing1]))
 
     val qn = 10
     val en = 3
 
     val baseEngineParams =
-      EngineParams(dataSourceParams =
-                     new PDataSource4.Params(id = 0, en = en, qn = qn),
-                   preparatorParams = PPreparator1.Params(1),
-                   algorithmParamsList = Seq(("", PAlgo2.Params(2))),
-                   servingParams = LServing1.Params(3))
+      EngineParams(
+        dataSourceParams = new PDataSource4.Params(id = 0, en = en, qn = qn),
+        preparatorParams = PPreparator1.Params(1),
+        algorithmParamsList = Seq(("", PAlgo2.Params(2))),
+        servingParams = LServing1.Params(3))
 
     val ep0 = baseEngineParams
     val ep1 =

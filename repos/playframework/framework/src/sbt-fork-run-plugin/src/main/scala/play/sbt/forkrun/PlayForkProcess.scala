@@ -38,13 +38,14 @@ object PlayForkProcess {
     val jvmOptions = options.jvmOptions ++ logProperties
     val arguments =
       Seq(options.baseDirectory.getAbsolutePath, options.configKey) ++ args
-    run(options.workingDirectory,
-        jvmOptions,
-        options.classpath,
-        "play.forkrun.ForkRun",
-        arguments,
-        log,
-        options.shutdownTimeout)
+    run(
+      options.workingDirectory,
+      jvmOptions,
+      options.classpath,
+      "play.forkrun.ForkRun",
+      arguments,
+      log,
+      options.shutdownTimeout)
   }
 
   def run(workingDirectory: File,

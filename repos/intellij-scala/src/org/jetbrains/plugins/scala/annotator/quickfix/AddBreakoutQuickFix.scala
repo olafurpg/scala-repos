@@ -39,12 +39,14 @@ class AddBreakoutQuickFix(expr: ScExpression) extends IntentionAction {
 
     expr match {
       case mc: ScMethodCall =>
-        mc.replaceExpression(createWithClauses(mc.getText),
-                             removeParenthesis = true)
+        mc.replaceExpression(
+          createWithClauses(mc.getText),
+          removeParenthesis = true)
       case inf: ScInfixExpr =>
         val equivCall = ScalaPsiElementFactory.createEquivMethodCall(inf)
-        inf.replaceExpression(createWithClauses(equivCall.getText),
-                              removeParenthesis = true)
+        inf.replaceExpression(
+          createWithClauses(equivCall.getText),
+          removeParenthesis = true)
       case forStmt: ScForStatement =>
         val withClauses = createWithClauses(s"(${forStmt.getText})")
         forStmt.replaceExpression(withClauses, removeParenthesis = true)

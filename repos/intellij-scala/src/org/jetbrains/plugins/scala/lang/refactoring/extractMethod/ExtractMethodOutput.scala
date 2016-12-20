@@ -27,9 +27,10 @@ object ExtractMethodOutput {
 
   def from(variableData: ScalaVariableData) = {
     val element = variableData.element
-    ExtractMethodOutput(element.name,
-                        variableData.scType,
-                        variableData.isInsideOfElements,
-                        element)
+    ExtractMethodOutput(
+      element.name,
+      variableData.scType,
+      variableData.isInsideOfElements,
+      element)
   }
 }

@@ -60,15 +60,17 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
       selectionModel.getSelectionEnd)
 
     if (!canSurround) {
-      assert(elementsToSurround == null || elementsToSurround.isEmpty,
-             elementsToSurround.mkString("![", ",", "]!"))
+      assert(
+        elementsToSurround == null || elementsToSurround.isEmpty,
+        elementsToSurround.mkString("![", ",", "]!"))
     } else {
       assert(elementsToSurround.nonEmpty, "No elements to surround!")
       extensions.startCommand(getProject, "Surround With Test") {
-        SurroundWithHandler.invoke(myFixture.getProject,
-                                   myFixture.getEditor,
-                                   myFixture.getFile,
-                                   surrounder)
+        SurroundWithHandler.invoke(
+          myFixture.getProject,
+          myFixture.getEditor,
+          myFixture.getFile,
+          surrounder)
       }
       myFixture.checkResult(assumedText)
     }
@@ -101,8 +103,9 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
         info.getEndOffset).contains(caretIndex)
     } yield info
     val ranges = highlights.map(info => (info.startOffset, info.endOffset))
-    assert(highlights.isEmpty,
-           "Highlights with this errors at " + ranges.mkString("", ", ", "."))
+    assert(
+      highlights.isEmpty,
+      "Highlights with this errors at " + ranges.mkString("", ", ", "."))
   }
 
   protected def performTest(text: String, assumedText: String)(
@@ -181,19 +184,21 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
     val withRightDescription = myFixture
       .doHighlighting()
       .filter(info => info.getDescription == annotation)
-    assert(withRightDescription.nonEmpty,
-           "No highlightings with such description: " + annotation)
+    assert(
+      withRightDescription.nonEmpty,
+      "No highlightings with such description: " + annotation)
 
     val ranges = withRightDescription.map(info =>
       (info.getStartOffset, info.getEndOffset))
     val message =
       "Highlights with this description are at " + ranges.mkString(" ") +
         ", but has to be at " + (selectionStart, selectionEnd)
-    assert(withRightDescription.exists(
-             info =>
-               info.getStartOffset == selectionStart &&
-                 info.getEndOffset == selectionEnd),
-           message)
+    assert(
+      withRightDescription.exists(
+        info =>
+          info.getStartOffset == selectionStart &&
+            info.getEndOffset == selectionEnd),
+      message)
   }
 
   /**
@@ -239,9 +244,10 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
           .executeCommand(myFixture.getProject, new Runnable {
             def run() {
               extensions.inWriteAction {
-                action.invoke(myFixture.getProject,
-                              myFixture.getEditor,
-                              myFixture.getFile)
+                action.invoke(
+                  myFixture.getProject,
+                  myFixture.getEditor,
+                  myFixture.getFile)
               }
             }
           }, "", null)

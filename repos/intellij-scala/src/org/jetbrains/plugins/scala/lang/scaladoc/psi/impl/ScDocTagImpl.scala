@@ -73,8 +73,9 @@ class ScDocTagImpl(node: ASTNode)
   override def getAllText(handler: PsiElement => String): String =
     getNode
       .getChildren(
-        TokenSet.orSet(TokenSet.create(ScalaDocTokenType.DOC_COMMENT_DATA),
-                       ScalaDocTokenType.ALL_SCALADOC_SYNTAX_ELEMENTS))
+        TokenSet.orSet(
+          TokenSet.create(ScalaDocTokenType.DOC_COMMENT_DATA),
+          ScalaDocTokenType.ALL_SCALADOC_SYNTAX_ELEMENTS))
       .map {
         case nd => handler(nd.getPsi)
       }

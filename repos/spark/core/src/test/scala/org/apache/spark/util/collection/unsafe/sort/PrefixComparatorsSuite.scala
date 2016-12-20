@@ -97,12 +97,14 @@ class PrefixComparatorsSuite extends SparkFunSuite with PropertyChecks {
     // scalastyle:on
 
     forAll(regressionTests) { (s1: String, s2: String) =>
-      testPrefixComparison(s1.getBytes(StandardCharsets.UTF_8),
-                           s2.getBytes(StandardCharsets.UTF_8))
+      testPrefixComparison(
+        s1.getBytes(StandardCharsets.UTF_8),
+        s2.getBytes(StandardCharsets.UTF_8))
     }
     forAll { (s1: String, s2: String) =>
-      testPrefixComparison(s1.getBytes(StandardCharsets.UTF_8),
-                           s2.getBytes(StandardCharsets.UTF_8))
+      testPrefixComparison(
+        s1.getBytes(StandardCharsets.UTF_8),
+        s2.getBytes(StandardCharsets.UTF_8))
     }
   }
 

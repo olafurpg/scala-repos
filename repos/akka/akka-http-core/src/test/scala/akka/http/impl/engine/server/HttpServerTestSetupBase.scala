@@ -38,9 +38,10 @@ abstract class HttpServerTestSetupBase {
     RunnableGraph
       .fromGraph(
         GraphDSL.create(
-          HttpServerBluePrint(settings,
-                              remoteAddress = remoteAddress,
-                              log = NoLogging)) { implicit b ⇒ server ⇒
+          HttpServerBluePrint(
+            settings,
+            remoteAddress = remoteAddress,
+            log = NoLogging)) { implicit b ⇒ server ⇒
           import GraphDSL.Implicits._
           Source.fromPublisher(netIn) ~> Flow[ByteString].map(
             SessionBytes(null, _)) ~> server.in2
@@ -63,8 +64,9 @@ abstract class HttpServerTestSetupBase {
     // XXXX = 4 bytes, ISO Date Time String = 29 bytes => need to request 25 bytes more than expected string
     val expectedSize = ByteString(trimmed, "utf8").length + 25
     val received = wipeDate(netOut.expectBytes(expectedSize).utf8String)
-    assert(received == trimmed,
-           s"Expected request '$trimmed' but got '$received'")
+    assert(
+      received == trimmed,
+      s"Expected request '$trimmed' but got '$received'")
   }
 
   def wipeDate(string: String) =

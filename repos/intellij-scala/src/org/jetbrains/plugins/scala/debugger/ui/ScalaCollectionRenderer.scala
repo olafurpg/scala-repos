@@ -50,10 +50,11 @@ import scala.reflect.NameTransformer
   * @author Nikolay.Tropin
   */
 class ScalaCollectionRenderer
-    extends CompoundReferenceRenderer(NodeRendererSettings.getInstance(),
-                                      "Scala collection",
-                                      sizeLabelRenderer,
-                                      ScalaToArrayRenderer) {
+    extends CompoundReferenceRenderer(
+      NodeRendererSettings.getInstance(),
+      "Scala collection",
+      sizeLabelRenderer,
+      ScalaToArrayRenderer) {
 
   setClassName(collectionClassName)
 
@@ -165,10 +166,11 @@ object ScalaCollectionRenderer {
       }
     }
     labelRenderer.setLabelExpression(
-      new TextWithImportsImpl(CodeFragmentKind.EXPRESSION,
-                              expressionText,
-                              "",
-                              StdFileTypes.JAVA))
+      new TextWithImportsImpl(
+        CodeFragmentKind.EXPRESSION,
+        expressionText,
+        "",
+        StdFileTypes.JAVA))
     labelRenderer
   }
 
@@ -224,10 +226,11 @@ object ScalaCollectionRenderer {
       val argEval =
         ScalaDuplexEvaluator(classTagObjectEval, manifestObjectEval)
 
-      new ScalaMethodEvaluator(new ScalaThisEvaluator(),
-                               "toArray",
-                               null,
-                               Seq(argEval))
+      new ScalaMethodEvaluator(
+        new ScalaThisEvaluator(),
+        "toArray",
+        null,
+        Seq(argEval))
     }
 
     override def getUniqueId: String = "ScalaToArrayRenderer"

@@ -40,14 +40,15 @@ object AtLeastOnceDeliverySpec {
                   async: Boolean,
                   actorSelectionDelivery: Boolean = false): Props =
     Props(
-      new Sender(testActor,
-                 name,
-                 redeliverInterval,
-                 warnAfterNumberOfUnconfirmedAttempts,
-                 redeliveryBurstLimit,
-                 destinations,
-                 async,
-                 actorSelectionDelivery))
+      new Sender(
+        testActor,
+        name,
+        redeliverInterval,
+        warnAfterNumberOfUnconfirmedAttempts,
+        redeliveryBurstLimit,
+        destinations,
+        async,
+        actorSelectionDelivery))
 
   class Sender(testActor: ActorRef,
                name: String,
@@ -209,14 +210,16 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
         val probeA = TestProbe()
         val destinations =
           Map("A" -> system.actorOf(destinationProps(probeA.ref)).path)
-        val snd = system.actorOf(senderProps(probe.ref,
-                                             name,
-                                             1000.millis,
-                                             5,
-                                             1000,
-                                             destinations,
-                                             async = false),
-                                 name)
+        val snd = system.actorOf(
+          senderProps(
+            probe.ref,
+            name,
+            1000.millis,
+            5,
+            1000,
+            destinations,
+            async = false),
+          name)
         snd.tell(Req("a"), probe.ref)
         probe.expectMsg(ReqAck)
         probeA.expectMsg(Action(1, "a"))
@@ -230,16 +233,17 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
         val dst = system.actorOf(destinationProps(probeA.ref))
         val destinations =
           Map("A" -> system.actorOf(unreliableProps(3, dst)).path)
-        val snd = system.actorOf(senderProps(probe.ref,
-                                             name,
-                                             1000.millis,
-                                             5,
-                                             1000,
-                                             destinations,
-                                             async = false,
-                                             actorSelectionDelivery =
-                                               deliverUsingActorSelection),
-                                 name)
+        val snd = system.actorOf(
+          senderProps(
+            probe.ref,
+            name,
+            1000.millis,
+            5,
+            1000,
+            destinations,
+            async = false,
+            actorSelectionDelivery = deliverUsingActorSelection),
+          name)
         snd.tell(Req("a-1"), probe.ref)
         probe.expectMsg(ReqAck)
         probeA.expectMsg(Action(1, "a-1"))
@@ -271,14 +275,16 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
       val dst = system.actorOf(destinationProps(probeA.ref))
       val destinations =
         Map("A" -> system.actorOf(unreliableProps(3, dst)).path)
-      val snd = system.actorOf(senderProps(probe.ref,
-                                           name,
-                                           1000.millis,
-                                           5,
-                                           1000,
-                                           destinations,
-                                           async = false),
-                               name)
+      val snd = system.actorOf(
+        senderProps(
+          probe.ref,
+          name,
+          1000.millis,
+          5,
+          1000,
+          destinations,
+          async = false),
+        name)
       snd.tell(Req("a-1"), probe.ref)
       probe.expectMsg(ReqAck)
       probeA.expectMsg(Action(1, "a-1"))
@@ -314,14 +320,16 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
       val dst = system.actorOf(destinationProps(probeA.ref))
       val destinations =
         Map("A" -> system.actorOf(unreliableProps(2, dst)).path)
-      val snd = system.actorOf(senderProps(probe.ref,
-                                           name,
-                                           1000.millis,
-                                           5,
-                                           1000,
-                                           destinations,
-                                           async = false),
-                               name)
+      val snd = system.actorOf(
+        senderProps(
+          probe.ref,
+          name,
+          1000.millis,
+          5,
+          1000,
+          destinations,
+          async = false),
+        name)
       snd.tell(Req("a-1"), probe.ref)
       probe.expectMsg(ReqAck)
       probeA.expectMsg(Action(1, "a-1"))
@@ -346,8 +354,9 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
       // and then re-delivered
       probeA.expectMsg(Action(2, "a-2")) // re-delivered
       // a-4 was re-delivered but lost
-      probeA.expectMsgAllOf(Action(5, "a-5"), // re-delivered
-                            Action(4, "a-4")) // re-delivered, 3rd time
+      probeA.expectMsgAllOf(
+        Action(5, "a-5"), // re-delivered
+        Action(4, "a-4")) // re-delivered, 3rd time
 
       probeA.expectNoMsg(1.second)
     }
@@ -358,14 +367,16 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
       val dst = system.actorOf(destinationProps(probeA.ref))
       val destinations =
         Map("A" -> system.actorOf(unreliableProps(3, dst)).path)
-      val snd = system.actorOf(senderProps(probe.ref,
-                                           name,
-                                           1000.millis,
-                                           5,
-                                           1000,
-                                           destinations,
-                                           async = false),
-                               name)
+      val snd = system.actorOf(
+        senderProps(
+          probe.ref,
+          name,
+          1000.millis,
+          5,
+          1000,
+          destinations,
+          async = false),
+        name)
       snd.tell(Req("a-1"), probe.ref)
       probe.expectMsg(ReqAck)
       probeA.expectMsg(Action(1, "a-1"))
@@ -403,14 +414,16 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
       val probeA = TestProbe()
       val probeB = TestProbe()
       val destinations = Map("A" -> probeA.ref.path, "B" -> probeB.ref.path)
-      val snd = system.actorOf(senderProps(probe.ref,
-                                           name,
-                                           1000.millis,
-                                           3,
-                                           1000,
-                                           destinations,
-                                           async = false),
-                               name)
+      val snd = system.actorOf(
+        senderProps(
+          probe.ref,
+          name,
+          1000.millis,
+          3,
+          1000,
+          destinations,
+          async = false),
+        name)
       snd.tell(Req("a-1"), probe.ref)
       snd.tell(Req("b-1"), probe.ref)
       snd.tell(Req("b-2"), probe.ref)
@@ -441,14 +454,16 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
         "A" -> system.actorOf(unreliableProps(2, dstA), "unreliable-a").path,
         "B" -> system.actorOf(unreliableProps(5, dstB), "unreliable-b").path,
         "C" -> system.actorOf(unreliableProps(3, dstC), "unreliable-c").path)
-      val snd = system.actorOf(senderProps(probe.ref,
-                                           name,
-                                           1000.millis,
-                                           5,
-                                           1000,
-                                           destinations,
-                                           async = true),
-                               name)
+      val snd = system.actorOf(
+        senderProps(
+          probe.ref,
+          name,
+          1000.millis,
+          5,
+          1000,
+          destinations,
+          async = true),
+        name)
       val N = 100
       for (n ← 1 to N) {
         snd.tell(Req("a-" + n), probe.ref)
@@ -481,14 +496,16 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
       val destinations =
         Map("A" -> system.actorOf(unreliableProps(2, dst)).path)
 
-      val snd = system.actorOf(senderProps(probe.ref,
-                                           name,
-                                           1000.millis,
-                                           5,
-                                           2,
-                                           destinations,
-                                           async = true),
-                               name)
+      val snd = system.actorOf(
+        senderProps(
+          probe.ref,
+          name,
+          1000.millis,
+          5,
+          2,
+          destinations,
+          async = true),
+        name)
 
       val N = 10
       for (n ← 1 to N) {

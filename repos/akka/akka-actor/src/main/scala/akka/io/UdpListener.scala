@@ -62,9 +62,10 @@ private[io] class UdpListener(val udp: UdpExt,
   } catch {
     case NonFatal(e) ⇒
       bindCommander ! CommandFailed(bind)
-      log.error(e,
-                "Failed to bind UDP channel to endpoint [{}]",
-                bind.localAddress)
+      log.error(
+        e,
+        "Failed to bind UDP channel to endpoint [{}]",
+        bind.localAddress)
       context.stop(self)
   }
 

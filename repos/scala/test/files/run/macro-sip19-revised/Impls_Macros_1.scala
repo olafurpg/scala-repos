@@ -15,10 +15,11 @@ object Macros {
     val charOffset = fun.pos.point
     def literal[T](x: T) = c.Expr[T](Literal(Constant(x)))
     c.universe.reify {
-      SourceLocation1(outer.splice,
-                      literal(fileName).splice,
-                      literal(line).splice,
-                      literal(charOffset).splice)
+      SourceLocation1(
+        outer.splice,
+        literal(fileName).splice,
+        literal(line).splice,
+        literal(charOffset).splice)
     }
   }
 

@@ -81,15 +81,17 @@ private[akka] class RemoteMetricsOn(system: ExtendedActorSystem)
         val max = maxPayloadBytes.get(clazz)
         if (max eq null) {
           if (maxPayloadBytes.putIfAbsent(clazz, newMax) eq null)
-            log.info("Payload size for [{}] is [{}] bytes",
-                     clazz.getName,
-                     payloadBytes)
+            log.info(
+              "Payload size for [{}] is [{}] bytes",
+              clazz.getName,
+              payloadBytes)
           else check()
         } else if (payloadBytes > max) {
           if (maxPayloadBytes.replace(clazz, max, newMax))
-            log.info("New maximum payload size for [{}] is [{}] bytes",
-                     clazz.getName,
-                     payloadBytes)
+            log.info(
+              "New maximum payload size for [{}] is [{}] bytes",
+              clazz.getName,
+              payloadBytes)
           else check()
         }
       }

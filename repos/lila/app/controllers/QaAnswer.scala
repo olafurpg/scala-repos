@@ -44,9 +44,10 @@ object QaAnswer extends QaController {
           api.answer.vote(answerId, me, v == 1) map {
             case Some(vote) =>
               Ok(
-                html.qa.vote(routes.QaAnswer.vote(questionId, answerId).url,
-                             vote,
-                             true))
+                html.qa.vote(
+                  routes.QaAnswer.vote(questionId, answerId).url,
+                  vote,
+                  true))
             case None => NotFound
         }
       )

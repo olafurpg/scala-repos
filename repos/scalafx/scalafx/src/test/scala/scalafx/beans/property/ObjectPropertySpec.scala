@@ -280,17 +280,20 @@ class ObjectPropertySpec
   }
 
   "fillProperty" should "fill property with not null value if receives a not null" in {
-    evaluateFillProperty(ObjectProperty[ju.Date](new ju.Date),
-                         new ju.Date(123456L))
+    evaluateFillProperty(
+      ObjectProperty[ju.Date](new ju.Date),
+      new ju.Date(123456L))
   }
 
   "fillProperty" should "supports variance" in {
-    evaluateFillProperty(ObjectProperty[ju.Date](new ju.Date),
-                         new java.sql.Date(1234678L))
+    evaluateFillProperty(
+      ObjectProperty[ju.Date](new ju.Date),
+      new java.sql.Date(1234678L))
   }
 
   "fillProperty" should "supports covariance" in {
-    evaluateFillProperty(ObjectProperty[ju.Date](new java.sql.Date(1234678L)),
-                         new ju.Date)
+    evaluateFillProperty(
+      ObjectProperty[ju.Date](new java.sql.Date(1234678L)),
+      new ju.Date)
   }
 }

@@ -39,10 +39,11 @@ class AccountRequiredService[A, B](
     val delegate: HttpService[A, (APIKey, Path, AccountId) => Future[B]])(
     implicit err: (HttpFailure, String) => B,
     executor: ExecutionContext)
-    extends DelegatingService[A,
-                              (APIKey, Path) => Future[B],
-                              A,
-                              (APIKey, Path, AccountId) => Future[B]]
+    extends DelegatingService[
+      A,
+      (APIKey, Path) => Future[B],
+      A,
+      (APIKey, Path, AccountId) => Future[B]]
     with Logging {
   val service = (request: HttpRequest[A]) => {
     delegate.service(request) map { f => (apiKey: APIKey, path: Path) =>
@@ -63,9 +64,10 @@ class AccountRequiredService[A, B](
             logger.warn(
               "Unable to determine account Id from api key: " + apiKey)
             Future(
-              err(BadRequest,
-                  "Unable to identify target account from apiKey " +
-                    apiKey))
+              err(
+                BadRequest,
+                "Unable to identify target account from apiKey " +
+                  apiKey))
         }
       }
     }

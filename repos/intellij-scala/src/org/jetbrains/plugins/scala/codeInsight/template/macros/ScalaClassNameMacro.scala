@@ -16,8 +16,9 @@ class ScalaClassNameMacro extends Macro {
   override def calculateResult(params: Array[Expression],
                                context: ExpressionContext): Result = {
     Option(
-      PsiTreeUtil.getParentOfType(context.getPsiElementAtStartOffset,
-                                  classOf[PsiClass]))
+      PsiTreeUtil.getParentOfType(
+        context.getPsiElementAtStartOffset,
+        classOf[PsiClass]))
       .map {
         case obj: ScObject => obj.fakeCompanionClassOrCompanionClass.getName
         case cl: PsiClass => cl.getName

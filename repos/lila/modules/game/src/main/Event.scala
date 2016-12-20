@@ -58,16 +58,17 @@ object Event {
              possibleMoves: Map[Pos, List[Pos]],
              possibleDrops: Option[List[Pos]],
              crazyData: Option[Crazyhouse.Data])(extra: JsObject) = {
-      extra ++ Json.obj("fen" -> fen,
-                        "check" -> check.option(true),
-                        "threefold" -> threefold.option(true),
-                        "ply" -> state.turns,
-                        "status" -> state.status,
-                        "winner" -> state.winner,
-                        "wDraw" -> state.whiteOffersDraw.option(true),
-                        "bDraw" -> state.blackOffersDraw.option(true),
-                        "clock" -> clock.map(_.data),
-                        "dests" -> PossibleMoves.json(possibleMoves))
+      extra ++ Json.obj(
+        "fen" -> fen,
+        "check" -> check.option(true),
+        "threefold" -> threefold.option(true),
+        "ply" -> state.turns,
+        "status" -> state.status,
+        "winner" -> state.winner,
+        "wDraw" -> state.whiteOffersDraw.option(true),
+        "bDraw" -> state.blackOffersDraw.option(true),
+        "clock" -> clock.map(_.data),
+        "dests" -> PossibleMoves.json(possibleMoves))
     }.noNull |> withCrazyData(crazyData, possibleDrops)
   }
 
@@ -88,19 +89,21 @@ object Event {
       extends Event {
     def typ = "move"
     def data =
-      MoveOrDrop.data(fen,
-                      check,
-                      threefold,
-                      state,
-                      clock,
-                      possibleMoves,
-                      possibleDrops,
-                      crazyData) {
-        Json.obj("uci" -> s"${orig.key}${dest.key}",
-                 "san" -> san,
-                 "promotion" -> promotion.map(_.data),
-                 "enpassant" -> enpassant.map(_.data),
-                 "castle" -> castle.map(_.data))
+      MoveOrDrop.data(
+        fen,
+        check,
+        threefold,
+        state,
+        clock,
+        possibleMoves,
+        possibleDrops,
+        crazyData) {
+        Json.obj(
+          "uci" -> s"${orig.key}${dest.key}",
+          "san" -> san,
+          "promotion" -> promotion.map(_.data),
+          "enpassant" -> enpassant.map(_.data),
+          "castle" -> castle.map(_.data))
       }
   }
   object Move {
@@ -109,24 +112,25 @@ object Event {
               state: State,
               clock: Option[Event],
               crazyData: Option[Crazyhouse.Data]): Move =
-      Move(orig = move.orig,
-           dest = move.dest,
-           san = chess.format.pgn.Dumper(move),
-           fen = chess.format.Forsyth.exportBoard(situation.board),
-           check = situation.check,
-           threefold = situation.threefoldRepetition,
-           promotion = move.promotion.map { Promotion(_, move.dest) },
-           enpassant = (move.capture ifTrue move.enpassant).map {
-             Event.Enpassant(_, !move.color)
-           },
-           castle = move.castle.map {
-             case (king, rook) => Castling(king, rook, move.color)
-           },
-           state = state,
-           clock = clock,
-           possibleMoves = situation.destinations,
-           possibleDrops = situation.drops,
-           crazyData = crazyData)
+      Move(
+        orig = move.orig,
+        dest = move.dest,
+        san = chess.format.pgn.Dumper(move),
+        fen = chess.format.Forsyth.exportBoard(situation.board),
+        check = situation.check,
+        threefold = situation.threefoldRepetition,
+        promotion = move.promotion.map { Promotion(_, move.dest) },
+        enpassant = (move.capture ifTrue move.enpassant).map {
+          Event.Enpassant(_, !move.color)
+        },
+        castle = move.castle.map {
+          case (king, rook) => Castling(king, rook, move.color)
+        },
+        state = state,
+        clock = clock,
+        possibleMoves = situation.destinations,
+        possibleDrops = situation.drops,
+        crazyData = crazyData)
   }
 
   case class Drop(role: chess.Role,
@@ -143,17 +147,19 @@ object Event {
       extends Event {
     def typ = "drop"
     def data =
-      MoveOrDrop.data(fen,
-                      check,
-                      threefold,
-                      state,
-                      clock,
-                      possibleMoves,
-                      possibleDrops,
-                      crazyData) {
-        Json.obj("role" -> role.name,
-                 "uci" -> s"${role.pgn}@${pos.key}",
-                 "san" -> san)
+      MoveOrDrop.data(
+        fen,
+        check,
+        threefold,
+        state,
+        clock,
+        possibleMoves,
+        possibleDrops,
+        crazyData) {
+        Json.obj(
+          "role" -> role.name,
+          "uci" -> s"${role.pgn}@${pos.key}",
+          "san" -> san)
       }
   }
   object Drop {
@@ -162,17 +168,18 @@ object Event {
               state: State,
               clock: Option[Event],
               crazyData: Option[Crazyhouse.Data]): Drop =
-      Drop(role = drop.piece.role,
-           pos = drop.pos,
-           san = chess.format.pgn.Dumper(drop),
-           fen = chess.format.Forsyth.exportBoard(situation.board),
-           check = situation.check,
-           threefold = situation.threefoldRepetition,
-           state = state,
-           clock = clock,
-           possibleMoves = situation.destinations,
-           possibleDrops = situation.drops,
-           crazyData = crazyData)
+      Drop(
+        role = drop.piece.role,
+        pos = drop.pos,
+        san = chess.format.pgn.Dumper(drop),
+        fen = chess.format.Forsyth.exportBoard(situation.board),
+        check = situation.check,
+        threefold = situation.threefoldRepetition,
+        state = state,
+        clock = clock,
+        possibleMoves = situation.destinations,
+        possibleDrops = situation.drops,
+        crazyData = crazyData)
   }
 
   object PossibleMoves {

@@ -53,17 +53,21 @@ object BitraverseTest extends SpecLite {
       Bitraverse[\/].embed[Option, List].leftTraverse[Int]
     implicit val R_E_LO_RL: Traverse[λ[α => Option[Int] \/ List[α]]] =
       Bitraverse[\/].embed[Option, List].rightTraverse[Int]
-    checkAll("Left-biased Bitraverse for Either[Option,List[_]]",
-             traverse.laws[λ[α => Option[α] \/ List[Int]]])
-    checkAll("Right-biased Bitraverse for Either[Option[_],List]",
-             traverse.laws[λ[α => Option[Int] \/ List[α]]])
+    checkAll(
+      "Left-biased Bitraverse for Either[Option,List[_]]",
+      traverse.laws[λ[α => Option[α] \/ List[Int]]])
+    checkAll(
+      "Right-biased Bitraverse for Either[Option[_],List]",
+      traverse.laws[λ[α => Option[Int] \/ List[α]]])
 
     implicit val L_E_LO = Bitraverse[\/].embedLeft[Option].leftTraverse[Int]
     implicit val R_E_RO = Bitraverse[\/].embedRight[Option].rightTraverse[Int]
-    checkAll("Left-biased Bitraverse for Either[Option,_]",
-             traverse.laws[λ[α => Option[α] \/ Int]])
-    checkAll("Right-biased Bitraverse for Either[_,Option]",
-             traverse.laws[λ[α => Int \/ Option[α]]])
+    checkAll(
+      "Left-biased Bitraverse for Either[Option,_]",
+      traverse.laws[λ[α => Option[α] \/ Int]])
+    checkAll(
+      "Right-biased Bitraverse for Either[_,Option]",
+      traverse.laws[λ[α => Int \/ Option[α]]])
   }
 }
 

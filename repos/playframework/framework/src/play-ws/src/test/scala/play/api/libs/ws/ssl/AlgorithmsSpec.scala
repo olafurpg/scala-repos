@@ -48,12 +48,13 @@ object AlgorithmsSpec extends Specification {
       keyGen.initialize(1024, new SecureRandom())
       val pair = keyGen.generateKeyPair()
       val cert =
-        CertificateGenerator.generateCertificate(dn,
-                                                 pair,
-                                                 from.toDate,
-                                                 to.toDate,
-                                                 "SHA1WithDSA",
-                                                 AlgorithmId.sha1WithDSA_oid)
+        CertificateGenerator.generateCertificate(
+          dn,
+          pair,
+          from.toDate,
+          to.toDate,
+          "SHA1WithDSA",
+          AlgorithmId.sha1WithDSA_oid)
 
       // DSA is getP.bitLength
       keySize(cert.getPublicKey) must_== Some(1024)

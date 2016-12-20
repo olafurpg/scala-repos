@@ -137,10 +137,11 @@ case class StructType(fields: Array[StructField])
     */
   def add(name: String, dataType: DataType): StructType = {
     StructType(
-      fields :+ new StructField(name,
-                                dataType,
-                                nullable = true,
-                                Metadata.empty))
+      fields :+ new StructField(
+        name,
+        dataType,
+        nullable = true,
+        Metadata.empty))
   }
 
   /**
@@ -389,8 +390,9 @@ object StructType extends AbstractDataType {
       case StructType(fields) =>
         val newFields = fields.map { f =>
           val mb = new MetadataBuilder()
-          f.copy(dataType = removeMetadata(key, f.dataType),
-                 metadata = mb.withMetadata(f.metadata).remove(key).build())
+          f.copy(
+            dataType = removeMetadata(key, f.dataType),
+            metadata = mb.withMetadata(f.metadata).remove(key).build())
         }
         StructType(newFields)
       case _ => dt
@@ -398,16 +400,20 @@ object StructType extends AbstractDataType {
 
   private[sql] def merge(left: DataType, right: DataType): DataType =
     (left, right) match {
-      case (ArrayType(leftElementType, leftContainsNull),
-            ArrayType(rightElementType, rightContainsNull)) =>
-        ArrayType(merge(leftElementType, rightElementType),
-                  leftContainsNull || rightContainsNull)
+      case (
+          ArrayType(leftElementType, leftContainsNull),
+          ArrayType(rightElementType, rightContainsNull)) =>
+        ArrayType(
+          merge(leftElementType, rightElementType),
+          leftContainsNull || rightContainsNull)
 
-      case (MapType(leftKeyType, leftValueType, leftContainsNull),
-            MapType(rightKeyType, rightValueType, rightContainsNull)) =>
-        MapType(merge(leftKeyType, rightKeyType),
-                merge(leftValueType, rightValueType),
-                leftContainsNull || rightContainsNull)
+      case (
+          MapType(leftKeyType, leftValueType, leftContainsNull),
+          MapType(rightKeyType, rightValueType, rightContainsNull)) =>
+        MapType(
+          merge(leftKeyType, rightKeyType),
+          merge(leftValueType, rightValueType),
+          leftContainsNull || rightContainsNull)
 
       case (StructType(leftFields), StructType(rightFields)) =>
         val newFields = ArrayBuffer.empty[StructField]
@@ -420,12 +426,14 @@ object StructType extends AbstractDataType {
             rightMapped
               .get(leftName)
               .map {
-                case rightField @ StructField(_,
-                                              rightType,
-                                              rightNullable,
-                                              _) =>
-                  leftField.copy(dataType = merge(leftType, rightType),
-                                 nullable = leftNullable || rightNullable)
+                case rightField @ StructField(
+                      _,
+                      rightType,
+                      rightNullable,
+                      _) =>
+                  leftField.copy(
+                    dataType = merge(leftType, rightType),
+                    nullable = leftNullable || rightNullable)
               }
               .orElse {
                 optionalMeta.putBoolean(metadataKeyForOptionalField, true)
@@ -443,8 +451,9 @@ object StructType extends AbstractDataType {
 
         StructType(newFields)
 
-      case (DecimalType.Fixed(leftPrecision, leftScale),
-            DecimalType.Fixed(rightPrecision, rightScale)) =>
+      case (
+          DecimalType.Fixed(leftPrecision, leftScale),
+          DecimalType.Fixed(rightPrecision, rightScale)) =>
         if ((leftPrecision == rightPrecision) && (leftScale == rightScale)) {
           DecimalType(leftPrecision, leftScale)
         } else if ((leftPrecision != rightPrecision) &&

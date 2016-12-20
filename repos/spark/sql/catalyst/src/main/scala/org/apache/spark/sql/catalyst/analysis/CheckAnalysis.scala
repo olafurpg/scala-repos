@@ -84,13 +84,15 @@ trait CheckAnalysis {
           case w @ WindowExpression(AggregateExpression(_, _, true), _) =>
             failAnalysis(s"Distinct window functions are not supported: $w")
 
-          case w @ WindowExpression(_: OffsetWindowFunction,
-                                    WindowSpecDefinition(_,
-                                                         order,
-                                                         SpecifiedWindowFrame(
-                                                           frame,
-                                                           FrameBoundary(l),
-                                                           FrameBoundary(h))))
+          case w @ WindowExpression(
+                _: OffsetWindowFunction,
+                WindowSpecDefinition(
+                  _,
+                  order,
+                  SpecifiedWindowFrame(
+                    frame,
+                    FrameBoundary(l),
+                    FrameBoundary(h))))
               if order.isEmpty || frame != RowFrame || l != h =>
             failAnalysis(
               "An offset window function can only be evaluated in an ordered " +

@@ -127,9 +127,10 @@ class WindowSpec private[sql] (partitionSpec: Seq[Expression],
       case x if x > 0 => ValueFollowing(end.toInt)
     }
 
-    new WindowSpec(partitionSpec,
-                   orderSpec,
-                   SpecifiedWindowFrame(typ, boundaryStart, boundaryEnd))
+    new WindowSpec(
+      partitionSpec,
+      orderSpec,
+      SpecifiedWindowFrame(typ, boundaryStart, boundaryEnd))
   }
 
   /**

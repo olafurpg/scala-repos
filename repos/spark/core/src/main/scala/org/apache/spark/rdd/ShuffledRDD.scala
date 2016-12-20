@@ -80,20 +80,23 @@ class ShuffledRDD[K: ClassTag, V: ClassTag, C: ClassTag](
     val serializer = userSpecifiedSerializer.getOrElse {
       val serializerManager = SparkEnv.get.serializerManager
       if (mapSideCombine) {
-        serializerManager.getSerializer(implicitly[ClassTag[K]],
-                                        implicitly[ClassTag[C]])
+        serializerManager.getSerializer(
+          implicitly[ClassTag[K]],
+          implicitly[ClassTag[C]])
       } else {
-        serializerManager.getSerializer(implicitly[ClassTag[K]],
-                                        implicitly[ClassTag[V]])
+        serializerManager.getSerializer(
+          implicitly[ClassTag[K]],
+          implicitly[ClassTag[V]])
       }
     }
     List(
-      new ShuffleDependency(prev,
-                            part,
-                            serializer,
-                            keyOrdering,
-                            aggregator,
-                            mapSideCombine))
+      new ShuffleDependency(
+        prev,
+        part,
+        serializer,
+        keyOrdering,
+        aggregator,
+        mapSideCombine))
   }
 
   override val partitioner = Some(part)

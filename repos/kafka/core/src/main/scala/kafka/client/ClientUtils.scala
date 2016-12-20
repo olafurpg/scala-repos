@@ -89,8 +89,8 @@ object ClientUtils extends Logging {
         t)
     } else {
       debug(
-        "Successfully fetched metadata for %d topic(s) %s".format(topics.size,
-                                                                  topics))
+        "Successfully fetched metadata for %d topic(s) %s"
+          .format(topics.size, topics))
     }
     topicMetadataResponse
   }
@@ -108,8 +108,9 @@ object ClientUtils extends Logging {
                          timeoutMs: Int,
                          correlationId: Int = 0): TopicMetadataResponse = {
     val props = new Properties()
-    props.put("metadata.broker.list",
-              brokers.map(_.connectionString).mkString(","))
+    props.put(
+      "metadata.broker.list",
+      brokers.map(_.connectionString).mkString(","))
     props.put("client.id", clientId)
     props.put("request.timeout.ms", timeoutMs.toString)
     val producerConfig = new ProducerConfig(props)
@@ -141,23 +142,24 @@ object ClientUtils extends Logging {
       Random.shuffle(allBrokers).find { broker =>
         trace("Connecting to broker %s:%d.".format(broker.host, broker.port))
         try {
-          channel = new BlockingChannel(broker.host,
-                                        broker.port,
-                                        BlockingChannel.UseDefaultBufferSize,
-                                        BlockingChannel.UseDefaultBufferSize,
-                                        socketTimeoutMs)
+          channel = new BlockingChannel(
+            broker.host,
+            broker.port,
+            BlockingChannel.UseDefaultBufferSize,
+            BlockingChannel.UseDefaultBufferSize,
+            socketTimeoutMs)
           channel.connect()
           debug(
-            "Created channel to broker %s:%d.".format(channel.host,
-                                                      channel.port))
+            "Created channel to broker %s:%d."
+              .format(channel.host, channel.port))
           true
         } catch {
           case e: Exception =>
             if (channel != null) channel.disconnect()
             channel = null
             info(
-              "Error while creating channel to %s:%d.".format(broker.host,
-                                                              broker.port))
+              "Error while creating channel to %s:%d."
+                .format(broker.host, broker.port))
             false
         }
       }
@@ -201,10 +203,11 @@ object ClientUtils extends Logging {
           else {
             debug(
               "Query to %s:%d to locate offset manager for %s failed - will retry in %d milliseconds."
-                .format(queryChannel.host,
-                        queryChannel.port,
-                        group,
-                        retryBackOffMs))
+                .format(
+                  queryChannel.host,
+                  queryChannel.port,
+                  group,
+                  retryBackOffMs))
             Thread.sleep(retryBackOffMs)
           }
         } catch {

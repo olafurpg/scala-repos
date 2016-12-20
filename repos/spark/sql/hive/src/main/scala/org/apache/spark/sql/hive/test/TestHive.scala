@@ -45,14 +45,16 @@ import org.apache.spark.util.{ShutdownHookManager, Utils}
 // SPARK-3729: Test key required to check for initialization errors with config.
 object TestHive
     extends TestHiveContext(
-      new SparkContext(System.getProperty("spark.sql.test.master", "local[1]"),
-                       "TestSQLContext",
-                       new SparkConf()
-                         .set("spark.sql.test", "")
-                         .set("spark.sql.hive.metastore.barrierPrefixes",
-                              "org.apache.spark.sql.hive.execution.PairSerDe")
-                         // SPARK-8910
-                         .set("spark.ui.enabled", "false")))
+      new SparkContext(
+        System.getProperty("spark.sql.test.master", "local[1]"),
+        "TestSQLContext",
+        new SparkConf()
+          .set("spark.sql.test", "")
+          .set(
+            "spark.sql.hive.metastore.barrierPrefixes",
+            "org.apache.spark.sql.hive.execution.PairSerDe")
+          // SPARK-8910
+          .set("spark.ui.enabled", "false")))
 
 trait TestHiveSingleton {
   protected val sqlContext: SQLContext = TestHive
@@ -298,12 +300,13 @@ class TestHiveContext(sc: SparkContext) extends HiveContext(sc) { self =>
       runSqlHive(
         s"LOAD DATA LOCAL INPATH '${getHiveFile("data/files/complex.seq")}' INTO TABLE src_thrift")
     }),
-    TestTable("serdeins",
-              s"""CREATE TABLE serdeins (key INT, value STRING)
+    TestTable(
+      "serdeins",
+      s"""CREATE TABLE serdeins (key INT, value STRING)
          |ROW FORMAT SERDE '${classOf[LazySimpleSerDe].getCanonicalName}'
          |WITH SERDEPROPERTIES ('field.delim'='\\t')
        """.stripMargin.cmd,
-              "INSERT OVERWRITE TABLE serdeins SELECT * FROM src".cmd),
+      "INSERT OVERWRITE TABLE serdeins SELECT * FROM src".cmd),
     TestTable(
       "episodes",
       s"""CREATE TABLE episodes (title STRING, air_date STRING, doctor INT)

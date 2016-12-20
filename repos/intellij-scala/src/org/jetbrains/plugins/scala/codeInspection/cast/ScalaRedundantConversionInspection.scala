@@ -28,13 +28,15 @@ class ScalaRedundantConversionInspection
     case element @ ScReferenceExpression.withQualifier(qualifier) && PsiReferenceEx
           .resolve(target) =>
       process(element, qualifier, target, qualifier.getTextLength, holder)
-    case element @ ScPostfixExpr(operand,
-                                 operator @ PsiReferenceEx.resolve(target)) =>
-      process(element,
-              operand,
-              target,
-              operator.getStartOffsetInParent,
-              holder)
+    case element @ ScPostfixExpr(
+          operand,
+          operator @ PsiReferenceEx.resolve(target)) =>
+      process(
+        element,
+        operand,
+        target,
+        operator.getStartOffsetInParent,
+        holder)
   }
 
   private def process(element: PsiElement,
@@ -47,11 +49,12 @@ class ScalaRedundantConversionInspection
         for (leftType <- left.getType(TypingContext.empty);
              conversionType = f.retType
              if leftType.equiv(conversionType))
-          registerProblem(element,
-                          left,
-                          conversionType.presentableText,
-                          offset,
-                          holder)
+          registerProblem(
+            element,
+            left,
+            conversionType.presentableText,
+            offset,
+            holder)
       case f: PsiMethod
           if f.getName == "toString" &&
             f.getParameterList.getParametersCount == 0 &&
@@ -92,9 +95,10 @@ class ScalaRedundantConversionInspection
 
   private class RemoveConversionQuickFix(element: PsiElement,
                                          expr: ScExpression)
-      extends AbstractFixOnTwoPsiElements("Remove Redundant Conversion",
-                                          element,
-                                          expr) {
+      extends AbstractFixOnTwoPsiElements(
+        "Remove Redundant Conversion",
+        element,
+        expr) {
     def doApplyFix(project: Project) {
       val elem = getFirstElement
       val scExpr = getSecondElement

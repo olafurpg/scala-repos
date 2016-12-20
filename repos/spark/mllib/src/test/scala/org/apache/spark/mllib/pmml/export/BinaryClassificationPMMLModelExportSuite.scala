@@ -31,8 +31,9 @@ class BinaryClassificationPMMLModelExportSuite extends SparkFunSuite {
     val linearInput =
       LinearDataGenerator.generateLinearInput(3.0, Array(10.0, 10.0), 1, 17)
     val logisticRegressionModel =
-      new LogisticRegressionModel(linearInput(0).features,
-                                  linearInput(0).label)
+      new LogisticRegressionModel(
+        linearInput(0).features,
+        linearInput(0).label)
 
     val logisticModelExport =
       PMMLModelExportFactory.createPMMLModelExport(logisticRegressionModel)

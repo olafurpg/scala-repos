@@ -54,8 +54,9 @@ class ClassTest {
     assertEquals("Integer", classOf[java.lang.Integer].getSimpleName())
     assertEquals("Class", classOf[java.lang.Class[_]].getSimpleName())
     assertEquals("Map", classOf[scala.collection.Map[_, _]].getSimpleName())
-    assertEquals("InnerClass",
-                 classOf[ClassTestClass#InnerClass].getSimpleName())
+    assertEquals(
+      "InnerClass",
+      classOf[ClassTestClass#InnerClass].getSimpleName())
   }
 
   @Test def getComponentType(): Unit = {

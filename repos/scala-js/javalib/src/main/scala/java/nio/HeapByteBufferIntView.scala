@@ -87,13 +87,14 @@ private[nio] object HeapByteBufferIntView {
               initialLimit: Int,
               readOnly: Boolean,
               isBigEndian: Boolean): IntBuffer = {
-      new HeapByteBufferIntView(capacity,
-                                byteArray,
-                                byteArrayOffset,
-                                initialPosition,
-                                initialLimit,
-                                readOnly,
-                                isBigEndian)
+      new HeapByteBufferIntView(
+        capacity,
+        byteArray,
+        byteArrayOffset,
+        initialPosition,
+        initialLimit,
+        readOnly,
+        isBigEndian)
     }
   }
 

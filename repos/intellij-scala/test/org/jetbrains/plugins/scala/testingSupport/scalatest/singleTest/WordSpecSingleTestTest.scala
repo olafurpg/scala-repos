@@ -17,9 +17,10 @@ trait WordSpecSingleTestTest extends WordSpecGenerator {
       5,
       10,
       wordSpecFileName,
-      checkConfigAndSettings(_,
-                             wordSpecClassName,
-                             "WordSpecTest should Run single test"),
+      checkConfigAndSettings(
+        _,
+        wordSpecClassName,
+        "WordSpecTest should Run single test"),
       root =>
         checkResultTreeHasExactNamedPath(root, wordSpecTestPath: _*) &&
           checkResultTreeDoesNotHaveNodes(root, "ignore other tests"),

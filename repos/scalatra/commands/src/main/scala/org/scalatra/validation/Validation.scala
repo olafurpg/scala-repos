@@ -65,10 +65,11 @@ object Validation {
       confirmationValue: => String,
       messageFormat: String = "%%s must match %s."): FieldValidation[String] =
     Validators
-      .validConfirmation(fieldName,
-                         confirmationFieldName,
-                         confirmationValue,
-                         messageFormat)
+      .validConfirmation(
+        fieldName,
+        confirmationFieldName,
+        confirmationValue,
+        messageFormat)
       .validate(value)
 
   def greaterThan[T <% Ordered[T]](fieldName: String,

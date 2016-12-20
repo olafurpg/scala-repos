@@ -79,8 +79,9 @@ class InterpolatedStringParserTest extends SimpleTestCase {
 
   def testFormattedComplexBlockExpression() {
     assertMatches(parse("${null; foo}%d")) {
-      case Injection(ElementText("{null; foo}"),
-                     Some(Specifier(Span(_, 0, 2), "%d"))) :: Nil =>
+      case Injection(
+            ElementText("{null; foo}"),
+            Some(Specifier(Span(_, 0, 2), "%d"))) :: Nil =>
     }
   }
 

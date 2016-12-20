@@ -29,9 +29,10 @@ private[http] class HttpRequestParser(_settings: ParserSettings,
   private[this] var uriBytes: Array[Byte] = _
 
   def createShallowCopy(): HttpRequestParser =
-    new HttpRequestParser(settings,
-                          rawRequestUriHeader,
-                          headerParser.createShallowCopy())
+    new HttpRequestParser(
+      settings,
+      rawRequestUriHeader,
+      headerParser.createShallowCopy())
 
   def parseMessage(input: ByteString, offset: Int): StateResult = {
     var cursor = parseMethod(input, offset)
@@ -154,13 +155,14 @@ private[http] class HttpRequestParser(_settings: ParserSettings,
           } else allHeaders0
 
         emit(
-          RequestStart(method,
-                       uri,
-                       protocol,
-                       allHeaders,
-                       createEntity,
-                       expect100continue,
-                       closeAfterResponseCompletion))
+          RequestStart(
+            method,
+            uri,
+            protocol,
+            allHeaders,
+            createEntity,
+            expect100continue,
+            closeAfterResponseCompletion))
       }
 
       teh match {
@@ -190,8 +192,9 @@ private[http] class HttpRequestParser(_settings: ParserSettings,
           }
 
         case Some(_) if !method.isEntityAccepted ⇒
-          failMessageStart(UnprocessableEntity,
-                           s"${method.name} requests must not have an entity")
+          failMessageStart(
+            UnprocessableEntity,
+            s"${method.name} requests must not have an entity")
 
         case Some(te) ⇒
           val completedHeaders =
@@ -199,24 +202,26 @@ private[http] class HttpRequestParser(_settings: ParserSettings,
           if (te.isChunked) {
             if (clh.isEmpty) {
               emitRequestStart(chunkedEntity(cth), completedHeaders)
-              parseChunk(input,
-                         bodyStart,
-                         closeAfterResponseCompletion,
-                         totalBytesRead = 0L)
+              parseChunk(
+                input,
+                bodyStart,
+                closeAfterResponseCompletion,
+                totalBytesRead = 0L)
             } else
               failMessageStart(
                 "A chunked request must not contain a Content-Length header.")
           } else
-            parseEntity(completedHeaders,
-                        protocol,
-                        input,
-                        bodyStart,
-                        clh,
-                        cth,
-                        teh = None,
-                        expect100continue,
-                        hostHeaderPresent,
-                        closeAfterResponseCompletion)
+            parseEntity(
+              completedHeaders,
+              protocol,
+              input,
+              bodyStart,
+              clh,
+              cth,
+              teh = None,
+              expect100continue,
+              hostHeaderPresent,
+              closeAfterResponseCompletion)
       }
     } else failMessageStart("Request is missing required `Host` header")
 }

@@ -74,9 +74,10 @@ class SizeTrackerSuite extends SparkFunSuite {
     for (i <- 0 until numElements) {
       val item = makeElement(i)
       vector += item
-      expectWithinError(vector,
-                        vector.estimateSize(),
-                        if (i < 32) HIGH_ERROR else NORMAL_ERROR)
+      expectWithinError(
+        vector,
+        vector.estimateSize(),
+        if (i < 32) HIGH_ERROR else NORMAL_ERROR)
     }
   }
 
@@ -85,9 +86,10 @@ class SizeTrackerSuite extends SparkFunSuite {
     for (i <- 0 until numElements) {
       val (k, v) = makeElement(i)
       map(k) = v
-      expectWithinError(map,
-                        map.estimateSize(),
-                        if (i < 32) HIGH_ERROR else NORMAL_ERROR)
+      expectWithinError(
+        map,
+        map.estimateSize(),
+        if (i < 32) HIGH_ERROR else NORMAL_ERROR)
     }
   }
 
@@ -154,10 +156,11 @@ private object SizeTrackerSuite {
             SizeEstimator.estimate(vector)
           }
         }
-    printSpeedTestResult("SizeTrackingVector",
-                         baseTimes,
-                         sampledTimes,
-                         unsampledTimes)
+    printSpeedTestResult(
+      "SizeTrackingVector",
+      baseTimes,
+      sampledTimes,
+      unsampledTimes)
   }
 
   /**
@@ -195,10 +198,11 @@ private object SizeTrackerSuite {
             SizeEstimator.estimate(map)
           }
         }
-    printSpeedTestResult("SizeTrackingAppendOnlyMap",
-                         baseTimes,
-                         sampledTimes,
-                         unsampledTimes)
+    printSpeedTestResult(
+      "SizeTrackingAppendOnlyMap",
+      baseTimes,
+      sampledTimes,
+      unsampledTimes)
   }
 
   def printSpeedTestResult(testName: String,

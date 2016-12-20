@@ -76,10 +76,9 @@ object Settings {
 
         q(host, "host") ++ q(id, "id") ++ q(token, "token") ++ q(
           accountsPort,
-          "accountsPort") ++ q(accountsPath, "accountsPath") ++ q(authPort,
-                                                                  "authPort") ++ q(
-          authPath,
-          "authPath") ++ q(ingestPort, "ingestPort") ++ q(
+          "accountsPort") ++ q(accountsPath, "accountsPath") ++ q(
+          authPort,
+          "authPort") ++ q(authPath, "authPath") ++ q(ingestPort, "ingestPort") ++ q(
           ingestPath,
           "ingestPath") ++ q(jobsPort, "jobsPort") ++ q(jobsPath, "jobsPath") ++ q(
           shardPort,
@@ -109,13 +108,14 @@ object Settings {
 
     val lines = io.Source.fromFile(f).getLines
 
-    val defaults = PartialSettings(host = Some("localhost"),
-                                   accountsPath = Some("accounts"),
-                                   authPath = Some("apikeys"),
-                                   ingestPath = Some("ingest"),
-                                   shardPath = Some("meta"),
-                                   jobsPath = Some("jobs/v1"),
-                                   secure = Some(false))
+    val defaults = PartialSettings(
+      host = Some("localhost"),
+      accountsPath = Some("accounts"),
+      authPath = Some("apikeys"),
+      ingestPath = Some("ingest"),
+      shardPath = Some("meta"),
+      jobsPath = Some("jobs/v1"),
+      secure = Some(false))
 
     val ps = lines.foldLeft(defaults) { (ps, s) =>
       val ps2 = s match {

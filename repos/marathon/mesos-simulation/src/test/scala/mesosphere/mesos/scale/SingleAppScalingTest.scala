@@ -42,16 +42,17 @@ class SingleAppScalingTest
     ProcessKeeper.startMarathon(
       cwd,
       env,
-      List("--http_port",
-           port.toString,
-           "--zk",
-           config.zk,
-           "--max_tasks_per_offer",
-           maxTasksPerOffer,
-           "--task_launch_timeout",
-           "20000",
-           "--task_launch_confirm_timeout",
-           "1000") ++ args.toList,
+      List(
+        "--http_port",
+        port.toString,
+        "--zk",
+        config.zk,
+        "--max_tasks_per_offer",
+        maxTasksPerOffer,
+        "--task_launch_timeout",
+        "20000",
+        "--task_launch_confirm_timeout",
+        "1000") ++ args.toList,
       mainClass = "mesosphere.mesos.simulation.SimulateMesosMain")
   }
 
@@ -127,16 +128,19 @@ class SingleAppScalingTest
         marathon.metrics().entityJson)
     }
 
-    ScalingTestResultFiles.writeJson(SingleAppScalingTest.appInfosFile,
-                                     appInfos.result())
-    ScalingTestResultFiles.writeJson(SingleAppScalingTest.metricsFile,
-                                     metrics.result())
+    ScalingTestResultFiles.writeJson(
+      SingleAppScalingTest.appInfosFile,
+      appInfos.result())
+    ScalingTestResultFiles.writeJson(
+      SingleAppScalingTest.metricsFile,
+      metrics.result())
 
     log.info("XXX suspend")
     val result = marathon
-      .updateApp(appWithManyInstances.id,
-                 AppUpdate(instances = Some(0)),
-                 force = true)
+      .updateApp(
+        appWithManyInstances.id,
+        AppUpdate(instances = Some(0)),
+        force = true)
       .originalResponse
     log.info(s"XXX ${result.status}: ${result.entity}")
 

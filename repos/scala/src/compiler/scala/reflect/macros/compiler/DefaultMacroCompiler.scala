@@ -68,10 +68,11 @@ abstract class DefaultMacroCompiler
     }
     val bundleImplRef = MacroImplRefCompiler(
       atPos(macroDdef.rhs.pos)(
-        gen.mkTypeApply(Select(New(maybeBundleRef,
-                                   List(List(Literal(Constant(null))))),
-                               methName),
-                        targs)),
+        gen.mkTypeApply(
+          Select(
+            New(maybeBundleRef, List(List(Literal(Constant(null))))),
+            methName),
+          targs)),
       isImplBundle = true
     )
     val vanillaResult = tryCompile(vanillaImplRef)

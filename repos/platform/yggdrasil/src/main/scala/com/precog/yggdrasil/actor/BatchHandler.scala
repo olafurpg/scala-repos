@@ -120,8 +120,8 @@ class BatchHandler(ingestActor: ActorRef,
     // if the ingest isn't complete by the timeout, ask the requestor to retry
     if (remaining != 0) {
       logger.info(
-        "Sending incomplete with %d remaining to %s".format(remaining,
-                                                            requestor))
+        "Sending incomplete with %d remaining to %s"
+          .format(remaining, requestor))
       ingestActor ! BatchFailed(requestor, checkpoint)
     } else {
       // update the metadatabase, by way of notifying the ingest actor

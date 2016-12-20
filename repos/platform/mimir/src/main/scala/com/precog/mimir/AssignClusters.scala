@@ -69,11 +69,13 @@ trait AssignClusterModule[M[+ _]]
               ModelId,
               Set[(ModelId, ClusterId, CPath, DoubleColumn)]] = {
               schema.columnRefs.flatMap {
-                case ref @ ColumnRef(CPath(TableModule.paths.Value,
-                                           CPathField(modelName),
-                                           CPathField(clusterName),
-                                           rest @ _ *),
-                                     ctype) =>
+                case ref @ ColumnRef(
+                      CPath(
+                        TableModule.paths.Value,
+                        CPathField(modelName),
+                        CPathField(clusterName),
+                        rest @ _ *),
+                      ctype) =>
                   Schema.mkType(ref :: Nil) flatMap {
                     case jType =>
                       schema.columns(jType) collectFirst {
@@ -297,17 +299,20 @@ trait AssignClusterModule[M[+ _]]
                       val centers: Map[ColumnRef, Column] = zipped
                         .collect {
                           case (col, path) if path.hasPrefix(pref) =>
-                            val path0 = CPath(TableModule.paths.Value,
-                                              CPathField(model.name),
-                                              CPathField("clusterCenter"))
-                            ColumnRef(path0 \ path.dropPrefix(pref).get,
-                                      CDouble) -> col
+                            val path0 = CPath(
+                              TableModule.paths.Value,
+                              CPathField(model.name),
+                              CPathField("clusterCenter"))
+                            ColumnRef(
+                              path0 \ path.dropPrefix(pref).get,
+                              CDouble) -> col
                         }
                         .toMap
 
-                      val idPath = CPath(TableModule.paths.Value,
-                                         CPathField(model.name),
-                                         CPathField("clusterId"))
+                      val idPath = CPath(
+                        TableModule.paths.Value,
+                        CPathField(model.name),
+                        CPathField("clusterId"))
                       val centerId = Map(
                         ColumnRef(idPath, CString) -> ArrayStrColumn(
                           definedModel,

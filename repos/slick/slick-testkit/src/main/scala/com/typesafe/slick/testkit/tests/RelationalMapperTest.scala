@@ -78,20 +78,24 @@ class RelationalMapperTest extends AsyncTest[RelationalTestDB] {
 
     seq(
       ts.schema.create,
-      ts.map(t => (t.b, t.c)) ++= Seq((EnumValue1, None),
-                                      (EnumValue1, Some(EnumValue2)),
-                                      (EnumValue2, Some(EnumValue3))),
+      ts.map(t => (t.b, t.c)) ++= Seq(
+        (EnumValue1, None),
+        (EnumValue1, Some(EnumValue2)),
+        (EnumValue2, Some(EnumValue3))),
       ts.to[Set]
         .result
         .map(
-          _ shouldBe Set((1, EnumValue1, None),
-                         (2, EnumValue1, Some(EnumValue2)),
-                         (3, EnumValue2, Some(EnumValue3)))),
+          _ shouldBe Set(
+            (1, EnumValue1, None),
+            (2, EnumValue1, Some(EnumValue2)),
+            (3, EnumValue2, Some(EnumValue3)))),
       ts.filter(_.b === (EnumValue1: EnumType))
         .to[Set]
         .result
-        .map(_ shouldBe Set((1, EnumValue1, None),
-                            (2, EnumValue1, Some(EnumValue2)))),
+        .map(
+          _ shouldBe Set(
+            (1, EnumValue1, None),
+            (2, EnumValue1, Some(EnumValue2)))),
       ts.filter(_.b === (EnumValue2: EnumType))
         .to[Set]
         .result

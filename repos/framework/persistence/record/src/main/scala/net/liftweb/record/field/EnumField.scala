@@ -73,9 +73,10 @@ trait EnumTypedField[EnumType <: Enumeration]
   }
 
   private def elem =
-    SHtml.selectObj[Box[EnumType#Value]](buildDisplayList,
-                                         Full(valueBox),
-                                         setBox(_)) %
+    SHtml.selectObj[Box[EnumType#Value]](
+      buildDisplayList,
+      Full(valueBox),
+      setBox(_)) %
       ("tabindex" -> tabIndex.toString)
 
   def toForm: Box[NodeSeq] =

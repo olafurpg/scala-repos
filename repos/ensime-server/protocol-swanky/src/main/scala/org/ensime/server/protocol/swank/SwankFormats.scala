@@ -843,10 +843,11 @@ object SwankProtocolRequest {
               (Loc.NewName, SexpString(newName)),
               (Loc.Start, SexpNumber(start))
               ) =>
-            RenameRefactorDesc(newName,
-                               File(f).canon,
-                               start.intValue,
-                               end.intValue)
+            RenameRefactorDesc(
+              newName,
+              File(f).canon,
+              start.intValue,
+              end.intValue)
 
           case List(
               (Loc.End, SexpNumber(end)),
@@ -854,10 +855,11 @@ object SwankProtocolRequest {
               (Loc.MethodName, SexpString(methodName)),
               (Loc.Start, SexpNumber(start))
               ) =>
-            ExtractMethodRefactorDesc(methodName,
-                                      File(f).canon,
-                                      start.intValue,
-                                      end.intValue)
+            ExtractMethodRefactorDesc(
+              methodName,
+              File(f).canon,
+              start.intValue,
+              end.intValue)
 
           case List(
               (Loc.End, SexpNumber(end)),
@@ -865,19 +867,21 @@ object SwankProtocolRequest {
               (Loc.Name, SexpString(name)),
               (Loc.Start, SexpNumber(start))
               ) =>
-            ExtractLocalRefactorDesc(name,
-                                     File(f).canon,
-                                     start.intValue,
-                                     end.intValue)
+            ExtractLocalRefactorDesc(
+              name,
+              File(f).canon,
+              start.intValue,
+              end.intValue)
 
           case List(
               (Loc.End, SexpNumber(end)),
               (Loc.File, SexpString(f)),
               (Loc.Start, SexpNumber(start))
               ) =>
-            InlineLocalRefactorDesc(File(f).canon,
-                                    start.intValue,
-                                    end.intValue)
+            InlineLocalRefactorDesc(
+              File(f).canon,
+              start.intValue,
+              end.intValue)
 
           case List(
               (Loc.File, SexpString(f))

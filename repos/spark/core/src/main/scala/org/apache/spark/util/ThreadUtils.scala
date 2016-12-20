@@ -194,10 +194,11 @@ private[spark] object ThreadUtils {
           setName(prefix + "-" + super.getName)
         }
     }
-    new SForkJoinPool(maxThreadNumber,
-                      factory,
-                      null, // handler
-                      false // asyncMode
+    new SForkJoinPool(
+      maxThreadNumber,
+      factory,
+      null, // handler
+      false // asyncMode
     )
   }
 }

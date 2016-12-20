@@ -117,8 +117,9 @@ object CaseClassBasedSetterImpl {
         case tpe if allowUnknownTypes =>
           DefaultSetter
         case _ =>
-          c.abort(c.enclosingPosition,
-                  s"Case class ${T.tpe} is not supported at type: $outerType")
+          c.abort(
+            c.enclosingPosition,
+            s"Case class ${T.tpe} is not supported at type: $outerType")
       }
     }
     def expandMethod(outerTpe: Type): Vector[(Tree => Tree, Type)] =
@@ -128,8 +129,8 @@ object CaseClassBasedSetterImpl {
         }
         .map { accessorMethod =>
           val fieldType = normalized(
-            accessorMethod.returnType.asSeenFrom(outerTpe,
-                                                 outerTpe.typeSymbol.asClass))
+            accessorMethod.returnType
+              .asSeenFrom(outerTpe, outerTpe.typeSymbol.asClass))
 
           ({ pTree: Tree =>
             q"""$pTree.$accessorMethod"""

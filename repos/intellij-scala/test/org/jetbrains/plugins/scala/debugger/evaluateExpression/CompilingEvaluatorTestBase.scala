@@ -24,8 +24,9 @@ abstract class CompilingEvaluatorTestBase extends ScalaDebuggerTestCase {
     CompileServerLauncher.ensureServerRunning(getProject)
   }
 
-  addFileWithBreakpoints("SimplePlace.scala",
-                         s"""
+  addFileWithBreakpoints(
+    "SimplePlace.scala",
+    s"""
       |object SimplePlace {
       |  val f = "f"
       |
@@ -63,8 +64,9 @@ abstract class CompilingEvaluatorTestBase extends ScalaDebuggerTestCase {
     )
   }
 
-  addFileWithBreakpoints("InForStmt.scala",
-                         s"""
+  addFileWithBreakpoints(
+    "InForStmt.scala",
+    s"""
       |object InForStmt {
       |  def main(args: Array[String]) {
       |    for {
@@ -87,8 +89,9 @@ abstract class CompilingEvaluatorTestBase extends ScalaDebuggerTestCase {
     )
   }
 
-  addFileWithBreakpoints("InConstructor.scala",
-                         s"""
+  addFileWithBreakpoints(
+    "InConstructor.scala",
+    s"""
       |object InConstructor {
       |  def main(args: Array[String]) {
       |    new Sample().foo()
@@ -109,8 +112,9 @@ abstract class CompilingEvaluatorTestBase extends ScalaDebuggerTestCase {
     )
   }
 
-  addFileWithBreakpoints("AddBraces.scala",
-                         s"""
+  addFileWithBreakpoints(
+    "AddBraces.scala",
+    s"""
     |object AddBraces {
     |  def main(args: Array[String]) {
     |    foo()

@@ -54,11 +54,13 @@ class JsCommands(val reverseList: List[JsCmd]) {
 
     val data = (containedJs ++ toAppend).mkString("\n").getBytes("UTF-8")
 
-    InMemoryResponse(data,
-                     List("Content-Length" -> data.length.toString,
-                          "Content-Type" -> "text/javascript; charset=utf-8"),
-                     S.responseCookies,
-                     200)
+    InMemoryResponse(
+      data,
+      List(
+        "Content-Length" -> data.length.toString,
+        "Content-Type" -> "text/javascript; charset=utf-8"),
+      S.responseCookies,
+      200)
   }
 }
 

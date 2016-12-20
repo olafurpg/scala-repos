@@ -67,17 +67,18 @@ object BigInteger {
   private final val POW32 = 4294967296d
 
   /** All the {@code BigInteger} numbers in the range [0,10] are cached. */
-  private final val SMALL_VALUES = Array(ZERO,
-                                         ONE,
-                                         new BigInteger(1, 2),
-                                         new BigInteger(1, 3),
-                                         new BigInteger(1, 4),
-                                         new BigInteger(1, 5),
-                                         new BigInteger(1, 6),
-                                         new BigInteger(1, 7),
-                                         new BigInteger(1, 8),
-                                         new BigInteger(1, 9),
-                                         TEN)
+  private final val SMALL_VALUES = Array(
+    ZERO,
+    ONE,
+    new BigInteger(1, 2),
+    new BigInteger(1, 3),
+    new BigInteger(1, 4),
+    new BigInteger(1, 5),
+    new BigInteger(1, 6),
+    new BigInteger(1, 7),
+    new BigInteger(1, 8),
+    new BigInteger(1, 9),
+    TEN)
 
   private final val TWO_POWS =
     Array.tabulate[BigInteger](32)(i => BigInteger.valueOf(1L << i))
@@ -379,12 +380,13 @@ class BigInteger extends Number with Comparable[BigInteger] {
             Division
               .divideArrayByInt(resDigits, digits, thisLen, divisor.digits(0))
           } else {
-            Division.divide(resDigits,
-                            resLength,
-                            digits,
-                            thisLen,
-                            divisor.digits,
-                            divisorLen)
+            Division.divide(
+              resDigits,
+              resLength,
+              digits,
+              thisLen,
+              divisor.digits,
+              divisorLen)
           }
           val result = new BigInteger(resSign, resLength, resDigits)
           result.cutOffLeadingZeroes()
@@ -427,12 +429,13 @@ class BigInteger extends Number with Comparable[BigInteger] {
         val remainderLength = divisorLen
         val quotientSign = if (thisSign == divisorSign) 1 else -1
         val quotientDigits = new Array[Int](quotientLength)
-        val remainderDigits = Division.divide(quotientDigits,
-                                              quotientLength,
-                                              thisDigits,
-                                              thisLen,
-                                              divisorDigits,
-                                              divisorLen)
+        val remainderDigits = Division.divide(
+          quotientDigits,
+          quotientLength,
+          thisDigits,
+          thisLen,
+          divisorDigits,
+          divisorLen)
         val result0 =
           new BigInteger(quotientSign, quotientLength, quotientDigits)
         val result1 =

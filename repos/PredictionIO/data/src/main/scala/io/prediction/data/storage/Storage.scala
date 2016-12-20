@@ -246,9 +246,10 @@ object Storage extends Logging {
       val props = sys.env
         .filter(t => t._1.startsWith(keyedPath))
         .map(t => t._1.replace(s"${keyedPath}_", "") -> t._2)
-      val clientConfig = StorageClientConfig(properties = props,
-                                             parallel = parallel,
-                                             test = test)
+      val clientConfig = StorageClientConfig(
+        properties = props,
+        parallel = parallel,
+        test = test)
       val client = getClient(clientConfig, sourceType)
       Some(ClientMeta(sourceType, client, clientConfig))
     } catch {
@@ -311,16 +312,17 @@ object Storage extends Logging {
       constructor.newInstance(ctorArgs: _*).asInstanceOf[T]
     } catch {
       case e: IllegalArgumentException =>
-        error("Unable to instantiate data object with class '" +
-                constructor.getDeclaringClass.getName +
-                " because its constructor" +
-                " does not have the right number of arguments." +
-                " Number of required constructor arguments: " + ctorArgs.size +
-                "." + " Number of existing constructor arguments: " +
-                constructor.getParameterTypes.size + "." +
-                s" Storage source name: ${sourceName}." +
-                s" Exception message: ${e.getMessage}).",
-              e)
+        error(
+          "Unable to instantiate data object with class '" +
+            constructor.getDeclaringClass.getName +
+            " because its constructor" +
+            " does not have the right number of arguments." +
+            " Number of required constructor arguments: " + ctorArgs.size +
+            "." + " Number of existing constructor arguments: " +
+            constructor.getParameterTypes.size + "." +
+            s" Storage source name: ${sourceName}." +
+            s" Exception message: ${e.getMessage}).",
+          e)
         errors += 1
         throw e
       case e: java.lang.reflect.InvocationTargetException =>

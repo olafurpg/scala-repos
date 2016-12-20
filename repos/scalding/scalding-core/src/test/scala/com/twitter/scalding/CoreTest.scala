@@ -210,26 +210,28 @@ class PartitionJob(args: Args) extends Job(args) {
 
 class PartitionJobTest extends WordSpec with Matchers {
   "A PartitionJob" should {
-    val input = List((3, 23),
-                     (23, 154),
-                     (15, 123),
-                     (53, 143),
-                     (7, 85),
-                     (19, 195),
-                     (42, 187),
-                     (35, 165),
-                     (68, 121),
-                     (13, 103),
-                     (17, 173),
-                     (2, 13))
+    val input = List(
+      (3, 23),
+      (23, 154),
+      (15, 123),
+      (53, 143),
+      (7, 85),
+      (19, 195),
+      (42, 187),
+      (35, 165),
+      (68, 121),
+      (13, 103),
+      (17, 173),
+      (2, 13))
 
     val (adults, minors) = input.partition { case (age, _) => age > 18 }
     val Seq(adultWeights, minorWeights) = Seq(adults, minors).map { list =>
       list.map { case (_, weight) => weight }
     }
     val expectedOutput =
-      Map(true -> adultWeights.sum / adultWeights.size.toDouble,
-          false -> minorWeights.sum / minorWeights.size.toDouble)
+      Map(
+        true -> adultWeights.sum / adultWeights.size.toDouble,
+        false -> minorWeights.sum / minorWeights.size.toDouble)
     JobTest(new com.twitter.scalding.PartitionJob(_))
       .source(Tsv("input", new Fields("age", "weight")), input)
       .sink[(Boolean, Double)](Tsv("output")) { outBuf =>
@@ -534,9 +536,10 @@ class LeftJoinTest extends WordSpec with Matchers {
   "A LeftJoinJob" should {
     val input1 = List("a" -> 1, "b" -> 2, "c" -> 3)
     val input2 = List("b" -> -1, "c" -> 5, "d" -> 4)
-    val correctOutput = Map[String, (Int, AnyRef)]("a" -> (1, "NULL"),
-                                                   "b" -> (2, "-1"),
-                                                   "c" -> (3, "5"))
+    val correctOutput = Map[String, (Int, AnyRef)](
+      "a" -> (1, "NULL"),
+      "b" -> (2, "-1"),
+      "c" -> (3, "5"))
     var idx = 0
     JobTest(new LeftJoinJob(_))
       .arg("input1", "fakeInput1")
@@ -586,9 +589,10 @@ class LeftJoinWithLargerTest extends WordSpec with Matchers {
   "A LeftJoinWithLargerJob" should {
     val input1 = List("a" -> 1, "b" -> 2, "c" -> 3)
     val input2 = List("b" -> -1, "c" -> 5, "d" -> 4)
-    val correctOutput = Map[String, (Int, AnyRef)]("a" -> (1, "NULL"),
-                                                   "b" -> (2, "-1"),
-                                                   "c" -> (3, "5"))
+    val correctOutput = Map[String, (Int, AnyRef)](
+      "a" -> (1, "NULL"),
+      "b" -> (2, "-1"),
+      "c" -> (3, "5"))
     var idx = 0
     JobTest(new LeftJoinWithLargerJob(_))
       .arg("input1", "fakeInput1")
@@ -770,14 +774,16 @@ class DoubleGroupSpec extends WordSpec with Matchers {
     JobTest(new DoubleGroupJob(_))
       .arg("in", "fakeIn")
       .arg("out", "fakeOut")
-      .source(TextLine("fakeIn"),
-              List("0" -> "one 1",
-                   "1" -> "two 1",
-                   "2" -> "two 2",
-                   "3" -> "three 3",
-                   "4" -> "three 4",
-                   "5" -> "three 5",
-                   "6" -> "just one"))
+      .source(
+        TextLine("fakeIn"),
+        List(
+          "0" -> "one 1",
+          "1" -> "two 1",
+          "2" -> "two 2",
+          "3" -> "three 3",
+          "4" -> "three 4",
+          "5" -> "three 5",
+          "6" -> "just one"))
       .sink[(Long, Long)](Tsv("fakeOut")) { outBuf =>
         "correctly build histogram" in {
           val outM = outBuf.toMap
@@ -807,14 +813,16 @@ class GroupUniqueSpec extends WordSpec with Matchers {
     JobTest(new GroupUniqueJob(_))
       .arg("in", "fakeIn")
       .arg("out", "fakeOut")
-      .source(TextLine("fakeIn"),
-              List("0" -> "one 1",
-                   "1" -> "two 1",
-                   "2" -> "two 2",
-                   "3" -> "three 3",
-                   "4" -> "three 4",
-                   "5" -> "three 5",
-                   "6" -> "just one"))
+      .source(
+        TextLine("fakeIn"),
+        List(
+          "0" -> "one 1",
+          "1" -> "two 1",
+          "2" -> "two 2",
+          "3" -> "three 3",
+          "4" -> "three 4",
+          "5" -> "three 5",
+          "6" -> "just one"))
       .sink[(Long)](Tsv("fakeOut")) { outBuf =>
         "correctly count unique sizes" in {
           outBuf.toSet should have size 3
@@ -850,8 +858,9 @@ class DiscardTest extends WordSpec with Matchers {
     JobTest(new DiscardTestJob(_))
       .arg("in", "fakeIn")
       .arg("out", "fakeOut")
-      .source(TextLine("fakeIn"),
-              List("0" -> "hello world", "1" -> "foo", "2" -> "bar"))
+      .source(
+        TextLine("fakeIn"),
+        List("0" -> "hello world", "1" -> "foo", "2" -> "bar"))
       .sink[Boolean](Tsv("fakeOut")) { outBuf =>
         "must reduce down to one line" in {
           outBuf should have size 1
@@ -909,8 +918,9 @@ class ForceReducersTest extends WordSpec with Matchers {
   "A ForceReducersJob" should {
     var idx = 0
     JobTest(new ForceReducersJob(_))
-      .source(TextLine("in"),
-              List("0" -> "single test", "1" -> "single result"))
+      .source(
+        TextLine("in"),
+        List("0" -> "single test", "1" -> "single result"))
       .sink[(Int, String)](Tsv("out")) { outBuf =>
         (idx + ": must get the result right") in {
           //need to convert to sets because order
@@ -954,8 +964,9 @@ class ToListTest extends WordSpec with Matchers {
     JobTest(new ToListJob(_))
       .arg("in", "fakeIn")
       .arg("out", "fakeOut")
-      .source(TextLine("fakeIn"),
-              List("0" -> "single test", "1" -> "single result"))
+      .source(
+        TextLine("fakeIn"),
+        List("0" -> "single test", "1" -> "single result"))
       .sink[(Int, String)](Tsv("fakeOut")) { outBuf =>
         "must have the right number of lines" in {
           outBuf should have size 2
@@ -974,8 +985,9 @@ class ToListTest extends WordSpec with Matchers {
     JobTest(new NullListJob(_))
       .arg("in", "fakeIn")
       .arg("out", "fakeOut")
-      .source(TextLine("fakeIn"),
-              List("0" -> null, "0" -> "a", "0" -> null, "0" -> "b"))
+      .source(
+        TextLine("fakeIn"),
+        List("0" -> null, "0" -> "a", "0" -> null, "0" -> "b"))
       .sink[(Int, String)](Tsv("fakeOut")) { outBuf =>
         "must have the right number of lines" in {
           outBuf should have size 1
@@ -1013,12 +1025,13 @@ class CrossTest extends WordSpec with Matchers {
         (idx + ": must look exactly right") in {
           outBuf should have size 6
           outBuf.toSet shouldBe
-            (Set((0, 1, 4),
-                 (0, 1, 5),
-                 (1, 2, 4),
-                 (1, 2, 5),
-                 (2, 3, 4),
-                 (2, 3, 5)))
+            (Set(
+              (0, 1, 4),
+              (0, 1, 5),
+              (1, 2, 4),
+              (1, 2, 5),
+              (2, 3, 4),
+              (2, 3, 5)))
         }
         idx += 1
       }
@@ -1093,12 +1106,13 @@ class SmallCrossTest extends WordSpec with Matchers {
       .sink[(Int, Int, Int)](Tsv("fakeOut")) { outBuf =>
         (idx + ": must look exactly right") in {
           outBuf should have size 6
-          outBuf.toSet shouldBe Set((0, 1, 4),
-                                    (0, 1, 5),
-                                    (1, 2, 4),
-                                    (1, 2, 5),
-                                    (2, 3, 4),
-                                    (2, 3, 5))
+          outBuf.toSet shouldBe Set(
+            (0, 1, 4),
+            (0, 1, 5),
+            (1, 2, 4),
+            (1, 2, 5),
+            (2, 3, 4),
+            (2, 3, 5))
         }
         idx += 1
       }
@@ -1155,8 +1169,9 @@ class ScanTest extends WordSpec with Matchers {
   "A ScanJob" should {
     var idx = 0
     JobTest(new ScanJob(_))
-      .source(Tsv("in", ('x, 'y, 'z)),
-              List((3, 0, 1), (3, 1, 10), (3, 5, 100)))
+      .source(
+        Tsv("in", ('x, 'y, 'z)),
+        List((3, 0, 1), (3, 1, 10), (3, 5, 100)))
       .sink[(Int, Int, Int)](Tsv("out")) { outBuf =>
         val correct = List((3, 0, 0), (3, 0, 1), (3, 1, 10), (3, 6, 100))
         (idx + ": have a working scanLeft") in {
@@ -1255,12 +1270,13 @@ class PivotTest extends WordSpec with Matchers with FieldConversions {
         "unpivot columns correctly" in {
           outBuf should have size 6
           outBuf.toList.sorted shouldBe
-            (List(("1", "w", "a"),
-                  ("1", "y", "b"),
-                  ("1", "z", "c"),
-                  ("2", "w", "d"),
-                  ("2", "y", "e"),
-                  ("2", "z", "f")).sorted)
+            (List(
+              ("1", "w", "a"),
+              ("1", "y", "b"),
+              ("1", "z", "c"),
+              ("2", "w", "d"),
+              ("2", "y", "e"),
+              ("2", "z", "f")).sorted)
         }
       }
       .sink[(String, String, String, String)](Tsv("pivot")) { outBuf =>
@@ -1312,8 +1328,9 @@ class IterableSourceTest extends WordSpec with Matchers with FieldConversions {
       }
       .sink[(Int, Int, Int, Int, Int)](Tsv("imp")) { outBuf =>
         s"$idx: correctly implicitly joinWithTiny" in {
-          outBuf.toList.sorted shouldBe List((1, 10, 1, 2, 3),
-                                             (3, 30, 3, 8, 9))
+          outBuf.toList.sorted shouldBe List(
+            (1, 10, 1, 2, 3),
+            (3, 30, 3, 8, 9))
         }
         idx += 1
       }
@@ -1386,8 +1403,9 @@ class MkStringToListTest extends WordSpec with Matchers with FieldConversions {
       .source(Tsv("input", ('x, 'y)), input)
       .sink[(Int, String, List[Int])](Tsv("output")) { outBuf =>
         "Correctly do mkString/toList" in {
-          outBuf.toSet shouldBe Set((1, "10,20,30", List(10, 20, 30)),
-                                    (2, "0", List(0)))
+          outBuf.toSet shouldBe Set(
+            (1, "10,20,30", List(10, 20, 30)),
+            (2, "0", List(0)))
         }
       }
       .run
@@ -1495,8 +1513,9 @@ class NormalizeJob(args: Args) extends Job(args) {
 class NormalizeTest extends WordSpec with Matchers {
   "A NormalizeJob" should {
     JobTest(new NormalizeJob(_))
-      .source(Tsv("in"),
-              List(("0.3", "1"), ("0.3", "1"), ("0.3", "1"), ("0.3", "1")))
+      .source(
+        Tsv("in"),
+        List(("0.3", "1"), ("0.3", "1"), ("0.3", "1"), ("0.3", "1")))
       .sink[(Double, Int)](Tsv("out")) { outBuf =>
         "must be normalized" in {
           outBuf should have size 4
@@ -1669,8 +1688,9 @@ class TypedItsATrapTest extends WordSpec with Matchers {
       }
       .typedSink(trap2) { outBuf =>
         "trap2 must contain the even numbered" in {
-          outBuf.toList.sorted shouldBe List(("b", 2, 4, "b"),
-                                             ("d", 4, 16, "d"))
+          outBuf.toList.sorted shouldBe List(
+            ("b", 2, 4, "b"),
+            ("d", 4, 16, "d"))
         }
       }
       .run
@@ -1691,9 +1711,10 @@ class TypedItsATrapTest extends WordSpec with Matchers {
       }
       .typedSink(TypedThrowsErrorsJob2.trap) { outBuf =>
         "trap must contain the first and the evens" in {
-          outBuf.toList.sorted shouldBe List(("a", 1, 1),
-                                             ("b", 2, 2),
-                                             ("d", 4, 4))
+          outBuf.toList.sorted shouldBe List(
+            ("a", 1, 1),
+            ("b", 2, 2),
+            ("d", 4, 4))
         }
       }
       .run
@@ -1757,8 +1778,9 @@ class ToListGroupAllToListSpec extends WordSpec with Matchers {
 
   "A ToListGroupAllToListTestJob" should {
     JobTest(new ToListGroupAllToListTestJob(_))
-      .source(TypedTsv[(Long, String)]("input"),
-              List((1L, "us"), (1L, "gb"), (2L, "jp"), (3L, "jp"), (3L, "gb")))
+      .source(
+        TypedTsv[(Long, String)]("input"),
+        List((1L, "us"), (1L, "gb"), (2L, "jp"), (3L, "jp"), (3L, "gb")))
       .sink[String](Tsv("output")) { outBuf =>
         "must properly aggregate stuff in hadoop mode" in {
           outBuf should have size 1
@@ -1770,8 +1792,9 @@ class ToListGroupAllToListSpec extends WordSpec with Matchers {
       .finish
 
     JobTest(new ToListGroupAllToListTestJob(_))
-      .source(TypedTsv[(Long, String)]("input"),
-              List((1L, "us"), (1L, "gb"), (2L, "jp"), (3L, "jp"), (3L, "gb")))
+      .source(
+        TypedTsv[(Long, String)]("input"),
+        List((1L, "us"), (1L, "gb"), (2L, "jp"), (3L, "jp"), (3L, "gb")))
       .sink[List[(String, List[Long])]](Tsv("output")) { outBuf =>
         "must properly aggregate stuff in local model" in {
           outBuf should have size 1
@@ -1892,19 +1915,20 @@ class VerifyTypesJob(args: Args) extends Job(args) {
 class VerifyTypesJobTest extends WordSpec with Matchers {
   "Verify types operation" should {
     "put bad records in a trap" in {
-      val input = List((3, "aaa"),
-                       (23, 154),
-                       (15, "123"),
-                       (53, 143),
-                       (7, 85),
-                       (19, 195),
-                       (42, 187),
-                       (35, 165),
-                       (68, 121),
-                       (13, "34"),
-                       (17, 173),
-                       (2, 13),
-                       (2, "break"))
+      val input = List(
+        (3, "aaa"),
+        (23, 154),
+        (15, "123"),
+        (53, 143),
+        (7, 85),
+        (19, 195),
+        (42, 187),
+        (35, 165),
+        (68, 121),
+        (13, "34"),
+        (17, 173),
+        (2, 13),
+        (2, "break"))
 
       JobTest(new VerifyTypesJob(_))
         .source(Tsv("input", new Fields("age", "weight")), input)
@@ -1928,8 +1952,9 @@ class SortingJobTest extends WordSpec with Matchers {
   import Dsl._
   "A SortingJob" should {
     JobTest(new SortingJob(_))
-      .source(Tsv("in", ('x, 'y, 'z)),
-              (1 to 100).map(i => (i, i * i % 5, i * i * i)))
+      .source(
+        Tsv("in", ('x, 'y, 'z)),
+        (1 to 100).map(i => (i, i * i % 5, i * i * i)))
       .sink[(Int, Int, Int)](Tsv("output")) { outBuf =>
         "keep all the columns" in {
           val correct =
@@ -1952,11 +1977,12 @@ class CollectJob(args: Args) extends Job(args) {
 
 class CollectJobTest extends WordSpec with Matchers {
   "A CollectJob" should {
-    val input = List(("steve m", 21),
-                     ("john f", 89),
-                     ("s smith", 12),
-                     ("jill q", 55),
-                     ("some child", 8))
+    val input = List(
+      ("steve m", 21),
+      ("john f", 89),
+      ("s smith", 12),
+      ("jill q", 55),
+      ("some child", 8))
     val expectedOutput = input.collect {
       case (name, age) if age > 18 => name.split(" ").head
     }
@@ -1981,11 +2007,12 @@ class FilterJob(args: Args) extends Job(args) {
 
 class FilterJobTest extends WordSpec with Matchers {
   "A FilterJob" should {
-    val input = List(("steve m", 21),
-                     ("john f", 89),
-                     ("s smith", 12),
-                     ("jill q", 55),
-                     ("some child", 8))
+    val input = List(
+      ("steve m", 21),
+      ("john f", 89),
+      ("s smith", 12),
+      ("jill q", 55),
+      ("some child", 8))
     val expectedOutput = input.filter(_._2 > 18)
 
     JobTest(new com.twitter.scalding.FilterJob(_))
@@ -2008,11 +2035,12 @@ class FilterNotJob(args: Args) extends Job(args) {
 
 class FilterNotJobTest extends WordSpec with Matchers {
   "A FilterNotJob" should {
-    val input = List(("steve m", 21),
-                     ("john f", 89),
-                     ("s smith", 12),
-                     ("jill q", 55),
-                     ("some child", 8))
+    val input = List(
+      ("steve m", 21),
+      ("john f", 89),
+      ("s smith", 12),
+      ("jill q", 55),
+      ("some child", 8))
     val expectedOutput = input.filterNot(_._2 > 18)
 
     JobTest(new com.twitter.scalding.FilterNotJob(_))
@@ -2050,11 +2078,12 @@ class CounterJob(args: Args) extends Job(args) {
 
 class CounterJobTest extends WordSpec with Matchers {
   "A CounterJob" should {
-    val input = List(("steve m", 21),
-                     ("john f", 89),
-                     ("s smith", 12),
-                     ("jill q", 55),
-                     ("some child", 8))
+    val input = List(
+      ("steve m", 21),
+      ("john f", 89),
+      ("s smith", 12),
+      ("jill q", 55),
+      ("some child", 8))
     val expectedOutput =
       input.collect { case (name, age) if age > 18 => age }.sum.toString
 
@@ -2070,9 +2099,10 @@ class CounterJobTest extends WordSpec with Matchers {
         .counter("bad_group_bad_counter") { _ shouldBe 0 }
         // This is redundant but just added here to show both methods for counter tests
         .counters {
-          _ shouldBe Map("foo_bar" -> 10,
-                         "age_group_older_than_18" -> 3,
-                         "reduce_hit" -> 2)
+          _ shouldBe Map(
+            "foo_bar" -> 10,
+            "age_group_older_than_18" -> 3,
+            "reduce_hit" -> 2)
         }
         .run
         .finish

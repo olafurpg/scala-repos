@@ -13,6 +13,7 @@ final class Env(config: Config, db: lila.db.Env) {
 object Env {
 
   lazy val current =
-    "memo" boot new Env(lila.common.PlayApp loadConfig "memo",
-                        lila.db.Env.current)
+    "memo" boot new Env(
+      lila.common.PlayApp loadConfig "memo",
+      lila.db.Env.current)
 }

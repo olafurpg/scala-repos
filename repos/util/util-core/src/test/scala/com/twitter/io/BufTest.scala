@@ -154,27 +154,28 @@ class BufTest
     val bytes = new Array[Byte](21)
     buf.write(bytes, 0)
 
-    val expected = Array[Byte](-17,
-                               -65,
-                               -68,
-                               -17,
-                               -65,
-                               -68,
-                               -17,
-                               -65,
-                               -68,
-                               -17,
-                               -65,
-                               -68,
-                               -17,
-                               -65,
-                               -68,
-                               -17,
-                               -65,
-                               -68,
-                               -17,
-                               -65,
-                               -68)
+    val expected = Array[Byte](
+      -17,
+      -65,
+      -68,
+      -17,
+      -65,
+      -68,
+      -17,
+      -65,
+      -68,
+      -17,
+      -65,
+      -68,
+      -17,
+      -65,
+      -68,
+      -17,
+      -65,
+      -68,
+      -17,
+      -65,
+      -68)
 
     assert(bytes.toSeq == expected.toSeq)
 

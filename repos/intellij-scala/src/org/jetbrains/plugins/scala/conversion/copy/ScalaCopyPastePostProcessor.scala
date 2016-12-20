@@ -57,9 +57,10 @@ class ScalaCopyPastePostProcessor
           override def run(): Unit = {
             breakable {
               for ((startOffset, endOffset) <- startOffsets.zip(endOffsets);
-                   element <- getElementsStrictlyInRange(file,
-                                                         startOffset,
-                                                         endOffset);
+                   element <- getElementsStrictlyInRange(
+                     file,
+                     startOffset,
+                     endOffset);
                    reference <- element.asOptionOf[ScReferenceElement];
                    dependency <- Dependency.dependencyFor(reference)
                    if dependency.isExternal;
@@ -94,9 +95,10 @@ class ScalaCopyPastePostProcessor
         val attachments = selections.zipWithIndex.map(p =>
           new Attachment(s"Selection-${p._2 + 1}.scala", p._1))
         Log.error(
-          LogMessageEx.createEvent(e.getMessage,
-                                   ExceptionUtil.getThrowableText(e),
-                                   attachments: _*))
+          LogMessageEx.createEvent(
+            e.getMessage,
+            ExceptionUtil.getThrowableText(e),
+            attachments: _*))
     }
     new Associations(associations.reverse)
   }
@@ -138,11 +140,12 @@ class ScalaCopyPastePostProcessor
             .getInstance()
             .ADD_IMPORTS_ON_PASTE == CodeInsightSettings.ASK) {
         val dialog =
-          new RestoreReferencesDialog(project,
-                                      bindingsToRestore
-                                        .map(_.path.toOption.getOrElse(""))
-                                        .sorted
-                                        .toArray)
+          new RestoreReferencesDialog(
+            project,
+            bindingsToRestore
+              .map(_.path.toOption.getOrElse(""))
+              .sorted
+              .toArray)
         dialog.show()
         val selectedPahts = dialog.getSelectedElements
         if (dialog.getExitCode == DialogWrapper.OK_EXIT_CODE)
@@ -171,11 +174,12 @@ class ScalaCopyPastePostProcessor
       element <- elementFor(association, file, offset)
       if !association.isSatisfiedIn(element)
     } yield
-      Binding(element,
-              association.path.asString(
-                ScalaCodeStyleSettings
-                  .getInstance(project)
-                  .isImportMembersUsingUnderScore))).filter {
+      Binding(
+        element,
+        association.path.asString(
+          ScalaCodeStyleSettings
+            .getInstance(project)
+            .isImportMembersUsingUnderScore))).filter {
       case Binding(_, path) =>
         val index = path.lastIndexOf('.')
         index != -1 && !Set("scala", "java.lang", "scala.Predef").contains(

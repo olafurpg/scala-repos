@@ -33,8 +33,9 @@ class DecodeHandlerTest extends FunSuite with MockitoSugar {
       }
     }
     val ch =
-      new EmbeddedChannel(new DecodeHandler[String](() => StringDecoder),
-                          readSnooper)
+      new EmbeddedChannel(
+        new DecodeHandler[String](() => StringDecoder),
+        readSnooper)
     ch.pipeline.fireChannelActive
 
     ch.writeInbound(Unpooled.wrappedBuffer("hi".getBytes))

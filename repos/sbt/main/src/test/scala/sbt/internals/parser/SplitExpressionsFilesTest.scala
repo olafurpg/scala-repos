@@ -41,17 +41,19 @@ abstract class AbstractSplitExpressionsFilesTest(pathName: String)
       val results = for {
         path <- allFiles
         lines = Source.fromFile(path).getLines().toList
-        comparison = SplitterComparison(splitLines(path, oldSplitter, lines),
-                                        splitLines(path, newSplitter, lines))
+        comparison = SplitterComparison(
+          splitLines(path, oldSplitter, lines),
+          splitLines(path, newSplitter, lines))
       } yield path -> comparison
 
       printResults(results)
 
       val validResults = results.collect {
-        case (path,
-              SplitterComparison(scala.util.Success(oldRes),
-                                 scala.util.Success(newRes)))
-            if oldRes == newRes =>
+        case (
+            path,
+            SplitterComparison(
+              scala.util.Success(oldRes),
+              scala.util.Success(newRes))) if oldRes == newRes =>
           path
       }
 
@@ -96,9 +98,10 @@ abstract class AbstractSplitExpressionsFilesTest(pathName: String)
                 lineRange.copy(
                   start = lineRange.start + closeSlashAsteriskLine + 1)
               }
-            removeSlashAsterisk(statements.drop(closeSlashAsteriskLine + 1),
-                                newLineRange,
-                                reverted)
+            removeSlashAsterisk(
+              statements.drop(closeSlashAsteriskLine + 1),
+              newLineRange,
+              reverted)
           }
         }
       case _ =>
@@ -132,8 +135,9 @@ abstract class AbstractSplitExpressionsFilesTest(pathName: String)
               case _ => None
             }
           } else {
-            removeDoubleSlashReversed(lines.tail,
-                                      lineRange.copy(end = lineRange.end - 1))
+            removeDoubleSlashReversed(
+              lines.tail,
+              lineRange.copy(end = lineRange.end - 1))
           }
         case _ =>
           None
@@ -173,8 +177,9 @@ abstract class AbstractSplitExpressionsFilesTest(pathName: String)
         case SplitterComparison(_, scala.util.Failure(ex)) =>
           println(s"In file: $fileName, new splitter failed. ${ex.toString}")
           ex.printStackTrace()
-        case SplitterComparison(scala.util.Success(resultOld),
-                                scala.util.Success(resultNew)) =>
+        case SplitterComparison(
+            scala.util.Success(resultOld),
+            scala.util.Success(resultNew)) =>
           if (resultOld != resultNew) {
             println(s"""In file: $fileName, results differ:
                  |resultOld:

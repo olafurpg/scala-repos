@@ -92,12 +92,13 @@ trait TestEventService
 
   protected val rootAPIKey = Await.result(apiKeyManager.rootAPIKey, to)
   protected val testAccount = TestAccounts
-    .createAccount("test@example.com",
-                   "open sesame",
-                   new DateTime,
-                   AccountPlan.Free,
-                   None,
-                   None) { accountId =>
+    .createAccount(
+      "test@example.com",
+      "open sesame",
+      new DateTime,
+      AccountPlan.Free,
+      None,
+      None) { accountId =>
       apiKeyManager.newStandardAPIKeyRecord(accountId).map(_.apiKey)
   } copoint
 
@@ -117,21 +118,23 @@ trait TestEventService
   )
 
   val expiredAccount = TestAccounts
-    .createAccount("expired@example.com",
-                   "open sesame",
-                   new DateTime,
-                   AccountPlan.Free,
-                   None,
-                   None) { accountId =>
+    .createAccount(
+      "expired@example.com",
+      "open sesame",
+      new DateTime,
+      AccountPlan.Free,
+      None,
+      None) { accountId =>
       apiKeyManager.newStandardAPIKeyRecord(accountId).map(_.apiKey).flatMap {
         expiredAPIKey =>
           apiKeyManager
-            .deriveAndAddGrant(None,
-                               None,
-                               testAccount.apiKey,
-                               accessTest,
-                               expiredAPIKey,
-                               Some(new DateTime().minusYears(1000)))
+            .deriveAndAddGrant(
+              None,
+              None,
+              testAccount.apiKey,
+              accessTest,
+              expiredAPIKey,
+              Some(new DateTime().minusYears(1000)))
             .map(_ => expiredAPIKey)
     }
   } copoint
@@ -140,9 +143,10 @@ trait TestEventService
 
   def configureEventService(config: Configuration): EventService.State = {
     val apiKeyFinder = new DirectAPIKeyFinder(apiKeyManager)
-    val permissionsFinder = new PermissionsFinder(apiKeyFinder,
-                                                  accountFinder,
-                                                  new Instant(1363327426906L))
+    val permissionsFinder = new PermissionsFinder(
+      apiKeyFinder,
+      accountFinder,
+      new Instant(1363327426906L))
     val eventStore = new EventStore[Future] {
       def save(action: Event, timeout: Timeout) = M.point {
         stored += action; \/-(PrecogUnit)
@@ -155,20 +159,22 @@ trait TestEventService
     val localhost = ServiceLocation("http", "localhost", 80, None)
     val tmpdir =
       java.io.File.createTempFile("test.ingest.tmpdir", null).getParentFile()
-    val serviceConfig = ServiceConfig(localhost,
-                                      localhost,
-                                      Timeout(10000l),
-                                      500,
-                                      1024,
-                                      tmpdir,
-                                      Timeout(10000l))
+    val serviceConfig = ServiceConfig(
+      localhost,
+      localhost,
+      Timeout(10000l),
+      500,
+      1024,
+      tmpdir,
+      Timeout(10000l))
 
-    buildServiceState(serviceConfig,
-                      apiKeyFinder,
-                      permissionsFinder,
-                      eventStore,
-                      jobManager,
-                      Stoppable.Noop)
+    buildServiceState(
+      serviceConfig,
+      apiKeyFinder,
+      permissionsFinder,
+      eventStore,
+      jobManager,
+      Stoppable.Noop)
   }
 
   implicit def jValueToFutureJValue(j: JValue) = Future(j)
@@ -188,8 +194,9 @@ trait TestEventService
       .query("mode", if (batch) "batch" else "stream")
       .path("/ingest/v2/fs/")
 
-    val queries = List(apiKey.map(("apiKey", _)),
-                       ownerAccountId.map(("ownerAccountId", _))).sequence
+    val queries = List(
+      apiKey.map(("apiKey", _)),
+      ownerAccountId.map(("ownerAccountId", _))).sequence
 
     val svcWithQueries = queries.map(svc.queries(_: _*)).getOrElse(svc)
 

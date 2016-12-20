@@ -153,12 +153,13 @@ case class Game(
 
     val pieces = BinaryFormat.piece.read(binaryPieces, variant)
 
-    ChessGame(board = Board(pieces, toChessHistory, variant, crazyData),
-              player = Color(0 == turns % 2),
-              clock = clock,
-              turns = turns,
-              startedAtTurn = startedAtTurn,
-              pgnMoves = pgnMoves)
+    ChessGame(
+      board = Board(pieces, toChessHistory, variant, crazyData),
+      player = Color(0 == turns % 2),
+      clock = clock,
+      turns = turns,
+      startedAtTurn = startedAtTurn,
+      pgnMoves = pgnMoves)
   }
 
   lazy val toChessHistory = ChessHistory(
@@ -241,19 +242,21 @@ case class Game(
   def check = castleLastMoveTime.check
 
   def updatePlayer(color: Color, f: Player => Player) =
-    color.fold(copy(whitePlayer = f(whitePlayer)),
-               copy(blackPlayer = f(blackPlayer)))
+    color.fold(
+      copy(whitePlayer = f(whitePlayer)),
+      copy(blackPlayer = f(blackPlayer)))
 
   def updatePlayers(f: Player => Player) =
     copy(whitePlayer = f(whitePlayer), blackPlayer = f(blackPlayer))
 
   def start =
-    started.fold(this,
-                 copy(
-                   status = Status.Started,
-                   mode = Mode(mode.rated && userIds.distinct.size == 2),
-                   updatedAt = DateTime.now.some
-                 ))
+    started.fold(
+      this,
+      copy(
+        status = Status.Started,
+        mode = Mode(mode.rated && userIds.distinct.size == 2),
+        updatedAt = DateTime.now.some
+      ))
 
   def correspondenceClock: Option[CorrespondenceClock] = daysPerTurn map {
     days =>
@@ -261,9 +264,10 @@ case class Game(
       val secondsLeft = lastMoveTimeDate.fold(increment) { lmd =>
         (lmd.getSeconds + increment - nowSeconds).toInt max 0
       }
-      CorrespondenceClock(increment = increment,
-                          whiteTime = turnColor.fold(secondsLeft, increment),
-                          blackTime = turnColor.fold(increment, secondsLeft))
+      CorrespondenceClock(
+        increment = increment,
+        whiteTime = turnColor.fold(secondsLeft, increment),
+        blackTime = turnColor.fold(increment, secondsLeft))
   }
 
   def playableCorrespondenceClock: Option[CorrespondenceClock] =
@@ -337,8 +341,9 @@ case class Game(
     }
 
   def withPlayer(color: Color, f: Player => Player) =
-    copy(whitePlayer = if (color.white) f(whitePlayer) else whitePlayer,
-         blackPlayer = if (color.black) f(blackPlayer) else blackPlayer)
+    copy(
+      whitePlayer = if (color.white) f(whitePlayer) else whitePlayer,
+      blackPlayer = if (color.black) f(blackPlayer) else blackPlayer)
 
   def resignable = playable && !abortable
   def drawable = playable && !abortable
@@ -459,8 +464,9 @@ case class Game(
 
   def abandoned =
     (status <= Status.Started) &&
-      ((updatedAt | createdAt) isBefore hasAi.fold(Game.aiAbandonedDate,
-                                                   Game.abandonedDate))
+      ((updatedAt | createdAt) isBefore hasAi.fold(
+        Game.aiAbandonedDate,
+        Game.abandonedDate))
 
   def forecastable = started && playable && isCorrespondence && !hasAi
 
@@ -505,20 +511,22 @@ case class Game(
 
 object Game {
 
-  val analysableVariants: Set[Variant] = Set(chess.variant.Standard,
-                                             chess.variant.Chess960,
-                                             chess.variant.KingOfTheHill,
-                                             chess.variant.ThreeCheck,
-                                             chess.variant.FromPosition)
+  val analysableVariants: Set[Variant] = Set(
+    chess.variant.Standard,
+    chess.variant.Chess960,
+    chess.variant.KingOfTheHill,
+    chess.variant.ThreeCheck,
+    chess.variant.FromPosition)
 
   val unanalysableVariants: Set[Variant] =
     Variant.all.toSet -- analysableVariants
 
-  val variantsWhereWhiteIsBetter: Set[Variant] = Set(chess.variant.ThreeCheck,
-                                                     chess.variant.Atomic,
-                                                     chess.variant.Horde,
-                                                     chess.variant.RacingKings,
-                                                     chess.variant.Antichess)
+  val variantsWhereWhiteIsBetter: Set[Variant] = Set(
+    chess.variant.ThreeCheck,
+    chess.variant.Atomic,
+    chess.variant.Horde,
+    chess.variant.RacingKings,
+    chess.variant.Antichess)
 
   val gameIdSize = 8
   val playerIdSize = 4
@@ -563,12 +571,13 @@ object Game {
       mode = mode,
       variant = variant,
       crazyData = (variant == Crazyhouse) option Crazyhouse.Data.init,
-      metadata = Metadata(source = source.some,
-                          pgnImport = pgnImport,
-                          tournamentId = none,
-                          simulId = none,
-                          tvAt = none,
-                          analysed = false),
+      metadata = Metadata(
+        source = source.some,
+        pgnImport = pgnImport,
+        tournamentId = none,
+        simulId = none,
+        tvAt = none,
+        analysed = false),
       createdAt = DateTime.now
     )
 

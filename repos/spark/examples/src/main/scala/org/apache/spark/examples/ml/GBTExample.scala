@@ -157,12 +157,13 @@ object GBTExample {
 
     // Load training and test data and cache it.
     val (training: DataFrame, test: DataFrame) =
-      DecisionTreeExample.loadDatasets(sc,
-                                       params.input,
-                                       params.dataFormat,
-                                       params.testInput,
-                                       algo,
-                                       params.fracTest)
+      DecisionTreeExample.loadDatasets(
+        sc,
+        params.input,
+        params.dataFormat,
+        params.testInput,
+        algo,
+        params.fracTest)
 
     // Set up Pipeline
     val stages = new mutable.ArrayBuffer[PipelineStage]()

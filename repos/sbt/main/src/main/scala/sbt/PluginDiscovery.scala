@@ -48,22 +48,25 @@ object PluginDiscovery {
     val allAutoPlugins =
       (defaultAutoPlugins ++ detectedAutoPugins.modules) map {
         case (name, value) =>
-          DetectedAutoPlugin(name,
-                             value,
-                             sbt.Plugins.hasAutoImportGetter(value, loader))
+          DetectedAutoPlugin(
+            name,
+            value,
+            sbt.Plugins.hasAutoImportGetter(value, loader))
       }
-    new DetectedPlugins(discover[Plugin](Plugins),
-                        allAutoPlugins,
-                        discover[Build](Builds))
+    new DetectedPlugins(
+      discover[Plugin](Plugins),
+      allAutoPlugins,
+      discover[Build](Builds))
   }
 
   /** Discovers the sbt-plugin-related top-level modules from the provided source `analysis`. */
   def discoverSourceAll(analysis: CompileAnalysis): DiscoveredNames = {
     def discover[T](implicit classTag: reflect.ClassTag[T]): Seq[String] =
       sourceModuleNames(analysis, classTag.runtimeClass.getName)
-    new DiscoveredNames(discover[Plugin],
-                        discover[AutoPlugin],
-                        discover[Build])
+    new DiscoveredNames(
+      discover[Plugin],
+      discover[AutoPlugin],
+      discover[Build])
   }
 
   // TODO: for 0.14.0, consider consolidating into a single file, which would make the classpath search 4x faster
@@ -145,10 +148,11 @@ object PluginDiscovery {
     val namesAndValues =
       if (classpath.isEmpty) Nil
       else {
-        val names = binarySourceModuleNames(classpath,
-                                            loader,
-                                            resourceName,
-                                            classTag.runtimeClass.getName)
+        val names = binarySourceModuleNames(
+          classpath,
+          loader,
+          resourceName,
+          classTag.runtimeClass.getName)
         loadModules[T](data, names, loader)
       }
     new DetectedModules(namesAndValues)

@@ -120,10 +120,11 @@ class ESEngineInstances(client: Client,
         .prepareSearch(index)
         .setTypes(estype)
         .setPostFilter(
-          andFilter(termFilter("status", "COMPLETED"),
-                    termFilter("engineId", engineId),
-                    termFilter("engineVersion", engineVersion),
-                    termFilter("engineVariant", engineVariant)))
+          andFilter(
+            termFilter("status", "COMPLETED"),
+            termFilter("engineId", engineId),
+            termFilter("engineVersion", engineVersion),
+            termFilter("engineVariant", engineVariant)))
         .addSort("startTime", SortOrder.DESC)
       ESUtils.getAll[EngineInstance](client, builder)
     } catch {

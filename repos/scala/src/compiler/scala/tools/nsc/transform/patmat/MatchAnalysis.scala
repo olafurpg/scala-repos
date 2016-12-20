@@ -395,18 +395,21 @@ trait MatchApproximation
                 def nonNullTest(testedBinder: Symbol) =
                   uniqueNonNullProp(binderToUniqueTree(testedBinder))
                 def equalsTest(pat: Tree, testedBinder: Symbol) =
-                  uniqueEqualityProp(binderToUniqueTree(testedBinder),
-                                     unique(pat))
+                  uniqueEqualityProp(
+                    binderToUniqueTree(testedBinder),
+                    unique(pat))
                 // rewrite eq test to type test against the singleton type `pat.tpe`; unrelated to == (uniqueEqualityProp), could be null
                 def eqTest(pat: Tree, testedBinder: Symbol) =
-                  uniqueTypeProp(binderToUniqueTree(testedBinder),
-                                 uniqueTp(pat.tpe))
+                  uniqueTypeProp(
+                    binderToUniqueTree(testedBinder),
+                    uniqueTp(pat.tpe))
                 def tru = True
               }
               ttm.renderCondition(condStrategy)
             case EqualityTestTreeMaker(prevBinder, patTree, _) =>
-              uniqueEqualityProp(binderToUniqueTree(prevBinder),
-                                 unique(patTree))
+              uniqueEqualityProp(
+                binderToUniqueTree(prevBinder),
+                unique(patTree))
             case AlternativesTreeMaker(_, altss, _) =>
               \/(altss map (alts => /\(alts map this)))
             case ProductExtractorTreeMaker(testedBinder, None) =>
@@ -437,8 +440,9 @@ trait MatchApproximation
         case p @ ExtractorTreeMaker(_, _, testedBinder)
             if testedBinder.tpe.typeSymbol == ListClass &&
               p.checkedLength == Some(0) =>
-          uniqueEqualityProp(binderToUniqueTree(p.prevBinder),
-                             unique(Ident(NilModule) setType NilModule.tpe))
+          uniqueEqualityProp(
+            binderToUniqueTree(p.prevBinder),
+            unique(Ident(NilModule) setType NilModule.tpe))
       }
       val fullRewrite = (irrefutableExtractor orElse rewriteListPattern)
       val refutableRewrite = irrefutableExtractor
@@ -852,8 +856,9 @@ trait MatchAnalysis extends MatchApproximation {
           val oneHot = for {
             s <- syms
           } yield {
-            addVarAssignment(List(s.const),
-                             syms.filterNot(_ == s).map(_.const))
+            addVarAssignment(
+              List(s.const),
+              syms.filterNot(_ == s).map(_.const))
           }
           allEqual :: allNotEqual :: oneHot
         } else {

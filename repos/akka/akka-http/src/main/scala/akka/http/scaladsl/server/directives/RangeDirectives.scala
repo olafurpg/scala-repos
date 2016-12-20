@@ -64,8 +64,9 @@ trait RangeDirectives {
           case ByteRange.FromOffset(first) ⇒
             new IndexRange(first, entityLength)
           case ByteRange.Suffix(suffixLength) ⇒
-            new IndexRange(math.max(0, entityLength - suffixLength),
-                           entityLength)
+            new IndexRange(
+              math.max(0, entityLength - suffixLength),
+              entityLength)
         }
 
       // See comment of the `range-coalescing-threshold` setting in `reference.conf` for the rationale of this behavior.
@@ -128,9 +129,10 @@ trait RangeDirectives {
                         length: Long,
                         headers: immutable.Seq[HttpHeader]) = {
         val aiRange = indexRange(length)(range)
-        HttpResponse(PartialContent,
-                     `Content-Range`(aiRange.contentRange(length)) +: headers,
-                     aiRange(entity))
+        HttpResponse(
+          PartialContent,
+          `Content-Range`(aiRange.contentRange(length)) +: headers,
+          aiRange(entity))
       }
 
       def satisfiable(entityLength: Long)(range: ByteRange): Boolean =
@@ -157,10 +159,11 @@ trait RangeDirectives {
                       ctx.reject(UnsatisfiableRangeRejection(ranges, length))
                     case Seq(satisfiableRange) ⇒
                       ctx.complete(
-                        rangeResponse(satisfiableRange,
-                                      entity,
-                                      length,
-                                      headers))
+                        rangeResponse(
+                          satisfiableRange,
+                          entity,
+                          length,
+                          headers))
                     case satisfiableRanges ⇒
                       ctx.complete(
                         (PartialContent,

@@ -102,14 +102,15 @@ object LoadBalancerFactory {
   private[finagle] trait StackModule[Req, Rep]
       extends Stack.Module[ServiceFactory[Req, Rep]] {
     val role = LoadBalancerFactory.role
-    val parameters = Seq(implicitly[Stack.Param[ErrorLabel]],
-                         implicitly[Stack.Param[Dest]],
-                         implicitly[Stack.Param[Param]],
-                         implicitly[Stack.Param[HostStats]],
-                         implicitly[Stack.Param[param.Stats]],
-                         implicitly[Stack.Param[param.Logger]],
-                         implicitly[Stack.Param[param.Monitor]],
-                         implicitly[Stack.Param[param.Reporter]])
+    val parameters = Seq(
+      implicitly[Stack.Param[ErrorLabel]],
+      implicitly[Stack.Param[Dest]],
+      implicitly[Stack.Param[Param]],
+      implicitly[Stack.Param[HostStats]],
+      implicitly[Stack.Param[param.Stats]],
+      implicitly[Stack.Param[param.Logger]],
+      implicitly[Stack.Param[param.Monitor]],
+      implicitly[Stack.Param[param.Reporter]])
 
     def make(params: Stack.Params, next: Stack[ServiceFactory[Req, Rep]]) = {
       val ErrorLabel(errorLabel) = params[ErrorLabel]
@@ -222,14 +223,15 @@ object LoadBalancerFactory {
 
       // Instead of simply creating a newBalancer here, we defer to the
       // traffic distributor to interpret weighted `Addresses`.
-      Stack.Leaf(role,
-                 new TrafficDistributor[Req, Rep](
-                   dest = destActivity,
-                   newEndpoint = newEndpoint,
-                   newBalancer = newBalancer,
-                   eagerEviction = !probationEnabled,
-                   statsReceiver = balancerStats
-                 ))
+      Stack.Leaf(
+        role,
+        new TrafficDistributor[Req, Rep](
+          dest = destActivity,
+          newEndpoint = newEndpoint,
+          newBalancer = newBalancer,
+          eagerEviction = !probationEnabled,
+          statsReceiver = balancerStats
+        ))
     }
   }
 
@@ -334,8 +336,9 @@ abstract class LoadBalancerFactory {
   *    Protocol.configured(LoadBalancerFactory.Param(balancer))
   * }}
   */
-@deprecated("Use com.twitter.finagle.loadbalancer.Balancers per-client.",
-            "2015-06-15")
+@deprecated(
+  "Use com.twitter.finagle.loadbalancer.Balancers per-client.",
+  "2015-06-15")
 object defaultBalancer extends GlobalFlag("choice", "Default load balancer")
 
 package exp {

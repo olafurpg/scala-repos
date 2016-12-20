@@ -29,9 +29,10 @@ private[sql] class TestSQLContext(sc: SparkContext) extends SQLContext(sc) {
 
   def this() {
     this(
-      new SparkContext("local[2]",
-                       "test-sql-context",
-                       new SparkConf().set("spark.sql.testkey", "true")))
+      new SparkContext(
+        "local[2]",
+        "test-sql-context",
+        new SparkConf().set("spark.sql.testkey", "true")))
   }
 
   @transient

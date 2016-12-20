@@ -127,17 +127,19 @@ class PartitioningSuite
   }
 
   test("RangePartitioner.determineBounds") {
-    assert(RangePartitioner
-             .determineBounds(ArrayBuffer.empty[(Int, Float)], 10)
-             .isEmpty,
-           "Bounds on an empty candidates set should be empty.")
-    val candidates = ArrayBuffer((0.7, 2.0f),
-                                 (0.1, 1.0f),
-                                 (0.4, 1.0f),
-                                 (0.3, 1.0f),
-                                 (0.2, 1.0f),
-                                 (0.5, 1.0f),
-                                 (1.0, 3.0f))
+    assert(
+      RangePartitioner
+        .determineBounds(ArrayBuffer.empty[(Int, Float)], 10)
+        .isEmpty,
+      "Bounds on an empty candidates set should be empty.")
+    val candidates = ArrayBuffer(
+      (0.7, 2.0f),
+      (0.1, 1.0f),
+      (0.4, 1.0f),
+      (0.3, 1.0f),
+      (0.2, 1.0f),
+      (0.5, 1.0f),
+      (1.0, 3.0f))
     assert(RangePartitioner.determineBounds(candidates, 3) === Array(0.4, 0.7))
   }
 

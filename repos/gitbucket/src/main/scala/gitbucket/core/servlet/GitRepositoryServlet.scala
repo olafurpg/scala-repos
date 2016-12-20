@@ -151,8 +151,9 @@ class CommitLogHook(owner: String,
             _.preReceive(owner, repository, receivePack, command, pusher))
           .headOption
           .foreach { error =>
-            command.setResult(ReceiveCommand.Result.REJECTED_OTHER_REASON,
-                              error)
+            command.setResult(
+              ReceiveCommand.Result.REJECTED_OTHER_REASON,
+              error)
           }
       }
       using(Git.open(Directory.getRepositoryDir(owner, repository))) { git =>
@@ -184,20 +185,23 @@ class CommitLogHook(owner: String,
               command.getType match {
                 case ReceiveCommand.Type.DELETE => Nil
                 case _ =>
-                  JGitUtil.getCommitLog(git,
-                                        command.getOldId.name,
-                                        command.getNewId.name)
+                  JGitUtil.getCommitLog(
+                    git,
+                    command.getOldId.name,
+                    command.getNewId.name)
               }
             }
 
           // Retrieve all issue count in the repository
           val issueCount =
-            countIssue(IssueSearchCondition(state = "open"),
-                       false,
-                       owner -> repository) +
-              countIssue(IssueSearchCondition(state = "closed"),
-                         false,
-                         owner -> repository)
+            countIssue(
+              IssueSearchCondition(state = "open"),
+              false,
+              owner -> repository) +
+              countIssue(
+                IssueSearchCondition(state = "closed"),
+                false,
+                owner -> repository)
 
           val repositoryInfo = getRepository(owner, repository).get
 
@@ -212,10 +216,11 @@ class CommitLogHook(owner: String,
                 // close issues
                 if (refName(1) == "heads" && branchName == defaultBranch &&
                     command.getType == ReceiveCommand.Type.UPDATE) {
-                  closeIssuesFromMessage(commit.fullMessage,
-                                         pusher,
-                                         owner,
-                                         repository)
+                  closeIssuesFromMessage(
+                    commit.fullMessage,
+                    pusher,
+                    owner,
+                    repository)
                 }
               }
               Some(commit)
@@ -226,37 +231,42 @@ class CommitLogHook(owner: String,
           if (refName(1) == "heads") {
             command.getType match {
               case ReceiveCommand.Type.CREATE =>
-                recordCreateBranchActivity(owner,
-                                           repository,
-                                           pusher,
-                                           branchName)
+                recordCreateBranchActivity(
+                  owner,
+                  repository,
+                  pusher,
+                  branchName)
               case ReceiveCommand.Type.UPDATE =>
-                recordPushActivity(owner,
-                                   repository,
-                                   pusher,
-                                   branchName,
-                                   newCommits)
+                recordPushActivity(
+                  owner,
+                  repository,
+                  pusher,
+                  branchName,
+                  newCommits)
               case ReceiveCommand.Type.DELETE =>
-                recordDeleteBranchActivity(owner,
-                                           repository,
-                                           pusher,
-                                           branchName)
+                recordDeleteBranchActivity(
+                  owner,
+                  repository,
+                  pusher,
+                  branchName)
               case _ =>
             }
           } else if (refName(1) == "tags") {
             command.getType match {
               case ReceiveCommand.Type.CREATE =>
-                recordCreateTagActivity(owner,
-                                        repository,
-                                        pusher,
-                                        branchName,
-                                        newCommits)
+                recordCreateTagActivity(
+                  owner,
+                  repository,
+                  pusher,
+                  branchName,
+                  newCommits)
               case ReceiveCommand.Type.DELETE =>
-                recordDeleteTagActivity(owner,
-                                        repository,
-                                        pusher,
-                                        branchName,
-                                        newCommits)
+                recordDeleteTagActivity(
+                  owner,
+                  repository,
+                  pusher,
+                  branchName,
+                  newCommits)
               case _ =>
             }
           }
@@ -267,11 +277,12 @@ class CommitLogHook(owner: String,
                   ReceiveCommand.Type.UPDATE_NONFASTFORWARD =>
                 updatePullRequests(owner, repository, branchName)
                 getAccountByUserName(pusher).map { pusherAccount =>
-                  callPullRequestWebHookByRequestBranch("synchronize",
-                                                        repositoryInfo,
-                                                        branchName,
-                                                        baseUrl,
-                                                        pusherAccount)
+                  callPullRequestWebHookByRequestBranch(
+                    "synchronize",
+                    repositoryInfo,
+                    branchName,
+                    baseUrl,
+                    pusherAccount)
                 }
               case _ =>
             }
@@ -281,14 +292,15 @@ class CommitLogHook(owner: String,
           callWebHookOf(owner, repository, WebHook.Push) {
             for (pusherAccount <- getAccountByUserName(pusher);
                  ownerAccount <- getAccountByUserName(owner)) yield {
-              WebHookPushPayload(git,
-                                 pusherAccount,
-                                 command.getRefName,
-                                 repositoryInfo,
-                                 newCommits,
-                                 ownerAccount,
-                                 newId = command.getNewId(),
-                                 oldId = command.getOldId())
+              WebHookPushPayload(
+                git,
+                pusherAccount,
+                command.getRefName,
+                repositoryInfo,
+                newCommits,
+                ownerAccount,
+                newId = command.getNewId(),
+                oldId = command.getOldId())
             }
           }
 

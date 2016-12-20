@@ -231,11 +231,12 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
       // Only create new instance if anything changed
       if (newPath == origPath) this
       else
-        new URI(getScheme(),
-                getRawAuthority(),
-                newPath,
-                getQuery(),
-                getFragment())
+        new URI(
+          getScheme(),
+          getRawAuthority(),
+          newPath,
+          getQuery(),
+          getFragment())
     }
 
   def parseServerAuthority(): URI = {
@@ -259,12 +260,13 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
       if (uriN.getRawPath().startsWith(thisN.getRawPath())) {
         val newPath = uriN.getRawPath().stripPrefix(thisN.getRawPath())
 
-        new URI(scheme = null,
-                authority = null,
-                // never produce an abs path if we relativized
-                path = newPath.stripPrefix("/"),
-                query = uri.getQuery(),
-                fragment = uri.getFragment())
+        new URI(
+          scheme = null,
+          authority = null,
+          // never produce an abs path if we relativized
+          path = newPath.stripPrefix("/"),
+          query = uri.getQuery(),
+          fragment = uri.getFragment())
       } else uri
     }
   }
@@ -277,23 +279,26 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
              uri._path.get == "" && uri._query.isEmpty)
       // This is a special case for URIs like: "#foo". This allows to
       // just change the fragment in the current document.
-      new URI(this.getScheme(),
-              this.getRawAuthority(),
-              this.getRawPath(),
-              this.getRawQuery(),
-              uri.getRawFragment())
+      new URI(
+        this.getScheme(),
+        this.getRawAuthority(),
+        this.getRawPath(),
+        this.getRawQuery(),
+        uri.getRawFragment())
     else if (uri._authority.isDefined)
-      new URI(this.getScheme(),
-              uri.getRawAuthority(),
-              uri.getRawPath(),
-              uri.getRawQuery(),
-              uri.getRawFragment())
+      new URI(
+        this.getScheme(),
+        uri.getRawAuthority(),
+        uri.getRawPath(),
+        uri.getRawQuery(),
+        uri.getRawFragment())
     else if (uri._path.get.startsWith("/"))
-      new URI(this.getScheme(),
-              this.getRawAuthority(),
-              uri.getRawPath(),
-              uri.getRawQuery(),
-              uri.getRawFragment())
+      new URI(
+        this.getScheme(),
+        this.getRawAuthority(),
+        uri.getRawPath(),
+        uri.getRawQuery(),
+        uri.getRawFragment())
     else {
       val basePath = this._path.get
       val relPath = uri._path.get
@@ -301,11 +306,12 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
       val path =
         if (endIdx == -1) relPath
         else basePath.substring(0, endIdx + 1) + relPath
-      new URI(this.getScheme(),
-              this.getAuthority(),
-              path,
-              uri.getRawQuery(),
-              uri.getRawFragment()).normalize()
+      new URI(
+        this.getScheme(),
+        this.getAuthority(),
+        path,
+        uri.getRawQuery(),
+        uri.getRawFragment()).normalize()
     }
   }
 

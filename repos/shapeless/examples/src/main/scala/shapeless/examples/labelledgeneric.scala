@@ -38,10 +38,11 @@ object LabelledGenericExamples extends App {
   val bookGen = LabelledGeneric[Book]
   val bookExtGen = LabelledGeneric[ExtendedBook]
 
-  val tapl = Book("Benjamin Pierce",
-                  "Types and Programming Languages",
-                  262162091,
-                  44.11)
+  val tapl = Book(
+    "Benjamin Pierce",
+    "Types and Programming Languages",
+    262162091,
+    44.11)
 
   val rec = bookGen.to(tapl)
 

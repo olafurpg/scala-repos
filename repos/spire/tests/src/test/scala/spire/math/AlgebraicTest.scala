@@ -228,13 +228,14 @@ class AlgebraicTest extends SpireProperties {
     def genRationalAlgebraic(depth: Int): Gen[RationalAlgebraic] =
       if (depth >= MaxDepth) genLeaf
       else
-        Gen.frequency((1, genAdd(depth + 1)),
-                      (1, genSub(depth + 1)),
-                      (1, genMul(depth + 1)),
-                      (1, genDiv(depth + 1)),
-                      (1, genNeg(depth + 1)),
-                      (1, genPow(depth + 1, arbitrary[Byte].map(_.toInt % 7))),
-                      (7, genLeaf))
+        Gen.frequency(
+          (1, genAdd(depth + 1)),
+          (1, genSub(depth + 1)),
+          (1, genMul(depth + 1)),
+          (1, genDiv(depth + 1)),
+          (1, genNeg(depth + 1)),
+          (1, genPow(depth + 1, arbitrary[Byte].map(_.toInt % 7))),
+          (7, genLeaf))
 
     def genLong: Gen[RationalAlgebraic] =
       for {

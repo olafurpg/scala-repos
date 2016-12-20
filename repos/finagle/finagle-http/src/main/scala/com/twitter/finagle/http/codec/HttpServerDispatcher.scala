@@ -45,8 +45,9 @@ class HttpServerDispatcher(trans: Transport[Any, Any],
             if (ex.getMessage().startsWith("An HTTP line is larger than "))
               Response(from(badReq.httpVersion), Status.RequestURITooLong)
             else
-              Response(from(badReq.httpVersion),
-                       Status.RequestHeaderFieldsTooLarge)
+              Response(
+                from(badReq.httpVersion),
+                Status.RequestHeaderFieldsTooLarge)
           case _ =>
             Response(from(badReq.httpVersion), Status.BadRequest)
         }
@@ -109,8 +110,9 @@ class HttpServerDispatcher(trans: Transport[Any, Any],
       f.onFailure { t =>
         Logger
           .get(this.getClass.getName)
-          .debug(t,
-                 "Failed mid-stream. Terminating stream, closing connection")
+          .debug(
+            t,
+            "Failed mid-stream. Terminating stream, closing connection")
         failureReceiver.counter(Throwables.mkString(t): _*).incr()
         rep.reader.discard()
       }

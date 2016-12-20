@@ -22,12 +22,13 @@ private[io] class TcpOutgoingConnection(_tcp: TcpExt,
                                         channelRegistry: ChannelRegistry,
                                         commander: ActorRef,
                                         connect: Connect)
-    extends TcpConnection(_tcp,
-                          SocketChannel
-                            .open()
-                            .configureBlocking(false)
-                            .asInstanceOf[SocketChannel],
-                          connect.pullMode) {
+    extends TcpConnection(
+      _tcp,
+      SocketChannel
+        .open()
+        .configureBlocking(false)
+        .asInstanceOf[SocketChannel],
+      connect.pullMode) {
 
   import context._
   import connect._
@@ -47,9 +48,10 @@ private[io] class TcpOutgoingConnection(_tcp: TcpExt,
       thunk
     } catch {
       case NonFatal(e) ⇒
-        log.debug("Could not establish connection to [{}] due to {}",
-                  remoteAddress,
-                  e)
+        log.debug(
+          "Could not establish connection to [{}] due to {}",
+          remoteAddress,
+          e)
         stop()
     }
   }
@@ -58,8 +60,9 @@ private[io] class TcpOutgoingConnection(_tcp: TcpExt,
     case registration: ChannelRegistration ⇒
       reportConnectFailure {
         if (remoteAddress.isUnresolved) {
-          log.debug("Resolving {} before connecting",
-                    remoteAddress.getHostName)
+          log.debug(
+            "Resolving {} before connecting",
+            remoteAddress.getHostName)
           Dns.resolve(remoteAddress.getHostName)(system, self) match {
             case None ⇒
               context.become(resolving(registration))
@@ -77,8 +80,9 @@ private[io] class TcpOutgoingConnection(_tcp: TcpExt,
   def resolving(registration: ChannelRegistration): Receive = {
     case resolved: Dns.Resolved ⇒
       reportConnectFailure {
-        register(new InetSocketAddress(resolved.addr, remoteAddress.getPort),
-                 registration)
+        register(
+          new InetSocketAddress(resolved.addr, remoteAddress.getPort),
+          registration)
       }
   }
 

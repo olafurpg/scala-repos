@@ -135,8 +135,9 @@ class TaskResultGetterSuite
     assert(result === 1.to(maxRpcMessageSize).toArray)
 
     val RESULT_BLOCK_ID = TaskResultBlockId(0)
-    assert(sc.env.blockManager.master.getLocations(RESULT_BLOCK_ID).size === 0,
-           "Expect result to be removed from the block manager.")
+    assert(
+      sc.env.blockManager.master.getLocations(RESULT_BLOCK_ID).size === 0,
+      "Expect result to be removed from the block manager.")
   }
 
   test("task retried if result missing from block manager") {
@@ -183,8 +184,9 @@ class TaskResultGetterSuite
     val srcDir = new File(tempDir, "repro/")
     srcDir.mkdirs()
     val excSource =
-      new JavaSourceFromString(new File(srcDir, "MyException").getAbsolutePath,
-                               """package repro;
+      new JavaSourceFromString(
+        new File(srcDir, "MyException").getAbsolutePath,
+        """package repro;
         |
         |public class MyException extends Exception {
         |}

@@ -124,9 +124,10 @@ trait MessageDispatcher {
           shutdownSchedule match {
             case UNSCHEDULED =>
               shutdownSchedule = SCHEDULED
-              Scheduler.scheduleOnce(shutdownAction,
-                                     timeoutMs,
-                                     TimeUnit.MILLISECONDS)
+              Scheduler.scheduleOnce(
+                shutdownAction,
+                timeoutMs,
+                TimeUnit.MILLISECONDS)
             case SCHEDULED =>
               shutdownSchedule = RESCHEDULED
             case RESCHEDULED => //Already marked for reschedule
@@ -153,9 +154,10 @@ trait MessageDispatcher {
         shutdownSchedule match {
           case UNSCHEDULED =>
             shutdownSchedule = SCHEDULED
-            Scheduler.scheduleOnce(shutdownAction,
-                                   timeoutMs,
-                                   TimeUnit.MILLISECONDS)
+            Scheduler.scheduleOnce(
+              shutdownAction,
+              timeoutMs,
+              TimeUnit.MILLISECONDS)
           case SCHEDULED =>
             shutdownSchedule = RESCHEDULED
           case RESCHEDULED => //Already marked for reschedule
@@ -259,8 +261,9 @@ abstract class MessageDispatcherConfigurator {
       BoundedMailbox(
         capacity,
         Duration(
-          config.getInt("mailbox-push-timeout-time",
-                        Dispatchers.MAILBOX_PUSH_TIME_OUT.toMillis.toInt),
+          config.getInt(
+            "mailbox-push-timeout-time",
+            Dispatchers.MAILBOX_PUSH_TIME_OUT.toMillis.toInt),
           TIME_UNIT))
   }
 

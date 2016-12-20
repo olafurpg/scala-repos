@@ -60,11 +60,12 @@ class ConvertExpressionToSAMInspection
                   _.startOffsetInParent + extendsBlock.startOffsetInParent)
                 val rangeInElement: TextRange =
                   lBraceInParent.map(new TextRange(0, _)).orNull
-                holder.registerProblem(definition,
-                                       inspectionName,
-                                       ProblemHighlightType.LIKE_UNUSED_SYMBOL,
-                                       rangeInElement,
-                                       fix)
+                holder.registerProblem(
+                  definition,
+                  inspectionName,
+                  ProblemHighlightType.LIKE_UNUSED_SYMBOL,
+                  rangeInElement,
+                  fix)
               case _ =>
             }
           case _ =>
@@ -93,8 +94,8 @@ class ReplaceExpressionWithSAMQuickFix(elem: PsiElement,
     val element = getElement
     if (!element.isValid) return
     element.replace(
-      ScalaPsiElementFactory.createExpressionFromText(replacement,
-                                                      element.getManager))
+      ScalaPsiElementFactory
+        .createExpressionFromText(replacement, element.getManager))
   }
 }
 

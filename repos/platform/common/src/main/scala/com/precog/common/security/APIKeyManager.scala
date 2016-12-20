@@ -71,12 +71,13 @@ trait APIKeyManager[M[+ _]] extends Logging { self =>
     for {
       rk <- rootAPIKey
       rg <- rootGrantId
-      ng <- createGrant(name,
-                        description,
-                        rk,
-                        Set(rg),
-                        Account.newAccountPermissions(accountId, path),
-                        None)
+      ng <- createGrant(
+        name,
+        description,
+        rk,
+        Set(rg),
+        Account.newAccountPermissions(accountId, path),
+        None)
     } yield ng
 
   def newStandardAPIKeyRecord(
@@ -173,12 +174,13 @@ trait APIKeyManager[M[+ _]] extends Logging { self =>
         if (minimized.isEmpty) {
           none[Grant].point[M]
         } else {
-          createGrant(name,
-                      description,
-                      issuerKey,
-                      minimized,
-                      perms,
-                      expiration) map {
+          createGrant(
+            name,
+            description,
+            issuerKey,
+            minimized,
+            perms,
+            expiration) map {
             some
           }
         }
@@ -196,12 +198,13 @@ trait APIKeyManager[M[+ _]] extends Logging { self =>
     validGrants(issuerKey, expiration).flatMap { validGrants =>
       validGrants.find(_.grantId == parentId) match {
         case Some(parent) if parent.implies(perms, expiration) =>
-          createGrant(name,
-                      description,
-                      issuerKey,
-                      Set(parentId),
-                      perms,
-                      expiration) map { some }
+          createGrant(
+            name,
+            description,
+            issuerKey,
+            Set(parentId),
+            perms,
+            expiration) map { some }
         case _ => none[Grant].point[M]
       }
     }
@@ -237,11 +240,12 @@ trait APIKeyManager[M[+ _]] extends Logging { self =>
         if (checks.forall(_ == true)) {
           for {
             newGrants <- grantList traverse { g =>
-              deriveGrant(g.name,
-                          g.description,
-                          issuerKey,
-                          g.permissions,
-                          g.expirationDate)
+              deriveGrant(
+                g.name,
+                g.description,
+                issuerKey,
+                g.permissions,
+                g.expirationDate)
             }
             newKey <- createAPIKey(
               name,

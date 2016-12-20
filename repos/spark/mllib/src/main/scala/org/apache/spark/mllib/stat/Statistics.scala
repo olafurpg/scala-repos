@@ -125,9 +125,10 @@ object Statistics {
   def corr(x: JavaRDD[java.lang.Double],
            y: JavaRDD[java.lang.Double],
            method: String): Double =
-    corr(x.rdd.asInstanceOf[RDD[Double]],
-         y.rdd.asInstanceOf[RDD[Double]],
-         method)
+    corr(
+      x.rdd.asInstanceOf[RDD[Double]],
+      y.rdd.asInstanceOf[RDD[Double]],
+      method)
 
   /**
     * Conduct Pearson's chi-squared goodness of fit test of the observed data against the
@@ -239,8 +240,9 @@ object Statistics {
   def kolmogorovSmirnovTest(data: JavaDoubleRDD,
                             distName: String,
                             params: Double*): KolmogorovSmirnovTestResult = {
-    kolmogorovSmirnovTest(data.rdd.asInstanceOf[RDD[Double]],
-                          distName,
-                          params: _*)
+    kolmogorovSmirnovTest(
+      data.rdd.asInstanceOf[RDD[Double]],
+      distName,
+      params: _*)
   }
 }

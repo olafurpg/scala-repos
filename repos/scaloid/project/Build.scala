@@ -88,10 +88,11 @@ object ScaloidBuild extends Build {
     .settings(name := "scaloid", exportJars := true)
     .settings(basicSettings: _*)
     .settings(scaloidSettings: _*)
-    .settings(libraryDependencies ++=
-                Seq(robolectric, scalaTest, junit, junitInterface, android),
-              libraryDependencies <+=
-                (scalaVersion)("org.scala-lang" % "scala-reflect" % _))
+    .settings(
+      libraryDependencies ++=
+        Seq(robolectric, scalaTest, junit, junitInterface, android),
+      libraryDependencies <+=
+        (scalaVersion)("org.scala-lang" % "scala-reflect" % _))
     //RobolectricTestRunner requires "fork" to reflect test code changes without sbt restart.
     .settings(fork in Test := true)
 

@@ -58,9 +58,10 @@ class MarathonSchedulerActorTest
     val schedulerActor = createActor()
     try {
       schedulerActor ! LocalLeadershipEvent.ElectedAsLeader
-      awaitAssert(verify(hcManager).reconcileWith(app.id),
-                  5.seconds,
-                  10.millis)
+      awaitAssert(
+        verify(hcManager).reconcileWith(app.id),
+        5.seconds,
+        10.millis)
       verify(deploymentRepo, times(1)).all()
     } finally {
       stopActor(schedulerActor)
@@ -188,10 +189,11 @@ class MarathonSchedulerActorTest
       val Some(taskFailureEvent) =
         TaskFailure.FromMesosStatusUpdateEvent(statusUpdateEvent)
 
-      awaitAssert(verify(taskFailureEventRepository, times(1))
-                    .store(app.id, taskFailureEvent),
-                  5.seconds,
-                  10.millis)
+      awaitAssert(
+        verify(taskFailureEventRepository, times(1))
+          .store(app.id, taskFailureEvent),
+        5.seconds,
+        10.millis)
 
       // KillTasks does no longer scale
       verify(repo, times(0)).store(any[AppDefinition])
@@ -303,11 +305,12 @@ class MarathonSchedulerActorTest
     val origGroup = Group(PathId("/foo/bar"), Set(app))
     val targetGroup = Group(PathId("/foo/bar"), Set())
 
-    val plan = DeploymentPlan("foo",
-                              origGroup,
-                              targetGroup,
-                              List(DeploymentStep(List(StopApplication(app)))),
-                              Timestamp.now())
+    val plan = DeploymentPlan(
+      "foo",
+      origGroup,
+      targetGroup,
+      List(DeploymentStep(List(StopApplication(app)))),
+      Timestamp.now())
 
     when(taskTracker.appTasksLaunchedSync(app.id)).thenReturn(Iterable(taskA))
     when(taskTracker.appTasks(eq(app.id))(any[ExecutionContext]))
@@ -437,10 +440,11 @@ class MarathonSchedulerActorTest
   }
 
   test("Forced deployment") {
-    val app = AppDefinition(id = PathId("app1"),
-                            cmd = Some("cmd"),
-                            instances = 2,
-                            upgradeStrategy = UpgradeStrategy(0.5))
+    val app = AppDefinition(
+      id = PathId("app1"),
+      cmd = Some("cmd"),
+      instances = 2,
+      upgradeStrategy = UpgradeStrategy(0.5))
     val group = Group(PathId("/foo/bar"), Set(app))
 
     val plan = DeploymentPlan(Group.empty, group)
@@ -467,10 +471,11 @@ class MarathonSchedulerActorTest
   }
 
   test("Cancellation timeout") {
-    val app = AppDefinition(id = PathId("app1"),
-                            cmd = Some("cmd"),
-                            instances = 2,
-                            upgradeStrategy = UpgradeStrategy(0.5))
+    val app = AppDefinition(
+      id = PathId("app1"),
+      cmd = Some("cmd"),
+      instances = 2,
+      upgradeStrategy = UpgradeStrategy(0.5))
     val group = Group(PathId("/foo/bar"), Set(app))
 
     val plan = DeploymentPlan(Group.empty, group)
@@ -607,14 +612,15 @@ class MarathonSchedulerActorTest
     historyActorProps =
       Props(new HistoryActor(system.eventStream, taskFailureEventRepository))
     schedulerActions = ref =>
-      new SchedulerActions(repo,
-                           groupRepo,
-                           hcManager,
-                           taskTracker,
-                           queue,
-                           new EventStream(),
-                           ref,
-                           mock[MarathonConf])(system.dispatcher)
+      new SchedulerActions(
+        repo,
+        groupRepo,
+        hcManager,
+        taskTracker,
+        queue,
+        new EventStream(),
+        ref,
+        mock[MarathonConf])(system.dispatcher)
 
     when(deploymentRepo.store(any))
       .thenAnswer(new Answer[Future[DeploymentPlan]] {

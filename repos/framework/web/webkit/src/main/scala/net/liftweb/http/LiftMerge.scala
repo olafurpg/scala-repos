@@ -133,13 +133,14 @@ private[http] trait LiftMerge { self: LiftSession =>
     def normalizeMergeAndExtractEvents(
         nodes: NodeSeq,
         startingState: HtmlState): NodesAndEventJs = {
-      val HtmlState(htmlDescendant,
-                    headChild,
-                    bodyDescendant,
-                    headInBodyChild,
-                    tailInBodyChild,
-                    _bodyChild,
-                    mergeHeadAndTail) = startingState
+      val HtmlState(
+        htmlDescendant,
+        headChild,
+        bodyDescendant,
+        headInBodyChild,
+        tailInBodyChild,
+        _bodyChild,
+        mergeHeadAndTail) = startingState
 
       nodes.foldLeft(NodesAndEventJs(Vector[Node](), Noop)) {
         case (soFar, node) =>
@@ -171,14 +172,16 @@ private[http] trait LiftMerge { self: LiftSession =>
             case element: Elem if element.label == "body" && htmlDescendant =>
               bodyElement = element
 
-              startingState.copy(bodyDescendant = true && mergeHeadAndTail,
-                                 bodyChild = true && mergeHeadAndTail)
+              startingState.copy(
+                bodyDescendant = true && mergeHeadAndTail,
+                bodyChild = true && mergeHeadAndTail)
 
             case _ =>
-              startingState.copy(headChild = false,
-                                 headInBodyChild = false,
-                                 tailInBodyChild = false,
-                                 bodyChild = false)
+              startingState.copy(
+                headChild = false,
+                headInBodyChild = false,
+                tailInBodyChild = false,
+                bodyChild = false)
           }
 
           val bodyHead = childInfo.headInBodyChild && !headInBodyChild
@@ -189,8 +192,9 @@ private[http] trait LiftMerge { self: LiftSession =>
             .map {
               case normalized @ NodeAndEventJs(normalizedElement: Elem, _) =>
                 val normalizedChildren =
-                  normalizeMergeAndExtractEvents(normalizedElement.child,
-                                                 childInfo)
+                  normalizeMergeAndExtractEvents(
+                    normalizedElement.child,
+                    childInfo)
 
                 normalized.copy(
                   normalizedElement.copy(child = normalizedChildren.nodes),
@@ -306,12 +310,13 @@ private[http] trait LiftMerge { self: LiftSession =>
         bodyElement.copy(child = bodyChildren.toList))(_ % _)
       htmlKids += nl
 
-      val tmpRet = Elem(htmlElement.prefix,
-                        htmlElement.label,
-                        htmlElement.attributes,
-                        htmlElement.scope,
-                        htmlElement.minimizeEmpty,
-                        htmlKids.toList: _*)
+      val tmpRet = Elem(
+        htmlElement.prefix,
+        htmlElement.label,
+        htmlElement.attributes,
+        htmlElement.scope,
+        htmlElement.minimizeEmpty,
+        htmlKids.toList: _*)
 
       val ret: Node =
         if (Props.devMode) {

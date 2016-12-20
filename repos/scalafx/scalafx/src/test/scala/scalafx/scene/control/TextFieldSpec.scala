@@ -50,7 +50,8 @@ class TextFieldSpec
     with RunOnApplicationThread {
 
   it should "have a Property class that exposes all the JavaFX properties" in {
-    comparePropertiesInProxy(classOf[jfxsc.TextField],
-                             classOf[TextFieldProperty])
+    comparePropertiesInProxy(
+      classOf[jfxsc.TextField],
+      classOf[TextFieldProperty])
   }
 }

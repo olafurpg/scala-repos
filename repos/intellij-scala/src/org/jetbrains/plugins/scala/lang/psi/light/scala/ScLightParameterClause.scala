@@ -43,10 +43,11 @@ class ScLightParameterClause(types: List[ScType], clause: ScParameterClause)
     throw new UnsupportedOperationException("Operation on light element")
 
   override def owner: PsiElement = {
-    ScalaPsiUtil.getContextOfType(this,
-                                  true,
-                                  classOf[ScFunctionExpr],
-                                  classOf[ScFunction],
-                                  classOf[ScPrimaryConstructor])
+    ScalaPsiUtil.getContextOfType(
+      this,
+      true,
+      classOf[ScFunctionExpr],
+      classOf[ScFunction],
+      classOf[ScPrimaryConstructor])
   }
 }

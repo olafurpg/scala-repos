@@ -287,10 +287,11 @@ private[spark] object ClosureCleaner extends Logging {
           s" + cleaning cloned closure $clone recursively (${cls.getName})")
         // No need to check serializable here for the outer closures because we're
         // only interested in the serializability of the starting closure
-        clean(clone,
-              checkSerializable = false,
-              cleanTransitively,
-              accessedFields)
+        clean(
+          clone,
+          checkSerializable = false,
+          cleanTransitively,
+          accessedFields)
       }
       parent = clone
     }
@@ -439,11 +440,13 @@ private[util] class FieldAccessFinder(
               visitedMethods += m
               ClosureCleaner
                 .getClassReader(cl)
-                .accept(new FieldAccessFinder(fields,
-                                              findTransitively,
-                                              Some(m),
-                                              visitedMethods),
-                        0)
+                .accept(
+                  new FieldAccessFinder(
+                    fields,
+                    findTransitively,
+                    Some(m),
+                    visitedMethods),
+                  0)
             }
           }
         }
@@ -486,9 +489,10 @@ private class InnerClosureFinder(output: Set[Class[_]])
             argTypes(0).toString.startsWith("L") // is it an object?
             && argTypes(0).getInternalName == myName) {
           // scalastyle:off classforname
-          output += Class.forName(owner.replace('/', '.'),
-                                  false,
-                                  Thread.currentThread.getContextClassLoader)
+          output += Class.forName(
+            owner.replace('/', '.'),
+            false,
+            Thread.currentThread.getContextClassLoader)
           // scalastyle:on classforname
         }
       }

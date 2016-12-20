@@ -61,10 +61,11 @@ trait DefaultFiltersSpec extends FiltersSpec {
       override lazy val httpFilters: Seq[EssentialFilter] = makeFilters(
         materializer)
       override lazy val httpErrorHandler = errorHandler.getOrElse(
-        new DefaultHttpErrorHandler(environment,
-                                    configuration,
-                                    sourceMapper,
-                                    Some(router))
+        new DefaultHttpErrorHandler(
+          environment,
+          configuration,
+          sourceMapper,
+          Some(router))
       )
     }.application
 
@@ -179,8 +180,9 @@ trait FiltersSpec extends Specification with ServerIntegrationSpecification {
       "ErrorHandlingFilter recovers from a POST that throws an asynchronous exception" in withServer(
         )(ErrorHandlingFilter) { ws =>
         val response =
-          Await.result(ws.url("/error-async").post(expectedOkText),
-                       Duration.Inf)
+          Await.result(
+            ws.url("/error-async").post(expectedOkText),
+            Duration.Inf)
         response.status must_== 500
         response.body must_== expectedOkText
       }
@@ -227,16 +229,18 @@ trait FiltersSpec extends Specification with ServerIntegrationSpecification {
       "ErrorHandlingFilter recovers from a POST that throws an asynchronous exception" in withServer(
         )(JavaErrorHandlingFilter) { ws =>
         val response =
-          Await.result(ws.url("/error-async").post(expectedOkText),
-                       Duration.Inf)
+          Await.result(
+            ws.url("/error-async").post(expectedOkText),
+            Duration.Inf)
         response.status must_== 500
         response.body must_== expectedOkText
       }
     }
 
     "Filters are not applied when the request is outside the application.context" in withServer(
-      Map("play.http.context" -> "/foo"))(ErrorHandlingFilter,
-                                          ThrowExceptionFilter) { ws =>
+      Map("play.http.context" -> "/foo"))(
+      ErrorHandlingFilter,
+      ThrowExceptionFilter) { ws =>
       val response =
         Await.result(ws.url("/ok").post(expectedOkText), Duration.Inf)
       response.status must_== 200

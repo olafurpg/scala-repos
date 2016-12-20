@@ -69,8 +69,9 @@ class MultivariateOnlineSummarizer
     if (weight == 0.0) return this
 
     if (n == 0) {
-      require(instance.size > 0,
-              s"Vector should have dimension larger than zero.")
+      require(
+        instance.size > 0,
+        s"Vector should have dimension larger than zero.")
       n = instance.size
 
       currMean = Array.ofDim[Double](n)
@@ -82,9 +83,10 @@ class MultivariateOnlineSummarizer
       currMin = Array.fill[Double](n)(Double.MaxValue)
     }
 
-    require(n == instance.size,
-            s"Dimensions mismatch when adding new sample." +
-              s" Expecting $n but got ${instance.size}.")
+    require(
+      n == instance.size,
+      s"Dimensions mismatch when adding new sample." +
+        s" Expecting $n but got ${instance.size}.")
 
     val localCurrMean = currMean
     val localCurrM2n = currM2n
@@ -130,9 +132,10 @@ class MultivariateOnlineSummarizer
   @Since("1.1.0")
   def merge(other: MultivariateOnlineSummarizer): this.type = {
     if (this.weightSum != 0.0 && other.weightSum != 0.0) {
-      require(n == other.n,
-              s"Dimensions mismatch when merging with another summarizer. " +
-                s"Expecting $n but got ${other.n}.")
+      require(
+        n == other.n,
+        s"Dimensions mismatch when merging with another summarizer. " +
+          s"Expecting $n but got ${other.n}.")
       totalCnt += other.totalCnt
       weightSum += other.weightSum
       weightSquareSum += other.weightSquareSum

@@ -100,10 +100,11 @@ abstract class ScalaTestingTestCase(
       testStatus: Int = TestStructureViewElement.normalStatusId) = {
     val structureViewRoot = buildFileStructure(testClassName + ".scala")
     assert(
-      checkTestNodeInFileStructure(structureViewRoot,
-                                   testName,
-                                   parentTestName,
-                                   testStatus))
+      checkTestNodeInFileStructure(
+        structureViewRoot,
+        testName,
+        parentTestName,
+        testStatus))
   }
 
   override protected def buildFileStructure(
@@ -262,16 +263,17 @@ abstract class ScalaTestingTestCase(
           }
           .get
         val (handler, runContentDescriptor) =
-          runProcess(runConfig,
-                     classOf[DefaultRunExecutor],
-                     new ProcessAdapter {
-                       override def onTextAvailable(event: ProcessEvent,
-                                                    outputType: Key[_]) {
-                         val text = event.getText
-                         if (debug) print(text)
-                       }
-                     },
-                     runner)
+          runProcess(
+            runConfig,
+            classOf[DefaultRunExecutor],
+            new ProcessAdapter {
+              override def onTextAvailable(event: ProcessEvent,
+                                           outputType: Key[_]) {
+                val text = event.getText
+                if (debug) print(text)
+              }
+            },
+            runner)
 
         runContentDescriptor.getExecutionConsole match {
           case descriptor: SMTRunnerConsoleView =>
@@ -305,8 +307,9 @@ abstract class ScalaTestingTestCase(
     runner
       .execute(executionEnvironmentBuilder.build, new ProgramRunner.Callback {
         def processStarted(descriptor: RunContentDescriptor) {
-          System.setProperty("idea.dynamic.classpath",
-                             useDynamicClassPath.toString)
+          System.setProperty(
+            "idea.dynamic.classpath",
+            useDynamicClassPath.toString)
           disposeOnTearDown(new Disposable {
             def dispose() {
               descriptor.dispose()

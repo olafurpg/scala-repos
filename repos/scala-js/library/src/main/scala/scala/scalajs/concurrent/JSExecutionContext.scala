@@ -14,8 +14,9 @@ object JSExecutionContext {
     *
     *  Beware of stack growth!
     */
-  @deprecated("Not asynchronous. Use JSExecutionContext.queue instead.",
-              "0.6.6")
+  @deprecated(
+    "Not asynchronous. Use JSExecutionContext.queue instead.",
+    "0.6.6")
   val runNow: ExecutionContextExecutor = RunNowExecutionContext
 
   /** Execution context that submits into the JavaScript runtime's task queue.

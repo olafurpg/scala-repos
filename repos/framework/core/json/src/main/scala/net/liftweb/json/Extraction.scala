@@ -76,8 +76,9 @@ object Extraction {
   def decompose(a: Any)(implicit formats: Formats): JValue = {
     def prependTypeHint(clazz: Class[_], o: JObject) =
       JObject(
-        JField(formats.typeHintFieldName,
-               JString(formats.typeHints.hintFor(clazz))) :: o.obj)
+        JField(
+          formats.typeHintFieldName,
+          JString(formats.typeHints.hintFor(clazz))) :: o.obj)
 
     def mkObject(clazz: Class[_], fields: List[JField]) =
       formats.typeHints.containsHint_?(clazz) match {
@@ -278,10 +279,11 @@ object Extraction {
           case o: JObject =>
             formats.fieldSerializer(a.getClass).map { serializer =>
               val constructorArgNames = Reflection
-                .constructorArgs(a.getClass,
-                                 constructor,
-                                 formats.parameterNameReader,
-                                 None)
+                .constructorArgs(
+                  a.getClass,
+                  constructor,
+                  formats.parameterNameReader,
+                  None)
                 .map(_._1)
                 .toSet
               val jsonFields = o.obj

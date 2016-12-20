@@ -108,9 +108,10 @@ class LeveldbReadJournal(
       fromSequenceNr: Long,
       toSequenceNr: Long): Source[EventEnvelope, NotUsed] =
     scaladslReadJournal
-      .currentEventsByPersistenceId(persistenceId,
-                                    fromSequenceNr,
-                                    toSequenceNr)
+      .currentEventsByPersistenceId(
+        persistenceId,
+        fromSequenceNr,
+        toSequenceNr)
       .asJava
 
   /**

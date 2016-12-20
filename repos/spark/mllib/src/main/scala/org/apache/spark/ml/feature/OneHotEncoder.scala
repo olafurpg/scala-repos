@@ -76,8 +76,9 @@ class OneHotEncoder(override val uid: String)
       schema(inputColName).dataType.isInstanceOf[NumericType],
       s"Input column must be of type NumericType but got ${schema(inputColName).dataType}")
     val inputFields = schema.fields
-    require(!inputFields.exists(_.name == outputColName),
-            s"Output column $outputColName already exists.")
+    require(
+      !inputFields.exists(_.name == outputColName),
+      s"Output column $outputColName already exists.")
 
     val inputAttr = Attribute.fromStructField(schema(inputColName))
     val outputAttrNames: Option[Array[String]] = inputAttr match {

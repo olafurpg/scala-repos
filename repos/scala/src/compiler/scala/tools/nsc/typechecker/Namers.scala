@@ -370,9 +370,10 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
       }
     }
     def createFieldSymbol(tree: ValDef): TermSymbol =
-      owner.newValue(tree.localName,
-                     tree.pos,
-                     tree.mods.flags & FieldFlags | PrivateLocal)
+      owner.newValue(
+        tree.localName,
+        tree.pos,
+        tree.mods.flags & FieldFlags | PrivateLocal)
 
     def createImportSymbol(tree: Tree) =
       NoSymbol.newImport(tree.pos) setInfo completerOf(tree)
@@ -407,9 +408,10 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
 
       clazz.associatedFile = contextFile
       if (clazz.sourceFile != null) {
-        assert(currentRun.canRedefine(clazz) ||
-                 clazz.sourceFile == currentRun.symSource(clazz),
-               clazz.sourceFile)
+        assert(
+          currentRun.canRedefine(clazz) ||
+            clazz.sourceFile == currentRun.symSource(clazz),
+          clazz.sourceFile)
         currentRun.symSource(clazz) = clazz.sourceFile
       }
       registerTopLevelSym(clazz)
@@ -574,9 +576,10 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
             val defSym =
               context.prefix.member(to) filter
                 (sym =>
-                   sym.exists && context.isAccessible(sym,
-                                                      context.prefix,
-                                                      superAccess = false))
+                   sym.exists && context.isAccessible(
+                     sym,
+                     context.prefix,
+                     superAccess = false))
 
             defSym andAlso (typer.permanentlyHiddenWarning(pos, to0, _))
           }
@@ -698,9 +701,10 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
       val sym =
         (if (owner.isClass) createFieldSymbol(tree)
          else
-           owner.newValue(tree.name append nme.LAZY_LOCAL,
-                          tree.pos,
-                          (tree.mods.flags | ARTIFACT) & ~IMPLICIT))
+           owner.newValue(
+             tree.name append nme.LAZY_LOCAL,
+             tree.pos,
+             (tree.mods.flags | ARTIFACT) & ~IMPLICIT))
       enterValSymbol(tree, sym setFlag MUTABLE setLazyAccessor lazyAccessor)
     }
     def enterStrictVal(tree: ValDef): TermSymbol = {
@@ -849,8 +853,9 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
           sym setInfo {
             val tp =
               if (isSetter)
-                MethodType(List(sym.newSyntheticValueParam(typeSig(tree))),
-                           UnitTpe)
+                MethodType(
+                  List(sym.newSyntheticValueParam(typeSig(tree))),
+                  UnitTpe)
               else NullaryMethodType(typeSig(tree))
             pluginsTypeSigAccessor(tp, typer, tree, sym)
           }
@@ -1101,8 +1106,9 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
           // so re-use / adapt that)
           if (meth.isJavaDefined)
             // TODODEPMET necessary?? new dependent types: replace symbols in restpe with the ones in vparams
-            JavaMethodType(vparams map (p => p setInfo objToAny(p.tpe)),
-                           restpe)
+            JavaMethodType(
+              vparams map (p => p setInfo objToAny(p.tpe)),
+              restpe)
           else MethodType(vparams, restpe)
         }
 
@@ -1183,8 +1189,9 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
           }
 
           // SI-7668 Substitute parameters from the parent method with those of the overriding method.
-          overriddenTp = overriddenTp.substSym(overridden.paramss.flatten,
-                                               vparamss.flatten.map(_.symbol))
+          overriddenTp = overriddenTp.substSym(
+            overridden.paramss.flatten,
+            vparamss.flatten.map(_.symbol))
 
           overriddenTp match {
             case NullaryMethodType(rtpe) => overriddenTp = rtpe
@@ -1325,8 +1332,9 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
       //   foo$default$1(a: Int) = a
       //
       vparamss.foldLeft(Nil: List[List[ValDef]]) { (previous, vparams) =>
-        assert(!overrides || vparams.length == baseParamss.head.length,
-               "" + meth.fullName + ", " + overridden.fullName)
+        assert(
+          !overrides || vparams.length == baseParamss.head.length,
+          "" + meth.fullName + ", " + overridden.fullName)
         val rvparams = rvparamss(previous.length)
         var baseParams = if (overrides) baseParamss.head else Nil
         map2(vparams, rvparams)((vparam, rvparam) => {
@@ -1424,12 +1432,13 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
             val defRhs = rvparam.rhs
 
             val defaultTree = atPos(vparam.pos.focus) {
-              DefDef(Modifiers(paramFlagsToDefaultGetter(meth.flags)) | oflag,
-                     name,
-                     defTparams,
-                     defVparamss,
-                     defTpt,
-                     defRhs)
+              DefDef(
+                Modifiers(paramFlagsToDefaultGetter(meth.flags)) | oflag,
+                name,
+                defTparams,
+                defVparamss,
+                defTpt,
+                defRhs)
             }
             if (!isConstr)
               methOwner.resetFlag(INTERFACE) // there's a concrete member now
@@ -1459,10 +1468,11 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
         } else {
           typer.typedType(tpt).tpe
         }
-      pluginsTypeSig(result,
-                     typer,
-                     vdef,
-                     if (tpt.isEmpty) WildcardType else result)
+      pluginsTypeSig(
+        result,
+        typer,
+        vdef,
+        if (tpt.isEmpty) WildcardType else result)
     }
 
     //@M! an abstract type definition (abstract type member/type parameter)
@@ -1664,9 +1674,10 @@ trait Namers extends MethodSynthesis { self: Analyzer =>
       def apply(tp: Type): Type = tp match {
         case TypeRef(pre, ArrayClass, List(elemtp))
             if elemtp.typeSymbol.isAbstractType && !(elemtp <:< ObjectTpe) =>
-          TypeRef(pre,
-                  ArrayClass,
-                  List(intersectionType(List(elemtp, ObjectTpe))))
+          TypeRef(
+            pre,
+            ArrayClass,
+            List(intersectionType(List(elemtp, ObjectTpe))))
         case _ =>
           mapOver(tp)
       }

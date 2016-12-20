@@ -93,9 +93,9 @@ class CodingDirectivesSpec extends RoutingSpec with Inside {
     }
     // CloseDelimited not support for requests
     "leave Chunked request entity unchanged" in {
-      val chunks = Vector(ByteString("abc"),
-                          ByteString("def"),
-                          ByteString("ghi")).map(ChunkStreamPart(_))
+      val chunks =
+        Vector(ByteString("abc"), ByteString("def"), ByteString("ghi"))
+          .map(ChunkStreamPart(_))
       val data = Source(chunks)
 
       val defaultEntity = HttpEntity.Chunked(`application/octet-stream`, data)
@@ -239,8 +239,9 @@ class CodingDirectivesSpec extends RoutingSpec with Inside {
           Chunk(chars.mkString): ChunkStreamPart
       }
       val chunkedTextEntity =
-        HttpEntity.Chunked(ContentTypes.`text/plain(UTF-8)`,
-                           Source.fromIterator(textChunks))
+        HttpEntity.Chunked(
+          ContentTypes.`text/plain(UTF-8)`,
+          Source.fromIterator(textChunks))
 
       Post() ~> `Accept-Encoding`(gzip) ~> {
         encodeResponseWith(Gzip) {
@@ -410,9 +411,10 @@ class CodingDirectivesSpec extends RoutingSpec with Inside {
       }
     }
     "negotiate the correct content encoding" in {
-      Get("/") ~> `Accept-Encoding`(identity.withQValue(.5f),
-                                    deflate.withQValue(0f),
-                                    gzip) ~> {
+      Get("/") ~> `Accept-Encoding`(
+        identity.withQValue(.5f),
+        deflate.withQValue(0f),
+        gzip) ~> {
         encodeResponseWith(NoCoding, Deflate, Gzip) { yeah }
       } ~> check {
         response should haveContentEncoding(gzip)
@@ -421,8 +423,9 @@ class CodingDirectivesSpec extends RoutingSpec with Inside {
           yeahGzipped)
       }
 
-      Get("/") ~> `Accept-Encoding`(HttpEncodingRange.`*`,
-                                    deflate withQValue 0.2) ~> {
+      Get("/") ~> `Accept-Encoding`(
+        HttpEncodingRange.`*`,
+        deflate withQValue 0.2) ~> {
         encodeResponseWith(Deflate, Gzip) { yeah }
       } ~> check {
         response should haveContentEncoding(gzip)

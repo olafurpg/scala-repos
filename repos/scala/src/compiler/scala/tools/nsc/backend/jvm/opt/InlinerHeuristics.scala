@@ -22,8 +22,9 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
   case class InlineRequest(callsite: Callsite, post: List[InlineRequest]) {
     // invariant: all post inline requests denote callsites in the callee of the main callsite
     for (pr <- post)
-      assert(pr.callsite.callsiteMethod == callsite.callee.get.callee,
-             s"Callsite method mismatch: main $callsite - post ${pr.callsite}")
+      assert(
+        pr.callsite.callsiteMethod == callsite.callee.get.callee,
+        s"Callsite method mismatch: main $callsite - post ${pr.callsite}")
   }
 
   /**
@@ -44,25 +45,27 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
       .map(methodNode => {
         var requests = Set.empty[InlineRequest]
         callGraph.callsites(methodNode).valuesIterator foreach {
-          case callsite @ Callsite(_,
-                                   _,
-                                   _,
-                                   Right(
-                                     Callee(callee,
-                                            calleeDeclClass,
-                                            safeToInline,
-                                            _,
-                                            canInlineFromSource,
-                                            calleeAnnotatedInline,
-                                            _,
-                                            _,
-                                            callsiteWarning)),
-                                   _,
-                                   _,
-                                   _,
-                                   pos,
-                                   _,
-                                   _) =>
+          case callsite @ Callsite(
+                _,
+                _,
+                _,
+                Right(
+                  Callee(
+                    callee,
+                    calleeDeclClass,
+                    safeToInline,
+                    _,
+                    canInlineFromSource,
+                    calleeAnnotatedInline,
+                    _,
+                    _,
+                    callsiteWarning)),
+                _,
+                _,
+                _,
+                pos,
+                _,
+                _) =>
             inlineRequest(callsite) match {
               case Some(Right(req)) => requests += req
               case Some(Left(w)) =>
@@ -74,8 +77,8 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
                     else ""
                   val msg =
                     s"${BackendReporting.methodSignature(calleeDeclClass.internalName, callee)}$annotWarn could not be inlined:\n$w"
-                  backendReporting.inlinerWarning(callsite.callsitePosition,
-                                                  msg)
+                  backendReporting
+                    .inlinerWarning(callsite.callsitePosition, msg)
                 }
 
               case None =>
@@ -101,8 +104,8 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
                       s"$initMsg: the method is not final and may be overridden." +
                         warnMsg)
                   else
-                    backendReporting.inlinerWarning(pos,
-                                                    s"$initMsg." + warnMsg)
+                    backendReporting
+                      .inlinerWarning(pos, s"$initMsg." + warnMsg)
                 } else if (callsiteWarning.isDefined && callsiteWarning.get
                              .emitWarning(compilerSettings)) {
                   // when annotatedInline is false, and there is some warning, the callsite metadata is possibly incomplete.

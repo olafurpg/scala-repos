@@ -182,16 +182,19 @@ class InsertIntoHiveTableSuite
     sql(
       "INSERT OVERWRITE TABLE hiveTableWithArrayValue SELECT a FROM tableWithArrayValue")
 
-    checkAnswer(sql("SELECT * FROM hiveTableWithArrayValue"),
-                rowRDD.collect().toSeq)
+    checkAnswer(
+      sql("SELECT * FROM hiveTableWithArrayValue"),
+      rowRDD.collect().toSeq)
 
     sql("DROP TABLE hiveTableWithArrayValue")
   }
 
   test("Insert MapType.valueContainsNull == false") {
-    val schema = StructType(Seq(
-      StructField("m",
-                  MapType(StringType, StringType, valueContainsNull = false))))
+    val schema = StructType(
+      Seq(
+        StructField(
+          "m",
+          MapType(StringType, StringType, valueContainsNull = false))))
     val rowRDD = hiveContext.sparkContext.parallelize((1 to 100).map(i =>
       Row(Map(s"key$i" -> s"value$i"))))
     val df = hiveContext.createDataFrame(rowRDD, schema)
@@ -200,8 +203,9 @@ class InsertIntoHiveTableSuite
     sql(
       "INSERT OVERWRITE TABLE hiveTableWithMapValue SELECT m FROM tableWithMapValue")
 
-    checkAnswer(sql("SELECT * FROM hiveTableWithMapValue"),
-                rowRDD.collect().toSeq)
+    checkAnswer(
+      sql("SELECT * FROM hiveTableWithMapValue"),
+      rowRDD.collect().toSeq)
 
     sql("DROP TABLE hiveTableWithMapValue")
   }
@@ -220,8 +224,9 @@ class InsertIntoHiveTableSuite
     sql(
       "INSERT OVERWRITE TABLE hiveTableWithStructValue SELECT s FROM tableWithStructValue")
 
-    checkAnswer(sql("SELECT * FROM hiveTableWithStructValue"),
-                rowRDD.collect().toSeq)
+    checkAnswer(
+      sql("SELECT * FROM hiveTableWithStructValue"),
+      rowRDD.collect().toSeq)
 
     sql("DROP TABLE hiveTableWithStructValue")
   }

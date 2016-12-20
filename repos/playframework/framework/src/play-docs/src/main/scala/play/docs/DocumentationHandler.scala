@@ -33,12 +33,13 @@ class DocumentationHandler(repo: FileRepository,
     * This is a def because we want to reindex the docs each time.
     */
   def playDoc = {
-    new PlayDoc(repo,
-                repo,
-                "resources",
-                PlayVersion.current,
-                PageIndex.parseFrom(repo, "Home", Some("manual")),
-                "Next")
+    new PlayDoc(
+      repo,
+      repo,
+      "resources",
+      PlayVersion.current,
+      PageIndex.parseFrom(repo, "Home", Some("manual")),
+      "Next")
   }
 
   val locator: String => String = new Memoise(

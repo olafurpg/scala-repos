@@ -54,9 +54,10 @@ object currenttype2 {
           val r = rewards(agent).r(s, a, s2)
           agent.learn(s, a, s2, r): G#Agent
         }
-      copy(agents = updatedAgents,
-           state = nextState,
-           pastHistory = currentHistory)
+      copy(
+        agents = updatedAgents,
+        state = nextState,
+        pastHistory = currentHistory)
     }
   }
 

@@ -5,17 +5,18 @@ import play.api.data.Forms._
 
 object DataForm {
 
-  private val txnTypes = Set("express_checkout",
-                             "web_accept",
-                             "recurring_payment",
-                             "subscr_payment")
+  private val txnTypes = Set(
+    "express_checkout",
+    "web_accept",
+    "recurring_payment",
+    "subscr_payment")
 
   val ipn = Form(
     mapping(
       "txn_id" -> optional(nonEmptyText),
       "subscr_id" -> optional(nonEmptyText),
-      "txn_type" -> nonEmptyText.verifying("Invalid txn type",
-                                           txnTypes contains _),
+      "txn_type" -> nonEmptyText
+        .verifying("Invalid txn type", txnTypes contains _),
       "mc_gross" -> bigDecimal,
       "mc_fee" -> bigDecimal,
       "custom" -> optional(text),

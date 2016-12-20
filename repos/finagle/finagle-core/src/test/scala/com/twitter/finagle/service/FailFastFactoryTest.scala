@@ -247,11 +247,12 @@ class FailFastFactoryTest
       val ctx = newCtx()
       import ctx._
 
-      val failfast = new FailFastFactory(underlying,
-                                         stats,
-                                         timer,
-                                         label,
-                                         backoffs = Stream.empty)
+      val failfast = new FailFastFactory(
+        underlying,
+        stats,
+        timer,
+        label,
+        backoffs = Stream.empty)
       failfast()
     }
   }

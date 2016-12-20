@@ -736,9 +736,10 @@ trait BaseCometActor
                 }
 
                 if (S.functionMap.size > 0) {
-                  theSession.updateFunctionMap(S.functionMap,
-                                               uniqueId,
-                                               lastRenderTime)
+                  theSession.updateFunctionMap(
+                    S.functionMap,
+                    uniqueId,
+                    lastRenderTime)
                   S.clearFunctionMap
                 }
               }
@@ -864,13 +865,15 @@ trait BaseCometActor
         case _ =>
           if (when < lastRenderTime && !partialUpdateStream_?) {
             toDo(
-              AnswerRender(new XmlOrJsCmd(spanId,
-                                          lastRendering,
-                                          buildSpan _,
-                                          notices.toList),
-                           whosAsking openOr this,
-                           lastRenderTime,
-                           wasLastFullRender))
+              AnswerRender(
+                new XmlOrJsCmd(
+                  spanId,
+                  lastRendering,
+                  buildSpan _,
+                  notices.toList),
+                whosAsking openOr this,
+                lastRenderTime,
+                wasLastFullRender))
             clearNotices
           } else {
             _lastRenderTime = when
@@ -880,14 +883,15 @@ trait BaseCometActor
               case all @ (hd :: xs) => {
                 toDo(
                   AnswerRender(
-                    new XmlOrJsCmd(spanId,
-                                   Empty,
-                                   Empty,
-                                   Full(all.reverse.foldLeft(Noop)(_ & _.js)),
-                                   Empty,
-                                   buildSpan,
-                                   false,
-                                   notices.toList),
+                    new XmlOrJsCmd(
+                      spanId,
+                      Empty,
+                      Empty,
+                      Full(all.reverse.foldLeft(Noop)(_ & _.js)),
+                      Empty,
+                      buildSpan,
+                      false,
+                      notices.toList),
                     whosAsking openOr this,
                     hd.when,
                     false))
@@ -943,13 +947,15 @@ trait BaseCometActor
             }
 
           reply(
-            AnswerRender(new XmlOrJsCmd(spanId,
-                                        out.openOr(lastRendering),
-                                        buildSpan _,
-                                        notices.toList),
-                         whosAsking openOr this,
-                         lastRenderTime,
-                         true))
+            AnswerRender(
+              new XmlOrJsCmd(
+                spanId,
+                out.openOr(lastRendering),
+                buildSpan _,
+                notices.toList),
+              whosAsking openOr this,
+              lastRenderTime,
+              true))
           clearNotices
         }
       }
@@ -1033,17 +1039,19 @@ trait BaseCometActor
       deltas = _deltaPruner(this, (delta :: deltas))
       if (!listeners.isEmpty) {
         val postPage = theSession.postPageJavaScript()
-        val rendered = AnswerRender(new XmlOrJsCmd(spanId,
-                                                   Empty,
-                                                   Empty,
-                                                   Full(cmd & postPage),
-                                                   Empty,
-                                                   buildSpan,
-                                                   false,
-                                                   notices.toList),
-                                    whosAsking openOr this,
-                                    time,
-                                    false)
+        val rendered = AnswerRender(
+          new XmlOrJsCmd(
+            spanId,
+            Empty,
+            Empty,
+            Full(cmd & postPage),
+            Empty,
+            buildSpan,
+            false,
+            notices.toList),
+          whosAsking openOr this,
+          time,
+          false)
         clearNotices
         listeners.foreach(_._2(rendered))
         listeners = Nil
@@ -1257,11 +1265,12 @@ trait BaseCometActor
     */
   protected def ask(who: LiftCometActor, what: Any)(answerWith: Any => Unit) {
     who.callInitCometActor(
-      CometCreationInfo(who.uniqueId,
-                        name,
-                        defaultHtml,
-                        attributes,
-                        theSession))
+      CometCreationInfo(
+        who.uniqueId,
+        name,
+        defaultHtml,
+        attributes,
+        theSession))
     theSession.addCometActor(who)
 
     who ! PerformSetupComet2(Empty)
@@ -1291,11 +1300,12 @@ trait BaseCometActor
         Empty
       }
 
-    new RenderOut((Box !! defaultHtml).map(f),
-                  internalFixedRender,
-                  additionalJs,
-                  Empty,
-                  false)
+    new RenderOut(
+      (Box !! defaultHtml).map(f),
+      internalFixedRender,
+      additionalJs,
+      Empty,
+      false)
   }
 
   /**
@@ -1313,11 +1323,12 @@ trait BaseCometActor
         Empty
       }
 
-    new RenderOut(Full(in: NodeSeq),
-                  internalFixedRender,
-                  additionalJs,
-                  Empty,
-                  false)
+    new RenderOut(
+      Full(in: NodeSeq),
+      internalFixedRender,
+      additionalJs,
+      Empty,
+      false)
   }
 
   protected implicit def jsToXmlOrJsCmd(in: JsCmd): RenderOut = {
@@ -1456,14 +1467,15 @@ private[http] class XmlOrJsCmd(
            ro: RenderOut,
            spanFunc: (NodeSeq) => NodeSeq,
            notices: List[(NoticeType.Value, NodeSeq, Box[String])]) =
-    this(id,
-         ro.xhtml,
-         ro.fixedXhtml,
-         ro.script,
-         ro.destroyScript,
-         spanFunc,
-         ro.ignoreHtmlOnJs,
-         notices)
+    this(
+      id,
+      ro.xhtml,
+      ro.fixedXhtml,
+      ro.script,
+      ro.destroyScript,
+      spanFunc,
+      ro.ignoreHtmlOnJs,
+      notices)
 
   val xml = _xml.flatMap(content =>
     S.session.map(s =>
@@ -1506,10 +1518,11 @@ private[http] class XmlOrJsCmd(
 
     var ret: JsCmd =
       JsCmds.JsTry(JsCmds.Run("destroy_" + id + "();"), false) & fullUpdateJs & JsCmds
-        .JsTry(JsCmds.Run(
-                 "destroy_" + id + " = function() {" +
-                   (destroy.openOr(JsCmds.Noop).toJsCmd) + "};"),
-               false)
+        .JsTry(
+          JsCmds.Run(
+            "destroy_" + id + " = function() {" +
+              (destroy.openOr(JsCmds.Noop).toJsCmd) + "};"),
+          false)
 
     S.appendNotices(notices)
     ret = S.noticesToJsCmd & ret
@@ -1633,11 +1646,12 @@ case class RenderOut(xhtml: Box[NodeSeq],
     this(Full(xhtml), Empty, Full(js), Full(destroy), false)
 
   def ++(cmd: JsCmd) =
-    RenderOut(xhtml,
-              fixedXhtml,
-              script.map(_ & cmd) or Full(cmd),
-              destroyScript,
-              ignoreHtmlOnJs)
+    RenderOut(
+      xhtml,
+      fixedXhtml,
+      script.map(_ & cmd) or Full(cmd),
+      destroyScript,
+      ignoreHtmlOnJs)
 }
 
 private[http] object Never extends Serializable

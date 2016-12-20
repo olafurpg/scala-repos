@@ -55,46 +55,53 @@ class ScalaArrangementVisitor(parseInfo: ScalaArrangementParseInfo,
     groupingRules.contains(SPLIT_INTO_UNARRANGEABLE_BLOCKS_BY_EXPRESSIONS)
 
   private val unseparableRanges = mutable
-    .HashMap[ScalaArrangementEntry /*parent*/,
-             mutable.Queue[ScalaArrangementEntry] /*Arrangement blocks*/ ]()
+    .HashMap[
+      ScalaArrangementEntry /*parent*/,
+      mutable.Queue[ScalaArrangementEntry] /*Arrangement blocks*/ ]()
 
   /**
     * Traverses method body to build inter-method dependencies.
     **/
   override def visitTypeAlias(alias: ScTypeAlias) {
-    processEntry(createNewEntry(alias.getParent,
-                                expandTextRangeToComment(alias),
-                                TYPE,
-                                alias.getName,
-                                canArrange = true),
-                 alias,
-                 null)
+    processEntry(
+      createNewEntry(
+        alias.getParent,
+        expandTextRangeToComment(alias),
+        TYPE,
+        alias.getName,
+        canArrange = true),
+      alias,
+      null)
   }
 
   override def visitConstructor(constr: ScConstructor) {
-    createNewEntry(constr.getParent,
-                   expandTextRangeToComment(constr),
-                   CONSTRUCTOR,
-                   null,
-                   canArrange = true)
+    createNewEntry(
+      constr.getParent,
+      expandTextRangeToComment(constr),
+      CONSTRUCTOR,
+      null,
+      canArrange = true)
   }
 
   override def visitFunction(fun: ScFunction) {
-    processEntry(createNewEntry(fun.getParent,
-                                expandTextRangeToComment(fun),
-                                FUNCTION,
-                                fun.getName,
-                                canArrange = true),
-                 fun,
-                 null)
+    processEntry(
+      createNewEntry(
+        fun.getParent,
+        expandTextRangeToComment(fun),
+        FUNCTION,
+        fun.getName,
+        canArrange = true),
+      fun,
+      null)
   }
 
   override def visitFunctionDefinition(fun: ScFunctionDefinition) {
-    val entry = createNewEntry(fun.getParent,
-                               expandTextRangeToComment(fun),
-                               FUNCTION,
-                               fun.getName,
-                               canArrange = true)
+    val entry = createNewEntry(
+      fun.getParent,
+      expandTextRangeToComment(fun),
+      FUNCTION,
+      fun.getName,
+      canArrange = true)
     parseInfo.onMethodEntryCreated(fun, entry)
     fun.body match {
       case Some(body) =>
@@ -107,11 +114,12 @@ class ScalaArrangementVisitor(parseInfo: ScalaArrangementParseInfo,
   }
 
   override def visitMacroDefinition(fun: ScMacroDefinition) {
-    val entry = createNewEntry(fun.getParent,
-                               expandTextRangeToComment(fun),
-                               MACRO,
-                               fun.getName,
-                               canArrange = true)
+    val entry = createNewEntry(
+      fun.getParent,
+      expandTextRangeToComment(fun),
+      MACRO,
+      fun.getName,
+      canArrange = true)
     parseInfo.onMethodEntryCreated(fun, entry)
     processEntry(entry, fun, null)
     fun.getLastChild match {
@@ -130,11 +138,12 @@ class ScalaArrangementVisitor(parseInfo: ScalaArrangementParseInfo,
   override def visitPatternDefinition(pat: ScPatternDefinition) {
     //TODO: insert inter-field dependency here
     processEntry(
-      createNewEntry(pat.getParent,
-                     expandTextRangeToComment(pat),
-                     VAL,
-                     pat.pList.patterns.toList.head.bindings(0).getName,
-                     canArrange = true),
+      createNewEntry(
+        pat.getParent,
+        expandTextRangeToComment(pat),
+        VAL,
+        pat.pList.patterns.toList.head.bindings(0).getName,
+        canArrange = true),
       pat,
       pat.expr.orNull)
   }
@@ -145,53 +154,62 @@ class ScalaArrangementVisitor(parseInfo: ScalaArrangementParseInfo,
   }
 
   override def visitClass(scClass: ScClass) =
-    processEntry(createNewEntry(scClass.getParent,
-                                expandTextRangeToComment(scClass),
-                                CLASS,
-                                scClass.getName,
-                                canArrange = true),
-                 scClass,
-                 scClass.extendsBlock.templateBody.orNull)
+    processEntry(
+      createNewEntry(
+        scClass.getParent,
+        expandTextRangeToComment(scClass),
+        CLASS,
+        scClass.getName,
+        canArrange = true),
+      scClass,
+      scClass.extendsBlock.templateBody.orNull)
 
   override def visitValueDeclaration(v: ScValueDeclaration) =
-    processEntry(createNewEntry(v.getParent,
-                                expandTextRangeToComment(v),
-                                VAL,
-                                v.getName,
-                                canArrange = true),
-                 v,
-                 null)
+    processEntry(
+      createNewEntry(
+        v.getParent,
+        expandTextRangeToComment(v),
+        VAL,
+        v.getName,
+        canArrange = true),
+      v,
+      null)
 
   override def visitVariableDefinition(varr: ScVariableDefinition) {
     //TODO: insert inter-field dependency here
-    processEntry(createNewEntry(varr.getParent,
-                                expandTextRangeToComment(varr),
-                                VAR,
-                                varr.declaredElements(0).getName,
-                                canArrange = true),
-                 varr,
-                 varr.expr.orNull)
+    processEntry(
+      createNewEntry(
+        varr.getParent,
+        expandTextRangeToComment(varr),
+        VAR,
+        varr.declaredElements(0).getName,
+        canArrange = true),
+      varr,
+      varr.expr.orNull)
   }
 
   override def visitVariableDeclaration(varr: ScVariableDeclaration) =
-    processEntry(createNewEntry(varr.getParent,
-                                expandTextRangeToComment(varr),
-                                VAR,
-                                varr.declaredElements(0).getName,
-                                canArrange = true),
-                 varr,
-                 null)
+    processEntry(
+      createNewEntry(
+        varr.getParent,
+        expandTextRangeToComment(varr),
+        VAR,
+        varr.declaredElements(0).getName,
+        canArrange = true),
+      varr,
+      null)
 
   override def visitTypeDefinition(typedef: ScTypeDefinition) {
-    val entry = createNewEntry(typedef.getParent,
-                               expandTextRangeToComment(typedef),
-                               typedef match {
-                                 case _: ScClass => CLASS
-                                 case _: ScTrait => TRAIT
-                                 case _ => OBJECT
-                               },
-                               typedef.getName,
-                               canArrange = true)
+    val entry = createNewEntry(
+      typedef.getParent,
+      expandTextRangeToComment(typedef),
+      typedef match {
+        case _: ScClass => CLASS
+        case _: ScTrait => TRAIT
+        case _ => OBJECT
+      },
+      typedef.getName,
+      canArrange = true)
     processEntry(entry, typedef, typedef.extendsBlock.templateBody.orNull)
   }
 
@@ -329,9 +347,10 @@ class ScalaArrangementVisitor(parseInfo: ScalaArrangementParseInfo,
           (!prev.isInstanceOf[PsiWhiteSpace] ||
           prev.isInstanceOf[PsiWhiteSpace] &&
           !prev.getText.contains("\n") && prev.getPrevSibling != null)) {
-        new TextRange(node.getTextRange.getStartOffset +
-                        first.getTextRange.getLength + 1,
-                      node.getTextRange.getEndOffset)
+        new TextRange(
+          node.getTextRange.getStartOffset +
+            first.getTextRange.getLength + 1,
+          node.getTextRange.getEndOffset)
       } else {
         node.getTextRange
       }
@@ -434,12 +453,12 @@ class ScalaArrangementVisitor(parseInfo: ScalaArrangementParseInfo,
           .foreach(
             queue =>
               queue.enqueue(
-                createNewEntry(body,
-                               new TextRange(newOffset,
-                                             child.getTextRange.getEndOffset),
-                               UNSEPARABLE_RANGE,
-                               null,
-                               canArrange = true)))
+                createNewEntry(
+                  body,
+                  new TextRange(newOffset, child.getTextRange.getEndOffset),
+                  UNSEPARABLE_RANGE,
+                  null,
+                  canArrange = true)))
         None
       } else startOffset
     })

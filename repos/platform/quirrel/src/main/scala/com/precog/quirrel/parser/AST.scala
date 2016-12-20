@@ -46,21 +46,25 @@ trait AST extends Phases {
 
   def printSExp(tree: Expr, indent: String = ""): String = tree match {
     case Add(_, left, right) =>
-      "%s(+\n%s\n%s)".format(indent,
-                             printSExp(left, indent + "  "),
-                             printSExp(right, indent + "  "))
+      "%s(+\n%s\n%s)".format(
+        indent,
+        printSExp(left, indent + "  "),
+        printSExp(right, indent + "  "))
     case Sub(_, left, right) =>
-      "%s(-\n%s\n%s)".format(indent,
-                             printSExp(left, indent + "  "),
-                             printSExp(right, indent + "  "))
+      "%s(-\n%s\n%s)".format(
+        indent,
+        printSExp(left, indent + "  "),
+        printSExp(right, indent + "  "))
     case Mul(_, left, right) =>
-      "%s(*\n%s\n%s)".format(indent,
-                             printSExp(left, indent + "  "),
-                             printSExp(right, indent + "  "))
+      "%s(*\n%s\n%s)".format(
+        indent,
+        printSExp(left, indent + "  "),
+        printSExp(right, indent + "  "))
     case Div(_, left, right) =>
-      "%s(/\n%s\n%s)".format(indent,
-                             printSExp(left, indent + "  "),
-                             printSExp(right, indent + "  "))
+      "%s(/\n%s\n%s)".format(
+        indent,
+        printSExp(left, indent + "  "),
+        printSExp(right, indent + "  "))
     case Neg(_, child) =>
       "%s(neg\n%s)".format(indent, printSExp(child, indent + "  "))
     case Paren(_, child) => printSExp(child, indent)
@@ -103,8 +107,9 @@ trait AST extends Phases {
           constraints map { indent + "  -\n" + prettyPrint(_, level + 4) } mkString "\n"
 
         indent + "type: solve\n" + indent + "constraints:\n" +
-          constraintsStr + "\n" + indent + "child:\n" + prettyPrint(child,
-                                                                    level + 2)
+          constraintsStr + "\n" + indent + "child:\n" + prettyPrint(
+          child,
+          level + 2)
       }
 
       case Import(loc, spec, child) => {
@@ -132,8 +137,9 @@ trait AST extends Phases {
       }
 
       case New(loc, child) => {
-        indent + "type: new\n" + indent + "child:\n" + prettyPrint(child,
-                                                                   level + 2)
+        indent + "type: new\n" + indent + "child:\n" + prettyPrint(
+          child,
+          level + 2)
       }
 
       case Relate(loc, from: Expr, to: Expr, in: Expr) => {
@@ -337,18 +343,21 @@ trait AST extends Phases {
       }
 
       case Comp(loc, child) => {
-        indent + "type: comp\n" + indent + "child:\n" + prettyPrint(child,
-                                                                    level + 2)
+        indent + "type: comp\n" + indent + "child:\n" + prettyPrint(
+          child,
+          level + 2)
       }
 
       case Neg(loc, child) => {
-        indent + "type: neg\n" + indent + "child:\n" + prettyPrint(child,
-                                                                   level + 2)
+        indent + "type: neg\n" + indent + "child:\n" + prettyPrint(
+          child,
+          level + 2)
       }
 
       case Paren(loc, child) => {
-        indent + "type: paren\n" + indent + "child:\n" + prettyPrint(child,
-                                                                     level + 2)
+        indent + "type: paren\n" + indent + "child:\n" + prettyPrint(
+          child,
+          level + 2)
       }
     }
 
@@ -476,8 +485,9 @@ trait AST extends Phases {
     def equalsIgnoreLoc(that: Expr): Boolean = (this, that) match {
       case (a, b) if a == b => true
 
-      case (Let(_, id1, params1, left1, right1),
-            Let(_, id2, params2, left2, right2)) =>
+      case (
+          Let(_, id1, params1, left1, right1),
+          Let(_, id2, params2, left2, right2)) =>
         (id1 == id2) && (params1 == params2) && (left1 equalsIgnoreLoc left2) &&
           (right1 equalsIgnoreLoc right2)
 
@@ -550,15 +560,17 @@ trait AST extends Phases {
       case (Descent(_, child1, property1), Descent(_, child2, property2)) =>
         (child1 equalsIgnoreLoc child2) && (property1 == property2)
 
-      case (MetaDescent(_, child1, property1),
-            MetaDescent(_, child2, property2)) =>
+      case (
+          MetaDescent(_, child1, property1),
+          MetaDescent(_, child2, property2)) =>
         (child1 equalsIgnoreLoc child2) && (property1 == property2)
 
       case (Deref(_, left1, right1), Deref(_, left2, right2)) =>
         (left1 equalsIgnoreLoc left2) && (right1 equalsIgnoreLoc right2)
 
-      case (d1 @ Dispatch(_, name1, actuals1),
-            d2 @ Dispatch(_, name2, actuals2)) => {
+      case (
+          d1 @ Dispatch(_, name1, actuals1),
+          d2 @ Dispatch(_, name2, actuals2)) => {
         val naming = name1 == name2
         val sizing = actuals1.length == actuals2.length
         val binding = d1.binding == d2.binding

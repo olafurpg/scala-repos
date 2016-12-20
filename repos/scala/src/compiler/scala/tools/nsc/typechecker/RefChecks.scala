@@ -101,10 +101,11 @@ abstract class RefChecks
       case (NullaryMethodType(rtp1), MethodType(List(), rtp2)) =>
         rtp1 <:< rtp2
       case (TypeRef(_, sym, _), _) if sym.isModuleClass =>
-        overridesTypeInPrefix(NullaryMethodType(tp1),
-                              tp2,
-                              prefix,
-                              isModuleOverride)
+        overridesTypeInPrefix(
+          NullaryMethodType(tp1),
+          tp2,
+          prefix,
+          isModuleOverride)
       case _ =>
         def classBoundAsSeen(tp: Type) =
           tp.typeSymbol.classBound.asSeenFrom(prefix, tp.typeSymbol.owner)
@@ -519,8 +520,9 @@ abstract class RefChecks
                      !(member.owner.thisType.baseClasses exists
                        (_ isSubClass other.owner)) && !member.isDeferred &&
                      !other.isDeferred &&
-                     intersectionIsEmpty(member.extendedOverriddenSymbols,
-                                         other.extendedOverriddenSymbols)) {
+                     intersectionIsEmpty(
+                       member.extendedOverriddenSymbols,
+                       other.extendedOverriddenSymbols)) {
             overrideError(
               "cannot override a concrete member without a third member that's overridden by both " +
                 "(this rule is designed to prevent ``accidental overrides'')")
@@ -549,8 +551,9 @@ abstract class RefChecks
             checkOverrideDeprecated()
             if (settings.warnNullaryOverride) {
               if (other.paramss.isEmpty && !member.paramss.isEmpty) {
-                reporter.warning(member.pos,
-                                 "non-nullary method overrides nullary method")
+                reporter.warning(
+                  member.pos,
+                  "non-nullary method overrides nullary method")
               }
             }
           }
@@ -582,10 +585,11 @@ abstract class RefChecks
           }
           // check overriding (abstract type --> abstract type or abstract type --> concrete type member (a type alias))
           // making an abstract type member concrete is like passing a type argument
-          typer.infer.checkKindBounds(high :: Nil,
-                                      lowType :: Nil,
-                                      rootType,
-                                      low.owner) match {
+          typer.infer.checkKindBounds(
+            high :: Nil,
+            lowType :: Nil,
+            rootType,
+            low.owner) match {
             // (1.7.2)
             case Nil =>
             case kindErrors =>
@@ -600,18 +604,20 @@ abstract class RefChecks
           // check a type alias's RHS corresponds to its declaration
           // this overlaps somewhat with validateVariance
           if (low.isAliasType) {
-            typer.infer.checkKindBounds(low :: Nil,
-                                        lowType.normalize :: Nil,
-                                        rootType,
-                                        low.owner) match {
+            typer.infer.checkKindBounds(
+              low :: Nil,
+              lowType.normalize :: Nil,
+              rootType,
+              low.owner) match {
               case Nil =>
               case kindErrors =>
-                reporter.error(member.pos,
-                               "The kind of the right-hand side " +
-                                 lowType.normalize + " of " + low.keyString +
-                                 " " + low.varianceString + low.nameString +
-                                 " does not conform to its expected kind." +
-                                 kindErrors.toList.mkString("\n", ", ", ""))
+                reporter.error(
+                  member.pos,
+                  "The kind of the right-hand side " +
+                    lowType.normalize + " of " + low.keyString +
+                    " " + low.varianceString + low.nameString +
+                    " does not conform to its expected kind." +
+                    kindErrors.toList.mkString("\n", ", ", ""))
             }
           } else if (low.isAbstractType && lowType.isVolatile &&
                      !highInfo.bounds.hi.isVolatile)
@@ -620,11 +626,12 @@ abstract class RefChecks
         }
         def checkOverrideTerm() {
           other.cookJavaRawInfo() // #2454
-          if (!overridesTypeInPrefix(lowType,
-                                     highType,
-                                     rootType,
-                                     low.isModuleOrModuleClass &&
-                                       high.isModuleOrModuleClass)) {
+          if (!overridesTypeInPrefix(
+                lowType,
+                highType,
+                rootType,
+                low.isModuleOrModuleClass &&
+                  high.isModuleOrModuleClass)) {
             // 8
             overrideTypeError()
             explainTypes(lowType, highType)
@@ -774,8 +781,9 @@ abstract class RefChecks
 
           for (member <- missing) {
             def undefined(msg: String) =
-              abstractClassError(false,
-                                 infoString(member) + " is not defined" + msg)
+              abstractClassError(
+                false,
+                infoString(member) + " is not defined" + msg)
             val underlying = analyzer.underlyingSymbol(member)
 
             // Give a specific error message for abstract vars based on why it fails:
@@ -820,8 +828,9 @@ abstract class RefChecks
                       val concreteSym = pc.typeSymbol
                       def subclassMsg(c1: Symbol, c2: Symbol) = (
                         ": %s is a subclass of %s, but method parameter types must match exactly."
-                          .format(c1.fullLocationString,
-                                  c2.fullLocationString)
+                          .format(
+                            c1.fullLocationString,
+                            c2.fullLocationString)
                         )
                       val addendum =
                         (if (abstractSym == concreteSym) {
@@ -977,8 +986,9 @@ abstract class RefChecks
             .filterNot(_.owner == clazz)
             .filterNot(_.isFinal)
           def issueError(suffix: String) =
-            reporter.error(member.pos,
-                           member.toString() + " overrides nothing" + suffix)
+            reporter.error(
+              member.pos,
+              member.toString() + " overrides nothing" + suffix)
           nonMatching match {
             case Nil =>
               issueError("")
@@ -1034,10 +1044,11 @@ abstract class RefChecks
           case _ :: Nil =>
             ; // OK
           case tp1 :: tp2 :: _ =>
-            reporter.error(clazz.pos,
-                           "illegal inheritance;\n " +
-                             clazz + " inherits different type instances of " +
-                             baseClass + ":\n" + tp1 + " and " + tp2)
+            reporter.error(
+              clazz.pos,
+              "illegal inheritance;\n " +
+                clazz + " inherits different type instances of " +
+                baseClass + ":\n" + tp1 + " and " + tp2)
             explainTypes(tp1, tp2)
             explainTypes(tp2, tp1)
         }
@@ -1170,12 +1181,13 @@ abstract class RefChecks
         normalizeAll(qual.tpe.widen) + " and " + normalizeAll(other.tpe.widen)
 
       /* Symbols which limit the warnings we can issue since they may be value types */
-      val isMaybeValue = Set[Symbol](AnyClass,
-                                     AnyRefClass,
-                                     AnyValClass,
-                                     ObjectClass,
-                                     ComparableClass,
-                                     JavaSerializableClass)
+      val isMaybeValue = Set[Symbol](
+        AnyClass,
+        AnyRefClass,
+        AnyValClass,
+        ObjectClass,
+        ComparableClass,
+        JavaSerializableClass)
 
       // Whether def equals(other: Any) has known behavior: it is the default
       // inherited from java.lang.Object, or it is a synthetically generated
@@ -1416,9 +1428,10 @@ abstract class RefChecks
         // used for the mixin case: need a new symbol owned by the subclass for the accessor, rather than repurposing the module symbol
         def mkAccessorSymbol =
           site
-            .newMethod(module.name.toTermName,
-                       site.pos,
-                       STABLE | MODULE | MIXEDIN)
+            .newMethod(
+              module.name.toTermName,
+              site.pos,
+              STABLE | MODULE | MIXEDIN)
             .setInfo(moduleVar.tpe)
             .andAlso(self =>
               if (module.isPrivate) self.expandName(module.owner))
@@ -1796,10 +1809,12 @@ abstract class RefChecks
     }
 
     private def transformApply(tree: Apply): Tree = tree match {
-      case Apply(Select(qual, nme.filter | nme.withFilter),
-                 List(
-                   Function(List(ValDef(_, pname, tpt, _)),
-                            Match(_, CaseDef(pat1, _, _) :: _))))
+      case Apply(
+          Select(qual, nme.filter | nme.withFilter),
+          List(
+            Function(
+              List(ValDef(_, pname, tpt, _)),
+              Match(_, CaseDef(pat1, _, _) :: _))))
           if ((pname startsWith nme.CHECK_IF_REFUTABLE_STRING) &&
             isIrrefutable(pat1, tpt.tpe) && (qual.tpe <:< tree.tpe)) =>
         transform(qual)
@@ -1828,8 +1843,9 @@ abstract class RefChecks
 
       def checkSuper(mix: Name) =
         // term should have been eliminated by super accessors
-        assert(!(qual.symbol.isTrait && sym.isTerm && mix == tpnme.EMPTY),
-               (qual.symbol, sym, mix))
+        assert(
+          !(qual.symbol.isTrait && sym.isTerm && mix == tpnme.EMPTY),
+          (qual.symbol, sym, mix))
 
       // Rewrite eligible calls to monomorphic case companion apply methods to the equivalent constructor call.
       //
@@ -1936,8 +1952,9 @@ abstract class RefChecks
             validateBaseTypes(currentOwner)
             checkOverloadedRestrictions(currentOwner, currentOwner)
             // SI-7870 default getters for constructors live in the companion module
-            checkOverloadedRestrictions(currentOwner,
-                                        currentOwner.companionModule)
+            checkOverloadedRestrictions(
+              currentOwner,
+              currentOwner.companionModule)
             val bridges = addVarargBridges(currentOwner)
             val moduleDesugared =
               if (currentOwner.isTrait) Nil else mixinModuleDefs(currentOwner)
@@ -1989,11 +2006,12 @@ abstract class RefChecks
             tree
 
           case TypeApply(fn, args) =>
-            checkBounds(tree,
-                        NoPrefix,
-                        NoSymbol,
-                        fn.tpe.typeParams,
-                        args map (_.tpe))
+            checkBounds(
+              tree,
+              NoPrefix,
+              NoSymbol,
+              fn.tpe.typeParams,
+              args map (_.tpe))
             if (isSimpleCaseApply(tree)) transformCaseApply(tree)
             else tree
 
@@ -2017,9 +2035,10 @@ abstract class RefChecks
           case Ident(name) =>
             checkUndesiredProperties(sym, tree.pos)
             if (name != nme.WILDCARD && name != tpnme.WILDCARD_STAR) {
-              assert(sym != NoSymbol,
-                     "transformCaseApply: name = " + name.debugString +
-                       " tree = " + tree + " / " + tree.getClass) //debug
+              assert(
+                sym != NoSymbol,
+                "transformCaseApply: name = " + name.debugString +
+                  " tree = " + tree + " / " + tree.getClass) //debug
               enterReference(tree.pos, sym)
             }
             tree

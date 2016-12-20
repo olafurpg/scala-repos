@@ -349,12 +349,15 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
     val data2 = constantData.map(equivalentModel2.transform)
     val data3 = constantData.map(equivalentModel3.transform)
 
-    assert(data1.forall(_.toArray.forall(_ == 0.0)),
-           "The variance is zero, so the transformed result should be 0.0")
-    assert(data2.forall(_.toArray.forall(_ == 0.0)),
-           "The variance is zero, so the transformed result should be 0.0")
-    assert(data3.forall(_.toArray.forall(_ == 0.0)),
-           "The variance is zero, so the transformed result should be 0.0")
+    assert(
+      data1.forall(_.toArray.forall(_ == 0.0)),
+      "The variance is zero, so the transformed result should be 0.0")
+    assert(
+      data2.forall(_.toArray.forall(_ == 0.0)),
+      "The variance is zero, so the transformed result should be 0.0")
+    assert(
+      data3.forall(_.toArray.forall(_ == 0.0)),
+      "The variance is zero, so the transformed result should be 0.0")
   }
 
   test("Standardization with constant input") {
@@ -373,12 +376,15 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
     val data2 = constantData.map(model2.transform)
     val data3 = constantData.map(model3.transform)
 
-    assert(data1.forall(_.toArray.forall(_ == 0.0)),
-           "The variance is zero, so the transformed result should be 0.0")
-    assert(data2.forall(_.toArray.forall(_ == 0.0)),
-           "The variance is zero, so the transformed result should be 0.0")
-    assert(data3.forall(_.toArray.forall(_ == 0.0)),
-           "The variance is zero, so the transformed result should be 0.0")
+    assert(
+      data1.forall(_.toArray.forall(_ == 0.0)),
+      "The variance is zero, so the transformed result should be 0.0")
+    assert(
+      data2.forall(_.toArray.forall(_ == 0.0)),
+      "The variance is zero, so the transformed result should be 0.0")
+    assert(
+      data3.forall(_.toArray.forall(_ == 0.0)),
+      "The variance is zero, so the transformed result should be 0.0")
   }
 
   test("StandardScalerModel argument nulls are properly handled") {

@@ -23,8 +23,9 @@ object kron extends UFunc {
           DenseMatrix.zeros[RV](a.rows * b.rows, a.cols * b.cols)
 
         for (((r, c), av) <- a.activeIterator) {
-          result((r * b.rows) until ((r + 1) * b.rows),
-                 (c * b.cols) until ((c + 1) * b.cols)) := mul(av, b)
+          result(
+            (r * b.rows) until ((r + 1) * b.rows),
+            (c * b.cols) until ((c + 1) * b.cols)) := mul(av, b)
         }
         result
       }

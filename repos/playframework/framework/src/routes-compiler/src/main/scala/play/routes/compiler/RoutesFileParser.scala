@@ -49,10 +49,11 @@ object RoutesFileParser {
       case parser.NoSuccess(message, in) =>
         Left(
           Seq(
-            RoutesCompilationError(routesFile,
-                                   message,
-                                   Some(in.pos.line),
-                                   Some(in.pos.column))))
+            RoutesCompilationError(
+              routesFile,
+              message,
+              Some(in.pos.line),
+              Some(in.pos.column))))
     }
   }
 
@@ -67,17 +68,19 @@ object RoutesFileParser {
 
     routes.foreach { route =>
       if (route.call.packageName.isEmpty) {
-        errors += RoutesCompilationError(file,
-                                         "Missing package name",
-                                         Some(route.call.pos.line),
-                                         Some(route.call.pos.column))
+        errors += RoutesCompilationError(
+          file,
+          "Missing package name",
+          Some(route.call.pos.line),
+          Some(route.call.pos.column))
       }
 
       if (route.call.controller.isEmpty) {
-        errors += RoutesCompilationError(file,
-                                         "Missing Controller",
-                                         Some(route.call.pos.line),
-                                         Some(route.call.pos.column))
+        errors += RoutesCompilationError(
+          file,
+          "Missing Controller",
+          Some(route.call.pos.line),
+          Some(route.call.pos.column))
       }
 
       route.path.parts.collect {
@@ -98,10 +101,11 @@ object RoutesFileParser {
                 java.util.regex.Pattern.compile(regex)
               } catch {
                 case e: Exception => {
-                  errors += RoutesCompilationError(file,
-                                                   e.getMessage,
-                                                   Some(part.pos.line),
-                                                   Some(part.pos.column))
+                  errors += RoutesCompilationError(
+                    file,
+                    e.getMessage,
+                    Some(part.pos.line),
+                    Some(part.pos.column))
                 }
               }
             }
@@ -309,10 +313,11 @@ private[routes] class RoutesFileParser extends JavaTokenParsers {
     ((identifier | tickedIdentifier) <~ ignoreWhiteSpace) ~ opt(parameterType) ~
       (ignoreWhiteSpace ~> opt(parameterDefaultValue | parameterFixedValue)) ^^ {
       case name ~ t ~ d =>
-        Parameter(name,
-                  t.getOrElse("String"),
-                  d.filter(_.startsWith("=")).map(_.drop(1)),
-                  d.filter(_.startsWith("?")).map(_.drop(2)))
+        Parameter(
+          name,
+          t.getOrElse("String"),
+          d.filter(_.startsWith("=")).map(_.drop(1)),
+          d.filter(_.startsWith("?")).map(_.drop(2)))
     }
 
   def parameters: Parser[List[Parameter]] =

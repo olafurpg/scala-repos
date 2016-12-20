@@ -67,9 +67,10 @@ class UnsafeRowSuite extends SparkFunSuite {
   }
 
   test("writeToStream") {
-    val row = InternalRow.apply(UTF8String.fromString("hello"),
-                                UTF8String.fromString("world"),
-                                123)
+    val row = InternalRow.apply(
+      UTF8String.fromString("hello"),
+      UTF8String.fromString("world"),
+      123)
     val arrayBackedUnsafeRow: UnsafeRow = UnsafeProjection
       .create(Array[DataType](StringType, StringType, IntegerType))
       .apply(row)

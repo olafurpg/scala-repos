@@ -112,8 +112,9 @@ class DispatchersSpec
     _.getClass == implicitly[ClassTag[T]].runtimeClass
 
   def typesAndValidators: Map[String, (MessageDispatcher) ⇒ Boolean] =
-    Map("PinnedDispatcher" -> ofType[PinnedDispatcher],
-        "Dispatcher" -> ofType[Dispatcher])
+    Map(
+      "PinnedDispatcher" -> ofType[PinnedDispatcher],
+      "Dispatcher" -> ofType[Dispatcher])
 
   def validTypes = typesAndValidators.keys.toList
 
@@ -166,11 +167,10 @@ class DispatchersSpec
 
     "throw ConfigurationException if type does not exist" in {
       intercept[ConfigurationException] {
-        from(
-          ConfigFactory
-            .parseMap(Map(tipe -> "typedoesntexist",
-                          id -> "invalid-dispatcher").asJava)
-            .withFallback(defaultDispatcherConfig))
+        from(ConfigFactory
+          .parseMap(
+            Map(tipe -> "typedoesntexist", id -> "invalid-dispatcher").asJava)
+          .withFallback(defaultDispatcherConfig))
       }
     }
 
@@ -260,8 +260,9 @@ class DispatchersSpec
     }
 
     "use balancing-pool router with special routees mailbox of deployment config" in {
-      system.actorOf(FromConfig.props(Props[ThreadNameEcho]),
-                     name = "balanced") ! "what's the name?"
+      system.actorOf(
+        FromConfig.props(Props[ThreadNameEcho]),
+        name = "balanced") ! "what's the name?"
       val Expected =
         """(DispatchersSpec-BalancingPool-/balanced-[1-9][0-9]*)""".r
       expectMsgPF() {

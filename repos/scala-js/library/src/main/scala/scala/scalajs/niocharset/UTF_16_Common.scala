@@ -117,13 +117,14 @@ private[niocharset] abstract class UTF_16_Common protected (
   }
 
   private class Encoder
-      extends CharsetEncoder(UTF_16_Common.this,
-                             2.0f,
-                             2.0f,
-                             // Character 0xfffd
-                             if (endianness == LittleEndian)
-                               Array(-3, -1)
-                             else Array(-1, -3)) {
+      extends CharsetEncoder(
+        UTF_16_Common.this,
+        2.0f,
+        2.0f,
+        // Character 0xfffd
+        if (endianness == LittleEndian)
+          Array(-3, -1)
+        else Array(-1, -3)) {
 
     private var needToWriteBOM: Boolean = endianness == AutoEndian
 

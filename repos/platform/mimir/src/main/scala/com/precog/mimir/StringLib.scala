@@ -63,38 +63,40 @@ trait StringLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
     val StringNamespace = Vector("std", "string")
 
     override def _lib1 =
-      super._lib1 ++ Set(length,
-                         trim,
-                         toUpperCase,
-                         toLowerCase,
-                         isEmpty,
-                         intern,
-                         parseNum,
-                         numToString)
+      super._lib1 ++ Set(
+        length,
+        trim,
+        toUpperCase,
+        toLowerCase,
+        isEmpty,
+        intern,
+        parseNum,
+        numToString)
 
     override def _lib2 =
-      super._lib2 ++ Set(equalsIgnoreCase,
-                         codePointAt,
-                         startsWith,
-                         lastIndexOf,
-                         concat,
-                         endsWith,
-                         codePointBefore,
-                         takeLeft,
-                         takeRight,
-                         dropLeft,
-                         dropRight,
-                         matches,
-                         regexMatch,
-                         compareTo,
-                         compareToIgnoreCase,
-                         compare,
-                         compareIgnoreCase,
-                         equals,
-                         indexOf,
-                         split,
-                         splitRegex,
-                         editDistance)
+      super._lib2 ++ Set(
+        equalsIgnoreCase,
+        codePointAt,
+        startsWith,
+        lastIndexOf,
+        concat,
+        endsWith,
+        codePointBefore,
+        takeLeft,
+        takeRight,
+        dropLeft,
+        dropRight,
+        matches,
+        regexMatch,
+        compareTo,
+        compareToIgnoreCase,
+        compare,
+        compareIgnoreCase,
+        equals,
+        indexOf,
+        split,
+        splitRegex,
+        editDistance)
 
     private def isValidInt(num: BigDecimal): Boolean = {
       try {
@@ -178,9 +180,10 @@ trait StringLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
       import trans._
 
       //@deprecated, see the DEPRECATED comment in StringLib
-      val tpe = BinaryOperationType(StrAndDateT,
-                                    StrAndDateT,
-                                    JArrayHomogeneousT(JTextT))
+      val tpe = BinaryOperationType(
+        StrAndDateT,
+        StrAndDateT,
+        JArrayHomogeneousT(JTextT))
 
       lazy val prepare = UnifyStrDate
 
@@ -233,10 +236,11 @@ trait StringLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
         case (c1: StrColumn, c2: DateColumn) =>
           new StrFrom.SS(c1, dateToStrCol(c2), neitherNull, _ concat _)
         case (c1: DateColumn, c2: DateColumn) =>
-          new StrFrom.SS(dateToStrCol(c1),
-                         dateToStrCol(c2),
-                         neitherNull,
-                         _ concat _)
+          new StrFrom.SS(
+            dateToStrCol(c1),
+            dateToStrCol(c2),
+            neitherNull,
+            _ concat _)
       }
     }
 
@@ -248,46 +252,52 @@ trait StringLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
       val tpe = BinaryOperationType(StrAndDateT, JNumberT, JNumberT)
       def f2(ctx: MorphContext): F2 = CF2P("builtin::str::op2sll::" + name) {
         case (c1: StrColumn, c2: DoubleColumn) =>
-          new LongFrom.SD(c1,
-                          c2,
-                          (s, n) => (n % 1 == 0) && defined(s, n.toLong),
-                          (s, n) => f(s, n.toLong))
+          new LongFrom.SD(
+            c1,
+            c2,
+            (s, n) => (n % 1 == 0) && defined(s, n.toLong),
+            (s, n) => f(s, n.toLong))
 
         case (c1: StrColumn, c2: LongColumn) =>
           new LongFrom.SL(c1, c2, defined, f)
 
         case (c1: StrColumn, c2: NumColumn) =>
-          new LongFrom.SN(c1,
-                          c2,
-                          (s, n) => (n % 1 == 0) && defined(s, n.toLong),
-                          (s, n) => f(s, n.toLong))
+          new LongFrom.SN(
+            c1,
+            c2,
+            (s, n) => (n % 1 == 0) && defined(s, n.toLong),
+            (s, n) => f(s, n.toLong))
 
         case (c1: DateColumn, c2: DoubleColumn) =>
-          new LongFrom.SD(dateToStrCol(c1),
-                          c2,
-                          (s, n) => (n % 1 == 0) && defined(s, n.toLong),
-                          (s, n) => f(s, n.toLong))
+          new LongFrom.SD(
+            dateToStrCol(c1),
+            c2,
+            (s, n) => (n % 1 == 0) && defined(s, n.toLong),
+            (s, n) => f(s, n.toLong))
 
         case (c1: DateColumn, c2: LongColumn) =>
           new LongFrom.SL(dateToStrCol(c1), c2, defined, f)
 
         case (c1: DateColumn, c2: NumColumn) =>
-          new LongFrom.SN(dateToStrCol(c1),
-                          c2,
-                          (s, n) => (n % 1 == 0) && defined(s, n.toLong),
-                          (s, n) => f(s, n.toLong))
+          new LongFrom.SN(
+            dateToStrCol(c1),
+            c2,
+            (s, n) => (n % 1 == 0) && defined(s, n.toLong),
+            (s, n) => f(s, n.toLong))
       }
     }
 
     object codePointAt
-        extends Op2SLL("codePointAt",
-                       (s, n) => n >= 0 && s.length > n,
-                       (s, n) => s.codePointAt(n.toInt))
+        extends Op2SLL(
+          "codePointAt",
+          (s, n) => n >= 0 && s.length > n,
+          (s, n) => s.codePointAt(n.toInt))
 
     object codePointBefore
-        extends Op2SLL("codePointBefore",
-                       (s, n) => n >= 0 && s.length > n,
-                       (s, n) => s.codePointBefore(n.toInt))
+        extends Op2SLL(
+          "codePointBefore",
+          (s, n) => n >= 0 && s.length > n,
+          (s, n) => s.codePointBefore(n.toInt))
 
     class Substring(name: String)(f: (String, Int) => String)
         extends Op2F2(StringNamespace, name) {
@@ -315,17 +325,19 @@ trait StringLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
               f(s, n.toInt)
             })
           case (c1: DateColumn, c2: DoubleColumn) =>
-            new StrFrom.SD(dateToStrCol(c1),
-                           c2,
-                           (s, n) => n >= 0 && (n % 1 == 0), { (s, n) =>
-                             f(s, n.toInt)
-                           })
+            new StrFrom.SD(
+              dateToStrCol(c1),
+              c2,
+              (s, n) => n >= 0 && (n % 1 == 0), { (s, n) =>
+                f(s, n.toInt)
+              })
           case (c1: DateColumn, c2: NumColumn) =>
-            new StrFrom.SN(dateToStrCol(c1),
-                           c2,
-                           (s, n) => n >= 0 && (n % 1 == 0), { (s, n) =>
-                             f(s, n.toInt)
-                           })
+            new StrFrom.SN(
+              dateToStrCol(c1),
+              c2,
+              (s, n) => n >= 0 && (n % 1 == 0), { (s, n) =>
+                f(s, n.toInt)
+              })
         }
     }
 
@@ -424,9 +436,10 @@ trait StringLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
 
     object split extends Op2(StringNamespace, "split") with Op2Array {
       //@deprecated, see the DEPRECATED comment in StringLib
-      val tpe = BinaryOperationType(StrAndDateT,
-                                    StrAndDateT,
-                                    JArrayHomogeneousT(JTextT))
+      val tpe = BinaryOperationType(
+        StrAndDateT,
+        StrAndDateT,
+        JArrayHomogeneousT(JTextT))
 
       lazy val prepare = UnifyStrDate
 
@@ -455,9 +468,10 @@ trait StringLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
         extends Op2(StringNamespace, "splitRegex")
         with Op2Array {
       //@deprecated, see the DEPRECATED comment in StringLib
-      val tpe = BinaryOperationType(StrAndDateT,
-                                    StrAndDateT,
-                                    JArrayHomogeneousT(JTextT))
+      val tpe = BinaryOperationType(
+        StrAndDateT,
+        StrAndDateT,
+        JArrayHomogeneousT(JTextT))
 
       lazy val prepare = UnifyStrDate
 

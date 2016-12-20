@@ -44,11 +44,12 @@ class StorageLevel private (private var _useDisk: Boolean,
 
   // TODO: Also add fields for caching priority, dataset ID, and flushing.
   private def this(flags: Int, replication: Int) {
-    this((flags & 8) != 0,
-         (flags & 4) != 0,
-         (flags & 2) != 0,
-         (flags & 1) != 0,
-         replication)
+    this(
+      (flags & 8) != 0,
+      (flags & 4) != 0,
+      (flags & 2) != 0,
+      (flags & 1) != 0,
+      replication)
   }
 
   def this() = this(false, true, false, false) // For deserialization
@@ -65,12 +66,15 @@ class StorageLevel private (private var _useDisk: Boolean,
 
   if (useOffHeap) {
     require(!useDisk, "Off-heap storage level does not support using disk")
-    require(!useMemory,
-            "Off-heap storage level does not support using heap memory")
-    require(!deserialized,
-            "Off-heap storage level does not support deserialized storage")
-    require(replication == 1,
-            "Off-heap storage level does not support multiple replication")
+    require(
+      !useMemory,
+      "Off-heap storage level does not support using heap memory")
+    require(
+      !deserialized,
+      "Off-heap storage level does not support deserialized storage")
+    require(
+      replication == 1,
+      "Off-heap storage level does not support multiple replication")
   }
 
   override def clone(): StorageLevel = {
@@ -193,11 +197,12 @@ object StorageLevel {
             deserialized: Boolean,
             replication: Int): StorageLevel = {
     getCachedStorageLevel(
-      new StorageLevel(useDisk,
-                       useMemory,
-                       useOffHeap,
-                       deserialized,
-                       replication))
+      new StorageLevel(
+        useDisk,
+        useMemory,
+        useOffHeap,
+        deserialized,
+        replication))
   }
 
   /**

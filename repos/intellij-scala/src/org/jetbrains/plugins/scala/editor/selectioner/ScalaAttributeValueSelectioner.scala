@@ -26,8 +26,9 @@ class ScalaAttributeValueSelectioner extends ExtendWordSelectionHandlerBase {
 
     if (start != end) {
       result.add(
-        new TextRange(start.getTextRange.getStartOffset,
-                      end.getTextRange.getEndOffset))
+        new TextRange(
+          start.getTextRange.getStartOffset,
+          end.getTextRange.getEndOffset))
     }
 
     result

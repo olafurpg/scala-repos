@@ -24,10 +24,11 @@ class DefaultDBApi(configuration: Map[String, Config],
     configuration
       .map {
         case (name, config) =>
-          val pool = ConnectionPool.fromConfig(config.getString("pool"),
-                                               injector,
-                                               environment,
-                                               defaultConnectionPool)
+          val pool = ConnectionPool.fromConfig(
+            config.getString("pool"),
+            injector,
+            environment,
+            defaultConnectionPool)
           new PooledDatabase(name, config, environment, pool)
       }
       .toSeq

@@ -69,14 +69,16 @@ trait JavaCompletion extends Helpers with SLF4JLogging {
          val patched =
            s.substring(0, indexAfterTarget) + " " +
              s.substring(indexAfterTarget + defaultPrefix.length + 1);
-         (pathToPoint(SourceFileInfo(info.file, Some(patched), None),
-                      indexAfterTarget - 1) map {
+         (pathToPoint(
+           SourceFileInfo(info.file, Some(patched), None),
+           indexAfterTarget - 1) map {
            case (info: CompilationInfo, path: TreePath) => {
-             memberCandidates(info,
-                              path.getLeaf,
-                              defaultPrefix,
-                              true,
-                              caseSens)
+             memberCandidates(
+               info,
+               path.getLeaf,
+               defaultPrefix,
+               true,
+               caseSens)
            }
          })
        } else if (ImportRegexp.findFirstMatchIn(preceding).isDefined) {
@@ -93,15 +95,17 @@ trait JavaCompletion extends Helpers with SLF4JLogging {
          val patched =
            s.substring(0, indexAfterTarget) + ".wait()" +
              s.substring(indexAfterTarget + defaultPrefix.length + 1);
-         (pathToPoint(SourceFileInfo(info.file, Some(patched), None),
-                      indexAfterTarget + 1) flatMap {
+         (pathToPoint(
+           SourceFileInfo(info.file, Some(patched), None),
+           indexAfterTarget + 1) flatMap {
            case (info: CompilationInfo, path: TreePath) => {
              getEnclosingMemberSelectTree(path).map { m =>
-               memberCandidates(info,
-                                m.getExpression(),
-                                defaultPrefix,
-                                false,
-                                caseSens)
+               memberCandidates(
+                 info,
+                 m.getExpression(),
+                 defaultPrefix,
+                 false,
+                 caseSens)
              }
            }
          })
@@ -116,11 +120,12 @@ trait JavaCompletion extends Helpers with SLF4JLogging {
 
          (scopeForPoint(info, indexAfterTarget) map {
            case (info: CompilationInfo, s: Scope) => {
-             scopeMemberCandidates(info,
-                                   s,
-                                   defaultPrefix,
-                                   caseSens,
-                                   constructing)
+             scopeMemberCandidates(
+               info,
+               s,
+               defaultPrefix,
+               caseSens,
+               constructing)
            }
          }) map { scopeCandidates =>
            val typeSearchResult =
@@ -220,13 +225,14 @@ trait JavaCompletion extends Helpers with SLF4JLogging {
     //
     def addTypeMembers(tel: TypeElement, relevance: Int): Unit = {
       for (el <- info.getElements().getAllMembers(tel)) {
-        for (info <- filterElement(info,
-                                   el,
-                                   prefix,
-                                   caseSense,
-                                   false,
-                                   constructing,
-                                   relevance)) {
+        for (info <- filterElement(
+               info,
+               el,
+               prefix,
+               caseSense,
+               false,
+               constructing,
+               relevance)) {
           candidates += info
         }
       }
@@ -250,13 +256,14 @@ trait JavaCompletion extends Helpers with SLF4JLogging {
     var s = scope
     while (s != null) {
       for (el <- s.getLocalElements()) {
-        for (info <- filterElement(info,
-                                   el,
-                                   prefix,
-                                   caseSense,
-                                   false,
-                                   constructing,
-                                   relavence)) {
+        for (info <- filterElement(
+               info,
+               el,
+               prefix,
+               caseSense,
+               false,
+               constructing,
+               relavence)) {
           candidates += info
         }
       }

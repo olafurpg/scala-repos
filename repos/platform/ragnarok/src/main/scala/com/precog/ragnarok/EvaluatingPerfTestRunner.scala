@@ -81,18 +81,20 @@ trait EvaluatingPerfTestRunner[M[+ _], T]
   def Evaluator[N[+ _]](N0: Monad[N])(implicit mn: M ~> N,
                                       nm: N ~> M): EvaluatorLike[N]
 
-  val dummyAccount = AccountDetails("dummyAccount",
-                                    "nobody@precog.com",
-                                    new DateTime,
-                                    yggConfig.apiKey,
-                                    Path.Root,
-                                    AccountPlan.Free)
+  val dummyAccount = AccountDetails(
+    "dummyAccount",
+    "nobody@precog.com",
+    new DateTime,
+    yggConfig.apiKey,
+    Path.Root,
+    AccountPlan.Free)
   def dummyEvaluationContext =
-    EvaluationContext(yggConfig.apiKey,
-                      dummyAccount,
-                      Path.Root,
-                      Path.Root,
-                      new DateTime)
+    EvaluationContext(
+      yggConfig.apiKey,
+      dummyAccount,
+      Path.Root,
+      Path.Root,
+      new DateTime)
 
   def eval(query: String): M[Result] =
     try {

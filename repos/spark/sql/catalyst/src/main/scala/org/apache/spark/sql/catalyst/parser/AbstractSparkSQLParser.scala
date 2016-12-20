@@ -70,8 +70,9 @@ private[sql] abstract class AbstractSparkSQLParser
   // Returns the rest of the input string that are not parsed yet
   protected lazy val restInput: Parser[String] = new Parser[String] {
     def apply(in: Input): ParseResult[String] =
-      Success(in.source.subSequence(in.offset, in.source.length()).toString,
-              in.drop(in.source.length()))
+      Success(
+        in.source.subSequence(in.offset, in.source.length()).toString,
+        in.drop(in.source.length()))
   }
 }
 

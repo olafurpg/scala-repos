@@ -15,8 +15,9 @@ class ContextsIteratorTest extends IteratorTestCase {
   }
 
   def testTwoParents() = {
-    assertIterates("1.1, 0",
-                   parse("0 (1.1 (2.1))").getFirstChild.getFirstChild)
+    assertIterates(
+      "1.1, 0",
+      parse("0 (1.1 (2.1))").getFirstChild.getFirstChild)
   }
 
   def testThreeParents() = {
@@ -26,8 +27,9 @@ class ContextsIteratorTest extends IteratorTestCase {
   }
 
   def testSiblings() = {
-    assertIterates("0",
-                   parse("0 (1.1, 1.2, 1.3)").getFirstChild.getNextSibling)
+    assertIterates(
+      "0",
+      parse("0 (1.1, 1.2, 1.3)").getFirstChild.getNextSibling)
   }
 
   def testChildren() = {

@@ -142,9 +142,10 @@ abstract class DStream[T: ClassTag](
   private def makeScope(time: Time): Option[RDDOperationScope] = {
     baseScope.map { bsJson =>
       val formattedBatchTime =
-        UIUtils.formatBatchTime(time.milliseconds,
-                                ssc.graph.batchDuration.milliseconds,
-                                showYYYYMMSS = false)
+        UIUtils.formatBatchTime(
+          time.milliseconds,
+          ssc.graph.batchDuration.milliseconds,
+          showYYYYMMSS = false)
       val bs = RDDOperationScope.fromJson(bsJson)
       val baseName = bs.name // e.g. countByWindow, "kafka stream [0]"
       val scopeName =
@@ -617,9 +618,10 @@ abstract class DStream[T: ClassTag](
       mapPartFunc: Iterator[T] => Iterator[U],
       preservePartitioning: Boolean = false
   ): DStream[U] = ssc.withScope {
-    new MapPartitionedDStream(this,
-                              context.sparkContext.clean(mapPartFunc),
-                              preservePartitioning)
+    new MapPartitionedDStream(
+      this,
+      context.sparkContext.clean(mapPartFunc),
+      preservePartitioning)
   }
 
   /**
@@ -686,9 +688,10 @@ abstract class DStream[T: ClassTag](
     */
   private def foreachRDD(foreachFunc: (RDD[T], Time) => Unit,
                          displayInnerRDDOps: Boolean): Unit = {
-    new ForEachDStream(this,
-                       context.sparkContext.clean(foreachFunc, false),
-                       displayInnerRDDOps).register()
+    new ForEachDStream(
+      this,
+      context.sparkContext.clean(foreachFunc, false),
+      displayInnerRDDOps).register()
   }
 
   /**
@@ -733,9 +736,9 @@ abstract class DStream[T: ClassTag](
     // DStreams can't be serialized with closures, we can't proactively check
     // it for serializability and so we pass the optional false to SparkContext.clean
     val cleanedF = ssc.sparkContext.clean(transformFunc, false)
-    transformWith(other,
-                  (rdd1: RDD[T], rdd2: RDD[U],
-                   time: Time) => cleanedF(rdd1, rdd2))
+    transformWith(
+      other,
+      (rdd1: RDD[T], rdd2: RDD[U], time: Time) => cleanedF(rdd1, rdd2))
   }
 
   /**
@@ -785,8 +788,9 @@ abstract class DStream[T: ClassTag](
         // scalastyle:on println
       }
     }
-    foreachRDD(context.sparkContext.clean(foreachFunc),
-               displayInnerRDDOps = false)
+    foreachRDD(
+      context.sparkContext.clean(foreachFunc),
+      displayInnerRDDOps = false)
   }
 
   /**
@@ -857,11 +861,12 @@ abstract class DStream[T: ClassTag](
   ): DStream[T] = ssc.withScope {
     this
       .map(x => (1, x))
-      .reduceByKeyAndWindow(reduceFunc,
-                            invReduceFunc,
-                            windowDuration,
-                            slideDuration,
-                            1)
+      .reduceByKeyAndWindow(
+        reduceFunc,
+        invReduceFunc,
+        windowDuration,
+        slideDuration,
+        1)
       .map(_._2)
   }
 

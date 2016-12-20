@@ -48,10 +48,11 @@ final class Paginator[A] private[paginator] (val currentPage: Int,
   def hasNextPage: Boolean = nextPage.isDefined
 
   def withCurrentPageResults[B](newResults: Seq[B]): Paginator[B] =
-    new Paginator(currentPage = currentPage,
-                  maxPerPage = maxPerPage,
-                  currentPageResults = newResults,
-                  nbResults = nbResults)
+    new Paginator(
+      currentPage = currentPage,
+      maxPerPage = maxPerPage,
+      currentPageResults = newResults,
+      nbResults = nbResults)
 
   def mapResults[B](f: A => B): Paginator[B] =
     withCurrentPageResults(currentPageResults map f)

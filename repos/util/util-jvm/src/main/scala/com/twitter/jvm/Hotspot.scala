@@ -46,10 +46,11 @@ class Hotspot extends Jvm {
     try Some {
       val o = ManagementFactory
         .getPlatformMBeanServer()
-        .invoke(DiagnosticBean,
-                "getVMOption",
-                Array(name),
-                Array("java.lang.String"))
+        .invoke(
+          DiagnosticBean,
+          "getVMOption",
+          Array(name),
+          Array("java.lang.String"))
       o.asInstanceOf[CompositeDataSupport].get("value").asInstanceOf[String]
     } catch {
       case _: IllegalArgumentException =>
@@ -124,9 +125,10 @@ class Hotspot extends Jvm {
     } yield epoch + ticksToDuration(ticks, freq)
 
     // TODO: include causes for GCs?
-    Snapshot(timestamp.getOrElse(Time.epoch),
-             heap.getOrElse(Heap(0, 0, Seq())),
-             getGc(0, cs).toSeq ++ getGc(1, cs).toSeq)
+    Snapshot(
+      timestamp.getOrElse(Time.epoch),
+      heap.getOrElse(Heap(0, 0, Seq())),
+      getGc(0, cs).toSeq ++ getGc(1, cs).toSeq)
   }
 
   private[this] object NilSafepointBean {
@@ -174,9 +176,10 @@ class Hotspot extends Jvm {
     val syncTime = safepointBean.getSafepointSyncTime
     val totalTime = safepointBean.getTotalSafepointTime
     val safepointsReached = safepointBean.getSafepointCount
-    Safepoint(syncTimeMillis = syncTime,
-              totalTimeMillis = totalTime,
-              count = safepointsReached)
+    Safepoint(
+      syncTimeMillis = syncTime,
+      totalTimeMillis = totalTime,
+      count = safepointsReached)
   }
 
   val edenPool: Pool = new Pool {

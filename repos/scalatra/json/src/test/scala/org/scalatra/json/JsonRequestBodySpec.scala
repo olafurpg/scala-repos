@@ -31,10 +31,12 @@ trait JsonRequestSpec extends MutableScalatraSpec {
 
     "parse the json body of a request" in {
       val rbody = """{"name": "hello world"}"""
-      post("/json",
-           headers = Map("Accept" -> "application/json",
-                         "Content-Type" -> "application/json"),
-           body = rbody) {
+      post(
+        "/json",
+        headers = Map(
+          "Accept" -> "application/json",
+          "Content-Type" -> "application/json"),
+        body = rbody) {
         status must_== 200
         body must_== "hello world"
       }
@@ -42,10 +44,12 @@ trait JsonRequestSpec extends MutableScalatraSpec {
 
     "parse the xml body of a request" in {
       val rbody = """<req><name>hello world</name></req>"""
-      post("/json",
-           headers = Map("Accept" -> "application/xml",
-                         "Content-Type" -> "application/xml"),
-           body = rbody) {
+      post(
+        "/json",
+        headers = Map(
+          "Accept" -> "application/xml",
+          "Content-Type" -> "application/xml"),
+        body = rbody) {
         status must_== 200
         body must_== "hello world"
       }
@@ -58,10 +62,12 @@ trait JsonRequestSpec extends MutableScalatraSpec {
 <!ENTITY pass SYSTEM "/etc/passwd">
 ]>
 <req><name>&pass;</name></req>"""
-      post("/json",
-           headers = Map("Accept" -> "application/xml",
-                         "Content-Type" -> "application/xml"),
-           body = rbody) {
+      post(
+        "/json",
+        headers = Map(
+          "Accept" -> "application/xml",
+          "Content-Type" -> "application/xml"),
+        body = rbody) {
         status must_== 200
         body must_== ""
       }
@@ -69,10 +75,12 @@ trait JsonRequestSpec extends MutableScalatraSpec {
 
     "parse number as double" in {
       val rbody = """{"number":3.14159265358979323846}"""
-      post("/decimal",
-           headers = Map("Accept" -> "application/json",
-                         "Content-Type" -> "application/json"),
-           body = rbody) {
+      post(
+        "/decimal",
+        headers = Map(
+          "Accept" -> "application/json",
+          "Content-Type" -> "application/json"),
+        body = rbody) {
         status must_== 200
         body must_== "3.141592653589793"
       }
@@ -85,10 +93,12 @@ trait BigDecimalJsonRequestSpec extends MutableScalatraSpec {
 
     "parse number as bigdecimal" in {
       val rbody = """{"number":3.14159265358979323846}"""
-      post("/decimal",
-           headers = Map("Accept" -> "application/json",
-                         "Content-Type" -> "application/json"),
-           body = rbody) {
+      post(
+        "/decimal",
+        headers = Map(
+          "Accept" -> "application/json",
+          "Content-Type" -> "application/json"),
+        body = rbody) {
         status must_== 200
         body must_== "3.14159265358979323846"
       }

@@ -26,23 +26,26 @@ class FetchRequestAndResponseMetrics(metricId: ClientIdBroker)
     extends KafkaMetricsGroup {
   val tags = metricId match {
     case ClientIdAndBroker(clientId, brokerHost, brokerPort) =>
-      Map("clientId" -> clientId,
-          "brokerHost" -> brokerHost,
-          "brokerPort" -> brokerPort.toString)
+      Map(
+        "clientId" -> clientId,
+        "brokerHost" -> brokerHost,
+        "brokerPort" -> brokerPort.toString)
     case ClientIdAllBrokers(clientId) =>
       Map("clientId" -> clientId)
   }
 
   val requestTimer = new KafkaTimer(
-    newTimer("FetchRequestRateAndTimeMs",
-             TimeUnit.MILLISECONDS,
-             TimeUnit.SECONDS,
-             tags))
+    newTimer(
+      "FetchRequestRateAndTimeMs",
+      TimeUnit.MILLISECONDS,
+      TimeUnit.SECONDS,
+      tags))
   val requestSizeHist = newHistogram("FetchResponseSize", biased = true, tags)
-  val throttleTimeStats = newTimer("FetchRequestThrottleRateAndTimeMs",
-                                   TimeUnit.MILLISECONDS,
-                                   TimeUnit.SECONDS,
-                                   tags)
+  val throttleTimeStats = newTimer(
+    "FetchRequestThrottleRateAndTimeMs",
+    TimeUnit.MILLISECONDS,
+    TimeUnit.SECONDS,
+    tags)
 }
 
 /**

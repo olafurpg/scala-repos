@@ -61,6 +61,7 @@ sealed trait TestInstances {
   // To be replaced by https://github.com/rickynils/scalacheck/pull/170
   implicit def arbitraryTry[A: Arbitrary]: Arbitrary[Try[A]] =
     Arbitrary(
-      Gen.oneOf(arbitrary[A].map(Success(_)),
-                arbitrary[Throwable].map(Failure(_))))
+      Gen.oneOf(
+        arbitrary[A].map(Success(_)),
+        arbitrary[Throwable].map(Failure(_))))
 }

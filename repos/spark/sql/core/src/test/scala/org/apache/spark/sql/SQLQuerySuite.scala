@@ -44,8 +44,9 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     Seq(("one", 1), ("two", 2), ("three", 3), ("one", 5))
       .toDF("k", "v")
       .registerTempTable("hav")
-    checkAnswer(sql("SELECT k, sum(v) FROM hav GROUP BY k HAVING sum(v) > 2"),
-                Row("one", 6) :: Row("three", 3) :: Nil)
+    checkAnswer(
+      sql("SELECT k, sum(v) FROM hav GROUP BY k HAVING sum(v) > 2"),
+      Row("one", 6) :: Row("three", 3) :: Nil)
   }
 
   test("SPARK-8010: promote numeric to string") {
@@ -93,9 +94,10 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
 
     checkExistence(sql("describe functioN Upper"), false, "Extended Usage")
 
-    checkExistence(sql("describe functioN abcadf"),
-                   true,
-                   "Function: abcadf not found.")
+    checkExistence(
+      sql("describe functioN abcadf"),
+      true,
+      "Function: abcadf not found.")
   }
 
   test("SPARK-6743: no columns from cache") {
@@ -117,12 +119,13 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
       .toDF("int", "str")
       .registerTempTable("df")
 
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
           |SELECT x.str, COUNT(*)
           |FROM df x JOIN df y ON x.str = y.str
           |GROUP BY x.str
         """.stripMargin),
-                Row("1", 1) :: Row("2", 1) :: Row("3", 1) :: Nil)
+      Row("1", 1) :: Row("2", 1) :: Row("3", 1) :: Nil)
   }
 
   test("support table.star") {
@@ -144,25 +147,28 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
       .agg($"str", count("str").as("strCount"))
       .registerTempTable("df")
 
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
           |SELECT x.str, SUM(x.strCount)
           |FROM df x JOIN df y ON x.str = y.str
           |GROUP BY x.str
         """.stripMargin),
-                Row("1", 1) :: Row("2", 1) :: Row("3", 1) :: Nil)
+      Row("1", 1) :: Row("2", 1) :: Row("3", 1) :: Nil)
   }
 
   test("SPARK-8668 expr function") {
-    checkAnswer(Seq((1, "Bobby G."))
-                  .toDF("id", "name")
-                  .select(expr("length(name)"), expr("abs(id)")),
-                Row(8, 1))
+    checkAnswer(
+      Seq((1, "Bobby G."))
+        .toDF("id", "name")
+        .select(expr("length(name)"), expr("abs(id)")),
+      Row(8, 1))
 
-    checkAnswer(Seq((1, "building burrito tunnels"), (1, "major projects"))
-                  .toDF("id", "saying")
-                  .groupBy(expr("length(saying)"))
-                  .count(),
-                Row(24, 1) :: Row(14, 1) :: Nil)
+    checkAnswer(
+      Seq((1, "building burrito tunnels"), (1, "major projects"))
+        .toDF("id", "saying")
+        .groupBy(expr("length(saying)"))
+        .count(),
+      Row(24, 1) :: Row(14, 1) :: Nil)
   }
 
   test("SPARK-4625 support SORT BY in SimpleSQLParser & DSL") {
@@ -204,7 +210,8 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
         """{"nested": {"attribute": 1}, "value": 2}""" :: Nil))
       .registerTempTable("rows")
 
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
           |select attribute, sum(cnt)
           |from (
           |  select nested.attribute, count(*) as cnt
@@ -212,7 +219,7 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
           |  group by nested.attribute) a
           |group by attribute
         """.stripMargin),
-                Row(1, 1) :: Nil)
+      Row(1, 1) :: Nil)
   }
 
   test("SPARK-6201 IN type conversion") {
@@ -221,8 +228,9 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
         Seq("{\"a\": \"1\"}}", "{\"a\": \"2\"}}", "{\"a\": \"3\"}}")))
       .registerTempTable("d")
 
-    checkAnswer(sql("select * from d where d.a in (1,2)"),
-                Seq(Row("1"), Row("2")))
+    checkAnswer(
+      sql("select * from d where d.a in (1,2)"),
+      Seq(Row("1"), Row("2")))
   }
 
   test("SPARK-11226 Skip empty line in json file") {
@@ -269,37 +277,46 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
 
     try {
       // Just to group rows.
-      testCodeGen("SELECT key FROM testData3x GROUP BY key",
-                  (1 to 100).map(Row(_)))
+      testCodeGen(
+        "SELECT key FROM testData3x GROUP BY key",
+        (1 to 100).map(Row(_)))
       // COUNT
-      testCodeGen("SELECT key, count(value) FROM testData3x GROUP BY key",
-                  (1 to 100).map(i => Row(i, 3)))
+      testCodeGen(
+        "SELECT key, count(value) FROM testData3x GROUP BY key",
+        (1 to 100).map(i => Row(i, 3)))
       testCodeGen("SELECT count(key) FROM testData3x", Row(300) :: Nil)
       // COUNT DISTINCT ON int
       testCodeGen(
         "SELECT value, count(distinct key) FROM testData3x GROUP BY value",
         (1 to 100).map(i => Row(i.toString, 1)))
-      testCodeGen("SELECT count(distinct key) FROM testData3x",
-                  Row(100) :: Nil)
+      testCodeGen(
+        "SELECT count(distinct key) FROM testData3x",
+        Row(100) :: Nil)
       // SUM
-      testCodeGen("SELECT value, sum(key) FROM testData3x GROUP BY value",
-                  (1 to 100).map(i => Row(i.toString, 3 * i)))
-      testCodeGen("SELECT sum(key), SUM(CAST(key as Double)) FROM testData3x",
-                  Row(5050 * 3, 5050 * 3.0) :: Nil)
+      testCodeGen(
+        "SELECT value, sum(key) FROM testData3x GROUP BY value",
+        (1 to 100).map(i => Row(i.toString, 3 * i)))
+      testCodeGen(
+        "SELECT sum(key), SUM(CAST(key as Double)) FROM testData3x",
+        Row(5050 * 3, 5050 * 3.0) :: Nil)
       // AVERAGE
-      testCodeGen("SELECT value, avg(key) FROM testData3x GROUP BY value",
-                  (1 to 100).map(i => Row(i.toString, i)))
+      testCodeGen(
+        "SELECT value, avg(key) FROM testData3x GROUP BY value",
+        (1 to 100).map(i => Row(i.toString, i)))
       testCodeGen("SELECT avg(key) FROM testData3x", Row(50.5) :: Nil)
       // MAX
-      testCodeGen("SELECT value, max(key) FROM testData3x GROUP BY value",
-                  (1 to 100).map(i => Row(i.toString, i)))
+      testCodeGen(
+        "SELECT value, max(key) FROM testData3x GROUP BY value",
+        (1 to 100).map(i => Row(i.toString, i)))
       testCodeGen("SELECT max(key) FROM testData3x", Row(100) :: Nil)
       // MIN
-      testCodeGen("SELECT value, min(key) FROM testData3x GROUP BY value",
-                  (1 to 100).map(i => Row(i.toString, i)))
+      testCodeGen(
+        "SELECT value, min(key) FROM testData3x GROUP BY value",
+        (1 to 100).map(i => Row(i.toString, i)))
       testCodeGen("SELECT min(key) FROM testData3x", Row(1) :: Nil)
       // Some combinations.
-      testCodeGen("""
+      testCodeGen(
+        """
           |SELECT
           |  value,
           |  sum(key),
@@ -311,13 +328,14 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
           |FROM testData3x
           |GROUP BY value
         """.stripMargin,
-                  (1 to 100).map(i => Row(i.toString, i * 3, i, i, i, 3, 1)))
+        (1 to 100).map(i => Row(i.toString, i * 3, i, i, i, 3, 1)))
       testCodeGen(
         "SELECT max(key), min(key), avg(key), count(key), count(distinct key) FROM testData3x",
         Row(100, 1, 50.5, 300, 100) :: Nil)
       // Aggregate with Code generation handling all null values
-      testCodeGen("SELECT  sum('a'), avg('a'), count(null) FROM testData",
-                  Row(null, null, 0) :: Nil)
+      testCodeGen(
+        "SELECT  sum('a'), avg('a'), count(null) FROM testData",
+        Row(null, null, 0) :: Nil)
     } finally {
       sqlContext.dropTempTable("testData3x")
     }
@@ -352,13 +370,16 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
   }
 
   test("SPARK-2407 Added Parser of SQL SUBSTR()") {
-    checkAnswer(sql("SELECT substr(tableName, 1, 2) FROM tableName"),
-                Row("te"))
+    checkAnswer(
+      sql("SELECT substr(tableName, 1, 2) FROM tableName"),
+      Row("te"))
     checkAnswer(sql("SELECT substr(tableName, 3) FROM tableName"), Row("st"))
-    checkAnswer(sql("SELECT substring(tableName, 1, 2) FROM tableName"),
-                Row("te"))
-    checkAnswer(sql("SELECT substring(tableName, 3) FROM tableName"),
-                Row("st"))
+    checkAnswer(
+      sql("SELECT substring(tableName, 1, 2) FROM tableName"),
+      Row("te"))
+    checkAnswer(
+      sql("SELECT substring(tableName, 3) FROM tableName"),
+      Row("st"))
   }
 
   test("SPARK-3173 Timestamp support in the parser") {
@@ -394,8 +415,9 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
         |SELECT time FROM timestamps
         |WHERE time IN ('1969-12-31 16:00:00.001','1969-12-31 16:00:00.002')
       """.stripMargin),
-      Seq(Row(java.sql.Timestamp.valueOf("1969-12-31 16:00:00.001")),
-          Row(java.sql.Timestamp.valueOf("1969-12-31 16:00:00.002"))))
+      Seq(
+        Row(java.sql.Timestamp.valueOf("1969-12-31 16:00:00.001")),
+        Row(java.sql.Timestamp.valueOf("1969-12-31 16:00:00.002"))))
 
     checkAnswer(sql("SELECT time FROM timestamps WHERE time='123'"), Nil)
   }
@@ -438,30 +460,37 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
       arrayData
         .map(
           d =>
-            Row(d.nestedData,
-                d.nestedData(0)(0),
-                d.nestedData(0)(0) + d.nestedData(0)(1)))
+            Row(
+              d.nestedData,
+              d.nestedData(0)(0),
+              d.nestedData(0)(0) + d.nestedData(0)(1)))
         .collect()
         .toSeq)
   }
 
   test("agg") {
-    checkAnswer(sql("SELECT a, SUM(b) FROM testData2 GROUP BY a"),
-                Seq(Row(1, 3), Row(2, 3), Row(3, 3)))
+    checkAnswer(
+      sql("SELECT a, SUM(b) FROM testData2 GROUP BY a"),
+      Seq(Row(1, 3), Row(2, 3), Row(3, 3)))
   }
 
   test("literal in agg grouping expressions") {
-    checkAnswer(sql("SELECT a, count(1) FROM testData2 GROUP BY a, 1"),
-                Seq(Row(1, 2), Row(2, 2), Row(3, 2)))
-    checkAnswer(sql("SELECT a, count(2) FROM testData2 GROUP BY a, 2"),
-                Seq(Row(1, 2), Row(2, 2), Row(3, 2)))
+    checkAnswer(
+      sql("SELECT a, count(1) FROM testData2 GROUP BY a, 1"),
+      Seq(Row(1, 2), Row(2, 2), Row(3, 2)))
+    checkAnswer(
+      sql("SELECT a, count(2) FROM testData2 GROUP BY a, 2"),
+      Seq(Row(1, 2), Row(2, 2), Row(3, 2)))
 
-    checkAnswer(sql("SELECT a, 1, sum(b) FROM testData2 GROUP BY a, 1"),
-                sql("SELECT a, 1, sum(b) FROM testData2 GROUP BY a"))
-    checkAnswer(sql("SELECT a, 1, sum(b) FROM testData2 GROUP BY a, 1 + 2"),
-                sql("SELECT a, 1, sum(b) FROM testData2 GROUP BY a"))
-    checkAnswer(sql("SELECT 1, 2, sum(b) FROM testData2 GROUP BY 1, 2"),
-                sql("SELECT 1, 2, sum(b) FROM testData2"))
+    checkAnswer(
+      sql("SELECT a, 1, sum(b) FROM testData2 GROUP BY a, 1"),
+      sql("SELECT a, 1, sum(b) FROM testData2 GROUP BY a"))
+    checkAnswer(
+      sql("SELECT a, 1, sum(b) FROM testData2 GROUP BY a, 1 + 2"),
+      sql("SELECT a, 1, sum(b) FROM testData2 GROUP BY a"))
+    checkAnswer(
+      sql("SELECT 1, 2, sum(b) FROM testData2 GROUP BY 1, 2"),
+      sql("SELECT 1, 2, sum(b) FROM testData2"))
   }
 
   test("aggregates with nulls") {
@@ -498,21 +527,25 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
       sql("SELECT * FROM testData2 ORDER BY a DESC, b ASC"),
       Seq(Row(3, 1), Row(3, 2), Row(2, 1), Row(2, 2), Row(1, 1), Row(1, 2)))
 
-    checkAnswer(sql("SELECT b FROM binaryData ORDER BY a ASC"),
-                (1 to 5).map(Row(_)))
+    checkAnswer(
+      sql("SELECT b FROM binaryData ORDER BY a ASC"),
+      (1 to 5).map(Row(_)))
 
-    checkAnswer(sql("SELECT b FROM binaryData ORDER BY a DESC"),
-                (1 to 5).map(Row(_)).toSeq.reverse)
+    checkAnswer(
+      sql("SELECT b FROM binaryData ORDER BY a DESC"),
+      (1 to 5).map(Row(_)).toSeq.reverse)
 
-    checkAnswer(sql("SELECT * FROM arrayData ORDER BY data[0] ASC"),
-                arrayData.collect().sortBy(_.data(0)).map(Row.fromTuple).toSeq)
+    checkAnswer(
+      sql("SELECT * FROM arrayData ORDER BY data[0] ASC"),
+      arrayData.collect().sortBy(_.data(0)).map(Row.fromTuple).toSeq)
 
     checkAnswer(
       sql("SELECT * FROM arrayData ORDER BY data[0] DESC"),
       arrayData.collect().sortBy(_.data(0)).reverse.map(Row.fromTuple).toSeq)
 
-    checkAnswer(sql("SELECT * FROM mapData ORDER BY data[1] ASC"),
-                mapData.collect().sortBy(_.data(1)).map(Row.fromTuple).toSeq)
+    checkAnswer(
+      sql("SELECT * FROM mapData ORDER BY data[1] ASC"),
+      mapData.collect().sortBy(_.data(1)).map(Row.fromTuple).toSeq)
 
     checkAnswer(
       sql("SELECT * FROM mapData ORDER BY data[1] DESC"),
@@ -524,14 +557,17 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
   }
 
   test("limit") {
-    checkAnswer(sql("SELECT * FROM testData LIMIT 10"),
-                testData.take(10).toSeq)
+    checkAnswer(
+      sql("SELECT * FROM testData LIMIT 10"),
+      testData.take(10).toSeq)
 
-    checkAnswer(sql("SELECT * FROM arrayData LIMIT 1"),
-                arrayData.collect().take(1).map(Row.fromTuple).toSeq)
+    checkAnswer(
+      sql("SELECT * FROM arrayData LIMIT 1"),
+      arrayData.collect().take(1).map(Row.fromTuple).toSeq)
 
-    checkAnswer(sql("SELECT * FROM mapData LIMIT 1"),
-                mapData.collect().take(1).map(Row.fromTuple).toSeq)
+    checkAnswer(
+      sql("SELECT * FROM mapData LIMIT 1"),
+      mapData.collect().take(1).map(Row.fromTuple).toSeq)
   }
 
   test("CTE feature") {
@@ -539,11 +575,12 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
       sql("with q1 as (select * from testData limit 10) select * from q1"),
       testData.take(10).toSeq)
 
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
         |with q1 as (select * from testData where key= '5'),
         |q2 as (select * from testData where key = '4')
         |select * from q1 union all select * from q2""".stripMargin),
-                Row(5, "5") :: Row(4, "4") :: Nil)
+      Row(5, "5") :: Row(4, "4") :: Nil)
   }
 
   test("Allow only a single WITH clause per query") {
@@ -560,14 +597,16 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
   }
 
   test("from follow multiple brackets") {
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
         |select key from ((select * from testData)
         |  union all (select * from testData)) x limit 1
       """.stripMargin),
-                Row(1))
+      Row(1))
 
-    checkAnswer(sql("select key from (select * from testData) x limit 1"),
-                Row(1))
+    checkAnswer(
+      sql("select key from (select * from testData) x limit 1"),
+      Row(1))
 
     checkAnswer(
       sql("""
@@ -583,8 +622,9 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
   }
 
   test("average overflow") {
-    checkAnswer(sql("SELECT AVG(a),b FROM largeAndSmallInts group by b"),
-                Seq(Row(2147483645.0, 1), Row(2.0, 2)))
+    checkAnswer(
+      sql("SELECT AVG(a),b FROM largeAndSmallInts group by b"),
+      Seq(Row(2147483645.0, 1), Row(2.0, 2)))
   }
 
   test("count") {
@@ -600,13 +640,15 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
   }
 
   test("approximate count distinct with user provided standard deviation") {
-    checkAnswer(sql("SELECT APPROX_COUNT_DISTINCT(a, 0.04) FROM testData2"),
-                Row(3))
+    checkAnswer(
+      sql("SELECT APPROX_COUNT_DISTINCT(a, 0.04) FROM testData2"),
+      Row(3))
   }
 
   test("null count") {
-    checkAnswer(sql("SELECT a, COUNT(b) FROM testData3 GROUP BY a"),
-                Seq(Row(1, 0), Row(2, 1)))
+    checkAnswer(
+      sql("SELECT a, COUNT(b) FROM testData3 GROUP BY a"),
+      Seq(Row(1, 0), Row(2, 1)))
 
     checkAnswer(
       sql(
@@ -624,44 +666,46 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
   test("inner join where, one match per row") {
     checkAnswer(
       sql("SELECT * FROM upperCaseData JOIN lowerCaseData WHERE n = N"),
-      Seq(Row(1, "A", 1, "a"),
-          Row(2, "B", 2, "b"),
-          Row(3, "C", 3, "c"),
-          Row(4, "D", 4, "d")))
+      Seq(
+        Row(1, "A", 1, "a"),
+        Row(2, "B", 2, "b"),
+        Row(3, "C", 3, "c"),
+        Row(4, "D", 4, "d")))
   }
 
   test("inner join ON, one match per row") {
-    checkAnswer(sql("SELECT * FROM upperCaseData JOIN lowerCaseData ON n = N"),
-                Seq(Row(1, "A", 1, "a"),
-                    Row(2, "B", 2, "b"),
-                    Row(3, "C", 3, "c"),
-                    Row(4, "D", 4, "d")))
+    checkAnswer(
+      sql("SELECT * FROM upperCaseData JOIN lowerCaseData ON n = N"),
+      Seq(
+        Row(1, "A", 1, "a"),
+        Row(2, "B", 2, "b"),
+        Row(3, "C", 3, "c"),
+        Row(4, "D", 4, "d")))
   }
 
   test("inner join, where, multiple matches") {
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
         |SELECT * FROM
         |  (SELECT * FROM testData2 WHERE a = 1) x JOIN
         |  (SELECT * FROM testData2 WHERE a = 1) y
         |WHERE x.a = y.a""".stripMargin),
-                Row(1, 1, 1, 1) :: Row(1, 1, 1, 2) :: Row(1, 2, 1, 1) :: Row(
-                  1,
-                  2,
-                  1,
-                  2) :: Nil)
+      Row(1, 1, 1, 1) :: Row(1, 1, 1, 2) :: Row(1, 2, 1, 1) :: Row(1, 2, 1, 2) :: Nil)
   }
 
   test("inner join, no matches") {
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
           |SELECT * FROM
           |  (SELECT * FROM testData2 WHERE a = 1) x JOIN
           |  (SELECT * FROM testData2 WHERE a = 2) y
           |WHERE x.a = y.a""".stripMargin),
-                Nil)
+      Nil)
   }
 
   test("big inner join, 4 matches per row") {
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
           |SELECT * FROM
           |  (SELECT * FROM testData UNION ALL
           |   SELECT * FROM testData UNION ALL
@@ -672,19 +716,20 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
           |   SELECT * FROM testData UNION ALL
           |   SELECT * FROM testData) y
           |WHERE x.key = y.key""".stripMargin),
-                testData.rdd
-                  .flatMap(row => Seq.fill(16)(Row.merge(row, row)))
-                  .collect()
-                  .toSeq)
+      testData.rdd
+        .flatMap(row => Seq.fill(16)(Row.merge(row, row)))
+        .collect()
+        .toSeq)
   }
 
   test("cartesian product join") {
-    checkAnswer(testData3.join(testData3),
-                Row(1, null, 1, null) :: Row(1, null, 2, 2) :: Row(
-                  2,
-                  2,
-                  1,
-                  null) :: Row(2, 2, 2, 2) :: Nil)
+    checkAnswer(
+      testData3.join(testData3),
+      Row(1, null, 1, null) :: Row(1, null, 2, 2) :: Row(2, 2, 1, null) :: Row(
+        2,
+        2,
+        2,
+        2) :: Nil)
   }
 
   test("left outer join") {
@@ -710,21 +755,19 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
   }
 
   test("full outer join") {
-    checkAnswer(sql("""
+    checkAnswer(
+      sql(
+        """
           |SELECT * FROM
           |  (SELECT * FROM upperCaseData WHERE N <= 4) leftTable FULL OUTER JOIN
           |  (SELECT * FROM upperCaseData WHERE N >= 3) rightTable
           |    ON leftTable.N = rightTable.N
         """.stripMargin),
-                Row(1, "A", null, null) :: Row(2, "B", null, null) :: Row(
-                  3,
-                  "C",
-                  3,
-                  "C") :: Row(4, "D", 4, "D") :: Row(null, null, 5, "E") :: Row(
-                  null,
-                  null,
-                  6,
-                  "F") :: Nil)
+      Row(1, "A", null, null) :: Row(2, "B", null, null) :: Row(3, "C", 3, "C") :: Row(
+        4,
+        "D",
+        4,
+        "D") :: Row(null, null, 5, "E") :: Row(null, null, 6, "F") :: Nil)
   }
 
   test("SPARK-11111 null-safe join should not use cartesian product") {
@@ -760,21 +803,19 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
   }
 
   test("mixed-case keywords") {
-    checkAnswer(sql("""
+    checkAnswer(
+      sql(
+        """
           |SeleCT * from
           |  (select * from upperCaseData WherE N <= 4) leftTable fuLL OUtER joiN
           |  (sElEcT * FROM upperCaseData whERe N >= 3) rightTable
           |    oN leftTable.N = rightTable.N
         """.stripMargin),
-                Row(1, "A", null, null) :: Row(2, "B", null, null) :: Row(
-                  3,
-                  "C",
-                  3,
-                  "C") :: Row(4, "D", 4, "D") :: Row(null, null, 5, "E") :: Row(
-                  null,
-                  null,
-                  6,
-                  "F") :: Nil)
+      Row(1, "A", null, null) :: Row(2, "B", null, null) :: Row(3, "C", 3, "C") :: Row(
+        4,
+        "D",
+        4,
+        "D") :: Row(null, null, 5, "E") :: Row(null, null, 6, "F") :: Nil)
   }
 
   test("select with table name as qualifier") {
@@ -787,10 +828,11 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     checkAnswer(
       sql(
         "SELECT * FROM upperCaseData JOIN lowerCaseData ON lowerCaseData.n = upperCaseData.N"),
-      Seq(Row(1, "A", 1, "a"),
-          Row(2, "B", 2, "b"),
-          Row(3, "C", 3, "c"),
-          Row(4, "D", 4, "d")))
+      Seq(
+        Row(1, "A", 1, "a"),
+        Row(2, "B", 2, "b"),
+        Row(3, "C", 3, "c"),
+        Row(4, "D", 4, "d")))
   }
 
   test("qualified select with inner join ON with table name as qualifier") {
@@ -802,24 +844,29 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
   }
 
   test("system function upper()") {
-    checkAnswer(sql("SELECT n,UPPER(l) FROM lowerCaseData"),
-                Seq(Row(1, "A"), Row(2, "B"), Row(3, "C"), Row(4, "D")))
+    checkAnswer(
+      sql("SELECT n,UPPER(l) FROM lowerCaseData"),
+      Seq(Row(1, "A"), Row(2, "B"), Row(3, "C"), Row(4, "D")))
 
-    checkAnswer(sql("SELECT n, UPPER(s) FROM nullStrings"),
-                Seq(Row(1, "ABC"), Row(2, "ABC"), Row(3, null)))
+    checkAnswer(
+      sql("SELECT n, UPPER(s) FROM nullStrings"),
+      Seq(Row(1, "ABC"), Row(2, "ABC"), Row(3, null)))
   }
 
   test("system function lower()") {
-    checkAnswer(sql("SELECT N,LOWER(L) FROM upperCaseData"),
-                Seq(Row(1, "a"),
-                    Row(2, "b"),
-                    Row(3, "c"),
-                    Row(4, "d"),
-                    Row(5, "e"),
-                    Row(6, "f")))
+    checkAnswer(
+      sql("SELECT N,LOWER(L) FROM upperCaseData"),
+      Seq(
+        Row(1, "a"),
+        Row(2, "b"),
+        Row(3, "c"),
+        Row(4, "d"),
+        Row(5, "e"),
+        Row(6, "f")))
 
-    checkAnswer(sql("SELECT n, LOWER(s) FROM nullStrings"),
-                Seq(Row(1, "abc"), Row(2, "abc"), Row(3, null)))
+    checkAnswer(
+      sql("SELECT n, LOWER(s) FROM nullStrings"),
+      Seq(Row(1, "abc"), Row(2, "abc"), Row(3, null)))
   }
 
   test("UNION") {
@@ -840,13 +887,12 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
 
   test("UNION with column mismatches") {
     // Column name mismatches are allowed.
-    checkAnswer(sql(
-                  "SELECT n,l FROM lowerCaseData UNION SELECT N as x1, L as x2 FROM upperCaseData"),
-                Row(1, "A") :: Row(1, "a") :: Row(2, "B") :: Row(2, "b") :: Row(
-                  3,
-                  "C") :: Row(3, "c") :: Row(4, "D") :: Row(4, "d") :: Row(
-                  5,
-                  "E") :: Row(6, "F") :: Nil)
+    checkAnswer(
+      sql(
+        "SELECT n,l FROM lowerCaseData UNION SELECT N as x1, L as x2 FROM upperCaseData"),
+      Row(1, "A") :: Row(1, "a") :: Row(2, "B") :: Row(2, "b") :: Row(3, "C") :: Row(
+        3,
+        "c") :: Row(4, "D") :: Row(4, "d") :: Row(5, "E") :: Row(6, "F") :: Nil)
     // Column type mismatches are not allowed, forcing a type coercion.
     checkAnswer(
       sql("SELECT n FROM lowerCaseData UNION SELECT L FROM upperCaseData"),
@@ -891,8 +937,9 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     sql("SET").collect().foreach { row =>
       val key = row.getString(0)
       val value = row.getString(1)
-      assert(TestSQLContext.overrideConfs.contains(key),
-             s"$key should exist in SQLConf.")
+      assert(
+        TestSQLContext.overrideConfs.contains(key),
+        s"$key should exist in SQLConf.")
       assert(
         TestSQLContext.overrideConfs(key) === value,
         s"The value of $key should be ${TestSQLContext.overrideConfs(key)} instead of $value.")
@@ -909,8 +956,9 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     sql(s"SET ${testKey + testKey}=${testVal + testVal}")
     checkAnswer(
       sql("set"),
-      overrideConfs ++ Seq(Row(testKey, testVal),
-                           Row(testKey + testKey, testVal + testVal))
+      overrideConfs ++ Seq(
+        Row(testKey, testVal),
+        Row(testKey + testKey, testVal + testVal))
     )
 
     // "set key"
@@ -956,28 +1004,30 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
 
     val df1 = sqlContext.createDataFrame(rowRDD1, schema1)
     df1.registerTempTable("applySchema1")
-    checkAnswer(sql("SELECT * FROM applySchema1"),
-                Row(1, "A1", true, null) :: Row(2, "B2", false, null) :: Row(
-                  3,
-                  "C3",
-                  true,
-                  null) :: Row(4, "D4", true, 2147483644) :: Nil)
+    checkAnswer(
+      sql("SELECT * FROM applySchema1"),
+      Row(1, "A1", true, null) :: Row(2, "B2", false, null) :: Row(
+        3,
+        "C3",
+        true,
+        null) :: Row(4, "D4", true, 2147483644) :: Nil)
 
-    checkAnswer(sql("SELECT f1, f4 FROM applySchema1"),
-                Row(1, null) :: Row(2, null) :: Row(3, null) :: Row(
-                  4,
-                  2147483644) :: Nil)
+    checkAnswer(
+      sql("SELECT f1, f4 FROM applySchema1"),
+      Row(1, null) :: Row(2, null) :: Row(3, null) :: Row(4, 2147483644) :: Nil)
 
     val schema2 = StructType(
       StructField(
         "f1",
         StructType(
-          StructField("f11", IntegerType, false) :: StructField("f12",
-                                                                BooleanType,
-                                                                false) :: Nil),
-        false) :: StructField("f2",
-                              MapType(StringType, IntegerType, true),
-                              false) :: Nil)
+          StructField("f11", IntegerType, false) :: StructField(
+            "f12",
+            BooleanType,
+            false) :: Nil),
+        false) :: StructField(
+        "f2",
+        MapType(StringType, IntegerType, true),
+        false) :: Nil)
 
     val rowRDD2 = unparsedStrings.map { r =>
       val values = r.split(",").map(_.trim)
@@ -998,10 +1048,9 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
         Row(4, true),
         Map("D4" -> 2147483644)) :: Nil)
 
-    checkAnswer(sql("SELECT f1.f11, f2['D4'] FROM applySchema2"),
-                Row(1, null) :: Row(2, null) :: Row(3, null) :: Row(
-                  4,
-                  2147483644) :: Nil)
+    checkAnswer(
+      sql("SELECT f1.f11, f2['D4'] FROM applySchema2"),
+      Row(1, null) :: Row(2, null) :: Row(3, null) :: Row(4, 2147483644) :: Nil)
 
     // The value of a MapType column can be a mutable map.
     val rowRDD3 = unparsedStrings.map { r =>
@@ -1010,17 +1059,17 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
       catch {
         case _: NumberFormatException => null
       }
-      Row(Row(values(0).toInt, values(2).toBoolean),
-          scala.collection.mutable.Map(values(1) -> v4))
+      Row(
+        Row(values(0).toInt, values(2).toBoolean),
+        scala.collection.mutable.Map(values(1) -> v4))
     }
 
     val df3 = sqlContext.createDataFrame(rowRDD3, schema2)
     df3.registerTempTable("applySchema3")
 
-    checkAnswer(sql("SELECT f1.f11, f2['D4'] FROM applySchema3"),
-                Row(1, null) :: Row(2, null) :: Row(3, null) :: Row(
-                  4,
-                  2147483644) :: Nil)
+    checkAnswer(
+      sql("SELECT f1.f11, f2['D4'] FROM applySchema3"),
+      Row(1, null) :: Row(2, null) :: Row(3, null) :: Row(4, 2147483644) :: Nil)
   }
 
   test("SPARK-3423 BETWEEN") {
@@ -1055,9 +1104,10 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     val docValue = "first name"
     val metadata = new MetadataBuilder().putString(docKey, docValue).build()
     val schemaWithMeta = new StructType(
-      Array(schema("id"),
-            schema("name").copy(metadata = metadata),
-            schema("age")))
+      Array(
+        schema("id"),
+        schema("name").copy(metadata = metadata),
+        schema("age")))
     val personWithMeta = sqlContext.createDataFrame(person.rdd, schemaWithMeta)
     def validateMetadata(rdd: DataFrame): Unit = {
       assert(rdd.schema("name").metadata.getString(docKey) == docValue)
@@ -1109,8 +1159,9 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     }
 
     checkAggregation("SELECT key, COUNT(*) FROM testData")
-    checkAggregation("SELECT COUNT(key), COUNT(*) FROM testData",
-                     isInvalidQuery = false)
+    checkAggregation(
+      "SELECT COUNT(key), COUNT(*) FROM testData",
+      isInvalidQuery = false)
 
     checkAggregation("SELECT value, COUNT(*) FROM testData GROUP BY key")
     checkAggregation(
@@ -1283,12 +1334,13 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
   }
 
   test("Multiple join") {
-    checkAnswer(sql("""SELECT a.key, b.key, c.key
+    checkAnswer(
+      sql("""SELECT a.key, b.key, c.key
           |FROM testData a
           |JOIN testData b ON a.key = b.key
           |JOIN testData c ON a.key = c.key
         """.stripMargin),
-                (1 to 100).map(i => Row(i, i, i)))
+      (1 to 100).map(i => Row(i, i, i)))
   }
 
   test("SPARK-3483 Special chars in column names") {
@@ -1315,11 +1367,12 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
   }
 
   test("SPARK-4120 Join of multiple tables does not work in SparkSQL") {
-    checkAnswer(sql("""SELECT a.key, b.key, c.key
+    checkAnswer(
+      sql("""SELECT a.key, b.key, c.key
           |FROM testData a,testData b,testData c
           |where a.key = b.key and a.key = c.key
         """.stripMargin),
-                (1 to 100).map(i => Row(i, i, i)))
+      (1 to 100).map(i => Row(i, i, i)))
   }
 
   test(
@@ -1373,18 +1426,20 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     val nullCheckData2 = TestData(1, "1") :: TestData(2, null) :: Nil
     val rdd2 = sparkContext.parallelize((0 to 1).map(i => nullCheckData2(i)))
     rdd2.toDF().registerTempTable("nulldata2")
-    checkAnswer(sql(
-                  "SELECT nulldata1.key FROM nulldata1 join " +
-                    "nulldata2 on nulldata1.value <=> nulldata2.value"),
-                (1 to 2).map(i => Row(i)))
+    checkAnswer(
+      sql(
+        "SELECT nulldata1.key FROM nulldata1 join " +
+          "nulldata2 on nulldata1.value <=> nulldata2.value"),
+      (1 to 2).map(i => Row(i)))
   }
 
   test("Multi-column COUNT(DISTINCT ...)") {
     val data = TestData(1, "val_1") :: TestData(2, "val_2") :: Nil
     val rdd = sparkContext.parallelize((0 to 1).map(i => data(i)))
     rdd.toDF().registerTempTable("distinctData")
-    checkAnswer(sql("SELECT COUNT(DISTINCT key,value) FROM distinctData"),
-                Row(2))
+    checkAnswer(
+      sql("SELECT COUNT(DISTINCT key,value) FROM distinctData"),
+      Row(2))
   }
 
   test("SPARK-4699 case sensitivity SQL query") {
@@ -1392,8 +1447,9 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     val data = TestData(1, "val_1") :: TestData(2, "val_2") :: Nil
     val rdd = sparkContext.parallelize((0 to 1).map(i => data(i)))
     rdd.toDF().registerTempTable("testTable1")
-    checkAnswer(sql("SELECT VALUE FROM TESTTABLE1 where KEY = 1"),
-                Row("val_1"))
+    checkAnswer(
+      sql("SELECT VALUE FROM TESTTABLE1 where KEY = 1"),
+      Row("val_1"))
     sqlContext.setConf(SQLConf.CASE_SENSITIVE, true)
   }
 
@@ -1432,38 +1488,42 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
   }
 
   test("SPARK-6583 order by aggregated function") {
-    Seq("1" -> 3,
-        "1" -> 4,
-        "2" -> 7,
-        "2" -> 8,
-        "3" -> 5,
-        "3" -> 6,
-        "4" -> 1,
-        "4" -> 2).toDF("a", "b").registerTempTable("orderByData")
+    Seq(
+      "1" -> 3,
+      "1" -> 4,
+      "2" -> 7,
+      "2" -> 8,
+      "3" -> 5,
+      "3" -> 6,
+      "4" -> 1,
+      "4" -> 2).toDF("a", "b").registerTempTable("orderByData")
 
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
           |SELECT a
           |FROM orderByData
           |GROUP BY a
           |ORDER BY sum(b)
         """.stripMargin),
-                Row("4") :: Row("1") :: Row("3") :: Row("2") :: Nil)
+      Row("4") :: Row("1") :: Row("3") :: Row("2") :: Nil)
 
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
           |SELECT sum(b)
           |FROM orderByData
           |GROUP BY a
           |ORDER BY sum(b)
         """.stripMargin),
-                Row(3) :: Row(7) :: Row(11) :: Row(15) :: Nil)
+      Row(3) :: Row(7) :: Row(11) :: Row(15) :: Nil)
 
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
           |SELECT sum(b)
           |FROM orderByData
           |GROUP BY a
           |ORDER BY sum(b), max(b)
         """.stripMargin),
-                Row(3) :: Row(7) :: Row(11) :: Row(15) :: Nil)
+      Row(3) :: Row(7) :: Row(11) :: Row(15) :: Nil)
 
     checkAnswer(
       sql("""
@@ -1483,21 +1543,23 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
           """.stripMargin),
       Row("4", 3) :: Row("1", 7) :: Row("3", 11) :: Row("2", 15) :: Nil)
 
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
             |SELECT count(*)
             |FROM orderByData
             |GROUP BY a
             |ORDER BY count(*)
           """.stripMargin),
-                Row(2) :: Row(2) :: Row(2) :: Row(2) :: Nil)
+      Row(2) :: Row(2) :: Row(2) :: Row(2) :: Nil)
 
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
             |SELECT a
             |FROM orderByData
             |GROUP BY a
             |ORDER BY a, count(*), sum(b)
           """.stripMargin),
-                Row("1") :: Row("2") :: Row("3") :: Row("4") :: Nil)
+      Row("1") :: Row("2") :: Row("3") :: Row("4") :: Nil)
   }
 
   test("SPARK-7952: fix the equality check between boolean and numeric types") {
@@ -1533,8 +1595,9 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
   test("SPARK-8782: ORDER BY NULL") {
     withTempTable("t") {
       Seq((1, 2), (1, 2)).toDF("a", "b").registerTempTable("t")
-      checkAnswer(sql("SELECT * FROM t ORDER BY NULL"),
-                  Seq(Row(1, 2), Row(1, 2)))
+      checkAnswer(
+        sql("SELECT * FROM t ORDER BY NULL"),
+        Seq(Row(1, 2), Row(1, 2)))
     }
   }
 
@@ -1554,8 +1617,9 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     checkAnswer(
       df,
       Row(
-        new CalendarInterval(12 * 3 - 3,
-                             7L * 1000 * 1000 * 3600 * 24 * 7 + 123)))
+        new CalendarInterval(
+          12 * 3 - 3,
+          7L * 1000 * 1000 * 3600 * 24 * 7 + 123)))
     withTempPath(f => {
       // Currently we don't yet support saving out values of interval data type.
       val e = intercept[AnalysisException] {
@@ -1588,15 +1652,19 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
       df,
       Row(new CalendarInterval(12 * 3 - 3, 7L * MICROS_PER_WEEK + 123)))
 
-    checkAnswer(df.select(df("i") + new CalendarInterval(2, 123)),
-                Row(
-                  new CalendarInterval(12 * 3 - 3 + 2,
-                                       7L * MICROS_PER_WEEK + 123 + 123)))
+    checkAnswer(
+      df.select(df("i") + new CalendarInterval(2, 123)),
+      Row(
+        new CalendarInterval(
+          12 * 3 - 3 + 2,
+          7L * MICROS_PER_WEEK + 123 + 123)))
 
-    checkAnswer(df.select(df("i") - new CalendarInterval(2, 123)),
-                Row(
-                  new CalendarInterval(12 * 3 - 3 - 2,
-                                       7L * MICROS_PER_WEEK + 123 - 123)))
+    checkAnswer(
+      df.select(df("i") - new CalendarInterval(2, 123)),
+      Row(
+        new CalendarInterval(
+          12 * 3 - 3 - 2,
+          7L * MICROS_PER_WEEK + 123 - 123)))
 
     // unary minus
     checkAnswer(
@@ -1605,10 +1673,12 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
   }
 
   test("aggregation with codegen updates peak execution memory") {
-    AccumulatorSuite.verifyPeakExecutionMemorySet(sparkContext,
-                                                  "aggregation with codegen") {
-      testCodeGen("SELECT key, count(value) FROM testData GROUP BY key",
-                  (1 to 100).map(i => Row(i, 1)))
+    AccumulatorSuite.verifyPeakExecutionMemorySet(
+      sparkContext,
+      "aggregation with codegen") {
+      testCodeGen(
+        "SELECT key, count(value) FROM testData GROUP BY key",
+        (1 to 100).map(i => Row(i, 1)))
     }
   }
 
@@ -1616,12 +1686,15 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     checkAnswer(sql("select 10.3 * 3.0"), Row(BigDecimal("30.90")))
     checkAnswer(sql("select 10.3000 * 3.0"), Row(BigDecimal("30.90000")))
     checkAnswer(sql("select 10.30000 * 30.0"), Row(BigDecimal("309.000000")))
-    checkAnswer(sql("select 10.300000000000000000 * 3.000000000000000000"),
-                Row(
-                  BigDecimal("30.900000000000000000000000000000000000",
-                             new MathContext(38))))
-    checkAnswer(sql("select 10.300000000000000000 * 3.0000000000000000000"),
-                Row(null))
+    checkAnswer(
+      sql("select 10.300000000000000000 * 3.000000000000000000"),
+      Row(
+        BigDecimal(
+          "30.900000000000000000000000000000000000",
+          new MathContext(38))))
+    checkAnswer(
+      sql("select 10.300000000000000000 * 3.0000000000000000000"),
+      Row(null))
 
     checkAnswer(sql("select 10.3 / 3.0"), Row(BigDecimal("3.433333")))
     checkAnswer(sql("select 10.3000 / 3.0"), Row(BigDecimal("3.4333333")))
@@ -1656,8 +1729,9 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
   }
 
   test("external sorting updates peak execution memory") {
-    AccumulatorSuite.verifyPeakExecutionMemorySet(sparkContext,
-                                                  "external sort") {
+    AccumulatorSuite.verifyPeakExecutionMemorySet(
+      sparkContext,
+      "external sort") {
       sql("SELECT * FROM testData2 ORDER BY a ASC, b ASC").collect()
     }
   }
@@ -1738,8 +1812,9 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
         sql(
           s"select id from `org.apache.spark.sql.json`.`${f.getCanonicalPath}`"),
         df)
-      checkAnswer(sql(s"select a.id from json.`${f.getCanonicalPath}` as a"),
-                  df)
+      checkAnswer(
+        sql(s"select a.id from json.`${f.getCanonicalPath}` as a"),
+        df)
     })
 
     val e1 = intercept[AnalysisException] {
@@ -1812,21 +1887,22 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
         3,
         2) :: Nil)
 
-    checkAnswer(structDf.select($"record.*", $"record.*"),
-                Row(1, 1, 1, 1) :: Row(1, 2, 1, 2) :: Row(2, 1, 2, 1) :: Row(
-                  2,
-                  2,
-                  2,
-                  2) :: Row(3, 1, 3, 1) :: Row(3, 2, 3, 2) :: Nil)
+    checkAnswer(
+      structDf.select($"record.*", $"record.*"),
+      Row(1, 1, 1, 1) :: Row(1, 2, 1, 2) :: Row(2, 1, 2, 1) :: Row(2, 2, 2, 2) :: Row(
+        3,
+        1,
+        3,
+        1) :: Row(3, 2, 3, 2) :: Nil)
 
-    checkAnswer(sql(
-                  "select struct(a, b) as r1, struct(b, a) as r2 from testData2")
-                  .select($"r1.*", $"r2.*"),
-                Row(1, 1, 1, 1) :: Row(1, 2, 2, 1) :: Row(2, 1, 1, 2) :: Row(
-                  2,
-                  2,
-                  2,
-                  2) :: Row(3, 1, 1, 3) :: Row(3, 2, 2, 3) :: Nil)
+    checkAnswer(
+      sql("select struct(a, b) as r1, struct(b, a) as r2 from testData2")
+        .select($"r1.*", $"r2.*"),
+      Row(1, 1, 1, 1) :: Row(1, 2, 2, 1) :: Row(2, 1, 1, 2) :: Row(2, 2, 2, 2) :: Row(
+        3,
+        1,
+        1,
+        3) :: Row(3, 2, 2, 3) :: Nil)
 
     // Try with a registered table.
     sql("select struct(a, b) as record from testData2").registerTempTable(
@@ -1837,18 +1913,20 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
         3,
         2) :: Nil)
 
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
         | SELECT min(struct(record.*)) FROM
         |   (select struct(a,b) as record from testData2) tmp
       """.stripMargin),
-                Row(Row(1, 1)) :: Nil)
+      Row(Row(1, 1)) :: Nil)
 
     // Try with an alias on the select list
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
         | SELECT max(struct(record.*)) as r FROM
         |   (select struct(a,b) as record from testData2) tmp
       """.stripMargin).select($"r.*"),
-                Row(3, 2) :: Nil)
+      Row(3, 2) :: Nil)
 
     // With GROUP BY
     checkAnswer(
@@ -1885,15 +1963,17 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
         |   (SELECT struct(a, b) as r1, struct(b, a) as r2 FROM testData2) tmp
       """.stripMargin)
 
-    checkAnswer(nestedStructData.select($"record.*"),
-                Row(Row(1, 1), Row(1, 1)) :: Row(Row(1, 2), Row(2, 1)) :: Row(
-                  Row(2, 1),
-                  Row(1, 2)) :: Row(Row(2, 2), Row(2, 2)) :: Row(
-                  Row(3, 1),
-                  Row(1, 3)) :: Row(Row(3, 2), Row(2, 3)) :: Nil)
-    checkAnswer(nestedStructData.select($"record.r1"),
-                Row(Row(1, 1)) :: Row(Row(1, 2)) :: Row(Row(2, 1)) :: Row(
-                  Row(2, 2)) :: Row(Row(3, 1)) :: Row(Row(3, 2)) :: Nil)
+    checkAnswer(
+      nestedStructData.select($"record.*"),
+      Row(Row(1, 1), Row(1, 1)) :: Row(Row(1, 2), Row(2, 1)) :: Row(
+        Row(2, 1),
+        Row(1, 2)) :: Row(Row(2, 2), Row(2, 2)) :: Row(Row(3, 1), Row(1, 3)) :: Row(
+        Row(3, 2),
+        Row(2, 3)) :: Nil)
+    checkAnswer(
+      nestedStructData.select($"record.r1"),
+      Row(Row(1, 1)) :: Row(Row(1, 2)) :: Row(Row(2, 1)) :: Row(Row(2, 2)) :: Row(
+        Row(3, 1)) :: Row(Row(3, 2)) :: Nil)
     checkAnswer(
       nestedStructData.select($"record.r1.*"),
       Row(1, 1) :: Row(1, 2) :: Row(2, 1) :: Row(2, 2) :: Row(3, 1) :: Row(
@@ -1903,12 +1983,15 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     // Try with a registered table
     withTempTable("nestedStructTable") {
       nestedStructData.registerTempTable("nestedStructTable")
-      checkAnswer(sql("SELECT record.* FROM nestedStructTable"),
-                  nestedStructData.select($"record.*"))
-      checkAnswer(sql("SELECT record.r1 FROM nestedStructTable"),
-                  nestedStructData.select($"record.r1"))
-      checkAnswer(sql("SELECT record.r1.* FROM nestedStructTable"),
-                  nestedStructData.select($"record.r1.*"))
+      checkAnswer(
+        sql("SELECT record.* FROM nestedStructTable"),
+        nestedStructData.select($"record.*"))
+      checkAnswer(
+        sql("SELECT record.r1 FROM nestedStructTable"),
+        nestedStructData.select($"record.r1"))
+      checkAnswer(
+        sql("SELECT record.r1.* FROM nestedStructTable"),
+        nestedStructData.select($"record.r1.*"))
 
       // Try resolving something not there.
       assert(
@@ -1926,12 +2009,15 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
       """.stripMargin)
     withTempTable("specialCharacterTable") {
       specialCharacterPath.registerTempTable("specialCharacterTable")
-      checkAnswer(specialCharacterPath.select($"`r&&b.c`.*"),
-                  nestedStructData.select($"record.*"))
-      checkAnswer(sql("SELECT `r&&b.c`.`col$.a_` FROM specialCharacterTable"),
-                  nestedStructData.select($"record.r1"))
-      checkAnswer(sql("SELECT `r&&b.c`.`a.b.c.` FROM specialCharacterTable"),
-                  nestedStructData.select($"record.r2"))
+      checkAnswer(
+        specialCharacterPath.select($"`r&&b.c`.*"),
+        nestedStructData.select($"record.*"))
+      checkAnswer(
+        sql("SELECT `r&&b.c`.`col$.a_` FROM specialCharacterTable"),
+        nestedStructData.select($"record.r1"))
+      checkAnswer(
+        sql("SELECT `r&&b.c`.`a.b.c.` FROM specialCharacterTable"),
+        nestedStructData.select($"record.r2"))
       checkAnswer(
         sql("SELECT `r&&b.c`.`col$.a_`.* FROM specialCharacterTable"),
         nestedStructData.select($"record.r1.*"))
@@ -1997,12 +2083,14 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
 
       verifyCallCount(df.selectExpr("testUdf(a)"), Row(1), 1)
       verifyCallCount(df.selectExpr("testUdf(a)", "testUdf(a)"), Row(1, 1), 1)
-      verifyCallCount(df.selectExpr("testUdf(a + 1)", "testUdf(a + 1)"),
-                      Row(2, 2),
-                      1)
-      verifyCallCount(df.selectExpr("testUdf(a + 1)", "testUdf(a)"),
-                      Row(2, 1),
-                      2)
+      verifyCallCount(
+        df.selectExpr("testUdf(a + 1)", "testUdf(a + 1)"),
+        Row(2, 2),
+        1)
+      verifyCallCount(
+        df.selectExpr("testUdf(a + 1)", "testUdf(a)"),
+        Row(2, 1),
+        2)
       verifyCallCount(
         df.selectExpr("testUdf(a + 1) + testUdf(a + 1)", "testUdf(a + 1)"),
         Row(4, 2),
@@ -2040,13 +2128,14 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     // This test produced an incorrect result of 1 before the SPARK-10707 fix because of the
     // NullPropagation rule: COUNT(v) got replaced with COUNT(1) because the output column of
     // UNION was incorrectly considered non-nullable:
-    checkAnswer(sql("""SELECT count(v) FROM (
+    checkAnswer(
+      sql("""SELECT count(v) FROM (
             |  SELECT v FROM (
             |    SELECT 'foo' AS v UNION ALL
             |    SELECT NULL AS v
             |  ) my_union WHERE isnull(v)
             |) my_subview""".stripMargin),
-                Seq(Row(0)))
+      Seq(Row(0)))
   }
 
   test(
@@ -2054,14 +2143,15 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     // This test uses RAND() to stop column pruning for Union and checks the resulting isnull
     // value. This would produce an incorrect result before the fix in SPARK-10707 because the "v"
     // column of the union was considered non-nullable.
-    checkAnswer(sql("""
+    checkAnswer(
+      sql("""
           |SELECT a FROM (
           |  SELECT ISNULL(v) AS a, RAND() FROM (
           |    SELECT 'foo' AS v UNION ALL SELECT null AS v
           |  ) my_union
           |) my_view
         """.stripMargin),
-                Row(false) :: Row(true) :: Nil)
+      Row(false) :: Row(true) :: Nil)
   }
 
   test("rollup") {
@@ -2114,15 +2204,13 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
       Row("Java", 2012, 20000.0) :: Row("Java", 2013, 30000.0) :: Row(
         "Java",
         null,
-        50000.0) :: Row("dotNET", 2012, 15000.0) :: Row("dotNET",
-                                                        2013,
-                                                        48000.0) :: Row(
+        50000.0) :: Row("dotNET", 2012, 15000.0) :: Row(
         "dotNET",
+        2013,
+        48000.0) :: Row("dotNET", null, 63000.0) :: Row(null, 2012, 35000.0) :: Row(
         null,
-        63000.0) :: Row(null, 2012, 35000.0) :: Row(null, 2013, 78000.0) :: Row(
-        null,
-        null,
-        113000.0) :: Nil
+        2013,
+        78000.0) :: Row(null, null, 113000.0) :: Nil
     )
   }
 
@@ -2201,10 +2289,12 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     withTempTable("maptest") {
       df.registerTempTable("maptest")
       // local optimization will by pass codegen code, so we should keep the filter `key=1`
-      checkAnswer(sql("SELECT value['abc'] FROM maptest where key = 1"),
-                  Row("somestring"))
-      checkAnswer(sql("SELECT value['cba'] FROM maptest where key = 1"),
-                  Row(null))
+      checkAnswer(
+        sql("SELECT value['abc'] FROM maptest where key = 1"),
+        Row("somestring"))
+      checkAnswer(
+        sql("SELECT value['cba'] FROM maptest where key = 1"),
+        Row(null))
     }
   }
 
@@ -2220,16 +2310,20 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
   }
 
   test("order by ordinal number") {
-    checkAnswer(sql("SELECT * FROM testData2 ORDER BY 1 DESC"),
-                sql("SELECT * FROM testData2 ORDER BY a DESC"))
+    checkAnswer(
+      sql("SELECT * FROM testData2 ORDER BY 1 DESC"),
+      sql("SELECT * FROM testData2 ORDER BY a DESC"))
     // If the position is not an integer, ignore it.
-    checkAnswer(sql("SELECT * FROM testData2 ORDER BY 1 + 0 DESC, b ASC"),
-                sql("SELECT * FROM testData2 ORDER BY b ASC"))
+    checkAnswer(
+      sql("SELECT * FROM testData2 ORDER BY 1 + 0 DESC, b ASC"),
+      sql("SELECT * FROM testData2 ORDER BY b ASC"))
 
-    checkAnswer(sql("SELECT * FROM testData2 ORDER BY 1 DESC, b ASC"),
-                sql("SELECT * FROM testData2 ORDER BY a DESC, b ASC"))
-    checkAnswer(sql("SELECT * FROM testData2 SORT BY 1 DESC, 2"),
-                sql("SELECT * FROM testData2 SORT BY a DESC, b ASC"))
+    checkAnswer(
+      sql("SELECT * FROM testData2 ORDER BY 1 DESC, b ASC"),
+      sql("SELECT * FROM testData2 ORDER BY a DESC, b ASC"))
+    checkAnswer(
+      sql("SELECT * FROM testData2 SORT BY 1 DESC, 2"),
+      sql("SELECT * FROM testData2 SORT BY a DESC, b ASC"))
     checkAnswer(
       sql("SELECT * FROM testData2 ORDER BY 1 ASC, b ASC"),
       Seq(Row(1, 1), Row(1, 2), Row(2, 1), Row(2, 2), Row(3, 1), Row(3, 2)))
@@ -2250,8 +2344,9 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
   test("order by ordinal number with conf spark.sql.orderByOrdinal=false") {
     withSQLConf(SQLConf.ORDER_BY_ORDINAL.key -> "false") {
       // If spark.sql.orderByOrdinal=false, ignore the position number.
-      checkAnswer(sql("SELECT * FROM testData2 ORDER BY 1 DESC, b ASC"),
-                  sql("SELECT * FROM testData2 ORDER BY b ASC"))
+      checkAnswer(
+        sql("SELECT * FROM testData2 ORDER BY 1 DESC, b ASC"),
+        sql("SELECT * FROM testData2 ORDER BY b ASC"))
     }
   }
 
@@ -2261,8 +2356,9 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     withTempTable("nt1", "nt2") {
       df1.registerTempTable("nt1")
       df2.registerTempTable("nt2")
-      checkAnswer(sql("SELECT * FROM nt1 natural join nt2 where k = \"one\""),
-                  Row("one", 1, 1) :: Row("one", 1, 5) :: Nil)
+      checkAnswer(
+        sql("SELECT * FROM nt1 natural join nt2 where k = \"one\""),
+        Row("one", 1, 1) :: Row("one", 1, 5) :: Nil)
 
       checkAnswer(
         sql("SELECT * FROM nt1 natural left join nt2 order by v1, v2"),
@@ -2275,41 +2371,47 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
         sql("SELECT * FROM nt1 natural right join nt2 order by v1, v2"),
         Row("one", 1, 1) :: Row("one", 1, 5) :: Row("two", 2, 22) :: Nil)
 
-      checkAnswer(sql("SELECT count(*) FROM nt1 natural full outer join nt2"),
-                  Row(4) :: Nil)
+      checkAnswer(
+        sql("SELECT count(*) FROM nt1 natural full outer join nt2"),
+        Row(4) :: Nil)
     }
   }
 
   test("join with using clause") {
-    val df1 = Seq(("r1c1", "r1c2", "t1r1c3"),
-                  ("r2c1", "r2c2", "t1r2c3"),
-                  ("r3c1x", "r3c2", "t1r3c3")).toDF("c1", "c2", "c3")
-    val df2 = Seq(("r1c1", "r1c2", "t2r1c3"),
-                  ("r2c1", "r2c2", "t2r2c3"),
-                  ("r3c1y", "r3c2", "t2r3c3")).toDF("c1", "c2", "c3")
-    val df3 = Seq((null, "r1c2", "t3r1c3"),
-                  ("r2c1", "r2c2", "t3r2c3"),
-                  ("r3c1y", "r3c2", "t3r3c3")).toDF("c1", "c2", "c3")
+    val df1 = Seq(
+      ("r1c1", "r1c2", "t1r1c3"),
+      ("r2c1", "r2c2", "t1r2c3"),
+      ("r3c1x", "r3c2", "t1r3c3")).toDF("c1", "c2", "c3")
+    val df2 = Seq(
+      ("r1c1", "r1c2", "t2r1c3"),
+      ("r2c1", "r2c2", "t2r2c3"),
+      ("r3c1y", "r3c2", "t2r3c3")).toDF("c1", "c2", "c3")
+    val df3 = Seq(
+      (null, "r1c2", "t3r1c3"),
+      ("r2c1", "r2c2", "t3r2c3"),
+      ("r3c1y", "r3c2", "t3r3c3")).toDF("c1", "c2", "c3")
     withTempTable("t1", "t2", "t3") {
       df1.registerTempTable("t1")
       df2.registerTempTable("t2")
       df3.registerTempTable("t3")
       // inner join with one using column
-      checkAnswer(sql("SELECT * FROM t1 join t2 using (c1)"),
-                  Row("r1c1", "r1c2", "t1r1c3", "r1c2", "t2r1c3") :: Row(
-                    "r2c1",
-                    "r2c2",
-                    "t1r2c3",
-                    "r2c2",
-                    "t2r2c3") :: Nil)
+      checkAnswer(
+        sql("SELECT * FROM t1 join t2 using (c1)"),
+        Row("r1c1", "r1c2", "t1r1c3", "r1c2", "t2r1c3") :: Row(
+          "r2c1",
+          "r2c2",
+          "t1r2c3",
+          "r2c2",
+          "t2r2c3") :: Nil)
 
       // inner join with two using columns
       checkAnswer(
         sql("SELECT * FROM t1 join t2 using (c1, c2)"),
-        Row("r1c1", "r1c2", "t1r1c3", "t2r1c3") :: Row("r2c1",
-                                                       "r2c2",
-                                                       "t1r2c3",
-                                                       "t2r2c3") :: Nil)
+        Row("r1c1", "r1c2", "t1r1c3", "t2r1c3") :: Row(
+          "r2c1",
+          "r2c2",
+          "t1r2c3",
+          "t2r2c3") :: Nil)
 
       // Left outer join with one using column.
       checkAnswer(

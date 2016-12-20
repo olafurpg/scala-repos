@@ -605,8 +605,8 @@ class LiftServlet extends Loggable {
             java.lang.Long.parseLong(
               ajaxPathPart.substring(separator + 1, ajaxPathPart.length - 1),
               36),
-            Integer.parseInt(ajaxPathPart.substring(ajaxPathPart.length - 1),
-                             36))
+            Integer
+              .parseInt(ajaxPathPart.substring(ajaxPathPart.length - 1), 36))
         )
       else None
     }
@@ -746,9 +746,10 @@ class LiftServlet extends Loggable {
             // the associated info with the future that needs to be
             // satisfied by the current request handler.
             def newRequestInfo = {
-              val info = AjaxRequestInfo(handlerVersion,
-                                         new LAFuture[Box[LiftResponse]],
-                                         millis)
+              val info = AjaxRequestInfo(
+                handlerVersion,
+                new LAFuture[Box[LiftResponse]],
+                millis)
 
               val existing =
                 currentAjaxRequests.getOrElseUpdate(renderVersion, Nil)
@@ -889,9 +890,10 @@ class LiftServlet extends Loggable {
           (request,
            S.init(Box !! request, session)(
              LiftRules.performTransform(
-               convertAnswersToCometResponse(session,
-                                             answers.toList,
-                                             actors))))))
+               convertAnswersToCometResponse(
+                 session,
+                 answers.toList,
+                 actors))))))
 
     try {
       session.enterComet(cont -> request)
@@ -933,10 +935,11 @@ class LiftServlet extends Loggable {
 
         case _ => {
           Right(
-            handleNonContinuationComet(requestState,
-                                       sessionActor,
-                                       actors,
-                                       originalRequest))
+            handleNonContinuationComet(
+              requestState,
+              sessionActor,
+              actors,
+              originalRequest))
         }
       }
   }
@@ -989,10 +992,11 @@ class LiftServlet extends Loggable {
       originalRequest: Req): () => Box[LiftResponse] =
     () => {
       val f = new LAFuture[List[AnswerRender]]
-      val cont = new ContinuationActor(request,
-                                       session,
-                                       actors,
-                                       answers => f.satisfy(answers))
+      val cont = new ContinuationActor(
+        request,
+        session,
+        actors,
+        answers => f.satisfy(answers))
 
       try {
         cont ! BeginContinuation

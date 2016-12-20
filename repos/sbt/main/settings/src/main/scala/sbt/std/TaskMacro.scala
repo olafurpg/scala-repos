@@ -53,8 +53,9 @@ object ParserInstance extends Instance {
 
 /** Composes the Task and Initialize Instances to provide an Instance for [T] Initialize[Task[T]].*/
 object FullInstance
-    extends Instance.Composed[Initialize, Task](InitializeInstance,
-                                                TaskInstance)
+    extends Instance.Composed[Initialize, Task](
+      InitializeInstance,
+      TaskInstance)
     with MonadInstance {
   type SS = sbt.internal.util.Settings[Scope]
   val settingsData = TaskKey[SS](
@@ -260,10 +261,11 @@ object TaskMacro {
     }
     c.macroApplication match {
       case Apply(Apply(TypeApply(Select(preT, nmeT), targs), _), a) =>
-        Apply(Apply(TypeApply(Select(preT, newTermName(newName).encodedName),
-                              targs),
-                    init :: sourcePosition(c).tree :: Nil),
-              a)
+        Apply(
+          Apply(
+            TypeApply(Select(preT, newTermName(newName).encodedName), targs),
+            init :: sourcePosition(c).tree :: Nil),
+          a)
       case x => ContextUtil.unexpectedTree(x)
     }
   }
@@ -280,10 +282,11 @@ object TaskMacro {
     }
     c.macroApplication match {
       case Apply(Apply(TypeApply(Select(preT, nmeT), targs), _), r) =>
-        Apply(Apply(TypeApply(Select(preT, newTermName(newName).encodedName),
-                              targs),
-                    init :: sourcePosition(c).tree :: Nil),
-              r)
+        Apply(
+          Apply(
+            TypeApply(Select(preT, newTermName(newName).encodedName), targs),
+            init :: sourcePosition(c).tree :: Nil),
+          r)
       case x => ContextUtil.unexpectedTree(x)
     }
   }
@@ -294,8 +297,9 @@ object TaskMacro {
       case Apply(Select(prefix, _), _) => prefix
       case x => ContextUtil.unexpectedTree(x)
     }
-    Apply.apply(Select(target, newTermName(newName).encodedName),
-                init :: sourcePosition(c).tree :: Nil)
+    Apply.apply(
+      Select(target, newTermName(newName).encodedName),
+      init :: sourcePosition(c).tree :: Nil)
   }
   private[this] def sourcePosition(c: Context): c.Expr[SourcePosition] = {
     import c.universe.reify
@@ -349,10 +353,11 @@ object TaskMacro {
       def apply(in: c.Tree): c.Tree = f(c.Expr[T](in)).tree
     }
     val cond = c.Expr[T](conditionInputTaskTree(c)(t.tree))
-    Instance.contImpl[T, M](c,
-                            InitializeInstance,
-                            InputInitConvert,
-                            MixedBuilder)(Left(cond), inner)
+    Instance.contImpl[T, M](
+      c,
+      InitializeInstance,
+      InputInitConvert,
+      MixedBuilder)(Left(cond), inner)
   }
   private[this] def conditionInputTaskTree(c: Context)(t: c.Tree): c.Tree = {
     import c.universe._
@@ -391,9 +396,9 @@ object TaskMacro {
         case _ => Converted.NotApplicable
       }
     val util = ContextUtil[c.type](c)
-    util.transformWrappers(t,
-                           (nme, tpe, tree,
-                            original) => expand(nme, tpe, tree))
+    util.transformWrappers(
+      t,
+      (nme, tpe, tree, original) => expand(nme, tpe, tree))
   }
 
   private[this] def iParserMacro[M[_], T](c: Context)(t: c.Expr[T])(
@@ -462,15 +467,17 @@ object TaskMacro {
                         tpeB: Type,
                         arg1: Tree,
                         arg2: Tree) = {
-      val typedApp = TypeApply(util.select(it, name),
-                               TypeTree(tpeA) :: TypeTree(tpeB) :: Nil)
+      val typedApp = TypeApply(
+        util.select(it, name),
+        TypeTree(tpeA) :: TypeTree(tpeB) :: Nil)
       val app = ApplyTree(ApplyTree(typedApp, arg1 :: Nil), arg2 :: Nil)
       c.Expr[Initialize[InputTask[T]]](app)
     }
     // Tree for InputTask.createFree[<tpe>](arg1)
     def inputTaskCreateFree(tpe: Type, arg: Tree) = {
-      val typedApp = TypeApply(util.select(it, InputTaskCreateFreeName),
-                               TypeTree(tpe) :: Nil)
+      val typedApp = TypeApply(
+        util.select(it, InputTaskCreateFreeName),
+        TypeTree(tpe) :: Nil)
       val app = ApplyTree(typedApp, arg :: Nil)
       c.Expr[Initialize[InputTask[T]]](app)
     }
@@ -491,9 +498,9 @@ object TaskMacro {
       }
     }
 
-    val tx = util.transformWrappers(ttree,
-                                    (n, tpe, tree,
-                                     replace) => sub(n, tpe, tree, replace))
+    val tx = util.transformWrappers(
+      ttree,
+      (n, tpe, tree, replace) => sub(n, tpe, tree, replace))
     result match {
       case Some((p, tpe, param)) =>
         val fCore = util.createFunction(param :: Nil, tx, functionSym)

@@ -8,8 +8,9 @@ case class Residency(relaunchEscalationTimeoutSeconds: Long,
 
 object Residency {
   def default: Residency =
-    Residency(defaultRelaunchEscalationTimeoutSeconds,
-              defaultTaskLostBehaviour)
+    Residency(
+      defaultRelaunchEscalationTimeoutSeconds,
+      defaultTaskLostBehaviour)
 
   val defaultTaskLostBehaviour = TaskLostBehavior.WAIT_FOREVER
   val defaultRelaunchEscalationTimeoutSeconds: Long = 3600

@@ -170,17 +170,19 @@ object DiscoveryClientSpec extends Specification with Mockito {
         val returnTo = "http://foo.bar.com/openid"
         val openId = "http://abc.example.com/foo"
         val redirectUrl =
-          Await.result(new WsOpenIdClient(ws, new WsDiscovery(ws))
-                         .redirectURL(openId, returnTo),
-                       dur)
+          Await.result(
+            new WsOpenIdClient(ws, new WsDiscovery(ws))
+              .redirectURL(openId, returnTo),
+            dur)
 
         there was one(ws.request).get()
 
         new URL(redirectUrl).hostAndPath must be equalTo "https://www.google.com/a/example.com/o8/ud"
 
-        verifyValidOpenIDRequest(parseQueryString(redirectUrl),
-                                 openId,
-                                 returnTo)
+        verifyValidOpenIDRequest(
+          parseQueryString(redirectUrl),
+          openId,
+          returnTo)
       }
 
       "should redirect to identifier selection" in {
@@ -195,17 +197,19 @@ object DiscoveryClientSpec extends Specification with Mockito {
         val identifierSelection =
           "http://specs.openid.net/auth/2.0/identifier_select"
         val redirectUrl =
-          Await.result(new WsOpenIdClient(ws, new WsDiscovery(ws))
-                         .redirectURL(openId, returnTo),
-                       dur)
+          Await.result(
+            new WsOpenIdClient(ws, new WsDiscovery(ws))
+              .redirectURL(openId, returnTo),
+            dur)
 
         there was one(ws.request).get()
 
         new URL(redirectUrl).hostAndPath must be equalTo "https://www.google.com/a/example.com/o8/ud"
 
-        verifyValidOpenIDRequest(parseQueryString(redirectUrl),
-                                 identifierSelection,
-                                 returnTo)
+        verifyValidOpenIDRequest(
+          parseQueryString(redirectUrl),
+          identifierSelection,
+          returnTo)
       }
 
       "should fall back to HTML based discovery if OP Identifier cannot be found in the XRDS" in {
@@ -221,17 +225,19 @@ object DiscoveryClientSpec extends Specification with Mockito {
         val returnTo = "http://foo.bar.com/openid"
         val openId = "http://abc.example.com/foo"
         val redirectUrl =
-          Await.result(new WsOpenIdClient(ws, new WsDiscovery(ws))
-                         .redirectURL(openId, returnTo),
-                       dur)
+          Await.result(
+            new WsOpenIdClient(ws, new WsDiscovery(ws))
+              .redirectURL(openId, returnTo),
+            dur)
 
         there was one(ws.request).get()
 
         new URL(redirectUrl).hostAndPath must be equalTo "https://www.example.com/openidserver/openid.server"
 
-        verifyValidOpenIDRequest(parseQueryString(redirectUrl),
-                                 openId,
-                                 returnTo)
+        verifyValidOpenIDRequest(
+          parseQueryString(redirectUrl),
+          openId,
+          returnTo)
       }
 
       // OpenID 1.1 compatibility - http://openid.net/specs/openid-authentication-2_0.html#anchor38
@@ -248,17 +254,19 @@ object DiscoveryClientSpec extends Specification with Mockito {
         val returnTo = "http://foo.bar.com/openid"
         val openId = "http://abc.example.com/foo"
         val redirectUrl =
-          Await.result(new WsOpenIdClient(ws, new WsDiscovery(ws))
-                         .redirectURL(openId, returnTo),
-                       dur)
+          Await.result(
+            new WsOpenIdClient(ws, new WsDiscovery(ws))
+              .redirectURL(openId, returnTo),
+            dur)
 
         there was one(ws.request).get()
 
         new URL(redirectUrl).hostAndPath must be equalTo "https://www.example.com/openidserver/openid.server-1"
 
-        verifyValidOpenIDRequest(parseQueryString(redirectUrl),
-                                 openId,
-                                 returnTo)
+        verifyValidOpenIDRequest(
+          parseQueryString(redirectUrl),
+          openId,
+          returnTo)
       }
     }
 
@@ -272,17 +280,19 @@ object DiscoveryClientSpec extends Specification with Mockito {
         val returnTo = "http://foo.bar.com/openid"
         val openId = "http://abc.example.com/foo"
         val redirectUrl =
-          Await.result(new WsOpenIdClient(ws, new WsDiscovery(ws))
-                         .redirectURL(openId, returnTo),
-                       dur)
+          Await.result(
+            new WsOpenIdClient(ws, new WsDiscovery(ws))
+              .redirectURL(openId, returnTo),
+            dur)
 
         there was one(ws.request).get()
 
         new URL(redirectUrl).hostAndPath must be equalTo "https://www.example.com/openidserver/openid.server"
 
-        verifyValidOpenIDRequest(parseQueryString(redirectUrl),
-                                 openId,
-                                 returnTo)
+        verifyValidOpenIDRequest(
+          parseQueryString(redirectUrl),
+          openId,
+          returnTo)
       }
 
       "when given a response that includes a local identifier (using openid2.local_id openid.delegate)" in {
@@ -292,19 +302,20 @@ object DiscoveryClientSpec extends Specification with Mockito {
 
         val returnTo = "http://foo.bar.com/openid"
         val redirectUrl =
-          Await.result(new WsOpenIdClient(ws, new WsDiscovery(ws))
-                         .redirectURL("http://example.com/", returnTo),
-                       dur)
+          Await.result(
+            new WsOpenIdClient(ws, new WsDiscovery(ws))
+              .redirectURL("http://example.com/", returnTo),
+            dur)
 
         there was one(ws.request).get()
 
         new URL(redirectUrl).hostAndPath must be equalTo "http://www.example.com:8080/openidserver/openid.server"
 
-        verifyValidOpenIDRequest(parseQueryString(redirectUrl),
-                                 "http://example.com/",
-                                 returnTo,
-                                 opLocalIdentifier =
-                                   Some("http://exampleuser.example.com/"))
+        verifyValidOpenIDRequest(
+          parseQueryString(redirectUrl),
+          "http://example.com/",
+          returnTo,
+          opLocalIdentifier = Some("http://exampleuser.example.com/"))
       }
     }
   }

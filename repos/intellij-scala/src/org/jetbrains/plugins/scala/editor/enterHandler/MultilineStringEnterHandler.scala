@@ -94,8 +94,9 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
 
     def getLineByNumber(number: Int): String =
       document.getText(
-        new TextRange(document.getLineStartOffset(number),
-                      document.getLineEndOffset(number)))
+        new TextRange(
+          document.getLineStartOffset(number),
+          document.getLineEndOffset(number)))
 
     def getSpaces(count: Int) = StringUtil.repeat(" ", count)
 
@@ -131,9 +132,10 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
       val lineStart = document.getLineStartOffset(lineNumber)
       val line = getLineByNumber(lineNumber)
       val wsPrefix = line.takeWhile(c => c == ' ' || c == '\t')
-      document.replaceString(lineStart,
-                             lineStart + wsPrefix.length,
-                             getSmartSpaces(indent) + marginChar.getOrElse(""))
+      document.replaceString(
+        lineStart,
+        lineStart + wsPrefix.length,
+        getSmartSpaces(indent) + marginChar.getOrElse(""))
     }
 
     extensions inWriteAction {
@@ -210,9 +212,10 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
           else 0
 
         if (needInsertNLBefore) {
-          insertNewLine(literalOffset,
-                        prevIndent + needInsertIndentInt,
-                        trimPreviousLine = true)
+          insertNewLine(
+            literalOffset,
+            prevIndent + needInsertIndentInt,
+            trimPreviousLine = true)
         }
 
         val indentSize =
@@ -222,9 +225,10 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
         if (literal.getText.substring(offset - literalOffset) == multilineQuotes) {
           forceIndent(caretOffset, indentSize, marginCharOpt)
           caretMarker.setGreedyToRight(false)
-          insertNewLine(caretOffset,
-                        indentSize - marginIndent,
-                        trimPreviousLine = false)
+          insertNewLine(
+            caretOffset,
+            indentSize - marginIndent,
+            trimPreviousLine = false)
           caretMarker.setGreedyToRight(true)
         } else {
           forceIndent(caretOffset, indentSize, marginCharOpt)
@@ -233,9 +237,10 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
         if (!wasSingleLine) {
           val currentPrefix =
             getPrefix(getLineByNumber(document.getLineNumber(caretOffset)))
-          forceIndent(caretOffset + 1,
-                      getSmartLength(currentPrefix),
-                      marginCharOpt)
+          forceIndent(
+            caretOffset + 1,
+            getSmartLength(currentPrefix),
+            marginCharOpt)
         }
       } else {
         val isCurrentLineEmpty = currentLine.trim.length == 0
@@ -270,9 +275,10 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
               else
                 (if (isCurrentLineEmpty) elementStart
                  else elementStart - wsPrefix) + prevLineWsPrefixAfterQuotes
-            forceIndent(currentLineOffset,
-                        getSmartLength(getSmartSpaces(spacesToInsert)),
-                        None)
+            forceIndent(
+              currentLineOffset,
+              getSmartLength(getSmartSpaces(spacesToInsert)),
+              None)
           } else if (isCurrentLineEmpty && prevLine.length > 0)
             forceIndent(caretOffset, wsPrefix, None)
           else if (prevLine.trim.length == 0)
@@ -306,8 +312,9 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
               val nextLineOffset =
                 document.getLineStartOffset(prevLineNumber + 2)
               forceIndent(nextLineOffset, 0, None)
-              document.insertString(nextLineOffset,
-                                    marginChar + getSpaces(wsAfterMargin))
+              document.insertString(
+                nextLineOffset,
+                marginChar + getSpaces(wsAfterMargin))
               forceIndent(nextLineOffset, getSmartLength(prefix), None)
             }
           }

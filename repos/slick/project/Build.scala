@@ -228,10 +228,11 @@ object SlickBuild extends Build {
         sdlc <<= sdlc dependsOn
           (sdlc in slickProject,
           sdlc in slickCodegenProject, sdlc in slickHikariCPProject)
-      )).aggregate(slickProject,
-                   slickCodegenProject,
-                   slickHikariCPProject,
-                   slickTestkitProject)
+      )).aggregate(
+    slickProject,
+    slickCodegenProject,
+    slickHikariCPProject,
+    slickTestkitProject)
 
   lazy val slickProject: Project = Project(
     id = "slick",
@@ -252,8 +253,8 @@ object SlickBuild extends Build {
               "scaladoc-root.txt"
           )),
         (sphinxEnv in Sphinx) := (sphinxEnv in Sphinx).value +
-          ("version" -> version.value.replaceFirst("""(\d*.\d*).*""",
-                                                   """$1""")) +
+          ("version" -> version.value
+            .replaceFirst("""(\d*.\d*).*""", """$1""")) +
           ("release" -> version.value),
         (sphinxProperties in Sphinx) := Map.empty,
         makeSite <<= makeSite dependsOn
@@ -337,12 +338,13 @@ object SlickBuild extends Build {
                 "https://github.com/slick/slick/blob/" + v +
                   "/slick-testkit/src/main€{FILE_PATH}.scala"
             )),
-          testOptions += Tests.Argument(TestFrameworks.JUnit,
-                                        "-q",
-                                        "-v",
-                                        "-s",
-                                        "-a",
-                                        "-Djava.awt.headless=true"),
+          testOptions += Tests.Argument(
+            TestFrameworks.JUnit,
+            "-q",
+            "-v",
+            "-s",
+            "-a",
+            "-Djava.awt.headless=true"),
           //scalacOptions in Compile += "-Yreify-copypaste",
           libraryDependencies ++= Dependencies.junit ++:
             (Dependencies.reactiveStreamsTCK % "test") +:
@@ -367,10 +369,11 @@ object SlickBuild extends Build {
         },
           buildCapabilitiesTable := {
           val logger = ConsoleLogger()
-          Run.run("com.typesafe.slick.testkit.util.BuildCapabilitiesTable",
-                  (fullClasspath in Compile).value.map(_.data),
-                  Seq("slick/src/sphinx/capabilities.csv"),
-                  logger)(runner.value)
+          Run.run(
+            "com.typesafe.slick.testkit.util.BuildCapabilitiesTable",
+            (fullClasspath in Compile).value.map(_.data),
+            Seq("slick/src/sphinx/capabilities.csv"),
+            logger)(runner.value)
         }
         ) ++ ifPublished(
           Seq(
@@ -521,14 +524,14 @@ object SlickBuild extends Build {
      sourceDirectory) map { (cp, r, output, s, srcDir) =>
       val fmppSrc = srcDir / "scala"
       val inFiles = (fmppSrc ** "*.fm").get.toSet
-      val cachedFun = FileFunction.cached(s.cacheDirectory / "fmpp",
-                                          outStyle = FilesInfo.exists) {
-        (in: Set[File]) =>
-          IO.delete((output ** "*.scala").get)
-          val args =
-            "--expert" :: "-q" :: "-S" :: fmppSrc.getPath :: "-O" :: output.getPath :: "--replace-extensions=fm, scala" :: "-M" :: "execute(**/*.fm), ignore(**/*)" :: Nil
-          toError(r.run("fmpp.tools.CommandLine", cp.files, args, s.log))
-          (output ** "*.scala").get.toSet
+      val cachedFun = FileFunction.cached(
+        s.cacheDirectory / "fmpp",
+        outStyle = FilesInfo.exists) { (in: Set[File]) =>
+        IO.delete((output ** "*.scala").get)
+        val args =
+          "--expert" :: "-q" :: "-S" :: fmppSrc.getPath :: "-O" :: output.getPath :: "--replace-extensions=fm, scala" :: "-M" :: "execute(**/*.fm), ignore(**/*)" :: Nil
+        toError(r.run("fmpp.tools.CommandLine", cp.files, args, s.log))
+        (output ** "*.scala").get.toSet
       }
       cachedFun(inFiles).toSeq
     }
@@ -576,19 +579,22 @@ object SlickBuild extends Build {
             (slickSrc / "main/scala/slick/codegen" ** "*.scala").get.toSet ++
             (slickSrc / "main/scala/slick/jdbc/meta" ** "*.scala").get.toSet
         val cachedFun =
-          FileFunction.cached(s.cacheDirectory / "type-providers",
-                              outStyle = FilesInfo.exists) { (in: Set[File]) =>
+          FileFunction.cached(
+            s.cacheDirectory / "type-providers",
+            outStyle = FilesInfo.exists) { (in: Set[File]) =>
             IO.delete((output ** "*.scala").get)
             toError(
-              r.run("slick.test.codegen.GenerateMainSources",
-                    cp.files,
-                    Array(outDir),
-                    s.log))
+              r.run(
+                "slick.test.codegen.GenerateMainSources",
+                cp.files,
+                Array(outDir),
+                s.log))
             toError(
-              r.run("slick.test.codegen.GenerateRoundtripSources",
-                    cp.files,
-                    Array(outDir),
-                    s.log))
+              r.run(
+                "slick.test.codegen.GenerateRoundtripSources",
+                cp.files,
+                Array(outDir),
+                s.log))
             (output ** "*.scala").get.toSet
           }
         cachedFun(inFiles).toSeq

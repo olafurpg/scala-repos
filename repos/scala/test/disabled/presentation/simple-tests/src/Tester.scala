@@ -146,10 +146,11 @@ class Tester(ntests: Int, inputs: Array[SourceFile], settings: Settings) {
       val changes = Vector.fill( /**/ randomChangesPerBatch()) {
 
         /**/
-        new Change(sfidx,
-                   randomPositionIn(inputs(sfidx)),
-                   randomNumChars(),
-                   rand.nextBoolean())
+        new Change(
+          sfidx,
+          randomPositionIn(inputs(sfidx)),
+          randomNumChars(),
+          rand.nextBoolean())
       }
       doTest(sfidx, changes, testPositions, otherTest) match {
         case Some(errortrace) =>

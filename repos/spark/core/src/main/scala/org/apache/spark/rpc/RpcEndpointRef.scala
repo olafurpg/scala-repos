@@ -121,7 +121,8 @@ private[spark] abstract class RpcEndpointRef(conf: SparkConf)
       }
     }
 
-    throw new SparkException(s"Error sending message [message = $message]",
-                             lastException)
+    throw new SparkException(
+      s"Error sending message [message = $message]",
+      lastException)
   }
 }

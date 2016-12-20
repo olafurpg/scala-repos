@@ -74,13 +74,14 @@ object Test extends App {
 
   def testNumeric[T: ClassTag](tpe: Type, value: T) {
     header(tpe)
-    List("toByte",
-         "toShort",
-         "toChar",
-         "toInt",
-         "toLong",
-         "toFloat",
-         "toDouble") foreach (meth => test(tpe, value, meth))
+    List(
+      "toByte",
+      "toShort",
+      "toChar",
+      "toInt",
+      "toLong",
+      "toFloat",
+      "toDouble") foreach (meth => test(tpe, value, meth))
     test(tpe, value, "==", 2)
     test(tpe, value, "!=", 2)
     test(tpe, value, "<", 2)

@@ -15,13 +15,15 @@ trait CollectionsOnMapsTest extends CollectionsTestBase {
     def test[K: ClassTag, V: ClassTag](toKey: Int => K,
                                        toValue: Int => V): Unit = {
       val map = factory.empty[K, V]
-      testMapUnmodifiability(ju.Collections.unmodifiableMap[K, V](map),
-                             toKey(0),
-                             toValue(0))
+      testMapUnmodifiability(
+        ju.Collections.unmodifiableMap[K, V](map),
+        toKey(0),
+        toValue(0))
       for (i <- range) map.put(toKey(i), toValue(i))
-      testMapUnmodifiability(ju.Collections.unmodifiableMap[K, V](map),
-                             toKey(0),
-                             toValue(0))
+      testMapUnmodifiability(
+        ju.Collections.unmodifiableMap[K, V](map),
+        toKey(0),
+        toValue(0))
     }
 
     test[jl.Integer, jl.Integer](_.toInt, _.toInt)

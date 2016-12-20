@@ -282,9 +282,10 @@ private final class Analyzer(semantics: Semantics,
             inherited
           } else {
             val syntheticInfo =
-              Infos.MethodInfo(encodedName = ctorName,
-                               methodsCalledStatically =
-                                 Map(superClass.encodedName -> List(ctorName)))
+              Infos.MethodInfo(
+                encodedName = ctorName,
+                methodsCalledStatically =
+                  Map(superClass.encodedName -> List(ctorName)))
             val m = new MethodInfo(this, syntheticInfo)
             m.syntheticKind = MethodSyntheticKind.InheritedConstructor
             methodInfos += ctorName -> m
@@ -309,8 +310,9 @@ private final class Analyzer(semantics: Semantics,
     }
 
     def tryLookupMethod(methodName: String): Option[MethodInfo] = {
-      assert(isScalaClass || isInterface,
-             s"Cannot call lookupMethod($methodName) on non Scala class $this")
+      assert(
+        isScalaClass || isInterface,
+        s"Cannot call lookupMethod($methodName) on non Scala class $this")
 
       @tailrec
       def tryLookupInherited(ancestorInfo: ClassInfo): Option[MethodInfo] = {
@@ -511,8 +513,9 @@ private final class Analyzer(semantics: Semantics,
       (left, right) match {
         case (ClassType(leftCls), ClassType(rightCls)) =>
           classIsMoreSpecific(leftCls, rightCls)
-        case (ArrayType(leftBase, leftDepth),
-              ArrayType(rightBase, rightDepth)) =>
+        case (
+            ArrayType(leftBase, leftDepth),
+            ArrayType(rightBase, rightDepth)) =>
           leftDepth == rightDepth && classIsMoreSpecific(leftBase, rightBase)
         case (ArrayType(_, _), ClassType(ObjectClass)) =>
           true
@@ -523,8 +526,9 @@ private final class Analyzer(semantics: Semantics,
 
     private def createReflProxy(proxyName: String,
                                 targetName: String): MethodInfo = {
-      assert(this.isScalaClass,
-             s"Cannot create reflective proxy in non-Scala class $this")
+      assert(
+        this.isScalaClass,
+        s"Cannot create reflective proxy in non-Scala class $this")
 
       val returnsChar = targetName.endsWith("__C")
       val syntheticInfo = Infos.MethodInfo(
@@ -649,8 +653,9 @@ private final class Analyzer(semantics: Semantics,
           s"Trying to call dynamically the constructor $this.$methodName from $from")
         lookupConstructor(methodName).reachStatic()
       } else if (statically) {
-        assert(!isReflProxyName(methodName),
-               s"Trying to call statically refl proxy $this.$methodName")
+        assert(
+          !isReflProxyName(methodName),
+          s"Trying to call statically refl proxy $this.$methodName")
         lookupMethod(methodName).reachStatic()
       } else {
         for (descendentClass <- descendentClasses) {
@@ -704,8 +709,9 @@ private final class Analyzer(semantics: Semantics,
     override def toString(): String = s"$owner.$encodedName"
 
     def reachStatic()(implicit from: From): Unit = {
-      assert(!isAbstract,
-             s"Trying to reach statically the abstract method $this")
+      assert(
+        !isAbstract,
+        s"Trying to reach statically the abstract method $this")
 
       checkExistent()
 
@@ -718,12 +724,15 @@ private final class Analyzer(semantics: Semantics,
 
     def reach(inClass: ClassInfo)(implicit from: From): Unit = {
       assert(!isStatic, s"Trying to dynamically reach the static method $this")
-      assert(!isAbstract,
-             s"Trying to dynamically reach the abstract method $this")
-      assert(owner.isAnyClass,
-             s"Trying to dynamically reach the non-class method $this")
-      assert(!isConstructorName(encodedName),
-             s"Trying to dynamically reach the constructor $this")
+      assert(
+        !isAbstract,
+        s"Trying to dynamically reach the abstract method $this")
+      assert(
+        owner.isAnyClass,
+        s"Trying to dynamically reach the non-class method $this")
+      assert(
+        !isConstructorName(encodedName),
+        s"Trying to dynamically reach the constructor $this")
 
       checkExistent()
 
@@ -825,9 +834,10 @@ private final class Analyzer(semantics: Semantics,
       encodedName: String,
       isStatic: Boolean = false,
       isAbstract: Boolean = false): Infos.MethodInfo = {
-    Infos.MethodInfo(encodedName = encodedName,
-                     isStatic = isStatic,
-                     isAbstract = isAbstract)
+    Infos.MethodInfo(
+      encodedName = encodedName,
+      isStatic = isStatic,
+      isAbstract = isAbstract)
   }
 }
 

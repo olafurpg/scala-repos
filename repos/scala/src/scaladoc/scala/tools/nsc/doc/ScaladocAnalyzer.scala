@@ -85,8 +85,9 @@ trait ScaladocAnalyzer extends Analyzer {
                    val tparams =
                      cloneSymbolsAtOwner(tpt.tpe.typeSymbol.typeParams, alias)
                    val newInfo =
-                     genPolyType(tparams,
-                                 appliedType(tpt.tpe, tparams map (_.tpe)))
+                     genPolyType(
+                       tparams,
+                       appliedType(tpt.tpe, tparams map (_.tpe)))
                    alias setInfo newInfo
                    context.scope.enter(alias)
                }

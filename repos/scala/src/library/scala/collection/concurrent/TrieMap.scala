@@ -199,21 +199,24 @@ private[collection] final class INode[K, V](bn: MainNode[K, V], g: Gen)
               cond match {
                 case null =>
                   if (sn.hc == hc && equal(sn.k, k, ct)) {
-                    if (GCAS(cn,
-                             cn.updatedAt(pos, new SNode(k, v, hc), gen),
-                             ct)) Some(sn.v)
+                    if (GCAS(
+                          cn,
+                          cn.updatedAt(pos, new SNode(k, v, hc), gen),
+                          ct)) Some(sn.v)
                     else null
                   } else {
                     val rn = if (cn.gen eq gen) cn else cn.renewed(gen, ct)
-                    val nn = rn.updatedAt(pos,
-                                          inode(
-                                            CNode.dual(sn,
-                                                       sn.hc,
-                                                       new SNode(k, v, hc),
-                                                       hc,
-                                                       lev + 5,
-                                                       gen)),
-                                          gen)
+                    val nn = rn.updatedAt(
+                      pos,
+                      inode(
+                        CNode.dual(
+                          sn,
+                          sn.hc,
+                          new SNode(k, v, hc),
+                          hc,
+                          lev + 5,
+                          gen)),
+                      gen)
                     if (GCAS(cn, nn, ct)) None
                     else null
                   }
@@ -221,30 +224,34 @@ private[collection] final class INode[K, V](bn: MainNode[K, V], g: Gen)
                   if (sn.hc == hc && equal(sn.k, k, ct)) Some(sn.v)
                   else {
                     val rn = if (cn.gen eq gen) cn else cn.renewed(gen, ct)
-                    val nn = rn.updatedAt(pos,
-                                          inode(
-                                            CNode.dual(sn,
-                                                       sn.hc,
-                                                       new SNode(k, v, hc),
-                                                       hc,
-                                                       lev + 5,
-                                                       gen)),
-                                          gen)
+                    val nn = rn.updatedAt(
+                      pos,
+                      inode(
+                        CNode.dual(
+                          sn,
+                          sn.hc,
+                          new SNode(k, v, hc),
+                          hc,
+                          lev + 5,
+                          gen)),
+                      gen)
                     if (GCAS(cn, nn, ct)) None
                     else null
                   }
                 case INode.KEY_PRESENT =>
                   if (sn.hc == hc && equal(sn.k, k, ct)) {
-                    if (GCAS(cn,
-                             cn.updatedAt(pos, new SNode(k, v, hc), gen),
-                             ct)) Some(sn.v)
+                    if (GCAS(
+                          cn,
+                          cn.updatedAt(pos, new SNode(k, v, hc), gen),
+                          ct)) Some(sn.v)
                     else null
                   } else None
                 case otherv =>
                   if (sn.hc == hc && equal(sn.k, k, ct) && sn.v == otherv) {
-                    if (GCAS(cn,
-                             cn.updatedAt(pos, new SNode(k, v, hc), gen),
-                             ct)) Some(sn.v)
+                    if (GCAS(
+                          cn,
+                          cn.updatedAt(pos, new SNode(k, v, hc), gen),
+                          ct)) Some(sn.v)
                     else null
                   } else None
               }

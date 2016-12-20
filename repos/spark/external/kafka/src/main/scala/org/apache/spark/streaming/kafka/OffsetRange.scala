@@ -90,10 +90,11 @@ object OffsetRange {
   def create(topicAndPartition: TopicAndPartition,
              fromOffset: Long,
              untilOffset: Long): OffsetRange =
-    new OffsetRange(topicAndPartition.topic,
-                    topicAndPartition.partition,
-                    fromOffset,
-                    untilOffset)
+    new OffsetRange(
+      topicAndPartition.topic,
+      topicAndPartition.partition,
+      fromOffset,
+      untilOffset)
 
   def apply(topic: String,
             partition: Int,
@@ -104,10 +105,11 @@ object OffsetRange {
   def apply(topicAndPartition: TopicAndPartition,
             fromOffset: Long,
             untilOffset: Long): OffsetRange =
-    new OffsetRange(topicAndPartition.topic,
-                    topicAndPartition.partition,
-                    fromOffset,
-                    untilOffset)
+    new OffsetRange(
+      topicAndPartition.topic,
+      topicAndPartition.partition,
+      fromOffset,
+      untilOffset)
 
   /** this is to avoid ClassNotFoundException during checkpoint restore */
   private[kafka] type OffsetRangeTuple = (String, Int, Long, Long)

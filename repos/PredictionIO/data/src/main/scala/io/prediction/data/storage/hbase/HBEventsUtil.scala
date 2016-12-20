@@ -220,20 +220,22 @@ object HBEventsUtil {
 
     def getStringCol(col: String): String = {
       val r = result.getValue(eBytes, colNames(col))
-      require(r != null,
-              s"Failed to get value for column ${col}. " +
-                s"Rowkey: ${rowKey.toString} " +
-                s"StringBinary: ${Bytes.toStringBinary(result.getRow())}.")
+      require(
+        r != null,
+        s"Failed to get value for column ${col}. " +
+          s"Rowkey: ${rowKey.toString} " +
+          s"StringBinary: ${Bytes.toStringBinary(result.getRow())}.")
 
       Bytes.toString(r)
     }
 
     def getLongCol(col: String): Long = {
       val r = result.getValue(eBytes, colNames(col))
-      require(r != null,
-              s"Failed to get value for column ${col}. " +
-                s"Rowkey: ${rowKey.toString} " +
-                s"StringBinary: ${Bytes.toStringBinary(result.getRow())}.")
+      require(
+        r != null,
+        s"Failed to get value for column ${col}. " +
+          s"Rowkey: ${rowKey.toString} " +
+          s"StringBinary: ${Bytes.toStringBinary(result.getRow())}.")
 
       Bytes.toLong(r)
     }
@@ -354,19 +356,21 @@ object HBEventsUtil {
 
     entityType.foreach { et =>
       val compType = new BinaryComparator(Bytes.toBytes(et))
-      val filterType = new SingleColumnValueFilter(eBytes,
-                                                   colNames("entityType"),
-                                                   CompareOp.EQUAL,
-                                                   compType)
+      val filterType = new SingleColumnValueFilter(
+        eBytes,
+        colNames("entityType"),
+        CompareOp.EQUAL,
+        compType)
       filters.addFilter(filterType)
     }
 
     entityId.foreach { eid =>
       val compId = new BinaryComparator(Bytes.toBytes(eid))
-      val filterId = new SingleColumnValueFilter(eBytes,
-                                                 colNames("entityId"),
-                                                 CompareOp.EQUAL,
-                                                 compId)
+      val filterId = new SingleColumnValueFilter(
+        eBytes,
+        colNames("entityId"),
+        CompareOp.EQUAL,
+        compId)
       filters.addFilter(filterId)
     }
 
@@ -375,10 +379,11 @@ object HBEventsUtil {
       val eventFilters = new FilterList(FilterList.Operator.MUST_PASS_ONE)
       eventsList.foreach { e =>
         val compEvent = new BinaryComparator(Bytes.toBytes(e))
-        val filterEvent = new SingleColumnValueFilter(eBytes,
-                                                      colNames("event"),
-                                                      CompareOp.EQUAL,
-                                                      compEvent)
+        val filterEvent = new SingleColumnValueFilter(
+          eBytes,
+          colNames("event"),
+          CompareOp.EQUAL,
+          compEvent)
         eventFilters.addFilter(filterEvent)
       }
       if (!eventFilters.getFilters().isEmpty) {

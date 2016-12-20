@@ -50,9 +50,10 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
 
     // start two memcached server and join the cluster
     val firstPoolCluster = new ZookeeperServerSetCluster(
-      ServerSets.create(zookeeperClient,
-                        ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
-                        firstPoolPath))
+      ServerSets.create(
+        zookeeperClient,
+        ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
+        firstPoolPath))
     (0 to 1) foreach { _ =>
       TestMemcachedServer.start() match {
         case Some(server) =>
@@ -63,9 +64,10 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
     }
 
     val secondPoolCluster = new ZookeeperServerSetCluster(
-      ServerSets.create(zookeeperClient,
-                        ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
-                        secondPoolPath))
+      ServerSets.create(
+        zookeeperClient,
+        ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
+        secondPoolPath))
     (0 to 1) foreach { _ =>
       TestMemcachedServer.start() match {
         case Some(server) =>
@@ -392,14 +394,16 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
       assert(
         Await
           .result(replicatedClient.getsAll("foo")) == InconsistentReplication(
-          Seq(Return(Some((Buf.Utf8("bar"), SCasUnique(Buf.Utf8("6"))))),
-              Return(Some((Buf.Utf8("baz"), SCasUnique(Buf.Utf8("5"))))))))
+          Seq(
+            Return(Some((Buf.Utf8("bar"), SCasUnique(Buf.Utf8("6"))))),
+            Return(Some((Buf.Utf8("baz"), SCasUnique(Buf.Utf8("5"))))))))
       assert(Await.result(client1.delete("foo")) == true)
       assert(
         Await
           .result(replicatedClient.getsAll("foo")) == InconsistentReplication(
-          Seq(Return(None),
-              Return(Some((Buf.Utf8("baz"), SCasUnique(Buf.Utf8("5"))))))))
+          Seq(
+            Return(None),
+            Return(Some((Buf.Utf8("baz"), SCasUnique(Buf.Utf8("5"))))))))
       assert(
         Await.result(
           replicatedClient.checkAndSet(

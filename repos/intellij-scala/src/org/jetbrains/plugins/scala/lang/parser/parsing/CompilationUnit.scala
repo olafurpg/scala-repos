@@ -61,9 +61,10 @@ object CompilationUnit {
               builder.error(ErrMsg("semi.expected"))
             }
             if (ScalaTokenTypes.kPACKAGE == askType &&
-                !ParserUtils.lookAhead(builder,
-                                       ScalaTokenTypes.kPACKAGE,
-                                       ScalaTokenTypes.kOBJECT)) {
+                !ParserUtils.lookAhead(
+                  builder,
+                  ScalaTokenTypes.kPACKAGE,
+                  ScalaTokenTypes.kOBJECT)) {
               // Parse package statement
               val newMarker = builder.mark
               builder.advanceLexer //package

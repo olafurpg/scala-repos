@@ -408,12 +408,13 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
        > [(1, 0.99504950495049516)], [(1, 0.99504950495049516)]]
      */
 
-    val expectedPredictions = List((0, 0.99504),
-                                   (0, 0.99504),
-                                   (0, 0.99504),
-                                   (1, 0.99504),
-                                   (1, 0.99504),
-                                   (1, 0.99504))
+    val expectedPredictions = List(
+      (0, 0.99504),
+      (0, 0.99504),
+      (0, 0.99504),
+      (1, 0.99504),
+      (1, 0.99504),
+      (1, 0.99504))
 
     val actualPredictions = ldaModel.topicDistributions(docs).cache()
     val topTopics = actualPredictions
@@ -536,10 +537,11 @@ class LDASuite extends SparkFunSuite with MLlibTestSparkContext {
   test("model save/load") {
     // Test for LocalLDAModel.
     val localModel =
-      new LocalLDAModel(tinyTopics,
-                        Vectors.dense(Array.fill(tinyTopics.numRows)(0.01)),
-                        0.5D,
-                        10D)
+      new LocalLDAModel(
+        tinyTopics,
+        Vectors.dense(Array.fill(tinyTopics.numRows)(0.01)),
+        0.5D,
+        10D)
     val tempDir1 = Utils.createTempDir()
     val path1 = tempDir1.toURI.toString
 
@@ -659,10 +661,10 @@ private[clustering] object LDASuite {
     Array[Double](0.2, 0.2, 0.05, 0.05, 0.5) // topic 2
   )
   def tinyTopics: Matrix =
-    new DenseMatrix(numRows = tinyVocabSize,
-                    numCols = tinyK,
-                    values =
-                      tinyTopicsAsArray.fold(Array.empty[Double])(_ ++ _))
+    new DenseMatrix(
+      numRows = tinyVocabSize,
+      numCols = tinyK,
+      values = tinyTopicsAsArray.fold(Array.empty[Double])(_ ++ _))
   def tinyTopicDescription: Array[(Array[Int], Array[Double])] =
     tinyTopicsAsArray.map { topic =>
       val (termWeights, terms) = topic.zipWithIndex.sortBy(-_._1).unzip
@@ -717,20 +719,22 @@ private[clustering] object LDASuite {
     val alpha = 0.01
     val eta = 0.01
     val gammaShape = 100
-    val topics = new DenseMatrix(numRows = vocabSize,
-                                 numCols = k,
-                                 values = Array(1.86738052,
-                                                1.94056535,
-                                                1.89981687,
-                                                0.0833265,
-                                                0.07405918,
-                                                0.07940597,
-                                                0.15081551,
-                                                0.08637973,
-                                                0.12428538,
-                                                1.9474897,
-                                                1.94615165,
-                                                1.95204124))
+    val topics = new DenseMatrix(
+      numRows = vocabSize,
+      numCols = k,
+      values = Array(
+        1.86738052,
+        1.94056535,
+        1.89981687,
+        0.0833265,
+        0.07405918,
+        0.07940597,
+        0.15081551,
+        0.08637973,
+        0.12428538,
+        1.9474897,
+        1.94615165,
+        1.95204124))
     val ldaModel: LocalLDAModel = new LocalLDAModel(
       topics,
       Vectors.dense(Array.fill(k)(alpha)),

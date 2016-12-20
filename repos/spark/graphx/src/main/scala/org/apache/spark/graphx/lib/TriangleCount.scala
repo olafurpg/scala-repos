@@ -112,8 +112,9 @@ object TriangleCount {
     graph.outerJoinVertices(counters) { (_, _, optCounter: Option[Int]) =>
       val dblCount = optCounter.getOrElse(0)
       // This algorithm double counts each triangle so the final count should be even
-      require(dblCount % 2 == 0,
-              "Triangle count resulted in an invalid number of triangles.")
+      require(
+        dblCount % 2 == 0,
+        "Triangle count resulted in an invalid number of triangles.")
       dblCount / 2
     }
   }

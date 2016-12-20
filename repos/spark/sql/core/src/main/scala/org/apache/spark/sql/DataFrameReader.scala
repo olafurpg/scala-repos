@@ -134,10 +134,11 @@ class DataFrameReader private[sql] (sqlContext: SQLContext) extends Logging {
     * @since 1.4.0
     */
   def load(): DataFrame = {
-    val dataSource = DataSource(sqlContext,
-                                userSpecifiedSchema = userSpecifiedSchema,
-                                className = source,
-                                options = extraOptions.toMap)
+    val dataSource = DataSource(
+      sqlContext,
+      userSpecifiedSchema = userSpecifiedSchema,
+      className = source,
+      options = extraOptions.toMap)
     Dataset
       .newDataFrame(sqlContext, LogicalRelation(dataSource.resolveRelation()))
   }
@@ -165,11 +166,12 @@ class DataFrameReader private[sql] (sqlContext: SQLContext) extends Logging {
     } else {
       sqlContext.baseRelationToDataFrame(
         DataSource
-          .apply(sqlContext,
-                 paths = paths,
-                 userSpecifiedSchema = userSpecifiedSchema,
-                 className = source,
-                 options = extraOptions.toMap)
+          .apply(
+            sqlContext,
+            paths = paths,
+            userSpecifiedSchema = userSpecifiedSchema,
+            className = source,
+            options = extraOptions.toMap)
           .resolveRelation())
     }
   }
@@ -181,10 +183,11 @@ class DataFrameReader private[sql] (sqlContext: SQLContext) extends Logging {
     * @since 2.0.0
     */
   def stream(): DataFrame = {
-    val dataSource = DataSource(sqlContext,
-                                userSpecifiedSchema = userSpecifiedSchema,
-                                className = source,
-                                options = extraOptions.toMap)
+    val dataSource = DataSource(
+      sqlContext,
+      userSpecifiedSchema = userSpecifiedSchema,
+      className = source,
+      options = extraOptions.toMap)
     Dataset
       .newDataFrame(sqlContext, StreamingRelation(dataSource.createSource()))
   }
@@ -371,18 +374,21 @@ class DataFrameReader private[sql] (sqlContext: SQLContext) extends Logging {
   def json(jsonRDD: RDD[String]): DataFrame = {
     val parsedOptions: JSONOptions = new JSONOptions(extraOptions.toMap)
     val schema = userSpecifiedSchema.getOrElse {
-      InferSchema.infer(jsonRDD,
-                        sqlContext.conf.columnNameOfCorruptRecord,
-                        parsedOptions)
+      InferSchema.infer(
+        jsonRDD,
+        sqlContext.conf.columnNameOfCorruptRecord,
+        parsedOptions)
     }
 
     Dataset.newDataFrame(
       sqlContext,
-      LogicalRDD(schema.toAttributes,
-                 JacksonParser.parse(jsonRDD,
-                                     schema,
-                                     sqlContext.conf.columnNameOfCorruptRecord,
-                                     parsedOptions))(sqlContext))
+      LogicalRDD(
+        schema.toAttributes,
+        JacksonParser.parse(
+          jsonRDD,
+          schema,
+          sqlContext.conf.columnNameOfCorruptRecord,
+          parsedOptions))(sqlContext))
   }
 
   /**

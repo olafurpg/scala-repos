@@ -180,8 +180,9 @@ class ReducerEstimatorTest
 
           val conf = Config.fromHadoop(steps.head.getConfig)
           val numReducers = conf.getNumReducers
-          assert(!numReducers.isDefined || numReducers.get == 0,
-                 "Reducers should be 0")
+          assert(
+            !numReducers.isDefined || numReducers.get == 0,
+            "Reducers should be 0")
         }
         .run
     }

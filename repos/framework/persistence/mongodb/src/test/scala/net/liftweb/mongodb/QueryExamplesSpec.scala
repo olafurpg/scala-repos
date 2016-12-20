@@ -69,26 +69,30 @@ object QueryExamplesSpec extends Specification with MongoTestKit {
     val pebblesId = UUID.randomUUID
     val bammbammId = UUID.randomUUID
 
-    val fred = Person(ObjectId.get,
-                      "Flinstone, Fred",
-                      fredsBirthDate.getTime,
-                      pebblesId,
-                      Some(dinoId))
-    val wilma = Person(ObjectId.get,
-                       "Flinstone, Wilma",
-                       wilmasBirthDate.getTime,
-                       pebblesId,
-                       Some(dinoId))
-    val barney = Person(ObjectId.get,
-                        "Rubble, Barney",
-                        barneysBirthDate.getTime,
-                        bammbammId,
-                        None)
-    val betty = Person(ObjectId.get,
-                       "Rubble, Betty",
-                       bettysBirthDate.getTime,
-                       bammbammId,
-                       None)
+    val fred = Person(
+      ObjectId.get,
+      "Flinstone, Fred",
+      fredsBirthDate.getTime,
+      pebblesId,
+      Some(dinoId))
+    val wilma = Person(
+      ObjectId.get,
+      "Flinstone, Wilma",
+      wilmasBirthDate.getTime,
+      pebblesId,
+      Some(dinoId))
+    val barney = Person(
+      ObjectId.get,
+      "Rubble, Barney",
+      barneysBirthDate.getTime,
+      bammbammId,
+      None)
+    val betty = Person(
+      ObjectId.get,
+      "Rubble, Betty",
+      bettysBirthDate.getTime,
+      bammbammId,
+      None)
 
     fred.save
     wilma.save

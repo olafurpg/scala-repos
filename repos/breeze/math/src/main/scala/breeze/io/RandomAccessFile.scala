@@ -538,14 +538,15 @@ class RandomAccessFile(file: File, arg0: String = "r")(
     var c = 0
     while (c < n) {
       val c8 = c * 8
-      tr(c) = converter.bytesToInt64(ba(c8),
-                                     ba(c8 + 1),
-                                     ba(c8 + 2),
-                                     ba(c8 + 3),
-                                     ba(c8 + 4),
-                                     ba(c8 + 5),
-                                     ba(c8 + 6),
-                                     ba(c8 + 7))
+      tr(c) = converter.bytesToInt64(
+        ba(c8),
+        ba(c8 + 1),
+        ba(c8 + 2),
+        ba(c8 + 3),
+        ba(c8 + 4),
+        ba(c8 + 5),
+        ba(c8 + 6),
+        ba(c8 + 7))
       c += 1
     }
     //for(c <- 0 until n) tr(c) = bytesToInt16(ba(c), ba(c + 1))
@@ -623,14 +624,15 @@ class RandomAccessFile(file: File, arg0: String = "r")(
     var c = 0
     while (c < n) {
       val c8 = c * 8
-      tr(c) = converter.bytesToUInt64(ba(c8),
-                                      ba(c8 + 1),
-                                      ba(c8 + 2),
-                                      ba(c8 + 3),
-                                      ba(c8 + 4),
-                                      ba(c8 + 5),
-                                      ba(c8 + 6),
-                                      ba(c8 + 7))
+      tr(c) = converter.bytesToUInt64(
+        ba(c8),
+        ba(c8 + 1),
+        ba(c8 + 2),
+        ba(c8 + 3),
+        ba(c8 + 4),
+        ba(c8 + 5),
+        ba(c8 + 6),
+        ba(c8 + 7))
       c += 1
     }
     //for(c <- 0 until n) tr(c) = bytesToInt16(ba(c), ba(c + 1))
@@ -669,14 +671,15 @@ class RandomAccessFile(file: File, arg0: String = "r")(
   @throws(classOf[IOException])
   final def readUInt64Shifted(): Long = {
     val ba = readByte(8)
-    converter.bytesToUInt64Shifted(ba(0),
-                                   ba(1),
-                                   ba(2),
-                                   ba(3),
-                                   ba(4),
-                                   ba(5),
-                                   ba(6),
-                                   ba(7))
+    converter.bytesToUInt64Shifted(
+      ba(0),
+      ba(1),
+      ba(2),
+      ba(3),
+      ba(4),
+      ba(5),
+      ba(6),
+      ba(7))
   }
 
   /** Tries to read n UInt64s, shifted down in value to fit into Int64/Longs from the current getFilePointer().
@@ -691,14 +694,15 @@ class RandomAccessFile(file: File, arg0: String = "r")(
     var c = 0
     while (c < n) {
       val c8 = c * 8
-      tr(c) = converter.bytesToUInt64Shifted(ba(c8),
-                                             ba(c8 + 1),
-                                             ba(c8 + 2),
-                                             ba(c8 + 3),
-                                             ba(c8 + 4),
-                                             ba(c8 + 5),
-                                             ba(c8 + 6),
-                                             ba(c8 + 7))
+      tr(c) = converter.bytesToUInt64Shifted(
+        ba(c8),
+        ba(c8 + 1),
+        ba(c8 + 2),
+        ba(c8 + 3),
+        ba(c8 + 4),
+        ba(c8 + 5),
+        ba(c8 + 6),
+        ba(c8 + 7))
       c += 1
     }
     //for(c <- 0 until n) tr(c) = bytesToInt16(ba(c), ba(c + 1))
@@ -756,14 +760,15 @@ class RandomAccessFile(file: File, arg0: String = "r")(
     while (c < n) {
       val c8 = c * 8
       tr(c) = java.lang.Double.longBitsToDouble(
-        converter.bytesToInt64(ba(c8),
-                               ba(c8 + 1),
-                               ba(c8 + 2),
-                               ba(c8 + 3),
-                               ba(c8 + 4),
-                               ba(c8 + 5),
-                               ba(c8 + 6),
-                               ba(c8 + 7))
+        converter.bytesToInt64(
+          ba(c8),
+          ba(c8 + 1),
+          ba(c8 + 2),
+          ba(c8 + 3),
+          ba(c8 + 4),
+          ba(c8 + 5),
+          ba(c8 + 6),
+          ba(c8 + 7))
       )
       c += 1
     }
@@ -982,8 +987,9 @@ abstract class ByteConverter {
   ///// XXXToByte /////
   /**Takes an UInt8 (as Sort), and returns a bytes*/
   def uInt8ToByte(value: Short): Byte = {
-    require(value <= 255 && value >= 0,
-            "Value " + value + " is out of range of 1-byte unsigned integer.")
+    require(
+      value <= 255 && value >= 0,
+      "Value " + value + " is out of range of 1-byte unsigned integer.")
     if (value >= 128) (value - 256.toShort).toByte else value.toByte
   }
 
@@ -1075,8 +1081,9 @@ object ByteConverterBigEndian extends ByteConverter {
   }
 
   def uInt16ToBytes(value: Char): Array[Byte] = {
-    require(value <= 65535 && value >= 0,
-            "Value " + value + " is out of range of 2-byte unsigned array.")
+    require(
+      value <= 65535 && value >= 0,
+      "Value " + value + " is out of range of 2-byte unsigned array.")
 
     val tempret = new Array[Byte](2)
     tempret(0) = ((value >> 8) & 0xFF).toByte
@@ -1094,8 +1101,9 @@ object ByteConverterBigEndian extends ByteConverter {
   }
 
   def uInt32ToBytes(value: Long): Array[Byte] = {
-    require(value <= 4294967295L && value >= 0L,
-            "Value " + value + " is out of range of 4-byte unsigned array.")
+    require(
+      value <= 4294967295L && value >= 0L,
+      "Value " + value + " is out of range of 4-byte unsigned array.")
 
     val tempret = new Array[Byte](4)
     tempret(0) = ((value >> 24) & 0xFF).toByte
@@ -1202,8 +1210,9 @@ object ByteConverterLittleEndian extends ByteConverter {
   }
 
   def uInt16ToBytes(value: Char): Array[Byte] = {
-    require(value <= 65535 && value >= 0,
-            "Value " + value + " is out of range of 2-byte unsigned array.")
+    require(
+      value <= 65535 && value >= 0,
+      "Value " + value + " is out of range of 2-byte unsigned array.")
 
     val tempret = new Array[Byte](2)
     tempret(1) = ((value >> 8) & 0xFF).toByte
@@ -1221,8 +1230,9 @@ object ByteConverterLittleEndian extends ByteConverter {
   }
 
   def uInt32ToBytes(value: Long): Array[Byte] = {
-    require(value <= 4294967295L && value >= 0L,
-            "Value " + value + " is out of range of 4-byte unsigned array.")
+    require(
+      value <= 4294967295L && value >= 0L,
+      "Value " + value + " is out of range of 4-byte unsigned array.")
 
     val tempret = new Array[Byte](4)
     tempret(3) = ((value >> 24) & 0xFF).toByte

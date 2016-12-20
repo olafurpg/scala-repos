@@ -390,19 +390,21 @@ final class ChildActorPath private[akka] (val parent: ActorPath,
   override def toStringWithAddress(addr: Address): String = {
     val diff = addressStringLengthDiff(addr)
     val length = toStringLength + diff
-    buildToString(new JStringBuilder(length),
-                  length,
-                  diff,
-                  _.toStringWithAddress(addr)).toString
+    buildToString(
+      new JStringBuilder(length),
+      length,
+      diff,
+      _.toStringWithAddress(addr)).toString
   }
 
   override def toSerializationFormatWithAddress(addr: Address): String = {
     val diff = addressStringLengthDiff(addr)
     val length = toStringLength + diff
-    val sb = buildToString(new JStringBuilder(length + 12),
-                           length,
-                           diff,
-                           _.toStringWithAddress(addr))
+    val sb = buildToString(
+      new JStringBuilder(length + 12),
+      length,
+      diff,
+      _.toStringWithAddress(addr))
     appendUidFragment(sb).toString
   }
 
@@ -471,10 +473,11 @@ final class ChildActorPath private[akka] (val parent: ActorPath,
     def rec(p: ActorPath, h: Int, c: Int, k: Int): Int = p match {
       case r: RootActorPath ⇒ extendHash(h, r.##, c, k)
       case _ ⇒
-        rec(p.parent,
-            extendHash(h, stringHash(name), c, k),
-            nextMagicA(c),
-            nextMagicB(k))
+        rec(
+          p.parent,
+          extendHash(h, stringHash(name), c, k),
+          nextMagicA(c),
+          nextMagicB(k))
     }
 
     finalizeHash(rec(this, startHash(42), startMagicA, startMagicB))

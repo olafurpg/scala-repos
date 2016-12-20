@@ -330,9 +330,10 @@ object LinearProgram {
 
       val constraints = for (c: Constraint <- objective.constraints) yield {
         val cs = c.standardize
-        new LinearConstraint(cs.lhs.coefficients.toDenseVector.data,
-                             relationToConstraintType(c.relation),
-                             cs.rhs.scalarComponent)
+        new LinearConstraint(
+          cs.lhs.coefficients.toDenseVector.data,
+          relationToConstraintType(c.relation),
+          cs.rhs.scalarComponent)
       }
       new LinearConstraintSet(constraints.asJava)
     }

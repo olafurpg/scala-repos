@@ -76,9 +76,10 @@ object TreeItem {
              treeItem: TreeItem[T],
              expanded: Boolean) =
       this(
-        new jfxsc.TreeItem.TreeModificationEvent[T](eventType,
-                                                    treeItem,
-                                                    expanded))
+        new jfxsc.TreeItem.TreeModificationEvent[T](
+          eventType,
+          treeItem,
+          expanded))
 
     /**
       * Constructs a TreeModificationEvent for when the TreeItem has had its
@@ -89,10 +90,11 @@ object TreeItem {
              added: mutable.Buffer[_ <: jfxsc.TreeItem[T]],
              removed: mutable.Buffer[_ <: jfxsc.TreeItem[T]]) =
       this(
-        new jfxsc.TreeItem.TreeModificationEvent[T](eventType,
-                                                    treeItem,
-                                                    added,
-                                                    removed))
+        new jfxsc.TreeItem.TreeModificationEvent[T](
+          eventType,
+          treeItem,
+          added,
+          removed))
 
     /**
       * Constructs a TreeModificationEvent for when the TreeItem has had its
@@ -102,9 +104,10 @@ object TreeItem {
              treeItem: TreeItem[T],
              newValue: T) =
       this(
-        new jfxsc.TreeItem.TreeModificationEvent[T](eventType,
-                                                    treeItem,
-                                                    newValue))
+        new jfxsc.TreeItem.TreeModificationEvent[T](
+          eventType,
+          treeItem,
+          newValue))
 
     /**
       * Returns the children added to the TreeItem in this event, or an empty

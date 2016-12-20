@@ -69,8 +69,9 @@ class StreamTest {
 
   @Test // SI-8990
   def withFilter_after_first_withFilter_foreach_allows_GC: Unit = {
-    assertStreamOpAllowsGC(_.withFilter(_ > 1).withFilter(_ < 100).foreach(_),
-                           _ => ())
+    assertStreamOpAllowsGC(
+      _.withFilter(_ > 1).withFilter(_ < 100).foreach(_),
+      _ => ())
   }
 
   @Test // SI-8990
@@ -116,8 +117,9 @@ class StreamTest {
 
   @Test // SI-9134
   def withFilter_map_properly_lazy_in_tail: Unit = {
-    assertStreamOpLazyInTail(_.withFilter(_ % 2 == 0).map(identity),
-                             List(1, 2))
+    assertStreamOpLazyInTail(
+      _.withFilter(_ % 2 == 0).map(identity),
+      List(1, 2))
   }
 
   @Test

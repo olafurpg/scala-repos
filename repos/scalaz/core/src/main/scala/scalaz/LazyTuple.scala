@@ -402,15 +402,16 @@ private trait LazyTuple4Show[A1, A2, A3, A4]
   implicit def _3: Show[A3]
   implicit def _4: Show[A4]
   override def show(f: LazyTuple4[A1, A2, A3, A4]) =
-    Cord("(",
-         _1.show(f._1),
-         ",",
-         _2.show(f._2),
-         ",",
-         _3.show(f._3),
-         ",",
-         _4.show(f._4),
-         ")")
+    Cord(
+      "(",
+      _1.show(f._1),
+      ",",
+      _2.show(f._2),
+      ",",
+      _3.show(f._3),
+      ",",
+      _4.show(f._4),
+      ")")
 }
 
 private trait LazyTuple2Order[A1, A2]
@@ -521,10 +522,11 @@ private trait LazyTuple4Monad[A1, A2, A3]
       f: A => LazyTuple4[A1, A2, A3, B]) = {
     val t = f(fa._4)
 
-    lazyTuple4(_1.append(fa._1, t._1),
-               _2.append(fa._2, t._2),
-               _3.append(fa._3, t._3),
-               t._4)
+    lazyTuple4(
+      _1.append(fa._1, t._1),
+      _2.append(fa._2, t._2),
+      _3.append(fa._3, t._3),
+      t._4)
   }
   def point[A](a: => A) = lazyTuple4(_1.zero, _2.zero, _3.zero, a)
 }

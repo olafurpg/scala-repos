@@ -682,8 +682,9 @@ class ExportsTest {
     assertEquals("a", js.Dynamic.newInstance(constr)("a").result)
     assertEquals("a|b", js.Dynamic.newInstance(constr)("a", "b").result)
     assertEquals("a|b|c", js.Dynamic.newInstance(constr)("a", "b", "c").result)
-    assertEquals("Number: <5>|a",
-                 js.Dynamic.newInstance(constr)(5, "a").result)
+    assertEquals(
+      "Number: <5>|a",
+      js.Dynamic.newInstance(constr)(5, "a").result)
   }
 
   @Test def export_for_classes_with_default_parameters_in_ctor(): Unit = {

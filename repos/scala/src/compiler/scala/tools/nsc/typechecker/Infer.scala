@@ -381,8 +381,9 @@ trait Infer extends Checkable { self: Analyzer =>
       var tparams: List[Symbol] = Nil
       def addTypeParam(bounds: TypeBounds): Type = {
         val tparam =
-          context.owner.newExistential(newTypeName("_" + tparams.size),
-                                       context.tree.pos.focus) setInfo bounds
+          context.owner.newExistential(
+            newTypeName("_" + tparams.size),
+            context.tree.pos.focus) setInfo bounds
         tparams ::= tparam
         tparam.tpe
       }
@@ -421,11 +422,12 @@ trait Infer extends Checkable { self: Analyzer =>
         case _ => restpe
       }
       def solve() =
-        solvedTypes(tvars,
-                    tparams,
-                    tparams map varianceInType(variance),
-                    upper = false,
-                    lubDepth(restpe :: pt :: Nil))
+        solvedTypes(
+          tvars,
+          tparams,
+          tparams map varianceInType(variance),
+          upper = false,
+          lubDepth(restpe :: pt :: Nil))
 
       if (conforms)
         try solve()
@@ -440,11 +442,12 @@ trait Infer extends Checkable { self: Analyzer =>
                              restpe: Type,
                              pt: Type,
                              useWeaklyCompatible: Boolean): List[Type] =
-      exprTypeArgs(tparams map freshVar,
-                   tparams,
-                   restpe,
-                   pt,
-                   useWeaklyCompatible)
+      exprTypeArgs(
+        tparams map freshVar,
+        tparams,
+        restpe,
+        pt,
+        useWeaklyCompatible)
 
     /** Return inferred proto-type arguments of function, given
       *  its type and value parameters and result type, and a
@@ -646,11 +649,12 @@ trait Infer extends Checkable { self: Analyzer =>
                 foundReqMsg(tp1, pt1))
         }
       }
-      val targs = solvedTypes(tvars,
-                              tparams,
-                              tparams map varianceInTypes(formals),
-                              upper = false,
-                              lubDepth(formals) max lubDepth(argtpes))
+      val targs = solvedTypes(
+        tvars,
+        tparams,
+        tparams map varianceInTypes(formals),
+        upper = false,
+        lubDepth(formals) max lubDepth(argtpes))
       // Can warn about inferring Any/AnyVal as long as they don't appear
       // explicitly anywhere amongst the formal, argument, result, or expected type.
       // ...or lower bound of a type param, since they're asking for it.
@@ -703,10 +707,11 @@ trait Infer extends Checkable { self: Analyzer =>
         // followApply may return an OverloadedType (tpe is a value type with multiple `apply` methods)
         alts exists
           (alt =>
-             isApplicableBasedOnArity(pre memberType alt,
-                                      argsCount,
-                                      varargsStar,
-                                      tuplingAllowed))
+             isApplicableBasedOnArity(
+               pre memberType alt,
+               argsCount,
+               varargsStar,
+               tuplingAllowed))
       case _ =>
         val paramsCount = tpe.params.length
         // simpleMatch implies we're not using defaults
@@ -818,9 +823,10 @@ trait Infer extends Checkable { self: Analyzer =>
     def eligibleForTupleConversion(formals: List[Type],
                                    argsCount: Int): Boolean = formals match {
       case p :: Nil =>
-        eligibleForTupleConversion(1,
-                                   argsCount,
-                                   varargsTarget = isScalaRepeatedParamType(p))
+        eligibleForTupleConversion(
+          1,
+          argsCount,
+          varargsTarget = isScalaRepeatedParamType(p))
       case _ :: p :: Nil if isScalaRepeatedParamType(p) =>
         eligibleForTupleConversion(2, argsCount, varargsTarget = true)
       case _ => false
@@ -858,9 +864,10 @@ trait Infer extends Checkable { self: Analyzer =>
       val formals =
         formalTypes(mt.paramTypes, argtpes0.length, removeByName = false)
       def missingArgs =
-        missingParams[Type](argtpes0,
-                            mt.params,
-                            x => Some(x) collect { case NamedType(n, _) => n })
+        missingParams[Type](
+          argtpes0,
+          mt.params,
+          x => Some(x) collect { case NamedType(n, _) => n })
       def argsTupled = tupleIfNecessary(mt.paramTypes, argtpes0)
       def argsPlusDefaults = missingArgs match {
         case (args, _) if args forall (_.hasDefault) =>
@@ -1123,16 +1130,18 @@ trait Infer extends Checkable { self: Analyzer =>
       printTyping(
         tree,
         s"inferring arg instance based on pt0=$strictPt, pt1=$lenientPt")
-      var targs = exprTypeArgs(undetparams,
-                               tree.tpe,
-                               strictPt,
-                               useWeaklyCompatible = false)
+      var targs = exprTypeArgs(
+        undetparams,
+        tree.tpe,
+        strictPt,
+        useWeaklyCompatible = false)
       if ((targs eq null) ||
           !(tree.tpe.subst(undetparams, targs) <:< strictPt))
-        targs = exprTypeArgs(undetparams,
-                             tree.tpe,
-                             lenientPt,
-                             useWeaklyCompatible = false)
+        targs = exprTypeArgs(
+          undetparams,
+          tree.tpe,
+          lenientPt,
+          useWeaklyCompatible = false)
 
       substExpr(tree, undetparams, targs, lenientPt)
       printTyping(
@@ -1229,12 +1238,13 @@ trait Infer extends Checkable { self: Analyzer =>
             .AllArgsAndUndets(okparams, okargs, allargs, leftUndet) =
             methTypeArgs(undetparams, formals, restpe, argtpes, pt)
 
-          if (checkBounds(fn,
-                          NoPrefix,
-                          NoSymbol,
-                          undetparams,
-                          allargs,
-                          "inferred ")) {
+          if (checkBounds(
+                fn,
+                NoPrefix,
+                NoSymbol,
+                undetparams,
+                allargs,
+                "inferred ")) {
             val treeSubst = new TreeTypeSubstituter(okparams, okargs)
             treeSubst traverseTrees fn :: args
             notifyUndetparamsInferred(okparams, okargs)
@@ -1290,11 +1300,12 @@ trait Infer extends Checkable { self: Analyzer =>
 
             // Note: this is the only place where solvedTypes (or, indirectly, solve) is called
             // with upper = true.
-            val targs = solvedTypes(tvars,
-                                    undetparams,
-                                    variances,
-                                    upper = true,
-                                    lubDepth(resTp :: pt :: Nil))
+            val targs = solvedTypes(
+              tvars,
+              undetparams,
+              variances,
+              upper = true,
+              lubDepth(resTp :: pt :: Nil))
             // checkBounds(tree, NoPrefix, NoSymbol, undetparams, targs, "inferred ")
             // no checkBounds here. If we enable it, test bug602 fails.
             // TODO: reinstate checkBounds, return params that fail to meet their bounds to undetparams
@@ -1313,32 +1324,31 @@ trait Infer extends Checkable { self: Analyzer =>
       def inferForApproxPt =
         if (isFullyDefined(pt)) {
           inferFor(
-            pt.instantiateTypeParams(ptparams,
-                                     ptparams map (x =>
-                                                     WildcardType))) flatMap {
-            targs =>
-              val ctorTpInst =
-                tree.tpe.instantiateTypeParams(undetparams, targs)
-              val resTpInst = skipImplicit(ctorTpInst.finalResultType)
-              val ptvars =
-                ptparams map {
-                  // since instantiateTypeVar wants to modify the skolem that corresponds to the method's type parameter,
-                  // and it uses the TypeVar's origin to locate it, deskolemize the existential skolem to the method tparam skolem
-                  // (the existential skolem was created by adaptConstrPattern to introduce the type slack necessary to soundly deal with variant type parameters)
-                  case skolem if skolem.isGADTSkolem =>
-                    freshVar(skolem.deSkolemize.asInstanceOf[TypeSymbol])
-                  case p => freshVar(p)
-                }
+            pt.instantiateTypeParams(
+              ptparams,
+              ptparams map (x => WildcardType))) flatMap { targs =>
+            val ctorTpInst =
+              tree.tpe.instantiateTypeParams(undetparams, targs)
+            val resTpInst = skipImplicit(ctorTpInst.finalResultType)
+            val ptvars =
+              ptparams map {
+                // since instantiateTypeVar wants to modify the skolem that corresponds to the method's type parameter,
+                // and it uses the TypeVar's origin to locate it, deskolemize the existential skolem to the method tparam skolem
+                // (the existential skolem was created by adaptConstrPattern to introduce the type slack necessary to soundly deal with variant type parameters)
+                case skolem if skolem.isGADTSkolem =>
+                  freshVar(skolem.deSkolemize.asInstanceOf[TypeSymbol])
+                case p => freshVar(p)
+              }
 
-              val ptV = pt.instantiateTypeParams(ptparams, ptvars)
+            val ptV = pt.instantiateTypeParams(ptparams, ptvars)
 
-              if (isPopulated(resTpInst, ptV)) {
-                ptvars foreach instantiateTypeVar
-                debuglog(
-                  "isPopulated " + resTpInst + ", " + ptV + " vars= " +
-                    ptvars)
-                Some(targs)
-              } else None
+            if (isPopulated(resTpInst, ptV)) {
+              ptvars foreach instantiateTypeVar
+              debuglog(
+                "isPopulated " + resTpInst + ", " + ptV + " vars= " +
+                  ptvars)
+              Some(targs)
+            } else None
           }
         } else None
 
@@ -1372,11 +1382,12 @@ trait Infer extends Checkable { self: Analyzer =>
       val tvars1 = tvars map (_.cloneInternal)
       // Note: right now it's not clear that solving is complete, or how it can be made complete!
       // So we should come back to this and investigate.
-      solve(tvars1,
-            tvars1 map (_.origin.typeSymbol),
-            tvars1 map (_ => Variance.Covariant),
-            upper = false,
-            Depth.AnyDepth)
+      solve(
+        tvars1,
+        tvars1 map (_.origin.typeSymbol),
+        tvars1 map (_ => Variance.Covariant),
+        upper = false,
+        Depth.AnyDepth)
     }
 
     // this is quite nasty: it destructively changes the info of the syms of e.g., method type params
@@ -1569,12 +1580,13 @@ trait Infer extends Checkable { self: Analyzer =>
               //         spurious in light of the erroneous expected type
               if (pt.isErroneous) setError(tree)
               else
-                AmbiguousExprAlternativeError(tree,
-                                              pre,
-                                              best,
-                                              competing,
-                                              pt,
-                                              isSecondTry)
+                AmbiguousExprAlternativeError(
+                  tree,
+                  pre,
+                  best,
+                  competing,
+                  pt,
+                  isSecondTry)
             case _ =>
               if (bests.isEmpty || alts0.isEmpty)
                 NoBestExprAlternativeError(tree, pt, isSecondTry)
@@ -1652,10 +1664,11 @@ trait Infer extends Checkable { self: Analyzer =>
             // TODO: should we really allow tupling here?? (If we don't, this is the only call-site with `tuplingAllowed = true`)
             eligible filter
               (alt =>
-                 isApplicableBasedOnArity(alt.tpe,
-                                          argtpes.length,
-                                          varargsStar,
-                                          tuplingAllowed = true))
+                 isApplicableBasedOnArity(
+                   alt.tpe,
+                   argtpes.length,
+                   varargsStar,
+                   tuplingAllowed = true))
         }
     }
 
@@ -1700,10 +1713,11 @@ trait Infer extends Checkable { self: Analyzer =>
             !context.reporter.hasErrors
           }
         private def rankAlternatives(sym1: Symbol, sym2: Symbol) =
-          isStrictlyMoreSpecific(followType(sym1),
-                                 followType(sym2),
-                                 sym1,
-                                 sym2)
+          isStrictlyMoreSpecific(
+            followType(sym1),
+            followType(sym2),
+            sym1,
+            sym2)
         private def bestForExpectedType(pt: Type, isLastTry: Boolean): Unit = {
           val applicable = overloadsToConsiderBySpecificity(
             alts filter isAltApplicable(pt),
@@ -1712,13 +1726,14 @@ trait Infer extends Checkable { self: Analyzer =>
           val ranked = bestAlternatives(applicable)(rankAlternatives)
           ranked match {
             case best :: competing :: _ =>
-              AmbiguousMethodAlternativeError(tree,
-                                              pre,
-                                              best,
-                                              competing,
-                                              argtpes,
-                                              pt,
-                                              isLastTry) // ambiguous
+              AmbiguousMethodAlternativeError(
+                tree,
+                pre,
+                best,
+                competing,
+                argtpes,
+                pt,
+                isLastTry) // ambiguous
             case best :: Nil =>
               tree setSymbol best setType (pre memberType best) // success
             case Nil if pt.isWildcard =>

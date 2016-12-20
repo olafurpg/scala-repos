@@ -54,9 +54,10 @@ private[expr] object ExpectedTypes {
 
   def smartExpectedTypeEx(expr: ScExpression, fromUnderscore: Boolean = true)
     : Option[(ScType, Option[ScTypeElement])] = {
-    val types = expectedExprTypes(expr,
-                                  withResolvedFunction = true,
-                                  fromUnderscore = fromUnderscore)
+    val types = expectedExprTypes(
+      expr,
+      withResolvedFunction = true,
+      fromUnderscore = fromUnderscore)
     types.length match {
       case 1 => Some(types(0))
       case _ => None
@@ -195,8 +196,9 @@ private[expr] object ExpectedTypes {
                   ScUnderScoreSectionUtil.isUnderscore(expr) /* See SCL-3512, SCL-3525, SCL-4809, SCL-6785 */ =>
               ref.bind() match {
                 case Some(
-                    ScalaResolveResult(named: PsiNamedElement,
-                                       subst: ScSubstitutor)) =>
+                    ScalaResolveResult(
+                      named: PsiNamedElement,
+                      subst: ScSubstitutor)) =>
                   ScalaPsiUtil.nameContext(named) match {
                     case v: ScValue =>
                       Array(
@@ -229,9 +231,10 @@ private[expr] object ExpectedTypes {
                     case f: PsiField =>
                       Array(
                         (subst.subst(
-                           ScType.create(f.getType,
-                                         f.getProject,
-                                         expr.getResolveScope)),
+                           ScType.create(
+                             f.getType,
+                             f.getProject,
+                             expr.getResolveScope)),
                          None))
                     case _ => Array.empty
                   }
@@ -267,12 +270,13 @@ private[expr] object ExpectedTypes {
             }
             tps.foreach {
               case (r, isDynamicNamed) =>
-                processArgsExpected(res,
-                                    expr,
-                                    i,
-                                    r,
-                                    exprs,
-                                    isDynamicNamed = isDynamicNamed)
+                processArgsExpected(
+                  res,
+                  expr,
+                  i,
+                  r,
+                  exprs,
+                  isDynamicNamed = isDynamicNamed)
             }
           }
           res.toArray
@@ -311,13 +315,14 @@ private[expr] object ExpectedTypes {
           }
           tps.foreach {
             case (tp, isDynamicNamed) =>
-              processArgsExpected(res,
-                                  zExpr,
-                                  0,
-                                  tp,
-                                  Seq(zExpr),
-                                  Some(infix),
-                                  isDynamicNamed = isDynamicNamed)
+              processArgsExpected(
+                res,
+                zExpr,
+                0,
+                tp,
+                Seq(zExpr),
+                Some(infix),
+                isDynamicNamed = isDynamicNamed)
           }
           res.toArray
         //SLS[4.1]
@@ -408,13 +413,14 @@ private[expr] object ExpectedTypes {
             })
             tps.foreach {
               case (r, isDynamicNamed) =>
-                processArgsExpected(res,
-                                    expr,
-                                    i,
-                                    r,
-                                    exprs,
-                                    callOption,
-                                    isDynamicNamed = isDynamicNamed)
+                processArgsExpected(
+                  res,
+                  expr,
+                  i,
+                  r,
+                  exprs,
+                  callOption,
+                  isDynamicNamed = isDynamicNamed)
             }
           } else {
             //it's constructor
@@ -526,8 +532,9 @@ private[expr] object ExpectedTypes {
             .getCachedClasses(expr.getResolveScope, "scala.collection.Seq")
             .filter(!_.isInstanceOf[ScObject])
           if (seqClass.length != 0) {
-            val tp = ScParameterizedType(ScType.designator(seqClass(0)),
-                                         Seq(params.last.paramType))
+            val tp = ScParameterizedType(
+              ScType.designator(seqClass(0)),
+              Seq(params.last.paramType))
             res += ((tp, None))
           }
         case _ => res += p
@@ -588,13 +595,14 @@ private[expr] object ExpectedTypes {
                 }, Some(expr))
               call.foreach(call =>
                 polyType = call.updateAccordingToExpectedType(polyType))
-              processArgsExpected(res,
-                                  expr,
-                                  i,
-                                  polyType,
-                                  exprs,
-                                  forApply = true,
-                                  isDynamicNamed = isDynamicNamed)
+              processArgsExpected(
+                res,
+                expr,
+                i,
+                polyType,
+                exprs,
+                forApply = true,
+                isDynamicNamed = isDynamicNamed)
             case _ =>
           }
         }
@@ -617,13 +625,14 @@ private[expr] object ExpectedTypes {
                 Success(update(subst.subst(fun.polymorphicType())), Some(expr))
               call.foreach(call =>
                 polyType = call.updateAccordingToExpectedType(polyType))
-              processArgsExpected(res,
-                                  expr,
-                                  i,
-                                  polyType,
-                                  exprs,
-                                  forApply = true,
-                                  isDynamicNamed = isDynamicNamed)
+              processArgsExpected(
+                res,
+                expr,
+                i,
+                polyType,
+                exprs,
+                forApply = true,
+                isDynamicNamed = isDynamicNamed)
             case _ =>
           }
         }

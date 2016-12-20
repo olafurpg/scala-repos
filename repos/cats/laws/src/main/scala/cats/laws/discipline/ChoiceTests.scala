@@ -17,10 +17,11 @@ trait ChoiceTests[F[_, _]] extends CategoryTests[F] {
                          EqFAB: Eq[F[A, B]],
                          EqFAD: Eq[F[A, D]],
                          EqFXorABD: Eq[F[Xor[A, B], D]]): RuleSet =
-    new DefaultRuleSet(name = "choice",
-                       parent = Some(category[A, B, C, D]),
-                       "choice composition distributivity" -> forAll(
-                         laws.choiceCompositionDistributivity[A, B, C, D] _))
+    new DefaultRuleSet(
+      name = "choice",
+      parent = Some(category[A, B, C, D]),
+      "choice composition distributivity" -> forAll(
+        laws.choiceCompositionDistributivity[A, B, C, D] _))
 }
 
 object ChoiceTests {

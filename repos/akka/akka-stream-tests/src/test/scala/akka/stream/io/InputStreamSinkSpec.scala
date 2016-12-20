@@ -63,8 +63,9 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
       val inputStream =
         Source(byteString :: byteString2 :: Nil).runWith(testSink(sinkProbe))
 
-      sinkProbe.expectMsgAllOf(GraphStageMessages.Push,
-                               GraphStageMessages.Push)
+      sinkProbe.expectMsgAllOf(
+        GraphStageMessages.Push,
+        GraphStageMessages.Push)
 
       readN(inputStream, 2) should ===((2, byteString.take(2)))
       readN(inputStream, 2) should ===(
@@ -191,8 +192,9 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
         Source(bytes1 :: bytes2 :: Nil).runWith(testSink(sinkProbe))
 
       //need to wait while both elements arrive to sink
-      sinkProbe.expectMsgAllOf(GraphStageMessages.Push,
-                               GraphStageMessages.Push)
+      sinkProbe.expectMsgAllOf(
+        GraphStageMessages.Push,
+        GraphStageMessages.Push)
 
       readN(inputStream, 15) should ===((15, bytes1 ++ bytes2.take(5)))
       readN(inputStream, 15) should ===((5, bytes2.drop(5)))

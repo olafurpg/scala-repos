@@ -21,11 +21,12 @@ private[akka] object OutputStreamSubscriber {
             bufSize: Int,
             autoFlush: Boolean) = {
     require(bufSize > 0, "buffer size must be > 0")
-    Props(classOf[OutputStreamSubscriber],
-          os,
-          completionPromise,
-          bufSize,
-          autoFlush).withDeploy(Deploy.local)
+    Props(
+      classOf[OutputStreamSubscriber],
+      os,
+      completionPromise,
+      bufSize,
+      autoFlush).withDeploy(Deploy.local)
   }
 }
 

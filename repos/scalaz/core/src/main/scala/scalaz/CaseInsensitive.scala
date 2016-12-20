@@ -32,8 +32,9 @@ sealed abstract class CaseInsensitiveInstances {
     new Monoid[CaseInsensitive[A]] {
       def zero = CaseInsensitive.mk(Monoid[A].zero, Monoid[A].zero)
       def append(a: CaseInsensitive[A], b: => CaseInsensitive[A]) =
-        CaseInsensitive.mk(Semigroup[A].append(a.original, b.original),
-                           Semigroup[A].append(a.foldedCase, b.foldedCase))
+        CaseInsensitive.mk(
+          Semigroup[A].append(a.original, b.original),
+          Semigroup[A].append(a.foldedCase, b.foldedCase))
     }
 
   implicit def CaseInsensitiveEqual[A: Equal]: Equal[CaseInsensitive[A]] =

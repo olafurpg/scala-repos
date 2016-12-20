@@ -64,8 +64,9 @@ trait ReductionLibSpecs[M[+ _]]
   val line = Line(1, 1, "")
 
   def parseDateTimeFuzzy(time: String) =
-    Operate(BuiltInFunction1Op(ParseDateTimeFuzzy),
-            dag.AbsoluteLoad(Const(CString(time))(line))(line))(line)
+    Operate(
+      BuiltInFunction1Op(ParseDateTimeFuzzy),
+      dag.AbsoluteLoad(Const(CString(time))(line))(line))(line)
 
   "reduce homogeneous sets" >> {
     "singleton count" >> {
@@ -84,9 +85,10 @@ trait ReductionLibSpecs[M[+ _]]
 
     "count het numbers" >> {
       val input =
-        dag.Reduce(Count,
-                   dag.AbsoluteLoad(Const(CString("/hom/numbersHet"))(line))(
-                     line))(line)
+        dag.Reduce(
+          Count,
+          dag
+            .AbsoluteLoad(Const(CString("/hom/numbersHet"))(line))(line))(line)
 
       determineResult(input, 13)
     }
@@ -109,9 +111,10 @@ trait ReductionLibSpecs[M[+ _]]
 
     "mean het numbers" >> {
       val input =
-        dag.Reduce(Mean,
-                   dag.AbsoluteLoad(Const(CString("/hom/numbersHet"))(line))(
-                     line))(line)
+        dag.Reduce(
+          Mean,
+          dag
+            .AbsoluteLoad(Const(CString("/hom/numbersHet"))(line))(line))(line)
 
       determineResult(input, -37940.51855769231)
     }
@@ -126,9 +129,10 @@ trait ReductionLibSpecs[M[+ _]]
 
     "max het numbers" >> {
       val input =
-        dag.Reduce(Max,
-                   dag.AbsoluteLoad(Const(CString("/hom/numbersHet"))(line))(
-                     line))(line)
+        dag.Reduce(
+          Max,
+          dag
+            .AbsoluteLoad(Const(CString("/hom/numbersHet"))(line))(line))(line)
 
       determineResult(input, 9999)
     }
@@ -143,9 +147,10 @@ trait ReductionLibSpecs[M[+ _]]
 
     "min het numbers" >> {
       val input =
-        dag.Reduce(Min,
-                   dag.AbsoluteLoad(Const(CString("/hom/numbersHet"))(line))(
-                     line))(line)
+        dag.Reduce(
+          Min,
+          dag
+            .AbsoluteLoad(Const(CString("/hom/numbersHet"))(line))(line))(line)
 
       determineResult(input, -500000)
     }
@@ -190,9 +195,10 @@ trait ReductionLibSpecs[M[+ _]]
 
     "stdDev het numbers" >> {
       val input =
-        dag.Reduce(StdDev,
-                   dag.AbsoluteLoad(Const(CString("/hom/numbersHet"))(line))(
-                     line))(line)
+        dag.Reduce(
+          StdDev,
+          dag
+            .AbsoluteLoad(Const(CString("/hom/numbersHet"))(line))(line))(line)
 
       determineResult(input, 133416.18997644997)
     }

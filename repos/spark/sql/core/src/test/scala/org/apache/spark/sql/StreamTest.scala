@@ -281,8 +281,9 @@ trait StreamTest extends QueryTest with Timeouts {
               .take(10)
               .mkString(s"\n$prefix", s"\n$prefix\t", "\n")
         if (e.getCause != null) {
-          base + s"\n$prefix\tCaused by: " + exceptionToString(e.getCause,
-                                                               s"$prefix\t")
+          base + s"\n$prefix\tCaused by: " + exceptionToString(
+            e.getCause,
+            s"$prefix\t")
         } else {
           base
         }
@@ -315,17 +316,21 @@ trait StreamTest extends QueryTest with Timeouts {
               })
 
           case StopStream =>
-            verify(currentStream != null,
-                   "can not stop a stream that is not running")
+            verify(
+              currentStream != null,
+              "can not stop a stream that is not running")
             try failAfter(streamingTimeout) {
               currentStream.stop()
-              verify(!currentStream.microBatchThread.isAlive,
-                     s"microbatch thread not stopped")
-              verify(!currentStream.isActive,
-                     "query.isActive() is false even after stopping")
-              verify(currentStream.exception.isEmpty,
-                     s"query.exception() is not empty after clean stop: " +
-                       currentStream.exception.map(_.toString()).getOrElse(""))
+              verify(
+                !currentStream.microBatchThread.isAlive,
+                s"microbatch thread not stopped")
+              verify(
+                !currentStream.isActive,
+                "query.isActive() is false even after stopping")
+              verify(
+                currentStream.exception.isEmpty,
+                s"query.exception() is not empty after clean stop: " +
+                  currentStream.exception.map(_.toString()).getOrElse(""))
             } catch {
               case _: InterruptedException =>
               case _: org.scalatest.exceptions.TestFailedDueToTimeoutException =>
@@ -339,13 +344,15 @@ trait StreamTest extends QueryTest with Timeouts {
             }
 
           case DropBatches(num) =>
-            verify(currentStream == null,
-                   "dropping batches while running leads to corruption")
+            verify(
+              currentStream == null,
+              "dropping batches while running leads to corruption")
             sink.dropBatches(num)
 
           case ef: ExpectFailure[_] =>
-            verify(currentStream != null,
-                   "can not expect failure when stream is not running")
+            verify(
+              currentStream != null,
+              "can not expect failure when stream is not running")
             try failAfter(streamingTimeout) {
               val thrownException = intercept[ContinuousQueryException] {
                 currentStream.awaitTermination()
@@ -354,10 +361,12 @@ trait StreamTest extends QueryTest with Timeouts {
                 "microbatch thread not stopped after termination with failure") {
                 assert(!currentStream.microBatchThread.isAlive)
               }
-              verify(thrownException.query.eq(currentStream),
-                     s"incorrect query reference in exception")
-              verify(currentStream.exception === Some(thrownException),
-                     s"incorrect exception returned by query.exception()")
+              verify(
+                thrownException.query.eq(currentStream),
+                s"incorrect query reference in exception")
+              verify(
+                currentStream.exception === Some(thrownException),
+                s"incorrect exception returned by query.exception()")
 
               val exception = currentStream.exception.get
               verify(
@@ -377,11 +386,13 @@ trait StreamTest extends QueryTest with Timeouts {
             }
 
           case a: AssertOnQuery =>
-            verify(currentStream != null || lastStream != null,
-                   "cannot assert when not stream has been started")
+            verify(
+              currentStream != null || lastStream != null,
+              "cannot assert when not stream has been started")
             val streamToAssert = Option(currentStream).getOrElse(lastStream)
-            verify(a.condition(streamToAssert),
-                   s"Assert on query failed: ${a.message}")
+            verify(
+              a.condition(streamToAssert),
+              s"Assert on query failed: ${a.message}")
 
           case a: Assert =>
             val streamToAssert = Option(currentStream).getOrElse(lastStream)
@@ -528,8 +539,9 @@ trait StreamTest extends QueryTest with Timeouts {
               }
             }
           }
-          assert(thrownException.cause.getClass === e.t.runtimeClass,
-                 "exception of incorrect type was throw")
+          assert(
+            thrownException.cause.getClass === e.t.runtimeClass,
+            "exception of incorrect type was throw")
       }
     }
   }

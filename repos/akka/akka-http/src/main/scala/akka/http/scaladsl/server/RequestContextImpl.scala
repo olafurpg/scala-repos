@@ -32,34 +32,37 @@ private[http] class RequestContextImpl(
            parserSettings: ParserSettings)(
       implicit ec: ExecutionContextExecutor,
       materializer: Materializer) =
-    this(request,
-         request.uri.path,
-         ec,
-         materializer,
-         log,
-         settings,
-         parserSettings)
+    this(
+      request,
+      request.uri.path,
+      ec,
+      materializer,
+      log,
+      settings,
+      parserSettings)
 
   def this(request: HttpRequest,
            log: LoggingAdapter,
            settings: RoutingSettings)(implicit ec: ExecutionContextExecutor,
                                       materializer: Materializer) =
-    this(request,
-         request.uri.path,
-         ec,
-         materializer,
-         log,
-         settings,
-         ParserSettings(ActorMaterializer.downcast(materializer).system))
+    this(
+      request,
+      request.uri.path,
+      ec,
+      materializer,
+      log,
+      settings,
+      ParserSettings(ActorMaterializer.downcast(materializer).system))
 
   def reconfigure(executionContext: ExecutionContextExecutor,
                   materializer: Materializer,
                   log: LoggingAdapter,
                   settings: RoutingSettings): RequestContext =
-    copy(executionContext = executionContext,
-         materializer = materializer,
-         log = log,
-         routingSettings = settings)
+    copy(
+      executionContext = executionContext,
+      materializer = materializer,
+      log = log,
+      routingSettings = settings)
 
   override def complete(trm: ToResponseMarshallable): Future[RouteResult] =
     trm(request)(executionContext).fast
@@ -154,11 +157,12 @@ private[http] class RequestContextImpl(
                    log: LoggingAdapter = log,
                    routingSettings: RoutingSettings = settings,
                    parserSettings: ParserSettings = parserSettings) =
-    new RequestContextImpl(request,
-                           unmatchedPath,
-                           executionContext,
-                           materializer,
-                           log,
-                           routingSettings,
-                           parserSettings)
+    new RequestContextImpl(
+      request,
+      unmatchedPath,
+      executionContext,
+      materializer,
+      log,
+      routingSettings,
+      parserSettings)
 }

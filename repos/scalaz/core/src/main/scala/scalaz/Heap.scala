@@ -47,8 +47,9 @@ sealed abstract class Heap[A] {
   def union(as: Heap[A]) = (this, as) match {
     case (Empty(), q) => q
     case (q, Empty()) => q
-    case (Heap(s1, leq, t1 @ Node(Ranked(r1, x1), f1)),
-          Heap(s2, _, t2 @ Node(Ranked(r2, x2), f2))) =>
+    case (
+        Heap(s1, leq, t1 @ Node(Ranked(r1, x1), f1)),
+        Heap(s2, _, t2 @ Node(Ranked(r2, x2), f2))) =>
       if (leq(x1, x2))
         Heap(s1 + s2, leq, Node(Ranked(0, x1), skewInsert(leq, t2, f1)))
       else Heap(s1 + s2, leq, Node(Ranked(0, x2), skewInsert(leq, t1, f2)))
@@ -67,18 +68,19 @@ sealed abstract class Heap[A] {
 
   /**Delete the minimum key from the heap and return the resulting heap. O(log n) */
   def deleteMin: Heap[A] = {
-    fold(Empty[A],
-         (s, leq, t) =>
-           t match {
-             case Node(_, Stream()) => Empty[A]
-             case Node(_, f0) => {
-               val (Node(Ranked(r, x), cf), ts2) = getMin(leq, f0)
-               val (zs, ts1, f1) = splitForest(r, Stream(), Stream(), cf)
-               val f2 = skewMeld(leq, skewMeld(leq, ts1, ts2), f1)
-               val f3 = zs.foldRight(f2)(skewInsert(leq, _, _))
-               Heap(s - 1, leq, Node(Ranked(0, x), f3))
-             }
-         })
+    fold(
+      Empty[A],
+      (s, leq, t) =>
+        t match {
+          case Node(_, Stream()) => Empty[A]
+          case Node(_, f0) => {
+            val (Node(Ranked(r, x), cf), ts2) = getMin(leq, f0)
+            val (zs, ts1, f1) = splitForest(r, Stream(), Stream(), cf)
+            val f2 = skewMeld(leq, skewMeld(leq, ts1, ts2), f1)
+            val f3 = zs.foldRight(f2)(skewInsert(leq, _, _))
+            Heap(s - 1, leq, Node(Ranked(0, x), f3))
+          }
+      })
   }
 
   def adjustMin(f: A => A): Heap[A] = this match {
@@ -108,20 +110,22 @@ sealed abstract class Heap[A] {
 
   /**Filter the heap, retaining only values that satisfy the predicate. O(n)*/
   def filter(p: A => Boolean): Heap[A] =
-    fold(Empty[A],
-         (_, leq, t) =>
-           t foldMap
-             (x => if (p(x.value)) singletonWith(leq, x.value) else Empty[A]))
+    fold(
+      Empty[A],
+      (_, leq, t) =>
+        t foldMap
+          (x => if (p(x.value)) singletonWith(leq, x.value) else Empty[A]))
 
   /**Partition the heap according to a predicate. The first heap contains all elements that
     * satisfy the predicate. The second contains all elements that fail the predicate. O(n)*/
   def partition(p: A => Boolean): (Heap[A], Heap[A]) =
-    fold((Empty[A], Empty[A]),
-         (_, leq, t) =>
-           t.foldMap(
-             x =>
-               if (p(x.value)) (singletonWith(leq, x.value), Empty[A])
-               else (Empty[A], singletonWith(leq, x.value))))
+    fold(
+      (Empty[A], Empty[A]),
+      (_, leq, t) =>
+        t.foldMap(
+          x =>
+            if (p(x.value)) (singletonWith(leq, x.value), Empty[A])
+            else (Empty[A], singletonWith(leq, x.value))))
 
   /**Partition the heap of the elements that are less than, equal to, and greater than a given value. O(n)*/
   def split(a: A): (Heap[A], Heap[A], Heap[A]) = {
@@ -203,10 +207,12 @@ sealed abstract class Heap[A] {
       val y = t.rootLabel.value
       if (f(x, y)) Heap(s + 1, f, Node(Ranked(0, x), Stream(t)))
       else
-        Heap(s + 1,
-             f,
-             Node(Ranked(0, y),
-                  skewInsert(f, Node(Ranked(0, x), Stream()), t.subForest)))
+        Heap(
+          s + 1,
+          f,
+          Node(
+            Ranked(0, y),
+            skewInsert(f, Node(Ranked(0, x), Stream()), t.subForest)))
     })
 
   private def splitWithList(f: List[A] => (List[A], List[A])) = {
@@ -337,8 +343,9 @@ object Heap extends HeapInstances {
         val (left, Node(Ranked(rp, ap), asp) #:: right) = minZ(leq)(as)
         if (leq(a, ap)) n
         else
-          Node(Ranked(r, ap),
-               rezip((left, heapify(leq)(Node(Ranked(rp, a), asp)) #:: right)))
+          Node(
+            Ranked(r, ap),
+            rezip((left, heapify(leq)(Node(Ranked(rp, a), asp)) #:: right)))
       }
     }
 
@@ -352,9 +359,10 @@ object Heap extends HeapInstances {
                     t1: Tree[Ranked[A]],
                     t2: Tree[Ranked[A]]): Tree[Ranked[A]] =
       (t0, t1, t2) match {
-        case (Node(Ranked(r0, x0), cf0),
-              Node(Ranked(r1, x1), cf1),
-              Node(Ranked(r2, x2), cf2)) =>
+        case (
+            Node(Ranked(r0, x0), cf0),
+            Node(Ranked(r1, x1), cf1),
+            Node(Ranked(r2, x2), cf2)) =>
           if (f(x1, x0) && f(x1, x2))
             Node(Ranked(r1 + 1, x1), t0 #:: t2 #:: cf1)
           else if (f(x2, x0) && f(x2, x1))

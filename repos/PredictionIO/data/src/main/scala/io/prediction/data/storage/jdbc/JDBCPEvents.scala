@@ -53,8 +53,9 @@ class JDBCPEvents(client: String,
     val upper =
       untilTime.map(_.getMillis).getOrElse((DateTime.now + 1.years).getMillis)
     val par = scala.math
-      .min(new Duration(upper - lower).getStandardDays,
-           config.properties.getOrElse("PARTITIONS", "4").toLong)
+      .min(
+        new Duration(upper - lower).getStandardDays,
+        config.properties.getOrElse("PARTITIONS", "4").toLong)
       .toInt
     val entityTypeClause =
       entityType.map(x => s"and entityType = '$x'").getOrElse("")
@@ -101,9 +102,10 @@ class JDBCPEvents(client: String,
     new JdbcRDD(
       sc,
       () => {
-        DriverManager.getConnection(client,
-                                    config.properties("USERNAME"),
-                                    config.properties("PASSWORD"))
+        DriverManager.getConnection(
+          client,
+          config.properties("USERNAME"),
+          config.properties("PASSWORD"))
       },
       q,
       lower / 1000,
@@ -120,16 +122,16 @@ class JDBCPEvents(client: String,
           properties = Option(r.getString("properties"))
             .map(x => DataMap(Serialization.read[JObject](x)))
             .getOrElse(DataMap()),
-          eventTime =
-            new DateTime(r.getTimestamp("eventTime").getTime,
-                         DateTimeZone.forID(r.getString("eventTimeZone"))),
+          eventTime = new DateTime(
+            r.getTimestamp("eventTime").getTime,
+            DateTimeZone.forID(r.getString("eventTimeZone"))),
           tags = Option(r.getString("tags"))
             .map(x => x.split(",").toList)
             .getOrElse(Nil),
           prId = Option(r.getString("prId")),
-          creationTime =
-            new DateTime(r.getTimestamp("creationTime").getTime,
-                         DateTimeZone.forID(r.getString("creationTimeZone")))
+          creationTime = new DateTime(
+            r.getTimestamp("creationTime").getTime,
+            DateTimeZone.forID(r.getString("creationTimeZone")))
         )
       }
     ).cache()
@@ -143,19 +145,20 @@ class JDBCPEvents(client: String,
 
     val tableName = JDBCUtils.eventTableName(namespace, appId, channelId)
 
-    val eventTableColumns = Seq[String]("id",
-                                        "event",
-                                        "entityType",
-                                        "entityId",
-                                        "targetEntityType",
-                                        "targetEntityId",
-                                        "properties",
-                                        "eventTime",
-                                        "eventTimeZone",
-                                        "tags",
-                                        "prId",
-                                        "creationTime",
-                                        "creationTimeZone")
+    val eventTableColumns = Seq[String](
+      "id",
+      "event",
+      "entityType",
+      "entityId",
+      "targetEntityType",
+      "targetEntityId",
+      "properties",
+      "eventTime",
+      "eventTimeZone",
+      "tags",
+      "prId",
+      "creationTime",
+      "creationTimeZone")
 
     val eventDF = events
       .map { event =>

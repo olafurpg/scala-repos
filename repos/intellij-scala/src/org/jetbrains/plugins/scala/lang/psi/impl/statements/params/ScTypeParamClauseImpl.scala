@@ -45,8 +45,9 @@ class ScTypeParamClauseImpl private (stub: StubElement[ScTypeParamClause],
     val stub = getStub
     if (stub != null) {
       stub
-        .getChildrenByType(ScalaElementTypes.TYPE_PARAM,
-                           JavaArrayFactoryUtil.ScTypeParamFactory)
+        .getChildrenByType(
+          ScalaElementTypes.TYPE_PARAM,
+          JavaArrayFactoryUtil.ScTypeParamFactory)
         .toSeq
     } else {
       val buffer = new ArrayBuffer[ScTypeParam]

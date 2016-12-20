@@ -274,15 +274,16 @@ class FlowSplitWhenSpec extends AkkaSpec {
 
     "fail substream if materialized twice" in assertAllStagesStopped {
       an[IllegalStateException] mustBe thrownBy {
-        Await.result(Source
-                       .single(1)
-                       .splitWhen(_ ⇒ true)
-                       .lift
-                       .mapAsync(1) { src ⇒
-                         src.runWith(Sink.ignore); src.runWith(Sink.ignore)
-                       } // Sink.ignore+mapAsync pipes error back
-                       .runWith(Sink.ignore),
-                     3.seconds)
+        Await.result(
+          Source
+            .single(1)
+            .splitWhen(_ ⇒ true)
+            .lift
+            .mapAsync(1) { src ⇒
+              src.runWith(Sink.ignore); src.runWith(Sink.ignore)
+            } // Sink.ignore+mapAsync pipes error back
+            .runWith(Sink.ignore),
+          3.seconds)
       }
     }
 
@@ -297,11 +298,12 @@ class FlowSplitWhenSpec extends AkkaSpec {
         Source.single(1).concat(Source.maybe).splitWhen(_ ⇒ true)
 
       a[SubscriptionTimeoutException] mustBe thrownBy {
-        Await.result(testSource.lift
-                       .delay(1.second)
-                       .flatMapConcat(identity)
-                       .runWith(Sink.ignore)(tightTimeoutMaterializer),
-                     3.seconds)
+        Await.result(
+          testSource.lift
+            .delay(1.second)
+            .flatMapConcat(identity)
+            .runWith(Sink.ignore)(tightTimeoutMaterializer),
+          3.seconds)
       }
     }
 
@@ -376,9 +378,10 @@ class FlowSplitWhenSpec extends AkkaSpec {
     }
 
     "support eager cancellation of master stream on cancelling substreams" in assertAllStagesStopped {
-      new SubstreamsSupport(splitWhen = 5,
-                            elementCount = 8,
-                            SubstreamCancelStrategy.propagate) {
+      new SubstreamsSupport(
+        splitWhen = 5,
+        elementCount = 8,
+        SubstreamCancelStrategy.propagate) {
         val s1 = StreamPuppet(getSubFlow().runWith(Sink.asPublisher(false)))
         s1.cancel()
         masterSubscriber.expectComplete()

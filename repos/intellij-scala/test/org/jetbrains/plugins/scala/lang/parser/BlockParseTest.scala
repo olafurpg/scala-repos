@@ -22,11 +22,12 @@ class BlockParseTest extends SimpleTestCase {
       .createHolder(context.getManager, context)
       .getTreeElement
     val builder: ScalaPsiBuilderImpl = new ScalaPsiBuilderImpl(
-      PsiBuilderFactory.getInstance.createBuilder(context.getProject,
-                                                  holder,
-                                                  new ScalaLexer,
-                                                  ScalaFileType.SCALA_LANGUAGE,
-                                                  s)
+      PsiBuilderFactory.getInstance.createBuilder(
+        context.getProject,
+        holder,
+        new ScalaLexer,
+        ScalaFileType.SCALA_LANGUAGE,
+        s)
     )
     BlockExpr.parse(builder)
     val node = builder.getTreeBuilt

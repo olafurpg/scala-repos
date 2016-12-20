@@ -140,14 +140,15 @@ object KinesisWordCountASL extends Logging {
 
     // Create the Kinesis DStreams
     val kinesisStreams = (0 until numStreams).map { i =>
-      KinesisUtils.createStream(ssc,
-                                appName,
-                                streamName,
-                                endpointUrl,
-                                regionName,
-                                InitialPositionInStream.LATEST,
-                                kinesisCheckpointInterval,
-                                StorageLevel.MEMORY_AND_DISK_2)
+      KinesisUtils.createStream(
+        ssc,
+        appName,
+        streamName,
+        endpointUrl,
+        regionName,
+        InitialPositionInStream.LATEST,
+        kinesisCheckpointInterval,
+        StorageLevel.MEMORY_AND_DISK_2)
     }
 
     // Union all the streams

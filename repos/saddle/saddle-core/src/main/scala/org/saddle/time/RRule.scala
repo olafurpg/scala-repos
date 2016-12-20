@@ -76,12 +76,13 @@ case class RRule private (
     excepts: List[(RRule, Option[DateTime])] = List.empty) {
 
   private def dt2dtv(dt: DateTime): com.google.ical.values.DateTimeValueImpl = {
-    new com.google.ical.values.DateTimeValueImpl(dt.getYear,
-                                                 dt.getMonthOfYear,
-                                                 dt.getDayOfMonth,
-                                                 dt.getHourOfDay,
-                                                 dt.getMinuteOfHour,
-                                                 dt.getSecondOfMinute)
+    new com.google.ical.values.DateTimeValueImpl(
+      dt.getYear,
+      dt.getMonthOfYear,
+      dt.getDayOfMonth,
+      dt.getHourOfDay,
+      dt.getMinuteOfHour,
+      dt.getSecondOfMinute)
   }
 
   protected[time] def toICal: com.google.ical.values.RRule = {

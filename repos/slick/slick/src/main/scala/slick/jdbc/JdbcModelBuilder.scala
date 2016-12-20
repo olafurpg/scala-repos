@@ -196,11 +196,12 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
 
     // models
     def buildModel(builders: Builders) =
-      m.Table(namer.qualifiedName,
-              columns,
-              primaryKey,
-              buildForeignKeys(builders),
-              indices)
+      m.Table(
+        namer.qualifiedName,
+        columns,
+        primaryKey,
+        buildForeignKeys(builders),
+        indices)
 
     /** Column models in ordinal position order */
     final lazy val columns: Seq[m.Column] =
@@ -261,10 +262,11 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
     /** Indicates wether this should be a varchar in case of a string column.
       * Currently defaults to true. Should be based on the value of dbType in the future. */
     def varying: Boolean =
-      Seq(java.sql.Types.NVARCHAR,
-          java.sql.Types.VARCHAR,
-          java.sql.Types.LONGVARCHAR,
-          java.sql.Types.LONGNVARCHAR) contains meta.sqlType
+      Seq(
+        java.sql.Types.NVARCHAR,
+        java.sql.Types.VARCHAR,
+        java.sql.Types.LONGVARCHAR,
+        java.sql.Types.LONGNVARCHAR) contains meta.sqlType
 
     def rawDefault = meta.columnDef
 
@@ -320,11 +322,11 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
         .map(v => (v, tpe))
         .collect {
           case (v, _)
-              if Seq("NOW",
-                     "CURRENT_TIMESTAMP",
-                     "CURRENT_DATE",
-                     "CURRENT_TIME").contains(
-                v.stripSuffix("()").toUpperCase) =>
+              if Seq(
+                "NOW",
+                "CURRENT_TIMESTAMP",
+                "CURRENT_DATE",
+                "CURRENT_TIME").contains(v.stripSuffix("()").toUpperCase) =>
             logger.debug(s"Ignoring" + formatDefault(v))
             None
         }
@@ -383,9 +385,10 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       if (!enabled) None
       else
         Some(
-          m.PrimaryKey(name,
-                       tableBuilder.namer.qualifiedName,
-                       columns.map(tableBuilder.columnsByName))
+          m.PrimaryKey(
+            name,
+            tableBuilder.namer.qualifiedName,
+            columns.map(tableBuilder.columnsByName))
         )
   }
 
@@ -449,9 +452,10 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       if (!enabled) None
       else
         Some(
-          m.Index(name,
-                  tableBuilder.namer.qualifiedName,
-                  columns.map(tableBuilder.columnsByName),
-                  unique))
+          m.Index(
+            name,
+            tableBuilder.namer.qualifiedName,
+            columns.map(tableBuilder.columnsByName),
+            unique))
   }
 }

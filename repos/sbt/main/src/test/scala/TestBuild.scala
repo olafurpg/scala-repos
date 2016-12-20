@@ -61,13 +61,14 @@ object TestBuild {
     val extra: BuildUtil[Proj] = {
       val getp = (build: URI, project: String) =>
         env.buildMap(build).projectMap(project)
-      new BuildUtil(keyIndex,
-                    data,
-                    env.root.uri,
-                    env.rootProject,
-                    getp,
-                    _.configurations.map(c => ConfigKey(c.name)),
-                    Relation.empty)
+      new BuildUtil(
+        keyIndex,
+        data,
+        env.root.uri,
+        env.rootProject,
+        getp,
+        _.configurations.map(c => ConfigKey(c.name)),
+        Relation.empty)
     }
 
     lazy val allAttributeKeys: Set[AttributeKey[_]] =
@@ -184,8 +185,9 @@ object TestBuild {
 
   implicit lazy val arbKeys: Arbitrary[Keys] = Arbitrary(keysGen)
   lazy val keysGen: Gen[Keys] = for (env <- mkEnv;
-                                     keyCount <- chooseShrinkable(1,
-                                                                  KeysPerEnv);
+                                     keyCount <- chooseShrinkable(
+                                       1,
+                                       KeysPerEnv);
                                      keys <- listOfN(keyCount, scope(env)))
     yield new Keys(env, keys)
 
@@ -196,8 +198,9 @@ object TestBuild {
       cAxis <- oneOrGlobal(project.configurations map toConfigKey)
       tAxis <- oneOrGlobal(env.tasks map getKey)
       pAxis <- orGlobal(
-        frequency((1, BuildRef(build.uri)),
-                  (3, ProjectRef(build.uri, project.id))))
+        frequency(
+          (1, BuildRef(build.uri)),
+          (3, ProjectRef(build.uri, project.id))))
     } yield Scope(pAxis, cAxis, tAxis, Global)
 
   def orGlobal[T](gen: Gen[T]): Gen[ScopeAxis[T]] =

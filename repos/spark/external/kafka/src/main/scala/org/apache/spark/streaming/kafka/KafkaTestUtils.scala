@@ -104,10 +104,11 @@ private[kafka] class KafkaTestUtils extends Logging {
     zookeeper = new EmbeddedZookeeper(s"$zkHost:$zkPort")
     // Get the actual zookeeper binding port
     zkPort = zookeeper.actualPort
-    zkClient = new ZkClient(s"$zkHost:$zkPort",
-                            zkSessionTimeout,
-                            zkConnectionTimeout,
-                            ZKStringSerializer)
+    zkClient = new ZkClient(
+      s"$zkHost:$zkPort",
+      zkSessionTimeout,
+      zkConnectionTimeout,
+      ZKStringSerializer)
     zkReady = true
   }
 
@@ -177,8 +178,9 @@ private[kafka] class KafkaTestUtils extends Logging {
 
   /** Java-friendly function for sending messages to the Kafka broker */
   def sendMessages(topic: String, messageToFreq: JMap[String, JInt]): Unit = {
-    sendMessages(topic,
-                 Map(messageToFreq.asScala.mapValues(_.intValue()).toSeq: _*))
+    sendMessages(
+      topic,
+      Map(messageToFreq.asScala.mapValues(_.intValue()).toSeq: _*))
   }
 
   /** Send the messages to the Kafka broker */

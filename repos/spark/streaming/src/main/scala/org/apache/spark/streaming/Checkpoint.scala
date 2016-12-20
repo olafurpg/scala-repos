@@ -48,14 +48,15 @@ private[streaming] class Checkpoint(ssc: StreamingContext,
 
     // Reload properties for the checkpoint application since user wants to set a reload property
     // or spark had changed its value and user wants to set it back.
-    val propertiesToReload = List("spark.yarn.app.id",
-                                  "spark.yarn.app.attemptId",
-                                  "spark.driver.host",
-                                  "spark.driver.port",
-                                  "spark.master",
-                                  "spark.yarn.keytab",
-                                  "spark.yarn.principal",
-                                  "spark.ui.filters")
+    val propertiesToReload = List(
+      "spark.yarn.app.id",
+      "spark.yarn.app.attemptId",
+      "spark.driver.host",
+      "spark.driver.port",
+      "spark.master",
+      "spark.yarn.keytab",
+      "spark.yarn.principal",
+      "spark.ui.filters")
 
     val newSparkConf = new SparkConf(loadDefaults = false)
       .setAll(sparkConfPairs)
@@ -279,9 +280,10 @@ private[streaming] class CheckpointWriter(
           return
         } catch {
           case ioe: IOException =>
-            logWarning("Error in attempt " + attempts +
-                         " of writing checkpoint to " + checkpointFile,
-                       ioe)
+            logWarning(
+              "Error in attempt " + attempts +
+                " of writing checkpoint to " + checkpointFile,
+              ioe)
             reset()
         }
       }
@@ -295,9 +297,10 @@ private[streaming] class CheckpointWriter(
     try {
       val bytes = Checkpoint.serialize(checkpoint, conf)
       executor.execute(
-        new CheckpointWriteHandler(checkpoint.checkpointTime,
-                                   bytes,
-                                   clearCheckpointDataLater))
+        new CheckpointWriteHandler(
+          checkpoint.checkpointTime,
+          bytes,
+          clearCheckpointDataLater))
       logInfo(
         "Submitted checkpoint of time " + checkpoint.checkpointTime +
           " writer queue")
@@ -344,10 +347,11 @@ private[streaming] object CheckpointReader extends Logging {
     * checkpoint files could be read correctly, then return None.
     */
   def read(checkpointDir: String): Option[Checkpoint] = {
-    read(checkpointDir,
-         new SparkConf(),
-         SparkHadoopUtil.get.conf,
-         ignoreReadError = true)
+    read(
+      checkpointDir,
+      new SparkConf(),
+      SparkHadoopUtil.get.conf,
+      ignoreReadError = true)
   }
 
   /**

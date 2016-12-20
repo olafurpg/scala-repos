@@ -20,9 +20,10 @@ class PersistentActorWithAtLeastOnceDeliveryBenchmark {
   val config = PersistenceSpec.config("leveldb", "benchmark")
 
   lazy val storageLocations =
-    List("akka.persistence.journal.leveldb.dir",
-         "akka.persistence.journal.leveldb-shared.store.dir",
-         "akka.persistence.snapshot-store.local.dir").map(s ⇒
+    List(
+      "akka.persistence.journal.leveldb.dir",
+      "akka.persistence.journal.leveldb-shared.store.dir",
+      "akka.persistence.snapshot-store.local.dir").map(s ⇒
       new File(system.settings.config.getString(s)))
 
   var system: ActorSystem = _
@@ -48,22 +49,25 @@ class PersistentActorWithAtLeastOnceDeliveryBenchmark {
     destinationActor = system.actorOf(Props[DestinationActor], "destination")
 
     noPersistPersistentActorWithAtLeastOnceDelivery = system.actorOf(
-      Props(classOf[NoPersistPersistentActorWithAtLeastOnceDelivery],
-            dataCount,
-            probe.ref,
-            destinationActor.path),
+      Props(
+        classOf[NoPersistPersistentActorWithAtLeastOnceDelivery],
+        dataCount,
+        probe.ref,
+        destinationActor.path),
       "nop-1")
     persistPersistentActorWithAtLeastOnceDelivery = system.actorOf(
-      Props(classOf[PersistPersistentActorWithAtLeastOnceDelivery],
-            dataCount,
-            probe.ref,
-            destinationActor.path),
+      Props(
+        classOf[PersistPersistentActorWithAtLeastOnceDelivery],
+        dataCount,
+        probe.ref,
+        destinationActor.path),
       "ep-1")
     persistAsyncPersistentActorWithAtLeastOnceDelivery = system.actorOf(
-      Props(classOf[PersistAsyncPersistentActorWithAtLeastOnceDelivery],
-            dataCount,
-            probe.ref,
-            destinationActor.path),
+      Props(
+        classOf[PersistAsyncPersistentActorWithAtLeastOnceDelivery],
+        dataCount,
+        probe.ref,
+        destinationActor.path),
       "epa-1")
   }
 

@@ -38,11 +38,13 @@ object SigarLoader {
 
   def locateSigarArtifact = update map { report =>
     val artifactList = report.matching(
-      moduleFilter(organization = sigarLoader.organization,
-                   name = sigarLoader.name)
+      moduleFilter(
+        organization = sigarLoader.organization,
+        name = sigarLoader.name)
     )
-    require(artifactList.size == 1,
-            "Expecting single artifact, while found: " + artifactList)
+    require(
+      artifactList.size == 1,
+      "Expecting single artifact, while found: " + artifactList)
     artifactList(0)
   }
 

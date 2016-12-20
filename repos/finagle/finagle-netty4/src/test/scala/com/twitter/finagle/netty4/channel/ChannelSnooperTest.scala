@@ -133,10 +133,11 @@ class ChannelSnooperTest extends FunSuite with MockitoSugar {
   test("SimpleChannelSnooper snoops connect") {
     new InstrumentedSnooperCtx {
       assert(eventCount == 0)
-      scs.connect(ctx,
-                  new InetSocketAddress(0),
-                  new InetSocketAddress(0),
-                  mock[ChannelPromise])
+      scs.connect(
+        ctx,
+        new InetSocketAddress(0),
+        new InetSocketAddress(0),
+        mock[ChannelPromise])
       assert(eventCount == 1)
     }
   }

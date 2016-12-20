@@ -67,8 +67,9 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
     */
   val selfUniqueAddress: UniqueAddress = system.provider match {
     case c: ClusterActorRefProvider ⇒
-      UniqueAddress(c.transport.defaultAddress,
-                    AddressUidExtension(system).addressUid)
+      UniqueAddress(
+        c.transport.defaultAddress,
+        AddressUidExtension(system).addressUid)
     case other ⇒
       throw new ConfigurationException(
         s"ActorSystem [${system}] needs to have a 'ClusterActorRefProvider' enabled in the configuration, currently uses [${other.getClass.getName}]")
@@ -99,9 +100,10 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
 
   val failureDetector: FailureDetectorRegistry[Address] = {
     def createFailureDetector(): FailureDetector =
-      FailureDetectorLoader.load(settings.FailureDetectorImplementationClass,
-                                 settings.FailureDetectorConfig,
-                                 system)
+      FailureDetectorLoader.load(
+        settings.FailureDetectorImplementationClass,
+        settings.FailureDetectorConfig,
+        system)
 
     new DefaultFailureDetectorRegistry(() ⇒ createFailureDetector())
   }
@@ -133,9 +135,10 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
       system.dynamicAccess
         .createInstanceFor[Scheduler](
           system.settings.SchedulerClass,
-          immutable.Seq(classOf[Config] -> cfg,
-                        classOf[LoggingAdapter] -> log,
-                        classOf[ThreadFactory] -> threadFactory))
+          immutable.Seq(
+            classOf[Config] -> cfg,
+            classOf[LoggingAdapter] -> log,
+            classOf[ThreadFactory] -> threadFactory))
         .get
     } else {
       // delegate to system.scheduler, but don't close over system
@@ -161,10 +164,11 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
 
   // create supervisor for daemons under path "/system/cluster"
   private val clusterDaemons: ActorRef = {
-    system.systemActorOf(Props(classOf[ClusterDaemon], settings)
-                           .withDispatcher(UseDispatcher)
-                           .withDeploy(Deploy.local),
-                         name = "cluster")
+    system.systemActorOf(
+      Props(classOf[ClusterDaemon], settings)
+        .withDispatcher(UseDispatcher)
+        .withDeploy(Deploy.local),
+      name = "cluster")
   }
 
   /**
@@ -173,9 +177,10 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
   private[cluster] val clusterCore: ActorRef = {
     implicit val timeout = system.settings.CreationTimeout
     try {
-      Await.result((clusterDaemons ? InternalClusterAction.GetClusterCoreRef)
-                     .mapTo[ActorRef],
-                   timeout.duration)
+      Await.result(
+        (clusterDaemons ? InternalClusterAction.GetClusterCoreRef)
+          .mapTo[ActorRef],
+        timeout.duration)
     } catch {
       case NonFatal(e) ⇒
         log.error(
@@ -246,8 +251,9 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
   def subscribe(subscriber: ActorRef,
                 initialStateMode: SubscriptionInitialStateMode,
                 to: Class[_]*): Unit = {
-    require(to.length > 0,
-            "at least one `ClusterDomainEvent` class is required")
+    require(
+      to.length > 0,
+      "at least one `ClusterDomainEvent` class is required")
     require(
       to.forall(classOf[ClusterDomainEvent].isAssignableFrom),
       s"subscribe to `akka.cluster.ClusterEvent.ClusterDomainEvent` or subclasses, was [${to.map(_.getName).mkString(", ")}]")

@@ -161,11 +161,12 @@ final case class TailChoppingPool(
     with PoolOverrideUnsetConfig[TailChoppingPool] {
 
   def this(config: Config) =
-    this(nrOfInstances = config.getInt("nr-of-instances"),
-         within = config.getMillisDuration("within"),
-         interval = config.getMillisDuration("tail-chopping-router.interval"),
-         resizer = Resizer.fromConfig(config),
-         usePoolDispatcher = config.hasPath("pool-dispatcher"))
+    this(
+      nrOfInstances = config.getInt("nr-of-instances"),
+      within = config.getMillisDuration("within"),
+      interval = config.getMillisDuration("tail-chopping-router.interval"),
+      resizer = Resizer.fromConfig(config),
+      usePoolDispatcher = config.hasPath("pool-dispatcher"))
 
   /**
     * Java API
@@ -179,10 +180,11 @@ final case class TailChoppingPool(
 
   override def createRouter(system: ActorSystem): Router =
     new Router(
-      TailChoppingRoutingLogic(system.scheduler,
-                               within,
-                               interval,
-                               system.dispatchers.lookup(routerDispatcher)))
+      TailChoppingRoutingLogic(
+        system.scheduler,
+        within,
+        interval,
+        system.dispatchers.lookup(routerDispatcher)))
 
   override def nrOfInstances(sys: ActorSystem) = this.nrOfInstances
 
@@ -250,9 +252,10 @@ final case class TailChoppingGroup(
     extends Group {
 
   def this(config: Config) =
-    this(paths = immutableSeq(config.getStringList("routees.paths")),
-         within = config.getMillisDuration("within"),
-         interval = config.getMillisDuration("tail-chopping-router.interval"))
+    this(
+      paths = immutableSeq(config.getStringList("routees.paths")),
+      within = config.getMillisDuration("within"),
+      interval = config.getMillisDuration("tail-chopping-router.interval"))
 
   /**
     * Java API
@@ -265,16 +268,18 @@ final case class TailChoppingGroup(
   def this(routeePaths: java.lang.Iterable[String],
            within: FiniteDuration,
            interval: FiniteDuration) =
-    this(paths = immutableSeq(routeePaths),
-         within = within,
-         interval = interval)
+    this(
+      paths = immutableSeq(routeePaths),
+      within = within,
+      interval = interval)
 
   override def createRouter(system: ActorSystem): Router =
     new Router(
-      TailChoppingRoutingLogic(system.scheduler,
-                               within,
-                               interval,
-                               system.dispatchers.lookup(routerDispatcher)))
+      TailChoppingRoutingLogic(
+        system.scheduler,
+        within,
+        interval,
+        system.dispatchers.lookup(routerDispatcher)))
 
   override def paths(system: ActorSystem): immutable.Iterable[String] =
     this.paths

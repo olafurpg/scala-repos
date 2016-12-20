@@ -599,8 +599,9 @@ object Console extends Logging {
 
     parser.parse(consoleArgs, ConsoleArgs()) map { pca =>
       val ca = pca.copy(
-        common = pca.common.copy(sparkPassThrough = sparkPassThroughArgs,
-                                 driverPassThrough = driverPassThroughArgs))
+        common = pca.common.copy(
+          sparkPassThrough = sparkPassThroughArgs,
+          driverPassThrough = driverPassThroughArgs))
       WorkflowUtils.modifyLogging(ca.common.verbose)
       val rv: Int = ca.commands match {
         case Seq("") =>
@@ -740,18 +741,20 @@ object Console extends Logging {
 
   def train(ca: ConsoleArgs): Int = {
     Template.verifyTemplateMinVersion(new File("template.json"))
-    withRegisteredManifest(ca.common.manifestJson,
-                           ca.common.engineId,
-                           ca.common.engineVersion) { em =>
+    withRegisteredManifest(
+      ca.common.manifestJson,
+      ca.common.engineId,
+      ca.common.engineVersion) { em =>
       RunWorkflow.newRunWorkflow(ca, em)
     }
   }
 
   def deploy(ca: ConsoleArgs): Int = {
     Template.verifyTemplateMinVersion(new File("template.json"))
-    withRegisteredManifest(ca.common.manifestJson,
-                           ca.common.engineId,
-                           ca.common.engineVersion) { em =>
+    withRegisteredManifest(
+      ca.common.manifestJson,
+      ca.common.engineId,
+      ca.common.engineVersion) { em =>
       val variantJson = parse(Source.fromFile(ca.common.variantJson).mkString)
       val variantId = variantJson \ "id" match {
         case JString(s) => s
@@ -793,9 +796,10 @@ object Console extends Logging {
     info(
       s"Creating Event Server at ${ca.eventServer.ip}:${ca.eventServer.port}")
     EventServer.createEventServer(
-      EventServerConfig(ip = ca.eventServer.ip,
-                        port = ca.eventServer.port,
-                        stats = ca.eventServer.stats))
+      EventServerConfig(
+        ip = ca.eventServer.ip,
+        port = ca.eventServer.port,
+        stats = ca.eventServer.stats))
   }
 
   def adminserver(ca: ConsoleArgs): Unit = {
@@ -841,11 +845,13 @@ object Console extends Logging {
     // only add pioVersion to sbt if project/pio.sbt exists
     if (new File("project", "pio-build.sbt").exists ||
         ca.build.forceGeneratePIOSbt) {
-      FileUtils.writeLines(new File("pio.sbt"),
-                           Seq("// Generated automatically by pio build.",
-                               "// Changes in this file will be overridden.",
-                               "",
-                               "pioVersion := \"" + BuildInfo.version + "\""))
+      FileUtils.writeLines(
+        new File("pio.sbt"),
+        Seq(
+          "// Generated automatically by pio build.",
+          "// Changes in this file will be overridden.",
+          "",
+          "pioVersion := \"" + BuildInfo.version + "\""))
     }
     implicit val formats = Utils.json4sDefaultFormats
     try {
@@ -892,8 +898,9 @@ object Console extends Logging {
           buildCmd.!(ProcessLogger(line => info(line), line => error(line)))
         } else {
           buildCmd.!(
-            ProcessLogger(line => outputSbtError(line),
-                          line => outputSbtError(line)))
+            ProcessLogger(
+              line => outputSbtError(line),
+              line => outputSbtError(line)))
         }
       if (r != 0) {
         error(s"Return code of previous step is ${r}. Aborting.")
@@ -934,12 +941,13 @@ object Console extends Logging {
         s"${ca.mainClass.get} ${ca.common.sparkPassThrough.mkString(" ")} " +
         coreAssembly(ca.common.pioHome.get) + " " +
         ca.common.driverPassThrough.mkString(" ")
-    val proc = Process(cmd,
-                       None,
-                       "SPARK_YARN_USER_ENV" -> sys.env
-                         .filter(kv => kv._1.startsWith("PIO_"))
-                         .map(kv => s"${kv._1}=${kv._2}")
-                         .mkString(","))
+    val proc = Process(
+      cmd,
+      None,
+      "SPARK_YARN_USER_ENV" -> sys.env
+        .filter(kv => kv._1.startsWith("PIO_"))
+        .map(kv => s"${kv._1}=${kv._2}")
+        .mkString(","))
     info(s"Submission command: ${cmd}")
     val r = proc.!
     if (r != 0) {
@@ -1098,12 +1106,13 @@ object Console extends Logging {
       .digest(cwd.getBytes)
       .map("%02x".format(_))
       .mkString
-    val em = EngineManifest(id = rand,
-                            version = ha,
-                            name = new File(cwd).getName,
-                            description = Some(manifestAutogenTag),
-                            files = Seq(),
-                            engineFactory = "")
+    val em = EngineManifest(
+      id = rand,
+      version = ha,
+      name = new File(cwd).getName,
+      description = Some(manifestAutogenTag),
+      files = Seq(),
+      engineFactory = "")
     try {
       FileUtils.writeStringToFile(json, write(em), "ISO-8859-1")
     } catch {

@@ -18,10 +18,11 @@ object Insight extends LilaController {
   }
 
   def index(username: String) =
-    path(username,
-         metric = Metric.MeanCpl.key,
-         dimension = Dimension.Perf.key,
-         filters = "")
+    path(
+      username,
+      metric = Metric.MeanCpl.key,
+      dimension = Dimension.Perf.key,
+      filters = "")
 
   def path(username: String,
            metric: String,

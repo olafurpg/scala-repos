@@ -214,8 +214,9 @@ class Job(val args: Args) extends FieldConversions with java.io.Serializable {
     defaultComparator
       .map(init.setDefaultComparator)
       .getOrElse(init)
-      .setSerialization(Right(classOf[serialization.KryoHadoop]),
-                        ioSerializations)
+      .setSerialization(
+        Right(classOf[serialization.KryoHadoop]),
+        ioSerializations)
       .setScaldingVersion
       .setCascadingAppName(name)
       .setCascadingAppId(name)
@@ -455,8 +456,9 @@ trait DefaultDateRangeJob extends Job {
         Some(
           clone(
             args +
-              ("date" -> List(nextStartDate.toString("yyyy-MM-dd"),
-                              endDate.toString("yyyy-MM-dd")))))
+              ("date" -> List(
+                nextStartDate.toString("yyyy-MM-dd"),
+                endDate.toString("yyyy-MM-dd")))))
     } else None
 }
 
@@ -494,8 +496,9 @@ abstract class ExecutionJob[+T](args: Args) extends Job(args) {
 
   final override def run = {
     val r = Config.tryFrom(config).map { conf =>
-      Await.result(execution.run(conf, mode)(concurrentExecutionContext),
-                   scala.concurrent.duration.Duration.Inf)
+      Await.result(
+        execution.run(conf, mode)(concurrentExecutionContext),
+        scala.concurrent.duration.Duration.Inf)
     }
     if (!resultPromise.tryComplete(r)) {
       // The test framework can call this more than once.

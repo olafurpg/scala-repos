@@ -72,9 +72,10 @@ object EventMessage {
   implicit val decomposer: Decomposer[EventMessage] =
     new Decomposer[EventMessage] {
       override def decompose(eventMessage: EventMessage): JValue = {
-        eventMessage.fold(IngestMessage.Decomposer.apply _,
-                          ArchiveMessage.Decomposer.apply _,
-                          StoreFileMessage.Decomposer.apply _)
+        eventMessage.fold(
+          IngestMessage.Decomposer.apply _,
+          ArchiveMessage.Decomposer.apply _,
+          StoreFileMessage.Decomposer.apply _)
       }
     }
 }
@@ -128,8 +129,9 @@ case class IngestMessage(apiKey: APIKey,
     if (data.size > 1) {
       val (dataA, dataB) = data.splitAt(data.size / 2)
       val Seq(refA, refB) = streamRef.split(2)
-      List(this.copy(data = dataA, streamRef = refA),
-           this.copy(data = dataB, streamRef = refB))
+      List(
+        this.copy(data = dataA, streamRef = refA),
+        this.copy(data = dataB, streamRef = refB))
     } else {
       List(this)
     }
@@ -176,25 +178,27 @@ object IngestMessage {
             ingest.writeAs map { authorities =>
               assert(ingest.data.size == 1)
               \/.right(
-                IngestMessage(ingest.apiKey,
-                              ingest.path,
-                              authorities,
-                              eventRecords,
-                              ingest.jobId,
-                              defaultTimestamp,
-                              StreamRef.Append))
+                IngestMessage(
+                  ingest.apiKey,
+                  ingest.path,
+                  authorities,
+                  eventRecords,
+                  ingest.jobId,
+                  defaultTimestamp,
+                  StreamRef.Append))
             } getOrElse {
               \/.left(
                 (ingest.apiKey,
                  ingest.path,
                  (authorities: Authorities) =>
-                   IngestMessage(ingest.apiKey,
-                                 ingest.path,
-                                 authorities,
-                                 eventRecords,
-                                 ingest.jobId,
-                                 defaultTimestamp,
-                                 StreamRef.Append))
+                   IngestMessage(
+                     ingest.apiKey,
+                     ingest.path,
+                     authorities,
+                     eventRecords,
+                     ingest.jobId,
+                     defaultTimestamp,
+                     StreamRef.Append))
               )
             }
           }
@@ -233,11 +237,12 @@ object ArchiveMessage {
     override def validated(obj: JValue): Validation[Error, ArchiveMessage] = {
       (obj.validated[Int]("producerId") |@| obj.validated[Int]("deletionId") |@| obj
         .validated[Archive]("deletion")) { (producerId, sequenceId, archive) =>
-        ArchiveMessage(archive.apiKey,
-                       archive.path,
-                       archive.jobId,
-                       EventId(producerId, sequenceId),
-                       defaultTimestamp)
+        ArchiveMessage(
+          archive.apiKey,
+          archive.path,
+          archive.jobId,
+          EventId(producerId, sequenceId),
+          defaultTimestamp)
       }
     }
   }

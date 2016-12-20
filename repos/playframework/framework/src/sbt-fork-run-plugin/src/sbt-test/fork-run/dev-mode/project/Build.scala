@@ -21,8 +21,9 @@ object DevModeBuild {
 
   def settings: Seq[Setting[_]] = Seq(
     DevModeKeys.writeRunProperties := {
-      IO.write(file("run.properties"),
-               s"project.version=${play.core.PlayVersion.current}")
+      IO.write(
+        file("run.properties"),
+        s"project.version=${play.core.PlayVersion.current}")
     },
     DevModeKeys.waitForServer := {
       DevModeBuild.waitForServer()

@@ -84,12 +84,13 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
       accumulatorUpdates
         .map {
           case (id, update) =>
-            new AccumulableInfo(id,
-                                Some(""),
-                                Some(new LongSQLMetricValue(update)),
-                                value = None,
-                                internal = true,
-                                countFailedValues = true)
+            new AccumulableInfo(
+              id,
+              Some(""),
+              Some(new LongSQLMetricValue(update)),
+              value = None,
+              internal = true,
+              countFailedValues = true)
         }
         .toSeq)
     metrics
@@ -128,13 +129,14 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
     val executionUIData = listener.executionIdToData(0)
 
     listener.onJobStart(
-      SparkListenerJobStart(jobId = 0,
-                            time = System.currentTimeMillis(),
-                            stageInfos = Seq(
-                              createStageInfo(0, 0),
-                              createStageInfo(1, 0)
-                            ),
-                            createProperties(executionId)))
+      SparkListenerJobStart(
+        jobId = 0,
+        time = System.currentTimeMillis(),
+        stageInfos = Seq(
+          createStageInfo(0, 0),
+          createStageInfo(1, 0)
+        ),
+        createProperties(executionId)))
     listener.onStageSubmitted(
       SparkListenerStageSubmitted(createStageInfo(0, 0)))
 
@@ -148,8 +150,9 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
         (1L, 0, 0, createTaskMetrics(accumulatorUpdates).accumulatorUpdates())
       )))
 
-    checkAnswer(listener.getExecutionMetrics(0),
-                accumulatorUpdates.mapValues(_ * 2))
+    checkAnswer(
+      listener.getExecutionMetrics(0),
+      accumulatorUpdates.mapValues(_ * 2))
 
     listener.onExecutorMetricsUpdate(
       SparkListenerExecutorMetricsUpdate(
@@ -167,8 +170,9 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
              .accumulatorUpdates())
         )))
 
-    checkAnswer(listener.getExecutionMetrics(0),
-                accumulatorUpdates.mapValues(_ * 3))
+    checkAnswer(
+      listener.getExecutionMetrics(0),
+      accumulatorUpdates.mapValues(_ * 3))
 
     // Retrying a stage should reset the metrics
     listener.onStageSubmitted(
@@ -182,8 +186,9 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
         (1L, 0, 1, createTaskMetrics(accumulatorUpdates).accumulatorUpdates())
       )))
 
-    checkAnswer(listener.getExecutionMetrics(0),
-                accumulatorUpdates.mapValues(_ * 2))
+    checkAnswer(
+      listener.getExecutionMetrics(0),
+      accumulatorUpdates.mapValues(_ * 2))
 
     // Ignore the task end for the first attempt
     listener.onTaskEnd(
@@ -195,8 +200,9 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
         createTaskInfo(0, 0),
         createTaskMetrics(accumulatorUpdates.mapValues(_ * 100))))
 
-    checkAnswer(listener.getExecutionMetrics(0),
-                accumulatorUpdates.mapValues(_ * 2))
+    checkAnswer(
+      listener.getExecutionMetrics(0),
+      accumulatorUpdates.mapValues(_ * 2))
 
     // Finish two tasks
     listener.onTaskEnd(
@@ -216,8 +222,9 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
         createTaskInfo(1, 0),
         createTaskMetrics(accumulatorUpdates.mapValues(_ * 3))))
 
-    checkAnswer(listener.getExecutionMetrics(0),
-                accumulatorUpdates.mapValues(_ * 5))
+    checkAnswer(
+      listener.getExecutionMetrics(0),
+      accumulatorUpdates.mapValues(_ * 5))
 
     // Summit a new stage
     listener.onStageSubmitted(
@@ -231,8 +238,9 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
         (1L, 1, 0, createTaskMetrics(accumulatorUpdates).accumulatorUpdates())
       )))
 
-    checkAnswer(listener.getExecutionMetrics(0),
-                accumulatorUpdates.mapValues(_ * 7))
+    checkAnswer(
+      listener.getExecutionMetrics(0),
+      accumulatorUpdates.mapValues(_ * 7))
 
     // Finish two tasks
     listener.onTaskEnd(
@@ -252,8 +260,9 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
         createTaskInfo(1, 0),
         createTaskMetrics(accumulatorUpdates.mapValues(_ * 3))))
 
-    checkAnswer(listener.getExecutionMetrics(0),
-                accumulatorUpdates.mapValues(_ * 11))
+    checkAnswer(
+      listener.getExecutionMetrics(0),
+      accumulatorUpdates.mapValues(_ * 11))
 
     assert(executionUIData.runningJobs === Seq(0))
     assert(executionUIData.succeededJobs.isEmpty)
@@ -272,8 +281,9 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
     assert(executionUIData.succeededJobs === Seq(0))
     assert(executionUIData.failedJobs.isEmpty)
 
-    checkAnswer(listener.getExecutionMetrics(0),
-                accumulatorUpdates.mapValues(_ * 11))
+    checkAnswer(
+      listener.getExecutionMetrics(0),
+      accumulatorUpdates.mapValues(_ * 11))
   }
 
   test("onExecutionEnd happens before onJobEnd(JobSucceeded)") {
@@ -289,10 +299,11 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
         SparkPlanInfo.fromSparkPlan(df.queryExecution.executedPlan),
         System.currentTimeMillis()))
     listener.onJobStart(
-      SparkListenerJobStart(jobId = 0,
-                            time = System.currentTimeMillis(),
-                            stageInfos = Nil,
-                            createProperties(executionId)))
+      SparkListenerJobStart(
+        jobId = 0,
+        time = System.currentTimeMillis(),
+        stageInfos = Nil,
+        createProperties(executionId)))
     listener.onOtherEvent(
       SparkListenerSQLExecutionEnd(executionId, System.currentTimeMillis()))
     listener.onJobEnd(
@@ -321,10 +332,11 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
         SparkPlanInfo.fromSparkPlan(df.queryExecution.executedPlan),
         System.currentTimeMillis()))
     listener.onJobStart(
-      SparkListenerJobStart(jobId = 0,
-                            time = System.currentTimeMillis(),
-                            stageInfos = Nil,
-                            createProperties(executionId)))
+      SparkListenerJobStart(
+        jobId = 0,
+        time = System.currentTimeMillis(),
+        stageInfos = Nil,
+        createProperties(executionId)))
     listener.onJobEnd(
       SparkListenerJobEnd(
         jobId = 0,
@@ -333,10 +345,11 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
       ))
 
     listener.onJobStart(
-      SparkListenerJobStart(jobId = 1,
-                            time = System.currentTimeMillis(),
-                            stageInfos = Nil,
-                            createProperties(executionId)))
+      SparkListenerJobStart(
+        jobId = 1,
+        time = System.currentTimeMillis(),
+        stageInfos = Nil,
+        createProperties(executionId)))
     listener.onOtherEvent(
       SparkListenerSQLExecutionEnd(executionId, System.currentTimeMillis()))
     listener.onJobEnd(
@@ -365,10 +378,11 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
         SparkPlanInfo.fromSparkPlan(df.queryExecution.executedPlan),
         System.currentTimeMillis()))
     listener.onJobStart(
-      SparkListenerJobStart(jobId = 0,
-                            time = System.currentTimeMillis(),
-                            stageInfos = Seq.empty,
-                            createProperties(executionId)))
+      SparkListenerJobStart(
+        jobId = 0,
+        time = System.currentTimeMillis(),
+        stageInfos = Seq.empty,
+        createProperties(executionId)))
     listener.onOtherEvent(
       SparkListenerSQLExecutionEnd(executionId, System.currentTimeMillis()))
     listener.onJobEnd(

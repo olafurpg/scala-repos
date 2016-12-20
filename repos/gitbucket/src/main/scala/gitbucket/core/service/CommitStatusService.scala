@@ -40,16 +40,17 @@ trait CommitStatusService {
       }
       case None =>
         (CommitStatuses returning CommitStatuses.map(_.commitStatusId)) +=
-          CommitStatus(userName = userName,
-                       repositoryName = repositoryName,
-                       commitId = sha,
-                       context = context,
-                       state = state,
-                       targetUrl = targetUrl,
-                       description = description,
-                       creator = creator.userName,
-                       registeredDate = now,
-                       updatedDate = now)
+          CommitStatus(
+            userName = userName,
+            repositoryName = repositoryName,
+            commitId = sha,
+            context = context,
+            state = state,
+            targetUrl = targetUrl,
+            description = description,
+            creator = creator.userName,
+            registeredDate = now,
+            updatedDate = now)
     }
 
   def getCommitStatus(userName: String, repositoryName: String, id: Int)(

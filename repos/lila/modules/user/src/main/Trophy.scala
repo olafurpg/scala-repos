@@ -27,40 +27,44 @@ object Trophy {
           none)
 
     object WayOfBerserk
-        extends Kind(key = "wayOfBerserk",
-                     name = "The way of Berserk",
-                     icon = "`".some,
-                     url =
-                       "http://lichess.org/qa/340/way-of-berserk-trophy".some,
-                     "fire_trophy".some)
+        extends Kind(
+          key = "wayOfBerserk",
+          name = "The way of Berserk",
+          icon = "`".some,
+          url = "http://lichess.org/qa/340/way-of-berserk-trophy".some,
+          "fire_trophy".some)
 
     object MarathonWinner
-        extends Kind(key = "marathonWinner",
-                     name = "Marathon Winner",
-                     icon = "\\".some,
-                     url = none,
-                     "fire_trophy".some)
+        extends Kind(
+          key = "marathonWinner",
+          name = "Marathon Winner",
+          icon = "\\".some,
+          url = none,
+          "fire_trophy".some)
 
     object MarathonTopTen
-        extends Kind(key = "marathonTopTen",
-                     name = "Marathon Top 10",
-                     icon = "\\".some,
-                     url = none,
-                     "fire_trophy".some)
+        extends Kind(
+          key = "marathonTopTen",
+          name = "Marathon Top 10",
+          icon = "\\".some,
+          url = none,
+          "fire_trophy".some)
 
     object MarathonTopFifty
-        extends Kind(key = "marathonTopFifty",
-                     name = "Marathon Top 50",
-                     icon = "\\".some,
-                     url = none,
-                     "fire_trophy".some)
+        extends Kind(
+          key = "marathonTopFifty",
+          name = "Marathon Top 50",
+          icon = "\\".some,
+          url = none,
+          "fire_trophy".some)
 
     object MarathonTopHundred
-        extends Kind(key = "marathonTopHundred",
-                     name = "Marathon Top 100",
-                     icon = "\\".some,
-                     url = none,
-                     "fire_trophy".some)
+        extends Kind(
+          key = "marathonTopHundred",
+          name = "Marathon Top 100",
+          icon = "\\".some,
+          url = none,
+          "fire_trophy".some)
 
     object MarathonSurvivor
         extends Kind(
@@ -89,43 +93,48 @@ object Trophy {
           "icon3d".some)
 
     object Moderator
-        extends Kind(key = "moderator",
-                     name = "Lichess moderator",
-                     icon = "&#xe002;".some,
-                     url = "http://lichess.org/report".some,
-                     "icon3d".some)
+        extends Kind(
+          key = "moderator",
+          name = "Lichess moderator",
+          icon = "&#xe002;".some,
+          url = "http://lichess.org/report".some,
+          "icon3d".some)
 
     object Donor
-        extends Kind(key = "donor",
-                     name = "Lichess donor",
-                     icon = "&#xe001;".some,
-                     url = "http://lichess.org/donate".some,
-                     "icon3d".some)
+        extends Kind(
+          key = "donor",
+          name = "Lichess donor",
+          icon = "&#xe001;".some,
+          url = "http://lichess.org/donate".some,
+          "icon3d".some)
 
     object Streamer
-        extends Kind(key = "streamer",
-                     name = "Lichess streamer",
-                     icon = "&#xe003;".some,
-                     url = "http://lichess.org/how-to-stream-on-lichess".some,
-                     "icon3d".some)
+        extends Kind(
+          key = "streamer",
+          name = "Lichess streamer",
+          icon = "&#xe003;".some,
+          url = "http://lichess.org/how-to-stream-on-lichess".some,
+          "icon3d".some)
 
-    val all = List(ZugMiracle,
-                   WayOfBerserk,
-                   MarathonSurvivor,
-                   MarathonWinner,
-                   MarathonTopTen,
-                   MarathonTopFifty,
-                   MarathonTopHundred,
-                   BongcloudWarrior,
-                   Developer,
-                   Moderator,
-                   Streamer)
+    val all = List(
+      ZugMiracle,
+      WayOfBerserk,
+      MarathonSurvivor,
+      MarathonWinner,
+      MarathonTopTen,
+      MarathonTopFifty,
+      MarathonTopHundred,
+      BongcloudWarrior,
+      Developer,
+      Moderator,
+      Streamer)
     def byKey(key: String) = all find (_.key == key)
   }
 
   def make(userId: String, kind: Trophy.Kind) =
-    Trophy(_id = ornicar.scalalib.Random nextStringUppercase 8,
-           user = userId,
-           kind = kind,
-           date = DateTime.now)
+    Trophy(
+      _id = ornicar.scalalib.Random nextStringUppercase 8,
+      user = userId,
+      kind = kind,
+      date = DateTime.now)
 }

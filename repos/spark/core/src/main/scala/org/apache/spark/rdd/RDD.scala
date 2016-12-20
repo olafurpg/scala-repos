@@ -195,8 +195,9 @@ abstract class RDD[T: ClassTag](
       // This means the user previously called localCheckpoint(), which should have already
       // marked this RDD for persisting. Here we should override the old storage level with
       // one that is explicitly requested by the user (after adapting it to use disk).
-      persist(LocalRDDCheckpointData.transformStorageLevel(newLevel),
-              allowOverride = true)
+      persist(
+        LocalRDDCheckpointData.transformStorageLevel(newLevel),
+        allowOverride = true)
     } else {
       persist(newLevel, allowOverride = false)
     }
@@ -358,8 +359,9 @@ abstract class RDD[T: ClassTag](
             }
           }
         } else {
-          new InterruptibleIterator(context,
-                                    blockResult.data.asInstanceOf[Iterator[T]])
+          new InterruptibleIterator(
+            context,
+            blockResult.data.asInstanceOf[Iterator[T]])
         }
       case Right(iter) =>
         new InterruptibleIterator(context, iter.asInstanceOf[Iterator[T]])
@@ -391,8 +393,9 @@ abstract class RDD[T: ClassTag](
     */
   def flatMap[U: ClassTag](f: T => TraversableOnce[U]): RDD[U] = withScope {
     val cleanF = sc.clean(f)
-    new MapPartitionsRDD[U, T](this,
-                               (context, pid, iter) => iter.flatMap(cleanF))
+    new MapPartitionsRDD[U, T](
+      this,
+      (context, pid, iter) => iter.flatMap(cleanF))
   }
 
   /**
@@ -400,9 +403,10 @@ abstract class RDD[T: ClassTag](
     */
   def filter(f: T => Boolean): RDD[T] = withScope {
     val cleanF = sc.clean(f)
-    new MapPartitionsRDD[T, T](this,
-                               (context, pid, iter) => iter.filter(cleanF),
-                               preservesPartitioning = true)
+    new MapPartitionsRDD[T, T](
+      this,
+      (context, pid, iter) => iter.filter(cleanF),
+      preservesPartitioning = true)
   }
 
   /**
@@ -471,8 +475,9 @@ abstract class RDD[T: ClassTag](
 
       // include a shuffle step so that our upstream tasks are still distributed
       new CoalescedRDD(
-        new ShuffledRDD[Int, T, T](mapPartitionsWithIndex(distributePartition),
-                                   new HashPartitioner(numPartitions)),
+        new ShuffledRDD[Int, T, T](
+          mapPartitionsWithIndex(distributePartition),
+          new HashPartitioner(numPartitions)),
         numPartitions).values
     } else {
       new CoalescedRDD(this, numPartitions)
@@ -493,15 +498,17 @@ abstract class RDD[T: ClassTag](
              seed: Long = Utils.random.nextLong): RDD[T] = withScope {
     require(fraction >= 0.0, "Negative fraction value: " + fraction)
     if (withReplacement) {
-      new PartitionwiseSampledRDD[T, T](this,
-                                        new PoissonSampler[T](fraction),
-                                        true,
-                                        seed)
+      new PartitionwiseSampledRDD[T, T](
+        this,
+        new PoissonSampler[T](fraction),
+        true,
+        seed)
     } else {
-      new PartitionwiseSampledRDD[T, T](this,
-                                        new BernoulliSampler[T](fraction),
-                                        true,
-                                        seed)
+      new PartitionwiseSampledRDD[T, T](
+        this,
+        new BernoulliSampler[T](fraction),
+        true,
+        seed)
     }
   }
 
@@ -561,9 +568,10 @@ abstract class RDD[T: ClassTag](
     val numStDev = 10.0
 
     require(num >= 0, "Negative number of elements requested")
-    require(num <= (Int.MaxValue - (numStDev * math.sqrt(Int.MaxValue)).toInt),
-            "Cannot support a sample size > Int.MaxValue - " +
-              s"$numStDev * math.sqrt(Int.MaxValue)")
+    require(
+      num <= (Int.MaxValue - (numStDev * math.sqrt(Int.MaxValue)).toInt),
+      "Cannot support a sample size > Int.MaxValue - " +
+        s"$numStDev * math.sqrt(Int.MaxValue)")
 
     if (num == 0) {
       new Array[T](0)
@@ -681,9 +689,9 @@ abstract class RDD[T: ClassTag](
     * Return an RDD created by coalescing all elements within each partition into an array.
     */
   def glom(): RDD[Array[T]] = withScope {
-    new MapPartitionsRDD[Array[T], T](this,
-                                      (context, pid,
-                                       iter) => Iterator(iter.toArray))
+    new MapPartitionsRDD[Array[T], T](
+      this,
+      (context, pid, iter) => Iterator(iter.toArray))
   }
 
   /**
@@ -796,10 +804,10 @@ abstract class RDD[T: ClassTag](
       f: Iterator[T] => Iterator[U],
       preservesPartitioning: Boolean = false): RDD[U] = withScope {
     val cleanedF = sc.clean(f)
-    new MapPartitionsRDD(this,
-                         (context: TaskContext, index: Int,
-                          iter: Iterator[T]) => cleanedF(iter),
-                         preservesPartitioning)
+    new MapPartitionsRDD(
+      this,
+      (context: TaskContext, index: Int, iter: Iterator[T]) => cleanedF(iter),
+      preservesPartitioning)
   }
 
   /**
@@ -814,10 +822,10 @@ abstract class RDD[T: ClassTag](
   private[spark] def mapPartitionsInternal[U: ClassTag](
       f: Iterator[T] => Iterator[U],
       preservesPartitioning: Boolean = false): RDD[U] = withScope {
-    new MapPartitionsRDD(this,
-                         (context: TaskContext, index: Int,
-                          iter: Iterator[T]) => f(iter),
-                         preservesPartitioning)
+    new MapPartitionsRDD(
+      this,
+      (context: TaskContext, index: Int, iter: Iterator[T]) => f(iter),
+      preservesPartitioning)
   }
 
   /**
@@ -831,10 +839,11 @@ abstract class RDD[T: ClassTag](
                                           preservesPartitioning: Boolean =
                                             false): RDD[U] = withScope {
     val cleanedF = sc.clean(f)
-    new MapPartitionsRDD(this,
-                         (context: TaskContext, index: Int,
-                          iter: Iterator[T]) => cleanedF(index, iter),
-                         preservesPartitioning)
+    new MapPartitionsRDD(
+      this,
+      (context: TaskContext, index: Int,
+       iter: Iterator[T]) => cleanedF(index, iter),
+      preservesPartitioning)
   }
 
   /**
@@ -869,11 +878,12 @@ abstract class RDD[T: ClassTag](
   def zipPartitions[B: ClassTag, V: ClassTag](rdd2: RDD[B],
                                               preservesPartitioning: Boolean)(
       f: (Iterator[T], Iterator[B]) => Iterator[V]): RDD[V] = withScope {
-    new ZippedPartitionsRDD2(sc,
-                             sc.clean(f),
-                             this,
-                             rdd2,
-                             preservesPartitioning)
+    new ZippedPartitionsRDD2(
+      sc,
+      sc.clean(f),
+      this,
+      rdd2,
+      preservesPartitioning)
   }
 
   def zipPartitions[B: ClassTag, V: ClassTag](rdd2: RDD[B])(
@@ -887,12 +897,13 @@ abstract class RDD[T: ClassTag](
       preservesPartitioning: Boolean)(
       f: (Iterator[T], Iterator[B], Iterator[C]) => Iterator[V]): RDD[V] =
     withScope {
-      new ZippedPartitionsRDD3(sc,
-                               sc.clean(f),
-                               this,
-                               rdd2,
-                               rdd3,
-                               preservesPartitioning)
+      new ZippedPartitionsRDD3(
+        sc,
+        sc.clean(f),
+        this,
+        rdd2,
+        rdd3,
+        preservesPartitioning)
     }
 
   def zipPartitions[B: ClassTag, C: ClassTag, V: ClassTag](rdd2: RDD[B],
@@ -909,13 +920,14 @@ abstract class RDD[T: ClassTag](
       preservesPartitioning: Boolean)(
       f: (Iterator[T], Iterator[B], Iterator[C],
           Iterator[D]) => Iterator[V]): RDD[V] = withScope {
-    new ZippedPartitionsRDD4(sc,
-                             sc.clean(f),
-                             this,
-                             rdd2,
-                             rdd3,
-                             rdd4,
-                             preservesPartitioning)
+    new ZippedPartitionsRDD4(
+      sc,
+      sc.clean(f),
+      this,
+      rdd2,
+      rdd3,
+      rdd4,
+      preservesPartitioning)
   }
 
   def zipPartitions[B: ClassTag, C: ClassTag, D: ClassTag, V: ClassTag](
@@ -986,8 +998,9 @@ abstract class RDD[T: ClassTag](
     * RDD will be &lt;= us.
     */
   def subtract(other: RDD[T]): RDD[T] = withScope {
-    subtract(other,
-             partitioner.getOrElse(new HashPartitioner(partitions.length)))
+    subtract(
+      other,
+      partitioner.getOrElse(new HashPartitioner(partitions.length)))
   }
 
   /**
@@ -1055,8 +1068,9 @@ abstract class RDD[T: ClassTag](
     * @see [[org.apache.spark.rdd.RDD#reduce]]
     */
   def treeReduce(f: (T, T) => T, depth: Int = 2): T = withScope {
-    require(depth >= 1,
-            s"Depth must be greater than or equal to 1 but got $depth.")
+    require(
+      depth >= 1,
+      s"Depth must be greater than or equal to 1 but got $depth.")
     val cleanF = context.clean(f)
     val reducePartition: Iterator[T] => Option[T] = iter => {
       if (iter.hasNext) {
@@ -1152,8 +1166,9 @@ abstract class RDD[T: ClassTag](
   def treeAggregate[U: ClassTag](zeroValue: U)(seqOp: (U, T) => U,
                                                combOp: (U, U) => U,
                                                depth: Int = 2): U = withScope {
-    require(depth >= 1,
-            s"Depth must be greater than or equal to 1 but got $depth.")
+    require(
+      depth >= 1,
+      s"Depth must be greater than or equal to 1 but got $depth.")
     if (partitions.length == 0) {
       Utils.clone(zeroValue, context.env.closureSerializer.newInstance())
     } else {
@@ -1287,8 +1302,9 @@ abstract class RDD[T: ClassTag](
     *                   It must be greater than 0.000017.
     */
   def countApproxDistinct(relativeSD: Double = 0.05): Long = withScope {
-    require(relativeSD > 0.000017,
-            s"accuracy ($relativeSD) must be greater than 0.000017")
+    require(
+      relativeSD > 0.000017,
+      s"accuracy ($relativeSD) must be greater than 0.000017")
     val p = math.ceil(2.0 * math.log(1.054 / relativeSD) / math.log(2)).toInt
     countApproxDistinct(if (p < 4) 4 else p, 0)
   }
@@ -1616,8 +1632,9 @@ abstract class RDD[T: ClassTag](
     if (storageLevel == StorageLevel.NONE) {
       persist(LocalRDDCheckpointData.DEFAULT_STORAGE_LEVEL)
     } else {
-      persist(LocalRDDCheckpointData.transformStorageLevel(storageLevel),
-              allowOverride = true)
+      persist(
+        LocalRDDCheckpointData.transformStorageLevel(storageLevel),
+        allowOverride = true)
     }
 
     // If this RDD is already checkpointed and materialized, its lineage is already truncated.
@@ -1806,10 +1823,11 @@ abstract class RDD[T: ClassTag](
         .map(
           info =>
             "    CachedPartitions: %d; MemorySize: %s; ExternalBlockStoreSize: %s; DiskSize: %s"
-              .format(info.numCachedPartitions,
-                      bytesToString(info.memSize),
-                      bytesToString(info.externalBlockStoreSize),
-                      bytesToString(info.diskSize)))
+              .format(
+                info.numCachedPartitions,
+                bytesToString(info.memSize),
+                bytesToString(info.externalBlockStoreSize),
+                bytesToString(info.diskSize)))
 
       s"$rdd [$persistence]" +: storageInfo
     }
@@ -1821,17 +1839,19 @@ abstract class RDD[T: ClassTag](
         case 0 => Seq.empty
         case 1 =>
           val d = rdd.dependencies.head
-          debugString(d.rdd,
-                      prefix,
-                      d.isInstanceOf[ShuffleDependency[_, _, _]],
-                      true)
+          debugString(
+            d.rdd,
+            prefix,
+            d.isInstanceOf[ShuffleDependency[_, _, _]],
+            true)
         case _ =>
           val frontDeps = rdd.dependencies.take(len - 1)
           val frontDepStrings = frontDeps.flatMap(
             d =>
-              debugString(d.rdd,
-                          prefix,
-                          d.isInstanceOf[ShuffleDependency[_, _, _]]))
+              debugString(
+                d.rdd,
+                prefix,
+                d.isInstanceOf[ShuffleDependency[_, _, _]]))
 
           val lastDep = rdd.dependencies.last
           val lastDepStrings = debugString(
@@ -1884,10 +1904,11 @@ abstract class RDD[T: ClassTag](
   }
 
   override def toString: String =
-    "%s%s[%d] at %s".format(Option(name).map(_ + " ").getOrElse(""),
-                            getClass.getSimpleName,
-                            id,
-                            getCreationSite)
+    "%s%s[%d] at %s".format(
+      Option(name).map(_ + " ").getOrElse(""),
+      getClass.getSimpleName,
+      id,
+      getCreationSite)
 
   def toJavaRDD(): JavaRDD[T] = {
     new JavaRDD(this)(elementClassTag)
@@ -1930,9 +1951,10 @@ object RDD {
     : SequenceFileRDDFunctions[K, V] = {
     implicit val keyConverter = keyWritableFactory.convert
     implicit val valueConverter = valueWritableFactory.convert
-    new SequenceFileRDDFunctions(rdd,
-                                 keyWritableFactory.writableClass(kt),
-                                 valueWritableFactory.writableClass(vt))
+    new SequenceFileRDDFunctions(
+      rdd,
+      keyWritableFactory.writableClass(kt),
+      valueWritableFactory.writableClass(vt))
   }
 
   implicit def rddToOrderedRDDFunctions[K: Ordering: ClassTag, V: ClassTag](

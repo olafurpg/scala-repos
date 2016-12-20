@@ -9,12 +9,13 @@ import com.typesafe.slick.testkit.util.{DBTest, DBTestObject, JdbcTestDB}
 import com.typesafe.slick.testkit.util.StandardTestDBs._
 
 object CodeGeneratorAllTest
-    extends DBTestObject(H2Mem,
-                         SQLiteMem,
-                         Postgres,
-                         MySQL,
-                         DerbyMem,
-                         HsqldbMem)
+    extends DBTestObject(
+      H2Mem,
+      SQLiteMem,
+      Postgres,
+      MySQL,
+      DerbyMem,
+      HsqldbMem)
 
 class CodeGeneratorAllTest(val tdb: JdbcTestDB) extends DBTest {
   import tdb.profile.api._
@@ -80,10 +81,11 @@ class CodeGeneratorAllTest(val tdb: JdbcTestDB) extends DBTest {
 
     val codegen = Await
       .result(db.run((createA >> codegenA).withPinnedSession), Duration.Inf)
-    codegen.writeToFile("slick.jdbc.H2Profile",
-                        "target/slick-testkit-codegen-tests/",
-                        "all.test",
-                        profileName + "Tables",
-                        profileName + ".scala")
+    codegen.writeToFile(
+      "slick.jdbc.H2Profile",
+      "target/slick-testkit-codegen-tests/",
+      "all.test",
+      profileName + "Tables",
+      profileName + ".scala")
   }
 }

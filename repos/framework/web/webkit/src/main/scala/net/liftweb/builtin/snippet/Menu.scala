@@ -221,12 +221,13 @@ object Menu extends DispatchSnippet {
             NodeSeq.Empty
           } else {
             if (outerTag.length > 0) {
-              Elem(null,
-                   outerTag,
-                   Null,
-                   TopScope,
-                   true,
-                   <xml:group>{in.flatMap(buildANavItem)}</xml:group>) % S
+              Elem(
+                null,
+                outerTag,
+                Null,
+                TopScope,
+                true,
+                <xml:group>{in.flatMap(buildANavItem)}</xml:group>) % S
                 .prefixedAttrsToMetaData("ul")
             } else {
               in.flatMap(buildANavItem)
@@ -272,21 +273,23 @@ object Menu extends DispatchSnippet {
 
     def buildItem(in: MenuItem): JsExp = in match {
       case MenuItem(text, uri, kids, current, path, _) =>
-        JsObj("text" -> text.toString,
-              "uri" -> uri.toString,
-              "children" -> buildItems(kids),
-              "current" -> current,
-              "cssClass" -> Str(in.cssClass openOr ""),
-              "placeholder" -> in.placeholder_?,
-              "path" -> path)
+        JsObj(
+          "text" -> text.toString,
+          "uri" -> uri.toString,
+          "children" -> buildItems(kids),
+          "current" -> current,
+          "cssClass" -> Str(in.cssClass openOr ""),
+          "placeholder" -> in.placeholder_?,
+          "path" -> path)
     }
 
     def buildItems(in: Seq[MenuItem]): JsExp =
       JsArray(in.map(buildItem): _*)
 
     Script(
-      JsCrVar(S.attr("var") openOr "lift_menu",
-              JsObj("menu" -> buildItems(toRender))))
+      JsCrVar(
+        S.attr("var") openOr "lift_menu",
+        JsObj("menu" -> buildItems(toRender))))
   }
 
   /**
@@ -487,8 +490,9 @@ object Menu extends DispatchSnippet {
       def buildLink[T](loc: Loc[T]) = {
         Group(SiteMap.buildLink(name, text) match {
           case e: Elem =>
-            Helpers.addCssClass(loc.cssClassForMenuItem,
-                                e % S.prefixedAttrsToMetaData("a"))
+            Helpers.addCssClass(
+              loc.cssClassForMenuItem,
+              e % S.prefixedAttrsToMetaData("a"))
           case x => x
         })
       }

@@ -318,11 +318,12 @@ object FieldSpec extends Specification {
     val rec = FieldTypeTestRecord.createRecord
     val bool = true
     val bool2 = false
-    passBasicTests(bool,
-                   bool2,
-                   rec.mandatoryBooleanField,
-                   rec.legacyOptionalBooleanField,
-                   rec.optionalBooleanField)
+    passBasicTests(
+      bool,
+      bool2,
+      rec.mandatoryBooleanField,
+      rec.legacyOptionalBooleanField,
+      rec.optionalBooleanField)
     passConversionTests(
       bool,
       rec.mandatoryBooleanField,
@@ -357,11 +358,12 @@ object FieldSpec extends Specification {
       val rec = FieldTypeTestRecord.createRecord
       val country = Countries.Canada
       val country2 = Countries.USA
-      passBasicTests(country,
-                     country2,
-                     rec.mandatoryCountryField,
-                     rec.legacyOptionalCountryField,
-                     rec.optionalCountryField)
+      passBasicTests(
+        country,
+        country2,
+        rec.mandatoryCountryField,
+        rec.legacyOptionalCountryField,
+        rec.optionalCountryField)
       passConversionTests(
         country,
         rec.mandatoryCountryField,
@@ -380,12 +382,13 @@ object FieldSpec extends Specification {
     dt2.add(Calendar.DATE, 1)
     val dtStr = toInternetDate(dt.getTime)
     // don't try to use the default value of date/time typed fields, because it changes from moment to moment!
-    passBasicTests(dt,
-                   dt2,
-                   rec.mandatoryDateTimeField,
-                   rec.legacyOptionalDateTimeField,
-                   rec.optionalDateTimeField,
-                   false)
+    passBasicTests(
+      dt,
+      dt2,
+      rec.mandatoryDateTimeField,
+      rec.legacyOptionalDateTimeField,
+      rec.optionalDateTimeField,
+      false)
     passConversionTests(
       dt,
       rec.mandatoryDateTimeField,
@@ -415,11 +418,12 @@ object FieldSpec extends Specification {
     val rec = FieldTypeTestRecord.createRecord
     val bd = BigDecimal("12.34")
     val bd2 = BigDecimal("1.22")
-    passBasicTests(bd,
-                   bd2,
-                   rec.mandatoryDecimalField,
-                   rec.legacyOptionalDecimalField,
-                   rec.optionalDecimalField)
+    passBasicTests(
+      bd,
+      bd2,
+      rec.mandatoryDecimalField,
+      rec.legacyOptionalDecimalField,
+      rec.optionalDecimalField)
     passConversionTests(
       bd,
       rec.mandatoryDecimalField,
@@ -434,11 +438,12 @@ object FieldSpec extends Specification {
     val rec = FieldTypeTestRecord.createRecord
     val d = 12.34
     val d2 = 1.00
-    passBasicTests(d,
-                   d2,
-                   rec.mandatoryDoubleField,
-                   rec.legacyOptionalDoubleField,
-                   rec.optionalDoubleField)
+    passBasicTests(
+      d,
+      d2,
+      rec.mandatoryDoubleField,
+      rec.legacyOptionalDoubleField,
+      rec.optionalDoubleField)
     passConversionTests(
       d,
       rec.mandatoryDoubleField,
@@ -459,11 +464,12 @@ object FieldSpec extends Specification {
     val rec = FieldTypeTestRecord.createRecord
     val email = "foo@bar.baz"
     val email2 = "foo2@bar.baz"
-    passBasicTests(email,
-                   email2,
-                   rec.mandatoryEmailField,
-                   rec.legacyOptionalEmailField,
-                   rec.optionalEmailField)
+    passBasicTests(
+      email,
+      email2,
+      rec.mandatoryEmailField,
+      rec.legacyOptionalEmailField,
+      rec.optionalEmailField)
     passConversionTests(
       email,
       rec.mandatoryEmailField,
@@ -502,11 +508,12 @@ object FieldSpec extends Specification {
     val rec = FieldTypeTestRecord.createRecord
     val ev = MyTestEnum.TWO
     val ev2 = MyTestEnum.ONE
-    passBasicTests(ev,
-                   ev2,
-                   rec.mandatoryEnumField,
-                   rec.legacyOptionalEnumField,
-                   rec.optionalEnumField)
+    passBasicTests(
+      ev,
+      ev2,
+      rec.mandatoryEnumField,
+      rec.legacyOptionalEnumField,
+      rec.optionalEnumField)
     passConversionTests(
       ev,
       rec.mandatoryEnumField,
@@ -521,11 +528,12 @@ object FieldSpec extends Specification {
     val rec = FieldTypeTestRecord.createRecord
     val num = 123
     val num2 = 456
-    passBasicTests(num,
-                   num2,
-                   rec.mandatoryIntField,
-                   rec.legacyOptionalIntField,
-                   rec.optionalIntField)
+    passBasicTests(
+      num,
+      num2,
+      rec.mandatoryIntField,
+      rec.legacyOptionalIntField,
+      rec.optionalIntField)
     passConversionTests(
       num,
       rec.mandatoryIntField,
@@ -564,22 +572,24 @@ object FieldSpec extends Specification {
       case "es_ES" => "en_NZ"
       case _ => "es_ES"
     }
-    passBasicTests(example,
-                   example2,
-                   rec.mandatoryLocaleField,
-                   rec.legacyOptionalLocaleField,
-                   rec.optionalLocaleField)
+    passBasicTests(
+      example,
+      example2,
+      rec.mandatoryLocaleField,
+      rec.legacyOptionalLocaleField,
+      rec.optionalLocaleField)
   }
 
   "LongField" should {
     val rec = FieldTypeTestRecord.createRecord
     val lng = 1234L
     val lng2 = 5678L
-    passBasicTests(lng,
-                   lng2,
-                   rec.mandatoryLongField,
-                   rec.legacyOptionalLongField,
-                   rec.optionalLongField)
+    passBasicTests(
+      lng,
+      lng2,
+      rec.mandatoryLongField,
+      rec.legacyOptionalLongField,
+      rec.optionalLongField)
     passConversionTests(
       lng,
       rec.mandatoryLongField,
@@ -628,11 +638,12 @@ object FieldSpec extends Specification {
     val zip = "02452"
     val zip2 = "03344"
     rec.mandatoryCountryField.set(Countries.USA)
-    passBasicTests(zip,
-                   zip2,
-                   rec.mandatoryPostalCodeField,
-                   rec.legacyOptionalPostalCodeField,
-                   rec.optionalPostalCodeField)
+    passBasicTests(
+      zip,
+      zip2,
+      rec.mandatoryPostalCodeField,
+      rec.legacyOptionalPostalCodeField,
+      rec.optionalPostalCodeField)
     passConversionTests(
       zip,
       rec.mandatoryPostalCodeField,
@@ -672,11 +683,12 @@ object FieldSpec extends Specification {
       val rec = FieldTypeTestRecord.createRecord
       val str = "foobar"
       val str2 = "foobaz"
-      passBasicTests(str,
-                     str2,
-                     rec.mandatoryStringField,
-                     rec.legacyOptionalStringField,
-                     rec.optionalStringField)
+      passBasicTests(
+        str,
+        str2,
+        rec.mandatoryStringField,
+        rec.legacyOptionalStringField,
+        rec.optionalStringField)
       passConversionTests(
         str,
         rec.mandatoryStringField,
@@ -765,11 +777,12 @@ object FieldSpec extends Specification {
     val rec = FieldTypeTestRecord.createRecord
     val txt = "foobar"
     val txt2 = "foobaz"
-    passBasicTests(txt,
-                   txt2,
-                   rec.mandatoryTextareaField,
-                   rec.legacyOptionalTextareaField,
-                   rec.optionalTextareaField)
+    passBasicTests(
+      txt,
+      txt2,
+      rec.mandatoryTextareaField,
+      rec.legacyOptionalTextareaField,
+      rec.optionalTextareaField)
     passConversionTests(
       txt,
       rec.mandatoryTextareaField,
@@ -790,11 +803,12 @@ object FieldSpec extends Specification {
       case "America/Chicago" => "Europe/Paris"
       case _ => "America/Chicago"
     }
-    passBasicTests(example,
-                   example2,
-                   rec.mandatoryTimeZoneField,
-                   rec.legacyOptionalTimeZoneField,
-                   rec.optionalTimeZoneField)
+    passBasicTests(
+      example,
+      example2,
+      rec.mandatoryTimeZoneField,
+      rec.legacyOptionalTimeZoneField,
+      rec.optionalTimeZoneField)
     passConversionTests(
       example,
       rec.mandatoryTimeZoneField,
@@ -810,12 +824,13 @@ object FieldSpec extends Specification {
     val dt = DateTime.now
     val dt2 = DateTime.now.plusDays(1)
     val dtStr = JodaHelpers.dateTimeFormatter.print(dt)
-    passBasicTests(dt,
-                   dt2,
-                   rec.mandatoryJodaTimeField,
-                   rec.legacyOptionalJodaTimeField,
-                   rec.optionalJodaTimeField,
-                   false)
+    passBasicTests(
+      dt,
+      dt2,
+      rec.mandatoryJodaTimeField,
+      rec.legacyOptionalJodaTimeField,
+      rec.optionalJodaTimeField,
+      false)
     passConversionTests(
       dt,
       rec.mandatoryJodaTimeField,

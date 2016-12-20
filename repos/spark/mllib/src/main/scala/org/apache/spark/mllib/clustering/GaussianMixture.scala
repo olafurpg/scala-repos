@@ -233,10 +233,11 @@ class GaussianMixture private (private var k: Int,
       } else {
         var i = 0
         while (i < k) {
-          val (weight, gaussian) = updateWeightsAndGaussians(sums.means(i),
-                                                             sums.sigmas(i),
-                                                             sums.weights(i),
-                                                             sumWeights)
+          val (weight, gaussian) = updateWeightsAndGaussians(
+            sums.means(i),
+            sums.sigmas(i),
+            sums.weights(i),
+            sumWeights)
           weights(i) = weight
           gaussians(i) = gaussian
           i = i + 1
@@ -263,9 +264,10 @@ class GaussianMixture private (private var k: Int,
       weight: Double,
       sumWeights: Double): (Double, MultivariateGaussian) = {
     val mu = (mean /= weight)
-    BLAS.syr(-weight,
-             Vectors.fromBreeze(mu),
-             Matrices.fromBreeze(sigma).asInstanceOf[DenseMatrix])
+    BLAS.syr(
+      -weight,
+      Vectors.fromBreeze(mu),
+      Matrices.fromBreeze(sigma).asInstanceOf[DenseMatrix])
     val newWeight = weight / sumWeights
     val newGaussian = new MultivariateGaussian(mu, sigma / weight)
     (newWeight, newGaussian)
@@ -305,10 +307,11 @@ private[clustering] object GaussianMixture {
 // companion class to provide zero constructor for ExpectationSum
 private object ExpectationSum {
   def zero(k: Int, d: Int): ExpectationSum = {
-    new ExpectationSum(0.0,
-                       Array.fill(k)(0.0),
-                       Array.fill(k)(BDV.zeros(d)),
-                       Array.fill(k)(BreezeMatrix.zeros(d, d)))
+    new ExpectationSum(
+      0.0,
+      Array.fill(k)(0.0),
+      Array.fill(k)(BDV.zeros(d)),
+      Array.fill(k)(BreezeMatrix.zeros(d, d)))
   }
 
   // compute cluster contributions for each input point
@@ -326,9 +329,10 @@ private object ExpectationSum {
       p(i) /= pSum
       sums.weights(i) += p(i)
       sums.means(i) += x * p(i)
-      BLAS.syr(p(i),
-               Vectors.fromBreeze(x),
-               Matrices.fromBreeze(sums.sigmas(i)).asInstanceOf[DenseMatrix])
+      BLAS.syr(
+        p(i),
+        Vectors.fromBreeze(x),
+        Matrices.fromBreeze(sums.sigmas(i)).asInstanceOf[DenseMatrix])
       i = i + 1
     }
     sums

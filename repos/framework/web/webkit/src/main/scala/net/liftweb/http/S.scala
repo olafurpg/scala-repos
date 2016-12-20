@@ -858,8 +858,9 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     */
   def addComet(cometActor: LiftCometActor): Unit = {
     requestCometVersions.set(
-      requestCometVersions.is + CVP(cometActor.uniqueId,
-                                    cometActor.lastRenderTime)
+      requestCometVersions.is + CVP(
+        cometActor.uniqueId,
+        cometActor.lastRenderTime)
     )
   }
 
@@ -1142,8 +1143,9 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
                   List(ResourceBundle.getBundle(name, loc))
                 }.openOr(
                   NamedPF
-                    .applyBox((name, loc),
-                              LiftRules.resourceBundleFactories.toList)
+                    .applyBox(
+                      (name, loc),
+                      LiftRules.resourceBundleFactories.toList)
                     .map(List(_)) openOr Nil
               )))
         _resBundle.value
@@ -1218,14 +1220,15 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
   def ?(str: String, params: Any*): String =
     if (params.length == 0) ?(str)
     else
-      String.format(locale,
-                    ?(str),
-                    params
-                      .flatMap {
-                        case s: AnyRef => List(s)
-                        case _ => Nil
-                      }
-                      .toArray: _*)
+      String.format(
+        locale,
+        ?(str),
+        params
+          .flatMap {
+            case s: AnyRef => List(s)
+            case _ => Nil
+          }
+          .toArray: _*)
 
   private def ?!(str: String, resBundle: List[ResourceBundle]): String =
     resBundle
@@ -1319,8 +1322,9 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
       logger.error("An error occurred while running error handlers", t)
       logger.error("Original error causing error handlers to be run", orig)
     } {
-      NamedPF.applyBox((Props.mode, req, orig),
-                       LiftRules.exceptionHandler.toList);
+      NamedPF.applyBox(
+        (Props.mode, req, orig),
+        LiftRules.exceptionHandler.toList);
     } openOr Full(
       PlainTextResponse(
         "An error has occurred while processing an error using the functions in LiftRules.exceptionHandler. Check the log for details.",
@@ -1841,11 +1845,12 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     old.map { req =>
       if (statefulRequest_? && req.path.partPath.nonEmpty &&
           (req.request ne null)) {
-        Req(req,
-            S.sessionRewriter
-              .map(_.rewrite) ::: LiftRules.statefulRewrite.toList,
-            Nil,
-            LiftRules.statelessReqTest.toList)
+        Req(
+          req,
+          S.sessionRewriter
+            .map(_.rewrite) ::: LiftRules.statefulRewrite.toList,
+          Nil,
+          LiftRules.statelessReqTest.toList)
       } else {
         req
       }
@@ -2985,11 +2990,12 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
 
     if (inS.value) doRender(session.openOrThrowException("legacy code"))
     else {
-      val req = Req(httpRequest,
-                    LiftRules.statelessRewrite.toList,
-                    Nil,
-                    LiftRules.statelessReqTest.toList,
-                    System.nanoTime)
+      val req = Req(
+        httpRequest,
+        LiftRules.statelessRewrite.toList,
+        Nil,
+        LiftRules.statelessReqTest.toList,
+        System.nanoTime)
 
       CurrentReq.doWith(req) {
         val ses: LiftSession =
@@ -3001,10 +3007,11 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
             case _ =>
               val ret = LiftSession(httpRequest.session, req.contextPath)
               ret.fixSessionTime()
-              SessionMaster.addSession(ret,
-                                       req,
-                                       httpRequest.userAgent,
-                                       SessionMaster.getIpFromReq(req))
+              SessionMaster.addSession(
+                ret,
+                req,
+                httpRequest.userAgent,
+                SessionMaster.getIpFromReq(req))
               ret
           }
 
@@ -3025,9 +3032,10 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     import json._
 
     val name = formFuncName
-    addFunctionMap(name,
-                   SFuncHolder((s: String) =>
-                     JsonParser.parseOpt(s).map(in) getOrElse JsCmds.Noop))
+    addFunctionMap(
+      name,
+      SFuncHolder(
+        (s: String) => JsonParser.parseOpt(s).map(in) getOrElse JsCmds.Noop))
     f(name)
   }
 

@@ -77,23 +77,27 @@ class BloomFilter[@specialized(Int, Long) T](val numBuckets: Int,
 
   def &(that: BloomFilter[T]) = {
     checkCompatibility(that)
-    new BloomFilter[T](this.numBuckets,
-                       this.numHashFunctions,
-                       this.bits & that.bits)
+    new BloomFilter[T](
+      this.numBuckets,
+      this.numHashFunctions,
+      this.bits & that.bits)
   }
 
   private def checkCompatibility(that: BloomFilter[T]) {
-    require(that.numBuckets == this.numBuckets,
-            "Must have the same number of buckets to intersect")
-    require(that.numHashFunctions == this.numHashFunctions,
-            "Must have the same number of hash functions to intersect")
+    require(
+      that.numBuckets == this.numBuckets,
+      "Must have the same number of buckets to intersect")
+    require(
+      that.numHashFunctions == this.numHashFunctions,
+      "Must have the same number of hash functions to intersect")
   }
 
   def |(that: BloomFilter[T]) = {
     checkCompatibility(that)
-    new BloomFilter[T](this.numBuckets,
-                       this.numHashFunctions,
-                       this.bits | that.bits)
+    new BloomFilter[T](
+      this.numBuckets,
+      this.numHashFunctions,
+      this.bits | that.bits)
   }
 
   def |=(that: BloomFilter[T]): this.type = {
@@ -116,9 +120,10 @@ class BloomFilter[@specialized(Int, Long) T](val numBuckets: Int,
 
   def &~(that: BloomFilter[T]) = {
     checkCompatibility(that)
-    new BloomFilter[T](this.numBuckets,
-                       this.numHashFunctions,
-                       this.bits &~ that.bits)
+    new BloomFilter[T](
+      this.numBuckets,
+      this.numHashFunctions,
+      this.bits &~ that.bits)
   }
 }
 

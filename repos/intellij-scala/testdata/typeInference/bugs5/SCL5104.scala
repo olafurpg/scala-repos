@@ -3,7 +3,7 @@ object SCL5104 {
 
   /*start*/
   Book( //cannot resolve method Book.apply
-       "Programming in Modula-2",
-       "Wirth, Niklaus") /*end*/
+    "Programming in Modula-2",
+    "Wirth, Niklaus") /*end*/
 }
 //SCL5104.Book

@@ -17,21 +17,24 @@ class FscSettings(error: String => Unit) extends Settings(error) { outer =>
     disable(resident)
   }
 
-  val currentDir = StringSetting("-current-dir",
-                                 "path",
-                                 "Base directory for resolving relative paths",
-                                 "").internalOnly()
+  val currentDir = StringSetting(
+    "-current-dir",
+    "path",
+    "Base directory for resolving relative paths",
+    "").internalOnly()
   val reset = BooleanSetting("-reset", "Reset compile server caches")
   val shutdown = BooleanSetting("-shutdown", "Shutdown compile server")
-  val server = StringSetting("-server",
-                             "hostname:portnumber",
-                             "Specify compile server socket",
-                             "")
-  val port = IntSetting("-port",
-                        "Search and start compile server in given port only",
-                        0,
-                        Some((0, Int.MaxValue)),
-                        (_: String) => None)
+  val server = StringSetting(
+    "-server",
+    "hostname:portnumber",
+    "Specify compile server socket",
+    "")
+  val port = IntSetting(
+    "-port",
+    "Search and start compile server in given port only",
+    0,
+    Some((0, Int.MaxValue)),
+    (_: String) => None)
   val preferIPv4 =
     BooleanSetting("-ipv4", "Use IPv4 rather than IPv6 for the server socket")
   val idleMins = IntSetting(

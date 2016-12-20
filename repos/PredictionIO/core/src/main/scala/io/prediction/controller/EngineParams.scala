@@ -68,10 +68,11 @@ class EngineParams(
            algorithmParamsList: Seq[(String, Params)] = algorithmParamsList,
            servingParams: (String, Params) = servingParams): EngineParams = {
 
-    new EngineParams(dataSourceParams,
-                     preparatorParams,
-                     algorithmParamsList,
-                     servingParams)
+    new EngineParams(
+      dataSourceParams,
+      preparatorParams,
+      algorithmParamsList,
+      servingParams)
   }
 }
 
@@ -123,10 +124,11 @@ object EngineParams {
 class SimpleEngine[TD, EI, Q, P, A](
     dataSourceClass: Class[_ <: BaseDataSource[TD, EI, Q, A]],
     algorithmClass: Class[_ <: BaseAlgorithm[TD, _, Q, P]])
-    extends Engine(dataSourceClass,
-                   IdentityPreparator(dataSourceClass),
-                   Map("" -> algorithmClass),
-                   LFirstServing(algorithmClass))
+    extends Engine(
+      dataSourceClass,
+      IdentityPreparator(dataSourceClass),
+      Map("" -> algorithmClass),
+      LFirstServing(algorithmClass))
 
 /** This shorthand class serves the `SimpleEngine` class.
   *
@@ -136,5 +138,6 @@ class SimpleEngine[TD, EI, Q, P, A](
   */
 class SimpleEngineParams(dataSourceParams: Params = EmptyParams(),
                          algorithmParams: Params = EmptyParams())
-    extends EngineParams(dataSourceParams = ("", dataSourceParams),
-                         algorithmParamsList = Seq(("", algorithmParams)))
+    extends EngineParams(
+      dataSourceParams = ("", dataSourceParams),
+      algorithmParamsList = Seq(("", algorithmParams)))

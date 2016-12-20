@@ -30,9 +30,10 @@ class ByteBufferMessageSet(val buffer: ByteBuffer) extends MessageSet {
   def this(compressionCodec: CompressionCodec,
            messages: java.util.List[Message]) {
     this(
-      new kafka.message.ByteBufferMessageSet(compressionCodec,
-                                             new LongRef(0),
-                                             messages.asScala: _*).buffer)
+      new kafka.message.ByteBufferMessageSet(
+        compressionCodec,
+        new LongRef(0),
+        messages.asScala: _*).buffer)
   }
 
   def this(messages: java.util.List[Message]) {

@@ -31,11 +31,12 @@ trait ProjectStructureMatcher {
           roots.ProjectRootManager.getInstance(actual).getProjectSdk))
     expected.foreach(languageLevel)(
       it =>
-        assertEquals("Project language level",
-                     it,
-                     roots.LanguageLevelProjectExtension
-                       .getInstance(actual)
-                       .getLanguageLevel))
+        assertEquals(
+          "Project language level",
+          it,
+          roots.LanguageLevelProjectExtension
+            .getInstance(actual)
+            .getLanguageLevel))
     expected.foreach(modules)(assertProjectModulesEqual(actual))
     expected.foreach(libraries)(assertProjectLibrariesEqual(actual))
   }
@@ -77,8 +78,9 @@ trait ProjectStructureMatcher {
     expected.foreach(resources)(
       assertModuleContentFoldersEqual(actual, JavaResourceRootType.RESOURCE))
     expected.foreach(testResources)(
-      assertModuleContentFoldersEqual(actual,
-                                      JavaResourceRootType.TEST_RESOURCE))
+      assertModuleContentFoldersEqual(
+        actual,
+        JavaResourceRootType.TEST_RESOURCE))
     expected.foreach(excluded)(assertModuleExcludedFoldersEqual(actual))
     expected.foreach(moduleDependencies)(assertModuleDependenciesEqual(actual))
     expected.foreach(libraryDependencies)(
@@ -109,9 +111,10 @@ trait ProjectStructureMatcher {
   private def assertModuleExcludedFoldersEqual(module: Module)(
       expected: Seq[String]): Unit = {
     val contentRoot = getSingleContentRoot(module)
-    assertContentRootFoldersEqual(contentRoot,
-                                  contentRoot.getExcludeFolders,
-                                  expected)
+    assertContentRootFoldersEqual(
+      contentRoot,
+      contentRoot.getExcludeFolders,
+      expected)
   }
 
   private def assertContentRootFoldersEqual(contentRoot: roots.ContentEntry,
@@ -130,9 +133,10 @@ trait ProjectStructureMatcher {
   private def getSingleContentRoot(module: Module): roots.ContentEntry = {
     val contentRoots =
       roots.ModuleRootManager.getInstance(module).getContentEntries
-    assertEquals(s"Expected single content root, Got: $contentRoots",
-                 1,
-                 contentRoots.length)
+    assertEquals(
+      s"Expected single content root, Got: $contentRoots",
+      1,
+      contentRoots.length)
     contentRoots.head
   }
 
@@ -140,9 +144,10 @@ trait ProjectStructureMatcher {
       expected: Seq[dependency[module]]): Unit = {
     val actualModuleEntries =
       roots.OrderEnumerator.orderEntries(module).moduleEntries
-    assertNamesEqual("Module dependency",
-                     expected.map(_.reference),
-                     actualModuleEntries.map(_.getModule))
+    assertNamesEqual(
+      "Module dependency",
+      expected.map(_.reference),
+      actualModuleEntries.map(_.getModule))
     pairByName(expected, actualModuleEntries).foreach(
       (assertDependencyScopeAndExportedFlagEqual _).tupled)
   }
@@ -151,9 +156,10 @@ trait ProjectStructureMatcher {
       expected: Seq[dependency[library]]): Unit = {
     val actualLibraryEntries =
       roots.OrderEnumerator.orderEntries(module).libraryEntries
-    assertNamesEqual("Library dependency",
-                     expected.map(_.reference),
-                     actualLibraryEntries.map(_.getLibrary))
+    assertNamesEqual(
+      "Library dependency",
+      expected.map(_.reference),
+      actualLibraryEntries.map(_.getLibrary))
     pairByName(expected, actualLibraryEntries).foreach(
       (assertDependencyScopeAndExportedFlagEqual _).tupled)
   }

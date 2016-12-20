@@ -211,9 +211,10 @@ object Source {
     */
   def fromPublisher[T](publisher: Publisher[T]): Source[T, NotUsed] =
     new Source(
-      new PublisherSource(publisher,
-                          DefaultAttributes.publisherSource,
-                          shape("PublisherSource")))
+      new PublisherSource(
+        publisher,
+        DefaultAttributes.publisherSource,
+        shape("PublisherSource")))
 
   /**
     * Helper to create [[Source]] from `Iterator`.
@@ -340,9 +341,10 @@ object Source {
     */
   def empty[T]: Source[T, NotUsed] = _empty
   private[this] val _empty: Source[Nothing, NotUsed] = new Source(
-    new PublisherSource[Nothing](EmptyPublisher,
-                                 DefaultAttributes.emptySource,
-                                 shape("EmptySource")))
+    new PublisherSource[Nothing](
+      EmptyPublisher,
+      DefaultAttributes.emptySource,
+      shape("EmptySource")))
 
   /**
     * Create a `Source` which materializes a [[scala.concurrent.Promise]] which controls what element
@@ -364,17 +366,19 @@ object Source {
     */
   def failed[T](cause: Throwable): Source[T, NotUsed] =
     new Source(
-      new PublisherSource(ErrorPublisher(cause, "FailedSource")[T],
-                          DefaultAttributes.failedSource,
-                          shape("FailedSource")))
+      new PublisherSource(
+        ErrorPublisher(cause, "FailedSource")[T],
+        DefaultAttributes.failedSource,
+        shape("FailedSource")))
 
   /**
     * Creates a `Source` that is materialized as a [[org.reactivestreams.Subscriber]]
     */
   def asSubscriber[T]: Source[T, Subscriber[T]] =
     new Source(
-      new SubscriberSource[T](DefaultAttributes.subscriberSource,
-                              shape("SubscriberSource")))
+      new SubscriberSource[T](
+        DefaultAttributes.subscriberSource,
+        shape("SubscriberSource")))
 
   /**
     * Creates a `Source` that is materialized to an [[akka.actor.ActorRef]] which points to an Actor
@@ -382,12 +386,14 @@ object Source {
     * be [[akka.stream.actor.ActorPublisher]].
     */
   def actorPublisher[T](props: Props): Source[T, ActorRef] = {
-    require(classOf[ActorPublisher[_]].isAssignableFrom(props.actorClass()),
-            "Actor must be ActorPublisher")
+    require(
+      classOf[ActorPublisher[_]].isAssignableFrom(props.actorClass()),
+      "Actor must be ActorPublisher")
     new Source(
-      new ActorPublisherSource(props,
-                               DefaultAttributes.actorPublisherSource,
-                               shape("ActorPublisherSource")))
+      new ActorPublisherSource(
+        props,
+        DefaultAttributes.actorPublisherSource,
+        shape("ActorPublisherSource")))
   }
 
   /**
@@ -423,13 +429,15 @@ object Source {
   def actorRef[T](bufferSize: Int,
                   overflowStrategy: OverflowStrategy): Source[T, ActorRef] = {
     require(bufferSize >= 0, "bufferSize must be greater than or equal to 0")
-    require(overflowStrategy != OverflowStrategies.Backpressure,
-            "Backpressure overflowStrategy not supported")
+    require(
+      overflowStrategy != OverflowStrategies.Backpressure,
+      "Backpressure overflowStrategy not supported")
     new Source(
-      new ActorRefSource(bufferSize,
-                         overflowStrategy,
-                         DefaultAttributes.actorRefSource,
-                         shape("ActorRefSource")))
+      new ActorRefSource(
+        bufferSize,
+        overflowStrategy,
+        DefaultAttributes.actorRefSource,
+        shape("ActorRefSource")))
   }
 
   /**

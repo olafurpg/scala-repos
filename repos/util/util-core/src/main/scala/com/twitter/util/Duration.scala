@@ -179,13 +179,14 @@ object Duration extends TimeLikeOps[Duration] {
     private def writeReplace(): Object = DurationBox.Undefined()
   }
 
-  private val timeUnits = Seq(TimeUnit.DAYS,
-                              TimeUnit.HOURS,
-                              TimeUnit.MINUTES,
-                              TimeUnit.SECONDS,
-                              TimeUnit.MILLISECONDS,
-                              TimeUnit.MICROSECONDS,
-                              TimeUnit.NANOSECONDS)
+  private val timeUnits = Seq(
+    TimeUnit.DAYS,
+    TimeUnit.HOURS,
+    TimeUnit.MINUTES,
+    TimeUnit.SECONDS,
+    TimeUnit.MILLISECONDS,
+    TimeUnit.MICROSECONDS,
+    TimeUnit.NANOSECONDS)
 
   private val nameToUnit: Map[String, TimeUnit] = TimeUnit
     .values()

@@ -73,10 +73,11 @@ object CanFilterMedian {
             //if the obsolete value is not equal to the new value...
             if (nowObsoleteWindowValue != newWindowValue) {
               //replace now obsolete value with new data value within temporary array
-              findAndReplaceInstanceInPlace(tempDataExtract,
-                                            nowObsoleteWindowValue,
-                                            newWindowValue,
-                                            halfWindow)
+              findAndReplaceInstanceInPlace(
+                tempDataExtract,
+                nowObsoleteWindowValue,
+                newWindowValue,
+                halfWindow)
               //if the new value and old value lie on different sides of the current Median,
               if ((nowObsoleteWindowValue >= currentMedian ||
                   newWindowValue >= currentMedian) &&

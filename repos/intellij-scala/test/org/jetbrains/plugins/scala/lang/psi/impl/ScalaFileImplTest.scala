@@ -36,12 +36,14 @@ class ScalaFileImplTest extends SimpleTestCase {
     assertPathIs("package a", List(List("a")))
     assertPathIs("package a.b", List(List("a", "b")))
     assertPathIs("package a\npackage b", List(List("a"), List("b")))
-    assertPathIs("package a.b\npackage c.d",
-                 List(List("a", "b"), List("c", "d")))
+    assertPathIs(
+      "package a.b\npackage c.d",
+      List(List("a", "b"), List("c", "d")))
 
     assertPathIs("/* foo */\npackage a", List(List("a")))
-    assertPathIs("/* foo */\npackage a\n/* bar */\npackage b",
-                 List(List("a"), List("b")))
+    assertPathIs(
+      "/* foo */\npackage a\n/* bar */\npackage b",
+      List(List("a"), List("b")))
   }
 
 //  def testSetPath() {
@@ -73,11 +75,13 @@ class ScalaFileImplTest extends SimpleTestCase {
     assertSplitsAre(List(List("a", "b")), List())
     assertSplitsAre(List(List("a", "b", "c")), List())
     assertSplitsAre(List(List("a"), List("b")), List(List("a")))
-    assertSplitsAre(List(List("a"), List("b"), List("c")),
-                    List(List("a"), List("a", "b")))
+    assertSplitsAre(
+      List(List("a"), List("b"), List("c")),
+      List(List("a"), List("a", "b")))
     assertSplitsAre(List(List("a", "b"), List("c", "d")), List(List("a", "b")))
-    assertSplitsAre(List(List("a", "b"), List("c", "d"), List("e")),
-                    List(List("a", "b"), List("a", "b", "c", "d")))
+    assertSplitsAre(
+      List(List("a", "b"), List("c", "d"), List("e")),
+      List(List("a", "b"), List("a", "b", "c", "d")))
   }
 
   def testSplitAt() {
@@ -89,21 +93,26 @@ class ScalaFileImplTest extends SimpleTestCase {
     assertSplitAs(List(List("a", "b")), List("c"), List(List("a", "b")))
     assertSplitAs(List(List("a", "b")), List("b"), List(List("a", "b")))
     assertSplitAs(List(List("a", "b")), List("a"), List(List("a"), List("b")))
-    assertSplitAs(List(List("a"), List("b")),
-                  List(),
-                  List(List("a"), List("b")))
-    assertSplitAs(List(List("a"), List("b")),
-                  List("a"),
-                  List(List("a"), List("b")))
-    assertSplitAs(List(List("a", "b"), List("c")),
-                  List("a"),
-                  List(List("a"), List("b"), List("c")))
-    assertSplitAs(List(List("a"), List("b", "c")),
-                  List("b"),
-                  List(List("a"), List("b", "c")))
-    assertSplitAs(List(List("a"), List("b", "c")),
-                  List("a", "b"),
-                  List(List("a"), List("b"), List("c")))
+    assertSplitAs(
+      List(List("a"), List("b")),
+      List(),
+      List(List("a"), List("b")))
+    assertSplitAs(
+      List(List("a"), List("b")),
+      List("a"),
+      List(List("a"), List("b")))
+    assertSplitAs(
+      List(List("a", "b"), List("c")),
+      List("a"),
+      List(List("a"), List("b"), List("c")))
+    assertSplitAs(
+      List(List("a"), List("b", "c")),
+      List("b"),
+      List(List("a"), List("b", "c")))
+    assertSplitAs(
+      List(List("a"), List("b", "c")),
+      List("a", "b"),
+      List(List("a"), List("b"), List("c")))
   }
 
   /*  def testSetPackageName() {

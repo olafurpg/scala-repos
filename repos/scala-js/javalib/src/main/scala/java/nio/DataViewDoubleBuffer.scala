@@ -110,11 +110,12 @@ private[nio] object DataViewDoubleBuffer {
               initialLimit: Int,
               readOnly: Boolean,
               isBigEndian: Boolean): DoubleBuffer = {
-      new DataViewDoubleBuffer(dataView,
-                               initialPosition,
-                               initialLimit,
-                               readOnly,
-                               isBigEndian)
+      new DataViewDoubleBuffer(
+        dataView,
+        initialPosition,
+        initialLimit,
+        readOnly,
+        isBigEndian)
     }
   }
 

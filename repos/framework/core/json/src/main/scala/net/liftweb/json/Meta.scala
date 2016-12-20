@@ -125,10 +125,11 @@ private[json] object Meta {
         case (c, args) =>
           DeclaredConstructor(c, args.map {
             case (name, t) =>
-              toArg(unmangleName(name),
-                    t,
-                    visited,
-                    Context(name, c.getDeclaringClass, args))
+              toArg(
+                unmangleName(name),
+                t,
+                visited,
+                Context(name, c.getDeclaringClass, args))
           })
       }
     }
@@ -153,10 +154,11 @@ private[json] object Meta {
           val typeArgs = x.getActualTypeArguments.toList.zipWithIndex.map {
             case (t, idx) =>
               if (t == classOf[java.lang.Object])
-                ScalaSigReader.readConstructor(context.argName,
-                                               context.containingClass,
-                                               idx,
-                                               context.allArgs.map(_._1))
+                ScalaSigReader.readConstructor(
+                  context.argName,
+                  context.containingClass,
+                  idx,
+                  context.allArgs.map(_._1))
               else t
           }
           Some(mkParameterizedType(x.getRawType, typeArgs))
@@ -166,8 +168,9 @@ private[json] object Meta {
       def mkConstructor(t: Type) =
         if (visited.contains(t)) (Cycle(t), false)
         else
-          (Constructor(TypeInfo(rawClassOf(t), parameterizedTypeOpt(t)),
-                       constructors(t, visited + t, Some(context))),
+          (Constructor(
+             TypeInfo(rawClassOf(t), parameterizedTypeOpt(t)),
+             constructors(t, visited + t, Some(context))),
            false)
 
       def fieldMapping(t: Type): (Mapping, Boolean) = t match {
@@ -190,8 +193,9 @@ private[json] object Meta {
           val raw = java.lang.reflect.Array
             .newInstance(rawClassOf(aType.getGenericComponentType), 0: Int)
             .getClass
-          (Col(TypeInfo(raw, None),
-               fieldMapping(aType.getGenericComponentType)._1),
+          (Col(
+             TypeInfo(raw, None),
+             fieldMapping(aType.getGenericComponentType)._1),
            false)
         case raw: Class[_] =>
           if (primitive_?(raw)) (Value(raw), false)
@@ -271,29 +275,30 @@ private[json] object Meta {
 
     val primitives =
       Map[Class[_], Unit]() ++
-        (List[Class[_]](classOf[String],
-                        classOf[Int],
-                        classOf[Long],
-                        classOf[Double],
-                        classOf[Float],
-                        classOf[Byte],
-                        classOf[BigInt],
-                        classOf[Boolean],
-                        classOf[Short],
-                        classOf[java.lang.Integer],
-                        classOf[java.lang.Long],
-                        classOf[java.lang.Double],
-                        classOf[java.lang.Float],
-                        classOf[java.lang.Byte],
-                        classOf[java.lang.Boolean],
-                        classOf[Number],
-                        classOf[java.lang.Short],
-                        classOf[Date],
-                        classOf[Timestamp],
-                        classOf[Symbol],
-                        classOf[JValue],
-                        classOf[JObject],
-                        classOf[JArray]).map((_, ())))
+        (List[Class[_]](
+          classOf[String],
+          classOf[Int],
+          classOf[Long],
+          classOf[Double],
+          classOf[Float],
+          classOf[Byte],
+          classOf[BigInt],
+          classOf[Boolean],
+          classOf[Short],
+          classOf[java.lang.Integer],
+          classOf[java.lang.Long],
+          classOf[java.lang.Double],
+          classOf[java.lang.Float],
+          classOf[java.lang.Byte],
+          classOf[java.lang.Boolean],
+          classOf[Number],
+          classOf[java.lang.Short],
+          classOf[Date],
+          classOf[Timestamp],
+          classOf[Symbol],
+          classOf[JValue],
+          classOf[JObject],
+          classOf[JArray]).map((_, ())))
 
     private val primaryConstructorArgumentsMemo =
       new Memo[Class[_], List[(String, Type)]]
@@ -326,10 +331,11 @@ private[json] object Meta {
                   context
                     .map(
                       ctx =>
-                        ScalaSigReader.readConstructor(ctx.argName,
-                                                       ctx.containingClass,
-                                                       idx,
-                                                       ctx.allArgs.map(_._1)))
+                        ScalaSigReader.readConstructor(
+                          ctx.argName,
+                          ctx.containingClass,
+                          idx,
+                          ctx.allArgs.map(_._1)))
                     .getOrElse(arg)
                 else arg
               case (x, _) => x
@@ -368,10 +374,11 @@ private[json] object Meta {
           ptype.getActualTypeArguments()(i) match {
             case c: Class[_] =>
               if (c == classOf[java.lang.Object])
-                ScalaSigReader.readConstructor(context.argName,
-                                               context.containingClass,
-                                               i,
-                                               context.allArgs.map(_._1))
+                ScalaSigReader.readConstructor(
+                  context.argName,
+                  context.containingClass,
+                  i,
+                  context.allArgs.map(_._1))
               else c
             case p: ParameterizedType => p.getRawType.asInstanceOf[Class[_]]
             case x => fail("do not know how to get type parameter from " + x)

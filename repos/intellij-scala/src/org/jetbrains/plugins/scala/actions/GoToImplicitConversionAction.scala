@@ -215,8 +215,9 @@ class GoToImplicitConversionAction
         else getExpressions(guard = true)
       }
       def chooseExpression(expr: ScExpression) {
-        editor.getSelectionModel.setSelection(expr.getTextRange.getStartOffset,
-                                              expr.getTextRange.getEndOffset)
+        editor.getSelectionModel.setSelection(
+          expr.getTextRange.getStartOffset,
+          expr.getTextRange.getEndOffset)
         forExpr(expr)
       }
       if (expressions.length == 0) editor.getSelectionModel.selectLineAtCaret()
@@ -248,9 +249,10 @@ class GoToImplicitConversionAction
 
     hintAlarm.addRequest(new Runnable {
       def run() {
-        hint = new LightBulbHint(element.getEditor,
-                                 project,
-                                 element.getOldExpression)
+        hint = new LightBulbHint(
+          element.getEditor,
+          project,
+          element.getOldExpression)
         hint.createHint(element.getFirstPart, element.getSecondPart)
         GoToImplicitConversionAction.getList.add(hint, 20, 0)
         hint.setBulbLayout()
@@ -302,12 +304,13 @@ class GoToImplicitConversionAction
             }
             if (function == null) return
 
-            IntentionUtils.showMakeExplicitPopup(project,
-                                                 expr,
-                                                 function,
-                                                 editor,
-                                                 secondPart,
-                                                 getCurrentItemBounds _)
+            IntentionUtils.showMakeExplicitPopup(
+              project,
+              expr,
+              function,
+              editor,
+              secondPart,
+              getCurrentItemBounds _)
           }
         }
       })

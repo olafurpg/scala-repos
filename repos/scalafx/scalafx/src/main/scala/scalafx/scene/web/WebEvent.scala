@@ -51,8 +51,9 @@ object WebEvent {
     * This event occurs when a script calls the JavaScript alert function.
     */
   val Alert: EventType[jfxsw.WebEvent[_]] = jfxsw.WebEvent.ALERT
-  @deprecated("Use Alert; ALERT will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Alert; ALERT will be removed in a future release",
+    "8.0.60-R10")
   val ALERT = Alert
 
   /**
@@ -66,8 +67,9 @@ object WebEvent {
     * This event occurs when a script changes location of the JavaScript window object.
     */
   val Resized: EventType[jfxsw.WebEvent[_]] = jfxsw.WebEvent.RESIZED
-  @deprecated("Use Resized; RESIZED will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Resized; RESIZED will be removed in a future release",
+    "8.0.60-R10")
   val RESIZED = Resized
 
   /**

@@ -143,8 +143,9 @@ class EndToEndTest extends FunSuite {
 
         val recvd = new Broker[ChannelEvent]
         val bootstrap = new ClientBootstrap(
-          new NioClientSocketChannelFactory(Executors.newCachedThreadPool(),
-                                            Executors.newCachedThreadPool()))
+          new NioClientSocketChannelFactory(
+            Executors.newCachedThreadPool(),
+            Executors.newCachedThreadPool()))
         bootstrap.setPipelineFactory(new ChannelPipelineFactory {
           override def getPipeline() = {
             val pipeline = Channels.pipeline()
@@ -333,9 +334,8 @@ class EndToEndTest extends FunSuite {
       val errors = new Broker[Throwable]
       errors ! EOF
       Future.value(new StreamResponse {
-        val info = StreamResponse.Info(req.version,
-                                       StreamResponse.Status(200),
-                                       req.headers)
+        val info = StreamResponse
+          .Info(req.version, StreamResponse.Status(200), req.headers)
         def messages = new Broker[Buf].recv
         def error = errors.recv
         def release() = errors !! EOF
@@ -358,8 +358,9 @@ class EndToEndTest extends FunSuite {
     val headers = Seq(Header("a", "b"), Header("c", "d"))
     val req = StreamRequest(StreamRequest.Method.Get, "/", headers = headers)
     val res = Await.result(client(req), 1.second)
-    assert(headers.forall(res.info.headers.contains),
-           s"$headers not found in ${res.info.headers}")
+    assert(
+      headers.forall(res.info.headers.contains),
+      s"$headers not found in ${res.info.headers}")
 
     Closable.all(client, server).close()
   }

@@ -19,12 +19,13 @@ case class Perf(glicko: Glicko,
   }
 
   def add(g: Glicko, date: DateTime): Perf =
-    copy(glicko = g,
-         nb = nb + 1,
-         recent =
-           if (nb < 10) recent
-           else (g.intRating :: recent) take Perf.recentMaxSize,
-         latest = date.some)
+    copy(
+      glicko = g,
+      nb = nb + 1,
+      recent =
+        if (nb < 10) recent
+        else (g.intRating :: recent) take Perf.recentMaxSize,
+      latest = date.some)
 
   def add(r: Rating, date: DateTime): Option[Perf] = {
     val glicko = Glicko(r.getRating, r.getRatingDeviation, r.getVolatility)
@@ -40,10 +41,11 @@ case class Perf(glicko: Glicko,
     }
 
   def toRating =
-    new Rating(math.max(Glicko.minRating, glicko.rating),
-               glicko.deviation,
-               glicko.volatility,
-               nb)
+    new Rating(
+      math.max(Glicko.minRating, glicko.rating),
+      glicko.deviation,
+      glicko.volatility,
+      nb)
 
   def isEmpty = nb == 0
   def nonEmpty = !isEmpty
@@ -68,15 +70,17 @@ case object Perf {
     import Glicko.glickoBSONHandler
 
     def reads(r: BSON.Reader): Perf =
-      Perf(glicko = r.getO[Glicko]("gl") | Glicko.default,
-           nb = r intD "nb",
-           latest = r dateO "la",
-           recent = r intsD "re")
+      Perf(
+        glicko = r.getO[Glicko]("gl") | Glicko.default,
+        nb = r intD "nb",
+        latest = r dateO "la",
+        recent = r intsD "re")
 
     def writes(w: BSON.Writer, o: Perf) =
-      BSONDocument("gl" -> o.glicko,
-                   "nb" -> w.int(o.nb),
-                   "re" -> w.intsO(o.recent),
-                   "la" -> o.latest.map(w.date))
+      BSONDocument(
+        "gl" -> o.glicko,
+        "nb" -> w.int(o.nb),
+        "re" -> w.intsO(o.recent),
+        "la" -> o.latest.map(w.date))
   }
 }

@@ -81,8 +81,9 @@ case class AddScheduledQueryRequest(schedule: CronExpression,
 object AddScheduledQueryRequest {
   import CronExpressionSerialization._
 
-  implicit val iso = Iso.hlist(AddScheduledQueryRequest.apply _,
-                               AddScheduledQueryRequest.unapply _)
+  implicit val iso = Iso.hlist(
+    AddScheduledQueryRequest.apply _,
+    AddScheduledQueryRequest.unapply _)
 
   val schemaV1 =
     "schedule" :: "owners" :: "context" :: "source" :: "sink" :: "timeout" :: HNil
@@ -99,17 +100,19 @@ class AddScheduledQueryServiceHandler(scheduler: Scheduler[Future],
                                       clock: Clock)(implicit M: Monad[Future],
                                                     executor: ExecutionContext,
                                                     addTimeout: Timeout)
-    extends CustomHttpService[Future[JValue],
-                              APIKey => Future[HttpResponse[JValue]]]
+    extends CustomHttpService[
+      Future[JValue],
+      APIKey => Future[HttpResponse[JValue]]]
     with Logging {
   val service: HttpRequest[Future[JValue]] => Validation[
     NotServed,
     APIKey => Future[HttpResponse[JValue]]] =
     (request: HttpRequest[Future[JValue]]) =>
       Success({ apiKey: APIKey =>
-        val permissionsFinder = new PermissionsFinder[Future](apiKeyFinder,
-                                                              accountFinder,
-                                                              clock.instant)
+        val permissionsFinder = new PermissionsFinder[Future](
+          apiKeyFinder,
+          accountFinder,
+          clock.instant)
         request.content map {
           contentFuture =>
             val responseVF =
@@ -142,10 +145,11 @@ class AddScheduledQueryServiceHandler(scheduler: Scheduler[Future],
                 }
                 okToRead = okToReads.exists(_ == true)
                 okToWrite <- EitherT.right(
-                  permissionsFinder.checkWriteAuthorities(authorities,
-                                                          apiKey,
-                                                          sreq.sink,
-                                                          clock.instant))
+                  permissionsFinder.checkWriteAuthorities(
+                    authorities,
+                    apiKey,
+                    sreq.sink,
+                    clock.instant))
 
                 readError = (!okToRead).option(
                   nels("The API Key does not have permission to execute %s"
@@ -157,13 +161,14 @@ class AddScheduledQueryServiceHandler(scheduler: Scheduler[Future],
 
                 taskId <- (readError |+| writeError) match {
                   case None =>
-                    scheduler.addTask(Some(sreq.schedule),
-                                      apiKey,
-                                      authorities,
-                                      sreq.context,
-                                      sreq.source,
-                                      sreq.sink,
-                                      sreq.timeout) leftMap { error =>
+                    scheduler.addTask(
+                      Some(sreq.schedule),
+                      apiKey,
+                      authorities,
+                      sreq.context,
+                      sreq.source,
+                      sreq.sink,
+                      sreq.timeout) leftMap { error =>
                       logger.error(
                         "Failure adding scheduled execution: " + error)
                       HttpResponse(
@@ -230,9 +235,10 @@ class ScheduledQueryStatusServiceHandler[A](scheduler: Scheduler[Future])(
         .toSuccess(
           DispatchError(BadRequest, "Missing schedule Id for status."))
       id <- Validation.fromTryCatch { UUID.fromString(idStr) } leftMap { ex =>
-        DispatchError(BadRequest,
-                      "Invalid schedule Id \"%s\"".format(idStr),
-                      Some(ex.getMessage))
+        DispatchError(
+          BadRequest,
+          "Invalid schedule Id \"%s\"".format(idStr),
+          Some(ex.getMessage))
       }
       limit <- Validation.fromTryCatch {
         request.parameters.get('last) map (_.toInt)

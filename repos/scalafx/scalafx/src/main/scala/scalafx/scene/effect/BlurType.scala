@@ -35,8 +35,9 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 object BlurType extends SFXEnumDelegateCompanion[jfxse.BlurType, BlurType] {
 
   val Gaussian = new BlurType(jfxse.BlurType.GAUSSIAN)
-  @deprecated("Use Gaussian; GAUSSIAN will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Gaussian; GAUSSIAN will be removed in a future release",
+    "8.0.60-R10")
   val GAUSSIAN = Gaussian
 
   val OnePassBox = new BlurType(jfxse.BlurType.ONE_PASS_BOX)

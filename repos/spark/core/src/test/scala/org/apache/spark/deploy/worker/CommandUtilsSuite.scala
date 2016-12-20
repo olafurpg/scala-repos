@@ -32,18 +32,20 @@ class CommandUtilsSuite
     val appId = "12345-worker321-9876"
     val sparkHome = sys.props
       .getOrElse("spark.test.home", fail("spark.test.home is not set!"))
-    val cmd = new Command("mainClass",
-                          Seq(),
-                          Map(),
-                          Seq(),
-                          Seq("libraryPathToB"),
-                          Seq())
+    val cmd = new Command(
+      "mainClass",
+      Seq(),
+      Map(),
+      Seq(),
+      Seq("libraryPathToB"),
+      Seq())
     val builder =
-      CommandUtils.buildProcessBuilder(cmd,
-                                       new SecurityManager(new SparkConf),
-                                       512,
-                                       sparkHome,
-                                       t => t)
+      CommandUtils.buildProcessBuilder(
+        cmd,
+        new SecurityManager(new SparkConf),
+        512,
+        sparkHome,
+        t => t)
     val libraryPath = Utils.libraryPathEnvName
     val env = builder.environment
     env.keySet should contain(libraryPath)
@@ -66,11 +68,12 @@ class CommandUtilsSuite
 
     // auth is not set
     var cmd =
-      CommandUtils invokePrivate buildLocalCommand(command,
-                                                   new SecurityManager(conf),
-                                                   (t: String) => t,
-                                                   Seq(),
-                                                   Map())
+      CommandUtils invokePrivate buildLocalCommand(
+        command,
+        new SecurityManager(conf),
+        (t: String) => t,
+        Seq(),
+        Map())
     assert(
       !cmd.javaOpts.exists(
         _.startsWith("-D" + SecurityManager.SPARK_AUTH_SECRET_CONF)))

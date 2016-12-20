@@ -63,8 +63,9 @@ class ServerStartupTest extends ZooKeeperTestHarness {
     }
 
     // broker registration shouldn't change
-    assertEquals(brokerRegistration,
-                 zkUtils.readData(ZkUtils.BrokerIdsPath + "/" + brokerId)._1)
+    assertEquals(
+      brokerRegistration,
+      zkUtils.readData(ZkUtils.BrokerIdsPath + "/" + brokerId)._1)
 
     server1.shutdown()
     CoreUtils.rm(server1.config.logDirs)

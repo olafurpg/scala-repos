@@ -15,8 +15,9 @@ private final class MainWatcher(repo: FishnetRepo,
 
   private def alert(client: Client) = if (!isAlerted(client)) {
     alerted put client.key.value
-    bus.publish(Warning(s"Fishnet server ${client.userId} might be down!"),
-                'slack)
+    bus.publish(
+      Warning(s"Fishnet server ${client.userId} might be down!"),
+      'slack)
   }
 
   private def unalert(client: Client) = if (isAlerted(client)) {

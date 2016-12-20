@@ -74,9 +74,10 @@ class CommandClient(
         } getOrElse {
           val appid =
             appClient.insert(
-              App(id = Option(req.id).getOrElse(0),
-                  name = req.name,
-                  description = Option(req.description)))
+              App(
+                id = Option(req.id).getOrElse(0),
+                name = req.name,
+                description = Option(req.description)))
           appid map { id =>
             val dbInit = eventClient.init(id)
             val r =
@@ -85,11 +86,12 @@ class CommandClient(
                 val accessKey2 = accessKeyClient.insert(
                   AccessKey(key = "", appid = id, events = Seq()))
                 accessKey2 map { k =>
-                  new AppNewResponse(1,
-                                     "App created successfully.",
-                                     id,
-                                     req.name,
-                                     k)
+                  new AppNewResponse(
+                    1,
+                    "App created successfully.",
+                    id,
+                    req.name,
+                    k)
                 } getOrElse {
                   GeneralResponse(0, s"Unable to create new access key.")
                 }
@@ -124,8 +126,9 @@ class CommandClient(
       appClient.getByName(appName) map { app =>
         val data =
           if (eventClient.remove(app.id)) {
-            GeneralResponse(1,
-                            s"Removed Event Store for this app ID: ${app.id}")
+            GeneralResponse(
+              1,
+              s"Removed Event Store for this app ID: ${app.id}")
           } else {
             GeneralResponse(0, s"Error removing Event Store for this app.")
           }
@@ -142,8 +145,9 @@ class CommandClient(
               s"Unable to initialize Event Store for this appId:" +
                 s" ${app.id}.")
           }
-        GeneralResponse(data.status * data2.status,
-                        data.message + data2.message)
+        GeneralResponse(
+          data.status * data2.status,
+          data.message + data2.message)
       } getOrElse {
         GeneralResponse(0, s"App ${appName} does not exist.")
       }

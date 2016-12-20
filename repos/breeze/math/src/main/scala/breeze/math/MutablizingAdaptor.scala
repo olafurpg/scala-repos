@@ -250,10 +250,11 @@ object MutablizingAdaptor {
 
   case class InnerProductSpaceAdaptor[V, S](
       val underlying: InnerProductVectorSpace[V, S])
-      extends MutablizingAdaptor[InnerProductVectorSpace,
-                                 MutableInnerProductVectorSpace,
-                                 V,
-                                 S] {
+      extends MutablizingAdaptor[
+        InnerProductVectorSpace,
+        MutableInnerProductVectorSpace,
+        V,
+        S] {
     type Wrapper = Ref[V]
 
     def wrap(v: V): Wrapper = Ref(v)

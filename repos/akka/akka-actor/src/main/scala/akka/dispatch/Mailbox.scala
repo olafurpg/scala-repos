@@ -149,10 +149,11 @@ private[akka] abstract class Mailbox(val messageQueue: MessageQueue)
   @inline
   protected final def updateStatus(oldStatus: Status,
                                    newStatus: Status): Boolean =
-    Unsafe.instance.compareAndSwapInt(this,
-                                      AbstractMailbox.mailboxStatusOffset,
-                                      oldStatus,
-                                      newStatus)
+    Unsafe.instance.compareAndSwapInt(
+      this,
+      AbstractMailbox.mailboxStatusOffset,
+      oldStatus,
+      newStatus)
 
   @inline
   protected final def setStatus(newStatus: Status): Unit =
@@ -240,10 +241,11 @@ private[akka] abstract class Mailbox(val messageQueue: MessageQueue)
     // Note: calling .head is not actually existing on the bytecode level as the parameters _old and _new
     // are SystemMessage instances hidden during compile time behind the SystemMessageList value class.
     // Without calling .head the parameters would be boxed in SystemMessageList wrapper.
-    Unsafe.instance.compareAndSwapObject(this,
-                                         AbstractMailbox.systemMessageOffset,
-                                         _old.head,
-                                         _new.head)
+    Unsafe.instance.compareAndSwapObject(
+      this,
+      AbstractMailbox.systemMessageOffset,
+      _old.head,
+      _new.head)
 
   final def canBeScheduledForExecution(
       hasMessageHint: Boolean,
@@ -350,11 +352,12 @@ private[akka] abstract class Mailbox(val messageQueue: MessageQueue)
         case e: InterruptedException ⇒ interruption = e
         case NonFatal(e) ⇒
           actor.system.eventStream.publish(
-            Error(e,
-                  actor.self.path.toString,
-                  this.getClass,
-                  "error while enqueuing " + msg + " to deadLetters: " +
-                    e.getMessage))
+            Error(
+              e,
+              actor.self.path.toString,
+              this.getClass,
+              "error while enqueuing " + msg + " to deadLetters: " +
+                e.getMessage))
       }
     }
     // if we got an interrupted exception while handling system messages, then rethrow it
@@ -469,8 +472,9 @@ class BoundedNodeMessageQueue(capacity: Int)
         .asInstanceOf[InternalActorRef]
         .provider
         .deadLetters
-        .tell(DeadLetter(handle.message, handle.sender, receiver),
-              handle.sender)
+        .tell(
+          DeadLetter(handle.message, handle.sender, receiver),
+          handle.sender)
 
   final def dequeue(): Envelope = poll()
 
@@ -612,8 +616,9 @@ trait BoundedQueueBasedMessageQueue
           .asInstanceOf[InternalActorRef]
           .provider
           .deadLetters
-          .tell(DeadLetter(handle.message, handle.sender, receiver),
-                handle.sender)
+          .tell(
+            DeadLetter(handle.message, handle.sender, receiver),
+            handle.sender)
     } else queue put handle
 
   def dequeue(): Envelope = queue.poll()
@@ -670,8 +675,9 @@ trait BoundedDequeBasedMessageQueue
           .asInstanceOf[InternalActorRef]
           .provider
           .deadLetters
-          .tell(DeadLetter(handle.message, handle.sender, receiver),
-                handle.sender)
+          .tell(
+            DeadLetter(handle.message, handle.sender, receiver),
+            handle.sender)
     } else queue put handle
 
   def enqueueFirst(receiver: ActorRef, handle: Envelope): Unit =
@@ -681,8 +687,9 @@ trait BoundedDequeBasedMessageQueue
           .asInstanceOf[InternalActorRef]
           .provider
           .deadLetters
-          .tell(DeadLetter(handle.message, handle.sender, receiver),
-                handle.sender)
+          .tell(
+            DeadLetter(handle.message, handle.sender, receiver),
+            handle.sender)
     } else queue putFirst handle
 
   def dequeue(): Envelope = queue.poll()
@@ -783,8 +790,9 @@ final case class BoundedMailbox(val capacity: Int,
     with ProducesPushTimeoutSemanticsMailbox {
 
   def this(settings: ActorSystem.Settings, config: Config) =
-    this(config.getInt("mailbox-capacity"),
-         config.getNanosDuration("mailbox-push-timeout-time"))
+    this(
+      config.getInt("mailbox-capacity"),
+      config.getNanosDuration("mailbox-push-timeout-time"))
 
   if (capacity < 0)
     throw new IllegalArgumentException(
@@ -955,8 +963,9 @@ case class BoundedDequeBasedMailbox(
     with ProducesPushTimeoutSemanticsMailbox {
 
   def this(settings: ActorSystem.Settings, config: Config) =
-    this(config.getInt("mailbox-capacity"),
-         config.getNanosDuration("mailbox-push-timeout-time"))
+    this(
+      config.getInt("mailbox-capacity"),
+      config.getNanosDuration("mailbox-push-timeout-time"))
 
   if (capacity < 0)
     throw new IllegalArgumentException(
@@ -1051,8 +1060,9 @@ final case class BoundedControlAwareMailbox(
     with ProducesMessageQueue[BoundedControlAwareMailbox.MessageQueue]
     with ProducesPushTimeoutSemanticsMailbox {
   def this(settings: ActorSystem.Settings, config: Config) =
-    this(config.getInt("mailbox-capacity"),
-         config.getNanosDuration("mailbox-push-timeout-time"))
+    this(
+      config.getInt("mailbox-capacity"),
+      config.getNanosDuration("mailbox-push-timeout-time"))
 
   def create(owner: Option[ActorRef],
              system: Option[ActorSystem]): MessageQueue =
@@ -1146,8 +1156,9 @@ object BoundedControlAwareMailbox {
           .asInstanceOf[InternalActorRef]
           .provider
           .deadLetters
-          .tell(DeadLetter(envelope.message, envelope.sender, receiver),
-                envelope.sender)
+          .tell(
+            DeadLetter(envelope.message, envelope.sender, receiver),
+            envelope.sender)
       }
     }
   }

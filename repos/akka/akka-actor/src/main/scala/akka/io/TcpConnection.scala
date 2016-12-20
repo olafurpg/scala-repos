@@ -71,10 +71,11 @@ private[io] abstract class TcpConnection(val tcp: TcpExt,
       if (TraceLogging)
         log.debug("[{}] registered as connection handler", handler)
 
-      val info = ConnectionInfo(registration,
-                                handler,
-                                keepOpenOnPeerClosed,
-                                useResumeWriting)
+      val info = ConnectionInfo(
+        registration,
+        handler,
+        keepOpenOnPeerClosed,
+        useResumeWriting)
 
       // if we have resumed reading from pullMode while waiting for Register then register OP_READ interest
       if (pullMode && !readingSuspended) resumeReading(info)
@@ -89,17 +90,19 @@ private[io] abstract class TcpConnection(val tcp: TcpExt,
       readingSuspended = true
 
     case cmd: CloseCommand ⇒
-      val info = ConnectionInfo(registration,
-                                commander,
-                                keepOpenOnPeerClosed = false,
-                                useResumeWriting = false)
+      val info = ConnectionInfo(
+        registration,
+        commander,
+        keepOpenOnPeerClosed = false,
+        useResumeWriting = false)
       handleClose(info, Some(sender()), cmd.event)
 
     case ReceiveTimeout ⇒
       // after sending `Register` user should watch this actor to make sure
       // it didn't die because of the timeout
-      log.debug("Configured registration timeout of [{}] expired, stopping",
-                RegisterTimeout)
+      log.debug(
+        "Configured registration timeout of [{}] expired, stopping",
+        RegisterTimeout)
       context.stop(self)
   }
 
@@ -474,12 +477,13 @@ private[io] abstract class TcpConnection(val tcp: TcpExt,
                        count: Long,
                        ack: Event,
                        tail: WriteCommand): PendingWriteFile =
-    new PendingWriteFile(commander,
-                         new FileInputStream(filePath).getChannel,
-                         offset,
-                         count,
-                         ack,
-                         tail)
+    new PendingWriteFile(
+      commander,
+      new FileInputStream(filePath).getChannel,
+      offset,
+      count,
+      ack,
+      tail)
 
   class PendingWriteFile(val commander: ActorRef,
                          fileChannel: FileChannel,
@@ -503,19 +507,21 @@ private[io] abstract class TcpConnection(val tcp: TcpExt,
         val written = fileChannel.transferTo(offset, toWrite, channel)
 
         if (written < remaining) {
-          val updated = new PendingWriteFile(commander,
-                                             fileChannel,
-                                             offset + written,
-                                             remaining - written,
-                                             ack,
-                                             tail)
+          val updated = new PendingWriteFile(
+            commander,
+            fileChannel,
+            offset + written,
+            remaining - written,
+            ack,
+            tail)
           self ! UpdatePendingWriteAndThen(updated, TcpConnection.doNothing)
         } else {
           release()
           val andThen =
             if (!ack.isInstanceOf[NoAck]) () ⇒ commander ! ack else doNothing
-          self ! UpdatePendingWriteAndThen(PendingWrite(commander, tail),
-                                           andThen)
+          self ! UpdatePendingWriteAndThen(
+            PendingWrite(commander, tail),
+            andThen)
         }
       } catch {
         case e: IOException ⇒ self ! WriteFileFailed(e)

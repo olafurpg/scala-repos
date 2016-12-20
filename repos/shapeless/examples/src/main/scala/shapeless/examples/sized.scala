@@ -39,8 +39,9 @@ object SizedExamples extends App {
     val rows = List(
       // List[Sized[IndexedSeq[String], _2]]
       Sized("Types and Programming Languages", "Benjamin Pierce"),
-      Sized("The Implementation of Functional Programming Languages",
-            "Simon Peyton-Jones"))
+      Sized(
+        "The Implementation of Functional Programming Languages",
+        "Simon Peyton-Jones"))
 
     // hdrs and rows statically known to have the same number of columns
     val formatted = csv(hdrs, rows)
@@ -65,8 +66,9 @@ object SizedExamples extends App {
     val hdrs = List("Title", "Author")
     val rows = List(
       List("Types and Programming Languages", "Benjamin Pierce"),
-      List("The Implementation of Functional Programming Languages",
-           "Simon Peyton-Jones")
+      List(
+        "The Implementation of Functional Programming Languages",
+        "Simon Peyton-Jones")
     )
 
     for {

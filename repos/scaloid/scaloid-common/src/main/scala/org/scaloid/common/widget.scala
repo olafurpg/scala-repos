@@ -439,8 +439,9 @@ object SArrayAdapter {
 
   def apply[T <: AnyRef: Manifest](textViewResourceId: Int, items: T*)(
       implicit context: Context): SArrayAdapter[TextView, T] =
-    new SArrayAdapter[TextView, T](java.util.Arrays.asList(items: _*),
-                                   textViewResourceId)
+    new SArrayAdapter[TextView, T](
+      java.util.Arrays.asList(items: _*),
+      textViewResourceId)
 
   def apply[T <: AnyRef](items: Array[T])(
       implicit context: Context): SArrayAdapter[TextView, T] =
@@ -452,8 +453,9 @@ object SArrayAdapter {
 
   def apply[T <: AnyRef](textViewResourceId: Int, items: Array[T])(
       implicit context: Context): SArrayAdapter[TextView, T] =
-    new SArrayAdapter[TextView, T](java.util.Arrays.asList(items: _*),
-                                   textViewResourceId)
+    new SArrayAdapter[TextView, T](
+      java.util.Arrays.asList(items: _*),
+      textViewResourceId)
 }
 
 /**

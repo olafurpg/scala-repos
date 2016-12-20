@@ -68,9 +68,10 @@ private[collection] object RedBlackTree {
         // right will all be greater than or equal to the lower bound. So 1 for this node plus
         // count the subtrees by stripping off the bounds that we don't need any more
         case _ =>
-          1 + countInRange(tree.left, from, None) + countInRange(tree.right,
-                                                                 None,
-                                                                 to)
+          1 + countInRange(tree.left, from, None) + countInRange(
+            tree.right,
+            None,
+            to)
       }
   def update[A: Ordering, B, B1 >: B](tree: Tree[A, B],
                                       k: A,
@@ -178,15 +179,17 @@ private[collection] object RedBlackTree {
                                                l: Tree[A, B1],
                                                d: Tree[A, B1]): Tree[A, B1] = {
     if (isRedTree(l) && isRedTree(l.left))
-      RedTree(l.key,
-              l.value,
-              BlackTree(l.left.key, l.left.value, l.left.left, l.left.right),
-              BlackTree(z, zv, l.right, d))
+      RedTree(
+        l.key,
+        l.value,
+        BlackTree(l.left.key, l.left.value, l.left.left, l.left.right),
+        BlackTree(z, zv, l.right, d))
     else if (isRedTree(l) && isRedTree(l.right))
-      RedTree(l.right.key,
-              l.right.value,
-              BlackTree(l.key, l.value, l.left, l.right.left),
-              BlackTree(z, zv, l.right.right, d))
+      RedTree(
+        l.right.key,
+        l.right.value,
+        BlackTree(l.key, l.value, l.left, l.right.left),
+        BlackTree(z, zv, l.right.right, d))
     else mkTree(isBlack, z, zv, l, d)
   }
   private[this] def balanceRight[A, B, B1 >: B](
@@ -196,10 +199,11 @@ private[collection] object RedBlackTree {
       a: Tree[A, B1],
       r: Tree[A, B1]): Tree[A, B1] = {
     if (isRedTree(r) && isRedTree(r.left))
-      RedTree(r.left.key,
-              r.left.value,
-              BlackTree(x, xv, a, r.left.left),
-              BlackTree(r.key, r.value, r.left.right, r.right))
+      RedTree(
+        r.left.key,
+        r.left.value,
+        BlackTree(x, xv, a, r.left.left),
+        BlackTree(r.key, r.value, r.left.right, r.right))
     else if (isRedTree(r) && isRedTree(r.right))
       RedTree(
         r.key,
@@ -218,17 +222,19 @@ private[collection] object RedBlackTree {
     } else {
       val cmp = ordering.compare(k, tree.key)
       if (cmp < 0)
-        balanceLeft(isBlackTree(tree),
-                    tree.key,
-                    tree.value,
-                    upd(tree.left, k, v, overwrite),
-                    tree.right)
+        balanceLeft(
+          isBlackTree(tree),
+          tree.key,
+          tree.value,
+          upd(tree.left, k, v, overwrite),
+          tree.right)
       else if (cmp > 0)
-        balanceRight(isBlackTree(tree),
-                     tree.key,
-                     tree.value,
-                     tree.left,
-                     upd(tree.right, k, v, overwrite))
+        balanceRight(
+          isBlackTree(tree),
+          tree.key,
+          tree.value,
+          tree.left,
+          upd(tree.right, k, v, overwrite))
       else if (overwrite || k != tree.key)
         mkTree(isBlackTree(tree), k, v, tree.left, tree.right)
       else tree
@@ -243,17 +249,19 @@ private[collection] object RedBlackTree {
     } else {
       val rank = count(tree.left) + 1
       if (idx < rank)
-        balanceLeft(isBlackTree(tree),
-                    tree.key,
-                    tree.value,
-                    updNth(tree.left, idx, k, v, overwrite),
-                    tree.right)
+        balanceLeft(
+          isBlackTree(tree),
+          tree.key,
+          tree.value,
+          updNth(tree.left, idx, k, v, overwrite),
+          tree.right)
       else if (idx > rank)
-        balanceRight(isBlackTree(tree),
-                     tree.key,
-                     tree.value,
-                     tree.left,
-                     updNth(tree.right, idx - rank, k, v, overwrite))
+        balanceRight(
+          isBlackTree(tree),
+          tree.key,
+          tree.value,
+          tree.left,
+          updNth(tree.right, idx - rank, k, v, overwrite))
       else if (overwrite)
         mkTree(isBlackTree(tree), k, v, tree.left, tree.right)
       else tree
@@ -271,29 +279,33 @@ private[collection] object RedBlackTree {
           if (isRedTree(tr)) {
             RedTree(x, xv, tl.black, tr.black)
           } else if (isRedTree(tl.left)) {
-            RedTree(tl.key,
-                    tl.value,
-                    tl.left.black,
-                    BlackTree(x, xv, tl.right, tr))
+            RedTree(
+              tl.key,
+              tl.value,
+              tl.left.black,
+              BlackTree(x, xv, tl.right, tr))
           } else if (isRedTree(tl.right)) {
-            RedTree(tl.right.key,
-                    tl.right.value,
-                    BlackTree(tl.key, tl.value, tl.left, tl.right.left),
-                    BlackTree(x, xv, tl.right.right, tr))
+            RedTree(
+              tl.right.key,
+              tl.right.value,
+              BlackTree(tl.key, tl.value, tl.left, tl.right.left),
+              BlackTree(x, xv, tl.right.right, tr))
           } else {
             BlackTree(x, xv, tl, tr)
           }
         } else if (isRedTree(tr)) {
           if (isRedTree(tr.right)) {
-            RedTree(tr.key,
-                    tr.value,
-                    BlackTree(x, xv, tl, tr.left),
-                    tr.right.black)
+            RedTree(
+              tr.key,
+              tr.value,
+              BlackTree(x, xv, tl, tr.left),
+              tr.right.black)
           } else if (isRedTree(tr.left)) {
-            RedTree(tr.left.key,
-                    tr.left.value,
-                    BlackTree(x, xv, tl, tr.left.left),
-                    BlackTree(tr.key, tr.value, tr.left.right, tr.right))
+            RedTree(
+              tr.left.key,
+              tr.left.value,
+              BlackTree(x, xv, tl, tr.left.left),
+              BlackTree(tr.key, tr.value, tr.left.right, tr.right))
           } else {
             BlackTree(x, xv, tl, tr)
           }
@@ -311,10 +323,11 @@ private[collection] object RedBlackTree {
         } else if (isBlackTree(tr)) {
           balance(x, xv, tl, tr.red)
         } else if (isRedTree(tr) && isBlackTree(tr.left)) {
-          RedTree(tr.left.key,
-                  tr.left.value,
-                  BlackTree(x, xv, tl, tr.left.left),
-                  balance(tr.key, tr.value, tr.left.right, subl(tr.right)))
+          RedTree(
+            tr.left.key,
+            tr.left.value,
+            BlackTree(x, xv, tl, tr.left.left),
+            balance(tr.key, tr.value, tr.left.right, subl(tr.right)))
         } else {
           sys.error("Defect: invariance violation")
         }
@@ -324,10 +337,11 @@ private[collection] object RedBlackTree {
         } else if (isBlackTree(tl)) {
           balance(x, xv, tl.red, tr)
         } else if (isRedTree(tl) && isBlackTree(tl.right)) {
-          RedTree(tl.right.key,
-                  tl.right.value,
-                  balance(tl.key, tl.value, subl(tl.left), tl.right.left),
-                  BlackTree(x, xv, tl.right.right, tr))
+          RedTree(
+            tl.right.key,
+            tl.right.value,
+            balance(tl.key, tl.value, subl(tl.left), tl.right.left),
+            BlackTree(x, xv, tl.right.right, tr))
         } else {
           sys.error("Defect: invariance violation")
         }
@@ -347,28 +361,32 @@ private[collection] object RedBlackTree {
         } else if (isRedTree(tl) && isRedTree(tr)) {
           val bc = append(tl.right, tr.left)
           if (isRedTree(bc)) {
-            RedTree(bc.key,
-                    bc.value,
-                    RedTree(tl.key, tl.value, tl.left, bc.left),
-                    RedTree(tr.key, tr.value, bc.right, tr.right))
+            RedTree(
+              bc.key,
+              bc.value,
+              RedTree(tl.key, tl.value, tl.left, bc.left),
+              RedTree(tr.key, tr.value, bc.right, tr.right))
           } else {
-            RedTree(tl.key,
-                    tl.value,
-                    tl.left,
-                    RedTree(tr.key, tr.value, bc, tr.right))
+            RedTree(
+              tl.key,
+              tl.value,
+              tl.left,
+              RedTree(tr.key, tr.value, bc, tr.right))
           }
         } else if (isBlackTree(tl) && isBlackTree(tr)) {
           val bc = append(tl.right, tr.left)
           if (isRedTree(bc)) {
-            RedTree(bc.key,
-                    bc.value,
-                    BlackTree(tl.key, tl.value, tl.left, bc.left),
-                    BlackTree(tr.key, tr.value, bc.right, tr.right))
+            RedTree(
+              bc.key,
+              bc.value,
+              BlackTree(tl.key, tl.value, tl.left, bc.left),
+              BlackTree(tr.key, tr.value, bc.right, tr.right))
           } else {
-            balLeft(tl.key,
-                    tl.value,
-                    tl.left,
-                    BlackTree(tr.key, tr.value, bc, tr.right))
+            balLeft(
+              tl.key,
+              tl.value,
+              tl.left,
+              BlackTree(tr.key, tr.value, bc, tr.right))
           }
         } else if (isRedTree(tr)) {
           RedTree(tr.key, tr.value, append(tl, tr.left), tr.right)
@@ -437,11 +455,12 @@ private[collection] object RedBlackTree {
     val newLeft = doDrop(tree.left, n)
     if (newLeft eq tree.left) tree
     else if (newLeft eq null)
-      updNth(tree.right,
-             n - count - 1,
-             tree.key,
-             tree.value,
-             overwrite = false)
+      updNth(
+        tree.right,
+        n - count - 1,
+        tree.key,
+        tree.value,
+        overwrite = false)
     else rebalance(tree, newLeft, tree.right)
   }
   private[this] def doTake[A, B](tree: Tree[A, B], n: Int): Tree[A, B] = {
@@ -467,11 +486,12 @@ private[collection] object RedBlackTree {
     val newRight = doTake(tree.right, until - count - 1)
     if ((newLeft eq tree.left) && (newRight eq tree.right)) tree
     else if (newLeft eq null)
-      updNth(newRight,
-             from - count - 1,
-             tree.key,
-             tree.value,
-             overwrite = false)
+      updNth(
+        newRight,
+        from - count - 1,
+        tree.key,
+        tree.value,
+        overwrite = false)
     else if (newRight eq null)
       updNth(newLeft, until, tree.key, tree.value, overwrite = false)
     else rebalance(tree, newLeft, newRight)
@@ -507,29 +527,33 @@ private[collection] object RedBlackTree {
         rightZipper: NList[Tree[A, B]],
         smallerDepth: Int): (NList[Tree[A, B]], Boolean, Boolean, Int) = {
       if (isBlackTree(left) && isBlackTree(right)) {
-        unzipBoth(left.right,
-                  right.left,
-                  cons(left, leftZipper),
-                  cons(right, rightZipper),
-                  smallerDepth + 1)
+        unzipBoth(
+          left.right,
+          right.left,
+          cons(left, leftZipper),
+          cons(right, rightZipper),
+          smallerDepth + 1)
       } else if (isRedTree(left) && isRedTree(right)) {
-        unzipBoth(left.right,
-                  right.left,
-                  cons(left, leftZipper),
-                  cons(right, rightZipper),
-                  smallerDepth)
+        unzipBoth(
+          left.right,
+          right.left,
+          cons(left, leftZipper),
+          cons(right, rightZipper),
+          smallerDepth)
       } else if (isRedTree(right)) {
-        unzipBoth(left,
-                  right.left,
-                  leftZipper,
-                  cons(right, rightZipper),
-                  smallerDepth)
+        unzipBoth(
+          left,
+          right.left,
+          leftZipper,
+          cons(right, rightZipper),
+          smallerDepth)
       } else if (isRedTree(left)) {
-        unzipBoth(left.right,
-                  right,
-                  cons(left, leftZipper),
-                  rightZipper,
-                  smallerDepth)
+        unzipBoth(
+          left.right,
+          right,
+          cons(left, leftZipper),
+          rightZipper,
+          smallerDepth)
       } else if ((left eq null) && (right eq null)) {
         (null, true, false, smallerDepth)
       } else if ((left eq null) && isBlackTree(right)) {
@@ -585,17 +609,19 @@ private[collection] object RedBlackTree {
       val zippedTree = NList.foldLeft(zipFrom.tail, union: Tree[A, B]) {
         (tree, node) =>
           if (leftMost)
-            balanceLeft(isBlackTree(node),
-                        node.key,
-                        node.value,
-                        tree,
-                        node.right)
+            balanceLeft(
+              isBlackTree(node),
+              node.key,
+              node.value,
+              tree,
+              node.right)
           else
-            balanceRight(isBlackTree(node),
-                         node.key,
-                         node.value,
-                         node.left,
-                         tree)
+            balanceRight(
+              isBlackTree(node),
+              node.key,
+              node.value,
+              node.left,
+              tree)
       }
       zippedTree
     }

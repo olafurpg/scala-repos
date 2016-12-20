@@ -105,8 +105,9 @@ class MetricsTest extends MarathonSpec with MockitoSugar {
 
     val durationCaptor = ArgumentCaptor.forClass(classOf[Long])
 
-    verify(origTimer).update(durationCaptor.capture(),
-                             org.mockito.Matchers.eq(TimeUnit.NANOSECONDS))
+    verify(origTimer).update(
+      durationCaptor.capture(),
+      org.mockito.Matchers.eq(TimeUnit.NANOSECONDS))
 
     assert(durationCaptor.getValue > 0)
   }

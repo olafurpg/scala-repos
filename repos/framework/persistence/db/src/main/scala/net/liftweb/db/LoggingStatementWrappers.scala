@@ -95,9 +95,10 @@ object DBLog {
   def createStatement(conn: Connection) = {
     val stmt = conn.createStatement
     Proxy
-      .newProxyInstance(this.getClass.getClassLoader,
-                        Array(classOf[java.sql.Statement], classOf[DBLog]),
-                        new LoggedStatementHandler(stmt))
+      .newProxyInstance(
+        this.getClass.getClassLoader,
+        Array(classOf[java.sql.Statement], classOf[DBLog]),
+        new LoggedStatementHandler(stmt))
       .asInstanceOf[Statement]
   }
 

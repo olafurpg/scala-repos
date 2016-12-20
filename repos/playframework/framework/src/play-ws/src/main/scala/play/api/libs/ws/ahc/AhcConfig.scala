@@ -90,8 +90,9 @@ class AhcWSClientConfigParser @Inject()(wsClientConfig: WSClientConfig,
     if (playConfig.underlying.hasPath("play.ws.ahc.keepAlive")) {
       val msg =
         "Both allowPoolingConnection and allowSslConnectionPool have been replaced by keepAlive!"
-      Seq("play.ws.ning.allowPoolingConnection",
-          "play.ws.ning.allowSslConnectionPool").foreach { s =>
+      Seq(
+        "play.ws.ning.allowPoolingConnection",
+        "play.ws.ning.allowSslConnectionPool").foreach { s =>
         if (playConfig.underlying.hasPath(s)) {
           throw playConfig.reportError(s, msg)
         }
@@ -283,9 +284,10 @@ class AhcConfigBuilder(ahcConfig: AhcWSClientConfig = AhcWSClientConfig()) {
         // break out the static methods as much as we can...
         val keyManagerFactory = buildKeyManagerFactory(sslConfig)
         val trustManagerFactory = buildTrustManagerFactory(sslConfig)
-        new ConfigSSLContextBuilder(sslConfig,
-                                    keyManagerFactory,
-                                    trustManagerFactory).build()
+        new ConfigSSLContextBuilder(
+          sslConfig,
+          keyManagerFactory,
+          trustManagerFactory).build()
       }
 
     // protocols!
@@ -340,8 +342,9 @@ class AhcConfigBuilder(ahcConfig: AhcWSClientConfig = AhcWSClientConfig()) {
             .parseAll(AlgorithmConstraintsParser.expression, a)
             .get)
       .toSet
-    val algorithmChecker = new AlgorithmChecker(keyConstraints = constraints,
-                                                signatureConstraints = Set())
+    val algorithmChecker = new AlgorithmChecker(
+      keyConstraints = constraints,
+      signatureConstraints = Set())
     for (cert <- trustManager.getAcceptedIssuers) {
       try {
         algorithmChecker.checkKeyAlgorithms(cert)

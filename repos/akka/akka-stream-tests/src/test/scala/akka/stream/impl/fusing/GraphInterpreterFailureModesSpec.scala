@@ -18,9 +18,10 @@ class GraphInterpreterFailureModesSpec
       stepAll()
 
       lastEvents() should be(
-        Set(Cancel(upstream),
-            OnError(downstream, testException),
-            PostStop(stage)))
+        Set(
+          Cancel(upstream),
+          OnError(downstream, testException),
+          PostStop(stage)))
     }
 
     "handle failure on onPush" in new FailingStageSetup {
@@ -34,9 +35,10 @@ class GraphInterpreterFailureModesSpec
       stepAll()
 
       lastEvents() should be(
-        Set(Cancel(upstream),
-            OnError(downstream, testException),
-            PostStop(stage)))
+        Set(
+          Cancel(upstream),
+          OnError(downstream, testException),
+          PostStop(stage)))
     }
 
     "handle failure on onPull while cancel is pending" in new FailingStageSetup {
@@ -102,9 +104,10 @@ class GraphInterpreterFailureModesSpec
       stepAll()
 
       lastEvents() should be(
-        Set(Cancel(upstream),
-            OnError(downstream, testException),
-            PostStop(stage)))
+        Set(
+          Cancel(upstream),
+          OnError(downstream, testException),
+          PostStop(stage)))
     }
 
     "handle failure in postStop" in new FailingStageSetup {

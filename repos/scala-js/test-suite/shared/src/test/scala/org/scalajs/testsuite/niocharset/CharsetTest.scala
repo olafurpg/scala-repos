@@ -49,11 +49,13 @@ class CharsetTest {
     assertEquals("UTF-16", Charset.forName("UnicodeBig").name())
 
     // Issue #2040
-    expectThrows(classOf[UnsupportedCharsetException],
-                 Charset.forName("UTF_8"))
+    expectThrows(
+      classOf[UnsupportedCharsetException],
+      Charset.forName("UTF_8"))
 
-    expectThrows(classOf[UnsupportedCharsetException],
-                 Charset.forName("this-charset-does-not-exist"))
+    expectThrows(
+      classOf[UnsupportedCharsetException],
+      Charset.forName("this-charset-does-not-exist"))
   }
 
   @Test def isSupported(): Unit = {

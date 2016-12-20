@@ -52,10 +52,11 @@ class VectorIndexerSuite
   override def beforeAll(): Unit = {
     super.beforeAll()
 
-    val densePoints1Seq = Seq(Vectors.dense(1.0, 2.0, 0.0),
-                              Vectors.dense(0.0, 1.0, 2.0),
-                              Vectors.dense(0.0, 0.0, -1.0),
-                              Vectors.dense(1.0, 3.0, 2.0))
+    val densePoints1Seq = Seq(
+      Vectors.dense(1.0, 2.0, 0.0),
+      Vectors.dense(0.0, 1.0, 2.0),
+      Vectors.dense(0.0, 0.0, -1.0),
+      Vectors.dense(1.0, 3.0, 2.0))
     val sparsePoints1Seq = Seq(
       Vectors.sparse(3, Array(0, 1), Array(1.0, 2.0)),
       Vectors.sparse(3, Array(1, 2), Array(1.0, 2.0)),
@@ -63,16 +64,18 @@ class VectorIndexerSuite
       Vectors.sparse(3, Array(0, 1, 2), Array(1.0, 3.0, 2.0)))
     point1maxes = Array(1.0, 3.0, 2.0)
 
-    val densePoints2Seq = Seq(Vectors.dense(1.0, 1.0, 0.0, 1.0),
-                              Vectors.dense(0.0, 1.0, 1.0, 1.0),
-                              Vectors.dense(-1.0, 1.0, 2.0, 0.0))
+    val densePoints2Seq = Seq(
+      Vectors.dense(1.0, 1.0, 0.0, 1.0),
+      Vectors.dense(0.0, 1.0, 1.0, 1.0),
+      Vectors.dense(-1.0, 1.0, 2.0, 0.0))
     val sparsePoints2Seq = Seq(
       Vectors.sparse(4, Array(0, 1, 3), Array(1.0, 1.0, 1.0)),
       Vectors.sparse(4, Array(1, 2, 3), Array(1.0, 1.0, 1.0)),
       Vectors.sparse(4, Array(0, 1, 2), Array(-1.0, 1.0, 2.0)))
 
-    val badPointsSeq = Seq(Vectors.sparse(2, Array(0, 1), Array(1.0, 1.0)),
-                           Vectors.sparse(3, Array(2), Array(-1.0)))
+    val badPointsSeq = Seq(
+      Vectors.sparse(2, Array(0, 1), Array(1.0, 1.0)),
+      Vectors.sparse(3, Array(2), Array(-1.0)))
 
     // Sanity checks for assumptions made in tests
     assert(densePoints1Seq.head.size == sparsePoints1Seq.head.size)
@@ -229,15 +232,18 @@ class VectorIndexerSuite
           throw e
       }
     }
-    checkCategoryMaps(densePoints1,
-                      maxCategories = 2,
-                      categoricalFeatures = Set(0))
-    checkCategoryMaps(densePoints1,
-                      maxCategories = 3,
-                      categoricalFeatures = Set(0, 2))
-    checkCategoryMaps(densePoints2,
-                      maxCategories = 2,
-                      categoricalFeatures = Set(1, 3))
+    checkCategoryMaps(
+      densePoints1,
+      maxCategories = 2,
+      categoricalFeatures = Set(0))
+    checkCategoryMaps(
+      densePoints1,
+      maxCategories = 3,
+      categoricalFeatures = Set(0, 2))
+    checkCategoryMaps(
+      densePoints2,
+      maxCategories = 2,
+      categoricalFeatures = Set(1, 3))
   }
 
   test("Maintain sparsity for sparse vectors") {
@@ -301,9 +307,10 @@ class VectorIndexerSuite
   }
 
   test("VectorIndexerModel read/write") {
-    val categoryMaps = Map(0 -> Map(0.0 -> 0, 1.0 -> 1),
-                           1 -> Map(0.0 -> 0, 1.0 -> 1, 2.0 -> 2, 3.0 -> 3),
-                           2 -> Map(0.0 -> 0, -1.0 -> 1, 2.0 -> 2))
+    val categoryMaps = Map(
+      0 -> Map(0.0 -> 0, 1.0 -> 1),
+      1 -> Map(0.0 -> 0, 1.0 -> 1, 2.0 -> 2, 3.0 -> 3),
+      2 -> Map(0.0 -> 0, -1.0 -> 1, 2.0 -> 2))
     val instance =
       new VectorIndexerModel("myVectorIndexerModel", 3, categoryMaps)
     val newInstance = testDefaultReadWrite(instance)

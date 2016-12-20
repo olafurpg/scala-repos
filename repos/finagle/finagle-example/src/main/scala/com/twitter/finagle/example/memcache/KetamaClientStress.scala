@@ -307,9 +307,10 @@ object KetamaClientStress extends App {
       val howmuch_throughput = throughput_count.get()
       assert(howmuch_throughput > 0)
 
-      printf("load: %6d QPS, throughput: %6d QPS\n",
-             howmuch_load / howlong.inSeconds,
-             howmuch_throughput / howlong.inSeconds)
+      printf(
+        "load: %6d QPS, throughput: %6d QPS\n",
+        howmuch_load / howlong.inSeconds,
+        howmuch_throughput / howlong.inSeconds)
 
       // stop generating load
       if (howmuch_load >= config.cap() && loadTask != null) {

@@ -51,8 +51,9 @@ class ScTryStmtImpl(node: ASTNode)
                   val tp = expr.getType(TypingContext.empty).getOrAny
                   val throwable = ScalaPsiManager
                     .instance(expr.getProject)
-                    .getCachedClass(expr.getResolveScope,
-                                    "java.lang.Throwable")
+                    .getCachedClass(
+                      expr.getResolveScope,
+                      "java.lang.Throwable")
                   throwable.fold(lifted) { throwable =>
                     val throwableType = ScDesignatorType(throwable)
                     val processor = new MethodResolveProcessor(

@@ -77,15 +77,17 @@ object LambdaDeserializer {
 
       // Lookup the implementation method
       val implMethod: MethodHandle = try {
-        findMember(lookup,
-                   getImplMethodKind,
-                   implClass,
-                   getImplMethodName,
-                   implMethodSig)
+        findMember(
+          lookup,
+          getImplMethodKind,
+          implClass,
+          getImplMethodName,
+          implMethodSig)
       } catch {
         case e: ReflectiveOperationException =>
-          throw new IllegalArgumentException("Illegal lambda deserialization",
-                                             e)
+          throw new IllegalArgumentException(
+            "Illegal lambda deserialization",
+            e)
       }
 
       val flags: Int =

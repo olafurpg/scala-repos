@@ -86,17 +86,18 @@ abstract class AbstractFetcherManager(protected val name: String,
     mapLock synchronized {
       val partitionsPerFetcher = partitionAndOffsets.groupBy {
         case (topicAndPartition, brokerAndInitialOffset) =>
-          BrokerAndFetcherId(brokerAndInitialOffset.broker,
-                             getFetcherId(topicAndPartition.topic,
-                                          topicAndPartition.partition))
+          BrokerAndFetcherId(
+            brokerAndInitialOffset.broker,
+            getFetcherId(topicAndPartition.topic, topicAndPartition.partition))
       }
       for ((brokerAndFetcherId, partitionAndOffsets) <- partitionsPerFetcher) {
         var fetcherThread: AbstractFetcherThread = null
         fetcherThreadMap.get(brokerAndFetcherId) match {
           case Some(f) => fetcherThread = f
           case None =>
-            fetcherThread = createFetcherThread(brokerAndFetcherId.fetcherId,
-                                                brokerAndFetcherId.broker)
+            fetcherThread = createFetcherThread(
+              brokerAndFetcherId.fetcherId,
+              brokerAndFetcherId.broker)
             fetcherThreadMap.put(brokerAndFetcherId, fetcherThread)
             fetcherThread.start
         }

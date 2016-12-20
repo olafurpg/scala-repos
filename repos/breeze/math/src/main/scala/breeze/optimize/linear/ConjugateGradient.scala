@@ -79,9 +79,10 @@ class ConjugateGradient[T, M](maxNormValue: Double = Double.PositiveInfinity,
               (radius - xtd) / dtd
             }
 
-          assert(!alphaNext.isNaN,
-                 xtd + " " + normSquare + " " + xtx + "  " + xtd + " " +
-                   radius + " " + dtd)
+          assert(
+            !alphaNext.isNaN,
+            xtd + " " + normSquare + " " + xtx + "  " + xtd + " " +
+              radius + " " + dtd)
           axpy(alphaNext, d, x)
           axpy(-alphaNext, Bd + (d :* normSquaredPenalty), r)
 

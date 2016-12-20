@@ -35,11 +35,13 @@ class ScalaArrangementParseInfo {
   private val currentDependentMethods = mutable.HashSet[ScFunction]()
   private var rebuildMethodDependencies = true
   private val javaPropertiesData =
-    mutable.HashMap[(String /*property name*/, PsiElement /*PSI parent*/ ),
-                    ScalaPropertyInfo]()
+    mutable.HashMap[
+      (String /*property name*/, PsiElement /*PSI parent*/ ),
+      ScalaPropertyInfo]()
   private val scalaPropertiesData =
-    mutable.HashMap[(String /*property name*/, PsiElement /*PSI parent*/ ),
-                    ScalaPropertyInfo]()
+    mutable.HashMap[
+      (String /*property name*/, PsiElement /*PSI parent*/ ),
+      ScalaPropertyInfo]()
 
   def onMethodEntryCreated(method: ScFunction, entry: ScalaArrangementEntry) =
     methodToEntry += ((method, entry))

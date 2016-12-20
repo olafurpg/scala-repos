@@ -51,9 +51,10 @@ trait AccountManager[M[+ _]] extends AccountFinder[M] {
                             newPassword: String): M[Boolean] = {
     val salt = randomSalt()
     updateAccount(
-      account.copy(passwordHash = saltAndHashSHA256(newPassword, salt),
-                   passwordSalt = salt,
-                   lastPasswordChangeTime = Some(new DateTime)))
+      account.copy(
+        passwordHash = saltAndHashSHA256(newPassword, salt),
+        passwordSalt = salt,
+        lastPasswordChangeTime = Some(new DateTime)))
   }
 
   def resetAccountPassword(accountId: AccountId,
@@ -80,8 +81,8 @@ trait AccountManager[M[+ _]] extends AccountFinder[M] {
   def findAccountByResetToken(accountId: AccountId,
                               tokenId: ResetTokenId): M[String \/ Account] = {
     logger.debug(
-      "Locating account for token id %s, account id %s".format(tokenId,
-                                                               accountId))
+      "Locating account for token id %s, account id %s"
+        .format(tokenId, accountId))
     findResetToken(accountId, tokenId).flatMap {
       case Some(token) =>
         if (token.expiresAt.isBefore(new DateTime)) {
@@ -141,12 +142,15 @@ trait AccountManager[M[+ _]] extends AccountFinder[M] {
       implicit M: Monad[M]): M[Validation[String, Account]] = {
     findAccountByEmail(email) map {
       case Some(account)
-          if account.passwordHash == saltAndHashSHA1(password,
-                                                     account.passwordSalt) ||
-            account.passwordHash == saltAndHashSHA256(password,
-                                                      account.passwordSalt) ||
-            account.passwordHash == saltAndHashLegacy(password,
-                                                      account.passwordSalt) =>
+          if account.passwordHash == saltAndHashSHA1(
+            password,
+            account.passwordSalt) ||
+            account.passwordHash == saltAndHashSHA256(
+              password,
+              account.passwordSalt) ||
+            account.passwordHash == saltAndHashLegacy(
+              password,
+              account.passwordSalt) =>
         Success(account)
       case Some(account) => Failure("password mismatch")
       case None => Failure("account not found")

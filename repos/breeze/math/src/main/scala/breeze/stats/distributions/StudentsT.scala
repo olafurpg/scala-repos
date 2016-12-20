@@ -15,8 +15,9 @@ case class StudentsT(degreesOfFreedom: Double)(implicit randBasis: RandBasis =
     extends ContinuousDistr[Double]
     with Moments[Double, Double]
     with HasCdf {
-  require(degreesOfFreedom > 0,
-          "degreesOfFreedom must be positive, but got " + degreesOfFreedom)
+  require(
+    degreesOfFreedom > 0,
+    "degreesOfFreedom must be positive, but got " + degreesOfFreedom)
   override def toString: String = ScalaRunTime._toString(this)
 
   private val innerInstance = new TDistribution(

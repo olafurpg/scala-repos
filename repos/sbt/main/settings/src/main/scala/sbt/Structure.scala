@@ -933,10 +933,11 @@ object InputKey {
                          extend1: Scoped,
                          extendN: Scoped*): InputKey[T] =
     apply(
-      AttributeKey[InputTask[T]](label,
-                                 description,
-                                 extendScoped(extend1, extendN),
-                                 rank))
+      AttributeKey[InputTask[T]](
+        label,
+        description,
+        extendScoped(extend1, extendN),
+        rank))
 
   def apply[T](akey: AttributeKey[InputTask[T]]): InputKey[T] =
     new InputKey[T] { val key = akey; def scope = Scope.ThisScope }
@@ -954,9 +955,10 @@ object TaskKey {
                          extend1: Scoped,
                          extendN: Scoped*): TaskKey[T] =
     apply(
-      AttributeKey[Task[T]](label,
-                            description,
-                            extendScoped(extend1, extendN)))
+      AttributeKey[Task[T]](
+        label,
+        description,
+        extendScoped(extend1, extendN)))
 
   def apply[T: Manifest](label: String,
                          description: String,
@@ -964,10 +966,11 @@ object TaskKey {
                          extend1: Scoped,
                          extendN: Scoped*): TaskKey[T] =
     apply(
-      AttributeKey[Task[T]](label,
-                            description,
-                            extendScoped(extend1, extendN),
-                            rank))
+      AttributeKey[Task[T]](
+        label,
+        description,
+        extendScoped(extend1, extendN),
+        rank))
 
   def apply[T](akey: AttributeKey[Task[T]]): TaskKey[T] =
     new TaskKey[T] { val key = akey; def scope = Scope.ThisScope }
@@ -995,10 +998,11 @@ object SettingKey {
                          extend1: Scoped,
                          extendN: Scoped*): SettingKey[T] =
     apply(
-      AttributeKey[T](label,
-                      description,
-                      extendScoped(extend1, extendN),
-                      rank))
+      AttributeKey[T](
+        label,
+        description,
+        extendScoped(extend1, extendN),
+        rank))
 
   def apply[T](akey: AttributeKey[T]): SettingKey[T] =
     new SettingKey[T] { val key = akey; def scope = Scope.ThisScope }

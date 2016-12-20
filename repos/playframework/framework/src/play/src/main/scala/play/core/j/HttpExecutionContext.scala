@@ -15,9 +15,10 @@ object HttpExecutionContext {
     * Create an HttpExecutionContext with values from the current thread.
     */
   def fromThread(delegate: ExecutionContext): ExecutionContextExecutor =
-    new HttpExecutionContext(Thread.currentThread().getContextClassLoader(),
-                             Http.Context.current.get(),
-                             delegate)
+    new HttpExecutionContext(
+      Thread.currentThread().getContextClassLoader(),
+      Http.Context.current.get(),
+      delegate)
 
   /**
     * Create an HttpExecutionContext with values from the current thread.
@@ -32,9 +33,10 @@ object HttpExecutionContext {
     * Create an HttpExecutionContext with values from the current thread.
     */
   def fromThread(delegate: Executor): ExecutionContextExecutor =
-    new HttpExecutionContext(Thread.currentThread().getContextClassLoader(),
-                             Http.Context.current.get(),
-                             FutureConverters.fromExecutor(delegate))
+    new HttpExecutionContext(
+      Thread.currentThread().getContextClassLoader(),
+      Http.Context.current.get(),
+      FutureConverters.fromExecutor(delegate))
 
   /**
     * Create an ExecutionContext that will, when prepared, be created with values from that thread.
@@ -80,9 +82,10 @@ class HttpExecutionContext(contextClassLoader: ClassLoader,
     if (delegatePrepared eq delegate) {
       this
     } else {
-      new HttpExecutionContext(contextClassLoader,
-                               httpContext,
-                               delegatePrepared)
+      new HttpExecutionContext(
+        contextClassLoader,
+        httpContext,
+        delegatePrepared)
     }
   }
 }

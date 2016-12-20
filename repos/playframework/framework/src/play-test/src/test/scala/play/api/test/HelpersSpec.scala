@@ -30,8 +30,9 @@ class HelpersSpec extends Specification {
 
     "add options" in {
       val inMemoryDatabaseConfiguration =
-        inMemoryDatabase("test",
-                         Map("MODE" -> "PostgreSQL", "DB_CLOSE_DELAY" -> "-1"))
+        inMemoryDatabase(
+          "test",
+          Map("MODE" -> "PostgreSQL", "DB_CLOSE_DELAY" -> "-1"))
       inMemoryDatabaseConfiguration.get("db.test.driver") must beSome(
         "org.h2.Driver")
       inMemoryDatabaseConfiguration.get("db.test.url") must beSome.which {

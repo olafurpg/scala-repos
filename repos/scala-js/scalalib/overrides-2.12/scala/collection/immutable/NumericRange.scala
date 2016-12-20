@@ -324,10 +324,12 @@ object NumericRange {
               //   startq steps to waypointA
               //   1 step to waypointB
               //   endq steps to the end (one less if !isInclusive and last==end)
-              num.plus(startq,
-                       num.plus(endq,
-                                if (!isInclusive && last == end) one
-                                else num.fromInt(2)))
+              num.plus(
+                startq,
+                num.plus(
+                  endq,
+                  if (!isInclusive && last == end) one
+                  else num.fromInt(2)))
             }
           }
         }

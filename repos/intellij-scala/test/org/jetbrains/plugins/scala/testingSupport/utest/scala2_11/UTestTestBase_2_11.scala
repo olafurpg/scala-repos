@@ -16,9 +16,10 @@ abstract class UTestTestBase_2_11 extends UTestTestCase {
     * Intended for loading libraries different from scala-compiler.
     */
   override protected def addOtherLibraries(): Unit = {
-    addIvyCacheLibrary("utest",
-                       "com.lihaoyi/utest_2.11/jars",
-                       "utest_2.11-0.3.1.jar")
+    addIvyCacheLibrary(
+      "utest",
+      "com.lihaoyi/utest_2.11/jars",
+      "utest_2.11-0.3.1.jar")
   }
 
   override protected val scalaSdkVersion = ScalaSdkVersion._2_11

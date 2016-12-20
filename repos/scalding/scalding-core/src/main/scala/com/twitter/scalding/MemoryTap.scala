@@ -47,8 +47,9 @@ class MemoryTap[In, Out](val scheme: Scheme[Properties, In, Out, _, _],
   override lazy val getIdentifier: String = scala.math.random.toString
 
   override def openForRead(flowProcess: FlowProcess[Properties], input: In) = {
-    new TupleEntryChainIterator(scheme.getSourceFields,
-                                tupleBuffer.toIterator.asJava)
+    new TupleEntryChainIterator(
+      scheme.getSourceFields,
+      tupleBuffer.toIterator.asJava)
   }
 
   override def openForWrite(flowProcess: FlowProcess[Properties],

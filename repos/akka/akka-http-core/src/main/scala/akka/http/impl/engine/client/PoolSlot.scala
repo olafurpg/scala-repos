@@ -213,25 +213,28 @@ private object PoolSlot {
     def handleDisconnect(connInport: ActorRef,
                          error: Option[Throwable],
                          firstContext: Option[RequestContext] = None): Unit = {
-      log.debug("Slot {} disconnected after {}",
-                slotIx,
-                error getOrElse "regular connection close")
+      log.debug(
+        "Slot {} disconnected after {}",
+        slotIx,
+        error getOrElse "regular connection close")
 
       val results: List[ProcessorOut] = {
         if (inflightRequests.isEmpty && firstContext.isDefined) {
           (error match {
             case Some(err) ⇒
               ResponseDelivery(
-                ResponseContext(firstContext.get,
-                                Failure(
-                                  new UnexpectedDisconnectException(
-                                    "Unexpected (early) disconnect",
-                                    err))))
+                ResponseContext(
+                  firstContext.get,
+                  Failure(
+                    new UnexpectedDisconnectException(
+                      "Unexpected (early) disconnect",
+                      err))))
             case _ ⇒
               ResponseDelivery(
-                ResponseContext(firstContext.get,
-                                Failure(new UnexpectedDisconnectException(
-                                  "Unexpected (early) disconnect"))))
+                ResponseContext(
+                  firstContext.get,
+                  Failure(new UnexpectedDisconnectException(
+                    "Unexpected (early) disconnect"))))
           }) :: Nil
         } else {
           inflightRequests.map { rc ⇒

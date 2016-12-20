@@ -17,12 +17,15 @@ trait SystemSettingsService {
       settings.baseUrl.foreach(x =>
         props.setProperty(BaseURL, x.replaceFirst("/\\Z", "")))
       settings.information.foreach(x => props.setProperty(Information, x))
-      props.setProperty(AllowAccountRegistration,
-                        settings.allowAccountRegistration.toString)
-      props.setProperty(AllowAnonymousAccess,
-                        settings.allowAnonymousAccess.toString)
-      props.setProperty(IsCreateRepoOptionPublic,
-                        settings.isCreateRepoOptionPublic.toString)
+      props.setProperty(
+        AllowAccountRegistration,
+        settings.allowAccountRegistration.toString)
+      props.setProperty(
+        AllowAnonymousAccess,
+        settings.allowAnonymousAccess.toString)
+      props.setProperty(
+        IsCreateRepoOptionPublic,
+        settings.isCreateRepoOptionPublic.toString)
       props.setProperty(Gravatar, settings.gravatar.toString)
       props.setProperty(Notification, settings.notification.toString)
       settings.activityLogLimit.foreach(x =>
@@ -42,8 +45,9 @@ trait SystemSettingsService {
           smtp.fromName.foreach(props.setProperty(SmtpFromName, _))
         }
       }
-      props.setProperty(LdapAuthentication,
-                        settings.ldapAuthentication.toString)
+      props.setProperty(
+        LdapAuthentication,
+        settings.ldapAuthentication.toString)
       if (settings.ldapAuthentication) {
         settings.ldap.map { ldap =>
           props.setProperty(LdapHost, ldap.host)
@@ -93,13 +97,14 @@ trait SystemSettingsService {
         getValue(props, UseSMTP, getValue(props, Notification, false)), // handle migration scenario from only notification to useSMTP
         if (getValue(props, UseSMTP, getValue(props, Notification, false))) {
           Some(
-            Smtp(getValue(props, SmtpHost, ""),
-                 getOptionValue(props, SmtpPort, Some(DefaultSmtpPort)),
-                 getOptionValue(props, SmtpUser, None),
-                 getOptionValue(props, SmtpPassword, None),
-                 getOptionValue[Boolean](props, SmtpSsl, None),
-                 getOptionValue(props, SmtpFromAddress, None),
-                 getOptionValue(props, SmtpFromName, None)))
+            Smtp(
+              getValue(props, SmtpHost, ""),
+              getOptionValue(props, SmtpPort, Some(DefaultSmtpPort)),
+              getOptionValue(props, SmtpUser, None),
+              getOptionValue(props, SmtpPassword, None),
+              getOptionValue[Boolean](props, SmtpSsl, None),
+              getOptionValue(props, SmtpFromAddress, None),
+              getOptionValue(props, SmtpFromName, None)))
         } else {
           None
         },

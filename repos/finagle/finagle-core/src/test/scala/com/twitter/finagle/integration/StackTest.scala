@@ -19,9 +19,10 @@ class StackTest extends FunSuite {
 
     val newClientStack = StackClient
       .newStack[String, String]
-      .replace(StackClient.Role.prepFactory,
-               (sf: ServiceFactory[String, String]) =>
-                 sf.map(identity[Service[String, String]]))
+      .replace(
+        StackClient.Role.prepFactory,
+        (sf: ServiceFactory[String, String]) =>
+          sf.map(identity[Service[String, String]]))
   }
 
   test(

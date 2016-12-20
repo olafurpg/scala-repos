@@ -95,8 +95,9 @@ class IndexIntRange(val length: Int, val from: Int = 0) extends Index[Int] {
   // slice at array locations, [from, until)
   def slice(from: Int, until: Int, stride: Int) =
     if (stride == 1)
-      new IndexIntRange(math.min(length, until - from),
-                        math.max(this.from + math.max(from, 0), 0))
+      new IndexIntRange(
+        math.min(length, until - from),
+        math.max(this.from + math.max(from, 0), 0))
     else genIdx.slice(from, until, stride)
 
   def getAll(keys: Array[Int]) =

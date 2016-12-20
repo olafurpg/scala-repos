@@ -29,16 +29,18 @@ class SystemConfiguration {
   }
 
   def configureUnsafeRenegotiation(allowUnsafeRenegotiation: Boolean) {
-    System.setProperty("sun.security.ssl.allowUnsafeRenegotiation",
-                       allowUnsafeRenegotiation.toString)
+    System.setProperty(
+      "sun.security.ssl.allowUnsafeRenegotiation",
+      allowUnsafeRenegotiation.toString)
     logger.debug(
       "configureUnsafeRenegotiation: sun.security.ssl.allowUnsafeRenegotiation = {}",
       allowUnsafeRenegotiation.toString)
   }
 
   def configureAllowLegacyHelloMessages(allowLegacyHelloMessages: Boolean) {
-    System.setProperty("sun.security.ssl.allowLegacyHelloMessages",
-                       allowLegacyHelloMessages.toString)
+    System.setProperty(
+      "sun.security.ssl.allowLegacyHelloMessages",
+      allowLegacyHelloMessages.toString)
     logger.debug(
       "configureAllowLegacyHelloMessages: sun.security.ssl.allowLegacyHelloMessages = {}",
       allowLegacyHelloMessages.toString)
@@ -50,12 +52,14 @@ class SystemConfiguration {
 
     // 1.7: PXIXCertPathValidator.populateVariables, it is dynamic so no override needed.
     Security.setProperty("ocsp.enable", checkRevocation.toString)
-    logger.debug("configureCheckRevocation: ocsp.enable = {}",
-                 checkRevocation.toString)
+    logger.debug(
+      "configureCheckRevocation: ocsp.enable = {}",
+      checkRevocation.toString)
     System
       .setProperty("com.sun.security.enableCRLDP", checkRevocation.toString)
-    logger.debug("configureCheckRevocation: com.sun.security.enableCRLDP = {}",
-                 checkRevocation.toString)
+    logger.debug(
+      "configureCheckRevocation: com.sun.security.enableCRLDP = {}",
+      checkRevocation.toString)
     System
       .setProperty("com.sun.net.ssl.checkRevocation", checkRevocation.toString)
   }

@@ -39,8 +39,9 @@ abstract class PicklerRuntime(classLoader: ClassLoader,
     val elType = if (clazz != null) clazz.getComponentType() else null
     if (elType != null) {
       // TODO: correctly convert elType
-      appliedType(ArrayClass.toType,
-                  List(mirror.classSymbol(elType).asType.toType))
+      appliedType(
+        ArrayClass.toType,
+        List(mirror.classSymbol(elType).asType.toType))
     } else {
       // TODO: fix duplication w.r.t Tools.scala
       val tpeWithMaybeTparams = sym.asType.toType

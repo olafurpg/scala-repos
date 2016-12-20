@@ -34,11 +34,12 @@ object Message extends LilaController {
     NotForKids {
       OptionFuOk(api.thread(id, me)) { thread =>
         relationApi.fetchBlocks(thread otherUserId me, me.id) map { blocked =>
-          html.message.thread(thread,
-                              forms.post,
-                              blocked,
-                              answerable = !Env.message.LichessSenders
-                                .contains(thread.creatorId))
+          html.message.thread(
+            thread,
+            forms.post,
+            blocked,
+            answerable = !Env.message.LichessSenders
+              .contains(thread.creatorId))
         }
       } map NoCache
     }
@@ -52,11 +53,12 @@ object Message extends LilaController {
           relationApi.fetchBlocks(thread otherUserId me, me.id) map {
             blocked =>
               BadRequest(
-                html.message.thread(thread,
-                                    err,
-                                    blocked,
-                                    answerable = !Env.message.LichessSenders
-                                      .contains(thread.creatorId)))
+                html.message.thread(
+                  thread,
+                  err,
+                  blocked,
+                  answerable = !Env.message.LichessSenders
+                    .contains(thread.creatorId)))
         },
         text =>
           api.makePost(thread, text, me) inject Redirect(
@@ -77,11 +79,12 @@ object Message extends LilaController {
       forms
         .thread(me)
         .bindFromRequest
-        .fold(err => renderForm(me, none, _ => err) map { BadRequest(_) },
-              data =>
-                api.makeThread(data, me) map { thread =>
-                  Redirect(routes.Message.thread(thread.id))
-              })
+        .fold(
+          err => renderForm(me, none, _ => err) map { BadRequest(_) },
+          data =>
+            api.makeThread(data, me) map { thread =>
+              Redirect(routes.Message.thread(thread.id))
+          })
     }
   }
 
@@ -92,11 +95,12 @@ object Message extends LilaController {
     get("user") ?? UserRepo.named flatMap { user =>
       user.fold(fuccess(true))(u => security.canMessage(me.id, u.id)) map {
         canMessage =>
-          html.message.form(f(forms thread me),
-                            user,
-                            title,
-                            canMessage = canMessage ||
-                                Granter(_.MessageAnyone)(me))
+          html.message.form(
+            f(forms thread me),
+            user,
+            title,
+            canMessage = canMessage ||
+                Granter(_.MessageAnyone)(me))
       }
     }
 

@@ -86,9 +86,9 @@ object ResultsSpec extends Specification {
       decodedCookies("preferences").value must be_==("blue")
 
       val newCookieHeader =
-        Cookies.mergeSetCookieHeader(setCookieHeader,
-                                     Seq(Cookie("lang", "fr"),
-                                         Cookie("session", "items2")))
+        Cookies.mergeSetCookieHeader(
+          setCookieHeader,
+          Seq(Cookie("lang", "fr"), Cookie("session", "items2")))
 
       val newDecodedCookies = Cookies
         .decodeSetCookieHeader(newCookieHeader)
@@ -130,26 +130,31 @@ object ResultsSpec extends Specification {
       val preferencesCookie = Cookie("preferences", "blue")
       val sessionCookie = Cookie("session", "items")
       testWithCookies(List(), List(), None)
-      testWithCookies(List(preferencesCookie),
-                      List(),
-                      Some(Set(preferencesCookie)))
+      testWithCookies(
+        List(preferencesCookie),
+        List(),
+        Some(Set(preferencesCookie)))
       testWithCookies(List(), List(sessionCookie), Some(Set(sessionCookie)))
-      testWithCookies(List(),
-                      List(sessionCookie, preferencesCookie),
-                      Some(Set(sessionCookie, preferencesCookie)))
-      testWithCookies(List(sessionCookie, preferencesCookie),
-                      List(),
-                      Some(Set(sessionCookie, preferencesCookie)))
-      testWithCookies(List(preferencesCookie),
-                      List(sessionCookie),
-                      Some(Set(preferencesCookie, sessionCookie)))
+      testWithCookies(
+        List(),
+        List(sessionCookie, preferencesCookie),
+        Some(Set(sessionCookie, preferencesCookie)))
+      testWithCookies(
+        List(sessionCookie, preferencesCookie),
+        List(),
+        Some(Set(sessionCookie, preferencesCookie)))
+      testWithCookies(
+        List(preferencesCookie),
+        List(sessionCookie),
+        Some(Set(preferencesCookie, sessionCookie)))
     }
 
     "support clearing a language cookie using clearingLang" in withApplication {
       implicit val messagesApi =
-        new DefaultMessagesApi(Environment.simple(),
-                               Configuration.reference,
-                               new DefaultLangs(Configuration.reference))
+        new DefaultMessagesApi(
+          Environment.simple(),
+          Configuration.reference,
+          new DefaultLangs(Configuration.reference))
       val cookie = Cookies
         .decodeSetCookieHeader(Ok.clearingLang.header.headers("Set-Cookie"))
         .head

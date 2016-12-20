@@ -107,22 +107,26 @@ class NetUtilTest extends WordSpec {
       val block = NetUtil.cidrToIpBlock("192.168.0.0/16")
 
       assert(
-        NetUtil.isInetAddressInBlock(InetAddress.getByName("192.168.0.1"),
-                                     block) == true)
+        NetUtil.isInetAddressInBlock(
+          InetAddress.getByName("192.168.0.1"),
+          block) == true)
       assert(
-        NetUtil.isInetAddressInBlock(InetAddress.getByName("192.168.255.254"),
-                                     block) == true)
+        NetUtil.isInetAddressInBlock(
+          InetAddress.getByName("192.168.255.254"),
+          block) == true)
       assert(
-        NetUtil.isInetAddressInBlock(InetAddress.getByName("192.169.0.1"),
-                                     block) == false)
+        NetUtil.isInetAddressInBlock(
+          InetAddress.getByName("192.169.0.1"),
+          block) == false)
     }
 
     "isIpInBlocks" in {
-      val blocks = Seq(NetUtil.cidrToIpBlock("127"),
-                       NetUtil.cidrToIpBlock("10.1.1.0/24"),
-                       NetUtil.cidrToIpBlock("192.168.0.0/16"),
-                       NetUtil.cidrToIpBlock("200.1.1.1"),
-                       NetUtil.cidrToIpBlock("200.1.1.2/32"))
+      val blocks = Seq(
+        NetUtil.cidrToIpBlock("127"),
+        NetUtil.cidrToIpBlock("10.1.1.0/24"),
+        NetUtil.cidrToIpBlock("192.168.0.0/16"),
+        NetUtil.cidrToIpBlock("200.1.1.1"),
+        NetUtil.cidrToIpBlock("200.1.1.2/32"))
 
       assert(NetUtil.isIpInBlocks("127.0.0.1", blocks) == true)
       assert(NetUtil.isIpInBlocks("128.0.0.1", blocks) == false)

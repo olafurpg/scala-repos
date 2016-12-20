@@ -34,19 +34,21 @@ private[simul] final class SimulRepo(simulColl: Coll) {
   private implicit val ApplicantBSONHandler = Macros.handler[SimulApplicant]
   private implicit val SimulPairingBSONHandler = new BSON[SimulPairing] {
     def reads(r: BSON.Reader) =
-      SimulPairing(player = r.get[SimulPlayer]("player"),
-                   gameId = r str "gameId",
-                   status = r.get[Status]("status"),
-                   wins = r boolO "wins",
-                   hostColor = r
-                       .strO("hostColor")
-                       .flatMap(chess.Color.apply) | chess.White)
+      SimulPairing(
+        player = r.get[SimulPlayer]("player"),
+        gameId = r str "gameId",
+        status = r.get[Status]("status"),
+        wins = r boolO "wins",
+        hostColor = r
+            .strO("hostColor")
+            .flatMap(chess.Color.apply) | chess.White)
     def writes(w: BSON.Writer, o: SimulPairing) =
-      BSONDocument("player" -> o.player,
-                   "gameId" -> o.gameId,
-                   "status" -> o.status,
-                   "wins" -> o.wins,
-                   "hostColor" -> o.hostColor.name)
+      BSONDocument(
+        "player" -> o.player,
+        "gameId" -> o.gameId,
+        "status" -> o.status,
+        "wins" -> o.wins,
+        "hostColor" -> o.hostColor.name)
   }
 
   private implicit val SimulBSONHandler = Macros.handler[Simul]

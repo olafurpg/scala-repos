@@ -46,9 +46,10 @@ trait SelectTest extends FunSuite /* with Checkers */ {
           val bs = shuffle(as)
           val orig = bs.clone()
           select(bs, i)
-          assert(bs(i) === i,
-                 "Select %d on %s failed." format
-                   (i, orig.mkString("[ ", ", ", " ]")))
+          assert(
+            bs(i) === i,
+            "Select %d on %s failed." format
+              (i, orig.mkString("[ ", ", ", " ]")))
         }
       }
     }

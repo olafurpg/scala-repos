@@ -91,13 +91,14 @@ private[nio] object HeapByteBufferDoubleView {
               initialLimit: Int,
               readOnly: Boolean,
               isBigEndian: Boolean): DoubleBuffer = {
-      new HeapByteBufferDoubleView(capacity,
-                                   byteArray,
-                                   byteArrayOffset,
-                                   initialPosition,
-                                   initialLimit,
-                                   readOnly,
-                                   isBigEndian)
+      new HeapByteBufferDoubleView(
+        capacity,
+        byteArray,
+        byteArrayOffset,
+        initialPosition,
+        initialLimit,
+        readOnly,
+        isBigEndian)
     }
   }
 

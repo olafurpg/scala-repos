@@ -94,12 +94,13 @@ private[nio] object HeapLongBuffer {
               initialPosition: Int,
               initialLimit: Int,
               readOnly: Boolean): LongBuffer = {
-      new HeapLongBuffer(capacity,
-                         array,
-                         arrayOffset,
-                         initialPosition,
-                         initialLimit,
-                         readOnly)
+      new HeapLongBuffer(
+        capacity,
+        array,
+        arrayOffset,
+        initialPosition,
+        initialLimit,
+        readOnly)
     }
   }
 
@@ -110,11 +111,12 @@ private[nio] object HeapLongBuffer {
                         initialPosition: Int,
                         initialLength: Int,
                         isReadOnly: Boolean): LongBuffer = {
-    GenHeapBuffer.generic_wrap(array,
-                               arrayOffset,
-                               capacity,
-                               initialPosition,
-                               initialLength,
-                               isReadOnly)
+    GenHeapBuffer.generic_wrap(
+      array,
+      arrayOffset,
+      capacity,
+      initialPosition,
+      initialLength,
+      isReadOnly)
   }
 }

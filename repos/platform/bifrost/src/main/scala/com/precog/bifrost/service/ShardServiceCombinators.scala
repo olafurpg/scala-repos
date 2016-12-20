@@ -206,11 +206,12 @@ object ShardServiceCombinators extends Logging {
 
     (offsetAndLimit |@| sortOn |@| sortOrder |@| timeout) {
       (offsetAndLimit, sortOn, sortOrder, timeout) =>
-        QueryOptions(offsetAndLimit,
-                     sortOn,
-                     sortOrder,
-                     timeout.map(Duration(_, TimeUnit.MILLISECONDS)),
-                     output)
+        QueryOptions(
+          offsetAndLimit,
+          sortOn,
+          sortOrder,
+          timeout.map(Duration(_, TimeUnit.MILLISECONDS)),
+          output)
     } leftMap { errors =>
       DispatchError(
         BadRequest,
@@ -238,12 +239,12 @@ trait ShardServiceCombinators
     : HttpService[ByteChunk,
                   ((APIKey, AccountDetails),
                    Path) => Future[HttpResponse[B]]] = {
-    new DelegatingService[ByteChunk,
-                          ((APIKey, AccountDetails),
-                           Path) => Future[HttpResponse[B]],
-                          ByteChunk,
-                          (APIKey, AccountDetails, Path, Query,
-                           QueryOptions) => Future[HttpResponse[B]]] {
+    new DelegatingService[
+      ByteChunk,
+      ((APIKey, AccountDetails), Path) => Future[HttpResponse[B]],
+      ByteChunk,
+      (APIKey, AccountDetails, Path, Query,
+       QueryOptions) => Future[HttpResponse[B]]] {
       val delegate = next
       val metadata = NoMetadata
       val service: HttpRequest[ByteChunk] => Validation[

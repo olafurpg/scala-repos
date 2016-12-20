@@ -99,8 +99,9 @@ object ThriftTypes
       super.apply(method)
     } catch {
       case e: NoSuchElementException =>
-        throw new TApplicationException(TApplicationException.UNKNOWN_METHOD,
-                                        "unknown method '%s'".format(method))
+        throw new TApplicationException(
+          TApplicationException.UNKNOWN_METHOD,
+          "unknown method '%s'".format(method))
     }
   }
 }

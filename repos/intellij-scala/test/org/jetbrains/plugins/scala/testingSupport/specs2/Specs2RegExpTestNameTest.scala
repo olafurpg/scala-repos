@@ -9,8 +9,9 @@ abstract class Specs2RegExpTestNameTest extends Specs2TestCase {
   protected val regExpFileName = regExpClassName + ".scala"
 
   def addRegExpTest() {
-    addFileToProject(regExpFileName,
-                     """
+    addFileToProject(
+      regExpFileName,
+      """
         |import org.specs2.mutable.Specification
         |
         |class SpecsRegExpTest extends Specification {
@@ -44,11 +45,12 @@ abstract class Specs2RegExpTestNameTest extends Specs2TestCase {
       regExpFileName,
       checkConfigAndSettings(_, regExpClassName, "test"),
       root =>
-        checkResultTreeHasExactNamedPath(root,
-                                         "[root]",
-                                         regExpClassName,
-                                         "The RegExpTest should",
-                                         "test") &&
+        checkResultTreeHasExactNamedPath(
+          root,
+          "[root]",
+          regExpClassName,
+          "The RegExpTest should",
+          "test") &&
           checkResultTreeDoesNotHaveNodes(root, "testtest", "testtesttest"))
   }
 
@@ -61,11 +63,12 @@ abstract class Specs2RegExpTestNameTest extends Specs2TestCase {
       regExpFileName,
       checkConfigAndSettings(_, regExpClassName, "testtest"),
       root =>
-        checkResultTreeHasExactNamedPath(root,
-                                         "[root]",
-                                         regExpClassName,
-                                         "The RegExpTest should",
-                                         "testtest") &&
+        checkResultTreeHasExactNamedPath(
+          root,
+          "[root]",
+          regExpClassName,
+          "The RegExpTest should",
+          "testtest") &&
           checkResultTreeDoesNotHaveNodes(root, "test", "testtesttest"))
   }
 
@@ -78,11 +81,12 @@ abstract class Specs2RegExpTestNameTest extends Specs2TestCase {
       regExpFileName,
       checkConfigAndSettings(_, regExpClassName, "testtesttest"),
       root =>
-        checkResultTreeHasExactNamedPath(root,
-                                         "[root]",
-                                         regExpClassName,
-                                         "The RegExpTest should",
-                                         "testtesttest") &&
+        checkResultTreeHasExactNamedPath(
+          root,
+          "[root]",
+          regExpClassName,
+          "The RegExpTest should",
+          "testtesttest") &&
           checkResultTreeDoesNotHaveNodes(root, "test", "testtest"))
   }
 
@@ -96,11 +100,12 @@ abstract class Specs2RegExpTestNameTest extends Specs2TestCase {
       regExpFileName,
       checkConfigAndSettings(_, regExpClassName, "run"),
       root =>
-        checkResultTreeHasExactNamedPath(root,
-                                         "[root]",
-                                         regExpClassName,
-                                         "First should",
-                                         "run") &&
+        checkResultTreeHasExactNamedPath(
+          root,
+          "[root]",
+          regExpClassName,
+          "First should",
+          "run") &&
           checkResultTreeDoesNotHaveNodes(root, "Second should"))
 
     runTestByLocation(
@@ -109,11 +114,12 @@ abstract class Specs2RegExpTestNameTest extends Specs2TestCase {
       regExpFileName,
       checkConfigAndSettings(_, regExpClassName, "run"),
       root =>
-        checkResultTreeHasExactNamedPath(root,
-                                         "[root]",
-                                         regExpClassName,
-                                         "Second should",
-                                         "run") &&
+        checkResultTreeHasExactNamedPath(
+          root,
+          "[root]",
+          regExpClassName,
+          "Second should",
+          "run") &&
           checkResultTreeDoesNotHaveNodes(root, "First should"))
   }
 }

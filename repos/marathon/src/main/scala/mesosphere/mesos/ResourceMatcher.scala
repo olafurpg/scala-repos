@@ -116,22 +116,26 @@ object ResourceMatcher {
     // that means if the resources that are matched are still unreserved.
     val diskMatch =
       if (!selector.reserved && app.diskForVolumes > 0) {
-        scalarResourceMatch(Resource.DISK,
-                            app.disk + app.diskForVolumes,
-                            ScalarMatchResult.Scope.IncludingLocalVolumes)
+        scalarResourceMatch(
+          Resource.DISK,
+          app.disk + app.diskForVolumes,
+          ScalarMatchResult.Scope.IncludingLocalVolumes)
       } else {
-        scalarResourceMatch(Resource.DISK,
-                            app.disk,
-                            ScalarMatchResult.Scope.ExcludingLocalVolumes)
+        scalarResourceMatch(
+          Resource.DISK,
+          app.disk,
+          ScalarMatchResult.Scope.ExcludingLocalVolumes)
       }
 
     val scalarMatchResults = Iterable(
-      scalarResourceMatch(Resource.CPUS,
-                          app.cpus,
-                          ScalarMatchResult.Scope.NoneDisk),
-      scalarResourceMatch(Resource.MEM,
-                          app.mem,
-                          ScalarMatchResult.Scope.NoneDisk),
+      scalarResourceMatch(
+        Resource.CPUS,
+        app.cpus,
+        ScalarMatchResult.Scope.NoneDisk),
+      scalarResourceMatch(
+        Resource.MEM,
+        app.mem,
+        ScalarMatchResult.Scope.NoneDisk),
       diskMatch
     ).filter(_.requiredValue != 0)
 
@@ -160,8 +164,9 @@ object ResourceMatcher {
       for {
         portsMatch <- portsMatchOpt if meetsAllConstraints
       } yield
-        ResourceMatch(scalarMatchResults.collect { case m: ScalarMatch => m },
-                      portsMatch)
+        ResourceMatch(
+          scalarMatchResults.collect { case m: ScalarMatch => m },
+          portsMatch)
     } else {
       None
     }
@@ -187,10 +192,11 @@ object ResourceMatcher {
       } else {
         resourcesLeft.headOption match {
           case None =>
-            NoMatch(name,
-                    requiredValue,
-                    requiredValue - valueLeft,
-                    scope = scope)
+            NoMatch(
+              name,
+              requiredValue,
+              requiredValue - valueLeft,
+              scope = scope)
           case Some(nextResource) =>
             val consume = Math.min(valueLeft, nextResource.getScalar.getValue)
             val newValueLeft = valueLeft - consume
@@ -200,9 +206,10 @@ object ResourceMatcher {
               else None
             val consumedValue = ScalarMatch
               .Consumption(consume, nextResource.getRole, reservation)
-            findMatches(newValueLeft,
-                        resourcesLeft.tail,
-                        consumedValue :: resourcesConsumed)
+            findMatches(
+              newValueLeft,
+              resourcesLeft.tail,
+              consumedValue :: resourcesConsumed)
         }
       }
     }

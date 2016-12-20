@@ -156,12 +156,14 @@ object LispCaseClasses extends Lisp {
   }
 
   def normalize(x: Data): Data = x match {
-    case CONS(SYM("def"),
-              CONS(CONS(SYM(name), args), CONS(body, CONS(expr, NIL())))) =>
+    case CONS(
+        SYM("def"),
+        CONS(CONS(SYM(name), args), CONS(body, CONS(expr, NIL())))) =>
       normalize(
         list(SYM("def"), SYM(name), list(SYM("lambda"), args, body), expr))
-    case CONS(SYM("cond"),
-              CONS(CONS(SYM("else"), CONS(expr, NIL())), NIL())) =>
+    case CONS(
+        SYM("cond"),
+        CONS(CONS(SYM("else"), CONS(expr, NIL())), NIL())) =>
       normalize(expr)
     case CONS(SYM("cond"), CONS(CONS(test, CONS(expr, NIL())), rest)) =>
       normalize(list(SYM("if"), test, expr, CONS(SYM("cond"), rest)))

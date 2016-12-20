@@ -303,10 +303,11 @@ package object templates {
       val localNames = reverseLocalNames(route, params)
       val parameters = reverseMatchParameters(params, false)
       val parameterConstraints = reverseParameterConstraints(route, localNames)
-      (parameters -> parameterConstraints) -> block(route,
-                                                    parameters,
-                                                    parameterConstraints,
-                                                    localNames)
+      (parameters -> parameterConstraints) -> block(
+        route,
+        parameters,
+        parameterConstraints,
+        localNames)
     }: _*).values.toSeq.reverse
   }
 

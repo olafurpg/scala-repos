@@ -52,9 +52,10 @@ private[http] object BodyPartRenderer {
             case IndefiniteLength(_, data) ⇒ bodyPartChunks(data)
           }
 
-        renderBoundary(r,
-                       boundary,
-                       suppressInitialCrLf = !firstBoundaryRendered)
+        renderBoundary(
+          r,
+          boundary,
+          suppressInitialCrLf = !firstBoundaryRendered)
         firstBoundaryRendered = true
         renderEntityContentType(r, bodyPart.entity)
         renderHeaders(r, bodyPart.headers, log)

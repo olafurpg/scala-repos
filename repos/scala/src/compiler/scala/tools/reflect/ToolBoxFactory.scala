@@ -161,11 +161,13 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
           val dummies = freeTerms
             .map {
               case (freeTerm, name) =>
-                ValDef(NoMods,
-                       name,
-                       TypeTree(freeTerm.info),
-                       Select(Ident(PredefModule),
-                              newTermName("$qmark$qmark$qmark")))
+                ValDef(
+                  NoMods,
+                  name,
+                  TypeTree(freeTerm.info),
+                  Select(
+                    Ident(PredefModule),
+                    newTermName("$qmark$qmark$qmark")))
             }
             .toList
           expr2 = Block(dummies, expr2)
@@ -176,8 +178,9 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
           // [Eugene] how can we implement that?
           val ownerClass = rootMirror.EmptyPackageClass.newClassSymbol(
             newTypeName("<expression-owner>"))
-          build.setInfo(ownerClass,
-                        ClassInfoType(List(ObjectTpe), newScope, ownerClass))
+          build.setInfo(
+            ownerClass,
+            ClassInfoType(List(ObjectTpe), newScope, ownerClass))
           val owner = ownerClass.newLocalDummy(expr2.pos)
           val currentTyper = analyzer.newTyper(
             analyzer
@@ -221,8 +224,9 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
             dummies1 map (_.symbol),
             dummies1 map
               (dummy =>
-                 SingleType(NoPrefix,
-                            invertedIndex(dummy.symbol.name.toTermName))))
+                 SingleType(
+                   NoPrefix,
+                   invertedIndex(dummy.symbol.name.toTermName))))
             .traverse(result)
           result
         })
@@ -242,19 +246,22 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
           trace(
             "typing (implicit views = %s, macros = %s): "
               .format(!withImplicitViewsDisabled, !withMacrosDisabled))(
-            showAttributed(expr,
-                           true,
-                           true,
-                           settings.Yshowsymowners.value,
-                           settings.Yshowsymkinds.value))
-          currentTyper.silent(_.typed(expr, mode, pt),
-                              reportAmbiguousErrors = false) match {
+            showAttributed(
+              expr,
+              true,
+              true,
+              settings.Yshowsymowners.value,
+              settings.Yshowsymkinds.value))
+          currentTyper.silent(
+            _.typed(expr, mode, pt),
+            reportAmbiguousErrors = false) match {
             case analyzer.SilentResultValue(result) =>
               trace("success: ")(
-                showAttributed(result,
-                               true,
-                               true,
-                               settings.Yshowsymkinds.value))
+                showAttributed(
+                  result,
+                  true,
+                  true,
+                  settings.Yshowsymkinds.value))
               result
             case error @ analyzer.SilentTypeError(_) =>
               trace("failed: ")(error.err.errMsg)
@@ -278,23 +285,26 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
           withImplicitViewsDisabled = false,
           withMacrosDisabled = withMacrosDisabled)((currentTyper, tree) => {
           trace(
-            "inferring implicit %s (macros = %s): ".format(if (isView)
-                                                             "view"
-                                                           else "value",
-                                                           !withMacrosDisabled))(
-            showAttributed(pt,
-                           true,
-                           true,
-                           settings.Yshowsymowners.value,
-                           settings.Yshowsymkinds.value))
-          analyzer.inferImplicit(tree,
-                                 pt,
-                                 isView,
-                                 currentTyper.context,
-                                 silent,
-                                 withMacrosDisabled,
-                                 pos,
-                                 (pos, msg) => throw ToolBoxError(msg))
+            "inferring implicit %s (macros = %s): ".format(
+              if (isView)
+                "view"
+              else "value",
+              !withMacrosDisabled))(
+            showAttributed(
+              pt,
+              true,
+              true,
+              settings.Yshowsymowners.value,
+              settings.Yshowsymkinds.value))
+          analyzer.inferImplicit(
+            tree,
+            pt,
+            isView,
+            currentTyper.context,
+            silent,
+            withMacrosDisabled,
+            pos,
+            (pos, msg) => throw ToolBoxError(msg))
         })
 
       private def wrapInPackageAndCompile(packageName: TermName,
@@ -339,10 +349,11 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
           def makeParam(schema: (FreeTermSymbol, TermName)) = {
             // see a detailed explanation of the STABLE trick in `GenSymbols.reifyFreeTerm`
             val (fv, name) = schema
-            meth.newValueParameter(name,
-                                   newFlags =
-                                     if (fv.hasStableFlag) STABLE
-                                     else 0) setInfo appliedType(
+            meth.newValueParameter(
+              name,
+              newFlags =
+                if (fv.hasStableFlag) STABLE
+                else 0) setInfo appliedType(
               definitions.FunctionClass(0).tpe,
               List(fv.tpe.resultType))
           }
@@ -356,27 +367,31 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
           trace("wrapping ")(defOwner(expr) -> meth)
           val methdef = DefDef(meth, expr changeOwner (defOwner(expr) -> meth))
 
-          val moduledef = ModuleDef(obj,
-                                    gen.mkTemplate(List(TypeTree(ObjectTpe)),
-                                                   noSelfType,
-                                                   NoMods,
-                                                   List(),
-                                                   List(methdef),
-                                                   NoPosition))
+          val moduledef = ModuleDef(
+            obj,
+            gen.mkTemplate(
+              List(TypeTree(ObjectTpe)),
+              noSelfType,
+              NoMods,
+              List(),
+              List(methdef),
+              NoPosition))
           trace("wrapped: ")(
-            showAttributed(moduledef,
-                           true,
-                           true,
-                           settings.Yshowsymowners.value,
-                           settings.Yshowsymkinds.value))
+            showAttributed(
+              moduledef,
+              true,
+              true,
+              settings.Yshowsymowners.value,
+              settings.Yshowsymkinds.value))
 
           val cleanedUp = resetAttrs(moduledef)
           trace("cleaned up: ")(
-            showAttributed(cleanedUp,
-                           true,
-                           true,
-                           settings.Yshowsymowners.value,
-                           settings.Yshowsymkinds.value))
+            showAttributed(
+              cleanedUp,
+              true,
+              true,
+              settings.Yshowsymowners.value,
+              settings.Yshowsymkinds.value))
           cleanedUp.asInstanceOf[ModuleDef]
         }
 
@@ -477,9 +492,10 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
         lazy val compiler: ToolBoxGlobal = {
           try {
             val errorFn: String => Unit = msg =>
-              frontEnd.log(scala.reflect.internal.util.NoPosition,
-                           msg,
-                           frontEnd.ERROR)
+              frontEnd.log(
+                scala.reflect.internal.util.NoPosition,
+                msg,
+                frontEnd.ERROR)
             val command = new CompilerCommand(arguments.toList, errorFn)
             command.settings.outputDirs setSingleOutput virtualDirectory
             val instance = new ToolBoxGlobal(
@@ -537,13 +553,13 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
         if (compiler.settings.verbose)
           println("typing " + ctree + ", expectedType = " + expectedType)
         val ttree: compiler.Tree =
-          compiler.typecheck(ctree,
-                             cexpectedType,
-                             mode,
-                             silent = silent,
-                             withImplicitViewsDisabled =
-                               withImplicitViewsDisabled,
-                             withMacrosDisabled = withMacrosDisabled)
+          compiler.typecheck(
+            ctree,
+            cexpectedType,
+            mode,
+            silent = silent,
+            withImplicitViewsDisabled = withImplicitViewsDisabled,
+            withMacrosDisabled = withMacrosDisabled)
         val uttree = exporter.importTree(ttree)
         uttree
       }
@@ -552,12 +568,13 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
                            silent: Boolean = true,
                            withMacrosDisabled: Boolean = false,
                            pos: u.Position = u.NoPosition): u.Tree = {
-      inferImplicit(u.EmptyTree,
-                    pt,
-                    isView = false,
-                    silent = silent,
-                    withMacrosDisabled = withMacrosDisabled,
-                    pos = pos)
+      inferImplicit(
+        u.EmptyTree,
+        pt,
+        isView = false,
+        silent = silent,
+        withMacrosDisabled = withMacrosDisabled,
+        pos = pos)
     }
 
     def inferImplicitView(tree: u.Tree,
@@ -569,12 +586,13 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
       val functionTypeCtor =
         u.definitions.FunctionClass(1).asClass.toTypeConstructor
       val viewTpe = u.appliedType(functionTypeCtor, List(from, to))
-      inferImplicit(tree,
-                    viewTpe,
-                    isView = true,
-                    silent = silent,
-                    withMacrosDisabled = withMacrosDisabled,
-                    pos = pos)
+      inferImplicit(
+        tree,
+        viewTpe,
+        isView = true,
+        silent = silent,
+        withMacrosDisabled = withMacrosDisabled,
+        pos = pos)
     }
 
     private def inferImplicit(tree: u.Tree,
@@ -596,12 +614,13 @@ abstract class ToolBoxFactory[U <: JavaUniverse](val u: U) { factorySelf =>
           println("inferring implicit %s of type %s, macros = %s"
             .format(if (isView) "view" else "value", pt, !withMacrosDisabled))
         val itree: compiler.Tree =
-          compiler.inferImplicit(ctree,
-                                 cpt,
-                                 isView = isView,
-                                 silent = silent,
-                                 withMacrosDisabled = withMacrosDisabled,
-                                 pos = cpos)
+          compiler.inferImplicit(
+            ctree,
+            cpt,
+            isView = isView,
+            silent = silent,
+            withMacrosDisabled = withMacrosDisabled,
+            pos = cpos)
         val uitree = exporter.importTree(itree)
         uitree
     }

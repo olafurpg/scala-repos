@@ -44,9 +44,10 @@ object $update {
                                        name: String,
                                        value: BSONValue,
                                        upsert: Boolean = false): Funit =
-    apply($select(id),
-          BSONDocument("$set" -> BSONDocument(name -> value)),
-          upsert = upsert)
+    apply(
+      $select(id),
+      BSONDocument("$set" -> BSONDocument(name -> value)),
+      upsert = upsert)
 
   // UNCHECKED
 

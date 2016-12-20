@@ -35,11 +35,12 @@ class FramingSpec extends FreeSpec with Matchers with WithMaterializerSpec {
               0        # mask?
                0000000 # length
           """ should parseTo(
-            FrameHeader(Opcode.Continuation,
-                        None,
-                        0,
-                        fin = false,
-                        rsv1 = true))
+            FrameHeader(
+              Opcode.Continuation,
+              None,
+              0,
+              fin = false,
+              rsv1 = true))
         }
         "RSV2" in {
           b"""0010     # flags
@@ -47,11 +48,12 @@ class FramingSpec extends FreeSpec with Matchers with WithMaterializerSpec {
               0        # mask?
                0000000 # length
           """ should parseTo(
-            FrameHeader(Opcode.Continuation,
-                        None,
-                        0,
-                        fin = false,
-                        rsv2 = true))
+            FrameHeader(
+              Opcode.Continuation,
+              None,
+              0,
+              fin = false,
+              rsv2 = true))
         }
         "RSV3" in {
           b"""0001     # flags
@@ -59,11 +61,12 @@ class FramingSpec extends FreeSpec with Matchers with WithMaterializerSpec {
               0        # mask?
                0000000 # length
           """ should parseTo(
-            FrameHeader(Opcode.Continuation,
-                        None,
-                        0,
-                        fin = false,
-                        rsv3 = true))
+            FrameHeader(
+              Opcode.Continuation,
+              None,
+              0,
+              fin = false,
+              rsv3 = true))
         }
       }
       "interpret opcode correctly" - {
@@ -261,11 +264,9 @@ class FramingSpec extends FreeSpec with Matchers with WithMaterializerSpec {
       val data = ByteString("abc", "ASCII")
 
       Seq(header, data) should parseMultipleTo(
-        FrameStart(FrameHeader(Opcode.Continuation,
-                               None,
-                               0xFFFFFFFFL,
-                               fin = false),
-                   ByteString.empty),
+        FrameStart(
+          FrameHeader(Opcode.Continuation, None, 0xFFFFFFFFL, fin = false),
+          ByteString.empty),
         FrameData(data, lastPart = false))
     }
     "a full frame" in {
@@ -277,8 +278,9 @@ class FramingSpec extends FreeSpec with Matchers with WithMaterializerSpec {
       val data = ByteString("abcde")
 
       (header ++ data) should parseTo(
-        FrameStart(FrameHeader(Opcode.Continuation, None, 5, fin = false),
-                   data))
+        FrameStart(
+          FrameHeader(Opcode.Continuation, None, 5, fin = false),
+          data))
     }
     "a full frame in chunks" in {
       val header = b"""0000       # flags
@@ -312,10 +314,12 @@ class FramingSpec extends FreeSpec with Matchers with WithMaterializerSpec {
       val data2 = ByteString("abc")
 
       (header1 ++ data1 ++ header2 ++ data2) should parseTo(
-        FrameStart(FrameHeader(Opcode.Continuation, None, 5, fin = false),
-                   data1),
-        FrameStart(FrameHeader(Opcode.Continuation, None, 7, fin = false),
-                   data2))
+        FrameStart(
+          FrameHeader(Opcode.Continuation, None, 5, fin = false),
+          data1),
+        FrameStart(
+          FrameHeader(Opcode.Continuation, None, 7, fin = false),
+          data2))
     }
   }
 

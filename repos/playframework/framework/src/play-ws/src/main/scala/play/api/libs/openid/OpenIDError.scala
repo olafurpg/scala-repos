@@ -16,14 +16,17 @@ object Errors {
         "auth_error",
         """The OpenID server failed to verify the OpenID response.""")
   object AUTH_CANCEL
-      extends OpenIDError("auth_cancel",
-                          """OpenID authentication was cancelled.""")
+      extends OpenIDError(
+        "auth_cancel",
+        """OpenID authentication was cancelled.""")
   object BAD_RESPONSE
-      extends OpenIDError("bad_response",
-                          """Bad response from the OpenID server.""")
+      extends OpenIDError(
+        "bad_response",
+        """Bad response from the OpenID server.""")
   object NO_SERVER
-      extends OpenIDError("no_server",
-                          """The OpenID server could not be resolved.""")
+      extends OpenIDError(
+        "no_server",
+        """The OpenID server could not be resolved.""")
   object NETWORK_ERROR
       extends OpenIDError("network_error", """Couldn't contact the server.""")
 }

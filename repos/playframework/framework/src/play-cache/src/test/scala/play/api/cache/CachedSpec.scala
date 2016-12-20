@@ -224,8 +224,9 @@ class CachedSpec extends PlaySpecification {
       }
 
       val beInOneHour =
-        beBetween((Duration(1, HOURS) - Duration(10, SECONDS)).toMillis,
-                  Duration(1, HOURS).toMillis)
+        beBetween(
+          (Duration(1, HOURS) - Duration(10, SECONDS)).toMillis,
+          Duration(1, HOURS).toMillis)
 
       res0.map(toDuration).map(_.toMillis) must beSome(beInOneHour)
       res1.map(toDuration).map(_.toMillis) must beSome(beInOneHour)

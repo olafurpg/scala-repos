@@ -73,8 +73,9 @@ case class Complex(real: Double, imag: Double) {
     Complex(this.real - that, this.imag)
 
   def *(that: Complex) =
-    Complex(this.real * that.real - this.imag * that.imag,
-            this.real * that.imag + this.imag * that.real)
+    Complex(
+      this.real * that.real - this.imag * that.imag,
+      this.real * that.imag + this.imag * that.real)
 
   def *(that: Int) =
     Complex(this.real * that, this.imag * that)
@@ -90,8 +91,9 @@ case class Complex(real: Double, imag: Double) {
 
   def /(that: Complex) = {
     val denom = that.real * that.real + that.imag * that.imag
-    Complex((this.real * that.real + this.imag * that.imag) / denom,
-            (this.imag * that.real - this.real * that.imag) / denom)
+    Complex(
+      (this.real * that.real + this.imag * that.imag) / denom,
+      (this.imag * that.real - this.real * that.imag) / denom)
   }
 
   def /(that: Int) =

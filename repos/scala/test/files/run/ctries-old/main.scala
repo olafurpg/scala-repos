@@ -33,9 +33,10 @@ object Test {
             if (e.getClass == implicitly[ClassManifest[T]].runtimeClass)
               produced = true
         } finally {
-          assert(produced,
-                 "Did not produce exception of type: " +
-                   implicitly[ClassManifest[T]])
+          assert(
+            produced,
+            "Did not produce exception of type: " +
+              implicitly[ClassManifest[T]])
         }
       }
     }

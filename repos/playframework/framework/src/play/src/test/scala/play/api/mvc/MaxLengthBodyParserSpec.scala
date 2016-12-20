@@ -50,8 +50,9 @@ object MaxLengthBodyParserSpec extends Specification with AfterAll {
   }
 
   def feed[A](accumulator: Accumulator[ByteString, A]): A = {
-    Await.result(accumulator.run(Source.fromIterator(() => Body15.grouped(3))),
-                 5.seconds)
+    Await.result(
+      accumulator.run(Source.fromIterator(() => Body15.grouped(3))),
+      5.seconds)
   }
 
   def assertDidNotParse(parsed: Future[Unit]) = {

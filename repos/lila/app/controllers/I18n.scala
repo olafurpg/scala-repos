@@ -66,11 +66,12 @@ object I18n extends LilaController {
         val data = env.forms.decodeTranslationBody
         FormFuResult(env.forms.translation) { form =>
           env.forms.anyCaptcha map { captcha =>
-            renderTranslationForm(form,
-                                  info,
-                                  captcha,
-                                  data = data,
-                                  context = context)
+            renderTranslationForm(
+              form,
+              info,
+              captcha,
+              data = data,
+              context = context)
           }
         } { metadata =>
           env.forms.process(lang, metadata, data, me.username) inject {
@@ -92,14 +93,15 @@ object I18n extends LilaController {
       captcha: Captcha,
       context: Map[String, String],
       data: Map[String, String] = Map.empty)(implicit ctx: Context) =
-    html.i18n.translationForm(info,
-                              form,
-                              env.keys,
-                              env.pool.default,
-                              env.translator.rawTranslation(info.lang) _,
-                              captcha,
-                              data = data,
-                              context = context)
+    html.i18n.translationForm(
+      info,
+      form,
+      env.keys,
+      env.pool.default,
+      env.translator.rawTranslation(info.lang) _,
+      captcha,
+      data = data,
+      context = context)
 
   def fetch(from: Int) = Open { implicit ctx =>
     JsonOk(env jsonFromVersion from)
@@ -107,9 +109,10 @@ object I18n extends LilaController {
 
   def hideCalls = Open { implicit ctx =>
     implicit val req = ctx.req
-    val cookie = LilaCookie.cookie(env.hideCallsCookieName,
-                                   "1",
-                                   maxAge = env.hideCallsCookieMaxAge.some)
+    val cookie = LilaCookie.cookie(
+      env.hideCallsCookieName,
+      "1",
+      maxAge = env.hideCallsCookieMaxAge.some)
     fuccess(Redirect(routes.Lobby.home()) withCookies cookie)
   }
 }

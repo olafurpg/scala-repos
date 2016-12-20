@@ -56,18 +56,20 @@ object BuildPaths {
       state)
 
   def getGlobalPluginsDirectory(state: State, globalBase: File): File =
-    fileSetting(globalPluginsDirectory,
-                GlobalPluginsProperty,
-                defaultGlobalPlugins(globalBase))(state)
+    fileSetting(
+      globalPluginsDirectory,
+      GlobalPluginsProperty,
+      defaultGlobalPlugins(globalBase))(state)
 
   def getGlobalSettingsDirectory(state: State, globalBase: File): File =
     fileSetting(globalSettingsDirectory, GlobalSettingsProperty, globalBase)(
       state)
 
   def getDependencyDirectory(state: State, globalBase: File): File =
-    fileSetting(dependencyBaseDirectory,
-                DependencyBaseProperty,
-                defaultDependencyBase(globalBase))(state)
+    fileSetting(
+      dependencyBaseDirectory,
+      DependencyBaseProperty,
+      defaultDependencyBase(globalBase))(state)
 
   private[this] def fileSetting(stateKey: AttributeKey[File],
                                 property: String,

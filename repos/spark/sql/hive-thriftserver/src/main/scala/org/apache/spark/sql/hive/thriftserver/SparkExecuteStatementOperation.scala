@@ -47,10 +47,11 @@ private[hive] class SparkExecuteStatementOperation(
     runInBackground: Boolean = true)(
     hiveContext: HiveContext,
     sessionToActivePool: SMap[SessionHandle, String])
-    extends ExecuteStatementOperation(parentSession,
-                                      statement,
-                                      confOverlay,
-                                      runInBackground)
+    extends ExecuteStatementOperation(
+      parentSession,
+      statement,
+      confOverlay,
+      runInBackground)
     with Logging {
 
   private var result: DataFrame = _
@@ -64,9 +65,10 @@ private[hive] class SparkExecuteStatementOperation(
     } else {
       logInfo(s"Result Schema: ${result.queryExecution.analyzed.output}")
       val schema = result.queryExecution.analyzed.output.map { attr =>
-        new FieldSchema(attr.name,
-                        HiveMetastoreTypes.toMetastoreType(attr.dataType),
-                        "")
+        new FieldSchema(
+          attr.name,
+          HiveMetastoreTypes.toMetastoreType(attr.dataType),
+          "")
       }
       new TableSchema(schema.asJava)
     }
@@ -176,9 +178,10 @@ private[hive] class SparkExecuteStatementOperation(
           } catch {
             case e: Exception =>
               setOperationException(new HiveSQLException(e))
-              logError("Error running hive query as user : " +
-                         sparkServiceUGI.getShortUserName(),
-                       e)
+              logError(
+                "Error running hive query as user : " +
+                  sparkServiceUGI.getShortUserName(),
+                e)
           }
         }
       }

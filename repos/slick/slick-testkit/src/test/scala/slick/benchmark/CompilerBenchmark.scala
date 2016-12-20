@@ -62,10 +62,11 @@ object CompilerBenchmark {
       val pms = (phaseNanos(p.name)(0) / 1000000.0 / COUNT_COMPILE)
       val percentage = pms / compileMS * 100.0
       println(
-        String.format("Phase %1$25s: %2$7.3f ms, %3$7.3f %%",
-                      p.name,
-                      pms.asInstanceOf[AnyRef],
-                      percentage.asInstanceOf[AnyRef]))
+        String.format(
+          "Phase %1$25s: %2$7.3f ms, %3$7.3f %%",
+          p.name,
+          pms.asInstanceOf[AnyRef],
+          percentage.asInstanceOf[AnyRef]))
     }
   }
 
@@ -228,31 +229,32 @@ object CompilerBenchmark {
         .take(4) on (_._1.supID === _.supID)
     } yield (t._1, t._2)
 
-    Vector(qa,
-           qa2,
-           qb,
-           qb2,
-           qc,
-           q0,
-           q1,
-           q1b_0,
-           q1b,
-           q2,
-           q3,
-           q3b,
-           q4,
-           q4b_0,
-           q4b,
-           q5_0,
-           q5,
-           q5b,
-           q6,
-           q7a,
-           q1,
-           q71,
-           q7b,
-           q8,
-           q8b)
+    Vector(
+      qa,
+      qa2,
+      qb,
+      qb2,
+      qc,
+      q0,
+      q1,
+      q1b_0,
+      q1b,
+      q2,
+      q3,
+      q3b,
+      q4,
+      q4b_0,
+      q4b,
+      q5_0,
+      q5,
+      q5b,
+      q6,
+      q7a,
+      q1,
+      q71,
+      q7b,
+      q8,
+      q8b)
   }
 
   def queriesFromAdancedFusion: Vector[Rep[_]] = {
@@ -358,28 +360,29 @@ object CompilerBenchmark {
       case (a, i) => (a.id, i)
     }
 
-    Vector[Rep[_]](q1,
-                   q2,
-                   q3,
-                   q4,
-                   q5a,
-                   q5b,
-                   q5c,
-                   q6,
-                   q7,
-                   q8,
-                   q9a,
-                   q9b,
-                   q10,
-                   q11a,
-                   q11b,
-                   q11c,
-                   q11d,
-                   q11e,
-                   q11f,
-                   q12,
-                   q13,
-                   q14, /*q15,*/ q16,
-                   q17)
+    Vector[Rep[_]](
+      q1,
+      q2,
+      q3,
+      q4,
+      q5a,
+      q5b,
+      q5c,
+      q6,
+      q7,
+      q8,
+      q9a,
+      q9b,
+      q10,
+      q11a,
+      q11b,
+      q11c,
+      q11d,
+      q11e,
+      q11f,
+      q12,
+      q13,
+      q14, /*q15,*/ q16,
+      q17)
   }
 }

@@ -121,24 +121,28 @@ object Test {
   def testInnerRuntime = {
     println("testInnerRuntime\n")
 
-    List("These should be true under any scenario: ",
-         inner1.isInstanceOf[outer1.Inner],
-         inner1.isInstanceOf[Outer#Inner],
-         (inner1: Any) match { case _: Outer#Inner => true; case _ => false },
-         (inner1: Any) match { case _: outer1.Inner => true; case _ => false },
-         inner1.compareSharpWithTypeMatch(inner2),
-         inner1.compareSharpWithInstanceOf(inner2)) foreach println
+    List(
+      "These should be true under any scenario: ",
+      inner1.isInstanceOf[outer1.Inner],
+      inner1.isInstanceOf[Outer#Inner],
+      (inner1: Any) match { case _: Outer#Inner => true; case _ => false },
+      (inner1: Any) match { case _: outer1.Inner => true; case _ => false },
+      inner1.compareSharpWithTypeMatch(inner2),
+      inner1.compareSharpWithInstanceOf(inner2)) foreach println
 
-    List("These should be true under current proposal: ",
-         inner1.compareSimpleWithInstanceOf(inner2)) foreach println
+    List(
+      "These should be true under current proposal: ",
+      inner1.compareSimpleWithInstanceOf(inner2)) foreach println
 
-    List("These should be false under current proposal: ",
-         inner1.compareSimpleWithTypeMatch(inner2),
-         inner1.comparePathWithTypeMatch(inner2)) foreach println
+    List(
+      "These should be false under current proposal: ",
+      inner1.compareSimpleWithTypeMatch(inner2),
+      inner1.comparePathWithTypeMatch(inner2)) foreach println
 
-    List("These return true but I think should return false: ",
-         inner1.isInstanceOf[outer2.Inner], // true
-         inner1.comparePathWithInstanceOf(inner2) // true
+    List(
+      "These return true but I think should return false: ",
+      inner1.isInstanceOf[outer2.Inner], // true
+      inner1.comparePathWithInstanceOf(inner2) // true
     ) foreach println
 
     List(
@@ -176,15 +180,18 @@ object Test {
   def testMethodInnerRuntime = {
     println("\ntestMethodInnerRuntime\n")
 
-    List("These should be true under any scenario: ",
-         method1.compareWithInstanceOf(method1),
-         method1.compareWithTypeMatch(method1)) foreach println
+    List(
+      "These should be true under any scenario: ",
+      method1.compareWithInstanceOf(method1),
+      method1.compareWithTypeMatch(method1)) foreach println
 
-    List("These should be true under current proposal: ",
-         method1.compareWithInstanceOf(method2)) foreach println
+    List(
+      "These should be true under current proposal: ",
+      method1.compareWithInstanceOf(method2)) foreach println
 
-    List("These are doing the wrong thing under current proposal",
-         method1.compareWithTypeMatch(method2) // should be false
+    List(
+      "These are doing the wrong thing under current proposal",
+      method1.compareWithTypeMatch(method2) // should be false
     ) foreach println
   }
 

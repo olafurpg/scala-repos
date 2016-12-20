@@ -23,8 +23,9 @@ object Ciphers {
   // http://armoredbarista.blogspot.com/2013/10/how-to-use-ecc-with-openjdk.html
 
   def recommendedCiphers: Seq[String] =
-    foldVersion(run16 = java16RecommendedCiphers,
-                runHigher = java17RecommendedCiphers)
+    foldVersion(
+      run16 = java16RecommendedCiphers,
+      runHigher = java17RecommendedCiphers)
 
   lazy val java17RecommendedCiphers: Seq[String] = {
     SSLContext.getDefault.getDefaultSSLParameters.getCipherSuites

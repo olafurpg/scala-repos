@@ -70,9 +70,10 @@ trait EndToEndAuthorizationTest extends IntegrationTestHarness with SaslSetup {
     AclCommand.main(clusterAclArgs)
     servers.foreach(
       s =>
-        TestUtils.waitAndVerifyAcls(ClusterActionAcl,
-                                    s.apis.authorizer.get,
-                                    clusterResource))
+        TestUtils.waitAndVerifyAcls(
+          ClusterActionAcl,
+          s.apis.authorizer.get,
+          clusterResource))
   }
   val numRecords = 1
   val group = "group"
@@ -96,82 +97,94 @@ trait EndToEndAuthorizationTest extends IntegrationTestHarness with SaslSetup {
   // 2- Provides only write access to topic
   // 3- Provides read access to consumer group
   def clusterAclArgs: Array[String] =
-    Array("--authorizer-properties",
-          s"zookeeper.connect=$zkConnect",
-          s"--add",
-          s"--cluster",
-          s"--operation=ClusterAction",
-          s"--allow-principal=$kafkaPrincipalType:$kafkaPrincipal")
+    Array(
+      "--authorizer-properties",
+      s"zookeeper.connect=$zkConnect",
+      s"--add",
+      s"--cluster",
+      s"--operation=ClusterAction",
+      s"--allow-principal=$kafkaPrincipalType:$kafkaPrincipal")
   def topicBrokerReadAclArgs: Array[String] =
-    Array("--authorizer-properties",
-          s"zookeeper.connect=$zkConnect",
-          s"--add",
-          s"--topic=$topicWildcard",
-          s"--operation=Read",
-          s"--allow-principal=$kafkaPrincipalType:$kafkaPrincipal")
+    Array(
+      "--authorizer-properties",
+      s"zookeeper.connect=$zkConnect",
+      s"--add",
+      s"--topic=$topicWildcard",
+      s"--operation=Read",
+      s"--allow-principal=$kafkaPrincipalType:$kafkaPrincipal")
   def produceAclArgs: Array[String] =
-    Array("--authorizer-properties",
-          s"zookeeper.connect=$zkConnect",
-          s"--add",
-          s"--topic=$topic",
-          s"--producer",
-          s"--allow-principal=$kafkaPrincipalType:$clientPrincipal")
+    Array(
+      "--authorizer-properties",
+      s"zookeeper.connect=$zkConnect",
+      s"--add",
+      s"--topic=$topic",
+      s"--producer",
+      s"--allow-principal=$kafkaPrincipalType:$clientPrincipal")
   def consumeAclArgs: Array[String] =
-    Array("--authorizer-properties",
-          s"zookeeper.connect=$zkConnect",
-          s"--add",
-          s"--topic=$topic",
-          s"--group=$group",
-          s"--consumer",
-          s"--allow-principal=$kafkaPrincipalType:$clientPrincipal")
+    Array(
+      "--authorizer-properties",
+      s"zookeeper.connect=$zkConnect",
+      s"--add",
+      s"--topic=$topic",
+      s"--group=$group",
+      s"--consumer",
+      s"--allow-principal=$kafkaPrincipalType:$clientPrincipal")
   def groupAclArgs: Array[String] =
-    Array("--authorizer-properties",
-          s"zookeeper.connect=$zkConnect",
-          s"--add",
-          s"--group=$group",
-          s"--operation=Read",
-          s"--allow-principal=$kafkaPrincipalType:$clientPrincipal")
+    Array(
+      "--authorizer-properties",
+      s"zookeeper.connect=$zkConnect",
+      s"--add",
+      s"--group=$group",
+      s"--operation=Read",
+      s"--allow-principal=$kafkaPrincipalType:$clientPrincipal")
   def ClusterActionAcl =
     Set(
-      new Acl(new KafkaPrincipal(kafkaPrincipalType, kafkaPrincipal),
-              Allow,
-              Acl.WildCardHost,
-              ClusterAction))
+      new Acl(
+        new KafkaPrincipal(kafkaPrincipalType, kafkaPrincipal),
+        Allow,
+        Acl.WildCardHost,
+        ClusterAction))
   def TopicBrokerReadAcl =
     Set(
-      new Acl(new KafkaPrincipal(kafkaPrincipalType, kafkaPrincipal),
-              Allow,
-              Acl.WildCardHost,
-              Read))
+      new Acl(
+        new KafkaPrincipal(kafkaPrincipalType, kafkaPrincipal),
+        Allow,
+        Acl.WildCardHost,
+        Read))
   def GroupReadAcl =
     Set(
-      new Acl(new KafkaPrincipal(kafkaPrincipalType, clientPrincipal),
-              Allow,
-              Acl.WildCardHost,
-              Read))
+      new Acl(
+        new KafkaPrincipal(kafkaPrincipalType, clientPrincipal),
+        Allow,
+        Acl.WildCardHost,
+        Read))
   def TopicReadAcl =
     Set(
-      new Acl(new KafkaPrincipal(kafkaPrincipalType, clientPrincipal),
-              Allow,
-              Acl.WildCardHost,
-              Read))
+      new Acl(
+        new KafkaPrincipal(kafkaPrincipalType, clientPrincipal),
+        Allow,
+        Acl.WildCardHost,
+        Read))
   def TopicWriteAcl =
     Set(
-      new Acl(new KafkaPrincipal(kafkaPrincipalType, clientPrincipal),
-              Allow,
-              Acl.WildCardHost,
-              Write))
+      new Acl(
+        new KafkaPrincipal(kafkaPrincipalType, clientPrincipal),
+        Allow,
+        Acl.WildCardHost,
+        Write))
   def TopicDescribeAcl =
     Set(
-      new Acl(new KafkaPrincipal(kafkaPrincipalType, clientPrincipal),
-              Allow,
-              Acl.WildCardHost,
-              Describe))
+      new Acl(
+        new KafkaPrincipal(kafkaPrincipalType, clientPrincipal),
+        Allow,
+        Acl.WildCardHost,
+        Describe))
   // The next two configuration parameters enable ZooKeeper secure ACLs
   // and sets the Kafka authorizer, both necessary to enable security.
   this.serverConfig.setProperty(KafkaConfig.ZkEnableSecureAclsProp, "true")
-  this.serverConfig.setProperty(KafkaConfig.AuthorizerClassNameProp,
-                                classOf[SimpleAclAuthorizer].getName)
+  this.serverConfig.setProperty(
+    KafkaConfig.AuthorizerClassNameProp,
+    classOf[SimpleAclAuthorizer].getName)
   // Some needed configuration for brokers, producers, and consumers
   this.serverConfig.setProperty(KafkaConfig.OffsetsTopicPartitionsProp, "1")
   this.serverConfig
@@ -194,9 +207,10 @@ trait EndToEndAuthorizationTest extends IntegrationTestHarness with SaslSetup {
     AclCommand.main(topicBrokerReadAclArgs)
     servers.foreach(
       s =>
-        TestUtils.waitAndVerifyAcls(TopicBrokerReadAcl,
-                                    s.apis.authorizer.get,
-                                    new Resource(Topic, "*")))
+        TestUtils.waitAndVerifyAcls(
+          TopicBrokerReadAcl,
+          s.apis.authorizer.get,
+          new Resource(Topic, "*")))
     // create the test topic with all the brokers as replicas
     TestUtils.createTopic(zkUtils, topic, 1, 3, this.servers)
   }
@@ -260,12 +274,14 @@ trait EndToEndAuthorizationTest extends IntegrationTestHarness with SaslSetup {
     AclCommand.main(produceAclArgs)
     AclCommand.main(groupAclArgs)
     servers.foreach(s => {
-      TestUtils.waitAndVerifyAcls(TopicWriteAcl ++ TopicDescribeAcl,
-                                  s.apis.authorizer.get,
-                                  topicResource)
-      TestUtils.waitAndVerifyAcls(GroupReadAcl,
-                                  servers.head.apis.authorizer.get,
-                                  groupResource)
+      TestUtils.waitAndVerifyAcls(
+        TopicWriteAcl ++ TopicDescribeAcl,
+        s.apis.authorizer.get,
+        topicResource)
+      TestUtils.waitAndVerifyAcls(
+        GroupReadAcl,
+        servers.head.apis.authorizer.get,
+        groupResource)
     })
     //Produce records
     debug("Starting to send records")
@@ -290,9 +306,10 @@ trait EndToEndAuthorizationTest extends IntegrationTestHarness with SaslSetup {
     AclCommand.main(produceAclArgs)
     servers.foreach(
       s =>
-        TestUtils.waitAndVerifyAcls(TopicWriteAcl ++ TopicDescribeAcl,
-                                    s.apis.authorizer.get,
-                                    topicResource))
+        TestUtils.waitAndVerifyAcls(
+          TopicWriteAcl ++ TopicDescribeAcl,
+          s.apis.authorizer.get,
+          topicResource))
     //Produce records
     debug("Starting to send records")
     sendRecords(numRecords, tp)
@@ -309,10 +326,11 @@ trait EndToEndAuthorizationTest extends IntegrationTestHarness with SaslSetup {
 
   private def sendRecords(numRecords: Int, tp: TopicPartition) {
     val futures = (0 until numRecords).map { i =>
-      val record = new ProducerRecord(tp.topic(),
-                                      tp.partition(),
-                                      s"$i".getBytes,
-                                      s"$i".getBytes)
+      val record = new ProducerRecord(
+        tp.topic(),
+        tp.partition(),
+        s"$i".getBytes,
+        s"$i".getBytes)
       debug(s"Sending this record: $record")
       this.producers.head.send(record)
     }

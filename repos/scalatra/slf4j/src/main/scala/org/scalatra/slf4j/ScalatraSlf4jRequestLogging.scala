@@ -127,9 +127,10 @@ trait ScalatraSlf4jRequestLogging extends ScalatraBase with Handler {
       try { logRequest() } catch { case _: Throwable => }
       action
     }
-    val route = Route(transformers,
-                      newAction,
-                      (req: HttpServletRequest) => routeBasePath(req))
+    val route = Route(
+      transformers,
+      newAction,
+      (req: HttpServletRequest) => routeBasePath(req))
     routes.prependRoute(method, route)
     route
   }

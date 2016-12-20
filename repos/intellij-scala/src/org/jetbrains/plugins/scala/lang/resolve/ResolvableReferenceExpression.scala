@@ -62,9 +62,10 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
   private object Resolver extends ReferenceExpressionResolver(false)
   private object ShapesResolver extends ReferenceExpressionResolver(true)
 
-  @CachedMappedWithRecursionGuard(this,
-                                  Array.empty,
-                                  ModCount.getBlockModificationCount)
+  @CachedMappedWithRecursionGuard(
+    this,
+    Array.empty,
+    ModCount.getBlockModificationCount)
   def multiResolveImpl(incomplete: Boolean): Array[ResolveResult] =
     Resolver.resolve(ResolvableReferenceExpression.this, incomplete)
 
@@ -142,10 +143,11 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
     @tailrec
     def treeWalkUp(place: PsiElement, lastParent: PsiElement) {
       if (place == null) return
-      if (!place.processDeclarations(processor,
-                                     ResolveState.initial(),
-                                     lastParent,
-                                     ref)) return
+      if (!place.processDeclarations(
+            processor,
+            ResolveState.initial(),
+            lastParent,
+            ref)) return
       place match {
         case (_: ScTemplateBody | _: ScExtendsBlock) =>
         //template body and inherited members are at the same level
@@ -190,25 +192,27 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
       case tuple: ScTuple =>
         tuple.getContext match {
           case inf: ScInfixExpr if inf.getArgExpr == tuple =>
-            processAnyAssignment(tuple.exprs,
-                                 inf,
-                                 inf.operation,
-                                 1,
-                                 ref,
-                                 assign,
-                                 processor)
+            processAnyAssignment(
+              tuple.exprs,
+              inf,
+              inf.operation,
+              1,
+              ref,
+              assign,
+              processor)
           case _ =>
         }
       case p: ScParenthesisedExpr =>
         p.getContext match {
           case inf: ScInfixExpr if inf.getArgExpr == p =>
-            processAnyAssignment(p.expr.toSeq,
-                                 inf,
-                                 inf.operation,
-                                 1,
-                                 ref,
-                                 assign,
-                                 processor)
+            processAnyAssignment(
+              p.expr.toSeq,
+              inf,
+              inf.operation,
+              1,
+              ref,
+              assign,
+              processor)
           case _ =>
         }
       case _ =>
@@ -267,12 +271,13 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
             }
           } else {
             //for completion only!
-            funCollectNamedCompletions(fun.paramClauses,
-                                       assign,
-                                       processor,
-                                       subst,
-                                       exprs,
-                                       invocationCount)
+            funCollectNamedCompletions(
+              fun.paramClauses,
+              assign,
+              processor,
+              subst,
+              exprs,
+              invocationCount)
           }
         case ScalaResolveResult(fun: FakePsiMethod, subst: ScSubstitutor) =>
         //todo: ?
@@ -283,12 +288,14 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
                 case methodCall: ScMethodCall
                     if methodCall.isNamedParametersEnabledEverywhere =>
                   method.getParameterList.getParameters foreach { p =>
-                    processor.execute(p,
-                                      ResolveState
-                                        .initial()
-                                        .put(ScSubstitutor.key, subst)
-                                        .put(CachesUtil.NAMED_PARAM_KEY,
-                                             java.lang.Boolean.TRUE))
+                    processor.execute(
+                      p,
+                      ResolveState
+                        .initial()
+                        .put(ScSubstitutor.key, subst)
+                        .put(
+                          CachesUtil.NAMED_PARAM_KEY,
+                          java.lang.Boolean.TRUE))
                   }
                 case _ =>
               }
@@ -397,10 +404,12 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
                     case Some(param) =>
                       var state = ResolveState.initial
                         .put(ScSubstitutor.key, subst)
-                        .put(CachesUtil.NAMED_PARAM_KEY,
-                             java.lang.Boolean.TRUE)
-                      if (!ScalaPsiUtil.memberNamesEquals(param.name,
-                                                          ref.refName)) {
+                        .put(
+                          CachesUtil.NAMED_PARAM_KEY,
+                          java.lang.Boolean.TRUE)
+                      if (!ScalaPsiUtil.memberNamesEquals(
+                            param.name,
+                            ref.refName)) {
                         state = state
                           .put(ResolverEnv.nameKey, param.deprecatedName.get)
                       }
@@ -409,32 +418,37 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
                   }
                 } else {
                   //for completion only!
-                  funCollectNamedCompletions(fun.paramClauses,
-                                             assign,
-                                             baseProcessor,
-                                             subst,
-                                             args.exprs,
-                                             args.invocationCount)
+                  funCollectNamedCompletions(
+                    fun.paramClauses,
+                    assign,
+                    baseProcessor,
+                    subst,
+                    args.exprs,
+                    args.invocationCount)
                 }
               case ScalaResolveResult(constructor: ScPrimaryConstructor, _) =>
                 if (!baseProcessor.isInstanceOf[CompletionProcessor])
-                  constructor.getParamByName(ref.refName,
-                                             arguments.indexOf(args)) match {
+                  constructor.getParamByName(
+                    ref.refName,
+                    arguments.indexOf(args)) match {
                     case Some(param) =>
-                      baseProcessor.execute(param,
-                                            ResolveState.initial
-                                              .put(ScSubstitutor.key, subst)
-                                              .put(CachesUtil.NAMED_PARAM_KEY,
-                                                   java.lang.Boolean.TRUE))
+                      baseProcessor.execute(
+                        param,
+                        ResolveState.initial
+                          .put(ScSubstitutor.key, subst)
+                          .put(
+                            CachesUtil.NAMED_PARAM_KEY,
+                            java.lang.Boolean.TRUE))
                     case None =>
                   } else {
                   //for completion only!
-                  funCollectNamedCompletions(constructor.parameterList,
-                                             assign,
-                                             baseProcessor,
-                                             subst,
-                                             args.exprs,
-                                             args.invocationCount)
+                  funCollectNamedCompletions(
+                    constructor.parameterList,
+                    assign,
+                    baseProcessor,
+                    subst,
+                    args.exprs,
+                    args.invocationCount)
                 }
               case _ =>
             }
@@ -469,11 +483,12 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
         val arguments = constr.arguments
         val secondaryConstructors = (clazz: ScClass) =>
           clazz.secondaryConstructors
-        processConstructor(constr,
-                           tp,
-                           typeArgs,
-                           arguments,
-                           secondaryConstructors)
+        processConstructor(
+          constr,
+          tp,
+          typeArgs,
+          arguments,
+          secondaryConstructors)
       case _ =>
     }
   }
@@ -631,8 +646,9 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
           val newProcessor = new MethodResolveProcessor(
             e,
             name,
-            List(List(emptyStringExpression),
-                 argumentExpressions.toSeq.flatten),
+            List(
+              List(emptyStringExpression),
+              argumentExpressions.toSeq.flatten),
             mrp.typeArgElements,
             mrp.prevTypeInfo,
             mrp.kinds,
@@ -688,11 +704,12 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
       case rp: ResolveProcessor => rp.name // See SCL-2934.
       case _ => refName
     }
-    val res = ScalaPsiUtil.findImplicitConversion(e,
-                                                  name,
-                                                  this,
-                                                  processor,
-                                                  noImplicitsForArgs) match {
+    val res = ScalaPsiUtil.findImplicitConversion(
+      e,
+      name,
+      this,
+      processor,
+      noImplicitsForArgs) match {
       case Some(a) => a
       case None => return
     }
@@ -707,8 +724,9 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
       case _ =>
     }
     state = state.put(BaseProcessor.FROM_TYPE_KEY, res.tp)
-    state = state.put(BaseProcessor.UNRESOLVED_TYPE_PARAMETERS_KEY,
-                      res.unresolvedTypeParameters)
+    state = state.put(
+      BaseProcessor.UNRESOLVED_TYPE_PARAMETERS_KEY,
+      res.unresolvedTypeParameters)
     processor.processType(res.getTypeWithDependentSubstitutor, e, state)
   }
 }

@@ -114,14 +114,16 @@ object Test extends App {
     assert(ten.reverse startsWith List(10, 9, 8), ten.reverse.take(10).toList)
     assert(ten.reverse.length == 10)
     assert(ten.reverse.reverse == ten)
-    assert(ten.reverseIterator.toList.reverse == ten,
-           ten.reverseIterator.toList)
+    assert(
+      ten.reverseIterator.toList.reverse == ten,
+      ten.reverseIterator.toList)
     assert(ten.startsWith(List(1)))
     assert(ten.startsWith(List(3, 4), 2))
     assert(ten.endsWith(List(9, 10)))
     assert(ten.endsWith(List()))
-    assert(ten.indexOfSlice(List(3, 4, 5)) == 2,
-           ten.indexOfSlice(List(3, 4, 5)))
+    assert(
+      ten.indexOfSlice(List(3, 4, 5)) == 2,
+      ten.indexOfSlice(List(3, 4, 5)))
     assert(ten.lastIndexOfSlice(List(8, 9, 10)) == 7)
     assert(ten.lastIndexOfSlice(List(1, 2, 3)) == 0)
     assert(ten.lastIndexOfSlice(List(9, 10, 11)) == -1)
@@ -129,21 +131,22 @@ object Test extends App {
     assert(ten contains 10)
     assert(!(ten contains 0))
     assert(
-      (empty ++ (1 to 7) union empty ++ (3 to 10)) == List(1,
-                                                           2,
-                                                           3,
-                                                           4,
-                                                           5,
-                                                           6,
-                                                           7,
-                                                           3,
-                                                           4,
-                                                           5,
-                                                           6,
-                                                           7,
-                                                           8,
-                                                           9,
-                                                           10))
+      (empty ++ (1 to 7) union empty ++ (3 to 10)) == List(
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10))
     assert((ten diff ten).isEmpty)
     assert((ten diff List()) == ten)
     assert(
@@ -207,8 +210,9 @@ object Test extends App {
     assert(m.keySet.size == 26)
     assert(m.size == 26)
     assert(m.keySet == Set() ++ m.keysIterator)
-    assert(m.keySet == m.keysIterator.toList.toSet,
-           m.keySet.toList + "!=" + m.keysIterator.toList.toSet)
+    assert(
+      m.keySet == m.keysIterator.toList.toSet,
+      m.keySet.toList + "!=" + m.keysIterator.toList.toSet)
     val m1 = empty ++ m
     val mm = m -- m.keySet.toList
     assert(mm.isEmpty, mm)

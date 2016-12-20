@@ -88,10 +88,11 @@ class VectorClockPerfSpec extends WordSpec with Matchers {
     }
 
     s"compare Concurrent (last) $iterations times" in {
-      checkThunkFor(vcAfterLast,
-                    vcConcurrentLast,
-                    compareTo(Concurrent),
-                    iterations)
+      checkThunkFor(
+        vcAfterLast,
+        vcConcurrentLast,
+        compareTo(Concurrent),
+        iterations)
     }
 
     s"compare Before (middle) $iterations times" in {
@@ -103,10 +104,11 @@ class VectorClockPerfSpec extends WordSpec with Matchers {
     }
 
     s"compare Concurrent (middle) $iterations times" in {
-      checkThunkFor(vcAfterMiddle,
-                    vcConcurrentMiddle,
-                    compareTo(Concurrent),
-                    iterations)
+      checkThunkFor(
+        vcAfterMiddle,
+        vcConcurrentMiddle,
+        compareTo(Concurrent),
+        iterations)
     }
 
     s"compare !== Before (middle) $iterations times" in {

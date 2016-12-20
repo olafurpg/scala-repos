@@ -53,11 +53,13 @@ object ScalaReflectMacroExpansionParser {
         val matcher = placeRegex.matcher(message)
         if (!matcher.matches()) reset()
         else {
-          expansions += MacroExpansion(Place(matcher.group(1),
-                                             matcher.group(2),
-                                             matcher.group(3).toInt,
-                                             matcher.group(4).toInt),
-                                       "")
+          expansions += MacroExpansion(
+            Place(
+              matcher.group(1),
+              matcher.group(2),
+              matcher.group(3).toInt,
+              matcher.group(4).toInt),
+            "")
           parsingState = PLACE
         }
       case PLACE =>

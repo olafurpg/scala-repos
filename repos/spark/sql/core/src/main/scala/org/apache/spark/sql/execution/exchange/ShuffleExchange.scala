@@ -81,10 +81,11 @@ case class ShuffleExchange(var newPartitioning: Partitioning,
     */
   private[sql] def prepareShuffleDependency(
       ): ShuffleDependency[Int, InternalRow, InternalRow] = {
-    ShuffleExchange.prepareShuffleDependency(child.execute(),
-                                             child.output,
-                                             newPartitioning,
-                                             serializer)
+    ShuffleExchange.prepareShuffleDependency(
+      child.execute(),
+      child.output,
+      newPartitioning,
+      serializer)
   }
 
   /**
@@ -133,9 +134,10 @@ case class ShuffleExchange(var newPartitioning: Partitioning,
 
 object ShuffleExchange {
   def apply(newPartitioning: Partitioning, child: SparkPlan): ShuffleExchange = {
-    ShuffleExchange(newPartitioning,
-                    child,
-                    coordinator = None: Option[ExchangeCoordinator])
+    ShuffleExchange(
+      newPartitioning,
+      child,
+      coordinator = None: Option[ExchangeCoordinator])
   }
 
   /**

@@ -96,8 +96,9 @@ object ConsoleProducer {
     props.put("key.serializer.class", config.keyEncoderClass)
     props.put("serializer.class", config.valueEncoderClass)
     props.put("send.buffer.bytes", config.socketBuffer.toString)
-    props.put("topic.metadata.refresh.interval.ms",
-              config.metadataExpiryMs.toString)
+    props.put(
+      "topic.metadata.refresh.interval.ms",
+      config.metadataExpiryMs.toString)
     props.put("client.id", "console-producer")
 
     props
@@ -118,26 +119,33 @@ object ConsoleProducer {
     props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.brokerList)
     props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, config.compressionCodec)
     props.put(ProducerConfig.SEND_BUFFER_CONFIG, config.socketBuffer.toString)
-    props.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG,
-              config.retryBackoffMs.toString)
-    props.put(ProducerConfig.METADATA_MAX_AGE_CONFIG,
-              config.metadataExpiryMs.toString)
+    props.put(
+      ProducerConfig.RETRY_BACKOFF_MS_CONFIG,
+      config.retryBackoffMs.toString)
+    props.put(
+      ProducerConfig.METADATA_MAX_AGE_CONFIG,
+      config.metadataExpiryMs.toString)
     props.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, config.maxBlockMs.toString)
     props.put(ProducerConfig.ACKS_CONFIG, config.requestRequiredAcks.toString)
-    props.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG,
-              config.requestTimeoutMs.toString)
-    props.put(ProducerConfig.RETRIES_CONFIG,
-              config.messageSendMaxRetries.toString)
+    props.put(
+      ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG,
+      config.requestTimeoutMs.toString)
+    props.put(
+      ProducerConfig.RETRIES_CONFIG,
+      config.messageSendMaxRetries.toString)
     props.put(ProducerConfig.LINGER_MS_CONFIG, config.sendTimeout.toString)
     props
       .put(ProducerConfig.BUFFER_MEMORY_CONFIG, config.maxMemoryBytes.toString)
-    props.put(ProducerConfig.BATCH_SIZE_CONFIG,
-              config.maxPartitionMemoryBytes.toString)
+    props.put(
+      ProducerConfig.BATCH_SIZE_CONFIG,
+      config.maxPartitionMemoryBytes.toString)
     props.put(ProducerConfig.CLIENT_ID_CONFIG, "console-producer")
-    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-              "org.apache.kafka.common.serialization.ByteArraySerializer")
-    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-              "org.apache.kafka.common.serialization.ByteArraySerializer")
+    props.put(
+      ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+      "org.apache.kafka.common.serialization.ByteArraySerializer")
+    props.put(
+      ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+      "org.apache.kafka.common.serialization.ByteArraySerializer")
 
     props
   }
@@ -214,8 +222,9 @@ object ConsoleProducer {
       .ofType(classOf[java.lang.Integer])
       .defaultsTo(Int.MaxValue)
     val requestRequiredAcksOpt = parser
-      .accepts("request-required-acks",
-               "The required acks of the producer requests")
+      .accepts(
+        "request-required-acks",
+        "The required acks of the producer requests")
       .withRequiredArg
       .describedAs("request required acks")
       .ofType(classOf[java.lang.Integer])

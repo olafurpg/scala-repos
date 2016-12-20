@@ -154,8 +154,9 @@ final case class ThreadPoolConfigBuilder(config: ThreadPoolConfig) {
 
   def setCorePoolSize(size: Int): ThreadPoolConfigBuilder =
     this.copy(
-      config = config.copy(corePoolSize = size,
-                           maxPoolSize = math.max(size, config.maxPoolSize)))
+      config = config.copy(
+        corePoolSize = size,
+        maxPoolSize = math.max(size, config.maxPoolSize)))
 
   def setMaxPoolSize(size: Int): ThreadPoolConfigBuilder =
     this.copy(

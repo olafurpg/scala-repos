@@ -93,11 +93,12 @@ class ScalaMoveClassesOrPackagesHandler
     val searchTextOccurences: Boolean = adjustedElements.exists(
       TextOccurrencesUtil.isSearchTextOccurencesEnabled)
     val moveDialog: MoveClassesOrPackagesDialog =
-      new MoveClassesOrPackagesDialog(project,
-                                      searchTextOccurences,
-                                      adjustedElements,
-                                      initialTargetElement,
-                                      moveCallback) {
+      new MoveClassesOrPackagesDialog(
+        project,
+        searchTextOccurences,
+        adjustedElements,
+        initialTargetElement,
+        moveCallback) {
         override def createCenterPanel(): JComponent = {
           addMoveCompanionChb(super.createCenterPanel(), adjustedElements)
         }
@@ -107,26 +108,28 @@ class ScalaMoveClassesOrPackagesHandler
             elementsToMove: Array[PsiElement],
             callback: MoveCallback): MoveClassesOrPackagesProcessor = {
 
-          new ScalaMoveClassesOrPackagesProcessor(project,
-                                                  elementsToMove,
-                                                  destination,
-                                                  isSearchInComments,
-                                                  searchTextOccurences,
-                                                  callback)
+          new ScalaMoveClassesOrPackagesProcessor(
+            project,
+            elementsToMove,
+            destination,
+            isSearchInComments,
+            searchTextOccurences,
+            callback)
         }
       }
     val searchInComments: Boolean =
       JavaRefactoringSettings.getInstance.MOVE_SEARCH_IN_COMMENTS
     val searchForTextOccurences: Boolean =
       JavaRefactoringSettings.getInstance.MOVE_SEARCH_FOR_TEXT
-    moveDialog.setData(adjustedElements,
-                       initialTargetPackageName,
-                       initialTargetDirectory,
-                       isTargetDirectoryFixed,
-                       initialTargetElement == null,
-                       searchInComments,
-                       searchForTextOccurences,
-                       HelpID.getMoveHelpID(adjustedElements(0)))
+    moveDialog.setData(
+      adjustedElements,
+      initialTargetPackageName,
+      initialTargetDirectory,
+      isTargetDirectoryFixed,
+      initialTargetElement == null,
+      searchInComments,
+      searchForTextOccurences,
+      HelpID.getMoveHelpID(adjustedElements(0)))
     moveDialog.show()
   }
 
@@ -135,9 +138,10 @@ class ScalaMoveClassesOrPackagesHandler
       @NotNull directory: PsiDirectory,
       elementsToMove: Array[PsiElement],
       moveCallback: MoveCallback): DialogWrapper = {
-    new MoveClassesOrPackagesToNewDirectoryDialog(directory,
-                                                  elementsToMove,
-                                                  moveCallback) {
+    new MoveClassesOrPackagesToNewDirectoryDialog(
+      directory,
+      elementsToMove,
+      moveCallback) {
       protected override def createCenterPanel(): JComponent = {
         addMoveCompanionChb(super.createCenterPanel(), elementsToMove)
       }
@@ -150,12 +154,13 @@ class ScalaMoveClassesOrPackagesHandler
           searchInNonJavaFiles: Boolean,
           moveCallback: MoveCallback): MoveClassesOrPackagesProcessor = {
 
-        new ScalaMoveClassesOrPackagesProcessor(project,
-                                                elements,
-                                                moveDestination,
-                                                searchInComments,
-                                                searchInNonJavaFiles,
-                                                moveCallback)
+        new ScalaMoveClassesOrPackagesProcessor(
+          project,
+          elements,
+          moveDestination,
+          searchInComments,
+          searchInNonJavaFiles,
+          moveCallback)
       }
     }
   }

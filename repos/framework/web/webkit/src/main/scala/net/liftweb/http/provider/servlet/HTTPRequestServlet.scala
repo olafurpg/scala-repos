@@ -40,13 +40,14 @@ class HTTPRequestServlet(val req: HttpServletRequest,
     (Box !! req.getCookies).map(
       _.toList.map(
         c =>
-          HTTPCookie(c.getName,
-                     Box !! (c.getValue),
-                     Box !! (c.getDomain),
-                     Box !! (c.getPath),
-                     Box !! (c.getMaxAge),
-                     Box !! (c.getVersion),
-                     Box !! (c.getSecure)))) openOr Nil
+          HTTPCookie(
+            c.getName,
+            Box !! (c.getValue),
+            Box !! (c.getDomain),
+            Box !! (c.getPath),
+            Box !! (c.getMaxAge),
+            Box !! (c.getVersion),
+            Box !! (c.getSecure)))) openOr Nil
   }
 
   lazy val authType: Box[String] = Box !! req.getAuthType
@@ -161,8 +162,9 @@ class HTTPRequestServlet(val req: HttpServletRequest,
 
       def next = what.next match {
         case f if (f.isFormField) =>
-          NormalParamHolder(f.getFieldName,
-                            new String(readWholeStream(f.openStream), "UTF-8"))
+          NormalParamHolder(
+            f.getFieldName,
+            new String(readWholeStream(f.openStream), "UTF-8"))
         case f => {
           val headers = f.getHeaders()
           val names: List[String] =
@@ -180,10 +182,11 @@ class HTTPRequestServlet(val req: HttpServletRequest,
                   .asInstanceOf[java.util.Iterator[String]]
                   .toList): _*)
           LiftRules.withMimeHeaders(map) {
-            LiftRules.handleMimeFile(f.getFieldName,
-                                     f.getContentType,
-                                     f.getName,
-                                     f.openStream)
+            LiftRules.handleMimeFile(
+              f.getFieldName,
+              f.getContentType,
+              f.getName,
+              f.openStream)
           }
         }
       }

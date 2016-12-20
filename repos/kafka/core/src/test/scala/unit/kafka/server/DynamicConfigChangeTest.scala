@@ -117,10 +117,11 @@ class DynamicConfigChangeTest extends KafkaServerTestHarness {
     val propertiesArgument = EasyMock.newCapture[Properties]
     val handler = EasyMock.createNiceMock(classOf[ConfigHandler])
     handler.processConfigChanges(
-      EasyMock.and(EasyMock.capture(entityArgument),
-                   EasyMock.isA(classOf[String])),
-      EasyMock.and(EasyMock.capture(propertiesArgument),
-                   EasyMock.isA(classOf[Properties])))
+      EasyMock
+        .and(EasyMock.capture(entityArgument), EasyMock.isA(classOf[String])),
+      EasyMock.and(
+        EasyMock.capture(propertiesArgument),
+        EasyMock.isA(classOf[Properties])))
     EasyMock.expectLastCall().once()
     EasyMock.replay(handler)
 
@@ -167,9 +168,10 @@ class DynamicConfigChangeTest extends KafkaServerTestHarness {
     }
 
     // Everything is provided
-    val jsonMap = Map("version" -> 1,
-                      "entity_type" -> ConfigType.Topic,
-                      "entity_name" -> "x")
+    val jsonMap = Map(
+      "version" -> 1,
+      "entity_type" -> ConfigType.Topic,
+      "entity_name" -> "x")
     configManager.ConfigChangedNotificationHandler.processNotification(
       Json.encode(jsonMap))
 

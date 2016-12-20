@@ -87,8 +87,9 @@ class FooFilter(headerValue: String) extends EssentialFilter {
 /** Scala GlobalSettings object that uses a filter */
 object FooFilteringScalaGlobal extends play.api.GlobalSettings {
   override def doFilter(next: EssentialAction): EssentialAction = {
-    Filters(super.doFilter(next),
-            new FooFilter("filter-constructor-called-by-scala-global"))
+    Filters(
+      super.doFilter(next),
+      new FooFilter("filter-constructor-called-by-scala-global"))
   }
 }
 

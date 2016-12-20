@@ -33,8 +33,9 @@ private[scalajs] object CoreJSLibs {
 
   def lib(semantics: Semantics, outputMode: OutputMode): VirtualJSFile = {
     synchronized {
-      cachedLibByConfig.getOrElseUpdate((semantics, outputMode),
-                                        makeLib(semantics, outputMode))
+      cachedLibByConfig.getOrElseUpdate(
+        (semantics, outputMode),
+        makeLib(semantics, outputMode))
     }
   }
 

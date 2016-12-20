@@ -102,10 +102,11 @@ private[server] class MetadataCache(brokerId: Int) extends Logging {
               if (replicaInfo.size < replicas.size) {
                 debug(
                   "Error while fetching metadata for %s: replica information not available for following brokers %s"
-                    .format(topicPartition,
-                            replicas
-                              .filterNot(replicaInfo.map(_.id).contains)
-                              .mkString(",")))
+                    .format(
+                      topicPartition,
+                      replicas
+                        .filterNot(replicaInfo.map(_.id).contains)
+                        .mkString(",")))
 
                 new MetadataResponse.PartitionMetadata(
                   Errors.REPLICA_NOT_AVAILABLE,
@@ -126,11 +127,12 @@ private[server] class MetadataCache(brokerId: Int) extends Logging {
                   replicaInfo.asJava,
                   isrInfo.asJava)
               } else {
-                new MetadataResponse.PartitionMetadata(Errors.NONE,
-                                                       partitionId,
-                                                       leader,
-                                                       replicaInfo.asJava,
-                                                       isrInfo.asJava)
+                new MetadataResponse.PartitionMetadata(
+                  Errors.NONE,
+                  partitionId,
+                  leader,
+                  replicaInfo.asJava,
+                  isrInfo.asJava)
               }
           }
       }
@@ -144,9 +146,10 @@ private[server] class MetadataCache(brokerId: Int) extends Logging {
       val topicsRequested = if (topics.isEmpty) cache.keySet else topics
       topicsRequested.toSeq.flatMap { topic =>
         getPartitionMetadata(topic, protocol).map { partitionMetadata =>
-          new MetadataResponse.TopicMetadata(Errors.NONE,
-                                             topic,
-                                             partitionMetadata.toBuffer.asJava)
+          new MetadataResponse.TopicMetadata(
+            Errors.NONE,
+            topic,
+            partitionMetadata.toBuffer.asJava)
         }
       }
     }
@@ -219,23 +222,25 @@ private[server] class MetadataCache(brokerId: Int) extends Logging {
             stateChangeLogger.trace(
               ("Broker %d deleted partition %s from metadata cache in response to UpdateMetadata request " +
                 "sent by controller %d epoch %d with correlation id %d")
-                .format(brokerId,
-                        tp,
-                        updateMetadataRequest.controllerId,
-                        updateMetadataRequest.controllerEpoch,
-                        correlationId))
+                .format(
+                  brokerId,
+                  tp,
+                  updateMetadataRequest.controllerId,
+                  updateMetadataRequest.controllerEpoch,
+                  correlationId))
           } else {
             val partitionInfo = partitionStateToPartitionStateInfo(info)
             addOrUpdatePartitionInfo(tp.topic, tp.partition, partitionInfo)
             stateChangeLogger.trace(
               ("Broker %d cached leader info %s for partition %s in response to UpdateMetadata request " +
                 "sent by controller %d epoch %d with correlation id %d")
-                .format(brokerId,
-                        info,
-                        tp,
-                        updateMetadataRequest.controllerId,
-                        updateMetadataRequest.controllerEpoch,
-                        correlationId))
+                .format(
+                  brokerId,
+                  info,
+                  tp,
+                  updateMetadataRequest.controllerId,
+                  updateMetadataRequest.controllerEpoch,
+                  correlationId))
           }
       }
     }
@@ -250,8 +255,9 @@ private[server] class MetadataCache(brokerId: Int) extends Logging {
       partitionState.zkVersion)
     val leaderInfo =
       LeaderIsrAndControllerEpoch(leaderAndIsr, partitionState.controllerEpoch)
-    PartitionStateInfo(leaderInfo,
-                       partitionState.replicas.asScala.map(_.toInt))
+    PartitionStateInfo(
+      leaderInfo,
+      partitionState.replicas.asScala.map(_.toInt))
   }
 
   def contains(topic: String): Boolean = {

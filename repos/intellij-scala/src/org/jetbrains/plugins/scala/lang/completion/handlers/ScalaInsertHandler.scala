@@ -221,29 +221,32 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
                  documentText.charAt(endOffset + 1) != openChar)) {
         document.insertString(endOffset, " ")
         shiftEndOffset(1, withSomeNum = false)
-        insertIfNeeded(placeInto,
-                       openChar,
-                       closeChar,
-                       withSpace = false,
-                       withSomeNum = withSomeNum)
+        insertIfNeeded(
+          placeInto,
+          openChar,
+          closeChar,
+          withSpace = false,
+          withSomeNum = withSomeNum)
       } else if (withSpace && nextChar == ' ') {
         shiftEndOffset(1, withSomeNum = false)
-        insertIfNeeded(placeInto,
-                       openChar,
-                       closeChar,
-                       withSpace = false,
-                       withSomeNum = withSomeNum)
+        insertIfNeeded(
+          placeInto,
+          openChar,
+          closeChar,
+          withSpace = false,
+          withSomeNum = withSomeNum)
       }
     }
 
     item.element match {
       case _: PsiClass | _: ScTypeAlias if context.getCompletionChar == '[' =>
         context.setAddCompletionChar(false)
-        insertIfNeeded(placeInto = true,
-                       openChar = '[',
-                       closeChar = ']',
-                       withSpace = false,
-                       withSomeNum = false)
+        insertIfNeeded(
+          placeInto = true,
+          openChar = '[',
+          closeChar = ']',
+          withSpace = false,
+          withSomeNum = false)
       case named: PsiNamedElement if item.isNamedParameter =>
         //some is impossible here
         val shouldAddEqualsSign = element.getParent match {
@@ -271,11 +274,12 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
           if fun.name == "classOf" && fun.containingClass != null &&
             fun.containingClass.qualifiedName == "scala.Predef" =>
         context.setAddCompletionChar(false)
-        insertIfNeeded(placeInto = true,
-                       openChar = '[',
-                       closeChar = ']',
-                       withSpace = false,
-                       withSomeNum = true)
+        insertIfNeeded(
+          placeInto = true,
+          openChar = '[',
+          closeChar = ']',
+          withSpace = false,
+          withSomeNum = true)
       case _: PsiMethod | _: ScFun =>
         if (context.getCompletionChar != '[') {
           val (count, _, isAccessor) = getItemParametersAndAccessorStatus(item)
@@ -286,11 +290,12 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
               endOffset += 2
               editor.getCaretModel.moveToOffset(endOffset)
             } else {
-              insertIfNeeded(placeInto = context.getCompletionChar == '(',
-                             openChar = '(',
-                             closeChar = ')',
-                             withSpace = false,
-                             withSomeNum = false)
+              insertIfNeeded(
+                placeInto = context.getCompletionChar == '(',
+                openChar = '(',
+                closeChar = ')',
+                withSpace = false,
+                withSomeNum = false)
             }
           } else if (count > 0) {
             import org.jetbrains.plugins.scala.extensions._
@@ -305,11 +310,12 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
                       if (context.getCompletionChar == '{') '{' else '('
                     val closeChar =
                       if (context.getCompletionChar == '{') '}' else ')'
-                    insertIfNeeded(placeInto = true,
-                                   openChar = openChar,
-                                   closeChar = closeChar,
-                                   withSpace = true,
-                                   withSomeNum = false)
+                    insertIfNeeded(
+                      placeInto = true,
+                      openChar = openChar,
+                      closeChar = closeChar,
+                      withSpace = true,
+                      withSomeNum = false)
                   } else {
                     document.insertString(endOffset, " _")
                     endOffset += 2
@@ -317,11 +323,12 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
                   }
                 } else {
                   if (context.getCompletionChar == '{') {
-                    insertIfNeeded(placeInto = true,
-                                   openChar = '{',
-                                   closeChar = '}',
-                                   withSpace = true,
-                                   withSomeNum = false)
+                    insertIfNeeded(
+                      placeInto = true,
+                      openChar = '{',
+                      closeChar = '}',
+                      withSpace = true,
+                      withSomeNum = false)
                   } else {
                     document.insertString(endOffset, " ")
                     endOffset += 1
@@ -343,24 +350,27 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
                       if (ScalaPsiUtil
                             .getSettings(context.getProject)
                             .SPACE_BEFORE_BRACE_METHOD_CALL) {
-                        insertIfNeeded(placeInto = true,
-                                       openChar = '{',
-                                       closeChar = '}',
-                                       withSpace = true,
-                                       withSomeNum = false)
+                        insertIfNeeded(
+                          placeInto = true,
+                          openChar = '{',
+                          closeChar = '}',
+                          withSpace = true,
+                          withSomeNum = false)
                       } else {
-                        insertIfNeeded(placeInto = true,
-                                       openChar = '{',
-                                       closeChar = '}',
-                                       withSpace = false,
-                                       withSomeNum = false)
+                        insertIfNeeded(
+                          placeInto = true,
+                          openChar = '{',
+                          closeChar = '}',
+                          withSpace = false,
+                          withSomeNum = false)
                       }
                     } else {
-                      insertIfNeeded(placeInto = true,
-                                     openChar = '(',
-                                     closeChar = ')',
-                                     withSpace = false,
-                                     withSomeNum = false)
+                      insertIfNeeded(
+                        placeInto = true,
+                        openChar = '(',
+                        closeChar = ')',
+                        withSpace = false,
+                        withSomeNum = false)
                     }
                   } else {
                     document.insertString(endOffset, " _")
@@ -377,11 +387,12 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
           } else moveCaretIfNeeded()
         } else {
           context.setAddCompletionChar(false)
-          insertIfNeeded(placeInto = true,
-                         openChar = '[',
-                         closeChar = ']',
-                         withSpace = false,
-                         withSomeNum = false)
+          insertIfNeeded(
+            placeInto = true,
+            openChar = '[',
+            closeChar = ']',
+            withSpace = false,
+            withSomeNum = false)
           //do not add () or {} in this case, use will choose what he want later
         }
       case _ => moveCaretIfNeeded()

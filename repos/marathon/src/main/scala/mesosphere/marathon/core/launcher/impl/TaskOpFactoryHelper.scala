@@ -17,8 +17,9 @@ class TaskOpFactoryHelper(private val principalOpt: Option[String],
              newTask: Task,
              oldTask: Option[Task] = None): TaskOp.Launch = {
 
-    assume(newTask.taskId.mesosTaskId == taskInfo.getTaskId,
-           "marathon task id and mesos task id must be equal")
+    assume(
+      newTask.taskId.mesosTaskId == taskInfo.getTaskId,
+      "marathon task id and mesos task id must be equal")
 
     def createOperations = Seq(offerOperationFactory.launch(taskInfo))
 
@@ -38,10 +39,11 @@ class TaskOpFactoryHelper(private val principalOpt: Option[String],
         offerOperationFactory
           .createVolumes(frameworkId, newTask.taskId, localVolumes))
 
-    TaskOp.ReserveAndCreateVolumes(newTask,
-                                   resources,
-                                   localVolumes,
-                                   oldTask,
-                                   createOperations)
+    TaskOp.ReserveAndCreateVolumes(
+      newTask,
+      resources,
+      localVolumes,
+      oldTask,
+      createOperations)
   }
 }

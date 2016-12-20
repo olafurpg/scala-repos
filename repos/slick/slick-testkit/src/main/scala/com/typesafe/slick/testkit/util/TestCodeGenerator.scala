@@ -84,13 +84,15 @@ trait TestCodeGenerator {
           }
           val db = tdb.createDB()
           try {
-            val m = Await.result(db.run((init >> generator).withPinnedSession),
-                                 Duration.Inf)
-            m.writeToFile(profile = slickProfile,
-                          folder = dir,
-                          pkg = packageName,
-                          objectName,
-                          fileName = objectName + ".scala")
+            val m = Await.result(
+              db.run((init >> generator).withPinnedSession),
+              Duration.Inf)
+            m.writeToFile(
+              profile = slickProfile,
+              folder = dir,
+              pkg = packageName,
+              objectName,
+              fileName = objectName + ".scala")
           } finally db.close
         } finally tdb.cleanUpAfter()
         Some(s"$packageName.$objectName")

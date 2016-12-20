@@ -106,9 +106,8 @@ trait CompactSpec[M[+ _]]
           new Slice {
             val size = slice.size
             val columns = slice.columns.mapValues { col =>
-              (col |> cf.util.filter(0,
-                                     slice.size,
-                                     BitSetUtil.create(retained))).get
+              (col |> cf.util
+                .filter(0, slice.size, BitSetUtil.create(retained))).get
             }
           }
         }
@@ -136,9 +135,8 @@ trait CompactSpec[M[+ _]]
                   if (scala.util.Random.nextDouble < 0.75) Some(x) else None
                 }
                 .flatten
-              (col |> cf.util.filter(0,
-                                     slice.size,
-                                     BitSetUtil.create(retained))).get
+              (col |> cf.util
+                .filter(0, slice.size, BitSetUtil.create(retained))).get
             }
           new Slice {
             val size = slice.size

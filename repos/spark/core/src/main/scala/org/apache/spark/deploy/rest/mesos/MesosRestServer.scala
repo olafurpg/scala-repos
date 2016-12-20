@@ -64,8 +64,9 @@ private[mesos] class MesosSubmitRequestServlet(
   private def createDateFormat =
     new SimpleDateFormat("yyyyMMddHHmmss") // For application IDs
   private def newDriverId(submitDate: Date): String = {
-    "driver-%s-%04d".format(createDateFormat.format(submitDate),
-                            nextDriverNumber.incrementAndGet())
+    "driver-%s-%04d".format(
+      createDateFormat.format(submitDate),
+      nextDriverNumber.incrementAndGet())
   }
 
   /**
@@ -110,12 +111,13 @@ private[mesos] class MesosSubmitRequestServlet(
       driverExtraJavaOptions.map(Utils.splitCommandString).getOrElse(Seq.empty)
     val sparkJavaOpts = Utils.sparkJavaOpts(conf)
     val javaOpts = sparkJavaOpts ++ extraJavaOpts
-    val command = new Command(mainClass,
-                              appArgs,
-                              environmentVariables,
-                              extraClassPath,
-                              extraLibraryPath,
-                              javaOpts)
+    val command = new Command(
+      mainClass,
+      appArgs,
+      environmentVariables,
+      extraClassPath,
+      extraLibraryPath,
+      javaOpts)
     val actualSuperviseDriver =
       superviseDriver.map(_.toBoolean).getOrElse(DEFAULT_SUPERVISE)
     val actualDriverMemory =
@@ -125,15 +127,16 @@ private[mesos] class MesosSubmitRequestServlet(
     val submitDate = new Date()
     val submissionId = newDriverId(submitDate)
 
-    new MesosDriverDescription(name,
-                               appResource,
-                               actualDriverMemory,
-                               actualDriverCores,
-                               actualSuperviseDriver,
-                               command,
-                               request.sparkProperties,
-                               submissionId,
-                               submitDate)
+    new MesosDriverDescription(
+      name,
+      appResource,
+      actualDriverMemory,
+      actualDriverCores,
+      actualSuperviseDriver,
+      command,
+      request.sparkProperties,
+      submissionId,
+      submitDate)
   }
 
   protected override def handleSubmit(

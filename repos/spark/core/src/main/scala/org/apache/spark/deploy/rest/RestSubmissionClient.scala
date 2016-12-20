@@ -273,16 +273,18 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
 
     try { Await.result(responseFuture, 10.seconds) } catch {
       case unreachable @ (_: FileNotFoundException | _: SocketException) =>
-        throw new SubmitRestConnectionException("Unable to connect to server",
-                                                unreachable)
+        throw new SubmitRestConnectionException(
+          "Unable to connect to server",
+          unreachable)
       case malformed @ (_: JsonProcessingException |
           _: SubmitRestProtocolException) =>
         throw new SubmitRestProtocolException(
           "Malformed response received from server",
           malformed)
       case timeout: TimeoutException =>
-        throw new SubmitRestConnectionException("No response from server",
-                                                timeout)
+        throw new SubmitRestConnectionException(
+          "No response from server",
+          timeout)
     }
   }
 
@@ -437,11 +439,12 @@ private[spark] object RestSubmissionClient {
     }
     val sparkProperties = conf.getAll.toMap
     val client = new RestSubmissionClient(master)
-    val submitRequest = client.constructSubmitRequest(appResource,
-                                                      mainClass,
-                                                      appArgs,
-                                                      sparkProperties,
-                                                      env)
+    val submitRequest = client.constructSubmitRequest(
+      appResource,
+      mainClass,
+      appArgs,
+      sparkProperties,
+      env)
     client.createSubmission(submitRequest)
   }
 

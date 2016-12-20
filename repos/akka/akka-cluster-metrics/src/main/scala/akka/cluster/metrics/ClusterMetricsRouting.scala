@@ -54,9 +54,10 @@ final case class AdaptiveLoadBalancingRoutingLogic(
     val oldValue = weightedRouteesRef.get
     val (routees, _, _) = oldValue
     val weightedRoutees = Some(
-      new WeightedRoutees(routees,
-                          cluster.selfAddress,
-                          metricsSelector.weights(event.nodeMetrics)))
+      new WeightedRoutees(
+        routees,
+        cluster.selfAddress,
+        metricsSelector.weights(event.nodeMetrics)))
     // retry when CAS failure
     if (!weightedRouteesRef.compareAndSet(
           oldValue,
@@ -75,9 +76,10 @@ final case class AdaptiveLoadBalancingRoutingLogic(
 
         if (routees ne oldRoutees) {
           val weightedRoutees = Some(
-            new WeightedRoutees(routees,
-                                cluster.selfAddress,
-                                metricsSelector.weights(oldMetrics)))
+            new WeightedRoutees(
+              routees,
+              cluster.selfAddress,
+              metricsSelector.weights(oldMetrics)))
           // ignore, don't update, in case of CAS failure
           weightedRouteesRef
             .compareAndSet(oldValue, (routees, oldMetrics, weightedRoutees))
@@ -141,10 +143,11 @@ final case class AdaptiveLoadBalancingPool(
     extends Pool {
 
   def this(config: Config, dynamicAccess: DynamicAccess) =
-    this(nrOfInstances =
-           ClusterRouterSettingsBase.getMaxTotalNrOfInstances(config),
-         metricsSelector = MetricsSelector.fromConfig(config, dynamicAccess),
-         usePoolDispatcher = config.hasPath("pool-dispatcher"))
+    this(
+      nrOfInstances =
+        ClusterRouterSettingsBase.getMaxTotalNrOfInstances(config),
+      metricsSelector = MetricsSelector.fromConfig(config, dynamicAccess),
+      usePoolDispatcher = config.hasPath("pool-dispatcher"))
 
   /**
     * Java API
@@ -165,8 +168,9 @@ final case class AdaptiveLoadBalancingPool(
   override def routingLogicController(
       routingLogic: RoutingLogic): Option[Props] =
     Some(
-      Props(classOf[AdaptiveLoadBalancingMetricsListener],
-            routingLogic.asInstanceOf[AdaptiveLoadBalancingRoutingLogic]))
+      Props(
+        classOf[AdaptiveLoadBalancingMetricsListener],
+        routingLogic.asInstanceOf[AdaptiveLoadBalancingRoutingLogic]))
 
   /**
     * Setting the supervisor strategy to be used for the “head” Router actor.
@@ -230,8 +234,9 @@ final case class AdaptiveLoadBalancingGroup(
     extends Group {
 
   def this(config: Config, dynamicAccess: DynamicAccess) =
-    this(metricsSelector = MetricsSelector.fromConfig(config, dynamicAccess),
-         paths = immutableSeq(config.getStringList("routees.paths")))
+    this(
+      metricsSelector = MetricsSelector.fromConfig(config, dynamicAccess),
+      paths = immutableSeq(config.getStringList("routees.paths")))
 
   /**
     * Java API
@@ -253,8 +258,9 @@ final case class AdaptiveLoadBalancingGroup(
   override def routingLogicController(
       routingLogic: RoutingLogic): Option[Props] =
     Some(
-      Props(classOf[AdaptiveLoadBalancingMetricsListener],
-            routingLogic.asInstanceOf[AdaptiveLoadBalancingRoutingLogic]))
+      Props(
+        classOf[AdaptiveLoadBalancingMetricsListener],
+        routingLogic.asInstanceOf[AdaptiveLoadBalancingRoutingLogic]))
 
   /**
     * Setting the dispatcher to be used for the router head actor, which handles
@@ -367,9 +373,10 @@ case object SystemLoadAverageMetricsSelector extends CapacityMetricsSelector {
 @SerialVersionUID(1L)
 object MixMetricsSelector
     extends MixMetricsSelectorBase(
-      Vector(HeapMetricsSelector,
-             CpuMetricsSelector,
-             SystemLoadAverageMetricsSelector)) {
+      Vector(
+        HeapMetricsSelector,
+        CpuMetricsSelector,
+        SystemLoadAverageMetricsSelector)) {
 
   /**
     * Java API: get the default singleton instance
@@ -543,8 +550,9 @@ private[metrics] class WeightedRoutees(routees: immutable.IndexedSeq[Routee],
     * Pick the routee matching a value, from 1 to total.
     */
   def apply(value: Int): Routee = {
-    require(1 <= value && value <= total,
-            "value must be between [1 - %s]" format total)
+    require(
+      1 <= value && value <= total,
+      "value must be between [1 - %s]" format total)
     routees(idx(Arrays.binarySearch(buckets, value)))
   }
 

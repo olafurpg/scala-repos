@@ -82,12 +82,13 @@ object SQLConf {
           throw new IllegalArgumentException(
             s"Duplicate SQLConfEntry. $key has been registered")
         }
-        val entry = new SQLConfEntry[T](key,
-                                        defaultValue,
-                                        valueConverter,
-                                        stringConverter,
-                                        doc,
-                                        isPublic)
+        val entry = new SQLConfEntry[T](
+          key,
+          defaultValue,
+          valueConverter,
+          stringConverter,
+          doc,
+          isPublic)
         sqlConfEntries.put(key, entry)
         entry
       }
@@ -193,12 +194,13 @@ object SQLConf {
                    defaultValue: Option[Seq[T]] = None,
                    doc: String = "",
                    isPublic: Boolean = true): SQLConfEntry[Seq[T]] = {
-      SQLConfEntry(key,
-                   defaultValue,
-                   _.split(",").map(valueConverter),
-                   _.mkString(","),
-                   doc,
-                   isPublic)
+      SQLConfEntry(
+        key,
+        defaultValue,
+        _.split(",").map(valueConverter),
+        _.mkString(","),
+        doc,
+        isPublic)
     }
 
     def stringSeqConf(key: String,
@@ -718,8 +720,9 @@ class SQLConf
   def setConf[T](entry: SQLConfEntry[T], value: T): Unit = {
     require(entry != null, "entry cannot be null")
     require(value != null, s"value cannot be null for key: ${entry.key}")
-    require(sqlConfEntries.get(entry.key) == entry,
-            s"$entry is not registered")
+    require(
+      sqlConfEntries.get(entry.key) == entry,
+      s"$entry is not registered")
     setConfWithCheck(entry.key, entry.stringConverter(value))
   }
 
@@ -740,8 +743,9 @@ class SQLConf
     * desired one.
     */
   def getConf[T](entry: SQLConfEntry[T], defaultValue: T): T = {
-    require(sqlConfEntries.get(entry.key) == entry,
-            s"$entry is not registered")
+    require(
+      sqlConfEntries.get(entry.key) == entry,
+      s"$entry is not registered")
     Option(settings.get(entry.key))
       .map(entry.valueConverter)
       .getOrElse(defaultValue)
@@ -752,8 +756,9 @@ class SQLConf
     * yet, return `defaultValue` in [[SQLConfEntry]].
     */
   def getConf[T](entry: SQLConfEntry[T]): T = {
-    require(sqlConfEntries.get(entry.key) == entry,
-            s"$entry is not registered")
+    require(
+      sqlConfEntries.get(entry.key) == entry,
+      s"$entry is not registered")
     Option(settings.get(entry.key))
       .map(entry.valueConverter)
       .orElse(entry.defaultValue)

@@ -150,12 +150,13 @@ class TreeSet[E](_comparator: Comparator[_ >: E])
       base
     }
 
-    new NavigableView(this,
-                      subSetFun,
-                      Some(fromElement),
-                      fromInclusive,
-                      Some(toElement),
-                      toInclusive)
+    new NavigableView(
+      this,
+      subSetFun,
+      Some(fromElement),
+      fromInclusive,
+      Some(toElement),
+      toInclusive)
   }
 
   def headSet(toElement: E, inclusive: Boolean): NavigableSet[E] = {
@@ -183,12 +184,13 @@ class TreeSet[E](_comparator: Comparator[_ >: E])
       base
     }
 
-    new NavigableView(this,
-                      tailSetFun,
-                      Some(fromElement),
-                      inclusive,
-                      None,
-                      true)
+    new NavigableView(
+      this,
+      tailSetFun,
+      Some(fromElement),
+      inclusive,
+      None,
+      true)
   }
 
   def subSet(fromElement: E, toElement: E): SortedSet[E] =

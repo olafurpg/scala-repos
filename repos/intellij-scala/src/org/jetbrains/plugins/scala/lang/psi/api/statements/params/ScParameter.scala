@@ -92,9 +92,10 @@ trait ScParameter
       case f @ Success(tp: ScType, elem) =>
         val seq = ScalaPsiManager
           .instance(getProject)
-          .getCachedClass("scala.collection.Seq",
-                          getResolveScope,
-                          ScalaPsiManager.ClassCategory.TYPE)
+          .getCachedClass(
+            "scala.collection.Seq",
+            getResolveScope,
+            ScalaPsiManager.ClassCategory.TYPE)
         if (seq != null) {
           Success(ScParameterizedType(ScType.designator(seq), Seq(tp)), elem)
         } else f
@@ -103,18 +104,20 @@ trait ScParameter
   }
 
   def getDeclarationScope =
-    PsiTreeUtil.getParentOfType(this,
-                                classOf[ScParameterOwner],
-                                classOf[ScFunctionExpr])
+    PsiTreeUtil.getParentOfType(
+      this,
+      classOf[ScParameterOwner],
+      classOf[ScFunctionExpr])
 
   def deprecatedName: Option[String]
 
   def owner: PsiElement = {
-    ScalaPsiUtil.getContextOfType(this,
-                                  true,
-                                  classOf[ScFunctionExpr],
-                                  classOf[ScFunction],
-                                  classOf[ScPrimaryConstructor])
+    ScalaPsiUtil.getContextOfType(
+      this,
+      true,
+      classOf[ScFunctionExpr],
+      classOf[ScFunction],
+      classOf[ScPrimaryConstructor])
   }
 
   def remove()
@@ -150,9 +153,10 @@ trait ScParameter
   }
 
   def getType: PsiType =
-    ScType.toPsi(getRealParameterType(TypingContext.empty).getOrNothing,
-                 getProject,
-                 getResolveScope)
+    ScType.toPsi(
+      getRealParameterType(TypingContext.empty).getOrNothing,
+      getProject,
+      getResolveScope)
 
   def isAnonymousParameter: Boolean = getContext match {
     case clause: ScParameterClause =>
@@ -196,8 +200,9 @@ trait ScParameter
                 case _ =>
               }
             }
-            applyForFunction(tp,
-                             ScUnderScoreSectionUtil.underscores(f).nonEmpty)
+            applyForFunction(
+              tp,
+              ScUnderScoreSectionUtil.underscores(f).nonEmpty)
           }
           result
         case _ => None

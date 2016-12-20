@@ -127,18 +127,19 @@ class Date private (private val date: js.Date)
 object Date {
   private val Days = Array("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
 
-  private val Months = Array("Jan",
-                             "Feb",
-                             "Mar",
-                             "Apr",
-                             "May",
-                             "Jun",
-                             "Jul",
-                             "Aug",
-                             "Sep",
-                             "Oct",
-                             "Nov",
-                             "Dec")
+  private val Months = Array(
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec")
 
   private def pad0(i: Int): String = {
     val str = "" + i

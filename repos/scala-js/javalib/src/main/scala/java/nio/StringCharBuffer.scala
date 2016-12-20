@@ -31,11 +31,12 @@ private[nio] final class StringCharBuffer private (_capacity: Int,
   def subSequence(start: Int, end: Int): CharBuffer = {
     if (start < 0 || end < start || end > remaining)
       throw new IndexOutOfBoundsException
-    new StringCharBuffer(capacity,
-                         _csq,
-                         _csqOffset,
-                         position + start,
-                         position + end)
+    new StringCharBuffer(
+      capacity,
+      _csq,
+      _csqOffset,
+      position + start,
+      position + end)
   }
 
   @noinline
@@ -105,10 +106,11 @@ private[nio] object StringCharBuffer {
     val initialLimit = initialPosition + initialLength
     if (initialPosition < 0 || initialLength < 0 || initialLimit > capacity)
       throw new IndexOutOfBoundsException
-    new StringCharBuffer(capacity,
-                         csq,
-                         csqOffset,
-                         initialPosition,
-                         initialLimit)
+    new StringCharBuffer(
+      capacity,
+      csq,
+      csqOffset,
+      initialPosition,
+      initialLimit)
   }
 }

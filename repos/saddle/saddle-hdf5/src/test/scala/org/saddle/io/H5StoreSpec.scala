@@ -210,9 +210,10 @@ class H5StoreSpec extends Specification {
       val df3 = Frame(mat.rand(3, 3), Index(1, 2, 3), Index(1, 2, 3))
       val df4 = Frame(mat.rand(3, 3), Index(1L, 2, 3), Index(1, 2, 3))
       val df5 = Frame(mat.rand(3, 3), Index(1d, 2, 3), Index(1, 2, 3))
-      val df6 = Panel(Vec("string", "anotherString", "unrelated"),
-                      vec.randi(3),
-                      vec.rand(3))
+      val df6 = Panel(
+        Vec("string", "anotherString", "unrelated"),
+        vec.randi(3),
+        vec.rand(3))
 
       H5Store.writeFrame(tmp, "df1", df1)
       H5Store.writeFrame(tmp, "df2", df2)
@@ -253,14 +254,15 @@ class H5StoreSpec extends Specification {
       H5Store.readFrame[Int, Int, Any](tmp, "df6") must_== df6
 
       // try slicing
-      H5Store.readFrameSlice[DateTime, Int, Double](fid,
-                                                    "df1",
-                                                    d2,
-                                                    d3,
-                                                    2,
-                                                    3,
-                                                    true,
-                                                    true) must_==
+      H5Store.readFrameSlice[DateTime, Int, Double](
+        fid,
+        "df1",
+        d2,
+        d3,
+        2,
+        3,
+        true,
+        true) must_==
         df1.colSliceBy(2, 3).rowSliceBy(d2, d3)
 
       H5Store.closeFile(fid)

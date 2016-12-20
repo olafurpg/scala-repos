@@ -25,9 +25,10 @@ import org.junit.Test
 
 trait BaseMessageSetTestCases extends JUnitSuite {
 
-  val messages = Array(new Message("abcd".getBytes),
-                       new Message("efgh".getBytes),
-                       new Message("ijkl".getBytes))
+  val messages = Array(
+    new Message("abcd".getBytes),
+    new Message("efgh".getBytes),
+    new Message("ijkl".getBytes))
 
   def createMessageSet(messages: Seq[Message]): MessageSet
 
@@ -46,12 +47,14 @@ trait BaseMessageSetTestCases extends JUnitSuite {
 
   @Test
   def testSizeInBytes() {
-    assertEquals("Empty message set should have 0 bytes.",
-                 0,
-                 createMessageSet(Array[Message]()).sizeInBytes)
-    assertEquals("Predicted size should equal actual size.",
-                 MessageSet.messageSetSize(messages),
-                 createMessageSet(messages).sizeInBytes)
+    assertEquals(
+      "Empty message set should have 0 bytes.",
+      0,
+      createMessageSet(Array[Message]()).sizeInBytes)
+    assertEquals(
+      "Predicted size should equal actual size.",
+      MessageSet.messageSetSize(messages),
+      createMessageSet(messages).sizeInBytes)
   }
 
   @Test
@@ -67,9 +70,10 @@ trait BaseMessageSetTestCases extends JUnitSuite {
       val file = tempFile()
       val channel = new RandomAccessFile(file, "rw").getChannel()
       val written = set.writeTo(channel, 0, 1024)
-      assertEquals("Expect to write the number of bytes in the set.",
-                   set.sizeInBytes,
-                   written)
+      assertEquals(
+        "Expect to write the number of bytes in the set.",
+        set.sizeInBytes,
+        written)
       val newSet = new FileMessageSet(file, channel)
       checkEquals(set.iterator, newSet.iterator)
     }

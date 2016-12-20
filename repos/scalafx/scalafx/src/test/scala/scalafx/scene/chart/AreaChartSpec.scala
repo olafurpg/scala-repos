@@ -41,8 +41,9 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
   */
 @RunWith(classOf[JUnitRunner])
 class AreaChartSpec
-    extends SimpleSFXDelegateSpec[jfxsc.AreaChart[Number, Number],
-                                  AreaChart[Number, Number]](
+    extends SimpleSFXDelegateSpec[
+      jfxsc.AreaChart[Number, Number],
+      AreaChart[Number, Number]](
       classOf[jfxsc.AreaChart[Number, Number]],
       classOf[AreaChart[Number, Number]])
     with RunOnApplicationThread {
@@ -51,6 +52,7 @@ class AreaChartSpec
     new AreaChart[Number, Number](getJavaClassInstance)
 
   override def getJavaClassInstance =
-    new jfxsc.AreaChart[Number, Number](new jfxsc.NumberAxis,
-                                        new jfxsc.NumberAxis)
+    new jfxsc.AreaChart[Number, Number](
+      new jfxsc.NumberAxis,
+      new jfxsc.NumberAxis)
 }

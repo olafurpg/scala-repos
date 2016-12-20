@@ -80,10 +80,11 @@ class WebJobManagerSpec extends TestJobService { self =>
       val M = self.M
       protected def withRawClient[A](f: HttpClient[ByteChunk] => A): A =
         f(client.path("/jobs/v1/"))
-    }).withM[Future](ResponseAsFuture(M),
-                     FutureAsResponse(M),
-                     Monad[Response],
-                     M)
+    }).withM[Future](
+      ResponseAsFuture(M),
+      FutureAsResponse(M),
+      Monad[Response],
+      M)
   })
 }
 
@@ -100,9 +101,10 @@ class MongoJobManagerSpec extends Specification with RealMongoSpecSupport {
     val validAPIKey = "Anything should work!"
     implicit lazy val M: Monad[Future] with Comonad[Future] =
       new UnsafeFutureComonad(executionContext, Duration(5, "seconds"))
-    lazy val jobs = new MongoJobManager(mongo.database("jobs"),
-                                        MongoJobManagerSettings.default,
-                                        new InMemoryFileStorage[Future])
+    lazy val jobs = new MongoJobManager(
+      mongo.database("jobs"),
+      MongoJobManagerSettings.default,
+      new InMemoryFileStorage[Future])
   })
 
   step {
@@ -207,12 +209,13 @@ trait JobManagerSpec[M[+ _]] extends Specification {
       status1 must beLike {
         case Some(Status(`jobId`, id, "1", `s0`, "%", None)) =>
           val status2 = jobs
-            .updateStatus(job.id,
-                          Some(id),
-                          "2",
-                          5.0,
-                          "%",
-                          Some(JString("...")))
+            .updateStatus(
+              job.id,
+              Some(id),
+              "2",
+              5.0,
+              "%",
+              Some(JString("...")))
             .copoint
             .right
             .toOption
@@ -244,12 +247,13 @@ trait JobManagerSpec[M[+ _]] extends Specification {
       status1 must beLike {
         case Some(Status(`jobId`, id, "1", `s0`, "%", None)) =>
           val status2 = jobs
-            .updateStatus(jobId,
-                          Some(id + 1),
-                          "2",
-                          5.0,
-                          "%",
-                          Some(JString("...")))
+            .updateStatus(
+              jobId,
+              Some(id + 1),
+              "2",
+              5.0,
+              "%",
+              Some(JString("...")))
             .copoint
           val status2x = jobs.getStatus(jobId).copoint
           status2x must_== status1
@@ -363,14 +367,16 @@ trait JobManagerSpec[M[+ _]] extends Specification {
         .cancel(job.id, "I didn't like the way it looked at me.")
         .copoint must beLike {
         case Right(
-            Job(`jobId`,
+            Job(
+              `jobId`,
+              _,
+              _,
+              _,
+              _,
+              Cancelled(
+                "I didn't like the way it looked at me.",
                 _,
-                _,
-                _,
-                _,
-                Cancelled("I didn't like the way it looked at me.",
-                          _,
-                          `state`))) =>
+                `state`))) =>
           ok
       }
 
@@ -398,12 +404,13 @@ trait JobManagerSpec[M[+ _]] extends Specification {
 
       jobs.abort(job1Id, "The mission was compromised.").copoint must beLike {
         case Right(
-            Job(`job1Id`,
-                _,
-                _,
-                _,
-                _,
-                Aborted("The mission was compromised.", _, `job1State`))) =>
+            Job(
+              `job1Id`,
+              _,
+              _,
+              _,
+              _,
+              Aborted("The mission was compromised.", _, `job1State`))) =>
           ok
       }
 
@@ -417,12 +424,13 @@ trait JobManagerSpec[M[+ _]] extends Specification {
 
           jobs.abort(job2.id, "Blagawaga").copoint must beLike {
             case Right(
-                Job(`job2Id`,
-                    _,
-                    _,
-                    _,
-                    _,
-                    Aborted("Blagawaga", _, `job2State`))) =>
+                Job(
+                  `job2Id`,
+                  _,
+                  _,
+                  _,
+                  _,
+                  Aborted("Blagawaga", _, `job2State`))) =>
               ok
           }
       }
@@ -432,12 +440,13 @@ trait JobManagerSpec[M[+ _]] extends Specification {
 
       jobs.abort(job3Id, "Because I could.").copoint must beLike {
         case Right(
-            Job(`job3Id`,
-                _,
-                _,
-                _,
-                _,
-                Aborted("Because I could.", _, NotStarted))) =>
+            Job(
+              `job3Id`,
+              _,
+              _,
+              _,
+              _,
+              Aborted("Because I could.", _, NotStarted))) =>
           ok
       }
     }

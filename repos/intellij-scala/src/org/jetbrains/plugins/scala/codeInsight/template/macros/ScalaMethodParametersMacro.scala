@@ -16,8 +16,9 @@ class ScalaMethodParametersMacro extends Macro {
                                context: ExpressionContext): Result = {
     import scala.collection.JavaConversions._
     Option(
-      PsiTreeUtil.getParentOfType(context.getPsiElementAtStartOffset,
-                                  classOf[ScFunction]))
+      PsiTreeUtil.getParentOfType(
+        context.getPsiElementAtStartOffset,
+        classOf[ScFunction]))
       .flatMap(fun => Option(fun.getParameterList))
       .map(_.getParameters.map(param => new TextResult(param.getName)))
       .map(resArr => new ListResult(resArr.toList))

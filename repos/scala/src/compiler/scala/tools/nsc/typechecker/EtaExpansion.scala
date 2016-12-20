@@ -123,10 +123,11 @@ trait EtaExpansion { self: Analyzer =>
           val droppedStarTpe =
             if (settings.etaExpandKeepsStar) origTpe
             else dropIllegalStarTypes(origTpe)
-          val valDef = ValDef(Modifiers(SYNTHETIC | PARAM),
-                              sym.name.toTermName,
-                              TypeTree(droppedStarTpe),
-                              EmptyTree)
+          val valDef = ValDef(
+            Modifiers(SYNTHETIC | PARAM),
+            sym.name.toTermName,
+            TypeTree(droppedStarTpe),
+            EmptyTree)
           (valDef, isRepeated)
         }
         atPos(tree.pos.makeTransparent) {

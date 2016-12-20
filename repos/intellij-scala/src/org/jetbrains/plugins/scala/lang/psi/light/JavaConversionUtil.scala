@@ -21,10 +21,11 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{
   */
 object JavaConversionUtil {
 
-  val keywordAnnotations = Map("scala.native" -> "native",
-                               "scala.annotation.strictfp" -> "strictfp",
-                               "scala.volatile" -> "volatile",
-                               "scala.transient" -> "transient")
+  val keywordAnnotations = Map(
+    "scala.native" -> "native",
+    "scala.annotation.strictfp" -> "strictfp",
+    "scala.volatile" -> "volatile",
+    "scala.transient" -> "transient")
 
   def typeText(tp: ScType,
                project: Project,

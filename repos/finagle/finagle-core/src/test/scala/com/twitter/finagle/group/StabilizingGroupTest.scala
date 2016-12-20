@@ -24,11 +24,12 @@ class Context {
   def limboSize: Int = statsRecv.gauges(Seq("testGroup", "limbo"))().toInt
   def healthStat: Int = statsRecv.gauges(Seq("testGroup", "health"))().toInt
   val timer = new MockTimer
-  val stableGroup = StabilizingGroup(sourceGroup,
-                                     healthStatus.pulse.recv,
-                                     grace,
-                                     statsRecv.scope("testGroup"),
-                                     timer)
+  val stableGroup = StabilizingGroup(
+    sourceGroup,
+    healthStatus.pulse.recv,
+    grace,
+    statsRecv.scope("testGroup"),
+    timer)
 }
 
 @RunWith(classOf[JUnitRunner])

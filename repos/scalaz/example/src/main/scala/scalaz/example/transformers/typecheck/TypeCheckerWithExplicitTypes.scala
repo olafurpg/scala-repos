@@ -49,11 +49,12 @@ object TypeCheckerWithExplicitTypes {
       val operandType = typeCheck(operand, env)
       val res = operatorType match {
         case TyLam(argType, resultType) =>
-          compare(argType,
-                  operandType,
-                  resultType,
-                  "function expected arg of type: " + argType + ", but got: " +
-                    operandType)
+          compare(
+            argType,
+            operandType,
+            resultType,
+            "function expected arg of type: " + argType + ", but got: " +
+              operandType)
         case t =>
           typeError("function application expected function, but got: " + t)
       }

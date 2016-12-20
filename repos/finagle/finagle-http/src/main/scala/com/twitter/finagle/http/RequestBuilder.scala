@@ -308,8 +308,9 @@ class RequestBuilder[HasUrl, HasForm] private[http] (
   def proxied(credentials: Option[ProxyCredentials]): This = {
     val headers: Map[String, Seq[String]] =
       credentials map { creds =>
-        config.headers.updated(HttpHeaders.Names.PROXY_AUTHORIZATION,
-                               Seq(creds.basicAuthorization))
+        config.headers.updated(
+          HttpHeaders.Names.PROXY_AUTHORIZATION,
+          Seq(creds.basicAuthorization))
       } getOrElse config.headers
 
     new RequestBuilder(config.copy(headers = headers, proxied = true))
@@ -389,9 +390,10 @@ class RequestBuilder[HasUrl, HasForm] private[http] (
 
     config.formElements.foreach {
       case FileElement(name, content, contentType, filename) =>
-        HttpPostRequestEncoderEx.addBodyFileUpload(encoder,
-                                                   dataFactory,
-                                                   req.httpRequest)(
+        HttpPostRequestEncoderEx.addBodyFileUpload(
+          encoder,
+          dataFactory,
+          req.httpRequest)(
           name,
           filename.getOrElse(""),
           BufChannelBuffer(content),
@@ -508,13 +510,14 @@ private object HttpPostRequestEncoderEx {
         HttpPostBodyUtil.TransferEncodingMechanism.BIT7
       }
 
-    val fileUpload = factory.createFileUpload(request,
-                                              name,
-                                              filename,
-                                              scontentType,
-                                              contentTransferEncoding,
-                                              null,
-                                              content.readableBytes)
+    val fileUpload = factory.createFileUpload(
+      request,
+      name,
+      filename,
+      scontentType,
+      contentTransferEncoding,
+      null,
+      content.readableBytes)
     fileUpload.setContent(content)
     encoder.addBodyHttpData(fileUpload)
   }

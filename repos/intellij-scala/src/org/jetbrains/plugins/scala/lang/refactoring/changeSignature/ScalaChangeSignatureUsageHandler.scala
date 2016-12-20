@@ -335,11 +335,12 @@ private[changeSignature] trait ScalaChangeSignatureUsageHandler {
       for {
         (param, idx) <- clause.zipWithIndex if !isRepeated(param)
       } {
-        newArgumentExpression(oldArgsInfo,
-                              param,
-                              manager,
-                              isAddDefault,
-                              needNamed) match {
+        newArgumentExpression(
+          oldArgsInfo,
+          param,
+          manager,
+          isAddDefault,
+          needNamed) match {
           case Some(text) =>
             buffer += text
             if (text.contains("=") && idx > buffer.size - 1) needNamed = true

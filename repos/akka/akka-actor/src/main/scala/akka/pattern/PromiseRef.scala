@@ -159,11 +159,12 @@ private[akka] final class AskPromiseRef private (
 private[akka] object AskPromiseRef {
   def apply(provider: ActorRefProvider, timeout: Timeout): AskPromiseRef = {
     if (timeout.duration.length > 0) {
-      val promiseActorRef = PromiseActorRef(provider,
-                                            timeout,
-                                            "unknown",
-                                            "unknown",
-                                            provider.deadLetters)
+      val promiseActorRef = PromiseActorRef(
+        provider,
+        timeout,
+        "unknown",
+        "unknown",
+        provider.deadLetters)
       new AskPromiseRef(promiseActorRef)
     } else {
       throw new IllegalArgumentException(

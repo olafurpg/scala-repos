@@ -40,8 +40,9 @@ package object json {
   def parse(s: String): JValue = JsonParser.parse(s)
   def parseOpt(s: String): Option[JValue] = JsonParser.parseOpt(s)
 
-  @deprecated("Please switch to using prettyRender or compactRender instead.",
-              "3.0")
+  @deprecated(
+    "Please switch to using prettyRender or compactRender instead.",
+    "3.0")
   def render(value: JValue): JsonAST.RenderIntermediaryDocument =
     JsonAST.render(value)
 

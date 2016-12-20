@@ -38,12 +38,13 @@ class CompilerFactoryImpl(sbtData: SbtData) extends CompilerFactory {
       case IncrementalityType.SBT =>
         val javac = {
           val scala = getScalaInstance(compilerData.compilerJars).getOrElse(
-            new ScalaInstance("stub",
-                              null,
-                              new File(""),
-                              new File(""),
-                              Seq.empty,
-                              None))
+            new ScalaInstance(
+              "stub",
+              null,
+              new File(""),
+              new File(""),
+              Seq.empty,
+              None))
           val classpathOptions = ClasspathOptions.javac(compiler = false)
           AggressiveCompile
             .directOrFork(scala, classpathOptions, compilerData.javaHome)
@@ -62,16 +63,18 @@ class CompilerFactoryImpl(sbtData: SbtData) extends CompilerFactory {
                 client: Client): Option[AnalyzingCompiler] = {
     getScalaInstance(compilerJars).map { scala =>
       val compiledIntefaceJar =
-        getOrCompileInterfaceJar(sbtData.interfacesHome,
-                                 sbtData.sourceJar,
-                                 sbtData.interfaceJar,
-                                 scala,
-                                 sbtData.javaClassVersion,
-                                 client)
+        getOrCompileInterfaceJar(
+          sbtData.interfacesHome,
+          sbtData.sourceJar,
+          sbtData.interfaceJar,
+          scala,
+          sbtData.javaClassVersion,
+          client)
 
-      IC.newScalaCompiler(scala,
-                          compiledIntefaceJar,
-                          ClasspathOptions.javac(compiler = false))
+      IC.newScalaCompiler(
+        scala,
+        compiledIntefaceJar,
+        ClasspathOptions.javac(compiler = false))
     }
   }
 
@@ -94,12 +97,13 @@ object CompilerFactoryImpl {
       val version =
         readProperty(classLoader, "compiler.properties", "version.number")
 
-      new ScalaInstance(version.getOrElse("unknown"),
-                        classLoader,
-                        jars.library,
-                        jars.compiler,
-                        jars.extra,
-                        version)
+      new ScalaInstance(
+        version.getOrElse("unknown"),
+        classLoader,
+        jars.library,
+        jars.compiler,
+        jars.extra,
+        version)
     }
   }
 
@@ -118,12 +122,13 @@ object CompilerFactoryImpl {
     if (!targetJar.exists) {
       client.progress("Compiling Scalac " + scalaVersion + " interface")
       home.mkdirs()
-      IC.compileInterfaceJar(interfaceId,
-                             sourceJar,
-                             targetJar,
-                             interfaceJar,
-                             scalaInstance,
-                             NullLogger)
+      IC.compileInterfaceJar(
+        interfaceId,
+        sourceJar,
+        targetJar,
+        interfaceJar,
+        scalaInstance,
+        NullLogger)
     }
 
     targetJar

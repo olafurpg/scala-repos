@@ -193,8 +193,9 @@ object ReducerEstimatorStepStrategy extends FlowStepStrategy[JobConf] {
       val numReducers = combinedEstimator.estimateReducers(info)
 
       // save the estimate in the JobConf which should be saved by hRaven
-      conf.setInt(EstimatorConfig.estimatedNumReducers,
-                  numReducers.getOrElse(-1))
+      conf.setInt(
+        EstimatorConfig.estimatedNumReducers,
+        numReducers.getOrElse(-1))
 
       // set number of reducers
       if (!setExplicitly || overrideExplicit) {

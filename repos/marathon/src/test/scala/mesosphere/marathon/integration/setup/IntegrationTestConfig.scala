@@ -122,17 +122,18 @@ object IntegrationTestConfig {
     val marathonGroup = PathId(
       string("marathonGroup", "/marathon_integration_test"))
 
-    IntegrationTestConfig(cwd,
-                          useExternalSetup,
-                          zkHost,
-                          zkPort,
-                          master,
-                          mesosLib,
-                          marathonHost,
-                          marathonBasePort,
-                          marathonGroup,
-                          httpPort,
-                          clusterSize,
-                          marathonPorts)
+    IntegrationTestConfig(
+      cwd,
+      useExternalSetup,
+      zkHost,
+      zkPort,
+      master,
+      mesosLib,
+      marathonHost,
+      marathonBasePort,
+      marathonGroup,
+      httpPort,
+      clusterSize,
+      marathonPorts)
   }
 }

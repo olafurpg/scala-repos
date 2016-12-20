@@ -29,11 +29,12 @@ object ServiceFactoryExample {
     .withCredentials("<user>", "<password>")
     .withDatabase("test")
     .configured(
-      DefaultPool.Param(low = 0,
-                        high = 10,
-                        idleTime = 5.minutes,
-                        bufferSize = 0,
-                        maxWaiters = Int.MaxValue))
+      DefaultPool.Param(
+        low = 0,
+        high = 10,
+        idleTime = 5.minutes,
+        bufferSize = 0,
+        maxWaiters = Int.MaxValue))
     .newClient("127.0.0.1:3306")
   //#client
 
@@ -63,11 +64,12 @@ object RichExample {
     .withCredentials("<user>", "<password>")
     .withDatabase("test")
     .configured(
-      DefaultPool.Param(low = 0,
-                        high = 10,
-                        idleTime = 5.minutes,
-                        bufferSize = 0,
-                        maxWaiters = Int.MaxValue))
+      DefaultPool.Param(
+        low = 0,
+        high = 10,
+        idleTime = 5.minutes,
+        bufferSize = 0,
+        maxWaiters = Int.MaxValue))
     .newRichClient("127.0.0.1:3306")
   //#richClient
 

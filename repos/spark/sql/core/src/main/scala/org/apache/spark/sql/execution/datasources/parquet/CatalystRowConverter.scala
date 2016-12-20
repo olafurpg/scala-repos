@@ -201,9 +201,10 @@ private[parquet] class CatalystRowConverter(parquetType: GroupType,
       .map {
         case ((parquetFieldType, catalystField), ordinal) =>
           // Converted field value should be set to the `ordinal`-th cell of `currentRow`
-          newConverter(parquetFieldType,
-                       catalystField.dataType,
-                       new RowUpdater(currentRow, ordinal))
+          newConverter(
+            parquetFieldType,
+            catalystField.dataType,
+            new RowUpdater(currentRow, ordinal))
       }
       .toArray
   }
@@ -258,16 +259,18 @@ private[parquet] class CatalystRowConverter(parquetType: GroupType,
       // For INT32 backed decimals
       case t: DecimalType
           if parquetType.asPrimitiveType().getPrimitiveTypeName == INT32 =>
-        new CatalystIntDictionaryAwareDecimalConverter(t.precision,
-                                                       t.scale,
-                                                       updater)
+        new CatalystIntDictionaryAwareDecimalConverter(
+          t.precision,
+          t.scale,
+          updater)
 
       // For INT64 backed decimals
       case t: DecimalType
           if parquetType.asPrimitiveType().getPrimitiveTypeName == INT64 =>
-        new CatalystLongDictionaryAwareDecimalConverter(t.precision,
-                                                        t.scale,
-                                                        updater)
+        new CatalystLongDictionaryAwareDecimalConverter(
+          t.precision,
+          t.scale,
+          updater)
 
       // For BINARY and FIXED_LEN_BYTE_ARRAY backed decimals
       case t: DecimalType
@@ -275,9 +278,10 @@ private[parquet] class CatalystRowConverter(parquetType: GroupType,
             .asPrimitiveType()
             .getPrimitiveTypeName == FIXED_LEN_BYTE_ARRAY ||
             parquetType.asPrimitiveType().getPrimitiveTypeName == BINARY =>
-        new CatalystBinaryDictionaryAwareDecimalConverter(t.precision,
-                                                          t.scale,
-                                                          updater)
+        new CatalystBinaryDictionaryAwareDecimalConverter(
+          t.precision,
+          t.scale,
+          updater)
 
       case t: DecimalType =>
         throw new RuntimeException(
@@ -420,9 +424,10 @@ private[parquet] class CatalystRowConverter(parquetType: GroupType,
         Decimal(unscaled, precision, scale)
       } else {
         // Otherwise, resorts to an unscaled `BigInteger` instead.
-        Decimal(new BigDecimal(new BigInteger(value.getBytes), scale),
-                precision,
-                scale)
+        Decimal(
+          new BigDecimal(new BigInteger(value.getBytes), scale),
+          precision,
+          scale)
       }
     }
   }
@@ -501,8 +506,9 @@ private[parquet] class CatalystRowConverter(parquetType: GroupType,
           override def set(value: Any): Unit = currentArray += value
         })
       } else {
-        new ElementConverter(repeatedType.asGroupType().getType(0),
-                             elementType)
+        new ElementConverter(
+          repeatedType.asGroupType().getType(0),
+          elementType)
       }
     }
 
@@ -585,10 +591,11 @@ private[parquet] class CatalystRowConverter(parquetType: GroupType,
 
     private val keyValueConverter = {
       val repeatedType = parquetType.getType(0).asGroupType()
-      new KeyValueConverter(repeatedType.getType(0),
-                            repeatedType.getType(1),
-                            catalystType.keyType,
-                            catalystType.valueType)
+      new KeyValueConverter(
+        repeatedType.getType(0),
+        repeatedType.getType(1),
+        catalystType.keyType,
+        catalystType.valueType)
     }
 
     override def getConverter(fieldIndex: Int): Converter = keyValueConverter
@@ -618,18 +625,20 @@ private[parquet] class CatalystRowConverter(parquetType: GroupType,
 
       private val converters = Array(
         // Converter for keys
-        newConverter(parquetKeyType,
-                     catalystKeyType,
-                     new ParentContainerUpdater {
-                       override def set(value: Any): Unit = currentKey = value
-                     }),
+        newConverter(
+          parquetKeyType,
+          catalystKeyType,
+          new ParentContainerUpdater {
+            override def set(value: Any): Unit = currentKey = value
+          }),
         // Converter for values
-        newConverter(parquetValueType,
-                     catalystValueType,
-                     new ParentContainerUpdater {
-                       override def set(value: Any): Unit =
-                         currentValue = value
-                     }))
+        newConverter(
+          parquetValueType,
+          catalystValueType,
+          new ParentContainerUpdater {
+            override def set(value: Any): Unit =
+              currentValue = value
+          }))
 
       override def getConverter(fieldIndex: Int): Converter =
         converters(fieldIndex)

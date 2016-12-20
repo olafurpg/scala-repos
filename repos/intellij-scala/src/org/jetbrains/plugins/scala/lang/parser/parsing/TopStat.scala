@@ -37,9 +37,10 @@ object TopStat {
       case ScalaTokenTypes.kPACKAGE =>
         if (state == 2) ParserState.EMPTY_STATE
         else {
-          if (ParserUtils.lookAhead(builder,
-                                    ScalaTokenTypes.kPACKAGE,
-                                    ScalaTokenTypes.kOBJECT)) {
+          if (ParserUtils.lookAhead(
+                builder,
+                ScalaTokenTypes.kPACKAGE,
+                ScalaTokenTypes.kOBJECT)) {
             if (PackageObject parse builder) ParserState.FILE_STATE
             else ParserState.EMPTY_STATE
           } else {

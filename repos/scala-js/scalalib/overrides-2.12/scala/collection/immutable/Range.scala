@@ -80,8 +80,9 @@ class Range(val start: Int, val end: Int, val step: Int)
   override final val isEmpty =
     ((start > end && step > 0) || (start < end && step < 0) ||
       (start == end && !isInclusive))
-  @deprecated("This method will be made private, use `length` instead.",
-              "2.11")
+  @deprecated(
+    "This method will be made private, use `length` instead.",
+    "2.11")
   final val numRangeElements: Int = {
     if (step == 0) throw new IllegalArgumentException("step cannot be 0.")
     else if (isEmpty) 0

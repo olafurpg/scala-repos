@@ -44,11 +44,12 @@ private[spark] class FetchFailedException(bmAddress: BlockManagerId,
   }
 
   def toTaskEndReason: TaskEndReason =
-    FetchFailed(bmAddress,
-                shuffleId,
-                mapId,
-                reduceId,
-                Utils.exceptionString(this))
+    FetchFailed(
+      bmAddress,
+      shuffleId,
+      mapId,
+      reduceId,
+      Utils.exceptionString(this))
 }
 
 /**

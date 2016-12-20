@@ -93,11 +93,12 @@ class ScReferencePatternImpl private (stub: StubElement[ScReferencePattern],
                                    state: ResolveState,
                                    lastParent: PsiElement,
                                    place: PsiElement): Boolean = {
-    ScalaPsiUtil.processImportLastParent(processor,
-                                         state,
-                                         place,
-                                         lastParent,
-                                         getType(TypingContext.empty))
+    ScalaPsiUtil.processImportLastParent(
+      processor,
+      state,
+      place,
+      lastParent,
+      getType(TypingContext.empty))
   }
 
   override def delete() {

@@ -226,8 +226,9 @@ package object collections {
         case ScFunctionExpr(Seq(x, y), Some(result)) =>
           def checkResolve(left: ScExpression, right: ScExpression) =
             (stripped(left), stripped(right)) match {
-              case (leftRef: ScReferenceExpression,
-                    rightRef: ScReferenceExpression) =>
+              case (
+                  leftRef: ScReferenceExpression,
+                  rightRef: ScReferenceExpression) =>
                 Set(leftRef.resolve(), rightRef.resolve()) equals Set(x, y)
               case _ => false
             }
@@ -240,8 +241,9 @@ package object collections {
             case _ => None
           }
         case ScInfixExpr(underscore(), oper, underscore()) => Some(oper)
-        case ScMethodCall(refExpr: ScReferenceExpression,
-                          Seq(underscore(), underscore())) =>
+        case ScMethodCall(
+            refExpr: ScReferenceExpression,
+            Seq(underscore(), underscore())) =>
           Some(refExpr)
         case _ => None
       }
@@ -504,28 +506,29 @@ package object collections {
   def isIterator(expr: ScExpression) =
     isExpressionOfType("scala.collection.Iterator", expr)
 
-  private val sideEffectsCollectionMethods = Set("append",
-                                                 "appendAll",
-                                                 "clear",
-                                                 "insert",
-                                                 "insertAll",
-                                                 "prepend",
-                                                 "prependAll",
-                                                 "reduceToSize",
-                                                 "remove",
-                                                 "retain",
-                                                 "transform",
-                                                 "trimEnd",
-                                                 "trimStart",
-                                                 "update",
-                                                 "push",
-                                                 "pushAll",
-                                                 "pop",
-                                                 "dequeue",
-                                                 "dequeueAll",
-                                                 "dequeueFirst",
-                                                 "enqueue",
-                                                 "next")
+  private val sideEffectsCollectionMethods = Set(
+    "append",
+    "appendAll",
+    "clear",
+    "insert",
+    "insertAll",
+    "prepend",
+    "prependAll",
+    "reduceToSize",
+    "remove",
+    "retain",
+    "transform",
+    "trimEnd",
+    "trimStart",
+    "update",
+    "push",
+    "pushAll",
+    "pop",
+    "dequeue",
+    "dequeueAll",
+    "dequeueFirst",
+    "enqueue",
+    "next")
 
   private class SideEffectsProvider(expr: ScExpression)
       extends CachedValueProvider[Seq[ScExpression]] {
@@ -585,8 +588,9 @@ package object collections {
                 definedOutside(ScalaPsiUtil.inNameContext(_: ScVariable)),
                 _) =>
             assign
-          case assign @ ScAssignStmt(mc @ ScMethodCall(definedOutside(_), _),
-                                     _) if mc.isUpdateCall =>
+          case assign @ ScAssignStmt(
+                mc @ ScMethodCall(definedOutside(_), _),
+                _) if mc.isUpdateCall =>
             assign
           case infix @ ScInfixExpr(
                 definedOutside(ScalaPsiUtil.inNameContext(v: ScVariable)),

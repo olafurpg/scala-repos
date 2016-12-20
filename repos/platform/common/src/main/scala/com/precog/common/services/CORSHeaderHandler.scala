@@ -31,24 +31,26 @@ object CORSHeaders {
   def genHeaders(methods: Seq[String] =
                    Seq("GET", "POST", "OPTIONS", "DELETE", "PUT"),
                  origin: String = "*",
-                 headers: Seq[String] = Seq("Origin",
-                                            "X-Requested-With",
-                                            "Content-Type",
-                                            "X-File-Name",
-                                            "X-File-Size",
-                                            "X-File-Type",
-                                            "X-Precog-Path",
-                                            "X-Precog-Service",
-                                            "X-Precog-Token",
-                                            "X-Precog-Uuid",
-                                            "Accept",
-                                            "Authorization")): HttpHeaders = {
+                 headers: Seq[String] = Seq(
+                   "Origin",
+                   "X-Requested-With",
+                   "Content-Type",
+                   "X-File-Name",
+                   "X-File-Size",
+                   "X-File-Type",
+                   "X-Precog-Path",
+                   "X-Precog-Service",
+                   "X-Precog-Token",
+                   "X-Precog-Uuid",
+                   "Accept",
+                   "Authorization")): HttpHeaders = {
 
     HttpHeaders(
-      Seq("Allow" -> methods.mkString(","),
-          "Access-Control-Allow-Origin" -> origin,
-          "Access-Control-Allow-Methods" -> methods.mkString(","),
-          "Access-Control-Allow-Headers" -> headers.mkString(",")))
+      Seq(
+        "Allow" -> methods.mkString(","),
+        "Access-Control-Allow-Origin" -> origin,
+        "Access-Control-Allow-Methods" -> methods.mkString(","),
+        "Access-Control-Allow-Headers" -> headers.mkString(",")))
   }
 
   val defaultHeaders = genHeaders()
@@ -62,10 +64,11 @@ object CORSHeaderHandler {
   def allowOrigin[A, B](value: String, executor: ExecutionContext)(
       delegateService: HttpService[A, Future[HttpResponse[B]]])
     : HttpService[A, Future[HttpResponse[B]]] =
-    new DelegatingService[A,
-                          Future[HttpResponse[B]],
-                          A,
-                          Future[HttpResponse[B]]] {
+    new DelegatingService[
+      A,
+      Future[HttpResponse[B]],
+      A,
+      Future[HttpResponse[B]]] {
       private val corsHeaders = CORSHeaders.genHeaders(origin = value)
       val delegate = delegateService
       val service = (r: HttpRequest[A]) =>

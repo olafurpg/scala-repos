@@ -63,18 +63,21 @@ class ScalaFoldingBuilder extends CustomFoldingBuilder with PossiblyDumbAware {
             descriptors += new FoldingDescriptor(node, nodeTextRange)
         case ScalaElementTypes.IMPORT_STMT if isGoodImport(node) =>
           descriptors +=
-            new FoldingDescriptor(node,
-                                  new TextRange(nodeTextRange.getStartOffset +
-                                                  IMPORT_KEYWORD.length + 1,
-                                                getImportEnd(node)))
+            new FoldingDescriptor(
+              node,
+              new TextRange(
+                nodeTextRange.getStartOffset +
+                  IMPORT_KEYWORD.length + 1,
+                getImportEnd(node)))
         case ScalaElementTypes.MATCH_STMT
             if isMultilineBodyInMatchStmt(node) =>
           descriptors +=
             new FoldingDescriptor(
               node,
-              new TextRange(nodeTextRange.getStartOffset +
-                              startOffsetForMatchStmt(node),
-                            nodeTextRange.getEndOffset))
+              new TextRange(
+                nodeTextRange.getStartOffset +
+                  startOffsetForMatchStmt(node),
+                nodeTextRange.getEndOffset))
         case ScalaElementTypes.FUNCTION_DEFINITION =>
           psi match {
             case f: ScFunctionDefinition =>
@@ -88,10 +91,12 @@ class ScalaFoldingBuilder extends CustomFoldingBuilder with PossiblyDumbAware {
       psi match {
         case p: ScPackaging if p.isExplicit =>
           descriptors +=
-            new FoldingDescriptor(node,
-                                  new TextRange(nodeTextRange.getStartOffset +
-                                                  PACKAGE_KEYWORD.length + 1,
-                                                nodeTextRange.getEndOffset))
+            new FoldingDescriptor(
+              node,
+              new TextRange(
+                nodeTextRange.getStartOffset +
+                  PACKAGE_KEYWORD.length + 1,
+                nodeTextRange.getEndOffset))
         case p: ScLiteral if p.isMultiLineString =>
           descriptors += new FoldingDescriptor(node, nodeTextRange)
         case p: ScArgumentExprList =>
@@ -143,8 +148,9 @@ class ScalaFoldingBuilder extends CustomFoldingBuilder with PossiblyDumbAware {
           val d1 = new FoldingDescriptor(node, range1, group) {
             override def getPlaceholderText = typeName
           }
-          val range2 = new TextRange(aliasedType.getTextRange.getEndOffset,
-                                     nodeTextRange.getEndOffset)
+          val range2 = new TextRange(
+            aliasedType.getTextRange.getEndOffset,
+            nodeTextRange.getEndOffset)
           val d2 = new FoldingDescriptor(aliasedType.getNode, range2, group) {
             override def getPlaceholderText = ""
           }
@@ -156,22 +162,25 @@ class ScalaFoldingBuilder extends CustomFoldingBuilder with PossiblyDumbAware {
       val stack = new mutable.Stack[PsiElement]
       if (!isCustomRegionStart(node.getText) &&
           !isCustomRegionEnd(node.getText)) {
-        addCommentFolds(node.getPsi.asInstanceOf[PsiComment],
-                        processedComments,
-                        descriptors)
+        addCommentFolds(
+          node.getPsi.asInstanceOf[PsiComment],
+          processedComments,
+          descriptors)
       } else if (isCustomRegionStart(node.getText)) {
         if (isTagRegionStart(node.getText)) {
-          addCustomRegionFolds(node.getPsi,
-                               processedRegions,
-                               descriptors,
-                               isTagRegion = true,
-                               stack)
+          addCustomRegionFolds(
+            node.getPsi,
+            processedRegions,
+            descriptors,
+            isTagRegion = true,
+            stack)
         } else if (isSimpleRegionStart(node.getText)) {
-          addCustomRegionFolds(node.getPsi,
-                               processedRegions,
-                               descriptors,
-                               isTagRegion = false,
-                               stack)
+          addCustomRegionFolds(
+            node.getPsi,
+            processedRegions,
+            descriptors,
+            isTagRegion = false,
+            stack)
         }
       }
     } else if (node.getElementType == ScalaElementTypes.SIMPLE_TYPE &&
@@ -200,8 +209,9 @@ class ScalaFoldingBuilder extends CustomFoldingBuilder with PossiblyDumbAware {
                 else a2
               descriptors += new FoldingDescriptor(
                 node,
-                new TextRange(startElement.getTextRange.getStartOffset,
-                              endElement.getTextRange.getEndOffset))
+                new TextRange(
+                  startElement.getTextRange.getStartOffset,
+                  endElement.getTextRange.getEndOffset))
               return
             case _ =>
           }
@@ -210,11 +220,12 @@ class ScalaFoldingBuilder extends CustomFoldingBuilder with PossiblyDumbAware {
     }
 
     for (child <- node.getChildren(null)) {
-      appendDescriptors(child,
-                        document,
-                        descriptors,
-                        processedComments,
-                        processedRegions)
+      appendDescriptors(
+        child,
+        document,
+        descriptors,
+        processedComments,
+        processedRegions)
     }
   }
 
@@ -225,11 +236,12 @@ class ScalaFoldingBuilder extends CustomFoldingBuilder with PossiblyDumbAware {
       quick: Boolean): Unit = {
     val processedComments = new mutable.HashSet[PsiElement]
     val processedRegions = new mutable.HashSet[PsiElement]
-    appendDescriptors(root.getNode,
-                      document,
-                      descriptors,
-                      processedComments,
-                      processedRegions)
+    appendDescriptors(
+      root.getNode,
+      document,
+      descriptors,
+      processedComments,
+      processedRegions)
   }
 
   override def getLanguagePlaceholderText(node: ASTNode,
@@ -541,8 +553,9 @@ class ScalaFoldingBuilder extends CustomFoldingBuilder with PossiblyDumbAware {
     if (end != null) {
       descriptors += new FoldingDescriptor(
         comment,
-        new TextRange(comment.getTextRange.getStartOffset,
-                      end.getTextRange.getEndOffset))
+        new TextRange(
+          comment.getTextRange.getStartOffset,
+          end.getTextRange.getEndOffset))
     }
   }
 
@@ -584,8 +597,9 @@ class ScalaFoldingBuilder extends CustomFoldingBuilder with PossiblyDumbAware {
     if (end != null) {
       descriptors += new FoldingDescriptor(
         element,
-        new TextRange(element.getTextRange.getStartOffset,
-                      end.getTextRange.getEndOffset))
+        new TextRange(
+          element.getTextRange.getStartOffset,
+          end.getTextRange.getEndOffset))
     }
   }
 
@@ -652,8 +666,9 @@ object TypeLambda {
                 cte.refinement match {
                   case Some(ref) =>
                     (ref.holders, ref.types) match {
-                      case (scala.Seq(),
-                            scala.Seq(tad: ScTypeAliasDefinitionImpl))
+                      case (
+                          scala.Seq(),
+                          scala.Seq(tad: ScTypeAliasDefinitionImpl))
                           if tad.name == nameId.getText =>
                         (tad.typeParametersClause,
                          Option(tad.aliasedTypeElement)) match {

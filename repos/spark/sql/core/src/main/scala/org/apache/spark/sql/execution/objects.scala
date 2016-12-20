@@ -107,8 +107,9 @@ case class AppendColumns(func: Any => Any,
         val newColumns = outputObject(func(getObject(row)))
 
         // This operates on the assumption that we always serialize the result...
-        combiner.join(row.asInstanceOf[UnsafeRow],
-                      newColumns.asInstanceOf[UnsafeRow]): InternalRow
+        combiner.join(
+          row.asInstanceOf[UnsafeRow],
+          newColumns.asInstanceOf[UnsafeRow]): InternalRow
       }
     }
   }
@@ -195,9 +196,10 @@ case class CoGroup(func: (Any, Iterator[Any],
 
       new CoGroupedIterator(leftGrouped, rightGrouped, leftGroup).flatMap {
         case (key, leftResult, rightResult) =>
-          val result = func(getKey(key),
-                            leftResult.map(getLeft),
-                            rightResult.map(getRight))
+          val result = func(
+            getKey(key),
+            leftResult.map(getLeft),
+            rightResult.map(getRight))
           result.map(outputObject)
       }
     }

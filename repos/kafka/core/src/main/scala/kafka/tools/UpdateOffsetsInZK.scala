@@ -35,10 +35,11 @@ object UpdateOffsetsInZK {
   def main(args: Array[String]) {
     if (args.length < 3) usage
     val config = new ConsumerConfig(Utils.loadProps(args(1)))
-    val zkUtils = ZkUtils(config.zkConnect,
-                          config.zkSessionTimeoutMs,
-                          config.zkConnectionTimeoutMs,
-                          JaasUtils.isZkSecurityEnabled())
+    val zkUtils = ZkUtils(
+      config.zkConnect,
+      config.zkSessionTimeoutMs,
+      config.zkConnectionTimeoutMs,
+      JaasUtils.isZkSecurityEnabled())
     args(0) match {
       case Earliest =>
         getAndSetOffsets(zkUtils, OffsetRequest.EarliestTime, config, args(2))

@@ -40,10 +40,12 @@ object Ssl {
     )
 
     nativeInstance.getOrElse {
-      require(ciphers == null,
-              "'Ciphers' parameter unsupported with JSSE SSL provider")
-      require(nextProtos == null,
-              "'Next Protocols' parameter unsupported with JSSE SSL provider")
+      require(
+        ciphers == null,
+        "'Ciphers' parameter unsupported with JSSE SSL provider")
+      require(
+        nextProtos == null,
+        "'Next Protocols' parameter unsupported with JSSE SSL provider")
 
       val jsseInstance = JSSE.server(
         certificatePath,

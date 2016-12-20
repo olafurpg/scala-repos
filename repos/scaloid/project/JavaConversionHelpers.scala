@@ -28,9 +28,10 @@ trait JavaConversionHelpers {
   def isOverride(m: Method): Boolean =
     getSuperclass(m.getDeclaringClass) match {
       case Some(c) =>
-        getAllMethods(c,
-                      withName(m.getName),
-                      withParameters(m.getParameterTypes: _*)).nonEmpty
+        getAllMethods(
+          c,
+          withName(m.getName),
+          withParameters(m.getParameterTypes: _*)).nonEmpty
       case None => false
     }
   def isDeprecated(e: AnnotatedElement) =
@@ -63,18 +64,20 @@ trait JavaConversionHelpers {
         tpe match {
           case null => throw new Error("Property cannot be null")
           case ga: GenericArrayType =>
-            ScalaType("Array",
-                      List(step(ga.getGenericComponentType, nextLevel)))
+            ScalaType(
+              "Array",
+              List(step(ga.getGenericComponentType, nextLevel)))
           case p: ParameterizedType =>
             ScalaType(
               step(p.getRawType, nextLevel).name,
               p.getActualTypeArguments.map(step(_, nextLevel)).toList
             )
           case t: TypeVariable[_] =>
-            ScalaType(t.getName,
-                      Nil,
-                      bounds = t.getBounds.map(step(_, nextLevel)).toList,
-                      isVar = true)
+            ScalaType(
+              t.getName,
+              Nil,
+              bounds = t.getBounds.map(step(_, nextLevel)).toList,
+              isVar = true)
           case w: WildcardType =>
             val bs = w.getUpperBounds
               .map(step(_, nextLevel))

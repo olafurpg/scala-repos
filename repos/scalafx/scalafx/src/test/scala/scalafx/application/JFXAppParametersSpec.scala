@@ -45,8 +45,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class JFXAppParametersSpec
-    extends SimpleSFXDelegateSpec[jfxa.Application.Parameters,
-                                  JFXApp.Parameters](
+    extends SimpleSFXDelegateSpec[
+      jfxa.Application.Parameters,
+      JFXApp.Parameters](
       classOf[jfxa.Application.Parameters],
       classOf[JFXApp.Parameters]) {
 

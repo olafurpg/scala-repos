@@ -446,13 +446,14 @@ private[deploy] class Master(override val rpcEnv: RpcEnv,
 
   override def receiveAndReply(
       context: RpcCallContext): PartialFunction[Any, Unit] = {
-    case RegisterWorker(id,
-                        workerHost,
-                        workerPort,
-                        workerRef,
-                        cores,
-                        memory,
-                        workerWebUiUrl) => {
+    case RegisterWorker(
+        id,
+        workerHost,
+        workerPort,
+        workerRef,
+        cores,
+        memory,
+        workerWebUiUrl) => {
       logInfo(
         "Registering worker %s:%d with %d cores, %s RAM".format(
           workerHost,
@@ -464,13 +465,14 @@ private[deploy] class Master(override val rpcEnv: RpcEnv,
       } else if (idToWorker.contains(id)) {
         context.reply(RegisterWorkerFailed("Duplicate worker ID"))
       } else {
-        val worker = new WorkerInfo(id,
-                                    workerHost,
-                                    workerPort,
-                                    cores,
-                                    memory,
-                                    workerRef,
-                                    workerWebUiUrl)
+        val worker = new WorkerInfo(
+          id,
+          workerHost,
+          workerPort,
+          cores,
+          memory,
+          workerRef,
+          workerWebUiUrl)
         if (registerWorker(worker)) {
           persistenceEngine.addWorker(worker)
           context.reply(RegisteredWorker(self, masterWebUiUrl))
@@ -557,20 +559,22 @@ private[deploy] class Master(override val rpcEnv: RpcEnv,
           s"${Utils.BACKUP_STANDALONE_MASTER_PREFIX}: $state. " +
             "Can only request driver status in ALIVE state."
         context.reply(
-          DriverStatusResponse(found = false,
-                               None,
-                               None,
-                               None,
-                               Some(new Exception(msg))))
+          DriverStatusResponse(
+            found = false,
+            None,
+            None,
+            None,
+            Some(new Exception(msg))))
       } else {
         (drivers ++ completedDrivers).find(_.id == driverId) match {
           case Some(driver) =>
             context.reply(
-              DriverStatusResponse(found = true,
-                                   Some(driver.state),
-                                   driver.worker.map(_.id),
-                                   driver.worker.map(_.hostPort),
-                                   driver.exception))
+              DriverStatusResponse(
+                found = true,
+                Some(driver.state),
+                driver.worker.map(_.id),
+                driver.worker.map(_.hostPort),
+                driver.exception))
           case None =>
             context.reply(
               DriverStatusResponse(found = false, None, None, None, None))
@@ -580,15 +584,16 @@ private[deploy] class Master(override val rpcEnv: RpcEnv,
 
     case RequestMasterState => {
       context.reply(
-        MasterStateResponse(address.host,
-                            address.port,
-                            restServerBoundPort,
-                            workers.toArray,
-                            apps.toArray,
-                            completedApps.toArray,
-                            drivers.toArray,
-                            completedDrivers.toArray,
-                            state))
+        MasterStateResponse(
+          address.host,
+          address.port,
+          restServerBoundPort,
+          workers.toArray,
+          apps.toArray,
+          completedApps.toArray,
+          drivers.toArray,
+          completedDrivers.toArray,
+          state))
     }
 
     case BoundPortsRequest => {
@@ -792,10 +797,11 @@ private[deploy] class Master(override val rpcEnv: RpcEnv,
 
       // Now that we've decided how many cores to allocate on each worker, let's allocate them
       for (pos <- 0 until usableWorkers.length if assignedCores(pos) > 0) {
-        allocateWorkerResourceToExecutors(app,
-                                          assignedCores(pos),
-                                          coresPerExecutor,
-                                          usableWorkers(pos))
+        allocateWorkerResourceToExecutors(
+          app,
+          assignedCores(pos),
+          coresPerExecutor,
+          usableWorkers(pos))
       }
     }
   }
@@ -862,18 +868,20 @@ private[deploy] class Master(override val rpcEnv: RpcEnv,
     logInfo("Launching executor " + exec.fullId + " on worker " + worker.id)
     worker.addExecutor(exec)
     worker.endpoint.send(
-      LaunchExecutor(masterUrl,
-                     exec.application.id,
-                     exec.id,
-                     exec.application.desc,
-                     exec.cores,
-                     exec.memory))
+      LaunchExecutor(
+        masterUrl,
+        exec.application.id,
+        exec.id,
+        exec.application.desc,
+        exec.cores,
+        exec.memory))
     exec.application.driver.send(
-      ExecutorAdded(exec.id,
-                    worker.id,
-                    worker.hostPort,
-                    exec.cores,
-                    exec.memory))
+      ExecutorAdded(
+        exec.id,
+        worker.id,
+        worker.hostPort,
+        exec.cores,
+        exec.memory))
   }
 
   private def registerWorker(worker: WorkerInfo): Boolean = {
@@ -919,10 +927,11 @@ private[deploy] class Master(override val rpcEnv: RpcEnv,
     for (exec <- worker.executors.values) {
       logInfo("Telling app of lost executor: " + exec.id)
       exec.application.driver.send(
-        ExecutorUpdated(exec.id,
-                        ExecutorState.LOST,
-                        Some("worker lost"),
-                        None))
+        ExecutorUpdated(
+          exec.id,
+          ExecutorState.LOST,
+          Some("worker lost"),
+          None))
       exec.state = ExecutorState.LOST
       exec.application.removeExecutor(exec)
     }
@@ -1129,11 +1138,11 @@ private[deploy] class Master(override val rpcEnv: RpcEnv,
     }
     val futureUI = Future {
       val eventLogFilePrefix =
-        EventLoggingListener.getLogPath(eventLogDir,
-                                        app.id,
-                                        appAttemptId = None,
-                                        compressionCodecName =
-                                          app.desc.eventLogCodec)
+        EventLoggingListener.getLogPath(
+          eventLogDir,
+          app.id,
+          appAttemptId = None,
+          compressionCodecName = app.desc.eventLogCodec)
       val fs = Utils.getHadoopFileSystem(eventLogDir, hadoopConf)
       val inProgressExists = fs.exists(
         new Path(eventLogFilePrefix + EventLoggingListener.IN_PROGRESS))
@@ -1152,12 +1161,13 @@ private[deploy] class Master(override val rpcEnv: RpcEnv,
         EventLoggingListener.openEventLog(new Path(eventLogFile), fs)
       val replayBus = new ReplayListenerBus()
       val ui =
-        SparkUI.createHistoryUI(new SparkConf,
-                                replayBus,
-                                new SecurityManager(conf),
-                                appName,
-                                HistoryServer.UI_PATH_PREFIX + s"/${app.id}",
-                                app.startTime)
+        SparkUI.createHistoryUI(
+          new SparkConf,
+          replayBus,
+          new SecurityManager(conf),
+          appName,
+          HistoryServer.UI_PATH_PREFIX + s"/${app.id}",
+          app.startTime)
       try {
         replayBus.replay(logInput, eventLogFile, inProgressExists)
       } finally {

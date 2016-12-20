@@ -111,9 +111,10 @@ private object ScalaProjectConverter {
 
     val profiles = sortedSettingsToModules.zipWithIndex.map {
       case ((settings, modules), i) =>
-        new ScalaCompilerSettingsProfile("Profile " + i,
-                                         modules.toSeq,
-                                         settings)
+        new ScalaCompilerSettingsProfile(
+          "Profile " + i,
+          modules.toSeq,
+          settings)
     }
 
     val defaultSettings =

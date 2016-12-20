@@ -167,8 +167,7 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
     }
 
     // TODO split "if" condition
-    if ((c == '"' && Set(ScalaTokenTypes.tMULTILINE_STRING,
-                         ScalaTokenTypes.tINTERPOLATED_STRING_END).contains(
+    if ((c == '"' && Set(ScalaTokenTypes.tMULTILINE_STRING, ScalaTokenTypes.tINTERPOLATED_STRING_END).contains(
           elementType) && element.getTextOffset + element.getTextLength -
           offset < 4) || isInDocComment(element) &&
         (elementType.isInstanceOf[ScaladocSyntaxElementType] ||
@@ -493,9 +492,10 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
     @inline
     def replaceElement(replaceWith: String) {
       extensions.inWriteAction {
-        document.replaceString(element.getTextRange.getStartOffset,
-                               element.getTextRange.getEndOffset,
-                               replaceWith)
+        document.replaceString(
+          element.getTextRange.getStartOffset,
+          element.getTextRange.getEndOffset,
+          replaceWith)
         PsiDocumentManager.getInstance(project).commitDocument(document)
       }
     }

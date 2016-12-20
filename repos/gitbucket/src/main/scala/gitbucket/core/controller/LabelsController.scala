@@ -33,21 +33,25 @@ trait LabelsControllerBase extends ControllerBase {
 
   val labelForm = mapping(
     "labelName" -> trim(
-      label("Label name",
-            text(required, labelName, uniqueLabelName, maxlength(100)))),
+      label(
+        "Label name",
+        text(required, labelName, uniqueLabelName, maxlength(100)))),
     "labelColor" -> trim(label("Color", text(required, color)))
   )(LabelForm.apply)
 
   get("/:owner/:repository/issues/labels")(referrersOnly { repository =>
-    html.list(getLabels(repository.owner, repository.name),
-              countIssueGroupByLabels(repository.owner,
-                                      repository.name,
-                                      IssuesService.IssueSearchCondition(),
-                                      Map.empty),
-              repository,
-              hasWritePermission(repository.owner,
-                                 repository.name,
-                                 context.loginAccount))
+    html.list(
+      getLabels(repository.owner, repository.name),
+      countIssueGroupByLabels(
+        repository.owner,
+        repository.name,
+        IssuesService.IssueSearchCondition(),
+        Map.empty),
+      repository,
+      hasWritePermission(
+        repository.owner,
+        repository.name,
+        context.loginAccount))
   })
 
   ajaxGet("/:owner/:repository/issues/labels/new")(collaboratorsOnly {
@@ -57,20 +61,24 @@ trait LabelsControllerBase extends ControllerBase {
 
   ajaxPost("/:owner/:repository/issues/labels/new", labelForm)(
     collaboratorsOnly { (form, repository) =>
-      val labelId = createLabel(repository.owner,
-                                repository.name,
-                                form.labelName,
-                                form.color.substring(1))
-      html.label(getLabel(repository.owner, repository.name, labelId).get,
-                 // TODO futility
-                 countIssueGroupByLabels(repository.owner,
-                                         repository.name,
-                                         IssuesService.IssueSearchCondition(),
-                                         Map.empty),
-                 repository,
-                 hasWritePermission(repository.owner,
-                                    repository.name,
-                                    context.loginAccount))
+      val labelId = createLabel(
+        repository.owner,
+        repository.name,
+        form.labelName,
+        form.color.substring(1))
+      html.label(
+        getLabel(repository.owner, repository.name, labelId).get,
+        // TODO futility
+        countIssueGroupByLabels(
+          repository.owner,
+          repository.name,
+          IssuesService.IssueSearchCondition(),
+          Map.empty),
+        repository,
+        hasWritePermission(
+          repository.owner,
+          repository.name,
+          context.loginAccount))
     })
 
   ajaxGet("/:owner/:repository/issues/labels/:labelId/edit")(
@@ -82,24 +90,31 @@ trait LabelsControllerBase extends ControllerBase {
     })
 
   ajaxPost("/:owner/:repository/issues/labels/:labelId/edit", labelForm)(
-    collaboratorsOnly { (form, repository) =>
-      updateLabel(repository.owner,
-                  repository.name,
-                  params("labelId").toInt,
-                  form.labelName,
-                  form.color.substring(1))
-      html.label(getLabel(repository.owner,
-                          repository.name,
-                          params("labelId").toInt).get,
-                 // TODO futility
-                 countIssueGroupByLabels(repository.owner,
-                                         repository.name,
-                                         IssuesService.IssueSearchCondition(),
-                                         Map.empty),
-                 repository,
-                 hasWritePermission(repository.owner,
-                                    repository.name,
-                                    context.loginAccount))
+    collaboratorsOnly {
+      (form, repository) =>
+        updateLabel(
+          repository.owner,
+          repository.name,
+          params("labelId").toInt,
+          form.labelName,
+          form.color.substring(1))
+        html
+          .label(
+            getLabel(
+              repository.owner,
+              repository.name,
+              params("labelId").toInt).get,
+            // TODO futility
+            countIssueGroupByLabels(
+              repository.owner,
+              repository.name,
+              IssuesService.IssueSearchCondition(),
+              Map.empty),
+            repository,
+            hasWritePermission(
+              repository.owner,
+              repository.name,
+              context.loginAccount))
     })
 
   ajaxPost("/:owner/:repository/issues/labels/:labelId/delete")(

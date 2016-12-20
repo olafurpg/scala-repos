@@ -67,14 +67,15 @@ trait WikiService {
       defining(Directory.getWikiRepositoryDir(owner, repository)) { dir =>
         if (!dir.exists) {
           JGitUtil.initRepository(dir)
-          saveWikiPage(owner,
-                       repository,
-                       "Home",
-                       "Home",
-                       s"Welcome to the ${repository} wiki!!",
-                       loginAccount,
-                       "Initial Commit",
-                       None)
+          saveWikiPage(
+            owner,
+            repository,
+            "Home",
+            "Home",
+            s"Welcome to the ${repository} wiki!!",
+            loginAccount,
+            "Initial Commit",
+            None)
         }
       }
     }
@@ -91,12 +92,13 @@ trait WikiService {
           .getFileList(git, "master", ".")
           .find(_.name == pageName + ".md")
           .map { file =>
-            WikiPageInfo(file.name,
-                         StringUtil.convertFromByteArray(
-                           git.getRepository.open(file.id).getBytes),
-                         file.author,
-                         file.time,
-                         file.commitId)
+            WikiPageInfo(
+              file.name,
+              StringUtil.convertFromByteArray(
+                git.getRepository.open(file.id).getBytes),
+              file.author,
+              file.time,
+              file.commitId)
           }
       } else None
     }
@@ -155,12 +157,14 @@ trait WikiService {
           git =>
             val reader = git.getRepository.newObjectReader
             val oldTreeIter = new CanonicalTreeParser
-            oldTreeIter.reset(reader,
-                              git.getRepository.resolve(from + "^{tree}"))
+            oldTreeIter.reset(
+              reader,
+              git.getRepository.resolve(from + "^{tree}"))
 
             val newTreeIter = new CanonicalTreeParser
-            newTreeIter.reset(reader,
-                              git.getRepository.resolve(to + "^{tree}"))
+            newTreeIter.reset(
+              reader,
+              git.getRepository.resolve(to + "^{tree}"))
 
             val diffs = git.diff
               .setNewTree(oldTreeIter)
@@ -190,9 +194,10 @@ trait WikiService {
               .map { fh =>
                 fh.getChangeType match {
                   case DiffEntry.ChangeType.MODIFY => {
-                    val source = getWikiPage(owner,
-                                             repository,
-                                             fh.getNewPath.stripSuffix(".md"))
+                    val source = getWikiPage(
+                      owner,
+                      repository,
+                      fh.getNewPath.stripSuffix(".md"))
                       .map(_.content)
                       .getOrElse("")
                     val applied = PatchUtil.apply(source, patch, fh)
@@ -212,8 +217,9 @@ trait WikiService {
                   case DiffEntry.ChangeType.RENAME => {
                     val applied = PatchUtil.apply("", patch, fh)
                     if (applied != null) {
-                      Seq(RevertInfo("DELETE", fh.getOldPath, ""),
-                          RevertInfo("ADD", fh.getNewPath, applied))
+                      Seq(
+                        RevertInfo("DELETE", fh.getOldPath, ""),
+                        RevertInfo("ADD", fh.getNewPath, applied))
                     } else {
                       Seq(RevertInfo("DELETE", fh.getOldPath, ""))
                     }
@@ -232,9 +238,10 @@ trait WikiService {
               JGitUtil.processTree(git, headId) { (path, tree) =>
                 if (revertInfo.find(x => x.filePath == path).isEmpty) {
                   builder.add(
-                    JGitUtil.createDirCacheEntry(path,
-                                                 tree.getEntryFileMode,
-                                                 tree.getEntryObjectId))
+                    JGitUtil.createDirCacheEntry(
+                      path,
+                      tree.getEntryFileMode,
+                      tree.getEntryObjectId))
                 }
               }
 
@@ -243,8 +250,8 @@ trait WikiService {
                   JGitUtil.createDirCacheEntry(
                     x.filePath,
                     FileMode.REGULAR_FILE,
-                    inserter.insert(Constants.OBJ_BLOB,
-                                    x.source.getBytes("UTF-8"))))
+                    inserter
+                      .insert(Constants.OBJ_BLOB, x.source.getBytes("UTF-8"))))
               }
               builder.finish()
 
@@ -300,9 +307,10 @@ trait WikiService {
                 removed = true
               } else if (path != newPageName + ".md") {
                 builder.add(
-                  JGitUtil.createDirCacheEntry(path,
-                                               tree.getEntryFileMode,
-                                               tree.getEntryObjectId))
+                  JGitUtil.createDirCacheEntry(
+                    path,
+                    tree.getEntryFileMode,
+                    tree.getEntryObjectId))
               } else {
                 created = false
                 updated = JGitUtil
@@ -318,8 +326,8 @@ trait WikiService {
               JGitUtil.createDirCacheEntry(
                 newPageName + ".md",
                 FileMode.REGULAR_FILE,
-                inserter.insert(Constants.OBJ_BLOB,
-                                content.getBytes("UTF-8"))))
+                inserter
+                  .insert(Constants.OBJ_BLOB, content.getBytes("UTF-8"))))
             builder.finish()
             val newHeadId = JGitUtil.createNewCommit(
               git,
@@ -367,23 +375,25 @@ trait WikiService {
           JGitUtil.processTree(git, headId) { (path, tree) =>
             if (path != pageName + ".md") {
               builder.add(
-                JGitUtil.createDirCacheEntry(path,
-                                             tree.getEntryFileMode,
-                                             tree.getEntryObjectId))
+                JGitUtil.createDirCacheEntry(
+                  path,
+                  tree.getEntryFileMode,
+                  tree.getEntryObjectId))
             } else {
               removed = true
             }
           }
           if (removed) {
             builder.finish()
-            JGitUtil.createNewCommit(git,
-                                     inserter,
-                                     headId,
-                                     builder.getDirCache.writeTree(inserter),
-                                     Constants.HEAD,
-                                     committer,
-                                     mailAddress,
-                                     message)
+            JGitUtil.createNewCommit(
+              git,
+              inserter,
+              headId,
+              builder.getDirCache.writeTree(inserter),
+              Constants.HEAD,
+              committer,
+              mailAddress,
+              message)
           }
       }
     }

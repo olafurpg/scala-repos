@@ -103,10 +103,11 @@ object ScalaVersion {
       case "" => NoScalaVersion
       case "any" => AnyScalaVersion
       case vpat(majorS, minorS, revS, buildS) =>
-        SpecificScalaVersion(toInt(majorS),
-                             toInt(minorS),
-                             toInt(revS),
-                             toBuild(buildS))
+        SpecificScalaVersion(
+          toInt(majorS),
+          toInt(minorS),
+          toInt(revS),
+          toBuild(buildS))
       case _ => error(); AnyScalaVersion
     }
   }

@@ -404,19 +404,20 @@ private[spark] object BLAS extends Serializable with Logging {
     require(
       B.numCols == C.numCols,
       s"The columns of C don't match the columns of B. C: ${C.numCols}, A: ${B.numCols}")
-    nativeBLAS.dgemm(tAstr,
-                     tBstr,
-                     A.numRows,
-                     B.numCols,
-                     A.numCols,
-                     alpha,
-                     A.values,
-                     lda,
-                     B.values,
-                     ldb,
-                     beta,
-                     C.values,
-                     C.numRows)
+    nativeBLAS.dgemm(
+      tAstr,
+      tBstr,
+      A.numRows,
+      B.numCols,
+      A.numCols,
+      alpha,
+      A.values,
+      lda,
+      B.values,
+      ldb,
+      beta,
+      C.values,
+      C.numRows)
   }
 
   /**
@@ -433,8 +434,9 @@ private[spark] object BLAS extends Serializable with Logging {
     val kA: Int = A.numCols
     val kB: Int = B.numRows
 
-    require(kA == kB,
-            s"The columns of A don't match the rows of B. A: $kA, B: $kB")
+    require(
+      kA == kB,
+      s"The columns of A don't match the rows of B. A: $kA, B: $kB")
     require(
       mA == C.numRows,
       s"The rows of C don't match the rows of A. C: ${C.numRows}, A: $mA")
@@ -592,17 +594,18 @@ private[spark] object BLAS extends Serializable with Logging {
     val tStrA = if (A.isTransposed) "T" else "N"
     val mA = if (!A.isTransposed) A.numRows else A.numCols
     val nA = if (!A.isTransposed) A.numCols else A.numRows
-    nativeBLAS.dgemv(tStrA,
-                     mA,
-                     nA,
-                     alpha,
-                     A.values,
-                     mA,
-                     x.values,
-                     1,
-                     beta,
-                     y.values,
-                     1)
+    nativeBLAS.dgemv(
+      tStrA,
+      mA,
+      nA,
+      alpha,
+      A.values,
+      mA,
+      x.values,
+      1,
+      beta,
+      y.values,
+      1)
   }
 
   /**

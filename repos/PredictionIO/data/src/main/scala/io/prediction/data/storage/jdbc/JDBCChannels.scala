@@ -64,8 +64,9 @@ class JDBCChannels(client: String, config: StorageClientConfig, prefix: String)
   }
 
   def resultToChannel(rs: WrappedResultSet): Channel = {
-    Channel(id = rs.int("id"),
-            name = rs.string("name"),
-            appid = rs.int("appid"))
+    Channel(
+      id = rs.int("id"),
+      name = rs.string("name"),
+      appid = rs.int("appid"))
   }
 }

@@ -59,38 +59,40 @@ private[linker] object LongImpl {
   final val compareTo = "compareTo__jl_Long__I"
   final val compareToO = "compareTo__O__I"
 
-  private val OperatorMethods = Set(UNARY_-,
-                                    UNARY_~,
-                                    this.+,
-                                    this.-,
-                                    *,
-                                    /,
-                                    %,
-                                    |,
-                                    &,
-                                    ^,
-                                    <<,
-                                    >>>,
-                                    >>,
-                                    ===,
-                                    !==,
-                                    <,
-                                    <=,
-                                    >,
-                                    >=,
-                                    toInt,
-                                    toDouble)
+  private val OperatorMethods = Set(
+    UNARY_-,
+    UNARY_~,
+    this.+,
+    this.-,
+    *,
+    /,
+    %,
+    |,
+    &,
+    ^,
+    <<,
+    >>>,
+    >>,
+    ===,
+    !==,
+    <,
+    <=,
+    >,
+    >=,
+    toInt,
+    toDouble)
 
-  private val BoxedLongMethods = Set(byteValue,
-                                     shortValue,
-                                     intValue,
-                                     longValue,
-                                     floatValue,
-                                     doubleValue,
-                                     equals_,
-                                     hashCode_,
-                                     compareTo,
-                                     compareToO)
+  private val BoxedLongMethods = Set(
+    byteValue,
+    shortValue,
+    intValue,
+    longValue,
+    floatValue,
+    doubleValue,
+    equals_,
+    hashCode_,
+    compareTo,
+    compareToO)
 
   val AllMethods = OperatorMethods ++ BoxedLongMethods
 

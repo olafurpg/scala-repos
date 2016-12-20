@@ -23,8 +23,9 @@ final case class Envelope private (val message: Any, val sender: ActorRef)
 object Envelope {
   def apply(message: Any, sender: ActorRef, system: ActorSystem): Envelope = {
     if (message == null) throw new InvalidMessageException("Message is null")
-    new Envelope(message,
-                 if (sender ne Actor.noSender) sender else system.deadLetters)
+    new Envelope(
+      message,
+      if (sender ne Actor.noSender) sender else system.deadLetters)
   }
 }
 
@@ -372,8 +373,9 @@ abstract class MessageDispatcherConfigurator(
             config.getConfig("thread-pool-executor"),
             prerequisites)
         case fqcn ⇒
-          val args = List(classOf[Config] -> config,
-                          classOf[DispatcherPrerequisites] -> prerequisites)
+          val args = List(
+            classOf[Config] -> config,
+            classOf[DispatcherPrerequisites] -> prerequisites)
           prerequisites.dynamicAccess
             .createInstanceFor[ExecutorServiceConfigurator](fqcn, args)
             .recover({
@@ -381,10 +383,11 @@ abstract class MessageDispatcherConfigurator(
                 throw new IllegalArgumentException(
                   ("""Cannot instantiate ExecutorServiceConfigurator ("executor = [%s]"), defined in [%s],
                 make sure it has an accessible constructor with a [%s,%s] signature""")
-                    .format(fqcn,
-                            config.getString("id"),
-                            classOf[Config],
-                            classOf[DispatcherPrerequisites]),
+                    .format(
+                      fqcn,
+                      config.getString("id"),
+                      classOf[Config],
+                      classOf[DispatcherPrerequisites]),
                   exception)
             })
             .get
@@ -433,12 +436,14 @@ class ThreadPoolExecutorConfigurator(config: Config,
 
     if (config.getString("fixed-pool-size") == "off")
       builder
-        .setCorePoolSizeFromFactor(config getInt "core-pool-size-min",
-                                   config getDouble "core-pool-size-factor",
-                                   config getInt "core-pool-size-max")
-        .setMaxPoolSizeFromFactor(config getInt "max-pool-size-min",
-                                  config getDouble "max-pool-size-factor",
-                                  config getInt "max-pool-size-max")
+        .setCorePoolSizeFromFactor(
+          config getInt "core-pool-size-min",
+          config getDouble "core-pool-size-factor",
+          config getInt "core-pool-size-max")
+        .setMaxPoolSizeFromFactor(
+          config getInt "max-pool-size-min",
+          config getDouble "max-pool-size-factor",
+          config getInt "max-pool-size-max")
     else builder.setFixedPoolSize(config.getInt("fixed-pool-size"))
   }
 
@@ -458,18 +463,20 @@ object ForkJoinExecutorConfigurator {
       threadFactory: ForkJoinPool.ForkJoinWorkerThreadFactory,
       unhandledExceptionHandler: Thread.UncaughtExceptionHandler,
       asyncMode: Boolean)
-      extends ForkJoinPool(parallelism,
-                           threadFactory,
-                           unhandledExceptionHandler,
-                           asyncMode)
+      extends ForkJoinPool(
+        parallelism,
+        threadFactory,
+        unhandledExceptionHandler,
+        asyncMode)
       with LoadMetrics {
     def this(parallelism: Int,
              threadFactory: ForkJoinPool.ForkJoinWorkerThreadFactory,
              unhandledExceptionHandler: Thread.UncaughtExceptionHandler) =
-      this(parallelism,
-           threadFactory,
-           unhandledExceptionHandler,
-           asyncMode = true)
+      this(
+        parallelism,
+        threadFactory,
+        unhandledExceptionHandler,
+        asyncMode = true)
 
     override def execute(r: Runnable): Unit =
       if (r ne null)
@@ -526,10 +533,11 @@ class ForkJoinExecutorConfigurator(config: Config,
              parallelism: Int) =
       this(threadFactory, parallelism, asyncMode = true)
     def createExecutorService: ExecutorService =
-      new AkkaForkJoinPool(parallelism,
-                           threadFactory,
-                           MonitorableThreadFactory.doNothing,
-                           asyncMode)
+      new AkkaForkJoinPool(
+        parallelism,
+        threadFactory,
+        MonitorableThreadFactory.doNothing,
+        asyncMode)
   }
 
   final def createExecutorServiceFactory(
@@ -553,9 +561,10 @@ class ForkJoinExecutorConfigurator(config: Config,
 
     new ForkJoinExecutorServiceFactory(
       validate(tf),
-      ThreadPoolConfig.scaledPoolSize(config.getInt("parallelism-min"),
-                                      config.getDouble("parallelism-factor"),
-                                      config.getInt("parallelism-max")),
+      ThreadPoolConfig.scaledPoolSize(
+        config.getInt("parallelism-min"),
+        config.getDouble("parallelism-factor"),
+        config.getInt("parallelism-max")),
       asyncMode)
   }
 }

@@ -21,9 +21,10 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
   def whileM[G[_], A](p: F[Boolean], body: => F[A])(
       implicit G: MonadPlus[G]): F[G[A]] = {
     lazy val f = body
-    ifM(p,
-        bind(f)(x => map(whileM(p, f))(xs => G.plus(G.point(x), xs))),
-        point(G.empty))
+    ifM(
+      p,
+      bind(f)(x => map(whileM(p, f))(xs => G.plus(G.point(x), xs))),
+      point(G.empty))
   }
 
   /**

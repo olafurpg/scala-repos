@@ -468,18 +468,19 @@ object ScalaBaseType {
   implicit val optionDiscType = new ErasedScalaBaseType[OptionDisc, Int]
 
   private[this] val all: Map[ClassTag[_], ScalaBaseType[_]] =
-    Seq(booleanType,
-        bigDecimalType,
-        byteType,
-        charType,
-        doubleType,
-        floatType,
-        intType,
-        longType,
-        nullType,
-        shortType,
-        stringType,
-        optionDiscType).map(s => (s.classTag, s)).toMap
+    Seq(
+      booleanType,
+      bigDecimalType,
+      byteType,
+      charType,
+      doubleType,
+      floatType,
+      intType,
+      longType,
+      nullType,
+      shortType,
+      stringType,
+      optionDiscType).map(s => (s.classTag, s)).toMap
 
   def apply[T](implicit classTag: ClassTag[T],
                ordering: scala.math.Ordering[T] = null): ScalaBaseType[T] =

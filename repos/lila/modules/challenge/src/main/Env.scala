@@ -31,26 +31,29 @@ final class Env(config: Config,
   private val socketHub =
     system.actorOf(Props(new lila.socket.SocketHubActor.Default[Socket] {
       def mkActor(challengeId: String) =
-        new Socket(challengeId = challengeId,
-                   history = new lila.socket.History(ttl = HistoryMessageTtl),
-                   getChallenge = repo.byId,
-                   uidTimeout = UidTimeout,
-                   socketTimeout = SocketTimeout)
+        new Socket(
+          challengeId = challengeId,
+          history = new lila.socket.History(ttl = HistoryMessageTtl),
+          getChallenge = repo.byId,
+          uidTimeout = UidTimeout,
+          socketTimeout = SocketTimeout)
     }), name = SocketName)
 
   def version(challengeId: Challenge.ID): Fu[Int] =
     socketHub ? Ask(challengeId, GetVersion) mapTo manifest[Int]
 
-  lazy val socketHandler = new SocketHandler(hub = hub,
-                                             socketHub = socketHub,
-                                             pingChallenge = api.ping)
+  lazy val socketHandler = new SocketHandler(
+    hub = hub,
+    socketHub = socketHub,
+    pingChallenge = api.ping)
 
-  lazy val api = new ChallengeApi(repo = repo,
-                                  joiner = new Joiner(onStart = onStart),
-                                  jsonView = jsonView,
-                                  socketHub = socketHub,
-                                  userRegister = hub.actor.userRegister,
-                                  lilaBus = system.lilaBus)
+  lazy val api = new ChallengeApi(
+    repo = repo,
+    joiner = new Joiner(onStart = onStart),
+    jsonView = jsonView,
+    socketHub = socketHub,
+    userRegister = hub.actor.userRegister,
+    lilaBus = system.lilaBus)
 
   private lazy val repo =
     new ChallengeRepo(coll = db(CollectionChallenge), maxPerUser = MaxPerUser)

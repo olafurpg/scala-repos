@@ -30,14 +30,16 @@ class FastFutureSpec extends FreeSpec with Matchers {
         }
       }
       "Failure -> Success" in {
-        test(Failure(TheException),
-             _.transformWith(t ⇒ FastFuture.successful(23))) {
+        test(
+          Failure(TheException),
+          _.transformWith(t ⇒ FastFuture.successful(23))) {
           _ shouldEqual Success(23)
         }
       }
       "Failure -> Failure" in {
-        test(Failure(TheException),
-             _.transformWith(_ ⇒ FastFuture.failed(TheException))) {
+        test(
+          Failure(TheException),
+          _.transformWith(_ ⇒ FastFuture.failed(TheException))) {
           _ shouldEqual Failure(TheException)
         }
       }
@@ -54,8 +56,9 @@ class FastFutureSpec extends FreeSpec with Matchers {
     }
     "transformWith(A => Future[B], Throwable => Future[B])" - {
       "Success -> Success" in {
-        test(Success(23),
-             _.transformWith(t ⇒ FastFuture.successful(t + 19), neverCalled)) {
+        test(
+          Success(23),
+          _.transformWith(t ⇒ FastFuture.successful(t + 19), neverCalled)) {
           _ shouldEqual Success(42)
         }
       }
@@ -67,8 +70,9 @@ class FastFutureSpec extends FreeSpec with Matchers {
         }
       }
       "Failure -> Success" in {
-        test(Failure(TheException),
-             _.transformWith(neverCalled, t ⇒ FastFuture.successful(23))) {
+        test(
+          Failure(TheException),
+          _.transformWith(neverCalled, t ⇒ FastFuture.successful(23))) {
           _ shouldEqual Success(23)
         }
       }

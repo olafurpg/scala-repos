@@ -11,12 +11,13 @@ object NettyHeadersWrapperSpec extends Specification {
 
   val headers: Headers = {
     val nettyHeaders = new DefaultHttpHeaders()
-    val headersToAdd = Seq("a" -> "a1",
-                           "a" -> "a2",
-                           "b" -> "b1",
-                           "b" -> "b2",
-                           "B" -> "b3",
-                           "c" -> "c1")
+    val headersToAdd = Seq(
+      "a" -> "a1",
+      "a" -> "a2",
+      "b" -> "b1",
+      "b" -> "b2",
+      "B" -> "b3",
+      "c" -> "c1")
     for ((k, v) <- headersToAdd) nettyHeaders.add(k, v)
     new NettyHeadersWrapper(nettyHeaders)
   }
@@ -96,32 +97,35 @@ object NettyHeadersWrapperSpec extends Specification {
     }
 
     "equal other Headers by case insensitive" in {
-      val other = Headers("A" -> "a1",
-                          "a" -> "a2",
-                          "b" -> "b1",
-                          "b" -> "b2",
-                          "B" -> "b3",
-                          "C" -> "c1")
+      val other = Headers(
+        "A" -> "a1",
+        "a" -> "a2",
+        "b" -> "b1",
+        "b" -> "b2",
+        "B" -> "b3",
+        "C" -> "c1")
       (headers must_== other) and (headers.## must_== other.##)
     }
 
     "equal other Headers with same relative order" in {
-      val other = Headers("A" -> "a1",
-                          "a" -> "a2",
-                          "b" -> "b1",
-                          "b" -> "b2",
-                          "B" -> "b3",
-                          "c" -> "c1")
+      val other = Headers(
+        "A" -> "a1",
+        "a" -> "a2",
+        "b" -> "b1",
+        "b" -> "b2",
+        "B" -> "b3",
+        "c" -> "c1")
       (headers must_== other) and (headers.## must_== other.##)
     }
 
     "not equal other Headers with different relative order" in {
-      headers must_!= Headers("a" -> "a2",
-                              "A" -> "a1",
-                              "b" -> "b1",
-                              "b" -> "b2",
-                              "B" -> "b3",
-                              "c" -> "C1")
+      headers must_!= Headers(
+        "a" -> "a2",
+        "A" -> "a1",
+        "b" -> "b1",
+        "b" -> "b2",
+        "B" -> "b3",
+        "c" -> "C1")
     }
   }
 }

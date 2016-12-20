@@ -86,10 +86,11 @@ class FormattedStringParserTest extends SimpleTestCase {
 
     assertMatches(parse("%dA%sB%c", 1, 2, 3)) {
       case Injection(ElementText("1"), Some(Specifier(Span(_, 1, 3), "%d"))) :: Text(
-            "A") :: Injection(ElementText("2"),
-                              Some(Specifier(Span(_, 4, 6), "%s"))) :: Text(
-            "B") :: Injection(ElementText("3"),
-                              Some(Specifier(Span(_, 7, 9), "%c"))) :: Nil =>
+            "A") :: Injection(
+            ElementText("2"),
+            Some(Specifier(Span(_, 4, 6), "%s"))) :: Text("B") :: Injection(
+            ElementText("3"),
+            Some(Specifier(Span(_, 7, 9), "%c"))) :: Nil =>
     }
   }
 

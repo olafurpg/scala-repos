@@ -71,13 +71,13 @@ object MongoCache {
                            f: => Fu[V],
                            timeToLive: FiniteDuration,
                            timeToLiveMongo: Option[FiniteDuration] = None) =
-      new MongoCache[Boolean, V](prefix = prefix,
-                                 expiresAt =
-                                   expiresAt(timeToLiveMongo | timeToLive),
-                                 cache = LruCache(timeToLive = timeToLive),
-                                 coll = coll,
-                                 f = _ => f,
-                                 keyToString = _.toString)
+      new MongoCache[Boolean, V](
+        prefix = prefix,
+        expiresAt = expiresAt(timeToLiveMongo | timeToLive),
+        cache = LruCache(timeToLive = timeToLive),
+        coll = coll,
+        f = _ => f,
+        keyToString = _.toString)
   }
 
   def apply(coll: Coll) = new Builder(coll)

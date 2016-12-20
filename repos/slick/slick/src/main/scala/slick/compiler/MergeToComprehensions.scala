@@ -91,11 +91,12 @@ class MergeToComprehensions extends Phase {
           (c2, replacements1)
 
         case n =>
-          mergeCommon(mergeTakeDrop _,
-                      mergeSortBy _,
-                      n,
-                      buildBase,
-                      allowFilter = false)
+          mergeCommon(
+            mergeTakeDrop _,
+            mergeSortBy _,
+            n,
+            buildBase,
+            allowFilter = false)
       }
 
     /** Merge Bind, Filter (as WHERE or HAVING depending on presence of GROUP BY), CollectionCast,
@@ -122,8 +123,9 @@ class MergeToComprehensions extends Phase {
             if (c1.distinct.isDefined || c1.having.isDefined)
               toSubquery(c1, replacements1)
             else (c1, replacements1)
-          logger.debug("Merging Distinct into Comprehension:",
-                       Ellipsis(n, List(0)))
+          logger.debug(
+            "Merging Distinct into Comprehension:",
+            Ellipsis(n, List(0)))
           val o2 = applyReplacements(o1, replacements1a, c1a)
           val c2 =
             c1a.copy(distinct = Some(
@@ -141,8 +143,9 @@ class MergeToComprehensions extends Phase {
       n match {
         case Bind(s1, GroupBy(s2, f1, b1, ts1), Pure(str1, ts2)) =>
           val (c1, replacements1) = mergeFilterWhere(f1, true)
-          logger.debug("Merging GroupBy into Comprehension:",
-                       Ellipsis(n, List(0, 0)))
+          logger.debug(
+            "Merging GroupBy into Comprehension:",
+            Ellipsis(n, List(0, 0)))
           val (c1a, replacements1a, b2a) = {
             val b2 = applyReplacements(b1, replacements1, c1)
             // Check whether groupBy keys containing bind variables are returned for further use
@@ -186,8 +189,9 @@ class MergeToComprehensions extends Phase {
               rest.foldLeft(b2a) { case (n, s) => n.select(s) }.infer()
           }
           val c2 = c1a
-            .copy(groupBy = Some(ProductNode(ConstArray(b2a)).flatten),
-                  select = Pure(str2, ts2))
+            .copy(
+              groupBy = Some(ProductNode(ConstArray(b2a)).flatten),
+              select = Pure(str2, ts2))
             .infer()
           logger.debug("Merged GroupBy into Comprehension:", c2)
           val StructNode(defs2) = str2
@@ -198,8 +202,9 @@ class MergeToComprehensions extends Phase {
 
         case n @ Pure(Aggregate(s1, f1, str1), ts) =>
           val (c1, replacements1) = mergeFilterWhere(f1, true)
-          logger.debug("Merging Aggregate source into Comprehension:",
-                       Ellipsis(n, List(0, 0)))
+          logger.debug(
+            "Merging Aggregate source into Comprehension:",
+            Ellipsis(n, List(0, 0)))
           val str2 = applyReplacements(str1, replacements1, c1)
           val c2 = c1.copy(select = Pure(str2, ts)).infer()
           logger.debug("Merged Aggregate source into Comprehension:", c2)
@@ -405,8 +410,9 @@ class MergeToComprehensions extends Phase {
       case Bind(s1, f1, Pure(StructNode(defs1), ts1))
           if !f1.isInstanceOf[GroupBy] =>
         val (c1, replacements1) = rec(f1, true)
-        logger.debug("Merging Bind into Comprehension as 'select':",
-                     Ellipsis(n, List(0)))
+        logger.debug(
+          "Merging Bind into Comprehension as 'select':",
+          Ellipsis(n, List(0)))
         val defs2 = defs1.map {
           case (s, d) => (s, applyReplacements(d, replacements1, c1))
         }

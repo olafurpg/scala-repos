@@ -52,19 +52,20 @@ case class AhcWSClient(config: AsyncHttpClientConfig)(
   def close(): Unit = asyncHttpClient.close()
 
   def url(url: String): WSRequest =
-    AhcWSRequest(this,
-                 url,
-                 "GET",
-                 EmptyBody,
-                 Map(),
-                 Map(),
-                 None,
-                 None,
-                 None,
-                 None,
-                 None,
-                 None,
-                 None)
+    AhcWSRequest(
+      this,
+      url,
+      "GET",
+      EmptyBody,
+      Map(),
+      Map(),
+      None,
+      None,
+      None,
+      None,
+      None,
+      None,
+      None)
 }
 
 object AhcWSClient {
@@ -394,8 +395,9 @@ case class AhcWSRequest(
     val proxyBuilder =
       new AHCProxyServer.Builder(wsProxyServer.host, wsProxyServer.port)
     if (wsProxyServer.principal.isDefined) {
-      val realmBuilder = new Realm.Builder(wsProxyServer.principal.orNull,
-                                           wsProxyServer.password.orNull)
+      val realmBuilder = new Realm.Builder(
+        wsProxyServer.principal.orNull,
+        wsProxyServer.password.orNull)
       val scheme: Realm.AuthScheme = wsProxyServer.protocol
         .getOrElse("http")
         .toLowerCase(java.util.Locale.ENGLISH) match {

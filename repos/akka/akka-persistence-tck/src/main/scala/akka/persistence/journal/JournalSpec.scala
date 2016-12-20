@@ -74,13 +74,14 @@ abstract class JournalSpec(config: Config)
                       deleted: Boolean = false,
                       confirms: Seq[String] = Nil): ReplayedMessage =
     ReplayedMessage(
-      PersistentImpl(s"a-${snr}",
-                     snr,
-                     pid,
-                     "",
-                     deleted,
-                     Actor.noSender,
-                     writerUuid))
+      PersistentImpl(
+        s"a-${snr}",
+        snr,
+        pid,
+        "",
+        deleted,
+        Actor.noSender,
+        writerUuid))
 
   def writeMessages(fromSnr: Int,
                     toSnr: Int,
@@ -89,11 +90,12 @@ abstract class JournalSpec(config: Config)
                     writerUuid: String): Unit = {
 
     def persistentRepr(sequenceNr: Long) =
-      PersistentRepr(payload = s"a-$sequenceNr",
-                     sequenceNr = sequenceNr,
-                     persistenceId = pid,
-                     sender = sender,
-                     writerUuid = writerUuid)
+      PersistentRepr(
+        payload = s"a-$sequenceNr",
+        sequenceNr = sequenceNr,
+        persistenceId = pid,
+        sender = sender,
+        writerUuid = writerUuid)
 
     val msgs =
       if (supportsAtomicPersistAllOfSeveralEvents) {
@@ -125,22 +127,24 @@ abstract class JournalSpec(config: Config)
 
   "A journal" must {
     "replay all messages" in {
-      journal ! ReplayMessages(1,
-                               Long.MaxValue,
-                               Long.MaxValue,
-                               pid,
-                               receiverProbe.ref)
+      journal ! ReplayMessages(
+        1,
+        Long.MaxValue,
+        Long.MaxValue,
+        pid,
+        receiverProbe.ref)
       1 to 5 foreach { i ⇒
         receiverProbe.expectMsg(replayedMessage(i))
       }
       receiverProbe.expectMsg(RecoverySuccess(highestSequenceNr = 5L))
     }
     "replay messages using a lower sequence number bound" in {
-      journal ! ReplayMessages(3,
-                               Long.MaxValue,
-                               Long.MaxValue,
-                               pid,
-                               receiverProbe.ref)
+      journal ! ReplayMessages(
+        3,
+        Long.MaxValue,
+        Long.MaxValue,
+        pid,
+        receiverProbe.ref)
       3 to 5 foreach { i ⇒
         receiverProbe.expectMsg(replayedMessage(i))
       }
@@ -197,11 +201,12 @@ abstract class JournalSpec(config: Config)
       receiverProbe.expectMsg(RecoverySuccess(highestSequenceNr = 5L))
     }
     "not replay messages if the persistent actor has not yet written messages" in {
-      journal ! ReplayMessages(0,
-                               Long.MaxValue,
-                               Long.MaxValue,
-                               "non-existing-pid",
-                               receiverProbe.ref)
+      journal ! ReplayMessages(
+        0,
+        Long.MaxValue,
+        Long.MaxValue,
+        "non-existing-pid",
+        receiverProbe.ref)
       receiverProbe.expectMsg(RecoverySuccess(highestSequenceNr = 0L))
     }
     "not replay permanently deleted messages (range deletion)" in {
@@ -214,11 +219,12 @@ abstract class JournalSpec(config: Config)
       sub.expectMsg(cmd)
       receiverProbe2.expectMsg(DeleteMessagesSuccess(cmd.toSequenceNr))
 
-      journal ! ReplayMessages(1,
-                               Long.MaxValue,
-                               Long.MaxValue,
-                               pid,
-                               receiverProbe.ref)
+      journal ! ReplayMessages(
+        1,
+        Long.MaxValue,
+        Long.MaxValue,
+        pid,
+        receiverProbe.ref)
       List(4, 5) foreach { i ⇒
         receiverProbe.expectMsg(replayedMessage(i))
       }
@@ -227,11 +233,12 @@ abstract class JournalSpec(config: Config)
     }
 
     "not reset highestSequenceNr after message deletion" in {
-      journal ! ReplayMessages(0,
-                               Long.MaxValue,
-                               Long.MaxValue,
-                               pid,
-                               receiverProbe.ref)
+      journal ! ReplayMessages(
+        0,
+        Long.MaxValue,
+        Long.MaxValue,
+        pid,
+        receiverProbe.ref)
       1 to 5 foreach { i ⇒
         receiverProbe.expectMsg(replayedMessage(i))
       }
@@ -240,11 +247,12 @@ abstract class JournalSpec(config: Config)
       journal ! DeleteMessagesTo(pid, 3L, receiverProbe.ref)
       receiverProbe.expectMsg(DeleteMessagesSuccess(3L))
 
-      journal ! ReplayMessages(0,
-                               Long.MaxValue,
-                               Long.MaxValue,
-                               pid,
-                               receiverProbe.ref)
+      journal ! ReplayMessages(
+        0,
+        Long.MaxValue,
+        Long.MaxValue,
+        pid,
+        receiverProbe.ref)
       4 to 5 foreach { i ⇒
         receiverProbe.expectMsg(replayedMessage(i))
       }
@@ -252,11 +260,12 @@ abstract class JournalSpec(config: Config)
     }
 
     "not reset highestSequenceNr after journal cleanup" in {
-      journal ! ReplayMessages(0,
-                               Long.MaxValue,
-                               Long.MaxValue,
-                               pid,
-                               receiverProbe.ref)
+      journal ! ReplayMessages(
+        0,
+        Long.MaxValue,
+        Long.MaxValue,
+        pid,
+        receiverProbe.ref)
       1 to 5 foreach { i ⇒
         receiverProbe.expectMsg(replayedMessage(i))
       }
@@ -265,11 +274,12 @@ abstract class JournalSpec(config: Config)
       journal ! DeleteMessagesTo(pid, Long.MaxValue, receiverProbe.ref)
       receiverProbe.expectMsg(DeleteMessagesSuccess(Long.MaxValue))
 
-      journal ! ReplayMessages(0,
-                               Long.MaxValue,
-                               Long.MaxValue,
-                               pid,
-                               receiverProbe.ref)
+      journal ! ReplayMessages(
+        0,
+        Long.MaxValue,
+        Long.MaxValue,
+        pid,
+        receiverProbe.ref)
       receiverProbe.expectMsg(RecoverySuccess(highestSequenceNr = 5L))
     }
   }
@@ -286,11 +296,12 @@ abstract class JournalSpec(config: Config)
         val msgs = (6 to 8).map { i ⇒
           val event = if (i == 7) notSerializableEvent else s"b-$i"
           AtomicWrite(
-            PersistentRepr(payload = event,
-                           sequenceNr = i,
-                           persistenceId = pid,
-                           sender = Actor.noSender,
-                           writerUuid = writerUuid))
+            PersistentRepr(
+              payload = event,
+              sequenceNr = i,
+              persistenceId = pid,
+              sender = Actor.noSender,
+              writerUuid = writerUuid))
         }
 
         val probe = TestProbe()
@@ -300,37 +311,43 @@ abstract class JournalSpec(config: Config)
         val Pid = pid
         val WriterUuid = writerUuid
         probe.expectMsgPF() {
-          case WriteMessageSuccess(PersistentImpl(payload,
-                                                  6L,
-                                                  Pid,
-                                                  _,
-                                                  _,
-                                                  Actor.noSender,
-                                                  WriterUuid),
-                                   _) ⇒
+          case WriteMessageSuccess(
+              PersistentImpl(
+                payload,
+                6L,
+                Pid,
+                _,
+                _,
+                Actor.noSender,
+                WriterUuid),
+              _) ⇒
             payload should be(s"b-6")
         }
         probe.expectMsgPF() {
-          case WriteMessageRejected(PersistentImpl(payload,
-                                                   7L,
-                                                   Pid,
-                                                   _,
-                                                   _,
-                                                   Actor.noSender,
-                                                   WriterUuid),
-                                    _,
-                                    _) ⇒
+          case WriteMessageRejected(
+              PersistentImpl(
+                payload,
+                7L,
+                Pid,
+                _,
+                _,
+                Actor.noSender,
+                WriterUuid),
+              _,
+              _) ⇒
             payload should be(notSerializableEvent)
         }
         probe.expectMsgPF() {
-          case WriteMessageSuccess(PersistentImpl(payload,
-                                                  8L,
-                                                  Pid,
-                                                  _,
-                                                  _,
-                                                  Actor.noSender,
-                                                  WriterUuid),
-                                   _) ⇒
+          case WriteMessageSuccess(
+              PersistentImpl(
+                payload,
+                8L,
+                Pid,
+                _,
+                _,
+                Actor.noSender,
+                WriterUuid),
+              _) ⇒
             payload should be(s"b-8")
         }
       }

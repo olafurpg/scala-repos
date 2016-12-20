@@ -220,9 +220,10 @@ case class Window(windowExpression: Seq[NamedExpression],
             ordinal,
             child.output,
             (expressions, schema) =>
-              newMutableProjection(expressions,
-                                   schema,
-                                   subexpressionEliminationEnabled))
+              newMutableProjection(
+                expressions,
+                schema,
+                subexpressionEliminationEnabled))
 
         // Create the factory
         val factory = key match {
@@ -235,9 +236,10 @@ case class Window(windowExpression: Seq[NamedExpression],
                 functions,
                 child.output,
                 (expressions, schema) =>
-                  newMutableProjection(expressions,
-                                       schema,
-                                       subexpressionEliminationEnabled),
+                  newMutableProjection(
+                    expressions,
+                    schema,
+                    subexpressionEliminationEnabled),
                 offset)
 
           // Growing Frame.
@@ -376,18 +378,20 @@ case class Window(windowExpression: Seq[NamedExpression],
                   1024,
                   SparkEnv.get.memoryManager.pageSizeBytes)
                 rows.foreach { r =>
-                  sorter.insertRecord(r.getBaseObject,
-                                      r.getBaseOffset,
-                                      r.getSizeInBytes,
-                                      0)
+                  sorter.insertRecord(
+                    r.getBaseObject,
+                    r.getBaseOffset,
+                    r.getSizeInBytes,
+                    0)
                 }
                 rows.clear()
               }
             } else {
-              sorter.insertRecord(nextRow.getBaseObject,
-                                  nextRow.getBaseOffset,
-                                  nextRow.getSizeInBytes,
-                                  0)
+              sorter.insertRecord(
+                nextRow.getBaseObject,
+                nextRow.getBaseOffset,
+                nextRow.getSizeInBytes,
+                0)
             }
             fetchNextRow()
           }
@@ -981,18 +985,20 @@ private[execution] object AggregateProcessor {
     val initialProjection =
       newMutableProjection(initialValues, Seq(SizeBasedWindowFunction.n))()
     val updateProjection =
-      newMutableProjection(updateExpressions,
-                           aggBufferAttributes ++ inputAttributes)()
+      newMutableProjection(
+        updateExpressions,
+        aggBufferAttributes ++ inputAttributes)()
     val evaluateProjection =
       newMutableProjection(evaluateExpressions, aggBufferAttributes)()
 
     // Create the processor
-    new AggregateProcessor(aggBufferAttributes.toArray,
-                           initialProjection,
-                           updateProjection,
-                           evaluateProjection,
-                           imperatives.toArray,
-                           trackPartitionSize)
+    new AggregateProcessor(
+      aggBufferAttributes.toArray,
+      initialProjection,
+      updateProjection,
+      evaluateProjection,
+      imperatives.toArray,
+      trackPartitionSize)
   }
 }
 

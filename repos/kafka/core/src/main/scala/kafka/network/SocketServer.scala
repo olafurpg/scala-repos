@@ -104,15 +104,16 @@ class SocketServer(val config: KafkaConfig,
         val processorEndIndex = processorBeginIndex + numProcessorThreads
 
         for (i <- processorBeginIndex until processorEndIndex) {
-          processors(i) = new Processor(i,
-                                        time,
-                                        maxRequestSize,
-                                        requestChannel,
-                                        connectionQuotas,
-                                        connectionsMaxIdleMs,
-                                        protocol,
-                                        config.values,
-                                        metrics)
+          processors(i) = new Processor(
+            i,
+            time,
+            maxRequestSize,
+            requestChannel,
+            connectionQuotas,
+            connectionsMaxIdleMs,
+            protocol,
+            config.values,
+            metrics)
         }
 
         val acceptor = new Acceptor(
@@ -124,10 +125,11 @@ class SocketServer(val config: KafkaConfig,
           connectionQuotas)
         acceptors.put(endpoint, acceptor)
         Utils
-          .newThread("kafka-socket-acceptor-%s-%d".format(protocol.toString,
-                                                          endpoint.port),
-                     acceptor,
-                     false)
+          .newThread(
+            "kafka-socket-acceptor-%s-%d"
+              .format(protocol.toString, endpoint.port),
+            acceptor,
+            false)
           .start()
         acceptor.awaitStartup()
 
@@ -266,12 +268,11 @@ private[kafka] class Acceptor(val endPoint: EndPoint,
   this.synchronized {
     processors.foreach { processor =>
       Utils
-        .newThread("kafka-network-thread-%d-%s-%d".format(
-                     brokerId,
-                     endPoint.protocolType.toString,
-                     processor.id),
-                   processor,
-                   false)
+        .newThread(
+          "kafka-network-thread-%d-%s-%d"
+            .format(brokerId, endPoint.protocolType.toString, processor.id),
+          processor,
+          false)
         .start()
     }
   }
@@ -364,12 +365,13 @@ private[kafka] class Acceptor(val endPoint: EndPoint,
 
       debug(
         "Accepted connection from %s on %s. sendBufferSize [actual|requested]: [%d|%d] recvBufferSize [actual|requested]: [%d|%d]"
-          .format(socketChannel.socket.getInetAddress,
-                  socketChannel.socket.getLocalSocketAddress,
-                  socketChannel.socket.getSendBufferSize,
-                  sendBufferSize,
-                  socketChannel.socket.getReceiveBufferSize,
-                  recvBufferSize))
+          .format(
+            socketChannel.socket.getInetAddress,
+            socketChannel.socket.getLocalSocketAddress,
+            socketChannel.socket.getSendBufferSize,
+            sendBufferSize,
+            socketChannel.socket.getReceiveBufferSize,
+            recvBufferSize))
 
       processor.accept(socketChannel)
     } catch {
@@ -444,14 +446,15 @@ private[kafka] class Processor(val id: Int,
     }
   }, metricTags.asScala)
 
-  private val selector = new KSelector(maxRequestSize,
-                                       connectionsMaxIdleMs,
-                                       metrics,
-                                       time,
-                                       "socket-server",
-                                       metricTags,
-                                       false,
-                                       channelBuilder)
+  private val selector = new KSelector(
+    maxRequestSize,
+    connectionsMaxIdleMs,
+    metrics,
+    time,
+    "socket-server",
+    metricTags,
+    false,
+    channelBuilder)
 
   override def run() {
     startupComplete()
@@ -477,15 +480,17 @@ private[kafka] class Processor(val id: Int,
           try {
             val channel = selector.channel(receive.source)
             val session = RequestChannel.Session(
-              new KafkaPrincipal(KafkaPrincipal.USER_TYPE,
-                                 channel.principal.getName),
+              new KafkaPrincipal(
+                KafkaPrincipal.USER_TYPE,
+                channel.principal.getName),
               channel.socketAddress)
-            val req = RequestChannel.Request(processor = id,
-                                             connectionId = receive.source,
-                                             session = session,
-                                             buffer = receive.payload,
-                                             startTimeMs = time.milliseconds,
-                                             securityProtocol = protocol)
+            val req = RequestChannel.Request(
+              processor = id,
+              connectionId = receive.source,
+              session = session,
+              buffer = receive.payload,
+              startTimeMs = time.milliseconds,
+              securityProtocol = protocol)
             requestChannel.sendRequest(req)
             selector.mute(receive.source)
           } catch {
@@ -596,9 +601,10 @@ private[kafka] class Processor(val id: Int,
         case NonFatal(e) =>
           // need to close the channel here to avoid socket leak.
           close(channel)
-          error("Processor " + id +
-                  " closed connection from " + channel.getRemoteAddress,
-                e)
+          error(
+            "Processor " + id +
+              " closed connection from " + channel.getRemoteAddress,
+            e)
       }
     }
   }

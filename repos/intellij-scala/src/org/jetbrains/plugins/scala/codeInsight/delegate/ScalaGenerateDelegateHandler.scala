@@ -51,8 +51,9 @@ class ScalaGenerateDelegateHandler extends GenerateDelegateHandler {
                       @NotNull editor: Editor,
                       @NotNull file: PsiFile) {
     if (!CodeInsightUtilBase.prepareEditorForWrite(editor)) return
-    if (!FileDocumentManager.getInstance.requestWriting(editor.getDocument,
-                                                        project)) return
+    if (!FileDocumentManager.getInstance.requestWriting(
+          editor.getDocument,
+          project)) return
     PsiDocumentManager.getInstance(project).commitAllDocuments()
 
     val target = chooseTarget(file, editor, project)
@@ -70,10 +71,11 @@ class ScalaGenerateDelegateHandler extends GenerateDelegateHandler {
         val aClass = classAtOffset(editor.getCaretModel.getOffset, file)
         val generatedMethods = for (member <- candidates) yield {
           val prototype: ScFunctionDefinition = ScalaPsiElementFactory
-            .createMethodFromSignature(member.sign,
-                                       aClass.getManager,
-                                       specifyType,
-                                       body = "???")
+            .createMethodFromSignature(
+              member.sign,
+              aClass.getManager,
+              specifyType,
+              body = "???")
             .asInstanceOf[ScFunctionDefinition]
           prototype.setModifierProperty("override", value = member.isOverride)
           val body = methodBody(target, prototype)
@@ -171,12 +173,13 @@ class ScalaGenerateDelegateHandler extends GenerateDelegateHandler {
     val members = toMethodMembers(candidates, place)
 
     if (!ApplicationManager.getApplication.isUnitTestMode) {
-      val chooser = new ScalaMemberChooser[ScMethodMember](members.toArray,
-                                                           false,
-                                                           true,
-                                                           false,
-                                                           true,
-                                                           aClass)
+      val chooser = new ScalaMemberChooser[ScMethodMember](
+        members.toArray,
+        false,
+        true,
+        false,
+        true,
+        aClass)
       chooser.setTitle(
         CodeInsightBundle.message("generate.delegate.method.chooser.title"))
       chooser.show()
@@ -200,9 +203,10 @@ class ScalaGenerateDelegateHandler extends GenerateDelegateHandler {
               if meth.getContainingClass.getQualifiedName == CommonClassNames.JAVA_LANG_OBJECT =>
             None
           case meth: PsiMethod
-              if !ResolveUtils.isAccessible(meth,
-                                            place,
-                                            forCompletion = true) =>
+              if !ResolveUtils.isAccessible(
+                meth,
+                place,
+                forCompletion = true) =>
             None
           case meth: PsiMethod =>
             Some(new PhysicalSignature(meth, srr.substitutor))
@@ -292,16 +296,18 @@ class ScalaGenerateDelegateHandler extends GenerateDelegateHandler {
           case _ => false
         }
       case v @ (_: ScValueMember | _: ScVariableMember | _: JavaFieldMember)
-          if ResolveUtils.isAccessible(v.getElement,
-                                       clazz,
-                                       forCompletion = false) =>
+          if ResolveUtils.isAccessible(
+            v.getElement,
+            clazz,
+            forCompletion = false) =>
         true
       case _ => false
     }
 
   private def classAtOffset(offset: Int, file: PsiFile) = {
-    val td = PsiTreeUtil.getContextOfType(file.findElementAt(offset),
-                                          classOf[ScTemplateDefinition])
+    val td = PsiTreeUtil.getContextOfType(
+      file.findElementAt(offset),
+      classOf[ScTemplateDefinition])
     if (td == null || td.extendsBlock.templateBody.isEmpty) null
     else td
   }

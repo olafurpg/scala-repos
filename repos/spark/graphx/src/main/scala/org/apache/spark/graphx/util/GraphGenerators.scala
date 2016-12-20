@@ -75,10 +75,11 @@ object GraphGenerators extends Logging {
 
     val edges = vertices.flatMap {
       case (src, degree) =>
-        generateRandomEdges(src.toInt,
-                            degree.toInt,
-                            numVertices,
-                            seed = (seed2 ^ src))
+        generateRandomEdges(
+          src.toInt,
+          degree.toInt,
+          numVertices,
+          seed = (seed2 ^ src))
     }
 
     Graph(vertices, edges, 0)
@@ -142,8 +143,8 @@ object GraphGenerators extends Logging {
     // This ensures that the 4 quadrants are the same size at all recursion levels
     val numVertices = math
       .round(
-        math.pow(2.0,
-                 math.ceil(math.log(requestedNumVertices) / math.log(2.0))))
+        math
+          .pow(2.0, math.ceil(math.log(requestedNumVertices) / math.log(2.0))))
       .toInt
     val numEdgesUpperBound =
       math.pow(2.0, 2 * ((math.log(numVertices) / math.log(2.0)) - 1)).toInt

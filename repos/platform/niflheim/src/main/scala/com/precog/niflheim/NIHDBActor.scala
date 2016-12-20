@@ -85,12 +85,13 @@ object NIHDB {
                    timeout: Timeout,
                    txLogScheduler: ScheduledExecutorService)(
       implicit actorSystem: ActorSystem): IO[Validation[Error, NIHDB]] = {
-    NIHDBActor.create(chef,
-                      authorities,
-                      baseDir,
-                      cookThreshold,
-                      timeout,
-                      txLogScheduler) map {
+    NIHDBActor.create(
+      chef,
+      authorities,
+      baseDir,
+      cookThreshold,
+      timeout,
+      txLogScheduler) map {
       _ map { actor =>
         new NIHDBImpl(actor, timeout, authorities)
       }
@@ -514,10 +515,11 @@ private[niflheim] class NIHDBActor private (
               pending = state.blockState.pending + (toCook.id -> toCook),
               rawLog = newRaw)
             state.txLog.startCook(toCook.id)
-            chef ! Prepare(toCook.id,
-                           cookSequence.getAndIncrement,
-                           cookedDir,
-                           toCook)
+            chef ! Prepare(
+              toCook.id,
+              cookSequence.getAndIncrement,
+              cookedDir,
+              toCook)
           }
 
           logger.debug(
@@ -528,9 +530,10 @@ private[niflheim] class NIHDBActor private (
       }
 
     case GetStatus =>
-      sender ! Status(state.blockState.cooked.length,
-                      state.blockState.pending.size,
-                      state.blockState.rawLog.length)
+      sender ! Status(
+        state.blockState.cooked.length,
+        state.blockState.pending.size,
+        state.blockState.rawLog.length)
 
     case Quiesce =>
       quiesce.unsafePerformIO

@@ -135,12 +135,13 @@ class Tcp(system: ExtendedActorSystem) extends akka.actor.Extension {
     : Source[IncomingConnection, CompletionStage[ServerBinding]] =
     Source.fromGraph(
       delegate
-        .bind(interface,
-              port,
-              backlog,
-              immutableSeq(options),
-              halfClose,
-              idleTimeout)
+        .bind(
+          interface,
+          port,
+          backlog,
+          immutableSeq(options),
+          halfClose,
+          idleTimeout)
         .map(new IncomingConnection(_))
         .mapMaterializedValue(_.map(new ServerBinding(_))(ec).toJava))
 
@@ -186,12 +187,13 @@ class Tcp(system: ExtendedActorSystem) extends akka.actor.Extension {
     : Flow[ByteString, ByteString, CompletionStage[OutgoingConnection]] =
     Flow.fromGraph(
       delegate
-        .outgoingConnection(remoteAddress,
-                            localAddress.asScala,
-                            immutableSeq(options),
-                            halfClose,
-                            connectTimeout,
-                            idleTimeout)
+        .outgoingConnection(
+          remoteAddress,
+          localAddress.asScala,
+          immutableSeq(options),
+          halfClose,
+          connectTimeout,
+          idleTimeout)
         .mapMaterializedValue(_.map(new OutgoingConnection(_))(ec).toJava))
 
   /**

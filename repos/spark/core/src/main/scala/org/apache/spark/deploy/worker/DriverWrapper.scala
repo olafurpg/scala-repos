@@ -42,11 +42,12 @@ object DriverWrapper {
        */
       case workerUrl :: userJar :: mainClass :: extraArgs =>
         val conf = new SparkConf()
-        val rpcEnv = RpcEnv.create("Driver",
-                                   Utils.localHostName(),
-                                   0,
-                                   conf,
-                                   new SecurityManager(conf))
+        val rpcEnv = RpcEnv.create(
+          "Driver",
+          Utils.localHostName(),
+          0,
+          conf,
+          new SecurityManager(conf))
         rpcEnv
           .setupEndpoint("workerWatcher", new WorkerWatcher(rpcEnv, workerUrl))
 

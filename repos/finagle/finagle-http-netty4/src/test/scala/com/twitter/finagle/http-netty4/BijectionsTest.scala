@@ -17,13 +17,14 @@ import scala.util.Random
 object BijectionsTest {
   import Arbitrary.arbitrary
 
-  val arbMethod = Gen.oneOf(Method.Get,
-                            Method.Post,
-                            Method.Trace,
-                            Method.Delete,
-                            Method.Put,
-                            Method.Connect,
-                            Method.Options)
+  val arbMethod = Gen.oneOf(
+    Method.Get,
+    Method.Post,
+    Method.Trace,
+    Method.Delete,
+    Method.Put,
+    Method.Connect,
+    Method.Options)
 
   val arbKeys = Gen.oneOf("Foo", "Bar", "Foo-Bar", "Bar-Baz")
 

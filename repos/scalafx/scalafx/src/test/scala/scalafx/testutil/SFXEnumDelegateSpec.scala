@@ -85,9 +85,10 @@ abstract class SFXEnumDelegateSpec[E <: java.lang.Enum[E],
   }
 
   private def assertScalaEnumWithOrdinal(s: S, index: Int) {
-    assert(s.delegate.ordinal() == index,
-           "%s - Expected position: %d, actual: %d"
-             .format(s, s.delegate.ordinal(), index))
+    assert(
+      s.delegate.ordinal() == index,
+      "%s - Expected position: %d, actual: %d"
+        .format(s, s.delegate.ordinal(), index))
   }
 
   protected override def getDesirableMethodName(javaMethod: Method): String =
@@ -125,8 +126,9 @@ abstract class SFXEnumDelegateSpec[E <: java.lang.Enum[E],
     val missingJavaEnumNames =
       javaEnumConstants.map(_.name).filterNot(nameIsPresent(_))
 
-    assert(missingJavaEnumNames.isEmpty,
-           "Missing constants: " + missingJavaEnumNames.mkString(", "))
+    assert(
+      missingJavaEnumNames.isEmpty,
+      "Missing constants: " + missingJavaEnumNames.mkString(", "))
   }
 
   it should "not find a non registered name among enum constants" in {

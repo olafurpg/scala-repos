@@ -57,21 +57,22 @@ class TabulatorTest {
   }
   @Test def sys() = {
     val sut = VTabby(width = 40)
-    val items = List("BooleanProp",
-                     "PropImpl",
-                     "addShutdownHook",
-                     "error",
-                     "process",
-                     "CreatorImpl",
-                     "ShutdownHookThread",
-                     "allThreads",
-                     "exit",
-                     "props",
-                     "Prop",
-                     "SystemProperties",
-                     "env",
-                     "package",
-                     "runtime")
+    val items = List(
+      "BooleanProp",
+      "PropImpl",
+      "addShutdownHook",
+      "error",
+      "process",
+      "CreatorImpl",
+      "ShutdownHookThread",
+      "allThreads",
+      "exit",
+      "props",
+      "Prop",
+      "SystemProperties",
+      "env",
+      "package",
+      "runtime")
     val rows = sut tabulate items
     assert(rows.size == 8)
     assert(rows(0).size == 2)
@@ -79,21 +80,22 @@ class TabulatorTest {
   }
   @Test def syswide() = {
     val sut = VTabby(width = 120)
-    val items = List("BooleanProp",
-                     "PropImpl",
-                     "addShutdownHook",
-                     "error",
-                     "process",
-                     "CreatorImpl",
-                     "ShutdownHookThread",
-                     "allThreads",
-                     "exit",
-                     "props",
-                     "Prop",
-                     "SystemProperties",
-                     "env",
-                     "package",
-                     "runtime")
+    val items = List(
+      "BooleanProp",
+      "PropImpl",
+      "addShutdownHook",
+      "error",
+      "process",
+      "CreatorImpl",
+      "ShutdownHookThread",
+      "allThreads",
+      "exit",
+      "props",
+      "Prop",
+      "SystemProperties",
+      "env",
+      "package",
+      "runtime")
     val rows = sut tabulate items
     assert(rows.size == 2)
     assert(rows(0).size == 8)

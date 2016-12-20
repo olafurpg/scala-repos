@@ -123,8 +123,9 @@ class MessageTest extends FunSuite with AssertionsForJUnit {
       } yield Tlease(lease))
 
     def assertEquiv(a: Message, b: Message) = (a, b) match {
-      case (Tdispatch(tag1, ctxs1, dst1, dtab1, req1),
-            Tdispatch(tag2, ctxs2, dst2, dtab2, req2)) =>
+      case (
+          Tdispatch(tag1, ctxs1, dst1, dtab1, req1),
+          Tdispatch(tag2, ctxs2, dst2, dtab2, req2)) =>
         assert(
           tag1 == tag2 && ctxs1 == ctxs2 && dst1 == dst2 &&
             Equiv[Dtab].equiv(dtab1, dtab2) && req1 == req2)

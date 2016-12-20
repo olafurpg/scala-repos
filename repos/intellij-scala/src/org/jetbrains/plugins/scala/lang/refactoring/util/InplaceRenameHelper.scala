@@ -77,10 +77,11 @@ class InplaceRenameHelper(parent: PsiElement) {
   def addGroup(primary: ScNamedElement,
                dependents: Seq[PsiElement],
                suggestedNames: Seq[String]): Unit = {
-    addGroup(primary.nameId,
-             primary.name,
-             dependents.map((_, null)),
-             suggestedNames)
+    addGroup(
+      primary.nameId,
+      primary.name,
+      dependents.map((_, null)),
+      suggestedNames)
   }
 
   def startRenaming() {
@@ -128,13 +129,14 @@ class InplaceRenameHelper(parent: PsiElement) {
             highlightManager: HighlightManager) {
           for ((range, attributes) <- ranges) {
             import scala.collection.JavaConversions._
-            highlightManager.addOccurrenceHighlight(editor,
-                                                    range.getStartOffset,
-                                                    range.getEndOffset,
-                                                    attributes,
-                                                    0,
-                                                    highlighters,
-                                                    null)
+            highlightManager.addOccurrenceHighlight(
+              editor,
+              range.getStartOffset,
+              range.getEndOffset,
+              attributes,
+              0,
+              highlighters,
+              null)
           }
           for (highlighter <- highlighters) {
             highlighter.setGreedyToLeft(true)
@@ -166,10 +168,11 @@ class InplaceRenameHelper(parent: PsiElement) {
             if (attributes != null)
               rangesToHighlight.put(segmentMarker, attributes)
           }
-          addHighlights(rangesToHighlight,
-                        editor,
-                        myHighlighters,
-                        HighlightManager.getInstance(project))
+          addHighlights(
+            rangesToHighlight,
+            editor,
+            myHighlighters,
+            HighlightManager.getInstance(project))
         }
 
         private def clearHighlighters() {

@@ -147,8 +147,9 @@ class ContinuousQueryListenerSuite
         require(listener.startStatus === null)
         testStream(MemoryStream[Int].toDS)(
           StartStream,
-          Assert(listener.startStatus !== null,
-                 "onQueryStarted not called before query returned"),
+          Assert(
+            listener.startStatus !== null,
+            "onQueryStarted not called before query returned"),
           StopStream,
           Assert { listener.checkAsyncErrors() }
         )
@@ -209,16 +210,18 @@ class ContinuousQueryListenerSuite
 
     override def onQueryProgress(queryProgress: QueryProgress): Unit = {
       asyncTestWaiter {
-        assert(startStatus != null,
-               "onQueryProgress called before onQueryStarted")
+        assert(
+          startStatus != null,
+          "onQueryProgress called before onQueryStarted")
         progressStatuses.add(QueryStatus(queryProgress.query))
       }
     }
 
     override def onQueryTerminated(queryTerminated: QueryTerminated): Unit = {
       asyncTestWaiter {
-        assert(startStatus != null,
-               "onQueryTerminated called before onQueryStarted")
+        assert(
+          startStatus != null,
+          "onQueryTerminated called before onQueryStarted")
         terminationStatus = QueryStatus(queryTerminated.query)
       }
       asyncTestWaiter.dismiss()
@@ -232,10 +235,11 @@ class ContinuousQueryListenerSuite
 
   object QueryStatus {
     def apply(query: ContinuousQuery): QueryStatus = {
-      QueryStatus(query.isActive,
-                  query.exception,
-                  query.sourceStatuses,
-                  query.sinkStatus)
+      QueryStatus(
+        query.isActive,
+        query.exception,
+        query.sourceStatuses,
+        query.sinkStatus)
     }
   }
 }

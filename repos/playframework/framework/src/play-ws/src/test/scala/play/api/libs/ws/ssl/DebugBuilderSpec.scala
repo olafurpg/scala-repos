@@ -57,9 +57,10 @@ object DebugBuilderSpec extends Specification {
 
     "match some random combinations" in {
       val config =
-        SSLDebugConfig(ssl = true,
-                       defaultctx = true,
-                       handshake = Some(SSLDebugHandshakeOptions(data = true)))
+        SSLDebugConfig(
+          ssl = true,
+          defaultctx = true,
+          handshake = Some(SSLDebugHandshakeOptions(data = true)))
       val builder = new JavaxNetDebugBuilder(config)
       val actual: String = builder.build()
 

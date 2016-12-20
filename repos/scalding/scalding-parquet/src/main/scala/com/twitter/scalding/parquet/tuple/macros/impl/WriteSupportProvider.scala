@@ -12,8 +12,9 @@ object WriteSupportProvider {
     import ctx.universe._
 
     if (!IsCaseClassImpl.isCaseClassType(ctx)(T.tpe))
-      ctx.abort(ctx.enclosingPosition,
-                s"""We cannot enforce ${T.tpe} is a case class,
+      ctx.abort(
+        ctx.enclosingPosition,
+        s"""We cannot enforce ${T.tpe} is a case class,
             either it is not a case class or this macro call is possibly enclosed in a class.
             This will mean the macro is operating on a non-resolved type.""")
 
@@ -77,8 +78,9 @@ object WriteSupportProvider {
           val newGroupName = createGroupName()
           val (_, subTree) = matchField(0, innerType, q"element", newGroupName)
           (idx + 1,
-           writeCollectionField(newGroupName,
-                                q"""
+           writeCollectionField(
+             newGroupName,
+             q"""
                           rc.startField("list", 0)
                           $fValue.foreach{ element =>
                             rc.startGroup()
@@ -93,8 +95,9 @@ object WriteSupportProvider {
           val (_, valueSubTree) =
             matchField(1, valueType, q"value", newGroupName)
           (idx + 1,
-           writeCollectionField(newGroupName,
-                                q"""
+           writeCollectionField(
+             newGroupName,
+             q"""
                           rc.startField("map", 0)
                           $fValue.foreach{ case(key, value) =>
                             rc.startGroup()
@@ -112,8 +115,9 @@ object WriteSupportProvider {
                ${writeGroupField(subTree)}""")
 
         case _ =>
-          ctx.abort(ctx.enclosingPosition,
-                    s"Case class $T has unsupported field type : $fieldType")
+          ctx.abort(
+            ctx.enclosingPosition,
+            s"Case class $T has unsupported field type : $fieldType")
       }
     }
 
@@ -126,10 +130,11 @@ object WriteSupportProvider {
         }
         .foldLeft((0, q"")) {
           case ((idx, existingTree), getter) =>
-            val (newIdx, subTree) = matchField(idx,
-                                               getter.returnType,
-                                               q"$pValueTree.$getter",
-                                               groupName)
+            val (newIdx, subTree) = matchField(
+              idx,
+              getter.returnType,
+              q"$pValueTree.$getter",
+              groupName)
             (newIdx,
              q"""
                       $existingTree

@@ -30,10 +30,11 @@ final class MultiHandler[S, T](builtIn: S => Option[T],
         Some(nr)
       case (Some(b), xs) =>
         if (xs.nonEmpty)
-          warn("Ignoring shadowed non-root build resolver(s) for " +
-                 getURI(info),
-               log(info),
-               xs)
+          warn(
+            "Ignoring shadowed non-root build resolver(s) for " +
+              getURI(info),
+            log(info),
+            xs)
         Some(b)
     }
 
@@ -80,11 +81,12 @@ object BuildLoader {
                          val full: Loader,
                          val transformAll: TransformAll) {
     def |(cs: Components): Components =
-      new Components(resolver | cs.resolver,
-                     builder | cs.builder,
-                     seq(transformer, cs.transformer),
-                     full | cs.full,
-                     transformAll andThen cs.transformAll)
+      new Components(
+        resolver | cs.resolver,
+        builder | cs.builder,
+        seq(transformer, cs.transformer),
+        full | cs.full,
+        transformAll andThen cs.transformAll)
   }
   def transform(t: Transformer): Components = components(transformer = t)
   def resolve(r: Resolver): Components = components(resolver = r)
@@ -139,14 +141,15 @@ object BuildLoader {
             config: LoadBuildConfiguration): BuildLoader = {
     def makeMulti[S <: Info, T](base: S => Option[T]) =
       new MultiHandler[S, T](base, None, Nil, _.uri, _.config.log)
-    new BuildLoader(fail,
-                    s,
-                    config,
-                    makeMulti(base.resolver),
-                    makeMulti(base.builder),
-                    base.transformer,
-                    makeMulti(base.full),
-                    base.transformAll)
+    new BuildLoader(
+      fail,
+      s,
+      config,
+      makeMulti(base.resolver),
+      makeMulti(base.builder),
+      base.transformer,
+      makeMulti(base.full),
+      base.transformAll)
   }
 
   def componentLoader: Loader =
@@ -174,23 +177,25 @@ final class BuildLoader(val fail: URI => Nothing,
                         val full: MultiHandler[LoadInfo, () => BuildUnit],
                         val transformAll: TransformAll) {
   def addNonRoot(uri: URI, loaders: Components): BuildLoader =
-    new BuildLoader(fail,
-                    state,
-                    config,
-                    resolvers.addNonRoot(uri, loaders.resolver),
-                    builders.addNonRoot(uri, loaders.builder),
-                    seq(transformer, loaders.transformer),
-                    full.addNonRoot(uri, loaders.full),
-                    transformAll andThen loaders.transformAll)
+    new BuildLoader(
+      fail,
+      state,
+      config,
+      resolvers.addNonRoot(uri, loaders.resolver),
+      builders.addNonRoot(uri, loaders.builder),
+      seq(transformer, loaders.transformer),
+      full.addNonRoot(uri, loaders.full),
+      transformAll andThen loaders.transformAll)
   def setRoot(loaders: Components): BuildLoader =
-    new BuildLoader(fail,
-                    state,
-                    config,
-                    resolvers.setRoot(loaders.resolver),
-                    builders.setRoot(loaders.builder),
-                    seq(loaders.transformer, transformer),
-                    full.setRoot(loaders.full),
-                    loaders.transformAll andThen transformAll)
+    new BuildLoader(
+      fail,
+      state,
+      config,
+      resolvers.setRoot(loaders.resolver),
+      builders.setRoot(loaders.builder),
+      seq(loaders.transformer, transformer),
+      full.setRoot(loaders.full),
+      loaders.transformAll andThen transformAll)
   def resetPluginDepth: BuildLoader =
     copyWithNewPM(config.pluginManagement.resetDepth)
 
@@ -200,22 +205,24 @@ final class BuildLoader(val fail: URI => Nothing,
   }
   private[this] def copyWithNewPM(newpm: PluginManagement): BuildLoader = {
     val newConfig = config.copy(pluginManagement = newpm)
-    new BuildLoader(fail,
-                    state,
-                    newConfig,
-                    resolvers,
-                    builders,
-                    transformer,
-                    full,
-                    transformAll)
+    new BuildLoader(
+      fail,
+      state,
+      newConfig,
+      resolvers,
+      builders,
+      transformer,
+      full,
+      transformAll)
   }
 
   def components =
-    new Components(resolvers.applyFun,
-                   builders.applyFun,
-                   transformer,
-                   full.applyFun,
-                   transformAll)
+    new Components(
+      resolvers.applyFun,
+      builders.applyFun,
+      transformer,
+      full.applyFun,
+      transformAll)
   def apply(uri: URI): BuildUnit = {
     val info =
       new LoadInfo(uri, config.stagingDirectory, config, state, components)

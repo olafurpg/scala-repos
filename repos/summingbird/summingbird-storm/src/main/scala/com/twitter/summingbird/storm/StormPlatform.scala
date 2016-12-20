@@ -120,8 +120,9 @@ object Storm {
 
   def toStormSource[T](spout: Spout[T], defaultSourcePar: Option[Int] = None)(
       implicit timeOf: TimeExtractor[T]): StormSource[T] =
-    SpoutSource(spout.map(t => (Timestamp(timeOf(t)), t)),
-                defaultSourcePar.map(SourceParallelism(_)))
+    SpoutSource(
+      spout.map(t => (Timestamp(timeOf(t)), t)),
+      defaultSourcePar.map(SourceParallelism(_)))
 
   implicit def spoutAsStormSource[T](spout: Spout[T])(
       implicit timeOf: TimeExtractor[T]): StormSource[T] =
@@ -179,8 +180,9 @@ abstract class Storm(options: Map[String, Options],
     */
   private def tickConfig = {
     val boltConfig = new BacktypeStormConfig
-    boltConfig.put(BacktypeStormConfig.TOPOLOGY_TICK_TUPLE_FREQ_SECS,
-                   java.lang.Integer.valueOf(1))
+    boltConfig.put(
+      BacktypeStormConfig.TOPOLOGY_TICK_TUPLE_FREQ_SECS,
+      java.lang.Integer.valueOf(1))
     boltConfig
   }
 
@@ -397,8 +399,9 @@ abstract class Storm(options: Map[String, Options],
     val inj = Injection.connect[String, Array[Byte], Base64String]
     logger.debug("Adding serialized copy of graphs")
     val withViz = stormConfig
-      .put("summingbird.base64_graph.producer",
-           inj.apply(VizGraph(dag.originalTail)).str)
+      .put(
+        "summingbird.base64_graph.producer",
+        inj.apply(VizGraph(dag.originalTail)).str)
       .put("summingbird.base64_graph.planned", inj.apply(VizGraph(dag)).str)
 
     val withOptions = withViz.put("summingbird.options", dumpOptions)
@@ -463,9 +466,10 @@ class RemoteStorm(options: Map[String, Options],
 
   override def run(plannedTopology: PlannedTopology, jobName: String): Unit = {
     val topologyName = "summingbird_" + jobName
-    StormSubmitter.submitTopology(topologyName,
-                                  plannedTopology.config,
-                                  plannedTopology.topology)
+    StormSubmitter.submitTopology(
+      topologyName,
+      plannedTopology.config,
+      plannedTopology.topology)
   }
 
   override def withRegistrars(registrars: List[IKryoRegistrar]) =
@@ -483,9 +487,10 @@ class LocalStorm(options: Map[String, Options],
 
   override def run(plannedTopology: PlannedTopology, jobName: String): Unit = {
     val topologyName = "summingbird_" + jobName
-    localCluster.submitTopology(topologyName,
-                                plannedTopology.config,
-                                plannedTopology.topology)
+    localCluster.submitTopology(
+      topologyName,
+      plannedTopology.config,
+      plannedTopology.topology)
   }
 
   override def withRegistrars(registrars: List[IKryoRegistrar]) =

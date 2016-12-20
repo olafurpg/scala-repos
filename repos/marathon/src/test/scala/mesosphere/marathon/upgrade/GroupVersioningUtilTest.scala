@@ -29,9 +29,10 @@ class GroupVersioningUtilTest
       Group(
         id = PathId("/nested"),
         apps = Set(
-          AppDefinition(PathId("/nested/app"),
-                        cmd = Some("sleep 123"),
-                        instances = 2)
+          AppDefinition(
+            PathId("/nested/app"),
+            cmd = Some("sleep 123"),
+            instances = 2)
         ),
         version = Timestamp(2)
       )
@@ -88,9 +89,10 @@ class GroupVersioningUtilTest
   test("A scaled app should get proper versionInfo") {
     When("Calculating version infos with a scaled app")
     val updated =
-      GroupVersioningUtil.updateVersionInfoForChangedApps(Timestamp(10),
-                                                          nestedApp,
-                                                          nestedAppScaled)
+      GroupVersioningUtil.updateVersionInfoForChangedApps(
+        Timestamp(10),
+        nestedApp,
+        nestedAppScaled)
     Then("The timestamp of the app and groups are updated appropriately")
     def update(maybeApp: Option[AppDefinition]): AppDefinition =
       maybeApp
@@ -113,9 +115,10 @@ class GroupVersioningUtilTest
   test("A updated app should get proper versionInfo") {
     When("Calculating version infos with an updated app")
     val updated =
-      GroupVersioningUtil.updateVersionInfoForChangedApps(Timestamp(10),
-                                                          nestedApp,
-                                                          nestedAppUpdated)
+      GroupVersioningUtil.updateVersionInfoForChangedApps(
+        Timestamp(10),
+        nestedApp,
+        nestedAppUpdated)
     Then("The timestamp of the app and groups are updated appropriately")
     def update(maybeApp: Option[AppDefinition]): AppDefinition =
       maybeApp

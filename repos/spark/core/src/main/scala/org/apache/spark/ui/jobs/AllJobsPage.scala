@@ -339,9 +339,10 @@ private[ui] class AllJobsPage(parent: JobsTab) extends WebUIPage("") {
 
       var content = summary
       val executorListener = parent.executorListener
-      content ++= makeTimeline(activeJobs ++ completedJobs ++ failedJobs,
-                               executorListener.executorIdToData,
-                               startTime)
+      content ++= makeTimeline(
+        activeJobs ++ completedJobs ++ failedJobs,
+        executorListener.executorIdToData,
+        startTime)
 
       if (shouldShowActiveJobs) {
         content ++=
@@ -360,10 +361,11 @@ private[ui] class AllJobsPage(parent: JobsTab) extends WebUIPage("") {
         """A job is triggered by an action, like count() or saveAsTextFile().""" +
           " Click on a job to see information about the stages of tasks inside it."
 
-      UIUtils.headerSparkPage("Spark Jobs",
-                              content,
-                              parent,
-                              helpText = Some(helpText))
+      UIUtils.headerSparkPage(
+        "Spark Jobs",
+        content,
+        parent,
+        helpText = Some(helpText))
     }
   }
 }

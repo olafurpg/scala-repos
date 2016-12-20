@@ -195,8 +195,9 @@ class SupervisorSpec
       topSupervisor,
       Props(
         new Supervisor(
-          AllForOneStrategy(maxNrOfRetries = 3,
-                            withinTimeRange = DilatedTimeout)(Nil))))
+          AllForOneStrategy(
+            maxNrOfRetries = 3,
+            withinTimeRange = DilatedTimeout)(Nil))))
     val pingpong2, pingpong3 =
       child(middleSupervisor, Props(new PingPongActor(testActor)))
 
@@ -273,8 +274,9 @@ class SupervisorSpec
       master ! "ping"
       expectMsg("pong")
 
-      filterEvents(EventFilter[RuntimeException]("Expected",
-                                                 occurrences = restarts + 1)) {
+      filterEvents(EventFilter[RuntimeException](
+        "Expected",
+        occurrences = restarts + 1)) {
         (1 to restarts) foreach { i ⇒
           master ! "crash"
           expectMsg("crashed")
@@ -297,8 +299,9 @@ class SupervisorSpec
       val (temporaryActor, _) = temporaryActorAllForOne
 
       intercept[RuntimeException] {
-        Await.result(temporaryActor.?(DieReply)(DilatedTimeout),
-                     DilatedTimeout)
+        Await.result(
+          temporaryActor.?(DieReply)(DilatedTimeout),
+          DilatedTimeout)
       }
 
       expectNoMsg(1 second)

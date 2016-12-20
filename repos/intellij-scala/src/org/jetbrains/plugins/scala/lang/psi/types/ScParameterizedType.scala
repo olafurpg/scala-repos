@@ -116,9 +116,10 @@ class ScParameterizedType private (val designator: ScType,
             (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
           args)
         Some(
-          AliasType(ta,
-                    ta.lowerBound.map(genericSubst.subst),
-                    ta.upperBound.map(genericSubst.subst)))
+          AliasType(
+            ta,
+            ta.lowerBound.map(genericSubst.subst),
+            ta.upperBound.map(genericSubst.subst)))
       case ScParameterizedType(p: ScProjectionType, args)
           if p.actualElement.isInstanceOf[ScTypeAlias] =>
         val ta: ScTypeAlias = p.actualElement.asInstanceOf[ScTypeAlias]
@@ -129,9 +130,10 @@ class ScParameterizedType private (val designator: ScType,
           args)
         val s = subst.followed(genericSubst)
         Some(
-          AliasType(ta,
-                    ta.lowerBound.map(s.subst),
-                    ta.upperBound.map(s.subst)))
+          AliasType(
+            ta,
+            ta.lowerBound.map(s.subst),
+            ta.upperBound.map(s.subst)))
       case _ => None
     }
   }
@@ -171,15 +173,17 @@ class ScParameterizedType private (val designator: ScType,
     }
     designator match {
       case ScTypeParameterType(_, args, _, _, _) =>
-        forParams(args.iterator,
-                  ScSubstitutor.empty,
-                  (p: ScTypeParameterType) => p)
+        forParams(
+          args.iterator,
+          ScSubstitutor.empty,
+          (p: ScTypeParameterType) => p)
       case _ =>
         ScType.extractDesignated(designator, withoutAliases = false) match {
           case Some((owner: ScTypeParametersOwner, s)) =>
-            forParams(owner.typeParameters.iterator,
-                      s,
-                      (tp: ScTypeParam) => ScalaPsiManager.typeVariable(tp))
+            forParams(
+              owner.typeParameters.iterator,
+              s,
+              (tp: ScTypeParam) => ScalaPsiManager.typeVariable(tp))
           case Some((owner: PsiTypeParameterListOwner, s)) =>
             forParams(
               owner.getTypeParameters.iterator,
@@ -191,8 +195,9 @@ class ScParameterizedType private (val designator: ScType,
   }
 
   override def removeAbstracts =
-    ScParameterizedType(designator.removeAbstracts,
-                        typeArgs.map(_.removeAbstracts))
+    ScParameterizedType(
+      designator.removeAbstracts,
+      typeArgs.map(_.removeAbstracts))
 
   override def recursiveUpdate(update: ScType => (Boolean, ScType),
                                visited: HashSet[ScType]): ScType = {
@@ -235,9 +240,10 @@ class ScParameterizedType private (val designator: ScType,
           typeArgs.zipWithIndex.map {
             case (ta, i) =>
               val v = if (i < des.length) des(i) else 0
-              ta.recursiveVarianceUpdateModifiable(newData,
-                                                   update,
-                                                   v * variance)
+              ta.recursiveVarianceUpdateModifiable(
+                newData,
+                update,
+                v * variance)
           })
     }
   }
@@ -271,9 +277,11 @@ class ScParameterizedType private (val designator: ScType,
             }, r, uSubst, falseUndef)
           case _ => (false, uSubst)
         }
-      case (ScParameterizedType(ScDesignatorType(a: ScTypeAliasDefinition),
-                                args),
-            _) =>
+      case (
+          ScParameterizedType(
+            ScDesignatorType(a: ScTypeAliasDefinition),
+            args),
+          _) =>
         isAliasType match {
           case Some(AliasType(ta: ScTypeAliasDefinition, lower, _)) =>
             Equivalence.equivInner(lower match {
@@ -282,8 +290,9 @@ class ScParameterizedType private (val designator: ScType,
             }, r, uSubst, falseUndef)
           case _ => (false, uSubst)
         }
-      case (ScParameterizedType(_, _),
-            ScParameterizedType(designator1, typeArgs1)) =>
+      case (
+          ScParameterizedType(_, _),
+          ScParameterizedType(designator1, typeArgs1)) =>
         var t = Equivalence
           .equivInner(designator, designator1, undefinedSubst, falseUndef)
         if (!t._1) return (false, undefinedSubst)
@@ -292,10 +301,11 @@ class ScParameterizedType private (val designator: ScType,
         val iterator1 = typeArgs.iterator
         val iterator2 = typeArgs1.iterator
         while (iterator1.hasNext && iterator2.hasNext) {
-          t = Equivalence.equivInner(iterator1.next(),
-                                     iterator2.next(),
-                                     undefinedSubst,
-                                     falseUndef)
+          t = Equivalence.equivInner(
+            iterator1.next(),
+            iterator2.next(),
+            undefinedSubst,
+            falseUndef)
           if (!t._1) return (false, undefinedSubst)
           undefinedSubst = t._2
         }
@@ -427,13 +437,14 @@ case class ScTypeParameterType(name: String,
       case _ =>
         new Suspension[ScType]({ () =>
           s.subst(
-            ScCompoundType(ptp.getExtendsListTypes
-                             .map(ScType.create(_, ptp.getProject))
-                             .toSeq ++ ptp.getImplementsListTypes
-                             .map(ScType.create(_, ptp.getProject))
-                             .toSeq,
-                           Map.empty,
-                           Map.empty))
+            ScCompoundType(
+              ptp.getExtendsListTypes
+                .map(ScType.create(_, ptp.getProject))
+                .toSeq ++ ptp.getImplementsListTypes
+                .map(ScType.create(_, ptp.getProject))
+                .toSeq,
+              Map.empty,
+              Map.empty))
         })
     }, ptp match {
       case tp: ScTypeParam =>
@@ -486,11 +497,12 @@ case class ScTypeParameterType(name: String,
 
 object ScTypeParameterType {
   def toTypeParameterType(tp: TypeParameter): ScTypeParameterType = {
-    new ScTypeParameterType(tp.name,
-                            tp.typeParams.map(toTypeParameterType).toList,
-                            new Suspension[ScType](tp.lowerType()),
-                            new Suspension[ScType](tp.upperType()),
-                            tp.ptp)
+    new ScTypeParameterType(
+      tp.name,
+      tp.typeParams.map(toTypeParameterType).toList,
+      new Suspension[ScType](tp.lowerType()),
+      new Suspension[ScType](tp.upperType()),
+      tp.ptp)
   }
 }
 
@@ -498,15 +510,16 @@ private[types] object CyclicHelper {
   def compute[R](pn1: PsiNamedElement, pn2: PsiNamedElement)(
       fun: () => R): Option[R] = {
     import org.jetbrains.plugins.scala.caches.ScalaRecursionManager._
-    doComputationsForTwoElements(pn1,
-                                 pn2,
-                                 (p: Object, searches: Seq[Object]) => {
-                                   !searches.contains(p)
-                                 },
-                                 pn2,
-                                 pn1,
-                                 fun(),
-                                 CYCLIC_HELPER_KEY)
+    doComputationsForTwoElements(
+      pn1,
+      pn2,
+      (p: Object, searches: Seq[Object]) => {
+        !searches.contains(p)
+      },
+      pn2,
+      pn1,
+      fun(),
+      CYCLIC_HELPER_KEY)
   }
 }
 

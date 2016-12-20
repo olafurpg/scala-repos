@@ -51,14 +51,15 @@ final class SuiteResult(val result: TestResult.Value,
       case (TestResult.Error, _) => TestResult.Error
       case _ => TestResult.Failed
     }
-    new SuiteResult(combinedTestResult,
-                    passedCount + other.passedCount,
-                    failureCount + other.failureCount,
-                    errorCount + other.errorCount,
-                    skippedCount + other.skippedCount,
-                    ignoredCount + other.ignoredCount,
-                    canceledCount + other.canceledCount,
-                    pendingCount + other.pendingCount)
+    new SuiteResult(
+      combinedTestResult,
+      passedCount + other.passedCount,
+      failureCount + other.failureCount,
+      errorCount + other.errorCount,
+      skippedCount + other.skippedCount,
+      ignoredCount + other.ignoredCount,
+      canceledCount + other.canceledCount,
+      pendingCount + other.pendingCount)
   }
 }
 
@@ -67,14 +68,15 @@ object SuiteResult {
   /** Computes the overall result and counts for a suite with individual test results in `events`. */
   def apply(events: Seq[TEvent]): SuiteResult = {
     def count(status: TStatus) = events.count(_.status == status)
-    new SuiteResult(TestEvent.overallResult(events),
-                    count(TStatus.Success),
-                    count(TStatus.Failure),
-                    count(TStatus.Error),
-                    count(TStatus.Skipped),
-                    count(TStatus.Ignored),
-                    count(TStatus.Canceled),
-                    count(TStatus.Pending))
+    new SuiteResult(
+      TestEvent.overallResult(events),
+      count(TStatus.Success),
+      count(TStatus.Failure),
+      count(TStatus.Error),
+      count(TStatus.Skipped),
+      count(TStatus.Ignored),
+      count(TStatus.Canceled),
+      count(TStatus.Pending))
   }
   val Error: SuiteResult =
     new SuiteResult(TestResult.Error, 0, 0, 0, 0, 0, 0, 0)
@@ -104,17 +106,20 @@ object TestEvent {
 }
 
 object TestLogger {
-  @deprecated("Doesn't provide for underlying resources to be released.",
-              "0.13.1")
+  @deprecated(
+    "Doesn't provide for underlying resources to be released.",
+    "0.13.1")
   def apply(logger: sbt.util.Logger,
             logTest: TestDefinition => sbt.util.Logger,
             buffered: Boolean): TestLogger =
     new TestLogger(
-      new TestLogging(wrap(logger),
-                      tdef => contentLogger(logTest(tdef), buffered)))
+      new TestLogging(
+        wrap(logger),
+        tdef => contentLogger(logTest(tdef), buffered)))
 
-  @deprecated("Doesn't provide for underlying resources to be released.",
-              "0.13.1")
+  @deprecated(
+    "Doesn't provide for underlying resources to be released.",
+    "0.13.1")
   def contentLogger(log: sbt.util.Logger, buffered: Boolean): ContentLogger = {
     val blog = new BufferedLogger(FullLogger(log))
     if (buffered) blog.record()

@@ -109,9 +109,10 @@ object expand {
           val newName = newTermName(mkName(c)(name, typeMap))
           if (shouldValify) {
             if (typesLeftAbstract.nonEmpty)
-              c.error(tree.pos,
-                      "Can't valify: Not all types were grounded: " +
-                        typesLeftAbstract.mkString(", "))
+              c.error(
+                tree.pos,
+                "Can't valify: Not all types were grounded: " +
+                  typesLeftAbstract.mkString(", "))
             if (newvargs.exists(_.nonEmpty))
               c.error(
                 tree.pos,

@@ -49,9 +49,10 @@ object ScalaWebSockets extends PlaySpecification {
       import akka.actor._
 
       "allow creating a simple echoing actor" in new WithApplication() {
-        runWebSocket(Samples.Controller1.socket,
-                     Source.single(TextMessage("foo")),
-                     1) must beRight.like {
+        runWebSocket(
+          Samples.Controller1.socket,
+          Source.single(TextMessage("foo")),
+          1) must beRight.like {
           case list =>
             list must_== List(TextMessage("I received your message: foo"))
         }
@@ -109,9 +110,10 @@ object ScalaWebSockets extends PlaySpecification {
 
       "allow creating a json actor" in new WithApplication() {
         val json = Json.obj("foo" -> "bar")
-        runWebSocket(Samples.Controller4.socket,
-                     Source.single(TextMessage(Json.stringify(json))),
-                     1) must beRight.which { out =>
+        runWebSocket(
+          Samples.Controller4.socket,
+          Source.single(TextMessage(Json.stringify(json))),
+          1) must beRight.which { out =>
           out must_== List(TextMessage(Json.stringify(json)))
         }
       }
@@ -146,9 +148,10 @@ object ScalaWebSockets extends PlaySpecification {
       }
 
       "iteratee3" in new WithApplication() {
-        runWebSocket(Samples.Controller8.socket,
-                     Source.single(TextMessage("foo")),
-                     1) must beRight.which { out =>
+        runWebSocket(
+          Samples.Controller8.socket,
+          Source.single(TextMessage("foo")),
+          1) must beRight.which { out =>
           out must_== List(TextMessage("I received your message: foo"))
         }
       }

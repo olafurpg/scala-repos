@@ -42,5 +42,6 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class ArcSpec
-    extends SimpleSFXDelegateSpec[jfxss.Arc, Arc](classOf[jfxss.Arc],
-                                                  classOf[Arc])
+    extends SimpleSFXDelegateSpec[jfxss.Arc, Arc](
+      classOf[jfxss.Arc],
+      classOf[Arc])

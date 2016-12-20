@@ -80,10 +80,11 @@ class CSRFAction(next: EssentialAction,
               case Some("application/x-www-form-urlencoded") =>
                 checkFormBody(request, next, headerToken, config.tokenName)
               case Some("multipart/form-data") =>
-                checkMultipartBody(request,
-                                   next,
-                                   headerToken,
-                                   config.tokenName)
+                checkMultipartBody(
+                  request,
+                  next,
+                  headerToken,
+                  config.tokenName)
               // No way to extract token from other content types
               case Some(content) =>
                 filterLogger.trace(
@@ -178,10 +179,11 @@ class CSRFAction(next: EssentialAction,
       }
       .recoverWith {
         case NoTokenInBody =>
-          clearTokenIfInvalid(request,
-                              config,
-                              errorHandler,
-                              "No CSRF token found in body")
+          clearTokenIfInvalid(
+            request,
+            config,
+            errorHandler,
+            "No CSRF token found in body")
       }
   }
 
@@ -206,11 +208,12 @@ class CSRFAction(next: EssentialAction,
         None
       } else {
         Some(
-          URLDecoder.decode(body
-                              .drop(index + andTokenEquals.size)
-                              .takeWhile(_ != '&')
-                              .utf8String,
-                            "utf-8"))
+          URLDecoder.decode(
+            body
+              .drop(index + andTokenEquals.size)
+              .takeWhile(_ != '&')
+              .utf8String,
+            "utf-8"))
       }
     }
   }
@@ -457,8 +460,9 @@ object CSRFAction {
       request: Request[A],
       config: CSRFConfig,
       tokenSigner: CSRFTokenSigner): Request[A] = {
-    Request(tagRequestFromHeader(request: RequestHeader, config, tokenSigner),
-            request.body)
+    Request(
+      tagRequestFromHeader(request: RequestHeader, config, tokenSigner),
+      request.body)
   }
 
   private[csrf] def tagRequest(request: RequestHeader,
@@ -509,12 +513,13 @@ object CSRFAction {
         // cookie
         name =>
           result.withCookies(
-            Cookie(name,
-                   newToken,
-                   path = Session.path,
-                   domain = Session.domain,
-                   secure = config.secureCookie,
-                   httpOnly = config.httpOnlyCookie))
+            Cookie(
+              name,
+              newToken,
+              path = Session.path,
+              domain = Session.domain,
+              secure = config.secureCookie,
+              httpOnly = config.httpOnlyCookie))
       } getOrElse {
 
         val newSession =
@@ -543,10 +548,11 @@ object CSRFAction {
             .flatMap { cookie =>
               request.cookies.get(cookie).map { token =>
                 result.discardingCookies(
-                  DiscardingCookie(cookie,
-                                   domain = Session.domain,
-                                   path = Session.path,
-                                   secure = config.secureCookie))
+                  DiscardingCookie(
+                    cookie,
+                    domain = Session.domain,
+                    path = Session.path,
+                    secure = config.secureCookie))
               }
             }
             .getOrElse {
@@ -611,10 +617,11 @@ case class CSRFCheck @Inject()(config: CSRFConfig,
               }
           }
           .getOrElse {
-            CSRFAction.clearTokenIfInvalid(request,
-                                           config,
-                                           errorHandler,
-                                           "CSRF token check failed")
+            CSRFAction.clearTokenIfInvalid(
+              request,
+              config,
+              errorHandler,
+              "CSRF token check failed")
           }
       }
     }
@@ -624,17 +631,19 @@ case class CSRFCheck @Inject()(config: CSRFConfig,
     * Wrap an action in a CSRF check.
     */
   def apply[A](action: Action[A], errorHandler: ErrorHandler): Action[A] =
-    new CSRFCheckAction(new TokenProviderProvider(config, tokenSigner).get,
-                        errorHandler,
-                        action)
+    new CSRFCheckAction(
+      new TokenProviderProvider(config, tokenSigner).get,
+      errorHandler,
+      action)
 
   /**
     * Wrap an action in a CSRF check.
     */
   def apply[A](action: Action[A]): Action[A] =
-    new CSRFCheckAction(new TokenProviderProvider(config, tokenSigner).get,
-                        CSRF.DefaultErrorHandler,
-                        action)
+    new CSRFCheckAction(
+      new TokenProviderProvider(config, tokenSigner).get,
+      CSRF.DefaultErrorHandler,
+      action)
 }
 
 object CSRFCheck {
@@ -685,13 +694,15 @@ case class CSRFAddToken @Inject()(config: CSRFConfig, crypto: CSRFTokenSigner) {
     * Wrap an action in an action that ensures there is a CSRF token.
     */
   def apply[A](action: Action[A]): Action[A] =
-    new CSRFAddTokenAction(config,
-                           new TokenProviderProvider(config, crypto).get,
-                           action)
+    new CSRFAddTokenAction(
+      config,
+      new TokenProviderProvider(config, crypto).get,
+      action)
 }
 object CSRFAddToken {
-  @deprecated("Use CSRFAddToken class with dependency injection instead",
-              "2.5.0")
+  @deprecated(
+    "Use CSRFAddToken class with dependency injection instead",
+    "2.5.0")
   def apply[A](action: Action[A],
                config: CSRFConfig = CSRFConfig.global,
                tokenSigner: CSRFTokenSigner = Crypto.crypto): Action[A] =

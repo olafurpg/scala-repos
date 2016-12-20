@@ -33,10 +33,11 @@ object Editor extends LilaController {
           chess.variant.Standard)
       val fen = Forsyth >> situation
       Ok(
-        html.board.editor(situation,
-                          fen,
-                          positionsJson,
-                          animationDuration = Env.api.EditorAnimationDuration))
+        html.board.editor(
+          situation,
+          fen,
+          positionsJson,
+          animationDuration = Env.api.EditorAnimationDuration))
     }
   }
 

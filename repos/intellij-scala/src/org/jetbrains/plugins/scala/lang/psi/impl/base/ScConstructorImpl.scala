@@ -148,11 +148,12 @@ class ScConstructorImpl(node: ASTNode)
         case ta: ScTypeAliasDefinition =>
           subst.subst(ta.aliasedType.getOrElse(return FAILURE))
         case _ =>
-          parameterize(ScSimpleTypeElementImpl
-                         .calculateReferenceType(ref, shapesOnly = true)
-                         .getOrElse(return FAILURE),
-                       clazz,
-                       subst)
+          parameterize(
+            ScSimpleTypeElementImpl
+              .calculateReferenceType(ref, shapesOnly = true)
+              .getOrElse(return FAILURE),
+            clazz,
+            subst)
       }
       val res = constr match {
         case fun: ScMethodLike =>
@@ -162,12 +163,14 @@ class ScConstructorImpl(node: ASTNode)
           subst.subst(methodType)
         case method: PsiMethod =>
           if (i > 0)
-            return Failure("Java constructors only have one parameter section",
-                           Some(this))
-          ResolveUtils.javaMethodType(method,
-                                      subst,
-                                      getResolveScope,
-                                      Some(subst.subst(tp)))
+            return Failure(
+              "Java constructors only have one parameter section",
+              Some(this))
+          ResolveUtils.javaMethodType(
+            method,
+            subst,
+            getResolveScope,
+            Some(subst.subst(tp)))
       }
       val typeParameters: Seq[TypeParameter] = r.getActualElement match {
         case tp: ScTypeParametersOwner if tp.typeParameters.nonEmpty =>
@@ -233,21 +236,23 @@ class ScConstructorImpl(node: ASTNode)
                     ScType
                       .create(p.getReturnType, getProject, getResolveScope))
                   Seq(
-                    Parameter(p.getName,
-                              None,
-                              paramType,
-                              paramType,
-                              p.getDefaultValue != null,
-                              isRepeated = false,
-                              isByName = false))
+                    Parameter(
+                      p.getName,
+                      None,
+                      paramType,
+                      paramType,
+                      p.getDefaultValue != null,
+                      isRepeated = false,
+                      isByName = false))
                 case _ => Seq.empty
               }
               buffer +=
-                Success(ScMethodType(ScDesignatorType(clazz),
-                                     params,
-                                     isImplicit = false)(getProject,
-                                                         getResolveScope),
-                        Some(this))
+                Success(
+                  ScMethodType(
+                    ScDesignatorType(clazz),
+                    params,
+                    isImplicit = false)(getProject, getResolveScope),
+                  Some(this))
             case _ =>
           }
           buffer.toSeq

@@ -32,11 +32,12 @@ class ScalaMemberInplaceRenamer(elementToRename: PsiNamedElement,
                                 editor: Editor,
                                 initialName: String,
                                 oldName: String)
-    extends MemberInplaceRenamer(elementToRename,
-                                 substituted,
-                                 editor,
-                                 initialName,
-                                 oldName) {
+    extends MemberInplaceRenamer(
+      elementToRename,
+      substituted,
+      editor,
+      initialName,
+      oldName) {
 
   private def this(t: (PsiNamedElement, PsiElement, Editor, String, String)) =
     this(t._1, t._2, t._3, t._4, t._5)
@@ -105,9 +106,8 @@ class ScalaMemberInplaceRenamer(elementToRename: PsiNamedElement,
         val document = myEditor.getDocument
         if (revertInfo != null) {
           extensions.inWriteAction {
-            document.replaceString(0,
-                                   document.getTextLength,
-                                   revertInfo.fileText)
+            document
+              .replaceString(0, document.getTextLength, revertInfo.fileText)
             PsiDocumentManager.getInstance(myProject).commitDocument(document)
           }
           val offset = revertInfo.caretOffset
@@ -158,8 +158,9 @@ class ScalaMemberInplaceRenamer(elementToRename: PsiNamedElement,
         .getInstance(myProject)
         .getPsiFile(myEditor.getDocument)
       if (psiFile != null)
-        PsiTreeUtil.getParentOfType(psiFile.findElementAt(substitutorOffset),
-                                    classOf[PsiNameIdentifierOwner])
+        PsiTreeUtil.getParentOfType(
+          psiFile.findElementAt(substitutorOffset),
+          classOf[PsiNameIdentifierOwner])
       else null
     }
   }
@@ -171,11 +172,12 @@ class ScalaMemberInplaceRenamer(elementToRename: PsiNamedElement,
       variable: PsiNamedElement,
       editor: Editor,
       initialName: String): VariableInplaceRenamer =
-    new ScalaMemberInplaceRenamer(variable,
-                                  getSubstituted,
-                                  editor,
-                                  initialName,
-                                  oldName)
+    new ScalaMemberInplaceRenamer(
+      variable,
+      getSubstituted,
+      editor,
+      initialName,
+      oldName)
 
   override def performInplaceRename(): Boolean = {
     val names = new util.LinkedHashSet[String]()

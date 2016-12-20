@@ -58,8 +58,9 @@ class InsertCompiler(val mode: InsertCompiler.Mode) extends Phase {
       case Bind(gen, te @ TableExpansion(_, t: TableNode, _), Pure(sel, _)) =>
         setTable(te)
         tr(
-          sel.replace({ case Ref(s) if s == gen => Ref(expansionRef) },
-                      keepType = true))
+          sel.replace(
+            { case Ref(s) if s == gen => Ref(expansionRef) },
+            keepType = true))
       case _ =>
         throw new SlickException(
           "Cannot use node " + n + " for inserting data")
@@ -67,10 +68,11 @@ class InsertCompiler(val mode: InsertCompiler.Mode) extends Phase {
     val tree2 = tr(tree).infer()
     if (tableExpansion eq null)
       throw new SlickException("No table to insert into")
-    val ins = Insert(tableSym,
-                     tableExpansion.table,
-                     ProductNode(cols.result),
-                     allFields.result).infer()
+    val ins = Insert(
+      tableSym,
+      tableExpansion.table,
+      ProductNode(cols.result),
+      allFields.result).infer()
     ResultSetMapping(linearSym, ins, tree2) :@ CollectionType(
       TypedCollectionTypeConstructor.seq,
       ins.nodeType)

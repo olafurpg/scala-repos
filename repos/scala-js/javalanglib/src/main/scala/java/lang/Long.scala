@@ -80,10 +80,11 @@ object Long {
       }
       val radixPowLengthLong = radixPowLength.toLong
       val overflowBarrier = Long.divideUnsigned(-1L, radixPowLengthLong)
-      r += new StringRadixInfo(chunkLength,
-                               radixPowLengthLong,
-                               paddingZeros,
-                               overflowBarrier)
+      r += new StringRadixInfo(
+        chunkLength,
+        radixPowLengthLong,
+        paddingZeros,
+        overflowBarrier)
     }
 
     r

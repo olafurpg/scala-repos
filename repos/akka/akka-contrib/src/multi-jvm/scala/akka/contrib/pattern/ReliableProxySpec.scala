@@ -303,8 +303,9 @@ class ReliableProxySpec
         stopProxy() // Stop previous proxy
 
         // Start new proxy with no reconnections
-        proxy = system.actorOf(ReliableProxy.props(target.path, 100.millis),
-                               "proxy2")
+        proxy = system.actorOf(
+          ReliableProxy.props(target.path, 100.millis),
+          "proxy2")
         proxy ! FSM.SubscribeTransitionCallBack(testActor)
         watch(proxy)
 

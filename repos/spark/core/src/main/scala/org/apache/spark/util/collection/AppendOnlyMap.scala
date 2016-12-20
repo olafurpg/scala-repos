@@ -43,8 +43,9 @@ class AppendOnlyMap[K, V](initialCapacity: Int = 64)
 
   import AppendOnlyMap._
 
-  require(initialCapacity <= MAXIMUM_CAPACITY,
-          s"Can't make capacity bigger than ${MAXIMUM_CAPACITY} elements")
+  require(
+    initialCapacity <= MAXIMUM_CAPACITY,
+    s"Can't make capacity bigger than ${MAXIMUM_CAPACITY} elements")
   require(initialCapacity >= 1, "Invalid initial capacity")
 
   private val LOAD_FACTOR = 0.7
@@ -218,8 +219,9 @@ class AppendOnlyMap[K, V](initialCapacity: Int = 64)
   protected def growTable() {
     // capacity < MAXIMUM_CAPACITY (2 ^ 29) so capacity * 2 won't overflow
     val newCapacity = capacity * 2
-    require(newCapacity <= MAXIMUM_CAPACITY,
-            s"Can't contain more than ${growThreshold} elements")
+    require(
+      newCapacity <= MAXIMUM_CAPACITY,
+      s"Can't contain more than ${growThreshold} elements")
     val newData = new Array[AnyRef](2 * newCapacity)
     val newMask = newCapacity - 1
     // Insert all our old values into the new array. Note that because our old keys are

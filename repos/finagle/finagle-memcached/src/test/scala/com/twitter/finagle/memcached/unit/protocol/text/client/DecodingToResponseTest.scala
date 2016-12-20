@@ -58,9 +58,10 @@ class DecodingToResponseTest extends FunSuite {
     val context = new Context
     import context._
 
-    val lines = Seq(Seq("STAT", "items:1:number", "1"),
-                    Seq("STAT", "items:1:age", "1468"),
-                    Seq("ITEM", "foo", "[5 b;", "1322514067", "s]"))
+    val lines = Seq(
+      Seq("STAT", "items:1:number", "1"),
+      Seq("STAT", "items:1:age", "1468"),
+      Seq("ITEM", "foo", "[5 b;", "1322514067", "s]"))
     val plines = lines.map { line =>
       Tokens(line map { Buf.Utf8(_) })
     }

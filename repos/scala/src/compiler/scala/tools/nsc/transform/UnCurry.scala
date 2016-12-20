@@ -140,9 +140,10 @@ abstract class UnCurry
     private def nonLocalReturnKey(meth: Symbol) =
       nonLocalReturnKeys.getOrElseUpdate(
         meth,
-        meth.newValue(unit.freshTermName("nonLocalReturnKey"),
-                      meth.pos,
-                      SYNTHETIC) setInfo ObjectTpe)
+        meth.newValue(
+          unit.freshTermName("nonLocalReturnKey"),
+          meth.pos,
+          SYNTHETIC) setInfo ObjectTpe)
 
     /** Generate a non-local return throw with given return expression from given method.
       *  I.e. for the method's non-local return key, generate:
@@ -241,10 +242,11 @@ abstract class UnCurry
           def mkMethod(owner: Symbol,
                        name: TermName,
                        additionalFlags: FlagSet = NoFlags): DefDef =
-            gen.mkMethodFromFunction(localTyper)(fun,
-                                                 owner,
-                                                 name,
-                                                 additionalFlags)
+            gen.mkMethodFromFunction(localTyper)(
+              fun,
+              owner,
+              name,
+              additionalFlags)
 
           def isSpecialized = {
             forceSpecializationInfoTransformOfFunctionN
@@ -271,25 +273,29 @@ abstract class UnCurry
             anonClass.info.decls enter applyMethodDef.symbol
 
             typedFunPos {
-              Block(ClassDef(anonClass,
-                             NoMods,
-                             ListOfNil,
-                             List(applyMethodDef),
-                             fun.pos),
-                    Typed(New(anonClass.tpe), TypeTree(fun.tpe)))
+              Block(
+                ClassDef(
+                  anonClass,
+                  NoMods,
+                  ListOfNil,
+                  List(applyMethodDef),
+                  fun.pos),
+                Typed(New(anonClass.tpe), TypeTree(fun.tpe)))
             }
           } else {
             // method definition with the same arguments, return type, and body as the original lambda
-            val liftedMethod = mkMethod(fun.symbol.owner,
-                                        nme.ANON_FUN_NAME,
-                                        additionalFlags = ARTIFACT)
+            val liftedMethod = mkMethod(
+              fun.symbol.owner,
+              nme.ANON_FUN_NAME,
+              additionalFlags = ARTIFACT)
 
             // new function whose body is just a call to the lifted method
             val newFun = deriveFunction(fun)(
               _ =>
                 typedFunPos(
-                  gen.mkForwarder(gen.mkAttributedRef(liftedMethod.symbol),
-                                  funParams :: Nil)
+                  gen.mkForwarder(
+                    gen.mkAttributedRef(liftedMethod.symbol),
+                    funParams :: Nil)
               ))
             typedFunPos(Block(liftedMethod, super.transform(newFun)))
           }
@@ -339,10 +345,11 @@ abstract class UnCurry
           }
           exitingUncurry {
             localTyper.typedPos(pos) {
-              gen.mkMethodCall(tree,
-                               toArraySym,
-                               Nil,
-                               List(traversableClassTag(tree.tpe)))
+              gen.mkMethodCall(
+                tree,
+                toArraySym,
+                Nil,
+                List(traversableClassTag(tree.tpe)))
             }
           }
         }
@@ -512,17 +519,19 @@ abstract class UnCurry
                          val supercalls =
                            rest take 1 map transformInConstructor
                          val others = rest drop 1 map transform
-                         treeCopy.Block(rhs,
-                                        presupers ::: supercalls ::: others,
-                                        transform(expr))
+                         treeCopy.Block(
+                           rhs,
+                           presupers ::: supercalls ::: others,
+                           transform(expr))
                      }
-                     treeCopy.DefDef(dd,
-                                     mods,
-                                     name,
-                                     transformTypeDefs(tparams),
-                                     transformValDefss(vparamssNoRhs),
-                                     transform(tpt),
-                                     rhs1)
+                     treeCopy.DefDef(
+                       dd,
+                       mods,
+                       name,
+                       transformTypeDefs(tparams),
+                       transformValDefss(vparamssNoRhs),
+                       transform(tpt),
+                       rhs1)
                    }
                  } else {
                    super.transform(treeCopy
@@ -601,8 +610,9 @@ abstract class UnCurry
                }
                tree1
            })
-      assert(result.tpe != null,
-             result.shortClass + " tpe is null:\n" + result)
+      assert(
+        result.tpe != null,
+        result.shortClass + " tpe is null:\n" + result)
       result modifyType uncurry
     }
 
@@ -696,8 +706,8 @@ abstract class UnCurry
           applyUnary()
         case ret @ Return(expr) if isNonLocalReturn(ret) =>
           log(
-            "non-local return from %s to %s".format(currentOwner.enclMethod,
-                                                    ret.symbol))
+            "non-local return from %s to %s"
+              .format(currentOwner.enclMethod, ret.symbol))
           atPos(ret.pos)(nonLocalReturnThrow(expr, ret.symbol))
         case TypeTree() =>
           tree
@@ -817,8 +827,9 @@ abstract class UnCurry
                     .newTermSymbol(tempValName, p.pos, SYNTHETIC)
                     .setInfo(info)
                   atPos(p.pos)(
-                    ValDef(newSym,
-                           gen.mkAttributedCast(Ident(p.symbol), info)))
+                    ValDef(
+                      newSym,
+                      gen.mkAttributedCast(Ident(p.symbol), info)))
                 }
                 Packed(newParam, tempVal)
               }
@@ -837,8 +848,9 @@ abstract class UnCurry
             localTyper.typedPos(rhs.pos) {
               // Patch the method body to refer to the temp vals
               val rhsSubstituted =
-                rhs.substituteSymbols(packedParams map (_.symbol),
-                                      tempVals map (_.symbol))
+                rhs.substituteSymbols(
+                  packedParams map (_.symbol),
+                  tempVals map (_.symbol))
               // The new method body: { val p$1 = p.asInstanceOf[<dependent type>]; ...; <rhsSubstituted> }
               Block(tempVals, rhsSubstituted)
             }
@@ -921,12 +933,14 @@ abstract class UnCurry
         val locals = map3(forwParams, flatparams, isRepeated) {
           case (_, fp, false) => null
           case (argsym, fp, true) =>
-            Block(Nil,
-                  gen.mkCast(
-                    gen.mkWrapArray(Ident(argsym),
-                                    elementType(ArrayClass, argsym.tpe)),
-                    seqType(elementType(SeqClass, fp.tpe))
-                  ))
+            Block(
+              Nil,
+              gen.mkCast(
+                gen.mkWrapArray(
+                  Ident(argsym),
+                  elementType(ArrayClass, argsym.tpe)),
+                seqType(elementType(SeqClass, fp.tpe))
+              ))
         }
         val seqargs = map2(locals, forwParams) {
           case (null, argsym) => Ident(argsym)

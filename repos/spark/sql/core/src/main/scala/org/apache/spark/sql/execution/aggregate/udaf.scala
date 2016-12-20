@@ -256,9 +256,10 @@ private[sql] class MutableAggregationBufferImpl(
         s"Could not update ${i}th value in this buffer because it only has $length values.")
     }
 
-    bufferValueSetters(i)(underlyingBuffer,
-                          offsets(i),
-                          toCatalystConverters(i)(value))
+    bufferValueSetters(i)(
+      underlyingBuffer,
+      offsets(i),
+      toCatalystConverters(i)(value))
   }
 
   // Because get method call specialized getter based on the schema, we cannot use the
@@ -269,11 +270,12 @@ private[sql] class MutableAggregationBufferImpl(
   }
 
   override def copy(): MutableAggregationBufferImpl = {
-    new MutableAggregationBufferImpl(schema,
-                                     toCatalystConverters,
-                                     toScalaConverters,
-                                     bufferOffset,
-                                     underlyingBuffer)
+    new MutableAggregationBufferImpl(
+      schema,
+      toCatalystConverters,
+      toScalaConverters,
+      bufferOffset,
+      underlyingBuffer)
   }
 }
 
@@ -322,11 +324,12 @@ private[sql] class InputAggregationBuffer private[sql] (
   }
 
   override def copy(): InputAggregationBuffer = {
-    new InputAggregationBuffer(schema,
-                               toCatalystConverters,
-                               toScalaConverters,
-                               bufferOffset,
-                               underlyingInputBuffer)
+    new InputAggregationBuffer(
+      schema,
+      toCatalystConverters,
+      toScalaConverters,
+      bufferOffset,
+      underlyingInputBuffer)
   }
 }
 
@@ -371,10 +374,11 @@ private[sql] case class ScalaUDAF(children: Seq[Expression],
   private[this] lazy val childrenSchema: StructType = {
     val inputFields = children.zipWithIndex.map {
       case (child, index) =>
-        StructField(s"input$index",
-                    child.dataType,
-                    child.nullable,
-                    Metadata.empty)
+        StructField(
+          s"input$index",
+          child.dataType,
+          child.nullable,
+          Metadata.empty)
     }
     StructType(inputFields)
   }
@@ -407,29 +411,32 @@ private[sql] case class ScalaUDAF(children: Seq[Expression],
 
   // This buffer is only used at executor side.
   private[this] lazy val inputAggregateBuffer: InputAggregationBuffer = {
-    new InputAggregationBuffer(aggBufferSchema,
-                               bufferValuesToCatalystConverters,
-                               bufferValuesToScalaConverters,
-                               inputAggBufferOffset,
-                               null)
+    new InputAggregationBuffer(
+      aggBufferSchema,
+      bufferValuesToCatalystConverters,
+      bufferValuesToScalaConverters,
+      inputAggBufferOffset,
+      null)
   }
 
   // This buffer is only used at executor side.
   private[this] lazy val mutableAggregateBuffer: MutableAggregationBufferImpl = {
-    new MutableAggregationBufferImpl(aggBufferSchema,
-                                     bufferValuesToCatalystConverters,
-                                     bufferValuesToScalaConverters,
-                                     mutableAggBufferOffset,
-                                     null)
+    new MutableAggregationBufferImpl(
+      aggBufferSchema,
+      bufferValuesToCatalystConverters,
+      bufferValuesToScalaConverters,
+      mutableAggBufferOffset,
+      null)
   }
 
   // This buffer is only used at executor side.
   private[this] lazy val evalAggregateBuffer: InputAggregationBuffer = {
-    new InputAggregationBuffer(aggBufferSchema,
-                               bufferValuesToCatalystConverters,
-                               bufferValuesToScalaConverters,
-                               mutableAggBufferOffset,
-                               null)
+    new InputAggregationBuffer(
+      aggBufferSchema,
+      bufferValuesToCatalystConverters,
+      bufferValuesToScalaConverters,
+      mutableAggBufferOffset,
+      null)
   }
 
   override def initialize(buffer: MutableRow): Unit = {

@@ -22,8 +22,9 @@ private[http] object HttpContext {
       val timestamp = values(0).toLong
       val deadline = values(1).toLong
       Some(
-        Deadline(Time.fromNanoseconds(timestamp),
-                 Time.fromNanoseconds(deadline)))
+        Deadline(
+          Time.fromNanoseconds(timestamp),
+          Time.fromNanoseconds(deadline)))
     } catch {
       case NonFatal(exc) =>
         log.debug(

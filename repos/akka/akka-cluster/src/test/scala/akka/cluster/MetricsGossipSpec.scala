@@ -30,12 +30,14 @@ class MetricsGossipSpec
 
   "A MetricsGossip" must {
     "add new NodeMetrics" in {
-      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
-                           newTimestamp,
-                           collector.sample.metrics)
-      val m2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555),
-                           newTimestamp,
-                           collector.sample.metrics)
+      val m1 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2554),
+        newTimestamp,
+        collector.sample.metrics)
+      val m2 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2555),
+        newTimestamp,
+        collector.sample.metrics)
 
       m1.metrics.size should be > (3)
       m2.metrics.size should be > (3)
@@ -51,12 +53,14 @@ class MetricsGossipSpec
     }
 
     "merge peer metrics" in {
-      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
-                           newTimestamp,
-                           collector.sample.metrics)
-      val m2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555),
-                           newTimestamp,
-                           collector.sample.metrics)
+      val m1 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2554),
+        newTimestamp,
+        collector.sample.metrics)
+      val m2 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2555),
+        newTimestamp,
+        collector.sample.metrics)
 
       val g1 = MetricsGossip.empty :+ m1 :+ m2
       g1.nodes.size should ===(2)
@@ -77,15 +81,18 @@ class MetricsGossipSpec
     }
 
     "merge an existing metric set for a node and update node ring" in {
-      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
-                           newTimestamp,
-                           collector.sample.metrics)
-      val m2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555),
-                           newTimestamp,
-                           collector.sample.metrics)
-      val m3 = NodeMetrics(Address("akka.tcp", "sys", "a", 2556),
-                           newTimestamp,
-                           collector.sample.metrics)
+      val m1 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2554),
+        newTimestamp,
+        collector.sample.metrics)
+      val m2 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2555),
+        newTimestamp,
+        collector.sample.metrics)
+      val m3 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2556),
+        newTimestamp,
+        collector.sample.metrics)
       val m2Updated =
         m2 copy
           (metrics = newSample(m2.metrics), timestamp = m2.timestamp + 1000)
@@ -111,20 +118,23 @@ class MetricsGossipSpec
     }
 
     "get the current NodeMetrics if it exists in the local nodes" in {
-      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
-                           newTimestamp,
-                           collector.sample.metrics)
+      val m1 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2554),
+        newTimestamp,
+        collector.sample.metrics)
       val g1 = MetricsGossip.empty :+ m1
       g1.nodeMetricsFor(m1.address).map(_.metrics) should ===(Some(m1.metrics))
     }
 
     "remove a node if it is no longer Up" in {
-      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
-                           newTimestamp,
-                           collector.sample.metrics)
-      val m2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555),
-                           newTimestamp,
-                           collector.sample.metrics)
+      val m1 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2554),
+        newTimestamp,
+        collector.sample.metrics)
+      val m2 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2555),
+        newTimestamp,
+        collector.sample.metrics)
 
       val g1 = MetricsGossip.empty :+ m1 :+ m2
       g1.nodes.size should ===(2)
@@ -136,12 +146,14 @@ class MetricsGossipSpec
     }
 
     "filter nodes" in {
-      val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
-                           newTimestamp,
-                           collector.sample.metrics)
-      val m2 = NodeMetrics(Address("akka.tcp", "sys", "a", 2555),
-                           newTimestamp,
-                           collector.sample.metrics)
+      val m1 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2554),
+        newTimestamp,
+        collector.sample.metrics)
+      val m2 = NodeMetrics(
+        Address("akka.tcp", "sys", "a", 2555),
+        newTimestamp,
+        collector.sample.metrics)
 
       val g1 = MetricsGossip.empty :+ m1 :+ m2
       g1.nodes.size should ===(2)

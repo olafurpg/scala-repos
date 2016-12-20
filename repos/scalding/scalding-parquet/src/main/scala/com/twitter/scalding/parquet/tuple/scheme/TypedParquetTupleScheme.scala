@@ -70,8 +70,9 @@ class ReadSupportInstanceProxy[T] extends ReadSupport[T] {
 
   def getDelegateInstance(conf: Configuration): ReadSupport[T] = {
     val readSupport = conf.get(ParquetInputOutputFormat.READ_SUPPORT_INSTANCE)
-    require(readSupport != null && !readSupport.isEmpty,
-            "no read support instance is configured")
+    require(
+      readSupport != null && !readSupport.isEmpty,
+      "no read support instance is configured")
     val readSupportInstance =
       ParquetInputOutputFormat.injection.invert(readSupport)
 
@@ -137,8 +138,9 @@ class ParquetOutputFormatFromWriteSupportInstance[T]
   override def getWriteSupport(conf: Configuration): WriteSupport[T] = {
     val writeSupport =
       conf.get(ParquetInputOutputFormat.WRITE_SUPPORT_INSTANCE)
-    require(writeSupport != null && !writeSupport.isEmpty,
-            "no write support instance is configured")
+    require(
+      writeSupport != null && !writeSupport.isEmpty,
+      "no write support instance is configured")
     val writeSupportInstance =
       ParquetInputOutputFormat.injection.invert(writeSupport)
     writeSupportInstance match {
@@ -163,11 +165,12 @@ private class InnerDeprecatedParquetOutputFormat[T]
 class TypedParquetTupleScheme[T](val readSupport: ParquetReadSupport[T],
                                  val writeSupport: ParquetWriteSupport[T],
                                  val fp: Option[FilterPredicate] = None)
-    extends Scheme[JobConf,
-                   RecordReader[AnyRef, Container[T]],
-                   OutputCollector[AnyRef, T],
-                   Array[AnyRef],
-                   Array[AnyRef]] {
+    extends Scheme[
+      JobConf,
+      RecordReader[AnyRef, Container[T]],
+      OutputCollector[AnyRef, T],
+      Array[AnyRef],
+      Array[AnyRef]] {
 
   type Output = OutputCollector[AnyRef, T]
   type Reader = RecordReader[AnyRef, Container[T]]
@@ -180,8 +183,9 @@ class TypedParquetTupleScheme[T](val readSupport: ParquetReadSupport[T],
                               jobConf: JobConf): Unit = {
     fp.map(ParquetInputFormat.setFilterPredicate(jobConf, _))
     jobConf.setInputFormat(classOf[DeprecatedParquetInputFormat[T]])
-    jobConf.set(ParquetInputOutputFormat.READ_SUPPORT_INSTANCE,
-                ParquetInputOutputFormat.injection(readSupport))
+    jobConf.set(
+      ParquetInputOutputFormat.READ_SUPPORT_INSTANCE,
+      ParquetInputOutputFormat.injection(readSupport))
     ParquetInputFormat
       .setReadSupportClass(jobConf, classOf[ReadSupportInstanceProxy[_]])
   }
@@ -205,8 +209,9 @@ class TypedParquetTupleScheme[T](val readSupport: ParquetReadSupport[T],
                             tap: TapType,
                             jobConf: JobConf): Unit = {
     jobConf.setOutputFormat(classOf[InnerDeprecatedParquetOutputFormat[T]])
-    jobConf.set(ParquetInputOutputFormat.WRITE_SUPPORT_INSTANCE,
-                ParquetInputOutputFormat.injection(writeSupport))
+    jobConf.set(
+      ParquetInputOutputFormat.WRITE_SUPPORT_INSTANCE,
+      ParquetInputOutputFormat.injection(writeSupport))
   }
 
   override def sink(flowProcess: FlowProcess[JobConf],

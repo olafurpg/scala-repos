@@ -30,9 +30,10 @@ class ExtractionsTest {
     val article = TestUtils.getArticle(url = url, rawHTML = html)
     val title = "Democrats to use Social Security against GOP this fall"
     val content = "Washington (CNN) -- Democrats pledged "
-    TestUtils.runArticleAssertions(article = article,
-                                   expectedTitle = title,
-                                   expectedStart = content)
+    TestUtils.runArticleAssertions(
+      article = article,
+      expectedTitle = title,
+      expectedStart = content)
   }
 
   @Test
@@ -75,9 +76,10 @@ class ExtractionsTest {
       "The Huffington Post has come across this fascinating five-minute interview"
     val title = "2005 Zuckerberg Didn’t Want To Take Over The World"
     val article = TestUtils.getArticle(url = url, rawHTML = html)
-    TestUtils.runArticleAssertions(article = article,
-                                   expectedTitle = title,
-                                   expectedStart = content)
+    TestUtils.runArticleAssertions(
+      article = article,
+      expectedTitle = title,
+      expectedStart = content)
   }
 
   @Test
@@ -90,9 +92,10 @@ class ExtractionsTest {
     val content =
       "Six years ago, Olivia Munn arrived in Hollywood with fading ambitions of making it as a sports reporter and set about deploying"
     val article = TestUtils.getArticle(url = url, rawHTML = html)
-    TestUtils.runArticleAssertions(article = article,
-                                   expectedTitle = title,
-                                   expectedStart = content)
+    TestUtils.runArticleAssertions(
+      article = article,
+      expectedTitle = title,
+      expectedStart = content)
   }
 
   @Test
@@ -147,10 +150,11 @@ class ExtractionsTest {
     val description =
       "A top regional Federal Reserve official sharply criticized Friday the Fed's ongoing policy of keeping interest rates near zero -- and at record lows -- as a \"dangerous gamble.\""
     val article = TestUtils.getArticle(url = url, rawHTML = html)
-    TestUtils.runArticleAssertions(article = article,
-                                   expectedTitle = title,
-                                   expectedStart = content,
-                                   expectedDescription = description)
+    TestUtils.runArticleAssertions(
+      article = article,
+      expectedTitle = title,
+      expectedStart = content,
+      expectedDescription = description)
 
     val expectedTags =
       "Federal Open Market Committee" :: "Federal Reserve" :: "Federal Reserve Bank Of Kansas City" :: "Financial Crisis" :: "Financial Reform" :: "Financial Regulation" :: "Financial Regulatory Reform" :: "Fomc" :: "Great Recession" :: "Interest Rates" :: "Kansas City Fed" :: "Monetary Policy" :: "The Financial Fix" :: "Thomas Hoenig" :: "Too Big To Fail" :: "Wall Street Reform" :: "Business News" :: Nil
@@ -158,8 +162,9 @@ class ExtractionsTest {
     assertTrue("Tags should not be empty!", article.tags.size > 0)
 
     for (actualTag <- article.tags) {
-      assertTrue("Each Tag should be contained in the expected set!",
-                 expectedTags.contains(actualTag))
+      assertTrue(
+        "Each Tag should be contained in the expected set!",
+        expectedTags.contains(actualTag))
     }
   }
 
@@ -220,9 +225,10 @@ class ExtractionsTest {
 
     val expectedDateString = "2010-08-18";
     assertNotNull("publishDate should not be null!", article.publishDate);
-    assertEquals("Publish date should equal: \"2010-08-18\"",
-                 expectedDateString,
-                 fmt.format(article.publishDate));
+    assertEquals(
+      "Publish date should equal: \"2010-08-18\"",
+      expectedDateString,
+      fmt.format(article.publishDate));
     System.out.println(
       "Publish Date Extracted: " + fmt.format(article.publishDate));
   }
@@ -277,9 +283,10 @@ class ExtractionsTest {
 
     assertNotNull("publishDate should not be null!", article.publishDate)
     val expDate = new java.util.Date(1321657238000L) // "2011-11-18T23:00:38Z"
-    assertEquals(s"""Publish date should equal: "$expDate"""",
-                 expDate,
-                 article.publishDate)
+    assertEquals(
+      s"""Publish date should equal: "$expDate"""",
+      expDate,
+      article.publishDate)
     System.out.println("Publish Date Extracted: " + article.publishDate)
   }
 
@@ -398,9 +405,10 @@ class ExtractionsTest {
     val expected = getHtml("issue_24_result.txt")
     val url: String = "http://danielspicar.github.com/goose-bug.html"
     val article = TestUtils.getArticle(url, html)
-    assertEquals("The beginning of the article text was not as expected!",
-                 expected,
-                 article.cleanedArticleText)
+    assertEquals(
+      "The beginning of the article text was not as expected!",
+      expected,
+      article.cleanedArticleText)
   }
 
   @Test

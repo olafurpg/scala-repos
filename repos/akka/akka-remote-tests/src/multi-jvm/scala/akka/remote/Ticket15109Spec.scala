@@ -92,8 +92,9 @@ abstract class Ticket15109Spec
         // DisassociateInfo that triggers the code-path we want to test
         Await.result(
           RARP(system).provider.transport.managementCommand(
-            ForceDisassociateExplicitly(node(first).address,
-                                        AssociationHandle.Shutdown)),
+            ForceDisassociateExplicitly(
+              node(first).address,
+              AssociationHandle.Shutdown)),
           3.seconds)
       }
 

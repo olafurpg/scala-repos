@@ -122,9 +122,10 @@ class NaiveBayesSuite extends SparkFunSuite with MLlibTestSparkContext {
     for (i <- modelIndex) {
       for (j <- 0 until thetaData(i._2).length) {
         assert(
-          closeFit(math.exp(thetaData(i._2)(j)),
-                   math.exp(model.theta(i._1)(j)),
-                   0.05))
+          closeFit(
+            math.exp(thetaData(i._2)(j)),
+            math.exp(model.theta(i._1)(j)),
+            0.05))
       }
     }
   }
@@ -164,12 +165,14 @@ class NaiveBayesSuite extends SparkFunSuite with MLlibTestSparkContext {
     val validationRDD = sc.parallelize(validationData, 2)
 
     // Test prediction on RDD.
-    validatePrediction(model.predict(validationRDD.map(_.features)).collect(),
-                       validationData)
+    validatePrediction(
+      model.predict(validationRDD.map(_.features)).collect(),
+      validationData)
 
     // Test prediction on Array.
-    validatePrediction(validationData.map(row => model.predict(row.features)),
-                       validationData)
+    validatePrediction(
+      validationData.map(row => model.predict(row.features)),
+      validationData)
 
     // Test posteriors
     validationData.map(_.features).foreach { features =>
@@ -204,42 +207,45 @@ class NaiveBayesSuite extends SparkFunSuite with MLlibTestSparkContext {
     val nPoints = 10000
     val pi = Array(0.5, 0.3, 0.2).map(math.log)
     val theta = Array(
-      Array(0.50,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.40), // label 0
-      Array(0.02,
-            0.70,
-            0.10,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02), // label 1
-      Array(0.02,
-            0.02,
-            0.60,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.30) // label 2
+      Array(
+        0.50,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.40), // label 0
+      Array(
+        0.02,
+        0.70,
+        0.10,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02), // label 1
+      Array(
+        0.02,
+        0.02,
+        0.60,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.30) // label 2
     ).map(_.map(math.log))
 
     val testData = NaiveBayesSuite
@@ -255,12 +261,14 @@ class NaiveBayesSuite extends SparkFunSuite with MLlibTestSparkContext {
     val validationRDD = sc.parallelize(validationData, 2)
 
     // Test prediction on RDD.
-    validatePrediction(model.predict(validationRDD.map(_.features)).collect(),
-                       validationData)
+    validatePrediction(
+      model.predict(validationRDD.map(_.features)).collect(),
+      validationData)
 
     // Test prediction on Array.
-    validatePrediction(validationData.map(row => model.predict(row.features)),
-                       validationData)
+    validatePrediction(
+      validationData.map(row => model.predict(row.features)),
+      validationData)
 
     // Test posteriors
     validationData.map(_.features).foreach { features =>
@@ -297,36 +305,40 @@ class NaiveBayesSuite extends SparkFunSuite with MLlibTestSparkContext {
   }
 
   test("detect negative values") {
-    val dense = Seq(LabeledPoint(1.0, Vectors.dense(1.0)),
-                    LabeledPoint(0.0, Vectors.dense(-1.0)),
-                    LabeledPoint(1.0, Vectors.dense(1.0)),
-                    LabeledPoint(1.0, Vectors.dense(0.0)))
+    val dense = Seq(
+      LabeledPoint(1.0, Vectors.dense(1.0)),
+      LabeledPoint(0.0, Vectors.dense(-1.0)),
+      LabeledPoint(1.0, Vectors.dense(1.0)),
+      LabeledPoint(1.0, Vectors.dense(0.0)))
     intercept[SparkException] {
       NaiveBayes.train(sc.makeRDD(dense, 2))
     }
     val sparse =
-      Seq(LabeledPoint(1.0, Vectors.sparse(1, Array(0), Array(1.0))),
-          LabeledPoint(0.0, Vectors.sparse(1, Array(0), Array(-1.0))),
-          LabeledPoint(1.0, Vectors.sparse(1, Array(0), Array(1.0))),
-          LabeledPoint(1.0, Vectors.sparse(1, Array.empty, Array.empty)))
+      Seq(
+        LabeledPoint(1.0, Vectors.sparse(1, Array(0), Array(1.0))),
+        LabeledPoint(0.0, Vectors.sparse(1, Array(0), Array(-1.0))),
+        LabeledPoint(1.0, Vectors.sparse(1, Array(0), Array(1.0))),
+        LabeledPoint(1.0, Vectors.sparse(1, Array.empty, Array.empty)))
     intercept[SparkException] {
       NaiveBayes.train(sc.makeRDD(sparse, 2))
     }
     val nan =
-      Seq(LabeledPoint(1.0, Vectors.sparse(1, Array(0), Array(1.0))),
-          LabeledPoint(0.0, Vectors.sparse(1, Array(0), Array(Double.NaN))),
-          LabeledPoint(1.0, Vectors.sparse(1, Array(0), Array(1.0))),
-          LabeledPoint(1.0, Vectors.sparse(1, Array.empty, Array.empty)))
+      Seq(
+        LabeledPoint(1.0, Vectors.sparse(1, Array(0), Array(1.0))),
+        LabeledPoint(0.0, Vectors.sparse(1, Array(0), Array(Double.NaN))),
+        LabeledPoint(1.0, Vectors.sparse(1, Array(0), Array(1.0))),
+        LabeledPoint(1.0, Vectors.sparse(1, Array.empty, Array.empty)))
     intercept[SparkException] {
       NaiveBayes.train(sc.makeRDD(nan, 2))
     }
   }
 
   test("detect non zero or one values in Bernoulli") {
-    val badTrain = Seq(LabeledPoint(1.0, Vectors.dense(1.0)),
-                       LabeledPoint(0.0, Vectors.dense(2.0)),
-                       LabeledPoint(1.0, Vectors.dense(1.0)),
-                       LabeledPoint(1.0, Vectors.dense(0.0)))
+    val badTrain = Seq(
+      LabeledPoint(1.0, Vectors.dense(1.0)),
+      LabeledPoint(0.0, Vectors.dense(2.0)),
+      LabeledPoint(1.0, Vectors.dense(1.0)),
+      LabeledPoint(1.0, Vectors.dense(0.0)))
 
     intercept[SparkException] {
       NaiveBayes.train(sc.makeRDD(badTrain, 2), 1.0, Bernoulli)
@@ -342,10 +354,11 @@ class NaiveBayesSuite extends SparkFunSuite with MLlibTestSparkContext {
       LabeledPoint(1.0, Vectors.dense(1.0))
     )
 
-    val badPredict = Seq(Vectors.dense(1.0),
-                         Vectors.dense(2.0),
-                         Vectors.dense(1.0),
-                         Vectors.dense(0.0))
+    val badPredict = Seq(
+      Vectors.dense(1.0),
+      Vectors.dense(2.0),
+      Vectors.dense(1.0),
+      Vectors.dense(0.0))
 
     val model = NaiveBayes.train(sc.makeRDD(okTrain, 2), 1.0, Bernoulli)
     intercept[SparkException] {
@@ -357,8 +370,9 @@ class NaiveBayesSuite extends SparkFunSuite with MLlibTestSparkContext {
     val tempDir = Utils.createTempDir()
     val path = tempDir.toURI.toString
 
-    Seq(NaiveBayesSuite.binaryBernoulliModel,
-        NaiveBayesSuite.binaryMultinomialModel).map { model =>
+    Seq(
+      NaiveBayesSuite.binaryBernoulliModel,
+      NaiveBayesSuite.binaryMultinomialModel).map { model =>
       // Save model, load it back, and compare.
       try {
         model.save(sc, path)
@@ -406,8 +420,9 @@ class NaiveBayesClusterSuite
       (idx, iter) =>
         val random = new Random(idx)
         iter.map { i =>
-          LabeledPoint(random.nextInt(2),
-                       Vectors.dense(Array.fill(n)(random.nextDouble())))
+          LabeledPoint(
+            random.nextInt(2),
+            Vectors.dense(Array.fill(n)(random.nextDouble())))
         }
     }
     // If we serialize data directly in the task closure, the size of the serialized task

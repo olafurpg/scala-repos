@@ -71,8 +71,9 @@ private[akka] trait MetricsKit extends MetricsKitOps { this: Notifying ⇒
       if (settings.Reporters.contains("graphite")) {
         note(
           s"MetricsKit: Graphite reporter enabled, sending metrics to: ${settings.GraphiteReporter.Host}:${settings.GraphiteReporter.Port}")
-        val address = new InetSocketAddress(settings.GraphiteReporter.Host,
-                                            settings.GraphiteReporter.Port)
+        val address = new InetSocketAddress(
+          settings.GraphiteReporter.Host,
+          settings.GraphiteReporter.Port)
         val graphite = new GraphiteClient(address)
         val akkaGraphiteReporter = new AkkaGraphiteReporter(
           registry,
@@ -183,9 +184,10 @@ private[akka] trait MetricsKit extends MetricsKitOps { this: Notifying ⇒
       case Some(existing) ⇒
         throw new IllegalArgumentException(
           "Key: [%s] is already for different kind of metric! Was [%s], expected [%s]"
-            .format(key,
-                    metric.getClass.getSimpleName,
-                    tag.runtimeClass.getSimpleName))
+            .format(
+              key,
+              metric.getClass.getSimpleName,
+              tag.runtimeClass.getSimpleName))
       case _ ⇒ registry.register(key, metric)
     }
   }

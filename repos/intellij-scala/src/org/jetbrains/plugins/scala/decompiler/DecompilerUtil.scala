@@ -103,9 +103,10 @@ object DecompilerUtil {
           val attributeTimeStamp = readAttribute.readLong()
           if (attributeTimeStamp != timeStamp) updateAttributeAndData()
           else
-            res = new DecompilationResult(isScala,
-                                          sourceName,
-                                          attributeTimeStamp) {
+            res = new DecompilationResult(
+              isScala,
+              sourceName,
+              attributeTimeStamp) {
               override lazy val sourceText: String = {
                 decompileInner(file, bytes).sourceText
               }
@@ -125,9 +126,10 @@ object DecompilerUtil {
     try {
       Decompiler.decompile(file.getName, bytes) match {
         case Some((sourceFileName, decompiledSourceText)) =>
-          new DecompilationResult(isScala = true,
-                                  sourceFileName,
-                                  file.getTimeStamp) {
+          new DecompilationResult(
+            isScala = true,
+            sourceFileName,
+            file.getTimeStamp) {
             override def sourceText: String = decompiledSourceText
           }
         case _ =>

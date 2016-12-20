@@ -85,9 +85,10 @@ object DistributedCacheFile {
   }
 
   def symlinkedUriFor(sourceUri: URI): URI =
-    new URI(sourceUri.getScheme,
-            sourceUri.getSchemeSpecificPart,
-            symlinkNameFor(sourceUri))
+    new URI(
+      sourceUri.getScheme,
+      sourceUri.getSchemeSpecificPart,
+      symlinkNameFor(sourceUri))
 }
 
 final case class UncachedFile private[scalding] (source: Either[String, URI]) {

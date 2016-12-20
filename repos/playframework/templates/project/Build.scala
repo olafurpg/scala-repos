@@ -359,9 +359,12 @@ object Templates {
     )
 
   val templatesCommand =
-    Command("templates",
-            Help.more("templates",
-                      "Execute the given command for the given templates"))(
+    Command(
+      "templates",
+      Help
+        .more(
+          "templates",
+          "Execute the given command for the given templates"))(
       templatesParser) { (state, args) =>
       val (templateDirs, command) = args
       val extracted = Project.extract(state)
@@ -369,9 +372,10 @@ object Templates {
       def createSetCommand(dirs: Seq[TemplateSources]): String = {
         dirs
           .map("file(\"" + _.mainDir.getAbsolutePath + "\")")
-          .mkString("set play.sbt.activator.Templates.templates := Seq(",
-                    ",",
-                    ")")
+          .mkString(
+            "set play.sbt.activator.Templates.templates := Seq(",
+            ",",
+            ")")
       }
 
       val setCommand = createSetCommand(templateDirs)

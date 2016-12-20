@@ -53,45 +53,49 @@ class SameSignatureCallParametersProvider extends ScalaCompletionContributor {
     .withSuperParent(2, classOf[ScArgumentExprList])
     .withSuperParent(3, classOf[ScMethodCall])
 
-  extend(CompletionType.BASIC,
-         constructorFilter,
-         new CompletionProvider[CompletionParameters]() {
-           def addCompletions(parameters: CompletionParameters,
-                              context: ProcessingContext,
-                              result: CompletionResultSet) {
-             addConstructorCompletions(parameters, result)
-           }
-         })
+  extend(
+    CompletionType.BASIC,
+    constructorFilter,
+    new CompletionProvider[CompletionParameters]() {
+      def addCompletions(parameters: CompletionParameters,
+                         context: ProcessingContext,
+                         result: CompletionResultSet) {
+        addConstructorCompletions(parameters, result)
+      }
+    })
 
-  extend(CompletionType.SMART,
-         constructorFilter,
-         new CompletionProvider[CompletionParameters]() {
-           def addCompletions(parameters: CompletionParameters,
-                              context: ProcessingContext,
-                              result: CompletionResultSet) {
-             addConstructorCompletions(parameters, result)
-           }
-         })
+  extend(
+    CompletionType.SMART,
+    constructorFilter,
+    new CompletionProvider[CompletionParameters]() {
+      def addCompletions(parameters: CompletionParameters,
+                         context: ProcessingContext,
+                         result: CompletionResultSet) {
+        addConstructorCompletions(parameters, result)
+      }
+    })
 
-  extend(CompletionType.BASIC,
-         superCallFilter,
-         new CompletionProvider[CompletionParameters]() {
-           def addCompletions(parameters: CompletionParameters,
-                              context: ProcessingContext,
-                              result: CompletionResultSet) {
-             addSuperCallCompletions(parameters, result)
-           }
-         })
+  extend(
+    CompletionType.BASIC,
+    superCallFilter,
+    new CompletionProvider[CompletionParameters]() {
+      def addCompletions(parameters: CompletionParameters,
+                         context: ProcessingContext,
+                         result: CompletionResultSet) {
+        addSuperCallCompletions(parameters, result)
+      }
+    })
 
-  extend(CompletionType.SMART,
-         superCallFilter,
-         new CompletionProvider[CompletionParameters]() {
-           def addCompletions(parameters: CompletionParameters,
-                              context: ProcessingContext,
-                              result: CompletionResultSet) {
-             addSuperCallCompletions(parameters, result)
-           }
-         })
+  extend(
+    CompletionType.SMART,
+    superCallFilter,
+    new CompletionProvider[CompletionParameters]() {
+      def addCompletions(parameters: CompletionParameters,
+                         context: ProcessingContext,
+                         result: CompletionResultSet) {
+        addSuperCallCompletions(parameters, result)
+      }
+    })
 
   private def addSuperCallCompletions(parameters: CompletionParameters,
                                       result: CompletionResultSet): Unit = {
@@ -110,9 +114,9 @@ class SameSignatureCallParametersProvider extends ScalaCompletionContributor {
             val function =
               PsiTreeUtil.getContextOfType(ref, classOf[ScFunction])
             if (function != null && function.name == ref.refName) {
-              val variants = ref.getSimpleVariants(implicits = false,
-                                                   filterNotNamedVariants =
-                                                     false)
+              val variants = ref.getSimpleVariants(
+                implicits = false,
+                filterNotNamedVariants = false)
               val signatures = variants.toSeq
                 .map {
                   case ScalaResolveResult(fun: ScMethodLike, subst) =>
@@ -129,9 +133,10 @@ class SameSignatureCallParametersProvider extends ScalaCompletionContributor {
                         case p: PsiParameter =>
                           (p.name,
                            subst.subst(
-                             ScType.create(p.getType,
-                                           position.getProject,
-                                           position.getResolveScope)))
+                             ScType.create(
+                               p.getType,
+                               position.getProject,
+                               position.getResolveScope)))
                       }
                   case _ => Seq.empty
                 }
@@ -194,9 +199,10 @@ class SameSignatureCallParametersProvider extends ScalaCompletionContributor {
                             case p: PsiParameter =>
                               (p.name,
                                subst.subst(
-                                 ScType.create(p.getType,
-                                               typeElement.getProject,
-                                               typeElement.getResolveScope)))
+                                 ScType.create(
+                                   p.getType,
+                                   typeElement.getProject,
+                                   typeElement.getResolveScope)))
                           }
                     }
                     .filter(_.length > 1)
@@ -257,8 +263,9 @@ class SameSignatureCallParametersProvider extends ScalaCompletionContributor {
                 exprs.getTextRange.getEndOffset) // put caret after )
             }
           })
-        element.putUserData(JavaCompletionUtil.SUPER_METHOD_PARAMETERS,
-                            java.lang.Boolean.TRUE)
+        element.putUserData(
+          JavaCompletionUtil.SUPER_METHOD_PARAMETERS,
+          java.lang.Boolean.TRUE)
         result.addElement(element)
       }
     }

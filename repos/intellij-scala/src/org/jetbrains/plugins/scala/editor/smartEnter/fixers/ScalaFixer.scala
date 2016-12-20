@@ -71,9 +71,10 @@ trait ScalaFixer {
                 WithEnter(0)
               case ws: PsiWhiteSpace if ws.getNextSibling == r =>
                 move2start(l)
-                editor.getDocument.replaceString(l.getTextRange.getStartOffset,
-                                                 r.getTextRange.getEndOffset,
-                                                 "{}")
+                editor.getDocument.replaceString(
+                  l.getTextRange.getStartOffset,
+                  r.getTextRange.getEndOffset,
+                  "{}")
                 WithEnter(1)
               case other =>
                 move2end(other)

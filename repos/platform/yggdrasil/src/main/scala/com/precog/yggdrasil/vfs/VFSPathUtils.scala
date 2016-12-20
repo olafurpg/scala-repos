@@ -54,8 +54,9 @@ object VFSPathUtils extends Logging {
 
   private final val pathFileFilter: FileFilter = {
     import FileFilterUtils.{notFileFilter => not, _}
-    and(not(nameFileFilter(versionsSubdir)),
-        not(nameFileFilter(perAuthProjectionsDir)))
+    and(
+      not(nameFileFilter(versionsSubdir)),
+      not(nameFileFilter(perAuthProjectionsDir)))
   }
 
   def escapePath(path: Path, toEscape: Set[String]) =

@@ -137,11 +137,12 @@ class ClientRegistryTest
     val simple = new SimpleRegistry
     GlobalRegistry.withRegistry(simple) {
       val c = stackClient.newClient(Name.Path(path), "foo")
-      val prefix = Seq("client",
-                       "fancy",
-                       "foo",
-                       "/$/com.twitter.finagle.client.crtnamer/foo",
-                       "Pool")
+      val prefix = Seq(
+        "client",
+        "fancy",
+        "foo",
+        "/$/com.twitter.finagle.client.crtnamer/foo",
+        "Pool")
       val filtered = GlobalRegistry.get.toSet.filter { e =>
         e.key.startsWith(prefix)
       }

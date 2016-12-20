@@ -35,10 +35,11 @@ object max
   @expand
   implicit def reduce[T, @expand.args(Int, Double, Float, Long) S](
       implicit iter: CanTraverseValues[T, S],
-      @expand.sequence[S](Int.MinValue,
-                          Double.NegativeInfinity,
-                          Float.NegativeInfinity,
-                          Long.MinValue) init: S): Impl[T, S] =
+      @expand.sequence[S](
+        Int.MinValue,
+        Double.NegativeInfinity,
+        Float.NegativeInfinity,
+        Long.MinValue) init: S): Impl[T, S] =
     new Impl[T, S] {
 
       def apply(v: T): S = {
@@ -161,10 +162,11 @@ object min extends UFunc {
   @expand
   implicit def reduce[T, @expand.args(Int, Double, Float, Long) S](
       implicit iter: CanTraverseValues[T, S],
-      @expand.sequence[S](Int.MaxValue,
-                          Double.PositiveInfinity,
-                          Float.PositiveInfinity,
-                          Long.MaxValue) init: S): Impl[T, S] =
+      @expand.sequence[S](
+        Int.MaxValue,
+        Double.PositiveInfinity,
+        Float.PositiveInfinity,
+        Long.MaxValue) init: S): Impl[T, S] =
     new Impl[T, S] {
 
       def apply(v: T): S = {
@@ -262,10 +264,11 @@ object ptp extends UFunc {
   @expand
   implicit def reduce[T, @expand.args(Int, Double, Float, Long) S](
       implicit iter: CanTraverseValues[T, S],
-      @expand.sequence[S](Int.MaxValue,
-                          Double.PositiveInfinity,
-                          Float.PositiveInfinity,
-                          Long.MaxValue) init: S): Impl[T, S] =
+      @expand.sequence[S](
+        Int.MaxValue,
+        Double.PositiveInfinity,
+        Float.PositiveInfinity,
+        Long.MaxValue) init: S): Impl[T, S] =
     new Impl[T, S] {
 
       def apply(v: T): S = {
@@ -321,10 +324,11 @@ object minMax extends UFunc {
   @expand
   implicit def reduce[T, @expand.args(Int, Double, Float, Long) S](
       implicit iter: CanTraverseValues[T, S],
-      @expand.sequence[S](Int.MaxValue,
-                          Double.PositiveInfinity,
-                          Float.PositiveInfinity,
-                          Long.MaxValue) init: S): Impl[T, (S, S)] =
+      @expand.sequence[S](
+        Int.MaxValue,
+        Double.PositiveInfinity,
+        Float.PositiveInfinity,
+        Long.MaxValue) init: S): Impl[T, (S, S)] =
     new Impl[T, (S, S)] {
 
       def apply(v: T): (S, S) = {

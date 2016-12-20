@@ -86,15 +86,17 @@ private[thriftserver] trait ReflectedCompositeService {
     serviceList.asScala.foreach(_.init(hiveConf))
 
     // Emulating `AbstractService.init(hiveConf)`
-    invoke(classOf[AbstractService],
-           this,
-           "ensureCurrentState",
-           classOf[STATE] -> STATE.NOTINITED)
+    invoke(
+      classOf[AbstractService],
+      this,
+      "ensureCurrentState",
+      classOf[STATE] -> STATE.NOTINITED)
     setAncestorField(this, 3, "hiveConf", hiveConf)
-    invoke(classOf[AbstractService],
-           this,
-           "changeState",
-           classOf[STATE] -> STATE.INITED)
+    invoke(
+      classOf[AbstractService],
+      this,
+      "changeState",
+      classOf[STATE] -> STATE.INITED)
     getAncestorField[Log](this, 3, "LOG").info(s"Service: $getName is inited.")
   }
 }

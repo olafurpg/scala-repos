@@ -63,10 +63,11 @@ class MiscDirectivesExamplesSpec extends RoutingSpec {
   }
   "selectPreferredLanguage-example" in {
     val request =
-      Get() ~> `Accept-Language`(Language("en-US"),
-                                 Language("en") withQValue 0.7f,
-                                 LanguageRange.`*` withQValue 0.1f,
-                                 Language("de") withQValue 0.5f)
+      Get() ~> `Accept-Language`(
+        Language("en-US"),
+        Language("en") withQValue 0.7f,
+        LanguageRange.`*` withQValue 0.1f,
+        Language("de") withQValue 0.5f)
 
     request ~> {
       selectPreferredLanguage("en", "en-US") { lang ⇒
@@ -82,8 +83,9 @@ class MiscDirectivesExamplesSpec extends RoutingSpec {
   }
   "validate-example" in {
     val route = extractUri { uri =>
-      validate(uri.path.toString.size < 5,
-               s"Path too long: '${uri.path.toString}'") {
+      validate(
+        uri.path.toString.size < 5,
+        s"Path too long: '${uri.path.toString}'") {
         complete(s"Full URI: $uri")
       }
     }

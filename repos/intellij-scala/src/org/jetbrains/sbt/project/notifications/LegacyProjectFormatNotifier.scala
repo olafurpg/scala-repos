@@ -36,11 +36,12 @@ class LegacyProjectFormatNotifier(project: Project)
         builder.setHandler { ref =>
           val manager = ActionManager.getInstance
           Option(manager.getAction("ImportProject")).foreach { action =>
-            manager.tryToExecute(action,
-                                 ActionCommand.getInputEvent("ImportProject"),
-                                 null,
-                                 ActionPlaces.UNKNOWN,
-                                 true)
+            manager.tryToExecute(
+              action,
+              ActionCommand.getInputEvent("ImportProject"),
+              null,
+              ActionPlaces.UNKNOWN,
+              true)
           }
         }
 

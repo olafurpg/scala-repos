@@ -340,11 +340,12 @@ class JavapClass(
       //getTask(writer, fileManager, reporter, options.asJava, classes.asJava)
       val toolopts = options filter (_ != "-filter")
       TaskCtor
-        .newInstance(writer,
-                     fileManager(inputs),
-                     reporter,
-                     toolopts.asJava,
-                     classes.asJava)
+        .newInstance(
+          writer,
+          fileManager(inputs),
+          reporter,
+          toolopts.asJava,
+          classes.asJava)
         .orFailed(throw new IllegalStateException)
     }
     // a result per input

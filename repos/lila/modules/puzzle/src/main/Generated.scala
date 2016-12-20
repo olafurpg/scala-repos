@@ -18,10 +18,11 @@ case class Generated(position: String, solution: JsObject, id: String) {
       else Success(true)
       fen ← Generated fenOf history
     } yield
-      Puzzle.make(gameId = id.some,
-                  history = position.trim.split(' ').toList,
-                  fen = fen,
-                  lines = lines)
+      Puzzle.make(
+        gameId = id.some,
+        history = position.trim.split(' ').toList,
+        fen = fen,
+        lines = lines)
 }
 
 object Generated {

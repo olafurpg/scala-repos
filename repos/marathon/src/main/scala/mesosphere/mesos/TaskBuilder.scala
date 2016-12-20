@@ -142,11 +142,12 @@ class TaskBuilder(app: AppDefinition,
     executor match {
       case CommandExecutor() =>
         builder.setCommand(
-          TaskBuilder.commandInfo(app,
-                                  Some(taskId),
-                                  host,
-                                  resourceMatch.hostPorts,
-                                  envPrefix))
+          TaskBuilder.commandInfo(
+            app,
+            Some(taskId),
+            host,
+            resourceMatch.hostPorts,
+            envPrefix))
         containerProto.foreach(builder.setContainer)
 
       case PathExecutor(path) =>
@@ -155,11 +156,12 @@ class TaskBuilder(app: AppDefinition,
         val cmd = app.cmd orElse app.args.map(_ mkString " ") getOrElse ""
         val shell = s"chmod ug+rx $executorPath && exec $executorPath $cmd"
         val command = TaskBuilder
-          .commandInfo(app,
-                       Some(taskId),
-                       host,
-                       resourceMatch.hostPorts,
-                       envPrefix)
+          .commandInfo(
+            app,
+            Some(taskId),
+            host,
+            resourceMatch.hostPorts,
+            envPrefix)
           .toBuilder
           .setValue(shell)
 

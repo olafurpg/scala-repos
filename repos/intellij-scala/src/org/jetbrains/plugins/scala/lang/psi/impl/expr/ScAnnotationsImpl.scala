@@ -27,6 +27,7 @@ class ScAnnotationsImpl private (stub: StubElement[ScAnnotations],
   override def toString: String = "AnnotationsList"
 
   def getAnnotations: Array[ScAnnotation] =
-    getStubOrPsiChildren(ScalaElementTypes.ANNOTATION,
-                         JavaArrayFactoryUtil.ScAnnotationFactory)
+    getStubOrPsiChildren(
+      ScalaElementTypes.ANNOTATION,
+      JavaArrayFactoryUtil.ScAnnotationFactory)
 }

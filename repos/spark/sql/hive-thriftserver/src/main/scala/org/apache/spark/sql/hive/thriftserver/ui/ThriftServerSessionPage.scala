@@ -44,8 +44,9 @@ private[ui] class ThriftServerSessionPage(parent: ThriftServerTab)
   /** Render the page */
   def render(request: HttpServletRequest): Seq[Node] = {
     val parameterId = request.getParameter("id")
-    require(parameterId != null && parameterId.nonEmpty,
-            "Missing id parameter")
+    require(
+      parameterId != null && parameterId.nonEmpty,
+      "Missing id parameter")
 
     val content = listener.synchronized {
       // make sure all parts in this page are consistent
@@ -82,15 +83,16 @@ private[ui] class ThriftServerSessionPage(parent: ThriftServerTab)
     val numStatement = executionList.size
     val table =
       if (numStatement > 0) {
-        val headerRow = Seq("User",
-                            "JobID",
-                            "GroupID",
-                            "Start Time",
-                            "Finish Time",
-                            "Duration",
-                            "Statement",
-                            "State",
-                            "Detail")
+        val headerRow = Seq(
+          "User",
+          "JobID",
+          "GroupID",
+          "Start Time",
+          "Finish Time",
+          "Duration",
+          "Statement",
+          "State",
+          "Detail")
         val dataRows = executionList.sortBy(_.startTimestamp).reverse
 
         def generateDataRow(info: ExecutionInfo): Seq[Node] = {
@@ -118,13 +120,14 @@ private[ui] class ThriftServerSessionPage(parent: ThriftServerTab)
         }
 
         Some(
-          UIUtils.listingTable(headerRow,
-                               generateDataRow,
-                               dataRows,
-                               false,
-                               None,
-                               Seq(null),
-                               false))
+          UIUtils.listingTable(
+            headerRow,
+            generateDataRow,
+            dataRows,
+            false,
+            None,
+            Seq(null),
+            false))
       } else {
         None
       }
@@ -182,13 +185,14 @@ private[ui] class ThriftServerSessionPage(parent: ThriftServerTab)
                 session.totalExecution.toString
             ))
           .toSeq
-        val headerRow = Seq("User",
-                            "IP",
-                            "Session ID",
-                            "Start Time",
-                            "Finish Time",
-                            "Duration",
-                            "Total Execute")
+        val headerRow = Seq(
+          "User",
+          "IP",
+          "Session ID",
+          "Start Time",
+          "Finish Time",
+          "Duration",
+          "Total Execute")
         Some(listingTable(headerRow, dataRows))
       } else {
         None

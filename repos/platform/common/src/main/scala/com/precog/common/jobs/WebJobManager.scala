@@ -273,10 +273,11 @@ trait WebJobManager
                     case Some(job) => Right(job)
                     case None => Left("Could not find job with ID: " + jobId)
                   }
-                case HttpResponse(HttpStatus(BadRequest, _),
-                                  _,
-                                  Some(JString(msg)),
-                                  _) =>
+                case HttpResponse(
+                    HttpStatus(BadRequest, _),
+                    _,
+                    Some(JString(msg)),
+                    _) =>
                   BadResponse(msg)
                 case res =>
                   BadResponse(unexpected(res))
@@ -325,10 +326,11 @@ trait WebJobManager
             Right((contentType(headers),
                    bytes :: StreamT.empty[Response, Array[Byte]])))
 
-        case HttpResponse(HttpStatus(OK, _),
-                          headers,
-                          Some(Right(chunks)),
-                          _) =>
+        case HttpResponse(
+            HttpStatus(OK, _),
+            headers,
+            Some(Right(chunks)),
+            _) =>
           val t = FutureStreamAsResponseStream
           right(Right((contentType(headers), t(chunks))))
 

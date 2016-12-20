@@ -69,12 +69,14 @@ class InterpolatedStringsAnnotatorTest
   }
 
   def testMultipleResolve() {
-    messageExists(header + "c\"blah blah $i1 $i2\"",
-                  "Error(i1,Type mismatch, expected: String, actual: Int)")
+    messageExists(
+      header + "c\"blah blah $i1 $i2\"",
+      "Error(i1,Type mismatch, expected: String, actual: Int)")
   }
 
   def testMultipleResolve2() {
-    messageExists(header + "c\"blah $i1 blah $s1 $i2\"",
-                  "Error(i2,Too many arguments for method c(String, String))")
+    messageExists(
+      header + "c\"blah $i1 blah $s1 $i2\"",
+      "Error(i2,Too many arguments for method c(String, String))")
   }
 }

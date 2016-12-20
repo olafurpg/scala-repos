@@ -38,22 +38,25 @@ class JsonProtocolSuite extends SparkFunSuite with JsonTestUtils {
   test("writeApplicationInfo") {
     val output = JsonProtocol.writeApplicationInfo(createAppInfo())
     assertValidJson(output)
-    assertValidDataInJson(output,
-                          JsonMethods.parse(JsonConstants.appInfoJsonStr))
+    assertValidDataInJson(
+      output,
+      JsonMethods.parse(JsonConstants.appInfoJsonStr))
   }
 
   test("writeWorkerInfo") {
     val output = JsonProtocol.writeWorkerInfo(createWorkerInfo())
     assertValidJson(output)
-    assertValidDataInJson(output,
-                          JsonMethods.parse(JsonConstants.workerInfoJsonStr))
+    assertValidDataInJson(
+      output,
+      JsonMethods.parse(JsonConstants.workerInfoJsonStr))
   }
 
   test("writeApplicationDescription") {
     val output = JsonProtocol.writeApplicationDescription(createAppDesc())
     assertValidJson(output)
-    assertValidDataInJson(output,
-                          JsonMethods.parse(JsonConstants.appDescJsonStr))
+    assertValidDataInJson(
+      output,
+      JsonMethods.parse(JsonConstants.appDescJsonStr))
   }
 
   test("writeExecutorRunner") {
@@ -67,8 +70,9 @@ class JsonProtocolSuite extends SparkFunSuite with JsonTestUtils {
   test("writeDriverInfo") {
     val output = JsonProtocol.writeDriverInfo(createDriverInfo())
     assertValidJson(output)
-    assertValidDataInJson(output,
-                          JsonMethods.parse(JsonConstants.driverInfoJsonStr))
+    assertValidDataInJson(
+      output,
+      JsonMethods.parse(JsonConstants.driverInfoJsonStr))
   }
 
   test("writeMasterState") {
@@ -77,45 +81,50 @@ class JsonProtocolSuite extends SparkFunSuite with JsonTestUtils {
     val completedApps = Array[ApplicationInfo]()
     val activeDrivers = Array(createDriverInfo())
     val completedDrivers = Array(createDriverInfo())
-    val stateResponse = new MasterStateResponse("host",
-                                                8080,
-                                                None,
-                                                workers,
-                                                activeApps,
-                                                completedApps,
-                                                activeDrivers,
-                                                completedDrivers,
-                                                RecoveryState.ALIVE)
+    val stateResponse = new MasterStateResponse(
+      "host",
+      8080,
+      None,
+      workers,
+      activeApps,
+      completedApps,
+      activeDrivers,
+      completedDrivers,
+      RecoveryState.ALIVE)
     val output = JsonProtocol.writeMasterState(stateResponse)
     assertValidJson(output)
-    assertValidDataInJson(output,
-                          JsonMethods.parse(JsonConstants.masterStateJsonStr))
+    assertValidDataInJson(
+      output,
+      JsonMethods.parse(JsonConstants.masterStateJsonStr))
   }
 
   test("writeWorkerState") {
     val executors = List[ExecutorRunner]()
-    val finishedExecutors = List[ExecutorRunner](createExecutorRunner(123),
-                                                 createExecutorRunner(123))
+    val finishedExecutors = List[ExecutorRunner](
+      createExecutorRunner(123),
+      createExecutorRunner(123))
     val drivers = List(createDriverRunner("driverId"))
     val finishedDrivers =
       List(createDriverRunner("driverId"), createDriverRunner("driverId"))
-    val stateResponse = new WorkerStateResponse("host",
-                                                8080,
-                                                "workerId",
-                                                executors,
-                                                finishedExecutors,
-                                                drivers,
-                                                finishedDrivers,
-                                                "masterUrl",
-                                                4,
-                                                1234,
-                                                4,
-                                                1234,
-                                                "masterWebUiUrl")
+    val stateResponse = new WorkerStateResponse(
+      "host",
+      8080,
+      "workerId",
+      executors,
+      finishedExecutors,
+      drivers,
+      finishedDrivers,
+      "masterUrl",
+      4,
+      1234,
+      4,
+      1234,
+      "masterWebUiUrl")
     val output = JsonProtocol.writeWorkerState(stateResponse)
     assertValidJson(output)
-    assertValidDataInJson(output,
-                          JsonMethods.parse(JsonConstants.workerStateJsonStr))
+    assertValidDataInJson(
+      output,
+      JsonMethods.parse(JsonConstants.workerStateJsonStr))
   }
 
   def assertValidJson(json: JValue) {
@@ -137,9 +146,10 @@ object JsonConstants {
       |"memoryperslave":1234,"submitdate":"%s",
       |"state":"WAITING","duration":%d}
     """
-    .format(System.getProperty("user.name", "<unknown>"),
-            submitDate.toString,
-            currTimeInMillis - appInfoStartTime)
+    .format(
+      System.getProperty("user.name", "<unknown>"),
+      submitDate.toString,
+      currTimeInMillis - appInfoStartTime)
     .stripMargin
 
   val workerInfoJsonStr = """
@@ -175,10 +185,11 @@ object JsonConstants {
       |"activedrivers":[%s],
       |"status":"ALIVE"}
     """
-      .format(workerInfoJsonStr,
-              workerInfoJsonStr,
-              appInfoJsonStr,
-              driverInfoJsonStr)
+      .format(
+        workerInfoJsonStr,
+        workerInfoJsonStr,
+        appInfoJsonStr,
+        driverInfoJsonStr)
       .stripMargin
 
   val workerStateJsonStr =

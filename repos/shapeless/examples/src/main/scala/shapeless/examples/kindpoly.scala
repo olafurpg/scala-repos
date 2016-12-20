@@ -29,9 +29,10 @@ object TyApp {
     new TyApp[TC[A, B], TC[Arbitrary, Arbitrary], A :: B :: HNil]
 
   implicit def tyApp3[TC[_, _, _], A, B, C] =
-    new TyApp[TC[A, B, C],
-              TC[Arbitrary, Arbitrary, Arbitrary],
-              A :: B :: C :: HNil]
+    new TyApp[
+      TC[A, B, C],
+      TC[Arbitrary, Arbitrary, Arbitrary],
+      A :: B :: C :: HNil]
 }
 
 object KindPolyExamples {

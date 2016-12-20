@@ -331,9 +331,10 @@ object PaintScale {
   val transparent = new Color(0, 0, 0, 0)
 
   /** Produces a gradient using the University of Minnesota's school colors, from maroon (low) to gold (high) */
-  lazy val MaroonToGold = createGradient(new Color(0xA0, 0x00, 0x00),
-                                         new Color(0xFF, 0xFF, 0x00),
-                                         256)
+  lazy val MaroonToGold = createGradient(
+    new Color(0xA0, 0x00, 0x00),
+    new Color(0xFF, 0xFF, 0x00),
+    256)
 
   /** Produces a gradient from blue (low) to red (high) */
   lazy val BlueToRed = createGradient(Color.BLUE, Color.RED, 500)
@@ -353,30 +354,36 @@ object PaintScale {
     500)
 
   /** Produces a gradient through the rainbow: violet, blue, green, yellow, orange, red */
-  lazy val Rainbow = createMultiGradient(Array(new Color(181, 32, 255),
-                                               Color.blue,
-                                               Color.green,
-                                               Color.yellow,
-                                               Color.orange,
-                                               Color.red),
-                                         500)
+  lazy val Rainbow = createMultiGradient(
+    Array(
+      new Color(181, 32, 255),
+      Color.blue,
+      Color.green,
+      Color.yellow,
+      Color.orange,
+      Color.red),
+    500)
 
   /** Produces a gradient for hot things (black, red, orange, yellow, white) */
-  lazy val Hot = createMultiGradient(Array(Color.black,
-                                           new Color(87, 0, 0),
-                                           Color.red,
-                                           Color.orange,
-                                           Color.yellow,
-                                           Color.white),
-                                     500)
+  lazy val Hot = createMultiGradient(
+    Array(
+      Color.black,
+      new Color(87, 0, 0),
+      Color.red,
+      Color.orange,
+      Color.yellow,
+      Color.white),
+    500)
 
   /** Produces a different gradient for hot things (black, brown, orange, white) */
-  lazy val Heat = createMultiGradient(Array(Color.black,
-                                            new Color(105, 0, 0),
-                                            new Color(192, 23, 0),
-                                            new Color(255, 150, 38),
-                                            Color.white),
-                                      500)
+  lazy val Heat = createMultiGradient(
+    Array(
+      Color.black,
+      new Color(105, 0, 0),
+      new Color(192, 23, 0),
+      new Color(255, 150, 38),
+      Color.white),
+    500)
 
   /** Produces a gradient through red, orange, yellow */
   lazy val RedOrangeYellow =
@@ -437,9 +444,10 @@ object PaintScale {
 
     for (section <- 0 until numSections) {
       //we divide the gradient into (n - 1) sections, and do a regular gradient for each
-      val temp = createGradient(colors(section),
-                                colors(section + 1),
-                                numSteps / numSections)
+      val temp = createGradient(
+        colors(section),
+        colors(section + 1),
+        numSteps / numSections)
       for (i <- 0 until temp.length) {
         //copy the sub-gradient into the overall gradient
         gradient(gradientIndex) = temp(i)

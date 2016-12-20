@@ -114,11 +114,12 @@ object PlayDocsValidation {
     def parseMarkdownFile(markdownFile: File): String = {
 
       val processor =
-        new PegDownProcessor(Extensions.ALL,
-                             PegDownPlugins
-                               .builder()
-                               .withPlugin(classOf[CodeReferenceParser])
-                               .build)
+        new PegDownProcessor(
+          Extensions.ALL,
+          PegDownPlugins
+            .builder()
+            .withPlugin(classOf[CodeReferenceParser])
+            .build)
 
       // Link renderer will also verify that all wiki links exist
       val linkRenderer = new LinkRenderer {
@@ -129,9 +130,10 @@ object PlayDocsValidation {
               val parts = link.split('|')
               val desc = parts.head
               val page = stripFragment(parts.tail.head.trim)
-              wikiLinks += LinkRef(page,
-                                   markdownFile,
-                                   node.getStartIndex + desc.length + 3)
+              wikiLinks += LinkRef(
+                page,
+                markdownFile,
+                node.getStartIndex + desc.length + 3)
 
             case image if image.endsWith(".png") =>
               image match {
@@ -139,9 +141,10 @@ object PlayDocsValidation {
                   externalLinks +=
                     LinkRef(full, markdownFile, node.getStartIndex + 2)
                 case absolute if absolute.startsWith("/") =>
-                  resourceLinks += LinkRef("manual" + absolute,
-                                           markdownFile,
-                                           node.getStartIndex + 2)
+                  resourceLinks += LinkRef(
+                    "manual" + absolute,
+                    markdownFile,
+                    node.getStartIndex + 2)
                 case relative =>
                   val link =
                     markdownFile.getParentFile.getCanonicalPath
@@ -208,11 +211,12 @@ object PlayDocsValidation {
                   code.getStartIndex + 2
                 }
 
-              codeSamples += CodeSampleRef(sourceFile,
-                                           label,
-                                           markdownFile,
-                                           sourcePos,
-                                           labelPos)
+              codeSamples += CodeSampleRef(
+                sourceFile,
+                label,
+                markdownFile,
+                sourcePos,
+                labelPos)
               true
             }
             case _ => false
@@ -220,19 +224,21 @@ object PlayDocsValidation {
       }
 
       val astRoot = processor.parseMarkdown(IO.read(markdownFile).toCharArray)
-      new ToHtmlSerializer(linkRenderer,
-                           java.util.Arrays.asList[ToHtmlSerializerPlugin](
-                             codeReferenceSerializer)).toHtml(astRoot)
+      new ToHtmlSerializer(
+        linkRenderer,
+        java.util.Arrays.asList[ToHtmlSerializerPlugin](
+          codeReferenceSerializer)).toHtml(astRoot)
     }
 
     markdownFiles.foreach(parseMarkdownFile)
 
-    MarkdownRefReport(markdownFiles,
-                      wikiLinks.toSeq,
-                      resourceLinks.toSeq,
-                      codeSamples.toSeq,
-                      relativeLinks.toSeq,
-                      externalLinks.toSeq)
+    MarkdownRefReport(
+      markdownFiles,
+      wikiLinks.toSeq,
+      resourceLinks.toSeq,
+      codeSamples.toSeq,
+      relativeLinks.toSeq,
+      externalLinks.toSeq)
   }
 
   private def extractCodeSamples(
@@ -352,10 +358,11 @@ object PlayDocsValidation {
             hasCodeSample(actualFile.codeSamples))
           val introducedCodeSamples = actualFile.codeSamples.filterNot(
             hasCodeSample(actualFile.codeSamples))
-          TranslationCodeSamples(actualFile.name,
-                                 missingCodeSamples,
-                                 introducedCodeSamples,
-                                 upstreamFile.codeSamples.size)
+          TranslationCodeSamples(
+            actualFile.name,
+            missingCodeSamples,
+            introducedCodeSamples,
+            upstreamFile.codeSamples.size)
       }
       .partition(c =>
         c.missingCodeSamples.nonEmpty || c.introducedCodeSamples.nonEmpty)
@@ -436,10 +443,11 @@ object PlayDocsValidation {
                               errorMessage: String): Unit = {
       doAssertion(desc, links) {
         links.foreach { link =>
-          logErrorAtLocation(log,
-                             link.file,
-                             link.position,
-                             errorMessage + " " + link.link)
+          logErrorAtLocation(
+            log,
+            link.file,
+            link.position,
+            errorMessage + " " + link.link)
         }
       }
     }
@@ -488,11 +496,12 @@ object PlayDocsValidation {
       case link if !relativeLinkOk(link) => link
     }, "Bad relative link")
 
-    assertLinksNotMissing("Missing wiki resources test",
-                          report.resourceLinks.collect {
-                            case link if !fileExists(link.link) => link
-                          },
-                          "Could not find resource")
+    assertLinksNotMissing(
+      "Missing wiki resources test",
+      report.resourceLinks.collect {
+        case link if !fileExists(link.link) => link
+      },
+      "Could not find resource")
 
     val (existing, nonExisting) =
       report.codeSamples.partition(sample => fileExists(sample.source))
@@ -579,12 +588,13 @@ object PlayDocsValidation {
               Nil
             case bad if bad >= 300 => {
               refs.foreach { link =>
-                logErrorAtLocation(log,
-                                   link.file,
-                                   link.position,
-                                   connection.getResponseCode +
-                                     " response for external link " +
-                                     link.link)
+                logErrorAtLocation(
+                  log,
+                  link.file,
+                  link.position,
+                  connection.getResponseCode +
+                    " response for external link " +
+                    link.link)
               }
               refs
             }
@@ -593,11 +603,12 @@ object PlayDocsValidation {
         } catch {
           case NonFatal(e) =>
             refs.foreach { link =>
-              logErrorAtLocation(log,
-                                 link.file,
-                                 link.position,
-                                 e.getClass.getName + ": " + e.getMessage +
-                                   " for external link " + link.link)
+              logErrorAtLocation(
+                log,
+                link.file,
+                link.position,
+                e.getClass.getName + ": " + e.getMessage +
+                  " for external link " + link.link)
             }
             refs
         } finally {

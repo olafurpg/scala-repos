@@ -33,8 +33,9 @@ private class LeadershipCoordinatorActor(var whenLeaderActors: Set[ActorRef])
   override def receive: Receive = suspended
 
   private[impl] def suspended: Receive = {
-    log.info("All actors suspended:\n{}",
-             whenLeaderActors.map(actorRef => s"* $actorRef").mkString("\n"))
+    log.info(
+      "All actors suspended:\n{}",
+      whenLeaderActors.map(actorRef => s"* $actorRef").mkString("\n"))
 
     LoggingReceive.withLabel("suspended") {
       case Terminated(actorRef) =>
@@ -61,20 +62,23 @@ private class LeadershipCoordinatorActor(var whenLeaderActors: Set[ActorRef])
       LoggingReceive.withLabel("preparingForStart") {
         case PreparationMessages.PrepareForStart =>
           context.become(
-            preparingForStart(ackStartRefs + sender(),
-                              whenLeaderActorsWithoutAck))
+            preparingForStart(
+              ackStartRefs + sender(),
+              whenLeaderActorsWithoutAck))
 
         case PreparationMessages.Prepared(whenLeaderRef) =>
           context.become(
-            preparingForStart(ackStartRefs,
-                              whenLeaderActorsWithoutAck - whenLeaderRef))
+            preparingForStart(
+              ackStartRefs,
+              whenLeaderActorsWithoutAck - whenLeaderRef))
 
         case Terminated(actorRef) =>
           log.error("unexpected death of {}", actorRef)
           whenLeaderActors -= actorRef
           context.become(
-            preparingForStart(ackStartRefs - actorRef,
-                              whenLeaderActorsWithoutAck - actorRef))
+            preparingForStart(
+              ackStartRefs - actorRef,
+              whenLeaderActorsWithoutAck - actorRef))
 
         case WhenLeaderActor.Stop =>
           whenLeaderActors.foreach(_ ! Stop)
@@ -89,8 +93,9 @@ private class LeadershipCoordinatorActor(var whenLeaderActors: Set[ActorRef])
   }
 
   private[impl] def active: Receive = LoggingReceive.withLabel("active") {
-    log.info("All actors active:\n{}",
-             whenLeaderActors.map(actorRef => s"* $actorRef").mkString("\n"))
+    log.info(
+      "All actors active:\n{}",
+      whenLeaderActors.map(actorRef => s"* $actorRef").mkString("\n"))
 
     LoggingReceive.withLabel("active") {
       case Terminated(actorRef) =>

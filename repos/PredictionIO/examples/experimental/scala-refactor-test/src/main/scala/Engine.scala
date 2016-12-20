@@ -14,11 +14,12 @@ case class ActualResult() extends Serializable
 
 object VanillaEngine extends IEngineFactory {
   def apply() = {
-    new Engine(classOf[DataSource],
-               //classOf[Preparator],
-               PIdentityPreparator(classOf[DataSource]),
-               Map("algo" -> classOf[Algorithm]),
-               classOf[Serving])
+    new Engine(
+      classOf[DataSource],
+      //classOf[Preparator],
+      PIdentityPreparator(classOf[DataSource]),
+      Map("algo" -> classOf[Algorithm]),
+      classOf[Serving])
   }
 }
 
@@ -35,9 +36,10 @@ object Runner {
     val evaluator = new VanillaEvaluator()
 
     logger.error("Runner before runEval!!!")
-    Workflow.runEval(engine = engine,
-                     engineParams = engineParams,
-                     evaluator = evaluator,
-                     evaluatorParams = EmptyParams())
+    Workflow.runEval(
+      engine = engine,
+      engineParams = engineParams,
+      evaluator = evaluator,
+      evaluatorParams = EmptyParams())
   }
 }

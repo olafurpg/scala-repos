@@ -37,9 +37,10 @@ object CanFilter {
   implicit val dvDouble1DFilter: CanFilter[DenseVector[Double],
                                            FIRKernel1D[Double],
                                            DenseVector[Double]] = {
-    new CanFilter[DenseVector[Double],
-                  FIRKernel1D[Double],
-                  DenseVector[Double]] {
+    new CanFilter[
+      DenseVector[Double],
+      FIRKernel1D[Double],
+      DenseVector[Double]] {
       def apply(data: DenseVector[Double],
                 kernel: FIRKernel1D[Double],
                 overhang: OptOverhang,
@@ -71,9 +72,10 @@ object CanFilter {
   implicit val dvDouble1DFilterVectorKernel: CanFilter[DenseVector[Double],
                                                        DenseVector[Double],
                                                        DenseVector[Double]] = {
-    new CanFilter[DenseVector[Double],
-                  DenseVector[Double],
-                  DenseVector[Double]] {
+    new CanFilter[
+      DenseVector[Double],
+      DenseVector[Double],
+      DenseVector[Double]] {
       def apply(data: DenseVector[Double],
                 kernel: DenseVector[Double],
                 overhang: OptOverhang,

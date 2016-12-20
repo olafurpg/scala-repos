@@ -34,13 +34,14 @@ final class PgnDump(netBaseUrl: String,
 
   def filename(game: Game): String = gameLightUsers(game) match {
     case (wu, bu) =>
-      fileR.replaceAllIn("lichess_pgn_%s_%s_vs_%s.%s.pgn".format(
-                           dateFormat.print(game.createdAt),
-                           player(game.whitePlayer, wu),
-                           player(game.blackPlayer, bu),
-                           game.id
-                         ),
-                         "_")
+      fileR.replaceAllIn(
+        "lichess_pgn_%s_%s_vs_%s.%s.pgn".format(
+          dateFormat.print(game.createdAt),
+          player(game.whitePlayer, wu),
+          player(game.blackPlayer, bu),
+          game.id
+        ),
+        "_")
   }
 
   private def gameUrl(id: String) = s"$netBaseUrl/$id"
@@ -111,18 +112,20 @@ final class PgnDump(netBaseUrl: String,
   private def turns(moves: List[String], from: Int): List[chessPgn.Turn] =
     (moves grouped 2).zipWithIndex.toList map {
       case (moves, index) =>
-        chessPgn.Turn(number = index + from,
-                      white = moves.headOption filter (".." !=) map {
-                        chessPgn.Move(_)
-                      },
-                      black = moves lift 1 map { chessPgn.Move(_) })
+        chessPgn.Turn(
+          number = index + from,
+          white = moves.headOption filter (".." !=) map {
+            chessPgn.Move(_)
+          },
+          black = moves lift 1 map { chessPgn.Move(_) })
     } filterNot (_.isEmpty)
 }
 
 object PgnDump {
 
   def result(game: Game) =
-    game.finished.fold(game.winnerColor.fold("1/2-1/2")(color =>
-                         color.white.fold("1-0", "0-1")),
-                       "*")
+    game.finished.fold(
+      game.winnerColor.fold("1/2-1/2")(color =>
+        color.white.fold("1-0", "0-1")),
+      "*")
 }

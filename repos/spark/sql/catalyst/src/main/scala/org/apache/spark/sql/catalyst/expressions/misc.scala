@@ -188,9 +188,10 @@ case class Crc32(child: Expression)
 
   protected override def nullSafeEval(input: Any): Any = {
     val checksum = new CRC32
-    checksum.update(input.asInstanceOf[Array[Byte]],
-                    0,
-                    input.asInstanceOf[Array[Byte]].length)
+    checksum.update(
+      input.asInstanceOf[Array[Byte]],
+      0,
+      input.asInstanceOf[Array[Byte]].length)
     checksum.getValue
   }
 
@@ -289,10 +290,11 @@ case class Murmur3Hash(children: Seq[Expression], seed: Int)
           hashLong(d.toUnscaledLong)
         } else {
           val bytes = d.toJavaBigDecimal.unscaledValue().toByteArray
-          Murmur3_x86_32.hashUnsafeBytes(bytes,
-                                         Platform.BYTE_ARRAY_OFFSET,
-                                         bytes.length,
-                                         seed)
+          Murmur3_x86_32.hashUnsafeBytes(
+            bytes,
+            Platform.BYTE_ARRAY_OFFSET,
+            bytes.length,
+            seed)
         }
       case c: CalendarInterval =>
         Murmur3_x86_32.hashInt(c.months, hashLong(c.microseconds))
@@ -300,10 +302,11 @@ case class Murmur3Hash(children: Seq[Expression], seed: Int)
         Murmur3_x86_32
           .hashUnsafeBytes(a, Platform.BYTE_ARRAY_OFFSET, a.length, seed)
       case s: UTF8String =>
-        Murmur3_x86_32.hashUnsafeBytes(s.getBaseObject,
-                                       s.getBaseOffset,
-                                       s.numBytes(),
-                                       seed)
+        Murmur3_x86_32.hashUnsafeBytes(
+          s.getBaseObject,
+          s.getBaseOffset,
+          s.numBytes(),
+          seed)
 
       case array: ArrayData =>
         val elementType = dataType match {
@@ -446,12 +449,13 @@ case class Murmur3Hash(children: Seq[Expression], seed: Int)
           final ArrayData $values = $input.valueArray();
           for (int $index = 0; $index < $input.numElements(); $index++) {
             ${nullSafeElementHash(keys, index, false, kt, result, ctx)}
-            ${nullSafeElementHash(values,
-                                  index,
-                                  valueContainsNull,
-                                  vt,
-                                  result,
-                                  ctx)}
+            ${nullSafeElementHash(
+          values,
+          index,
+          valueContainsNull,
+          vt,
+          result,
+          ctx)}
           }
         """
 
@@ -459,12 +463,13 @@ case class Murmur3Hash(children: Seq[Expression], seed: Int)
         fields.zipWithIndex
           .map {
             case (field, index) =>
-              nullSafeElementHash(input,
-                                  index.toString,
-                                  field.nullable,
-                                  field.dataType,
-                                  result,
-                                  ctx)
+              nullSafeElementHash(
+                input,
+                index.toString,
+                field.nullable,
+                field.dataType,
+                result,
+                ctx)
           }
           .mkString("\n")
 
@@ -484,9 +489,10 @@ case class PrintToStderr(child: Expression) extends UnaryExpression {
   protected override def nullSafeEval(input: Any): Any = input
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx,
-                    ev,
-                    c => s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      c => s"""
          | System.err.println("Result of ${child.simpleString} is " + $c);
          | ${ev.value} = $c;
        """.stripMargin)

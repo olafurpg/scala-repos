@@ -42,9 +42,10 @@ class MapStatusSuite extends SparkFunSuite {
     assert(MapStatus.decompressSize(0) === 0)
     for (size <- Seq(2L, 10L, 100L, 50000L, 1000000L, 1000000000L)) {
       val size2 = MapStatus.decompressSize(MapStatus.compressSize(size))
-      assert(size2 >= 0.99 * size && size2 <= 1.11 * size,
-             "size " + size + " decompressed to " + size2 +
-               ", which is out of range")
+      assert(
+        size2 >= 0.99 * size && size2 <= 1.11 * size,
+        "size " + size + " decompressed to " + size2 +
+          ", which is out of range")
     }
   }
 

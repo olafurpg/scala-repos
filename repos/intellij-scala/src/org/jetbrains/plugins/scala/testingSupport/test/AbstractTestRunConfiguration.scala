@@ -363,8 +363,9 @@ abstract class AbstractTestRunConfiguration(
       ExecutionBundle.message("run.configuration.configuration.tab.title"),
       new AbstractTestRunConfigurationEditor(project, this))
     JavaRunConfigurationExtensionManager.getInstance.appendEditors(this, group)
-    group.addEditor(ExecutionBundle.message("logs.tab.title"),
-                    new LogConfigurationPanel)
+    group.addEditor(
+      ExecutionBundle.message("logs.tab.title"),
+      new LogConfigurationPanel)
     group
   }
 
@@ -469,13 +470,15 @@ abstract class AbstractTestRunConfiguration(
                  if jdk == null) {
               jdk = JavaParameters.getModuleJdk(module)
             }
-            params.configureByProject(project,
-                                      JavaParameters.JDK_AND_CLASSES_AND_TESTS,
-                                      jdk)
+            params.configureByProject(
+              project,
+              JavaParameters.JDK_AND_CLASSES_AND_TESTS,
+              jdk)
           case _ =>
-            params.configureByModule(module,
-                                     JavaParameters.JDK_AND_CLASSES_AND_TESTS,
-                                     JavaParameters.getModuleJdk(module))
+            params.configureByModule(
+              module,
+              JavaParameters.JDK_AND_CLASSES_AND_TESTS,
+              JavaParameters.getModuleJdk(module))
         }
 
         params.setMainClass(mainClass)
@@ -572,9 +575,10 @@ abstract class AbstractTestRunConfiguration(
 
         for (ext <- Extensions.getExtensions(
                RunConfigurationExtension.EP_NAME)) {
-          ext.updateJavaParameters(currentConfiguration,
-                                   params,
-                                   getRunnerSettings)
+          ext.updateJavaParameters(
+            currentConfiguration,
+            params,
+            getRunnerSettings)
         }
 
         params
@@ -588,9 +592,10 @@ abstract class AbstractTestRunConfiguration(
         if (getConfiguration == null) setConfiguration(currentConfiguration)
         val config = getConfiguration
         JavaRunConfigurationExtensionManager.getInstance
-          .attachExtensionsToProcess(currentConfiguration,
-                                     processHandler,
-                                     runnerSettings)
+          .attachExtensionsToProcess(
+            currentConfiguration,
+            processHandler,
+            runnerSettings)
         val consoleProperties = new SMTRunnerConsoleProperties(
           currentConfiguration,
           "Scala",
@@ -642,10 +647,11 @@ abstract class AbstractTestRunConfiguration(
     JDOMExternalizer.write(element, "workingDirectory", workingDirectory)
     JDOMExternalizer.write(element, "searchForTest", searchTest.toString)
     JDOMExternalizer.write(element, "testName", testName)
-    JDOMExternalizer.write(element,
-                           "testKind",
-                           if (testKind != null) testKind.toString
-                           else TestKind.CLASS.toString)
+    JDOMExternalizer.write(
+      element,
+      "testKind",
+      if (testKind != null) testKind.toString
+      else TestKind.CLASS.toString)
     JDOMExternalizer
       .write(element, "showProgressMessages", showProgressMessages.toString)
     JDOMExternalizer.writeMap(element, envs, "envs", "envVar")

@@ -49,9 +49,10 @@ class ReachingDefsTest extends LightCodeInsightFixtureTestCase {
 
     import org.jetbrains.plugins.scala.lang.psi.dataFlow.impl.reachingDefs.ReachingDefinitions._
 
-    val engine = new DfaEngine(instructions,
-                               ReachingDefinitionsInstance,
-                               ReachingDefinitionsLattice)
+    val engine = new DfaEngine(
+      instructions,
+      ReachingDefinitionsInstance,
+      ReachingDefinitionsLattice)
     val markup: mutable.Map[Instruction, Set[Instruction]] = engine.performDFA
 
     val cf: String = dumpDataFlow(markup)

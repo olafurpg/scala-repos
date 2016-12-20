@@ -80,8 +80,9 @@ final case class Comprehension(sym: TermSymbol,
         h2.isEmpty && distinct2.isEmpty && fetch2.isEmpty && offset2.isEmpty
     val newType =
       if (!hasType)
-        CollectionType(f2.nodeType.asCollectionType.cons,
-                       s2.nodeType.asCollectionType.elementType)
+        CollectionType(
+          f2.nodeType.asCollectionType.cons,
+          s2.nodeType.asCollectionType.elementType)
       else nodeType
     if (same && newType == nodeType) this
     else {

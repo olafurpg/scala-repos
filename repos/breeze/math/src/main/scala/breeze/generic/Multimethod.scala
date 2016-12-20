@@ -128,9 +128,10 @@ trait Multimethod2[Method[AA, BB, RR] <: Function2[AA, BB, RR], A, B, R]
   def register[AA <: A, BB <: B](op: Method[AA, BB, _ <: R])(
       implicit manA: Manifest[AA],
       manB: Manifest[BB]) {
-    super.register(manA.runtimeClass.asInstanceOf[Class[_]],
-                   manB.runtimeClass.asInstanceOf[Class[_]],
-                   op)
+    super.register(
+      manA.runtimeClass.asInstanceOf[Class[_]],
+      manB.runtimeClass.asInstanceOf[Class[_]],
+      op)
   }
 }
 
@@ -187,9 +188,10 @@ trait Multiproc2[Method[AA, BB] <: (AA, BB) => Unit, A <: AnyRef, B]
 
   def register[AA <: A, BB <: B](
       op: Method[AA, BB])(implicit manA: Manifest[AA], manB: Manifest[BB]) {
-    super.register(manA.runtimeClass.asInstanceOf[Class[AA]],
-                   manB.runtimeClass.asInstanceOf[Class[BB]],
-                   op)
+    super.register(
+      manA.runtimeClass.asInstanceOf[Class[AA]],
+      manB.runtimeClass.asInstanceOf[Class[BB]],
+      op)
   }
 }
 

@@ -109,9 +109,10 @@ class CommandSpec extends Specification {
     "bindTo 'params' with a confirmation" in {
       val form = new CommandWithConfirmationValidation
       form.bindTo(
-        Map("name" -> "blah",
-            "password" -> "blah123",
-            "passwordConfirmation" -> "blah123"))
+        Map(
+          "name" -> "blah",
+          "password" -> "blah123",
+          "passwordConfirmation" -> "blah123"))
       form.isValid must beTrue
     }
 

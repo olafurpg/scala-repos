@@ -66,11 +66,12 @@ class Accumulator[T] private[spark] (
     name: Option[String],
     internal: Boolean,
     private[spark] override val countFailedValues: Boolean = false)
-    extends Accumulable[T, T](initialValue,
-                              param,
-                              name,
-                              internal,
-                              countFailedValues) {
+    extends Accumulable[T, T](
+      initialValue,
+      param,
+      name,
+      internal,
+      countFailedValues) {
 
   def this(initialValue: T, param: AccumulatorParam[T], name: Option[String]) = {
     this(initialValue, param, name, false /* internal */ )

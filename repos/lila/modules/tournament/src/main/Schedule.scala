@@ -52,14 +52,15 @@ object Schedule {
       override val name = "Experimental Marathon"
     }
     case object Unique extends Freq(90, 59)
-    val all: List[Freq] = List(Hourly,
-                               Daily,
-                               Eastern,
-                               Weekly,
-                               Monthly,
-                               Marathon,
-                               ExperimentalMarathon,
-                               Unique)
+    val all: List[Freq] = List(
+      Hourly,
+      Daily,
+      Eastern,
+      Weekly,
+      Monthly,
+      Marathon,
+      ExperimentalMarathon,
+      Unique)
     def apply(name: String) = all find (_.name == name)
     def byId(id: Int) = all find (_.id == id)
   }

@@ -365,14 +365,15 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
           runStoreLoadAgain
 
       val downstreamRequireEliminateUnusedLocals =
-        runAgain && removalRound(requestNullness = runNullnessAgain,
-                                 requestDCE = runDCEAgain,
-                                 requestBoxUnbox = runBoxUnboxAgain,
-                                 requestStaleStores = runStaleStoresAgain,
-                                 requestPushPop = runPushPopAgain,
-                                 requestStoreLoad = runStoreLoadAgain,
-                                 firstIteration = false,
-                                 maxRecursion = maxRecursion - 1)._2
+        runAgain && removalRound(
+          requestNullness = runNullnessAgain,
+          requestDCE = runDCEAgain,
+          requestBoxUnbox = runBoxUnboxAgain,
+          requestStaleStores = runStaleStoresAgain,
+          requestPushPop = runPushPopAgain,
+          requestStoreLoad = runStoreLoadAgain,
+          firstIteration = false,
+          maxRecursion = maxRecursion - 1)._2
 
       val requireEliminateUnusedLocals =
         downstreamRequireEliminateUnusedLocals || nullnessOptChanged ||
@@ -388,18 +389,20 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
       (codeChanged, requireEliminateUnusedLocals)
     }
 
-    val (nullnessDceBoxesCastsCopypropPushpopOrJumpsChanged,
-         requireEliminateUnusedLocals) =
+    val (
+      nullnessDceBoxesCastsCopypropPushpopOrJumpsChanged,
+      requireEliminateUnusedLocals) =
       if (AsmAnalyzer.sizeOKForBasicValue(method)) {
         // we run DCE even if the method is already in the `unreachableCodeEliminated` map: the DCE
         // here is more thorough than `minimalRemoveUnreachableCode` that run before inlining.
-        val r = removalRound(requestNullness = true,
-                             requestDCE = true,
-                             requestBoxUnbox = true,
-                             requestStaleStores = true,
-                             requestPushPop = true,
-                             requestStoreLoad = true,
-                             firstIteration = true)
+        val r = removalRound(
+          requestNullness = true,
+          requestDCE = true,
+          requestBoxUnbox = true,
+          requestStaleStores = true,
+          requestPushPop = true,
+          requestStoreLoad = true,
+          firstIteration = true)
         if (compilerSettings.YoptUnreachableCode)
           unreachableCodeEliminated += method
         r
@@ -427,10 +430,12 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
     // assert that local variable annotations are empty (we don't emit them) - otherwise we'd have
     // to eliminate those covering an empty range, similar to removeUnusedLocalVariableNodes.
     def nullOrEmpty[T](l: java.util.List[T]) = l == null || l.isEmpty
-    assert(nullOrEmpty(method.visibleLocalVariableAnnotations),
-           method.visibleLocalVariableAnnotations)
-    assert(nullOrEmpty(method.invisibleLocalVariableAnnotations),
-           method.invisibleLocalVariableAnnotations)
+    assert(
+      nullOrEmpty(method.visibleLocalVariableAnnotations),
+      method.visibleLocalVariableAnnotations)
+    assert(
+      nullOrEmpty(method.invisibleLocalVariableAnnotations),
+      method.invisibleLocalVariableAnnotations)
 
     nullnessDceBoxesCastsCopypropPushpopOrJumpsChanged || localsRemoved ||
     lineNumbersRemoved || labelsRemoved
@@ -524,9 +529,9 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
         case mi: MethodInsnNode =>
           if (isScalaUnbox(mi))
             for (frame <- frameAt(mi) if frame.peekStack(0) == NullValue) {
-              toReplace(mi) =
-                List(getPop(1),
-                     loadZeroForTypeSort(Type.getReturnType(mi.desc).getSort))
+              toReplace(mi) = List(
+                getPop(1),
+                loadZeroForTypeSort(Type.getReturnType(mi.desc).getSort))
             }
 
         case _ =>

@@ -14,10 +14,11 @@ class AdaDeltaGradientDescent[T](rho: Double,
                                  minImprovementWindow: Int = 50)(
     implicit vspace: MutableFiniteCoordinateField[T, _, Double],
     rand: RandBasis = Rand)
-    extends StochasticGradientDescent[T](1d,
-                                         maxIter,
-                                         tolerance,
-                                         minImprovementWindow) {
+    extends StochasticGradientDescent[T](
+      1d,
+      maxIter,
+      tolerance,
+      minImprovementWindow) {
 
   val epsilon = 1e-6
   import vspace._

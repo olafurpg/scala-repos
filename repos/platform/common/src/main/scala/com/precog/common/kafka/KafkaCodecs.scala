@@ -94,10 +94,10 @@ object EventEncoding extends EncodingFlags with Logging {
     logger.trace("Serialized event " + event + " to " + serialized)
     val msgBuffer = charset.encode(serialized)
     val bytes = ByteBuffer.allocate(msgBuffer.limit + 3)
-    writeHeader(bytes,
-                event.fold(_ => jsonIngestFlag,
-                           _ => jsonArchiveFlag,
-                           _ => storeFileFlag))
+    writeHeader(
+      bytes,
+      event
+        .fold(_ => jsonIngestFlag, _ => jsonArchiveFlag, _ => storeFileFlag))
     bytes.put(msgBuffer)
     bytes.flip()
     bytes
@@ -142,10 +142,12 @@ object EventMessageEncoding extends EncodingFlags with Logging {
     logger.trace("Serialized event " + msg + " to " + serialized)
     val msgBuffer = charset.encode(serialized)
     val bytes = ByteBuffer.allocate(msgBuffer.limit + 3)
-    writeHeader(bytes,
-                msg.fold(_ => jsonIngestMessageFlag,
-                         _ => jsonArchiveMessageFlag,
-                         _ => storeFileFlag))
+    writeHeader(
+      bytes,
+      msg.fold(
+        _ => jsonIngestMessageFlag,
+        _ => jsonArchiveMessageFlag,
+        _ => storeFileFlag))
     bytes.put(msgBuffer)
     bytes.flip()
     bytes

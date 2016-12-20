@@ -140,10 +140,12 @@ object UserRepo {
             }
           }
           .addEffect { v =>
-            $update.unchecked($select(u1),
-                              $incBson(F.colorIt -> v.fold(1, -1)))
-            $update.unchecked($select(u2),
-                              $incBson(F.colorIt -> v.fold(-1, 1)))
+            $update.unchecked(
+              $select(u1),
+              $incBson(F.colorIt -> v.fold(1, -1)))
+            $update.unchecked(
+              $select(u2),
+              $incBson(F.colorIt -> v.fold(-1, 1)))
           }
     }
 
@@ -164,14 +166,16 @@ object UserRepo {
   }
 
   def setPerf(userId: String, perfName: String, perf: Perf) =
-    $update($select(userId),
-            $setBson(
-              s"${F.perfs}.$perfName" -> Perf.perfBSONHandler.write(perf)
-            ))
+    $update(
+      $select(userId),
+      $setBson(
+        s"${F.perfs}.$perfName" -> Perf.perfBSONHandler.write(perf)
+      ))
 
   def setProfile(id: ID, profile: Profile): Funit =
-    $update($select(id),
-            $setBson(F.profile -> Profile.profileBSONHandler.write(profile)))
+    $update(
+      $select(id),
+      $setBson(F.profile -> Profile.profileBSONHandler.write(profile)))
 
   def setTitle(id: ID, title: Option[String]): Funit = title match {
     case Some(t) => $update.field(id, F.title, t)
@@ -179,8 +183,9 @@ object UserRepo {
   }
 
   def setPlayTime(u: User, playTime: User.PlayTime): Funit =
-    $update($select(u.id),
-            $setBson(F.playTime -> User.playTimeHandler.write(playTime)))
+    $update(
+      $select(u.id),
+      $setBson(F.playTime -> User.playTimeHandler.write(playTime)))
 
   val enabledSelect = Json.obj(F.enabled -> true)
   def engineSelect(v: Boolean) =
@@ -272,10 +277,10 @@ object UserRepo {
     checkPassword(Json.obj(F.email -> email), password)
 
   private def checkPassword(select: JsObject, password: String): Fu[Boolean] =
-    $projection.one(select,
-                    Seq("password", "salt", "enabled", "sha512", "email")) {
-      obj =>
-        (AuthData.reader reads obj).asOpt
+    $projection.one(
+      select,
+      Seq("password", "salt", "enabled", "sha512", "email")) { obj =>
+      (AuthData.reader reads obj).asOpt
     } map {
       _ ?? (data => data.enabled && data.compare(password))
     }
@@ -290,11 +295,12 @@ object UserRepo {
              mobileApiVersion: Option[Int]): Fu[Option[User]] =
     !nameExists(username) flatMap {
       _ ?? {
-        $insert.bson(newUser(username,
-                             password,
-                             email,
-                             blind,
-                             mobileApiVersion)) >> named(normalize(username))
+        $insert.bson(newUser(
+          username,
+          password,
+          email,
+          blind,
+          mobileApiVersion)) >> named(normalize(username))
       }
     }
 
@@ -387,28 +393,31 @@ object UserRepo {
   }
 
   def recentlySeenNotKidIds(since: DateTime) =
-    coll.distinct("_id",
-                  BSONDocument(
-                    F.enabled -> true,
-                    "seenAt" -> BSONDocument("$gt" -> since),
-                    "count.game" -> BSONDocument("$gt" -> 9),
-                    "kid" -> BSONDocument("$ne" -> true)
-                  ).some) map lila.db.BSON.asStrings
+    coll.distinct(
+      "_id",
+      BSONDocument(
+        F.enabled -> true,
+        "seenAt" -> BSONDocument("$gt" -> since),
+        "count.game" -> BSONDocument("$gt" -> 9),
+        "kid" -> BSONDocument("$ne" -> true)
+      ).some) map lila.db.BSON.asStrings
 
   def setLang(id: ID, lang: String) = $update.field(id, "lang", lang)
 
   def idsSumToints(ids: Iterable[String]): Fu[Int] =
     ids.nonEmpty ?? coll
-      .aggregate(Match(BSONDocument("_id" -> BSONDocument("$in" -> ids))),
-                 List(Group(BSONNull)(F.toints -> SumField(F.toints))))
+      .aggregate(
+        Match(BSONDocument("_id" -> BSONDocument("$in" -> ids))),
+        List(Group(BSONNull)(F.toints -> SumField(F.toints))))
       .map(
         _.documents.headOption flatMap { _.getAs[Int](F.toints) }
       )
       .map(~_)
 
   def filterByEngine(userIds: List[String]): Fu[List[String]] =
-    $primitive(Json.obj("_id" -> $in(userIds)) ++ engineSelect(true),
-               F.username)(_.asOpt[String])
+    $primitive(
+      Json.obj("_id" -> $in(userIds)) ++ engineSelect(true),
+      F.username)(_.asOpt[String])
 
   def countEngines(userIds: List[String]): Fu[Int] =
     coll.count(
@@ -421,8 +430,9 @@ object UserRepo {
     $count.exists($select(id) ++ Json.obj(F.mustConfirmEmail -> $exists(true)))
 
   def setEmailConfirmed(id: String): Funit =
-    $update($select(id),
-            BSONDocument("$unset" -> BSONDocument(F.mustConfirmEmail -> true)))
+    $update(
+      $select(id),
+      BSONDocument("$unset" -> BSONDocument(F.mustConfirmEmail -> true)))
 
   private def newUser(username: String,
                       password: String,
@@ -435,20 +445,21 @@ object UserRepo {
     implicit def perfsHandler = Perfs.perfsBSONHandler
     import lila.db.BSON.BSONJodaDateTimeHandler
 
-    BSONDocument(F.id -> normalize(username),
-                 F.username -> username,
-                 F.email -> email,
-                 F.mustConfirmEmail ->
-                   (email.isDefined &&
-                     mobileApiVersion.isEmpty).option(DateTime.now),
-                 "password" -> hash(password, salt),
-                 "salt" -> salt,
-                 F.perfs -> Json.obj(),
-                 F.count -> Count.default,
-                 F.enabled -> true,
-                 F.createdAt -> DateTime.now,
-                 F.createdWithApiVersion -> mobileApiVersion,
-                 F.seenAt -> DateTime.now) ++ {
+    BSONDocument(
+      F.id -> normalize(username),
+      F.username -> username,
+      F.email -> email,
+      F.mustConfirmEmail ->
+        (email.isDefined &&
+          mobileApiVersion.isEmpty).option(DateTime.now),
+      "password" -> hash(password, salt),
+      "salt" -> salt,
+      F.perfs -> Json.obj(),
+      F.count -> Count.default,
+      F.enabled -> true,
+      F.createdAt -> DateTime.now,
+      F.createdWithApiVersion -> mobileApiVersion,
+      F.seenAt -> DateTime.now) ++ {
       if (blind) BSONDocument("blind" -> true) else BSONDocument()
     }
   }

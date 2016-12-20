@@ -181,10 +181,11 @@ trait Jvm {
       }
     }
 
-    executor.scheduleAtFixedRate(new Runnable { def run() = sample() },
-                                 0 /*initial delay*/,
-                                 Period.inMilliseconds,
-                                 TimeUnit.MILLISECONDS)
+    executor.scheduleAtFixedRate(
+      new Runnable { def run() = sample() },
+      0 /*initial delay*/,
+      Period.inMilliseconds,
+      TimeUnit.MILLISECONDS)
   }
 
   /**

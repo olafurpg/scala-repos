@@ -62,19 +62,23 @@ trait JoinOptimizerModule[M[+ _]]
           val key = "key"
           val value = "value"
 
-          AddSortKey(Join(JoinObject,
-                          IdentitySort,
-                          Join(WrapObject,
-                               Cross(Some(CrossRight)),
-                               Const(CString(key))(filter.loc),
-                               keyGraph)(filter.loc),
-                          Join(WrapObject,
-                               Cross(Some(CrossRight)),
-                               Const(CString(value))(filter.loc),
-                               valueGraph)(filter.loc))(filter.loc),
-                     key,
-                     value,
-                     sortId)
+          AddSortKey(
+            Join(
+              JoinObject,
+              IdentitySort,
+              Join(
+                WrapObject,
+                Cross(Some(CrossRight)),
+                Const(CString(key))(filter.loc),
+                keyGraph)(filter.loc),
+              Join(
+                WrapObject,
+                Cross(Some(CrossRight)),
+                Const(CString(value))(filter.loc),
+                valueGraph)(filter.loc))(filter.loc),
+            key,
+            value,
+            sortId)
         }
 
         val rewritten = transformBottomUp(body) {
@@ -97,10 +101,11 @@ trait JoinOptimizerModule[M[+ _]]
             val liftedLHS = lift(eqLHS, ancestorLHS)
             val liftedRHS = lift(eqRHS, ancestorRHS)
 
-            Join(op,
-                 ValueSort(sortId),
-                 liftRewrite(lhs, ancestorLHS, liftedLHS),
-                 liftRewrite(rhs, ancestorRHS, liftedRHS))(j.loc)
+            Join(
+              op,
+              ValueSort(sortId),
+              liftRewrite(lhs, ancestorLHS, liftedLHS),
+              liftRewrite(rhs, ancestorRHS, liftedRHS))(j.loc)
           }
 
           case other => other
@@ -110,25 +115,28 @@ trait JoinOptimizerModule[M[+ _]]
       }
 
       transformBottomUp(graph) {
-        case filter @ Filter(IdentitySort,
-                             body @ Join(BuiltInFunction2Op(op2), _, _, _),
-                             Join(Eq, Cross(_), eqA, eqB)) if op2.rowLevel =>
+        case filter @ Filter(
+              IdentitySort,
+              body @ Join(BuiltInFunction2Op(op2), _, _, _),
+              Join(Eq, Cross(_), eqA, eqB)) if op2.rowLevel =>
           rewrite(filter, body, eqA, eqB)
 
-        case filter @ Filter(IdentitySort,
-                             body @ Join(BuiltInMorphism2(morph2), _, _, _),
-                             Join(Eq, Cross(_), eqA, eqB))
-            if morph2.rowLevel =>
+        case filter @ Filter(
+              IdentitySort,
+              body @ Join(BuiltInMorphism2(morph2), _, _, _),
+              Join(Eq, Cross(_), eqA, eqB)) if morph2.rowLevel =>
           rewrite(filter, body, eqA, eqB)
 
-        case filter @ Filter(IdentitySort,
-                             body @ Join(_, _, _, _),
-                             Join(Eq, Cross(_), eqA, eqB)) =>
+        case filter @ Filter(
+              IdentitySort,
+              body @ Join(_, _, _, _),
+              Join(Eq, Cross(_), eqA, eqB)) =>
           rewrite(filter, body, eqA, eqB)
 
-        case filter @ Filter(IdentitySort,
-                             body @ Operate(BuiltInFunction1Op(op1), _),
-                             Join(Eq, Cross(_), eqA, eqB)) if op1.rowLevel =>
+        case filter @ Filter(
+              IdentitySort,
+              body @ Operate(BuiltInFunction1Op(op1), _),
+              Join(Eq, Cross(_), eqA, eqB)) if op1.rowLevel =>
           rewrite(filter, body, eqA, eqB)
 
         case other => other

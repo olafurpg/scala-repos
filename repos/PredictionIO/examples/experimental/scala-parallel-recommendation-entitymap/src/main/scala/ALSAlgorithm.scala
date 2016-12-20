@@ -25,15 +25,17 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     val mllibRatings = data.ratings.map(
       r =>
         // MLlibRating requires integer index for user and item
-        MLlibRating(data.users(r.user).toInt,
-                    data.items(r.item).toInt,
-                    r.rating))
+        MLlibRating(
+          data.users(r.user).toInt,
+          data.items(r.item).toInt,
+          r.rating))
     val m = ALS.train(mllibRatings, ap.rank, ap.numIterations, ap.lambda)
-    new ALSModel(rank = m.rank,
-                 userFeatures = m.userFeatures,
-                 productFeatures = m.productFeatures,
-                 users = data.users,
-                 items = data.items)
+    new ALSModel(
+      rank = m.rank,
+      userFeatures = m.userFeatures,
+      productFeatures = m.productFeatures,
+      users = data.users,
+      items = data.items)
   }
 
   def predict(model: ALSModel, query: Query): PredictedResult = {

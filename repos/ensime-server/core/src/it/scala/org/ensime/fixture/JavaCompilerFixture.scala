@@ -32,8 +32,9 @@ trait JavaCompilerFixture {
       points :+= ((m.start - offset, m.group(1)))
       offset += ((m.end - m.start))
     }
-    val f = new File(config.rootDir,
-                     "testing/simple/src/main/java/org/example/Test1.java")
+    val f = new File(
+      config.rootDir,
+      "testing/simple/src/main/java/org/example/Test1.java")
     val file = SourceFileInfo(f, Some(contents.replaceAll(re, "")), None)
     cc.askTypecheckFiles(List(file))
     assert(points.nonEmpty)

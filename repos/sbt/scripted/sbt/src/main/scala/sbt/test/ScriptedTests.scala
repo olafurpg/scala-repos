@@ -141,13 +141,14 @@ object ScriptedTests extends ScriptedRunner {
     val bootProperties = new File(args(5))
     val tests = args.drop(6)
     val logger = ConsoleLogger()
-    run(directory,
-        buffer,
-        tests,
-        logger,
-        bootProperties,
-        Array(),
-        emptyCallback)
+    run(
+      directory,
+      buffer,
+      tests,
+      logger,
+      bootProperties,
+      Array(),
+      emptyCallback)
   }
 }
 
@@ -160,13 +161,14 @@ class ScriptedRunner {
           tests: Array[String],
           bootProperties: File,
           launchOpts: Array[String]): Unit =
-    run(resourceBaseDirectory,
-        bufferLog,
-        tests,
-        ConsoleLogger(),
-        bootProperties,
-        launchOpts,
-        emptyCallback) //new FullLogger(Logger.xlog2Log(log)))
+    run(
+      resourceBaseDirectory,
+      bufferLog,
+      tests,
+      ConsoleLogger(),
+      bootProperties,
+      launchOpts,
+      emptyCallback) //new FullLogger(Logger.xlog2Log(log)))
 
   // This is called by project/Scripted.scala
   // Using java.util.List[File] to encode File => Unit
@@ -176,14 +178,15 @@ class ScriptedRunner {
           bootProperties: File,
           launchOpts: Array[String],
           prescripted: java.util.List[File]): Unit =
-    run(resourceBaseDirectory,
-        bufferLog,
-        tests,
-        ConsoleLogger(),
-        bootProperties,
-        launchOpts, { f: File =>
-          prescripted.add(f); ()
-        }) //new FullLogger(Logger.xlog2Log(log)))
+    run(
+      resourceBaseDirectory,
+      bufferLog,
+      tests,
+      ConsoleLogger(),
+      bootProperties,
+      launchOpts, { f: File =>
+        prescripted.add(f); ()
+      }) //new FullLogger(Logger.xlog2Log(log)))
 
   @deprecated("No longer used", "0.13.9")
   def run(resourceBaseDirectory: File,
@@ -192,13 +195,14 @@ class ScriptedRunner {
           bootProperties: File,
           launchOpts: Array[String],
           prescripted: File => Unit): Unit =
-    run(resourceBaseDirectory,
-        bufferLog,
-        tests,
-        ConsoleLogger(),
-        bootProperties,
-        launchOpts,
-        prescripted)
+    run(
+      resourceBaseDirectory,
+      bufferLog,
+      tests,
+      ConsoleLogger(),
+      bootProperties,
+      launchOpts,
+      prescripted)
 
   @deprecated("No longer used", "0.13.9")
   def run(resourceBaseDirectory: File,
@@ -207,13 +211,14 @@ class ScriptedRunner {
           logger: AbstractLogger,
           bootProperties: File,
           launchOpts: Array[String]): Unit =
-    run(resourceBaseDirectory,
-        bufferLog,
-        tests,
-        logger,
-        bootProperties,
-        launchOpts,
-        emptyCallback)
+    run(
+      resourceBaseDirectory,
+      bufferLog,
+      tests,
+      logger,
+      bootProperties,
+      launchOpts,
+      emptyCallback)
 
   def run(resourceBaseDirectory: File,
           bufferLog: Boolean,
@@ -222,10 +227,11 @@ class ScriptedRunner {
           bootProperties: File,
           launchOpts: Array[String],
           prescripted: File => Unit): Unit = {
-    val runner = new ScriptedTests(resourceBaseDirectory,
-                                   bufferLog,
-                                   bootProperties,
-                                   launchOpts)
+    val runner = new ScriptedTests(
+      resourceBaseDirectory,
+      bufferLog,
+      bootProperties,
+      launchOpts)
     val allTests =
       get(tests, resourceBaseDirectory, logger) flatMap {
         case ScriptedTest(group, name) =>

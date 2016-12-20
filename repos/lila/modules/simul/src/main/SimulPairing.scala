@@ -24,9 +24,10 @@ case class SimulPairing(player: SimulPlayer,
 private[simul] object SimulPairing {
 
   def apply(player: SimulPlayer): SimulPairing =
-    new SimulPairing(player = player,
-                     gameId = IdGenerator.game,
-                     status = chess.Status.Created,
-                     wins = none,
-                     hostColor = chess.White)
+    new SimulPairing(
+      player = player,
+      gameId = IdGenerator.game,
+      status = chess.Status.Created,
+      wins = none,
+      hostColor = chess.White)
 }

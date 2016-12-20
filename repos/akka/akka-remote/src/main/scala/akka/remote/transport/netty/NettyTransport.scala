@@ -189,9 +189,10 @@ class NettyTransportSettings(config: Config) {
     config.getConfig("client-socket-worker-pool"))
 
   private def computeWPS(config: Config): Int =
-    ThreadPoolConfig.scaledPoolSize(config.getInt("pool-size-min"),
-                                    config.getDouble("pool-size-factor"),
-                                    config.getInt("pool-size-max"))
+    ThreadPoolConfig.scaledPoolSize(
+      config.getInt("pool-size-min"),
+      config.getDouble("pool-size-factor"),
+      config.getInt("pool-size-max"))
 }
 
 /**
@@ -219,11 +220,12 @@ private[netty] trait CommonHandlers extends NettyHelpers {
       remoteAddress: Address,
       msg: ChannelBuffer)(op: (AssociationHandle ⇒ Any)): Unit = {
     import transport._
-    NettyTransport.addressFromSocketAddress(channel.getLocalAddress,
-                                            schemeIdentifier,
-                                            system.name,
-                                            Some(settings.Hostname),
-                                            None) match {
+    NettyTransport.addressFromSocketAddress(
+      channel.getLocalAddress,
+      schemeIdentifier,
+      system.name,
+      Some(settings.Hostname),
+      None) match {
       case Some(localAddress) ⇒
         val handle = createHandle(channel, localAddress, remoteAddress)
         handle.readHandlerPromise.future.onSuccess {
@@ -261,11 +263,12 @@ private[netty] abstract class ServerHandler(
     associationListenerFuture.onSuccess {
       case listener: AssociationEventListener ⇒
         val remoteAddress = NettyTransport
-          .addressFromSocketAddress(remoteSocketAddress,
-                                    transport.schemeIdentifier,
-                                    transport.system.name,
-                                    hostName = None,
-                                    port = None)
+          .addressFromSocketAddress(
+            remoteSocketAddress,
+            transport.schemeIdentifier,
+            transport.system.name,
+            hostName = None,
+            port = None)
           .getOrElse(throw new NettyTransportException(
             s"Unknown inbound remote address type [${remoteSocketAddress.getClass.getName}]"))
         init(channel, remoteSocketAddress, remoteAddress, msg) {
@@ -320,10 +323,11 @@ private[transport] object NettyTransport {
     addr match {
       case sa: InetSocketAddress ⇒
         Some(
-          Address(schemeIdentifier,
-                  systemName,
-                  hostName.getOrElse(sa.getHostString),
-                  port.getOrElse(sa.getPort)))
+          Address(
+            schemeIdentifier,
+            systemName,
+            hostName.getOrElse(sa.getHostString),
+            port.getOrElse(sa.getPort)))
       case _ ⇒ None
     }
 
@@ -332,11 +336,12 @@ private[transport] object NettyTransport {
                                schemeIdentifier: String,
                                systemName: String,
                                hostName: Option[String]): Option[Address] =
-    addressFromSocketAddress(addr,
-                             schemeIdentifier,
-                             systemName,
-                             hostName,
-                             port = None)
+    addressFromSocketAddress(
+      addr,
+      schemeIdentifier,
+      systemName,
+      hostName,
+      port = None)
 }
 
 // FIXME: Split into separate UDP and TCP classes
@@ -402,37 +407,42 @@ class NettyTransport(val settings: NettyTransportSettings,
         new HashedWheelTimer(system.threadFactory))
     case Udp ⇒
       // This does not create a HashedWheelTimer internally
-      new NioDatagramChannelFactory(createExecutorService(),
-                                    ClientSocketWorkerPoolSize)
+      new NioDatagramChannelFactory(
+        createExecutorService(),
+        ClientSocketWorkerPoolSize)
   }
 
   private val serverChannelFactory: ChannelFactory = TransportMode match {
     case Tcp ⇒
       val boss, worker = createExecutorService()
       // This does not create a HashedWheelTimer internally
-      new NioServerSocketChannelFactory(boss,
-                                        worker,
-                                        ServerSocketWorkerPoolSize)
+      new NioServerSocketChannelFactory(
+        boss,
+        worker,
+        ServerSocketWorkerPoolSize)
     case Udp ⇒
       // This does not create a HashedWheelTimer internally
-      new NioDatagramChannelFactory(createExecutorService(),
-                                    ServerSocketWorkerPoolSize)
+      new NioDatagramChannelFactory(
+        createExecutorService(),
+        ServerSocketWorkerPoolSize)
   }
 
   private def newPipeline: DefaultChannelPipeline = {
     val pipeline = new DefaultChannelPipeline
 
     if (!isDatagram) {
-      pipeline.addLast("FrameDecoder",
-                       new LengthFieldBasedFrameDecoder(
-                         maximumPayloadBytes,
-                         0,
-                         FrameLengthFieldLength,
-                         0,
-                         FrameLengthFieldLength, // Strip the header
-                         true))
-      pipeline.addLast("FrameEncoder",
-                       new LengthFieldPrepender(FrameLengthFieldLength))
+      pipeline.addLast(
+        "FrameDecoder",
+        new LengthFieldBasedFrameDecoder(
+          maximumPayloadBytes,
+          0,
+          FrameLengthFieldLength,
+          0,
+          FrameLengthFieldLength, // Strip the header
+          true))
+      pipeline.addLast(
+        "FrameEncoder",
+        new LengthFieldPrepender(FrameLengthFieldLength))
     }
 
     pipeline
@@ -455,11 +465,13 @@ class NettyTransport(val settings: NettyTransportSettings,
           pipeline.addFirst("SslHandler", sslHandler(isClient = false))
         val handler =
           if (isDatagram)
-            new UdpServerHandler(NettyTransport.this,
-                                 associationListenerPromise.future)
+            new UdpServerHandler(
+              NettyTransport.this,
+              associationListenerPromise.future)
           else
-            new TcpServerHandler(NettyTransport.this,
-                                 associationListenerPromise.future)
+            new TcpServerHandler(
+              NettyTransport.this,
+              associationListenerPromise.future)
         pipeline.addLast("ServerHandler", handler)
         pipeline
       }
@@ -506,16 +518,19 @@ class NettyTransport(val settings: NettyTransportSettings,
 
   private val inboundBootstrap: Bootstrap = settings.TransportMode match {
     case Tcp ⇒
-      setupBootstrap(new ServerBootstrap(serverChannelFactory),
-                     serverPipelineFactory)
+      setupBootstrap(
+        new ServerBootstrap(serverChannelFactory),
+        serverPipelineFactory)
     case Udp ⇒
-      setupBootstrap(new ConnectionlessBootstrap(serverChannelFactory),
-                     serverPipelineFactory)
+      setupBootstrap(
+        new ConnectionlessBootstrap(serverChannelFactory),
+        serverPipelineFactory)
   }
 
   private def outboundBootstrap(remoteAddress: Address): ClientBootstrap = {
-    val bootstrap = setupBootstrap(new ClientBootstrap(clientChannelFactory),
-                                   clientPipelineFactory(remoteAddress))
+    val bootstrap = setupBootstrap(
+      new ClientBootstrap(clientChannelFactory),
+      clientPipelineFactory(remoteAddress))
     bootstrap
       .setOption("connectTimeoutMillis", settings.ConnectionTimeout.toMillis)
     bootstrap.setOption("tcpNoDelay", settings.TcpNodelay)
@@ -564,18 +579,20 @@ class NettyTransport(val settings: NettyTransportSettings,
 
         serverChannel = newServerChannel
 
-        addressFromSocketAddress(newServerChannel.getLocalAddress,
-                                 schemeIdentifier,
-                                 system.name,
-                                 Some(settings.Hostname),
-                                 if (settings.PortSelector == 0) None
-                                 else Some(settings.PortSelector)) match {
+        addressFromSocketAddress(
+          newServerChannel.getLocalAddress,
+          schemeIdentifier,
+          system.name,
+          Some(settings.Hostname),
+          if (settings.PortSelector == 0) None
+          else Some(settings.PortSelector)) match {
           case Some(address) ⇒
-            addressFromSocketAddress(newServerChannel.getLocalAddress,
-                                     schemeIdentifier,
-                                     system.name,
-                                     None,
-                                     None) match {
+            addressFromSocketAddress(
+              newServerChannel.getLocalAddress,
+              schemeIdentifier,
+              system.name,
+              None,
+              None) match {
               case Some(address) ⇒ boundTo = address
               case None ⇒
                 throw new NettyTransportException(
@@ -592,8 +609,9 @@ class NettyTransport(val settings: NettyTransportSettings,
         }
       } catch {
         case NonFatal(e) ⇒ {
-          log.error("failed to bind to {}, shutting down Netty transport",
-                    address)
+          log.error(
+            "failed to bind to {}, shutting down Netty transport",
+            address)
           try { shutdown() } catch { case NonFatal(e) ⇒ } // ignore possible exception during shutdown
           throw e
         }
@@ -629,10 +647,11 @@ class NettyTransport(val settings: NettyTransportSettings,
             readyChannel.getRemoteAddress match {
               case addr: InetSocketAddress ⇒
                 val handle =
-                  new UdpAssociationHandle(localAddress,
-                                           remoteAddress,
-                                           readyChannel,
-                                           NettyTransport.this)
+                  new UdpAssociationHandle(
+                    localAddress,
+                    remoteAddress,
+                    readyChannel,
+                    NettyTransport.this)
                 handle.readHandlerPromise.future.onSuccess {
                   case listener ⇒
                     udpConnectionTable.put(addr, listener)

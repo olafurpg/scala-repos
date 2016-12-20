@@ -69,11 +69,12 @@ class OperatorAndBacktickedSearcher
         val helper: PsiSearchHelper =
           new ScalaPsiSearchHelper(manager.asInstanceOf[PsiManagerEx])
         try {
-          helper.processElementsWithWord(processor,
-                                         scope,
-                                         name,
-                                         UsageSearchContext.IN_CODE,
-                                         true)
+          helper.processElementsWithWord(
+            processor,
+            scope,
+            name,
+            UsageSearchContext.IN_CODE,
+            true)
         } catch {
           case ignore: IndexNotReadyException =>
         }

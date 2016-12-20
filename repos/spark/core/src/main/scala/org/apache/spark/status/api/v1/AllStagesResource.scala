@@ -57,10 +57,11 @@ private[v1] class AllStagesResource(ui: SparkUI) {
         listener.stageIdToData.get((stageInfo.stageId, stageInfo.attemptId))
       }
     } yield {
-      AllStagesResource.stageUiToStageData(status,
-                                           stageInfo,
-                                           stageUiData,
-                                           includeDetails = false)
+      AllStagesResource.stageUiToStageData(
+        status,
+        stageInfo,
+        stageUiData,
+        includeDetails = false)
     }
   }
 }
@@ -223,8 +224,9 @@ private[v1] object AllStagesResource {
       }.metricOption
 
     val shuffleReadMetrics: Option[ShuffleReadMetricDistributions] =
-      new MetricHelper[InternalShuffleReadMetrics,
-                       ShuffleReadMetricDistributions](rawMetrics, quantiles) {
+      new MetricHelper[
+        InternalShuffleReadMetrics,
+        ShuffleReadMetricDistributions](rawMetrics, quantiles) {
         def getSubmetrics(
             raw: InternalTaskMetrics): Option[InternalShuffleReadMetrics] = {
           raw.shuffleReadMetrics
@@ -274,10 +276,11 @@ private[v1] object AllStagesResource {
   }
 
   def convertAccumulableInfo(acc: InternalAccumulableInfo): AccumulableInfo = {
-    new AccumulableInfo(acc.id,
-                        acc.name.orNull,
-                        acc.update.map(_.toString),
-                        acc.value.map(_.toString).orNull)
+    new AccumulableInfo(
+      acc.id,
+      acc.name.orNull,
+      acc.update.map(_.toString),
+      acc.value.map(_.toString).orNull)
   }
 
   def convertUiTaskMetrics(internal: InternalTaskMetrics): TaskMetrics = {

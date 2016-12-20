@@ -50,17 +50,20 @@ class ErrorPositionSuite
     }
   }
 
-  positionTest("ambiguous attribute reference 1",
-               "SELECT a from dupAttributes",
-               "a")
+  positionTest(
+    "ambiguous attribute reference 1",
+    "SELECT a from dupAttributes",
+    "a")
 
-  positionTest("ambiguous attribute reference 2",
-               "SELECT a, b from dupAttributes",
-               "a")
+  positionTest(
+    "ambiguous attribute reference 2",
+    "SELECT a, b from dupAttributes",
+    "a")
 
-  positionTest("ambiguous attribute reference 3",
-               "SELECT b, a from dupAttributes",
-               "a")
+  positionTest(
+    "ambiguous attribute reference 3",
+    "SELECT b, a from dupAttributes",
+    "a")
 
   positionTest("unresolved attribute 1", "SELECT x FROM src", "x")
 
@@ -68,56 +71,64 @@ class ErrorPositionSuite
 
   positionTest("unresolved attribute 3", "SELECT key, x FROM src", "x")
 
-  positionTest("unresolved attribute 4",
-               """SELECT key,
+  positionTest(
+    "unresolved attribute 4",
+    """SELECT key,
       |x FROM src
     """.stripMargin,
-               "x")
+    "x")
 
-  positionTest("unresolved attribute 5",
-               """SELECT key,
+  positionTest(
+    "unresolved attribute 5",
+    """SELECT key,
       |  x FROM src
     """.stripMargin,
-               "x")
+    "x")
 
-  positionTest("unresolved attribute 6",
-               """SELECT key,
+  positionTest(
+    "unresolved attribute 6",
+    """SELECT key,
       |
       |  1 + x FROM src
     """.stripMargin,
-               "x")
+    "x")
 
-  positionTest("unresolved attribute 7",
-               """SELECT key,
+  positionTest(
+    "unresolved attribute 7",
+    """SELECT key,
       |
       |  1 + x + 1 FROM src
     """.stripMargin,
-               "x")
+    "x")
 
-  positionTest("multi-char unresolved attribute",
-               """SELECT key,
+  positionTest(
+    "multi-char unresolved attribute",
+    """SELECT key,
       |
       |  1 + abcd + 1 FROM src
     """.stripMargin,
-               "abcd")
+    "abcd")
 
-  positionTest("unresolved attribute group by",
-               """SELECT key FROM src GROUP BY
+  positionTest(
+    "unresolved attribute group by",
+    """SELECT key FROM src GROUP BY
        |x
     """.stripMargin,
-               "x")
+    "x")
 
-  positionTest("unresolved attribute order by",
-               """SELECT key FROM src ORDER BY
+  positionTest(
+    "unresolved attribute order by",
+    """SELECT key FROM src ORDER BY
       |x
     """.stripMargin,
-               "x")
+    "x")
 
-  positionTest("unresolved attribute where",
-               """SELECT key FROM src
+  positionTest(
+    "unresolved attribute where",
+    """SELECT key FROM src
       |WHERE x = true
     """.stripMargin,
-               "x")
+    "x")
 
   positionTest("unresolved attribute backticks", "SELECT `x` FROM src", "`x`")
 
@@ -169,8 +180,9 @@ class ErrorPositionSuite
         fail(
           s"start not returned for error on token $token\n${ast.treeString}")
       }
-      assert(expectedStart === actualStart,
-             s"""Incorrect start position.
+      assert(
+        expectedStart === actualStart,
+        s"""Incorrect start position.
           |== QUERY ==
           |$query
           |

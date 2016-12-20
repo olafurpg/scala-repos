@@ -63,15 +63,16 @@ private[tournament] object Pairing {
   case class LastOpponents(hash: Map[String, String])
 
   def apply(tourId: String, u1: String, u2: String): Pairing =
-    new Pairing(id = IdGenerator.game,
-                tourId = tourId,
-                status = chess.Status.Created,
-                user1 = u1,
-                user2 = u2,
-                winner = none,
-                turns = none,
-                berserk1 = 0,
-                berserk2 = 0)
+    new Pairing(
+      id = IdGenerator.game,
+      tourId = tourId,
+      status = chess.Status.Created,
+      user1 = u1,
+      user2 = u2,
+      winner = none,
+      turns = none,
+      berserk1 = 0,
+      berserk2 = 0)
 
   case class Prep(tourId: String, user1: String, user2: String) {
     def toPairing(firstGetsWhite: Boolean) =

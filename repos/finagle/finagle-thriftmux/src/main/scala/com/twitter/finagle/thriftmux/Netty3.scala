@@ -89,11 +89,12 @@ private[finagle] class PipelineFactory(
 
       val requestBuf = ChannelBuffers.wrappedBuffer(request_)
 
-      Message.Tdispatch(Message.Tags.MinTag,
-                        contextBuf.toSeq,
-                        richHeader.dest,
-                        richHeader.dtab,
-                        requestBuf)
+      Message.Tdispatch(
+        Message.Tags.MinTag,
+        contextBuf.toSeq,
+        richHeader.dest,
+        richHeader.dtab,
+        requestBuf)
     }
 
     override def messageReceived(ctx: ChannelHandlerContext,
@@ -101,9 +102,10 @@ private[finagle] class PipelineFactory(
       val buf = e.getMessage.asInstanceOf[ChannelBuffer]
       super.messageReceived(
         ctx,
-        new UpstreamMessageEvent(e.getChannel,
-                                 Message.encode(thriftToMux(buf)),
-                                 e.getRemoteAddress))
+        new UpstreamMessageEvent(
+          e.getChannel,
+          Message.encode(thriftToMux(buf)),
+          e.getRemoteAddress))
     }
 
     override def writeRequested(ctx: ChannelHandlerContext,
@@ -130,9 +132,10 @@ private[finagle] class PipelineFactory(
           e.getFuture.setSuccess()
           super.messageReceived(
             ctx,
-            new UpstreamMessageEvent(e.getChannel,
-                                     Message.encode(Message.Rdrain(tag)),
-                                     e.getRemoteAddress))
+            new UpstreamMessageEvent(
+              e.getChannel,
+              Message.encode(Message.Rdrain(tag)),
+              e.getRemoteAddress))
 
         case unexpected =>
           throw newUnexpectedRequestException(
@@ -146,11 +149,13 @@ private[finagle] class PipelineFactory(
                                 e: MessageEvent): Unit = {
       Message.decode(e.getMessage.asInstanceOf[ChannelBuffer]) match {
         case Message.RdispatchOk(_, _, rep) =>
-          super.writeRequested(ctx,
-                               new DownstreamMessageEvent(e.getChannel,
-                                                          e.getFuture,
-                                                          rep,
-                                                          e.getRemoteAddress))
+          super.writeRequested(
+            ctx,
+            new DownstreamMessageEvent(
+              e.getChannel,
+              e.getFuture,
+              rep,
+              e.getRemoteAddress))
 
         case Message.RdispatchNack(_, _) =>
           // The only mechanism for negative acknowledgement afforded by non-Mux
@@ -164,9 +169,10 @@ private[finagle] class PipelineFactory(
           e.getFuture.setSuccess()
           super.messageReceived(
             ctx,
-            new UpstreamMessageEvent(e.getChannel,
-                                     Message.encode(Message.Rdrain(tag)),
-                                     e.getRemoteAddress))
+            new UpstreamMessageEvent(
+              e.getChannel,
+              Message.encode(Message.Rdrain(tag)),
+              e.getRemoteAddress))
 
         case unexpected =>
           throw newUnexpectedRequestException(
@@ -311,9 +317,10 @@ private[finagle] class PipelineFactory(
 
           // Add a ChannelHandler to serialize the requests since we may
           // deal with a client that pipelines requests
-          pipeline.addBefore(ctx.getName,
-                             "request_serializer",
-                             new RequestSerializer(1))
+          pipeline.addBefore(
+            ctx.getName,
+            "request_serializer",
+            new RequestSerializer(1))
           if (isTTwitterUpNegotiation(buf)) {
             pipeline.replace(this, "twitter_thrift_to_mux", new TTwitterToMux)
             Channels
@@ -322,14 +329,16 @@ private[finagle] class PipelineFactory(
             pipeline.replace(this, "framed_thrift_to_mux", new TFramedToMux)
             super.messageReceived(
               ctx,
-              new UpstreamMessageEvent(e.getChannel,
-                                       Message.encode(
-                                         Message.Tdispatch(Message.Tags.MinTag,
-                                                           Nil,
-                                                           Path.empty,
-                                                           Dtab.empty,
-                                                           buf)),
-                                       e.getRemoteAddress))
+              new UpstreamMessageEvent(
+                e.getChannel,
+                Message.encode(
+                  Message.Tdispatch(
+                    Message.Tags.MinTag,
+                    Nil,
+                    Path.empty,
+                    Dtab.empty,
+                    buf)),
+                e.getRemoteAddress))
           }
 
         case Return(_) =>

@@ -147,8 +147,9 @@ object TableColumn {
 
     /** Column will be sorted in an ascending order. */
     val Ascending = new SortType(jfxsc.TableColumn.SortType.ASCENDING)
-    @deprecated("Use Ascending; ASCENDING will be removed in a future release",
-                "8.0.60-R10")
+    @deprecated(
+      "Use Ascending; ASCENDING will be removed in a future release",
+      "8.0.60-R10")
     val ASCENDING = Ascending
 
     /** Column will be sorted in a descending order. */
@@ -266,8 +267,9 @@ class TableColumn[S, T](
   def cellValueFactory_=(
       f: TableColumn.CellDataFeatures[S, T] => ObservableValue[T, T]) {
     delegate.cellValueFactoryProperty.setValue(
-      new jfxu.Callback[jfxsc.TableColumn.CellDataFeatures[S, T],
-                        jfxbv.ObservableValue[T]] {
+      new jfxu.Callback[
+        jfxsc.TableColumn.CellDataFeatures[S, T],
+        jfxbv.ObservableValue[T]] {
         def call(v: jfxsc.TableColumn.CellDataFeatures[S, T])
           : jfxbv.ObservableValue[T] = {
           f(v).delegate

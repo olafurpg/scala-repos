@@ -69,8 +69,9 @@ class RespondWithDirectivesExamplesSpec extends RoutingSpec {
 
   "respondWithHeaders-0" in {
     val route = path("foo") {
-      respondWithHeaders(RawHeader("Funky-Muppet", "gonzo"),
-                         Origin(HttpOrigin("http://akka.io"))) {
+      respondWithHeaders(
+        RawHeader("Funky-Muppet", "gonzo"),
+        Origin(HttpOrigin("http://akka.io"))) {
         complete("beep")
       }
     }

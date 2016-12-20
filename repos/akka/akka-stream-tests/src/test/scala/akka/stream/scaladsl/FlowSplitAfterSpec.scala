@@ -274,9 +274,10 @@ class FlowSplitAfterSpec extends AkkaSpec {
     }
 
     "support eager cancellation of master stream on cancelling substreams" in assertAllStagesStopped {
-      new SubstreamsSupport(splitAfter = 5,
-                            elementCount = 8,
-                            SubstreamCancelStrategy.propagate) {
+      new SubstreamsSupport(
+        splitAfter = 5,
+        elementCount = 8,
+        SubstreamCancelStrategy.propagate) {
         val s1 = StreamPuppet(expectSubFlow().runWith(Sink.asPublisher(false)))
         s1.cancel()
         masterSubscriber.expectComplete()

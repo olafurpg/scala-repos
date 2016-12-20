@@ -154,8 +154,9 @@ class LBatchView(val appId: Int,
     events
       .filter(entityTypeOpt = Some(entityType))
       .filter(e => EventValidation.isSpecialEvents(e.event))
-      .aggregateByEntityOrdered(init = None,
-                                op = ViewAggregators.getDataMapAggregator())
+      .aggregateByEntityOrdered(
+        init = None,
+        op = ViewAggregators.getDataMapAggregator())
       .filter { case (k, v) => (v != None) }
       .mapValues(_.get)
   }

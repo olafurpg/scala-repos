@@ -33,11 +33,12 @@ class OfferMatcherManagerModule(clock: Clock,
     new OfferMatcherManagerActorMetrics(metrics)
 
   private[this] val offerMatcherMultiplexer: ActorRef = {
-    val props = OfferMatcherManagerActor.props(offerMatcherManagerMetrics,
-                                               random,
-                                               clock,
-                                               offerMatcherConfig,
-                                               offersWanted)
+    val props = OfferMatcherManagerActor.props(
+      offerMatcherManagerMetrics,
+      random,
+      clock,
+      offerMatcherConfig,
+      offersWanted)
     leadershipModule.startWhenLeader(props, "offerMatcherManager")
   }
 

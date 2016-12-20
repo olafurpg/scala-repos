@@ -40,11 +40,11 @@ object Play2Keys {
       if (children.forall(
             _.child.forall { case _: Text => true; case _ => false })) {
         Some(
-          new StringXmlKey(keyName,
-                           children
-                             .map(projectKey =>
-                               (projectKey.label, projectKey.text))
-                             .toMap))
+          new StringXmlKey(
+            keyName,
+            children
+              .map(projectKey => (projectKey.label, projectKey.text))
+              .toMap))
       } else if (children.forall(_.child.forall(node =>
                    node.label == ENTRY_SEQ_NAME ||
                      node.isInstanceOf[Text]))) {

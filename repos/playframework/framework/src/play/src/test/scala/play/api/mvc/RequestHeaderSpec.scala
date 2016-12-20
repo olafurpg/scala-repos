@@ -20,15 +20,17 @@ class RequestHeaderSpec extends Specification {
         rh.host must_== "playframework.com"
       }
       "absolute uri" in {
-        val rh = DummyRequestHeader("GET",
-                                    "https://example.com/test",
-                                    Headers(HOST -> "playframework.com"))
+        val rh = DummyRequestHeader(
+          "GET",
+          "https://example.com/test",
+          Headers(HOST -> "playframework.com"))
         rh.host must_== "example.com"
       }
       "absolute uri with port" in {
-        val rh = DummyRequestHeader("GET",
-                                    "https://example.com:8080/test",
-                                    Headers(HOST -> "playframework.com"))
+        val rh = DummyRequestHeader(
+          "GET",
+          "https://example.com:8080/test",
+          Headers(HOST -> "playframework.com"))
         rh.host must_== "example.com:8080"
       }
     }

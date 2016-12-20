@@ -78,12 +78,13 @@ class StreamingContextSuite
   }
 
   test("from no conf + spark home + env") {
-    ssc = new StreamingContext(master,
-                               appName,
-                               batchDuration,
-                               sparkHome,
-                               Nil,
-                               Map(envPair))
+    ssc = new StreamingContext(
+      master,
+      appName,
+      batchDuration,
+      sparkHome,
+      Nil,
+      Map(envPair))
     assert(ssc.conf.getExecutorEnv.contains(envPair))
   }
 
@@ -424,8 +425,9 @@ class StreamingContextSuite
         throw new Exception("Did not wait for stop")
       }
     }
-    assert(exception.isInstanceOf[TestFailedDueToTimeoutException],
-           "Did not wait for stop")
+    assert(
+      exception.isInstanceOf[TestFailedDueToTimeoutException],
+      "Did not wait for stop")
 
     var t: Thread = null
     // test whether wait exits if context is stopped
@@ -471,8 +473,9 @@ class StreamingContextSuite
       ssc.start()
       ssc.awaitTerminationOrTimeout(5000)
     }
-    assert(exception.getMessage.contains("map task"),
-           "Expected exception not thrown")
+    assert(
+      exception.getMessage.contains("map task"),
+      "Expected exception not thrown")
   }
 
   test("awaitTermination with error in job generation") {
@@ -487,8 +490,9 @@ class StreamingContextSuite
       ssc.start()
       ssc.awaitTerminationOrTimeout(5000)
     }
-    assert(exception.getMessage.contains("transform"),
-           "Expected exception not thrown")
+    assert(
+      exception.getMessage.contains("transform"),
+      "Expected exception not thrown")
   }
 
   test("awaitTerminationOrTimeout") {
@@ -558,22 +562,25 @@ class StreamingContextSuite
 
     // getOrCreate should throw exception with fake checkpoint file and createOnError = false
     intercept[Exception] {
-      ssc = StreamingContext.getOrCreate(corruptedCheckpointPath,
-                                         creatingFunction _)
+      ssc = StreamingContext.getOrCreate(
+        corruptedCheckpointPath,
+        creatingFunction _)
     }
 
     // getOrCreate should throw exception with fake checkpoint file
     intercept[Exception] {
-      ssc = StreamingContext.getOrCreate(corruptedCheckpointPath,
-                                         creatingFunction _,
-                                         createOnError = false)
+      ssc = StreamingContext.getOrCreate(
+        corruptedCheckpointPath,
+        creatingFunction _,
+        createOnError = false)
     }
 
     // getOrCreate should create new context with fake checkpoint file and createOnError = true
     testGetOrCreate {
-      ssc = StreamingContext.getOrCreate(corruptedCheckpointPath,
-                                         creatingFunction _,
-                                         createOnError = true)
+      ssc = StreamingContext.getOrCreate(
+        corruptedCheckpointPath,
+        creatingFunction _,
+        createOnError = true)
       assert(ssc != null, "no context created")
       assert(newContextCreated, "new context not created")
     }
@@ -585,8 +592,9 @@ class StreamingContextSuite
       ssc = StreamingContext.getOrCreate(checkpointPath, creatingFunction _)
       assert(ssc != null, "no context created")
       assert(!newContextCreated, "old context not recovered")
-      assert(ssc.conf.get("someKey") === "someValue",
-             "checkpointed config not recovered")
+      assert(
+        ssc.conf.get("someKey") === "someValue",
+        "checkpointed config not recovered")
     }
 
     // getOrCreate should recover StreamingContext with existing SparkContext
@@ -595,8 +603,9 @@ class StreamingContextSuite
       ssc = StreamingContext.getOrCreate(checkpointPath, creatingFunction _)
       assert(ssc != null, "no context created")
       assert(!newContextCreated, "old context not recovered")
-      assert(!ssc.conf.contains("someKey"),
-             "checkpointed config unexpectedly recovered")
+      assert(
+        !ssc.conf.contains("someKey"),
+        "checkpointed config unexpectedly recovered")
     }
   }
 
@@ -635,29 +644,36 @@ class StreamingContextSuite
       ssc = StreamingContext.getActiveOrCreate(creatingFunc _)
       assert(ssc != null, "no context created")
       assert(newContextCreated === true, "new context not created")
-      assert(StreamingContext.getActive().isEmpty,
-             "new initialized context returned before starting")
+      assert(
+        StreamingContext.getActive().isEmpty,
+        "new initialized context returned before starting")
       ssc.start()
-      assert(StreamingContext.getActive() === Some(ssc),
-             "active context not returned")
-      assert(StreamingContext.getActiveOrCreate(creatingFunc _) === ssc,
-             "active context not returned")
+      assert(
+        StreamingContext.getActive() === Some(ssc),
+        "active context not returned")
+      assert(
+        StreamingContext.getActiveOrCreate(creatingFunc _) === ssc,
+        "active context not returned")
       ssc.stop()
       assert(StreamingContext.getActive().isEmpty, "inactive context returned")
-      assert(StreamingContext.getActiveOrCreate(creatingFunc _) !== ssc,
-             "inactive context returned")
+      assert(
+        StreamingContext.getActiveOrCreate(creatingFunc _) !== ssc,
+        "inactive context returned")
     }
 
     // getActiveOrCreate and getActive should return independently created context after activating
     testGetActiveOrCreate {
       ssc = creatingFunc() // Create
-      assert(StreamingContext.getActive().isEmpty,
-             "new initialized context returned before starting")
+      assert(
+        StreamingContext.getActive().isEmpty,
+        "new initialized context returned before starting")
       ssc.start()
-      assert(StreamingContext.getActive() === Some(ssc),
-             "active context not returned")
-      assert(StreamingContext.getActiveOrCreate(creatingFunc _) === ssc,
-             "active context not returned")
+      assert(
+        StreamingContext.getActive() === Some(ssc),
+        "active context not returned")
+      assert(
+        StreamingContext.getActiveOrCreate(creatingFunc _) === ssc,
+        "active context not returned")
       ssc.stop()
       assert(StreamingContext.getActive().isEmpty, "inactive context returned")
     }
@@ -692,16 +708,17 @@ class StreamingContextSuite
     // getActiveOrCreate should return the current active context if there is one
     testGetActiveOrCreate {
       ssc = new StreamingContext(
-        conf.clone.set("spark.streaming.clock",
-                       "org.apache.spark.util.ManualClock"),
+        conf.clone
+          .set("spark.streaming.clock", "org.apache.spark.util.ManualClock"),
         batchDuration)
       addInputStream(ssc).register()
       ssc.start()
       val returnedSsc =
         StreamingContext.getActiveOrCreate(checkpointPath, creatingFunction _)
       assert(!newContextCreated, "new context created instead of returning")
-      assert(returnedSsc.eq(ssc),
-             "returned context is not the activated context")
+      assert(
+        returnedSsc.eq(ssc),
+        "returned context is not the activated context")
     }
 
     // getActiveOrCreate should create new context with empty path
@@ -713,23 +730,26 @@ class StreamingContextSuite
 
     // getActiveOrCreate should throw exception with fake checkpoint file and createOnError = false
     intercept[Exception] {
-      ssc = StreamingContext.getOrCreate(corruptedCheckpointPath,
-                                         creatingFunction _)
+      ssc = StreamingContext.getOrCreate(
+        corruptedCheckpointPath,
+        creatingFunction _)
     }
 
     // getActiveOrCreate should throw exception with fake checkpoint file
     intercept[Exception] {
-      ssc = StreamingContext.getActiveOrCreate(corruptedCheckpointPath,
-                                               creatingFunction _,
-                                               createOnError = false)
+      ssc = StreamingContext.getActiveOrCreate(
+        corruptedCheckpointPath,
+        creatingFunction _,
+        createOnError = false)
     }
 
     // getActiveOrCreate should create new context with fake
     // checkpoint file and createOnError = true
     testGetActiveOrCreate {
-      ssc = StreamingContext.getActiveOrCreate(corruptedCheckpointPath,
-                                               creatingFunction _,
-                                               createOnError = true)
+      ssc = StreamingContext.getActiveOrCreate(
+        corruptedCheckpointPath,
+        creatingFunction _,
+        createOnError = true)
       assert(ssc != null, "no context created")
       assert(newContextCreated, "new context not created")
     }
@@ -746,8 +766,8 @@ class StreamingContextSuite
 
   test("multiple streaming contexts") {
     sc = new SparkContext(
-      conf.clone.set("spark.streaming.clock",
-                     "org.apache.spark.util.ManualClock"))
+      conf.clone
+        .set("spark.streaming.clock", "org.apache.spark.util.ManualClock"))
     ssc = new StreamingContext(sc, Seconds(1))
     val input = addInputStream(ssc)
     input.foreachRDD { rdd =>
@@ -765,8 +785,9 @@ class StreamingContextSuite
     val exception = intercept[IllegalStateException] {
       anotherSsc.start()
     }
-    assert(exception.getMessage.contains("StreamingContext"),
-           "Did not get the right exception")
+    assert(
+      exception.getMessage.contains("StreamingContext"),
+      "Did not get the right exception")
   }
 
   test("DStream and generated RDD creation sites") {
@@ -808,8 +829,9 @@ class StreamingContextSuite
         x * 2
       }
     }
-    testForException("no error on adding output operation after start",
-                     "start") {
+    testForException(
+      "no error on adding output operation after start",
+      "start") {
       transformed.foreachRDD { rdd =>
         rdd.collect()
       }
@@ -883,8 +905,9 @@ class StreamingContextSuite
   def createValidCheckpoint(): String = {
     val testDirectory = Utils.createTempDir().getAbsolutePath()
     val checkpointDirectory = Utils.createTempDir().getAbsolutePath()
-    ssc = new StreamingContext(conf.clone.set("someKey", "someValue"),
-                               batchDuration)
+    ssc = new StreamingContext(
+      conf.clone.set("someKey", "someValue"),
+      batchDuration)
     ssc.checkpoint(checkpointDirectory)
     ssc.textFileStream(testDirectory).foreachRDD { rdd =>
       rdd.count()
@@ -1010,10 +1033,12 @@ package object testPackage extends Assertions {
       ssc.start()
 
       eventually(timeout(10000 millis), interval(10 millis)) {
-        assert(rddGenerated && rddCreationSiteCorrect,
-               "RDD creation site was not correct")
-        assert(rddGenerated && foreachCallSiteCorrect,
-               "Call site in foreachRDD was not correct")
+        assert(
+          rddGenerated && rddCreationSiteCorrect,
+          "RDD creation site was not correct")
+        assert(
+          rddGenerated && foreachCallSiteCorrect,
+          "Call site in foreachRDD was not correct")
       }
     } finally {
       ssc.stop()

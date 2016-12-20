@@ -113,12 +113,11 @@ trait ParSeqLike[
       val ctx = new DefaultSignalling with AtomicIndexFlag
       ctx.setIndexFlag(Int.MaxValue)
       tasksupport
-        .executeAndWaitResult(
-          new SegmentLength(p,
-                            0,
-                            splitter.psplitWithSignalling(
-                              realfrom,
-                              length - realfrom)(1) assign ctx))
+        .executeAndWaitResult(new SegmentLength(
+          p,
+          0,
+          splitter
+            .psplitWithSignalling(realfrom, length - realfrom)(1) assign ctx))
         ._1
     }
 
@@ -140,11 +139,11 @@ trait ParSeqLike[
       val ctx = new DefaultSignalling with AtomicIndexFlag
       ctx.setIndexFlag(Int.MaxValue)
       tasksupport.executeAndWaitResult(
-        new IndexWhere(p,
-                       realfrom,
-                       splitter.psplitWithSignalling(
-                         realfrom,
-                         length - realfrom)(1) assign ctx))
+        new IndexWhere(
+          p,
+          realfrom,
+          splitter
+            .psplitWithSignalling(realfrom, length - realfrom)(1) assign ctx))
     }
 
   /** Finds the last element satisfying some predicate.
@@ -286,10 +285,11 @@ trait ParSeqLike[
       implicit bf: CanBuildFrom[Repr, U, That]): That =
     if (bf(repr).isCombiner) {
       tasksupport.executeAndWaitResult(
-        new Updated(index,
-                    elem,
-                    combinerFactory(() => bf(repr).asCombiner),
-                    splitter) mapResult {
+        new Updated(
+          index,
+          elem,
+          combinerFactory(() => bf(repr).asCombiner),
+          splitter) mapResult {
           _.resultWithTaskSupport
         }
       )
@@ -319,10 +319,11 @@ trait ParSeqLike[
     if (bf(repr).isCombiner && that.isParSeq) {
       val thatseq = that.asParSeq
       tasksupport.executeAndWaitResult(
-        new Zip(length min thatseq.length,
-                combinerFactory(() => bf(repr).asCombiner),
-                splitter,
-                thatseq.splitter) mapResult {
+        new Zip(
+          length min thatseq.length,
+          combinerFactory(() => bf(repr).asCombiner),
+          splitter,
+          thatseq.splitter) mapResult {
           _.resultWithTaskSupport
         }
       )

@@ -48,16 +48,18 @@ private[spark] object RpcUtils {
 
   /** Returns the default Spark timeout to use for RPC ask operations. */
   def askRpcTimeout(conf: SparkConf): RpcTimeout = {
-    RpcTimeout(conf,
-               Seq("spark.rpc.askTimeout", "spark.network.timeout"),
-               "120s")
+    RpcTimeout(
+      conf,
+      Seq("spark.rpc.askTimeout", "spark.network.timeout"),
+      "120s")
   }
 
   /** Returns the default Spark timeout to use for RPC remote endpoint lookup. */
   def lookupRpcTimeout(conf: SparkConf): RpcTimeout = {
-    RpcTimeout(conf,
-               Seq("spark.rpc.lookupTimeout", "spark.network.timeout"),
-               "120s")
+    RpcTimeout(
+      conf,
+      Seq("spark.rpc.lookupTimeout", "spark.network.timeout"),
+      "120s")
   }
 
   private val MAX_MESSAGE_SIZE_IN_MB = Int.MaxValue / 1024 / 1024

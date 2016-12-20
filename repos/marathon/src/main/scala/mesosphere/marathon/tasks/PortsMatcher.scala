@@ -117,12 +117,13 @@ class PortsMatcher(app: AppDefinition,
           !hostPortsFromMappings(portWithRole.port))
 
       mappings.iterator.map {
-        case PortMapping(containerPort,
-                         hostPort,
-                         servicePort,
-                         protocol,
-                         name,
-                         labels) if hostPort == 0 =>
+        case PortMapping(
+            containerPort,
+            hostPort,
+            servicePort,
+            protocol,
+            name,
+            labels) if hostPort == 0 =>
           if (!availablePortsWithoutStaticHostPorts.hasNext) {
             log.info(
               s"Offer [${offer.getId.getValue}]. $resourceSelector. " +
@@ -165,10 +166,11 @@ class PortsMatcher(app: AppDefinition,
         Option(resource.getReservation)
       else None
     } yield
-      PortRange(resource.getRole,
-                rangeInResource.getBegin.toInt,
-                rangeInResource.getEnd.toInt,
-                reservation)
+      PortRange(
+        resource.getRole,
+        rangeInResource.getBegin.toInt,
+        rangeInResource.getEnd.toInt,
+        reservation)
     portRangeIter.to[Seq]
   }
 
@@ -214,8 +216,9 @@ object PortsMatcher {
               builder += lastRange
             case (Some(lastRange), Some(nextPort))
                 if lastRange.end == nextPort.port - 1 =>
-              process(Some(lastRange.copy(end = nextPort.port.toLong)),
-                      next.tail)
+              process(
+                Some(lastRange.copy(end = nextPort.port.toLong)),
+                next.tail)
             case (Some(lastRange), Some(nextPort)) =>
               builder += lastRange
               process(Some(nextPort.toRange), next.tail)

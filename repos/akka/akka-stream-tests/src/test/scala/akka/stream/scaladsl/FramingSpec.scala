@@ -99,48 +99,53 @@ class FramingSpec extends AkkaSpec {
 
     "Respect maximum line settings" in {
       // The buffer will contain more than 1 bytes, but the individual frames are less
-      Await.result(Source
-                     .single(ByteString("a\nb\nc\nd\n"))
-                     .via(simpleLines("\n", 1))
-                     .limit(100)
-                     .runWith(Sink.seq),
-                   3.seconds) should ===(List("a", "b", "c", "d"))
+      Await.result(
+        Source
+          .single(ByteString("a\nb\nc\nd\n"))
+          .via(simpleLines("\n", 1))
+          .limit(100)
+          .runWith(Sink.seq),
+        3.seconds) should ===(List("a", "b", "c", "d"))
 
       an[FramingException] should be thrownBy {
-        Await.result(Source
-                       .single(ByteString("ab\n"))
-                       .via(simpleLines("\n", 1))
-                       .limit(100)
-                       .runWith(Sink.seq),
-                     3.seconds)
+        Await.result(
+          Source
+            .single(ByteString("ab\n"))
+            .via(simpleLines("\n", 1))
+            .limit(100)
+            .runWith(Sink.seq),
+          3.seconds)
       }
     }
 
     "work with empty streams" in {
-      Await.result(Source.empty
-                     .via(simpleLines("\n", 256))
-                     .runFold(Vector.empty[String])(_ :+ _),
-                   3.seconds) should ===(Vector.empty)
+      Await.result(
+        Source.empty
+          .via(simpleLines("\n", 256))
+          .runFold(Vector.empty[String])(_ :+ _),
+        3.seconds) should ===(Vector.empty)
     }
 
     "report truncated frames" in {
       an[FramingException] should be thrownBy {
-        Await.result(Source
-                       .single(ByteString("I have no end"))
-                       .via(simpleLines("\n", 256, allowTruncation = false))
-                       .grouped(1000)
-                       .runWith(Sink.head),
-                     3.seconds)
+        Await.result(
+          Source
+            .single(ByteString("I have no end"))
+            .via(simpleLines("\n", 256, allowTruncation = false))
+            .grouped(1000)
+            .runWith(Sink.head),
+          3.seconds)
       }
     }
 
     "allow truncated frames if configured so" in {
-      Await.result(Source
-                     .single(ByteString("I have no end"))
-                     .via(simpleLines("\n", 256, allowTruncation = true))
-                     .grouped(1000)
-                     .runWith(Sink.head),
-                   3.seconds) should ===(List("I have no end"))
+      Await.result(
+        Source
+          .single(ByteString("I have no end"))
+          .via(simpleLines("\n", 256, allowTruncation = true))
+          .grouped(1000)
+          .runWith(Sink.head),
+        3.seconds) should ===(List("I have no end"))
     }
   }
 
@@ -149,19 +154,20 @@ class FramingSpec extends AkkaSpec {
     val referenceChunk = ByteString(scala.util.Random.nextString(0x100001))
 
     val byteOrders = List(ByteOrder.BIG_ENDIAN, ByteOrder.LITTLE_ENDIAN)
-    val frameLengths = List(0,
-                            1,
-                            2,
-                            3,
-                            0xFF,
-                            0x100,
-                            0x101,
-                            0xFFF,
-                            0x1000,
-                            0x1001,
-                            0xFFFF,
-                            0x10000,
-                            0x10001)
+    val frameLengths = List(
+      0,
+      1,
+      2,
+      3,
+      0xFF,
+      0x100,
+      0x101,
+      0xFFF,
+      0x1000,
+      0x1001,
+      0xFFFF,
+      0x10000,
+      0x10001)
     val fieldLengths = List(1, 2, 3, 4)
     val fieldOffsets = List(0, 1, 2, 3, 15, 16, 31, 32, 44, 107)
 
@@ -246,23 +252,26 @@ class FramingSpec extends AkkaSpec {
           (frameLength != 0)
       } {
 
-        val fullFrame = encode(referenceChunk.take(frameLength),
-                               fieldOffset,
-                               fieldLength,
-                               byteOrder)
+        val fullFrame = encode(
+          referenceChunk.take(frameLength),
+          fieldOffset,
+          fieldLength,
+          byteOrder)
         val partialFrame = fullFrame.dropRight(1)
 
         an[FramingException] should be thrownBy {
-          Await.result(Source(List(fullFrame, partialFrame))
-                         .via(rechunk)
-                         .via(
-                           Framing.lengthField(fieldLength,
-                                               fieldOffset,
-                                               Int.MaxValue,
-                                               byteOrder))
-                         .grouped(10000)
-                         .runWith(Sink.head),
-                       3.seconds)
+          Await.result(
+            Source(List(fullFrame, partialFrame))
+              .via(rechunk)
+              .via(
+                Framing.lengthField(
+                  fieldLength,
+                  fieldOffset,
+                  Int.MaxValue,
+                  byteOrder))
+              .grouped(10000)
+              .runWith(Sink.head),
+            3.seconds)
         }
       }
     }

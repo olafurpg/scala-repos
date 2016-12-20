@@ -38,9 +38,10 @@ final class Semantics private (
     copy(runtimeClassName = runtimeClassName)
 
   def optimized: Semantics = {
-    copy(asInstanceOfs = this.asInstanceOfs.optimized,
-         moduleInit = this.moduleInit.optimized,
-         productionMode = true)
+    copy(
+      asInstanceOfs = this.asInstanceOfs.optimized,
+      moduleInit = this.moduleInit.optimized,
+      productionMode = true)
   }
 
   override def equals(that: Any): Boolean = that match {
@@ -86,8 +87,9 @@ final class Semantics private (
 
     cl("asInstanceOfs", asInstanceOfs == CheckedBehavior.Compliant) ++ cl(
       "moduleInit",
-      moduleInit == CheckedBehavior.Compliant) ++ cl("strictFloats",
-                                                     strictFloats)
+      moduleInit == CheckedBehavior.Compliant) ++ cl(
+      "strictFloats",
+      strictFloats)
   }
 
   private def copy(asInstanceOfs: CheckedBehavior = this.asInstanceOfs,
@@ -96,11 +98,12 @@ final class Semantics private (
                    productionMode: Boolean = this.productionMode,
                    runtimeClassName: RuntimeClassNameFunction =
                      this.runtimeClassName): Semantics = {
-    new Semantics(asInstanceOfs = asInstanceOfs,
-                  moduleInit = moduleInit,
-                  strictFloats = strictFloats,
-                  productionMode = productionMode,
-                  runtimeClassName = runtimeClassName)
+    new Semantics(
+      asInstanceOfs = asInstanceOfs,
+      moduleInit = moduleInit,
+      strictFloats = strictFloats,
+      productionMode = productionMode,
+      runtimeClassName = runtimeClassName)
   }
 }
 

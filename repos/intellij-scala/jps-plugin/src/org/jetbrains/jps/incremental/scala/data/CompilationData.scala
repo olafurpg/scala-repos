@@ -75,16 +75,17 @@ object CompilationData {
 
       val outputGroups = createOutputGroups(chunk)
 
-      CompilationData(sources,
-                      classpath,
-                      output,
-                      commonOptions ++ scalaOptions,
-                      commonOptions ++ javaOptions,
-                      order,
-                      cacheFile,
-                      relevantOutputToCacheMap,
-                      outputGroups,
-                      Some(compilerSettings.getSbtIncrementalOptions))
+      CompilationData(
+        sources,
+        classpath,
+        output,
+        commonOptions ++ scalaOptions,
+        commonOptions ++ javaOptions,
+        order,
+        cacheFile,
+        relevantOutputToCacheMap,
+        outputGroups,
+        Some(compilerSettings.getSbtIncrementalOptions))
     }
   }
 
@@ -126,10 +127,11 @@ object CompilationData {
       compilerConfig.getAnnotationProcessingProfile(module)
     }
 
-    JavaBuilder.addCompilationOptions(options,
-                                      context,
-                                      chunk,
-                                      annotationProcessingProfile)
+    JavaBuilder.addCompilationOptions(
+      options,
+      context,
+      chunk,
+      annotationProcessingProfile)
 
     options.asScala
   }

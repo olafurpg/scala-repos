@@ -417,16 +417,17 @@ object Req {
         StatelessReqTest(wholePath, original.request),
         otherStatelessTest) or NamedPF.applyBox(wholePath, statelessTest)
 
-    new Req(rewritten.path,
-            original.contextPath,
-            original.requestType,
-            original.contentType,
-            original.request,
-            original.nanoStart,
-            original.nanoEnd,
-            stateless openOr original.stateless_?,
-            original.paramCalculator,
-            original.addlParams ++ rewritten.params)
+    new Req(
+      rewritten.path,
+      original.contextPath,
+      original.requestType,
+      original.contentType,
+      original.request,
+      original.nanoStart,
+      original.nanoEnd,
+      stateless openOr original.stateless_?,
+      original.paramCalculator,
+      original.addlParams ++ rewritten.params)
   }
 
   def apply(request: HTTPRequest,
@@ -512,10 +513,11 @@ object Req {
                   x.startsWith("text/json") || x.startsWith("application/json")
             }
           }) {
-        ParamCalcInfo(queryStringParam._1,
-                      queryStringParam._2 ++ localParams,
-                      Nil,
-                      Full(BodyOrInputStream(request.inputStream)))
+        ParamCalcInfo(
+          queryStringParam._1,
+          queryStringParam._2 ++ localParams,
+          Nil,
+          Full(BodyOrInputStream(request.inputStream)))
         // it's multipart
       } else if (request.multipartContent_?) {
         val allInfo = request.extractFiles
@@ -533,16 +535,18 @@ object Req {
         val params = normal.foldLeft(eMap)((a, b) =>
           a + (b.name -> (a.getOrElse(b.name, Nil) ::: List(b.value))))
 
-        ParamCalcInfo((queryStringParam._1 ::: normal.map(_.name)).distinct,
-                      queryStringParam._2 ++ localParams ++ params,
-                      files,
-                      Empty)
+        ParamCalcInfo(
+          (queryStringParam._1 ::: normal.map(_.name)).distinct,
+          queryStringParam._2 ++ localParams ++ params,
+          files,
+          Empty)
         // it's a GET
       } else if (reqType.get_?) {
-        ParamCalcInfo(queryStringParam._1,
-                      queryStringParam._2 ++ localParams,
-                      Nil,
-                      Empty)
+        ParamCalcInfo(
+          queryStringParam._1,
+          queryStringParam._2 ++ localParams,
+          Nil,
+          Empty)
       } else if (contentType.dmap(false)(_.toLowerCase.startsWith(
                    "application/x-www-form-urlencoded"))) {
         val params =
@@ -553,10 +557,11 @@ object Req {
             .map(n => (n.name, n.values))
         ParamCalcInfo(request.paramNames, params, Nil, Empty)
       } else {
-        ParamCalcInfo(queryStringParam._1,
-                      queryStringParam._2 ++ localParams,
-                      Nil,
-                      Full(BodyOrInputStream(request.inputStream)))
+        ParamCalcInfo(
+          queryStringParam._1,
+          queryStringParam._2 ++ localParams,
+          Nil,
+          Full(BodyOrInputStream(request.inputStream)))
       }
     })
 
@@ -571,16 +576,17 @@ object Req {
         StatelessReqTest(wholePath, request),
         otherStatelessTest) or NamedPF.applyBox(wholePath, statelessTest)
 
-    new Req(rewritten.path,
-            contextPath,
-            reqType,
-            contentType,
-            request,
-            nanoStart,
-            System.nanoTime,
-            stateless openOr false,
-            paramCalculator,
-            Map())
+    new Req(
+      rewritten.path,
+      contextPath,
+      reqType,
+      contentType,
+      request,
+      nanoStart,
+      System.nanoTime,
+      stateless openOr false,
+      paramCalculator,
+      Map())
   }
 
   private def fixURI(uri: String) = uri indexOf ";jsessionid" match {
@@ -592,16 +598,17 @@ object Req {
     * Create a nil request... useful for testing
     */
   def nil =
-    new Req(NilPath,
-            "",
-            GetRequest,
-            Empty,
-            null,
-            System.nanoTime,
-            System.nanoTime,
-            false,
-            () => ParamCalcInfo(Nil, Map.empty, Nil, Empty),
-            Map()) {
+    new Req(
+      NilPath,
+      "",
+      GetRequest,
+      Empty,
+      null,
+      System.nanoTime,
+      System.nanoTime,
+      false,
+      () => ParamCalcInfo(Nil, Map.empty, Nil, Empty),
+      Map()) {
       override lazy val standardRequest_? = false
     }
 
@@ -676,40 +683,45 @@ object Req {
         v match {
           case Group(nodes) => Group(_fixHtml(contextPath, nodes))
           case e: Elem if e.label == "form" =>
-            Elem(v.prefix,
-                 v.label,
-                 fixAttrs("action", v.attributes, true),
-                 v.scope,
-                 e.minimizeEmpty,
-                 _fixHtml(contextPath, v.child): _*)
+            Elem(
+              v.prefix,
+              v.label,
+              fixAttrs("action", v.attributes, true),
+              v.scope,
+              e.minimizeEmpty,
+              _fixHtml(contextPath, v.child): _*)
           case e: Elem if e.label == "script" =>
-            Elem(v.prefix,
-                 v.label,
-                 fixAttrs("src", v.attributes, false),
-                 v.scope,
-                 e.minimizeEmpty,
-                 _fixHtml(contextPath, v.child): _*)
+            Elem(
+              v.prefix,
+              v.label,
+              fixAttrs("src", v.attributes, false),
+              v.scope,
+              e.minimizeEmpty,
+              _fixHtml(contextPath, v.child): _*)
           case e: Elem if e.label == "a" =>
-            Elem(v.prefix,
-                 v.label,
-                 fixAttrs("href", v.attributes, true),
-                 v.scope,
-                 e.minimizeEmpty,
-                 _fixHtml(contextPath, v.child): _*)
+            Elem(
+              v.prefix,
+              v.label,
+              fixAttrs("href", v.attributes, true),
+              v.scope,
+              e.minimizeEmpty,
+              _fixHtml(contextPath, v.child): _*)
           case e: Elem if e.label == "link" =>
-            Elem(v.prefix,
-                 v.label,
-                 fixAttrs("href", v.attributes, false),
-                 v.scope,
-                 e.minimizeEmpty,
-                 _fixHtml(contextPath, v.child): _*)
+            Elem(
+              v.prefix,
+              v.label,
+              fixAttrs("href", v.attributes, false),
+              v.scope,
+              e.minimizeEmpty,
+              _fixHtml(contextPath, v.child): _*)
           case e: Elem =>
-            Elem(v.prefix,
-                 v.label,
-                 fixAttrs("src", v.attributes, true),
-                 v.scope,
-                 e.minimizeEmpty,
-                 _fixHtml(contextPath, v.child): _*)
+            Elem(
+              v.prefix,
+              v.label,
+              fixAttrs("src", v.attributes, true),
+              v.scope,
+              e.minimizeEmpty,
+              _fixHtml(contextPath, v.child): _*)
           case _ => v
         }
       }
@@ -889,16 +901,17 @@ class Req(val path: ParsePath,
            _nanoEnd: Long,
            _paramCalculator: () => ParamCalcInfo,
            _addlParams: Map[String, String]) =
-    this(_path,
-         _contextPath,
-         _requestType,
-         _contentType,
-         _request,
-         _nanoStart,
-         _nanoEnd,
-         false,
-         _paramCalculator,
-         _addlParams)
+    this(
+      _path,
+      _contextPath,
+      _requestType,
+      _contentType,
+      _request,
+      _nanoStart,
+      _nanoEnd,
+      false,
+      _paramCalculator,
+      _addlParams)
 
   /**
     * Build a new Req, the same except with a different path.
@@ -907,16 +920,17 @@ class Req(val path: ParsePath,
   def withNewPath(newPath: ParsePath): Req = {
     val outer = this
 
-    new Req(newPath,
-            contextPath,
-            requestType,
-            contentType,
-            request,
-            nanoStart,
-            nanoEnd,
-            _stateless_?,
-            paramCalculator,
-            addlParams) {
+    new Req(
+      newPath,
+      contextPath,
+      requestType,
+      contentType,
+      request,
+      nanoStart,
+      nanoEnd,
+      _stateless_?,
+      paramCalculator,
+      addlParams) {
       override lazy val json: Box[JsonAST.JValue] = outer.json
 
       override lazy val xml: Box[Elem] = outer.xml
@@ -1026,16 +1040,17 @@ class Req(val path: ParsePath,
   def snapshot: Req = {
     val paramCalc = paramCalculator()
     paramCalc.body.map(_.body) // make sure we grab the body
-    new Req(path,
-            contextPath,
-            requestType,
-            contentType,
-            request.snapshot,
-            nanoStart,
-            nanoEnd,
-            stateless_?,
-            () => paramCalc,
-            addlParams)
+    new Req(
+      path,
+      contextPath,
+      requestType,
+      contentType,
+      request.snapshot,
+      nanoStart,
+      nanoEnd,
+      stateless_?,
+      () => paramCalc,
+      addlParams)
   }
   val section = path(0) match { case null => "default"; case s => s }
   val view = path(1) match { case null => "index"; case s @ _ => s }
@@ -1094,10 +1109,11 @@ class Req(val path: ParsePath,
     */
   def rawInputStream: Box[InputStream] = _body.flatMap(_.stream)
 
-  private lazy val ParamCalcInfo(_paramNames /*: List[String]*/,
-                                 __params /*: Map[String, List[String]]*/,
-                                 _uploadedFiles /*: List[FileParamHolder]*/,
-                                 _body /*: Box[BodyOrInputStream]*/ ) = {
+  private lazy val ParamCalcInfo(
+    _paramNames /*: List[String]*/,
+    __params /*: Map[String, List[String]]*/,
+    _uploadedFiles /*: List[FileParamHolder]*/,
+    _body /*: Box[BodyOrInputStream]*/ ) = {
     val ret = paramCalculator()
     ret
   }
@@ -1298,16 +1314,17 @@ class Req(val path: ParsePath,
       case DefaultNotFound => Full(Req.defaultCreateNotFound(this))
       case NotFoundAsResponse(resp) => Full(resp)
       case NotFoundAsTemplate(path) =>
-        val newReq = new Req(path,
-                             this.contextPath,
-                             this.requestType,
-                             this.contentType,
-                             this.request,
-                             this.nanoStart,
-                             this.nanoEnd,
-                             true,
-                             this.paramCalculator,
-                             this.addlParams)
+        val newReq = new Req(
+          path,
+          this.contextPath,
+          this.requestType,
+          this.contentType,
+          this.request,
+          this.nanoStart,
+          this.nanoEnd,
+          true,
+          this.paramCalculator,
+          this.addlParams)
         S.withReq(Full(newReq)) {
           f(path)
         }
@@ -1480,9 +1497,10 @@ object RewriteResponse {
     new RewriteResponse(ParsePath(path, "", true, false), Map.empty, false)
 
   def apply(path: List[String], stopRewriting: Boolean) =
-    new RewriteResponse(ParsePath(path, "", true, false),
-                        Map.empty,
-                        stopRewriting)
+    new RewriteResponse(
+      ParsePath(path, "", true, false),
+      Map.empty,
+      stopRewriting)
 
   def apply(path: List[String], suffix: String) =
     new RewriteResponse(ParsePath(path, suffix, true, false), Map.empty, false)

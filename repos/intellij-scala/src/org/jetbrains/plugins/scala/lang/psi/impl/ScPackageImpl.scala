@@ -33,8 +33,9 @@ import scala.util.control.ControlThrowable
   * Date: 22.04.2010
   */
 class ScPackageImpl private (val pack: PsiPackage)
-    extends PsiPackageImpl(pack.getManager.asInstanceOf[PsiManagerEx],
-                           pack.getQualifiedName)
+    extends PsiPackageImpl(
+      pack.getManager.asInstanceOf[PsiManagerEx],
+      pack.getQualifiedName)
     with ScPackage {
   def superProcessDeclarations(processor: PsiScopeProcessor,
                                state: ResolveState,
@@ -79,11 +80,12 @@ class ScPackageImpl private (val pack: PsiPackage)
         }
       }
     } else {
-      if (!ResolveUtils.packageProcessDeclarations(pack,
-                                                   processor,
-                                                   state,
-                                                   lastParent,
-                                                   place)) return false
+      if (!ResolveUtils.packageProcessDeclarations(
+            pack,
+            processor,
+            state,
+            lastParent,
+            place)) return false
     }
 
     //for Scala
@@ -101,10 +103,11 @@ class ScPackageImpl private (val pack: PsiPackage)
               case tp: ScType =>
                 newState = state.put(BaseProcessor.FROM_TYPE_KEY, tp)
             }
-            if (!obj.processDeclarations(processor,
-                                         newState,
-                                         lastParent,
-                                         place)) return false
+            if (!obj.processDeclarations(
+                  processor,
+                  newState,
+                  lastParent,
+                  place)) return false
           case _ =>
         }
       } else {
@@ -115,10 +118,11 @@ class ScPackageImpl private (val pack: PsiPackage)
               case tp: ScType =>
                 newState = state.put(BaseProcessor.FROM_TYPE_KEY, tp)
             }
-            if (!obj.processDeclarations(processor,
-                                         newState,
-                                         lastParent,
-                                         place)) return false
+            if (!obj.processDeclarations(
+                  processor,
+                  newState,
+                  lastParent,
+                  place)) return false
           case _ =>
         }
       }

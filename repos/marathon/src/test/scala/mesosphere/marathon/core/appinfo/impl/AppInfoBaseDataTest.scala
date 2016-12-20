@@ -106,14 +106,15 @@ class AppInfoBaseDataTest
       Set("task1", "task2", "task3"))
 
     appInfo should be(
-      AppInfo(app,
-              maybeTasks = Some(
-                Seq(
-                  EnrichedTask(app.id, running1, Seq.empty),
-                  EnrichedTask(app.id, running2, Seq(alive)),
-                  EnrichedTask(app.id, running3, Seq(unhealthy))
-                )
-              )))
+      AppInfo(
+        app,
+        maybeTasks = Some(
+          Seq(
+            EnrichedTask(app.id, running1, Seq.empty),
+            EnrichedTask(app.id, running2, Seq(alive)),
+            EnrichedTask(app.id, running3, Seq(unhealthy))
+          )
+        )))
 
     And("the taskTracker should have been called")
     verify(f.taskTracker, times(1)).tasksByApp()(global)
@@ -154,13 +155,15 @@ class AppInfoBaseDataTest
 
     Then("we get counts object in the appInfo")
     appInfo should be(
-      AppInfo(app,
-              maybeCounts = Some(
-                TaskCounts(tasksStaged = 1,
-                           tasksRunning = 2,
-                           tasksHealthy = 1,
-                           tasksUnhealthy = 1)
-              )))
+      AppInfo(
+        app,
+        maybeCounts = Some(
+          TaskCounts(
+            tasksStaged = 1,
+            tasksRunning = 2,
+            tasksHealthy = 1,
+            tasksUnhealthy = 1)
+        )))
 
     And("the taskTracker should have been called")
     verify(f.taskTracker, times(1)).tasksByApp()(global)
@@ -193,10 +196,11 @@ class AppInfoBaseDataTest
 
     Then("we get an counts in the appInfo")
     appInfo should be(
-      AppInfo(app,
-              maybeDeployments = Some(
-                Seq(Identifiable(relatedDeployment.id))
-              )))
+      AppInfo(
+        app,
+        maybeDeployments = Some(
+          Seq(Identifiable(relatedDeployment.id))
+        )))
 
     And(
       "the marathonSchedulerService should have been called to retrieve the deployments")
@@ -220,10 +224,11 @@ class AppInfoBaseDataTest
 
     Then("we get an empty list of deployments")
     appInfo should be(
-      AppInfo(app,
-              maybeDeployments = Some(
-                Seq.empty
-              )))
+      AppInfo(
+        app,
+        maybeDeployments = Some(
+          Seq.empty
+        )))
 
     And(
       "the marathonSchedulerService should have been called to retrieve the deployments")
@@ -246,10 +251,11 @@ class AppInfoBaseDataTest
 
     Then("we get the failure in the app info")
     appInfo should be(
-      AppInfo(app,
-              maybeLastTaskFailure = Some(
-                TaskFailureTestHelper.taskFailure
-              )))
+      AppInfo(
+        app,
+        maybeLastTaskFailure = Some(
+          TaskFailureTestHelper.taskFailure
+        )))
 
     And(
       "the taskFailureRepository should have been called to retrieve the failure")

@@ -45,11 +45,12 @@ final class BaseLinker(semantics: Semantics,
            logger: Logger,
            symbolRequirements: SymbolRequirement,
            checkIR: Boolean): LinkingUnit = {
-    linkInternal(irInput,
-                 logger,
-                 symbolRequirements,
-                 bypassLinkingErrors = false,
-                 checkIR = checkIR)
+    linkInternal(
+      irInput,
+      logger,
+      symbolRequirements,
+      bypassLinkingErrors = false,
+      checkIR = checkIR)
   }
 
   @deprecated(
@@ -61,11 +62,12 @@ final class BaseLinker(semantics: Semantics,
            symbolRequirements: SymbolRequirement,
            bypassLinkingErrors: Boolean,
            checkIR: Boolean): LinkingUnit = {
-    linkInternal(irInput,
-                 logger,
-                 symbolRequirements,
-                 bypassLinkingErrors,
-                 checkIR)
+    linkInternal(
+      irInput,
+      logger,
+      symbolRequirements,
+      bypassLinkingErrors,
+      checkIR)
   }
 
   // Non-deprecated version to be called from `LinkerFrontend`
@@ -95,12 +97,13 @@ final class BaseLinker(semantics: Semantics,
       (pf.tree, pf.version)
     }
 
-    linkInternal(infos,
-                 getTree,
-                 logger,
-                 symbolRequirements,
-                 bypassLinkingErrors,
-                 checkIR)
+    linkInternal(
+      infos,
+      getTree,
+      logger,
+      symbolRequirements,
+      bypassLinkingErrors,
+      checkIR)
   }
 
   private def linkInternal(infoInput: List[Infos.ClassInfo],
@@ -121,10 +124,11 @@ final class BaseLinker(semantics: Semantics,
     }
 
     val analysis = logger.time("Linker: Compute reachability") {
-      Analyzer.computeReachability(semantics,
-                                   symbolRequirements,
-                                   infoInput,
-                                   allowAddingSyntheticMethods = true)
+      Analyzer.computeReachability(
+        semantics,
+        symbolRequirements,
+        infoInput,
+        allowAddingSyntheticMethods = true)
     }
 
     if (analysis.errors.nonEmpty) {
@@ -179,12 +183,13 @@ final class BaseLinker(semantics: Semantics,
           val (tree, version) = getTree(encodedName)
           val newVersion =
             version.map("real" + _) // avoid collision with dummy
-          linkedClassDef(info,
-                         tree,
-                         analyzerInfo,
-                         newVersion,
-                         getTree,
-                         analysis)
+          linkedClassDef(
+            info,
+            tree,
+            analyzerInfo,
+            newVersion,
+            getTree,
+            analysis)
         }
         .orElse(optDummyParent)
     }
@@ -194,11 +199,12 @@ final class BaseLinker(semantics: Semantics,
       linkedClassDef <- optClassDef(classInfo)
     } yield linkedClassDef
 
-    new LinkingUnit(semantics,
-                    esLevel,
-                    linkedClassDefs.toList,
-                    infoByName,
-                    analysis.allAvailable)
+    new LinkingUnit(
+      semantics,
+      esLevel,
+      linkedClassDefs.toList,
+      infoByName,
+      analysis.allAvailable)
   }
 
   /** Takes a Infos, a ClassDef and DCE infos to construct a stripped down
@@ -288,19 +294,21 @@ final class BaseLinker(semantics: Semantics,
           memberMethods += linkedSyntheticMethod(syntheticMDef)
 
         case MethodSyntheticKind.ReflectiveProxy(targetName) =>
-          val syntheticMDef = synthesizeReflectiveProxy(analyzerInfo,
-                                                        m,
-                                                        targetName,
-                                                        getTree,
-                                                        analysis)
+          val syntheticMDef = synthesizeReflectiveProxy(
+            analyzerInfo,
+            m,
+            targetName,
+            getTree,
+            analysis)
           memberMethods += linkedSyntheticMethod(syntheticMDef)
 
         case MethodSyntheticKind.DefaultBridge(targetInterface) =>
-          val syntheticMDef = synthesizeDefaultBridge(analyzerInfo,
-                                                      m,
-                                                      targetInterface,
-                                                      getTree,
-                                                      analysis)
+          val syntheticMDef = synthesizeDefaultBridge(
+            analyzerInfo,
+            m,
+            targetInterface,
+            getTree,
+            analysis)
           memberMethods += linkedSyntheticMethod(syntheticMDef)
       }
     }
@@ -314,25 +322,26 @@ final class BaseLinker(semantics: Semantics,
 
     val ancestors = analyzerInfo.ancestors.map(_.encodedName)
 
-    new LinkedClass(classDef.name,
-                    kind,
-                    classDef.superClass,
-                    classDef.interfaces,
-                    classDef.jsName,
-                    fields.toList,
-                    staticMethods.toList,
-                    memberMethods.toList,
-                    abstractMethods.toList,
-                    exportedMembers.toList,
-                    classExports.toList,
-                    classExportInfo,
-                    classDef.optimizerHints,
-                    classDef.pos,
-                    ancestors.toList,
-                    hasInstances = analyzerInfo.isAnySubclassInstantiated,
-                    hasInstanceTests = analyzerInfo.areInstanceTestsUsed,
-                    hasRuntimeTypeInfo = analyzerInfo.isDataAccessed,
-                    version)
+    new LinkedClass(
+      classDef.name,
+      kind,
+      classDef.superClass,
+      classDef.interfaces,
+      classDef.jsName,
+      fields.toList,
+      staticMethods.toList,
+      memberMethods.toList,
+      abstractMethods.toList,
+      exportedMembers.toList,
+      classExports.toList,
+      classExportInfo,
+      classDef.optimizerHints,
+      classDef.pos,
+      ancestors.toList,
+      hasInstances = analyzerInfo.isAnySubclassInstantiated,
+      hasInstanceTests = analyzerInfo.areInstanceTestsUsed,
+      hasRuntimeTypeInfo = analyzerInfo.isDataAccessed,
+      version)
   }
 
   private def synthesizeInheritedConstructor(
@@ -353,16 +362,16 @@ final class BaseLinker(semantics: Semantics,
     val params = inheritedMDef.args.map(_.copy()) // for the new pos
     val currentClassType = ClassType(classInfo.encodedName)
     val superClassType = ClassType(classInfo.superClass.encodedName)
-    MethodDef(static = false,
-              ctorIdent,
-              params,
-              NoType,
-              ApplyStatically(This()(currentClassType),
-                              superClassType,
-                              ctorIdent,
-                              params.map(_.ref))(NoType))(
-      OptimizerHints.empty,
-      inheritedMDef.hash) // over-approximation
+    MethodDef(
+      static = false,
+      ctorIdent,
+      params,
+      NoType,
+      ApplyStatically(
+        This()(currentClassType),
+        superClassType,
+        ctorIdent,
+        params.map(_.ref))(NoType))(OptimizerHints.empty, inheritedMDef.hash) // over-approximation
   }
 
   private def synthesizeReflectiveProxy(classInfo: Analysis.ClassInfo,
@@ -388,9 +397,10 @@ final class BaseLinker(semantics: Semantics,
     val body =
       if (targetName.endsWith("__C")) {
         // A Char needs to be boxed
-        New(ClassType(Definitions.BoxedCharacterClass),
-            Ident("init___C"),
-            List(call))
+        New(
+          ClassType(Definitions.BoxedCharacterClass),
+          Ident("init___C"),
+          List(call))
       } else if (targetName.endsWith("__V")) {
         // Materialize an `undefined` result for void methods
         Block(call, Undefined())
@@ -421,16 +431,18 @@ final class BaseLinker(semantics: Semantics,
     val params = targetMDef.args.map(_.copy()) // for the new pos
     val currentClassType = ClassType(classInfo.encodedName)
 
-    val body = ApplyStatically(This()(currentClassType),
-                               ClassType(targetInterface),
-                               targetIdent,
-                               params.map(_.ref))(targetMDef.resultType)
+    val body = ApplyStatically(
+      This()(currentClassType),
+      ClassType(targetInterface),
+      targetIdent,
+      params.map(_.ref))(targetMDef.resultType)
 
-    MethodDef(static = false,
-              bridgeIdent,
-              params,
-              targetMDef.resultType,
-              body)(OptimizerHints.empty, targetMDef.hash)
+    MethodDef(
+      static = false,
+      bridgeIdent,
+      params,
+      targetMDef.resultType,
+      body)(OptimizerHints.empty, targetMDef.hash)
   }
 
   private def findInheritedMethodDef(classInfo: Analysis.ClassInfo,

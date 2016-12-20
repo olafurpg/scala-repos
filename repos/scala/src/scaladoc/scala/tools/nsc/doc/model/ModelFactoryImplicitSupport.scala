@@ -123,8 +123,8 @@ trait ModelFactoryImplicitSupport {
       if (isPrimitiveValueType(sym.tpe_*))
         conversions = conversions.filter(
           (ic: ImplicitConversionImpl) =>
-            hardcoded.valueClassFilter(sym.nameString,
-                                       ic.conversionQualifiedName))
+            hardcoded
+              .valueClassFilter(sym.nameString, ic.conversionQualifiedName))
 
       // Put the visible conversions in front
       val (ownConversions, commonConversions) =
@@ -225,11 +225,12 @@ trait ModelFactoryImplicitSupport {
           implParamConstraints ::: boundsConstraints ::: substConstraints
 
         List(
-          new ImplicitConversionImpl(sym,
-                                     result.tree.symbol,
-                                     toType,
-                                     constraints,
-                                     inTpl))
+          new ImplicitConversionImpl(
+            sym,
+            result.tree.symbol,
+            toType,
+            constraints,
+            inTpl))
       } catch {
         case i: ImplicitNotFound =>
           //debug(s"  Eliminating: $toType")

@@ -88,13 +88,14 @@ private[yarn] class ExecutorRunnable(container: Container,
     credentials.writeTokenStorageToStream(dob)
     ctx.setTokens(ByteBuffer.wrap(dob.getData()))
 
-    val commands = prepareCommand(masterAddress,
-                                  slaveId,
-                                  hostname,
-                                  executorMemory,
-                                  executorCores,
-                                  appId,
-                                  localResources)
+    val commands = prepareCommand(
+      masterAddress,
+      slaveId,
+      hostname,
+      executorMemory,
+      executorCores,
+      appId,
+      localResources)
 
     logInfo(s"""
       |===============================================================================
@@ -297,12 +298,13 @@ private[yarn] class ExecutorRunnable(container: Container,
       val visibilities =
         System.getenv("SPARK_YARN_CACHE_FILES_VISIBILITIES").split(',')
       for (i <- 0 to distFiles.length - 1) {
-        setupDistributedCache(distFiles(i),
-                              LocalResourceType.FILE,
-                              localResources,
-                              timeStamps(i),
-                              fileSizes(i),
-                              visibilities(i))
+        setupDistributedCache(
+          distFiles(i),
+          LocalResourceType.FILE,
+          localResources,
+          timeStamps(i),
+          fileSizes(i),
+          visibilities(i))
       }
     }
 
@@ -315,12 +317,13 @@ private[yarn] class ExecutorRunnable(container: Container,
       val visibilities =
         System.getenv("SPARK_YARN_CACHE_ARCHIVES_VISIBILITIES").split(',')
       for (i <- 0 to distArchives.length - 1) {
-        setupDistributedCache(distArchives(i),
-                              LocalResourceType.ARCHIVE,
-                              localResources,
-                              timeStamps(i),
-                              fileSizes(i),
-                              visibilities(i))
+        setupDistributedCache(
+          distArchives(i),
+          LocalResourceType.ARCHIVE,
+          localResources,
+          timeStamps(i),
+          fileSizes(i),
+          visibilities(i))
       }
     }
 
@@ -331,12 +334,13 @@ private[yarn] class ExecutorRunnable(container: Container,
   private def prepareEnvironment(
       container: Container): HashMap[String, String] = {
     val env = new HashMap[String, String]()
-    Client.populateClasspath(null,
-                             yarnConf,
-                             sparkConf,
-                             env,
-                             false,
-                             sparkConf.get(EXECUTOR_CLASS_PATH))
+    Client.populateClasspath(
+      null,
+      yarnConf,
+      sparkConf,
+      env,
+      false,
+      sparkConf.get(EXECUTOR_CLASS_PATH))
 
     sparkConf.getExecutorEnv.foreach {
       case (key, value) =>

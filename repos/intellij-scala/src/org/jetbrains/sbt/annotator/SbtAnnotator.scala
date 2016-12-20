@@ -67,8 +67,9 @@ class SbtAnnotator extends Annotator {
           if (!isTypeAllowed(expression, expressionType))
             holder.createErrorAnnotation(
               expression,
-              SbtBundle("sbt.annotation.expressionMustConform",
-                        expressionType))
+              SbtBundle(
+                "sbt.annotation.expressionMustConform",
+                expressionType))
         }
       }
 

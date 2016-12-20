@@ -48,9 +48,10 @@ object TlsSpec {
     trustManagerFactory.init(trustStore)
 
     val context = SSLContext.getInstance("TLS")
-    context.init(keyManagerFactory.getKeyManagers,
-                 trustManagerFactory.getTrustManagers,
-                 new SecureRandom)
+    context.init(
+      keyManagerFactory.getKeyManagers,
+      trustManagerFactory.getTrustManagers,
+      new SecureRandom)
     context
   }
 
@@ -185,10 +186,11 @@ class TlsSpec
       override def cleanup(): Unit = binding.unbind()
     }
 
-    val communicationPatterns = Seq(ClientInitiates,
-                                    ServerInitiates,
-                                    ClientInitiatesViaTcp,
-                                    ServerInitiatesViaTcp)
+    val communicationPatterns = Seq(
+      ClientInitiates,
+      ServerInitiates,
+      ClientInitiatesViaTcp,
+      ServerInitiatesViaTcp)
 
     trait PayloadScenario extends Named {
       def flow: Flow[SslTlsInbound, SslTlsOutbound, Any] =
@@ -358,17 +360,18 @@ class TlsSpec
       def output = ByteString("TLS_ECDHE_RSA_WITH_AES_128_CBC_SHAhello")
     }
 
-    val scenarios = Seq(SingleBytes,
-                        MediumMessages,
-                        LargeMessages,
-                        EmptyBytesFirst,
-                        EmptyBytesInTheMiddle,
-                        EmptyBytesLast,
-                        CancellingRHS,
-                        SessionRenegotiationBySender,
-                        SessionRenegotiationByReceiver,
-                        SessionRenegotiationFirstOne,
-                        SessionRenegotiationFirstTwo)
+    val scenarios = Seq(
+      SingleBytes,
+      MediumMessages,
+      LargeMessages,
+      EmptyBytesFirst,
+      EmptyBytesInTheMiddle,
+      EmptyBytesLast,
+      CancellingRHS,
+      SessionRenegotiationBySender,
+      SessionRenegotiationByReceiver,
+      SessionRenegotiationFirstOne,
+      SessionRenegotiationFirstTwo)
 
     for {
       commPattern ← communicationPatterns
@@ -377,9 +380,8 @@ class TlsSpec
       s"work in mode ${commPattern.name} while sending ${scenario.name}" in assertAllStagesStopped {
         val onRHS = debug.via(scenario.flow)
         val f = Source(scenario.inputs)
-          .via(commPattern.decorateFlow(scenario.leftClosing,
-                                        scenario.rightClosing,
-                                        onRHS))
+          .via(commPattern
+            .decorateFlow(scenario.leftClosing, scenario.rightClosing, onRHS))
           .transform(() ⇒
             new PushStage[SslTlsInbound, SslTlsInbound] {
               override def onPush(elem: SslTlsInbound,
@@ -451,14 +453,14 @@ class TlsSpec
       val ex = new Exception("hello")
       val (sub, out1, out2) = RunnableGraph
         .fromGraph(
-          GraphDSL.create(Source.asSubscriber[SslTlsOutbound],
-                          Sink.head[ByteString],
-                          Sink.head[SslTlsInbound])((_, _, _)) {
-            implicit b ⇒ (s, o1, o2) ⇒
-              val tls = b.add(clientTls(EagerClose))
-              s ~> tls.in1; tls.out1 ~> o1
-              o2 <~ tls.out2; tls.in2 <~ Source.failed(ex)
-              ClosedShape
+          GraphDSL.create(
+            Source.asSubscriber[SslTlsOutbound],
+            Sink.head[ByteString],
+            Sink.head[SslTlsInbound])((_, _, _)) { implicit b ⇒ (s, o1, o2) ⇒
+            val tls = b.add(clientTls(EagerClose))
+            s ~> tls.in1; tls.out1 ~> o1
+            o2 <~ tls.out2; tls.in2 <~ Source.failed(ex)
+            ClosedShape
           })
         .run()
       the[Exception] thrownBy Await.result(out1, 1.second) should be(ex)
@@ -473,14 +475,14 @@ class TlsSpec
       val ex = new Exception("hello")
       val (sub, out1, out2) = RunnableGraph
         .fromGraph(
-          GraphDSL.create(Source.asSubscriber[ByteString],
-                          Sink.head[ByteString],
-                          Sink.head[SslTlsInbound])((_, _, _)) {
-            implicit b ⇒ (s, o1, o2) ⇒
-              val tls = b.add(clientTls(EagerClose))
-              Source.failed[SslTlsOutbound](ex) ~> tls.in1; tls.out1 ~> o1
-              o2 <~ tls.out2; tls.in2 <~ s
-              ClosedShape
+          GraphDSL.create(
+            Source.asSubscriber[ByteString],
+            Sink.head[ByteString],
+            Sink.head[SslTlsInbound])((_, _, _)) { implicit b ⇒ (s, o1, o2) ⇒
+            val tls = b.add(clientTls(EagerClose))
+            Source.failed[SslTlsOutbound](ex) ~> tls.in1; tls.out1 ~> o1
+            o2 <~ tls.out2; tls.in2 <~ s
+            ClosedShape
           })
         .run()
       the[Exception] thrownBy Await.result(out1, 1.second) should be(ex)

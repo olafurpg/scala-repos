@@ -82,10 +82,11 @@ class AssociationRules private[fpm] (private var minConfidence: Double)
       .join(freqItemsets.map(x => (x.items.toSeq, x.freq)))
       .map {
         case (antecendent, ((consequent, freqUnion), freqAntecedent)) =>
-          new Rule(antecendent.toArray,
-                   consequent.toArray,
-                   freqUnion,
-                   freqAntecedent)
+          new Rule(
+            antecendent.toArray,
+            consequent.toArray,
+            freqUnion,
+            freqAntecedent)
       }
       .filter(_.confidence >= minConfidence)
   }

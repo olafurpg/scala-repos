@@ -79,10 +79,12 @@ object JSTreeExtractors {
         case Apply(
             LoadModule(ClassType("s_Predef$ArrowAssoc$")),
             Ident("$$minus$greater$extension__O__O__T2", _),
-            List(Apply(LoadModule(ClassType("s_Predef$")),
-                       Ident("any2ArrowAssoc__O__O" | "ArrowAssoc__O__O", _),
-                       List(_1)),
-                 _2)) =>
+            List(
+              Apply(
+                LoadModule(ClassType("s_Predef$")),
+                Ident("any2ArrowAssoc__O__O" | "ArrowAssoc__O__O", _),
+                List(_1)),
+              _2)) =>
           Some((_1, _2))
         case _ =>
           None

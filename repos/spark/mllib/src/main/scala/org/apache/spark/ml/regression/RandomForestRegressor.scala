@@ -47,9 +47,10 @@ import org.apache.spark.sql.functions._
 @Experimental
 final class RandomForestRegressor @Since("1.4.0")(
     @Since("1.4.0") override val uid: String)
-    extends Predictor[Vector,
-                      RandomForestRegressor,
-                      RandomForestRegressionModel]
+    extends Predictor[
+      Vector,
+      RandomForestRegressor,
+      RandomForestRegressionModel]
     with RandomForestParams
     with TreeRegressorParams {
 
@@ -109,16 +110,18 @@ final class RandomForestRegressor @Since("1.4.0")(
     val categoricalFeatures: Map[Int, Int] =
       MetadataUtils.getCategoricalFeatures(dataset.schema($(featuresCol)))
     val oldDataset: RDD[LabeledPoint] = extractLabeledPoints(dataset)
-    val strategy = super.getOldStrategy(categoricalFeatures,
-                                        numClasses = 0,
-                                        OldAlgo.Regression,
-                                        getOldImpurity)
+    val strategy = super.getOldStrategy(
+      categoricalFeatures,
+      numClasses = 0,
+      OldAlgo.Regression,
+      getOldImpurity)
     val trees = RandomForest
-      .run(oldDataset,
-           strategy,
-           getNumTrees,
-           getFeatureSubsetStrategy,
-           getSeed)
+      .run(
+        oldDataset,
+        strategy,
+        getNumTrees,
+        getFeatureSubsetStrategy,
+        getSeed)
       .map(_.asInstanceOf[DecisionTreeRegressionModel])
     val numFeatures = oldDataset.first().features.size
     new RandomForestRegressionModel(trees, numFeatures)
@@ -161,8 +164,9 @@ final class RandomForestRegressionModel private[ml] (
     with TreeEnsembleModel
     with Serializable {
 
-  require(numTrees > 0,
-          "RandomForestRegressionModel requires at least 1 tree.")
+  require(
+    numTrees > 0,
+    "RandomForestRegressionModel requires at least 1 tree.")
 
   /**
     * Construct a random forest regression model, with all trees weighted equally.
@@ -200,8 +204,9 @@ final class RandomForestRegressionModel private[ml] (
 
   @Since("1.4.0")
   override def copy(extra: ParamMap): RandomForestRegressionModel = {
-    copyValues(new RandomForestRegressionModel(uid, _trees, numFeatures),
-               extra).setParent(parent)
+    copyValues(
+      new RandomForestRegressionModel(uid, _trees, numFeatures),
+      extra).setParent(parent)
   }
 
   @Since("1.4.0")

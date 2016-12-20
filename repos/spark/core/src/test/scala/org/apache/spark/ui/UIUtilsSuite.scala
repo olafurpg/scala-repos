@@ -90,7 +90,8 @@ class UIUtilsSuite extends SparkFunSuite {
                      errorMsg: String = "",
                      baseUrl: String = ""): Unit = {
     val generated = makeDescription(desc, baseUrl)
-    assert(generated.sameElements(expected),
-           s"\n$errorMsg\n\nExpected:\n$expected\nGenerated:\n$generated")
+    assert(
+      generated.sameElements(expected),
+      s"\n$errorMsg\n\nExpected:\n$expected\nGenerated:\n$generated")
   }
 }

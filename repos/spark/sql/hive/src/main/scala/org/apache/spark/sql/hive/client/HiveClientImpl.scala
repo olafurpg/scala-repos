@@ -278,11 +278,13 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
   override def createDatabase(database: CatalogDatabase,
                               ignoreIfExists: Boolean): Unit =
     withHiveState {
-      client.createDatabase(new HiveDatabase(database.name,
-                                             database.description,
-                                             database.locationUri,
-                                             database.properties.asJava),
-                            ignoreIfExists)
+      client.createDatabase(
+        new HiveDatabase(
+          database.name,
+          database.description,
+          database.locationUri,
+          database.properties.asJava),
+        ignoreIfExists)
     }
 
   override def dropDatabase(name: String,
@@ -293,20 +295,23 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
     }
 
   override def alterDatabase(database: CatalogDatabase): Unit = withHiveState {
-    client.alterDatabase(database.name,
-                         new HiveDatabase(database.name,
-                                          database.description,
-                                          database.locationUri,
-                                          database.properties.asJava))
+    client.alterDatabase(
+      database.name,
+      new HiveDatabase(
+        database.name,
+        database.description,
+        database.locationUri,
+        database.properties.asJava))
   }
 
   override def getDatabaseOption(name: String): Option[CatalogDatabase] =
     withHiveState {
       Option(client.getDatabase(name)).map { d =>
-        CatalogDatabase(name = d.getName,
-                        description = d.getDescription,
-                        locationUri = d.getLocationUri,
-                        properties = d.getParameters.asScala.toMap)
+        CatalogDatabase(
+          name = d.getName,
+          description = d.getDescription,
+          locationUri = d.getLocationUri,
+          properties = d.getParameters.asScala.toMap)
       }
     }
 
@@ -385,8 +390,9 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
     withHiveState {
       val addPartitionDesc = new AddPartitionDesc(db, table, ignoreIfExists)
       parts.foreach { s =>
-        addPartitionDesc.addPartition(s.spec.asJava,
-                                      s.storage.locationUri.orNull)
+        addPartitionDesc.addPartition(
+          s.spec.asJava,
+          s.storage.locationUri.orNull)
       }
       client.createPartitions(addPartitionDesc)
     }
@@ -407,8 +413,9 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
       specs: Seq[ExternalCatalog.TablePartitionSpec],
       newSpecs: Seq[ExternalCatalog.TablePartitionSpec]): Unit =
     withHiveState {
-      require(specs.size == newSpecs.size,
-              "number of old and new partition specs differ")
+      require(
+        specs.size == newSpecs.size,
+        "number of old and new partition specs differ")
       val catalogTable = getTable(db, table)
       val hiveTable = toHiveTable(catalogTable)
       specs.zip(newSpecs).foreach {
@@ -429,12 +436,13 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
                                newParts: Seq[CatalogTablePartition]): Unit =
     withHiveState {
       val hiveTable = toHiveTable(getTable(db, table))
-      client.alterPartitions(table,
-                             newParts
-                               .map { p =>
-                                 toHivePartition(p, hiveTable)
-                               }
-                               .asJava)
+      client.alterPartitions(
+        table,
+        newParts
+          .map { p =>
+            toHivePartition(p, hiveTable)
+          }
+          .asJava)
     }
 
   override def getPartitionOption(table: CatalogTable,
@@ -541,14 +549,15 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
                     holdDDLTime: Boolean,
                     inheritTableSpecs: Boolean,
                     isSkewedStoreAsSubdir: Boolean): Unit = withHiveState {
-    shim.loadPartition(client,
-                       new Path(loadPath), // TODO: Use URI
-                       tableName,
-                       partSpec,
-                       replace,
-                       holdDDLTime,
-                       inheritTableSpecs,
-                       isSkewedStoreAsSubdir)
+    shim.loadPartition(
+      client,
+      new Path(loadPath), // TODO: Use URI
+      tableName,
+      partSpec,
+      replace,
+      holdDDLTime,
+      inheritTableSpecs,
+      isSkewedStoreAsSubdir)
   }
 
   def loadTable(loadPath: String, // TODO URI
@@ -566,14 +575,15 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
                             holdDDLTime: Boolean,
                             listBucketingEnabled: Boolean): Unit =
     withHiveState {
-      shim.loadDynamicPartitions(client,
-                                 new Path(loadPath),
-                                 tableName,
-                                 partSpec,
-                                 replace,
-                                 numDP,
-                                 holdDDLTime,
-                                 listBucketingEnabled)
+      shim.loadDynamicPartitions(
+        client,
+        new Path(loadPath),
+        tableName,
+        partSpec,
+        replace,
+        numDP,
+        holdDDLTime,
+        listBucketingEnabled)
     }
 
   override def createFunction(db: String, func: CatalogFunction): Unit =
@@ -661,14 +671,15 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
         _ <: org.apache.hadoop.hive.ql.io.HiveOutputFormat[_, _]]]
 
   private def toHiveFunction(f: CatalogFunction, db: String): HiveFunction = {
-    new HiveFunction(f.name.funcName,
-                     db,
-                     f.className,
-                     null,
-                     PrincipalType.USER,
-                     (System.currentTimeMillis / 1000).toInt,
-                     FunctionType.JAVA,
-                     List.empty[ResourceUri].asJava)
+    new HiveFunction(
+      f.name.funcName,
+      db,
+      f.className,
+      null,
+      PrincipalType.USER,
+      (System.currentTimeMillis / 1000).toInt,
+      FunctionType.JAVA,
+      List.empty[ResourceUri].asJava)
   }
 
   private def fromHiveFunction(hf: HiveFunction): CatalogFunction = {
@@ -681,10 +692,11 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
   }
 
   private def fromHiveColumn(hc: FieldSchema): CatalogColumn = {
-    new CatalogColumn(name = hc.getName,
-                      dataType = hc.getType,
-                      nullable = true,
-                      comment = Option(hc.getComment))
+    new CatalogColumn(
+      name = hc.getName,
+      dataType = hc.getType,
+      nullable = true,
+      comment = Option(hc.getComment))
   }
 
   private def toHiveTable(table: CatalogTable): HiveTable = {
@@ -735,13 +747,14 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
 
   private def toHivePartition(p: CatalogTablePartition,
                               ht: HiveTable): HivePartition = {
-    new HivePartition(ht,
-                      p.spec.asJava,
-                      p.storage.locationUri
-                        .map { l =>
-                          new Path(l)
-                        }
-                        .orNull)
+    new HivePartition(
+      ht,
+      p.spec.asJava,
+      p.storage.locationUri
+        .map { l =>
+          new Path(l)
+        }
+        .orNull)
   }
 
   private def fromHivePartition(hp: HivePartition): CatalogTablePartition = {

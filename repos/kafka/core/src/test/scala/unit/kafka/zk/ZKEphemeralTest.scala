@@ -78,10 +78,11 @@ class ZKEphemeralTest(val secure: Boolean) extends ZooKeeperTestHarness {
   def testEphemeralNodeCleanup = {
     val config = new ConsumerConfig(
       TestUtils.createConsumerProperties(zkConnect, "test", "1"))
-    var zkUtils = ZkUtils(zkConnect,
-                          zkSessionTimeoutMs,
-                          config.zkConnectionTimeoutMs,
-                          JaasUtils.isZkSecurityEnabled())
+    var zkUtils = ZkUtils(
+      zkConnect,
+      zkSessionTimeoutMs,
+      config.zkConnectionTimeoutMs,
+      JaasUtils.isZkSecurityEnabled())
 
     try {
       zkUtils.createEphemeralPathExpectConflict("/tmp/zktest", "node created")
@@ -93,10 +94,11 @@ class ZKEphemeralTest(val secure: Boolean) extends ZooKeeperTestHarness {
     testData = zkUtils.readData("/tmp/zktest")._1
     Assert.assertNotNull(testData)
     zkUtils.close
-    zkUtils = ZkUtils(zkConnect,
-                      zkSessionTimeoutMs,
-                      config.zkConnectionTimeoutMs,
-                      JaasUtils.isZkSecurityEnabled())
+    zkUtils = ZkUtils(
+      zkConnect,
+      zkSessionTimeoutMs,
+      config.zkConnectionTimeoutMs,
+      JaasUtils.isZkSecurityEnabled())
     val nodeExists = zkUtils.pathExists("/tmp/zktest")
     Assert.assertFalse(nodeExists)
   }
@@ -131,8 +133,9 @@ class ZKEphemeralTest(val secure: Boolean) extends ZooKeeperTestHarness {
     })
     zwe.create()
     // Waits until the znode is created
-    TestUtils.waitUntilTrue(() => zkUtils.pathExists(path),
-                            s"Znode $path wasn't created")
+    TestUtils.waitUntilTrue(
+      () => zkUtils.pathExists(path),
+      s"Znode $path wasn't created")
   }
 
   /**

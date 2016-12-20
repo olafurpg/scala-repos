@@ -36,8 +36,9 @@ case class CreateArray(children: Seq[Expression]) extends Expression {
       .checkForSameTypeInputExpr(children.map(_.dataType), "function array")
 
   override def dataType: DataType = {
-    ArrayType(children.headOption.map(_.dataType).getOrElse(NullType),
-              containsNull = children.exists(_.nullable))
+    ArrayType(
+      children.headOption.map(_.dataType).getOrElse(NullType),
+      containsNull = children.exists(_.nullable))
   }
 
   override def nullable: Boolean = false
@@ -85,10 +86,11 @@ case class CreateStruct(children: Seq[Expression]) extends Expression {
           case ne: NamedExpression =>
             StructField(ne.name, ne.dataType, ne.nullable, ne.metadata)
           case _ =>
-            StructField(s"col${idx + 1}",
-                        child.dataType,
-                        child.nullable,
-                        Metadata.empty)
+            StructField(
+              s"col${idx + 1}",
+              child.dataType,
+              child.nullable,
+              Metadata.empty)
         }
     }
     StructType(fields)
@@ -151,10 +153,11 @@ case class CreateNamedStruct(children: Seq[Expression]) extends Expression {
   override lazy val dataType: StructType = {
     val fields = names.zip(valExprs).map {
       case (name, valExpr) =>
-        StructField(name.asInstanceOf[UTF8String].toString,
-                    valExpr.dataType,
-                    valExpr.nullable,
-                    Metadata.empty)
+        StructField(
+          name.asInstanceOf[UTF8String].toString,
+          valExpr.dataType,
+          valExpr.nullable,
+          Metadata.empty)
     }
     StructType(fields)
   }
@@ -229,10 +232,11 @@ case class CreateStructUnsafe(children: Seq[Expression]) extends Expression {
           case ne: NamedExpression =>
             StructField(ne.name, ne.dataType, ne.nullable, ne.metadata)
           case _ =>
-            StructField(s"col${idx + 1}",
-                        child.dataType,
-                        child.nullable,
-                        Metadata.empty)
+            StructField(
+              s"col${idx + 1}",
+              child.dataType,
+              child.nullable,
+              Metadata.empty)
         }
     }
     StructType(fields)

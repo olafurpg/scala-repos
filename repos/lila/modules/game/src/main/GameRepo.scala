@@ -91,13 +91,14 @@ object GameRepo {
   )
 
   def unrate(gameId: String) =
-    $update($select(gameId),
-            BSONDocument(
-              "$unset" -> BSONDocument(
-                F.rated -> true,
-                s"${F.whitePlayer}.${Player.BSONFields.ratingDiff}" -> true,
-                s"${F.blackPlayer}.${Player.BSONFields.ratingDiff}" -> true
-              )))
+    $update(
+      $select(gameId),
+      BSONDocument(
+        "$unset" -> BSONDocument(
+          F.rated -> true,
+          s"${F.whitePlayer}.${Player.BSONFields.ratingDiff}" -> true,
+          s"${F.blackPlayer}.${Player.BSONFields.ratingDiff}" -> true
+        )))
 
   def goBerserk(pov: Pov): Funit =
     $update(
@@ -188,8 +189,9 @@ object GameRepo {
   }
 
   def onTv(nb: Int): Fu[List[Game]] =
-    $find($query(Json.obj(F.tvAt -> $exists(true))) sort $sort.desc(F.tvAt),
-          nb)
+    $find(
+      $query(Json.obj(F.tvAt -> $exists(true))) sort $sort.desc(F.tvAt),
+      nb)
 
   def setAnalysed(id: ID) {
     $update.fieldUnchecked(id, F.analysed, true)
@@ -202,11 +204,12 @@ object GameRepo {
     $count.exists($select(id) ++ Query.analysed(true))
 
   def filterAnalysed(ids: Seq[String]): Fu[Set[String]] =
-    gameTube.coll.distinct("_id",
-                           BSONDocument(
-                             "_id" -> BSONDocument("$in" -> ids),
-                             F.analysed -> true
-                           ).some) map lila.db.BSON.asStringSet
+    gameTube.coll.distinct(
+      "_id",
+      BSONDocument(
+        "_id" -> BSONDocument("$in" -> ids),
+        F.analysed -> true
+      ).some) map lila.db.BSON.asStringSet
 
   def exists(id: String) =
     gameTube.coll.count(BSONDocument("_id" -> id).some).map(0 <)
@@ -249,11 +252,12 @@ object GameRepo {
       else partialUnsets
     $update(
       $select(id),
-      nonEmptyMod("$set",
-                  BSONDocument(
-                    F.winnerId -> winnerId,
-                    F.winnerColor -> winnerColor.map(_.white)
-                  )) ++ BSONDocument("$unset" -> unsets)
+      nonEmptyMod(
+        "$set",
+        BSONDocument(
+          F.winnerId -> winnerId,
+          F.winnerColor -> winnerColor.map(_.white)
+        )) ++ BSONDocument("$unset" -> unsets)
     )
   }
 
@@ -293,12 +297,14 @@ object GameRepo {
         .createdSince(DateTime.now minusHours 1))
 
   def setCheckAt(g: Game, at: DateTime) =
-    $update($select(g.id),
-            BSONDocument("$set" -> BSONDocument(F.checkAt -> at)))
+    $update(
+      $select(g.id),
+      BSONDocument("$set" -> BSONDocument(F.checkAt -> at)))
 
   def unsetCheckAt(g: Game) =
-    $update($select(g.id),
-            BSONDocument("$unset" -> BSONDocument(F.checkAt -> true)))
+    $update(
+      $select(g.id),
+      BSONDocument("$unset" -> BSONDocument(F.checkAt -> true)))
 
   def unsetPlayingUids(g: Game): Unit =
     $update.unchecked(
@@ -307,10 +313,11 @@ object GameRepo {
 
   // used to make a compound sparse index
   def setImportCreatedAt(g: Game) =
-    $update($select(g.id),
-            BSONDocument(
-              "$set" -> BSONDocument("pgni.ca" -> g.createdAt)
-            ))
+    $update(
+      $select(g.id),
+      BSONDocument(
+        "$set" -> BSONDocument("pgni.ca" -> g.createdAt)
+      ))
 
   def saveNext(game: Game, nextId: ID): Funit = $update(
     $select(game.id),
@@ -460,20 +467,22 @@ object GameRepo {
     }
 
     gameTube.coll
-      .aggregate(Match(
-                   BSONDocument(
-                     F.createdAt -> BSONDocument("$gt" -> since),
-                     F.status -> BSONDocument("$gte" -> chess.Status.Mate.id),
-                     s"${F.playerUids}.0" -> BSONDocument("$exists" -> true)
-                   )),
-                 List(Unwind(F.playerUids),
-                      Match(
-                        BSONDocument(
-                          F.playerUids -> BSONDocument("$ne" -> "")
-                        )),
-                      GroupField(F.playerUids)("nb" -> SumValue(1)),
-                      Sort(Descending("nb")),
-                      Limit(max)))
+      .aggregate(
+        Match(
+          BSONDocument(
+            F.createdAt -> BSONDocument("$gt" -> since),
+            F.status -> BSONDocument("$gte" -> chess.Status.Mate.id),
+            s"${F.playerUids}.0" -> BSONDocument("$exists" -> true)
+          )),
+        List(
+          Unwind(F.playerUids),
+          Match(
+            BSONDocument(
+              F.playerUids -> BSONDocument("$ne" -> "")
+            )),
+          GroupField(F.playerUids)("nb" -> SumValue(1)),
+          Sort(Descending("nb")),
+          Limit(max)))
       .map(_.documents.flatMap { obj =>
         obj.getAs[Int]("nb") map { nb =>
           UidNb(~obj.getAs[String]("_id"), nb)

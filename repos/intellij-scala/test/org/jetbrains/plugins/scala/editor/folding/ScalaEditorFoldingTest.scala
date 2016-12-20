@@ -33,8 +33,9 @@ class ScalaEditorFoldingTest extends ScalaLightCodeInsightFixtureTestAdapter {
       overallFixOffset += FOLD_MARKER_LENGTH
     @inline
     def appendPair(errorPlaceMsg: String) {
-      assert(myOpenMarkers.nonEmpty,
-             "Unbalanced fold markers " + errorPlaceMsg)
+      assert(
+        myOpenMarkers.nonEmpty,
+        "Unbalanced fold markers " + errorPlaceMsg)
       val st = myOpenMarkers.pop()
       myRegions += new TextRange(st, i2 - overallFixOffset)
     }
@@ -49,9 +50,10 @@ class ScalaEditorFoldingTest extends ScalaLightCodeInsightFixtureTestAdapter {
 
         val i2Old = i2
         i2 = fileText.indexOf(FOLD_END_MARKER, i2Old + 1)
-        myFileText append fileText.substring(i2Old + FOLD_MARKER_LENGTH,
-                                             if (i2 > 0) Math.min(i2, i1)
-                                             else i1)
+        myFileText append fileText.substring(
+          i2Old + FOLD_MARKER_LENGTH,
+          if (i2 > 0) Math.min(i2, i1)
+          else i1)
 
         increaseOverall()
       } else if (i1 < i2 && i1 > -1) {
@@ -62,9 +64,10 @@ class ScalaEditorFoldingTest extends ScalaLightCodeInsightFixtureTestAdapter {
         val i1Old = i1
         i1 = fileText.indexOf(FOLD_START_MARKER, i1Old + 1)
 
-        myFileText append fileText.substring(i1Old + FOLD_MARKER_LENGTH,
-                                             if (i1 > -1) Math.min(i2, i1)
-                                             else i2)
+        myFileText append fileText.substring(
+          i1Old + FOLD_MARKER_LENGTH,
+          if (i1 > -1) Math.min(i2, i1)
+          else i2)
       } else if (i1 < i2) {
         //i1 == -1
         appendPair("#1.5")
@@ -80,8 +83,9 @@ class ScalaEditorFoldingTest extends ScalaLightCodeInsightFixtureTestAdapter {
       } else assert(assertion = false, "Unbalanced fold markers #2")
     }
 
-    assert(myOpenMarkers.isEmpty,
-           s"Unbalanced fold markers #3: ${myOpenMarkers.mkString}")
+    assert(
+      myOpenMarkers.isEmpty,
+      s"Unbalanced fold markers #3: ${myOpenMarkers.mkString}")
 
     val assumedRegionRanges = myRegions
       .result()

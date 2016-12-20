@@ -365,8 +365,9 @@ object TestSubscriber {
         case Nil ⇒
         case list ⇒
           val next = expectNext()
-          assert(all.contains(next),
-                 s"expected one of $all, but received $next")
+          assert(
+            all.contains(next),
+            s"expected one of $all, but received $next")
           expectOneOf(all.diff(Seq(next)))
       }
 

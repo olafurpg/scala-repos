@@ -34,9 +34,10 @@ class GroupedIteratorSuite extends SparkFunSuite {
     val schema = new StructType().add("i", IntegerType).add("s", StringType)
     val encoder = RowEncoder(schema)
     val input = Seq(Row(1, "a"), Row(1, "b"), Row(2, "c"))
-    val grouped = GroupedIterator(input.iterator.map(encoder.toRow),
-                                  Seq('i.int.at(0)),
-                                  schema.toAttributes)
+    val grouped = GroupedIterator(
+      input.iterator.map(encoder.toRow),
+      Seq('i.int.at(0)),
+      schema.toAttributes)
 
     val result = grouped
       .map {
@@ -56,15 +57,17 @@ class GroupedIteratorSuite extends SparkFunSuite {
       .add("s", StringType)
     val encoder = RowEncoder(schema)
 
-    val input = Seq(Row(1, 2L, "a"),
-                    Row(1, 2L, "b"),
-                    Row(1, 3L, "c"),
-                    Row(2, 1L, "d"),
-                    Row(3, 2L, "e"))
+    val input = Seq(
+      Row(1, 2L, "a"),
+      Row(1, 2L, "b"),
+      Row(1, 3L, "c"),
+      Row(2, 1L, "d"),
+      Row(3, 2L, "e"))
 
-    val grouped = GroupedIterator(input.iterator.map(encoder.toRow),
-                                  Seq('i.int.at(0), 'l.long.at(1)),
-                                  schema.toAttributes)
+    val grouped = GroupedIterator(
+      input.iterator.map(encoder.toRow),
+      Seq('i.int.at(0), 'l.long.at(1)),
+      schema.toAttributes)
 
     val result = grouped
       .map {
@@ -88,9 +91,10 @@ class GroupedIteratorSuite extends SparkFunSuite {
     val schema = new StructType().add("i", IntegerType).add("s", StringType)
     val encoder = RowEncoder(schema)
     val input = Seq(Row(1, "a"), Row(1, "b"), Row(2, "c"))
-    val grouped = GroupedIterator(input.iterator.map(encoder.toRow),
-                                  Seq('i.int.at(0)),
-                                  schema.toAttributes)
+    val grouped = GroupedIterator(
+      input.iterator.map(encoder.toRow),
+      Seq('i.int.at(0)),
+      schema.toAttributes)
 
     assert(grouped.length == 2)
   }

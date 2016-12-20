@@ -23,10 +23,12 @@ class FloatJSTest {
     assertTrue(froundNotInlined(Double.NaN).isNaN)
     assertEquals(Double.PositiveInfinity, 1 / froundNotInlined(0.0).toDouble)
     assertEquals(Double.NegativeInfinity, 1 / froundNotInlined(-0.0).toDouble)
-    assertEquals(Float.PositiveInfinity,
-                 froundNotInlined(Double.PositiveInfinity))
-    assertEquals(Float.NegativeInfinity,
-                 froundNotInlined(Double.NegativeInfinity))
+    assertEquals(
+      Float.PositiveInfinity,
+      froundNotInlined(Double.PositiveInfinity))
+    assertEquals(
+      Float.NegativeInfinity,
+      froundNotInlined(Double.NegativeInfinity))
   }
 
   @Test def fround_overflows(): Unit = {
@@ -35,10 +37,12 @@ class FloatJSTest {
   }
 
   @Test def fround_underflows(): Unit = {
-    assertEquals(Double.PositiveInfinity,
-                 1 / froundNotInlined(1e-300).toDouble)
-    assertEquals(Double.NegativeInfinity,
-                 1 / froundNotInlined(-1e-300).toDouble)
+    assertEquals(
+      Double.PositiveInfinity,
+      1 / froundNotInlined(1e-300).toDouble)
+    assertEquals(
+      Double.NegativeInfinity,
+      1 / froundNotInlined(-1e-300).toDouble)
   }
 
   @Test def fround_normal_cases(): Unit = {

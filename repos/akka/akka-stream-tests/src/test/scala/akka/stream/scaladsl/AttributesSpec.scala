@@ -23,8 +23,9 @@ object AttributesSpec {
   object AttributesSink {
     def apply(): Sink[Nothing, Future[Attributes]] =
       new Sink(
-        new AttributesSink(Attributes.name("attributesSink"),
-                           Sink.shape("attributesSink")))
+        new AttributesSink(
+          Attributes.name("attributesSink"),
+          Sink.shape("attributesSink")))
   }
 
   final class AttributesSink(val attributes: Attributes,

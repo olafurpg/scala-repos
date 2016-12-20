@@ -121,14 +121,15 @@ class ScConstructorPatternImpl(node: ASTNode)
                 case _ => emptySubst
               }
             }
-            Success(ScParameterizedType(
-                      refType,
-                      td.getTypeParameters
-                        .map({ tp =>
-                          newSubst.subst(ScalaPsiManager.typeVariable(tp))
-                        })
-                        .toSeq),
-                    Some(this))
+            Success(
+              ScParameterizedType(
+                refType,
+                td.getTypeParameters
+                  .map({ tp =>
+                    newSubst.subst(ScalaPsiManager.typeVariable(tp))
+                  })
+                  .toSeq),
+              Some(this))
           case td: ScClass => Success(ScType.designator(td), Some(this))
           case obj: ScObject => Success(ScType.designator(obj), Some(this))
           case fun: ScFunction /*It's unapply method*/
@@ -141,14 +142,16 @@ class ScConstructorPatternImpl(node: ASTNode)
                 val undefSubst: ScSubstitutor =
                   fun.typeParameters.foldLeft(ScSubstitutor.empty)(
                     (s, p) =>
-                      s.bindT((p.name, ScalaPsiUtil.getPsiElementId(p)),
-                              ScUndefinedType(
-                                new ScTypeParameterType(p, substitutor))))
+                      s.bindT(
+                        (p.name, ScalaPsiUtil.getPsiElementId(p)),
+                        ScUndefinedType(
+                          new ScTypeParameterType(p, substitutor))))
                 val emptySubst: ScSubstitutor =
                   fun.typeParameters.foldLeft(ScSubstitutor.empty)(
                     (s, p) =>
-                      s.bindT((p.name, ScalaPsiUtil.getPsiElementId(p)),
-                              p.upperBound.getOrAny))
+                      s.bindT(
+                        (p.name, ScalaPsiUtil.getPsiElementId(p)),
+                        p.upperBound.getOrAny))
                 val emptyRes = substitutor followed emptySubst
                 val result = fun.parameters(0).getType(TypingContext.empty)
                 if (result.isEmpty) emptyRes

@@ -10,8 +10,9 @@ import org.jetbrains.plugins.scala.extensions.VisitorWrapper
 abstract class AbstractInspection(id: String, name: String)
     extends LocalInspectionTool {
   def this() {
-    this(AbstractInspection.formatId(getClass),
-         AbstractInspection.formatName(getClass))
+    this(
+      AbstractInspection.formatId(getClass),
+      AbstractInspection.formatName(getClass))
   }
 
   def this(name: String) {

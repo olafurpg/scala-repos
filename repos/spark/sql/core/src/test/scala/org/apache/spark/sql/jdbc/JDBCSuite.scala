@@ -477,13 +477,14 @@ class JDBCSuite
   test("Partitioning via JDBCPartitioningInfo API") {
     assert(
       sqlContext.read
-        .jdbc(urlWithUserAndPass,
-              "TEST.PEOPLE",
-              "THEID",
-              0,
-              4,
-              3,
-              new Properties)
+        .jdbc(
+          urlWithUserAndPass,
+          "TEST.PEOPLE",
+          "THEID",
+          0,
+          4,
+          3,
+          new Properties)
         .collect()
         .length === 3)
   }
@@ -511,13 +512,14 @@ class JDBCSuite
     // partitioning on a nullable quoted column
     assert(
       sqlContext.read
-        .jdbc(urlWithUserAndPass,
-              "TEST.EMP",
-              """"Dept"""",
-              0,
-              4,
-              3,
-              new Properties)
+        .jdbc(
+          urlWithUserAndPass,
+          "TEST.EMP",
+          """"Dept"""",
+          0,
+          4,
+          3,
+          new Properties)
         .collect()
         .length === 4)
   }

@@ -42,13 +42,14 @@ trait SecureFlagSpec
       block: Port => T) = {
     val port = testServerPort
     running(
-      TestServer(port,
-                 sslPort = sslPort,
-                 application = GuiceApplicationBuilder()
-                   .routes {
-                     case _ => action
-                   }
-                   .build())) {
+      TestServer(
+        port,
+        sslPort = sslPort,
+        application = GuiceApplicationBuilder()
+          .routes {
+            case _ => action
+          }
+          .build())) {
       block(port)
     }
   }
@@ -92,12 +93,12 @@ trait SecureFlagSpec
     "show that requests are secure if X_FORWARDED_PROTO is https" in withServer(
       secureFlagAction) { port =>
       val responses = BasicHttpClient.makeRequests(port)(
-        BasicRequest("GET",
-                     "/",
-                     "HTTP/1.1",
-                     Map(X_FORWARDED_FOR -> "127.0.0.1",
-                         X_FORWARDED_PROTO -> "https"),
-                     "foo")
+        BasicRequest(
+          "GET",
+          "/",
+          "HTTP/1.1",
+          Map(X_FORWARDED_FOR -> "127.0.0.1", X_FORWARDED_PROTO -> "https"),
+          "foo")
       )
       responses.length must_== 1
       responses(0).body must_== Left("true")
@@ -105,11 +106,12 @@ trait SecureFlagSpec
     "not show that requests are secure if X_FORWARDED_PROTO is http" in withServer(
       secureFlagAction) { port =>
       val responses = BasicHttpClient.makeRequests(port)(
-        BasicRequest("GET",
-                     "/",
-                     "HTTP/1.1",
-                     Map((X_FORWARDED_PROTO, "http")),
-                     "foo")
+        BasicRequest(
+          "GET",
+          "/",
+          "HTTP/1.1",
+          Map((X_FORWARDED_PROTO, "http")),
+          "foo")
       )
       responses.length must_== 1
       responses(0).body must_== Left("false")

@@ -42,10 +42,11 @@ object Scheduler {
                timeUnit: TimeUnit): ScheduledFuture[AnyRef] = {
     try {
       service
-        .scheduleAtFixedRate(new Runnable { def run = receiver ! message },
-                             initialDelay,
-                             delay,
-                             timeUnit)
+        .scheduleAtFixedRate(
+          new Runnable { def run = receiver ! message },
+          initialDelay,
+          delay,
+          timeUnit)
         .asInstanceOf[ScheduledFuture[AnyRef]]
     } catch {
       case e: Exception =>
@@ -96,9 +97,10 @@ object Scheduler {
                    timeUnit: TimeUnit): ScheduledFuture[AnyRef] = {
     try {
       service
-        .schedule(new Runnable { def run = receiver ! message },
-                  delay,
-                  timeUnit)
+        .schedule(
+          new Runnable { def run = receiver ! message },
+          delay,
+          timeUnit)
         .asInstanceOf[ScheduledFuture[AnyRef]]
     } catch {
       case e: Exception =>

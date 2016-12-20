@@ -50,11 +50,12 @@ object MethodCallExpression extends IntermediateNode {
       case "this" => LiteralExpression(methodName)
       case _ => LiteralExpression(escapeKeyword(methodName))
     }
-    MethodCallExpression(methodName,
-                         if (reciever != null)
-                           QualifiedExpression(reciever, identifier)
-                         else identifier,
-                         args)
+    MethodCallExpression(
+      methodName,
+      if (reciever != null)
+        QualifiedExpression(reciever, identifier)
+      else identifier,
+      args)
   }
 }
 

@@ -153,8 +153,9 @@ abstract class Source extends java.io.Serializable {
      */
     val uuid = java.util.UUID.randomUUID
     val srcName = sourceId + uuid.toString
-    assert(!sources.containsKey(srcName),
-           "Source %s had collision in uuid: %s".format(this, uuid))
+    assert(
+      !sources.containsKey(srcName),
+      "Source %s had collision in uuid: %s".format(this, uuid))
     sources.put(srcName, createTap(Read)(mode))
     FlowStateMap.mutate(flowDef) { st =>
       (st.addSource(srcName, this), ())
@@ -188,8 +189,9 @@ abstract class Source extends java.io.Serializable {
   }
 
   protected def checkFlowDefNotNull(implicit flowDef: FlowDef, mode: Mode) {
-    assert(flowDef != null,
-           "Trying to access null FlowDef while in mode: %s".format(mode))
+    assert(
+      flowDef != null,
+      "Trying to access null FlowDef while in mode: %s".format(mode))
   }
 
   protected def transformForWrite(pipe: Pipe) = pipe
@@ -307,11 +309,12 @@ trait BaseNullSource extends Source {
       case Write =>
         mode match {
           case Hdfs(_, _) =>
-            new NullTap[JobConf,
-                        RecordReader[_, _],
-                        OutputCollector[_, _],
-                        Any,
-                        Any]
+            new NullTap[
+              JobConf,
+              RecordReader[_, _],
+              OutputCollector[_, _],
+              Any,
+              Any]
           case Local(_) =>
             new NullTap[Properties, InputStream, OutputStream, Any, Any]
           case Test(_) =>

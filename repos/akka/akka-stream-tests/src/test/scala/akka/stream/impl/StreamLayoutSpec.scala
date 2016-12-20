@@ -13,8 +13,9 @@ class StreamLayoutSpec extends AkkaSpec {
 
   def testAtomic(inPortCount: Int, outPortCount: Int): Module =
     new AtomicModule {
-      override val shape = AmorphousShape(List.fill(inPortCount)(Inlet("")),
-                                          List.fill(outPortCount)(Outlet("")))
+      override val shape = AmorphousShape(
+        List.fill(inPortCount)(Inlet("")),
+        List.fill(outPortCount)(Outlet("")))
       override def replaceShape(s: Shape): Module = ???
 
       override def carbonCopy: Module = ???

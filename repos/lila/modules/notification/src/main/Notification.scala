@@ -12,8 +12,9 @@ case class Notification(id: String,
 object Notification {
 
   def apply(user: String, html: String, from: Option[String]): Notification =
-    new Notification(id = nextStringUppercase(8),
-                     user = user,
-                     html = html,
-                     from = from)
+    new Notification(
+      id = nextStringUppercase(8),
+      user = user,
+      html = html,
+      from = from)
 }

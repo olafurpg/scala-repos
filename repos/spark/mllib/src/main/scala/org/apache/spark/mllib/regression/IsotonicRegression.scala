@@ -77,8 +77,9 @@ class IsotonicRegressionModel @Since("1.3.0")(
     var i = 1
     val len = xs.length
     while (i < len) {
-      require(ord.compare(xs(i - 1), xs(i)) <= 0,
-              s"Elements (${xs(i - 1)}, ${xs(i)}) are not ordered.")
+      require(
+        ord.compare(xs(i - 1), xs(i)) <= 0,
+        s"Elements (${xs(i - 1)}, ${xs(i)}) are not ordered.")
       i += 1
     }
   }
@@ -148,11 +149,12 @@ class IsotonicRegressionModel @Since("1.3.0")(
     } else if (insertIndex == boundaries.length) {
       predictions.last
     } else if (foundIndex < 0) {
-      linearInterpolation(boundaries(insertIndex - 1),
-                          predictions(insertIndex - 1),
-                          boundaries(insertIndex),
-                          predictions(insertIndex),
-                          testData)
+      linearInterpolation(
+        boundaries(insertIndex - 1),
+        predictions(insertIndex - 1),
+        boundaries(insertIndex),
+        predictions(insertIndex),
+        testData)
     } else {
       predictions(foundIndex)
     }

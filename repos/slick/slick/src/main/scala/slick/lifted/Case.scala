@@ -30,8 +30,9 @@ object Case {
     def Then[P, B](res: Rep[P])(
         implicit om: OptionMapperDSL.arg[B, P]#to[B, P],
         bType: BaseTypedType[B]) =
-      new TypedCase[B, P](ConstArray(cond, res.toNode))(bType,
-                                                        om.liftedType(bType))
+      new TypedCase[B, P](ConstArray(cond, res.toNode))(
+        bType,
+        om.liftedType(bType))
   }
 
   final class TypedCase[B: TypedType, T: TypedType](clauses: ConstArray[Node])

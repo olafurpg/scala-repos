@@ -234,8 +234,9 @@ final class CrossProject private (
   // Concrete alteration members
 
   def aggregate(refs: CrossProject*): CrossProject = {
-    copy(jvm.aggregate(refs.map(_.jvm: ProjectReference): _*),
-         js.aggregate(refs.map(_.js: ProjectReference): _*))
+    copy(
+      jvm.aggregate(refs.map(_.jvm: ProjectReference): _*),
+      js.aggregate(refs.map(_.js: ProjectReference): _*))
   }
 
   def configs(cs: Configuration*): CrossProject =
@@ -302,14 +303,16 @@ object CrossProject extends CrossProjectExtra {
 
   private def sharedSrcSettings(crossType: CrossType) = Seq(
     unmanagedSourceDirectories in Compile ++= {
-      makeCrossSources(crossType.sharedSrcDir(baseDirectory.value, "main"),
-                       scalaBinaryVersion.value,
-                       crossPaths.value)
+      makeCrossSources(
+        crossType.sharedSrcDir(baseDirectory.value, "main"),
+        scalaBinaryVersion.value,
+        crossPaths.value)
     },
     unmanagedSourceDirectories in Test ++= {
-      makeCrossSources(crossType.sharedSrcDir(baseDirectory.value, "test"),
-                       scalaBinaryVersion.value,
-                       crossPaths.value)
+      makeCrossSources(
+        crossType.sharedSrcDir(baseDirectory.value, "test"),
+        scalaBinaryVersion.value,
+        crossPaths.value)
     }
   )
 
@@ -321,8 +324,9 @@ object CrossProject extends CrossProjectExtra {
       Seq.empty
     } { srcDir =>
       if (cross)
-        Seq(srcDir.getParentFile / s"${srcDir.name}-$scalaBinaryVersion",
-            srcDir)
+        Seq(
+          srcDir.getParentFile / s"${srcDir.name}-$scalaBinaryVersion",
+          srcDir)
       else Seq(srcDir)
     }
   }

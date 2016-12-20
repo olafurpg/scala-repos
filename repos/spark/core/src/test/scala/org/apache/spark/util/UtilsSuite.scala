@@ -246,10 +246,8 @@ class UtilsSuite
     assert(Utils.splitCommandString("a \"b c\"") === Seq("a", "b c"))
     assert(Utils.splitCommandString("a \"b c\" d") === Seq("a", "b c", "d"))
     assert(Utils.splitCommandString("\"b c\"") === Seq("b c"))
-    assert(
-      Utils.splitCommandString("a 'b\" c' \"d' e\"") === Seq("a",
-                                                             "b\" c",
-                                                             "d' e"))
+    assert(Utils
+      .splitCommandString("a 'b\" c' \"d' e\"") === Seq("a", "b\" c", "d' e"))
     assert(Utils.splitCommandString("a\t'b\nc'\nd") === Seq("a", "b\nc", "d"))
     assert(Utils.splitCommandString("a \"b\\\\c\"") === Seq("a", "b\\c"))
     assert(Utils.splitCommandString("a \"b\\\"c\"") === Seq("a", "b\"c"))
@@ -401,8 +399,9 @@ class UtilsSuite
     val rawCwd = System.getProperty("user.dir")
     val cwd = if (Utils.isWindows) s"/$rawCwd".replace("\\", "/") else rawCwd
     assertResolves("hdfs:/root/spark.jar", "hdfs:/root/spark.jar")
-    assertResolves("hdfs:///root/spark.jar#app.jar",
-                   "hdfs:/root/spark.jar#app.jar")
+    assertResolves(
+      "hdfs:///root/spark.jar#app.jar",
+      "hdfs:/root/spark.jar#app.jar")
     assertResolves("spark.jar", s"file:$cwd/spark.jar")
     assertResolves("spark.jar#app.jar", s"file:$cwd/spark.jar#app.jar")
     assertResolves("path to/file.txt", s"file:$cwd/path%20to/file.txt")
@@ -412,8 +411,9 @@ class UtilsSuite
     }
     assertResolves("file:/C:/path/to/file.txt", "file:/C:/path/to/file.txt")
     assertResolves("file:///C:/path/to/file.txt", "file:/C:/path/to/file.txt")
-    assertResolves("file:/C:/file.txt#alias.txt",
-                   "file:/C:/file.txt#alias.txt")
+    assertResolves(
+      "file:/C:/file.txt#alias.txt",
+      "file:/C:/file.txt#alias.txt")
     assertResolves("file:foo", s"file:foo")
     assertResolves("file:foo:baby", s"file:foo:baby")
   }
@@ -433,8 +433,9 @@ class UtilsSuite
     val cwd = if (Utils.isWindows) s"/$rawCwd".replace("\\", "/") else rawCwd
     assertResolves("jar1,jar2", s"file:$cwd/jar1,file:$cwd/jar2")
     assertResolves("file:/jar1,file:/jar2", "file:/jar1,file:/jar2")
-    assertResolves("hdfs:/jar1,file:/jar2,jar3",
-                   s"hdfs:/jar1,file:/jar2,file:$cwd/jar3")
+    assertResolves(
+      "hdfs:/jar1,file:/jar2,jar3",
+      s"hdfs:/jar1,file:/jar2,file:$cwd/jar3")
     assertResolves(
       "hdfs:/jar1,file:/jar2,jar3,jar4#jar5,path to/jar6",
       s"hdfs:/jar1,file:/jar2,file:$cwd/jar3,file:$cwd/jar4#jar5,file:$cwd/path%20to/jar6")
@@ -493,17 +494,17 @@ class UtilsSuite
     assert(Utils
       .nonLocalPaths("local:///C:/some/path.jar", testWindows = true) === Array.empty)
     assert(
-      Utils.nonLocalPaths("hdfs:/a.jar,C:/my.jar,s3:/another.jar",
-                          testWindows = true) === Array("hdfs:/a.jar",
-                                                        "s3:/another.jar"))
+      Utils.nonLocalPaths(
+        "hdfs:/a.jar,C:/my.jar,s3:/another.jar",
+        testWindows = true) === Array("hdfs:/a.jar", "s3:/another.jar"))
     assert(
-      Utils.nonLocalPaths("D:/your.jar,hdfs:/a.jar,s3:/another.jar",
-                          testWindows = true) === Array("hdfs:/a.jar",
-                                                        "s3:/another.jar"))
+      Utils.nonLocalPaths(
+        "D:/your.jar,hdfs:/a.jar,s3:/another.jar",
+        testWindows = true) === Array("hdfs:/a.jar", "s3:/another.jar"))
     assert(
-      Utils.nonLocalPaths("hdfs:/a.jar,s3:/another.jar,e:/our.jar",
-                          testWindows = true) === Array("hdfs:/a.jar",
-                                                        "s3:/another.jar"))
+      Utils.nonLocalPaths(
+        "hdfs:/a.jar,s3:/another.jar,e:/our.jar",
+        testWindows = true) === Array("hdfs:/a.jar", "s3:/another.jar"))
   }
 
   test("isBindCollision") {
@@ -652,13 +653,14 @@ class UtilsSuite
     val testFileDir = new File(tempDir, "test-filename")
     val testFileName = "testFName"
     val testFilefs = Utils.getHadoopFileSystem(filePath.toString, conf)
-    Utils.fetchHcfsFile(filePath,
-                        testFileDir,
-                        testFilefs,
-                        new SparkConf(),
-                        conf,
-                        false,
-                        Some(testFileName))
+    Utils.fetchHcfsFile(
+      filePath,
+      testFileDir,
+      testFilefs,
+      new SparkConf(),
+      conf,
+      false,
+      Some(testFileName))
     val newFileName = new File(testFileDir, testFileName)
     assert(newFileName.isFile())
   }
@@ -728,8 +730,8 @@ class UtilsSuite
     assert(!Utils.isInDirectory(parentDir, new File(parentDir, "one.txt")))
     assert(!Utils.isInDirectory(parentDir, new File(parentDir, "one/two.txt")))
     assert(
-      !Utils.isInDirectory(parentDir,
-                           new File(parentDir, "one/two/three.txt")))
+      !Utils
+        .isInDirectory(parentDir, new File(parentDir, "one/two/three.txt")))
 
     // Siblings should fail
     assert(!Utils.isInDirectory(childDir1, childDir1b))

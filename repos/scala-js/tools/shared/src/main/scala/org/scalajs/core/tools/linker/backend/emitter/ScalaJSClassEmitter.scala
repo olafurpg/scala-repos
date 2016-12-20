@@ -262,10 +262,11 @@ private[scalajs] final class ScalaJSClassEmitter(
         } { parentIdent =>
           js.Apply(js.Super(), Nil)
         }
-        js.MethodDef(static = false,
-                     js.Ident("constructor"),
-                     Nil,
-                     js.Block(superCtorCall :: fieldDefs))
+        js.MethodDef(
+          static = false,
+          js.Ident("constructor"),
+          Nil,
+          js.Block(superCtorCall :: fieldDefs))
       }
     }
   }
@@ -294,10 +295,11 @@ private[scalajs] final class ScalaJSClassEmitter(
       val selectField = (name: @unchecked) match {
         case name: Ident => Select(This()(tpe), name)(ftpe)
       }
-      desugarTree(this,
-                  tree.encodedName,
-                  Assign(selectField, zeroOf(ftpe)),
-                  isStat = true)
+      desugarTree(
+        this,
+        tree.encodedName,
+        Assign(selectField, zeroOf(ftpe)),
+        isStat = true)
     }
   }
 
@@ -305,11 +307,12 @@ private[scalajs] final class ScalaJSClassEmitter(
   def genMethod(className: String, method: MethodDef): js.Tree = {
     implicit val pos = method.pos
 
-    val methodFun0 = desugarToFunction(this,
-                                       className,
-                                       method.args,
-                                       method.body,
-                                       method.resultType == NoType)
+    val methodFun0 = desugarToFunction(
+      this,
+      className,
+      method.args,
+      method.body,
+      method.resultType == NoType)
 
     val methodFun =
       if (Definitions.isConstructorName(method.name.name)) {
@@ -331,10 +334,11 @@ private[scalajs] final class ScalaJSClassEmitter(
           genAddToPrototype(className, method.name, methodFun)
 
         case OutputMode.ECMAScript6 =>
-          js.MethodDef(static = false,
-                       genPropertyName(method.name),
-                       methodFun.args,
-                       methodFun.body)
+          js.MethodDef(
+            static = false,
+            genPropertyName(method.name),
+            methodFun.args,
+            methodFun.body)
       }
     }
   }
@@ -349,16 +353,18 @@ private[scalajs] final class ScalaJSClassEmitter(
      */
     val thisIdent = js.Ident("$thiz", Some("this"))
 
-    val methodFun0 = desugarToFunction(this,
-                                       className,
-                                       Some(thisIdent),
-                                       method.args,
-                                       method.body,
-                                       method.resultType == NoType)
+    val methodFun0 = desugarToFunction(
+      this,
+      className,
+      Some(thisIdent),
+      method.args,
+      method.body,
+      method.resultType == NoType)
 
     val methodFun =
-      js.Function(js.ParamDef(thisIdent, rest = false) :: methodFun0.args,
-                  methodFun0.body)(methodFun0.pos)
+      js.Function(
+        js.ParamDef(thisIdent, rest = false) :: methodFun0.args,
+        methodFun0.body)(methodFun0.pos)
 
     val Ident(methodName, origName) = method.name
 
@@ -408,11 +414,12 @@ private[scalajs] final class ScalaJSClassEmitter(
       val wget = {
         if (property.getterBody == EmptyTree) base
         else {
-          val fun = desugarToFunction(this,
-                                      className,
-                                      Nil,
-                                      property.getterBody,
-                                      isStat = false)
+          val fun = desugarToFunction(
+            this,
+            className,
+            Nil,
+            property.getterBody,
+            isStat = false)
           js.StringLiteral("get") -> fun :: base
         }
       }
@@ -420,11 +427,12 @@ private[scalajs] final class ScalaJSClassEmitter(
       // Optionally add setter
       if (property.setterBody == EmptyTree) wget
       else {
-        val fun = desugarToFunction(this,
-                                    className,
-                                    property.setterArg :: Nil,
-                                    property.setterBody,
-                                    isStat = true)
+        val fun = desugarToFunction(
+          this,
+          className,
+          property.setterArg :: Nil,
+          property.setterBody,
+          isStat = true)
         js.StringLiteral("set") -> fun :: wget
       }
     }
@@ -441,11 +449,12 @@ private[scalajs] final class ScalaJSClassEmitter(
     val getter = {
       if (property.getterBody == EmptyTree) js.Skip()
       else {
-        val fun = desugarToFunction(this,
-                                    className,
-                                    Nil,
-                                    property.getterBody,
-                                    isStat = false)
+        val fun = desugarToFunction(
+          this,
+          className,
+          Nil,
+          property.getterBody,
+          isStat = false)
         js.GetterDef(static = false, propName, fun.body)
       }
     }
@@ -453,11 +462,12 @@ private[scalajs] final class ScalaJSClassEmitter(
     val setter = {
       if (property.setterBody == EmptyTree) js.Skip()
       else {
-        val fun = desugarToFunction(this,
-                                    className,
-                                    property.setterArg :: Nil,
-                                    property.setterBody,
-                                    isStat = true)
+        val fun = desugarToFunction(
+          this,
+          className,
+          property.setterArg :: Nil,
+          property.setterBody,
+          isStat = true)
         js.SetterDef(static = false, propName, fun.args.head, fun.body)
       }
     }
@@ -567,20 +577,22 @@ private[scalajs] final class ScalaJSClassEmitter(
 
               case _ =>
                 val throwError = {
-                  genCallHelper("throwClassCastException",
-                                obj,
-                                js.StringLiteral(displayName))
+                  genCallHelper(
+                    "throwClassCastException",
+                    obj,
+                    js.StringLiteral(displayName))
                 }
                 if (className == RuntimeNothingClass) {
                   // Always throw for .asInstanceOf[Nothing], even for null
                   throwError
                 } else {
-                  js.If(js.Apply(envField("is", className), List(obj)) ||
-                          (obj === js.Null()), {
-                          obj
-                        }, {
-                          throwError
-                        })
+                  js.If(
+                    js.Apply(envField("is", className), List(obj)) ||
+                      (obj === js.Null()), {
+                      obj
+                    }, {
+                      throwError
+                    })
                 }
             })))
         }
@@ -652,17 +664,22 @@ private[scalajs] final class ScalaJSClassEmitter(
         envFieldDef(
           "asArrayOf",
           className,
-          js.Function(List(objParam, depthParam), js.Return {
-              js.If(js.Apply(envField("isArrayOf", className),
-                             List(obj, depth)) || (obj === js.Null()), {
+          js.Function(
+              List(objParam, depthParam),
+              js.Return {
+                  js.If(
+                    js.Apply(
+                      envField("isArrayOf", className),
+                      List(obj, depth)) || (obj === js.Null()), {
                       obj
                     }, {
-                      genCallHelper("throwArrayCastException",
-                                    obj,
-                                    js.StringLiteral("L" + displayName + ";"),
-                                    depth)
+                      genCallHelper(
+                        "throwArrayCastException",
+                        obj,
+                        js.StringLiteral("L" + displayName + ";"),
+                        depth)
                     })
-            }))
+                }))
       }
 
     js.Block(createIsArrayOfStat, createAsArrayOfStat)
@@ -789,8 +806,9 @@ private[scalajs] final class ScalaJSClassEmitter(
     val className = classIdent.name
     val tpe = ClassType(className)
 
-    require(tree.kind.hasModuleAccessor,
-            s"genModuleAccessor called with non-module class: $className")
+    require(
+      tree.kind.hasModuleAccessor,
+      s"genModuleAccessor called with non-module class: $className")
 
     val createModuleInstanceField =
       envFieldDef("n", className, js.Undefined(), mutable = true)
@@ -810,12 +828,13 @@ private[scalajs] final class ScalaJSClassEmitter(
         case CheckedBehavior.Unchecked =>
           js.If(!(moduleInstanceVar), assignModule, js.Skip())
         case CheckedBehavior.Compliant =>
-          js.If(moduleInstanceVar === js.Undefined(),
-                js.Block(
-                  moduleInstanceVar := js.Null(),
-                  assignModule
-                ),
-                js.Skip())
+          js.If(
+            moduleInstanceVar === js.Undefined(),
+            js.Block(
+              moduleInstanceVar := js.Null(),
+              assignModule
+            ),
+            js.Skip())
         case CheckedBehavior.Fatal =>
           js.If(moduleInstanceVar === js.Undefined(), {
             js.Block(
@@ -892,12 +911,13 @@ private[scalajs] final class ScalaJSClassEmitter(
 
     val thisIdent = js.Ident("$thiz")
 
-    val js.Function(ctorParams, ctorBody) = desugarToFunction(this,
-                                                              cd.encodedName,
-                                                              Some(thisIdent),
-                                                              args,
-                                                              body,
-                                                              isStat = true)
+    val js.Function(ctorParams, ctorBody) = desugarToFunction(
+      this,
+      cd.encodedName,
+      Some(thisIdent),
+      args,
+      body,
+      isStat = true)
 
     val exportedCtor = js.Function(
       ctorParams,
@@ -966,8 +986,9 @@ private[scalajs] final class ScalaJSClassEmitter(
     for (i <- 0 until parts.length - 1) {
       namespace = genBracketSelect(namespace, js.StringLiteral(parts(i)))
       statements +=
-        js.Assign(namespace,
-                  js.BinaryOp(JSBinaryOp.||, namespace, js.ObjectConstr(Nil)))
+        js.Assign(
+          namespace,
+          js.BinaryOp(JSBinaryOp.||, namespace, js.ObjectConstr(Nil)))
     }
     val lhs = genBracketSelect(namespace, js.StringLiteral(parts.last))
     (js.Block(statements.result()), lhs)

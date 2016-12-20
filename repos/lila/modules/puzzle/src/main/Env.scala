@@ -22,9 +22,10 @@ final class Env(config: Config,
 
   private val db = new lila.db.Env(config getConfig "mongodb", lifecycle)
 
-  lazy val api = new PuzzleApi(puzzleColl = puzzleColl,
-                               attemptColl = attemptColl,
-                               apiToken = ApiToken)
+  lazy val api = new PuzzleApi(
+    puzzleColl = puzzleColl,
+    attemptColl = attemptColl,
+    apiToken = ApiToken)
 
   lazy val finisher = new Finisher(api = api, puzzleColl = puzzleColl)
 
@@ -66,8 +67,9 @@ final class Env(config: Config,
 object Env {
 
   lazy val current: Env =
-    "puzzle" boot new Env(config = lila.common.PlayApp loadConfig "puzzle",
-                          renderer = lila.hub.Env.current.actor.renderer,
-                          system = lila.common.PlayApp.system,
-                          lifecycle = lila.common.PlayApp.lifecycle)
+    "puzzle" boot new Env(
+      config = lila.common.PlayApp loadConfig "puzzle",
+      renderer = lila.hub.Env.current.actor.renderer,
+      system = lila.common.PlayApp.system,
+      lifecycle = lila.common.PlayApp.lifecycle)
 }

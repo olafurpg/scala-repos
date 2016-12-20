@@ -63,8 +63,9 @@ package parsing {
                                           val info: ErrorInfo)
       extends RuntimeException(info.formatPretty) {
     def this(status: StatusCode, summary: String = "") =
-      this(status,
-           ErrorInfo(if (summary.isEmpty) status.defaultMessage else summary))
+      this(
+        status,
+        ErrorInfo(if (summary.isEmpty) status.defaultMessage else summary))
     def this(summary: String) =
       this(StatusCodes.BadRequest, ErrorInfo(summary))
   }

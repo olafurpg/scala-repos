@@ -47,7 +47,8 @@ class FoldTrueAndTest extends OperationsOnCollectionInspectionTest {
   }
 
   def testWithoutSideEffect(): Unit = {
-    doTest(s"""
+    doTest(
+      s"""
          |List(0).${START}foldLeft(true) {(x, y) =>
          |  x && {
          |    var z = 1
@@ -56,7 +57,7 @@ class FoldTrueAndTest extends OperationsOnCollectionInspectionTest {
          |  }
          |}$END
        """.stripMargin,
-           """
+      """
          |List(0).foldLeft(true) {(x, y) =>
          |  x && {
          |    var z = 1
@@ -65,7 +66,7 @@ class FoldTrueAndTest extends OperationsOnCollectionInspectionTest {
          |  }
          |}
        """.stripMargin,
-           """
+      """
         |List(0).forall(y => {
         |  var z = 1
         |  z += 1

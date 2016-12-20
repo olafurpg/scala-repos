@@ -23,9 +23,10 @@ object ForkTestsTest extends Build {
         assert(tests.size == 3)
         for (idx <- 0 until groups)
           yield
-            new Group(groupId(idx),
-                      tests,
-                      SubProcess(Seq("-Dgroup.prefix=" + groupPrefix(idx))))
+            new Group(
+              groupId(idx),
+              tests,
+              SubProcess(Seq("-Dgroup.prefix=" + groupPrefix(idx))))
       },
         check := {
         val files = for (i <- 0 until groups; j <- 1 to groupSize)

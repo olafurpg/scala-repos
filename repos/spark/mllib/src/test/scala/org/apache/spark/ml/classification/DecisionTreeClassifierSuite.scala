@@ -68,10 +68,11 @@ class DecisionTreeClassifierSuite
   test("params") {
     ParamsSuite.checkParams(new DecisionTreeClassifier)
     val model =
-      new DecisionTreeClassificationModel("dtc",
-                                          new LeafNode(0.0, 0.0, null),
-                                          1,
-                                          2)
+      new DecisionTreeClassificationModel(
+        "dtc",
+        new LeafNode(0.0, 0.0, null),
+        1,
+        2)
     ParamsSuite.checkParams(model)
   }
 
@@ -97,10 +98,11 @@ class DecisionTreeClassifierSuite
       .foreach { rdd =>
         DecisionTreeClassifier.supportedImpurities.foreach { impurity =>
           dt.setImpurity(impurity)
-          compareAPIs(rdd,
-                      dt,
-                      categoricalFeatures = Map.empty[Int, Int],
-                      numClasses)
+          compareAPIs(
+            rdd,
+            dt,
+            categoricalFeatures = Map.empty[Int, Int],
+            numClasses)
         }
       }
   }
@@ -116,10 +118,11 @@ class DecisionTreeClassifierSuite
 
   test(
     "Binary classification stump with 1 continuous feature, to check off-by-1 error") {
-    val arr = Array(LabeledPoint(0.0, Vectors.dense(0.0)),
-                    LabeledPoint(1.0, Vectors.dense(1.0)),
-                    LabeledPoint(1.0, Vectors.dense(2.0)),
-                    LabeledPoint(1.0, Vectors.dense(3.0)))
+    val arr = Array(
+      LabeledPoint(0.0, Vectors.dense(0.0)),
+      LabeledPoint(1.0, Vectors.dense(1.0)),
+      LabeledPoint(1.0, Vectors.dense(2.0)),
+      LabeledPoint(1.0, Vectors.dense(3.0)))
     val rdd = sc.parallelize(arr)
     val dt = new DecisionTreeClassifier().setImpurity("Gini").setMaxDepth(4)
     val numClasses = 2
@@ -127,10 +130,11 @@ class DecisionTreeClassifierSuite
   }
 
   test("Binary classification stump with 2 continuous features") {
-    val arr = Array(LabeledPoint(0.0, Vectors.sparse(2, Seq((0, 0.0)))),
-                    LabeledPoint(1.0, Vectors.sparse(2, Seq((1, 1.0)))),
-                    LabeledPoint(0.0, Vectors.sparse(2, Seq((0, 0.0)))),
-                    LabeledPoint(1.0, Vectors.sparse(2, Seq((1, 2.0)))))
+    val arr = Array(
+      LabeledPoint(0.0, Vectors.sparse(2, Seq((0, 0.0)))),
+      LabeledPoint(1.0, Vectors.sparse(2, Seq((1, 1.0)))),
+      LabeledPoint(0.0, Vectors.sparse(2, Seq((0, 0.0)))),
+      LabeledPoint(1.0, Vectors.sparse(2, Seq((1, 2.0)))))
     val rdd = sc.parallelize(arr)
     val dt = new DecisionTreeClassifier().setImpurity("Gini").setMaxDepth(4)
     val numClasses = 2
@@ -202,9 +206,10 @@ class DecisionTreeClassifierSuite
   }
 
   test("split must satisfy min instances per node requirements") {
-    val arr = Array(LabeledPoint(0.0, Vectors.sparse(2, Seq((0, 0.0)))),
-                    LabeledPoint(1.0, Vectors.sparse(2, Seq((1, 1.0)))),
-                    LabeledPoint(0.0, Vectors.sparse(2, Seq((0, 1.0)))))
+    val arr = Array(
+      LabeledPoint(0.0, Vectors.sparse(2, Seq((0, 0.0)))),
+      LabeledPoint(1.0, Vectors.sparse(2, Seq((1, 1.0)))),
+      LabeledPoint(0.0, Vectors.sparse(2, Seq((0, 1.0)))))
     val rdd = sc.parallelize(arr)
     val dt = new DecisionTreeClassifier()
       .setImpurity("Gini")
@@ -218,10 +223,11 @@ class DecisionTreeClassifierSuite
     "do not choose split that does not satisfy min instance per node requirements") {
     // if a split does not satisfy min instances per node requirements,
     // this split is invalid, even though the information gain of split is large.
-    val arr = Array(LabeledPoint(0.0, Vectors.dense(0.0, 1.0)),
-                    LabeledPoint(1.0, Vectors.dense(1.0, 1.0)),
-                    LabeledPoint(0.0, Vectors.dense(0.0, 0.0)),
-                    LabeledPoint(0.0, Vectors.dense(0.0, 0.0)))
+    val arr = Array(
+      LabeledPoint(0.0, Vectors.dense(0.0, 1.0)),
+      LabeledPoint(1.0, Vectors.dense(1.0, 1.0)),
+      LabeledPoint(0.0, Vectors.dense(0.0, 0.0)),
+      LabeledPoint(0.0, Vectors.dense(0.0, 0.0)))
     val rdd = sc.parallelize(arr)
     val dt = new DecisionTreeClassifier()
       .setImpurity("Gini")
@@ -234,9 +240,10 @@ class DecisionTreeClassifierSuite
   }
 
   test("split must satisfy min info gain requirements") {
-    val arr = Array(LabeledPoint(0.0, Vectors.sparse(2, Seq((0, 0.0)))),
-                    LabeledPoint(1.0, Vectors.sparse(2, Seq((1, 1.0)))),
-                    LabeledPoint(0.0, Vectors.sparse(2, Seq((0, 1.0)))))
+    val arr = Array(
+      LabeledPoint(0.0, Vectors.sparse(2, Seq((0, 0.0)))),
+      LabeledPoint(1.0, Vectors.sparse(2, Seq((1, 1.0)))),
+      LabeledPoint(0.0, Vectors.sparse(2, Seq((0, 1.0)))))
     val rdd = sc.parallelize(arr)
 
     val dt = new DecisionTreeClassifier()
@@ -265,9 +272,10 @@ class DecisionTreeClassifierSuite
 
     val predictions = newTree
       .transform(newData)
-      .select(newTree.getPredictionCol,
-              newTree.getRawPredictionCol,
-              newTree.getProbabilityCol)
+      .select(
+        newTree.getPredictionCol,
+        newTree.getRawPredictionCol,
+        newTree.getProbabilityCol)
       .collect()
 
     predictions.foreach {
@@ -276,8 +284,9 @@ class DecisionTreeClassifierSuite
           pred === rawPred.argmax,
           s"Expected prediction $pred but calculated ${rawPred.argmax} from rawPrediction.")
         val sum = rawPred.toArray.sum
-        assert(Vectors.dense(rawPred.toArray.map(_ / sum)) === probPred,
-               "probability prediction mismatch")
+        assert(
+          Vectors.dense(rawPred.toArray.map(_ / sum)) === probPred,
+          "probability prediction mismatch")
     }
   }
 
@@ -299,18 +308,19 @@ class DecisionTreeClassifierSuite
     "Use soft prediction for binary classification with ordered categorical features") {
     // The following dataset is set up such that the best split is {1} vs. {0, 2}.
     // If the hard prediction is used to order the categories, then {0} vs. {1, 2} is chosen.
-    val arr = Array(LabeledPoint(0.0, Vectors.dense(0.0)),
-                    LabeledPoint(0.0, Vectors.dense(0.0)),
-                    LabeledPoint(0.0, Vectors.dense(0.0)),
-                    LabeledPoint(1.0, Vectors.dense(0.0)),
-                    LabeledPoint(0.0, Vectors.dense(1.0)),
-                    LabeledPoint(0.0, Vectors.dense(1.0)),
-                    LabeledPoint(0.0, Vectors.dense(1.0)),
-                    LabeledPoint(0.0, Vectors.dense(1.0)),
-                    LabeledPoint(0.0, Vectors.dense(2.0)),
-                    LabeledPoint(0.0, Vectors.dense(2.0)),
-                    LabeledPoint(0.0, Vectors.dense(2.0)),
-                    LabeledPoint(1.0, Vectors.dense(2.0)))
+    val arr = Array(
+      LabeledPoint(0.0, Vectors.dense(0.0)),
+      LabeledPoint(0.0, Vectors.dense(0.0)),
+      LabeledPoint(0.0, Vectors.dense(0.0)),
+      LabeledPoint(1.0, Vectors.dense(0.0)),
+      LabeledPoint(0.0, Vectors.dense(1.0)),
+      LabeledPoint(0.0, Vectors.dense(1.0)),
+      LabeledPoint(0.0, Vectors.dense(1.0)),
+      LabeledPoint(0.0, Vectors.dense(1.0)),
+      LabeledPoint(0.0, Vectors.dense(2.0)),
+      LabeledPoint(0.0, Vectors.dense(2.0)),
+      LabeledPoint(0.0, Vectors.dense(2.0)),
+      LabeledPoint(1.0, Vectors.dense(2.0)))
     val data = sc.parallelize(arr)
     val df = TreeTests.setMetadata(data, Map(0 -> 3), 2)
 
@@ -377,24 +387,27 @@ class DecisionTreeClassifierSuite
     // Categorical splits with tree depth 2
     val categoricalData: DataFrame =
       TreeTests.setMetadata(rdd, Map(0 -> 2, 1 -> 3), numClasses = 2)
-    testEstimatorAndModelReadWrite(dt,
-                                   categoricalData,
-                                   allParamSettings,
-                                   checkModelData)
+    testEstimatorAndModelReadWrite(
+      dt,
+      categoricalData,
+      allParamSettings,
+      checkModelData)
 
     // Continuous splits with tree depth 2
     val continuousData: DataFrame =
       TreeTests.setMetadata(rdd, Map.empty[Int, Int], numClasses = 2)
-    testEstimatorAndModelReadWrite(dt,
-                                   continuousData,
-                                   allParamSettings,
-                                   checkModelData)
+    testEstimatorAndModelReadWrite(
+      dt,
+      continuousData,
+      allParamSettings,
+      checkModelData)
 
     // Continuous splits with tree depth 0
-    testEstimatorAndModelReadWrite(dt,
-                                   continuousData,
-                                   allParamSettings ++ Map("maxDepth" -> 0),
-                                   checkModelData)
+    testEstimatorAndModelReadWrite(
+      dt,
+      continuousData,
+      allParamSettings ++ Map("maxDepth" -> 0),
+      checkModelData)
   }
 }
 

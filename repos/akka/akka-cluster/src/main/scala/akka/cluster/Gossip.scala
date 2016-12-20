@@ -145,8 +145,9 @@ private[cluster] final case class Gossip(
 
     // 2. merge members by selecting the single Member with highest MemberStatus out of the Member groups
     val mergedMembers =
-      Gossip.emptyMembers union Member.pickHighestPriority(this.members,
-                                                           that.members)
+      Gossip.emptyMembers union Member.pickHighestPriority(
+        this.members,
+        that.members)
 
     // 3. merge reachability table by picking records with highest version
     val mergedReachability = this.overview.reachability
@@ -155,9 +156,10 @@ private[cluster] final case class Gossip(
     // 4. Nobody can have seen this new gossip yet
     val mergedSeen = Set.empty[UniqueAddress]
 
-    Gossip(mergedMembers,
-           GossipOverview(mergedSeen, mergedReachability),
-           mergedVClock)
+    Gossip(
+      mergedMembers,
+      GossipOverview(mergedSeen, mergedReachability),
+      mergedVClock)
   }
 
   /**

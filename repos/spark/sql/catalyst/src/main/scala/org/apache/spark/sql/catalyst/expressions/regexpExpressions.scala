@@ -267,21 +267,26 @@ case class RegExpReplace(subject: Expression,
     val classNameStringBuffer =
       classOf[java.lang.StringBuffer].getCanonicalName
 
-    ctx.addMutableState("UTF8String",
-                        termLastRegex,
-                        s"${termLastRegex} = null;")
-    ctx.addMutableState(classNamePattern,
-                        termPattern,
-                        s"${termPattern} = null;")
-    ctx.addMutableState("String",
-                        termLastReplacement,
-                        s"${termLastReplacement} = null;")
-    ctx.addMutableState("UTF8String",
-                        termLastReplacementInUTF8,
-                        s"${termLastReplacementInUTF8} = null;")
-    ctx.addMutableState(classNameStringBuffer,
-                        termResult,
-                        s"${termResult} = new $classNameStringBuffer();")
+    ctx.addMutableState(
+      "UTF8String",
+      termLastRegex,
+      s"${termLastRegex} = null;")
+    ctx.addMutableState(
+      classNamePattern,
+      termPattern,
+      s"${termPattern} = null;")
+    ctx.addMutableState(
+      "String",
+      termLastReplacement,
+      s"${termLastReplacement} = null;")
+    ctx.addMutableState(
+      "UTF8String",
+      termLastReplacementInUTF8,
+      s"${termLastReplacementInUTF8} = null;")
+    ctx.addMutableState(
+      classNameStringBuffer,
+      termResult,
+      s"${termResult} = new $classNameStringBuffer();")
 
     nullSafeCodeGen(ctx, ev, (subject, regexp, rep) => {
       s"""
@@ -352,12 +357,14 @@ case class RegExpExtract(subject: Expression,
     val termPattern = ctx.freshName("pattern")
     val classNamePattern = classOf[Pattern].getCanonicalName
 
-    ctx.addMutableState("UTF8String",
-                        termLastRegex,
-                        s"${termLastRegex} = null;")
-    ctx.addMutableState(classNamePattern,
-                        termPattern,
-                        s"${termPattern} = null;")
+    ctx.addMutableState(
+      "UTF8String",
+      termLastRegex,
+      s"${termLastRegex} = null;")
+    ctx.addMutableState(
+      classNamePattern,
+      termPattern,
+      s"${termPattern} = null;")
 
     nullSafeCodeGen(ctx, ev, (subject, regexp, idx) => {
       s"""

@@ -72,14 +72,15 @@ class InvertIfConditionIntention extends PsiElementBaseIntentionAction {
           } else {
             infixExpr.getArgExpr.getText
           }
-        val replaceOper = Map("==" -> "!=",
-                              "!=" -> "==",
-                              ">" -> "<=",
-                              "<" -> ">=",
-                              ">=" -> "<",
-                              "<=" -> ">",
-                              "&&" -> "||",
-                              "||" -> "&&")
+        val replaceOper = Map(
+          "==" -> "!=",
+          "!=" -> "==",
+          ">" -> "<=",
+          "<" -> ">=",
+          ">=" -> "<",
+          "<=" -> ">",
+          "&&" -> "||",
+          "||" -> "&&")
         val buf = new StringBuilder
         buf
           .append(first)

@@ -104,8 +104,9 @@ class ThrottlerTransportAdapterSpec
       .provider
       .asInstanceOf[RemoteActorRefProvider]
       .transport
-    Await.result(transport.managementCommand(ForceDisassociate(rootBAddress)),
-                 3.seconds)
+    Await.result(
+      transport.managementCommand(ForceDisassociate(rootBAddress)),
+      3.seconds)
   }
 
   "ThrottlerTransportAdapter" must {
@@ -159,8 +160,9 @@ class ThrottlerTransportAdapterSpec
   override def beforeTermination() {
     system.eventStream.publish(
       TestEvent.Mute(
-        EventFilter.warning(source = "akka://AkkaProtocolStressTest/user/$a",
-                            start = "received dead letter"),
+        EventFilter.warning(
+          source = "akka://AkkaProtocolStressTest/user/$a",
+          start = "received dead letter"),
         EventFilter.warning(
           pattern = "received dead letter.*(InboundPayload|Disassociate)")))
     systemB.eventStream.publish(
@@ -180,6 +182,7 @@ class ThrottlerTransportAdapterGenericSpec
   def transportName = "ThrottlerTransportAdapter"
   def schemeIdentifier = "akka.trttl"
   def freshTransport(testTransport: TestTransport) =
-    new ThrottlerTransportAdapter(testTransport,
-                                  system.asInstanceOf[ExtendedActorSystem])
+    new ThrottlerTransportAdapter(
+      testTransport,
+      system.asInstanceOf[ExtendedActorSystem])
 }

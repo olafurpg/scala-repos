@@ -25,9 +25,10 @@ object ScalaChangeContextUtil {
         null,
         Array[Int](range.getStartOffset),
         Array[Int](range.getEndOffset))
-      elem.putCopyableUserData(ASSOCIATIONS_KEY,
-                               if (associations.isEmpty) null
-                               else associations.get(0))
+      elem.putCopyableUserData(
+        ASSOCIATIONS_KEY,
+        if (associations.isEmpty) null
+        else associations.get(0))
     }
     scope.foreach(collectDataForElement)
   }
@@ -38,10 +39,11 @@ object ScalaChangeContextUtil {
         elem.getCopyableUserData(ASSOCIATIONS_KEY)
       if (associations != null) {
         try {
-          processor.restoreAssociations(associations,
-                                        elem.getContainingFile,
-                                        elem.getTextRange.getStartOffset,
-                                        elem.getProject)
+          processor.restoreAssociations(
+            associations,
+            elem.getContainingFile,
+            elem.getTextRange.getStartOffset,
+            elem.getProject)
         } finally {
           elem.putCopyableUserData(ASSOCIATIONS_KEY, null)
         }

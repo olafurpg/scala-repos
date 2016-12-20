@@ -65,8 +65,8 @@ private[hive] case class InsertIntoHiveTable(
 
     FileOutputFormat.setOutputPath(
       conf.value,
-      SparkHiveWriterContainer.createPathFromString(fileSinkConf.getDirName,
-                                                    conf.value))
+      SparkHiveWriterContainer
+        .createPathFromString(fileSinkConf.getDirName, conf.value))
     log.debug("Saving as hadoop file of type " + valueClass.getSimpleName)
     writerContainer.driverSideSetup()
     sc.sparkContext.runJob(rdd, writerContainer.writeToFile _)
@@ -158,25 +158,28 @@ private[hive] case class InsertIntoHiveTable(
       if (numDynamicPartitions > 0) {
         val dynamicPartColNames =
           partitionColumnNames.takeRight(numDynamicPartitions)
-        new SparkHiveDynamicPartitionWriterContainer(jobConf,
-                                                     fileSinkConf,
-                                                     dynamicPartColNames,
-                                                     child.output,
-                                                     table)
+        new SparkHiveDynamicPartitionWriterContainer(
+          jobConf,
+          fileSinkConf,
+          dynamicPartColNames,
+          child.output,
+          table)
       } else {
-        new SparkHiveWriterContainer(jobConf,
-                                     fileSinkConf,
-                                     child.output,
-                                     table)
+        new SparkHiveWriterContainer(
+          jobConf,
+          fileSinkConf,
+          child.output,
+          table)
       }
 
     @transient val outputClass =
       writerContainer.newSerializer(table.tableDesc).getSerializedClass
-    saveAsHiveFile(child.execute(),
-                   outputClass,
-                   fileSinkConf,
-                   jobConfSer,
-                   writerContainer)
+    saveAsHiveFile(
+      child.execute(),
+      outputClass,
+      fileSinkConf,
+      jobConfSer,
+      writerContainer)
 
     val outputPath = FileOutputFormat.getOutputPath(jobConf)
     // Have to construct the format of dbname.tablename.
@@ -190,8 +193,9 @@ private[hive] case class InsertIntoHiveTable(
       // loadPartition call orders directories created on the iteration order of the this map
       val orderedPartitionSpec = new util.LinkedHashMap[String, String]()
       table.hiveQlTable.getPartCols.asScala.foreach { entry =>
-        orderedPartitionSpec.put(entry.getName,
-                                 partitionSpec.getOrElse(entry.getName, ""))
+        orderedPartitionSpec.put(
+          entry.getName,
+          partitionSpec.getOrElse(entry.getName, ""))
       }
 
       // inheritTableSpecs is set to true. It should be set to false for a IMPORT query
@@ -201,13 +205,14 @@ private[hive] case class InsertIntoHiveTable(
       val isSkewedStoreAsSubdir = false
       if (numDynamicPartitions > 0) {
         catalog.synchronized {
-          catalog.client.loadDynamicPartitions(outputPath.toString,
-                                               qualifiedTableName,
-                                               orderedPartitionSpec,
-                                               overwrite,
-                                               numDynamicPartitions,
-                                               holdDDLTime,
-                                               isSkewedStoreAsSubdir)
+          catalog.client.loadDynamicPartitions(
+            outputPath.toString,
+            qualifiedTableName,
+            orderedPartitionSpec,
+            overwrite,
+            numDynamicPartitions,
+            holdDDLTime,
+            isSkewedStoreAsSubdir)
         }
       } else {
         // scalastyle:off
@@ -219,20 +224,22 @@ private[hive] case class InsertIntoHiveTable(
           partitionSpec)
 
         if (oldPart.isEmpty || !ifNotExists) {
-          catalog.client.loadPartition(outputPath.toString,
-                                       qualifiedTableName,
-                                       orderedPartitionSpec,
-                                       overwrite,
-                                       holdDDLTime,
-                                       inheritTableSpecs,
-                                       isSkewedStoreAsSubdir)
+          catalog.client.loadPartition(
+            outputPath.toString,
+            qualifiedTableName,
+            orderedPartitionSpec,
+            overwrite,
+            holdDDLTime,
+            inheritTableSpecs,
+            isSkewedStoreAsSubdir)
         }
       }
     } else {
-      catalog.client.loadTable(outputPath.toString, // TODO: URI
-                               qualifiedTableName,
-                               overwrite,
-                               holdDDLTime)
+      catalog.client.loadTable(
+        outputPath.toString, // TODO: URI
+        qualifiedTableName,
+        overwrite,
+        holdDDLTime)
     }
 
     // Invalidate the cache.

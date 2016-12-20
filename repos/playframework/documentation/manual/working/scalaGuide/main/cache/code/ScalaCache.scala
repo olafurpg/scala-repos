@@ -91,8 +91,9 @@ package scalaguide.cache {
       "composition cached page" in {
         running() { app =>
           val cachedApp = app.injector.instanceOf[cachedaction.Application1]
-          testAction(action = cachedApp.userProfile,
-                     expectedResponse = UNAUTHORIZED)
+          testAction(
+            action = cachedApp.userProfile,
+            expectedResponse = UNAUTHORIZED)
         }
       }
 

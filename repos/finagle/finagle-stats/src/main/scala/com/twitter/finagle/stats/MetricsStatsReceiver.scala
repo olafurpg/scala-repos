@@ -107,11 +107,12 @@ object MetricsStatsReceiver {
         case Event(etype, when, value, name: String, _, tid, sid)
             if etype eq this =>
           val (t, s) = serializeTrace(tid, sid)
-          val env = Json.Envelope(id,
-                                  when.inMilliseconds,
-                                  t,
-                                  s,
-                                  CounterIncrData(name, value))
+          val env = Json.Envelope(
+            id,
+            when.inMilliseconds,
+            t,
+            s,
+            CounterIncrData(name, value))
           Try(Buf.Utf8(Json.serialize(env)))
 
         case _ =>
@@ -131,12 +132,13 @@ object MetricsStatsReceiver {
           // This line fails without the JsonDeserialize annotation in Envelope.
           val tid = env.traceId.getOrElse(Event.NoTraceId)
           val sid = env.spanId.getOrElse(Event.NoSpanId)
-          Event(this,
-                when,
-                longVal = env.data.value,
-                objectVal = env.data.name,
-                traceIdVal = tid,
-                spanIdVal = sid)
+          Event(
+            this,
+            when,
+            longVal = env.data.value,
+            objectVal = env.data.name,
+            traceIdVal = tid,
+            spanIdVal = sid)
         }
     }
   }
@@ -173,12 +175,13 @@ object MetricsStatsReceiver {
           // This line fails without the JsonDeserialize annotation in Envelope.
           val tid = env.traceId.getOrElse(Event.NoTraceId)
           val sid = env.spanId.getOrElse(Event.NoSpanId)
-          Event(this,
-                when,
-                longVal = env.data.delta,
-                objectVal = env.data.name,
-                traceIdVal = tid,
-                spanIdVal = sid)
+          Event(
+            this,
+            when,
+            longVal = env.data.delta,
+            objectVal = env.data.name,
+            traceIdVal = tid,
+            spanIdVal = sid)
         }
     }
   }
@@ -248,8 +251,9 @@ class MetricsStatsReceiver(
 
   // Scope separator, a string value used to separate scopes defined by `StatsReceiver`.
   private[this] val separator: String = scopeSeparator()
-  require(separator.length == 1,
-          s"Scope separator should be one symbol: '$separator'")
+  require(
+    separator.length == 1,
+    s"Scope separator should be one symbol: '$separator'")
 
   override def toString: String = "MetricsStatsReceiver"
 
@@ -272,15 +276,17 @@ class MetricsStatsReceiver(
               if (sink.recording) {
                 if (Trace.hasId) {
                   val traceId = Trace.id
-                  sink.event(CounterIncr,
-                             objectVal = metricsCounter.getName(),
-                             longVal = delta,
-                             traceIdVal = traceId.traceId.self,
-                             spanIdVal = traceId.spanId.self)
+                  sink.event(
+                    CounterIncr,
+                    objectVal = metricsCounter.getName(),
+                    longVal = delta,
+                    traceIdVal = traceId.traceId.self,
+                    spanIdVal = traceId.spanId.self)
                 } else {
-                  sink.event(CounterIncr,
-                             objectVal = metricsCounter.getName(),
-                             longVal = delta)
+                  sink.event(
+                    CounterIncr,
+                    objectVal = metricsCounter.getName(),
+                    longVal = delta)
                 }
               }
             }
@@ -315,15 +321,17 @@ class MetricsStatsReceiver(
               if (sink.recording) {
                 if (Trace.hasId) {
                   val traceId = Trace.id
-                  sink.event(StatAdd,
-                             objectVal = histogram.getName(),
-                             longVal = asLong,
-                             traceIdVal = traceId.traceId.self,
-                             spanIdVal = traceId.spanId.self)
+                  sink.event(
+                    StatAdd,
+                    objectVal = histogram.getName(),
+                    longVal = asLong,
+                    traceIdVal = traceId.traceId.self,
+                    spanIdVal = traceId.spanId.self)
                 } else {
-                  sink.event(StatAdd,
-                             objectVal = histogram.getName(),
-                             longVal = asLong)
+                  sink.event(
+                    StatAdd,
+                    objectVal = histogram.getName(),
+                    longVal = asLong)
                 }
               }
             }

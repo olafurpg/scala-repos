@@ -46,10 +46,11 @@ trait ExternalSourceRootResolution { self: SbtProjectResolver =>
     }
 
     groupSharedRoots(sharedRoots).map { group =>
-      createSourceModuleNodesAndDependencies(group,
-                                             projectToModuleNode,
-                                             libraryNodes,
-                                             moduleFilesDirectory)
+      createSourceModuleNodesAndDependencies(
+        group,
+        projectToModuleNode,
+        libraryNodes,
+        moduleFilesDirectory)
     }
   }
 
@@ -97,18 +98,20 @@ trait ExternalSourceRootResolution { self: SbtProjectResolver =>
 
   private def createSourceModule(group: RootGroup,
                                  moduleFilesDirectory: File): ModuleNode = {
-    val moduleNode = new ModuleNode(SharedSourcesModuleType.instance.getId,
-                                    group.name,
-                                    group.name,
-                                    moduleFilesDirectory.path,
-                                    group.base.canonicalPath)
+    val moduleNode = new ModuleNode(
+      SharedSourcesModuleType.instance.getId,
+      group.name,
+      group.name,
+      moduleFilesDirectory.path,
+      group.base.canonicalPath)
 
     val contentRootNode = {
       val node = new ContentRootNode(group.base.path)
 
       group.roots.foreach { root =>
-        node.storePath(scopeAndKindToSourceType(root.scope, root.kind),
-                       root.directory.path)
+        node.storePath(
+          scopeAndKindToSourceType(root.scope, root.kind),
+          root.directory.path)
       }
 
       node

@@ -22,8 +22,9 @@ class WrappedArrayTest extends FunSuite {
         implicitly[FastTypeTag[WrappedArray.ofRef[AnyRef]]]
 
       def pickle(coll: WrappedArray.ofRef[AnyRef], builder: PBuilder): Unit = {
-        builder.beginEntry(coll,
-                           implicitly[FastTypeTag[WrappedArray.ofRef[AnyRef]]])
+        builder.beginEntry(
+          coll,
+          implicitly[FastTypeTag[WrappedArray.ofRef[AnyRef]]])
 
         builder.beginCollection(coll.size)
         coll.foreach { (elem: AnyRef) =>

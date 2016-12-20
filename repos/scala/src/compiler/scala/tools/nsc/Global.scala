@@ -923,12 +923,13 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
             else new MergedClassPath(elems, recursiveClassPath.context)
           val oldEntries = mkClassPath(subst.keys)
           val newEntries = mkClassPath(subst.values)
-          mergeNewEntries(newEntries,
-                          RootClass,
-                          Some(recursiveClassPath),
-                          Some(oldEntries),
-                          invalidated,
-                          failed)
+          mergeNewEntries(
+            newEntries,
+            RootClass,
+            Some(recursiveClassPath),
+            Some(oldEntries),
+            invalidated,
+            failed)
         }
     }
     def show(msg: String, syms: scala.collection.Traversable[Symbol]) =
@@ -996,16 +997,18 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
             (root.info decl pname) orElse {
               // package does not exist in symbol table, create symbol to track it
               assert(!subPackage(oldEntries.get, pstr).isDefined)
-              loaders.enterPackage(root,
-                                   pstr,
-                                   new loaders.PackageLoader(allEntries.get))
+              loaders.enterPackage(
+                root,
+                pstr,
+                new loaders.PackageLoader(allEntries.get))
             }
-          mergeNewEntries(subPackage(newEntries, pstr).get,
-                          pkg.moduleClass.asClass,
-                          subPackage(allEntries.get, pstr),
-                          subPackage(oldEntries.get, pstr),
-                          invalidated,
-                          failed)
+          mergeNewEntries(
+            subPackage(newEntries, pstr).get,
+            pkg.moduleClass.asClass,
+            subPackage(allEntries.get, pstr),
+            subPackage(oldEntries.get, pstr),
+            invalidated,
+            failed)
         }
     }
   }
@@ -1128,9 +1131,10 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
           xs.zipWithIndex map {
             case (line, idx) => f"${start + idx}%6d $line"
           }
-        strs.mkString("== Source file context for tree position ==\n\n",
-                      "\n",
-                      "")
+        strs.mkString(
+          "== Source file context for tree position ==\n\n",
+          "\n",
+          "")
       } catch {
         case t: Exception => devWarning("" + t); "<Cannot read source file>"
       }
@@ -1499,14 +1503,16 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
         }
       }
       if (settings.Xshowcls.isSetByUser)
-        showDef(splitClassAndPhase(settings.Xshowcls.value, term = false),
-                declsOnly = false,
-                globalPhase)
+        showDef(
+          splitClassAndPhase(settings.Xshowcls.value, term = false),
+          declsOnly = false,
+          globalPhase)
 
       if (settings.Xshowobj.isSetByUser)
-        showDef(splitClassAndPhase(settings.Xshowobj.value, term = true),
-                declsOnly = false,
-                globalPhase)
+        showDef(
+          splitClassAndPhase(settings.Xshowobj.value, term = true),
+          declsOnly = false,
+          globalPhase)
     }
 
     // Similarly, this will only be created under -Yshow-syms.
@@ -1695,9 +1701,10 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
   /** We resolve the class/object ambiguity by passing a type/term name.
     */
   def showDef(fullName: Name, declsOnly: Boolean, ph: Phase) = {
-    val boringOwners = Set[Symbol](definitions.AnyClass,
-                                   definitions.AnyRefClass,
-                                   definitions.ObjectClass)
+    val boringOwners = Set[Symbol](
+      definitions.AnyClass,
+      definitions.AnyRefClass,
+      definitions.ObjectClass)
     def phased[T](body: => T): T = exitingPhase(ph)(body)
     def boringMember(sym: Symbol) = boringOwners(sym.owner)
     def symString(sym: Symbol) =

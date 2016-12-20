@@ -22,14 +22,16 @@ private[team] final class DataForm(val captcher: akka.actor.ActorSelection)
   }
 
   val create = Form(
-    mapping(Fields.name,
-            Fields.location,
-            Fields.description,
-            Fields.open,
-            Fields.gameId,
-            Fields.move)(TeamSetup.apply)(TeamSetup.unapply)
-      .verifying("This team already exists",
-                 d => !teamExists(d).awaitSeconds(2))
+    mapping(
+      Fields.name,
+      Fields.location,
+      Fields.description,
+      Fields.open,
+      Fields.gameId,
+      Fields.move)(TeamSetup.apply)(TeamSetup.unapply)
+      .verifying(
+        "This team already exists",
+        d => !teamExists(d).awaitSeconds(2))
       .verifying(captchaFailMessage, validateCaptcha _))
 
   def edit(team: Team) =
@@ -79,9 +81,10 @@ private[team] case class TeamSetup(name: String,
   def isOpen = open == 1
 
   def trim =
-    copy(name = name.trim,
-         location = location map (_.trim) filter (_.nonEmpty),
-         description = description.trim)
+    copy(
+      name = name.trim,
+      location = location map (_.trim) filter (_.nonEmpty),
+      description = description.trim)
 }
 
 private[team] case class TeamEdit(location: Option[String],
@@ -91,8 +94,9 @@ private[team] case class TeamEdit(location: Option[String],
   def isOpen = open == 1
 
   def trim =
-    copy(location = location map (_.trim) filter (_.nonEmpty),
-         description = description.trim)
+    copy(
+      location = location map (_.trim) filter (_.nonEmpty),
+      description = description.trim)
 }
 
 private[team] case class RequestSetup(message: String,

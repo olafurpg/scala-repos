@@ -32,8 +32,9 @@ class Specs2ConfigurationProducer extends {
 with AbstractTestConfigurationProducer {
 
   override def suitePaths =
-    List("org.specs2.specification.SpecificationStructure",
-         "org.specs2.specification.core.SpecificationStructure")
+    List(
+      "org.specs2.specification.SpecificationStructure",
+      "org.specs2.specification.core.SpecificationStructure")
 
   override def findExistingByElement(
       location: Location[_ <: PsiElement],
@@ -60,8 +61,8 @@ with AbstractTestConfigurationProducer {
            element,
            location,
            confFactory,
-           ScalaBundle.message("test.in.scope.specs2.presentable.text",
-                               name))))
+           ScalaBundle
+             .message("test.in.scope.specs2.presentable.text", name))))
     }
 
     val parent: ScTypeDefinition =
@@ -124,9 +125,10 @@ with AbstractTestConfigurationProducer {
         suite =>
           ScalaPsiManager
             .instance(parent.getProject)
-            .getCachedClass(suite,
-                            element.getResolveScope,
-                            ScalaPsiManager.ClassCategory.TYPE))
+            .getCachedClass(
+              suite,
+              element.getResolveScope,
+              ScalaPsiManager.ClassCategory.TYPE))
       .filter(_ != null)
     if (suiteClasses.isEmpty) return false
     val suiteClazz = suiteClasses.head
@@ -168,9 +170,10 @@ with AbstractTestConfigurationProducer {
     val suiteClasses = suitePaths
       .map(
         suite =>
-          psiManager.getCachedClass(suite,
-                                    element.getResolveScope,
-                                    ScalaPsiManager.ClassCategory.TYPE))
+          psiManager.getCachedClass(
+            suite,
+            element.getResolveScope,
+            ScalaPsiManager.ClassCategory.TYPE))
       .filter(_ != null)
     if (suiteClasses.isEmpty) return (null, null)
     val suiteClazz = suiteClasses.head

@@ -57,8 +57,9 @@ abstract class GenIncOptimizer private[optimizer] (
     import factory._
 
     callMethods(LongImpl.RuntimeLongClass, LongImpl.AllIntrinsicMethods) ++ optional(
-      callMethods(LongImpl.RuntimeLongClass,
-                  LongImpl.OptionalIntrinsicMethods)) ++ callMethods(
+      callMethods(
+        LongImpl.RuntimeLongClass,
+        LongImpl.OptionalIntrinsicMethods)) ++ callMethods(
       Definitions.BoxedIntegerClass,
       Seq("compareTo__jl_Byte__I", "compareTo__jl_Short__I")) ++ // #2184
       instantiateClass("jl_NullPointerException", "init___")
@@ -184,8 +185,9 @@ abstract class GenIncOptimizer private[optimizer] (
     assert(!batchMode || (statics.isEmpty && defaults.isEmpty))
     if (!batchMode) {
       for {
-        (containerMap, neededLinkedClasses) <- Seq((statics, neededStatics),
-                                                   (defaults, neededDefaults))
+        (containerMap, neededLinkedClasses) <- Seq(
+          (statics, neededStatics),
+          (defaults, neededDefaults))
       } {
         CollOps.retain(containerMap) { (namespaceName, namespace) =>
           CollOps
@@ -481,9 +483,10 @@ abstract class GenIncOptimizer private[optimizer] (
       // Tag callers with dynamic calls
       val wasInstantiated = isInstantiated
       isInstantiated = linkedClass.hasInstances
-      assert(!(wasInstantiated && !isInstantiated),
-             "(wasInstantiated && !isInstantiated) should have been handled " +
-               "during deletion phase")
+      assert(
+        !(wasInstantiated && !isInstantiated),
+        "(wasInstantiated && !isInstantiated) should have been handled " +
+          "during deletion phase")
 
       if (isInstantiated) {
         if (wasInstantiated) {
@@ -924,9 +927,10 @@ abstract class GenIncOptimizer private[optimizer] (
     def process(): Unit = if (!_deleted) {
       val rawOptimizedDef = new Optimizer().optimize(thisType, originalDef)
       lastOutVersion += 1
-      optimizedMethodDef = new LinkedMember(rawOptimizedDef.info,
-                                            rawOptimizedDef.tree,
-                                            Some(lastOutVersion.toString))
+      optimizedMethodDef = new LinkedMember(
+        rawOptimizedDef.info,
+        rawOptimizedDef.tree,
+        Some(lastOutVersion.toString))
       resetTag()
     }
 
@@ -957,8 +961,8 @@ abstract class GenIncOptimizer private[optimizer] (
           .fold {
             // If it's not a class, it must be a call to a default intf method
             val defaultsNS = defaults(className)
-            MethodImpl.this.registerStaticCall(defaultsNS.myInterface,
-                                               methodName)
+            MethodImpl.this
+              .registerStaticCall(defaultsNS.myInterface, methodName)
             defaultsNS.methods.get(methodName)
           } { clazz =>
             MethodImpl.this.registerStaticCall(clazz.myInterface, methodName)

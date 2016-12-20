@@ -89,10 +89,11 @@ private[spark] object TreePoint {
     val arr = new Array[Int](numFeatures)
     var featureIndex = 0
     while (featureIndex < numFeatures) {
-      arr(featureIndex) = findBin(featureIndex,
-                                  labeledPoint,
-                                  featureArity(featureIndex),
-                                  thresholds(featureIndex))
+      arr(featureIndex) = findBin(
+        featureIndex,
+        labeledPoint,
+        featureArity(featureIndex),
+        thresholds(featureIndex))
       featureIndex += 1
     }
     new TreePoint(labeledPoint.label, arr)

@@ -143,10 +143,11 @@ class HealthCheckActor(
       scheduleNextHealthCheck()
 
     case result: HealthResult if result.version == app.version =>
-      log.info("Received health result for app [{}] version [{}]: [{}]",
-               app.id,
-               app.version,
-               result)
+      log.info(
+        "Received health result for app [{}] version [{}]: [{}]",
+        app.id,
+        app.version,
+        result)
       val taskId = result.taskId
       val health = taskHealth.getOrElse(taskId, Health(taskId))
 
@@ -175,10 +176,11 @@ class HealthCheckActor(
 
       if (health.alive != newHealth.alive) {
         eventBus.publish(
-          HealthStatusChanged(appId = app.id,
-                              taskId = taskId,
-                              version = result.version,
-                              alive = newHealth.alive)
+          HealthStatusChanged(
+            appId = app.id,
+            taskId = taskId,
+            version = result.version,
+            alive = newHealth.alive)
         )
       }
 

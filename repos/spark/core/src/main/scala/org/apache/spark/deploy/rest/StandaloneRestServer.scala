@@ -176,11 +176,12 @@ private[rest] class StandaloneSubmitRequestServlet(
     val actualDriverCores = driverCores.map(_.toInt).getOrElse(DEFAULT_CORES)
     val actualSuperviseDriver =
       superviseDriver.map(_.toBoolean).getOrElse(DEFAULT_SUPERVISE)
-    new DriverDescription(appResource,
-                          actualDriverMemory,
-                          actualDriverCores,
-                          actualSuperviseDriver,
-                          command)
+    new DriverDescription(
+      appResource,
+      actualDriverMemory,
+      actualDriverCores,
+      actualSuperviseDriver,
+      command)
   }
 
   /**

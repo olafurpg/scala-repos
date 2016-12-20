@@ -367,9 +367,10 @@ object UnrolledBuffer extends ClassTagTraversableFactory[UnrolledBuffer] {
     override def toString =
       array
         .take(size)
-        .mkString("Unrolled@%08x".format(System.identityHashCode(this)) + "[" +
-                    size + "/" + array.length + "](",
-                  ", ",
-                  ")") + " -> " + (if (next ne null) next.toString else "")
+        .mkString(
+          "Unrolled@%08x".format(System.identityHashCode(this)) + "[" +
+            size + "/" + array.length + "](",
+          ", ",
+          ")") + " -> " + (if (next ne null) next.toString else "")
   }
 }

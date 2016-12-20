@@ -15,8 +15,9 @@ sealed trait AbstractJSDep {
 
   def %(configurations: Configuration): AbstractJSDep = %(configurations.name)
   def %(configurations: String): AbstractJSDep = {
-    require(this.configurations.isEmpty,
-            "Configurations already specified for jsModule " + this)
+    require(
+      this.configurations.isEmpty,
+      "Configurations already specified for jsModule " + this)
     nonEmpty(configurations, "Configurations")
     withConfigs(Some(configurations))
   }

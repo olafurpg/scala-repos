@@ -18,13 +18,14 @@ private[lobby] case class LobbyUser(id: String,
 private[lobby] object LobbyUser {
 
   def make(user: User, blocking: Set[String]) =
-    LobbyUser(id = user.id,
-              username = user.username,
-              troll = user.troll,
-              engine = user.engine,
-              booster = user.booster,
-              ratingMap = user.perfs.ratingMap,
-              blocking = blocking)
+    LobbyUser(
+      id = user.id,
+      username = user.username,
+      troll = user.troll,
+      engine = user.engine,
+      booster = user.booster,
+      ratingMap = user.perfs.ratingMap,
+      blocking = blocking)
 }
 
 private[lobby] case class Member(channel: JsChannel,
@@ -44,10 +45,11 @@ private[lobby] object Member {
             blocking: Set[String],
             uid: String,
             mobile: Boolean): Member =
-    Member(channel = channel,
-           user = user map { LobbyUser.make(_, blocking) },
-           uid = uid,
-           mobile = mobile)
+    Member(
+      channel = channel,
+      user = user map { LobbyUser.make(_, blocking) },
+      uid = uid,
+      mobile = mobile)
 }
 
 private[lobby] case class HookMeta(hookId: Option[String] = None)

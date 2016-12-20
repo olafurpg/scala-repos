@@ -50,13 +50,14 @@ class SyncProducerTest extends KafkaServerTestHarness {
       correlationId: Int = 0,
       clientId: String = SyncProducerConfig.DefaultClientId)
     : ProducerRequest = {
-    TestUtils.produceRequest(topic,
-                             partition,
-                             message,
-                             acks,
-                             timeout,
-                             correlationId,
-                             clientId)
+    TestUtils.produceRequest(
+      topic,
+      partition,
+      message,
+      acks,
+      timeout,
+      correlationId,
+      clientId)
   }
 
   @Test
@@ -73,8 +74,9 @@ class SyncProducerTest extends KafkaServerTestHarness {
         produceRequest(
           "test",
           0,
-          new ByteBufferMessageSet(compressionCodec = NoCompressionCodec,
-                                   messages = new Message(messageBytes)),
+          new ByteBufferMessageSet(
+            compressionCodec = NoCompressionCodec,
+            messages = new Message(messageBytes)),
           acks = 1))
       assertNotNull(response)
     } catch {
@@ -89,8 +91,9 @@ class SyncProducerTest extends KafkaServerTestHarness {
         produceRequest(
           "test",
           0,
-          new ByteBufferMessageSet(compressionCodec = NoCompressionCodec,
-                                   messages = new Message(messageBytes)),
+          new ByteBufferMessageSet(
+            compressionCodec = NoCompressionCodec,
+            messages = new Message(messageBytes)),
           acks = 1))
       assertNotNull(response)
     } catch {
@@ -104,8 +107,9 @@ class SyncProducerTest extends KafkaServerTestHarness {
         produceRequest(
           "test",
           0,
-          new ByteBufferMessageSet(compressionCodec = NoCompressionCodec,
-                                   messages = new Message(messageBytes)),
+          new ByteBufferMessageSet(
+            compressionCodec = NoCompressionCodec,
+            messages = new Message(messageBytes)),
           acks = 1))
       assertNotNull(response)
     } catch {
@@ -144,37 +148,40 @@ class SyncProducerTest extends KafkaServerTestHarness {
       TestUtils.getSyncProducerConfig(server.socketServer.boundPort())
 
     val producer = new SyncProducer(new SyncProducerConfig(props))
-    TestUtils.createTopic(zkUtils,
-                          "test",
-                          numPartitions = 1,
-                          replicationFactor = 1,
-                          servers = servers)
+    TestUtils.createTopic(
+      zkUtils,
+      "test",
+      numPartitions = 1,
+      replicationFactor = 1,
+      servers = servers)
 
     val message1 = new Message(new Array[Byte](configs(0).messageMaxBytes + 1))
-    val messageSet1 = new ByteBufferMessageSet(compressionCodec =
-                                                 NoCompressionCodec,
-                                               messages = message1)
+    val messageSet1 = new ByteBufferMessageSet(
+      compressionCodec = NoCompressionCodec,
+      messages = message1)
     val response1 =
       producer.send(produceRequest("test", 0, messageSet1, acks = 1))
 
     assertEquals(1, response1.status.count(_._2.error != Errors.NONE.code))
-    assertEquals(Errors.MESSAGE_TOO_LARGE.code,
-                 response1.status(TopicAndPartition("test", 0)).error)
+    assertEquals(
+      Errors.MESSAGE_TOO_LARGE.code,
+      response1.status(TopicAndPartition("test", 0)).error)
     assertEquals(-1L, response1.status(TopicAndPartition("test", 0)).offset)
 
     val safeSize =
       configs(0).messageMaxBytes - Message.MinMessageOverhead -
         Message.TimestampLength - MessageSet.LogOverhead - 1
     val message2 = new Message(new Array[Byte](safeSize))
-    val messageSet2 = new ByteBufferMessageSet(compressionCodec =
-                                                 NoCompressionCodec,
-                                               messages = message2)
+    val messageSet2 = new ByteBufferMessageSet(
+      compressionCodec = NoCompressionCodec,
+      messages = message2)
     val response2 =
       producer.send(produceRequest("test", 0, messageSet2, acks = 1))
 
     assertEquals(1, response1.status.count(_._2.error != Errors.NONE.code))
-    assertEquals(Errors.NONE.code,
-                 response2.status(TopicAndPartition("test", 0)).error)
+    assertEquals(
+      Errors.NONE.code,
+      response2.status(TopicAndPartition("test", 0)).error)
     assertEquals(0, response2.status(TopicAndPartition("test", 0)).offset)
   }
 
@@ -192,26 +199,28 @@ class SyncProducerTest extends KafkaServerTestHarness {
 
     // This message will be dropped silently since message size too large.
     producer.send(
-      produceRequest("test",
-                     0,
-                     new ByteBufferMessageSet(
-                       compressionCodec = NoCompressionCodec,
-                       messages = new Message(
-                         new Array[Byte](configs(0).messageMaxBytes + 1))),
-                     acks = 0))
+      produceRequest(
+        "test",
+        0,
+        new ByteBufferMessageSet(
+          compressionCodec = NoCompressionCodec,
+          messages =
+            new Message(new Array[Byte](configs(0).messageMaxBytes + 1))),
+        acks = 0))
 
     // Send another message whose size is large enough to exceed the buffer size so
     // the socket buffer will be flushed immediately;
     // this send should fail since the socket has been closed
     try {
       producer.send(
-        produceRequest("test",
-                       0,
-                       new ByteBufferMessageSet(
-                         compressionCodec = NoCompressionCodec,
-                         messages = new Message(
-                           new Array[Byte](configs(0).messageMaxBytes + 1))),
-                       acks = 0))
+        produceRequest(
+          "test",
+          0,
+          new ByteBufferMessageSet(
+            compressionCodec = NoCompressionCodec,
+            messages =
+              new Message(new Array[Byte](configs(0).messageMaxBytes + 1))),
+          acks = 0))
     } catch {
       case e: java.io.IOException => // success
       case e2: Throwable => throw e2
@@ -260,16 +269,19 @@ class SyncProducerTest extends KafkaServerTestHarness {
     assertEquals(3, response2.status.size)
 
     // the first and last message should have been accepted by broker
-    assertEquals(Errors.NONE.code,
-                 response2.status(TopicAndPartition("topic1", 0)).error)
-    assertEquals(Errors.NONE.code,
-                 response2.status(TopicAndPartition("topic3", 0)).error)
+    assertEquals(
+      Errors.NONE.code,
+      response2.status(TopicAndPartition("topic1", 0)).error)
+    assertEquals(
+      Errors.NONE.code,
+      response2.status(TopicAndPartition("topic3", 0)).error)
     assertEquals(0, response2.status(TopicAndPartition("topic1", 0)).offset)
     assertEquals(0, response2.status(TopicAndPartition("topic3", 0)).offset)
 
     // the middle message should have been rejected because broker doesn't lead partition
-    assertEquals(Errors.UNKNOWN_TOPIC_OR_PARTITION.code,
-                 response2.status(TopicAndPartition("topic2", 0)).error)
+    assertEquals(
+      Errors.UNKNOWN_TOPIC_OR_PARTITION.code,
+      response2.status(TopicAndPartition("topic2", 0)).error)
     assertEquals(-1, response2.status(TopicAndPartition("topic2", 0)).offset)
   }
 
@@ -345,11 +357,13 @@ class SyncProducerTest extends KafkaServerTestHarness {
       produceRequest(
         topicName,
         0,
-        new ByteBufferMessageSet(compressionCodec = NoCompressionCodec,
-                                 messages = new Message(messageBytes)),
+        new ByteBufferMessageSet(
+          compressionCodec = NoCompressionCodec,
+          messages = new Message(messageBytes)),
         -1))
 
-    assertEquals(Errors.NOT_ENOUGH_REPLICAS.code,
-                 response.status(TopicAndPartition(topicName, 0)).error)
+    assertEquals(
+      Errors.NOT_ENOUGH_REPLICAS.code,
+      response.status(TopicAndPartition(topicName, 0)).error)
   }
 }

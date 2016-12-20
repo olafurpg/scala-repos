@@ -24,17 +24,18 @@ object UnapplyTest extends SpecLite {
   }
 
   object unapplyProduct {
-    val ue = UnapplyProduct[Applicative,
-                            Writer[IList[String], Int],
-                            Writer[IList[String], Char]]
+    val ue = UnapplyProduct[
+      Applicative,
+      Writer[IList[String], Int],
+      Writer[IList[String], Char]]
     def mequiv[A] = implicitly[ue.M[A] === Writer[IList[String], A]]
     implicitly[ue.A === Int]
     implicitly[ue.B === Char]
 
     // needs only transient stable type
-    UnapplyProduct[Applicative,
-                   Writer[IList[String], Int],
-                   Writer[IList[String], Char]].TC: Applicative[
-      Writer[IList[String], ?]]
+    UnapplyProduct[
+      Applicative,
+      Writer[IList[String], Int],
+      Writer[IList[String], Char]].TC: Applicative[Writer[IList[String], ?]]
   }
 }

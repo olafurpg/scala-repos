@@ -127,17 +127,20 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
       else List(Typed(makeXMLseq(pos, children), wildStar))
 
     def pat =
-      Apply(_scala_xml__Elem,
-            List(pre, label, wild, wild) ::: convertToTextPat(children))
+      Apply(
+        _scala_xml__Elem,
+        List(pre, label, wild, wild) ::: convertToTextPat(children))
     def nonpat =
-      New(_scala_xml_Elem,
+      New(
+        _scala_xml_Elem,
+        List(
           List(
-            List(pre,
-                 label,
-                 attrs,
-                 scope,
-                 if (empty) Literal(Constant(true))
-                 else Literal(Constant(false))) ::: starArgs))
+            pre,
+            label,
+            attrs,
+            scope,
+            if (empty) Literal(Constant(true))
+            else Literal(Constant(false))) ::: starArgs))
 
     atPos(pos) { if (isPattern) pat else nonpat }
   }
@@ -177,14 +180,15 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
       case (Some(pre), rest) => (const(pre), const(rest))
       case _ => (wild, const(n))
     }
-    mkXML(pos,
-          isPattern = true,
-          prepat,
-          labpat,
-          null,
-          null,
-          empty = false,
-          args)
+    mkXML(
+      pos,
+      isPattern = true,
+      prepat,
+      labpat,
+      null,
+      null,
+      empty = false,
+      args)
   }
 
   protected def convertToTextPat(t: Tree): Tree = t match {
@@ -249,8 +253,9 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
         case Apply(
             Select(
               New(
-                Select(Select(Select(Ident(nme.ROOTPKG), nme.scala_), nme.xml),
-                       tpnme.Text)),
+                Select(
+                  Select(Select(Ident(nme.ROOTPKG), nme.scala_), nme.xml),
+                  tpnme.Text)),
               nme.CONSTRUCTOR),
             List(uri @ Literal(Constant(_)))) =>
           mkAssign(uri)
@@ -303,10 +308,11 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
 
     lazy val scopeDef =
       ValDef(NoMods, _scope, _scala_xml_NamespaceBinding, Ident(_tmpscope))
-    lazy val tmpScopeDef = ValDef(Modifiers(MUTABLE),
-                                  _tmpscope,
-                                  _scala_xml_NamespaceBinding,
-                                  Ident(_scope))
+    lazy val tmpScopeDef = ValDef(
+      Modifiers(MUTABLE),
+      _tmpscope,
+      _scala_xml_NamespaceBinding,
+      Ident(_scope))
     lazy val metadataDef =
       ValDef(Modifiers(MUTABLE), _md, _scala_xml_MetaData, _scala_xml_Null)
     val makeSymbolicAttrs =

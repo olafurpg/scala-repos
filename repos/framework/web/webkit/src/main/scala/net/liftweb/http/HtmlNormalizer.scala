@@ -205,9 +205,10 @@ private[http] final object HtmlNormalizer {
             case EventAttribute(event, _) =>
               s"on$event"
           }
-          new UnprefixedAttribute(attribute,
-                                  removedAttributes.mkString(" "),
-                                  normalizedAttributes)
+          new UnprefixedAttribute(
+            attribute,
+            removedAttributes.mkString(" "),
+            normalizedAttributes)
 
         case _ =>
           normalizedAttributes
@@ -224,10 +225,10 @@ private[http] final object HtmlNormalizer {
 
         NodeAndEventJs(
           element.copy(
-            attributes =
-              new UnprefixedAttribute("id",
-                                      generatedId,
-                                      attributesIncludingEventsAsData)),
+            attributes = new UnprefixedAttribute(
+              "id",
+              generatedId,
+              attributesIncludingEventsAsData)),
           jsForEventAttributes(generatedId, eventAttributes)
         )
       } else {
@@ -307,8 +308,9 @@ private[http] final object HtmlNormalizer {
 
             soFar
               .append(js)
-              .append(normalizedElement.copy(child = normalizedChildren),
-                      childJs)
+              .append(
+                normalizedElement.copy(child = normalizedChildren),
+                childJs)
 
           case node =>
             soFar.append(node)

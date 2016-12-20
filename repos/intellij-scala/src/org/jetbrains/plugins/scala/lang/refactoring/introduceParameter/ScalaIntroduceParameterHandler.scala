@@ -76,21 +76,23 @@ class ScalaIntroduceParameterHandler
              dataContext: DataContext) {
     if (!file.isInstanceOf[ScalaFile]) return
     if (!ScalaRefactoringUtil.ensureFileWritable(project, file)) {
-      showErrorHint(ScalaBundle.message("file.is.not.writable"),
-                    project,
-                    editor,
-                    REFACTORING_NAME)
+      showErrorHint(
+        ScalaBundle.message("file.is.not.writable"),
+        project,
+        editor,
+        REFACTORING_NAME)
       return
     }
 
     val canBeIntroduced: (ScExpression) => Boolean =
       ScalaRefactoringUtil.checkCanBeIntroduced(_)
-    ScalaRefactoringUtil.afterExpressionChoosing(project,
-                                                 editor,
-                                                 file,
-                                                 dataContext,
-                                                 "Introduce Parameter",
-                                                 canBeIntroduced) {
+    ScalaRefactoringUtil.afterExpressionChoosing(
+      project,
+      editor,
+      file,
+      dataContext,
+      "Introduce Parameter",
+      canBeIntroduced) {
       UsageTrigger.trigger(ScalaBundle.message("introduce.parameter.id"))
       invoke(project, editor, file)
     }
@@ -120,9 +122,10 @@ class ScalaIntroduceParameterHandler
         s"$paramsText $arrow {\n$bodyText\n}"
     }
     val expr = ScalaPsiElementFactory
-      .createExpressionWithContextFromText(funText,
-                                           elems.head.getContext,
-                                           elems.head)
+      .createExpressionWithContextFromText(
+        funText,
+        elems.head.getContext,
+        elems.head)
       .asInstanceOf[ScFunctionExpr]
     val toReturn = IntroduceImplicitParameterIntention
       .createExpressionToIntroduce(expr, withoutParameterTypes = true) match {
@@ -183,9 +186,10 @@ class ScalaIntroduceParameterHandler
       val elems = exprWithTypes match {
         case Some((e, _)) => Seq(e)
         case None =>
-          ScalaRefactoringUtil.selectedElements(editor,
-                                                file.asInstanceOf[ScalaFile],
-                                                trimComments = false)
+          ScalaRefactoringUtil.selectedElements(
+            editor,
+            file.asInstanceOf[ScalaFile],
+            trimComments = false)
       }
 
       val hasWarnings = ScalaRefactoringUtil
@@ -243,12 +247,13 @@ class ScalaIntroduceParameterHandler
       return None
 
     val suggestedName = {
-      val validator = new ScalaVariableValidator(this,
-                                                 project,
-                                                 elems.head,
-                                                 false,
-                                                 methodLike,
-                                                 methodLike)
+      val validator = new ScalaVariableValidator(
+        this,
+        project,
+        elems.head,
+        false,
+        methodLike,
+        methodLike)
       val possibleNames = elems match {
         case Seq(expr: ScExpression) =>
           NameSuggester.suggestNames(expr, validator)
@@ -277,17 +282,18 @@ class ScalaIntroduceParameterHandler
         (Array.empty[TextRange],
          elems.head.getTextRange.union(elems.last.getTextRange))
     }
-    val data = ScalaIntroduceParameterData(methodLike,
-                                           methodToSearchFor,
-                                           elems,
-                                           suggestedName,
-                                           types,
-                                           types(0),
-                                           occurrences,
-                                           mainOcc,
-                                           replaceAll = false,
-                                           argText,
-                                           Some(argClauseText))
+    val data = ScalaIntroduceParameterData(
+      methodLike,
+      methodToSearchFor,
+      elems,
+      suggestedName,
+      types,
+      types(0),
+      occurrences,
+      mainOcc,
+      replaceAll = false,
+      argText,
+      Some(argClauseText))
     Some(data)
   }
 
@@ -301,10 +307,11 @@ class ScalaIntroduceParameterHandler
     var enclosingMethods = new ArrayBuffer[ScMethodLike]
     var elem: PsiElement = expr
     while (elem != null) {
-      val newFun = PsiTreeUtil.getContextOfType(elem,
-                                                true,
-                                                classOf[ScFunctionDefinition],
-                                                classOf[ScClass])
+      val newFun = PsiTreeUtil.getContextOfType(
+        elem,
+        true,
+        classOf[ScFunctionDefinition],
+        classOf[ScClass])
       newFun match {
         case f @ ScFunctionDefinition.withBody(body)
             if PsiTreeUtil.isContextAncestor(body, expr, false) =>
@@ -328,14 +335,15 @@ class ScalaIntroduceParameterHandler
   }
 
   def createDialog(project: Project, data: ScalaIntroduceParameterData) = {
-    val paramInfo = new ScalaParameterInfo(data.paramName,
-                                           -1,
-                                           data.tp,
-                                           project,
-                                           false,
-                                           false,
-                                           data.defaultArg,
-                                           isIntroducedParameter = true)
+    val paramInfo = new ScalaParameterInfo(
+      data.paramName,
+      -1,
+      data.tp,
+      project,
+      false,
+      false,
+      data.defaultArg,
+      isIntroducedParameter = true)
     val descriptor = createMethodDescriptor(data.methodToSearchFor, paramInfo)
     new ScalaIntroduceParameterDialog(project, descriptor, data)
   }
@@ -393,10 +401,11 @@ class ScalaIntroduceParameterHandler
                ApplicationManager.getApplication.isUnitTestMode) {
       action(validEnclosingMethods.head)
     } else {
-      showErrorHint(ScalaBundle.message("cannot.refactor.no.function"),
-                    elem.getProject,
-                    editor,
-                    REFACTORING_NAME)
+      showErrorHint(
+        ScalaBundle.message("cannot.refactor.no.function"),
+        elem.getProject,
+        editor,
+        REFACTORING_NAME)
     }
   }
 

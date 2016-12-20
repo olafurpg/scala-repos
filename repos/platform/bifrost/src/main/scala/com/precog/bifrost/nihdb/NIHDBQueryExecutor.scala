@@ -158,8 +158,10 @@ trait NIHDBQueryExecutorComponent {
 
       val chefs = (1 to yggConfig.howManyChefsInTheKitchen).map { _ =>
         actorSystem.actorOf(
-          Props(Chef(VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
-                     VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
+          Props(
+            Chef(
+              VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
+              VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
       }
       val masterChef =
         actorSystem.actorOf(Props[Chef].withRouter(RoundRobinRouter(chefs)))
@@ -172,24 +174,27 @@ trait NIHDBQueryExecutorComponent {
         extApiKeyFinder,
         extAccountFinder,
         yggConfig.timestampRequiredAfter)
-      val resourceBuilder = new ResourceBuilder(actorSystem,
-                                                clock,
-                                                masterChef,
-                                                yggConfig.cookThreshold,
-                                                storageTimeout)
+      val resourceBuilder = new ResourceBuilder(
+        actorSystem,
+        clock,
+        masterChef,
+        yggConfig.cookThreshold,
+        storageTimeout)
 
       private val projectionsActor = actorSystem.actorOf(
         Props(
-          new PathRoutingActor(yggConfig.dataDir,
-                               storageTimeout.duration,
-                               yggConfig.quiescenceTimeout,
-                               yggConfig.maxOpenPaths,
-                               clock)))
+          new PathRoutingActor(
+            yggConfig.dataDir,
+            storageTimeout.duration,
+            yggConfig.quiescenceTimeout,
+            yggConfig.maxOpenPaths,
+            clock)))
       val ingestSystem = initShardActors(permissionsFinder, projectionsActor)
 
-      private val actorVFS = new ActorVFS(projectionsActor,
-                                          yggConfig.storageTimeout,
-                                          yggConfig.storageTimeout)
+      private val actorVFS = new ActorVFS(
+        projectionsActor,
+        yggConfig.storageTimeout,
+        yggConfig.storageTimeout)
       val vfs = new SecureVFS(actorVFS, permissionsFinder, jobManager, clock)
 
       private val (scheduleStorage, scheduleStorageStoppable) =
@@ -197,11 +202,12 @@ trait NIHDBQueryExecutorComponent {
 
       private val scheduleActor = actorSystem.actorOf(
         Props(
-          new SchedulingActor(jobManager,
-                              permissionsFinder,
-                              scheduleStorage,
-                              platform,
-                              clock)))
+          new SchedulingActor(
+            jobManager,
+            permissionsFinder,
+            scheduleStorage,
+            platform,
+            clock)))
 
       val scheduler =
         new ActorScheduler(scheduleActor, yggConfig.schedulingTimeout)
@@ -257,8 +263,9 @@ trait NIHDBQueryExecutorComponent {
         for {
           _ <- Stoppable.stop(
             Stoppable.fromFuture(
-              gracefulStop(scheduleActor,
-                           yggConfig.schedulingTimeout.duration)(actorSystem)))
+              gracefulStop(
+                scheduleActor,
+                yggConfig.schedulingTimeout.duration)(actorSystem)))
           _ <- Stoppable.stop(
             ingestSystem
               .map(_.stoppable)

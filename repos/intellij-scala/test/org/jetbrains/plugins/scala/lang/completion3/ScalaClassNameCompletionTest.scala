@@ -289,8 +289,9 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
           |}
         """.stripMargin.replaceAll("\r", "").trim()
 
-      completeLookupItem(activeLookup.find(_.getLookupString == "XXXX").get,
-                         '\t')
+      completeLookupItem(
+        activeLookup.find(_.getLookupString == "XXXX").get,
+        '\t')
       checkResultByText(resultText)
     }
   }
@@ -328,8 +329,9 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
           |}
         """.stripMargin.replaceAll("\r", "").trim()
 
-      completeLookupItem(activeLookup.find(_.getLookupString == "XXXX").get,
-                         '\t')
+      completeLookupItem(
+        activeLookup.find(_.getLookupString == "XXXX").get,
+        '\t')
       checkResultByText(resultText)
     }
   }

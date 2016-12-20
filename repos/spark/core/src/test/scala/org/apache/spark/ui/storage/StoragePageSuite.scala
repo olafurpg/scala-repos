@@ -45,12 +45,13 @@ class StoragePageSuite extends SparkFunSuite {
 
     val xmlNodes = storagePage.rddTable(Seq(rdd1, rdd2, rdd3))
 
-    val headers = Seq("RDD Name",
-                      "Storage Level",
-                      "Cached Partitions",
-                      "Fraction Cached",
-                      "Size in Memory",
-                      "Size on Disk")
+    val headers = Seq(
+      "RDD Name",
+      "Storage Level",
+      "Cached Partitions",
+      "Fraction Cached",
+      "Size in Memory",
+      "Size on Disk")
     assert((xmlNodes \\ "th").map(_.text) === headers)
 
     assert((xmlNodes \\ "tr").size === 3)
@@ -102,29 +103,32 @@ class StoragePageSuite extends SparkFunSuite {
   }
 
   test("streamBlockStorageLevelDescriptionAndSize") {
-    val memoryBlock = BlockUIData(StreamBlockId(0, 0),
-                                  "localhost:1111",
-                                  StorageLevel.MEMORY_ONLY,
-                                  memSize = 100,
-                                  diskSize = 0)
+    val memoryBlock = BlockUIData(
+      StreamBlockId(0, 0),
+      "localhost:1111",
+      StorageLevel.MEMORY_ONLY,
+      memSize = 100,
+      diskSize = 0)
     assert(
       ("Memory", 100) === storagePage
         .streamBlockStorageLevelDescriptionAndSize(memoryBlock))
 
-    val memorySerializedBlock = BlockUIData(StreamBlockId(0, 0),
-                                            "localhost:1111",
-                                            StorageLevel.MEMORY_ONLY_SER,
-                                            memSize = 100,
-                                            diskSize = 0)
+    val memorySerializedBlock = BlockUIData(
+      StreamBlockId(0, 0),
+      "localhost:1111",
+      StorageLevel.MEMORY_ONLY_SER,
+      memSize = 100,
+      diskSize = 0)
     assert(
       ("Memory Serialized", 100) === storagePage
         .streamBlockStorageLevelDescriptionAndSize(memorySerializedBlock))
 
-    val diskBlock = BlockUIData(StreamBlockId(0, 0),
-                                "localhost:1111",
-                                StorageLevel.DISK_ONLY,
-                                memSize = 0,
-                                diskSize = 100)
+    val diskBlock = BlockUIData(
+      StreamBlockId(0, 0),
+      "localhost:1111",
+      StorageLevel.DISK_ONLY,
+      memSize = 0,
+      diskSize = 100)
     assert(
       ("Disk", 100) === storagePage.streamBlockStorageLevelDescriptionAndSize(
         diskBlock))
@@ -132,42 +136,47 @@ class StoragePageSuite extends SparkFunSuite {
 
   test("receiverBlockTables") {
     val blocksForExecutor0 = Seq(
-      BlockUIData(StreamBlockId(0, 0),
-                  "localhost:10000",
-                  StorageLevel.MEMORY_ONLY,
-                  memSize = 100,
-                  diskSize = 0),
-      BlockUIData(StreamBlockId(1, 1),
-                  "localhost:10000",
-                  StorageLevel.DISK_ONLY,
-                  memSize = 0,
-                  diskSize = 100)
+      BlockUIData(
+        StreamBlockId(0, 0),
+        "localhost:10000",
+        StorageLevel.MEMORY_ONLY,
+        memSize = 100,
+        diskSize = 0),
+      BlockUIData(
+        StreamBlockId(1, 1),
+        "localhost:10000",
+        StorageLevel.DISK_ONLY,
+        memSize = 0,
+        diskSize = 100)
     )
     val executor0 =
       ExecutorStreamBlockStatus("0", "localhost:10000", blocksForExecutor0)
 
     val blocksForExecutor1 = Seq(
-      BlockUIData(StreamBlockId(0, 0),
-                  "localhost:10001",
-                  StorageLevel.MEMORY_ONLY,
-                  memSize = 100,
-                  diskSize = 0),
-      BlockUIData(StreamBlockId(1, 1),
-                  "localhost:10001",
-                  StorageLevel.MEMORY_ONLY_SER,
-                  memSize = 100,
-                  diskSize = 0)
+      BlockUIData(
+        StreamBlockId(0, 0),
+        "localhost:10001",
+        StorageLevel.MEMORY_ONLY,
+        memSize = 100,
+        diskSize = 0),
+      BlockUIData(
+        StreamBlockId(1, 1),
+        "localhost:10001",
+        StorageLevel.MEMORY_ONLY_SER,
+        memSize = 100,
+        diskSize = 0)
     )
     val executor1 =
       ExecutorStreamBlockStatus("1", "localhost:10001", blocksForExecutor1)
     val xmlNodes = storagePage.receiverBlockTables(Seq(executor0, executor1))
 
     val executorTable = (xmlNodes \\ "table")(0)
-    val executorHeaders = Seq("Executor ID",
-                              "Address",
-                              "Total Size in Memory",
-                              "Total Size on Disk",
-                              "Stream Blocks")
+    val executorHeaders = Seq(
+      "Executor ID",
+      "Address",
+      "Total Size in Memory",
+      "Total Size on Disk",
+      "Stream Blocks")
     assert((executorTable \\ "th").map(_.text) === executorHeaders)
 
     assert((executorTable \\ "tr").size === 2)

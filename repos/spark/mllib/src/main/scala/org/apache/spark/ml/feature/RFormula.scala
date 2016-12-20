@@ -274,11 +274,13 @@ class RFormulaModel private[feature] (
 
   private def checkCanTransform(schema: StructType) {
     val columnNames = schema.map(_.name)
-    require(!columnNames.contains($(featuresCol)),
-            "Features column already exists.")
-    require(!columnNames.contains($(labelCol)) ||
-              schema($(labelCol)).dataType == DoubleType,
-            "Label column already exists and is not of type DoubleType.")
+    require(
+      !columnNames.contains($(featuresCol)),
+      "Features column already exists.")
+    require(
+      !columnNames.contains($(labelCol)) ||
+        schema($(labelCol)).dataType == DoubleType,
+      "Label column already exists and is not of type DoubleType.")
   }
 
   @Since("2.0.0")
@@ -434,9 +436,10 @@ private class VectorAttributeRewriter(
     with MLWritable {
 
   def this(vectorCol: String, prefixesToRewrite: Map[String, String]) =
-    this(Identifiable.randomUID("vectorAttrRewriter"),
-         vectorCol,
-         prefixesToRewrite)
+    this(
+      Identifiable.randomUID("vectorAttrRewriter"),
+      vectorCol,
+      prefixesToRewrite)
 
   override def transform(dataset: DataFrame): DataFrame = {
     val metadata = {

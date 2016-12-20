@@ -82,15 +82,16 @@ case class PartitionedDelimitedSource[P, T](path: String,
   // see sinkFields in PartitionSchemed for other half of this work around.
   override def hdfsScheme = {
     val scheme = HadoopSchemeInstance(
-      new TextDelimited(fields,
-                        null,
-                        skipHeader,
-                        writeHeader,
-                        separator,
-                        strict,
-                        quote,
-                        types,
-                        safe).asInstanceOf[Scheme[_, _, _, _, _]])
+      new TextDelimited(
+        fields,
+        null,
+        skipHeader,
+        writeHeader,
+        separator,
+        strict,
+        quote,
+        types,
+        safe).asInstanceOf[Scheme[_, _, _, _, _]])
     scheme.setSinkFields(fields)
     scheme
   }

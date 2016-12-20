@@ -33,9 +33,10 @@ class AbdicateOnConnectionLossActorTest
       AbdicateOnConnectionLossActor.props(zk, leader))
 
     When("The actor is killed")
-    val disconnected = new WatchedEvent(Watcher.Event.EventType.None,
-                                        Watcher.Event.KeeperState.Disconnected,
-                                        "")
+    val disconnected = new WatchedEvent(
+      Watcher.Event.EventType.None,
+      Watcher.Event.KeeperState.Disconnected,
+      "")
     actor.underlyingActor.watcher.process(disconnected)
 
     Then("Abdication is called")
@@ -49,9 +50,10 @@ class AbdicateOnConnectionLossActorTest
       AbdicateOnConnectionLossActor.props(zk, leader))
 
     When("An event is fired, that is not a disconnected event")
-    val authFailed = new WatchedEvent(Watcher.Event.EventType.None,
-                                      Watcher.Event.KeeperState.AuthFailed,
-                                      "")
+    val authFailed = new WatchedEvent(
+      Watcher.Event.EventType.None,
+      Watcher.Event.KeeperState.AuthFailed,
+      "")
     actor.underlyingActor.watcher.process(authFailed)
 
     Then("Abdication is _NOT_ called")

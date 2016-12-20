@@ -55,11 +55,12 @@ final class LinkerFrontend(
     }
 
     val linkResult = logger.time("Basic Linking") {
-      linker.linkInternal(irFiles,
-                          logger,
-                          preOptimizerRequirements,
-                          config.bypassLinkingErrors,
-                          config.checkIR)
+      linker.linkInternal(
+        irFiles,
+        logger,
+        preOptimizerRequirements,
+        config.bypassLinkingErrors,
+        config.checkIR)
     }
 
     optOptimizer.fold(linkResult) { optimizer =>

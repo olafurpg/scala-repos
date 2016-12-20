@@ -123,9 +123,10 @@ private[deploy] object IvyTestUtils {
         |export("myfunc")
       """.stripMargin
     val nameFile = writeFile(rFilesDir, "NAMESPACE", namespace)
-    Seq(("R/pkg/R/mylib.R", source),
-        ("R/pkg/DESCRIPTION", descFile),
-        ("R/pkg/NAMESPACE", nameFile))
+    Seq(
+      ("R/pkg/R/mylib.R", source),
+      ("R/pkg/DESCRIPTION", descFile),
+      ("R/pkg/NAMESPACE", nameFile))
   }
 
   /** Create a simple testable Class. */
@@ -350,19 +351,21 @@ private[deploy] object IvyTestUtils {
       withPython: Boolean = false,
       withR: Boolean = false): File = {
     val deps = dependencies.map(SparkSubmitUtils.extractMavenCoordinates)
-    val mainRepo = createLocalRepository(artifact,
-                                         deps,
-                                         rootDir,
-                                         useIvyLayout,
-                                         withPython,
-                                         withR)
+    val mainRepo = createLocalRepository(
+      artifact,
+      deps,
+      rootDir,
+      useIvyLayout,
+      withPython,
+      withR)
     deps.foreach { seq =>
       seq.foreach { dep =>
-        createLocalRepository(dep,
-                              None,
-                              Some(mainRepo),
-                              useIvyLayout,
-                              withPython = false)
+        createLocalRepository(
+          dep,
+          None,
+          Some(mainRepo),
+          useIvyLayout,
+          withPython = false)
       }
     }
     mainRepo
@@ -388,12 +391,13 @@ private[deploy] object IvyTestUtils {
       ivySettings: IvySettings = new IvySettings)(f: String => Unit): Unit = {
     val deps = dependencies.map(SparkSubmitUtils.extractMavenCoordinates)
     purgeLocalIvyCache(artifact, deps, ivySettings)
-    val repo = createLocalRepositoryForTests(artifact,
-                                             dependencies,
-                                             rootDir,
-                                             useIvyLayout,
-                                             withPython,
-                                             withR)
+    val repo = createLocalRepositoryForTests(
+      artifact,
+      dependencies,
+      rootDir,
+      useIvyLayout,
+      withPython,
+      withR)
     try {
       f(repo.toURI.toString)
     } finally {

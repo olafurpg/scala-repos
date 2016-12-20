@@ -38,9 +38,10 @@ abstract class JsonCommandSpec(jsonTestTitle: String,
   (jsonTestTitle + " command support") should {
 
     "read valid json" in {
-      post("/valid",
-           body = validJson,
-           headers = Map("Content-Type" -> "application/json")) {
+      post(
+        "/valid",
+        body = validJson,
+        headers = Map("Content-Type" -> "application/json")) {
         status must_== 200
         body must_== "ihavemorethan5chars:5"
       }
@@ -54,18 +55,20 @@ abstract class JsonCommandSpec(jsonTestTitle: String,
     }
 
     "read valid xml" in {
-      post("/valid",
-           body = validXml,
-           headers = Map("Content-Type" -> "application/xml")) {
+      post(
+        "/valid",
+        body = validXml,
+        headers = Map("Content-Type" -> "application/xml")) {
         status must_== 200
         body must_== "ihavemorethan5chars:5"
       }
     }
 
     "read invalid json" in {
-      post("/invalid",
-           body = invalidJson,
-           headers = Map("Content-Type" -> "application/json")) {
+      post(
+        "/invalid",
+        body = invalidJson,
+        headers = Map("Content-Type" -> "application/json")) {
         status must_== 200
         body must_== "OK"
       }
@@ -79,9 +82,10 @@ abstract class JsonCommandSpec(jsonTestTitle: String,
     }
 
     "read invalid xml" in {
-      post("/invalid",
-           body = invalidXml,
-           headers = Map("Content-Type" -> "application/xml")) {
+      post(
+        "/invalid",
+        body = invalidXml,
+        headers = Map("Content-Type" -> "application/xml")) {
         status must_== 200
         body must_== "OK"
       }

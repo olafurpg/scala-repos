@@ -43,9 +43,10 @@ object StatsSampleOneMaster {
       //#singleton-proxy
       system.actorOf(
         ClusterSingletonProxy
-          .props(singletonManagerPath = "/user/statsService",
-                 settings =
-                   ClusterSingletonProxySettings(system).withRole("compute")),
+          .props(
+            singletonManagerPath = "/user/statsService",
+            settings =
+              ClusterSingletonProxySettings(system).withRole("compute")),
         name = "statsServiceProxy")
       //#singleton-proxy
     }

@@ -202,9 +202,10 @@ class Analyzer(
     case CompletionsReq(fileInfo, point, maxResults, caseSens, _reload) =>
       sender ! withExisting(fileInfo) {
         reporter.disable()
-        scalaCompiler.askCompletionsAt(pos(fileInfo, point),
-                                       maxResults,
-                                       caseSens)
+        scalaCompiler.askCompletionsAt(
+          pos(fileInfo, point),
+          maxResults,
+          caseSens)
       }
     case UsesOfSymbolAtPointReq(file, point) =>
       sender ! withExisting(file) {
@@ -232,9 +233,10 @@ class Analyzer(
         scalaCompiler.askLoadedTyped(p.source)
         scalaCompiler.askSymbolInfoAt(p).getOrElse(FalseResponse)
       }
-    case SymbolByNameReq(typeFullName: String,
-                         memberName: Option[String],
-                         signatureString: Option[String]) =>
+    case SymbolByNameReq(
+        typeFullName: String,
+        memberName: Option[String],
+        signatureString: Option[String]) =>
       sender ! scalaCompiler
         .askSymbolByName(typeFullName, memberName, signatureString)
         .getOrElse(FalseResponse)
@@ -242,9 +244,10 @@ class Analyzer(
       val p = pos(file, range)
       scalaCompiler.askLoadedTyped(p.source)
       sender() ! scalaCompiler.askDocSignatureAtPoint(p)
-    case DocUriForSymbolReq(typeFullName: String,
-                            memberName: Option[String],
-                            signatureString: Option[String]) =>
+    case DocUriForSymbolReq(
+        typeFullName: String,
+        memberName: Option[String],
+        signatureString: Option[String]) =>
       sender() ! scalaCompiler
         .askDocSignatureForSymbol(typeFullName, memberName, signatureString)
     case InspectPackageByPathReq(path: String) =>

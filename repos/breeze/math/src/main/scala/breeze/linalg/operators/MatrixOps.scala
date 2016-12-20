@@ -137,19 +137,21 @@ trait MatrixOps extends MatrixGenericOps { this: Matrix.type =>
   @expand.valify
   @expand.exclude(Complex, OpMod)
   @expand.exclude(BigInt, OpPow)
-  implicit def m_m_UpdateOp[@expand.args(Int,
-                                         Double,
-                                         Float,
-                                         Long,
-                                         BigInt,
-                                         Complex) T,
-                            @expand.args(OpAdd,
-                                         OpSub,
-                                         OpMulScalar,
-                                         OpDiv,
-                                         OpSet,
-                                         OpMod,
-                                         OpPow) Op <: OpType](
+  implicit def m_m_UpdateOp[@expand.args(
+                              Int,
+                              Double,
+                              Float,
+                              Long,
+                              BigInt,
+                              Complex) T,
+                            @expand.args(
+                              OpAdd,
+                              OpSub,
+                              OpMulScalar,
+                              OpDiv,
+                              OpSet,
+                              OpMod,
+                              OpPow) Op <: OpType](
       implicit @expand.sequence[Op](
         { _ + _ }, { _ - _ }, { _ * _ }, { _ / _ }, { (a, b) =>
           b
@@ -171,13 +173,14 @@ trait MatrixOps extends MatrixGenericOps { this: Matrix.type =>
     }
 
   @expand
-  implicit def m_m_UpdateOp[@expand.args(OpAdd,
-                                         OpSub,
-                                         OpMulScalar,
-                                         OpDiv,
-                                         OpSet,
-                                         OpMod,
-                                         OpPow) Op <: OpType,
+  implicit def m_m_UpdateOp[@expand.args(
+                              OpAdd,
+                              OpSub,
+                              OpMulScalar,
+                              OpDiv,
+                              OpSet,
+                              OpMod,
+                              OpPow) Op <: OpType,
                             T: Field: Zero: ClassTag](
       implicit @expand.sequence[Op](
         { f.+(_, _) }, { f.-(_, _) }, { f.*(_, _) }, {
@@ -206,20 +209,22 @@ trait MatrixOps extends MatrixGenericOps { this: Matrix.type =>
   @expand.valify
   @expand.exclude(Complex, OpMod)
   @expand.exclude(BigInt, OpPow)
-  implicit def m_s_UpdateOp[@expand.args(Int,
-                                         Double,
-                                         Float,
-                                         Long,
-                                         BigInt,
-                                         Complex) T,
-                            @expand.args(OpAdd,
-                                         OpSub,
-                                         OpMulScalar,
-                                         OpMulMatrix,
-                                         OpDiv,
-                                         OpSet,
-                                         OpMod,
-                                         OpPow) Op <: OpType](
+  implicit def m_s_UpdateOp[@expand.args(
+                              Int,
+                              Double,
+                              Float,
+                              Long,
+                              BigInt,
+                              Complex) T,
+                            @expand.args(
+                              OpAdd,
+                              OpSub,
+                              OpMulScalar,
+                              OpMulMatrix,
+                              OpDiv,
+                              OpSet,
+                              OpMod,
+                              OpPow) Op <: OpType](
       implicit @expand.sequence[Op](
         { _ + _ }, { _ - _ }, { _ * _ }, { _ * _ }, {
           _ / _
@@ -243,13 +248,14 @@ trait MatrixOps extends MatrixGenericOps { this: Matrix.type =>
     }
 
   @expand
-  implicit def m_s_UpdateOp[@expand.args(OpAdd,
-                                         OpSub,
-                                         OpMulScalar,
-                                         OpMulMatrix,
-                                         OpDiv,
-                                         OpMod,
-                                         OpPow) Op <: OpType,
+  implicit def m_s_UpdateOp[@expand.args(
+                              OpAdd,
+                              OpSub,
+                              OpMulScalar,
+                              OpMulMatrix,
+                              OpDiv,
+                              OpMod,
+                              OpPow) Op <: OpType,
                             T: Field: Zero: ClassTag](
       implicit @expand.sequence[Op](
         { f.+(_, _) }, { f.-(_, _) }, { f.*(_, _) }, {
@@ -294,13 +300,14 @@ trait MatrixOps extends MatrixGenericOps { this: Matrix.type =>
   }
 
   @expand
-  implicit def op_M_S[@expand.args(OpAdd,
-                                   OpSub,
-                                   OpMulScalar,
-                                   OpMulMatrix,
-                                   OpDiv,
-                                   OpMod,
-                                   OpPow) Op <: OpType,
+  implicit def op_M_S[@expand.args(
+                        OpAdd,
+                        OpSub,
+                        OpMulScalar,
+                        OpMulMatrix,
+                        OpDiv,
+                        OpMod,
+                        OpPow) Op <: OpType,
                       T: Field: Zero: ClassTag]
 //  (implicit @expand.sequence[Op]({f.+(_,_)}, {f.-(_,_)}, {f.*(_,_)}, {f.*(_,_)}, {f./(_,_)}, {f.%(_,_)},{f.pow(_,_)}) op: Op.Impl2[T,T,T])
     : BinaryRegistry[Matrix[T], T, Op.type, Matrix[T]] = {
@@ -348,13 +355,14 @@ trait MatrixOps extends MatrixGenericOps { this: Matrix.type =>
     }
   }
   @expand
-  implicit def op_S_M[@expand.args(OpAdd,
-                                   OpSub,
-                                   OpMulScalar,
-                                   OpMulMatrix,
-                                   OpDiv,
-                                   OpMod,
-                                   OpPow) Op <: OpType,
+  implicit def op_S_M[@expand.args(
+                        OpAdd,
+                        OpSub,
+                        OpMulScalar,
+                        OpMulMatrix,
+                        OpDiv,
+                        OpMod,
+                        OpPow) Op <: OpType,
                       T: Field: Zero: ClassTag](implicit @expand.sequence[Op]({
     f.+(_, _)
   }, { f.-(_, _) }, { f.*(_, _) }, {

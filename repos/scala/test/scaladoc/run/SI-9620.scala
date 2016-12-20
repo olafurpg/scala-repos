@@ -35,11 +35,13 @@ object Test extends ScaladocModelTest {
     assert(conversions.length == 1, conversions.length + " == 1")
 
     // Assert that the implicit conversion is not "BooShouldNotAppearIsFoo"
-    assert(conversions.head.conversionShortName == "BooLongIsFoo",
-           conversions.head.conversionShortName + " == BooLongIsFoo")
+    assert(
+      conversions.head.conversionShortName == "BooLongIsFoo",
+      conversions.head.conversionShortName + " == BooLongIsFoo")
 
     // Assert that the same for full path
-    assert(conversions.head.conversionQualifiedName == "a.Boo.BooLongIsFoo",
-           conversions.head.conversionQualifiedName + " == a.Boo.BooLongIsFoo")
+    assert(
+      conversions.head.conversionQualifiedName == "a.Boo.BooLongIsFoo",
+      conversions.head.conversionQualifiedName + " == a.Boo.BooLongIsFoo")
   }
 }

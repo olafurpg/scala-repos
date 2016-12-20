@@ -23,13 +23,15 @@ sealed abstract class SingleLineReply extends Reply {
 sealed abstract class MultiLineReply extends Reply
 
 case class StatusReply(message: String) extends SingleLineReply {
-  RequireServerProtocol(message != null && message.length > 0,
-                        "StatusReply had empty message")
+  RequireServerProtocol(
+    message != null && message.length > 0,
+    "StatusReply had empty message")
   override def getMessageTuple() = (RedisCodec.STATUS_REPLY, message)
 }
 case class ErrorReply(message: String) extends SingleLineReply {
-  RequireServerProtocol(message != null && message.length > 0,
-                        "ErrorReply had empty message")
+  RequireServerProtocol(
+    message != null && message.length > 0,
+    "ErrorReply had empty message")
   override def getMessageTuple() = (RedisCodec.ERROR_REPLY, message)
 }
 case class IntegerReply(id: Long) extends SingleLineReply {
@@ -48,22 +50,25 @@ case class EmptyBulkReply() extends MultiLineReply {
 }
 
 case class MBulkReply(messages: List[Reply]) extends MultiLineReply {
-  RequireServerProtocol(messages != null && messages.length > 0,
-                        "Multi-BulkReply had empty message list")
+  RequireServerProtocol(
+    messages != null && messages.length > 0,
+    "Multi-BulkReply had empty message list")
   override def toChannelBuffer =
     RedisCodec.toUnifiedFormat(ReplyFormat.toChannelBuffers(messages))
 }
 case class EmptyMBulkReply() extends MultiLineReply {
   val message = "*0"
   override def toChannelBuffer =
-    ChannelBuffers.wrappedBuffer(RedisCodec.EMPTY_MBULK_REPLY_BA,
-                                 RedisCodec.EOL_DELIMITER_BA)
+    ChannelBuffers.wrappedBuffer(
+      RedisCodec.EMPTY_MBULK_REPLY_BA,
+      RedisCodec.EOL_DELIMITER_BA)
 }
 case class NilMBulkReply() extends MultiLineReply {
   val message = "*-1"
   override def toChannelBuffer =
-    ChannelBuffers.wrappedBuffer(RedisCodec.NIL_MBULK_REPLY_BA,
-                                 RedisCodec.EOL_DELIMITER_BA)
+    ChannelBuffers.wrappedBuffer(
+      RedisCodec.NIL_MBULK_REPLY_BA,
+      RedisCodec.EOL_DELIMITER_BA)
 }
 
 class ReplyCodec extends UnifiedProtocolCodec {
@@ -154,10 +159,10 @@ class ReplyCodec extends UnifiedProtocolCodec {
                     throw new ProtocolError(
                       "Expected EOL after line data and didn't find it")
                   }
-                  decodeMBulkLines(i - 1,
-                                   stack,
-                                   BulkReply(ChannelBuffers.wrappedBuffer(
-                                     byteArray)) :: lines)
+                  decodeMBulkLines(
+                    i - 1,
+                    stack,
+                    BulkReply(ChannelBuffers.wrappedBuffer(byteArray)) :: lines)
                 }
               }
             }
@@ -169,10 +174,12 @@ class ReplyCodec extends UnifiedProtocolCodec {
           case ARG_COUNT_MARKER =>
             decodeMBulkLines(line.drop(1).toLong, (i - 1, lines) :: stack, Nil)
           case INTEGER_REPLY =>
-            decodeMBulkLines(i - 1,
-                             stack,
-                             IntegerReply(NumberFormat.toLong(
-                               BytesToString(line.drop(1).getBytes))) :: lines)
+            decodeMBulkLines(
+              i - 1,
+              stack,
+              IntegerReply(
+                NumberFormat
+                  .toLong(BytesToString(line.drop(1).getBytes))) :: lines)
           case ERROR_REPLY =>
             decodeMBulkLines(
               i - 1,

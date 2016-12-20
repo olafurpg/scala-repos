@@ -39,26 +39,27 @@ class ExpandSums extends Phase {
       val tree3 = tree2 match {
         // Expand multi-column null values in ELSE branches (used by Rep[Option].filter) with correct type
         case IfThenElse(
-            ConstArray(pred,
-                       then1 :@ tpe,
-                       LiteralNode(None) :@ OptionType(
-                         ScalaBaseType.nullType))) =>
+            ConstArray(
+              pred,
+              then1 :@ tpe,
+              LiteralNode(None) :@ OptionType(ScalaBaseType.nullType))) =>
           multi = true
           IfThenElse(ConstArray(pred, then1, buildMultiColumnNone(tpe))) :@ tpe
 
         // Identity OptionFold/OptionApply combination -> remove
-        case OptionFold(from,
-                        LiteralNode(None) :@ OptionType(
-                          ScalaBaseType.nullType),
-                        oa @ OptionApply(Ref(s)),
-                        gen) if s == gen =>
+        case OptionFold(
+            from,
+            LiteralNode(None) :@ OptionType(ScalaBaseType.nullType),
+            oa @ OptionApply(Ref(s)),
+            gen) if s == gen =>
           silentCast(oa.nodeType, from)
 
         // Primitive OptionFold representing GetOrElse -> translate to GetOrElse
-        case OptionFold(from :@ OptionType.Primitive(_),
-                        LiteralNode(v),
-                        Ref(s),
-                        gen) if s == gen =>
+        case OptionFold(
+            from :@ OptionType.Primitive(_),
+            LiteralNode(v),
+            Ref(s),
+            gen) if s == gen =>
           GetOrElse(from, () => v).infer()
 
         // Primitive OptionFold -> translate to null check
@@ -95,9 +96,10 @@ class ExpandSums extends Phase {
               if (left == Disc1) ifDefined
               else
                 IfThenElse(
-                  ConstArray(Library.Not.typed[Boolean](pred),
-                             ifDefined,
-                             ifEmpty2))
+                  ConstArray(
+                    Library.Not.typed[Boolean](pred),
+                    ifDefined,
+                    ifEmpty2))
           }
           n2.infer()
 
@@ -143,14 +145,16 @@ class ExpandSums extends Phase {
       bind: Bind,
       discCandidates: Set[(TypeSymbol, List[TermSymbol])]): Bind = {
     logger.debug("translateJoin", bind)
-    val Bind(bsym,
-             (join @ Join(lsym,
-                          rsym,
-                          left :@ CollectionType(_, leftElemType),
-                          right :@ CollectionType(_, rightElemType),
-                          jt,
-                          on)) :@ CollectionType(cons, elemType),
-             pure) = bind
+    val Bind(
+      bsym,
+      (join @ Join(
+        lsym,
+        rsym,
+        left :@ CollectionType(_, leftElemType),
+        right :@ CollectionType(_, rightElemType),
+        jt,
+        on)) :@ CollectionType(cons, elemType),
+      pure) = bind
     val lComplex = !leftElemType.structural.isInstanceOf[AtomicType]
     val rComplex = !rightElemType.structural.isInstanceOf[AtomicType]
     logger
@@ -213,9 +217,10 @@ class ExpandSums extends Phase {
           (Disc1, false)
       }
       val extend :@ CollectionType(_, extendedElementType) =
-        Bind(extendGen,
-             side,
-             Pure(ProductNode(ConstArray(disc, Ref(extendGen))))).infer()
+        Bind(
+          extendGen,
+          side,
+          Pure(ProductNode(ConstArray(disc, Ref(extendGen))))).infer()
       val sideInCondition =
         Select(Ref(sym) :@ extendedElementType, ElementSymbol(2)).infer()
       val on2 = on
@@ -254,11 +259,12 @@ class ExpandSums extends Phase {
           val protoDisc = Select(ref, ElementSymbol(1)).infer()
           val rest = Select(ref, ElementSymbol(2))
           val disc = IfThenElse(
-            ConstArray(Library.==.typed[Boolean](
-                         silentCast(OptionType(protoDisc.nodeType), protoDisc),
-                         LiteralNode(null)),
-                       DiscNone,
-                       Disc1))
+            ConstArray(
+              Library.==.typed[Boolean](
+                silentCast(OptionType(protoDisc.nodeType), protoDisc),
+                LiteralNode(null)),
+              DiscNone,
+              Disc1))
           ProductNode(ConstArray(disc, rest))
         } else ref
       silentCast(trType(elemType.asInstanceOf[ProductType].children(idx)), v)
@@ -308,8 +314,9 @@ class ExpandSums extends Phase {
       case t @ OptionType.Primitive(_) => t
       case OptionType(ch) =>
         ProductType(
-          ConstArray(ScalaBaseType.optionDiscType.optionType,
-                     toOptionColumns(ch)))
+          ConstArray(
+            ScalaBaseType.optionDiscType.optionType,
+            toOptionColumns(ch)))
       case t => t
     }
     val tpe2 = f(tpe)
@@ -329,9 +336,10 @@ class ExpandSums extends Phase {
   def fuse(n: Node): Node = n match {
     // Option.map
     case IfThenElse(
-        ConstArray(Library.Not(Library.==(disc, LiteralNode(null))),
-                   ProductNode(ConstArray(Disc1, map)),
-                   ProductNode(ConstArray(DiscNone, _)))) =>
+        ConstArray(
+          Library.Not(Library.==(disc, LiteralNode(null))),
+          ProductNode(ConstArray(Disc1, map)),
+          ProductNode(ConstArray(DiscNone, _)))) =>
       ProductNode(ConstArray(disc, map)).infer()
     case n => n
   }
@@ -412,9 +420,10 @@ class ExpandSums extends Phase {
 
       // Optimize null-propagating single-column IfThenElse
       case IfThenElse(
-          ConstArray(Library.==(r, LiteralNode(null)),
-                     Library.SilentCast(LiteralNode(None)),
-                     c @ Library.SilentCast(r2))) if r == r2 =>
+          ConstArray(
+            Library.==(r, LiteralNode(null)),
+            Library.SilentCast(LiteralNode(None)),
+            c @ Library.SilentCast(r2))) if r == r2 =>
         c
 
       // Fix Untyped nulls in else clauses

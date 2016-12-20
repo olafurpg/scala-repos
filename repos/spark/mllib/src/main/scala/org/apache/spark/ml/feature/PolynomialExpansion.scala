@@ -46,10 +46,11 @@ class PolynomialExpansion(override val uid: String)
     * Default: 2
     * @group param
     */
-  val degree = new IntParam(this,
-                            "degree",
-                            "the polynomial degree to expand (>= 1)",
-                            ParamValidators.gtEq(1))
+  val degree = new IntParam(
+    this,
+    "degree",
+    "the polynomial degree to expand (>= 1)",
+    ParamValidators.gtEq(1))
 
   setDefault(degree -> 2)
 
@@ -110,12 +111,13 @@ object PolynomialExpansion extends DefaultParamsReadable[PolynomialExpansion] {
       var i = 0
       var curStart = curPolyIdx
       while (i <= degree && alpha != 0.0) {
-        curStart = expandDense(values,
-                               lastIdx1,
-                               degree - i,
-                               alpha,
-                               polyValues,
-                               curStart)
+        curStart = expandDense(
+          values,
+          lastIdx1,
+          degree - i,
+          alpha,
+          polyValues,
+          curStart)
         i += 1
         alpha *= v
       }
@@ -149,15 +151,16 @@ object PolynomialExpansion extends DefaultParamsReadable[PolynomialExpansion] {
       var curStart = curPolyIdx
       var i = 0
       while (i <= degree && alpha != 0.0) {
-        curStart = expandSparse(indices,
-                                values,
-                                lastIdx1,
-                                lastFeatureIdx1,
-                                degree - i,
-                                alpha,
-                                polyIndices,
-                                polyValues,
-                                curStart)
+        curStart = expandSparse(
+          indices,
+          values,
+          lastIdx1,
+          lastFeatureIdx1,
+          degree - i,
+          alpha,
+          polyIndices,
+          polyValues,
+          curStart)
         i += 1
         alpha *= v
       }
@@ -181,15 +184,16 @@ object PolynomialExpansion extends DefaultParamsReadable[PolynomialExpansion] {
     polyIndices.sizeHint(nnzPolySize - 1)
     val polyValues = mutable.ArrayBuilder.make[Double]
     polyValues.sizeHint(nnzPolySize - 1)
-    expandSparse(sv.indices,
-                 sv.values,
-                 nnz - 1,
-                 sv.size - 1,
-                 degree,
-                 1.0,
-                 polyIndices,
-                 polyValues,
-                 -1)
+    expandSparse(
+      sv.indices,
+      sv.values,
+      nnz - 1,
+      sv.size - 1,
+      degree,
+      1.0,
+      polyIndices,
+      polyValues,
+      -1)
     new SparseVector(polySize - 1, polyIndices.result(), polyValues.result())
   }
 

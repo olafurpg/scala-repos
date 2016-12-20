@@ -156,12 +156,13 @@ object JDBCPlatformSpecEngine extends Logging {
                 }
 
                 val ddlCreate =
-                  "CREATE TABLE %s (%s);".format(tableName,
-                                                 schema
-                                                   .map {
-                                                     case (p, t) => p + " " + t
-                                                   }
-                                                   .mkString(", "))
+                  "CREATE TABLE %s (%s);".format(
+                    tableName,
+                    schema
+                      .map {
+                        case (p, t) => p + " " + t
+                      }
+                      .mkString(", "))
 
                 logger.debug("Create = " + ddlCreate)
 
@@ -240,8 +241,9 @@ trait JDBCPlatformSpecs
     Duration(10, "minutes") // it's just unreasonable to run tests longer than this
 
   implicit val M: Monad[Future] with Comonad[Future] =
-    new blueeyes.bkka.UnsafeFutureComonad(asyncContext,
-                                          yggConfig.maxEvalDuration)
+    new blueeyes.bkka.UnsafeFutureComonad(
+      asyncContext,
+      yggConfig.maxEvalDuration)
 
   val unescapeColumnNames = true
 

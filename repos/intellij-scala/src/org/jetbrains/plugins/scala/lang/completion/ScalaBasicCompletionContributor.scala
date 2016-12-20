@@ -125,9 +125,10 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
               val offsetInString =
                 offset - dummyInterpolated.getTextRange.getStartOffset
               val res = ScalaBasicCompletionContributor
-                .getStartEndPointForInterpolatedString(interpolated,
-                                                       index,
-                                                       offsetInString)
+                .getStartEndPointForInterpolatedString(
+                  interpolated,
+                  index,
+                  offsetInString)
               if (res.isEmpty) return
               val (exprStartInString, endPoint) = res.get
               val stringText = interpolated.getText
@@ -147,9 +148,10 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
 
         //if prefix is capitalized, class name completion is enabled
         val classNameCompletion =
-          shouldRunClassNameCompletion(positionFromParameters(parameters),
-                                       parameters,
-                                       result.getPrefixMatcher)
+          shouldRunClassNameCompletion(
+            positionFromParameters(parameters),
+            parameters,
+            result.getPrefixMatcher)
         val insertedElement: PsiElement = position
         if (!inString && !inInterpolatedString && !ScalaPsiUtil
               .fileContext(insertedElement)
@@ -191,8 +193,8 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
                         ApplicationManager.getApplication.runReadAction(
                           new Computable[Boolean] {
                             def compute: Boolean = {
-                              JavaCompletionUtil.isInExcludedPackage(clazz,
-                                                                     false)
+                              JavaCompletionUtil
+                                .isInExcludedPackage(clazz, false)
                             }
                           })
 
@@ -201,9 +203,10 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
                           clazz.isAnnotationType)) {
                         if (isAfterNew) {
                           val lookupElement =
-                            getLookupElementFromClass(expectedTypesAfterNew,
-                                                      clazz,
-                                                      renamedMap)
+                            getLookupElementFromClass(
+                              expectedTypesAfterNew,
+                              clazz,
+                              renamedMap)
                           addElement(lookupElement)
                         } else {
                           addElement(el)
@@ -234,17 +237,19 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
                           addElement(el)
                         case memb: PsiMember =>
                           if (parameters.getInvocationCount > 1 ||
-                              ResolveUtils.isAccessible(memb,
-                                                        position,
-                                                        forCompletion = true))
+                              ResolveUtils.isAccessible(
+                                memb,
+                                position,
+                                forCompletion = true))
                             addElement(el)
                         case _ => addElement(el)
                       }
                     case memb: PsiMember =>
                       if (parameters.getInvocationCount > 1 ||
-                          ResolveUtils.isAccessible(memb,
-                                                    position,
-                                                    forCompletion = true))
+                          ResolveUtils.isAccessible(
+                            memb,
+                            position,
+                            forCompletion = true))
                         addElement(el)
                     case _ =>
                       addElement(el)
@@ -351,15 +356,18 @@ class ScalaBasicCompletionContributor extends ScalaCompletionContributor {
               }
 
               val newRef =
-                createReferenceWithQualifierType(runtimeQualifierType,
-                                                 ref.getContext,
-                                                 ref)
+                createReferenceWithQualifierType(
+                  runtimeQualifierType,
+                  ref.getContext,
+                  ref)
               newRef match {
                 case refImpl: ScReferenceExpressionImpl =>
-                  refImpl.doResolve(refImpl,
-                                    completionProcessor(refImpl,
-                                                        collectImplicit = true,
-                                                        postProcess))
+                  refImpl.doResolve(
+                    refImpl,
+                    completionProcessor(
+                      refImpl,
+                      collectImplicit = true,
+                      postProcess))
                 case _ =>
               }
             }

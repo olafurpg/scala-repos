@@ -67,8 +67,9 @@ object OrderedSerialization2 {
                                        ordB: Ordering[B]): Ordering[(A, B)] = {
     (ordA, ordB) match {
       case (ordA: OrderedSerialization[_], ordB: OrderedSerialization[_]) =>
-        new OrderedSerialization2(ordA.asInstanceOf[OrderedSerialization[A]],
-                                  ordB.asInstanceOf[OrderedSerialization[B]])
+        new OrderedSerialization2(
+          ordA.asInstanceOf[OrderedSerialization[A]],
+          ordB.asInstanceOf[OrderedSerialization[B]])
       case _ => Ordering.Tuple2(ordA, ordB)
     }
   }

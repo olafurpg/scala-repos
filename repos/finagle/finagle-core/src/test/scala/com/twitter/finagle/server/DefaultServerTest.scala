@@ -40,9 +40,10 @@ class DefaultServerTest extends FunSpec with MockitoSugar {
       }
 
       val server: Server[Try[Int], Try[Int]] =
-        DefaultServer[Try[Int], Try[Int], Try[Int], Try[Int]](name,
-                                                              listener,
-                                                              serviceTransport)
+        DefaultServer[Try[Int], Try[Int], Try[Int], Try[Int]](
+          name,
+          listener,
+          serviceTransport)
 
       val socket = new InetSocketAddress(InetAddress.getLoopbackAddress, 0)
       val factory =
@@ -73,9 +74,10 @@ class DefaultServerTest extends FunSpec with MockitoSugar {
         (_, _) => mockConnHandle
 
       val server: Server[Try[Int], Try[Int]] =
-        DefaultServer[Try[Int], Try[Int], Try[Int], Try[Int]](name,
-                                                              listener,
-                                                              serviceTransport)
+        DefaultServer[Try[Int], Try[Int], Try[Int], Try[Int]](
+          name,
+          listener,
+          serviceTransport)
 
       val socket = new InetSocketAddress(InetAddress.getLoopbackAddress, 0)
       val factory = mock[ServiceFactory[Try[Int], Try[Int]]]
@@ -106,9 +108,10 @@ class DefaultServerTest extends FunSpec with MockitoSugar {
         new SerialServerDispatcher(_, _)
 
       val server: Server[Try[Int], Try[Int]] =
-        DefaultServer[Try[Int], Try[Int], Try[Int], Try[Int]](name,
-                                                              listener,
-                                                              serviceTransport)
+        DefaultServer[Try[Int], Try[Int], Try[Int], Try[Int]](
+          name,
+          listener,
+          serviceTransport)
       val socket = new InetSocketAddress(InetAddress.getLoopbackAddress, 0)
 
       val p = Promise[Try[Int]]

@@ -135,10 +135,9 @@ class BucketedWriteSuite
       val qe = readBack.select(bucketCols.map(col): _*).queryExecution
       val rows = qe.toRdd.map(_.copy()).collect()
       val getBucketId =
-        UnsafeProjection.create(HashPartitioning(
-                                  qe.analyzed.output,
-                                  numBuckets).partitionIdExpression :: Nil,
-                                qe.analyzed.output)
+        UnsafeProjection.create(
+          HashPartitioning(qe.analyzed.output, numBuckets).partitionIdExpression :: Nil,
+          qe.analyzed.output)
 
       for (row <- rows) {
         val actualBucketId = getBucketId(row).getInt(0)
@@ -174,11 +173,12 @@ class BucketedWriteSuite
           .saveAsTable("bucketed_table")
 
         for (i <- 0 until 5) {
-          testBucketing(new File(tableDir, s"i=$i"),
-                        source,
-                        8,
-                        Seq("j"),
-                        Seq("k"))
+          testBucketing(
+            new File(tableDir, s"i=$i"),
+            source,
+            8,
+            Seq("j"),
+            Seq("k"))
         }
       }
     }
@@ -239,10 +239,11 @@ class BucketedWriteSuite
             .saveAsTable("bucketed_table")
 
           for (i <- 0 until 5) {
-            testBucketing(new File(tableDir, s"i=$i"),
-                          source,
-                          8,
-                          Seq("j", "k"))
+            testBucketing(
+              new File(tableDir, s"i=$i"),
+              source,
+              8,
+              Seq("j", "k"))
           }
         }
       }

@@ -45,9 +45,10 @@ class CORSFilter(override protected val corsConfig: CORSConfig = CORSConfig(),
   def this(corsConfig: CORSConfig,
            errorHandler: play.http.HttpErrorHandler,
            pathPrefixes: java.util.List[String])(mat: Materializer) = {
-    this(corsConfig,
-         new JavaHttpErrorHandlerAdapter(errorHandler),
-         Seq(pathPrefixes.toArray.asInstanceOf[Array[String]]: _*))(mat)
+    this(
+      corsConfig,
+      new JavaHttpErrorHandlerAdapter(errorHandler),
+      Seq(pathPrefixes.toArray.asInstanceOf[Array[String]]: _*))(mat)
   }
 
   override protected val logger = Logger(classOf[CORSFilter])

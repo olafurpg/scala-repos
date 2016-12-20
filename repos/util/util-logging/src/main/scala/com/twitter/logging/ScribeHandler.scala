@@ -79,16 +79,17 @@ object ScribeHandler {
       statsReceiver: StatsReceiver = NullStatsReceiver
   ) =
     () =>
-      new ScribeHandler(hostname,
-                        port,
-                        category,
-                        bufferTime,
-                        connectBackoff,
-                        maxMessagesPerTransaction,
-                        maxMessagesToBuffer,
-                        formatter,
-                        level,
-                        statsReceiver)
+      new ScribeHandler(
+        hostname,
+        port,
+        category,
+        bufferTime,
+        connectBackoff,
+        maxMessagesPerTransaction,
+        maxMessagesToBuffer,
+        formatter,
+        level,
+        statsReceiver)
 
   def apply(
       hostname: String,
@@ -101,16 +102,17 @@ object ScribeHandler {
       formatter: Formatter,
       level: Option[Level]
   ): () => ScribeHandler =
-    apply(hostname,
-          port,
-          category,
-          bufferTime,
-          connectBackoff,
-          maxMessagesPerTransaction,
-          maxMessagesToBuffer,
-          formatter,
-          level,
-          NullStatsReceiver)
+    apply(
+      hostname,
+      port,
+      category,
+      bufferTime,
+      connectBackoff,
+      maxMessagesPerTransaction,
+      maxMessagesToBuffer,
+      formatter,
+      level,
+      NullStatsReceiver)
 }
 
 /**
@@ -142,16 +144,17 @@ class ScribeHandler(hostname: String,
       formatter: Formatter,
       level: Option[Level]
   ) =
-    this(hostname,
-         port,
-         category,
-         bufferTime,
-         connectBackoff,
-         maxMessagesPerTransaction,
-         maxMessagesToBuffer,
-         formatter,
-         level,
-         NullStatsReceiver)
+    this(
+      hostname,
+      port,
+      category,
+      bufferTime,
+      connectBackoff,
+      maxMessagesPerTransaction,
+      maxMessagesToBuffer,
+      formatter,
+      level,
+      NullStatsReceiver)
 
   private[this] val stats = new ScribeHandlerStats(statsReceiver)
 
@@ -179,13 +182,14 @@ class ScribeHandler(hostname: String,
     // should be 1, but this is a crude form of retry
     val queue = new ArrayBlockingQueue[Runnable](5)
     val rejectionHandler = new ThreadPoolExecutor.DiscardPolicy()
-    new ThreadPoolExecutor(1,
-                           1,
-                           0L,
-                           TimeUnit.MILLISECONDS,
-                           queue,
-                           threadFactory,
-                           rejectionHandler)
+    new ThreadPoolExecutor(
+      1,
+      1,
+      0L,
+      TimeUnit.MILLISECONDS,
+      queue,
+      threadFactory,
+      rejectionHandler)
   }
 
   private[logging] val queue =
@@ -206,10 +210,11 @@ class ScribeHandler(hostname: String,
             serverType = Unknown
           } catch {
             case e: Exception =>
-              log.error("Unable to open socket to scribe server at %s:%d: %s",
-                        hostname,
-                        port,
-                        e)
+              log.error(
+                "Unable to open socket to scribe server at %s:%d: %s",
+                hostname,
+                port,
+                e)
               stats.incrConnectionFailure()
           }
         } else {

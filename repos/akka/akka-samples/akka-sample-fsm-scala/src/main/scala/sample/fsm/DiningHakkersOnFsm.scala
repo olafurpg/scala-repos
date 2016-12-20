@@ -187,10 +187,11 @@ object DiningHakkersOnFsm {
       (name, i) <- List("Ghosh", "Boner", "Klang", "Krasser", "Manie").zipWithIndex
     } yield
       system.actorOf(
-        Props(classOf[FSMHakker],
-              name,
-              chopsticks(i),
-              chopsticks((i + 1) % 5)))
+        Props(
+          classOf[FSMHakker],
+          name,
+          chopsticks(i),
+          chopsticks((i + 1) % 5)))
 
     hakkers.foreach(_ ! Think)
   }

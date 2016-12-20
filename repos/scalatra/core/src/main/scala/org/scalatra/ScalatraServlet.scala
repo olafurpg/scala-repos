@@ -15,8 +15,9 @@ object ScalatraServlet {
   val RequestPathKey = "org.scalatra.ScalatraServlet.requestPath"
 
   def requestPath(request: HttpServletRequest): String = {
-    require(request != null,
-            "The request can't be null for getting the request path")
+    require(
+      request != null,
+      "The request can't be null for getting the request path")
     def startIndex(r: HttpServletRequest) =
       r.getContextPath.blankOption.map(_.length).getOrElse(0) +
         r.getServletPath.blankOption.map(_.length).getOrElse(0)
@@ -76,8 +77,9 @@ trait ScalatraServlet extends HttpServlet with ServletBase with Initializable {
     ScalatraServlet.requestPath(request)
 
   protected def routeBasePath(implicit request: HttpServletRequest): String = {
-    require(config != null,
-            "routeBasePath requires the servlet to be initialized")
+    require(
+      config != null,
+      "routeBasePath requires the servlet to be initialized")
     require(
       request != null,
       "routeBasePath requires an active request to determine the servlet path")

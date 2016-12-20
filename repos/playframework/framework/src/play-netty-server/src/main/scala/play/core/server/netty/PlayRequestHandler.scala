@@ -149,10 +149,11 @@ private[play] class PlayRequestHandler(val server: NettyServer)
               val processor =
                 WebSocketHandler.messageFlowToFrameProcessor(flow, bufferLimit)
               Future.successful(
-                new DefaultWebSocketHttpResponse(request.getProtocolVersion,
-                                                 HttpResponseStatus.OK,
-                                                 processor,
-                                                 factory))
+                new DefaultWebSocketHttpResponse(
+                  request.getProtocolVersion,
+                  HttpResponseStatus.OK,
+                  processor,
+                  factory))
           }
           .recoverWith {
             case error =>
@@ -212,8 +213,9 @@ private[play] class PlayRequestHandler(val server: NettyServer)
           f.recover {
             case error: Exception =>
               logger.error("Exception caught in channelRead future", error)
-              sendSimpleErrorResponse(ctx,
-                                      HttpResponseStatus.SERVICE_UNAVAILABLE)
+              sendSimpleErrorResponse(
+                ctx,
+                HttpResponseStatus.SERVICE_UNAVAILABLE)
           }
         }
     }
@@ -304,9 +306,10 @@ private[play] class PlayRequestHandler(val server: NettyServer)
           val validated =
             ServerResultUtils.validateResult(requestHeader, cleanedResult)
           modelConversion
-            .convertResult(validated,
-                           requestHeader,
-                           request.getProtocolVersion)
+            .convertResult(
+              validated,
+              requestHeader,
+              request.getProtocolVersion)
       }
   }
 

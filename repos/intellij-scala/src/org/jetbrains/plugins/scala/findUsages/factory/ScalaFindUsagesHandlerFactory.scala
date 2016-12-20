@@ -67,10 +67,11 @@ class ScalaFindUsagesHandlerFactory(project: Project)
       def showDialog() {
         val message =
           ScalaBundle.message("find.usages.member.has.supers", name)
-        val result = Messages.showYesNoCancelDialog(element.getProject,
-                                                    message,
-                                                    "Warning",
-                                                    Messages.getQuestionIcon)
+        val result = Messages.showYesNoCancelDialog(
+          element.getProject,
+          message,
+          "Warning",
+          Messages.getQuestionIcon)
         result match {
           case 0 =>
             val elem = supers.last

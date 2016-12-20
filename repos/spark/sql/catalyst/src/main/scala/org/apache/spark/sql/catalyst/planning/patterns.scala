@@ -98,18 +98,20 @@ object PhysicalOperation extends PredicateHelper {
         aliases
           .get(ref)
           .map(
-            Alias(_, name)(a.exprId,
-                           a.qualifiers,
-                           isGenerated = a.isGenerated))
+            Alias(_, name)(
+              a.exprId,
+              a.qualifiers,
+              isGenerated = a.isGenerated))
           .getOrElse(a)
 
       case a: AttributeReference =>
         aliases
           .get(a)
           .map(
-            Alias(_, a.name)(a.exprId,
-                             a.qualifiers,
-                             isGenerated = a.isGenerated))
+            Alias(_, a.name)(
+              a.exprId,
+              a.qualifiers,
+              isGenerated = a.isGenerated))
           .getOrElse(a)
     }
   }
@@ -204,8 +206,9 @@ object ExtractFiltersAndInnerJoins extends PredicateHelper {
         val (plans, conditions) = flattenJoin(left)
         (plans ++ Seq(right), conditions ++ cond.toSeq)
 
-      case Filter(filterCondition,
-                  j @ Join(left, right, Inner, joinCondition)) =>
+      case Filter(
+          filterCondition,
+          j @ Join(left, right, Inner, joinCondition)) =>
         val (plans, conditions) = flattenJoin(j)
         (plans, conditions ++ splitConjunctivePredicates(filterCondition))
 

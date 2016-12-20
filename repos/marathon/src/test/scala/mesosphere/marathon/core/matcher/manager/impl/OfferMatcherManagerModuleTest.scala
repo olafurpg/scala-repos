@@ -100,8 +100,9 @@ class OfferMatcherManagerModuleTest
     val matchedTasks: MatchedTaskOps =
       Await.result(matchedTasksFuture, 3.seconds)
     assert(
-      matchedTasks.launchedTaskInfos.toSet == Set(makeOneCPUTask("task1_1"),
-                                                  makeOneCPUTask("task2_1")))
+      matchedTasks.launchedTaskInfos.toSet == Set(
+        makeOneCPUTask("task1_1"),
+        makeOneCPUTask("task2_1")))
   }
 
   for (launchTokens <- Seq(0, 1, 5)) {
@@ -178,11 +179,12 @@ class OfferMatcherManagerModuleTest
     val actorSystem = AlwaysElectedLeadershipModule(shutdownHooks)
     val config = new OfferMatcherManagerConfig {}
     config.afterInit()
-    module = new OfferMatcherManagerModule(clock,
-                                           random,
-                                           new Metrics(new MetricRegistry),
-                                           config,
-                                           actorSystem)
+    module = new OfferMatcherManagerModule(
+      clock,
+      random,
+      new Metrics(new MetricRegistry),
+      config,
+      actorSystem)
   }
 
   /**

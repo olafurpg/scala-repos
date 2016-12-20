@@ -263,8 +263,9 @@ private[streaming] class ReceivedBlockTracker(
     if (isWriteAheadLogEnabled) {
       logTrace(s"Writing record: $record")
       try {
-        writeAheadLogOption.get.write(ByteBuffer.wrap(Utils.serialize(record)),
-                                      clock.getTimeMillis())
+        writeAheadLogOption.get.write(
+          ByteBuffer.wrap(Utils.serialize(record)),
+          clock.getTimeMillis())
         true
       } catch {
         case NonFatal(e) =>

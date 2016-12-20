@@ -68,13 +68,15 @@ class DocFindingSpec
 
         label match {
           case "0" =>
-            sig.scala shouldBe DocSig(DocFqn("scala", "Some"),
-                                      Some("map[B](f:A=>B):Option[B]"))
+            sig.scala shouldBe DocSig(
+              DocFqn("scala", "Some"),
+              Some("map[B](f:A=>B):Option[B]"))
           case "0.5" =>
             sig.scala shouldBe DocSig(DocFqn("scala", "Boolean"), None)
           case "1" =>
-            sig.scala shouldBe DocSig(DocFqn("scala", "Option"),
-                                      Some("isDefined:Boolean"))
+            sig.scala shouldBe DocSig(
+              DocFqn("scala", "Option"),
+              Some("isDefined:Boolean"))
           case "2" =>
             sig.scala shouldBe DocSig(
               DocFqn("scala", "Some"),
@@ -84,34 +86,41 @@ class DocFindingSpec
               DocFqn("scala", "Some"),
               Some("flatten[B](implicitev:<:<[A,Option[B]]):Option[B]"))
           case "4" =>
-            sig.scala shouldBe DocSig(DocFqn("scala", "Some"),
-                                      Some("fold[B](ifEmpty:=>B)(f:A=>B):B"))
+            sig.scala shouldBe DocSig(
+              DocFqn("scala", "Some"),
+              Some("fold[B](ifEmpty:=>B)(f:A=>B):B"))
           case "5" =>
             sig.scala shouldBe DocSig(
               DocFqn("scala", "Some"),
               Some("mkString(start:String,sep:String,end:String):String"))
           case "6" =>
-            sig.scala shouldBe DocSig(DocFqn("scala", "Some"),
-                                      Some("mkString:String"))
+            sig.scala shouldBe DocSig(
+              DocFqn("scala", "Some"),
+              Some("mkString:String"))
           case "7" =>
-            sig.scala shouldBe DocSig(DocFqn("scala", "Some"),
-                                      Some("mkString(sep:String):String"))
+            sig.scala shouldBe DocSig(
+              DocFqn("scala", "Some"),
+              Some("mkString(sep:String):String"))
           case "8" =>
-            sig.scala shouldBe DocSig(DocFqn("scala", "Some"),
-                                      Some("getOrElse[B>:A](default:=>B):B"))
+            sig.scala shouldBe DocSig(
+              DocFqn("scala", "Some"),
+              Some("getOrElse[B>:A](default:=>B):B"))
           case "9" =>
-            sig.scala shouldBe DocSig(DocFqn("scala", "Some"),
-                                      Some("grouped(size:Int):Iterator[Repr]"))
+            sig.scala shouldBe DocSig(
+              DocFqn("scala", "Some"),
+              Some("grouped(size:Int):Iterator[Repr]"))
           case "10" =>
-            sig.scala shouldBe DocSig(DocFqn("scala.collection.immutable",
-                                             "List$"),
-                                      Some("empty[A]:List[A]"))
+            sig.scala shouldBe DocSig(
+              DocFqn("scala.collection.immutable", "List$"),
+              Some("empty[A]:List[A]"))
           case "11" =>
-            sig.java shouldBe DocSig(DocFqn("com.google.common.io", "Files"),
-                                     Some("move(java.io.File, java.io.File)"))
+            sig.java shouldBe DocSig(
+              DocFqn("com.google.common.io", "Files"),
+              Some("move(java.io.File, java.io.File)"))
           case "12" =>
-            sig.java shouldBe DocSig(DocFqn("com.google.common.io", "Files"),
-                                     Some("asByteSource(java.io.File)"))
+            sig.java shouldBe DocSig(
+              DocFqn("com.google.common.io", "Files"),
+              Some("asByteSource(java.io.File)"))
           case "13" =>
             sig.java shouldBe DocSig(
               DocFqn("com.google.common.io", "Files"),
@@ -122,8 +131,9 @@ class DocFindingSpec
               Some(
                 "map(java.io.File, java.nio.channels.FileChannel.MapMode, long)"))
           case "15" =>
-            sig.java shouldBe DocSig(DocFqn("com.google.common.io", "Files"),
-                                     Some("write(byte[], java.io.File)"))
+            sig.java shouldBe DocSig(
+              DocFqn("com.google.common.io", "Files"),
+              Some("write(byte[], java.io.File)"))
           // TODO(fix this hack) - just goes to the class itself if companion
           // constructor is requested.
           case "16" => sig.java shouldBe DocSig(DocFqn("scala", "Some"), None)
@@ -133,31 +143,35 @@ class DocFindingSpec
           case "20" =>
             sig.java shouldBe DocSig(DocFqn("java.io", "File"), None)
           case "21" =>
-            sig.java shouldBe DocSig(DocFqn("java.lang", "Class"),
-                                     Some("isInstance(java.lang.Object)"))
+            sig.java shouldBe DocSig(
+              DocFqn("java.lang", "Class"),
+              Some("isInstance(java.lang.Object)"))
           case "22" =>
-            sig.scala shouldBe DocSig(DocFqn("scala",
-                                             "Predef$$DummyImplicit$"),
-                                      None)
+            sig.scala shouldBe DocSig(
+              DocFqn("scala", "Predef$$DummyImplicit$"),
+              None)
           case "23" =>
             sig.java shouldBe DocSig(DocFqn("java.util", "HashMap"), None)
           case "24" =>
-            sig.java shouldBe DocSig(DocFqn("java.util", "HashMap"),
-                                     Some("entrySet()"))
+            sig.java shouldBe DocSig(
+              DocFqn("java.util", "HashMap"),
+              Some("entrySet()"))
           case "25" =>
             sig.java shouldBe DocSig(DocFqn("java.util", "Map.Entry"), None)
           case "26" =>
             sig.java shouldBe DocSig(DocFqn("java.util", "package"), None)
           case "27" =>
-            sig.java shouldBe DocSig(DocFqn("scala.collection", "package"),
-                                     None)
+            sig.java shouldBe DocSig(
+              DocFqn("scala.collection", "package"),
+              None)
           // TODO: Would be nice to be able to inspect a particular constructor. The problem is that
           // symbolAt returns the type itself when point is in 'File', and it's not totally clear
           // that's wrong.
           //            case "28" => sig.java shouldBe DocSig("java.io.File", Some("File(java.lang.String, java.lang.String)")
           case "28" =>
-            sig.scala shouldBe DocSig(DocFqn("scala", "package"),
-                                      Some("Exception=Exception"))
+            sig.scala shouldBe DocSig(
+              DocFqn("scala", "package"),
+              Some("Exception=Exception"))
 
           // Check @usecase handling.
           case "29" =>

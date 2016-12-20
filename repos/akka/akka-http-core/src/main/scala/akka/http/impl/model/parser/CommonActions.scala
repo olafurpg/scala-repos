@@ -34,16 +34,18 @@ private[parser] trait CommonActions {
             if (params.isEmpty) registered else registered.withParams(params)
           case None ⇒
             if (charsetDefined)
-              MediaType.customWithOpenCharset(mainLower,
-                                              subType,
-                                              params = params,
-                                              allowArbitrarySubtypes = true)
+              MediaType.customWithOpenCharset(
+                mainLower,
+                subType,
+                params = params,
+                allowArbitrarySubtypes = true)
             else
-              MediaType.customBinary(mainLower,
-                                     subType,
-                                     MediaType.Compressible,
-                                     params = params,
-                                     allowArbitrarySubtypes = true)
+              MediaType.customBinary(
+                mainLower,
+                subType,
+                MediaType.Compressible,
+                params = params,
+                allowArbitrarySubtypes = true)
         }
     }
   }

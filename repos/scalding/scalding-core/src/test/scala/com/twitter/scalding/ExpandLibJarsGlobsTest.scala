@@ -13,8 +13,9 @@ class ExpandLibJarsGlobsTest extends WordSpec with Matchers {
   }
 
   def getTmpRoot = {
-    val tmpRoot = new File(System.getProperty("java.io.tmpdir"),
-                           scala.util.Random.nextInt(Int.MaxValue).toString)
+    val tmpRoot = new File(
+      System.getProperty("java.io.tmpdir"),
+      scala.util.Random.nextInt(Int.MaxValue).toString)
     require(tmpRoot.mkdirs(), "Failed to make temporary directory")
     tmpRoot.deleteOnExit()
     tmpRoot

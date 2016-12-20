@@ -33,12 +33,13 @@ object ClientMergeable {
                                                                  V],
       batchesToKeep: Int)(implicit batcher: Batcher,
                           monoid: Semigroup[V]): ClientMergeable[K, V] =
-    new ClientMergeable[K, V](offlineStore,
-                              onlineStore,
-                              batcher,
-                              batchesToKeep,
-                              ClientStore.defaultOnlineKeyFilter[K],
-                              FutureCollector.bestEffort)
+    new ClientMergeable[K, V](
+      offlineStore,
+      onlineStore,
+      batcher,
+      batchesToKeep,
+      ClientStore.defaultOnlineKeyFilter[K],
+      FutureCollector.bestEffort)
 }
 
 /**
@@ -56,12 +57,13 @@ class ClientMergeable[K, V: Semigroup](
     extends Mergeable[(K, BatchID), V] {
 
   def readable: ClientStore[K, V] =
-    new ClientStore(offlineStore,
-                    onlineStore,
-                    batcher,
-                    batchesToKeep,
-                    onlineKeyFilter,
-                    collector)
+    new ClientStore(
+      offlineStore,
+      onlineStore,
+      batcher,
+      batchesToKeep,
+      onlineKeyFilter,
+      collector)
 
   import MergeOperations.FOpt
 

@@ -193,10 +193,11 @@ case class ForbiddenResponse(message: String)
     extends LiftResponse
     with HeaderDefaults {
   def toResponse =
-    InMemoryResponse(message.getBytes("UTF-8"),
-                     "Content-Type" -> "text/plain; charset=utf-8" :: headers,
-                     cookies,
-                     403)
+    InMemoryResponse(
+      message.getBytes("UTF-8"),
+      "Content-Type" -> "text/plain; charset=utf-8" :: headers,
+      cookies,
+      403)
 }
 
 object NotFoundResponse {
@@ -212,10 +213,11 @@ case class NotFoundResponse(message: String)
     extends LiftResponse
     with HeaderDefaults {
   def toResponse =
-    InMemoryResponse(message.getBytes("UTF-8"),
-                     "Content-Type" -> "text/plain; charset=utf-8" :: headers,
-                     cookies,
-                     404)
+    InMemoryResponse(
+      message.getBytes("UTF-8"),
+      "Content-Type" -> "text/plain; charset=utf-8" :: headers,
+      cookies,
+      404)
 }
 
 /**
@@ -311,10 +313,11 @@ case class BadGatewayResponse() extends LiftResponse with HeaderDefaults {
   */
 case class ServiceUnavailableResponse(retryAfter: Long) extends LiftResponse {
   def toResponse =
-    InMemoryResponse(Array(),
-                     List("Retry-After" -> retryAfter.toString),
-                     Nil,
-                     503)
+    InMemoryResponse(
+      Array(),
+      List("Retry-After" -> retryAfter.toString),
+      Nil,
+      503)
 }
 
 object JavaScriptResponse {
@@ -508,9 +511,10 @@ object RedirectResponse {
     * Construct an instnace of RedirectResponse
     */
   def apply(uri: String, cookies: HTTPCookie*): RedirectResponse =
-    new RedirectResponse(uri,
-                         S.request or CurrentReq.box openOr Req.nil,
-                         cookies: _*)
+    new RedirectResponse(
+      uri,
+      S.request or CurrentReq.box openOr Req.nil,
+      cookies: _*)
 }
 
 /**
@@ -520,10 +524,11 @@ case class RedirectResponse(uri: String, request: Req, cookies: HTTPCookie*)
     extends LiftResponse {
   // The Location URI is not resolved here, instead it is resolved with context path prior of sending the actual response
   def toResponse =
-    InMemoryResponse(Array(),
-                     List("Location" -> uri, "Content-Type" -> "text/plain"),
-                     cookies.toList,
-                     302)
+    InMemoryResponse(
+      Array(),
+      List("Location" -> uri, "Content-Type" -> "text/plain"),
+      cookies.toList,
+      302)
 }
 
 /**
@@ -535,9 +540,10 @@ object SeeOtherResponse {
     * Construct an instnace of SeeOtherResponse
     */
   def apply(uri: String, cookies: HTTPCookie*): SeeOtherResponse =
-    new SeeOtherResponse(uri,
-                         S.request or CurrentReq.box openOr Req.nil,
-                         cookies: _*)
+    new SeeOtherResponse(
+      uri,
+      S.request or CurrentReq.box openOr Req.nil,
+      cookies: _*)
 }
 
 /**
@@ -547,10 +553,11 @@ case class SeeOtherResponse(uri: String, request: Req, cookies: HTTPCookie*)
     extends LiftResponse {
   // The Location URI is not resolved here, instead it is resolved with context path prior of sending the actual response
   def toResponse =
-    InMemoryResponse(Array(),
-                     List("Location" -> uri, "Content-Type" -> "text/plain"),
-                     cookies.toList,
-                     303)
+    InMemoryResponse(
+      Array(),
+      List("Location" -> uri, "Content-Type" -> "text/plain"),
+      cookies.toList,
+      303)
 }
 
 object DoRedirectResponse {
@@ -562,10 +569,11 @@ object RedirectWithState {
   def apply(uri: String,
             state: RedirectState,
             cookies: HTTPCookie*): RedirectWithState =
-    this.apply(uri,
-               S.request or CurrentReq.box openOr Req.nil,
-               state,
-               cookies: _*)
+    this.apply(
+      uri,
+      S.request or CurrentReq.box openOr Req.nil,
+      state,
+      cookies: _*)
 
   def apply(uri: String,
             req: Req,
@@ -760,12 +768,13 @@ trait XmlNodeResponse extends LiftResponse {
     def htmlWriter: (Node, Writer) => Unit =
       (n: Node, w: Writer) => {
         val sb = new StringBuilder(64000)
-        AltXML.toXML(n,
-                     scala.xml.TopScope,
-                     sb,
-                     false,
-                     !LiftRules.convertToEntity.vend,
-                     false)
+        AltXML.toXML(
+          n,
+          scala.xml.TopScope,
+          sb,
+          false,
+          !LiftRules.convertToEntity.vend,
+          false)
         w.append(sb)
         w.flush()
       }

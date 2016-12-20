@@ -103,12 +103,13 @@ class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
   def typeDefs = {
     val stub = getStub
     if (stub != null) {
-      stub.getChildrenByType(TokenSet.create(
-                               ScalaElementTypes.OBJECT_DEF,
-                               ScalaElementTypes.CLASS_DEF,
-                               ScalaElementTypes.TRAIT_DEF
-                             ),
-                             JavaArrayFactoryUtil.ScTypeDefinitionFactory)
+      stub.getChildrenByType(
+        TokenSet.create(
+          ScalaElementTypes.OBJECT_DEF,
+          ScalaElementTypes.CLASS_DEF,
+          ScalaElementTypes.TRAIT_DEF
+        ),
+        JavaArrayFactoryUtil.ScTypeDefinitionFactory)
     } else {
       val buffer = new ArrayBuffer[ScTypeDefinition]
       var curr = getFirstChild

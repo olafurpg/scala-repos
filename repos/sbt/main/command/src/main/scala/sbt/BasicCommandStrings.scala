@@ -44,9 +44,10 @@ object BasicCommandStrings {
   def HistoryHelpBrief =
     (HistoryCommands.Start -> "History command help.  Lists and describes all history commands.")
   def historyHelp =
-    Help(Nil,
-         (HistoryHelpBrief +: HistoryCommands.descriptions).toMap,
-         Set(HistoryCommands.Start))
+    Help(
+      Nil,
+      (HistoryHelpBrief +: HistoryCommands.descriptions).toMap,
+      Set(HistoryCommands.Start))
 
   def exitBrief = "Terminates the build."
 

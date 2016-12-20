@@ -153,11 +153,12 @@ private[sql] class SQLListener(conf: SparkConf)
       executorMetricsUpdate: SparkListenerExecutorMetricsUpdate): Unit =
     synchronized {
       for ((taskId, stageId, stageAttemptID, accumUpdates) <- executorMetricsUpdate.accumUpdates) {
-        updateTaskAccumulatorValues(taskId,
-                                    stageId,
-                                    stageAttemptID,
-                                    accumUpdates,
-                                    finishTask = false)
+        updateTaskAccumulatorValues(
+          taskId,
+          stageId,
+          stageAttemptID,
+          accumUpdates,
+          finishTask = false)
       }
     }
 
@@ -177,11 +178,12 @@ private[sql] class SQLListener(conf: SparkConf)
 
   override def onTaskEnd(taskEnd: SparkListenerTaskEnd): Unit = synchronized {
     if (taskEnd.taskMetrics != null) {
-      updateTaskAccumulatorValues(taskEnd.taskInfo.taskId,
-                                  taskEnd.stageId,
-                                  taskEnd.stageAttemptId,
-                                  taskEnd.taskMetrics.accumulatorUpdates(),
-                                  finishTask = true)
+      updateTaskAccumulatorValues(
+        taskEnd.taskInfo.taskId,
+        taskEnd.stageId,
+        taskEnd.stageAttemptId,
+        taskEnd.taskMetrics.accumulatorUpdates(),
+        finishTask = true)
     }
   }
 
@@ -235,23 +237,25 @@ private[sql] class SQLListener(conf: SparkConf)
   }
 
   override def onOtherEvent(event: SparkListenerEvent): Unit = event match {
-    case SparkListenerSQLExecutionStart(executionId,
-                                        description,
-                                        details,
-                                        physicalPlanDescription,
-                                        sparkPlanInfo,
-                                        time) =>
+    case SparkListenerSQLExecutionStart(
+        executionId,
+        description,
+        details,
+        physicalPlanDescription,
+        sparkPlanInfo,
+        time) =>
       val physicalPlanGraph = SparkPlanGraph(sparkPlanInfo)
       val sqlPlanMetrics = physicalPlanGraph.allNodes.flatMap { node =>
         node.metrics.map(metric => metric.accumulatorId -> metric)
       }
-      val executionUIData = new SQLExecutionUIData(executionId,
-                                                   description,
-                                                   details,
-                                                   physicalPlanDescription,
-                                                   physicalPlanGraph,
-                                                   sqlPlanMetrics.toMap,
-                                                   time)
+      val executionUIData = new SQLExecutionUIData(
+        executionId,
+        description,
+        details,
+        physicalPlanDescription,
+        physicalPlanGraph,
+        sqlPlanMetrics.toMap,
+        time)
       synchronized {
         activeExecutions(executionId) = executionUIData
         _executionIdToData(executionId) = executionUIData

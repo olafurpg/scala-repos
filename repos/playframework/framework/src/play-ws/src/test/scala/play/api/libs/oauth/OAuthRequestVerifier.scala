@@ -102,11 +102,12 @@ object OAuthRequestVerifier {
         }
         oauthSignature must beSome.like {
           case signature =>
-            val ourSignature = signParams(method,
-                                          baseUrl,
-                                          collectedParamsWithBody,
-                                          consumerKey.secret,
-                                          requestToken.secret)
+            val ourSignature = signParams(
+              method,
+              baseUrl,
+              collectedParamsWithBody,
+              consumerKey.secret,
+              requestToken.secret)
             signature must_== ourSignature
         }
     }

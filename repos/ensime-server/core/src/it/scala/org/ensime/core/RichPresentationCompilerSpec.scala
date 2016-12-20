@@ -31,17 +31,17 @@ class RichPresentationCompilerThatNeedsJavaLibsSpec
       cc.search.refreshResolver()
       Await.result(cc.search.refresh(), Duration.Inf)
 
-      runForPositionInCompiledSource(config,
-                                     cc,
-                                     "package com.example",
-                                     "import java.io.File@0@") {
-        (p, label, cc) =>
-          val sym = cc.askSymbolInfoAt(p).get
-          inside(sym.declPos) {
-            case Some(LineSourcePosition(f, i)) =>
-              f.parts should contain("File.java")
-              i should be > 0
-          }
+      runForPositionInCompiledSource(
+        config,
+        cc,
+        "package com.example",
+        "import java.io.File@0@") { (p, label, cc) =>
+        val sym = cc.askSymbolInfoAt(p).get
+        inside(sym.declPos) {
+          case Some(LineSourcePosition(f, i)) =>
+            f.parts should contain("File.java")
+            i should be > 0
+        }
       }
     }
   }
@@ -57,20 +57,21 @@ class RichPresentationCompilerSpec
 
   "RichPresentationCompiler" should "round-trip between typeFullName and askTypeInfoByName" in {
     withPresCompiler { (config, cc) =>
-      val file = srcFile(config,
-                         "abc.scala",
-                         contents(
-                           "package com.example",
-                           "object /*1*/A { ",
-                           "   val /*1.1*/x: Int = 1",
-                           "   class  /*1.2*/X {} ",
-                           "   object /*1.3*/X {} ",
-                           "}",
-                           "class  /*2*/A { ",
-                           "   class  /*2.1*/X {} ",
-                           "   object /*2.2*/X {} ",
-                           "}"
-                         ))
+      val file = srcFile(
+        config,
+        "abc.scala",
+        contents(
+          "package com.example",
+          "object /*1*/A { ",
+          "   val /*1.1*/x: Int = 1",
+          "   class  /*1.2*/X {} ",
+          "   object /*1.3*/X {} ",
+          "}",
+          "class  /*2*/A { ",
+          "   class  /*2.1*/X {} ",
+          "   object /*2.2*/X {} ",
+          "}"
+        ))
       cc.askReloadFile(file)
       cc.askLoadedTyped(file)
 
@@ -122,17 +123,17 @@ class RichPresentationCompilerSpec
       cc.search.refreshResolver()
       Await.result(cc.search.refresh(), Duration.Inf)
 
-      runForPositionInCompiledSource(config,
-                                     cc,
-                                     "package com.example",
-                                     "object Bla { val x = 1 @0@+ 1 }") {
-        (p, label, cc) =>
-          val sym = cc.askSymbolInfoAt(p).get
-          inside(sym.declPos) {
-            case Some(OffsetSourcePosition(f, i)) =>
-              f.parts should contain("Int.scala")
-              i should be > 0
-          }
+      runForPositionInCompiledSource(
+        config,
+        cc,
+        "package com.example",
+        "object Bla { val x = 1 @0@+ 1 }") { (p, label, cc) =>
+        val sym = cc.askSymbolInfoAt(p).get
+        inside(sym.declPos) {
+          case Some(OffsetSourcePosition(f, i)) =>
+            f.parts should contain("Int.scala")
+            i should be > 0
+        }
       }
     }
   }
@@ -159,16 +160,17 @@ class RichPresentationCompilerSpec
   it should "jump to case class definition when symbol under cursor is name of case class field" in {
     withPresCompiler { (config, cc) =>
       import ReallyRichPresentationCompilerFixture._
-      runForPositionInCompiledSource(config,
-                                     cc,
-                                     "package com.example",
-                                     "case class Foo(bar: String, baz: Int)",
-                                     "object Bla {",
-                                     "  val foo = Foo(",
-                                     "    b@@ar = \"Bar\",",
-                                     "    baz = 123",
-                                     "  )",
-                                     "}") { (p, label, cc) =>
+      runForPositionInCompiledSource(
+        config,
+        cc,
+        "package com.example",
+        "case class Foo(bar: String, baz: Int)",
+        "object Bla {",
+        "  val foo = Foo(",
+        "    b@@ar = \"Bar\",",
+        "    baz = 123",
+        "  )",
+        "}") { (p, label, cc) =>
         val sym = cc.askSymbolInfoAt(p).get
         sym.name shouldBe "apply"
         sym.localName shouldBe "apply"
@@ -242,96 +244,109 @@ class RichPresentationCompilerSpec
       sym.name should ===(expectedName)
       sym.tpe.declaredAs should ===(expectedDeclAs)
     }
-    verify("java.lang.String",
-           Some("startsWith"),
-           None,
-           "startsWith",
-           "startsWith",
-           DeclaredAs.Nil)
-    verify("java.lang.String",
-           None,
-           None,
-           "String",
-           "java.lang.String",
-           DeclaredAs.Class)
+    verify(
+      "java.lang.String",
+      Some("startsWith"),
+      None,
+      "startsWith",
+      "startsWith",
+      DeclaredAs.Nil)
+    verify(
+      "java.lang.String",
+      None,
+      None,
+      "String",
+      "java.lang.String",
+      DeclaredAs.Class)
     // TODO: should not be getting 'nil for declaredAs.
-    verify("scala.Option",
-           Some("wait"),
-           Some("(x$1: Long,x$2: Int): Unit"),
-           "wait",
-           "wait",
-           DeclaredAs.Nil)
-    verify("scala.Option",
-           Some("wait"),
-           Some("(x$1: Long): Unit"),
-           "wait",
-           "wait",
-           DeclaredAs.Nil)
-    verify("scala.Option",
-           Some("wait"),
-           Some("(): Unit"),
-           "wait",
-           "wait",
-           DeclaredAs.Nil)
-    verify("java$",
-           Some("lang"),
-           None,
-           "lang",
-           "java.lang$",
-           DeclaredAs.Object)
-    verify("scala$",
-           Some("Option$"),
-           None,
-           "Option",
-           "scala.Option$",
-           DeclaredAs.Object)
-    verify("scala$",
-           Some("Option"),
-           None,
-           "Option",
-           "scala.Option",
-           DeclaredAs.Class)
-    verify("scala.Option",
-           Some("WithFilter"),
-           None,
-           "WithFilter",
-           "scala.Option$WithFilter",
-           DeclaredAs.Class)
-    verify("scala.Option$WithFilter",
-           Some("flatMap"),
-           None,
-           "flatMap",
-           "flatMap",
-           DeclaredAs.Nil)
-    verify("scala.Boolean",
-           None,
-           None,
-           "Boolean",
-           "scala.Boolean",
-           DeclaredAs.Class)
-    verify("scala.Predef$",
-           Some("DummyImplicit$"),
-           None,
-           "DummyImplicit",
-           "scala.Predef$$DummyImplicit$",
-           DeclaredAs.Object)
+    verify(
+      "scala.Option",
+      Some("wait"),
+      Some("(x$1: Long,x$2: Int): Unit"),
+      "wait",
+      "wait",
+      DeclaredAs.Nil)
+    verify(
+      "scala.Option",
+      Some("wait"),
+      Some("(x$1: Long): Unit"),
+      "wait",
+      "wait",
+      DeclaredAs.Nil)
+    verify(
+      "scala.Option",
+      Some("wait"),
+      Some("(): Unit"),
+      "wait",
+      "wait",
+      DeclaredAs.Nil)
+    verify(
+      "java$",
+      Some("lang"),
+      None,
+      "lang",
+      "java.lang$",
+      DeclaredAs.Object)
+    verify(
+      "scala$",
+      Some("Option$"),
+      None,
+      "Option",
+      "scala.Option$",
+      DeclaredAs.Object)
+    verify(
+      "scala$",
+      Some("Option"),
+      None,
+      "Option",
+      "scala.Option",
+      DeclaredAs.Class)
+    verify(
+      "scala.Option",
+      Some("WithFilter"),
+      None,
+      "WithFilter",
+      "scala.Option$WithFilter",
+      DeclaredAs.Class)
+    verify(
+      "scala.Option$WithFilter",
+      Some("flatMap"),
+      None,
+      "flatMap",
+      "flatMap",
+      DeclaredAs.Nil)
+    verify(
+      "scala.Boolean",
+      None,
+      None,
+      "Boolean",
+      "scala.Boolean",
+      DeclaredAs.Class)
+    verify(
+      "scala.Predef$",
+      Some("DummyImplicit$"),
+      None,
+      "DummyImplicit",
+      "scala.Predef$$DummyImplicit$",
+      DeclaredAs.Object)
   }
 
   it should "handle askSymbolByName" in withPresCompiler { (config, cc) =>
-    val file = srcFile(config,
-                       "abc.scala",
-                       contents(
-                         "package com.example",
-                         "object A { ",
-                         "   val x: Int = 1",
-                         "   class  X {}",
-                         "   object X {}",
-                         "}",
-                         "class A { ",
-                         "   class  X {}",
-                         "   object X {}",
-                         "}"
-                       ))
+    val file = srcFile(
+      config,
+      "abc.scala",
+      contents(
+        "package com.example",
+        "object A { ",
+        "   val x: Int = 1",
+        "   class  X {}",
+        "   object X {}",
+        "}",
+        "class A { ",
+        "   class  X {}",
+        "   object X {}",
+        "}"
+      ))
     cc.askReloadFile(file)
     cc.askLoadedTyped(file)
 
@@ -353,56 +368,63 @@ class RichPresentationCompilerSpec
       }
     }
 
-    test("com.example$",
-         "A$",
-         "A",
-         "com.example.A$",
-         isType = false,
-         "com.example.A$",
-         DeclaredAs.Object)
-    test("com.example.A$",
-         "x",
-         "x",
-         "x",
-         isType = false,
-         "scala.Int",
-         DeclaredAs.Class)
-    test("com.example.A$",
-         "X$",
-         "X",
-         "com.example.A$$X$",
-         isType = false,
-         "com.example.A$$X$",
-         DeclaredAs.Object)
-    test("com.example.A$",
-         "X",
-         "X",
-         "com.example.A$$X",
-         isType = true,
-         "com.example.A$$X",
-         DeclaredAs.Class)
+    test(
+      "com.example$",
+      "A$",
+      "A",
+      "com.example.A$",
+      isType = false,
+      "com.example.A$",
+      DeclaredAs.Object)
+    test(
+      "com.example.A$",
+      "x",
+      "x",
+      "x",
+      isType = false,
+      "scala.Int",
+      DeclaredAs.Class)
+    test(
+      "com.example.A$",
+      "X$",
+      "X",
+      "com.example.A$$X$",
+      isType = false,
+      "com.example.A$$X$",
+      DeclaredAs.Object)
+    test(
+      "com.example.A$",
+      "X",
+      "X",
+      "com.example.A$$X",
+      isType = true,
+      "com.example.A$$X",
+      DeclaredAs.Class)
 
-    test("com.example$",
-         "A",
-         "A",
-         "com.example.A",
-         isType = true,
-         "com.example.A",
-         DeclaredAs.Class)
-    test("com.example.A",
-         "X$",
-         "X",
-         "com.example.A$X$",
-         isType = false,
-         "com.example.A$X$",
-         DeclaredAs.Object)
-    test("com.example.A",
-         "X",
-         "X",
-         "com.example.A$X",
-         isType = true,
-         "com.example.A$X",
-         DeclaredAs.Class)
+    test(
+      "com.example$",
+      "A",
+      "A",
+      "com.example.A",
+      isType = true,
+      "com.example.A",
+      DeclaredAs.Class)
+    test(
+      "com.example.A",
+      "X$",
+      "X",
+      "com.example.A$X$",
+      isType = false,
+      "com.example.A$X$",
+      DeclaredAs.Object)
+    test(
+      "com.example.A",
+      "X",
+      "X",
+      "com.example.A$X",
+      isType = true,
+      "com.example.A$X",
+      DeclaredAs.Class)
   }
 
   it should "get completions on member with no prefix" in withPosInCompiledSource(
@@ -617,56 +639,58 @@ class RichPresentationCompilerSpec
 
   it should "get symbol positions for compiled files" in withPresCompiler {
     (config, cc) =>
-      val defsFile = srcFile(config,
-                             "com/example/defs.scala",
-                             contents(
-                               "package com.example",
-                               "object /*1*/A { ",
-                               "   val /*1.1*/x: Int = 1",
-                               "   class /*1.2*/X {} ",
-                               "}",
-                               "class  /*2*/B { ",
-                               "   val /*2.1*/y: Int = 1",
-                               "   def /*2.2*/meth(a: String): Int = 1",
-                               "   def /*2.3*/meth(a: Int): Int = 1",
-                               "}",
-                               "trait  /*3*/C { ",
-                               "   val /*3.1*/z: Int = 1",
-                               "   class /*3.2*/Z {}",
-                               "}",
-                               "class /*4*/D extends C { }",
-                               "package object /*5.0*/pkg {",
-                               "   type /*5.1*/A  = java.lang.Error",
-                               "   def /*5.2*/B = 1",
-                               "   val /*5.3*/C = 2",
-                               "   class /*5.4*/D {}",
-                               "   object /*5.5*/E {}",
-                               "}"
-                             ),
-                             write = true)
-      val usesFile = srcFile(config,
-                             "com/example/uses.scala",
-                             contents(
-                               "package com.example",
-                               "object Test { ",
-                               "   val x_1 = A/*1*/",
-                               "   val x_1_1 = A.x/*1.1*/",
-                               "   val x_1_2 = new A.X/*1.2*/",
-                               "   val x_2 = new B/*2*/",
-                               "   val x_2_1 = new B().y/*2.1*/",
-                               "   val x_2_2 = new B().meth/*2.2*/(\"x\")",
-                               "   val x_2_3 = new B().meth/*2.3*/(1)",
-                               "   val x_3: C/*3*/ = new D/*4*/",
-                               "   val x_3_1 = x_3.z/*3.1*/",
-                               "   val x_3_2 = new x_3.Z/*3.2*/",
-                               "   val x_5_0 = pkg.`package`/*5.0*/",
-                               "   var x_5_1: pkg.A/*5.1*/ = null",
-                               "   val x_5_2 = pkg.B/*5.2*/",
-                               "   val x_5_3 = pkg.C/*5.3*/",
-                               "   val x_5_4 = new pkg.D/*5.4*/",
-                               "   val x_5_5 = pkg.E/*5.5*/",
-                               "}"
-                             ))
+      val defsFile = srcFile(
+        config,
+        "com/example/defs.scala",
+        contents(
+          "package com.example",
+          "object /*1*/A { ",
+          "   val /*1.1*/x: Int = 1",
+          "   class /*1.2*/X {} ",
+          "}",
+          "class  /*2*/B { ",
+          "   val /*2.1*/y: Int = 1",
+          "   def /*2.2*/meth(a: String): Int = 1",
+          "   def /*2.3*/meth(a: Int): Int = 1",
+          "}",
+          "trait  /*3*/C { ",
+          "   val /*3.1*/z: Int = 1",
+          "   class /*3.2*/Z {}",
+          "}",
+          "class /*4*/D extends C { }",
+          "package object /*5.0*/pkg {",
+          "   type /*5.1*/A  = java.lang.Error",
+          "   def /*5.2*/B = 1",
+          "   val /*5.3*/C = 2",
+          "   class /*5.4*/D {}",
+          "   object /*5.5*/E {}",
+          "}"
+        ),
+        write = true)
+      val usesFile = srcFile(
+        config,
+        "com/example/uses.scala",
+        contents(
+          "package com.example",
+          "object Test { ",
+          "   val x_1 = A/*1*/",
+          "   val x_1_1 = A.x/*1.1*/",
+          "   val x_1_2 = new A.X/*1.2*/",
+          "   val x_2 = new B/*2*/",
+          "   val x_2_1 = new B().y/*2.1*/",
+          "   val x_2_2 = new B().meth/*2.2*/(\"x\")",
+          "   val x_2_3 = new B().meth/*2.3*/(1)",
+          "   val x_3: C/*3*/ = new D/*4*/",
+          "   val x_3_1 = x_3.z/*3.1*/",
+          "   val x_3_2 = new x_3.Z/*3.2*/",
+          "   val x_5_0 = pkg.`package`/*5.0*/",
+          "   var x_5_1: pkg.A/*5.1*/ = null",
+          "   val x_5_2 = pkg.B/*5.2*/",
+          "   val x_5_3 = pkg.C/*5.3*/",
+          "   val x_5_4 = new pkg.D/*5.4*/",
+          "   val x_5_5 = pkg.E/*5.5*/",
+          "}"
+        ))
 
       def test(label: String, cc: RichPresentationCompiler) = {
         val comment = "/*" + label + "*/"
@@ -679,12 +703,13 @@ class RichPresentationCompilerSpec
         // which changes its state.
 
         implicit val ensimeVFS = EnsimeVFS()
-        val cc1 = new RichPresentationCompiler(cc.config,
-                                               cc.settings,
-                                               cc.reporter,
-                                               cc.parent,
-                                               cc.indexer,
-                                               cc.search)
+        val cc1 = new RichPresentationCompiler(
+          cc.config,
+          cc.settings,
+          cc.reporter,
+          cc.parent,
+          cc.indexer,
+          cc.search)
 
         try {
           cc1.askReloadFile(usesFile)

@@ -164,8 +164,9 @@ class FlagTest extends FunSuite {
 
     flag.finishParsing()
     assert(!allFlags.exists(_() == 1), "original flag was not overridden")
-    assert(allFlags.exists(_() == 2),
-           "overriding flag was not present in flags set")
+    assert(
+      allFlags.exists(_() == 2),
+      "overriding flag was not present in flags set")
   }
 
   test("Flag: let") {
@@ -377,17 +378,19 @@ class FlagTest extends FunSuite {
     val flagWithGlobal = new Flags("my", includeGlobal = true)
     flagWithGlobal("unset.local.flag", "a flag!", "this is a local flag")
     flagWithGlobal("set.local.flag", "a flag!", "this is a local flag")
-    flagWithGlobal("flag.with.single.quote",
-                   "i'm so cool",
-                   "why would you do this?")
+    flagWithGlobal(
+      "flag.with.single.quote",
+      "i'm so cool",
+      "why would you do this?")
     flagWithGlobal.parseArgs(Array("-set.local.flag=hi"))
 
     val flagWithoutGlobal = new Flags("my", includeGlobal = false)
     flagWithoutGlobal("unset.local.flag", "a flag!", "this is a local flag")
     flagWithoutGlobal("set.local.flag", "a flag!", "this is a local flag")
-    flagWithoutGlobal("flag.with.single.quote",
-                      "i'm so cool",
-                      "why would you do this?")
+    flagWithoutGlobal(
+      "flag.with.single.quote",
+      "i'm so cool",
+      "why would you do this?")
     flagWithoutGlobal.parseArgs(Array("-set.local.flag=hi"))
 
     val localOnly = """|Set flags:

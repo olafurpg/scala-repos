@@ -91,12 +91,14 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
   def render(request: HttpServletRequest): Seq[Node] = {
     progressListener.synchronized {
       val parameterId = request.getParameter("id")
-      require(parameterId != null && parameterId.nonEmpty,
-              "Missing id parameter")
+      require(
+        parameterId != null && parameterId.nonEmpty,
+        "Missing id parameter")
 
       val parameterAttempt = request.getParameter("attempt")
-      require(parameterAttempt != null && parameterAttempt.nonEmpty,
-              "Missing attempt parameter")
+      require(
+        parameterAttempt != null && parameterAttempt.nonEmpty,
+        "Missing attempt parameter")
 
       val parameterTaskPage = request.getParameter("task.page")
       val parameterTaskSortColumn = request.getParameter("task.sort")
@@ -277,9 +279,10 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
           case _ => Seq.empty[Node]
         }
       }
-      val accumulableTable = UIUtils.listingTable(accumulableHeaders,
-                                                  accumulableRow,
-                                                  externalAccumulables.toSeq)
+      val accumulableTable = UIUtils.listingTable(
+        accumulableHeaders,
+        accumulableRow,
+        externalAccumulables.toSeq)
 
       val page: Int = {
         // If the user has changed to a larger page size, then go to page 1 in order to avoid
@@ -611,21 +614,23 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
             else Nil
           )
 
-          val quantileHeaders = Seq("Metric",
-                                    "Min",
-                                    "25th percentile",
-                                    "Median",
-                                    "75th percentile",
-                                    "Max")
+          val quantileHeaders = Seq(
+            "Metric",
+            "Min",
+            "25th percentile",
+            "Median",
+            "75th percentile",
+            "Max")
           // The summary table does not use CSS to stripe rows, which doesn't work with hidden
           // rows (instead, JavaScript in table.js is used to stripe the non-hidden rows).
           Some(
-            UIUtils.listingTable(quantileHeaders,
-                                 identity[Seq[Node]],
-                                 listings,
-                                 fixedWidth = true,
-                                 id = Some("task-summary-table"),
-                                 stripeRowsWithCss = false))
+            UIUtils.listingTable(
+              quantileHeaders,
+              identity[Seq[Node]],
+              listings,
+              fixedWidth = true,
+              id = Some("task-summary-table"),
+              stripeRowsWithCss = false))
         }
 
       val executorTable = new ExecutorTable(stageId, stageAttemptId, parent)
@@ -640,10 +645,11 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
           stageData.taskData.values.toSeq.filter(t =>
             taskIdsInPage.contains(t.taskInfo.taskId)),
           currentTime) ++ <h4>Summary Metrics for {numCompleted} Completed Tasks</h4> ++ <div>{summaryTable.getOrElse("No tasks have reported metrics yet.")}</div> ++ <h4>Aggregated Metrics by Executor</h4> ++ executorTable.toNodeSeq ++ maybeAccumulableTable ++ <h4 id="tasks-section">Tasks</h4> ++ taskTableHTML ++ jsForScrollingDownToTaskTable
-      UIUtils.headerSparkPage(stageHeader,
-                              content,
-                              parent,
-                              showVisualization = true)
+      UIUtils.headerSparkPage(
+        stageHeader,
+        content,
+        parent,
+        showVisualization = true)
     }
   }
 
@@ -858,9 +864,10 @@ private[ui] object StagePage {
       val totalExecutionTime = info.finishTime - info.launchTime
       val executorOverhead =
         (metrics.executorDeserializeTime + metrics.resultSerializationTime)
-      math.max(0,
-               totalExecutionTime - metrics.executorRunTime -
-                 executorOverhead - getGettingResultTime(info, currentTime))
+      math.max(
+        0,
+        totalExecutionTime - metrics.executorRunTime -
+          executorOverhead - getGettingResultTime(info, currentTime))
     } else {
       // The task is still running and the metrics like executorRunTime are not available.
       0L
@@ -1051,8 +1058,9 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
     val input =
       if (hasInput) {
         Some(
-          TaskTableRowInputData(inputSortable,
-                                s"$inputReadable / $inputRecords"))
+          TaskTableRowInputData(
+            inputSortable,
+            s"$inputReadable / $inputRecords"))
       } else {
         None
       }
@@ -1060,8 +1068,9 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
     val output =
       if (hasOutput) {
         Some(
-          TaskTableRowOutputData(outputSortable,
-                                 s"$outputReadable / $outputRecords"))
+          TaskTableRowOutputData(
+            outputSortable,
+            s"$outputReadable / $outputRecords"))
       } else {
         None
       }
@@ -1107,31 +1116,32 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
         None
       }
 
-    new TaskTableRowData(info.index,
-                         info.taskId,
-                         info.attemptNumber,
-                         info.speculative,
-                         info.status,
-                         info.taskLocality.toString,
-                         s"${info.executorId} / ${info.host}",
-                         info.launchTime,
-                         duration,
-                         formatDuration,
-                         schedulerDelay,
-                         taskDeserializationTime,
-                         gcTime,
-                         serializationTime,
-                         gettingResultTime,
-                         peakExecutionMemoryUsed,
-                         if (hasAccumulators)
-                           Some(externalAccumulableReadable.mkString("<br/>"))
-                         else None,
-                         input,
-                         output,
-                         shuffleRead,
-                         shuffleWrite,
-                         bytesSpilled,
-                         errorMessage.getOrElse(""))
+    new TaskTableRowData(
+      info.index,
+      info.taskId,
+      info.attemptNumber,
+      info.speculative,
+      info.status,
+      info.taskLocality.toString,
+      s"${info.executorId} / ${info.host}",
+      info.launchTime,
+      duration,
+      formatDuration,
+      schedulerDelay,
+      taskDeserializationTime,
+      gcTime,
+      serializationTime,
+      gettingResultTime,
+      peakExecutionMemoryUsed,
+      if (hasAccumulators)
+        Some(externalAccumulableReadable.mkString("<br/>"))
+      else None,
+      input,
+      output,
+      shuffleRead,
+      shuffleWrite,
+      bytesSpilled,
+      errorMessage.getOrElse(""))
   }
 
   /**
@@ -1240,8 +1250,9 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
           new Ordering[TaskTableRowData] {
             override def compare(x: TaskTableRowData,
                                  y: TaskTableRowData): Int =
-              Ordering.Long.compare(x.output.get.outputSortable,
-                                    y.output.get.outputSortable)
+              Ordering.Long.compare(
+                x.output.get.outputSortable,
+                y.output.get.outputSortable)
           }
         } else {
           throw new IllegalArgumentException(
@@ -1266,8 +1277,9 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
           new Ordering[TaskTableRowData] {
             override def compare(x: TaskTableRowData,
                                  y: TaskTableRowData): Int =
-              Ordering.Long.compare(x.shuffleRead.get.shuffleReadSortable,
-                                    y.shuffleRead.get.shuffleReadSortable)
+              Ordering.Long.compare(
+                x.shuffleRead.get.shuffleReadSortable,
+                y.shuffleRead.get.shuffleReadSortable)
           }
         } else {
           throw new IllegalArgumentException(
@@ -1292,8 +1304,9 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
           new Ordering[TaskTableRowData] {
             override def compare(x: TaskTableRowData,
                                  y: TaskTableRowData): Int =
-              Ordering.Long.compare(x.shuffleWrite.get.writeTimeSortable,
-                                    y.shuffleWrite.get.writeTimeSortable)
+              Ordering.Long.compare(
+                x.shuffleWrite.get.writeTimeSortable,
+                y.shuffleWrite.get.writeTimeSortable)
           }
         } else {
           throw new IllegalArgumentException(
@@ -1304,8 +1317,9 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
           new Ordering[TaskTableRowData] {
             override def compare(x: TaskTableRowData,
                                  y: TaskTableRowData): Int =
-              Ordering.Long.compare(x.shuffleWrite.get.shuffleWriteSortable,
-                                    y.shuffleWrite.get.shuffleWriteSortable)
+              Ordering.Long.compare(
+                x.shuffleWrite.get.shuffleWriteSortable,
+                y.shuffleWrite.get.shuffleWriteSortable)
           }
         } else {
           throw new IllegalArgumentException(
@@ -1384,17 +1398,18 @@ private[ui] class TaskPagedTable(conf: SparkConf,
 
   override def pageNumberFormField: String = "task.page"
 
-  override val dataSource: TaskDataSource = new TaskDataSource(data,
-                                                               hasAccumulators,
-                                                               hasInput,
-                                                               hasOutput,
-                                                               hasShuffleRead,
-                                                               hasShuffleWrite,
-                                                               hasBytesSpilled,
-                                                               currentTime,
-                                                               pageSize,
-                                                               sortColumn,
-                                                               desc)
+  override val dataSource: TaskDataSource = new TaskDataSource(
+    data,
+    hasAccumulators,
+    hasInput,
+    hasOutput,
+    hasShuffleRead,
+    hasShuffleWrite,
+    hasBytesSpilled,
+    currentTime,
+    pageSize,
+    sortColumn,
+    desc)
 
   override def pageLink(page: Int): String = {
     val encodedSortColumn = URLEncoder.encode(sortColumn, "UTF-8")
@@ -1436,11 +1451,12 @@ private[ui] class TaskPagedTable(conf: SparkConf,
         if (hasInput) Seq(("Input Size / Records", "")) else Nil
       } ++ { if (hasOutput) Seq(("Output Size / Records", "")) else Nil } ++ {
         if (hasShuffleRead) {
-          Seq(("Shuffle Read Blocked Time",
-               TaskDetailsClassNames.SHUFFLE_READ_BLOCKED_TIME),
-              ("Shuffle Read Size / Records", ""),
-              ("Shuffle Remote Reads",
-               TaskDetailsClassNames.SHUFFLE_READ_REMOTE_SIZE))
+          Seq(
+            ("Shuffle Read Blocked Time",
+             TaskDetailsClassNames.SHUFFLE_READ_BLOCKED_TIME),
+            ("Shuffle Read Size / Records", ""),
+            ("Shuffle Remote Reads",
+             TaskDetailsClassNames.SHUFFLE_READ_REMOTE_SIZE))
         } else {
           Nil
         }

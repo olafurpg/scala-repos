@@ -151,10 +151,11 @@ trait DAG extends Instructions {
             Left(OperationOnBucket(instr)).point[Trampoline]
           } else {
             val (boolean :: target :: predRoots) = rightArgs
-            loop(loc,
-                 Right(Filter(joinSort, target, boolean)(loc)) :: roots2,
-                 splits,
-                 stream.tail)
+            loop(
+              loc,
+              Right(Filter(joinSort, target, boolean)(loc)) :: roots2,
+              splits,
+              stream.tail)
           }
         }
       }
@@ -260,10 +261,11 @@ trait DAG extends Instructions {
           case instructions.Split => {
             roots match {
               case Left(spec) :: tl =>
-                loop(loc,
-                     tl,
-                     OpenSplit(loc, spec, tl, new Identifier) :: splits,
-                     stream.tail)
+                loop(
+                  loc,
+                  tl,
+                  OpenSplit(loc, spec, tl, new Identifier) :: splits,
+                  stream.tail)
 
               case Right(_) :: _ =>
                 Left(OperationOnBucket(instructions.Split)).point[Trampoline]
@@ -365,10 +367,11 @@ trait DAG extends Instructions {
                 findGraphWithId(id)(open.spec).isDefined
               }
             openPoss map { open =>
-              loop(loc,
-                   Right(SplitParam(id, open.id)(loc)) :: roots,
-                   splits,
-                   stream.tail)
+              loop(
+                loc,
+                Right(SplitParam(id, open.id)(loc)) :: roots,
+                splits,
+                stream.tail)
             } getOrElse Left(UnableToLocateSplitDescribingId(id))
               .point[Trampoline]
           }
@@ -604,11 +607,12 @@ trait DAG extends Instructions {
             dag.Assert(memoized(pred), memoized(child))(graph.loc)
 
           case graph @ dag.Cond(pred, left, leftJoin, right, rightJoin) =>
-            dag.Cond(memoized(pred),
-                     memoized(left),
-                     leftJoin,
-                     memoized(right),
-                     rightJoin)(graph.loc)
+            dag.Cond(
+              memoized(pred),
+              memoized(left),
+              leftJoin,
+              memoized(right),
+              rightJoin)(graph.loc)
 
           case graph @ dag.Observe(data, samples) =>
             dag.Observe(memoized(data), memoized(samples))(graph.loc)
@@ -896,40 +900,39 @@ trait DAG extends Instructions {
         } yield inScope
 
         val rewritten = inScopeM.flatMap { inScope =>
-          editUpdate[E].edit(inScope,
-                             spec,
-                             edit,
-                             (rep: dag.BucketSpec) =>
-                               for { state <- monadState.gets(identity) } yield
-                               rep,
-                             (_: dag.BucketSpec) match {
-                               case dag.UnionBucketSpec(left, right) =>
-                                 for {
-                                   newLeft <- memoizedSpec(left)
-                                   newRight <- memoizedSpec(right)
-                                 } yield dag.UnionBucketSpec(newLeft, newRight)
+          editUpdate[E].edit(
+            inScope,
+            spec,
+            edit,
+            (rep: dag.BucketSpec) =>
+              for { state <- monadState.gets(identity) } yield rep,
+            (_: dag.BucketSpec) match {
+              case dag.UnionBucketSpec(left, right) =>
+                for {
+                  newLeft <- memoizedSpec(left)
+                  newRight <- memoizedSpec(right)
+                } yield dag.UnionBucketSpec(newLeft, newRight)
 
-                               case dag.IntersectBucketSpec(left, right) =>
-                                 for {
-                                   newLeft <- memoizedSpec(left)
-                                   newRight <- memoizedSpec(right)
-                                 } yield
-                                   dag.IntersectBucketSpec(newLeft, newRight)
+              case dag.IntersectBucketSpec(left, right) =>
+                for {
+                  newLeft <- memoizedSpec(left)
+                  newRight <- memoizedSpec(right)
+                } yield dag.IntersectBucketSpec(newLeft, newRight)
 
-                               case dag.Group(id, target, child) =>
-                                 for {
-                                   newTarget <- memoized(target)
-                                   newChild <- memoizedSpec(child)
-                                 } yield dag.Group(id, newTarget, newChild)
+              case dag.Group(id, target, child) =>
+                for {
+                  newTarget <- memoized(target)
+                  newChild <- memoizedSpec(child)
+                } yield dag.Group(id, newTarget, newChild)
 
-                               case dag.UnfixedSolution(id, target) =>
-                                 for { newTarget <- memoized(target) } yield
-                                   dag.UnfixedSolution(id, newTarget)
+              case dag.UnfixedSolution(id, target) =>
+                for { newTarget <- memoized(target) } yield
+                  dag.UnfixedSolution(id, newTarget)
 
-                               case dag.Extra(target) =>
-                                 for { newTarget <- memoized(target) } yield
-                                   dag.Extra(newTarget)
-                             })
+              case dag.Extra(target) =>
+                for { newTarget <- memoized(target) } yield
+                  dag.Extra(newTarget)
+            })
         }
 
         if (spec != scope) rewritten
@@ -1373,9 +1376,10 @@ trait DAG extends Instructions {
                     rightJoin: JoinSort)(val loc: Line)
         extends DepGraph {
       val peer =
-        IUI(true,
-            Filter(leftJoin, left, pred)(loc),
-            Filter(rightJoin, right, Operate(Comp, pred)(loc))(loc))(loc)
+        IUI(
+          true,
+          Filter(leftJoin, left, pred)(loc),
+          Filter(rightJoin, right, Operate(Comp, pred)(loc))(loc))(loc)
 
       lazy val identities = peer.identities
 

@@ -78,8 +78,9 @@ class ScVariableDefinitionImpl private (stub: StubElement[ScVariable],
     val stub = getStub
     if (stub != null) {
       stub
-        .getChildrenByType(ScalaElementTypes.PATTERN_LIST,
-                           JavaArrayFactoryUtil.ScPatternListFactory)
+        .getChildrenByType(
+          ScalaElementTypes.PATTERN_LIST,
+          JavaArrayFactoryUtil.ScPatternListFactory)
         .apply(0)
     } else findChildByClass(classOf[ScPatternList])
   }

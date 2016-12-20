@@ -15,8 +15,9 @@ case class SAdd(key: ChannelBuffer, values: Seq[ChannelBuffer])
 object SAdd {
   def apply(args: Seq[Array[Byte]]): SAdd = args match {
     case head :: tail =>
-      SAdd(ChannelBuffers.wrappedBuffer(head),
-           tail map ChannelBuffers.wrappedBuffer)
+      SAdd(
+        ChannelBuffers.wrappedBuffer(head),
+        tail map ChannelBuffers.wrappedBuffer)
     case _ =>
       throw ClientError("Invalid use of SAdd")
   }
@@ -45,8 +46,9 @@ case class SIsMember(key: ChannelBuffer, value: ChannelBuffer)
 object SIsMember {
   def apply(args: Seq[Array[Byte]]): SIsMember = {
     val list = Commands.trimList(args, 2, Commands.SISMEMBER)
-    SIsMember(ChannelBuffers.wrappedBuffer(list(0)),
-              ChannelBuffers.wrappedBuffer(list(1)))
+    SIsMember(
+      ChannelBuffers.wrappedBuffer(list(0)),
+      ChannelBuffers.wrappedBuffer(list(1)))
   }
 }
 
@@ -71,8 +73,9 @@ case class SRem(key: ChannelBuffer, values: List[ChannelBuffer])
 object SRem {
   def apply(args: Seq[Array[Byte]]): SRem = args match {
     case head :: tail =>
-      SRem(ChannelBuffers.wrappedBuffer(head),
-           tail map ChannelBuffers.wrappedBuffer)
+      SRem(
+        ChannelBuffers.wrappedBuffer(head),
+        tail map ChannelBuffers.wrappedBuffer)
     case _ => throw ClientError("Invalid use of SRem")
   }
 }

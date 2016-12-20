@@ -48,51 +48,57 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
       case If(cond, thenp, Skip()) =>
         new Node(Token.IF, transformExpr(cond), transformBlock(thenp))
       case If(cond, thenp, elsep) =>
-        new Node(Token.IF,
-                 transformExpr(cond),
-                 transformBlock(thenp),
-                 transformBlock(elsep))
+        new Node(
+          Token.IF,
+          transformExpr(cond),
+          transformBlock(thenp),
+          transformBlock(elsep))
       case While(cond, body, None) =>
         new Node(Token.WHILE, transformExpr(cond), transformBlock(body))
       case While(cond, body, Some(label)) =>
         val whileNode =
           new Node(Token.WHILE, transformExpr(cond), transformBlock(body))
-        new Node(Token.LABEL,
-                 transformLabel(label),
-                 setNodePosition(whileNode, pos))
+        new Node(
+          Token.LABEL,
+          transformLabel(label),
+          setNodePosition(whileNode, pos))
       case DoWhile(body, cond, None) =>
         new Node(Token.DO, transformBlock(body), transformExpr(cond))
       case DoWhile(body, cond, Some(label)) =>
         val doNode =
           new Node(Token.DO, transformBlock(body), transformExpr(cond))
-        new Node(Token.LABEL,
-                 transformLabel(label),
-                 setNodePosition(doNode, pos))
+        new Node(
+          Token.LABEL,
+          transformLabel(label),
+          setNodePosition(doNode, pos))
       case Try(block, errVar, handler, EmptyTree) =>
         val catchPos = handler.pos orElse pos
         val catchNode =
           new Node(Token.CATCH, transformName(errVar), transformBlock(handler))
         val blockNode =
           new Node(Token.BLOCK, setNodePosition(catchNode, catchPos))
-        new Node(Token.TRY,
-                 transformBlock(block),
-                 setNodePosition(blockNode, catchPos))
+        new Node(
+          Token.TRY,
+          transformBlock(block),
+          setNodePosition(blockNode, catchPos))
       case Try(block, _, EmptyTree, finalizer) =>
         val blockNode = setNodePosition(new Node(Token.BLOCK), pos)
-        new Node(Token.TRY,
-                 transformBlock(block),
-                 blockNode,
-                 transformBlock(finalizer))
+        new Node(
+          Token.TRY,
+          transformBlock(block),
+          blockNode,
+          transformBlock(finalizer))
       case Try(block, errVar, handler, finalizer) =>
         val catchPos = handler.pos orElse pos
         val catchNode =
           new Node(Token.CATCH, transformName(errVar), transformBlock(handler))
         val blockNode =
           new Node(Token.BLOCK, setNodePosition(catchNode, catchPos))
-        new Node(Token.TRY,
-                 transformBlock(block),
-                 setNodePosition(blockNode, catchPos),
-                 transformBlock(finalizer))
+        new Node(
+          Token.TRY,
+          transformBlock(block),
+          setNodePosition(blockNode, catchPos),
+          transformBlock(finalizer))
       case Throw(expr) =>
         new Node(Token.THROW, transformExpr(expr))
       case Break(None) =>
@@ -152,10 +158,11 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
           setNodePosition(new Node(Token.COMMA, expr1, expr2), pos)
         }
       case If(cond, thenp, elsep) =>
-        new Node(Token.HOOK,
-                 transformExpr(cond),
-                 transformExpr(thenp),
-                 transformExpr(elsep))
+        new Node(
+          Token.HOOK,
+          transformExpr(cond),
+          transformExpr(thenp),
+          transformExpr(elsep))
       case Assign(lhs, rhs) =>
         new Node(Token.ASSIGN, transformExpr(lhs), transformExpr(rhs))
       case New(ctor, args) =>
@@ -163,9 +170,10 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
         args.foreach(arg => node.addChildToBack(transformExpr(arg)))
         node
       case DotSelect(qualifier, item) =>
-        new Node(Token.GETPROP,
-                 transformExpr(qualifier),
-                 transformString(item))
+        new Node(
+          Token.GETPROP,
+          transformExpr(qualifier),
+          transformString(item))
       case BracketSelect(qualifier, item) =>
         new Node(Token.GETELEM, transformExpr(qualifier), transformExpr(item))
 
@@ -243,12 +251,14 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
     transformName(param.name)
 
   def transformName(ident: Ident)(implicit parentPos: Position): Node =
-    setNodePosition(Node.newString(Token.NAME, ident.name),
-                    ident.pos orElse parentPos)
+    setNodePosition(
+      Node.newString(Token.NAME, ident.name),
+      ident.pos orElse parentPos)
 
   def transformLabel(ident: Ident)(implicit parentPos: Position): Node =
-    setNodePosition(Node.newString(Token.LABEL_NAME, ident.name),
-                    ident.pos orElse parentPos)
+    setNodePosition(
+      Node.newString(Token.LABEL_NAME, ident.name),
+      ident.pos orElse parentPos)
 
   def transformString(pName: PropertyName)(
       implicit parentPos: Position): Node =

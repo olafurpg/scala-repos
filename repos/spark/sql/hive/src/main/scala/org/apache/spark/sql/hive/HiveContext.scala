@@ -92,12 +92,13 @@ class HiveContext private[hive] (
     with Logging { self =>
 
   def this(sc: SparkContext) = {
-    this(sc,
-         new CacheManager,
-         SQLContext.createListenerAndUI(sc),
-         null,
-         null,
-         true)
+    this(
+      sc,
+      new CacheManager,
+      SQLContext.createListenerAndUI(sc),
+      null,
+      null,
+      true)
   }
   def this(sc: JavaSparkContext) = this(sc.sc)
 
@@ -111,12 +112,13 @@ class HiveContext private[hive] (
     * and Hive client (both of execution and metadata) with existing HiveContext.
     */
   override def newSession(): HiveContext = {
-    new HiveContext(sc = sc,
-                    cacheManager = cacheManager,
-                    listener = listener,
-                    execHive = executionHive.newSession(),
-                    metaHive = metadataHive.newSession(),
-                    isRootContext = false)
+    new HiveContext(
+      sc = sc,
+      cacheManager = cacheManager,
+      listener = listener,
+      execHive = executionHive.newSession(),
+      metaHive = metadataHive.newSession(),
+      isRootContext = false)
   }
 
   @transient
@@ -557,8 +559,9 @@ class HiveContext private[hive] (
 
   private def functionOrMacroDDLPattern(command: String) =
     Pattern
-      .compile(".*(create|drop)\\s+(temporary\\s+)?(function|macro).+",
-               Pattern.DOTALL)
+      .compile(
+        ".*(create|drop)\\s+(temporary\\s+)?(function|macro).+",
+        Pattern.DOTALL)
       .matcher(command)
 
   protected[hive] def runSqlHive(sql: String): Seq[String] = {
@@ -598,9 +601,10 @@ class HiveContext private[hive] (
         // be similar with Hive.
         desc.run(self).map {
           case Row(name: String, dataType: String, comment) =>
-            Seq(name,
-                dataType,
-                Option(comment.asInstanceOf[String]).getOrElse(""))
+            Seq(
+              name,
+              dataType,
+              Option(comment.asInstanceOf[String]).getOrElse(""))
               .map(s => String.format(s"%-20s", s))
               .mkString("\t")
         }
@@ -655,9 +659,10 @@ private[hive] object HiveContext {
     defaultValue = Some(hiveExecutionVersion),
     doc = "Version of Hive used internally by Spark SQL.")
 
-  val HIVE_METASTORE_JARS = stringConf("spark.sql.hive.metastore.jars",
-                                       defaultValue = Some("builtin"),
-                                       doc = s"""
+  val HIVE_METASTORE_JARS = stringConf(
+    "spark.sql.hive.metastore.jars",
+    defaultValue = Some("builtin"),
+    doc = s"""
       | Location of the jars that should be used to instantiate the HiveMetastoreClient.
       | This property can be one of three options: "
       | 1. "builtin"
@@ -698,10 +703,11 @@ private[hive] object HiveContext {
         "shared. For example, custom appenders that are used by log4j.")
 
   private def jdbcPrefixes =
-    Seq("com.mysql.jdbc",
-        "org.postgresql",
-        "com.microsoft.sqlserver",
-        "oracle.jdbc")
+    Seq(
+      "com.mysql.jdbc",
+      "org.postgresql",
+      "com.microsoft.sqlserver",
+      "oracle.jdbc")
 
   val HIVE_METASTORE_BARRIER_PREFIXES = stringSeqConf(
     "spark.sql.hive.metastore.barrierPrefixes",
@@ -733,13 +739,15 @@ private[hive] object HiveContext {
         propMap.put(confvar.varname, confvar.getDefaultExpr())
       }
     }
-    propMap.put(HiveConf.ConfVars.METASTOREWAREHOUSE.varname,
-                localMetastore.toURI.toString)
+    propMap.put(
+      HiveConf.ConfVars.METASTOREWAREHOUSE.varname,
+      localMetastore.toURI.toString)
     propMap.put(
       HiveConf.ConfVars.METASTORECONNECTURLKEY.varname,
       s"jdbc:derby:${withInMemoryMode};databaseName=${localMetastore.getAbsolutePath};create=true")
-    propMap.put("datanucleus.rdbms.datastoreAdapterClassName",
-                "org.datanucleus.store.rdbms.adapter.DerbyAdapter")
+    propMap.put(
+      "datanucleus.rdbms.datastoreAdapterClassName",
+      "org.datanucleus.store.rdbms.adapter.DerbyAdapter")
 
     // SPARK-11783: When "hive.metastore.uris" is set, the metastore connection mode will be
     // remote (https://cwiki.apache.org/confluence/display/Hive/AdminManual+MetastoreAdmin
@@ -758,17 +766,18 @@ private[hive] object HiveContext {
     propMap.toMap
   }
 
-  protected val primitiveTypes = Seq(StringType,
-                                     IntegerType,
-                                     LongType,
-                                     DoubleType,
-                                     FloatType,
-                                     BooleanType,
-                                     ByteType,
-                                     ShortType,
-                                     DateType,
-                                     TimestampType,
-                                     BinaryType)
+  protected val primitiveTypes = Seq(
+    StringType,
+    IntegerType,
+    LongType,
+    DoubleType,
+    FloatType,
+    BooleanType,
+    ByteType,
+    ShortType,
+    DateType,
+    TimestampType,
+    BinaryType)
 
   protected[sql] def toHiveString(a: (Any, DataType)): String = a match {
     case (struct: Row, StructType(fields)) =>

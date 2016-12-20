@@ -60,8 +60,9 @@ object TestServer extends App {
   ////////////// helpers //////////////
 
   lazy val index = HttpResponse(
-    entity = HttpEntity(ContentTypes.`text/html(UTF-8)`,
-                        """|<html>
+    entity = HttpEntity(
+      ContentTypes.`text/html(UTF-8)`,
+      """|<html>
          | <body>
          |    <h1>Say hello to <i>akka-http-core</i>!</h1>
          |    <p>Defined resources:</p>

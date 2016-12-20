@@ -81,8 +81,9 @@ class EnumerationTest {
   }
 
   @Test def should_respond_to_values(): Unit = {
-    assertEquals("FooBarEnum.ValueSet(A, B, C, D, E, F)",
-                 FooBarEnum.values.toString)
+    assertEquals(
+      "FooBarEnum.ValueSet(A, B, C, D, E, F)",
+      FooBarEnum.values.toString)
   }
 
   @Test def should_allow_setting_nextName(): Unit = {

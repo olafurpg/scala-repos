@@ -118,8 +118,9 @@ object Task {
             copy(status = status.copy(mesosStatus = Some(newStatus))))
 
         healthOrStateChange.getOrElse {
-          log.debug("Ignoring status update for {}. Status did not change.",
-                    taskId)
+          log.debug(
+            "Ignoring status update for {}. Status did not change.",
+            taskId)
           TaskStateChange.NoChange
         }
 
@@ -159,12 +160,13 @@ object Task {
     override def update(update: TaskStateOp): TaskStateChange = update match {
       case TaskStateOp.Launch(appVersion, status, networking) =>
         TaskStateChange.Update(
-          LaunchedOnReservation(taskId,
-                                agentInfo,
-                                appVersion,
-                                status,
-                                networking,
-                                reservation))
+          LaunchedOnReservation(
+            taskId,
+            agentInfo,
+            appVersion,
+            status,
+            networking,
+            reservation))
 
       case TaskStateOp.ReservationTimeout =>
         TaskStateChange.Expunge
@@ -226,8 +228,9 @@ object Task {
             copy(status = status.copy(mesosStatus = Some(newStatus))))
 
         healthOrStateChange.getOrElse {
-          log.debug("Ignoring status update for {}. Status did not change.",
-                    taskId)
+          log.debug(
+            "Ignoring status update for {}. Status did not change.",
+            taskId)
           TaskStateChange.NoChange
         }
 
@@ -370,9 +373,10 @@ object Task {
       s"^([^.]+)[$delimiter]([^.]+)[$delimiter]([^.]+)$$".r
 
     def apply(appId: PathId, volume: PersistentVolume): LocalVolumeId =
-      LocalVolumeId(appId,
-                    volume.containerPath,
-                    uuidGenerator.generate().toString)
+      LocalVolumeId(
+        appId,
+        volume.containerPath,
+        uuidGenerator.generate().toString)
 
     def unapply(id: String): Option[(LocalVolumeId)] = id match {
       case LocalVolumeEncoderRE(app, path, uuid) =>

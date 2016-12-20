@@ -84,10 +84,11 @@ class FSMDocSpec extends MyFavoriteTestFrameWorkPlusAkkaTestKit {
         goto(Active) using t.copy(queue = v :+ obj)
 
       case Event(e, s) =>
-        log.warning("received unhandled request {} in state {}/{}",
-                    e,
-                    stateName,
-                    s)
+        log.warning(
+          "received unhandled request {} in state {}/{}",
+          e,
+          stateName,
+          s)
         stay
     }
     //#unhandled-elided

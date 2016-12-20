@@ -66,8 +66,9 @@ class CopyWorksheetAction extends AnAction with TopComponentAction {
     }
 
     def getFromDoc(lineNumber: Int, document: Document) = document getText {
-      new TextRange(document getLineStartOffset lineNumber,
-                    document getLineEndOffset lineNumber)
+      new TextRange(
+        document getLineStartOffset lineNumber,
+        document getLineEndOffset lineNumber)
     }
 
     def getFromLeft(lineNumber: Int) = getFromDoc(lineNumber, leftDocument)
@@ -88,12 +89,14 @@ class CopyWorksheetAction extends AnAction with TopComponentAction {
     marker map {
       case m: WorksheetFoldRegionDelegate =>
         (0 /: m.getWorksheetGroup.getCorrespondInfo) {
-          case (lastEnd,
-                (rightStartOffset,
-                 rightEndOffset,
-                 leftOffset,
-                 spaces,
-                 leftLength)) =>
+          case (
+              lastEnd,
+              (
+                rightStartOffset,
+                rightEndOffset,
+                leftOffset,
+                spaces,
+                leftLength)) =>
             val leftStart = {
               var j = lastEnd
 
@@ -115,9 +118,10 @@ class CopyWorksheetAction extends AnAction with TopComponentAction {
             for (i <- leftStart to leftEnd) {
               val txt = getFromLeft(i)
 
-              append2Result(txt,
-                            getFromRight(rightStart + i - currentLeftStart),
-                            " ")
+              append2Result(
+                txt,
+                getFromRight(rightStart + i - currentLeftStart),
+                " ")
             }
 
             if (spaces > 0)
@@ -142,9 +146,10 @@ class CopyWorksheetAction extends AnAction with TopComponentAction {
     }
 
     for (i <- 0 until (leftDocument.getLineCount - lastLeftEnd))
-      append2Result(getFromLeft(lastLeftEnd + i),
-                    getFromRight(lastRightEnd + i),
-                    " ")
+      append2Result(
+        getFromLeft(lastLeftEnd + i),
+        getFromRight(lastRightEnd + i),
+        " ")
 
     result.toString()
   }

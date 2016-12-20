@@ -160,10 +160,9 @@ class DistributedDataDocSpec extends AkkaSpec(DistributedDataDocSpec.config) {
     def receive: Receive = {
       case "increment" =>
         // incoming command to increase the counter
-        val upd = Update(Counter1Key,
-                         PNCounter(),
-                         writeTwo,
-                         request = Some(sender()))(_ + 1)
+        val upd =
+          Update(Counter1Key, PNCounter(), writeTwo, request = Some(sender()))(
+            _ + 1)
         replicator ! upd
 
       case UpdateSuccess(Counter1Key, Some(replyTo: ActorRef)) =>

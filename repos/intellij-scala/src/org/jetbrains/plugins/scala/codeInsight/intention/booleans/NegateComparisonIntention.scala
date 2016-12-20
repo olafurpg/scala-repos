@@ -39,12 +39,13 @@ class NegateComparisonIntention extends PsiElementBaseIntentionAction {
     if (!(range.getStartOffset <= offset && offset <= range.getEndOffset))
       return false
 
-    val replaceOper = Map("==" -> "!=",
-                          "!=" -> "==",
-                          ">" -> "<=",
-                          "<" -> ">=",
-                          ">=" -> "<",
-                          "<=" -> ">")
+    val replaceOper = Map(
+      "==" -> "!=",
+      "!=" -> "==",
+      ">" -> "<=",
+      "<" -> ">=",
+      ">=" -> "<",
+      "<=" -> ">")
     setText("Negate '" + oper + "' to " + replaceOper(oper) + "'")
 
     true
@@ -55,12 +56,13 @@ class NegateComparisonIntention extends PsiElementBaseIntentionAction {
       PsiTreeUtil.getParentOfType(element, classOf[ScInfixExpr], false)
     if (infixExpr == null || !infixExpr.isValid) return
 
-    val replaceOper = Map("==" -> "!=",
-                          "!=" -> "==",
-                          ">" -> "<=",
-                          "<" -> ">=",
-                          ">=" -> "<",
-                          "<=" -> ">")
+    val replaceOper = Map(
+      "==" -> "!=",
+      "!=" -> "==",
+      ">" -> "<=",
+      "<" -> ">=",
+      ">=" -> "<",
+      "<=" -> ">")
 
     val start = infixExpr.getTextRange.getStartOffset
     val diff =

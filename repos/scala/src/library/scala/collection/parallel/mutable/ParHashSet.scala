@@ -113,11 +113,11 @@ object ParHashSet extends ParSetFactory[ParHashSet] {
 
 private[mutable] abstract class ParHashSetCombiner[T](
     private val tableLoadFactor: Int)
-    extends scala.collection.parallel.BucketCombiner[T,
-                                                     ParHashSet[T],
-                                                     AnyRef,
-                                                     ParHashSetCombiner[T]](
-      ParHashSetCombiner.numblocks)
+    extends scala.collection.parallel.BucketCombiner[
+      T,
+      ParHashSet[T],
+      AnyRef,
+      ParHashSetCombiner[T]](ParHashSetCombiner.numblocks)
     with scala.collection.mutable.FlatHashTable.HashUtils[T] {
 //self: EnvironmentPassingCombiner[T, ParHashSet[T]] =>
   private val nonmasklen = ParHashSetCombiner.nonmasklength
@@ -318,8 +318,9 @@ private[mutable] abstract class ParHashSetCombiner[T](
     }
     def split = {
       val fp = howmany / 2
-      List(new FillBlocks(buckets, table, offset, fp),
-           new FillBlocks(buckets, table, offset + fp, howmany - fp))
+      List(
+        new FillBlocks(buckets, table, offset, fp),
+        new FillBlocks(buckets, table, offset + fp, howmany - fp))
     }
     override def merge(that: FillBlocks) {
       // take the leftovers from the left task, store them into the block of the right task

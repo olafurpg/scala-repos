@@ -35,8 +35,9 @@ final case class Metric private[metrics] (name: String,
     if (this sameAs latest)
       average match {
         case Some(avg) ⇒
-          copy(value = latest.value,
-               average = Some(avg :+ latest.value.doubleValue))
+          copy(
+            value = latest.value,
+            average = Some(avg :+ latest.value.doubleValue))
         case None if latest.average.isDefined ⇒
           copy(value = latest.value, average = latest.average)
         case _ ⇒ copy(value = latest.value)
@@ -209,19 +210,21 @@ object StandardMetrics {
     * contains necessary cpu metrics, otherwise it returns null.
     */
   def extractCpu(nodeMetrics: NodeMetrics): Cpu = nodeMetrics match {
-    case Cpu(address,
-             timestamp,
-             systemLoadAverage,
-             cpuCombined,
-             cpuStolen,
-             processors) ⇒
+    case Cpu(
+        address,
+        timestamp,
+        systemLoadAverage,
+        cpuCombined,
+        cpuStolen,
+        processors) ⇒
       // note that above extractor returns tuple
-      Cpu(address,
-          timestamp,
-          systemLoadAverage,
-          cpuCombined,
-          cpuStolen,
-          processors)
+      Cpu(
+        address,
+        timestamp,
+        systemLoadAverage,
+        cpuCombined,
+        cpuStolen,
+        processors)
     case _ ⇒ null
   }
 
@@ -246,15 +249,17 @@ object StandardMetrics {
 
     cpuCombined match {
       case Some(x) ⇒
-        require(0.0 <= x && x <= 1.0,
-                s"cpuCombined must be between [0.0 - 1.0], was [$x]")
+        require(
+          0.0 <= x && x <= 1.0,
+          s"cpuCombined must be between [0.0 - 1.0], was [$x]")
       case None ⇒
     }
 
     cpuStolen match {
       case Some(x) ⇒
-        require(0.0 <= x && x <= 1.0,
-                s"cpuStolen must be between [0.0 - 1.0], was [$x]")
+        require(
+          0.0 <= x && x <= 1.0,
+          s"cpuStolen must be between [0.0 - 1.0], was [$x]")
       case None ⇒
     }
   }

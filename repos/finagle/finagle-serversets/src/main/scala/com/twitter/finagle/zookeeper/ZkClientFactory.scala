@@ -32,8 +32,9 @@ private[finagle] class ZooKeeperHealthHandler extends Watcher {
 private[finagle] object DefaultZkClientFactory
     extends ZkClientFactory(
       Amount
-        .of(ZooKeeperUtils.DEFAULT_ZK_SESSION_TIMEOUT.getValue.toLong,
-            ZooKeeperUtils.DEFAULT_ZK_SESSION_TIMEOUT.getUnit)
+        .of(
+          ZooKeeperUtils.DEFAULT_ZK_SESSION_TIMEOUT.getValue.toLong,
+          ZooKeeperUtils.DEFAULT_ZK_SESSION_TIMEOUT.getUnit)
         .toDuration)
 
 private[finagle] class ZkClientFactory(val sessionTimeout: Duration) {

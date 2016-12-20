@@ -137,8 +137,9 @@ class PhantomJSEnv(
       }
 
       val serverPort = mgr.localPort
-      assert(serverPort > 0,
-             s"Manager running with a non-positive port number: $serverPort")
+      assert(
+        serverPort > 0,
+        s"Manager running with a non-positive port number: $serverPort")
 
       val code = s"""
         |(function() {

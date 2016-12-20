@@ -84,10 +84,11 @@ class ScTypedPatternImpl(node: ASTNode)
                                 if (arg.upper.equiv(psi.types.Any))
                                   subst subst param.upperBound.getOrAny
                                 else arg.upper //todo: glb?
-                              ScSkolemizedType(arg.name,
-                                               arg.args,
-                                               lowerBound,
-                                               upperBound)
+                              ScSkolemizedType(
+                                arg.name,
+                                arg.args,
+                                lowerBound,
+                                upperBound)
                             case (tp: ScType, param: ScTypeParam) => tp
                           }).unpackedType
                     case _ => tp
@@ -103,8 +104,9 @@ class ScTypedPatternImpl(node: ASTNode)
                         typeArgs
                           .zip(typeParams)
                           .map {
-                            case (arg: ScSkolemizedType,
-                                  param: PsiTypeParameter) =>
+                            case (
+                                arg: ScSkolemizedType,
+                                param: PsiTypeParameter) =>
                               val lowerBound = arg.lower
                               val upperBound =
                                 if (arg.upper.equiv(psi.types.Any)) {
@@ -116,16 +118,19 @@ class ScTypedPatternImpl(node: ASTNode)
                                       Bounds
                                         .glb(
                                           listTypes.toSeq
-                                            .map(ScType
-                                              .create(_,
-                                                      getProject,
-                                                      param.getResolveScope)),
+                                            .map(
+                                              ScType
+                                                .create(
+                                                  _,
+                                                  getProject,
+                                                  param.getResolveScope)),
                                           checkWeak = true))
                                 } else arg.upper //todo: glb?
-                              ScSkolemizedType(arg.name,
-                                               arg.args,
-                                               lowerBound,
-                                               upperBound)
+                              ScSkolemizedType(
+                                arg.name,
+                                arg.args,
+                                lowerBound,
+                                upperBound)
                             case (tp: ScType, _) => tp
                           }).unpackedType
                     case _ => tp
@@ -150,11 +155,12 @@ class ScTypedPatternImpl(node: ASTNode)
                                    state: ResolveState,
                                    lastParent: PsiElement,
                                    place: PsiElement) = {
-    ScalaPsiUtil.processImportLastParent(processor,
-                                         state,
-                                         place,
-                                         lastParent,
-                                         getType(TypingContext.empty))
+    ScalaPsiUtil.processImportLastParent(
+      processor,
+      state,
+      place,
+      lastParent,
+      getType(TypingContext.empty))
   }
 
   override def getOriginalElement: PsiElement =

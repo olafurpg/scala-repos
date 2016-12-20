@@ -78,8 +78,9 @@ private[kinesis] class KinesisTestUtils extends Logging {
   }
 
   def streamName: String = {
-    require(streamCreated,
-            "Stream not yet created, call createStream() to create one")
+    require(
+      streamCreated,
+      "Stream not yet created, call createStream() to create one")
     _streamName
   }
 
@@ -106,8 +107,9 @@ private[kinesis] class KinesisTestUtils extends Logging {
     */
   def pushData(testData: Seq[Int],
                aggregate: Boolean): Map[String, Seq[(Int, String)]] = {
-    require(streamCreated,
-            "Stream not yet created, call createStream() to create one")
+    require(
+      streamCreated,
+      "Stream not yet created, call createStream() to create one")
     val producer = getProducer(aggregate)
     val shardIdToSeqNumbers = producer.sendData(streamName, testData)
     logInfo(s"Pushed $testData:\n\t ${shardIdToSeqNumbers.mkString("\n\t")}")

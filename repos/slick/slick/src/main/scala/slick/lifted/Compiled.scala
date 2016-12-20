@@ -133,9 +133,10 @@ object Executable {
                                                  C[_],
                                                  Ba1,
                                                  Ba2] =
-    StreamingExecutable[BaseJoinQuery[B1, B2, BU1, BU2, C, Ba1, Ba2],
-                        C[(BU1, BU2)],
-                        (BU1, BU2)]
+    StreamingExecutable[
+      BaseJoinQuery[B1, B2, BU1, BU2, C, Ba1, Ba2],
+      C[(BU1, BU2)],
+      (BU1, BU2)]
   @inline implicit def scalarIsExecutable[R, U](
       implicit shape: Shape[_ <: FlatShapeLevel, R, U, _]): Executable[R, U] =
     new Executable[R, U] { def toNode(value: R) = shape.toNode(value) }

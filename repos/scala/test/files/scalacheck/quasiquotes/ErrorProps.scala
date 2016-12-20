@@ -198,16 +198,18 @@ object ErrorProps extends QuasiquoteProperties("errors") {
 
   property(
     "SI-8451 construction: disallow everything except for constructor calls in secondary constructor bodies") =
-    fails("'this' expected but unquotee found",
-          """
+    fails(
+      "'this' expected but unquotee found",
+      """
       val rhs1 = q"this(0)"
       val ctor1 = q"def this(x: Int) = $rhs1"
     """)
 
   property(
     "SI-8451 deconstruction: disallow everything except for constructor calls in secondary constructor bodies") =
-    fails("'this' expected but unquotee found",
-          """
+    fails(
+      "'this' expected but unquotee found",
+      """
       val q"def this(..$params) = $rhs2" = q"def this(x: Int) = this(0)"
     """)
 

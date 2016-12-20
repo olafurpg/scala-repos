@@ -29,10 +29,11 @@ class StorageLevel private (private var useDisk_ : Boolean,
   def replication = replication_
 
   override def clone(): StorageLevel =
-    new StorageLevel(this.useDisk,
-                     this.useMemory,
-                     this.deserialized,
-                     this.replication)
+    new StorageLevel(
+      this.useDisk,
+      this.useMemory,
+      this.deserialized,
+      this.replication)
 
   override def equals(other: Any): Boolean = other match {
     case s: StorageLevel =>

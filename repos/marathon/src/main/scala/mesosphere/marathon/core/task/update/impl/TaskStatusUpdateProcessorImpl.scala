@@ -50,8 +50,9 @@ class TaskStatusUpdateProcessorImpl @Inject()(
     }
     .toMap
 
-  log.info("Started status update processor with steps:\n{}",
-           steps.map(step => s"* ${step.name}").mkString("\n"))
+  log.info(
+    "Started status update processor with steps:\n{}",
+    steps.map(step => s"* ${step.name}").mkString("\n"))
 
   override def publish(status: MesosProtos.TaskStatus): Future[Unit] =
     publishFutureTimer.timeFuture {
@@ -101,9 +102,9 @@ class TaskStatusUpdateProcessorImpl @Inject()(
     steps.foldLeft(Future.successful(())) { (resultSoFar, nextStep) =>
       resultSoFar.flatMap { _ =>
         stepTimers(nextStep.name).timeFuture {
-          log.debug("Executing {} for [{}]",
-                    Array[Object](nextStep.name,
-                                  mesosStatus.getTaskId.getValue): _*)
+          log.debug(
+            "Executing {} for [{}]",
+            Array[Object](nextStep.name, mesosStatus.getTaskId.getValue): _*)
           nextStep.processUpdate(timestamp, task, mesosStatus).map { _ =>
             log.debug(
               "Done with executing {} for [{}]",

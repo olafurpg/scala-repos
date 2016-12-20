@@ -63,8 +63,9 @@ class ArgHelpTest extends WordSpec with Matchers {
 
   it should {
     "not fail when all args are described" in {
-      val args = List(OptionalArg("name", "Name of person"),
-                      OptionalArg("phone", "Person's phone"))
+      val args = List(
+        OptionalArg("name", "Name of person"),
+        OptionalArg("phone", "Person's phone"))
       val config = Config.unitTestDefault.setArgs(
         Args(List("--name", "Bill", "--phone", "111")))
 
@@ -76,8 +77,9 @@ class ArgHelpTest extends WordSpec with Matchers {
 
   it should {
     "fail when all args are not described" in {
-      val args = List(OptionalArg("name", "Name of person"),
-                      OptionalArg("phone", "Person's phone"))
+      val args = List(
+        OptionalArg("name", "Name of person"),
+        OptionalArg("phone", "Person's phone"))
       val config = Config.unitTestDefault.setArgs(
         Args(List("--name", "Bill", "--phone", "111", "--address", "123")))
 

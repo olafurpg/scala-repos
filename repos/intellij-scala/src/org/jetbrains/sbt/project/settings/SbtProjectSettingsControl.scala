@@ -39,12 +39,13 @@ class SbtProjectSettingsControl(context: Context,
       }
     }
 
-    result.setSetupButton(button,
-                          null,
-                          model,
-                          new JdkComboBox.NoneJdkComboBoxItem,
-                          addToTable,
-                          false)
+    result.setSetupButton(
+      button,
+      null,
+      model,
+      new JdkComboBox.NoneJdkComboBoxItem,
+      addToTable,
+      false)
 
     result
   }

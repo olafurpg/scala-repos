@@ -255,9 +255,10 @@ abstract class AbstractFile extends Iterable[AbstractFile] {
     * creating an empty file if it does not already existing.
     */
   def fileNamed(name: String): AbstractFile = {
-    assert(isDirectory,
-           "Tried to find '%s' in '%s' but it is not a directory".format(name,
-                                                                         path))
+    assert(
+      isDirectory,
+      "Tried to find '%s' in '%s' but it is not a directory"
+        .format(name, path))
     fileOrSubdirectoryNamed(name, isDir = false)
   }
 
@@ -266,9 +267,10 @@ abstract class AbstractFile extends Iterable[AbstractFile] {
     * does not already exist.
     */
   def subdirectoryNamed(name: String): AbstractFile = {
-    assert(isDirectory,
-           "Tried to find '%s' in '%s' but it is not a directory".format(name,
-                                                                         path))
+    assert(
+      isDirectory,
+      "Tried to find '%s' in '%s' but it is not a directory"
+        .format(name, path))
     fileOrSubdirectoryNamed(name, isDir = true)
   }
 

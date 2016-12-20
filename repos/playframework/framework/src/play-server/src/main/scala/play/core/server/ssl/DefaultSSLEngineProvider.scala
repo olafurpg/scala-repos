@@ -60,9 +60,10 @@ class DefaultSSLEngineProvider(serverConfig: ServerConfig,
             kmf
           } catch {
             case NonFatal(e) => {
-              throw new Exception("Error loading HTTPS keystore from " +
-                                    file.getAbsolutePath,
-                                  e)
+              throw new Exception(
+                "Error loading HTTPS keystore from " +
+                  file.getAbsolutePath,
+                e)
             }
           } finally {
             PlayIO.closeQuietly(in)

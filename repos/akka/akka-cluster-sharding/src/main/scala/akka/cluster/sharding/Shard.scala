@@ -97,22 +97,24 @@ private[akka] object Shard {
             handOffStopMessage: Any): Props = {
     if (settings.rememberEntities)
       Props(
-        new PersistentShard(typeName,
-                            shardId,
-                            entityProps,
-                            settings,
-                            extractEntityId,
-                            extractShardId,
-                            handOffStopMessage)).withDeploy(Deploy.local)
+        new PersistentShard(
+          typeName,
+          shardId,
+          entityProps,
+          settings,
+          extractEntityId,
+          extractShardId,
+          handOffStopMessage)).withDeploy(Deploy.local)
     else
       Props(
-        new Shard(typeName,
-                  shardId,
-                  entityProps,
-                  settings,
-                  extractEntityId,
-                  extractShardId,
-                  handOffStopMessage)).withDeploy(Deploy.local)
+        new Shard(
+          typeName,
+          shardId,
+          entityProps,
+          settings,
+          extractEntityId,
+          extractShardId,
+          handOffStopMessage)).withDeploy(Deploy.local)
   }
 }
 
@@ -197,9 +199,10 @@ private[akka] class Shard(typeName: String,
   def receiveCoordinatorMessage(msg: CoordinatorMessage): Unit = msg match {
     case HandOff(`shardId`) ⇒ handOff(sender())
     case HandOff(shard) ⇒
-      log.warning("Shard [{}] can not hand off for another Shard [{}]",
-                  shardId,
-                  shard)
+      log.warning(
+        "Shard [{}] can not hand off for another Shard [{}]",
+        shardId,
+        shard)
     case _ ⇒ unhandled(msg)
   }
 
@@ -211,8 +214,9 @@ private[akka] class Shard(typeName: String,
 
   def handOff(replyTo: ActorRef): Unit = handOffStopper match {
     case Some(_) ⇒
-      log.warning("HandOff shard [{}] received during existing handOff",
-                  shardId)
+      log.warning(
+        "HandOff shard [{}] received during existing handOff",
+        shardId)
     case None ⇒
       log.debug("HandOff shard [{}]", shardId)
 
@@ -220,10 +224,11 @@ private[akka] class Shard(typeName: String,
         handOffStopper = Some(
           context.watch(
             context.actorOf(
-              handOffStopperProps(shardId,
-                                  replyTo,
-                                  idByRef.keySet,
-                                  handOffStopMessage))))
+              handOffStopperProps(
+                shardId,
+                replyTo,
+                idByRef.keySet,
+                handOffStopMessage))))
 
         //During hand off we only care about watching for termination of the hand off stopper
         context become {
@@ -287,9 +292,10 @@ private[akka] class Shard(typeName: String,
     messageBuffers = messageBuffers - event.entityId
 
     if (messages.nonEmpty) {
-      log.debug("Sending message buffer for entity [{}] ([{}] messages)",
-                event.entityId,
-                messages.size)
+      log.debug(
+        "Sending message buffer for entity [{}] ([{}] messages)",
+        event.entityId,
+        messages.size)
       getEntity(event.entityId)
 
       //Now there is no deliveryBuffer we can try to redeliver
@@ -303,8 +309,9 @@ private[akka] class Shard(typeName: String,
   def deliverMessage(msg: Any, snd: ActorRef): Unit = {
     val (id, payload) = extractEntityId(msg)
     if (id == null || id == "") {
-      log.warning("Id must not be empty, dropping message [{}]",
-                  msg.getClass.getName)
+      log.warning(
+        "Id must not be empty, dropping message [{}]",
+        msg.getClass.getName)
       context.system.deadLetters ! msg
     } else {
       messageBuffers.get(id) match {
@@ -359,13 +366,14 @@ private[akka] class PersistentShard(
     extractEntityId: ShardRegion.ExtractEntityId,
     extractShardId: ShardRegion.ExtractShardId,
     handOffStopMessage: Any)
-    extends Shard(typeName,
-                  shardId,
-                  entityProps,
-                  settings,
-                  extractEntityId,
-                  extractShardId,
-                  handOffStopMessage)
+    extends Shard(
+      typeName,
+      shardId,
+      entityProps,
+      settings,
+      extractEntityId,
+      extractShardId,
+      handOffStopMessage)
     with PersistentActor
     with ActorLogging {
 

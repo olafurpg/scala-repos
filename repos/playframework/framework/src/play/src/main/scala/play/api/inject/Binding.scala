@@ -176,11 +176,12 @@ final case class BindingKey[T](clazz: Class[T],
     * This class will be instantiated and injected by the injection framework.
     */
   def to(implementation: Class[_ <: T]): Binding[T] =
-    Binding(this,
-            Some(ConstructionTarget(implementation)),
-            None,
-            false,
-            SourceLocator.source)
+    Binding(
+      this,
+      Some(ConstructionTarget(implementation)),
+      None,
+      false,
+      SourceLocator.source)
 
   /**
     * Bind this binding key to the given implementation class.
@@ -196,11 +197,12 @@ final case class BindingKey[T](clazz: Class[T],
     * This provider instance will be invoked to obtain the implementation for the key.
     */
   def to(provider: Provider[_ <: T]): Binding[T] =
-    Binding(this,
-            Some(ProviderTarget(provider)),
-            None,
-            false,
-            SourceLocator.source)
+    Binding(
+      this,
+      Some(ProviderTarget(provider)),
+      None,
+      false,
+      SourceLocator.source)
 
   /**
     * Bind this binding key to the given instance.
@@ -212,11 +214,12 @@ final case class BindingKey[T](clazz: Class[T],
     * Bind this binding key to another binding key.
     */
   def to(key: BindingKey[_ <: T]): Binding[T] =
-    Binding(this,
-            Some(BindingKeyTarget(key)),
-            None,
-            false,
-            SourceLocator.source)
+    Binding(
+      this,
+      Some(BindingKeyTarget(key)),
+      None,
+      false,
+      SourceLocator.source)
 
   /**
     * Bind this binding key to the given provider class.
@@ -225,11 +228,12 @@ final case class BindingKey[T](clazz: Class[T],
     * whenever an instance of the class is needed.
     */
   def toProvider[P <: Provider[_ <: T]](provider: Class[P]): Binding[T] =
-    Binding(this,
-            Some(ProviderConstructionTarget[T](provider)),
-            None,
-            false,
-            SourceLocator.source)
+    Binding(
+      this,
+      Some(ProviderConstructionTarget[T](provider)),
+      None,
+      false,
+      SourceLocator.source)
 
   /**
     * Bind this binding key to the given provider class.

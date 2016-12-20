@@ -132,9 +132,10 @@ private[akka] class RemoteSystemDaemon(system: ActorSystemImpl,
 
   override def sendSystemMessage(message: SystemMessage): Unit =
     message match {
-      case DeathWatchNotification(child: ActorRefWithCell with ActorRefScope,
-                                  _,
-                                  _) if child.isLocal ⇒
+      case DeathWatchNotification(
+          child: ActorRefWithCell with ActorRefScope,
+          _,
+          _) if child.isLocal ⇒
         terminating.locked {
           removeChild(child.path.elements.drop(1).mkString("/"), child)
           val parent = child.getParent
@@ -161,9 +162,10 @@ private[akka] class RemoteSystemDaemon(system: ActorSystemImpl,
   override def !(msg: Any)(implicit sender: ActorRef = Actor.noSender): Unit =
     try msg match {
       case message: DaemonMsg ⇒
-        log.debug("Received command [{}] to RemoteSystemDaemon on [{}]",
-                  message,
-                  path.address)
+        log.debug(
+          "Received command [{}] to RemoteSystemDaemon on [{}]",
+          message,
+          path.address)
         message match {
           case DaemonMsgCreate(_, _, path, _) if untrustedMode ⇒
             log.debug("does not accept deployments (untrusted) for [{}]", path)
@@ -183,14 +185,15 @@ private[akka] class RemoteSystemDaemon(system: ActorSystemImpl,
                 }
                 val isTerminating = !terminating.whileOff {
                   val parent = supervisor.asInstanceOf[InternalActorRef]
-                  val actor = system.provider.actorOf(system,
-                                                      props,
-                                                      parent,
-                                                      p,
-                                                      systemService = false,
-                                                      Some(deploy),
-                                                      lookupDeploy = true,
-                                                      async = false)
+                  val actor = system.provider.actorOf(
+                    system,
+                    props,
+                    parent,
+                    p,
+                    systemService = false,
+                    Some(deploy),
+                    lookupDeploy = true,
+                    async = false)
                   addChild(childName, actor)
                   actor.sendSystemMessage(Watch(actor, this))
                   actor.start()
@@ -203,8 +206,9 @@ private[akka] class RemoteSystemDaemon(system: ActorSystemImpl,
                     message,
                     p.address)
               case _ ⇒
-                log.debug("remote path does not match path from message [{}]",
-                          message)
+                log.debug(
+                  "remote path does not match path from message [{}]",
+                  message)
             }
         }
 
@@ -256,10 +260,11 @@ private[akka] class RemoteSystemDaemon(system: ActorSystemImpl,
         log.warning("Unknown message [{}] received by [{}]", unknown, this)
     } catch {
       case NonFatal(e) ⇒
-        log.error(e,
-                  "exception while processing remote command [{}] from [{}]",
-                  msg,
-                  sender)
+        log.error(
+          e,
+          "exception while processing remote command [{}] from [{}]",
+          msg,
+          sender)
     }
 
   def terminationHookDoneWhenNoChildren(): Unit = terminating.whileOn {

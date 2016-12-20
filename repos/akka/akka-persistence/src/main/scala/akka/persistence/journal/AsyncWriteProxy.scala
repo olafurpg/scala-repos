@@ -84,10 +84,11 @@ private[persistence] trait AsyncWriteProxy
       case Some(s) ⇒
         val replayCompletionPromise = Promise[Unit]()
         val mediator = context.actorOf(
-          Props(classOf[ReplayMediator],
-                replayCallback,
-                replayCompletionPromise,
-                timeout.duration).withDeploy(Deploy.local))
+          Props(
+            classOf[ReplayMediator],
+            replayCallback,
+            replayCompletionPromise,
+            timeout.duration).withDeploy(Deploy.local))
         s.tell(
           ReplayMessages(persistenceId, fromSequenceNr, toSequenceNr, max),
           mediator)
@@ -99,10 +100,11 @@ private[persistence] trait AsyncWriteProxy
                                  fromSequenceNr: Long): Future[Long] =
     store match {
       case Some(s) ⇒
-        (s ? ReplayMessages(persistenceId,
-                            fromSequenceNr = 0L,
-                            toSequenceNr = 0L,
-                            max = 0L)).map {
+        (s ? ReplayMessages(
+          persistenceId,
+          fromSequenceNr = 0L,
+          toSequenceNr = 0L,
+          max = 0L)).map {
           case ReplaySuccess(highest) ⇒ highest
         }
       case None ⇒ storeNotInitialized

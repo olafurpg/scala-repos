@@ -24,12 +24,13 @@ object ScalaTypeValidator {
             element: PsiElement,
             container: PsiElement,
             noOccurrences: Boolean): ScalaTypeValidator = {
-    new ScalaTypeValidator(conflictsReporter,
-                           project,
-                           element,
-                           noOccurrences,
-                           container,
-                           container)
+    new ScalaTypeValidator(
+      conflictsReporter,
+      project,
+      element,
+      noOccurrences,
+      container,
+      container)
   }
 }
 
@@ -39,12 +40,13 @@ class ScalaTypeValidator(val conflictsReporter: ConflictsReporter,
                          val noOccurrences: Boolean,
                          val enclosingContainerAll: PsiElement,
                          val enclosingOne: PsiElement)
-    extends ScalaValidator(conflictsReporter,
-                           myProject,
-                           selectedElement,
-                           noOccurrences,
-                           enclosingContainerAll,
-                           enclosingOne) {
+    extends ScalaValidator(
+      conflictsReporter,
+      myProject,
+      selectedElement,
+      noOccurrences,
+      enclosingContainerAll,
+      enclosingOne) {
 
   override def findConflicts(
       name: String,

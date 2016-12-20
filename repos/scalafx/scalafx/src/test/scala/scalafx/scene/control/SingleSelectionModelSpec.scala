@@ -40,8 +40,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class SingleSelectionModelSpec[T]
-    extends SimpleSFXDelegateSpec[jfxsc.SingleSelectionModel[T],
-                                  SingleSelectionModel[T]](
+    extends SimpleSFXDelegateSpec[
+      jfxsc.SingleSelectionModel[T],
+      SingleSelectionModel[T]](
       classOf[jfxsc.SingleSelectionModel[T]],
       classOf[SingleSelectionModel[T]]) {
 

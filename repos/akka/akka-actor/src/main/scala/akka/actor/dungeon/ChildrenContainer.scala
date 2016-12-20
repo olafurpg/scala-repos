@@ -245,8 +245,9 @@ private[akka] object ChildrenContainer {
     override def toString =
       if (c.size > 20) c.size + " children"
       else
-        c.mkString("children (" + toDie.size + " terminating):\n    ",
-                   "\n    ",
-                   "\n") + toDie
+        c.mkString(
+          "children (" + toDie.size + " terminating):\n    ",
+          "\n    ",
+          "\n") + toDie
   }
 }

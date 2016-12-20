@@ -171,10 +171,11 @@ private[kinesis] class KinesisReceiver[T](
     // KCL config instance
     val awsCredProvider = resolveAWSCredentialsProvider()
     val kinesisClientLibConfiguration =
-      new KinesisClientLibConfiguration(checkpointAppName,
-                                        streamName,
-                                        awsCredProvider,
-                                        workerId)
+      new KinesisClientLibConfiguration(
+        checkpointAppName,
+        streamName,
+        awsCredProvider,
+        workerId)
         .withKinesisEndpoint(endpointUrl)
         .withInitialPositionInStream(initialPositionInStream)
         .withTaskBackoffTimeMillis(500)
@@ -261,8 +262,9 @@ private[kinesis] class KinesisReceiver[T](
     */
   def setCheckpointer(shardId: String,
                       checkpointer: IRecordProcessorCheckpointer): Unit = {
-    assert(kinesisCheckpointer != null,
-           "Kinesis Checkpointer not initialized!")
+    assert(
+      kinesisCheckpointer != null,
+      "Kinesis Checkpointer not initialized!")
     kinesisCheckpointer.setCheckpointer(shardId, checkpointer)
   }
 
@@ -273,8 +275,9 @@ private[kinesis] class KinesisReceiver[T](
     */
   def removeCheckpointer(shardId: String,
                          checkpointer: IRecordProcessorCheckpointer): Unit = {
-    assert(kinesisCheckpointer != null,
-           "Kinesis Checkpointer not initialized!")
+    assert(
+      kinesisCheckpointer != null,
+      "Kinesis Checkpointer not initialized!")
     kinesisCheckpointer.removeCheckpointer(shardId, checkpointer)
   }
 
@@ -385,8 +388,9 @@ private[kinesis] class KinesisReceiver[T](
     /** Callback method called when a block is ready to be pushed / stored. */
     def onPushBlock(blockId: StreamBlockId,
                     arrayBuffer: mutable.ArrayBuffer[_]): Unit = {
-      storeBlockWithRanges(blockId,
-                           arrayBuffer.asInstanceOf[mutable.ArrayBuffer[T]])
+      storeBlockWithRanges(
+        blockId,
+        arrayBuffer.asInstanceOf[mutable.ArrayBuffer[T]])
     }
 
     /** Callback called in case of any error in internal of the BlockGenerator */

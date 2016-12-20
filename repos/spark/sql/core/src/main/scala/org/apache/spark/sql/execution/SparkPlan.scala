@@ -339,10 +339,11 @@ abstract class SparkPlan
       val p = partsScanned.until(
         math.min(partsScanned + numPartsToTry, totalParts).toInt)
       val sc = sqlContext.sparkContext
-      val res = sc.runJob(childRDD,
-                          (it: Iterator[Array[Byte]]) =>
-                            if (it.hasNext) it.next() else Array.empty,
-                          p)
+      val res = sc.runJob(
+        childRDD,
+        (it: Iterator[Array[Byte]]) =>
+          if (it.hasNext) it.next() else Array.empty,
+        p)
 
       res.foreach { r =>
         decodeUnsafeRows(r.asInstanceOf[Array[Byte]], buf)

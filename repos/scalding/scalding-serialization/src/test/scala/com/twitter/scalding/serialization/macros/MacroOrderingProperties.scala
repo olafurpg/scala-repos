@@ -74,13 +74,14 @@ object TestCC {
       anOptionOfAListOfStrings <- arb[Option[List[String]]]
       aBB <- arb[ByteBuffer]
     } yield
-      TestCC(aInt,
-             aLong,
-             anOption,
-             aDouble,
-             anStrOption,
-             anOptionOfAListOfStrings,
-             aBB)
+      TestCC(
+        aInt,
+        aLong,
+        anOption,
+        aDouble,
+        anStrOption,
+        anOptionOfAListOfStrings,
+        aBB)
   }
 
   implicit def arbitraryTestCaseClassB: Arbitrary[TestCaseClassB] = Arbitrary {
@@ -320,21 +321,27 @@ class MacroOrderingProperties
     val rtb = rt(b) // before we do anything ensure these don't throw
     val asize = Serialization.toBytes(a).length
     if (obuf.dynamicSize(a).isDefined) {
-      assert(obuf.dynamicSize(a).get == asize,
-             "dynamic size matches the correct value")
+      assert(
+        obuf.dynamicSize(a).get == asize,
+        "dynamic size matches the correct value")
     }
     if (obuf.staticSize.isDefined) {
-      assert(obuf.dynamicSize(a).get == asize,
-             "dynamic size matches the correct value")
-      assert(obuf.staticSize.get == asize,
-             "dynamic size matches the correct value")
+      assert(
+        obuf.dynamicSize(a).get == asize,
+        "dynamic size matches the correct value")
+      assert(
+        obuf.staticSize.get == asize,
+        "dynamic size matches the correct value")
     }
-    assert(oBufCompare(rta, a) === 0,
-           s"A should be equal to itself after an RT -- ${rt(a)}")
-    assert(oBufCompare(rtb, b) === 0,
-           s"B should be equal to itself after an RT-- ${rt(b)}")
-    assert(oBufCompare(a, b) + oBufCompare(b, a) === 0,
-           "In memory comparasons make sense")
+    assert(
+      oBufCompare(rta, a) === 0,
+      s"A should be equal to itself after an RT -- ${rt(a)}")
+    assert(
+      oBufCompare(rtb, b) === 0,
+      s"B should be equal to itself after an RT-- ${rt(b)}")
+    assert(
+      oBufCompare(a, b) + oBufCompare(b, a) === 0,
+      "In memory comparasons make sense")
     assert(
       rawCompare(a, b) + rawCompare(b, a) === 0,
       "When adding the raw compares in inverse order they should sum to 0")
@@ -346,10 +353,12 @@ class MacroOrderingProperties
   def checkAreSame[T](a: T, b: T)(implicit obuf: OrderedSerialization[T]) {
     val rta = rt(a) // before we do anything ensure these don't throw
     val rtb = rt(b) // before we do anything ensure these don't throw
-    assert(oBufCompare(rta, a) === 0,
-           s"A should be equal to itself after an RT -- ${rt(a)}")
-    assert(oBufCompare(rtb, b) === 0,
-           "B should be equal to itself after an RT-- ${rt(b)}")
+    assert(
+      oBufCompare(rta, a) === 0,
+      s"A should be equal to itself after an RT -- ${rt(a)}")
+    assert(
+      oBufCompare(rtb, b) === 0,
+      "B should be equal to itself after an RT-- ${rt(b)}")
     assert(oBufCompare(a, b) === 0, "In memory comparasons make sense")
     assert(oBufCompare(b, a) === 0, "In memory comparasons make sense")
     assert(
@@ -602,8 +611,9 @@ class MacroOrderingProperties
   test("Test out Map[Long, Set[Int]]") {
     primitiveOrderedBufferSupplier[Map[Long, Set[Int]]]
     check[Map[Long, Set[Int]]]
-    val c = List(Map(9223372036854775807L -> Set[Int]()),
-                 Map(-1L -> Set[Int](-2043106012)))
+    val c = List(
+      Map(9223372036854775807L -> Set[Int]()),
+      Map(-1L -> Set[Int](-2043106012)))
     checkManyExplicit(c.map { i =>
       (i, i)
     })
@@ -651,8 +661,9 @@ class MacroOrderingProperties
     val a = "6"
     val b = "곆"
     val ord = Ordering.String
-    assert(rawCompare(a, b) === ord.compare(a, b).signum,
-           "Raw and in memory compares match.")
+    assert(
+      rawCompare(a, b) === ord.compare(a, b).signum,
+      "Raw and in memory compares match.")
 
     val c = List(
       "榴㉕⊟풠湜ᙬ覹ꜻ裧뚐⠂覝쫨塢䇺楠谭픚ᐌ轮뺷Ⱟ洦擄黏著탅ﮓꆋ숷梸傠ァ蹵窥轲闇涡飽ꌳ䝞慙擃",

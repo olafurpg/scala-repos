@@ -70,10 +70,11 @@ trait SqlProfile
     }
 
     override def hashCode() =
-      Vector(self.createPhase1,
-             self.createPhase2,
-             self.dropPhase1,
-             self.dropPhase2).hashCode
+      Vector(
+        self.createPhase1,
+        self.createPhase2,
+        self.dropPhase1,
+        self.dropPhase2).hashCode
 
     override def equals(o: Any) = o match {
       case ddl: DDL =>
@@ -183,8 +184,9 @@ trait SqlAction[+R, +S <: NoStream, -E <: Effect]
   def overrideStatements(statements: Iterable[String]): ResultAction[R, S, E]
 
   def getDumpInfo =
-    DumpInfo(DumpInfo.simpleNameFor(getClass),
-             mainInfo = statements.mkString("[", "; ", "]"))
+    DumpInfo(
+      DumpInfo.simpleNameFor(getClass),
+      mainInfo = statements.mkString("[", "; ", "]"))
 }
 
 trait SqlStreamingAction[+R, +T, -E <: Effect]

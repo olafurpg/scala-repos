@@ -69,12 +69,13 @@ trait KafkaIngestActorProjectionSystemConfig extends ShardConfig {
       failureLogRoot <- config.get[File]("failure_log_root")
       if config[Boolean]("enabled", false)
     } yield {
-      IngestConfig(bufferSize = config[Int]("buffer_size", 1024 * 1024),
-                   maxParallel = config[Int]("max_parallel", 5),
-                   batchTimeout = config[Int]("timeout", 120) seconds,
-                   maxConsecutiveFailures =
-                     config[Int]("ingest.max_consecutive_failures", 3),
-                   failureLogRoot = failureLogRoot)
+      IngestConfig(
+        bufferSize = config[Int]("buffer_size", 1024 * 1024),
+        maxParallel = config[Int]("max_parallel", 5),
+        batchTimeout = config[Int]("timeout", 120) seconds,
+        maxConsecutiveFailures =
+          config[Int]("ingest.max_consecutive_failures", 3),
+        failureLogRoot = failureLogRoot)
     }
   }
 
@@ -110,10 +111,11 @@ trait KafkaIngestActorProjectionSystem extends ShardSystemActorModule {
       permissionsFinder: PermissionsFinder[Future]) = {
     yggConfig.ingestConfig map { conf =>
       val consumer =
-        new SimpleConsumer(yggConfig.kafkaHost,
-                           yggConfig.kafkaPort,
-                           yggConfig.kafkaSocketTimeout.toMillis.toInt,
-                           yggConfig.kafkaBufferSize)
+        new SimpleConsumer(
+          yggConfig.kafkaHost,
+          yggConfig.kafkaPort,
+          yggConfig.kafkaSocketTimeout.toMillis.toInt,
+          yggConfig.kafkaBufferSize)
 
       actorSystem.actorOf(
         Props(
@@ -146,10 +148,11 @@ trait KafkaIngestActorProjectionSystem extends ShardSystemActorModule {
   }
 
   override def checkpointCoordination =
-    ZookeeperSystemCoordination(yggConfig.zookeeperHosts,
-                                yggConfig.serviceUID,
-                                yggConfig.ingestConfig.isDefined,
-                                yggConfig.createYggCheckpointFlag)
+    ZookeeperSystemCoordination(
+      yggConfig.zookeeperHosts,
+      yggConfig.serviceUID,
+      yggConfig.ingestConfig.isDefined,
+      yggConfig.createYggCheckpointFlag)
 }
 
 trait StandaloneShardSystemConfig extends ShardConfig {

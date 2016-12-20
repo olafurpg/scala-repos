@@ -27,14 +27,16 @@ trait MilestonesService {
     Milestones
       .filter(
         t =>
-          t.byPrimaryKey(milestone.userName,
-                         milestone.repositoryName,
-                         milestone.milestoneId))
+          t.byPrimaryKey(
+            milestone.userName,
+            milestone.repositoryName,
+            milestone.milestoneId))
       .map(t => (t.title, t.description.?, t.dueDate.?, t.closedDate.?))
-      .update(milestone.title,
-              milestone.description,
-              milestone.dueDate,
-              milestone.closedDate)
+      .update(
+        milestone.title,
+        milestone.description,
+        milestone.dueDate,
+        milestone.closedDate)
 
   def openMilestone(milestone: Milestone)(implicit s: Session): Unit =
     updateMilestone(milestone.copy(closedDate = None))

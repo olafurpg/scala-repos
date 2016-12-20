@@ -418,8 +418,9 @@ D <: jfxc.ObservableArray[D]](override val delegate: D)
                                sizeChanged: Boolean,
                                start: Int,
                                end: Int) {
-          op(ObservableArray.this.asInstanceOf[T],
-             ObservableArray.Change(sizeChanged, start, end))
+          op(
+            ObservableArray.this.asInstanceOf[T],
+            ObservableArray.Change(sizeChanged, start, end))
         }
       }
     }

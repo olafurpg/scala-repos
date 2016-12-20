@@ -130,8 +130,9 @@ final class ReplicatorSettings(val role: Option[String],
   def withPruning(
       pruningInterval: FiniteDuration,
       maxPruningDissemination: FiniteDuration): ReplicatorSettings =
-    copy(pruningInterval = pruningInterval,
-         maxPruningDissemination = maxPruningDissemination)
+    copy(
+      pruningInterval = pruningInterval,
+      maxPruningDissemination = maxPruningDissemination)
 
   private def copy(role: Option[String] = role,
                    gossipInterval: FiniteDuration = gossipInterval,
@@ -142,13 +143,14 @@ final class ReplicatorSettings(val role: Option[String],
                    pruningInterval: FiniteDuration = pruningInterval,
                    maxPruningDissemination: FiniteDuration =
                      maxPruningDissemination): ReplicatorSettings =
-    new ReplicatorSettings(role,
-                           gossipInterval,
-                           notifySubscribersInterval,
-                           maxDeltaElements,
-                           dispatcher,
-                           pruningInterval,
-                           maxPruningDissemination)
+    new ReplicatorSettings(
+      role,
+      gossipInterval,
+      notifySubscribersInterval,
+      maxDeltaElements,
+      dispatcher,
+      pruningInterval,
+      maxPruningDissemination)
 }
 
 object Replicator {
@@ -576,9 +578,10 @@ object Replicator {
             require(pruning.contains(from))
             val to = pruning(from).owner
             val prunedData = dataWithRemovedNodePruning.prune(from, to)
-            copy(data = prunedData,
-                 pruning =
-                   pruning.updated(from, PruningState(to, PruningPerformed)))
+            copy(
+              data = prunedData,
+              pruning =
+                pruning.updated(from, PruningState(to, PruningPerformed)))
           case _ ⇒ this
         }
       }
@@ -599,8 +602,9 @@ object Replicator {
           }
 
           // cleanup both sides before merging, `merge((otherData: ReplicatedData)` will cleanup other.data
-          copy(data = cleaned(data, mergedRemovedNodePruning),
-               pruning = mergedRemovedNodePruning).merge(other.data)
+          copy(
+            data = cleaned(data, mergedRemovedNodePruning),
+            pruning = mergedRemovedNodePruning).merge(other.data)
         }
 
       def merge(otherData: ReplicatedData): DataEnvelope =
@@ -613,8 +617,9 @@ object Replicator {
           c: ReplicatedData,
           p: Map[UniqueAddress, PruningState]): ReplicatedData =
         p.foldLeft(c) {
-          case (c: RemovedNodePruning,
-                (removed, PruningState(_, PruningPerformed))) ⇒
+          case (
+              c: RemovedNodePruning,
+              (removed, PruningState(_, PruningPerformed))) ⇒
             if (c.needPruningFrom(removed)) c.pruningCleanup(removed) else c
           case (c, _) ⇒ c
         }
@@ -848,10 +853,11 @@ final class Replicator(settings: ReplicatorSettings)
   import context.dispatcher
   val gossipTask = context.system.scheduler
     .schedule(gossipInterval, gossipInterval, self, GossipTick)
-  val notifyTask = context.system.scheduler.schedule(notifySubscribersInterval,
-                                                     notifySubscribersInterval,
-                                                     self,
-                                                     FlushChanges)
+  val notifyTask = context.system.scheduler.schedule(
+    notifySubscribersInterval,
+    notifySubscribersInterval,
+    self,
+    FlushChanges)
   val pruningTask = context.system.scheduler
     .schedule(pruningInterval, pruningInterval, self, RemovedNodePruningTick)
   val clockTask = context.system.scheduler
@@ -896,11 +902,12 @@ final class Replicator(settings: ReplicatorSettings)
     val leaderChangedClass =
       if (role.isDefined) classOf[RoleLeaderChanged]
       else classOf[LeaderChanged]
-    cluster.subscribe(self,
-                      initialStateMode = InitialStateAsEvents,
-                      classOf[MemberEvent],
-                      classOf[ReachabilityEvent],
-                      leaderChangedClass)
+    cluster.subscribe(
+      self,
+      initialStateMode = InitialStateAsEvents,
+      classOf[MemberEvent],
+      classOf[ReachabilityEvent],
+      leaderChangedClass)
   }
 
   override def postStop(): Unit = {
@@ -991,10 +998,11 @@ final class Replicator(settings: ReplicatorSettings)
       }
     } match {
       case Success(newData) ⇒
-        log.debug("Received Update for key [{}], old data [{}], new data [{}]",
-                  key,
-                  localValue,
-                  newData)
+        log.debug(
+          "Received Update for key [{}], old data [{}], new data [{}]",
+          key,
+          localValue,
+          newData)
         val envelope = DataEnvelope(pruningCleanupTombstoned(newData))
         setData(key.id, envelope)
         if (isLocalUpdate(writeConsistency)) sender() ! UpdateSuccess(key, req)
@@ -1043,8 +1051,9 @@ final class Replicator(settings: ReplicatorSettings)
             writeEnvelope.data.getClass.getName)
         }
       case None ⇒
-        setData(key,
-                pruningCleanupTombstoned(writeEnvelope).addSeen(selfAddress))
+        setData(
+          key,
+          pruningCleanupTombstoned(writeEnvelope).addSeen(selfAddress))
     }
 
   def receiveReadRepair(key: String, writeEnvelope: DataEnvelope): Unit = {
@@ -1203,19 +1212,22 @@ final class Replicator(settings: ReplicatorSettings)
     val keys = (otherDifferentKeys ++ otherMissingKeys).take(maxDeltaElements)
     if (keys.nonEmpty) {
       if (log.isDebugEnabled)
-        log.debug("Sending gossip to [{}], containing [{}]",
-                  sender().path.address,
-                  keys.mkString(", "))
-      val g = Gossip(keys.map(k ⇒ k -> getData(k).get)(collection.breakOut),
-                     sendBack = otherDifferentKeys.nonEmpty)
+        log.debug(
+          "Sending gossip to [{}], containing [{}]",
+          sender().path.address,
+          keys.mkString(", "))
+      val g = Gossip(
+        keys.map(k ⇒ k -> getData(k).get)(collection.breakOut),
+        sendBack = otherDifferentKeys.nonEmpty)
       sender() ! g
     }
     val myMissingKeys = otherKeys diff myKeys
     if (myMissingKeys.nonEmpty) {
       if (log.isDebugEnabled)
-        log.debug("Sending gossip status to [{}], requesting missing [{}]",
-                  sender().path.address,
-                  myMissingKeys.mkString(", "))
+        log.debug(
+          "Sending gossip status to [{}], requesting missing [{}]",
+          sender().path.address,
+          myMissingKeys.mkString(", "))
       val status = Status(
         myMissingKeys.map(k ⇒ k -> NotFoundDigest)(collection.breakOut),
         chunk,
@@ -1227,9 +1239,10 @@ final class Replicator(settings: ReplicatorSettings)
   def receiveGossip(updatedData: Map[String, DataEnvelope],
                     sendBack: Boolean): Unit = {
     if (log.isDebugEnabled)
-      log.debug("Received gossip from [{}], containing [{}]",
-                sender().path.address,
-                updatedData.keys.mkString(", "))
+      log.debug(
+        "Received gossip from [{}], containing [{}]",
+        sender().path.address,
+        updatedData.keys.mkString(", "))
     var replyData = Map.empty[String, DataEnvelope]
     updatedData.foreach {
       case (key, envelope) ⇒
@@ -1358,8 +1371,9 @@ final class Replicator(settings: ReplicatorSettings)
   def performRemovedNodePruning(): Unit = {
     // perform pruning when all seen Init
     dataEntries.foreach {
-      case (key,
-            (envelope @ DataEnvelope(data: RemovedNodePruning, pruning), _)) ⇒
+      case (
+          key,
+          (envelope @ DataEnvelope(data: RemovedNodePruning, pruning), _)) ⇒
         pruning.foreach {
           case (removed, PruningState(owner, PruningInitialized(seen)))
               if owner == selfUniqueAddress &&
@@ -1367,10 +1381,11 @@ final class Replicator(settings: ReplicatorSettings)
             val newEnvelope = envelope.prune(removed)
             pruningPerformed =
               pruningPerformed.updated(removed, allReachableClockTime)
-            log.debug("Perform pruning of [{}] from [{}] to [{}]",
-                      key,
-                      removed,
-                      selfUniqueAddress)
+            log.debug(
+              "Perform pruning of [{}] from [{}] to [{}]",
+              key,
+              removed,
+              selfUniqueAddress)
             setData(key, newEnvelope)
           case _ ⇒
         }
@@ -1403,8 +1418,9 @@ final class Replicator(settings: ReplicatorSettings)
         removedNodes -= removed
         tombstoneNodes += removed
         dataEntries.foreach {
-          case (key,
-                (envelope @ DataEnvelope(data: RemovedNodePruning, _), _)) ⇒
+          case (
+              key,
+              (envelope @ DataEnvelope(data: RemovedNodePruning, _), _)) ⇒
             setData(key, pruningCleanupTombstoned(removed, envelope))
           case _ ⇒ // deleted, or pruning not needed
         }

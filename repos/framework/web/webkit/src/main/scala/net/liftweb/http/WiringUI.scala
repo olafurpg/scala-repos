@@ -145,11 +145,12 @@ object WiringUI {
 
       addHistJsFunc(cell, (old: Box[T], nw: T) => f(old, nw, in))
 
-      new Elem(myElem.prefix,
-               myElem.label,
-               myElem.attributes,
-               myElem.scope,
-               myElem.minimizeEmpty)
+      new Elem(
+        myElem.prefix,
+        myElem.label,
+        myElem.attributes,
+        myElem.scope,
+        myElem.minimizeEmpty)
     }
 
   /**

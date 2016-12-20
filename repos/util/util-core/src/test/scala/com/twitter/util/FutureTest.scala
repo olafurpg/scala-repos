@@ -1162,11 +1162,12 @@ class FutureTest
         }
       }
 
-      testSequence("flatMap",
-                   (a, next) =>
-                     a flatMap { _ =>
-                       next()
-                   })
+      testSequence(
+        "flatMap",
+        (a, next) =>
+          a flatMap { _ =>
+            next()
+        })
       testSequence("before", (a, next) => a before next())
 
       "flatMap (values)" should {
@@ -1362,8 +1363,8 @@ class FutureTest
       }
 
       "willEqual" in {
-        assert(Await.result(const.value(1) willEqual (const.value(1)),
-                            1.second) == true)
+        assert(Await
+          .result(const.value(1) willEqual (const.value(1)), 1.second) == true)
       }
 
       "Future() handles exceptions" in {
@@ -1657,8 +1658,9 @@ class FutureTest
     }
   }
 
-  test("ConstFuture",
-       new MkConst { def apply[A](r: Try[A]) = Future.const(r) })
+  test(
+    "ConstFuture",
+    new MkConst { def apply[A](r: Try[A]) = Future.const(r) })
   test("Promise", new MkConst { def apply[A](r: Try[A]) = new Promise(r) })
 
   "Future.apply" should {

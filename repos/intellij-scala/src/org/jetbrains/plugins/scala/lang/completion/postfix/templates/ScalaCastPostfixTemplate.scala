@@ -31,8 +31,9 @@ class ScalaCastPostfixTemplate
   override def expandForChooseExpression(expression: PsiElement,
                                          editor: Editor): Unit = {
     val document: Document = editor.getDocument
-    document.deleteString(expression.getTextRange.getStartOffset,
-                          expression.getTextRange.getEndOffset)
+    document.deleteString(
+      expression.getTextRange.getStartOffset,
+      expression.getTextRange.getEndOffset)
     val manager: TemplateManager =
       TemplateManager.getInstance(expression.getProject)
 

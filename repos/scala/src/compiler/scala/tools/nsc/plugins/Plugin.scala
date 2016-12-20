@@ -103,8 +103,9 @@ object Plugin {
     // XXX Return to this once we have more ARM support
     def read(is: Option[InputStream]) = is match {
       case None =>
-        throw new PluginLoadException(jarp.path,
-                                      s"Missing $PluginXML in $jarp")
+        throw new PluginLoadException(
+          jarp.path,
+          s"Missing $PluginXML in $jarp")
       case Some(is) => PluginDescription.fromXML(is)
     }
     Try(new Jar(jarp.jfile).withEntryStream(PluginXML)(read))
@@ -124,8 +125,9 @@ object Plugin {
     } catch {
       case NonFatal(e) =>
         Failure(
-          new PluginLoadException(classname,
-                                  s"Error: unable to load class: $classname"))
+          new PluginLoadException(
+            classname,
+            s"Error: unable to load class: $classname"))
       case e: NoClassDefFoundError =>
         Failure(
           new PluginLoadException(

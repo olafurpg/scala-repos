@@ -135,9 +135,10 @@ trait MatchTranslation { self: PatternMatching =>
         // even though the eventual null check will be on typeTest.nextBinder
         // it'll be equal to binder casted to paramType anyway (and the type test is on binder)
         def extraction: TreeMaker =
-          treeMaker(typeTest.nextBinder,
-                    typeTest impliesBinderNonNull binder,
-                    pos)
+          treeMaker(
+            typeTest.nextBinder,
+            typeTest impliesBinderNonNull binder,
+            pos)
 
         // paramType = the type expected by the unapply
         // TODO: paramType may contain unbound type params (run/t2800, run/t3530)
@@ -293,8 +294,9 @@ trait MatchTranslation { self: PatternMatching =>
               // if we fail to emit a fine-grained switch, have to do translateCase again with a single scrutSym (TODO: uniformize substitution on treemakers so we can avoid this)
               val caseScrutSym = freshSym(pos, pureType(ThrowableTpe))
               (caseScrutSym,
-               propagateSubstitution(translateCase(caseScrutSym, pt)(caseDef),
-                                     EmptySubstitution))
+               propagateSubstitution(
+                 translateCase(caseScrutSym, pt)(caseDef),
+                 EmptySubstitution))
             }
 
           for (cases <- emitTypeSwitch(bindersAndCases, pt).toList
@@ -309,8 +311,9 @@ trait MatchTranslation { self: PatternMatching =>
             val scrutSym = freshSym(pos, pureType(ThrowableTpe))
             val casesNoSubstOnly =
               caseDefs map { caseDef =>
-                (propagateSubstitution(translateCase(scrutSym, pt)(caseDef),
-                                       EmptySubstitution))
+                (propagateSubstitution(
+                  translateCase(scrutSym, pt)(caseDef),
+                  EmptySubstitution))
               }
 
             val exSym = freshSym(pos, pureType(ThrowableTpe), "ex")
@@ -319,12 +322,13 @@ trait MatchTranslation { self: PatternMatching =>
               CaseDef(
                 Bind(exSym, Ident(nme.WILDCARD)), // TODO: does this need fixing upping?
                 EmptyTree,
-                combineCasesNoSubstOnly(REF(exSym),
-                                        scrutSym,
-                                        casesNoSubstOnly,
-                                        pt,
-                                        matchOwner,
-                                        Some(scrut => Throw(REF(exSym))))
+                combineCasesNoSubstOnly(
+                  REF(exSym),
+                  scrutSym,
+                  casesNoSubstOnly,
+                  pt,
+                  matchOwner,
+                  Some(scrut => Throw(REF(exSym))))
               )
             })
           }
@@ -524,10 +528,11 @@ trait MatchTranslation { self: PatternMatching =>
          else productElemsToN(binder, totalArity))
 
       private def compareInts(t1: Tree, t2: Tree) =
-        gen.mkMethodCall(termMember(ScalaPackage, "math"),
-                         TermName("signum"),
-                         Nil,
-                         (t1 INT_- t2) :: Nil)
+        gen.mkMethodCall(
+          termMember(ScalaPackage, "math"),
+          TermName("signum"),
+          Nil,
+          (t1 INT_- t2) :: Nil)
 
       protected def lengthGuard(binder: Symbol): Option[Tree] =
         // no need to check unless it's an unapplySeq and the minimal length is non-trivially satisfied
@@ -538,8 +543,9 @@ trait MatchTranslation { self: PatternMatching =>
           def checkExpectedLength =
             sequenceType member nme.lengthCompare match {
               case NoSymbol =>
-                compareInts(Select(seqTree(binder), nme.length),
-                            LIT(expectedLength))
+                compareInts(
+                  Select(seqTree(binder), nme.length),
+                  LIT(expectedLength))
               case lencmp => (seqTree(binder) DOT lencmp)(LIT(expectedLength))
             }
 
@@ -551,8 +557,9 @@ trait MatchTranslation { self: PatternMatching =>
             else _ INT_== _
 
           // `if (binder != null && $checkExpectedLength [== | >=] 0) then else zero`
-          (seqTree(binder) ANY_!= NULL) AND compareOp(checkExpectedLength,
-                                                      ZERO)
+          (seqTree(binder) ANY_!= NULL) AND compareOp(
+            checkExpectedLength,
+            ZERO)
         }
 
       def checkedLength: Option[Int] =

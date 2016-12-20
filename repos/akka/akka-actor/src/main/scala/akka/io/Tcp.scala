@@ -301,8 +301,9 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
     * Common supertype of [[Write]] and [[WriteFile]].
     */
   sealed abstract class SimpleWriteCommand extends WriteCommand {
-    require(ack != null,
-            "ack must be non-null. Use NoAck if you don't want acks.")
+    require(
+      ack != null,
+      "ack must be non-null. Use NoAck if you don't want acks.")
 
     /**
       * The acknowledgment token associated with this write command.
@@ -605,10 +606,11 @@ class TcpExt(system: ExtendedActorSystem) extends IO.Extension {
     *
     */
   val manager: ActorRef = {
-    system.systemActorOf(props = Props(classOf[TcpManager], this)
-                           .withDispatcher(Settings.ManagementDispatcher)
-                           .withDeploy(Deploy.local),
-                         name = "IO-TCP")
+    system.systemActorOf(
+      props = Props(classOf[TcpManager], this)
+        .withDispatcher(Settings.ManagementDispatcher)
+        .withDeploy(Deploy.local),
+      name = "IO-TCP")
   }
 
   /**
@@ -676,11 +678,12 @@ object TcpMessage {
               options: JIterable[SocketOption],
               timeout: FiniteDuration,
               pullMode: Boolean): Command =
-    Connect(remoteAddress,
-            Option(localAddress),
-            options,
-            Option(timeout),
-            pullMode)
+    Connect(
+      remoteAddress,
+      Option(localAddress),
+      options,
+      Option(timeout),
+      pullMode)
 
   /**
     * Connect to the given `remoteAddress` without binding to a local address and without

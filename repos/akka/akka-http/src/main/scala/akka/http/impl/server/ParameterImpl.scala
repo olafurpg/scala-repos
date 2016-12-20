@@ -57,7 +57,8 @@ private[http] object ParameterImpl {
   def apply[T, U](receptacle: NameUnmarshallerReceptacle[T])(
       implicit tTag: ClassTag[U],
       conv: T ⇒ U): Parameter[U] =
-    new ParameterImpl(new NameReceptacle(receptacle.name))(receptacle.um,
-                                                           tTag,
-                                                           conv)
+    new ParameterImpl(new NameReceptacle(receptacle.name))(
+      receptacle.um,
+      tTag,
+      conv)
 }

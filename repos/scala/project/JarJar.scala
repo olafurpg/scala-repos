@@ -49,9 +49,10 @@ object JarJar {
                                verbose: Boolean,
                                skipManifest: Boolean): JarProcessor = {
     val cls = Class.forName("org.pantsbuild.jarjar.MainProcessor")
-    val constructor = cls.getConstructor(classOf[java.util.List[_]],
-                                         java.lang.Boolean.TYPE,
-                                         java.lang.Boolean.TYPE)
+    val constructor = cls.getConstructor(
+      classOf[java.util.List[_]],
+      java.lang.Boolean.TYPE,
+      java.lang.Boolean.TYPE)
     constructor.setAccessible(true)
     constructor
       .newInstance(patterns, Boolean.box(verbose), Boolean.box(skipManifest))

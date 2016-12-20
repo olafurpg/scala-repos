@@ -1,7 +1,12 @@
 package mesosphere.marathon.core.appinfo.impl
 
 import mesosphere.marathon.MarathonSpec
-import mesosphere.marathon.core.appinfo.{GroupSelector, GroupInfo, AppInfo, AppSelector}
+import mesosphere.marathon.core.appinfo.{
+  GroupSelector,
+  GroupInfo,
+  AppInfo,
+  AppSelector
+}
 import mesosphere.marathon.state._
 import mesosphere.marathon.test.Mockito
 import org.scalatest.{Matchers, GivenWhenThen}
@@ -9,7 +14,10 @@ import org.scalatest.{Matchers, GivenWhenThen}
 import scala.concurrent.Future
 
 class DefaultInfoServiceTest
-    extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Mockito
+    with Matchers {
   import mesosphere.FutureTestSupport._
 
   test("queryForAppId") {
@@ -130,7 +138,7 @@ class DefaultInfoServiceTest
     Given("a group repo with some apps below the queried group id")
     val f = new Fixture
     f.groupManager.group(PathId("/nested")) returns Future.successful(
-        someGroupWithNested.group(PathId("/nested")))
+      someGroupWithNested.group(PathId("/nested")))
     f.baseData.appInfoFuture(any, any) answers { args =>
       Future.successful(AppInfo(args.head.asInstanceOf[AppDefinition]))
     }
@@ -156,7 +164,7 @@ class DefaultInfoServiceTest
     Given("a group repo with some apps below the queried group id")
     val f = new Fixture
     f.groupManager.group(PathId("/nested")) returns Future.successful(
-        someGroupWithNested.group(PathId("/nested")))
+      someGroupWithNested.group(PathId("/nested")))
     f.baseData.appInfoFuture(any, any) answers { args =>
       Future.successful(AppInfo(args.head.asInstanceOf[AppDefinition]))
     }
@@ -185,10 +193,10 @@ class DefaultInfoServiceTest
 
     When("querying extending group information")
     val result = f.infoService.selectGroup(
-        group.id,
-        GroupSelector.all,
-        Set.empty,
-        Set(GroupInfo.Embed.Apps, GroupInfo.Embed.Groups))
+      group.id,
+      GroupSelector.all,
+      Set.empty,
+      Set(GroupInfo.Embed.Apps, GroupInfo.Embed.Groups))
 
     Then("The group info contains apps and groups")
     result.futureValue.get.maybeGroups should be(defined)
@@ -198,7 +206,10 @@ class DefaultInfoServiceTest
 
     When("querying extending group information without apps")
     val result2 = f.infoService.selectGroup(
-        group.id, GroupSelector.all, Set.empty, Set(GroupInfo.Embed.Groups))
+      group.id,
+      GroupSelector.all,
+      Set.empty,
+      Set(GroupInfo.Embed.Groups))
 
     Then("The group info contains no apps but groups")
     result2.futureValue.get.maybeGroups should be(defined)
@@ -206,7 +217,10 @@ class DefaultInfoServiceTest
 
     When("querying extending group information without apps and groups")
     val result3 = f.infoService.selectGroup(
-        group.id, GroupSelector.all, Set.empty, Set.empty)
+      group.id,
+      GroupSelector.all,
+      Set.empty,
+      Set.empty)
 
     Then("The group info contains no apps nor groups")
     result3.futureValue.get.maybeGroups should be(empty)
@@ -230,10 +244,10 @@ class DefaultInfoServiceTest
 
     When("querying extending group information with selector")
     val result = f.infoService.selectGroup(
-        group.id,
-        selector,
-        Set.empty,
-        Set(GroupInfo.Embed.Apps, GroupInfo.Embed.Groups))
+      group.id,
+      selector,
+      Set.empty,
+      Set(GroupInfo.Embed.Apps, GroupInfo.Embed.Groups))
 
     Then("The result is filtered by the selector")
     result.futureValue.get.maybeGroups should be(defined)
@@ -247,8 +261,8 @@ class DefaultInfoServiceTest
     lazy val appRepo = mock[AppRepository]
     lazy val baseData = mock[AppInfoBaseData]
     def newBaseData(): AppInfoBaseData = baseData
-    lazy val infoService = new DefaultInfoService(
-        groupManager, appRepo, newBaseData)
+    lazy val infoService =
+      new DefaultInfoService(groupManager, appRepo, newBaseData)
 
     def verifyNoMoreInteractions(): Unit = {
       noMoreInteractions(groupManager)
@@ -259,43 +273,51 @@ class DefaultInfoServiceTest
 
   private val app1: AppDefinition = AppDefinition(PathId("/test1"))
   val someApps = Set(
-      app1,
-      AppDefinition(PathId("/test2")),
-      AppDefinition(PathId("/test3"))
+    app1,
+    AppDefinition(PathId("/test2")),
+    AppDefinition(PathId("/test3"))
   )
 
   val someNestedApps = Set(
-      AppDefinition(PathId("/nested/test1")),
-      AppDefinition(PathId("/nested/test2"))
+    AppDefinition(PathId("/nested/test1")),
+    AppDefinition(PathId("/nested/test2"))
   )
 
   val someGroupWithNested = Group.empty.copy(
-      apps = someApps,
-      groups = Set(
-            Group.empty.copy(
-                id = PathId("/nested"),
-                apps = someNestedApps
-            )
-        )
+    apps = someApps,
+    groups = Set(
+      Group.empty.copy(
+        id = PathId("/nested"),
+        apps = someNestedApps
+      )
+    )
   )
 
   val nestedGroup = Group(
-      PathId.empty,
-      Set(AppDefinition(PathId("/app1"))),
-      Set(Group(PathId("/visible"),
-                Set(AppDefinition(PathId("/visible/app1"))),
-                Set(
-                    Group(PathId("/visible/group"),
-                          Set(AppDefinition(PathId("/visible/group/app1"))))
-                )),
-          Group(PathId("/secure"),
-                Set(AppDefinition(PathId("/secure/app1"))),
-                Set(
-                    Group(PathId("/secure/group"),
-                          Set(AppDefinition(PathId("/secure/group/app1"))))
-                )),
-          Group(PathId("/other"),
-                Set(AppDefinition(PathId("/other/app1"))),
-                Set(Group(PathId("/other/group"),
-                          Set(AppDefinition(PathId("/other/group/app1"))))))))
+    PathId.empty,
+    Set(AppDefinition(PathId("/app1"))),
+    Set(
+      Group(
+        PathId("/visible"),
+        Set(AppDefinition(PathId("/visible/app1"))),
+        Set(
+          Group(
+            PathId("/visible/group"),
+            Set(AppDefinition(PathId("/visible/group/app1"))))
+        )),
+      Group(
+        PathId("/secure"),
+        Set(AppDefinition(PathId("/secure/app1"))),
+        Set(
+          Group(
+            PathId("/secure/group"),
+            Set(AppDefinition(PathId("/secure/group/app1"))))
+        )),
+      Group(
+        PathId("/other"),
+        Set(AppDefinition(PathId("/other/app1"))),
+        Set(
+          Group(
+            PathId("/other/group"),
+            Set(AppDefinition(PathId("/other/group/app1"))))))))
 }

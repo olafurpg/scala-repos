@@ -17,15 +17,17 @@ private[twitter] object ThriftUtil {
   private val thriftFinagleClientParamTypes =
     Seq(classOf[Service[_, _]], classOf[TProtocolFactory])
 
-  private val scrooge2FinagleClientParamTypes = Seq(classOf[Service[_, _]],
-                                                    classOf[TProtocolFactory],
-                                                    classOf[Option[_]],
-                                                    classOf[StatsReceiver])
+  private val scrooge2FinagleClientParamTypes = Seq(
+    classOf[Service[_, _]],
+    classOf[TProtocolFactory],
+    classOf[Option[_]],
+    classOf[StatsReceiver])
 
-  private val scrooge3FinagleClientParamTypes = Seq(classOf[Service[_, _]],
-                                                    classOf[TProtocolFactory],
-                                                    classOf[String],
-                                                    classOf[StatsReceiver])
+  private val scrooge3FinagleClientParamTypes = Seq(
+    classOf[Service[_, _]],
+    classOf[TProtocolFactory],
+    classOf[String],
+    classOf[StatsReceiver])
 
   private val scrooge3FinagleClientWithRepClassifierParamTypes = Seq(
     classOf[Service[_, _]],
@@ -136,10 +138,11 @@ private[twitter] object ThriftUtil {
       for {
         swiftClass <- findSwiftClass(cls)
         proxy <- findClass1("com.twitter.finagle.exp.swift.SwiftProxy")
-        meth <- findMethod(proxy,
-                           "newClient",
-                           classOf[Service[_, _]],
-                           classOf[ClassTag[_]])
+        meth <- findMethod(
+          proxy,
+          "newClient",
+          classOf[Service[_, _]],
+          classOf[ClassTag[_]])
       } yield {
         val manifest = ClassTag(swiftClass).asInstanceOf[ClassTag[Iface]]
         meth.invoke(null, underlying, manifest).asInstanceOf[Iface]
@@ -182,10 +185,11 @@ private[twitter] object ThriftUtil {
       } yield {
         // The new constructor takes one more 'label' paramater than the old one, so we first try find
         // the new constructor, it it doesn't not exist, fallback to the one without 'label' parameter.
-        val oldParameters = Seq(baseClass,
-                                classOf[TProtocolFactory],
-                                classOf[StatsReceiver],
-                                Integer.TYPE)
+        val oldParameters = Seq(
+          baseClass,
+          classOf[TProtocolFactory],
+          classOf[StatsReceiver],
+          Integer.TYPE)
         val newParameters = oldParameters :+ classOf[String]
         val oldArgs =
           Seq(impl, protocolFactory, stats, Int.box(maxThriftBufferSize))
@@ -241,11 +245,12 @@ private[twitter] object ThriftUtil {
   def serverFromIface(impl: AnyRef,
                       protocolFactory: TProtocolFactory,
                       serviceName: String): BinaryService = {
-    serverFromIface(impl,
-                    protocolFactory,
-                    LoadedStatsReceiver,
-                    Thrift.maxThriftBufferSize,
-                    serviceName)
+    serverFromIface(
+      impl,
+      protocolFactory,
+      LoadedStatsReceiver,
+      Thrift.maxThriftBufferSize,
+      serviceName)
   }
 }
 
@@ -364,8 +369,9 @@ trait ThriftRichClient { self: Client[ThriftClientRequest, Array[Byte]] =>
   /**
     * $clientUse
     */
-  @deprecated("Use destination names via newIface(String) or newIface(Name)",
-              "6.7.x")
+  @deprecated(
+    "Use destination names via newIface(String) or newIface(Name)",
+    "6.7.x")
   def newIface[Iface: ClassTag](group: Group[SocketAddress]): Iface = {
     val cls = implicitly[ClassTag[Iface]].runtimeClass
     newIface[Iface](group, cls)
@@ -374,8 +380,9 @@ trait ThriftRichClient { self: Client[ThriftClientRequest, Array[Byte]] =>
   /**
     * $clientUse
     */
-  @deprecated("Use destination names via newIface(String) or newIface(Name)",
-              "6.7.x")
+  @deprecated(
+    "Use destination names via newIface(String) or newIface(Name)",
+    "6.7.x")
   def newIface[Iface](group: Group[SocketAddress], cls: Class[_]): Iface =
     group match {
       case LabelledGroup(g, label) => newIface(Name.fromGroup(g), label, cls)
@@ -508,21 +515,25 @@ trait ThriftRichServer { self: Server[Array[Byte], Array[Byte]] =>
     * $serveIface
     */
   def serveIface(addr: String, iface: AnyRef): ListeningServer =
-    serve(addr,
-          serverFromIface(iface,
-                          protocolFactory,
-                          serverStats,
-                          maxThriftBufferSize,
-                          serverLabel))
+    serve(
+      addr,
+      serverFromIface(
+        iface,
+        protocolFactory,
+        serverStats,
+        maxThriftBufferSize,
+        serverLabel))
 
   /**
     * $serveIface
     */
   def serveIface(addr: SocketAddress, iface: AnyRef): ListeningServer =
-    serve(addr,
-          serverFromIface(iface,
-                          protocolFactory,
-                          serverStats,
-                          maxThriftBufferSize,
-                          serverLabel))
+    serve(
+      addr,
+      serverFromIface(
+        iface,
+        protocolFactory,
+        serverStats,
+        maxThriftBufferSize,
+        serverLabel))
 }

@@ -36,11 +36,12 @@ object WorksheetDiffSplitters {
                            intervals: Iterable[(Int, Int)],
                            changes: Iterable[(Int, Int)],
                            prop: Float) = {
-    new SimpleWorksheetSplitter(originalEditor,
-                                viewerEditor,
-                                intervals,
-                                changes,
-                                prop)
+    new SimpleWorksheetSplitter(
+      originalEditor,
+      viewerEditor,
+      intervals,
+      changes,
+      prop)
   }
 
   class WorksheetEditingSides(originalEditor: Editor, viewerEditor: Editor)
@@ -48,9 +49,10 @@ object WorksheetDiffSplitters {
     private val left = new WeakReference(originalEditor)
     private val right = new WeakReference(viewerEditor)
 
-    private lazy val lineBlocks = createLineBlocks(originalEditor.getDocument,
-                                                   viewerEditor.getDocument,
-                                                   originalEditor.getProject)
+    private lazy val lineBlocks = createLineBlocks(
+      originalEditor.getDocument,
+      viewerEditor.getDocument,
+      originalEditor.getProject)
 
     override def getEditor(side: FragmentSide) = side match {
       case FragmentSide.SIDE1 => left.get()

@@ -796,8 +796,9 @@ object MutableOptimizationSpace {
       val norms = EntrywiseMatrixNorms.make[DenseMatrix[Double], Double]
       import norms.{canInnerProduct, canNorm_Double}
       import DenseMatrix.canMapValues
-      make[DenseMatrix[Double], DenseVector[Double], Double](_.asDenseMatrix,
-                                                             _.flatten())
+      make[DenseMatrix[Double], DenseVector[Double], Double](
+        _.asDenseMatrix,
+        _.flatten())
     }
   }
 
@@ -808,8 +809,9 @@ object MutableOptimizationSpace {
       Double] = {
       val norms = EntrywiseMatrixNorms.make[CSCMatrix[Double], Double]
       import norms.{canInnerProduct, canNorm_Double}
-      make[CSCMatrix[Double], SparseVector[Double], Double](_.asCscRow,
-                                                            _.flatten())
+      make[CSCMatrix[Double], SparseVector[Double], Double](
+        _.asCscRow,
+        _.flatten())
     }
   }
 

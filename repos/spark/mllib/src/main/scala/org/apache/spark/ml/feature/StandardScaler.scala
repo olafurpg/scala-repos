@@ -106,10 +106,12 @@ class StandardScaler(override val uid: String)
 
   override def transformSchema(schema: StructType): StructType = {
     val inputType = schema($(inputCol)).dataType
-    require(inputType.isInstanceOf[VectorUDT],
-            s"Input column ${$(inputCol)} must be a vector column")
-    require(!schema.fieldNames.contains($(outputCol)),
-            s"Output column ${$(outputCol)} already exists.")
+    require(
+      inputType.isInstanceOf[VectorUDT],
+      s"Input column ${$(inputCol)} must be a vector column")
+    require(
+      !schema.fieldNames.contains($(outputCol)),
+      s"Output column ${$(outputCol)} already exists.")
     val outputFields =
       schema.fields :+ StructField($(outputCol), new VectorUDT, false)
     StructType(outputFields)
@@ -158,10 +160,12 @@ class StandardScalerModel private[ml] (override val uid: String,
 
   override def transformSchema(schema: StructType): StructType = {
     val inputType = schema($(inputCol)).dataType
-    require(inputType.isInstanceOf[VectorUDT],
-            s"Input column ${$(inputCol)} must be a vector column")
-    require(!schema.fieldNames.contains($(outputCol)),
-            s"Output column ${$(outputCol)} already exists.")
+    require(
+      inputType.isInstanceOf[VectorUDT],
+      s"Input column ${$(inputCol)} must be a vector column")
+    require(
+      !schema.fieldNames.contains($(outputCol)),
+      s"Output column ${$(outputCol)} already exists.")
     val outputFields =
       schema.fields :+ StructField($(outputCol), new VectorUDT, false)
     StructType(outputFields)

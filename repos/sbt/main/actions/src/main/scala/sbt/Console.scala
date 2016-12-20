@@ -29,8 +29,9 @@ final class Console(compiler: AnalyzingCompiler) {
             initialCommands: String,
             cleanupCommands: String)(bindings: (String, Any)*)(
       implicit log: Logger): Option[String] =
-    apply(classpath, options, initialCommands, cleanupCommands)(Some(loader),
-                                                                bindings)
+    apply(classpath, options, initialCommands, cleanupCommands)(
+      Some(loader),
+      bindings)
 
   def apply(classpath: Seq[File],
             options: Seq[String],
@@ -39,11 +40,12 @@ final class Console(compiler: AnalyzingCompiler) {
       loader: Option[ClassLoader],
       bindings: Seq[(String, Any)])(implicit log: Logger): Option[String] = {
     def console0() =
-      compiler.console(classpath,
-                       options,
-                       initialCommands,
-                       cleanupCommands,
-                       log)(loader, bindings)
+      compiler.console(
+        classpath,
+        options,
+        initialCommands,
+        cleanupCommands,
+        log)(loader, bindings)
     // TODO: Fix JLine
     //JLine.withJLine(Run.executeTrapExit(console0, log))
     Run.executeTrapExit(console0, log)

@@ -31,9 +31,10 @@ final class LeaderboardApi(coll: Coll, maxPerPage: Int) {
       .aggregate(
         Match(BSONDocument("u" -> user.id)),
         List(
-          GroupField("v")("nb" -> SumValue(1),
-                          "points" -> Push("s"),
-                          "ratios" -> Push("w")))
+          GroupField("v")(
+            "nb" -> SumValue(1),
+            "points" -> Push("s"),
+            "ratios" -> Push("w")))
       )
       .map {
         _.documents map leaderboardAggregationResultBSONHandler.read
@@ -43,9 +44,10 @@ final class LeaderboardApi(coll: Coll, maxPerPage: Int) {
           aggs
             .flatMap { agg =>
               PerfType.byId get agg._id map {
-                _ -> ChartData.PerfResult(nb = agg.nb,
-                                          points = ChartData.Ints(agg.points),
-                                          rank = ChartData.Ints(agg.ratios))
+                _ -> ChartData.PerfResult(
+                  nb = agg.nb,
+                  points = ChartData.Ints(agg.points),
+                  rank = ChartData.Ints(agg.ratios))
               }
             }
             .sortLike(PerfType.leaderboardable, _._1)
@@ -56,14 +58,15 @@ final class LeaderboardApi(coll: Coll, maxPerPage: Int) {
   private def paginator(user: User,
                         page: Int,
                         sort: BSONDocument): Fu[Paginator[TourEntry]] =
-    Paginator(adapter = new BSONAdapter[Entry](
-                  collection = coll,
-                  selector = BSONDocument("u" -> user.id),
-                  projection = BSONDocument(),
-                  sort = sort
-                ) mapFutureList withTournaments,
-              currentPage = page,
-              maxPerPage = maxPerPage)
+    Paginator(
+      adapter = new BSONAdapter[Entry](
+          collection = coll,
+          selector = BSONDocument("u" -> user.id),
+          projection = BSONDocument(),
+          sort = sort
+        ) mapFutureList withTournaments,
+      currentPage = page,
+      maxPerPage = maxPerPage)
 
   private def withTournaments(entries: Seq[Entry]): Fu[Seq[TourEntry]] =
     TournamentRepo byIds entries.map(_.tourId) map { tours =>
@@ -100,9 +103,10 @@ object LeaderboardApi {
       case head :: tail =>
         tail.foldLeft(head) {
           case (acc, res) =>
-            PerfResult(nb = acc.nb + res.nb,
-                       points = res.points ::: acc.points,
-                       rank = res.rank ::: acc.rank)
+            PerfResult(
+              nb = acc.nb + res.nb,
+              points = res.points ::: acc.points,
+              rank = res.rank ::: acc.rank)
         }
       case Nil => PerfResult(0, Ints(Nil), Ints(Nil))
     }

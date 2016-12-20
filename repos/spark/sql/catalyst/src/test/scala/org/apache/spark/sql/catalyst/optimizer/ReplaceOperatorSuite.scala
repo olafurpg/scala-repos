@@ -27,10 +27,11 @@ class ReplaceOperatorSuite extends PlanTest {
 
   object Optimize extends RuleExecutor[LogicalPlan] {
     val batches =
-      Batch("Replace Operators",
-            FixedPoint(100),
-            ReplaceDistinctWithAggregate,
-            ReplaceIntersectWithSemiJoin) :: Nil
+      Batch(
+        "Replace Operators",
+        FixedPoint(100),
+        ReplaceDistinctWithAggregate,
+        ReplaceIntersectWithSemiJoin) :: Nil
   }
 
   test("replace Intersect with Left-semi Join") {

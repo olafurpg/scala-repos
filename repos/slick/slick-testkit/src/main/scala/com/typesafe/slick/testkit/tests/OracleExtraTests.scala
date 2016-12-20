@@ -53,11 +53,12 @@ class OracleExtraTests extends AsyncTest[JdbcTestDB] {
   def testSequenceAndTriggerName = {
     class A(tag: Tag) extends Table[(Int, Int)](tag, "A_SEQTRG") {
       def id =
-        column[Int]("ID",
-                    O.PrimaryKey,
-                    O.AutoInc,
-                    O.AutoIncSequenceName("SEQ_SEQTRG"),
-                    O.AutoIncTriggerName("TRG_SEQTRG"))
+        column[Int](
+          "ID",
+          O.PrimaryKey,
+          O.AutoInc,
+          O.AutoIncSequenceName("SEQ_SEQTRG"),
+          O.AutoIncTriggerName("TRG_SEQTRG"))
       def a = column[Int]("A")
       def * = (id, a)
     }

@@ -278,11 +278,12 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
     DB.use(dbId) { conn =>
       val bl = by.toList ::: addlQueryParams.get
       val (query, start, max) = addEndStuffs(
-        addFields("SELECT COUNT(*) FROM " +
-                    MapperRules.quoteTableName.vend(_dbTableNameLC) + "  ",
-                  false,
-                  bl,
-                  conn),
+        addFields(
+          "SELECT COUNT(*) FROM " +
+            MapperRules.quoteTableName.vend(_dbTableNameLC) + "  ",
+          false,
+          bl,
+          conn),
         bl,
         conn)
 
@@ -342,9 +343,10 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
           j.field.dbKeyToTable
             .asInstanceOf[MetaMapper[A]]
             .findAll(
-              ByList(j.field.dbKeyToTable.primaryKeyField
-                       .asInstanceOf[MappedField[FT, A]],
-                     lst.toList))
+              ByList(
+                j.field.dbKeyToTable.primaryKeyField
+                  .asInstanceOf[MappedField[FT, A]],
+                lst.toList))
             .asInstanceOf[List[MT]]
         } else {
           j.field.dbKeyToTable
@@ -397,11 +399,12 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
     DB.use(dbId) { conn =>
       val bl = by.toList ::: addlQueryParams.get
       val (query, start, max) = addEndStuffs(
-        addFields("DELETE FROM " +
-                    MapperRules.quoteTableName.vend(_dbTableNameLC) + " ",
-                  false,
-                  bl,
-                  conn),
+        addFields(
+          "DELETE FROM " +
+            MapperRules.quoteTableName.vend(_dbTableNameLC) + " ",
+          false,
+          bl,
+          conn),
         bl,
         conn)
 
@@ -555,17 +558,18 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
             updatedWhat = updatedWhat + whereOrAnd +
                 MapperRules.quoteColumnName.vend(in.outerField._dbColumnNameLC) +
                 in.inKeyword + "(" + in.innerMeta
-                .addEndStuffs(in.innerMeta.addFields(
-                                "SELECT " + in.distinct +
-                                  MapperRules.quoteColumnName.vend(
-                                    in.innerField._dbColumnNameLC) +
-                                  " FROM " + MapperRules.quoteTableName.vend(
-                                  in.innerMeta._dbTableNameLC) + " ",
-                                false,
-                                in.queryParams,
-                                conn),
-                              in.queryParams,
-                              conn)
+                .addEndStuffs(
+                  in.innerMeta.addFields(
+                    "SELECT " + in.distinct +
+                      MapperRules.quoteColumnName.vend(
+                        in.innerField._dbColumnNameLC) +
+                      " FROM " + MapperRules.quoteTableName.vend(
+                      in.innerMeta._dbTableNameLC) + " ",
+                    false,
+                    in.queryParams,
+                    conn),
+                  in.queryParams,
+                  conn)
                 ._1 + " ) "
 
           // Executes a subquery with {@code query}
@@ -585,26 +589,28 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
     by match {
       case Nil => curPos
       case Cmp(field, _, Full(value), _, _) :: xs =>
-        setPreparedStatementValue(conn,
-                                  st,
-                                  curPos,
-                                  field,
-                                  field.targetSQLType,
-                                  field.convertToJDBCFriendly(value),
-                                  objectSetterFor(field))
+        setPreparedStatementValue(
+          conn,
+          st,
+          curPos,
+          field,
+          field.targetSQLType,
+          field.convertToJDBCFriendly(value),
+          objectSetterFor(field))
         setStatementFields(st, xs, curPos + 1, conn)
 
       case ByList(field, orgVals) :: xs => {
         val vals = Set(orgVals: _*).toList
         var newPos = curPos
         vals.foreach(v => {
-          setPreparedStatementValue(conn,
-                                    st,
-                                    newPos,
-                                    field,
-                                    field.targetSQLType,
-                                    field.convertToJDBCFriendly(v),
-                                    objectSetterFor(field))
+          setPreparedStatementValue(
+            conn,
+            st,
+            newPos,
+            field,
+            field.targetSQLType,
+            field.convertToJDBCFriendly(v),
+            objectSetterFor(field))
           newPos = newPos + 1
         })
 
@@ -643,13 +649,14 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
             st.setTimestamp(curPos, new java.sql.Timestamp(d.getTime))
             setStatementFields(st, xs, curPos + 1, conn)
           case List(field: BaseMappedField) =>
-            setPreparedStatementValue(conn,
-                                      st,
-                                      curPos,
-                                      field,
-                                      field.targetSQLType,
-                                      field.jdbcFriendly,
-                                      objectSetterFor(field))
+            setPreparedStatementValue(
+              conn,
+              st,
+              curPos,
+              field,
+              field.targetSQLType,
+              field.jdbcFriendly,
+              objectSetterFor(field))
             setStatementFields(st, xs, curPos + 1, conn)
           case p :: ps =>
             setStatementFields(
@@ -723,12 +730,13 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
                 conn) { st =>
                 val indVal = indexedField(toDelete)
                 indVal.map { indVal =>
-                  setPreparedStatementValue(conn,
-                                            st,
-                                            1,
-                                            indVal,
-                                            im,
-                                            objectSetterFor(indVal))
+                  setPreparedStatementValue(
+                    conn,
+                    st,
+                    1,
+                    indVal,
+                    im,
+                    objectSetterFor(indVal))
                   st.executeUpdate == 1
                 } openOr false
               }
@@ -906,13 +914,14 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
                                         columnName: String,
                                         setObj: (PreparedStatement, Int,
                                                  AnyRef, Int) => Unit) {
-    setPreparedStatementValue(conn,
-                              st,
-                              index,
-                              field,
-                              field.targetSQLType(columnName),
-                              field.jdbcFriendly(columnName),
-                              setObj)
+    setPreparedStatementValue(
+      conn,
+      st,
+      index,
+      field,
+      field.targetSQLType(columnName),
+      field.jdbcFriendly(columnName),
+      setObj)
   }
 
   /**
@@ -943,9 +952,10 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
     mappedColumnType match {
       case Types.VARCHAR =>
         // Set a string with a simple guard for null values
-        st.setString(index,
-                     if (value ne null) value.toString
-                     else value.asInstanceOf[String])
+        st.setString(
+          index,
+          if (value ne null) value.toString
+          else value.asInstanceOf[String])
 
       // Sybase SQL Anywhere and DB2 choke on using setObject for boolean data
       case Types.BOOLEAN =>
@@ -1046,12 +1056,13 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
                       for (col <- mappedColumns) {
                         val colVal = ??(col._2, toSave)
                         if (!columnPrimaryKey_?(col._1) && colVal.dirty_?) {
-                          setPreparedStatementValue(conn,
-                                                    st,
-                                                    colNum,
-                                                    colVal,
-                                                    col._1,
-                                                    objectSetterFor(colVal))
+                          setPreparedStatementValue(
+                            conn,
+                            st,
+                            colNum,
+                            colVal,
+                            col._1,
+                            objectSetterFor(colVal))
                           colNum = colNum + 1
                         }
                       }
@@ -1060,12 +1071,13 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
                         indVal <- indexedField(toSave)
                         indexColumnName <- thePrimaryKeyField
                       } {
-                        setPreparedStatementValue(conn,
-                                                  st,
-                                                  colNum,
-                                                  indVal,
-                                                  indexColumnName,
-                                                  objectSetterFor(indVal))
+                        setPreparedStatementValue(
+                          conn,
+                          st,
+                          colNum,
+                          indVal,
+                          indexColumnName,
+                          objectSetterFor(indVal))
                       }
 
                       st.executeUpdate
@@ -1091,12 +1103,13 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
                     if (!columnPrimaryKey_?(col._1)) {
                       val colVal = col._2.invoke(toSave)
                         .asInstanceOf[MappedField[AnyRef, A]]
-                      setPreparedStatementValue(conn,
-                                                st,
-                                                colNum,
-                                                colVal,
-                                                col._1,
-                                                objectSetterFor(colVal))
+                      setPreparedStatementValue(
+                        conn,
+                        st,
+                        colNum,
+                        colVal,
+                        col._1,
+                        objectSetterFor(colVal))
                       colNum = colNum + 1
                     }
                   }
@@ -1342,8 +1355,9 @@ trait MetaMapper[A <: Mapper[A]] extends BaseMetaMapper with Mapper[A] {
   protected val rootClass = this.getClass.getSuperclass
 
   private val mappedAppliers =
-    new HashMap[(String, Box[Class[(C forSome { type C })]]),
-                (A, AnyRef) => Unit];
+    new HashMap[
+      (String, Box[Class[(C forSome { type C })]]),
+      (A, AnyRef) => Unit];
 
   private val _mappedFields = new HashMap[String, Method];
 
@@ -2246,8 +2260,9 @@ trait KeyedMetaMapper[Type, A <: KeyedMapper[Type, A]]
             List(
               (fk.name, JE.Str(key)),
               (fk.name + "_obj",
-               JE.AnonFunc("index",
-                           JE.JsRaw("return index[" + key.encJs + "];").cmd))
+               JE.AnonFunc(
+                 "index",
+                 JE.JsRaw("return index[" + key.encJs + "];").cmd))
             )
           case x => x.asJs
         }
@@ -2353,10 +2368,11 @@ trait KeyedMetaMapper[Type, A <: KeyedMapper[Type, A]]
         if (field.dbIgnoreSQLType_?)
           st.setObject(1, field.makeKeyJDBCFriendly(key))
         else
-          st.setObject(1,
-                       field.makeKeyJDBCFriendly(key),
-                       conn.driverType.columnTypeMap(
-                         field.targetSQLType(field._dbColumnNameLC)))
+          st.setObject(
+            1,
+            field.makeKeyJDBCFriendly(key),
+            conn.driverType.columnTypeMap(
+              field.targetSQLType(field._dbColumnNameLC)))
         DB.exec(st) { rs =>
           val mi = buildMapper(rs)
           if (rs.next) Full(createInstance(dbId, rs, mi))

@@ -79,18 +79,19 @@ object CommonUtil {
 
   def unquote(str: String) = {
     var result = str.stripPrefix("\"").stripSuffix("\"")
-    result = quotedCharPattern.replaceAllIn(result,
-                                            m =>
-                                              m.group(0).charAt(1) match {
-                                                case '\\' => "\\"
-                                                case '/' => "/"
-                                                case '"' => "\""
-                                                case 'b' => "\b"
-                                                case 'f' => "\f"
-                                                case 'n' => "\n"
-                                                case 'r' => "\r"
-                                                case 't' => "\t"
-                                            })
+    result = quotedCharPattern.replaceAllIn(
+      result,
+      m =>
+        m.group(0).charAt(1) match {
+          case '\\' => "\\"
+          case '/' => "/"
+          case '"' => "\""
+          case 'b' => "\b"
+          case 'f' => "\f"
+          case 'n' => "\n"
+          case 'r' => "\r"
+          case 't' => "\t"
+      })
     quotedUnicodePattern.replaceAllIn(
       result,
       m => jl.Short.parseShort(m.group(1), 16).toChar.toString)

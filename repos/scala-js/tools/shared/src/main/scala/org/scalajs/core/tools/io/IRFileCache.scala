@@ -48,9 +48,10 @@ final class IRFileCache {
 
   /** Approximate statistics about the cache usage */
   def stats: IRFileCache.Stats = {
-    new IRFileCache.Stats(statsReused.get,
-                          statsInvalidated.get,
-                          statsTreesRead.get)
+    new IRFileCache.Stats(
+      statsReused.get,
+      statsInvalidated.get,
+      statsTreesRead.get)
   }
 
   /** Reset statistics */

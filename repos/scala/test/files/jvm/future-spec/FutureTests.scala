@@ -146,14 +146,18 @@ class FutureTests extends MinimalScalaTest {
       val e = new Exception("foo")
       val f = Future.failed[Future[String]](e)
 
-      assert(f.mapTo[String] eq f,
-             "Future.mapTo must be the same instance as Future.mapTo")
-      assert(f.zip(f) eq f,
-             "Future.zip must be the same instance as Future.zip")
-      assert(f.flatten eq f,
-             "Future.flatten must be the same instance as Future.flatten")
-      assert(f.failed eq f,
-             "Future.failed must be the same instance as Future.failed")
+      assert(
+        f.mapTo[String] eq f,
+        "Future.mapTo must be the same instance as Future.mapTo")
+      assert(
+        f.zip(f) eq f,
+        "Future.zip must be the same instance as Future.zip")
+      assert(
+        f.flatten eq f,
+        "Future.flatten must be the same instance as Future.flatten")
+      assert(
+        f.failed eq f,
+        "Future.failed must be the same instance as Future.failed")
 
       ECNotUsed(
         ec => f.foreach(_ => fail("foreach should not have been called"))(ec))
@@ -199,11 +203,13 @@ class FutureTests extends MinimalScalaTest {
 
     "have a unit member representing an already completed Future containing Unit" in {
       assert(Future.unit ne null, "Future.unit must not be null")
-      assert(Future.unit eq Future.unit,
-             "Future.unit must be the same instance as Future.unit")
+      assert(
+        Future.unit eq Future.unit,
+        "Future.unit must be the same instance as Future.unit")
       assert(Future.unit.isCompleted, "Future.unit must already be completed")
-      assert(Future.unit.value.get == Success(()),
-             "Future.unit must contain a Success(())")
+      assert(
+        Future.unit.value.get == Success(()),
+        "Future.unit must contain a Success(())")
     }
 
     "have a never member representing a never completed Future of Nothing" in {
@@ -216,11 +222,13 @@ class FutureTests extends MinimalScalaTest {
         case _ => fail("Future.never did not match Future.`never`")
       }
 
-      assert(test eq Future.never,
-             "Future.never must be the same instance as Future.never")
+      assert(
+        test eq Future.never,
+        "Future.never must be the same instance as Future.never")
       assert(test ne null, "Future.never must not be null")
-      assert(!test.isCompleted && test.value.isEmpty,
-             "Future.never must never be completed")
+      assert(
+        !test.isCompleted && test.value.isEmpty,
+        "Future.never must never be completed")
       assert(test.failed eq test)
       assert(test.asInstanceOf[Future[Future[Nothing]]].flatten eq test)
       assert(test.zip(test) eq test)

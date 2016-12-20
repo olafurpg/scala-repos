@@ -40,11 +40,12 @@ final class EmailConfirmMailGun(apiUrl: String,
       WS.url(s"$apiUrl/messages")
         .withAuth("api", apiKey, WSAuthScheme.BASIC)
         .post(
-          Map("from" -> Seq(sender),
-              "to" -> Seq(email),
-              "subject" -> Seq(
-                s"Confirm your lichess.org account, ${user.username}"),
-              "text" -> Seq(s"""
+          Map(
+            "from" -> Seq(sender),
+            "to" -> Seq(email),
+            "subject" -> Seq(
+              s"Confirm your lichess.org account, ${user.username}"),
+            "text" -> Seq(s"""
 Final step!
 
 Confirm your email address to complete your lichess account. It's easy — just click on the link below.

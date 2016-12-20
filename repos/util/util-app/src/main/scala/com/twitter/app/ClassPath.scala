@@ -15,16 +15,17 @@ import scala.collection.mutable
   */
 private object ClassPath {
 
-  private val ignoredPackages = Seq("apple/",
-                                    "ch/epfl/",
-                                    "com/apple/",
-                                    "com/oracle/",
-                                    "com/sun/",
-                                    "java/",
-                                    "javax/",
-                                    "scala/",
-                                    "sun/",
-                                    "sunw/")
+  private val ignoredPackages = Seq(
+    "apple/",
+    "ch/epfl/",
+    "com/apple/",
+    "com/oracle/",
+    "com/sun/",
+    "java/",
+    "javax/",
+    "scala/",
+    "sun/",
+    "sunw/")
 
   // TODO: we can inspect the constant pool for "Premain"
   // if needed to speed up start.
@@ -159,8 +160,9 @@ private object ClassPath {
       if (uri.isAbsolute) Some(uri)
       else
         Some(
-          new File(jarFile.getParentFile,
-                   path.replace('/', File.separatorChar)).toURI)
+          new File(
+            jarFile.getParentFile,
+            path.replace('/', File.separatorChar)).toURI)
     } catch {
       case _: URISyntaxException => None
     }

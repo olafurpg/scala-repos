@@ -147,11 +147,12 @@ object Trace {
     val spanId = SpanId(rng.nextLong())
     idOption match {
       case Some(id) =>
-        TraceId(Some(id.traceId),
-                Some(id.spanId),
-                spanId,
-                id.sampled,
-                id.flags)
+        TraceId(
+          Some(id.traceId),
+          Some(id.spanId),
+          spanId,
+          id.sampled,
+          id.flags)
       case None =>
         TraceId(None, None, spanId, None, Flags())
     }

@@ -113,9 +113,10 @@ private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
 
           suspendedLaunchersMessages.get(actorRef) match {
             case None =>
-              log.warning("Got unexpected terminated for app {}: {}",
-                          pathId,
-                          actorRef)
+              log.warning(
+                "Got unexpected terminated for app {}: {}",
+                pathId,
+                actorRef)
             case Some(deferredMessages) =>
               deferredMessages.foreach(msg =>
                 self.tell(msg.message, msg.sender))
@@ -124,8 +125,9 @@ private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
               suspendedLaunchersMessages -= actorRef
           }
         case None =>
-          log.warning("Don't know anything about terminated actor: {}",
-                      actorRef)
+          log.warning(
+            "Don't know anything about terminated actor: {}",
+            actorRef)
       }
   }
 
@@ -208,8 +210,9 @@ private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
 
   private[this] def createAppTaskLauncher(app: AppDefinition,
                                           initialCount: Int): ActorRef = {
-    val actorRef = context.actorOf(appActorProps(app, initialCount),
-                                   s"$childSerial-${app.id.safePath}")
+    val actorRef = context.actorOf(
+      appActorProps(app, initialCount),
+      s"$childSerial-${app.id.safePath}")
     childSerial += 1
     launchers += app.id -> actorRef
     launcherRefs += actorRef -> app.id

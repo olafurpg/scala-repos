@@ -53,28 +53,30 @@ trait SwaggerEngine[T <: SwaggerApi[_]] {
 
 object Swagger {
 
-  val baseTypes = Set("byte",
-                      "boolean",
-                      "int",
-                      "long",
-                      "float",
-                      "double",
-                      "string",
-                      "date",
-                      "void",
-                      "Date",
-                      "DateTime",
-                      "DateMidnight",
-                      "Duration",
-                      "FiniteDuration",
-                      "Chronology")
-  val excludes: Set[java.lang.reflect.Type] = Set(classOf[java.util.TimeZone],
-                                                  classOf[java.util.Date],
-                                                  classOf[DateTime],
-                                                  classOf[DateMidnight],
-                                                  classOf[ReadableInstant],
-                                                  classOf[Chronology],
-                                                  classOf[DateTimeZone])
+  val baseTypes = Set(
+    "byte",
+    "boolean",
+    "int",
+    "long",
+    "float",
+    "double",
+    "string",
+    "date",
+    "void",
+    "Date",
+    "DateTime",
+    "DateMidnight",
+    "Duration",
+    "FiniteDuration",
+    "Chronology")
+  val excludes: Set[java.lang.reflect.Type] = Set(
+    classOf[java.util.TimeZone],
+    classOf[java.util.Date],
+    classOf[DateTime],
+    classOf[DateMidnight],
+    classOf[ReadableInstant],
+    classOf[Chronology],
+    classOf[DateTimeZone])
   val containerTypes = Set("Array", "List", "Set")
   val SpecVersion = "1.2"
   val Iso8601Date = ISODateTimeFormat.dateTime.withZone(DateTimeZone.UTC)
@@ -169,11 +171,12 @@ object Swagger {
               if f.getAnnotation(classOf[ApiModelProperty]) != null =>
             val annot = f.getAnnotation(classOf[ApiModelProperty])
             val asModelProperty =
-              toModelProperty(descr,
-                              Some(annot.position()),
-                              annot.required(),
-                              annot.description().blankOption,
-                              annot.allowableValues()) _
+              toModelProperty(
+                descr,
+                Some(annot.position()),
+                annot.required(),
+                annot.description().blankOption,
+                annot.allowableValues()) _
             descr.properties.find(_.mangledName == f.getName) map asModelProperty
 
           case f: Field =>
@@ -183,17 +186,19 @@ object Swagger {
 
       val result =
         apiModel map { am =>
-          Model(name,
-                name,
-                klass.fullName.blankOption,
-                properties = fields.flatten,
-                baseModel = am.parent.getName.blankOption,
-                discriminator = am.discriminator.blankOption)
+          Model(
+            name,
+            name,
+            klass.fullName.blankOption,
+            properties = fields.flatten,
+            baseModel = am.parent.getName.blankOption,
+            discriminator = am.discriminator.blankOption)
         } orElse Some(
-          Model(name,
-                name,
-                klass.fullName.blankOption,
-                properties = fields.flatten))
+          Model(
+            name,
+            name,
+            klass.fullName.blankOption,
+            properties = fields.flatten))
       //      if (descr.simpleName == "Pet") println("The collected fields:\n" + result)
       result
     }
@@ -280,21 +285,22 @@ class Swagger(val swaggerVersion: String,
     val endpoints: List[Endpoint] =
       s.endpoints(resourcePath) collect { case m: Endpoint => m }
     _docs +=
-      listingPath -> Api(apiVersion,
-                         swaggerVersion,
-                         resourcePath,
-                         description,
-                         (produces ::: endpoints.flatMap(
-                           _.operations.flatMap(_.produces))).distinct,
-                         (consumes ::: endpoints.flatMap(
-                           _.operations.flatMap(_.consumes))).distinct,
-                         (protocols ::: endpoints.flatMap(
-                           _.operations.flatMap(_.protocols))).distinct,
-                         endpoints,
-                         s.models.toMap,
-                         (authorizations ::: endpoints.flatMap(
-                           _.operations.flatMap(_.authorizations))).distinct,
-                         0)
+      listingPath -> Api(
+        apiVersion,
+        swaggerVersion,
+        resourcePath,
+        description,
+        (produces ::: endpoints
+          .flatMap(_.operations.flatMap(_.produces))).distinct,
+        (consumes ::: endpoints
+          .flatMap(_.operations.flatMap(_.consumes))).distinct,
+        (protocols ::: endpoints
+          .flatMap(_.operations.flatMap(_.protocols))).distinct,
+        endpoints,
+        s.models.toMap,
+        (authorizations ::: endpoints.flatMap(
+          _.operations.flatMap(_.authorizations))).distinct,
+        0)
   }
 }
 
@@ -473,18 +479,20 @@ object DataType {
     }
   }
 
-  private[this] val IntTypes = Set[Class[_]](classOf[Int],
-                                             classOf[java.lang.Integer],
-                                             classOf[Short],
-                                             classOf[java.lang.Short],
-                                             classOf[BigInt],
-                                             classOf[java.math.BigInteger])
+  private[this] val IntTypes = Set[Class[_]](
+    classOf[Int],
+    classOf[java.lang.Integer],
+    classOf[Short],
+    classOf[java.lang.Short],
+    classOf[BigInt],
+    classOf[java.math.BigInteger])
   private[this] def isInt(klass: Class[_]) = IntTypes.contains(klass)
 
-  private[this] val DecimalTypes = Set[Class[_]](classOf[Double],
-                                                 classOf[java.lang.Double],
-                                                 classOf[BigDecimal],
-                                                 classOf[java.math.BigDecimal])
+  private[this] val DecimalTypes = Set[Class[_]](
+    classOf[Double],
+    classOf[java.lang.Double],
+    classOf[BigDecimal],
+    classOf[java.math.BigDecimal])
   private[this] def isDecimal(klass: Class[_]) = DecimalTypes contains klass
 
   private[this] val DateTypes = Set[Class[_]](classOf[DateMidnight])

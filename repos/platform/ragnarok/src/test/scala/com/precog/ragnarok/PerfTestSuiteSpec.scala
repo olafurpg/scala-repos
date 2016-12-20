@@ -54,14 +54,16 @@ class PerfTestSuiteSpec extends Specification {
           Tree.node(
             RunSequential,
             Stream(
-              Tree.node(Group("b"),
-                        Stream(
-                          Tree.node(RunConcurrent,
-                                    Stream(
-                                      Tree.leaf[PerfTest](RunQuery("1")),
-                                      Tree.leaf[PerfTest](RunQuery("2"))
-                                    ))
-                        )),
+              Tree.node(
+                Group("b"),
+                Stream(
+                  Tree.node(
+                    RunConcurrent,
+                    Stream(
+                      Tree.leaf[PerfTest](RunQuery("1")),
+                      Tree.leaf[PerfTest](RunQuery("2"))
+                    ))
+                )),
               Tree.leaf[PerfTest](RunQuery("3"))
             ))
         ))
@@ -92,8 +94,9 @@ class PerfTestSuiteSpec extends Specification {
       }
 
       ex2.test must beLike {
-        case Tree.Node(Group(_),
-                       Stream(Tree.Node(RunSequential, Stream(inner)))) =>
+        case Tree.Node(
+            Group(_),
+            Stream(Tree.Node(RunSequential, Stream(inner)))) =>
           treeEq[PerfTest].equal(ex.test, inner) must beTrue
       }
     }

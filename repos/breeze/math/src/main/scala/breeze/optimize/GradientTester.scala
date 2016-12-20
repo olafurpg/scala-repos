@@ -42,8 +42,9 @@ object GradientTester extends SerializableLogging {
       canNorm: norm.Impl[T, Double],
       opSub: OpSub.Impl2[T, T, T]) = {
     val indices = Rand
-      .subsetsOfSize(x.keysIterator.toIndexedSeq,
-                     (x.size * randFraction + 1).toInt)
+      .subsetsOfSize(
+        x.keysIterator.toIndexedSeq,
+        (x.size * randFraction + 1).toInt)
       .get()
     testIndices(f, x, indices, skipZeros, toString, epsilon, tolerance)
   }

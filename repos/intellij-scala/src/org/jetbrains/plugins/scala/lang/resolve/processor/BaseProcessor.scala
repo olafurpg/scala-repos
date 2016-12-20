@@ -194,12 +194,13 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
       case ScThisType(clazz) =>
         val thisSubst = new ScSubstitutor(ScThisType(clazz))
         if (clazz.selfType.isEmpty) {
-          processElement(clazz,
-                         thisSubst,
-                         place,
-                         state,
-                         visitedAliases = visitedAliases,
-                         visitedTypeParameter = visitedTypeParameter)
+          processElement(
+            clazz,
+            thisSubst,
+            place,
+            state,
+            visitedAliases = visitedAliases,
+            visitedTypeParameter = visitedTypeParameter)
         } else {
           val selfType = clazz.selfType.get
           val clazzType: ScType = clazz
@@ -207,12 +208,13 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
             .getOrElse(return true)
           if (selfType == ScThisType(clazz)) {
             //to prevent SOE, let's process Element
-            processElement(clazz,
-                           thisSubst,
-                           place,
-                           state,
-                           visitedAliases = visitedAliases,
-                           visitedTypeParameter = visitedTypeParameter)
+            processElement(
+              clazz,
+              thisSubst,
+              place,
+              state,
+              visitedAliases = visitedAliases,
+              visitedTypeParameter = visitedTypeParameter)
           } else if (selfType.conforms(clazzType)) {
             processType(
               selfType,
@@ -223,12 +225,13 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
               visitedAliases = visitedAliases,
               visitedTypeParameter = visitedTypeParameter)
           } else if (clazzType.conforms(selfType)) {
-            processElement(clazz,
-                           thisSubst,
-                           place,
-                           state,
-                           visitedAliases = visitedAliases,
-                           visitedTypeParameter = visitedTypeParameter)
+            processElement(
+              clazz,
+              thisSubst,
+              place,
+              state,
+              visitedAliases = visitedAliases,
+              visitedTypeParameter = visitedTypeParameter)
           } else {
             processType(
               clazz.selfType.map(Bounds.glb(_, clazzType)).get,
@@ -257,12 +260,13 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
         if (!break) return false
         TypeDefinitionMembers.processEnum(e, execute(_, state))
       case ScDesignatorType(o: ScObject) =>
-        processElement(o,
-                       ScSubstitutor.empty,
-                       place,
-                       state,
-                       visitedAliases = visitedAliases,
-                       visitedTypeParameter = visitedTypeParameter)
+        processElement(
+          o,
+          ScSubstitutor.empty,
+          place,
+          state,
+          visitedAliases = visitedAliases,
+          visitedTypeParameter = visitedTypeParameter)
       case ScDesignatorType(e: ScTypedDefinition)
           if place.isInstanceOf[ScTypeProjection] =>
         val result: TypeResult[ScType] = e match {
@@ -271,27 +275,30 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
         }
         result match {
           case Success(tp, _) =>
-            processType(tp,
-                        place,
-                        state,
-                        visitedAliases = visitedAliases,
-                        visitedTypeParameter = visitedTypeParameter)
+            processType(
+              tp,
+              place,
+              state,
+              visitedAliases = visitedAliases,
+              visitedTypeParameter = visitedTypeParameter)
           case _ => true
         }
       case ScDesignatorType(e) =>
-        processElement(e,
-                       ScSubstitutor.empty,
-                       place,
-                       state,
-                       visitedAliases = visitedAliases,
-                       visitedTypeParameter = visitedTypeParameter)
+        processElement(
+          e,
+          ScSubstitutor.empty,
+          place,
+          state,
+          visitedAliases = visitedAliases,
+          visitedTypeParameter = visitedTypeParameter)
       case ScTypeParameterType(_, Nil, _, upper, _) =>
-        processType(upper.v,
-                    place,
-                    state,
-                    updateWithProjectionSubst = false,
-                    visitedAliases = visitedAliases,
-                    visitedTypeParameter = visitedTypeParameter)
+        processType(
+          upper.v,
+          place,
+          state,
+          updateWithProjectionSubst = false,
+          visitedAliases = visitedAliases,
+          visitedTypeParameter = visitedTypeParameter)
       case j: JavaArrayType =>
         processType(
           j.getParameterizedType(place.getProject, place.getResolveScope)
@@ -304,20 +311,22 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
         p.designator match {
           case tpt @ ScTypeParameterType(_, _, _, upper, _) =>
             if (visitedTypeParameter.contains(tpt)) return true
-            processType(p.substitutor.subst(upper.v),
-                        place,
-                        state.put(ScSubstitutor.key, new ScSubstitutor(p)),
-                        visitedAliases = visitedAliases,
-                        visitedTypeParameter = visitedTypeParameter + tpt)
+            processType(
+              p.substitutor.subst(upper.v),
+              place,
+              state.put(ScSubstitutor.key, new ScSubstitutor(p)),
+              visitedAliases = visitedAliases,
+              visitedTypeParameter = visitedTypeParameter + tpt)
           case _ =>
             ScType.extractDesignated(p, withoutAliases = false) match {
               case Some((designator, subst)) =>
-                processElement(designator,
-                               subst,
-                               place,
-                               state,
-                               visitedAliases = visitedAliases,
-                               visitedTypeParameter = visitedTypeParameter)
+                processElement(
+                  designator,
+                  subst,
+                  place,
+                  state,
+                  visitedAliases = visitedAliases,
+                  visitedTypeParameter = visitedTypeParameter)
               case None => true
             }
         }
@@ -326,32 +335,35 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
         val ta = proj.actualElement.asInstanceOf[ScTypeAlias]
         val subst = proj.actualSubst
         val upper = ta.upperBound.getOrElse(return true)
-        processType(subst.subst(upper),
-                    place,
-                    state.put(ScSubstitutor.key, ScSubstitutor.empty),
-                    visitedAliases = visitedAliases + ta,
-                    visitedTypeParameter = visitedTypeParameter)
+        processType(
+          subst.subst(upper),
+          place,
+          state.put(ScSubstitutor.key, ScSubstitutor.empty),
+          visitedAliases = visitedAliases + ta,
+          visitedTypeParameter = visitedTypeParameter)
       case proj @ ScProjectionType(des, elem, _) =>
         val s: ScSubstitutor =
           if (updateWithProjectionSubst)
             new ScSubstitutor(Map.empty, Map.empty, Some(proj)) followed proj.actualSubst
           else proj.actualSubst
-        processElement(proj.actualElement,
-                       s,
-                       place,
-                       state,
-                       visitedAliases = visitedAliases,
-                       visitedTypeParameter = visitedTypeParameter)
+        processElement(
+          proj.actualElement,
+          s,
+          place,
+          state,
+          visitedAliases = visitedAliases,
+          visitedTypeParameter = visitedTypeParameter)
       case StdType(name, tSuper) =>
         SyntheticClasses.get(place.getProject).byName(name) match {
           case Some(c) =>
             if (!c.processDeclarations(this, state, null, place) ||
                 !(tSuper match {
                   case Some(ts) =>
-                    processType(ts,
-                                place,
-                                visitedAliases = visitedAliases,
-                                visitedTypeParameter = visitedTypeParameter)
+                    processType(
+                      ts,
+                      place,
+                      visitedAliases = visitedAliases,
+                      visitedTypeParameter = visitedTypeParameter)
                   case _ => true
                 })) return false
           case None => //nothing to do
@@ -377,18 +389,20 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
         TypeDefinitionMembers
           .processDeclarations(comp, this, state, null, place)
       case ex: ScExistentialType =>
-        processType(ex.skolem,
-                    place,
-                    state.put(ScSubstitutor.key, ScSubstitutor.empty),
-                    visitedAliases = visitedAliases,
-                    visitedTypeParameter = visitedTypeParameter)
+        processType(
+          ex.skolem,
+          place,
+          state.put(ScSubstitutor.key, ScSubstitutor.empty),
+          visitedAliases = visitedAliases,
+          visitedTypeParameter = visitedTypeParameter)
       case ScSkolemizedType(_, _, lower, upper) =>
-        processType(upper,
-                    place,
-                    state,
-                    updateWithProjectionSubst,
-                    visitedAliases = visitedAliases,
-                    visitedTypeParameter = visitedTypeParameter)
+        processType(
+          upper,
+          place,
+          state,
+          updateWithProjectionSubst,
+          visitedAliases = visitedAliases,
+          visitedTypeParameter = visitedTypeParameter)
       case _ => true
     }
   }
@@ -410,11 +424,12 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
     e match {
       case ta: ScTypeAlias =>
         if (visitedAliases.contains(ta)) return true
-        processType(s.subst(ta.upperBound.getOrAny),
-                    place,
-                    state.put(ScSubstitutor.key, ScSubstitutor.empty),
-                    visitedAliases = visitedAliases + ta,
-                    visitedTypeParameter = visitedTypeParameter)
+        processType(
+          s.subst(ta.upperBound.getOrAny),
+          place,
+          state.put(ScSubstitutor.key, ScSubstitutor.empty),
+          visitedAliases = visitedAliases + ta,
+          visitedTypeParameter = visitedTypeParameter)
       //need to process scala way
       case clazz: PsiClass =>
         TypeDefinitionMembers.processDeclarations(
@@ -430,24 +445,27 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
         }
         typeResult match {
           case Success(tp, _) =>
-            processType(newSubst subst tp,
-                        place,
-                        state.put(ScSubstitutor.key, ScSubstitutor.empty),
-                        updateWithProjectionSubst = false,
-                        visitedAliases = visitedAliases,
-                        visitedTypeParameter = visitedTypeParameter)
+            processType(
+              newSubst subst tp,
+              place,
+              state.put(ScSubstitutor.key, ScSubstitutor.empty),
+              updateWithProjectionSubst = false,
+              visitedAliases = visitedAliases,
+              visitedTypeParameter = visitedTypeParameter)
           case _ => true
         }
       case pack: ScPackage =>
-        pack.processDeclarations(BaseProcessor.this,
-                                 state.put(ScSubstitutor.key, newSubst),
-                                 null,
-                                 place)
+        pack.processDeclarations(
+          BaseProcessor.this,
+          state.put(ScSubstitutor.key, newSubst),
+          null,
+          place)
       case des =>
-        des.processDeclarations(BaseProcessor.this,
-                                state.put(ScSubstitutor.key, newSubst),
-                                null,
-                                place)
+        des.processDeclarations(
+          BaseProcessor.this,
+          state.put(ScSubstitutor.key, newSubst),
+          null,
+          place)
     }
   }
 

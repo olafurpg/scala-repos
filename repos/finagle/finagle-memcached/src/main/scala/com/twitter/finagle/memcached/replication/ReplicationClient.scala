@@ -57,10 +57,11 @@ object ReplicationClient {
     val underlyingClients =
       pools map { pool =>
         Await.result(pool.ready)
-        KetamaClientBuilder(Group.fromCluster(pool),
-                            hashName,
-                            clientBuilder,
-                            failureAccrualParams).build()
+        KetamaClientBuilder(
+          Group.fromCluster(pool),
+          hashName,
+          clientBuilder,
+          failureAccrualParams).build()
       }
     val repStatsReceiver =
       clientBuilder map { _.statsReceiver.scope("cache_replication") } getOrElse
@@ -75,10 +76,11 @@ object ReplicationClient {
       failureAccrualParams: (Int, () => Duration) = (5, () => 30.seconds)
   ) = {
     new SimpleReplicationClient(
-      newBaseReplicationClient(pools,
-                               clientBuilder,
-                               hashName,
-                               failureAccrualParams))
+      newBaseReplicationClient(
+        pools,
+        clientBuilder,
+        hashName,
+        failureAccrualParams))
   }
 }
 
@@ -434,8 +436,9 @@ class SimpleReplicationClient(underlying: BaseReplicationClient)
     underlyingClient.getsAll(keys) map { resultsMap =>
       val getsResultSeq =
         resultsMap map {
-          case (key,
-                ConsistentReplication(Some((value, RCasUnique(uniques))))) =>
+          case (
+              key,
+              ConsistentReplication(Some((value, RCasUnique(uniques))))) =>
             val newCas = uniques map { case Buf.Utf8(s) => s } mkString ("|")
             val newValue = Value(Buf.Utf8(key), value, Some(Buf.Utf8(newCas)))
             GetsResult(GetResult(hits = Map(key -> newValue)))
@@ -468,9 +471,10 @@ class SimpleReplicationClient(underlying: BaseReplicationClient)
                   casUnique: Buf): Future[CasResult] = {
     val Buf.Utf8(casUniqueStr) = casUnique
     val casUniqueBufs = casUniqueStr.split('|') map { Buf.Utf8(_) }
-    resolve[CasResult]("checkAndSet",
-                       _.checkAndSet(key, flags, expiry, value, casUniqueBufs),
-                       CasResult.Stored)
+    resolve[CasResult](
+      "checkAndSet",
+      _.checkAndSet(key, flags, expiry, value, casUniqueBufs),
+      CasResult.Stored)
   }
 
   /**

@@ -54,21 +54,23 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
   // ports and then get a consumer instance that will be pointed at the correct port
   def getConsumer1() = {
     if (consumer1 == null)
-      consumer1 = new SimpleConsumer("localhost",
-                                     server1.boundPort(),
-                                     1000000,
-                                     64 * 1024,
-                                     "")
+      consumer1 = new SimpleConsumer(
+        "localhost",
+        server1.boundPort(),
+        1000000,
+        64 * 1024,
+        "")
     consumer1
   }
 
   def getConsumer2() = {
     if (consumer2 == null)
-      consumer2 = new SimpleConsumer("localhost",
-                                     server2.boundPort(),
-                                     100,
-                                     64 * 1024,
-                                     "")
+      consumer2 = new SimpleConsumer(
+        "localhost",
+        server2.boundPort(),
+        100,
+        64 * 1024,
+        "")
     consumer2
   }
 
@@ -112,11 +114,12 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
   @Test
   def testUpdateBrokerPartitionInfo() {
     val topic = "new-topic"
-    TestUtils.createTopic(zkUtils,
-                          topic,
-                          numPartitions = 1,
-                          replicationFactor = 2,
-                          servers = servers)
+    TestUtils.createTopic(
+      zkUtils,
+      topic,
+      numPartitions = 1,
+      replicationFactor = 2,
+      servers = servers)
 
     val props = new Properties()
     // no need to retry since the send will always fail
@@ -174,11 +177,12 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
 
     val topic = "new-topic"
     // create topic with 1 partition and await leadership
-    TestUtils.createTopic(zkUtils,
-                          topic,
-                          numPartitions = 1,
-                          replicationFactor = 2,
-                          servers = servers)
+    TestUtils.createTopic(
+      zkUtils,
+      topic,
+      numPartitions = 1,
+      replicationFactor = 2,
+      servers = servers)
 
     val producer1 =
       TestUtils.createProducer[String, String](
@@ -195,8 +199,9 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
     val endTime = System.currentTimeMillis()
     // get the leader
     val leaderOpt = zkUtils.getLeaderForPartition(topic, 0)
-    assertTrue("Leader for topic new-topic partition 0 should exist",
-               leaderOpt.isDefined)
+    assertTrue(
+      "Leader for topic new-topic partition 0 should exist",
+      leaderOpt.isDefined)
     val leader = leaderOpt.get
 
     val messageSet =
@@ -218,8 +223,9 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
     assertTrue(
       messageSet(0).message.timestamp >= startTime &&
         messageSet(0).message.timestamp < endTime)
-    assertEquals(TimestampType.CREATE_TIME,
-                 messageSet(0).message.timestampType)
+    assertEquals(
+      TimestampType.CREATE_TIME,
+      messageSet(0).message.timestampType)
     assertEquals(Message.MagicValue_V1, messageSet(0).message.magic)
 
     // Message 2
@@ -230,8 +236,9 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
     assertTrue(
       messageSet(1).message.timestamp >= startTime &&
         messageSet(1).message.timestamp < endTime)
-    assertEquals(TimestampType.CREATE_TIME,
-                 messageSet(1).message.timestampType)
+    assertEquals(
+      TimestampType.CREATE_TIME,
+      messageSet(1).message.timestampType)
     assertEquals(Message.MagicValue_V1, messageSet(1).message.magic)
     producer1.close()
 
@@ -322,8 +329,9 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
       assertTrue(message.timestamp >= startTime && message.timestamp < endTime)
       assertEquals(TimestampType.CREATE_TIME, message.timestampType)
       assertEquals(Message.MagicValue_V1, message.magic)
-      assertFalse("Message set should have another message",
-                  messageSet1.hasNext)
+      assertFalse(
+        "Message set should have another message",
+        messageSet1.hasNext)
     } catch {
       case e: Exception => fail("Not expected", e)
     }
@@ -337,8 +345,9 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
     props.put("request.timeout.ms", String.valueOf(timeoutMs))
     props.put("request.required.acks", "1")
     props.put("message.send.max.retries", "0")
-    props.put("client.id",
-              "ProducerTest-testAsyncSendCanCorrectlyFailWithTimeout")
+    props.put(
+      "client.id",
+      "ProducerTest-testAsyncSendCanCorrectlyFailWithTimeout")
     val producer =
       TestUtils.createProducer[String, String](
         brokerList =
@@ -350,10 +359,11 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
 
     val topic = "new-topic"
     // create topics in ZK
-    TestUtils.createTopic(zkUtils,
-                          topic,
-                          partitionReplicaAssignment = Map(0 -> Seq(0, 1)),
-                          servers = servers)
+    TestUtils.createTopic(
+      zkUtils,
+      topic,
+      partitionReplicaAssignment = Map(0 -> Seq(0, 1)),
+      servers = servers)
 
     // do a simple test to make sure plumbing is okay
     try {

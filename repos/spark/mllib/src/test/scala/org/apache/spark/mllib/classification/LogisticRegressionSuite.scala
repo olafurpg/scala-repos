@@ -262,12 +262,14 @@ class LogisticRegressionSuite
       LogisticRegressionSuite.generateLogisticInput(A, B, nPoints, 17)
     val validationRDD = sc.parallelize(validationData, 2)
     // Test prediction on RDD.
-    validatePrediction(model.predict(validationRDD.map(_.features)).collect(),
-                       validationData)
+    validatePrediction(
+      model.predict(validationRDD.map(_.features)).collect(),
+      validationData)
 
     // Test prediction on Array.
-    validatePrediction(validationData.map(row => model.predict(row.features)),
-                       validationData)
+    validatePrediction(
+      validationData.map(row => model.predict(row.features)),
+      validationData)
   }
 
   // Test if we can correctly learn A, B where Y = logistic(A + B*X)
@@ -305,12 +307,14 @@ class LogisticRegressionSuite
       LogisticRegressionSuite.generateLogisticInput(A, B, nPoints, 17)
     val validationRDD = sc.parallelize(validationData, 2)
     // Test prediction on RDD.
-    validatePrediction(model.predict(validationRDD.map(_.features)).collect(),
-                       validationData)
+    validatePrediction(
+      model.predict(validationRDD.map(_.features)).collect(),
+      validationData)
 
     // Test prediction on Array.
-    validatePrediction(validationData.map(row => model.predict(row.features)),
-                       validationData)
+    validatePrediction(
+      validationData.map(row => model.predict(row.features)),
+      validationData)
   }
 
   test("logistic regression with initial weights with SGD") {
@@ -341,12 +345,14 @@ class LogisticRegressionSuite
       LogisticRegressionSuite.generateLogisticInput(A, B, nPoints, 17)
     val validationRDD = sc.parallelize(validationData, 2)
     // Test prediction on RDD.
-    validatePrediction(model.predict(validationRDD.map(_.features)).collect(),
-                       validationData)
+    validatePrediction(
+      model.predict(validationRDD.map(_.features)).collect(),
+      validationData)
 
     // Test prediction on Array.
-    validatePrediction(validationData.map(row => model.predict(row.features)),
-                       validationData)
+    validatePrediction(
+      validationData.map(row => model.predict(row.features)),
+      validationData)
   }
 
   test(
@@ -379,14 +385,16 @@ class LogisticRegressionSuite
       LogisticRegressionSuite.generateLogisticInput(A, B, nPoints, 17)
     val validationRDD = sc.parallelize(validationData, 2)
     // Test prediction on RDD.
-    validatePrediction(model.predict(validationRDD.map(_.features)).collect(),
-                       validationData,
-                       0.8)
+    validatePrediction(
+      model.predict(validationRDD.map(_.features)).collect(),
+      validationData,
+      0.8)
 
     // Test prediction on Array.
-    validatePrediction(validationData.map(row => model.predict(row.features)),
-                       validationData,
-                       0.8)
+    validatePrediction(
+      validationData.map(row => model.predict(row.features)),
+      validationData,
+      0.8)
   }
 
   test("logistic regression with initial weights with LBFGS") {
@@ -416,12 +424,14 @@ class LogisticRegressionSuite
       LogisticRegressionSuite.generateLogisticInput(A, B, nPoints, 17)
     val validationRDD = sc.parallelize(validationData, 2)
     // Test prediction on RDD.
-    validatePrediction(model.predict(validationRDD.map(_.features)).collect(),
-                       validationData)
+    validatePrediction(
+      model.predict(validationRDD.map(_.features)).collect(),
+      validationData)
 
     // Test prediction on Array.
-    validatePrediction(validationData.map(row => model.predict(row.features)),
-                       validationData)
+    validatePrediction(
+      validationData.map(row => model.predict(row.features)),
+      validationData)
   }
 
   test(
@@ -451,15 +461,17 @@ class LogisticRegressionSuite
     val testRDD2 = sc.parallelize(
       testData.map(
         x =>
-          LabeledPoint(x.label,
-                       Vectors.fromBreeze(x.features.toBreeze * 1.0E3))),
+          LabeledPoint(
+            x.label,
+            Vectors.fromBreeze(x.features.toBreeze * 1.0E3))),
       2)
 
     val testRDD3 = sc.parallelize(
       testData.map(
         x =>
-          LabeledPoint(x.label,
-                       Vectors.fromBreeze(x.features.toBreeze * 1.0E6))),
+          LabeledPoint(
+            x.label,
+            Vectors.fromBreeze(x.features.toBreeze * 1.0E6))),
       2)
 
     testRDD1.cache()
@@ -504,27 +516,29 @@ class LogisticRegressionSuite
       * The following weights and xMean/xVariance are computed from iris dataset with lambda = 0.2.
       * As a result, we are actually drawing samples from probability distribution of built model.
       */
-    val weights = Array(-0.57997,
-                        0.912083,
-                        -0.371077,
-                        -0.819866,
-                        2.688191,
-                        -0.16624,
-                        -0.84355,
-                        -0.048509,
-                        -0.301789,
-                        4.170682)
+    val weights = Array(
+      -0.57997,
+      0.912083,
+      -0.371077,
+      -0.819866,
+      2.688191,
+      -0.16624,
+      -0.84355,
+      -0.048509,
+      -0.301789,
+      4.170682)
 
     val xMean = Array(5.843, 3.057, 3.758, 1.199)
     val xVariance = Array(0.6856, 0.1899, 3.116, 0.581)
 
     val testData =
-      LogisticRegressionSuite.generateMultinomialLogisticInput(weights,
-                                                               xMean,
-                                                               xVariance,
-                                                               true,
-                                                               nPoints,
-                                                               42)
+      LogisticRegressionSuite.generateMultinomialLogisticInput(
+        weights,
+        xMean,
+        xVariance,
+        true,
+        nPoints,
+        42)
 
     val testRDD = sc.parallelize(testData, 2)
     testRDD.cache()
@@ -586,33 +600,36 @@ class LogisticRegressionSuite
       *    data.V5 -0.29198337
       */
     val weightsR = Vectors.dense(
-      Array(-0.5837166,
-            0.9285260,
-            -0.3783612,
-            -0.8123411,
-            2.6228269,
-            -0.1691865,
-            -0.811048,
-            -0.0646380,
-            -0.2919834,
-            4.1119745))
+      Array(
+        -0.5837166,
+        0.9285260,
+        -0.3783612,
+        -0.8123411,
+        2.6228269,
+        -0.1691865,
+        -0.811048,
+        -0.0646380,
+        -0.2919834,
+        4.1119745))
 
     assert(model.weights ~== weightsR relTol 0.05)
 
     val validationData =
-      LogisticRegressionSuite.generateMultinomialLogisticInput(weights,
-                                                               xMean,
-                                                               xVariance,
-                                                               true,
-                                                               nPoints,
-                                                               17)
+      LogisticRegressionSuite.generateMultinomialLogisticInput(
+        weights,
+        xMean,
+        xVariance,
+        true,
+        nPoints,
+        17)
     val validationRDD = sc.parallelize(validationData, 2)
     // The validation accuracy is not good since this model (even the original weights) doesn't have
     // very steep curve in logistic function so that when we draw samples from distribution, it's
     // very easy to assign to another labels. However, this prediction result is consistent to R.
-    validatePrediction(model.predict(validationRDD.map(_.features)).collect(),
-                       validationData,
-                       0.47)
+    validatePrediction(
+      model.predict(validationRDD.map(_.features)).collect(),
+      validationData,
+      0.47)
   }
 
   test("model save/load: binary classification") {

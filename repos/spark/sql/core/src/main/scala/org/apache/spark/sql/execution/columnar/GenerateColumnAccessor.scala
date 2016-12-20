@@ -101,9 +101,10 @@ object GenerateColumnAccessor
             case array: ArrayType => classOf[ArrayColumnAccessor].getName
             case t: MapType => classOf[MapColumnAccessor].getName
           }
-          ctx.addMutableState(accessorCls,
-                              accessorName,
-                              s"$accessorName = null;")
+          ctx.addMutableState(
+            accessorCls,
+            accessorName,
+            s"$accessorName = null;")
 
           val createCode = dt match {
             case t if ctx.isPrimitiveType(dt) =>

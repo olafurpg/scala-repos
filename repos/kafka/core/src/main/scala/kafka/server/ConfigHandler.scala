@@ -92,19 +92,21 @@ class ClientIdConfigHandler(
     if (clientConfig.containsKey(ClientConfigOverride.ProducerOverride)) {
       quotaManagers(ApiKeys.PRODUCE.id).updateQuota(
         clientId,
-        new Quota(clientConfig
-                    .getProperty(ClientConfigOverride.ProducerOverride)
-                    .toLong,
-                  true))
+        new Quota(
+          clientConfig
+            .getProperty(ClientConfigOverride.ProducerOverride)
+            .toLong,
+          true))
     }
 
     if (clientConfig.containsKey(ClientConfigOverride.ConsumerOverride)) {
       quotaManagers(ApiKeys.FETCH.id).updateQuota(
         clientId,
-        new Quota(clientConfig
-                    .getProperty(ClientConfigOverride.ConsumerOverride)
-                    .toLong,
-                  true))
+        new Quota(
+          clientConfig
+            .getProperty(ClientConfigOverride.ConsumerOverride)
+            .toLong,
+          true))
     }
   }
 }

@@ -50,11 +50,12 @@ abstract class PatternParameterInfoTestBase
     val editor = fileEditorManager.openTextEditor(
       new OpenFileDescriptor(getProjectAdapter, file, offset),
       false)
-    val context = new ShowParameterInfoContext(editor,
-                                               getProjectAdapter,
-                                               scalaFile,
-                                               offset,
-                                               -1)
+    val context = new ShowParameterInfoContext(
+      editor,
+      getProjectAdapter,
+      scalaFile,
+      offset,
+      -1)
     val handler = new ScalaPatternParameterInfoHandler
     val leafElement = scalaFile.findElementAt(offset)
     val element =

@@ -182,10 +182,11 @@ class MapWithStateSuite
       sum
     }
 
-    testOperation[String, Int, Int](inputData,
-                                    StateSpec.function(mappingFunc),
-                                    outputData,
-                                    stateData)
+    testOperation[String, Int, Int](
+      inputData,
+      StateSpec.function(mappingFunc),
+      outputData,
+      stateData)
   }
 
   test("mapWithState - basic operations with advanced API") {
@@ -227,10 +228,11 @@ class MapWithStateSuite
       Some(key * 2)
     }
 
-    testOperation(inputData,
-                  StateSpec.function(mappingFunc),
-                  outputData,
-                  stateData)
+    testOperation(
+      inputData,
+      StateSpec.function(mappingFunc),
+      outputData,
+      stateData)
   }
 
   test("mapWithState - type inferencing and class tags") {
@@ -328,10 +330,11 @@ class MapWithStateSuite
       Some(output)
     }
 
-    testOperation(inputData,
-                  StateSpec.function(mappingFunc),
-                  outputData,
-                  stateData)
+    testOperation(
+      inputData,
+      StateSpec.function(mappingFunc),
+      outputData,
+      stateData)
   }
 
   test(
@@ -420,10 +423,11 @@ class MapWithStateSuite
       }
     }
 
-    testOperation(inputData,
-                  StateSpec.function(mappingFunc).numPartitions(1),
-                  outputData,
-                  stateData)
+    testOperation(
+      inputData,
+      StateSpec.function(mappingFunc).numPartitions(1),
+      outputData,
+      stateData)
   }
 
   test("mapWithState - state timing out") {
@@ -450,9 +454,10 @@ class MapWithStateSuite
     }
 
     val (collectedOutputs, collectedStateSnapshots) =
-      getOperationOutput(inputData,
-                         StateSpec.function(mappingFunc).timeout(Seconds(3)),
-                         20)
+      getOperationOutput(
+        inputData,
+        StateSpec.function(mappingFunc).timeout(Seconds(3)),
+        20)
 
     // b and c should be returned once each, when they were marked as expired
     assert(collectedOutputs.flatten.sorted === Seq("b", "c"))
@@ -548,12 +553,13 @@ class MapWithStateSuite
       mapWithStateStream.stateSnapshots()
     }
 
-    testCheckpointedOperation(inputData,
-                              operation,
-                              stateData,
-                              inputData.size / 2,
-                              batchDuration = batchDuration,
-                              stopSparkContextAfterTest = false)
+    testCheckpointedOperation(
+      inputData,
+      operation,
+      stateData,
+      inputData.size / 2,
+      batchDuration = batchDuration,
+      stopSparkContextAfterTest = false)
   }
 
   private def testOperation[K: ClassTag, S: ClassTag, T: ClassTag](
@@ -615,8 +621,9 @@ class MapWithStateSuite
         debugString)
     expected.zip(collected).foreach {
       case (c, e) =>
-        assert(c.toSet === e.toSet,
-               s"collected $typ is different from expected $debugString")
+        assert(
+          c.toSet === e.toSet,
+          s"collected $typ is different from expected $debugString")
     }
   }
 }

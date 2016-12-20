@@ -34,9 +34,9 @@ private final class Storage(coll: Coll) {
   def insert(p: Entry) = coll.insert(p).void
 
   def bulkInsert(ps: Seq[Entry]) =
-    coll.bulkInsert(documents =
-                      ps.map(BSONHandlers.EntryBSONHandler.write).toStream,
-                    ordered = false)
+    coll.bulkInsert(
+      documents = ps.map(BSONHandlers.EntryBSONHandler.write).toStream,
+      ordered = false)
 
   def update(p: Entry) = coll.update(selectId(p.id), p, upsert = true).void
 

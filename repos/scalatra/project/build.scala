@@ -23,19 +23,21 @@ object ScalatraBuild extends Build {
       scalaVersion <<= (crossScalaVersions) { versions =>
         versions.head
       },
-      scalacOptions ++= Seq("-target:jvm-1.7",
-                            "-unchecked",
-                            "-deprecation",
-                            "-Yinline-warnings",
-                            "-Xcheckinit",
-                            "-encoding",
-                            "utf8",
-                            "-feature"),
-      scalacOptions ++= Seq("-language:higherKinds",
-                            "-language:postfixOps",
-                            "-language:implicitConversions",
-                            "-language:reflectiveCalls",
-                            "-language:existentials"),
+      scalacOptions ++= Seq(
+        "-target:jvm-1.7",
+        "-unchecked",
+        "-deprecation",
+        "-Yinline-warnings",
+        "-Xcheckinit",
+        "-encoding",
+        "utf8",
+        "-feature"),
+      scalacOptions ++= Seq(
+        "-language:higherKinds",
+        "-language:postfixOps",
+        "-language:implicitConversions",
+        "-language:reflectiveCalls",
+        "-language:existentials"),
       javacOptions ++=
         Seq("-target", "1.7", "-source", "1.7", "-Xlint:deprecation"),
       manifestSetting,
@@ -65,26 +67,27 @@ object ScalatraBuild extends Build {
         Unidoc.unidocExclude := Seq("scalatra-example"),
         previousArtifacts := Set.empty
       ),
-    aggregate = Seq(scalatraCore,
-                    scalatraAuth,
-                    scalatraFileupload,
-                    scalatraCommands,
-                    scalatraScalate,
-                    scalatraJson,
-                    scalatraSlf4j,
-                    scalatraAtmosphere,
-                    scalatraTest,
-                    scalatraScalatest,
-                    scalatraSpecs2,
-                    scalatraExample,
-                    scalatraSwagger,
-                    scalatraJetty,
-                    scalatraCommon,
-                    scalatraSwaggerExt,
-                    scalatraSpring,
-                    scalatraMetrics,
-                    scalatraCache,
-                    scalatraCacheGuava)
+    aggregate = Seq(
+      scalatraCore,
+      scalatraAuth,
+      scalatraFileupload,
+      scalatraCommands,
+      scalatraScalate,
+      scalatraJson,
+      scalatraSlf4j,
+      scalatraAtmosphere,
+      scalatraTest,
+      scalatraScalatest,
+      scalatraSpecs2,
+      scalatraExample,
+      scalatraSwagger,
+      scalatraJetty,
+      scalatraCommon,
+      scalatraSwaggerExt,
+      scalatraSpring,
+      scalatraMetrics,
+      scalatraCache,
+      scalatraCacheGuava)
   )
 
   lazy val scalatraCommon = Project(
@@ -154,13 +157,14 @@ object ScalatraBuild extends Build {
       base = file("atmosphere"),
       settings = scalatraSettings ++ Seq(
           libraryDependencies ++= Seq(akkaActor, akkaTestkit % "test"),
-          libraryDependencies ++= Seq(atmosphereRuntime,
-                                      atmosphereRedis,
-                                      atmosphereCompatJbossweb,
-                                      atmosphereCompatTomcat,
-                                      atmosphereCompatTomcat7,
-                                      atmosphereClient % "test",
-                                      jettyWebsocket % "test"),
+          libraryDependencies ++= Seq(
+            atmosphereRuntime,
+            atmosphereRedis,
+            atmosphereCompatJbossweb,
+            atmosphereCompatTomcat,
+            atmosphereCompatTomcat7,
+            atmosphereClient % "test",
+            jettyWebsocket % "test"),
           description := "Atmosphere integration for scalatra"
         )
     ) dependsOn (scalatraJson % "compile;test->test;provided->provided")
@@ -181,9 +185,10 @@ object ScalatraBuild extends Build {
       base = file("json"),
       settings = scalatraSettings ++ Seq(
           description := "JSON support for Scalatra",
-          libraryDependencies ++= Seq(json4sJackson % "provided",
-                                      json4sNative % "provided",
-                                      json4sCore)
+          libraryDependencies ++= Seq(
+            json4sJackson % "provided",
+            json4sNative % "provided",
+            json4sCore)
         )
     ) dependsOn (scalatraCore % "compile;test->test;provided->provided")
 
@@ -569,8 +574,9 @@ object ScalatraBuild extends Build {
     }
   )
 
-  lazy val doNotPublish = Seq(publish := {},
-                              publishLocal := {},
-                              PgpKeys.publishSigned := {},
-                              PgpKeys.publishLocalSigned := {})
+  lazy val doNotPublish = Seq(
+    publish := {},
+    publishLocal := {},
+    PgpKeys.publishSigned := {},
+    PgpKeys.publishLocalSigned := {})
 }

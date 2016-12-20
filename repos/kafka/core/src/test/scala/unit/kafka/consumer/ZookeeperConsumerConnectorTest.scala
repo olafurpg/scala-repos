@@ -104,10 +104,11 @@ class ZookeeperConsumerConnectorTest
 
     // send some messages to each broker
     val sentMessages1 =
-      sendMessages(servers, topic, nMessages, 0) ++ sendMessages(servers,
-                                                                 topic,
-                                                                 nMessages,
-                                                                 1)
+      sendMessages(servers, topic, nMessages, 0) ++ sendMessages(
+        servers,
+        topic,
+        nMessages,
+        1)
 
     // wait to make sure the topic and partition have a leader for the successful case
     waitUntilLeaderIsElectedOrChanged(zkUtils, topic, 0)
@@ -151,10 +152,11 @@ class ZookeeperConsumerConnectorTest
       new StringDecoder())
     // send some messages to each broker
     val sentMessages2 =
-      sendMessages(servers, topic, nMessages, 0) ++ sendMessages(servers,
-                                                                 topic,
-                                                                 nMessages,
-                                                                 1)
+      sendMessages(servers, topic, nMessages, 0) ++ sendMessages(
+        servers,
+        topic,
+        nMessages,
+        1)
 
     waitUntilLeaderIsElectedOrChanged(zkUtils, topic, 0)
     waitUntilLeaderIsElectedOrChanged(zkUtils, topic, 1)
@@ -180,10 +182,11 @@ class ZookeeperConsumerConnectorTest
       new mutable.HashMap[String, Int]())
     // send some messages to each broker
     val sentMessages3 =
-      sendMessages(servers, topic, nMessages, 0) ++ sendMessages(servers,
-                                                                 topic,
-                                                                 nMessages,
-                                                                 1)
+      sendMessages(servers, topic, nMessages, 0) ++ sendMessages(
+        servers,
+        topic,
+        nMessages,
+        1)
 
     waitUntilLeaderIsElectedOrChanged(zkUtils, topic, 0)
     waitUntilLeaderIsElectedOrChanged(zkUtils, topic, 1)
@@ -417,11 +420,12 @@ class ZookeeperConsumerConnectorTest
     val zkUtils = ZkUtils(zkConnect, 6000, 30000, false)
 
     // create topic topic1 with 1 partition on broker 0
-    createTopic(zkUtils,
-                topic,
-                numPartitions = 1,
-                replicationFactor = 1,
-                servers = servers)
+    createTopic(
+      zkUtils,
+      topic,
+      numPartitions = 1,
+      replicationFactor = 1,
+      servers = servers)
 
     // send some messages to each broker
     val sentMessages1 = sendMessages(servers, topic, nMessages)
@@ -522,8 +526,9 @@ class ZookeeperConsumerConnectorTest
     // Check if rebalance listener is fired
     assertEquals(true, rebalanceListener1.beforeReleasingPartitionsCalled)
     assertEquals(true, rebalanceListener1.beforeStartingFetchersCalled)
-    assertEquals(Set[Int](0, 1),
-                 rebalanceListener1.partitionOwnership.get(topic))
+    assertEquals(
+      Set[Int](0, 1),
+      rebalanceListener1.partitionOwnership.get(topic))
     // Check if global partition ownership in rebalance listener is correct
     assertEquals(
       "group1_consumer1",
@@ -539,8 +544,9 @@ class ZookeeperConsumerConnectorTest
       rebalanceListener1.globalPartitionOwnership.get(topic).get(1).threadId)
     assertEquals("group1_consumer1", rebalanceListener1.consumerId)
     assertEquals("group1_consumer2", rebalanceListener2.consumerId)
-    assertEquals(rebalanceListener1.globalPartitionOwnership,
-                 rebalanceListener2.globalPartitionOwnership)
+    assertEquals(
+      rebalanceListener1.globalPartitionOwnership,
+      rebalanceListener2.globalPartitionOwnership)
     zkConsumerConnector1.shutdown()
     zkConsumerConnector2.shutdown()
   }

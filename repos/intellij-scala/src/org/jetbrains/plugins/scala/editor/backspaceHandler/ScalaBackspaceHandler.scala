@@ -42,12 +42,14 @@ class ScalaBackspaceHandler extends BackspaceHandlerDelegate {
               if (tagToDelete.getNode.getElementType != ScalaDocTokenType.DOC_BOLD_TAG)
                 tagToDelete.getTextLength
               else 1
-            document.deleteString(tagToDelete.getTextOffset,
-                                  tagToDelete.getTextOffset + textLength)
+            document.deleteString(
+              tagToDelete.getTextOffset,
+              tagToDelete.getTextOffset + textLength)
           }
         } else {
-          document.deleteString(element.getTextOffset,
-                                element.getTextOffset + 2)
+          document.deleteString(
+            element.getTextOffset,
+            element.getTextOffset + 2)
           editor.getCaretModel.moveCaretRelatively(1, 0, false, false, false)
         }
 
@@ -97,9 +99,10 @@ class ScalaBackspaceHandler extends BackspaceHandlerDelegate {
     }
 
     @inline def isMultilineInterpolatedStringPrefix(tpe: IElementType) =
-      Set(ScalaElementTypes.INTERPOLATED_PREFIX_LITERAL_REFERENCE,
-          ScalaElementTypes.INTERPOLATED_PREFIX_PATTERN_REFERENCE,
-          ScalaTokenTypes.tINTERPOLATED_STRING_ID) contains tpe
+      Set(
+        ScalaElementTypes.INTERPOLATED_PREFIX_LITERAL_REFERENCE,
+        ScalaElementTypes.INTERPOLATED_PREFIX_PATTERN_REFERENCE,
+        ScalaTokenTypes.tINTERPOLATED_STRING_ID) contains tpe
 
     def correctMultilineString(closingQuotesOffset: Int) {
       extensions.inWriteAction {

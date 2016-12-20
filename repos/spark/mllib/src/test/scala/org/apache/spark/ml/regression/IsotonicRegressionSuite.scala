@@ -165,9 +165,10 @@ class IsotonicRegressionSuite
   test("vector features column with feature index") {
     val dataset = sqlContext
       .createDataFrame(
-        Seq((4.0, Vectors.dense(0.0, 1.0)),
-            (3.0, Vectors.dense(0.0, 2.0)),
-            (5.0, Vectors.sparse(2, Array(1), Array(3.0)))))
+        Seq(
+          (4.0, Vectors.dense(0.0, 1.0)),
+          (3.0, Vectors.dense(0.0, 2.0)),
+          (5.0, Vectors.sparse(2, Array(1), Array(3.0)))))
       .toDF("label", "features")
 
     val ir = new IsotonicRegression().setFeatureIndex(1)
@@ -199,10 +200,11 @@ class IsotonicRegressionSuite
     }
 
     val ir = new IsotonicRegression()
-    testEstimatorAndModelReadWrite(ir,
-                                   dataset,
-                                   IsotonicRegressionSuite.allParamSettings,
-                                   checkModelData)
+    testEstimatorAndModelReadWrite(
+      ir,
+      dataset,
+      IsotonicRegressionSuite.allParamSettings,
+      checkModelData)
   }
 }
 

@@ -37,9 +37,10 @@ object SbtLauncherPlugin extends AutoPlugin {
           else file.getName -> file
         }
       // TODO - We need to inject the appropriate boot.properties file for this version of sbt.
-      rebundle(rawSbtLaunchJar.value,
-               propFileLocations.toMap,
-               target.value / "sbt-launch.jar")
+      rebundle(
+        rawSbtLaunchJar.value,
+        propFileLocations.toMap,
+        target.value / "sbt-launch.jar")
     }
   )
 

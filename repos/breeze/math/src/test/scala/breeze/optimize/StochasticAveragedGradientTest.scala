@@ -45,9 +45,9 @@ class StochasticAveragedGradientTest extends OptimizeTestBase {
 
   test("optimize a simple multivariate gaussian with l2 regularization") {
     val lbfgs =
-      new StochasticAveragedGradient[DenseVector[Double]](400,
-                                                          l2Regularization =
-                                                            1.0)
+      new StochasticAveragedGradient[DenseVector[Double]](
+        400,
+        l2Regularization = 1.0)
 
     def optimizeThis(init: DenseVector[Double]) = {
       val f = new DiffFunction[DenseVector[Double]] {

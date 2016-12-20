@@ -208,46 +208,50 @@ class SearchService(
         // TODO: other types of visibility when we get more sophisticated
         if (clazz.access != Public) Nil
         else
-          FqnSymbol(None,
-                    name,
-                    path,
-                    clazz.name.fqnString,
-                    None,
-                    None,
-                    sourceUri,
-                    clazz.source.line) :: clazz.methods.toList
+          FqnSymbol(
+            None,
+            name,
+            path,
+            clazz.name.fqnString,
+            None,
+            None,
+            sourceUri,
+            clazz.source.line) :: clazz.methods.toList
             .filter(_.access == Public)
             .map { method =>
               val descriptor = method.descriptor.descriptorString
-              FqnSymbol(None,
-                        name,
-                        path,
-                        method.name.fqnString,
-                        Some(descriptor),
-                        None,
-                        sourceUri,
-                        method.line)
+              FqnSymbol(
+                None,
+                name,
+                path,
+                method.name.fqnString,
+                Some(descriptor),
+                None,
+                sourceUri,
+                method.line)
             } ::: clazz.fields.toList.filter(_.access == Public).map { field =>
             val internal = field.clazz.internalString
-            FqnSymbol(None,
-                      name,
-                      path,
-                      field.name.fqnString,
-                      None,
-                      Some(internal),
-                      sourceUri,
-                      clazz.source.line)
+            FqnSymbol(
+              None,
+              name,
+              path,
+              field.name.fqnString,
+              None,
+              Some(internal),
+              sourceUri,
+              clazz.source.line)
           } ::: depickler.getTypeAliases.toList
             .filter(_.access == Public)
             .map { rawType =>
-              FqnSymbol(None,
-                        name,
-                        path,
-                        rawType.fqnString,
-                        None,
-                        None,
-                        sourceUri,
-                        None)
+              FqnSymbol(
+                None,
+                name,
+                path,
+                rawType.fqnString,
+                None,
+                None,
+                sourceUri,
+                None)
             }
     }
   }.filterNot(sym => ignore.exists(sym.fqn.contains))

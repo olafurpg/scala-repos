@@ -84,9 +84,10 @@ class ListTablesSuite
 
   test("query the returned DataFrame of tables") {
     val expectedSchema = StructType(
-      StructField("tableName", StringType, false) :: StructField("isTemporary",
-                                                                 BooleanType,
-                                                                 false) :: Nil)
+      StructField("tableName", StringType, false) :: StructField(
+        "isTemporary",
+        BooleanType,
+        false) :: Nil)
 
     Seq(sqlContext.tables(), sql("SHOW TABLes")).foreach {
       case tableDF =>
@@ -98,11 +99,12 @@ class ListTablesSuite
             "SELECT isTemporary, tableName from tables WHERE tableName = 'ListTablesSuiteTable'"),
           Row(true, "ListTablesSuiteTable")
         )
-        checkAnswer(sqlContext
-                      .tables()
-                      .filter("tableName = 'tables'")
-                      .select("tableName", "isTemporary"),
-                    Row("tables", true))
+        checkAnswer(
+          sqlContext
+            .tables()
+            .filter("tableName = 'tables'")
+            .select("tableName", "isTemporary"),
+          Row("tables", true))
         sqlContext.dropTempTable("tables")
     }
   }

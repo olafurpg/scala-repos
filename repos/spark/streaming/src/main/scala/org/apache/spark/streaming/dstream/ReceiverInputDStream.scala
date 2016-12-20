@@ -117,10 +117,11 @@ abstract class ReceiverInputDStream[T: ClassTag](_ssc: StreamingContext)
         val isBlockIdValid = blockInfos.map { _.isBlockIdValid() }.toArray
         val walRecordHandles =
           blockInfos.map { _.walRecordHandleOption.get }.toArray
-        new WriteAheadLogBackedBlockRDD[T](ssc.sparkContext,
-                                           blockIds,
-                                           walRecordHandles,
-                                           isBlockIdValid)
+        new WriteAheadLogBackedBlockRDD[T](
+          ssc.sparkContext,
+          blockIds,
+          walRecordHandles,
+          isBlockIdValid)
       } else {
         // Else, create a BlockRDD. However, if there are some blocks with WAL info but not
         // others then that is unexpected and log a warning accordingly.
@@ -149,10 +150,11 @@ abstract class ReceiverInputDStream[T: ClassTag](_ssc: StreamingContext)
       // If no block is ready now, creating WriteAheadLogBackedBlockRDD or BlockRDD
       // according to the configuration
       if (WriteAheadLogUtils.enableReceiverLog(ssc.conf)) {
-        new WriteAheadLogBackedBlockRDD[T](ssc.sparkContext,
-                                           Array.empty,
-                                           Array.empty,
-                                           Array.empty)
+        new WriteAheadLogBackedBlockRDD[T](
+          ssc.sparkContext,
+          Array.empty,
+          Array.empty,
+          Array.empty)
       } else {
         new BlockRDD[T](ssc.sc, Array.empty)
       }

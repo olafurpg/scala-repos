@@ -30,14 +30,16 @@ class ImplicitsTest extends FunSuite {
   import Implicits._
   test("Set#toMultiMap") {
     assert(
-      Set((1, 2), (1, 3), (1, 2), (2, 4)).toMultiMap === Map(1 -> Set(2, 3),
-                                                             2 -> Set(4)))
+      Set((1, 2), (1, 3), (1, 2), (2, 4)).toMultiMap === Map(
+        1 -> Set(2, 3),
+        2 -> Set(4)))
   }
 
   test("Seq#toMultiMap") {
     assert(
-      Seq((1, 2), (1, 3), (1, 2), (2, 4)).toMultiMap === Map(1 -> Seq(2, 3, 2),
-                                                             2 -> Seq(4)))
+      Seq((1, 2), (1, 3), (1, 2), (2, 4)).toMultiMap === Map(
+        1 -> Seq(2, 3, 2),
+        2 -> Seq(4)))
   }
 
   test("IndexedSeq#toMultiMap") {

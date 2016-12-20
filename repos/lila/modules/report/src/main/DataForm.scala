@@ -20,12 +20,13 @@ private[report] final class DataForm(val captcher: akka.actor.ActorSelection)
       "move" -> text
     )({
       case (username, reason, text, gameId, move) =>
-        ReportSetup(user = fetchUser(username) err "Unknown username " +
-                        username,
-                    reason = reason,
-                    text = text,
-                    gameId = gameId,
-                    move = move)
+        ReportSetup(
+          user = fetchUser(username) err "Unknown username " +
+              username,
+          reason = reason,
+          text = text,
+          gameId = gameId,
+          move = move)
     })(_.export.some).verifying(captchaFailMessage, validateCaptcha _))
 
   def createWithCaptcha = withCaptcha(create)

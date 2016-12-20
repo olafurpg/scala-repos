@@ -40,8 +40,9 @@ class AttributeGroup private (val name: String,
     extends Serializable {
 
   require(name.nonEmpty, "Cannot have an empty string for name.")
-  require(!(numAttributes.isDefined && attrs.isDefined),
-          "Cannot have both numAttributes and attrs defined.")
+  require(
+    !(numAttributes.isDefined && attrs.isDefined),
+    "Cannot have both numAttributes and attrs defined.")
 
   /**
     * Creates an attribute group without attribute info.
@@ -142,12 +143,14 @@ class AttributeGroup private (val name: String,
       }
       val attrBldr = new MetadataBuilder
       if (numericMetadata.nonEmpty) {
-        attrBldr.putMetadataArray(AttributeType.Numeric.name,
-                                  numericMetadata.toArray)
+        attrBldr.putMetadataArray(
+          AttributeType.Numeric.name,
+          numericMetadata.toArray)
       }
       if (nominalMetadata.nonEmpty) {
-        attrBldr.putMetadataArray(AttributeType.Nominal.name,
-                                  nominalMetadata.toArray)
+        attrBldr.putMetadataArray(
+          AttributeType.Nominal.name,
+          nominalMetadata.toArray)
       }
       if (binaryMetadata.nonEmpty) {
         attrBldr
@@ -174,10 +177,11 @@ class AttributeGroup private (val name: String,
 
   /** Converts to a StructField with some existing metadata. */
   def toStructField(existingMetadata: Metadata): StructField = {
-    StructField(name,
-                new VectorUDT,
-                nullable = false,
-                toMetadata(existingMetadata))
+    StructField(
+      name,
+      new VectorUDT,
+      nullable = false,
+      toMetadata(existingMetadata))
   }
 
   /** Converts to a StructField. */

@@ -70,9 +70,10 @@ object Msgs extends DispatchSnippet {
     ShowAll(toBoolean(S.attr("showAll") or S.attr("showall")))
 
     // Extract user-specified titles and CSS classes for later use
-    List((NoticeType.Error, MsgsErrorMeta),
-         (NoticeType.Warning, MsgsWarningMeta),
-         (NoticeType.Notice, MsgsNoticeMeta)).foreach {
+    List(
+      (NoticeType.Error, MsgsErrorMeta),
+      (NoticeType.Warning, MsgsWarningMeta),
+      (NoticeType.Notice, MsgsNoticeMeta)).foreach {
       case (noticeType, ajaxStorage) => {
         // Extract the title if provided, or default to none. Allow for XML nodes
         // so that people can localize, etc.
@@ -136,9 +137,10 @@ object Msgs extends DispatchSnippet {
     }
 
     // Render all three types together
-    List((S.errors, NoticeType.Error, MsgsErrorMeta),
-         (S.warnings, NoticeType.Warning, MsgsWarningMeta),
-         (S.notices, NoticeType.Notice, MsgsNoticeMeta))
+    List(
+      (S.errors, NoticeType.Error, MsgsErrorMeta),
+      (S.warnings, NoticeType.Warning, MsgsWarningMeta),
+      (S.notices, NoticeType.Notice, MsgsNoticeMeta))
       .flatMap(computeMessageDiv)
   }
 

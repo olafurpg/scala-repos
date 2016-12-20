@@ -256,14 +256,16 @@ class ReceivedBlockTrackerSuite
     // If we face any issue during recovery, because these old files exist, then we need to make
     // deletion more robust rather than a parallelized operation where we fire and forget
     val batch1Allocation = createBatchAllocation(t(1), batch1)
-    writeEventsManually(getLogFileName(t(1)),
-                        batch1.map(BlockAdditionEvent) :+ batch1Allocation)
+    writeEventsManually(
+      getLogFileName(t(1)),
+      batch1.map(BlockAdditionEvent) :+ batch1Allocation)
 
     writeEventsManually(getLogFileName(t(2)), Seq(createBatchCleanup(t(1))))
 
     val batch2Allocation = createBatchAllocation(t(3), batch2)
-    writeEventsManually(getLogFileName(t(3)),
-                        batch2.map(BlockAdditionEvent) :+ batch2Allocation)
+    writeEventsManually(
+      getLogFileName(t(3)),
+      batch2.map(BlockAdditionEvent) :+ batch2Allocation)
 
     writeEventsManually(getLogFileName(t(4)), batch3.map(BlockAdditionEvent))
 
@@ -274,8 +276,9 @@ class ReceivedBlockTrackerSuite
     // Create the tracker to recover from the log files. We're going to ask the tracker to clean
     // things up, and then we're going to rewrite that data, and recover using a different tracker.
     // They should have identical data no matter what
-    val tracker = createTracker(recoverFromWriteAheadLog = true,
-                                clock = new ManualClock(t(4)))
+    val tracker = createTracker(
+      recoverFromWriteAheadLog = true,
+      clock = new ManualClock(t(4)))
 
     def compareTrackers(base: ReceivedBlockTracker,
                         subject: ReceivedBlockTracker): Unit = {
@@ -290,25 +293,29 @@ class ReceivedBlockTrackerSuite
     tracker.cleanupOldBatches(t(3), waitForCompletion = true)
     assert(getWriteAheadLogFiles().length === 3)
 
-    val tracker2 = createTracker(recoverFromWriteAheadLog = true,
-                                 clock = new ManualClock(t(4)))
+    val tracker2 = createTracker(
+      recoverFromWriteAheadLog = true,
+      clock = new ManualClock(t(4)))
     compareTrackers(tracker, tracker2)
 
     // rewrite first file
     writeEventsManually(getLogFileName(t(0)), Seq(createBatchCleanup(t(0))))
     assert(getWriteAheadLogFiles().length === 4)
     // make sure trackers are consistent
-    val tracker3 = createTracker(recoverFromWriteAheadLog = true,
-                                 clock = new ManualClock(t(4)))
+    val tracker3 = createTracker(
+      recoverFromWriteAheadLog = true,
+      clock = new ManualClock(t(4)))
     compareTrackers(tracker, tracker3)
 
     // rewrite second file
-    writeEventsManually(getLogFileName(t(1)),
-                        batch1.map(BlockAdditionEvent) :+ batch1Allocation)
+    writeEventsManually(
+      getLogFileName(t(1)),
+      batch1.map(BlockAdditionEvent) :+ batch1Allocation)
     assert(getWriteAheadLogFiles().length === 5)
     // make sure trackers are consistent
-    val tracker4 = createTracker(recoverFromWriteAheadLog = true,
-                                 clock = new ManualClock(t(4)))
+    val tracker4 = createTracker(
+      recoverFromWriteAheadLog = true,
+      clock = new ManualClock(t(4)))
     compareTrackers(tracker, tracker4)
   }
 
@@ -321,12 +328,13 @@ class ReceivedBlockTrackerSuite
                     clock: Clock = new SystemClock): ReceivedBlockTracker = {
     val cpDirOption =
       if (setCheckpointDir) Some(checkpointDirectory.toString) else None
-    val tracker = new ReceivedBlockTracker(conf,
-                                           hadoopConf,
-                                           Seq(streamId),
-                                           clock,
-                                           recoverFromWriteAheadLog,
-                                           cpDirOption)
+    val tracker = new ReceivedBlockTracker(
+      conf,
+      hadoopConf,
+      Seq(streamId),
+      clock,
+      recoverFromWriteAheadLog,
+      cpDirOption)
     allReceivedBlockTrackers += tracker
     tracker
   }
@@ -334,12 +342,13 @@ class ReceivedBlockTrackerSuite
   /** Generate blocks infos using random ids */
   def generateBlockInfos(): Seq[ReceivedBlockInfo] = {
     List.fill(5)(
-      ReceivedBlockInfo(streamId,
-                        Some(0L),
-                        None,
-                        BlockManagerBasedStoreResult(
-                          StreamBlockId(streamId, math.abs(Random.nextInt)),
-                          Some(0L))))
+      ReceivedBlockInfo(
+        streamId,
+        Some(0L),
+        None,
+        BlockManagerBasedStoreResult(
+          StreamBlockId(streamId, math.abs(Random.nextInt)),
+          Some(0L))))
   }
 
   /**

@@ -39,9 +39,10 @@ abstract class ChooseValueExpression[T](lookupItems: Seq[T], defaultItem: T)
               if (range != null) {
                 //need to insert with FQNs
                 val newText = result(item.getObject.asInstanceOf[T])
-                topLevelEditor.getDocument.replaceString(range.getStartOffset,
-                                                         range.getEndOffset,
-                                                         newText)
+                topLevelEditor.getDocument.replaceString(
+                  range.getStartOffset,
+                  range.getEndOffset,
+                  newText)
               }
             }
           }

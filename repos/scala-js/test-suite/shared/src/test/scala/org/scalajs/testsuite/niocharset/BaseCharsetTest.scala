@@ -19,9 +19,10 @@ import org.junit.Assert._
 class BaseCharsetTest(val charset: Charset) {
   import BaseCharsetTest._
 
-  protected val AllErrorActions = Seq(CodingErrorAction.IGNORE,
-                                      CodingErrorAction.REPLACE,
-                                      CodingErrorAction.REPORT)
+  protected val AllErrorActions = Seq(
+    CodingErrorAction.IGNORE,
+    CodingErrorAction.REPLACE,
+    CodingErrorAction.REPORT)
 
   protected val ReportActions = Seq(CodingErrorAction.REPORT)
 
@@ -79,17 +80,20 @@ class BaseCharsetTest(val charset: Charset) {
       }
 
       (actualTry, expectedTry) match {
-        case (Failure(actualEx: MalformedInputException),
-              Failure(expectedEx: MalformedInputException)) =>
+        case (
+            Failure(actualEx: MalformedInputException),
+            Failure(expectedEx: MalformedInputException)) =>
           assertEquals(expectedEx.getInputLength(), actualEx.getInputLength())
 
-        case (Failure(actualEx: UnmappableCharacterException),
-              Failure(expectedEx: UnmappableCharacterException)) =>
+        case (
+            Failure(actualEx: UnmappableCharacterException),
+            Failure(expectedEx: UnmappableCharacterException)) =>
           assertEquals(expectedEx.getInputLength(), actualEx.getInputLength())
 
         case (Success(actualChars), Success(expectedChars)) =>
-          assertArrayEquals(expectedChars.map(_.toInt),
-                            actualChars.map(_.toInt))
+          assertArrayEquals(
+            expectedChars.map(_.toInt),
+            actualChars.map(_.toInt))
 
         case _ =>
           // For the error message
@@ -165,12 +169,14 @@ class BaseCharsetTest(val charset: Charset) {
       }
 
       (actualTry, expectedTry) match {
-        case (Failure(actualEx: MalformedInputException),
-              Failure(expectedEx: MalformedInputException)) =>
+        case (
+            Failure(actualEx: MalformedInputException),
+            Failure(expectedEx: MalformedInputException)) =>
           assertEquals(expectedEx.getInputLength(), actualEx.getInputLength())
 
-        case (Failure(actualEx: UnmappableCharacterException),
-              Failure(expectedEx: UnmappableCharacterException)) =>
+        case (
+            Failure(actualEx: UnmappableCharacterException),
+            Failure(expectedEx: UnmappableCharacterException)) =>
           assertEquals(expectedEx.getInputLength(), actualEx.getInputLength())
 
         case (Success(actualBytes), Success(expectedBytes)) =>

@@ -442,8 +442,9 @@ object WorksheetEditorPrinter {
 
             viewerImpl.getCaretModel.moveToVisualPosition(
               new VisualPosition(
-                Math.min(originalImpl.getCaretModel.getVisualPosition.line,
-                         viewerImpl.getDocument.getLineCount),
+                Math.min(
+                  originalImpl.getCaretModel.getVisualPosition.line,
+                  viewerImpl.getDocument.getLineCount),
                 0)
             )
 
@@ -516,9 +517,10 @@ object WorksheetEditorPrinter {
   def newUiFor(editor: Editor, virtualFile: VirtualFile, isPlain: Boolean) =
     new WorksheetEditorPrinter(
       editor,
-      createRightSideViewer(editor,
-                            virtualFile,
-                            getOrCreateViewerEditorFor(editor, isPlain)),
+      createRightSideViewer(
+        editor,
+        virtualFile,
+        getOrCreateViewerEditorFor(editor, isPlain)),
       PsiManager getInstance editor.getProject findFile virtualFile match {
         case scalaFile: ScalaFile => scalaFile
         case _ => null
@@ -613,9 +615,10 @@ object WorksheetEditorPrinter {
       case _ =>
         if (isPlain) createBlankEditor(editor.getProject)
         else
-          createBlankEditorWithLang(editor.getProject,
-                                    ScalaFileType.SCALA_LANGUAGE,
-                                    ScalaFileType.SCALA_FILE_TYPE)
+          createBlankEditorWithLang(
+            editor.getProject,
+            ScalaFileType.SCALA_LANGUAGE,
+            ScalaFileType.SCALA_FILE_TYPE)
     }
   }
 

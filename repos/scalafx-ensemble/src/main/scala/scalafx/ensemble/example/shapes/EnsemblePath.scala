@@ -50,11 +50,12 @@ class EnsemblePath extends EnsembleExample {
     padding = Insets(20)
     children = List(
       new Path {
-        elements = List(MoveTo(35, 35),
-                        HLineTo(75),
-                        VLineTo(75),
-                        LineTo(35, 75),
-                        new ClosePath())
+        elements = List(
+          MoveTo(35, 35),
+          HLineTo(75),
+          VLineTo(75),
+          LineTo(35, 75),
+          new ClosePath())
         fill = Color.Orange
         stroke = Color.Black
         strokeWidth = 1d

@@ -57,11 +57,12 @@ class WorksheetFoldGroup(
   }
 
   def getCorrespondInfo = regions map {
-    case FoldRegionInfo(region: WorksheetFoldRegionDelegate,
-                        _,
-                        leftStart,
-                        spaces,
-                        lsLength) =>
+    case FoldRegionInfo(
+        region: WorksheetFoldRegionDelegate,
+        _,
+        leftStart,
+        spaces,
+        lsLength) =>
       (region.getStartOffset, region.getEndOffset, leftStart, spaces, lsLength)
   }
 
@@ -159,8 +160,9 @@ class WorksheetFoldGroup(
     val lower = unfolded.tailMap(line).entrySet().iterator()
     while (lower.hasNext) {
       val t = lower.next()
-      unfolded.put(t.getKey,
-                   if (expand) t.getValue + spaces else t.getValue - spaces)
+      unfolded.put(
+        t.getKey,
+        if (expand) t.getValue + spaces else t.getValue - spaces)
     }
 
     if (expand) unfolded.put(line, unfolded.get(key) + spaces)

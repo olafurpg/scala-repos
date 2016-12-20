@@ -242,12 +242,13 @@ object Fork {
               scalaJars: Iterable[File],
               arguments: Seq[String],
               log: Logger): Int =
-      apply(javaHome,
-            jvmOptions,
-            scalaJars,
-            arguments,
-            None,
-            BufferedOutput(log))
+      apply(
+        javaHome,
+        jvmOptions,
+        scalaJars,
+        arguments,
+        None,
+        BufferedOutput(log))
 
     @deprecated("Use apply(ForkOptions, Seq[String])", "0.13.0")
     def apply(javaHome: Option[File],
@@ -256,12 +257,13 @@ object Fork {
               arguments: Seq[String],
               workingDirectory: Option[File],
               log: Logger): Int =
-      apply(javaHome,
-            jvmOptions,
-            scalaJars,
-            arguments,
-            workingDirectory,
-            BufferedOutput(log))
+      apply(
+        javaHome,
+        jvmOptions,
+        scalaJars,
+        arguments,
+        workingDirectory,
+        BufferedOutput(log))
 
     @deprecated("Use apply(ForkOptions, Seq[String])", "0.13.0")
     def apply(javaHome: Option[File],
@@ -270,13 +272,14 @@ object Fork {
               arguments: Seq[String],
               workingDirectory: Option[File],
               outputStrategy: OutputStrategy): Int =
-      fork(javaHome,
-           jvmOptions,
-           scalaJars,
-           arguments,
-           workingDirectory,
-           false,
-           outputStrategy).exitValue()
+      fork(
+        javaHome,
+        jvmOptions,
+        scalaJars,
+        arguments,
+        workingDirectory,
+        false,
+        outputStrategy).exitValue()
 
     @deprecated("Use fork(ForkOptions, Seq[String])", "0.13.0")
     def fork(javaHome: Option[File],
@@ -286,14 +289,15 @@ object Fork {
              workingDirectory: Option[File],
              connectInput: Boolean,
              outputStrategy: OutputStrategy): Process =
-      fork(javaHome,
-           jvmOptions,
-           scalaJars,
-           arguments,
-           workingDirectory,
-           Map.empty,
-           connectInput,
-           outputStrategy)
+      fork(
+        javaHome,
+        jvmOptions,
+        scalaJars,
+        arguments,
+        workingDirectory,
+        Map.empty,
+        connectInput,
+        outputStrategy)
 
     @deprecated("Use apply(ForkOptions, Seq[String])", "0.13.0")
     def fork(javaHome: Option[File],
@@ -311,12 +315,13 @@ object Fork {
       val mainClass = if (mainClassName.isEmpty) Nil else mainClassName :: Nil
       val options =
         jvmOptions ++ (scalaClasspathString :: mainClass ::: arguments.toList)
-      Fork.java.fork(javaHome,
-                     options,
-                     workingDirectory,
-                     env,
-                     connectInput,
-                     outputStrategy)
+      Fork.java.fork(
+        javaHome,
+        options,
+        workingDirectory,
+        env,
+        connectInput,
+        outputStrategy)
     }
   }
 }

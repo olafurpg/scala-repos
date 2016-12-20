@@ -35,12 +35,13 @@ import scalafx.scene.Scene
 
 object CategoryLineChartDemo extends JFXApp {
 
-  val dataPairs = Seq(("Alpha", 50),
-                      ("Beta", 80),
-                      ("RC1", 90),
-                      ("RC2", 30),
-                      ("1.0", 122),
-                      ("1.1", 10))
+  val dataPairs = Seq(
+    ("Alpha", 50),
+    ("Beta", 80),
+    ("RC1", 90),
+    ("RC2", 30),
+    ("1.0", 122),
+    ("1.1", 10))
 
   stage = new JFXApp.PrimaryStage {
     title = "CategoryLineChartDemo"

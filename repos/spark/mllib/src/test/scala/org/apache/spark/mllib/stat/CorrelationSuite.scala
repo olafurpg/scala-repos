@@ -103,10 +103,11 @@ class CorrelationSuite
     val defaultMat = Statistics.corr(X)
     val pearsonMat = Statistics.corr(X, "pearson")
     // scalastyle:off
-    val expected = BDM((1.00000000, 0.05564149, Double.NaN, 0.4004714),
-                       (0.05564149, 1.00000000, Double.NaN, 0.9135959),
-                       (Double.NaN, Double.NaN, 1.00000000, Double.NaN),
-                       (0.40047142, 0.91359586, Double.NaN, 1.0000000))
+    val expected = BDM(
+      (1.00000000, 0.05564149, Double.NaN, 0.4004714),
+      (0.05564149, 1.00000000, Double.NaN, 0.9135959),
+      (Double.NaN, Double.NaN, 1.00000000, Double.NaN),
+      (0.40047142, 0.91359586, Double.NaN, 1.0000000))
     // scalastyle:on
     assert(matrixApproxEqual(defaultMat.toBreeze, expected))
     assert(matrixApproxEqual(pearsonMat.toBreeze, expected))
@@ -116,10 +117,11 @@ class CorrelationSuite
     val X = sc.parallelize(data)
     val spearmanMat = Statistics.corr(X, "spearman")
     // scalastyle:off
-    val expected = BDM((1.0000000, 0.1054093, Double.NaN, 0.4000000),
-                       (0.1054093, 1.0000000, Double.NaN, 0.9486833),
-                       (Double.NaN, Double.NaN, 1.00000000, Double.NaN),
-                       (0.4000000, 0.9486833, Double.NaN, 1.0000000))
+    val expected = BDM(
+      (1.0000000, 0.1054093, Double.NaN, 0.4000000),
+      (0.1054093, 1.0000000, Double.NaN, 0.9486833),
+      (Double.NaN, Double.NaN, 1.00000000, Double.NaN),
+      (0.4000000, 0.9486833, Double.NaN, 1.0000000))
     // scalastyle:on
     assert(matrixApproxEqual(spearmanMat.toBreeze, expected))
   }

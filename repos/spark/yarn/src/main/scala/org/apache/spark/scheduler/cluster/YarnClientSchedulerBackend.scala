@@ -123,8 +123,9 @@ private[spark] class YarnClientSchedulerBackend(scheduler: TaskSchedulerImpl,
     * This assumes both `client` and `appId` have already been set.
     */
   private def waitForApplication(): Unit = {
-    assert(client != null && appId.isDefined,
-           "Application has not been submitted yet!")
+    assert(
+      client != null && appId.isDefined,
+      "Application has not been submitted yet!")
     val (state, _) =
       client.monitorApplication(appId.get, returnOnRunning = true) // blocking
     if (state == YarnApplicationState.FINISHED ||
@@ -174,8 +175,9 @@ private[spark] class YarnClientSchedulerBackend(scheduler: TaskSchedulerImpl,
     * This assumes both `client` and `appId` have already been set.
     */
   private def asyncMonitorApplication(): MonitorThread = {
-    assert(client != null && appId.isDefined,
-           "Application has not been submitted yet!")
+    assert(
+      client != null && appId.isDefined,
+      "Application has not been submitted yet!")
     val t = new MonitorThread
     t.setName("Yarn application state monitor")
     t.setDaemon(true)
@@ -186,8 +188,9 @@ private[spark] class YarnClientSchedulerBackend(scheduler: TaskSchedulerImpl,
     * Stop the scheduler. This assumes `start()` has already been called.
     */
   override def stop() {
-    assert(client != null,
-           "Attempted to stop this scheduler before starting it!")
+    assert(
+      client != null,
+      "Attempted to stop this scheduler before starting it!")
     if (monitorThread != null) {
       monitorThread.stopMonitor()
     }

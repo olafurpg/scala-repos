@@ -76,11 +76,12 @@ class KafkaTest {
     // We should be also able to set several properties
     val config4 = KafkaConfig.fromProps(
       Kafka.getPropsFromArgs(
-        Array(propertiesFile,
-              "--override",
-              "log.cleanup.policy=compact",
-              "--override",
-              "broker.id=2")))
+        Array(
+          propertiesFile,
+          "--override",
+          "log.cleanup.policy=compact",
+          "--override",
+          "broker.id=2")))
     assertEquals(2, config4.brokerId)
     assertEquals("compact", config4.logCleanupPolicy)
   }
@@ -121,13 +122,14 @@ class KafkaTest {
     val propertiesFile = prepareDefaultConfig()
     val config = KafkaConfig.fromProps(
       Kafka.getPropsFromArgs(
-        Array(propertiesFile,
-              "--override",
-              "ssl.keystore.password=keystore_password",
-              "--override",
-              "ssl.key.password=key_password",
-              "--override",
-              "ssl.truststore.password=truststore_password")))
+        Array(
+          propertiesFile,
+          "--override",
+          "ssl.keystore.password=keystore_password",
+          "--override",
+          "ssl.key.password=key_password",
+          "--override",
+          "ssl.truststore.password=truststore_password")))
     assertEquals(Password.HIDDEN, config.sslKeyPassword.toString)
     assertEquals(Password.HIDDEN, config.sslKeystorePassword.toString)
     assertEquals(Password.HIDDEN, config.sslTruststorePassword.toString)

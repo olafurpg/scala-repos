@@ -101,9 +101,10 @@ class ResponseParserSpec
           HttpResponse(
             ServerOnTheMove,
             List(
-              `Transfer-Encoding`(TransferEncodings.Extension("foo"),
-                                  TransferEncodings.chunked,
-                                  TransferEncodings.Extension("bar")))))
+              `Transfer-Encoding`(
+                TransferEncodings.Extension("foo"),
+                TransferEncodings.chunked,
+                TransferEncodings.Extension("bar")))))
         closeAfterResponseCompletion shouldEqual Seq(false)
       }
 
@@ -112,10 +113,11 @@ class ResponseParserSpec
           |Host: api.example.com
           |
           |Foobs""" should parseTo(
-          HttpResponse(NotFound,
-                       List(Host("api.example.com")),
-                       "Foobs".getBytes,
-                       `HTTP/1.0`))
+          HttpResponse(
+            NotFound,
+            List(Host("api.example.com")),
+            "Foobs".getBytes,
+            `HTTP/1.0`))
         closeAfterResponseCompletion shouldEqual Seq(true)
       }
 
@@ -133,19 +135,20 @@ class ResponseParserSpec
       }
 
       "a response with 3 headers, a body and remaining content" in new Test {
-        Seq("""HTTP/1.1 500 Internal Server Error
+        Seq(
+          """HTTP/1.1 500 Internal Server Error
           |User-Agent: curl/7.19.7 xyz
           |Connection:close
           |Content-Length: 17
           |Content-Type: text/plain; charset=UTF-8
           |
           |Sh""",
-            "ake your BOODY!HTTP/1.") should generalMultiParseTo(
+          "ake your BOODY!HTTP/1.") should generalMultiParseTo(
           Right(
-            HttpResponse(InternalServerError,
-                         List(`User-Agent`("curl/7.19.7 xyz"),
-                              Connection("close")),
-                         "Shake your BOODY!")))
+            HttpResponse(
+              InternalServerError,
+              List(`User-Agent`("curl/7.19.7 xyz"), Connection("close")),
+              "Shake your BOODY!")))
         closeAfterResponseCompletion shouldEqual Seq(true)
       }
 
@@ -182,29 +185,31 @@ class ResponseParserSpec
       }
 
       "message chunk with and without extension" in new Test {
-        Seq(start + """3
+        Seq(
+          start + """3
             |abc
             |10;some=stuff;bla
             |0123456789ABCDEF
             |""",
-            "10;foo=",
-            """bar
+          "10;foo=",
+          """bar
             |0123456789ABCDEF
             |10
             |0123456789""",
-            """ABCDEF
+          """ABCDEF
             |0
             |
             |""") should generalMultiParseTo(
           Right(
             baseResponse.withEntity(
-              Chunked(`application/pdf`,
-                      source(Chunk(ByteString("abc")),
-                             Chunk(ByteString("0123456789ABCDEF"),
-                                   "some=stuff;bla"),
-                             Chunk(ByteString("0123456789ABCDEF"), "foo=bar"),
-                             Chunk(ByteString("0123456789ABCDEF")),
-                             LastChunk)))))
+              Chunked(
+                `application/pdf`,
+                source(
+                  Chunk(ByteString("abc")),
+                  Chunk(ByteString("0123456789ABCDEF"), "some=stuff;bla"),
+                  Chunk(ByteString("0123456789ABCDEF"), "foo=bar"),
+                  Chunk(ByteString("0123456789ABCDEF")),
+                  LastChunk)))))
         closeAfterResponseCompletion shouldEqual Seq(false)
       }
 
@@ -224,23 +229,24 @@ class ResponseParserSpec
             |Bar: xyz
             |
             |HT""") should generalMultiParseTo(
-          Right(
-            baseResponse.withEntity(
-              Chunked(`application/pdf`,
-                      source(LastChunk("nice=true",
-                                       List(RawHeader("Foo", "pip apo"),
-                                            RawHeader("Bar", "xyz"))))))),
+          Right(baseResponse.withEntity(Chunked(
+            `application/pdf`,
+            source(LastChunk(
+              "nice=true",
+              List(RawHeader("Foo", "pip apo"), RawHeader("Bar", "xyz"))))))),
           Left(
-            MessageStartError(400: StatusCode,
-                              ErrorInfo("Illegal HTTP message start"))))
+            MessageStartError(
+              400: StatusCode,
+              ErrorInfo("Illegal HTTP message start"))))
         closeAfterResponseCompletion shouldEqual Seq(false)
       }
 
       "response with additional transfer encodings" in new Test {
-        Seq("""HTTP/1.1 200 OK
+        Seq(
+          """HTTP/1.1 200 OK
           |Transfer-Encoding: fancy, chunked
           |Cont""",
-            """ent-Type: application/pdf
+          """ent-Type: application/pdf
           |
           |""") should generalMultiParseTo(
           Right(
@@ -264,8 +270,10 @@ class ResponseParserSpec
 
       "an illegal status code" in new Test {
         Seq("HTTP/1", ".1 2000 Something") should generalMultiParseTo(
-          Left(MessageStartError(400: StatusCode,
-                                 ErrorInfo("Illegal response status code"))))
+          Left(
+            MessageStartError(
+              400: StatusCode,
+              ErrorInfo("Illegal response status code"))))
       }
 
       "a too-long response status reason" in new Test {
@@ -279,8 +287,9 @@ class ResponseParserSpec
       "with a missing reason phrase and no trailing space" in new Test {
         Seq("HTTP/1.1 200\r\nContent-Length: 0\r\n\r\n") should generalMultiParseTo(
           Left(
-            MessageStartError(400: StatusCode,
-                              ErrorInfo("Status code misses trailing space"))))
+            MessageStartError(
+              400: StatusCode,
+              ErrorInfo("Status code misses trailing space"))))
       }
     }
   }
@@ -361,21 +370,25 @@ class ResponseParserSpec
             x.isInstanceOf[EntityStreamError])
         .prefixAndTail(1)
         .collect {
-          case (Seq(
-                  ResponseStart(statusCode,
-                                protocol,
-                                headers,
-                                createEntity,
-                                close)),
-                entityParts) ⇒
+          case (
+              Seq(
+                ResponseStart(
+                  statusCode,
+                  protocol,
+                  headers,
+                  createEntity,
+                  close)),
+              entityParts) ⇒
             closeAfterResponseCompletion :+= close
             Right(
-              HttpResponse(statusCode,
-                           headers,
-                           createEntity(entityParts),
-                           protocol))
-          case (Seq(x @ (MessageStartError(_, _) | EntityStreamError(_))),
-                tail) ⇒
+              HttpResponse(
+                statusCode,
+                headers,
+                createEntity(entityParts),
+                protocol))
+          case (
+              Seq(x @ (MessageStartError(_, _) | EntityStreamError(_))),
+              tail) ⇒
             tail.runWith(Sink.ignore)
             Left(x)
         }
@@ -387,8 +400,9 @@ class ResponseParserSpec
     protected def parserSettings: ParserSettings = ParserSettings(system)
 
     def newParserStage(requestMethod: HttpMethod = GET) = {
-      val parser = new HttpResponseParser(parserSettings,
-                                          HttpHeaderParser(parserSettings)())
+      val parser = new HttpResponseParser(
+        parserSettings,
+        HttpHeaderParser(parserSettings)())
       parser.setContextForNextResponse(
         HttpResponseParser.ResponseContext(requestMethod, None))
       parser.stage

@@ -284,9 +284,10 @@ trait OptimizationSpaceTest[M, V, S] extends TensorSpaceTestBase[V, Int, S] {
 }
 
 class DenseOptimizationSpaceTest_Double
-    extends OptimizationSpaceTest[DenseMatrix[Double],
-                                  DenseVector[Double],
-                                  Double] {
+    extends OptimizationSpaceTest[
+      DenseMatrix[Double],
+      DenseVector[Double],
+      Double] {
   override implicit val space: MutableOptimizationSpace[DenseMatrix[Double],
                                                         DenseVector[Double],
                                                         Double] =
@@ -328,9 +329,10 @@ class DenseOptimizationSpaceTest_Double
 }
 
 class SparseOptimizationSpaceTest_Double
-    extends OptimizationSpaceTest[CSCMatrix[Double],
-                                  SparseVector[Double],
-                                  Double] {
+    extends OptimizationSpaceTest[
+      CSCMatrix[Double],
+      SparseVector[Double],
+      Double] {
   override implicit val space: MutableOptimizationSpace[CSCMatrix[Double],
                                                         SparseVector[Double],
                                                         Double] =

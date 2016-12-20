@@ -220,8 +220,9 @@ trait Inbox { this: ActorDSL.type ⇒
         predicate: PartialFunction[Any, T]): T = {
       implicit val t = Timeout(timeout + extraTime)
       predicate(
-        Await.result(receiver ? Select(Deadline.now + timeout, predicate),
-                     Duration.Inf))
+        Await.result(
+          receiver ? Select(Deadline.now + timeout, predicate),
+          Duration.Inf))
     }
 
     /**

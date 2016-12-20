@@ -56,9 +56,10 @@ import org.apache.spark.sql.types._
   */
 private[sql] object FileSourceStrategy extends Strategy with Logging {
   def apply(plan: LogicalPlan): Seq[SparkPlan] = plan match {
-    case PhysicalOperation(projects,
-                           filters,
-                           l @ LogicalRelation(files: HadoopFsRelation, _, _))
+    case PhysicalOperation(
+        projects,
+        filters,
+        l @ LogicalRelation(files: HadoopFsRelation, _, _))
         if files.fileFormat.toString == "TestFileFormat" =>
       // Filters on this relation fall into four categories based on where we can use them to avoid
       // reading unneeded data:
@@ -69,8 +70,9 @@ private[sql] object FileSourceStrategy extends Strategy with Logging {
       val filterSet = ExpressionSet(filters)
 
       val partitionColumns = AttributeSet(
-        l.resolve(files.partitionSchema,
-                  files.sqlContext.sessionState.analyzer.resolver))
+        l.resolve(
+          files.partitionSchema,
+          files.sqlContext.sessionState.analyzer.resolver))
       val partitionKeyFilters = ExpressionSet(
         filters.filter(_.references.subsetOf(partitionColumns)))
       logInfo(
@@ -123,10 +125,11 @@ private[sql] object FileSourceStrategy extends Strategy with Logging {
             .flatMap { p =>
               p.files.map(
                 f =>
-                  PartitionedFile(p.values,
-                                  f.getPath.toUri.toString,
-                                  0,
-                                  f.getLen))
+                  PartitionedFile(
+                    p.values,
+                    f.getPath.toUri.toString,
+                    0,
+                    f.getLen))
             }
             .groupBy { f =>
               BucketingUtils
@@ -151,10 +154,11 @@ private[sql] object FileSourceStrategy extends Strategy with Logging {
                   val remaining = file.getLen - offset
                   val size =
                     if (remaining > maxSplitBytes) maxSplitBytes else remaining
-                  PartitionedFile(partition.values,
-                                  file.getPath.toUri.toString,
-                                  offset,
-                                  size)
+                  PartitionedFile(
+                    partition.values,
+                    file.getPath.toUri.toString,
+                    offset,
+                    size)
                 }
               }
             }

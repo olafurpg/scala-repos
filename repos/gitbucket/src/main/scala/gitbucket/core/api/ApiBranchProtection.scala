@@ -21,8 +21,9 @@ object ApiBranchProtection {
     ApiBranchProtection(
       enabled = info.enabled,
       required_status_checks = Some(
-        Status(EnforcementLevel(info.enabled, info.includeAdministrators),
-               info.contexts)))
+        Status(
+          EnforcementLevel(info.enabled, info.includeAdministrators),
+          info.contexts)))
   val statusNone = Status(Off, Seq.empty)
   case class Status(enforcement_level: EnforcementLevel, contexts: Seq[String])
   sealed class EnforcementLevel(val name: String)

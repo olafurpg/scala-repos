@@ -39,8 +39,9 @@ class DerefSlice(source: Slice, derefBy: PartialFunction[Int, CPathNode])
   private val indexableArrays: Map[ColumnRef, HomogeneousArrayColumn[_]] =
     source.columns
       .collect {
-        case (ColumnRef(CPath(CPathArray, xs @ _ *), ctype),
-              col: HomogeneousArrayColumn[_]) =>
+        case (
+            ColumnRef(CPath(CPathArray, xs @ _ *), ctype),
+            col: HomogeneousArrayColumn[_]) =>
           (ColumnRef(CPath(xs: _*), ctype), col)
       }
       .toMap

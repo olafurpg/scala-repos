@@ -48,8 +48,9 @@ object PixelFormat {
       * index: blue, green, red, alpha.
       */
     val ByteBGRA = new Type(jfxsi.PixelFormat.Type.BYTE_BGRA)
-    @deprecated("Use ByteBGRA; BYTE_BGRA will be removed in a future release",
-                "8.0.60-R10")
+    @deprecated(
+      "Use ByteBGRA; BYTE_BGRA will be removed in a future release",
+      "8.0.60-R10")
     val BYTE_BGRA = ByteBGRA
 
     /**
@@ -77,8 +78,9 @@ object PixelFormat {
       * red, green, blue.
       */
     val ByteRGB = new Type(jfxsi.PixelFormat.Type.BYTE_RGB)
-    @deprecated("Use ByteRGB; BYTE_RGB will be removed in a future release",
-                "8.0.60-R10")
+    @deprecated(
+      "Use ByteRGB; BYTE_RGB will be removed in a future release",
+      "8.0.60-R10")
     val BYTE_RGB = ByteRGB
 
     /**
@@ -86,8 +88,9 @@ object PixelFormat {
       * alpha, red, green, blue.
       */
     val IntARGB = new Type(jfxsi.PixelFormat.Type.INT_ARGB)
-    @deprecated("Use IntARGB; INT_ARGB will be removed in a future release",
-                "8.0.60-R10")
+    @deprecated(
+      "Use IntARGB; INT_ARGB will be removed in a future release",
+      "8.0.60-R10")
     val INT_ARGB = IntARGB
 
     /**

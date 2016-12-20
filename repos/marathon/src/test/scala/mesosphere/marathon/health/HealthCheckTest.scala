@@ -266,8 +266,9 @@ class HealthCheckTest extends MarathonSpec {
 
   def shouldBeValid(hc: HealthCheck): Unit = {
     val result = validate(hc)
-    assert(result.isSuccess,
-           s"violations: ${ValidationHelper.getAllRuleConstrains(result)}")
+    assert(
+      result.isSuccess,
+      s"violations: ${ValidationHelper.getAllRuleConstrains(result)}")
   }
 
   test("A default HealthCheck should be valid") {

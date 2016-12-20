@@ -94,31 +94,38 @@ object DecimalPrecision extends Rule[LogicalPlan] {
     // Skip nodes who is already promoted
     case e: BinaryArithmetic if e.left.isInstanceOf[PromotePrecision] => e
 
-    case Add(e1 @ DecimalType.Expression(p1, s1),
-             e2 @ DecimalType.Expression(p2, s2)) =>
+    case Add(
+        e1 @ DecimalType.Expression(p1, s1),
+        e2 @ DecimalType.Expression(p2, s2)) =>
       val dt = DecimalType
         .bounded(max(s1, s2) + max(p1 - s1, p2 - s2) + 1, max(s1, s2))
-      CheckOverflow(Add(promotePrecision(e1, dt), promotePrecision(e2, dt)),
-                    dt)
+      CheckOverflow(
+        Add(promotePrecision(e1, dt), promotePrecision(e2, dt)),
+        dt)
 
-    case Subtract(e1 @ DecimalType.Expression(p1, s1),
-                  e2 @ DecimalType.Expression(p2, s2)) =>
+    case Subtract(
+        e1 @ DecimalType.Expression(p1, s1),
+        e2 @ DecimalType.Expression(p2, s2)) =>
       val dt = DecimalType
         .bounded(max(s1, s2) + max(p1 - s1, p2 - s2) + 1, max(s1, s2))
       CheckOverflow(
         Subtract(promotePrecision(e1, dt), promotePrecision(e2, dt)),
         dt)
 
-    case Multiply(e1 @ DecimalType.Expression(p1, s1),
-                  e2 @ DecimalType.Expression(p2, s2)) =>
+    case Multiply(
+        e1 @ DecimalType.Expression(p1, s1),
+        e2 @ DecimalType.Expression(p2, s2)) =>
       val resultType = DecimalType.bounded(p1 + p2 + 1, s1 + s2)
       val widerType = widerDecimalType(p1, s1, p2, s2)
-      CheckOverflow(Multiply(promotePrecision(e1, widerType),
-                             promotePrecision(e2, widerType)),
-                    resultType)
+      CheckOverflow(
+        Multiply(
+          promotePrecision(e1, widerType),
+          promotePrecision(e2, widerType)),
+        resultType)
 
-    case Divide(e1 @ DecimalType.Expression(p1, s1),
-                e2 @ DecimalType.Expression(p2, s2)) =>
+    case Divide(
+        e1 @ DecimalType.Expression(p1, s1),
+        e2 @ DecimalType.Expression(p2, s2)) =>
       var intDig = min(DecimalType.MAX_SCALE, p1 - s1 + s2)
       var decDig = min(DecimalType.MAX_SCALE, max(6, s1 + p2 + 1))
       val diff = (intDig + decDig) - DecimalType.MAX_SCALE
@@ -128,22 +135,28 @@ object DecimalPrecision extends Rule[LogicalPlan] {
       }
       val resultType = DecimalType.bounded(intDig + decDig, decDig)
       val widerType = widerDecimalType(p1, s1, p2, s2)
-      CheckOverflow(Divide(promotePrecision(e1, widerType),
-                           promotePrecision(e2, widerType)),
-                    resultType)
+      CheckOverflow(
+        Divide(
+          promotePrecision(e1, widerType),
+          promotePrecision(e2, widerType)),
+        resultType)
 
-    case Remainder(e1 @ DecimalType.Expression(p1, s1),
-                   e2 @ DecimalType.Expression(p2, s2)) =>
+    case Remainder(
+        e1 @ DecimalType.Expression(p1, s1),
+        e2 @ DecimalType.Expression(p2, s2)) =>
       val resultType =
         DecimalType.bounded(min(p1 - s1, p2 - s2) + max(s1, s2), max(s1, s2))
       // resultType may have lower precision, so we cast them into wider type first.
       val widerType = widerDecimalType(p1, s1, p2, s2)
-      CheckOverflow(Remainder(promotePrecision(e1, widerType),
-                              promotePrecision(e2, widerType)),
-                    resultType)
+      CheckOverflow(
+        Remainder(
+          promotePrecision(e1, widerType),
+          promotePrecision(e2, widerType)),
+        resultType)
 
-    case Pmod(e1 @ DecimalType.Expression(p1, s1),
-              e2 @ DecimalType.Expression(p2, s2)) =>
+    case Pmod(
+        e1 @ DecimalType.Expression(p1, s1),
+        e2 @ DecimalType.Expression(p2, s2)) =>
       val resultType =
         DecimalType.bounded(min(p1 - s1, p2 - s2) + max(s1, s2), max(s1, s2))
       // resultType may have lower precision, so we cast them into wider type first.
@@ -152,9 +165,9 @@ object DecimalPrecision extends Rule[LogicalPlan] {
         Pmod(promotePrecision(e1, widerType), promotePrecision(e2, widerType)),
         resultType)
 
-    case b @ BinaryComparison(e1 @ DecimalType.Expression(p1, s1),
-                              e2 @ DecimalType.Expression(p2, s2))
-        if p1 != p2 || s1 != s2 =>
+    case b @ BinaryComparison(
+          e1 @ DecimalType.Expression(p1, s1),
+          e2 @ DecimalType.Expression(p2, s2)) if p1 != p2 || s1 != s2 =>
       val resultType = widerDecimalType(p1, s1, p2, s2)
       b.makeCopy(Array(Cast(e1, resultType), Cast(e2, resultType)))
 

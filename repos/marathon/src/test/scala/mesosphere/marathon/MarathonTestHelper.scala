@@ -100,8 +100,9 @@ object MarathonTestHelper {
       role: String = "*",
       reservation: Option[ResourceLabels] = None): Offer.Builder = {
 
-    require(role != "*" || reservation.isEmpty,
-            "reserved resources cannot have role *")
+    require(
+      role != "*" || reservation.isEmpty,
+      "reserved resources cannot have role *")
 
     def heedReserved(resource: Mesos.Resource): Mesos.Resource = {
       reservation match {
@@ -344,8 +345,9 @@ object MarathonTestHelper {
     val appJson = JsonLoader.fromString(appStr)
     val validationResult: ProcessingReport = appSchema.validate(appJson)
     lazy val pretty = Json.prettyPrint(Json.parse(appStr))
-    assert(validationResult.isSuccess == valid,
-           s"validation errors $validationResult for json:\n$pretty")
+    assert(
+      validationResult.isSuccess == valid,
+      s"validation errors $validationResult for json:\n$pretty")
   }
 
   def createTaskTrackerModule(leadershipModule: LeadershipModule,
@@ -369,11 +371,12 @@ object MarathonTestHelper {
       metrics
     )
 
-    new TaskTrackerModule(clock,
-                          metrics,
-                          defaultConfig(),
-                          leadershipModule,
-                          taskRepo) {
+    new TaskTrackerModule(
+      clock,
+      metrics,
+      defaultConfig(),
+      leadershipModule,
+      taskRepo) {
       // some tests create only one actor system but create multiple task trackers
       override protected lazy val taskTrackerActorName: String =
         s"taskTracker_${Random.alphanumeric.take(10).mkString}"
@@ -406,9 +409,10 @@ object MarathonTestHelper {
                     now: Timestamp = clock.now()): Task.LaunchedEphemeral = {
     Task.LaunchedEphemeral(
       Task.Id(taskId),
-      Task.AgentInfo(host = "host.some",
-                     agentId = None,
-                     attributes = Iterable.empty),
+      Task.AgentInfo(
+        host = "host.some",
+        agentId = None,
+        attributes = Iterable.empty),
       appVersion = now,
       status = Task.Status(
         stagedAt = now,
@@ -421,11 +425,13 @@ object MarathonTestHelper {
 
   def minimalReservedTask(appId: PathId,
                           reservation: Task.Reservation): Task.Reserved =
-    Task.Reserved(taskId = Task.Id.forApp(appId),
-                  Task.AgentInfo(host = "host.some",
-                                 agentId = None,
-                                 attributes = Iterable.empty),
-                  reservation = reservation)
+    Task.Reserved(
+      taskId = Task.Id.forApp(appId),
+      Task.AgentInfo(
+        host = "host.some",
+        agentId = None,
+        attributes = Iterable.empty),
+      reservation = reservation)
 
   def newReservation: Task.Reservation =
     Task.Reservation(Seq.empty, taskReservationStateNew)
@@ -473,9 +479,10 @@ object MarathonTestHelper {
   def stagedTaskForApp(appId: PathId = PathId("/test"),
                        appVersion: Timestamp = Timestamp(1),
                        stagedAt: Long = 2): Task =
-    stagedTask(Task.Id.forApp(appId).idString,
-               appVersion = appVersion,
-               stagedAt = stagedAt)
+    stagedTask(
+      Task.Id.forApp(appId).idString,
+      appVersion = appVersion,
+      stagedAt = stagedAt)
   def stagedTask(
       taskId: String,
       appVersion: Timestamp = Timestamp(1),
@@ -635,8 +642,9 @@ object MarathonTestHelper {
       .copy(
         container = Some(mesosContainerWithPersistentVolume),
         residency = Some(
-          Residency(Residency.defaultRelaunchEscalationTimeoutSeconds,
-                    Residency.defaultTaskLostBehaviour))
+          Residency(
+            Residency.defaultRelaunchEscalationTimeoutSeconds,
+            Residency.defaultTaskLostBehaviour))
       )
   }
 
@@ -651,9 +659,10 @@ object MarathonTestHelper {
     val now = Timestamp.now()
     Task.LaunchedOnReservation(
       taskId = Task.Id.forApp(appId),
-      agentInfo = Task.AgentInfo(host = "host.some",
-                                 agentId = None,
-                                 attributes = Iterable.empty),
+      agentInfo = Task.AgentInfo(
+        host = "host.some",
+        agentId = None,
+        attributes = Iterable.empty),
       appVersion = now,
       status = Task.Status(
         stagedAt = now,

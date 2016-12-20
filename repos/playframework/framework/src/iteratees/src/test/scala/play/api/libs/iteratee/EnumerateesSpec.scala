@@ -169,9 +169,10 @@ object EnumerateesSpec
           triggered = true
           Future(Some(1))(dec)
         }(generateEC)
-        Await.result(enumerator &> Enumeratee.take(0) |>>> Iteratee.fold(0)(
-                       (_: Int) + (_: Int))(foldEC),
-                     Duration.Inf) must equalTo(0)
+        Await.result(
+          enumerator &> Enumeratee.take(0) |>>> Iteratee.fold(0)(
+            (_: Int) + (_: Int))(foldEC),
+          Duration.Inf) must equalTo(0)
         triggered must beFalse
       }
     }

@@ -65,9 +65,10 @@ final class ProjectNavigation(s: State) {
   import complete.Parsers._
 
   val parser: Parser[Option[ResolvedReference]] = {
-    val reference = Act.resolvedReference(structure.index.keyIndex,
-                                          currentRef.build,
-                                          success(()))
+    val reference = Act.resolvedReference(
+      structure.index.keyIndex,
+      currentRef.build,
+      success(()))
     val root = token('/' ^^^ rootRef)
     success(None) | some(token(Space) ~> (root | reference))
   }

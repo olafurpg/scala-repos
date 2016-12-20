@@ -14,10 +14,11 @@ import org.apache.spark.rdd.RDD
 case class DataSourceParams(appId: Int) extends Params
 
 class DataSource(val dsp: DataSourceParams)
-    extends PDataSource[TrainingData,
-                        EmptyEvaluationInfo,
-                        Query,
-                        EmptyActualResult] {
+    extends PDataSource[
+      TrainingData,
+      EmptyEvaluationInfo,
+      Query,
+      EmptyActualResult] {
 
   @transient lazy val logger = Logger[this.type]
 
@@ -48,19 +49,21 @@ class DataSource(val dsp: DataSourceParams)
 
     // get all "user" "follow" "followedUser" events
     val followEventsRDD: RDD[FollowEvent] = eventsDb
-      .find(appId = dsp.appId,
-            entityType = Some("user"),
-            eventNames = Some(List("follow")),
-            // targetEntityType is optional field of an event.
-            targetEntityType = Some(Some("user")))(sc)
+      .find(
+        appId = dsp.appId,
+        entityType = Some("user"),
+        eventNames = Some(List("follow")),
+        // targetEntityType is optional field of an event.
+        targetEntityType = Some(Some("user")))(sc)
       // eventsDb.find() returns RDD[Event]
       .map { event =>
         val followEvent = try {
           event.event match {
             case "follow" =>
-              FollowEvent(user = event.entityId,
-                          followedUser = event.targetEntityId.get,
-                          t = event.eventTime.getMillis)
+              FollowEvent(
+                user = event.entityId,
+                followedUser = event.targetEntityId.get,
+                t = event.eventTime.getMillis)
             case _ => throw new Exception(s"Unexpected event $event is read.")
           }
         } catch {

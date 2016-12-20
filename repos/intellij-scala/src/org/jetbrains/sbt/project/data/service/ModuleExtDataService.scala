@@ -31,10 +31,11 @@ class ModuleExtDataService
       projectData: ProjectData,
       project: Project,
       modelsProvider: IdeModifiableModelsProvider): Importer[ModuleExtData] =
-    new ModuleExtDataService.Importer(toImport,
-                                      projectData,
-                                      project,
-                                      modelsProvider)
+    new ModuleExtDataService.Importer(
+      toImport,
+      projectData,
+      project,
+      modelsProvider)
 }
 
 object ModuleExtDataService {
@@ -42,10 +43,11 @@ object ModuleExtDataService {
                          projectData: ProjectData,
                          project: Project,
                          modelsProvider: IdeModifiableModelsProvider)
-      extends AbstractImporter[ModuleExtData](dataToImport,
-                                              projectData,
-                                              project,
-                                              modelsProvider) {
+      extends AbstractImporter[ModuleExtData](
+        dataToImport,
+        projectData,
+        project,
+        modelsProvider) {
 
     override def importData(): Unit =
       dataToImport.foreach(doImport)
@@ -82,9 +84,10 @@ object ModuleExtDataService {
               compilerClasspath)
           case None =>
             showWarning(
-              SbtBundle("sbt.dataService.scalaLibraryIsNotFound",
-                        compilerVersion.number,
-                        module.getName))
+              SbtBundle(
+                "sbt.dataService.scalaLibraryIsNotFound",
+                compilerVersion.number,
+                module.getName))
           case _ => // do nothing
         }
       }

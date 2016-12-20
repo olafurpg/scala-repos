@@ -52,11 +52,13 @@ class ZkSessionEndToEndTest extends FunSuite with BeforeAndAfter {
       }
       val notConnected: (WatchState => Boolean) = w => !connected(w)
       val session1 =
-        ZkSession.retrying(retryStream,
-                           () =>
-                             ZkSession(retryStream,
-                                       inst.zookeeperConnectString,
-                                       statsReceiver = NullStatsReceiver))
+        ZkSession.retrying(
+          retryStream,
+          () =>
+            ZkSession(
+              retryStream,
+              inst.zookeeperConnectString,
+              statsReceiver = NullStatsReceiver))
 
       @volatile var states = Seq.empty[SessionState]
       val state =
@@ -92,10 +94,11 @@ class ZkSessionEndToEndTest extends FunSuite with BeforeAndAfter {
       Await.result(state.changes.filter(connected).toFuture())
 
       assert(
-        states == Seq(SessionState.SyncConnected,
-                      SessionState.Expired,
-                      SessionState.Disconnected,
-                      SessionState.SyncConnected))
+        states == Seq(
+          SessionState.SyncConnected,
+          SessionState.Expired,
+          SessionState.Disconnected,
+          SessionState.SyncConnected))
     }
 
   // COORD-339
@@ -104,11 +107,13 @@ class ZkSessionEndToEndTest extends FunSuite with BeforeAndAfter {
       implicit val timer = new MockTimer
       val watch = Stopwatch.start()
       val varZkSession =
-        ZkSession.retrying(retryStream,
-                           () =>
-                             ZkSession(retryStream,
-                                       inst.zookeeperConnectString,
-                                       statsReceiver = NullStatsReceiver))
+        ZkSession.retrying(
+          retryStream,
+          () =>
+            ZkSession(
+              retryStream,
+              inst.zookeeperConnectString,
+              statsReceiver = NullStatsReceiver))
       val varZkState = varZkSession flatMap { _.state }
 
       @volatile var zkStates = Seq[(SessionState, Duration)]()

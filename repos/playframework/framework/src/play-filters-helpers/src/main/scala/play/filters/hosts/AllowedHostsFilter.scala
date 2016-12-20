@@ -33,9 +33,10 @@ case class AllowedHostsFilter @Inject()(config: AllowedHostsConfig,
       next(req)
     } else {
       Accumulator.done(
-        errorHandler.onClientError(req,
-                                   Status.BAD_REQUEST,
-                                   s"Host not allowed: ${req.host}"))
+        errorHandler.onClientError(
+          req,
+          Status.BAD_REQUEST,
+          s"Host not allowed: ${req.host}"))
     }
   }
 }

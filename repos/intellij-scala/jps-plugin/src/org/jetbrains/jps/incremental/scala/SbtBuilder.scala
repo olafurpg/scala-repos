@@ -73,11 +73,12 @@ class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
 
     val modules = chunk.getModules.asScala.toSet
 
-    val client = new IdeClientSbt("scala",
-                                  context,
-                                  modules.map(_.getName).toSeq,
-                                  outputConsumer,
-                                  filesToCompile.get)
+    val client = new IdeClientSbt(
+      "scala",
+      context,
+      modules.map(_.getName).toSeq,
+      outputConsumer,
+      filesToCompile.get)
 
     logCustomSbtIncOptions(context, chunk, client)
 
@@ -171,13 +172,15 @@ class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
     if (!hasDirtyDependencies && !dirtyFilesHolder.hasDirtyFiles &&
         !dirtyFilesHolder.hasRemovedFiles) {
       if (targetTimestamp.isEmpty)
-        timestamps.set(representativeTarget,
-                       context.getCompilationStartStamp(representativeTarget))
+        timestamps.set(
+          representativeTarget,
+          context.getCompilationStartStamp(representativeTarget))
       return false
     }
 
-    timestamps.set(representativeTarget,
-                   context.getCompilationStartStamp(representativeTarget))
+    timestamps.set(
+      representativeTarget,
+      context.getCompilationStartStamp(representativeTarget))
     true
   }
 
@@ -229,8 +232,9 @@ class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
         new TargetOutputIndexImpl(targets, context)
       }
       target
-        .computeDependencies(context.getProjectDescriptor.getBuildTargetIndex,
-                             targetOutputIndex)
+        .computeDependencies(
+          context.getProjectDescriptor.getBuildTargetIndex,
+          targetOutputIndex)
         .asScala
     }
 

@@ -288,8 +288,9 @@ object Word2VecModel extends MLReadable[Word2VecModel] {
 
     override protected def saveImpl(path: String): Unit = {
       DefaultParamsWriter.saveMetadata(instance, path, sc)
-      val data = Data(instance.wordVectors.wordIndex,
-                      instance.wordVectors.wordVectors.toSeq)
+      val data = Data(
+        instance.wordVectors.wordIndex,
+        instance.wordVectors.wordVectors.toSeq)
       val dataPath = new Path(path, "data").toString
       sqlContext
         .createDataFrame(Seq(data))

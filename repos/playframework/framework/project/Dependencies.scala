@@ -44,12 +44,13 @@ object Dependencies {
   val acolyte = "org.eu.acolyte" % "jdbc-driver" % acolyteVersion
 
   val jdbcDeps =
-    Seq("com.jolbox" % "bonecp" % "0.8.0.RELEASE",
-        "com.zaxxer" % "HikariCP" % "2.4.3",
-        "com.googlecode.usc" % "jdbcdslog" % "1.0.6.2",
-        h2database,
-        acolyte % Test,
-        "tyrex" % "tyrex" % "1.0.1") ++ specsBuild.map(_ % Test) ++ logback
+    Seq(
+      "com.jolbox" % "bonecp" % "0.8.0.RELEASE",
+      "com.zaxxer" % "HikariCP" % "2.4.3",
+      "com.googlecode.usc" % "jdbcdslog" % "1.0.6.2",
+      h2database,
+      acolyte % Test,
+      "tyrex" % "tyrex" % "1.0.1") ++ specsBuild.map(_ % Test) ++ logback
       .map(_ % Test)
 
   val javaJdbcDeps = Seq(acolyte % Test)
@@ -205,9 +206,10 @@ object Dependencies {
 
   def sbtForkRunPluginDependencies(sbtVersion: String, scalaVersion: String) =
     Seq(
-      sbtPluginDep(sbtVersion,
-                   scalaVersion,
-                   "org.scala-sbt" % "sbt-core-next" % sbtCoreNextVersion)
+      sbtPluginDep(
+        sbtVersion,
+        scalaVersion,
+        "org.scala-sbt" % "sbt-core-next" % sbtCoreNextVersion)
     )
 
   val typesafeConfig = "com.typesafe" % "config" % "1.3.0"
@@ -252,9 +254,10 @@ object Dependencies {
     ) ++ specsBuild.map(_ % "test") ++ logback.map(_ % Test) ++ javaTestDeps
 
   def jsonDependencies(scalaVersion: String) =
-    Seq(jodatime,
-        jodaConvert,
-        "org.scala-lang" % "scala-reflect" % scalaVersion) ++ jacksons ++ specsBuild
+    Seq(
+      jodatime,
+      jodaConvert,
+      "org.scala-lang" % "scala-reflect" % scalaVersion) ++ jacksons ++ specsBuild
       .map(_ % Test) ++ logback.map(_ % Test)
 
   val scalacheckDependencies = Seq(

@@ -87,8 +87,9 @@ trait MemberLookupBase {
                 sym.hasPackageFlag) findExternalLink(sym, linkName(sym))
             else if (owner.isClass || owner.isModule || owner.isTrait ||
                      owner.hasPackageFlag)
-              findExternalLink(sym,
-                               linkName(owner) + "@" + externalSignature(sym))
+              findExternalLink(
+                sym,
+                linkName(owner) + "@" + externalSignature(sym))
             else None
         }
       case links => links

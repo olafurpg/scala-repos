@@ -78,8 +78,9 @@ class IterativelyReweightedLeastSquaresSuite
        [1] -0.30216651 -0.04452045
        [1]  3.5651651 -1.2334085 -0.7348971
      */
-    val expected = Seq(Vectors.dense(0.0, -0.30216651, -0.04452045),
-                       Vectors.dense(3.5651651, -1.2334085, -0.7348971))
+    val expected = Seq(
+      Vectors.dense(0.0, -0.30216651, -0.04452045),
+      Vectors.dense(3.5651651, -1.2334085, -0.7348971))
 
     import IterativelyReweightedLeastSquaresSuite._
 
@@ -91,17 +92,19 @@ class IterativelyReweightedLeastSquaresSuite
         Instance(eta, instance.weight, instance.features)
       }
       val initial =
-        new WeightedLeastSquares(fitIntercept,
-                                 regParam = 0.0,
-                                 standardizeFeatures = false,
-                                 standardizeLabel = false).fit(newInstances)
+        new WeightedLeastSquares(
+          fitIntercept,
+          regParam = 0.0,
+          standardizeFeatures = false,
+          standardizeLabel = false).fit(newInstances)
       val irls =
-        new IterativelyReweightedLeastSquares(initial,
-                                              BinomialReweightFunc,
-                                              fitIntercept,
-                                              regParam = 0.0,
-                                              maxIter = 25,
-                                              tol = 1e-8).fit(instances1)
+        new IterativelyReweightedLeastSquares(
+          initial,
+          BinomialReweightFunc,
+          fitIntercept,
+          regParam = 0.0,
+          maxIter = 25,
+          tol = 1e-8).fit(instances1)
       val actual = Vectors
         .dense(irls.intercept, irls.coefficients(0), irls.coefficients(1))
       assert(actual ~== expected(idx) absTol 1e-4)
@@ -122,8 +125,9 @@ class IterativelyReweightedLeastSquaresSuite
        [1] -0.09607792  0.18375613
        [1]  6.299947  3.324107 -1.081766
      */
-    val expected = Seq(Vectors.dense(0.0, -0.09607792, 0.18375613),
-                       Vectors.dense(6.299947, 3.324107, -1.081766))
+    val expected = Seq(
+      Vectors.dense(0.0, -0.09607792, 0.18375613),
+      Vectors.dense(6.299947, 3.324107, -1.081766))
 
     import IterativelyReweightedLeastSquaresSuite._
 
@@ -136,17 +140,19 @@ class IterativelyReweightedLeastSquaresSuite
         Instance(eta, instance.weight, instance.features)
       }
       val initial =
-        new WeightedLeastSquares(fitIntercept,
-                                 regParam = 0.0,
-                                 standardizeFeatures = false,
-                                 standardizeLabel = false).fit(newInstances)
+        new WeightedLeastSquares(
+          fitIntercept,
+          regParam = 0.0,
+          standardizeFeatures = false,
+          standardizeLabel = false).fit(newInstances)
       val irls =
-        new IterativelyReweightedLeastSquares(initial,
-                                              PoissonReweightFunc,
-                                              fitIntercept,
-                                              regParam = 0.0,
-                                              maxIter = 25,
-                                              tol = 1e-8).fit(instances2)
+        new IterativelyReweightedLeastSquares(
+          initial,
+          PoissonReweightFunc,
+          fitIntercept,
+          regParam = 0.0,
+          maxIter = 25,
+          tol = 1e-8).fit(instances2)
       val actual = Vectors
         .dense(irls.intercept, irls.coefficients(0), irls.coefficients(1))
       assert(actual ~== expected(idx) absTol 1e-4)
@@ -169,25 +175,28 @@ class IterativelyReweightedLeastSquaresSuite
        [1] 1.266667 0.400000
        [1] 29.5 17.0 -5.5
      */
-    val expected = Seq(Vectors.dense(0.0, 1.266667, 0.400000),
-                       Vectors.dense(29.5, 17.0, -5.5))
+    val expected = Seq(
+      Vectors.dense(0.0, 1.266667, 0.400000),
+      Vectors.dense(29.5, 17.0, -5.5))
 
     import IterativelyReweightedLeastSquaresSuite._
 
     var idx = 0
     for (fitIntercept <- Seq(false, true)) {
       val initial =
-        new WeightedLeastSquares(fitIntercept,
-                                 regParam = 0.0,
-                                 standardizeFeatures = false,
-                                 standardizeLabel = false).fit(instances2)
+        new WeightedLeastSquares(
+          fitIntercept,
+          regParam = 0.0,
+          standardizeFeatures = false,
+          standardizeLabel = false).fit(instances2)
       val irls =
-        new IterativelyReweightedLeastSquares(initial,
-                                              L1RegressionReweightFunc,
-                                              fitIntercept,
-                                              regParam = 0.0,
-                                              maxIter = 200,
-                                              tol = 1e-7).fit(instances2)
+        new IterativelyReweightedLeastSquares(
+          initial,
+          L1RegressionReweightFunc,
+          fitIntercept,
+          regParam = 0.0,
+          maxIter = 200,
+          tol = 1e-7).fit(instances2)
       val actual = Vectors
         .dense(irls.intercept, irls.coefficients(0), irls.coefficients(1))
       assert(actual ~== expected(idx) absTol 1e-4)

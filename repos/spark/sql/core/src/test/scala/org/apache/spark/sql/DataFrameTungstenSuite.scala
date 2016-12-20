@@ -41,12 +41,13 @@ class DataFrameTungstenSuite extends QueryTest with SharedSQLContext {
 
     val schema = new StructType()
       .add("a", IntegerType)
-      .add("b",
-           new StructType()
-             .add("b1", IntegerType)
-             .add("b2", LongType)
-             .add("b3", FloatType)
-             .add("b4", DoubleType))
+      .add(
+        "b",
+        new StructType()
+          .add("b1", IntegerType)
+          .add("b2", LongType)
+          .add("b3", FloatType)
+          .add("b4", DoubleType))
 
     val df = sqlContext.createDataFrame(data, schema)
     assert(df.select("b").first() === Row(struct))
@@ -66,8 +67,9 @@ class DataFrameTungstenSuite extends QueryTest with SharedSQLContext {
           .add("b2", LongType)
           .add("b3", FloatType)
           .add("b4", DoubleType)
-          .add("b5",
-               new StructType().add("b5a", IntegerType).add("b5b", StringType))
+          .add(
+            "b5",
+            new StructType().add("b5a", IntegerType).add("b5b", StringType))
           .add("b6", StringType))
 
     val df = sqlContext.createDataFrame(data, schema)

@@ -100,9 +100,10 @@ object LiftedEmbedding extends App {
   {
     //#schemaname
     class Coffees(tag: Tag)
-        extends Table[(String, Int, Double, Int, Int)](tag,
-                                                       Some("MYSCHEMA"),
-                                                       "COFFEES") {
+        extends Table[(String, Int, Double, Int, Int)](
+          tag,
+          Some("MYSCHEMA"),
+          "COFFEES") {
       //...
       //#schemaname
       def * = ???
@@ -172,16 +173,16 @@ object LiftedEmbedding extends App {
     val schema = coffees.schema ++ suppliers.schema
     //#ddl
     Await.result(
-                 //#ddl
-                 db.run(
-                   DBIO.seq(
-                     schema.create,
-                     //...
-                     schema.drop
-                   ))
-                 //#ddl
-                 ,
-                 Duration.Inf)
+      //#ddl
+      db.run(
+        DBIO.seq(
+          schema.create,
+          //...
+          schema.drop
+        ))
+      //#ddl
+      ,
+      Duration.Inf)
 
     //#ddl2
     schema.create.statements.foreach(println)
@@ -348,16 +349,17 @@ object LiftedEmbedding extends App {
       //#insert1
       println(sql)
 
-      Await.result(db.run(
-                     DBIO.seq(
-                       (suppliers ++= Seq(
-                         (101, "", "", "", "", ""),
-                         (49, "", "", "", "", ""),
-                         (150, "", "", "", "", "")
-                       )),
-                       insertActions
-                     )),
-                   Duration.Inf)
+      Await.result(
+        db.run(
+          DBIO.seq(
+            (suppliers ++= Seq(
+              (101, "", "", "", "", ""),
+              (49, "", "", "", "", ""),
+              (150, "", "", "", "", "")
+            )),
+            insertActions
+          )),
+        Duration.Inf)
 
       //#insert3
       val userId =
@@ -419,13 +421,14 @@ object LiftedEmbedding extends App {
       println(sql)
     };
     {
-      Await.result(db.run(
-                     usersForInsert ++= Seq(
-                       User(None, "", ""),
-                       User(None, "", "")
-                     )
-                   ),
-                   Duration.Inf)
+      Await.result(
+        db.run(
+          usersForInsert ++= Seq(
+            User(None, "", ""),
+            User(None, "", "")
+          )
+        ),
+        Duration.Inf)
 
       {
         //#compiled1
@@ -499,17 +502,18 @@ object LiftedEmbedding extends App {
 
       assert {
         Await
-          .result(db.run(
-                    salesPerDay.schema.create >>
-                      (salesPerDay += ((new Date(999999999), 999))) >> {
-                      //#simpleliteral
-                      val current_date =
-                        SimpleLiteral[java.sql.Date]("CURRENT_DATE")
-                      salesPerDay.map(_ => current_date)
-                      //#simpleliteral
-                    }.result.head
-                  ),
-                  Duration.Inf)
+          .result(
+            db.run(
+              salesPerDay.schema.create >>
+                (salesPerDay += ((new Date(999999999), 999))) >> {
+                //#simpleliteral
+                val current_date =
+                  SimpleLiteral[java.sql.Date]("CURRENT_DATE")
+                salesPerDay.map(_ => current_date)
+                //#simpleliteral
+              }.result.head
+            ),
+            Duration.Inf)
           .isInstanceOf[java.sql.Date]
       }
     }
@@ -601,9 +605,11 @@ object LiftedEmbedding extends App {
       //#recordtype2
 
       assert(
-        Await.result(db.run(as.schema.create >> insertAction >> q2.result),
-                     Duration.Inf) == Vector(Pair(3, Pair(42, "bb")),
-                                             Pair(2, Pair(42, "cc"))))
+        Await.result(
+          db.run(as.schema.create >> insertAction >> q2.result),
+          Duration.Inf) == Vector(
+          Pair(3, Pair(42, "bb")),
+          Pair(2, Pair(42, "cc"))))
 
       //#case-class-shape
       // two custom case class variants
@@ -636,8 +642,9 @@ object LiftedEmbedding extends App {
       // returns: Vector(B(3,"bb"), B(2,"cc"))
       //#case-class-shape
       assert(
-        Await.result(db.run(bs.schema.create >> insertActions >> q3.result),
-                     Duration.Inf) == Vector(B(3, "bb"), B(2, "cc")))
+        Await.result(
+          db.run(bs.schema.create >> insertActions >> q3.result),
+          Duration.Inf) == Vector(B(3, "bb"), B(2, "cc")))
 
       //#combining-shapes
       // Combining multiple mapped types
@@ -675,9 +682,11 @@ object LiftedEmbedding extends App {
       // returns: Vector(C(Pair(9,"z"),B(3,"bb")), C(Pair(8,"y"),B(2,"cc")))
       //#combining-shapes
       assert(
-        Await.result(db.run(cs.schema.create >> insertActions2 >> q4.result),
-                     Duration.Inf) == Vector(C(Pair(9, "z"), B(3, "bb")),
-                                             C(Pair(8, "y"), B(2, "cc"))))
+        Await.result(
+          db.run(cs.schema.create >> insertActions2 >> q4.result),
+          Duration.Inf) == Vector(
+          C(Pair(9, "z"), B(3, "bb")),
+          C(Pair(8, "y"), B(2, "cc"))))
 
       ()
     }

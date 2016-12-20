@@ -21,9 +21,10 @@ final class HashClientIntegrationSuite extends RedisClientTest {
     }
   }
 
-  test("Correctly perform hash set and get an empty value",
-       RedisTest,
-       ClientTest) {
+  test(
+    "Correctly perform hash set and get an empty value",
+    RedisTest,
+    ClientTest) {
     withRedisClient { client =>
       Await.result(client.hSet(foo, bar, StringToChannelBuffer("")))
       assert(CBToString(Await.result(client.hGet(foo, bar)).get) == "")
@@ -60,8 +61,9 @@ final class HashClientIntegrationSuite extends RedisClientTest {
       Await.result(client.hSet(foo, boo, moo))
       assert(
         CBToString.fromList(
-          Await.result(client.hMGet(foo, Seq(bar, boo))).toList) == Seq("baz",
-                                                                        "moo"))
+          Await.result(client.hMGet(foo, Seq(bar, boo))).toList) == Seq(
+          "baz",
+          "moo"))
     }
   }
 
@@ -70,8 +72,9 @@ final class HashClientIntegrationSuite extends RedisClientTest {
       Await.result(client.hMSet(foo, Map(baz -> bar, moo -> boo)))
       assert(
         CBToString.fromList(
-          Await.result(client.hMGet(foo, Seq(baz, moo))).toList) == Seq("bar",
-                                                                        "boo"))
+          Await.result(client.hMGet(foo, Seq(baz, moo))).toList) == Seq(
+          "bar",
+          "boo"))
     }
   }
 
@@ -85,8 +88,9 @@ final class HashClientIntegrationSuite extends RedisClientTest {
         client.hMSet(foo, Map(baz -> bar, moo -> StringToChannelBuffer(""))))
       assert(
         CBToString.fromList(
-          Await.result(client.hMGet(foo, Seq(baz, moo))).toList) == Seq("bar",
-                                                                        ""))
+          Await.result(client.hMGet(foo, Seq(baz, moo))).toList) == Seq(
+          "bar",
+          ""))
     }
   }
 
@@ -101,9 +105,10 @@ final class HashClientIntegrationSuite extends RedisClientTest {
     }
   }
 
-  test("Correctly get multiple values including one empty string",
-       RedisTest,
-       ClientTest) {
+  test(
+    "Correctly get multiple values including one empty string",
+    RedisTest,
+    ClientTest) {
     withRedisClient { client =>
       Await.result(client.hSet(foo, bar, StringToChannelBuffer("")))
       Await.result(client.hSet(foo, boo, moo))
@@ -141,8 +146,9 @@ final class HashClientIntegrationSuite extends RedisClientTest {
       Await.result(client.del(Seq(foo)))
       Await.result(client.hMSet(foo, Map(baz -> bar, moo -> boo)))
       assert(
-        Await.result(client.hVals(foo)).map(CBToString(_)) == Seq("bar",
-                                                                  "boo"))
+        Await.result(client.hVals(foo)).map(CBToString(_)) == Seq(
+          "bar",
+          "boo"))
     }
   }
 

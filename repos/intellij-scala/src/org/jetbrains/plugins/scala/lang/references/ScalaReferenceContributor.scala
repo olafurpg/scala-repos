@@ -81,8 +81,9 @@ class InterpolatedStringReferenceProvider extends PsiReferenceProvider {
                 override def getRangeInElement: TextRange = {
                   val range = ref.getTextRange
                   val startOffset = interpolated.getTextRange.getStartOffset + 1
-                  new TextRange(range.getStartOffset - startOffset,
-                                range.getEndOffset - startOffset)
+                  new TextRange(
+                    range.getStartOffset - startOffset,
+                    range.getEndOffset - startOffset)
                 }
 
                 override def resolve(): PsiElement = null
@@ -154,12 +155,13 @@ class FilePathReferenceProvider extends PsiReferenceProvider {
                              text: String,
                              offset: Int,
                              soft: Boolean): Array[PsiReference] = {
-    new FileReferenceSet(text,
-                         element,
-                         offset,
-                         this,
-                         true,
-                         myEndingSlashNotAllowed) {
+    new FileReferenceSet(
+      text,
+      element,
+      offset,
+      this,
+      true,
+      myEndingSlashNotAllowed) {
       protected override def isSoft: Boolean = soft
 
       override def isAbsolutePathReference: Boolean = true
@@ -180,10 +182,11 @@ class FilePathReferenceProvider extends PsiReferenceProvider {
       override def createFileReference(range: TextRange,
                                        index: Int,
                                        text: String): FileReference = {
-        FilePathReferenceProvider.this.createFileReference(this,
-                                                           range,
-                                                           index,
-                                                           text)
+        FilePathReferenceProvider.this.createFileReference(
+          this,
+          range,
+          index,
+          text)
       }
 
       protected override def getReferenceCompletionFilter: Condition[
@@ -222,20 +225,22 @@ class FilePathReferenceProvider extends PsiReferenceProvider {
         val start: Int = interpolated.getTextRange.getStartOffset
         return refs.flatMap { r =>
           val offset = r.getElement.getTextRange.getStartOffset - start
-          getReferencesByElement(r.getElement,
-                                 r.getElement.getText,
-                                 offset,
-                                 soft = true)
+          getReferencesByElement(
+            r.getElement,
+            r.getElement.getText,
+            offset,
+            soft = true)
         }
       case interpolatedString: ScInterpolatedStringLiteral =>
         val refs = interpolatedString.getReferencesToStringParts
         val start: Int = interpolatedString.getTextRange.getStartOffset
         return refs.flatMap { r =>
           val offset = r.getElement.getTextRange.getStartOffset - start
-          getReferencesByElement(r.getElement,
-                                 r.getElement.getText,
-                                 offset,
-                                 soft = true)
+          getReferencesByElement(
+            r.getElement,
+            r.getElement.getText,
+            offset,
+            soft = true)
         }
       case literal: ScLiteral =>
         literal.getValue match {

@@ -86,23 +86,26 @@ object Supervision {
     def this(trapExit: List[Class[_ <: Throwable]],
              maxNrOfRetries: Int,
              withinTimeRange: Int) =
-      this(trapExit,
-           if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
-           if (withinTimeRange < 0) None else Some(withinTimeRange))
+      this(
+        trapExit,
+        if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
+        if (withinTimeRange < 0) None else Some(withinTimeRange))
 
     def this(trapExit: Array[Class[_ <: Throwable]],
              maxNrOfRetries: Int,
              withinTimeRange: Int) =
-      this(trapExit.toList,
-           if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
-           if (withinTimeRange < 0) None else Some(withinTimeRange))
+      this(
+        trapExit.toList,
+        if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
+        if (withinTimeRange < 0) None else Some(withinTimeRange))
 
     def this(trapExit: java.util.List[Class[_ <: Throwable]],
              maxNrOfRetries: Int,
              withinTimeRange: Int) =
-      this(trapExit.toArray.toList.asInstanceOf[List[Class[_ <: Throwable]]],
-           if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
-           if (withinTimeRange < 0) None else Some(withinTimeRange))
+      this(
+        trapExit.toArray.toList.asInstanceOf[List[Class[_ <: Throwable]]],
+        if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
+        if (withinTimeRange < 0) None else Some(withinTimeRange))
   }
 
   object OneForOneStrategy {
@@ -123,23 +126,26 @@ object Supervision {
     def this(trapExit: List[Class[_ <: Throwable]],
              maxNrOfRetries: Int,
              withinTimeRange: Int) =
-      this(trapExit,
-           if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
-           if (withinTimeRange < 0) None else Some(withinTimeRange))
+      this(
+        trapExit,
+        if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
+        if (withinTimeRange < 0) None else Some(withinTimeRange))
 
     def this(trapExit: Array[Class[_ <: Throwable]],
              maxNrOfRetries: Int,
              withinTimeRange: Int) =
-      this(trapExit.toList,
-           if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
-           if (withinTimeRange < 0) None else Some(withinTimeRange))
+      this(
+        trapExit.toList,
+        if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
+        if (withinTimeRange < 0) None else Some(withinTimeRange))
 
     def this(trapExit: java.util.List[Class[_ <: Throwable]],
              maxNrOfRetries: Int,
              withinTimeRange: Int) =
-      this(trapExit.toArray.toList.asInstanceOf[List[Class[_ <: Throwable]]],
-           if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
-           if (withinTimeRange < 0) None else Some(withinTimeRange))
+      this(
+        trapExit.toArray.toList.asInstanceOf[List[Class[_ <: Throwable]]],
+        if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
+        if (withinTimeRange < 0) None else Some(withinTimeRange))
   }
 
   case object NoFaultHandlingStrategy extends FaultHandlingStrategy(Nil)
@@ -169,23 +175,25 @@ object Supervision {
     val remoteAddress: Option[RemoteAddress] = Option(_remoteAddress)
 
     def this(target: Class[_], lifeCycle: LifeCycle, timeout: Long) =
-      this(null: Class[_],
-           target,
-           lifeCycle,
-           timeout,
-           null: MessageDispatcher,
-           null: RemoteAddress)
+      this(
+        null: Class[_],
+        target,
+        lifeCycle,
+        timeout,
+        null: MessageDispatcher,
+        null: RemoteAddress)
 
     def this(intf: Class[_],
              target: Class[_],
              lifeCycle: LifeCycle,
              timeout: Long) =
-      this(intf,
-           target,
-           lifeCycle,
-           timeout,
-           null: MessageDispatcher,
-           null: RemoteAddress)
+      this(
+        intf,
+        target,
+        lifeCycle,
+        timeout,
+        null: MessageDispatcher,
+        null: RemoteAddress)
 
     def this(intf: Class[_],
              target: Class[_],
@@ -198,46 +206,50 @@ object Supervision {
              lifeCycle: LifeCycle,
              timeout: Long,
              dispatcher: MessageDispatcher) =
-      this(null: Class[_],
-           target,
-           lifeCycle,
-           timeout,
-           dispatcher,
-           null: RemoteAddress)
+      this(
+        null: Class[_],
+        target,
+        lifeCycle,
+        timeout,
+        dispatcher,
+        null: RemoteAddress)
 
     def this(intf: Class[_],
              target: Class[_],
              lifeCycle: LifeCycle,
              timeout: Long,
              remoteAddress: RemoteAddress) =
-      this(intf,
-           target,
-           lifeCycle,
-           timeout,
-           null: MessageDispatcher,
-           remoteAddress)
+      this(
+        intf,
+        target,
+        lifeCycle,
+        timeout,
+        null: MessageDispatcher,
+        remoteAddress)
 
     def this(target: Class[_],
              lifeCycle: LifeCycle,
              timeout: Long,
              remoteAddress: RemoteAddress) =
-      this(null: Class[_],
-           target,
-           lifeCycle,
-           timeout,
-           null: MessageDispatcher,
-           remoteAddress)
+      this(
+        null: Class[_],
+        target,
+        lifeCycle,
+        timeout,
+        null: MessageDispatcher,
+        remoteAddress)
 
     def this(target: Class[_],
              lifeCycle: LifeCycle,
              timeout: Long,
              dispatcher: MessageDispatcher,
              remoteAddress: RemoteAddress) =
-      this(null: Class[_],
-           target,
-           lifeCycle,
-           timeout,
-           dispatcher,
-           remoteAddress)
+      this(
+        null: Class[_],
+        target,
+        lifeCycle,
+        timeout,
+        dispatcher,
+        remoteAddress)
   }
 }

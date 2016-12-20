@@ -83,10 +83,11 @@ class ScSubstitutor(val tvMap: Map[(String, PsiElement), ScType],
     else ""}"
 
   def bindT(name: (String, PsiElement), t: ScType) = {
-    val res = new ScSubstitutor(tvMap + ((name, t)),
-                                aliasesMap,
-                                updateThisType,
-                                follower)
+    val res = new ScSubstitutor(
+      tvMap + ((name, t)),
+      aliasesMap,
+      updateThisType,
+      follower)
     res.myDependentMethodTypesFun = myDependentMethodTypesFun
     res.myDependentMethodTypesFunDefined = myDependentMethodTypesFunDefined
     res.myDependentMethodTypes = myDependentMethodTypes
@@ -144,12 +145,13 @@ class ScSubstitutor(val tvMap: Map[(String, PsiElement), ScType],
              s.updateThisType.isEmpty && !s.myDependentMethodTypesFunDefined)
       this
     else {
-      val res = new ScSubstitutor(tvMap,
-                                  aliasesMap,
-                                  updateThisType,
-                                  if (follower != null)
-                                    follower followed (s, level + 1)
-                                  else s)
+      val res = new ScSubstitutor(
+        tvMap,
+        aliasesMap,
+        updateThisType,
+        if (follower != null)
+          follower followed (s, level + 1)
+        else s)
       res.myDependentMethodTypesFun = myDependentMethodTypesFun
       res.myDependentMethodTypesFunDefined = myDependentMethodTypesFunDefined
       res.myDependentMethodTypes = myDependentMethodTypes
@@ -212,9 +214,10 @@ class ScSubstitutor(val tvMap: Map[(String, PsiElement), ScType],
           substInternal(retType),
           params.map(
             p =>
-              p.copy(paramType = substInternal(p.paramType),
-                     expectedType = substInternal(p.expectedType),
-                     defaultType = p.defaultType.map(substInternal))),
+              p.copy(
+                paramType = substInternal(p.paramType),
+                expectedType = substInternal(p.expectedType),
+                defaultType = p.defaultType.map(substInternal))),
           isImplicit)(m.project, m.scope)
       }
 
@@ -283,12 +286,14 @@ class ScSubstitutor(val tvMap: Map[(String, PsiElement), ScType],
                   else {
                     t.selfType match {
                       case Some(selfType) =>
-                        ScType.extractDesignated(selfType,
-                                                 withoutAliases = true) match {
+                        ScType.extractDesignated(
+                          selfType,
+                          withoutAliases = true) match {
                           case Some((cl: PsiClass, _)) =>
                             if (cl == clazz) tp
-                            else if (ScalaPsiUtil.cachedDeepIsInheritor(cl,
-                                                                        clazz))
+                            else if (ScalaPsiUtil.cachedDeepIsInheritor(
+                                       cl,
+                                       clazz))
                               tp
                             else null
                           case _ =>
@@ -335,8 +340,9 @@ class ScSubstitutor(val tvMap: Map[(String, PsiElement), ScType],
                         ScType.extractClass(tps) match {
                           case Some(cl) =>
                             if (cl == clazz) return tp
-                            else if (ScalaPsiUtil.cachedDeepIsInheritor(cl,
-                                                                        clazz))
+                            else if (ScalaPsiUtil.cachedDeepIsInheritor(
+                                       cl,
+                                       clazz))
                               return tp
                           case _ =>
                         }
@@ -404,8 +410,9 @@ class ScSubstitutor(val tvMap: Map[(String, PsiElement), ScType],
                 if (tpt.args.isEmpty) {
                   substInternal(param) //to prevent types like T[A][A]
                 } else {
-                  ScParameterizedType(param.designator,
-                                      typeArgs.map(substInternal))
+                  ScParameterizedType(
+                    param.designator,
+                    typeArgs.map(substInternal))
                 }
               case _ =>
                 substInternal(tpt) match {
@@ -421,8 +428,9 @@ class ScSubstitutor(val tvMap: Map[(String, PsiElement), ScType],
                 if (u.tpt.args.isEmpty) {
                   substInternal(param) //to prevent types like T[A][A]
                 } else {
-                  ScParameterizedType(param.designator,
-                                      typeArgs map substInternal)
+                  ScParameterizedType(
+                    param.designator,
+                    typeArgs map substInternal)
                 }
               case _ =>
                 substInternal(u) match {
@@ -438,8 +446,9 @@ class ScSubstitutor(val tvMap: Map[(String, PsiElement), ScType],
                 if (u.tpt.args.isEmpty) {
                   substInternal(param) //to prevent types like T[A][A]
                 } else {
-                  ScParameterizedType(param.designator,
-                                      typeArgs map substInternal)
+                  ScParameterizedType(
+                    param.designator,
+                    typeArgs map substInternal)
                 }
               case _ =>
                 substInternal(u) match {
@@ -484,11 +493,12 @@ class ScSubstitutor(val tvMap: Map[(String, PsiElement), ScType],
           myDependentMethodTypesFunDefined
         substCopy.myDependentMethodTypes = myDependentMethodTypes
         def substTypeParam(tp: TypeParameter): TypeParameter = {
-          new TypeParameter(tp.name,
-                            tp.typeParams.map(substTypeParam),
-                            () => substInternal(tp.lowerType()),
-                            () => substInternal(tp.upperType()),
-                            tp.ptp)
+          new TypeParameter(
+            tp.name,
+            tp.typeParams.map(substTypeParam),
+            () => substInternal(tp.lowerType()),
+            () => substInternal(tp.upperType()),
+            tp.ptp)
         }
         val middleRes =
           ScCompoundType(comps.map(substInternal), signatureMap.map {
@@ -499,25 +509,26 @@ class ScSubstitutor(val tvMap: Map[(String, PsiElement), ScType],
                 if (s.typeParams.length == 0) TypeParameter.EMPTY_ARRAY
                 else s.typeParams.map(substTypeParam)
               val rt: ScType = substInternal(tp)
-              (new Signature(s.name,
-                             pTypes,
-                             s.paramLength,
-                             tParams,
-                             ScSubstitutor.empty,
-                             s.namedElement match {
-                               case fun: ScFunction =>
-                                 ScFunction.getCompoundCopy(
-                                   pTypes.map(_.map(_()).toList),
-                                   tParams.toList,
-                                   rt,
-                                   fun)
-                               case b: ScBindingPattern =>
-                                 ScBindingPattern.getCompoundCopy(rt, b)
-                               case f: ScFieldId =>
-                                 ScFieldId.getCompoundCopy(rt, f)
-                               case named => named
-                             },
-                             s.hasRepeatedParam),
+              (new Signature(
+                 s.name,
+                 pTypes,
+                 s.paramLength,
+                 tParams,
+                 ScSubstitutor.empty,
+                 s.namedElement match {
+                   case fun: ScFunction =>
+                     ScFunction.getCompoundCopy(
+                       pTypes.map(_.map(_()).toList),
+                       tParams.toList,
+                       rt,
+                       fun)
+                   case b: ScBindingPattern =>
+                     ScBindingPattern.getCompoundCopy(rt, b)
+                   case f: ScFieldId =>
+                     ScFieldId.getCompoundCopy(rt, f)
+                   case named => named
+                 },
+                 s.hasRepeatedParam),
                rt)
           }, typeMap.map {
             case (s, sign) => (s, sign.updateTypes(substInternal))
@@ -552,10 +563,11 @@ class ScUndefinedSubstitutor(
              upperAdditionalMap,
            lowerAdditionalMap: Map[(String, PsiElement), HashSet[ScType]] =
              lowerAdditionalMap): ScUndefinedSubstitutor = {
-    new ScUndefinedSubstitutor(upperMap,
-                               lowerMap,
-                               upperAdditionalMap,
-                               lowerAdditionalMap)
+    new ScUndefinedSubstitutor(
+      upperMap,
+      lowerMap,
+      upperAdditionalMap,
+      lowerAdditionalMap)
   }
 
   type Name = (String, PsiElement)
@@ -621,10 +633,11 @@ class ScUndefinedSubstitutor(
                 case 1 => (true, upper)
                 case 0 =>
                   (true,
-                   ScSkolemizedType(s"_$$${ index += 1; index }",
-                                    Nil,
-                                    skoLower,
-                                    upper))
+                   ScSkolemizedType(
+                     s"_$$${ index += 1; index }",
+                     Nil,
+                     skoLower,
+                     upper))
               }
             case _ => (false, tp)
           }
@@ -664,10 +677,11 @@ class ScUndefinedSubstitutor(
                 case 1 => (true, absUpper)
                 case 0 =>
                   (true,
-                   ScSkolemizedType(s"_$$${ index += 1; index }",
-                                    Nil,
-                                    lower,
-                                    absUpper)) //todo: why this is right?
+                   ScSkolemizedType(
+                     s"_$$${ index += 1; index }",
+                     Nil,
+                     lower,
+                     absUpper)) //todo: why this is right?
               }
             case ScSkolemizedType(_, _, lower, skoUpper) =>
               i match {
@@ -675,10 +689,11 @@ class ScUndefinedSubstitutor(
                 case 1 => (true, skoUpper)
                 case 0 =>
                   (true,
-                   ScSkolemizedType(s"_$$${ index += 1; index }",
-                                    Nil,
-                                    lower,
-                                    skoUpper))
+                   ScSkolemizedType(
+                     s"_$$${ index += 1; index }",
+                     Nil,
+                     lower,
+                     skoUpper))
               }
             case _ => (false, tp)
           }
@@ -852,9 +867,10 @@ class ScUndefinedSubstitutor(
                   var upper: ScType = Any
                   val setIterator = set.iterator
                   while (setIterator.hasNext) {
-                    upper = Bounds.glb(upper,
-                                       subst.subst(setIterator.next()),
-                                       checkWeak = false)
+                    upper = Bounds.glb(
+                      upper,
+                      subst.subst(setIterator.next()),
+                      checkWeak = false)
                   }
                   rType = upper
                   rMap += ((name, rType))

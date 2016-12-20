@@ -440,10 +440,11 @@ object Engine1 {
 }
 
 class Engine1
-    extends BaseEngine[Engine1.EvalInfo,
-                       Engine1.Query,
-                       Engine1.Prediction,
-                       Engine1.Actual] {
+    extends BaseEngine[
+      Engine1.EvalInfo,
+      Engine1.Query,
+      Engine1.Prediction,
+      Engine1.Actual] {
 
   def train(sc: SparkContext,
             engineParams: EngineParams,
@@ -463,11 +464,12 @@ class Engine1
 }
 
 class Metric0
-    extends Metric[Engine1.EvalInfo,
-                   Engine1.Query,
-                   Engine1.Prediction,
-                   Engine1.Actual,
-                   Double] {
+    extends Metric[
+      Engine1.EvalInfo,
+      Engine1.Query,
+      Engine1.Prediction,
+      Engine1.Actual,
+      Double] {
   override def header: String = "Metric0"
 
   def calculate(sc: SparkContext,

@@ -131,8 +131,9 @@ final case class BalancingPool(
 
       dispatchers.registerConfigurator(
         dispatcherId,
-        new BalancingDispatcherConfigurator(dispatcherConfig,
-                                            dispatchers.prerequisites))
+        new BalancingDispatcherConfigurator(
+          dispatcherConfig,
+          dispatchers.prerequisites))
     }
 
     val routeePropsWithDispatcher = routeeProps.withDispatcher(dispatcherId)

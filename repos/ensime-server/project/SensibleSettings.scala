@@ -148,8 +148,9 @@ object Sensible {
     .envOrNone("YOURKIT_AGENT")
     .map { name =>
       val agent = file(name)
-      require(agent.exists(),
-              s"Yourkit agent specified ($agent) does not exist")
+      require(
+        agent.exists(),
+        s"Yourkit agent specified ($agent) does not exist")
       Seq(s"-agentpath:${agent.getCanonicalPath}")
     }
     .getOrElse(Nil)

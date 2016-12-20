@@ -863,13 +863,14 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
         |val x: Option[<caret>]
       """.stripMargin.replaceAll("\r", "").trim()
 
-    completeLookupItem(activeLookup
-                         .find(
-                           le =>
-                             le.getLookupString == "Option" &&
-                               le.getPsiElement.isInstanceOf[ScClass])
-                         .get,
-                       '[')
+    completeLookupItem(
+      activeLookup
+        .find(
+          le =>
+            le.getLookupString == "Option" &&
+              le.getPsiElement.isInstanceOf[ScClass])
+        .get,
+      '[')
 
     checkResultByText(resultText)
   }
@@ -939,8 +940,9 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     configureFromFileTextAdapter("dummy.scala", fileText)
     complete(1, CompletionType.BASIC)
 
-    assert(getActiveLookup.getCurrentItem.getLookupString == "type",
-           "Wrong item preselected.")
+    assert(
+      getActiveLookup.getCurrentItem.getLookupString == "type",
+      "Wrong item preselected.")
   }
 
   def testBackticks() {

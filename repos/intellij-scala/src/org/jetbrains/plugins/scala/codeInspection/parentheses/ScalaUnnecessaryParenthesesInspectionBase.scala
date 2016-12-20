@@ -26,23 +26,25 @@ import scala.annotation.tailrec
   * 4/25/13
   */
 abstract class ScalaUnnecessaryParenthesesInspectionBase
-    extends AbstractInspection("UnnecessaryParenthesesU",
-                               "Remove unnecessary parentheses") {
+    extends AbstractInspection(
+      "UnnecessaryParenthesesU",
+      "Remove unnecessary parentheses") {
 
   def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case parenthesized: ScParenthesisedExpr
         if !parenthesized.getParent.isInstanceOf[ScParenthesisedExpr] &&
           IntentionAvailabilityChecker.checkInspection(this, parenthesized) &&
-          UnnecessaryParenthesesUtil.canBeStripped(parenthesized,
-                                                   getIgnoreClarifying) =>
+          UnnecessaryParenthesesUtil.canBeStripped(
+            parenthesized,
+            getIgnoreClarifying) =>
       holder.registerProblem(
         parenthesized,
         "Unnecessary parentheses",
         ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
         new UnnecessaryParenthesesQuickFix(
           parenthesized,
-          UnnecessaryParenthesesUtil.getTextOfStripped(parenthesized,
-                                                       getIgnoreClarifying)))
+          UnnecessaryParenthesesUtil
+            .getTextOfStripped(parenthesized, getIgnoreClarifying)))
   }
 
   override def createOptionsPanel(): JComponent = {

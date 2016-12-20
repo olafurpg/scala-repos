@@ -11,16 +11,17 @@ object PhoneCode {
     //prepare lookup table number -> all words, 8 lines
     val dictEntriesDigified2Words = {
       val wordToDigits = {
-        val mappingReversed = (for (chars2Digit <- Array("e",
-                                                         "jnq",
-                                                         "rwx",
-                                                         "dsy",
-                                                         "ft",
-                                                         "am",
-                                                         "civ",
-                                                         "bku",
-                                                         "lop",
-                                                         "ghz").zipWithIndex;
+        val mappingReversed = (for (chars2Digit <- Array(
+                                      "e",
+                                      "jnq",
+                                      "rwx",
+                                      "dsy",
+                                      "ft",
+                                      "am",
+                                      "civ",
+                                      "bku",
+                                      "lop",
+                                      "ghz").zipWithIndex;
                                     char <- (chars2Digit._1 ++ chars2Digit._1.toUpperCase))
           yield (char -> chars2Digit._2)).toMap
         (word: String) =>
@@ -34,9 +35,10 @@ object PhoneCode {
       def asFallback(notMatched: String) =
         if (canFallBackToDigit)
           List(
-            copy(translated + " " + notMatched.head,
-                 notMatched.tail,
-                 original))
+            copy(
+              translated + " " + notMatched.head,
+              notMatched.tail,
+              original))
         else Nil
       def format = original + ": " + translated.trim
       def ifFinished = if (remaining.isEmpty) Some(List(this)) else None
@@ -56,8 +58,8 @@ object PhoneCode {
                 for ((translated, remaining) <- matchingWords.map(
                        e => e -> matchAgainst.drop(e.count(_.isLetter))))
                   yield
-                    (current.copy(current.translated + " " + translated,
-                                  remaining))
+                    (current
+                      .copy(current.translated + " " + translated, remaining))
               else current.asFallback(matchAgainst)
             }
             allMatches(current.remaining).flatMap(collectPossibleTranslations)

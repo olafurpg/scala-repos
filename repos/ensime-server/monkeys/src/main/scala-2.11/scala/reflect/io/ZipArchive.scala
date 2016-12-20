@@ -225,8 +225,8 @@ final class URLZipArchive(val url: URL) extends ZipArchive(null) {
           if (offset == arr.length) arr
           else
             throw new IOException(
-              "Input stream truncated: read %d of %d bytes".format(offset,
-                                                                   len))
+              "Input stream truncated: read %d of %d bytes"
+                .format(offset, len))
         }
         override def sizeOption = Some(zipEntry.getSize().toInt)
       }

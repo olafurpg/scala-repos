@@ -49,8 +49,9 @@ object OverrunStyle
   @deprecated("Use Clip; CLIP will be removed in a future release", "2.2.60")
   val CLIP = Clip
   val Ellipsis = new OverrunStyle(jfxsc.OverrunStyle.ELLIPSIS)
-  @deprecated("Use Ellipsis; ELLIPSIS will be removed in a future release",
-              "2.2.60")
+  @deprecated(
+    "Use Ellipsis; ELLIPSIS will be removed in a future release",
+    "2.2.60")
   val ELLIPSIS = Ellipsis
   val LeadingEllipsis = new OverrunStyle(jfxsc.OverrunStyle.LEADING_ELLIPSIS)
   @deprecated(

@@ -59,20 +59,21 @@ object History {
 
     def read(doc: BSONDocument): History = {
       def ratingsMap(key: String): RatingsMap = ~doc.getAs[RatingsMap](key)
-      History(standard = ratingsMap("standard"),
-              chess960 = ratingsMap("chess960"),
-              kingOfTheHill = ratingsMap("kingOfTheHill"),
-              threeCheck = ratingsMap("threeCheck"),
-              antichess = ratingsMap("antichess"),
-              atomic = ratingsMap("atomic"),
-              horde = ratingsMap("horde"),
-              racingKings = ratingsMap("racingKings"),
-              crazyhouse = ratingsMap("crazyhouse"),
-              bullet = ratingsMap("bullet"),
-              blitz = ratingsMap("blitz"),
-              classical = ratingsMap("classical"),
-              correspondence = ratingsMap("correspondence"),
-              puzzle = ratingsMap("puzzle"))
+      History(
+        standard = ratingsMap("standard"),
+        chess960 = ratingsMap("chess960"),
+        kingOfTheHill = ratingsMap("kingOfTheHill"),
+        threeCheck = ratingsMap("threeCheck"),
+        antichess = ratingsMap("antichess"),
+        atomic = ratingsMap("atomic"),
+        horde = ratingsMap("horde"),
+        racingKings = ratingsMap("racingKings"),
+        crazyhouse = ratingsMap("crazyhouse"),
+        bullet = ratingsMap("bullet"),
+        blitz = ratingsMap("blitz"),
+        classical = ratingsMap("classical"),
+        correspondence = ratingsMap("correspondence"),
+        puzzle = ratingsMap("puzzle"))
     }
   }
 }

@@ -77,8 +77,9 @@ class SkimpyOffsetMap(val memory: Int, val hashAlgorithm: String = "MD5")
     * @param offset The offset
     */
   override def put(key: ByteBuffer, offset: Long) {
-    require(entries < slots,
-            "Attempt to add a new entry to a full offset map.")
+    require(
+      entries < slots,
+      "Attempt to add a new entry to a full offset map.")
     lookups += 1
     hashInto(key, hash1)
     // probe until we find the first empty slot
@@ -138,10 +139,11 @@ class SkimpyOffsetMap(val memory: Int, val hashAlgorithm: String = "MD5")
     this.entries = 0
     this.lookups = 0L
     this.probes = 0L
-    Arrays.fill(bytes.array,
-                bytes.arrayOffset,
-                bytes.arrayOffset + bytes.limit,
-                0.toByte)
+    Arrays.fill(
+      bytes.array,
+      bytes.arrayOffset,
+      bytes.arrayOffset + bytes.limit,
+      0.toByte)
   }
 
   /**

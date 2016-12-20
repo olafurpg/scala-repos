@@ -97,9 +97,10 @@ private[memory] trait MemoryManagerSuite
         val args = invocation.getArguments
         val numBytesToFree = args(1).asInstanceOf[Long]
         assert(numBytesToFree > 0)
-        require(evictBlocksToFreeSpaceCalled
-                  .get() === DEFAULT_EVICT_BLOCKS_TO_FREE_SPACE_CALLED,
-                "bad test: evictBlocksToFreeSpace() variable was not reset")
+        require(
+          evictBlocksToFreeSpaceCalled
+            .get() === DEFAULT_EVICT_BLOCKS_TO_FREE_SPACE_CALLED,
+          "bad test: evictBlocksToFreeSpace() variable was not reset")
         evictBlocksToFreeSpaceCalled.set(numBytesToFree)
         if (numBytesToFree <= mm.storageMemoryUsed) {
           // We can evict enough blocks to fulfill the request for space
@@ -120,8 +121,9 @@ private[memory] trait MemoryManagerSuite
     */
   protected def assertEvictBlocksToFreeSpaceCalled(ms: MemoryStore,
                                                    numBytes: Long): Unit = {
-    assert(evictBlocksToFreeSpaceCalled.get() === numBytes,
-           s"expected evictBlocksToFreeSpace() to be called with $numBytes")
+    assert(
+      evictBlocksToFreeSpaceCalled.get() === numBytes,
+      s"expected evictBlocksToFreeSpace() to be called with $numBytes")
     evictBlocksToFreeSpaceCalled.set(DEFAULT_EVICT_BLOCKS_TO_FREE_SPACE_CALLED)
   }
 
@@ -130,9 +132,10 @@ private[memory] trait MemoryManagerSuite
     */
   protected def assertEvictBlocksToFreeSpaceNotCalled[T](
       ms: MemoryStore): Unit = {
-    assert(evictBlocksToFreeSpaceCalled
-             .get() === DEFAULT_EVICT_BLOCKS_TO_FREE_SPACE_CALLED,
-           "evictBlocksToFreeSpace() should not have been called!")
+    assert(
+      evictBlocksToFreeSpaceCalled
+        .get() === DEFAULT_EVICT_BLOCKS_TO_FREE_SPACE_CALLED,
+      "evictBlocksToFreeSpace() should not have been called!")
     assert(evictedBlocks.isEmpty)
   }
 
@@ -325,8 +328,9 @@ private[memory] trait MemoryManagerSuite
   }
 
   test("off-heap execution allocations cannot exceed limit") {
-    val memoryManager = createMemoryManager(maxOnHeapExecutionMemory = 0L,
-                                            maxOffHeapExecutionMemory = 1000L)
+    val memoryManager = createMemoryManager(
+      maxOnHeapExecutionMemory = 0L,
+      maxOffHeapExecutionMemory = 1000L)
 
     val tMemManager = new TaskMemoryManager(memoryManager, 1)
     val result1 = Future {

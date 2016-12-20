@@ -108,9 +108,10 @@ class LevelDbBatchingBenchmark {
 
   private def deleteStorage(sys: ActorSystem) {
     val storageLocations =
-      List("akka.persistence.journal.leveldb.dir",
-           "akka.persistence.journal.leveldb-shared.store.dir",
-           "akka.persistence.snapshot-store.local.dir").map(s ⇒
+      List(
+        "akka.persistence.journal.leveldb.dir",
+        "akka.persistence.journal.leveldb-shared.store.dir",
+        "akka.persistence.snapshot-store.local.dir").map(s ⇒
         new File(sys.settings.config.getString(s)))
 
     storageLocations.foreach(FileUtils.deleteDirectory)

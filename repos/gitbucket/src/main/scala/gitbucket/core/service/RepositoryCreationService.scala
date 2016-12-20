@@ -62,14 +62,15 @@ trait RepositoryCreationService {
             inserter.insert(Constants.OBJ_BLOB, content.getBytes("UTF-8"))))
         builder.finish()
 
-        JGitUtil.createNewCommit(git,
-                                 inserter,
-                                 headId,
-                                 builder.getDirCache.writeTree(inserter),
-                                 Constants.HEAD,
-                                 loginAccount.fullName,
-                                 loginAccount.mailAddress,
-                                 "Initial commit")
+        JGitUtil.createNewCommit(
+          git,
+          inserter,
+          headId,
+          builder.getDirCache.writeTree(inserter),
+          Constants.HEAD,
+          loginAccount.fullName,
+          loginAccount.mailAddress,
+          "Initial commit")
       }
     }
 

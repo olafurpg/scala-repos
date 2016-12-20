@@ -114,9 +114,9 @@ trait GroupFinder extends parser.AST with Tracer {
         findVars(solve, id)(pred) ++ findVars(solve, id)(child)
 
       case Relate(_, from, to, in) =>
-        findVars(solve, id)(from) ++ findVars(solve, id)(to) ++ findVars(solve,
-                                                                         id)(
-          in)
+        findVars(solve, id)(from) ++ findVars(solve, id)(to) ++ findVars(
+          solve,
+          id)(in)
 
       case expr @ TicVar(_, `id`) if expr.binding == SolveBinding(solve) =>
         Set(expr)

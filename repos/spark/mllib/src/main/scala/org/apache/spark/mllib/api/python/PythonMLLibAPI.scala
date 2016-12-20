@@ -110,10 +110,11 @@ private[python] class PythonMLLibAPI extends Serializable {
         .run(data.rdd.persist(StorageLevel.MEMORY_AND_DISK), initialWeights)
       if (model.isInstanceOf[LogisticRegressionModel]) {
         val lrModel = model.asInstanceOf[LogisticRegressionModel]
-        List(lrModel.weights,
-             lrModel.intercept,
-             lrModel.numFeatures,
-             lrModel.numClasses).map(_.asInstanceOf[Object]).asJava
+        List(
+          lrModel.weights,
+          lrModel.intercept,
+          lrModel.numFeatures,
+          lrModel.numClasses).map(_.asInstanceOf[Object]).asJava
       } else {
         List(model.weights, model.intercept).map(_.asInstanceOf[Object]).asJava
       }
@@ -311,9 +312,10 @@ private[python] class PythonMLLibAPI extends Serializable {
   def trainNaiveBayesModel(data: JavaRDD[LabeledPoint],
                            lambda: Double): JList[Object] = {
     val model = NaiveBayes.train(data.rdd, lambda)
-    List(Vectors.dense(model.labels),
-         Vectors.dense(model.pi),
-         model.theta.map(Vectors.dense)).map(_.asInstanceOf[Object]).asJava
+    List(
+      Vectors.dense(model.labels),
+      Vectors.dense(model.pi),
+      model.theta.map(Vectors.dense)).map(_.asInstanceOf[Object]).asJava
   }
 
   /**
@@ -399,8 +401,9 @@ private[python] class PythonMLLibAPI extends Serializable {
       val gaussians =
         initialModelMu.asScala.toSeq.zip(initialModelSigma.asScala.toSeq).map {
           case (x, y) =>
-            new MultivariateGaussian(x.asInstanceOf[Vector],
-                                     y.asInstanceOf[Matrix])
+            new MultivariateGaussian(
+              x.asInstanceOf[Vector],
+              y.asInstanceOf[Matrix])
         }
       val initialModel = new GaussianMixtureModel(
         initialModelWeights.asScala.toArray,
@@ -713,15 +716,15 @@ private[python] class PythonMLLibAPI extends Serializable {
     val algo = Algo.fromString(algoStr)
     val impurity = Impurities.fromString(impurityStr)
 
-    val strategy = new Strategy(algo = algo,
-                                impurity = impurity,
-                                maxDepth = maxDepth,
-                                numClasses = numClasses,
-                                maxBins = maxBins,
-                                categoricalFeaturesInfo =
-                                  categoricalFeaturesInfo.asScala.toMap,
-                                minInstancesPerNode = minInstancesPerNode,
-                                minInfoGain = minInfoGain)
+    val strategy = new Strategy(
+      algo = algo,
+      impurity = impurity,
+      maxDepth = maxDepth,
+      numClasses = numClasses,
+      maxBins = maxBins,
+      categoricalFeaturesInfo = categoricalFeaturesInfo.asScala.toMap,
+      minInstancesPerNode = minInstancesPerNode,
+      minInfoGain = minInfoGain)
     try {
       DecisionTree
         .train(data.rdd.persist(StorageLevel.MEMORY_AND_DISK), strategy)
@@ -749,27 +752,29 @@ private[python] class PythonMLLibAPI extends Serializable {
 
     val algo = Algo.fromString(algoStr)
     val impurity = Impurities.fromString(impurityStr)
-    val strategy = new Strategy(algo = algo,
-                                impurity = impurity,
-                                maxDepth = maxDepth,
-                                numClasses = numClasses,
-                                maxBins = maxBins,
-                                categoricalFeaturesInfo =
-                                  categoricalFeaturesInfo.asScala.toMap)
+    val strategy = new Strategy(
+      algo = algo,
+      impurity = impurity,
+      maxDepth = maxDepth,
+      numClasses = numClasses,
+      maxBins = maxBins,
+      categoricalFeaturesInfo = categoricalFeaturesInfo.asScala.toMap)
     val cached = data.rdd.persist(StorageLevel.MEMORY_AND_DISK)
     try {
       if (algo == Algo.Classification) {
-        RandomForest.trainClassifier(cached,
-                                     strategy,
-                                     numTrees,
-                                     featureSubsetStrategy,
-                                     seed)
+        RandomForest.trainClassifier(
+          cached,
+          strategy,
+          numTrees,
+          featureSubsetStrategy,
+          seed)
       } else {
-        RandomForest.trainRegressor(cached,
-                                    strategy,
-                                    numTrees,
-                                    featureSubsetStrategy,
-                                    seed)
+        RandomForest.trainRegressor(
+          cached,
+          strategy,
+          numTrees,
+          featureSubsetStrategy,
+          seed)
       }
     } finally {
       cached.unpersist(blocking = false)
@@ -1097,13 +1102,14 @@ private[python] class PythonMLLibAPI extends Serializable {
                                  seed: Int,
                                  eps: Double): Array[LabeledPoint] = {
     LinearDataGenerator
-      .generateLinearInput(intercept,
-                           weights.asScala.toArray,
-                           xMean.asScala.toArray,
-                           xVariance.asScala.toArray,
-                           nPoints,
-                           seed,
-                           eps)
+      .generateLinearInput(
+        intercept,
+        weights.asScala.toArray,
+        xMean.asScala.toArray,
+        xVariance.asScala.toArray,
+        nPoints,
+        seed,
+        eps)
       .toArray
   }
 
@@ -1180,8 +1186,9 @@ private[python] class PythonMLLibAPI extends Serializable {
     // Python, so map each Row in the DataFrame back to a
     // ((blockRowIndex, blockColIndex), sub-matrix) tuple.
     val blockTuples = blocks.rdd.map {
-      case Row(Row(blockRowIndex: Long, blockColIndex: Long),
-               subMatrix: Matrix) =>
+      case Row(
+          Row(blockRowIndex: Long, blockColIndex: Long),
+          subMatrix: Matrix) =>
         ((blockRowIndex.toInt, blockColIndex.toInt), subMatrix)
     }
     new BlockMatrix(blockTuples, rowsPerBlock, colsPerBlock, numRows, numCols)
@@ -1351,10 +1358,11 @@ private[spark] object SerDe extends Serializable {
       val order = ByteOrder.nativeOrder()
       ByteBuffer.wrap(bytes).order(order).asDoubleBuffer().get(values)
       val isTransposed = args(3).asInstanceOf[Int] == 1
-      new DenseMatrix(args(0).asInstanceOf[Int],
-                      args(1).asInstanceOf[Int],
-                      values,
-                      isTransposed)
+      new DenseMatrix(
+        args(0).asInstanceOf[Int],
+        args(1).asInstanceOf[Int],
+        values,
+        isTransposed)
     }
   }
 
@@ -1411,12 +1419,13 @@ private[spark] object SerDe extends Serializable {
       ByteBuffer.wrap(indicesBytes).order(order).asIntBuffer().get(rowIndices)
       ByteBuffer.wrap(valuesBytes).order(order).asDoubleBuffer().get(values)
       val isTransposed = args(5).asInstanceOf[Int] == 1
-      new SparseMatrix(args(0).asInstanceOf[Int],
-                       args(1).asInstanceOf[Int],
-                       colPtrs,
-                       rowIndices,
-                       values,
-                       isTransposed)
+      new SparseMatrix(
+        args(0).asInstanceOf[Int],
+        args(1).asInstanceOf[Int],
+        colPtrs,
+        rowIndices,
+        values,
+        isTransposed)
     }
   }
 
@@ -1474,8 +1483,9 @@ private[spark] object SerDe extends Serializable {
       if (args.length != 2) {
         throw new PickleException("should be 2")
       }
-      new LabeledPoint(args(0).asInstanceOf[Double],
-                       args(1).asInstanceOf[Vector])
+      new LabeledPoint(
+        args(0).asInstanceOf[Double],
+        args(1).asInstanceOf[Vector])
     }
   }
 
@@ -1491,9 +1501,10 @@ private[spark] object SerDe extends Serializable {
       if (args.length != 3) {
         throw new PickleException("should be 3")
       }
-      new Rating(ratingsIdCheckLong(args(0)),
-                 ratingsIdCheckLong(args(1)),
-                 args(2).asInstanceOf[Double])
+      new Rating(
+        ratingsIdCheckLong(args(0)),
+        ratingsIdCheckLong(args(1)),
+        args(2).asInstanceOf[Double])
     }
 
     private def ratingsIdCheckLong(obj: Object): Int = {
@@ -1501,9 +1512,10 @@ private[spark] object SerDe extends Serializable {
         obj.asInstanceOf[Int]
       } catch {
         case ex: ClassCastException =>
-          throw new PickleException(s"Ratings id ${obj.toString} exceeds " +
-                                      s"max integer value of ${Int.MaxValue}",
-                                    ex)
+          throw new PickleException(
+            s"Ratings id ${obj.toString} exceeds " +
+              s"max integer value of ${Int.MaxValue}",
+            ex)
       }
     }
   }

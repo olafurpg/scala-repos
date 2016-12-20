@@ -154,11 +154,12 @@ class MessageSerializerPersistenceSpec extends AkkaSpec(customSerializers) {
     "not given a manifest" must {
       "handle custom Persistent message serialization" in {
         val persistent =
-          PersistentRepr(MyPayload("a"),
-                         13,
-                         "p1",
-                         "",
-                         writerUuid = UUID.randomUUID().toString)
+          PersistentRepr(
+            MyPayload("a"),
+            13,
+            "p1",
+            "",
+            writerUuid = UUID.randomUUID().toString)
         val serializer = serialization.findSerializerFor(persistent)
 
         val bytes = serializer.toBinary(persistent)
@@ -171,11 +172,12 @@ class MessageSerializerPersistenceSpec extends AkkaSpec(customSerializers) {
     "given a PersistentRepr manifest" must {
       "handle custom Persistent message serialization" in {
         val persistent =
-          PersistentRepr(MyPayload("b"),
-                         13,
-                         "p1",
-                         "",
-                         writerUuid = UUID.randomUUID().toString)
+          PersistentRepr(
+            MyPayload("b"),
+            13,
+            "p1",
+            "",
+            writerUuid = UUID.randomUUID().toString)
         val serializer = serialization.findSerializerFor(persistent)
 
         val bytes = serializer.toBinary(persistent)
@@ -189,11 +191,12 @@ class MessageSerializerPersistenceSpec extends AkkaSpec(customSerializers) {
     "given payload serializer with string manifest" must {
       "handle serialization" in {
         val persistent =
-          PersistentRepr(MyPayload2("a", 17),
-                         13,
-                         "p1",
-                         "",
-                         writerUuid = UUID.randomUUID().toString)
+          PersistentRepr(
+            MyPayload2("a", 17),
+            13,
+            "p1",
+            "",
+            writerUuid = UUID.randomUUID().toString)
         val serializer = serialization.findSerializerFor(persistent)
 
         val bytes = serializer.toBinary(persistent)
@@ -280,30 +283,36 @@ class MessageSerializerPersistenceSpec extends AkkaSpec(customSerializers) {
 
         val bytes = serializer.toBinary(snap)
         val deserialized =
-          serializer.fromBinary(bytes,
-                                Some(classOf[AtLeastOnceDeliverySnapshot]))
+          serializer.fromBinary(
+            bytes,
+            Some(classOf[AtLeastOnceDeliverySnapshot]))
 
         deserialized should ===(snap)
       }
 
       "handle a few unconfirmed" in {
         val unconfirmed =
-          Vector(UnconfirmedDelivery(deliveryId = 1,
-                                     destination = testActor.path,
-                                     "a"),
-                 UnconfirmedDelivery(deliveryId = 2,
-                                     destination = testActor.path,
-                                     "b"),
-                 UnconfirmedDelivery(deliveryId = 3,
-                                     destination = testActor.path,
-                                     42))
+          Vector(
+            UnconfirmedDelivery(
+              deliveryId = 1,
+              destination = testActor.path,
+              "a"),
+            UnconfirmedDelivery(
+              deliveryId = 2,
+              destination = testActor.path,
+              "b"),
+            UnconfirmedDelivery(
+              deliveryId = 3,
+              destination = testActor.path,
+              42))
         val snap = AtLeastOnceDeliverySnapshot(17, unconfirmed)
         val serializer = serialization.findSerializerFor(snap)
 
         val bytes = serializer.toBinary(snap)
         val deserialized =
-          serializer.fromBinary(bytes,
-                                Some(classOf[AtLeastOnceDeliverySnapshot]))
+          serializer.fromBinary(
+            bytes,
+            Some(classOf[AtLeastOnceDeliverySnapshot]))
 
         deserialized should ===(snap)
       }

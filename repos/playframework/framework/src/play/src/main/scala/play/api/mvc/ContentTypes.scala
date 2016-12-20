@@ -414,8 +414,9 @@ trait BodyParsers {
           m.equalsIgnoreCase("text/json") ||
             m.equalsIgnoreCase("application/json")),
       tolerantJson(maxLength),
-      createBadResult("Expecting text/json or application/json body",
-                      UNSUPPORTED_MEDIA_TYPE)
+      createBadResult(
+        "Expecting text/json or application/json body",
+        UNSUPPORTED_MEDIA_TYPE)
     )
 
     /**
@@ -584,9 +585,10 @@ trait BodyParsers {
       */
     def tolerantFormUrlEncoded(
         maxLength: Int): BodyParser[Map[String, Seq[String]]] =
-      tolerantBodyParser("urlFormEncoded",
-                         maxLength,
-                         "Error parsing application/x-www-form-urlencoded") {
+      tolerantBodyParser(
+        "urlFormEncoded",
+        maxLength,
+        "Error parsing application/x-www-form-urlencoded") {
         (request, bytes) =>
           import play.core.parsers._
           FormUrlEncodedParser.parse(
@@ -610,8 +612,9 @@ trait BodyParsers {
         _.contentType.exists(
           _.equalsIgnoreCase("application/x-www-form-urlencoded")),
         tolerantFormUrlEncoded(maxLength),
-        createBadResult("Expecting application/x-www-form-urlencoded body",
-                        UNSUPPORTED_MEDIA_TYPE)
+        createBadResult(
+          "Expecting application/x-www-form-urlencoded body",
+          UNSUPPORTED_MEDIA_TYPE)
       )
 
     /**
@@ -681,8 +684,9 @@ trait BodyParsers {
 
           case Some("multipart/form-data") =>
             logger.trace("Parsing AnyContent as multipartFormData")
-            multipartFormData(Multipart.handleFilePartAsTemporaryFile,
-                              maxLengthOrDefaultLarge)
+            multipartFormData(
+              Multipart.handleFilePartAsTemporaryFile,
+              maxLengthOrDefaultLarge)
               .apply(request)
               .map(_.right.map(m => AnyContentAsMultipartFormData(m)))
 
@@ -810,10 +814,11 @@ trait BodyParsers {
             case MaxSizeExceeded(_) =>
               val badResult = Future
                 .successful(())
-                .flatMap(_ =>
-                  createBadResult("Request Entity Too Large",
-                                  REQUEST_ENTITY_TOO_LARGE)(request))(
-                  defaultCtx)
+                .flatMap(
+                  _ =>
+                    createBadResult(
+                      "Request Entity Too Large",
+                      REQUEST_ENTITY_TOO_LARGE)(request))(defaultCtx)
               badResult.map(Left(_))
             case MaxSizeNotExceeded => resultFuture
           }

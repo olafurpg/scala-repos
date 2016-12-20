@@ -19,28 +19,36 @@ class XorTTests extends CatsSuite {
   checkAll(
     "MonadError[XorT[List, ?, ?]]",
     SerializableTests.serializable(MonadError[XorT[List, String, ?], String]))
-  checkAll("XorT[List, String, Int]",
-           MonoidKTests[XorT[List, String, ?]].monoidK[Int])
-  checkAll("MonoidK[XorT[List, String, ?]]",
-           SerializableTests.serializable(MonoidK[XorT[List, String, ?]]))
-  checkAll("XorT[List, ?, ?]",
-           BifunctorTests[XorT[List, ?, ?]]
-             .bifunctor[Int, Int, Int, String, String, String])
-  checkAll("Bifunctor[XorT[List, ?, ?]]",
-           SerializableTests.serializable(Bifunctor[XorT[List, ?, ?]]))
-  checkAll("XorT[List, Int, ?]",
-           TraverseTests[XorT[List, Int, ?]]
-             .traverse[Int, Int, Int, Int, Option, Option])
-  checkAll("Traverse[XorT[List, Int, ?]]",
-           SerializableTests.serializable(Traverse[XorT[List, Int, ?]]))
+  checkAll(
+    "XorT[List, String, Int]",
+    MonoidKTests[XorT[List, String, ?]].monoidK[Int])
+  checkAll(
+    "MonoidK[XorT[List, String, ?]]",
+    SerializableTests.serializable(MonoidK[XorT[List, String, ?]]))
+  checkAll(
+    "XorT[List, ?, ?]",
+    BifunctorTests[XorT[List, ?, ?]]
+      .bifunctor[Int, Int, Int, String, String, String])
+  checkAll(
+    "Bifunctor[XorT[List, ?, ?]]",
+    SerializableTests.serializable(Bifunctor[XorT[List, ?, ?]]))
+  checkAll(
+    "XorT[List, Int, ?]",
+    TraverseTests[XorT[List, Int, ?]]
+      .traverse[Int, Int, Int, Int, Option, Option])
+  checkAll(
+    "Traverse[XorT[List, Int, ?]]",
+    SerializableTests.serializable(Traverse[XorT[List, Int, ?]]))
   checkAll("XorT[List, String, Int]", OrderLaws[XorT[List, String, Int]].order)
-  checkAll("Order[XorT[List, String, Int]]",
-           SerializableTests.serializable(Order[XorT[List, String, Int]]))
+  checkAll(
+    "Order[XorT[List, String, Int]]",
+    SerializableTests.serializable(Order[XorT[List, String, Int]]))
 
   {
     implicit val F = ListWrapper.foldable
-    checkAll("XorT[ListWrapper, Int, ?]",
-             FoldableTests[XorT[ListWrapper, Int, ?]].foldable[Int, Int])
+    checkAll(
+      "XorT[ListWrapper, Int, ?]",
+      FoldableTests[XorT[ListWrapper, Int, ?]].foldable[Int, Int])
     checkAll(
       "Foldable[XorT[ListWrapper, Int, ?]]",
       SerializableTests.serializable(Foldable[XorT[ListWrapper, Int, ?]]))
@@ -48,8 +56,9 @@ class XorTTests extends CatsSuite {
 
   {
     implicit val F = ListWrapper.functor
-    checkAll("XorT[ListWrapper, Int, ?]",
-             FunctorTests[XorT[ListWrapper, Int, ?]].functor[Int, Int, Int])
+    checkAll(
+      "XorT[ListWrapper, Int, ?]",
+      FunctorTests[XorT[ListWrapper, Int, ?]].functor[Int, Int, Int])
     checkAll(
       "Functor[XorT[ListWrapper, Int, ?]]",
       SerializableTests.serializable(Functor[XorT[ListWrapper, Int, ?]]))
@@ -57,17 +66,20 @@ class XorTTests extends CatsSuite {
 
   {
     implicit val F = ListWrapper.partialOrder[String Xor Int]
-    checkAll("XorT[ListWrapper, String, Int]",
-             OrderLaws[XorT[ListWrapper, String, Int]].partialOrder)
-    checkAll("PartialOrder[XorT[ListWrapper, String, Int]]",
-             SerializableTests.serializable(
-               PartialOrder[XorT[ListWrapper, String, Int]]))
+    checkAll(
+      "XorT[ListWrapper, String, Int]",
+      OrderLaws[XorT[ListWrapper, String, Int]].partialOrder)
+    checkAll(
+      "PartialOrder[XorT[ListWrapper, String, Int]]",
+      SerializableTests.serializable(
+        PartialOrder[XorT[ListWrapper, String, Int]]))
   }
 
   {
     implicit val F = ListWrapper.eqv[String Xor Int]
-    checkAll("XorT[ListWrapper, String, Int]",
-             OrderLaws[XorT[ListWrapper, String, Int]].eqv)
+    checkAll(
+      "XorT[ListWrapper, String, Int]",
+      OrderLaws[XorT[ListWrapper, String, Int]].eqv)
     checkAll(
       "Eq[XorT[ListWrapper, String, Int]]",
       SerializableTests.serializable(Eq[XorT[ListWrapper, String, Int]]))
@@ -78,9 +90,10 @@ class XorTTests extends CatsSuite {
     checkAll(
       "XorT[Option, ListWrapper[String], ?]",
       SemigroupKTests[XorT[Option, ListWrapper[String], ?]].semigroupK[Int])
-    checkAll("SemigroupK[XorT[Option, ListWrapper[String], ?]]",
-             SerializableTests.serializable(
-               SemigroupK[XorT[Option, ListWrapper[String], ?]]))
+    checkAll(
+      "SemigroupK[XorT[Option, ListWrapper[String], ?]]",
+      SerializableTests.serializable(
+        SemigroupK[XorT[Option, ListWrapper[String], ?]]))
   }
 
   // make sure that the Monad and Traverse instances don't result in ambiguous

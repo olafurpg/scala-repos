@@ -92,13 +92,15 @@ private[spark] class ZippedPartitionsRDD2[A: ClassTag,
     var rdd1: RDD[A],
     var rdd2: RDD[B],
     preservesPartitioning: Boolean = false)
-    extends ZippedPartitionsBaseRDD[V](sc,
-                                       List(rdd1, rdd2),
-                                       preservesPartitioning) {
+    extends ZippedPartitionsBaseRDD[V](
+      sc,
+      List(rdd1, rdd2),
+      preservesPartitioning) {
 
   override def compute(s: Partition, context: TaskContext): Iterator[V] = {
     val partitions = s.asInstanceOf[ZippedPartitionsPartition].partitions
-    f(rdd1.iterator(partitions(0), context),
+    f(
+      rdd1.iterator(partitions(0), context),
       rdd2.iterator(partitions(1), context))
   }
 
@@ -120,13 +122,15 @@ private[spark] class ZippedPartitionsRDD3[A: ClassTag,
     var rdd2: RDD[B],
     var rdd3: RDD[C],
     preservesPartitioning: Boolean = false)
-    extends ZippedPartitionsBaseRDD[V](sc,
-                                       List(rdd1, rdd2, rdd3),
-                                       preservesPartitioning) {
+    extends ZippedPartitionsBaseRDD[V](
+      sc,
+      List(rdd1, rdd2, rdd3),
+      preservesPartitioning) {
 
   override def compute(s: Partition, context: TaskContext): Iterator[V] = {
     val partitions = s.asInstanceOf[ZippedPartitionsPartition].partitions
-    f(rdd1.iterator(partitions(0), context),
+    f(
+      rdd1.iterator(partitions(0), context),
       rdd2.iterator(partitions(1), context),
       rdd3.iterator(partitions(2), context))
   }
@@ -152,13 +156,15 @@ private[spark] class ZippedPartitionsRDD4[A: ClassTag,
     var rdd3: RDD[C],
     var rdd4: RDD[D],
     preservesPartitioning: Boolean = false)
-    extends ZippedPartitionsBaseRDD[V](sc,
-                                       List(rdd1, rdd2, rdd3, rdd4),
-                                       preservesPartitioning) {
+    extends ZippedPartitionsBaseRDD[V](
+      sc,
+      List(rdd1, rdd2, rdd3, rdd4),
+      preservesPartitioning) {
 
   override def compute(s: Partition, context: TaskContext): Iterator[V] = {
     val partitions = s.asInstanceOf[ZippedPartitionsPartition].partitions
-    f(rdd1.iterator(partitions(0), context),
+    f(
+      rdd1.iterator(partitions(0), context),
       rdd2.iterator(partitions(1), context),
       rdd3.iterator(partitions(2), context),
       rdd4.iterator(partitions(3), context))

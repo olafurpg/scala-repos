@@ -34,13 +34,14 @@ class StableCodeReferenceElementResolver(
             case List() => List(List())
             case x => x
           }
-        new ConstructorResolveProcessor(ref,
-                                        ref.refName,
-                                        effectiveArgs,
-                                        typeArgs,
-                                        kinds,
-                                        shapeResolve,
-                                        allConstructorResults)
+        new ConstructorResolveProcessor(
+          ref,
+          ref.refName,
+          effectiveArgs,
+          typeArgs,
+          kinds,
+          shapeResolve,
+          allConstructorResults)
       } else
         ref.getContext match {
           //last ref may import many elements with the same name
@@ -51,20 +52,23 @@ class StableCodeReferenceElementResolver(
           case _: ScImportSelector =>
             new CollectAllForImportProcessor(kinds, ref, reference.refName)
           case constr: ScInterpolationPattern =>
-            new ExtractorResolveProcessor(ref,
-                                          reference.refName,
-                                          kinds,
-                                          constr.expectedType)
+            new ExtractorResolveProcessor(
+              ref,
+              reference.refName,
+              kinds,
+              constr.expectedType)
           case constr: ScConstructorPattern =>
-            new ExtractorResolveProcessor(ref,
-                                          reference.refName,
-                                          kinds,
-                                          constr.expectedType)
+            new ExtractorResolveProcessor(
+              ref,
+              reference.refName,
+              kinds,
+              constr.expectedType)
           case infix: ScInfixPattern =>
-            new ExtractorResolveProcessor(ref,
-                                          reference.refName,
-                                          kinds,
-                                          infix.expectedType)
+            new ExtractorResolveProcessor(
+              ref,
+              reference.refName,
+              kinds,
+              infix.expectedType)
           case _ => new ResolveProcessor(kinds, ref, reference.refName)
         }
 

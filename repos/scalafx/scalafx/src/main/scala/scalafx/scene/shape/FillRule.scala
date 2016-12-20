@@ -35,13 +35,15 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 object FillRule extends SFXEnumDelegateCompanion[jfxss.FillRule, FillRule] {
 
   val EvenOdd = new FillRule(jfxss.FillRule.EVEN_ODD)
-  @deprecated("Use EvenOdd; EVEN_ODD will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use EvenOdd; EVEN_ODD will be removed in a future release",
+    "8.0.60-R10")
   val EVEN_ODD = EvenOdd
 
   val NonZero = new FillRule(jfxss.FillRule.NON_ZERO)
-  @deprecated("Use NonZero; NON_ZERO will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use NonZero; NON_ZERO will be removed in a future release",
+    "8.0.60-R10")
   val NON_ZERO = NonZero
 
   protected override def unsortedValues: Array[FillRule] =

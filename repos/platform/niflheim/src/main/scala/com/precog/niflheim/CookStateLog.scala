@@ -151,10 +151,11 @@ object TXLogEntry extends Logging {
       case other =>
         logger.error(
           "Unknown TX log record type = %d, isCTRL = %s, isEOB = %s from %s"
-            .format(other,
-                    record.isCTRL,
-                    record.isEOB,
-                    record.data.mkString("[", ", ", "]")))
+            .format(
+              other,
+              record.isCTRL,
+              record.isEOB,
+              record.data.mkString("[", ", ", "]")))
     }
   }
 

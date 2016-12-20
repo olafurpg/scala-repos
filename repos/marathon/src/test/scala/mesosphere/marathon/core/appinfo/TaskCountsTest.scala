@@ -24,8 +24,9 @@ class TaskCountsTest
     Given("one unstaged task")
     val oneTaskWithoutTaskState = f.taskWithoutState
     When("getting counts")
-    val counts = TaskCounts(appTasks = Seq(oneTaskWithoutTaskState),
-                            healthStatuses = Map.empty)
+    val counts = TaskCounts(
+      appTasks = Seq(oneTaskWithoutTaskState),
+      healthStatuses = Map.empty)
     Then("the task without taskState is counted as staged")
     counts should be(TaskCounts.zero.copy(tasksStaged = 1))
   }
@@ -61,8 +62,9 @@ class TaskCountsTest
     )
     When("getting counts")
     val counts =
-      TaskCounts(appTasks = oneRunningTask,
-                 healthStatuses = Map(Task.Id("task1") -> aliveHealth))
+      TaskCounts(
+        appTasks = oneRunningTask,
+        healthStatuses = Map(Task.Id("task1") -> aliveHealth))
     Then("all counts are 0 except healthy")
     counts should be(TaskCounts.zero.copy(tasksRunning = 1, tasksHealthy = 1))
   }
@@ -74,8 +76,9 @@ class TaskCountsTest
     )
     When("getting counts")
     val counts =
-      TaskCounts(appTasks = oneRunningTask,
-                 healthStatuses = Map(Task.Id("task1") -> notAliveHealth))
+      TaskCounts(
+        appTasks = oneRunningTask,
+        healthStatuses = Map(Task.Id("task1") -> notAliveHealth))
     Then("all counts are 0 except tasksUnhealthy")
     counts should be(
       TaskCounts.zero.copy(tasksRunning = 1, tasksUnhealthy = 1))
@@ -88,8 +91,9 @@ class TaskCountsTest
     )
     When("getting counts")
     val counts =
-      TaskCounts(appTasks = oneRunningTask,
-                 healthStatuses = Map(Task.Id("task1") -> mixedHealth))
+      TaskCounts(
+        appTasks = oneRunningTask,
+        healthStatuses = Map(Task.Id("task1") -> mixedHealth))
     Then("all counts are 0 except tasksUnhealthy")
     counts should be(
       TaskCounts.zero.copy(tasksRunning = 1, tasksUnhealthy = 1))
@@ -102,8 +106,9 @@ class TaskCountsTest
     )
     When("getting counts")
     val counts =
-      TaskCounts(appTasks = oneRunningTask,
-                 healthStatuses = Map(Task.Id("task1") -> noHealths))
+      TaskCounts(
+        appTasks = oneRunningTask,
+        healthStatuses = Map(Task.Id("task1") -> noHealths))
     Then("all counts are 0")
     counts should be(TaskCounts.zero.copy(tasksRunning = 1))
   }

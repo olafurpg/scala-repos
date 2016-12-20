@@ -28,23 +28,25 @@ object CodeGenTools {
       throwsExceptions: Array[String] = null,
       handlers: List[ExceptionHandler] = Nil,
       localVars: List[LocalVariable] = Nil)(body: Instruction*): MethodNode = {
-    val node = new MethodNode(flags,
-                              name,
-                              descriptor,
-                              genericSignature,
-                              throwsExceptions)
+    val node = new MethodNode(
+      flags,
+      name,
+      descriptor,
+      genericSignature,
+      throwsExceptions)
     applyToMethod(node, Method(body.toList, handlers, localVars))
     node
   }
 
   def wrapInClass(method: MethodNode): ClassNode = {
     val cls = new ClassNode()
-    cls.visit(Opcodes.V1_6,
-              Opcodes.ACC_PUBLIC,
-              "C",
-              null,
-              "java/lang/Object",
-              null)
+    cls.visit(
+      Opcodes.V1_6,
+      Opcodes.ACC_PUBLIC,
+      "C",
+      null,
+      "java/lang/Object",
+      null)
     cls.methods.add(method)
     cls
   }
@@ -108,8 +110,9 @@ object CodeGenTools {
         .filter(!allowMessage(_)) // toList prevents an infer-non-wildcard-existential warning.
     if (disallowed.nonEmpty) {
       val msg = disallowed.mkString("\n")
-      assert(false,
-             "The compiler issued non-allowed warnings or errors:\n" + msg)
+      assert(
+        false,
+        "The compiler issued non-allowed warnings or errors:\n" + msg)
     }
   }
 
@@ -240,8 +243,9 @@ object CodeGenTools {
           case i: Int => opcodeToString(i, i)
         })
         .mkString("List(", ", ", ")")
-    assert(actual.summary == expected,
-           s"\nFound   : ${actual.summaryText}\nExpected: $expectedString")
+    assert(
+      actual.summary == expected,
+      s"\nFound   : ${actual.summaryText}\nExpected: $expectedString")
   }
 
   def assertNoInvoke(m: Method): Unit = assertNoInvoke(m.instructions)
@@ -276,8 +280,9 @@ object CodeGenTools {
     def quote(l: List[String]) =
       l.map(s => s""""$s"""").mkString("List(", ", ", ")")
     val actual = l collect { case i: Invoke => i.owner + "." + i.name }
-    assert(actual == expected,
-           s"\nFound   : ${quote(actual)}\nExpected: ${quote(expected)}")
+    assert(
+      actual == expected,
+      s"\nFound   : ${quote(actual)}\nExpected: ${quote(expected)}")
   }
 
   def getSingleMethod(classNode: ClassNode, name: String): Method =

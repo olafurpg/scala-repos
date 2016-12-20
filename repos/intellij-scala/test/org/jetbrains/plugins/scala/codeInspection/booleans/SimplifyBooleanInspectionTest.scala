@@ -18,10 +18,11 @@ class SimplifyBooleanInspectionTest
   }
 
   private def testFix(text: String, result: String, hint: String) {
-    testQuickFix(text.replace("\r", ""),
-                 result.replace("\r", ""),
-                 hint,
-                 classOf[SimplifyBooleanInspection])
+    testQuickFix(
+      text.replace("\r", ""),
+      result.replace("\r", ""),
+      hint,
+      classOf[SimplifyBooleanInspection])
   }
 
   private def checkHasNoErrors(text: String) {
@@ -156,8 +157,9 @@ class SimplifyBooleanInspectionTest
   }
 
   def testParentheses(): Unit = {
-    testFix("true<caret> && (2 - 1) * 0 == 0",
-            "(2 - 1) * 0 == 0",
-            "Simplify true && (2 - 1) * 0 == 0")
+    testFix(
+      "true<caret> && (2 - 1) * 0 == 0",
+      "(2 - 1) * 0 == 0",
+      "Simplify true && (2 - 1) * 0 == 0")
   }
 }

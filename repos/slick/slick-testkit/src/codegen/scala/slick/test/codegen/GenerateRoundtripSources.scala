@@ -215,9 +215,10 @@ class Tables(val profile: JdbcProfile) {
       column[Option[Double]]("Option_Double", O.Default(Some(9.999)))
     //def java_math_BigDecimal = column[Option[java.math.BigDecimal]]("java_math_BigDecimal")
     def Option_String =
-      column[Option[String]]("Option_String",
-                             O.Default(Some("someDefaultString")),
-                             O.Length(254))
+      column[Option[String]](
+        "Option_String",
+        O.Default(Some("someDefaultString")),
+        O.Length(254))
     def Option_java_sql_Date =
       column[Option[java.sql.Date]]("Option_java_sql_Date")
     def Option_java_sql_Time =
@@ -328,13 +329,14 @@ class Tables(val profile: JdbcProfile) {
         ({
           case (id, p1, p2, p3, p4, p5, p6) =>
             // We could do this without .shaped but then we'd have to write a type annotation for the parameters
-            Whole(id,
-                  Part.tupled.apply(p1),
-                  Part.tupled.apply(p2),
-                  Part.tupled.apply(p3),
-                  Part.tupled.apply(p4),
-                  Part.tupled.apply(p5),
-                  Part.tupled.apply(p6))
+            Whole(
+              id,
+              Part.tupled.apply(p1),
+              Part.tupled.apply(p2),
+              Part.tupled.apply(p3),
+              Part.tupled.apply(p4),
+              Part.tupled.apply(p5),
+              Part.tupled.apply(p6))
         }, { w: Whole =>
           def f(p: Part) = Part.unapply(p).get
           Some((w.id, f(w.p1), f(w.p2), f(w.p3), f(w.p4), f(w.p5), f(w.p6)))

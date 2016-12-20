@@ -47,9 +47,9 @@ object GlobalPlugin {
             config: LoadBuildConfiguration): (BuildStructure, State) = {
     val newInject = config.injectSettings.copy(
       global = config.injectSettings.global ++ globalPluginSettings)
-    val globalConfig = config.copy(injectSettings = newInject,
-                                   pluginManagement =
-                                     config.pluginManagement.forGlobalPlugin)
+    val globalConfig = config.copy(
+      injectSettings = newInject,
+      pluginManagement = config.pluginManagement.forGlobalPlugin)
     val (eval, structure) = Load(base, s, globalConfig)
     val session = Load.initialSession(structure, eval)
     (structure, Project.setProject(session, structure, s))
@@ -75,12 +75,13 @@ object GlobalPlugin {
       // If we reference it directly (if it's an executionRoot) then it forces an update, which is not what we want.
       val updateReport = Def.taskDyn { Def.task { update.value } }.value
 
-      GlobalPluginData(projectID.value,
-                       projectDependencies.value,
-                       depMap,
-                       resolvers.value,
-                       (fullClasspath in Runtime).value,
-                       (prods ++ intcp).distinct)(updateReport)
+      GlobalPluginData(
+        projectID.value,
+        projectDependencies.value,
+        depMap,
+        resolvers.value,
+        (fullClasspath in Runtime).value,
+        (prods ++ intcp).distinct)(updateReport)
     }
     val resolvedTaskInit =
       taskInit mapReferenced Project.mapScope(Scope replaceThis p)

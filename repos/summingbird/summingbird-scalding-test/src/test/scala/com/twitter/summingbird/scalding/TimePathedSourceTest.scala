@@ -50,8 +50,9 @@ object TimePathSourceLaws extends Properties("Time path source") {
 
   def genEmbiggen(embiggen: Long): (DateRange => DateRange) = {
     ((dr: DateRange) =>
-       DateRange(RichDate(dr.start.timestamp - embiggen),
-                 RichDate(dr.end.timestamp + embiggen)))
+       DateRange(
+         RichDate(dr.start.timestamp - embiggen),
+         RichDate(dr.end.timestamp + embiggen)))
   }
 
   def genVertractor(
@@ -79,9 +80,10 @@ object TimePathSourceLaws extends Properties("Time path source") {
       val retData = BTimePathedSource.minify(
         genEmbiggen(data.embiggen),
         genVertractor(data.availableRange))(data.requestedRange)
-      if (rangeWithEmbgginContained(data.requestedRange,
-                                    data.embiggen,
-                                    data.availableRange)) {
+      if (rangeWithEmbgginContained(
+            data.requestedRange,
+            data.embiggen,
+            data.availableRange)) {
         retData == Some(data.requestedRange)
       } else true // not tested here
     }

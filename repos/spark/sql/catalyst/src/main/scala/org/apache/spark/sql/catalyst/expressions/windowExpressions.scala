@@ -496,9 +496,10 @@ trait SizeBasedWindowFunction extends AggregateWindowFunction {
 }
 
 object SizeBasedWindowFunction {
-  val n = AttributeReference("window__partition__size",
-                             IntegerType,
-                             nullable = false)()
+  val n = AttributeReference(
+    "window__partition__size",
+    IntegerType,
+    nullable = false)()
 }
 
 /**
@@ -761,8 +762,9 @@ case class PercentRank(children: Seq[Expression])
   override def dataType: DataType = DoubleType
   override val evaluateExpression = If(
     GreaterThan(n, one),
-    Divide(Cast(Subtract(rank, one), DoubleType),
-           Cast(Subtract(n, one), DoubleType)),
+    Divide(
+      Cast(Subtract(rank, one), DoubleType),
+      Cast(Subtract(n, one), DoubleType)),
     Literal(0.0d))
   override def sql: String = "PERCENT_RANK()"
 }

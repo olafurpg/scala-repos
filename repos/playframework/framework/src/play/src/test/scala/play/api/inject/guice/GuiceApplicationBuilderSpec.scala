@@ -26,8 +26,9 @@ object GuiceApplicationBuilderSpec extends Specification {
     "override bindings" in {
       val app = new GuiceApplicationBuilder()
         .bindings(new AModule)
-        .overrides(bind[Configuration] to new ExtendConfiguration("a" -> 1),
-                   bind[A].to[A2])
+        .overrides(
+          bind[Configuration] to new ExtendConfiguration("a" -> 1),
+          bind[A].to[A2])
         .build
 
       app.configuration.getInt("a") must beSome(1)

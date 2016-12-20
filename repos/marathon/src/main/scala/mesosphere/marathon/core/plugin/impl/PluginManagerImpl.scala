@@ -45,8 +45,9 @@ private[plugin] class PluginManagerImpl(val config: MarathonConf,
       case cf: PluginConfiguration if definition.configuration.isDefined =>
         log.info(
           s"Configure the plugin with this configuration: ${definition.configuration}")
-        cf.initialize(Map("frameworkName" -> config.frameworkName()),
-                      definition.configuration.get)
+        cf.initialize(
+          Map("frameworkName" -> config.frameworkName()),
+          definition.configuration.get)
         plugin
       case _ => plugin
     }

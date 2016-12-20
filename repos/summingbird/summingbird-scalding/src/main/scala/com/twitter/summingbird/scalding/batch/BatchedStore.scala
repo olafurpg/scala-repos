@@ -200,14 +200,16 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
       batches.last // batches won't be empty, ensured by atLeastOneBatch method
     val filteredBatches = select(batches).sorted
 
-    assert(filteredBatches.contains(finalBatch),
-           "select must not remove the final batch.")
+    assert(
+      filteredBatches.contains(finalBatch),
+      "select must not remove the final batch.")
 
     import IteratorSums._ // get the groupedSum, partials function
 
-    logger.debug("Previous written batch: {}, computing: {}",
-                 inBatch.asInstanceOf[Any],
-                 batches)
+    logger.debug(
+      "Previous written batch: {}, computing: {}",
+      inBatch.asInstanceOf[Any],
+      batches)
 
     def prepareOld(
         old: TypedPipe[(K, V)]): TypedPipe[(K, (BatchID, (Timestamp, V)))] =
@@ -316,8 +318,8 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
       (batchOps.coverIt(timeSpan).toList match {
         case Nil =>
           Left(
-            List("Timespan is covered by Nil: %s batcher: %s".format(timeSpan,
-                                                                     batcher)))
+            List("Timespan is covered by Nil: %s batcher: %s"
+              .format(timeSpan, batcher)))
         case list => Right((in, list))
       })
     })
@@ -465,12 +467,13 @@ trait BatchedStore[K, V] extends scalding.Store[K, V] { self =>
       /**
         * Once we have read the last snapshot and the available batched blocks of delta, just merge
         */
-      merged = mergeBatched(actualLast,
-                            snapshot,
-                            deltaFlow2Pipe,
-                            tsRead,
-                            commutativity,
-                            reducers)(sg)
+      merged = mergeBatched(
+        actualLast,
+        snapshot,
+        deltaFlow2Pipe,
+        tsRead,
+        commutativity,
+        reducers)(sg)
 
       prunedFlow = Scalding.limitTimes(tsRequested && tsRead, merged)
     } yield (prunedFlow)

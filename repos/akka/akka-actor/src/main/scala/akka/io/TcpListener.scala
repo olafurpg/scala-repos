@@ -70,9 +70,10 @@ private[io] class TcpListener(selectorRouter: ActorRef,
   } catch {
     case NonFatal(e) ⇒
       bindCommander ! bind.failureMessage
-      log.error(e,
-                "Bind failed for TCP channel on endpoint [{}]",
-                bind.localAddress)
+      log.error(
+        e,
+        "Bind failed for TCP channel on endpoint [{}]",
+        bind.localAddress)
       context.stop(self)
   }
 
@@ -126,16 +127,18 @@ private[io] class TcpListener(selectorRouter: ActorRef,
       log.debug("New connection accepted")
       socketChannel.configureBlocking(false)
       def props(registry: ChannelRegistry) =
-        Props(classOf[TcpIncomingConnection],
-              tcp,
-              socketChannel,
-              registry,
-              bind.handler,
-              bind.options,
-              bind.pullMode)
-      selectorRouter ! WorkerForCommand(RegisterIncoming(socketChannel),
-                                        self,
-                                        props)
+        Props(
+          classOf[TcpIncomingConnection],
+          tcp,
+          socketChannel,
+          registry,
+          bind.handler,
+          bind.options,
+          bind.pullMode)
+      selectorRouter ! WorkerForCommand(
+        RegisterIncoming(socketChannel),
+        self,
+        props)
       acceptAllPending(registration, limit - 1)
     } else if (bind.pullMode) limit
     else BatchAcceptLimit

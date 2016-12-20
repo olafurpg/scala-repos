@@ -79,11 +79,13 @@ class ScNewTemplateDefinitionImpl private (
     }
 
     if (superTypes.length > 1 || holders.nonEmpty || aliases.nonEmpty) {
-      new Success(ScCompoundType.fromPsi(superTypes,
-                                         holders.toList,
-                                         aliases.toList,
-                                         ScSubstitutor.empty),
-                  Some(this))
+      new Success(
+        ScCompoundType.fromPsi(
+          superTypes,
+          holders.toList,
+          aliases.toList,
+          ScSubstitutor.empty),
+        Some(this))
     } else {
       extendsBlock.templateParents match {
         case Some(tp) if tp.allTypeElements.length == 1 =>
@@ -217,9 +219,10 @@ class ScNewTemplateDefinitionImpl private (
   override def getAllMethods: Array[PsiMethod] = {
     val res = new ArrayBuffer[PsiMethod]()
     TypeDefinitionMembers.SignatureNodes.forAllSignatureNodes(this) { node =>
-      this.processPsiMethodsForNode(node,
-                                    isStatic = false,
-                                    isInterface = false)(res += _)
+      this.processPsiMethodsForNode(
+        node,
+        isStatic = false,
+        isInterface = false)(res += _)
     }
     res.toArray
   }

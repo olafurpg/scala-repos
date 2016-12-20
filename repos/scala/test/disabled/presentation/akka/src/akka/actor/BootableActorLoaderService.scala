@@ -44,8 +44,9 @@ trait BootableActorLoaderService extends Bootable {
         val toDeploy = filesToDeploy.map(_.toURI.toURL)
         val allJars = toDeploy ::: dependencyJars
 
-        new URLClassLoader(allJars.toArray,
-                           Thread.currentThread.getContextClassLoader)
+        new URLClassLoader(
+          allJars.toArray,
+          Thread.currentThread.getContextClassLoader)
       } else Thread.currentThread.getContextClassLoader
     })
 

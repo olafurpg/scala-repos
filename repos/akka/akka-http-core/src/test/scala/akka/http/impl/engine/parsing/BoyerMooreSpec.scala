@@ -82,8 +82,9 @@ class BoyerMooreSpec extends WordSpec with Matchers {
         case NotEnoughDataException ⇒ -1
       }
       if (ix >= 0)
-        rec(if (skipFindsThatStartInFinds) ix + needle.length else ix + 1,
-            result :+ ix)
+        rec(
+          if (skipFindsThatStartInFinds) ix + needle.length else ix + 1,
+          result :+ ix)
       else result
     }
     rec(0, Seq.empty)

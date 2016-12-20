@@ -59,8 +59,9 @@ object FactorialFrontend {
       "Factorials will start when 2 backend members in the cluster.")
     //#registerOnUp
     Cluster(system) registerOnMemberUp {
-      system.actorOf(Props(classOf[FactorialFrontend], upToN, true),
-                     name = "factorialFrontend")
+      system.actorOf(
+        Props(classOf[FactorialFrontend], upToN, true),
+        name = "factorialFrontend")
     }
     //#registerOnUp
 

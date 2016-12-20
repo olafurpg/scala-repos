@@ -101,8 +101,9 @@ object ResourceUtil {
       val baseSet: Set[String] = resource.getSet.getItemList.asScala.toSet
       val consumedSet: Set[String] =
         usedResource.getSet.getItemList.asScala.toSet
-      require(consumedSet subsetOf baseSet,
-              s"$consumedSet must be subset of $baseSet")
+      require(
+        consumedSet subsetOf baseSet,
+        s"$consumedSet must be subset of $baseSet")
 
       val resultSet: Set[String] = baseSet -- consumedSet
 
@@ -122,8 +123,9 @@ object ResourceUtil {
       case MesosProtos.Value.Type.SET => consumeSetResource
 
       case unexpectedResourceType: MesosProtos.Value.Type =>
-        log.warn("unexpected resourceType {} for resource {}",
-                 Seq(unexpectedResourceType, resource.getName): _*)
+        log.warn(
+          "unexpected resourceType {} for resource {}",
+          Seq(unexpectedResourceType, resource.getName): _*)
         // we don't know the resource, thus we consume it completely
         None
     }
@@ -144,19 +146,21 @@ object ResourceUtil {
           usedResources.foldLeft(Some(resource): Option[MesosProtos.Resource]) {
             case (Some(resource), usedResource) =>
               if (resource.getType != usedResource.getType) {
-                log.warn("Different resource types for resource {}: {} and {}",
-                         resource.getName,
-                         resource.getType,
-                         usedResource.getType)
+                log.warn(
+                  "Different resource types for resource {}: {} and {}",
+                  resource.getName,
+                  resource.getType,
+                  usedResource.getType)
                 None
               } else
                 try ResourceUtil.consumeResource(resource, usedResource)
                 catch {
                   case NonFatal(e) =>
-                    log.warn("while consuming {} of type {}",
-                             resource.getName,
-                             resource.getType,
-                             e)
+                    log.warn(
+                      "while consuming {} of type {}",
+                      resource.getName,
+                      resource.getType,
+                      e)
                     None
                 }
             case (None, _) => None

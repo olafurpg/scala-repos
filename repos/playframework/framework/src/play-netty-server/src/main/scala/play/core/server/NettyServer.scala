@@ -108,8 +108,9 @@ class NettyServer(
       .filterNot(_.getKey.startsWith("child."))
       .foreach { option =>
         if (ChannelOption.exists(option.getKey)) {
-          setOption(ChannelOption.valueOf(option.getKey),
-                    unwrap(option.getValue))
+          setOption(
+            ChannelOption.valueOf(option.getKey),
+            unwrap(option.getValue))
         } else {
           logger.warn(
             "Ignoring unknown Netty channel option: " + option.getKey)
@@ -165,8 +166,9 @@ class NettyServer(
         .config()
         .setOption(ChannelOption.AUTO_READ, java.lang.Boolean.FALSE)
 
-      setOptions(connChannel.config().setOption,
-                 nettyConfig.getConfig("option.child"))
+      setOptions(
+        connChannel.config().setOption,
+        nettyConfig.getConfig("option.child"))
 
       val pipeline = connChannel.pipeline()
       if (secure) {
@@ -188,10 +190,12 @@ class NettyServer(
       }
 
       // Netty HTTP decoders/encoders/etc
-      pipeline.addLast("decoder",
-                       new HttpRequestDecoder(maxInitialLineLength,
-                                              maxHeaderSize,
-                                              maxChunkSize))
+      pipeline.addLast(
+        "decoder",
+        new HttpRequestDecoder(
+          maxInitialLineLength,
+          maxHeaderSize,
+          maxChunkSize))
       pipeline.addLast("encoder", new HttpResponseEncoder())
       pipeline.addLast("decompressor", new HttpContentDecompressor())
       if (logWire) {
@@ -201,9 +205,10 @@ class NettyServer(
       val requestHandler = new PlayRequestHandler(this)
 
       // Use the streams handler to close off the connection.
-      pipeline.addLast("http-handler",
-                       new HttpStreamsServerHandler(
-                         Seq[ChannelHandler](requestHandler).asJava))
+      pipeline.addLast(
+        "http-handler",
+        new HttpStreamsServerHandler(
+          Seq[ChannelHandler](requestHandler).asJava))
 
       pipeline.addLast("request-handler", requestHandler)
 
@@ -328,10 +333,11 @@ object NettyServer {
     */
   def fromApplication(application: Application,
                       config: ServerConfig = ServerConfig()): NettyServer = {
-    new NettyServer(config,
-                    ApplicationProvider(application),
-                    () => Future.successful(()),
-                    application.actorSystem)(application.materializer)
+    new NettyServer(
+      config,
+      ApplicationProvider(application),
+      () => Future.successful(()),
+      application.actorSystem)(application.materializer)
   }
 
   /**
@@ -354,10 +360,11 @@ trait NettyServerComponents {
   lazy val server: NettyServer = {
     // Start the application first
     Play.start(application)
-    new NettyServer(serverConfig,
-                    ApplicationProvider(application),
-                    serverStopHook,
-                    application.actorSystem)(application.materializer)
+    new NettyServer(
+      serverConfig,
+      ApplicationProvider(application),
+      serverStopHook,
+      application.actorSystem)(application.materializer)
   }
 
   lazy val environment: Environment =

@@ -135,8 +135,9 @@ class DataFrameFunctionsSuite extends QueryTest with SharedSQLContext {
   }
 
   test("bitwiseNOT") {
-    checkAnswer(testData2.select(bitwiseNOT($"a")),
-                testData2.collect().toSeq.map(r => Row(~r.getInt(0))))
+    checkAnswer(
+      testData2.select(bitwiseNOT($"a")),
+      testData2.collect().toSeq.map(r => Row(~r.getInt(0))))
   }
 
   test("bin") {
@@ -147,51 +148,64 @@ class DataFrameFunctionsSuite extends QueryTest with SharedSQLContext {
 
   test("if function") {
     val df = Seq((1, 2)).toDF("a", "b")
-    checkAnswer(df.selectExpr("if(a = 1, 'one', 'not_one')",
-                              "if(b = 1, 'one', 'not_one')"),
-                Row("one", "not_one"))
+    checkAnswer(
+      df.selectExpr(
+        "if(a = 1, 'one', 'not_one')",
+        "if(b = 1, 'one', 'not_one')"),
+      Row("one", "not_one"))
   }
 
   test("nvl function") {
-    checkAnswer(sql("SELECT nvl(null, 'x'), nvl('y', 'x'), nvl(null, null)"),
-                Row("x", "y", null))
+    checkAnswer(
+      sql("SELECT nvl(null, 'x'), nvl('y', 'x'), nvl(null, null)"),
+      Row("x", "y", null))
   }
 
   test("misc md5 function") {
     val df = Seq(("ABC", Array[Byte](1, 2, 3, 4, 5, 6))).toDF("a", "b")
-    checkAnswer(df.select(md5($"a"), md5($"b")),
-                Row("902fbdd2b1df0c4f70b4a5d23525e932",
-                    "6ac1e56bc78f031059be7be854522c4c"))
+    checkAnswer(
+      df.select(md5($"a"), md5($"b")),
+      Row(
+        "902fbdd2b1df0c4f70b4a5d23525e932",
+        "6ac1e56bc78f031059be7be854522c4c"))
 
-    checkAnswer(df.selectExpr("md5(a)", "md5(b)"),
-                Row("902fbdd2b1df0c4f70b4a5d23525e932",
-                    "6ac1e56bc78f031059be7be854522c4c"))
+    checkAnswer(
+      df.selectExpr("md5(a)", "md5(b)"),
+      Row(
+        "902fbdd2b1df0c4f70b4a5d23525e932",
+        "6ac1e56bc78f031059be7be854522c4c"))
   }
 
   test("misc sha1 function") {
     val df =
       Seq(("ABC", "ABC".getBytes(StandardCharsets.UTF_8))).toDF("a", "b")
-    checkAnswer(df.select(sha1($"a"), sha1($"b")),
-                Row("3c01bdbb26f358bab27f267924aa2c9a03fcfdb8",
-                    "3c01bdbb26f358bab27f267924aa2c9a03fcfdb8"))
+    checkAnswer(
+      df.select(sha1($"a"), sha1($"b")),
+      Row(
+        "3c01bdbb26f358bab27f267924aa2c9a03fcfdb8",
+        "3c01bdbb26f358bab27f267924aa2c9a03fcfdb8"))
 
     val dfEmpty = Seq(("", "".getBytes(StandardCharsets.UTF_8))).toDF("a", "b")
-    checkAnswer(dfEmpty.selectExpr("sha1(a)", "sha1(b)"),
-                Row("da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                    "da39a3ee5e6b4b0d3255bfef95601890afd80709"))
+    checkAnswer(
+      dfEmpty.selectExpr("sha1(a)", "sha1(b)"),
+      Row(
+        "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "da39a3ee5e6b4b0d3255bfef95601890afd80709"))
   }
 
   test("misc sha2 function") {
     val df = Seq(("ABC", Array[Byte](1, 2, 3, 4, 5, 6))).toDF("a", "b")
     checkAnswer(
       df.select(sha2($"a", 256), sha2($"b", 256)),
-      Row("b5d4045c3f466fa91fe2cc6abe79232a1a57cdf104f7a26e716e0a1e2789df78",
-          "7192385c3c0605de55bb9476ce1d90748190ecb32a8eed7f5207b30cf6a1fe89"))
+      Row(
+        "b5d4045c3f466fa91fe2cc6abe79232a1a57cdf104f7a26e716e0a1e2789df78",
+        "7192385c3c0605de55bb9476ce1d90748190ecb32a8eed7f5207b30cf6a1fe89"))
 
     checkAnswer(
       df.selectExpr("sha2(a, 256)", "sha2(b, 256)"),
-      Row("b5d4045c3f466fa91fe2cc6abe79232a1a57cdf104f7a26e716e0a1e2789df78",
-          "7192385c3c0605de55bb9476ce1d90748190ecb32a8eed7f5207b30cf6a1fe89"))
+      Row(
+        "b5d4045c3f466fa91fe2cc6abe79232a1a57cdf104f7a26e716e0a1e2789df78",
+        "7192385c3c0605de55bb9476ce1d90748190ecb32a8eed7f5207b30cf6a1fe89"))
 
     intercept[IllegalArgumentException] {
       df.select(sha2($"a", 1024))
@@ -200,18 +214,21 @@ class DataFrameFunctionsSuite extends QueryTest with SharedSQLContext {
 
   test("misc crc32 function") {
     val df = Seq(("ABC", Array[Byte](1, 2, 3, 4, 5, 6))).toDF("a", "b")
-    checkAnswer(df.select(crc32($"a"), crc32($"b")),
-                Row(2743272264L, 2180413220L))
+    checkAnswer(
+      df.select(crc32($"a"), crc32($"b")),
+      Row(2743272264L, 2180413220L))
 
-    checkAnswer(df.selectExpr("crc32(a)", "crc32(b)"),
-                Row(2743272264L, 2180413220L))
+    checkAnswer(
+      df.selectExpr("crc32(a)", "crc32(b)"),
+      Row(2743272264L, 2180413220L))
   }
 
   test("string function find_in_set") {
     val df = Seq(("abc,b,ab,c,def", "abc,b,ab,c,def")).toDF("a", "b")
 
-    checkAnswer(df.selectExpr("find_in_set('ab', a)", "find_in_set('x', b)"),
-                Row(3, 0))
+    checkAnswer(
+      df.selectExpr("find_in_set('ab', a)", "find_in_set('x', b)"),
+      Row(3, 0))
   }
 
   test("conditional function: least") {
@@ -281,27 +298,31 @@ class DataFrameFunctionsSuite extends QueryTest with SharedSQLContext {
     ).toDF("a", "b")
     checkAnswer(
       df.select(sort_array($"a"), sort_array($"b")),
-      Seq(Row(Seq(1, 2, 3), Seq("a", "b", "c")),
-          Row(Seq[Int](), Seq[String]()),
-          Row(null, null))
+      Seq(
+        Row(Seq(1, 2, 3), Seq("a", "b", "c")),
+        Row(Seq[Int](), Seq[String]()),
+        Row(null, null))
     )
     checkAnswer(
       df.select(sort_array($"a", false), sort_array($"b", false)),
-      Seq(Row(Seq(3, 2, 1), Seq("c", "b", "a")),
-          Row(Seq[Int](), Seq[String]()),
-          Row(null, null))
+      Seq(
+        Row(Seq(3, 2, 1), Seq("c", "b", "a")),
+        Row(Seq[Int](), Seq[String]()),
+        Row(null, null))
     )
     checkAnswer(
       df.selectExpr("sort_array(a)", "sort_array(b)"),
-      Seq(Row(Seq(1, 2, 3), Seq("a", "b", "c")),
-          Row(Seq[Int](), Seq[String]()),
-          Row(null, null))
+      Seq(
+        Row(Seq(1, 2, 3), Seq("a", "b", "c")),
+        Row(Seq[Int](), Seq[String]()),
+        Row(null, null))
     )
     checkAnswer(
       df.selectExpr("sort_array(a, true)", "sort_array(b, false)"),
-      Seq(Row(Seq(1, 2, 3), Seq("c", "b", "a")),
-          Row(Seq[Int](), Seq[String]()),
-          Row(null, null))
+      Seq(
+        Row(Seq(1, 2, 3), Seq("c", "b", "a")),
+        Row(Seq[Int](), Seq[String]()),
+        Row(null, null))
     )
 
     val df2 =
@@ -310,8 +331,9 @@ class DataFrameFunctionsSuite extends QueryTest with SharedSQLContext {
     checkAnswer(
       df2.selectExpr("sort_array(a, true)", "sort_array(a, false)"),
       Seq(
-        Row(Seq[Seq[Int]](null, Seq(1), Seq(2), Seq(2, 4)),
-            Seq[Seq[Int]](Seq(2, 4), Seq(2), Seq(1), null)))
+        Row(
+          Seq[Seq[Int]](null, Seq(1), Seq(2), Seq(2, 4)),
+          Seq[Seq[Int]](Seq(2, 4), Seq(2), Seq(1), null)))
     )
 
     val df3 = Seq(("xxx", "x")).toDF("a", "b")

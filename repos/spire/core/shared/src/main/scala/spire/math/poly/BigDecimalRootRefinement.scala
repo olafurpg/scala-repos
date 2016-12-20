@@ -76,8 +76,9 @@ object BigDecimalRootRefinement {
     val upoly = poly.map { n =>
       new BigDecimal(n.bigDecimal, MathContext.UNLIMITED)
     }
-    BigDecimalRootRefinement(AbsoluteContext(upoly),
-                             Unbounded(lowerBound, upperBound))
+    BigDecimalRootRefinement(
+      AbsoluteContext(upoly),
+      Unbounded(lowerBound, upperBound))
   }
 
   def apply(poly: Polynomial[BigDecimal],
@@ -199,8 +200,9 @@ object BigDecimalRootRefinement {
       poly
         .mapTerms {
           case Term(coeff, k) =>
-            val a = BigDecimal(h.denominator.toBigInteger.pow(n - k),
-                               MathContext.UNLIMITED)
+            val a = BigDecimal(
+              h.denominator.toBigInteger.pow(n - k),
+              MathContext.UNLIMITED)
             Term(coeff * a, k)
         }
         .compose(Polynomial.linear[BigDecimal](
@@ -240,10 +242,11 @@ object BigDecimalRootRefinement {
             ExactRoot(lx)
           } else {
             // We try to push lx up a bit to get the sign to change.
-            adjust(lx.add(JBigDecimal.valueOf(1, getEps(lx))),
-                   Some(ly),
-                   rx,
-                   Some(ry))
+            adjust(
+              lx.add(JBigDecimal.valueOf(1, getEps(lx))),
+              Some(ly),
+              rx,
+              Some(ry))
           }
         } else if (ry.signum == 0) {
           if (qrx < upperBound) {
@@ -251,10 +254,11 @@ object BigDecimalRootRefinement {
             ExactRoot(rx)
           } else {
             // We try to push rx down a bit to get the sign to change.
-            adjust(lx,
-                   Some(ly),
-                   rx.subtract(JBigDecimal.valueOf(1, getEps(rx))),
-                   Some(ry))
+            adjust(
+              lx,
+              Some(ly),
+              rx.subtract(JBigDecimal.valueOf(1, getEps(rx))),
+              Some(ry))
           }
         } else if (ry.signum == ly.signum) {
           // We've managed to overshoot the actual root, but since we're still

@@ -20,8 +20,9 @@ class ZkAnnouncerTest extends FunSuite with BeforeAndAfter {
   var inst: ZkInstance = _
   val factory = new ZkClientFactory(zkTimeout)
 
-  implicit val patienceConfig = PatienceConfig(timeout = toSpan(zkTimeout * 3),
-                                               interval = toSpan(zkTimeout))
+  implicit val patienceConfig = PatienceConfig(
+    timeout = toSpan(zkTimeout * 3),
+    interval = toSpan(zkTimeout))
 
   before {
     inst = new ZkInstance

@@ -103,39 +103,43 @@ class SequenceFileRDDFunctions[K <% Writable: ClassTag,
       val format = classOf[SequenceFileOutputFormat[Writable, Writable]]
       val jobConf = new JobConf(self.context.hadoopConfiguration)
       if (!convertKey && !convertValue) {
-        self.saveAsHadoopFile(path,
-                              keyWritableClass,
-                              valueWritableClass,
-                              format,
-                              jobConf,
-                              codec)
+        self.saveAsHadoopFile(
+          path,
+          keyWritableClass,
+          valueWritableClass,
+          format,
+          jobConf,
+          codec)
       } else if (!convertKey && convertValue) {
         self
           .map(x => (x._1, anyToWritable(x._2)))
-          .saveAsHadoopFile(path,
-                            keyWritableClass,
-                            valueWritableClass,
-                            format,
-                            jobConf,
-                            codec)
+          .saveAsHadoopFile(
+            path,
+            keyWritableClass,
+            valueWritableClass,
+            format,
+            jobConf,
+            codec)
       } else if (convertKey && !convertValue) {
         self
           .map(x => (anyToWritable(x._1), x._2))
-          .saveAsHadoopFile(path,
-                            keyWritableClass,
-                            valueWritableClass,
-                            format,
-                            jobConf,
-                            codec)
+          .saveAsHadoopFile(
+            path,
+            keyWritableClass,
+            valueWritableClass,
+            format,
+            jobConf,
+            codec)
       } else if (convertKey && convertValue) {
         self
           .map(x => (anyToWritable(x._1), anyToWritable(x._2)))
-          .saveAsHadoopFile(path,
-                            keyWritableClass,
-                            valueWritableClass,
-                            format,
-                            jobConf,
-                            codec)
+          .saveAsHadoopFile(
+            path,
+            keyWritableClass,
+            valueWritableClass,
+            format,
+            jobConf,
+            codec)
       }
     }
 }

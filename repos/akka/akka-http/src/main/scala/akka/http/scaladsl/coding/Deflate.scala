@@ -140,9 +140,10 @@ abstract class DeflateDecompressorBase(
         if (read > 0) {
           afterBytesRead(buffer, 0, read)
           val next = if (inflater.finished()) afterInflate else this
-          ParseResult(Some(ByteString.fromArray(buffer, 0, read)),
-                      next,
-                      noPostProcessing)
+          ParseResult(
+            Some(ByteString.fromArray(buffer, 0, read)),
+            next,
+            noPostProcessing)
         } else {
           if (inflater.finished())
             ParseResult(None, afterInflate, noPostProcessing)

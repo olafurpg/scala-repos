@@ -66,46 +66,48 @@ class StringConcatTest extends ClearAfterClass {
       getSingleMethod(c, m).instructions collect {
         case Invoke(_, _, name, desc, _) => name + desc
       }
-    assertEquals(invokeNameDesc("t1"),
-                 List(
-                   "<init>()V",
-                   "append(Ljava/lang/String;)Ljava/lang/StringBuilder;",
-                   "append(Ljava/lang/Object;)Ljava/lang/StringBuilder;",
-                   "append(Ljava/lang/Object;)Ljava/lang/StringBuilder;",
-                   "append(Z)Ljava/lang/StringBuilder;",
-                   "append(C)Ljava/lang/StringBuilder;",
-                   "append(I)Ljava/lang/StringBuilder;",
-                   "append(I)Ljava/lang/StringBuilder;",
-                   "append(I)Ljava/lang/StringBuilder;",
-                   "append(F)Ljava/lang/StringBuilder;",
-                   "append(J)Ljava/lang/StringBuilder;",
-                   "append(D)Ljava/lang/StringBuilder;",
-                   "append(Ljava/lang/StringBuffer;)Ljava/lang/StringBuilder;",
-                   "append(Ljava/lang/CharSequence;)Ljava/lang/StringBuilder;",
-                   "append(Ljava/lang/Object;)Ljava/lang/StringBuilder;", // test that we're not using the [C overload
-                   "toString()Ljava/lang/String;"
-                 ))
+    assertEquals(
+      invokeNameDesc("t1"),
+      List(
+        "<init>()V",
+        "append(Ljava/lang/String;)Ljava/lang/StringBuilder;",
+        "append(Ljava/lang/Object;)Ljava/lang/StringBuilder;",
+        "append(Ljava/lang/Object;)Ljava/lang/StringBuilder;",
+        "append(Z)Ljava/lang/StringBuilder;",
+        "append(C)Ljava/lang/StringBuilder;",
+        "append(I)Ljava/lang/StringBuilder;",
+        "append(I)Ljava/lang/StringBuilder;",
+        "append(I)Ljava/lang/StringBuilder;",
+        "append(F)Ljava/lang/StringBuilder;",
+        "append(J)Ljava/lang/StringBuilder;",
+        "append(D)Ljava/lang/StringBuilder;",
+        "append(Ljava/lang/StringBuffer;)Ljava/lang/StringBuilder;",
+        "append(Ljava/lang/CharSequence;)Ljava/lang/StringBuilder;",
+        "append(Ljava/lang/Object;)Ljava/lang/StringBuilder;", // test that we're not using the [C overload
+        "toString()Ljava/lang/String;"
+      ))
 
-    assertEquals(invokeNameDesc("t2"),
-                 List(
-                   "<init>()V",
-                   "any2stringadd(Ljava/lang/Object;)Ljava/lang/Object;",
-                   "$plus$extension(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/String;",
-                   "append(Ljava/lang/String;)Ljava/lang/StringBuilder;",
-                   "append(Ljava/lang/Object;)Ljava/lang/StringBuilder;",
-                   "append(Z)Ljava/lang/StringBuilder;",
-                   "append(C)Ljava/lang/StringBuilder;",
-                   "append(I)Ljava/lang/StringBuilder;",
-                   "append(I)Ljava/lang/StringBuilder;",
-                   "append(I)Ljava/lang/StringBuilder;",
-                   "append(F)Ljava/lang/StringBuilder;",
-                   "append(J)Ljava/lang/StringBuilder;",
-                   "append(D)Ljava/lang/StringBuilder;",
-                   "append(Ljava/lang/StringBuffer;)Ljava/lang/StringBuilder;",
-                   "append(Ljava/lang/CharSequence;)Ljava/lang/StringBuilder;",
-                   "append(Ljava/lang/Object;)Ljava/lang/StringBuilder;", // test that we're not using the [C overload
-                   "toString()Ljava/lang/String;"
-                 ))
+    assertEquals(
+      invokeNameDesc("t2"),
+      List(
+        "<init>()V",
+        "any2stringadd(Ljava/lang/Object;)Ljava/lang/Object;",
+        "$plus$extension(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/String;",
+        "append(Ljava/lang/String;)Ljava/lang/StringBuilder;",
+        "append(Ljava/lang/Object;)Ljava/lang/StringBuilder;",
+        "append(Z)Ljava/lang/StringBuilder;",
+        "append(C)Ljava/lang/StringBuilder;",
+        "append(I)Ljava/lang/StringBuilder;",
+        "append(I)Ljava/lang/StringBuilder;",
+        "append(I)Ljava/lang/StringBuilder;",
+        "append(F)Ljava/lang/StringBuilder;",
+        "append(J)Ljava/lang/StringBuilder;",
+        "append(D)Ljava/lang/StringBuilder;",
+        "append(Ljava/lang/StringBuffer;)Ljava/lang/StringBuilder;",
+        "append(Ljava/lang/CharSequence;)Ljava/lang/StringBuilder;",
+        "append(Ljava/lang/Object;)Ljava/lang/StringBuilder;", // test that we're not using the [C overload
+        "toString()Ljava/lang/String;"
+      ))
   }
 
   @Test
@@ -132,19 +134,20 @@ class StringConcatTest extends ClearAfterClass {
     }
     def sbuf = { val r = new java.lang.StringBuffer(); r.append("sbuf"); r }
     def chsq: java.lang.CharSequence = "chsq"
-    val s = t((),
-              true,
-              'd',
-              3: Byte,
-              12: Short,
-              3,
-              -32l,
-              12.3f,
-              -4.2d,
-              "me",
-              sbuf,
-              chsq,
-              Array('a', 'b'))
+    val s = t(
+      (),
+      true,
+      'd',
+      3: Byte,
+      12: Short,
+      3,
+      -32l,
+      12.3f,
+      -4.2d,
+      "me",
+      sbuf,
+      chsq,
+      Array('a', 'b'))
     val r = s.replaceAll("""\[C@\w+""", "<ARRAY>")
     assertEquals(
       r,

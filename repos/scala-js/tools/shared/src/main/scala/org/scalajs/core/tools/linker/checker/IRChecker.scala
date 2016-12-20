@@ -89,12 +89,14 @@ private final class IRChecker(unit: LinkingUnit, logger: Logger) {
 
         member.tree match {
           case m: MethodDef =>
-            assert(m.name.isInstanceOf[StringLiteral],
-                   "Exported method must have StringLiteral as name")
+            assert(
+              m.name.isInstanceOf[StringLiteral],
+              "Exported method must have StringLiteral as name")
             checkExportedMethodDef(m, classDef)
           case p: PropertyDef =>
-            assert(p.name.isInstanceOf[StringLiteral],
-                   "Exported property must have StringLiteral as name")
+            assert(
+              p.name.isInstanceOf[StringLiteral],
+              "Exported property must have StringLiteral as name")
             checkExportedPropertyDef(p, classDef)
           // Anything else is illegal
           case _ =>
@@ -141,8 +143,9 @@ private final class IRChecker(unit: LinkingUnit, logger: Logger) {
       implicit val ctx = ErrorContext(tree)
 
       assert(!tree.static, "Member or abstract method may not be static")
-      assert(tree.name.isInstanceOf[Ident],
-             "Normal method must have Ident as name")
+      assert(
+        tree.name.isInstanceOf[Ident],
+        "Normal method must have Ident as name")
 
       checkMethodDef(tree, classDef)
     }
@@ -609,11 +612,12 @@ private final class IRChecker(unit: LinkingUnit, logger: Logger) {
       case New(cls, ctor, args) =>
         val clazz = lookupClass(cls)
         if (!clazz.kind.isClass) reportError(s"new $cls which is not a class")
-        checkApplyGeneric(ctor.name,
-                          s"$cls.$ctor",
-                          args,
-                          NoType,
-                          isStatic = false)
+        checkApplyGeneric(
+          ctor.name,
+          s"$cls.$ctor",
+          args,
+          NoType,
+          isStatic = false)
 
       case LoadModule(cls) =>
         if (!cls.className.endsWith("$"))
@@ -647,27 +651,30 @@ private final class IRChecker(unit: LinkingUnit, logger: Logger) {
 
       case Apply(receiver, Ident(method, _), args) =>
         val receiverType = typecheckExpr(receiver, env)
-        checkApplyGeneric(method,
-                          s"$receiverType.$method",
-                          args,
-                          tree.tpe,
-                          isStatic = false)
+        checkApplyGeneric(
+          method,
+          s"$receiverType.$method",
+          args,
+          tree.tpe,
+          isStatic = false)
 
       case ApplyStatically(receiver, cls, Ident(method, _), args) =>
         typecheckExpect(receiver, env, cls)
-        checkApplyGeneric(method,
-                          s"$cls.$method",
-                          args,
-                          tree.tpe,
-                          isStatic = false)
+        checkApplyGeneric(
+          method,
+          s"$cls.$method",
+          args,
+          tree.tpe,
+          isStatic = false)
 
       case ApplyStatic(cls, Ident(method, _), args) =>
         val clazz = lookupClass(cls)
-        checkApplyGeneric(method,
-                          s"$cls.$method",
-                          args,
-                          tree.tpe,
-                          isStatic = true)
+        checkApplyGeneric(
+          method,
+          s"$cls.$method",
+          args,
+          tree.tpe,
+          isStatic = true)
 
       case UnaryOp(op, lhs) =>
         import UnaryOp._
@@ -950,12 +957,13 @@ private final class IRChecker(unit: LinkingUnit, logger: Logger) {
       implicit ctx: ErrorContext): CheckedClass = {
     classes.getOrElseUpdate(className, {
       reportError(s"Cannot find class $className")
-      new CheckedClass(className,
-                       ClassKind.Class,
-                       Some(ObjectClass),
-                       Set(ObjectClass),
-                       None,
-                       Nil)
+      new CheckedClass(
+        className,
+        ClassKind.Class,
+        Some(ObjectClass),
+        Set(ObjectClass),
+        None,
+        Nil)
     })
   }
 
@@ -993,28 +1001,32 @@ private final class IRChecker(unit: LinkingUnit, logger: Logger) {
       new Env(thisTpe, this.locals, this.returnTypes, this.inConstructor)
 
     def withLocal(localDef: LocalDef): Env =
-      new Env(thisTpe,
-              locals + (localDef.name -> localDef),
-              returnTypes,
-              this.inConstructor)
+      new Env(
+        thisTpe,
+        locals + (localDef.name -> localDef),
+        returnTypes,
+        this.inConstructor)
 
     def withLocals(localDefs: TraversableOnce[LocalDef]): Env =
-      new Env(thisTpe,
-              locals ++ localDefs.map(d => d.name -> d),
-              returnTypes,
-              this.inConstructor)
+      new Env(
+        thisTpe,
+        locals ++ localDefs.map(d => d.name -> d),
+        returnTypes,
+        this.inConstructor)
 
     def withReturnType(returnType: Type): Env =
-      new Env(this.thisTpe,
-              this.locals,
-              returnTypes + (None -> returnType),
-              this.inConstructor)
+      new Env(
+        this.thisTpe,
+        this.locals,
+        returnTypes + (None -> returnType),
+        this.inConstructor)
 
     def withLabeledReturnType(label: String, returnType: Type): Env =
-      new Env(this.thisTpe,
-              this.locals,
-              returnTypes + (Some(label) -> returnType),
-              this.inConstructor)
+      new Env(
+        this.thisTpe,
+        this.locals,
+        returnTypes + (Some(label) -> returnType),
+        this.inConstructor)
 
     def withInConstructor(inConstructor: Boolean): Env =
       new Env(this.thisTpe, this.locals, this.returnTypes, inConstructor)
@@ -1030,10 +1042,11 @@ private final class IRChecker(unit: LinkingUnit, logger: Logger) {
       val paramLocalDefs =
         for (p @ ParamDef(name, tpe, mutable, _) <- params)
           yield name.name -> LocalDef(name.name, tpe, mutable)(p.pos)
-      new Env(thisType,
-              paramLocalDefs.toMap,
-              Map(None -> (if (resultType == NoType) AnyType else resultType)),
-              isConstructor)
+      new Env(
+        thisType,
+        paramLocalDefs.toMap,
+        Map(None -> (if (resultType == NoType) AnyType else resultType)),
+        isConstructor)
     }
   }
 
@@ -1050,13 +1063,14 @@ private final class IRChecker(unit: LinkingUnit, logger: Logger) {
     lazy val superClass = superClassName.map(classes)
 
     def this(classDef: LinkedClass)(implicit ctx: ErrorContext) = {
-      this(classDef.name.name,
-           classDef.kind,
-           classDef.superClass.map(_.name),
-           classDef.ancestors.toSet,
-           classDef.jsName,
-           if (classDef.kind.isJSClass) Nil
-           else classDef.fields.map(CheckedClass.checkedField))
+      this(
+        classDef.name.name,
+        classDef.kind,
+        classDef.superClass.map(_.name),
+        classDef.ancestors.toSet,
+        classDef.jsName,
+        if (classDef.kind.isJSClass) Nil
+        else classDef.fields.map(CheckedClass.checkedField))
     }
 
     def isAncestorOfHijackedClass: Boolean =

@@ -63,10 +63,11 @@ abstract class HiveQueryFileTest extends HiveComparisonTest {
                    .reduceLeft(_ || _) || runAll) {
         // Build a test case and submit it to scala test framework...
         val queriesString = fileToString(testCaseFile)
-        createQueryTest(testCaseName,
-                        queriesString,
-                        reset = true,
-                        tryWithoutResettingFirst = true)
+        createQueryTest(
+          testCaseName,
+          queriesString,
+          reset = true,
+          tryWithoutResettingFirst = true)
       } else {
         // Only output warnings for the built in whitelist as this clutters the output when the user
         // trying to execute a single test from the commandline.

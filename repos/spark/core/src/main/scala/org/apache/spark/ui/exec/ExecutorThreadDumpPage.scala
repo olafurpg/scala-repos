@@ -103,8 +103,9 @@ private[ui] class ExecutorThreadDumpPage(parent: ExecutorsTab)
     </div>
       }
       .getOrElse(Text("Error fetching thread dump"))
-    UIUtils.headerSparkPage(s"Thread dump for executor $executorId",
-                            content,
-                            parent)
+    UIUtils.headerSparkPage(
+      s"Thread dump for executor $executorId",
+      content,
+      parent)
   }
 }

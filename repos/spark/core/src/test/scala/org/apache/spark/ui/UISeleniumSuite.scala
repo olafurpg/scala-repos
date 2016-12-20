@@ -285,11 +285,12 @@ class UISeleniumSuite
           val mapId = 0
           val reduceId = taskContext.partitionId()
           val message = "Simulated fetch failure"
-          throw new FetchFailedException(bmAddress,
-                                         shuffleId,
-                                         mapId,
-                                         reduceId,
-                                         message)
+          throw new FetchFailedException(
+            bmAddress,
+            shuffleId,
+            mapId,
+            reduceId,
+            message)
         } else {
           x
         }

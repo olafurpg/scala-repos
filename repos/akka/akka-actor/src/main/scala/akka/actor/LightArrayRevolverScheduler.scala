@@ -44,15 +44,17 @@ class LightArrayRevolverScheduler(config: Config,
 
   val WheelSize = config
     .getInt("akka.scheduler.ticks-per-wheel")
-    .requiring(ticks ⇒ (ticks & (ticks - 1)) == 0,
-               "ticks-per-wheel must be a power of 2")
+    .requiring(
+      ticks ⇒ (ticks & (ticks - 1)) == 0,
+      "ticks-per-wheel must be a power of 2")
   val TickDuration = config
     .getMillisDuration("akka.scheduler.tick-duration")
     .requiring(
       _ >= 10.millis || !Helpers.isWindows,
       "minimum supported akka.scheduler.tick-duration on Windows is 10ms")
-    .requiring(_ >= 1.millis,
-               "minimum supported akka.scheduler.tick-duration is 1ms")
+    .requiring(
+      _ >= 1.millis,
+      "minimum supported akka.scheduler.tick-duration is 1ms")
   val ShutdownTimeout =
     config.getMillisDuration("akka.scheduler.shutdown-timeout")
 
@@ -112,10 +114,11 @@ class LightArrayRevolverScheduler(config: Config,
                 val driftNanos = clock() - getAndAdd(delay.toNanos)
                 if (self.get != null)
                   swap(
-                    schedule(preparedEC,
-                             this,
-                             Duration.fromNanos(
-                               Math.max(delay.toNanos - driftNanos, 1))))
+                    schedule(
+                      preparedEC,
+                      this,
+                      Duration.fromNanos(
+                        Math.max(delay.toNanos - driftNanos, 1))))
               } catch {
                 case _: SchedulerException ⇒
                 // ignore failure to enqueue or terminated target actor
@@ -279,8 +282,9 @@ class LightArrayRevolverScheduler(config: Config,
                   }
                   timerThread = thread
                 case p ⇒
-                  assert(stopped.compareAndSet(p, Promise successful Nil),
-                         "Stop signal violated in LARS")
+                  assert(
+                    stopped.compareAndSet(p, Promise successful Nil),
+                    "Stop signal violated in LARS")
                   p success clearAll()
               }
               throw t
@@ -319,8 +323,9 @@ class LightArrayRevolverScheduler(config: Config,
           stopped.get match {
             case null ⇒ nextTick()
             case p ⇒
-              assert(stopped.compareAndSet(p, Promise successful Nil),
-                     "Stop signal violated in LARS")
+              assert(
+                stopped.compareAndSet(p, Promise successful Nil),
+                "Stop signal violated in LARS")
               p success clearAll()
           }
         }

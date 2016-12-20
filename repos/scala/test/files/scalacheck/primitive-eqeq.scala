@@ -23,15 +23,16 @@ object Test extends Properties("==") {
 
   property("##") = forAll { (x: Short) =>
     {
-      val anyvals = List(x.toByte,
-                         x.toChar,
-                         x,
-                         x.toInt,
-                         x.toLong,
-                         x.toFloat,
-                         x.toDouble,
-                         BigInt(x),
-                         BigDecimal(x))
+      val anyvals = List(
+        x.toByte,
+        x.toChar,
+        x,
+        x.toInt,
+        x.toLong,
+        x.toFloat,
+        x.toDouble,
+        BigInt(x),
+        BigDecimal(x))
       val shortAndLarger = anyvals drop 2
 
       val result =

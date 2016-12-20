@@ -57,9 +57,10 @@ object BasicIO {
           else Stream.empty
         case Right(s) => Stream.cons(s, next())
       }
-      new Streamed((s: T) => q put Right(s),
-                   code => q put Left(code),
-                   () => next())
+      new Streamed(
+        (s: T) => q put Right(s),
+        code => q put Left(code),
+        () => next())
     }
   }
 

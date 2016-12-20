@@ -10,12 +10,13 @@ import play.core.test._
 object HttpSpec extends Specification {
   "HTTP" title
 
-  val headers = Headers("a" -> "a1",
-                        "a" -> "a2",
-                        "b" -> "b1",
-                        "b" -> "b2",
-                        "B" -> "b3",
-                        "c" -> "c1")
+  val headers = Headers(
+    "a" -> "a1",
+    "a" -> "a2",
+    "b" -> "b1",
+    "b" -> "b2",
+    "B" -> "b3",
+    "c" -> "c1")
 
   "Headers" should {
     "return its headers as a sequence of name-value pairs" in {
@@ -92,32 +93,35 @@ object HttpSpec extends Specification {
     }
 
     "equal other Headers by case insensitive" in {
-      val other = Headers("A" -> "a1",
-                          "a" -> "a2",
-                          "b" -> "b1",
-                          "b" -> "b2",
-                          "B" -> "b3",
-                          "C" -> "c1")
+      val other = Headers(
+        "A" -> "a1",
+        "a" -> "a2",
+        "b" -> "b1",
+        "b" -> "b2",
+        "B" -> "b3",
+        "C" -> "c1")
       (headers must_== other) and (headers.## must_== other.##)
     }
 
     "equal other Headers with same relative order" in {
-      val other = Headers("A" -> "a1",
-                          "a" -> "a2",
-                          "b" -> "b1",
-                          "b" -> "b2",
-                          "B" -> "b3",
-                          "c" -> "c1")
+      val other = Headers(
+        "A" -> "a1",
+        "a" -> "a2",
+        "b" -> "b1",
+        "b" -> "b2",
+        "B" -> "b3",
+        "c" -> "c1")
       (headers must_== other) and (headers.## must_== other.##)
     }
 
     "not equal other Headers with different relative order" in {
-      headers must_!= Headers("a" -> "a2",
-                              "A" -> "a1",
-                              "b" -> "b1",
-                              "b" -> "b2",
-                              "B" -> "b3",
-                              "c" -> "C1")
+      headers must_!= Headers(
+        "a" -> "a2",
+        "A" -> "a1",
+        "b" -> "b1",
+        "b" -> "b2",
+        "B" -> "b3",
+        "c" -> "C1")
     }
   }
 
@@ -129,14 +133,15 @@ object HttpSpec extends Specification {
         "foo=bar; Path=/; HTTPOnly;;bar=qux; Path=/; HTTPOnly")
     }
     "merge and remove duplicates" in withApplication {
-      val cookies = Seq(Cookie("foo", "bar"),
-                        Cookie("foo", "baz"),
-                        Cookie("foo", "bar", domain = Some("Foo")),
-                        Cookie("foo", "baz", domain = Some("FoO")),
-                        Cookie("foo", "baz", secure = true),
-                        Cookie("foo", "baz", httpOnly = false),
-                        Cookie("foo", "bar", path = "/blah"),
-                        Cookie("foo", "baz", path = "/blah"))
+      val cookies = Seq(
+        Cookie("foo", "bar"),
+        Cookie("foo", "baz"),
+        Cookie("foo", "bar", domain = Some("Foo")),
+        Cookie("foo", "baz", domain = Some("FoO")),
+        Cookie("foo", "baz", secure = true),
+        Cookie("foo", "baz", httpOnly = false),
+        Cookie("foo", "bar", path = "/blah"),
+        Cookie("foo", "baz", path = "/blah"))
 
       Cookies.mergeSetCookieHeader("", cookies) must ===(
         "foo=baz; Path=/; Domain=FoO; HTTPOnly" + ";;" +

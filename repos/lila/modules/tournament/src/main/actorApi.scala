@@ -12,9 +12,10 @@ private[tournament] case class Member(channel: JsChannel,
 
 private[tournament] object Member {
   def apply(channel: JsChannel, user: Option[User]): Member =
-    Member(channel = channel,
-           userId = user map (_.id),
-           troll = user.??(_.troll))
+    Member(
+      channel = channel,
+      userId = user map (_.id),
+      troll = user.??(_.troll))
 }
 
 private[tournament] case class Messadata(trollish: Boolean = false)

@@ -223,13 +223,15 @@ object CharPredicate {
             rec(mask, offset, bit + 1, ix + 1)
           } else rec(mask, offset, bit + 1, ix)
         } else ix
-      rec(highMask,
-          64,
-          java.lang.Long.numberOfTrailingZeros(highMask),
-          rec(lowMask,
-              0,
-              java.lang.Long.numberOfTrailingZeros(lowMask),
-              startIx))
+      rec(
+        highMask,
+        64,
+        java.lang.Long.numberOfTrailingZeros(highMask),
+        rec(
+          lowMask,
+          0,
+          java.lang.Long.numberOfTrailingZeros(lowMask),
+          startIx))
     }
 
     override def toString(): String =

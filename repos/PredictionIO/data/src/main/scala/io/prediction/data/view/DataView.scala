@@ -90,10 +90,11 @@ object DataView {
         logger.info("Cached copy not found, reading from DB.")
         // if cached copy is found, use it. If not, grab from Storage
         val result: RDD[E] = PEventStore
-          .find(appName = appName,
-                channelName = channelName,
-                startTime = startTime,
-                untilTime = Some(endTime))(sc)
+          .find(
+            appName = appName,
+            channelName = channelName,
+            startTime = startTime,
+            untilTime = Some(endTime))(sc)
           .flatMap((e) => conversionFunction(e))
         import sqlContext.implicits._ // needed for RDD.toDF()
         val resultDF = result.toDF()

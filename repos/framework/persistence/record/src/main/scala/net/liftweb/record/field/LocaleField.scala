@@ -39,9 +39,10 @@ trait LocaleTypedField extends TypedField[String] {
   def buildDisplayList: List[(String, String)]
 
   private def elem =
-    SHtml.select(buildDisplayList,
-                 Full(valueBox.map(_.toString) openOr ""),
-                 locale => setBox(Full(locale))) %
+    SHtml.select(
+      buildDisplayList,
+      Full(valueBox.map(_.toString) openOr ""),
+      locale => setBox(Full(locale))) %
       ("tabindex" -> tabIndex.toString)
 
   override def toForm: Box[NodeSeq] =

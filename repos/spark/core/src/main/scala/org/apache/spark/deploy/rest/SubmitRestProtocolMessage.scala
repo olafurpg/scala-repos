@@ -41,8 +41,9 @@ import org.apache.spark.util.Utils
   *   (3) an optional message
   */
 @JsonInclude(Include.NON_NULL)
-@JsonAutoDetect(getterVisibility = Visibility.ANY,
-                setterVisibility = Visibility.ANY)
+@JsonAutoDetect(
+  getterVisibility = Visibility.ANY,
+  setterVisibility = Visibility.ANY)
 @JsonPropertyOrder(alphabetic = true)
 private[rest] abstract class SubmitRestProtocolMessage {
   @JsonIgnore

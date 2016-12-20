@@ -58,9 +58,10 @@ class KafkaHealthcheck(
     val updatedEndpoints = advertisedEndpoints.mapValues(
       endpoint =>
         if (endpoint.host == null || endpoint.host.trim.isEmpty)
-          EndPoint(InetAddress.getLocalHost.getCanonicalHostName,
-                   endpoint.port,
-                   endpoint.protocolType)
+          EndPoint(
+            InetAddress.getLocalHost.getCanonicalHostName,
+            endpoint.port,
+            endpoint.protocolType)
         else endpoint)
 
     // the default host and port are here for compatibility with older client
@@ -68,13 +69,14 @@ class KafkaHealthcheck(
     // if the broker doesn't listen on PLAINTEXT protocol, an empty endpoint will be registered and older clients will be unable to connect
     val plaintextEndpoint = updatedEndpoints
       .getOrElse(SecurityProtocol.PLAINTEXT, new EndPoint(null, -1, null))
-    zkUtils.registerBrokerInZk(brokerId,
-                               plaintextEndpoint.host,
-                               plaintextEndpoint.port,
-                               updatedEndpoints,
-                               jmxPort,
-                               rack,
-                               interBrokerProtocolVersion)
+    zkUtils.registerBrokerInZk(
+      brokerId,
+      plaintextEndpoint.host,
+      plaintextEndpoint.port,
+      updatedEndpoints,
+      jmxPort,
+      rack,
+      interBrokerProtocolVersion)
   }
 
   /**

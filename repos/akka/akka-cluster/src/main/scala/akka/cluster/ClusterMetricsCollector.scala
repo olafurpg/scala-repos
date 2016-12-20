@@ -173,12 +173,14 @@ private[cluster] class ClusterMetricsCollector(publisher: ActorRef)
     selectRandomNode((nodes - selfAddress).toVector) foreach gossipTo
 
   def gossipTo(address: Address): Unit =
-    sendGossip(address,
-               MetricsGossipEnvelope(selfAddress, latestGossip, reply = false))
+    sendGossip(
+      address,
+      MetricsGossipEnvelope(selfAddress, latestGossip, reply = false))
 
   def replyGossipTo(address: Address): Unit =
-    sendGossip(address,
-               MetricsGossipEnvelope(selfAddress, latestGossip, reply = true))
+    sendGossip(
+      address,
+      MetricsGossipEnvelope(selfAddress, latestGossip, reply = true))
 
   def sendGossip(address: Address, envelope: MetricsGossipEnvelope): Unit =
     context.actorSelection(self.path.toStringWithAddress(address)) ! envelope
@@ -336,8 +338,9 @@ private[cluster] final case class EWMA(value: Double, alpha: Double) {
   *   averages (e.g. system load average) or finite (e.g. as number of processors), are not trended.
   */
 @SerialVersionUID(1L)
-@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
-            "2.4")
+@deprecated(
+  "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+  "2.4")
 final case class Metric private[cluster] (
     name: String,
     value: Number,
@@ -354,8 +357,9 @@ final case class Metric private[cluster] (
     if (this sameAs latest)
       average match {
         case Some(avg) ⇒
-          copy(value = latest.value,
-               average = Some(avg :+ latest.value.doubleValue))
+          copy(
+            value = latest.value,
+            average = Some(avg :+ latest.value.doubleValue))
         case None if latest.average.isDefined ⇒
           copy(value = latest.value, average = latest.average)
         case _ ⇒ copy(value = latest.value)
@@ -389,8 +393,9 @@ final case class Metric private[cluster] (
 /**
   * Factory for creating valid Metric instances.
   */
-@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
-            "2.4")
+@deprecated(
+  "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+  "2.4")
 object Metric extends MetricNumericConverter {
 
   /**
@@ -434,8 +439,9 @@ object Metric extends MetricNumericConverter {
   * @param metrics the set of sampled [[akka.cluster.Metric]]
   */
 @SerialVersionUID(1L)
-@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
-            "2.4")
+@deprecated(
+  "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+  "2.4")
 final case class NodeMetrics(address: Address,
                              timestamp: Long,
                              metrics: Set[Metric] = Set.empty[Metric]) {
@@ -482,8 +488,9 @@ final case class NodeMetrics(address: Address,
   * The following extractors and data structures makes it easy to consume the
   * [[akka.cluster.NodeMetrics]] in for example load balancers.
   */
-@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
-            "2.4")
+@deprecated(
+  "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+  "2.4")
 object StandardMetrics {
 
   // Constants for the heap related Metric names
@@ -602,8 +609,9 @@ object StandardMetrics {
 
     cpuCombined match {
       case Some(x) ⇒
-        require(0.0 <= x && x <= 1.0,
-                s"cpuCombined must be between [0.0 - 1.0], was [$x]")
+        require(
+          0.0 <= x && x <= 1.0,
+          s"cpuCombined must be between [0.0 - 1.0], was [$x]")
       case None ⇒
     }
   }
@@ -644,8 +652,9 @@ private[cluster] trait MetricNumericConverter {
 /**
   * Implementations of cluster system metrics extends this trait.
   */
-@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
-            "2.4")
+@deprecated(
+  "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+  "2.4")
 trait MetricsCollector extends Closeable {
 
   /**
@@ -662,16 +671,19 @@ trait MetricsCollector extends Closeable {
   * @param address The [[akka.actor.Address]] of the node being sampled
   * @param decay how quickly the exponential weighting of past data is decayed
   */
-@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
-            "2.4")
+@deprecated(
+  "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+  "2.4")
 class JmxMetricsCollector(address: Address, decayFactor: Double)
     extends MetricsCollector {
   import StandardMetrics._
 
   private def this(cluster: Cluster) =
-    this(cluster.selfAddress,
-         EWMA.alpha(cluster.settings.MetricsMovingAverageHalfLife,
-                    cluster.settings.MetricsInterval))
+    this(
+      cluster.selfAddress,
+      EWMA.alpha(
+        cluster.settings.MetricsMovingAverageHalfLife,
+        cluster.settings.MetricsInterval))
 
   /**
     * This constructor is used when creating an instance from configured FQCN
@@ -693,11 +705,12 @@ class JmxMetricsCollector(address: Address, decayFactor: Double)
 
   def metrics: Set[Metric] = {
     val heap = heapMemoryUsage
-    Set(systemLoadAverage,
-        heapUsed(heap),
-        heapCommitted(heap),
-        heapMax(heap),
-        processors).flatten
+    Set(
+      systemLoadAverage,
+      heapUsed(heap),
+      heapCommitted(heap),
+      heapMax(heap),
+      processors).flatten
   }
 
   /**
@@ -707,18 +720,20 @@ class JmxMetricsCollector(address: Address, decayFactor: Double)
     * Creates a new instance each time.
     */
   def systemLoadAverage: Option[Metric] =
-    Metric.create(name = SystemLoadAverage,
-                  value = osMBean.getSystemLoadAverage,
-                  decayFactor = None)
+    Metric.create(
+      name = SystemLoadAverage,
+      value = osMBean.getSystemLoadAverage,
+      decayFactor = None)
 
   /**
     * (JMX) Returns the number of available processors
     * Creates a new instance each time.
     */
   def processors: Option[Metric] =
-    Metric.create(name = Processors,
-                  value = osMBean.getAvailableProcessors,
-                  decayFactor = None)
+    Metric.create(
+      name = Processors,
+      value = osMBean.getAvailableProcessors,
+      decayFactor = None)
 
   /**
     * Current heap to be passed in to heapUsed, heapCommitted and heapMax
@@ -730,9 +745,10 @@ class JmxMetricsCollector(address: Address, decayFactor: Double)
     * Creates a new instance each time.
     */
   def heapUsed(heap: MemoryUsage): Option[Metric] =
-    Metric.create(name = HeapMemoryUsed,
-                  value = heap.getUsed,
-                  decayFactor = decayFactorOption)
+    Metric.create(
+      name = HeapMemoryUsed,
+      value = heap.getUsed,
+      decayFactor = decayFactorOption)
 
   /**
     * (JMX) Returns the current sum of heap memory guaranteed to be available to the JVM
@@ -740,9 +756,10 @@ class JmxMetricsCollector(address: Address, decayFactor: Double)
     * Creates a new instance each time.
     */
   def heapCommitted(heap: MemoryUsage): Option[Metric] =
-    Metric.create(name = HeapMemoryCommitted,
-                  value = heap.getCommitted,
-                  decayFactor = decayFactorOption)
+    Metric.create(
+      name = HeapMemoryCommitted,
+      value = heap.getCommitted,
+      decayFactor = decayFactorOption)
 
   /**
     * (JMX) Returns the maximum amount of memory (in bytes) that can be used
@@ -769,8 +786,9 @@ class JmxMetricsCollector(address: Address, decayFactor: Double)
   * @param decay how quickly the exponential weighting of past data is decayed
   * @param sigar the org.hyperic.Sigar instance
   */
-@deprecated("Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
-            "2.4")
+@deprecated(
+  "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
+  "2.4")
 class SigarMetricsCollector(address: Address,
                             decayFactor: Double,
                             sigar: AnyRef)
@@ -779,12 +797,14 @@ class SigarMetricsCollector(address: Address,
   import StandardMetrics._
 
   private def this(cluster: Cluster) =
-    this(cluster.selfAddress,
-         EWMA.alpha(cluster.settings.MetricsMovingAverageHalfLife,
-                    cluster.settings.MetricsInterval),
-         cluster.system.dynamicAccess
-           .createInstanceFor[AnyRef]("org.hyperic.sigar.Sigar", Nil)
-           .get)
+    this(
+      cluster.selfAddress,
+      EWMA.alpha(
+        cluster.settings.MetricsMovingAverageHalfLife,
+        cluster.settings.MetricsInterval),
+      cluster.system.dynamicAccess
+        .createInstanceFor[AnyRef]("org.hyperic.sigar.Sigar", Nil)
+        .get)
 
   /**
     * This constructor is used when creating an instance from configured FQCN
@@ -832,13 +852,14 @@ class SigarMetricsCollector(address: Address,
     * Creates a new instance each time.
     */
   override def systemLoadAverage: Option[Metric] =
-    Metric.create(name = SystemLoadAverage,
-                  value = Try(
-                    LoadAverage.get
-                      .invoke(sigar)
-                      .asInstanceOf[Array[AnyRef]](0)
-                      .asInstanceOf[Number]),
-                  decayFactor = None) orElse super.systemLoadAverage
+    Metric.create(
+      name = SystemLoadAverage,
+      value = Try(
+        LoadAverage.get
+          .invoke(sigar)
+          .asInstanceOf[Array[AnyRef]](0)
+          .asInstanceOf[Number]),
+      decayFactor = None) orElse super.systemLoadAverage
 
   /**
     * (SIGAR) Returns the combined CPU sum of User + Sys + Nice + Wait, in percentage. This metric can describe

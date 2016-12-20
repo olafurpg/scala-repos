@@ -42,11 +42,12 @@ private[hive] trait HiveStrategies {
 
   object Scripts extends Strategy {
     def apply(plan: LogicalPlan): Seq[SparkPlan] = plan match {
-      case logical.ScriptTransformation(input,
-                                        script,
-                                        output,
-                                        child,
-                                        schema: HiveScriptIOSchema) =>
+      case logical.ScriptTransformation(
+          input,
+          script,
+          output,
+          child,
+          schema: HiveScriptIOSchema) =>
         ScriptTransformation(input, script, output, planLater(child), schema)(
           hiveContext) :: Nil
       case _ => Nil
@@ -55,26 +56,30 @@ private[hive] trait HiveStrategies {
 
   object DataSinks extends Strategy {
     def apply(plan: LogicalPlan): Seq[SparkPlan] = plan match {
-      case logical.InsertIntoTable(table: MetastoreRelation,
-                                   partition,
-                                   child,
-                                   overwrite,
-                                   ifNotExists) =>
-        execution.InsertIntoHiveTable(table,
-                                      partition,
-                                      planLater(child),
-                                      overwrite,
-                                      ifNotExists) :: Nil
-      case hive.InsertIntoHiveTable(table: MetastoreRelation,
-                                    partition,
-                                    child,
-                                    overwrite,
-                                    ifNotExists) =>
-        execution.InsertIntoHiveTable(table,
-                                      partition,
-                                      planLater(child),
-                                      overwrite,
-                                      ifNotExists) :: Nil
+      case logical.InsertIntoTable(
+          table: MetastoreRelation,
+          partition,
+          child,
+          overwrite,
+          ifNotExists) =>
+        execution.InsertIntoHiveTable(
+          table,
+          partition,
+          planLater(child),
+          overwrite,
+          ifNotExists) :: Nil
+      case hive.InsertIntoHiveTable(
+          table: MetastoreRelation,
+          partition,
+          child,
+          overwrite,
+          ifNotExists) =>
+        execution.InsertIntoHiveTable(
+          table,
+          partition,
+          planLater(child),
+          overwrite,
+          ifNotExists) :: Nil
       case _ => Nil
     }
   }
@@ -85,9 +90,10 @@ private[hive] trait HiveStrategies {
     */
   object HiveTableScans extends Strategy {
     def apply(plan: LogicalPlan): Seq[SparkPlan] = plan match {
-      case PhysicalOperation(projectList,
-                             predicates,
-                             relation: MetastoreRelation) =>
+      case PhysicalOperation(
+          projectList,
+          predicates,
+          relation: MetastoreRelation) =>
         // Filter out all predicates that only deal with partition keys, these are given to the
         // hive table scan operator to be used for partition pruning.
         val partitionKeyIds = AttributeSet(relation.partitionKeys)
@@ -109,29 +115,32 @@ private[hive] trait HiveStrategies {
 
   object HiveDDLStrategy extends Strategy {
     def apply(plan: LogicalPlan): Seq[SparkPlan] = plan match {
-      case CreateTableUsing(tableIdent,
-                            userSpecifiedSchema,
-                            provider,
-                            false,
-                            opts,
-                            allowExisting,
-                            managedIfNoPath) =>
-        val cmd = CreateMetastoreDataSource(tableIdent,
-                                            userSpecifiedSchema,
-                                            provider,
-                                            opts,
-                                            allowExisting,
-                                            managedIfNoPath)
+      case CreateTableUsing(
+          tableIdent,
+          userSpecifiedSchema,
+          provider,
+          false,
+          opts,
+          allowExisting,
+          managedIfNoPath) =>
+        val cmd = CreateMetastoreDataSource(
+          tableIdent,
+          userSpecifiedSchema,
+          provider,
+          opts,
+          allowExisting,
+          managedIfNoPath)
         ExecutedCommand(cmd) :: Nil
 
       case c: CreateTableUsingAsSelect =>
-        val cmd = CreateMetastoreDataSourceAsSelect(c.tableIdent,
-                                                    c.provider,
-                                                    c.partitionColumns,
-                                                    c.bucketSpec,
-                                                    c.mode,
-                                                    c.options,
-                                                    c.child)
+        val cmd = CreateMetastoreDataSourceAsSelect(
+          c.tableIdent,
+          c.provider,
+          c.partitionColumns,
+          c.bucketSpec,
+          c.mode,
+          c.options,
+          c.child)
         ExecutedCommand(cmd) :: Nil
 
       case _ => Nil
@@ -142,9 +151,10 @@ private[hive] trait HiveStrategies {
     def apply(plan: LogicalPlan): Seq[SparkPlan] = plan match {
       case describe: DescribeCommand =>
         ExecutedCommand(
-          DescribeHiveTableCommand(describe.table,
-                                   describe.output,
-                                   describe.isExtended)) :: Nil
+          DescribeHiveTableCommand(
+            describe.table,
+            describe.output,
+            describe.isExtended)) :: Nil
       case _ => Nil
     }
   }

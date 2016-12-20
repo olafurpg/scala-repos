@@ -73,11 +73,12 @@ class NamingParamsSearcher
         }
         val helper: PsiSearchHelper =
           PsiSearchHelper.SERVICE.getInstance(queryParameters.getProject)
-        helper.processElementsWithWord(processor,
-                                       scope,
-                                       name,
-                                       UsageSearchContext.IN_CODE,
-                                       true)
+        helper.processElementsWithWord(
+          processor,
+          scope,
+          name,
+          UsageSearchContext.IN_CODE,
+          true)
       case _ => true
     }
   }

@@ -30,12 +30,13 @@ class RemoveTakeDrop(val translateTake: Boolean = true,
             val s = new AnonSymbol
             Bind(s, n, Pure(Ref(s)))
         }
-        val j = Join(new AnonSymbol,
-                     new AnonSymbol,
-                     from2,
-                     RangeFrom(1L),
-                     JoinType.Zip,
-                     LiteralNode(true))
+        val j = Join(
+          new AnonSymbol,
+          new AnonSymbol,
+          from2,
+          RangeFrom(1L),
+          JoinType.Zip,
+          LiteralNode(true))
         val bs1 = new AnonSymbol
         val b1 = Bind(bs1, j, Pure(Ref(bs1)))
         val fs = new AnonSymbol
@@ -47,8 +48,9 @@ class RemoveTakeDrop(val translateTake: Boolean = true,
           case (Some(t), Some(d)) =>
             Library.And.typed[Boolean](
               Library.>.typed[Boolean](Select(Ref(fs), ElementSymbol(2)), d),
-              Library.<=.typed[Boolean](Select(Ref(fs), ElementSymbol(2)),
-                                        constOp[Long]("+")(_ + _)(t, d))
+              Library.<=.typed[Boolean](
+                Select(Ref(fs), ElementSymbol(2)),
+                constOp[Long]("+")(_ + _)(t, d))
             )
           case _ => throw new SlickException("Unexpected empty Take/Drop")
         })

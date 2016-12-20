@@ -134,8 +134,10 @@ trait ShardService
         path("/queries") {
           path("/'jobId") {
             get(new AsyncQueryResultServiceHandler(state.jobManager)) ~
-              delete(new QueryDeleteHandler[ByteChunk](state.jobManager,
-                                                       state.clock))
+              delete(
+                new QueryDeleteHandler[ByteChunk](
+                  state.jobManager,
+                  state.clock))
           } ~
             requireAccount(state.accountFinder) {
               // async handler *always* returns a JSON object containing the job ID
@@ -150,9 +152,10 @@ trait ShardService
   }
 
   private def syncHandler(state: ShardState) = {
-    val queryService = new SyncQueryServiceHandler(state.platform.synchronous,
-                                                   state.jobManager,
-                                                   SyncResultFormat.Simple)
+    val queryService = new SyncQueryServiceHandler(
+      state.platform.synchronous,
+      state.jobManager,
+      SyncResultFormat.Simple)
     jsonp {
       jsonAPIKey(state.apiKeyFinder) {
         requireAccount(state.accountFinder) {
@@ -180,11 +183,13 @@ trait ShardService
                 new BrowseServiceHandler[ByteChunk](state.platform.vfs) map {
                   _ map { _ map { _ map { jvalueToChunk } } }
                 }
-              )(ResponseModifier.responseFG[({
-                                              type λ[α] = (APIKey, Path) => α
-                                            })#λ,
-                                            Future,
-                                            ByteChunk])
+              )(
+                ResponseModifier.responseFG[
+                  ({
+                    type λ[α] = (APIKey, Path) => α
+                  })#λ,
+                  Future,
+                  ByteChunk])
             } ~
               options {
                 (request: HttpRequest[ByteChunk]) => (a: APIKey, p: Path) =>
@@ -194,15 +199,18 @@ trait ShardService
           dataPath("/meta/fs") {
             get {
               produce(application / json)(
-                new BrowseServiceHandler[ByteChunk](state.platform.vfs,
-                                                    legacy = true) map {
+                new BrowseServiceHandler[ByteChunk](
+                  state.platform.vfs,
+                  legacy = true) map {
                   _ map { _ map { _ map { jvalueToChunk } } }
                 }
-              )(ResponseModifier.responseFG[({
-                                              type λ[α] = (APIKey, Path) => α
-                                            })#λ,
-                                            Future,
-                                            ByteChunk])
+              )(
+                ResponseModifier.responseFG[
+                  ({
+                    type λ[α] = (APIKey, Path) => α
+                  })#λ,
+                  Future,
+                  ByteChunk])
             } ~
               options {
                 (request: HttpRequest[ByteChunk]) => (a: APIKey, p: Path) =>
@@ -221,10 +229,11 @@ trait ShardService
         path("/scheduled/") {
           jsonAPIKey(state.apiKeyFinder) {
             post {
-              new AddScheduledQueryServiceHandler(state.scheduler,
-                                                  state.apiKeyFinder,
-                                                  state.accountFinder,
-                                                  state.clock)
+              new AddScheduledQueryServiceHandler(
+                state.scheduler,
+                state.apiKeyFinder,
+                state.accountFinder,
+                state.clock)
             }
           } ~
             path("'scheduleId") {
@@ -249,9 +258,10 @@ trait ShardService
             shardService[({
               type λ[+α] = ((APIKey, AccountDetails), Path) => α
             })#λ] {
-              new AnalysisServiceHandler(state.platform,
-                                         state.scheduler,
-                                         state.clock)
+              new AnalysisServiceHandler(
+                state.platform,
+                state.scheduler,
+                state.clock)
             }
           }
         }

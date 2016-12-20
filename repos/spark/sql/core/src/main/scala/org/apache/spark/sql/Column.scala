@@ -290,8 +290,9 @@ class Column(protected[sql] val expr: Expression) extends Logging {
     * @group expr_ops
     * @since 1.3.0
     */
-  @deprecated("!== does not have the same precedence as ===, use =!= instead",
-              "2.0.0")
+  @deprecated(
+    "!== does not have the same precedence as ===, use =!= instead",
+    "2.0.0")
   def !==(other: Any): Column = this =!= other
 
   /**

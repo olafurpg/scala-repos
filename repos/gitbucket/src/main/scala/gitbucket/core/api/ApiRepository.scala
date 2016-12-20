@@ -43,17 +43,19 @@ object ApiRepository {
     )(urlIsHtmlUrl)
 
   def apply(repositoryInfo: RepositoryInfo, owner: ApiUser): ApiRepository =
-    ApiRepository(repositoryInfo.repository,
-                  owner,
-                  forkedCount = repositoryInfo.forkedCount)
+    ApiRepository(
+      repositoryInfo.repository,
+      owner,
+      forkedCount = repositoryInfo.forkedCount)
 
   def apply(repositoryInfo: RepositoryInfo, owner: Account): ApiRepository =
     this(repositoryInfo.repository, ApiUser(owner))
 
   def forPushPayload(repositoryInfo: RepositoryInfo,
                      owner: ApiUser): ApiRepository =
-    ApiRepository(repositoryInfo.repository,
-                  owner,
-                  forkedCount = repositoryInfo.forkedCount,
-                  urlIsHtmlUrl = true)
+    ApiRepository(
+      repositoryInfo.repository,
+      owner,
+      forkedCount = repositoryInfo.forkedCount,
+      urlIsHtmlUrl = true)
 }

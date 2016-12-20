@@ -30,18 +30,21 @@ class AclTest extends JUnitSuite {
 
   @Test
   def testAclJsonConversion(): Unit = {
-    val acl1 = new Acl(new KafkaPrincipal(KafkaPrincipal.USER_TYPE, "alice"),
-                       Deny,
-                       "host1",
-                       Read)
-    val acl2 = new Acl(new KafkaPrincipal(KafkaPrincipal.USER_TYPE, "bob"),
-                       Allow,
-                       "*",
-                       Read)
-    val acl3 = new Acl(new KafkaPrincipal(KafkaPrincipal.USER_TYPE, "bob"),
-                       Deny,
-                       "host1",
-                       Read)
+    val acl1 = new Acl(
+      new KafkaPrincipal(KafkaPrincipal.USER_TYPE, "alice"),
+      Deny,
+      "host1",
+      Read)
+    val acl2 = new Acl(
+      new KafkaPrincipal(KafkaPrincipal.USER_TYPE, "bob"),
+      Allow,
+      "*",
+      Read)
+    val acl3 = new Acl(
+      new KafkaPrincipal(KafkaPrincipal.USER_TYPE, "bob"),
+      Deny,
+      "host1",
+      Read)
 
     val acls = Set[Acl](acl1, acl2, acl3)
     val jsonAcls = Json.encode(Acl.toJsonCompatibleMap(acls))

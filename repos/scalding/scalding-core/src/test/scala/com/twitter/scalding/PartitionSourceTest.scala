@@ -145,8 +145,9 @@ class CustomPartitionSourceTest extends WordSpec with Matchers {
 
       val directory = new File(testMode.getWritePathFor(CustomPartitionedTsv))
 
-      directory.listFiles().map({ _.getName() }).toSet shouldBe Set("{A}->{x}",
-                                                                    "{B}->{y}")
+      directory.listFiles().map({ _.getName() }).toSet shouldBe Set(
+        "{A}->{x}",
+        "{B}->{y}")
 
       val aSource =
         ScalaSource.fromFile(new File(directory, "{A}->{x}/part-00000-00000"))

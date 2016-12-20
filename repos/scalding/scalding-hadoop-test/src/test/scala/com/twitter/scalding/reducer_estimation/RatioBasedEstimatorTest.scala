@@ -49,32 +49,34 @@ object HistoryServiceWithData {
     val random = new scala.util.Random(123)
     val tasks = taskRuntimes.map { time =>
       val startTime = random.nextLong
-      Task(taskType = "REDUCE",
-           status = "SUCCEEDED",
-           startTime = startTime,
-           finishTime = startTime + time)
+      Task(
+        taskType = "REDUCE",
+        status = "SUCCEEDED",
+        startTime = startTime,
+        finishTime = startTime + time)
     }
 
-    FlowStepHistory(keys = null,
-                    submitTime = 0,
-                    launchTime = 0L,
-                    finishTime = 0L,
-                    totalMaps = 0L,
-                    totalReduces = 0L,
-                    finishedMaps = 0L,
-                    finishedReduces = 0L,
-                    failedMaps = 0L,
-                    failedReduces = 0L,
-                    mapFileBytesRead = 0L,
-                    mapFileBytesWritten = 0L,
-                    reduceFileBytesRead = inputHdfsReduceFileBytesRead,
-                    hdfsBytesRead = inputHdfsBytesRead,
-                    hdfsBytesWritten = 0L,
-                    mapperTimeMillis = 0L,
-                    reducerTimeMillis = 0L,
-                    reduceShuffleBytes = 0L,
-                    cost = 1.1,
-                    tasks = tasks)
+    FlowStepHistory(
+      keys = null,
+      submitTime = 0,
+      launchTime = 0L,
+      finishTime = 0L,
+      totalMaps = 0L,
+      totalReduces = 0L,
+      finishedMaps = 0L,
+      finishedReduces = 0L,
+      failedMaps = 0L,
+      failedReduces = 0L,
+      mapFileBytesRead = 0L,
+      mapFileBytesWritten = 0L,
+      reduceFileBytesRead = inputHdfsReduceFileBytesRead,
+      hdfsBytesRead = inputHdfsBytesRead,
+      hdfsBytesWritten = 0L,
+      mapperTimeMillis = 0L,
+      reducerTimeMillis = 0L,
+      reduceShuffleBytes = 0L,
+      cost = 1.1,
+      tasks = tasks)
   }
 
   def inputSize = HipJob.InSrcFileSize
@@ -89,10 +91,11 @@ object ValidHistoryService extends HistoryServiceWithData {
                    maxHistory: Int): Try[Seq[FlowStepHistory]] =
     // past reducer ratio 0.5
     Success(
-      Seq(makeHistory(10, 1), // below threshold, ignored
-          makeHistory(inputSize, inputSize / 2),
-          makeHistory(inputSize, inputSize / 2),
-          makeHistory(inputSize, inputSize / 2)))
+      Seq(
+        makeHistory(10, 1), // below threshold, ignored
+        makeHistory(inputSize, inputSize / 2),
+        makeHistory(inputSize, inputSize / 2),
+        makeHistory(inputSize, inputSize / 2)))
 }
 
 object InvalidHistoryService extends HistoryServiceWithData {
@@ -133,8 +136,9 @@ class RatioBasedReducerEstimatorTest
           (InputSizeReducerEstimator.BytesPerReducer -> "1k") +
           (RatioBasedEstimator.inputRatioThresholdKey -> 0.10f.toString)
 
-      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, customConfig),
-                            cluster)
+      HadoopPlatformJobTest(
+        new SimpleJobWithNoSetReducers(_, customConfig),
+        cluster)
         .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
           steps should have size 1
@@ -151,8 +155,9 @@ class RatioBasedReducerEstimatorTest
           (InputSizeReducerEstimator.BytesPerReducer -> "1k") +
           (RatioBasedEstimator.inputRatioThresholdKey -> 0.10f.toString)
 
-      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, customConfig),
-                            cluster)
+      HadoopPlatformJobTest(
+        new SimpleJobWithNoSetReducers(_, customConfig),
+        cluster)
         .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
           steps should have size 1
@@ -169,8 +174,9 @@ class RatioBasedReducerEstimatorTest
           (InputSizeReducerEstimator.BytesPerReducer -> "1k") +
           (RatioBasedEstimator.inputRatioThresholdKey -> 0.10f.toString)
 
-      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, customConfig),
-                            cluster)
+      HadoopPlatformJobTest(
+        new SimpleJobWithNoSetReducers(_, customConfig),
+        cluster)
         .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
           steps should have size 1
@@ -190,8 +196,9 @@ class RatioBasedReducerEstimatorTest
           (InputSizeReducerEstimator.BytesPerReducer -> "1k") +
           (RatioBasedEstimator.inputRatioThresholdKey -> 0.10f.toString)
 
-      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, customConfig),
-                            cluster)
+      HadoopPlatformJobTest(
+        new SimpleJobWithNoSetReducers(_, customConfig),
+        cluster)
         .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
           steps should have size 1

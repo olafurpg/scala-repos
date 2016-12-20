@@ -38,8 +38,9 @@ class ScalaDocUnbalancedHeaderInspection extends LocalInspectionTool {
                 true,
                 ProblemHighlightType.GENERIC_ERROR,
                 isOnTheFly,
-                new ScalaDocHeaderBalanceQuickFix(s.getFirstChild,
-                                                  s.getLastChild)))
+                new ScalaDocHeaderBalanceQuickFix(
+                  s.getFirstChild,
+                  s.getLastChild)))
           }
 
           var sibl = s.getNextSibling
@@ -66,9 +67,10 @@ class ScalaDocUnbalancedHeaderInspection extends LocalInspectionTool {
 }
 
 class ScalaDocHeaderBalanceQuickFix(opening: PsiElement, closing: PsiElement)
-    extends AbstractFixOnTwoPsiElements(ScalaBundle.message("balance.header"),
-                                        opening,
-                                        closing) {
+    extends AbstractFixOnTwoPsiElements(
+      ScalaBundle.message("balance.header"),
+      opening,
+      closing) {
 
   override def getFamilyName: String = InspectionsUtil.SCALADOC
 
@@ -83,8 +85,8 @@ class ScalaDocHeaderBalanceQuickFix(opening: PsiElement, closing: PsiElement)
     }
 
     cl.replace(
-      ScalaPsiElementFactory.createDocHeaderElement(op.getText.length(),
-                                                    op.getManager))
+      ScalaPsiElementFactory
+        .createDocHeaderElement(op.getText.length(), op.getManager))
   }
 }
 

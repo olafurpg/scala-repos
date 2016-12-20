@@ -94,16 +94,18 @@ class GraphGeneratorsSuite extends SparkFunSuite with LocalSparkContext {
         .logNormalGraph(sc, numVertices100, mu = mu, sigma = sigma)
       assert(graph.vertices.count() == numVertices100)
 
-      val graph_round1 = GraphGenerators.logNormalGraph(sc,
-                                                        numVertices100,
-                                                        mu = mu,
-                                                        sigma = sigma,
-                                                        seed = 12345)
-      val graph_round2 = GraphGenerators.logNormalGraph(sc,
-                                                        numVertices100,
-                                                        mu = mu,
-                                                        sigma = sigma,
-                                                        seed = 12345)
+      val graph_round1 = GraphGenerators.logNormalGraph(
+        sc,
+        numVertices100,
+        mu = mu,
+        sigma = sigma,
+        seed = 12345)
+      val graph_round2 = GraphGenerators.logNormalGraph(
+        sc,
+        numVertices100,
+        mu = mu,
+        sigma = sigma,
+        seed = 12345)
 
       val graph_round1_edges = graph_round1.edges.collect()
       val graph_round2_edges = graph_round2.edges.collect()

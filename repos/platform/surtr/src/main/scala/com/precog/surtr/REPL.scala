@@ -120,18 +120,20 @@ trait REPL
     with XLightWebHttpClientModule[Future]
     with LongIdMemoryDatasetConsumer[Future] {
 
-  val dummyAccount = AccountDetails("dummyAccount",
-                                    "nobody@precog.com",
-                                    new DateTime,
-                                    "dummyAPIKey",
-                                    Path.Root,
-                                    AccountPlan.Free)
+  val dummyAccount = AccountDetails(
+    "dummyAccount",
+    "nobody@precog.com",
+    new DateTime,
+    "dummyAPIKey",
+    Path.Root,
+    AccountPlan.Free)
   def dummyEvaluationContext =
-    EvaluationContext("dummyAPIKey",
-                      dummyAccount,
-                      Path.Root,
-                      Path.Root,
-                      new DateTime)
+    EvaluationContext(
+      "dummyAPIKey",
+      dummyAccount,
+      Path.Root,
+      Path.Root,
+      new DateTime)
 
   val Prompt = "quirrel> "
   val Follow = "       | "
@@ -310,8 +312,9 @@ object Console extends App {
         implicit val asyncContext =
           ExecutionContext.defaultExecutionContext(actorSystem)
         implicit val M =
-          new blueeyes.bkka.UnsafeFutureComonad(asyncContext,
-                                                yggConfig.maxEvalDuration)
+          new blueeyes.bkka.UnsafeFutureComonad(
+            asyncContext,
+            yggConfig.maxEvalDuration)
 
         type YggConfig = REPLConfig
         val yggConfig = replConfig
@@ -322,31 +325,37 @@ object Console extends App {
         val accessControl = new DirectAPIKeyFinder(apiKeyManager)
 
         val masterChef = actorSystem.actorOf(
-          Props(Chef(VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
-                     VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
+          Props(
+            Chef(
+              VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
+              VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
 
         val jobManager = new InMemoryJobManager[Future]
         val permissionsFinder =
-          new PermissionsFinder(accessControl,
-                                new StaticAccountFinder[Future]("", ""),
-                                new org.joda.time.Instant())
-        val resourceBuilder = new ResourceBuilder(actorSystem,
-                                                  yggConfig.clock,
-                                                  masterChef,
-                                                  yggConfig.cookThreshold,
-                                                  storageTimeout)
+          new PermissionsFinder(
+            accessControl,
+            new StaticAccountFinder[Future]("", ""),
+            new org.joda.time.Instant())
+        val resourceBuilder = new ResourceBuilder(
+          actorSystem,
+          yggConfig.clock,
+          masterChef,
+          yggConfig.cookThreshold,
+          storageTimeout)
 
         val projectionsActor = actorSystem.actorOf(
           Props(
-            new PathRoutingActor(yggConfig.dataDir,
-                                 Duration(300, "seconds"),
-                                 Duration(300, "seconds"),
-                                 100,
-                                 yggConfig.clock)))
+            new PathRoutingActor(
+              yggConfig.dataDir,
+              Duration(300, "seconds"),
+              Duration(300, "seconds"),
+              100,
+              yggConfig.clock)))
 
-        val actorVFS = new ActorVFS(projectionsActor,
-                                    yggConfig.storageTimeout,
-                                    yggConfig.storageTimeout)
+        val actorVFS = new ActorVFS(
+          projectionsActor,
+          yggConfig.storageTimeout,
+          yggConfig.storageTimeout)
         val vfs =
           new SecureVFS(actorVFS, permissionsFinder, jobManager, Clock.System)
 
@@ -367,9 +376,9 @@ object Console extends App {
         def startup = IO { PrecogUnit }
 
         def shutdown = IO {
-          Await.result(gracefulStop(projectionsActor,
-                                    yggConfig.controlTimeout),
-                       yggConfig.controlTimeout)
+          Await.result(
+            gracefulStop(projectionsActor, yggConfig.controlTimeout),
+            yggConfig.controlTimeout)
           actorSystem.shutdown()
           PrecogUnit
         }

@@ -106,12 +106,13 @@ trait PEvents extends Serializable {
                           untilTime: Option[DateTime] = None,
                           required: Option[Seq[String]] = None)(
       sc: SparkContext): RDD[(String, PropertyMap)] = {
-    val eventRDD = find(appId = appId,
-                        channelId = channelId,
-                        startTime = startTime,
-                        untilTime = untilTime,
-                        entityType = Some(entityType),
-                        eventNames = Some(PEventAggregator.eventNames))(sc)
+    val eventRDD = find(
+      appId = appId,
+      channelId = channelId,
+      startTime = startTime,
+      untilTime = untilTime,
+      entityType = Some(entityType),
+      eventNames = Some(PEventAggregator.eventNames))(sc)
 
     val dmRDD = PEventAggregator.aggregateProperties(eventRDD)
 

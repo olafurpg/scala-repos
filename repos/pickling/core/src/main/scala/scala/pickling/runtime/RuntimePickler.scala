@@ -26,8 +26,9 @@ class RuntimeTypeInfo(classLoader: ClassLoader,
       if (clazz != null) clazz.getComponentType() else null
 
     if (elemClass != null) // assume it's an array
-      appliedType(ArrayClass.toType,
-                  List(mirror.classSymbol(elemClass).asType.toType))
+      appliedType(
+        ArrayClass.toType,
+        List(mirror.classSymbol(elemClass).asType.toType))
     else sym.asType.toType
   }
   // debug(s"tpe: ${tpe.key}")
@@ -56,8 +57,9 @@ class RuntimePickler(classLoader: ClassLoader,
     extends RuntimeTypeInfo(classLoader, clazz, share) {
   import ru._
 
-  assert(scala.pickling.internal.GRL.isHeldByCurrentThread,
-         "Failed to aquire GRL lock before instantiating a runtime pickler!")
+  assert(
+    scala.pickling.internal.GRL.isHeldByCurrentThread,
+    "Failed to aquire GRL lock before instantiating a runtime pickler!")
 
   sealed abstract class Logic(fir: irs.FieldIR, isEffFinal: Boolean) {
     // debug(s"creating Logic for ${fir.name}")

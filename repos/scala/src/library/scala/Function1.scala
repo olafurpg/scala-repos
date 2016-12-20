@@ -31,12 +31,13 @@ package scala
   msg = "No implicit view available from ${T1} => ${R}.")
 trait Function1[
     @specialized(scala.Int, scala.Long, scala.Float, scala.Double) -T1,
-    @specialized(scala.Unit,
-                 scala.Boolean,
-                 scala.Int,
-                 scala.Float,
-                 scala.Long,
-                 scala.Double) +R]
+    @specialized(
+      scala.Unit,
+      scala.Boolean,
+      scala.Int,
+      scala.Float,
+      scala.Long,
+      scala.Double) +R]
     extends AnyRef { self =>
 
   /** Apply the body of this function to the argument.

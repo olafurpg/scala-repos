@@ -63,8 +63,9 @@ trait FindMembers { this: SymbolTable =>
       val deferredSeen =
         walkBaseClasses(requiredFlags, excludedFlags | DEFERRED)
       if (deferredSeen) // OPT: the `if` avoids a second pass if the first pass didn't spot any candidates.
-        walkBaseClasses(requiredFlags | DEFERRED,
-                        excludedFlags & ~(DEFERRED.toLong))
+        walkBaseClasses(
+          requiredFlags | DEFERRED,
+          excludedFlags & ~(DEFERRED.toLong))
       result
     }
 
@@ -102,11 +103,12 @@ trait FindMembers { this: SymbolTable =>
           if (meetsRequirements) {
             val excl: Long = flags & excluded
             val isExcluded: Boolean = excl != 0L
-            if (!isExcluded && isPotentialMember(sym,
-                                                 flags,
-                                                 currentBaseClass,
-                                                 seenFirstNonRefinementClass,
-                                                 refinementParents)) {
+            if (!isExcluded && isPotentialMember(
+                  sym,
+                  flags,
+                  currentBaseClass,
+                  seenFirstNonRefinementClass,
+                  refinementParents)) {
               if (shortCircuit(sym)) return false
               else addMemberIfNew(sym)
             } else if (excl == DEFERRED) {
@@ -208,10 +210,11 @@ trait FindMembers { this: SymbolTable =>
   private[reflect] final class FindMembers(tpe: Type,
                                            excludedFlags: Long,
                                            requiredFlags: Long)
-      extends FindMemberBase[Scope](tpe,
-                                    nme.ANYname,
-                                    excludedFlags,
-                                    requiredFlags) {
+      extends FindMemberBase[Scope](
+        tpe,
+        nme.ANYname,
+        excludedFlags,
+        requiredFlags) {
     private[this] var _membersScope: Scope = null
     private def membersScope: Scope = {
       if (_membersScope eq null) _membersScope = newFindMemberScope

@@ -91,8 +91,9 @@ class PlatformTest
     }
 
     "Expected items should match : Internal Serializer / TestSets" in {
-      runCompareTest[TestSets](toScroogeInternalOrderedSerialization[TestSets],
-                               implicitly)
+      runCompareTest[TestSets](
+        toScroogeInternalOrderedSerialization[TestSets],
+        implicitly)
     }
 
     "Expected items should match : Internal Serializer / TestLists" in {
@@ -102,8 +103,9 @@ class PlatformTest
     }
 
     "Expected items should match : Internal Serializer /  TestMaps" in {
-      runCompareTest[TestMaps](toScroogeInternalOrderedSerialization[TestMaps],
-                               implicitly)
+      runCompareTest[TestMaps](
+        toScroogeInternalOrderedSerialization[TestMaps],
+        implicitly)
     }
 
     "Expected items should match : Internal Serializer / TestUnion" in {
@@ -114,8 +116,9 @@ class PlatformTest
     }
 
     "Expected items should match : Internal Serializer / Enum" in {
-      runCompareTest[TestEnum](toScroogeInternalOrderedSerialization[TestEnum],
-                               implicitly)
+      runCompareTest[TestEnum](
+        toScroogeInternalOrderedSerialization[TestEnum],
+        implicitly)
     }
 
     "Expected items should match : Internal Serializer / TestTypes" in {

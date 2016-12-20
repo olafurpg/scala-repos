@@ -131,9 +131,10 @@ object SafeDeleteProcessorUtil {
                 referenceElement.getParameterList.getTypeParameterElements
               if (typeArgs.length > index) {
                 usages.add(
-                  new SafeDeleteReferenceJavaDeleteUsageInfo(typeArgs(index),
-                                                             typeParameter,
-                                                             true))
+                  new SafeDeleteReferenceJavaDeleteUsageInfo(
+                    typeArgs(index),
+                    typeParameter,
+                    true))
               }
             case _ =>
           }
@@ -150,10 +151,11 @@ object SafeDeleteProcessorUtil {
     val references: util.Collection[PsiReference] =
       referenceSearch(psiMethod).findAll
     if (psiMethod.isConstructor) {
-      return findConstructorUsages(psiMethod,
-                                   references,
-                                   usages,
-                                   allElementsToDelete)
+      return findConstructorUsages(
+        psiMethod,
+        references,
+        usages,
+        allElementsToDelete)
     }
     val overridingElements: Array[PsiNamedElement] =
       ScalaOverridingMemberSearcher.search(psiMethod)
@@ -166,9 +168,10 @@ object SafeDeleteProcessorUtil {
         val isReferenceInImport =
           PsiTreeUtil.getParentOfType(element, classOf[ScImportStmt]) != null
         usages.add(
-          new SafeDeleteReferenceJavaDeleteUsageInfo(element,
-                                                     psiMethod,
-                                                     isReferenceInImport))
+          new SafeDeleteReferenceJavaDeleteUsageInfo(
+            element,
+            psiMethod,
+            isReferenceInImport))
       }
     }
     val methodToReferences: util.HashMap[PsiNamedElement,
@@ -321,9 +324,10 @@ object SafeDeleteProcessorUtil {
               if (!isInside(element, allElementsToDelete) &&
                   !isInside(element, overridingMethods)) {
                 usages.add(
-                  new SafeDeleteReferenceJavaDeleteUsageInfo(element,
-                                                             originalMethod,
-                                                             false))
+                  new SafeDeleteReferenceJavaDeleteUsageInfo(
+                    element,
+                    originalMethod,
+                    false))
                 validOverriding.clear()
               }
             }
@@ -489,17 +493,19 @@ object SafeDeleteProcessorUtil {
             if (index < args.length) {
               if (!parameter.isVarArgs) {
                 usages.add(
-                  new SafeDeleteReferenceJavaDeleteUsageInfo(args(index),
-                                                             parameter,
-                                                             true))
+                  new SafeDeleteReferenceJavaDeleteUsageInfo(
+                    args(index),
+                    parameter,
+                    true))
               } else {
                 {
                   var i: Int = index
                   while (i < args.length) {
                     usages.add(
-                      new SafeDeleteReferenceJavaDeleteUsageInfo(args(i),
-                                                                 parameter,
-                                                                 true))
+                      new SafeDeleteReferenceJavaDeleteUsageInfo(
+                        args(i),
+                        parameter,
+                        true))
                     i += 1
                   }
                 }
@@ -521,9 +527,10 @@ object SafeDeleteProcessorUtil {
                   parameters.map(_.getType.getCanonicalText).mkString(","))
                 newText.append(")*/")
                 usages.add(
-                  new SafeDeleteReferenceJavaDeleteUsageInfo(element,
-                                                             parameter,
-                                                             true) {
+                  new SafeDeleteReferenceJavaDeleteUsageInfo(
+                    element,
+                    parameter,
+                    true) {
                     override def deleteElement() {
                       val javadocMethodReference: PsiDocMethodOrFieldRef#MyReference =
                         element.getReference
@@ -547,9 +554,10 @@ object SafeDeleteProcessorUtil {
           PsiTreeUtil.getParentOfType(element, classOf[PsiDocTag])
         if (docTag != null) {
           usages.add(
-            new SafeDeleteReferenceJavaDeleteUsageInfo(docTag,
-                                                       parameter,
-                                                       true))
+            new SafeDeleteReferenceJavaDeleteUsageInfo(
+              docTag,
+              parameter,
+              true))
           return true
         }
         var isSafeDelete: Boolean = false
@@ -570,9 +578,10 @@ object SafeDeleteProcessorUtil {
           case _ =>
         }
         usages.add(
-          new SafeDeleteReferenceJavaDeleteUsageInfo(element,
-                                                     parameter,
-                                                     isSafeDelete))
+          new SafeDeleteReferenceJavaDeleteUsageInfo(
+            element,
+            parameter,
+            isSafeDelete))
         true
       }
     })

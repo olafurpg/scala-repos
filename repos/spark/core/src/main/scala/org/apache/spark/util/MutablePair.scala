@@ -28,11 +28,12 @@ import org.apache.spark.annotation.DeveloperApi
   * @param  _2   Element 2 of this MutablePair
   */
 @DeveloperApi
-case class MutablePair[@specialized(Int,
-                                    Long,
-                                    Double,
-                                    Char,
-                                    Boolean /* , AnyRef */ ) T1,
+case class MutablePair[@specialized(
+                         Int,
+                         Long,
+                         Double,
+                         Char,
+                         Boolean /* , AnyRef */ ) T1,
                        @specialized(
                          Int,
                          Long,

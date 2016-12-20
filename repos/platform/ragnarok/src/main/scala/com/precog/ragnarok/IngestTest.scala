@@ -37,10 +37,11 @@ object IngestTest {
   }
 
   private def dataDirs(runner: NIHDBPerfTestRunner[_]): List[File] =
-    List(runner.yggConfig.dataDir,
-         runner.yggConfig.archiveDir,
-         runner.yggConfig.cacheDir,
-         runner.yggConfig.scratchDir)
+    List(
+      runner.yggConfig.dataDir,
+      runner.yggConfig.archiveDir,
+      runner.yggConfig.cacheDir,
+      runner.yggConfig.scratchDir)
 
   private def ensureDataDirsAreEmpty(runner: NIHDBPerfTestRunner[_]) {
     dataDirs(runner) foreach { dir =>
@@ -69,10 +70,11 @@ object IngestTest {
     import RunConfig.OutputFormat
 
     try {
-      val runner = new NIHDBPerfTestRunner(SimpleTimer,
-                                           optimize = config.optimize,
-                                           apiKey = "dummyAPIKey",
-                                           _rootDir = config.rootDir)
+      val runner = new NIHDBPerfTestRunner(
+        SimpleTimer,
+        optimize = config.optimize,
+        apiKey = "dummyAPIKey",
+        _rootDir = config.rootDir)
 
       runner.startup()
       try {

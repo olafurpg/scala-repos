@@ -33,8 +33,9 @@ object DateRange extends java.io.Serializable {
     */
   def parse(truncatediso8601: String)(implicit tz: TimeZone,
                                       dp: DateParser): DateRange =
-    DateRange(RichDate(truncatediso8601),
-              RichDate.upperBound(truncatediso8601))
+    DateRange(
+      RichDate(truncatediso8601),
+      RichDate.upperBound(truncatediso8601))
 
   /**
     * We take the upper bound of the second parameter, so we take the latest time that
@@ -82,8 +83,9 @@ object DateRange extends java.io.Serializable {
   */
 case class DateRange(val start: RichDate, val end: RichDate) {
   import DateOps._
-  require(start <= end,
-          s"""The start "${start}" must be before or on the end "${end}".""")
+  require(
+    start <= end,
+    s"""The start "${start}" must be before or on the end "${end}".""")
 
   /**
     * shift this by the given unit

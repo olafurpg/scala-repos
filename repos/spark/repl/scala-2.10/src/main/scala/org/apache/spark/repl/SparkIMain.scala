@@ -810,10 +810,11 @@ class SparkIMain(initialSettings: Settings,
             val combined = prefix + "val " + varName + " =\n" + l2
 
             logDebug(
-              List("    line" -> line,
-                   " content" -> content,
-                   "     was" -> l2,
-                   "combined" -> combined) map {
+              List(
+                "    line" -> line,
+                " content" -> content,
+                "     was" -> l2,
+                "combined" -> combined) map {
                 case (label, s) => label + ": '" + s + "'"
               } mkString "\n")
             combined
@@ -1084,8 +1085,9 @@ class SparkIMain(initialSettings: Settings,
 
       val unwrapped = unwrap(t)
       withLastExceptionLock[String]({
-        directBind[Throwable]("lastException", unwrapped)(tagOfThrowable,
-                                                          classTag[Throwable])
+        directBind[Throwable]("lastException", unwrapped)(
+          tagOfThrowable,
+          classTag[Throwable])
         util.stackTraceString(unwrapped)
       }, util.stackTraceString(unwrapped))
     }
@@ -1874,9 +1876,10 @@ object SparkIMain {
   }
 
   class ReplReporter(intp: SparkIMain)
-      extends ConsoleReporter(intp.settings,
-                              null,
-                              new ReplStrippingWriter(intp)) {
+      extends ConsoleReporter(
+        intp.settings,
+        null,
+        new ReplStrippingWriter(intp)) {
     override def printMessage(msg: String) {
       // Avoiding deadlock when the compiler starts logging before
       // the lazy val is done.

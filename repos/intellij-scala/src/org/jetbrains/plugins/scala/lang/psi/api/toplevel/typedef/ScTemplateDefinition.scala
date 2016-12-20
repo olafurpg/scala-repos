@@ -57,8 +57,9 @@ trait ScTemplateDefinition extends ScNamedElement with PsiClass {
         }
       case _ =>
     }
-    assert(getLastChild.isInstanceOf[ScExtendsBlock],
-           "Class hasn't extends block: " + this.getText)
+    assert(
+      getLastChild.isInstanceOf[ScExtendsBlock],
+      "Class hasn't extends block: " + this.getText)
     getLastChild.asInstanceOf[ScExtendsBlock]
   }
 
@@ -81,9 +82,10 @@ trait ScTemplateDefinition extends ScNamedElement with PsiClass {
         case Some(tp1) =>
           (for (te <- tp1.allTypeElements;
                 t = te.getType(TypingContext.empty).getOrAny;
-                asPsi = ScType.toPsi(t,
-                                     getProject,
-                                     GlobalSearchScope.allScope(getProject))
+                asPsi = ScType.toPsi(
+                  t,
+                  getProject,
+                  GlobalSearchScope.allScope(getProject))
                 if asPsi.isInstanceOf[PsiClassType])
             yield asPsi.asInstanceOf[PsiClassType]).toArray[PsiClassType]
         case _ => PsiClassType.EMPTY_ARRAY
@@ -364,14 +366,15 @@ trait ScTemplateDefinition extends ScNamedElement with PsiClass {
           methodProcessor.getLanguageLevel
         case _ => PsiUtil.getLanguageLevel(place)
       }
-      return PsiClassImplUtil.processDeclarationsInClass(this,
-                                                         processor,
-                                                         oldState,
-                                                         null,
-                                                         lastChild,
-                                                         place,
-                                                         languageLevel,
-                                                         false)
+      return PsiClassImplUtil.processDeclarationsInClass(
+        this,
+        processor,
+        oldState,
+        null,
+        lastChild,
+        place,
+        languageLevel,
+        false)
     }
     if (extendsBlock.templateBody.isDefined && PsiTreeUtil.isContextAncestor(
           extendsBlock.templateBody.get,
@@ -404,10 +407,11 @@ trait ScTemplateDefinition extends ScNamedElement with PsiClass {
         if (!processor.execute(se, state)) return false
       case _ =>
     }
-    state = state.put(BaseProcessor.FROM_TYPE_KEY,
-                      if (ScalaPsiUtil.isPlaceTdAncestor(this, place))
-                        ScThisType(this)
-                      else ScType.designator(this))
+    state = state.put(
+      BaseProcessor.FROM_TYPE_KEY,
+      if (ScalaPsiUtil.isPlaceTdAncestor(this, place))
+        ScThisType(this)
+      else ScType.designator(this))
     val eb = extendsBlock
     eb.templateParents match {
       case Some(p) if PsiTreeUtil.isContextAncestor(p, place, false) =>
@@ -442,12 +446,14 @@ trait ScTemplateDefinition extends ScNamedElement with PsiClass {
                   this match {
                     case t: ScTypeDefinition
                         if selfTypeElement != None &&
-                          !PsiTreeUtil.isContextAncestor(selfTypeElement.get,
-                                                         place,
-                                                         true) &&
-                          PsiTreeUtil.isContextAncestor(e.templateBody.orNull,
-                                                        place,
-                                                        true) &&
+                          !PsiTreeUtil.isContextAncestor(
+                            selfTypeElement.get,
+                            place,
+                            true) &&
+                          PsiTreeUtil.isContextAncestor(
+                            e.templateBody.orNull,
+                            place,
+                            true) &&
                           processor.isInstanceOf[BaseProcessor] &&
                           !t.isInstanceOf[ScObject] =>
                       selfTypeElement match {

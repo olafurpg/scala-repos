@@ -62,9 +62,10 @@ object Connection extends App {
     //#forURL2
     db.close
   }
-  val db = Database.forURL("jdbc:h2:mem:test2;INIT=" +
-                             coffees.schema.createStatements.mkString("\\;"),
-                           driver = "org.h2.Driver")
+  val db = Database.forURL(
+    "jdbc:h2:mem:test2;INIT=" +
+      coffees.schema.createStatements.mkString("\\;"),
+    driver = "org.h2.Driver")
   try {
     val lines = new ArrayBuffer[Any]()
     def println(s: Any) = lines += s;

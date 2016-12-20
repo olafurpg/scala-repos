@@ -79,9 +79,10 @@ trait ResolvableStableCodeReferenceElement
 
   def resolveTypesOnly(incomplete: Boolean) = {
 
-    @CachedMappedWithRecursionGuard(this,
-                                    Array.empty,
-                                    ModCount.getBlockModificationCount)
+    @CachedMappedWithRecursionGuard(
+      this,
+      Array.empty,
+      ModCount.getBlockModificationCount)
     def doResolve(incomplete: Boolean): Array[ResolveResult] =
       ImportResolverNoMethods
         .resolve(ResolvableStableCodeReferenceElement.this, incomplete)
@@ -91,9 +92,10 @@ trait ResolvableStableCodeReferenceElement
 
   def resolveMethodsOnly(incomplete: Boolean) = {
 
-    @CachedMappedWithRecursionGuard(this,
-                                    Array.empty,
-                                    ModCount.getBlockModificationCount)
+    @CachedMappedWithRecursionGuard(
+      this,
+      Array.empty,
+      ModCount.getBlockModificationCount)
     def doResolve(incomplete: Boolean): Array[ResolveResult] =
       ImportResolverNoTypes
         .resolve(ResolvableStableCodeReferenceElement.this, incomplete)
@@ -124,9 +126,10 @@ trait ResolvableStableCodeReferenceElement
     }
   }
 
-  @CachedMappedWithRecursionGuard(this,
-                                  Array.empty,
-                                  ModCount.getBlockModificationCount)
+  @CachedMappedWithRecursionGuard(
+    this,
+    Array.empty,
+    ModCount.getBlockModificationCount)
   private def multiResolveCached(incomplete: Boolean): Array[ResolveResult] =
     Resolver.resolve(ResolvableStableCodeReferenceElement.this, incomplete)
 
@@ -140,22 +143,25 @@ trait ResolvableStableCodeReferenceElement
           case obj: ScObject =>
             val fromType = r.fromType match {
               case Some(fType) =>
-                Success(ScProjectionType(fType, obj, superReference = false),
-                        Some(this))
+                Success(
+                  ScProjectionType(fType, obj, superReference = false),
+                  Some(this))
               case _ => td.getType(TypingContext.empty).map(substitutor.subst)
             }
             var state =
               ResolveState.initial.put(ScSubstitutor.key, substitutor)
             if (fromType.isDefined) {
               state = state.put(BaseProcessor.FROM_TYPE_KEY, fromType.get)
-              processor.processType(fromType.get,
-                                    ResolvableStableCodeReferenceElement.this,
-                                    state)
+              processor.processType(
+                fromType.get,
+                ResolvableStableCodeReferenceElement.this,
+                state)
             } else {
-              td.processDeclarations(processor,
-                                     state,
-                                     null,
-                                     ResolvableStableCodeReferenceElement.this)
+              td.processDeclarations(
+                processor,
+                state,
+                null,
+                ResolvableStableCodeReferenceElement.this)
             }
           case _: ScClass | _: ScTrait =>
             td.processDeclarations(
@@ -284,10 +290,11 @@ trait ResolvableStableCodeReferenceElement
               // See ScalaPsiUtil.syntheticParamClause and StableCodeReferenceElementResolver#computeEffectiveParameterClauses
               treeWalkUp(p.analog.get, lastParent)
             case p =>
-              if (!p.processDeclarations(processor,
-                                         ResolveState.initial,
-                                         lastParent,
-                                         ref)) return
+              if (!p.processDeclarations(
+                    processor,
+                    ResolveState.initial,
+                    lastParent,
+                    ref)) return
               place match {
                 case (_: ScTemplateBody | _: ScExtendsBlock) =>
                 // template body and inherited members are at the same level.

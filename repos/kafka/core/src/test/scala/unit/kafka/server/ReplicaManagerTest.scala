@@ -54,14 +54,15 @@ class ReplicaManagerTest {
     val time = new MockTime()
     val jTime = new JMockTime
     val metrics = new Metrics
-    val rm = new ReplicaManager(config,
-                                metrics,
-                                time,
-                                jTime,
-                                zkUtils,
-                                new MockScheduler(time),
-                                mockLogMgr,
-                                new AtomicBoolean(false))
+    val rm = new ReplicaManager(
+      config,
+      metrics,
+      time,
+      jTime,
+      zkUtils,
+      new MockScheduler(time),
+      mockLogMgr,
+      new AtomicBoolean(false))
     try {
       val partition = rm.getOrCreatePartition(topic, 1)
       partition.getOrCreateReplica(1)
@@ -85,14 +86,15 @@ class ReplicaManagerTest {
     val time = new MockTime()
     val jTime = new JMockTime
     val metrics = new Metrics
-    val rm = new ReplicaManager(config,
-                                metrics,
-                                time,
-                                jTime,
-                                zkUtils,
-                                new MockScheduler(time),
-                                mockLogMgr,
-                                new AtomicBoolean(false))
+    val rm = new ReplicaManager(
+      config,
+      metrics,
+      time,
+      jTime,
+      zkUtils,
+      new MockScheduler(time),
+      mockLogMgr,
+      new AtomicBoolean(false))
     try {
       val partition = rm.getOrCreatePartition(topic, 1)
       partition.getOrCreateReplica(1)
@@ -115,15 +117,16 @@ class ReplicaManagerTest {
     val time = new MockTime()
     val jTime = new JMockTime
     val metrics = new Metrics
-    val rm = new ReplicaManager(config,
-                                metrics,
-                                time,
-                                jTime,
-                                zkUtils,
-                                new MockScheduler(time),
-                                mockLogMgr,
-                                new AtomicBoolean(false),
-                                Option(this.getClass.getName))
+    val rm = new ReplicaManager(
+      config,
+      metrics,
+      time,
+      jTime,
+      zkUtils,
+      new MockScheduler(time),
+      mockLogMgr,
+      new AtomicBoolean(false),
+      Option(this.getClass.getName))
     try {
       def callback(responseStatus: Map[TopicPartition, PartitionResponse]) = {
         assert(
@@ -157,31 +160,34 @@ class ReplicaManagerTest {
     val time = new MockTime()
     val jTime = new JMockTime
     val metrics = new Metrics
-    val rm = new ReplicaManager(config,
-                                metrics,
-                                time,
-                                jTime,
-                                zkUtils,
-                                new MockScheduler(time),
-                                mockLogMgr,
-                                new AtomicBoolean(false))
+    val rm = new ReplicaManager(
+      config,
+      metrics,
+      time,
+      jTime,
+      zkUtils,
+      new MockScheduler(time),
+      mockLogMgr,
+      new AtomicBoolean(false))
 
     try {
       var produceCallbackFired = false
       def produceCallback(
           responseStatus: Map[TopicPartition, PartitionResponse]) = {
-        assertEquals("Should give NotLeaderForPartitionException",
-                     Errors.NOT_LEADER_FOR_PARTITION.code,
-                     responseStatus.values.head.errorCode)
+        assertEquals(
+          "Should give NotLeaderForPartitionException",
+          Errors.NOT_LEADER_FOR_PARTITION.code,
+          responseStatus.values.head.errorCode)
         produceCallbackFired = true
       }
 
       var fetchCallbackFired = false
       def fetchCallback(responseStatus: Map[TopicAndPartition,
                                             FetchResponsePartitionData]) = {
-        assertEquals("Should give NotLeaderForPartitionException",
-                     Errors.NOT_LEADER_FOR_PARTITION.code,
-                     responseStatus.values.head.error)
+        assertEquals(
+          "Should give NotLeaderForPartitionException",
+          Errors.NOT_LEADER_FOR_PARTITION.code,
+          responseStatus.values.head.error)
         fetchCallbackFired = true
       }
 
@@ -205,19 +211,22 @@ class ReplicaManagerTest {
         0,
         collection.immutable
           .Map(
-            new TopicPartition(topic, 0) -> new PartitionState(0,
-                                                               0,
-                                                               0,
-                                                               brokerList,
-                                                               0,
-                                                               brokerSet))
+            new TopicPartition(topic, 0) -> new PartitionState(
+              0,
+              0,
+              0,
+              brokerList,
+              0,
+              brokerSet))
           .asJava,
-        Set(new BrokerEndPoint(0, "host1", 0),
-            new BrokerEndPoint(1, "host2", 1)).asJava)
-      rm.becomeLeaderOrFollower(0,
-                                leaderAndIsrRequest1,
-                                metadataCache,
-                                (_, _) => {})
+        Set(
+          new BrokerEndPoint(0, "host1", 0),
+          new BrokerEndPoint(1, "host2", 1)).asJava)
+      rm.becomeLeaderOrFollower(
+        0,
+        leaderAndIsrRequest1,
+        metadataCache,
+        (_, _) => {})
       rm.getLeaderReplicaIfLocal(topic, 0)
 
       // Append a message.
@@ -236,8 +245,9 @@ class ReplicaManagerTest {
         replicaId = -1,
         fetchMinBytes = 100000,
         fetchInfo = collection.immutable.Map(
-          new TopicAndPartition(topic, 0) -> new PartitionFetchInfo(0,
-                                                                    100000)),
+          new TopicAndPartition(topic, 0) -> new PartitionFetchInfo(
+            0,
+            100000)),
         responseCallback = fetchCallback)
 
       // Make this replica the follower
@@ -246,19 +256,22 @@ class ReplicaManagerTest {
         0,
         collection.immutable
           .Map(
-            new TopicPartition(topic, 0) -> new PartitionState(0,
-                                                               1,
-                                                               1,
-                                                               brokerList,
-                                                               0,
-                                                               brokerSet))
+            new TopicPartition(topic, 0) -> new PartitionState(
+              0,
+              1,
+              1,
+              brokerList,
+              0,
+              brokerSet))
           .asJava,
-        Set(new BrokerEndPoint(0, "host1", 0),
-            new BrokerEndPoint(1, "host2", 1)).asJava)
-      rm.becomeLeaderOrFollower(1,
-                                leaderAndIsrRequest2,
-                                metadataCache,
-                                (_, _) => {})
+        Set(
+          new BrokerEndPoint(0, "host1", 0),
+          new BrokerEndPoint(1, "host2", 1)).asJava)
+      rm.becomeLeaderOrFollower(
+        1,
+        leaderAndIsrRequest2,
+        metadataCache,
+        (_, _) => {})
 
       assertTrue(produceCallbackFired)
       assertTrue(fetchCallbackFired)

@@ -126,10 +126,11 @@ class Codec[A: Manifest](
         if (manifest[A].runtimeClass.isAssignableFrom(obj.getClass)) {
           encode(obj.asInstanceOf[A]) match {
             case Some(buffer) =>
-              Channels.write(context,
-                             message.getFuture,
-                             buffer,
-                             message.getRemoteAddress)
+              Channels.write(
+                context,
+                message.getFuture,
+                buffer,
+                message.getRemoteAddress)
             case None =>
               message.getFuture.setSuccess()
           }

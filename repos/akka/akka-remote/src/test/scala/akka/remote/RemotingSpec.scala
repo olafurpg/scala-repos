@@ -127,9 +127,10 @@ object RemotingSpec {
 
   def muteSystem(system: ActorSystem) {
     system.eventStream.publish(
-      TestEvent.Mute(EventFilter.error(start = "AssociationError"),
-                     EventFilter.warning(start = "AssociationError"),
-                     EventFilter.warning(pattern = "received dead letter.*")))
+      TestEvent.Mute(
+        EventFilter.error(start = "AssociationError"),
+        EventFilter.warning(start = "AssociationError"),
+        EventFilter.warning(pattern = "received dead letter.*")))
   }
 }
 
@@ -152,11 +153,13 @@ class RemotingSpec
     .resolve()
   val remoteSystem = ActorSystem("remote-sys", conf)
 
-  for ((name, proto) ← Seq("/gonk" -> "tcp",
-                           "/zagzag" -> "udp",
-                           "/roghtaar" -> "ssl.tcp"))
-    deploy(system,
-           Deploy(name, scope = RemoteScope(addr(remoteSystem, proto))))
+  for ((name, proto) ← Seq(
+         "/gonk" -> "tcp",
+         "/zagzag" -> "udp",
+         "/roghtaar" -> "ssl.tcp"))
+    deploy(
+      system,
+      Deploy(name, scope = RemoteScope(addr(remoteSystem, proto))))
 
   def addr(sys: ActorSystem, proto: String) =
     sys
@@ -242,8 +245,8 @@ class RemotingSpec
 
     "send warning message for wrong address" in {
       filterEvents(
-        EventFilter.warning(pattern = "Address is now gated for ",
-                            occurrences = 1)) {
+        EventFilter
+          .warning(pattern = "Address is now gated for ", occurrences = 1)) {
         system.actorFor(
           "akka.test://nonexistingsystem@localhost:12346/user/echo") ! "ping"
       }
@@ -632,8 +635,9 @@ class RemotingSpec
         val remoteEchoHereTcp = system.actorFor(
           s"akka.tcp://remote-sys@localhost:${port(remoteSystem, "tcp")}/user/echo")
         val proxyTcp =
-          system.actorOf(Props(classOf[Proxy], remoteEchoHereTcp, testActor),
-                         "proxy-tcp")
+          system.actorOf(
+            Props(classOf[Proxy], remoteEchoHereTcp, testActor),
+            "proxy-tcp")
         proxyTcp ! otherGuy
         expectMsg(3.seconds, ("pong", otherGuyRemoteTcp))
         // now check that we fall back to default when we haven't got a corresponding transport
@@ -642,8 +646,9 @@ class RemotingSpec
         val remoteEchoHereSsl = system.actorFor(
           s"akka.ssl.tcp://remote-sys@localhost:${port(remoteSystem, "ssl.tcp")}/user/echo")
         val proxySsl =
-          system.actorOf(Props(classOf[Proxy], remoteEchoHereSsl, testActor),
-                         "proxy-ssl")
+          system.actorOf(
+            Props(classOf[Proxy], remoteEchoHereSsl, testActor),
+            "proxy-ssl")
         EventFilter
           .warning(start = "Error while resolving address", occurrences = 1)
           .intercept {
@@ -748,10 +753,11 @@ class RemotingSpec
                 remoteTransportProbe.ref ! ev
             }))
 
-        val outboundHandle = new TestAssociationHandle(rawLocalAddress,
-                                                       rawRemoteAddress,
-                                                       remoteTransport,
-                                                       inbound = false)
+        val outboundHandle = new TestAssociationHandle(
+          rawLocalAddress,
+          rawRemoteAddress,
+          remoteTransport,
+          inbound = false)
 
         // Hijack associations through the test transport
         awaitCond(registry.transportsReady(rawLocalAddress, rawRemoteAddress))
@@ -844,10 +850,11 @@ class RemotingSpec
                 remoteTransportProbe.ref ! ev
             }))
 
-        val outboundHandle = new TestAssociationHandle(rawLocalAddress,
-                                                       rawRemoteAddress,
-                                                       remoteTransport,
-                                                       inbound = false)
+        val outboundHandle = new TestAssociationHandle(
+          rawLocalAddress,
+          rawRemoteAddress,
+          remoteTransport,
+          inbound = false)
 
         // Hijack associations through the test transport
         awaitCond(registry.transportsReady(rawLocalAddress, rawRemoteAddress))

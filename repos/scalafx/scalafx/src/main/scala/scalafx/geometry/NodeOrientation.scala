@@ -36,8 +36,9 @@ object NodeOrientation
     extends SFXEnumDelegateCompanion[jfxg.NodeOrientation, NodeOrientation] {
 
   val Inherit = new NodeOrientation(jfxg.NodeOrientation.INHERIT)
-  @deprecated("Use Inherit; INHERIT will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Inherit; INHERIT will be removed in a future release",
+    "8.0.60-R10")
   val INHERIT = Inherit
 
   val LeftToRight = new NodeOrientation(jfxg.NodeOrientation.LEFT_TO_RIGHT)

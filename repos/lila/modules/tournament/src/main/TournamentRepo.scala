@@ -126,14 +126,15 @@ object TournamentRepo {
       .collect[List](limit)
 
   def finishedPaginator(maxPerPage: Int, page: Int) =
-    Paginator(adapter = new BSONAdapter[Tournament](
-                collection = coll,
-                selector = finishedSelect,
-                projection = BSONDocument(),
-                sort = BSONDocument("startsAt" -> -1)
-              ),
-              currentPage = page,
-              maxPerPage = maxPerPage)
+    Paginator(
+      adapter = new BSONAdapter[Tournament](
+        collection = coll,
+        selector = finishedSelect,
+        projection = BSONDocument(),
+        sort = BSONDocument("startsAt" -> -1)
+      ),
+      currentPage = page,
+      maxPerPage = maxPerPage)
 
   def setStatus(tourId: String, status: Status) =
     coll

@@ -119,9 +119,10 @@ private[hive] object HiveShim {
         hdoi.precision(),
         hdoi.scale())
     } else {
-      Decimal(hdoi.getPrimitiveJavaObject(data).bigDecimalValue(),
-              hdoi.precision(),
-              hdoi.scale())
+      Decimal(
+        hdoi.getPrimitiveJavaObject(data).bigDecimalValue(),
+        hdoi.precision(),
+        hdoi.scale())
     }
   }
 
@@ -144,8 +145,9 @@ private[hive] object HiveShim {
 
     override def hashCode(): Int = {
       if (functionClassName == HIVE_GENERIC_UDF_MACRO_CLS) {
-        Objects.hashCode(functionClassName,
-                         instance.asInstanceOf[GenericUDFMacro].getBody())
+        Objects.hashCode(
+          functionClassName,
+          instance.asInstanceOf[GenericUDFMacro].getBody())
       } else {
         functionClassName.hashCode()
       }
@@ -184,15 +186,17 @@ private[hive] object HiveShim {
 
     def deserializePlan[UDFType](is: java.io.InputStream,
                                  clazz: Class[_]): UDFType = {
-      deserializeObjectByKryo(Utilities.runtimeSerializationKryo.get(),
-                              is,
-                              clazz).asInstanceOf[UDFType]
+      deserializeObjectByKryo(
+        Utilities.runtimeSerializationKryo.get(),
+        is,
+        clazz).asInstanceOf[UDFType]
     }
 
     def serializePlan(function: AnyRef, out: java.io.OutputStream): Unit = {
-      serializeObjectByKryo(Utilities.runtimeSerializationKryo.get(),
-                            function,
-                            out)
+      serializeObjectByKryo(
+        Utilities.runtimeSerializationKryo.get(),
+        function,
+        out)
     }
 
     def writeExternal(out: java.io.ObjectOutput) {

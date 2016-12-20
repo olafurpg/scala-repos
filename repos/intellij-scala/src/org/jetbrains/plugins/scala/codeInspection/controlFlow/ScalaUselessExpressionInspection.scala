@@ -37,8 +37,9 @@ class ScalaUselessExpressionInspection
   override def actionFor(
       holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case expr: ScExpression
-        if IntentionAvailabilityChecker.checkInspection(this,
-                                                        expr.getParent) =>
+        if IntentionAvailabilityChecker.checkInspection(
+          this,
+          expr.getParent) =>
       if (canResultInSideEffectsOnly(expr) &&
           SideEffectsUtil.hasNoSideEffects(expr)) {
         val message = "Useless expression"
@@ -52,9 +53,10 @@ class ScalaUselessExpressionInspection
           case _ => Seq.empty
         }
 
-        holder.registerProblem(expr,
-                               message,
-                               removeElemFix +: addReturnKeywordFix: _*)
+        holder.registerProblem(
+          expr,
+          message,
+          removeElemFix +: addReturnKeywordFix: _*)
       }
   }
 

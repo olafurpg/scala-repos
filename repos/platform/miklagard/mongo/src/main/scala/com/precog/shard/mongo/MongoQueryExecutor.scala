@@ -85,9 +85,10 @@ object MongoQueryExecutor {
             jobActorSystem: ActorSystem)(
       implicit ec: ExecutionContext,
       M: Monad[Future]): Platform[Future, StreamT[Future, Slice]] = {
-    new MongoQueryExecutor(new MongoQueryExecutorConfig(config),
-                           jobManager,
-                           jobActorSystem)
+    new MongoQueryExecutor(
+      new MongoQueryExecutorConfig(config),
+      jobManager,
+      jobActorSystem)
   }
 }
 

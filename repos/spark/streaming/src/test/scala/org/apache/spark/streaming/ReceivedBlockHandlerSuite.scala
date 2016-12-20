@@ -76,10 +76,11 @@ class ReceivedBlockHandlerSuite
     blockManagerMaster = new BlockManagerMaster(
       rpcEnv.setupEndpoint(
         "blockmanager",
-        new BlockManagerMasterEndpoint(rpcEnv,
-                                       true,
-                                       conf,
-                                       new LiveListenerBus)),
+        new BlockManagerMasterEndpoint(
+          rpcEnv,
+          true,
+          conf,
+          new LiveListenerBus)),
       conf,
       true)
 
@@ -171,8 +172,9 @@ class ReceivedBlockHandlerSuite
             val fileSegment =
               walSegment.asInstanceOf[FileBasedWriteAheadLogSegment]
             val reader =
-              new FileBasedWriteAheadLogRandomReader(fileSegment.path,
-                                                     hadoopConf)
+              new FileBasedWriteAheadLogRandomReader(
+                fileSegment.path,
+                hadoopConf)
             val bytes = reader.read(fileSegment)
             reader.close()
             blockManager.dataDeserialize(generateBlockId(), bytes).toList
@@ -274,53 +276,61 @@ class ReceivedBlockHandlerSuite
       blockManager,
       None)
     // ArrayBufferBlock-MEMORY_ONLY
-    testRecordcount(isBlockManagerBasedBlockHandler,
-                    StorageLevel.MEMORY_ONLY,
-                    ArrayBufferBlock(ArrayBuffer.fill(25)(0)),
-                    blockManager,
-                    Some(25))
+    testRecordcount(
+      isBlockManagerBasedBlockHandler,
+      StorageLevel.MEMORY_ONLY,
+      ArrayBufferBlock(ArrayBuffer.fill(25)(0)),
+      blockManager,
+      Some(25))
     // ArrayBufferBlock-MEMORY_ONLY_SER
-    testRecordcount(isBlockManagerBasedBlockHandler,
-                    StorageLevel.MEMORY_ONLY_SER,
-                    ArrayBufferBlock(ArrayBuffer.fill(25)(0)),
-                    blockManager,
-                    Some(25))
+    testRecordcount(
+      isBlockManagerBasedBlockHandler,
+      StorageLevel.MEMORY_ONLY_SER,
+      ArrayBufferBlock(ArrayBuffer.fill(25)(0)),
+      blockManager,
+      Some(25))
     // ArrayBufferBlock-DISK_ONLY
-    testRecordcount(isBlockManagerBasedBlockHandler,
-                    StorageLevel.DISK_ONLY,
-                    ArrayBufferBlock(ArrayBuffer.fill(50)(0)),
-                    blockManager,
-                    Some(50))
+    testRecordcount(
+      isBlockManagerBasedBlockHandler,
+      StorageLevel.DISK_ONLY,
+      ArrayBufferBlock(ArrayBuffer.fill(50)(0)),
+      blockManager,
+      Some(50))
     // ArrayBufferBlock-MEMORY_AND_DISK
-    testRecordcount(isBlockManagerBasedBlockHandler,
-                    StorageLevel.MEMORY_AND_DISK,
-                    ArrayBufferBlock(ArrayBuffer.fill(75)(0)),
-                    blockManager,
-                    Some(75))
+    testRecordcount(
+      isBlockManagerBasedBlockHandler,
+      StorageLevel.MEMORY_AND_DISK,
+      ArrayBufferBlock(ArrayBuffer.fill(75)(0)),
+      blockManager,
+      Some(75))
     // IteratorBlock-MEMORY_ONLY
-    testRecordcount(isBlockManagerBasedBlockHandler,
-                    StorageLevel.MEMORY_ONLY,
-                    IteratorBlock((ArrayBuffer.fill(100)(0)).iterator),
-                    blockManager,
-                    Some(100))
+    testRecordcount(
+      isBlockManagerBasedBlockHandler,
+      StorageLevel.MEMORY_ONLY,
+      IteratorBlock((ArrayBuffer.fill(100)(0)).iterator),
+      blockManager,
+      Some(100))
     // IteratorBlock-MEMORY_ONLY_SER
-    testRecordcount(isBlockManagerBasedBlockHandler,
-                    StorageLevel.MEMORY_ONLY_SER,
-                    IteratorBlock((ArrayBuffer.fill(100)(0)).iterator),
-                    blockManager,
-                    Some(100))
+    testRecordcount(
+      isBlockManagerBasedBlockHandler,
+      StorageLevel.MEMORY_ONLY_SER,
+      IteratorBlock((ArrayBuffer.fill(100)(0)).iterator),
+      blockManager,
+      Some(100))
     // IteratorBlock-DISK_ONLY
-    testRecordcount(isBlockManagerBasedBlockHandler,
-                    StorageLevel.DISK_ONLY,
-                    IteratorBlock((ArrayBuffer.fill(125)(0)).iterator),
-                    blockManager,
-                    Some(125))
+    testRecordcount(
+      isBlockManagerBasedBlockHandler,
+      StorageLevel.DISK_ONLY,
+      IteratorBlock((ArrayBuffer.fill(125)(0)).iterator),
+      blockManager,
+      Some(125))
     // IteratorBlock-MEMORY_AND_DISK
-    testRecordcount(isBlockManagerBasedBlockHandler,
-                    StorageLevel.MEMORY_AND_DISK,
-                    IteratorBlock((ArrayBuffer.fill(150)(0)).iterator),
-                    blockManager,
-                    Some(150))
+    testRecordcount(
+      isBlockManagerBasedBlockHandler,
+      StorageLevel.MEMORY_AND_DISK,
+      IteratorBlock((ArrayBuffer.fill(150)(0)).iterator),
+      blockManager,
+      Some(150))
   }
 
   private def createBlockManager(
@@ -331,17 +341,18 @@ class ReceivedBlockHandlerSuite
       new StaticMemoryManager(conf, Long.MaxValue, maxMem, numCores = 1)
     val transfer =
       new NettyBlockTransferService(conf, securityMgr, numCores = 1)
-    val blockManager = new BlockManager(name,
-                                        rpcEnv,
-                                        blockManagerMaster,
-                                        serializer,
-                                        conf,
-                                        memManager,
-                                        mapOutputTracker,
-                                        shuffleManager,
-                                        transfer,
-                                        securityMgr,
-                                        0)
+    val blockManager = new BlockManager(
+      name,
+      rpcEnv,
+      blockManagerMaster,
+      serializer,
+      conf,
+      memManager,
+      mapOutputTracker,
+      shuffleManager,
+      transfer,
+      securityMgr,
+      0)
     memManager.setMemoryStore(blockManager.memoryStore)
     blockManager.initialize("app-id")
     blockManagerBuffer += blockManager
@@ -436,15 +447,17 @@ class ReceivedBlockHandlerSuite
     // Handle error in iterator (e.g. divide-by-zero error)
     intercept[Exception] {
       val iterator = (10 to (-10, -1)).toIterator.map { _ / 0 }
-      receivedBlockHandler.storeBlock(StreamBlockId(1, 1),
-                                      IteratorBlock(iterator))
+      receivedBlockHandler.storeBlock(
+        StreamBlockId(1, 1),
+        IteratorBlock(iterator))
     }
 
     // Handler error in block manager storing (e.g. too big block)
     intercept[SparkException] {
       val byteBuffer = ByteBuffer.wrap(new Array[Byte](blockManagerSize + 1))
-      receivedBlockHandler.storeBlock(StreamBlockId(1, 1),
-                                      ByteBufferBlock(byteBuffer))
+      receivedBlockHandler.storeBlock(
+        StreamBlockId(1, 1),
+        ByteBufferBlock(byteBuffer))
     }
   }
 

@@ -117,10 +117,12 @@ private final class InfoChecker(
         info.isAbstract != expectedInfo.isAbstract ||
         info.isExported != expectedInfo.isExported ||
         !mapIncludes(info.methodsCalled, expectedInfo.methodsCalled) ||
-        !mapIncludes(info.methodsCalledStatically,
-                     expectedInfo.methodsCalledStatically) ||
-        !mapIncludes(info.staticMethodsCalled,
-                     expectedInfo.staticMethodsCalled) || !listIncludes(
+        !mapIncludes(
+          info.methodsCalledStatically,
+          expectedInfo.methodsCalledStatically) ||
+        !mapIncludes(
+          info.staticMethodsCalled,
+          expectedInfo.staticMethodsCalled) || !listIncludes(
           info.instantiatedClasses,
           expectedInfo.instantiatedClasses) ||
         !listIncludes(info.accessedModules, expectedInfo.accessedModules) ||

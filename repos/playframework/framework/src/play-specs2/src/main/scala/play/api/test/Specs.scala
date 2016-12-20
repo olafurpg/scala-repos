@@ -24,9 +24,10 @@ import play.core.server.ServerProvider
 abstract class WithApplicationLoader(
     applicationLoader: ApplicationLoader = new GuiceApplicationLoader(),
     context: ApplicationLoader.Context = ApplicationLoader.createContext(
-      new Environment(new java.io.File("."),
-                      ApplicationLoader.getClass.getClassLoader,
-                      Mode.Test)))
+      new Environment(
+        new java.io.File("."),
+        ApplicationLoader.getClass.getClassLoader,
+        Mode.Test)))
     extends Around
     with Scope {
   implicit lazy val app = applicationLoader.load(context)
@@ -76,9 +77,10 @@ abstract class WithServer(val app: Application =
 
   override def around[T: AsResult](t: => T): Result =
     Helpers.running(
-      TestServer(port = port,
-                 application = app,
-                 serverProvider = serverProvider))(AsResult.effectively(t))
+      TestServer(
+        port = port,
+        application = app,
+        serverProvider = serverProvider))(AsResult.effectively(t))
 }
 
 /**

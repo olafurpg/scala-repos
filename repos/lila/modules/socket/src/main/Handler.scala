@@ -38,9 +38,10 @@ object Handler {
         }
       case ("startWatching", o) =>
         o str "d" foreach { ids =>
-          hub.actor.moveBroadcast ! StartWatching(uid,
-                                                  member,
-                                                  ids.split(' ').toSet)
+          hub.actor.moveBroadcast ! StartWatching(
+            uid,
+            member,
+            ids.split(' ').toSet)
         }
       case ("moveLat", o) =>
         hub.channel.roundMoveTime ! (~(o boolean "d"))
@@ -57,8 +58,8 @@ object Handler {
                     "path" -> anaMove.path
                   ))
               case scalaz.Failure(err) =>
-                member push lila.socket.Socket.makeMessage("stepFailure",
-                                                           err.toString)
+                member push lila.socket.Socket
+                  .makeMessage("stepFailure", err.toString)
             }
           }
         }
@@ -74,8 +75,8 @@ object Handler {
                     "path" -> anaDrop.path
                   ))
               case scalaz.Failure(err) =>
-                member push lila.socket.Socket.makeMessage("stepFailure",
-                                                           err.toString)
+                member push lila.socket.Socket
+                  .makeMessage("stepFailure", err.toString)
             }
           }
         }

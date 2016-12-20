@@ -34,9 +34,10 @@ object StatsScoping {
       val role = Role
       val description =
         "May modify stats scoping based on the destination address"
-      val parameters = Seq(implicitly[Stack.Param[AddrMetadata]],
-                           implicitly[Stack.Param[Scoper]],
-                           implicitly[Stack.Param[Stats]])
+      val parameters = Seq(
+        implicitly[Stack.Param[AddrMetadata]],
+        implicitly[Stack.Param[Scoper]],
+        implicitly[Stack.Param[Stats]])
 
       def make(params: Stack.Params, next: Stack[ServiceFactory[Req, Rep]]) = {
         val AddrMetadata(metadata) = params[AddrMetadata]

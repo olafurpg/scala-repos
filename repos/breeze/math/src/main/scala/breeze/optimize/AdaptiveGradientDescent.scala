@@ -37,10 +37,11 @@ object AdaptiveGradientDescent {
                             minImprovementWindow: Int = 50)(
       implicit vspace: MutableFiniteCoordinateField[T, _, Double],
       rand: RandBasis = Rand)
-      extends StochasticGradientDescent[T](stepSize,
-                                           maxIter,
-                                           tolerance,
-                                           minImprovementWindow) {
+      extends StochasticGradientDescent[T](
+        stepSize,
+        maxIter,
+        tolerance,
+        minImprovementWindow) {
 
     val delta = 1E-4
     import vspace._

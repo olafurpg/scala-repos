@@ -154,12 +154,14 @@ class KryoSerializerSuite extends SparkFunSuite with SharedSparkContext {
     check(mutable.HashMap(1 -> "one", 2 -> "two"))
     check(mutable.HashMap("one" -> 1, "two" -> 2))
     check(
-      List(Some(mutable.HashMap(1 -> 1, 2 -> 2)),
-           None,
-           Some(mutable.HashMap(3 -> 4))))
+      List(
+        Some(mutable.HashMap(1 -> 1, 2 -> 2)),
+        None,
+        Some(mutable.HashMap(3 -> 4))))
     check(
-      List(mutable.HashMap("one" -> 1, "two" -> 2),
-           mutable.HashMap(1 -> "one", 2 -> "two", 3 -> "three")))
+      List(
+        mutable.HashMap("one" -> 1, "two" -> 2),
+        mutable.HashMap(1 -> "one", 2 -> "two", 3 -> "three")))
   }
 
   test("Bug: SPARK-10251") {
@@ -189,12 +191,14 @@ class KryoSerializerSuite extends SparkFunSuite with SharedSparkContext {
     check(mutable.HashMap(1 -> "one", 2 -> "two"))
     check(mutable.HashMap("one" -> 1, "two" -> 2))
     check(
-      List(Some(mutable.HashMap(1 -> 1, 2 -> 2)),
-           None,
-           Some(mutable.HashMap(3 -> 4))))
+      List(
+        Some(mutable.HashMap(1 -> 1, 2 -> 2)),
+        None,
+        Some(mutable.HashMap(3 -> 4))))
     check(
-      List(mutable.HashMap("one" -> 1, "two" -> 2),
-           mutable.HashMap(1 -> "one", 2 -> "two", 3 -> "three")))
+      List(
+        mutable.HashMap("one" -> 1, "two" -> 2),
+        mutable.HashMap(1 -> "one", 2 -> "two", 3 -> "three")))
   }
 
   test("ranges") {
@@ -365,8 +369,9 @@ class KryoSerializerSuite extends SparkFunSuite with SharedSparkContext {
     val sparseBlockSizes = Array[Long](0L, 1L, 0L, 2L)
     Seq(denseBlockSizes, sparseBlockSizes).foreach { blockSizes =>
       ser.serialize(
-        HighlyCompressedMapStatus(BlockManagerId("exec-1", "host", 1234),
-                                  blockSizes))
+        HighlyCompressedMapStatus(
+          BlockManagerId("exec-1", "host", 1234),
+          blockSizes))
     }
   }
 
@@ -432,8 +437,9 @@ class KryoSerializerSuite extends SparkFunSuite with SharedSparkContext {
       .asInstanceOf[KryoSerializerInstance]
     assert(ser.getAutoReset)
     val conf =
-      new SparkConf().set("spark.kryo.registrator",
-                          classOf[RegistratorWithoutAutoReset].getName)
+      new SparkConf().set(
+        "spark.kryo.registrator",
+        classOf[RegistratorWithoutAutoReset].getName)
     val ser2 = new KryoSerializer(conf)
       .newInstance()
       .asInstanceOf[KryoSerializerInstance]
@@ -445,8 +451,9 @@ class KryoSerializerSuite extends SparkFunSuite with SharedSparkContext {
     val conf = new SparkConf(loadDefaults = false)
       .set("spark.kryo.referenceTracking", referenceTracking.toString)
     if (!autoReset) {
-      conf.set("spark.kryo.registrator",
-               classOf[RegistratorWithoutAutoReset].getName)
+      conf.set(
+        "spark.kryo.registrator",
+        classOf[RegistratorWithoutAutoReset].getName)
     }
     val ser = new KryoSerializer(conf)
     val serInstance = ser.newInstance().asInstanceOf[KryoSerializerInstance]
@@ -470,8 +477,9 @@ class KryoSerializerSuite extends SparkFunSuite with SharedSparkContext {
   for (referenceTracking <- Set(true, false); autoReset <- Set(true, false)) {
     test(
       s"instance reuse with autoReset = $autoReset, referenceTracking = $referenceTracking") {
-      testSerializerInstanceReuse(autoReset = autoReset,
-                                  referenceTracking = referenceTracking)
+      testSerializerInstanceReuse(
+        autoReset = autoReset,
+        referenceTracking = referenceTracking)
     }
   }
 }
@@ -480,8 +488,9 @@ class KryoSerializerAutoResetDisabledSuite
     extends SparkFunSuite
     with SharedSparkContext {
   conf.set("spark.serializer", classOf[KryoSerializer].getName)
-  conf.set("spark.kryo.registrator",
-           classOf[RegistratorWithoutAutoReset].getName)
+  conf.set(
+    "spark.kryo.registrator",
+    classOf[RegistratorWithoutAutoReset].getName)
   conf.set("spark.kryo.referenceTracking", "true")
   conf.set("spark.shuffle.manager", "sort")
   conf.set("spark.shuffle.sort.bypassMergeThreshold", "200")

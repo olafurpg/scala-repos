@@ -36,8 +36,9 @@ private[akka] final case class ParserSettingsImpl(
 
   require(maxUriLength > 0, "max-uri-length must be > 0")
   require(maxMethodLength > 0, "max-method-length must be > 0")
-  require(maxResponseReasonLength > 0,
-          "max-response-reason-length must be > 0")
+  require(
+    maxResponseReasonLength > 0,
+    "max-response-reason-length must be > 0")
   require(maxHeaderNameLength > 0, "max-header-name-length must be > 0")
   require(maxHeaderValueLength > 0, "max-header-value-length must be > 0")
   require(maxHeaderCount > 0, "max-header-count must be > 0")

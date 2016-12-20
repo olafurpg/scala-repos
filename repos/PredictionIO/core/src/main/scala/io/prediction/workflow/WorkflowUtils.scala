@@ -157,9 +157,10 @@ object WorkflowUtils extends Logging {
           .asInstanceOf[Params]
       } catch {
         case e @ (_: MappingException | _: JsonSyntaxException) =>
-          error(s"Unable to extract parameters for ${apClass.getName} from " +
-                  s"JSON string: $json. Aborting workflow.",
-                e)
+          error(
+            s"Unable to extract parameters for ${apClass.getName} from " +
+              s"JSON string: $json. Aborting workflow.",
+            e)
           throw e
       }
     }
@@ -192,11 +193,12 @@ object WorkflowUtils extends Logging {
                 " defined in Engine.")
               sys.exit(1)
             }
-            WorkflowUtils.extractParams(engineLanguage,
-                                        compact(render(p)),
-                                        classMap(np.name),
-                                        jsonExtractor,
-                                        formats)
+            WorkflowUtils.extractParams(
+              engineLanguage,
+              compact(render(p)),
+              classMap(np.name),
+              jsonExtractor,
+              formats)
           } catch {
             case e: Exception =>
               error(s"Unable to extract $field params $p")
@@ -250,10 +252,11 @@ object WorkflowUtils extends Logging {
     * configuration.
     */
   def thirdPartyConfFiles: Seq[String] = {
-    val thirdPartyFiles = Map("PIO_CONF_DIR" -> "log4j.properties",
-                              "ES_CONF_DIR" -> "elasticsearch.yml",
-                              "HADOOP_CONF_DIR" -> "core-site.xml",
-                              "HBASE_CONF_DIR" -> "hbase-site.xml")
+    val thirdPartyFiles = Map(
+      "PIO_CONF_DIR" -> "log4j.properties",
+      "ES_CONF_DIR" -> "elasticsearch.yml",
+      "HADOOP_CONF_DIR" -> "core-site.xml",
+      "HBASE_CONF_DIR" -> "hbase-site.xml")
 
     thirdPartyFiles.keys.toSeq
       .map { k: String =>
@@ -266,12 +269,13 @@ object WorkflowUtils extends Logging {
   }
 
   def thirdPartyClasspaths: Seq[String] = {
-    val thirdPartyPaths = Seq("PIO_CONF_DIR",
-                              "ES_CONF_DIR",
-                              "POSTGRES_JDBC_DRIVER",
-                              "MYSQL_JDBC_DRIVER",
-                              "HADOOP_CONF_DIR",
-                              "HBASE_CONF_DIR")
+    val thirdPartyPaths = Seq(
+      "PIO_CONF_DIR",
+      "ES_CONF_DIR",
+      "POSTGRES_JDBC_DRIVER",
+      "MYSQL_JDBC_DRIVER",
+      "HADOOP_CONF_DIR",
+      "HBASE_CONF_DIR")
     thirdPartyPaths
       .map(p => sys.env.get(p).map(Seq(_)).getOrElse(Seq[String]()))
       .flatten
@@ -377,10 +381,11 @@ object SparkWorkflowUtils extends Logging {
         try {
           val loadMethod = Class
             .forName(pmm.className)
-            .getMethod("load",
-                       classOf[String],
-                       classOf[Params],
-                       classOf[SparkContext])
+            .getMethod(
+              "load",
+              classOf[String],
+              classOf[Params],
+              classOf[SparkContext])
           loadMethod.invoke(null, runId, params, sc.orNull).asInstanceOf[M]
         } catch {
           case e: ClassNotFoundException =>

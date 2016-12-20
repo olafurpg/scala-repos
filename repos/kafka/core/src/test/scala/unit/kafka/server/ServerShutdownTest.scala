@@ -63,11 +63,12 @@ class ServerShutdownTest extends ZooKeeperTestHarness {
     var producer = createProducer(server)
 
     // create topic
-    createTopic(zkUtils,
-                topic,
-                numPartitions = 1,
-                replicationFactor = 1,
-                servers = Seq(server))
+    createTopic(
+      zkUtils,
+      topic,
+      numPartitions = 1,
+      replicationFactor = 1,
+      servers = Seq(server))
 
     // send some messages
     sent1
@@ -136,9 +137,9 @@ class ServerShutdownTest extends ZooKeeperTestHarness {
     val newProps = TestUtils.createBrokerConfig(0, zkConnect)
     newProps.setProperty("delete.topic.enable", "true")
     val newConfig = KafkaConfig.fromProps(newProps)
-    val server = new KafkaServer(newConfig,
-                                 threadNamePrefix =
-                                   Option(this.getClass.getName))
+    val server = new KafkaServer(
+      newConfig,
+      threadNamePrefix = Option(this.getClass.getName))
     server.startup()
     server.shutdown()
     server.awaitShutdown()
@@ -151,9 +152,9 @@ class ServerShutdownTest extends ZooKeeperTestHarness {
     val newProps = TestUtils.createBrokerConfig(0, zkConnect)
     newProps.setProperty("zookeeper.connect", "fakehostthatwontresolve:65535")
     val newConfig = KafkaConfig.fromProps(newProps)
-    val server = new KafkaServer(newConfig,
-                                 threadNamePrefix =
-                                   Option(this.getClass.getName))
+    val server = new KafkaServer(
+      newConfig,
+      threadNamePrefix = Option(this.getClass.getName))
     try {
       server.startup()
       fail("Expected KafkaServer setup to fail, throw exception")
@@ -181,12 +182,13 @@ class ServerShutdownTest extends ZooKeeperTestHarness {
   }
 
   def verifyNonDaemonThreadsStatus() {
-    assertEquals(0,
-                 Thread.getAllStackTraces
-                   .keySet()
-                   .toArray
-                   .map { _.asInstanceOf[Thread] }
-                   .count(isNonDaemonKafkaThread))
+    assertEquals(
+      0,
+      Thread.getAllStackTraces
+        .keySet()
+        .toArray
+        .map { _.asInstanceOf[Thread] }
+        .count(isNonDaemonKafkaThread))
   }
 
   @Test

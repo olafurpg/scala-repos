@@ -221,8 +221,9 @@ object Memcached
       */
     def newStack: Stack[ServiceFactory[Command, Response]] =
       StackClient.newStack
-        .replace(LoadBalancerFactory.role,
-                 ConcurrentLoadBalancerFactory.module[Command, Response])
+        .replace(
+          LoadBalancerFactory.role,
+          ConcurrentLoadBalancerFactory.module[Command, Response])
         .replace(DefaultPool.Role, SingletonPool.module[Command, Response])
         .replace(ClientTracingFilter.role, MemcachedTraceInitializer.Module)
 
@@ -240,16 +241,20 @@ object Memcached
       hasher: String,
       isPipelining: Boolean
   ): Unit = {
-    GlobalRegistry.get.put(Seq(ClientRegistry.registryName,
-                               Client.ProtocolLibraryName,
-                               label,
-                               "is_pipelining"),
-                           isPipelining.toString)
-    GlobalRegistry.get.put(Seq(ClientRegistry.registryName,
-                               Client.ProtocolLibraryName,
-                               label,
-                               "key_hasher"),
-                           hasher)
+    GlobalRegistry.get.put(
+      Seq(
+        ClientRegistry.registryName,
+        Client.ProtocolLibraryName,
+        label,
+        "is_pipelining"),
+      isPipelining.toString)
+    GlobalRegistry.get.put(
+      Seq(
+        ClientRegistry.registryName,
+        Client.ProtocolLibraryName,
+        label,
+        "key_hasher"),
+      hasher)
   }
 
   /**
@@ -318,12 +323,13 @@ object Memcached
 
       val group = CacheNodeGroup.fromVarAddr(va)
       val scopedSr = sr.scope(label)
-      new KetamaPartitionedClient(group,
-                                  newService,
-                                  healthBroker,
-                                  scopedSr,
-                                  hasher,
-                                  numReps) with TwemcachePartitionedClient
+      new KetamaPartitionedClient(
+        group,
+        newService,
+        healthBroker,
+        scopedSr,
+        hasher,
+        numReps) with TwemcachePartitionedClient
     }
 
     /**

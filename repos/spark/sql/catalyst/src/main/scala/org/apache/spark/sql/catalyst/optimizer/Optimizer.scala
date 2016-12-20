@@ -151,8 +151,9 @@ object EliminateSerialization extends Rule[LogicalPlan] {
         if !deserializer.isInstanceOf[Attribute] &&
           deserializer.dataType == child.outputObject.dataType =>
       val childWithoutSerialization = child.withObjectOutput
-      m.copy(deserializer = childWithoutSerialization.output.head,
-             child = childWithoutSerialization)
+      m.copy(
+        deserializer = childWithoutSerialization.output.head,
+        child = childWithoutSerialization)
   }
 }
 
@@ -317,11 +318,12 @@ object SetOperationPushDown extends Rule[LogicalPlan] with PredicateHelper {
       val (deterministic, nondeterministic) =
         partitionByDeterministic(condition)
       val rewrites = buildRewrites(left, right)
-      Filter(nondeterministic,
-             Except(
-               Filter(deterministic, left),
-               Filter(pushToRight(deterministic, rewrites), right)
-             ))
+      Filter(
+        nondeterministic,
+        Except(
+          Filter(deterministic, left),
+          Filter(pushToRight(deterministic, rewrites), right)
+        ))
   }
 }
 
@@ -1006,8 +1008,9 @@ object PushPredicateThroughProject
           // Push down the small conditions without nondeterministic expressions.
           val pushedCondition =
             deterministic.map(replaceAlias(_, aliasMap)).reduce(And)
-          Filter(nondeterministic.reduce(And),
-                 project.copy(child = Filter(pushedCondition, grandChild)))
+          Filter(
+            nondeterministic.reduce(And),
+            project.copy(child = Filter(pushedCondition, grandChild)))
         }
       }
   }
@@ -1031,12 +1034,13 @@ object PushPredicateThroughGenerate
         }
       if (pushDown.nonEmpty) {
         val pushDownPredicate = pushDown.reduce(And)
-        val newGenerate = Generate(g.generator,
-                                   join = g.join,
-                                   outer = g.outer,
-                                   g.qualifier,
-                                   g.generatorOutput,
-                                   Filter(pushDownPredicate, g.child))
+        val newGenerate = Generate(
+          g.generator,
+          join = g.join,
+          outer = g.outer,
+          g.qualifier,
+          g.generatorOutput,
+          Filter(pushDownPredicate, g.child))
         if (stayUp.isEmpty) newGenerate
         else Filter(stayUp.reduce(And), newGenerate)
       } else {
@@ -1196,8 +1200,9 @@ object OuterJoinElimination extends Rule[LogicalPlan] with PredicateHelper {
   }
 
   def apply(plan: LogicalPlan): LogicalPlan = plan transform {
-    case f @ Filter(condition,
-                    j @ Join(_, _, RightOuter | LeftOuter | FullOuter, _)) =>
+    case f @ Filter(
+          condition,
+          j @ Join(_, _, RightOuter | LeftOuter | FullOuter, _)) =>
       val newJoinType = buildNewJoinType(f, j)
       if (j.joinType == newJoinType) f
       else Filter(condition, j.copy(joinType = newJoinType))
@@ -1237,8 +1242,9 @@ object PushPredicateThroughJoin
 
   def apply(plan: LogicalPlan): LogicalPlan = plan transform {
     // push the where condition down into join filter
-    case f @ Filter(filterCondition,
-                    Join(left, right, joinType, joinCondition)) =>
+    case f @ Filter(
+          filterCondition,
+          Join(left, right, joinType, joinCondition)) =>
       val (leftFilterConditions, rightFilterConditions, commonFilterCondition) =
         split(splitConjunctivePredicates(filterCondition), left, right)
 
@@ -1293,9 +1299,10 @@ object PushPredicateThroughJoin
     // push down the join filter into sub query scanning if applicable
     case f @ Join(left, right, joinType, joinCondition) =>
       val (leftJoinConditions, rightJoinConditions, commonJoinCondition) =
-        split(joinCondition.map(splitConjunctivePredicates).getOrElse(Nil),
-              left,
-              right)
+        split(
+          joinCondition.map(splitConjunctivePredicates).getOrElse(Nil),
+          left,
+          right)
 
       joinType match {
         case _ @(Inner | LeftSemi) =>
@@ -1403,16 +1410,19 @@ object DecimalAggregates extends Rule[LogicalPlan] {
   private val MAX_DOUBLE_DIGITS = 15
 
   def apply(plan: LogicalPlan): LogicalPlan = plan transformAllExpressions {
-    case AggregateExpression(Sum(e @ DecimalType.Expression(prec, scale)),
-                             mode,
-                             isDistinct) if prec + 10 <= MAX_LONG_DIGITS =>
-      MakeDecimal(AggregateExpression(Sum(UnscaledValue(e)), mode, isDistinct),
-                  prec + 10,
-                  scale)
+    case AggregateExpression(
+        Sum(e @ DecimalType.Expression(prec, scale)),
+        mode,
+        isDistinct) if prec + 10 <= MAX_LONG_DIGITS =>
+      MakeDecimal(
+        AggregateExpression(Sum(UnscaledValue(e)), mode, isDistinct),
+        prec + 10,
+        scale)
 
-    case AggregateExpression(Average(e @ DecimalType.Expression(prec, scale)),
-                             mode,
-                             isDistinct) if prec + 4 <= MAX_DOUBLE_DIGITS =>
+    case AggregateExpression(
+        Average(e @ DecimalType.Expression(prec, scale)),
+        mode,
+        isDistinct) if prec + 4 <= MAX_DOUBLE_DIGITS =>
       val newAggExpr =
         AggregateExpression(Average(UnscaledValue(e)), mode, isDistinct)
       Cast(

@@ -49,11 +49,12 @@ class SexpPrettyPrinterSpec extends EnsimeSpec {
     )
 
     val datum = SexpData(fookey -> foo, barkey -> foo)
-    assertPrinter(SexpData(
-                    fookey -> datum,
-                    barkey -> datum
-                  ),
-                  """(
+    assertPrinter(
+      SexpData(
+        fookey -> datum,
+        barkey -> datum
+      ),
+      """(
   :foo (
     :foo "foo"
     :bar "foo"

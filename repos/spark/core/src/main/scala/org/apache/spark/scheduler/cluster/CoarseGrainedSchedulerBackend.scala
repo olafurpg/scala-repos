@@ -168,12 +168,13 @@ private[spark] class CoarseGrainedSchedulerBackend(
           addressToExecutorId(executorAddress) = executorId
           totalCoreCount.addAndGet(cores)
           totalRegisteredExecutors.addAndGet(1)
-          val data = new ExecutorData(executorRef,
-                                      executorRef.address,
-                                      executorAddress.host,
-                                      cores,
-                                      cores,
-                                      logUrls)
+          val data = new ExecutorData(
+            executorRef,
+            executorRef.address,
+            executorAddress.host,
+            cores,
+            cores,
+            logUrls)
           // This must be synchronized because variables mutated
           // in this block are read when requesting executors
           CoarseGrainedSchedulerBackend.this.synchronized {
@@ -187,9 +188,10 @@ private[spark] class CoarseGrainedSchedulerBackend(
           // Note: some tests expect the reply to come after we put the executor in the map
           context.reply(RegisteredExecutor(executorAddress.host))
           listenerBus.post(
-            SparkListenerExecutorAdded(System.currentTimeMillis(),
-                                       executorId,
-                                       data))
+            SparkListenerExecutorAdded(
+              System.currentTimeMillis(),
+              executorId,
+              data))
           makeOffers()
         }
 
@@ -225,9 +227,10 @@ private[spark] class CoarseGrainedSchedulerBackend(
       val workOffers = activeExecutors
         .map {
           case (id, executorData) =>
-            new WorkerOffer(id,
-                            executorData.executorHost,
-                            executorData.freeCores)
+            new WorkerOffer(
+              id,
+              executorData.executorHost,
+              executorData.freeCores)
         }
         .toSeq
       launchTasks(scheduler.resourceOffers(workOffers))
@@ -250,9 +253,10 @@ private[spark] class CoarseGrainedSchedulerBackend(
       if (executorIsAlive(executorId)) {
         val executorData = executorDataMap(executorId)
         val workOffers = Seq(
-          new WorkerOffer(executorId,
-                          executorData.executorHost,
-                          executorData.freeCores))
+          new WorkerOffer(
+            executorId,
+            executorData.executorHost,
+            executorData.freeCores))
         launchTasks(scheduler.resourceOffers(workOffers))
       }
     }
@@ -274,10 +278,11 @@ private[spark] class CoarseGrainedSchedulerBackend(
                   "Serialized task %s:%d was %d bytes, which exceeds max allowed: " +
                     "spark.rpc.message.maxSize (%d bytes). Consider increasing " +
                     "spark.rpc.message.maxSize or using broadcast variables for large values."
-                msg = msg.format(task.taskId,
-                                 task.index,
-                                 serializedTask.limit,
-                                 maxRpcMessageSize)
+                msg = msg.format(
+                  task.taskId,
+                  task.index,
+                  serializedTask.limit,
+                  maxRpcMessageSize)
                 taskSetMgr.abort(msg)
               } catch {
                 case e: Exception => logError("Exception in error callback", e)
@@ -314,9 +319,10 @@ private[spark] class CoarseGrainedSchedulerBackend(
           scheduler
             .executorLost(executorId, if (killed) ExecutorKilled else reason)
           listenerBus.post(
-            SparkListenerExecutorRemoved(System.currentTimeMillis(),
-                                         executorId,
-                                         reason.toString))
+            SparkListenerExecutorRemoved(
+              System.currentTimeMillis(),
+              executorId,
+              reason.toString))
         case None =>
           logInfo(s"Asked to remove non-existent executor $executorId")
       }

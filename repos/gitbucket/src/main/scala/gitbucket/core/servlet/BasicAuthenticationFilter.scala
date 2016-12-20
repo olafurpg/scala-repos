@@ -54,20 +54,22 @@ class BasicAuthenticationFilter
         .map {
           case GitRepositoryRouting(_, _, filter) =>
             // served by plug-ins
-            pluginRepository(request,
-                             wrappedResponse,
-                             chain,
-                             settings,
-                             isUpdating,
-                             filter)
+            pluginRepository(
+              request,
+              wrappedResponse,
+              chain,
+              settings,
+              isUpdating,
+              filter)
         }
         .getOrElse {
           // default repositories
-          defaultRepository(request,
-                            wrappedResponse,
-                            chain,
-                            settings,
-                            isUpdating)
+          defaultRepository(
+            request,
+            wrappedResponse,
+            chain,
+            settings,
+            isUpdating)
         }
     } catch {
       case ex: Exception => {
@@ -94,10 +96,11 @@ class BasicAuthenticationFilter
       account
     }
 
-    if (filter.filter(request.gitRepositoryPath,
-                      account.map(_.userName),
-                      settings,
-                      isUpdating)) {
+    if (filter.filter(
+          request.gitRepositoryPath,
+          account.map(_.userName),
+          settings,
+          isUpdating)) {
       chain.doFilter(request, response)
     } else {
       requireAuth(response)
@@ -128,9 +131,10 @@ class BasicAuthenticationFilter
                 account <- authenticate(settings, username, password)
               } yield
                 if (isUpdating || repository.repository.isPrivate) {
-                  if (hasWritePermission(repository.owner,
-                                         repository.name,
-                                         Some(account))) {
+                  if (hasWritePermission(
+                        repository.owner,
+                        repository.name,
+                        Some(account))) {
                     request
                       .setAttribute(Keys.Request.UserName, account.userName)
                     true

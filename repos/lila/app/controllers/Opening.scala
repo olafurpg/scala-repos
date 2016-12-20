@@ -38,13 +38,14 @@ object Opening extends LilaController {
       win: Option[Boolean])(implicit ctx: Context): Fu[Result] =
     identify(opening) map { identified =>
       Ok(
-        JsData(opening,
-               identified,
-               infos,
-               play = play,
-               attempt = attempt,
-               win = win,
-               animationDuration = env.AnimationDuration)) as JSON
+        JsData(
+          opening,
+          identified,
+          infos,
+          play = play,
+          attempt = attempt,
+          win = win,
+          animationDuration = env.AnimationDuration)) as JSON
     }
 
   def home = Open { implicit ctx =>
@@ -91,11 +92,12 @@ object Opening extends LilaController {
                     (env.api.opening find id) zip
                       (env userInfos me2.some) flatMap {
                       case (o2, infos) =>
-                        makeData(o2 | opening,
-                                 infos,
-                                 false,
-                                 newAttempt.some,
-                                 none)
+                        makeData(
+                          o2 | opening,
+                          infos,
+                          false,
+                          newAttempt.some,
+                          none)
                     }
                   }
                 case (oldAttempt, Some(win)) =>

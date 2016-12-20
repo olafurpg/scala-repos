@@ -108,10 +108,11 @@ private[nio] object TypedArrayFloatBuffer {
               initialPosition: Int,
               initialLimit: Int,
               readOnly: Boolean): TypedArrayFloatBuffer = {
-      new TypedArrayFloatBuffer(typedArray,
-                                initialPosition,
-                                initialLimit,
-                                readOnly)
+      new TypedArrayFloatBuffer(
+        typedArray,
+        initialPosition,
+        initialLimit,
+        readOnly)
     }
 
     @inline

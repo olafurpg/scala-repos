@@ -94,12 +94,13 @@ object Dimension {
           "Rating of your opponent compared to yours. Much weaker:-200, Weaker:-100, Stronger:+100, Much stronger:+200."))
 
   case object PieceRole
-      extends Dimension[Role]("piece",
-                              "Piece moved",
-                              F.moves("r"),
-                              Move,
-                              _.toString,
-                              Html("The type of piece you move."))
+      extends Dimension[Role](
+        "piece",
+        "Piece moved",
+        F.moves("r"),
+        Move,
+        _.toString,
+        Html("The type of piece you move."))
 
   case object MovetimeRange
       extends Dimension[MovetimeRange](
@@ -150,16 +151,17 @@ object Dimension {
         Html(
           "Value of your pieces compared to your opponent's. Pawn=1, Bishop/Knight=3, Rook=5, Queen=9."))
 
-  val all = List(Perf,
-                 Phase,
-                 Result,
-                 Termination,
-                 Color,
-                 Opening,
-                 OpponentStrength,
-                 PieceRole,
-                 MyCastling,
-                 OpCastling)
+  val all = List(
+    Perf,
+    Phase,
+    Result,
+    Termination,
+    Color,
+    Opening,
+    OpponentStrength,
+    PieceRole,
+    MyCastling,
+    OpCastling)
   val byKey = all map { p =>
     (p.key, p)
   } toMap

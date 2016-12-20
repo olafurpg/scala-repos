@@ -42,10 +42,11 @@ class SbtNotificationListener
     text match {
       case WarningMessage(message) =>
         Notifications.Bus.notify(
-          new Notification("scala",
-                           "SBT project import",
-                           message,
-                           NotificationType.WARNING))
+          new Notification(
+            "scala",
+            "SBT project import",
+            message,
+            NotificationType.WARNING))
       case _ => // do nothing
     }
   }

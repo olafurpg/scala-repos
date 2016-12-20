@@ -27,12 +27,14 @@ class HashingTFSuite extends SparkFunSuite with MLlibTestSparkContext {
     val hashingTF = new HashingTF(1000)
     val doc = "a a b b c d".split(" ")
     val n = hashingTF.numFeatures
-    val termFreqs = Seq((hashingTF.indexOf("a"), 2.0),
-                        (hashingTF.indexOf("b"), 2.0),
-                        (hashingTF.indexOf("c"), 1.0),
-                        (hashingTF.indexOf("d"), 1.0))
-    assert(termFreqs.map(_._1).forall(i => i >= 0 && i < n),
-           "index must be in range [0, #features)")
+    val termFreqs = Seq(
+      (hashingTF.indexOf("a"), 2.0),
+      (hashingTF.indexOf("b"), 2.0),
+      (hashingTF.indexOf("c"), 1.0),
+      (hashingTF.indexOf("d"), 1.0))
+    assert(
+      termFreqs.map(_._1).forall(i => i >= 0 && i < n),
+      "index must be in range [0, #features)")
     assert(termFreqs.map(_._1).toSet.size === 4, "expecting perfect hashing")
     val expected = Vectors.sparse(n, termFreqs)
     assert(hashingTF.transform(doc) === expected)
@@ -40,9 +42,10 @@ class HashingTFSuite extends SparkFunSuite with MLlibTestSparkContext {
 
   test("hashing tf on an RDD") {
     val hashingTF = new HashingTF
-    val localDocs: Seq[Seq[String]] = Seq("a a b b b c d".split(" "),
-                                          "a b c d a b c".split(" "),
-                                          "c b a c b a a".split(" "))
+    val localDocs: Seq[Seq[String]] = Seq(
+      "a a b b b c d".split(" "),
+      "a b c d a b c".split(" "),
+      "c b a c b a a".split(" "))
     val docs = sc.parallelize(localDocs, 2)
     assert(
       hashingTF.transform(docs).collect().toSet === localDocs

@@ -84,15 +84,16 @@ class FlipComparisonInMethodCallExprIntention
     val expr = new StringBuilder
     val qualBuilder = new StringBuilder
     val argsBuilder = new StringBuilder
-    val replaceOper = Map("equals" -> "equals",
-                          "==" -> "==",
-                          "!=" -> "!=",
-                          "eq" -> "eq",
-                          "ne" -> "ne",
-                          ">" -> "<",
-                          "<" -> ">",
-                          ">=" -> "<=",
-                          "<=" -> ">=")
+    val replaceOper = Map(
+      "equals" -> "equals",
+      "==" -> "==",
+      "!=" -> "!=",
+      "eq" -> "eq",
+      "ne" -> "ne",
+      ">" -> "<",
+      "<" -> ">",
+      ">=" -> "<=",
+      "<=" -> ">=")
 
     argsBuilder.append(methodCallExpr.args.getText)
 
@@ -149,8 +150,9 @@ class FlipComparisonInMethodCallExprIntention
         .getStartOffset - newMethodCallExpr.getTextRange.getStartOffset
 
     inWriteAction {
-      methodCallExpr.replaceExpression(newMethodCallExpr,
-                                       removeParenthesis = true)
+      methodCallExpr.replaceExpression(
+        newMethodCallExpr,
+        removeParenthesis = true)
       editor.getCaretModel.moveToOffset(start + diff + size)
       PsiDocumentManager
         .getInstance(project)

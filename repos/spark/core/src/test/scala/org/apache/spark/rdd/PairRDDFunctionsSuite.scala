@@ -267,8 +267,9 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
     val counted2 = rdd2.countApproxDistinctByKey(relativeSD).collect()
     counted2.foreach {
       case (k, count) =>
-        assert(error(count, k) < relativeSD,
-               s"${error(count, k)} < $relativeSD")
+        assert(
+          error(count, k) < relativeSD,
+          s"${error(count, k)} < $relativeSD")
     }
   }
 
@@ -553,11 +554,12 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
       sums.toSet === Set((1, ArrayBuffer(1, 2, 3, 1)), (2, ArrayBuffer(1))))
     // Check that the mutable objects in the original RDD were not changed
     assert(
-      bufs.collect().toSet === Set((1, ArrayBuffer(1)),
-                                   (1, ArrayBuffer(2)),
-                                   (1, ArrayBuffer(3)),
-                                   (1, ArrayBuffer(1)),
-                                   (2, ArrayBuffer(1))))
+      bufs.collect().toSet === Set(
+        (1, ArrayBuffer(1)),
+        (1, ArrayBuffer(2)),
+        (1, ArrayBuffer(3)),
+        (1, ArrayBuffer(1)),
+        (2, ArrayBuffer(1))))
   }
 
   test("saveNewAPIHadoopFile should call setConf if format is configurable") {
@@ -581,11 +583,12 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
     conf.setOutputCommitter(classOf[FakeOutputCommitter])
 
     FakeOutputCommitter.ran = false
-    pairs.saveAsHadoopFile("ignored",
-                           pairs.keyClass,
-                           pairs.valueClass,
-                           classOf[FakeOutputFormat],
-                           conf)
+    pairs.saveAsHadoopFile(
+      "ignored",
+      pairs.keyClass,
+      pairs.valueClass,
+      classOf[FakeOutputFormat],
+      conf)
 
     assert(FakeOutputCommitter.ran, "OutputCommitter was never called")
   }
@@ -602,8 +605,9 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
     assert(e.getMessage contains "failed to write")
 
     assert(FakeWriterWithCallback.calledBy === "write,callback,close")
-    assert(FakeWriterWithCallback.exception != null,
-           "exception should be captured")
+    assert(
+      FakeWriterWithCallback.exception != null,
+      "exception should be captured")
     assert(
       FakeWriterWithCallback.exception.getMessage contains "failed to write")
   }
@@ -616,17 +620,19 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
     FakeWriterWithCallback.calledBy = ""
     FakeWriterWithCallback.exception = null
     val e = intercept[SparkException] {
-      pairs.saveAsHadoopFile("ignored",
-                             pairs.keyClass,
-                             pairs.valueClass,
-                             classOf[FakeFormatWithCallback],
-                             conf)
+      pairs.saveAsHadoopFile(
+        "ignored",
+        pairs.keyClass,
+        pairs.valueClass,
+        classOf[FakeFormatWithCallback],
+        conf)
     }
     assert(e.getMessage contains "failed to write")
 
     assert(FakeWriterWithCallback.calledBy === "write,callback,close")
-    assert(FakeWriterWithCallback.exception != null,
-           "exception should be captured")
+    assert(
+      FakeWriterWithCallback.exception != null,
+      "exception should be captured")
     assert(
       FakeWriterWithCallback.exception.getMessage contains "failed to write")
   }
@@ -740,10 +746,11 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
       val takeSample = sample.collect()
       sampleCounts.foreach {
         case (k, v) =>
-          assertBinomialSample(exact = exact,
-                               actual = v.toInt,
-                               trials = trials(k).toInt,
-                               p = samplingRate)
+          assertBinomialSample(
+            exact = exact,
+            actual = v.toInt,
+            trials = trials(k).toInt,
+            p = samplingRate)
       }
       assert(takeSample.size === takeSample.toSet.size)
       takeSample.foreach { x =>
@@ -772,10 +779,11 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
       val takeSample = sample.collect()
       sampleCounts.foreach {
         case (k, v) =>
-          assertPoissonSample(exact,
-                              actual = v.toInt,
-                              trials = trials(k).toInt,
-                              p = samplingRate)
+          assertPoissonSample(
+            exact,
+            actual = v.toInt,
+            trials = trials(k).toInt,
+            p = samplingRate)
       }
       val groupedByKey = takeSample.groupBy(_._1)
       for ((key, v) <- groupedByKey) {
@@ -786,10 +794,11 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
           if (exact) {
             assert(v.toSet.size <= expectedSampleSize(key))
           } else {
-            assertPoissonSample(false,
-                                actual = v.toSet.size,
-                                trials(key).toInt,
-                                p = samplingRate)
+            assertPoissonSample(
+              false,
+              actual = v.toSet.size,
+              trials(key).toInt,
+              p = samplingRate)
           }
         }
       }

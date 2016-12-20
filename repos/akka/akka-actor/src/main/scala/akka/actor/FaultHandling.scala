@@ -371,8 +371,9 @@ abstract class SupervisorStrategy {
           publish(context, Warning(child.path.toString, getClass, logMessage))
         case Escalate ⇒ // don't log here
         case _ ⇒
-          publish(context,
-                  Error(cause, child.path.toString, getClass, logMessage))
+          publish(
+            context,
+            Error(cause, child.path.toString, getClass, logMessage))
       }
     }
 
@@ -506,9 +507,10 @@ case class AllForOneStrategy(maxNrOfRetries: Int = -1,
           children.forall(_.requestRestartPermission(retriesWindow)))
         children foreach
           (crs ⇒
-             restartChild(crs.child,
-                          cause,
-                          suspendFirst = (crs.child != child)))
+             restartChild(
+               crs.child,
+               cause,
+               suspendFirst = (crs.child != child)))
       else for (c ← children) context.stop(c.child)
     }
   }

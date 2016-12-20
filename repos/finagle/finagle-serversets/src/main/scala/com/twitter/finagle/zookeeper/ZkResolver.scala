@@ -61,10 +61,11 @@ private class ZkOffer(serverSet: ServerSet, path: String)
         // There are certain path permission checks in the serverset library
         // that can cause exceptions here. We'll send an empty set (which
         // becomes a negative resolution).
-        log.log(Level.WARNING,
-                "Exception when trying to watch a ServerSet! " +
-                  "Returning negative resolution.",
-                exc)
+        log.log(
+          Level.WARNING,
+          "Exception when trying to watch a ServerSet! " +
+            "Returning negative resolution.",
+          exc)
         inbound !! Set.empty
     }
   }
@@ -135,10 +136,11 @@ class ZkResolver(factory: ZkClientFactory) extends Resolver {
         else Addr.Neg
       }
 
-    val stable = StabilizingAddr(addrOffer,
-                                 zkHealthHandler,
-                                 factory.sessionTimeout,
-                                 DefaultStatsReceiver.scope("zkGroup"))
+    val stable = StabilizingAddr(
+      addrOffer,
+      zkHealthHandler,
+      factory.sessionTimeout,
+      DefaultStatsReceiver.scope("zkGroup"))
 
     val v = Var[Addr](Addr.Pending)
     stable foreach { newAddr =>

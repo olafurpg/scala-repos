@@ -85,12 +85,14 @@ object SBTProjectBuilder {
       copyResource(new File(projectDir, resourceSubDir), resource))
 
     // Copy project files
-    copyText(projectDir,
-             "build.sbt",
-             filters = List("@name@" -> projectName,
-                            "@mainClass@" ->
-                              (sampleInfo.packageName + "." +
-                                sampleInfo.classSimpleName)))
+    copyText(
+      projectDir,
+      "build.sbt",
+      filters = List(
+        "@name@" -> projectName,
+        "@mainClass@" ->
+          (sampleInfo.packageName + "." +
+            sampleInfo.classSimpleName)))
     copyText(projectDir, "project/build.properties")
     copyText(projectDir, "project/plugins.sbt")
     copyText(projectDir, "README.md")

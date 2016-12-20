@@ -81,53 +81,59 @@ private[parser] trait LinkHeader {
                                 seenType: Boolean = false): Seq[LinkParam] =
     params match {
       case Seq((x: LinkParams.rel), tail @ _ *) ⇒
-        sanitize(tail,
-                 if (seenRel) result else result :+ x,
-                 seenRel = true,
-                 seenMedia,
-                 seenTitle,
-                 seenTitleS,
-                 seenType)
+        sanitize(
+          tail,
+          if (seenRel) result else result :+ x,
+          seenRel = true,
+          seenMedia,
+          seenTitle,
+          seenTitleS,
+          seenType)
       case Seq((x: LinkParams.media), tail @ _ *) ⇒
-        sanitize(tail,
-                 if (seenMedia) result else result :+ x,
-                 seenRel,
-                 seenMedia = true,
-                 seenTitle,
-                 seenTitleS,
-                 seenType)
+        sanitize(
+          tail,
+          if (seenMedia) result else result :+ x,
+          seenRel,
+          seenMedia = true,
+          seenTitle,
+          seenTitleS,
+          seenType)
       case Seq((x: LinkParams.title), tail @ _ *) ⇒
-        sanitize(tail,
-                 if (seenTitle) result else result :+ x,
-                 seenRel,
-                 seenMedia,
-                 seenTitle = true,
-                 seenTitleS,
-                 seenType)
+        sanitize(
+          tail,
+          if (seenTitle) result else result :+ x,
+          seenRel,
+          seenMedia,
+          seenTitle = true,
+          seenTitleS,
+          seenType)
       case Seq((x: LinkParams.`title*`), tail @ _ *) ⇒
-        sanitize(tail,
-                 if (seenTitleS) result else result :+ x,
-                 seenRel,
-                 seenMedia,
-                 seenTitle,
-                 seenTitleS = true,
-                 seenType)
+        sanitize(
+          tail,
+          if (seenTitleS) result else result :+ x,
+          seenRel,
+          seenMedia,
+          seenTitle,
+          seenTitleS = true,
+          seenType)
       case Seq((x: LinkParams.`type`), tail @ _ *) ⇒
-        sanitize(tail,
-                 if (seenType) result else result :+ x,
-                 seenRel,
-                 seenMedia,
-                 seenTitle,
-                 seenTitleS,
-                 seenType = true)
+        sanitize(
+          tail,
+          if (seenType) result else result :+ x,
+          seenRel,
+          seenMedia,
+          seenTitle,
+          seenTitleS,
+          seenType = true)
       case Seq(head, tail @ _ *) ⇒
-        sanitize(tail,
-                 result :+ head,
-                 seenRel,
-                 seenMedia,
-                 seenTitle,
-                 seenTitleS,
-                 seenType)
+        sanitize(
+          tail,
+          result :+ head,
+          seenRel,
+          seenMedia,
+          seenTitle,
+          seenTitleS,
+          seenType)
       case Nil ⇒ result
     }
 }

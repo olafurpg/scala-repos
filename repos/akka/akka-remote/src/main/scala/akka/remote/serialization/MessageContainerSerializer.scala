@@ -87,9 +87,10 @@ class MessageContainerSerializer(val system: ExtendedActorSystem)
         selectionEnvelope.getMessageManifest.toStringUtf8
       else ""
     val msg = serialization
-      .deserialize(selectionEnvelope.getEnclosedMessage.toByteArray,
-                   selectionEnvelope.getSerializerId,
-                   manifest)
+      .deserialize(
+        selectionEnvelope.getEnclosedMessage.toByteArray,
+        selectionEnvelope.getSerializerId,
+        manifest)
       .get
 
     import scala.collection.JavaConverters._

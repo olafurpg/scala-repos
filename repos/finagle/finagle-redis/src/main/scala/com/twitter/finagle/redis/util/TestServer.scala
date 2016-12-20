@@ -69,8 +69,9 @@ class ExternalRedis() {
     val p = new ProcessBuilder("redis-server", "--help").start()
     p.waitFor()
     val exitValue = p.exitValue()
-    require(exitValue == 0 || exitValue == 1,
-            "redis-server binary must be present.")
+    require(
+      exitValue == 0 || exitValue == 1,
+      "redis-server binary must be present.")
   }
 
   private[this] def findAddress() {

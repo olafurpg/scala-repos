@@ -26,19 +26,22 @@ import scala.util.control.NonFatal
 
 object Imports {
   object PlayDocsKeys {
-    val manualPath = SettingKey[File]("playDocsManualPath",
-                                      "The location of the manual",
-                                      KeyRanks.CSetting)
+    val manualPath = SettingKey[File](
+      "playDocsManualPath",
+      "The location of the manual",
+      KeyRanks.CSetting)
     val docsVersion = SettingKey[String](
       "playDocsVersion",
       "The version of the documentation to fallback to.",
       KeyRanks.ASetting)
-    val docsName = SettingKey[String]("playDocsName",
-                                      "The name of the documentation artifact",
-                                      KeyRanks.BSetting)
-    val docsJarFile = TaskKey[Option[File]]("playDocsJarFile",
-                                            "Optional play docs jar file",
-                                            KeyRanks.CTask)
+    val docsName = SettingKey[String](
+      "playDocsName",
+      "The name of the documentation artifact",
+      KeyRanks.BSetting)
+    val docsJarFile = TaskKey[Option[File]](
+      "playDocsJarFile",
+      "Optional play docs jar file",
+      KeyRanks.CTask)
     val resources = TaskKey[Seq[PlayDocsResource]](
       "playDocsResources",
       "Resource files to add to the file repository for running docs and validation",
@@ -183,18 +186,20 @@ object PlayDocsPlugin extends AutoPlugin {
       sourceGenerators in Test <+= (javaManualSourceDirectories,
                                     javaTwirlSourceManaged,
                                     streams) map { (from, to, s) =>
-        compileTemplates(from,
-                         to,
-                         TemplateImports.defaultJavaTemplateImports.asScala,
-                         s.log)
+        compileTemplates(
+          from,
+          to,
+          TemplateImports.defaultJavaTemplateImports.asScala,
+          s.log)
       },
       sourceGenerators in Test <+= (scalaManualSourceDirectories,
                                     scalaTwirlSourceManaged,
                                     streams) map { (from, to, s) =>
-        compileTemplates(from,
-                         to,
-                         TemplateImports.defaultScalaTemplateImports.asScala,
-                         s.log)
+        compileTemplates(
+          from,
+          to,
+          TemplateImports.defaultScalaTemplateImports.asScala,
+          s.log)
       },
       routesCompilerTasks in Test := {
         val javaRoutes = (javaManualSourceDirectories.value * "*.routes").get
@@ -242,15 +247,17 @@ object PlayDocsPlugin extends AutoPlugin {
       },
       parallelExecution in Test := false,
       javacOptions in Test ++= Seq("-g", "-Xlint:deprecation"),
-      testOptions in Test += Tests.Argument(TestFrameworks.Specs2,
-                                            "sequential",
-                                            "true",
-                                            "junitxml",
-                                            "console"),
+      testOptions in Test += Tests.Argument(
+        TestFrameworks.Specs2,
+        "sequential",
+        "true",
+        "junitxml",
+        "console"),
       testOptions in Test +=
-        Tests.Argument(TestFrameworks.JUnit,
-                       "-v",
-                       "--ignore-runners=org.specs2.runner.JUnitRunner")
+        Tests.Argument(
+          TestFrameworks.JUnit,
+          "-v",
+          "--ignore-runners=org.specs2.runner.JUnitRunner")
     )
 
   val docsJarFileSetting: Def.Initialize[Task[Option[File]]] = Def.task {
@@ -296,9 +303,10 @@ object PlayDocsPlugin extends AutoPlugin {
     val docHandlerFactoryClass =
       classloader.loadClass("play.docs.BuildDocHandlerFactory")
     val fromResourcesMethod =
-      docHandlerFactoryClass.getMethod("fromResources",
-                                       classOf[Array[java.io.File]],
-                                       classOf[Array[String]])
+      docHandlerFactoryClass.getMethod(
+        "fromResources",
+        classOf[Array[java.io.File]],
+        classOf[Array[String]])
 
     val files = allResources.map(_.file).toArray[File]
     val baseDirs = allResources
@@ -312,12 +320,13 @@ object PlayDocsPlugin extends AutoPlugin {
 
     val clazz = classloader.loadClass("play.docs.DocServerStart")
     val constructor = clazz.getConstructor()
-    val startMethod = clazz.getMethod("start",
-                                      classOf[File],
-                                      classOf[BuildDocHandler],
-                                      classOf[Callable[_]],
-                                      classOf[Callable[_]],
-                                      classOf[java.lang.Integer])
+    val startMethod = clazz.getMethod(
+      "start",
+      classOf[File],
+      classOf[BuildDocHandler],
+      classOf[Callable[_]],
+      classOf[Callable[_]],
+      classOf[java.lang.Integer])
 
     val translationReport = new Callable[File] {
       def call() =
@@ -341,12 +350,13 @@ object PlayDocsPlugin extends AutoPlugin {
     }
     val docServerStart = constructor.newInstance()
     val server: ServerWithStop = startMethod
-      .invoke(docServerStart,
-              manualPath.value,
-              buildDocHandler,
-              translationReport,
-              forceTranslationReport,
-              new java.lang.Integer(port))
+      .invoke(
+        docServerStart,
+        manualPath.value,
+        buildDocHandler,
+        translationReport,
+        forceTranslationReport,
+        new java.lang.Integer(port))
       .asInstanceOf[ServerWithStop]
 
     println()
@@ -393,14 +403,15 @@ object PlayDocsPlugin extends AutoPlugin {
                        target: File,
                        imports: Seq[String],
                        log: Logger) = {
-    play.twirl.sbt.TemplateCompiler.compile(sourceDirectories,
-                                            target,
-                                            templateFormats,
-                                            imports,
-                                            templateFilter,
-                                            HiddenFileFilter,
-                                            templateCodec,
-                                            false,
-                                            log)
+    play.twirl.sbt.TemplateCompiler.compile(
+      sourceDirectories,
+      target,
+      templateFormats,
+      imports,
+      templateFilter,
+      HiddenFileFilter,
+      templateCodec,
+      false,
+      log)
   }
 }

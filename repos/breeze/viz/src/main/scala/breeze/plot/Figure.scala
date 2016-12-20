@@ -139,11 +139,13 @@ class Figure(name: String,
     for (opt <- plots) {
       opt match {
         case Some(plot) =>
-          plot.chart.draw(g2d,
-                          new java.awt.Rectangle(px * plotWidth,
-                                                 py * plotHeight,
-                                                 plotWidth,
-                                                 plotHeight))
+          plot.chart.draw(
+            g2d,
+            new java.awt.Rectangle(
+              px * plotWidth,
+              py * plotHeight,
+              plotWidth,
+              plotHeight))
         case None => {}
       }
       px = (px + 1) % cols
@@ -156,11 +158,12 @@ class Figure(name: String,
     // make sure figure is visible or saved image will come up empty
     refresh()
 
-    ExportGraphics.writeFile(new java.io.File(filename),
-                             draw = drawPlots _,
-                             width = contents.getWidth,
-                             height = contents.getHeight,
-                             dpi = dpi)
+    ExportGraphics.writeFile(
+      new java.io.File(filename),
+      draw = drawPlots _,
+      width = contents.getWidth,
+      height = contents.getHeight,
+      dpi = dpi)
   }
 
   private def selectPlot(i: Int) = {

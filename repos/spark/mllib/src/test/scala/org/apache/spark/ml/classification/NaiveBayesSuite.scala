@@ -65,11 +65,13 @@ class NaiveBayesSuite
   def validateModelFit(piData: Vector,
                        thetaData: Matrix,
                        model: NaiveBayesModel): Unit = {
-    assert(Vectors.dense(model.pi.toArray.map(math.exp)) ~==
-             Vectors.dense(piData.toArray.map(math.exp)) absTol 0.05,
-           "pi mismatch")
-    assert(model.theta.map(math.exp) ~== thetaData.map(math.exp) absTol 0.05,
-           "theta mismatch")
+    assert(
+      Vectors.dense(model.pi.toArray.map(math.exp)) ~==
+        Vectors.dense(piData.toArray.map(math.exp)) absTol 0.05,
+      "pi mismatch")
+    assert(
+      model.theta.map(math.exp) ~== thetaData.map(math.exp) absTol 0.05,
+      "theta mismatch")
   }
 
   def expectedMultinomialProbabilities(model: NaiveBayesModel,
@@ -166,42 +168,45 @@ class NaiveBayesSuite
     val nPoints = 10000
     val piArray = Array(0.5, 0.3, 0.2).map(math.log)
     val thetaArray = Array(
-      Array(0.50,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.40), // label 0
-      Array(0.02,
-            0.70,
-            0.10,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02), // label 1
-      Array(0.02,
-            0.02,
-            0.60,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.02,
-            0.30) // label 2
+      Array(
+        0.50,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.40), // label 0
+      Array(
+        0.02,
+        0.70,
+        0.10,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02), // label 1
+      Array(
+        0.02,
+        0.02,
+        0.60,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.02,
+        0.30) // label 2
     ).map(_.map(math.log))
     val pi = Vectors.dense(piArray)
     val theta = new DenseMatrix(3, 12, thetaArray.flatten, true)
@@ -232,10 +237,11 @@ class NaiveBayesSuite
       assert(model.theta === model2.theta)
     }
     val nb = new NaiveBayes()
-    testEstimatorAndModelReadWrite(nb,
-                                   dataset,
-                                   NaiveBayesSuite.allParamSettings,
-                                   checkModelData)
+    testEstimatorAndModelReadWrite(
+      nb,
+      dataset,
+      NaiveBayesSuite.allParamSettings,
+      checkModelData)
   }
 }
 

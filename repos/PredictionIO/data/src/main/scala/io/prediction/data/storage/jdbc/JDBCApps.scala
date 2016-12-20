@@ -53,9 +53,10 @@ class JDBCApps(client: String, config: StorageClientConfig, prefix: String)
     sql"SELECT id, name, description FROM $tableName WHERE id = ${id}"
       .map(
         rs =>
-          App(id = rs.int("id"),
-              name = rs.string("name"),
-              description = rs.stringOpt("description")))
+          App(
+            id = rs.int("id"),
+            name = rs.string("name"),
+            description = rs.stringOpt("description")))
       .single()
       .apply()
   }
@@ -64,9 +65,10 @@ class JDBCApps(client: String, config: StorageClientConfig, prefix: String)
     sql"SELECT id, name, description FROM $tableName WHERE name = ${name}"
       .map(
         rs =>
-          App(id = rs.int("id"),
-              name = rs.string("name"),
-              description = rs.stringOpt("description")))
+          App(
+            id = rs.int("id"),
+            name = rs.string("name"),
+            description = rs.stringOpt("description")))
       .single()
       .apply()
   }
@@ -75,9 +77,10 @@ class JDBCApps(client: String, config: StorageClientConfig, prefix: String)
     sql"SELECT id, name, description FROM $tableName"
       .map(
         rs =>
-          App(id = rs.int("id"),
-              name = rs.string("name"),
-              description = rs.stringOpt("description")))
+          App(
+            id = rs.int("id"),
+            name = rs.string("name"),
+            description = rs.stringOpt("description")))
       .list()
       .apply()
   }

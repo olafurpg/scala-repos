@@ -51,8 +51,9 @@ abstract class ExistentialSimplificationTestBase
       "Not specified end marker in test case. Use /*end*/ in scala file for this.")
 
     val addOne =
-      if (PsiTreeUtil.getParentOfType(scalaFile.findElementAt(startOffset),
-                                      classOf[ScExpression]) != null) 0
+      if (PsiTreeUtil.getParentOfType(
+            scalaFile.findElementAt(startOffset),
+            classOf[ScExpression]) != null) 0
       else 1 //for xml tests
     val expr: ScExpression = PsiTreeUtil.findElementOfClassAtRange(
       scalaFile,
@@ -75,15 +76,17 @@ abstract class ExistentialSimplificationTestBase
         }
         assertEquals(output, res)
       case Success(_, _) =>
-        assert(assertion = false,
-               message = "Expression has not existential type")
+        assert(
+          assertion = false,
+          message = "Expression has not existential type")
       case Failure(msg, elem) =>
-        assert(assertion = false,
-               message = msg + " :: " +
-                   (elem match {
-                   case Some(x) => x.getText
-                   case None => "empty element"
-                 }))
+        assert(
+          assertion = false,
+          message = msg + " :: " +
+              (elem match {
+              case Some(x) => x.getText
+              case None => "empty element"
+            }))
     }
   }
 }

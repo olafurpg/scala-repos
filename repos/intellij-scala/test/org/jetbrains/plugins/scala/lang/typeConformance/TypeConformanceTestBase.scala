@@ -41,8 +41,9 @@ abstract class TypeConformanceTestBase
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     val expr: PsiElement = scalaFile.findLastChildByType[PsiElement](
       ScalaElementTypes.PATTERN_DEFINITION)
-    assert(expr != null,
-           "Not specified expression in range to check conformance.")
+    assert(
+      expr != null,
+      "Not specified expression in range to check conformance.")
     val valueDecl = expr.asInstanceOf[ScPatternDefinition]
     val declaredType = valueDecl.declaredType.getOrElse(
       sys.error("Must provide type annotation for LHS"))

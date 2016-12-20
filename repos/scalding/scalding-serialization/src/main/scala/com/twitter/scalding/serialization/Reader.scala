@@ -92,14 +92,14 @@ object Reader {
       def read(is: InputStream) = (r1.read(is), r2.read(is))
     }
 
-  implicit def array[@specialized(Boolean,
-                                  Byte,
-                                  Short,
-                                  Int,
-                                  Long,
-                                  Float,
-                                  Double) T: Reader: ClassTag]
-    : Reader[Array[T]] =
+  implicit def array[@specialized(
+    Boolean,
+    Byte,
+    Short,
+    Int,
+    Long,
+    Float,
+    Double) T: Reader: ClassTag]: Reader[Array[T]] =
     new Reader[Array[T]] {
       val readerT = implicitly[Reader[T]]
       def read(is: InputStream) = {

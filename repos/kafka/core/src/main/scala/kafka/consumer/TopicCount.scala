@@ -105,11 +105,12 @@ private[kafka] object TopicCount extends Logging {
       val filter =
         if (hasWhiteList) new Whitelist(regex)
         else new Blacklist(regex)
-      new WildcardTopicCount(zkUtils,
-                             consumerId,
-                             filter,
-                             numStreams,
-                             excludeInternalTopics)
+      new WildcardTopicCount(
+        zkUtils,
+        consumerId,
+        filter,
+        numStreams,
+        excludeInternalTopics)
     }
   }
 
@@ -122,11 +123,12 @@ private[kafka] object TopicCount extends Logging {
                           numStreams: Int,
                           zkUtils: ZkUtils,
                           excludeInternalTopics: Boolean) =
-    new WildcardTopicCount(zkUtils,
-                           consumerIdString,
-                           filter,
-                           numStreams,
-                           excludeInternalTopics)
+    new WildcardTopicCount(
+      zkUtils,
+      consumerIdString,
+      filter,
+      numStreams,
+      excludeInternalTopics)
 }
 
 private[kafka] class StaticTopicCount(val consumerIdString: String,

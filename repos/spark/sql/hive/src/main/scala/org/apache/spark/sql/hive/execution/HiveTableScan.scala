@@ -53,8 +53,8 @@ private[hive] case class HiveTableScan(
     "Partition pruning predicates only supported for partitioned tables.")
 
   private[sql] override lazy val metrics = Map(
-    "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
-                                                   "number of output rows"))
+    "numOutputRows" -> SQLMetrics
+      .createLongMetric(sparkContext, "number of output rows"))
 
   override def producedAttributes: AttributeSet =
     outputSet ++ AttributeSet(partitionPruningPred.flatMap(_.references))
@@ -103,8 +103,9 @@ private[hive] case class HiveTableScan(
 
     // Specifies types and object inspectors of columns to be scanned.
     val structOI = ObjectInspectorUtils
-      .getStandardObjectInspector(deserializer.getObjectInspector,
-                                  ObjectInspectorCopyOption.JAVA)
+      .getStandardObjectInspector(
+        deserializer.getObjectInspector,
+        ObjectInspectorCopyOption.JAVA)
       .asInstanceOf[StructObjectInspector]
 
     val columnTypeNames = structOI.getAllStructFieldRefs.asScala
@@ -113,8 +114,9 @@ private[hive] case class HiveTableScan(
       .mkString(",")
 
     hiveConf.set(serdeConstants.LIST_COLUMN_TYPES, columnTypeNames)
-    hiveConf.set(serdeConstants.LIST_COLUMNS,
-                 relation.attributes.map(_.name).mkString(","))
+    hiveConf.set(
+      serdeConstants.LIST_COLUMNS,
+      relation.attributes.map(_.name).mkString(","))
   }
 
   /**

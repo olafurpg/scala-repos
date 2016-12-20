@@ -152,9 +152,10 @@ class CompileServerManager(project: Project) extends ProjectComponent {
   }
 
   private object Start
-      extends AnAction("&Run",
-                       "Start compile server",
-                       AllIcons.Actions.Execute)
+      extends AnAction(
+        "&Run",
+        "Start compile server",
+        AllIcons.Actions.Execute)
       with DumbAware {
     override def update(e: AnActionEvent) {
       e.getPresentation.setEnabled(!launcher.running)
@@ -166,9 +167,10 @@ class CompileServerManager(project: Project) extends ProjectComponent {
   }
 
   private object Stop
-      extends AnAction("&Stop",
-                       "Shutdown compile server",
-                       AllIcons.Actions.Suspend)
+      extends AnAction(
+        "&Stop",
+        "Shutdown compile server",
+        AllIcons.Actions.Suspend)
       with DumbAware {
     override def update(e: AnActionEvent) {
       e.getPresentation.setEnabled(launcher.running)
@@ -180,9 +182,10 @@ class CompileServerManager(project: Project) extends ProjectComponent {
   }
 
   private object Configure
-      extends AnAction("&Configure...",
-                       "Configure compile server",
-                       AllIcons.General.Settings)
+      extends AnAction(
+        "&Configure...",
+        "Configure compile server",
+        AllIcons.General.Settings)
       with DumbAware {
     def actionPerformed(e: AnActionEvent) {
       showCompileServerSettingsDialog()
@@ -217,11 +220,13 @@ class CompileServerManager(project: Project) extends ProjectComponent {
       val errors = launcher.errors()
 
       if (errors.nonEmpty) {
-        Notifications.Bus.notify(new Notification("scala",
-                                                  title,
-                                                  errors.mkString,
-                                                  NotificationType.ERROR),
-                                 project)
+        Notifications.Bus.notify(
+          new Notification(
+            "scala",
+            title,
+            errors.mkString,
+            NotificationType.ERROR),
+          project)
       }
     }
   }

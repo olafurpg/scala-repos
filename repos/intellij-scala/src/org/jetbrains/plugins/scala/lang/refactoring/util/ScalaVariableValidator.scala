@@ -46,18 +46,20 @@ object ScalaVariableValidator {
       ScalaRefactoringUtil.commonParent(file, occurrences: _*))
     val containerOne = ScalaRefactoringUtil.enclosingContainer(
       ScalaRefactoringUtil.commonParent(file, mainOccurence))
-    ScalaRefactoringUtil.getExpression(project,
-                                       editor,
-                                       file,
-                                       mainOccurence.getStartOffset,
-                                       mainOccurence.getEndOffset) match {
+    ScalaRefactoringUtil.getExpression(
+      project,
+      editor,
+      file,
+      mainOccurence.getStartOffset,
+      mainOccurence.getEndOffset) match {
       case Some((expr, _)) =>
-        new ScalaVariableValidator(conflictsReporter,
-                                   project,
-                                   expr,
-                                   occurrences.isEmpty,
-                                   container,
-                                   containerOne)
+        new ScalaVariableValidator(
+          conflictsReporter,
+          project,
+          expr,
+          occurrences.isEmpty,
+          container,
+          containerOne)
       case _ => null
     }
   }
@@ -71,12 +73,13 @@ object ScalaVariableValidator {
     val container = ScalaRefactoringUtil.enclosingContainer(
       ScalaRefactoringUtil.commonParent(file, occurrences: _*))
     val containerOne = ScalaRefactoringUtil.enclosingContainer(element)
-    new ScalaVariableValidator(conflictsReporter,
-                               project,
-                               element,
-                               occurrences.isEmpty,
-                               container,
-                               containerOne)
+    new ScalaVariableValidator(
+      conflictsReporter,
+      project,
+      element,
+      occurrences.isEmpty,
+      container,
+      containerOne)
   }
 }
 
@@ -86,12 +89,13 @@ class ScalaVariableValidator(conflictsReporter: ConflictsReporter,
                              noOccurrences: Boolean,
                              enclosingContainerAll: PsiElement,
                              enclosingOne: PsiElement)
-    extends ScalaValidator(conflictsReporter,
-                           myProject,
-                           selectedElement,
-                           noOccurrences,
-                           enclosingContainerAll,
-                           enclosingOne) {
+    extends ScalaValidator(
+      conflictsReporter,
+      myProject,
+      selectedElement,
+      noOccurrences,
+      enclosingContainerAll,
+      enclosingOne) {
 
   override def findConflicts(
       name: String,

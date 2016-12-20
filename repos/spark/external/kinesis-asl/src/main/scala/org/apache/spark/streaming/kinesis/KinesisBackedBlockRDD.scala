@@ -88,10 +88,11 @@ private[kinesis] class KinesisBackedBlockRDD[T: ClassTag](
   override def getPartitions: Array[Partition] = {
     Array.tabulate(_blockIds.length) { i =>
       val isValid = if (isBlockIdValid.length == 0) true else isBlockIdValid(i)
-      new KinesisBackedBlockRDDPartition(i,
-                                         _blockIds(i),
-                                         isValid,
-                                         arrayOfseqNumberRanges(i))
+      new KinesisBackedBlockRDDPartition(
+        i,
+        _blockIds(i),
+        isValid,
+        arrayOfseqNumberRanges(i))
     }
   }
 
@@ -111,11 +112,12 @@ private[kinesis] class KinesisBackedBlockRDD[T: ClassTag](
         new DefaultAWSCredentialsProviderChain().getCredentials()
       }
       partition.seqNumberRanges.ranges.iterator.flatMap { range =>
-        new KinesisSequenceRangeIterator(credentials,
-                                         endpointUrl,
-                                         regionName,
-                                         range,
-                                         retryTimeoutMs).map(messageHandler)
+        new KinesisSequenceRangeIterator(
+          credentials,
+          endpointUrl,
+          regionName,
+          range,
+          retryTimeoutMs).map(messageHandler)
       }
     }
     if (partition.isBlockIdValid) {
@@ -272,8 +274,9 @@ private[kinesis] class KinesisSequenceRangeIterator(
           lastError = t
           t match {
             case ptee: ProvisionedThroughputExceededException =>
-              logWarning(s"Error while $message [attempt = ${retryCount + 1}]",
-                         ptee)
+              logWarning(
+                s"Error while $message [attempt = ${retryCount + 1}]",
+                ptee)
             case e: Throwable =>
               throw new SparkException(s"Error while $message", e)
           }

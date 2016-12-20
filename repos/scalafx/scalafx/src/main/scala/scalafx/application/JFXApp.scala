@@ -41,11 +41,13 @@ import scalafx.stage.Stage
 object JFXApp {
 
   var Stage: jfxs.Stage = null
-  @deprecated("Prefer Scala naming convention over Java, use `Stage` instead.",
-              "8.0.60-R10")
+  @deprecated(
+    "Prefer Scala naming convention over Java, use `Stage` instead.",
+    "8.0.60-R10")
   def STAGE: jfxs.Stage = Stage
-  @deprecated("Prefer Scala naming convention over Java, use `Stage` instead.",
-              "8.0.60-R10")
+  @deprecated(
+    "Prefer Scala naming convention over Java, use `Stage` instead.",
+    "8.0.60-R10")
   def STAGE_=(stage: jfxs.Stage): Unit = Stage = stage
 
   var ActiveApp: JFXApp = null

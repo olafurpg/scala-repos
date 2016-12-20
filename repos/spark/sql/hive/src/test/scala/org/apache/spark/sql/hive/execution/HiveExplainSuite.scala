@@ -30,20 +30,23 @@ class HiveExplainSuite
     with TestHiveSingleton {
 
   test("explain extended command") {
-    checkExistence(sql(" explain   select * from src where key=123 "),
-                   true,
-                   "== Physical Plan ==")
-    checkExistence(sql(" explain   select * from src where key=123 "),
-                   false,
-                   "== Parsed Logical Plan ==",
-                   "== Analyzed Logical Plan ==",
-                   "== Optimized Logical Plan ==")
-    checkExistence(sql(" explain   extended select * from src where key=123 "),
-                   true,
-                   "== Parsed Logical Plan ==",
-                   "== Analyzed Logical Plan ==",
-                   "== Optimized Logical Plan ==",
-                   "== Physical Plan ==")
+    checkExistence(
+      sql(" explain   select * from src where key=123 "),
+      true,
+      "== Physical Plan ==")
+    checkExistence(
+      sql(" explain   select * from src where key=123 "),
+      false,
+      "== Parsed Logical Plan ==",
+      "== Analyzed Logical Plan ==",
+      "== Optimized Logical Plan ==")
+    checkExistence(
+      sql(" explain   extended select * from src where key=123 "),
+      true,
+      "== Parsed Logical Plan ==",
+      "== Analyzed Logical Plan ==",
+      "== Optimized Logical Plan ==",
+      "== Physical Plan ==")
   }
 
   test("explain create table command") {

@@ -230,10 +230,11 @@ trait Imports { self: IMain =>
     }
 
     val computedHeader = if (predefEscapes) header.toString else ""
-    ComputedImports(computedHeader,
-                    code.toString,
-                    trailingBraces.toString,
-                    accessPath.toString)
+    ComputedImports(
+      computedHeader,
+      code.toString,
+      trailingBraces.toString,
+      accessPath.toString)
   }
 
   private def allReqAndHandlers =

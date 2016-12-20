@@ -148,9 +148,10 @@ class LeaderProxyFilterTest extends MarathonSpec {
     // When we have inconsistent leadership info
     init()
     when(leaderInfo.elected).thenReturn(false)
-    when(leaderInfo.currentLeaderHostPort()).thenReturn(Some("host:10000"),
-                                                        Some("host:10000"),
-                                                        Some("otherhost:9999"))
+    when(leaderInfo.currentLeaderHostPort()).thenReturn(
+      Some("host:10000"),
+      Some("host:10000"),
+      Some("otherhost:9999"))
     when(request.getRequestURI).thenReturn("/test")
     when(request.getQueryString).thenReturn(null)
 

@@ -28,8 +28,9 @@ class VertexRDDImpl[VD] private[graphx] (
     @transient val partitionsRDD: RDD[ShippableVertexPartition[VD]],
     val targetStorageLevel: StorageLevel = StorageLevel.MEMORY_ONLY)(
     implicit override protected val vdTag: ClassTag[VD])
-    extends VertexRDD[VD](partitionsRDD.context,
-                          List(new OneToOneDependency(partitionsRDD))) {
+    extends VertexRDD[VD](
+      partitionsRDD.context,
+      List(new OneToOneDependency(partitionsRDD))) {
 
   require(partitionsRDD.partitioner.isDefined)
 
@@ -113,19 +114,19 @@ class VertexRDDImpl[VD] private[graphx] (
     other match {
       case other: VertexRDD[_] if this.partitioner == other.partitioner =>
         this.withPartitionsRDD[VD](
-          partitionsRDD.zipPartitions(other.partitionsRDD,
-                                      preservesPartitioning = true) {
-            (thisIter, otherIter) =>
-              val thisPart = thisIter.next()
-              val otherPart = otherIter.next()
-              Iterator(thisPart.minus(otherPart))
-          })
+          partitionsRDD
+            .zipPartitions(other.partitionsRDD, preservesPartitioning = true) {
+              (thisIter, otherIter) =>
+                val thisPart = thisIter.next()
+                val otherPart = otherIter.next()
+                Iterator(thisPart.minus(otherPart))
+            })
       case _ =>
         this.withPartitionsRDD[VD](
-          partitionsRDD.zipPartitions(other.partitionBy(this.partitioner.get),
-                                      preservesPartitioning = true) {
-            (partIter, msgs) =>
-              partIter.map(_.minus(msgs))
+          partitionsRDD.zipPartitions(
+            other.partitionBy(this.partitioner.get),
+            preservesPartitioning = true) { (partIter, msgs) =>
+            partIter.map(_.minus(msgs))
           }
         )
     }
@@ -177,10 +178,10 @@ class VertexRDDImpl[VD] private[graphx] (
         leftZipJoin(other)(f)
       case _ =>
         this.withPartitionsRDD[VD3](
-          partitionsRDD.zipPartitions(other.partitionBy(this.partitioner.get),
-                                      preservesPartitioning = true) {
-            (partIter, msgs) =>
-              partIter.map(_.leftJoin(msgs)(f))
+          partitionsRDD.zipPartitions(
+            other.partitionBy(this.partitioner.get),
+            preservesPartitioning = true) { (partIter, msgs) =>
+            partIter.map(_.leftJoin(msgs)(f))
           }
         )
     }
@@ -209,10 +210,10 @@ class VertexRDDImpl[VD] private[graphx] (
         innerZipJoin(other)(f)
       case _ =>
         this.withPartitionsRDD(
-          partitionsRDD.zipPartitions(other.partitionBy(this.partitioner.get),
-                                      preservesPartitioning = true) {
-            (partIter, msgs) =>
-              partIter.map(_.innerJoin(msgs)(f))
+          partitionsRDD.zipPartitions(
+            other.partitionBy(this.partitioner.get),
+            preservesPartitioning = true) { (partIter, msgs) =>
+            partIter.map(_.innerJoin(msgs)(f))
           }
         )
     }

@@ -112,9 +112,10 @@ class FlowGraphDocSpec extends AkkaSpec {
       // A Shape must be able to create a copy of itself. Basically
       // it means a new instance with copies of the ports
       override def deepCopy() =
-        PriorityWorkerPoolShape(jobsIn.carbonCopy(),
-                                priorityJobsIn.carbonCopy(),
-                                resultsOut.carbonCopy())
+        PriorityWorkerPoolShape(
+          jobsIn.carbonCopy(),
+          priorityJobsIn.carbonCopy(),
+          resultsOut.carbonCopy())
 
       // A Shape must also be able to create itself from existing ports
       override def copyFromPorts(inlets: immutable.Seq[Inlet[_]],
@@ -122,9 +123,10 @@ class FlowGraphDocSpec extends AkkaSpec {
         assert(inlets.size == this.inlets.size)
         assert(outlets.size == this.outlets.size)
         // This is why order matters when overriding inlets and outlets.
-        PriorityWorkerPoolShape[In, Out](inlets(0).as[In],
-                                         inlets(1).as[In],
-                                         outlets(0).as[Out])
+        PriorityWorkerPoolShape[In, Out](
+          inlets(0).as[In],
+          inlets(1).as[In],
+          outlets(0).as[Out])
       }
     }
     //#flow-graph-components-shape
@@ -152,9 +154,10 @@ class FlowGraphDocSpec extends AkkaSpec {
           // We now expose the input ports of the priorityMerge and the output
           // of the resultsMerge as our PriorityWorkerPool ports
           // -- all neatly wrapped in our domain specific Shape
-          PriorityWorkerPoolShape(jobsIn = priorityMerge.in(0),
-                                  priorityJobsIn = priorityMerge.preferred,
-                                  resultsOut = resultsMerge.out)
+          PriorityWorkerPoolShape(
+            jobsIn = priorityMerge.in(0),
+            priorityJobsIn = priorityMerge.preferred,
+            resultsOut = resultsMerge.out)
         }
       }
     }
@@ -210,8 +213,9 @@ class FlowGraphDocSpec extends AkkaSpec {
     val foldFlow: Flow[Int, Int, Future[Int]] =
       Flow.fromGraph(GraphDSL.create(Sink.fold[Int, Int](0)(_ + _)) {
         implicit builder ⇒ fold ⇒
-          FlowShape(fold.in,
-                    builder.materializedValue.mapAsync(4)(identity).outlet)
+          FlowShape(
+            fold.in,
+            builder.materializedValue.mapAsync(4)(identity).outlet)
       })
     //#flow-graph-matvalue
 

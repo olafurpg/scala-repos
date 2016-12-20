@@ -131,10 +131,11 @@ private[repl] trait SparkMemberHandlers {
               .format(req fullPath name)
           else ""
 
-        """ + "%s%s: %s = " + %s""".format(string2code(prettyName),
-                                           vidString,
-                                           string2code(req typeOf name),
-                                           resultString)
+        """ + "%s%s: %s = " + %s""".format(
+          string2code(prettyName),
+          vidString,
+          string2code(req typeOf name),
+          resultString)
       }
     }
   }

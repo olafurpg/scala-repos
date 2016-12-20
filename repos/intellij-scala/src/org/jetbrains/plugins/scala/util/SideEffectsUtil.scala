@@ -52,8 +52,9 @@ object SideEffectsUtil {
       else {
         ref.qualifier.forall(hasNoSideEffects) &&
         (ref.resolve() match {
-          case Both(b: ScBindingPattern,
-                    ScalaPsiUtil.inNameContext(pd: ScPatternDefinition))
+          case Both(
+              b: ScBindingPattern,
+              ScalaPsiUtil.inNameContext(pd: ScPatternDefinition))
               if pd.hasModifierProperty("lazy") =>
             false
           case bp: ScBindingPattern =>
@@ -67,8 +68,9 @@ object SideEffectsUtil {
             true
           case _: ScSyntheticFunction => true
           case m: PsiMethod =>
-            methodHasNoSideEffects(m,
-                                   ref.qualifier.flatMap(_.getType().toOption))
+            methodHasNoSideEffects(
+              m,
+              ref.qualifier.flatMap(_.getType().toOption))
           case _ => false
         })
       }
@@ -119,19 +121,21 @@ object SideEffectsUtil {
     val excludeNonString =
       Seq("StringBuffer._", "StringBuilder._").map("exclude:java.lang." + _)
 
-    val javaWrappers = Seq("Integer",
-                           "Byte",
-                           "Character",
-                           "Short",
-                           "Boolean",
-                           "Long",
-                           "Double",
-                           "Float").map(name => s"java.lang.$name._")
+    val javaWrappers = Seq(
+      "Integer",
+      "Byte",
+      "Character",
+      "Short",
+      "Boolean",
+      "Long",
+      "Double",
+      "Float").map(name => s"java.lang.$name._")
 
-    val otherJavaClasses = Seq("java.lang.String._",
-                               "java.lang.Math._",
-                               "java.math.BigInteger._",
-                               "java.math.BigDecimal._")
+    val otherJavaClasses = Seq(
+      "java.lang.String._",
+      "java.lang.Math._",
+      "java.math.BigInteger._",
+      "java.math.BigDecimal._")
 
     val scalaValueClasses =
       Seq("Boolean", "Byte", "Char", "Double", "Float", "Int", "Lont", "Unit")

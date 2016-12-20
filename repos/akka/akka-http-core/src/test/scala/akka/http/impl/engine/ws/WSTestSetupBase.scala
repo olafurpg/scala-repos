@@ -66,9 +66,10 @@ trait WSTestSetupBase extends Matchers {
   }
 
   def expectMaskedCloseFrame(closeCode: Int): Unit =
-    expectMaskedFrameOnNetwork(Protocol.Opcode.Close,
-                               closeFrameData(closeCode),
-                               fin = true)
+    expectMaskedFrameOnNetwork(
+      Protocol.Opcode.Close,
+      closeFrameData(closeCode),
+      fin = true)
 
   /** Returns the mask if any is available */
   def expectFrameHeaderOnNetwork(opcode: Opcode,

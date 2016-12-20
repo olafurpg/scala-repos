@@ -125,11 +125,12 @@ final class DistributedPubSubSettings(val role: Option[String],
       gossipInterval: FiniteDuration = gossipInterval,
       removedTimeToLive: FiniteDuration = removedTimeToLive,
       maxDeltaElements: Int = maxDeltaElements): DistributedPubSubSettings =
-    new DistributedPubSubSettings(role,
-                                  routingLogic,
-                                  gossipInterval,
-                                  removedTimeToLive,
-                                  maxDeltaElements)
+    new DistributedPubSubSettings(
+      role,
+      routingLogic,
+      gossipInterval,
+      removedTimeToLive,
+      maxDeltaElements)
 }
 
 object DistributedPubSubMediator {
@@ -772,9 +773,10 @@ class DistributedPubSubMediator(settings: DistributedPubSubSettings)
     val bucket = registry(selfAddress)
     val v = nextVersion()
     registry +=
-      (selfAddress -> bucket.copy(version = v,
-                                  content = bucket.content +
-                                      (key -> ValueHolder(v, valueOption))))
+      (selfAddress -> bucket.copy(
+        version = v,
+        content = bucket.content +
+            (key -> ValueHolder(v, valueOption))))
   }
 
   def getCurrentTopics(): Set[String] = {
@@ -820,8 +822,9 @@ class DistributedPubSubMediator(settings: DistributedPubSubSettings)
           val sortedContent = deltaContent.toVector.sortBy(_._2.version)
           val chunk =
             sortedContent.take(maxDeltaElements - (count - sortedContent.size))
-          bucket.copy(content = TreeMap.empty[String, ValueHolder] ++ chunk,
-                      version = chunk.last._2.version)
+          bucket.copy(
+            content = TreeMap.empty[String, ValueHolder] ++ chunk,
+            version = chunk.last._2.version)
         }
     }
   }

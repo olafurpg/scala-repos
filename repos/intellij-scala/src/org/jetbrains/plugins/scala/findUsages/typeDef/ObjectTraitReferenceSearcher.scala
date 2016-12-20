@@ -58,11 +58,12 @@ class ObjectTraitReferenceSearcher
         val helper: PsiSearchHelper =
           PsiSearchHelper.SERVICE.getInstance(queryParameters.getProject)
         try {
-          helper.processElementsWithWord(processor,
-                                         scope,
-                                         name,
-                                         UsageSearchContext.IN_CODE,
-                                         true)
+          helper.processElementsWithWord(
+            processor,
+            scope,
+            name,
+            UsageSearchContext.IN_CODE,
+            true)
         } catch {
           case ignore: IndexNotReadyException =>
           case ignore: AssertionError

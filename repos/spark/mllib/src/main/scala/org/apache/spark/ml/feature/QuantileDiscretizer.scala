@@ -88,8 +88,9 @@ final class QuantileDiscretizer(override val uid: String)
   override def transformSchema(schema: StructType): StructType = {
     SchemaUtils.checkColumnType(schema, $(inputCol), DoubleType)
     val inputFields = schema.fields
-    require(inputFields.forall(_.name != $(outputCol)),
-            s"Output column ${$(outputCol)} already exists.")
+    require(
+      inputFields.forall(_.name != $(outputCol)),
+      s"Output column ${$(outputCol)} already exists.")
     val attr = NominalAttribute.defaultAttr.withName($(outputCol))
     val outputFields = inputFields :+ attr.toStructField()
     StructType(outputFields)
@@ -133,9 +134,10 @@ object QuantileDiscretizer
     val requiredSamples = math.max(numBins * numBins, minSamplesRequired)
     val fraction = math.min(requiredSamples.toDouble / totalSamples, 1.0)
     dataset
-      .sample(withReplacement = false,
-              fraction,
-              new XORShiftRandom(seed).nextInt())
+      .sample(
+        withReplacement = false,
+        fraction,
+        new XORShiftRandom(seed).nextInt())
       .collect()
   }
 

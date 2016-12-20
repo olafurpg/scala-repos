@@ -94,21 +94,23 @@ object HRavenHistoryService extends HistoryService {
                                    max: Int,
                                    nFetch: Int): Try[Seq[Flow]] =
     Try(
-      client.fetchFlowsWithConfig(cluster,
-                                  user,
-                                  batch,
-                                  signature,
-                                  nFetch,
-                                  RequiredJobConfigs: _*))
+      client.fetchFlowsWithConfig(
+        cluster,
+        user,
+        batch,
+        signature,
+        nFetch,
+        RequiredJobConfigs: _*))
       .flatMap { flows =>
         Try {
           // Ugly mutable code to add task info to flows
           flows.asScala.foreach { flow =>
             flow.getJobs.asScala.foreach { job =>
               // client.fetchTaskDetails might throw IOException
-              val tasks = client.fetchTaskDetails(flow.getCluster,
-                                                  job.getJobId,
-                                                  TaskDetailFields)
+              val tasks = client.fetchTaskDetails(
+                flow.getCluster,
+                job.getJobId,
+                TaskDetailFields)
               job.addTasks(tasks)
             }
           }
@@ -180,13 +182,14 @@ object HRavenHistoryService extends HistoryService {
       signature <- conf.getFirstKey("scalding.flow.class.signature")
 
       // query hRaven for matching flows
-      flows <- fetchSuccessfulFlows(client,
-                                    cluster,
-                                    user,
-                                    batch,
-                                    signature,
-                                    max,
-                                    conf.maxFetch)
+      flows <- fetchSuccessfulFlows(
+        client,
+        cluster,
+        user,
+        batch,
+        signature,
+        max,
+        conf.maxFetch)
     } yield flows
 
     // Find the FlowStep in the hRaven flow that corresponds to the current step
@@ -199,12 +202,13 @@ object HRavenHistoryService extends HistoryService {
     fetchPastJobDetails(info.step, maxHistory).map { history =>
       for {
         step <- history
-        keys = FlowStepKeys(step.getJobName,
-                            step.getUser,
-                            step.getPriority,
-                            step.getStatus,
-                            step.getVersion,
-                            "")
+        keys = FlowStepKeys(
+          step.getJobName,
+          step.getUser,
+          step.getPriority,
+          step.getStatus,
+          step.getVersion,
+          "")
         // update HRavenHistoryService.TaskDetailFields when consuming additional task fields from hraven below
         tasks = step.getTasks.asScala.map { t =>
           Task(t.getType, t.getStatus, t.getStartTime, t.getFinishTime)

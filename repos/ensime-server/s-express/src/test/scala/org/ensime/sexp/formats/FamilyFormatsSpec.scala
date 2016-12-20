@@ -90,8 +90,9 @@ class FamilyFormatsSpec extends FormatSpec with FamilyFormats {
     /////////////////// END OF BOILERPLATE /////////////////
 
     assertFormat(SpecialToken, SexpNil)
-    assertFormat(SpecialToken: TokenTree,
-                 SexpList(SexpSymbol(":SpecialToken")))
+    assertFormat(
+      SpecialToken: TokenTree,
+      SexpList(SexpSymbol(":SpecialToken")))
 
     val fieldTerm = FieldTerm("thing is ten", DatabaseField("THING"), "10")
     val expectField = SexpData(

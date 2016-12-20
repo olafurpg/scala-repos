@@ -52,11 +52,12 @@ object HttpRequestHandler {
       configuration: Configuration): Seq[Binding[_]] = {
 
     val fromConfiguration = Reflect
-      .bindingsFromConfiguration[HttpRequestHandler,
-                                 play.http.HttpRequestHandler,
-                                 play.core.j.JavaHttpRequestHandlerAdapter,
-                                 play.http.DefaultHttpRequestHandler,
-                                 JavaCompatibleHttpRequestHandler](
+      .bindingsFromConfiguration[
+        HttpRequestHandler,
+        play.http.HttpRequestHandler,
+        play.core.j.JavaHttpRequestHandlerAdapter,
+        play.http.DefaultHttpRequestHandler,
+        JavaCompatibleHttpRequestHandler](
         environment,
         PlayConfig(configuration),
         "play.http.requestHandler",
@@ -77,9 +78,10 @@ object ActionCreator {
       environment: Environment,
       configuration: Configuration): Seq[Binding[_]] = {
     Reflect
-      .configuredClass[ActionCreator,
-                       ActionCreator,
-                       HttpRequestHandlerActionCreator](
+      .configuredClass[
+        ActionCreator,
+        ActionCreator,
+        HttpRequestHandlerActionCreator](
         environment,
         PlayConfig(configuration),
         "play.http.actionCreator",
@@ -245,10 +247,11 @@ class JavaCompatibleHttpRequestHandler @Inject()(
     configuration: HttpConfiguration,
     filters: HttpFilters,
     components: JavaHandlerComponents)
-    extends DefaultHttpRequestHandler(router,
-                                      errorHandler,
-                                      configuration,
-                                      filters.filters: _*) {
+    extends DefaultHttpRequestHandler(
+      router,
+      errorHandler,
+      configuration,
+      filters.filters: _*) {
 
   override def routeRequest(request: RequestHeader): Option[Handler] = {
     super.routeRequest(request) match {

@@ -66,19 +66,21 @@ trait StatsLibModule[M[+ _]]
     val EmptyNamespace = Vector()
 
     override def _libMorphism1 =
-      super._libMorphism1 ++ Set(Median,
-                                 Mode,
-                                 Rank,
-                                 DenseRank,
-                                 IndexedRank,
-                                 Dummy)
+      super._libMorphism1 ++ Set(
+        Median,
+        Mode,
+        Rank,
+        DenseRank,
+        IndexedRank,
+        Dummy)
     override def _libMorphism2 =
-      super._libMorphism2 ++ Set(Covariance,
-                                 LinearCorrelation,
-                                 LinearRegression,
-                                 LogarithmicRegression,
-                                 SimpleExponentialSmoothing,
-                                 DoubleExponentialSmoothing)
+      super._libMorphism2 ++ Set(
+        Covariance,
+        LinearCorrelation,
+        LinearRegression,
+        LogarithmicRegression,
+        SimpleExponentialSmoothing,
+        DoubleExponentialSmoothing)
 
     object Median extends Morphism1(EmptyNamespace, "median") {
       import Mean._
@@ -157,10 +159,11 @@ trait StatsLibModule[M[+ _]]
                                    BigDecimal,
                                    Set[BigDecimal],
                                    BigDecimal) =
-                  mapped.foldLeft(Option.empty[BigDecimal],
-                                  BigDecimal(0),
-                                  Set.empty[BigDecimal],
-                                  BigDecimal(0)) {
+                  mapped.foldLeft(
+                    Option.empty[BigDecimal],
+                    BigDecimal(0),
+                    Set.empty[BigDecimal],
+                    BigDecimal(0)) {
                     case ((None, count, modes, maxCount), sv) =>
                       ((Some(sv), count + 1, Set(sv), maxCount + 1))
                     case ((Some(currentRun), count, modes, maxCount), sv) => {
@@ -234,18 +237,21 @@ trait StatsLibModule[M[+ _]]
 
       val keySpec = DerefObjectStatic(TransSpec1.Id, paths.Key)
       val sortSpec = DerefObjectStatic(
-        DerefArrayStatic(DerefObjectStatic(TransSpec1.Id, paths.Value),
-                         CPathIndex(0)),
+        DerefArrayStatic(
+          DerefObjectStatic(TransSpec1.Id, paths.Value),
+          CPathIndex(0)),
         CPathField(smoother))
       val valueSpec = DerefObjectStatic(
-        DerefArrayStatic(DerefObjectStatic(TransSpec1.Id, paths.Value),
-                         CPathIndex(0)),
+        DerefArrayStatic(
+          DerefObjectStatic(TransSpec1.Id, paths.Value),
+          CPathIndex(0)),
         CPathField(smoothee))
 
       def smoothSpec: TransSpec1
       def spec =
-        InnerObjectConcat(WrapObject(keySpec, paths.Key.name),
-                          WrapObject(smoothSpec, paths.Value.name))
+        InnerObjectConcat(
+          WrapObject(keySpec, paths.Key.name),
+          WrapObject(smoothSpec, paths.Value.name))
 
       private val morph1 = new Morph1Apply {
         def apply(table: Table, ctx: MorphContext): M[Table] =
@@ -308,8 +314,9 @@ trait StatsLibModule[M[+ _]]
 
             (Some(s),
              Map(
-               ColumnRef(CPath.Identity, CNum) -> ArrayNumColumn(defined,
-                                                                 smoothed)))
+               ColumnRef(CPath.Identity, CNum) -> ArrayNumColumn(
+                 defined,
+                 smoothed)))
           } getOrElse {
             (None, Map.empty)
           }
@@ -320,8 +327,9 @@ trait StatsLibModule[M[+ _]]
         DerefObjectStatic(TransSpec1.Id, paths.Value),
         CPathIndex(1))
       def smoothSpec =
-        Scan(InnerArrayConcat(WrapArray(valueSpec), WrapArray(alphaSpec)),
-             ExpSmoothingScanner)
+        Scan(
+          InnerArrayConcat(WrapArray(valueSpec), WrapArray(alphaSpec)),
+          ExpSmoothingScanner)
     }
 
     object DoubleExponentialSmoothing extends Smoothing("doubleExpSmoothing") {
@@ -454,18 +462,22 @@ trait StatsLibModule[M[+ _]]
       }
 
       val alphaSpec = DerefObjectStatic(
-        DerefArrayStatic(DerefObjectStatic(TransSpec1.Id, paths.Value),
-                         CPathIndex(1)),
+        DerefArrayStatic(
+          DerefObjectStatic(TransSpec1.Id, paths.Value),
+          CPathIndex(1)),
         CPathField(alpha))
       val betaSpec = DerefObjectStatic(
-        DerefArrayStatic(DerefObjectStatic(TransSpec1.Id, paths.Value),
-                         CPathIndex(1)),
+        DerefArrayStatic(
+          DerefObjectStatic(TransSpec1.Id, paths.Value),
+          CPathIndex(1)),
         CPathField(beta))
       def smoothSpec =
-        Scan(InnerArrayConcat(WrapArray(valueSpec),
-                              WrapArray(alphaSpec),
-                              WrapArray(betaSpec)),
-             DoubleExpSmoothingScanner)
+        Scan(
+          InnerArrayConcat(
+            WrapArray(valueSpec),
+            WrapArray(alphaSpec),
+            WrapArray(betaSpec)),
+          DoubleExpSmoothingScanner)
     }
 
     object LinearCorrelation extends Morphism2(StatsNamespace, "corr") {
@@ -516,8 +528,9 @@ trait StatsLibModule[M[+ _]]
                      BigDecimal(0),
                      BigDecimal(0),
                      BigDecimal(0))) {
-                    case ((count, sum1, sum2, sumsq1, sumsq2, productSum),
-                          (v1, v2)) =>
+                    case (
+                        (count, sum1, sum2, sumsq1, sumsq2, productSum),
+                        (v1, v2)) =>
                       (count + 1,
                        sum1 + v1,
                        sum2 + v2,
@@ -545,8 +558,9 @@ trait StatsLibModule[M[+ _]]
                      BigDecimal(0),
                      BigDecimal(0),
                      BigDecimal(0))) {
-                    case ((count, sum1, sum2, sumsq1, sumsq2, productSum),
-                          (v1, v2)) =>
+                    case (
+                        (count, sum1, sum2, sumsq1, sumsq2, productSum),
+                        (v1, v2)) =>
                       (count + 1,
                        sum1 + v1,
                        sum2 + v2,
@@ -574,8 +588,9 @@ trait StatsLibModule[M[+ _]]
                      BigDecimal(0),
                      BigDecimal(0),
                      BigDecimal(0))) {
-                    case ((count, sum1, sum2, sumsq1, sumsq2, productSum),
-                          (v1, v2)) =>
+                    case (
+                        (count, sum1, sum2, sumsq1, sumsq2, productSum),
+                        (v1, v2)) =>
                       (count + 1,
                        sum1 + v1,
                        sum2 + v2,
@@ -603,8 +618,9 @@ trait StatsLibModule[M[+ _]]
                      BigDecimal(0),
                      BigDecimal(0),
                      BigDecimal(0))) {
-                    case ((count, sum1, sum2, sumsq1, sumsq2, productSum),
-                          (v1, v2)) =>
+                    case (
+                        (count, sum1, sum2, sumsq1, sumsq2, productSum),
+                        (v1, v2)) =>
                       (count + 1,
                        sum1 + v1,
                        sum2 + v2,
@@ -632,8 +648,9 @@ trait StatsLibModule[M[+ _]]
                      BigDecimal(0),
                      BigDecimal(0),
                      BigDecimal(0))) {
-                    case ((count, sum1, sum2, sumsq1, sumsq2, productSum),
-                          (v1, v2)) =>
+                    case (
+                        (count, sum1, sum2, sumsq1, sumsq2, productSum),
+                        (v1, v2)) =>
                       (count + 1,
                        sum1 + v1,
                        sum2 + v2,
@@ -661,8 +678,9 @@ trait StatsLibModule[M[+ _]]
                      BigDecimal(0),
                      BigDecimal(0),
                      BigDecimal(0))) {
-                    case ((count, sum1, sum2, sumsq1, sumsq2, productSum),
-                          (v1, v2)) =>
+                    case (
+                        (count, sum1, sum2, sumsq1, sumsq2, productSum),
+                        (v1, v2)) =>
                       (count + 1,
                        sum1 + v1,
                        sum2 + v2,
@@ -690,8 +708,9 @@ trait StatsLibModule[M[+ _]]
                      BigDecimal(0),
                      BigDecimal(0),
                      BigDecimal(0))) {
-                    case ((count, sum1, sum2, sumsq1, sumsq2, productSum),
-                          (v1, v2)) =>
+                    case (
+                        (count, sum1, sum2, sumsq1, sumsq2, productSum),
+                        (v1, v2)) =>
                       (count + 1,
                        sum1 + v1,
                        sum2 + v2,
@@ -719,8 +738,9 @@ trait StatsLibModule[M[+ _]]
                      BigDecimal(0),
                      BigDecimal(0),
                      BigDecimal(0))) {
-                    case ((count, sum1, sum2, sumsq1, sumsq2, productSum),
-                          (v1, v2)) =>
+                    case (
+                        (count, sum1, sum2, sumsq1, sumsq2, productSum),
+                        (v1, v2)) =>
                       (count + 1,
                        sum1 + v1,
                        sum2 + v2,
@@ -748,8 +768,9 @@ trait StatsLibModule[M[+ _]]
                      BigDecimal(0),
                      BigDecimal(0),
                      BigDecimal(0))) {
-                    case ((count, sum1, sum2, sumsq1, sumsq2, productSum),
-                          (v1, v2)) =>
+                    case (
+                        (count, sum1, sum2, sumsq1, sumsq2, productSum),
+                        (v1, v2)) =>
                       (count + 1,
                        sum1 + v1,
                        sum2 + v2,

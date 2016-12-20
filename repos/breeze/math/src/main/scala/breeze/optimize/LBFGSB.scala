@@ -40,8 +40,9 @@ class LBFGSB(lowerBounds: DenseVector[Double],
              tolerance: Double = 1E-8,
              maxZoomIter: Int = 64,
              maxLineSearchIter: Int = 64)
-    extends FirstOrderMinimizer[DenseVector[Double],
-                                DiffFunction[DenseVector[Double]]](
+    extends FirstOrderMinimizer[
+      DenseVector[Double],
+      DiffFunction[DenseVector[Double]]](
       LBFGSB
         .defaultConvergenceCheck(lowerBounds, upperBounds, tolerance, maxIter))
     with SerializableLogging {
@@ -72,9 +73,10 @@ class LBFGSB(lowerBounds: DenseVector[Double],
                                        newVal: Double,
                                        f: DiffFunction[DenseVector[Double]],
                                        oldState: State): History = {
-    updateSkYkHessianApproxMat(oldState.history,
-                               newX - oldState.x,
-                               newGrad :- oldState.grad)
+    updateSkYkHessianApproxMat(
+      oldState.history,
+      newX - oldState.x,
+      newGrad :- oldState.grad)
   }
 
   override protected def chooseDescentDirection(
@@ -125,8 +127,9 @@ class LBFGSB(lowerBounds: DenseVector[Double],
     require(
       upperBounds.length == x0.length,
       s"Mismatch between x0 length (${x0.length}) and upperBounds length ${upperBounds.length}")
-    require(x0.forall((i, v) => (lowerBounds(i) <= v && v <= upperBounds(i))),
-            "seed is not feasible (violates lower bound or upperBounds)")
+    require(
+      x0.forall((i, v) => (lowerBounds(i) <= v && v <= upperBounds(i))),
+      "seed is not feasible (violates lower bound or upperBounds)")
 
     History(
       theta = 1.0,
@@ -227,11 +230,13 @@ class LBFGSB(lowerBounds: DenseVector[Double],
     var starAlpha = 1.0
     for ((vIdx, i) <- freeVarIndex.zipWithIndex) {
       starAlpha = if (0 < du(i)) {
-        math.max(starAlpha,
-                 math.min(upperBounds(vIdx) - xCauchy(vIdx) / du(i), 1.0))
+        math.max(
+          starAlpha,
+          math.min(upperBounds(vIdx) - xCauchy(vIdx) / du(i), 1.0))
       } else {
-        math.max(starAlpha,
-                 math.min(lowerBounds(vIdx) - xCauchy(vIdx) / du(i), 1.0))
+        math.max(
+          starAlpha,
+          math.min(lowerBounds(vIdx) - xCauchy(vIdx) / du(i), 1.0))
       }
     }
 
@@ -299,8 +304,9 @@ class LBFGSB(lowerBounds: DenseVector[Double],
       import history._
       if (0 == yHistory.cols) {
         //yHistory.cols means update times
-        history.copy(yHistory = newY.toDenseMatrix.t,
-                     sHistory = newS.toDenseMatrix.t)
+        history.copy(
+          yHistory = newY.toDenseMatrix.t,
+          sHistory = newS.toDenseMatrix.t)
       } else if (yHistory.cols < m) {
         history.copy(
           yHistory = DenseMatrix.horzcat(yHistory, newY.toDenseMatrix.t),
@@ -332,8 +338,9 @@ class LBFGSB(lowerBounds: DenseVector[Double],
       val D: DenseMatrix[Double] = diag(diag(A)) :* (-1.0)
 
       val STS: DenseMatrix[Double] = sHistory.t * sHistory
-      val MM = DenseMatrix.vertcat(DenseMatrix.horzcat(D, L.t),
-                                   DenseMatrix.horzcat(L, STS :* newTheta))
+      val MM = DenseMatrix.vertcat(
+        DenseMatrix.horzcat(D, L.t),
+        DenseMatrix.horzcat(L, STS :* newTheta))
       val newM = inv(MM) //MM-1 M is defined at formula 3.4
       newHistory.copy(newTheta, newW, newM)
     } else {

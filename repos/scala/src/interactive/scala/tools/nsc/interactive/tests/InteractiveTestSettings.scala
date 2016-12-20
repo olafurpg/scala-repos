@@ -52,17 +52,19 @@ trait InteractiveTestSettings
       settings.sourcepath.value =
         (baseDir / Path(settings.sourcepath.value)).path
 
-    adjustPaths(settings.bootclasspath,
-                settings.classpath,
-                settings.javabootclasspath,
-                settings.sourcepath)
+    adjustPaths(
+      settings.bootclasspath,
+      settings.classpath,
+      settings.javabootclasspath,
+      settings.sourcepath)
   }
 
   /** If there's a file ending in .opts, read it and parse it for cmd line arguments. */
   protected val argsString = {
     val optsFile =
-      outDir / "%s.%s".format(System.getProperty("partest.testname"),
-                              TestOptionsFileExtension)
+      outDir / "%s.%s".format(
+        System.getProperty("partest.testname"),
+        TestOptionsFileExtension)
     val str = try File(optsFile).slurp()
     catch {
       case e: java.io.IOException => ""

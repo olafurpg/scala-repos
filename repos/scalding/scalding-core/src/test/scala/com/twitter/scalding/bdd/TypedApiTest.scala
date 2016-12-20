@@ -27,8 +27,9 @@ class TypedApiTest extends WordSpec with Matchers with TBddDsl {
           }
         }
       } Then { buffer: mutable.Buffer[(String, Double)] =>
-        buffer.toList shouldBe List(("Joe", 1000.0 / 32),
-                                    ("Sarah", 1000.0 / 58))
+        buffer.toList shouldBe List(
+          ("Joe", 1000.0 / 32),
+          ("Sarah", 1000.0 / 58))
       }
     }
 
@@ -45,9 +46,9 @@ class TypedApiTest extends WordSpec with Matchers with TBddDsl {
           }
         }
       } Then { buffer: mutable.Buffer[EstimatedContribution] =>
-        buffer.toList shouldBe List(EstimatedContribution("Joe", 1000.0 / 32),
-                                    EstimatedContribution("Sarah",
-                                                          1000.0 / 58))
+        buffer.toList shouldBe List(
+          EstimatedContribution("Joe", 1000.0 / 32),
+          EstimatedContribution("Sarah", 1000.0 / 58))
       }
     }
   }
@@ -87,8 +88,9 @@ class TypedApiTest extends WordSpec with Matchers with TBddDsl {
             }
             .values
       } Then { buffer: mutable.Buffer[UserInfo] =>
-        buffer.toList shouldBe List(UserInfo("Joe", "M", 40),
-                                    UserInfo("Sarah", "F", 22))
+        buffer.toList shouldBe List(
+          UserInfo("Joe", "M", 40),
+          UserInfo("Sarah", "F", 22))
       }
     }
   }
@@ -96,8 +98,9 @@ class TypedApiTest extends WordSpec with Matchers with TBddDsl {
   "A test with a list of sources" should {
     "Work as if combining the sources with the And operator but requires explicit cast of the input pipes" in {
       GivenSources {
-        List(List(UserWithGender("Joe", "M"), UserWithGender("Sarah", "F")),
-             List(UserWithAge("Joe", 40), UserWithAge("Sarah", 22)))
+        List(
+          List(UserWithGender("Joe", "M"), UserWithGender("Sarah", "F")),
+          List(UserWithAge("Joe", 40), UserWithAge("Sarah", 22)))
       } When { pipes: List[TypedPipe[_]] =>
         val gender = pipes(0).asInstanceOf[TypedPipe[UserWithGender]]
         val age = pipes(1).asInstanceOf[TypedPipe[UserWithAge]]
@@ -111,16 +114,18 @@ class TypedApiTest extends WordSpec with Matchers with TBddDsl {
           }
           .values
       } Then { buffer: mutable.Buffer[UserInfo] =>
-        buffer.toList shouldBe List(UserInfo("Joe", "M", 40),
-                                    UserInfo("Sarah", "F", 22))
+        buffer.toList shouldBe List(
+          UserInfo("Joe", "M", 40),
+          UserInfo("Sarah", "F", 22))
       }
     }
 
     "not checking the types of the sources and fail if any error occurs" in {
       an[FlowException] should be thrownBy {
         GivenSources {
-          List(List(UserWithGender("Joe", "M"), UserWithGender("Sarah", "F")),
-               List(("Joe", 40), ("Sarah", 22)))
+          List(
+            List(UserWithGender("Joe", "M"), UserWithGender("Sarah", "F")),
+            List(("Joe", 40), ("Sarah", 22)))
         } When { pipes: List[TypedPipe[_]] =>
           val gender = pipes(0).asInstanceOf[TypedPipe[UserWithGender]]
           val age = pipes(1).asInstanceOf[TypedPipe[UserWithAge]]
@@ -134,8 +139,9 @@ class TypedApiTest extends WordSpec with Matchers with TBddDsl {
             }
             .values
         } Then { buffer: mutable.Buffer[UserInfo] =>
-          buffer.toList shouldBe List(UserInfo("Joe", "M", 40),
-                                      UserInfo("Sarah", "F", 22))
+          buffer.toList shouldBe List(
+            UserInfo("Joe", "M", 40),
+            UserInfo("Sarah", "F", 22))
         }
       }
     }
@@ -164,8 +170,9 @@ class TypedApiTest extends WordSpec with Matchers with TBddDsl {
           .join(withIncome.group)
           .join(withSmoker.group)
           .flatMapValues {
-            case ((((name: String, gender: String), age: Int), income: Long),
-                  smoker) =>
+            case (
+                (((name: String, gender: String), age: Int), income: Long),
+                smoker) =>
               val lifeExpectancy = (gender, smoker) match {
                 case ("M", true) => 68
                 case ("M", false) => 72
@@ -174,14 +181,16 @@ class TypedApiTest extends WordSpec with Matchers with TBddDsl {
               }
 
               Some(
-                EstimatedContribution(name,
-                                      floor(income / (lifeExpectancy - age))))
+                EstimatedContribution(
+                  name,
+                  floor(income / (lifeExpectancy - age))))
             case _ => None
           }
           .values
       } Then { buffer: mutable.Buffer[EstimatedContribution] =>
-        buffer.toList shouldBe List(EstimatedContribution("Joe", 35.0),
-                                    EstimatedContribution("Sarah", 13.0))
+        buffer.toList shouldBe List(
+          EstimatedContribution("Joe", 35.0),
+          EstimatedContribution("Sarah", 13.0))
       }
     }
   }

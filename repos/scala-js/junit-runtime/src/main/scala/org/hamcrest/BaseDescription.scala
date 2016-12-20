@@ -72,10 +72,11 @@ abstract class BaseDescription extends Description {
       separator: String,
       end: String,
       values: java.util.Iterator[T]): Description = {
-    appendList(start,
-               separator,
-               end,
-               new SelfDescribingValueIterator[T](values))
+    appendList(
+      start,
+      separator,
+      end,
+      new SelfDescribingValueIterator[T](values))
   }
 
   override def appendList(

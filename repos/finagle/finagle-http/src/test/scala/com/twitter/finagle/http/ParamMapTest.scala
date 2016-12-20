@@ -118,9 +118,10 @@ class ParamMapTest extends FunSuite {
   test("iterator") {
     val request = Request("/search.json?q=twitter&q=twitter2&lang=en")
     assert(
-      request.params.iterator.toList.sorted == List(("lang", "en"),
-                                                    ("q", "twitter"),
-                                                    ("q", "twitter2")))
+      request.params.iterator.toList.sorted == List(
+        ("lang", "en"),
+        ("q", "twitter"),
+        ("q", "twitter2")))
   }
 
   test("plus") {
@@ -169,8 +170,9 @@ class ParamMapTest extends FunSuite {
       request.contentString = "q=twitter"
       assert(request.params.get("q") == Some("twitter")) // favor POST param
       assert(
-        request.params.getAll("q").toList.sorted == List("twitter",
-                                                         "twitter2"))
+        request.params.getAll("q").toList.sorted == List(
+          "twitter",
+          "twitter2"))
     }
   }
 

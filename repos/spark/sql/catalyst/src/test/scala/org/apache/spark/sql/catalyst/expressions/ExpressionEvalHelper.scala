@@ -44,9 +44,10 @@ trait ExpressionEvalHelper extends GeneratorDrivenPropertyChecks {
                                 inputRow: InternalRow = EmptyRow): Unit = {
     val catalystValue = CatalystTypeConverters.convertToCatalyst(expected)
     checkEvaluationWithoutCodegen(expression, catalystValue, inputRow)
-    checkEvaluationWithGeneratedMutableProjection(expression,
-                                                  catalystValue,
-                                                  inputRow)
+    checkEvaluationWithGeneratedMutableProjection(
+      expression,
+      catalystValue,
+      inputRow)
     if (GenerateUnsafeProjection.canSupport(expression.dataType)) {
       checkEvalutionWithUnsafeProjection(expression, catalystValue, inputRow)
     }
@@ -161,12 +162,14 @@ trait ExpressionEvalHelper extends GeneratorDrivenPropertyChecks {
                                                 expected: Any,
                                                 inputRow: InternalRow =
                                                   EmptyRow): Unit = {
-    val plan = Project(Alias(expression, s"Optimized($expression)")() :: Nil,
-                       OneRowRelation)
+    val plan = Project(
+      Alias(expression, s"Optimized($expression)")() :: Nil,
+      OneRowRelation)
     val optimizedPlan = DefaultOptimizer.execute(plan)
-    checkEvaluationWithoutCodegen(optimizedPlan.expressions.head,
-                                  expected,
-                                  inputRow)
+    checkEvaluationWithoutCodegen(
+      optimizedPlan.expressions.head,
+      expected,
+      inputRow)
   }
 
   protected def checkDoubleEvaluation(
@@ -274,9 +277,10 @@ trait ExpressionEvalHelper extends GeneratorDrivenPropertyChecks {
       case e: Exception => fail(s"Exception evaluating $expr", e)
     }
 
-    val plan = generateProject(GenerateMutableProjection.generate(
-                                 Alias(expr, s"Optimized($expr)")() :: Nil)(),
-                               expr)
+    val plan = generateProject(
+      GenerateMutableProjection.generate(
+        Alias(expr, s"Optimized($expr)")() :: Nil)(),
+      expr)
     val codegen = plan(inputRow).get(0, expr.dataType)
 
     if (!compareResults(interpret, codegen)) {

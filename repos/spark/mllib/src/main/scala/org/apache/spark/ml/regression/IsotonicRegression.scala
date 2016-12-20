@@ -309,9 +309,10 @@ object IsotonicRegressionModel extends MLReadable[IsotonicRegressionModel] {
       // Save metadata and Params
       DefaultParamsWriter.saveMetadata(instance, path, sc)
       // Save model data: boundaries, predictions, isotonic
-      val data = Data(instance.oldModel.boundaries,
-                      instance.oldModel.predictions,
-                      instance.oldModel.isotonic)
+      val data = Data(
+        instance.oldModel.boundaries,
+        instance.oldModel.predictions,
+        instance.oldModel.isotonic)
       val dataPath = new Path(path, "data").toString
       sqlContext
         .createDataFrame(Seq(data))

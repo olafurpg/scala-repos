@@ -41,14 +41,15 @@ object Markdown {
     options.setSanitize(true)
     options.setBreaks(enableLineBreaks)
 
-    val renderer = new GitBucketMarkedRenderer(options,
-                                               repository,
-                                               enableWikiLink,
-                                               enableRefsLink,
-                                               enableAnchor,
-                                               enableTaskList,
-                                               hasWritePermission,
-                                               pages)
+    val renderer = new GitBucketMarkedRenderer(
+      options,
+      repository,
+      enableWikiLink,
+      enableRefsLink,
+      enableAnchor,
+      enableTaskList,
+      hasWritePermission,
+      pages)
 
     Marked.marked(source, options, renderer)
   }

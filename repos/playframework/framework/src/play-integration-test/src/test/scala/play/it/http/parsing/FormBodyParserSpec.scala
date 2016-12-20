@@ -36,13 +36,15 @@ class FormBodyParserSpec extends PlaySpecification {
         User.unapply))
 
     "bind JSON requests" in new WithApplication() {
-      parse(Json.obj("name" -> "Alice", "age" -> 42),
-            BodyParsers.parse.form(userForm)) must beRight(User("Alice", 42))
+      parse(
+        Json.obj("name" -> "Alice", "age" -> 42),
+        BodyParsers.parse.form(userForm)) must beRight(User("Alice", 42))
     }
 
     "bind form-urlencoded requests" in new WithApplication() {
-      parse(Map("name" -> Seq("Alice"), "age" -> Seq("42")),
-            BodyParsers.parse.form(userForm)) must beRight(User("Alice", 42))
+      parse(
+        Map("name" -> Seq("Alice"), "age" -> Seq("42")),
+        BodyParsers.parse.form(userForm)) must beRight(User("Alice", 42))
     }
 
     "not bind erroneous body" in new WithApplication() {
@@ -52,11 +54,12 @@ class FormBodyParserSpec extends PlaySpecification {
 
     "allow users to override the error reporting behaviour" in new WithApplication() {
       import play.api.i18n.Messages.Implicits.applicationMessages
-      parse(Json.obj("age" -> "Alice"),
-            BodyParsers.parse.form(
-              userForm,
-              onErrors = (form: Form[User]) =>
-                Results.BadRequest(form.errorsAsJson))) must beLeft.which {
+      parse(
+        Json.obj("age" -> "Alice"),
+        BodyParsers.parse.form(
+          userForm,
+          onErrors = (form: Form[User]) =>
+            Results.BadRequest(form.errorsAsJson))) must beLeft.which {
         result =>
           result.header.status must equalTo(BAD_REQUEST)
           val json = contentAsJson(Future.successful(result))

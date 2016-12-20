@@ -201,56 +201,62 @@ class Message(val buffer: ByteBuffer,
            timestamp: Long,
            codec: CompressionCodec,
            magicValue: Byte) =
-    this(bytes = bytes,
-         key = key,
-         timestamp = timestamp,
-         timestampType = TimestampType.CREATE_TIME,
-         codec = codec,
-         payloadOffset = 0,
-         payloadSize = -1,
-         magicValue = magicValue)
+    this(
+      bytes = bytes,
+      key = key,
+      timestamp = timestamp,
+      timestampType = TimestampType.CREATE_TIME,
+      codec = codec,
+      payloadOffset = 0,
+      payloadSize = -1,
+      magicValue = magicValue)
 
   def this(bytes: Array[Byte],
            timestamp: Long,
            codec: CompressionCodec,
            magicValue: Byte) =
-    this(bytes = bytes,
-         key = null,
-         timestamp = timestamp,
-         codec = codec,
-         magicValue = magicValue)
+    this(
+      bytes = bytes,
+      key = null,
+      timestamp = timestamp,
+      codec = codec,
+      magicValue = magicValue)
 
   def this(bytes: Array[Byte],
            key: Array[Byte],
            timestamp: Long,
            magicValue: Byte) =
-    this(bytes = bytes,
-         key = key,
-         timestamp = timestamp,
-         codec = NoCompressionCodec,
-         magicValue = magicValue)
+    this(
+      bytes = bytes,
+      key = key,
+      timestamp = timestamp,
+      codec = NoCompressionCodec,
+      magicValue = magicValue)
 
   def this(bytes: Array[Byte], timestamp: Long, magicValue: Byte) =
-    this(bytes = bytes,
-         key = null,
-         timestamp = timestamp,
-         codec = NoCompressionCodec,
-         magicValue = magicValue)
+    this(
+      bytes = bytes,
+      key = null,
+      timestamp = timestamp,
+      codec = NoCompressionCodec,
+      magicValue = magicValue)
 
   def this(bytes: Array[Byte]) =
-    this(bytes = bytes,
-         key = null,
-         timestamp = Message.NoTimestamp,
-         codec = NoCompressionCodec,
-         magicValue = Message.CurrentMagicValue)
+    this(
+      bytes = bytes,
+      key = null,
+      timestamp = Message.NoTimestamp,
+      codec = NoCompressionCodec,
+      magicValue = Message.CurrentMagicValue)
 
   /**
     * Compute the checksum of the message from the message contents
     */
   def computeChecksum: Long =
-    CoreUtils.crc32(buffer.array,
-                    buffer.arrayOffset + MagicOffset,
-                    buffer.limit - MagicOffset)
+    CoreUtils.crc32(
+      buffer.array,
+      buffer.arrayOffset + MagicOffset,
+      buffer.limit - MagicOffset)
 
   /**
     * Retrieve the previously computed CRC for this message
@@ -400,24 +406,27 @@ class Message(val buffer: ByteBuffer,
       if (timestampType == TimestampType.LOG_APPEND_TIME)
         byteBuffer.putLong(now)
       else byteBuffer.putLong(Message.NoTimestamp)
-      byteBuffer.put(buffer.array(),
-                     buffer.arrayOffset() + Message.KeySizeOffset_V0,
-                     size - Message.KeySizeOffset_V0)
+      byteBuffer.put(
+        buffer.array(),
+        buffer.arrayOffset() + Message.KeySizeOffset_V0,
+        size - Message.KeySizeOffset_V0)
     } else {
       // Down-conversion, reserve CRC and update magic byte
       byteBuffer.position(Message.MagicOffset)
       byteBuffer.put(Message.MagicValue_V0)
       byteBuffer.put(TimestampType.CREATE_TIME.updateAttributes(attributes))
       // Down-conversion, skip the timestamp field
-      byteBuffer.put(buffer.array(),
-                     buffer.arrayOffset() + Message.KeySizeOffset_V1,
-                     size - Message.KeySizeOffset_V1)
+      byteBuffer.put(
+        buffer.array(),
+        buffer.arrayOffset() + Message.KeySizeOffset_V1,
+        size - Message.KeySizeOffset_V1)
     }
     // update crc value
     val newMessage = new Message(byteBuffer)
-    Utils.writeUnsignedInt(byteBuffer,
-                           Message.CrcOffset,
-                           newMessage.computeChecksum)
+    Utils.writeUnsignedInt(
+      byteBuffer,
+      Message.CrcOffset,
+      newMessage.computeChecksum)
     byteBuffer.rewind()
   }
 

@@ -215,24 +215,27 @@ class LogManager(val logDirs: Array[File],
       info(
         "Starting log cleanup with a period of %d ms.".format(
           retentionCheckMs))
-      scheduler.schedule("kafka-log-retention",
-                         cleanupLogs,
-                         delay = InitialTaskDelayMs,
-                         period = retentionCheckMs,
-                         TimeUnit.MILLISECONDS)
+      scheduler.schedule(
+        "kafka-log-retention",
+        cleanupLogs,
+        delay = InitialTaskDelayMs,
+        period = retentionCheckMs,
+        TimeUnit.MILLISECONDS)
       info(
         "Starting log flusher with a default period of %d ms.".format(
           flushCheckMs))
-      scheduler.schedule("kafka-log-flusher",
-                         flushDirtyLogs,
-                         delay = InitialTaskDelayMs,
-                         period = flushCheckMs,
-                         TimeUnit.MILLISECONDS)
-      scheduler.schedule("kafka-recovery-point-checkpoint",
-                         checkpointRecoveryPointOffsets,
-                         delay = InitialTaskDelayMs,
-                         period = flushCheckpointMs,
-                         TimeUnit.MILLISECONDS)
+      scheduler.schedule(
+        "kafka-log-flusher",
+        flushDirtyLogs,
+        delay = InitialTaskDelayMs,
+        period = flushCheckMs,
+        TimeUnit.MILLISECONDS)
+      scheduler.schedule(
+        "kafka-recovery-point-checkpoint",
+        checkpointRecoveryPointOffsets,
+        delay = InitialTaskDelayMs,
+        period = flushCheckpointMs,
+        TimeUnit.MILLISECONDS)
     }
     if (cleanerConfig.enableCleaner) cleaner.startup()
   }
@@ -317,9 +320,10 @@ class LogManager(val logDirs: Array[File],
           cleaner.abortAndPauseCleaning(topicAndPartition)
         log.truncateTo(truncateOffset)
         if (needToStopCleaner && cleaner != null) {
-          cleaner.maybeTruncateCheckpoint(log.dir.getParentFile,
-                                          topicAndPartition,
-                                          log.activeSegment.baseOffset)
+          cleaner.maybeTruncateCheckpoint(
+            log.dir.getParentFile,
+            topicAndPartition,
+            log.activeSegment.baseOffset)
           cleaner.resumeCleaning(topicAndPartition)
         }
       }
@@ -340,9 +344,10 @@ class LogManager(val logDirs: Array[File],
       if (cleaner != null) cleaner.abortAndPauseCleaning(topicAndPartition)
       log.truncateFullyAndStartAt(newOffset)
       if (cleaner != null) {
-        cleaner.maybeTruncateCheckpoint(log.dir.getParentFile,
-                                        topicAndPartition,
-                                        log.activeSegment.baseOffset)
+        cleaner.maybeTruncateCheckpoint(
+          log.dir.getParentFile,
+          topicAndPartition,
+          log.activeSegment.baseOffset)
         cleaner.resumeCleaning(topicAndPartition)
       }
     }
@@ -392,8 +397,9 @@ class LogManager(val logDirs: Array[File],
       // if not, create it
       val dataDir = nextLogDir()
       val dir =
-        new File(dataDir,
-                 topicAndPartition.topic + "-" + topicAndPartition.partition)
+        new File(
+          dataDir,
+          topicAndPartition.topic + "-" + topicAndPartition.partition)
       dir.mkdirs()
       log = new Log(dir, config, recoveryPoint = 0L, scheduler, time)
       logs.put(topicAndPartition, log)

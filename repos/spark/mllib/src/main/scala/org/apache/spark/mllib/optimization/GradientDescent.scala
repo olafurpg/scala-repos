@@ -125,15 +125,16 @@ class GradientDescent private[spark] (private var gradient: Gradient,
     */
   @DeveloperApi
   def optimize(data: RDD[(Double, Vector)], initialWeights: Vector): Vector = {
-    val (weights, _) = GradientDescent.runMiniBatchSGD(data,
-                                                       gradient,
-                                                       updater,
-                                                       stepSize,
-                                                       numIterations,
-                                                       regParam,
-                                                       miniBatchFraction,
-                                                       initialWeights,
-                                                       convergenceTol)
+    val (weights, _) = GradientDescent.runMiniBatchSGD(
+      data,
+      gradient,
+      updater,
+      stepSize,
+      numIterations,
+      regParam,
+      miniBatchFraction,
+      initialWeights,
+      convergenceTol)
     weights
   }
 }
@@ -255,9 +256,10 @@ object GradientDescent extends Logging {
         previousWeights = currentWeights
         currentWeights = Some(weights)
         if (previousWeights != None && currentWeights != None) {
-          converged = isConverged(previousWeights.get,
-                                  currentWeights.get,
-                                  convergenceTol)
+          converged = isConverged(
+            previousWeights.get,
+            currentWeights.get,
+            convergenceTol)
         }
       } else {
         logWarning(
@@ -284,15 +286,16 @@ object GradientDescent extends Logging {
                       regParam: Double,
                       miniBatchFraction: Double,
                       initialWeights: Vector): (Vector, Array[Double]) =
-    GradientDescent.runMiniBatchSGD(data,
-                                    gradient,
-                                    updater,
-                                    stepSize,
-                                    numIterations,
-                                    regParam,
-                                    miniBatchFraction,
-                                    initialWeights,
-                                    0.001)
+    GradientDescent.runMiniBatchSGD(
+      data,
+      gradient,
+      updater,
+      stepSize,
+      numIterations,
+      regParam,
+      miniBatchFraction,
+      initialWeights,
+      0.001)
 
   private def isConverged(previousWeights: Vector,
                           currentWeights: Vector,

@@ -76,8 +76,9 @@ object Metadata {
       override def decompose(metadata: Metadata): JValue = {
         JObject(
           List(
-            JField(MetadataType.toName(metadata.metadataType),
-                   metadata.fold(_.jv, _.jv, _.jv, _.jv, _.jv))))
+            JField(
+              MetadataType.toName(metadata.metadataType),
+              metadata.fold(_.jv, _.jv, _.jv, _.jv, _.jv))))
       }
     }
 
@@ -172,9 +173,10 @@ case class LongValueStats(count: Long, min: Long, max: Long)
   def merge(that: Metadata) = that match {
     case LongValueStats(count, min, max) =>
       Some(
-        LongValueStats(this.count + count,
-                       this.min.min(min),
-                       this.max.max(max)))
+        LongValueStats(
+          this.count + count,
+          this.min.min(min),
+          this.max.max(max)))
     case _ => None
   }
 }
@@ -202,9 +204,10 @@ case class DoubleValueStats(count: Long, min: Double, max: Double)
   def merge(that: Metadata) = that match {
     case DoubleValueStats(count, min, max) =>
       Some(
-        DoubleValueStats(this.count + count,
-                         this.min min min,
-                         this.max max max))
+        DoubleValueStats(
+          this.count + count,
+          this.min min min,
+          this.max max max))
     case _ => None
   }
 }
@@ -232,9 +235,10 @@ case class BigDecimalValueStats(count: Long, min: BigDecimal, max: BigDecimal)
   def merge(that: Metadata) = that match {
     case BigDecimalValueStats(count, min, max) =>
       Some(
-        BigDecimalValueStats(this.count + count,
-                             this.min min min,
-                             this.max max max))
+        BigDecimalValueStats(
+          this.count + count,
+          this.min min min,
+          this.max max max))
     case _ => None
   }
 }
@@ -262,9 +266,10 @@ case class StringValueStats(count: Long, min: String, max: String)
   def merge(that: Metadata) = that match {
     case StringValueStats(count, min, max) =>
       Some(
-        StringValueStats(this.count + count,
-                         Order[String].min(this.min, min),
-                         Order[String].max(this.max, max)))
+        StringValueStats(
+          this.count + count,
+          Order[String].min(this.min, min),
+          Order[String].max(this.max, max)))
     case _ => None
   }
 }

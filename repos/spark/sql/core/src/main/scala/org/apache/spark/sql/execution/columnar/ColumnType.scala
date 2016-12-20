@@ -435,10 +435,11 @@ private[columnar] trait DirectCopyColumnType[JvmType]
       row
         .asInstanceOf[MutableUnsafeRow]
         .writer
-        .write(ordinal,
-               buffer.array(),
-               buffer.arrayOffset() + cursor,
-               numBytes)
+        .write(
+          ordinal,
+          buffer.array(),
+          buffer.arrayOffset() + cursor,
+          numBytes)
     } else {
       setField(row, ordinal, extract(buffer))
     }
@@ -709,9 +710,10 @@ private[columnar] case class ARRAY(dataType: ArrayType)
     val cursor = buffer.position()
     buffer.position(cursor + numBytes)
     val array = new UnsafeArrayData
-    array.pointTo(buffer.array(),
-                  Platform.BYTE_ARRAY_OFFSET + buffer.arrayOffset() + cursor,
-                  numBytes)
+    array.pointTo(
+      buffer.array(),
+      Platform.BYTE_ARRAY_OFFSET + buffer.arrayOffset() + cursor,
+      numBytes)
     array
   }
 
@@ -749,9 +751,10 @@ private[columnar] case class MAP(dataType: MapType)
     val cursor = buffer.position()
     buffer.position(cursor + numBytes)
     val map = new UnsafeMapData
-    map.pointTo(buffer.array(),
-                Platform.BYTE_ARRAY_OFFSET + buffer.arrayOffset() + cursor,
-                numBytes)
+    map.pointTo(
+      buffer.array(),
+      Platform.BYTE_ARRAY_OFFSET + buffer.arrayOffset() + cursor,
+      numBytes)
     map
   }
 

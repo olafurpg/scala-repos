@@ -15,9 +15,10 @@ import org.jetbrains.plugins.scala.project._
   * Pavel Fatin
   */
 class ConvertFormattedStringToInterpolatedString
-    extends AbstractFormatConversionIntention("Convert to interpolated string",
-                                              FormattedStringParser,
-                                              InterpolatedStringFormatter) {
+    extends AbstractFormatConversionIntention(
+      "Convert to interpolated string",
+      FormattedStringParser,
+      InterpolatedStringFormatter) {
 
   override def isAvailable(project: Project,
                            editor: Editor,

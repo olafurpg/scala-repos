@@ -56,10 +56,11 @@ private[spark] class ExecutorDelegationTokenUpdater(sparkConf: SparkConf,
       val credentialsFilePath = new Path(credentialsFile)
       val remoteFs = FileSystem.get(freshHadoopConf)
       SparkHadoopUtil.get
-        .listFilesSorted(remoteFs,
-                         credentialsFilePath.getParent,
-                         credentialsFilePath.getName,
-                         SparkHadoopUtil.SPARK_YARN_CREDS_TEMP_EXTENSION)
+        .listFilesSorted(
+          remoteFs,
+          credentialsFilePath.getParent,
+          credentialsFilePath.getName,
+          SparkHadoopUtil.SPARK_YARN_CREDS_TEMP_EXTENSION)
         .lastOption
         .foreach { credentialsStatus =>
           val suffix = SparkHadoopUtil.get.getSuffixForCredentialsPath(
@@ -96,9 +97,10 @@ private[spark] class ExecutorDelegationTokenUpdater(sparkConf: SparkConf,
       } else {
         logInfo(
           s"Scheduling token refresh from HDFS in $timeFromNowToRenewal millis.")
-        delegationTokenRenewer.schedule(executorUpdaterRunnable,
-                                        timeFromNowToRenewal,
-                                        TimeUnit.MILLISECONDS)
+        delegationTokenRenewer.schedule(
+          executorUpdaterRunnable,
+          timeFromNowToRenewal,
+          TimeUnit.MILLISECONDS)
       }
     } catch {
       // Since the file may get deleted while we are reading it, catch the Exception and come

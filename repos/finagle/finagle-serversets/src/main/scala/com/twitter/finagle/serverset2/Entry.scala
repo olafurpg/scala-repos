@@ -40,8 +40,9 @@ case class Endpoint(
   override def equals(that: Any) =
     that match {
       case that: Endpoint =>
-        java.util.Arrays.equals(this.names.asInstanceOf[Array[Object]],
-                                that.names.asInstanceOf[Array[Object]]) &&
+        java.util.Arrays.equals(
+          this.names.asInstanceOf[Array[Object]],
+          that.names.asInstanceOf[Array[Object]]) &&
           this.host == that.host && this.port == that.port &&
           this.shard == that.shard && this.status == that.status &&
           this.memberId == that.memberId
@@ -65,23 +66,25 @@ object Entry {
 }
 
 object Endpoint {
-  val Empty = Endpoint(null,
-                       null,
-                       Int.MinValue,
-                       Int.MinValue,
-                       Endpoint.Status.Unknown,
-                       "")
+  val Empty = Endpoint(
+    null,
+    null,
+    Int.MinValue,
+    Int.MinValue,
+    Endpoint.Status.Unknown,
+    "")
 
   object Status extends Enumeration {
     val Dead, Starting, Alive, Stopping, Stopped, Warning, Unknown = Value
 
-    private val map = Map("DEAD" -> Dead,
-                          "STARTING" -> Starting,
-                          "ALIVE" -> Alive,
-                          "STOPPING" -> Stopping,
-                          "STOPPED" -> Stopped,
-                          "WARNING" -> Warning,
-                          "UNKNOWN" -> Unknown)
+    private val map = Map(
+      "DEAD" -> Dead,
+      "STARTING" -> Starting,
+      "ALIVE" -> Alive,
+      "STOPPING" -> Stopping,
+      "STOPPED" -> Stopped,
+      "WARNING" -> Warning,
+      "UNKNOWN" -> Unknown)
 
     def ofString(s: String): Option[Value] = map.get(s)
   }

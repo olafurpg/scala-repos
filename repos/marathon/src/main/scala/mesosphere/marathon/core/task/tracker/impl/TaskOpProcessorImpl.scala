@@ -160,8 +160,9 @@ private[tracker] class TaskOpProcessorImpl(
         .map {
           case Some(task) =>
             val taskState = TaskSerializer.fromProto(task)
-            taskTrackerRef ! TaskTrackerActor.TaskUpdated(taskState,
-                                                          ack(Some(task)))
+            taskTrackerRef ! TaskTrackerActor.TaskUpdated(
+              taskState,
+              ack(Some(task)))
           case None =>
             taskTrackerRef ! TaskTrackerActor.TaskRemoved(op.taskId, ack(None))
         }

@@ -51,9 +51,10 @@ class CacheNodeGroupTest extends FunSuite with BeforeAndAfterEach {
     // create serverset
     serverSet = new CompoundServerSet(
       List(
-        ServerSets.create(zookeeperClient,
-                          ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
-                          zkPath)))
+        ServerSets.create(
+          zookeeperClient,
+          ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
+          zkPath)))
 
     // start five memcached server and join the cluster
     addShards(List(0, 1, 2, 3, 4))
@@ -154,8 +155,9 @@ class CacheNodeGroupTest extends FunSuite with BeforeAndAfterEach {
       testServers(3)._2.leave()
       addShards(List(2, 3))
       assert(waitForMemberSize(myPool, 5, 5))
-      assert(myPool.members != currentMembers,
-             myPool.members + " should NOT equal to " + currentMembers)
+      assert(
+        myPool.members != currentMembers,
+        myPool.members + " should NOT equal to " + currentMembers)
       currentMembers = myPool.members
 
       // turn off detecting key remapping
@@ -163,13 +165,15 @@ class CacheNodeGroupTest extends FunSuite with BeforeAndAfterEach {
         .serialize(CachePoolConfig(5, detectKeyRemapping = false), output)
       zookeeperClient.get().setData(zkPath, output.toByteArray, -1)
       assert(waitForMemberSize(myPool, 5, 5))
-      assert(myPool.members == currentMembers,
-             myPool.members + " should NOT equal to " + currentMembers)
+      assert(
+        myPool.members == currentMembers,
+        myPool.members + " should NOT equal to " + currentMembers)
       testServers(4)._2.leave()
       addShards(List(4))
       assert(waitForMemberSize(myPool, 5, 5))
-      assert(myPool.members == currentMembers,
-             myPool.members + " should equal to " + currentMembers)
+      assert(
+        myPool.members == currentMembers,
+        myPool.members + " should equal to " + currentMembers)
 
       /***** remap shard key while adding keys should not take effect ******/
       CachePoolConfig.jsonCodec
@@ -180,8 +184,9 @@ class CacheNodeGroupTest extends FunSuite with BeforeAndAfterEach {
       testServers(1)._2.leave()
       addShards(List(5, 0, 1))
       assert(waitForMemberSize(myPool, 5, 5))
-      assert(myPool.members == currentMembers,
-             myPool.members + " should equal to " + currentMembers)
+      assert(
+        myPool.members == currentMembers,
+        myPool.members + " should equal to " + currentMembers)
     }
 
   if (!Option(System.getProperty("SKIP_FLAKY")).isDefined)
@@ -252,9 +257,10 @@ class CacheNodeGroupTest extends FunSuite with BeforeAndAfterEach {
         case Some(server) =>
           testServers :+=
             ((server,
-              serverSet.join(server.address,
-                             Map[String, InetSocketAddress](),
-                             shardId)))
+              serverSet.join(
+                server.address,
+                Map[String, InetSocketAddress](),
+                shardId)))
         case None => fail("Cannot start memcached. Skipping...")
       }
     }

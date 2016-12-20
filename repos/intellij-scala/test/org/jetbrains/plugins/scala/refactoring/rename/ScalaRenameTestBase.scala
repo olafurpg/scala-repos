@@ -57,11 +57,12 @@ abstract class ScalaRenameTestBase
           .forElement(element)
           .substituteElementToRename(element, getEditorAdapter)
         if (subst == null) return
-        new RenameProcessor(getProjectAdapter,
-                            subst,
-                            "NameAfterRename",
-                            searchInComments,
-                            false).run()
+        new RenameProcessor(
+          getProjectAdapter,
+          subst,
+          "NameAfterRename",
+          searchInComments,
+          false).run()
       }
     }, getProjectAdapter, "Test")
     res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim

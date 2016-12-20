@@ -66,9 +66,10 @@ object SpecialPolynomials {
   // Laguerre polynomials
   def laguerres[C: Eq: ClassTag](num: Int)(
       implicit f: Field[C]): Stream[Polynomial[C]] =
-    hornerScheme(Polynomial.one[C],
-                 Polynomial(Map((0, f.one), (1, -f.one))),
-                 laguerreFn[C]).take(num)
+    hornerScheme(
+      Polynomial.one[C],
+      Polynomial(Map((0, f.one), (1, -f.one))),
+      laguerreFn[C]).take(num)
 
   // Chebyshev polynomials of the first kind
   def chebyshevsFirstKind[C: Ring: Eq: ClassTag](

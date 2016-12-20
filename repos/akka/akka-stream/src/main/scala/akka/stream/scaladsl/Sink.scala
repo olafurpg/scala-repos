@@ -112,9 +112,10 @@ object Sink {
     */
   def fromSubscriber[T](subscriber: Subscriber[T]): Sink[T, NotUsed] =
     new Sink(
-      new SubscriberSink(subscriber,
-                         DefaultAttributes.subscriberSink,
-                         shape("SubscriberSink")))
+      new SubscriberSink(
+        subscriber,
+        DefaultAttributes.subscriberSink,
+        shape("SubscriberSink")))
 
   /**
     * A `Sink` that immediately cancels its upstream after materialization.
@@ -208,11 +209,13 @@ object Sink {
   def asPublisher[T](fanout: Boolean): Sink[T, Publisher[T]] =
     new Sink(
       if (fanout)
-        new FanoutPublisherSink[T](DefaultAttributes.fanoutPublisherSink,
-                                   shape("FanoutPublisherSink"))
+        new FanoutPublisherSink[T](
+          DefaultAttributes.fanoutPublisherSink,
+          shape("FanoutPublisherSink"))
       else
-        new PublisherSink[T](DefaultAttributes.publisherSink,
-                             shape("PublisherSink")))
+        new PublisherSink[T](
+          DefaultAttributes.publisherSink,
+          shape("PublisherSink")))
 
   /**
     * A `Sink` that will consume the stream and discard the elements.
@@ -341,10 +344,11 @@ object Sink {
     */
   def actorRef[T](ref: ActorRef, onCompleteMessage: Any): Sink[T, NotUsed] =
     new Sink(
-      new ActorRefSink(ref,
-                       onCompleteMessage,
-                       DefaultAttributes.actorRefSink,
-                       shape("ActorRefSink")))
+      new ActorRefSink(
+        ref,
+        onCompleteMessage,
+        DefaultAttributes.actorRefSink,
+        shape("ActorRefSink")))
 
   /**
     * Sends the elements of the stream to the given `ActorRef` that sends back back-pressure signal.
@@ -366,11 +370,12 @@ object Sink {
       onCompleteMessage: Any,
       onFailureMessage: (Throwable) ⇒ Any = Status.Failure): Sink[T, NotUsed] =
     Sink.fromGraph(
-      new ActorRefBackpressureSinkStage(ref,
-                                        onInitMessage,
-                                        ackMessage,
-                                        onCompleteMessage,
-                                        onFailureMessage))
+      new ActorRefBackpressureSinkStage(
+        ref,
+        onInitMessage,
+        ackMessage,
+        onCompleteMessage,
+        onFailureMessage))
 
   /**
     * Creates a `Sink` that is materialized to an [[akka.actor.ActorRef]] which points to an Actor
@@ -378,12 +383,14 @@ object Sink {
     * be [[akka.stream.actor.ActorSubscriber]].
     */
   def actorSubscriber[T](props: Props): Sink[T, ActorRef] = {
-    require(classOf[ActorSubscriber].isAssignableFrom(props.actorClass()),
-            "Actor must be ActorSubscriber")
+    require(
+      classOf[ActorSubscriber].isAssignableFrom(props.actorClass()),
+      "Actor must be ActorSubscriber")
     new Sink(
-      new ActorSubscriberSink(props,
-                              DefaultAttributes.actorSubscriberSink,
-                              shape("ActorSubscriberSink")))
+      new ActorSubscriberSink(
+        props,
+        DefaultAttributes.actorSubscriberSink,
+        shape("ActorSubscriberSink")))
   }
 
   /**

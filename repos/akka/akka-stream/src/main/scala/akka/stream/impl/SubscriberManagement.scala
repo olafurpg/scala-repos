@@ -115,8 +115,9 @@ private[akka] trait SubscriberManagement[T]
       import ReactiveStreamsCompliance._
       // check for illegal demand See 3.9
       if (elements < 1) {
-        try tryOnError(subscription.subscriber,
-                       numberOfElementsInRequestMustBePositiveException)
+        try tryOnError(
+          subscription.subscriber,
+          numberOfElementsInRequestMustBePositiveException)
         finally unregisterSubscriptionInternal(subscription)
       } else {
         endOfStream match {
@@ -145,8 +146,9 @@ private[akka] trait SubscriberManagement[T]
                     false
                 }
                 if (goOn)
-                  dispatchFromBufferAndReturnRemainingRequested(requested - 1,
-                                                                eos)
+                  dispatchFromBufferAndReturnRemainingRequested(
+                    requested - 1,
+                    eos)
                 else Long.MinValue
               } else if (eos ne NotReached) Long.MinValue
               else requested
@@ -174,9 +176,10 @@ private[akka] trait SubscriberManagement[T]
         case _ ⇒ result
       }
     val desired = Math
-      .min(Int.MaxValue,
-           Math.min(maxRequested(subscriptions), buffer.maxAvailable) -
-             pendingFromUpstream)
+      .min(
+        Int.MaxValue,
+        Math.min(maxRequested(subscriptions), buffer.maxAvailable) -
+          pendingFromUpstream)
       .toInt
     if (desired > 0) {
       pendingFromUpstream += desired

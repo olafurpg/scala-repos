@@ -76,8 +76,9 @@ final class ClusterSingletonProxySettings(
     val bufferSize: Int)
     extends NoSerializationVerificationNeeded {
 
-  require(bufferSize >= 0 && bufferSize <= 10000,
-          "bufferSize must be >= 0 and <= 10000")
+  require(
+    bufferSize >= 0 && bufferSize <= 10000,
+    "bufferSize must be >= 0 and <= 10000")
 
   def withSingletonName(name: String): ClusterSingletonProxySettings =
     copy(singletonName = name)
@@ -102,10 +103,11 @@ final class ClusterSingletonProxySettings(
       singletonIdentificationInterval: FiniteDuration =
         singletonIdentificationInterval,
       bufferSize: Int = bufferSize): ClusterSingletonProxySettings =
-    new ClusterSingletonProxySettings(singletonName,
-                                      role,
-                                      singletonIdentificationInterval,
-                                      bufferSize)
+    new ClusterSingletonProxySettings(
+      singletonName,
+      role,
+      singletonIdentificationInterval,
+      bufferSize)
 }
 
 object ClusterSingletonProxy {
@@ -303,8 +305,9 @@ final class ClusterSingletonProxy(singletonManagerPath: String,
         m.getClass.getName)
       buffer.addLast((msg, sender()))
     } else {
-      log.debug("Singleton not available, buffering message type [{}]",
-                msg.getClass.getName)
+      log.debug(
+        "Singleton not available, buffering message type [{}]",
+        msg.getClass.getName)
       buffer.addLast((msg, sender()))
     }
 

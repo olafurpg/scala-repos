@@ -77,19 +77,21 @@ private[hive] object IsolatedClientLoader extends Logging {
               sharesHadoopClasses = false
               (downloadVersion(resolvedVersion, "2.4.0", ivyPath), "2.4.0")
           }
-          resolvedVersions.put((resolvedVersion, actualHadoopVersion),
-                               downloadedFiles)
+          resolvedVersions.put(
+            (resolvedVersion, actualHadoopVersion),
+            downloadedFiles)
           resolvedVersions((resolvedVersion, actualHadoopVersion))
         }
 
-      new IsolatedClientLoader(hiveVersion(hiveMetastoreVersion),
-                               sparkConf,
-                               execJars = files,
-                               hadoopConf = hadoopConf,
-                               config = config,
-                               sharesHadoopClasses = sharesHadoopClasses,
-                               sharedPrefixes = sharedPrefixes,
-                               barrierPrefixes = barrierPrefixes)
+      new IsolatedClientLoader(
+        hiveVersion(hiveMetastoreVersion),
+        sparkConf,
+        execJars = files,
+        hadoopConf = hadoopConf,
+        config = config,
+        sharesHadoopClasses = sharesHadoopClasses,
+        sharedPrefixes = sharedPrefixes,
+        barrierPrefixes = barrierPrefixes)
     }
 
   def hiveVersion(version: String): HiveVersion = version match {
@@ -105,12 +107,12 @@ private[hive] object IsolatedClientLoader extends Logging {
                               hadoopVersion: String,
                               ivyPath: Option[String]): Seq[URL] = {
     val hiveArtifacts =
-      version.extraDeps ++ Seq("hive-metastore",
-                               "hive-exec",
-                               "hive-common",
-                               "hive-serde",
-                               "hive-cli").map(a =>
-        s"org.apache.hive:$a:${version.fullVersion}") ++ Seq(
+      version.extraDeps ++ Seq(
+        "hive-metastore",
+        "hive-exec",
+        "hive-common",
+        "hive-serde",
+        "hive-cli").map(a => s"org.apache.hive:$a:${version.fullVersion}") ++ Seq(
         "com.google.guava:guava:14.0.1",
         s"org.apache.hadoop:hadoop-client:$hadoopVersion")
 
@@ -253,12 +255,13 @@ private[hive] class IsolatedClientLoader(
   /** The isolated client interface to Hive. */
   private[hive] def createClient(): HiveClient = {
     if (!isolationOn) {
-      return new HiveClientImpl(version,
-                                sparkConf,
-                                hadoopConf,
-                                config,
-                                baseClassLoader,
-                                this)
+      return new HiveClientImpl(
+        version,
+        sparkConf,
+        hadoopConf,
+        config,
+        baseClassLoader,
+        this)
     }
     // Pre-reflective instantiation setup.
     logDebug("Initializing the logger to avoid disaster...")

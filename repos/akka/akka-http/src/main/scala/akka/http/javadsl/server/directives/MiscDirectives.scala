@@ -27,11 +27,12 @@ abstract class MiscDirectives extends MethodDirectives {
                errorMsg: String,
                innerRoute: Route,
                moreInnerRoutes: Route*): Route =
-    validate(RequestVals.requestContext,
-             check,
-             errorMsg,
-             innerRoute,
-             moreInnerRoutes: _*)
+    validate(
+      RequestVals.requestContext,
+      check,
+      errorMsg,
+      innerRoute,
+      moreInnerRoutes: _*)
 
   /**
     * Returns a Route which checks the given condition before running its inner Route. If the condition fails the

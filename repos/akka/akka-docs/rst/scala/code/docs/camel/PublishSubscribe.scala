@@ -46,8 +46,9 @@ object PublishSubscribe {
   val jmsPublisher =
     system.actorOf(Props(classOf[Publisher], "jms-publisher", jmsUri))
   val jmsPublisherBridge = system.actorOf(
-    Props(classOf[PublisherBridge],
-          "jetty:http://0.0.0.0:8877/camel/pub/jms",
-          jmsPublisher))
+    Props(
+      classOf[PublisherBridge],
+      "jetty:http://0.0.0.0:8877/camel/pub/jms",
+      jmsPublisher))
   //#PubSub
 }

@@ -46,8 +46,9 @@ object HttpMethod {
              idempotent: Boolean,
              requestEntityAcceptance: RequestEntityAcceptance): HttpMethod = {
     require(name.nonEmpty, "value must be non-empty")
-    require(!safe || idempotent,
-            "An HTTP method cannot be safe without being idempotent")
+    require(
+      !safe || idempotent,
+      "An HTTP method cannot be safe without being idempotent")
     apply(name, safe, idempotent, requestEntityAcceptance)
   }
 
@@ -56,10 +57,11 @@ object HttpMethod {
     * safe = false, idempotent = false and requestEntityAcceptance = Expected.
     */
   def custom(name: String): HttpMethod =
-    custom(name,
-           safe = false,
-           idempotent = false,
-           requestEntityAcceptance = Expected)
+    custom(
+      name,
+      safe = false,
+      idempotent = false,
+      requestEntityAcceptance = Expected)
 }
 
 object HttpMethods extends ObjectRegistry[String, HttpMethod] {

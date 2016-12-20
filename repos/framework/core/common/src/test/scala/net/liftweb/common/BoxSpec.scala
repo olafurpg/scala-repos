@@ -311,9 +311,10 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
         Full(new LiftException("broken"))
     }
     "return a chained list of causes" in {
-      Failure("error",
-              Full(new Exception("broken")),
-              Full(Failure("nested cause", Empty, Empty))).chain must_==
+      Failure(
+        "error",
+        Full(new Exception("broken")),
+        Full(Failure("nested cause", Empty, Empty))).chain must_==
         Full(Failure("nested cause", Empty, Empty))
     }
     "be converted to a ParamFailure" in {
@@ -353,12 +354,13 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
   "A ParamFailure is a failure which" should {
     "appear in the chain when ~> is invoked on it" in {
       Failure("Apple") ~> 404 ~> "apple" must_==
-        ParamFailure("Apple",
-                     Empty,
-                     Full(
-                       ParamFailure("Apple", Empty, Empty, 404)
-                     ),
-                     "apple")
+        ParamFailure(
+          "Apple",
+          Empty,
+          Full(
+            ParamFailure("Apple", Empty, Empty, 404)
+          ),
+          "apple")
     }
   }
 
@@ -417,21 +419,24 @@ class BoxSpec extends Specification with ScalaCheck with BoxGenerator {
     }
 
     "chain the ParamFailure to the failures in the list when any are Failure" in {
-      val someBoxes: List[Box[String]] = List(Full("bacon"),
-                                              Failure("I HATE BACON"),
-                                              Full("sammich"),
-                                              Failure("MORE BACON FAIL"),
-                                              Failure("BACON WHY U BACON"))
+      val someBoxes: List[Box[String]] = List(
+        Full("bacon"),
+        Failure("I HATE BACON"),
+        Full("sammich"),
+        Failure("MORE BACON FAIL"),
+        Failure("BACON WHY U BACON"))
 
       val singleBox = someBoxes.toSingleBox("Failure.")
 
       val expectedChain =
-        Failure("I HATE BACON",
-                Empty,
-                Full(
-                  Failure("MORE BACON FAIL",
-                          Empty,
-                          Full(Failure("BACON WHY U BACON")))))
+        Failure(
+          "I HATE BACON",
+          Empty,
+          Full(
+            Failure(
+              "MORE BACON FAIL",
+              Empty,
+              Full(Failure("BACON WHY U BACON")))))
 
       singleBox must beLike {
         case ParamFailure(_, _, chain, _) =>
@@ -463,7 +468,8 @@ trait BoxGenerator {
       msg <- listOfN(msgLen, alphaChar)
       exception <- const(Full(new Exception("")))
       chainLen <- choose(1, 5)
-      chain <- frequency((1, listOfN(chainLen, genFailureBox)),
-                         (3, const(Nil)))
+      chain <- frequency(
+        (1, listOfN(chainLen, genFailureBox)),
+        (3, const(Nil)))
     } yield Failure(msg.mkString, exception, Box(chain.headOption))
 }

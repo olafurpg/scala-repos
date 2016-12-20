@@ -97,12 +97,14 @@ object ClassPathImplComparator {
             case (a, _) => a && checkExistenceOfClasses(classesToFind)(cp)
           }
 
-        val cp = withMeasuredTime("Creating classpath",
-                                  createClassPaths(),
-                                  cpCreationStats)
-        val result = withMeasuredTime("Searching for specified classes",
-                                      testClassLookup(cp),
-                                      cpSearchingStats)
+        val cp = withMeasuredTime(
+          "Creating classpath",
+          createClassPaths(),
+          cpCreationStats)
+        val result = withMeasuredTime(
+          "Searching for specified classes",
+          testClassLookup(cp),
+          cpSearchingStats)
         println(
           s"The end of the test case. All expected classes found = $result \n")
       }
@@ -112,18 +114,20 @@ object ClassPathImplComparator {
           println(s"Iteration no $iteration")
 
         println("Recursive (old) classpath representation:")
-        doTest(PathResolverFactory.create(oldCpSettings).result,
-               oldCpCreationStats,
-               oldCpSearchingStats,
-               oldCpSettings.cpCreationRepetitions.value,
-               oldCpSettings.cpLookupRepetitions.value)
+        doTest(
+          PathResolverFactory.create(oldCpSettings).result,
+          oldCpCreationStats,
+          oldCpSearchingStats,
+          oldCpSettings.cpCreationRepetitions.value,
+          oldCpSettings.cpLookupRepetitions.value)
 
         println("Flat classpath representation:")
-        doTest(PathResolverFactory.create(flatCpSettings).result,
-               flatCpCreationStats,
-               flatCpSearchingStats,
-               flatCpSettings.cpCreationRepetitions.value,
-               flatCpSettings.cpLookupRepetitions.value)
+        doTest(
+          PathResolverFactory.create(flatCpSettings).result,
+          flatCpCreationStats,
+          flatCpSearchingStats,
+          flatCpSettings.cpCreationRepetitions.value,
+          flatCpSettings.cpLookupRepetitions.value)
       }
 
       if (oldCpSettings.requiredIterations.value > 1) {

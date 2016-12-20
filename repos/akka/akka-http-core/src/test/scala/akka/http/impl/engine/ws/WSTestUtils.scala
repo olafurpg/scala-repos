@@ -74,13 +74,15 @@ object WSTestUtils {
     FrameEventParser.mask(bytes, mask)
 
   def shortBE(value: Int): ByteString = {
-    require(value >= 0 && value < 65536,
-            s"Value wasn't in short range: $value")
+    require(
+      value >= 0 && value < 65536,
+      s"Value wasn't in short range: $value")
     ByteString(((value >> 8) & 0xff).toByte, ((value >> 0) & 0xff).toByte)
   }
   def intBE(value: Int): ByteString =
-    ByteString(((value >> 24) & 0xff).toByte,
-               ((value >> 16) & 0xff).toByte,
-               ((value >> 8) & 0xff).toByte,
-               ((value >> 0) & 0xff).toByte)
+    ByteString(
+      ((value >> 24) & 0xff).toByte,
+      ((value >> 16) & 0xff).toByte,
+      ((value >> 8) & 0xff).toByte,
+      ((value >> 0) & 0xff).toByte)
 }

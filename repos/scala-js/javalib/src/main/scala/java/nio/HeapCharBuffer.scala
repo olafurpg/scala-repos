@@ -33,12 +33,13 @@ private[nio] final class HeapCharBuffer private (_capacity: Int,
   def subSequence(start: Int, end: Int): CharBuffer = {
     if (start < 0 || end < start || end > remaining)
       throw new IndexOutOfBoundsException
-    new HeapCharBuffer(capacity,
-                       _array,
-                       _arrayOffset,
-                       position + start,
-                       position + end,
-                       isReadOnly)
+    new HeapCharBuffer(
+      capacity,
+      _array,
+      _arrayOffset,
+      position + start,
+      position + end,
+      isReadOnly)
   }
 
   @noinline
@@ -105,12 +106,13 @@ private[nio] object HeapCharBuffer {
               initialPosition: Int,
               initialLimit: Int,
               readOnly: Boolean): CharBuffer = {
-      new HeapCharBuffer(capacity,
-                         array,
-                         arrayOffset,
-                         initialPosition,
-                         initialLimit,
-                         readOnly)
+      new HeapCharBuffer(
+        capacity,
+        array,
+        arrayOffset,
+        initialPosition,
+        initialLimit,
+        readOnly)
     }
   }
 
@@ -120,11 +122,12 @@ private[nio] object HeapCharBuffer {
                         initialPosition: Int,
                         initialLength: Int,
                         isReadOnly: Boolean): CharBuffer = {
-    GenHeapBuffer.generic_wrap(array,
-                               arrayOffset,
-                               capacity,
-                               initialPosition,
-                               initialLength,
-                               isReadOnly)
+    GenHeapBuffer.generic_wrap(
+      array,
+      arrayOffset,
+      capacity,
+      initialPosition,
+      initialLength,
+      isReadOnly)
   }
 }

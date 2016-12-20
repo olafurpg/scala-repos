@@ -31,8 +31,9 @@ sealed abstract class Query[+E, U, C[_]] extends QueryBase[C[U]] { self =>
     val generator = new AnonSymbol
     val aliased = shaped.encodeRef(Ref(generator)).value
     val fv = f(aliased)
-    new WrappingQuery[F, T, C](new Bind(generator, toNode, fv.toNode),
-                               fv.shaped)
+    new WrappingQuery[F, T, C](
+      new Bind(generator, toNode, fv.toNode),
+      fv.shaped)
   }
 
   /** Build a new query by applying a function to all elements of this query. */
@@ -73,14 +74,15 @@ sealed abstract class Query[+E, U, C[_]] extends QueryBase[C[U]] { self =>
     val leftGen, rightGen = new AnonSymbol
     val aliased1 = shaped.encodeRef(Ref(leftGen))
     val aliased2 = q2.shaped.encodeRef(Ref(rightGen))
-    new BaseJoinQuery[E, E2, U, U2, C, E, E2](leftGen,
-                                              rightGen,
-                                              toNode,
-                                              q2.toNode,
-                                              JoinType.Inner,
-                                              aliased1.zip(aliased2),
-                                              aliased1.value,
-                                              aliased2.value)
+    new BaseJoinQuery[E, E2, U, U2, C, E, E2](
+      leftGen,
+      rightGen,
+      toNode,
+      q2.toNode,
+      JoinType.Inner,
+      aliased1.zip(aliased2),
+      aliased1.value,
+      aliased2.value)
   }
 
   /** Join two queries with a left outer join.
@@ -160,14 +162,15 @@ sealed abstract class Query[+E, U, C[_]] extends QueryBase[C[U]] { self =>
     val leftGen, rightGen = new AnonSymbol
     val aliased1 = shaped.encodeRef(Ref(leftGen))
     val aliased2 = q2.shaped.encodeRef(Ref(rightGen))
-    new BaseJoinQuery[E, E2, U, U2, C, E, E2](leftGen,
-                                              rightGen,
-                                              toNode,
-                                              q2.toNode,
-                                              jt,
-                                              aliased1.zip(aliased2),
-                                              aliased1.value,
-                                              aliased2.value)
+    new BaseJoinQuery[E, E2, U, U2, C, E, E2](
+      leftGen,
+      rightGen,
+      toNode,
+      q2.toNode,
+      jt,
+      aliased1.zip(aliased2),
+      aliased1.value,
+      aliased2.value)
   }
 
   /** Return a query formed from this query and another query by combining
@@ -185,8 +188,9 @@ sealed abstract class Query[+E, U, C[_]] extends QueryBase[C[U]] { self =>
   def zipWithIndex = {
     val leftGen, rightGen = new AnonSymbol
     val aliased1 = shaped.encodeRef(Ref(leftGen))
-    val aliased2 = ShapedValue(Rep.forNode[Long](Ref(rightGen)),
-                               Shape.repColumnShape[Long, FlatShapeLevel])
+    val aliased2 = ShapedValue(
+      Rep.forNode[Long](Ref(rightGen)),
+      Shape.repColumnShape[Long, FlatShapeLevel])
     new BaseJoinQuery[E, Rep[Long], U, Long, C, E, Rep[Long]](
       leftGen,
       rightGen,
@@ -301,8 +305,9 @@ sealed abstract class Query[+E, U, C[_]] extends QueryBase[C[U]] { self =>
     val generator = new AnonSymbol
     val aliased = shaped.encodeRef(Ref(generator)).value
     val fv = f(aliased)
-    new WrappingQuery[E, U, C](Distinct(generator, toNode, shape.toNode(fv)),
-                               shaped)
+    new WrappingQuery[E, U, C](
+      Distinct(generator, toNode, shape.toNode(fv)),
+      shaped)
   }
 
   /** Change the collection type to build when executing the query. */
@@ -434,10 +439,11 @@ object TableQueryMacroImpl {
     val cons = c.Expr[Tag => E](
       Function(
         List(
-          ValDef(Modifiers(Flag.PARAM),
-                 TermName("tag"),
-                 Ident(typeOf[Tag].typeSymbol),
-                 EmptyTree)),
+          ValDef(
+            Modifiers(Flag.PARAM),
+            TermName("tag"),
+            Ident(typeOf[Tag].typeSymbol),
+            EmptyTree)),
         Apply(
           Select(New(TypeTree(e.tpe)), termNames.CONSTRUCTOR),
           List(Ident(TermName("tag")))

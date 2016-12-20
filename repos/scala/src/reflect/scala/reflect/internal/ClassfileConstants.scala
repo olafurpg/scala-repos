@@ -378,9 +378,10 @@ object ClassfileConstants {
       translateFlags(jflags, 0, isClass = true)
     }
     def fieldFlags(jflags: Int): Long = {
-      translateFlags(jflags,
-                     if ((jflags & JAVA_ACC_FINAL) == 0) MUTABLE else 0,
-                     isClass = false)
+      translateFlags(
+        jflags,
+        if ((jflags & JAVA_ACC_FINAL) == 0) MUTABLE else 0,
+        isClass = false)
     }
     def methodFlags(jflags: Int): Long = {
       translateFlags(

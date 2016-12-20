@@ -49,8 +49,9 @@ class AddUnitTypeEnterHandler extends EnterHandlerDelegateAdapter {
           case (funDef: ScFunctionDefinition, prev: ScalaPsiElement) =>
             if (funDef.findFirstChildByType(ScalaTokenTypes.tASSIGN) == null)
               extensions.inWriteAction {
-                document.insertString(prev.getTextRange.getEndOffset,
-                                      ": Unit =")
+                document.insertString(
+                  prev.getTextRange.getEndOffset,
+                  ": Unit =")
                 PsiDocumentManager
                   .getInstance(project)
                   .commitDocument(document)

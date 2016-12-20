@@ -21,10 +21,11 @@ private[thrift] class ThriftServerEncoder(protocolFactory: TProtocolFactory)
         val transport = new ChannelBufferToTransport(buffer)
         val protocol = protocolFactory.getProtocol(transport)
         call.writeReply(call.seqid, protocol, response)
-        Channels.write(ctx,
-                       Channels.succeededFuture(e.getChannel()),
-                       buffer,
-                       e.getRemoteAddress)
+        Channels.write(
+          ctx,
+          Channels.succeededFuture(e.getChannel()),
+          buffer,
+          e.getRemoteAddress)
       case _ =>
         Channels.fireExceptionCaught(ctx, new IllegalArgumentException)
     }

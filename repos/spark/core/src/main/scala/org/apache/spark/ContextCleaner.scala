@@ -158,8 +158,9 @@ private[spark] class ContextCleaner(sc: SparkContext) extends Logging {
   /** Register a ShuffleDependency for cleanup when it is garbage collected. */
   def registerShuffleForCleanup(
       shuffleDependency: ShuffleDependency[_, _, _]): Unit = {
-    registerForCleanup(shuffleDependency,
-                       CleanShuffle(shuffleDependency.shuffleId))
+    registerForCleanup(
+      shuffleDependency,
+      CleanShuffle(shuffleDependency.shuffleId))
   }
 
   /** Register a Broadcast for cleanup when it is garbage collected. */
@@ -196,8 +197,9 @@ private[spark] class ContextCleaner(sc: SparkContext) extends Logging {
               case CleanRDD(rddId) =>
                 doCleanupRDD(rddId, blocking = blockOnCleanupTasks)
               case CleanShuffle(shuffleId) =>
-                doCleanupShuffle(shuffleId,
-                                 blocking = blockOnShuffleCleanupTasks)
+                doCleanupShuffle(
+                  shuffleId,
+                  blocking = blockOnShuffleCleanupTasks)
               case CleanBroadcast(broadcastId) =>
                 doCleanupBroadcast(broadcastId, blocking = blockOnCleanupTasks)
               case CleanAccum(accId) =>

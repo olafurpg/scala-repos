@@ -74,8 +74,9 @@ object TestServer {
     val serverProvider: ServerProvider = {
       testServerProvider
     } getOrElse {
-      ServerProvider.fromConfiguration(process.classLoader,
-                                       config.configuration)
+      ServerProvider.fromConfiguration(
+        process.classLoader,
+        config.configuration)
     }
     Play.start(application)
     val server = serverProvider.createServer(config, application)

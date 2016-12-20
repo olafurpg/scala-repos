@@ -137,10 +137,11 @@ trait Enum[F] extends Order[F] { self =>
     EphemeralStream.cons(a, fromStep(n, succn(n, a)))
 
   def fromTo(a: F, z: F): EphemeralStream[F] =
-    EphemeralStream.cons(a,
-                         if (equal(a, z)) EphemeralStream.emptyEphemeralStream
-                         else
-                           fromTo(if (lessThan(a, z)) succ(a) else pred(a), z))
+    EphemeralStream.cons(
+      a,
+      if (equal(a, z)) EphemeralStream.emptyEphemeralStream
+      else
+        fromTo(if (lessThan(a, z)) succ(a) else pred(a), z))
 
   def fromToL(a: F, z: F): List[F] = {
     def fromToLT(a: F, z: F): Trampoline[List[F]] =

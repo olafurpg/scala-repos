@@ -66,40 +66,43 @@ class ScalaClassNameCompletionContributor extends ScalaCompletionContributor {
       def addCompletions(parameters: CompletionParameters,
                          context: ProcessingContext,
                          result: CompletionResultSet) {
-        if (shouldRunClassNameCompletion(positionFromParameters(parameters),
-                                         parameters,
-                                         result.getPrefixMatcher)) {
-          completeClassName(positionFromParameters(parameters),
-                            parameters,
-                            context,
-                            result)
+        if (shouldRunClassNameCompletion(
+              positionFromParameters(parameters),
+              parameters,
+              result.getPrefixMatcher)) {
+          completeClassName(
+            positionFromParameters(parameters),
+            parameters,
+            context,
+            result)
         }
         result.stopHere()
       }
     })
 
-  extend(CompletionType.BASIC,
-         PlatformPatterns.psiElement(),
-         new CompletionProvider[CompletionParameters] {
-           def addCompletions(parameters: CompletionParameters,
-                              context: ProcessingContext,
-                              result: CompletionResultSet) {
-             parameters.getPosition.getNode.getElementType match {
-               case ScalaTokenTypes.tSTRING |
-                   ScalaTokenTypes.tMULTILINE_STRING =>
-                 if (shouldRunClassNameCompletion(
-                       positionFromParameters(parameters),
-                       parameters,
-                       result.getPrefixMatcher)) {
-                   completeClassName(positionFromParameters(parameters),
-                                     parameters,
-                                     context,
-                                     result)
-                 }
-               case _ =>
-             }
-           }
-         })
+  extend(
+    CompletionType.BASIC,
+    PlatformPatterns.psiElement(),
+    new CompletionProvider[CompletionParameters] {
+      def addCompletions(parameters: CompletionParameters,
+                         context: ProcessingContext,
+                         result: CompletionResultSet) {
+        parameters.getPosition.getNode.getElementType match {
+          case ScalaTokenTypes.tSTRING | ScalaTokenTypes.tMULTILINE_STRING =>
+            if (shouldRunClassNameCompletion(
+                  positionFromParameters(parameters),
+                  parameters,
+                  result.getPrefixMatcher)) {
+              completeClassName(
+                positionFromParameters(parameters),
+                parameters,
+                context,
+                result)
+            }
+          case _ =>
+        }
+      }
+    })
 }
 
 object ScalaClassNameCompletionContributor {
@@ -177,8 +180,8 @@ object ScalaClassNameCompletionContributor {
                 case TypeAliasToImport(alias) =>
                   val containingClass = alias.containingClass
                   if (containingClass == null) return false
-                  JavaCompletionUtil.isInExcludedPackage(containingClass,
-                                                         false)
+                  JavaCompletionUtil
+                    .isInExcludedPackage(containingClass, false)
                 case PrefixPackageToImport(pack) =>
                   JavaProjectCodeInsightSettings
                     .getSettings(pack.getProject)
@@ -223,9 +226,10 @@ object ScalaClassNameCompletionContributor {
           typeToImport match {
             case ClassTypeToImport(clazz) =>
               result.addElement(
-                getLookupElementFromClass(expectedTypesAfterNew,
-                                          clazz,
-                                          renamesMap))
+                getLookupElementFromClass(
+                  expectedTypesAfterNew,
+                  clazz,
+                  renamesMap))
             case _ =>
           }
         }

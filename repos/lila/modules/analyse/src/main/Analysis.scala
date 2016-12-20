@@ -71,12 +71,13 @@ object Analysis {
         date = r date "date")
     }
     def writes(w: BSON.Writer, o: Analysis) =
-      BSONDocument("_id" -> o.id,
-                   "data" -> Info.encodeList(o.infos),
-                   "ply" -> w.intO(o.startPly),
-                   "uid" -> o.uid,
-                   "by" -> o.by,
-                   "date" -> w.date(o.date))
+      BSONDocument(
+        "_id" -> o.id,
+        "data" -> Info.encodeList(o.infos),
+        "ply" -> w.intO(o.startPly),
+        "uid" -> o.uid,
+        "by" -> o.by,
+        "date" -> w.date(o.date))
   }
 
   private[analyse] lazy val tube = lila.db.BsTube(analysisBSONHandler)

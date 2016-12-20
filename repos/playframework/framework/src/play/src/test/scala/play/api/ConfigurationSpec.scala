@@ -36,40 +36,43 @@ object ConfigurationSpec extends Specification {
     "be accessible as an entry set" in {
       val map = Map(exampleConfig.entrySet.toList: _*)
       map.keySet must contain(
-        allOf("foo.bar1",
-              "foo.bar2",
-              "blah.0",
-              "blah.1",
-              "blah.2",
-              "blah.3",
-              "blah.4",
-              "blah2.blah3.blah4"))
+        allOf(
+          "foo.bar1",
+          "foo.bar2",
+          "blah.0",
+          "blah.1",
+          "blah.2",
+          "blah.3",
+          "blah.4",
+          "blah2.blah3.blah4"))
     }
 
     "make all paths accessible" in {
       exampleConfig.keys must contain(
-        allOf("foo.bar1",
-              "foo.bar2",
-              "blah.0",
-              "blah.1",
-              "blah.2",
-              "blah.3",
-              "blah.4",
-              "blah2.blah3.blah4"))
+        allOf(
+          "foo.bar1",
+          "foo.bar2",
+          "blah.0",
+          "blah.1",
+          "blah.2",
+          "blah.3",
+          "blah.4",
+          "blah2.blah3.blah4"))
     }
 
     "make all sub keys accessible" in {
       exampleConfig.subKeys must contain(allOf("foo", "blah", "blah2"))
       exampleConfig.subKeys must not(
         contain(
-          anyOf("foo.bar1",
-                "foo.bar2",
-                "blah.0",
-                "blah.1",
-                "blah.2",
-                "blah.3",
-                "blah.4",
-                "blah2.blah3.blah4")))
+          anyOf(
+            "foo.bar1",
+            "foo.bar2",
+            "blah.0",
+            "blah.1",
+            "blah.2",
+            "blah.3",
+            "blah.4",
+            "blah2.blah3.blah4")))
     }
 
     "make all get accessible using scala" in {

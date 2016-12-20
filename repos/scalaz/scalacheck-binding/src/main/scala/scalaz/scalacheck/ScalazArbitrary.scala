@@ -320,9 +320,10 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
         case 1 => arbitrary[A].map(single[V, A](_))
         case n => {
           val nextSize = n.abs / 2
-          ^^(FingerArbitrary[V, A].arbitrary,
-             fingerTree[Node[V, A]](nextSize)(NodeArbitrary[V, A], implicitly),
-             FingerArbitrary[V, A].arbitrary)(deep[V, A](_, _, _))
+          ^^(
+            FingerArbitrary[V, A].arbitrary,
+            fingerTree[Node[V, A]](nextSize)(NodeArbitrary[V, A], implicitly),
+            FingerArbitrary[V, A].arbitrary)(deep[V, A](_, _, _))
         }
       }
     Gen.sized(fingerTree[A] _)

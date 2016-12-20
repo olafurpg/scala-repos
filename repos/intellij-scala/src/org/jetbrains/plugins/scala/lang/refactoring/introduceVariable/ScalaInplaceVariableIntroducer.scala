@@ -61,12 +61,13 @@ class ScalaInplaceVariableIntroducer(project: Project,
                                      replaceAll: Boolean,
                                      asVar: Boolean,
                                      forceInferType: Option[Boolean])
-    extends InplaceVariableIntroducer[ScExpression](namedElement,
-                                                    editor,
-                                                    project,
-                                                    title,
-                                                    Array.empty[ScExpression],
-                                                    expr) {
+    extends InplaceVariableIntroducer[ScExpression](
+      namedElement,
+      editor,
+      project,
+      title,
+      Array.empty[ScExpression],
+      expr) {
 
   private var myVarCheckbox: JCheckBox = null
   private var mySpecifyTypeChb: JCheckBox = null
@@ -94,8 +95,9 @@ class ScalaInplaceVariableIntroducer(project: Project,
     new DocumentAdapter() {
       override def documentChanged(e: DocumentEvent): Unit = {
         commitDocument()
-        val range = new TextRange(myCaretRangeMarker.getStartOffset,
-                                  myCaretRangeMarker.getEndOffset)
+        val range = new TextRange(
+          myCaretRangeMarker.getStartOffset,
+          myCaretRangeMarker.getEndOffset)
         if (range.getLength == 0 &&
             UndoManager.getInstance(myProject).isUndoInProgress) {} else {
           val input = myCaretRangeMarker.getDocument.getText(range)
@@ -130,9 +132,10 @@ class ScalaInplaceVariableIntroducer(project: Project,
 
   private def findDeclaration(offset: Int): PsiElement = {
     val elem = myFile.findElementAt(offset)
-    ScalaPsiUtil.getParentOfType(elem,
-                                 classOf[ScEnumerator],
-                                 classOf[ScDeclaredElementsHolder])
+    ScalaPsiUtil.getParentOfType(
+      elem,
+      classOf[ScEnumerator],
+      classOf[ScDeclaredElementsHolder])
   }
 
   private def getDeclaration: PsiElement =
@@ -166,9 +169,10 @@ class ScalaInplaceVariableIntroducer(project: Project,
       myVarCheckbox.setMnemonic('v')
       myVarCheckbox.addActionListener(new ActionListener {
         def actionPerformed(e: ActionEvent): Unit = {
-          val writeAction = new WriteCommandAction[Unit](myProject,
-                                                         getCommandName,
-                                                         getCommandName) {
+          val writeAction = new WriteCommandAction[Unit](
+            myProject,
+            getCommandName,
+            getCommandName) {
 
             private def changeValOrVar(asVar: Boolean,
                                        declaration: PsiElement): Unit = {
@@ -210,8 +214,9 @@ class ScalaInplaceVariableIntroducer(project: Project,
             val highlighters: Array[RangeHighlighter] =
               myEditor.getMarkupModel.getAllHighlighters
             for (highlighter <- highlighters;
-                 if checkRange(highlighter.getStartOffset,
-                               highlighter.getEndOffset))
+                 if checkRange(
+                   highlighter.getStartOffset,
+                   highlighter.getEndOffset))
               greedyToRight +=
                 (highlighter -> highlighter.isGreedyToRight)
           }
@@ -219,8 +224,9 @@ class ScalaInplaceVariableIntroducer(project: Project,
             val highlighters: Array[RangeHighlighter] =
               myEditor.getMarkupModel.getAllHighlighters
             for (highlighter <- highlighters;
-                 if checkRange(highlighter.getStartOffset,
-                               highlighter.getEndOffset))
+                 if checkRange(
+                   highlighter.getStartOffset,
+                   highlighter.getEndOffset))
               highlighter.setGreedyToRight(greedyToRight(highlighter))
           }
           def checkRange(start: Int, end: Int): Boolean = {
@@ -232,9 +238,10 @@ class ScalaInplaceVariableIntroducer(project: Project,
             } else false
           }
 
-          val writeAction = new WriteCommandAction[Unit](myProject,
-                                                         getCommandName,
-                                                         getCommandName) {
+          val writeAction = new WriteCommandAction[Unit](
+            myProject,
+            getCommandName,
+            getCommandName) {
             private def addTypeAnnotation(selectedType: ScType): Unit = {
               val declaration = getDeclaration
               declaration match {

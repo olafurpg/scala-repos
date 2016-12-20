@@ -117,10 +117,11 @@ object getDummyBlocks {
             null,
             null,
             ScalaIndentProcessor.getChildIndent(block, children.head),
-            arrangeSuggestedWrapForChild(block,
-                                         children.head,
-                                         scalaSettings,
-                                         block.suggestedWrap),
+            arrangeSuggestedWrapForChild(
+              block,
+              children.head,
+              scalaSettings,
+              block.suggestedWrap),
             block.getSettings))
         //add subblock with try expr
         val tail = children.filter(isCorrectBlock).tail
@@ -134,10 +135,11 @@ object getDummyBlocks {
                 null,
                 null,
                 ScalaIndentProcessor.getChildIndent(block, tail.head),
-                arrangeSuggestedWrapForChild(block,
-                                             tail.head,
-                                             scalaSettings,
-                                             block.suggestedWrap),
+                arrangeSuggestedWrapForChild(
+                  block,
+                  tail.head,
+                  scalaSettings,
+                  block.suggestedWrap),
                 block.getSettings))
           } else {
             //there is block expr under try
@@ -148,10 +150,11 @@ object getDummyBlocks {
                 tail.last,
                 null,
                 ScalaIndentProcessor.getChildIndent(block, tail.head),
-                arrangeSuggestedWrapForChild(block,
-                                             tail.head,
-                                             scalaSettings,
-                                             block.suggestedWrap),
+                arrangeSuggestedWrapForChild(
+                  block,
+                  tail.head,
+                  scalaSettings,
+                  block.suggestedWrap),
                 block.getSettings))
           }
         }
@@ -166,11 +169,11 @@ object getDummyBlocks {
             afterOpenBrace.last.getElementType == ScalaTokenTypes.tRBRACE
         for (child <- if (hasValidTail) beforeOpenBrace else correctChildren) {
           subBlocks.add(
-            getSubBlock(block,
-                        scalaSettings,
-                        child,
-                        indent =
-                          ScalaIndentProcessor.getChildIndent(block, child)))
+            getSubBlock(
+              block,
+              scalaSettings,
+              child,
+              indent = ScalaIndentProcessor.getChildIndent(block, child)))
         }
         if (hasValidTail) {
           subBlocks.add(
@@ -203,17 +206,19 @@ object getDummyBlocks {
             case _ => None
           }).map(a => new SubBlocksContext(alignment = Some(a)))
           subBlocks.add(
-            new ScalaBlock(block,
-                           child,
-                           null,
-                           alignment,
-                           ScalaIndentProcessor.getChildIndent(block, child),
-                           arrangeSuggestedWrapForChild(block,
-                                                        child,
-                                                        scalaSettings,
-                                                        block.suggestedWrap),
-                           block.getSettings,
-                           context))
+            new ScalaBlock(
+              block,
+              child,
+              null,
+              alignment,
+              ScalaIndentProcessor.getChildIndent(block, child),
+              arrangeSuggestedWrapForChild(
+                block,
+                child,
+                scalaSettings,
+                block.suggestedWrap),
+              block.getSettings,
+              context))
         }
         return subBlocks
       case _ if node.getElementType == ScalaDocElementTypes.DOC_TAG =>
@@ -242,10 +247,11 @@ object getDummyBlocks {
             subBlocks.add(getSubBlock(block, scalaSettings, tagName))
             subBlocks.add(getSubBlock(block, scalaSettings, space))
             subBlocks.add(
-              getSubBlock(block,
-                          scalaSettings,
-                          tagParameter,
-                          if (tail.isEmpty) null else tail.last))
+              getSubBlock(
+                block,
+                scalaSettings,
+                tagParameter,
+                if (tail.isEmpty) null else tail.last))
           case tagName :: tail
               if Option(docTag.getNameElement)
                 .map(_.getNode)
@@ -265,10 +271,11 @@ object getDummyBlocks {
         return subBlocks
       case interpolated: ScInterpolatedStringLiteral =>
         //create and store alignment; required for support of multi-line interploated strings (SCL-8665)
-        alignmentsMap.put(SmartPointerManager
-                            .getInstance(interpolated.getProject)
-                            .createSmartPsiElementPointer(interpolated),
-                          Alignment.createAlignment())
+        alignmentsMap.put(
+          SmartPointerManager
+            .getInstance(interpolated.getProject)
+            .createSmartPsiElementPointer(interpolated),
+          Alignment.createAlignment())
       case _ =>
     }
     val alignment: Alignment =
@@ -352,10 +359,11 @@ object getDummyBlocks {
           case _ => alignment
         }
       }
-      val childWrap = arrangeSuggestedWrapForChild(block,
-                                                   child,
-                                                   scalaSettings,
-                                                   block.suggestedWrap)
+      val childWrap = arrangeSuggestedWrapForChild(
+        block,
+        child,
+        scalaSettings,
+        block.suggestedWrap)
       if (child.getFirstChildNode == null &&
           child.getElementType == ScalaTokenTypes.tINTERPOLATED_MULTILINE_STRING &&
           scalaSettings.MULTILINE_STRING_SUPORT != ScalaCodeStyleSettings.MULTILINE_STRING_NONE) {
@@ -363,13 +371,14 @@ object getDummyBlocks {
         subBlocks.addAll(getMultilineStringBlocks(child, block))
       } else {
         subBlocks.add(
-          new ScalaBlock(block,
-                         child,
-                         null,
-                         childAlignment,
-                         indent,
-                         childWrap,
-                         block.getSettings))
+          new ScalaBlock(
+            block,
+            child,
+            null,
+            childAlignment,
+            indent,
+            childWrap,
+            block.getSettings))
       }
       prevChild = child
     }
@@ -404,16 +413,18 @@ object getDummyBlocks {
       var scaladocNode = node.getElementType match {
         case ScalaDocTokenType.DOC_TAG_VALUE_TOKEN =>
           subBlocks.add(
-            new ScalaBlock(block,
-                           node,
-                           null,
-                           null,
-                           Indent.getNoneIndent,
-                           arrangeSuggestedWrapForChild(block,
-                                                        node,
-                                                        scalaSettings,
-                                                        block.suggestedWrap),
-                           block.getSettings))
+            new ScalaBlock(
+              block,
+              node,
+              null,
+              null,
+              Indent.getNoneIndent,
+              arrangeSuggestedWrapForChild(
+                block,
+                node,
+                scalaSettings,
+                block.suggestedWrap),
+              block.getSettings))
           node.getTreeNext
         case _ => node
       }
@@ -463,19 +474,21 @@ object getDummyBlocks {
               }, wrap)
             } else
               (null,
-               arrangeSuggestedWrapForChild(block,
-                                            child,
-                                            settings,
-                                            block.suggestedWrap))
+               arrangeSuggestedWrapForChild(
+                 block,
+                 child,
+                 settings,
+                 block.suggestedWrap))
 
           subBlocks.add(
-            new ScalaBlock(block,
-                           child,
-                           null,
-                           childAlignment,
-                           indent,
-                           childWrap,
-                           block.getSettings))
+            new ScalaBlock(
+              block,
+              child,
+              null,
+              childAlignment,
+              indent,
+              childWrap,
+              block.getSettings))
         }
       }
     } else {
@@ -487,21 +500,23 @@ object getDummyBlocks {
             !child.getPsi.isInstanceOf[ScTemplateParents]) {
           val (childAlignment, childWrap) =
             (block.getCustomAlignment(child).orNull,
-             arrangeSuggestedWrapForChild(block,
-                                          child,
-                                          settings,
-                                          block.suggestedWrap))
+             arrangeSuggestedWrapForChild(
+               block,
+               child,
+               settings,
+               block.suggestedWrap))
 
           subBlocks.add(
-            new ScalaBlock(block,
-                           child,
-                           block.getChildBlockLastNode(child),
-                           childAlignment,
-                           indent,
-                           childWrap,
-                           block.getSettings,
-                           block.subBlocksContext.flatMap(
-                             _.childrenAdditionalContexts.get(child))))
+            new ScalaBlock(
+              block,
+              child,
+              block.getChildBlockLastNode(child),
+              childAlignment,
+              indent,
+              childWrap,
+              block.getSettings,
+              block.subBlocksContext.flatMap(
+                _.childrenAdditionalContexts.get(child))))
         } else if (isCorrectBlock(child)) {
           subBlocks.addAll(getTemplateParentsBlocks(child, block))
         }
@@ -516,18 +531,20 @@ object getDummyBlocks {
         val indent = ScalaIndentProcessor.getChildIndent(block, additionalNode)
         val (childAlignment, childWrap) =
           (block.getCustomAlignment(additionalNode).orNull,
-           arrangeSuggestedWrapForChild(block,
-                                        additionalNode,
-                                        settings,
-                                        block.suggestedWrap))
+           arrangeSuggestedWrapForChild(
+             block,
+             additionalNode,
+             settings,
+             block.suggestedWrap))
         subBlocks.add(
-          new ScalaBlock(block,
-                         additionalNode,
-                         block.getChildBlockLastNode(additionalNode),
-                         childAlignment,
-                         indent,
-                         childWrap,
-                         block.getSettings))
+          new ScalaBlock(
+            block,
+            additionalNode,
+            block.getChildBlockLastNode(additionalNode),
+            childAlignment,
+            indent,
+            childWrap,
+            block.getSettings))
     })
 
     subBlocks
@@ -586,9 +603,8 @@ object getDummyBlocks {
         if (child.getElementType == ScalaTokenTypes.tFUNTYPE ||
             child.getElementType == ScalaTokenTypes.tFUNTYPE_ASCII) {
           if (prev == null) return createNewAlignment
-          val prevChild = prev.findChildByType(
-            TokenSet.create(ScalaTokenTypes.tFUNTYPE,
-                            ScalaTokenTypes.tFUNTYPE_ASCII))
+          val prevChild = prev.findChildByType(TokenSet
+            .create(ScalaTokenTypes.tFUNTYPE, ScalaTokenTypes.tFUNTYPE_ASCII))
           if (prevChild == null) {
             return getChildAlignment(prev, child)
           } else return getAlignment(prevChild)
@@ -596,19 +612,21 @@ object getDummyBlocks {
         null
       }
       val indent = ScalaIndentProcessor.getChildIndent(block, child)
-      val childWrap = arrangeSuggestedWrapForChild(block,
-                                                   child,
-                                                   scalaSettings,
-                                                   block.suggestedWrap)
+      val childWrap = arrangeSuggestedWrapForChild(
+        block,
+        child,
+        scalaSettings,
+        block.suggestedWrap)
       val childAlignment = getChildAlignment(node, child)
       subBlocks.add(
-        new ScalaBlock(block,
-                       child,
-                       null,
-                       childAlignment,
-                       indent,
-                       childWrap,
-                       block.getSettings))
+        new ScalaBlock(
+          block,
+          child,
+          null,
+          childAlignment,
+          indent,
+          childWrap,
+          block.getSettings))
       prevChild = child
     }
     subBlocks
@@ -716,19 +734,21 @@ object getDummyBlocks {
         null
       }
       val indent = ScalaIndentProcessor.getChildIndent(block, child)
-      val childWrap = arrangeSuggestedWrapForChild(block,
-                                                   child,
-                                                   scalaSettings,
-                                                   block.suggestedWrap)
+      val childWrap = arrangeSuggestedWrapForChild(
+        block,
+        child,
+        scalaSettings,
+        block.suggestedWrap)
       val childAlignment = getChildAlignment(node, child)
       subBlocks.add(
-        new ScalaBlock(block,
-                       child,
-                       null,
-                       childAlignment,
-                       indent,
-                       childWrap,
-                       block.getSettings))
+        new ScalaBlock(
+          block,
+          child,
+          null,
+          childAlignment,
+          indent,
+          childWrap,
+          block.getSettings))
       prevChild = child
     }
     subBlocks
@@ -748,20 +768,22 @@ object getDummyBlocks {
     for (child <- children) {
       if (isCorrectBlock(child)) {
         val indent = ScalaIndentProcessor.getChildIndent(block, child)
-        val childWrap = arrangeSuggestedWrapForChild(block,
-                                                     child,
-                                                     scalaSettings,
-                                                     block.suggestedWrap)
+        val childWrap = arrangeSuggestedWrapForChild(
+          block,
+          child,
+          scalaSettings,
+          block.suggestedWrap)
         subBlocks.add(
-          new ScalaBlock(block,
-                         child,
-                         block.getChildBlockLastNode(child),
-                         alignment,
-                         indent,
-                         childWrap,
-                         settings,
-                         block.subBlocksContext.flatMap(
-                           _.childrenAdditionalContexts.get(child))))
+          new ScalaBlock(
+            block,
+            child,
+            block.getChildBlockLastNode(child),
+            alignment,
+            indent,
+            childWrap,
+            settings,
+            block.subBlocksContext.flatMap(
+              _.childrenAdditionalContexts.get(child))))
       }
     }
     subBlocks
@@ -782,35 +804,39 @@ object getDummyBlocks {
     }
     if (last != null) {
       val indent = ScalaIndentProcessor.getChildIndent(block, first.getNode)
-      val childWrap = arrangeSuggestedWrapForChild(block,
-                                                   first.getNode,
-                                                   settings,
-                                                   block.suggestedWrap)
+      val childWrap = arrangeSuggestedWrapForChild(
+        block,
+        first.getNode,
+        settings,
+        block.suggestedWrap)
       subBlocks.add(
-        new ScalaBlock(block,
-                       first.getNode,
-                       last.getNode,
-                       null,
-                       indent,
-                       childWrap,
-                       block.getSettings))
+        new ScalaBlock(
+          block,
+          first.getNode,
+          last.getNode,
+          null,
+          indent,
+          childWrap,
+          block.getSettings))
     }
 
     tempBody match {
       case Some(x) =>
         val indent = ScalaIndentProcessor.getChildIndent(block, x.getNode)
-        val childWrap = arrangeSuggestedWrapForChild(block,
-                                                     x.getNode,
-                                                     settings,
-                                                     block.suggestedWrap)
+        val childWrap = arrangeSuggestedWrapForChild(
+          block,
+          x.getNode,
+          settings,
+          block.suggestedWrap)
         subBlocks.add(
-          new ScalaBlock(block,
-                         x.getNode,
-                         null,
-                         null,
-                         indent,
-                         childWrap,
-                         block.getSettings))
+          new ScalaBlock(
+            block,
+            x.getNode,
+            null,
+            null,
+            indent,
+            childWrap,
+            block.getSettings))
       case _ =>
     }
     subBlocks
@@ -826,16 +852,18 @@ object getDummyBlocks {
       block.getSettings.getCustomSettings(classOf[ScalaCodeStyleSettings])
     def addSubBlock(node: ASTNode, lastNode: ASTNode): Unit = {
       subBlocks.add(
-        new ScalaBlock(block,
-                       node,
-                       lastNode,
-                       null,
-                       ScalaIndentProcessor.getChildIndent(block, node),
-                       arrangeSuggestedWrapForChild(block,
-                                                    node,
-                                                    scalaSettings,
-                                                    block.suggestedWrap),
-                       block.getSettings))
+        new ScalaBlock(
+          block,
+          node,
+          lastNode,
+          null,
+          ScalaIndentProcessor.getChildIndent(block, node),
+          arrangeSuggestedWrapForChild(
+            block,
+            node,
+            scalaSettings,
+            block.suggestedWrap),
+          block.getSettings))
     }
     def addTail(tail: List[ASTNode]): Unit = {
       for (child <- tail) {
@@ -895,17 +923,19 @@ object getDummyBlocks {
       child = child.getTreeNext
     }
     val indent = ScalaIndentProcessor.getChildIndent(block, firstChildNode)
-    val childWrap = arrangeSuggestedWrapForChild(block,
-                                                 firstChildNode,
-                                                 scalaSettings,
-                                                 block.suggestedWrap)
-    val firstBlock = new ScalaBlock(block,
-                                    firstChildNode,
-                                    child,
-                                    alignment,
-                                    indent,
-                                    childWrap,
-                                    block.getSettings)
+    val childWrap = arrangeSuggestedWrapForChild(
+      block,
+      firstChildNode,
+      scalaSettings,
+      block.suggestedWrap)
+    val firstBlock = new ScalaBlock(
+      block,
+      firstChildNode,
+      child,
+      alignment,
+      indent,
+      childWrap,
+      block.getSettings)
     subBlocks.add(firstBlock)
     if (child.getTreeNext != null) {
       val firstChild = child.getTreeNext
@@ -913,18 +943,20 @@ object getDummyBlocks {
       while (child.getTreeNext != null) {
         child.getTreeNext.getPsi match {
           case _: ScIfStmt if settings.SPECIAL_ELSE_IF_TREATMENT =>
-            val childWrap = arrangeSuggestedWrapForChild(block,
-                                                         firstChild,
-                                                         scalaSettings,
-                                                         block.suggestedWrap)
+            val childWrap = arrangeSuggestedWrapForChild(
+              block,
+              firstChild,
+              scalaSettings,
+              block.suggestedWrap)
             subBlocks.add(
-              new ScalaBlock(block,
-                             firstChild,
-                             child,
-                             alignment,
-                             indent,
-                             childWrap,
-                             block.getSettings))
+              new ScalaBlock(
+                block,
+                firstChild,
+                child,
+                alignment,
+                indent,
+                childWrap,
+                block.getSettings))
             subBlocks.addAll(
               getIfSubBlocks(child.getTreeNext, block, alignment))
           case _ =>
@@ -932,18 +964,20 @@ object getDummyBlocks {
         child = child.getTreeNext
       }
       if (subBlocks.size == 1) {
-        val childWrap = arrangeSuggestedWrapForChild(block,
-                                                     firstChild,
-                                                     scalaSettings,
-                                                     block.suggestedWrap)
+        val childWrap = arrangeSuggestedWrapForChild(
+          block,
+          firstChild,
+          scalaSettings,
+          block.suggestedWrap)
         subBlocks.add(
-          new ScalaBlock(block,
-                         firstChild,
-                         child,
-                         alignment,
-                         indent,
-                         childWrap,
-                         block.getSettings))
+          new ScalaBlock(
+            block,
+            firstChild,
+            child,
+            alignment,
+            indent,
+            childWrap,
+            block.getSettings))
       }
     }
     subBlocks
@@ -957,8 +991,8 @@ object getDummyBlocks {
 
     val alignment = null
     val validAlignment = Option(
-      ScalaPsiUtil.getParentOfType(node.getPsi,
-                                   classOf[ScInterpolatedStringLiteral]))
+      ScalaPsiUtil
+        .getParentOfType(node.getPsi, classOf[ScInterpolatedStringLiteral]))
       .map(_.asInstanceOf[ScInterpolatedStringLiteral])
       .flatMap(literal =>
         alignmentsMap
@@ -1000,9 +1034,10 @@ object getDummyBlocks {
       if (trimmedLine.startsWith(marginChar)) {
         subBlocks.add(
           new StringLineScalaBlock(
-            new TextRange(node.getStartOffset + acc + linePrefixLength,
-                          node.getStartOffset + acc + linePrefixLength +
-                            1),
+            new TextRange(
+              node.getStartOffset + acc + linePrefixLength,
+              node.getStartOffset + acc + linePrefixLength +
+                1),
             node,
             block,
             validAlignment,
@@ -1018,9 +1053,10 @@ object getDummyBlocks {
 
           subBlocks.add(
             new StringLineScalaBlock(
-              new TextRange(node.getStartOffset + acc + linePrefixLength +
-                              suffixOffset,
-                            node.getStartOffset + acc + line.length),
+              new TextRange(
+                node.getStartOffset + acc + linePrefixLength +
+                  suffixOffset,
+                node.getStartOffset + acc + line.length),
               node,
               block,
               null,
@@ -1067,13 +1103,14 @@ object getDummyBlocks {
              alignment)
 
         subBlocks.add(
-          new StringLineScalaBlock(new TextRange(startOffset, endOffset),
-                                   node,
-                                   block,
-                                   myAlignment,
-                                   myIndent,
-                                   null,
-                                   settings))
+          new StringLineScalaBlock(
+            new TextRange(startOffset, endOffset),
+            node,
+            block,
+            myAlignment,
+            myIndent,
+            null,
+            settings))
       }
 
       acc += line.length + 1
@@ -1123,18 +1160,20 @@ object getDummyBlocks {
       } else if (isCorrectBlock(child)) {
         val indent = ScalaIndentProcessor.getChildIndent(block, child)
 
-        val childWrap = arrangeSuggestedWrapForChild(block,
-                                                     child,
-                                                     scalaSettings,
-                                                     block.suggestedWrap)
+        val childWrap = arrangeSuggestedWrapForChild(
+          block,
+          child,
+          scalaSettings,
+          block.suggestedWrap)
         subBlocks.add(
-          new ScalaBlock(block,
-                         child,
-                         null,
-                         alignment,
-                         indent,
-                         childWrap,
-                         settings))
+          new ScalaBlock(
+            block,
+            child,
+            null,
+            alignment,
+            indent,
+            childWrap,
+            settings))
       }
     }
     subBlocks
@@ -1157,19 +1196,21 @@ object getDummyBlocks {
                     lastNode: ASTNode,
                     context: Option[SubBlocksContext] = None): Unit = {
       val indent = ScalaIndentProcessor.getChildIndent(block, node)
-      val wrap = arrangeSuggestedWrapForChild(block,
-                                              node,
-                                              scalaSettings,
-                                              block.suggestedWrap)
+      val wrap = arrangeSuggestedWrapForChild(
+        block,
+        node,
+        scalaSettings,
+        block.suggestedWrap)
       subBlocks.add(
-        new ScalaBlock(block,
-                       node,
-                       lastNode,
-                       alignment,
-                       indent,
-                       wrap,
-                       settings,
-                       context))
+        new ScalaBlock(
+          block,
+          node,
+          lastNode,
+          alignment,
+          indent,
+          wrap,
+          settings,
+          context))
     }
     val children = node.getChildren(null).filter(isCorrectBlock).toList
     children match {
@@ -1177,19 +1218,21 @@ object getDummyBlocks {
       case caller :: args :: Nil
           if args.getPsi.isInstanceOf[ScArgumentExprList] =>
         subBlocks.addAll(
-          getMethodCallOrRefExprSubBlocks(caller,
-                                          block,
-                                          parentAlignment,
-                                          args :: delegatedChildren))
+          getMethodCallOrRefExprSubBlocks(
+            caller,
+            block,
+            parentAlignment,
+            args :: delegatedChildren))
       case expr :: dot :: id :: Nil
           if dot.getElementType == ScalaTokenTypes.tDOT =>
         addSubBlock(expr, null)
-        addSubBlock(dot,
-                    (id :: delegatedChildren)
-                      .sortBy(_.getTextRange.getStartOffset)
-                      .lastOption
-                      .orNull,
-                    Some(SubBlocksContext(id, alignment, delegatedChildren)))
+        addSubBlock(
+          dot,
+          (id :: delegatedChildren)
+            .sortBy(_.getTextRange.getStartOffset)
+            .lastOption
+            .orNull,
+          Some(SubBlocksContext(id, alignment, delegatedChildren)))
       case expr :: typeArgs :: Nil
           if typeArgs.getPsi.isInstanceOf[ScTypeArgs] =>
         addSubBlock(
@@ -1200,12 +1243,13 @@ object getDummyBlocks {
             .orNull,
           Some(SubBlocksContext(typeArgs, alignment, delegatedChildren)))
       case expr :: Nil =>
-        addSubBlock(expr,
-                    delegatedChildren
-                      .sortBy(_.getTextRange.getStartOffset)
-                      .lastOption
-                      .orNull,
-                    Some(SubBlocksContext(expr, alignment, delegatedChildren)))
+        addSubBlock(
+          expr,
+          delegatedChildren
+            .sortBy(_.getTextRange.getStartOffset)
+            .lastOption
+            .orNull,
+          Some(SubBlocksContext(expr, alignment, delegatedChildren)))
 
       case _ =>
         for (child <- (children ++ delegatedChildren).filter(isCorrectBlock)) {
@@ -1265,9 +1309,10 @@ object getDummyBlocks {
     }
   }
 
-  private val INFIX_ELEMENTS = TokenSet.create(ScalaElementTypes.INFIX_EXPR,
-                                               ScalaElementTypes.INFIX_PATTERN,
-                                               ScalaElementTypes.INFIX_TYPE)
+  private val INFIX_ELEMENTS = TokenSet.create(
+    ScalaElementTypes.INFIX_EXPR,
+    ScalaElementTypes.INFIX_PATTERN,
+    ScalaElementTypes.INFIX_TYPE)
 
   private class StringLineScalaBlock(myTextRange: TextRange,
                                      mainNode: ASTNode,
@@ -1276,13 +1321,14 @@ object getDummyBlocks {
                                      myIndent: Indent,
                                      myWrap: Wrap,
                                      mySettings: CodeStyleSettings)
-      extends ScalaBlock(myParentBlock,
-                         mainNode,
-                         null,
-                         myAlignment,
-                         myIndent,
-                         myWrap,
-                         mySettings) {
+      extends ScalaBlock(
+        myParentBlock,
+        mainNode,
+        null,
+        myAlignment,
+        myIndent,
+        myWrap,
+        mySettings) {
     override def getTextRange = myTextRange
 
     override def isLeaf = true
@@ -1308,14 +1354,16 @@ object getDummyBlocks {
                   node: ASTNode,
                   lastNode: ASTNode = null,
                   indent: Indent = Indent.getNoneIndent) =
-    new ScalaBlock(block,
-                   node,
-                   lastNode,
-                   null,
-                   ScalaIndentProcessor.getChildIndent(block, node),
-                   arrangeSuggestedWrapForChild(block,
-                                                node,
-                                                scalaSettings,
-                                                block.suggestedWrap),
-                   block.getSettings)
+    new ScalaBlock(
+      block,
+      node,
+      lastNode,
+      null,
+      ScalaIndentProcessor.getChildIndent(block, node),
+      arrangeSuggestedWrapForChild(
+        block,
+        node,
+        scalaSettings,
+        block.suggestedWrap),
+      block.getSettings)
 }

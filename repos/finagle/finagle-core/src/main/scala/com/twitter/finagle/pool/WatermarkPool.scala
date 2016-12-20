@@ -126,8 +126,9 @@ class WatermarkPool[Req, Rep](factory: ServiceFactory[Req, Rep],
             case _cause =>
               if (thePool.synchronized(waiters.remove(p))) {
                 val failure =
-                  Failure.adapt(new CancelledConnectionException(_cause),
-                                Failure.Restartable | Failure.Interrupted)
+                  Failure.adapt(
+                    new CancelledConnectionException(_cause),
+                    Failure.Restartable | Failure.Interrupted)
                 p.setException(failure)
               }
           }

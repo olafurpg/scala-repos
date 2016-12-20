@@ -37,8 +37,9 @@ class ScParameterClauseImpl private (stub: StubElement[ScParameterClause],
   override def toString: String = "ParametersClause"
 
   def parameters: Seq[ScParameter] = {
-    getStubOrPsiChildren[ScParameter](TokenSets.PARAMETERS,
-                                      JavaArrayFactoryUtil.ScParameterFactory)
+    getStubOrPsiChildren[ScParameter](
+      TokenSets.PARAMETERS,
+      JavaArrayFactoryUtil.ScParameterFactory)
   }
 
   @volatile
@@ -121,10 +122,11 @@ class ScParameterClauseImpl private (stub: StubElement[ScParameterClause],
   }
 
   override def owner: PsiElement = {
-    ScalaPsiUtil.getContextOfType(this,
-                                  true,
-                                  classOf[ScFunctionExpr],
-                                  classOf[ScFunction],
-                                  classOf[ScPrimaryConstructor])
+    ScalaPsiUtil.getContextOfType(
+      this,
+      true,
+      classOf[ScFunctionExpr],
+      classOf[ScFunction],
+      classOf[ScPrimaryConstructor])
   }
 }

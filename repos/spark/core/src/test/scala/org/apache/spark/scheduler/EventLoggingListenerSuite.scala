@@ -127,16 +127,18 @@ class EventLoggingListenerSuite
     // illegal characters in app ID
     assert(
       s"file:/base-dir/a-fine-mind_dollar_bills__1" === EventLoggingListener
-        .getLogPath(Utils.resolveURI("/base-dir"),
-                    "a fine:mind$dollar{bills}.1",
-                    None))
+        .getLogPath(
+          Utils.resolveURI("/base-dir"),
+          "a fine:mind$dollar{bills}.1",
+          None))
     // illegal characters in app ID with compression
     assert(
       s"file:/base-dir/a-fine-mind_dollar_bills__1.lz4" === EventLoggingListener
-        .getLogPath(Utils.resolveURI("/base-dir"),
-                    "a fine:mind$dollar{bills}.1",
-                    None,
-                    Some("lz4")))
+        .getLogPath(
+          Utils.resolveURI("/base-dir"),
+          "a fine:mind$dollar{bills}.1",
+          None,
+          Some("lz4")))
   }
 
   /* ----------------- *
@@ -234,17 +236,18 @@ class EventLoggingListenerSuite
     val logStart = SparkListenerLogStart(SPARK_VERSION)
     val lines = readLines(logData)
     val eventSet = mutable
-      .Set(SparkListenerApplicationStart,
-           SparkListenerBlockManagerAdded,
-           SparkListenerExecutorAdded,
-           SparkListenerEnvironmentUpdate,
-           SparkListenerJobStart,
-           SparkListenerJobEnd,
-           SparkListenerStageSubmitted,
-           SparkListenerStageCompleted,
-           SparkListenerTaskStart,
-           SparkListenerTaskEnd,
-           SparkListenerApplicationEnd)
+      .Set(
+        SparkListenerApplicationStart,
+        SparkListenerBlockManagerAdded,
+        SparkListenerExecutorAdded,
+        SparkListenerEnvironmentUpdate,
+        SparkListenerJobStart,
+        SparkListenerJobEnd,
+        SparkListenerStageSubmitted,
+        SparkListenerStageCompleted,
+        SparkListenerTaskStart,
+        SparkListenerTaskEnd,
+        SparkListenerApplicationEnd)
       .map(Utils.getFormattedClassName)
     lines.foreach { line =>
       eventSet.foreach { event =>
@@ -258,8 +261,9 @@ class EventLoggingListenerSuite
       }
     }
     assert(JsonProtocol.sparkEventFromJson(parse(lines(0))) === logStart)
-    assert(eventSet.isEmpty,
-           "The following events are missing: " + eventSet.toSeq)
+    assert(
+      eventSet.isEmpty,
+      "The following events are missing: " + eventSet.toSeq)
   }
 
   private def readLines(in: InputStream): Seq[String] = {

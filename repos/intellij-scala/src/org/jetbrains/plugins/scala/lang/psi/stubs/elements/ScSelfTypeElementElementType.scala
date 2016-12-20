@@ -38,14 +38,15 @@ class ScSelfTypeElementElementType[Func <: ScSelfTypeElement]
   def createStubImpl[ParentPsi <: PsiElement](
       psi: ScSelfTypeElement,
       parentStub: StubElement[ParentPsi]): ScSelfTypeElementStub = {
-    new ScSelfTypeElementStubImpl(parentStub,
-                                  this,
-                                  psi.name,
-                                  psi.typeElement match {
-                                    case None => ""
-                                    case Some(x) => x.getText
-                                  },
-                                  psi.getClassNames)
+    new ScSelfTypeElementStubImpl(
+      parentStub,
+      this,
+      psi.name,
+      psi.typeElement match {
+        case None => ""
+        case Some(x) => x.getText
+      },
+      psi.getClassNames)
   }
 
   def deserializeImpl(dataStream: StubInputStream,

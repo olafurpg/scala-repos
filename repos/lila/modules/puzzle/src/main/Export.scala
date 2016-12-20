@@ -14,11 +14,12 @@ object Export {
       puzzles
         .map { puzzle =>
           val encoded = base64(Json stringify {
-            Json.obj("id" -> puzzle.id,
-                     "fen" -> puzzle.fen,
-                     "color" -> puzzle.color.name,
-                     "move" -> puzzle.initialMove,
-                     "lines" -> lila.puzzle.Line.toJson(puzzle.lines))
+            Json.obj(
+              "id" -> puzzle.id,
+              "fen" -> puzzle.fen,
+              "color" -> puzzle.color.name,
+              "move" -> puzzle.initialMove,
+              "lines" -> lila.puzzle.Line.toJson(puzzle.lines))
           })
           s""""$encoded"""" -> puzzle.vote.sum
         }

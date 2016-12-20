@@ -37,10 +37,11 @@ class CatalystQlSuite extends PlanTest {
 
   test("test NOT operator with comparison operations") {
     val parsed = parser.parsePlan("SELECT NOT TRUE > TRUE")
-    val expected = Project(UnresolvedAlias(
-                             Not(GreaterThan(Literal(true), Literal(true)))
-                           ) :: Nil,
-                           OneRowRelation)
+    val expected = Project(
+      UnresolvedAlias(
+        Not(GreaterThan(Literal(true), Literal(true)))
+      ) :: Nil,
+      OneRowRelation)
     comparePlans(parsed, expected)
   }
 
@@ -53,10 +54,13 @@ class CatalystQlSuite extends PlanTest {
       SubqueryAlias(
         "u_1",
         Distinct(
-          Union(Project(UnresolvedAlias(UnresolvedStar(None)) :: Nil,
-                        UnresolvedRelation(TableIdentifier("t0"), None)),
-                Project(UnresolvedAlias(UnresolvedStar(None)) :: Nil,
-                        UnresolvedRelation(TableIdentifier("t1"), None))))))
+          Union(
+            Project(
+              UnresolvedAlias(UnresolvedStar(None)) :: Nil,
+              UnresolvedRelation(TableIdentifier("t0"), None)),
+            Project(
+              UnresolvedAlias(UnresolvedStar(None)) :: Nil,
+              UnresolvedRelation(TableIdentifier("t1"), None))))))
     comparePlans(parsed1, expected)
     comparePlans(parsed2, expected)
   }
@@ -68,36 +72,43 @@ class CatalystQlSuite extends PlanTest {
       UnresolvedAlias(UnresolvedStar(None)) :: Nil,
       SubqueryAlias(
         "u_1",
-        Union(Project(UnresolvedAlias(UnresolvedStar(None)) :: Nil,
-                      UnresolvedRelation(TableIdentifier("t0"), None)),
-              Project(UnresolvedAlias(UnresolvedStar(None)) :: Nil,
-                      UnresolvedRelation(TableIdentifier("t1"), None)))))
+        Union(
+          Project(
+            UnresolvedAlias(UnresolvedStar(None)) :: Nil,
+            UnresolvedRelation(TableIdentifier("t0"), None)),
+          Project(
+            UnresolvedAlias(UnresolvedStar(None)) :: Nil,
+            UnresolvedRelation(TableIdentifier("t1"), None)))))
     comparePlans(parsed, expected)
   }
 
   test("support hive interval literal") {
     def checkInterval(sql: String, result: CalendarInterval): Unit = {
       val parsed = parser.parsePlan(sql)
-      val expected = Project(UnresolvedAlias(
-                               Literal(result)
-                             ) :: Nil,
-                             OneRowRelation)
+      val expected = Project(
+        UnresolvedAlias(
+          Literal(result)
+        ) :: Nil,
+        OneRowRelation)
       comparePlans(parsed, expected)
     }
 
     def checkYearMonth(lit: String): Unit = {
-      checkInterval(s"SELECT INTERVAL '$lit' YEAR TO MONTH",
-                    CalendarInterval.fromYearMonthString(lit))
+      checkInterval(
+        s"SELECT INTERVAL '$lit' YEAR TO MONTH",
+        CalendarInterval.fromYearMonthString(lit))
     }
 
     def checkDayTime(lit: String): Unit = {
-      checkInterval(s"SELECT INTERVAL '$lit' DAY TO SECOND",
-                    CalendarInterval.fromDayTimeString(lit))
+      checkInterval(
+        s"SELECT INTERVAL '$lit' DAY TO SECOND",
+        CalendarInterval.fromDayTimeString(lit))
     }
 
     def checkSingleUnit(lit: String, unit: String): Unit = {
-      checkInterval(s"SELECT INTERVAL '$lit' $unit",
-                    CalendarInterval.fromSingleUnitString(unit, lit))
+      checkInterval(
+        s"SELECT INTERVAL '$lit' $unit",
+        CalendarInterval.fromSingleUnitString(unit, lit))
     }
 
     checkYearMonth("123-10")
@@ -125,10 +136,11 @@ class CatalystQlSuite extends PlanTest {
   test("support scientific notation") {
     def assertRight(input: String, output: Double): Unit = {
       val parsed = parser.parsePlan("SELECT " + input)
-      val expected = Project(UnresolvedAlias(
-                               Literal(output)
-                             ) :: Nil,
-                             OneRowRelation)
+      val expected = Project(
+        UnresolvedAlias(
+          Literal(output)
+        ) :: Nil,
+        OneRowRelation)
       comparePlans(parsed, expected)
     }
 
@@ -145,9 +157,10 @@ class CatalystQlSuite extends PlanTest {
   test("parse expressions") {
     compareExpressions(
       parser.parseExpression("prinln('hello', 'world')"),
-      UnresolvedFunction("prinln",
-                         Literal("hello") :: Literal("world") :: Nil,
-                         false))
+      UnresolvedFunction(
+        "prinln",
+        Literal("hello") :: Literal("world") :: Nil,
+        false))
 
     compareExpressions(
       parser.parseExpression("1 + r.r As q"),
@@ -155,13 +168,15 @@ class CatalystQlSuite extends PlanTest {
 
     compareExpressions(
       parser.parseExpression("1 - f('o', o(bar))"),
-      Subtract(Literal(1),
-               UnresolvedFunction("f",
-                                  Literal("o") :: UnresolvedFunction(
-                                    "o",
-                                    UnresolvedAttribute("bar") :: Nil,
-                                    false) :: Nil,
-                                  false)))
+      Subtract(
+        Literal(1),
+        UnresolvedFunction(
+          "f",
+          Literal("o") :: UnresolvedFunction(
+            "o",
+            UnresolvedAttribute("bar") :: Nil,
+            false) :: Nil,
+          false)))
 
     intercept[AnalysisException](
       parser.parseExpression("1 - f('o', o(bar)) hello * world"))

@@ -115,10 +115,11 @@ trait ScType {
             case 1 => (true, upper)
             case 0 =>
               (true,
-               ScSkolemizedType(s"_$$${ index += 1; index }",
-                                Nil,
-                                lower,
-                                upper))
+               ScSkolemizedType(
+                 s"_$$${ index += 1; index }",
+                 Nil,
+                 lower,
+                 upper))
           }
         case _ => (false, tp)
       }
@@ -295,9 +296,10 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
             if (visitedAlias.contains(t)) return None
             val result = t.aliasedType(TypingContext.empty)
             if (result.isEmpty) return None
-            extractClassType(proj.actualSubst.subst(result.get),
-                             project,
-                             visitedAlias + t)
+            extractClassType(
+              proj.actualSubst.subst(result.get),
+              project,
+              visitedAlias + t)
           case _ => None
         }
       case ScExistentialType(quantified, _) =>
@@ -340,8 +342,9 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
           case t: ScTypeAliasDefinition if withoutAliases =>
             val result = t.aliasedType(TypingContext.empty)
             if (result.isEmpty) return None
-            extractDesignated(proj.actualSubst.subst(result.get),
-                              withoutAliases)
+            extractDesignated(
+              proj.actualSubst.subst(result.get),
+              withoutAliases)
           case _ => Some((proj.actualElement, proj.actualSubst))
         }
       case p @ ScParameterizedType(t1, _) =>
@@ -457,8 +460,9 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
         expandAliases(at.upper, visited + tp) // ugly hack for SCL-3592
       case ScDesignatorType(t: ScType) => expandAliases(t, visited + tp)
       case ScDesignatorType(ta: ScTypeAliasDefinition) =>
-        expandAliases(ta.aliasedType(TypingContext.empty).getOrNothing,
-                      visited + tp)
+        expandAliases(
+          ta.aliasedType(TypingContext.empty).getOrNothing,
+          visited + tp)
       case t: ScTypeAliasDeclaration if t.typeParameters.isEmpty =>
         t.upperBound.flatMap(expandAliases(_, visited + tp))
       case t: ScTypeAliasDefinition if t.typeParameters.isEmpty =>
@@ -526,18 +530,20 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
             element.getContext match {
               case _: ScTemplateBody | _: ScEarlyDefinitions =>
                 Option(
-                  ScalaPsiUtil.contextOfType(element,
-                                             strict = true,
-                                             classOf[ScTemplateDefinition]))
+                  ScalaPsiUtil.contextOfType(
+                    element,
+                    strict = true,
+                    classOf[ScTemplateDefinition]))
               case _ => None
             }
         }
 
         clazzOpt match {
           case Some(clazz) =>
-            ScProjectionType(ScThisType(clazz),
-                             element,
-                             superReference = false)
+            ScProjectionType(
+              ScThisType(clazz),
+              element,
+              superReference = false)
           case _ => new ScDesignatorType(element)
         }
     }

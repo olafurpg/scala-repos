@@ -53,8 +53,8 @@ object Dispatchers {
   val MAILBOX_CAPACITY =
     config.getInt("akka.actor.default-dispatcher.mailbox-capacity", -1)
   val MAILBOX_PUSH_TIME_OUT = Duration(
-    config.getInt("akka.actor.default-dispatcher.mailbox-push-timeout-time",
-                  10),
+    config
+      .getInt("akka.actor.default-dispatcher.mailbox-push-timeout-time", 10),
     TIME_UNIT)
   val THROUGHPUT_DEADLINE_TIME = Duration(
     config.getInt("akka.actor.throughput-deadline-time", -1),
@@ -127,11 +127,12 @@ object Dispatchers {
                                             mailboxType: MailboxType) =
     ThreadPoolConfigDispatcherBuilder(
       config =>
-        new ExecutorBasedEventDrivenDispatcher(name,
-                                               throughput,
-                                               THROUGHPUT_DEADLINE_TIME_MILLIS,
-                                               mailboxType,
-                                               config),
+        new ExecutorBasedEventDrivenDispatcher(
+          name,
+          throughput,
+          THROUGHPUT_DEADLINE_TIME_MILLIS,
+          mailboxType,
+          config),
       ThreadPoolConfig())
 
   /**
@@ -145,11 +146,12 @@ object Dispatchers {
                                             mailboxType: MailboxType) =
     ThreadPoolConfigDispatcherBuilder(
       config =>
-        new ExecutorBasedEventDrivenDispatcher(name,
-                                               throughput,
-                                               throughputDeadlineMs,
-                                               mailboxType,
-                                               config),
+        new ExecutorBasedEventDrivenDispatcher(
+          name,
+          throughput,
+          throughputDeadlineMs,
+          mailboxType,
+          config),
       ThreadPoolConfig())
 
   /**
@@ -298,8 +300,9 @@ class ExecutorBasedEventDrivenDispatcherConfigurator
         new ExecutorBasedEventDrivenDispatcher(
           config.getString("name", newUuid.toString),
           config.getInt("throughput", Dispatchers.THROUGHPUT),
-          config.getInt("throughput-deadline-time",
-                        Dispatchers.THROUGHPUT_DEADLINE_TIME_MILLIS),
+          config.getInt(
+            "throughput-deadline-time",
+            Dispatchers.THROUGHPUT_DEADLINE_TIME_MILLIS),
           mailboxType(config),
           threadPoolConfig)).build
   }
@@ -314,8 +317,9 @@ class ExecutorBasedEventDrivenWorkStealingDispatcherConfigurator
         new ExecutorBasedEventDrivenWorkStealingDispatcher(
           config.getString("name", newUuid.toString),
           config.getInt("throughput", Dispatchers.THROUGHPUT),
-          config.getInt("throughput-deadline-time",
-                        Dispatchers.THROUGHPUT_DEADLINE_TIME_MILLIS),
+          config.getInt(
+            "throughput-deadline-time",
+            Dispatchers.THROUGHPUT_DEADLINE_TIME_MILLIS),
           mailboxType(config),
           threadPoolConfig)).build
   }

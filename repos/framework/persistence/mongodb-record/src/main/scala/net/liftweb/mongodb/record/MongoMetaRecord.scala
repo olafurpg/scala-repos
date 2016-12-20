@@ -227,9 +227,10 @@ trait MongoMetaRecord[BaseRecord <: MongoRecord[BaseRecord]]
   def findAll(qry: JObject,
               sort: JObject,
               opts: FindOption*): List[BaseRecord] =
-    findAll(JObjectParser.parse(qry),
-            Some(JObjectParser.parse(sort)),
-            opts: _*)
+    findAll(
+      JObjectParser.parse(qry),
+      Some(JObjectParser.parse(sort)),
+      opts: _*)
 
   /**
     * Find all documents using a k, v query

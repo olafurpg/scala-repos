@@ -244,9 +244,10 @@ trait ObservableMap[K, V]
         val changeEvent: Change[K, V] =
           (change.wasAdded, change.wasRemoved) match {
             case (true, true) =>
-              Replace(change.getKey,
-                      change.getValueAdded,
-                      change.getValueRemoved)
+              Replace(
+                change.getKey,
+                change.getValueAdded,
+                change.getValueRemoved)
             case (true, false) => Add(change.getKey, change.getValueAdded)
             case (false, true) => Remove(change.getKey, change.getValueRemoved)
             case (false, false) =>

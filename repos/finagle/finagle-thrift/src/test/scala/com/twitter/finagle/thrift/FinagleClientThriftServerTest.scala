@@ -212,11 +212,13 @@ class FinagleClientThriftServerTest extends FunSuite {
       }
   }
 
-  doit(new TFramedTransport.Factory(),
-       ThriftClientFramedCodec(),
-       "framed transport")
+  doit(
+    new TFramedTransport.Factory(),
+    ThriftClientFramedCodec(),
+    "framed transport")
 
-  doit(new TTransportFactory,
-       ThriftClientBufferedCodec(),
-       "buffered transport")
+  doit(
+    new TTransportFactory,
+    ThriftClientBufferedCodec(),
+    "buffered transport")
 }

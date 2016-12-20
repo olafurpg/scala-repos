@@ -234,10 +234,11 @@ trait Binder extends parser.AST {
       lib1.map(Op1Binding) ++ lib2.map(Op2Binding) ++ libReduction.map(
         ReductionBinding) ++ libMorphism1.map(Morphism1Binding).filterNot {
         _.name == ExpandGlobBinding.name
-      } ++ libMorphism2.map(Morphism2Binding) ++ Set(LoadBinding,
-                                                     RelLoadBinding,
-                                                     DistinctBinding,
-                                                     ExpandGlobBinding)
+      } ++ libMorphism2.map(Morphism2Binding) ++ Set(
+        LoadBinding,
+        RelLoadBinding,
+        DistinctBinding,
+        ExpandGlobBinding)
 
     val env = Env(Map(), builtIns.map({ b =>
       b.name -> b

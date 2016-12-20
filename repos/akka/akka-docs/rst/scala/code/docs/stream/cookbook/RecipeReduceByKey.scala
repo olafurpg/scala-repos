@@ -42,12 +42,13 @@ class RecipeReduceByKey extends RecipeSpec {
       Await
         .result(counts.limit(10).runWith(Sink.seq), 3.seconds)
         .toSet should be(
-        Set(("hello", 2),
-            ("world", 1),
-            ("and", 1),
-            ("universe", 1),
-            ("akka", 1),
-            ("rocks!", 1000)))
+        Set(
+          ("hello", 2),
+          ("world", 1),
+          ("and", 1),
+          ("universe", 1),
+          ("akka", 1),
+          ("rocks!", 1000)))
     }
 
     "work generalized" in {
@@ -71,21 +72,22 @@ class RecipeReduceByKey extends RecipeSpec {
       }
 
       val wordCounts = words.via(
-        reduceByKey(MaximumDistinctWords,
-                    groupKey = (word: String) => word,
-                    map = (word: String) => 1)((left: Int, right: Int) =>
-          left + right))
+        reduceByKey(
+          MaximumDistinctWords,
+          groupKey = (word: String) => word,
+          map = (word: String) => 1)((left: Int, right: Int) => left + right))
       //#reduce-by-key-general
 
       Await
         .result(wordCounts.limit(10).runWith(Sink.seq), 3.seconds)
         .toSet should be(
-        Set(("hello", 2),
-            ("world", 1),
-            ("and", 1),
-            ("universe", 1),
-            ("akka", 1),
-            ("rocks!", 1000)))
+        Set(
+          ("hello", 2),
+          ("world", 1),
+          ("and", 1),
+          ("universe", 1),
+          ("akka", 1),
+          ("rocks!", 1000)))
     }
   }
 }

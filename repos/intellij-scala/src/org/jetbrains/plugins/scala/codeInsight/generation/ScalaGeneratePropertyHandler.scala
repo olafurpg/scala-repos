@@ -65,8 +65,9 @@ class ScalaGeneratePropertyHandler extends LanguageCodeInsightActionHandler {
 
     val parent = varDef.getParent
     val added = Seq(backingVar_0, getter_0, setter_0).map { elem =>
-      parent.addBefore(ScalaPsiElementFactory.createNewLine(varDef.getManager),
-                       varDef)
+      parent.addBefore(
+        ScalaPsiElementFactory.createNewLine(varDef.getManager),
+        varDef)
       parent.addBefore(elem, varDef)
     }
     TypeAdjuster.adjustFor(added)

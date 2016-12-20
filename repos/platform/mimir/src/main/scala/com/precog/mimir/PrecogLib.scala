@@ -68,9 +68,10 @@ trait PrecogLibModule[M[+ _]]
       def spec[A <: SourceType](ctx: MorphContext)(
           left: TransSpec[A],
           right: TransSpec[A]): TransSpec[A] = {
-        trans.MapWith(trans.InnerArrayConcat(trans.WrapArray(left),
-                                             trans.WrapArray(right)),
-                      new EnrichmentMapper(ctx))
+        trans.MapWith(
+          trans
+            .InnerArrayConcat(trans.WrapArray(left), trans.WrapArray(right)),
+          new EnrichmentMapper(ctx))
       }
 
       class EnrichmentMapper(ctx: MorphContext) extends CMapperM[M] {
@@ -137,8 +138,9 @@ trait PrecogLibModule[M[+ _]]
           val options = params.deref(CPathField("options"))
           // TODO: Add these values to MorphContext.
           val account = ctx.evalContext.account
-          val baseOpts = Map(jfield("accountId", account.accountId),
-                             jfield("email", account.email))
+          val baseOpts = Map(
+            jfield("accountId", account.accountId),
+            jfield("email", account.email))
           val chunks: List[((String, Map[String, JValue]), BitSet)] =
             chunks0 map {
               case (row, members) =>
@@ -174,8 +176,9 @@ trait PrecogLibModule[M[+ _]]
                                        xs: List[RValue]): Stream[RValue] =
                         if (row < slice.size) {
                           if (members(row))
-                            Stream.cons(xs.head,
-                                        sparseStream(row + 1, xs.tail))
+                            Stream.cons(
+                              xs.head,
+                              sparseStream(row + 1, xs.tail))
                           else
                             Stream.cons(CUndefined, sparseStream(row + 1, xs))
                         } else Stream.empty

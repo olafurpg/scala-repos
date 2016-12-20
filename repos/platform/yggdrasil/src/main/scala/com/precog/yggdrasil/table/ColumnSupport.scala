@@ -238,9 +238,9 @@ object ArraySetColumn {
     assert(columnSet.length != 0)
     ctype match {
       case CString =>
-        new ArraySetColumn[StrColumn](ctype,
-                                      columnSet.map(_.asInstanceOf[StrColumn]))
-        with StrColumn {
+        new ArraySetColumn[StrColumn](
+          ctype,
+          columnSet.map(_.asInstanceOf[StrColumn])) with StrColumn {
           def apply(row: Int): String =
             backing(firstDefinedIndexAt(row))
               .asInstanceOf[StrColumn]
@@ -278,9 +278,9 @@ object ArraySetColumn {
         }
 
       case CNum =>
-        new ArraySetColumn[NumColumn](ctype,
-                                      columnSet.map(_.asInstanceOf[NumColumn]))
-        with NumColumn {
+        new ArraySetColumn[NumColumn](
+          ctype,
+          columnSet.map(_.asInstanceOf[NumColumn])) with NumColumn {
           def apply(row: Int): BigDecimal =
             backing(firstDefinedIndexAt(row))
               .asInstanceOf[NumColumn]

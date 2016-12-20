@@ -100,8 +100,8 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
     def projection(implicit M: Monad[M]): M[Projection] = M point { proj }
     def asByteStream(mimeType: MimeType)(implicit M: Monad[M]) = OptionT {
       M.point {
-        table.ColumnarTableModule.byteStream(proj.getBlockStream(None),
-                                             Some(mimeType))
+        table.ColumnarTableModule
+          .byteStream(proj.getBlockStream(None), Some(mimeType))
       }
     }
   }
@@ -217,9 +217,10 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
         appendTo match {
           case Some(record @ BinaryRecord(resource, uuid)) =>
             acc + ((path, Version.Archived(uuid)) -> record) +
-              ((path, Version.Current) -> JsonRecord(Vector(values: _*),
-                                                     writeAs,
-                                                     newVersion))
+              ((path, Version.Current) -> JsonRecord(
+                Vector(values: _*),
+                writeAs,
+                newVersion))
 
           case Some(rec @ JsonRecord(resource, _)) =>
             //TODO: fix the ugly
@@ -239,48 +240,56 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
               val currentKey = (path, Version.Current)
               // We can discard the event IDs for the purposes of this class
               messages.map(_._2).foldLeft(acc) {
-                case (acc,
-                      IngestMessage(_,
-                                    _,
-                                    writeAs,
-                                    records,
-                                    _,
-                                    _,
-                                    StreamRef.Append)) =>
-                  updated(acc,
-                          acc.get(currentKey),
-                          currentKey,
-                          writeAs,
-                          records.map(_.value))
+                case (
+                    acc,
+                    IngestMessage(
+                      _,
+                      _,
+                      writeAs,
+                      records,
+                      _,
+                      _,
+                      StreamRef.Append)) =>
+                  updated(
+                    acc,
+                    acc.get(currentKey),
+                    currentKey,
+                    writeAs,
+                    records.map(_.value))
 
-                case (acc,
-                      IngestMessage(_,
-                                    _,
-                                    writeAs,
-                                    records,
-                                    _,
-                                    _,
-                                    StreamRef.Create(id, _))) =>
+                case (
+                    acc,
+                    IngestMessage(
+                      _,
+                      _,
+                      writeAs,
+                      records,
+                      _,
+                      _,
+                      StreamRef.Create(id, _))) =>
                   val archiveKey = (path, Version.Archived(id))
                   val appendTo = acc
                     .get(archiveKey)
                     .orElse(acc.get(currentKey).filter(_.versionId == id))
-                  updated(acc,
-                          appendTo,
-                          if (acc.contains(currentKey))
-                            currentKey
-                          else archiveKey,
-                          writeAs,
-                          records.map(_.value))
+                  updated(
+                    acc,
+                    appendTo,
+                    if (acc.contains(currentKey))
+                      currentKey
+                    else archiveKey,
+                    writeAs,
+                    records.map(_.value))
 
-                case (acc,
-                      IngestMessage(_,
-                                    _,
-                                    writeAs,
-                                    records,
-                                    _,
-                                    _,
-                                    StreamRef.Replace(id, _))) =>
+                case (
+                    acc,
+                    IngestMessage(
+                      _,
+                      _,
+                      writeAs,
+                      records,
+                      _,
+                      _,
+                      StreamRef.Replace(id, _))) =>
                   val archiveKey = (path, Version.Archived(id))
                   acc.get(archiveKey).orElse(acc.get(currentKey)) map {
                     case rec @ JsonRecord(resource, `id`) =>
@@ -310,26 +319,30 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
                         id))
                   }
 
-                case (acc,
-                      StoreFileMessage(_,
-                                       _,
-                                       writeAs,
-                                       _,
-                                       _,
-                                       content,
-                                       _,
-                                       StreamRef.Create(id, _))) =>
+                case (
+                    acc,
+                    StoreFileMessage(
+                      _,
+                      _,
+                      writeAs,
+                      _,
+                      _,
+                      content,
+                      _,
+                      StreamRef.Create(id, _))) =>
                   sys.error("todo")
 
-                case (acc,
-                      StoreFileMessage(_,
-                                       _,
-                                       writeAs,
-                                       _,
-                                       _,
-                                       content,
-                                       _,
-                                       StreamRef.Replace(id, _))) =>
+                case (
+                    acc,
+                    StoreFileMessage(
+                      _,
+                      _,
+                      writeAs,
+                      _,
+                      _,
+                      content,
+                      _,
+                      StreamRef.Replace(id, _))) =>
                   sys.error("todo")
 
                 case (acc, _: ArchiveMessage) =>
@@ -363,9 +376,10 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
         val isDir = p0.length > 1
         data.get((childPath, Version.Current)) map { record =>
           Set(
-            PathMetadata(p0,
-                         if (isDir) DataDir(record.resource.mimeType)
-                         else DataOnly(record.resource.mimeType)))
+            PathMetadata(
+              p0,
+              if (isDir) DataDir(record.resource.mimeType)
+              else DataOnly(record.resource.mimeType)))
         } getOrElse {
           // no current version
           if (isDir) Set(PathMetadata(p0, PathOnly))
@@ -387,9 +401,10 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
           val isDir = childMetadata(path).nonEmpty
           data.get((path, Version.Current)) map { record =>
             \/.right(
-              PathMetadata(path,
-                           if (isDir) DataDir(record.resource.mimeType)
-                           else DataOnly(record.resource.mimeType)))
+              PathMetadata(
+                path,
+                if (isDir) DataDir(record.resource.mimeType)
+                else DataOnly(record.resource.mimeType)))
           } getOrElse {
             if (isDir) \/.right(PathMetadata(path, PathOnly))
             else \/.left(NotFound("Path not fournd: %s".format(path.path)))

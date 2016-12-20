@@ -35,11 +35,12 @@ import scala.collection.mutable
   * @author Pavel Fatin
   */
 class SbtExternalSystemManager
-    extends ExternalSystemManager[SbtProjectSettings,
-                                  SbtProjectSettingsListener,
-                                  SbtSystemSettings,
-                                  SbtLocalSettings,
-                                  SbtExecutionSettings]
+    extends ExternalSystemManager[
+      SbtProjectSettings,
+      SbtProjectSettingsListener,
+      SbtSystemSettings,
+      SbtLocalSettings,
+      SbtExecutionSettings]
     with ExternalSystemConfigurableAware {
 
   def enhanceLocalProcessing(urls: util.List[URL]) {
@@ -101,16 +102,17 @@ object SbtExternalSystemManager {
     val environment =
       Map.empty ++ getAndroidEnvironmentVariables(projectJdkName)
 
-    new SbtExecutionSettings(realProjectPath,
-                             vmExecutable,
-                             vmOptions,
-                             environment,
-                             customLauncher,
-                             customSbtStructureFile,
-                             projectJdkName,
-                             projectSettings.resolveClassifiers,
-                             projectSettings.resolveJavadocs,
-                             projectSettings.resolveSbtClassifiers)
+    new SbtExecutionSettings(
+      realProjectPath,
+      vmExecutable,
+      vmOptions,
+      environment,
+      customLauncher,
+      customSbtStructureFile,
+      projectJdkName,
+      projectSettings.resolveClassifiers,
+      projectSettings.resolveJavadocs,
+      projectSettings.resolveSbtClassifiers)
   }
 
   private def getProjectJdkName(
@@ -188,8 +190,9 @@ object SbtExternalSystemManager {
     val useProxy = http.USE_HTTP_PROXY && !http.PROXY_TYPE_IS_SOCKS
     val useCredentials = useProxy && http.PROXY_AUTHENTICATION
 
-    useProxy.seq(s"-Dhttp.proxyHost=${http.PROXY_HOST}",
-                 s"-Dhttp.proxyPort=${http.PROXY_PORT}") ++ useCredentials.seq(
+    useProxy.seq(
+      s"-Dhttp.proxyHost=${http.PROXY_HOST}",
+      s"-Dhttp.proxyPort=${http.PROXY_PORT}") ++ useCredentials.seq(
       s"-Dhttp.proxyUser=${http.PROXY_LOGIN}",
       s"-Dhttp.proxyPassword=${http.getPlainProxyPassword}")
   }

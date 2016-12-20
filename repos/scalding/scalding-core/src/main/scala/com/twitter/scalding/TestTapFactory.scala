@@ -83,8 +83,9 @@ class TestTapFactory(src: Source, sinkMode: SinkMode) extends Serializable {
          * to access this.  You must explicitly name each of your test sources in your
          * JobTest.
          */
-        require(buffers(src).isDefined,
-                TestTapFactory.sourceNotFoundError.format(src))
+        require(
+          buffers(src).isDefined,
+          TestTapFactory.sourceNotFoundError.format(src))
         val buffer =
           if (readOrWrite == Write) {
             val buf = buffers(src).get
@@ -110,9 +111,10 @@ class TestTapFactory(src: Source, sinkMode: SinkMode) extends Serializable {
                 .asInstanceOf[Tap[JobConf, _, _]]
             } else {
               CastHfsTap(
-                new Hfs(hdfsScheme.get,
-                        hdfsTest.getWritePathFor(src),
-                        sinkMode))
+                new Hfs(
+                  hdfsScheme.get,
+                  hdfsTest.getWritePathFor(src),
+                  sinkMode))
             }
           }
           case Write => {

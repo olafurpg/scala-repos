@@ -309,8 +309,9 @@ class CheckpointSuite
           sc.makeRDD(1 to 4).map { _ -> 1 }.partitionBy(partitioner)
         rddWithPartitioner.checkpoint()
         rddWithPartitioner.count()
-        assert(rddWithPartitioner.getCheckpointFile.get.nonEmpty,
-               "checkpointing was not successful")
+        assert(
+          rddWithPartitioner.getCheckpointFile.get.nonEmpty,
+          "checkpointing was not successful")
 
         if (corruptPartitionerFile) {
           // Overwrite the partitioner file with garbage data
@@ -321,8 +322,9 @@ class CheckpointSuite
             .listStatus(checkpointDir)
             .find(_.getPath.getName.contains("partitioner"))
             .map(_.getPath)
-          require(partitionerFile.nonEmpty,
-                  "could not find the partitioner file for testing")
+          require(
+            partitionerFile.nonEmpty,
+            "could not find the partitioner file for testing")
           val output = fs.create(partitionerFile.get, true)
           output.write(100)
           output.close()
@@ -330,16 +332,19 @@ class CheckpointSuite
 
         val newRDD = sc.checkpointFile[(Int, Int)](
           rddWithPartitioner.getCheckpointFile.get)
-        assert(newRDD.collect().toSet === rddWithPartitioner.collect().toSet,
-               "RDD not recovered")
+        assert(
+          newRDD.collect().toSet === rddWithPartitioner.collect().toSet,
+          "RDD not recovered")
 
         if (!corruptPartitionerFile) {
           assert(newRDD.partitioner != None, "partitioner not recovered")
-          assert(newRDD.partitioner === rddWithPartitioner.partitioner,
-                 "recovered partitioner does not match")
+          assert(
+            newRDD.partitioner === rddWithPartitioner.partitioner,
+            "recovered partitioner does not match")
         } else {
-          assert(newRDD.partitioner == None,
-                 "partitioner unexpectedly recovered")
+          assert(
+            newRDD.partitioner == None,
+            "partitioner unexpectedly recovered")
         }
       }
 
@@ -356,8 +361,9 @@ class CheckpointSuite
     testRDD(_.sample(false, 0.5, 0), reliableCheckpoint)
     testRDD(_.glom(), reliableCheckpoint)
     testRDD(_.mapPartitions(_.map(_.toString)), reliableCheckpoint)
-    testRDD(_.map(x => (x % 2, 1)).reduceByKey(_ + _).mapValues(_.toString),
-            reliableCheckpoint)
+    testRDD(
+      _.map(x => (x % 2, 1)).reduceByKey(_ + _).mapValues(_.toString),
+      reliableCheckpoint)
     testRDD(
       _.map(x => (x % 2, 1)).reduceByKey(_ + _).flatMapValues(x => 1 to x),
       reliableCheckpoint)
@@ -468,16 +474,16 @@ class CheckpointSuite
       rdd.map { case (p, a) => (p, a.toSeq) }.collect(): Any
 
     testRDD(rdd => {
-      CheckpointSuite.cogroup(longLineageRDD1,
-                              rdd.map(x => (x % 2, 1)),
-                              partitioner)
+      CheckpointSuite
+        .cogroup(longLineageRDD1, rdd.map(x => (x % 2, 1)), partitioner)
     }, reliableCheckpoint, seqCollectFunc)
 
     val longLineageRDD2 = generateFatPairRDD()
     testRDDPartitions(rdd => {
-      CheckpointSuite.cogroup(longLineageRDD2,
-                              sc.makeRDD(1 to 2, 2).map(x => (x % 2, 1)),
-                              partitioner)
+      CheckpointSuite.cogroup(
+        longLineageRDD2,
+        sc.makeRDD(1 to 2, 2).map(x => (x % 2, 1)),
+        partitioner)
     }, reliableCheckpoint, seqCollectFunc)
   }
 
@@ -562,17 +568,20 @@ class CheckpointSuite
   }
 
   runTest("checkpointAllMarkedAncestors") { reliableCheckpoint: Boolean =>
-    testCheckpointAllMarkedAncestors(reliableCheckpoint,
-                                     checkpointAllMarkedAncestors = true)
-    testCheckpointAllMarkedAncestors(reliableCheckpoint,
-                                     checkpointAllMarkedAncestors = false)
+    testCheckpointAllMarkedAncestors(
+      reliableCheckpoint,
+      checkpointAllMarkedAncestors = true)
+    testCheckpointAllMarkedAncestors(
+      reliableCheckpoint,
+      checkpointAllMarkedAncestors = false)
   }
 
   private def testCheckpointAllMarkedAncestors(
       reliableCheckpoint: Boolean,
       checkpointAllMarkedAncestors: Boolean): Unit = {
-    sc.setLocalProperty(RDD.CHECKPOINT_ALL_MARKED_ANCESTORS,
-                        checkpointAllMarkedAncestors.toString)
+    sc.setLocalProperty(
+      RDD.CHECKPOINT_ALL_MARKED_ANCESTORS,
+      checkpointAllMarkedAncestors.toString)
     try {
       val rdd1 = sc.parallelize(1 to 10)
       checkpoint(rdd1, reliableCheckpoint)

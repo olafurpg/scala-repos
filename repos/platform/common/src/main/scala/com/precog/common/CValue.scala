@@ -473,8 +473,9 @@ case class CArray[@spec(Boolean, Long, Double) A](value: Array[A],
   private final def equiv(a: Any, b: Any, elemType: CValueType[_]): Boolean =
     elemType match {
       case CBoolean =>
-        leafEquiv(a.asInstanceOf[Array[Boolean]],
-                  b.asInstanceOf[Array[Boolean]])
+        leafEquiv(
+          a.asInstanceOf[Array[Boolean]],
+          b.asInstanceOf[Array[Boolean]])
 
       case CLong =>
         leafEquiv(a.asInstanceOf[Array[Long]], b.asInstanceOf[Array[Long]])

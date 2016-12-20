@@ -32,10 +32,11 @@ object Test extends DirectTest {
 
   override def show() = {
     val dirs = 1 to 2 map (compilePlugin(_))
-    compile("-Xdev",
-            s"-Xplugin:${dirs mkString ","}",
-            "-usejavacp",
-            "-d",
-            testOutput.path)
+    compile(
+      "-Xdev",
+      s"-Xplugin:${dirs mkString ","}",
+      "-usejavacp",
+      "-d",
+      testOutput.path)
   }
 }

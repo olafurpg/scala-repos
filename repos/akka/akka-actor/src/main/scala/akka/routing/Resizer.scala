@@ -153,8 +153,8 @@ case class DefaultResizer(val lowerBound: Int = 1,
       "upperBound must be >= 0, was: [%s]".format(upperBound))
   if (upperBound < lowerBound)
     throw new IllegalArgumentException(
-      "upperBound must be >= lowerBound, was: [%s] < [%s]".format(upperBound,
-                                                                  lowerBound))
+      "upperBound must be >= lowerBound, was: [%s] < [%s]"
+        .format(upperBound, lowerBound))
   if (rampupRate < 0.0)
     throw new IllegalArgumentException(
       "rampupRate must be >= 0.0, was [%s]".format(rampupRate))
@@ -279,15 +279,17 @@ private[akka] final class ResizablePoolCell(
     _routeeProps: Props,
     _supervisor: InternalActorRef,
     val pool: Pool)
-    extends RoutedActorCell(_system,
-                            _ref,
-                            _routerProps,
-                            _routerDispatcher,
-                            _routeeProps,
-                            _supervisor) {
+    extends RoutedActorCell(
+      _system,
+      _ref,
+      _routerProps,
+      _routerDispatcher,
+      _routeeProps,
+      _supervisor) {
 
-  require(pool.resizer.isDefined,
-          "RouterConfig must be a Pool with defined resizer")
+  require(
+    pool.resizer.isDefined,
+    "RouterConfig must be a Pool with defined resizer")
   val resizer = pool.resizer.get
   private val resizeInProgress = new AtomicBoolean
   private val resizeCounter = new AtomicLong

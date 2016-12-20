@@ -58,8 +58,9 @@ class GaussianTest
 
   test("#295, cdf/inverseCdf broken") {
     val gaussian = Gaussian(0, 1)
-    assert((gaussian.cdf(gaussian.inverseCdf(0.1)) - 0.1).abs <= 1E-3,
-           gaussian.cdf(gaussian.inverseCdf(0.1)) + " was not close to " + 0.1)
+    assert(
+      (gaussian.cdf(gaussian.inverseCdf(0.1)) - 0.1).abs <= 1E-3,
+      gaussian.cdf(gaussian.inverseCdf(0.1)) + " was not close to " + 0.1)
   }
 
   test("Probability of N(0,1)(1) propto exp(-.5))") {

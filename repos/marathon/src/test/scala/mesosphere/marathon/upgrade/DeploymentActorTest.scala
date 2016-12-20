@@ -95,15 +95,16 @@ class DeploymentActorTest
       .thenAnswer(new Answer[Status] {
         def answer(invocation: InvocationOnMock): Status = {
           system.eventStream.publish(
-            MesosStatusUpdateEvent(slaveId = "",
-                                   taskId = Task.Id("task1_2"),
-                                   taskStatus = "TASK_KILLED",
-                                   message = "",
-                                   appId = app1.id,
-                                   host = "",
-                                   ipAddresses = Nil,
-                                   ports = Nil,
-                                   version = app1New.version.toString))
+            MesosStatusUpdateEvent(
+              slaveId = "",
+              taskId = Task.Id("task1_2"),
+              taskStatus = "TASK_KILLED",
+              message = "",
+              appId = app1.id,
+              host = "",
+              ipAddresses = Nil,
+              ports = Nil,
+              version = app1New.version.toString))
           Status.DRIVER_RUNNING
         }
       })
@@ -112,15 +113,16 @@ class DeploymentActorTest
       .thenAnswer(new Answer[Status] {
         def answer(invocation: InvocationOnMock): Status = {
           system.eventStream.publish(
-            MesosStatusUpdateEvent(slaveId = "",
-                                   taskId = Task.Id("task2_1"),
-                                   taskStatus = "TASK_KILLED",
-                                   message = "",
-                                   appId = app2.id,
-                                   host = "",
-                                   ipAddresses = Nil,
-                                   ports = Nil,
-                                   version = app2.version.toString))
+            MesosStatusUpdateEvent(
+              slaveId = "",
+              taskId = Task.Id("task2_1"),
+              taskStatus = "TASK_KILLED",
+              message = "",
+              appId = app2.id,
+              host = "",
+              ipAddresses = Nil,
+              ports = Nil,
+              version = app2.version.toString))
           Status.DRIVER_RUNNING
         }
       })
@@ -130,15 +132,16 @@ class DeploymentActorTest
         println(invocation.getArguments.toSeq)
         for (i <- 0 until invocation.getArguments()(1).asInstanceOf[Int])
           system.eventStream.publish(
-            MesosStatusUpdateEvent(slaveId = "",
-                                   taskId = Task.Id.forApp(app2New.id),
-                                   taskStatus = "TASK_RUNNING",
-                                   message = "",
-                                   appId = app2.id,
-                                   host = "",
-                                   ipAddresses = Nil,
-                                   ports = Nil,
-                                   version = app2New.version.toString))
+            MesosStatusUpdateEvent(
+              slaveId = "",
+              taskId = Task.Id.forApp(app2New.id),
+              taskStatus = "TASK_RUNNING",
+              message = "",
+              appId = app2.id,
+              host = "",
+              ipAddresses = Nil,
+              ports = Nil,
+              version = app2New.version.toString))
         true
       }
     })
@@ -154,15 +157,16 @@ class DeploymentActorTest
     when(scheduler.scale(driver, app3)).thenAnswer(new Answer[Future[Unit]] {
       def answer(invocation: InvocationOnMock): Future[Unit] = {
         system.eventStream.publish(
-          MesosStatusUpdateEvent(slaveId = "",
-                                 taskId = Task.Id("task3_1"),
-                                 taskStatus = "TASK_RUNNING",
-                                 message = "",
-                                 appId = app3.id,
-                                 host = "",
-                                 ipAddresses = Nil,
-                                 ports = Nil,
-                                 version = app3.version.toString))
+          MesosStatusUpdateEvent(
+            slaveId = "",
+            taskId = Task.Id("task3_1"),
+            taskStatus = "TASK_RUNNING",
+            message = "",
+            appId = app3.id,
+            host = "",
+            ipAddresses = Nil,
+            ports = Nil,
+            version = app3.version.toString))
         Future.successful(())
       }
     })
@@ -204,8 +208,9 @@ class DeploymentActorTest
 
       plan.steps.zipWithIndex.foreach {
         case (step, num) =>
-          managerProbe.expectMsg(5.seconds,
-                                 DeploymentStepInfo(plan, step, num + 1))
+          managerProbe.expectMsg(
+            5.seconds,
+            DeploymentStepInfo(plan, step, num + 1))
       }
 
       managerProbe.expectMsg(5.seconds, DeploymentFinished(plan))
@@ -240,25 +245,27 @@ class DeploymentActorTest
       .thenReturn(Set(task1_1, task1_2))
 
     val plan =
-      DeploymentPlan("foo",
-                     origGroup,
-                     targetGroup,
-                     List(DeploymentStep(List(RestartApplication(appNew)))),
-                     Timestamp.now())
+      DeploymentPlan(
+        "foo",
+        origGroup,
+        targetGroup,
+        List(DeploymentStep(List(RestartApplication(appNew)))),
+        Timestamp.now())
 
     when(driver.killTask(task1_1.taskId.mesosTaskId))
       .thenAnswer(new Answer[Status] {
         def answer(invocation: InvocationOnMock): Status = {
           system.eventStream.publish(
-            MesosStatusUpdateEvent("",
-                                   Task.Id("task1_1"),
-                                   "TASK_KILLED",
-                                   "",
-                                   app.id,
-                                   "",
-                                   Nil,
-                                   Nil,
-                                   app.version.toString))
+            MesosStatusUpdateEvent(
+              "",
+              Task.Id("task1_1"),
+              "TASK_KILLED",
+              "",
+              app.id,
+              "",
+              Nil,
+              Nil,
+              app.version.toString))
           Status.DRIVER_RUNNING
         }
       })
@@ -267,15 +274,16 @@ class DeploymentActorTest
       .thenAnswer(new Answer[Status] {
         def answer(invocation: InvocationOnMock): Status = {
           system.eventStream.publish(
-            MesosStatusUpdateEvent("",
-                                   Task.Id("task1_2"),
-                                   "TASK_KILLED",
-                                   "",
-                                   app.id,
-                                   "",
-                                   Nil,
-                                   Nil,
-                                   app.version.toString))
+            MesosStatusUpdateEvent(
+              "",
+              Task.Id("task1_2"),
+              "TASK_KILLED",
+              "",
+              app.id,
+              "",
+              Nil,
+              Nil,
+              app.version.toString))
           Status.DRIVER_RUNNING
         }
       })
@@ -290,15 +298,16 @@ class DeploymentActorTest
       def answer(invocation: InvocationOnMock): Boolean = {
         for (i <- 0 until invocation.getArguments()(1).asInstanceOf[Int])
           system.eventStream.publish(
-            MesosStatusUpdateEvent("",
-                                   Task.Id(s"task1_${taskIDs.next()}"),
-                                   "TASK_RUNNING",
-                                   "",
-                                   app.id,
-                                   "",
-                                   Nil,
-                                   Nil,
-                                   appNew.version.toString))
+            MesosStatusUpdateEvent(
+              "",
+              Task.Id(s"task1_${taskIDs.next()}"),
+              "TASK_RUNNING",
+              "",
+              app.id,
+              "",
+              Nil,
+              Nil,
+              appNew.version.toString))
         true
       }
     })
@@ -343,11 +352,12 @@ class DeploymentActorTest
     val targetGroup = Group(PathId("/foo/bar"), Set(appNew))
 
     val plan =
-      DeploymentPlan("foo",
-                     origGroup,
-                     targetGroup,
-                     List(DeploymentStep(List(RestartApplication(appNew)))),
-                     Timestamp.now())
+      DeploymentPlan(
+        "foo",
+        origGroup,
+        targetGroup,
+        List(DeploymentStep(List(RestartApplication(appNew)))),
+        Timestamp.now())
 
     when(tracker.appTasksLaunchedSync(app.id)).thenReturn(Iterable.empty[Task])
 
@@ -393,9 +403,10 @@ class DeploymentActorTest
     val task1_3 = MarathonTestHelper
       .runningTask("task1_3", appVersion = app1.version, startedAt = 1000)
 
-    val plan = DeploymentPlan(original = origGroup,
-                              target = targetGroup,
-                              toKill = Map(app1.id -> Set(task1_2)))
+    val plan = DeploymentPlan(
+      original = origGroup,
+      target = targetGroup,
+      toKill = Map(app1.id -> Set(task1_2)))
 
     when(tracker.appTasksLaunchedSync(app1.id))
       .thenReturn(Set(task1_1, task1_2, task1_3))
@@ -404,15 +415,16 @@ class DeploymentActorTest
       .thenAnswer(new Answer[Status] {
         def answer(invocation: InvocationOnMock): Status = {
           system.eventStream.publish(
-            MesosStatusUpdateEvent("",
-                                   Task.Id("task1_2"),
-                                   "TASK_KILLED",
-                                   "",
-                                   app1.id,
-                                   "",
-                                   Nil,
-                                   Nil,
-                                   app1New.version.toString))
+            MesosStatusUpdateEvent(
+              "",
+              Task.Id("task1_2"),
+              "TASK_KILLED",
+              "",
+              app1.id,
+              "",
+              Nil,
+              Nil,
+              app1New.version.toString))
           Status.DRIVER_RUNNING
         }
       })
@@ -435,8 +447,9 @@ class DeploymentActorTest
 
       plan.steps.zipWithIndex.foreach {
         case (step, num) =>
-          managerProbe.expectMsg(5.seconds,
-                                 DeploymentStepInfo(plan, step, num + 1))
+          managerProbe.expectMsg(
+            5.seconds,
+            DeploymentStepInfo(plan, step, num + 1))
       }
 
       managerProbe.expectMsg(5.seconds, DeploymentFinished(plan))

@@ -54,16 +54,17 @@ private[akka] object TlsModule {
     val plainIn = Inlet[SslTlsOutbound](s"$name.transportIn")
     val plainOut = Outlet[SslTlsInbound](s"$name.transportOut")
     val shape = new BidiShape(plainIn, cipherOut, cipherIn, plainOut)
-    TlsModule(plainIn,
-              plainOut,
-              cipherIn,
-              cipherOut,
-              shape,
-              attributes,
-              sslContext,
-              firstSession,
-              role,
-              closing,
-              hostInfo)
+    TlsModule(
+      plainIn,
+      plainOut,
+      cipherIn,
+      cipherOut,
+      shape,
+      attributes,
+      sslContext,
+      firstSession,
+      role,
+      closing,
+      hostInfo)
   }
 }

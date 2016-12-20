@@ -109,35 +109,41 @@ trait NIHDBTestActors
 
   type YggConfig <: NIHDBTestActorsConfig
   implicit val M: Monad[Future] with Comonad[Future] =
-    new blueeyes.bkka.UnsafeFutureComonad(executor,
-                                          yggConfig.storageTimeout.duration)
+    new blueeyes.bkka.UnsafeFutureComonad(
+      executor,
+      yggConfig.storageTimeout.duration)
 
-  val accountFinder = new StaticAccountFinder[Future](TestStack.testAccount,
-                                                      TestStack.testAPIKey,
-                                                      Some("/"))
+  val accountFinder = new StaticAccountFinder[Future](
+    TestStack.testAccount,
+    TestStack.testAPIKey,
+    Some("/"))
   val apiKeyFinder = new StaticAPIKeyFinder[Future](TestStack.testAPIKey)
-  val permissionsFinder = new PermissionsFinder(apiKeyFinder,
-                                                accountFinder,
-                                                yggConfig.clock.instant())
+  val permissionsFinder = new PermissionsFinder(
+    apiKeyFinder,
+    accountFinder,
+    yggConfig.clock.instant())
   val jobManager = new InMemoryJobManager[Future]
 
   val masterChef = actorSystem.actorOf(
     Props(
-      Chef(VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
-           VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
-  val resourceBuilder = new ResourceBuilder(actorSystem,
-                                            yggConfig.clock,
-                                            masterChef,
-                                            yggConfig.cookThreshold,
-                                            yggConfig.storageTimeout)
+      Chef(
+        VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
+        VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
+  val resourceBuilder = new ResourceBuilder(
+    actorSystem,
+    yggConfig.clock,
+    masterChef,
+    yggConfig.cookThreshold,
+    yggConfig.storageTimeout)
 
   val projectionsActor = actorSystem.actorOf(
     Props(
-      new PathRoutingActor(yggConfig.dataDir,
-                           yggConfig.storageTimeout.duration,
-                           yggConfig.quiescenceTimeout,
-                           10,
-                           yggConfig.clock)))
+      new PathRoutingActor(
+        yggConfig.dataDir,
+        yggConfig.storageTimeout.duration,
+        yggConfig.quiescenceTimeout,
+        10,
+        yggConfig.clock)))
 }
 
 trait NIHDBTestStack
@@ -180,9 +186,10 @@ trait NIHDBTestStack
       def freshIdScanner = self.freshIdScanner
     }
 
-  val actorVFS = new ActorVFS(projectionsActor,
-                              yggConfig.storageTimeout,
-                              yggConfig.storageTimeout)
+  val actorVFS = new ActorVFS(
+    projectionsActor,
+    yggConfig.storageTimeout,
+    yggConfig.storageTimeout)
   val vfs =
     new SecureVFS(actorVFS, permissionsFinder, jobManager, yggConfig.clock)
 

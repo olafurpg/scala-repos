@@ -274,8 +274,9 @@ object StackClient {
      */
     stk.push(LoadBalancerFactory.module)
     stk.push(StatsFactoryWrapper.module)
-    stk.push(Role.requestDraining,
-             (fac: ServiceFactory[Req, Rep]) => new RefcountedFactory(fac))
+    stk.push(
+      Role.requestDraining,
+      (fac: ServiceFactory[Req, Rep]) => new RefcountedFactory(fac))
     stk.push(TimeoutFactory.module)
     stk.push(Role.prepFactory, identity[ServiceFactory[Req, Rep]](_))
     stk.push(FactoryToService.module)

@@ -171,16 +171,19 @@ case class DefaultOptimalSizeExploringResizer(
   checkParamAsPositiveNum(upperBound, "upperBound")
   if (upperBound < lowerBound)
     throw new IllegalArgumentException(
-      "upperBound must be >= lowerBound, was: [%s] < [%s]".format(upperBound,
-                                                                  lowerBound))
+      "upperBound must be >= lowerBound, was: [%s] < [%s]"
+        .format(upperBound, lowerBound))
 
-  checkParamLowerBound(numOfAdjacentSizesToConsiderDuringOptimization,
-                       2,
-                       "numOfAdjacentSizesToConsiderDuringOptimization")
-  checkParamAsProbability(chanceOfScalingDownWhenFull,
-                          "chanceOfScalingDownWhenFull")
-  checkParamAsPositiveNum(numOfAdjacentSizesToConsiderDuringOptimization,
-                          "numOfAdjacentSizesToConsiderDuringOptimization")
+  checkParamLowerBound(
+    numOfAdjacentSizesToConsiderDuringOptimization,
+    2,
+    "numOfAdjacentSizesToConsiderDuringOptimization")
+  checkParamAsProbability(
+    chanceOfScalingDownWhenFull,
+    "chanceOfScalingDownWhenFull")
+  checkParamAsPositiveNum(
+    numOfAdjacentSizesToConsiderDuringOptimization,
+    "numOfAdjacentSizesToConsiderDuringOptimization")
   checkParamAsPositiveNum(exploreStepSize, "exploreStepSize")
   checkParamAsPositiveNum(downsizeRatio, "downsizeRatio")
   checkParamAsProbability(explorationProbability, "explorationProbability")
@@ -253,11 +256,11 @@ case class DefaultOptimalSizeExploringResizer(
         } else performanceLog
       } else performanceLog
 
-    val newRecord = record.copy(underutilizationStreak =
-                                  newUnderutilizationStreak,
-                                messageCount = messageCounter,
-                                totalQueueLength = totalQueueLength,
-                                checkTime = System.nanoTime())
+    val newRecord = record.copy(
+      underutilizationStreak = newUnderutilizationStreak,
+      messageCount = messageCounter,
+      totalQueueLength = totalQueueLength,
+      checkTime = System.nanoTime())
 
     (newPerformanceLog, newRecord)
   }

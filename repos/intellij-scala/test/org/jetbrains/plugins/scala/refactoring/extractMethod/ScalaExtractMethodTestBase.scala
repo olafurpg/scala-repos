@@ -68,9 +68,10 @@ abstract class ScalaExtractMethodTestBase
       res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim
     } catch {
       case e: Exception =>
-        assert(assertion = false,
-               message = e.getMessage + "\n" +
-                   e.getStackTrace.map(_.toString).mkString("  \n"))
+        assert(
+          assertion = false,
+          message = e.getMessage + "\n" +
+              e.getStackTrace.map(_.toString).mkString("  \n"))
     }
 
     val text = lastPsi.getText

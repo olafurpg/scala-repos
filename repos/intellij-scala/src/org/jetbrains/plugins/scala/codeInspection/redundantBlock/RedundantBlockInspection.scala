@@ -28,15 +28,17 @@ class RedundantBlockInspection extends AbstractInspection {
         if block.hasRBrace && block.getFirstChild.getText == "{" &&
           blockOfExpr.getChildren.length == 1 &&
           !block.getChildren.exists(_.isInstanceOf[ScCaseClauses]) =>
-      holder.registerProblem(block,
-                             new TextRange(0, 1),
-                             "Remove redundant braces",
-                             new InCaseClauseQuickFix(block))
+      holder.registerProblem(
+        block,
+        new TextRange(0, 1),
+        "Remove redundant braces",
+        new InCaseClauseQuickFix(block))
     case block: ScBlockExpr if block.getChildren.length == 3 =>
       if (RedundantBlockInspection.isRedundantBlock(block)) {
-        holder.registerProblem(block,
-                               "The enclosing block is redundant",
-                               new QuickFix(block))
+        holder.registerProblem(
+          block,
+          "The enclosing block is redundant",
+          new QuickFix(block))
       }
   }
 

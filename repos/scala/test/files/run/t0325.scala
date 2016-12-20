@@ -47,8 +47,9 @@ object Test {
       '-' -> "x-z"
     )
     for ((c, str) <- badCases)
-      test(("a" + c + "b").split(str.toArray),
-           "RichString split(\"" + str + "\")")
+      test(
+        ("a" + c + "b").split(str.toArray),
+        "RichString split(\"" + str + "\")")
     println
 
     for ((c, str) <- badCases)

@@ -660,8 +660,9 @@ final class FiniteDuration(val length: Long, val unit: TimeUnit)
   private[this] def add(otherLength: Long,
                         otherUnit: TimeUnit): FiniteDuration = {
     val commonUnit = if (otherUnit.convert(1, unit) == 0) unit else otherUnit
-    val totalLength = safeAdd(commonUnit.convert(length, unit),
-                              commonUnit.convert(otherLength, otherUnit))
+    val totalLength = safeAdd(
+      commonUnit.convert(length, unit),
+      commonUnit.convert(otherLength, otherUnit))
     new FiniteDuration(totalLength, commonUnit)
   }
 

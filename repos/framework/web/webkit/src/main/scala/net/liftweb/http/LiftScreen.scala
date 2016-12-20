@@ -250,37 +250,40 @@ trait AbstractScreen extends Factory with Loggable {
       * Set the Help HTML
       */
     def help(h: NodeSeq): FieldBuilder[T] =
-      new FieldBuilder[T](name,
-                          default,
-                          manifest,
-                          Full(h),
-                          validations,
-                          filters,
-                          stuff)
+      new FieldBuilder[T](
+        name,
+        default,
+        manifest,
+        Full(h),
+        validations,
+        filters,
+        stuff)
 
     /**
       * Add a filter field (the wacky symbols are supposed to look like a filter symbol)
       */
     def <*>(f: T => T): FieldBuilder[T] =
-      new FieldBuilder[T](name,
-                          default,
-                          manifest,
-                          help,
-                          validations,
-                          filters ::: List(f),
-                          stuff)
+      new FieldBuilder[T](
+        name,
+        default,
+        manifest,
+        help,
+        validations,
+        filters ::: List(f),
+        stuff)
 
     /**
       * Add a validation (the wacky symbols are supposed to look like a check mark)
       */
     def ^/(f: T => List[FieldError]): FieldBuilder[T] =
-      new FieldBuilder[T](name,
-                          default,
-                          manifest,
-                          help,
-                          validations ::: List(f),
-                          filters,
-                          stuff)
+      new FieldBuilder[T](
+        name,
+        default,
+        manifest,
+        help,
+        validations ::: List(f),
+        filters,
+        stuff)
 
     /**
       * Convert the field builder into a field
@@ -778,8 +781,9 @@ trait AbstractScreen extends Factory with Loggable {
         case str if (null ne str) && str.length >= len => Nil
         case _ =>
           List(
-            FieldError(currentField.box openOr new FieldIdentifier {},
-                       Text(msg)))
+            FieldError(
+              currentField.box openOr new FieldIdentifier {},
+              Text(msg)))
     }
 
   /**
@@ -793,8 +797,9 @@ trait AbstractScreen extends Factory with Loggable {
         case str if (null eq str) || str.length <= len => Nil
         case _ =>
           List(
-            FieldError(currentField.box openOr new FieldIdentifier {},
-                       Text(msg)))
+            FieldError(
+              currentField.box openOr new FieldIdentifier {},
+              Text(msg)))
     }
 
   /**
@@ -807,8 +812,9 @@ trait AbstractScreen extends Factory with Loggable {
         case str if (null ne str) && pat.matcher(str).matches => Nil
         case _ =>
           List(
-            FieldError(currentField.box openOr new FieldIdentifier {},
-                       Text(msg)))
+            FieldError(
+              currentField.box openOr new FieldIdentifier {},
+              Text(msg)))
     }
 
   protected def minVal[T](len: => T, msg: => String)(
@@ -1083,14 +1089,14 @@ trait AbstractScreen extends Factory with Loggable {
     : Field { type ValueType = T; type OtherValueType = Seq[T] } = {
     val eAttr = grabParams(stuff)
 
-    makeField[T, Seq[T]](name,
-                         default,
-                         field =>
-                           SHtml.selectElem(field.otherValue,
-                                            Full(field.is),
-                                            eAttr: _*)(field.set(_)),
-                         OtherValueInitializerImpl[Seq[T]](() => choices),
-                         stuff: _*)
+    makeField[T, Seq[T]](
+      name,
+      default,
+      field =>
+        SHtml.selectElem(field.otherValue, Full(field.is), eAttr: _*)(
+          field.set(_)),
+      OtherValueInitializerImpl[Seq[T]](() => choices),
+      stuff: _*)
   }
 
   /**
@@ -1196,41 +1202,49 @@ trait ScreenWizardRendered extends Loggable {
       ".%s *" format (f(cssClassBinding))
 
     def remove(f: CssClassBinding => String) =
-      traceInline("Removing %s".format(f(cssClassBinding)),
-                  ".%s".format(f(cssClassBinding))) #> NodeSeq.Empty
+      traceInline(
+        "Removing %s".format(f(cssClassBinding)),
+        ".%s".format(f(cssClassBinding))) #> NodeSeq.Empty
 
     def nsSetChildren(f: CssClassBinding => String, value: NodeSeq) =
-      traceInline("Binding %s to %s".format(replaceChildren(f), value),
-                  replaceChildren(f) #> value)
+      traceInline(
+        "Binding %s to %s".format(replaceChildren(f), value),
+        replaceChildren(f) #> value)
 
     def funcSetChildren(f: CssClassBinding => String,
                         value: NodeSeq => NodeSeq) =
-      traceInline("Binding %s to function".format(replaceChildren(f)),
-                  replaceChildren(f) #> value)
+      traceInline(
+        "Binding %s to function".format(replaceChildren(f)),
+        replaceChildren(f) #> value)
 
     def optSetChildren(f: CssClassBinding => String, value: Box[NodeSeq]) =
-      traceInline("Binding %s to %s".format(replaceChildren(f), value),
-                  replaceChildren(f) #> value)
+      traceInline(
+        "Binding %s to %s".format(replaceChildren(f), value),
+        replaceChildren(f) #> value)
 
     def nsReplace(f: CssClassBinding => String, value: NodeSeq) =
-      traceInline("Binding %s to %s".format(replace(f), value),
-                  replace(f) #> value)
+      traceInline(
+        "Binding %s to %s".format(replace(f), value),
+        replace(f) #> value)
 
     def funcReplace(f: CssClassBinding => String, value: NodeSeq => NodeSeq) =
-      traceInline("Binding %s to function".format(replace(f)),
-                  replace(f) #> value)
+      traceInline(
+        "Binding %s to function".format(replace(f)),
+        replace(f) #> value)
 
     def optReplace(f: CssClassBinding => String, value: Box[NodeSeq]) =
-      traceInline("Binding %s to %s".format(replace(f), value),
-                  replace(f) #> value)
+      traceInline(
+        "Binding %s to %s".format(replace(f), value),
+        replace(f) #> value)
 
     def updateAttrs(metaData: MetaData): NodeSeq => NodeSeq = {
       case e: Elem => e % metaData
     }
 
     def update(f: CssClassBinding => String, metaData: MetaData) =
-      traceInline("Update %s with %s".format(f(cssClassBinding), metaData),
-                  ".%s".format(f(cssClassBinding)) #> updateAttrs(metaData))
+      traceInline(
+        "Update %s with %s".format(f(cssClassBinding), metaData),
+        ".%s".format(f(cssClassBinding)) #> updateAttrs(metaData))
   }
 
   protected def renderAll(currentScreenNumber: Box[NodeSeq],
@@ -1257,12 +1271,13 @@ trait ScreenWizardRendered extends Loggable {
       S.getAllNotices
 
     def fieldsWithStyle(style: BindingStyle, includeMissing: Boolean) =
-      logger.trace("Looking for fields with style %s, includeMissing = %s"
-                     .format(style, includeMissing),
-                   fields filter
-                     (field =>
-                        field.binding map (_.bindingStyle == style) openOr
-                          (includeMissing)))
+      logger.trace(
+        "Looking for fields with style %s, includeMissing = %s"
+          .format(style, includeMissing),
+        fields filter
+          (field =>
+             field.binding map (_.bindingStyle == style) openOr
+               (includeMissing)))
 
     def bindingInfoWithFields(style: BindingStyle) =
       logger.trace("Looking for fields with style %s".format(style), (for {
@@ -1321,11 +1336,12 @@ trait ScreenWizardRendered extends Loggable {
 
     def bindFields: CssBindFunc = {
       logger.trace("Binding fields", fields)
-      List(templateFields,
-           selfFields,
-           defaultFields,
-           customFields,
-           dynamicFields).flatten.reduceLeft(_ & _)
+      List(
+        templateFields,
+        selfFields,
+        defaultFields,
+        customFields,
+        dynamicFields).flatten.reduceLeft(_ & _)
     }
 
     def bindField(f: ScreenFieldInfo): NodeSeq => NodeSeq = {
@@ -1368,8 +1384,9 @@ trait ScreenWizardRendered extends Loggable {
       }
 
       def bindForm(): CssBindFunc =
-        traceInline("Replacing %s with %s".format(replace(_.value), theForm),
-                    replace(_.value) #> theForm)
+        traceInline(
+          "Replacing %s with %s".format(replace(_.value), theForm),
+          replace(_.value) #> theForm)
 
       def bindHelp(): CssBindFunc =
         f.help match {
@@ -1469,8 +1486,9 @@ trait ScreenWizardRendered extends Loggable {
       (currentScreenNumber, screenCount) match {
         case (Full(num), Full(cnt)) =>
           replaceChildren(_.screenInfo) #>
-            (nsSetChildren(_.screenNumber, num) & nsSetChildren(_.totalScreens,
-                                                                cnt))
+            (nsSetChildren(_.screenNumber, num) & nsSetChildren(
+              _.totalScreens,
+              cnt))
         case _ => remove(_.screenInfo)
       }
 
@@ -1924,12 +1942,13 @@ trait LiftScreen
           f =>
             if (f.show_?)
               List(
-                ScreenFieldInfo(f,
-                                f.displayHtml,
-                                f.helpAsHtml,
-                                f.toForm,
-                                fieldBinding(f),
-                                fieldTransform(f)))
+                ScreenFieldInfo(
+                  f,
+                  f.displayHtml,
+                  f.helpAsHtml,
+                  f.toForm,
+                  fieldBinding(f),
+                  fieldTransform(f)))
             else Nil), //fields: List[ScreenFieldInfo],
       Empty, // prev: Box[Elem],
       Full(cancelButton), // cancel: Box[Elem],

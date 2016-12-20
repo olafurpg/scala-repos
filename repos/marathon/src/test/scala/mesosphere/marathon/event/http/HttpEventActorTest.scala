@@ -115,10 +115,10 @@ class HttpEventActorTest
   implicit var system: ActorSystem = _
 
   before {
-    system =
-      ActorSystem("test-system",
-                  ConfigFactory.parseString(
-                    """akka.loggers = ["akka.testkit.TestEventListener"]"""))
+    system = ActorSystem(
+      "test-system",
+      ConfigFactory.parseString(
+        """akka.loggers = ["akka.testkit.TestEventListener"]"""))
     clock = ConstantClock()
     conf = mock[HttpEventConfiguration]
     conf.slowConsumerTimeout returns 10.seconds

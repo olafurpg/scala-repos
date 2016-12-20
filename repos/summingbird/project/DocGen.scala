@@ -29,8 +29,9 @@ object DocGen {
       .map(_.getAbsolutePath)
       .toList
     if (!toClean.isEmpty)
-      git(("rm" :: "-r" :: "-f" :: "--ignore-unmatch" :: toClean): _*)(dir,
-                                                                       s.log)
+      git(("rm" :: "-r" :: "-f" :: "--ignore-unmatch" :: toClean): _*)(
+        dir,
+        s.log)
     ()
   }
 
@@ -43,10 +44,11 @@ object DocGen {
             val docSourceUrl =
               "https://github.com/twitter/" + aggregateName + "/tree/" +
                 tagOrBranch + "€{FILE_PATH}.scala"
-            Seq("-sourcepath",
-                rootBase.getAbsolutePath,
-                "-doc-source-url",
-                docSourceUrl)
+            Seq(
+              "-sourcepath",
+              rootBase.getAbsolutePath,
+              "-doc-source-url",
+              docSourceUrl)
         },
       Unidoc.unidocDirectory := file(docDirectory),
       gitRemoteRepo := "git@github.com:twitter/" + aggregateName + ".git",

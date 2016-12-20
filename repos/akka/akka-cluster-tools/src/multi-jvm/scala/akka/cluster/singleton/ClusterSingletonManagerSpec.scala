@@ -92,15 +92,17 @@ object ClusterSingletonManagerSpec extends MultiNodeConfig {
         sender() ! UnregistrationOk
         context.become(idle)
       case UnregisterConsumer ⇒
-        log.info("UnexpectedUnregistration: [{}], expected [{}]",
-                 sender().path,
-                 consumer.path)
+        log.info(
+          "UnexpectedUnregistration: [{}], expected [{}]",
+          sender().path,
+          consumer.path)
         sender() ! UnexpectedUnregistration
         context stop self
       case RegisterConsumer ⇒
-        log.info("Unexpected RegisterConsumer [{}], active consumer [{}]",
-                 sender().path,
-                 consumer.path)
+        log.info(
+          "Unexpected RegisterConsumer [{}], active consumer [{}]",
+          sender().path,
+          consumer.path)
         sender() ! UnexpectedRegistration
         context stop self
       case Reset ⇒
@@ -361,14 +363,15 @@ class ClusterSingletonManagerSpec
       verifyProxyMsg(first, fifth, msg = msg())
 
       join(sixth, first)
-      awaitMemberUp(memberProbe,
-                    sixth,
-                    fifth,
-                    fourth,
-                    third,
-                    second,
-                    observer,
-                    first)
+      awaitMemberUp(
+        memberProbe,
+        sixth,
+        fifth,
+        fourth,
+        third,
+        second,
+        observer,
+        first)
       verifyMsg(first, msg = msg())
       verifyProxyMsg(first, sixth, msg = msg())
 

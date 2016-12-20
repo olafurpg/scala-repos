@@ -68,10 +68,11 @@ trait IntroduceExpressions { this: ScalaIntroduceVariableHandler =>
 
       ScalaRefactoringUtil.checkCanBeIntroduced(
         expr,
-        showErrorMessageWithException(_,
-                                      project,
-                                      editor,
-                                      INTRODUCE_VARIABLE_REFACTORING_NAME))
+        showErrorMessageWithException(
+          _,
+          project,
+          editor,
+          INTRODUCE_VARIABLE_REFACTORING_NAME))
 
       val fileEncloser = ScalaRefactoringUtil.fileEncloser(startOffset, file)
       val occurrences: Array[TextRange] =
@@ -82,13 +83,14 @@ trait IntroduceExpressions { this: ScalaIntroduceVariableHandler =>
         ScalaVariableValidator(this, project, editor, file, expr, occurrences)
 
       def runWithDialog() {
-        val dialog = getDialog(project,
-                               editor,
-                               expr,
-                               types,
-                               occurrences,
-                               declareVariable = false,
-                               validator)
+        val dialog = getDialog(
+          project,
+          editor,
+          expr,
+          types,
+          occurrences,
+          declareVariable = false,
+          validator)
         if (!dialog.isOK) {
           occurrenceHighlighters.foreach(_.dispose())
           occurrenceHighlighters = Seq.empty
@@ -98,16 +100,17 @@ trait IntroduceExpressions { this: ScalaIntroduceVariableHandler =>
         val varType: ScType = dialog.getSelectedType
         val isVariable: Boolean = dialog.isDeclareVariable
         val replaceAllOccurrences: Boolean = dialog.isReplaceAllOccurrences
-        runRefactoring(startOffset,
-                       endOffset,
-                       file,
-                       editor,
-                       expr,
-                       occurrences,
-                       varName,
-                       varType,
-                       replaceAllOccurrences,
-                       isVariable)
+        runRefactoring(
+          startOffset,
+          endOffset,
+          file,
+          editor,
+          expr,
+          occurrences,
+          varName,
+          varType,
+          replaceAllOccurrences,
+          isVariable)
       }
 
       def runInplace() {
@@ -197,9 +200,10 @@ trait IntroduceExpressions { this: ScalaIntroduceVariableHandler =>
           callback.pass(OccurrencesChooser.ReplaceChoice.NO)
         } else {
           import scala.collection.JavaConverters._
-          chooser.showChooser(new TextRange(startOffset, endOffset),
-                              occurrences.toList.asJava,
-                              callback)
+          chooser.showChooser(
+            new TextRange(startOffset, endOffset),
+            occurrences.toList.asJava,
+            callback)
         }
       }
 
@@ -408,10 +412,11 @@ trait IntroduceExpressions { this: ScalaIntroduceVariableHandler =>
             ScalaPsiElementFactory.createNewLineNode(elem.getManager).getPsi,
             elem)
           if (needSemicolon) {
-            parent.addBefore(ScalaPsiElementFactory
-                               .createNewLineNode(parent.getManager)
-                               .getPsi,
-                             result)
+            parent.addBefore(
+              ScalaPsiElementFactory
+                .createNewLineNode(parent.getManager)
+                .getPsi,
+              result)
           }
         }
       }
@@ -494,22 +499,24 @@ trait IntroduceExpressions { this: ScalaIntroduceVariableHandler =>
                      isVariable: Boolean) {
     val runnable = new Runnable() {
       def run() {
-        runRefactoringInside(startOffset,
-                             endOffset,
-                             file,
-                             editor,
-                             expression,
-                             occurrences_,
-                             varName,
-                             varType,
-                             replaceAllOccurrences,
-                             isVariable) //this for better debug
+        runRefactoringInside(
+          startOffset,
+          endOffset,
+          file,
+          editor,
+          expression,
+          occurrences_,
+          varName,
+          varType,
+          replaceAllOccurrences,
+          isVariable) //this for better debug
       }
     }
 
-    ScalaUtils.runWriteAction(runnable,
-                              editor.getProject,
-                              INTRODUCE_VARIABLE_REFACTORING_NAME)
+    ScalaUtils.runWriteAction(
+      runnable,
+      editor.getProject,
+      INTRODUCE_VARIABLE_REFACTORING_NAME)
     editor.getSelectionModel.removeSelection()
   }
 
@@ -527,16 +534,17 @@ trait IntroduceExpressions { this: ScalaIntroduceVariableHandler =>
 
     new Computable[SmartPsiElementPointer[PsiElement]]() {
       def compute() =
-        runRefactoringInside(startOffset,
-                             endOffset,
-                             file,
-                             editor,
-                             expression,
-                             occurrences_,
-                             varName,
-                             varType,
-                             replaceAllOccurrences,
-                             isVariable)
+        runRefactoringInside(
+          startOffset,
+          endOffset,
+          file,
+          editor,
+          expression,
+          occurrences_,
+          varName,
+          varType,
+          replaceAllOccurrences,
+          isVariable)
     }
   }
 
@@ -554,11 +562,12 @@ trait IntroduceExpressions { this: ScalaIntroduceVariableHandler =>
         ScalaRefactoringUtil.highlightOccurrences(project, occurrences, editor)
 
     val possibleNames = NameSuggester.suggestNames(expr, validator)
-    val dialog = new ScalaIntroduceVariableDialog(project,
-                                                  typez,
-                                                  occurrences.length,
-                                                  validator,
-                                                  possibleNames)
+    val dialog = new ScalaIntroduceVariableDialog(
+      project,
+      typez,
+      occurrences.length,
+      validator,
+      possibleNames)
     dialog.show()
     if (!dialog.isOK) {
       if (occurrences.length > 1) {
@@ -593,25 +602,27 @@ trait IntroduceExpressions { this: ScalaIntroduceVariableHandler =>
 
     ScalaRefactoringUtil.checkCanBeIntroduced(
       expr,
-      showErrorMessageWithException(_,
-                                    project,
-                                    editor,
-                                    INTRODUCE_VARIABLE_REFACTORING_NAME))
+      showErrorMessageWithException(
+        _,
+        project,
+        editor,
+        INTRODUCE_VARIABLE_REFACTORING_NAME))
 
     val fileEncloser = ScalaRefactoringUtil.fileEncloser(startOffset, file)
     val occurrences: Array[TextRange] =
       ScalaRefactoringUtil.getOccurrenceRanges(
         ScalaRefactoringUtil.unparExpr(expr),
         fileEncloser)
-    runRefactoring(startOffset,
-                   endOffset,
-                   file,
-                   editor,
-                   expr,
-                   occurrences,
-                   "value",
-                   types(0),
-                   replaceAll,
-                   isVariable = false)
+    runRefactoring(
+      startOffset,
+      endOffset,
+      file,
+      editor,
+      expr,
+      occurrences,
+      "value",
+      types(0),
+      replaceAll,
+      isVariable = false)
   }
 }

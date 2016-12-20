@@ -249,16 +249,17 @@ class JDBCLEvents(client: String,
         .stringOpt("properties")
         .map(p => DataMap(read[JObject](p)))
         .getOrElse(DataMap()),
-      eventTime = new DateTime(rs.jodaDateTime("eventTime"),
-                               DateTimeZone.forID(rs.string("eventTimeZone"))),
+      eventTime = new DateTime(
+        rs.jodaDateTime("eventTime"),
+        DateTimeZone.forID(rs.string("eventTimeZone"))),
       tags = rs
         .stringOpt("tags")
         .map(t => t.split(",").toList)
         .getOrElse(Nil),
       prId = rs.stringOpt("prId"),
-      creationTime =
-        new DateTime(rs.jodaDateTime("creationTime"),
-                     DateTimeZone.forID(rs.string("creationTimeZone")))
+      creationTime = new DateTime(
+        rs.jodaDateTime("creationTime"),
+        DateTimeZone.forID(rs.string("creationTimeZone")))
     )
   }
 }

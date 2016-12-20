@@ -25,8 +25,9 @@ class Test[@specialized(Int, Double) X](val x: X) {
   // name matching:
   private[this] def checkNameStartsWith(prefix: String): Unit = {
     val method = (new Exception).getStackTrace()(1).getMethodName()
-    assert(method.startsWith(prefix),
-           method + ".startsWith(" + prefix + ") should be true")
+    assert(
+      method.startsWith(prefix),
+      method + ".startsWith(" + prefix + ") should be true")
   }
 }
 

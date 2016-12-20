@@ -110,9 +110,9 @@ class ScalaFunctionalTestSpec extends ExampleSpecification {
         })
         .build()
 
-    "run in a browser" in new WithBrowser(webDriver =
-                                            WebDriverFactory(HTMLUNIT),
-                                          app = applicationWithBrowser) {
+    "run in a browser" in new WithBrowser(
+      webDriver = WebDriverFactory(HTMLUNIT),
+      app = applicationWithBrowser) {
       browser.goTo("/")
 
       // Check the page
@@ -129,8 +129,9 @@ class ScalaFunctionalTestSpec extends ExampleSpecification {
     val myPublicAddress = s"localhost:$testPort"
     val testPaymentGatewayURL = s"http://$myPublicAddress"
     // #scalafunctionaltest-testpaymentgateway
-    "test server logic" in new WithServer(app = applicationWithBrowser,
-                                          port = testPort) {
+    "test server logic" in new WithServer(
+      app = applicationWithBrowser,
+      port = testPort) {
       // The test payment gateway requires a callback to this server before it returns a result...
       val callbackURL = s"http://$myPublicAddress/callback"
 

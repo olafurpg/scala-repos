@@ -126,8 +126,9 @@ class LeaderProxyFilter @Inject()(
         lazy val leaderDataOpt = leaderInfo.currentLeaderHostPort()
 
         if (leaderInfo.elected) {
-          response.addHeader(LeaderProxyFilter.HEADER_MARATHON_LEADER,
-                             buildUrl(myHostPort).toString)
+          response.addHeader(
+            LeaderProxyFilter.HEADER_MARATHON_LEADER,
+            buildUrl(myHostPort).toString)
           chain.doFilter(request, response)
         } else if (leaderDataOpt.forall(_ == myHostPort)) {
           // either not leader or ourselves
@@ -137,8 +138,9 @@ class LeaderProxyFilter @Inject()(
           if (waitForConsistentLeadership(response)) {
             doFilter(rawRequest, rawResponse, chain)
           } else {
-            response.sendError(HttpStatus.SC_SERVICE_UNAVAILABLE,
-                               ERROR_STATUS_NO_CURRENT_LEADER)
+            response.sendError(
+              HttpStatus.SC_SERVICE_UNAVAILABLE,
+              ERROR_STATUS_NO_CURRENT_LEADER)
           }
         } else {
           try {
@@ -324,8 +326,9 @@ class JavaUrlConnectionRequestForwarder @Inject()(
           copyConnectionResponse(leaderConnection, response)
         } catch {
           case connException: ConnectException =>
-            response.sendError(HttpStatus.SC_BAD_GATEWAY,
-                               ERROR_STATUS_CONNECTION_REFUSED)
+            response.sendError(
+              HttpStatus.SC_BAD_GATEWAY,
+              ERROR_STATUS_CONNECTION_REFUSED)
         } finally {
           Try(leaderConnection.getInputStream.close())
           Try(leaderConnection.getErrorStream.close())

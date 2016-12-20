@@ -72,8 +72,9 @@ object UdpConnected
     * has been successfully enqueued to the O/S kernel.
     */
   final case class Send(payload: ByteString, ack: Any) extends Command {
-    require(ack != null,
-            "ack must be non-null. Use NoAck if you don't want acks.")
+    require(
+      ack != null,
+      "ack must be non-null. Use NoAck if you don't want acks.")
 
     def wantsAck: Boolean = !ack.isInstanceOf[NoAck]
   }

@@ -16,11 +16,12 @@ import scala.reflect.ClassTag
 class AkkaConsoleReporter(registry: AkkaMetricRegistry,
                           verbose: Boolean,
                           output: PrintStream = System.out)
-    extends ScheduledReporter(registry.asInstanceOf[MetricRegistry],
-                              "akka-console-reporter",
-                              MetricFilter.ALL,
-                              TimeUnit.SECONDS,
-                              TimeUnit.NANOSECONDS) {
+    extends ScheduledReporter(
+      registry.asInstanceOf[MetricRegistry],
+      "akka-console-reporter",
+      MetricFilter.ALL,
+      TimeUnit.SECONDS,
+      TimeUnit.NANOSECONDS) {
 
   private final val ConsoleWidth = 80
 
@@ -39,8 +40,9 @@ class AkkaConsoleReporter(registry: AkkaMetricRegistry,
     printMetrics(timers.asScala, printTimer)
 
     // custom Akka types
-    printMetrics(registry.getKnownOpsInTimespanCounters,
-                 printKnownOpsInTimespanCounter)
+    printMetrics(
+      registry.getKnownOpsInTimespanCounters,
+      printKnownOpsInTimespanCounter)
     printMetrics(registry.getHdrHistograms, printHdrHistogram)
     printMetrics(registry.getAveragingGauges, printAveragingGauge)
 
@@ -172,20 +174,20 @@ class AkkaConsoleReporter(registry: AkkaMetricRegistry,
     output.print("              mean = %2.2f %s%n".format(data.getMean, unit))
     output.print("            stddev = %2.2f%n".format(data.getStdDeviation))
     output.print(
-      "              75%% <= %d %s%n".format(data.getValueAtPercentile(75.0),
-                                             unit))
+      "              75%% <= %d %s%n"
+        .format(data.getValueAtPercentile(75.0), unit))
     output.print(
-      "              95%% <= %d %s%n".format(data.getValueAtPercentile(95.0),
-                                             unit))
+      "              95%% <= %d %s%n"
+        .format(data.getValueAtPercentile(95.0), unit))
     output.print(
-      "              98%% <= %d %s%n".format(data.getValueAtPercentile(98.0),
-                                             unit))
+      "              98%% <= %d %s%n"
+        .format(data.getValueAtPercentile(98.0), unit))
     output.print(
-      "              99%% <= %d %s%n".format(data.getValueAtPercentile(99.0),
-                                             unit))
+      "              99%% <= %d %s%n"
+        .format(data.getValueAtPercentile(99.0), unit))
     output.print(
-      "            99.9%% <= %d %s%n".format(data.getValueAtPercentile(99.9),
-                                             unit))
+      "            99.9%% <= %d %s%n"
+        .format(data.getValueAtPercentile(99.9), unit))
 
     if (verbose) data.outputPercentileDistribution(output, 1)
   }

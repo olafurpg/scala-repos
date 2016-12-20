@@ -107,11 +107,12 @@ object ScalaI18nUtil {
       @NotNull expression: ScLiteral,
       @NotNull annotationAttributeValues: mutable.HashMap[String, AnyRef])
     : Boolean = {
-    isPassedToAnnotatedParam(project,
-                             expression,
-                             AnnotationUtil.PROPERTY_KEY,
-                             annotationAttributeValues,
-                             null)
+    isPassedToAnnotatedParam(
+      project,
+      expression,
+      AnnotationUtil.PROPERTY_KEY,
+      annotationAttributeValues,
+      null)
   }
 
   def isPassedToAnnotatedParam(
@@ -148,12 +149,13 @@ object ScalaI18nUtil {
             method match {
               case psiMethod: PsiMethod =>
                 if (method != null &&
-                    isMethodParameterAnnotatedWith(psiMethod,
-                                                   idx,
-                                                   null,
-                                                   annFqn,
-                                                   annotationAttributeValues,
-                                                   nonNlsTargets)) {
+                    isMethodParameterAnnotatedWith(
+                      psiMethod,
+                      idx,
+                      null,
+                      annFqn,
+                      annotationAttributeValues,
+                      nonNlsTargets)) {
                   return true
                 }
               case _ =>
@@ -173,11 +175,12 @@ object ScalaI18nUtil {
         expression.getParent.isInstanceOf[PsiBinaryExpression]) {
       return CachedValuesManager
         .getManager(project)
-        .getParameterizedCachedValue(expression,
-                                     TOP_LEVEL_EXPRESSION,
-                                     TOP_LEVEL_PROVIDER,
-                                     true,
-                                     (project, expression))
+        .getParameterizedCachedValue(
+          expression,
+          TOP_LEVEL_EXPRESSION,
+          TOP_LEVEL_PROVIDER,
+          true,
+          (project, expression))
     }
     getTopLevel(project, expression)
   }
@@ -263,12 +266,13 @@ object ScalaI18nUtil {
     }
     val superMethods: Array[PsiMethod] = method.findSuperMethods
     for (superMethod <- superMethods) {
-      if (isMethodParameterAnnotatedWith(superMethod,
-                                         idx,
-                                         processed,
-                                         annFqn,
-                                         annotationAttributeValues,
-                                         null)) return true
+      if (isMethodParameterAnnotatedWith(
+            superMethod,
+            idx,
+            processed,
+            annFqn,
+            annotationAttributeValues,
+            null)) return true
     }
     false
   }
@@ -504,8 +508,9 @@ object ScalaI18nUtil {
     if (editor == null) return null
     val selectedText: String = editor.getSelectionModel.getSelectedText
     if (selectedText != null) {
-      return new TextRange(editor.getSelectionModel.getSelectionStart,
-                           editor.getSelectionModel.getSelectionEnd)
+      return new TextRange(
+        editor.getSelectionModel.getSelectionStart,
+        editor.getSelectionModel.getSelectionEnd)
     }
     val psiElement: PsiElement =
       psiFile.findElementAt(editor.getCaretModel.getOffset)

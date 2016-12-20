@@ -37,12 +37,13 @@ object PlayRun {
   val createDelegatedResourcesClassLoader: ClassLoaderCreator =
     Reloader.createDelegatedResourcesClassLoader
 
-  val playDefaultRunTask = playRunTask(playRunHooks,
-                                       playDependencyClasspath,
-                                       playDependencyClassLoader,
-                                       playReloaderClasspath,
-                                       playReloaderClassLoader,
-                                       playAssetsClassLoader)
+  val playDefaultRunTask = playRunTask(
+    playRunHooks,
+    playDependencyClasspath,
+    playDependencyClassLoader,
+    playReloaderClasspath,
+    playReloaderClassLoader,
+    playAssetsClassLoader)
 
   /**
     * This method is public API, used by sbt-echo, which is used by Activator:
@@ -135,10 +136,11 @@ object PlayRun {
           case Some(watched) =>
             // ~ run mode
             interaction doWithoutEcho {
-              twiddleRunMonitor(watched,
-                                state,
-                                devModeServer.buildLink,
-                                Some(WatchState.empty))
+              twiddleRunMonitor(
+                watched,
+                state,
+                devModeServer.buildLink,
+                Some(WatchState.empty))
             }
           case None =>
             // run mode
@@ -172,9 +174,10 @@ object PlayRun {
 
     val (triggered, newWatchState, newState) = try {
       val (triggered, newWatchState) =
-        SourceModificationWatch.watch(sourcesFinder,
-                                      watched.pollInterval,
-                                      watchState)(shouldTerminate)
+        SourceModificationWatch.watch(
+          sourcesFinder,
+          watched.pollInterval,
+          watchState)(shouldTerminate)
       (triggered, newWatchState, state)
     } catch {
       case e: Exception =>
@@ -269,8 +272,9 @@ object PlayRun {
       extracted.get(playDefaultPort),
       extracted.get(playDefaultAddress),
       devSettings)
-    require(httpPort.isDefined || httpsPort.isDefined,
-            "You have to specify https.port when http.port is disabled")
+    require(
+      httpPort.isDefined || httpsPort.isDefined,
+      "You have to specify https.port when http.port is disabled")
 
     Project.runTask(stage, state).get._2.toEither match {
       case Left(_) =>

@@ -166,23 +166,27 @@ object AlterTableCommandParser {
           node.source)
 
       // ALTER TABLE table_name [PARTITION spec] SET SERDE serde_name [WITH SERDEPROPERTIES props];
-      case Token("TOK_ALTERTABLE_SERIALIZER",
-                 Token(serdeClassName, Nil) :: serdeArgs) :: _ =>
-        AlterTableSerDeProperties(tableIdent,
-                                  Some(cleanAndUnquoteString(serdeClassName)),
-                                  serdeArgs.headOption.map(extractTableProps),
-                                  partition)(node.source)
+      case Token(
+            "TOK_ALTERTABLE_SERIALIZER",
+            Token(serdeClassName, Nil) :: serdeArgs) :: _ =>
+        AlterTableSerDeProperties(
+          tableIdent,
+          Some(cleanAndUnquoteString(serdeClassName)),
+          serdeArgs.headOption.map(extractTableProps),
+          partition)(node.source)
 
       // ALTER TABLE table_name [PARTITION spec] SET SERDEPROPERTIES serde_properties;
       case Token("TOK_ALTERTABLE_SERDEPROPERTIES", args) :: _ =>
-        AlterTableSerDeProperties(tableIdent,
-                                  None,
-                                  Some(extractTableProps(args.head)),
-                                  partition)(node.source)
+        AlterTableSerDeProperties(
+          tableIdent,
+          None,
+          Some(extractTableProps(args.head)),
+          partition)(node.source)
 
       // ALTER TABLE table_name CLUSTERED BY (col, ...) [SORTED BY (col, ...)] INTO n BUCKETS;
-      case Token("TOK_ALTERTABLE_CLUSTER_SORT",
-                 Token("TOK_ALTERTABLE_BUCKETS", b) :: Nil) :: _ =>
+      case Token(
+            "TOK_ALTERTABLE_CLUSTER_SORT",
+            Token("TOK_ALTERTABLE_BUCKETS", b) :: Nil) :: _ =>
         val clusterCols: Seq[String] = b.head match {
           case Token("TOK_TABCOLNAME", children) => children.map(_.text)
           case _ => parseFailed("Invalid ALTER TABLE command", node)
@@ -190,18 +194,21 @@ object AlterTableCommandParser {
         // If sort columns are specified, num buckets should be the third arg.
         // If sort columns are not specified, num buckets should be the second arg.
         // TODO: actually use `sortDirections` once we actually store that in the metastore
-        val (sortCols: Seq[String],
-             sortDirections: Seq[SortDirection],
-             numBuckets: Int) = {
+        val (
+          sortCols: Seq[String],
+          sortDirections: Seq[SortDirection],
+          numBuckets: Int) = {
           b.tail match {
             case Token("TOK_TABCOLNAME", children) :: numBucketsNode :: Nil =>
               val (cols, directions) = children
                 .map {
-                  case Token("TOK_TABSORTCOLNAMEASC",
-                             Token(col, Nil) :: Nil) =>
+                  case Token(
+                      "TOK_TABSORTCOLNAMEASC",
+                      Token(col, Nil) :: Nil) =>
                     (col, Ascending)
-                  case Token("TOK_TABSORTCOLNAMEDESC",
-                             Token(col, Nil) :: Nil) =>
+                  case Token(
+                      "TOK_TABSORTCOLNAMEDESC",
+                      Token(col, Nil) :: Nil) =>
                     (col, Descending)
                 }
                 .unzip
@@ -217,13 +224,15 @@ object AlterTableCommandParser {
           BucketSpec(numBuckets, clusterCols, sortCols))(node.source)
 
       // ALTER TABLE table_name NOT CLUSTERED
-      case Token("TOK_ALTERTABLE_CLUSTER_SORT",
-                 Token("TOK_NOT_CLUSTERED", Nil) :: Nil) :: _ =>
+      case Token(
+            "TOK_ALTERTABLE_CLUSTER_SORT",
+            Token("TOK_NOT_CLUSTERED", Nil) :: Nil) :: _ =>
         AlterTableNotClustered(tableIdent)(node.source)
 
       // ALTER TABLE table_name NOT SORTED
-      case Token("TOK_ALTERTABLE_CLUSTER_SORT",
-                 Token("TOK_NOT_SORTED", Nil) :: Nil) :: _ =>
+      case Token(
+            "TOK_ALTERTABLE_CLUSTER_SORT",
+            Token("TOK_NOT_SORTED", Nil) :: Nil) :: _ =>
         AlterTableNotSorted(tableIdent)(node.source)
 
       // ALTER TABLE table_name SKEWED BY (col1, col2)
@@ -261,8 +270,9 @@ object AlterTableCommandParser {
             })
           case Token("TOK_TABCOLVALUE_PAIR", pairs) =>
             pairs.map {
-              case Token("TOK_TABCOLVALUES",
-                         Token("TOK_TABCOLVALUE", vals) :: Nil) =>
+              case Token(
+                  "TOK_TABCOLVALUES",
+                  Token("TOK_TABCOLVALUE", vals) :: Nil) =>
                 vals.map { n =>
                   cleanAndUnquoteString(n.text)
                 }
@@ -283,8 +293,9 @@ object AlterTableCommandParser {
         AlterTableNotSkewed(tableIdent)(node.source)
 
       // ALTER TABLE table_name NOT STORED AS DIRECTORIES
-      case Token("TOK_ALTERTABLE_SKEWED",
-                 Token("TOK_STOREDASDIRS", Nil) :: Nil) :: _ =>
+      case Token(
+            "TOK_ALTERTABLE_SKEWED",
+            Token("TOK_STOREDASDIRS", Nil) :: Nil) :: _ =>
         AlterTableNotStoredAsDirs(tableIdent)(node.source)
 
       // ALTER TABLE table_name SET SKEWED LOCATION (col1="loc1" [, (col2, col3)="loc2", ...] );
@@ -315,8 +326,9 @@ object AlterTableCommandParser {
                   Seq(
                     (cleanAndUnquoteString(const),
                      cleanAndUnquoteString(loc.text)))
-                case Token("TOK_TABCOLVALUES",
-                           Token("TOK_TABCOLVALUE", keys) :: Nil) =>
+                case Token(
+                    "TOK_TABCOLVALUES",
+                    Token("TOK_TABCOLVALUE", keys) :: Nil) =>
                   keys.map { k =>
                     (cleanAndUnquoteString(k.text),
                      cleanAndUnquoteString(loc.text))
@@ -414,9 +426,10 @@ object AlterTableCommandParser {
 
       // ALTER TABLE table_name [PARTITION spec] SET LOCATION "loc";
       case Token("TOK_ALTERTABLE_LOCATION", Token(loc, Nil) :: Nil) :: _ =>
-        AlterTableSetLocation(tableIdent,
-                              partition,
-                              cleanAndUnquoteString(loc))(node.source)
+        AlterTableSetLocation(
+          tableIdent,
+          partition,
+          cleanAndUnquoteString(loc))(node.source)
 
       // ALTER TABLE table_name TOUCH [PARTITION spec];
       case Token("TOK_ALTERTABLE_TOUCH", args) :: _ =>
@@ -428,9 +441,10 @@ object AlterTableCommandParser {
 
       // ALTER TABLE table_name [PARTITION spec] COMPACT 'compaction_type';
       case Token("TOK_ALTERTABLE_COMPACT", Token(compactType, Nil) :: Nil) :: _ =>
-        AlterTableCompact(tableIdent,
-                          partition,
-                          cleanAndUnquoteString(compactType))(node.source)
+        AlterTableCompact(
+          tableIdent,
+          partition,
+          cleanAndUnquoteString(compactType))(node.source)
 
       // ALTER TABLE table_name [PARTITION spec] CONCATENATE;
       case Token("TOK_ALTERTABLE_MERGEFILES", _) :: _ =>
@@ -438,8 +452,9 @@ object AlterTableCommandParser {
 
       // ALTER TABLE table_name [PARTITION spec] CHANGE [COLUMN] col_old_name col_new_name
       // column_type [COMMENT col_comment] [FIRST|AFTER column_name] [CASCADE|RESTRICT];
-      case Token("TOK_ALTERTABLE_RENAMECOL",
-                 oldName :: newName :: dataType :: args) :: _ =>
+      case Token(
+            "TOK_ALTERTABLE_RENAMECOL",
+            oldName :: newName :: dataType :: args) :: _ =>
         val afterColName: Option[String] =
           getClauseOption("TOK_ALTERTABLE_CHANGECOL_AFTER_POSITION", args)
             .map { ap =>
@@ -457,15 +472,16 @@ object AlterTableCommandParser {
           case Token(commentStr, Nil) => cleanAndUnquoteString(commentStr)
           case _ => parseFailed("Invalid ALTER TABLE command", node)
         }
-        AlterTableChangeCol(tableIdent,
-                            partition,
-                            oldName.text,
-                            newName.text,
-                            nodeToDataType(dataType),
-                            comment,
-                            afterColName,
-                            restrict,
-                            cascade)(node.source)
+        AlterTableChangeCol(
+          tableIdent,
+          partition,
+          oldName.text,
+          newName.text,
+          nodeToDataType(dataType),
+          comment,
+          afterColName,
+          restrict,
+          cascade)(node.source)
 
       // ALTER TABLE table_name [PARTITION spec] ADD COLUMNS (name type [COMMENT comment], ...)
       // [CASCADE|RESTRICT]
@@ -484,11 +500,12 @@ object AlterTableCommandParser {
         val columns = StructType(columnNodes.map(nodeToStructField))
         val restrict = getClauseOption("TOK_RESTRICT", args).isDefined
         val cascade = getClauseOption("TOK_CASCADE", args).isDefined
-        AlterTableReplaceCol(tableIdent,
-                             partition,
-                             columns,
-                             restrict,
-                             cascade)(node.source)
+        AlterTableReplaceCol(
+          tableIdent,
+          partition,
+          columns,
+          restrict,
+          cascade)(node.source)
 
       case _ =>
         parseFailed("Unsupported ALTER TABLE command", node)

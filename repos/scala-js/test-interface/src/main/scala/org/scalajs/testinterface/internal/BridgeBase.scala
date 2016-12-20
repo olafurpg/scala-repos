@@ -56,9 +56,10 @@ abstract class BridgeBase(frameworkName: String) {
           task,
           taskDef => js.JSON.stringify(TaskDefSerializer.serialize(taskDef)))
 
-        lit(serializedTask = serTask,
-            taskDef = TaskDefSerializer.serialize(task.taskDef),
-            tags = task.tags.toJSArray)
+        lit(
+          serializedTask = serTask,
+          taskDef = TaskDefSerializer.serialize(task.taskDef),
+          tags = task.tags.toJSArray)
       }
       .toJSArray
   }

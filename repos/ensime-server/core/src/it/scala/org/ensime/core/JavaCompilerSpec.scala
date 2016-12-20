@@ -21,12 +21,13 @@ class JavaCompilerSpec
 
   "JavaCompiler" should "generate compilation notes" in {
     withJavaCompiler { (_, config, cc, store, search) =>
-      runForPositionInCompiledSource(config,
-                                     cc,
-                                     "import java.io.File;",
-                                     "class Test1 {",
-                                     "  ksjdfkdjsf @1@",
-                                     "}") { (sf, p, label, cc) =>
+      runForPositionInCompiledSource(
+        config,
+        cc,
+        "import java.io.File;",
+        "class Test1 {",
+        "  ksjdfkdjsf @1@",
+        "}") { (sf, p, label, cc) =>
         }
       store.notes should not be empty
     }
@@ -34,15 +35,16 @@ class JavaCompilerSpec
 
   it should "find type at point" in {
     withJavaCompiler { (_, config, cc, store, search) =>
-      runForPositionInCompiledSource(config,
-                                     cc,
-                                     "import java.io.File;",
-                                     "class Tes@0@t1 {",
-                                     "  private void main() {",
-                                     "    int fo@1@o = 1;",
-                                     "    System.out.println(fo@2@o);",
-                                     "  }",
-                                     "}") { (sf, offset, label, cc) =>
+      runForPositionInCompiledSource(
+        config,
+        cc,
+        "import java.io.File;",
+        "class Tes@0@t1 {",
+        "  private void main() {",
+        "    int fo@1@o = 1;",
+        "    System.out.println(fo@2@o);",
+        "  }",
+        "}") { (sf, offset, label, cc) =>
         val info = cc.askTypeAtPoint(sf, offset).get
         label match {
           case "0" => info.name shouldBe "Test1"
@@ -56,11 +58,13 @@ class JavaCompilerSpec
   it should "link symbols to their source positions" in {
     withJavaCompiler { (_, config, cc, store, _) =>
       val test1 = SourceFileInfo(
-        new File(config.rootDir,
-                 "testing/simple/src/main/java/org/example/Test1.java"))
+        new File(
+          config.rootDir,
+          "testing/simple/src/main/java/org/example/Test1.java"))
       val test2 = SourceFileInfo(
-        new File(config.rootDir,
-                 "testing/simple/src/main/java/org/example/Test2.java"))
+        new File(
+          config.rootDir,
+          "testing/simple/src/main/java/org/example/Test2.java"))
 
       cc.askLinkPos(JavaFqn("org.example", "Test2", None), test2) should matchPattern {
         case Some(OffsetSourcePosition(f, 22)) =>
@@ -333,14 +337,17 @@ class JavaCompilerSpec
                 "createTempFile(java.lang.String,java.lang.String,java.io.File)"));
           case "5" => sig.fqn shouldBe DocFqn("java.io", "File")
           case "6" =>
-            sig shouldBe DocSig(DocFqn("java.lang", "String"),
-                                Some("indexOf(java.lang.String)"));
+            sig shouldBe DocSig(
+              DocFqn("java.lang", "String"),
+              Some("indexOf(java.lang.String)"));
           case "7" =>
-            sig shouldBe DocSig(DocFqn("java.lang", "String"),
-                                Some("indexOf(java.lang.String,int)"));
+            sig shouldBe DocSig(
+              DocFqn("java.lang", "String"),
+              Some("indexOf(java.lang.String,int)"));
           case "8" =>
-            sig shouldBe DocSig(DocFqn("java.lang", "String"),
-                                Some("indexOf(int)"));
+            sig shouldBe DocSig(
+              DocFqn("java.lang", "String"),
+              Some("indexOf(int)"));
         }
       }
   }

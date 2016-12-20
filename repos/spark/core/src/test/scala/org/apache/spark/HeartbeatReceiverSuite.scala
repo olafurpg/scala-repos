@@ -219,8 +219,9 @@ class HeartbeatReceiverSuite
     // explicitly request new executors. For more detail, see SPARK-8119.
     assert(fakeClusterManager.getTargetNumExecutors === 2)
     assert(
-      fakeClusterManager.getExecutorIdsToKill === Set(executorId1,
-                                                      executorId2))
+      fakeClusterManager.getExecutorIdsToKill === Set(
+        executorId1,
+        executorId2))
   }
 
   /** Manually send a heartbeat and return the response. */
@@ -229,9 +230,10 @@ class HeartbeatReceiverSuite
     val metrics = new TaskMetrics
     val blockManagerId = BlockManagerId(executorId, "localhost", 12345)
     val response = heartbeatReceiverRef.askWithRetry[HeartbeatResponse](
-      Heartbeat(executorId,
-                Array(1L -> metrics.accumulatorUpdates()),
-                blockManagerId))
+      Heartbeat(
+        executorId,
+        Array(1L -> metrics.accumulatorUpdates()),
+        blockManagerId))
     if (executorShouldReregister) {
       assert(response.reregisterBlockManager)
     } else {
@@ -284,9 +286,10 @@ private class FakeSchedulerBackend(scheduler: TaskSchedulerImpl,
   protected override def doRequestTotalExecutors(
       requestedTotal: Int): Boolean = {
     clusterManagerEndpoint.askWithRetry[Boolean](
-      RequestExecutors(requestedTotal,
-                       localityAwareTasks,
-                       hostToLocalTaskCount))
+      RequestExecutors(
+        requestedTotal,
+        localityAwareTasks,
+        hostToLocalTaskCount))
   }
 
   protected override def doKillExecutors(executorIds: Seq[String]): Boolean = {

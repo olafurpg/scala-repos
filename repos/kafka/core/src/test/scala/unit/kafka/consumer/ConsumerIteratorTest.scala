@@ -57,27 +57,29 @@ class ConsumerIteratorTest extends KafkaServerTestHarness {
     super.setUp()
     topicInfos = configs.map(
       c =>
-        new PartitionTopicInfo(topic,
-                               0,
-                               queue,
-                               new AtomicLong(consumedOffset),
-                               new AtomicLong(0),
-                               new AtomicInteger(0),
-                               ""))
-    createTopic(zkUtils,
-                topic,
-                partitionReplicaAssignment =
-                  Map(0 -> Seq(configs.head.brokerId)),
-                servers = servers)
+        new PartitionTopicInfo(
+          topic,
+          0,
+          queue,
+          new AtomicLong(consumedOffset),
+          new AtomicLong(0),
+          new AtomicInteger(0),
+          ""))
+    createTopic(
+      zkUtils,
+      topic,
+      partitionReplicaAssignment = Map(0 -> Seq(configs.head.brokerId)),
+      servers = servers)
   }
 
   @Test
   def testConsumerIteratorDeduplicationDeepIterator() {
     val messageStrings = (0 until 10).map(_.toString).toList
     val messages = messageStrings.map(s => new Message(s.getBytes))
-    val messageSet = new ByteBufferMessageSet(DefaultCompressionCodec,
-                                              new LongRef(0),
-                                              messages: _*)
+    val messageSet = new ByteBufferMessageSet(
+      DefaultCompressionCodec,
+      new LongRef(0),
+      messages: _*)
 
     topicInfos(0).enqueue(messageSet)
     assertEquals(1, queue.size)
@@ -104,9 +106,10 @@ class ConsumerIteratorTest extends KafkaServerTestHarness {
   def testConsumerIteratorDecodingFailure() {
     val messageStrings = (0 until 10).map(_.toString).toList
     val messages = messageStrings.map(s => new Message(s.getBytes))
-    val messageSet = new ByteBufferMessageSet(NoCompressionCodec,
-                                              new LongRef(0),
-                                              messages: _*)
+    val messageSet = new ByteBufferMessageSet(
+      NoCompressionCodec,
+      new LongRef(0),
+      messages: _*)
 
     topicInfos(0).enqueue(messageSet)
     assertEquals(1, queue.size)

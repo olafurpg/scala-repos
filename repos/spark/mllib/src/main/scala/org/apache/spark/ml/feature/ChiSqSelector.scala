@@ -140,9 +140,10 @@ final class ChiSqSelectorModel private[ml] (
     val transformedSchema = transformSchema(dataset.schema, logging = true)
     val newField = transformedSchema.last
     val selector = udf { chiSqSelector.transform _ }
-    dataset.withColumn($(outputCol),
-                       selector(col($(featuresCol))),
-                       newField.metadata)
+    dataset.withColumn(
+      $(outputCol),
+      selector(col($(featuresCol))),
+      newField.metadata)
   }
 
   override def transformSchema(schema: StructType): StructType = {

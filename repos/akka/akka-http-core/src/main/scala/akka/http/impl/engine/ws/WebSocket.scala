@@ -43,8 +43,9 @@ private[http] object WebSocket {
                         ByteString,
                         NotUsed] =
     BidiFlow
-      .fromFlows(Flow[ByteString].via(FrameEventParser),
-                 Flow[FrameEvent].transform(() ⇒ new FrameEventRenderer))
+      .fromFlows(
+        Flow[ByteString].via(FrameEventParser),
+        Flow[FrameEvent].transform(() ⇒ new FrameEventRenderer))
       .named("ws-framing")
 
   /** The layer that handles masking using the rules defined in the specification */
@@ -68,8 +69,9 @@ private[http] object WebSocket {
                                                    FrameStart,
                                                    NotUsed] =
     BidiFlow
-      .fromFlows(FrameHandler.create(server = serverSide),
-                 FrameOutHandler.create(serverSide, closeTimeout, log))
+      .fromFlows(
+        FrameHandler.create(server = serverSide),
+        FrameOutHandler.create(serverSide, closeTimeout, log))
       .named("ws-frame-handling")
 
   /**
@@ -169,10 +171,11 @@ private[http] object WebSocket {
           // timeout support
           tick ~> merge.in2
 
-          BidiShape(split.in,
-                    messagePreparation.out,
-                    messageRendering.in,
-                    merge.out)
+          BidiShape(
+            split.in,
+            messagePreparation.out,
+            messageRendering.in,
+            merge.out)
         }
         .named("ws-message-api"))
   }

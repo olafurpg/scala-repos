@@ -94,15 +94,15 @@ class GraphMatValueSpec extends AkkaSpec {
 
         "work properly with nesting and reusing" in {
           val compositeSource1 =
-            Source.fromGraph(GraphDSL.create(foldFeedbackSource,
-                                             foldFeedbackSource)(Keep.both) {
-              implicit b ⇒ (s1, s2) ⇒
+            Source.fromGraph(
+              GraphDSL.create(foldFeedbackSource, foldFeedbackSource)(
+                Keep.both) { implicit b ⇒ (s1, s2) ⇒
                 val zip = b.add(ZipWith[Int, Int, Int](_ + _))
 
                 s1.out.mapAsync(4)(identity) ~> zip.in0
                 s2.out.mapAsync(4)(identity).map(_ * 100) ~> zip.in1
                 SourceShape(zip.out)
-            })
+              })
 
           val compositeSource2 = Source.fromGraph(
             GraphDSL.create(compositeSource1, compositeSource1)(Keep.both) {
@@ -124,14 +124,17 @@ class GraphMatValueSpec extends AkkaSpec {
         }
 
         "work also when the source’s module is copied" in {
-          val foldFlow: Flow[Int, Int, Future[Int]] = Flow.fromGraph(
-            GraphDSL.create(foldSink) { implicit builder ⇒ fold ⇒
-              FlowShape(fold.in,
-                        builder.materializedValue.mapAsync(4)(identity).outlet)
+          val foldFlow: Flow[Int, Int, Future[Int]] =
+            Flow.fromGraph(GraphDSL.create(foldSink) {
+              implicit builder ⇒ fold ⇒
+                FlowShape(
+                  fold.in,
+                  builder.materializedValue.mapAsync(4)(identity).outlet)
             })
 
-          Await.result(Source(1 to 10).via(foldFlow).runWith(Sink.head),
-                       3.seconds) should ===(55)
+          Await.result(
+            Source(1 to 10).via(foldFlow).runWith(Sink.head),
+            3.seconds) should ===(55)
         }
 
         "work also when the source’s module is copied and the graph is extended before using the matValSrc" in {
@@ -143,8 +146,9 @@ class GraphMatValueSpec extends AkkaSpec {
                 FlowShape(fold.in, map.outlet)
             })
 
-          Await.result(Source(1 to 10).via(foldFlow).runWith(Sink.head),
-                       3.seconds) should ===(55)
+          Await.result(
+            Source(1 to 10).via(foldFlow).runWith(Sink.head),
+            3.seconds) should ===(55)
         }
 
         "perform side-effecting transformations even when not used as source" in {

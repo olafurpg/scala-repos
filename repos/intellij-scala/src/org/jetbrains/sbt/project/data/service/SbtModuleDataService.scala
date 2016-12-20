@@ -20,10 +20,11 @@ class SbtModuleDataService
       projectData: ProjectData,
       project: Project,
       modelsProvider: IdeModifiableModelsProvider): Importer[SbtModuleData] =
-    new SbtModuleDataService.Importer(toImport,
-                                      projectData,
-                                      project,
-                                      modelsProvider)
+    new SbtModuleDataService.Importer(
+      toImport,
+      projectData,
+      project,
+      modelsProvider)
 }
 
 object SbtModuleDataService {
@@ -31,10 +32,11 @@ object SbtModuleDataService {
                          projectData: ProjectData,
                          project: Project,
                          modelsProvider: IdeModifiableModelsProvider)
-      extends AbstractImporter[SbtModuleData](dataToImport,
-                                              projectData,
-                                              project,
-                                              modelsProvider) {
+      extends AbstractImporter[SbtModuleData](
+        dataToImport,
+        projectData,
+        project,
+        modelsProvider) {
 
     override def importData(): Unit =
       dataToImport.foreach { moduleNode =>

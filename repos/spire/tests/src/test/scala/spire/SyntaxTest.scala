@@ -114,8 +114,9 @@ class SyntaxTest extends SpireTests with Checkers with BaseSyntaxTest {
     testEuclideanRingSyntax(a, b.x)
   }))
   test("Field syntax")(check(forAll { (a: Double, b: NonZero[Double]) =>
-    testFieldSyntax(a, b.x)(implicitly,
-                            spire.optional.totalfloat.TotalDoubleOrder)
+    testFieldSyntax(a, b.x)(
+      implicitly,
+      spire.optional.totalfloat.TotalDoubleOrder)
   }))
   test("NRoot syntax")(check(forAll { (a: Positive[Double]) =>
     testNRootSyntax(a.x)

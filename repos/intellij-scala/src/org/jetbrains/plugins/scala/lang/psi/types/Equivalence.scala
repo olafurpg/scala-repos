@@ -24,8 +24,9 @@ object Equivalence {
 
   val cache: ConcurrentWeakHashMap[(ScType, ScType, Boolean),
                                    (Boolean, ScUndefinedSubstitutor)] =
-    new ConcurrentWeakHashMap[(ScType, ScType, Boolean),
-                              (Boolean, ScUndefinedSubstitutor)]()
+    new ConcurrentWeakHashMap[
+      (ScType, ScType, Boolean),
+      (Boolean, ScUndefinedSubstitutor)]()
 
   /**
     * @param falseUndef use false to consider undef type equals to any type

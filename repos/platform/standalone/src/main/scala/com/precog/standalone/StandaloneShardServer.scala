@@ -100,15 +100,16 @@ trait StandaloneShardServer extends BlueEyesServer with ShardService {
     val (platform, stoppable) = platformFor(config, apiKeyFinder, jobManager)
 
     // We always want a managed bifrost now, for better error reporting and Labcoat compatibility
-    ShardState(platform,
-               apiKeyFinder,
-               accountFinder,
-               NoopVFS,
-               NoopStoredQueries[Future],
-               NoopScheduler[Future],
-               jobManager,
-               Clock.System,
-               stoppable)
+    ShardState(
+      platform,
+      apiKeyFinder,
+      accountFinder,
+      NoopVFS,
+      NoopStoredQueries[Future],
+      NoopScheduler[Future],
+      jobManager,
+      Clock.System,
+      stoppable)
   }
 
   val jettyService = this.service("labcoat", "1.0") { context =>

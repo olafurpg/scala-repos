@@ -167,8 +167,9 @@ class MiscInteropTest {
   }
 
   @Test def should_compile_js_undefined(): Unit = {
-    assertThrows(classOf[Exception],
-                 js.undefined.asInstanceOf[js.Dynamic].toFixed())
+    assertThrows(
+      classOf[Exception],
+      js.undefined.asInstanceOf[js.Dynamic].toFixed())
   }
 
   @Test def should_allow_to_define_direct_subtraits_of_js_Any(): Unit = {

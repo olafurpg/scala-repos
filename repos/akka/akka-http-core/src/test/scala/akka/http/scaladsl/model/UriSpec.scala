@@ -72,8 +72,9 @@ class UriSpec extends WordSpec with Matchers {
         "2010:836B:4179::836B:4179")
 
       // Quad length
-      Host("[abcd::]") shouldEqual IPv6Host("ABCD0000000000000000000000000000",
-                                            "abcd::")
+      Host("[abcd::]") shouldEqual IPv6Host(
+        "ABCD0000000000000000000000000000",
+        "abcd::")
       Host("[abcd::1]") shouldEqual IPv6Host(
         "ABCD0000000000000000000000000001",
         "abcd::1")
@@ -160,14 +161,18 @@ class UriSpec extends WordSpec with Matchers {
       Host("[1:1::1:1]") shouldEqual IPv6Host(
         "00010001000000000000000000010001",
         "1:1::1:1")
-      Host("[1:1::1]") shouldEqual IPv6Host("00010001000000000000000000000001",
-                                            "1:1::1")
-      Host("[1::1]") shouldEqual IPv6Host("00010000000000000000000000000001",
-                                          "1::1")
-      Host("[::1]") shouldEqual IPv6Host("00000000000000000000000000000001",
-                                         "::1") // == localhost
-      Host("[::]") shouldEqual IPv6Host("00000000000000000000000000000000",
-                                        "::") // == all addresses
+      Host("[1:1::1]") shouldEqual IPv6Host(
+        "00010001000000000000000000000001",
+        "1:1::1")
+      Host("[1::1]") shouldEqual IPv6Host(
+        "00010000000000000000000000000001",
+        "1::1")
+      Host("[::1]") shouldEqual IPv6Host(
+        "00000000000000000000000000000001",
+        "::1") // == localhost
+      Host("[::]") shouldEqual IPv6Host(
+        "00000000000000000000000000000000",
+        "::") // == all addresses
 
       // A few more variations
       Host("[21ff:abcd::1]") shouldEqual IPv6Host(
@@ -281,9 +286,10 @@ class UriSpec extends WordSpec with Matchers {
           val rendering =
             UriRendering.renderPath(new StringRendering, p, cs).get
           if (rendering != s)
-            MatchResult(matches = false,
-                        s"The path rendered to '$rendering' rather than '$s'",
-                        "<?>")
+            MatchResult(
+              matches = false,
+              s"The path rendered to '$rendering' rather than '$s'",
+              "<?>")
           else if (Path(s, cs) != p)
             MatchResult(
               matches = false,
@@ -312,8 +318,9 @@ class UriSpec extends WordSpec with Matchers {
       "/foo%F0%9F%92%A9bar" should roundTripTo(Path / "foo\ud83d\udca9bar")
       "/%C3%89g%20get%20eti%C3%B0%20gler%20%C3%A1n%20%C3%BEess%20a%C3%B0%20mei%C3%B0a%20mig" should roundTripTo(
         Path / "Ég get etið gler án þess að meiða mig")
-      "/%00%E4%00%F6%00%FC" should roundTripTo(Path / "äöü",
-                                               Charset.forName("UTF-16BE"))
+      "/%00%E4%00%F6%00%FC" should roundTripTo(
+        Path / "äöü",
+        Charset.forName("UTF-16BE"))
     }
     "support the `startsWith` predicate" in {
       Empty startsWith Empty shouldBe true
@@ -397,19 +404,22 @@ class UriSpec extends WordSpec with Matchers {
       query.getAll("b") shouldEqual List("", "4", "2")
       query.getAll("d") shouldEqual Nil
       query.toMap shouldEqual Map("a" -> "1", "b" -> "", "c" -> "3")
-      query.toMultiMap shouldEqual Map("a" -> List("1"),
-                                       "b" -> List("", "4", "2"),
-                                       "c" -> List("3"))
-      query.toList shouldEqual List("a" -> "1",
-                                    "b" -> "2",
-                                    "c" -> "3",
-                                    "b" -> "4",
-                                    "b" -> "")
-      query.toSeq shouldEqual Seq("a" -> "1",
-                                  "b" -> "2",
-                                  "c" -> "3",
-                                  "b" -> "4",
-                                  "b" -> "")
+      query.toMultiMap shouldEqual Map(
+        "a" -> List("1"),
+        "b" -> List("", "4", "2"),
+        "c" -> List("3"))
+      query.toList shouldEqual List(
+        "a" -> "1",
+        "b" -> "2",
+        "c" -> "3",
+        "b" -> "4",
+        "b" -> "")
+      query.toSeq shouldEqual Seq(
+        "a" -> "1",
+        "b" -> "2",
+        "c" -> "3",
+        "b" -> "4",
+        "b" -> "")
     }
     "support conversion from list of name/value pairs" in {
       import Query._
@@ -457,32 +467,37 @@ class UriSpec extends WordSpec with Matchers {
       Uri("news:comp.infosystems.www.servers.unix") shouldEqual Uri
         .from(scheme = "news", path = "comp.infosystems.www.servers.unix")
 
-      Uri("tel:+1-816-555-1212") shouldEqual Uri.from(scheme = "tel",
-                                                      path = "+1-816-555-1212")
+      Uri("tel:+1-816-555-1212") shouldEqual Uri.from(
+        scheme = "tel",
+        path = "+1-816-555-1212")
 
-      Uri("telnet://192.0.2.16:80/") shouldEqual Uri.from(scheme = "telnet",
-                                                          host = "192.0.2.16",
-                                                          port = 80,
-                                                          path = "/")
+      Uri("telnet://192.0.2.16:80/") shouldEqual Uri.from(
+        scheme = "telnet",
+        host = "192.0.2.16",
+        port = 80,
+        path = "/")
 
       Uri("urn:oasis:names:specification:docbook:dtd:xml:4.1.2") shouldEqual Uri
-        .from(scheme = "urn",
-              path = "oasis:names:specification:docbook:dtd:xml:4.1.2")
+        .from(
+          scheme = "urn",
+          path = "oasis:names:specification:docbook:dtd:xml:4.1.2")
 
       // more examples
-      Uri("http://") shouldEqual Uri(scheme = "http",
-                                     authority = Authority(Host.Empty))
-      Uri("http:?") shouldEqual Uri.from(scheme = "http",
-                                         queryString = Some(""))
+      Uri("http://") shouldEqual Uri(
+        scheme = "http",
+        authority = Authority(Host.Empty))
+      Uri("http:?") shouldEqual Uri.from(
+        scheme = "http",
+        queryString = Some(""))
       Uri("http:") shouldEqual Uri.from(scheme = "http", queryString = None)
       Uri("?a+b=c%2Bd").query() shouldEqual ("a b", "c+d") +: Query.Empty
 
       // illegal paths
       Uri("foo/another@url/[]and{}") shouldEqual Uri.from(
         path = "foo/another@url/%5B%5Dand%7B%7D")
-      a[IllegalUriException] should be thrownBy Uri("foo/another@url/[]and{}",
-                                                    mode =
-                                                      Uri.ParsingMode.Strict)
+      a[IllegalUriException] should be thrownBy Uri(
+        "foo/another@url/[]and{}",
+        mode = Uri.ParsingMode.Strict)
 
       // handle query parameters with more than percent-encoded character
       Uri("?%7Ba%7D=$%7B%7D", UTF8, Uri.ParsingMode.Strict)
@@ -497,12 +512,14 @@ class UriSpec extends WordSpec with Matchers {
       Uri("/foo/?a#b").toString shouldEqual "/foo/?a#b"
 
       // empty host
-      Uri("http://:8000/foo") shouldEqual Uri("http",
-                                              Authority(Host.Empty, 8000),
-                                              Path / "foo")
-      Uri("http://:80/foo") shouldEqual Uri("http",
-                                            Authority.Empty,
-                                            Path / "foo")
+      Uri("http://:8000/foo") shouldEqual Uri(
+        "http",
+        Authority(Host.Empty, 8000),
+        Path / "foo")
+      Uri("http://:80/foo") shouldEqual Uri(
+        "http",
+        Authority.Empty,
+        Path / "foo")
     }
 
     "properly complete a normalization cycle" in {

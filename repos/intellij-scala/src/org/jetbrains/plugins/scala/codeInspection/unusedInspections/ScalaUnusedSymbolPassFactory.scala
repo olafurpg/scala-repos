@@ -16,11 +16,12 @@ class ScalaUnusedSymbolPassFactory(project: Project)
     extends TextEditorHighlightingPassFactory {
   TextEditorHighlightingPassRegistrar
     .getInstance(project)
-    .registerTextEditorHighlightingPass(this,
-                                        Array[Int](Pass.UPDATE_ALL),
-                                        null,
-                                        false,
-                                        -1)
+    .registerTextEditorHighlightingPass(
+      this,
+      Array[Int](Pass.UPDATE_ALL),
+      null,
+      false,
+      -1)
 
   def projectClosed() {}
 

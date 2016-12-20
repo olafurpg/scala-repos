@@ -66,10 +66,11 @@ object ListView {
              newValue: T,
              editIndex: Int) =
       this(
-        new jfxsc.ListView.EditEvent[T](source,
-                                        eventType,
-                                        newValue,
-                                        editIndex))
+        new jfxsc.ListView.EditEvent[T](
+          source,
+          eventType,
+          newValue,
+          editIndex))
 
     /**
       * Returns the ListView upon which the edit took place.

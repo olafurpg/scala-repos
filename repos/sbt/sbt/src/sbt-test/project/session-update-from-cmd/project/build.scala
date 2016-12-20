@@ -12,10 +12,11 @@ object build extends Build {
     val ex = Project extract st
     import ex._
     val session2 = BuiltinCommands
-      .setThis(st,
-               ex,
-               Seq(k1 := {}),
-               """k1 := {
+      .setThis(
+        st,
+        ex,
+        Seq(k1 := {}),
+        """k1 := {
     |//
     |//
     |}""".stripMargin)
@@ -29,10 +30,11 @@ object build extends Build {
     val ex = Project extract st
     import ex._
     val session2 = BuiltinCommands
-      .setThis(st,
-               ex,
-               Seq(k3 := {}),
-               """k3 := {
+      .setThis(
+        st,
+        ex,
+        Seq(k3 := {}),
+        """k3 := {
                                                                     |//
                                                                     |//
                                                                     |}""".stripMargin)

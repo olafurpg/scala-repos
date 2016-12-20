@@ -52,9 +52,10 @@ object Play {
     Constants.SAX_FEATURE_PREFIX +
       Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE,
     false)
-  xercesSaxParserFactory.setFeature(Constants.XERCES_FEATURE_PREFIX +
-                                      Constants.DISALLOW_DOCTYPE_DECL_FEATURE,
-                                    true)
+  xercesSaxParserFactory.setFeature(
+    Constants.XERCES_FEATURE_PREFIX +
+      Constants.DISALLOW_DOCTYPE_DECL_FEATURE,
+    true)
   xercesSaxParserFactory
     .setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
 
@@ -77,8 +78,9 @@ object Play {
     *
     * @deprecated This is a static reference to application, use DI, since 2.5.0
     */
-  @deprecated("This is a static reference to application, use DI instead",
-              "2.5.0")
+  @deprecated(
+    "This is a static reference to application, use DI instead",
+    "2.5.0")
   def maybeApplication: Option[Application] = Option(_currentApp)
 
   private[play] def privateMaybeApplication: Option[Application] =
@@ -95,8 +97,9 @@ object Play {
     *
     * @deprecated This is a static reference to application, use DI, since 2.5.0
     */
-  @deprecated("This is a static reference to application, use DI instead",
-              "2.5.0")
+  @deprecated(
+    "This is a static reference to application, use DI instead",
+    "2.5.0")
   implicit def current: Application =
     privateMaybeApplication.getOrElse(
       sys.error("There is no started application"))

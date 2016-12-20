@@ -208,9 +208,10 @@ class JobCancellationSuite
 
     // jobA is the one to be cancelled.
     val jobA = Future {
-      sc.setJobGroup("jobA",
-                     "this is a job to be cancelled",
-                     interruptOnCancel = true)
+      sc.setJobGroup(
+        "jobA",
+        "this is a job to be cancelled",
+        interruptOnCancel = true)
       sc.parallelize(1 to 10000, 2)
         .map { i =>
           Thread.sleep(100000); i

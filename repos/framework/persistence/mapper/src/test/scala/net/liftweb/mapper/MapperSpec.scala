@@ -224,8 +224,8 @@ class MapperSpec extends Specification with BeforeExample {
         }
 
         "Precache works" in {
-          val oo = SampleTag.findAll(By(SampleTag.tag, "Meow"),
-                                     PreCache(SampleTag.model))
+          val oo = SampleTag
+            .findAll(By(SampleTag.tag, "Meow"), PreCache(SampleTag.model))
 
           for (t <- oo) yield t.model.cached_? must beTrue
 
@@ -238,12 +238,14 @@ class MapperSpec extends Specification with BeforeExample {
             // this doesn't work for Derby, but it's a derby bug
             // nor does it work in MySQL, but it's a MySQL limitation
             //  try { provider.setupDB } catch { case e => skip(e.getMessage) }
-            val dogs = Dog.findAll(By(Dog.name, "fido"),
-                                   OrderBy(Dog.name, Ascending),
-                                   PreCache(Dog.owner))
-            val oo = SampleTag.findAll(OrderBy(SampleTag.tag, Ascending),
-                                       MaxRows(2),
-                                       PreCache(SampleTag.model))
+            val dogs = Dog.findAll(
+              By(Dog.name, "fido"),
+              OrderBy(Dog.name, Ascending),
+              PreCache(Dog.owner))
+            val oo = SampleTag.findAll(
+              OrderBy(SampleTag.tag, Ascending),
+              MaxRows(2),
+              PreCache(SampleTag.model))
 
             (oo.length > 0) must beTrue
             for (t <- oo) t.model.cached_? must beTrue
@@ -254,8 +256,9 @@ class MapperSpec extends Specification with BeforeExample {
         "Non-deterministic Precache works" in {
           val dogs =
             Dog.findAll(By(Dog.name, "fido"), PreCache(Dog.owner, false))
-          val oo = SampleTag.findAll(By(SampleTag.tag, "Meow"),
-                                     PreCache(SampleTag.model, false))
+          val oo = SampleTag.findAll(
+            By(SampleTag.tag, "Meow"),
+            PreCache(SampleTag.model, false))
 
           for (t <- oo) yield t.model.cached_? must beTrue
 
@@ -263,12 +266,14 @@ class MapperSpec extends Specification with BeforeExample {
         }
 
         "Non-deterministic Precache works with OrderBy" in {
-          val dogs = Dog.findAll(By(Dog.name, "fido"),
-                                 OrderBy(Dog.name, Ascending),
-                                 PreCache(Dog.owner, false))
-          val oo = SampleTag.findAll(OrderBy(SampleTag.tag, Ascending),
-                                     MaxRows(2),
-                                     PreCache(SampleTag.model, false))
+          val dogs = Dog.findAll(
+            By(Dog.name, "fido"),
+            OrderBy(Dog.name, Ascending),
+            PreCache(Dog.owner, false))
+          val oo = SampleTag.findAll(
+            OrderBy(SampleTag.tag, Ascending),
+            MaxRows(2),
+            PreCache(SampleTag.model, false))
 
           for (t <- oo) yield t.model.cached_? must beTrue
 
@@ -355,12 +360,14 @@ class MapperSpec extends Specification with BeforeExample {
             // this doesn't work for Derby, but it's a derby bug
             // nor does it work in MySQL, but it's a MySQL limitation
             //  try { provider.setupDB } catch { case e => skip(e.getMessage) }
-            val dogs = Dog2.findAll(By(Dog2.name, "fido"),
-                                    OrderBy(Dog2.name, Ascending),
-                                    PreCache(Dog2.owner))
-            val oo = SampleTag.findAll(OrderBy(SampleTag.tag, Ascending),
-                                       MaxRows(2),
-                                       PreCache(SampleTag.model))
+            val dogs = Dog2.findAll(
+              By(Dog2.name, "fido"),
+              OrderBy(Dog2.name, Ascending),
+              PreCache(Dog2.owner))
+            val oo = SampleTag.findAll(
+              OrderBy(SampleTag.tag, Ascending),
+              MaxRows(2),
+              PreCache(SampleTag.model))
 
             (oo.length > 0) must beTrue
             for (t <- oo) yield t.model.cached_? must beTrue
@@ -371,8 +378,9 @@ class MapperSpec extends Specification with BeforeExample {
         "Non-deterministic Precache works with Mixed Case" in {
           val dogs =
             Dog2.findAll(By(Dog2.name, "fido"), PreCache(Dog2.owner, false))
-          val oo = SampleTag.findAll(By(SampleTag.tag, "Meow"),
-                                     PreCache(SampleTag.model, false))
+          val oo = SampleTag.findAll(
+            By(SampleTag.tag, "Meow"),
+            PreCache(SampleTag.model, false))
 
           for (t <- oo) yield t.model.cached_? must beTrue
 
@@ -400,13 +408,15 @@ class MapperSpec extends Specification with BeforeExample {
         }
 
         "Non-deterministic Precache works with OrderBy with Mixed Case" in {
-          val dogs = Dog2.findAll(By(Dog2.name, "fido"),
-                                  OrderBy(Dog2.name, Ascending),
-                                  PreCache(Dog2.owner, false))
+          val dogs = Dog2.findAll(
+            By(Dog2.name, "fido"),
+            OrderBy(Dog2.name, Ascending),
+            PreCache(Dog2.owner, false))
 
-          val oo = SampleTag.findAll(OrderBy(SampleTag.tag, Ascending),
-                                     MaxRows(2),
-                                     PreCache(SampleTag.model, false))
+          val oo = SampleTag.findAll(
+            OrderBy(SampleTag.tag, Ascending),
+            MaxRows(2),
+            PreCache(SampleTag.model, false))
 
           for (t <- oo) yield t.model.cached_? must beTrue
 

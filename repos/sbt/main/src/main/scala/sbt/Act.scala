@@ -40,11 +40,12 @@ object Act {
       current: ProjectRef,
       defaultConfigs: Option[ResolvedReference] => Seq[String],
       structure: BuildStructure): KeysParser =
-    for (selected <- scopedKeySelected(structure.index.aggregateKeyIndex,
-                                       current,
-                                       defaultConfigs,
-                                       structure.index.keyMap,
-                                       structure.data))
+    for (selected <- scopedKeySelected(
+           structure.index.aggregateKeyIndex,
+           current,
+           defaultConfigs,
+           structure.index.keyMap,
+           structure.data))
       yield Aggregation.aggregate(selected.key, selected.mask, structure.extra)
 
   def scopedKeySelected(
@@ -82,10 +83,11 @@ object Act {
       rawProject <- optProjectRef(index, current)
       proj = resolveProject(rawProject, current)
       confAmb <- config(index configs proj)
-      partialMask = ScopeMask(rawProject.isExplicit,
-                              confAmb.isExplicit,
-                              false,
-                              false)
+      partialMask = ScopeMask(
+        rawProject.isExplicit,
+        confAmb.isExplicit,
+        false,
+        false)
     } yield taskKeyExtra(proj, confAmb, partialMask)
   }
   def makeScopedKey(proj: Option[ResolvedReference],
@@ -93,11 +95,13 @@ object Act {
                     task: Option[AttributeKey[_]],
                     extra: ScopeAxis[AttributeMap],
                     key: AttributeKey[_]): ScopedKey[_] =
-    ScopedKey(Scope(toAxis(proj, Global),
-                    toAxis(conf map ConfigKey.apply, Global),
-                    toAxis(task, Global),
-                    extra),
-              key)
+    ScopedKey(
+      Scope(
+        toAxis(proj, Global),
+        toAxis(conf map ConfigKey.apply, Global),
+        toAxis(task, Global),
+        extra),
+      key)
 
   def select(allKeys: Seq[Parser[ParsedKey]], data: Settings[Scope])(
       implicit show: Show[ScopedKey[_]]): Parser[ParsedKey] =
@@ -371,11 +375,12 @@ object Act {
     scopedKeyParser(extracted.structure, extracted.currentRef)
   def scopedKeyParser(structure: BuildStructure,
                       currentRef: ProjectRef): Parser[ScopedKey[_]] =
-    scopedKey(structure.index.keyIndex,
-              currentRef,
-              structure.extra.configurationsForAxis,
-              structure.index.keyMap,
-              structure.data)
+    scopedKey(
+      structure.index.keyIndex,
+      currentRef,
+      structure.extra.configurationsForAxis,
+      structure.index.keyMap,
+      structure.data)
 
   type KeysParser = Parser[Seq[ScopedKey[T]] forSome { type T }]
   def aggregatedKeyParser(state: State): KeysParser =
@@ -384,9 +389,10 @@ object Act {
     aggregatedKeyParser(extracted.structure, extracted.currentRef)
   def aggregatedKeyParser(structure: BuildStructure,
                           currentRef: ProjectRef): KeysParser =
-    scopedKeyAggregated(currentRef,
-                        structure.extra.configurationsForAxis,
-                        structure)
+    scopedKeyAggregated(
+      currentRef,
+      structure.extra.configurationsForAxis,
+      structure)
 
   def keyValues[T](state: State)(keys: Seq[ScopedKey[T]]): Values[T] =
     keyValues(Project extract state)(keys)

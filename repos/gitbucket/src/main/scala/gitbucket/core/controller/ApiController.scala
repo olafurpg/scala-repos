@@ -83,16 +83,18 @@ trait ApiControllerBase extends ControllerBase {
     } yield {
       LockUtil.lock(s"${owner}/${data.name}") {
         if (getRepository(owner, data.name).isEmpty) {
-          createRepository(context.loginAccount.get,
-                           owner,
-                           data.name,
-                           data.description,
-                           data.`private`,
-                           data.auto_init)
+          createRepository(
+            context.loginAccount.get,
+            owner,
+            data.name,
+            data.description,
+            data.`private`,
+            data.auto_init)
           val repository = getRepository(owner, data.name).get
           JsonFormat(
-            ApiRepository(repository,
-                          ApiUser(getAccountByUserName(owner).get)))
+            ApiRepository(
+              repository,
+              ApiUser(getAccountByUserName(owner).get)))
         } else {
           ApiError(
             "A repository with this name already exists on this account",
@@ -114,16 +116,18 @@ trait ApiControllerBase extends ControllerBase {
     } yield {
       LockUtil.lock(s"${groupName}/${data.name}") {
         if (getRepository(groupName, data.name).isEmpty) {
-          createRepository(context.loginAccount.get,
-                           groupName,
-                           data.name,
-                           data.description,
-                           data.`private`,
-                           data.auto_init)
+          createRepository(
+            context.loginAccount.get,
+            groupName,
+            data.name,
+            data.description,
+            data.`private`,
+            data.auto_init)
           val repository = getRepository(groupName, data.name).get
           JsonFormat(
-            ApiRepository(repository,
-                          ApiUser(getAccountByUserName(groupName).get)))
+            ApiRepository(
+              repository,
+              ApiUser(getAccountByUserName(groupName).get)))
         } else {
           ApiError(
             "A repository with this name already exists for this group",
@@ -174,17 +178,19 @@ trait ApiControllerBase extends ControllerBase {
     repository =>
       (for {
         issueId <- params("id").toIntOpt
-        comments = getCommentsForApi(repository.owner,
-                                     repository.name,
-                                     issueId.toInt)
+        comments = getCommentsForApi(
+          repository.owner,
+          repository.name,
+          issueId.toInt)
       } yield {
         JsonFormat(comments.map {
           case (issueComment, user, issue) =>
-            ApiComment(issueComment,
-                       RepositoryName(repository),
-                       issueId,
-                       ApiUser(user),
-                       issue.isPullRequest)
+            ApiComment(
+              issueComment,
+              RepositoryName(repository),
+              issueId,
+              ApiUser(user),
+              issue.isPullRequest)
         })
       }).getOrElse(NotFound)
   })
@@ -203,20 +209,23 @@ trait ApiControllerBase extends ControllerBase {
           .get("action")
           .filter(
             _ =>
-              isEditable(issue.userName,
-                         issue.repositoryName,
-                         issue.openedUserName))
+              isEditable(
+                issue.userName,
+                issue.repositoryName,
+                issue.openedUserName))
         (issue, id) <- handleComment(issue, Some(body), repository, action)
-        issueComment <- getComment(repository.owner,
-                                   repository.name,
-                                   id.toString())
+        issueComment <- getComment(
+          repository.owner,
+          repository.name,
+          id.toString())
       } yield {
         JsonFormat(
-          ApiComment(issueComment,
-                     RepositoryName(repository),
-                     issueId,
-                     ApiUser(context.loginAccount.get),
-                     issue.isPullRequest))
+          ApiComment(
+            issueComment,
+            RepositoryName(repository),
+            issueId,
+            ApiUser(context.loginAccount.get),
+            issue.isPullRequest))
       }) getOrElse NotFound
     })
 
@@ -253,10 +262,11 @@ trait ApiControllerBase extends ControllerBase {
       } yield {
         LockUtil.lock(RepositoryName(repository).fullName) {
           if (getLabel(repository.owner, repository.name, data.name).isEmpty) {
-            val labelId = createLabel(repository.owner,
-                                      repository.name,
-                                      data.name,
-                                      data.color)
+            val labelId = createLabel(
+              repository.owner,
+              repository.name,
+              data.name,
+              data.color)
             getLabel(repository.owner, repository.name, labelId).map { label =>
               Created(JsonFormat(ApiLabel(label, RepositoryName(repository))))
             } getOrElse NotFound()
@@ -286,16 +296,19 @@ trait ApiControllerBase extends ControllerBase {
             .map {
               label =>
                 if (getLabel(repository.owner, repository.name, data.name).isEmpty) {
-                  updateLabel(repository.owner,
-                              repository.name,
-                              label.labelId,
-                              data.name,
-                              data.color)
+                  updateLabel(
+                    repository.owner,
+                    repository.name,
+                    label.labelId,
+                    data.name,
+                    data.color)
                   JsonFormat(
-                    ApiLabel(getLabel(repository.owner,
-                                      repository.name,
-                                      label.labelId).get,
-                             RepositoryName(repository)))
+                    ApiLabel(
+                      getLabel(
+                        repository.owner,
+                        repository.name,
+                        label.labelId).get,
+                      RepositoryName(repository)))
                 } else {
                   // TODO ApiError should support errors field to enhance compatibility of GitHub API
                   UnprocessableEntity(ApiError(
@@ -331,22 +344,25 @@ trait ApiControllerBase extends ControllerBase {
     val condition = IssueSearchCondition(request)
     val baseOwner = getAccountByUserName(repository.owner).get
     val issues: List[(Issue, Account, Int, PullRequest, Repository, Account)] =
-      searchPullRequestByApi(condition,
-                             (page - 1) * PullRequestLimit,
-                             PullRequestLimit,
-                             repository.owner -> repository.name)
+      searchPullRequestByApi(
+        condition,
+        (page - 1) * PullRequestLimit,
+        PullRequestLimit,
+        repository.owner -> repository.name)
     JsonFormat(issues.map {
-      case (issue,
-            issueUser,
-            commentCount,
-            pullRequest,
-            headRepo,
-            headOwner) =>
-        ApiPullRequest(issue,
-                       pullRequest,
-                       ApiRepository(headRepo, ApiUser(headOwner)),
-                       ApiRepository(repository, ApiUser(baseOwner)),
-                       ApiUser(issueUser))
+      case (
+          issue,
+          issueUser,
+          commentCount,
+          pullRequest,
+          headRepo,
+          headOwner) =>
+        ApiPullRequest(
+          issue,
+          pullRequest,
+          ApiRepository(headRepo, ApiUser(headOwner)),
+          ApiRepository(repository, ApiUser(baseOwner)),
+          ApiUser(issueUser))
     })
   })
 
@@ -357,25 +373,30 @@ trait ApiControllerBase extends ControllerBase {
     repository =>
       (for {
         issueId <- params("id").toIntOpt
-        (issue, pullRequest) <- getPullRequest(repository.owner,
-                                               repository.name,
-                                               issueId)
-        users = getAccountsByUserNames(Set(repository.owner,
-                                           pullRequest.requestUserName,
-                                           issue.openedUserName),
-                                       Set())
+        (issue, pullRequest) <- getPullRequest(
+          repository.owner,
+          repository.name,
+          issueId)
+        users = getAccountsByUserNames(
+          Set(
+            repository.owner,
+            pullRequest.requestUserName,
+            issue.openedUserName),
+          Set())
         baseOwner <- users.get(repository.owner)
         headOwner <- users.get(pullRequest.requestUserName)
         issueUser <- users.get(issue.openedUserName)
-        headRepo <- getRepository(pullRequest.requestUserName,
-                                  pullRequest.requestRepositoryName)
+        headRepo <- getRepository(
+          pullRequest.requestUserName,
+          pullRequest.requestRepositoryName)
       } yield {
         JsonFormat(
-          ApiPullRequest(issue,
-                         pullRequest,
-                         ApiRepository(headRepo, ApiUser(headOwner)),
-                         ApiRepository(repository, ApiUser(baseOwner)),
-                         ApiUser(issueUser)))
+          ApiPullRequest(
+            issue,
+            pullRequest,
+            ApiRepository(headRepo, ApiUser(headOwner)),
+            ApiRepository(repository, ApiUser(baseOwner)),
+            ApiUser(issueUser)))
       }).getOrElse(NotFound)
   })
 
@@ -414,8 +435,9 @@ trait ApiControllerBase extends ControllerBase {
     */
   get("/api/v3/repos/:owner/:repository")(referrersOnly { repository =>
     JsonFormat(
-      ApiRepository(repository,
-                    ApiUser(getAccountByUserName(repository.owner).get)))
+      ApiRepository(
+        repository,
+        ApiUser(getAccountByUserName(repository.owner).get)))
   })
 
   /**
@@ -429,15 +451,16 @@ trait ApiControllerBase extends ControllerBase {
         data <- extractFromJsonBody[CreateAStatus] if data.isValid
         creator <- context.loginAccount
         state <- CommitState.valueOf(data.state)
-        statusId = createCommitStatus(repository.owner,
-                                      repository.name,
-                                      sha,
-                                      data.context.getOrElse("default"),
-                                      state,
-                                      data.target_url,
-                                      data.description,
-                                      new java.util.Date(),
-                                      creator)
+        statusId = createCommitStatus(
+          repository.owner,
+          repository.name,
+          sha,
+          data.context.getOrElse("default"),
+          state,
+          data.target_url,
+          data.description,
+          new java.util.Date(),
+          creator)
         status <- getCommitStatus(repository.owner, repository.name, statusId)
       } yield {
         JsonFormat(ApiCommitStatus(status, ApiUser(creator)))
@@ -489,9 +512,10 @@ trait ApiControllerBase extends ControllerBase {
         val statuses =
           getCommitStatuesWithCreator(repository.owner, repository.name, sha)
         JsonFormat(
-          ApiCombinedCommitStatus(sha,
-                                  statuses,
-                                  ApiRepository(repository, owner)))
+          ApiCombinedCommitStatus(
+            sha,
+            statuses,
+            ApiRepository(repository, owner)))
       }) getOrElse NotFound
   })
 

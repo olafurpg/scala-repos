@@ -125,10 +125,11 @@ trait CheckpointState[T] extends WaitingState[Interval[Timestamp]] {
               val batchToken: T = checkpointStore.checkpointBatchStart(
                 leftClosedRightOpenIntersection)
               Right(
-                new CheckpointRunningState(this,
-                                           intersection,
-                                           hasStarted,
-                                           batchToken))
+                new CheckpointRunningState(
+                  this,
+                  intersection,
+                  hasStarted,
+                  batchToken))
             case _ => Left(waitingState)
           }
         case _ => Left(waitingState)

@@ -79,8 +79,9 @@ trait BaseParsers extends RegexParsers {
     } else {
       val source = in.source
       val offset = in.offset
-      Success(source.subSequence(offset, source.length).toString,
-              in.drop(source.length - offset))
+      Success(
+        source.subSequence(offset, source.length).toString,
+        in.drop(source.length - offset))
     }
   }
 
@@ -100,8 +101,9 @@ trait BaseParsers extends RegexParsers {
   def oneOf(lookup: Set[Char]): Parser[String] = Parser { in =>
     if (lookup.contains(in.first)) Success(in.first.toString, in.rest)
     else
-      Failure("Expected one of " + lookup + " but found '" + in.first + "'",
-              in)
+      Failure(
+        "Expected one of " + lookup + " but found '" + in.first + "'",
+        in)
   }
 
   /**
@@ -126,9 +128,10 @@ trait BaseParsers extends RegexParsers {
     if (offset == 0) {
       Failure("No chars before current char, cannot look behind.", in)
     } else if (!cs.contains(source.charAt(offset - 1))) {
-      Failure("Previous char was '" + source.charAt(offset - 1) +
-                "' expected one of " + cs,
-              in)
+      Failure(
+        "Previous char was '" + source.charAt(offset - 1) +
+          "' expected one of " + cs,
+        in)
     } else {
       Success((), in)
     }
@@ -147,9 +150,10 @@ trait BaseParsers extends RegexParsers {
     val c = in.first
     if (begin <= c && c <= end) Success(c, in.rest)
     else
-      Failure(verboseString(c) + " not in range " + verboseString(begin) +
-                " - " + verboseString(end),
-              in)
+      Failure(
+        verboseString(c) + " not in range " + verboseString(begin) +
+          " - " + verboseString(end),
+        in)
   }
 
   def ranges(rs: SortedMap[Char, Char]): Parser[Char] = Parser { in =>
@@ -164,9 +168,10 @@ trait BaseParsers extends RegexParsers {
 
       if (begin <= c && c <= end) Success(c, in.rest)
       else
-        Failure(verboseString(c) + " not in range " + verboseString(begin) +
-                  " - " + verboseString(end),
-                in)
+        Failure(
+          verboseString(c) + " not in range " + verboseString(begin) +
+            " - " + verboseString(end),
+          in)
     }
   }
 
@@ -249,12 +254,13 @@ trait BaseParsers extends RegexParsers {
     '\uFDF0' -> '\uFFFD') //'\u10000' -> '\uEFFFF'
 
   val xmlNameCharRanges: SortedMap[Char, Char] =
-    xmlNameStartCharRanges ++ SortedMap('-' -> '-',
-                                        '.' -> '.',
-                                        '0' -> '9',
-                                        '\u00b7' -> '\u00b7',
-                                        '\u0300' -> '\u0369',
-                                        '\u203F' -> '\u2040')
+    xmlNameStartCharRanges ++ SortedMap(
+      '-' -> '-',
+      '.' -> '.',
+      '0' -> '9',
+      '\u00b7' -> '\u00b7',
+      '\u0300' -> '\u0369',
+      '\u203F' -> '\u2040')
 
   /**Parser for one char that starts an XML name.
     * According to W3C specs except that range #x10000 to #xEFFFF

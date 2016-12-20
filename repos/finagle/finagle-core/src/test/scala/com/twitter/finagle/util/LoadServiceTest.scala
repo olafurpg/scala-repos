@@ -48,8 +48,9 @@ class LoadServiceTest extends FunSuite with MockitoSugar {
       assert(LoadService[Resolver]().nonEmpty)
       assert(
         GlobalRegistry.get.toSet == Set(
-          Entry(Seq("loadservice", "com.twitter.finagle.Resolver"),
-                "com.twitter.finagle.TestResolver,com.twitter.finagle.TestAsyncInetResolver")
+          Entry(
+            Seq("loadservice", "com.twitter.finagle.Resolver"),
+            "com.twitter.finagle.TestResolver,com.twitter.finagle.TestAsyncInetResolver")
         ))
     }
   }
@@ -71,9 +72,11 @@ class LoadServiceTest extends FunSuite with MockitoSugar {
       val randomIfaces = LoadService[LoadServiceMaybeInterface]()
       assert(
         GlobalRegistry.get.toSet == Set(
-          Entry(Seq("loadservice",
-                    "com.twitter.finagle.util.LoadServiceMaybeInterface"),
-                "com.twitter.finagle.util.LoadServiceGoodClass")
+          Entry(
+            Seq(
+              "loadservice",
+              "com.twitter.finagle.util.LoadServiceMaybeInterface"),
+            "com.twitter.finagle.util.LoadServiceGoodClass")
         ))
     }
   }
@@ -127,8 +130,9 @@ class LoadServiceTest extends FunSuite with MockitoSugar {
 
     // Get the result
     val announcers: Seq[Any] = future.get()
-    assert(announcers.exists(_.getClass.getName.endsWith("FooAnnouncer")),
-           "Non-URLClassloader found announcer was not discovered")
+    assert(
+      announcers.exists(_.getClass.getName.endsWith("FooAnnouncer")),
+      "Non-URLClassloader found announcer was not discovered")
     executor.shutdown()
   }
 

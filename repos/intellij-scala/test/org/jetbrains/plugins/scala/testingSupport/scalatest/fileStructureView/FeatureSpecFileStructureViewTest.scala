@@ -23,8 +23,9 @@ trait FeatureSpecFileStructureViewTest extends ScalaTestTestCase {
   }
 
   def addFeatureSpec() {
-    addFileToProject(className + ".scala",
-                     """
+    addFileToProject(
+      className + ".scala",
+      """
         |import org.scalatest._
         |
         |class FeatureSpecViewTest extends FeatureSpec {
@@ -51,6 +52,7 @@ trait FeatureSpecFileStructureViewTest extends ScalaTestTestCase {
     runTest(ignoredStatusId, "ignore(\"ignored1\")", "ignore(\"ignored2\")")
 
   def testFeatureSpecIgnoredHierarchy(): Unit =
-    runTest("scenario(\"ignored_inner\")",
-            Some("ignore(\"ignored2\")" + TestNodeProvider.ignoredSuffix))
+    runTest(
+      "scenario(\"ignored_inner\")",
+      Some("ignore(\"ignored2\")" + TestNodeProvider.ignoredSuffix))
 }

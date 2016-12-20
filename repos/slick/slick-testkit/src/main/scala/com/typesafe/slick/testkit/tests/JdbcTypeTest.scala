@@ -114,8 +114,10 @@ class JdbcTypeTest extends AsyncTest[JdbcTestDB] {
       ts.map(_.b) ++= Seq(Serialized(List(1, 2, 3)), Serialized(List(4, 5))),
       ts.to[Set]
         .result
-        .map(_ shouldBe Set((1, Serialized(List(1, 2, 3))),
-                            (2, Serialized(List(4, 5)))))
+        .map(
+          _ shouldBe Set(
+            (1, Serialized(List(1, 2, 3))),
+            (2, Serialized(List(4, 5)))))
     ).transactionally
   }
 
@@ -157,8 +159,9 @@ class JdbcTypeTest extends AsyncTest[JdbcTestDB] {
     roundtrip("time_t1", Time.valueOf("17:53:48"))
 
   def testTimestamp = {
-    roundtrip[Timestamp]("timestamp_t1",
-                         Timestamp.valueOf("2012-12-24 17:53:48.0")) >> {
+    roundtrip[Timestamp](
+      "timestamp_t1",
+      Timestamp.valueOf("2012-12-24 17:53:48.0")) >> {
       class T2(tag: Tag)
           extends Table[Option[Timestamp]](tag, "timestamp_t2") {
         def t = column[Option[Timestamp]]("t")

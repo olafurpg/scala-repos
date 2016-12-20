@@ -23,14 +23,15 @@ import JsonDSL._
 
 object JodaTimeSerializers {
   def all =
-    List(DurationSerializer,
-         InstantSerializer,
-         DateTimeSerializer,
-         DateMidnightSerializer,
-         IntervalSerializer(),
-         LocalDateSerializer(),
-         LocalTimeSerializer(),
-         PeriodSerializer)
+    List(
+      DurationSerializer,
+      InstantSerializer,
+      DateTimeSerializer,
+      DateMidnightSerializer,
+      IntervalSerializer(),
+      LocalDateSerializer(),
+      LocalTimeSerializer(),
+      PeriodSerializer)
 }
 
 case object PeriodSerializer
@@ -118,10 +119,11 @@ object LocalTimeSerializer {
       def unwrap(t: _LocalTime)(implicit format: Formats) =
         new LocalTime(t.hour, t.minute, t.second, t.millis)
       def wrap(t: LocalTime)(implicit format: Formats) =
-        _LocalTime(t.getHourOfDay,
-                   t.getMinuteOfHour,
-                   t.getSecondOfMinute,
-                   t.getMillisOfSecond)
+        _LocalTime(
+          t.getHourOfDay,
+          t.getMinuteOfHour,
+          t.getSecondOfMinute,
+          t.getMillisOfSecond)
     })
 }
 

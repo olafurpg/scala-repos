@@ -50,11 +50,12 @@ class ReplayListenerSuite extends SparkFunSuite with BeforeAndAfter {
     val fstream = fileSystem.create(logFilePath)
     val writer = new PrintWriter(fstream)
     val applicationStart =
-      SparkListenerApplicationStart("Greatest App (N)ever",
-                                    None,
-                                    125L,
-                                    "Mickey",
-                                    None)
+      SparkListenerApplicationStart(
+        "Greatest App (N)ever",
+        None,
+        125L,
+        "Mickey",
+        None)
     val applicationEnd = SparkListenerApplicationEnd(1000L)
     // scalastyle:off println
     writer.println(
@@ -145,8 +146,9 @@ class ReplayListenerSuite extends SparkFunSuite with BeforeAndAfter {
     originalEvents.zip(replayedEvents).foreach {
       case (e1, e2) =>
         // Don't compare the JSON here because accumulators in StageInfo may be out of order
-        JsonProtocolSuite.assertEquals(JsonProtocol.sparkEventFromJson(e1),
-                                       JsonProtocol.sparkEventFromJson(e2))
+        JsonProtocolSuite.assertEquals(
+          JsonProtocol.sparkEventFromJson(e1),
+          JsonProtocol.sparkEventFromJson(e2))
     }
   }
 

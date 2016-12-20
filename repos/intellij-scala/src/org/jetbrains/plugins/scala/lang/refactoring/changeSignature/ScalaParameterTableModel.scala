@@ -29,8 +29,9 @@ class ScalaParameterTableModel(typeContext: PsiElement,
                                defaultValueContext: PsiElement,
                                methodDescriptor: ScalaMethodDescriptor,
                                columnInfos: ColumnInfo[_, _]*)
-    extends ParameterTableModelBase[ScalaParameterInfo,
-                                    ScalaParameterTableModelItem](
+    extends ParameterTableModelBase[
+      ScalaParameterInfo,
+      ScalaParameterTableModelItem](
       typeContext,
       defaultValueContext,
       columnInfos: _*) {
@@ -45,12 +46,13 @@ class ScalaParameterTableModel(typeContext: PsiElement,
   def this(typeContext: PsiElement,
            defaultValueContext: PsiElement,
            methodDescriptor: ScalaMethodDescriptor) {
-    this(typeContext,
-         defaultValueContext,
-         methodDescriptor,
-         new ScalaNameColumn(typeContext.getProject),
-         new ScalaTypeColumn(typeContext.getProject),
-         new ScalaDefaultValueColumn(typeContext.getProject))
+    this(
+      typeContext,
+      defaultValueContext,
+      methodDescriptor,
+      new ScalaNameColumn(typeContext.getProject),
+      new ScalaTypeColumn(typeContext.getProject),
+      new ScalaDefaultValueColumn(typeContext.getProject))
   }
 
   override def createRowItem(
@@ -77,16 +79,17 @@ class ScalaParameterTableModel(typeContext: PsiElement,
     val newClauseParams = initialParams.flatMap(_.headOption).drop(1)
     val startsNewClause = newClauseParams.contains(parameterInfo)
 
-    new ScalaParameterTableModelItem(info,
-                                     paramTypeCodeFragment,
-                                     defaultValueCodeFragment,
-                                     startsNewClause)
+    new ScalaParameterTableModelItem(
+      info,
+      paramTypeCodeFragment,
+      defaultValueCodeFragment,
+      startsNewClause)
   }
 
   def clear(): Unit = {
     codeFragments.foreach(
-      HighlightLevelUtil.forceRootHighlighting(_,
-                                               FileHighlightingSetting.NONE))
+      HighlightLevelUtil
+        .forceRootHighlighting(_, FileHighlightingSetting.NONE))
   }
 }
 

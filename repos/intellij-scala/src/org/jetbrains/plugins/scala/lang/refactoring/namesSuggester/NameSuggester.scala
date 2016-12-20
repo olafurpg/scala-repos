@@ -68,8 +68,9 @@ object NameSuggester {
 
   def suggestNamesByType(typez: ScType): Array[String] = {
     val names = new ArrayBuffer[String]
-    generateNamesByType(typez)(names,
-                               emptyValidator(DecompilerUtil.obtainProject))
+    generateNamesByType(typez)(
+      names,
+      emptyValidator(DecompilerUtil.obtainProject))
     val result = names
       .map {
         case "class" => "clazz"
@@ -175,11 +176,12 @@ object NameSuggester {
           (c.isInheritor(baseClass, true) ||
           ScEquivalenceUtil.areClassesEquivalent(c, baseClass))
         }
-        val needPrefix = Map("scala.Option" -> "maybe",
-                             "scala.Some" -> "some",
-                             "scala.concurrent.Future" -> "eventual",
-                             "scala.concurrent.Promise" -> "promised",
-                             "scala.util.Try" -> "tried")
+        val needPrefix = Map(
+          "scala.Option" -> "maybe",
+          "scala.Some" -> "some",
+          "scala.concurrent.Future" -> "eventual",
+          "scala.concurrent.Promise" -> "promised",
+          "scala.util.Try" -> "tried")
 
         classOfBaseType match {
           case c if c.qualifiedName == arrayClassName && args.nonEmpty =>

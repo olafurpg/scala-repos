@@ -27,12 +27,13 @@ class ReassignPartitionsCommandTest
 
   @Test
   def testRackAwareReassign() {
-    val rackInfo = Map(0 -> "rack1",
-                       1 -> "rack2",
-                       2 -> "rack2",
-                       3 -> "rack1",
-                       4 -> "rack3",
-                       5 -> "rack3")
+    val rackInfo = Map(
+      0 -> "rack1",
+      1 -> "rack2",
+      2 -> "rack2",
+      3 -> "rack1",
+      4 -> "rack3",
+      5 -> "rack3")
     TestUtils.createBrokersInZk(toBrokerMetadata(rackInfo), zkUtils)
 
     val numPartitions = 18
@@ -40,31 +41,34 @@ class ReassignPartitionsCommandTest
 
     // create a non rack aware assignment topic first
     val createOpts = new kafka.admin.TopicCommand.TopicCommandOptions(
-      Array("--partitions",
-            numPartitions.toString,
-            "--replication-factor",
-            replicationFactor.toString,
-            "--disable-rack-aware",
-            "--topic",
-            "foo"))
+      Array(
+        "--partitions",
+        numPartitions.toString,
+        "--replication-factor",
+        replicationFactor.toString,
+        "--disable-rack-aware",
+        "--topic",
+        "foo"))
     kafka.admin.TopicCommand.createTopic(zkUtils, createOpts)
 
     val topicJson = """{"topics": [{"topic": "foo"}], "version":1}"""
     val (proposedAssignment, currentAssignment) =
-      ReassignPartitionsCommand.generateAssignment(zkUtils,
-                                                   rackInfo.keys.toSeq.sorted,
-                                                   topicJson,
-                                                   disableRackAware = false)
+      ReassignPartitionsCommand.generateAssignment(
+        zkUtils,
+        rackInfo.keys.toSeq.sorted,
+        topicJson,
+        disableRackAware = false)
 
     val assignment =
       proposedAssignment map {
         case (topicPartition, replicas) =>
           (topicPartition.partition, replicas)
       }
-    checkReplicaDistribution(assignment,
-                             rackInfo,
-                             rackInfo.size,
-                             numPartitions,
-                             replicationFactor)
+    checkReplicaDistribution(
+      assignment,
+      rackInfo,
+      rackInfo.size,
+      numPartitions,
+      replicationFactor)
   }
 }

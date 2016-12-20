@@ -27,10 +27,11 @@ final class Env(config: AppConfig,
   def filter(ctx: UserContext): Fu[FilterConfig] =
     ctx.me.fold(AnonConfigRepo filter ctx.req)(UserConfigRepo.filter)
 
-  lazy val processor = new Processor(lobby = hub.actor.lobby,
-                                     fishnetPlayer = fishnetPlayer,
-                                     router = hub.actor.router,
-                                     onStart = onStart)
+  lazy val processor = new Processor(
+    lobby = hub.actor.lobby,
+    fishnetPlayer = fishnetPlayer,
+    router = hub.actor.router,
+    onStart = onStart)
 
   private[setup] lazy val userConfigColl = db(CollectionUserConfig)
   private[setup] lazy val anonConfigColl = db(CollectionAnonConfig)
@@ -39,12 +40,13 @@ final class Env(config: AppConfig,
 object Env {
 
   lazy val current =
-    "setup" boot new Env(config = lila.common.PlayApp loadConfig "setup",
-                         db = lila.db.Env.current,
-                         hub = lila.hub.Env.current,
-                         fishnetPlayer = lila.fishnet.Env.current.player,
-                         onStart = lila.game.Env.current.onStart,
-                         prefApi = lila.pref.Env.current.api,
-                         relationApi = lila.relation.Env.current.api,
-                         system = lila.common.PlayApp.system)
+    "setup" boot new Env(
+      config = lila.common.PlayApp loadConfig "setup",
+      db = lila.db.Env.current,
+      hub = lila.hub.Env.current,
+      fishnetPlayer = lila.fishnet.Env.current.player,
+      onStart = lila.game.Env.current.onStart,
+      prefApi = lila.pref.Env.current.api,
+      relationApi = lila.relation.Env.current.api,
+      system = lila.common.PlayApp.system)
 }

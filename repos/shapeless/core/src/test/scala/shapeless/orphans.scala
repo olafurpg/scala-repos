@@ -260,12 +260,15 @@ class OrphansTest {
     import EqDeriver._
 
     assertEquals("Eq.eqInt", implicitly[Eq[Int]].toString)
-    assertEquals("project(product(Eq.eqInt, emptyProduct))",
-                 implicitly[Eq[Foo]].toString)
-    assertEquals("project(product(Eq.eqString, emptyProduct))",
-                 implicitly[Eq[Bar]].toString)
-    assertEquals("project(product(Eq.fallback, emptyProduct))",
-                 implicitly[Eq[Baz]].toString)
+    assertEquals(
+      "project(product(Eq.eqInt, emptyProduct))",
+      implicitly[Eq[Foo]].toString)
+    assertEquals(
+      "project(product(Eq.eqString, emptyProduct))",
+      implicitly[Eq[Bar]].toString)
+    assertEquals(
+      "project(product(Eq.fallback, emptyProduct))",
+      implicitly[Eq[Baz]].toString)
     assertEquals("Eq.fallback", implicitly[Eq[Quux]].toString)
     assertEquals(
       "project(coproduct(project(product(project(<loop>), emptyProduct)), coproduct(project(emptyProduct), emptyCoproduct)))",
@@ -281,8 +284,9 @@ class OrphansTest {
 
     assertEquals("Eq.eqInt", implicitly[Eq[Int]].toString)
     assertEquals("Eq.eqFoo", implicitly[Eq[Foo]].toString)
-    assertEquals("project(product(Eq.eqString, emptyProduct))",
-                 implicitly[Eq[Bar]].toString)
+    assertEquals(
+      "project(product(Eq.eqString, emptyProduct))",
+      implicitly[Eq[Bar]].toString)
     assertEquals("Baz.eqBaz", implicitly[Eq[Baz]].toString)
     assertEquals("Eq.fallback", implicitly[Eq[Quux]].toString)
     assertEquals(
@@ -299,8 +303,9 @@ class OrphansTest {
 
     assertEquals("Eq.eqInt", implicitly[Eq[Int]].toString)
     assertEquals("Eq.eqFoo", implicitly[Eq[Foo]].toString)
-    assertEquals("project(product(Eq.eqString, emptyProduct))",
-                 implicitly[Eq[Bar]].toString)
+    assertEquals(
+      "project(product(Eq.eqString, emptyProduct))",
+      implicitly[Eq[Bar]].toString)
     assertEquals("Baz.eqBaz", implicitly[Eq[Baz]].toString)
     assertEquals("Eq.fallback", implicitly[Eq[Quux]].toString)
     assertEquals(

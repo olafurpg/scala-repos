@@ -92,9 +92,10 @@ case class EnsureRequirements(conf: SQLConf) extends Rule[SparkPlan] {
 
     val withCoordinator =
       if (adaptiveExecutionEnabled && supportsCoordinator) {
-        val coordinator = new ExchangeCoordinator(children.length,
-                                                  targetPostShuffleInputSize,
-                                                  minNumPostShufflePartitions)
+        val coordinator = new ExchangeCoordinator(
+          children.length,
+          targetPostShuffleInputSize,
+          minNumPostShufflePartitions)
         children.zip(requiredChildDistributions).map {
           case (e: ShuffleExchange, _) =>
             // This child is an Exchange, we need to add the coordinator.

@@ -12,8 +12,9 @@ object Test extends App {
         new Complex(re * that.re - im * that.im, re * that.im + im * that.re)
       def /(that: Complex) = {
         val denom = that.re * that.re + that.im * that.im
-        new Complex((re * that.re + im * that.im) / denom,
-                    (im * that.re - re * that.im) / denom)
+        new Complex(
+          (re * that.re + im * that.im) / denom,
+          (im * that.re - re * that.im) / denom)
       }
       override def toString =
         re + (if (im < 0) "-" + (-im) else "+" + im) + "*i"

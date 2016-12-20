@@ -257,8 +257,9 @@ private[spark] class MesosSchedulerBackend(scheduler: TaskSchedulerImpl,
         offers.asScala.partition { o =>
           val offerAttributes = toAttributeMap(o.getAttributesList)
           val meetsConstraints =
-            matchesAttributeRequirements(slaveOfferConstraints,
-                                         offerAttributes)
+            matchesAttributeRequirements(
+              slaveOfferConstraints,
+              offerAttributes)
 
           // add some debug messaging
           if (!meetsConstraints) {
@@ -372,9 +373,10 @@ private[spark] class MesosSchedulerBackend(scheduler: TaskSchedulerImpl,
                     new ExecutorInfo(o.host, o.cores, Map.empty))))
           logTrace(
             s"Launching Mesos tasks on slave '$slaveId', tasks:\n${getTasksSummary(tasks)}")
-          d.launchTasks(Collections.singleton(slaveIdToOffer(slaveId).getId),
-                        tasks,
-                        filters)
+          d.launchTasks(
+            Collections.singleton(slaveIdToOffer(slaveId).getId),
+            tasks,
+            filters)
       }
 
       // Decline offers that weren't used
@@ -459,9 +461,10 @@ private[spark] class MesosSchedulerBackend(scheduler: TaskSchedulerImpl,
   private def removeExecutor(slaveId: String, reason: String) = {
     synchronized {
       listenerBus.post(
-        SparkListenerExecutorRemoved(System.currentTimeMillis(),
-                                     slaveId,
-                                     reason))
+        SparkListenerExecutorRemoved(
+          System.currentTimeMillis(),
+          slaveId,
+          reason))
       slaveIdToExecutorInfo -= slaveId
     }
   }
@@ -485,8 +488,8 @@ private[spark] class MesosSchedulerBackend(scheduler: TaskSchedulerImpl,
                             slaveId: SlaveID,
                             status: Int) {
     logInfo(
-      "Executor lost: %s, marking slave %s as lost".format(executorId.getValue,
-                                                           slaveId.getValue))
+      "Executor lost: %s, marking slave %s as lost"
+        .format(executorId.getValue, slaveId.getValue))
     recordSlaveLost(d, slaveId, ExecutorExited(status, exitCausedByApp = true))
   }
 

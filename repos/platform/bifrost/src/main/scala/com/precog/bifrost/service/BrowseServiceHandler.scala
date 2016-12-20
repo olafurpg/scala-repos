@@ -72,11 +72,13 @@ class BrowseSupport[M[+ _]: Bind](vfs: VFSMetadata[M]) {
         (paths map { p =>
           val fields: Map[String, JValue] = p.pathType match {
             case DataDir(contentType) =>
-              Map("contentType" -> JString(contentType.value),
-                  "type" -> JArray(JString("file"), JString("directory")))
+              Map(
+                "contentType" -> JString(contentType.value),
+                "type" -> JArray(JString("file"), JString("directory")))
             case DataOnly(contentType) =>
-              Map("contentType" -> JString(contentType.value),
-                  "type" -> JArray(JString("file")))
+              Map(
+                "contentType" -> JString(contentType.value),
+                "type" -> JArray(JString("file")))
             case PathOnly => Map("type" -> JArray(JString("directory")))
           }
           JObject(fields + ("name" -> JString(p.path.path.substring(1))))
@@ -111,8 +113,9 @@ class BrowseSupport[M[+ _]: Bind](vfs: VFSMetadata[M]) {
         }, {
           case PathStructure(types, children) =>
             \/.right(
-              JObject("children" -> children.serialize,
-                      "types" -> JObject(normalizeTypes(types))))
+              JObject(
+                "children" -> children.serialize,
+                "types" -> JObject(normalizeTypes(types))))
         })
     }
   }
@@ -151,8 +154,8 @@ class BrowseServiceHandler[A](
           }
       } getOrElse {
         logger.debug(
-          "Retrieving all available metadata for %s as %s".format(path.path,
-                                                                  apiKey))
+          "Retrieving all available metadata for %s as %s"
+            .format(path.path, apiKey))
         for {
           sz <- size(apiKey, path)
           children <- if (legacy) children(apiKey, path)

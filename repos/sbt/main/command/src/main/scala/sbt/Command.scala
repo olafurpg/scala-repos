@@ -158,15 +158,16 @@ object Command {
     } filter (_._2 <= maxDistance) sortBy (_._2) take (maxSuggestions) map
       (_._1)
   def distance(a: String, b: String): Int =
-    EditDistance.levenshtein(a,
-                             b,
-                             insertCost = 1,
-                             deleteCost = 1,
-                             subCost = 2,
-                             transposeCost = 1,
-                             matchCost = -1,
-                             caseCost = 1,
-                             true)
+    EditDistance.levenshtein(
+      a,
+      b,
+      insertCost = 1,
+      deleteCost = 1,
+      subCost = 2,
+      transposeCost = 1,
+      matchCost = -1,
+      caseCost = 1,
+      true)
 
   def spacedAny(name: String): Parser[String] = spacedC(name, any)
   def spacedC(name: String, c: Parser[Char]): Parser[String] =
@@ -186,9 +187,10 @@ private final class Help0(val brief: Seq[(String, String)],
                           val more: Set[String])
     extends Help {
   def ++(h: Help): Help =
-    new Help0(Help0.this.brief ++ h.brief,
-              Help0.this.detail ++ h.detail,
-              more ++ h.more)
+    new Help0(
+      Help0.this.brief ++ h.brief,
+      Help0.this.detail ++ h.detail,
+      more ++ h.more)
 }
 object Help {
   val empty: Help = briefDetail(Nil)

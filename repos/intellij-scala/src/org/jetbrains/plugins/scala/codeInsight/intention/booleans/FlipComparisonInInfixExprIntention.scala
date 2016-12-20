@@ -65,17 +65,18 @@ class FlipComparisonInInfixExprIntention
       editor.getCaretModel.getOffset -
         infixExpr.operation.nameId.getTextRange.getStartOffset
     val expr = new StringBuilder
-    val replaceOper = Map("equals" -> "equals",
-                          "==" -> "==",
-                          "!=" -> "!=",
-                          "eq" -> "eq",
-                          "ne" -> "ne",
-                          ">" -> "<",
-                          "<" -> ">",
-                          ">=" -> "<=",
-                          "<=" -> ">=",
-                          "&&" -> "&&",
-                          "||" -> "||")
+    val replaceOper = Map(
+      "equals" -> "equals",
+      "==" -> "==",
+      "!=" -> "!=",
+      "eq" -> "eq",
+      "ne" -> "ne",
+      ">" -> "<",
+      "<" -> ">",
+      ">=" -> "<=",
+      "<=" -> ">=",
+      "&&" -> "&&",
+      "||" -> "||")
 
     expr
       .append(infixExpr.getArgExpr.getText)

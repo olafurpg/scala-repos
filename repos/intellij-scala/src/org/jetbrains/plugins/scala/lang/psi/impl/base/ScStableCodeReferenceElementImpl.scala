@@ -66,10 +66,11 @@ class ScStableCodeReferenceElementImpl(node: ASTNode)
         case res: ScalaResolveResult =>
           import org.jetbrains.plugins.scala.lang.psi.types.Nothing
           val qualifier = res.fromType.getOrElse(Nothing)
-          LookupElementManager.getLookupElement(res,
-                                                isInImport = isInImport,
-                                                qualifierType = qualifier,
-                                                isInStableCodeReference = true)
+          LookupElementManager.getLookupElement(
+            res,
+            isInImport = isInImport,
+            qualifierType = qualifier,
+            isInStableCodeReference = true)
         case r => Seq(r.getElement)
       }
   }
@@ -287,11 +288,13 @@ class ScStableCodeReferenceElementImpl(node: ASTNode)
   }
 
   def getSameNameVariants: Array[ResolveResult] =
-    doResolve(this,
-              new CompletionProcessor(getKinds(incomplete = true),
-                                      this,
-                                      false,
-                                      Some(refName)))
+    doResolve(
+      this,
+      new CompletionProcessor(
+        getKinds(incomplete = true),
+        this,
+        false,
+        Some(refName)))
 
   override def delete() {
     getContext match {

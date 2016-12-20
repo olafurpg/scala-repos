@@ -152,13 +152,16 @@ object MongoAccountManagerSpec
       val newPassword = "bluemeanies"
       (for {
         tokenId <- accountManager.generateResetToken(account)
-        _ <- accountManager.resetAccountPassword(account.accountId,
-                                                 tokenId,
-                                                 newPassword)
-        authResultBad <- accountManager.authAccount(account.email,
-                                                    origPassword)
-        authResultGood <- accountManager.authAccount(account.email,
-                                                     newPassword)
+        _ <- accountManager.resetAccountPassword(
+          account.accountId,
+          tokenId,
+          newPassword)
+        authResultBad <- accountManager.authAccount(
+          account.email,
+          origPassword)
+        authResultGood <- accountManager.authAccount(
+          account.email,
+          newPassword)
       } yield (authResultBad, authResultGood)).copoint must beLike {
         case (Failure("password mismatch"), Success(authenticated)) =>
           authenticated.accountId must_== account.accountId
@@ -171,12 +174,14 @@ object MongoAccountManagerSpec
 
       (for {
         tokenId <- accountManager.generateResetToken(account)
-        _ <- accountManager.resetAccountPassword(account.accountId,
-                                                 tokenId,
-                                                 newPassword)
-        _ <- accountManager.resetAccountPassword(account.accountId,
-                                                 tokenId,
-                                                 newPassword2)
+        _ <- accountManager.resetAccountPassword(
+          account.accountId,
+          tokenId,
+          newPassword)
+        _ <- accountManager.resetAccountPassword(
+          account.accountId,
+          tokenId,
+          newPassword2)
         // We should still be able to authenticate with the *first* changed password
         authResult <- accountManager.authAccount(account.email, newPassword)
       } yield authResult).copoint must beLike[Validation[String, Account]] {
@@ -219,10 +224,11 @@ object MongoAccountManagerSpec
     val origPassword = "test password"
 
     val account = (accountManager
-      .createAccount("test@precog.com",
-                     origPassword,
-                     new DateTime,
-                     AccountPlan.Free) { _ =>
+      .createAccount(
+        "test@precog.com",
+        origPassword,
+        new DateTime,
+        AccountPlan.Free) { _ =>
         M.point("testapikey")
       })
       .copoint

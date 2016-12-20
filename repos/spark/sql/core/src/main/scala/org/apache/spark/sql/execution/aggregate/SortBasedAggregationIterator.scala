@@ -40,13 +40,14 @@ class SortBasedAggregationIterator(
     newMutableProjection: (Seq[Expression],
                            Seq[Attribute]) => (() => MutableProjection),
     numOutputRows: LongSQLMetric)
-    extends AggregationIterator(groupingExpressions,
-                                valueAttributes,
-                                aggregateExpressions,
-                                aggregateAttributes,
-                                initialInputBufferOffset,
-                                resultExpressions,
-                                newMutableProjection) {
+    extends AggregationIterator(
+      groupingExpressions,
+      valueAttributes,
+      aggregateExpressions,
+      aggregateAttributes,
+      initialInputBufferOffset,
+      resultExpressions,
+      newMutableProjection) {
 
   /**
     * Creates a new aggregation buffer and initializes buffer values
@@ -169,7 +170,8 @@ class SortBasedAggregationIterator(
 
   def outputForEmptyGroupingKeyWithoutInput(): UnsafeRow = {
     initializeBuffer(sortBasedAggregationBuffer)
-    generateOutput(UnsafeRow.createFromByteArray(0, 0),
-                   sortBasedAggregationBuffer)
+    generateOutput(
+      UnsafeRow.createFromByteArray(0, 0),
+      sortBasedAggregationBuffer)
   }
 }

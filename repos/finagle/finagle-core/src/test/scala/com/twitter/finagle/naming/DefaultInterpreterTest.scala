@@ -68,10 +68,11 @@ class DefaultInterpreterTest extends FunSuite {
       /booz => ~
     """)
 
-    assertEval(dtab,
-               "/foo",
-               boundWithWeight(3.0, Address(8080)),
-               boundWithWeight(2.0, Address(9090)),
-               boundWithWeight(1.0, Address(7070)))
+    assertEval(
+      dtab,
+      "/foo",
+      boundWithWeight(3.0, Address(8080)),
+      boundWithWeight(2.0, Address(9090)),
+      boundWithWeight(1.0, Address(7070)))
   }
 }

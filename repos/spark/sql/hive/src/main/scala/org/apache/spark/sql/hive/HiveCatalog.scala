@@ -39,8 +39,9 @@ private[spark] class HiveCatalog(client: HiveClient)
   import ExternalCatalog._
 
   // Exceptions thrown by the hive client that we would like to wrap
-  private val clientExceptions = Set(classOf[HiveException].getCanonicalName,
-                                     classOf[TException].getCanonicalName)
+  private val clientExceptions = Set(
+    classOf[HiveException].getCanonicalName,
+    classOf[TException].getCanonicalName)
 
   /**
     * Whether this is an exception thrown by the hive client that should be wrapped.

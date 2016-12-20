@@ -153,9 +153,10 @@ object FormFieldDirectives extends FormFieldDirectives {
           reject(UnsupportedRequestContentTypeRejection(x.supported))
         case Failure(x) ⇒
           reject(
-            MalformedFormFieldRejection(fieldName,
-                                        x.getMessage.nullAsEmpty,
-                                        Option(x.getCause)))
+            MalformedFormFieldRejection(
+              fieldName,
+              x.getMessage.nullAsEmpty,
+              Option(x.getCause)))
       }
 
     //////////////////// "regular" formField extraction ////////////////////
@@ -242,9 +243,10 @@ object FormFieldDirectives extends FormFieldDirectives {
     implicit def forRVDR[T](implicit sfu: SFU)
       : FieldDefAux[RequiredValueUnmarshallerReceptacle[T], Directive0] =
       fieldDef[RequiredValueUnmarshallerReceptacle[T], Directive0] { rvr ⇒
-        requiredFilter(rvr.name,
-                       StrictForm.Field.unmarshallerFromFSU(rvr.um),
-                       rvr.requiredValue)
+        requiredFilter(
+          rvr.name,
+          StrictForm.Field.unmarshallerFromFSU(rvr.um),
+          rvr.requiredValue)
       }
 
     //////////////////// repeated formField support ////////////////////

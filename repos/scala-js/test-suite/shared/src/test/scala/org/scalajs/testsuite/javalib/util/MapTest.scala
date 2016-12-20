@@ -254,8 +254,9 @@ trait MapTest {
       assertEquals("y", mp.get(null))
       assertEquals("y", mp.get("X"))
     } else {
-      expectThrows(classOf[NullPointerException],
-                   mp.putAll(mutableMapAsJavaMap(nullMap)))
+      expectThrows(
+        classOf[NullPointerException],
+        mp.putAll(mutableMapAsJavaMap(nullMap)))
     }
   }
 

@@ -35,9 +35,10 @@ class ScImportStmtElementType[Func <: ScImportStmt]
   def deserializeImpl(dataStream: StubInputStream,
                       parentStub: Any): ScImportStmtStub = {
     val text = dataStream.readName.toString
-    new ScImportStmtStubImpl(parentStub.asInstanceOf[StubElement[PsiElement]],
-                             this,
-                             text)
+    new ScImportStmtStubImpl(
+      parentStub.asInstanceOf[StubElement[PsiElement]],
+      this,
+      text)
   }
 
   def indexStub(stub: ScImportStmtStub, sink: IndexSink): Unit = {}

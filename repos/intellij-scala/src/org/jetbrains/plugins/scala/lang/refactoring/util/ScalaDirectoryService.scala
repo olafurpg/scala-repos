@@ -40,11 +40,12 @@ object ScalaDirectoryService {
     val fileName: String = name
     val element: PsiElement = try {
       if (askToDefineVariables)
-        new CreateFromTemplateDialog(dir.getProject,
-                                     dir,
-                                     template,
-                                     null,
-                                     properties).create
+        new CreateFromTemplateDialog(
+          dir.getProject,
+          dir,
+          template,
+          null,
+          properties).create
       else
         FileTemplateUtil
           .createFromTemplate(template, fileName, properties, dir)

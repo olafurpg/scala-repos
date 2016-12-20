@@ -46,8 +46,9 @@ abstract class BrowseServiceSpecs[M[+ _]](
     Path("/foo/bar2/baz/quux1") -> Map(ColumnRef(CPath(), CString) -> 20L),
     Path("/foo/bar2/baz/quux2") -> Map(ColumnRef(CPath(), CString) -> 30L),
     Path("/foo2/bar1/baz/quux1") -> Map(ColumnRef(CPath(), CString) -> 40L),
-    Path("/foo/bar/") -> Map(ColumnRef(CPath(".bar"), CLong) -> 50,
-                             ColumnRef(CPath(".baz"), CLong) -> 60L)
+    Path("/foo/bar/") -> Map(
+      ColumnRef(CPath(".bar"), CLong) -> 50,
+      ColumnRef(CPath(".baz"), CLong) -> 60L)
   )
 
   val metadata = new StubVFSMetadata[M](projectionMetadata)
@@ -114,8 +115,9 @@ abstract class BrowseServiceSpecs[M[+ _]](
         .valueOr(e => sys.error(e.toString))
         .copoint must beLike {
         case result =>
-          result must_== JObject("children" -> JArray(),
-                                 "types" -> JObject("Number" -> JNum(50)))
+          result must_== JObject(
+            "children" -> JArray(),
+            "types" -> JObject("Number" -> JNum(50)))
       }
     }
 

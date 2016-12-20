@@ -41,12 +41,13 @@ class CreateAggregates extends Phase {
             val from2 = sources.init
               .foldRight(sources.last._2) {
                 case ((_, n), z) =>
-                  Join(new AnonSymbol,
-                       new AnonSymbol,
-                       n,
-                       z,
-                       JoinType.Inner,
-                       LiteralNode(true))
+                  Join(
+                    new AnonSymbol,
+                    new AnonSymbol,
+                    n,
+                    z,
+                    JoinType.Inner,
+                    LiteralNode(true))
               }
               .infer()
             logger.debug("New 'from' with joined aggregates:", from2)
@@ -67,8 +68,9 @@ class CreateAggregates extends Phase {
             val scope =
               Type.Scope(s1 -> from2.nodeType.asCollectionType.elementType)
             val replNodes = repl.mapValues(ss => FwdPath(ss).infer(scope))
-            logger.debug("Replacement path nodes: ",
-                         StructNode(ConstArray.from(replNodes)))
+            logger.debug(
+              "Replacement path nodes: ",
+              StructNode(ConstArray.from(replNodes)))
             val sel3 = sel2.replace({
               case n @ Ref(s) => replNodes.getOrElse(s, n)
             }, keepType = true)

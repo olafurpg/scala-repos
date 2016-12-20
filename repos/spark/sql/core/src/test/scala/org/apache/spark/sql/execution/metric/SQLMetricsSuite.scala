@@ -45,8 +45,9 @@ class SQLMetricsSuite extends SparkFunSuite with SharedSQLContext {
     val cl = BoxingFinder.getClassReader(f.getClass)
     val boxingFinder = new BoxingFinder()
     cl.accept(boxingFinder, 0)
-    assert(boxingFinder.boxingInvokes.isEmpty,
-           s"Found boxing: ${boxingFinder.boxingInvokes}")
+    assert(
+      boxingFinder.boxingInvokes.isEmpty,
+      s"Found boxing: ${boxingFinder.boxingInvokes}")
   }
 
   test("Normal accumulator should do boxing") {
@@ -56,8 +57,9 @@ class SQLMetricsSuite extends SparkFunSuite with SharedSQLContext {
     val cl = BoxingFinder.getClassReader(f.getClass)
     val boxingFinder = new BoxingFinder()
     cl.accept(boxingFinder, 0)
-    assert(boxingFinder.boxingInvokes.nonEmpty,
-           "Found find boxing in this test")
+    assert(
+      boxingFinder.boxingInvokes.nonEmpty,
+      "Found find boxing in this test")
   }
 
   /**
@@ -150,16 +152,18 @@ class SQLMetricsSuite extends SparkFunSuite with SharedSQLContext {
     testSparkPlanMetrics(
       df,
       1,
-      Map(2L -> ("TungstenAggregate", Map("number of output rows" -> 2L)),
-          0L -> ("TungstenAggregate", Map("number of output rows" -> 1L))))
+      Map(
+        2L -> ("TungstenAggregate", Map("number of output rows" -> 2L)),
+        0L -> ("TungstenAggregate", Map("number of output rows" -> 1L))))
 
     // 2 partitions and each partition contains 2 keys
     val df2 = testData2.groupBy('a).count()
     testSparkPlanMetrics(
       df2,
       1,
-      Map(2L -> ("TungstenAggregate", Map("number of output rows" -> 4L)),
-          0L -> ("TungstenAggregate", Map("number of output rows" -> 3L))))
+      Map(
+        2L -> ("TungstenAggregate", Map("number of output rows" -> 4L)),
+        0L -> ("TungstenAggregate", Map("number of output rows" -> 3L))))
   }
 
   test("Sort metrics") {
@@ -180,13 +184,14 @@ class SQLMetricsSuite extends SparkFunSuite with SharedSQLContext {
       // ... -> SortMergeJoin(nodeId = 1) -> TungstenProject(nodeId = 0)
       val df = sqlContext.sql(
         "SELECT * FROM testData2 JOIN testDataForJoin ON testData2.a = testDataForJoin.a")
-      testSparkPlanMetrics(df,
-                           1,
-                           Map(
-                             0L ->
-                               ("SortMergeJoin", Map(
-                                 // It's 4 because we only read 3 rows in the first partition and 1 row in the second one
-                                 "number of output rows" -> 4L))))
+      testSparkPlanMetrics(
+        df,
+        1,
+        Map(
+          0L ->
+            ("SortMergeJoin", Map(
+              // It's 4 because we only read 3 rows in the first partition and 1 row in the second one
+              "number of output rows" -> 4L))))
     }
   }
 
@@ -201,23 +206,25 @@ class SQLMetricsSuite extends SparkFunSuite with SharedSQLContext {
       // ... -> SortMergeJoin(nodeId = 1) -> TungstenProject(nodeId = 0)
       val df = sqlContext.sql(
         "SELECT * FROM testData2 left JOIN testDataForJoin ON testData2.a = testDataForJoin.a")
-      testSparkPlanMetrics(df,
-                           1,
-                           Map(
-                             0L ->
-                               ("SortMergeJoin", Map(
-                                 // It's 4 because we only read 3 rows in the first partition and 1 row in the second one
-                                 "number of output rows" -> 8L))))
+      testSparkPlanMetrics(
+        df,
+        1,
+        Map(
+          0L ->
+            ("SortMergeJoin", Map(
+              // It's 4 because we only read 3 rows in the first partition and 1 row in the second one
+              "number of output rows" -> 8L))))
 
       val df2 = sqlContext.sql(
         "SELECT * FROM testDataForJoin right JOIN testData2 ON testData2.a = testDataForJoin.a")
-      testSparkPlanMetrics(df2,
-                           1,
-                           Map(
-                             0L ->
-                               ("SortMergeJoin", Map(
-                                 // It's 4 because we only read 3 rows in the first partition and 1 row in the second one
-                                 "number of output rows" -> 8L))))
+      testSparkPlanMetrics(
+        df2,
+        1,
+        Map(
+          0L ->
+            ("SortMergeJoin", Map(
+              // It's 4 because we only read 3 rows in the first partition and 1 row in the second one
+              "number of output rows" -> 8L))))
     }
   }
 
@@ -261,12 +268,13 @@ class SQLMetricsSuite extends SparkFunSuite with SharedSQLContext {
       val df = sqlContext.sql(
         "SELECT * FROM testData2 left JOIN testDataForJoin ON " +
           "testData2.a * testDataForJoin.a != testData2.a + testDataForJoin.a")
-      testSparkPlanMetrics(df,
-                           3,
-                           Map(
-                             1L ->
-                               ("BroadcastNestedLoopJoin",
-                               Map("number of output rows" -> 12L))))
+      testSparkPlanMetrics(
+        df,
+        3,
+        Map(
+          1L ->
+            ("BroadcastNestedLoopJoin",
+            Map("number of output rows" -> 12L))))
     }
   }
 
@@ -379,14 +387,15 @@ private class BoxingFinder(
     visitedMethods: mutable.Set[MethodIdentifier[_]] = mutable.Set.empty)
     extends ClassVisitor(ASM5) {
 
-  private val primitiveBoxingClassName = Set("java/lang/Long",
-                                             "java/lang/Double",
-                                             "java/lang/Integer",
-                                             "java/lang/Float",
-                                             "java/lang/Short",
-                                             "java/lang/Character",
-                                             "java/lang/Byte",
-                                             "java/lang/Boolean")
+  private val primitiveBoxingClassName = Set(
+    "java/lang/Long",
+    "java/lang/Double",
+    "java/lang/Integer",
+    "java/lang/Float",
+    "java/lang/Short",
+    "java/lang/Character",
+    "java/lang/Byte",
+    "java/lang/Boolean")
 
   override def visitMethod(access: Int,
                            name: String,

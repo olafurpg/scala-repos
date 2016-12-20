@@ -72,11 +72,12 @@ object RemoveInternalClusterShardingData {
         val journalPluginId = system.settings.config
           .getString("akka.cluster.sharding.journal-plugin-id")
         import system.dispatcher
-        remove(system,
-               journalPluginId,
-               typeNames,
-               terminateSystem = true,
-               remove2dot3Data).onComplete { _ ⇒
+        remove(
+          system,
+          journalPluginId,
+          typeNames,
+          terminateSystem = true,
+          remove2dot3Data).onComplete { _ ⇒
           system.terminate()
         }
       }
@@ -117,10 +118,11 @@ object RemoveInternalClusterShardingData {
                           completion: Promise[Unit],
                           remove2dot3Data: Boolean): Props =
     Props(
-      new RemoveInternalClusterShardingData(journalPluginId,
-                                            typeNames,
-                                            completion,
-                                            remove2dot3Data))
+      new RemoveInternalClusterShardingData(
+        journalPluginId,
+        typeNames,
+        completion,
+        remove2dot3Data))
       .withDeploy(Deploy.local)
 
   /**
@@ -131,9 +133,10 @@ object RemoveInternalClusterShardingData {
               persistenceId: String,
               replyTo: ActorRef): Props =
       Props(
-        new RemoveOnePersistenceId(journalPluginId,
-                                   persistenceId: String,
-                                   replyTo))
+        new RemoveOnePersistenceId(
+          journalPluginId,
+          persistenceId: String,
+          replyTo))
 
     case class Result(removals: Try[Removals])
     case class Removals(events: Boolean, snapshots: Boolean)

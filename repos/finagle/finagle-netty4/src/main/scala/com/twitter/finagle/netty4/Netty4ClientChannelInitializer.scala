@@ -75,13 +75,15 @@ private[netty4] abstract class AbstractNetty4ClientChannelInitializer[In, Out](
 
     if (readTimeout.isFinite) {
       val (timeoutValue, timeoutUnit) = readTimeout.inTimeUnit
-      pipe.addFirst(ReadTimeoutHandlerKey,
-                    new ReadTimeoutHandler(timeoutValue, timeoutUnit))
+      pipe.addFirst(
+        ReadTimeoutHandlerKey,
+        new ReadTimeoutHandler(timeoutValue, timeoutUnit))
     }
 
     if (writeTimeout.isFinite)
-      pipe.addLast(WriteTimeoutHandlerKey,
-                   new WriteCompletionTimeoutHandler(timer, writeTimeout))
+      pipe.addLast(
+        WriteTimeoutHandlerKey,
+        new WriteCompletionTimeoutHandler(timer, writeTimeout))
 
     pipe.addLast(ConnectionHandlerKey, new ConnectionHandler(transportP))
   }

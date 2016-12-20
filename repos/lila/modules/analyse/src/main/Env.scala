@@ -22,9 +22,10 @@ final class Env(config: Config,
 
   private[analyse] lazy val analysisColl = db(CollectionAnalysis)
 
-  lazy val analyser = new Analyser(indexer = indexer,
-                                   roundSocket = roundSocket,
-                                   bus = system.lilaBus)
+  lazy val analyser = new Analyser(
+    indexer = indexer,
+    roundSocket = roundSocket,
+    bus = system.lilaBus)
 
   lazy val annotator = new Annotator(NetDomain)
 }
@@ -32,9 +33,10 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "analyse" boot new Env(config = lila.common.PlayApp loadConfig "analyse",
-                           db = lila.db.Env.current,
-                           system = lila.common.PlayApp.system,
-                           roundSocket = lila.hub.Env.current.socket.round,
-                           indexer = lila.hub.Env.current.actor.gameSearch)
+    "analyse" boot new Env(
+      config = lila.common.PlayApp loadConfig "analyse",
+      db = lila.db.Env.current,
+      system = lila.common.PlayApp.system,
+      roundSocket = lila.hub.Env.current.socket.round,
+      indexer = lila.hub.Env.current.actor.gameSearch)
 }

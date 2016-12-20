@@ -49,10 +49,12 @@ abstract class LinkerBackend(val semantics: Semantics,
     *  @throws java.lang.IllegalArgumentException if there is a mismatch
     */
   protected def verifyUnit(unit: LinkingUnit): Unit = {
-    require(unit.semantics == semantics,
-            "LinkingUnit and LinkerBackend must agree on semantics")
-    require(unit.esLevel == esLevel,
-            "LinkingUnit and LinkerBackend must agree on esLevel")
+    require(
+      unit.semantics == semantics,
+      "LinkingUnit and LinkerBackend must agree on semantics")
+    require(
+      unit.esLevel == esLevel,
+      "LinkingUnit and LinkerBackend must agree on esLevel")
   }
 }
 

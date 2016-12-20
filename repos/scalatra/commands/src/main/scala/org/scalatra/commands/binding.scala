@@ -89,15 +89,17 @@ object Binding {
         typeConverterFactory)(sourceManifest, valueManifest, typeConverter)
 
     def apply(toBind: Either[String, Option[S]]): Binding =
-      new DefaultBinding(field(toBind), typeConverterFactory)(sourceManifest,
-                                                              valueManifest,
-                                                              typeConverter)
+      new DefaultBinding(field(toBind), typeConverterFactory)(
+        sourceManifest,
+        valueManifest,
+        typeConverter)
 
     def validate: Binding = {
       val nwFld = field.asInstanceOf[DataboundFieldDescriptor[S, T]].validate
-      new DefaultBinding(nwFld, typeConverterFactory)(sourceManifest,
-                                                      valueManifest,
-                                                      typeConverter)
+      new DefaultBinding(nwFld, typeConverterFactory)(
+        sourceManifest,
+        valueManifest,
+        typeConverter)
     }
   }
 }

@@ -36,18 +36,21 @@ object TransferMode
     extends SFXEnumDelegateCompanion[jfxsi.TransferMode, TransferMode] {
 
   val Copy = new TransferMode(jfxsi.TransferMode.COPY)
-  @deprecated("Use Copy; COPY will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Copy; COPY will be removed in a future release",
+    "8.0.60-R10")
   val COPY = Copy
 
   val Move = new TransferMode(jfxsi.TransferMode.MOVE)
-  @deprecated("Use Move; MOVE will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Move; MOVE will be removed in a future release",
+    "8.0.60-R10")
   val MOVE = Move
 
   val Link = new TransferMode(jfxsi.TransferMode.LINK)
-  @deprecated("Use Link; LINK will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Link; LINK will be removed in a future release",
+    "8.0.60-R10")
   val LINK = Link
 
   /** Array containing all transfer modes. */
@@ -64,8 +67,9 @@ object TransferMode
 
   /** Empty array of transfer modes. */
   val None = jfxsi.TransferMode.NONE
-  @deprecated("Use None; NONE will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use None; NONE will be removed in a future release",
+    "8.0.60-R10")
   val NONE = None
 
   protected override def unsortedValues: Array[TransferMode] =

@@ -359,9 +359,10 @@ abstract class LambdaLift extends InfoTransform {
       freeArgs(sym) match {
         case Nil => args
         case fvs =>
-          addFree(sym,
-                  free = fvs map (fv => atPos(pos)(proxyRef(fv))),
-                  original = args)
+          addFree(
+            sym,
+            free = fvs map (fv => atPos(pos)(proxyRef(fv))),
+            original = args)
       }
 
     def proxiesOrNil(sym: Symbol) = proxies.getOrElse(sym, Nil)

@@ -80,14 +80,16 @@ class ScalaCompilingEvaluator(psiContext: PsiElement,
     }
 
     try {
-      defineClasses(generatedClass.compiledClasses,
-                    context,
-                    process,
-                    classLoader)
+      defineClasses(
+        generatedClass.compiledClasses,
+        context,
+        process,
+        classLoader)
     } catch {
       case e: Exception =>
-        throw new EvaluateException("Error during classes definition:\n " + e,
-                                    e)
+        throw new EvaluateException(
+          "Error during classes definition:\n " + e,
+          e)
     }
 
     try {
@@ -108,8 +110,9 @@ class ScalaCompilingEvaluator(psiContext: PsiElement,
       project,
       new EvaluatingComputable[ExpressionEvaluator] {
         override def compute(): ExpressionEvaluator = {
-          val callCode = new TextWithImportsImpl(CodeFragmentKind.CODE_BLOCK,
-                                                 generatedClass.callText)
+          val callCode = new TextWithImportsImpl(
+            CodeFragmentKind.CODE_BLOCK,
+            generatedClass.callText)
           val codeFragment = new ScalaCodeFragmentFactory()
             .createCodeFragment(callCode, generatedClass.getAnchor, project)
           ScalaEvaluatorBuilder.build(
@@ -166,10 +169,11 @@ class ScalaCompilingEvaluator(psiContext: PsiElement,
     val args =
       util.Arrays.asList(createURLArray(context), context.getClassLoader)
     val reference = loaderClass
-      .newInstance(threadReference,
-                   ctorMethod,
-                   args,
-                   ClassType.INVOKE_SINGLE_THREADED)
+      .newInstance(
+        threadReference,
+        ctorMethod,
+        args,
+        ClassType.INVOKE_SINGLE_THREADED)
       .asInstanceOf[ClassLoaderReference]
     keep(reference, context)
     reference
@@ -204,10 +208,11 @@ object ScalaCompilingEvaluator {
     keep(url, context)
     val ctorMethod =
       classType.concreteMethodByName("<init>", "(Ljava/lang/String;)V")
-    val reference = classType.newInstance(threadReference,
-                                          ctorMethod,
-                                          util.Arrays.asList(url),
-                                          ClassType.INVOKE_SINGLE_THREADED)
+    val reference = classType.newInstance(
+      threadReference,
+      ctorMethod,
+      util.Arrays.asList(url),
+      ClassType.INVOKE_SINGLE_THREADED)
     keep(reference, context)
     arrayRef.setValues(util.Arrays.asList(reference))
     arrayRef
@@ -224,10 +229,11 @@ object ScalaCompilingEvaluator {
     keep(reference, context)
     bytes.zipWithIndex.foreach {
       case (b, i) =>
-        reference.setValue(i,
-                           process.getVirtualMachineProxy
-                             .asInstanceOf[VirtualMachineProxyImpl]
-                             .mirrorOf(bytes(i)))
+        reference.setValue(
+          i,
+          process.getVirtualMachineProxy
+            .asInstanceOf[VirtualMachineProxyImpl]
+            .mirrorOf(bytes(i)))
       case _ =>
     }
     reference
@@ -269,18 +275,20 @@ private class GeneratedClass(fragment: ScalaCodeFragment,
     //create physical file to work with source positions
     val copy = PsiFileFactory
       .getInstance(project)
-      .createFileFromText(file.getName,
-                          file.getFileType,
-                          textWithLocalClass,
-                          file.getModificationStamp,
-                          true)
+      .createFileFromText(
+        file.getName,
+        file.getFileType,
+        textWithLocalClass,
+        file.getModificationStamp,
+        true)
     copy.putUserData(ScalaCompilingEvaluator.classNameKey, generatedClassName)
     copy.putUserData(ScalaCompilingEvaluator.originalFileKey, file)
-    anchor = CodeInsightUtilCore.findElementInRange(copy,
-                                                    anchorRange.getStartOffset,
-                                                    anchorRange.getEndOffset,
-                                                    classOf[ScBlockStatement],
-                                                    file.getLanguage)
+    anchor = CodeInsightUtilCore.findElementInRange(
+      copy,
+      anchorRange.getStartOffset,
+      anchorRange.getEndOffset,
+      classOf[ScBlockStatement],
+      file.getLanguage)
     compileGeneratedClass(copy.getText)
   }
 
@@ -306,11 +314,12 @@ private class GeneratedClass(fragment: ScalaCodeFragment,
     val file = context.getContainingFile
     val copy = PsiFileFactory
       .getInstance(project)
-      .createFileFromText(file.getName,
-                          file.getFileType,
-                          file.getText,
-                          file.getModificationStamp,
-                          false)
+      .createFileFromText(
+        file.getName,
+        file.getFileType,
+        file.getText,
+        file.getModificationStamp,
+        false)
     val range = context.getTextRange
     val copyContext: PsiElement = CodeInsightUtilCore.findElementInRange(
       copy,
@@ -378,11 +387,13 @@ private class GeneratedClass(fragment: ScalaCodeFragment,
         anchor)
 
     parent.addBefore(scClass, anchor)
-    parent.addBefore(ScalaPsiElementFactory.createNewLine(context.getManager),
-                     anchor)
+    parent.addBefore(
+      ScalaPsiElementFactory.createNewLine(context.getManager),
+      anchor)
     parent.addBefore(newInstance, anchor)
-    parent.addBefore(ScalaPsiElementFactory.createNewLine(context.getManager),
-                     anchor)
+    parent.addBefore(
+      ScalaPsiElementFactory.createNewLine(context.getManager),
+      anchor)
     anchorRange = anchor.getTextRange
   }
 

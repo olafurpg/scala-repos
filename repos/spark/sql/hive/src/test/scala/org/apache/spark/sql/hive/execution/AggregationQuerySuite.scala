@@ -88,9 +88,10 @@ class ScalaAggregateFunctionWithoutInputSchema
   }
 
   def update(buffer: MutableAggregationBuffer, input: Row): Unit = {
-    buffer.update(0,
-                  input.getAs[Seq[Row]](0).map(_.getAs[Int]("v")).sum +
-                    buffer.getLong(0))
+    buffer.update(
+      0,
+      input.getAs[Seq[Row]](0).map(_.getAs[Int]("v")).sum +
+        buffer.getLong(0))
   }
 
   def merge(buffer1: MutableAggregationBuffer, buffer2: Row): Unit = {
@@ -138,19 +139,20 @@ abstract class AggregationQuerySuite
 
   override def beforeAll(): Unit = {
     super.beforeAll()
-    val data1 = Seq[(Integer, Integer)]((1, 10),
-                                        (null, -60),
-                                        (1, 20),
-                                        (1, 30),
-                                        (2, 0),
-                                        (null, -10),
-                                        (2, -1),
-                                        (2, null),
-                                        (2, null),
-                                        (null, 100),
-                                        (3, null),
-                                        (null, null),
-                                        (3, null)).toDF("key", "value")
+    val data1 = Seq[(Integer, Integer)](
+      (1, 10),
+      (null, -60),
+      (1, 20),
+      (1, 30),
+      (2, 0),
+      (null, -10),
+      (2, -1),
+      (2, null),
+      (2, null),
+      (null, 100),
+      (3, null),
+      (null, null),
+      (3, null)).toDF("key", "value")
     data1.write.saveAsTable("agg1")
 
     val data2 = Seq[(Integer, Integer, Integer)](
@@ -186,11 +188,11 @@ abstract class AggregationQuerySuite
     data3.write.saveAsTable("agg3")
 
     val emptyDF = sqlContext
-      .createDataFrame(sparkContext.emptyRDD[Row],
-                       StructType(
-                         StructField("key", StringType) :: StructField(
-                           "value",
-                           IntegerType) :: Nil))
+      .createDataFrame(
+        sparkContext.emptyRDD[Row],
+        StructType(StructField("key", StringType) :: StructField(
+          "value",
+          IntegerType) :: Nil))
     emptyDF.registerTempTable("emptyTable")
 
     // Register UDAFs
@@ -217,7 +219,8 @@ abstract class AggregationQuerySuite
 
   test("empty table") {
     // If there is no GROUP BY clause and the table is empty, we will generate a single row.
-    checkAnswer(sqlContext.sql("""
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT
           |  AVG(value),
           |  COUNT(*),
@@ -230,9 +233,10 @@ abstract class AggregationQuerySuite
           |  SUM(key)
           |FROM emptyTable
         """.stripMargin),
-                Row(null, 0, 0, 0, null, null, null, null, null) :: Nil)
+      Row(null, 0, 0, 0, null, null, null, null, null) :: Nil)
 
-    checkAnswer(sqlContext.sql("""
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT
           |  AVG(value),
           |  COUNT(*),
@@ -246,10 +250,11 @@ abstract class AggregationQuerySuite
           |  COUNT(DISTINCT value)
           |FROM emptyTable
         """.stripMargin),
-                Row(null, 0, 0, 0, null, null, null, null, null, 0) :: Nil)
+      Row(null, 0, 0, 0, null, null, null, null, null, 0) :: Nil)
 
     // If there is a GROUP BY clause and the table is empty, there is no output.
-    checkAnswer(sqlContext.sql("""
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT
           |  AVG(value),
           |  COUNT(*),
@@ -263,11 +268,12 @@ abstract class AggregationQuerySuite
           |FROM emptyTable
           |GROUP BY key
         """.stripMargin),
-                Nil)
+      Nil)
   }
 
   test("null literal") {
-    checkAnswer(sqlContext.sql("""
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT
           |  AVG(null),
           |  COUNT(null),
@@ -277,74 +283,72 @@ abstract class AggregationQuerySuite
           |  MIN(null),
           |  SUM(null)
         """.stripMargin),
-                Row(null, 0, null, null, null, null, null) :: Nil)
+      Row(null, 0, null, null, null, null, null) :: Nil)
   }
 
   test("only do grouping") {
-    checkAnswer(sqlContext.sql("""
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT key
           |FROM agg1
           |GROUP BY key
         """.stripMargin),
-                Row(1) :: Row(2) :: Row(3) :: Row(null) :: Nil)
+      Row(1) :: Row(2) :: Row(3) :: Row(null) :: Nil)
 
-    checkAnswer(sqlContext.sql("""
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT DISTINCT value1, key
           |FROM agg2
         """.stripMargin),
-                Row(10, 1) :: Row(-60, null) :: Row(30, 1) :: Row(1, 2) :: Row(
-                  -10,
-                  null) :: Row(-1, 2) :: Row(null, 2) :: Row(100, null) :: Row(
-                  null,
-                  3) :: Row(null, null) :: Nil)
+      Row(10, 1) :: Row(-60, null) :: Row(30, 1) :: Row(1, 2) :: Row(-10, null) :: Row(
+        -1,
+        2) :: Row(null, 2) :: Row(100, null) :: Row(null, 3) :: Row(null, null) :: Nil)
 
-    checkAnswer(sqlContext.sql("""
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT value1, key
           |FROM agg2
           |GROUP BY key, value1
         """.stripMargin),
-                Row(10, 1) :: Row(-60, null) :: Row(30, 1) :: Row(1, 2) :: Row(
-                  -10,
-                  null) :: Row(-1, 2) :: Row(null, 2) :: Row(100, null) :: Row(
-                  null,
-                  3) :: Row(null, null) :: Nil)
+      Row(10, 1) :: Row(-60, null) :: Row(30, 1) :: Row(1, 2) :: Row(-10, null) :: Row(
+        -1,
+        2) :: Row(null, 2) :: Row(100, null) :: Row(null, 3) :: Row(null, null) :: Nil)
 
-    checkAnswer(sqlContext.sql("""
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT DISTINCT key
           |FROM agg3
         """.stripMargin),
-                Row(Seq[Integer](1, 1)) :: Row(Seq[Integer](null)) :: Row(
-                  Seq[Integer](1)) :: Row(Seq[Integer](2)) :: Row(null) :: Row(
-                  Seq[Integer](2, 3)) :: Row(Seq[Integer](2, 3, 4)) :: Row(
-                  Seq[Integer](3)) :: Nil)
+      Row(Seq[Integer](1, 1)) :: Row(Seq[Integer](null)) :: Row(
+        Seq[Integer](1)) :: Row(Seq[Integer](2)) :: Row(null) :: Row(
+        Seq[Integer](2, 3)) :: Row(Seq[Integer](2, 3, 4)) :: Row(
+        Seq[Integer](3)) :: Nil)
 
-    checkAnswer(sqlContext.sql("""
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT value1, key
           |FROM agg3
           |GROUP BY value1, key
         """.stripMargin),
-                Row(10, Seq[Integer](1, 1)) :: Row(-60, Seq[Integer](null)) :: Row(
-                  30,
-                  Seq[Integer](1, 1)) :: Row(30, Seq[Integer](1)) :: Row(
-                  1,
-                  Seq[Integer](2)) :: Row(-10, null) :: Row(
-                  -1,
-                  Seq[Integer](2, 3)) :: Row(1, Seq[Integer](2, 3)) :: Row(
-                  null,
-                  Seq[Integer](2, 3, 4)) :: Row(100, Seq[Integer](null)) :: Row(
-                  null,
-                  Seq[Integer](3)) :: Row(null, null) :: Nil)
+      Row(10, Seq[Integer](1, 1)) :: Row(-60, Seq[Integer](null)) :: Row(
+        30,
+        Seq[Integer](1, 1)) :: Row(30, Seq[Integer](1)) :: Row(
+        1,
+        Seq[Integer](2)) :: Row(-10, null) :: Row(-1, Seq[Integer](2, 3)) :: Row(
+        1,
+        Seq[Integer](2, 3)) :: Row(null, Seq[Integer](2, 3, 4)) :: Row(
+        100,
+        Seq[Integer](null)) :: Row(null, Seq[Integer](3)) :: Row(null, null) :: Nil)
   }
 
   test("case in-sensitive resolution") {
-    checkAnswer(sqlContext.sql("""
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT avg(value), kEY - 100
           |FROM agg1
           |GROUP BY Key - 100
         """.stripMargin),
-                Row(20.0, -99) :: Row(-0.5, -98) :: Row(null, -97) :: Row(
-                  10.0,
-                  null) :: Nil)
+      Row(20.0, -99) :: Row(-0.5, -98) :: Row(null, -97) :: Row(10.0, null) :: Nil)
 
     checkAnswer(
       sqlContext.sql(
@@ -353,26 +357,28 @@ abstract class AggregationQuerySuite
           |FROM agg2
           |GROUP BY Key - 100
         """.stripMargin),
-      Row(40, -99, 2) :: Row(0, -98, 2) :: Row(null, -97, 0) :: Row(30,
-                                                                    null,
-                                                                    3) :: Nil)
+      Row(40, -99, 2) :: Row(0, -98, 2) :: Row(null, -97, 0) :: Row(
+        30,
+        null,
+        3) :: Nil)
 
-    checkAnswer(sqlContext.sql("""
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT valUe * key - 100
           |FROM agg1
           |GROUP BY vAlue * keY - 100
         """.stripMargin),
-                Row(-90) :: Row(-80) :: Row(-70) :: Row(-100) :: Row(-102) :: Row(
-                  null) :: Nil)
+      Row(-90) :: Row(-80) :: Row(-70) :: Row(-100) :: Row(-102) :: Row(null) :: Nil)
   }
 
   test("test average no key in output") {
-    checkAnswer(sqlContext.sql("""
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT avg(value)
           |FROM agg1
           |GROUP BY key
         """.stripMargin),
-                Row(-0.5) :: Row(20.0) :: Row(null) :: Row(10.0) :: Nil)
+      Row(-0.5) :: Row(20.0) :: Row(null) :: Row(10.0) :: Nil)
   }
 
   test("test average") {
@@ -408,17 +414,19 @@ abstract class AggregationQuerySuite
         """.stripMargin),
       Row(21.5, 11) :: Row(1.0, 12) :: Row(null, 13) :: Row(11.5, null) :: Nil)
 
-    checkAnswer(sqlContext.sql("""
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT avg(value) FROM agg1
         """.stripMargin),
-                Row(11.125) :: Nil)
+      Row(11.125) :: Nil)
   }
 
   test("first_value and last_value") {
     // We force to use a single partition for the sort and aggregate to make result
     // deterministic.
     withSQLConf(SQLConf.SHUFFLE_PARTITIONS.key -> "1") {
-      checkAnswer(sqlContext.sql("""
+      checkAnswer(
+        sqlContext.sql("""
             |SELECT
             |  first_valUE(key),
             |  lasT_value(key),
@@ -430,7 +438,7 @@ abstract class AggregationQuerySuite
             |  lASt(key, true)
             |FROM (SELECT key FROM agg1 ORDER BY key) tmp
           """.stripMargin),
-                  Row(null, 3, null, 3, 1, 3, 1, 3) :: Nil)
+        Row(null, 3, null, 3, 1, 3, 1, 3) :: Nil)
 
       checkAnswer(
         sqlContext.sql("""
@@ -450,7 +458,8 @@ abstract class AggregationQuerySuite
   }
 
   test("udaf") {
-    checkAnswer(sqlContext.sql("""
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT
           |  key,
           |  mydoublesum(value + 1.5 * key),
@@ -461,18 +470,19 @@ abstract class AggregationQuerySuite
           |FROM agg1
           |GROUP BY key
         """.stripMargin),
-                Row(1, 64.5, 120.0, 19.0, 55.5, 20.0) :: Row(2,
-                                                             5.0,
-                                                             99.5,
-                                                             -2.5,
-                                                             -7.0,
-                                                             -0.5) :: Row(
-                  3,
-                  null,
-                  null,
-                  null,
-                  null,
-                  null) :: Row(null, null, 110.0, null, null, 10.0) :: Nil)
+      Row(1, 64.5, 120.0, 19.0, 55.5, 20.0) :: Row(
+        2,
+        5.0,
+        99.5,
+        -2.5,
+        -7.0,
+        -0.5) :: Row(3, null, null, null, null, null) :: Row(
+        null,
+        null,
+        110.0,
+        null,
+        null,
+        10.0) :: Nil)
   }
 
   test("interpreted aggregate function") {
@@ -484,15 +494,17 @@ abstract class AggregationQuerySuite
         """.stripMargin),
       Row(60.0, 1) :: Row(-1.0, 2) :: Row(null, 3) :: Row(30.0, null) :: Nil)
 
-    checkAnswer(sqlContext.sql("""
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT mydoublesum(value) FROM agg1
         """.stripMargin),
-                Row(89.0) :: Nil)
+      Row(89.0) :: Nil)
 
-    checkAnswer(sqlContext.sql("""
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT mydoublesum(null)
         """.stripMargin),
-                Row(null) :: Nil)
+      Row(null) :: Nil)
   }
 
   test("interpreted and expression-based aggregation functions") {
@@ -528,7 +540,8 @@ abstract class AggregationQuerySuite
 
   test("single distinct column set") {
     // DISTINCT is not meaningful with Max and Min, so we just ignore the DISTINCT keyword.
-    checkAnswer(sqlContext.sql("""
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT
           |  min(distinct value1),
           |  sum(distinct value1),
@@ -537,9 +550,10 @@ abstract class AggregationQuerySuite
           |  max(distinct value1)
           |FROM agg2
         """.stripMargin),
-                Row(-60, 70.0, 101.0 / 9.0, 5.6, 100))
+      Row(-60, 70.0, 101.0 / 9.0, 5.6, 100))
 
-    checkAnswer(sqlContext.sql("""
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT
           |  mydoubleavg(distinct value1),
           |  avg(value1),
@@ -551,31 +565,21 @@ abstract class AggregationQuerySuite
           |FROM agg2
           |GROUP BY key
         """.stripMargin),
-                Row(120.0,
-                    70.0 / 3.0,
-                    -10.0 / 3.0,
-                    1,
-                    67.0 / 3.0 + 100.0,
-                    12.0,
-                    20.0) :: Row(100.0,
-                                 1.0 / 3.0,
-                                 1.0,
-                                 2,
-                                 -2.0 / 3.0 + 100.0,
-                                 10.0,
-                                 2.0) :: Row(null,
-                                             null,
-                                             3.0,
-                                             3,
-                                             null,
-                                             null,
-                                             null) :: Row(110.0,
-                                                          10.0,
-                                                          20.0,
-                                                          null,
-                                                          109.0,
-                                                          11.0,
-                                                          30.0) :: Nil)
+      Row(120.0, 70.0 / 3.0, -10.0 / 3.0, 1, 67.0 / 3.0 + 100.0, 12.0, 20.0) :: Row(
+        100.0,
+        1.0 / 3.0,
+        1.0,
+        2,
+        -2.0 / 3.0 + 100.0,
+        10.0,
+        2.0) :: Row(null, null, 3.0, 3, null, null, null) :: Row(
+        110.0,
+        10.0,
+        20.0,
+        null,
+        109.0,
+        11.0,
+        30.0) :: Nil)
 
     checkAnswer(
       sqlContext.sql("""
@@ -623,14 +627,15 @@ abstract class AggregationQuerySuite
   }
 
   test("single distinct multiple columns set") {
-    checkAnswer(sqlContext.sql("""
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT
           |  key,
           |  count(distinct value1, value2)
           |FROM agg2
           |GROUP BY key
         """.stripMargin),
-                Row(null, 3) :: Row(1, 3) :: Row(2, 1) :: Row(3, 0) :: Nil)
+      Row(null, 3) :: Row(1, 3) :: Row(2, 1) :: Row(3, 0) :: Nil)
   }
 
   test("multiple distinct multiple columns sets") {
@@ -668,24 +673,26 @@ abstract class AggregationQuerySuite
         -10,
         -100,
         3,
-        3) :: Row(2, 2, 0, 1, 1, 1, 1, 3, 1, 3, 3, 2, 4, 4) :: Row(3,
-                                                                   0,
-                                                                   null,
-                                                                   1,
-                                                                   3,
-                                                                   0,
-                                                                   0,
-                                                                   0,
-                                                                   null,
-                                                                   1,
-                                                                   3,
-                                                                   0,
-                                                                   2,
-                                                                   2) :: Nil)
+        3) :: Row(2, 2, 0, 1, 1, 1, 1, 3, 1, 3, 3, 2, 4, 4) :: Row(
+        3,
+        0,
+        null,
+        1,
+        3,
+        0,
+        0,
+        0,
+        null,
+        1,
+        3,
+        0,
+        2,
+        2) :: Nil)
   }
 
   test("test count") {
-    checkAnswer(sqlContext.sql("""
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT
           |  count(value2),
           |  value1,
@@ -695,22 +702,22 @@ abstract class AggregationQuerySuite
           |FROM agg2
           |GROUP BY key, value1
         """.stripMargin),
-                Row(1, 10, 1, 1, 1) :: Row(1, -60, 1, 1, null) :: Row(
-                  2,
-                  30,
-                  2,
-                  2,
-                  1) :: Row(2, 1, 2, 2, 2) :: Row(1, -10, 1, 1, null) :: Row(
-                  0,
-                  -1,
-                  1,
-                  1,
-                  2) :: Row(1, null, 1, 1, 2) :: Row(1, 100, 1, 1, null) :: Row(
-                  1,
-                  null,
-                  2,
-                  2,
-                  3) :: Row(0, null, 1, 1, null) :: Nil)
+      Row(1, 10, 1, 1, 1) :: Row(1, -60, 1, 1, null) :: Row(2, 30, 2, 2, 1) :: Row(
+        2,
+        1,
+        2,
+        2,
+        2) :: Row(1, -10, 1, 1, null) :: Row(0, -1, 1, 1, 2) :: Row(
+        1,
+        null,
+        1,
+        1,
+        2) :: Row(1, 100, 1, 1, null) :: Row(1, null, 2, 2, 3) :: Row(
+        0,
+        null,
+        1,
+        1,
+        null) :: Nil)
 
     checkAnswer(
       sqlContext.sql("""
@@ -801,37 +808,41 @@ abstract class AggregationQuerySuite
     // SELECT corr(b, c) FROM covar_tab; => 0.6633880657639323
 
     val covar_tab =
-      Seq[(Integer, Integer, Integer)]((1, null, 15),
-                                       (2, 3, null),
-                                       (3, 7, 12),
-                                       (4, 4, 14),
-                                       (5, 8, 17),
-                                       (6, 2, 11)).toDF("a", "b", "c")
+      Seq[(Integer, Integer, Integer)](
+        (1, null, 15),
+        (2, 3, null),
+        (3, 7, 12),
+        (4, 4, 14),
+        (5, 8, 17),
+        (6, 2, 11)).toDF("a", "b", "c")
 
     covar_tab.registerTempTable("covar_tab")
 
-    checkAnswer(sqlContext.sql("""
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT corr(b, c) FROM covar_tab WHERE a < 1
         """.stripMargin),
-                Row(null) :: Nil)
+      Row(null) :: Nil)
 
-    checkAnswer(sqlContext.sql("""
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT corr(b, c) FROM covar_tab WHERE a < 3
         """.stripMargin),
-                Row(null) :: Nil)
+      Row(null) :: Nil)
 
-    checkAnswer(sqlContext.sql("""
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT corr(b, c) FROM covar_tab WHERE a = 3
         """.stripMargin),
-                Row(Double.NaN) :: Nil)
+      Row(Double.NaN) :: Nil)
 
-    checkAnswer(sqlContext.sql(
-                  """
+    checkAnswer(
+      sqlContext.sql("""
           |SELECT a, corr(b, c) FROM covar_tab GROUP BY a ORDER BY a
         """.stripMargin),
-                Row(1, null) :: Row(2, null) :: Row(3, Double.NaN) :: Row(
-                  4,
-                  Double.NaN) :: Row(5, Double.NaN) :: Row(6, Double.NaN) :: Nil)
+      Row(1, null) :: Row(2, null) :: Row(3, Double.NaN) :: Row(4, Double.NaN) :: Row(
+        5,
+        Double.NaN) :: Row(6, Double.NaN) :: Nil)
 
     val corr7 = sqlContext
       .sql("SELECT corr(b, c) FROM covar_tab")
@@ -887,27 +898,29 @@ abstract class AggregationQuerySuite
 
   test("udaf with all data types") {
     val struct = StructType(
-      StructField("f1", FloatType, true) :: StructField("f2",
-                                                        ArrayType(BooleanType),
-                                                        true) :: Nil)
-    val dataTypes = Seq(StringType,
-                        BinaryType,
-                        NullType,
-                        BooleanType,
-                        ByteType,
-                        ShortType,
-                        IntegerType,
-                        LongType,
-                        FloatType,
-                        DoubleType,
-                        DecimalType(25, 5),
-                        DecimalType(6, 5),
-                        DateType,
-                        TimestampType,
-                        ArrayType(IntegerType),
-                        MapType(StringType, LongType),
-                        struct,
-                        new MyDenseVectorUDT())
+      StructField("f1", FloatType, true) :: StructField(
+        "f2",
+        ArrayType(BooleanType),
+        true) :: Nil)
+    val dataTypes = Seq(
+      StringType,
+      BinaryType,
+      NullType,
+      BooleanType,
+      ByteType,
+      ShortType,
+      IntegerType,
+      LongType,
+      FloatType,
+      DoubleType,
+      DecimalType(25, 5),
+      DecimalType(6, 5),
+      DateType,
+      TimestampType,
+      ArrayType(IntegerType),
+      MapType(StringType, LongType),
+      struct,
+      new MyDenseVectorUDT())
     // Right now, we will use SortBasedAggregate to handle UDAFs.
     // UnsafeRow.mutableFieldTypes.asScala.toSeq will trigger SortBasedAggregate to use
     // UnsafeRow as the aggregation buffer. While, dataTypes will trigger
@@ -929,9 +942,10 @@ abstract class AggregationQuerySuite
         // Generate data at the driver side. We need to materialize the data first and then
         // create RDD.
         val maybeDataGenerator =
-          RandomDataGenerator.forType(dataType = schemaForGenerator,
-                                      nullable = true,
-                                      new Random(System.nanoTime()))
+          RandomDataGenerator.forType(
+            dataType = schemaForGenerator,
+            nullable = true,
+            new Random(System.nanoTime()))
         val dataGenerator = maybeDataGenerator.getOrElse(
           fail(
             s"Failed to create data generator for schema $schemaForGenerator"))
@@ -965,8 +979,9 @@ abstract class AggregationQuerySuite
 
   test("udaf without specifying inputSchema") {
     withTempTable("noInputSchemaUDAF") {
-      sqlContext.udf.register("noInputSchema",
-                              new ScalaAggregateFunctionWithoutInputSchema)
+      sqlContext.udf.register(
+        "noInputSchema",
+        new ScalaAggregateFunctionWithoutInputSchema)
 
       val data =
         Row(1, Seq(Row(1), Row(2), Row(3))) :: Row(
@@ -980,18 +995,20 @@ abstract class AggregationQuerySuite
         .createDataFrame(sparkContext.parallelize(data, 2), schema)
         .registerTempTable("noInputSchemaUDAF")
 
-      checkAnswer(sqlContext.sql("""
+      checkAnswer(
+        sqlContext.sql("""
             |SELECT key, noInputSchema(myArray)
             |FROM noInputSchemaUDAF
             |GROUP BY key
           """.stripMargin),
-                  Row(1, 21) :: Row(2, -10) :: Nil)
+        Row(1, 21) :: Row(2, -10) :: Nil)
 
-      checkAnswer(sqlContext.sql("""
+      checkAnswer(
+        sqlContext.sql("""
             |SELECT noInputSchema(myArray)
             |FROM noInputSchemaUDAF
           """.stripMargin),
-                  Row(11) :: Nil)
+        Row(11) :: Nil)
     }
   }
 }

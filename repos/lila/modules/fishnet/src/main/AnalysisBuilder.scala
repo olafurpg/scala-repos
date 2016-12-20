@@ -57,11 +57,12 @@ private object AnalysisBuilder {
           case _ => Nil
         }
         val best = variation.headOption flatMap Uci.Move.apply
-        val info = Info(ply = index + 1 + startedAtPly,
-                        score = after.score.cp map lila.analyse.Score.apply,
-                        mate = after.score.mate,
-                        variation = variation,
-                        best = best)
+        val info = Info(
+          ply = index + 1 + startedAtPly,
+          score = after.score.cp map lila.analyse.Score.apply,
+          mate = after.score.mate,
+          variation = variation,
+          best = best)
         if (info.ply % 2 == 1) info.invert else info
       }
     }

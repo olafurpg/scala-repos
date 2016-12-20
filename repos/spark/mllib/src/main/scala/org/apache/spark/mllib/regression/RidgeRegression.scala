@@ -148,10 +148,11 @@ object RidgeRegressionWithSGD {
             regParam: Double,
             miniBatchFraction: Double,
             initialWeights: Vector): RidgeRegressionModel = {
-    new RidgeRegressionWithSGD(stepSize,
-                               numIterations,
-                               regParam,
-                               miniBatchFraction).run(input, initialWeights)
+    new RidgeRegressionWithSGD(
+      stepSize,
+      numIterations,
+      regParam,
+      miniBatchFraction).run(input, initialWeights)
   }
 
   /**
@@ -172,10 +173,11 @@ object RidgeRegressionWithSGD {
             stepSize: Double,
             regParam: Double,
             miniBatchFraction: Double): RidgeRegressionModel = {
-    new RidgeRegressionWithSGD(stepSize,
-                               numIterations,
-                               regParam,
-                               miniBatchFraction).run(input)
+    new RidgeRegressionWithSGD(
+      stepSize,
+      numIterations,
+      regParam,
+      miniBatchFraction).run(input)
   }
 
   /**

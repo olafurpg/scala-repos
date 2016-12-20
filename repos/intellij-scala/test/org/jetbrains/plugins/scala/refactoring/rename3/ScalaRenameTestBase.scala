@@ -152,11 +152,12 @@ abstract class ScalaRenameTestBase
         .substituteElementToRename(element, getEditorAdapter)
       if (subst != null) {
         oldName = ScalaNamesUtil.scalaName(subst)
-        new RenameProcessor(projectAdapter,
-                            subst,
-                            newName,
-                            searchInComments,
-                            false).run()
+        new RenameProcessor(
+          projectAdapter,
+          subst,
+          newName,
+          searchInComments,
+          false).run()
       }
     }
     PsiDocumentManager.getInstance(getProjectAdapter).commitAllDocuments()

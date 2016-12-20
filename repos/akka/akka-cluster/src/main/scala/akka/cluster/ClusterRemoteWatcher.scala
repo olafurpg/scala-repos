@@ -25,11 +25,12 @@ private[cluster] object ClusterRemoteWatcher {
             heartbeatInterval: FiniteDuration,
             unreachableReaperInterval: FiniteDuration,
             heartbeatExpectedResponseAfter: FiniteDuration): Props =
-    Props(classOf[ClusterRemoteWatcher],
-          failureDetector,
-          heartbeatInterval,
-          unreachableReaperInterval,
-          heartbeatExpectedResponseAfter).withDeploy(Deploy.local)
+    Props(
+      classOf[ClusterRemoteWatcher],
+      failureDetector,
+      heartbeatInterval,
+      unreachableReaperInterval,
+      heartbeatExpectedResponseAfter).withDeploy(Deploy.local)
 }
 
 /**
@@ -48,10 +49,11 @@ private[cluster] class ClusterRemoteWatcher(
     heartbeatInterval: FiniteDuration,
     unreachableReaperInterval: FiniteDuration,
     heartbeatExpectedResponseAfter: FiniteDuration)
-    extends RemoteWatcher(failureDetector,
-                          heartbeatInterval,
-                          unreachableReaperInterval,
-                          heartbeatExpectedResponseAfter) {
+    extends RemoteWatcher(
+      failureDetector,
+      heartbeatInterval,
+      unreachableReaperInterval,
+      heartbeatExpectedResponseAfter) {
 
   val cluster = Cluster(context.system)
   import cluster.selfAddress

@@ -32,8 +32,9 @@ object BSONHandlers {
             .toList
             .flatMap(chess.Piece.fromChar)
             .partition(_ is chess.White)
-          Pockets(white = Pocket(white.map(_.role)),
-                  black = Pocket(black.map(_.role)))
+          Pockets(
+            white = Pocket(white.map(_.role)),
+            black = Pocket(black.map(_.role)))
         }, promoted = r.str("t").toSet.flatMap(chess.Pos.piotr))
 
       def writes(w: BSON.Writer, o: Crazyhouse.Data) = BSONDocument(
@@ -84,9 +85,10 @@ object BSONHandlers {
         startedAtTurn = r intD startedAtTurn,
         clock = r
             .getO[Color => Clock](clock)(
-              clockBSONReader(createdAtValue,
-                              wPlayer.berserk,
-                              bPlayer.berserk)) map
+              clockBSONReader(
+                createdAtValue,
+                wPlayer.berserk,
+                bPlayer.berserk)) map
             (_(Color(0 == nbTurns % 2))),
         positionHashes = r.bytesD(positionHashes).value,
         checkCount = {

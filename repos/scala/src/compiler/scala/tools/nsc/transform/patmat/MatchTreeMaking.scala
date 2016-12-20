@@ -179,8 +179,9 @@ trait MatchTreeMaking extends MatchCodeGen with Debugging {
         if (!emitVars) Substitution(subPatBinders, subPatRefs)
         else {
           val (subPatBindersSubstituted, subPatRefsSubstituted) = substed.unzip
-          Substitution(subPatBindersSubstituted.toList,
-                       subPatRefsSubstituted.toList)
+          Substitution(
+            subPatBindersSubstituted.toList,
+            subPatRefsSubstituted.toList)
         }
 
       /** The substitution that specifies the trees that compute the values of the subpattern binders.
@@ -219,9 +220,10 @@ trait MatchTreeMaking extends MatchCodeGen with Debugging {
                 case (b, _) => usedBinders(b)
               }
               .unzip
-            Block(map2(subPatBindersStored.toList, subPatRefsStored.toList)(
-                    ValDef(_, _)),
-                  in)
+            Block(
+              map2(subPatBindersStored.toList, subPatRefsStored.toList)(
+                ValDef(_, _)),
+              in)
           }
         }
     }
@@ -265,8 +267,9 @@ trait MatchTreeMaking extends MatchCodeGen with Debugging {
       def chainBefore(next: Tree)(casegen: Casegen): Tree = {
         val condAndNext = extraCond match {
           case Some(cond) =>
-            casegen.ifThenElseZero(substitution(cond),
-                                   bindSubPats(substitution(next)))
+            casegen.ifThenElseZero(
+              substitution(cond),
+              bindSubPats(substitution(next)))
           case _ =>
             bindSubPats(substitution(next))
         }
@@ -421,8 +424,9 @@ trait MatchTreeMaking extends MatchCodeGen with Debugging {
                     vpmName.outer,
                     newFlags = SYNTHETIC | ARTIFACT) setInfo expectedPrefix
                 val outerTest =
-                  (Select(codegen._asInstanceOf(testedBinder, expectedTp),
-                          synthOuterGetter)) OBJ_EQ expectedOuterRef
+                  (Select(
+                    codegen._asInstanceOf(testedBinder, expectedTp),
+                    synthOuterGetter)) OBJ_EQ expectedOuterRef
                 and(orig, outerTest)
             }
         }
@@ -663,12 +667,13 @@ trait MatchTreeMaking extends MatchCodeGen with Debugging {
       // drops SubstOnlyTreeMakers, since their effect is now contained in the TreeMakers that follow them
       val casesNoSubstOnly =
         casesRaw map (propagateSubstitution(_, EmptySubstitution))
-      combineCasesNoSubstOnly(scrut,
-                              scrutSym,
-                              casesNoSubstOnly,
-                              pt,
-                              owner,
-                              matchFailGenOverride)
+      combineCasesNoSubstOnly(
+        scrut,
+        scrutSym,
+        casesNoSubstOnly,
+        pt,
+        owner,
+        matchFailGenOverride)
     }
 
     // pt is the fully defined type of the cases (either pt or the lub of the types of the cases)
@@ -725,12 +730,13 @@ trait MatchTreeMaking extends MatchCodeGen with Debugging {
                 (Suppression.NoSuppression, false)
             }
 
-        emitSwitch(scrut,
-                   scrutSym,
-                   casesNoSubstOnly,
-                   pt,
-                   matchFailGenOverride,
-                   unchecked = suppression.suppressExhaustive).getOrElse {
+        emitSwitch(
+          scrut,
+          scrutSym,
+          casesNoSubstOnly,
+          pt,
+          matchFailGenOverride,
+          unchecked = suppression.suppressExhaustive).getOrElse {
           if (requireSwitch)
             reporter.warning(
               scrut.pos,
@@ -757,8 +763,9 @@ trait MatchTreeMaking extends MatchCodeGen with Debugging {
               optimizeCases(scrutSym, casesNoSubstOnly, pt)
 
             val matchRes =
-              codegen.matcher(scrut, scrutSym, pt)(cases map combineExtractors,
-                                                   synthCatchAll)
+              codegen.matcher(scrut, scrutSym, pt)(
+                cases map combineExtractors,
+                synthCatchAll)
 
             if (toHoist isEmpty) matchRes else Block(toHoist, matchRes)
           } else {

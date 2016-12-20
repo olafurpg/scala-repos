@@ -32,9 +32,10 @@ object Constructor {
           latestDoneMarker.getTokenType != ScalaElementTypes.MODIFIERS &&
           latestDoneMarker.getTokenType != ScalaElementTypes.TYPE_PARAM_CLAUSE)
 
-    if ((!isAnnotation && !AnnotType.parse(builder,
-                                           isPattern = false,
-                                           multipleSQBrackets = false)) ||
+    if ((!isAnnotation && !AnnotType.parse(
+          builder,
+          isPattern = false,
+          multipleSQBrackets = false)) ||
         (isAnnotation && !SimpleType.parse(builder, isPattern = false))) {
       constrMarker.drop()
       return false

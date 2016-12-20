@@ -15,7 +15,8 @@ class ScalaCallHierarchyProvider extends JavaCallHierarchyProvider {
   }
 
   override def createHierarchyBrowser(target: PsiElement): HierarchyBrowser = {
-    new ScalaCallHierarchyBrowser(target.getProject,
-                                  target.asInstanceOf[PsiMethod])
+    new ScalaCallHierarchyBrowser(
+      target.getProject,
+      target.asInstanceOf[PsiMethod])
   }
 }

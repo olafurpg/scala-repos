@@ -46,8 +46,9 @@ private[sql] case class PartitionSpec(partitionColumns: StructType,
                                       partitions: Seq[PartitionDirectory])
 
 private[sql] object PartitionSpec {
-  val emptySpec = PartitionSpec(StructType(Seq.empty[StructField]),
-                                Seq.empty[PartitionDirectory])
+  val emptySpec = PartitionSpec(
+    StructType(Seq.empty[StructField]),
+    Seq.empty[PartitionDirectory])
 }
 
 private[sql] object PartitioningUtils {
@@ -145,8 +146,9 @@ private[sql] object PartitioningUtils {
       val partitions =
         resolvedPartitionValues.zip(pathsWithPartitionValues).map {
           case (PartitionValues(_, literals), (path, _)) =>
-            PartitionDirectory(InternalRow.fromSeq(literals.map(_.value)),
-                               path)
+            PartitionDirectory(
+              InternalRow.fromSeq(literals.map(_.value)),
+              path)
         }
 
       PartitionSpec(StructType(fields), partitions)
@@ -197,9 +199,10 @@ private[sql] object PartitioningUtils {
       } else {
         // Let's say currentPath is a path of "/table/a=1/", currentPath.getName will give us a=1.
         // Once we get the string, we try to parse it and find the partition column and value.
-        val maybeColumn = parsePartitionColumn(currentPath.getName,
-                                               defaultPartitionName,
-                                               typeInference)
+        val maybeColumn = parsePartitionColumn(
+          currentPath.getName,
+          defaultPartitionName,
+          typeInference)
         maybeColumn.foreach(columns += _)
 
         // Now, we determine if we should stop.
@@ -238,16 +241,19 @@ private[sql] object PartitioningUtils {
       None
     } else {
       val columnName = columnSpec.take(equalSignIndex)
-      assert(columnName.nonEmpty,
-             s"Empty partition column name in '$columnSpec'")
+      assert(
+        columnName.nonEmpty,
+        s"Empty partition column name in '$columnSpec'")
 
       val rawColumnValue = columnSpec.drop(equalSignIndex + 1)
-      assert(rawColumnValue.nonEmpty,
-             s"Empty partition column value in '$columnSpec'")
+      assert(
+        rawColumnValue.nonEmpty,
+        s"Empty partition column value in '$columnSpec'")
 
-      val literal = inferPartitionColumnValue(rawColumnValue,
-                                              defaultPartitionName,
-                                              typeInference)
+      val literal = inferPartitionColumnValue(
+        rawColumnValue,
+        defaultPartitionName,
+        typeInference)
       Some(columnName -> literal)
     }
   }
@@ -271,8 +277,9 @@ private[sql] object PartitioningUtils {
       val distinctPartColNames = pathsWithPartitionValues
         .map(_._2.columnNames.map(_.toLowerCase()))
         .distinct
-      assert(distinctPartColNames.size == 1,
-             listConflictingPartitionColumns(pathsWithPartitionValues))
+      assert(
+        distinctPartColNames.size == 1,
+        listConflictingPartitionColumns(pathsWithPartitionValues))
 
       // Resolves possible type conflicts for each column
       val values = pathsWithPartitionValues.map(_._2)
@@ -424,52 +431,53 @@ private[sql] object PartitioningUtils {
       * ASCII 01-1F are HTTP control characters that need to be escaped.
       * \u000A and \u000D are \n and \r, respectively.
       */
-    val clist = Array('\u0001',
-                      '\u0002',
-                      '\u0003',
-                      '\u0004',
-                      '\u0005',
-                      '\u0006',
-                      '\u0007',
-                      '\u0008',
-                      '\u0009',
-                      '\n',
-                      '\u000B',
-                      '\u000C',
-                      '\r',
-                      '\u000E',
-                      '\u000F',
-                      '\u0010',
-                      '\u0011',
-                      '\u0012',
-                      '\u0013',
-                      '\u0014',
-                      '\u0015',
-                      '\u0016',
-                      '\u0017',
-                      '\u0018',
-                      '\u0019',
-                      '\u001A',
-                      '\u001B',
-                      '\u001C',
-                      '\u001D',
-                      '\u001E',
-                      '\u001F',
-                      '"',
-                      '#',
-                      '%',
-                      '\'',
-                      '*',
-                      '/',
-                      ':',
-                      '=',
-                      '?',
-                      '\\',
-                      '\u007F',
-                      '{',
-                      '[',
-                      ']',
-                      '^')
+    val clist = Array(
+      '\u0001',
+      '\u0002',
+      '\u0003',
+      '\u0004',
+      '\u0005',
+      '\u0006',
+      '\u0007',
+      '\u0008',
+      '\u0009',
+      '\n',
+      '\u000B',
+      '\u000C',
+      '\r',
+      '\u000E',
+      '\u000F',
+      '\u0010',
+      '\u0011',
+      '\u0012',
+      '\u0013',
+      '\u0014',
+      '\u0015',
+      '\u0016',
+      '\u0017',
+      '\u0018',
+      '\u0019',
+      '\u001A',
+      '\u001B',
+      '\u001C',
+      '\u001D',
+      '\u001E',
+      '\u001F',
+      '"',
+      '#',
+      '%',
+      '\'',
+      '*',
+      '/',
+      ':',
+      '=',
+      '?',
+      '\\',
+      '\u007F',
+      '{',
+      '[',
+      ']',
+      '^')
 
     clist.foreach(bitSet.set(_))
 

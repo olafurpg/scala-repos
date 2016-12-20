@@ -186,8 +186,9 @@ class StripNameTest extends FunSuite {
       assert(nodes.size == 1) // Only one node
       val ordering = nameMap(nodes(0)).zipWithIndex.toMap
       val order = Ordering.by(ordering)
-      assert(names.sorted(order) == names,
-             s"not sorted: $names != ${names.sorted(order)}")
+      assert(
+        names.sorted(order) == names,
+        s"not sorted: $names != ${names.sorted(order)}")
     }
     assertName(List("source", "map0", "sumByKey0")) {
       case p @ Source(l) if l == input => p

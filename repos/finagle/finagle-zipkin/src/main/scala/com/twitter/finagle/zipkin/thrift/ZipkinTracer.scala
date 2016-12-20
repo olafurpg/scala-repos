@@ -123,11 +123,12 @@ object ZipkinTracer {
           // This line fails without the JsonDeserialize annotation in Envelope.
           val tid = env.traceId.getOrElse(Event.NoTraceId)
           val sid = env.spanId.getOrElse(Event.NoSpanId)
-          Event(this,
-                when,
-                objectVal = env.data,
-                traceIdVal = tid,
-                spanIdVal = sid)
+          Event(
+            this,
+            when,
+            objectVal = env.data,
+            traceIdVal = tid,
+            spanIdVal = sid)
         }
     }
   }
@@ -174,10 +175,11 @@ object ZipkinTracer {
     * @param statsReceiver stats receiver to send successes/failures to
     */
   def mk(statsReceiver: StatsReceiver): Tracer =
-    mk(Host().getHostName,
-       Host().getPort,
-       statsReceiver,
-       Sampler.DefaultSampleRate)
+    mk(
+      Host().getHostName,
+      Host().getPort,
+      statsReceiver,
+      Sampler.DefaultSampleRate)
 }
 
 /**
@@ -205,10 +207,12 @@ class SamplingTracer(underlyingTracer: Tracer,
     * Tracer that supports sampling. Will pass through a subset of the records.
     */
   def this() =
-    this(RawZipkinTracer(Host().getHostName,
-                         Host().getPort,
-                         DefaultStatsReceiver.scope("zipkin")),
-         sampleRateFlag())
+    this(
+      RawZipkinTracer(
+        Host().getHostName,
+        Host().getPort,
+        DefaultStatsReceiver.scope("zipkin")),
+      sampleRateFlag())
 
   private[this] val sampler = new Sampler
   setSampleRate(initialSampleRate)
@@ -226,10 +230,11 @@ class SamplingTracer(underlyingTracer: Tracer,
       if (sink.recording) {
         if (Trace.hasId) {
           val traceId = Trace.id
-          sink.event(ZipkinTracer.Trace,
-                     objectVal = record.annotation,
-                     traceIdVal = traceId.traceId.self,
-                     spanIdVal = traceId.spanId.self)
+          sink.event(
+            ZipkinTracer.Trace,
+            objectVal = record.annotation,
+            traceIdVal = traceId.traceId.self,
+            spanIdVal = traceId.spanId.self)
         } else {
           sink.event(ZipkinTracer.Trace, objectVal = record.annotation)
         }

@@ -130,10 +130,11 @@ private[spark] class DTStatsAggregator(val metadata: DecisionTreeMetadata,
                     binIndex: Int,
                     label: Double,
                     instanceWeight: Double): Unit = {
-    impurityAggregator.update(allStats,
-                              featureOffset + binIndex * statsSize,
-                              label,
-                              instanceWeight)
+    impurityAggregator.update(
+      allStats,
+      featureOffset + binIndex * statsSize,
+      label,
+      instanceWeight)
   }
 
   /**
@@ -152,9 +153,10 @@ private[spark] class DTStatsAggregator(val metadata: DecisionTreeMetadata,
   def mergeForFeature(featureOffset: Int,
                       binIndex: Int,
                       otherBinIndex: Int): Unit = {
-    impurityAggregator.merge(allStats,
-                             featureOffset + binIndex * statsSize,
-                             featureOffset + otherBinIndex * statsSize)
+    impurityAggregator.merge(
+      allStats,
+      featureOffset + binIndex * statsSize,
+      featureOffset + otherBinIndex * statsSize)
   }
 
   /**

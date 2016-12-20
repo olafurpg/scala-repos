@@ -58,12 +58,13 @@ class KeyCharacterCombination(
            meta: jfxsi.KeyCombination.ModifierValue,
            shortcut: jfxsi.KeyCombination.ModifierValue) =
     this(
-      new jfxsi.KeyCharacterCombination(character,
-                                        shift,
-                                        control,
-                                        alt,
-                                        meta,
-                                        shortcut))
+      new jfxsi.KeyCharacterCombination(
+        character,
+        shift,
+        control,
+        alt,
+        meta,
+        shortcut))
 
   /**
     * Gets the key character associated with this key combination.

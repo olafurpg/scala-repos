@@ -103,9 +103,10 @@ class ZookeeperLeaderElector(controllerContext: ControllerContext,
             "A leader has been elected but just resigned, this will result in another round of election")
 
       case e2: Throwable =>
-        error("Error while electing or becoming leader on broker %d".format(
-                brokerId),
-              e2)
+        error(
+          "Error while electing or becoming leader on broker %d".format(
+            brokerId),
+          e2)
         resign()
     }
     amILeader

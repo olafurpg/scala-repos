@@ -10,10 +10,11 @@ final class JsonView(isOnline: String => Boolean) {
   import JsonView._
 
   private implicit val perfWrites: OWrites[Perf] = OWrites { o =>
-    Json.obj("games" -> o.nb,
-             "rating" -> o.glicko.rating.toInt,
-             "rd" -> o.glicko.deviation.toInt,
-             "prog" -> o.progress)
+    Json.obj(
+      "games" -> o.nb,
+      "rating" -> o.glicko.rating.toInt,
+      "rd" -> o.glicko.deviation.toInt,
+      "prog" -> o.progress)
   }
   private implicit val profileWrites = Json.writes[Profile]
   private implicit val playTimeWrites = Json.writes[PlayTime]
@@ -61,8 +62,8 @@ object JsonView {
         "id" -> l.user.id,
         "username" -> l.user.name,
         "title" -> l.user.title,
-        "perfs" -> Json.obj(l.perfKey -> Json.obj("rating" -> l.rating,
-                                                  "progress" -> l.progress))
+        "perfs" -> Json.obj(l.perfKey -> Json
+          .obj("rating" -> l.rating, "progress" -> l.progress))
       )
       .noNull
   }

@@ -215,8 +215,9 @@ class SparkConf(loadDefaults: Boolean) extends Cloneable with Logging {
     */
   def registerAvroSchemas(schemas: Schema*): SparkConf = {
     for (schema <- schemas) {
-      set(avroNamespace + SchemaNormalization.parsingFingerprint64(schema),
-          schema.toString)
+      set(
+        avroNamespace + SchemaNormalization.parsingFingerprint64(schema),
+        schema.toString)
     }
     this
   }
@@ -479,11 +480,12 @@ class SparkConf(loadDefaults: Boolean) extends Cloneable with Logging {
     }
 
     // Validate memory fractions
-    val deprecatedMemoryKeys = Seq("spark.storage.memoryFraction",
-                                   "spark.shuffle.memoryFraction",
-                                   "spark.shuffle.safetyFraction",
-                                   "spark.storage.unrollFraction",
-                                   "spark.storage.safetyFraction")
+    val deprecatedMemoryKeys = Seq(
+      "spark.storage.memoryFraction",
+      "spark.shuffle.memoryFraction",
+      "spark.shuffle.safetyFraction",
+      "spark.storage.unrollFraction",
+      "spark.storage.safetyFraction")
     val memoryKeys =
       Seq("spark.memory.fraction", "spark.memory.storageFraction") ++ deprecatedMemoryKeys
     for (key <- memoryKeys) {
@@ -665,16 +667,18 @@ private[spark] object SparkConf extends Logging {
     "spark.history.fs.cleaner.maxAge" -> Seq(
       AlternateConfig("spark.history.fs.cleaner.maxAge.seconds", "1.4")),
     "spark.yarn.am.waitTime" -> Seq(
-      AlternateConfig("spark.yarn.applicationMaster.waitTries",
-                      "1.3",
-                      // Translate old value to a duration, with 10s wait time per try.
-                      translation = s => s"${s.toLong * 10}s")),
+      AlternateConfig(
+        "spark.yarn.applicationMaster.waitTries",
+        "1.3",
+        // Translate old value to a duration, with 10s wait time per try.
+        translation = s => s"${s.toLong * 10}s")),
     "spark.reducer.maxSizeInFlight" -> Seq(
       AlternateConfig("spark.reducer.maxMbInFlight", "1.4")),
     "spark.kryoserializer.buffer" -> Seq(
-      AlternateConfig("spark.kryoserializer.buffer.mb",
-                      "1.4",
-                      translation = s => s"${(s.toDouble * 1000).toInt}k")),
+      AlternateConfig(
+        "spark.kryoserializer.buffer.mb",
+        "1.4",
+        translation = s => s"${(s.toDouble * 1000).toInt}k")),
     "spark.kryoserializer.buffer.max" -> Seq(
       AlternateConfig("spark.kryoserializer.buffer.max.mb", "1.4")),
     "spark.shuffle.file.buffer" -> Seq(

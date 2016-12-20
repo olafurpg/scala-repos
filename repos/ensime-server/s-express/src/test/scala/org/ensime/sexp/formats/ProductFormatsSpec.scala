@@ -53,22 +53,24 @@ class ProductFormatsSpec
   it should "support missing fields as SexpNil / None" in {
     val wibble = Wibble("wibble", 13, Some("fork"))
 
-    assertFormat(wibble,
-                 SexpData(
-                   SexpSymbol(":thing") -> SexpString("wibble"),
-                   SexpSymbol(":thong") -> SexpNumber(13),
-                   SexpSymbol(":bling") -> SexpList(SexpString("fork"))
-                 ))
+    assertFormat(
+      wibble,
+      SexpData(
+        SexpSymbol(":thing") -> SexpString("wibble"),
+        SexpSymbol(":thong") -> SexpNumber(13),
+        SexpSymbol(":bling") -> SexpList(SexpString("fork"))
+      ))
 
     val wobble = Wibble("wibble", 13, None)
 
     // write out None as SexpNil
-    assertFormat(wobble,
-                 SexpData(
-                   SexpSymbol(":thing") -> SexpString("wibble"),
-                   SexpSymbol(":thong") -> SexpNumber(13),
-                   SexpSymbol(":bling") -> SexpNil
-                 ))
+    assertFormat(
+      wobble,
+      SexpData(
+        SexpSymbol(":thing") -> SexpString("wibble"),
+        SexpSymbol(":thong") -> SexpNumber(13),
+        SexpSymbol(":bling") -> SexpNil
+      ))
 
     // but tolerate missing entries
     SexpData(
@@ -108,27 +110,30 @@ class CustomisedProductFormatsSpec
   case class Bar(num: Int, str: Option[String])
 
   "ProductFormats with overloaded toWireName" should "support custom field names" in {
-    assertFormat(Foo(13, "foo"),
-                 SexpData(
-                   SexpSymbol(":a-thingy-ma-bob") -> SexpNumber(13),
-                   SexpSymbol(":h-t-m-l") -> SexpString("foo")
-                 ))
+    assertFormat(
+      Foo(13, "foo"),
+      SexpData(
+        SexpSymbol(":a-thingy-ma-bob") -> SexpNumber(13),
+        SexpSymbol(":h-t-m-l") -> SexpString("foo")
+      ))
   }
 
   "ProductFormats" should "not skip writing out nil values by default" in {
     val wobble = Bar(13, None)
-    assertFormat(wobble,
-                 SexpData(
-                   SexpSymbol(":num") -> SexpNumber(13),
-                   SexpSymbol(":str") -> SexpNil
-                 ))
+    assertFormat(
+      wobble,
+      SexpData(
+        SexpSymbol(":num") -> SexpNumber(13),
+        SexpSymbol(":str") -> SexpNil
+      ))
   }
 
   "ProductFormats with overloaded skipNilValues" should "support writing out only non-nil values" in new SkippingEnabled {
     val wobble = Bar(13, None)
-    assertFormat(wobble,
-                 SexpData(
-                   SexpSymbol(":num") -> SexpNumber(13)
-                 ))
+    assertFormat(
+      wobble,
+      SexpData(
+        SexpSymbol(":num") -> SexpNumber(13)
+      ))
   }
 }

@@ -141,9 +141,10 @@ object PlayImport {
 
     val devSettings = SettingKey[Seq[(String, String)]]("playDevSettings")
 
-    val generateSecret = TaskKey[String]("playGenerateSecret",
-                                         "Generate a new application secret",
-                                         KeyRanks.BTask)
+    val generateSecret = TaskKey[String](
+      "playGenerateSecret",
+      "Generate a new application secret",
+      KeyRanks.BTask)
     val updateSecret = TaskKey[File](
       "playUpdateSecret",
       "Update the application conf to generate an application secret",

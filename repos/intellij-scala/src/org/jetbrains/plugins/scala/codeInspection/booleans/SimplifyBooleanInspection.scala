@@ -23,17 +23,19 @@ import scala.Predef._
   *
   */
 class SimplifyBooleanInspection
-    extends AbstractInspection("SimplifyBoolean",
-                               "Simplify boolean expression") {
+    extends AbstractInspection(
+      "SimplifyBoolean",
+      "Simplify boolean expression") {
 
   def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case _: ScParenthesisedExpr =>
     //do nothing to avoid many similar expressions
     case expr: ScExpression if SimplifyBooleanUtil.canBeSimplified(expr) =>
-      holder.registerProblem(expr,
-                             "Simplify boolean expression",
-                             ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
-                             new SimplifyBooleanQuickFix(expr))
+      holder.registerProblem(
+        expr,
+        "Simplify boolean expression",
+        ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+        new SimplifyBooleanQuickFix(expr))
   }
 }
 
@@ -112,8 +114,9 @@ object SimplifyBooleanUtil {
     expr match {
       case parenthesized: ScParenthesisedExpr =>
         val copy = parenthesized.copy.asInstanceOf[ScParenthesisedExpr]
-        copy.replaceExpression(copy.expr.getOrElse(copy),
-                               removeParenthesis = true)
+        copy.replaceExpression(
+          copy.expr.getOrElse(copy),
+          removeParenthesis = true)
       case ScPrefixExpr(operation, operand) =>
         if (operation.refName != "!") expr
         else {

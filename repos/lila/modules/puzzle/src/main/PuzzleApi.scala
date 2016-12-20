@@ -111,9 +111,10 @@ private[puzzle] final class PuzzleApi(puzzleColl: Coll,
           }
           val a2 = a1.copy(vote = v.some)
           attemptColl
-            .update(BSONDocument("_id" -> a2.id),
-                    BSONDocument("$set" -> BSONDocument(
-                      Attempt.BSONFields.vote -> v))) zip puzzleColl.update(
+            .update(
+              BSONDocument("_id" -> a2.id),
+              BSONDocument("$set" -> BSONDocument(
+                Attempt.BSONFields.vote -> v))) zip puzzleColl.update(
             BSONDocument("_id" -> p2.id),
             BSONDocument(
               "$set" -> BSONDocument(Puzzle.BSONFields.vote -> p2.vote))) map {
@@ -136,11 +137,12 @@ private[puzzle] final class PuzzleApi(puzzleColl: Coll,
 
     def hasVoted(user: User): Fu[Boolean] =
       attemptColl
-        .find(BSONDocument(Attempt.BSONFields.userId -> user.id),
-              BSONDocument(
-                Attempt.BSONFields.vote -> true,
-                Attempt.BSONFields.id -> false
-              ))
+        .find(
+          BSONDocument(Attempt.BSONFields.userId -> user.id),
+          BSONDocument(
+            Attempt.BSONFields.vote -> true,
+            Attempt.BSONFields.id -> false
+          ))
         .sort(BSONDocument(Attempt.BSONFields.date -> -1))
         .cursor[BSONDocument]()
         .collect[List](5) map {

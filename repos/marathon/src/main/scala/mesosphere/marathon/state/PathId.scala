@@ -55,8 +55,9 @@ case class PathId(path: List[String], absolute: Boolean = true)
   }
 
   def canonicalPath(base: PathId = PathId(Nil, absolute = true)): PathId = {
-    require(base.absolute,
-            "Base path is not absolute, canonical path can not be computed!")
+    require(
+      base.absolute,
+      "Base path is not absolute, canonical path can not be computed!")
     def in(remaining: List[String], result: List[String] = Nil): List[String] =
       remaining match {
         case head :: tail if head == "." => in(tail, result)
@@ -96,11 +97,12 @@ object PathId {
   def fromSafePath(in: String): PathId =
     PathId(in.split("_").toList, absolute = true)
   def apply(in: String): PathId =
-    PathId(in.replaceAll("""(^/+)|(/+$)""", "")
-             .split("/")
-             .filter(_.nonEmpty)
-             .toList,
-           in.startsWith("/"))
+    PathId(
+      in.replaceAll("""(^/+)|(/+$)""", "")
+        .split("/")
+        .filter(_.nonEmpty)
+        .toList,
+      in.startsWith("/"))
   def empty: PathId = PathId(Nil)
 
   implicit class StringPathId(val stringPath: String) extends AnyVal {

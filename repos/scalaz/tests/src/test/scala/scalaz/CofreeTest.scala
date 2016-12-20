@@ -128,11 +128,13 @@ object CofreeTest extends SpecLite {
         h -> t.take(1000)
       }
 
-    checkAll("CofreeZipLazyOption",
-             applicative.laws[CofreeZipLazyOption](implicitly,
-                                                   implicitly,
-                                                   implicitly,
-                                                   CofreeZipLazyOptionEqual))
+    checkAll(
+      "CofreeZipLazyOption",
+      applicative.laws[CofreeZipLazyOption](
+        implicitly,
+        implicitly,
+        implicitly,
+        CofreeZipLazyOptionEqual))
   }
 
   {

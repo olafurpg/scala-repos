@@ -75,9 +75,10 @@ class PruneFiltersSuite extends PlanTest {
 
     val query = tr1
       .where("tr1.a".attr > 10 || "tr1.c".attr < 10)
-      .join(tr2.where('d.attr < 100),
-            Inner,
-            Some("tr1.a".attr === "tr2.a".attr))
+      .join(
+        tr2.where('d.attr < 100),
+        Inner,
+        Some("tr1.a".attr === "tr2.a".attr))
     // different order of "tr2.a" and "tr1.a"
     val queryWithUselessFilter =
       query.where(
@@ -98,9 +99,10 @@ class PruneFiltersSuite extends PlanTest {
     // Thus, the filter is not removed
     val query = tr1
       .where("tr1.a".attr > 10)
-      .join(tr2.where('d.attr < 100),
-            Inner,
-            Some("tr1.a".attr === "tr2.d".attr))
+      .join(
+        tr2.where('d.attr < 100),
+        Inner,
+        Some("tr1.a".attr === "tr2.d".attr))
     val queryWithExtraFilters = query.where(
       "tr1.a".attr > 10 && 'd.attr < 100 && "tr1.a".attr === "tr2.a".attr)
 

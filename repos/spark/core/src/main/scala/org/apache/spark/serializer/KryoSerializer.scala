@@ -121,8 +121,9 @@ class KryoSerializer(conf: SparkConf)
     }
 
     // For results returned by asJavaIterable. See JavaIterableWrapperSerializer.
-    kryo.register(JavaIterableWrapperSerializer.wrapperClass,
-                  new JavaIterableWrapperSerializer)
+    kryo.register(
+      JavaIterableWrapperSerializer.wrapperClass,
+      new JavaIterableWrapperSerializer)
 
     // Allow sending classes with custom Java serializers
     kryo.register(classOf[SerializableWritable[_]], new KryoJavaSerializer())
@@ -132,8 +133,9 @@ class KryoSerializer(conf: SparkConf)
 
     kryo
       .register(classOf[GenericRecord], new GenericAvroSerializer(avroSchemas))
-    kryo.register(classOf[GenericData.Record],
-                  new GenericAvroSerializer(avroSchemas))
+    kryo.register(
+      classOf[GenericData.Record],
+      new GenericAvroSerializer(avroSchemas))
 
     try {
       // scalastyle:off classforname
@@ -545,9 +547,10 @@ private[spark] class KryoSerializerInstance(ks: KryoSerializer)
   override def deserialize[T: ClassTag](bytes: ByteBuffer): T = {
     val kryo = borrowKryo()
     try {
-      input.setBuffer(bytes.array(),
-                      bytes.arrayOffset() + bytes.position(),
-                      bytes.remaining())
+      input.setBuffer(
+        bytes.array(),
+        bytes.arrayOffset() + bytes.position(),
+        bytes.remaining())
       kryo.readClassAndObject(input).asInstanceOf[T]
     } finally {
       releaseKryo(kryo)
@@ -560,9 +563,10 @@ private[spark] class KryoSerializerInstance(ks: KryoSerializer)
     val oldClassLoader = kryo.getClassLoader
     try {
       kryo.setClassLoader(loader)
-      input.setBuffer(bytes.array(),
-                      bytes.arrayOffset() + bytes.position(),
-                      bytes.remaining())
+      input.setBuffer(
+        bytes.array(),
+        bytes.arrayOffset() + bytes.position(),
+        bytes.remaining())
       kryo.readClassAndObject(input).asInstanceOf[T]
     } finally {
       kryo.setClassLoader(oldClassLoader)

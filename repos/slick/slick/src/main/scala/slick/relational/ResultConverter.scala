@@ -90,14 +90,15 @@ T <: Product](elementConverters: ResultConverter[M, _]*)
 
 /** Result converter that can write to multiple sub-converters and read from the first one */
 final case class CompoundResultConverter[M <: ResultConverterDomain,
-                                         @specialized(Byte,
-                                                      Short,
-                                                      Int,
-                                                      Long,
-                                                      Char,
-                                                      Float,
-                                                      Double,
-                                                      Boolean) T](
+                                         @specialized(
+                                           Byte,
+                                           Short,
+                                           Int,
+                                           Long,
+                                           Char,
+                                           Float,
+                                           Double,
+                                           Boolean) T](
     width: Int,
     childConverters: ResultConverter[M, T]*)
     extends ResultConverter[M, T] {
@@ -220,8 +221,9 @@ abstract class SimpleFastPathResultConverter[M <: ResultConverterDomain, T](
   def set(value: T, pp: Writer) = rc.set(value, pp)
 
   override def getDumpInfo =
-    super.getDumpInfo.copy(name = "SimpleFastPathResultConverter",
-                           mainInfo = "",
-                           children = Vector(("rc", rc)))
+    super.getDumpInfo.copy(
+      name = "SimpleFastPathResultConverter",
+      mainInfo = "",
+      children = Vector(("rc", rc)))
   def width = rc.width
 }

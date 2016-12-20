@@ -94,8 +94,9 @@ object IndexMaker extends IndexMakerLowPriority {
       a: T[A],
       b: T[B],
       c: T[C]): Index[(A, B, C)] = {
-    require(a.length == b.length && b.length == c.length,
-            "Arguments must have same length")
+    require(
+      a.length == b.length && b.length == c.length,
+      "Arguments must have same length")
     val sz = a.length
     val arr = Array.ofDim[(A, B, C)](sz)
     var i = 0
@@ -137,9 +138,10 @@ object IndexMaker extends IndexMakerLowPriority {
                                 c: T[C],
                                 d: T[D],
                                 e: T[E]): Index[(A, B, C, D, E)] = {
-    require(a.length == b.length && b.length == c.length &&
-              c.length == d.length && d.length == e.length,
-            "Arguments must have same length")
+    require(
+      a.length == b.length && b.length == c.length &&
+        c.length == d.length && d.length == e.length,
+      "Arguments must have same length")
     val sz = a.length
     val arr = Array.ofDim[(A, B, C, D, E)](sz)
     var i = 0

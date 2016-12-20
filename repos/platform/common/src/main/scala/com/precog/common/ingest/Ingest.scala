@@ -118,13 +118,14 @@ object Ingest {
         .validated[Option[AccountId]]("ownerAccountId")) {
         (apiKey, path, ownerAccountId) =>
           val jv = (obj \ "data")
-          Ingest(apiKey,
-                 path,
-                 ownerAccountId.map(Authorities(_)),
-                 if (jv == JUndefined) Vector() else Vector(jv),
-                 None,
-                 EventMessage.defaultTimestamp,
-                 StreamRef.Append)
+          Ingest(
+            apiKey,
+            path,
+            ownerAccountId.map(Authorities(_)),
+            if (jv == JUndefined) Vector() else Vector(jv),
+            None,
+            EventMessage.defaultTimestamp,
+            StreamRef.Append)
       }
     }
   }
@@ -134,13 +135,14 @@ object Ingest {
       (obj.validated[String]("tokenId") |@| obj.validated[Path]("path")) {
         (apiKey, path) =>
           val jv = (obj \ "data")
-          Ingest(apiKey,
-                 path,
-                 None,
-                 if (jv == JUndefined) Vector() else Vector(jv),
-                 None,
-                 EventMessage.defaultTimestamp,
-                 StreamRef.Append)
+          Ingest(
+            apiKey,
+            path,
+            None,
+            if (jv == JUndefined) Vector() else Vector(jv),
+            None,
+            EventMessage.defaultTimestamp,
+            StreamRef.Append)
       }
     }
   }

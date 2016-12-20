@@ -173,15 +173,16 @@ object Externalizables {
        writeChar(int v)
        ...
      */
-    val storage = Map(BooleanTpe -> BooleanTpe,
-                      ByteTpe -> IntTpe,
-                      CharTpe -> IntTpe,
-                      DoubleTpe -> DoubleTpe,
-                      FloatTpe -> FloatTpe,
-                      IntTpe -> IntTpe,
-                      LongTpe -> LongTpe,
-                      ShortTpe -> IntTpe,
-                      typeOf[AnyRef] -> typeOf[Any])
+    val storage = Map(
+      BooleanTpe -> BooleanTpe,
+      ByteTpe -> IntTpe,
+      CharTpe -> IntTpe,
+      DoubleTpe -> DoubleTpe,
+      FloatTpe -> FloatTpe,
+      IntTpe -> IntTpe,
+      LongTpe -> LongTpe,
+      ShortTpe -> IntTpe,
+      typeOf[AnyRef] -> typeOf[Any])
 
     /* Byte, Byte, Array[Byte], Byte, Long, Object
           0,    1,           2,    3,    4,      5
@@ -272,8 +273,9 @@ object Externalizables {
         def close(): Unit = ???
         def flush(): Unit = ???
         def write(x1: Array[Byte],x2: Int,x3: Int): Unit = ???
-        def write(x: Array[Byte]): Unit = ${finalTree(typeOf[Array[Byte]],
-                                                      "arrByte")}
+        def write(x: Array[Byte]): Unit = ${finalTree(
+      typeOf[Array[Byte]],
+      "arrByte")}
         def write(x: Int): Unit = ???
         def writeObject(x: Any): Unit = ${finalTree(typeOf[AnyRef], "anyRef")}
       }

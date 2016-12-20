@@ -65,9 +65,10 @@ trait BaseTypeSeqs { this: SymbolTable =>
             //Console.println("compute closure of "+this+" => glb("+variants+")")
             pending += i
             try {
-              mergePrefixAndArgs(variants,
-                                 Variance.Contravariant,
-                                 lubDepth(variants)) match {
+              mergePrefixAndArgs(
+                variants,
+                Variance.Contravariant,
+                lubDepth(variants)) match {
                 case NoType =>
                   typeError(
                     "no common type instance of base types " +

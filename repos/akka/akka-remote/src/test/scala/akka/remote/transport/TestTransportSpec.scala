@@ -75,8 +75,9 @@ class TestTransportSpec
 
       // TestTransport throws IllegalAssociationException when trying to associate with non-existing system
       intercept[InvalidAssociationException] {
-        Await.result(transportA.associate(nonExistingAddress),
-                     timeout.duration)
+        Await.result(
+          transportA.associate(nonExistingAddress),
+          timeout.duration)
       }
     }
 

@@ -483,11 +483,12 @@ object Arrays {
                       key: T,
                       c: Comparator[_ >: T]): Int = {
     checkRangeIndices(a.length, startIndex, endIndex)
-    binarySearchImpl[T](a,
-                        startIndex,
-                        endIndex,
-                        key,
-                        (a, b) => c.compare(a, b) < 0)
+    binarySearchImpl[T](
+      a,
+      startIndex,
+      endIndex,
+      key,
+      (a, b) => c.compare(a, b) < 0)
   }
 
   @inline

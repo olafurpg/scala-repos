@@ -25,10 +25,11 @@ private[serverset2] trait ChattyClient extends ZooKeeperClient {
   }
 
   def addAuthInfo(scheme: String, auth: Buf): Future[Unit] =
-    printOp("addAuthInfo",
-            underlying.addAuthInfo(scheme, auth),
-            scheme,
-            auth.toString)
+    printOp(
+      "addAuthInfo",
+      underlying.addAuthInfo(scheme, auth),
+      scheme,
+      auth.toString)
 
   def close(deadline: Time): Future[Unit] =
     printOp("close", underlying.close(deadline))
@@ -79,12 +80,13 @@ private[serverset2] trait ChattyWriter
              data: Option[Buf],
              acl: Seq[Data.ACL],
              createMode: CreateMode): Future[String] =
-    printOp("create",
-            underlying.create(path, data, acl, createMode),
-            path,
-            data.toString,
-            acl.toString,
-            createMode.toString)
+    printOp(
+      "create",
+      underlying.create(path, data, acl, createMode),
+      path,
+      data.toString,
+      acl.toString,
+      createMode.toString)
 
   def delete(path: String, version: Option[Int]): Future[Unit] =
     printOp("delete", underlying.delete(path, version), path, version.toString)
@@ -92,20 +94,22 @@ private[serverset2] trait ChattyWriter
   def setData(path: String,
               data: Option[Buf],
               version: Option[Int]): Future[Data.Stat] =
-    printOp("setData",
-            underlying.setData(path, data, version),
-            path,
-            data.toString,
-            version.toString)
+    printOp(
+      "setData",
+      underlying.setData(path, data, version),
+      path,
+      data.toString,
+      version.toString)
 
   def setACL(path: String,
              acl: Seq[Data.ACL],
              version: Option[Int]): Future[Data.Stat] =
-    printOp("setACL",
-            underlying.setACL(path, acl, version),
-            path,
-            acl.toString,
-            version.toString)
+    printOp(
+      "setACL",
+      underlying.setACL(path, acl, version),
+      path,
+      acl.toString,
+      version.toString)
 }
 
 private[serverset2] trait ChattyMulti

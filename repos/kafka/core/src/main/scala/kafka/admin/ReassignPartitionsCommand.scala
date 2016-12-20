@@ -147,9 +147,10 @@ object ReassignPartitionsCommand extends Logging {
       case (topic, assignment) =>
         val (_, replicas) = assignment.head
         val assignedReplicas =
-          AdminUtils.assignReplicasToBrokers(brokerMetadatas,
-                                             assignment.size,
-                                             replicas.size)
+          AdminUtils.assignReplicasToBrokers(
+            brokerMetadatas,
+            assignment.size,
+            replicas.size)
         partitionsToBeReassigned ++= assignedReplicas.map {
           case (partition, replicas) =>
             (TopicAndPartition(topic, partition) -> replicas)
@@ -231,11 +232,12 @@ object ReassignPartitionsCommand extends Logging {
       zkUtils.getPartitionsBeingReassigned().mapValues(_.newReplicas)
     partitionsToBeReassigned.map { topicAndPartition =>
       (topicAndPartition._1,
-       checkIfPartitionReassignmentSucceeded(zkUtils,
-                                             topicAndPartition._1,
-                                             topicAndPartition._2,
-                                             partitionsToBeReassigned,
-                                             partitionsBeingReassigned))
+       checkIfPartitionReassignmentSucceeded(
+         zkUtils,
+         topicAndPartition._1,
+         topicAndPartition._2,
+         partitionsToBeReassigned,
+         partitionsBeingReassigned))
     }
   }
 
@@ -258,9 +260,10 @@ object ReassignPartitionsCommand extends Logging {
         else {
           println(
             ("ERROR: Assigned replicas (%s) don't match the list of replicas for reassignment (%s)" +
-              " for partition %s").format(assignedReplicas.mkString(","),
-                                          newReplicas.mkString(","),
-                                          topicAndPartition))
+              " for partition %s").format(
+              assignedReplicas.mkString(","),
+              newReplicas.mkString(","),
+              topicAndPartition))
           ReassignmentFailed
         }
     }
@@ -338,8 +341,9 @@ class ReassignPartitionsCommand(
       } else {
         val jsonReassignmentData =
           zkUtils.getPartitionReassignmentZkData(validPartitions)
-        zkUtils.createPersistentPath(ZkUtils.ReassignPartitionsPath,
-                                     jsonReassignmentData)
+        zkUtils.createPersistentPath(
+          ZkUtils.ReassignPartitionsPath,
+          jsonReassignmentData)
         true
       }
     } catch {

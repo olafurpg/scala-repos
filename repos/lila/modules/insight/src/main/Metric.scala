@@ -40,31 +40,34 @@ object Metric {
           """Precision of your moves. Lower is better. <a href="http://lichess.org/qa/103/what-is-average-centipawn-loss">More info</a>"""))
 
   case object Movetime
-      extends Metric("movetime",
-                     "Move time",
-                     F moves "t",
-                     Move,
-                     Move,
-                     Seconds,
-                     Dimension.MovetimeRange.description)
+      extends Metric(
+        "movetime",
+        "Move time",
+        F moves "t",
+        Move,
+        Move,
+        Seconds,
+        Dimension.MovetimeRange.description)
 
   case object Result
-      extends Metric("result",
-                     "Game result",
-                     F.result,
-                     Game,
-                     Game,
-                     Percent,
-                     Dimension.Result.description)
+      extends Metric(
+        "result",
+        "Game result",
+        F.result,
+        Game,
+        Game,
+        Percent,
+        Dimension.Result.description)
 
   case object Termination
-      extends Metric("termination",
-                     "Game termination",
-                     F.termination,
-                     Game,
-                     Game,
-                     Percent,
-                     Dimension.Termination.description)
+      extends Metric(
+        "termination",
+        "Game termination",
+        F.termination,
+        Game,
+        Game,
+        Percent,
+        Dimension.Termination.description)
 
   case object RatingDiff
       extends Metric(
@@ -99,13 +102,14 @@ object Metric {
           "Number of moves you play in the game. Doesn't count the opponent moves."))
 
   case object PieceRole
-      extends Metric("piece",
-                     "Piece moved",
-                     F moves "r",
-                     Move,
-                     Move,
-                     Percent,
-                     Dimension.PieceRole.description)
+      extends Metric(
+        "piece",
+        "Piece moved",
+        F moves "r",
+        Move,
+        Move,
+        Percent,
+        Dimension.PieceRole.description)
 
   case object Opportunism
       extends Metric(
@@ -130,25 +134,27 @@ object Metric {
           "How often your opponent fails to punish your blunders. 100% means they miss all your blunders, 0% means they spot them all."))
 
   case object Material
-      extends Metric("material",
-                     "Material imbalance",
-                     F moves "i",
-                     Move,
-                     Move,
-                     Average,
-                     Dimension.MaterialRange.description)
+      extends Metric(
+        "material",
+        "Material imbalance",
+        F moves "i",
+        Move,
+        Move,
+        Average,
+        Dimension.MaterialRange.description)
 
-  val all = List(MeanCpl,
-                 Movetime,
-                 Result,
-                 Termination,
-                 RatingDiff,
-                 OpponentRating,
-                 NbMoves,
-                 PieceRole,
-                 Opportunism,
-                 Luck,
-                 Material)
+  val all = List(
+    MeanCpl,
+    Movetime,
+    Result,
+    Termination,
+    RatingDiff,
+    OpponentRating,
+    NbMoves,
+    PieceRole,
+    Opportunism,
+    Luck,
+    Material)
   val byKey = all map { p =>
     (p.key, p)
   } toMap
@@ -182,8 +188,9 @@ object Metric {
       }
     case PieceRole =>
       chess.Role.all.reverse.map { r =>
-        MetricValue(BSONString(r.forsyth.toString),
-                    MetricValueName(r.toString))
+        MetricValue(
+          BSONString(r.forsyth.toString),
+          MetricValueName(r.toString))
       }
     case _ => Nil
   }

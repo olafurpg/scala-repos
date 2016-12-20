@@ -118,10 +118,11 @@ class JavaCopyPastePostProcessor
         val shift = startOffsets.headOption.getOrElse(0)
         if (refs != null)
           refs.getData.map { it =>
-            new ReferenceData(it.startOffset + shift,
-                              it.endOffset + shift,
-                              it.qClassName,
-                              it.staticMemberName)
+            new ReferenceData(
+              it.startOffset + shift,
+              it.endOffset + shift,
+              it.qClassName,
+              it.staticMemberName)
           } else Seq.empty
       }
 
@@ -170,9 +171,10 @@ class JavaCopyPastePostProcessor
         val attachments = selections.zipWithIndex.map(p =>
           new Attachment("Selection-%d.java".format(p._2 + 1), p._1))
         Log.error(
-          LogMessageEx.createEvent(e.getMessage,
-                                   ExceptionUtil.getThrowableText(e),
-                                   attachments: _*))
+          LogMessageEx.createEvent(
+            e.getMessage,
+            ExceptionUtil.getThrowableText(e),
+            attachments: _*))
         null
     }
   }
@@ -223,17 +225,18 @@ class JavaCopyPastePostProcessor
 
         withSpecialStyleIn(project) {
           val manager = CodeStyleManager.getInstance(project)
-          manager.reformatText(file,
-                               bounds.getStartOffset,
-                               bounds.getStartOffset + text.length)
+          manager.reformatText(
+            file,
+            bounds.getStartOffset,
+            bounds.getStartOffset + text.length)
         }
 
         markedAssociations.map {
           case (association, marker) =>
             val movedAssociation = association.copy(
-              range =
-                new TextRange(marker.getStartOffset - bounds.getStartOffset,
-                              marker.getEndOffset - bounds.getStartOffset))
+              range = new TextRange(
+                marker.getStartOffset - bounds.getStartOffset,
+                marker.getEndOffset - bounds.getStartOffset))
             marker.dispose()
             movedAssociation
         }

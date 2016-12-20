@@ -18,8 +18,9 @@ class FreeApplicativeTests extends CatsSuite {
       implicit F: Arbitrary[F[A]],
       A: Arbitrary[A]): Arbitrary[FreeApplicative[F, A]] =
     Arbitrary(
-      Gen.oneOf(A.arbitrary.map(FreeApplicative.pure[F, A]),
-                F.arbitrary.map(FreeApplicative.lift[F, A])))
+      Gen.oneOf(
+        A.arbitrary.map(FreeApplicative.pure[F, A]),
+        F.arbitrary.map(FreeApplicative.lift[F, A])))
 
   implicit def freeApplicativeEq[S[_]: Applicative, A](
       implicit SA: Eq[S[A]]): Eq[FreeApplicative[S, A]] =

@@ -430,9 +430,10 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
       */
     final def newOverloaded(pre: Type,
                             alternatives: List[Symbol]): TermSymbol =
-      (newTermSymbol(alternatives.head.name.toTermName,
-                     alternatives.head.pos,
-                     OVERLOADED) setInfo OverloadedType(pre, alternatives))
+      (newTermSymbol(
+        alternatives.head.name.toTermName,
+        alternatives.head.pos,
+        OVERLOADED) setInfo OverloadedType(pre, alternatives))
 
     final def newErrorValue(name: TermName): TermSymbol =
       newTermSymbol(name, pos, SYNTHETIC | IS_ERROR) setInfo ErrorType
@@ -504,11 +505,12 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
       *  based on the given symbol and origin.
       */
     def newExistentialSkolem(basis: Symbol, origin: AnyRef): TypeSkolem =
-      newExistentialSkolem(basis.name.toTypeName,
-                           basis.info,
-                           basis.flags,
-                           basis.pos,
-                           origin)
+      newExistentialSkolem(
+        basis.name.toTypeName,
+        basis.info,
+        basis.flags,
+        basis.pos,
+        origin)
 
     /** Create a new existential type skolem with this symbol its owner, and the given other properties.
       */
@@ -517,10 +519,11 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
                              flags: Long,
                              pos: Position,
                              origin: AnyRef): TypeSkolem = {
-      val skolem = newTypeSkolemSymbol(name.toTypeName,
-                                       origin,
-                                       pos,
-                                       (flags | EXISTENTIAL) & ~PARAM)
+      val skolem = newTypeSkolemSymbol(
+        name.toTypeName,
+        origin,
+        pos,
+        (flags | EXISTENTIAL) & ~PARAM)
       skolem setInfo (info cloneInfo skolem)
     }
 
@@ -565,11 +568,12 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
       clazz setInfo ClassInfoType(parents, scope, clazz)
     }
     final def newErrorClass(name: TypeName): ClassSymbol =
-      newClassWithInfo(name,
-                       Nil,
-                       new ErrorScope(this),
-                       pos,
-                       SYNTHETIC | IS_ERROR)
+      newClassWithInfo(
+        name,
+        Nil,
+        new ErrorScope(this),
+        pos,
+        SYNTHETIC | IS_ERROR)
 
     final def newModuleClass(name: TypeName,
                              pos: Position = NoPosition,
@@ -616,8 +620,9 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
         this
       } else {
         val result = owner
-          .newValue(getter.name.toTermName,
-                    newFlags = getter.flags & ~Flags.METHOD)
+          .newValue(
+            getter.name.toTermName,
+            newFlags = getter.flags & ~Flags.METHOD)
           .setPrivateWithin(getter.privateWithin)
           .setInfo(getter.info.resultType)
         val setter = setterIn(owner)
@@ -698,8 +703,9 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
     def isAnonymousClass = false
     def isCaseClass = false
     def isConcreteClass = false
-    @deprecated("Trait implementation classes have been removed in Scala 2.12",
-                "2.12.0")
+    @deprecated(
+      "Trait implementation classes have been removed in Scala 2.12",
+      "2.12.0")
     def isImplClass = false
     def isJavaInterface = false
     def isNumericValueClass = false
@@ -1343,8 +1349,9 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
     // lots of these to be declared (or more realistically, discovered.)
     def owner_=(owner: Symbol) {
       saveOriginalOwner(this)
-      assert(isCompilerUniverse,
-             "owner_= is not thread-safe; cannot be run in reflexive code")
+      assert(
+        isCompilerUniverse,
+        "owner_= is not thread-safe; cannot be run in reflexive code")
       if (traceSymbolActivity) traceSymbols.recordNewSymbolOwner(this, owner)
       _rawowner = owner
     }
@@ -1960,10 +1967,11 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
         val oldsyms = oldsymbuf.toList
         val newsyms = newsymbuf.toList
         for (sym <- newsyms) {
-          addMember(thistp,
-                    tp,
-                    sym modifyInfo
-                      (_ substThisAndSym (this, thistp, oldsyms, newsyms)))
+          addMember(
+            thistp,
+            tp,
+            sym modifyInfo
+              (_ substThisAndSym (this, thistp, oldsyms, newsyms)))
         }
       }
       tp
@@ -3075,8 +3083,9 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
     }
 
     def setLazyAccessor(sym: Symbol): TermSymbol = {
-      assert(isLazy && (referenced == NoSymbol || referenced == sym),
-             (this, debugFlagString, referenced, sym))
+      assert(
+        isLazy && (referenced == NoSymbol || referenced == sym),
+        (this, debugFlagString, referenced, sym))
       referenced = sym
       this
     }
@@ -3964,8 +3973,9 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
   private case class TypeHistory(var validFrom: Period,
                                  info: Type,
                                  prev: TypeHistory) {
-    assert((prev eq null) || phaseId(validFrom) > phaseId(prev.validFrom),
-           this)
+    assert(
+      (prev eq null) || phaseId(validFrom) > phaseId(prev.validFrom),
+      this)
     assert(validFrom != NoPeriod, this)
 
     private def phaseString = "%s: %s".format(phaseOf(validFrom), info)

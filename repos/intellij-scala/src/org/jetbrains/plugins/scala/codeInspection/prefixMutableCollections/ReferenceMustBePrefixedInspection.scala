@@ -38,9 +38,10 @@ class ReferenceMustBePrefixedInspection
               if (ScalaCodeStyleSettings
                     .getInstance(holder.getProject)
                     .hasImportWithPrefix(qualName)) {
-                holder.registerProblem(ref,
-                                       getDisplayName,
-                                       new AddPrefixFix(ref, clazz))
+                holder.registerProblem(
+                  ref,
+                  getDisplayName,
+                  new AddPrefixFix(ref, clazz))
               }
             case _ =>
           }

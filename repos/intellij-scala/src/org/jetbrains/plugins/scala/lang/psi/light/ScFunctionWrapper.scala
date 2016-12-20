@@ -120,19 +120,21 @@ class ScFunctionWrapper(val function: ScFunction,
           case _ =>
         }
       }
-      assert(res != null,
-             "Method: " + function.getText +
-               "\nhas null containing class. isStatic: " + isStatic +
-               "\nContaining file text: " + function.getContainingFile.getText)
+      assert(
+        res != null,
+        "Method: " + function.getText +
+          "\nhas null containing class. isStatic: " + isStatic +
+          "\nContaining file text: " + function.getContainingFile.getText)
       res
     }
   }
-  val methodText = ScFunctionWrapper.methodText(function,
-                                                isStatic,
-                                                isInterface,
-                                                cClass,
-                                                isJavaVarargs,
-                                                forDefault)
+  val methodText = ScFunctionWrapper.methodText(
+    function,
+    isStatic,
+    isInterface,
+    cClass,
+    isJavaVarargs,
+    forDefault)
   val method: PsiMethod = {
     try {
       elementFactory.createMethodFromText(methodText, containingClass)
@@ -265,8 +267,9 @@ object ScFunctionWrapper {
                     JavaPsiFacade
                       .getInstance(function.getProject)
                       .getElementFactory
-                      .createTypeByFQClassName("java.lang.Object",
-                                               function.getResolveScope)
+                      .createTypeByFQClassName(
+                        "java.lang.Object",
+                        function.getResolveScope)
                   case Success(tpt: ScTypeParameterType, _) =>
                     classes += tpt.canonicalText
                   case Success(scType, _) =>
@@ -299,9 +302,10 @@ object ScFunctionWrapper {
     def evalType(typeResult: TypeResult[ScType]) {
       typeResult match {
         case Success(tp, _) =>
-          val typeText = JavaConversionUtil.typeText(subst.subst(tp),
-                                                     function.getProject,
-                                                     function.getResolveScope)
+          val typeText = JavaConversionUtil.typeText(
+            subst.subst(tp),
+            function.getProject,
+            function.getResolveScope)
           builder.append(typeText)
         case _ => builder.append("java.lang.Object")
       }
@@ -350,17 +354,19 @@ object ScFunctionWrapper {
             tt match {
               case Success(tp, _) if param.isCallByNameParameter =>
                 builder.append("scala.Function0<")
-                val psiType = ScType.toPsi(subst.subst(tp),
-                                           function.getProject,
-                                           function.getResolveScope,
-                                           noPrimitives = true)
+                val psiType = ScType.toPsi(
+                  subst.subst(tp),
+                  function.getProject,
+                  function.getResolveScope,
+                  noPrimitives = true)
                 builder.append(psiType.getCanonicalText)
                 builder.append(">")
               case Success(tp, _) =>
                 builder.append(
-                  JavaConversionUtil.typeText(subst.subst(tp),
-                                              function.getProject,
-                                              function.getResolveScope))
+                  JavaConversionUtil.typeText(
+                    subst.subst(tp),
+                    function.getProject,
+                    function.getResolveScope))
               case _ => builder.append("java.lang.Object")
             }
 

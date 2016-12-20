@@ -99,14 +99,16 @@ private[streaming] class OpenHashMapBasedStateMap[K, S](
   def this(initialCapacity: Int, deltaChainThreshold: Int)(
       implicit keyClassTag: ClassTag[K],
       stateClassTag: ClassTag[S]) =
-    this(new EmptyStateMap[K, S],
-         initialCapacity = initialCapacity,
-         deltaChainThreshold = deltaChainThreshold)
+    this(
+      new EmptyStateMap[K, S],
+      initialCapacity = initialCapacity,
+      deltaChainThreshold = deltaChainThreshold)
 
   def this(deltaChainThreshold: Int)(implicit keyClassTag: ClassTag[K],
                                      stateClassTag: ClassTag[S]) =
-    this(initialCapacity = DEFAULT_INITIAL_CAPACITY,
-         deltaChainThreshold = deltaChainThreshold)
+    this(
+      initialCapacity = DEFAULT_INITIAL_CAPACITY,
+      deltaChainThreshold = deltaChainThreshold)
 
   def this()(implicit keyClassTag: ClassTag[K], stateClassTag: ClassTag[S]) = {
     this(DELTA_CHAIN_LENGTH_THRESHOLD)
@@ -193,9 +195,9 @@ private[streaming] class OpenHashMapBasedStateMap[K, S](
     * should not mutate `this` map.
     */
   override def copy(): StateMap[K, S] = {
-    new OpenHashMapBasedStateMap[K, S](this,
-                                       deltaChainThreshold =
-                                         deltaChainThreshold)
+    new OpenHashMapBasedStateMap[K, S](
+      this,
+      deltaChainThreshold = deltaChainThreshold)
   }
 
   /** Whether the delta chain length is long enough that it should be compacted */
@@ -257,8 +259,9 @@ private[streaming] class OpenHashMapBasedStateMap[K, S](
     val newParentSessionStore =
       if (doCompaction) {
         val initCapacity = if (approxSize > 0) approxSize else 64
-        new OpenHashMapBasedStateMap[K, S](initialCapacity = initCapacity,
-                                           deltaChainThreshold)
+        new OpenHashMapBasedStateMap[K, S](
+          initialCapacity = initCapacity,
+          deltaChainThreshold)
       } else { null }
 
     val iterOfActiveSessions = parentStateMap.getAll()

@@ -122,16 +122,17 @@ object SerializationTests {
     }
   """
 
-  val systemMessageClasses = List[Class[_]](classOf[Create],
-                                            classOf[Recreate],
-                                            classOf[Suspend],
-                                            classOf[Resume],
-                                            classOf[Terminate],
-                                            classOf[Supervise],
-                                            classOf[Watch],
-                                            classOf[Unwatch],
-                                            classOf[Failed],
-                                            NoMessage.getClass)
+  val systemMessageClasses = List[Class[_]](
+    classOf[Create],
+    classOf[Recreate],
+    classOf[Suspend],
+    classOf[Resume],
+    classOf[Terminate],
+    classOf[Supervise],
+    classOf[Watch],
+    classOf[Unwatch],
+    classOf[Failed],
+    NoMessage.getClass)
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
@@ -142,9 +143,10 @@ class SerializeSpec extends AkkaSpec(SerializationTests.serializeConf) {
   import ser._
 
   val addr = Address("120", "Monroe Street", "Santa Clara", "95050")
-  val person = Person("debasish ghosh",
-                      25,
-                      Address("120", "Monroe Street", "Santa Clara", "95050"))
+  val person = Person(
+    "debasish ghosh",
+    25,
+    Address("120", "Monroe Street", "Santa Clara", "95050"))
 
   "Serialization" must {
 
@@ -237,8 +239,9 @@ class SerializeSpec extends AkkaSpec(SerializationTests.serializeConf) {
     }
 
     "give warning for message with several bindings" in {
-      EventFilter.warning(start = "Multiple serializers found",
-                          occurrences = 1) intercept {
+      EventFilter.warning(
+        start = "Multiple serializers found",
+        occurrences = 1) intercept {
         ser.serializerFor(classOf[Both]).getClass should
           (be(classOf[TestSerializer]) or be(classOf[JavaSerializer]))
       }
@@ -249,8 +252,9 @@ class SerializeSpec extends AkkaSpec(SerializationTests.serializeConf) {
         classOf[JavaSerializer])
       ser.serializerFor(classOf[B]).getClass should ===(
         classOf[TestSerializer])
-      EventFilter.warning(start = "Multiple serializers found",
-                          occurrences = 1) intercept {
+      EventFilter.warning(
+        start = "Multiple serializers found",
+        occurrences = 1) intercept {
         ser.serializerFor(classOf[C]).getClass should
           (be(classOf[TestSerializer]) or be(classOf[JavaSerializer]))
       }
@@ -454,8 +458,9 @@ class OverriddenSystemMessageSerializationSpec
   "Overridden SystemMessage serialization" must {
 
     "resolve to a single serializer" in {
-      EventFilter.warning(start = "Multiple serializers found",
-                          occurrences = 0) intercept {
+      EventFilter.warning(
+        start = "Multiple serializers found",
+        occurrences = 0) intercept {
         for (smc ← systemMessageClasses) {
           ser.serializerFor(smc).getClass should ===(classOf[TestSerializer])
         }

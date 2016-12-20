@@ -101,10 +101,11 @@ class DefaultSource extends FileFormat with DataSourceRegister {
 
     val parsedOptions: JSONOptions = new JSONOptions(options)
     val requiredDataSchema = StructType(requiredColumns.map(dataSchema(_)))
-    val rows = JacksonParser.parse(createBaseRdd(sqlContext, jsonFiles),
-                                   requiredDataSchema,
-                                   sqlContext.conf.columnNameOfCorruptRecord,
-                                   parsedOptions)
+    val rows = JacksonParser.parse(
+      createBaseRdd(sqlContext, jsonFiles),
+      requiredDataSchema,
+      sqlContext.conf.columnNameOfCorruptRecord,
+      parsedOptions)
 
     rows.mapPartitions { iterator =>
       val unsafeProjection = UnsafeProjection.create(requiredDataSchema)
@@ -124,10 +125,11 @@ class DefaultSource extends FileFormat with DataSourceRegister {
     }
 
     sqlContext.sparkContext
-      .hadoopRDD(conf.asInstanceOf[JobConf],
-                 classOf[TextInputFormat],
-                 classOf[LongWritable],
-                 classOf[Text])
+      .hadoopRDD(
+        conf.asInstanceOf[JobConf],
+        classOf[TextInputFormat],
+        classOf[LongWritable],
+        classOf[Text])
       .map(_._2.toString) // get the text line
   }
 

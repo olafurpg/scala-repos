@@ -63,11 +63,12 @@ trait ClusterMetricsCommonConfig extends MultiNodeConfig {
 object ClusterMetricsDisabledConfig extends ClusterMetricsCommonConfig {
 
   commonConfig {
-    Seq(customLogging,
-        disableMetricsLegacy,
-        disableMetricsExtension,
-        debugConfig(on = false),
-        MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet)
+    Seq(
+      customLogging,
+      disableMetricsLegacy,
+      disableMetricsExtension,
+      debugConfig(on = false),
+      MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet)
       .reduceLeft(_ withFallback _)
   }
 }
@@ -76,11 +77,12 @@ object ClusterMetricsEnabledConfig extends ClusterMetricsCommonConfig {
   import ConfigFactory._
 
   commonConfig {
-    Seq(customLogging,
-        disableMetricsLegacy,
-        enableMetricsExtension,
-        debugConfig(on = false),
-        MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet)
+    Seq(
+      customLogging,
+      disableMetricsLegacy,
+      enableMetricsExtension,
+      debugConfig(on = false),
+      MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet)
       .reduceLeft(_ withFallback _)
   }
 }

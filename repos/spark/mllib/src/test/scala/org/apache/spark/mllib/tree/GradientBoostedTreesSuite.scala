@@ -41,23 +41,26 @@ class GradientBoostedTreesSuite
       case (numIterations, learningRate, subsamplingRate) =>
         val rdd = sc.parallelize(GradientBoostedTreesSuite.data, 2)
 
-        val treeStrategy = new Strategy(algo = Regression,
-                                        impurity = Variance,
-                                        maxDepth = 2,
-                                        categoricalFeaturesInfo = Map.empty,
-                                        subsamplingRate = subsamplingRate)
-        val boostingStrategy = new BoostingStrategy(treeStrategy,
-                                                    SquaredError,
-                                                    numIterations,
-                                                    learningRate)
+        val treeStrategy = new Strategy(
+          algo = Regression,
+          impurity = Variance,
+          maxDepth = 2,
+          categoricalFeaturesInfo = Map.empty,
+          subsamplingRate = subsamplingRate)
+        val boostingStrategy = new BoostingStrategy(
+          treeStrategy,
+          SquaredError,
+          numIterations,
+          learningRate)
 
         val gbt = GradientBoostedTrees.train(rdd, boostingStrategy)
 
         assert(gbt.trees.size === numIterations)
         try {
-          EnsembleTestHelper.validateRegressor(gbt,
-                                               GradientBoostedTreesSuite.data,
-                                               0.06)
+          EnsembleTestHelper.validateRegressor(
+            gbt,
+            GradientBoostedTreesSuite.data,
+            0.06)
         } catch {
           case e: java.lang.AssertionError =>
             logError(
@@ -80,24 +83,27 @@ class GradientBoostedTreesSuite
       case (numIterations, learningRate, subsamplingRate) =>
         val rdd = sc.parallelize(GradientBoostedTreesSuite.data, 2)
 
-        val treeStrategy = new Strategy(algo = Regression,
-                                        impurity = Variance,
-                                        maxDepth = 2,
-                                        categoricalFeaturesInfo = Map.empty,
-                                        subsamplingRate = subsamplingRate)
-        val boostingStrategy = new BoostingStrategy(treeStrategy,
-                                                    AbsoluteError,
-                                                    numIterations,
-                                                    learningRate)
+        val treeStrategy = new Strategy(
+          algo = Regression,
+          impurity = Variance,
+          maxDepth = 2,
+          categoricalFeaturesInfo = Map.empty,
+          subsamplingRate = subsamplingRate)
+        val boostingStrategy = new BoostingStrategy(
+          treeStrategy,
+          AbsoluteError,
+          numIterations,
+          learningRate)
 
         val gbt = GradientBoostedTrees.train(rdd, boostingStrategy)
 
         assert(gbt.trees.size === numIterations)
         try {
-          EnsembleTestHelper.validateRegressor(gbt,
-                                               GradientBoostedTreesSuite.data,
-                                               0.85,
-                                               "mae")
+          EnsembleTestHelper.validateRegressor(
+            gbt,
+            GradientBoostedTreesSuite.data,
+            0.85,
+            "mae")
         } catch {
           case e: java.lang.AssertionError =>
             logError(
@@ -120,24 +126,27 @@ class GradientBoostedTreesSuite
       case (numIterations, learningRate, subsamplingRate) =>
         val rdd = sc.parallelize(GradientBoostedTreesSuite.data, 2)
 
-        val treeStrategy = new Strategy(algo = Classification,
-                                        impurity = Variance,
-                                        maxDepth = 2,
-                                        numClasses = 2,
-                                        categoricalFeaturesInfo = Map.empty,
-                                        subsamplingRate = subsamplingRate)
-        val boostingStrategy = new BoostingStrategy(treeStrategy,
-                                                    LogLoss,
-                                                    numIterations,
-                                                    learningRate)
+        val treeStrategy = new Strategy(
+          algo = Classification,
+          impurity = Variance,
+          maxDepth = 2,
+          numClasses = 2,
+          categoricalFeaturesInfo = Map.empty,
+          subsamplingRate = subsamplingRate)
+        val boostingStrategy = new BoostingStrategy(
+          treeStrategy,
+          LogLoss,
+          numIterations,
+          learningRate)
 
         val gbt = GradientBoostedTrees.train(rdd, boostingStrategy)
 
         assert(gbt.trees.size === numIterations)
         try {
-          EnsembleTestHelper.validateClassifier(gbt,
-                                                GradientBoostedTreesSuite.data,
-                                                0.9)
+          EnsembleTestHelper.validateClassifier(
+            gbt,
+            GradientBoostedTreesSuite.data,
+            0.9)
         } catch {
           case e: java.lang.AssertionError =>
             logError(
@@ -160,10 +169,11 @@ class GradientBoostedTreesSuite
 
   test(
     "SPARK-5496: BoostingStrategy.defaultParams should recognize Classification") {
-    for (algo <- Seq("classification",
-                     "Classification",
-                     "regression",
-                     "Regression")) {
+    for (algo <- Seq(
+           "classification",
+           "Classification",
+           "regression",
+           "Regression")) {
       BoostingStrategy.defaultParams(algo)
     }
   }
@@ -206,14 +216,16 @@ class GradientBoostedTreesSuite
     val losses = Array(SquaredError, AbsoluteError, LogLoss)
     algos.zip(losses).foreach {
       case (algo, loss) =>
-        val treeStrategy = new Strategy(algo = algo,
-                                        impurity = Variance,
-                                        maxDepth = 2,
-                                        categoricalFeaturesInfo = Map.empty)
-        val boostingStrategy = new BoostingStrategy(treeStrategy,
-                                                    loss,
-                                                    numIterations,
-                                                    validationTol = 0.0)
+        val treeStrategy = new Strategy(
+          algo = algo,
+          impurity = Variance,
+          maxDepth = 2,
+          categoricalFeaturesInfo = Map.empty)
+        val boostingStrategy = new BoostingStrategy(
+          treeStrategy,
+          loss,
+          numIterations,
+          validationTol = 0.0)
         val gbtValidate = new GradientBoostedTrees(boostingStrategy)
           .runWithValidation(trainRdd, validateRdd)
         val numTrees = gbtValidate.numTrees
@@ -254,11 +266,12 @@ class GradientBoostedTreesSuite
 
     val rdd = sc.parallelize(GradientBoostedTreesSuite.data, 2)
 
-    val treeStrategy = new Strategy(algo = Regression,
-                                    impurity = Variance,
-                                    maxDepth = 2,
-                                    categoricalFeaturesInfo = Map.empty,
-                                    checkpointInterval = 2)
+    val treeStrategy = new Strategy(
+      algo = Regression,
+      impurity = Variance,
+      maxDepth = 2,
+      categoricalFeaturesInfo = Map.empty,
+      checkpointInterval = 2)
     val boostingStrategy =
       new BoostingStrategy(treeStrategy, SquaredError, 5, 0.1)
 

@@ -57,10 +57,11 @@ private[clustering] trait LDAParams
     * @group param
     */
   @Since("1.6.0")
-  final val k = new IntParam(this,
-                             "k",
-                             "number of topics (clusters) to infer",
-                             ParamValidators.gt(1))
+  final val k = new IntParam(
+    this,
+    "k",
+    "number of topics (clusters) to infer",
+    ParamValidators.gt(1))
 
   /** @group getParam */
   @Since("1.6.0")
@@ -329,13 +330,15 @@ private[clustering] trait LDAParams
     if (isSet(topicConcentration)) {
       getOptimizer match {
         case "online" =>
-          require(getTopicConcentration >= 0,
-                  s"For Online LDA optimizer, topicConcentration" +
-                    s" must be >= 0.  Found value: $getTopicConcentration")
+          require(
+            getTopicConcentration >= 0,
+            s"For Online LDA optimizer, topicConcentration" +
+              s" must be >= 0.  Found value: $getTopicConcentration")
         case "em" =>
-          require(getTopicConcentration >= 0,
-                  s"For EM optimizer, topicConcentration" +
-                    s" must be >= 1.  Found value: $getTopicConcentration")
+          require(
+            getTopicConcentration >= 0,
+            s"For EM optimizer, topicConcentration" +
+              s" must be >= 1.  Found value: $getTopicConcentration")
       }
     }
     SchemaUtils.checkColumnType(schema, $(featuresCol), new VectorUDT)
@@ -558,11 +561,12 @@ object LocalLDAModel extends MLReadable[LocalLDAModel] {
     override protected def saveImpl(path: String): Unit = {
       DefaultParamsWriter.saveMetadata(instance, path, sc)
       val oldModel = instance.oldLocalModel
-      val data = Data(instance.vocabSize,
-                      oldModel.topicsMatrix,
-                      oldModel.docConcentration,
-                      oldModel.topicConcentration,
-                      oldModel.gammaShape)
+      val data = Data(
+        instance.vocabSize,
+        oldModel.topicsMatrix,
+        oldModel.docConcentration,
+        oldModel.topicConcentration,
+        oldModel.gammaShape)
       val dataPath = new Path(path, "data").toString
       sqlContext
         .createDataFrame(Seq(data))
@@ -581,21 +585,23 @@ object LocalLDAModel extends MLReadable[LocalLDAModel] {
       val dataPath = new Path(path, "data").toString
       val data = sqlContext.read
         .parquet(dataPath)
-        .select("vocabSize",
-                "topicsMatrix",
-                "docConcentration",
-                "topicConcentration",
-                "gammaShape")
+        .select(
+          "vocabSize",
+          "topicsMatrix",
+          "docConcentration",
+          "topicConcentration",
+          "gammaShape")
         .head()
       val vocabSize = data.getAs[Int](0)
       val topicsMatrix = data.getAs[Matrix](1)
       val docConcentration = data.getAs[Vector](2)
       val topicConcentration = data.getAs[Double](3)
       val gammaShape = data.getAs[Double](4)
-      val oldModel = new OldLocalLDAModel(topicsMatrix,
-                                          docConcentration,
-                                          topicConcentration,
-                                          gammaShape)
+      val oldModel = new OldLocalLDAModel(
+        topicsMatrix,
+        docConcentration,
+        topicConcentration,
+        gammaShape)
       val model =
         new LocalLDAModel(metadata.uid, vocabSize, oldModel, sqlContext)
       DefaultParamsReader.getAndSetParams(model, metadata)
@@ -653,11 +659,12 @@ class DistributedLDAModel private[ml] (
 
   @Since("1.6.0")
   override def copy(extra: ParamMap): DistributedLDAModel = {
-    val copied = new DistributedLDAModel(uid,
-                                         vocabSize,
-                                         oldDistributedModel,
-                                         sqlContext,
-                                         oldLocalModelOption)
+    val copied = new DistributedLDAModel(
+      uid,
+      vocabSize,
+      oldDistributedModel,
+      sqlContext,
+      oldLocalModelOption)
     copyValues(copied, extra).setParent(parent)
     copied
   }
@@ -716,11 +723,12 @@ object DistributedLDAModel extends MLReadable[DistributedLDAModel] {
       val metadata = DefaultParamsReader.loadMetadata(path, sc, className)
       val modelPath = new Path(path, "oldModel").toString
       val oldModel = OldDistributedLDAModel.load(sc, modelPath)
-      val model = new DistributedLDAModel(metadata.uid,
-                                          oldModel.vocabSize,
-                                          oldModel,
-                                          sqlContext,
-                                          None)
+      val model = new DistributedLDAModel(
+        metadata.uid,
+        oldModel.vocabSize,
+        oldModel,
+        sqlContext,
+        None)
       DefaultParamsReader.getAndSetParams(model, metadata)
       model
     }
@@ -769,14 +777,15 @@ class LDA @Since("1.6.0")(@Since("1.6.0") override val uid: String)
   @Since("1.6.0")
   def this() = this(Identifiable.randomUID("lda"))
 
-  setDefault(maxIter -> 20,
-             k -> 10,
-             optimizer -> "online",
-             checkpointInterval -> 10,
-             learningOffset -> 1024,
-             learningDecay -> 0.51,
-             subsamplingRate -> 0.05,
-             optimizeDocConcentration -> true)
+  setDefault(
+    maxIter -> 20,
+    k -> 10,
+    optimizer -> "online",
+    checkpointInterval -> 10,
+    learningOffset -> 1024,
+    learningDecay -> 0.51,
+    subsamplingRate -> 0.05,
+    optimizeDocConcentration -> true)
 
   /**
     * The features for LDA should be a [[Vector]] representing the word counts in a document.

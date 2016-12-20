@@ -31,7 +31,8 @@ final class Env(config: Config, system: ActorSystem, db: lila.db.Env) {
 object Env {
 
   lazy val current =
-    "bookmark" boot new Env(config = lila.common.PlayApp loadConfig "bookmark",
-                            system = lila.common.PlayApp.system,
-                            db = lila.db.Env.current)
+    "bookmark" boot new Env(
+      config = lila.common.PlayApp loadConfig "bookmark",
+      system = lila.common.PlayApp.system,
+      db = lila.db.Env.current)
 }

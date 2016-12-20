@@ -582,19 +582,22 @@ class Dataset[T] private[sql] (
     // by creating a new instance for one of the branch.
     val joined = sqlContext
       .executePlan(
-        Join(logicalPlan,
-             right.logicalPlan,
-             joinType = JoinType(joinType),
-             None))
+        Join(
+          logicalPlan,
+          right.logicalPlan,
+          joinType = JoinType(joinType),
+          None))
       .analyzed
       .asInstanceOf[Join]
 
     withPlan {
-      Join(joined.left,
-           joined.right,
-           UsingJoin(JoinType(joinType),
-                     usingColumns.map(UnresolvedAttribute(_))),
-           None)
+      Join(
+        joined.left,
+        joined.right,
+        UsingJoin(
+          JoinType(joinType),
+          usingColumns.map(UnresolvedAttribute(_))),
+        None)
     }
   }
 
@@ -646,10 +649,11 @@ class Dataset[T] private[sql] (
     // Trigger analysis so in the case of self-join, the analyzer will clone the plan.
     // After the cloning, left and right side will have distinct expression ids.
     val plan = withPlan(
-      Join(logicalPlan,
-           right.logicalPlan,
-           JoinType(joinType),
-           Some(joinExprs.expr))).queryExecution.analyzed.asInstanceOf[Join]
+      Join(
+        logicalPlan,
+        right.logicalPlan,
+        JoinType(joinType),
+        Some(joinExprs.expr))).queryExecution.analyzed.asInstanceOf[Join]
 
     // If auto self join alias is disabled, return the plan.
     if (!sqlContext.conf.dataFrameSelfJoinAutoResolveAmbiguity) {
@@ -671,8 +675,9 @@ class Dataset[T] private[sql] (
         case catalyst.expressions
               .EqualTo(a: AttributeReference, b: AttributeReference)
             if a.sameRef(b) =>
-          catalyst.expressions.EqualTo(withPlan(plan.left).resolve(a.name),
-                                       withPlan(plan.right).resolve(b.name))
+          catalyst.expressions.EqualTo(
+            withPlan(plan.left).resolve(a.name),
+            withPlan(plan.right).resolve(b.name))
       }
     }
 
@@ -948,8 +953,9 @@ class Dataset[T] private[sql] (
   def select[U1: Encoder](c1: TypedColumn[T, U1]): Dataset[U1] = {
     new Dataset[U1](
       sqlContext,
-      Project(c1.withInputType(boundTEncoder, logicalPlan.output).named :: Nil,
-              logicalPlan),
+      Project(
+        c1.withInputType(boundTEncoder, logicalPlan.output).named :: Nil,
+        logicalPlan),
       implicitly[Encoder[U1]])
   }
 
@@ -1101,9 +1107,10 @@ class Dataset[T] private[sql] (
     */
   @scala.annotation.varargs
   def groupBy(cols: Column*): RelationalGroupedDataset = {
-    RelationalGroupedDataset(toDF(),
-                             cols.map(_.expr),
-                             RelationalGroupedDataset.GroupByType)
+    RelationalGroupedDataset(
+      toDF(),
+      cols.map(_.expr),
+      RelationalGroupedDataset.GroupByType)
   }
 
   /**
@@ -1127,9 +1134,10 @@ class Dataset[T] private[sql] (
     */
   @scala.annotation.varargs
   def rollup(cols: Column*): RelationalGroupedDataset = {
-    RelationalGroupedDataset(toDF(),
-                             cols.map(_.expr),
-                             RelationalGroupedDataset.RollupType)
+    RelationalGroupedDataset(
+      toDF(),
+      cols.map(_.expr),
+      RelationalGroupedDataset.RollupType)
   }
 
   /**
@@ -1153,9 +1161,10 @@ class Dataset[T] private[sql] (
     */
   @scala.annotation.varargs
   def cube(cols: Column*): RelationalGroupedDataset = {
-    RelationalGroupedDataset(toDF(),
-                             cols.map(_.expr),
-                             RelationalGroupedDataset.CubeType)
+    RelationalGroupedDataset(
+      toDF(),
+      cols.map(_.expr),
+      RelationalGroupedDataset.CubeType)
   }
 
   /**
@@ -1181,9 +1190,10 @@ class Dataset[T] private[sql] (
   @scala.annotation.varargs
   def groupBy(col1: String, cols: String*): RelationalGroupedDataset = {
     val colNames: Seq[String] = col1 +: cols
-    RelationalGroupedDataset(toDF(),
-                             colNames.map(colName => resolve(colName)),
-                             RelationalGroupedDataset.GroupByType)
+    RelationalGroupedDataset(
+      toDF(),
+      colNames.map(colName => resolve(colName)),
+      RelationalGroupedDataset.GroupByType)
   }
 
   /**
@@ -1224,11 +1234,12 @@ class Dataset[T] private[sql] (
     val withGroupingKey = AppendColumns(func, inputPlan)
     val executed = sqlContext.executePlan(withGroupingKey)
 
-    new KeyValueGroupedDataset(encoderFor[K],
-                               encoderFor[T],
-                               executed,
-                               inputPlan.output,
-                               withGroupingKey.newColumns)
+    new KeyValueGroupedDataset(
+      encoderFor[K],
+      encoderFor[T],
+      executed,
+      inputPlan.output,
+      withGroupingKey.newColumns)
   }
 
   /**
@@ -1250,11 +1261,12 @@ class Dataset[T] private[sql] (
     val dataAttributes = executed.analyzed.output.dropRight(cols.size)
     val keyAttributes = executed.analyzed.output.takeRight(cols.size)
 
-    new KeyValueGroupedDataset(RowEncoder(keyAttributes.toStructType),
-                               encoderFor[T],
-                               executed,
-                               dataAttributes,
-                               keyAttributes)
+    new KeyValueGroupedDataset(
+      RowEncoder(keyAttributes.toStructType),
+      encoderFor[T],
+      executed,
+      dataAttributes,
+      keyAttributes)
   }
 
   /**
@@ -1295,9 +1307,10 @@ class Dataset[T] private[sql] (
   @scala.annotation.varargs
   def rollup(col1: String, cols: String*): RelationalGroupedDataset = {
     val colNames: Seq[String] = col1 +: cols
-    RelationalGroupedDataset(toDF(),
-                             colNames.map(colName => resolve(colName)),
-                             RelationalGroupedDataset.RollupType)
+    RelationalGroupedDataset(
+      toDF(),
+      colNames.map(colName => resolve(colName)),
+      RelationalGroupedDataset.RollupType)
   }
 
   /**
@@ -1324,9 +1337,10 @@ class Dataset[T] private[sql] (
   @scala.annotation.varargs
   def cube(col1: String, cols: String*): RelationalGroupedDataset = {
     val colNames: Seq[String] = col1 +: cols
-    RelationalGroupedDataset(toDF(),
-                             colNames.map(colName => resolve(colName)),
-                             RelationalGroupedDataset.CubeType)
+    RelationalGroupedDataset(
+      toDF(),
+      colNames.map(colName => resolve(colName)),
+      RelationalGroupedDataset.CubeType)
   }
 
   /**
@@ -1504,9 +1518,10 @@ class Dataset[T] private[sql] (
     // constituent partitions each time a split is materialized which could result in
     // overlapping splits. To prevent this, we explicitly sort each input partition to make the
     // ordering deterministic.
-    val sorted = Sort(logicalPlan.output.map(SortOrder(_, Ascending)),
-                      global = false,
-                      logicalPlan)
+    val sorted = Sort(
+      logicalPlan.output.map(SortOrder(_, Ascending)),
+      global = false,
+      logicalPlan)
     val sum = weights.sum
     val normalizedCumWeights = weights.map(_ / sum).scanLeft(0.0d)(_ + _)
     normalizedCumWeights
@@ -1582,12 +1597,13 @@ class Dataset[T] private[sql] (
       UserDefinedGenerator(elementTypes, rowFunction, input.map(_.expr))
 
     withPlan {
-      Generate(generator,
-               join = true,
-               outer = false,
-               qualifier = None,
-               generatorOutput = Nil,
-               logicalPlan)
+      Generate(
+        generator,
+        join = true,
+        outer = false,
+        qualifier = None,
+        generatorOutput = Nil,
+        logicalPlan)
     }
   }
 
@@ -1618,17 +1634,19 @@ class Dataset[T] private[sql] (
       val convert = CatalystTypeConverters.createToCatalystConverter(dataType)
       f(row(0).asInstanceOf[A]).map(o => InternalRow(convert(o)))
     }
-    val generator = UserDefinedGenerator(elementTypes,
-                                         rowFunction,
-                                         apply(inputColumn).expr :: Nil)
+    val generator = UserDefinedGenerator(
+      elementTypes,
+      rowFunction,
+      apply(inputColumn).expr :: Nil)
 
     withPlan {
-      Generate(generator,
-               join = true,
-               outer = false,
-               qualifier = None,
-               generatorOutput = Nil,
-               logicalPlan)
+      Generate(
+        generator,
+        join = true,
+        outer = false,
+        qualifier = None,
+        generatorOutput = Nil,
+        logicalPlan)
     }
   }
 
@@ -1966,9 +1984,10 @@ class Dataset[T] private[sql] (
     */
   @Experimental
   def mapPartitions[U: Encoder](func: Iterator[T] => Iterator[U]): Dataset[U] = {
-    new Dataset[U](sqlContext,
-                   MapPartitions[T, U](func, logicalPlan),
-                   implicitly[Encoder[U]])
+    new Dataset[U](
+      sqlContext,
+      MapPartitions[T, U](func, logicalPlan),
+      implicitly[Encoder[U]])
   }
 
   /**
@@ -2151,9 +2170,10 @@ class Dataset[T] private[sql] (
   @scala.annotation.varargs
   def repartition(numPartitions: Int, partitionExprs: Column*): Dataset[T] =
     withTypedPlan {
-      RepartitionByExpression(partitionExprs.map(_.expr),
-                              logicalPlan,
-                              Some(numPartitions))
+      RepartitionByExpression(
+        partitionExprs.map(_.expr),
+        logicalPlan,
+        Some(numPartitions))
     }
 
   /**
@@ -2167,9 +2187,10 @@ class Dataset[T] private[sql] (
     */
   @scala.annotation.varargs
   def repartition(partitionExprs: Column*): Dataset[T] = withTypedPlan {
-    RepartitionByExpression(partitionExprs.map(_.expr),
-                            logicalPlan,
-                            numPartitions = None)
+    RepartitionByExpression(
+      partitionExprs.map(_.expr),
+      logicalPlan,
+      numPartitions = None)
   }
 
   /**

@@ -103,9 +103,10 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
         }
       }
       val aggregator =
-        new Aggregator[K, V, C](self.context.clean(createCombiner),
-                                self.context.clean(mergeValue),
-                                self.context.clean(mergeCombiners))
+        new Aggregator[K, V, C](
+          self.context.clean(createCombiner),
+          self.context.clean(mergeValue),
+          self.context.clean(mergeCombiners))
       if (self.partitioner == Some(partitioner)) {
         self.mapPartitions(iter => {
           val context = TaskContext.get()
@@ -135,12 +136,13 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
                       mapSideCombine: Boolean = true,
                       serializer: Serializer = null): RDD[(K, C)] =
     self.withScope {
-      combineByKeyWithClassTag(createCombiner,
-                               mergeValue,
-                               mergeCombiners,
-                               partitioner,
-                               mapSideCombine,
-                               serializer)(null)
+      combineByKeyWithClassTag(
+        createCombiner,
+        mergeValue,
+        mergeCombiners,
+        partitioner,
+        mapSideCombine,
+        serializer)(null)
     }
 
   /**
@@ -154,10 +156,11 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
                       mergeValue: (C, V) => C,
                       mergeCombiners: (C, C) => C,
                       numPartitions: Int): RDD[(K, C)] = self.withScope {
-    combineByKeyWithClassTag(createCombiner,
-                             mergeValue,
-                             mergeCombiners,
-                             numPartitions)(null)
+    combineByKeyWithClassTag(
+      createCombiner,
+      mergeValue,
+      mergeCombiners,
+      numPartitions)(null)
   }
 
   /**
@@ -171,10 +174,11 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
       mergeCombiners: (C, C) => C,
       numPartitions: Int)(implicit ct: ClassTag[C]): RDD[(K, C)] =
     self.withScope {
-      combineByKeyWithClassTag(createCombiner,
-                               mergeValue,
-                               mergeCombiners,
-                               new HashPartitioner(numPartitions))
+      combineByKeyWithClassTag(
+        createCombiner,
+        mergeValue,
+        mergeCombiners,
+        new HashPartitioner(numPartitions))
     }
 
   /**
@@ -200,10 +204,11 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
 
     // We will clean the combiner closure later in `combineByKey`
     val cleanedSeqOp = self.context.clean(seqOp)
-    combineByKeyWithClassTag[U]((v: V) => cleanedSeqOp(createZero(), v),
-                                cleanedSeqOp,
-                                combOp,
-                                partitioner)
+    combineByKeyWithClassTag[U](
+      (v: V) => cleanedSeqOp(createZero(), v),
+      cleanedSeqOp,
+      combOp,
+      partitioner)
   }
 
   /**
@@ -218,8 +223,9 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
   def aggregateByKey[U: ClassTag](zeroValue: U, numPartitions: Int)(
       seqOp: (U, V) => U,
       combOp: (U, U) => U): RDD[(K, U)] = self.withScope {
-    aggregateByKey(zeroValue, new HashPartitioner(numPartitions))(seqOp,
-                                                                  combOp)
+    aggregateByKey(zeroValue, new HashPartitioner(numPartitions))(
+      seqOp,
+      combOp)
   }
 
   /**
@@ -255,10 +261,11 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
       () => cachedSerializer.deserialize[V](ByteBuffer.wrap(zeroArray))
 
     val cleanedFunc = self.context.clean(func)
-    combineByKeyWithClassTag[V]((v: V) => cleanedFunc(createZero(), v),
-                                cleanedFunc,
-                                cleanedFunc,
-                                partitioner)
+    combineByKeyWithClassTag[V](
+      (v: V) => cleanedFunc(createZero(), v),
+      cleanedFunc,
+      cleanedFunc,
+      partitioner)
   }
 
   /**
@@ -299,8 +306,9 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
                   seed: Long = Utils.random.nextLong): RDD[(K, V)] =
     self.withScope {
 
-      require(fractions.values.forall(v => v >= 0.0),
-              "Negative sampling rates.")
+      require(
+        fractions.values.forall(v => v >= 0.0),
+        "Negative sampling rates.")
 
       val samplingFunc =
         if (withReplacement) {
@@ -333,8 +341,9 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
                        seed: Long = Utils.random.nextLong): RDD[(K, V)] =
     self.withScope {
 
-      require(fractions.values.forall(v => v >= 0.0),
-              "Negative sampling rates.")
+      require(
+        fractions.values.forall(v => v >= 0.0),
+        "Negative sampling rates.")
 
       val samplingFunc =
         if (withReplacement) {
@@ -489,8 +498,9 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
   def countApproxDistinctByKey(relativeSD: Double,
                                partitioner: Partitioner): RDD[(K, Long)] =
     self.withScope {
-      require(relativeSD > 0.000017,
-              s"accuracy ($relativeSD) must be greater than 0.000017")
+      require(
+        relativeSD > 0.000017,
+        s"accuracy ($relativeSD) must be greater than 0.000017")
       val p = math.ceil(2.0 * math.log(1.054 / relativeSD) / math.log(2)).toInt
       assert(p <= 32)
       countApproxDistinctByKey(if (p < 4) 4 else p, 0, partitioner)
@@ -551,11 +561,12 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
       val mergeCombiners = (c1: CompactBuffer[V],
                             c2: CompactBuffer[V]) => c1 ++= c2
       val bufs =
-        combineByKeyWithClassTag[CompactBuffer[V]](createCombiner,
-                                                   mergeValue,
-                                                   mergeCombiners,
-                                                   partitioner,
-                                                   mapSideCombine = false)
+        combineByKeyWithClassTag[CompactBuffer[V]](
+          createCombiner,
+          mergeValue,
+          mergeCombiners,
+          partitioner,
+          mapSideCombine = false)
       bufs.asInstanceOf[RDD[(K, Iterable[V])]]
     }
 
@@ -685,10 +696,11 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
       mergeValue: (C, V) => C,
       mergeCombiners: (C, C) => C)(implicit ct: ClassTag[C]): RDD[(K, C)] =
     self.withScope {
-      combineByKeyWithClassTag(createCombiner,
-                               mergeValue,
-                               mergeCombiners,
-                               defaultPartitioner(self))
+      combineByKeyWithClassTag(
+        createCombiner,
+        mergeValue,
+        mergeCombiners,
+        defaultPartitioner(self))
     }
 
   /**
@@ -836,13 +848,14 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
   def flatMapValues[U](f: V => TraversableOnce[U]): RDD[(K, U)] =
     self.withScope {
       val cleanF = self.context.clean(f)
-      new MapPartitionsRDD[(K, U), (K, V)](self,
-                                           (context, pid, iter) =>
-                                             iter.flatMap {
-                                               case (k, v) =>
-                                                 cleanF(v).map(x => (k, x))
-                                           },
-                                           preservesPartitioning = true)
+      new MapPartitionsRDD[(K, U), (K, V)](
+        self,
+        (context, pid, iter) =>
+          iter.flatMap {
+            case (k, v) =>
+              cleanF(v).map(x => (k, x))
+        },
+        preservesPartitioning = true)
     }
 
   /**
@@ -921,10 +934,11 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
                           other3: RDD[(K, W3)])
     : RDD[(K, (Iterable[V], Iterable[W1], Iterable[W2], Iterable[W3]))] =
     self.withScope {
-      cogroup(other1,
-              other2,
-              other3,
-              defaultPartitioner(self, other1, other2, other3))
+      cogroup(
+        other1,
+        other2,
+        other3,
+        defaultPartitioner(self, other1, other2, other3))
     }
 
   /**
@@ -998,10 +1012,11 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
                             other3: RDD[(K, W3)])
     : RDD[(K, (Iterable[V], Iterable[W1], Iterable[W2], Iterable[W3]))] =
     self.withScope {
-      cogroup(other1,
-              other2,
-              other3,
-              defaultPartitioner(self, other1, other2, other3))
+      cogroup(
+        other1,
+        other2,
+        other3,
+        defaultPartitioner(self, other1, other2, other3))
     }
 
   /**
@@ -1012,9 +1027,10 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
     */
   def subtractByKey[W: ClassTag](other: RDD[(K, W)]): RDD[(K, V)] =
     self.withScope {
-      subtractByKey(other,
-                    self.partitioner.getOrElse(
-                      new HashPartitioner(self.partitions.length)))
+      subtractByKey(
+        other,
+        self.partitioner.getOrElse(
+          new HashPartitioner(self.partitions.length)))
     }
 
   /** Return an RDD with the pairs from `this` whose keys are not in `other`. */
@@ -1059,10 +1075,11 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
     */
   def saveAsHadoopFile[F <: OutputFormat[K, V]](path: String)(
       implicit fm: ClassTag[F]): Unit = self.withScope {
-    saveAsHadoopFile(path,
-                     keyClass,
-                     valueClass,
-                     fm.runtimeClass.asInstanceOf[Class[F]])
+    saveAsHadoopFile(
+      path,
+      keyClass,
+      valueClass,
+      fm.runtimeClass.asInstanceOf[Class[F]])
   }
 
   /**
@@ -1075,11 +1092,12 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
       codec: Class[_ <: CompressionCodec])(implicit fm: ClassTag[F]): Unit =
     self.withScope {
       val runtimeClass = fm.runtimeClass
-      saveAsHadoopFile(path,
-                       keyClass,
-                       valueClass,
-                       runtimeClass.asInstanceOf[Class[F]],
-                       codec)
+      saveAsHadoopFile(
+        path,
+        keyClass,
+        valueClass,
+        runtimeClass.asInstanceOf[Class[F]],
+        codec)
     }
 
   /**
@@ -1088,10 +1106,11 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
     */
   def saveAsNewAPIHadoopFile[F <: NewOutputFormat[K, V]](path: String)(
       implicit fm: ClassTag[F]): Unit = self.withScope {
-    saveAsNewAPIHadoopFile(path,
-                           keyClass,
-                           valueClass,
-                           fm.runtimeClass.asInstanceOf[Class[F]])
+    saveAsNewAPIHadoopFile(
+      path,
+      keyClass,
+      valueClass,
+      fm.runtimeClass.asInstanceOf[Class[F]])
   }
 
   /**
@@ -1126,12 +1145,13 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
                        outputFormatClass: Class[_ <: OutputFormat[_, _]],
                        codec: Class[_ <: CompressionCodec]): Unit =
     self.withScope {
-      saveAsHadoopFile(path,
-                       keyClass,
-                       valueClass,
-                       outputFormatClass,
-                       new JobConf(self.context.hadoopConfiguration),
-                       Some(codec))
+      saveAsHadoopFile(
+        path,
+        keyClass,
+        valueClass,
+        outputFormatClass,
+        new JobConf(self.context.hadoopConfiguration),
+        Some(codec))
     }
 
   /**
@@ -1161,8 +1181,9 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
         hadoopConf.set("mapred.output.compress", "true")
         hadoopConf.setMapOutputCompressorClass(c)
         hadoopConf.set("mapred.output.compression.codec", c.getCanonicalName)
-        hadoopConf.set("mapred.output.compression.type",
-                       CompressionType.BLOCK.toString)
+        hadoopConf.set(
+          "mapred.output.compression.type",
+          CompressionType.BLOCK.toString)
       }
 
       // Use configured output committer if already set
@@ -1221,11 +1242,12 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
     val writeShard = (context: TaskContext, iter: Iterator[(K, V)]) => {
       val config = wrappedConf.value
       /* "reduce task" <split #> <attempt # = spark task #> */
-      val attemptId = new TaskAttemptID(jobtrackerID,
-                                        stageId,
-                                        TaskType.REDUCE,
-                                        context.partitionId,
-                                        context.attemptNumber)
+      val attemptId = new TaskAttemptID(
+        jobtrackerID,
+        stageId,
+        TaskType.REDUCE,
+        context.partitionId,
+        context.attemptNumber)
       val hadoopContext = new TaskAttemptContextImpl(config, attemptId)
       val format = outfmt.newInstance
       format match {
@@ -1250,8 +1272,9 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
           writer.write(pair._1, pair._2)
 
           // Update bytes written metric every few records
-          maybeUpdateOutputMetrics(outputMetricsAndBytesWrittenCallback,
-                                   recordsWritten)
+          maybeUpdateOutputMetrics(
+            outputMetricsAndBytesWrittenCallback,
+            recordsWritten)
           recordsWritten += 1
         }
       } {
@@ -1342,12 +1365,14 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTag[K],
       Utils.tryWithSafeFinallyAndFailureCallbacks {
         while (iter.hasNext) {
           val record = iter.next()
-          writer.write(record._1.asInstanceOf[AnyRef],
-                       record._2.asInstanceOf[AnyRef])
+          writer.write(
+            record._1.asInstanceOf[AnyRef],
+            record._2.asInstanceOf[AnyRef])
 
           // Update bytes written metric every few records
-          maybeUpdateOutputMetrics(outputMetricsAndBytesWrittenCallback,
-                                   recordsWritten)
+          maybeUpdateOutputMetrics(
+            outputMetricsAndBytesWrittenCallback,
+            recordsWritten)
           recordsWritten += 1
         }
       } {

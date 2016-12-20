@@ -28,10 +28,11 @@ final class ScalaCallHierarchyBrowser(project: Project, method: PsiMethod)
       .getAction(IdeActions.GROUP_CALL_HIERARCHY_POPUP)
       .asInstanceOf[ActionGroup]
     val tree1: JTree = createTree(false)
-    PopupHandler.installPopupHandler(tree1,
-                                     group,
-                                     ActionPlaces.CALL_HIERARCHY_VIEW_POPUP,
-                                     ActionManager.getInstance)
+    PopupHandler.installPopupHandler(
+      tree1,
+      group,
+      ActionPlaces.CALL_HIERARCHY_VIEW_POPUP,
+      ActionManager.getInstance)
     val forName: Class[_] =
       Class.forName("com.intellij.ide.hierarchy.CallHierarchyBrowserBase")
     val classes = forName.getDeclaredClasses
@@ -41,25 +42,29 @@ final class ScalaCallHierarchyBrowser(project: Project, method: PsiMethod)
     val constructor = baseClass.getConstructor()
     val inst: Any = constructor.newInstance()
     val methods = baseClass.getMethods
-    val method = baseClass.getMethod("registerCustomShortcutSet",
-                                     classOf[ShortcutSet],
-                                     classOf[JComponent])
-    method.invoke(inst,
-                  ActionManager.getInstance
-                    .getAction(IdeActions.ACTION_CALL_HIERARCHY)
-                    .getShortcutSet,
-                  tree1)
+    val method = baseClass.getMethod(
+      "registerCustomShortcutSet",
+      classOf[ShortcutSet],
+      classOf[JComponent])
+    method.invoke(
+      inst,
+      ActionManager.getInstance
+        .getAction(IdeActions.ACTION_CALL_HIERARCHY)
+        .getShortcutSet,
+      tree1)
     type2TreeMap.put(CALLEE_TYPE, tree1)
     val tree2: JTree = createTree(false)
-    PopupHandler.installPopupHandler(tree2,
-                                     group,
-                                     ActionPlaces.CALL_HIERARCHY_VIEW_POPUP,
-                                     ActionManager.getInstance)
-    method.invoke(inst,
-                  ActionManager.getInstance
-                    .getAction(IdeActions.ACTION_CALL_HIERARCHY)
-                    .getShortcutSet,
-                  tree2)
+    PopupHandler.installPopupHandler(
+      tree2,
+      group,
+      ActionPlaces.CALL_HIERARCHY_VIEW_POPUP,
+      ActionManager.getInstance)
+    method.invoke(
+      inst,
+      ActionManager.getInstance
+        .getAction(IdeActions.ACTION_CALL_HIERARCHY)
+        .getShortcutSet,
+      tree2)
     type2TreeMap.put(CALLER_TYPE, tree2)
   }
 
@@ -89,13 +94,15 @@ final class ScalaCallHierarchyBrowser(project: Project, method: PsiMethod)
       typeName: String,
       psiElement: PsiElement): HierarchyTreeStructure = {
     if (CALLER_TYPE.equals(typeName))
-      new ScalaCallerMethodsTreeStructure(myProject,
-                                          psiElement.asInstanceOf[PsiMethod],
-                                          getCurrentScopeType)
+      new ScalaCallerMethodsTreeStructure(
+        myProject,
+        psiElement.asInstanceOf[PsiMethod],
+        getCurrentScopeType)
     else if (CALLEE_TYPE.equals(typeName))
-      new ScalaCalleeMethodsTreeStructure(myProject,
-                                          psiElement.asInstanceOf[PsiMethod],
-                                          getCurrentScopeType)
+      new ScalaCalleeMethodsTreeStructure(
+        myProject,
+        psiElement.asInstanceOf[PsiMethod],
+        getCurrentScopeType)
     else null
   }
 

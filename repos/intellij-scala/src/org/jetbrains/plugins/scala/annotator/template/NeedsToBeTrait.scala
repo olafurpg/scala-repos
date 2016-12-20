@@ -18,8 +18,8 @@ object NeedsToBeTrait extends AnnotatorPart[ScTemplateDefinition] {
       case (refElement, Some((psiClass, _))) if !isMixable(psiClass) =>
         holder.createErrorAnnotation(
           refElement,
-          "%s %s needs to be trait to be mixed in".format(kindOf(psiClass),
-                                                          psiClass.name))
+          "%s %s needs to be trait to be mixed in"
+            .format(kindOf(psiClass), psiClass.name))
       case _ =>
     }
   }

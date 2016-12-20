@@ -22,9 +22,10 @@ case class ItemScore(
 
 object ECommerceRecommendationEngine extends IEngineFactory {
   def apply() = {
-    new Engine(classOf[DataSource],
-               classOf[Preparator],
-               Map("als" -> classOf[ALSAlgorithm]),
-               classOf[Serving])
+    new Engine(
+      classOf[DataSource],
+      classOf[Preparator],
+      Map("als" -> classOf[ALSAlgorithm]),
+      classOf[Serving])
   }
 }

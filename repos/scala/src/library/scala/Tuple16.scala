@@ -29,8 +29,9 @@ package scala
   *  @param  _15   Element 15 of this Tuple16
   *  @param  _16   Element 16 of this Tuple16
   */
-@deprecatedInheritance("Tuples will be made final in a future version.",
-                       "2.11.0")
+@deprecatedInheritance(
+  "Tuples will be made final in a future version.",
+  "2.11.0")
 case class Tuple16[+T1,
                    +T2,
                    +T3,
@@ -62,22 +63,23 @@ case class Tuple16[+T1,
                          _14: T14,
                          _15: T15,
                          _16: T16)
-    extends Product16[T1,
-                      T2,
-                      T3,
-                      T4,
-                      T5,
-                      T6,
-                      T7,
-                      T8,
-                      T9,
-                      T10,
-                      T11,
-                      T12,
-                      T13,
-                      T14,
-                      T15,
-                      T16] {
+    extends Product16[
+      T1,
+      T2,
+      T3,
+      T4,
+      T5,
+      T6,
+      T7,
+      T8,
+      T9,
+      T10,
+      T11,
+      T12,
+      T13,
+      T14,
+      T15,
+      T16] {
   override def toString() =
     "(" + _1 + "," + _2 + "," + _3 + "," + _4 + "," + _5 + "," + _6 + "," +
       _7 + "," + _8 + "," + _9 + "," + _10 + "," + _11 + "," + _12 + "," + _13 +

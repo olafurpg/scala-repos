@@ -53,9 +53,9 @@ class FileSourceTest extends WordSpec with Matchers {
 
   "A MultipleTsvFile Source" should {
     JobTest(new MultiTsvInputJob(_))
-      .source(MultipleTsvFiles(List("input0", "input1"),
-                               ('query, 'queryStats)),
-              List(("foobar", 1), ("helloworld", 2)))
+      .source(
+        MultipleTsvFiles(List("input0", "input1"), ('query, 'queryStats)),
+        List(("foobar", 1), ("helloworld", 2)))
       .sink[(String, Int)](Tsv("output0")) { outBuf =>
         "take multiple Tsv files as input sources" in {
           outBuf should have length 2
@@ -69,21 +69,21 @@ class FileSourceTest extends WordSpec with Matchers {
   "A WritableSequenceFile Source" should {
     JobTest(new SequenceFileInputJob(_))
       .source(SequenceFile("input0"), List(("foobar0", 1), ("helloworld0", 2)))
-      .source(WritableSequenceFile("input1", ('query, 'queryStats)),
-              List(("foobar1", 1), ("helloworld1", 2)))
+      .source(
+        WritableSequenceFile("input1", ('query, 'queryStats)),
+        List(("foobar1", 1), ("helloworld1", 2)))
       .sink[(String, Int)](SequenceFile("output0")) { outBuf =>
         "sequence file input" in {
           outBuf should have length 2
           outBuf.toList shouldBe List(("foobar0", 1), ("helloworld0", 2))
         }
       }
-      .sink[(String, Int)](WritableSequenceFile("output1",
-                                                ('query, 'queryStats))) {
-        outBuf =>
-          "writable sequence file input" in {
-            outBuf should have length 2
-            outBuf.toList shouldBe List(("foobar1", 1), ("helloworld1", 2))
-          }
+      .sink[(String, Int)](
+        WritableSequenceFile("output1", ('query, 'queryStats))) { outBuf =>
+        "writable sequence file input" in {
+          outBuf should have length 2
+          outBuf.toList shouldBe List(("foobar1", 1), ("helloworld1", 2))
+        }
       }
       .run
       .finish
@@ -92,8 +92,9 @@ class FileSourceTest extends WordSpec with Matchers {
   "A MultipleTextLineFiles Source" should {
     JobTest(new MultipleTextLineFilesJob(_))
       .arg("input", List("input0", "input1"))
-      .source(MultipleTextLineFiles("input0", "input1"),
-              List("foobar", "helloworld"))
+      .source(
+        MultipleTextLineFiles("input0", "input1"),
+        List("foobar", "helloworld"))
       .sink[String](Tsv("output0")) { outBuf =>
         "take multiple text files as input sources" in {
           outBuf should have length 2
@@ -282,8 +283,8 @@ class FileSourceTest extends WordSpec with Matchers {
     }
     "Throw in toIterator because no data is present" in {
       an[InvalidSourceException] should be thrownBy
-        (TestInvalidFileSource.toIterator(Config.default,
-                                          Hdfs(true, new JobConf())))
+        (TestInvalidFileSource
+          .toIterator(Config.default, Hdfs(true, new JobConf())))
     }
   }
 }

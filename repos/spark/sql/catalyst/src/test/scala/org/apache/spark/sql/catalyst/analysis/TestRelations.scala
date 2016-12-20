@@ -48,13 +48,13 @@ object TestRelations {
         StringType) :: Nil
     ))())
 
-  val nestedRelation2 = LocalRelation(
-    AttributeReference("top",
-                       StructType(
-                         StructField("aField", StringType) :: StructField(
-                           "bField",
-                           StringType) :: StructField("cField", StringType) :: Nil
-                       ))())
+  val nestedRelation2 = LocalRelation(AttributeReference(
+    "top",
+    StructType(
+      StructField("aField", StringType) :: StructField("bField", StringType) :: StructField(
+        "cField",
+        StringType) :: Nil
+    ))())
 
   val listRelation = LocalRelation(
     AttributeReference("list", ArrayType(IntegerType))())

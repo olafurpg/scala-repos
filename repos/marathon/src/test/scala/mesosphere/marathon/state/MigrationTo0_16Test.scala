@@ -18,16 +18,18 @@ class MigrationTo0_16Test
     lazy val metrics = new Metrics(new MetricRegistry)
     lazy val store = new InMemoryStore()
 
-    lazy val groupStore = new MarathonStore[Group](store,
-                                                   metrics,
-                                                   () => Group.empty,
-                                                   prefix = "group:")
+    lazy val groupStore = new MarathonStore[Group](
+      store,
+      metrics,
+      () => Group.empty,
+      prefix = "group:")
     lazy val groupRepo =
       new GroupRepository(groupStore, maxVersions = None, metrics)
-    lazy val appStore = new MarathonStore[AppDefinition](store,
-                                                         metrics,
-                                                         () => AppDefinition(),
-                                                         prefix = "app:")
+    lazy val appStore = new MarathonStore[AppDefinition](
+      store,
+      metrics,
+      () => AppDefinition(),
+      prefix = "app:")
     lazy val appRepo = new AppRepository(appStore, maxVersions = None, metrics)
 
     lazy val migration =
@@ -56,9 +58,10 @@ class MigrationTo0_16Test
     val f = new Fixture
 
     def appProtoInNewFormatAsserts(proto: Protos.ServiceDefinition) = {
-      assert(Seq(1000, 1001) == proto.getPortDefinitionsList.asScala
-               .map(_.getNumber),
-             proto.toString)
+      assert(
+        Seq(1000, 1001) == proto.getPortDefinitionsList.asScala
+          .map(_.getNumber),
+        proto.toString)
       assert(proto.getPortsCount == 0)
     }
 

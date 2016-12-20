@@ -58,9 +58,10 @@ class ScExistentialTypeElementImpl(node: ASTNode)
               case Some(te) =>
                 val ttype = te.getType(ctx)
                 problems += ttype
-                val t = ScCompoundType(Seq(ttype.getOrAny, Singleton),
-                                       Map.empty,
-                                       Map.empty)
+                val t = ScCompoundType(
+                  Seq(ttype.getOrAny, Singleton),
+                  Map.empty,
+                  Map.empty)
                 for (declared <- value.declaredElements) {
                   buff += ScExistentialArgument(declared.name, Nil, Nothing, t)
                 }

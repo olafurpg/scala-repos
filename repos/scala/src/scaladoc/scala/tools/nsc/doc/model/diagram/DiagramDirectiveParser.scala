@@ -73,10 +73,11 @@ trait DiagramDirectiveParser {
       else NoDiagramAtAll
 
     if (template.comment.isDefined)
-      makeDiagramFilter(template,
-                        template.comment.get.inheritDiagram,
-                        defaultFilter,
-                        isInheritanceDiagram = true)
+      makeDiagramFilter(
+        template,
+        template.comment.get.inheritDiagram,
+        defaultFilter,
+        isInheritanceDiagram = true)
     else defaultFilter
   }
 
@@ -86,10 +87,11 @@ trait DiagramDirectiveParser {
       if (template.isPackage || template.isObject) FullDiagram
       else NoDiagramAtAll
     if (template.comment.isDefined)
-      makeDiagramFilter(template,
-                        template.comment.get.contentDiagram,
-                        defaultFilter,
-                        isInheritanceDiagram = false)
+      makeDiagramFilter(
+        template,
+        template.comment.get.contentDiagram,
+        defaultFilter,
+        isInheritanceDiagram = false)
     else defaultFilter
   }
 

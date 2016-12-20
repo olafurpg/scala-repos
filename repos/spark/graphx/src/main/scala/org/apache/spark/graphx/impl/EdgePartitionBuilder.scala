@@ -74,14 +74,15 @@ VD: ClassTag](size: Int = 64) {
       }
       vertexAttrs = new Array[VD](currLocalId + 1)
     }
-    new EdgePartition(localSrcIds,
-                      localDstIds,
-                      data,
-                      index,
-                      global2local,
-                      local2global.trim().array,
-                      vertexAttrs,
-                      None)
+    new EdgePartition(
+      localSrcIds,
+      localDstIds,
+      data,
+      index,
+      global2local,
+      local2global.trim().array,
+      vertexAttrs,
+      None)
   }
 }
 
@@ -135,14 +136,15 @@ private[impl] class ExistingEdgePartitionBuilder[@specialized(
       }
     }
 
-    new EdgePartition(localSrcIds,
-                      localDstIds,
-                      data,
-                      index,
-                      global2local,
-                      local2global,
-                      vertexAttrs,
-                      activeSet)
+    new EdgePartition(
+      localSrcIds,
+      localDstIds,
+      data,
+      index,
+      global2local,
+      local2global,
+      vertexAttrs,
+      activeSet)
   }
 }
 

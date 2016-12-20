@@ -12,17 +12,21 @@ class BitSetTest {
     val bitSet = BitSet.empty
     val size = bitSet.toBitMask.length
     bitSet ^= bitSet
-    assert(bitSet.toBitMask.length == size,
-           "Capacity of bitset changed after ^=")
+    assert(
+      bitSet.toBitMask.length == size,
+      "Capacity of bitset changed after ^=")
     bitSet |= bitSet
-    assert(bitSet.toBitMask.length == size,
-           "Capacity of bitset changed after |=")
+    assert(
+      bitSet.toBitMask.length == size,
+      "Capacity of bitset changed after |=")
     bitSet &= bitSet
-    assert(bitSet.toBitMask.length == size,
-           "Capacity of bitset changed after &=")
+    assert(
+      bitSet.toBitMask.length == size,
+      "Capacity of bitset changed after &=")
     bitSet &~= bitSet
-    assert(bitSet.toBitMask.length == size,
-           "Capacity of bitset changed after &~=")
+    assert(
+      bitSet.toBitMask.length == size,
+      "Capacity of bitset changed after &~=")
   }
 
   @Test
@@ -32,8 +36,9 @@ class BitSetTest {
     bigBitSet &= littleBitSet
     assert(!(bigBitSet contains 10000), "&= not applied to the full bitset")
     littleBitSet &= bigBitSet
-    assert(littleBitSet.toBitMask.length < bigBitSet.toBitMask.length,
-           "Needlessly extended the size of bitset on &=")
+    assert(
+      littleBitSet.toBitMask.length < bigBitSet.toBitMask.length,
+      "Needlessly extended the size of bitset on &=")
   }
 
   @Test

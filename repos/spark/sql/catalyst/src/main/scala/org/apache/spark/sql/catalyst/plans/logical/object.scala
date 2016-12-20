@@ -44,8 +44,9 @@ trait ObjectOperator extends LogicalPlan {
     * is the same whether or not the operator is output serialized data.
     */
   def outputObject: NamedExpression =
-    Alias(serializer.head.collect { case b: BoundReference => b }.head,
-          "obj")()
+    Alias(
+      serializer.head.collect { case b: BoundReference => b }.head,
+      "obj")()
 
   /**
     * Returns a copy of this operator that will produce an object instead of an encoded row.
@@ -73,10 +74,11 @@ trait ObjectOperator extends LogicalPlan {
 object MapPartitions {
   def apply[T: Encoder, U: Encoder](func: Iterator[T] => Iterator[U],
                                     child: LogicalPlan): MapPartitions = {
-    MapPartitions(func.asInstanceOf[Iterator[Any] => Iterator[Any]],
-                  encoderFor[T].fromRowExpression,
-                  encoderFor[U].namedExpressions,
-                  child)
+    MapPartitions(
+      func.asInstanceOf[Iterator[Any] => Iterator[Any]],
+      encoderFor[T].fromRowExpression,
+      encoderFor[U].namedExpressions,
+      child)
   }
 }
 
@@ -100,10 +102,11 @@ case class MapPartitions(func: Iterator[Any] => Iterator[Any],
 object AppendColumns {
   def apply[T: Encoder, U: Encoder](func: T => U,
                                     child: LogicalPlan): AppendColumns = {
-    new AppendColumns(func.asInstanceOf[Any => Any],
-                      encoderFor[T].fromRowExpression,
-                      encoderFor[U].namedExpressions,
-                      child)
+    new AppendColumns(
+      func.asInstanceOf[Any => Any],
+      encoderFor[T].fromRowExpression,
+      encoderFor[U].namedExpressions,
+      child)
   }
 }
 
@@ -167,8 +170,9 @@ case class MapGroups(func: (Any, Iterator[Any]) => TraversableOnce[Any],
     with ObjectOperator {
 
   override def deserializers: Seq[(Expression, Seq[Attribute])] =
-    Seq(keyDeserializer -> groupingAttributes,
-        valueDeserializer -> dataAttributes)
+    Seq(
+      keyDeserializer -> groupingAttributes,
+      valueDeserializer -> dataAttributes)
 }
 
 /** Factory for constructing new `CoGroup` nodes. */
@@ -185,18 +189,19 @@ object CoGroup {
       StructType.fromAttributes(leftGroup) == StructType.fromAttributes(
         rightGroup))
 
-    CoGroup(func.asInstanceOf[(Any, Iterator[Any],
-                               Iterator[Any]) => TraversableOnce[Any]],
-            encoderFor[Key].fromRowExpression,
-            encoderFor[Left].fromRowExpression,
-            encoderFor[Right].fromRowExpression,
-            encoderFor[Result].namedExpressions,
-            leftGroup,
-            rightGroup,
-            leftData,
-            rightData,
-            left,
-            right)
+    CoGroup(
+      func.asInstanceOf[(Any, Iterator[Any],
+                         Iterator[Any]) => TraversableOnce[Any]],
+      encoderFor[Key].fromRowExpression,
+      encoderFor[Left].fromRowExpression,
+      encoderFor[Right].fromRowExpression,
+      encoderFor[Result].namedExpressions,
+      leftGroup,
+      rightGroup,
+      leftData,
+      rightData,
+      left,
+      right)
   }
 }
 
@@ -222,7 +227,8 @@ case class CoGroup(func: (Any, Iterator[Any],
   override def deserializers: Seq[(Expression, Seq[Attribute])] =
     // The `leftGroup` and `rightGroup` are guaranteed te be of same schema, so it's safe to resolve
     // the `keyDeserializer` based on either of them, here we pick the left one.
-    Seq(keyDeserializer -> leftGroup,
-        leftDeserializer -> leftAttr,
-        rightDeserializer -> rightAttr)
+    Seq(
+      keyDeserializer -> leftGroup,
+      leftDeserializer -> leftAttr,
+      rightDeserializer -> rightAttr)
 }

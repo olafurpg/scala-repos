@@ -47,10 +47,11 @@ object FilterArgsSpec extends Specification {
     "support port property with dev setting" in {
       val devSettings: Seq[(String, String)] =
         Seq("play.server.http.port" -> "1234")
-      val result = Reloader.filterArgs(Seq.empty,
-                                       defaultHttpPort,
-                                       defaultHttpAddress,
-                                       devSettings)
+      val result = Reloader.filterArgs(
+        Seq.empty,
+        defaultHttpPort,
+        defaultHttpAddress,
+        devSettings)
       result must_== ((Seq.empty, Some(1234), None, defaultHttpAddress))
     }
 
@@ -79,10 +80,11 @@ object FilterArgsSpec extends Specification {
     "support https port property with dev setting" in {
       val devSettings: Seq[(String, String)] =
         Seq("play.server.https.port" -> "1234")
-      val result = Reloader.filterArgs(Seq.empty,
-                                       defaultHttpPort,
-                                       defaultHttpAddress,
-                                       devSettings)
+      val result = Reloader.filterArgs(
+        Seq.empty,
+        defaultHttpPort,
+        defaultHttpAddress,
+        devSettings)
       result must_== ((Seq.empty, Some(9000), Some(1234), defaultHttpAddress))
     }
 
@@ -104,21 +106,24 @@ object FilterArgsSpec extends Specification {
     "support address property with dev setting" in {
       val devSettings: Seq[(String, String)] =
         Seq("play.server.http.address" -> "not-default-address")
-      val result = Reloader.filterArgs(Seq.empty,
-                                       defaultHttpPort,
-                                       defaultHttpAddress,
-                                       devSettings)
+      val result = Reloader.filterArgs(
+        Seq.empty,
+        defaultHttpPort,
+        defaultHttpAddress,
+        devSettings)
       result must_== ((Seq.empty, Some(9000), None, "not-default-address"))
     }
 
     "support all options" in {
-      check("-Dhttp.address=localhost",
-            "-Dhttps.port=4321",
-            "-Dtest.option=something",
-            "1234")(
-        properties = Seq("http.address" -> "localhost",
-                         "https.port" -> "4321",
-                         "test.option" -> "something"),
+      check(
+        "-Dhttp.address=localhost",
+        "-Dhttps.port=4321",
+        "-Dtest.option=something",
+        "1234")(
+        properties = Seq(
+          "http.address" -> "localhost",
+          "https.port" -> "4321",
+          "test.option" -> "something"),
         httpPort = Some(1234),
         httpsPort = Some(4321),
         httpAddress = "localhost"

@@ -98,21 +98,23 @@ object RunServer extends Logging {
            Seq()
          }) ++
         (if (ca.common.sparkKryo) {
-           Seq("--conf",
-               "spark.serializer=org.apache.spark.serializer.KryoSerializer")
+           Seq(
+             "--conf",
+             "spark.serializer=org.apache.spark.serializer.KryoSerializer")
          } else {
            Seq()
-         }) ++ Seq(mainJar,
-                   "--engineInstanceId",
-                   engineInstanceId,
-                   "--ip",
-                   ca.deploy.ip,
-                   "--port",
-                   ca.deploy.port.toString,
-                   "--event-server-ip",
-                   ca.eventServer.ip,
-                   "--event-server-port",
-                   ca.eventServer.port.toString) ++
+         }) ++ Seq(
+        mainJar,
+        "--engineInstanceId",
+        engineInstanceId,
+        "--ip",
+        ca.deploy.ip,
+        "--port",
+        ca.deploy.port.toString,
+        "--event-server-ip",
+        ca.eventServer.ip,
+        "--event-server-port",
+        ca.eventServer.port.toString) ++
         (if (ca.accessKey.accessKey != "") {
            Seq("--accesskey", ca.accessKey.accessKey)
          } else {
@@ -125,15 +127,17 @@ object RunServer extends Logging {
         .map(x => Seq("--log-url", x))
         .getOrElse(Seq()) ++ ca.deploy.logPrefix
         .map(x => Seq("--log-prefix", x))
-        .getOrElse(Seq()) ++ Seq("--json-extractor",
-                                 ca.common.jsonExtractor.toString)
+        .getOrElse(Seq()) ++ Seq(
+        "--json-extractor",
+        ca.common.jsonExtractor.toString)
 
     info(s"Submission command: ${sparkSubmit.mkString(" ")}")
 
-    val proc = Process(sparkSubmit,
-                       None,
-                       "CLASSPATH" -> "",
-                       "SPARK_YARN_USER_ENV" -> pioEnvVars).run()
+    val proc = Process(
+      sparkSubmit,
+      None,
+      "CLASSPATH" -> "",
+      "SPARK_YARN_USER_ENV" -> pioEnvVars).run()
     Runtime.getRuntime.addShutdownHook(new Thread(new Runnable {
       def run(): Unit = {
         proc.destroy()
@@ -151,18 +155,19 @@ object RunServer extends Logging {
         .getOrElse(Array.empty[File])
         .map(_.toURI)
     val args =
-      Seq("--engineInstanceId",
-          engineInstanceId,
-          "--engine-variant",
-          ca.common.variantJson.toURI.toString,
-          "--ip",
-          ca.deploy.ip,
-          "--port",
-          ca.deploy.port.toString,
-          "--event-server-ip",
-          ca.eventServer.ip,
-          "--event-server-port",
-          ca.eventServer.port.toString) ++
+      Seq(
+        "--engineInstanceId",
+        engineInstanceId,
+        "--engine-variant",
+        ca.common.variantJson.toURI.toString,
+        "--ip",
+        ca.deploy.ip,
+        "--port",
+        ca.deploy.port.toString,
+        "--event-server-ip",
+        ca.eventServer.ip,
+        "--event-server-port",
+        ca.eventServer.port.toString) ++
         (if (ca.accessKey.accessKey != "") {
            Seq("--accesskey", ca.accessKey.accessKey)
          } else {
@@ -173,8 +178,9 @@ object RunServer extends Logging {
         .map(x => Seq("--log-url", x))
         .getOrElse(Nil) ++ ca.deploy.logPrefix
         .map(x => Seq("--log-prefix", x))
-        .getOrElse(Nil) ++ Seq("--json-extractor",
-                               ca.common.jsonExtractor.toString)
+        .getOrElse(Nil) ++ Seq(
+        "--json-extractor",
+        ca.common.jsonExtractor.toString)
 
     Runner
       .runOnSpark("io.prediction.workflow.CreateServer", args, ca, jarFiles)

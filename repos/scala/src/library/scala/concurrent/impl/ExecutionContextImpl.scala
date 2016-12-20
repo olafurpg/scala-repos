@@ -49,8 +49,9 @@ private[concurrent] object ExecutionContextImpl {
       with ForkJoinPool.ForkJoinWorkerThreadFactory {
 
     require(prefix ne null, "DefaultThreadFactory.prefix must be non null")
-    require(maxThreads > 0,
-            "DefaultThreadFactory.maxThreads must be greater than 0")
+    require(
+      maxThreads > 0,
+      "DefaultThreadFactory.maxThreads must be greater than 0")
 
     private final val currentNumberOfThreads = new AtomicInteger(0)
 
@@ -162,10 +163,11 @@ private[concurrent] object ExecutionContextImpl {
       prefix = "scala-execution-context-global",
       uncaught = uncaughtExceptionHandler)
 
-    new ForkJoinPool(desiredParallelism,
-                     threadFactory,
-                     uncaughtExceptionHandler,
-                     true) {
+    new ForkJoinPool(
+      desiredParallelism,
+      threadFactory,
+      uncaughtExceptionHandler,
+      true) {
       override def execute(runnable: Runnable): Unit = {
         val fjt: ForkJoinTask[_] = runnable match {
           case t: ForkJoinTask[_] => t

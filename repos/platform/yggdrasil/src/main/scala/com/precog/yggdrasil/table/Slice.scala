@@ -303,8 +303,9 @@ trait Slice { source =>
     val columns = node match {
       case CPathIndex(i) =>
         source.columns collect {
-          case (ColumnRef(CPath(CPathArray, xs @ _ *), CArrayType(elemType)),
-                col: HomogeneousArrayColumn[_]) =>
+          case (
+              ColumnRef(CPath(CPathArray, xs @ _ *), CArrayType(elemType)),
+              col: HomogeneousArrayColumn[_]) =>
             (ColumnRef(CPath(xs: _*), elemType), col.select(i))
 
           case (ColumnRef(CPath(CPathIndex(`i`), xs @ _ *), ctype), col) =>
@@ -389,9 +390,10 @@ trait Slice { source =>
           delete
         case (JObjectUnfixedT, _, CPath(CPathField(_), _ *)) =>
           delete
-        case (JObjectFixedT(fields),
-              _,
-              CPath(CPathField(name), cPath @ _ *)) =>
+        case (
+            JObjectFixedT(fields),
+            _,
+            CPath(CPathField(name), cPath @ _ *)) =>
           fields get name map (flattenDeleteTree(_, cType, CPath(cPath: _*))) getOrElse
             (retain)
         case (JArrayUnfixedT, _, CPath(CPathArray | CPathIndex(_), _ *)) =>
@@ -399,9 +401,10 @@ trait Slice { source =>
         case (JArrayFixedT(elems), cType, CPath(CPathIndex(i), cPath @ _ *)) =>
           elems get i map (flattenDeleteTree(_, cType, CPath(cPath: _*))) getOrElse
             (retain)
-        case (JArrayFixedT(elems),
-              CArrayType(cElemType),
-              CPath(CPathArray, cPath @ _ *)) =>
+        case (
+            JArrayFixedT(elems),
+            CArrayType(cElemType),
+            CPath(CPathArray, cPath @ _ *)) =>
           val mappers =
             elems mapValues (flattenDeleteTree(_, cElemType, CPath(cPath: _*)))
           xs =>
@@ -412,9 +415,10 @@ trait Slice { source =>
                   case None => x
                 }
             })
-        case (JArrayHomogeneousT(jType),
-              CArrayType(cType),
-              CPath(CPathArray, _ *)) if Schema.ctypes(jType)(cType) =>
+        case (
+            JArrayHomogeneousT(jType),
+            CArrayType(cType),
+            CPath(CPathArray, _ *)) if Schema.ctypes(jType)(cType) =>
           delete
         case _ =>
           retain
@@ -427,8 +431,9 @@ trait Slice { source =>
           if Schema.includes(jtype, cpath, ctype) =>
         None
 
-      case (ref @ ColumnRef(cpath, ctype: CArrayType[a]),
-            col: HomogeneousArrayColumn[_]) if ctype == col.tpe =>
+      case (
+          ref @ ColumnRef(cpath, ctype: CArrayType[a]),
+          col: HomogeneousArrayColumn[_]) if ctype == col.tpe =>
         val trans = flattenDeleteTree(jtype, ctype, cpath)
         Some((ref, new HomogeneousArrayColumn[a] {
           val tpe = ctype
@@ -561,8 +566,9 @@ trait Slice { source =>
   def arraySwap(index: Int) = new Slice {
     val size = source.size
     val columns = source.columns.collect {
-      case (ColumnRef(cPath @ CPath(CPathArray, _ *), cType),
-            col: HomogeneousArrayColumn[a]) =>
+      case (
+          ColumnRef(cPath @ CPath(CPathArray, _ *), cType),
+          col: HomogeneousArrayColumn[a]) =>
         (ColumnRef(cPath, cType), new HomogeneousArrayColumn[a] {
           val tpe = col.tpe
           def isDefinedAt(row: Int) = col.isDefinedAt(row)
@@ -1864,8 +1870,9 @@ object Slice {
 
           case CArray(arr, cType) =>
             acc
-              .getOrElse(ref,
-                         ArrayHomogeneousArrayColumn.empty(sliceSize)(cType))
+              .getOrElse(
+                ref,
+                ArrayHomogeneousArrayColumn.empty(sliceSize)(cType))
               .asInstanceOf[ArrayHomogeneousArrayColumn[cType.tpe]]
               .unsafeTap { c =>
                 c.update(sliceIndex, arr)

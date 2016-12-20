@@ -32,11 +32,12 @@ object CapConcurrentExecutions {
                actorName: String,
                maxParallel: Int,
                maxQueued: Int): CapConcurrentExecutions = {
-    new CapConcurrentExecutions(metrics,
-                                actorRefFactory,
-                                actorName,
-                                maxParallel,
-                                maxQueued)
+    new CapConcurrentExecutions(
+      metrics,
+      actorRefFactory,
+      actorName,
+      maxParallel,
+      maxQueued)
   }
 }
 
@@ -172,9 +173,10 @@ private[util] object RestrictParallelExecutionsActor {
             maxParallel: Int,
             maxQueued: Int): Props =
     Props(
-      new RestrictParallelExecutionsActor(metrics,
-                                          maxParallel = maxParallel,
-                                          maxQueued = maxQueued))
+      new RestrictParallelExecutionsActor(
+        metrics,
+        maxParallel = maxParallel,
+        maxQueued = maxQueued))
 
   private val log = LoggerFactory.getLogger(getClass.getName)
   case class Execute[T](promise: Promise[T], func: () => Future[T]) {

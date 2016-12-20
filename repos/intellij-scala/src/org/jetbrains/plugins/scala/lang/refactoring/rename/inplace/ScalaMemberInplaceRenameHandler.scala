@@ -49,9 +49,10 @@ class ScalaMemberInplaceRenameHandler
         new ScalaMemberInplaceRenamer(elementToRename, clazz, editor)
       case clazz: PsiClass =>
         val companion = ScalaPsiUtil.getBaseCompanionModule(clazz)
-        new ScalaMemberInplaceRenamer(clazz,
-                                      companion.getOrElse(clazz),
-                                      editor)
+        new ScalaMemberInplaceRenamer(
+          clazz,
+          companion.getOrElse(clazz),
+          editor)
       case subst: PsiNamedElement =>
         new ScalaMemberInplaceRenamer(elementToRename, subst, editor)
       case _ =>

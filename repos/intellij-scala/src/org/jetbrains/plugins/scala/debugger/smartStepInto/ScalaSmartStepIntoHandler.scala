@@ -178,11 +178,12 @@ class ScalaSmartStepIntoHandler extends JvmSmartStepIntoHandler {
                   fun @ (_f: ScFunctionDefinition) <- tb.functions
                   body <- fun.body
                 } {
-                  result += new MethodSmartStepTarget(fun,
-                                                      label,
-                                                      body,
-                                                      true,
-                                                      noStopAtLines)
+                  result += new MethodSmartStepTarget(
+                    fun,
+                    label,
+                    body,
+                    true,
+                    noStopAtLines)
                 }
               case _ =>
             }
@@ -201,11 +202,12 @@ class ScalaSmartStepIntoHandler extends JvmSmartStepIntoHandler {
       implicits match {
         case Some(f: PsiMethod) if f.isPhysical =>
           //synthetic conversions are created for implicit classes
-          result += new MethodSmartStepTarget(f,
-                                              "implicit ",
-                                              expr,
-                                              false,
-                                              noStopAtLines)
+          result += new MethodSmartStepTarget(
+            f,
+            "implicit ",
+            expr,
+            false,
+            noStopAtLines)
         case _ =>
       }
 
@@ -215,37 +217,41 @@ class ScalaSmartStepIntoHandler extends JvmSmartStepIntoHandler {
             new MethodSmartStepTarget(m, null, expr, true, noStopAtLines)
           return
         case FunExpressionTarget(stmts, presentation) =>
-          result += new ScalaFunExprSmartStepTarget(expr,
-                                                    stmts,
-                                                    presentation,
-                                                    noStopAtLines)
+          result += new ScalaFunExprSmartStepTarget(
+            expr,
+            stmts,
+            presentation,
+            noStopAtLines)
           return //stop at function expression
         case ref: ScReferenceExpression =>
           ref.resolve() match {
             case fun: ScFunctionDefinition
                 if fun.name == "apply" && ref.refName != "apply" =>
               val prefix = s"${ref.refName}."
-              result += new MethodSmartStepTarget(fun,
-                                                  prefix,
-                                                  ref.nameId,
-                                                  false,
-                                                  noStopAtLines)
+              result += new MethodSmartStepTarget(
+                fun,
+                prefix,
+                ref.nameId,
+                false,
+                noStopAtLines)
             case Both(f: ScFunctionDefinition, ContainingClass(cl: ScClass))
                 if cl.getModifierList.hasModifierProperty("implicit") =>
               val isActuallyImplicit =
                 ref.qualifier.exists(_.getImplicitConversions()._2.nonEmpty)
               val prefix = if (isActuallyImplicit) "implicit " else null
-              result += new MethodSmartStepTarget(f,
-                                                  prefix,
-                                                  ref.nameId,
-                                                  false,
-                                                  noStopAtLines)
+              result += new MethodSmartStepTarget(
+                f,
+                prefix,
+                ref.nameId,
+                false,
+                noStopAtLines)
             case fun: PsiMethod =>
-              result += new MethodSmartStepTarget(fun,
-                                                  null,
-                                                  ref.nameId,
-                                                  false,
-                                                  noStopAtLines)
+              result += new MethodSmartStepTarget(
+                fun,
+                null,
+                ref.nameId,
+                false,
+                noStopAtLines)
             case _ =>
           }
         case _ =>
@@ -264,11 +270,12 @@ class ScalaSmartStepIntoHandler extends JvmSmartStepIntoHandler {
       ref match {
         case Some(r @ ResolvesTo(f: ScFunctionDefinition)) =>
           val prefix = s"${r.refName}."
-          result += new MethodSmartStepTarget(f,
-                                              prefix,
-                                              r.nameId,
-                                              false,
-                                              noStopAtLines)
+          result += new MethodSmartStepTarget(
+            f,
+            prefix,
+            r.nameId,
+            false,
+            noStopAtLines)
         case _ =>
       }
       super.visitPattern(pat)

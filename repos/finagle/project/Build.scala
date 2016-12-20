@@ -214,21 +214,22 @@ object Finagle extends Build {
     settings = Defaults.coreDefaultSettings ++ sharedSettings
   ).settings(
     name := "finagle-core",
-    libraryDependencies ++= Seq(util("app"),
-                                util("cache"),
-                                util("codec"),
-                                util("collection"),
-                                util("core"),
-                                util("hashing"),
-                                util("jvm"),
-                                util("lint"),
-                                util("logging"),
-                                util("registry"),
-                                util("stats"),
-                                commonsCodecLib,
-                                guavaLib,
-                                jsr166eLib,
-                                nettyLib)
+    libraryDependencies ++= Seq(
+      util("app"),
+      util("cache"),
+      util("codec"),
+      util("collection"),
+      util("core"),
+      util("hashing"),
+      util("jvm"),
+      util("lint"),
+      util("logging"),
+      util("registry"),
+      util("stats"),
+      commonsCodecLib,
+      guavaLib,
+      jsr166eLib,
+      nettyLib)
   )
 
   lazy val finagleNetty4 = Project(
@@ -542,14 +543,15 @@ object Finagle extends Build {
         "org.slf4j" % "slf4j-nop" % "1.7.7" % "provided"
       ) ++ scroogeLibs
     )
-    .dependsOn(finagleCore,
-               finagleThrift,
-               finagleMemcached,
-               finagleKestrel,
-               finagleRedis,
-               finagleMySQL,
-               finagleOstrich4,
-               finagleStats)
+    .dependsOn(
+      finagleCore,
+      finagleThrift,
+      finagleMemcached,
+      finagleKestrel,
+      finagleRedis,
+      finagleMySQL,
+      finagleOstrich4,
+      finagleStats)
 
   lazy val finagleBenchmarkThrift = Project(
     id = "finagle-benchmark-thrift",

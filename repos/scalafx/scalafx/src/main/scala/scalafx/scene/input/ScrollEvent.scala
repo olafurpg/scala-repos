@@ -61,8 +61,9 @@ object ScrollEvent {
       */
     val None = new HorizontalTextScrollUnits(
       jfxsi.ScrollEvent.HorizontalTextScrollUnits.NONE)
-    @deprecated("Use None; NONE will be removed in a future release",
-                "8.0.60-R10")
+    @deprecated(
+      "Use None; NONE will be removed in a future release",
+      "8.0.60-R10")
     val NONE = None
 
     protected override def unsortedValues: Array[HorizontalTextScrollUnits] =
@@ -86,8 +87,9 @@ object ScrollEvent {
       */
     val Lines = new VerticalTextScrollUnits(
       jfxsi.ScrollEvent.VerticalTextScrollUnits.LINES)
-    @deprecated("Use Lines; LINES will be removed in a future release",
-                "8.0.60-R10")
+    @deprecated(
+      "Use Lines; LINES will be removed in a future release",
+      "8.0.60-R10")
     val LINES = Lines
 
     /**
@@ -95,8 +97,9 @@ object ScrollEvent {
       */
     val Pages = new VerticalTextScrollUnits(
       jfxsi.ScrollEvent.VerticalTextScrollUnits.PAGES)
-    @deprecated("Use Pages; PAGES will be removed in a future release",
-                "8.0.60-R10")
+    @deprecated(
+      "Use Pages; PAGES will be removed in a future release",
+      "8.0.60-R10")
     val PAGES = Pages
 
     /**
@@ -104,8 +107,9 @@ object ScrollEvent {
       */
     val None = new VerticalTextScrollUnits(
       jfxsi.ScrollEvent.VerticalTextScrollUnits.NONE)
-    @deprecated("Use None; NONE will be removed in a future release",
-                "8.0.60-R10")
+    @deprecated(
+      "Use None; NONE will be removed in a future release",
+      "8.0.60-R10")
     val NONE = None
 
     protected override def unsortedValues: Array[VerticalTextScrollUnits] =
@@ -131,8 +135,9 @@ object ScrollEvent {
     * touch screen.
     */
   val Scroll: EventType[jfxsi.ScrollEvent] = jfxsi.ScrollEvent.SCROLL
-  @deprecated("Use Scroll; SCROLL will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Scroll; SCROLL will be removed in a future release",
+    "8.0.60-R10")
   val SCROLL = Scroll
 
   /**

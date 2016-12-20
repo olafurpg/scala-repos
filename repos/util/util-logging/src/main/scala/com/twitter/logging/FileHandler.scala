@@ -98,12 +98,13 @@ object FileHandler {
       level: Option[Level] = None
   ) =
     () =>
-      new FileHandler(filename,
-                      rollPolicy,
-                      append,
-                      rotateCount,
-                      formatter,
-                      level)
+      new FileHandler(
+        filename,
+        rollPolicy,
+        append,
+        rotateCount,
+        formatter,
+        level)
 }
 
 /**

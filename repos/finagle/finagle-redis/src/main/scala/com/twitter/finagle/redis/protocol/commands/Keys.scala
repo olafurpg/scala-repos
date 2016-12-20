@@ -49,8 +49,9 @@ object Expire {
   def apply(args: Seq[Array[Byte]]) = {
     val list = trimList(args, 2, "EXPIRE")
     RequireClientProtocol.safe {
-      new Expire(ChannelBuffers.wrappedBuffer(list(0)),
-                 NumberFormat.toLong(BytesToString(list(1))))
+      new Expire(
+        ChannelBuffers.wrappedBuffer(list(0)),
+        NumberFormat.toLong(BytesToString(list(1))))
     }
   }
 }
@@ -78,8 +79,9 @@ object ExpireAt {
 
 case class Keys(pattern: ChannelBuffer) extends Command {
   def command = Commands.KEYS
-  RequireClientProtocol(pattern != null && pattern.readableBytes > 0,
-                        "Pattern must be specified")
+  RequireClientProtocol(
+    pattern != null && pattern.readableBytes > 0,
+    "Pattern must be specified")
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(Seq(CommandBytes.KEYS, pattern))
 }
@@ -91,16 +93,18 @@ object Keys {
 case class Move(key: ChannelBuffer, db: ChannelBuffer)
     extends StrictKeyCommand {
   def command = Commands.MOVE
-  RequireClientProtocol(db != null && db.readableBytes > 0,
-                        "Database must be specified")
+  RequireClientProtocol(
+    db != null && db.readableBytes > 0,
+    "Database must be specified")
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(Seq(CommandBytes.MOVE, key, db))
 }
 object Move {
   def apply(args: Seq[Array[Byte]]) = {
     val list = trimList(args, 2, "MOVE")
-    new Move(ChannelBuffers.wrappedBuffer(list(0)),
-             ChannelBuffers.wrappedBuffer(list(1)))
+    new Move(
+      ChannelBuffers.wrappedBuffer(list(0)),
+      ChannelBuffers.wrappedBuffer(list(1)))
   }
 }
 
@@ -121,16 +125,18 @@ case class PExpire(key: ChannelBuffer, milliseconds: Long)
   def command = Commands.PEXPIRE
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(
-      Seq(CommandBytes.PEXPIRE,
-          key,
-          StringToChannelBuffer(milliseconds.toString)))
+      Seq(
+        CommandBytes.PEXPIRE,
+        key,
+        StringToChannelBuffer(milliseconds.toString)))
 }
 object PExpire {
   def apply(args: Seq[Array[Byte]]) = {
     val list = trimList(args, 2, "PEXPIRE")
     RequireClientProtocol.safe {
-      new PExpire(ChannelBuffers.wrappedBuffer(list(0)),
-                  NumberFormat.toLong(BytesToString(list(1))))
+      new PExpire(
+        ChannelBuffers.wrappedBuffer(list(0)),
+        NumberFormat.toLong(BytesToString(list(1))))
     }
   }
 }
@@ -143,9 +149,10 @@ case class PExpireAt(key: ChannelBuffer, timestamp: Time)
 
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(
-      Seq(CommandBytes.PEXPIREAT,
-          key,
-          StringToChannelBuffer(milliseconds.toString)))
+      Seq(
+        CommandBytes.PEXPIREAT,
+        key,
+        StringToChannelBuffer(milliseconds.toString)))
 }
 object PExpireAt {
   def apply(args: Seq[Array[Byte]]) = {
@@ -177,32 +184,36 @@ case class Randomkey() extends Command {
 case class Rename(key: ChannelBuffer, newkey: ChannelBuffer)
     extends StrictKeyCommand {
   def command = Commands.RENAME
-  RequireClientProtocol(newkey != null && newkey.readableBytes > 0,
-                        "New key must not be empty")
+  RequireClientProtocol(
+    newkey != null && newkey.readableBytes > 0,
+    "New key must not be empty")
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(Seq(CommandBytes.RENAME, key, newkey))
 }
 object Rename {
   def apply(args: Seq[Array[Byte]]) = {
     val list = trimList(args, 2, "RENAME")
-    new Rename(ChannelBuffers.wrappedBuffer(list(0)),
-               ChannelBuffers.wrappedBuffer(list(1)))
+    new Rename(
+      ChannelBuffers.wrappedBuffer(list(0)),
+      ChannelBuffers.wrappedBuffer(list(1)))
   }
 }
 
 case class RenameNx(key: ChannelBuffer, newkey: ChannelBuffer)
     extends StrictKeyCommand {
   def command = Commands.RENAMENX
-  RequireClientProtocol(newkey != null && newkey.readableBytes > 0,
-                        "New key must not be empty")
+  RequireClientProtocol(
+    newkey != null && newkey.readableBytes > 0,
+    "New key must not be empty")
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(Seq(CommandBytes.RENAMENX, key, newkey))
 }
 object RenameNx {
   def apply(args: Seq[Array[Byte]]) = {
     val list = trimList(args, 2, "RENAMENX")
-    new RenameNx(ChannelBuffers.wrappedBuffer(list(0)),
-                 ChannelBuffers.wrappedBuffer(list(1)))
+    new RenameNx(
+      ChannelBuffers.wrappedBuffer(list(0)),
+      ChannelBuffers.wrappedBuffer(list(1)))
   }
 }
 
@@ -229,8 +240,9 @@ object Scan {
   import ScanCompanion._
 
   def apply(args: Seq[Array[Byte]]) = {
-    RequireClientProtocol(args != null && !args.isEmpty,
-                          "Expected at least 1 arguments for scan command")
+    RequireClientProtocol(
+      args != null && !args.isEmpty,
+      "Expected at least 1 arguments for scan command")
     args match {
       case cursor :: Nil =>
         new Scan(NumberFormat.toLong(BytesToString(cursor)))

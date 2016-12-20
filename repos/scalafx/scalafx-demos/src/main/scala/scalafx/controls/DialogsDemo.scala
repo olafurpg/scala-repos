@@ -57,8 +57,9 @@ object DialogsDemo extends JFXApp {
           button("Error", errorDialog),
           button("Exception", exceptionDialog),
           button("Confirmation", confirmationDialog),
-          button("Confirmation Dialog with Custom Actions",
-                 confirmationWithCustomActions),
+          button(
+            "Confirmation Dialog with Custom Actions",
+            confirmationWithCustomActions),
           button("Text Input", textInputDialog),
           button("Choice", choiceDialog)
         )

@@ -49,11 +49,13 @@ class Zip(args: Args) extends Job(args) {
 class SideEffectTest extends WordSpec with Matchers with FieldConversions {
   "Zipper should do create zipped sequence. Coded with side effect" should {
     JobTest(new Zip(_))
-      .source(Tsv("line", ('line)),
-              List(Tuple1("line1"),
-                   Tuple1("line2"),
-                   Tuple1("line3"),
-                   Tuple1("line4")))
+      .source(
+        Tsv("line", ('line)),
+        List(
+          Tuple1("line1"),
+          Tuple1("line2"),
+          Tuple1("line3"),
+          Tuple1("line4")))
       .sink[(String, String)](Tsv("zipped")) { ob =>
         "correctly compute zipped sequence" in {
           val res = ob.toList
@@ -109,20 +111,23 @@ class SideEffectBufferTest
     with FieldConversions {
   "ZipBuffer should do create two zipped sequences, one for even lines and one for odd lines. Coded with side effect" should {
     JobTest("com.twitter.scalding.ZipBuffer")
-      .source(Tsv("line", ('line)),
-              List(Tuple1("line1"),
-                   Tuple1("line2"),
-                   Tuple1("line3"),
-                   Tuple1("line4"),
-                   Tuple1("line5"),
-                   Tuple1("line6")))
+      .source(
+        Tsv("line", ('line)),
+        List(
+          Tuple1("line1"),
+          Tuple1("line2"),
+          Tuple1("line3"),
+          Tuple1("line4"),
+          Tuple1("line5"),
+          Tuple1("line6")))
       .sink[(String, String)](Tsv("zipped")) { ob =>
         "correctly compute zipped sequence" in {
           val res = ob.toList.sorted
-          val expected = List(("line1", "line3"),
-                              ("line3", "line5"),
-                              ("line2", "line4"),
-                              ("line4", "line6")).sorted
+          val expected = List(
+            ("line1", "line3"),
+            ("line3", "line5"),
+            ("line2", "line4"),
+            ("line4", "line6")).sorted
           res shouldBe expected
         }
       }

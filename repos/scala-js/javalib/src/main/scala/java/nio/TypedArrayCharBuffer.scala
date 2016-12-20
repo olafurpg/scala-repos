@@ -34,10 +34,11 @@ private[nio] final class TypedArrayCharBuffer private (
   def subSequence(start: Int, end: Int): CharBuffer = {
     if (start < 0 || end < start || end > remaining)
       throw new IndexOutOfBoundsException
-    new TypedArrayCharBuffer(_typedArray,
-                             position + start,
-                             position + end,
-                             isReadOnly)
+    new TypedArrayCharBuffer(
+      _typedArray,
+      position + start,
+      position + end,
+      isReadOnly)
   }
 
   @noinline
@@ -117,10 +118,11 @@ private[nio] object TypedArrayCharBuffer {
               initialPosition: Int,
               initialLimit: Int,
               readOnly: Boolean): TypedArrayCharBuffer = {
-      new TypedArrayCharBuffer(typedArray,
-                               initialPosition,
-                               initialLimit,
-                               readOnly)
+      new TypedArrayCharBuffer(
+        typedArray,
+        initialPosition,
+        initialLimit,
+        readOnly)
     }
 
     @inline

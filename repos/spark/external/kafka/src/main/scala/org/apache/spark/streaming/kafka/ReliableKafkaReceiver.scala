@@ -138,10 +138,11 @@ private[streaming] class ReliableKafkaReceiver[K: ClassTag,
     consumerConnector = Consumer.create(consumerConfig)
     logInfo(s"Connected to Zookeeper: ${consumerConfig.zkConnect}")
 
-    zkClient = new ZkClient(consumerConfig.zkConnect,
-                            consumerConfig.zkSessionTimeoutMs,
-                            consumerConfig.zkConnectionTimeoutMs,
-                            ZKStringSerializer)
+    zkClient = new ZkClient(
+      consumerConfig.zkConnect,
+      consumerConfig.zkSessionTimeoutMs,
+      consumerConfig.zkConnectionTimeoutMs,
+      ZKStringSerializer)
 
     messageHandlerThreadPool = ThreadUtils
       .newDaemonFixedThreadPool(topics.values.sum, "KafkaMessageHandler")
@@ -263,8 +264,9 @@ private[streaming] class ReliableKafkaReceiver[K: ClassTag,
     if (zkClient == null) {
       val thrown = new IllegalStateException(
         "Zookeeper client is unexpectedly null")
-      stop("Zookeeper client is not initialized before commit offsets to ZK",
-           thrown)
+      stop(
+        "Zookeeper client is not initialized before commit offsets to ZK",
+        thrown)
       return
     }
 

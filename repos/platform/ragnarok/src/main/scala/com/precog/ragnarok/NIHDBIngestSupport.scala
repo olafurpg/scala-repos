@@ -126,13 +126,14 @@ trait NIHDBIngestSupport
             .writeAll(
               Seq(
                 (0,
-                 IngestMessage(apiKey,
-                               path,
-                               Authorities(accountId),
-                               records,
-                               None,
-                               clock.instant,
-                               StreamRef.Append))))
+                 IngestMessage(
+                   apiKey,
+                   path,
+                   Authorities(accountId),
+                   records,
+                   None,
+                   clock.instant,
+                   StreamRef.Append))))
             .unsafePerformIO
         }
         _ = logger.debug(

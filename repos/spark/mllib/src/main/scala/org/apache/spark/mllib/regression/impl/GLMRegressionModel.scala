@@ -78,11 +78,13 @@ private[regression] object GLMRegressionModel {
       val sqlContext = SQLContext.getOrCreate(sc)
       val dataRDD = sqlContext.read.parquet(datapath)
       val dataArray = dataRDD.select("weights", "intercept").take(1)
-      assert(dataArray.length == 1,
-             s"Unable to load $modelClass data from: $datapath")
+      assert(
+        dataArray.length == 1,
+        s"Unable to load $modelClass data from: $datapath")
       val data = dataArray(0)
-      assert(data.size == 2,
-             s"Unable to load $modelClass data from: $datapath")
+      assert(
+        data.size == 2,
+        s"Unable to load $modelClass data from: $datapath")
       data match {
         case Row(weights: Vector, intercept: Double) =>
           assert(

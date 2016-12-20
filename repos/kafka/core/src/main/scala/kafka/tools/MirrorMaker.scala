@@ -179,15 +179,17 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
         .ofType(classOf[String])
 
       val messageHandlerArgsOpt = parser
-        .accepts("message.handler.args",
-                 "Arguments used by custom message handler for mirror maker.")
+        .accepts(
+          "message.handler.args",
+          "Arguments used by custom message handler for mirror maker.")
         .withRequiredArg()
         .describedAs("Arguments passed to message handler constructor.")
         .ofType(classOf[String])
 
       val abortOnSendFailureOpt = parser
-        .accepts("abort.on.send.failure",
-                 "Configure the mirror maker to exit on a failed send.")
+        .accepts(
+          "abort.on.send.failure",
+          "Configure the mirror maker to exit on a failed send.")
         .withRequiredArg()
         .describedAs("Stop the entire mirror maker when a send failure occurs")
         .ofType(classOf[String])
@@ -207,10 +209,11 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
         System.exit(0)
       }
 
-      CommandLineUtils.checkRequiredArgs(parser,
-                                         options,
-                                         consumerConfigOpt,
-                                         producerConfigOpt)
+      CommandLineUtils.checkRequiredArgs(
+        parser,
+        options,
+        consumerConfigOpt,
+        producerConfigOpt)
 
       val useNewConsumer = options.has(useNewConsumerOpt)
       if (useNewConsumer) {
@@ -246,12 +249,14 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
       // create producer
       val producerProps = Utils.loadProps(options.valueOf(producerConfigOpt))
       // Defaults to no data loss settings.
-      maybeSetDefaultProperty(producerProps,
-                              ProducerConfig.RETRIES_CONFIG,
-                              Int.MaxValue.toString)
-      maybeSetDefaultProperty(producerProps,
-                              ProducerConfig.MAX_BLOCK_MS_CONFIG,
-                              Long.MaxValue.toString)
+      maybeSetDefaultProperty(
+        producerProps,
+        ProducerConfig.RETRIES_CONFIG,
+        Int.MaxValue.toString)
+      maybeSetDefaultProperty(
+        producerProps,
+        ProducerConfig.MAX_BLOCK_MS_CONFIG,
+        Long.MaxValue.toString)
       maybeSetDefaultProperty(producerProps, ProducerConfig.ACKS_CONFIG, "all")
       maybeSetDefaultProperty(
         producerProps,
@@ -294,11 +299,12 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
                 !_.isInstanceOf[ConsumerRebalanceListener]))
             throw new IllegalArgumentException(
               "The rebalance listener should be an instance of kafka.consumer.ConsumerRebalanceListener")
-          createOldConsumers(numStreams,
-                             options.valueOf(consumerConfigOpt),
-                             customRebalanceListener,
-                             Option(options.valueOf(whitelistOpt)),
-                             Option(options.valueOf(blacklistOpt)))
+          createOldConsumers(
+            numStreams,
+            options.valueOf(consumerConfigOpt),
+            customRebalanceListener,
+            Option(options.valueOf(whitelistOpt)),
+            Option(options.valueOf(blacklistOpt)))
         } else {
           val customRebalanceListener = {
             val customRebalanceListenerClass =
@@ -325,10 +331,11 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
             throw new IllegalArgumentException(
               "The rebalance listener should be an instance of" +
                 "org.apache.kafka.clients.consumer.ConsumerRebalanceListner")
-          createNewConsumers(numStreams,
-                             options.valueOf(consumerConfigOpt),
-                             customRebalanceListener,
-                             Option(options.valueOf(whitelistOpt)))
+          createNewConsumers(
+            numStreams,
+            options.valueOf(consumerConfigOpt),
+            customRebalanceListener,
+            Option(options.valueOf(whitelistOpt)))
         }
 
       // Create mirror maker threads.
@@ -373,15 +380,17 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
     maybeSetDefaultProperty(consumerConfigProps, "auto.commit.enable", "false")
     // Set the consumer timeout so we will not block for low volume pipeline. The timeout is necessary to make sure
     // Offsets are still committed for those low volume pipelines.
-    maybeSetDefaultProperty(consumerConfigProps,
-                            "consumer.timeout.ms",
-                            "10000")
+    maybeSetDefaultProperty(
+      consumerConfigProps,
+      "consumer.timeout.ms",
+      "10000")
     // The default client id is group id, we manually set client id to groupId-index to avoid metric collision
     val groupIdString = consumerConfigProps.getProperty("group.id")
     val connectors =
       (0 until numStreams) map { i =>
-        consumerConfigProps.setProperty("client.id",
-                                        groupIdString + "-" + i.toString)
+        consumerConfigProps.setProperty(
+          "client.id",
+          groupIdString + "-" + i.toString)
         val consumerConfig = new ConsumerConfig(consumerConfigProps)
         new ZookeeperConsumerConnector(consumerConfig)
       }
@@ -396,8 +405,9 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
     (0 until numStreams) map { i =>
       val consumer = new MirrorMakerOldConsumer(connectors(i), filterSpec)
       val consumerRebalanceListener =
-        new InternalRebalanceListenerForOldConsumer(consumer,
-                                                    customRebalanceListener)
+        new InternalRebalanceListenerForOldConsumer(
+          consumer,
+          customRebalanceListener)
       connectors(i).setConsumerRebalanceListener(consumerRebalanceListener)
       consumer
     }
@@ -416,14 +426,16 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
     // Hardcode the deserializer to ByteArrayDeserializer
     consumerConfigProps
       .setProperty("key.deserializer", classOf[ByteArrayDeserializer].getName)
-    consumerConfigProps.setProperty("value.deserializer",
-                                    classOf[ByteArrayDeserializer].getName)
+    consumerConfigProps.setProperty(
+      "value.deserializer",
+      classOf[ByteArrayDeserializer].getName)
     // The default client id is group id, we manually set client id to groupId-index to avoid metric collision
     val groupIdString = consumerConfigProps.getProperty("group.id")
     val consumers =
       (0 until numStreams) map { i =>
-        consumerConfigProps.setProperty("client.id",
-                                        groupIdString + "-" + i.toString)
+        consumerConfigProps.setProperty(
+          "client.id",
+          groupIdString + "-" + i.toString)
         new KafkaConsumer[Array[Byte], Array[Byte]](consumerConfigProps)
       }
     whitelist.getOrElse(
@@ -598,13 +610,14 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
 
     override def receive(): BaseConsumerRecord = {
       val messageAndMetadata = iter.next()
-      BaseConsumerRecord(messageAndMetadata.topic,
-                         messageAndMetadata.partition,
-                         messageAndMetadata.offset,
-                         messageAndMetadata.timestamp,
-                         messageAndMetadata.timestampType,
-                         messageAndMetadata.key,
-                         messageAndMetadata.message)
+      BaseConsumerRecord(
+        messageAndMetadata.topic,
+        messageAndMetadata.partition,
+        messageAndMetadata.offset,
+        messageAndMetadata.timestamp,
+        messageAndMetadata.timestampType,
+        messageAndMetadata.key,
+        messageAndMetadata.message)
     }
 
     override def stop() {
@@ -640,12 +653,14 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
     override def init() {
       debug("Initiating new consumer")
       val consumerRebalanceListener =
-        new InternalRebalanceListenerForNewConsumer(this,
-                                                    customRebalanceListener)
+        new InternalRebalanceListenerForNewConsumer(
+          this,
+          customRebalanceListener)
       if (whitelistOpt.isDefined) {
         try {
-          consumer.subscribe(Pattern.compile(whitelistOpt.get),
-                             consumerRebalanceListener)
+          consumer.subscribe(
+            Pattern.compile(whitelistOpt.get),
+            consumerRebalanceListener)
         } catch {
           case pse: PatternSyntaxException =>
             error("Invalid expression syntax: %s".format(whitelistOpt.get))
@@ -667,13 +682,14 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
 
       offsets.put(tp, record.offset + 1)
 
-      BaseConsumerRecord(record.topic,
-                         record.partition,
-                         record.offset,
-                         record.timestamp,
-                         record.timestampType,
-                         record.key,
-                         record.value)
+      BaseConsumerRecord(
+        record.topic,
+        record.partition,
+        record.offset,
+        record.timestamp,
+        record.timestampType,
+        record.key,
+        record.value)
     }
 
     override def stop() {
@@ -749,10 +765,12 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
       if (sync) {
         this.producer.send(record).get()
       } else {
-        this.producer.send(record,
-                           new MirrorMakerProducerCallback(record.topic(),
-                                                           record.key(),
-                                                           record.value()))
+        this.producer.send(
+          record,
+          new MirrorMakerProducerCallback(
+            record.topic(),
+            record.key(),
+            record.value()))
       }
     }
 
@@ -803,9 +821,10 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
     override def handle(record: BaseConsumerRecord)
       : util.List[ProducerRecord[Array[Byte], Array[Byte]]] = {
       Collections.singletonList(
-        new ProducerRecord[Array[Byte], Array[Byte]](record.topic,
-                                                     record.key,
-                                                     record.value))
+        new ProducerRecord[Array[Byte], Array[Byte]](
+          record.topic,
+          record.key,
+          record.value))
     }
   }
 }

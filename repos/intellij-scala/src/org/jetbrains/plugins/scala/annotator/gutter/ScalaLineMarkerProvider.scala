@@ -107,13 +107,14 @@ class ScalaLineMarkerProvider(daemonSettings: DaemonCodeAnalyzerSettings,
       def marker(element: PsiElement,
                  icon: Icon,
                  typez: ScalaMarkerType): LineMarkerInfo[PsiElement] =
-        new LineMarkerInfo[PsiElement](element,
-                                       offset,
-                                       icon,
-                                       Pass.UPDATE_ALL,
-                                       typez.fun,
-                                       typez.handler,
-                                       GutterIconRenderer.Alignment.LEFT)
+        new LineMarkerInfo[PsiElement](
+          element,
+          offset,
+          icon,
+          Pass.UPDATE_ALL,
+          typez.fun,
+          typez.handler,
+          GutterIconRenderer.Alignment.LEFT)
 
       val parent = getParent
       if (parent == null) return null
@@ -264,12 +265,13 @@ private object GutterUtil {
         case _ => SUBCLASSED_CLASS_MARKER_RENDERER
       }
       val typez = ScalaMarkerType.SUBCLASSED_CLASS
-      val info = new LineMarkerInfo[PsiElement](clazz.nameId,
-                                                offset,
-                                                icon,
-                                                Pass.UPDATE_OVERRIDEN_MARKERS,
-                                                typez.fun,
-                                                typez.handler)
+      val info = new LineMarkerInfo[PsiElement](
+        clazz.nameId,
+        offset,
+        icon,
+        Pass.UPDATE_OVERRIDEN_MARKERS,
+        typez.fun,
+        typez.handler)
       result.add(info)
     }
   }

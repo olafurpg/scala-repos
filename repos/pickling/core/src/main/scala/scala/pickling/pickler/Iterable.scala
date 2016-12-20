@@ -25,8 +25,9 @@ trait IterablePicklers {
   // Register List runtime pickler
   locally {
     val generator =
-      TravPickler.generate(implicitly[CanBuildFrom[List[Any], Any, List[Any]]],
-                           identity[List[Any]]) { tpe =>
+      TravPickler.generate(
+        implicitly[CanBuildFrom[List[Any], Any, List[Any]]],
+        identity[List[Any]]) { tpe =>
         TravPickler.oneArgumentTagExtractor(tpe)
       } _
     currentRuntime.picklers.registerPicklerUnpicklerGenerator(
@@ -93,11 +94,12 @@ object TravPickler {
           .getOrElse(throw new PicklingException(
             s"Cannnot generate a pickler/unpickler for $tpe, cannot find an unpickler for $elementType"))
     val colTag = FastTypeTag.apply(currentMirror, tpe.toString)
-    apply[T, C](asTraversable,
-                elemPickler.asInstanceOf[Pickler[T]],
-                elemUnpickler.asInstanceOf[Unpickler[T]],
-                cbf,
-                colTag.asInstanceOf[FastTypeTag[C]])
+    apply[T, C](
+      asTraversable,
+      elemPickler.asInstanceOf[Pickler[T]],
+      elemUnpickler.asInstanceOf[Unpickler[T]],
+      cbf,
+      colTag.asInstanceOf[FastTypeTag[C]])
   }
 
   def apply[T, C <% Traversable[_]](

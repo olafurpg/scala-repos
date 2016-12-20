@@ -19,8 +19,9 @@ private[http] object Masking {
   def apply(serverSide: Boolean, maskRandom: () ⇒ Random): BidiFlow[
     /* net in */ FrameEvent, /* app out */ FrameEventOrError, /* app in */ FrameEvent, /* net out */ FrameEvent,
     NotUsed] =
-    BidiFlow.fromFlowsMat(unmaskIf(serverSide),
-                          maskIf(!serverSide, maskRandom))(Keep.none)
+    BidiFlow.fromFlowsMat(
+      unmaskIf(serverSide),
+      maskIf(!serverSide, maskRandom))(Keep.none)
 
   def maskIf(condition: Boolean,
              maskRandom: () ⇒ Random): Flow[FrameEvent, FrameEvent, NotUsed] =

@@ -302,10 +302,11 @@ private[ml] object DefaultParamsReader {
                 pName == paramName
             }
             .map(_._2)
-          assert(values.length == 1,
-                 s"Expected one instance of Param '$paramName' but found" +
-                   s" ${values.length} in JSON Params: " +
-                   pairs.map(_.toString).mkString(", "))
+          assert(
+            values.length == 1,
+            s"Expected one instance of Param '$paramName' but found" +
+              s" ${values.length} in JSON Params: " +
+              pairs.map(_.toString).mkString(", "))
           values.head
         case _ =>
           throw new IllegalArgumentException(
@@ -333,18 +334,20 @@ private[ml] object DefaultParamsReader {
     val sparkVersion = (metadata \ "sparkVersion").extract[String]
     val params = metadata \ "paramMap"
     if (expectedClassName.nonEmpty) {
-      require(className == expectedClassName,
-              s"Error loading metadata: Expected class name" +
-                s" $expectedClassName but found class name $className")
+      require(
+        className == expectedClassName,
+        s"Error loading metadata: Expected class name" +
+          s" $expectedClassName but found class name $className")
     }
 
-    Metadata(className,
-             uid,
-             timestamp,
-             sparkVersion,
-             params,
-             metadata,
-             metadataStr)
+    Metadata(
+      className,
+      uid,
+      timestamp,
+      sparkVersion,
+      params,
+      metadata,
+      metadataStr)
   }
 
   /**

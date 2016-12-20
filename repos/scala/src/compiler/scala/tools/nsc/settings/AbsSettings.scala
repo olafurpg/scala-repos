@@ -49,8 +49,8 @@ trait AbsSettings extends scala.reflect.internal.settings.AbsSettings {
            case (dep, value) =>
              (Option(dep.value) exists (_.toString == value)) || {
                errorFn(
-                 "incomplete option %s (requires %s)".format(setting.name,
-                                                             dep.name))
+                 "incomplete option %s (requires %s)"
+                   .format(setting.name, dep.name))
                false
              }
          })
@@ -106,8 +106,9 @@ trait AbsSettings extends scala.reflect.internal.settings.AbsSettings {
       */
     protected[nsc] def tryToSetColon(
         args: List[String]): Option[ResultOfTryToSet] =
-      errorAndValue("'%s' does not accept multiple arguments" format name,
-                    None)
+      errorAndValue(
+        "'%s' does not accept multiple arguments" format name,
+        None)
 
     /** Attempt to set from a properties file style property value.
       *  Currently used by Eclipse SDT only.

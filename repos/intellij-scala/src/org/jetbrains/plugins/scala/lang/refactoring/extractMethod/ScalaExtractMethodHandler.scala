@@ -74,10 +74,11 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
       dataContext,
       REFACTORING_NAME,
       ScalaRefactoringUtil.checkCanBeIntroduced(_)) {
-      invokeOnEditor(project,
-                     editor,
-                     file.asInstanceOf[ScalaFile],
-                     dataContext)
+      invokeOnEditor(
+        project,
+        editor,
+        file.asInstanceOf[ScalaFile],
+        dataContext)
     }
   }
 
@@ -86,10 +87,11 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
                              file: ScalaFile,
                              dataContext: DataContext) {
     if (!ScalaRefactoringUtil.ensureFileWritable(project, file)) {
-      showErrorHint(ScalaBundle.message("file.is.not.writable"),
-                    project,
-                    editor,
-                    REFACTORING_NAME)
+      showErrorHint(
+        ScalaBundle.message("file.is.not.writable"),
+        project,
+        editor,
+        REFACTORING_NAME)
       return
     }
     if (!editor.getSelectionModel.hasSelection) return
@@ -156,39 +158,42 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
     val array = elements.toArray
     if (ApplicationManager.getApplication.isUnitTestMode &&
         siblings.length > 0) {
-      invokeDialog(project,
-                   editor,
-                   array,
-                   hasReturn,
-                   lastReturn,
-                   siblings(0),
-                   siblings.length == 1,
-                   lastExprType)
+      invokeDialog(
+        project,
+        editor,
+        array,
+        hasReturn,
+        lastReturn,
+        siblings(0),
+        siblings.length == 1,
+        lastExprType)
     } else if (siblings.length > 1) {
       ScalaRefactoringUtil.showChooser(
         editor,
         siblings, { (selectedValue: PsiElement) =>
-          invokeDialog(project,
-                       editor,
-                       array,
-                       hasReturn,
-                       lastReturn,
-                       selectedValue,
-                       siblings(siblings.length - 1) == selectedValue,
-                       lastExprType)
+          invokeDialog(
+            project,
+            editor,
+            array,
+            hasReturn,
+            lastReturn,
+            selectedValue,
+            siblings(siblings.length - 1) == selectedValue,
+            lastExprType)
         },
         "Choose level for Extract Method",
         getTextForElement,
         (e: PsiElement) => e.getParent)
     } else if (siblings.length == 1) {
-      invokeDialog(project,
-                   editor,
-                   array,
-                   hasReturn,
-                   lastReturn,
-                   siblings(0),
-                   smallestScope = true,
-                   lastExprType)
+      invokeDialog(
+        project,
+        editor,
+        array,
+        hasReturn,
+        lastReturn,
+        siblings(0),
+        smallestScope = true,
+        lastExprType)
     }
   }
 
@@ -197,8 +202,9 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
       @Nullable stopAtScope: PsiElement): Array[PsiElement] = {
     def isParentOk(parent: PsiElement): Boolean = {
       if (parent == null) return false
-      assert(parent.getTextRange != null,
-             "TextRange is null: " + parent.getText)
+      assert(
+        parent.getTextRange != null,
+        "TextRange is null: " + parent.getText)
       stopAtScope == null ||
       stopAtScope.getTextRange.contains(parent.getTextRange)
     }
@@ -310,14 +316,15 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
     }
     val settings: ScalaExtractMethodSettings =
       if (!ApplicationManager.getApplication.isUnitTestMode) {
-        val dialog = new ScalaExtractMethodDialog(project,
-                                                  elements,
-                                                  hasReturn,
-                                                  lastReturn,
-                                                  sibling,
-                                                  input.toArray,
-                                                  output.toArray,
-                                                  lastExprType)
+        val dialog = new ScalaExtractMethodDialog(
+          project,
+          elements,
+          hasReturn,
+          lastReturn,
+          sibling,
+          input.toArray,
+          output.toArray,
+          lastExprType)
         dialog.show()
         if (!dialog.isOK) return
         dialog.getSettings
@@ -329,10 +336,11 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
           val out = output
             .map(ScalaExtractMethodUtils.convertVariableData(_, elements))
             .map(ExtractMethodOutput.from)
-          InnerClassSettings(isCase || isInner,
-                             "TestMethodNameResult",
-                             out.toArray,
-                             isCase)
+          InnerClassSettings(
+            isCase || isInner,
+            "TestMethodNameResult",
+            out.toArray,
+            isCase)
         }
 
         new ScalaExtractMethodSettings(
@@ -438,10 +446,11 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
     }
 
     def insertMethodCall() =
-      ScalaExtractMethodUtils.replaceWithMethodCall(settings,
-                                                    settings.elements,
-                                                    param => param.oldName,
-                                                    output => output.paramName)
+      ScalaExtractMethodUtils.replaceWithMethodCall(
+        settings,
+        settings.elements,
+        param => param.oldName,
+        output => output.paramName)
 
     PsiDocumentManager
       .getInstance(editor.getProject)

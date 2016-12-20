@@ -84,8 +84,9 @@ trait DocComments { self: Global =>
             reporter.warning(
               sym.pos,
               s"The comment for ${sym} contains @inheritdoc, but no parent comment is available to inherit from.")
-          ownComment.replaceAllLiterally("@inheritdoc",
-                                         "<invalid inheritdoc annotation>")
+          ownComment.replaceAllLiterally(
+            "@inheritdoc",
+            "<invalid inheritdoc annotation>")
         case Some(sc) =>
           if (ownComment == "") sc
           else expandInheritdoc(sc, merge(sc, ownComment, sym), sym)
@@ -180,8 +181,9 @@ trait DocComments { self: Global =>
 
     if (copyFirstPara) {
       val eop = // end of comment body (first para), which is delimited by blank line, or tag, or end of comment
-        (findNext(src, 0)(src.charAt(_) == '\n')) min startTag(src,
-                                                               srcSections)
+        (findNext(src, 0)(src.charAt(_) == '\n')) min startTag(
+          src,
+          srcSections)
       out append src.substring(0, eop).trim
       copied = 3
       tocopy = 3
@@ -204,11 +206,13 @@ trait DocComments { self: Global =>
       }
 
     for (params <- sym.paramss; param <- params)
-      mergeSection(srcParams get param.name.toString,
-                   dstParams get param.name.toString)
+      mergeSection(
+        srcParams get param.name.toString,
+        dstParams get param.name.toString)
     for (tparam <- sym.typeParams)
-      mergeSection(srcTParams get tparam.name.toString,
-                   dstTParams get tparam.name.toString)
+      mergeSection(
+        srcTParams get tparam.name.toString,
+        dstTParams get tparam.name.toString)
     mergeSection(returnDoc(src, srcSections), returnDoc(dst, dstSections))
     mergeSection(groupDoc(src, srcSections), groupDoc(dst, dstSections))
 
@@ -279,8 +283,9 @@ trait DocComments { self: Global =>
 
         child.substring(section._1, section._1 + 7) match {
           case param @ ("@param " | "@tparam" | "@throws") =>
-            sectionString(extractSectionParam(child, section),
-                          parentNamedParams(param.trim))
+            sectionString(
+              extractSectionParam(child, section),
+              parentNamedParams(param.trim))
           case _ =>
             sectionString(extractSectionTag(child, section), parentTagMap)
         }
@@ -293,14 +298,16 @@ trait DocComments { self: Global =>
       // Append main comment
       out.append("/**")
       out.append(
-        replaceInheritdoc(mainComment(child, childSections),
-                          mainComment(parent, parentSections)))
+        replaceInheritdoc(
+          mainComment(child, childSections),
+          mainComment(parent, parentSections)))
 
       // Append sections
       for (section <- childSections)
         out.append(
-          replaceInheritdoc(child.substring(section._1, section._2),
-                            getParentSection(section)))
+          replaceInheritdoc(
+            child.substring(section._1, section._2),
+            getParentSection(section)))
 
       out.append("*/")
       out.toString
@@ -548,9 +555,10 @@ trait DocComments { self: Global =>
               val tpe = getType(repl2, alias.name.toString)
               if (tpe != NoType) (tpe, true)
               else {
-                val alias1 = alias.cloneSymbol(rootMirror.RootClass,
-                                               alias.rawflags,
-                                               newTypeName(repl2))
+                val alias1 = alias.cloneSymbol(
+                  rootMirror.RootClass,
+                  alias.rawflags,
+                  newTypeName(repl2))
                 (typeRef(NoPrefix, alias1, Nil), false)
               }
             case None =>

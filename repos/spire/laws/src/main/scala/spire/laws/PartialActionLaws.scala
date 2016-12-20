@@ -139,9 +139,10 @@ trait PartialActionLaws[G, A] extends Laws {
     new ActionProperties(
       name = "monoidPartialAction",
       sl = _.monoid(G0),
-      parents = Seq(semigroupPartialAction,
-                    leftSemigroupPartialAction,
-                    rightSemigroupPartialAction)
+      parents = Seq(
+        semigroupPartialAction,
+        leftSemigroupPartialAction,
+        rightSemigroupPartialAction)
     )
 
   def groupPartialAction(implicit G: PartialAction[A, G], G0: Group[G]) =

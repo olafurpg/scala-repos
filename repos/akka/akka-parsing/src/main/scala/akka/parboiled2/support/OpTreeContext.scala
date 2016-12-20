@@ -136,9 +136,8 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
       RuleCall(
         Right(call),
         Literal(
-          Constant(
-            callName(call) getOrElse c.abort(call.pos,
-                                             "Illegal rule call: " + call))))
+          Constant(callName(call) getOrElse c
+            .abort(call.pos, "Illegal rule call: " + call))))
   }
 
   def OpTree(tree: Tree): OpTree =
@@ -252,8 +251,9 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
     else if (argTypeSymbol == definitions.StringClass)
       IgnoreCaseString(argTree)
     else
-      c.abort(argTree.pos,
-              "Unexpected `ignoreCase` argument type: " + argTypeSymbol)
+      c.abort(
+        argTree.pos,
+        "Unexpected `ignoreCase` argument type: " + argTypeSymbol)
   }
 
   case class IgnoreCaseChar(charTree: Tree) extends TerminalOpTree {
@@ -456,8 +456,9 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
           case x @ (Ident(_) | Select(_, _)) ⇒
             Times(rule, q"val min = $n; val max = min", collector, separator)
           case _ ⇒
-            c.abort(n.pos,
-                    "Invalid int base expression for `.times(...)`: " + n)
+            c.abort(
+              n.pos,
+              "Invalid int base expression for `.times(...)`: " + n)
         }
       case q"$a.this.range2NTimes($r)" ⇒
         r match {
@@ -466,13 +467,15 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
           case q"scala.this.Predef.intWrapper($mn).to($mx)" ⇒
             handleRange(mn, mx, r) // Scala 2.11
           case x @ (Ident(_) | Select(_, _)) ⇒
-            Times(rule,
-                  q"val r = $r; val min = r.start; val max = r.end",
-                  collector,
-                  separator)
+            Times(
+              rule,
+              q"val r = $r; val min = r.start; val max = r.end",
+              collector,
+              separator)
           case _ ⇒
-            c.abort(r.pos,
-                    "Invalid range base expression for `.times(...)`: " + r)
+            c.abort(
+              r.pos,
+              "Invalid range base expression for `.times(...)`: " + r)
         }
       case _ ⇒
         c.abort(base.pos, "Invalid base expression for `.times(...)`: " + base)
@@ -610,8 +613,9 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
                 tree match {
                   case Block(statements, res) ⇒ block(statements, rewrite(res))
                   case x
-                      if isSubClass(resultTypeTree.tpe,
-                                    "akka.parboiled2.Rule") ⇒
+                      if isSubClass(
+                        resultTypeTree.tpe,
+                        "akka.parboiled2.Rule") ⇒
                     expand(x, wrapped)
                   case x ⇒ q"__push($x)"
                 }
@@ -625,8 +629,9 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
               block(valDefs, rewrite(body))
 
             case x ⇒
-              c.abort(argTree.pos,
-                      "Unexpected `run` argument: " + show(argTree))
+              c.abort(
+                argTree.pos,
+                "Unexpected `run` argument: " + show(argTree))
           }
 
         actionBody(c.resetLocalAttrs(argTree))
@@ -709,8 +714,9 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
       case (Literal(Constant(l: String)), Literal(Constant(u: String))) ⇒
         l -> u
       case _ ⇒
-        c.abort(lowerTree.pos,
-                "Character ranges must be specified with string literals")
+        c.abort(
+          lowerTree.pos,
+          "Character ranges must be specified with string literals")
     }
     if (lower.length != 1)
       c.abort(lowerTree.pos, "lower bound must be a single char string")

@@ -42,10 +42,12 @@ class ConsumerBounceTest extends IntegrationTestHarness with Logging {
   val tp = new TopicPartition(topic, part)
 
   // configure the servers and clients
-  this.serverConfig.setProperty(KafkaConfig.ControlledShutdownEnableProp,
-                                "false") // speed up shutdown
-  this.serverConfig.setProperty(KafkaConfig.OffsetsTopicReplicationFactorProp,
-                                "3") // don't want to lose offset
+  this.serverConfig.setProperty(
+    KafkaConfig.ControlledShutdownEnableProp,
+    "false") // speed up shutdown
+  this.serverConfig.setProperty(
+    KafkaConfig.OffsetsTopicReplicationFactorProp,
+    "3") // don't want to lose offset
   this.serverConfig.setProperty(KafkaConfig.OffsetsTopicPartitionsProp, "1")
   this.serverConfig
     .setProperty(KafkaConfig.GroupMinSessionTimeoutMsProp, "10") // set small enough session timeout
@@ -63,9 +65,10 @@ class ConsumerBounceTest extends IntegrationTestHarness with Logging {
 
   override def generateConfigs() = {
     FixedPortTestUtils
-      .createBrokerConfigs(serverCount,
-                           zkConnect,
-                           enableControlledShutdown = false)
+      .createBrokerConfigs(
+        serverCount,
+        zkConnect,
+        enableControlledShutdown = false)
       .map(KafkaConfig.fromProps(_, serverConfig))
   }
 
@@ -196,10 +199,11 @@ class ConsumerBounceTest extends IntegrationTestHarness with Logging {
       this
         .producers(0)
         .send(
-          new ProducerRecord(topic,
-                             part,
-                             i.toString.getBytes,
-                             i.toString.getBytes))
+          new ProducerRecord(
+            topic,
+            part,
+            i.toString.getBytes,
+            i.toString.getBytes))
     }
     futures.map(_.get)
   }

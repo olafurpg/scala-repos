@@ -91,18 +91,21 @@ class HoconLexer extends LexerBase {
   val matchers = List(
     WhitespaceMatcher,
     new RegexTokenMatcher("""\$""".r, Dollar, always, onDollar),
-    new LiteralTokenMatcher("{",
-                            SubLBrace,
-                            isAnyOf(SubStarting),
-                            forceState(SubStarted)),
-    new LiteralTokenMatcher("?",
-                            QMark,
-                            isAnyOf(SubStarted),
-                            forceState(Substitution)),
-    new LiteralTokenMatcher("}",
-                            SubRBrace,
-                            isAnyOf(SubStarted, Substitution),
-                            forceState(Value)),
+    new LiteralTokenMatcher(
+      "{",
+      SubLBrace,
+      isAnyOf(SubStarting),
+      forceState(SubStarted)),
+    new LiteralTokenMatcher(
+      "?",
+      QMark,
+      isAnyOf(SubStarted),
+      forceState(Substitution)),
+    new LiteralTokenMatcher(
+      "}",
+      SubRBrace,
+      isAnyOf(SubStarted, Substitution),
+      forceState(Value)),
     new LiteralTokenMatcher("{", LBrace, always, forceState(Initial)),
     new LiteralTokenMatcher("}", RBrace, always, forceState(Value)),
     new LiteralTokenMatcher("[", LBracket, always, forceState(Initial)),
@@ -113,10 +116,11 @@ class HoconLexer extends LexerBase {
     new LiteralTokenMatcher("+=", PlusEquals, always, forceState(Initial)),
     new LiteralTokenMatcher(".", Period, always, onContents),
     new RegexTokenMatcher("""#[^\n]*""".r, HashComment, always, identity),
-    new RegexTokenMatcher("""//[^\n]*""".r,
-                          DoubleSlashComment,
-                          always,
-                          identity),
+    new RegexTokenMatcher(
+      """//[^\n]*""".r,
+      DoubleSlashComment,
+      always,
+      identity),
     UnquotedCharsMatcher,
     MultilineStringMatcher,
     QuotedStringMatcher,
@@ -150,9 +154,10 @@ class HoconLexer extends LexerBase {
             }
           } else offset
         Some(
-          TokenMatch(QuotedString,
-                     drain(1, escaping = false),
-                     onContents(state)))
+          TokenMatch(
+            QuotedString,
+            drain(1, escaping = false),
+            onContents(state)))
       } else None
   }
 

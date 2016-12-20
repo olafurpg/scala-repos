@@ -42,9 +42,10 @@ class ClassloadVerify extends ScalaMatchingTask {
       yield (name, error)
     if (errors.isEmpty) {
       // TODO - Log success
-      log("Classload verification succeeded with " + results.size +
-            " classes.",
-          Project.MSG_INFO)
+      log(
+        "Classload verification succeeded with " + results.size +
+          " classes.",
+        Project.MSG_INFO)
     } else {
       for ((name, error) <- errors) {
         log(name + " failed verification with: " + error, Project.MSG_ERR)

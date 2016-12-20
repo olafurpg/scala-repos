@@ -112,8 +112,9 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int)
 
     (insn.getOpcode: @switch) match {
       case ILOAD | LLOAD | FLOAD | DLOAD | ALOAD =>
-        newAlias(assignee = stackTop,
-                 source = insn.asInstanceOf[VarInsnNode].`var`)
+        newAlias(
+          assignee = stackTop,
+          source = insn.asInstanceOf[VarInsnNode].`var`)
 
       case DUP =>
         val top = stackTop
@@ -352,11 +353,12 @@ class AliasingFrame[V <: Value](nLocals: Int, nStack: Int)
 
   override def init(src: Frame[_ <: V]): Frame[V] = {
     super.init(src) // very quick (just an arraycopy)
-    System.arraycopy(src.asInstanceOf[AliasingFrame[_]].aliases,
-                     0,
-                     aliases,
-                     0,
-                     aliases.length) // also quick
+    System.arraycopy(
+      src.asInstanceOf[AliasingFrame[_]].aliases,
+      0,
+      aliases,
+      0,
+      aliases.length) // also quick
 
     val newSets = mutable.HashMap.empty[AliasSet, AliasSet]
 

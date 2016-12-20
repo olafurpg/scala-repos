@@ -62,11 +62,12 @@ object GenerateUnsafeProjection
       if ($input instanceof UnsafeRow) {
         ${writeUnsafeData(ctx, s"((UnsafeRow) $input)", bufferHolder)}
       } else {
-        ${writeExpressionsToBuffer(ctx,
-                                   input,
-                                   fieldEvals,
-                                   fieldTypes,
-                                   bufferHolder)}
+        ${writeExpressionsToBuffer(
+      ctx,
+      input,
+      fieldEvals,
+      fieldTypes,
+      bufferHolder)}
       }
     """
   }
@@ -121,10 +122,11 @@ object GenerateUnsafeProjection
               // Remember the current cursor so that we can calculate how many bytes are
               // written later.
               final int $tmpCursor = $bufferHolder.cursor;
-              ${writeStructToBuffer(ctx,
-                                    input.value,
-                                    t.map(_.dataType),
-                                    bufferHolder)}
+              ${writeStructToBuffer(
+              ctx,
+              input.value,
+              t.map(_.dataType),
+              bufferHolder)}
               $rowWriter.setOffsetAndSize($index, $tmpCursor, $bufferHolder.cursor - $tmpCursor);
             """
 
@@ -186,9 +188,10 @@ object GenerateUnsafeProjection
                                  bufferHolder: String): String = {
     val arrayWriterClass = classOf[UnsafeArrayWriter].getName
     val arrayWriter = ctx.freshName("arrayWriter")
-    ctx.addMutableState(arrayWriterClass,
-                        arrayWriter,
-                        s"this.$arrayWriter = new $arrayWriterClass();")
+    ctx.addMutableState(
+      arrayWriterClass,
+      arrayWriter,
+      s"this.$arrayWriter = new $arrayWriterClass();")
     val numElements = ctx.freshName("numElements")
     val index = ctx.freshName("index")
     val element = ctx.freshName("element")
@@ -316,9 +319,10 @@ object GenerateUnsafeProjection
     }
 
     val result = ctx.freshName("result")
-    ctx.addMutableState("UnsafeRow",
-                        result,
-                        s"$result = new UnsafeRow(${expressions.length});")
+    ctx.addMutableState(
+      "UnsafeRow",
+      result,
+      s"$result = new UnsafeRow(${expressions.length});")
 
     val holder = ctx.freshName("holder")
     val holderClass = classOf[BufferHolder].getName
@@ -343,12 +347,13 @@ object GenerateUnsafeProjection
     // Evaluate all the subexpression.
     val evalSubexpr = ctx.subexprFunctions.mkString("\n")
 
-    val writeExpressions = writeExpressionsToBuffer(ctx,
-                                                    ctx.INPUT_ROW,
-                                                    exprEvals,
-                                                    exprTypes,
-                                                    holder,
-                                                    isTopLevel = true)
+    val writeExpressions = writeExpressionsToBuffer(
+      ctx,
+      ctx.INPUT_ROW,
+      exprEvals,
+      exprTypes,
+      holder,
+      isTopLevel = true)
 
     val code = s"""
         $resetBufferHolder

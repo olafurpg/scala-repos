@@ -91,8 +91,9 @@ abstract class MultiNodeConfig {
   def testTransport(on: Boolean): Unit = _testTransport = on
 
   private[testkit] lazy val myself: RoleName = {
-    require(_roles.size > MultiNodeSpec.selfIndex,
-            "not enough roles declared for this test")
+    require(
+      _roles.size > MultiNodeSpec.selfIndex,
+      "not enough roles declared for this test")
     _roles(MultiNodeSpec.selfIndex)
   }
 
@@ -162,8 +163,9 @@ object MultiNodeSpec {
     */
   val selfPort: Int = Integer.getInteger("multinode.port", 0)
 
-  require(selfPort >= 0 && selfPort < 65535,
-          "multinode.port is out of bounds: " + selfPort)
+  require(
+    selfPort >= 0 && selfPort < 65535,
+    "multinode.port is out of bounds: " + selfPort)
 
   /**
     * Name (or IP address; must be resolvable using InetAddress.getByName)
@@ -189,8 +191,9 @@ object MultiNodeSpec {
     */
   val serverPort: Int = Integer.getInteger("multinode.server-port", 4711)
 
-  require(serverPort > 0 && serverPort < 65535,
-          "multinode.server-port is out of bounds: " + serverPort)
+  require(
+    serverPort > 0 && serverPort < 65535,
+    "multinode.server-port is out of bounds: " + serverPort)
 
   /**
     * Index of this node in the roles sequence. The TestConductor
@@ -206,13 +209,15 @@ object MultiNodeSpec {
       (throw new IllegalStateException(
         "need system property multinode.index to be set"))
 
-  require(selfIndex >= 0 && selfIndex < maxNodes,
-          "multinode.index is out of bounds: " + selfIndex)
+  require(
+    selfIndex >= 0 && selfIndex < maxNodes,
+    "multinode.index is out of bounds: " + selfIndex)
 
   private[testkit] val nodeConfig = mapToConfig(
-    Map("akka.actor.provider" -> "akka.remote.RemoteActorRefProvider",
-        "akka.remote.netty.tcp.hostname" -> selfName,
-        "akka.remote.netty.tcp.port" -> selfPort))
+    Map(
+      "akka.actor.provider" -> "akka.remote.RemoteActorRefProvider",
+      "akka.remote.netty.tcp.hostname" -> selfName,
+      "akka.remote.netty.tcp.port" -> selfPort))
 
   private[testkit] val baseConfig: Config =
     ConfigFactory.parseString("""
@@ -268,11 +273,13 @@ abstract class MultiNodeSpec(val myself: RoleName,
   import MultiNodeSpec._
 
   def this(config: MultiNodeConfig) =
-    this(config.myself,
-         ActorSystem(MultiNodeSpec.getCallerName(classOf[MultiNodeSpec]),
-                     ConfigFactory.load(config.config)),
-         config.roles,
-         config.deployments)
+    this(
+      config.myself,
+      ActorSystem(
+        MultiNodeSpec.getCallerName(classOf[MultiNodeSpec]),
+        ConfigFactory.load(config.config)),
+      config.roles,
+      config.deployments)
 
   val log: LoggingAdapter = Logging(system, this.getClass)
 

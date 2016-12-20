@@ -59,17 +59,19 @@ class ClusterDeployerSpec extends AkkaSpec(ClusterDeployerSpec.deployerConf) {
 
       deployment should ===(
         Some(
-          Deploy(service,
-                 deployment.get.config,
-                 ClusterRouterPool(
-                   RoundRobinPool(20),
-                   ClusterRouterPoolSettings(totalInstances = 20,
-                                             maxInstancesPerNode = 3,
-                                             allowLocalRoutees = false,
-                                             useRole = None)),
-                 ClusterScope,
-                 Deploy.NoDispatcherGiven,
-                 Deploy.NoMailboxGiven)))
+          Deploy(
+            service,
+            deployment.get.config,
+            ClusterRouterPool(
+              RoundRobinPool(20),
+              ClusterRouterPoolSettings(
+                totalInstances = 20,
+                maxInstancesPerNode = 3,
+                allowLocalRoutees = false,
+                useRole = None)),
+            ClusterScope,
+            Deploy.NoDispatcherGiven,
+            Deploy.NoMailboxGiven)))
     }
 
     "be able to parse 'akka.actor.deployment._' with specified cluster group" in {
@@ -83,17 +85,19 @@ class ClusterDeployerSpec extends AkkaSpec(ClusterDeployerSpec.deployerConf) {
 
       deployment should ===(
         Some(
-          Deploy(service,
-                 deployment.get.config,
-                 ClusterRouterGroup(RoundRobinGroup(List("/user/myservice")),
-                                    ClusterRouterGroupSettings(
-                                      totalInstances = 20,
-                                      routeesPaths = List("/user/myservice"),
-                                      allowLocalRoutees = false,
-                                      useRole = None)),
-                 ClusterScope,
-                 "mydispatcher",
-                 "mymailbox")))
+          Deploy(
+            service,
+            deployment.get.config,
+            ClusterRouterGroup(
+              RoundRobinGroup(List("/user/myservice")),
+              ClusterRouterGroupSettings(
+                totalInstances = 20,
+                routeesPaths = List("/user/myservice"),
+                allowLocalRoutees = false,
+                useRole = None)),
+            ClusterScope,
+            "mydispatcher",
+            "mymailbox")))
     }
 
     "have correct router mappings" in {

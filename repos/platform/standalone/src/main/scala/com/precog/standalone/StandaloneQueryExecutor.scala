@@ -73,8 +73,9 @@ trait StandaloneQueryExecutorConfig
   val idSource = new FreshAtomicIdSource
 
   def masterAPIKey: String =
-    config[String]("masterAccount.apiKey",
-                   "12345678-9101-1121-3141-516171819202")
+    config[String](
+      "masterAccount.apiKey",
+      "12345678-9101-1121-3141-516171819202")
 
   def maxEvalDuration: Duration =
     config[Int]("precog.evaluator.timeout.eval", 90) seconds
@@ -128,8 +129,8 @@ trait StandaloneQueryExecutor
   def asyncExecutorFor(apiKey: APIKey)
     : Future[Validation[String, QueryExecutor[Future, JobId]]] = {
     logger.debug(
-      "Creating new async executor for %s => %s".format(apiKey,
-                                                        executionContext))
+      "Creating new async executor for %s => %s"
+        .format(apiKey, executionContext))
     Promise.successful(Success(new AsyncQueryExecutor {
       def executionContext: ExecutionContext = platform.executionContext
     }))
@@ -139,8 +140,8 @@ trait StandaloneQueryExecutor
     String,
     QueryExecutor[Future, (Option[JobId], StreamT[Future, Slice])]]] = {
     logger.debug(
-      "Creating new sync executor for %s => %s".format(apiKey,
-                                                       executionContext))
+      "Creating new sync executor for %s => %s"
+        .format(apiKey, executionContext))
     Promise.successful(Success(new SyncQueryExecutor {
       def executionContext: ExecutionContext = platform.executionContext
     }))

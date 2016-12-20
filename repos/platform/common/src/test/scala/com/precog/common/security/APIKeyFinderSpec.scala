@@ -92,12 +92,13 @@ trait APIKeyFinderSpec[M[+ _]] extends Specification {
         mgr <- M.point(emptyAPIKeyManager)
         key0 <- mgr.newStandardAPIKeyRecord("user1", None, None)
         key1 <- mgr.newStandardAPIKeyRecord("user2", None, None)
-        grant <- mgr.createGrant(None,
-                                 None,
-                                 key0.apiKey,
-                                 Set.empty,
-                                 permissions,
-                                 None)
+        grant <- mgr.createGrant(
+          None,
+          None,
+          key0.apiKey,
+          Set.empty,
+          permissions,
+          None)
       } yield (key0.apiKey, key1.apiKey, grant.grantId, mgr)).copoint
 
       withAPIKeyFinder(mgr) { keyFinder =>
@@ -150,12 +151,13 @@ trait APIKeyFinderSpec[M[+ _]] extends Specification {
         mgr <- M.point(emptyAPIKeyManager)
         key0 <- mgr.newStandardAPIKeyRecord("user1", None, None)
         key1 <- mgr.newStandardAPIKeyRecord("user2", None, None)
-        grant <- mgr.createGrant(None,
-                                 None,
-                                 key0.apiKey,
-                                 Set.empty,
-                                 permissions,
-                                 Some(expiration))
+        grant <- mgr.createGrant(
+          None,
+          None,
+          key0.apiKey,
+          Set.empty,
+          permissions,
+          Some(expiration))
       } yield (key0.apiKey, key1.apiKey, grant.grantId, mgr)).copoint
 
       withAPIKeyFinder(mgr) { keyFinder =>

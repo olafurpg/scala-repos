@@ -71,8 +71,9 @@ private[sql] object StatFunctions extends Logging {
       Column(Cast(Column(colName).expr, DoubleType))
     }
     val emptySummaries = Array.fill(cols.size)(
-      new QuantileSummaries(QuantileSummaries.defaultCompressThreshold,
-                            relativeError))
+      new QuantileSummaries(
+        QuantileSummaries.defaultCompressThreshold,
+        relativeError))
 
     // Note that it works more or less by accident as `rdd.aggregate` is not a pure function:
     // this function returns the same array as given in the input (because `aggregate` reuses
@@ -195,10 +196,11 @@ private[sql] object StatFunctions extends Logging {
         newSamples.append(sampled(sampleIdx))
         sampleIdx += 1
       }
-      new QuantileSummaries(compressThreshold,
-                            relativeError,
-                            newSamples,
-                            currentCount)
+      new QuantileSummaries(
+        compressThreshold,
+        relativeError,
+        newSamples,
+        currentCount)
     }
 
     /**
@@ -216,18 +218,20 @@ private[sql] object StatFunctions extends Logging {
       val compressed = compressImmut(
         inserted.sampled,
         mergeThreshold = 2 * relativeError * inserted.count)
-      new QuantileSummaries(compressThreshold,
-                            relativeError,
-                            compressed,
-                            inserted.count)
+      new QuantileSummaries(
+        compressThreshold,
+        relativeError,
+        compressed,
+        inserted.count)
     }
 
     private def shallowCopy: QuantileSummaries = {
-      new QuantileSummaries(compressThreshold,
-                            relativeError,
-                            sampled,
-                            count,
-                            headSampled)
+      new QuantileSummaries(
+        compressThreshold,
+        relativeError,
+        sampled,
+        count,
+        headSampled)
     }
 
     /**
@@ -236,10 +240,12 @@ private[sql] object StatFunctions extends Logging {
       * Returns a new summary.
       */
     def merge(other: QuantileSummaries): QuantileSummaries = {
-      require(headSampled.isEmpty,
-              "Current buffer needs to be compressed before merge")
-      require(other.headSampled.isEmpty,
-              "Other buffer needs to be compressed before merge")
+      require(
+        headSampled.isEmpty,
+        "Current buffer needs to be compressed before merge")
+      require(
+        other.headSampled.isEmpty,
+        "Other buffer needs to be compressed before merge")
       if (other.count == 0) {
         this.shallowCopy
       } else if (count == 0) {
@@ -253,10 +259,11 @@ private[sql] object StatFunctions extends Logging {
         val res = (sampled ++ other.sampled).sortBy(_.value)
         val comp =
           compressImmut(res, mergeThreshold = 2 * relativeError * count)
-        new QuantileSummaries(other.compressThreshold,
-                              other.relativeError,
-                              comp,
-                              other.count + count)
+        new QuantileSummaries(
+          other.compressThreshold,
+          other.relativeError,
+          comp,
+          other.count + count)
       }
     }
 
@@ -270,8 +277,9 @@ private[sql] object StatFunctions extends Logging {
       * @return
       */
     def query(quantile: Double): Double = {
-      require(quantile >= 0 && quantile <= 1.0,
-              "quantile should be in the range [0.0, 1.0]")
+      require(
+        quantile >= 0 && quantile <= 1.0,
+        "quantile should be in the range [0.0, 1.0]")
       require(
         headSampled.isEmpty,
         "Cannot operate on an uncompressed summary, call compress() first")
@@ -415,9 +423,10 @@ private[sql] object StatFunctions extends Logging {
       df: DataFrame,
       cols: Seq[String],
       functionName: String): CovarianceCounter = {
-    require(cols.length == 2,
-            s"Currently $functionName calculation is supported " +
-              "between two columns.")
+    require(
+      cols.length == 2,
+      s"Currently $functionName calculation is supported " +
+        "between two columns.")
     cols.map(name => (name, df.schema.fields.find(_.name == name))).foreach {
       case (name, data) =>
         require(data.nonEmpty, s"Couldn't find column with name $name")
@@ -466,9 +475,10 @@ private[sql] object StatFunctions extends Logging {
     val distinctCol2: Map[Any, Int] =
       counts.map(e => cleanElement(e.get(1))).distinct.zipWithIndex.toMap
     val columnSize = distinctCol2.size
-    require(columnSize < 1e4,
-            s"The number of distinct values for $col2, can't " +
-              s"exceed 1e4. Currently $columnSize")
+    require(
+      columnSize < 1e4,
+      s"The number of distinct values for $col2, can't " +
+        s"exceed 1e4. Currently $columnSize")
     val table = counts
       .groupBy(_.get(0))
       .map {

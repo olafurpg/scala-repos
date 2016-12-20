@@ -129,9 +129,10 @@ class OrderingSuite extends SparkFunSuite with ExpressionEvalHelper {
               assert(
                 signum(rowOrdering.compare(a, b)) === -1 * signum(
                   rowOrdering.compare(b, a)))
-              assert(signum(rowOrdering.compare(a, b)) === signum(
-                       genOrdering.compare(a, b)),
-                     "Generated and non-generated orderings should agree")
+              assert(
+                signum(rowOrdering.compare(a, b)) === signum(
+                  genOrdering.compare(a, b)),
+                "Generated and non-generated orderings should agree")
             }
           }
         }

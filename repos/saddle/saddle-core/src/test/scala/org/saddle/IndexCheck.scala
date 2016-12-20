@@ -63,10 +63,11 @@ class IndexCheck extends Specification with ScalaCheck {
     "index joins work" in {
       forAll { (ix1: Index[Int], ix2: Index[Int]) =>
         val all =
-          Seq(index.LeftJoin,
-              index.RightJoin,
-              index.OuterJoin,
-              index.InnerJoin) map { jointype =>
+          Seq(
+            index.LeftJoin,
+            index.RightJoin,
+            index.OuterJoin,
+            index.InnerJoin) map { jointype =>
             val res = ix1.join(ix2, how = jointype)
 
             val exp = res.index.toVec
@@ -200,10 +201,11 @@ class IndexCheck extends Specification with ScalaCheck {
 
       forAll { (ix1: Index[DateTime], ix2: Index[DateTime]) =>
         val all =
-          Seq(index.LeftJoin,
-              index.RightJoin,
-              index.OuterJoin,
-              index.InnerJoin) map { jointype =>
+          Seq(
+            index.LeftJoin,
+            index.RightJoin,
+            index.OuterJoin,
+            index.InnerJoin) map { jointype =>
             val res = ix1.join(ix2, how = jointype)
 
             val exp = res.index.toVec

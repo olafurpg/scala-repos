@@ -44,13 +44,16 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
   val tp2 = new TopicPartition(topic, part2)
 
   // configure the servers and clients
-  this.serverConfig.setProperty(KafkaConfig.ControlledShutdownEnableProp,
-                                "false") // speed up shutdown
-  this.serverConfig.setProperty(KafkaConfig.OffsetsTopicReplicationFactorProp,
-                                "3") // don't want to lose offset
+  this.serverConfig.setProperty(
+    KafkaConfig.ControlledShutdownEnableProp,
+    "false") // speed up shutdown
+  this.serverConfig.setProperty(
+    KafkaConfig.OffsetsTopicReplicationFactorProp,
+    "3") // don't want to lose offset
   this.serverConfig.setProperty(KafkaConfig.OffsetsTopicPartitionsProp, "1")
-  this.serverConfig.setProperty(KafkaConfig.GroupMinSessionTimeoutMsProp,
-                                "100") // set small enough session timeout
+  this.serverConfig.setProperty(
+    KafkaConfig.GroupMinSessionTimeoutMsProp,
+    "100") // set small enough session timeout
   this.serverConfig
     .setProperty(KafkaConfig.GroupMaxSessionTimeoutMsProp, "30000")
   this.producerConfig.setProperty(ProducerConfig.ACKS_CONFIG, "all")
@@ -80,9 +83,10 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
     assertEquals(1, this.consumers(0).assignment.size)
 
     this.consumers(0).seek(tp, 0)
-    consumeAndVerifyRecords(consumer = this.consumers(0),
-                            numRecords = numRecords,
-                            startingOffset = 0)
+    consumeAndVerifyRecords(
+      consumer = this.consumers(0),
+      numRecords = numRecords,
+      startingOffset = 0)
 
     // check async commit callbacks
     val commitCallback = new CountConsumerCommitCallback()
@@ -101,9 +105,10 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
 
     this.consumerConfig
       .setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true")
-    val consumer0 = new KafkaConsumer(this.consumerConfig,
-                                      new ByteArrayDeserializer(),
-                                      new ByteArrayDeserializer())
+    val consumer0 = new KafkaConsumer(
+      this.consumerConfig,
+      new ByteArrayDeserializer(),
+      new ByteArrayDeserializer())
 
     val numRecords = 10000
     sendRecords(numRecords)
@@ -135,10 +140,11 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
     // change subscription to trigger rebalance
     consumer0.subscribe(List(topic, topic2).asJava, rebalanceListener)
 
-    val newAssignment = Set(tp,
-                            tp2,
-                            new TopicPartition(topic2, 0),
-                            new TopicPartition(topic2, 1))
+    val newAssignment = Set(
+      tp,
+      tp2,
+      new TopicPartition(topic2, 0),
+      new TopicPartition(topic2, 1))
     TestUtils.waitUntilTrue(
       () => {
         val records = consumer0.poll(50)
@@ -183,9 +189,10 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
     val commitCallback = new CountConsumerCommitCallback()
     this
       .consumers(0)
-      .commitAsync(Map[TopicPartition, OffsetAndMetadata](
-                     (tp2, new OffsetAndMetadata(7L))).asJava,
-                   commitCallback)
+      .commitAsync(
+        Map[TopicPartition, OffsetAndMetadata](
+          (tp2, new OffsetAndMetadata(7L))).asJava,
+        commitCallback)
     awaitCommitCallback(this.consumers(0), commitCallback)
     assertEquals(7, this.consumers(0).committed(tp2).offset)
   }
@@ -217,9 +224,10 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
       "100") // timeout quickly to avoid slow test
     this.consumerConfig
       .setProperty(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, "30")
-    val consumer0 = new KafkaConsumer(this.consumerConfig,
-                                      new ByteArrayDeserializer(),
-                                      new ByteArrayDeserializer())
+    val consumer0 = new KafkaConsumer(
+      this.consumerConfig,
+      new ByteArrayDeserializer(),
+      new ByteArrayDeserializer())
     consumer0.subscribe(List(topic).asJava, listener)
 
     // the initial subscription should cause a callback execution
@@ -255,9 +263,10 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
       "100") // timeout quickly to avoid slow test
     this.consumerConfig
       .setProperty(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, "30")
-    val consumer0 = new KafkaConsumer(this.consumerConfig,
-                                      new ByteArrayDeserializer(),
-                                      new ByteArrayDeserializer())
+    val consumer0 = new KafkaConsumer(
+      this.consumerConfig,
+      new ByteArrayDeserializer(),
+      new ByteArrayDeserializer())
 
     try {
       val listener = new TestConsumerReassignmentListener()
@@ -280,15 +289,17 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
       "100") // timeout quickly to avoid slow test
     this.consumerConfig
       .setProperty(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, "30")
-    val consumer0 = new KafkaConsumer(this.consumerConfig,
-                                      new ByteArrayDeserializer(),
-                                      new ByteArrayDeserializer())
+    val consumer0 = new KafkaConsumer(
+      this.consumerConfig,
+      new ByteArrayDeserializer(),
+      new ByteArrayDeserializer())
 
     sendRecords(5)
     consumer0.subscribe(List(topic).asJava)
-    consumeAndVerifyRecords(consumer = consumer0,
-                            numRecords = 5,
-                            startingOffset = 0)
+    consumeAndVerifyRecords(
+      consumer = consumer0,
+      numRecords = 5,
+      startingOffset = 0)
     consumer0.pause(List(tp).asJava)
 
     // subscribe to a new topic to trigger a rebalance
@@ -296,9 +307,10 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
 
     // after rebalance, our position should be reset and our pause state lost,
     // so we should be able to consume from the beginning
-    consumeAndVerifyRecords(consumer = consumer0,
-                            numRecords = 0,
-                            startingOffset = 5)
+    consumeAndVerifyRecords(
+      consumer = consumer0,
+      numRecords = 0,
+      startingOffset = 5)
   }
 
   protected class TestConsumerReassignmentListener
@@ -327,11 +339,12 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
       this
         .producers(0)
         .send(
-          new ProducerRecord(tp.topic(),
-                             tp.partition(),
-                             i.toLong,
-                             s"key $i".getBytes,
-                             s"value $i".getBytes))
+          new ProducerRecord(
+            tp.topic(),
+            tp.partition(),
+            i.toLong,
+            s"key $i".getBytes,
+            s"value $i".getBytes))
     }
     this.producers(0).flush()
   }
@@ -367,8 +380,9 @@ abstract class BaseConsumerTest extends IntegrationTestHarness with Logging {
       assertEquals(s"value $keyAndValueIndex", new String(record.value))
       // this is true only because K and V are byte arrays
       assertEquals(s"key $keyAndValueIndex".length, record.serializedKeySize)
-      assertEquals(s"value $keyAndValueIndex".length,
-                   record.serializedValueSize)
+      assertEquals(
+        s"value $keyAndValueIndex".length,
+        record.serializedValueSize)
     }
   }
 

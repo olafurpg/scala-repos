@@ -72,8 +72,9 @@ object Constraints {
         case Operator.UNIQUE =>
           tasks.forall(_.agentInfo.host != offer.getHostname)
         case Operator.GROUP_BY =>
-          checkGroupBy(offer.getHostname,
-                       (task: Task) => Some(task.agentInfo.host))
+          checkGroupBy(
+            offer.getHostname,
+            (task: Task) => Some(task.agentInfo.host))
         case Operator.CLUSTER =>
           // Hostname must match or be empty
           (value.isEmpty || value == offer.getHostname) &&
@@ -152,8 +153,9 @@ object Constraints {
                         runningTasks: Iterable[Task],
                         toKillCount: Int): Iterable[Task] = {
 
-    require(toKillCount <= runningTasks.size,
-            "Can not kill more instances than running")
+    require(
+      toKillCount <= runningTasks.size,
+      "Can not kill more instances than running")
 
     //short circuit, if all tasks shall be killed
     if (runningTasks.size == toKillCount) return runningTasks

@@ -39,8 +39,9 @@ class ScFileStubImpl(file: ScalaFile)
 
   def getClasses = {
     import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes._
-    getChildrenByType(TokenSet.create(CLASS_DEF, OBJECT_DEF, TRAIT_DEF),
-                      PsiClass.ARRAY_FACTORY)
+    getChildrenByType(
+      TokenSet.create(CLASS_DEF, OBJECT_DEF, TRAIT_DEF),
+      PsiClass.ARRAY_FACTORY)
   }
 
   def getFileName = StringRef.toString(sourceFileName)

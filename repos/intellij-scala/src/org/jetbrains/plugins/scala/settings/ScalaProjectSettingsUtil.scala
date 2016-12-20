@@ -97,12 +97,13 @@ object ScalaProjectSettingsUtil {
           val validator: InputValidator =
             ScalaProjectSettingsUtil.getPatternValidator
           val pattern: String =
-            Messages.showInputDialog(parent,
-                                     inputMessage,
-                                     inputTitle,
-                                     Messages.getWarningIcon,
-                                     "",
-                                     validator)
+            Messages.showInputDialog(
+              parent,
+              inputMessage,
+              inputTitle,
+              Messages.getWarningIcon,
+              "",
+              validator)
           addPattern(pattern, patternJBList)
         }
       })
@@ -138,22 +139,23 @@ object ScalaProjectSettingsUtil {
           val validator: InputValidator =
             ScalaProjectSettingsUtil.getPackageValidator
           val pattern: String =
-            Messages.showInputDialog(parent,
-                                     inputMessage,
-                                     inputTitle,
-                                     Messages.getWarningIcon,
-                                     "",
-                                     validator)
+            Messages.showInputDialog(
+              parent,
+              inputMessage,
+              inputTitle,
+              Messages.getWarningIcon,
+              "",
+              validator)
           addPattern(pattern, patternJBList)
         }
       })
-      .addExtraAction(
-        new AnActionButton(ApplicationBundle.message("button.add.blank"),
-                           IconUtil.getAddBlankLineIcon) {
-          def actionPerformed(e: AnActionEvent) {
-            addPattern(ScalaCodeStyleSettings.BLANK_LINE, patternJBList)
-          }
-        })
+      .addExtraAction(new AnActionButton(
+        ApplicationBundle.message("button.add.blank"),
+        IconUtil.getAddBlankLineIcon) {
+        def actionPerformed(e: AnActionEvent) {
+          addPattern(ScalaCodeStyleSettings.BLANK_LINE, patternJBList)
+        }
+      })
       .setRemoveAction(new AnActionButtonRunnable {
         override def run(t: AnActionButton): Unit = {
           val listModel = JListCompatibility.getDefaultListModel(

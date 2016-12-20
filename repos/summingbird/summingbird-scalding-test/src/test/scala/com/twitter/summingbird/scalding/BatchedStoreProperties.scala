@@ -53,17 +53,17 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
   implicit val arbitraryPipeFactory: Arbitrary[PipeFactory[Nothing]] = {
     Arbitrary {
       Gen.const {
-        StateWithError[(Interval[Timestamp], Mode),
-                       List[FailureReason],
-                       FlowToPipe[Nothing]] {
-          (timeMode: (Interval[Timestamp], Mode)) =>
-            {
-              val (time: Interval[Timestamp], mode: Mode) = timeMode
-              val a: FlowToPipe[Nothing] = Reader { (fdM: (FlowDef, Mode)) =>
-                TypedPipe.empty
-              }
-              Right((timeMode, a))
+        StateWithError[
+          (Interval[Timestamp], Mode),
+          List[FailureReason],
+          FlowToPipe[Nothing]] { (timeMode: (Interval[Timestamp], Mode)) =>
+          {
+            val (time: Interval[Timestamp], mode: Mode) = timeMode
+            val a: FlowToPipe[Nothing] = Reader { (fdM: (FlowDef, Mode)) =>
+              TypedPipe.empty
             }
+            Right((timeMode, a))
+          }
         }
       }
     }
@@ -109,10 +109,13 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
 
         result match {
           case Right(
-              ((Intersection(InclusiveLower(readIntervalLower),
-                             ExclusiveUpper(_)),
-                _),
-               _)) => {
+              (
+                (
+                  Intersection(
+                    InclusiveLower(readIntervalLower),
+                    ExclusiveUpper(_)),
+                  _),
+                _)) => {
             //readInterval should start from the last written interval in the store
             val start: Timestamp =
               batcher.earliestTimeOf(testStore.initBatch.next)
@@ -140,10 +143,13 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
 
         result match {
           case Right(
-              ((Intersection(InclusiveLower(_),
-                             ExclusiveUpper(readIntervalUpper)),
-                _),
-               _)) => {
+              (
+                (
+                  Intersection(
+                    InclusiveLower(_),
+                    ExclusiveUpper(readIntervalUpper)),
+                  _),
+                _)) => {
             //readInterval should start from the last written interval in the store
             implicitly[Ordering[Timestamp]]
               .lteq(readIntervalUpper, interval.upper.upper)
@@ -164,16 +170,20 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
        commutativity: Commutativity, mode: Mode) =>
         val (inputWithTimeStamp, batcher, testStore) =
           inputWithTimeStampAndBatcherAndStore
-        val mergeResult = testStore.merge(diskPipeFactory,
-                                          implicitly[Semigroup[Int]],
-                                          commutativity,
-                                          10)((interval, mode))
+        val mergeResult = testStore.merge(
+          diskPipeFactory,
+          implicitly[Semigroup[Int]],
+          commutativity,
+          10)((interval, mode))
         mergeResult.isRight ==> {
           val Right(
-            ((Intersection(InclusiveLower(_),
-                           ExclusiveUpper(readIntervalUpper)),
-              _),
-             _)) = mergeResult
+            (
+              (
+                Intersection(
+                  InclusiveLower(_),
+                  ExclusiveUpper(readIntervalUpper)),
+                _),
+              _)) = mergeResult
           val requestedEndingTimestamp: Timestamp = interval.upper.upper
           val readIntervalEndingTimestamp: Timestamp = readIntervalUpper
           implicitly[Ordering[Timestamp]]
@@ -204,27 +214,31 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
           val nextBatchEnding = batcher.latestTimeOf(testStore.initBatch.next)
 
           //this diskPipeFactory returns a time interval that ends before the ending of next batch, meaning there is not enough data for a new batch
-          val diskPipeFactory = StateWithError[(Interval[Timestamp], Mode),
-                                               List[FailureReason],
-                                               FlowToPipe[(Int, Int)]] {
+          val diskPipeFactory = StateWithError[
+            (Interval[Timestamp], Mode),
+            List[FailureReason],
+            FlowToPipe[(Int, Int)]] {
             (timeMode: (Interval[Timestamp], Mode)) =>
               {
                 val (time: Interval[Timestamp], mode: Mode) = timeMode
-                val Intersection(InclusiveLower(startRequestedTime),
-                                 ExclusiveUpper(_)) = time
+                val Intersection(
+                  InclusiveLower(startRequestedTime),
+                  ExclusiveUpper(_)) = time
 
                 //shrink the endTime so it does not cover a whole batch
                 val onDiskEndTime: Long = Gen
-                  .choose(startRequestedTime.milliSinceEpoch,
-                          nextBatchEnding.milliSinceEpoch)
+                  .choose(
+                    startRequestedTime.milliSinceEpoch,
+                    nextBatchEnding.milliSinceEpoch)
                   .sample
                   .get
 
                 val readTime: Interval[Timestamp] =
                   if (startRequestedTime == nextBatchEnding) Empty()
                   else
-                    Intersection(InclusiveLower(startRequestedTime),
-                                 ExclusiveUpper(nextBatchEnding))
+                    Intersection(
+                      InclusiveLower(startRequestedTime),
+                      ExclusiveUpper(nextBatchEnding))
 
                 val flowToPipe: FlowToPipe[(Int, Int)] = Reader {
                   (fdM: (FlowDef, Mode)) =>
@@ -235,10 +249,11 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
               }
           }
 
-          val mergeResult = testStore.merge(diskPipeFactory,
-                                            implicitly[Semigroup[Int]],
-                                            commutativity,
-                                            10)((interval, mode))
+          val mergeResult = testStore.merge(
+            diskPipeFactory,
+            implicitly[Semigroup[Int]],
+            commutativity,
+            10)((interval, mode))
 
           mergeResult match {
             case Left(l) => {

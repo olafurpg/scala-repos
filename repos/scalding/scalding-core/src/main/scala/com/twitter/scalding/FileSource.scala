@@ -399,29 +399,32 @@ trait DelimitedScheme extends SchemedSource {
 
   //These should not be changed:
   override def localScheme =
-    new CLTextDelimited(fields,
-                        skipHeader,
-                        writeHeader,
-                        separator,
-                        strict,
-                        quote,
-                        types,
-                        safe)
+    new CLTextDelimited(
+      fields,
+      skipHeader,
+      writeHeader,
+      separator,
+      strict,
+      quote,
+      types,
+      safe)
 
   override def hdfsScheme = {
-    assert(types == null || fields.size == types.size,
-           "Fields [" + fields + "] of different size than types array [" +
-             types.mkString(",") + "]")
+    assert(
+      types == null || fields.size == types.size,
+      "Fields [" + fields + "] of different size than types array [" +
+        types.mkString(",") + "]")
     HadoopSchemeInstance(
-      new CHTextDelimited(fields,
-                          null,
-                          skipHeader,
-                          writeHeader,
-                          separator,
-                          strict,
-                          quote,
-                          types,
-                          safe))
+      new CHTextDelimited(
+        fields,
+        null,
+        skipHeader,
+        writeHeader,
+        separator,
+        strict,
+        quote,
+        types,
+        safe))
   }
 }
 

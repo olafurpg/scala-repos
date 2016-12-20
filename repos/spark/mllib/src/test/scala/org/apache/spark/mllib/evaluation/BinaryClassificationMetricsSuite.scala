@@ -60,25 +60,31 @@ class BinaryClassificationMetricsSuite
     assert(
       metrics.areaUnderPR() ~==
         AreaUnderCurve.of(expectedPRCurve) absTol 1E-5)
-    assertTupleSequencesMatch(metrics.fMeasureByThreshold().collect(),
-                              expectedThresholds.zip(expectedFMeasures1))
-    assertTupleSequencesMatch(metrics.fMeasureByThreshold(2.0).collect(),
-                              expectedThresholds.zip(expectedFmeasures2))
-    assertTupleSequencesMatch(metrics.precisionByThreshold().collect(),
-                              expectedThresholds.zip(expectedPrecisions))
-    assertTupleSequencesMatch(metrics.recallByThreshold().collect(),
-                              expectedThresholds.zip(expectedRecalls))
+    assertTupleSequencesMatch(
+      metrics.fMeasureByThreshold().collect(),
+      expectedThresholds.zip(expectedFMeasures1))
+    assertTupleSequencesMatch(
+      metrics.fMeasureByThreshold(2.0).collect(),
+      expectedThresholds.zip(expectedFmeasures2))
+    assertTupleSequencesMatch(
+      metrics.precisionByThreshold().collect(),
+      expectedThresholds.zip(expectedPrecisions))
+    assertTupleSequencesMatch(
+      metrics.recallByThreshold().collect(),
+      expectedThresholds.zip(expectedRecalls))
   }
 
   test("binary evaluation metrics") {
-    val scoreAndLabels = sc.parallelize(Seq((0.1, 0.0),
-                                            (0.1, 1.0),
-                                            (0.4, 0.0),
-                                            (0.6, 0.0),
-                                            (0.6, 1.0),
-                                            (0.6, 1.0),
-                                            (0.8, 1.0)),
-                                        2)
+    val scoreAndLabels = sc.parallelize(
+      Seq(
+        (0.1, 0.0),
+        (0.1, 1.0),
+        (0.4, 0.0),
+        (0.6, 0.0),
+        (0.6, 1.0),
+        (0.6, 1.0),
+        (0.8, 1.0)),
+      2)
     val metrics = new BinaryClassificationMetrics(scoreAndLabels)
     val thresholds = Seq(0.8, 0.6, 0.4, 0.1)
     val numTruePositives = Seq(1, 3, 3, 4)
@@ -97,14 +103,15 @@ class BinaryClassificationMetricsSuite
     val f1 = pr.map { case (r, p) => 2.0 * (p * r) / (p + r) }
     val f2 = pr.map { case (r, p) => 5.0 * (p * r) / (4.0 * p + r) }
 
-    validateMetrics(metrics,
-                    thresholds,
-                    rocCurve,
-                    prCurve,
-                    f1,
-                    f2,
-                    precisions,
-                    recalls)
+    validateMetrics(
+      metrics,
+      thresholds,
+      rocCurve,
+      prCurve,
+      f1,
+      f2,
+      precisions,
+      recalls)
   }
 
   test(
@@ -122,14 +129,15 @@ class BinaryClassificationMetricsSuite
     val f1 = pr.map { case (r, p) => 2.0 * (p * r) / (p + r) }
     val f2 = pr.map { case (r, p) => 5.0 * (p * r) / (4.0 * p + r) }
 
-    validateMetrics(metrics,
-                    thresholds,
-                    rocCurve,
-                    prCurve,
-                    f1,
-                    f2,
-                    precisions,
-                    recalls)
+    validateMetrics(
+      metrics,
+      thresholds,
+      rocCurve,
+      prCurve,
+      f1,
+      f2,
+      precisions,
+      recalls)
   }
 
   test(
@@ -153,26 +161,28 @@ class BinaryClassificationMetricsSuite
       case (r, p) => 5.0 * (p * r) / (4.0 * p + r)
     }
 
-    validateMetrics(metrics,
-                    thresholds,
-                    rocCurve,
-                    prCurve,
-                    f1,
-                    f2,
-                    precisions,
-                    recalls)
+    validateMetrics(
+      metrics,
+      thresholds,
+      rocCurve,
+      prCurve,
+      f1,
+      f2,
+      precisions,
+      recalls)
   }
 
   test("binary evaluation metrics with downsampling") {
-    val scoreAndLabels = Seq((0.1, 0.0),
-                             (0.2, 0.0),
-                             (0.3, 1.0),
-                             (0.4, 0.0),
-                             (0.5, 0.0),
-                             (0.6, 1.0),
-                             (0.7, 1.0),
-                             (0.8, 0.0),
-                             (0.9, 1.0))
+    val scoreAndLabels = Seq(
+      (0.1, 0.0),
+      (0.2, 0.0),
+      (0.3, 1.0),
+      (0.4, 0.0),
+      (0.5, 0.0),
+      (0.6, 1.0),
+      (0.7, 1.0),
+      (0.8, 0.0),
+      (0.9, 1.0))
 
     val scoreAndLabelsRDD = sc.parallelize(scoreAndLabels, 1)
 

@@ -82,9 +82,10 @@ class DataTypeSuite extends SparkFunSuite {
     }
 
     val expectedStruct =
-      StructType(StructField("b", LongType, false) :: StructField("d",
-                                                                  FloatType,
-                                                                  true) :: Nil)
+      StructType(StructField("b", LongType, false) :: StructField(
+        "d",
+        FloatType,
+        true) :: Nil)
 
     assert(expectedStruct === struct(Set("b", "d")))
     intercept[IllegalArgumentException] {
@@ -110,8 +111,9 @@ class DataTypeSuite extends SparkFunSuite {
 
     val mapped = StructType.fieldsMap(struct.fields)
 
-    val expected = Map("a" -> StructField("a", LongType),
-                       "b" -> StructField("b", FloatType))
+    val expected = Map(
+      "a" -> StructField("a", LongType),
+      "b" -> StructField("b", FloatType))
 
     assert(mapped === expected)
   }
@@ -229,9 +231,10 @@ class DataTypeSuite extends SparkFunSuite {
 
   val metadata = new MetadataBuilder().putString("name", "age").build()
   val structType = StructType(
-    Seq(StructField("a", IntegerType, nullable = true),
-        StructField("b", ArrayType(DoubleType), nullable = false),
-        StructField("c", DoubleType, nullable = false, metadata)))
+    Seq(
+      StructField("a", IntegerType, nullable = true),
+      StructField("b", ArrayType(DoubleType), nullable = false),
+      StructField("c", DoubleType, nullable = false, metadata)))
   checkDataTypeJsonRepr(structType)
 
   def checkDefaultSize(dataType: DataType, expectedDefaultSize: Int): Unit = {
@@ -308,20 +311,24 @@ class DataTypeSuite extends SparkFunSuite {
     to = MapType(StringType, DoubleType, valueContainsNull = false),
     expected = false)
   checkEqualsIgnoreCompatibleNullability(
-    from = MapType(StringType,
-                   ArrayType(IntegerType, true),
-                   valueContainsNull = true),
-    to = MapType(StringType,
-                 ArrayType(IntegerType, false),
-                 valueContainsNull = true),
+    from = MapType(
+      StringType,
+      ArrayType(IntegerType, true),
+      valueContainsNull = true),
+    to = MapType(
+      StringType,
+      ArrayType(IntegerType, false),
+      valueContainsNull = true),
     expected = false)
   checkEqualsIgnoreCompatibleNullability(
-    from = MapType(StringType,
-                   ArrayType(IntegerType, false),
-                   valueContainsNull = true),
-    to = MapType(StringType,
-                 ArrayType(IntegerType, true),
-                 valueContainsNull = true),
+    from = MapType(
+      StringType,
+      ArrayType(IntegerType, false),
+      valueContainsNull = true),
+    to = MapType(
+      StringType,
+      ArrayType(IntegerType, true),
+      valueContainsNull = true),
     expected = true)
 
   checkEqualsIgnoreCompatibleNullability(

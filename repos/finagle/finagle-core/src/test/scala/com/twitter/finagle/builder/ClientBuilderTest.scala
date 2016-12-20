@@ -37,8 +37,9 @@ class ClientBuilderTest
 
     val m = new MockChannel
     when(
-      m.codec.prepareConnFactory(any[ServiceFactory[String, String]],
-                                 any[Stack.Params]))
+      m.codec.prepareConnFactory(
+        any[ServiceFactory[String, String]],
+        any[Stack.Params]))
       .thenReturn(preparedFactory)
   }
 
@@ -47,8 +48,9 @@ class ClientBuilderTest
       val client = m.build()
       val requestFuture = client("123")
 
-      verify(m.codec).prepareConnFactory(any[ServiceFactory[String, String]],
-                                         any[Stack.Params])
+      verify(m.codec).prepareConnFactory(
+        any[ServiceFactory[String, String]],
+        any[Stack.Params])
       verify(preparedFactory)()
 
       assert(!requestFuture.isDefined)
@@ -72,8 +74,9 @@ class ClientBuilderTest
         val entries = GlobalRegistry.get.toSet
         val unspecified =
           entries.count(_.key.startsWith(Seq("client", "not-specified")))
-        assert(unspecified == 0,
-               "saw registry keys with 'not-specified' protocol")
+        assert(
+          unspecified == 0,
+          "saw registry keys with 'not-specified' protocol")
         val specified =
           entries.count(_.key.startsWith(Seq("client", expected)))
         assert(specified > 0, "did not see expected protocol registry keys")

@@ -75,8 +75,9 @@ trait ReductionFinderModule[M[+ _]]
       // for each reduce node, associate it with its ancestor
       val (ancestorByReduce, specByParent) = info.foldLeft(
         (Map[dag.Reduce, DepGraph](), Map[DepGraph, TransSpec1]())) {
-        case ((ancestorByReduce, specByParent),
-              ReduceInfo(reduce, spec, ancestor)) =>
+        case (
+            (ancestorByReduce, specByParent),
+            ReduceInfo(reduce, spec, ancestor)) =>
           (ancestorByReduce + (reduce -> ancestor),
            specByParent + (reduce.parent -> spec))
       }
@@ -96,10 +97,11 @@ trait ReductionFinderModule[M[+ _]]
             reducesByParent + (parent -> (lst map { _.reduce }))
         }
 
-      MegaReduceState(ancestorByReduce,
-                      parentsByAncestor,
-                      reducesByParent,
-                      specByParent)
+      MegaReduceState(
+        ancestorByReduce,
+        parentsByAncestor,
+        reducesByParent,
+        specByParent)
     }
 
     case class MegaReduceState(
@@ -138,13 +140,15 @@ trait ReductionFinderModule[M[+ _]]
             val secondIndex =
               st.reducesByParent(parent).reverse indexOf graph
 
-            dag.Join(DerefArray,
-                     Cross(Some(CrossLeft)),
-                     dag.Join(DerefArray,
-                              Cross(Some(CrossLeft)),
-                              left,
-                              Const(CLong(firstIndex))(graph.loc))(graph.loc),
-                     Const(CLong(secondIndex))(graph.loc))(graph.loc)
+            dag.Join(
+              DerefArray,
+              Cross(Some(CrossLeft)),
+              dag.Join(
+                DerefArray,
+                Cross(Some(CrossLeft)),
+                left,
+                Const(CLong(firstIndex))(graph.loc))(graph.loc),
+              Const(CLong(secondIndex))(graph.loc))(graph.loc)
           }
         }
       }

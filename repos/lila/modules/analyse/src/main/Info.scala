@@ -63,11 +63,12 @@ object Info {
       case Array(cp, ma, va) =>
         Info(ply, Score(cp), parseIntOption(ma), va.split(' ').toList).some
       case Array(cp, ma, va, be) =>
-        Info(ply,
-             Score(cp),
-             parseIntOption(ma),
-             va.split(' ').toList,
-             Uci.Move piotr be).some
+        Info(
+          ply,
+          Score(cp),
+          parseIntOption(ma),
+          va.split(' ').toList,
+          Uci.Move piotr be).some
       case _ => none
     }
 

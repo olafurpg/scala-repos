@@ -108,10 +108,11 @@ private[nio] object TypedArrayIntBuffer {
               initialPosition: Int,
               initialLimit: Int,
               readOnly: Boolean): TypedArrayIntBuffer = {
-      new TypedArrayIntBuffer(typedArray,
-                              initialPosition,
-                              initialLimit,
-                              readOnly)
+      new TypedArrayIntBuffer(
+        typedArray,
+        initialPosition,
+        initialLimit,
+        readOnly)
     }
 
     @inline

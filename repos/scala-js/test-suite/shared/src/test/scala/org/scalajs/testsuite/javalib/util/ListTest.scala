@@ -455,9 +455,10 @@ trait ListTest extends CollectionTest {
 
 object ListFactory {
   def allFactories: Iterator[ListFactory] =
-    Iterator(new ArrayListFactory,
-             new LinkedListFactory,
-             new AbstractListFactory)
+    Iterator(
+      new ArrayListFactory,
+      new LinkedListFactory,
+      new AbstractListFactory)
 }
 
 trait ListFactory extends CollectionFactory {

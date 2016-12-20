@@ -163,9 +163,10 @@ trait FileAndResourceDirectives {
         if (dirs.isEmpty) reject
         else
           complete(
-            DirectoryListing(pathPrefix + pathString,
-                             isRoot = pathString == "/",
-                             dirs.flatMap(_.listFiles)))
+            DirectoryListing(
+              pathPrefix + pathString,
+              isRoot = pathString == "/",
+              dirs.flatMap(_.listFiles)))
       }
     }
 
@@ -376,8 +377,9 @@ object DirectoryListing {
           deduped.partition(_._1.isDirectory)
         def maxNameLength(seq: Seq[(File, String)]) =
           if (seq.isEmpty) 0 else seq.map(_._2.length).max
-        val maxNameLen = math.max(maxNameLength(directoryFilesAndNames) + 1,
-                                  maxNameLength(fileFilesAndNames))
+        val maxNameLen = math.max(
+          maxNameLength(directoryFilesAndNames) + 1,
+          maxNameLength(fileFilesAndNames))
         val sb = new java.lang.StringBuilder
         sb.append(html(0))
           .append(path)

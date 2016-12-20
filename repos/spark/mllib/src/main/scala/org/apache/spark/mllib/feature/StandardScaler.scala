@@ -88,11 +88,13 @@ class StandardScalerModel @Since("1.3.0")(
   @Since("1.3.0")
   def this(std: Vector, mean: Vector) {
     this(std, mean, withStd = std != null, withMean = mean != null)
-    require(this.withStd || this.withMean,
-            "at least one of std or mean vectors must be provided")
+    require(
+      this.withStd || this.withMean,
+      "at least one of std or mean vectors must be provided")
     if (this.withStd && this.withMean) {
-      require(mean.size == std.size,
-              "mean and std vectors must have equal size if both are provided")
+      require(
+        mean.size == std.size,
+        "mean and std vectors must have equal size if both are provided")
     }
   }
 
@@ -102,8 +104,9 @@ class StandardScalerModel @Since("1.3.0")(
   @Since("1.3.0")
   @DeveloperApi
   def setWithMean(withMean: Boolean): this.type = {
-    require(!(withMean && this.mean == null),
-            "cannot set withMean to true while mean is null")
+    require(
+      !(withMean && this.mean == null),
+      "cannot set withMean to true while mean is null")
     this.withMean = withMean
     this
   }
@@ -111,8 +114,9 @@ class StandardScalerModel @Since("1.3.0")(
   @Since("1.3.0")
   @DeveloperApi
   def setWithStd(withStd: Boolean): this.type = {
-    require(!(withStd && this.std == null),
-            "cannot set withStd to true while std is null")
+    require(
+      !(withStd && this.std == null),
+      "cannot set withStd to true while std is null")
     this.withStd = withStd
     this
   }

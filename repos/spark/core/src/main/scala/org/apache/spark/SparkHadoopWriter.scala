@@ -162,8 +162,9 @@ private[spark] class SparkHadoopWriter(jobConf: JobConf)
     jID = new SerializableWritable[JobID](
       SparkHadoopWriter.createJobID(now, jobid))
     taID = new SerializableWritable[TaskAttemptID](
-      new TaskAttemptID(new TaskID(jID.value, TaskType.MAP, splitID),
-                        attemptID))
+      new TaskAttemptID(
+        new TaskID(jID.value, TaskType.MAP, splitID),
+        attemptID))
   }
 }
 

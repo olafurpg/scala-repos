@@ -38,8 +38,9 @@ object LinearRegressionWithSGDExample {
     val parsedData = data
       .map { line =>
         val parts = line.split(',')
-        LabeledPoint(parts(0).toDouble,
-                     Vectors.dense(parts(1).split(' ').map(_.toDouble)))
+        LabeledPoint(
+          parts(0).toDouble,
+          Vectors.dense(parts(1).split(' ').map(_.toDouble)))
       }
       .cache()
 

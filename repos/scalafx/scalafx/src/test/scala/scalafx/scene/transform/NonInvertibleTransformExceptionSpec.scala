@@ -37,8 +37,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 /** NonInvertibleTransformException Spec tests. */
 @RunWith(classOf[JUnitRunner])
 class NonInvertibleTransformExceptionSpec
-    extends SimpleSFXDelegateSpec[jfxst.NonInvertibleTransformException,
-                                  NonInvertibleTransformException](
+    extends SimpleSFXDelegateSpec[
+      jfxst.NonInvertibleTransformException,
+      NonInvertibleTransformException](
       classOf[jfxst.NonInvertibleTransformException],
       classOf[NonInvertibleTransformException]) {
 

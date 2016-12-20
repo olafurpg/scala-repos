@@ -196,12 +196,13 @@ private[streaming] object MasterFailureTest extends Logging {
     setupCalled = true
 
     // Setup the streaming computation with the given operation
-    val ssc = new StreamingContext("local[4]",
-                                   "MasterFailureTest",
-                                   batchDuration,
-                                   null,
-                                   Nil,
-                                   Map())
+    val ssc = new StreamingContext(
+      "local[4]",
+      "MasterFailureTest",
+      batchDuration,
+      null,
+      Nil,
+      Map())
     ssc.checkpoint(checkpointDir.toString)
     val inputStream = ssc.textFileStream(testDir.toString)
     val operatedStream = operation(inputStream)
@@ -316,8 +317,9 @@ private[streaming] object MasterFailureTest extends Logging {
                                         expectedOutput: Seq[T]) {
     // Verify whether expected outputs do not consecutive batches with same output
     for (i <- 0 until expectedOutput.size - 1) {
-      assert(expectedOutput(i) != expectedOutput(i + 1),
-             "Expected output has consecutive duplicate sequence of values")
+      assert(
+        expectedOutput(i) != expectedOutput(i + 1),
+        "Expected output has consecutive duplicate sequence of values")
     }
 
     // Log the output
@@ -409,9 +411,10 @@ private[streaming] class FileGeneratingThread(input: Seq[String],
           } catch {
             case ioe: IOException => {
               fs = testDir.getFileSystem(new Configuration())
-              logWarning("Attempt " + tries + " at generating file " +
-                           hadoopFile + " failed.",
-                         ioe)
+              logWarning(
+                "Attempt " + tries + " at generating file " +
+                  hadoopFile + " failed.",
+                ioe)
             }
           }
         }

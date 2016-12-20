@@ -116,23 +116,25 @@ object ConsumerGroupCommand {
           case topicPartition => topicPartition.partition
         }
         .foreach { topicPartition =>
-          describePartition(group,
-                            topicPartition.topic,
-                            topicPartition.partition,
-                            getPartitionOffset(topicPartition),
-                            getOwner(topicPartition))
+          describePartition(
+            group,
+            topicPartition.topic,
+            topicPartition.partition,
+            getPartitionOffset(topicPartition),
+            getOwner(topicPartition))
         }
     }
 
     protected def printDescribeHeader() {
       println(
-        "%-30s %-30s %-10s %-15s %-15s %-15s %s".format("GROUP",
-                                                        "TOPIC",
-                                                        "PARTITION",
-                                                        "CURRENT-OFFSET",
-                                                        "LOG-END-OFFSET",
-                                                        "LAG",
-                                                        "OWNER"))
+        "%-30s %-30s %-10s %-15s %-15s %-15s %s".format(
+          "GROUP",
+          "TOPIC",
+          "PARTITION",
+          "CURRENT-OFFSET",
+          "LOG-END-OFFSET",
+          "LAG",
+          "OWNER"))
     }
 
     private def describePartition(group: String,
@@ -201,10 +203,11 @@ object ConsumerGroupCommand {
       printDescribeHeader()
       topics.foreach(
         topic =>
-          describeTopic(group,
-                        topic,
-                        channelSocketTimeoutMs,
-                        channelRetryBackoffMs))
+          describeTopic(
+            group,
+            topic,
+            channelSocketTimeoutMs,
+            channelRetryBackoffMs))
     }
 
     private def describeTopic(group: String,
@@ -224,14 +227,16 @@ object ConsumerGroupCommand {
             }
         }
         .toMap
-      val partitionOffsets = getPartitionOffsets(group,
-                                                 topicPartitions,
-                                                 channelSocketTimeoutMs,
-                                                 channelRetryBackoffMs)
-      describeTopicPartition(group,
-                             topicPartitions,
-                             partitionOffsets.get,
-                             ownerByTopicPartition.get)
+      val partitionOffsets = getPartitionOffsets(
+        group,
+        topicPartitions,
+        channelSocketTimeoutMs,
+        channelRetryBackoffMs)
+      describeTopicPartition(
+        group,
+        topicPartitions,
+        partitionOffsets.get,
+        ownerByTopicPartition.get)
     }
 
     private def getTopicPartitions(topic: String): Seq[TopicAndPartition] = {
@@ -275,10 +280,11 @@ object ConsumerGroupCommand {
         channelSocketTimeoutMs: Int,
         channelRetryBackoffMs: Int): Map[TopicAndPartition, Long] = {
       val offsetMap = mutable.Map[TopicAndPartition, Long]()
-      val channel = ClientUtils.channelToOffsetManager(group,
-                                                       zkUtils,
-                                                       channelSocketTimeoutMs,
-                                                       channelRetryBackoffMs)
+      val channel = ClientUtils.channelToOffsetManager(
+        group,
+        zkUtils,
+        channelSocketTimeoutMs,
+        channelRetryBackoffMs)
       channel.send(OffsetFetchRequest(group, topicPartitions))
       val offsetFetchResponse =
         OffsetFetchResponse.readFrom(channel.receive().payload())
@@ -309,9 +315,10 @@ object ConsumerGroupCommand {
           else
             println(
               "Could not fetch offset from kafka for group %s partition %s due to %s."
-                .format(group,
-                        topicAndPartition,
-                        Errors.forCode(offsetAndMetadata.error).exception))
+                .format(
+                  group,
+                  topicAndPartition,
+                  Errors.forCode(offsetAndMetadata.error).exception))
       }
       channel.disconnect()
       offsetMap.toMap
@@ -344,9 +351,10 @@ object ConsumerGroupCommand {
       Topic.validate(topic)
       groups.asScala.foreach { group =>
         try {
-          if (AdminUtils.deleteConsumerGroupInfoForTopicInZK(zkUtils,
-                                                             group,
-                                                             topic))
+          if (AdminUtils.deleteConsumerGroupInfoForTopicInZK(
+                zkUtils,
+                group,
+                topic))
             println(
               "Deleted consumer group information for group %s topic %s in zookeeper."
                 .format(group, topic))
@@ -384,11 +392,12 @@ object ConsumerGroupCommand {
                 val host = brokerInfo.get("host").get.asInstanceOf[String]
                 val port = brokerInfo.get("port").get.asInstanceOf[Int]
                 Some(
-                  new SimpleConsumer(host,
-                                     port,
-                                     10000,
-                                     100000,
-                                     "ConsumerGroupCommand"))
+                  new SimpleConsumer(
+                    host,
+                    port,
+                    10000,
+                    100000,
+                    "ConsumerGroupCommand"))
               case None =>
                 throw new BrokerNotAvailableException(
                   "Broker id %d does not exist".format(brokerId))
@@ -433,10 +442,10 @@ object ConsumerGroupCommand {
             .flatMap { topicPartition =>
               Option(
                 consumer.committed(
-                  new TopicPartition(topicPartition.topic,
-                                     topicPartition.partition))).map {
-                offsetAndMetadata =>
-                  topicPartition -> offsetAndMetadata.offset
+                  new TopicPartition(
+                    topicPartition.topic,
+                    topicPartition.partition))).map { offsetAndMetadata =>
+                topicPartition -> offsetAndMetadata.offset
               }
             }
             .toMap
@@ -471,8 +480,9 @@ object ConsumerGroupCommand {
         if (opts.options.has(opts.commandConfigOpt))
           Utils.loadProps(opts.options.valueOf(opts.commandConfigOpt))
         else new Properties()
-      props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG,
-                opts.options.valueOf(opts.bootstrapServerOpt))
+      props.put(
+        CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG,
+        opts.options.valueOf(opts.bootstrapServerOpt))
       AdminClient.create(props)
     }
 
@@ -486,8 +496,9 @@ object ConsumerGroupCommand {
       val deserializer = (new StringDeserializer).getClass.getName
       val brokerUrl = opts.options.valueOf(opts.bootstrapServerOpt)
       properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerUrl)
-      properties.put(ConsumerConfig.GROUP_ID_CONFIG,
-                     opts.options.valueOf(opts.groupOpt))
+      properties.put(
+        ConsumerConfig.GROUP_ID_CONFIG,
+        opts.options.valueOf(opts.groupOpt))
       properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false")
       properties.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "30000")
       properties
@@ -611,10 +622,11 @@ object ConsumerGroupCommand {
         options,
         groupOpt,
         allConsumerGroupLevelOpts - describeOpt - deleteOpt)
-      CommandLineUtils.checkInvalidArgs(parser,
-                                        options,
-                                        topicOpt,
-                                        allConsumerGroupLevelOpts - deleteOpt)
+      CommandLineUtils.checkInvalidArgs(
+        parser,
+        options,
+        topicOpt,
+        allConsumerGroupLevelOpts - deleteOpt)
     }
   }
 }

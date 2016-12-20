@@ -117,9 +117,10 @@ trait LowPriorityTypes {
         case TypeRef(_, cpdTpe, List(highTpe))
             if cpdTpe.asType.toType.typeConstructor =:= lowPriorityForTpe =>
           Some(("", highTpe))
-        case TypeRef(_,
-                     cpdTpe,
-                     List(ConstantType(Constant(ignored: String)), tTpe))
+        case TypeRef(
+            _,
+            cpdTpe,
+            List(ConstantType(Constant(ignored: String)), tTpe))
             if cpdTpe.asType.toType.typeConstructor =:= lowPriorityForIgnoringTpe &&
               ignored.nonEmpty =>
           Some(ignored, tTpe)

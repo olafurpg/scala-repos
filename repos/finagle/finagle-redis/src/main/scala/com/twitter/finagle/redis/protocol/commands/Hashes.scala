@@ -8,10 +8,12 @@ import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 
 object HDel {
   def apply(args: Seq[Array[Byte]]) = {
-    RequireClientProtocol(args.length >= 2,
-                          "HDEL requires a hash key and at least one field")
-    new HDel(ChannelBuffers.wrappedBuffer(args(0)),
-             args.drop(1).map(ChannelBuffers.wrappedBuffer(_)))
+    RequireClientProtocol(
+      args.length >= 2,
+      "HDEL requires a hash key and at least one field")
+    new HDel(
+      ChannelBuffers.wrappedBuffer(args(0)),
+      args.drop(1).map(ChannelBuffers.wrappedBuffer(_)))
   }
 }
 case class HDel(key: ChannelBuffer, fields: Seq[ChannelBuffer])
@@ -24,8 +26,9 @@ case class HDel(key: ChannelBuffer, fields: Seq[ChannelBuffer])
 object HExists {
   def apply(args: Seq[Array[Byte]]) = {
     val list = trimList(args, 2, "HEXISTS")
-    new HExists(ChannelBuffers.wrappedBuffer(list(0)),
-                ChannelBuffers.wrappedBuffer(list(1)))
+    new HExists(
+      ChannelBuffers.wrappedBuffer(list(0)),
+      ChannelBuffers.wrappedBuffer(list(1)))
   }
 }
 case class HExists(key: ChannelBuffer, field: ChannelBuffer)
@@ -38,8 +41,9 @@ case class HExists(key: ChannelBuffer, field: ChannelBuffer)
 object HGet {
   def apply(args: Seq[Array[Byte]]) = {
     val list = trimList(args, 2, "HGET")
-    new HGet(ChannelBuffers.wrappedBuffer(list(0)),
-             ChannelBuffers.wrappedBuffer(list(1)))
+    new HGet(
+      ChannelBuffers.wrappedBuffer(list(0)),
+      ChannelBuffers.wrappedBuffer(list(1)))
   }
 }
 case class HGet(key: ChannelBuffer, field: ChannelBuffer)
@@ -66,19 +70,21 @@ case class HIncrBy(key: ChannelBuffer, field: ChannelBuffer, amount: Long)
   def command = Commands.HINCRBY
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(
-      Seq(CommandBytes.HINCRBY,
-          key,
-          field,
-          StringToChannelBuffer(amount.toString)))
+      Seq(
+        CommandBytes.HINCRBY,
+        key,
+        field,
+        StringToChannelBuffer(amount.toString)))
 }
 object HIncrBy {
   def apply(args: Seq[Array[Byte]]): Command = {
     val amount = RequireClientProtocol.safe {
       NumberFormat.toLong(BytesToString(args(2)))
     }
-    HIncrBy(ChannelBuffers.wrappedBuffer(args(0)),
-            ChannelBuffers.wrappedBuffer(args(1)),
-            amount)
+    HIncrBy(
+      ChannelBuffers.wrappedBuffer(args(0)),
+      ChannelBuffers.wrappedBuffer(args(1)),
+      amount)
   }
 }
 
@@ -95,10 +101,12 @@ case class HKeys(key: ChannelBuffer) extends StrictKeyCommand {
 
 object HMGet {
   def apply(args: Seq[Array[Byte]]) = {
-    RequireClientProtocol(args.length >= 2,
-                          "HMGET requires a hash key and at least one field")
-    new HMGet(ChannelBuffers.wrappedBuffer(args(0)),
-              args.drop(1).map(ChannelBuffers.wrappedBuffer(_)))
+    RequireClientProtocol(
+      args.length >= 2,
+      "HMGET requires a hash key and at least one field")
+    new HMGet(
+      ChannelBuffers.wrappedBuffer(args(0)),
+      args.drop(1).map(ChannelBuffers.wrappedBuffer(_)))
   }
 }
 case class HMGet(key: ChannelBuffer, fields: Seq[ChannelBuffer])
@@ -170,12 +178,14 @@ object HScan {
   import ScanCompanion._
 
   def apply(args: Seq[Array[Byte]]) = {
-    RequireClientProtocol(args != null && !args.isEmpty,
-                          "Expected at least 1 arguments for hscan command")
+    RequireClientProtocol(
+      args != null && !args.isEmpty,
+      "Expected at least 1 arguments for hscan command")
     args match {
       case key :: cursor :: Nil =>
-        new HScan(ChannelBuffers.wrappedBuffer(key),
-                  NumberFormat.toLong(BytesToString(cursor)))
+        new HScan(
+          ChannelBuffers.wrappedBuffer(key),
+          NumberFormat.toLong(BytesToString(cursor)))
       case key :: cursor :: tail =>
         parseArgs(key, NumberFormat.toLong(BytesToString(cursor)), tail)
       case _ => throw ClientError("Unexpected args to hscan command")
@@ -195,9 +205,10 @@ object HScan {
 object HSet {
   def apply(args: Seq[Array[Byte]]) = {
     val list = trimList(args, 3, "HSET")
-    new HSet(ChannelBuffers.wrappedBuffer(list(0)),
-             ChannelBuffers.wrappedBuffer(list(1)),
-             ChannelBuffers.wrappedBuffer(list(2)))
+    new HSet(
+      ChannelBuffers.wrappedBuffer(list(0)),
+      ChannelBuffers.wrappedBuffer(list(1)),
+      ChannelBuffers.wrappedBuffer(list(2)))
   }
 }
 case class HSet(key: ChannelBuffer, field: ChannelBuffer, value: ChannelBuffer)
@@ -210,9 +221,10 @@ case class HSet(key: ChannelBuffer, field: ChannelBuffer, value: ChannelBuffer)
 object HSetNx {
   def apply(args: Seq[Array[Byte]]) = {
     val list = trimList(args, 3, "HSETNX")
-    new HSetNx(ChannelBuffers.wrappedBuffer(list(0)),
-               ChannelBuffers.wrappedBuffer(list(1)),
-               ChannelBuffers.wrappedBuffer(list(2)))
+    new HSetNx(
+      ChannelBuffers.wrappedBuffer(list(0)),
+      ChannelBuffers.wrappedBuffer(list(1)),
+      ChannelBuffers.wrappedBuffer(list(2)))
   }
 }
 case class HSetNx(key: ChannelBuffer,

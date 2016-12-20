@@ -117,11 +117,12 @@ trait ShardSystemActorModule extends YggConfigComponent with Logging {
     val initialCheckpoint = loadCheckpoint()
 
     val ingestActor = for (checkpoint <- initialCheckpoint;
-                           init <- initIngestActor(ingestActorSystem,
-                                                   routingActor,
-                                                   checkpoint,
-                                                   checkpointCoordination,
-                                                   permissionsFinder))
+                           init <- initIngestActor(
+                             ingestActorSystem,
+                             routingActor,
+                             checkpoint,
+                             checkpointCoordination,
+                             permissionsFinder))
       yield init
 
     val stoppable = Stoppable.fromFuture({
@@ -129,8 +130,9 @@ trait ShardSystemActorModule extends YggConfigComponent with Logging {
       logger.info("Stopping bifrost system")
       for {
         _ <- ingestActor map {
-          actorStop(yggConfig, _, "ingestActor")(ingestActorSystem,
-                                                 ingestActorSystem.dispatcher)
+          actorStop(yggConfig, _, "ingestActor")(
+            ingestActorSystem,
+            ingestActorSystem.dispatcher)
         } getOrElse { Future(())(ingestActorSystem.dispatcher) }
       } yield {
         ingestActorSystem.shutdown()

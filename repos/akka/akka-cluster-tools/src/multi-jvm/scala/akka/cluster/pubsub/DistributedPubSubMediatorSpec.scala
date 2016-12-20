@@ -105,9 +105,10 @@ object DistributedPubSubMediatorSpec extends MultiNodeConfig {
     def receive = {
       case in: String ⇒
         val out = in.toUpperCase
-        mediator ! Send(path = "/user/destination",
-                        msg = out,
-                        localAffinity = true)
+        mediator ! Send(
+          path = "/user/destination",
+          msg = out,
+          localAffinity = true)
     }
   }
   //#sender

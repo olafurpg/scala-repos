@@ -71,32 +71,35 @@ abstract class Reifier extends States with Phases with Errors with Utils {
 
           val tpe = typer.packedType(tree, NoSymbol)
           val ReifiedType(_, _, tpeSymtab, _, rtpe, tpeReificationIsConcrete) =
-            `package`.reifyType(global)(typer,
-                                        universe,
-                                        mirror,
-                                        tpe,
-                                        concrete = false)
+            `package`.reifyType(global)(
+              typer,
+              universe,
+              mirror,
+              tpe,
+              concrete = false)
           state.reificationIsConcrete &= tpeReificationIsConcrete
           state.symtab ++= tpeSymtab
-          ReifiedTree(universe,
-                      mirror,
-                      symtab,
-                      rtree,
-                      tpe,
-                      rtpe,
-                      reificationIsConcrete)
+          ReifiedTree(
+            universe,
+            mirror,
+            symtab,
+            rtree,
+            tpe,
+            rtpe,
+            reificationIsConcrete)
 
         case tpe: Type =>
           reifyTrace("reifying = ")(tpe.toString)
           reifyTrace("universe = ")(universe)
           reifyTrace("mirror = ")(mirror)
           val rtree = reify(tpe)
-          ReifiedType(universe,
-                      mirror,
-                      symtab,
-                      tpe,
-                      rtree,
-                      reificationIsConcrete)
+          ReifiedType(
+            universe,
+            mirror,
+            symtab,
+            tpe,
+            rtree,
+            reificationIsConcrete)
 
         case _ =>
           throw new Error(
@@ -170,9 +173,10 @@ abstract class Reifier extends States with Phases with Errors with Utils {
       case ex: UnexpectedReificationException =>
         throw ex
       case ex: Throwable =>
-        throw new UnexpectedReificationException(defaultErrorPosition,
-                                                 "reification crashed",
-                                                 ex)
+        throw new UnexpectedReificationException(
+          defaultErrorPosition,
+          "reification crashed",
+          ex)
     }
   }
 }

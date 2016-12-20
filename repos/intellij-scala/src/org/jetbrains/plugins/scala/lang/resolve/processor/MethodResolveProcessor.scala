@@ -99,18 +99,18 @@ class MethodResolveProcessor(
       element match {
         case m: PsiMethod =>
           addResult(
-            new ScalaResolveResult(m,
-                                   s,
-                                   getImports(state),
-                                   nameShadow,
-                                   implicitConversionClass,
-                                   implicitFunction = implFunction,
-                                   implicitType = implType,
-                                   fromType = fromType,
-                                   isAccessible = accessible,
-                                   isForwardReference = forwardReference,
-                                   unresolvedTypeParameters =
-                                     unresolvedTypeParameters))
+            new ScalaResolveResult(
+              m,
+              s,
+              getImports(state),
+              nameShadow,
+              implicitConversionClass,
+              implicitFunction = implFunction,
+              implicitType = implType,
+              fromType = fromType,
+              isAccessible = accessible,
+              isForwardReference = forwardReference,
+              unresolvedTypeParameters = unresolvedTypeParameters))
         case cc: ScClass =>
         case o: ScObject if o.isPackageObject =>
         // do not resolve to package object
@@ -120,8 +120,9 @@ class MethodResolveProcessor(
           val functionName = if (isUpdate) "update" else "apply"
           val typeResult = getFromType(state) match {
             case Some(tp) =>
-              Success(ScProjectionType(tp, obj, superReference = false),
-                      Some(obj))
+              Success(
+                ScProjectionType(tp, obj, superReference = false),
+                Some(obj))
             case _ => obj.getType(TypingContext.empty)
           }
           val processor = new CollectMethodsProcessor(ref, functionName)
@@ -156,62 +157,62 @@ class MethodResolveProcessor(
           if (seq.nonEmpty) addResults(seq)
           else
             addResult(
-              new ScalaResolveResult(named,
-                                     s,
-                                     getImports(state),
-                                     nameShadow,
-                                     implicitConversionClass,
-                                     implicitFunction = implFunction,
-                                     implicitType = implType,
-                                     isNamedParameter = isNamedParameter,
-                                     fromType = fromType,
-                                     isAccessible = accessible,
-                                     isForwardReference = forwardReference,
-                                     unresolvedTypeParameters =
-                                       unresolvedTypeParameters))
+              new ScalaResolveResult(
+                named,
+                s,
+                getImports(state),
+                nameShadow,
+                implicitConversionClass,
+                implicitFunction = implFunction,
+                implicitType = implType,
+                isNamedParameter = isNamedParameter,
+                fromType = fromType,
+                isAccessible = accessible,
+                isForwardReference = forwardReference,
+                unresolvedTypeParameters = unresolvedTypeParameters))
         case synthetic: ScSyntheticFunction =>
           addResult(
-            new ScalaResolveResult(synthetic,
-                                   s,
-                                   getImports(state),
-                                   nameShadow,
-                                   implicitConversionClass,
-                                   implicitFunction = implFunction,
-                                   implicitType = implType,
-                                   fromType = fromType,
-                                   isAccessible = accessible,
-                                   isForwardReference = forwardReference,
-                                   unresolvedTypeParameters =
-                                     unresolvedTypeParameters))
+            new ScalaResolveResult(
+              synthetic,
+              s,
+              getImports(state),
+              nameShadow,
+              implicitConversionClass,
+              implicitFunction = implFunction,
+              implicitType = implType,
+              fromType = fromType,
+              isAccessible = accessible,
+              isForwardReference = forwardReference,
+              unresolvedTypeParameters = unresolvedTypeParameters))
         case pack: PsiPackage =>
           addResult(
-            new ScalaResolveResult(ScPackageImpl(pack),
-                                   s,
-                                   getImports(state),
-                                   nameShadow,
-                                   implicitConversionClass,
-                                   implicitFunction = implFunction,
-                                   implicitType = implType,
-                                   fromType = fromType,
-                                   isAccessible = accessible,
-                                   isForwardReference = forwardReference,
-                                   unresolvedTypeParameters =
-                                     unresolvedTypeParameters))
+            new ScalaResolveResult(
+              ScPackageImpl(pack),
+              s,
+              getImports(state),
+              nameShadow,
+              implicitConversionClass,
+              implicitFunction = implFunction,
+              implicitType = implType,
+              fromType = fromType,
+              isAccessible = accessible,
+              isForwardReference = forwardReference,
+              unresolvedTypeParameters = unresolvedTypeParameters))
         case _ =>
           addResult(
-            new ScalaResolveResult(named,
-                                   s,
-                                   getImports(state),
-                                   nameShadow,
-                                   implicitConversionClass,
-                                   implicitFunction = implFunction,
-                                   implicitType = implType,
-                                   isNamedParameter = isNamedParameter,
-                                   fromType = fromType,
-                                   isAccessible = accessible,
-                                   isForwardReference = forwardReference,
-                                   unresolvedTypeParameters =
-                                     unresolvedTypeParameters))
+            new ScalaResolveResult(
+              named,
+              s,
+              getImports(state),
+              nameShadow,
+              implicitConversionClass,
+              implicitFunction = implFunction,
+              implicitType = implType,
+              isNamedParameter = isNamedParameter,
+              fromType = fromType,
+              isAccessible = accessible,
+              isForwardReference = forwardReference,
+              unresolvedTypeParameters = unresolvedTypeParameters))
       }
     }
     true
@@ -236,10 +237,11 @@ class MethodResolveProcessor(
         //tupling ok
         isShapeResolve = false
         val oldArg = argumentClauses
-        val tpl = ScalaPsiUtil.tuplizy(argumentClauses.head,
-                                       ref.getResolveScope,
-                                       ref.getManager,
-                                       ScalaPsiUtil.firstLeaf(ref))
+        val tpl = ScalaPsiUtil.tuplizy(
+          argumentClauses.head,
+          ref.getResolveScope,
+          ref.getManager,
+          ScalaPsiUtil.firstLeaf(ref))
         if (tpl.isEmpty) {
           return MethodResolveProcessor.candidates(this, input)
         }
@@ -347,12 +349,13 @@ object MethodResolveProcessor {
       def processFunctionType(retType: ScType,
                               params: Seq[ScType]): ConformanceExtResult = {
         val args = params.map(new Expression(_))
-        val result = Compatibility.compatible(fun,
-                                              substitutor,
-                                              List(args),
-                                              checkWithImplicits = false,
-                                              scope = ref.getResolveScope,
-                                              isShapesResolve = isShapeResolve)
+        val result = Compatibility.compatible(
+          fun,
+          substitutor,
+          List(args),
+          checkWithImplicits = false,
+          scope = ref.getResolveScope,
+          isShapesResolve = isShapeResolve)
         problems ++= result.problems
         addExpectedTypeProblems(Some(retType))
         result.copy(problems)
@@ -387,12 +390,13 @@ object MethodResolveProcessor {
         constr.getClassTypeParameters.map(_.typeParameters).getOrElse(Seq())
       if (typeArgElements.isEmpty ||
           typeArgElements.length == classTypeParameters.length) {
-        val result = Compatibility.compatible(constr,
-                                              substitutor,
-                                              argumentClauses,
-                                              checkWithImplicits,
-                                              ref.getResolveScope,
-                                              isShapeResolve)
+        val result = Compatibility.compatible(
+          constr,
+          substitutor,
+          argumentClauses,
+          checkWithImplicits,
+          ref.getResolveScope,
+          isShapeResolve)
         problems ++= result.problems
         result.copy(problems)
       } else {
@@ -405,12 +409,13 @@ object MethodResolveProcessor {
       val classTypeParmeters = constr.containingClass.getTypeParameters
       if (typeArgElements.isEmpty ||
           typeArgElements.length == classTypeParmeters.length) {
-        val result = Compatibility.compatible(constr,
-                                              substitutor,
-                                              argumentClauses,
-                                              checkWithImplicits,
-                                              ref.getResolveScope,
-                                              isShapeResolve)
+        val result = Compatibility.compatible(
+          constr,
+          substitutor,
+          argumentClauses,
+          checkWithImplicits,
+          ref.getResolveScope,
+          isShapeResolve)
         problems ++= result.problems
         result.copy(problems)
       } else {
@@ -511,12 +516,13 @@ object MethodResolveProcessor {
           new ConformanceExtResult(problems)
         } else {
           val args = argumentClauses.headOption.toList
-          val result = Compatibility.compatible(tp,
-                                                substitutor,
-                                                args,
-                                                checkWithImplicits,
-                                                ref.getResolveScope,
-                                                isShapeResolve)
+          val result = Compatibility.compatible(
+            tp,
+            substitutor,
+            args,
+            checkWithImplicits,
+            ref.getResolveScope,
+            isShapeResolve)
           problems ++= result.problems
           addExpectedTypeProblems()
           result.copy(problems)
@@ -593,36 +599,42 @@ object MethodResolveProcessor {
     (constructorTypeParameters, element) match {
       case (Some(typeParameterClause), _) =>
         val typeParameters = typeParameterClause.typeParameters
-        s.followed(if (typeArgElements.nonEmpty &&
-                       typeParameters.length == typeArgElements.length) {
-          ScalaPsiUtil.genericCallSubstitutor(
-            typeParameters.map(p => (p.name, ScalaPsiUtil.getPsiElementId(p))),
-            typeArgElements)
-        } else {
-          typeParameters.foldLeft(ScSubstitutor.empty) {
-            (subst: ScSubstitutor, tp: ScTypeParam) =>
-              subst.bindT((tp.name, ScalaPsiUtil.getPsiElementId(tp)),
-                          new ScUndefinedType(
-                            new ScTypeParameterType(tp, ScSubstitutor.empty)))
-          }
-        })
+        s.followed(
+          if (typeArgElements.nonEmpty &&
+              typeParameters.length == typeArgElements.length) {
+            ScalaPsiUtil.genericCallSubstitutor(
+              typeParameters.map(p =>
+                (p.name, ScalaPsiUtil.getPsiElementId(p))),
+              typeArgElements)
+          } else {
+            typeParameters.foldLeft(ScSubstitutor.empty) {
+              (subst: ScSubstitutor, tp: ScTypeParam) =>
+                subst.bindT(
+                  (tp.name, ScalaPsiUtil.getPsiElementId(tp)),
+                  new ScUndefinedType(
+                    new ScTypeParameterType(tp, ScSubstitutor.empty)))
+            }
+          })
       //todo: this case is impossible case for reasons mentioned above
       case (_, method: PsiMethod) if method.isConstructor =>
         // Java constructors
         val typeParameters = method.containingClass.getTypeParameters
-        s.followed(if (typeArgElements.nonEmpty &&
-                       typeParameters.length == typeArgElements.length) {
-          ScalaPsiUtil.genericCallSubstitutor(
-            typeParameters.map(p => (p.name, ScalaPsiUtil.getPsiElementId(p))),
-            typeArgElements)
-        } else {
-          typeParameters.foldLeft(ScSubstitutor.empty) {
-            (subst: ScSubstitutor, tp: PsiTypeParameter) =>
-              subst.bindT((tp.name, ScalaPsiUtil.getPsiElementId(tp)),
-                          new ScUndefinedType(
-                            new ScTypeParameterType(tp, ScSubstitutor.empty)))
-          }
-        })
+        s.followed(
+          if (typeArgElements.nonEmpty &&
+              typeParameters.length == typeArgElements.length) {
+            ScalaPsiUtil.genericCallSubstitutor(
+              typeParameters.map(p =>
+                (p.name, ScalaPsiUtil.getPsiElementId(p))),
+              typeArgElements)
+          } else {
+            typeParameters.foldLeft(ScSubstitutor.empty) {
+              (subst: ScSubstitutor, tp: PsiTypeParameter) =>
+                subst.bindT(
+                  (tp.name, ScalaPsiUtil.getPsiElementId(tp)),
+                  new ScUndefinedType(
+                    new ScTypeParameterType(tp, ScSubstitutor.empty)))
+            }
+          })
       case (None, t: ScTypeParametersOwner) =>
         s.followed(
           if (typeArgElements.nonEmpty &&
@@ -690,8 +702,9 @@ object MethodResolveProcessor {
                               else {
                                 if (clazz1 == clazz2) true
                                 else {
-                                  ScalaPsiUtil.cachedDeepIsInheritor(clazz1,
-                                                                     clazz2)
+                                  ScalaPsiUtil.cachedDeepIsInheritor(
+                                    clazz1,
+                                    clazz2)
                                 }
                               }
                             case _ => true
@@ -734,21 +747,24 @@ object MethodResolveProcessor {
               case Some(rr) =>
                 r.copy(
                   innerResolveResult = Some(
-                    rr.copy(problems = pr.problems,
-                            defaultParameterUsed = pr.defaultParameterUsed)))
+                    rr.copy(
+                      problems = pr.problems,
+                      defaultParameterUsed = pr.defaultParameterUsed)))
               case _ =>
-                r.copy(problems = pr.problems,
-                       defaultParameterUsed = pr.defaultParameterUsed,
-                       resultUndef = Some(pr.undefSubst))
+                r.copy(
+                  problems = pr.problems,
+                  defaultParameterUsed = pr.defaultParameterUsed,
+                  resultUndef = Some(pr.undefSubst))
             }
           }
         }
       } else
         input.map(r => {
           val pr = problemsFor(r, applicationImplicits, proc)
-          r.copy(problems = pr.problems,
-                 defaultParameterUsed = pr.defaultParameterUsed,
-                 resultUndef = Some(pr.undefSubst))
+          r.copy(
+            problems = pr.problems,
+            defaultParameterUsed = pr.defaultParameterUsed,
+            resultUndef = Some(pr.undefSubst))
         })
     }
     var mapped = mapper(applicationImplicits = false)

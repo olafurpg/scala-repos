@@ -101,8 +101,9 @@ trait TestShardService
   val executionContext = ExecutionContext.defaultExecutionContext(actorSystem)
 
   implicit val M: Monad[Future] with Comonad[Future] =
-    new blueeyes.bkka.UnsafeFutureComonad(executionContext,
-                                          Duration(5, "seconds"))
+    new blueeyes.bkka.UnsafeFutureComonad(
+      executionContext,
+      Duration(5, "seconds"))
 
   private val apiKeyManager =
     new InMemoryAPIKeyManager[Future](blueeyes.util.Clock.System)
@@ -133,12 +134,13 @@ trait TestShardService
     .map(_.apiKey)
     .flatMap { expiredAPIKey =>
       apiKeyManager
-        .deriveAndAddGrant(None,
-                           None,
-                           testAPIKey,
-                           testPermissions,
-                           expiredAPIKey,
-                           Some(new DateTime().minusYears(1000)))
+        .deriveAndAddGrant(
+          None,
+          None,
+          testAPIKey,
+          testPermissions,
+          expiredAPIKey,
+          Some(new DateTime().minusYears(1000)))
         .map(_ => expiredAPIKey)
   } copoint
 
@@ -173,8 +175,9 @@ trait TestShardService
       def stubValue(authorities: Authorities)
         : ((Array[Byte], MimeType) \/ Vector[JValue], Authorities) =
         (\/.right(
-           Vector(JObject("foo" -> JString("foov"), "bar" -> JNum(1)),
-                  JObject("foo" -> JString("foov2")))),
+           Vector(
+             JObject("foo" -> JString("foov"), "bar" -> JNum(1)),
+             JObject("foo" -> JString("foov2")))),
          authorities)
 
       val stubData =
@@ -183,19 +186,21 @@ trait TestShardService
         }
 
       val rawVFS = new InMemoryVFS(stubData, clock)
-      val permissionsFinder = new PermissionsFinder(self.apiKeyFinder,
-                                                    accountFinder,
-                                                    clock.instant())
+      val permissionsFinder = new PermissionsFinder(
+        self.apiKeyFinder,
+        accountFinder,
+        clock.instant())
       val vfs = new SecureVFS(rawVFS, permissionsFinder, jobManager, clock)
     }
 
-    ShardState(platform,
-               self.apiKeyFinder,
-               self.accountFinder,
-               scheduler,
-               jobManager,
-               clock,
-               Stoppable.Noop)
+    ShardState(
+      platform,
+      self.apiKeyFinder,
+      self.accountFinder,
+      scheduler,
+      jobManager,
+      clock,
+      Stoppable.Noop)
   }
 
   val utf8 = Charset.forName("UTF-8")
@@ -614,9 +619,10 @@ trait TestPlatform extends ManagedPlatform { self =>
         if (query == "bad query") {
           val mu =
             shardQueryMonad.jobId traverse { jobId =>
-              jobManager.addMessage(jobId,
-                                    JobManager.channels.Error,
-                                    JString("ERROR!"))
+              jobManager.addMessage(
+                jobId,
+                JobManager.channels.Error,
+                JString("ERROR!"))
             }
 
           EitherT[JobQueryTF, EvaluationError, StreamT[JobQueryTF, Slice]] {

@@ -66,8 +66,9 @@ private[ml] trait ValidatorParams extends Params {
   def getEvaluator: Evaluator = $(evaluator)
 
   protected def transformSchemaImpl(schema: StructType): StructType = {
-    require($(estimatorParamMaps).nonEmpty,
-            s"Validator requires non-empty estimatorParamMaps")
+    require(
+      $(estimatorParamMaps).nonEmpty,
+      s"Validator requires non-empty estimatorParamMaps")
     val firstEstimatorParamMap = $(estimatorParamMaps).head
     val est = $(estimator)
     for (paramMap <- $(estimatorParamMaps).tail) {

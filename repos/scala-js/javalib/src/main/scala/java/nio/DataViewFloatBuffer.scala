@@ -106,11 +106,12 @@ private[nio] object DataViewFloatBuffer {
               initialLimit: Int,
               readOnly: Boolean,
               isBigEndian: Boolean): FloatBuffer = {
-      new DataViewFloatBuffer(dataView,
-                              initialPosition,
-                              initialLimit,
-                              readOnly,
-                              isBigEndian)
+      new DataViewFloatBuffer(
+        dataView,
+        initialPosition,
+        initialLimit,
+        readOnly,
+        isBigEndian)
     }
   }
 

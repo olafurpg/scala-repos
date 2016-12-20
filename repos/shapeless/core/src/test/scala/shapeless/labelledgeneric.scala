@@ -35,19 +35,22 @@ object LabelledGenericTestsAux {
                           inPrint: Boolean)
   case class BookWithMultipleAuthors(title: String, id: Int, authors: String*)
 
-  val tapl = Book("Benjamin Pierce",
-                  "Types and Programming Languages",
-                  262162091,
-                  44.11)
-  val tapl2 = Book("Benjamin Pierce",
-                   "Types and Programming Languages (2nd Ed.)",
-                   262162091,
-                   46.11)
-  val taplExt = ExtendedBook("Benjamin Pierce",
-                             "Types and Programming Languages",
-                             262162091,
-                             44.11,
-                             true)
+  val tapl = Book(
+    "Benjamin Pierce",
+    "Types and Programming Languages",
+    262162091,
+    44.11)
+  val tapl2 = Book(
+    "Benjamin Pierce",
+    "Types and Programming Languages (2nd Ed.)",
+    262162091,
+    46.11)
+  val taplExt = ExtendedBook(
+    "Benjamin Pierce",
+    "Types and Programming Languages",
+    262162091,
+    44.11,
+    true)
   val dp = BookWithMultipleAuthors(
     "Design Patterns",
     201633612,
@@ -64,10 +67,11 @@ object LabelledGenericTestsAux {
 
   val dpRecord =
     ('title ->> "Design Patterns") :: ('id ->> 201633612) ::
-      ('authors ->> Seq("Erich Gamma",
-                        "Richard Helm",
-                        "Ralph Johnson",
-                        "John Vlissides")) :: HNil
+      ('authors ->> Seq(
+        "Erich Gamma",
+        "Richard Helm",
+        "Ralph Johnson",
+        "John Vlissides")) :: HNil
 
   type BookRec =
     Record.`'author -> String, 'title -> String, 'id -> Int, 'price -> Double`.T
@@ -194,10 +198,11 @@ class LabelledGenericTests {
 
     val values = b0.values
     assertEquals(
-      "Design Patterns" :: 201633612 :: Seq("Erich Gamma",
-                                            "Richard Helm",
-                                            "Ralph Johnson",
-                                            "John Vlissides") :: HNil,
+      "Design Patterns" :: 201633612 :: Seq(
+        "Erich Gamma",
+        "Richard Helm",
+        "Ralph Johnson",
+        "John Vlissides") :: HNil,
       values
     )
   }

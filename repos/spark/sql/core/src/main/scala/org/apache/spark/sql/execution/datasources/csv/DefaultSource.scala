@@ -114,12 +114,13 @@ class DefaultSource extends FileFormat with DataSourceRegister {
     val pathsString = csvFiles.map(_.getPath.toUri.toString)
     val header = dataSchema.fields.map(_.name)
     val tokenizedRdd = tokenRdd(sqlContext, csvOptions, header, pathsString)
-    val rows = CSVRelation.parseCsv(tokenizedRdd,
-                                    dataSchema,
-                                    requiredColumns,
-                                    csvFiles,
-                                    sqlContext,
-                                    csvOptions)
+    val rows = CSVRelation.parseCsv(
+      tokenizedRdd,
+      dataSchema,
+      requiredColumns,
+      csvFiles,
+      sqlContext,
+      csvOptions)
 
     val requiredDataSchema = StructType(
       requiredColumns.map(c => dataSchema.find(_.name == c).get))

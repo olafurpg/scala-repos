@@ -100,8 +100,9 @@ object Form extends DispatchSnippet {
 
     val ajax: String =
       pre + SHtml
-        .makeAjaxCall(LiftRules.jsArtifacts.serialize(id),
-                      AjaxContext.js(post))
+        .makeAjaxCall(
+          LiftRules.jsArtifacts.serialize(id),
+          AjaxContext.js(post))
         .toJsCmd + ";" + "return false;"
 
     new UnprefixedAttribute(

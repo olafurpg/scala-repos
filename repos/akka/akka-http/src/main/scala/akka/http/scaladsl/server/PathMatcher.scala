@@ -433,9 +433,10 @@ trait PathMatchers {
           if (a == minusOne) {
             if (value == minusOne) Unmatched
             else
-              Matched(if (ix < segment.length) segment.substring(ix) :: tail
-                      else tail,
-                      Tuple1(value))
+              Matched(
+                if (ix < segment.length) segment.substring(ix) :: tail
+                else tail,
+                Tuple1(value))
           } else {
             if (value == minusOne) digits(ix + 1, a)
             else if (value <= maxDivBase &&

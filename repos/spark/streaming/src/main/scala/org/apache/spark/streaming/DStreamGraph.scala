@@ -172,8 +172,9 @@ final private[streaming] class DStreamGraph extends Serializable with Logging {
       require(batchDuration != null, "Batch duration has not been set")
       // assert(batchDuration >= Milliseconds(100), "Batch duration of " + batchDuration +
       // " is very low")
-      require(getOutputStreams().nonEmpty,
-              "No output operations registered, so nothing to execute")
+      require(
+        getOutputStreams().nonEmpty,
+        "No output operations registered, so nothing to execute")
     }
   }
 

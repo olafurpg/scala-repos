@@ -171,10 +171,11 @@ object ThriftMux
       params[Thrift.param.ClientId]
 
     private[this] object ThriftMuxToMux
-        extends Filter[ThriftClientRequest,
-                       Array[Byte],
-                       mux.Request,
-                       mux.Response] {
+        extends Filter[
+          ThriftClientRequest,
+          Array[Byte],
+          mux.Request,
+          mux.Response] {
       def apply(
           req: ThriftClientRequest,
           service: Service[mux.Request, mux.Response]): Future[Array[Byte]] = {
@@ -406,8 +407,9 @@ object ThriftMux
     }
 
     private[ThriftMux] val ExnHandler =
-      new Stack.Module1[Thrift.param.ProtocolFactory,
-                        ServiceFactory[mux.Request, mux.Response]] {
+      new Stack.Module1[
+        Thrift.param.ProtocolFactory,
+        ServiceFactory[mux.Request, mux.Response]] {
         val role = Stack.Role("appExceptionHandling")
         val description =
           "Translates uncaught application exceptions into Thrift messages"

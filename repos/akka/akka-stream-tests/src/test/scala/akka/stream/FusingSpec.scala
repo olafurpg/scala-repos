@@ -69,9 +69,10 @@ class FusingSpec extends AkkaSpec {
       module.info.downstreams.size should be >= downstreams
       module.info.upstreams.size should be >= downstreams
       singlePath(fused, Attributes.Name("mainSink"), Attributes.Name("unfold"))
-      singlePath(fused,
-                 Attributes.Name("otherSink"),
-                 Attributes.Name("unfold"))
+      singlePath(
+        fused,
+        Attributes.Name("otherSink"),
+        Attributes.Name("unfold"))
     }
 
     "fuse a moderately complex graph" in {

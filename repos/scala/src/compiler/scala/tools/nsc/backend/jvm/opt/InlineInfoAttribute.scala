@@ -144,10 +144,11 @@ case class InlineInfoAttribute(inlineInfo: InlineInfo)
           val isInline = (inlineInfo & 4) != 0
           val isNoInline = (inlineInfo & 8) != 0
           (name + desc,
-           MethodInlineInfo(isFinal,
-                            traitMethodWithStaticImplementation,
-                            isInline,
-                            isNoInline))
+           MethodInlineInfo(
+             isFinal,
+             traitMethodWithStaticImplementation,
+             isInline,
+             isNoInline))
         })
         .toMap
 

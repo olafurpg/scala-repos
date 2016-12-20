@@ -32,8 +32,9 @@ class FinallyFilter extends ElementFilter {
             .getChildren(null)
             .exists(_.getElementType == ScalaElementTypes.FINALLY_BLOCK))
         return false
-      i = getNextNotWhitespaceAndComment(context.getTextRange.getEndOffset,
-                                         context)
+      i = getNextNotWhitespaceAndComment(
+        context.getTextRange.getEndOffset,
+        context)
       if (Array("catch", "finally").contains(
             getLeafByOffset(i, context).getText)) return false
       return true
@@ -73,8 +74,9 @@ class FinallyFilter extends ElementFilter {
            context.getContainingFile.getText.charAt(i) == '\n')) i = i + 1
     val leaf = getLeafByOffset(i, context)
     if (leaf.isInstanceOf[PsiComment] || leaf.isInstanceOf[ScDocComment])
-      return getNextNotWhitespaceAndComment(leaf.getTextRange.getEndOffset,
-                                            context)
+      return getNextNotWhitespaceAndComment(
+        leaf.getTextRange.getEndOffset,
+        context)
     i
   }
 }

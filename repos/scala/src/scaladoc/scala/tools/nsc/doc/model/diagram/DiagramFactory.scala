@@ -68,8 +68,9 @@ trait DiagramFactory extends DiagramDirectiveParser {
         lazy val incomingImplicitNodes =
           tpl.incomingImplicitlyConvertedClasses.map {
             case (incomingTpl, conv) =>
-              ImplicitNode(makeType(incomingTpl.sym.tpe, tpl),
-                           Some(incomingTpl))(
+              ImplicitNode(
+                makeType(incomingTpl.sym.tpe, tpl),
+                Some(incomingTpl))(
                 implicitTooltip(from = incomingTpl, to = tpl, conv = conv))
           }
 
@@ -110,12 +111,14 @@ trait DiagramFactory extends DiagramDirectiveParser {
           else outgoingImplicitNodes
 
         // final diagram filter
-        filterDiagram(InheritanceDiagram(thisNode,
-                                         filteredSuperclasses.reverse,
-                                         filteredSubclasses.reverse,
-                                         filteredIncomingImplicits,
-                                         filteredImplicitOutgoingNodes),
-                      diagramFilter)
+        filterDiagram(
+          InheritanceDiagram(
+            thisNode,
+            filteredSuperclasses.reverse,
+            filteredSubclasses.reverse,
+            filteredIncomingImplicits,
+            filteredImplicitOutgoingNodes),
+          diagramFilter)
       }
 
     tModel += System.currentTimeMillis
@@ -217,10 +220,10 @@ trait DiagramFactory extends DiagramDirectiveParser {
               val allAnyRefTypes = aggregationNode("All AnyRef subtypes")
               val nullTemplate = makeTemplate(NullClass)
               if (nullTemplate.isDocTemplate)
-                ContentDiagram(allAnyRefTypes :: nodes,
-                               (mapNodes(nullTemplate),
-                                allAnyRefTypes :: anyRefSubtypes) :: edges
-                                 .filterNot(_._1.tpl == Some(nullTemplate)))
+                ContentDiagram(
+                  allAnyRefTypes :: nodes,
+                  (mapNodes(nullTemplate), allAnyRefTypes :: anyRefSubtypes) :: edges
+                    .filterNot(_._1.tpl == Some(nullTemplate)))
               else ContentDiagram(nodes, edges)
             } else ContentDiagram(nodes, edges)
 
@@ -250,11 +253,12 @@ trait DiagramFactory extends DiagramDirectiveParser {
               if diagramFilter.hideNode(thisNode) =>
             None
 
-          case InheritanceDiagram(thisNode,
-                                  superClasses,
-                                  subClasses,
-                                  incomingImplicits,
-                                  outgoingImplicits) =>
+          case InheritanceDiagram(
+              thisNode,
+              superClasses,
+              subClasses,
+              incomingImplicits,
+              outgoingImplicits) =>
             def hideIncoming(node: Node): Boolean =
               diagramFilter.hideNode(node) ||
                 diagramFilter.hideEdge(node, thisNode)
@@ -267,11 +271,12 @@ trait DiagramFactory extends DiagramDirectiveParser {
             // println(superClasses.map(cl => "super: " + cl + "  " + hideOutgoing(cl)).mkString("\n"))
             // println(subClasses.map(cl => "sub: " + cl + "  " + hideIncoming(cl)).mkString("\n"))
             Some(
-              InheritanceDiagram(thisNode,
-                                 superClasses.filterNot(hideOutgoing(_)),
-                                 subClasses.filterNot(hideIncoming(_)),
-                                 incomingImplicits.filterNot(hideIncoming(_)),
-                                 outgoingImplicits.filterNot(hideOutgoing(_))))
+              InheritanceDiagram(
+                thisNode,
+                superClasses.filterNot(hideOutgoing(_)),
+                subClasses.filterNot(hideIncoming(_)),
+                incomingImplicits.filterNot(hideIncoming(_)),
+                outgoingImplicits.filterNot(hideOutgoing(_))))
 
           case ContentDiagram(nodes0, edges0) =>
             // Filter out all edges that:

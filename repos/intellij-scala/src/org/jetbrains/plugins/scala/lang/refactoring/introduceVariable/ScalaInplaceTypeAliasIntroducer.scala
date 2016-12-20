@@ -25,11 +25,12 @@ object ScalaInplaceTypeAliasIntroducer {
     editor
       .getUserData(IntroduceTypeAlias.REVERT_TYPE_ALIAS_INFO)
       .addScopeElement(scopeItem)
-    new ScalaInplaceTypeAliasIntroducer(scNamedElement,
-                                        substituted,
-                                        editor,
-                                        initialName,
-                                        oldName)
+    new ScalaInplaceTypeAliasIntroducer(
+      scNamedElement,
+      substituted,
+      editor,
+      initialName,
+      oldName)
   }
 
   def revertState(myEditor: Editor,
@@ -43,9 +44,8 @@ object ScalaInplaceTypeAliasIntroducer {
         val document = myEditor.getDocument
         if (revertInfo != null) {
           extensions.inWriteAction {
-            document.replaceString(0,
-                                   document.getTextLength,
-                                   revertInfo.fileText)
+            document
+              .replaceString(0, document.getTextLength, revertInfo.fileText)
             PsiDocumentManager.getInstance(myProject).commitDocument(document)
           }
           val offset = revertInfo.caretOffset
@@ -68,11 +68,12 @@ class ScalaInplaceTypeAliasIntroducer(scNamedElement: ScNamedElement,
                                       editor: Editor,
                                       initialName: String,
                                       oldName: String)
-    extends ScalaMemberInplaceRenamer(scNamedElement,
-                                      substituted,
-                                      editor,
-                                      initialName,
-                                      oldName) {
+    extends ScalaMemberInplaceRenamer(
+      scNamedElement,
+      substituted,
+      editor,
+      initialName,
+      oldName) {
 
   override def setAdvertisementText(text: String) = {
     myAdvertisementText = "Press ctrl + alt + v" +

@@ -201,8 +201,9 @@ class GenericTests {
 
     val e0 = star(e)
     typed[Employee](e0)
-    assertEquals(Employee(Person("Joe Soap*", "Brighton*", 23), Salary(2000)),
-                 e0)
+    assertEquals(
+      Employee(Person("Joe Soap*", "Brighton*", 23), Salary(2000)),
+      e0)
   }
 
   @Test

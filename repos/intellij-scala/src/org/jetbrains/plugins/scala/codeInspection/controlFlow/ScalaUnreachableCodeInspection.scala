@@ -96,15 +96,16 @@ class ScalaUnreachableCodeInspection
           new UnwrapDoStmtFix(doStmt)
         case _ => new RemoveFragmentQuickFix(fragment)
       }
-      new ProblemDescriptorImpl(fragment.head,
-                                fragment.last,
-                                message,
-                                Array(fix),
-                                ProblemHighlightType.LIKE_UNUSED_SYMBOL,
-                                false,
-                                null,
-                                null,
-                                false)
+      new ProblemDescriptorImpl(
+        fragment.head,
+        fragment.last,
+        message,
+        Array(fix),
+        ProblemHighlightType.LIKE_UNUSED_SYMBOL,
+        false,
+        null,
+        null,
+        false)
     }
 
     holder.registerProblem(descriptor)
@@ -112,9 +113,10 @@ class ScalaUnreachableCodeInspection
 }
 
 class RemoveFragmentQuickFix(fragment: Seq[PsiElement])
-    extends AbstractFixOnPsiElement("Remove unreachable code",
-                                    fragment.head,
-                                    fragment.last) {
+    extends AbstractFixOnPsiElement(
+      "Remove unreachable code",
+      fragment.head,
+      fragment.last) {
   override def doApplyFix(project: Project): Unit = {
     val startElement: PsiElement = getStartElement
     if (startElement == null) return

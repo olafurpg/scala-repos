@@ -12,9 +12,10 @@ private final class GooglePush(getDevice: String => Fu[Option[Device]],
     getDevice(userId) flatMap {
       _ ?? { device =>
         WS.url(url)
-          .withHeaders("Authorization" -> s"key=$key",
-                       "Accept" -> "application/json",
-                       "Content-type" -> "application/json")
+          .withHeaders(
+            "Authorization" -> s"key=$key",
+            "Accept" -> "application/json",
+            "Content-type" -> "application/json")
           .post(
             Json.obj(
               "to" -> device.deviceId,

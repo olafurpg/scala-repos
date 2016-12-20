@@ -35,11 +35,13 @@ trait MarshallingDirectives {
           reject(ValidationRejection(x.getMessage.nullAsEmpty, Some(x)))
         case Failure(x) ⇒
           reject(
-            MalformedRequestContentRejection(x.getMessage.nullAsEmpty,
-                                             Option(x.getCause)))
+            MalformedRequestContentRejection(
+              x.getMessage.nullAsEmpty,
+              Option(x.getCause)))
       }
-    } & cancelRejections(RequestEntityExpectedRejection.getClass,
-                         classOf[UnsupportedRequestContentTypeRejection])
+    } & cancelRejections(
+      RequestEntityExpectedRejection.getClass,
+      classOf[UnsupportedRequestContentTypeRejection])
 
   /**
     * Returns the in-scope [[FromRequestUnmarshaller]] for the given type.

@@ -74,8 +74,9 @@ class ShoppingCartSpec
         shoppingCart ! ShoppingCart.GetCart
         val cart = expectMsgType[Cart]
         cart.items should be(
-          Set(LineItem("1", "Apples", quantity = 2),
-              LineItem("2", "Oranges", quantity = 3)))
+          Set(
+            LineItem("1", "Apples", quantity = 2),
+            LineItem("2", "Oranges", quantity = 3)))
       }
 
       enterBarrier("after-2")
@@ -97,8 +98,9 @@ class ShoppingCartSpec
         shoppingCart ! ShoppingCart.GetCart
         val cart = expectMsgType[Cart]
         cart.items should be(
-          Set(LineItem("1", "Apples", quantity = 7),
-              LineItem("3", "Bananas", quantity = 4)))
+          Set(
+            LineItem("1", "Apples", quantity = 7),
+            LineItem("3", "Bananas", quantity = 4)))
       }
 
       enterBarrier("after-3")

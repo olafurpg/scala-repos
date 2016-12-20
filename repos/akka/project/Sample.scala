@@ -56,8 +56,9 @@ object Sample {
                ResolvedClasspathDependency(_, None)))
           case (project, deps) => (project, deps)
         }
-        BuildDependencies(classpathWithProjectDependencies,
-                          dependencies.aggregate)
+        BuildDependencies(
+          classpathWithProjectDependencies,
+          dependencies.aggregate)
       }
   )
 
@@ -91,12 +92,13 @@ object Sample {
 
   private implicit class RichLoadedDefinitions(ld: LoadedDefinitions) {
     def copy(projects: Seq[Project]) =
-      new LoadedDefinitions(ld.base,
-                            ld.target,
-                            ld.loader,
-                            ld.builds,
-                            projects,
-                            ld.buildNames)
+      new LoadedDefinitions(
+        ld.base,
+        ld.target,
+        ld.loader,
+        ld.builds,
+        projects,
+        ld.buildNames)
   }
 
   private implicit class RichBuildUnit(bu: BuildUnit) {

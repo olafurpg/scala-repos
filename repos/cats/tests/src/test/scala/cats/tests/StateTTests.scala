@@ -125,10 +125,12 @@ class StateTTests extends CatsSuite {
 
   {
     implicit val iso = CartesianTests.Isomorphisms.invariant[State[Long, ?]]
-    checkAll("State[Long, ?]",
-             MonadStateTests[State[Long, ?], Long].monadState[Int, Int, Int])
-    checkAll("MonadState[State[Long, ?], Long]",
-             SerializableTests.serializable(MonadState[State[Long, ?], Long]))
+    checkAll(
+      "State[Long, ?]",
+      MonadStateTests[State[Long, ?], Long].monadState[Int, Int, Int])
+    checkAll(
+      "MonadState[State[Long, ?], Long]",
+      SerializableTests.serializable(MonadState[State[Long, ?], Long]))
   }
 }
 

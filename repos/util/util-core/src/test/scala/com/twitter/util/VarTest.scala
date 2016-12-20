@@ -116,8 +116,9 @@ class VarTest extends FunSuite with GeneratorDrivenPropertyChecks {
 
     Var.sample(s); Var.sample(s)
     assert(us.forall(_.accessCount == 3))
-    assert(us.forall(_.observerCount == 0),
-           us.map(_.observerCount.toString).mkString(","))
+    assert(
+      us.forall(_.observerCount == 0),
+      us.map(_.observerCount.toString).mkString(","))
 
     // Now maintain a subscription.
     var cur = Var.sample(s)

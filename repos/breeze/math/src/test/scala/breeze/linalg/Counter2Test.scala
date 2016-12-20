@@ -33,9 +33,10 @@ class Counter2Test extends FunSuite with Checkers {
   test("Slice rows and columns") {
 //    val x = Counter2[String,Int,Double]()
 //    x(("a",1),("b",2),("c",2)) := List(3.0,7.75,8.0)
-    val x = Counter2[String, Int, Double](("a", 1, 3.0),
-                                          ("b", 2, 7.75),
-                                          ("c", 2, 8.0))
+    val x = Counter2[String, Int, Double](
+      ("a", 1, 3.0),
+      ("b", 2, 7.75),
+      ("c", 2, 8.0))
 
     // require expected static type
     val s1: Counter[Int, Double] = x("a", ::)
@@ -84,8 +85,9 @@ class Counter2Test extends FunSuite with Checkers {
         Counter2(("a", "a", 3)) === Counter2(("a", "a", -2), ("b", "b", 2)))
     assert(
       Counter2(("a", "a", 3)) -
-        Counter2(("a", "a", 1), ("b", "b", 2)) === Counter2(("a", "a", 2),
-                                                            ("b", "b", -2)))
+        Counter2(("a", "a", 1), ("b", "b", 2)) === Counter2(
+        ("a", "a", 2),
+        ("b", "b", -2)))
   }
 
   test("Multiplication") {
@@ -125,11 +127,13 @@ class Counter2Test extends FunSuite with Checkers {
 
   test("sum") {
     assert(
-      sum(Counter2((1, 'a, 1.0), (1, 'b, 3.0), (2, 'a, 2.0), (2, 'b, 4.0)),
-          Axis._0) === Counter('a -> 3.0, 'b -> 7.0))
+      sum(
+        Counter2((1, 'a, 1.0), (1, 'b, 3.0), (2, 'a, 2.0), (2, 'b, 4.0)),
+        Axis._0) === Counter('a -> 3.0, 'b -> 7.0))
     assert(
-      sum(Counter2((1, 'a, 1.0), (1, 'b, 3.0), (2, 'a, 2.0), (2, 'b, 4.0)),
-          Axis._1) === Counter(1 -> 4.0, 2 -> 6.0))
+      sum(
+        Counter2((1, 'a, 1.0), (1, 'b, 3.0), (2, 'a, 2.0), (2, 'b, 4.0)),
+        Axis._1) === Counter(1 -> 4.0, 2 -> 6.0))
   }
 
   test("normalize Rows and columns") {
@@ -137,18 +141,20 @@ class Counter2Test extends FunSuite with Checkers {
       normalize(
         Counter2((1, 'a, 1.0), (1, 'b, 3.0), (2, 'a, 2.0), (2, 'b, 4.0)),
         Axis._0,
-        1) === Counter2((1, 'a, 1.0 / 3.0),
-                        (1, 'b, 3.0 / 7.0),
-                        (2, 'a, 2.0 / 3.0),
-                        (2, 'b, 4.0 / 7.0)))
+        1) === Counter2(
+        (1, 'a, 1.0 / 3.0),
+        (1, 'b, 3.0 / 7.0),
+        (2, 'a, 2.0 / 3.0),
+        (2, 'b, 4.0 / 7.0)))
     assert(
       normalize(
         Counter2((1, 'a, 1.0), (1, 'b, 3.0), (2, 'a, 2.0), (2, 'b, 4.0)),
         Axis._1,
-        1) === Counter2((1, 'a, 1.0 / 4.0),
-                        (1, 'b, 3.0 / 4.0),
-                        (2, 'a, 2.0 / 6.0),
-                        (2, 'b, 4.0 / 6.0)))
+        1) === Counter2(
+        (1, 'a, 1.0 / 4.0),
+        (1, 'b, 3.0 / 4.0),
+        (2, 'a, 2.0 / 6.0),
+        (2, 'b, 4.0 / 6.0)))
   }
 
   test("ufuncs") {

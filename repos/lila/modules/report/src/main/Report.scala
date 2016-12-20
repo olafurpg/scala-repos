@@ -43,13 +43,14 @@ object Report {
   case class WithUser(report: Report, user: User)
 
   def make(user: User, reason: Reason, text: String, createdBy: User): Report =
-    new Report(id = Random nextStringUppercase 8,
-               user = user.id,
-               reason = reason.name,
-               text = text,
-               processedBy = none,
-               createdAt = DateTime.now,
-               createdBy = createdBy.id)
+    new Report(
+      id = Random nextStringUppercase 8,
+      user = user.id,
+      reason = reason.name,
+      text = text,
+      processedBy = none,
+      createdAt = DateTime.now,
+      createdBy = createdBy.id)
 
   import lila.db.JsTube, JsTube.Helpers._
   import play.api.libs.json._

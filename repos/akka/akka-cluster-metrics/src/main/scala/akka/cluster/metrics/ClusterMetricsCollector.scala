@@ -263,12 +263,14 @@ private[metrics] class ClusterMetricsCollector
     selectRandomNode((nodes - selfAddress).toVector) foreach gossipTo
 
   def gossipTo(address: Address): Unit =
-    sendGossip(address,
-               MetricsGossipEnvelope(selfAddress, latestGossip, reply = false))
+    sendGossip(
+      address,
+      MetricsGossipEnvelope(selfAddress, latestGossip, reply = false))
 
   def replyGossipTo(address: Address): Unit =
-    sendGossip(address,
-               MetricsGossipEnvelope(selfAddress, latestGossip, reply = true))
+    sendGossip(
+      address,
+      MetricsGossipEnvelope(selfAddress, latestGossip, reply = true))
 
   def sendGossip(address: Address, envelope: MetricsGossipEnvelope): Unit =
     context.actorSelection(self.path.toStringWithAddress(address)) ! envelope

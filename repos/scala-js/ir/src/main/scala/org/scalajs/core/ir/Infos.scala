@@ -32,12 +32,13 @@ object Infos {
               superClass: Option[String] = None,
               interfaces: List[String] = Nil,
               methods: List[MethodInfo] = Nil): ClassInfo = {
-      new ClassInfo(encodedName,
-                    isExported,
-                    kind,
-                    superClass,
-                    interfaces,
-                    methods)
+      new ClassInfo(
+        encodedName,
+        isExported,
+        kind,
+        superClass,
+        interfaces,
+        methods)
     }
   }
 
@@ -70,17 +71,18 @@ object Infos {
               accessedModules: List[String] = Nil,
               usedInstanceTests: List[String] = Nil,
               accessedClassData: List[String] = Nil): MethodInfo = {
-      new MethodInfo(encodedName,
-                     isStatic,
-                     isAbstract,
-                     isExported,
-                     methodsCalled,
-                     methodsCalledStatically,
-                     staticMethodsCalled,
-                     instantiatedClasses,
-                     accessedModules,
-                     usedInstanceTests,
-                     accessedClassData)
+      new MethodInfo(
+        encodedName,
+        isStatic,
+        isAbstract,
+        isExported,
+        methodsCalled,
+        methodsCalledStatically,
+        staticMethodsCalled,
+        instantiatedClasses,
+        accessedModules,
+        usedInstanceTests,
+        accessedClassData)
     }
   }
 
@@ -128,12 +130,13 @@ object Infos {
     }
 
     def result(): ClassInfo = {
-      ClassInfo(encodedName,
-                isExported,
-                kind,
-                superClass,
-                interfaces.toList,
-                methods.toList)
+      ClassInfo(
+        encodedName,
+        isExported,
+        kind,
+        superClass,
+        interfaces.toList,
+        methods.toList)
     }
   }
 

@@ -30,19 +30,22 @@ class MapKeysTest extends OperationsOnCollectionInspectionTest {
   }
 
   def test3(): Unit = {
-    checkTextHasError(s"Map(1 -> 2).${START}map(_._1).toSet$END",
-                      setHint,
-                      inspectionClass)
+    checkTextHasError(
+      s"Map(1 -> 2).${START}map(_._1).toSet$END",
+      setHint,
+      inspectionClass)
     testFix("Map(1 -> 2).map(_._1).toSet", "Map(1 -> 2).keySet", setHint)
   }
 
   def test4(): Unit = {
-    checkTextHasError(s"Map(1 -> 2).${START}map(_._1).toIterator$END",
-                      iteratorHint,
-                      inspectionClass)
-    testFix("Map(1 -> 2).map(_._1).toIterator",
-            "Map(1 -> 2).keysIterator",
-            iteratorHint)
+    checkTextHasError(
+      s"Map(1 -> 2).${START}map(_._1).toIterator$END",
+      iteratorHint,
+      inspectionClass)
+    testFix(
+      "Map(1 -> 2).map(_._1).toIterator",
+      "Map(1 -> 2).keysIterator",
+      iteratorHint)
   }
 
   def test5(): Unit = {
@@ -74,12 +77,14 @@ class MapValuesTest extends OperationsOnCollectionInspectionTest {
   }
 
   def test3(): Unit = {
-    checkTextHasError(s"Map(1 -> 2).${START}map(_._2).toIterator$END",
-                      iteratorHint,
-                      inspectionClass)
-    testFix("Map(1 -> 2).map(_._2).toIterator",
-            "Map(1 -> 2).valuesIterator",
-            iteratorHint)
+    checkTextHasError(
+      s"Map(1 -> 2).${START}map(_._2).toIterator$END",
+      iteratorHint,
+      inspectionClass)
+    testFix(
+      "Map(1 -> 2).map(_._2).toIterator",
+      "Map(1 -> 2).valuesIterator",
+      iteratorHint)
   }
 
   def test4(): Unit = {

@@ -171,9 +171,10 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration)
     if (total == 0) JsNull
     else if (userIds.size >= maxSpectatorUsers) Json.obj("nb" -> total)
     else
-      Json.obj("nb" -> total,
-               "users" -> userIds.flatMap { lightUser(_) }.map(_.titleName),
-               "anons" -> anons)
+      Json.obj(
+        "nb" -> total,
+        "users" -> userIds.flatMap { lightUser(_) }.map(_.titleName),
+        "anons" -> anons)
   }
 
   def withMember(uid: String)(f: M => Unit) {

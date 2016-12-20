@@ -28,8 +28,9 @@ object BundleDelegatingClassLoader {
   def apply(
       context: BundleContext,
       fallBackCLassLoader: Option[ClassLoader]): BundleDelegatingClassLoader =
-    new BundleDelegatingClassLoader(context.getBundle,
-                                    fallBackCLassLoader.orNull)
+    new BundleDelegatingClassLoader(
+      context.getBundle,
+      fallBackCLassLoader.orNull)
 }
 
 /*

@@ -94,9 +94,10 @@ abstract class UnaryLogExpression(f: Double => Double, name: String)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx,
-                    ev,
-                    c => s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      c => s"""
         if ($c <= $yAsymptote) {
           ${ev.isNull} = true;
         } else {
@@ -131,9 +132,10 @@ abstract class BinaryMathExpression(f: (Double, Double) => Double,
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    defineCodeGen(ctx,
-                  ev,
-                  (c1, c2) => s"java.lang.Math.${name.toLowerCase}($c1, $c2)")
+    defineCodeGen(
+      ctx,
+      ev,
+      (c1, c2) => s"java.lang.Math.${name.toLowerCase}($c1, $c2)")
   }
 }
 
@@ -227,16 +229,18 @@ case class Conv(numExpr: Expression,
   override def nullable: Boolean = true
 
   override def nullSafeEval(num: Any, fromBase: Any, toBase: Any): Any = {
-    NumberConverter.convert(num.asInstanceOf[UTF8String].getBytes,
-                            fromBase.asInstanceOf[Int],
-                            toBase.asInstanceOf[Int])
+    NumberConverter.convert(
+      num.asInstanceOf[UTF8String].getBytes,
+      fromBase.asInstanceOf[Int],
+      toBase.asInstanceOf[Int])
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
     val numconv = NumberConverter.getClass.getName.stripSuffix("$")
-    nullSafeCodeGen(ctx,
-                    ev,
-                    (num, from, to) => s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      (num, from, to) => s"""
        ${ev.value} = $numconv.convert($num.getBytes(), $from, $to);
        if (${ev.value} == null) {
          ${ev.isNull} = true;
@@ -347,12 +351,14 @@ case class Factorial(child: Expression)
 case class Log(child: Expression) extends UnaryLogExpression(math.log, "LOG")
 
 case class Log2(child: Expression)
-    extends UnaryLogExpression((x: Double) => math.log(x) / math.log(2),
-                               "LOG2") {
+    extends UnaryLogExpression(
+      (x: Double) => math.log(x) / math.log(2),
+      "LOG2") {
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx,
-                    ev,
-                    c => s"""
+    nullSafeCodeGen(
+      ctx,
+      ev,
+      c => s"""
         if ($c <= $yAsymptote) {
           ${ev.isNull} = true;
         } else {
@@ -577,14 +583,16 @@ case class Atan2(left: Expression, right: Expression)
 
   protected override def nullSafeEval(input1: Any, input2: Any): Any = {
     // With codegen, the values returned by -0.0 and 0.0 are different. Handled with +0.0
-    math.atan2(input1.asInstanceOf[Double] + 0.0,
-               input2.asInstanceOf[Double] + 0.0)
+    math.atan2(
+      input1.asInstanceOf[Double] + 0.0,
+      input2.asInstanceOf[Double] + 0.0)
   }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    defineCodeGen(ctx,
-                  ev,
-                  (c1, c2) => s"java.lang.Math.atan2($c1 + 0.0, $c2 + 0.0)")
+    defineCodeGen(
+      ctx,
+      ev,
+      (c1, c2) => s"java.lang.Math.atan2($c1 + 0.0, $c2 + 0.0)")
   }
 }
 
@@ -682,8 +690,9 @@ case class Hypot(left: Expression, right: Expression)
   * @param right the number to compute the logarithm of.
   */
 case class Logarithm(left: Expression, right: Expression)
-    extends BinaryMathExpression((c1, c2) => math.log(c2) / math.log(c1),
-                                 "LOG") {
+    extends BinaryMathExpression(
+      (c1, c2) => math.log(c2) / math.log(c1),
+      "LOG") {
 
   /**
     * Natural log, i.e. using e as the base.
@@ -704,9 +713,10 @@ case class Logarithm(left: Expression, right: Expression)
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
     if (left.isInstanceOf[EulerNumber]) {
-      nullSafeCodeGen(ctx,
-                      ev,
-                      (c1, c2) => s"""
+      nullSafeCodeGen(
+        ctx,
+        ev,
+        (c1, c2) => s"""
           if ($c2 <= 0.0) {
             ${ev.isNull} = true;
           } else {
@@ -714,9 +724,10 @@ case class Logarithm(left: Expression, right: Expression)
           }
         """)
     } else {
-      nullSafeCodeGen(ctx,
-                      ev,
-                      (c1, c2) => s"""
+      nullSafeCodeGen(
+        ctx,
+        ev,
+        (c1, c2) => s"""
           if ($c1 <= 0.0 || $c2 <= 0.0) {
             ${ev.isNull} = true;
           } else {

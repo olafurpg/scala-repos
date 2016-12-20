@@ -74,10 +74,11 @@ class RenameScalaVariableProcessor
               Seq(GETTER, SETTER, IS_GETTER).foreach(
                 r => {
                   val wrapper =
-                    t.getTypedDefinitionWrapper(isStatic = false,
-                                                isInterface = false,
-                                                r,
-                                                None)
+                    t.getTypedDefinitionWrapper(
+                      isStatic = false,
+                      isInterface = false,
+                      r,
+                      None)
                   val name = wrapper.getName
                   val is = name.startsWith("is")
                   val prefix = if (is) "is" else name.substring(0, 3)
@@ -95,8 +96,9 @@ class RenameScalaVariableProcessor
 
     addBeanMethods(element, newName)
 
-    for (elem <- ScalaOverridingMemberSearcher.search(namedElement,
-                                                      deep = true)) {
+    for (elem <- ScalaOverridingMemberSearcher.search(
+           namedElement,
+           deep = true)) {
       val overriderName = elem.name
       val baseName = namedElement.name
       val newOverriderName = RefactoringUtil

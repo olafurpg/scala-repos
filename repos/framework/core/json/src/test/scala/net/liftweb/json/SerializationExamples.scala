@@ -29,11 +29,14 @@ object SerializationExamples extends Specification {
     "test",
     new Date,
     Some(Language("Scala", 2.75)),
-    List(Team("QA", List(Employee("John Doe", 5), Employee("Mike", 3))),
-         Team("Impl",
-              List(Employee("Mark", 4),
-                   Employee("Mary", 5),
-                   Employee("Nick Noob", 1)))))
+    List(
+      Team("QA", List(Employee("John Doe", 5), Employee("Mike", 3))),
+      Team(
+        "Impl",
+        List(
+          Employee("Mark", 4),
+          Employee("Mary", 5),
+          Employee("Nick Noob", 1)))))
 
   "Project serialization example" in {
     val ser = swrite(project)
@@ -63,15 +66,16 @@ object SerializationExamples extends Specification {
   }
 
   "Primitive-wrapping case class serialization example" in {
-    val primitives = Primitives(124,
-                                123L,
-                                126.5,
-                                127.5.floatValue,
-                                "128",
-                                's,
-                                125,
-                                129.byteValue,
-                                true)
+    val primitives = Primitives(
+      124,
+      123L,
+      126.5,
+      127.5.floatValue,
+      "128",
+      's,
+      125,
+      129.byteValue,
+      true)
     val ser = swrite(primitives)
     read[Primitives](ser) mustEqual primitives
   }
@@ -121,9 +125,11 @@ object SerializationExamples extends Specification {
 
   "Map serialization example" in {
     val p =
-      PersonWithAddresses("joe",
-                          Map("address1" -> Address("Bulevard", "Helsinki"),
-                              "address2" -> Address("Soho", "London")))
+      PersonWithAddresses(
+        "joe",
+        Map(
+          "address1" -> Address("Bulevard", "Helsinki"),
+          "address2" -> Address("Soho", "London")))
     val ser = swrite(p)
     read[PersonWithAddresses](ser) mustEqual p
   }
@@ -206,11 +212,12 @@ object FullTypeHintExamples extends TypeHintExamples {
 
   implicit val formats = Serialization.formats(
     FullTypeHints(
-      List[Class[_]](classOf[Animal],
-                     classOf[True],
-                     classOf[False],
-                     classOf[Falcon],
-                     classOf[Chicken])))
+      List[Class[_]](
+        classOf[Animal],
+        classOf[True],
+        classOf[False],
+        classOf[Falcon],
+        classOf[Chicken])))
 
   "Ambiguous field decomposition example" in {
     val a = Ambiguous(False())

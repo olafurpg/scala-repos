@@ -60,9 +60,10 @@ import scala.collection.Seq
   * Date: 18.01.2009
   */
 class ScalaFunctionParameterInfoHandler
-    extends ParameterInfoHandlerWithTabActionSupport[PsiElement,
-                                                     Any,
-                                                     ScExpression] {
+    extends ParameterInfoHandlerWithTabActionSupport[
+      PsiElement,
+      Any,
+      ScExpression] {
   def getArgListStopSearchClasses: java.util.Set[_ <: Class[_]] = {
     java.util.Collections.singleton(classOf[PsiMethod])
   }
@@ -299,20 +300,22 @@ class ScalaFunctionParameterInfoHandler
             else {
               val paramsSeq: Seq[(Parameter, String)] = seq.zipWithIndex.map {
                 case (t, paramIndex) =>
-                  (new Parameter(t._1,
-                                 None,
-                                 t._2,
-                                 t._3 != null,
-                                 false,
-                                 false,
-                                 paramIndex),
+                  (new Parameter(
+                     t._1,
+                     None,
+                     t._2,
+                     t._3 != null,
+                     false,
+                     false,
+                     paramIndex),
                    t._1 + ": " + ScType.presentableText(t._2) +
                      (if (t._3 != null) " = " + t._3.getText else ""))
               }
-              applyToParameters(paramsSeq,
-                                ScSubstitutor.empty,
-                                canBeNaming = true,
-                                isImplicit = false)
+              applyToParameters(
+                paramsSeq,
+                ScSubstitutor.empty,
+                canBeNaming = true,
+                isImplicit = false)
             }
           case (sign: PhysicalSignature, i: Int) =>
             //i  can be -1 (it's update method)
@@ -414,9 +417,10 @@ class ScalaFunctionParameterInfoHandler
                       .mkString(", "))
                 }
             }
-          case (constructor: ScPrimaryConstructor,
-                subst: ScSubstitutor,
-                i: Int) if constructor.isValid =>
+          case (
+              constructor: ScPrimaryConstructor,
+              subst: ScSubstitutor,
+              i: Int) if constructor.isValid =>
             val clauses = constructor.effectiveParameterClauses
             if (clauses.length <= i)
               buffer.append(
@@ -439,13 +443,14 @@ class ScalaFunctionParameterInfoHandler
         if (endOffset != -1) buffer.replace(endOffset, endOffset + 4, "")
 
         if (buffer.toString != "")
-          context.setupUIComponentPresentation(buffer.toString(),
-                                               startOffset,
-                                               endOffset,
-                                               isGrey,
-                                               false,
-                                               false,
-                                               color)
+          context.setupUIComponentPresentation(
+            buffer.toString(),
+            startOffset,
+            endOffset,
+            isGrey,
+            false,
+            false,
+            color)
         else context.setUIComponentEnabled(false)
       case _ =>
     }
@@ -590,8 +595,9 @@ class ScalaFunctionParameterInfoHandler
                         call)
                   } {
                     variant match {
-                      case ScalaResolveResult(method: ScFunction,
-                                              subst: ScSubstitutor) =>
+                      case ScalaResolveResult(
+                          method: ScFunction,
+                          subst: ScSubstitutor) =>
                         res +=
                           ((new PhysicalSignature(
                               method,
@@ -611,8 +617,9 @@ class ScalaFunctionParameterInfoHandler
                     //todo: missed case with last implicit call
                     ref.bind() match {
                       case Some(
-                          ScalaResolveResult(function: ScFunction,
-                                             subst: ScSubstitutor))
+                          ScalaResolveResult(
+                            function: ScFunction,
+                            subst: ScSubstitutor))
                           if function.effectiveParameterClauses.length >= count =>
                         res +=
                           ((new PhysicalSignature(
@@ -636,15 +643,17 @@ class ScalaFunctionParameterInfoHandler
                     } {
                       variant match {
                         //todo: Synthetic function
-                        case ScalaResolveResult(method: PsiMethod,
-                                                subst: ScSubstitutor) =>
+                        case ScalaResolveResult(
+                            method: PsiMethod,
+                            subst: ScSubstitutor) =>
                           res +=
                             ((new PhysicalSignature(
                                 method,
                                 subst.followed(collectSubstitutor(method))),
                               0))
-                        case ScalaResolveResult(typed: ScTypedDefinition,
-                                                subst: ScSubstitutor) =>
+                        case ScalaResolveResult(
+                            typed: ScTypedDefinition,
+                            subst: ScSubstitutor) =>
                           val typez = subst.subst(
                             typed
                               .getType(TypingContext.empty)
@@ -671,8 +680,9 @@ class ScalaFunctionParameterInfoHandler
             val res: ArrayBuffer[Object] = new ArrayBuffer[Object]
             val typeElement = constr.typeElement
             val i = constr.arguments.indexOf(args.element)
-            ScType.extractClassType(typeElement.calcType,
-                                    Some(file.getProject)) match {
+            ScType.extractClassType(
+              typeElement.calcType,
+              Some(file.getProject)) match {
               case Some((clazz: PsiClass, subst: ScSubstitutor)) =>
                 clazz match {
                   case clazz: ScClass =>
@@ -686,9 +696,9 @@ class ScalaFunctionParameterInfoHandler
                             val typeArgs: Seq[ScTypeElement] =
                               gen.typeArgList.typeArgs
                             val map =
-                              new collection.mutable.HashMap[(String,
-                                                              PsiElement),
-                                                             ScType]
+                              new collection.mutable.HashMap[
+                                (String, PsiElement),
+                                ScType]
                             for (i <- 0 to Math.min(tp.length, typeArgs.length) -
                                    1) {
                               map += ((tp(i), typeArgs(i).calcType))
@@ -721,9 +731,10 @@ class ScalaFunctionParameterInfoHandler
                            .map(
                              meth =>
                                (meth.name,
-                                ScType.create(meth.getReturnType,
-                                              meth.getProject,
-                                              meth.getResolveScope),
+                                ScType.create(
+                                  meth.getReturnType,
+                                  meth.getProject,
+                                  meth.getResolveScope),
                                 meth
                                   .asInstanceOf[PsiAnnotationMethod]
                                   .getDefaultValue))),

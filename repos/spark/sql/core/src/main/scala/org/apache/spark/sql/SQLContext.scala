@@ -78,10 +78,11 @@ class SQLContext private[sql] (
     with Serializable { self =>
 
   def this(sparkContext: SparkContext) = {
-    this(sparkContext,
-         new CacheManager,
-         SQLContext.createListenerAndUI(sparkContext),
-         true)
+    this(
+      sparkContext,
+      new CacheManager,
+      SQLContext.createListenerAndUI(sparkContext),
+      true)
   }
 
   def this(sparkContext: JavaSparkContext) = this(sparkContext.sc)
@@ -115,10 +116,11 @@ class SQLContext private[sql] (
     * @since 1.6.0
     */
   def newSession(): SQLContext = {
-    new SQLContext(sparkContext = sparkContext,
-                   cacheManager = cacheManager,
-                   listener = listener,
-                   isRootContext = false)
+    new SQLContext(
+      sparkContext = sparkContext,
+      cacheManager = cacheManager,
+      listener = listener,
+      isRootContext = false)
   }
 
   /**
@@ -656,13 +658,14 @@ class SQLContext private[sql] (
                           source: String,
                           options: Map[String, String]): DataFrame = {
     val tableIdent = sessionState.sqlParser.parseTableIdentifier(tableName)
-    val cmd = CreateTableUsing(tableIdent,
-                               userSpecifiedSchema = None,
-                               source,
-                               temporary = false,
-                               options,
-                               allowExisting = false,
-                               managedIfNoPath = false)
+    val cmd = CreateTableUsing(
+      tableIdent,
+      userSpecifiedSchema = None,
+      source,
+      temporary = false,
+      options,
+      allowExisting = false,
+      managedIfNoPath = false)
     executePlan(cmd).toRdd
     table(tableIdent)
   }
@@ -699,13 +702,14 @@ class SQLContext private[sql] (
                           schema: StructType,
                           options: Map[String, String]): DataFrame = {
     val tableIdent = sessionState.sqlParser.parseTableIdentifier(tableName)
-    val cmd = CreateTableUsing(tableIdent,
-                               userSpecifiedSchema = Some(schema),
-                               source,
-                               temporary = false,
-                               options,
-                               allowExisting = false,
-                               managedIfNoPath = false)
+    val cmd = CreateTableUsing(
+      tableIdent,
+      userSpecifiedSchema = Some(schema),
+      source,
+      temporary = false,
+      options,
+      allowExisting = false,
+      managedIfNoPath = false)
     executePlan(cmd).toRdd
     table(tableIdent)
   }
@@ -755,10 +759,11 @@ class SQLContext private[sql] (
     */
   @Experimental
   def range(start: Long, end: Long): Dataset[Long] = {
-    range(start,
-          end,
-          step = 1,
-          numPartitions = sparkContext.defaultParallelism)
+    range(
+      start,
+      end,
+      step = 1,
+      numPartitions = sparkContext.defaultParallelism)
   }
 
   /**
@@ -788,9 +793,10 @@ class SQLContext private[sql] (
             end: Long,
             step: Long,
             numPartitions: Int): Dataset[Long] = {
-    new Dataset(this,
-                Range(start, end, step, numPartitions),
-                implicits.newLongEncoder)
+    new Dataset(
+      this,
+      Range(start, end, step, numPartitions),
+      implicits.newLongEncoder)
   }
 
   /**

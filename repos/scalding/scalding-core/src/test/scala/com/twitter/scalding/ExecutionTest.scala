@@ -275,9 +275,10 @@ class ExecutionTest extends WordSpec with Matchers {
         .arg("output", "out")
         .source(TextLine("in"), List((0, "hello world"), (1, "goodbye world")))
         .typedSink(TypedTsv[(String, Long)]("out")) { outBuf =>
-          outBuf.toMap shouldBe Map("hello" -> 1L,
-                                    "world" -> 2L,
-                                    "goodbye" -> 1L)
+          outBuf.toMap shouldBe Map(
+            "hello" -> 1L,
+            "world" -> 2L,
+            "goodbye" -> 1L)
         }
         .run
         .runHadoop
@@ -354,8 +355,9 @@ class ExecutionTest extends WordSpec with Matchers {
       }
 
       executionLoop(55).shouldSucceed()
-      assert(timesEvaluated == 55 * 1000,
-             "Should run the 55 execution loops for 1000 elements")
+      assert(
+        timesEvaluated == 55 * 1000,
+        "Should run the 55 execution loops for 1000 elements")
     }
 
     "evaluate shared portions just once, writeExecution" in {

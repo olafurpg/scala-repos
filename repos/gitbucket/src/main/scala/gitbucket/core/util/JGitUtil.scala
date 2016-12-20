@@ -100,16 +100,17 @@ object JGitUtil {
                         committerEmailAddress: String) {
 
     def this(rev: org.eclipse.jgit.revwalk.RevCommit) =
-      this(rev.getName,
-           rev.getShortMessage,
-           rev.getFullMessage,
-           rev.getParents().map(_.name).toList,
-           rev.getAuthorIdent.getWhen,
-           rev.getAuthorIdent.getName,
-           rev.getAuthorIdent.getEmailAddress,
-           rev.getCommitterIdent.getWhen,
-           rev.getCommitterIdent.getName,
-           rev.getCommitterIdent.getEmailAddress)
+      this(
+        rev.getName,
+        rev.getShortMessage,
+        rev.getFullMessage,
+        rev.getParents().map(_.name).toList,
+        rev.getAuthorIdent.getWhen,
+        rev.getAuthorIdent.getName,
+        rev.getAuthorIdent.getEmailAddress,
+        rev.getCommitterIdent.getWhen,
+        rev.getCommitterIdent.getName,
+        rev.getCommitterIdent.getEmailAddress)
 
     val summary = getSummaryMessage(fullMessage, shortMessage)
 
@@ -236,9 +237,10 @@ object JGitUtil {
           git.tagList.call.asScala
             .map { ref =>
               val revCommit = getRevCommitFromId(git, ref.getObjectId)
-              TagInfo(ref.getName.stripPrefix("refs/tags/"),
-                      revCommit.getCommitterIdent.getWhen,
-                      revCommit.getName)
+              TagInfo(
+                ref.getName.stripPrefix("refs/tags/"),
+                revCommit.getCommitterIdent.getWhen,
+                revCommit.getName)
             }
             .sortBy(_.time)
             .toList
@@ -392,16 +394,16 @@ object JGitUtil {
         .map(simplifyPath)
         .map {
           case (objectId, fileMode, name, linkUrl, commit) =>
-            FileInfo(objectId,
-                     fileMode == FileMode.TREE || fileMode == FileMode.GITLINK,
-                     name,
-                     getSummaryMessage(commit.getFullMessage,
-                                       commit.getShortMessage),
-                     commit.getName,
-                     commit.getAuthorIdent.getWhen,
-                     commit.getAuthorIdent.getName,
-                     commit.getAuthorIdent.getEmailAddress,
-                     linkUrl)
+            FileInfo(
+              objectId,
+              fileMode == FileMode.TREE || fileMode == FileMode.GITLINK,
+              name,
+              getSummaryMessage(commit.getFullMessage, commit.getShortMessage),
+              commit.getName,
+              commit.getAuthorIdent.getWhen,
+              commit.getAuthorIdent.getName,
+              commit.getAuthorIdent.getEmailAddress,
+              linkUrl)
         }
         .sortWith { (file1, file2) =>
           (file1.isDirectory, file2.isDirectory) match {
@@ -487,11 +489,12 @@ object JGitUtil {
       i.hasNext match {
         case true if (limit <= 0 || logs.size < limit) => {
           val commit = i.next
-          getCommitLog(i,
-                       count + 1,
-                       if (limit <= 0 || (fixedPage - 1) * limit <= count)
-                         logs :+ new CommitInfo(commit)
-                       else logs)
+          getCommitLog(
+            i,
+            count + 1,
+            if (limit <= 0 || (fixedPage - 1) * limit <= count)
+              logs :+ new CommitInfo(commit)
+            else logs)
         }
         case _ => (logs, i.hasNext)
       }
@@ -504,8 +507,8 @@ object JGitUtil {
           revWalk.markStart(revWalk.parseCommit(objectId))
           if (path.nonEmpty) {
             revWalk.setTreeFilter(
-              AndTreeFilter.create(PathFilter.create(path),
-                                   TreeFilter.ANY_DIFF))
+              AndTreeFilter
+                .create(PathFilter.create(path), TreeFilter.ANY_DIFF))
           }
           Right(getCommitLog(revWalk.iterator, 0, Nil))
         }
@@ -894,9 +897,10 @@ object JGitUtil {
         }
       } catch {
         case e: ConfigInvalidException => {
-          logger.error("Failed to load .gitmodules file for " +
-                         repository.getDirectory(),
-                       e)
+          logger.error(
+            "Failed to load .gitmodules file for " +
+              repository.getDirectory(),
+            e)
           Nil
         }
       }).toList
@@ -949,9 +953,10 @@ object JGitUtil {
       if (viewer == "other") {
         if (bytes.isDefined && FileUtil.isText(bytes.get)) {
           // text
-          ContentInfo("text",
-                      Some(StringUtil.convertFromByteArray(bytes.get)),
-                      Some(StringUtil.detectEncoding(bytes.get)))
+          ContentInfo(
+            "text",
+            Some(StringUtil.convertFromByteArray(bytes.get)),
+            Some(StringUtil.detectEncoding(bytes.get)))
         } else {
           // binary
           ContentInfo("binary", None, None)
@@ -1028,7 +1033,8 @@ object JGitUtil {
         val index = treeWalk.addTree(revWalk.parseTree(id))
         treeWalk.setRecursive(true)
         while (treeWalk.next) {
-          f(treeWalk.getPathString,
+          f(
+            treeWalk.getPathString,
             treeWalk.getTree(index, classOf[CanonicalTreeParser]))
         }
       }
@@ -1082,14 +1088,15 @@ object JGitUtil {
 
         val commitIdTo =
           oldGit.getRepository.resolve(s"refs/pull/${issueId}/head").getName
-        val commitIdFrom = getForkedCommitId(oldGit,
-                                             newGit,
-                                             userName,
-                                             repositoryName,
-                                             branch,
-                                             requestUserName,
-                                             requestRepositoryName,
-                                             requestBranch)
+        val commitIdFrom = getForkedCommitId(
+          oldGit,
+          newGit,
+          userName,
+          repositoryName,
+          branch,
+          requestUserName,
+          requestRepositoryName,
+          requestBranch)
         (commitIdTo, commitIdFrom)
     }
 
@@ -1156,12 +1163,13 @@ object JGitUtil {
                   behind = RevWalkUtils.count(walk, defaultCommit, mergeBase),
                   isMerged = walk.isMergedInto(branchCommit, defaultCommit)))
             }
-          BranchInfo(branchName,
-                     committer,
-                     when,
-                     committerEmail,
-                     mergeInfo,
-                     ref.getObjectId.name)
+          BranchInfo(
+            branchName,
+            committer,
+            when,
+            committerEmail,
+            mergeInfo,
+            ref.getObjectId.name)
         } finally {
           walk.dispose();
         }

@@ -54,10 +54,11 @@ class ScModifiersElementType(debugName: String)
         for (i <- 0 until num) mods(i) = dataStream.readName.toString
         mods
       }
-    new ScModifiersStubImpl(parentStub.asInstanceOf[StubElement[PsiElement]],
-                            this,
-                            modifiers,
-                            explicitModifiers)
+    new ScModifiersStubImpl(
+      parentStub.asInstanceOf[StubElement[PsiElement]],
+      this,
+      modifiers,
+      explicitModifiers)
   }
 
   def indexStub(stub: ScModifiersStub, sink: IndexSink) {}

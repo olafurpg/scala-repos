@@ -65,9 +65,10 @@ class KafkaStreamSuite
     kafkaTestUtils.sendMessages(topic, sent)
 
     val kafkaParams =
-      Map("zookeeper.connect" -> kafkaTestUtils.zkAddress,
-          "group.id" -> s"test-consumer-${Random.nextInt(10000)}",
-          "auto.offset.reset" -> "smallest")
+      Map(
+        "zookeeper.connect" -> kafkaTestUtils.zkAddress,
+        "group.id" -> s"test-consumer-${Random.nextInt(10000)}",
+        "auto.offset.reset" -> "smallest")
 
     val stream =
       KafkaUtils.createStream[String, String, StringDecoder, StringDecoder](

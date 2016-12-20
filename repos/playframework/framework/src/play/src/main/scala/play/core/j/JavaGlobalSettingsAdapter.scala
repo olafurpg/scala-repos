@@ -48,16 +48,18 @@ class JavaGlobalSettingsAdapter(val underlying: play.GlobalSettings)
   override def onBadRequest(request: RequestHeader,
                             error: String): Future[Result] = {
     JavaHelpers
-      .invokeWithContextOpt(request,
-                            req => underlying.onBadRequest(req, error))
+      .invokeWithContextOpt(
+        request,
+        req => underlying.onBadRequest(req, error))
       .getOrElse(super.onBadRequest(request, error))
   }
 
   override def doFilter(a: EssentialAction): EssentialAction = {
     try {
-      Filters(super.doFilter(a),
-              underlying.filters.map(
-                _.newInstance: play.api.mvc.EssentialFilter): _*)
+      Filters(
+        super.doFilter(a),
+        underlying.filters
+          .map(_.newInstance: play.api.mvc.EssentialFilter): _*)
     } catch {
       case NonFatal(e) => {
         EssentialAction(req => Accumulator.done(onError(req, e)))

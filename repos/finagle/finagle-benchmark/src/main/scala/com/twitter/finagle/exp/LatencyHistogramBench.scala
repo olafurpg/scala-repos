@@ -24,11 +24,12 @@ class LatencyHistogramBench extends StdBenchAnnotations {
   def setup(): Unit = {
     val err = if (error <= 0.0) 0.0 else error
 
-    histo = new LatencyHistogram(maxDurationMs,
-                                 err,
-                                 1.minute.inMillis,
-                                 LatencyHistogram.DefaultSlices,
-                                 Stopwatch.systemMillis)
+    histo = new LatencyHistogram(
+      maxDurationMs,
+      err,
+      1.minute.inMillis,
+      LatencyHistogram.DefaultSlices,
+      Stopwatch.systemMillis)
 
     // give it some data to start with
     0L.until(maxDurationMs).foreach(histo.add)

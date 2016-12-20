@@ -158,18 +158,20 @@ object TypeDefinitionMembers {
                     ScalaPsiUtil.isBooleanBeanProperty(s, noResolve = true)
                   if (beanProperty) {
                     addSignature(
-                      new Signature("get" + dcl.name.capitalize,
-                                    Seq.empty,
-                                    0,
-                                    subst,
-                                    dcl))
+                      new Signature(
+                        "get" + dcl.name.capitalize,
+                        Seq.empty,
+                        0,
+                        subst,
+                        dcl))
                   } else if (booleanBeanProperty) {
                     addSignature(
-                      new Signature("is" + dcl.name.capitalize,
-                                    Seq.empty,
-                                    0,
-                                    subst,
-                                    dcl))
+                      new Signature(
+                        "is" + dcl.name.capitalize,
+                        Seq.empty,
+                        0,
+                        subst,
+                        dcl))
                   }
                 case _ =>
               }
@@ -185,18 +187,20 @@ object TypeDefinitionMembers {
                     ScalaPsiUtil.isBooleanBeanProperty(s, noResolve = true)
                   if (beanProperty) {
                     addSignature(
-                      new Signature("get" + dcl.name.capitalize,
-                                    Seq.empty,
-                                    0,
-                                    subst,
-                                    dcl))
+                      new Signature(
+                        "get" + dcl.name.capitalize,
+                        Seq.empty,
+                        0,
+                        subst,
+                        dcl))
                   } else if (booleanBeanProperty) {
                     addSignature(
-                      new Signature("is" + dcl.name.capitalize,
-                                    Seq.empty,
-                                    0,
-                                    subst,
-                                    dcl))
+                      new Signature(
+                        "is" + dcl.name.capitalize,
+                        Seq.empty,
+                        0,
+                        subst,
+                        dcl))
                   }
                 case _ =>
               }
@@ -212,18 +216,20 @@ object TypeDefinitionMembers {
                 ScalaPsiUtil.isBooleanBeanProperty(param, noResolve = true)
               if (beanProperty) {
                 addSignature(
-                  new Signature("get" + param.name.capitalize,
-                                Seq.empty,
-                                0,
-                                subst,
-                                param))
+                  new Signature(
+                    "get" + param.name.capitalize,
+                    Seq.empty,
+                    0,
+                    subst,
+                    param))
               } else if (booleanBeanProperty) {
                 addSignature(
-                  new Signature("is" + param.name.capitalize,
-                                Seq.empty,
-                                0,
-                                subst,
-                                param))
+                  new Signature(
+                    "is" + param.name.capitalize,
+                    Seq.empty,
+                    0,
+                    subst,
+                    param))
               }
             }
           case f: ScFunction
@@ -464,26 +470,29 @@ object TypeDefinitionMembers {
                     ScalaPsiUtil.isBooleanBeanProperty(s, noResolve = true)
                   if (beanProperty) {
                     addSignature(
-                      new Signature("get" + dcl.name.capitalize,
-                                    Seq.empty,
-                                    0,
-                                    subst,
-                                    dcl))
+                      new Signature(
+                        "get" + dcl.name.capitalize,
+                        Seq.empty,
+                        0,
+                        subst,
+                        dcl))
                   } else if (booleanBeanProperty) {
                     addSignature(
-                      new Signature("is" + dcl.name.capitalize,
-                                    Seq.empty,
-                                    0,
-                                    subst,
-                                    dcl))
+                      new Signature(
+                        "is" + dcl.name.capitalize,
+                        Seq.empty,
+                        0,
+                        subst,
+                        dcl))
                   }
                   if (beanProperty || booleanBeanProperty) {
                     addSignature(
-                      new Signature("set" + dcl.name.capitalize,
-                                    Seq(() => t),
-                                    1,
-                                    subst,
-                                    dcl))
+                      new Signature(
+                        "set" + dcl.name.capitalize,
+                        Seq(() => t),
+                        1,
+                        subst,
+                        dcl))
                   }
                 case _ =>
               }
@@ -499,18 +508,20 @@ object TypeDefinitionMembers {
                     ScalaPsiUtil.isBooleanBeanProperty(s, noResolve = true)
                   if (beanProperty) {
                     addSignature(
-                      new Signature("get" + dcl.name.capitalize,
-                                    Seq.empty,
-                                    0,
-                                    subst,
-                                    dcl))
+                      new Signature(
+                        "get" + dcl.name.capitalize,
+                        Seq.empty,
+                        0,
+                        subst,
+                        dcl))
                   } else if (booleanBeanProperty) {
                     addSignature(
-                      new Signature("is" + dcl.name.capitalize,
-                                    Seq.empty,
-                                    0,
-                                    subst,
-                                    dcl))
+                      new Signature(
+                        "is" + dcl.name.capitalize,
+                        Seq.empty,
+                        0,
+                        subst,
+                        dcl))
                   }
                 case _ =>
               }
@@ -523,44 +534,49 @@ object TypeDefinitionMembers {
                 new Signature(param.name, Seq.empty, 0, subst, param))
               if (!param.isStable)
                 addSignature(
-                  new Signature(param.name + "_=",
-                                Seq(() => t),
-                                1,
-                                subst,
-                                param))
+                  new Signature(
+                    param.name + "_=",
+                    Seq(() => t),
+                    1,
+                    subst,
+                    param))
               val beanProperty =
                 ScalaPsiUtil.isBeanProperty(param, noResolve = true)
               val booleanBeanProperty =
                 ScalaPsiUtil.isBooleanBeanProperty(param, noResolve = true)
               if (beanProperty) {
                 addSignature(
-                  new Signature("get" + param.name.capitalize,
-                                Seq.empty,
-                                0,
-                                subst,
-                                param))
+                  new Signature(
+                    "get" + param.name.capitalize,
+                    Seq.empty,
+                    0,
+                    subst,
+                    param))
                 if (!param.isStable) {
                   addSignature(
-                    new Signature("set" + param.name.capitalize,
-                                  Seq(() => t),
-                                  1,
-                                  subst,
-                                  param))
+                    new Signature(
+                      "set" + param.name.capitalize,
+                      Seq(() => t),
+                      1,
+                      subst,
+                      param))
                 }
               } else if (booleanBeanProperty) {
                 addSignature(
-                  new Signature("is" + param.name.capitalize,
-                                Seq.empty,
-                                0,
-                                subst,
-                                param))
+                  new Signature(
+                    "is" + param.name.capitalize,
+                    Seq.empty,
+                    0,
+                    subst,
+                    param))
                 if (!param.isStable) {
                   addSignature(
-                    new Signature("set" + param.name.capitalize,
-                                  Seq(() => t),
-                                  1,
-                                  subst,
-                                  param))
+                    new Signature(
+                      "set" + param.name.capitalize,
+                      Seq(() => t),
+                      1,
+                      subst,
+                      param))
                 }
               }
             }
@@ -700,8 +716,9 @@ object TypeDefinitionMembers {
                 c match {
                   case o: ScObject =>
                     if (allowedNames.contains(o.name)) {
-                      @CachedInsidePsiElement(o,
-                                              CachesUtil.getDependentItem(o)())
+                      @CachedInsidePsiElement(
+                        o,
+                        CachesUtil.getDependentItem(o)())
                       def buildNodesObject(): SMap = SignatureNodes.build(o)
 
                       val add = buildNodesObject()
@@ -709,8 +726,9 @@ object TypeDefinitionMembers {
                     }
                   case c: ScClass =>
                     if (allowedNames.contains(c.name)) {
-                      @CachedInsidePsiElement(c,
-                                              CachesUtil.getDependentItem(c)())
+                      @CachedInsidePsiElement(
+                        c,
+                        CachesUtil.getDependentItem(c)())
                       def buildNodesClass2(): SMap = SignatureNodes.build(c)
 
                       val add = buildNodesClass2()
@@ -869,15 +887,16 @@ object TypeDefinitionMembers {
                                state: ResolveState,
                                lastParent: PsiElement,
                                place: PsiElement): Boolean = {
-    if (!privateProcessDeclarations(processor,
-                                    state,
-                                    lastParent,
-                                    place,
-                                    () => getSignatures(td),
-                                    () => getParameterlessSignatures(td),
-                                    () => getTypes(td),
-                                    isSupers = true,
-                                    isObject = td.isInstanceOf[ScObject]))
+    if (!privateProcessDeclarations(
+          processor,
+          state,
+          lastParent,
+          place,
+          () => getSignatures(td),
+          () => getParameterlessSignatures(td),
+          () => getTypes(td),
+          isSupers = true,
+          isObject = td.isInstanceOf[ScObject]))
       return false
 
     if (!(types.AnyRef
@@ -1005,8 +1024,9 @@ object TypeDefinitionMembers {
                   //we can accept this member
                   if (!processor.execute(
                         elem,
-                        state.put(ScSubstitutor.key,
-                                  n.substitutor followed subst)))
+                        state.put(
+                          ScSubstitutor.key,
+                          n.substitutor followed subst)))
                     return false
                 } else {
                   if (n.supers.nonEmpty && !processor.execute(
@@ -1036,8 +1056,9 @@ object TypeDefinitionMembers {
                     if t.isVar && signature.name.endsWith("_=") =>
                   if (processValsForScala && !processor.execute(
                         t.getUnderEqualsMethod,
-                        state.put(ScSubstitutor.key,
-                                  n.substitutor followed subst)))
+                        state.put(
+                          ScSubstitutor.key,
+                          n.substitutor followed subst)))
                     return false
                 case _ =>
               }
@@ -1049,8 +1070,9 @@ object TypeDefinitionMembers {
                   def process(method: PsiMethod): Boolean = {
                     if (processValsForScala && !processor.execute(
                           method,
-                          state.put(ScSubstitutor.key,
-                                    n.substitutor followed subst)))
+                          state.put(
+                            ScSubstitutor.key,
+                            n.substitutor followed subst)))
                       return false
                     true
                   }
@@ -1224,9 +1246,10 @@ object TypeDefinitionMembers {
             val (_, n) = iterator.next()
             if (checkName(n.info.name)) {
               ProgressManager.checkCanceled()
-              if (!processor.execute(n.info,
-                                     state.put(ScSubstitutor.key,
-                                               n.substitutor followed subst)))
+              if (!processor.execute(
+                    n.info,
+                    state
+                      .put(ScSubstitutor.key, n.substitutor followed subst)))
                 return false
             }
           }
@@ -1267,9 +1290,10 @@ object TypeDefinitionMembers {
             if (checkName(n.info.name)) {
               ProgressManager.checkCanceled()
               if (n.info.isInstanceOf[ScTypeDefinition] &&
-                  !processor.execute(n.info,
-                                     state.put(ScSubstitutor.key,
-                                               n.substitutor followed subst)))
+                  !processor.execute(
+                    n.info,
+                    state
+                      .put(ScSubstitutor.key, n.substitutor followed subst)))
                 return false
             }
           }

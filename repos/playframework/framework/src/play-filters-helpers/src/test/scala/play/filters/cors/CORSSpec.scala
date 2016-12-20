@@ -139,21 +139,24 @@ object CORSActionBuilderSpec extends CORSCommonSpec {
       conf: Map[String, _ <: Any] = Map.empty)(block: => T): T = {
     running(_.configure(conf).routes {
       case (_, "/error") =>
-        CORSActionBuilder(Configuration.reference ++ Configuration.from(conf),
-                          configPath = configPath) { req =>
+        CORSActionBuilder(
+          Configuration.reference ++ Configuration.from(conf),
+          configPath = configPath) { req =>
           throw sys.error("error")
         }
       case _ =>
-        CORSActionBuilder(Configuration.reference ++ Configuration.from(conf),
-                          configPath = configPath)(Results.Ok)
+        CORSActionBuilder(
+          Configuration.reference ++ Configuration.from(conf),
+          configPath = configPath)(Results.Ok)
     })(_ => block)
   }
 
   "The CORSActionBuilder with" should {
 
     val restrictOriginsPathConf = Map(
-      "myaction.allowedOrigins" -> Seq("http://example.org",
-                                       "http://localhost:9000"))
+      "myaction.allowedOrigins" -> Seq(
+        "http://example.org",
+        "http://localhost:9000"))
 
     "handle a cors request with a subpath of app configuration" in withApplicationWithPathConfiguredAction(
       configPath = "myaction",
@@ -502,8 +505,9 @@ trait CORSCommonSpec extends PlaySpecification {
     }
 
     val restrictOrigins = Map(
-      "play.filters.cors.allowedOrigins" -> Seq("http://example.org",
-                                                "http://localhost:9000"))
+      "play.filters.cors.allowedOrigins" -> Seq(
+        "http://example.org",
+        "http://localhost:9000"))
 
     "forbid a preflight request with a retricted origin" in withApplication(
       conf = restrictOrigins) {

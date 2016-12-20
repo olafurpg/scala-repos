@@ -337,14 +337,16 @@ private[precog] case class VectorN[+A](vector: Vector[A])
         case 1 => Vector1(vector(vector.length - 1))
         case 2 => Vector2(vector(vector.length - 2), vector(vector.length - 1))
         case 3 =>
-          Vector3(vector(vector.length - 3),
-                  vector(vector.length - 2),
-                  vector(vector.length - 1))
+          Vector3(
+            vector(vector.length - 3),
+            vector(vector.length - 2),
+            vector(vector.length - 1))
         case 4 =>
-          Vector4(vector(vector.length - 4),
-                  vector(vector.length - 3),
-                  vector(vector.length - 2),
-                  vector(vector.length - 1))
+          Vector4(
+            vector(vector.length - 4),
+            vector(vector.length - 3),
+            vector(vector.length - 2),
+            vector(vector.length - 1))
         case _ => VectorN(vector drop n)
       }
     }
@@ -411,14 +413,16 @@ private[precog] case class VectorN[+A](vector: Vector[A])
         case 1 => Vector1(vector(vector.length - 1))
         case 2 => Vector2(vector(vector.length - 2), vector(vector.length - 1))
         case 3 =>
-          Vector3(vector(vector.length - 3),
-                  vector(vector.length - 2),
-                  vector(vector.length - 1))
+          Vector3(
+            vector(vector.length - 3),
+            vector(vector.length - 2),
+            vector(vector.length - 1))
         case 4 =>
-          Vector4(vector(vector.length - 4),
-                  vector(vector.length - 3),
-                  vector(vector.length - 2),
-                  vector(vector.length - 1))
+          Vector4(
+            vector(vector.length - 4),
+            vector(vector.length - 3),
+            vector(vector.length - 2),
+            vector(vector.length - 1))
         case _ => VectorN(vector takeRight n)
       }
     }

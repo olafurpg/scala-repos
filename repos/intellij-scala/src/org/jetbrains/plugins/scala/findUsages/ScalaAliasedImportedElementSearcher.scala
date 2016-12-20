@@ -37,11 +37,12 @@ class ScalaAliasedImportedElementSearcher
         inReadAction(parameters.getEffectiveSearchScope) // TODO PsiUtil.restrictScopeToGroovyFiles(parameters.getEffectiveSearchScope)
       val collector: SearchRequestCollector = parameters.getOptimizer
       val session: SearchSession = collector.getSearchSession
-      collector.searchWord(name,
-                           scope,
-                           UsageSearchContext.IN_CODE,
-                           true,
-                           new MyProcessor(named, null, session))
+      collector.searchWord(
+        name,
+        scope,
+        UsageSearchContext.IN_CODE,
+        true,
+        new MyProcessor(named, null, session))
     }
   }
 
@@ -73,11 +74,12 @@ class ScalaAliasedImportedElementSearcher
           new SearchRequestCollector(mySession)
         val fileScope: SearchScope =
           new LocalSearchScope(element.getContainingFile)
-        collector.searchWord(alias,
-                             fileScope,
-                             UsageSearchContext.IN_CODE,
-                             true,
-                             myTarget)
+        collector.searchWord(
+          alias,
+          fileScope,
+          UsageSearchContext.IN_CODE,
+          true,
+          myTarget)
         PsiSearchHelper.SERVICE
           .getInstance(element.getProject)
           .processRequests(collector, consumer)

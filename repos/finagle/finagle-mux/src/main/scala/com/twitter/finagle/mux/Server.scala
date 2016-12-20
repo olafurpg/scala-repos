@@ -164,11 +164,12 @@ private[twitter] object ServerDispatcher {
       tracer: Tracer,
       statsReceiver: StatsReceiver
   ): ServerDispatcher =
-    new ServerDispatcher(trans,
-                         Processor andThen service,
-                         lessor,
-                         tracer,
-                         statsReceiver)
+    new ServerDispatcher(
+      trans,
+      Processor andThen service,
+      lessor,
+      tracer,
+      statsReceiver)
 
   /**
     * Construct a new request-response dispatcher with a
@@ -178,11 +179,12 @@ private[twitter] object ServerDispatcher {
       trans: Transport[Message, Message],
       service: Service[Request, Response]
   ): ServerDispatcher =
-    newRequestResponse(trans,
-                       service,
-                       Lessor.nil,
-                       NullTracer,
-                       NullStatsReceiver)
+    newRequestResponse(
+      trans,
+      service,
+      Lessor.nil,
+      NullTracer,
+      NullStatsReceiver)
 
   /**
     * Used when comparing the difference between leases.

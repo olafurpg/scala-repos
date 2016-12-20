@@ -67,9 +67,10 @@ class SerializabilitySpec extends WordSpec with Matchers {
 
   def beSerializable: Matcher[AnyRef] = Matcher[AnyRef] { value ⇒
     val result = Try(tryToSerialize(value))
-    MatchResult(result.isSuccess,
-                "Failed with " + result,
-                "Was unexpectly successful and returned " + result)
+    MatchResult(
+      result.isSuccess,
+      "Failed with " + result,
+      "Was unexpectly successful and returned " + result)
   }
 
   def tryToSerialize[T](obj: T): T = {

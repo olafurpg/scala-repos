@@ -18,10 +18,11 @@ import grizzled.slf4j.Logger
 case class DataSourceParams(appId: Int) extends Params
 
 class DataSource(val dsp: DataSourceParams)
-    extends PDataSource[TrainingData,
-                        EmptyEvaluationInfo,
-                        Query,
-                        EmptyActualResult] {
+    extends PDataSource[
+      TrainingData,
+      EmptyEvaluationInfo,
+      Query,
+      EmptyActualResult] {
 
   @transient lazy val logger = Logger[this.type]
 
@@ -41,13 +42,14 @@ class DataSource(val dsp: DataSourceParams)
       .map {
         case (entityId, properties) =>
           try {
-            LabeledPoint(properties.get[Double]("plan"),
-                         Vectors.dense(
-                           Array(
-                             gendersMap(properties.get[String]("gender")),
-                             properties.get[Double]("age"),
-                             educationMap(properties.get[String]("education"))
-                           )))
+            LabeledPoint(
+              properties.get[Double]("plan"),
+              Vectors.dense(
+                Array(
+                  gendersMap(properties.get[String]("gender")),
+                  properties.get[Double]("age"),
+                  educationMap(properties.get[String]("education"))
+                )))
           } catch {
             case e: Exception => {
               logger.error(

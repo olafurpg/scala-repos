@@ -70,9 +70,10 @@ class BroadcastedTest extends FunSuite {
       DenseMatrix((-1.0, -2.0, -3.0), (1.0, 2.0, 3.0), (4.0, 5.0, 6.0)).t
 
     dm(*, 1 to 2) := DenseVector(3.0, 4.0)
-    assert(dm === DenseMatrix((-1.0, -2.0, -3.0),
-                              (3.0, 3.0, 3.0),
-                              (4.0, 4.0, 4.0)).t)
+    assert(dm === DenseMatrix(
+      (-1.0, -2.0, -3.0),
+      (3.0, 3.0, 3.0),
+      (4.0, 4.0, 4.0)).t)
   }
 
   test("dot product for DM/FV") {

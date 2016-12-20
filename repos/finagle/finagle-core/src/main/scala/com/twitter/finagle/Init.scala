@@ -42,9 +42,10 @@ private[twitter] object Init {
       }
     } catch {
       case NonFatal(exc) =>
-        log.log(Level.WARNING,
-                s"Exception while loading Finagle's build.properties: $path",
-                exc)
+        log.log(
+          Level.WARNING,
+          s"Exception while loading Finagle's build.properties: $path",
+          exc)
         None
     }
   }

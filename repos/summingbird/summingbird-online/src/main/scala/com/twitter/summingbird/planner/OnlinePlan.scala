@@ -181,9 +181,10 @@ class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V]) {
         // Note the currentProducer is *ALREADY* a part of activeBolt
         if (doSplit) {
           // Note that FlatMapNode is used as the default empty node
-          recurse(dep,
-                  updatedBolt = FlatMapNode(),
-                  updatedRegistry = distinctAddToList(nodeSet, activeBolt))
+          recurse(
+            dep,
+            updatedBolt = FlatMapNode(),
+            updatedRegistry = distinctAddToList(nodeSet, activeBolt))
         } else {
           recurse(dep, updatedBolt = activeBolt)
         }
@@ -235,9 +236,10 @@ class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V]) {
           maybeSplitThenRecurse(dependantProducer, producer)
         // The following are special cases
         case Summer(producer, _, _) =>
-          maybeSplitThenRecurse(dependantProducer,
-                                producer,
-                                currentBolt.toSummer)
+          maybeSplitThenRecurse(
+            dependantProducer,
+            producer,
+            currentBolt.toSummer)
         case AlsoProducer(lProducer, rProducer) =>
           val (updatedReg, updatedVisited) =
             maybeSplitThenRecurse(dependantProducer, rProducer)
@@ -268,8 +270,9 @@ class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V]) {
 
   val (nodeSet, _) =
     addWithDependencies(tail, FlatMapNode(), List[CNode](), Set())
-  require(nodeSet.collect { case n @ SourceNode(_) => n }.size > 0,
-          "Valid nodeSet should have at least one source node")
+  require(
+    nodeSet.collect { case n @ SourceNode(_) => n }.size > 0,
+    "Valid nodeSet should have at least one source node")
 }
 
 object OnlinePlan {

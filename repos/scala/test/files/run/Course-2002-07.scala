@@ -85,8 +85,9 @@ object M1 {
     Console.println(
       "    1 + 2 = " + new Sum(new Number(1), new Number(2)).eval);
     Console.println(
-      "2 + 3 + 4 = " + new Sum(new Sum(new Number(2), new Number(3)),
-                               new Number(4)).eval);
+      "2 + 3 + 4 = " + new Sum(
+        new Sum(new Number(2), new Number(3)),
+        new Number(4)).eval);
     Console.println;
   }
 }

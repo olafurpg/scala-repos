@@ -157,11 +157,12 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
 
     object ReusedCondTreeMaker {
       def apply(orig: CondTreeMaker) =
-        new ReusedCondTreeMaker(orig.prevBinder,
-                                orig.nextBinder,
-                                orig.cond,
-                                orig.res,
-                                orig.pos)
+        new ReusedCondTreeMaker(
+          orig.prevBinder,
+          orig.nextBinder,
+          orig.cond,
+          orig.res,
+          orig.pos)
     }
     class ReusedCondTreeMaker(prevBinder: Symbol,
                               val nextBinder: Symbol,
@@ -184,11 +185,12 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
         atPos(pos)(
           casegen
             .asInstanceOf[optimizedCodegen.OptimizedCasegen]
-            .flatMapCondStored(cond,
-                               storedCond,
-                               res,
-                               nextBinder,
-                               substitution(next).duplicate))
+            .flatMapCondStored(
+              cond,
+              storedCond,
+              res,
+              nextBinder,
+              substitution(next).duplicate))
 
       override def toString =
         "Memo" + ((nextBinder.name, storedCond.name, cond, res, substitution))
@@ -239,8 +241,9 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
       def chainBefore(next: Tree)(casegen: Casegen): Tree = {
         // TODO: finer-grained duplication -- MUST duplicate though, or we'll get VerifyErrors since sharing trees confuses lambdalift,
         // and in its confusion it emits illegal casts (diagnosed by Grzegorz: checkcast T ; invokevirtual S.m, where T not a subtype of S)
-        casegen.ifThenElseZero(REF(lastReusedTreeMaker.storedCond),
-                               substitution(next).duplicate)
+        casegen.ifThenElseZero(
+          REF(lastReusedTreeMaker.storedCond),
+          substitution(next).duplicate)
       }
       override def toString =
         "R" + ((lastReusedTreeMaker.storedCond.name, substitution))
@@ -364,9 +367,10 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
               // TODO: I don't think the binder's types can actually be different (due to checks in caseEquals)
               // if they do somehow manage to diverge, the lub might not be precise enough and we could get a type error
               // TODO: reuse name exactly if there's only one binder in binders
-              val binder = freshSym(binders.head.pos,
-                                    lub(binders.map(_.tpe)),
-                                    binders.head.name.toString)
+              val binder = freshSym(
+                binders.head.pos,
+                lub(binders.map(_.tpe)),
+                binders.head.name.toString)
 
               // the patterns in same are equal (according to caseEquals)
               // we can thus safely pick the first one arbitrarily, provided we correct binding
@@ -448,8 +452,9 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
         case (Literal(Constant(cx)), Literal(Constant(cy))) => cx == cy
         case (Ident(nme.WILDCARD), Ident(nme.WILDCARD)) => true
         // type-switch for catch
-        case (Bind(_, Typed(Ident(nme.WILDCARD), tpX)),
-              Bind(_, Typed(Ident(nme.WILDCARD), tpY))) =>
+        case (
+            Bind(_, Typed(Ident(nme.WILDCARD), tpX)),
+            Bind(_, Typed(Ident(nme.WILDCARD), tpY))) =>
           tpX.tpe =:= tpY.tpe
         case _ => false
       }
@@ -465,8 +470,9 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
         case (Literal(Constant(cx)), Literal(Constant(cy))) => cx == cy
         case (Ident(nme.WILDCARD), _) => true
         // type-switch for catch
-        case (Bind(_, Typed(Ident(nme.WILDCARD), tpX)),
-              Bind(_, Typed(Ident(nme.WILDCARD), tpY))) =>
+        case (
+            Bind(_, Typed(Ident(nme.WILDCARD), tpX)),
+            Bind(_, Typed(Ident(nme.WILDCARD), tpY))) =>
           instanceOfTpImplies(tpY.tpe, tpX.tpe)
         case _ => false
       }
@@ -573,9 +579,10 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
                 if (needDefaultLabel)
                   deriveCaseDef(cd) { b =>
                     // TODO: can b.tpe ever be null? can't really use pt, see e.g. pos/t2683 or cps/match1.scala
-                    defaultLabel setInfo MethodType(Nil,
-                                                    if (b.tpe != null) b.tpe
-                                                    else pt)
+                    defaultLabel setInfo MethodType(
+                      Nil,
+                      if (b.tpe != null) b.tpe
+                      else pt)
                     LabelDef(defaultLabel, Nil, b)
                   } else cd
 

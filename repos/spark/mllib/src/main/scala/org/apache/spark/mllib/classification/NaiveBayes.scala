@@ -73,9 +73,10 @@ class NaiveBayesModel private[spark] (
   private[mllib] def this(labels: JIterable[Double],
                           pi: JIterable[Double],
                           theta: JIterable[JIterable[Double]]) =
-    this(labels.asScala.toArray,
-         pi.asScala.toArray,
-         theta.asScala.toArray.map(_.asScala.toArray))
+    this(
+      labels.asScala.toArray,
+      pi.asScala.toArray,
+      theta.asScala.toArray.map(_.asScala.toArray))
 
   require(
     supportedModelTypes.contains(modelType),
@@ -230,8 +231,9 @@ object NaiveBayesModel extends Loader[NaiveBayesModel] {
       checkSchema[Data](dataRDD.schema)
       val dataArray =
         dataRDD.select("labels", "pi", "theta", "modelType").take(1)
-      assert(dataArray.length == 1,
-             s"Unable to load NaiveBayesModel data from: ${dataPath(path)}")
+      assert(
+        dataArray.length == 1,
+        s"Unable to load NaiveBayesModel data from: ${dataPath(path)}")
       val data = dataArray(0)
       val labels = data.getAs[Seq[Double]](0).toArray
       val pi = data.getAs[Seq[Double]](1).toArray
@@ -278,8 +280,9 @@ object NaiveBayesModel extends Loader[NaiveBayesModel] {
       // Check schema explicitly since erasure makes it hard to use match-case for checking.
       checkSchema[Data](dataRDD.schema)
       val dataArray = dataRDD.select("labels", "pi", "theta").take(1)
-      assert(dataArray.length == 1,
-             s"Unable to load NaiveBayesModel data from: ${dataPath(path)}")
+      assert(
+        dataArray.length == 1,
+        s"Unable to load NaiveBayesModel data from: ${dataPath(path)}")
       val data = dataArray(0)
       val labels = data.getAs[Seq[Double]](0).toArray
       val pi = data.getAs[Seq[Double]](1).toArray
@@ -309,17 +312,19 @@ object NaiveBayesModel extends Loader[NaiveBayesModel] {
             s"($loadedClassName, $version).  Supported:\n" +
             s"  ($classNameV1_0, 1.0)")
     }
-    assert(model.pi.length == numClasses,
-           s"NaiveBayesModel.load expected $numClasses classes," +
-             s" but class priors vector pi had ${model.pi.length} elements")
+    assert(
+      model.pi.length == numClasses,
+      s"NaiveBayesModel.load expected $numClasses classes," +
+        s" but class priors vector pi had ${model.pi.length} elements")
     assert(
       model.theta.length == numClasses,
       s"NaiveBayesModel.load expected $numClasses classes," +
         s" but class conditionals array theta had ${model.theta.length} elements")
-    assert(model.theta.forall(_.length == numFeatures),
-           s"NaiveBayesModel.load expected $numFeatures features," +
-             s" but class conditionals array theta had elements of size:" +
-             s" ${model.theta.map(_.length).mkString(",")}")
+    assert(
+      model.theta.forall(_.length == numFeatures),
+      s"NaiveBayesModel.load expected $numFeatures features," +
+        s" but class conditionals array theta had elements of size:" +
+        s" ${model.theta.map(_.length).mkString(",")}")
     model
   }
 }
@@ -363,8 +368,9 @@ class NaiveBayes private (private var lambda: Double,
     */
   @Since("1.4.0")
   def setModelType(modelType: String): NaiveBayes = {
-    require(NaiveBayes.supportedModelTypes.contains(modelType),
-            s"NaiveBayes was created with an unknown modelType: $modelType.")
+    require(
+      NaiveBayes.supportedModelTypes.contains(modelType),
+      s"NaiveBayes was created with an unknown modelType: $modelType.")
     this.modelType = modelType
     this
   }
@@ -538,8 +544,9 @@ object NaiveBayes {
   def train(input: RDD[LabeledPoint],
             lambda: Double,
             modelType: String): NaiveBayesModel = {
-    require(supportedModelTypes.contains(modelType),
-            s"NaiveBayes was created with an unknown modelType: $modelType.")
+    require(
+      supportedModelTypes.contains(modelType),
+      s"NaiveBayes was created with an unknown modelType: $modelType.")
     new NaiveBayes(lambda, modelType).run(input)
   }
 }

@@ -100,8 +100,9 @@ object SimpleConsumerShell extends Logging {
     val printOffsetOpt = parser
       .accepts("print-offsets", "Print the offsets returned by the iterator")
     val maxWaitMsOpt = parser
-      .accepts("max-wait-ms",
-               "The max amount of time each fetch request waits.")
+      .accepts(
+        "max-wait-ms",
+        "The max amount of time each fetch request waits.")
       .withRequiredArg
       .describedAs("ms")
       .ofType(classOf[java.lang.Integer])
@@ -126,11 +127,12 @@ object SimpleConsumerShell extends Logging {
         "A low-level tool for fetching data directly from a particular replica.")
 
     val options = parser.parse(args: _*)
-    CommandLineUtils.checkRequiredArgs(parser,
-                                       options,
-                                       brokerListOpt,
-                                       topicOpt,
-                                       partitionIdOpt)
+    CommandLineUtils.checkRequiredArgs(
+      parser,
+      options,
+      brokerListOpt,
+      topicOpt,
+      partitionIdOpt)
 
     val topic = options.valueOf(topicOpt)
     val partitionId = options.valueOf(partitionIdOpt).intValue()
@@ -163,10 +165,11 @@ object SimpleConsumerShell extends Logging {
     ToolsUtils.validatePortOrDie(parser, brokerList)
     val metadataTargetBrokers = ClientUtils.parseBrokerList(brokerList)
     val topicsMetadata = ClientUtils
-      .fetchTopicMetadata(Set(topic),
-                          metadataTargetBrokers,
-                          clientId,
-                          maxWaitMs)
+      .fetchTopicMetadata(
+        Set(topic),
+        metadataTargetBrokers,
+        clientId,
+        maxWaitMs)
       .topicsMetadata
     if (topicsMetadata.size != 1 || !topicsMetadata(0).topic.equals(topic)) {
       System.err.println(
@@ -181,8 +184,8 @@ object SimpleConsumerShell extends Logging {
       partitionsMetadata.find(p => p.partitionId == partitionId)
     if (!partitionMetadataOpt.isDefined) {
       System.err.println(
-        "Error: partition %d does not exist for topic %s".format(partitionId,
-                                                                 topic))
+        "Error: partition %d does not exist for topic %s"
+          .format(partitionId, topic))
       System.exit(1)
     }
 
@@ -215,11 +218,12 @@ object SimpleConsumerShell extends Logging {
       System.exit(1)
     }
     if (startingOffset < 0) {
-      val simpleConsumer = new SimpleConsumer(fetchTargetBroker.host,
-                                              fetchTargetBroker.port,
-                                              ConsumerConfig.SocketTimeout,
-                                              ConsumerConfig.SocketBufferSize,
-                                              clientId)
+      val simpleConsumer = new SimpleConsumer(
+        fetchTargetBroker.host,
+        fetchTargetBroker.port,
+        ConsumerConfig.SocketTimeout,
+        ConsumerConfig.SocketBufferSize,
+        clientId)
       try {
         startingOffset = simpleConsumer.earliestOrLatestOffset(
           TopicAndPartition(topic, partitionId),
@@ -244,18 +248,20 @@ object SimpleConsumerShell extends Logging {
     val replicaString = if (replicaId > 0) "leader" else "replica"
     info(
       "Starting simple consumer shell to partition [%s, %d], %s [%d], host and port: [%s, %d], from offset [%d]"
-        .format(topic,
-                partitionId,
-                replicaString,
-                replicaId,
-                fetchTargetBroker.host,
-                fetchTargetBroker.port,
-                startingOffset))
-    val simpleConsumer = new SimpleConsumer(fetchTargetBroker.host,
-                                            fetchTargetBroker.port,
-                                            10000,
-                                            64 * 1024,
-                                            clientId)
+        .format(
+          topic,
+          partitionId,
+          replicaString,
+          replicaId,
+          fetchTargetBroker.host,
+          fetchTargetBroker.port,
+          startingOffset))
+    val simpleConsumer = new SimpleConsumer(
+      fetchTargetBroker.host,
+      fetchTargetBroker.port,
+      10000,
+      64 * 1024,
+      clientId)
     val thread = Utils.newThread("kafka-simpleconsumer-shell", new Runnable() {
       def run() {
         var offset = startingOffset
@@ -290,23 +296,26 @@ object SimpleConsumerShell extends Logging {
                 val serializedKeySize = if (message.hasKey) key.size else -1
                 val serializedValueSize =
                   if (message.isNull) -1 else value.size
-                formatter.writeTo(new ConsumerRecord(topic,
-                                                     partitionId,
-                                                     offset,
-                                                     message.timestamp,
-                                                     message.timestampType,
-                                                     message.checksum,
-                                                     serializedKeySize,
-                                                     serializedValueSize,
-                                                     key,
-                                                     value),
-                                  System.out)
+                formatter.writeTo(
+                  new ConsumerRecord(
+                    topic,
+                    partitionId,
+                    offset,
+                    message.timestamp,
+                    message.timestampType,
+                    message.checksum,
+                    serializedKeySize,
+                    serializedValueSize,
+                    key,
+                    value),
+                  System.out)
                 numMessagesConsumed += 1
               } catch {
                 case e: Throwable =>
                   if (skipMessageOnError)
-                    error("Error processing message, skipping this message: ",
-                          e)
+                    error(
+                      "Error processing message, skipping this message: ",
+                      e)
                   else throw e
               }
               if (System.out.checkError()) {

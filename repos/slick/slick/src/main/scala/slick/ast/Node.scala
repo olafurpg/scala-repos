@@ -113,10 +113,11 @@ trait Node extends Dumpable {
       case Path(l @ (_ :: _ :: _)) if !GlobalConfig.dumpPaths => Vector.empty
       case _ => childNames.zip(children.toSeq).toVector
     }
-    DumpInfo(objName,
-             mainInfo,
-             if (t != UnassignedType) ": " + t.toString else "",
-             ch)
+    DumpInfo(
+      objName,
+      mainInfo,
+      if (t != UnassignedType) ": " + t.toString else "",
+      ch)
   }
 
   override final def toString = getDumpInfo.getNamePlusMainInfo
@@ -200,8 +201,9 @@ class LiteralNode(val buildType: Type,
     with SimplyTypedNode {
   type Self = LiteralNode
   override def getDumpInfo =
-    super.getDumpInfo.copy(name = "LiteralNode",
-                           mainInfo = s"$value (volatileHint=$volatileHint)")
+    super.getDumpInfo.copy(
+      name = "LiteralNode",
+      mainInfo = s"$value (volatileHint=$volatileHint)")
   protected[this] def rebuild = new LiteralNode(buildType, value, volatileHint)
 
   override def hashCode =
@@ -287,8 +289,9 @@ final case class Pure(value: Node, identity: TypeSymbol = new AnonTypeSymbol)
   override def childNames = Seq("value")
   protected[this] def rebuild(child: Node) = copy(child)
   protected def buildType =
-    CollectionType(TypedCollectionTypeConstructor.seq,
-                   NominalType(identity, value.nodeType))
+    CollectionType(
+      TypedCollectionTypeConstructor.seq,
+      NominalType(identity, value.nodeType))
 }
 
 final case class CollectionCast(child: Node, cons: CollectionTypeConstructor)
@@ -457,9 +460,11 @@ final case class GroupBy(fromGen: TermSymbol,
          CollectionType(
            from2Type.cons,
            ProductType(
-             ConstArray(NominalType(identity, by2.nodeType),
-                        CollectionType(TypedCollectionTypeConstructor.seq,
-                                       from2Type.elementType))))
+             ConstArray(
+               NominalType(identity, by2.nodeType),
+               CollectionType(
+                 TypedCollectionTypeConstructor.seq,
+                 from2Type.elementType))))
        else nodeType)
   }
 }
@@ -531,9 +536,10 @@ final case class Join(leftGen: TermSymbol,
     val right2 = right.infer(scope, typeChildren)
     val left2Type = left2.nodeType.asCollectionType
     val right2Type = right2.nodeType.asCollectionType
-    val on2 = on.infer(scope + (leftGen -> left2Type.elementType) +
-                         (rightGen -> right2Type.elementType),
-                       typeChildren)
+    val on2 = on.infer(
+      scope + (leftGen -> left2Type.elementType) +
+        (rightGen -> right2Type.elementType),
+      typeChildren)
     val (joinedLeftType, joinedRightType) = jt match {
       case JoinType.LeftOption =>
         (left2Type.elementType, OptionType(right2Type.elementType))
@@ -591,8 +597,9 @@ final case class Bind(generator: TermSymbol, from: Node, select: Node)
       else rebuild(from2, select2)
     withCh :@
       (if (!hasType)
-         CollectionType(from2Type.cons,
-                        select2.nodeType.asCollectionType.elementType)
+         CollectionType(
+           from2Type.cons,
+           select2.nodeType.asCollectionType.elementType)
        else nodeType)
   }
 }
@@ -777,8 +784,9 @@ final case class TableNode(
     with TypeGenerator {
   type Self = TableNode
   def buildType =
-    CollectionType(TypedCollectionTypeConstructor.seq,
-                   NominalType(identity, UnassignedType))
+    CollectionType(
+      TypedCollectionTypeConstructor.seq,
+      NominalType(identity, UnassignedType))
   def rebuild = copy()(profileTable)
   override def getDumpInfo =
     super.getDumpInfo.copy(
@@ -963,28 +971,32 @@ object QueryParameter {
     * `QueryParameter`. */
   def constOp[T](name: String)(op: (T, T) => T)(l: Node, r: Node)(
       implicit tpe: ScalaBaseType[T]): Node = (l, r) match {
-    case (LiteralNode(lv) :@ (lt: TypedType[_]),
-          LiteralNode(rv) :@ (rt: TypedType[_]))
+    case (
+        LiteralNode(lv) :@ (lt: TypedType[_]),
+        LiteralNode(rv) :@ (rt: TypedType[_]))
         if lt.scalaType == tpe && rt.scalaType == tpe =>
       LiteralNode[T](op(lv.asInstanceOf[T], rv.asInstanceOf[T])).infer()
-    case (LiteralNode(lv) :@ (lt: TypedType[_]),
-          QueryParameter(re, rt: TypedType[_], _))
+    case (
+        LiteralNode(lv) :@ (lt: TypedType[_]),
+        QueryParameter(re, rt: TypedType[_], _))
         if lt.scalaType == tpe && rt.scalaType == tpe =>
       QueryParameter(new (Any => T) {
         def apply(param: Any) =
           op(lv.asInstanceOf[T], re(param).asInstanceOf[T])
         override def toString = s"($lv $name $re)"
       }, tpe)
-    case (QueryParameter(le, lt: TypedType[_], _),
-          LiteralNode(rv) :@ (rt: TypedType[_]))
+    case (
+        QueryParameter(le, lt: TypedType[_], _),
+        LiteralNode(rv) :@ (rt: TypedType[_]))
         if lt.scalaType == tpe && rt.scalaType == tpe =>
       QueryParameter(new (Any => T) {
         def apply(param: Any) =
           op(le(param).asInstanceOf[T], rv.asInstanceOf[T])
         override def toString = s"($le $name $rv)"
       }, tpe)
-    case (QueryParameter(le, lt: TypedType[_], _),
-          QueryParameter(re, rt: TypedType[_], _))
+    case (
+        QueryParameter(le, lt: TypedType[_], _),
+        QueryParameter(re, rt: TypedType[_], _))
         if lt.scalaType == tpe && rt.scalaType == tpe =>
       QueryParameter(new (Any => T) {
         def apply(param: Any) =

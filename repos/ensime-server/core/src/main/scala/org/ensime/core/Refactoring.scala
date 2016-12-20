@@ -98,8 +98,9 @@ trait RefactoringHandler { self: Analyzer =>
           case Left(failure) => failure
         }
       case None =>
-        RefactorFailure(procedureId,
-                        "No effect found for procId " + procedureId)
+        RefactorFailure(
+          procedureId,
+          "No effect found for procId " + procedureId)
     }
   }
 
@@ -245,9 +246,10 @@ trait RefactoringImpl { self: RichPresentationCompiler =>
         }
         val index = GlobalIndex(cuIndexes.toList)
       }
-      val result = performRefactoring(procId,
-                                      tpe,
-                                      new refactoring.RefactoringParameters())
+      val result = performRefactoring(
+        procId,
+        tpe,
+        new refactoring.RefactoringParameters())
     }.result
 
   protected def doOrganizeImports(procId: Int, tpe: RefactorType, file: File) =
@@ -291,9 +293,10 @@ trait RefactoringImpl { self: RichPresentationCompiler =>
     val af = AbstractFile.getFile(file.getPath)
     val modifications = refactoring.addImport(af, qualName)
     Right(
-      new RefactorEffect(procId,
-                         tpe,
-                         modifications.map(FileEditHelper.fromChange)))
+      new RefactorEffect(
+        procId,
+        tpe,
+        modifications.map(FileEditHelper.fromChange)))
   }
 
   protected def reloadAndType(f: File) =

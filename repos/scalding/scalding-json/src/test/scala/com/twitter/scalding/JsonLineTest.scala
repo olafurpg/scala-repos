@@ -30,12 +30,13 @@ object JsonLine {
 }
 
 class JsonLine(p: String, fields: Fields, failOnEmptyLines: Boolean)
-    extends StandardJsonLine(p,
-                             fields,
-                             SinkMode.REPLACE,
-                             // We want to test the actual transformation here.
-                             transformInTest = true,
-                             failOnEmptyLines = failOnEmptyLines)
+    extends StandardJsonLine(
+      p,
+      fields,
+      SinkMode.REPLACE,
+      // We want to test the actual transformation here.
+      transformInTest = true,
+      failOnEmptyLines = failOnEmptyLines)
 
 class JsonLineJob(args: Args) extends Job(args) {
   try {
@@ -90,8 +91,9 @@ class JsonLineTest extends WordSpec {
 
   "A JsonLine sink" should {
     JobTest(new JsonLineJob(_))
-      .source(Tsv("input0", ('query, 'queryStats)),
-              List(("doctor's mask", List(42.1f, 17.1f))))
+      .source(
+        Tsv("input0", ('query, 'queryStats)),
+        List(("doctor's mask", List(42.1f, 17.1f))))
       .sink[String](JsonLine("output0")) { buf =>
         val json = buf.head
         "not stringify lists or numbers and not escape single quotes" in {
@@ -103,8 +105,9 @@ class JsonLineTest extends WordSpec {
       .finish
 
     JobTest(new JsonLineRestrictedFieldsJob(_))
-      .source(Tsv("input0", ('query, 'queryStats)),
-              List(("doctor's mask", List(42.1f, 17.1f))))
+      .source(
+        Tsv("input0", ('query, 'queryStats)),
+        List(("doctor's mask", List(42.1f, 17.1f))))
       .sink[String](JsonLine("output0", Tuple1('query))) { buf =>
         val json = buf.head
         "only sink requested fields" in {
@@ -141,8 +144,9 @@ class JsonLineTest extends WordSpec {
     val json3 = """{"foo": {"too": 9}}\n"""
 
     JobTest(new JsonLineNestedInputJob(_))
-      .source(JsonLine("input0", (Symbol("foo.too"), 'bar)),
-              List((0, json), (1, json3)))
+      .source(
+        JsonLine("input0", (Symbol("foo.too"), 'bar)),
+        List((0, json), (1, json3)))
       .sink[(Int, String)](Tsv("output0")) { outBuf =>
         "handle nested fields" in {
           assert(outBuf.toList === List((0, "baz"), (9, null)))
@@ -154,8 +158,9 @@ class JsonLineTest extends WordSpec {
     "fail on empty lines by default" in {
       intercept[FlowException] {
         JobTest(new JsonLineInputJob(_))
-          .source(JsonLine("input0", ('foo, 'bar)),
-                  List((0, json), (1, json2), (2, ""), (3, "   ")))
+          .source(
+            JsonLine("input0", ('foo, 'bar)),
+            List((0, json), (1, json2), (2, ""), (3, "   ")))
           .sink[(Int, String)](Tsv("output0")) { outBuf =>
             outBuf.toList
           }
@@ -165,8 +170,9 @@ class JsonLineTest extends WordSpec {
     }
 
     JobTest(new JsonLineInputJobSkipEmptyLines(_))
-      .source(JsonLine("input0", ('foo, 'bar)),
-              List((0, json), (1, json2), (2, ""), (3, "   ")))
+      .source(
+        JsonLine("input0", ('foo, 'bar)),
+        List((0, json), (1, json2), (2, ""), (3, "   ")))
       .sink[(Int, String)](Tsv("output0")) { outBuf =>
         "handle empty lines when `failOnEmptyLines` is set to false" in {
           assert(outBuf.toList.size === 2)

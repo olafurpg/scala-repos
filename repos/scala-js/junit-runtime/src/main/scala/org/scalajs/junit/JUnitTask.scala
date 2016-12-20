@@ -32,11 +32,12 @@ final class JUnitTask(val taskDef: TaskDef, runner: JUnitBaseRunner)
 
     Try(TestUtils.loadModule(bootstrapperName, runner.testClassLoader)) match {
       case Success(classMetadata: JUnitTestBootstrapper) =>
-        new JUnitExecuteTest(taskDef,
-                             runner,
-                             classMetadata,
-                             richLogger,
-                             eventHandler).executeTests()
+        new JUnitExecuteTest(
+          taskDef,
+          runner,
+          classMetadata,
+          richLogger,
+          eventHandler).executeTests()
 
       case Success(_) =>
         richLogger.error(

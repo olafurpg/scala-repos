@@ -80,10 +80,11 @@ private[clustering] trait KMeansParams
     * @group expertParam
     */
   @Since("1.5.0")
-  final val initSteps = new IntParam(this,
-                                     "initSteps",
-                                     "number of steps for k-means||",
-                                     (value: Int) => value > 0)
+  final val initSteps = new IntParam(
+    this,
+    "initSteps",
+    "number of steps for k-means||",
+    (value: Int) => value > 0)
 
   /** @group expertGetParam */
   @Since("1.5.0")
@@ -235,11 +236,12 @@ class KMeans @Since("1.5.0")(@Since("1.5.0") override val uid: String)
     with KMeansParams
     with DefaultParamsWritable {
 
-  setDefault(k -> 2,
-             maxIter -> 20,
-             initMode -> MLlibKMeans.K_MEANS_PARALLEL,
-             initSteps -> 5,
-             tol -> 1e-4)
+  setDefault(
+    k -> 2,
+    maxIter -> 20,
+    initMode -> MLlibKMeans.K_MEANS_PARALLEL,
+    initSteps -> 5,
+    tol -> 1e-4)
 
   @Since("1.5.0")
   override def copy(extra: ParamMap): KMeans = defaultCopy(extra)
@@ -294,9 +296,10 @@ class KMeans @Since("1.5.0")(@Since("1.5.0") override val uid: String)
       .setEpsilon($(tol))
     val parentModel = algo.run(rdd)
     val model = copyValues(new KMeansModel(uid, parentModel).setParent(this))
-    val summary = new KMeansSummary(model.transform(dataset),
-                                    $(predictionCol),
-                                    $(featuresCol))
+    val summary = new KMeansSummary(
+      model.transform(dataset),
+      $(predictionCol),
+      $(featuresCol))
     model.setSummary(summary)
   }
 

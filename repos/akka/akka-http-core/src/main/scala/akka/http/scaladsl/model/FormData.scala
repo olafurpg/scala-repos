@@ -20,8 +20,9 @@ final case class FormData(fields: Uri.Query) {
       this.fields,
       charset.nioCharset,
       CharacterClasses.unreserved)
-    HttpEntity(`application/x-www-form-urlencoded` withCharset charset,
-               render.get)
+    HttpEntity(
+      `application/x-www-form-urlencoded` withCharset charset,
+      render.get)
   }
 }
 

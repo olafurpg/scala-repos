@@ -314,8 +314,9 @@ trait ScTypePresentation {
             case _ =>
               existentialTypeText(existType, checkWildcard = false, stable)
           }
-        case ex @ ScExistentialType(ScParameterizedType(des, typeArgs),
-                                    wilds) =>
+        case ex @ ScExistentialType(
+              ScParameterizedType(des, typeArgs),
+              wilds) =>
           val wildcardsMap = ex.wildcardsMap()
           val replacingArgs =
             new ArrayBuffer[(ScType, ScExistentialArgument)]()
@@ -380,11 +381,12 @@ trait ScTypePresentation {
         case proj: ScProjectionType if proj != null =>
           projectionTypeText(proj, needDotType)
         case ScParameterizedType(des, typeArgs) =>
-          innerTypeText(des) + typeSeqText(typeArgs,
-                                           "[",
-                                           ", ",
-                                           "]",
-                                           checkWildcard = true)
+          innerTypeText(des) + typeSeqText(
+            typeArgs,
+            "[",
+            ", ",
+            "]",
+            checkWildcard = true)
         case j @ JavaArrayType(arg) =>
           s"Array[${innerTypeText(arg)}]"
         case ScSkolemizedType(name, _, _, _) => name
@@ -410,8 +412,9 @@ trait ScTypePresentation {
             .mkString("[", ", ", "] ") + internalType.toString
         case mt @ ScMethodType(retType, params, isImplicit) =>
           innerTypeText(
-            ScFunctionType(retType, params.map(_.paramType))(mt.project,
-                                                             mt.scope),
+            ScFunctionType(retType, params.map(_.paramType))(
+              mt.project,
+              mt.scope),
             needDotType)
         case _ => "" //todo
       }

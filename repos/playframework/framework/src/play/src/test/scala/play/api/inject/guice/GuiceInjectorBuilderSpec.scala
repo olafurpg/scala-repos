@@ -59,10 +59,11 @@ object GuiceInjectorBuilderSpec extends Specification {
 
     "support various bindings" in {
       val injector = new GuiceInjectorBuilder()
-        .bindings(new EnvironmentModule,
-                  Seq(new ConfigurationModule),
-                  new AModule,
-                  Seq(new BModule))
+        .bindings(
+          new EnvironmentModule,
+          Seq(new ConfigurationModule),
+          new AModule,
+          Seq(new BModule))
         .bindings(bind[C].to[C1], Seq(bind[D].to[D1]))
         .injector
 
@@ -79,8 +80,9 @@ object GuiceInjectorBuilderSpec extends Specification {
         .in(Mode.Dev)
         .configure("a" -> 1)
         .bindings(new EnvironmentModule, new ConfigurationModule)
-        .overrides(bind[Environment] to Environment.simple(),
-                   new SetConfigurationModule(Configuration("b" -> 2)))
+        .overrides(
+          bind[Environment] to Environment.simple(),
+          new SetConfigurationModule(Configuration("b" -> 2)))
         .injector
 
       val env = injector.instanceOf[Environment]
@@ -92,12 +94,13 @@ object GuiceInjectorBuilderSpec extends Specification {
 
     "disable modules" in {
       val injector = new GuiceInjectorBuilder()
-        .bindings(new EnvironmentModule,
-                  new ConfigurationModule,
-                  new AModule,
-                  new BModule,
-                  bind[C].to[C1],
-                  bind[D] to new D1)
+        .bindings(
+          new EnvironmentModule,
+          new ConfigurationModule,
+          new AModule,
+          new BModule,
+          bind[C].to[C1],
+          bind[D] to new D1)
         .disable[EnvironmentModule]
         .disable(classOf[AModule], classOf[CModule]) // C won't be disabled
         .injector

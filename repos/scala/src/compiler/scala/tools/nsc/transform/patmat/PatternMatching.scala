@@ -63,9 +63,10 @@ trait PatternMatching
         val origTp = tree.tpe
         // setType origTp intended for CPS -- TODO: is it necessary?
         val translated = translator.translateMatch(
-          treeCopy.Match(tree,
-                         transform(sel),
-                         transformTrees(cases).asInstanceOf[List[CaseDef]]))
+          treeCopy.Match(
+            tree,
+            transform(sel),
+            transformTrees(cases).asInstanceOf[List[CaseDef]]))
         try {
           localTyper.typed(translated) setType origTp
         } catch {
@@ -78,13 +79,14 @@ trait PatternMatching
             translated
         }
       case Try(block, catches, finalizer) =>
-        treeCopy.Try(tree,
-                     transform(block),
-                     translator.translateTry(
-                       transformTrees(catches).asInstanceOf[List[CaseDef]],
-                       tree.tpe,
-                       tree.pos),
-                     transform(finalizer))
+        treeCopy.Try(
+          tree,
+          transform(block),
+          translator.translateTry(
+            transformTrees(catches).asInstanceOf[List[CaseDef]],
+            tree.tpe,
+            tree.pos),
+          transform(finalizer))
       case _ => super.transform(tree)
     }
 
@@ -261,16 +263,18 @@ trait Interface extends ast.TreeDSL {
             else typer.typed(to)
 
           def typedStable(t: Tree) =
-            typer.typed(t.shallowDuplicate,
-                        Mode.MonoQualifierModes | Mode.TYPEPATmode)
+            typer.typed(
+              t.shallowDuplicate,
+              Mode.MonoQualifierModes | Mode.TYPEPATmode)
           lazy val toTypes: List[Type] = to map (tree => typedStable(tree).tpe)
 
           override def transform(tree: Tree): Tree = {
             def subst(from: List[Symbol], to: List[Tree]): Tree =
               if (from.isEmpty) tree
               else if (tree.symbol == from.head)
-                typedIfOrigTyped(typedStable(to.head).setPos(tree.pos),
-                                 tree.tpe)
+                typedIfOrigTyped(
+                  typedStable(to.head).setPos(tree.pos),
+                  tree.tpe)
               else subst(from.tail, to.tail)
 
             val tree1 = tree match {

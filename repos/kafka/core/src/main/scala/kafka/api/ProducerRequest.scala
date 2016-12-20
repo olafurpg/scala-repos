@@ -50,12 +50,13 @@ object ProducerRequest {
       })
     })
 
-    ProducerRequest(versionId,
-                    correlationId,
-                    clientId,
-                    requiredAcks,
-                    ackTimeoutMs,
-                    collection.mutable.Map(partitionDataPairs: _*))
+    ProducerRequest(
+      versionId,
+      correlationId,
+      clientId,
+      requiredAcks,
+      ackTimeoutMs,
+      collection.mutable.Map(partitionDataPairs: _*))
   }
 }
 
@@ -81,12 +82,13 @@ case class ProducerRequest(
       requiredAcks: Short,
       ackTimeoutMs: Int,
       data: collection.mutable.Map[TopicAndPartition, ByteBufferMessageSet]) =
-    this(ProducerRequest.CurrentVersion,
-         correlationId,
-         clientId,
-         requiredAcks,
-         ackTimeoutMs,
-         data)
+    this(
+      ProducerRequest.CurrentVersion,
+      correlationId,
+      clientId,
+      requiredAcks,
+      ackTimeoutMs,
+      data)
 
   def writeTo(buffer: ByteBuffer) {
     buffer.putShort(versionId)
@@ -147,9 +149,10 @@ case class ProducerRequest(
       val producerResponseStatus = data.map {
         case (topicAndPartition, data) =>
           (topicAndPartition,
-           ProducerResponseStatus(Errors.forException(e).code,
-                                  -1l,
-                                  Message.NoTimestamp))
+           ProducerResponseStatus(
+             Errors.forException(e).code,
+             -1l,
+             Message.NoTimestamp))
       }
       val errorResponse =
         ProducerResponse(correlationId, producerResponseStatus)

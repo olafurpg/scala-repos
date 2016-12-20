@@ -181,10 +181,11 @@ class MarathonModule(conf: MarathonConf, http: HttpConf, zk: ZooKeeperClient)
     def directZK(): PersistentStore = {
       import com.twitter.util.TimeConversions._
       val sessionTimeout = conf.zooKeeperSessionTimeout().millis
-      val connector = NativeConnector(conf.zkHosts,
-                                      None,
-                                      sessionTimeout,
-                                      new JavaTimer(isDaemon = true))
+      val connector = NativeConnector(
+        conf.zkHosts,
+        None,
+        sessionTimeout,
+        new JavaTimer(isDaemon = true))
       val client =
         ZkClient(connector).withAcl(Ids.OPEN_ACL_UNSAFE.asScala).withRetries(3)
       val compressionConf = CompressionConf(
@@ -236,14 +237,15 @@ class MarathonModule(conf: MarathonConf, http: HttpConf, zk: ZooKeeperClient)
 
     import scala.concurrent.ExecutionContext.Implicits.global
     def createSchedulerActions(schedulerActor: ActorRef): SchedulerActions = {
-      new SchedulerActions(appRepository,
-                           groupRepository,
-                           healthCheckManager,
-                           taskTracker,
-                           taskQueue,
-                           eventBus,
-                           schedulerActor,
-                           conf)
+      new SchedulerActions(
+        appRepository,
+        groupRepository,
+        healthCheckManager,
+        taskTracker,
+        taskQueue,
+        eventBus,
+        schedulerActor,
+        conf)
     }
 
     def deploymentManagerProps(schedulerActions: SchedulerActions): Props = {
@@ -424,9 +426,10 @@ class MarathonModule(conf: MarathonConf, http: HttpConf, zk: ZooKeeperClient)
   def provideAppRepository(
       @Named(ModuleNames.STORE_APP) store: EntityStore[AppDefinition],
       metrics: Metrics): AppRepository = {
-    new AppRepository(store,
-                      maxVersions = conf.zooKeeperMaxVersions.get,
-                      metrics)
+    new AppRepository(
+      store,
+      maxVersions = conf.zooKeeperMaxVersions.get,
+      metrics)
   }
 
   @Provides
@@ -470,10 +473,11 @@ class MarathonModule(conf: MarathonConf, http: HttpConf, zk: ZooKeeperClient)
   @Singleton
   def provideFrameworkIdStore(store: PersistentStore,
                               metrics: Metrics): EntityStore[FrameworkId] = {
-    entityStore(store,
-                metrics,
-                "framework:",
-                () => new FrameworkId(UUID.randomUUID().toString))
+    entityStore(
+      store,
+      metrics,
+      "framework:",
+      () => new FrameworkId(UUID.randomUUID().toString))
   }
 
   @Named(ModuleNames.STORE_GROUP)
@@ -498,15 +502,16 @@ class MarathonModule(conf: MarathonConf, http: HttpConf, zk: ZooKeeperClient)
   def provideTaskFailreStore(store: PersistentStore,
                              metrics: Metrics): EntityStore[TaskFailure] = {
     import org.apache.mesos.{Protos => mesos}
-    entityStore(store,
-                metrics,
-                "taskFailure:",
-                () =>
-                  TaskFailure(
-                    PathId.empty,
-                    mesos.TaskID.newBuilder().setValue("").build,
-                    mesos.TaskState.TASK_STAGING
-                ))
+    entityStore(
+      store,
+      metrics,
+      "taskFailure:",
+      () =>
+        TaskFailure(
+          PathId.empty,
+          mesos.TaskID.newBuilder().setValue("").build,
+          mesos.TaskState.TASK_STAGING
+      ))
   }
 
   @Named(ModuleNames.STORE_TASK)
@@ -531,10 +536,11 @@ class MarathonModule(conf: MarathonConf, http: HttpConf, zk: ZooKeeperClient)
   def provideEventSubscribersStore(
       store: PersistentStore,
       metrics: Metrics): EntityStore[EventSubscribers] = {
-    entityStore(store,
-                metrics,
-                "events:",
-                () => new EventSubscribers(Set.empty[String]))
+    entityStore(
+      store,
+      metrics,
+      "events:",
+      () => new EventSubscribers(Set.empty[String]))
   }
 
   private[this] def entityStore[

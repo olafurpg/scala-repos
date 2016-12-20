@@ -129,11 +129,12 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
              topicAndPartition.topic))) {
         if (partitionState.equals(OfflinePartition) ||
             partitionState.equals(NewPartition))
-          handleStateChange(topicAndPartition.topic,
-                            topicAndPartition.partition,
-                            OnlinePartition,
-                            controller.offlinePartitionSelector,
-                            (new CallbackBuilder).build)
+          handleStateChange(
+            topicAndPartition.topic,
+            topicAndPartition.partition,
+            OnlinePartition,
+            controller.offlinePartitionSelector,
+            (new CallbackBuilder).build)
       }
       brokerRequestBatch.sendRequestsToBrokers(controller.epoch)
     } catch {
@@ -163,11 +164,12 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
     try {
       brokerRequestBatch.newBatch()
       partitions.foreach { topicAndPartition =>
-        handleStateChange(topicAndPartition.topic,
-                          topicAndPartition.partition,
-                          targetState,
-                          leaderSelector,
-                          callbacks)
+        handleStateChange(
+          topicAndPartition.topic,
+          topicAndPartition.partition,
+          targetState,
+          leaderSelector,
+          callbacks)
       }
       brokerRequestBatch.sendRequestsToBrokers(controller.epoch)
     } catch {
@@ -222,21 +224,23 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
       targetState match {
         case NewPartition =>
           // pre: partition did not exist before this
-          assertValidPreviousStates(topicAndPartition,
-                                    List(NonExistentPartition),
-                                    NewPartition)
+          assertValidPreviousStates(
+            topicAndPartition,
+            List(NonExistentPartition),
+            NewPartition)
           partitionState.put(topicAndPartition, NewPartition)
           val assignedReplicas = controllerContext
             .partitionReplicaAssignment(topicAndPartition)
             .mkString(",")
           stateChangeLogger.trace(
             "Controller %d epoch %d changed partition %s state from %s to %s with assigned replicas %s"
-              .format(controllerId,
-                      controller.epoch,
-                      topicAndPartition,
-                      currState,
-                      targetState,
-                      assignedReplicas))
+              .format(
+                controllerId,
+                controller.epoch,
+                topicAndPartition,
+                currState,
+                targetState,
+                assignedReplicas))
         // post: partition has been assigned replicas
         case OnlinePartition =>
           assertValidPreviousStates(
@@ -262,12 +266,13 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
             .leader
           stateChangeLogger.trace(
             "Controller %d epoch %d changed partition %s from %s to %s with leader %d"
-              .format(controllerId,
-                      controller.epoch,
-                      topicAndPartition,
-                      currState,
-                      targetState,
-                      leader))
+              .format(
+                controllerId,
+                controller.epoch,
+                topicAndPartition,
+                currState,
+                targetState,
+                leader))
         // post: partition has a leader
         case OfflinePartition =>
           // pre: partition should be in New or Online state
@@ -278,25 +283,28 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
           // should be called when the leader for a partition is no longer alive
           stateChangeLogger.trace(
             "Controller %d epoch %d changed partition %s state from %s to %s"
-              .format(controllerId,
-                      controller.epoch,
-                      topicAndPartition,
-                      currState,
-                      targetState))
+              .format(
+                controllerId,
+                controller.epoch,
+                topicAndPartition,
+                currState,
+                targetState))
           partitionState.put(topicAndPartition, OfflinePartition)
         // post: partition has no alive leader
         case NonExistentPartition =>
           // pre: partition should be in Offline state
-          assertValidPreviousStates(topicAndPartition,
-                                    List(OfflinePartition),
-                                    NonExistentPartition)
+          assertValidPreviousStates(
+            topicAndPartition,
+            List(OfflinePartition),
+            NonExistentPartition)
           stateChangeLogger.trace(
             "Controller %d epoch %d changed partition %s state from %s to %s"
-              .format(controllerId,
-                      controller.epoch,
-                      topicAndPartition,
-                      currState,
-                      targetState))
+              .format(
+                controllerId,
+                controller.epoch,
+                topicAndPartition,
+                currState,
+                targetState))
           partitionState.put(topicAndPartition, NonExistentPartition)
         // post: partition state is deleted from all brokers and zookeeper
       }
@@ -304,11 +312,12 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
       case t: Throwable =>
         stateChangeLogger.error(
           "Controller %d epoch %d initiated state change for partition %s from %s to %s failed"
-            .format(controllerId,
-                    controller.epoch,
-                    topicAndPartition,
-                    currState,
-                    targetState),
+            .format(
+              controllerId,
+              controller.epoch,
+              topicAndPartition,
+              currState,
+              targetState),
           t)
     }
   }
@@ -386,8 +395,9 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
             .format(topicAndPartition, leaderIsrAndControllerEpoch))
         try {
           zkUtils.createPersistentPath(
-            getTopicPartitionLeaderAndIsrPath(topicAndPartition.topic,
-                                              topicAndPartition.partition),
+            getTopicPartitionLeaderAndIsrPath(
+              topicAndPartition.topic,
+              topicAndPartition.partition),
             zkUtils.leaderAndIsrZkData(
               leaderIsrAndControllerEpoch.leaderAndIsr,
               controller.epoch))
@@ -406,9 +416,10 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
           case e: ZkNodeExistsException =>
             // read the controller epoch
             val leaderIsrAndEpoch = ReplicationUtils
-              .getLeaderIsrAndEpochForPartition(zkUtils,
-                                                topicAndPartition.topic,
-                                                topicAndPartition.partition)
+              .getLeaderIsrAndEpochForPartition(
+                zkUtils,
+                topicAndPartition.topic,
+                topicAndPartition.partition)
               .get
             val failMsg =
               ("encountered error while changing partition %s's state from New to Online since LeaderAndIsr path already " +
@@ -463,12 +474,13 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
         val (leaderAndIsr, replicas) =
           leaderSelector.selectLeader(topicAndPartition, currentLeaderAndIsr)
         val (updateSucceeded, newVersion) =
-          ReplicationUtils.updateLeaderAndIsr(zkUtils,
-                                              topic,
-                                              partition,
-                                              leaderAndIsr,
-                                              controller.epoch,
-                                              currentLeaderAndIsr.zkVersion)
+          ReplicationUtils.updateLeaderAndIsr(
+            zkUtils,
+            topic,
+            partition,
+            leaderAndIsr,
+            controller.epoch,
+            currentLeaderAndIsr.zkVersion)
         newLeaderAndIsr = leaderAndIsr
         newLeaderAndIsr.zkVersion = newVersion
         zookeeperPathUpdateSucceeded = updateSucceeded
@@ -482,10 +494,11 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
         newLeaderIsrAndControllerEpoch)
       stateChangeLogger.trace(
         "Controller %d epoch %d elected leader %d for Offline partition %s"
-          .format(controllerId,
-                  controller.epoch,
-                  newLeaderAndIsr.leader,
-                  topicAndPartition))
+          .format(
+            controllerId,
+            controller.epoch,
+            newLeaderAndIsr.leader,
+            topicAndPartition))
       val replicas = controllerContext.partitionReplicaAssignment(
         TopicAndPartition(topic, partition))
       // store new leader and isr info in cache
@@ -595,9 +608,10 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
               addedPartitionReplicaAssignment)
             info(
               "New topics: [%s], deleted topics: [%s], new partition replica assignment [%s]"
-                .format(newTopics,
-                        deletedTopics,
-                        addedPartitionReplicaAssignment))
+                .format(
+                  newTopics,
+                  deletedTopics,
+                  addedPartitionReplicaAssignment))
             if (newTopics.size > 0)
               controller.onNewTopicCreation(
                 newTopics,
@@ -699,8 +713,9 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
           if (controller.deleteTopicManager.isTopicQueuedUpForDeletion(topic))
             error(
               "Skipping adding partitions %s for topic %s since it is currently being deleted"
-                .format(partitionsToBeAdded.map(_._1.partition).mkString(","),
-                        topic))
+                .format(
+                  partitionsToBeAdded.map(_._1.partition).mkString(","),
+                  topic))
           else {
             if (partitionsToBeAdded.size > 0) {
               info("New partitions to be added %s".format(partitionsToBeAdded))
@@ -712,9 +727,10 @@ class PartitionStateMachine(controller: KafkaController) extends Logging {
           }
         } catch {
           case e: Throwable =>
-            error("Error while handling add partitions for data path " +
-                    dataPath,
-                  e)
+            error(
+              "Error while handling add partitions for data path " +
+                dataPath,
+              e)
         }
       }
     }

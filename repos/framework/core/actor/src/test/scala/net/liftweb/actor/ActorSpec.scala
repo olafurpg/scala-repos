@@ -70,8 +70,8 @@ class ActorSpec extends Specification {
 
     "properly timeout" in {
       val a = actor
-      (a !< Set(33)).get(50) must be_==(Empty).eventually(900,
-                                                          100.milliseconds)
+      (a !< Set(33))
+        .get(50) must be_==(Empty).eventually(900, 100.milliseconds)
     }
   }
 }

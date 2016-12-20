@@ -68,10 +68,12 @@ private[sql] object InferSchema {
         }
       }
       .treeAggregate[DataType](StructType(Seq()))(
-        compatibleRootType(columnNameOfCorruptRecords,
-                           shouldHandleCorruptRecord),
-        compatibleRootType(columnNameOfCorruptRecords,
-                           shouldHandleCorruptRecord))
+        compatibleRootType(
+          columnNameOfCorruptRecords,
+          shouldHandleCorruptRecord),
+        compatibleRootType(
+          columnNameOfCorruptRecords,
+          shouldHandleCorruptRecord))
 
     canonicalizeType(rootType) match {
       case Some(st: StructType) => st
@@ -107,9 +109,10 @@ private[sql] object InferSchema {
       case START_OBJECT =>
         val builder = Seq.newBuilder[StructField]
         while (nextUntil(parser, END_OBJECT)) {
-          builder += StructField(parser.getCurrentName,
-                                 inferField(parser, configOptions),
-                                 nullable = true)
+          builder += StructField(
+            parser.getCurrentName,
+            inferField(parser, configOptions),
+            nullable = true)
         }
 
         StructType(builder.result().sortBy(_.name))
@@ -208,11 +211,13 @@ private[sql] object InferSchema {
     // Since we support array of json objects at the top level,
     // we need to check the element type and find the root level data type.
     case (ArrayType(ty1, _), ty2) =>
-      compatibleRootType(columnNameOfCorruptRecords,
-                         shouldHandleCorruptRecord)(ty1, ty2)
+      compatibleRootType(
+        columnNameOfCorruptRecords,
+        shouldHandleCorruptRecord)(ty1, ty2)
     case (ty1, ArrayType(ty2, _)) =>
-      compatibleRootType(columnNameOfCorruptRecords,
-                         shouldHandleCorruptRecord)(ty1, ty2)
+      compatibleRootType(
+        columnNameOfCorruptRecords,
+        shouldHandleCorruptRecord)(ty1, ty2)
     // If we see any other data type at the root level, we get records that cannot be
     // parsed. So, we use the struct as the data type and add the corrupt field to the schema.
     case (struct: StructType, NullType) => struct
@@ -261,10 +266,12 @@ private[sql] object InferSchema {
             }
           StructType(newFields.toSeq.sortBy(_.name))
 
-        case (ArrayType(elementType1, containsNull1),
-              ArrayType(elementType2, containsNull2)) =>
-          ArrayType(compatibleType(elementType1, elementType2),
-                    containsNull1 || containsNull2)
+        case (
+            ArrayType(elementType1, containsNull1),
+            ArrayType(elementType2, containsNull2)) =>
+          ArrayType(
+            compatibleType(elementType1, elementType2),
+            containsNull1 || containsNull2)
 
         // strings and every string is a Json object.
         case (_, _) => StringType

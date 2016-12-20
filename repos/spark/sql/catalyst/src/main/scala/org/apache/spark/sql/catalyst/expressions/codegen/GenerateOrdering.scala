@@ -54,8 +54,9 @@ object GenerateOrdering
   def create(schema: StructType): BaseOrdering = {
     create(schema.zipWithIndex.map {
       case (field, ordinal) =>
-        SortOrder(BoundReference(ordinal, field.dataType, nullable = true),
-                  Ascending)
+        SortOrder(
+          BoundReference(ordinal, field.dataType, nullable = true),
+          Ascending)
     })
   }
 
@@ -107,9 +108,10 @@ object GenerateOrdering
           } else if ($isNullB) {
             return ${if (order.direction == Ascending) "1" else "-1"};
           } else {
-            int comp = ${ctx.genComp(order.child.dataType,
-                                     primitiveA,
-                                     primitiveB)};
+            int comp = ${ctx.genComp(
+          order.child.dataType,
+          primitiveA,
+          primitiveB)};
             if (comp != 0) {
               return ${if (asc) "comp" else "-comp"};
             }
@@ -186,8 +188,9 @@ object LazilyGeneratedOrdering {
   def forSchema(schema: StructType): LazilyGeneratedOrdering = {
     new LazilyGeneratedOrdering(schema.zipWithIndex.map {
       case (field, ordinal) =>
-        SortOrder(BoundReference(ordinal, field.dataType, nullable = true),
-                  Ascending)
+        SortOrder(
+          BoundReference(ordinal, field.dataType, nullable = true),
+          Ascending)
     })
   }
 }

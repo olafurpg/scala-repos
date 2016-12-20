@@ -292,13 +292,14 @@ object PersistentFSM {
         notifies: Boolean = notifies,
         domainEvents: Seq[E] = domainEvents,
         afterTransitionDo: D ⇒ Unit = afterTransitionDo): State[S, D, E] = {
-      State(stateName,
-            stateData,
-            timeout,
-            stopReason,
-            replies,
-            domainEvents,
-            afterTransitionDo)(notifies)
+      State(
+        stateName,
+        stateData,
+        timeout,
+        stopReason,
+        replies,
+        domainEvents,
+        afterTransitionDo)(notifies)
     }
 
     /**

@@ -301,21 +301,22 @@ trait Html5Writer {
 }
 
 object Html5Constants {
-  val voidTags: Set[String] = Set("area",
-                                  "base",
-                                  "br",
-                                  "col",
-                                  "command",
-                                  "embed",
-                                  "hr",
-                                  "img",
-                                  "input",
-                                  "keygen",
-                                  "link",
-                                  "meta",
-                                  "param",
-                                  "source",
-                                  "wbr")
+  val voidTags: Set[String] = Set(
+    "area",
+    "base",
+    "br",
+    "col",
+    "command",
+    "embed",
+    "hr",
+    "img",
+    "input",
+    "keygen",
+    "link",
+    "meta",
+    "param",
+    "source",
+    "wbr")
 
   /**
     * Is the tag a void tag?

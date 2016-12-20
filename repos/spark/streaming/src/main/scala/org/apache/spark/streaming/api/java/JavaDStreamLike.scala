@@ -171,8 +171,9 @@ trait JavaDStreamLike[
   /** Return a new DStream by applying a function to all elements of this DStream. */
   def mapToPair[K2, V2](f: PairFunction[T, K2, V2]): JavaPairDStream[K2, V2] = {
     def cm: ClassTag[(K2, V2)] = fakeClassTag
-    new JavaPairDStream(dstream.map[(K2, V2)](f)(cm))(fakeClassTag[K2],
-                                                      fakeClassTag[V2])
+    new JavaPairDStream(dstream.map[(K2, V2)](f)(cm))(
+      fakeClassTag[K2],
+      fakeClassTag[V2])
   }
 
   /**
@@ -192,8 +193,9 @@ trait JavaDStreamLike[
       f: PairFlatMapFunction[T, K2, V2]): JavaPairDStream[K2, V2] = {
     def fn: (T) => Iterator[(K2, V2)] = (x: T) => f.call(x).asScala
     def cm: ClassTag[(K2, V2)] = fakeClassTag
-    new JavaPairDStream(dstream.flatMap(fn)(cm))(fakeClassTag[K2],
-                                                 fakeClassTag[V2])
+    new JavaPairDStream(dstream.flatMap(fn)(cm))(
+      fakeClassTag[K2],
+      fakeClassTag[V2])
   }
 
   /**
@@ -221,8 +223,9 @@ trait JavaDStreamLike[
     def fn: (Iterator[T]) => Iterator[(K2, V2)] = { (x: Iterator[T]) =>
       f.call(x.asJava).asScala
     }
-    new JavaPairDStream(dstream.mapPartitions(fn))(fakeClassTag[K2],
-                                                   fakeClassTag[V2])
+    new JavaPairDStream(dstream.mapPartitions(fn))(
+      fakeClassTag[K2],
+      fakeClassTag[V2])
   }
 
   /**
@@ -425,8 +428,9 @@ trait JavaDStreamLike[
                        inThat: RDD[(K2, V2)],
                        time: Time): RDD[(K3, V3)] =
       transformFunc.call(wrapRDD(inThis), other.wrapRDD(inThat), time).rdd
-    dstream.transformWith[(K2, V2), (K3, V3)](other.dstream,
-                                              scalaTransform(_, _, _))
+    dstream.transformWith[(K2, V2), (K3, V3)](
+      other.dstream,
+      scalaTransform(_, _, _))
   }
 
   /**

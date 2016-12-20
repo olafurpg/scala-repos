@@ -70,8 +70,9 @@ abstract class JsonSupportSpec
     }
     "provide proper error messages for requirement errors" in {
       val result = unmarshal(
-        HttpEntity(MediaTypes.`application/json`,
-                   Employee.illegalEmployeeJson))
+        HttpEntity(
+          MediaTypes.`application/json`,
+          Employee.illegalEmployeeJson))
 
       result.isFailure shouldEqual true
       val ex = result.failed.get

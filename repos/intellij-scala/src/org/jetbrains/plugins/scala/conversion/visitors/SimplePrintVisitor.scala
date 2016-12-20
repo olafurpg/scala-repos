@@ -25,24 +25,26 @@ class SimplePrintVisitor extends IntermediateTreeVisitor {
       case AnnotaionConstruction(inAnnotation, attributes, name) =>
         visitAnnotation(inAnnotation, attributes, name)
       case b @ BlockConstruction(statements) => visitBlock(b, statements)
-      case ClassConstruction(name,
-                             primaryConstructor,
-                             bodyElements,
-                             modifiers,
-                             typeParams,
-                             initalizers,
-                             classType,
-                             companion,
-                             extendsList) =>
-        visitClass(name,
-                   primaryConstructor,
-                   bodyElements,
-                   modifiers,
-                   typeParams,
-                   initalizers,
-                   classType,
-                   companion,
-                   extendsList)
+      case ClassConstruction(
+          name,
+          primaryConstructor,
+          bodyElements,
+          modifiers,
+          typeParams,
+          initalizers,
+          classType,
+          companion,
+          extendsList) =>
+        visitClass(
+          name,
+          primaryConstructor,
+          bodyElements,
+          modifiers,
+          typeParams,
+          initalizers,
+          classType,
+          companion,
+          extendsList)
       case AnonymousClass(mType, args, body, extendsList) =>
         visitAnonymousClass(mType, args, body, extendsList)
       case Enum(name, modifiers, enumConstants: Seq[String]) =>
@@ -53,9 +55,10 @@ class SimplePrintVisitor extends IntermediateTreeVisitor {
         visitCastType(c, operand, castType, isPrimitive)
       case ArrayInitializer(expresions: Seq[IntermediateNode]) =>
         visitArrayInitalizer(expresions)
-      case BinaryExpressionConstruction(firstPart,
-                                        secondPart,
-                                        operation: String) =>
+      case BinaryExpressionConstruction(
+          firstPart,
+          secondPart,
+          operation: String) =>
         visitBinary(firstPart, secondPart, operation)
       case ClassObjectAccess(expression) => visitClassObjAccess(expression)
       case InstanceOfConstruction(operand, mtype) =>
@@ -78,10 +81,11 @@ class SimplePrintVisitor extends IntermediateTreeVisitor {
       case PrefixExpression(operand, signType, canBeSimplified) =>
         visitPrefixPostfix(operand, signType, canBeSimplified)
       case PostfixExpression(operand, signType, canBeSimplified) =>
-        visitPrefixPostfix(operand,
-                           signType,
-                           canBeSimplified,
-                           isPostfix = true)
+        visitPrefixPostfix(
+          operand,
+          signType,
+          canBeSimplified,
+          isPostfix = true)
       case FieldConstruction(modifiers, name, ftype, isVar, initalaizer) =>
         visitVariable(modifiers, name, ftype, isVar, initalaizer)
       case LocalVariable(modifiers, name, ftype, isVar, initalaizer) =>
@@ -90,12 +94,13 @@ class SimplePrintVisitor extends IntermediateTreeVisitor {
         visitConstructor(modifiers, typeParams, params, body)
       case PrimaryConstruction(params, superCall, body, modifiers) =>
         visitPrimaryConstructor(params, superCall, body, modifiers)
-      case MethodConstruction(modifiers,
-                              name,
-                              typeParams,
-                              params,
-                              body,
-                              retType) =>
+      case MethodConstruction(
+          modifiers,
+          name,
+          typeParams,
+          params,
+          body,
+          retType) =>
         visitMethod(modifiers, name, typeParams, params, body, retType)
       case m @ ModifiersConstruction(annotations, modifiers) =>
         visitModifiers(m, annotations, modifiers)
@@ -119,27 +124,31 @@ class SimplePrintVisitor extends IntermediateTreeVisitor {
       case ImportStatementList(data) => visitImportStatementList(data)
       case PackageStatement(value) =>
         visitWithExtraWord(Some(value), "package ")
-      case ForeachStatement(iterParamName,
-                            iteratedValue,
-                            body,
-                            isJavaCollection) =>
+      case ForeachStatement(
+          iterParamName,
+          iteratedValue,
+          body,
+          isJavaCollection) =>
         visitForEach(iterParamName, iteratedValue, body, isJavaCollection)
-      case WhileStatement(initialization,
-                          condition,
-                          body,
-                          update,
-                          whileType) =>
+      case WhileStatement(
+          initialization,
+          condition,
+          body,
+          update,
+          whileType) =>
         visitWhile(initialization, condition, body, update, whileType)
-      case TryCatchStatement(resourcesList,
-                             tryBlock,
-                             catchStatements,
-                             finallyStatements,
-                             arrow) =>
-        visitTryCatch(resourcesList,
-                      tryBlock,
-                      catchStatements,
-                      finallyStatements,
-                      arrow)
+      case TryCatchStatement(
+          resourcesList,
+          tryBlock,
+          catchStatements,
+          finallyStatements,
+          arrow) =>
+        visitTryCatch(
+          resourcesList,
+          tryBlock,
+          catchStatements,
+          finallyStatements,
+          arrow)
       case SwitchStatemtnt(expession, body) =>
         visitSwitchStatement(expession, body)
       case SwitchLabelStatement(caseValue, arrow) =>
@@ -196,11 +205,12 @@ class SimplePrintVisitor extends IntermediateTreeVisitor {
   def visitBlock(node: BlockConstruction,
                  statements: Seq[IntermediateNode]): PrettyPrinter = {
     printer.append("{\n")
-    printWithSeparator(node.beforeStatements.toSeq,
-                       "\n",
-                       "",
-                       "\n",
-                       node.beforeStatements.nonEmpty)
+    printWithSeparator(
+      node.beforeStatements.toSeq,
+      "\n",
+      "",
+      "\n",
+      node.beforeStatements.nonEmpty)
     printWithSeparator(statements, "\n", "", "\n", statements.nonEmpty)
     printer.append("}")
   }
@@ -229,11 +239,12 @@ class SimplePrintVisitor extends IntermediateTreeVisitor {
 
     printer.append(escapeKeyword(name))
     if (typeParams.isDefined)
-      printWithSeparator(typeParams.get,
-                         ", ",
-                         "[",
-                         "]",
-                         typeParams.get.nonEmpty)
+      printWithSeparator(
+        typeParams.get,
+        ", ",
+        "[",
+        "]",
+        typeParams.get.nonEmpty)
 
     if (primaryConstructor.isDefined) {
       printer.space()
@@ -261,11 +272,12 @@ class SimplePrintVisitor extends IntermediateTreeVisitor {
     }
     printWithSeparator(bodyElements, "\n", "", "")
     if (initalizers.isDefined)
-      printWithSeparator(initalizers.get,
-                         "\n",
-                         "\ntry ",
-                         "\n",
-                         initalizers.get.nonEmpty)
+      printWithSeparator(
+        initalizers.get,
+        "\n",
+        "\ntry ",
+        "\n",
+        initalizers.get.nonEmpty)
     printer.append("}")
   }
 
@@ -401,12 +413,13 @@ class SimplePrintVisitor extends IntermediateTreeVisitor {
     } else {
       printer.append("new ")
       visit(mtype)
-      printWithSeparator(arrayDimension,
-                         ", ",
-                         "(",
-                         ")",
-                         arrayDimension != null && arrayDimension.nonEmpty &&
-                           !arrayDimension.head.isInstanceOf[ExpressionList])
+      printWithSeparator(
+        arrayDimension,
+        ", ",
+        "(",
+        ")",
+        arrayDimension != null && arrayDimension.nonEmpty &&
+          !arrayDimension.head.isInstanceOf[ExpressionList])
     }
   }
 

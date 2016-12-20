@@ -317,13 +317,15 @@ private[stream] object ActorGraphInterpreter {
       exposedPublisher.takePendingSubscribers() foreach { sub ⇒
         if (subscriber eq null) {
           subscriber = sub
-          tryOnSubscribe(subscriber,
-                         new BoundarySubscription(actor, shell, id))
+          tryOnSubscribe(
+            subscriber,
+            new BoundarySubscription(actor, shell, id))
           if (GraphInterpreter.Debug)
             println(s"${interpreter.Name}  subscribe subscriber=$sub")
         } else
-          rejectAdditionalSubscriber(subscriber,
-                                     s"${Logging.simpleName(this)}")
+          rejectAdditionalSubscriber(
+            subscriber,
+            s"${Logging.simpleName(this)}")
       }
 
     def exposedPublisher(publisher: ActorPublisher[Any]): Unit = {
@@ -551,11 +553,12 @@ private[stream] final class GraphInterpreterShell(
         if (canShutDown) _isTerminated = true
         else {
           waitingForShutdown = true
-          mat.scheduleOnce(settings.subscriptionTimeoutSettings.timeout,
-                           new Runnable {
-                             override def run(): Unit =
-                               self ! Abort(GraphInterpreterShell.this)
-                           })
+          mat.scheduleOnce(
+            settings.subscriptionTimeoutSettings.timeout,
+            new Runnable {
+              override def run(): Unit =
+                self ! Abort(GraphInterpreterShell.this)
+            })
         }
       } else if (interpreter.isSuspended && !resumeScheduled)
         sendResume(!usingShellLimit)
@@ -612,10 +615,11 @@ private[stream] class ActorGraphInterpreter(_initial: GraphInterpreterShell)
 
   def tryInit(shell: GraphInterpreterShell): Boolean =
     try {
-      currentLimit = shell.init(self,
-                                subFusingMaterializerImpl,
-                                enqueueToShortCircuit(_),
-                                currentLimit)
+      currentLimit = shell.init(
+        self,
+        subFusingMaterializerImpl,
+        enqueueToShortCircuit(_),
+        currentLimit)
       if (GraphInterpreter.Debug)
         println(
           s"registering new shell in ${_initial}\n  ${shell.toString.replace("\n", "\n  ")}")
@@ -626,9 +630,10 @@ private[stream] class ActorGraphInterpreter(_initial: GraphInterpreterShell)
       }
     } catch {
       case NonFatal(e) ⇒
-        log.error(e,
-                  "initialization of GraphInterpreterShell failed for {}",
-                  shell)
+        log.error(
+          e,
+          "initialization of GraphInterpreterShell failed for {}",
+          shell)
         false
     }
 

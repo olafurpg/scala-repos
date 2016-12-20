@@ -231,8 +231,9 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
       tol: Double,
       mode: String): SingularValueDecomposition[RowMatrix, Matrix] = {
     val n = numCols().toInt
-    require(k > 0 && k <= n,
-            s"Requested k singular values but got k=$k and numCols=$n.")
+    require(
+      k > 0 && k <= n,
+      s"Requested k singular values but got k=$k and numCols=$n.")
 
     object SVDMode extends Enumeration {
       val LocalARPACK, LocalLAPACK, DistARPACK = Value
@@ -565,8 +566,9 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
         10 * math.log(numCols()) / threshold
       }
 
-    columnSimilaritiesDIMSUM(computeColumnSummaryStatistics().normL2.toArray,
-                             gamma)
+    columnSimilaritiesDIMSUM(
+      computeColumnSummaryStatistics().normL2.toArray,
+      gamma)
   }
 
   /**
@@ -633,8 +635,9 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
       colMags: Array[Double],
       gamma: Double): CoordinateMatrix = {
     require(gamma > 1.0, s"Oversampling should be greater than 1: $gamma")
-    require(colMags.size == this.numCols(),
-            "Number of magnitudes didn't match column dimension")
+    require(
+      colMags.size == this.numCols(),
+      "Number of magnitudes didn't match column dimension")
     val sg = math.sqrt(gamma) // sqrt(gamma) used many times
 
     // Don't divide by zero for those columns with zero magnitude

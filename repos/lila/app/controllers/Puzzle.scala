@@ -68,10 +68,11 @@ object Puzzle extends LilaController {
     (env userInfos ctx.me) zip
       (ctx.me ?? { env.api.attempt.hasPlayed(_, puzzle) map (!_) }) map {
       case (infos, asPlay) =>
-        JsData(puzzle,
-               infos,
-               asPlay.fold("play", "try"),
-               animationDuration = env.AnimationDuration)
+        JsData(
+          puzzle,
+          infos,
+          asPlay.fold("play", "try"),
+          animationDuration = env.AnimationDuration)
     }
 
   def history = Auth { implicit ctx => me =>
@@ -96,10 +97,11 @@ object Puzzle extends LilaController {
       selectPuzzle(ctx.me) zip (env userInfos ctx.me) map {
         case (Some(puzzle), infos) =>
           Ok(
-            JsData(puzzle,
-                   infos,
-                   ctx.isAuth.fold("play", "try"),
-                   animationDuration = env.AnimationDuration)) as JSON
+            JsData(
+              puzzle,
+              infos,
+              ctx.isAuth.fold("play", "try"),
+              animationDuration = env.AnimationDuration)) as JSON
         case (None, _) => NotFound(noMorePuzzleJson)
       } map (_ as JSON)
     }
@@ -118,10 +120,11 @@ object Puzzle extends LilaController {
             selectPuzzle(newCtx.me) zip env.userInfos(newCtx.me) map {
               case (Some(puzzle), infos) =>
                 Ok(
-                  JsData(puzzle,
-                         infos,
-                         ctx.isAuth.fold("play", "try"),
-                         animationDuration = env.AnimationDuration)(newCtx))
+                  JsData(
+                    puzzle,
+                    infos,
+                    ctx.isAuth.fold("play", "try"),
+                    animationDuration = env.AnimationDuration)(newCtx))
               case (None, _) => NotFound(noMorePuzzleJson)
             }
           }
@@ -149,34 +152,37 @@ object Puzzle extends LilaController {
                       (env.api.attempt hasVoted me2) map {
                       case ((p2, infos), voted) =>
                         Ok {
-                          JsData(p2 | puzzle,
-                                 infos,
-                                 "view",
-                                 attempt = newAttempt.some,
-                                 voted = voted.some,
-                                 animationDuration = env.AnimationDuration)
+                          JsData(
+                            p2 | puzzle,
+                            infos,
+                            "view",
+                            attempt = newAttempt.some,
+                            voted = voted.some,
+                            animationDuration = env.AnimationDuration)
                         }
                     }
                   }
                 case (oldAttempt, Some(win)) =>
                   env userInfos me.some map { infos =>
                     Ok(
-                      JsData(puzzle,
-                             infos,
-                             "view",
-                             attempt = oldAttempt.some,
-                             win = win.some,
-                             animationDuration = env.AnimationDuration))
+                      JsData(
+                        puzzle,
+                        infos,
+                        "view",
+                        attempt = oldAttempt.some,
+                        win = win.some,
+                        animationDuration = env.AnimationDuration))
                   }
               }
             case None =>
               fuccess {
                 Ok(
-                  JsData(puzzle,
-                         none,
-                         "view",
-                         win = data.isWin.some,
-                         animationDuration = env.AnimationDuration))
+                  JsData(
+                    puzzle,
+                    none,
+                    "view",
+                    win = data.isWin.some,
+                    animationDuration = env.AnimationDuration))
               }
         }
       ) map (_ as JSON)
@@ -208,9 +214,10 @@ object Puzzle extends LilaController {
 
   def frame = Open { implicit ctx =>
     OptionOk(env.daily()) { daily =>
-      html.puzzle.embed(daily,
-                        get("bg") | "light",
-                        lila.pref.Theme(~get("theme")).cssClass)
+      html.puzzle.embed(
+        daily,
+        get("bg") | "light",
+        lila.pref.Theme(~get("theme")).cssClass)
     }
   }
 }

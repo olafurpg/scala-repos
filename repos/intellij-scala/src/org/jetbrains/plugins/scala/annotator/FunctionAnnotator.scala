@@ -137,9 +137,10 @@ trait FunctionAnnotator {
         if (typeAware) {
           val (usageTypeText, functionTypeText) =
             ScTypePresentation.different(usageType, functionType)
-          val message = ScalaBundle.message("type.mismatch.found.required",
-                                            usageTypeText,
-                                            functionTypeText)
+          val message = ScalaBundle.message(
+            "type.mismatch.found.required",
+            usageTypeText,
+            functionTypeText)
           val returnExpression =
             if (explicitReturn) usage.asInstanceOf[ScReturnStmt].expr else None
           val expr = returnExpression.getOrElse(usage) match {

@@ -40,9 +40,10 @@ final class AutoPairing(roundMap: ActorRef,
             fen = tour.position.some.filterNot(_.initial).map(_.fen)
           ) |> { g =>
           val turns = g.player.fold(0, 1)
-          g.copy(clock = tour.clock.chessClock.some,
-                 turns = turns,
-                 startedAtTurn = turns)
+          g.copy(
+            clock = tour.clock.chessClock.some,
+            turns = turns,
+            startedAtTurn = turns)
         },
         whitePlayer = GamePlayer.white,
         blackPlayer = GamePlayer.black,
@@ -53,9 +54,9 @@ final class AutoPairing(roundMap: ActorRef,
         source = Source.Tournament,
         pgnImport = None)
       game2 = game1
-        .updatePlayer(Color.White,
-                      _.withUser(user1.id,
-                                 PerfPicker.mainOrDefault(game1)(user1.perfs)))
+        .updatePlayer(
+          Color.White,
+          _.withUser(user1.id, PerfPicker.mainOrDefault(game1)(user1.perfs)))
         .updatePlayer(
           Color.Black,
           _.withUser(user2.id, PerfPicker.mainOrDefault(game1)(user2.perfs)))

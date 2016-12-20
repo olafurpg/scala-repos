@@ -107,11 +107,12 @@ private[nio] object DataViewLongBuffer {
               initialLimit: Int,
               readOnly: Boolean,
               isBigEndian: Boolean): LongBuffer = {
-      new DataViewLongBuffer(dataView,
-                             initialPosition,
-                             initialLimit,
-                             readOnly,
-                             isBigEndian)
+      new DataViewLongBuffer(
+        dataView,
+        initialPosition,
+        initialLimit,
+        readOnly,
+        isBigEndian)
     }
   }
 

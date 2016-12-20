@@ -41,8 +41,9 @@ object Test {
                              start: Int,
                              end: Int) = {
     val res = a
-    assert(res.length == (end - start),
-           res.length + "!=" + (end - start) + " (" + res + ")")
+    assert(
+      res.length == (end - start),
+      res.length + "!=" + (end - start) + " (" + res + ")")
     for (i <- start until end) {
       assert(res(i) == (label + i), "" + res(i) + "!=" + (label + i))
     }
@@ -54,8 +55,9 @@ object Test {
                               start: Int,
                               end: Int) = {
     val res = a
-    assert(res.length == (end - start),
-           res.length + "!=" + (end - start) + " (" + res + ")")
+    assert(
+      res.length == (end - start),
+      res.length + "!=" + (end - start) + " (" + res + ")")
     var i = start
     var it = res.iterator
     while (it.hasNext) {

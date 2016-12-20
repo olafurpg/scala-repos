@@ -67,11 +67,12 @@ class MediaRange(mediaType: String,
       (mediaType == "*" && mediaSubType == "*")
 
   override def toString = {
-    new MediaType(mediaType,
-                  mediaSubType,
-                  parameters ++ qValue
-                    .map(q => ("q", Some(q.toString())))
-                    .toSeq ++ acceptExtensions).toString
+    new MediaType(
+      mediaType,
+      mediaSubType,
+      parameters ++ qValue
+        .map(q => ("q", Some(q.toString())))
+        .toSeq ++ acceptExtensions).toString
   }
 }
 
@@ -278,11 +279,12 @@ object MediaRange {
                 None
             }
           }
-          new MediaRange(mediaType.mediaType,
-                         mediaType.mediaSubType,
-                         params,
-                         qValue,
-                         acceptParams)
+          new MediaRange(
+            mediaType.mediaType,
+            mediaType.mediaSubType,
+            params,
+            qValue,
+            acceptParams)
       }
 
     // Either it's a valid media range followed immediately by the end or a comma, or it's a bad media type

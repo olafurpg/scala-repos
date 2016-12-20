@@ -6,11 +6,12 @@ import org.specs2.mutable.Specification
 
 class ValueReaderSpec extends Specification with DefaultImplicitConversions {
 
-  val params = Map("hello" -> "world",
-                   "int" -> "1",
-                   "long" -> "1239485775745309200",
-                   "date" -> "29/01/2012",
-                   "bool" -> "true")
+  val params = Map(
+    "hello" -> "world",
+    "int" -> "1",
+    "long" -> "1239485775745309200",
+    "date" -> "29/01/2012",
+    "bool" -> "true")
 
   val multiParams = Map(
     "hello" -> Seq("world"),

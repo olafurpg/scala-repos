@@ -47,14 +47,16 @@ class TTwitterServerFilterTest extends FunSuite {
       val header = new thrift.RequestHeader
       header.setClient_id(new thrift.ClientId("testclient"))
       val bytes =
-        ByteArrays.concat(OutputBuffer.messageToArray(header, protocolFactory),
-                          buffer.toArray)
+        ByteArrays.concat(
+          OutputBuffer.messageToArray(header, protocolFactory),
+          buffer.toArray)
 
       filter(bytes, service) map { bytes =>
         // Strip the response header.
-        InputBuffer.peelMessage(bytes,
-                                new thrift.ResponseHeader,
-                                protocolFactory)
+        InputBuffer.peelMessage(
+          bytes,
+          new thrift.ResponseHeader,
+          protocolFactory)
       }
     }
     assert(req.isDefined)

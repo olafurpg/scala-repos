@@ -133,12 +133,13 @@ class FileJobManager[M[+ _]] private[FileJobManager] (workDir: File,
                 jobType: String,
                 data: Option[JValue],
                 started: Option[DateTime]) = M.point {
-    Job(newJobId,
-        auth,
-        name,
-        jobType,
-        data,
-        started map (Started(_, NotStarted)) getOrElse NotStarted) unsafeTap {
+    Job(
+      newJobId,
+      auth,
+      name,
+      jobType,
+      data,
+      started map (Started(_, NotStarted)) getOrElse NotStarted) unsafeTap {
       job =>
         val jobState = FileJobState(job, None, Map.empty)
         saveJob(job.id, jobState)

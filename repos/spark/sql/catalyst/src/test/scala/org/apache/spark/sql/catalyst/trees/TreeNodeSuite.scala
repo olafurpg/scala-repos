@@ -209,8 +209,9 @@ class TreeNodeSuite extends SparkFunSuite {
         case add: Add => add
       }
       val expected = Some(
-        Add(Literal(1),
-            Multiply(Literal(2), Subtract(Literal(3), Literal(4)))))
+        Add(
+          Literal(1),
+          Multiply(Literal(2), Subtract(Literal(3), Literal(4)))))
       assert(expected === actual)
     }
 

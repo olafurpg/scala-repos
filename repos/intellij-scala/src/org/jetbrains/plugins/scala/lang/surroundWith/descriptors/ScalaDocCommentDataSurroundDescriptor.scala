@@ -14,12 +14,13 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 3/2/12
   */
 class ScalaDocCommentDataSurroundDescriptor extends SurroundDescriptor {
-  val surrounders = Array[Surrounder](new ScalaDocWithBoldSurrounder,
-                                      new ScalaDocWithUnderlinedSurrounder,
-                                      new ScalaDocWithMonospaceSurrounder,
-                                      new ScalaDocWithItalicSurrounder,
-                                      new ScalaDocWithSubscriptSurrounder,
-                                      new ScalaDocWithSuperscriptSurrounder)
+  val surrounders = Array[Surrounder](
+    new ScalaDocWithBoldSurrounder,
+    new ScalaDocWithUnderlinedSurrounder,
+    new ScalaDocWithMonospaceSurrounder,
+    new ScalaDocWithItalicSurrounder,
+    new ScalaDocWithSubscriptSurrounder,
+    new ScalaDocWithSuperscriptSurrounder)
 
   def getElementsToSurround(file: PsiFile,
                             startOffset: Int,
@@ -101,9 +102,10 @@ class ScalaDocCommentDataSurroundDescriptor extends SurroundDescriptor {
     do {
       if (nextElement == null) return PsiElement.EMPTY_ARRAY
 
-      if ((!Set(DOC_COMMENT_DATA,
-                DOC_COMMENT_LEADING_ASTERISKS,
-                DOC_WHITESPACE).contains(nextElement.getNode.getElementType) &&
+      if ((!Set(
+            DOC_COMMENT_DATA,
+            DOC_COMMENT_LEADING_ASTERISKS,
+            DOC_WHITESPACE).contains(nextElement.getNode.getElementType) &&
           !nextElement.getNode.getElementType
             .isInstanceOf[ScaladocSyntaxElementType]) ||
           (nextElement.getNode.getElementType == DOC_WHITESPACE &&

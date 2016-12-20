@@ -71,8 +71,9 @@ class QuadraticMinimizer(nGram: Int,
   val linearEquality = if (Aeq != null) Aeq.rows else 0
 
   if (linearEquality > 0)
-    require(beq.length == linearEquality,
-            s"QuadraticMinimizer linear equalities should match beq vector")
+    require(
+      beq.length == linearEquality,
+      s"QuadraticMinimizer linear equalities should match beq vector")
 
   val n = nGram + linearEquality
   val full = n * n
@@ -142,8 +143,9 @@ class QuadraticMinimizer(nGram: Int,
     * @param upper upper triangular gram matrix specified in primitive array
     */
   def updateGram(upper: Array[Double]): Unit = {
-    require(upper.length == upperSize,
-            s"QuadraticMinimizer:updateGram upper triangular size mismatch")
+    require(
+      upper.length == upperSize,
+      s"QuadraticMinimizer:updateGram upper triangular size mismatch")
     var i = 0
     var pos = 0
     var h = 0.0
@@ -207,8 +209,9 @@ class QuadraticMinimizer(nGram: Int,
       // TO DO : Use LDL' for symmetric quasi definite matrix lapack.dsytrf
       lapack.dgetrf(n, n, wsH.data, scala.math.max(1, n), pivot, info)
     } else {
-      require(wsH.rows == nlinear && wsH.cols == nlinear,
-              s"QuadraticMinimizer:reset cholesky and linear size mismatch")
+      require(
+        wsH.rows == nlinear && wsH.cols == nlinear,
+        s"QuadraticMinimizer:reset cholesky and linear size mismatch")
       lapack.dpotrf("L", n, wsH.data, scala.math.max(1, n), info)
     }
 
@@ -338,18 +341,19 @@ class QuadraticMinimizer(nGram: Int,
       val epsDual = convergenceScale * abstol + reltol * norm(s, 2)
 
       if (residualNorm < epsPrimal && sNorm < epsDual) {
-        return State(x,
-                     u,
-                     z,
-                     scale,
-                     R,
-                     pivot,
-                     xHat,
-                     zOld,
-                     residual,
-                     s,
-                     nextIter,
-                     true)
+        return State(
+          x,
+          u,
+          z,
+          scale,
+          R,
+          pivot,
+          xHat,
+          zOld,
+          residual,
+          s,
+          nextIter,
+          true)
       }
       nextIter += 1
     }
@@ -358,8 +362,9 @@ class QuadraticMinimizer(nGram: Int,
 
   private def computeRhoSparse(H: DenseMatrix[Double]): Double = {
     val eigenMax = QuadraticMinimizer.normColumn(H)
-    require(linearEquality <= 0,
-            s"QuadraticMinimizer:computeRho L1 with affine not supported")
+    require(
+      linearEquality <= 0,
+      s"QuadraticMinimizer:computeRho L1 with affine not supported")
     val eigenMin = QuadraticMinimizer.approximateMinEigen(H)
     sqrt(eigenMin * eigenMax)
   }
@@ -508,18 +513,19 @@ object QuadraticMinimizer {
     val nrhs = 1
     val info: intW = new intW(0)
 
-    lapack.dgetrs("No transpose",
-                  n,
-                  nrhs,
-                  A.data,
-                  0,
-                  n,
-                  pivot,
-                  0,
-                  x.data,
-                  0,
-                  n,
-                  info)
+    lapack.dgetrs(
+      "No transpose",
+      n,
+      nrhs,
+      A.data,
+      0,
+      n,
+      pivot,
+      0,
+      x.data,
+      0,
+      n,
+      info)
     if (info.`val` > 0)
       throw new LapackException("DGETRS: LU solve unsuccessful")
   }

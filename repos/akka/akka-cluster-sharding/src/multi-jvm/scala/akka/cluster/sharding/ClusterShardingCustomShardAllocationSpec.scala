@@ -145,9 +145,10 @@ abstract class ClusterShardingCustomShardAllocationSpec(
   override def initialParticipants = roles.size
 
   val storageLocations =
-    List("akka.persistence.journal.leveldb.dir",
-         "akka.persistence.journal.leveldb-shared.store.dir",
-         "akka.persistence.snapshot-store.local.dir").map(s ⇒
+    List(
+      "akka.persistence.journal.leveldb.dir",
+      "akka.persistence.journal.leveldb-shared.store.dir",
+      "akka.persistence.snapshot-store.local.dir").map(s ⇒
       new File(system.settings.config.getString(s)))
 
   override protected def atStartup() {
@@ -173,14 +174,14 @@ abstract class ClusterShardingCustomShardAllocationSpec(
   }
 
   def startSharding(): Unit = {
-    ClusterSharding(system).start(typeName = "Entity",
-                                  entityProps = Props[Entity],
-                                  settings = ClusterShardingSettings(system),
-                                  extractEntityId = extractEntityId,
-                                  extractShardId = extractShardId,
-                                  allocationStrategy =
-                                    TestAllocationStrategy(allocator),
-                                  handOffStopMessage = PoisonPill)
+    ClusterSharding(system).start(
+      typeName = "Entity",
+      entityProps = Props[Entity],
+      settings = ClusterShardingSettings(system),
+      extractEntityId = extractEntityId,
+      extractShardId = extractShardId,
+      allocationStrategy = TestAllocationStrategy(allocator),
+      handOffStopMessage = PoisonPill)
   }
 
   lazy val region = ClusterSharding(system).shardRegion("Entity")

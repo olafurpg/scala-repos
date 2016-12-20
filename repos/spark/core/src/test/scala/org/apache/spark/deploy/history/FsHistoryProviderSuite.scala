@@ -81,39 +81,45 @@ class FsHistoryProviderSuite
 
     // Write a new-style application log.
     val newAppComplete = newLogFile("new1", None, inProgress = false)
-    writeFile(newAppComplete,
-              true,
-              None,
-              SparkListenerApplicationStart(newAppComplete.getName(),
-                                            Some("new-app-complete"),
-                                            1L,
-                                            "test",
-                                            None),
-              SparkListenerApplicationEnd(5L))
+    writeFile(
+      newAppComplete,
+      true,
+      None,
+      SparkListenerApplicationStart(
+        newAppComplete.getName(),
+        Some("new-app-complete"),
+        1L,
+        "test",
+        None),
+      SparkListenerApplicationEnd(5L))
 
     // Write a new-style application log.
     val newAppCompressedComplete =
       newLogFile("new1compressed", None, inProgress = false, Some("lzf"))
-    writeFile(newAppCompressedComplete,
-              true,
-              None,
-              SparkListenerApplicationStart(newAppCompressedComplete.getName(),
-                                            Some("new-complete-lzf"),
-                                            1L,
-                                            "test",
-                                            None),
-              SparkListenerApplicationEnd(4L))
+    writeFile(
+      newAppCompressedComplete,
+      true,
+      None,
+      SparkListenerApplicationStart(
+        newAppCompressedComplete.getName(),
+        Some("new-complete-lzf"),
+        1L,
+        "test",
+        None),
+      SparkListenerApplicationEnd(4L))
 
     // Write an unfinished app, new-style.
     val newAppIncomplete = newLogFile("new2", None, inProgress = true)
-    writeFile(newAppIncomplete,
-              true,
-              None,
-              SparkListenerApplicationStart(newAppIncomplete.getName(),
-                                            Some("new-incomplete"),
-                                            1L,
-                                            "test",
-                                            None))
+    writeFile(
+      newAppIncomplete,
+      true,
+      None,
+      SparkListenerApplicationStart(
+        newAppIncomplete.getName(),
+        Some("new-incomplete"),
+        1L,
+        "test",
+        None))
 
     // Force a reload of data from the log directory, and check that logs are loaded.
     // Take the opportunity to check that the offset checks work as expected.
@@ -128,41 +134,46 @@ class FsHistoryProviderSuite
                       lastMod: Long,
                       user: String,
                       completed: Boolean): ApplicationHistoryInfo = {
-        ApplicationHistoryInfo(id,
-                               name,
-                               List(
-                                 ApplicationAttemptInfo(None,
-                                                        start,
-                                                        end,
-                                                        lastMod,
-                                                        user,
-                                                        completed)))
+        ApplicationHistoryInfo(
+          id,
+          name,
+          List(
+            ApplicationAttemptInfo(
+              None,
+              start,
+              end,
+              lastMod,
+              user,
+              completed)))
       }
 
       list(0) should be(
-        makeAppInfo("new-app-complete",
-                    newAppComplete.getName(),
-                    1L,
-                    5L,
-                    newAppComplete.lastModified(),
-                    "test",
-                    true))
+        makeAppInfo(
+          "new-app-complete",
+          newAppComplete.getName(),
+          1L,
+          5L,
+          newAppComplete.lastModified(),
+          "test",
+          true))
       list(1) should be(
-        makeAppInfo("new-complete-lzf",
-                    newAppCompressedComplete.getName(),
-                    1L,
-                    4L,
-                    newAppCompressedComplete.lastModified(),
-                    "test",
-                    true))
+        makeAppInfo(
+          "new-complete-lzf",
+          newAppCompressedComplete.getName(),
+          1L,
+          4L,
+          newAppCompressedComplete.lastModified(),
+          "test",
+          true))
       list(2) should be(
-        makeAppInfo("new-incomplete",
-                    newAppIncomplete.getName(),
-                    1L,
-                    -1L,
-                    newAppIncomplete.lastModified(),
-                    "test",
-                    false))
+        makeAppInfo(
+          "new-incomplete",
+          newAppIncomplete.getName(),
+          1L,
+          -1L,
+          newAppIncomplete.lastModified(),
+          "test",
+          false))
 
       // Make sure the UI can be rendered.
       list.foreach {
@@ -176,25 +187,29 @@ class FsHistoryProviderSuite
 
   test("SPARK-3697: ignore directories that cannot be read.") {
     val logFile1 = newLogFile("new1", None, inProgress = false)
-    writeFile(logFile1,
-              true,
-              None,
-              SparkListenerApplicationStart("app1-1",
-                                            Some("app1-1"),
-                                            1L,
-                                            "test",
-                                            None),
-              SparkListenerApplicationEnd(2L))
+    writeFile(
+      logFile1,
+      true,
+      None,
+      SparkListenerApplicationStart(
+        "app1-1",
+        Some("app1-1"),
+        1L,
+        "test",
+        None),
+      SparkListenerApplicationEnd(2L))
     val logFile2 = newLogFile("new2", None, inProgress = false)
-    writeFile(logFile2,
-              true,
-              None,
-              SparkListenerApplicationStart("app1-2",
-                                            Some("app1-2"),
-                                            1L,
-                                            "test",
-                                            None),
-              SparkListenerApplicationEnd(2L))
+    writeFile(
+      logFile2,
+      true,
+      None,
+      SparkListenerApplicationStart(
+        "app1-2",
+        Some("app1-2"),
+        1L,
+        "test",
+        None),
+      SparkListenerApplicationEnd(2L))
     logFile2.setReadable(false, false)
 
     val provider = new FsHistoryProvider(createTestConf())
@@ -263,14 +278,16 @@ class FsHistoryProviderSuite
     val provider = new FsHistoryProvider(createTestConf())
 
     val attempt1 = newLogFile("app1", Some("attempt1"), inProgress = true)
-    writeFile(attempt1,
-              true,
-              None,
-              SparkListenerApplicationStart("app1",
-                                            Some("app1"),
-                                            1L,
-                                            "test",
-                                            Some("attempt1")))
+    writeFile(
+      attempt1,
+      true,
+      None,
+      SparkListenerApplicationStart(
+        "app1",
+        Some("app1"),
+        1L,
+        "test",
+        Some("attempt1")))
 
     updateAndCheck(provider) { list =>
       list.size should be(1)
@@ -278,14 +295,16 @@ class FsHistoryProviderSuite
     }
 
     val attempt2 = newLogFile("app1", Some("attempt2"), inProgress = true)
-    writeFile(attempt2,
-              true,
-              None,
-              SparkListenerApplicationStart("app1",
-                                            Some("app1"),
-                                            2L,
-                                            "test",
-                                            Some("attempt2")))
+    writeFile(
+      attempt2,
+      true,
+      None,
+      SparkListenerApplicationStart(
+        "app1",
+        Some("app1"),
+        2L,
+        "test",
+        Some("attempt2")))
 
     updateAndCheck(provider) { list =>
       list.size should be(1)
@@ -294,15 +313,17 @@ class FsHistoryProviderSuite
     }
 
     val attempt3 = newLogFile("app1", Some("attempt3"), inProgress = false)
-    writeFile(attempt3,
-              true,
-              None,
-              SparkListenerApplicationStart("app1",
-                                            Some("app1"),
-                                            3L,
-                                            "test",
-                                            Some("attempt3")),
-              SparkListenerApplicationEnd(4L))
+    writeFile(
+      attempt3,
+      true,
+      None,
+      SparkListenerApplicationStart(
+        "app1",
+        Some("app1"),
+        3L,
+        "test",
+        Some("attempt3")),
+      SparkListenerApplicationEnd(4L))
 
     updateAndCheck(provider) { list =>
       list should not be (null)
@@ -312,15 +333,17 @@ class FsHistoryProviderSuite
     }
 
     val app2Attempt1 = newLogFile("app2", Some("attempt1"), inProgress = false)
-    writeFile(attempt1,
-              true,
-              None,
-              SparkListenerApplicationStart("app2",
-                                            Some("app2"),
-                                            5L,
-                                            "test",
-                                            Some("attempt1")),
-              SparkListenerApplicationEnd(6L))
+    writeFile(
+      attempt1,
+      true,
+      None,
+      SparkListenerApplicationStart(
+        "app2",
+        Some("app2"),
+        5L,
+        "test",
+        Some("attempt1")),
+      SparkListenerApplicationEnd(6L))
 
     updateAndCheck(provider) { list =>
       list.size should be(2)
@@ -346,27 +369,31 @@ class FsHistoryProviderSuite
       clock)
 
     val log1 = newLogFile("app1", Some("attempt1"), inProgress = false)
-    writeFile(log1,
-              true,
-              None,
-              SparkListenerApplicationStart("app1",
-                                            Some("app1"),
-                                            1L,
-                                            "test",
-                                            Some("attempt1")),
-              SparkListenerApplicationEnd(2L))
+    writeFile(
+      log1,
+      true,
+      None,
+      SparkListenerApplicationStart(
+        "app1",
+        Some("app1"),
+        1L,
+        "test",
+        Some("attempt1")),
+      SparkListenerApplicationEnd(2L))
     log1.setLastModified(0L)
 
     val log2 = newLogFile("app1", Some("attempt2"), inProgress = false)
-    writeFile(log2,
-              true,
-              None,
-              SparkListenerApplicationStart("app1",
-                                            Some("app1"),
-                                            3L,
-                                            "test",
-                                            Some("attempt2")),
-              SparkListenerApplicationEnd(4L))
+    writeFile(
+      log2,
+      true,
+      None,
+      SparkListenerApplicationStart(
+        "app1",
+        Some("app1"),
+        3L,
+        "test",
+        Some("attempt2")),
+      SparkListenerApplicationEnd(4L))
     log2.setLastModified(clock.getTimeMillis())
 
     updateAndCheck(provider) { list =>
@@ -398,15 +425,17 @@ class FsHistoryProviderSuite
     val logs = (1 to 2).map { i =>
       val log =
         newLogFile("downloadApp1", Some(s"attempt$i"), inProgress = false)
-      writeFile(log,
-                true,
-                None,
-                SparkListenerApplicationStart("downloadApp1",
-                                              Some("downloadApp1"),
-                                              5000 * i,
-                                              "test",
-                                              Some(s"attempt$i")),
-                SparkListenerApplicationEnd(5001 * i))
+      writeFile(
+        log,
+        true,
+        None,
+        SparkListenerApplicationStart(
+          "downloadApp1",
+          Some("downloadApp1"),
+          5000 * i,
+          "test",
+          Some(s"attempt$i")),
+        SparkListenerApplicationEnd(5001 * i))
       log
     }
     provider.checkForLogs()
@@ -422,11 +451,13 @@ class FsHistoryProviderSuite
       var entry = inputStream.getNextEntry
       entry should not be null
       while (entry != null) {
-        val actual = new String(ByteStreams.toByteArray(inputStream),
-                                StandardCharsets.UTF_8)
+        val actual = new String(
+          ByteStreams.toByteArray(inputStream),
+          StandardCharsets.UTF_8)
         val expected =
-          Files.toString(logs.find(_.getName == entry.getName).get,
-                         StandardCharsets.UTF_8)
+          Files.toString(
+            logs.find(_.getName == entry.getName).get,
+            StandardCharsets.UTF_8)
         actual should be(expected)
         totalEntries += 1
         entry = inputStream.getNextEntry

@@ -51,8 +51,8 @@ class DecodingToCommandTest extends FunSuite {
           assert(set.key == Buf.Utf8(key))
           assert(set.value == Buf.Utf8(data))
           assert(
-            set.expiry.moreOrLessEquals(expectedTime.expirationTime,
-                                        allowedDelta))
+            set.expiry
+              .moreOrLessEquals(expectedTime.expirationTime, allowedDelta))
       }
     }
   }

@@ -122,8 +122,9 @@ class GzipFilter @Inject()(config: GzipFilterConfig)(
             })
 
           Future.successful(
-            Result(header,
-                   HttpEntity.Chunked(chunks via gzipFlow, contentType)))
+            Result(
+              header,
+              HttpEntity.Chunked(chunks via gzipFlow, contentType)))
       }
     } else {
       Future.successful(result)
@@ -183,9 +184,10 @@ class GzipFilter @Inject()(config: GzipFilterConfig)(
     header.headers.get(CONTENT_ENCODING).isEmpty
 
   private def setupHeader(header: Map[String, String]): Map[String, String] = {
-    header + (CONTENT_ENCODING -> "gzip") + addToVaryHeader(header,
-                                                            VARY,
-                                                            ACCEPT_ENCODING)
+    header + (CONTENT_ENCODING -> "gzip") + addToVaryHeader(
+      header,
+      VARY,
+      ACCEPT_ENCODING)
   }
 
   /**

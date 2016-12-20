@@ -37,9 +37,10 @@ class ESEngineManifests(client: Client,
   def insert(engineManifest: EngineManifest): Unit = {
     val json = write(engineManifest)
     val response = client
-      .prepareIndex(index,
-                    estype,
-                    esid(engineManifest.id, engineManifest.version))
+      .prepareIndex(
+        index,
+        estype,
+        esid(engineManifest.id, engineManifest.version))
       .setSource(json)
       .execute()
       .actionGet()

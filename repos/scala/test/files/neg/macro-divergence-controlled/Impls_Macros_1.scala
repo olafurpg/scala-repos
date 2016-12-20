@@ -14,8 +14,9 @@ object Complex {
          }) {
       val trecur = appliedType(typeOf[Complex[_]], List(f.info))
       if (c.openImplicits.tail.exists(ic => ic.pt =:= trecur))
-        c.abort(c.enclosingPosition,
-                "diverging implicit expansion. reported by a macro!")
+        c.abort(
+          c.enclosingPosition,
+          "diverging implicit expansion. reported by a macro!")
       val recur = c.inferImplicitValue(trecur, silent = true)
       if (recur == EmptyTree)
         c.abort(c.enclosingPosition, s"couldn't synthesize $trecur")

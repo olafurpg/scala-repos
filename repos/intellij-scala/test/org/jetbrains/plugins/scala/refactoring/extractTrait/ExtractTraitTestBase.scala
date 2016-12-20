@@ -16,13 +16,15 @@ abstract class ExtractTraitTestBase
                   expectedText: String,
                   onlyDeclarations: Boolean,
                   onlyFirstMember: Boolean = false) {
-    configureFromFileTextAdapter("dummy.scala",
-                                 fileText.replace("\r", "").stripMargin.trim)
-    new ScalaExtractTraitHandler().testInvoke(getProjectAdapter,
-                                              getEditorAdapter,
-                                              getFileAdapter,
-                                              onlyDeclarations,
-                                              onlyFirstMember)
+    configureFromFileTextAdapter(
+      "dummy.scala",
+      fileText.replace("\r", "").stripMargin.trim)
+    new ScalaExtractTraitHandler().testInvoke(
+      getProjectAdapter,
+      getEditorAdapter,
+      getFileAdapter,
+      onlyDeclarations,
+      onlyFirstMember)
     UsefulTestCase.doPostponedFormatting(getProjectAdapter)
     checkResultByText(expectedText.replace("\r", "").stripMargin.trim)
   }
@@ -31,14 +33,16 @@ abstract class ExtractTraitTestBase
                      messageText: String,
                      onlyDeclarations: Boolean,
                      onlyFirstMember: Boolean) {
-    configureFromFileTextAdapter("dummy.scala",
-                                 fileText.replace("\r", "").stripMargin.trim)
+    configureFromFileTextAdapter(
+      "dummy.scala",
+      fileText.replace("\r", "").stripMargin.trim)
     try {
-      new ScalaExtractTraitHandler().testInvoke(getProjectAdapter,
-                                                getEditorAdapter,
-                                                getFileAdapter,
-                                                onlyDeclarations,
-                                                onlyFirstMember)
+      new ScalaExtractTraitHandler().testInvoke(
+        getProjectAdapter,
+        getEditorAdapter,
+        getFileAdapter,
+        onlyDeclarations,
+        onlyFirstMember)
       assert(assertion = false, "Exception was not thrown")
     } catch {
       case e: Exception => assert(messageText == e.getMessage)

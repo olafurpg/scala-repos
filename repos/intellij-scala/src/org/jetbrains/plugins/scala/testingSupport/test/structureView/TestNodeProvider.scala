@@ -42,9 +42,10 @@ class TestNodeProvider extends FileStructureNodeProvider[TreeElement] {
 
   //TODO: what icon should be used here?
   override def getPresentation: ActionPresentation =
-    new ActionPresentationData(getCheckBoxText,
-                               null,
-                               IconLoader.getIcon("/hierarchy/supertypes.png"))
+    new ActionPresentationData(
+      getCheckBoxText,
+      null,
+      IconLoader.getIcon("/hierarchy/supertypes.png"))
 
   override def getName: String = "SCALA_SHOW_SCALATEST_TESTS"
 
@@ -61,17 +62,20 @@ class TestNodeProvider extends FileStructureNodeProvider[TreeElement] {
               for (expr <- body.exprs) {
                 (expr match {
                   case expr: ScMethodCall =>
-                    TestNodeProvider.extractTestViewElement(expr,
-                                                            clazz,
-                                                            project)
+                    TestNodeProvider.extractTestViewElement(
+                      expr,
+                      clazz,
+                      project)
                   case expr: ScInfixExpr =>
-                    TestNodeProvider.extractTestViewElementInfix(expr,
-                                                                 clazz,
-                                                                 project)
+                    TestNodeProvider.extractTestViewElementInfix(
+                      expr,
+                      clazz,
+                      project)
                   case expr: ScPatternDefinition =>
-                    TestNodeProvider.extractTestViewElementPatternDef(expr,
-                                                                      clazz,
-                                                                      project)
+                    TestNodeProvider.extractTestViewElementPatternDef(
+                      expr,
+                      clazz,
+                      project)
                   case _ =>
                     None
                 }).map(children.add)
@@ -86,8 +90,9 @@ class TestNodeProvider extends FileStructureNodeProvider[TreeElement] {
         def tryTupledId(psiElement: PsiElement) =
           TestNodeProvider.getUTestLeftHandTestDefinition(psiElement) match {
             case Some(testTupleDefinition) =>
-              TestNodeProvider.extractUTest(testTupleDefinition,
-                                            testTupleDefinition.getProject)
+              TestNodeProvider.extractUTest(
+                testTupleDefinition,
+                testTupleDefinition.getProject)
             case _ => new util.ArrayList[TreeElement]()
           }
 
@@ -214,18 +219,20 @@ object TestNodeProvider {
   private def ignoredScalaTestElement(element: PsiElement,
                                       name: String,
                                       children: Array[TreeElement] = Array()) =
-    new TestStructureViewElement(element,
-                                 name + TestNodeProvider.ignoredSuffix,
-                                 children,
-                                 TestStructureViewElement.ignoredStatusId)
+    new TestStructureViewElement(
+      element,
+      name + TestNodeProvider.ignoredSuffix,
+      children,
+      TestStructureViewElement.ignoredStatusId)
 
   private def pendingScalaTestElement(element: PsiElement,
                                       name: String,
                                       children: Array[TreeElement] = Array()) =
-    new TestStructureViewElement(element,
-                                 name + TestNodeProvider.pendingSuffix,
-                                 children,
-                                 TestStructureViewElement.pendingStatusId)
+    new TestStructureViewElement(
+      element,
+      name + TestNodeProvider.pendingSuffix,
+      children,
+      TestStructureViewElement.pendingStatusId)
 
   def getInfixExprTestName(expr: ScInfixExpr) =
     expr.getNode.getFirstChildNode.getText
@@ -236,9 +243,10 @@ object TestNodeProvider {
     val methodExpr = expr.getEffectiveInvokedExpr.findFirstChildByType(
       ScalaElementTypes.REFERENCE_EXPRESSION)
     methodExpr != null &&
-    checkRefExpr(methodExpr.asInstanceOf[ScReferenceExpression],
-                 funName,
-                 paramNames: _*)
+    checkRefExpr(
+      methodExpr.asInstanceOf[ScReferenceExpression],
+      funName,
+      paramNames: _*)
   }
 
   private def checkScMethodCallApply(expr: ScMethodCall,
@@ -260,11 +268,12 @@ object TestNodeProvider {
             }
             funElement.getName == "apply" &&
             funElement.isInstanceOf[ScFunctionDefinition] &&
-            checkClauses(funElement
-                           .asInstanceOf[ScFunctionDefinition]
-                           .getParameterList
-                           .clauses,
-                         paramNames: _*)
+            checkClauses(
+              funElement
+                .asInstanceOf[ScFunctionDefinition]
+                .getParameterList
+                .clauses,
+              paramNames: _*)
           }
         case _ => false
       }
@@ -288,10 +297,11 @@ object TestNodeProvider {
       paramNames: Option[Seq[List[String]]]): Boolean = {
     val methodExpr = expr.getEffectiveInvokedExpr
     methodExpr.isInstanceOf[ScReferenceExpression] &&
-    checkRefExpr(methodExpr.asInstanceOf[ScReferenceExpression],
-                 funName,
-                 None,
-                 paramNames)
+    checkRefExpr(
+      methodExpr.asInstanceOf[ScReferenceExpression],
+      funName,
+      None,
+      paramNames)
   }
 
   private def checkScInfixExpr(expr: ScInfixExpr,
@@ -347,22 +357,26 @@ object TestNodeProvider {
         (checkScInfixExpr(expr, "ignore", List("void")) ||
         checkIgnoreExpr(expr))) {
       Some(
-        ignoredScalaTestElement(expr,
-                                getInfixExprTestName(expr),
-                                entry.children(())))
-    } else if (checkScInfixExpr(expr,
-                                "is",
-                                List("org.scalatest.PendingNothing")) ||
+        ignoredScalaTestElement(
+          expr,
+          getInfixExprTestName(expr),
+          entry.children(())))
+    } else if (checkScInfixExpr(
+                 expr,
+                 "is",
+                 List("org.scalatest.PendingNothing")) ||
                checkPendingInfixExpr(expr)) {
       Some(
-        pendingScalaTestElement(expr,
-                                getInfixExprTestName(expr),
-                                entry.children(())))
+        pendingScalaTestElement(
+          expr,
+          getInfixExprTestName(expr),
+          entry.children(())))
     } else if (checkScInfixExpr(expr, entry.funName, entry.args: _*)) {
       Some(
-        new TestStructureViewElement(expr,
-                                     getInfixExprTestName(expr),
-                                     entry.children(())))
+        new TestStructureViewElement(
+          expr,
+          getInfixExprTestName(expr),
+          entry.children(())))
     } else None
   }
 
@@ -409,12 +423,14 @@ object TestNodeProvider {
   def isSpecs2ScopeExpr(expr: PsiElement): Boolean = {
     expr match {
       case infixExpr: ScInfixExpr =>
-        checkScInfixExpr(infixExpr,
-                         "should",
-                         List("org.specs2.specification.Fragment")) ||
-          checkScInfixExpr(infixExpr,
-                           "should",
-                           List("org.specs2.specification.core.Fragment")) ||
+        checkScInfixExpr(
+          infixExpr,
+          "should",
+          List("org.specs2.specification.Fragment")) ||
+          checkScInfixExpr(
+            infixExpr,
+            "should",
+            List("org.specs2.specification.core.Fragment")) ||
           checkScInfixExpr(
             infixExpr,
             "should",
@@ -429,14 +445,17 @@ object TestNodeProvider {
             infixExpr,
             "should",
             List("void"),
-            List("org.specs2.control.ImplicitParameters.ImplicitParam1",
-                 "org.specs2.control.ImplicitParameters.ImplicitParam2")) ||
-          checkScInfixExpr(infixExpr,
-                           "can",
-                           List("org.specs2.specification.Fragment")) ||
-          checkScInfixExpr(infixExpr,
-                           "can",
-                           List("org.specs2.specification.core.Fragment")) ||
+            List(
+              "org.specs2.control.ImplicitParameters.ImplicitParam1",
+              "org.specs2.control.ImplicitParameters.ImplicitParam2")) ||
+          checkScInfixExpr(
+            infixExpr,
+            "can",
+            List("org.specs2.specification.Fragment")) ||
+          checkScInfixExpr(
+            infixExpr,
+            "can",
+            List("org.specs2.specification.core.Fragment")) ||
           checkScInfixExpr(
             infixExpr,
             "can",
@@ -451,8 +470,9 @@ object TestNodeProvider {
             infixExpr,
             "can",
             List("void"),
-            List("org.specs2.control.ImplicitParameters.ImplicitParam1",
-                 "org.specs2.control.ImplicitParameters.ImplicitParam2"))
+            List(
+              "org.specs2.control.ImplicitParameters.ImplicitParam1",
+              "org.specs2.control.ImplicitParameters.ImplicitParam2"))
       case _ => false
     }
   }
@@ -484,22 +504,26 @@ object TestNodeProvider {
     if (entry.canIgnore &&
         checkScMethodCall(expr, "ignore", scMethodCallDefaultArg: _*)) {
       Some(
-        ignoredScalaTestElement(expr,
-                                getMethodCallTestName(expr),
-                                entry.children(())))
+        ignoredScalaTestElement(
+          expr,
+          getMethodCallTestName(expr),
+          entry.children(())))
     } else if (entry.canPend && checkMethodCallPending(expr)) {
       Some(
-        pendingScalaTestElement(expr,
-                                getMethodCallTestName(expr),
-                                entry.children(())))
+        pendingScalaTestElement(
+          expr,
+          getMethodCallTestName(expr),
+          entry.children(())))
     } else if (checkScMethodCall(expr, entry.funName, entry.args: _*) ||
-               checkScMethodCallApply(expr,
-                                      entry.funName,
-                                      scMethodCallDefaultArg: _*)) {
+               checkScMethodCallApply(
+                 expr,
+                 entry.funName,
+                 scMethodCallDefaultArg: _*)) {
       Some(
-        new TestStructureViewElement(expr,
-                                     getMethodCallTestName(expr),
-                                     entry.children(())))
+        new TestStructureViewElement(
+          expr,
+          getMethodCallTestName(expr),
+          entry.children(())))
     } else None
   }
 
@@ -514,17 +538,19 @@ object TestNodeProvider {
       expr,
       ExtractEntry("$minus", true, false, _ => children, List("void")),
       project).orElse(
-      extractScalaTestScInfixExpr(expr,
-                                  ExtractEntry("in", true, true, List("void")),
-                                  project))
+      extractScalaTestScInfixExpr(
+        expr,
+        ExtractEntry("in", true, true, List("void")),
+        project))
   }
 
   private def extractFlatSpec(
       expr: ScInfixExpr,
       project: Project): Option[TestStructureViewElement] = {
-    extractScalaTestScInfixExpr(expr,
-                                ExtractEntry("in", true, true, List("void")),
-                                project)
+    extractScalaTestScInfixExpr(
+      expr,
+      ExtractEntry("in", true, true, List("void")),
+      project)
   }
 
   private def extractWordSpec(
@@ -532,9 +558,10 @@ object TestNodeProvider {
       project: Project): Option[TestStructureViewElement] = {
     lazy val children =
       processChildren(getInnerInfixExprs(expr), extractWordSpec, project)
-    extractScalaTestScInfixExpr(expr,
-                                ExtractEntry("in", true, true, List("void")),
-                                project)
+    extractScalaTestScInfixExpr(
+      expr,
+      ExtractEntry("in", true, true, List("void")),
+      project)
       .orElse(
         extractScalaTestScInfixExpr(
           expr,
@@ -585,14 +612,16 @@ object TestNodeProvider {
       project: Project): Option[TestStructureViewElement] = {
     lazy val children =
       processChildren(getInnerMethodCalls(expr), extractFunSpec, project)
-    extractScMethodCall(expr,
-                        ExtractEntry("describe",
-                                     true,
-                                     true,
-                                     _ => children,
-                                     List("java.lang.String"),
-                                     List("void")),
-                        project)
+    extractScMethodCall(
+      expr,
+      ExtractEntry(
+        "describe",
+        true,
+        true,
+        _ => children,
+        List("java.lang.String"),
+        List("void")),
+      project)
       .orElse(
         extractScMethodCall(
           expr,
@@ -610,14 +639,16 @@ object TestNodeProvider {
       project: Project): Option[TestStructureViewElement] = {
     lazy val children =
       processChildren(getInnerMethodCalls(expr), extractFeatureSpec, project)
-    extractScMethodCall(expr,
-                        ExtractEntry("feature",
-                                     true,
-                                     false,
-                                     _ => children,
-                                     List("java.lang.String"),
-                                     List("void")),
-                        project).orElse(
+    extractScMethodCall(
+      expr,
+      ExtractEntry(
+        "feature",
+        true,
+        false,
+        _ => children,
+        List("java.lang.String"),
+        List("void")),
+      project).orElse(
       extractScMethodCall(
         expr,
         ExtractEntry("scenario", true, true, scMethodCallDefaultArg: _*),
@@ -714,8 +745,9 @@ object TestNodeProvider {
         actualType match {
           case Some(funDef: ScFunctionDefinition) =>
             funDef.getName == "TestableSymbol" && funDef.isSynthetic &&
-              checkClauses(funDef.getParameterList.clauses,
-                           List("scala.Symbol"))
+              checkClauses(
+                funDef.getParameterList.clauses,
+                List("scala.Symbol"))
           case _ => false
         }
       }
@@ -803,9 +835,10 @@ object ExtractEntry {
             canIgnore: Boolean,
             canPend: Boolean,
             args: List[String]*): ExtractEntry =
-    ExtractEntry(funName,
-                 canIgnore,
-                 canPend,
-                 _ => Array[TreeElement](),
-                 args: _*)
+    ExtractEntry(
+      funName,
+      canIgnore,
+      canPend,
+      _ => Array[TreeElement](),
+      args: _*)
 }

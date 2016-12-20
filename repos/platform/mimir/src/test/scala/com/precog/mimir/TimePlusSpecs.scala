@@ -55,10 +55,11 @@ trait TimePlusSpecs[M[+ _]]
   "time plus functions (homogeneous case)" should {
     "compute incrememtation of positive number of years" in {
       val input =
-        Join(BuiltInFunction2Op(YearsPlus),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/hom/iso8601"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(YearsPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/iso8601"))(line))(line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -69,18 +70,20 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2015-04-29T09:37:52.599+08:00",
-                           "2016-02-21T20:09:59.165+09:00",
-                           "2016-09-06T06:44:52.848-10:00",
-                           "2017-02-11T09:11:33.394-07:00",
-                           "2017-12-28T22:38:19.430+06:00")
+      result2 must contain(
+        "2015-04-29T09:37:52.599+08:00",
+        "2016-02-21T20:09:59.165+09:00",
+        "2016-09-06T06:44:52.848-10:00",
+        "2017-02-11T09:11:33.394-07:00",
+        "2017-12-28T22:38:19.430+06:00")
     }
     "compute incrememtation of negative number of years" in {
       val input =
-        Join(BuiltInFunction2Op(YearsPlus),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/hom/iso8601"))(line))(line),
-             Const(CLong(-5))(line))(line)
+        Join(
+          BuiltInFunction2Op(YearsPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/iso8601"))(line))(line),
+          Const(CLong(-5))(line))(line)
 
       val result = testEval(input)
 
@@ -91,18 +94,20 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2005-04-29T09:37:52.599+08:00",
-                           "2006-02-21T20:09:59.165+09:00",
-                           "2006-09-06T06:44:52.848-10:00",
-                           "2007-02-11T09:11:33.394-07:00",
-                           "2007-12-28T22:38:19.430+06:00")
+      result2 must contain(
+        "2005-04-29T09:37:52.599+08:00",
+        "2006-02-21T20:09:59.165+09:00",
+        "2006-09-06T06:44:52.848-10:00",
+        "2007-02-11T09:11:33.394-07:00",
+        "2007-12-28T22:38:19.430+06:00")
     }
     "compute incrememtation of zero of years" in {
       val input =
-        Join(BuiltInFunction2Op(YearsPlus),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/hom/iso8601"))(line))(line),
-             Const(CLong(0))(line))(line)
+        Join(
+          BuiltInFunction2Op(YearsPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/iso8601"))(line))(line),
+          Const(CLong(0))(line))(line)
 
       val result = testEval(input)
 
@@ -113,19 +118,21 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2010-04-29T09:37:52.599+08:00",
-                           "2011-02-21T20:09:59.165+09:00",
-                           "2011-09-06T06:44:52.848-10:00",
-                           "2012-02-11T09:11:33.394-07:00",
-                           "2012-12-28T22:38:19.430+06:00")
+      result2 must contain(
+        "2010-04-29T09:37:52.599+08:00",
+        "2011-02-21T20:09:59.165+09:00",
+        "2011-09-06T06:44:52.848-10:00",
+        "2012-02-11T09:11:33.394-07:00",
+        "2012-12-28T22:38:19.430+06:00")
     }
 
     "compute incrememtation of months" in {
       val input =
-        Join(BuiltInFunction2Op(MonthsPlus),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/hom/iso8601"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(MonthsPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/iso8601"))(line))(line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -136,19 +143,21 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2010-09-29T09:37:52.599+08:00",
-                           "2011-07-21T20:09:59.165+09:00",
-                           "2012-02-06T06:44:52.848-10:00",
-                           "2012-07-11T09:11:33.394-07:00",
-                           "2013-05-28T22:38:19.430+06:00")
+      result2 must contain(
+        "2010-09-29T09:37:52.599+08:00",
+        "2011-07-21T20:09:59.165+09:00",
+        "2012-02-06T06:44:52.848-10:00",
+        "2012-07-11T09:11:33.394-07:00",
+        "2013-05-28T22:38:19.430+06:00")
     }
 
     "compute incrememtation of weeks" in {
       val input =
-        Join(BuiltInFunction2Op(WeeksPlus),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/hom/iso8601"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(WeeksPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/iso8601"))(line))(line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -159,18 +168,20 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2011-10-11T06:44:52.848-10:00",
-                           "2012-03-17T09:11:33.394-07:00",
-                           "2011-03-28T20:09:59.165+09:00",
-                           "2013-02-01T22:38:19.430+06:00",
-                           "2010-06-03T09:37:52.599+08:00")
+      result2 must contain(
+        "2011-10-11T06:44:52.848-10:00",
+        "2012-03-17T09:11:33.394-07:00",
+        "2011-03-28T20:09:59.165+09:00",
+        "2013-02-01T22:38:19.430+06:00",
+        "2010-06-03T09:37:52.599+08:00")
     }
     "compute incrememtation of days" in {
       val input =
-        Join(BuiltInFunction2Op(DaysPlus),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/hom/iso8601"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(DaysPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/iso8601"))(line))(line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -181,18 +192,20 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2010-05-04T09:37:52.599+08:00",
-                           "2011-02-26T20:09:59.165+09:00",
-                           "2011-09-11T06:44:52.848-10:00",
-                           "2012-02-16T09:11:33.394-07:00",
-                           "2013-01-02T22:38:19.430+06:00")
+      result2 must contain(
+        "2010-05-04T09:37:52.599+08:00",
+        "2011-02-26T20:09:59.165+09:00",
+        "2011-09-11T06:44:52.848-10:00",
+        "2012-02-16T09:11:33.394-07:00",
+        "2013-01-02T22:38:19.430+06:00")
     }
     "compute incrememtation of hours" in {
       val input =
-        Join(BuiltInFunction2Op(HoursPlus),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/hom/iso8601"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(HoursPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/iso8601"))(line))(line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -203,18 +216,20 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2010-04-29T14:37:52.599+08:00",
-                           "2011-02-22T01:09:59.165+09:00",
-                           "2011-09-06T11:44:52.848-10:00",
-                           "2012-02-11T14:11:33.394-07:00",
-                           "2012-12-29T03:38:19.430+06:00")
+      result2 must contain(
+        "2010-04-29T14:37:52.599+08:00",
+        "2011-02-22T01:09:59.165+09:00",
+        "2011-09-06T11:44:52.848-10:00",
+        "2012-02-11T14:11:33.394-07:00",
+        "2012-12-29T03:38:19.430+06:00")
     }
     "compute incrememtation of minutes" in {
       val input =
-        Join(BuiltInFunction2Op(MinutesPlus),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/hom/iso8601"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(MinutesPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/iso8601"))(line))(line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -225,18 +240,20 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2010-04-29T09:42:52.599+08:00",
-                           "2011-02-21T20:14:59.165+09:00",
-                           "2011-09-06T06:49:52.848-10:00",
-                           "2012-02-11T09:16:33.394-07:00",
-                           "2012-12-28T22:43:19.430+06:00")
+      result2 must contain(
+        "2010-04-29T09:42:52.599+08:00",
+        "2011-02-21T20:14:59.165+09:00",
+        "2011-09-06T06:49:52.848-10:00",
+        "2012-02-11T09:16:33.394-07:00",
+        "2012-12-28T22:43:19.430+06:00")
     }
     "compute incrememtation of seconds" in {
       val input =
-        Join(BuiltInFunction2Op(SecondsPlus),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/hom/iso8601"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(SecondsPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/iso8601"))(line))(line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -247,18 +264,20 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2010-04-29T09:37:57.599+08:00",
-                           "2011-02-21T20:10:04.165+09:00",
-                           "2011-09-06T06:44:57.848-10:00",
-                           "2012-02-11T09:11:38.394-07:00",
-                           "2012-12-28T22:38:24.430+06:00")
+      result2 must contain(
+        "2010-04-29T09:37:57.599+08:00",
+        "2011-02-21T20:10:04.165+09:00",
+        "2011-09-06T06:44:57.848-10:00",
+        "2012-02-11T09:11:38.394-07:00",
+        "2012-12-28T22:38:24.430+06:00")
     }
     "compute incrememtation of ms" in {
       val input =
-        Join(BuiltInFunction2Op(MillisPlus),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/hom/iso8601"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(MillisPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/iso8601"))(line))(line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -269,21 +288,23 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2010-04-29T09:37:52.604+08:00",
-                           "2011-02-21T20:09:59.170+09:00",
-                           "2011-09-06T06:44:52.853-10:00",
-                           "2012-02-11T09:11:33.399-07:00",
-                           "2012-12-28T22:38:19.435+06:00")
+      result2 must contain(
+        "2010-04-29T09:37:52.604+08:00",
+        "2011-02-21T20:09:59.170+09:00",
+        "2011-09-06T06:44:52.853-10:00",
+        "2012-02-11T09:11:33.399-07:00",
+        "2012-12-28T22:38:19.435+06:00")
     }
   }
 
   "time plus functions (heterogeneous case)" should {
     "compute incrememtation of years" in {
       val input =
-        Join(BuiltInFunction2Op(YearsPlus),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/het/iso8601"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(YearsPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/iso8601"))(line))(line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -294,19 +315,21 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2015-04-29T09:37:52.599+08:00",
-                           "2016-02-21T20:09:59.165+09:00",
-                           "2016-09-06T06:44:52.848-10:00",
-                           "2017-02-11T09:11:33.394-07:00",
-                           "2017-12-28T22:38:19.430+06:00")
+      result2 must contain(
+        "2015-04-29T09:37:52.599+08:00",
+        "2016-02-21T20:09:59.165+09:00",
+        "2016-09-06T06:44:52.848-10:00",
+        "2017-02-11T09:11:33.394-07:00",
+        "2017-12-28T22:38:19.430+06:00")
     }
 
     "compute incrememtation of months" in {
       val input =
-        Join(BuiltInFunction2Op(MonthsPlus),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/het/iso8601"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(MonthsPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/iso8601"))(line))(line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -317,19 +340,21 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2010-09-29T09:37:52.599+08:00",
-                           "2011-07-21T20:09:59.165+09:00",
-                           "2012-02-06T06:44:52.848-10:00",
-                           "2012-07-11T09:11:33.394-07:00",
-                           "2013-05-28T22:38:19.430+06:00")
+      result2 must contain(
+        "2010-09-29T09:37:52.599+08:00",
+        "2011-07-21T20:09:59.165+09:00",
+        "2012-02-06T06:44:52.848-10:00",
+        "2012-07-11T09:11:33.394-07:00",
+        "2013-05-28T22:38:19.430+06:00")
     }
 
     "compute incrememtation of weeks" in {
       val input =
-        Join(BuiltInFunction2Op(WeeksPlus),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/het/iso8601"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(WeeksPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/iso8601"))(line))(line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -340,18 +365,20 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2011-10-11T06:44:52.848-10:00",
-                           "2012-03-17T09:11:33.394-07:00",
-                           "2011-03-28T20:09:59.165+09:00",
-                           "2013-02-01T22:38:19.430+06:00",
-                           "2010-06-03T09:37:52.599+08:00")
+      result2 must contain(
+        "2011-10-11T06:44:52.848-10:00",
+        "2012-03-17T09:11:33.394-07:00",
+        "2011-03-28T20:09:59.165+09:00",
+        "2013-02-01T22:38:19.430+06:00",
+        "2010-06-03T09:37:52.599+08:00")
     }
     "compute incrememtation of days" in {
       val input =
-        Join(BuiltInFunction2Op(DaysPlus),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/het/iso8601"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(DaysPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/iso8601"))(line))(line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -362,18 +389,20 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2010-05-04T09:37:52.599+08:00",
-                           "2011-02-26T20:09:59.165+09:00",
-                           "2011-09-11T06:44:52.848-10:00",
-                           "2012-02-16T09:11:33.394-07:00",
-                           "2013-01-02T22:38:19.430+06:00")
+      result2 must contain(
+        "2010-05-04T09:37:52.599+08:00",
+        "2011-02-26T20:09:59.165+09:00",
+        "2011-09-11T06:44:52.848-10:00",
+        "2012-02-16T09:11:33.394-07:00",
+        "2013-01-02T22:38:19.430+06:00")
     }
     "compute incrememtation of hours" in {
       val input =
-        Join(BuiltInFunction2Op(HoursPlus),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/het/iso8601"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(HoursPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/iso8601"))(line))(line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -384,18 +413,20 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2010-04-29T14:37:52.599+08:00",
-                           "2011-02-22T01:09:59.165+09:00",
-                           "2011-09-06T11:44:52.848-10:00",
-                           "2012-02-11T14:11:33.394-07:00",
-                           "2012-12-29T03:38:19.430+06:00")
+      result2 must contain(
+        "2010-04-29T14:37:52.599+08:00",
+        "2011-02-22T01:09:59.165+09:00",
+        "2011-09-06T11:44:52.848-10:00",
+        "2012-02-11T14:11:33.394-07:00",
+        "2012-12-29T03:38:19.430+06:00")
     }
     "compute incrememtation of minutes" in {
       val input =
-        Join(BuiltInFunction2Op(MinutesPlus),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/het/iso8601"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(MinutesPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/iso8601"))(line))(line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -406,18 +437,20 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2010-04-29T09:42:52.599+08:00",
-                           "2011-02-21T20:14:59.165+09:00",
-                           "2011-09-06T06:49:52.848-10:00",
-                           "2012-02-11T09:16:33.394-07:00",
-                           "2012-12-28T22:43:19.430+06:00")
+      result2 must contain(
+        "2010-04-29T09:42:52.599+08:00",
+        "2011-02-21T20:14:59.165+09:00",
+        "2011-09-06T06:49:52.848-10:00",
+        "2012-02-11T09:16:33.394-07:00",
+        "2012-12-28T22:43:19.430+06:00")
     }
     "compute incrememtation of seconds" in {
       val input =
-        Join(BuiltInFunction2Op(SecondsPlus),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/het/iso8601"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(SecondsPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/iso8601"))(line))(line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -428,18 +461,20 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2010-04-29T09:37:57.599+08:00",
-                           "2011-02-21T20:10:04.165+09:00",
-                           "2011-09-06T06:44:57.848-10:00",
-                           "2012-02-11T09:11:38.394-07:00",
-                           "2012-12-28T22:38:24.430+06:00")
+      result2 must contain(
+        "2010-04-29T09:37:57.599+08:00",
+        "2011-02-21T20:10:04.165+09:00",
+        "2011-09-06T06:44:57.848-10:00",
+        "2012-02-11T09:11:38.394-07:00",
+        "2012-12-28T22:38:24.430+06:00")
     }
     "compute incrememtation of ms" in {
       val input =
-        Join(BuiltInFunction2Op(MillisPlus),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/het/iso8601"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(MillisPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/iso8601"))(line))(line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -450,22 +485,24 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2010-04-29T09:37:52.604+08:00",
-                           "2011-02-21T20:09:59.170+09:00",
-                           "2011-09-06T06:44:52.853-10:00",
-                           "2012-02-11T09:11:33.399-07:00",
-                           "2012-12-28T22:38:19.435+06:00")
+      result2 must contain(
+        "2010-04-29T09:37:52.604+08:00",
+        "2011-02-21T20:09:59.170+09:00",
+        "2011-09-06T06:44:52.853-10:00",
+        "2012-02-11T09:11:33.399-07:00",
+        "2012-12-28T22:38:19.435+06:00")
     }
   }
 
   "time plus functions (homogeneous case across slices)" should {
     "compute incrememtation of positive number of years" in {
       val input =
-        Join(BuiltInFunction2Op(YearsPlus),
-             Cross(None),
-             dag.AbsoluteLoad(
-               Const(CString("/hom/iso8601AcrossSlices"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(YearsPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/iso8601AcrossSlices"))(line))(
+            line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -503,11 +540,12 @@ trait TimePlusSpecs[M[+ _]]
     }
     "compute incrememtation of negative number of years" in {
       val input =
-        Join(BuiltInFunction2Op(YearsPlus),
-             Cross(None),
-             dag.AbsoluteLoad(
-               Const(CString("/hom/iso8601AcrossSlices"))(line))(line),
-             Const(CLong(-5))(line))(line)
+        Join(
+          BuiltInFunction2Op(YearsPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/iso8601AcrossSlices"))(line))(
+            line),
+          Const(CLong(-5))(line))(line)
 
       val result = testEval(input)
 
@@ -545,11 +583,12 @@ trait TimePlusSpecs[M[+ _]]
     }
     "compute incrememtation of zero of years" in {
       val input =
-        Join(BuiltInFunction2Op(YearsPlus),
-             Cross(None),
-             dag.AbsoluteLoad(
-               Const(CString("/hom/iso8601AcrossSlices"))(line))(line),
-             Const(CLong(0))(line))(line)
+        Join(
+          BuiltInFunction2Op(YearsPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/iso8601AcrossSlices"))(line))(
+            line),
+          Const(CLong(0))(line))(line)
 
       val result = testEval(input)
 
@@ -588,11 +627,12 @@ trait TimePlusSpecs[M[+ _]]
 
     "compute incrememtation of months" in {
       val input =
-        Join(BuiltInFunction2Op(MonthsPlus),
-             Cross(None),
-             dag.AbsoluteLoad(
-               Const(CString("/hom/iso8601AcrossSlices"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(MonthsPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/iso8601AcrossSlices"))(line))(
+            line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -631,11 +671,12 @@ trait TimePlusSpecs[M[+ _]]
 
     "compute incrememtation of weeks" in {
       val input =
-        Join(BuiltInFunction2Op(WeeksPlus),
-             Cross(None),
-             dag.AbsoluteLoad(
-               Const(CString("/hom/iso8601AcrossSlices"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(WeeksPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/iso8601AcrossSlices"))(line))(
+            line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -673,11 +714,12 @@ trait TimePlusSpecs[M[+ _]]
     }
     "compute incrememtation of days" in {
       val input =
-        Join(BuiltInFunction2Op(DaysPlus),
-             Cross(None),
-             dag.AbsoluteLoad(
-               Const(CString("/hom/iso8601AcrossSlices"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(DaysPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/iso8601AcrossSlices"))(line))(
+            line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -715,11 +757,12 @@ trait TimePlusSpecs[M[+ _]]
     }
     "compute incrememtation of hours" in {
       val input =
-        Join(BuiltInFunction2Op(HoursPlus),
-             Cross(None),
-             dag.AbsoluteLoad(
-               Const(CString("/hom/iso8601AcrossSlices"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(HoursPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/iso8601AcrossSlices"))(line))(
+            line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -757,11 +800,12 @@ trait TimePlusSpecs[M[+ _]]
     }
     "compute incrememtation of minutes" in {
       val input =
-        Join(BuiltInFunction2Op(MinutesPlus),
-             Cross(None),
-             dag.AbsoluteLoad(
-               Const(CString("/hom/iso8601AcrossSlices"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(MinutesPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/iso8601AcrossSlices"))(line))(
+            line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -799,11 +843,12 @@ trait TimePlusSpecs[M[+ _]]
     }
     "compute incrememtation of seconds" in {
       val input =
-        Join(BuiltInFunction2Op(SecondsPlus),
-             Cross(None),
-             dag.AbsoluteLoad(
-               Const(CString("/hom/iso8601AcrossSlices"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(SecondsPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/iso8601AcrossSlices"))(line))(
+            line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -841,11 +886,12 @@ trait TimePlusSpecs[M[+ _]]
     }
     "compute incrememtation of ms" in {
       val input =
-        Join(BuiltInFunction2Op(MillisPlus),
-             Cross(None),
-             dag.AbsoluteLoad(
-               Const(CString("/hom/iso8601AcrossSlices"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(MillisPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/iso8601AcrossSlices"))(line))(
+            line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -886,11 +932,12 @@ trait TimePlusSpecs[M[+ _]]
   "time plus functions (heterogeneous case across slices)" should {
     "compute incrememtation of years" in {
       val input =
-        Join(BuiltInFunction2Op(YearsPlus),
-             Cross(None),
-             dag.AbsoluteLoad(
-               Const(CString("/het/iso8601AcrossSlices"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(YearsPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/iso8601AcrossSlices"))(line))(
+            line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -901,25 +948,27 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2013-10-24T11:44:19.844+03:00",
-                           "2017-05-05T08:58:10.171+10:00",
-                           "2015-11-21T23:50:10.932+06:00",
-                           "2015-10-25T01:51:16.248+04:00",
-                           "2012-07-14T03:49:30.311-07:00",
-                           "2016-06-25T00:18:50.873-11:00",
-                           "2013-05-27T16:27:24.858Z",
-                           "2013-07-02T18:53:43.506-04:00",
-                           "2014-08-17T05:54:08.513+02:00",
-                           "2016-10-13T15:47:40.629+08:00")
+      result2 must contain(
+        "2013-10-24T11:44:19.844+03:00",
+        "2017-05-05T08:58:10.171+10:00",
+        "2015-11-21T23:50:10.932+06:00",
+        "2015-10-25T01:51:16.248+04:00",
+        "2012-07-14T03:49:30.311-07:00",
+        "2016-06-25T00:18:50.873-11:00",
+        "2013-05-27T16:27:24.858Z",
+        "2013-07-02T18:53:43.506-04:00",
+        "2014-08-17T05:54:08.513+02:00",
+        "2016-10-13T15:47:40.629+08:00")
     }
 
     "compute incrememtation of months" in {
       val input =
-        Join(BuiltInFunction2Op(MonthsPlus),
-             Cross(None),
-             dag.AbsoluteLoad(
-               Const(CString("/het/iso8601AcrossSlices"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(MonthsPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/iso8601AcrossSlices"))(line))(
+            line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -930,25 +979,27 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2011-04-21T23:50:10.932+06:00",
-                           "2012-10-05T08:58:10.171+10:00",
-                           "2012-03-13T15:47:40.629+08:00",
-                           "2010-01-17T05:54:08.513+02:00",
-                           "2009-03-24T11:44:19.844+03:00",
-                           "2008-12-02T18:53:43.506-04:00",
-                           "2011-03-25T01:51:16.248+04:00",
-                           "2008-10-27T16:27:24.858Z",
-                           "2007-12-14T03:49:30.311-07:00",
-                           "2011-11-25T00:18:50.873-11:00")
+      result2 must contain(
+        "2011-04-21T23:50:10.932+06:00",
+        "2012-10-05T08:58:10.171+10:00",
+        "2012-03-13T15:47:40.629+08:00",
+        "2010-01-17T05:54:08.513+02:00",
+        "2009-03-24T11:44:19.844+03:00",
+        "2008-12-02T18:53:43.506-04:00",
+        "2011-03-25T01:51:16.248+04:00",
+        "2008-10-27T16:27:24.858Z",
+        "2007-12-14T03:49:30.311-07:00",
+        "2011-11-25T00:18:50.873-11:00")
     }
 
     "compute incrememtation of weeks" in {
       val input =
-        Join(BuiltInFunction2Op(WeeksPlus),
-             Cross(None),
-             dag.AbsoluteLoad(
-               Const(CString("/het/iso8601AcrossSlices"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(WeeksPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/iso8601AcrossSlices"))(line))(
+            line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -959,24 +1010,26 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2009-09-21T05:54:08.513+02:00",
-                           "2011-11-17T15:47:40.629+08:00",
-                           "2008-08-06T18:53:43.506-04:00",
-                           "2011-07-30T00:18:50.873-11:00",
-                           "2012-06-09T08:58:10.171+10:00",
-                           "2010-12-26T23:50:10.932+06:00",
-                           "2010-11-29T01:51:16.248+04:00",
-                           "2008-11-28T11:44:19.844+03:00",
-                           "2007-08-18T03:49:30.311-07:00",
-                           "2008-07-01T16:27:24.858Z")
+      result2 must contain(
+        "2009-09-21T05:54:08.513+02:00",
+        "2011-11-17T15:47:40.629+08:00",
+        "2008-08-06T18:53:43.506-04:00",
+        "2011-07-30T00:18:50.873-11:00",
+        "2012-06-09T08:58:10.171+10:00",
+        "2010-12-26T23:50:10.932+06:00",
+        "2010-11-29T01:51:16.248+04:00",
+        "2008-11-28T11:44:19.844+03:00",
+        "2007-08-18T03:49:30.311-07:00",
+        "2008-07-01T16:27:24.858Z")
     }
     "compute incrememtation of days" in {
       val input =
-        Join(BuiltInFunction2Op(DaysPlus),
-             Cross(None),
-             dag.AbsoluteLoad(
-               Const(CString("/het/iso8601AcrossSlices"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(DaysPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/iso8601AcrossSlices"))(line))(
+            line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -987,24 +1040,26 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2008-06-01T16:27:24.858Z",
-                           "2007-07-19T03:49:30.311-07:00",
-                           "2010-10-30T01:51:16.248+04:00",
-                           "2009-08-22T05:54:08.513+02:00",
-                           "2008-10-29T11:44:19.844+03:00",
-                           "2010-11-26T23:50:10.932+06:00",
-                           "2011-06-30T00:18:50.873-11:00",
-                           "2011-10-18T15:47:40.629+08:00",
-                           "2012-05-10T08:58:10.171+10:00",
-                           "2008-07-07T18:53:43.506-04:00")
+      result2 must contain(
+        "2008-06-01T16:27:24.858Z",
+        "2007-07-19T03:49:30.311-07:00",
+        "2010-10-30T01:51:16.248+04:00",
+        "2009-08-22T05:54:08.513+02:00",
+        "2008-10-29T11:44:19.844+03:00",
+        "2010-11-26T23:50:10.932+06:00",
+        "2011-06-30T00:18:50.873-11:00",
+        "2011-10-18T15:47:40.629+08:00",
+        "2012-05-10T08:58:10.171+10:00",
+        "2008-07-07T18:53:43.506-04:00")
     }
     "compute incrememtation of hours" in {
       val input =
-        Join(BuiltInFunction2Op(HoursPlus),
-             Cross(None),
-             dag.AbsoluteLoad(
-               Const(CString("/het/iso8601AcrossSlices"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(HoursPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/iso8601AcrossSlices"))(line))(
+            line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -1015,24 +1070,26 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2012-05-05T13:58:10.171+10:00",
-                           "2009-08-17T10:54:08.513+02:00",
-                           "2011-10-13T20:47:40.629+08:00",
-                           "2008-05-27T21:27:24.858Z",
-                           "2008-10-24T16:44:19.844+03:00",
-                           "2007-07-14T08:49:30.311-07:00",
-                           "2011-06-25T05:18:50.873-11:00",
-                           "2010-11-22T04:50:10.932+06:00",
-                           "2008-07-02T23:53:43.506-04:00",
-                           "2010-10-25T06:51:16.248+04:00")
+      result2 must contain(
+        "2012-05-05T13:58:10.171+10:00",
+        "2009-08-17T10:54:08.513+02:00",
+        "2011-10-13T20:47:40.629+08:00",
+        "2008-05-27T21:27:24.858Z",
+        "2008-10-24T16:44:19.844+03:00",
+        "2007-07-14T08:49:30.311-07:00",
+        "2011-06-25T05:18:50.873-11:00",
+        "2010-11-22T04:50:10.932+06:00",
+        "2008-07-02T23:53:43.506-04:00",
+        "2010-10-25T06:51:16.248+04:00")
     }
     "compute incrememtation of minutes" in {
       val input =
-        Join(BuiltInFunction2Op(MinutesPlus),
-             Cross(None),
-             dag.AbsoluteLoad(
-               Const(CString("/het/iso8601AcrossSlices"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(MinutesPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/iso8601AcrossSlices"))(line))(
+            line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -1043,24 +1100,26 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2010-11-21T23:55:10.932+06:00",
-                           "2011-10-13T15:52:40.629+08:00",
-                           "2008-10-24T11:49:19.844+03:00",
-                           "2010-10-25T01:56:16.248+04:00",
-                           "2012-05-05T09:03:10.171+10:00",
-                           "2008-07-02T18:58:43.506-04:00",
-                           "2011-06-25T00:23:50.873-11:00",
-                           "2008-05-27T16:32:24.858Z",
-                           "2007-07-14T03:54:30.311-07:00",
-                           "2009-08-17T05:59:08.513+02:00")
+      result2 must contain(
+        "2010-11-21T23:55:10.932+06:00",
+        "2011-10-13T15:52:40.629+08:00",
+        "2008-10-24T11:49:19.844+03:00",
+        "2010-10-25T01:56:16.248+04:00",
+        "2012-05-05T09:03:10.171+10:00",
+        "2008-07-02T18:58:43.506-04:00",
+        "2011-06-25T00:23:50.873-11:00",
+        "2008-05-27T16:32:24.858Z",
+        "2007-07-14T03:54:30.311-07:00",
+        "2009-08-17T05:59:08.513+02:00")
     }
     "compute incrememtation of seconds" in {
       val input =
-        Join(BuiltInFunction2Op(SecondsPlus),
-             Cross(None),
-             dag.AbsoluteLoad(
-               Const(CString("/het/iso8601AcrossSlices"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(SecondsPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/iso8601AcrossSlices"))(line))(
+            line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -1071,24 +1130,26 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2011-06-25T00:18:55.873-11:00",
-                           "2009-08-17T05:54:13.513+02:00",
-                           "2010-11-21T23:50:15.932+06:00",
-                           "2008-10-24T11:44:24.844+03:00",
-                           "2012-05-05T08:58:15.171+10:00",
-                           "2010-10-25T01:51:21.248+04:00",
-                           "2008-05-27T16:27:29.858Z",
-                           "2011-10-13T15:47:45.629+08:00",
-                           "2007-07-14T03:49:35.311-07:00",
-                           "2008-07-02T18:53:48.506-04:00")
+      result2 must contain(
+        "2011-06-25T00:18:55.873-11:00",
+        "2009-08-17T05:54:13.513+02:00",
+        "2010-11-21T23:50:15.932+06:00",
+        "2008-10-24T11:44:24.844+03:00",
+        "2012-05-05T08:58:15.171+10:00",
+        "2010-10-25T01:51:21.248+04:00",
+        "2008-05-27T16:27:29.858Z",
+        "2011-10-13T15:47:45.629+08:00",
+        "2007-07-14T03:49:35.311-07:00",
+        "2008-07-02T18:53:48.506-04:00")
     }
     "compute incrememtation of ms" in {
       val input =
-        Join(BuiltInFunction2Op(MillisPlus),
-             Cross(None),
-             dag.AbsoluteLoad(
-               Const(CString("/het/iso8601AcrossSlices"))(line))(line),
-             Const(CLong(5))(line))(line)
+        Join(
+          BuiltInFunction2Op(MillisPlus),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/iso8601AcrossSlices"))(line))(
+            line),
+          Const(CLong(5))(line))(line)
 
       val result = testEval(input)
 
@@ -1099,16 +1160,17 @@ trait TimePlusSpecs[M[+ _]]
           case (ids, SString(s)) if ids.length == 1 => s
         }
 
-      result2 must contain("2008-07-02T18:53:43.511-04:00",
-                           "2011-06-25T00:18:50.878-11:00",
-                           "2007-07-14T03:49:30.316-07:00",
-                           "2010-11-21T23:50:10.937+06:00",
-                           "2008-05-27T16:27:24.863Z",
-                           "2010-10-25T01:51:16.253+04:00",
-                           "2008-10-24T11:44:19.849+03:00",
-                           "2011-10-13T15:47:40.634+08:00",
-                           "2012-05-05T08:58:10.176+10:00",
-                           "2009-08-17T05:54:08.518+02:00")
+      result2 must contain(
+        "2008-07-02T18:53:43.511-04:00",
+        "2011-06-25T00:18:50.878-11:00",
+        "2007-07-14T03:49:30.316-07:00",
+        "2010-11-21T23:50:10.937+06:00",
+        "2008-05-27T16:27:24.863Z",
+        "2010-10-25T01:51:16.253+04:00",
+        "2008-10-24T11:44:19.849+03:00",
+        "2011-10-13T15:47:40.634+08:00",
+        "2012-05-05T08:58:10.176+10:00",
+        "2009-08-17T05:54:08.518+02:00")
     }
   }
 }

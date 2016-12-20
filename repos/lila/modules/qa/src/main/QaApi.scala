@@ -26,19 +26,20 @@ final class QaApi(questionColl: Coll,
 
     def create(data: QuestionData, user: User): Fu[Question] =
       lila.db.Util findNextId questionColl flatMap { id =>
-        val q = Question(_id = id,
-                         userId = user.id,
-                         title = data.title,
-                         body = data.body,
-                         tags = data.tags,
-                         vote = Vote(Set(user.id), Set.empty, 1),
-                         comments = Nil,
-                         views = 0,
-                         answers = 0,
-                         createdAt = DateTime.now,
-                         updatedAt = DateTime.now,
-                         acceptedAt = None,
-                         editedAt = None)
+        val q = Question(
+          _id = id,
+          userId = user.id,
+          title = data.title,
+          body = data.body,
+          tags = data.tags,
+          vote = Vote(Set(user.id), Set.empty, 1),
+          comments = Nil,
+          views = 0,
+          answers = 0,
+          createdAt = DateTime.now,
+          updatedAt = DateTime.now,
+          acceptedAt = None,
+          editedAt = None)
 
         (questionColl insert q) >> tag.clearCache >> relation.clearCache >>- notifier
           .createQuestion(q, user) inject q
@@ -78,24 +79,26 @@ final class QaApi(questionColl: Coll,
                           sort: BSONDocument,
                           page: Int,
                           perPage: Int): Fu[Paginator[Question]] =
-      Paginator(adapter = new BSONAdapter[Question](
-                  collection = questionColl,
-                  selector = selector,
-                  projection = BSONDocument(),
-                  sort = sort
-                ),
-                currentPage = page,
-                maxPerPage = perPage)
+      Paginator(
+        adapter = new BSONAdapter[Question](
+          collection = questionColl,
+          selector = selector,
+          projection = BSONDocument(),
+          sort = sort
+        ),
+        currentPage = page,
+        maxPerPage = perPage)
 
     private def popularCache =
-      mongoCache(prefix = "qa:popular",
-                 f = (nb: Int) =>
-                   questionColl
-                     .find(BSONDocument())
-                     .sort(BSONDocument("vote.score" -> -1))
-                     .cursor[Question]()
-                     .collect[List](nb),
-                 timeToLive = 3 hour)
+      mongoCache(
+        prefix = "qa:popular",
+        f = (nb: Int) =>
+          questionColl
+            .find(BSONDocument())
+            .sort(BSONDocument("vote.score" -> -1))
+            .cursor[Question]()
+            .collect[List](nb),
+        timeToLive = 3 hour)
 
     def popular(max: Int): Fu[List[Question]] = popularCache(max)
 
@@ -141,13 +144,14 @@ final class QaApi(questionColl: Coll,
 
     def setAnswers(id: QuestionId, nb: Int) =
       questionColl
-        .update(BSONDocument("_id" -> id),
-                BSONDocument(
-                  "$set" -> BSONDocument(
-                    "answers" -> BSONInteger(nb),
-                    "updatedAt" -> DateTime.now
-                  )
-                ))
+        .update(
+          BSONDocument("_id" -> id),
+          BSONDocument(
+            "$set" -> BSONDocument(
+              "answers" -> BSONInteger(nb),
+              "updatedAt" -> DateTime.now
+            )
+          ))
         .void
 
     def remove(id: QuestionId) =
@@ -169,15 +173,16 @@ final class QaApi(questionColl: Coll,
 
     def create(data: AnswerData, q: Question, user: User): Fu[Answer] =
       lila.db.Util findNextId answerColl flatMap { id =>
-        val a = Answer(_id = id,
-                       questionId = q.id,
-                       userId = user.id,
-                       body = data.body,
-                       vote = Vote(Set(user.id), Set.empty, 1),
-                       comments = Nil,
-                       acceptedAt = None,
-                       createdAt = DateTime.now,
-                       editedAt = None)
+        val a = Answer(
+          _id = id,
+          questionId = q.id,
+          userId = user.id,
+          body = data.body,
+          vote = Vote(Set(user.id), Set.empty, 1),
+          comments = Nil,
+          acceptedAt = None,
+          createdAt = DateTime.now,
+          editedAt = None)
 
         (answerColl insert a) >> (question recountAnswers q.id) >>- notifier
           .createAnswer(q, a, user) inject a
@@ -219,8 +224,9 @@ final class QaApi(questionColl: Coll,
       }
 
     def addComment(c: Comment)(a: Answer) =
-      answerColl.update(BSONDocument("_id" -> a.id),
-                        BSONDocument("$push" -> BSONDocument("comments" -> c)))
+      answerColl.update(
+        BSONDocument("_id" -> a.id),
+        BSONDocument("$push" -> BSONDocument("comments" -> c)))
 
     def vote(id: QuestionId, user: User, v: Boolean): Fu[Option[Vote]] =
       answer findById id flatMap {
@@ -251,10 +257,11 @@ final class QaApi(questionColl: Coll,
 
     def moveToQuestionComment(a: Answer, q: Question) = {
       val allComments =
-        Comment(id = Comment.makeId,
-                userId = a.userId,
-                body = a.body,
-                createdAt = a.createdAt) :: a.comments
+        Comment(
+          id = Comment.makeId,
+          userId = a.userId,
+          body = a.body,
+          createdAt = a.createdAt) :: a.comments
       allComments.map(c => question.addComment(c)(q)).sequenceFu >> remove(a)
     }
 
@@ -262,10 +269,11 @@ final class QaApi(questionColl: Coll,
       findById(toAnswerId) flatMap {
         _ ?? { toAnswer =>
           val allComments =
-            Comment(id = Comment.makeId,
-                    userId = a.userId,
-                    body = a.body,
-                    createdAt = a.createdAt) :: a.comments
+            Comment(
+              id = Comment.makeId,
+              userId = a.userId,
+              body = a.body,
+              createdAt = a.createdAt) :: a.comments
           allComments.map(c => addComment(c)(toAnswer)).sequenceFu >> remove(a)
         }
       }
@@ -279,10 +287,11 @@ final class QaApi(questionColl: Coll,
     def create(data: CommentData,
                subject: Either[Question, Answer],
                user: User): Fu[Comment] = {
-      val c = Comment(id = Comment.makeId,
-                      userId = user.id,
-                      body = data.body,
-                      createdAt = DateTime.now)
+      val c = Comment(
+        id = Comment.makeId,
+        userId = user.id,
+        body = data.body,
+        createdAt = DateTime.now)
       subject.fold(question addComment c, answer addComment c) >>- {
         subject match {
           case Left(q) => notifier.createQuestionComment(q, c, user)
@@ -319,9 +328,11 @@ final class QaApi(questionColl: Coll,
       }
 
       col
-        .aggregate(Project(BSONDocument("tags" -> BSONBoolean(true))),
-                   List(Unwind("tags"),
-                        Group(BSONBoolean(true))("tags" -> AddToSet("tags"))))
+        .aggregate(
+          Project(BSONDocument("tags" -> BSONBoolean(true))),
+          List(
+            Unwind("tags"),
+            Group(BSONBoolean(true))("tags" -> AddToSet("tags"))))
         .map(
           _.documents.headOption
             .flatMap(_.getAs[List[String]]("tags"))

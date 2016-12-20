@@ -9,8 +9,9 @@ trait UTestPackageTest extends UTestTestCase {
   val secondPackageName = "otherPackage"
 
   protected def addPackageTest(): Unit = {
-    addFileToProject(packageName + "/Test1.scala",
-                     """
+    addFileToProject(
+      packageName + "/Test1.scala",
+      """
         |package myPackage
         |
         |import utest.framework.TestSuite
@@ -25,8 +26,9 @@ trait UTestPackageTest extends UTestTestCase {
         |}
       """.stripMargin.trim())
 
-    addFileToProject(packageName + "/Test2.scala",
-                     """
+    addFileToProject(
+      packageName + "/Test2.scala",
+      """
         |package myPackage
         |
         |import utest.framework.TestSuite
@@ -41,8 +43,9 @@ trait UTestPackageTest extends UTestTestCase {
         |}
       """.stripMargin.trim())
 
-    addFileToProject(secondPackageName + "/Test1.scala",
-                     """
+    addFileToProject(
+      secondPackageName + "/Test1.scala",
+      """
         |package otherPackage
         |
         |import utest.framework.TestSuite
@@ -62,26 +65,30 @@ trait UTestPackageTest extends UTestTestCase {
       createTestFromPackage(packageName),
       checkPackageConfigAndSettings(_, packageName),
       root =>
-        checkResultTreeHasExactNamedPath(root,
-                                         "[root]",
-                                         "Test1",
-                                         "tests",
-                                         "test1") &&
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           "Test1",
-                                           "tests",
-                                           "test2") &&
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           "Test2",
-                                           "tests",
-                                           "test1") &&
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           "Test2",
-                                           "tests",
-                                           "test2") &&
+        checkResultTreeHasExactNamedPath(
+          root,
+          "[root]",
+          "Test1",
+          "tests",
+          "test1") &&
+          checkResultTreeHasExactNamedPath(
+            root,
+            "[root]",
+            "Test1",
+            "tests",
+            "test2") &&
+          checkResultTreeHasExactNamedPath(
+            root,
+            "[root]",
+            "Test2",
+            "tests",
+            "test1") &&
+          checkResultTreeHasExactNamedPath(
+            root,
+            "[root]",
+            "Test2",
+            "tests",
+            "test2") &&
           checkResultTreeDoesNotHaveNodes(root, "[root]", "test"))
   }
 
@@ -91,30 +98,35 @@ trait UTestPackageTest extends UTestTestCase {
       createTestFromModule(testClassName),
       checkPackageConfigAndSettings(_, generatedName = "ScalaTests in 'src'"),
       root =>
-        checkResultTreeHasExactNamedPath(root,
-                                         "[root]",
-                                         "Test1",
-                                         "tests",
-                                         "test1") &&
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           "Test1",
-                                           "tests",
-                                           "test2") &&
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           "Test2",
-                                           "tests",
-                                           "test1") &&
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           "Test2",
-                                           "tests",
-                                           "test2") &&
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           "Test2",
-                                           "tests",
-                                           "test"))
+        checkResultTreeHasExactNamedPath(
+          root,
+          "[root]",
+          "Test1",
+          "tests",
+          "test1") &&
+          checkResultTreeHasExactNamedPath(
+            root,
+            "[root]",
+            "Test1",
+            "tests",
+            "test2") &&
+          checkResultTreeHasExactNamedPath(
+            root,
+            "[root]",
+            "Test2",
+            "tests",
+            "test1") &&
+          checkResultTreeHasExactNamedPath(
+            root,
+            "[root]",
+            "Test2",
+            "tests",
+            "test2") &&
+          checkResultTreeHasExactNamedPath(
+            root,
+            "[root]",
+            "Test2",
+            "tests",
+            "test"))
   }
 }

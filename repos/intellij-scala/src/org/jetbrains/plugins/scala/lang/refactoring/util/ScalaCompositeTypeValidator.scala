@@ -20,13 +20,14 @@ object ScalaCompositeTypeValidator {
             noOccurrences: Boolean,
             enclosingContainerAll: PsiElement,
             enclosingOne: PsiElement): ScalaCompositeTypeValidator = {
-    new ScalaCompositeTypeValidator(conflictsReporter,
-                                    myProject,
-                                    selectedElement,
-                                    noOccurrences,
-                                    enclosingContainerAll,
-                                    enclosingOne,
-                                    validators)
+    new ScalaCompositeTypeValidator(
+      conflictsReporter,
+      myProject,
+      selectedElement,
+      noOccurrences,
+      enclosingContainerAll,
+      enclosingOne,
+      validators)
   }
 }
 
@@ -37,12 +38,13 @@ class ScalaCompositeTypeValidator(conflictsReporter: ConflictsReporter,
                                   enclosingContainerAll: PsiElement,
                                   enclosingOne: PsiElement,
                                   validators: List[ScalaValidator])
-    extends ScalaTypeValidator(conflictsReporter,
-                               myProject,
-                               selectedElement,
-                               noOccurrences,
-                               enclosingContainerAll,
-                               enclosingOne) {
+    extends ScalaTypeValidator(
+      conflictsReporter,
+      myProject,
+      selectedElement,
+      noOccurrences,
+      enclosingContainerAll,
+      enclosingOne) {
 
   override def findConflicts(
       name: String,

@@ -43,10 +43,12 @@ object LEventAggregator {
         _.sortBy(_.eventTime.getMillis).foldLeft[Prop](Prop())(propAggregator))
       .filter { case (k, v) => v.dm.isDefined }
       .mapValues { v =>
-        require(v.firstUpdated.isDefined,
-                "Unexpected Error: firstUpdated cannot be None.")
-        require(v.lastUpdated.isDefined,
-                "Unexpected Error: lastUpdated cannot be None.")
+        require(
+          v.firstUpdated.isDefined,
+          "Unexpected Error: firstUpdated cannot be None.")
+        require(
+          v.lastUpdated.isDefined,
+          "Unexpected Error: lastUpdated cannot be None.")
 
         PropertyMap(
           fields = v.dm.get.fields,
@@ -70,10 +72,12 @@ object LEventAggregator {
       .foldLeft[Prop](Prop())(propAggregator)
 
     prop.dm.map { d =>
-      require(prop.firstUpdated.isDefined,
-              "Unexpected Error: firstUpdated cannot be None.")
-      require(prop.lastUpdated.isDefined,
-              "Unexpected Error: lastUpdated cannot be None.")
+      require(
+        prop.firstUpdated.isDefined,
+        "Unexpected Error: firstUpdated cannot be None.")
+      require(
+        prop.lastUpdated.isDefined,
+        "Unexpected Error: lastUpdated cannot be None.")
 
       PropertyMap(
         fields = d.fields,

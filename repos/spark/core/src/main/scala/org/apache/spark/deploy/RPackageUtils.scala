@@ -119,14 +119,16 @@ private[deploy] object RPackageUtils extends Logging {
       val env = builder.environment()
       val rPackageDir = RUtils.sparkRPackagePath(isDriver = true)
       env.put("SPARKR_PACKAGE_DIR", rPackageDir.mkString(","))
-      env.put("R_PROFILE_USER",
-              Seq(rPackageDir(0), "SparkR", "profile", "general.R")
-                .mkString(File.separator))
+      env.put(
+        "R_PROFILE_USER",
+        Seq(rPackageDir(0), "SparkR", "profile", "general.R")
+          .mkString(File.separator))
 
       val process = builder.start()
-      new RedirectThread(process.getInputStream,
-                         printStream,
-                         "redirect R packaging").start()
+      new RedirectThread(
+        process.getInputStream,
+        printStream,
+        "redirect R packaging").start()
       process.waitFor() == 0
     } catch {
       case e: Throwable =>
@@ -180,18 +182,20 @@ private[deploy] object RPackageUtils extends Logging {
       if (file.exists()) {
         val jar = new JarFile(file)
         if (checkManifestForR(jar)) {
-          print(s"$file contains R source code. Now installing package.",
-                printStream,
-                Level.INFO)
+          print(
+            s"$file contains R source code. Now installing package.",
+            printStream,
+            Level.INFO)
           val rSource = extractRFolder(jar, printStream, verbose)
           if (RUtils.rPackages.isEmpty) {
             RUtils.rPackages = Some(Utils.createTempDir().getAbsolutePath)
           }
           try {
-            if (!rPackageBuilder(rSource,
-                                 printStream,
-                                 verbose,
-                                 RUtils.rPackages.get)) {
+            if (!rPackageBuilder(
+                  rSource,
+                  printStream,
+                  verbose,
+                  RUtils.rPackages.get)) {
               print(s"ERROR: Failed to build R package in $file.", printStream)
               print(RJarDoc, printStream)
             }
@@ -203,14 +207,16 @@ private[deploy] object RPackageUtils extends Logging {
           }
         } else {
           if (verbose) {
-            print(s"$file doesn't contain R source code, skipping...",
-                  printStream)
+            print(
+              s"$file doesn't contain R source code, skipping...",
+              printStream)
           }
         }
       } else {
-        print(s"WARN: $file resolved as dependency, but not found.",
-              printStream,
-              Level.WARNING)
+        print(
+          s"WARN: $file resolved as dependency, but not found.",
+          printStream,
+          Level.WARNING)
       }
     }
   }

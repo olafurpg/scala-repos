@@ -61,13 +61,14 @@ object FailFastFactory {
     * Creates a [[com.twitter.finagle.Stackable]] [[FailFastFactory]] when enabled.
     */
   def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
-    new Stack.Module6[FailFast,
-                      param.Stats,
-                      param.Timer,
-                      param.Label,
-                      param.Logger,
-                      Transporter.EndpointAddr,
-                      ServiceFactory[Req, Rep]] {
+    new Stack.Module6[
+      FailFast,
+      param.Stats,
+      param.Timer,
+      param.Label,
+      param.Logger,
+      Transporter.EndpointAddr,
+      ServiceFactory[Req, Rep]] {
       val role = FailFastFactory.role
       val description =
         "Backoff exponentially from hosts to which we cannot establish a connection"
@@ -90,12 +91,13 @@ object FailFastFactory {
             val param.Logger(logger) = _logger
             val Transporter.EndpointAddr(endpoint) = _endpoint
 
-            new FailFastFactory(next,
-                                statsReceiver.scope("failfast"),
-                                timer,
-                                label,
-                                logger,
-                                endpoint)
+            new FailFastFactory(
+              next,
+              statsReceiver.scope("failfast"),
+              timer,
+              label,
+              logger,
+              endpoint)
         }
       }
     }

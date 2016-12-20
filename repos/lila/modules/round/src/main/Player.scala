@@ -117,16 +117,17 @@ private[round] final class Player(fishnetPlayer: lila.fishnet.Player,
 
   private def notifyMove(moveOrDrop: MoveOrDrop, game: Game) {
     val color = moveOrDrop.fold(_.color, _.color)
-    bus.publish(MoveEvent(
-                  gameId = game.id,
-                  color = color,
-                  fen = Forsyth exportBoard game.toChess.board,
-                  move = moveOrDrop.fold(_.toUci.keys, _.toUci.uci),
-                  mobilePushable = game.mobilePushable,
-                  opponentUserId = game.player(!color).userId,
-                  simulId = game.simulId
-                ),
-                'moveEvent)
+    bus.publish(
+      MoveEvent(
+        gameId = game.id,
+        color = color,
+        fen = Forsyth exportBoard game.toChess.board,
+        move = moveOrDrop.fold(_.toUci.keys, _.toUci.uci),
+        mobilePushable = game.mobilePushable,
+        opponentUserId = game.player(!color).userId,
+        simulId = game.simulId
+      ),
+      'moveEvent)
   }
 
   private def moveFinish(game: Game, color: Color): Fu[Events] = {

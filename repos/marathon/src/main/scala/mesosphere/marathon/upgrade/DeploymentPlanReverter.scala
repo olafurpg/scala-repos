@@ -79,8 +79,9 @@ private[upgrade] object DeploymentPlanReverter {
       group: Group): Group = {
 
     def revertGroupRemoval(oldGroup: Group)(existingGroup: Group): Group = {
-      log.debug("re-adding group {} with dependencies {}",
-                Seq(oldGroup.id, oldGroup.dependencies): _*)
+      log.debug(
+        "re-adding group {} with dependencies {}",
+        Seq(oldGroup.id, oldGroup.dependencies): _*)
       if ((oldGroup.dependencies -- existingGroup.dependencies).nonEmpty) {
         existingGroup.copy(
           dependencies = existingGroup.dependencies ++ oldGroup.dependencies)
@@ -164,9 +165,10 @@ private[upgrade] object DeploymentPlanReverter {
             result.update(oldGroup.id, revertGroupRemoval(oldGroup), version)
 
           case (Some(oldGroup), Some(newGroup)) =>
-            result.update(oldGroup.id,
-                          revertDependencyChanges(oldGroup, newGroup),
-                          version)
+            result.update(
+              oldGroup.id,
+              revertDependencyChanges(oldGroup, newGroup),
+              version)
 
           case (None, Some(newGroup)) =>
             revertGroupAddition(result, newGroup)
@@ -197,9 +199,10 @@ private[upgrade] object DeploymentPlanReverter {
             result.updateApp(oldApp.id, _ => oldApp, version)
           case (None, Some(newApp)) =>
             log.debug("remove app definition {}", newApp.id)
-            result.update(newApp.id.parent,
-                          _.removeApplication(newApp.id),
-                          version)
+            result.update(
+              newApp.id.parent,
+              _.removeApplication(newApp.id),
+              version)
           case (None, None) =>
             log.warn("processing unexpected NOOP in app changes")
             result

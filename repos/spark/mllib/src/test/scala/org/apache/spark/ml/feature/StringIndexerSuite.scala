@@ -205,8 +205,9 @@ class StringIndexerSuite
     }
 
     val attr = NominalAttribute.defaultAttr.withValues(labels)
-    val df1 = df0.select(col("index").as("indexWithAttr", attr.toMetadata()),
-                         col("expected"))
+    val df1 = df0.select(
+      col("index").as("indexWithAttr", attr.toMetadata()),
+      col("expected"))
 
     val idxToStr1 =
       new IndexToString().setInputCol("indexWithAttr").setOutputCol("actual")

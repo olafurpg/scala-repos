@@ -112,13 +112,14 @@ class IdeaIncrementalBuilder(category: BuilderCategory)
     val compilerName =
       if (modules.exists(CompilerData.isDottyModule)) "dotc" else "scalac"
 
-    val client = new IdeClientIdea(compilerName,
-                                   context,
-                                   modules.map(_.getName).toSeq,
-                                   outputConsumer,
-                                   callback,
-                                   successfullyCompiled,
-                                   packageObjectsData)
+    val client = new IdeClientIdea(
+      compilerName,
+      context,
+      modules.map(_.getName).toSeq,
+      outputConsumer,
+      callback,
+      successfullyCompiled,
+      packageObjectsData)
 
     val scalaSources = sources.filter(_.getName.endsWith(".scala")).asJava
 
@@ -129,12 +130,13 @@ class IdeaIncrementalBuilder(category: BuilderCategory)
       case _ if client.hasReportedErrors || client.isCanceled => ExitCode.ABORT
       case Right(code) =>
         if (delta != null &&
-            JavaBuilderUtil.updateMappings(context,
-                                           delta,
-                                           dirtyFilesHolder,
-                                           chunk,
-                                           scalaSources,
-                                           successfullyCompiled.asJava))
+            JavaBuilderUtil.updateMappings(
+              context,
+              delta,
+              dirtyFilesHolder,
+              chunk,
+              scalaSources,
+              successfullyCompiled.asJava))
           ExitCode.ADDITIONAL_PASS_REQUIRED
         else {
           if (ScalaReflectMacroExpansionParser.expansions.nonEmpty)

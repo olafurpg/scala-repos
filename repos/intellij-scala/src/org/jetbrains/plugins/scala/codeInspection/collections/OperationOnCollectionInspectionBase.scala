@@ -34,11 +34,12 @@ object OperationOnCollectionInspectionBase {
 
   val likeOptionClassesDefault =
     Array("scala.Option", "scala.Some", "scala.None")
-  val likeCollectionClassesDefault = Array("scala.collection._",
-                                           "scala.Array",
-                                           "scala.Option",
-                                           "scala.Some",
-                                           "scala.None")
+  val likeCollectionClassesDefault = Array(
+    "scala.collection._",
+    "scala.Array",
+    "scala.Option",
+    "scala.Some",
+    "scala.None")
 
   private val likeOptionKey = "operation.on.collection.like.option"
   private val likeCollectionKey = "operation.on.collection.like.collection"
@@ -72,11 +73,12 @@ abstract class OperationOnCollectionInspectionBase
   def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case expr: ScExpression =>
       for (s <- simplifications(expr)) {
-        holder.registerProblem(s.exprToReplace.getElement,
-                               s.hint,
-                               highlightType,
-                               s.rangeInParent,
-                               new OperationOnCollectionQuickFix(expr, s))
+        holder.registerProblem(
+          s.exprToReplace.getElement,
+          s.hint,
+          highlightType,
+          s.rangeInParent,
+          new OperationOnCollectionQuickFix(expr, s))
       }
   }
 
@@ -163,8 +165,8 @@ abstract class OperationOnCollectionInspectionBase
             resetValues()
             patternJBList.setSelectedValue(pattern, true)
             ScrollingUtil.ensureIndexIsVisible(patternJBList, index, 0)
-            IdeFocusManager.getGlobalInstance.requestFocus(patternJBList,
-                                                           false)
+            IdeFocusManager.getGlobalInstance
+              .requestFocus(patternJBList, false)
           }
 
           def run(button: AnActionButton) {
@@ -173,12 +175,13 @@ abstract class OperationOnCollectionInspectionBase
             val inputMessage = inputMessages(patternListKey)
             val inputTitle = inputTitles(patternListKey)
             val newPattern: String =
-              Messages.showInputDialog(parent,
-                                       inputMessage,
-                                       inputTitle,
-                                       Messages.getWarningIcon,
-                                       "",
-                                       validator)
+              Messages.showInputDialog(
+                parent,
+                inputMessage,
+                inputTitle,
+                Messages.getWarningIcon,
+                "",
+                validator)
             addPattern(newPattern)
           }
         })

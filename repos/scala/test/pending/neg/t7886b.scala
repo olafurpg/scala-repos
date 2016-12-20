@@ -13,8 +13,9 @@ object Test extends Covariant[Any] {
   }
   def main(args: Array[String]) {
     f(
-      Unravel[String](new Contra[String] { def accept(x: String) = x.length },
-                      ""))
+      Unravel[String](
+        new Contra[String] { def accept(x: String) = x.length },
+        ""))
   }
 }
 // java.lang.ClassCastException: java.lang.Integer cannot be cast to java.lang.String

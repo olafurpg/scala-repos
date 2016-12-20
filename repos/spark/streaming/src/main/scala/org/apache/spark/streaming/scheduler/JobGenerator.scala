@@ -76,10 +76,11 @@ private[streaming] class JobGenerator(jobScheduler: JobScheduler)
 
   private lazy val checkpointWriter =
     if (shouldCheckpoint) {
-      new CheckpointWriter(this,
-                           ssc.conf,
-                           ssc.checkpointDir,
-                           ssc.sparkContext.hadoopConfiguration)
+      new CheckpointWriter(
+        this,
+        ssc.conf,
+        ssc.checkpointDir,
+        ssc.sparkContext.hadoopConfiguration)
     } else {
       null
     }
@@ -128,8 +129,9 @@ private[streaming] class JobGenerator(jobScheduler: JobScheduler)
       logInfo("Stopping JobGenerator gracefully")
       val timeWhenStopStarted = System.currentTimeMillis()
       val stopTimeoutMs =
-        conf.getTimeAsMs("spark.streaming.gracefulStopTimeout",
-                         s"${10 * ssc.graph.batchDuration.milliseconds}ms")
+        conf.getTimeAsMs(
+          "spark.streaming.gracefulStopTimeout",
+          s"${10 * ssc.graph.batchDuration.milliseconds}ms")
       val pollTime = 100
 
       // To prevent graceful stop to get stuck permanently

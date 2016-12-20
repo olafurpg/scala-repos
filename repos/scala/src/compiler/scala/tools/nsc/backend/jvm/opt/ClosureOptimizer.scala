@@ -114,8 +114,9 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
                 for (init <- closureInits.valuesIterator)
                   closureCallsites(init, prodCons) foreach {
                     case Left(warning) =>
-                      backendReporting.inlinerWarning(warning.pos,
-                                                      warning.toString)
+                      backendReporting.inlinerWarning(
+                        warning.pos,
+                        warning.toString)
 
                     case Right((invocation, stackHeight)) =>
                       addRewrite(init, invocation, stackHeight)
@@ -132,11 +133,12 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
       val (localsForCapturedValues, argumentLocalsList) =
         localsForClosureRewrite(closureInit)
       for ((invocation, stackHeight) <- invocations)
-        rewriteClosureApplyInvocation(closureInit,
-                                      invocation,
-                                      stackHeight,
-                                      localsForCapturedValues,
-                                      argumentLocalsList)
+        rewriteClosureApplyInvocation(
+          closureInit,
+          invocation,
+          stackHeight,
+          localsForCapturedValues,
+          argumentLocalsList)
     }
   }
 
@@ -274,8 +276,9 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
         val specArgs = Type.getArgumentTypes(specMethodDesc)
         val nonSpecArgs = Type.getArgumentTypes(nonSpecMethodDesc)
         specArgs.corresponds(nonSpecArgs)(sameOrSpecializedType) &&
-        sameOrSpecializedType(Type.getReturnType(specMethodDesc),
-                              Type.getReturnType(nonSpecMethodDesc))
+        sameOrSpecializedType(
+          Type.getReturnType(specMethodDesc),
+          Type.getReturnType(nonSpecMethodDesc))
       }
 
       def nameAndDescMatch = {
@@ -337,8 +340,9 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
           res(i) = Some(getScalaBox(invokeArgTypes(i)))
         } else {
           assert(!isPrimitiveType(invokeArgTypes(i)), invokeArgTypes(i))
-          assert(!isPrimitiveType(implMethodArgTypes(i)),
-                 implMethodArgTypes(i))
+          assert(
+            !isPrimitiveType(implMethodArgTypes(i)),
+            implMethodArgTypes(i))
           // The comment in the unapply method of `LambdaMetaFactoryCall` explains why we have to introduce
           // casts for arguments that have different types in samMethodType and instantiatedMethodType.
           //
@@ -365,10 +369,11 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
     val lambdaBodyHandle = closureInit.lambdaMetaFactoryCall.implMethod
 
     // store arguments
-    insertStoreOps(invocation,
-                   ownerMethod,
-                   argumentLocalsList,
-                   adaptStoredArguments(closureInit, invocation))
+    insertStoreOps(
+      invocation,
+      ownerMethod,
+      argumentLocalsList,
+      adaptStoredArguments(closureInit, invocation))
 
     // drop the closure from the stack
     ownerMethod.instructions.insertBefore(invocation, new InsnNode(POP))
@@ -393,17 +398,19 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
       case H_INVOKEINTERFACE => INVOKEINTERFACE
       case H_NEWINVOKESPECIAL =>
         val insns = ownerMethod.instructions
-        insns.insertBefore(invocation,
-                           new TypeInsnNode(NEW, lambdaBodyHandle.getOwner))
+        insns.insertBefore(
+          invocation,
+          new TypeInsnNode(NEW, lambdaBodyHandle.getOwner))
         insns.insertBefore(invocation, new InsnNode(DUP))
         INVOKESPECIAL
     }
     val isInterface = bodyOpcode == INVOKEINTERFACE
-    val bodyInvocation = new MethodInsnNode(bodyOpcode,
-                                            lambdaBodyHandle.getOwner,
-                                            lambdaBodyHandle.getName,
-                                            lambdaBodyHandle.getDesc,
-                                            isInterface)
+    val bodyInvocation = new MethodInsnNode(
+      bodyOpcode,
+      lambdaBodyHandle.getOwner,
+      lambdaBodyHandle.getName,
+      lambdaBodyHandle.getDesc,
+      isInterface)
     ownerMethod.instructions.insertBefore(invocation, bodyInvocation)
 
     val bodyReturnType = Type.getReturnType(lambdaBodyHandle.getDesc)
@@ -422,10 +429,11 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
       ownerMethod.instructions.insertBefore(invocation, op)
     } else {
       // see comment of that method
-      fixLoadedNothingOrNullValue(bodyReturnType,
-                                  bodyInvocation,
-                                  ownerMethod,
-                                  btypes)
+      fixLoadedNothingOrNullValue(
+        bodyReturnType,
+        bodyInvocation,
+        ownerMethod,
+        btypes)
     }
 
     ownerMethod.instructions.remove(invocation)
@@ -434,9 +442,10 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
     val originalCallsite = callGraph.removeCallsite(invocation, ownerMethod)
 
     // the method node is needed for building the call graph entry
-    val bodyMethod = byteCodeRepository.methodNode(lambdaBodyHandle.getOwner,
-                                                   lambdaBodyHandle.getName,
-                                                   lambdaBodyHandle.getDesc)
+    val bodyMethod = byteCodeRepository.methodNode(
+      lambdaBodyHandle.getOwner,
+      lambdaBodyHandle.getName,
+      lambdaBodyHandle.getDesc)
     def bodyMethodIsBeingCompiled =
       byteCodeRepository
         .classNodeAndSource(lambdaBodyHandle.getOwner)

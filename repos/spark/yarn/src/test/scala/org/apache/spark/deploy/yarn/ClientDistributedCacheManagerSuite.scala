@@ -63,16 +63,17 @@ class ClientDistributedCacheManagerSuite
     val distMgr = new ClientDistributedCacheManager()
     val fs = mock[FileSystem]
     val uri = new URI("/tmp/testing")
-    val realFileStatus = new FileStatus(10,
-                                        false,
-                                        1,
-                                        1024,
-                                        10,
-                                        10,
-                                        null,
-                                        "testOwner",
-                                        null,
-                                        new Path("/tmp/testing"))
+    val realFileStatus = new FileStatus(
+      10,
+      false,
+      1,
+      1024,
+      10,
+      10,
+      null,
+      "testOwner",
+      null,
+      new Path("/tmp/testing"))
     when(fs.getFileStatus(new Path(uri))).thenReturn(new FileStatus())
     val statCache: Map[URI, FileStatus] =
       HashMap[URI, FileStatus](uri -> realFileStatus)
@@ -89,14 +90,15 @@ class ClientDistributedCacheManagerSuite
     val statCache: Map[URI, FileStatus] = HashMap[URI, FileStatus]()
     when(fs.getFileStatus(destPath)).thenReturn(new FileStatus())
 
-    distMgr.addResource(fs,
-                        conf,
-                        destPath,
-                        localResources,
-                        LocalResourceType.FILE,
-                        "link",
-                        statCache,
-                        false)
+    distMgr.addResource(
+      fs,
+      conf,
+      destPath,
+      localResources,
+      LocalResourceType.FILE,
+      "link",
+      statCache,
+      false)
     val resource = localResources("link")
     assert(resource.getVisibility() === LocalResourceVisibility.PRIVATE)
     assert(
@@ -122,26 +124,28 @@ class ClientDistributedCacheManagerSuite
     assert(env.get("SPARK_YARN_CACHE_ARCHIVES_VISIBILITIES") === None)
 
     // add another one and verify both there and order correct
-    val realFileStatus = new FileStatus(20,
-                                        false,
-                                        1,
-                                        1024,
-                                        10,
-                                        30,
-                                        null,
-                                        "testOwner",
-                                        null,
-                                        new Path("/tmp/testing2"))
+    val realFileStatus = new FileStatus(
+      20,
+      false,
+      1,
+      1024,
+      10,
+      30,
+      null,
+      "testOwner",
+      null,
+      new Path("/tmp/testing2"))
     val destPath2 = new Path("file:///foo.invalid.com:8080/tmp/testing2")
     when(fs.getFileStatus(destPath2)).thenReturn(realFileStatus)
-    distMgr.addResource(fs,
-                        conf,
-                        destPath2,
-                        localResources,
-                        LocalResourceType.FILE,
-                        "link2",
-                        statCache,
-                        false)
+    distMgr.addResource(
+      fs,
+      conf,
+      destPath2,
+      localResources,
+      LocalResourceType.FILE,
+      "link2",
+      statCache,
+      false)
     val resource2 = localResources("link2")
     assert(resource2.getVisibility() === LocalResourceVisibility.PRIVATE)
     assert(
@@ -177,14 +181,15 @@ class ClientDistributedCacheManagerSuite
     when(fs.getFileStatus(destPath)).thenReturn(new FileStatus())
 
     intercept[Exception] {
-      distMgr.addResource(fs,
-                          conf,
-                          destPath,
-                          localResources,
-                          LocalResourceType.FILE,
-                          null,
-                          statCache,
-                          false)
+      distMgr.addResource(
+        fs,
+        conf,
+        destPath,
+        localResources,
+        LocalResourceType.FILE,
+        null,
+        statCache,
+        false)
     }
     assert(localResources.get("link") === None)
     assert(localResources.size === 0)
@@ -197,26 +202,28 @@ class ClientDistributedCacheManagerSuite
     val destPath = new Path("file:///foo.invalid.com:8080/tmp/testing")
     val localResources = HashMap[String, LocalResource]()
     val statCache: Map[URI, FileStatus] = HashMap[URI, FileStatus]()
-    val realFileStatus = new FileStatus(20,
-                                        false,
-                                        1,
-                                        1024,
-                                        10,
-                                        30,
-                                        null,
-                                        "testOwner",
-                                        null,
-                                        new Path("/tmp/testing"))
+    val realFileStatus = new FileStatus(
+      20,
+      false,
+      1,
+      1024,
+      10,
+      30,
+      null,
+      "testOwner",
+      null,
+      new Path("/tmp/testing"))
     when(fs.getFileStatus(destPath)).thenReturn(realFileStatus)
 
-    distMgr.addResource(fs,
-                        conf,
-                        destPath,
-                        localResources,
-                        LocalResourceType.ARCHIVE,
-                        "link",
-                        statCache,
-                        true)
+    distMgr.addResource(
+      fs,
+      conf,
+      destPath,
+      localResources,
+      LocalResourceType.ARCHIVE,
+      "link",
+      statCache,
+      true)
     val resource = localResources("link")
     assert(resource.getVisibility() === LocalResourceVisibility.PRIVATE)
     assert(
@@ -246,26 +253,28 @@ class ClientDistributedCacheManagerSuite
     val destPath = new Path("file:///foo.invalid.com:8080/tmp/testing")
     val localResources = HashMap[String, LocalResource]()
     val statCache: Map[URI, FileStatus] = HashMap[URI, FileStatus]()
-    val realFileStatus = new FileStatus(20,
-                                        false,
-                                        1,
-                                        1024,
-                                        10,
-                                        30,
-                                        null,
-                                        "testOwner",
-                                        null,
-                                        new Path("/tmp/testing"))
+    val realFileStatus = new FileStatus(
+      20,
+      false,
+      1,
+      1024,
+      10,
+      30,
+      null,
+      "testOwner",
+      null,
+      new Path("/tmp/testing"))
     when(fs.getFileStatus(destPath)).thenReturn(realFileStatus)
 
-    distMgr.addResource(fs,
-                        conf,
-                        destPath,
-                        localResources,
-                        LocalResourceType.ARCHIVE,
-                        "link",
-                        statCache,
-                        false)
+    distMgr.addResource(
+      fs,
+      conf,
+      destPath,
+      localResources,
+      LocalResourceType.ARCHIVE,
+      "link",
+      statCache,
+      false)
     val resource = localResources("link")
     assert(resource.getVisibility() === LocalResourceVisibility.PRIVATE)
     assert(

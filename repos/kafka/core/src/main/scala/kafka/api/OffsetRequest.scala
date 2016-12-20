@@ -50,11 +50,12 @@ object OffsetRequest {
          PartitionOffsetRequestInfo(time, maxNumOffsets))
       })
     })
-    OffsetRequest(Map(pairs: _*),
-                  versionId = versionId,
-                  clientId = clientId,
-                  correlationId = correlationId,
-                  replicaId = replicaId)
+    OffsetRequest(
+      Map(pairs: _*),
+      versionId = versionId,
+      clientId = clientId,
+      correlationId = correlationId,
+      replicaId = replicaId)
   }
 }
 
@@ -71,11 +72,12 @@ case class OffsetRequest(
   def this(requestInfo: Map[TopicAndPartition, PartitionOffsetRequestInfo],
            correlationId: Int,
            replicaId: Int) =
-    this(requestInfo,
-         OffsetRequest.CurrentVersion,
-         correlationId,
-         OffsetRequest.DefaultClientId,
-         replicaId)
+    this(
+      requestInfo,
+      OffsetRequest.CurrentVersion,
+      correlationId,
+      OffsetRequest.DefaultClientId,
+      replicaId)
 
   lazy val requestInfoGroupedByTopic = requestInfo.groupBy(_._1.topic)
 

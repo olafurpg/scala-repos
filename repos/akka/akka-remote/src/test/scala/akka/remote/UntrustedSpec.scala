@@ -135,8 +135,9 @@ akka.loglevel = DEBUG
     }
 
     "discard harmful messages to testActor" in {
-      target2 ! Terminated(remoteDaemon)(existenceConfirmed = true,
-                                         addressTerminated = false)
+      target2 ! Terminated(remoteDaemon)(
+        existenceConfirmed = true,
+        addressTerminated = false)
       target2 ! PoisonPill
       client.stop(target2)
       target2 ! "blech"
@@ -170,8 +171,9 @@ akka.loglevel = DEBUG
         .tell(Identify(None), p.ref)
       val clientReceptionistRef = p.expectMsgType[ActorIdentity].ref.get
 
-      val sel = ActorSelection(clientReceptionistRef,
-                               receptionist.path.toStringWithoutAddress)
+      val sel = ActorSelection(
+        clientReceptionistRef,
+        receptionist.path.toStringWithoutAddress)
       sel ! "hello"
       expectNoMsg(1.second)
     }

@@ -42,8 +42,9 @@ import scalafx.testutil.{PositionDelegateSpec, SimpleSFXDelegateSpec}
   */
 @RunWith(classOf[JUnitRunner])
 class MoveToSpec
-    extends SimpleSFXDelegateSpec[jfxss.MoveTo, MoveTo](classOf[jfxss.MoveTo],
-                                                        classOf[MoveTo])
+    extends SimpleSFXDelegateSpec[jfxss.MoveTo, MoveTo](
+      classOf[jfxss.MoveTo],
+      classOf[MoveTo])
     with PositionDelegateSpec[MoveTo] {
 
   val positionDelegate = getScalaClassInstance

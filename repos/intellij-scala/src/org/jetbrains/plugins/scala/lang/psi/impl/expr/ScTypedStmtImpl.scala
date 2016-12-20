@@ -29,8 +29,9 @@ class ScTypedStmtImpl(node: ASTNode)
       case Some(te) => te.getType(ctx)
       case None if !expr.isInstanceOf[ScUnderscoreSection] => expr.getType(ctx)
       case _ =>
-        Failure("Typed statement is not complete for underscore section",
-                Some(this))
+        Failure(
+          "Typed statement is not complete for underscore section",
+          Some(this))
     }
   }
 

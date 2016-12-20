@@ -75,8 +75,9 @@ private[prediction] object ExampleJsonConnector extends JsonConnector {
         case "userAction" =>
           toEventJson(common = common, userAction = data.extract[UserAction])
         case "userActionItem" =>
-          toEventJson(common = common,
-                      userActionItem = data.extract[UserActionItem])
+          toEventJson(
+            common = common,
+            userActionItem = data.extract[UserActionItem])
         case x: String =>
           throw new ConnectorException(
             s"Cannot convert unknown type '${x}' to Event JSON.")

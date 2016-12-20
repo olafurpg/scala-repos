@@ -201,10 +201,11 @@ object State {
 
   def defaultReload(state: State): Reboot = {
     val app = state.configuration.provider
-    new Reboot(app.scalaProvider.version,
-               state.remainingCommands,
-               app.id,
-               state.configuration.baseDirectory)
+    new Reboot(
+      app.scalaProvider.version,
+      state.remainingCommands,
+      app.id,
+      state.configuration.baseDirectory)
   }
 
   /** Provides operations and transformations on State. */

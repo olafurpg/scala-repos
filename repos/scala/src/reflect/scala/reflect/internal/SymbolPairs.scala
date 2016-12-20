@@ -249,9 +249,10 @@ abstract class SymbolPairs {
       (index1 >= 0) && {
         val index2 = index(sym2.owner)
         (index2 >= 0) && {
-          intersectionContainsElementLeq(subParents(index1),
-                                         subParents(index2),
-                                         index1 min index2)
+          intersectionContainsElementLeq(
+            subParents(index1),
+            subParents(index2),
+            index1 min index2)
         }
       }
     }

@@ -64,8 +64,9 @@ private[http] class HeaderParser(val input: ParserInput,
   def parseError(error: ParseError): Result = {
     val formatter = new ErrorFormatter(showLine = false)
     Left(
-      ErrorInfo(formatter.format(error, input),
-                formatter.formatErrorLine(error, input)))
+      ErrorInfo(
+        formatter.format(error, input),
+        formatter.formatErrorLine(error, input)))
   }
   def failure(error: Throwable): Result = error match {
     case IllegalUriException(info) ⇒ Left(info)
@@ -116,8 +117,9 @@ private[http] object HeaderParser {
             s"Rule for $headerName accepted trailing garbage. Is the parser missing a trailing EOI?"))
       case Left(e) ⇒
         Left(
-          e.copy(summary = e.summary.filterNot(_ == EOI),
-                 detail = e.detail.filterNot(_ == EOI)))
+          e.copy(
+            summary = e.summary.filterNot(_ == EOI),
+            detail = e.detail.filterNot(_ == EOI)))
     }
   }
 

@@ -10,13 +10,14 @@ object JavaScriptRouterGenerator extends App {
   import controllers.routes.javascript._
 
   val jsFile = play.api.routing
-    .JavaScriptReverseRouter("jsRoutes",
-                             None,
-                             "localhost",
-                             Application.index,
-                             Application.post,
-                             Application.withParam,
-                             Application.takeBool)
+    .JavaScriptReverseRouter(
+      "jsRoutes",
+      None,
+      "localhost",
+      Application.index,
+      Application.post,
+      Application.withParam,
+      Application.takeBool)
     .body
 
   // Add module exports for node

@@ -110,8 +110,9 @@ abstract class CreateTypeDefinitionQuickFix(ref: ScReferenceElement,
       val newTd = ScalaPsiElementFactory
         .createTemplateDefinitionFromText(text, parent, parent.getFirstChild)
       val anchor = anchorAfter.orNull
-      parent.addBefore(ScalaPsiElementFactory.createNewLine(parent.getManager),
-                       anchor)
+      parent.addBefore(
+        ScalaPsiElementFactory.createNewLine(parent.getManager),
+        anchor)
       val result = parent.addBefore(newTd, anchor)
       afterCreationWork(result.asInstanceOf[ScTypeDefinition])
     } catch {
@@ -151,11 +152,12 @@ abstract class CreateTypeDefinitionQuickFix(ref: ScReferenceElement,
           }
         }
         NavigationUtil
-          .getPsiElementPopup(siblings.toArray,
-                              renderer,
-                              "Choose level",
-                              processor,
-                              selection)
+          .getPsiElementPopup(
+            siblings.toArray,
+            renderer,
+            "Choose level",
+            processor,
+            selection)
           .showInBestPositionFor(editor)
     }
   }

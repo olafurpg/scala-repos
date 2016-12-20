@@ -50,8 +50,9 @@ private[feature] trait StringIndexerBase
         s"but got $inputDataType.")
     val inputFields = schema.fields
     val outputColName = $(outputCol)
-    require(inputFields.forall(_.name != outputColName),
-            s"Output column $outputColName already exists.")
+    require(
+      inputFields.forall(_.name != outputColName),
+      s"Output column $outputColName already exists.")
     val attr = NominalAttribute.defaultAttr.withName($(outputCol))
     val outputFields = inputFields :+ attr.toStructField()
     StructType(outputFields)
@@ -182,9 +183,10 @@ class StringIndexerModel(override val uid: String, val labels: Array[String])
       }
       case _ => dataset
     }
-    filteredDataset.select(col("*"),
-                           indexer(dataset($(inputCol)).cast(StringType))
-                             .as($(outputCol), metadata))
+    filteredDataset.select(
+      col("*"),
+      indexer(dataset($(inputCol)).cast(StringType))
+        .as($(outputCol), metadata))
   }
 
   override def transformSchema(schema: StructType): StructType = {
@@ -296,13 +298,15 @@ class IndexToString private[ml] (override val uid: String)
   override def transformSchema(schema: StructType): StructType = {
     val inputColName = $(inputCol)
     val inputDataType = schema(inputColName).dataType
-    require(inputDataType.isInstanceOf[NumericType],
-            s"The input column $inputColName must be a numeric type, " +
-              s"but got $inputDataType.")
+    require(
+      inputDataType.isInstanceOf[NumericType],
+      s"The input column $inputColName must be a numeric type, " +
+        s"but got $inputDataType.")
     val inputFields = schema.fields
     val outputColName = $(outputCol)
-    require(inputFields.forall(_.name != outputColName),
-            s"Output column $outputColName already exists.")
+    require(
+      inputFields.forall(_.name != outputColName),
+      s"Output column $outputColName already exists.")
     val outputFields = inputFields :+ StructField($(outputCol), StringType)
     StructType(outputFields)
   }

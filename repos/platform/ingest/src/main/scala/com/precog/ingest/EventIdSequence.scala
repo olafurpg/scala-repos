@@ -53,10 +53,11 @@ class SystemEventIdSequence private (
   }
 
   private def refill(offset: Long): InternalState = {
-    coordination.renewEventRelayState(agent,
-                                      offset,
-                                      state.block.producerId,
-                                      blockSize) match {
+    coordination.renewEventRelayState(
+      agent,
+      offset,
+      state.block.producerId,
+      blockSize) match {
       case Success(ers @ EventRelayState(_, _, _)) => InternalState(ers)
       case Failure(e) => sys.error("Error trying to renew relay agent: " + e)
     }
@@ -106,9 +107,10 @@ object SystemEventIdSequence {
       InternalState(eventRelayState)
     }
 
-    new SystemEventIdSequence(agent,
-                              coordination,
-                              loadInitialState(),
-                              blockSize)
+    new SystemEventIdSequence(
+      agent,
+      coordination,
+      loadInitialState(),
+      blockSize)
   }
 }

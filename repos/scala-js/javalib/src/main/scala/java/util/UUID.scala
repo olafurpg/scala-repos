@@ -31,12 +31,13 @@ final class UUID private (private val i1: Int,
    */
 
   def this(mostSigBits: Long, leastSigBits: Long) = {
-    this((mostSigBits >>> 32).toInt,
-         mostSigBits.toInt,
-         (leastSigBits >>> 32).toInt,
-         leastSigBits.toInt,
-         mostSigBits,
-         leastSigBits)
+    this(
+      (mostSigBits >>> 32).toInt,
+      mostSigBits.toInt,
+      (leastSigBits >>> 32).toInt,
+      leastSigBits.toInt,
+      mostSigBits,
+      leastSigBits)
   }
 
   def getLeastSignificantBits(): Long = {

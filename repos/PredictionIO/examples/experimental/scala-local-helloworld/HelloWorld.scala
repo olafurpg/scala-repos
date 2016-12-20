@@ -27,11 +27,12 @@ class MyPredictedResult(
 
 // controller components
 class MyDataSource
-    extends LDataSource[EmptyDataSourceParams,
-                        EmptyDataParams,
-                        MyTrainingData,
-                        MyQuery,
-                        EmptyActualResult] {
+    extends LDataSource[
+      EmptyDataSourceParams,
+      EmptyDataParams,
+      MyTrainingData,
+      MyQuery,
+      EmptyActualResult] {
 
   /* override this to return Training Data only */
   override def readTraining(): MyTrainingData = {
@@ -47,11 +48,12 @@ class MyDataSource
 }
 
 class MyAlgorithm
-    extends LAlgorithm[EmptyAlgorithmParams,
-                       MyTrainingData,
-                       MyModel,
-                       MyQuery,
-                       MyPredictedResult] {
+    extends LAlgorithm[
+      EmptyAlgorithmParams,
+      MyTrainingData,
+      MyModel,
+      MyQuery,
+      MyPredictedResult] {
 
   override def train(pd: MyTrainingData): MyModel = {
     // calculate average value of each day

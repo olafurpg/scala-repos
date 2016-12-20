@@ -46,12 +46,14 @@ class ScalaMoveClassTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
   }
 
   def testSCL2625() {
-    doTest("scl2625",
-           Array("somepackage.Dummy",
-                 "somepackage.MoreBusiness",
-                 "somepackage.Business",
-                 "somepackage.AnotherEnum"),
-           "dest")
+    doTest(
+      "scl2625",
+      Array(
+        "somepackage.Dummy",
+        "somepackage.MoreBusiness",
+        "somepackage.Business",
+        "somepackage.AnotherEnum"),
+      "dest")
   }
 
   def testSCL4623() {
@@ -79,9 +81,10 @@ class ScalaMoveClassTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
   }
 
   def testSCL4894() {
-    doTest("scl4894",
-           Array("moveRefactoring.foo.B", "moveRefactoring.foo.BB"),
-           "moveRefactoring.bar")
+    doTest(
+      "scl4894",
+      Array("moveRefactoring.foo.B", "moveRefactoring.foo.BB"),
+      "moveRefactoring.bar")
   }
 
   def testSCL4972() {

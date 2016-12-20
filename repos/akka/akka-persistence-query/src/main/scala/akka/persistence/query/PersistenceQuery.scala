@@ -72,8 +72,9 @@ class PersistenceQuery(system: ExtendedActorSystem) extends Extension {
           override def createExtension(
               system: ExtendedActorSystem): PluginHolder = {
             val provider = createPlugin(configPath)
-            PluginHolder(provider.scaladslReadJournal(),
-                         provider.javadslReadJournal())
+            PluginHolder(
+              provider.scaladslReadJournal(),
+              provider.javadslReadJournal())
           }
         }
         readJournalPluginExtensionIds.compareAndSet(

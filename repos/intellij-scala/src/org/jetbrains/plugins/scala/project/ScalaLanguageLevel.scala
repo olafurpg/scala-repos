@@ -25,13 +25,14 @@ sealed case class ScalaLanguageLevel(ordinal: Int, version: String)
 }
 
 object ScalaLanguageLevel {
-  val Values = Array(Scala_2_7,
-                     Scala_2_8,
-                     Scala_2_9,
-                     Scala_2_10,
-                     Scala_2_11,
-                     Scala_2_12,
-                     Dotty)
+  val Values = Array(
+    Scala_2_7,
+    Scala_2_8,
+    Scala_2_9,
+    Scala_2_10,
+    Scala_2_11,
+    Scala_2_12,
+    Dotty)
 
   val Default = Scala_2_11
 

@@ -65,19 +65,17 @@ trait DAGRewriterSpecs[M[+ _]]
 
       val t1 = dag.AbsoluteLoad(Const(CString("/hom/pairs"))(line))(line)
 
-      val input = Join(Add,
-                       IdentitySort,
-                       Join(Add,
-                            Cross(None),
-                            Join(DerefObject,
-                                 Cross(None),
-                                 t1,
-                                 Const(CString("first"))(line))(line),
-                            dag.Reduce(Count, t1)(line))(line),
-                       Join(DerefObject,
-                            Cross(None),
-                            t1,
-                            Const(CString("second"))(line))(line))(line)
+      val input = Join(
+        Add,
+        IdentitySort,
+        Join(
+          Add,
+          Cross(None),
+          Join(DerefObject, Cross(None), t1, Const(CString("first"))(line))(
+            line),
+          dag.Reduce(Count, t1)(line))(line),
+        Join(DerefObject, Cross(None), t1, Const(CString("second"))(line))(
+          line))(line)
 
       val ctx = defaultEvaluationContext
       val optimize = true

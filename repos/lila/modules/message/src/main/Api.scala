@@ -46,19 +46,19 @@ final class Api(unreadCache: UnreadCache,
     val fromMod = Granter(_.MessageAnyone)(me)
     UserRepo named data.user.id flatMap {
       _.fold(fufail[Thread]("No such recipient")) { invited =>
-        Thread.make(name = data.subject,
-                    text = data.text,
-                    creatorId = me.id,
-                    invitedId = data.user.id) |> { t =>
+        Thread.make(
+          name = data.subject,
+          text = data.text,
+          creatorId = me.id,
+          invitedId = data.user.id) |> { t =>
           val thread =
             if (me.troll || lila.security.Spam.detect(data.subject, data.text))
               t deleteFor invited
             else t
           sendUnlessBlocked(thread, fromMod) >>- updateUser(invited) >>- {
             val text = s"${data.subject} ${data.text}"
-            shutup ! lila.hub.actorApi.shutup.RecordPrivateMessage(me.id,
-                                                                   invited.id,
-                                                                   text)
+            shutup ! lila.hub.actorApi.shutup
+              .RecordPrivateMessage(me.id, invited.id, text)
           } inject thread
         }
       }
@@ -66,11 +66,13 @@ final class Api(unreadCache: UnreadCache,
   }
 
   def lichessThread(lt: LichessThread): Funit =
-    sendUnlessBlocked(Thread.make(name = lt.subject,
-                                  text = lt.message,
-                                  creatorId = lt.from,
-                                  invitedId = lt.to),
-                      fromMod = false) >> unreadCache.clear(lt.to)
+    sendUnlessBlocked(
+      Thread.make(
+        name = lt.subject,
+        text = lt.message,
+        creatorId = lt.from,
+        invitedId = lt.to),
+      fromMod = false) >> unreadCache.clear(lt.to)
 
   private def sendUnlessBlocked(thread: Thread, fromMod: Boolean): Funit =
     if (fromMod) $insert(thread)

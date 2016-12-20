@@ -30,8 +30,9 @@ import blueeyes.json.serialization.Extractor._
 
 object ServiceHandlerUtil {
   def forbidden(message: String): HttpResponse[JValue] =
-    HttpResponse[JValue](HttpStatus(Forbidden),
-                         content = Some(JString(message)))
+    HttpResponse[JValue](
+      HttpStatus(Forbidden),
+      content = Some(JString(message)))
 
   def badRequest(message: String,
                  details: Option[String] = None): HttpResponse[JValue] =
@@ -40,8 +41,9 @@ object ServiceHandlerUtil {
       content = Some(jobject(jfield("error", details getOrElse message))))
 
   def notFound(message: String): HttpResponse[JValue] =
-    HttpResponse[JValue](HttpStatus(NotFound),
-                         content = Some(JString(message)))
+    HttpResponse[JValue](
+      HttpStatus(NotFound),
+      content = Some(JString(message)))
 
   def ok[A: Decomposer](content: Option[A]): HttpResponse[JValue] =
     HttpResponse[JValue](OK, content = content.map(_.serialize))
@@ -54,9 +56,9 @@ object ServiceHandlerUtil {
 
   def serverError(message: String,
                   details: Option[String] = None): HttpResponse[JValue] =
-    HttpResponse(HttpStatus(InternalServerError, message),
-                 content =
-                   Some(jobject(jfield("error", details getOrElse message))))
+    HttpResponse(
+      HttpStatus(InternalServerError, message),
+      content = Some(jobject(jfield("error", details getOrElse message))))
 }
 
 // vim: set ts=4 sw=4 et:

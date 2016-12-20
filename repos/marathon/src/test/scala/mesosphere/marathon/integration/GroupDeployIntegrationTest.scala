@@ -46,8 +46,8 @@ class GroupDeployIntegrationTest
 
     When("The group gets updated")
     waitForChange(
-      marathon.updateGroup(name,
-                           group.copy(dependencies = Some(dependencies))))
+      marathon
+        .updateGroup(name, group.copy(dependencies = Some(dependencies))))
 
     Then("The group is updated")
     val result = marathon.group("test2".toRootTestPath)
@@ -183,8 +183,9 @@ class GroupDeployIntegrationTest
     }
 
     When("A rollback to the first version is initiated")
-    waitForChange(marathon.rollbackGroup(gid, create.value.version),
-                  120.seconds)
+    waitForChange(
+      marathon.rollbackGroup(gid, create.value.version),
+      120.seconds)
 
     Then("The rollback will be performed and the old version is available")
     v1Checks.healthy
@@ -280,16 +281,18 @@ class GroupDeployIntegrationTest
   test(
     "Groups with Applications with circular dependencies can not get deployed") {
     Given("A group with 3 circular dependent applications")
-    val db = appProxy("/test/db".toTestPath,
-                      "v1",
-                      1,
-                      dependencies = Set("/test/frontend1".toTestPath))
+    val db = appProxy(
+      "/test/db".toTestPath,
+      "v1",
+      1,
+      dependencies = Set("/test/frontend1".toTestPath))
     val service =
       appProxy("/test/service".toTestPath, "v1", 1, dependencies = Set(db.id))
-    val frontend = appProxy("/test/frontend1".toTestPath,
-                            "v1",
-                            1,
-                            dependencies = Set(service.id))
+    val frontend = appProxy(
+      "/test/frontend1".toTestPath,
+      "v1",
+      1,
+      dependencies = Set(service.id))
     val group = GroupUpdate("test".toTestPath, Set(db, service, frontend))
 
     When("The group gets posted")
@@ -307,10 +310,11 @@ class GroupDeployIntegrationTest
     val db = appProxy("/test/db".toTestPath, "v1", 1)
     val service =
       appProxy("/test/service".toTestPath, "v1", 1, dependencies = Set(db.id))
-    val frontend = appProxy("/test/frontend1".toTestPath,
-                            "v1",
-                            1,
-                            dependencies = Set(service.id))
+    val frontend = appProxy(
+      "/test/frontend1".toTestPath,
+      "v1",
+      1,
+      dependencies = Set(service.id))
     val group = GroupUpdate("/test".toTestPath, Set(db, service, frontend))
 
     When("The group gets deployed")
@@ -378,14 +382,16 @@ class GroupDeployIntegrationTest
     }
     def create(version: String, initialState: Boolean) = {
       val db = appProxy("/test/db".toTestPath, version, 1)
-      val service = appProxy("/test/service".toTestPath,
-                             version,
-                             1,
-                             dependencies = Set(db.id))
-      val frontend = appProxy("/test/frontend1".toTestPath,
-                              version,
-                              1,
-                              dependencies = Set(service.id))
+      val service = appProxy(
+        "/test/service".toTestPath,
+        version,
+        1,
+        dependencies = Set(db.id))
+      val frontend = appProxy(
+        "/test/frontend1".toTestPath,
+        version,
+        1,
+        dependencies = Set(service.id))
       (GroupUpdate("/test".toTestPath, Set(db, service, frontend)),
        appProxyCheck(db.id, version, state = initialState)
          .withHealthAction(storeFirst),
@@ -409,8 +415,9 @@ class GroupDeployIntegrationTest
     ping should have size 4
     ping(key(dbV1)) should be < ping(key(serviceV1))
     ping(key(serviceV1)) should be < ping(key(frontendV1))
-    WaitTestSupport.validFor("all v1 apps are available as well as db v2",
-                             15.seconds) {
+    WaitTestSupport.validFor(
+      "all v1 apps are available as well as db v2",
+      15.seconds) {
       dbV1.pingSince(2.seconds) && serviceV1.pingSince(2.seconds) &&
       frontendV1.pingSince(2.seconds) && dbV2.pingSince(2.seconds)
     }
@@ -438,8 +445,9 @@ class GroupDeployIntegrationTest
     ping should have size 6
     ping(key(dbV2)) should be < ping(key(serviceV2))
     ping(key(serviceV2)) should be < ping(key(frontendV2))
-    WaitTestSupport.validFor("frontend v1 is available as well as all v2",
-                             15.seconds) {
+    WaitTestSupport.validFor(
+      "frontend v1 is available as well as all v2",
+      15.seconds) {
       frontendV1.pingSince(2.seconds) && dbV2.pingSince(2.seconds) &&
       serviceV2.pingSince(2.seconds) && frontendV2.pingSince(2.seconds)
     }

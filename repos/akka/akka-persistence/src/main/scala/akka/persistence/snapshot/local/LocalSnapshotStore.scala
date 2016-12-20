@@ -135,9 +135,10 @@ private[persistence] class LocalSnapshotStore
 
   private def withInputStream[T](metadata: SnapshotMetadata)(
       p: (InputStream) ⇒ T): T =
-    withStream(new BufferedInputStream(
-                 new FileInputStream(snapshotFileForWrite(metadata))),
-               p)
+    withStream(
+      new BufferedInputStream(
+        new FileInputStream(snapshotFileForWrite(metadata))),
+      p)
 
   private def withStream[A <: Closeable, B](stream: A, p: A ⇒ B): B =
     try { p(stream) } finally { stream.close() }
@@ -160,9 +161,10 @@ private[persistence] class LocalSnapshotStore
         .map(_.getName)
         .collect {
           case FilenamePattern(pid, snr, tms) ⇒
-            SnapshotMetadata(URLDecoder.decode(pid, UTF_8),
-                             snr.toLong,
-                             tms.toLong)
+            SnapshotMetadata(
+              URLDecoder.decode(pid, UTF_8),
+              snr.toLong,
+              tms.toLong)
         }
         .filter(md ⇒ criteria.matches(md) && !saving.contains(md))
         .toVector

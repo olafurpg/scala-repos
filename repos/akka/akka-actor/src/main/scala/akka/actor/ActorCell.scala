@@ -532,9 +532,10 @@ private[akka] class ActorCell(
   def autoReceiveMessage(msg: Envelope): Unit = {
     if (system.settings.DebugAutoReceive)
       publish(
-        Debug(self.path.toString,
-              clazz(actor),
-              "received AutoReceiveMessage " + msg))
+        Debug(
+          self.path.toString,
+          clazz(actor),
+          "received AutoReceiveMessage " + msg))
 
     msg.message match {
       case t: Terminated ⇒ receivedTerminated(t)
@@ -631,16 +632,18 @@ private[akka] class ActorCell(
       checkReceiveTimeout
       if (system.settings.DebugLifecycle)
         publish(
-          Debug(self.path.toString,
-                clazz(created),
-                "started (" + created + ")"))
+          Debug(
+            self.path.toString,
+            clazz(created),
+            "started (" + created + ")"))
     } catch {
       case e: InterruptedException ⇒
         clearOutActorIfNonNull()
         Thread.currentThread().interrupt()
-        throw ActorInitializationException(self,
-                                           "interruption during creation",
-                                           e)
+        throw ActorInitializationException(
+          self,
+          "interruption during creation",
+          e)
       case NonFatal(e) ⇒
         clearOutActorIfNonNull()
         e match {
@@ -653,9 +656,10 @@ private[akka] class ActorCell(
               """,
               i.getCause)
           case x ⇒
-            throw ActorInitializationException(self,
-                                               "exception during creation",
-                                               x)
+            throw ActorInitializationException(
+              self,
+              "exception during creation",
+              x)
         }
     }
   }
@@ -668,15 +672,17 @@ private[akka] class ActorCell(
           handleSupervise(child, async)
           if (system.settings.DebugLifecycle)
             publish(
-              Debug(self.path.toString,
-                    clazz(actor),
-                    "now supervising " + child))
+              Debug(
+                self.path.toString,
+                clazz(actor),
+                "now supervising " + child))
         case None ⇒
           publish(
-            Error(self.path.toString,
-                  clazz(actor),
-                  "received Supervise from unregistered child " + child +
-                    ", this will not end well"))
+            Error(
+              self.path.toString,
+              clazz(actor),
+              "received Supervise from unregistered child " + child +
+                ", this will not end well"))
       }
     }
 
@@ -689,18 +695,20 @@ private[akka] class ActorCell(
 
   final protected def clearActorCellFields(cell: ActorCell): Unit = {
     cell.unstashAll()
-    if (!Reflect.lookupAndSetField(classOf[ActorCell],
-                                   cell,
-                                   "props",
-                                   ActorCell.terminatedProps))
+    if (!Reflect.lookupAndSetField(
+          classOf[ActorCell],
+          cell,
+          "props",
+          ActorCell.terminatedProps))
       throw new IllegalArgumentException("ActorCell has no props field")
   }
 
   final protected def clearActorFields(actorInstance: Actor,
                                        recreate: Boolean): Unit = {
-    setActorFields(actorInstance,
-                   context = null,
-                   self = if (recreate) self else system.deadLetters)
+    setActorFields(
+      actorInstance,
+      context = null,
+      self = if (recreate) self else system.deadLetters)
     currentMessage = null
     behaviorStack = emptyBehaviorStack
   }
@@ -709,14 +717,16 @@ private[akka] class ActorCell(
                                      context: ActorContext,
                                      self: ActorRef): Unit =
     if (actorInstance ne null) {
-      if (!Reflect.lookupAndSetField(actorInstance.getClass,
-                                     actorInstance,
-                                     "context",
-                                     context) ||
-          !Reflect.lookupAndSetField(actorInstance.getClass,
-                                     actorInstance,
-                                     "self",
-                                     self))
+      if (!Reflect.lookupAndSetField(
+            actorInstance.getClass,
+            actorInstance,
+            "context",
+            context) ||
+          !Reflect.lookupAndSetField(
+            actorInstance.getClass,
+            actorInstance,
+            "self",
+            self))
         throw new IllegalActorStateException(
           actorInstance.getClass +
             " is not an Actor since it have not mixed in the 'Actor' trait")

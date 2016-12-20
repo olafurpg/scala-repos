@@ -157,11 +157,13 @@ object AbcdStringGen {
 object WhiteStringGen {
   def genWhite =
     for (len <- choose(1, 4);
-         string <- listOfN(len,
-                           frequency((1, Gen.const(" ")),
-                                     (1, Gen.const("\t")),
-                                     (1, Gen.const("\r")),
-                                     (1, Gen.const("\n")))))
+         string <- listOfN(
+           len,
+           frequency(
+             (1, Gen.const(" ")),
+             (1, Gen.const("\t")),
+             (1, Gen.const("\r")),
+             (1, Gen.const("\n")))))
       yield string.mkString("")
 
   implicit def genWhiteString: Arbitrary[String] =

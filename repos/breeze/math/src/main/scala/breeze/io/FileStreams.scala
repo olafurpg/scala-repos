@@ -41,8 +41,9 @@ object FileStreams {
     val fis = new FileInputStream(path);
     try {
       if (path.getName.endsWith(".gz")) {
-        new BufferedInputStream(new GZIPInputStream(fis, BUFFER_SIZE),
-                                BUFFER_SIZE);
+        new BufferedInputStream(
+          new GZIPInputStream(fis, BUFFER_SIZE),
+          BUFFER_SIZE);
       } else {
         new BufferedInputStream(fis, BUFFER_SIZE);
       }
@@ -61,8 +62,9 @@ object FileStreams {
     val fos = new FileOutputStream(path);
     try {
       if (path.getName.endsWith(".gz")) {
-        new BufferedOutputStream(new GZIPOutputStream(fos, BUFFER_SIZE),
-                                 BUFFER_SIZE);
+        new BufferedOutputStream(
+          new GZIPOutputStream(fos, BUFFER_SIZE),
+          BUFFER_SIZE);
       } else {
         new BufferedOutputStream(fos, BUFFER_SIZE);
       }

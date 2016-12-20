@@ -48,11 +48,12 @@ class ReplicatorChaosSpec
   override def initialParticipants = roles.size
 
   implicit val cluster = Cluster(system)
-  val replicator = system.actorOf(Replicator.props(
-                                    ReplicatorSettings(system)
-                                      .withRole("backend")
-                                      .withGossipInterval(1.second)),
-                                  "replicator")
+  val replicator = system.actorOf(
+    Replicator.props(
+      ReplicatorSettings(system)
+        .withRole("backend")
+        .withGossipInterval(1.second)),
+    "replicator")
   val timeout = 3.seconds.dilated
 
   val KeyA = GCounterKey("A")
@@ -126,9 +127,10 @@ class ReplicatorChaosSpec
         replicator ! Update(KeyB, PNCounter(), WriteTo(2, timeout))(_ + 20)
         replicator ! Update(KeyC, GCounter(), WriteAll(timeout))(_ + 20)
         receiveN(3).toSet should be(
-          Set(UpdateSuccess(KeyA, None),
-              UpdateSuccess(KeyB, None),
-              UpdateSuccess(KeyC, None)))
+          Set(
+            UpdateSuccess(KeyA, None),
+            UpdateSuccess(KeyB, None),
+            UpdateSuccess(KeyC, None)))
 
         replicator ! Update(KeyE, GSet(), WriteLocal)(_ + "e1" + "e2")
         expectMsg(UpdateSuccess(KeyE, None))

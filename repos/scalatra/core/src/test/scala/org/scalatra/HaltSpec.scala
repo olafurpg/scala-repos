@@ -32,11 +32,13 @@ class HaltTestServlet extends ScalatraServlet {
   }
 
   get("/all-args") {
-    halt(status = 403,
-         reason = "Go away",
-         headers = Map("X-Your-Mother-Was-A" -> "hamster",
-                       "X-Your-Father-Smelt-Of" -> "elderberries"),
-         body = <h1>Go away or I shall taunt you a second time!</h1>)
+    halt(
+      status = 403,
+      reason = "Go away",
+      headers = Map(
+        "X-Your-Mother-Was-A" -> "hamster",
+        "X-Your-Father-Smelt-Of" -> "elderberries"),
+      body = <h1>Go away or I shall taunt you a second time!</h1>)
     "this content must not be returned"
   }
 
@@ -46,9 +48,10 @@ class HaltTestServlet extends ScalatraServlet {
 
   get("/action-result") {
     halt(
-      ActionResult(status = new ResponseStatus(406, "Not Acceptable"),
-                   headers = Map("X-Action-Result" -> "present"),
-                   body = "body sent using ActionResult"))
+      ActionResult(
+        status = new ResponseStatus(406, "Not Acceptable"),
+        headers = Map("X-Action-Result" -> "present"),
+        body = "body sent using ActionResult"))
     "this content must not be returned"
   }
 
@@ -91,9 +94,10 @@ class HaltSpec extends ScalatraSpec {
 
   def commonHalt(uri: String) =
     "not execute the rest of the action" ! haltsAction(uri) ^ "retain the headers" ! retainsHeaders(
-      uri) ^ "still execute after filter" ! hasHeader(uri,
-                                                      "After-Header",
-                                                      "after")
+      uri) ^ "still execute after filter" ! hasHeader(
+      uri,
+      "After-Header",
+      "after")
 
   def haltsAction(uri: String) =
     get(uri) {

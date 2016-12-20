@@ -44,8 +44,9 @@ private[spark] class LocalRDDCheckpointData[T: ClassTag](
     val level = rdd.getStorageLevel
 
     // Assume storage level uses disk; otherwise memory eviction may cause data loss
-    assume(level.useDisk,
-           s"Storage level $level is not appropriate for local checkpointing")
+    assume(
+      level.useDisk,
+      s"Storage level $level is not appropriate for local checkpointing")
 
     // Not all actions compute all partitions of the RDD (e.g. take). For correctness, we
     // must cache any missing partitions. TODO: avoid running another job here (SPARK-8582).
@@ -76,9 +77,10 @@ private[spark] object LocalRDDCheckpointData {
     * This method is idempotent.
     */
   def transformStorageLevel(level: StorageLevel): StorageLevel = {
-    StorageLevel(useDisk = true,
-                 level.useMemory,
-                 level.deserialized,
-                 level.replication)
+    StorageLevel(
+      useDisk = true,
+      level.useMemory,
+      level.deserialized,
+      level.replication)
   }
 }

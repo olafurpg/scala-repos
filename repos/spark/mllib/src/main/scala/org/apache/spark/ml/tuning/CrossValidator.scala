@@ -282,9 +282,10 @@ object CrossValidator extends MLReadable[CrossValidator] {
               case paramMap =>
                 paramMap.toSeq.map {
                   case ParamPair(p, v) =>
-                    Map("parent" -> p.parent,
-                        "name" -> p.name,
-                        "value" -> p.jsonEncode(v))
+                    Map(
+                      "parent" -> p.parent,
+                      "name" -> p.name,
+                      "value" -> p.jsonEncode(v))
                 }
             }
             .toSeq

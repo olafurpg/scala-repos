@@ -168,8 +168,9 @@ trait MapSubInstances extends MapSubInstances0 with MapSubFunctions {
         implicit val ok = Order[K].toScalaOrdering
         Semigroup[Ordering].append(
           Order[Int].order(x.size, y.size),
-          Order[Vector[(K, V)]].order(x.toVector.sortBy((_: (K, V))._1),
-                                      y.toVector.sortBy((_: (K, V))._1)))
+          Order[Vector[(K, V)]].order(
+            x.toVector.sortBy((_: (K, V))._1),
+            y.toVector.sortBy((_: (K, V))._1)))
       }
     }
 }

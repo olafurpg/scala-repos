@@ -125,8 +125,9 @@ trait JSDefinitions { self: JSGlobalAddons =>
 
     lazy val JSThisFunctionModule = JSThisFunctionClass.companionModule
     def JSThisFunction_fromFunction(arity: Int): TermSymbol =
-      getMemberMethod(JSThisFunctionModule,
-                      newTermName("fromFunction" + arity))
+      getMemberMethod(
+        JSThisFunctionModule,
+        newTermName("fromFunction" + arity))
 
     lazy val JSConstructorTagModule = getRequiredModule(
       "scala.scalajs.js.ConstructorTag")

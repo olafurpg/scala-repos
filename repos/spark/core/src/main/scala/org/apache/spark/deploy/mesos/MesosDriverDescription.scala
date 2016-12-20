@@ -57,16 +57,17 @@ private[spark] class MesosDriverDescription(
            submissionDate: Date = submissionDate,
            retryState: Option[MesosClusterRetryState] = retryState)
     : MesosDriverDescription = {
-    new MesosDriverDescription(name,
-                               jarUrl,
-                               mem,
-                               cores,
-                               supervise,
-                               command,
-                               schedulerProperties,
-                               submissionId,
-                               submissionDate,
-                               retryState)
+    new MesosDriverDescription(
+      name,
+      jarUrl,
+      mem,
+      cores,
+      supervise,
+      command,
+      schedulerProperties,
+      submissionId,
+      submissionDate,
+      retryState)
   }
 
   override def toString: String =

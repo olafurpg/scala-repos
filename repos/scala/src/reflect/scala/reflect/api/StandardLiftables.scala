@@ -829,8 +829,9 @@ trait StandardLiftables { self: Universe =>
     }
 
     implicit def unliftScalaSymbol: Unliftable[scala.Symbol] = Unliftable {
-      case Apply(ScalaDot(stdnme.Symbol),
-                 List(Literal(Constant(name: String)))) =>
+      case Apply(
+          ScalaDot(stdnme.Symbol),
+          List(Literal(Constant(name: String)))) =>
         scala.Symbol(name)
     }
 
@@ -1130,21 +1131,22 @@ trait StandardLiftables { self: Universe =>
             v5) :: UnliftT6(v6) :: UnliftT7(v7) :: UnliftT8(v8) :: UnliftT9(v9) :: UnliftT10(
             v10) :: UnliftT11(v11) :: UnliftT12(v12) :: UnliftT13(v13) :: UnliftT14(
             v14) :: UnliftT15(v15) :: Nil) =>
-        Tuple15(v1,
-                v2,
-                v3,
-                v4,
-                v5,
-                v6,
-                v7,
-                v8,
-                v9,
-                v10,
-                v11,
-                v12,
-                v13,
-                v14,
-                v15)
+        Tuple15(
+          v1,
+          v2,
+          v3,
+          v4,
+          v5,
+          v6,
+          v7,
+          v8,
+          v9,
+          v10,
+          v11,
+          v12,
+          v13,
+          v14,
+          v15)
     }
     implicit def unliftTuple16[T1,
                                T2,
@@ -1198,22 +1200,23 @@ trait StandardLiftables { self: Universe =>
             v5) :: UnliftT6(v6) :: UnliftT7(v7) :: UnliftT8(v8) :: UnliftT9(v9) :: UnliftT10(
             v10) :: UnliftT11(v11) :: UnliftT12(v12) :: UnliftT13(v13) :: UnliftT14(
             v14) :: UnliftT15(v15) :: UnliftT16(v16) :: Nil) =>
-        Tuple16(v1,
-                v2,
-                v3,
-                v4,
-                v5,
-                v6,
-                v7,
-                v8,
-                v9,
-                v10,
-                v11,
-                v12,
-                v13,
-                v14,
-                v15,
-                v16)
+        Tuple16(
+          v1,
+          v2,
+          v3,
+          v4,
+          v5,
+          v6,
+          v7,
+          v8,
+          v9,
+          v10,
+          v11,
+          v12,
+          v13,
+          v14,
+          v15,
+          v16)
     }
     implicit def unliftTuple17[T1,
                                T2,
@@ -1270,23 +1273,24 @@ trait StandardLiftables { self: Universe =>
             v5) :: UnliftT6(v6) :: UnliftT7(v7) :: UnliftT8(v8) :: UnliftT9(v9) :: UnliftT10(
             v10) :: UnliftT11(v11) :: UnliftT12(v12) :: UnliftT13(v13) :: UnliftT14(
             v14) :: UnliftT15(v15) :: UnliftT16(v16) :: UnliftT17(v17) :: Nil) =>
-        Tuple17(v1,
-                v2,
-                v3,
-                v4,
-                v5,
-                v6,
-                v7,
-                v8,
-                v9,
-                v10,
-                v11,
-                v12,
-                v13,
-                v14,
-                v15,
-                v16,
-                v17)
+        Tuple17(
+          v1,
+          v2,
+          v3,
+          v4,
+          v5,
+          v6,
+          v7,
+          v8,
+          v9,
+          v10,
+          v11,
+          v12,
+          v13,
+          v14,
+          v15,
+          v16,
+          v17)
     }
     implicit def unliftTuple18[T1,
                                T2,
@@ -1347,24 +1351,25 @@ trait StandardLiftables { self: Universe =>
             v10) :: UnliftT11(v11) :: UnliftT12(v12) :: UnliftT13(v13) :: UnliftT14(
             v14) :: UnliftT15(v15) :: UnliftT16(v16) :: UnliftT17(v17) :: UnliftT18(
             v18) :: Nil) =>
-        Tuple18(v1,
-                v2,
-                v3,
-                v4,
-                v5,
-                v6,
-                v7,
-                v8,
-                v9,
-                v10,
-                v11,
-                v12,
-                v13,
-                v14,
-                v15,
-                v16,
-                v17,
-                v18)
+        Tuple18(
+          v1,
+          v2,
+          v3,
+          v4,
+          v5,
+          v6,
+          v7,
+          v8,
+          v9,
+          v10,
+          v11,
+          v12,
+          v13,
+          v14,
+          v15,
+          v16,
+          v17,
+          v18)
     }
     implicit def unliftTuple19[T1,
                                T2,
@@ -1428,25 +1433,26 @@ trait StandardLiftables { self: Universe =>
             v10) :: UnliftT11(v11) :: UnliftT12(v12) :: UnliftT13(v13) :: UnliftT14(
             v14) :: UnliftT15(v15) :: UnliftT16(v16) :: UnliftT17(v17) :: UnliftT18(
             v18) :: UnliftT19(v19) :: Nil) =>
-        Tuple19(v1,
-                v2,
-                v3,
-                v4,
-                v5,
-                v6,
-                v7,
-                v8,
-                v9,
-                v10,
-                v11,
-                v12,
-                v13,
-                v14,
-                v15,
-                v16,
-                v17,
-                v18,
-                v19)
+        Tuple19(
+          v1,
+          v2,
+          v3,
+          v4,
+          v5,
+          v6,
+          v7,
+          v8,
+          v9,
+          v10,
+          v11,
+          v12,
+          v13,
+          v14,
+          v15,
+          v16,
+          v17,
+          v18,
+          v19)
     }
     implicit def unliftTuple20[T1,
                                T2,
@@ -1513,26 +1519,27 @@ trait StandardLiftables { self: Universe =>
             v10) :: UnliftT11(v11) :: UnliftT12(v12) :: UnliftT13(v13) :: UnliftT14(
             v14) :: UnliftT15(v15) :: UnliftT16(v16) :: UnliftT17(v17) :: UnliftT18(
             v18) :: UnliftT19(v19) :: UnliftT20(v20) :: Nil) =>
-        Tuple20(v1,
-                v2,
-                v3,
-                v4,
-                v5,
-                v6,
-                v7,
-                v8,
-                v9,
-                v10,
-                v11,
-                v12,
-                v13,
-                v14,
-                v15,
-                v16,
-                v17,
-                v18,
-                v19,
-                v20)
+        Tuple20(
+          v1,
+          v2,
+          v3,
+          v4,
+          v5,
+          v6,
+          v7,
+          v8,
+          v9,
+          v10,
+          v11,
+          v12,
+          v13,
+          v14,
+          v15,
+          v16,
+          v17,
+          v18,
+          v19,
+          v20)
     }
     implicit def unliftTuple21[T1,
                                T2,
@@ -1602,27 +1609,28 @@ trait StandardLiftables { self: Universe =>
             v10) :: UnliftT11(v11) :: UnliftT12(v12) :: UnliftT13(v13) :: UnliftT14(
             v14) :: UnliftT15(v15) :: UnliftT16(v16) :: UnliftT17(v17) :: UnliftT18(
             v18) :: UnliftT19(v19) :: UnliftT20(v20) :: UnliftT21(v21) :: Nil) =>
-        Tuple21(v1,
-                v2,
-                v3,
-                v4,
-                v5,
-                v6,
-                v7,
-                v8,
-                v9,
-                v10,
-                v11,
-                v12,
-                v13,
-                v14,
-                v15,
-                v16,
-                v17,
-                v18,
-                v19,
-                v20,
-                v21)
+        Tuple21(
+          v1,
+          v2,
+          v3,
+          v4,
+          v5,
+          v6,
+          v7,
+          v8,
+          v9,
+          v10,
+          v11,
+          v12,
+          v13,
+          v14,
+          v15,
+          v16,
+          v17,
+          v18,
+          v19,
+          v20,
+          v21)
     }
     implicit def unliftTuple22[T1,
                                T2,
@@ -1696,28 +1704,29 @@ trait StandardLiftables { self: Universe =>
             v14) :: UnliftT15(v15) :: UnliftT16(v16) :: UnliftT17(v17) :: UnliftT18(
             v18) :: UnliftT19(v19) :: UnliftT20(v20) :: UnliftT21(v21) :: UnliftT22(
             v22) :: Nil) =>
-        Tuple22(v1,
-                v2,
-                v3,
-                v4,
-                v5,
-                v6,
-                v7,
-                v8,
-                v9,
-                v10,
-                v11,
-                v12,
-                v13,
-                v14,
-                v15,
-                v16,
-                v17,
-                v18,
-                v19,
-                v20,
-                v21,
-                v22)
+        Tuple22(
+          v1,
+          v2,
+          v3,
+          v4,
+          v5,
+          v6,
+          v7,
+          v8,
+          v9,
+          v10,
+          v11,
+          v12,
+          v13,
+          v14,
+          v15,
+          v16,
+          v17,
+          v18,
+          v19,
+          v20,
+          v21,
+          v22)
     }
   }
 

@@ -51,10 +51,11 @@ class AssignUniqueSymbols extends Phase {
             val d = g.copy(identity = new AnonTypeSymbol)
             val a = new AnonSymbol
             replace += g.fromGen -> a
-            g.copy(fromGen = a,
-                   tr(g.from),
-                   tr(g.by),
-                   identity = new AnonTypeSymbol)
+            g.copy(
+              fromGen = a,
+              tr(g.from),
+              tr(g.by),
+              identity = new AnonTypeSymbol)
           case n: StructNode => n.mapChildren(tr)
           case d: DefNode =>
             checkFeatures(d)
@@ -69,10 +70,11 @@ class AssignUniqueSymbols extends Phase {
       }
       tr(tree)
     }
-    val features = UsedFeatures(hasDistinct,
-                                hasTypeMapping,
-                                hasAggregate,
-                                hasNonPrimitiveOption)
+    val features = UsedFeatures(
+      hasDistinct,
+      hasTypeMapping,
+      hasAggregate,
+      hasNonPrimitiveOption)
     logger.debug("Detected features: " + features)
     s2 + (this -> features)
   }

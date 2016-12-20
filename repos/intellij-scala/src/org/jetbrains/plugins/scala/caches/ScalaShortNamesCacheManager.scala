@@ -217,11 +217,12 @@ class ScalaShortNamesCacheManager(project: Project) extends ProjectComponent {
   }
 
   def getClassesByName(name: String, scope: GlobalSearchScope): Seq[PsiClass] = {
-    val plainClasses = StubIndex.getElements(ScalaIndexKeys.SHORT_NAME_KEY,
-                                             name,
-                                             project,
-                                             scope,
-                                             classOf[PsiClass])
+    val plainClasses = StubIndex.getElements(
+      ScalaIndexKeys.SHORT_NAME_KEY,
+      name,
+      project,
+      scope,
+      classOf[PsiClass])
     import scala.collection.JavaConversions._
     plainClasses.toSeq
   }

@@ -88,10 +88,11 @@ class BypassMergeSortShuffleWriterSuite
         null
       }
     }).when(blockResolver)
-      .writeIndexFileAndCommit(anyInt,
-                               anyInt,
-                               any(classOf[Array[Long]]),
-                               any(classOf[File]))
+      .writeIndexFileAndCommit(
+        anyInt,
+        anyInt,
+        any(classOf[Array[Long]]),
+        any(classOf[File]))
     when(blockManager.diskBlockManager).thenReturn(diskBlockManager)
     when(
       blockManager.getDiskWriter(

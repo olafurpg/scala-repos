@@ -40,19 +40,20 @@ class ParquetThriftCompatibilitySuite
       (0 until 10).map { i =>
         val suits = Array("SPADES", "HEARTS", "DIAMONDS", "CLUBS")
 
-        val nonNullablePrimitiveValues = Seq(i % 2 == 0,
-                                             i.toByte,
-                                             (i + 1).toShort,
-                                             i + 2,
-                                             i.toLong * 10,
-                                             i.toDouble + 0.2d,
-                                             // Thrift `BINARY` values are actually unencoded `STRING` values, and thus are always
-                                             // treated as `BINARY (UTF8)` in parquet-thrift, since parquet-thrift always assume
-                                             // Thrift `STRING`s are encoded using UTF-8.
-                                             s"val_$i",
-                                             s"val_$i",
-                                             // Thrift ENUM values are converted to Parquet binaries containing UTF-8 strings
-                                             suits(i % 4))
+        val nonNullablePrimitiveValues = Seq(
+          i % 2 == 0,
+          i.toByte,
+          (i + 1).toShort,
+          i + 2,
+          i.toLong * 10,
+          i.toDouble + 0.2d,
+          // Thrift `BINARY` values are actually unencoded `STRING` values, and thus are always
+          // treated as `BINARY (UTF8)` in parquet-thrift, since parquet-thrift always assume
+          // Thrift `STRING`s are encoded using UTF-8.
+          s"val_$i",
+          s"val_$i",
+          // Thrift ENUM values are converted to Parquet binaries containing UTF-8 strings
+          suits(i % 4))
 
         val nullablePrimitiveValues =
           if (i % 3 == 0) {
@@ -62,17 +63,18 @@ class ParquetThriftCompatibilitySuite
           }
 
         val complexValues =
-          Seq(Seq.tabulate(3)(n => s"arr_${i + n}"),
-              // Thrift `SET`s are converted to Parquet `LIST`s
-              Seq(i),
-              Seq.tabulate(3)(n => (i + n: Integer) -> s"val_${i + n}").toMap,
-              Seq
-                .tabulate(3) { n =>
-                  (i + n) -> Seq.tabulate(3) { m =>
-                    Row(Seq.tabulate(3)(j => i + j + m), s"val_${i + m}")
-                  }
+          Seq(
+            Seq.tabulate(3)(n => s"arr_${i + n}"),
+            // Thrift `SET`s are converted to Parquet `LIST`s
+            Seq(i),
+            Seq.tabulate(3)(n => (i + n: Integer) -> s"val_${i + n}").toMap,
+            Seq
+              .tabulate(3) { n =>
+                (i + n) -> Seq.tabulate(3) { m =>
+                  Row(Seq.tabulate(3)(j => i + j + m), s"val_${i + m}")
                 }
-                .toMap)
+              }
+              .toMap)
 
         Row(
           nonNullablePrimitiveValues ++ nullablePrimitiveValues ++ complexValues: _*)
@@ -145,9 +147,9 @@ class ParquetThriftCompatibilitySuite
 
       logParquetSchema(path)
 
-      checkAnswer(sqlContext.read.parquet(path),
-                  Seq(Row(Seq(Seq(0, 1), Seq(2, 3))),
-                      Row(Seq(Seq(4, 5), Seq(6, 7)))))
+      checkAnswer(
+        sqlContext.read.parquet(path),
+        Seq(Row(Seq(Seq(0, 1), Seq(2, 3))), Row(Seq(Seq(4, 5), Seq(6, 7)))))
     }
   }
 }

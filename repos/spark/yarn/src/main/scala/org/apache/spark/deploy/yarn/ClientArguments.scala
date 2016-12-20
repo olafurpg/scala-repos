@@ -64,15 +64,16 @@ private[spark] class ClientArguments(args: Array[String], sparkConf: SparkConf) 
   val amMemoryOverhead = sparkConf
     .get(amMemoryOverheadEntry)
     .getOrElse(
-      math.max((MEMORY_OVERHEAD_FACTOR * amMemory).toLong,
-               MEMORY_OVERHEAD_MIN))
+      math
+        .max((MEMORY_OVERHEAD_FACTOR * amMemory).toLong, MEMORY_OVERHEAD_MIN))
     .toInt
 
   val executorMemoryOverhead = sparkConf
     .get(EXECUTOR_MEMORY_OVERHEAD)
     .getOrElse(
-      math.max((MEMORY_OVERHEAD_FACTOR * executorMemory).toLong,
-               MEMORY_OVERHEAD_MIN))
+      math.max(
+        (MEMORY_OVERHEAD_FACTOR * executorMemory).toLong,
+        MEMORY_OVERHEAD_MIN))
     .toInt
 
   /** Load any default arguments provided through environment variables and Spark properties. */

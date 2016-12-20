@@ -114,8 +114,8 @@ class ScalaAttachSourcesNotificationProvider(
         GuiUtils.getTextWithoutMnemonicEscaping(each.getName),
         new Runnable {
           def run() {
-            if (!Comparing.equal(libraries,
-                                 findOrderEntriesContainingFile(file))) {
+            if (!Comparing
+                  .equal(libraries, findOrderEntriesContainingFile(file))) {
               Messages.showErrorDialog(
                 myProject,
                 "Cannot find library for " + StringUtil.getShortName(fqn),

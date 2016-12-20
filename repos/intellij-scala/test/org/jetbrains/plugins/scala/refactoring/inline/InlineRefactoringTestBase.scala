@@ -71,12 +71,14 @@ abstract class InlineRefactoringTestBase
       res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim //getImportStatements.map(_.getText()).mkString("\n")
     } catch {
       case e: RefactoringErrorHintException =>
-        assert(e.getMessage == warning,
-               s"Warning should be: $warning, but is: ${e.getMessage}")
+        assert(
+          e.getMessage == warning,
+          s"Warning should be: $warning, but is: ${e.getMessage}")
         return
       case e: Exception =>
-        assert(assertion = false,
-               message = e.getMessage + "\n" + e.getStackTrace)
+        assert(
+          assertion = false,
+          message = e.getMessage + "\n" + e.getStackTrace)
     }
 
     val text = lastPsi.getText

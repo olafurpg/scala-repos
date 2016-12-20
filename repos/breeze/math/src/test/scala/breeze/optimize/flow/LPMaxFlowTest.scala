@@ -26,11 +26,12 @@ class LPMaxFlowTest extends FunSuite {
                    override val cost: Double)
           extends Edge
 
-      val edges = Map(0 -> Seq(E(0, 1, 3, 3), E(0, 2, 3, 1)),
-                      1 -> Seq(E(1, 3, 2, 1), E(1, 4, 2, 1)),
-                      2 -> Seq(E(2, 3, 1, 4), E(2, 4, 2, 2)),
-                      3 -> Seq(E(3, 5, 2, 2)),
-                      4 -> Seq(E(4, 5, 2, 1)))
+      val edges = Map(
+        0 -> Seq(E(0, 1, 3, 3), E(0, 2, 3, 1)),
+        1 -> Seq(E(1, 3, 2, 1), E(1, 4, 2, 1)),
+        2 -> Seq(E(2, 3, 1, 4), E(2, 4, 2, 2)),
+        3 -> Seq(E(3, 5, 2, 2)),
+        4 -> Seq(E(4, 5, 2, 1)))
 
       def edgesFrom(n: Int) = edges(n).iterator
     }

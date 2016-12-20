@@ -122,9 +122,10 @@ trait Counter2Ops {
     : OpMulScalar.Impl2[Counter2[K1, K2, V],
                         Counter2[K1, K2, V],
                         Counter2[K1, K2, V]] = {
-    new OpMulScalar.Impl2[Counter2[K1, K2, V],
-                          Counter2[K1, K2, V],
-                          Counter2[K1, K2, V]] {
+    new OpMulScalar.Impl2[
+      Counter2[K1, K2, V],
+      Counter2[K1, K2, V],
+      Counter2[K1, K2, V]] {
       override def apply(a: Counter2[K1, K2, V], b: Counter2[K1, K2, V]) = {
         val r = Counter2[K1, K2, V]()
         for ((k, v) <- a.activeIterator) {
@@ -203,9 +204,10 @@ trait Counter2Ops {
       semiring: Field[V]): OpDiv.Impl2[Counter2[K1, K2, V],
                                        Counter2[K1, K2, V],
                                        Counter2[K1, K2, V]] = {
-    new OpDiv.Impl2[Counter2[K1, K2, V],
-                    Counter2[K1, K2, V],
-                    Counter2[K1, K2, V]] {
+    new OpDiv.Impl2[
+      Counter2[K1, K2, V],
+      Counter2[K1, K2, V],
+      Counter2[K1, K2, V]] {
       override def apply(a: Counter2[K1, K2, V], b: Counter2[K1, K2, V]) = {
         val r = Counter2[K1, K2, V]()
         for ((k, v) <- a.activeIterator) {
@@ -322,9 +324,10 @@ trait Counter2Ops {
     : OpMulMatrix.Impl2[Counter2[K1, K2, V],
                         Counter2[K2, K3, V],
                         Counter2[K1, K3, V]] = {
-    new OpMulMatrix.Impl2[Counter2[K1, K2, V],
-                          Counter2[K2, K3, V],
-                          Counter2[K1, K3, V]] {
+    new OpMulMatrix.Impl2[
+      Counter2[K1, K2, V],
+      Counter2[K2, K3, V],
+      Counter2[K1, K3, V]] {
       override def apply(a: Counter2[K1, K2, V], b: Counter2[K2, K3, V]) = {
         val r = Counter2[K1, K3, V]()
         for ((row, ctr) <- a.data.iterator; (k2, v) <- ctr.activeIterator;

@@ -81,12 +81,13 @@ class JavaStreamingContext(val ssc: StreamingContext) extends Closeable {
            sparkHome: String,
            jarFile: String) =
     this(
-      new StreamingContext(master,
-                           appName,
-                           batchDuration,
-                           sparkHome,
-                           Seq(jarFile),
-                           Map()))
+      new StreamingContext(
+        master,
+        appName,
+        batchDuration,
+        sparkHome,
+        Seq(jarFile),
+        Map()))
 
   /**
     * Create a StreamingContext.
@@ -103,12 +104,13 @@ class JavaStreamingContext(val ssc: StreamingContext) extends Closeable {
            sparkHome: String,
            jars: Array[String]) =
     this(
-      new StreamingContext(master,
-                           appName,
-                           batchDuration,
-                           sparkHome,
-                           jars,
-                           Map()))
+      new StreamingContext(
+        master,
+        appName,
+        batchDuration,
+        sparkHome,
+        jars,
+        Map()))
 
   /**
     * Create a StreamingContext.
@@ -127,12 +129,13 @@ class JavaStreamingContext(val ssc: StreamingContext) extends Closeable {
            jars: Array[String],
            environment: JMap[String, String]) =
     this(
-      new StreamingContext(master,
-                           appName,
-                           batchDuration,
-                           sparkHome,
-                           jars,
-                           environment.asScala))
+      new StreamingContext(
+        master,
+        appName,
+        batchDuration,
+        sparkHome,
+        jars,
+        environment.asScala))
 
   /**
     * Create a JavaStreamingContext using an existing JavaSparkContext.

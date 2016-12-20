@@ -111,8 +111,9 @@ class ResizerSpec
       val c1 = resizer.capacity(Vector.empty[Routee])
       c1 should ===(2)
 
-      val current = Vector(ActorRefRoutee(system.actorOf(Props[TestActor])),
-                           ActorRefRoutee(system.actorOf(Props[TestActor])))
+      val current = Vector(
+        ActorRefRoutee(system.actorOf(Props[TestActor])),
+        ActorRefRoutee(system.actorOf(Props[TestActor])))
       val c2 = resizer.capacity(current)
       c2 should ===(0)
     }
@@ -127,10 +128,11 @@ class ResizerSpec
     }
 
     "use settings to evaluate backoff" in {
-      val resizer = DefaultResizer(lowerBound = 2,
-                                   upperBound = 10,
-                                   backoffThreshold = 0.3,
-                                   backoffRate = 0.1)
+      val resizer = DefaultResizer(
+        lowerBound = 2,
+        upperBound = 10,
+        backoffThreshold = 0.3,
+        backoffRate = 0.1)
 
       resizer.backoff(pressure = 10, capacity = 10) should ===(0)
       resizer.backoff(pressure = 4, capacity = 10) should ===(0)
@@ -178,13 +180,14 @@ class ResizerSpec
       // make sure the pool starts at the expected lower limit and grows to the upper as needed
       // as influenced by the backlog of blocking pooled actors
 
-      val resizer = DefaultResizer(lowerBound = 3,
-                                   upperBound = 5,
-                                   rampupRate = 0.1,
-                                   backoffRate = 0.0,
-                                   pressureThreshold = 1,
-                                   messagesPerResize = 1,
-                                   backoffThreshold = 0.0)
+      val resizer = DefaultResizer(
+        lowerBound = 3,
+        upperBound = 5,
+        rampupRate = 0.1,
+        backoffRate = 0.0,
+        pressureThreshold = 1,
+        messagesPerResize = 1,
+        backoffThreshold = 0.0)
 
       val router = system.actorOf(
         RoundRobinPool(nrOfInstances = 0, resizer = Some(resizer))
@@ -223,13 +226,14 @@ class ResizerSpec
     }
 
     "backoff" in within(10 seconds) {
-      val resizer = DefaultResizer(lowerBound = 2,
-                                   upperBound = 5,
-                                   rampupRate = 1.0,
-                                   backoffRate = 1.0,
-                                   backoffThreshold = 0.40,
-                                   pressureThreshold = 1,
-                                   messagesPerResize = 2)
+      val resizer = DefaultResizer(
+        lowerBound = 2,
+        upperBound = 5,
+        rampupRate = 1.0,
+        backoffRate = 1.0,
+        backoffThreshold = 0.40,
+        pressureThreshold = 1,
+        messagesPerResize = 2)
 
       val router = system.actorOf(
         RoundRobinPool(nrOfInstances = 0, resizer = Some(resizer))

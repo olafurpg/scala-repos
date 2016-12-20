@@ -74,8 +74,9 @@ class SystemTest {
     }
 
     assertEquals(12, chars.filter(_ == null).length)
-    assertEquals("ab01ab0101ab01ab0101ab0101ab01ab0101ab01",
-                 chars.filter(_ != null).map(_.mkString).mkString)
+    assertEquals(
+      "ab01ab0101ab01ab0101ab0101ab01ab0101ab01",
+      chars.filter(_ != null).map(_.mkString).mkString)
   }
 
   @Test def arraycopy_with_range_overlaps_for_the_same_array(): Unit = {
@@ -125,8 +126,9 @@ class SystemTest {
     val list2 = List(1, 3, 5)
     assertEquals(list2, list1)
     assertEquals(list2.hashCode(), list1.hashCode())
-    assertNotEquals(System.identityHashCode(list1),
-                    System.identityHashCode(list2))
+    assertNotEquals(
+      System.identityHashCode(list1),
+      System.identityHashCode(list2))
   }
 
   @Test def identityHashCode_of_null(): Unit = {

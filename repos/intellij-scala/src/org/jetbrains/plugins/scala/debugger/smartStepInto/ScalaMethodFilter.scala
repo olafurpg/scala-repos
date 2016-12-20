@@ -31,9 +31,10 @@ class ScalaMethodFilter(function: ScMethodLike,
       PsiTreeUtil.getParentOfType(function, classOf[ScTemplateDefinition])
     if (clazz == null) JVMNameUtil.getJVMRawText(unknownName)
     else
-      DebuggerUtil.getClassJVMName(clazz,
-                                   clazz.isInstanceOf[ScObject] ||
-                                     ValueClassType.isValueClass(clazz))
+      DebuggerUtil.getClassJVMName(
+        clazz,
+        clazz.isInstanceOf[ScObject] ||
+          ValueClassType.isValueClass(clazz))
   }
   private val funName = function match {
     case c: ScMethodLike if c.isConstructor => "<init>"
@@ -57,8 +58,9 @@ class ScalaMethodFilter(function: ScMethodLike,
              method.signature() != myTargetMethodSignature.getName(process))
       false
     else {
-      DebuggerUtilsEx.isAssignableFrom(locationTypeName,
-                                       location.declaringType) &&
+      DebuggerUtilsEx.isAssignableFrom(
+        locationTypeName,
+        location.declaringType) &&
       !ScalaPositionManager.shouldSkip(location, process)
     }
   }

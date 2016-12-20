@@ -95,9 +95,10 @@ abstract class SuperAccessors
         clazz.info.decl(supername).suchThat(_.alias == sym) orElse {
           debuglog(s"add super acc ${sym.fullLocationString} to $clazz")
           val acc =
-            clazz.newMethod(supername,
-                            sel.pos,
-                            SUPERACCESSOR | PRIVATE | ARTIFACT) setAlias sym
+            clazz.newMethod(
+              supername,
+              sel.pos,
+              SUPERACCESSOR | PRIVATE | ARTIFACT) setAlias sym
           val tpe = clazz.thisType memberType sym match {
             case t if sym.isModuleNotMethod => NullaryMethodType(t)
             case t => t
@@ -193,13 +194,14 @@ abstract class SuperAccessors
     // otherwise lead to either a compiler crash or runtime failure.
     private lazy val isDisallowed = {
       import definitions._
-      Set[Symbol](Any_isInstanceOf,
-                  Object_isInstanceOf,
-                  Any_asInstanceOf,
-                  Object_asInstanceOf,
-                  Object_==,
-                  Object_!=,
-                  Object_##)
+      Set[Symbol](
+        Any_isInstanceOf,
+        Object_isInstanceOf,
+        Any_asInstanceOf,
+        Object_asInstanceOf,
+        Object_==,
+        Object_!=,
+        Object_##)
     }
 
     override def transform(tree: Tree): Tree = {
@@ -327,17 +329,19 @@ abstract class SuperAccessors
                     isAccessibleFromSuper(sym.alias)) {
                   val result = (localTyper
                     .typedPos(tree.pos) {
-                      Select(Super(qual, tpnme.EMPTY) setPos qual.pos,
-                             sym.alias)
+                      Select(
+                        Super(qual, tpnme.EMPTY) setPos qual.pos,
+                        sym.alias)
                     })
                     .asInstanceOf[Select]
                   debuglog(
                     s"alias replacement: $sym --> ${sym.alias} / $tree ==> $result"); //debug
                   localTyper.typed(
-                    gen.maybeMkAsInstanceOf(transformSuperSelect(result),
-                                            sym.tpe,
-                                            sym.alias.tpe,
-                                            beforeRefChecks = true))
+                    gen.maybeMkAsInstanceOf(
+                      transformSuperSelect(result),
+                      sym.tpe,
+                      sym.alias.tpe,
+                      beforeRefChecks = true))
                 } else {
                   /*
                    * A trait which extends a class and accesses a protected member
@@ -364,9 +368,10 @@ abstract class SuperAccessors
                         sym.fullLocationString + " from " + currentClass)
                     ensureAccessor(sel)
                   } else
-                    mayNeedProtectedAccessor(sel,
-                                             EmptyTree.asList,
-                                             goToSuper = false)
+                    mayNeedProtectedAccessor(
+                      sel,
+                      EmptyTree.asList,
+                      goToSuper = false)
                 }
 
               case Super(_, mix) =>
@@ -376,16 +381,18 @@ abstract class SuperAccessors
                       tree.pos,
                       "super may not be used on " + sym.accessedOrSelf)
                 } else if (isDisallowed(sym)) {
-                  reporter.error(tree.pos,
-                                 "super not allowed here: use this." +
-                                   name.decode + " instead")
+                  reporter.error(
+                    tree.pos,
+                    "super not allowed here: use this." +
+                      name.decode + " instead")
                 }
                 transformSuperSelect(sel)
 
               case _ =>
-                mayNeedProtectedAccessor(sel,
-                                         EmptyTree.asList,
-                                         goToSuper = true)
+                mayNeedProtectedAccessor(
+                  sel,
+                  EmptyTree.asList,
+                  goToSuper = true)
             }
           }
           transformSelect
@@ -499,9 +506,10 @@ abstract class SuperAccessors
         clazz.info
           .decl(accName)
           .suchThat(s => s == NoSymbol || s.tpe =:= accType(s)) orElse {
-          val newAcc = clazz.newMethod(nme.protName(sym.unexpandedName),
-                                       tree.pos,
-                                       newFlags = ARTIFACT)
+          val newAcc = clazz.newMethod(
+            nme.protName(sym.unexpandedName),
+            tree.pos,
+            newFlags = ARTIFACT)
           newAcc setInfoAndEnter accType(newAcc)
 
           val code = DefDef(newAcc, {
@@ -548,8 +556,9 @@ abstract class SuperAccessors
       }
       val result = gen.paramToArg(v)
       if (clazz != NoSymbol && (obj.tpe.typeSymbol isSubClass clazz)) // path-dependent type
-        gen.mkAsInstanceOf(result,
-                           pt.asSeenFrom(singleType(NoPrefix, obj), clazz))
+        gen.mkAsInstanceOf(
+          result,
+          pt.asSeenFrom(singleType(NoPrefix, obj), clazz))
       else result
     }
 
@@ -575,8 +584,9 @@ abstract class SuperAccessors
           val obj :: value :: Nil = params
           storeAccessorDefinition(
             clazz,
-            DefDef(protAcc,
-                   Assign(Select(Ident(obj), field.name), Ident(value))))
+            DefDef(
+              protAcc,
+              Assign(Select(Ident(obj), field.name), Ident(value))))
 
           protAcc
         }
@@ -611,10 +621,11 @@ abstract class SuperAccessors
       val host = hostForAccessorOf(sym, clazz)
       def isSelfType = !(host.tpe <:< host.typeOfThis) && {
         if (host.typeOfThis.typeSymbol.isJavaDefined)
-          restrictionError(pos,
-                           unit,
-                           "%s accesses protected %s from self type %s."
-                             .format(clazz, sym, host.typeOfThis))
+          restrictionError(
+            pos,
+            unit,
+            "%s accesses protected %s from self type %s."
+              .format(clazz, sym, host.typeOfThis))
         true
       }
       def isJavaProtected = host.isTrait && sym.isJavaDefined && {

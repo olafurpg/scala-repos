@@ -65,9 +65,10 @@ class InlinerIllegalAccessTest extends ClearAfterClass {
       for (m <- methods)
         test(
           inliner
-            .findIllegalAccess(m.instructions,
-                               classBTypeFromParsedClassfile(cClass.name),
-                               classBTypeFromParsedClassfile(classNode.name))
+            .findIllegalAccess(
+              m.instructions,
+              classBTypeFromParsedClassfile(cClass.name),
+              classBTypeFromParsedClassfile(classNode.name))
             .map(_._1))
     }
 
@@ -175,9 +176,10 @@ class InlinerIllegalAccessTest extends ClearAfterClass {
               test: Option[AbstractInsnNode] => Unit): Unit = {
       test(
         inliner
-          .findIllegalAccess(method.instructions,
-                             classBTypeFromParsedClassfile(decl.name),
-                             classBTypeFromParsedClassfile(dest.name))
+          .findIllegalAccess(
+            method.instructions,
+            classBTypeFromParsedClassfile(decl.name),
+            classBTypeFromParsedClassfile(dest.name))
           .map(_._1))
     }
 

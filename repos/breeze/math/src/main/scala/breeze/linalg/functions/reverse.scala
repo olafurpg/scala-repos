@@ -26,10 +26,11 @@ object reverse extends UFunc {
           nIndex(i) = sv.length - 1 - sv.index(sv.activeSize - 1 - i)
           i += 1
         }
-        new SparseVector[T](nIndex,
-                            sv.data.take(sv.activeSize).reverse,
-                            sv.activeSize,
-                            sv.length)
+        new SparseVector[T](
+          nIndex,
+          sv.data.take(sv.activeSize).reverse,
+          sv.activeSize,
+          sv.length)
       }
     }
 }

@@ -168,12 +168,14 @@ class ScalaLookupItem(val element: PsiNamedElement,
         presentation.setTailText(tailText + paramClausesText)
       case bind: ScBindingPattern =>
         presentation.setTypeText(
-          presentationString(bind.getType(TypingContext.empty).getOrAny,
-                             substitutor))
+          presentationString(
+            bind.getType(TypingContext.empty).getOrAny,
+            substitutor))
       case f: ScFieldId =>
         presentation.setTypeText(
-          presentationString(f.getType(TypingContext.empty).getOrAny,
-                             substitutor))
+          presentationString(
+            f.getType(TypingContext.empty).getOrAny,
+            substitutor))
       case param: ScParameter =>
         val str: String = presentationString(
           param.getRealParameterType(TypingContext.empty).getOrAny,
@@ -189,8 +191,9 @@ class ScalaLookupItem(val element: PsiNamedElement,
         if (name == "this" || name.endsWith(".this")) {
           clazz match {
             case t: ScTemplateDefinition =>
-              t.getTypeWithProjections(TypingContext.empty,
-                                       thisProjections = true) match {
+              t.getTypeWithProjections(
+                TypingContext.empty,
+                thisProjections = true) match {
                 case Success(tp, _) =>
                   presentation.setTypeText(tp.presentableText)
                 case _ =>
@@ -319,8 +322,9 @@ class ScalaLookupItem(val element: PsiNamedElement,
                   .createExpressionFromText(newRefText, ref.getManager)
                   .asInstanceOf[ScReferenceExpression]
               } else {
-                ref.createReplacingElementWithClassName(useFullyQualifiedName,
-                                                        cl)
+                ref.createReplacingElementWithClassName(
+                  useFullyQualifiedName,
+                  cl)
               }
             case ref: ScStableCodeReferenceElement if prefixCompletion =>
               val parts = cl.qualifiedName.split('.')
@@ -329,8 +333,9 @@ class ScalaLookupItem(val element: PsiNamedElement,
                 ScalaPsiElementFactory
                   .createReferenceFromText(newRefText, ref.getManager)
               } else {
-                ref.createReplacingElementWithClassName(useFullyQualifiedName,
-                                                        cl)
+                ref.createReplacingElementWithClassName(
+                  useFullyQualifiedName,
+                  cl)
               }
             case _ =>
               ref
@@ -405,8 +410,9 @@ class ScalaLookupItem(val element: PsiNamedElement,
                                 containingClass.qualifiedName != null) {
                               ScalaImportTypeFix
                                 .getImportHolder(ref, ref.getProject)
-                                .addImportForPsiNamedElement(elementToImport,
-                                                             null)
+                                .addImportForPsiNamedElement(
+                                  elementToImport,
+                                  null)
                             }
                           case _ =>
                         }

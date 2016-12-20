@@ -272,8 +272,9 @@ object Multipart {
                                      maxHeaderSize: Int)
       extends PushPullStage[ByteString, RawPart] {
 
-    require(boundary.nonEmpty,
-            "'boundary' parameter of multipart Content-Type must be non-empty")
+    require(
+      boundary.nonEmpty,
+      "'boundary' parameter of multipart Content-Type must be non-empty")
     require(
       boundary.charAt(boundary.length - 1) != ' ',
       "'boundary' parameter of multipart Content-Type must not end with a space char")
@@ -386,22 +387,25 @@ object Multipart {
 
           headers match {
             case FileInfoMatcher(partName, fileName, contentType) =>
-              handleFilePart(input,
-                             partStart,
-                             memoryBufferSize + headersSize,
-                             partName,
-                             fileName,
-                             contentType)
+              handleFilePart(
+                input,
+                partStart,
+                memoryBufferSize + headersSize,
+                partName,
+                fileName,
+                contentType)
             case PartInfoMatcher(name) =>
-              handleDataPart(input,
-                             partStart,
-                             memoryBufferSize + name.length,
-                             name)
+              handleDataPart(
+                input,
+                partStart,
+                memoryBufferSize + name.length,
+                name)
             case _ =>
-              handleBadPart(input,
-                            partStart,
-                            memoryBufferSize + headersSize,
-                            headers)
+              handleBadPart(
+                input,
+                partStart,
+                memoryBufferSize + headersSize,
+                headers)
           }
       }
     }
@@ -463,13 +467,15 @@ object Multipart {
           bufferExceeded("Memory buffer full on part " + partName)
         } else if (crlf(input, needleEnd)) {
           emit(
-            DataPart(partName,
-                     input.slice(partStart, currentPartEnd).utf8String))
+            DataPart(
+              partName,
+              input.slice(partStart, currentPartEnd).utf8String))
           parseHeader(input, needleEnd + 2, newMemoryBufferSize)
         } else if (doubleDash(input, needleEnd)) {
           emit(
-            DataPart(partName,
-                     input.slice(partStart, currentPartEnd).utf8String))
+            DataPart(
+              partName,
+              input.slice(partStart, currentPartEnd).utf8String))
           terminate()
         } else {
           fail("Unexpected boundary")

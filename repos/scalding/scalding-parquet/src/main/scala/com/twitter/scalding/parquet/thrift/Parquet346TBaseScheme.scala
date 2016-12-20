@@ -98,10 +98,11 @@ object Parquet346StructTypeRepairer extends StateVisitor[ThriftType, Unit] {
   }
 
   def copyRecurse(field: ThriftField): ThriftField = {
-    new ThriftField(field.getName,
-                    field.getFieldId,
-                    field.getRequirement,
-                    field.getType.accept(this, ()))
+    new ThriftField(
+      field.getName,
+      field.getFieldId,
+      field.getRequirement,
+      field.getType.accept(this, ()))
   }
 
   override def visit(structType: StructType, state: Unit): StructType = {

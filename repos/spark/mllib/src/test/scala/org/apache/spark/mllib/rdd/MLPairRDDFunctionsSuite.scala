@@ -26,16 +26,18 @@ class MLPairRDDFunctionsSuite
     with MLlibTestSparkContext {
   test("topByKey") {
     val topMap = sc
-      .parallelize(Array((1, 7),
-                         (1, 3),
-                         (1, 6),
-                         (1, 1),
-                         (1, 2),
-                         (3, 2),
-                         (3, 7),
-                         (5, 1),
-                         (3, 5)),
-                   2)
+      .parallelize(
+        Array(
+          (1, 7),
+          (1, 3),
+          (1, 6),
+          (1, 1),
+          (1, 2),
+          (3, 2),
+          (3, 7),
+          (5, 1),
+          (3, 5)),
+        2)
       .topByKey(5)
       .collectAsMap()
 

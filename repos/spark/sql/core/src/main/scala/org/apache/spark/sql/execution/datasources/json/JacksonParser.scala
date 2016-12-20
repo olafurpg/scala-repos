@@ -211,8 +211,9 @@ object JacksonParser extends Logging {
     while (nextUntil(parser, JsonToken.END_OBJECT)) {
       schema.getFieldIndex(parser.getCurrentName) match {
         case Some(index) =>
-          row.update(index,
-                     convertField(factory, parser, schema(index).dataType))
+          row.update(
+            index,
+            convertField(factory, parser, schema(index).dataType))
 
         case None =>
           parser.skipChildren()

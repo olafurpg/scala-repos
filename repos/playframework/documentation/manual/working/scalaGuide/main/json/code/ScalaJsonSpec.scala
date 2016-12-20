@@ -155,9 +155,10 @@ class ScalaJsonSpec extends Specification {
 
       implicit val placeWrites = new Writes[Place] {
         def writes(place: Place) =
-          Json.obj("name" -> place.name,
-                   "location" -> place.location,
-                   "residents" -> place.residents)
+          Json.obj(
+            "name" -> place.name,
+            "location" -> place.location,
+            "residents" -> place.residents)
       }
 
       val place = Place(
@@ -227,9 +228,10 @@ class ScalaJsonSpec extends Specification {
       val names = json \\ "name"
       // returns Seq(JsString("Watership Down"), JsString("Fiver"), JsString("Bigwig"))
       //#traverse-recursive-path
-      names === Seq(JsString("Watership Down"),
-                    JsString("Fiver"),
-                    JsString("Bigwig"))
+      names === Seq(
+        JsString("Watership Down"),
+        JsString("Fiver"),
+        JsString("Bigwig"))
 
       //#traverse-array-index
       val bigwig = (json \ "residents")(1)

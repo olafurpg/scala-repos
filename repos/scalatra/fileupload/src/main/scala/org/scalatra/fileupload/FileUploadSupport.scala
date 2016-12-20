@@ -98,8 +98,8 @@ trait FileUploadSupport extends ServletBase {
                 BodyParams(
                   params.fileParams +
                     ((item.getFieldName,
-                      item +: params.fileParams.getOrElse(item.getFieldName,
-                                                          List[FileItem]()))),
+                      item +: params.fileParams
+                        .getOrElse(item.getFieldName, List[FileItem]()))),
                   params.formParams)
           }
         req(BodyParamsKey) = bodyParams

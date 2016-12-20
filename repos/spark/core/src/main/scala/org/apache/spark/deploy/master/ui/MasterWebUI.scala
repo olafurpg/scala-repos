@@ -34,11 +34,12 @@ import org.apache.spark.ui.JettyUtils._
 private[master] class MasterWebUI(val master: Master,
                                   requestedPort: Int,
                                   customMasterPage: Option[MasterPage] = None)
-    extends WebUI(master.securityMgr,
-                  master.securityMgr.getSSLOptions("standalone"),
-                  requestedPort,
-                  master.conf,
-                  name = "MasterUI")
+    extends WebUI(
+      master.securityMgr,
+      master.securityMgr.getSSLOptions("standalone"),
+      requestedPort,
+      master.conf,
+      name = "MasterUI")
     with Logging
     with UIRoot {
 
@@ -59,28 +60,32 @@ private[master] class MasterWebUI(val master: Master,
       createStaticHandler(MasterWebUI.STATIC_RESOURCE_DIR, "/static"))
     attachHandler(ApiRootResource.getServletHandler(this))
     attachHandler(
-      createRedirectHandler("/app/kill",
-                            "/",
-                            masterPage.handleAppKillRequest,
-                            httpMethods = Set("POST")))
+      createRedirectHandler(
+        "/app/kill",
+        "/",
+        masterPage.handleAppKillRequest,
+        httpMethods = Set("POST")))
     attachHandler(
-      createRedirectHandler("/driver/kill",
-                            "/",
-                            masterPage.handleDriverKillRequest,
-                            httpMethods = Set("POST")))
+      createRedirectHandler(
+        "/driver/kill",
+        "/",
+        masterPage.handleDriverKillRequest,
+        httpMethods = Set("POST")))
   }
 
   /** Attach a reconstructed UI to this Master UI. Only valid after bind(). */
   def attachSparkUI(ui: SparkUI) {
-    assert(serverInfo.isDefined,
-           "Master UI must be bound to a server before attaching SparkUIs")
+    assert(
+      serverInfo.isDefined,
+      "Master UI must be bound to a server before attaching SparkUIs")
     ui.getHandlers.foreach(attachHandler)
   }
 
   /** Detach a reconstructed UI from this Master UI. Only valid after bind(). */
   def detachSparkUI(ui: SparkUI) {
-    assert(serverInfo.isDefined,
-           "Master UI must be bound to a server before detaching SparkUIs")
+    assert(
+      serverInfo.isDefined,
+      "Master UI must be bound to a server before detaching SparkUIs")
     ui.getHandlers.foreach(detachHandler)
   }
 

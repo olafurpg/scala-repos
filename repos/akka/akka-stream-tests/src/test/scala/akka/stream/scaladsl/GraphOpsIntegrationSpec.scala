@@ -23,10 +23,11 @@ object GraphOpsIntegrationSpec {
       override def outlets: immutable.Seq[Outlet[_]] = List(out1, out2)
 
       override def deepCopy() =
-        ShufflePorts(in1.carbonCopy(),
-                     in2.carbonCopy(),
-                     out1.carbonCopy(),
-                     out2.carbonCopy())
+        ShufflePorts(
+          in1.carbonCopy(),
+          in2.carbonCopy(),
+          out1.carbonCopy(),
+          out2.carbonCopy())
       override def copyFromPorts(
           inlets: immutable.Seq[Inlet[_]],
           outlets: immutable.Seq[Outlet[_]]): ShufflePorts[In, Out] = {

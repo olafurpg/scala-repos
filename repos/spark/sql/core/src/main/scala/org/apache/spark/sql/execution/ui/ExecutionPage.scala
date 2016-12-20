@@ -33,8 +33,9 @@ private[sql] class ExecutionPage(parent: SQLTab)
   override def render(request: HttpServletRequest): Seq[Node] =
     listener.synchronized {
       val parameterExecutionId = request.getParameter("id")
-      require(parameterExecutionId != null && parameterExecutionId.nonEmpty,
-              "Missing execution id parameter")
+      require(
+        parameterExecutionId != null && parameterExecutionId.nonEmpty,
+        "Missing execution id parameter")
 
       val executionId = parameterExecutionId.toLong
       val content = listener
@@ -91,10 +92,11 @@ private[sql] class ExecutionPage(parent: SQLTab)
           <div>No information to display for Plan {executionId}</div>
         }
 
-      UIUtils.headerSparkPage(s"Details for Query $executionId",
-                              content,
-                              parent,
-                              Some(5000))
+      UIUtils.headerSparkPage(
+        s"Details for Query $executionId",
+        content,
+        parent,
+        Some(5000))
     }
 
   private def planVisualizationResources: Seq[Node] = {

@@ -28,9 +28,10 @@ class FrameGrouper[Z: ST: ORD, X: ST: ORD, Y: ST: ORD, T: ST](
   private lazy val uniq: Array[Z] = {
     val arr = ix.uniques.toArray
     if (sorted && !ix.isMonotonic)
-      array.take(arr,
-                 array.argsort(arr),
-                 sys.error("Logic error in sorting group index"))
+      array.take(
+        arr,
+        array.argsort(arr),
+        sys.error("Logic error in sorting group index"))
     else arr
   }
 
@@ -48,9 +49,10 @@ class FrameGrouper[Z: ST: ORD, X: ST: ORD, Y: ST: ORD, T: ST](
     combine((k, v) => fn(v))
 
   def transform[U: ST](fn: (Z, Vec[T]) => Vec[U]): Frame[X, Y, U] =
-    Frame(frame.values.map(SeriesGrouper.transform(_, groups, fn)),
-          frame.rowIx,
-          frame.colIx)
+    Frame(
+      frame.values.map(SeriesGrouper.transform(_, groups, fn)),
+      frame.rowIx,
+      frame.colIx)
 
   // less powerful transform, ignores group key
   def transform[U: ST](fn: Vec[T] => Vec[U]): Frame[X, Y, U] =

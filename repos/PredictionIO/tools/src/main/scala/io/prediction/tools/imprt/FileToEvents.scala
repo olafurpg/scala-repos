@@ -80,9 +80,10 @@ object FileToEvents extends Logging {
       WorkflowUtils.modifyLogging(verbose = args.verbose)
       @transient lazy implicit val formats =
         Utils.json4sDefaultFormats + new EventJson4sSupport.APISerializer
-      val sc = WorkflowContext(mode = "Import",
-                               batch = "App ID " + args.appId + channelStr,
-                               executorEnv = Runner.envStringToMap(args.env))
+      val sc = WorkflowContext(
+        mode = "Import",
+        batch = "App ID " + args.appId + channelStr,
+        executorEnv = Runner.envStringToMap(args.env))
       val rdd = sc.textFile(args.inputPath).filter(_.trim.nonEmpty).map {
         json =>
           Try(read[Event](json))

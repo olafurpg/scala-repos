@@ -400,26 +400,29 @@ class StackClientTest
       }
     }
 
-    val stack = StackClient
-      .newStack[Unit, Unit]
+    val stack =
+      StackClient
+        .newStack[Unit, Unit]
 
-      // direct the two addresses to the two service factories instead
-      // of trying to connect to them
-      .replace(LoadBalancerFactory.role,
-               new Stack.Module1[LoadBalancerFactory.Dest,
-                                 ServiceFactory[Unit, Unit]] {
-                 val role = new Stack.Role("role")
-                 val description = "description"
-                 def make(dest: LoadBalancerFactory.Dest,
-                          next: ServiceFactory[Unit, Unit]) = {
-                   val LoadBalancerFactory.Dest(va) = dest
-                   va.sample() match {
-                     case Addr.Bound(addrs, _) if addrs == Set(addr1) => fac1
-                     case Addr.Bound(addrs, _) if addrs == Set(addr2) => fac2
-                     case _ => throw new IllegalArgumentException("wat")
-                   }
-                 }
-               })
+        // direct the two addresses to the two service factories instead
+        // of trying to connect to them
+        .replace(
+          LoadBalancerFactory.role,
+          new Stack.Module1[
+            LoadBalancerFactory.Dest,
+            ServiceFactory[Unit, Unit]] {
+            val role = new Stack.Role("role")
+            val description = "description"
+            def make(dest: LoadBalancerFactory.Dest,
+                     next: ServiceFactory[Unit, Unit]) = {
+              val LoadBalancerFactory.Dest(va) = dest
+              va.sample() match {
+                case Addr.Bound(addrs, _) if addrs == Set(addr1) => fac1
+                case Addr.Bound(addrs, _) if addrs == Set(addr2) => fac2
+                case _ => throw new IllegalArgumentException("wat")
+              }
+            }
+          })
 
     val sr = new InMemoryStatsReceiver
 
@@ -541,11 +544,12 @@ class StackClientTest
     val sr = new InMemoryStatsReceiver
     val params =
       Stack.Params.empty + param.Stats(sr) +
-        DefaultPool.Param(low = 0,
-                          high = 2,
-                          bufferSize = 0,
-                          idleTime = Duration.Zero,
-                          maxWaiters = 0) + FactoryToService.Enabled(false) +
+        DefaultPool.Param(
+          low = 0,
+          high = 2,
+          bufferSize = 0,
+          idleTime = Duration.Zero,
+          maxWaiters = 0) + FactoryToService.Enabled(false) +
         PendingRequestFilter.Param(Some(2)) +
         BindingFactory.Dest(Name.Path(Path.read("/$/inet/localhost/0")))
 

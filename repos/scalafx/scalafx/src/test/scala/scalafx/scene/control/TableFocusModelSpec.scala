@@ -39,8 +39,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
 class TableFocusModelSpec[T, TC <: jfxsc.TableColumnBase[T, _]]
-    extends SimpleSFXDelegateSpec[jfxsc.TableFocusModel[T, TC],
-                                  TableFocusModel[T, TC]](
+    extends SimpleSFXDelegateSpec[
+      jfxsc.TableFocusModel[T, TC],
+      TableFocusModel[T, TC]](
       classOf[jfxsc.TableFocusModel[T, TC]],
       classOf[TableFocusModel[T, TC]]) {
 

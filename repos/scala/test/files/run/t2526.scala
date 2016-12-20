@@ -34,8 +34,9 @@ object Test {
       assert(notYetFound.contains(e))
       notYetFound -= e
     }
-    assert(notYetFound.size == 0,
-           "mutable.HashMap.foreach should have iterated over: " + notYetFound)
+    assert(
+      notYetFound.size == 0,
+      "mutable.HashMap.foreach should have iterated over: " + notYetFound)
   }
 
   /*
@@ -51,7 +52,8 @@ object Test {
       assert(notYetFound.contains(e))
       notYetFound -= e
     }
-    assert(notYetFound.size == 0,
-           "mutable.HashMap.foreach should have iterated over: " + notYetFound)
+    assert(
+      notYetFound.size == 0,
+      "mutable.HashMap.foreach should have iterated over: " + notYetFound)
   }
 }

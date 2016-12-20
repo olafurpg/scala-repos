@@ -29,14 +29,16 @@ private[game] final class PaginatorBuilder(cached: Cached, maxPerPage: Int) {
   private def cacheAdapter(selector: JsObject,
                            sort: Sort,
                            nbResults: Fu[Int]): AdapterLike[Game] =
-    new CachedAdapter(adapter = noCacheAdapter(selector, sort),
-                      nbResults = nbResults)
+    new CachedAdapter(
+      adapter = noCacheAdapter(selector, sort),
+      nbResults = nbResults)
 
   private def noCacheAdapter(selector: JsObject,
                              sort: Sort): AdapterLike[Game] =
-    new Adapter(selector = selector,
-                sort = sort,
-                readPreference = readPreference)
+    new Adapter(
+      selector = selector,
+      sort = sort,
+      readPreference = readPreference)
 
   private def paginator(adapter: AdapterLike[Game],
                         page: Int): Fu[Paginator[Game]] =

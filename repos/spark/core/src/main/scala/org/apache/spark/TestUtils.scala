@@ -56,17 +56,19 @@ private[spark] object TestUtils {
                            classpathUrls: Seq[URL] = Seq()): URL = {
     val tempDir = Utils.createTempDir()
     val files1 = for (name <- classNames) yield {
-      createCompiledClass(name,
-                          tempDir,
-                          toStringValue,
-                          classpathUrls = classpathUrls)
+      createCompiledClass(
+        name,
+        tempDir,
+        toStringValue,
+        classpathUrls = classpathUrls)
     }
     val files2 = for ((childName, baseName) <- classNamesWithBase) yield {
-      createCompiledClass(childName,
-                          tempDir,
-                          toStringValue,
-                          baseName,
-                          classpathUrls)
+      createCompiledClass(
+        childName,
+        tempDir,
+        toStringValue,
+        baseName,
+        classpathUrls)
     }
     val jarFile =
       new File(tempDir, "testJar-%s.jar".format(System.currentTimeMillis()))
@@ -141,32 +143,36 @@ private[spark] object TestUtils {
     // build a custom FileManager that controls the output location.
     val options =
       if (classpathUrls.nonEmpty) {
-        Seq("-classpath",
-            classpathUrls.map { _.getFile }.mkString(File.pathSeparator))
+        Seq(
+          "-classpath",
+          classpathUrls.map { _.getFile }.mkString(File.pathSeparator))
       } else {
         Seq()
       }
     compiler
-      .getTask(null,
-               null,
-               null,
-               options.asJava,
-               null,
-               Arrays.asList(sourceFile))
+      .getTask(
+        null,
+        null,
+        null,
+        options.asJava,
+        null,
+        Arrays.asList(sourceFile))
       .call()
 
     val fileName = className + ".class"
     val result = new File(fileName)
-    assert(result.exists(),
-           "Compiled file not found: " + result.getAbsolutePath())
+    assert(
+      result.exists(),
+      "Compiled file not found: " + result.getAbsolutePath())
     val out = new File(destDir, fileName)
 
     // renameTo cannot handle in and out files in different filesystems
     // use google's Files.move instead
     Files.move(result, out)
 
-    assert(out.exists(),
-           "Destination file not moved: " + out.getAbsolutePath())
+    assert(
+      out.exists(),
+      "Destination file not moved: " + out.getAbsolutePath())
     out
   }
 
@@ -198,8 +204,9 @@ private[spark] object TestUtils {
     val spillListener = new SpillListener
     sc.addSparkListener(spillListener)
     body
-    assert(spillListener.numSpilledStages > 0,
-           s"expected $identifier to spill, but did not")
+    assert(
+      spillListener.numSpilledStages > 0,
+      s"expected $identifier to spill, but did not")
   }
 
   /**
@@ -211,8 +218,9 @@ private[spark] object TestUtils {
     val spillListener = new SpillListener
     sc.addSparkListener(spillListener)
     body
-    assert(spillListener.numSpilledStages == 0,
-           s"expected $identifier to not spill, but did")
+    assert(
+      spillListener.numSpilledStages == 0,
+      s"expected $identifier to not spill, but did")
   }
 }
 

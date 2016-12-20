@@ -587,9 +587,10 @@ class HDFSFileCatalog(val sqlContext: SQLContext,
       val boundPredicate = InterpretedPredicate.create(predicate.transform {
         case a: AttributeReference =>
           val index = partitionColumns.indexWhere(a.name == _.name)
-          BoundReference(index,
-                         partitionColumns(index).dataType,
-                         nullable = true)
+          BoundReference(
+            index,
+            partitionColumns(index).dataType,
+            nullable = true)
       })
 
       val selected = partitions.filter {
@@ -662,8 +663,9 @@ class HDFSFileCatalog(val sqlContext: SQLContext,
         // we need to cast into the data type that user specified.
         def castPartitionValuesToUserSchema(row: InternalRow) = {
           InternalRow((0 until row.numFields).map { i =>
-            Cast(Literal.create(row.getUTF8String(i), StringType),
-                 userProvidedSchema.fields(i).dataType).eval()
+            Cast(
+              Literal.create(row.getUTF8String(i), StringType),
+              userProvidedSchema.fields(i).dataType).eval()
           }: _*)
         }
 
@@ -800,23 +802,25 @@ private[sql] object HadoopFsRelation extends Logging {
         Try(listLeafFiles(fs, fs.getFileStatus(path))).getOrElse(Array.empty)
       }
       .map { status =>
-        FakeFileStatus(status.getPath.toString,
-                       status.getLen,
-                       status.isDirectory,
-                       status.getReplication,
-                       status.getBlockSize,
-                       status.getModificationTime,
-                       status.getAccessTime)
+        FakeFileStatus(
+          status.getPath.toString,
+          status.getLen,
+          status.isDirectory,
+          status.getReplication,
+          status.getBlockSize,
+          status.getModificationTime,
+          status.getAccessTime)
       }
       .collect()
 
     val hadoopFakeStatuses = fakeStatuses.map { f =>
-      new FileStatus(f.length,
-                     f.isDir,
-                     f.blockReplication,
-                     f.blockSize,
-                     f.modificationTime,
-                     new Path(f.path))
+      new FileStatus(
+        f.length,
+        f.isDir,
+        f.blockReplication,
+        f.blockSize,
+        f.modificationTime,
+        new Path(f.path))
     }
     mutable.LinkedHashSet(hadoopFakeStatuses: _*)
   }

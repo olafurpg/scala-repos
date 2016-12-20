@@ -87,9 +87,10 @@ object MakeJar {
             })
           }
         } else {
-          getRelativeFileBetween(parent,
-                                 src.getParentFile,
-                                 src.getName :: result)
+          getRelativeFileBetween(
+            parent,
+            src.getParentFile,
+            src.getName :: result)
         }
       }
       case None => None

@@ -26,8 +26,9 @@ object Test extends ScaladocModelTest {
 
     val test1Constants = test1._object("Constants")._method("a").resultType
     assert(test1Constants.name == "Value", test1Constants.name + " == Value")
-    assert(test1Constants.refEntity.size == 1,
-           test1Constants.refEntity.size + " == 1")
+    assert(
+      test1Constants.refEntity.size == 1,
+      test1Constants.refEntity.size + " == 1")
     assert(
       test1Constants.refEntity(0)._1 == LinkToMember(
         test1._object("Constants")._class("Value"),
@@ -39,15 +40,18 @@ object Test extends ScaladocModelTest {
     val test2 = base._package("test2")
     def testDefinition(doc: DocTemplateEntity) = {
       for (day <- List("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) {
-        assert(doc._value(day).resultType.name == "Value",
-               doc._value(day).resultType.name + " == Value")
-        assert(doc._value(day).resultType.refEntity.size == 1,
-               doc._value(day).resultType.refEntity.size + " == 1")
-        assert(doc._value(day).resultType.refEntity(0)._1 == LinkToMember(
-                 doc._classMbr("Value"),
-                 doc),
-               doc._value(day).resultType.refEntity(0)._1 +
-                 " == LinkToMember(" + doc.qualifiedName + ".Value)")
+        assert(
+          doc._value(day).resultType.name == "Value",
+          doc._value(day).resultType.name + " == Value")
+        assert(
+          doc._value(day).resultType.refEntity.size == 1,
+          doc._value(day).resultType.refEntity.size + " == 1")
+        assert(
+          doc._value(day).resultType.refEntity(0)._1 == LinkToMember(
+            doc._classMbr("Value"),
+            doc),
+          doc._value(day).resultType.refEntity(0)._1 +
+            " == LinkToMember(" + doc.qualifiedName + ".Value)")
       }
     }
     testDefinition(test2._trait("WeekDayTrait"))
@@ -72,9 +76,10 @@ object Test extends ScaladocModelTest {
         ("isWorkingDay9", "WeekDayObject.Value", ValueInObject))
 
       for ((method, name, ref) <- expected) {
-        assert(doc._method(method).valueParams(0)(0).resultType.name == name,
-               doc._method(method).valueParams(0)(0).resultType.name + " == " +
-                 name + " (in " + doc + "." + method + ")")
+        assert(
+          doc._method(method).valueParams(0)(0).resultType.name == name,
+          doc._method(method).valueParams(0)(0).resultType.name + " == " +
+            name + " (in " + doc + "." + method + ")")
         assert(
           doc._method(method).valueParams(0)(0).resultType.refEntity.size == 1,
           doc._method(method).valueParams(0)(0).resultType.refEntity.size +
@@ -98,8 +103,9 @@ object Test extends ScaladocModelTest {
     // test3
     val test3 = base._package("test3")
     val foo = test3._method("foo")
-    assert(foo.valueParams(0)(0).resultType.name == "T",
-           foo.valueParams(0)(0).resultType.name + " == T")
+    assert(
+      foo.valueParams(0)(0).resultType.name == "T",
+      foo.valueParams(0)(0).resultType.name + " == T")
     val bar = test3._method("bar")
     assert(
       bar

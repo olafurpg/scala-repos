@@ -181,8 +181,9 @@ sealed case class Reporter(client: Scribe[Future],
       se = se withClient ca
     }
 
-    LogEntry(Reporter.scribeCategory,
-             GZIPStringEncoder.encodeString(se.toJson))
+    LogEntry(
+      Reporter.scribeCategory,
+      GZIPStringEncoder.encodeString(se.toJson))
   }
 
   /**

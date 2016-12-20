@@ -174,10 +174,12 @@ class SizeEstimatorSuite
 
     // TODO: If we sample 100 elements, this should always be 4176 ?
     val estimatedSize = SizeEstimator.estimate(Array.fill(1000)(d1))
-    assert(estimatedSize >= 4000,
-           "Estimated size " + estimatedSize + " should be more than 4000")
-    assert(estimatedSize <= 4200,
-           "Estimated size " + estimatedSize + " should be less than 4200")
+    assert(
+      estimatedSize >= 4000,
+      "Estimated size " + estimatedSize + " should be more than 4000")
+    assert(
+      estimatedSize <= 4200,
+      "Estimated size " + estimatedSize + " should be less than 4200")
   }
 
   test("32-bit arch") {

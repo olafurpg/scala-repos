@@ -31,11 +31,12 @@ object ApplicationID {
   def apply(delegate: xsbti.ApplicationID, newVersion: String): ApplicationID =
     apply(delegate).copy(version = newVersion)
   def apply(delegate: xsbti.ApplicationID): ApplicationID =
-    ApplicationID(delegate.groupID,
-                  delegate.name,
-                  delegate.version,
-                  delegate.mainClass,
-                  delegate.mainComponents,
-                  delegate.crossVersionedValue,
-                  delegate.classpathExtra)
+    ApplicationID(
+      delegate.groupID,
+      delegate.name,
+      delegate.version,
+      delegate.mainClass,
+      delegate.mainComponents,
+      delegate.crossVersionedValue,
+      delegate.classpathExtra)
 }

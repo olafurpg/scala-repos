@@ -141,9 +141,10 @@ package ll {
         .sortBy(_._1.toString) flatMap {
         case (site, xs) =>
           block(fmt(site)) {
-            fmt("type", "seen from prefix", "is") :: fmt("----",
-                                                         "----------------",
-                                                         "--") :: {
+            fmt("type", "seen from prefix", "is") :: fmt(
+              "----",
+              "----------------",
+              "--") :: {
               xs.groupBy(_._2).toList.sortBy(_._1.toString) flatMap {
                 case (tp, ys) =>
                   (ys map {

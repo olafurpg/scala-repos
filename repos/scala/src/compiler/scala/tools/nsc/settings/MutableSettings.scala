@@ -145,9 +145,10 @@ class MutableSettings(val errorFn: String => Unit)
       } else {
         for {
           (p, args) <- StringOps.splitWhere(s, _ == ':', doDropIndex = true)
-          rest <- tryToSetIfExists(p,
-                                   (args split ",").toList,
-                                   (s: Setting) => s.tryToSetColon _)
+          rest <- tryToSetIfExists(
+            p,
+            (args split ",").toList,
+            (s: Setting) => s.tryToSetColon _)
         } yield rest
       }
 
@@ -307,8 +308,9 @@ class MutableSettings(val errorFn: String => Unit)
       */
     def add(srcDir: String, outDir: String): Unit =
       // used in ide?
-      add(checkDir(AbstractFile.getDirectory(srcDir), srcDir),
-          checkDir(AbstractFile.getDirectory(outDir), outDir))
+      add(
+        checkDir(AbstractFile.getDirectory(srcDir), srcDir),
+        checkDir(AbstractFile.getDirectory(outDir), outDir))
 
     /** Check that dir is exists and is a directory. */
     private def checkDir(dir: AbstractFile,
@@ -627,10 +629,11 @@ class MutableSettings(val errorFn: String => Unit)
   /** Set the output directory. */
   class OutputSetting private[nsc] (private[nsc] val outputDirs: OutputDirs,
                                     default: String)
-      extends StringSetting("-d",
-                            "directory|jar",
-                            "destination for generated classfiles.",
-                            default) {
+      extends StringSetting(
+        "-d",
+        "directory|jar",
+        "destination for generated classfiles.",
+        default) {
     value = default
     override def value_=(str: String) {
       super.value_=(str)
@@ -907,11 +910,13 @@ class MutableSettings(val errorFn: String => Unit)
       case Nil => errorAndValue(usageErrorMessage, None)
       case List(x) if choices contains x => value = x; Some(Nil)
       case List(x) =>
-        errorAndValue("'" + x + "' is not a valid choice for '" + name + "'",
-                      None)
+        errorAndValue(
+          "'" + x + "' is not a valid choice for '" + name + "'",
+          None)
       case xs =>
-        errorAndValue("'" + name + "' does not accept multiple arguments.",
-                      None)
+        errorAndValue(
+          "'" + name + "' does not accept multiple arguments.",
+          None)
     }
     def unparse: List[String] =
       if (value == default) Nil else List(name + ":" + value)

@@ -111,8 +111,9 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
         val existing = super.lookupEntry(sym.name)
         def eitherIsMethod(sym1: Symbol, sym2: Symbol) =
           sym1.isMethod || sym2.isMethod
-        assert(existing == null || eitherIsMethod(existing.sym, sym),
-               s"pkgClass = $pkgClass, sym = $sym, existing = $existing")
+        assert(
+          existing == null || eitherIsMethod(existing.sym, sym),
+          s"pkgClass = $pkgClass, sym = $sym, existing = $existing")
         super.enter(sym)
       }
     }
@@ -141,9 +142,10 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
             val loadingMirror = currentMirror.mirrorDefining(cls)
             val (_, module) =
               if (loadingMirror eq currentMirror) {
-                initAndEnterClassAndModule(pkgClass,
-                                           name.toTypeName,
-                                           new TopClassCompleter(_, _))
+                initAndEnterClassAndModule(
+                  pkgClass,
+                  name.toTypeName,
+                  new TopClassCompleter(_, _))
               } else {
                 val origOwner =
                   loadingMirror.packageNameToScala(pkgClass.fullName)

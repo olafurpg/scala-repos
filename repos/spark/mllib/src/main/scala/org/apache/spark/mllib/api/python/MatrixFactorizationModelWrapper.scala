@@ -27,9 +27,10 @@ import org.apache.spark.rdd.RDD
   */
 private[python] class MatrixFactorizationModelWrapper(
     model: MatrixFactorizationModel)
-    extends MatrixFactorizationModel(model.rank,
-                                     model.userFeatures,
-                                     model.productFeatures) {
+    extends MatrixFactorizationModel(
+      model.rank,
+      model.userFeatures,
+      model.productFeatures) {
 
   def predict(userAndProducts: JavaRDD[Array[Any]]): RDD[Rating] =
     predict(SerDe.asTupleRDD(userAndProducts.rdd))

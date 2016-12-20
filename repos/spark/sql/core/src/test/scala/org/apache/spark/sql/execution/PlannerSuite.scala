@@ -63,8 +63,9 @@ class PlannerSuite extends SharedSQLContext {
 
     // For the new aggregation code path, there will be four aggregate operator for
     // distinct aggregations.
-    assert(aggregations.size == 2 || aggregations.size == 4,
-           s"The plan of query $query does not have partial aggregations.")
+    assert(
+      aggregations.size == 2 || aggregations.size == 4,
+      s"The plan of query $query does not have partial aggregations.")
   }
 
   test("count is partially aggregated") {
@@ -135,9 +136,10 @@ class PlannerSuite extends SharedSQLContext {
         IntegerType,
         StringType,
         true) :: MapType(IntegerType, ArrayType(DoubleType), false) :: StructType(
-        Seq(StructField("a", IntegerType, nullable = true),
-            StructField("b", ArrayType(DoubleType), nullable = false),
-            StructField("c", DoubleType, nullable = false))) :: Nil
+        Seq(
+          StructField("a", IntegerType, nullable = true),
+          StructField("b", ArrayType(DoubleType), nullable = false),
+          StructField("c", DoubleType, nullable = false))) :: Nil
 
     withSQLConf(SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key -> "901617") {
       checkPlan(complexTypes)
@@ -490,10 +492,10 @@ class PlannerSuite extends SharedSQLContext {
     assert(!childPartitioning.satisfies(distribution))
     val inputPlan = ShuffleExchange(
       finalPartitioning,
-      DummySparkPlan(children = DummySparkPlan(
-                         outputPartitioning = childPartitioning) :: Nil,
-                     requiredChildDistribution = Seq(distribution),
-                     requiredChildOrdering = Seq(Seq.empty)),
+      DummySparkPlan(
+        children = DummySparkPlan(outputPartitioning = childPartitioning) :: Nil,
+        requiredChildDistribution = Seq(distribution),
+        requiredChildOrdering = Seq(Seq.empty)),
       None)
 
     val outputPlan =
@@ -513,10 +515,10 @@ class PlannerSuite extends SharedSQLContext {
     assert(!childPartitioning.satisfies(distribution))
     val inputPlan = ShuffleExchange(
       finalPartitioning,
-      DummySparkPlan(children = DummySparkPlan(
-                         outputPartitioning = childPartitioning) :: Nil,
-                     requiredChildDistribution = Seq(distribution),
-                     requiredChildOrdering = Seq(Seq.empty)),
+      DummySparkPlan(
+        children = DummySparkPlan(outputPartitioning = childPartitioning) :: Nil,
+        requiredChildDistribution = Seq(distribution),
+        requiredChildOrdering = Seq(Seq.empty)),
       None)
 
     val outputPlan =
@@ -536,18 +538,19 @@ class PlannerSuite extends SharedSQLContext {
     assert(!childPartitioning.satisfies(distribution))
     val shuffle = ShuffleExchange(
       finalPartitioning,
-      DummySparkPlan(children = DummySparkPlan(
-                         outputPartitioning = childPartitioning) :: Nil,
-                     requiredChildDistribution = Seq(distribution),
-                     requiredChildOrdering = Seq(Seq.empty)),
+      DummySparkPlan(
+        children = DummySparkPlan(outputPartitioning = childPartitioning) :: Nil,
+        requiredChildDistribution = Seq(distribution),
+        requiredChildOrdering = Seq(Seq.empty)),
       None)
 
-    val inputPlan = SortMergeJoin(Literal(1) :: Nil,
-                                  Literal(1) :: Nil,
-                                  Inner,
-                                  None,
-                                  shuffle,
-                                  shuffle)
+    val inputPlan = SortMergeJoin(
+      Literal(1) :: Nil,
+      Literal(1) :: Nil,
+      Inner,
+      None,
+      shuffle,
+      shuffle)
 
     val outputPlan =
       ReuseExchange(sqlContext.sessionState.conf).apply(inputPlan)
@@ -560,12 +563,13 @@ class PlannerSuite extends SharedSQLContext {
 
     // nested exchanges
     val inputPlan2 =
-      SortMergeJoin(Literal(1) :: Nil,
-                    Literal(1) :: Nil,
-                    Inner,
-                    None,
-                    ShuffleExchange(finalPartitioning, inputPlan),
-                    ShuffleExchange(finalPartitioning, inputPlan))
+      SortMergeJoin(
+        Literal(1) :: Nil,
+        Literal(1) :: Nil,
+        Inner,
+        None,
+        ShuffleExchange(finalPartitioning, inputPlan),
+        ShuffleExchange(finalPartitioning, inputPlan))
 
     val outputPlan2 =
       ReuseExchange(sqlContext.sessionState.conf).apply(inputPlan2)

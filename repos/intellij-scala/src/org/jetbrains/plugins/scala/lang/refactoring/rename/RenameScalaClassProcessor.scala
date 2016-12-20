@@ -146,10 +146,11 @@ class ScalaClassRenameDialog(project: Project,
                              editor: Editor)
     extends {
   private val chbRenameCompanion: JCheckBox = new JCheckBox("", true)
-} with RenameDialog(project: Project,
-                    psiElement: PsiElement,
-                    nameSuggestionContext: PsiElement,
-                    editor: Editor) {
+} with RenameDialog(
+  project: Project,
+  psiElement: PsiElement,
+  nameSuggestionContext: PsiElement,
+  editor: Editor) {
 
   override def createCenterPanel(): JComponent = {
 

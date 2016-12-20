@@ -155,20 +155,21 @@ class BigIntegerAddTest {
     val bBytes = Array[Byte](10, 20, 30, 40, 50, 60, 70, 10, 20, 30)
     val aSign = -1
     val bSign = -1
-    val rBytes = Array[Byte](-2,
-                             -3,
-                             -4,
-                             -5,
-                             -16,
-                             -27,
-                             -38,
-                             -42,
-                             -53,
-                             -64,
-                             -75,
-                             -16,
-                             -27,
-                             -37)
+    val rBytes = Array[Byte](
+      -2,
+      -3,
+      -4,
+      -5,
+      -16,
+      -27,
+      -38,
+      -42,
+      -53,
+      -64,
+      -75,
+      -16,
+      -27,
+      -37)
     val aNumber = new BigInteger(aSign, aBytes)
     val bNumber = new BigInteger(bSign, bBytes)
     val result = aNumber.add(bNumber)

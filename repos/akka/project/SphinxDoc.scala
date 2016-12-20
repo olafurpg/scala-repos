@@ -54,12 +54,13 @@ object SphinxDoc {
          preprocessVars in Sphinx,
          streams) map { (orig, src, target, cacheDir, exts, vars, s) =>
           val contribSrc = Map("contribSrc" -> "../../../akka-contrib")
-          simplePreprocess(src / "docs",
-                           target / "contrib",
-                           cacheDir / "sphinx" / "preprocessed-contrib",
-                           exts,
-                           vars ++ contribSrc,
-                           s.log)
+          simplePreprocess(
+            src / "docs",
+            target / "contrib",
+            cacheDir / "sphinx" / "preprocessed-contrib",
+            exts,
+            vars ++ contribSrc,
+            s.log)
           orig
         },
       enableOutput in generatePdf in Sphinx := true,
@@ -108,12 +109,13 @@ object SphinxDoc {
            preprocessExts,
            preprocessVars,
            streams) map { (src, target, cacheDir, exts, vars, s) =>
-            simplePreprocess(src,
-                             target,
-                             cacheDir / "sphinx" / "preprocessed",
-                             exts,
-                             vars,
-                             s.log)
+            simplePreprocess(
+              src,
+              target,
+              cacheDir / "sphinx" / "preprocessed",
+              exts,
+              vars,
+              s.log)
           },
         sphinxInputs <<= (sphinxInputs, preprocess) map {
           (inputs, preprocessed) =>

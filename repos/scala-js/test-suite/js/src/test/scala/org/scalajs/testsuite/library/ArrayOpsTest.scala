@@ -63,15 +63,17 @@ class ArrayOpsTest {
   @Test def reduceLeft(): Unit = {
     val array = js.Array(100, 6, 2, 56, -1)
     assertEquals(37, array.reduceLeft(_ - _))
-    assertThrows(classOf[UnsupportedOperationException],
-                 js.Array[Int]().reduceLeft(_ + _))
+    assertThrows(
+      classOf[UnsupportedOperationException],
+      js.Array[Int]().reduceLeft(_ + _))
   }
 
   @Test def reduceRight(): Unit = {
     val array = js.Array("hello", "world")
     assertEquals("hello, world", array.reduceRight(_ + ", " + _))
-    assertThrows(classOf[UnsupportedOperationException],
-                 js.Array[Int]().reduceRight(_ + _))
+    assertThrows(
+      classOf[UnsupportedOperationException],
+      js.Array[Int]().reduceRight(_ + _))
   }
 
   @Test def ++(): Unit = {

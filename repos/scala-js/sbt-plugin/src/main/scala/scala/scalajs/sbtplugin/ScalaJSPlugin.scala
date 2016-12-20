@@ -185,9 +185,10 @@ object ScalaJSPlugin extends AutoPlugin {
       "The JS console used by the Scala.js runner/tester",
       DTask)
 
-    val scalaJSUseRhino = SettingKey[Boolean]("scalaJSUseRhino",
-                                              "Whether Rhino should be used",
-                                              APlusSetting)
+    val scalaJSUseRhino = SettingKey[Boolean](
+      "scalaJSUseRhino",
+      "Whether Rhino should be used",
+      APlusSetting)
 
     val jsEnv = TaskKey[JSEnv](
       "jsEnv",
@@ -236,9 +237,10 @@ object ScalaJSPlugin extends AutoPlugin {
       "Configurable semantics of Scala.js.",
       BPlusSetting)
 
-    val scalaJSOutputMode = SettingKey[OutputMode]("scalaJSOutputMode",
-                                                   "Output mode of Scala.js.",
-                                                   BPlusSetting)
+    val scalaJSOutputMode = SettingKey[OutputMode](
+      "scalaJSOutputMode",
+      "Output mode of Scala.js.",
+      BPlusSetting)
 
     val jsDependencyFilter = SettingKey[DependencyFilter](
       "jsDependencyFilter",

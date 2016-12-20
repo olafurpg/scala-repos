@@ -51,8 +51,9 @@ trait AccountService {
               updateAccount(x.copy(fullName = ldapUserInfo.fullName))
             } else {
               updateAccount(
-                x.copy(mailAddress = ldapUserInfo.mailAddress,
-                       fullName = ldapUserInfo.fullName))
+                x.copy(
+                  mailAddress = ldapUserInfo.mailAddress,
+                  fullName = ldapUserInfo.fullName))
             }
             getAccountByUserName(ldapUserInfo.userName)
           }
@@ -73,12 +74,13 @@ trait AccountService {
                 defaultAuthentication(userName, password)
               }
               case None => {
-                createAccount(ldapUserInfo.userName,
-                              "",
-                              ldapUserInfo.fullName,
-                              ldapUserInfo.mailAddress,
-                              false,
-                              None)
+                createAccount(
+                  ldapUserInfo.userName,
+                  "",
+                  ldapUserInfo.fullName,
+                  ldapUserInfo.mailAddress,
+                  false,
+                  None)
                 getAccountByUserName(ldapUserInfo.userName)
               }
             }
@@ -140,18 +142,19 @@ trait AccountService {
                     mailAddress: String,
                     isAdmin: Boolean,
                     url: Option[String])(implicit s: Session): Unit =
-    Accounts insert Account(userName = userName,
-                            password = password,
-                            fullName = fullName,
-                            mailAddress = mailAddress,
-                            isAdmin = isAdmin,
-                            url = url,
-                            registeredDate = currentDate,
-                            updatedDate = currentDate,
-                            lastLoginDate = None,
-                            image = None,
-                            isGroupAccount = false,
-                            isRemoved = false)
+    Accounts insert Account(
+      userName = userName,
+      password = password,
+      fullName = fullName,
+      mailAddress = mailAddress,
+      isAdmin = isAdmin,
+      url = url,
+      registeredDate = currentDate,
+      updatedDate = currentDate,
+      lastLoginDate = None,
+      image = None,
+      isGroupAccount = false,
+      isRemoved = false)
 
   def updateAccount(account: Account)(implicit s: Session): Unit =
     Accounts
@@ -169,15 +172,16 @@ trait AccountService {
          a.lastLoginDate.?,
          a.removed)
       }
-      .update(account.password,
-              account.fullName,
-              account.mailAddress,
-              account.isAdmin,
-              account.url,
-              account.registeredDate,
-              currentDate,
-              account.lastLoginDate,
-              account.isRemoved)
+      .update(
+        account.password,
+        account.fullName,
+        account.mailAddress,
+        account.isAdmin,
+        account.url,
+        account.registeredDate,
+        currentDate,
+        account.lastLoginDate,
+        account.isRemoved)
 
   def updateAvatarImage(userName: String, image: Option[String])(
       implicit s: Session): Unit =
@@ -191,18 +195,19 @@ trait AccountService {
 
   def createGroup(groupName: String, url: Option[String])(
       implicit s: Session): Unit =
-    Accounts insert Account(userName = groupName,
-                            password = "",
-                            fullName = groupName,
-                            mailAddress = groupName + "@devnull",
-                            isAdmin = false,
-                            url = url,
-                            registeredDate = currentDate,
-                            updatedDate = currentDate,
-                            lastLoginDate = None,
-                            image = None,
-                            isGroupAccount = true,
-                            isRemoved = false)
+    Accounts insert Account(
+      userName = groupName,
+      password = "",
+      fullName = groupName,
+      mailAddress = groupName + "@devnull",
+      isAdmin = false,
+      url = url,
+      registeredDate = currentDate,
+      updatedDate = currentDate,
+      lastLoginDate = None,
+      image = None,
+      isGroupAccount = true,
+      isRemoved = false)
 
   def updateGroup(groupName: String, url: Option[String], removed: Boolean)(
       implicit s: Session): Unit =

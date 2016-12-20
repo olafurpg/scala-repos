@@ -17,8 +17,9 @@ import java.util.concurrent.atomic.AtomicInteger
 case class OpenConnectionsThresholds(lowWaterMark: Int,
                                      highWaterMark: Int,
                                      idleTimeout: Duration) {
-  require(lowWaterMark <= highWaterMark,
-          "lowWaterMark must be <= highWaterMark")
+  require(
+    lowWaterMark <= highWaterMark,
+    "lowWaterMark must be <= highWaterMark")
 }
 
 object IdleConnectionFilter {

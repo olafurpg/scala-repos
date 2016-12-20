@@ -370,18 +370,20 @@ private[spark] object SerDe {
             val key = entry.getKey
             val value = entry.getValue
 
-            writeKeyValue(dos,
-                          key.asInstanceOf[Object],
-                          value.asInstanceOf[Object])
+            writeKeyValue(
+              dos,
+              key.asInstanceOf[Object],
+              value.asInstanceOf[Object])
           }
         case v: scala.collection.Map[_, _] =>
           writeType(dos, "map")
           writeInt(dos, v.size)
           v.foreach {
             case (key, value) =>
-              writeKeyValue(dos,
-                            key.asInstanceOf[Object],
-                            value.asInstanceOf[Object])
+              writeKeyValue(
+                dos,
+                key.asInstanceOf[Object],
+                value.asInstanceOf[Object])
           }
 
         case _ =>

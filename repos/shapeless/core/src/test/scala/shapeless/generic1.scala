@@ -105,8 +105,9 @@ package Generic1TestsAux {
           icc.pack(
             icc
               .unpack(fa)
-              .fold(hd => Left(icc.fh.map(hd)(f)),
-                    tl => Right(icc.ft.map(tl)(f))))
+              .fold(
+                hd => Left(icc.fh.map(hd)(f)),
+                tl => Right(icc.ft.map(tl)(f))))
       }
 
     implicit def generic[F[_]](
@@ -315,11 +316,9 @@ class Generic1Tests {
     typed[
       Id[Int] :: String :: (Int, Int) :: List[Option[Int]] :: Option[Int] :: List[
         Int] :: HNil](tl)
-    assertEquals(13 :: "foo" :: (7, 13) :: List(Some(5)) :: Some(11) :: List(
-                   1,
-                   2,
-                   3) :: HNil,
-                 tl)
+    assertEquals(
+      13 :: "foo" :: (7, 13) :: List(Some(5)) :: Some(11) :: List(1, 2, 3) :: HNil,
+      tl)
 
     val cons = ihc.pack((hd, tl))
     typed[L[Int]](cons)

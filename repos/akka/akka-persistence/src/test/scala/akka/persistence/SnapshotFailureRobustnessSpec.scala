@@ -158,10 +158,9 @@ class SnapshotFailureRobustnessSpec
       expectMsg(1)
       p ! DeleteSnapshot(1)
       expectMsgPF() {
-        case DeleteSnapshotFailure(SnapshotMetadata(`persistenceId`,
-                                                    1,
-                                                    timestamp),
-                                   cause) ⇒
+        case DeleteSnapshotFailure(
+            SnapshotMetadata(`persistenceId`, 1, timestamp),
+            cause) ⇒
           // ok, expected failure
           cause.getMessage should include("Failed to delete")
       }

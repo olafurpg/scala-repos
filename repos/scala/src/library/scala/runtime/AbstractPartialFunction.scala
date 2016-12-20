@@ -23,16 +23,18 @@ package runtime
   *  @author  Pavel Pavlov
   *  @since   2.10
   */
-abstract class AbstractPartialFunction[@specialized(scala.Int,
-                                                    scala.Long,
-                                                    scala.Float,
-                                                    scala.Double) -T1,
-                                       @specialized(scala.Unit,
-                                                    scala.Boolean,
-                                                    scala.Int,
-                                                    scala.Float,
-                                                    scala.Long,
-                                                    scala.Double) +R]
+abstract class AbstractPartialFunction[@specialized(
+                                         scala.Int,
+                                         scala.Long,
+                                         scala.Float,
+                                         scala.Double) -T1,
+                                       @specialized(
+                                         scala.Unit,
+                                         scala.Boolean,
+                                         scala.Int,
+                                         scala.Float,
+                                         scala.Long,
+                                         scala.Double) +R]
     extends Function1[T1, R]
     with PartialFunction[T1, R] { self =>
   // this method must be overridden for better performance,

@@ -88,16 +88,19 @@ class GraphBalanceSpec extends AkkaSpec {
       val s1 = TestSubscriber.manualProbe[Int]()
 
       val (p2, p3) = RunnableGraph
-        .fromGraph(GraphDSL.create(Sink.asPublisher[Int](false),
-                                   Sink.asPublisher[Int](false))(Keep.both) {
-          implicit b ⇒ (p2Sink, p3Sink) ⇒
-            val balance = b.add(Balance[Int](3, waitForAllDownstreams = true))
-            Source(List(1, 2, 3)) ~> balance.in
-            balance.out(0) ~> Sink.fromSubscriber(s1)
-            balance.out(1) ~> p2Sink
-            balance.out(2) ~> p3Sink
-            ClosedShape
-        })
+        .fromGraph(
+          GraphDSL.create(
+            Sink.asPublisher[Int](false),
+            Sink.asPublisher[Int](false))(Keep.both) {
+            implicit b ⇒ (p2Sink, p3Sink) ⇒
+              val balance =
+                b.add(Balance[Int](3, waitForAllDownstreams = true))
+              Source(List(1, 2, 3)) ~> balance.in
+              balance.out(0) ~> Sink.fromSubscriber(s1)
+              balance.out(1) ~> p2Sink
+              balance.out(2) ~> p3Sink
+              ClosedShape
+          })
         .run()
 
       val sub1 = s1.expectSubscription()

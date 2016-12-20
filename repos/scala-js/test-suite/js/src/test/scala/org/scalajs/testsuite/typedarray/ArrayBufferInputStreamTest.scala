@@ -63,8 +63,9 @@ trait ArrayBufferInputStreamTest {
     val buf = new Array[Byte](20)
 
     assertEquals(5, stream.read(buf, 10, 5))
-    assertArrayEquals(byteArray(Seq.fill(10)(0) ++ (1 to 5) ++ Seq.fill(5)(0)),
-                      buf)
+    assertArrayEquals(
+      byteArray(Seq.fill(10)(0) ++ (1 to 5) ++ Seq.fill(5)(0)),
+      buf)
 
     assertEquals(20, stream.read(buf, 0, 20))
     assertArrayEquals(byteArray(6 to 25), buf)

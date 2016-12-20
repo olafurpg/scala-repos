@@ -30,9 +30,10 @@ class PackageSplitLinesProcessor extends SmartEnterProcessor {
         if (dotIndex == -1) false
         else {
           val tail = line.substring(dotIndex + 1)
-          document.replaceString(start + dotIndex,
-                                 end,
-                                 "\n%spackage %s".format(prefix, tail))
+          document.replaceString(
+            start + dotIndex,
+            end,
+            "\n%spackage %s".format(prefix, tail))
           true
         }
       case _ => false

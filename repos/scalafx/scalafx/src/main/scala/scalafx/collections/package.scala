@@ -108,8 +108,9 @@ package object collections {
   def fillSFXCollectionWithOne[J <: Object](
       originalList: jfxc.ObservableList[J],
       element: SFXDelegate[J]) {
-    this.internalFillerWithOne(originalList,
-                               element,
-                               (s: SFXDelegate[J]) => s.delegate)
+    this.internalFillerWithOne(
+      originalList,
+      element,
+      (s: SFXDelegate[J]) => s.delegate)
   }
 }

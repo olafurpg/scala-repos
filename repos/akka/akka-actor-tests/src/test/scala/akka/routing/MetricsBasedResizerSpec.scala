@@ -145,8 +145,9 @@ class MetricsBasedResizerSpec
       val resizer = DefaultOptimalSizeExploringResizer()
       resizer.record = ResizeRecord(
         underutilizationStreak = Some(
-          UnderUtilizationStreak(start = LocalDateTime.now.minusHours(1),
-                                 highestUtilization = 1)))
+          UnderUtilizationStreak(
+            start = LocalDateTime.now.minusHours(1),
+            highestUtilization = 1)))
 
       val router = TestRouter(routees(2))
       router.sendToAll(await = true)
@@ -172,8 +173,9 @@ class MetricsBasedResizerSpec
       val resizer = DefaultOptimalSizeExploringResizer()
       resizer.record = ResizeRecord(
         underutilizationStreak = Some(
-          UnderUtilizationStreak(start = LocalDateTime.now,
-                                 highestUtilization = 2)))
+          UnderUtilizationStreak(
+            start = LocalDateTime.now,
+            highestUtilization = 2)))
 
       val router = TestRouter(routees(2))
       router.mockSend(await = true)
@@ -188,8 +190,9 @@ class MetricsBasedResizerSpec
       val resizer = DefaultOptimalSizeExploringResizer()
       resizer.record = ResizeRecord(
         underutilizationStreak = Some(
-          UnderUtilizationStreak(start = LocalDateTime.now,
-                                 highestUtilization = 1)))
+          UnderUtilizationStreak(
+            start = LocalDateTime.now,
+            highestUtilization = 1)))
 
       val router = TestRouter(routees(3))
       router.mockSend(await = true, routeeIdx = 0)
@@ -216,9 +219,10 @@ class MetricsBasedResizerSpec
 
     "not record the performance log when no message is processed" in {
       val resizer = DefaultOptimalSizeExploringResizer()
-      resizer.record = ResizeRecord(totalQueueLength = 2,
-                                    messageCount = 2,
-                                    checkTime = System.nanoTime())
+      resizer.record = ResizeRecord(
+        totalQueueLength = 2,
+        messageCount = 2,
+        checkTime = System.nanoTime())
 
       val router = TestRouter(routees(2))
 
@@ -306,14 +310,15 @@ class MetricsBasedResizerSpec
   "MetricsBasedResizer resize" must {
     "downsize to close to the highest retention when a streak of underutilization started downsizeAfterUnderutilizedFor" in {
       val resizer =
-        DefaultOptimalSizeExploringResizer(downsizeAfterUnderutilizedFor =
-                                             72.hours,
-                                           downsizeRatio = 0.5)
+        DefaultOptimalSizeExploringResizer(
+          downsizeAfterUnderutilizedFor = 72.hours,
+          downsizeRatio = 0.5)
 
       resizer.record = ResizeRecord(
         underutilizationStreak = Some(
-          UnderUtilizationStreak(start = LocalDateTime.now.minusHours(73),
-                                 highestUtilization = 8)))
+          UnderUtilizationStreak(
+            start = LocalDateTime.now.minusHours(73),
+            highestUtilization = 8)))
       resizer.resize(routees(20)) should be(4 - 20)
     }
 
@@ -334,9 +339,9 @@ class MetricsBasedResizerSpec
     }
 
     "explore when there is performance log but not go beyond exploreStepSize" in {
-      val resizer = DefaultOptimalSizeExploringResizer(exploreStepSize = 0.3,
-                                                       explorationProbability =
-                                                         1)
+      val resizer = DefaultOptimalSizeExploringResizer(
+        exploreStepSize = 0.3,
+        explorationProbability = 1)
       resizer.performanceLog = Map(11 → 1.milli, 13 → 1.millis, 12 → 3.millis)
 
       val exploreSamples = (1 to 100).map(_ ⇒ resizer.resize(routees(10)))
@@ -361,12 +366,13 @@ class MetricsBasedResizerSpec
       val resizer = DefaultOptimalSizeExploringResizer(
         explorationProbability = 0,
         numOfAdjacentSizesToConsiderDuringOptimization = 4)
-      resizer.performanceLog = Map(7 → 5.millis,
-                                   8 → 2.millis,
-                                   10 → 3.millis,
-                                   11 → 4.millis,
-                                   12 → 3.millis,
-                                   13 → 1.millis)
+      resizer.performanceLog = Map(
+        7 → 5.millis,
+        8 → 2.millis,
+        10 → 3.millis,
+        11 → 4.millis,
+        12 → 3.millis,
+        13 → 1.millis)
 
       resizer.resize(routees(10)) should be(-1)
     }

@@ -57,8 +57,9 @@ abstract class AutoOps {
 
   def binop[A](name: String, x: String = "x", y: String = "y"): c.Expr[A] =
     c.Expr[A](
-      Apply(Select(Ident(termName(c)(x)), termName(c)(name)),
-            List(Ident(termName(c)(y)))))
+      Apply(
+        Select(Ident(termName(c)(x)), termName(c)(name)),
+        List(Ident(termName(c)(y)))))
 
   def binopSearch[A: c.WeakTypeTag](names: List[String],
                                     x: String = "x",
@@ -102,8 +103,9 @@ abstract class AutoOps {
   }
 
   def failedSearch(name: String, op: String): c.Expr[Nothing] =
-    c.abort(c.enclosingPosition,
-            "Couldn't find matching method for op %s (%s)." format (name, op))
+    c.abort(
+      c.enclosingPosition,
+      "Couldn't find matching method for op %s (%s)." format (name, op))
 }
 
 abstract class AutoAlgebra extends AutoOps { ops =>
@@ -224,8 +226,9 @@ case class ScalaAlgebra[C <: Context](c: C) extends AutoAlgebra {
   def times[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$times")
   def negate[A: c.WeakTypeTag]: c.Expr[A] = unop[A]("unary_$minus")
   def quot[A: c.WeakTypeTag]: c.Expr[A] =
-    binopSearch[A]("quot" :: "$div" :: Nil) getOrElse failedSearch("quot",
-                                                                   "/~")
+    binopSearch[A]("quot" :: "$div" :: Nil) getOrElse failedSearch(
+      "quot",
+      "/~")
   def div[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$div")
   def mod[A: c.WeakTypeTag](stub: => c.Expr[A]): c.Expr[A] =
     binop[A]("$percent")
@@ -252,8 +255,9 @@ case class JavaAlgebra[C <: Context](c: C) extends AutoAlgebra {
       // for JScience's Rational :(
       import c.universe._
       c.Expr[A](
-        Apply(Select(Ident(termName(c)("zero")), termName(c)("minus")),
-              List(Ident(termName(c)("x")))))
+        Apply(
+          Select(Ident(termName(c)("zero")), termName(c)("minus")),
+          List(Ident(termName(c)("x")))))
     }
   def quot[A: c.WeakTypeTag]: c.Expr[A] =
     binopSearch[A]("quot" :: "divide" :: "div" :: Nil) getOrElse failedSearch(

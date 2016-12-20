@@ -539,13 +539,16 @@ class LazyMacros(val c: whitebox.Context)
       override def transform(tree: Tree): Tree = {
         super.transform {
           tree match {
-            case UnApply(Apply(Select(qual, nme.unapply | nme.unapplySeq),
-                               List(Ident(nme.SELECTOR_DUMMY))),
-                         args) =>
+            case UnApply(
+                Apply(
+                  Select(qual, nme.unapply | nme.unapplySeq),
+                  List(Ident(nme.SELECTOR_DUMMY))),
+                args) =>
               Apply(transform(qual), transformTrees(args))
             case UnApply(
-                Apply(TypeApply(Select(qual, nme.unapply | nme.unapplySeq), _),
-                      List(Ident(nme.SELECTOR_DUMMY))),
+                Apply(
+                  TypeApply(Select(qual, nme.unapply | nme.unapplySeq), _),
+                  List(Ident(nme.SELECTOR_DUMMY))),
                 args) =>
               Apply(transform(qual), transformTrees(args))
             case t => t

@@ -34,8 +34,9 @@ class SecurityDirectivesSpec extends RoutingSpec {
       Get() ~> {
         dontBasicAuth { echoComplete }
       } ~> check {
-        rejection shouldEqual AuthenticationFailedRejection(CredentialsMissing,
-                                                            challenge)
+        rejection shouldEqual AuthenticationFailedRejection(
+          CredentialsMissing,
+          challenge)
       }
     }
     "reject unauthenticated requests with Authorization header with an AuthenticationFailedRejection" in {
@@ -95,8 +96,9 @@ class SecurityDirectivesSpec extends RoutingSpec {
       Get() ~> {
         dontOAuth2Auth { echoComplete }
       } ~> check {
-        rejection shouldEqual AuthenticationFailedRejection(CredentialsMissing,
-                                                            challenge)
+        rejection shouldEqual AuthenticationFailedRejection(
+          CredentialsMissing,
+          challenge)
       }
     }
     "reject unauthenticated requests with Authorization header with an AuthenticationFailedRejection" in {

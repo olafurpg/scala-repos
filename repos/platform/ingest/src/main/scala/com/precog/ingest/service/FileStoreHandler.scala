@@ -61,8 +61,9 @@ class FileStoreHandler(serviceLocation: ServiceLocation,
                        eventStore: EventStore[Future],
                        ingestTimeout: Timeout)(implicit val M: Monad[Future],
                                                executor: ExecutionContext)
-    extends CustomHttpService[ByteChunk,
-                              (APIKey, Path) => Future[HttpResponse[JValue]]]
+    extends CustomHttpService[
+      ByteChunk,
+      (APIKey, Path) => Future[HttpResponse[JValue]]]
     with IngestSupport
     with Logging {
 
@@ -134,66 +135,67 @@ class FileStoreHandler(serviceLocation: ServiceLocation,
             val timestamp = clock.now()
             val fullPath = pathf(path)
 
-            findRequestWriteAuthorities(request,
-                                        apiKey,
-                                        fullPath,
-                                        Some(timestamp.toInstant)) {
-              authorities =>
-                request.content map { content =>
-                  (for {
-                    jobId <- jobManager
-                      .createJob(apiKey,
-                                 "ingest-" + path,
-                                 "ingest",
-                                 None,
-                                 Some(timestamp))
-                      .map(_.id)
-                      .leftMap { errors =>
-                        logger.error(
-                          "File creation failed due to errors in job service: " +
-                            errors)
-                        serverError(errors)
-                      }
-                    bytes <- EitherT {
-                      // FIXME: This should only read at most approximately the upload limit,
-                      // so we don't read GB of data into memory from users.
-                      ByteChunk.forceByteArray(content) map {
-                        // TODO: Raise/remove this limit
-                        case b if b.length > 614400 =>
-                          logger.error(
-                            "Rejecting excessive file upload of size %d"
-                              .format(b.length))
-                          -\/(badRequest(
-                            "File uploads are currently limited to 600KB"))
-
-                        case b =>
-                          \/-(b)
-                      }
+            findRequestWriteAuthorities(
+              request,
+              apiKey,
+              fullPath,
+              Some(timestamp.toInstant)) { authorities =>
+              request.content map { content =>
+                (for {
+                  jobId <- jobManager
+                    .createJob(
+                      apiKey,
+                      "ingest-" + path,
+                      "ingest",
+                      None,
+                      Some(timestamp))
+                    .map(_.id)
+                    .leftMap { errors =>
+                      logger.error(
+                        "File creation failed due to errors in job service: " +
+                          errors)
+                      serverError(errors)
                     }
-                    storeFile = StoreFile(apiKey,
-                                          fullPath,
-                                          Some(authorities),
-                                          jobId,
-                                          FileContent(bytes, contentType),
-                                          timestamp.toInstant,
-                                          StreamRef.forWriteMode(storeMode,
-                                                                 true))
-                    _ <- right(eventStore.save(storeFile, ingestTimeout))
-                  } yield {
-                    val resultsPath = (baseURI.path |+| Some("/data/fs/" +
-                      fullPath.path)).map(_.replaceAll("//", "/"))
-                    val locationHeader =
-                      Location(baseURI.copy(path = resultsPath))
-                    HttpResponse[JValue](Accepted,
-                                         headers =
-                                           HttpHeaders(List(locationHeader)))
-                  }).fold(e => e, x => x)
-                } getOrElse {
-                  Promise successful HttpResponse[JValue](
-                    HttpStatus(
-                      BadRequest,
-                      "Attempt to create a file without body content."))
-                }
+                  bytes <- EitherT {
+                    // FIXME: This should only read at most approximately the upload limit,
+                    // so we don't read GB of data into memory from users.
+                    ByteChunk.forceByteArray(content) map {
+                      // TODO: Raise/remove this limit
+                      case b if b.length > 614400 =>
+                        logger.error(
+                          "Rejecting excessive file upload of size %d"
+                            .format(b.length))
+                        -\/(badRequest(
+                          "File uploads are currently limited to 600KB"))
+
+                      case b =>
+                        \/-(b)
+                    }
+                  }
+                  storeFile = StoreFile(
+                    apiKey,
+                    fullPath,
+                    Some(authorities),
+                    jobId,
+                    FileContent(bytes, contentType),
+                    timestamp.toInstant,
+                    StreamRef.forWriteMode(storeMode, true))
+                  _ <- right(eventStore.save(storeFile, ingestTimeout))
+                } yield {
+                  val resultsPath = (baseURI.path |+| Some("/data/fs/" +
+                    fullPath.path)).map(_.replaceAll("//", "/"))
+                  val locationHeader =
+                    Location(baseURI.copy(path = resultsPath))
+                  HttpResponse[JValue](
+                    Accepted,
+                    headers = HttpHeaders(List(locationHeader)))
+                }).fold(e => e, x => x)
+              } getOrElse {
+                Promise successful HttpResponse[JValue](
+                  HttpStatus(
+                    BadRequest,
+                    "Attempt to create a file without body content."))
+              }
             }
           }
       } leftMap { errors =>

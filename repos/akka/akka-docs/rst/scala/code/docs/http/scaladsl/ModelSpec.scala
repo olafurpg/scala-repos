@@ -56,8 +56,9 @@ class ModelSpec extends AkkaSpec {
     HttpResponse(NotFound)
 
     // 404 response with a body explaining the error
-    HttpResponse(404,
-                 entity = "Unfortunately, the resource couldn't be found.")
+    HttpResponse(
+      404,
+      entity = "Unfortunately, the resource couldn't be found.")
 
     // A redirecting response containing an extra header
     val locationHeader = headers.Location("http://example.com/other")

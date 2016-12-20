@@ -91,9 +91,10 @@ case class CovPopulation(left: Expression, right: Expression)
 case class CovSample(left: Expression, right: Expression)
     extends Covariance(left, right) {
   override val evaluateExpression: Expression = {
-    If(n === Literal(0.0),
-       Literal.create(null, DoubleType),
-       If(n === Literal(1.0), Literal(Double.NaN), ck / (n - Literal(1.0))))
+    If(
+      n === Literal(0.0),
+      Literal.create(null, DoubleType),
+      If(n === Literal(1.0), Literal(Double.NaN), ck / (n - Literal(1.0))))
   }
   override def prettyName: String = "covar_samp"
 }

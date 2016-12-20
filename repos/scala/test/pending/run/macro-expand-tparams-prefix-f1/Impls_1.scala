@@ -7,12 +7,15 @@ object Impls {
     import c.universe._
     Block(
       List(
-        Apply(Select(Ident(definitions.PredefModule), TermName("println")),
-              List(Literal(Constant(T.toString)))),
-        Apply(Select(Ident(definitions.PredefModule), TermName("println")),
-              List(Literal(Constant(implicitly[c.WeakTypeTag[U]].toString)))),
-        Apply(Select(Ident(definitions.PredefModule), TermName("println")),
-              List(Literal(Constant(V.toString))))),
+        Apply(
+          Select(Ident(definitions.PredefModule), TermName("println")),
+          List(Literal(Constant(T.toString)))),
+        Apply(
+          Select(Ident(definitions.PredefModule), TermName("println")),
+          List(Literal(Constant(implicitly[c.WeakTypeTag[U]].toString)))),
+        Apply(
+          Select(Ident(definitions.PredefModule), TermName("println")),
+          List(Literal(Constant(V.toString))))),
       Literal(Constant(())))
   }
 }

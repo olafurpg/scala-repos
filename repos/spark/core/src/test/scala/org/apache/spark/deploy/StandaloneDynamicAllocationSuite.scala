@@ -459,8 +459,9 @@ class StandaloneDynamicAllocationSuite
     val myConf = appConf
       .set("spark.dynamicAllocation.enabled", "true")
       .set("spark.shuffle.service.enabled", "true")
-      .set("spark.dynamicAllocation.initialExecutors",
-           initialExecutorLimit.toString)
+      .set(
+        "spark.dynamicAllocation.initialExecutors",
+        initialExecutorLimit.toString)
     sc = new SparkContext(myConf)
     val appId = sc.applicationId
     eventually(timeout(10.seconds), interval(10.millis)) {
@@ -496,15 +497,16 @@ class StandaloneDynamicAllocationSuite
   private def makeWorkers(cores: Int, memory: Int): Seq[Worker] = {
     (0 until numWorkers).map { i =>
       val rpcEnv = workerRpcEnvs(i)
-      val worker = new Worker(rpcEnv,
-                              0,
-                              cores,
-                              memory,
-                              Array(masterRpcEnv.address),
-                              Worker.ENDPOINT_NAME,
-                              null,
-                              conf,
-                              securityManager)
+      val worker = new Worker(
+        rpcEnv,
+        0,
+        cores,
+        memory,
+        Array(masterRpcEnv.address),
+        Worker.ENDPOINT_NAME,
+        null,
+        conf,
+        securityManager)
       rpcEnv.setupEndpoint(Worker.ENDPOINT_NAME, worker)
       worker
     }

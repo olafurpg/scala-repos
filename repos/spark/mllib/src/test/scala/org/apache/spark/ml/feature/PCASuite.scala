@@ -68,8 +68,9 @@ class PCASuite
 
     pca.transform(df).select("pca_features", "expected").collect().foreach {
       case Row(x: Vector, y: Vector) =>
-        assert(x ~== y absTol 1e-5,
-               "Transformed vector is different with expected vector.")
+        assert(
+          x ~== y absTol 1e-5,
+          "Transformed vector is different with expected vector.")
     }
   }
 
@@ -81,11 +82,12 @@ class PCASuite
 
   test("PCAModel read/write") {
     val instance =
-      new PCAModel("myPCAModel",
-                   Matrices
-                     .dense(2, 2, Array(0.0, 1.0, 2.0, 3.0))
-                     .asInstanceOf[DenseMatrix],
-                   Vectors.dense(0.5, 0.5).asInstanceOf[DenseVector])
+      new PCAModel(
+        "myPCAModel",
+        Matrices
+          .dense(2, 2, Array(0.0, 1.0, 2.0, 3.0))
+          .asInstanceOf[DenseMatrix],
+        Vectors.dense(0.5, 0.5).asInstanceOf[DenseVector])
     val newInstance = testDefaultReadWrite(instance)
     assert(newInstance.pc === instance.pc)
   }

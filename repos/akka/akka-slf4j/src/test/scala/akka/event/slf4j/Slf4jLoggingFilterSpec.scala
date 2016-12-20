@@ -106,8 +106,9 @@ class Slf4jLoggingFilterSpec
       val probe = TestProbe()
       system.eventStream.publish(SetTarget(probe.ref))
       probe.expectMsg("OK")
-      val debugLevelProducer = system.actorOf(Props[WarningLevelProducer],
-                                              name = "warningLevelProducer")
+      val debugLevelProducer = system.actorOf(
+        Props[WarningLevelProducer],
+        name = "warningLevelProducer")
       debugLevelProducer ! "test2"
       probe.expectMsgType[Warning].message should be("test2")
       probe.expectNoMsg(500.millis)

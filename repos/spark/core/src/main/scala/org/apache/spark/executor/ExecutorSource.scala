@@ -49,18 +49,20 @@ private[spark] class ExecutorSource(threadPool: ThreadPoolExecutor,
   override val sourceName = "executor"
 
   // Gauge for executor thread pool's actively executing task counts
-  metricRegistry.register(MetricRegistry.name("threadpool", "activeTasks"),
-                          new Gauge[Int] {
-                            override def getValue: Int =
-                              threadPool.getActiveCount()
-                          })
+  metricRegistry.register(
+    MetricRegistry.name("threadpool", "activeTasks"),
+    new Gauge[Int] {
+      override def getValue: Int =
+        threadPool.getActiveCount()
+    })
 
   // Gauge for executor thread pool's approximate total number of tasks that have been completed
-  metricRegistry.register(MetricRegistry.name("threadpool", "completeTasks"),
-                          new Gauge[Long] {
-                            override def getValue: Long =
-                              threadPool.getCompletedTaskCount()
-                          })
+  metricRegistry.register(
+    MetricRegistry.name("threadpool", "completeTasks"),
+    new Gauge[Long] {
+      override def getValue: Long =
+        threadPool.getCompletedTaskCount()
+    })
 
   // Gauge for executor thread pool's current number of threads
   metricRegistry.register(
@@ -71,11 +73,12 @@ private[spark] class ExecutorSource(threadPool: ThreadPoolExecutor,
 
   // Gauge got executor thread pool's largest number of threads that have ever simultaneously
   // been in th pool
-  metricRegistry.register(MetricRegistry.name("threadpool", "maxPool_size"),
-                          new Gauge[Int] {
-                            override def getValue: Int =
-                              threadPool.getMaximumPoolSize()
-                          })
+  metricRegistry.register(
+    MetricRegistry.name("threadpool", "maxPool_size"),
+    new Gauge[Int] {
+      override def getValue: Int =
+        threadPool.getMaximumPoolSize()
+    })
 
   // Gauge for file system stats of this executor
   for (scheme <- Array("hdfs", "file")) {
